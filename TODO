@@ -1,0 +1,137 @@
+Move frame from disconnected a monitor
+
+Tracing every event for right state enums / defines / handlers:
+	Char
+	CharMods
+	CursorEnter
+	CursorPos
+	Drop
+	FramebufferSize
+	Key
+	MouseButton
+	Scroll
+	WindowClose
+	WindowFocus
+	WindowIconify
+	WindowPos
+	WindowRefresh
+	WindowSize
+	Monitor
+
+
+What is GLFW_USE_DWM_SWAP_INTERVAL?.... Test it off
+
+
+
+
+
+variant
+https://github.com/JasonL9000/cppcon14
+
+
+two phase lookup, what, why, how?
+
+-----
+CMake resource folder
+Move loadResource to Resource
+Texture
+Cube / Sky Textures http://sourceforge.net/projects/spacescape/
+Skeleton animation
+
+Render Target
+Shadow Pass
+Multi Pass
+
+VM3 Static mesh
+VM4 Animated mesh
+
+http://www.oldunreal.com/editing/s3tc/ARB_texture_compression.pdf
+http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
+OpenGL Reference page: https://www.opengl.org/sdk/docs/man/
+
+
+
+
+
+----
+Fresnel shader - Atmosphere
+Cook-Torrance shader - Metal
+Minnaert - More depth?
+OrenNayar - More avg lambert
+
+
+
+
+
+
+
+> RANDOM
+template<class URNG>
+int rnd(int n, URNG &engine) {
+    using dist_t = std::uniform_int_distribution<>;
+    using param_t = dist_t::param_type;
+
+    static dist_t dist;
+    param_t params{0,n-1};
+
+    return dist(engine, params);
+}
+
+
+
+
+diffuse(1.0f, 1.0f, 1.0f, 1.0f),
+specular(0.8f, 0.8f, 0.8f, 1.0f),
+emission(0.0f, 0.0f, 0.0f, 1.0f),
+ambient(0.1f, 0.1f, 0.1f, 1.0f),
+reflective(1.0f, 1.0f, 1.0f, 1.0f),
+shininess(32.0f) { }
+
+
+
+
+
+
+
+
+
+
+
+GLuint fullScreenQuadVBO;
+
+void cleanFullScreenQuad() {
+	glDeleteBuffers(1, &fullScreenQuadVBO);
+}
+
+void initFullScreenQuad() {
+	float vertexData[]{
+		0.0f, 0.0f, -1.0f, -1.0f,
+		1.0f, 0.0f, 1.0f, -1.0f,
+		0.0f, 1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f
+	};
+
+	glGenBuffers(1, &fullScreenQuadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, (sizeof (float)) * 16, vertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void vglPassFullScreenQuad() {
+	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
+	glEnableVertexAttribArray(ATTRIBUTE_POSITION);
+	glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD0);
+
+	glVertexAttribPointer(ATTRIBUTE_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof (float) * 4, ((void*) (sizeof (float) * 2)));
+	glVertexAttribPointer(ATTRIBUTE_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof (float) * 4, ((void*) (sizeof (float) * 0)));
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+	glDisableVertexAttribArray(ATTRIBUTE_TEXCOORD0);
+	glDisableVertexAttribArray(ATTRIBUTE_POSITION);
+	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void vglViewportFullScreen() {
+	glViewport(0, 0, options.graphics.resolution.get().x
+			, options.graphics.resolution.get().y);
+} 

@@ -1,0 +1,13 @@
+/*
+/*/
+
+!include/
+!src/
+!Data/
+!ext/
+!test/
+
+!.gitignore
+!TODO
+!CMakeLists.txt
+!README.md
