@@ -13,38 +13,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void ProtectedContainer::buildComponents() {
-	for (auto& component : components) {
-		component->build();
-	}
-}
-
-void ProtectedContainer::destroyComponents() {
-	for (auto& component : components) {
-		component->destroy();
-	}
-}
-
-void ProtectedContainer::invalidateComponents() {
-	for (auto& component : components) {
-		component->invalidate();
-	}
-}
-
-void ProtectedContainer::renderComponents() {
-	for (auto& component : components) {
-		component->render();
-	}
-}
-
-void ProtectedContainer::updateComponents() {
-	for (auto& component : components) {
-		component->update();
-	}
-}
-
-// -------------------------------------------------------------------------------------------------
-
 void ProtectedContainer::add(ComponentPtr component) {
 	assert(!component->getParent());
 
@@ -96,28 +64,77 @@ ProtectedContainer::reverse_iterator ProtectedContainer::rend() {
 
 // -------------------------------------------------------------------------------------------------
 
-void ProtectedContainer::build() {
-	buildComponents();
+void ProtectedContainer::buildComponents(Renderer& renderer) {
+	for (auto& component : components) {
+		component->build(renderer);
+	}
+}
+
+void ProtectedContainer::destroyComponents(Renderer& renderer) {
+	for (auto& component : components) {
+		component->destroy(renderer);
+	}
+}
+
+void ProtectedContainer::invalidateComponents() {
+	for (auto& component : components) {
+		component->invalidate();
+	}
+}
+
+void ProtectedContainer::renderComponents(Renderer& renderer) {
+	for (auto& component : components) {
+		component->render(renderer);
+	}
+}
+
+void ProtectedContainer::updateComponents() {
+	for (auto& component : components) {
+		component->update();
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+//	ivec3 size = v->getDisplaySize();
+//	ivec3 pos = v->getDisplayPosition();
+//
+//	glPushMatrix();
+//	glMatrixMode(GL_MODELVIEW);
+//	glViewport(pos.x, pos.y, size.x, size.y);
+//	gluOrtho2D(0, size.x, 0, size.y);
+//
+//	glBegin(GL_TRIANGLE_STRIP);
+//	glColor4f(v->id, 0, v->blue, 1);
+//	glVertex3f(0, 0, 0);
+//	glVertex3f(size.x, 0, 0);
+//	glVertex3f(0, size.y, 0);
+//	glVertex3f(size.x, size.y, 0);
+//	glEnd();
+//	glPopMatrix();
+
+void ProtectedContainer::build(Renderer& renderer) {
+	buildComponents(renderer);
 	if (layoutManager != nullptr) {
 //		layoutManager->layoutContainer(this);
 		layoutManager->layout(begin(), end(), this);
 	} //TODO P4: else default layout mrg
 }
 
-void ProtectedContainer::destroy() {
-	destroyComponents();
+void ProtectedContainer::destroy(Renderer& renderer) {
+	destroyComponents(renderer);
 }
 
 void ProtectedContainer::invalidate() {
 	invalidateComponents();
 }
 
-void ProtectedContainer::update() {
-	updateComponents();
+void ProtectedContainer::render(Renderer& renderer) {
+	renderComponents(renderer);
 }
 
-void ProtectedContainer::render() {
-	renderComponents();
+void ProtectedContainer::update() {
+	updateComponents();
 }
 
 // -------------------------------------------------------------------------------------------------

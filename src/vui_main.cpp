@@ -19,9 +19,9 @@ using namespace vl::ui;
 class TestFrame : public Frame {
 	Panel pn;
 	Label lbl;
-	
+
 	void init() {
-		lbl.setText("Hello UI!"); 
+		lbl.setText("Hello UI!");
 		setContent(pn);
 		pn.add(lbl);
 	}
@@ -39,7 +39,7 @@ public:
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glViewport(0, 0, getSize().x, getSize().y);
 		gl::pushVMat();
-		getContent()->render();
+		getContent()->render(renderer);
 		gl::popVMat();
 
 		//std::cout << " build: "   << std::chrono::duration_cast<std::chrono::nanoseconds>(lastBuildDuration).count() / 1000000.0;
@@ -56,7 +56,7 @@ int main(int, char**) {
 	vl::log().output(std::cout);
 	TestFrame f1("TestFrame");
 	f1.onChar([](const EventChar & e) {
-		std::cout << e.asUTF8() << std::endl;
+		std::cout << e.utf8 << std::endl;
 	});
 	f1.join();
 	return 0;

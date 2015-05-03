@@ -21,6 +21,7 @@
 #include "vl/ui/component/component.hpp"
 #include "vl/ui/events/events.hpp"
 #include "vl/ui/monitor.hpp"
+#include "vl/ui/render/renderer.hpp"
 
 class GLFWwindow;
 class GLFWmonitor;
@@ -257,6 +258,8 @@ private:
 
 private:
 	ComponentPtr content;
+protected: // or getter?
+	Renderer renderer;
 
 private:
 	std::chrono::nanoseconds lastBuildDuration;
@@ -288,11 +291,12 @@ public:
 protected:
 	virtual void build();
 	virtual void destroy();
+//	virtual void invalidate();
 	virtual void render();
 	virtual void update();
 
 public:
-	void invalidate();
+	virtual void invalidate();
 
 public:
 	void setOpenGLProfile(TypeOpenGLProfile profile);

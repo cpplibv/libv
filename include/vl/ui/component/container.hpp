@@ -29,13 +29,6 @@ private:
 	std::shared_ptr<LayoutManager> layoutManager;
 
 protected:
-	void buildComponents();
-	void destroyComponents();
-	void invalidateComponents();
-	void updateComponents();
-	void renderComponents();
-
-protected:
 	void add(ComponentPtr ptr);
 	//	void remove(ComponentPtr);
 
@@ -50,12 +43,19 @@ protected:
 	reverse_iterator rbegin();
 	reverse_iterator rend();
 
+protected:
+	void buildComponents(Renderer& renderer);
+	void destroyComponents(Renderer& renderer);
+	void invalidateComponents();
+	void renderComponents(Renderer& renderer);
+	void updateComponents();
+	
 public:
-	virtual void build() override;
-	virtual void destroy() override;
+	virtual void build(Renderer& renderer) override;
+	virtual void destroy(Renderer& renderer) override;
 	virtual void invalidate() override;
+	virtual void render(Renderer& renderer) override;
 	virtual void update() override;
-	virtual void render() override;
 
 public:
 	ProtectedContainer() = default;

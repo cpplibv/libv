@@ -6,6 +6,7 @@
 #include <vl/string.hpp>
 #include <vl/vec.hpp>
 // std
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -16,22 +17,26 @@ class Monitor;
 class Frame;
 
 struct EventChar {
-	unsigned int codepoint;
-	std::string asUTF8() const {
-		return unicode_to_utf8(codepoint);
+	unsigned int unicode;
+	char utf8[5];
+	EventChar(unsigned int unicode) : unicode(unicode) {
+		vl::unicode_to_utf8(utf8, unicode);
 	}
-	EventChar(unsigned int codepoint) : codepoint(codepoint) { }
-	EventChar(const EventChar& orig) : codepoint(orig.codepoint) { }
+	EventChar(const EventChar& orig) : unicode(orig.unicode) {
+		std::memcpy(utf8, orig.utf8, 5);
+	}
 };
 
 struct EventCharMods {
-	unsigned int codepoint;
+	unsigned int unicode;
 	int mods;
-	std::string asUTF8() const {
-		return unicode_to_utf8(codepoint);
+	char utf8[5];
+	EventCharMods(unsigned int unicode, int mods) : unicode(unicode), mods(mods) {
+		vl::unicode_to_utf8(utf8, unicode);
 	}
-	EventCharMods(unsigned int codepoint, int mods) : codepoint(codepoint), mods(mods) { }
-	EventCharMods(const EventCharMods& orig) : codepoint(orig.codepoint), mods(orig.mods) { }
+	EventCharMods(const EventCharMods& orig) : unicode(orig.unicode), mods(orig.mods) {
+		std::memcpy(utf8, orig.utf8, 5);
+	}
 };
 
 struct EventCursorEnter {

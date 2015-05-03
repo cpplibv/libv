@@ -36,20 +36,6 @@ namespace vl {
 		void pushVMat();
 		void pushPMat();
 
-		////FrameBuffer
-		//extern GLuint depthFrameBuffer;
-		//extern GLuint depthTexture;
-		//
-		////Shader
-		//extern GLuint simpleShader;
-		//extern GLuint lightShader;
-		//extern GLuint light2Shader;
-		//extern GLuint shaderDepthCast;
-		//
-		////Light
-		//class Light;
-		//extern vector<Light*> glLight;
-
 		//Debug
 		void renderCube(float x = 0, float y = 0, float z = 0, float size = 0.5f);
 		void renderXYZ(float x = 0, float y = 0, float z = 0, float size = 2);

@@ -203,6 +203,7 @@ bool Frame::isUpdateSkipable() {
 
 void Frame::build() {
 	glViewport(0, 0, size.x, size.y);
+//	content->build(renderer);
 }
 
 void Frame::destroy() { }
@@ -210,7 +211,7 @@ void Frame::destroy() { }
 void Frame::render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, size.x, size.y);
-	content->render();
+	content->render(renderer);
 }
 
 void Frame::update() {

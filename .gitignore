@@ -2,9 +2,9 @@
 /*/
 
 !include/
+!cmake/
 !src/
 !Data/
-!ext/
 !test/
 
 !.gitignore

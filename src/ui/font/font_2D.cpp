@@ -50,7 +50,7 @@ void Font2D::makeChars(FT_Face face) {
 	FT_Glyph glyphs[256];
 	int charWidth(0), charHeight(0);
 
-	for (unsigned int ch = 0; ch < 256; ch++) { //Get bitmaps
+	for (int ch = 0; ch < 256; ch++) { //Get bitmaps
 		FT_Glyph& glyph = glyphs[ch];
 		int charpos = FT_Get_Char_Index(face, ch);
 		//	if (charpos)std::cout << "FT_Get_Char_Index failed: " << ch << std::endl; //This fail is acceptable

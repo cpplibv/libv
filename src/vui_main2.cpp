@@ -37,7 +37,7 @@ int main(int, char**) {
 	f1.show();
 
 	f1.onChar([](const EventChar& e) {
-		std::cout << e.codepoint << std::endl;
+		std::cout << e.unicode << std::endl;
 	});
 	
 	std::this_thread::sleep_for(1000ms);

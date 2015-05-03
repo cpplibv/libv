@@ -14,17 +14,17 @@ namespace ui {
 //	return false;
 //}
 
-void Component::build() { }
+void Component::build(Renderer& renderer) { }
 
-void Component::destroy() { }
+void Component::destroy(Renderer& renderer) { }
 
 void Component::invalidate() {
 	invalid = true;
 }
 
-void Component::update() { }
+void Component::render(Renderer& renderer) { }
 
-void Component::render() { }
+void Component::update() { }
 
 void Component::setDisplayPosition(const ivec3& pos) {
 	this->pos = pos;

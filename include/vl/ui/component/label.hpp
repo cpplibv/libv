@@ -16,9 +16,9 @@ private:
 public:
 	void setText(const std::string& text);
 public:
-	virtual void build() override;
-	virtual void destroy() override;
-	virtual void render() override;
+	virtual void build(Renderer& renderer) override;
+	virtual void destroy(Renderer& renderer) override;
+	virtual void render(Renderer& renderer) override;
 };
 
 } //namespace ui

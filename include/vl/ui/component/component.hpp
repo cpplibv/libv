@@ -9,6 +9,7 @@
 #include <string>
 // pro
 #include "vl/ui/layout/properties.hpp"
+#include "vl/ui/render/renderer.hpp"
 
 namespace vl {
 namespace ui {
@@ -50,10 +51,10 @@ public:
 		return properties.get(address);
 	}
 
-	virtual void build();
-	virtual void destroy();
+	virtual void build(Renderer& renderer);
+	virtual void destroy(Renderer& renderer);
 	virtual void invalidate();
-	virtual void render();
+	virtual void render(Renderer& renderer);
 	virtual void update();
 
 	Component();

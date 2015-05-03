@@ -19,14 +19,14 @@ namespace detail {
 //Template magic for snprintf and std::string
 
 template <typename T> struct CType {
-	using Type = T;
+	using type = T;
 };
 
 template <> struct CType<const std::string&> {
-	using Type = const char*;
+	using type = const char*;
 };
 
-template<typename T> inline typename CType<const T&>::Type toCType(const T& var) {
+template<typename T> inline typename CType<const T&>::type toCType(const T& var) {
 	return var;
 }
 
@@ -48,46 +48,50 @@ std::string format(const std::string& pattern, const Args&... args) {
 // -------------------------------------------------------------------------------------------------
 
 // trim from start
-static inline std::string &ltrim(std::string &s) {
+inline std::string &ltrim(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
 
 // trim from end
-static inline std::string &rtrim(std::string &s) {
+inline std::string &rtrim(std::string &s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
 
 // trim from both ends
-static inline std::string &trim(std::string &s) {
+inline std::string &trim(std::string &s) {
 	return ltrim(rtrim(s));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename = void> std::string unicode_to_utf8(unsigned int codepoint) {
-	std::string out;
-	if (codepoint <= 0x7f) {
-		out.resize(1);
-		out[0] = static_cast<char> (codepoint);
-	} else if (codepoint <= 0x7ff) {
-		out.resize(2);
-		out[0] = static_cast<char> (0xc0 | ((codepoint >> 6) & 0x1f));
-		out[1] = static_cast<char> (0x80 | (codepoint & 0x3f));
-	} else if (codepoint <= 0xffff) {
-		out.resize(3);
-		out[0] = static_cast<char> (0xe0 | ((codepoint >> 12) & 0x0f));
-		out[1] = static_cast<char> (0x80 | ((codepoint >> 6) & 0x3f));
-		out[2] = static_cast<char> (0x80 | (codepoint & 0x3f));
+template <typename = void> void unicode_to_utf8(char* out, unsigned int unicode) {
+	if (unicode <= 0x7f) {
+		out[0] = static_cast<char> (unicode);
+		out[1] = '\0';
+	} else if (unicode <= 0x7ff) {
+		out[0] = static_cast<char> (0xc0 | ((unicode >> 6) & 0x1f));
+		out[1] = static_cast<char> (0x80 | (unicode & 0x3f));
+		out[2] = '\0';
+	} else if (unicode <= 0xffff) {
+		out[0] = static_cast<char> (0xe0 | ((unicode >> 12) & 0x0f));
+		out[1] = static_cast<char> (0x80 | ((unicode >> 6) & 0x3f));
+		out[2] = static_cast<char> (0x80 | (unicode & 0x3f));
+		out[3] = '\0';
 	} else {
-		out.resize(4);
-		out[0] = static_cast<char> (0xf0 | ((codepoint >> 18) & 0x07));
-		out[1] = static_cast<char> (0x80 | ((codepoint >> 12) & 0x3f));
-		out[2] = static_cast<char> (0x80 | ((codepoint >> 6) & 0x3f));
-		out[3] = static_cast<char> (0x80 | (codepoint & 0x3f));
+		out[0] = static_cast<char> (0xf0 | ((unicode >> 18) & 0x07));
+		out[1] = static_cast<char> (0x80 | ((unicode >> 12) & 0x3f));
+		out[2] = static_cast<char> (0x80 | ((unicode >> 6) & 0x3f));
+		out[3] = static_cast<char> (0x80 | (unicode & 0x3f));
+		out[4] = '\0';
 	}
-	return out;
+}
+
+template <typename = void> std::string unicode_to_utf8(unsigned int unicode) {
+	char buf[5];
+	unicode_to_utf8(buf, unicode);
+	return std::string(buf);
 }
 
 } //namespace vl

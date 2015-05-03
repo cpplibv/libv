@@ -20,17 +20,17 @@ void Label::setText(const std::string& text) {
 	invalidate();
 }
 
-void Label::build() {
+void Label::build(Renderer& renderer) {
 	VLOG_TRACE(vl::ui::log(), "Build Label");
 	deafultFont.load("Data/Font/cour.ttf", 12);
 }
 
-void Label::destroy() {
+void Label::destroy(Renderer& renderer) {
 	VLOG_TRACE(vl::ui::log(), "Destroy Label");
 	deafultFont.clean();
 }
 
-void Label::render() {
+void Label::render(Renderer& renderer) {
 	//VLOG_TRACE(vl::ui::log(), "Render Label");
 
 	glBegin(GL_QUADS);
