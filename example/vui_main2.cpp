@@ -29,10 +29,8 @@ using namespace vl::ui;
 int main(int, char**) {
 	vl::log().output(std::cout);
 	
-	std::cout << "привет" << std::endl;
-
 	Frame f1("1");
-	f1.setContent(std::make_shared<Quad>());
+	f1.setContent(new Quad());
 	f1.setPosition(400, 300);
 	f1.show();
 

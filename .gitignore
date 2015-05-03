@@ -1,10 +1,11 @@
 /*
 /*/
 
-!include/
-!cmake/
-!src/
 !Data/
+!cmake/
+!example/
+!include/
+!src/
 !test/
 
 !.gitignore
