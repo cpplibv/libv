@@ -111,12 +111,12 @@ void CommandImport::execute() {
 	vl::vm3::Model model;
 	vl::vm3::Importer::import(model, filePath.value());
 	{
-		std::ofstream ofs(vl::removeExtension(filePath.value()) + ".vm3.xml");
+		std::ofstream ofs(vl::file_path::removeExtension(filePath.value()) + ".vm3.xml");
 		boost::archive::xml_oarchive oar(ofs);
 		oar << VL_NVP(model);
 	}
 	{
-		std::ofstream ofs(vl::removeExtension(filePath.value()) + ".vm3", std::ios_base::binary);
+		std::ofstream ofs(vl::file_path::removeExtension(filePath.value()) + ".vm3", std::ios_base::binary);
 		eos::portable_oarchive oar(ofs);
 		oar << VL_NVP(model);
 	}

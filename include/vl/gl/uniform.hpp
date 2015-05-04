@@ -123,7 +123,9 @@ struct UniformLight {
 } //namespace gl
 
 // GLSL --------------------------------------------------------------------
+
 namespace glsl {
+
 extern gl::Uniform<bool> debugB0;
 extern gl::Uniform<bool> debugB1;
 extern gl::Uniform<int> debugI0;
@@ -159,5 +161,6 @@ extern gl::Uniform<glm::vec4> clip;
 extern gl::Uniform<bool> opt;
 extern gl::Uniform<int> numActiveLight;
 extern gl::UniformLight light[8];
+
 } //namespace glsl
 } //namespace vl

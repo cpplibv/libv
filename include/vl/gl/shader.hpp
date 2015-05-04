@@ -88,6 +88,7 @@ public:
 public:
 	void printActiveUniforms();
 };
+
 } //namespace gl
 } //namespace vl
 

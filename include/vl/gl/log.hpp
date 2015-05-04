@@ -8,14 +8,16 @@
 #define checkGL() ::vl::gl::detail::logOGLError(__FUNCTION__, __VFILENAME__, __LINE__);
 
 namespace vl {
-	namespace gl {
-		inline Log& log() {
-			static Log log("gl", vl::log());
-			return log;
-		}
+namespace gl {
 
-		namespace detail {
-			void logOGLError(const char* func, const char* file, int line);
-		} //namespace detail
-	} //namespace gl
+inline Log& log() {
+	static Log log("gl", vl::log());
+	return log;
+}
+
+namespace detail {
+void logOGLError(const char* func, const char* file, int line);
+} //namespace detail
+
+} //namespace gl
 } //namespace vl

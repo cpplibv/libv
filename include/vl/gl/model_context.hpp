@@ -13,5 +13,6 @@ struct ModelContext {
 
 	ModelContext(vl::Context& gl, vl::Context& io) : gl(gl), io(io) { }
 };
+
 } //namespace gl
 } //namespace vl
