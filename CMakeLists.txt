@@ -23,7 +23,10 @@ add_definitions(-Ofast)
 
 add_definitions(-m64)
 add_definitions(-std=c++14)
-add_definitions(-Wall -Wextra -Wno-comment -Wno-unused-local-typedefs)
+add_definitions(-Wall -Wextra -Wno-comment)
+
+add_definitions(-Wno-unused-local-typedefs) #Boost...
+add_definitions(-Wno-strict-aliasing) #Until i dont fix gli and glm
 
 #Macro
 add_definitions(-DGLEW_STATIC)
@@ -184,7 +187,7 @@ string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 set(ext_boost_bootstrap_command)
 if(NOT WIN32)
 	set(ext_boost_bootstrap_command ./bootstrap.sh)
-	set(ext_boost_b2_command ./b2)
+	set(ext_boost_b2_command ./b2 --ignore-site-config)
 else()
 	set(ext_boost_bootstrap_command cmd.exe //c bootstrap.bat ${TOOLSET})
 	set(ext_boost_b2_command cmd.exe //c b2.exe)
