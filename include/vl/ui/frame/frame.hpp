@@ -5,11 +5,11 @@
 // conf
 #include "vl/ui/config.hpp"
 // vl
-#include <vl/sig/signal.hpp>
 #include <vl/context.hpp>
+#include <vl/sig/signal.hpp>
+#include <vl/timer.hpp>
 // std
 #include <atomic>
-#include <chrono>
 #include <condition_variable>
 #include <map>
 #include <memory>
@@ -215,7 +215,7 @@ public:
 	 * This event occures even if the default close operation does not close the frame.
 	 * If the returned value is False the closing operation will be interrupted.
 	 * @return False: interrupt close; True: proceed */
-	Signal<bool(Frame*)> onClose;
+	Signal<bool(Frame*) > onClose;
 	/** Event invoked if the frame is closed by frame's thread.
 	 * Can't be used for interrupting close.
 	 * Event occures when the window is ALREADY CLOSED, 
@@ -262,15 +262,16 @@ protected: // or getter?
 	Renderer renderer;
 
 private:
-	std::chrono::nanoseconds lastBuildDuration;
-	std::chrono::nanoseconds lastDestroyDuration;
-	std::chrono::nanoseconds lastLoopDuration;
-	std::chrono::nanoseconds lastRenderDuration;
-	std::chrono::nanoseconds lastSwapDuration;
-	std::chrono::nanoseconds lastUpdateDuration;
-		
-	std::chrono::steady_clock::time_point lastLoopStartTime;
-	
+	Timer timerBuild;
+	Timer timerDestroy;
+	Timer timerEvent;
+	Timer timerLoop;
+	Timer timerOffLoop;
+	Timer timerPoll;
+	Timer timerRender;
+	Timer timerSwap;
+	Timer timerUpdate;
+
 	// ---------------------------------------------------------------------------------------------
 private:
 	void hideImpl();
@@ -287,11 +288,11 @@ public:
 	void restoreAsync();
 	void show();
 	void showAsync();
-	
+
 protected:
 	virtual void build();
 	virtual void destroy();
-//	virtual void invalidate();
+	//	virtual void invalidate();
 	virtual void render();
 	virtual void update();
 
@@ -320,7 +321,7 @@ public:
 	ivec2 getSize() const;
 	std::string getTitle() const;
 	//	unsigned int getWidth() const;
-	//	 * * *
+	// * * *
 
 	bool isDecorated()const;
 	bool isVisible() const;

@@ -28,30 +28,31 @@ using namespace vl::ui;
 
 int main(int, char**) {
 	vl::log().output(std::cout);
-	
+
 	Frame f1("1");
-	f1.setContent(new Quad());
+	//	f1.setContent(new Quad());
 	f1.setPosition(400, 300);
 	f1.show();
 
-	f1.onChar([](const EventChar& e) {
+	f1.onChar([](const EventChar & e) {
 		std::cout << e.unicode << std::endl;
 	});
-	
-	std::this_thread::sleep_for(1000ms);
+
+	std::this_thread::sleep_for(500ms);
 	f1.minimalize();
-	std::this_thread::sleep_for(1000ms);
+	std::this_thread::sleep_for(500ms);
 	f1.restore();
-	std::this_thread::sleep_for(1000ms);
+	std::this_thread::sleep_for(500ms);
 	f1.setDecoration(false);
-	std::this_thread::sleep_for(1000ms);
+	std::this_thread::sleep_for(500ms);
 	f1.setDecoration(true);
-	std::this_thread::sleep_for(1000ms);
+	std::this_thread::sleep_for(500ms);
 	f1.hide();
-	std::this_thread::sleep_for(1000ms);
+	std::this_thread::sleep_for(500ms);
 	f1.show();
 
 	Frame::joinAll();
+
 	return 0;
 }
 

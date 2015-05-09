@@ -7,44 +7,44 @@
 
 namespace vl {
 
-	struct TrackableBase {
-		virtual void connect(TrackableBase* ptr, bool reflect) = 0;
-		virtual void disconnect(TrackableBase* ptr, bool reflect) = 0;
-		virtual ~TrackableBase() { }
-	};
+struct TrackableBase {
+	virtual void connect(TrackableBase* ptr, bool reflect) = 0;
+	virtual void disconnect(TrackableBase* ptr, bool reflect) = 0;
+	virtual ~TrackableBase() { }
+};
 
-	template <typename ThreadPolicy = SingleThread>
-	class Trackable : public TrackableBase {
-	private:
-		std::map<TrackableBase*, int> connections;
-		ThreadPolicy threadPolicy;
-	private:
-		inline void connect(TrackableBase* ptr, bool reflect = true) {
-			std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
-			++connections[ptr];
+template <typename ThreadPolicy = SingleThread>
+class Trackable : public TrackableBase {
+private:
+	std::map<TrackableBase*, int> connections;
+	ThreadPolicy threadPolicy;
+private:
+	inline void connect(TrackableBase* ptr, bool reflect = true) {
+		std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
+		++connections[ptr];
 
-			if (reflect)
-				ptr->connect(this, false);
-		}
-		inline void disconnect(TrackableBase* ptr, bool reflect = true) {
-			std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
-			if (!--connections[ptr])
-				connections.erase(ptr);
+		if (reflect)
+			ptr->connect(this, false);
+	}
+	inline void disconnect(TrackableBase* ptr, bool reflect = true) {
+		std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
+		if (!--connections[ptr])
+			connections.erase(ptr);
 
-			if (reflect)
-				ptr->disconnect(this, false);
-		}
-	protected:
-		inline void disconnectAll() {
-			std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
-			while (!connections.empty())
-				this->disconnect(connections.begin()->first);
-		}
-		virtual ~Trackable() {
-			disconnectAll();
-		}
-	};
-	
+		if (reflect)
+			ptr->disconnect(this, false);
+	}
+protected:
+	inline void disconnectAll() {
+		std::lock_guard<ThreadPolicy> thread_guard(threadPolicy);
+		while (!connections.empty())
+			this->disconnect(connections.begin()->first);
+	}
+	virtual ~Trackable() {
+		disconnectAll();
+	}
+};
+
 } //namespace vl
 
 //namespace vl {

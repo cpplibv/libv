@@ -42,41 +42,47 @@ RenderPrimitiv Renderer::triangle(
 // -------------------------------------------------------------------------------------------------
 
 void Renderer::clear() {
+	data.clear();
 }
 
 void Renderer::pop() {
+	mxStack.pop();
 }
 
-void Renderer::push(const glm::mat4&) {
+glm::mat4& Renderer::top() {
+	return mxStack.top();
 }
 
-void Renderer::upload() {
+void Renderer::push(const glm::mat4& m) {
+	mxStack.push(mxStack.top() * m);
 }
+
+void Renderer::push() {
+	mxStack.push(mxStack.top());
+}
+
+void Renderer::upload() { }
 
 // -------------------------------------------------------------------------------------------------
 
-Vertex::Vertex() {
-}
+Vertex::Vertex() { }
 
 Vertex::Vertex(const vec3& position, const vec3& normal, const vec3& tangent,
 		const vec3& bitangent, const vec2& texCoord0) :
-position(position),
-normal(normal),
-tangent(tangent),
-bitangent(bitangent),
-texCoord0(texCoord0) {
-}
+	position(position),
+	normal(normal),
+	tangent(tangent),
+	bitangent(bitangent),
+	texCoord0(texCoord0) { }
 
 
 // -------------------------------------------------------------------------------------------------
 
 RenderPrimitiv::RenderPrimitiv() :
-first(0), count(0) {
-}
+	first(0), count(0) { }
 
 RenderPrimitiv::RenderPrimitiv(unsigned int first, unsigned int count) :
-first(first), count(count) {
-}
+	first(first), count(count) { }
 
 void RenderPrimitiv::render() {
 	glDrawArrays(GL_TRIANGLES, first, count);

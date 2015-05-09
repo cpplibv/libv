@@ -14,11 +14,13 @@
 namespace vl {
 namespace ui {
 
+class Frame;
 class ProtectedContainer;
 
 class Component {
 private:
 	ProtectedContainer* parent = nullptr;
+	Frame* frame = nullptr;
 	ivec3 pos;
 	ivec3 size;
 	std::string name;
@@ -30,6 +32,7 @@ public:
 	//	bool isActive() const;
 	//	bool isFocused() const;
 
+	Frame* getFrame() const;
 	ProtectedContainer* getParent() const;
 	ivec3 getDisplayPosition() const;
 	ivec3 getDisplaySize() const;

@@ -25,7 +25,9 @@ public:
 	void wait() {
 		std::unique_lock<std::mutex> lock(mutex);
 		if (!passed.load())
-			cv.wait(lock);
+			cv.wait(lock, [this]{
+				return passed.load();
+			});
 	}
 	
 	Semaphore(bool passed = false) : passed(passed) { }

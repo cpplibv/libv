@@ -11,6 +11,7 @@ namespace ui {
 
 class Label : public Component {
 private:
+	//Font2D deafultFont;
 	std::string text;
 	//Font2D font;
 public:

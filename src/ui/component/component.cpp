@@ -2,6 +2,8 @@
 
 // hpp
 #include "vl/ui/component/component.hpp"
+// pro
+#include "vl/ui/frame/frame.hpp"
 
 namespace vl {
 namespace ui {
@@ -48,6 +50,10 @@ ivec3 Component::getDisplayPosition() const {
 
 ivec3 Component::getDisplaySize() const {
 	return size;
+}
+
+Frame* Component::getFrame() const {
+	return frame;
 }
 
 ProtectedContainer* Component::getParent() const {

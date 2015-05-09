@@ -9,23 +9,35 @@ int main(int, char**) {
 	vl::log().output(std::cout);
 	VLOG_TRACE(vl::log(), "trace");
 
-	for (int i = 0; i < 100000; i++) {
+	for (int i = 0; i < 50000; i++) {
 		vl::Context context;
 		VLOG_TRACE(vl::log(), "trace %d", i);
 	}
-	for (int i = 0; i < 100000; i++) {
+	for (int i = 0; i < 500000; i++) {
 		vl::Context context;
+		context.executeAsync([&] {
+			context.executeAsync([&] {
+				std::cerr << '-';
+				context.executeSync([&] {
+					std::cerr << 0;
+				});
+			});
+			std::cerr << 1;
+		});
+		std::cerr << 2;
+		context.executeSync([i] {
+			std::cerr << 3;
+		});
+	}
+
+	VLOG_TRACE(vl::log(), "trace");
+}
+
+
+
 //		context.onInit([i]() {
 //			VLOG_TRACE(vl::log(), "trace %d", i);
 //		});
 //		context.onTerm([]() {
 //			VLOG_TRACE(vl::log(), "trace");
 //		});
-		context.executeSync([i] {
-			VLOG_TRACE(vl::log(), "trace %d", i);
-		});
-		VLOG_TRACE(vl::log(), "trace %d", i);
-	}
-
-	VLOG_TRACE(vl::log(), "trace");
-}

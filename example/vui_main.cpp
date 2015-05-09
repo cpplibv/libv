@@ -15,7 +15,6 @@
 
 using namespace vl;
 using namespace vl::ui;
-
 class TestFrame : public Frame {
 	Panel pn;
 	Label lbl;
@@ -27,6 +26,7 @@ class TestFrame : public Frame {
 	}
 
 public:
+
 	TestFrame(const std::string& title) :
 		Frame(title) {
 		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize() / 2);

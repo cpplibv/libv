@@ -12,8 +12,8 @@ message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 #IF DEBUG TODO
 add_definitions(-Ofast)
 #add_definitions(-O2)
-#add_definitions(-O0)
 #EF DEBUG TODO
+#add_definitions(-O0)
 #add_definitions(-ggdb)
 #FI DEBUG TODO
 

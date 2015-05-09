@@ -5,10 +5,13 @@
 // ext
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 // vl
-#include "vl/gl/vgl.hpp"
+#include <vl/semaphore.hpp>
+#include <vl/gl/vgl.hpp>
 // pro
 #include "vl/ui/log.hpp"
+#include "vl/timer.hpp"
 
 namespace vl {
 namespace ui {
@@ -202,24 +205,50 @@ bool Frame::isUpdateSkipable() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::build() {
+	timerBuild.reset();
 	glViewport(0, 0, size.x, size.y);
-//	content->build(renderer);
+	if (content) {
+		content->build(renderer);
+		invalidated = false;
+	}
+	timerBuild.time();
 }
 
-void Frame::destroy() { }
-
-void Frame::render() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, size.x, size.y);
-	content->render(renderer);
-}
-
-void Frame::update() {
-	content->update();
+void Frame::destroy() {
+	timerDestroy.reset();
+	timerDestroy.time();
 }
 
 void Frame::invalidate() {
 	invalidated = true;
+	if (content)
+		content->invalidate();
+}
+
+void Frame::render() {
+	if (!isRenderSkipable() && content && window) {
+		if (invalidated)
+			build();
+
+		timerRender.reset();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, size.x, size.y);
+		renderer.push(glm::ortho(0, 0, size.x, size.y, -1000, 1000));
+		content->render(renderer);
+		timerRender.time();
+
+		timerSwap.reset();
+		glfwSwapBuffers(window);
+		timerSwap.time();
+	}
+}
+
+void Frame::update() {
+	timerUpdate.reset();
+	if (!isUpdateSkipable() && content) {
+		content->update();
+	}
+	timerUpdate.time();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -532,8 +561,8 @@ void Frame::cmdCoreDestroy() {
 
 	if (window) {
 		deactivateFrame(this);
-		glfwDestroyWindow(window);
 		unregisterEventCallbacks(window);
+		glfwDestroyWindow(window);
 		window = nullptr;
 	}
 }
@@ -729,41 +758,31 @@ const Monitor* Frame::getCurrentMonitor() const {
 // Frame Loop ----------------------------------------------------------
 
 void Frame::init() {
-	auto buildStartTime = std::chrono::steady_clock::now();
-	build();
-	lastBuildDuration = std::chrono::steady_clock::now() - buildStartTime;
 	context.executeAsync(std::bind(&Frame::loop, this));
 }
 
 void Frame::loop() {
-	lastLoopDuration = std::chrono::steady_clock::now() - lastLoopStartTime;
-	lastLoopStartTime = std::chrono::steady_clock::now();
+	timerOffLoop.time();
+	timerLoop.reset();
+
+	timerPoll.reset();
 	coreContext->executeSync(glfwPollEvents);
+	timerPoll.time();
+	timerEvent.reset();
 	distributeEvents();
+	timerEvent.time();
 
 	if (isFrameShouldClose()) {
 		term();
 		return;
 	}
-	if (!isUpdateSkipable() && content) {
-		auto updateStartTime = std::chrono::steady_clock::now();
-		update();
-		lastUpdateDuration = std::chrono::steady_clock::now() - updateStartTime;
-	}
-	if (!isRenderSkipable() && content && window) {
-		//		if (invalidated)
-		//			content->build();
-		auto renderStartTime = std::chrono::steady_clock::now();
-		render();
-		auto swapStartTime = std::chrono::steady_clock::now();
-		lastRenderDuration = swapStartTime - renderStartTime;
-		glfwSwapBuffers(window);
-		lastSwapDuration = std::chrono::steady_clock::now() - swapStartTime;
 
-		//TODO P2: fpsTick
-	}
+	update();
+	render();
 
 	context.executeAsync(std::bind(&Frame::loop, this));
+	timerLoop.time();
+	timerOffLoop.reset();
 }
 
 void Frame::term() {
