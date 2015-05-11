@@ -1,218 +1,215 @@
 // File: file_system_test.cpp, Created on 2015. április 26. 20:26, Author: Vader
 
-#include <UnitTest++/UnitTest++.h>
+#include <catch.hpp>
+
 #include "vl/file_system.hpp"
 
-//SUITE(FileSystemTests) {
-
-TEST(getDirFull) {
+TEST_CASE("getDirFull") {
 	auto filePath0 = "D:/X-Files/Cpp/test/main.cpp";
 	auto filePath1 = "/X-Files/Cpp/test/main.cpp";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/", vl::getDir(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/", vl::getDir(filePath1));
+	CHECK("D:/X-Files/Cpp/test/" == vl::file_path::directory(filePath0));
+	CHECK("/X-Files/Cpp/test/" == vl::file_path::directory(filePath1));
 }
 
-TEST(getDirDirOnly) {
+TEST_CASE("getDirDirOnly") {
 	auto filePath0 = "D:/X-Files/Cpp/test/";
 	auto filePath1 = "/X-Files/Cpp/test/";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/", vl::getDir(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/", vl::getDir(filePath1));
+	CHECK("D:/X-Files/Cpp/test/" == vl::file_path::directory(filePath0));
+	CHECK("/X-Files/Cpp/test/" == vl::file_path::directory(filePath1));
 }
 
-TEST(getDirRelativ) {
+TEST_CASE("getDirRelativ") {
 	auto filePath0 = "../test/main.cpp";
 
-	CHECK_EQUAL("../test/", vl::getDir(filePath0));
+	CHECK("../test/" == vl::file_path::directory(filePath0));
 }
 
-TEST(getDirFileOnly) {
+TEST_CASE("getDirFileOnly") {
 	auto filePath0 = "main.cpp";
 
-	CHECK_EQUAL("", vl::getDir(filePath0));
+	CHECK("" == vl::file_path::directory(filePath0));
 }
 
-TEST(getDirSlash) {
+TEST_CASE("getDirSlash") {
 	auto filePath0 = "/";
 
-	CHECK_EQUAL("/", vl::getDir(filePath0));
+	CHECK("/" == vl::file_path::directory(filePath0));
 }
 
-TEST(getDirDot) {
+TEST_CASE("getDirDot") {
 	auto filePath0 = ".../";
 	auto filePath1 = "../";
 	auto filePath2 = "./";
 
-	CHECK_EQUAL(".../", vl::getDir(filePath0));
-	CHECK_EQUAL("../", vl::getDir(filePath1));
-	CHECK_EQUAL("./", vl::getDir(filePath2));
+	CHECK(".../" == vl::file_path::directory(filePath0));
+	CHECK("../" == vl::file_path::directory(filePath1));
+	CHECK("./" == vl::file_path::directory(filePath2));
 }
 
-TEST(getDirFolderDotDot) {
+TEST_CASE("getDirFolderDotDot") {
 	auto filePath0 = "folder/test/../";
 
-	CHECK_EQUAL("folder/test/../", vl::getDir(filePath0));
+	CHECK("folder/test/../" == vl::file_path::directory(filePath0));
 }
 
-TEST(getDirFolder2DotDot) {
+TEST_CASE("getDirFolder2DotDot") {
 	auto filePath0 = "folder/test/../../";
 
-	CHECK_EQUAL("folder/test/../../", vl::getDir(filePath0));
+	CHECK("folder/test/../../" == vl::file_path::directory(filePath0));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-TEST(getFileFull) {
+TEST_CASE("getFileFull") {
 	auto filePath0 = "D:/X-Files/Cpp/test/main.cpp";
 	auto filePath1 = "/X-Files/Cpp/test/main.cpp";
 
-	CHECK_EQUAL("main.cpp", vl::getFile(filePath0));
-	CHECK_EQUAL("main.cpp", vl::getFile(filePath1));
+	CHECK("main.cpp" == vl::file_path::file(filePath0));
+	CHECK("main.cpp" == vl::file_path::file(filePath1));
 }
 
-TEST(getFileDirOnly) {
+TEST_CASE("getFileDirOnly") {
 	auto filePath0 = "D:/X-Files/Cpp/test/";
 	auto filePath1 = "/X-Files/Cpp/test/";
 
-	CHECK_EQUAL("", vl::getFile(filePath0));
-	CHECK_EQUAL("", vl::getFile(filePath1));
+	CHECK("" == vl::file_path::file(filePath0));
+	CHECK("" == vl::file_path::file(filePath1));
 }
 
-TEST(getFileRelativ) {
+TEST_CASE("getFileRelativ") {
 	auto filePath0 = "../test/main.cpp";
 
-	CHECK_EQUAL("main.cpp", vl::getFile(filePath0));
+	CHECK("main.cpp" == vl::file_path::file(filePath0));
 }
 
-TEST(getFileFileOnly) {
+TEST_CASE("getFileFileOnly") {
 	auto filePath0 = "main.cpp";
 
-	CHECK_EQUAL("main.cpp", vl::getFile(filePath0));
+	CHECK("main.cpp" == vl::file_path::file(filePath0));
 }
 
-TEST(getFileSlash) {
+TEST_CASE("getFileSlash") {
 	auto filePath0 = "/";
 
-	CHECK_EQUAL("", vl::getFile(filePath0));
+	CHECK("" == vl::file_path::file(filePath0));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-TEST(removeExtensionFull) {
+TEST_CASE("removeExtensionFull") {
 	auto filePath0 = "D:/X-Files/Cpp/test/main.cpp";
 	auto filePath1 = "/X-Files/Cpp/test/main.cpp";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/main", vl::removeExtension(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/main", vl::removeExtension(filePath1));
+	CHECK("D:/X-Files/Cpp/test/main" == vl::file_path::removeExtension(filePath0));
+	CHECK("/X-Files/Cpp/test/main" == vl::file_path::removeExtension(filePath1));
 }
 
-TEST(removeExtensionDirOnly) {
+TEST_CASE("removeExtensionDirOnly") {
 	auto filePath0 = "D:/X-Files/Cpp/test/";
 	auto filePath1 = "/X-Files/Cpp/test/";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/", vl::removeExtension(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/", vl::removeExtension(filePath1));
+	CHECK("D:/X-Files/Cpp/test/" == vl::file_path::removeExtension(filePath0));
+	CHECK("/X-Files/Cpp/test/" == vl::file_path::removeExtension(filePath1));
 }
 
-TEST(removeExtensionRelativ) {
+TEST_CASE("removeExtensionRelativ") {
 	auto filePath0 = "../test/main.cpp";
 
-	CHECK_EQUAL("../test/main", vl::removeExtension(filePath0));
+	CHECK("../test/main" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFileOnly) {
+TEST_CASE("removeExtensionFileOnly") {
 	auto filePath0 = "main.cpp";
 
-	CHECK_EQUAL("main", vl::removeExtension(filePath0));
+	CHECK("main" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionSlash) {
+TEST_CASE("removeExtensionSlash") {
 	auto filePath0 = "/";
 
-	CHECK_EQUAL("/", vl::removeExtension(filePath0));
+	CHECK("/" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFullDouble) {
+TEST_CASE("removeExtensionFullDouble") {
 	auto filePath0 = "D:/X-Files/Cpp/test/main.cpp.txt";
 	auto filePath1 = "/X-Files/Cpp/test/main.cpp.txt";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/main.cpp", vl::removeExtension(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/main.cpp", vl::removeExtension(filePath1));
+	CHECK("D:/X-Files/Cpp/test/main.cpp" == vl::file_path::removeExtension(filePath0));
+	CHECK("/X-Files/Cpp/test/main.cpp" == vl::file_path::removeExtension(filePath1));
 }
 
-TEST(removeExtensionRelativDouble) {
+TEST_CASE("removeExtensionRelativDouble") {
 	auto filePath0 = "../test/main.cpp.txt";
 
-	CHECK_EQUAL("../test/main.cpp", vl::removeExtension(filePath0));
+	CHECK("../test/main.cpp" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFileOnlyDouble) {
+TEST_CASE("removeExtensionFileOnlyDouble") {
 	auto filePath0 = "main.cpp.txt";
 
-	CHECK_EQUAL("main.cpp", vl::removeExtension(filePath0));
+	CHECK("main.cpp" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFullDot) {
+TEST_CASE("removeExtensionFullDot") {
 	auto filePath0 = "D:/X-Files/Cpp/test/.gitignore";
 	auto filePath1 = "/X-Files/Cpp/test/.gitignore";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/.gitignore", vl::removeExtension(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/.gitignore", vl::removeExtension(filePath1));
+	CHECK("D:/X-Files/Cpp/test/.gitignore" == vl::file_path::removeExtension(filePath0));
+	CHECK("/X-Files/Cpp/test/.gitignore" == vl::file_path::removeExtension(filePath1));
 }
 
-TEST(removeExtensionRelativDot) {
+TEST_CASE("removeExtensionRelativDot") {
 	auto filePath0 = "../test/.gitignore";
 
-	CHECK_EQUAL("../test/.gitignore", vl::removeExtension(filePath0));
+	CHECK("../test/.gitignore" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFileOnlyDot) {
+TEST_CASE("removeExtensionFileOnlyDot") {
 	auto filePath0 = ".gitignore";
 
-	CHECK_EQUAL(".gitignore", vl::removeExtension(filePath0));
+	CHECK(".gitignore" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFullDotDot) {
+TEST_CASE("removeExtensionFullDotDot") {
 	auto filePath0 = "D:/X-Files/Cpp/test/.gitignore.txt";
 	auto filePath1 = "/X-Files/Cpp/test/.gitignore.txt";
 
-	CHECK_EQUAL("D:/X-Files/Cpp/test/.gitignore", vl::removeExtension(filePath0));
-	CHECK_EQUAL("/X-Files/Cpp/test/.gitignore", vl::removeExtension(filePath1));
+	CHECK("D:/X-Files/Cpp/test/.gitignore" == vl::file_path::removeExtension(filePath0));
+	CHECK("/X-Files/Cpp/test/.gitignore" == vl::file_path::removeExtension(filePath1));
 }
 
-TEST(removeExtensionRelativDotDot) {
+TEST_CASE("removeExtensionRelativDotDot") {
 	auto filePath0 = "../test/.gitignore.txt";
 
-	CHECK_EQUAL("../test/.gitignore", vl::removeExtension(filePath0));
+	CHECK("../test/.gitignore" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFileOnlyDotDot) {
+TEST_CASE("removeExtensionFileOnlyDotDot") {
 	auto filePath0 = ".gitignore.txt";
 
-	CHECK_EQUAL(".gitignore", vl::removeExtension(filePath0));
+	CHECK(".gitignore" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFolderDot0) {
+TEST_CASE("removeExtensionFolderDot0") {
 	auto filePath0 = "../test/Makefile";
 
-	CHECK_EQUAL("../test/Makefile", vl::removeExtension(filePath0));
+	CHECK("../test/Makefile" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionFolderDot1) {
+TEST_CASE("removeExtensionFolderDot1") {
 	auto filePath0 = "/te.st/Makefile";
 
-	CHECK_EQUAL("/te.st/Makefile", vl::removeExtension(filePath0));
+	CHECK("/te.st/Makefile" == vl::file_path::removeExtension(filePath0));
 }
 
-TEST(removeExtensionDotDotDot) {
+TEST_CASE("removeExtensionDotDotDot") {
 	auto filePath0 = "...";
 	auto filePath1 = "..";
 	auto filePath2 = ".";
 
-	CHECK_EQUAL("...", vl::removeExtension(filePath0));
-	CHECK_EQUAL("..", vl::removeExtension(filePath1));
-	CHECK_EQUAL(".", vl::removeExtension(filePath2));
+	CHECK("..." == vl::file_path::removeExtension(filePath0));
+	CHECK(".." == vl::file_path::removeExtension(filePath1));
+	CHECK("." == vl::file_path::removeExtension(filePath2));
 }
-
-//}

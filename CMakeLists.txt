@@ -10,11 +10,11 @@ message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 
 #Definitions
 #IF DEBUG TODO
-add_definitions(-Ofast)
+#add_definitions(-Ofast)
 #add_definitions(-O2)
 #EF DEBUG TODO
-#add_definitions(-O0)
-#add_definitions(-ggdb)
+add_definitions(-O0)
+add_definitions(-ggdb)
 #FI DEBUG TODO
 
 #if(NOT PIC)
@@ -52,15 +52,20 @@ set(TOOLSET gcc)
 
 # --------------------------------------------------------------------------------------------------
 
-#list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
-#ExternalProject_Add(ext_unittest
-#	GIT_REPOSITORY https://github.com/unittest-cpp/unittest-cpp.git
-#	GIT_TAG master
-#	PREFIX ${PATH_EXT_SRC}/unittest
-#	INSTALL_DIR ${PATH_EXT}/unittest
-#	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/unittest
-#	EXCLUDE_FROM_ALL 1
-#)
+list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
+ExternalProject_Add(ext_unittest
+	GIT_REPOSITORY https://github.com/philsquared/Catch.git
+	GIT_TAG master
+	PREFIX ${PATH_EXT_SRC}/unittest
+	INSTALL_DIR ${PATH_EXT}/unittest
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/unittest
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""
+	INSTALL_COMMAND 
+		mkdir -p ${PATH_EXT}/unittest/ &&
+		cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
+	EXCLUDE_FROM_ALL 1
+)
 
 list(APPEND EXTERNAL_PROJECT_LIST ext_glfw)
 ExternalProject_Add(ext_glfw
@@ -223,7 +228,6 @@ include_directories (${PATH_INC})
 include_directories (${PATH_SRC})
 
 #Externals
-include_directories(${PATH_EXT}/unittest/include)
 include_directories(${PATH_EXT}/assimp/include)
 include_directories(${PATH_EXT}/boost/include)
 include_directories(${PATH_EXT}/freetype/include/freetype2)
@@ -231,8 +235,8 @@ include_directories(${PATH_EXT}/glew/include)
 include_directories(${PATH_EXT}/glfw/include)
 include_directories(${PATH_EXT}/gli/include)
 include_directories(${PATH_EXT}/glm/include)
+include_directories(${PATH_EXT}/unittest/include)
 
-link_directories(${PATH_EXT}/unittest/lib)
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)
 link_directories(${PATH_EXT}/freetype/lib)
@@ -264,12 +268,12 @@ add_library(vsig   STATIC ${vsig_src})
 add_library(vui    STATIC ${vui_src})
 
 #Tests
-#add_executable(vgl_test    ${vgl_test_src})
-#add_executable(vl_test     ${vl_test_src})
-#add_executable(vm3_test    ${vm3_test_src})
-#add_executable(vm3imp_test ${vm3imp_test_src})
-#add_executable(vsig_test   ${vsig_test_src})
-#add_executable(vui_test    ${vui_test_src})
+add_executable(vgl_test    ${vgl_test_src})
+add_executable(vl_test     ${vl_test_src})
+add_executable(vm3_test    ${vm3_test_src})
+add_executable(vm3imp_test ${vm3imp_test_src})
+add_executable(vsig_test   ${vsig_test_src})
+add_executable(vui_test    ${vui_test_src})
 
 #Executables
 add_executable(vgl_main    ${PATH_EXP}/vgl_main.cpp)
@@ -292,12 +296,12 @@ target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
 target_link_libraries(vui    -static glew glfw3 opengl32 glu32 gdi32 freetype vgl)
 
 #Link - Tests
-#target_link_libraries(vgl_test    UnitTest++ vgl)
-#target_link_libraries(vl_test     UnitTest++)
-#target_link_libraries(vm3_test    UnitTest++ vm3 boost_serialization-mt-s)
-#target_link_libraries(vm3imp_test UnitTest++ vm3)
-#target_link_libraries(vsig_test   UnitTest++)
-#target_link_libraries(vui_test    UnitTest++)
+target_link_libraries(vgl_test     vgl)
+target_link_libraries(vl_test     )
+target_link_libraries(vm3_test     vm3 boost_serialization-mt-s)
+target_link_libraries(vm3imp_test  vm3)
+target_link_libraries(vsig_test   )
+target_link_libraries(vui_test    )
 
 #Link - Executables
 target_link_libraries(vgl_main    -static glew glfw3 vgl)

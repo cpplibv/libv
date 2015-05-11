@@ -1,7 +1,7 @@
 // File: ResourceManagerTest.cpp, Created on 2015. február 26. 10:31, Author: Vader
 
+#include <catch.hpp>
 #include "vl/resource_manager.hpp"
-#include <UnitTest++/UnitTest++.h>
 #include <iostream>
 
 using namespace vl;
@@ -81,7 +81,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-TEST(RMBasic) {
+TEST_CASE("RMBasic") {
 	ResourceManager<TestResource> rm0;
 	Resource<TestResource> tr0(rm0, "x");
 	Resource<TestResource> tr1(rm0, "x");
@@ -93,14 +93,14 @@ TEST(RMBasic) {
 	CHECK(&tr0.data() != &tr2.data());
 }
 
-TEST(RMDefault) {
+TEST_CASE("RMDefault") {
 	TestResourceManager<TestResource> rm0;
 	Resource<TestResource> tr0(rm0, "x");
 
 	CHECK(&tr0.data() != nullptr);
 }
 
-TEST(RMMultiArg) {
+TEST_CASE("RMMultiArg") {
 	ResourceManager<TestResource2> rm0;
 	Resource<TestResource2> tr0(rm0, "x");
 	Resource<TestResource2> tr1(rm0, "x");
@@ -119,7 +119,7 @@ TEST(RMMultiArg) {
 	CHECK(&tr3.data() == &tr4.data());
 }
 
-TEST(RMDestruct) {
+TEST_CASE("RMDestruct") {
 	int dtor0 = 0;
 	{
 		TestResourceManager<TestResource> rm0;
@@ -129,7 +129,7 @@ TEST(RMDestruct) {
 	CHECK(dtor0 == 1);
 }
 
-TEST(RMResourceDestruct) {
+TEST_CASE("RMResourceDestruct") {
 	int dtor0 = 0;
 	int dtor1 = 0;
 	ResourceManager<TestResource> rm0;
@@ -144,7 +144,7 @@ TEST(RMResourceDestruct) {
 	CHECK(dtor1 == 1);
 }
 
-TEST(RMRMDestruct) {
+TEST_CASE("RMRMDestruct") {
 	int dtor0 = 0;
 	int dtor1 = 0;
 	{
@@ -159,7 +159,7 @@ TEST(RMRMDestruct) {
 	CHECK(dtor1 == 1);
 }
 
-TEST(RMDestructOnLastRef) {
+TEST_CASE("RMDestructOnLastRef") {
 	int dtor0 = 0;
 	ResourceManager<TestResource> rm0;
 	{
@@ -173,7 +173,7 @@ TEST(RMDestructOnLastRef) {
 	CHECK(dtor0 == 2);
 }
 
-TEST(RMNoDestructOnNonLast) {
+TEST_CASE("RMNoDestructOnNonLast") {
 	int dtor0 = 0;
 	ResourceManager<TestResource> rm0;
 	{
@@ -190,7 +190,7 @@ TEST(RMNoDestructOnNonLast) {
 	CHECK(dtor0 == 1);
 }
 
-//TEST(RMNoDestructOnStillRef) {
+//TEST_CASE("RMNoDestructOnStillRef") {
 //	int dtor0 = 0;
 //	
 //	auto* rm0 = new ResourceManager<TestResource>{};
@@ -204,7 +204,7 @@ TEST(RMNoDestructOnNonLast) {
 //	CHECK(dtor0 == 1);
 //}
 
-TEST(RSKeepAlive) {
+TEST_CASE("RSKeepAlive") {
 	int dtor0 = 0;
 	{
 		ResourceManager<TestResource> rm0;
@@ -227,7 +227,7 @@ TEST(RSKeepAlive) {
 	CHECK(dtor0 == 1);
 }
 
-TEST(RSRSKeepAlive) {
+TEST_CASE("RSRSKeepAlive") {
 	int dtor0 = 0;
 	int dtor1 = 0;
 	{

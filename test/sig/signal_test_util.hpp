@@ -12,18 +12,18 @@
 template<typename...> struct SpyResultFor;
 
 template<typename... Args>
-struct SpyResultFor<vl::Signal<Args...>> {
-	using type = std::vector<std::tuple<Args...>>;
+struct SpyResultFor<vl::Signal<Args...>>
+{
+	using type = std::vector < std::tuple<typename std::remove_reference<Args>::type...>>;
 };
-template<typename... Args>
-std::function<void(Args...)> spyInto(std::vector<std::tuple<Args...>>& result) {
+template<typename... Args, typename T>
+std::function<void(Args...) > spyInto(T& result) {
 	return [&result](Args... args) {
-		result.push_back(std::make_tuple(args...));
+		result.emplace_back(args...);
 	};
 }
 
 // --- Dummy targets -------------------------------------------------------------------------------
-
 template<typename R = void, typename... Args>
 R dummyGlobalFunction(Args...) { }
 

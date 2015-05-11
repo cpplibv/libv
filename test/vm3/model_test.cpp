@@ -1,6 +1,6 @@
 // File: ModelTest.cpp, Created on 2015. február 14. 18:51, Author: Vader
 
-#include <UnitTest++/UnitTest++.h>
+#include <catch.hpp>
 
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
@@ -19,13 +19,10 @@
 
 #include "vl/vm3/serialization/model.hpp"
 
-//SUITE(ModelTest) {
-//}
-
 using namespace vl;
 using namespace vl::vm3;
 
-TEST(modelBasic) {
+TEST_CASE("modelBasic") {
 	Model model;
 //	CHECK(model.getName() == "unnamed");
 //	CHECK(model.getFilePath() == "unknown");
@@ -56,7 +53,7 @@ void modelArchiveTester(std::iostream& stream) {
 //	CHECK(*model_target.get<std::string>("diffuseTexture") == "diffuseTexture.dds");
 }
 
-TEST(modelSerializationWithArchives) {
+TEST_CASE("modelSerializationWithArchives") {
 #ifndef VM3_NO_BINARY_ARCHIVE
 	std::stringstream ssb(std::stringstream::binary | std::ios_base::out | std::ios_base::in);
 	modelArchiveTester<

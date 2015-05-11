@@ -34,8 +34,7 @@
 //			igy kibaszott zsirúl lehetne hivni onClose();-al onClose(this); helyett
 //			(na jól van, talán ez nem szükséges)
 //
-//UnitTest:
-//https://www.youtube.com/watch?v=Y8YVSohnlgY
+//https://www.youtube.com/watch?v=C2LcIp56i-8
 
 #include <map>
 #include <memory>
@@ -282,7 +281,7 @@ public:
 		argQue.emplace_back(args...);
 	}
 	inline void flush() {
-		flushHelper(std::index_sequence_for < Args...>{});
+		flushHelper(std::index_sequence_for<Args...>{});
 	}
 };
 

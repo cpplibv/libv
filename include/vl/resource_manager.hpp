@@ -110,7 +110,7 @@ private:
 				//cache.erase(result.first);
 
 				auto it = cache.begin();
-				while (it != cache.end()) {
+				while (it != cache.end()) { //lin search!
 					if (it->expired()) {
 						cache.erase(it++);
 						break;

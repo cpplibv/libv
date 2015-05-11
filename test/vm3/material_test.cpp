@@ -1,6 +1,6 @@
 // File: MaterialTest.cpp, Created on 2015. february 2. 08:18, Author: Vader
 
-#include <UnitTest++/UnitTest++.h>
+#include <catch.hpp>
 
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/portable_iarchive.hpp>
@@ -17,13 +17,10 @@
 #include "vl/vm3/serialization/material.hpp"
 #include "vl/vm3/material_property_visitor.hpp"
 
-//SUITE(MaterialTest) {
-//}
-
 using namespace vl;
 using namespace vl::vm3;
 
-TEST(materialBasic) {
+TEST_CASE("materialBasic") {
 	Material material0;
 	CHECK(material0.getName() == "--unnamed--");
 	CHECK(material0.getShader() == "--unknown--");
@@ -33,7 +30,7 @@ TEST(materialBasic) {
 	CHECK(material1.getShader() == "Phong-E-v2");
 }
 
-TEST(materialPropertySetGet) {
+TEST_CASE("materialPropertySetGet") {
 	Material material("Metal", "Phong-E-v2");
 
 	std::string result0;
@@ -49,7 +46,7 @@ TEST(materialPropertySetGet) {
 	CHECK(!material.get("notSet", result2));
 }
 
-TEST(materialPropertyReset) {
+TEST_CASE("materialPropertyReset") {
 	Material material("Metal", "Phong-E-v2");
 
 	std::string result;
@@ -60,7 +57,7 @@ TEST(materialPropertyReset) {
 	CHECK(result == "diffuseTexture2.dds");
 }
 
-TEST(materialPropertyGetProxy) {
+TEST_CASE("materialPropertyGetProxy") {
 	Material material("Metal", "Phong-E-v2");
 	material.set<std::string>("diffuseTexture", "diffuseTexture.dds");
 
@@ -98,7 +95,7 @@ void materialArchiveTester(std::iostream& stream) {
 	CHECK(*material_target.get<std::string>("diffuseTexture") == "diffuseTexture.dds");
 }
 
-TEST(materialSerializationWithArchives) {
+TEST_CASE("materialSerializationWithArchives") {
 #ifndef VM3_NO_BINARY_ARCHIVE
 	std::stringstream ssb(std::stringstream::binary | std::ios_base::out | std::ios_base::in);
 	materialArchiveTester<
@@ -128,7 +125,7 @@ TEST(materialSerializationWithArchives) {
 #endif
 }
 
-TEST(materialVisitor) {
+TEST_CASE("materialVisitor") {
 	Material material;
 	material.set("numDim0", 3);
 	material.set("numDim1", 4);

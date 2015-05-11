@@ -334,18 +334,6 @@ int main(int, char**) {
 //
 ////	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 //
-////	triangle0.addLayoutInfo(Layout::Position(100, 100));
-////	triangle0.addLayoutInfo(Layout::Border(1, 1, 1, 1));
-////	triangle0.addLayoutInfo(Layout::Margin(12, 12, 12, 12));
-//
-////	triangle1.addLayoutInfo(
-////		Layout::Position(5, 0, Corner::CenterRight),
-////		Layout::Link(triangle0, Corner::CenterLeft),
-////		Layout::Border(1, 1, 1, 1),
-////		Layout::Margin(12, 12, 12, 12)
-////	); //TODO P4: FUCK THIS, THIS IS AWESOME!
-//
-//
 //// TODO P~: NB ticket
 ////------------------------------------------------------------------------------
 ////Using code completion with template types cause unnecessary "typename",

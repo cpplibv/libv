@@ -13,16 +13,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P3: ResourceTask
-struct ResourceTask {
-	int priority;
-	void(*func)();
-};
-
 struct ResourceManager {
 	std::priority_queue<ResourceTask> io_que; //static....
 	std::priority_queue<ResourceTask> gl_que;
-	
+
 	vl::Context* io_context;
 	vl::Context* gl_context;
 };
@@ -31,11 +25,13 @@ struct  {
 	
 };
 
-//	400 -> 50 Render based on time, measure it
+// Context Task Priority levels for each operation
+//
+//	50 Render But based on time, measure it ?
 //
 //		110 *Unload Texture
 //		120 *Unload Model
-//	130 Unload UI Texture
+//	130 Unload UITexture
 //	140 Unload Font
 //		150 Unload CSS
 //		160 Unload Layout
@@ -46,7 +42,7 @@ struct  {
 //		230 Layout
 //		240 CSS
 //	250 Font
-//	260 UI Texture
+//	260 UITexture
 //		270 *Model
 //		280 *Texture
 

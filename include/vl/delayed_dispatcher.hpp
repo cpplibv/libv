@@ -4,7 +4,6 @@
 
 //TODO P4: Rename to DelayedFunction or AsyncFunction(!)
 //TODO P5: Use std::function
-//TODO P5: Namespace vl
 
 namespace vl {
 
@@ -13,7 +12,7 @@ struct DelayedDispatcher {
 	typedef void(&funcReference)(ArgList...);
 private:
 	funcReference func;
-	std::tuple<ArgList...> params;
+	std::tuple<typename std::remove_reference<ArgList>::type...> params;
 public:
 	DelayedDispatcher(funcReference func, std::tuple<ArgList...>&& params) : func(func), params(params) { }
 	inline void dispatch() {
@@ -23,7 +22,7 @@ private:
 	//C++14: use std integer sequnce
 	template<int ...S>
 	inline void callFunc(seq<S...>) {
-		func(std::get<S>(params) ...);
+		func(std::get<S>(params)...);
 	}
 };
 template <typename... ArgList>
