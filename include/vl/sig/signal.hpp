@@ -262,7 +262,8 @@ SignalImpl<RType, Args...>::~SignalImpl() {
 	clearOutput();
 }
 
-//------------------------------------------------------------------------------
+//==============================================================================
+//==============================================================================
 
 template <typename... Args>
 class CapacitivSignalImpl : public SignalImpl<void, Args...> {
@@ -270,19 +271,10 @@ private:
 	std::vector<std::tuple<typename std::remove_reference<Args>::type...>> argQue;
 private:
 	template<std::size_t... Is>
-	inline void flushHelper(std::index_sequence<Is...>) {
-		for (auto& item : argQue) {
-			SignalImpl<void, Args...>::fire(std::get<Is>(item)...);
-		}
-		argQue.clear();
-	}
+	inline void flushHelper(std::index_sequence<Is...>);
 public:
-	virtual void fire(Args... args) override {
-		argQue.emplace_back(args...);
-	}
-	inline void flush() {
-		flushHelper(std::index_sequence_for<Args...>{});
-	}
+	virtual void fire(Args... args) override;
+	inline void flush();
 };
 
 //------------------------------------------------------------------------------
@@ -294,7 +286,32 @@ struct CapacitivSignal : public CapacitivSignalImpl<T...> {
 
 template<typename R, typename... T>
 struct CapacitivSignal<R(T...)> : public CapacitivSignalImpl<T...> {
+	static_assert(!std::is_same<R, void>::value, "Return type cannot be non void in CapacitivSignal"); //<<<
 	using CapacitivSignalImpl<T...>::CapacitivSignalImpl;
 };
+
+//==============================================================================
+template<typename... Args>
+template<std::size_t... Is>
+inline void CapacitivSignalImpl<Args...>::flushHelper(std::index_sequence<Is...>) {
+	for (auto& item : argQue) {
+		SignalImpl<void, Args...>::fire(std::get<Is>(item)...);
+	}
+	argQue.clear();
+}
+
+//------------------------------------------------------------------------------
+template<typename... Args>
+void CapacitivSignalImpl<Args...>::fire(Args... args) {
+	argQue.emplace_back(args...);
+}
+
+//------------------------------------------------------------------------------
+template<typename... Args>
+inline void CapacitivSignalImpl<Args...>::flush() {
+	flushHelper(std::index_sequence_for < Args...>{});
+}
+
+//------------------------------------------------------------------------------
 
 } //namespace vl

@@ -7,15 +7,19 @@
 #include <functional>
 #include <vector>
 
-#define SpyResultTypeFor(SIGNAL) SpyResultFor<decltype(SIGNAL)>::type
+#define SpyResultTypeFor(SIGNAL) typename SpyResultFor<decltype(SIGNAL)>::type
 
 template<typename...> struct SpyResultFor;
 
 template<typename... Args>
-struct SpyResultFor<vl::Signal<Args...>>
-{
+struct SpyResultFor<vl::Signal<Args...>> {
 	using type = std::vector < std::tuple<typename std::remove_reference<Args>::type...>>;
 };
+template<typename... Args>
+struct SpyResultFor<vl::CapacitivSignal<Args...>> {
+	using type = std::vector < std::tuple<typename std::remove_reference<Args>::type...>>;
+};
+
 template<typename... Args, typename T>
 std::function<void(Args...) > spyInto(T& result) {
 	return [&result](Args... args) {

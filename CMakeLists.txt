@@ -10,11 +10,11 @@ message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 
 #Definitions
 #IF DEBUG TODO
-#add_definitions(-Ofast)
+add_definitions(-Ofast)
 #add_definitions(-O2)
 #EF DEBUG TODO
-add_definitions(-O0)
-add_definitions(-ggdb)
+#add_definitions(-O0)
+#add_definitions(-ggdb)
 #FI DEBUG TODO
 
 #if(NOT PIC)
@@ -296,10 +296,10 @@ target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
 target_link_libraries(vui    -static glew glfw3 opengl32 glu32 gdi32 freetype vgl)
 
 #Link - Tests
-target_link_libraries(vgl_test     vgl)
+target_link_libraries(vgl_test    vgl)
 target_link_libraries(vl_test     )
-target_link_libraries(vm3_test     vm3 boost_serialization-mt-s)
-target_link_libraries(vm3imp_test  vm3)
+target_link_libraries(vm3_test    vm3 boost_serialization-mt-s)
+target_link_libraries(vm3imp_test vm3)
 target_link_libraries(vsig_test   )
 target_link_libraries(vui_test    )
 

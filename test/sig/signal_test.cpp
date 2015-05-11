@@ -208,8 +208,6 @@ TEST_CASE("SignalFireConstArgs") {
 	CHECK(result[1] == std::make_tuple(1, 2));
 }
 
-#include <iostream>
-
 TEST_CASE("SignalFireStringArgs") {
 	Signal<const char*, const std::string&> source;
 	SpyResultTypeFor(source) result;
@@ -221,7 +219,7 @@ TEST_CASE("SignalFireStringArgs") {
 	source.fire(hello, "World!");
 	source.fire(hello, world);
 	CHECK(result.size() == 2u);
-	
+
 	CHECK(std::get<0>(result[0]) == hello);
 	CHECK(std::get<1>(result[0]) == "World!");
 	CHECK(std::get<1>(result[0]) == world);
@@ -238,9 +236,9 @@ TEST_CASE("SignalFireArgsLValueRef") {
 	source.output([&x, &y, &recieved](int& a, std::string & b) {
 		recieved = true;
 		CHECK(a == 2);
-		CHECK(b == std::string("Test string"));
-		CHECK(&a == &x);
-		CHECK(&b == &y);
+				CHECK(b == std::string("Test string"));
+				CHECK(&a == &x);
+				CHECK(&b == &y);
 	});
 	source.fire(x, y);
 	CHECK(recieved);
@@ -254,9 +252,9 @@ TEST_CASE("SignalFireArgsConstLValueRef") {
 	source.output([&x, &y, &recieved](const int& a, const std::string & b) {
 		recieved = true;
 		CHECK(a == 2);
-		CHECK(b == std::string("Test string"));
-		CHECK(&a == &x);
-		CHECK(&b == &y);
+				CHECK(b == std::string("Test string"));
+				CHECK(&a == &x);
+				CHECK(&b == &y);
 	});
 	source.fire(x, y);
 	CHECK(recieved);
@@ -270,9 +268,9 @@ TEST_CASE("SignalFireArgsRValueRef") {
 	source.output([&x, &y, &recieved](int&& a, std::string && b) {
 		recieved = true;
 		CHECK(a == 2);
-		CHECK(b == std::string("Test string"));
-		CHECK(&a == &x);
-		CHECK(b.data() == y.data());
+				CHECK(b == std::string("Test string"));
+				CHECK(&a == &x);
+				CHECK(b.data() == y.data());
 	});
 	source.fire(std::move(x), std::move(y));
 	CHECK(recieved);
