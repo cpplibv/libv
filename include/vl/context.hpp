@@ -15,14 +15,14 @@
 #include <vl/log.hpp>
 
 #ifndef VL_DEFAULT_CONTEXT_TASK_PRIORITY
-#    define VL_DEFAULT_CONTEXT_TASK_PRIORITY 150
+#    define VL_DEFAULT_CONTEXT_TASK_PRIORITY 300
 #endif
 
 namespace vl {
 
 class Context {
 	class Task {
-		int priority = VL_DEFAULT_CONTEXT_TASK_PRIORITY;
+		int priority;
 		std::condition_variable_any* executed_cv;
 		std::function<void() > function;
 		std::recursive_mutex* mtx;
@@ -31,9 +31,11 @@ class Context {
 		Task() { }
 		template<typename F, typename = decltype(std::declval<F>()()) >
 		Task(F&& func,
+				int priority,
 				std::condition_variable_any* cv = nullptr,
 				std::recursive_mutex* mtx = nullptr,
 				std::atomic<bool>* done = nullptr) :
+			priority(priority),
 			executed_cv(cv),
 			function(std::forward<F>(func)),
 			mtx(mtx),
@@ -77,19 +79,19 @@ private:
 
 public:
 	template<typename F, typename = decltype(std::declval<F>()())>
-	void executeAsync(F&& func) {
+	void executeAsync(F&& func, int priority = VL_DEFAULT_CONTEXT_TASK_PRIORITY) {
 		std::lock_guard<std::recursive_mutex> lk(que_m);
-		que.emplace(std::forward<F>(func));
+		que.emplace(std::forward<F>(func), priority);
 		recieved_cv.notify_all();
 	}
 	template<typename F, typename = decltype(std::declval<F>()())>
-	void executeSync(F&& func) {
+	void executeSync(F&& func, int priority = VL_DEFAULT_CONTEXT_TASK_PRIORITY) {
 		if (std::this_thread::get_id() != thread.get_id()) {
 			std::condition_variable_any executed_cv;
 			std::unique_lock<std::recursive_mutex> lk(que_m);
 			std::atomic<bool> done{false};
 
-			que.emplace(std::forward<F>(func), &executed_cv, &que_m, &done);
+			que.emplace(std::forward<F>(func), priority, &executed_cv, &que_m, &done);
 			recieved_cv.notify_all();
 			executed_cv.wait(lk, [&done] {
 				return done.load();
@@ -102,7 +104,9 @@ public:
 		terminateFlag = true;
 		recieved_cv.notify_all();
 	}
-	inline void join() {
+	void join() {
+		static std::mutex join_m;
+		std::lock_guard<std::mutex> lk(join_m);
 		if (thread.joinable())
 			thread.join();
 	}
