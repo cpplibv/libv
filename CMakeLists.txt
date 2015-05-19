@@ -47,10 +47,19 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
 
 #Variables
-set(EXTERNAL_PROJECT_LIST)
 set(TOOLSET gcc)
 
+if(WIN32)
+	set(LIB_OPENGL opengl32)
+	set(LIB_GLU glu32)
+else()
+	set(LIB_OPENGL GL)
+	set(LIB_GLU GLU)
+endif()
+
 # --------------------------------------------------------------------------------------------------
+
+set(EXTERNAL_PROJECT_LIST)
 
 list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
 ExternalProject_Add(ext_unittest
@@ -290,10 +299,10 @@ add_custom_target(externals DEPENDS ${EXTERNAL_PROJECT_LIST})
 add_custom_target(ext DEPENDS externals)
 
 #Link - Libraries
-target_link_libraries(vgl    -static glew opengl32 glu32 vm3 boost_serialization-mt-s)
+target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3 boost_serialization-mt-s)
 target_link_libraries(vm3    -static boost_serialization-mt-s)
 target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
-target_link_libraries(vui    -static glew glfw3 opengl32 glu32 gdi32 freetype vgl)
+target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 freetype vgl)
 
 #Link - Tests
 target_link_libraries(vgl_test    vgl)
