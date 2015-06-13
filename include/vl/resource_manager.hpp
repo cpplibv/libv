@@ -13,64 +13,16 @@
 
 namespace vl {
 
-struct TestResourceIOData {
-	int n = 0;
-	TestResourceIOData(int n) : n(n) { }
-	bool load() {
-		return true;
-	}
-	bool unload() {
-		return true;
-	}
-	bool operator<(const TestResourceIOData& r) const {
-		return n < r.n;
-	}
-	//	friend bool operator<(int t, const TestResourceIOData& r) {
-	//		return t < r.n;
-	//	}
-	//	friend bool operator<(const TestResourceIOData& r, int t) {
-	//		return r.n < t;
-	//	}
-	friend bool operator<(const std::tuple<int>& t, const TestResourceIOData& r) {
-		return std::get<0>(t) < r.n;
-	}
-	friend bool operator<(const TestResourceIOData& r, const std::tuple<int>& t) {
-		return r.n < std::get<0>(t);
-	}
-};
-
-struct TestResourceGLData {
-	int n = 0;
-	vl::Semaphore loaded;
-	TestResourceGLData(int n) :
-		n(n) { }
-	bool load() {
-		loaded.raise();
-		return true;
-	}
-	bool unload() {
-		loaded.reset();
-		return true;
-	}
-	bool operator<(const TestResourceGLData& r) const {
-		return n < r.n;
-	}
-	//	friend bool operator<(int t, const TestResourceGLData& r) {
-	//		return t < r.n;
-	//	}
-	//	friend bool operator<(const TestResourceGLData& r, int t) {
-	//		return r.n < t;
-	//	}
-	friend bool operator<(const std::tuple<int>& t, const TestResourceGLData& r) {
-		return std::get<0>(t) < r.n;
-	}
-	friend bool operator<(const TestResourceGLData& r, const std::tuple<int>& t) {
-		return r.n < std::get<0>(t);
-	}
-};
-
 namespace detail {
-
+template <typename T,
+typename = vl::disable_if<vl::is_efl_loadable<T>>,
+typename = vl::disable_if<vl::is_member_loadable<T>>>
+inline void applicableFunction_Load(T&) {
+	static_assert(vl::always_false<T>::value,
+			"\n\t\tT type has no way of loading."
+			"\n\t\tNeither ::vl::efl::load(T&) nor member T::load() function was not found."
+			"\n\t\tFor more information see vl::efl - External Function Location");
+}
 template <typename T,
 typename = vl::disable_if<vl::is_efl_loadable<T>>,
 typename = vl::enable_if<vl::is_member_loadable<T>>>
@@ -81,6 +33,15 @@ template <typename T,
 typename = vl::enable_if<vl::is_efl_loadable<T>>>
 inline auto applicableFunction_Load(T& p) -> decltype(::vl::efl::load(p)) {
 	return ::vl::efl::load(p);
+}
+template <typename T,
+typename = vl::disable_if<vl::is_efl_unloadable<T>>,
+typename = vl::disable_if<vl::is_member_unloadable<T>>>
+inline void applicableFunction_Unload(T&) {
+	static_assert(vl::always_false<T>::value,
+			"\n\t\tT type has no way of unloading."
+			"\n\t\tNeither ::vl::efl::unload(T&) nor member T::unload() function was not found."
+			"\n\t\tFor more information see vl::efl - External Function Location");
 }
 template <typename T,
 typename = vl::disable_if<vl::is_efl_unloadable<T>>,
@@ -161,8 +122,6 @@ struct ContextLoader {
 //		contextID(contextID), work(work), priority(priority) { }
 //};
 //
-//class TestResourceManager;
-//
 //class LoadSequence {
 //	friend class TestResourceManager;
 //	std::shared_ptr<LoadStep> firstStep;
@@ -185,6 +144,64 @@ struct ContextLoader {
 //		return *this;
 //	}
 //};
+
+// -------------------------------------------------------------------------------------------------
+
+struct TestResourceIOData {
+	int n = 0;
+	TestResourceIOData(int n) : n(n) { }
+	bool load() {
+		return true;
+	}
+	bool unload() {
+		return true;
+	}
+	bool operator<(const TestResourceIOData& r) const {
+		return n < r.n;
+	}
+	//	friend bool operator<(int t, const TestResourceIOData& r) {
+	//		return t < r.n;
+	//	}
+	//	friend bool operator<(const TestResourceIOData& r, int t) {
+	//		return r.n < t;
+	//	}
+	friend bool operator<(const std::tuple<int>& t, const TestResourceIOData& r) {
+		return std::get<0>(t) < r.n;
+	}
+	friend bool operator<(const TestResourceIOData& r, const std::tuple<int>& t) {
+		return r.n < std::get<0>(t);
+	}
+};
+
+struct TestResourceGLData {
+	int n = 0;
+	vl::Semaphore loaded;
+	TestResourceGLData(int n) :
+		n(n) { }
+	bool load() {
+		loaded.raise();
+		return true;
+	}
+	bool unload() {
+		loaded.reset();
+		return true;
+	}
+	bool operator<(const TestResourceGLData& r) const {
+		return n < r.n;
+	}
+	//	friend bool operator<(int t, const TestResourceGLData& r) {
+	//		return t < r.n;
+	//	}
+	//	friend bool operator<(const TestResourceGLData& r, int t) {
+	//		return r.n < t;
+	//	}
+	friend bool operator<(const std::tuple<int>& t, const TestResourceGLData& r) {
+		return std::get<0>(t) < r.n;
+	}
+	friend bool operator<(const TestResourceGLData& r, const std::tuple<int>& t) {
+		return r.n < std::get<0>(t);
+	}
+};
 
 using ContextedTestResourceIOData = ContextLoader<TestResourceIOData>;
 using ContextedTestResourceGLData = ContextLoader<TestResourceGLData>;

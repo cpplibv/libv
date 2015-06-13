@@ -19,6 +19,16 @@ struct voider { //CWG 1558
 template <typename... Args>
 using void_t = typename voider<Args...>::type;
 
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+struct always_true : std::true_type {
+};
+
+template <typename T>
+struct always_false : std::false_type {
+};
+
 // =================================================================================================
 
 template <typename T>
@@ -28,9 +38,9 @@ template <typename T>
 using enable_if = typename std::enable_if<T::value>::type;
 
 // =================================================================================================
+// is_less_comparable
 
-template <typename T, typename L, typename = void>
-struct is_less_comparable : std::false_type {
+template <typename T, typename L, typename = void> struct is_less_comparable : std::false_type {
 };
 template <typename T, typename L>
 struct is_less_comparable<T, L, void_t<decltype(
@@ -38,9 +48,9 @@ struct is_less_comparable<T, L, void_t<decltype(
 		)>> : std::true_type { };
 
 // =================================================================================================
+// is_efl_loadable
 
-template <typename T, typename = void>
-struct is_efl_loadable : std::false_type {
+template <typename T, typename = void> struct is_efl_loadable : std::false_type {
 };
 template <typename T>
 struct is_efl_loadable<T, void_t<decltype(
@@ -48,19 +58,19 @@ struct is_efl_loadable<T, void_t<decltype(
 		)>> : std::true_type { };
 
 // -------------------------------------------------------------------------------------------------
+// is_efl_unloadable
 
-template <typename T, typename = void>
-struct is_efl_unloadable : std::false_type {
+template <typename T, typename = void> struct is_efl_unloadable : std::false_type {
 };
 template <typename T>
 struct is_efl_unloadable<T, void_t<decltype(
 		::vl::efl::unload(std::declval<T&>())
 		)>> : std::true_type { };
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
+// is_member_loadable
 
-template <typename T, typename = void>
-struct is_member_loadable : std::false_type {
+template <typename T, typename = void> struct is_member_loadable : std::false_type {
 };
 template <typename T>
 struct is_member_loadable<T, void_t<decltype(
@@ -68,9 +78,9 @@ struct is_member_loadable<T, void_t<decltype(
 		)>> : std::true_type { };
 
 // -------------------------------------------------------------------------------------------------
+// is_member_unloadable
 
-template <typename T, typename = void>
-struct is_member_unloadable : std::false_type {
+template <typename T, typename = void> struct is_member_unloadable : std::false_type {
 };
 template <typename T>
 struct is_member_unloadable<T, void_t<decltype(
