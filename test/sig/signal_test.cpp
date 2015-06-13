@@ -5,7 +5,9 @@
 #include "signal_test_util.hpp"
 #include "vl/sig/signal.hpp"
 
-using namespace vl;
+using vl::Signal;
+using vl::CapacitivSignal;
+using vl::ConditionalSignal;
 
 TEST_CASE("SignalConstruct") {
 	Signal<> testObj;
@@ -160,7 +162,7 @@ TEST_CASE("SignalConnectionGlobalLifeTime") {
 TEST_CASE("SignalFire") {
 	Signal<> source;
 	SpyResultTypeFor(source) result;
-	source.output(spyInto(result));
+	source.output(spyInto<void>(result));
 
 	CHECK(result.size() == 0u);
 	source.fire();
@@ -174,7 +176,7 @@ TEST_CASE("SignalRelayFire") {
 	Signal<> source, relay;
 	SpyResultTypeFor(source) result;
 	source.output(relay);
-	relay.output(spyInto(result));
+	relay.output(spyInto<void>(result));
 
 	CHECK(result.size() == 0u);
 	source.fire();
@@ -187,7 +189,7 @@ TEST_CASE("SignalRelayFire") {
 TEST_CASE("SignalFireArgs") {
 	Signal<int, int> source;
 	SpyResultTypeFor(source) result;
-	source.output(spyInto<int, int>(result));
+	source.output(spyInto<void, int, int>(result));
 
 	source.fire(0, 1);
 	source.fire(1, 2);
@@ -199,7 +201,7 @@ TEST_CASE("SignalFireArgs") {
 TEST_CASE("SignalFireConstArgs") {
 	Signal<const int, const int> source;
 	SpyResultTypeFor(source) result;
-	source.output(spyInto<const int, const int>(result));
+	source.output(spyInto<void, const int, const int>(result));
 
 	source.fire(0, 1);
 	source.fire(1, 2);
@@ -211,7 +213,7 @@ TEST_CASE("SignalFireConstArgs") {
 TEST_CASE("SignalFireStringArgs") {
 	Signal<const char*, const std::string&> source;
 	SpyResultTypeFor(source) result;
-	source.output(spyInto<const char*, const std::string&>(result));
+	source.output(spyInto<void, const char*, const std::string&>(result));
 
 	const char* hello = "Hello";
 	std::string world("World!");
@@ -331,3 +333,84 @@ TEST_CASE("SignalReturnDefaultAccumulation") {
 // --- Disconnect ----------------------------------------------------------------------------------
 // --- Clear ---------------------------------------------------------------------------------------
 // --- DisconnectAllSignal -------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+// === CapacitivSignal =============================================================================
+
+TEST_CASE("CapacitivSignal Test") {
+	CapacitivSignal<int> source;
+	SpyResultTypeFor(source) result;
+	source.output(spyInto<void, int>(result));
+
+	SECTION("Flushing an empty signal result no output") {
+		source.flush();
+		CHECK(result.size() == 0u);
+	}
+
+	SECTION("Firing then flushing reaches the output") {
+		source.fire(0);
+		CHECK(result.size() == 0u);
+
+		source.flush();
+		CHECK(result.size() == 1u);
+	}
+
+	SECTION("Firing multiple time then flushing reaches the output") {
+		source.fire(0);
+		source.fire(0);
+		CHECK(result.size() == 0u);
+
+		source.flush();
+		CHECK(result.size() == 2u);
+	}
+}
+
+// === ConditionalSignal ===========================================================================
+
+TEST_CASE("ConditionalSignal Test") {
+	ConditionalSignal<int> source;
+	SpyResultTypeFor(source) result;
+	source.output(spyInto<void, int>(result));
+
+	SECTION("By default firing reaches the output") {
+		source.fire(0);
+		CHECK(result.size() == 1u);
+	}
+
+	SECTION("Output can be disabled") {
+		source.disable();
+		source.fire(0);
+		CHECK(result.size() == 0u);
+	}
+
+	SECTION("Output can be re-enabled") {
+		source.disable();
+		source.enable();
+		source.fire(0);
+		CHECK(result.size() == 1u);
+	}
+}
+
+// === CustomSignal ================================================================================
+
+//#include <iostream>
+//
+//TEST_CASE("Signal chaining") {
+//	CustomSignal<void(int), Conditional, Capacitiv, Priority> source;
+////	std::cout << source.ca << std::endl;
+//	
+////	A<void(int), B> a;
+////	a.a;
+////	a.b;
+//
+//	M<A, B, C> magic;
+//	
+//	A<void(int), B<C<>>> ab;
+//	ab.b;
+//}

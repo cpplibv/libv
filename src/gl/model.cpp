@@ -4,6 +4,8 @@
 #include "vl/gl/model.hpp"
 // vl
 #include <vl/vm3/model.hpp>
+// pro
+#include "vl/gl/vgl.hpp"
 
 namespace vl {
 namespace gl {
@@ -14,9 +16,9 @@ ModelManager::ModelManager(ModelContext* context) :
 Model::Model(ModelManager& resourceManager, const std::string& filePath) :
 	vl::Resource<detail::ModelImpl>(resourceManager, filePath, resourceManager.context) { }
 
-void Model::render() {
+void Model::render(vl::gl::GL& gl) {
 	if (data().loaded())
-		data().render();
+		data().render(gl);
 }
 
 } //namespace gl

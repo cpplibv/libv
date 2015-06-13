@@ -9,7 +9,7 @@
 #include <assimp/scene.h>
 #include <glm/gtx/transform.hpp>
 // vl
-#include <vl/Vec.hpp>
+#include <vl/vec.hpp>
 // std
 #include <vector>
 // pro

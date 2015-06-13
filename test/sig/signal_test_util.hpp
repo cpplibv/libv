@@ -13,15 +13,31 @@ template<typename...> struct SpyResultFor;
 
 template<typename... Args>
 struct SpyResultFor<vl::Signal<Args...>> {
-	using type = std::vector < std::tuple<typename std::remove_reference<Args>::type...>>;
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
+};
+template<typename R, typename... Args>
+struct SpyResultFor<vl::Signal<R(Args...)>> {
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
 };
 template<typename... Args>
 struct SpyResultFor<vl::CapacitivSignal<Args...>> {
-	using type = std::vector < std::tuple<typename std::remove_reference<Args>::type...>>;
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
+};
+template<typename R, typename... Args>
+struct SpyResultFor<vl::CapacitivSignal<R(Args...)>> {
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
+};
+template<typename... Args>
+struct SpyResultFor<vl::ConditionalSignal<Args...>> {
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
+};
+template<typename R, typename... Args>
+struct SpyResultFor<vl::ConditionalSignal<R(Args...)>> {
+	using type = std::vector<std::tuple<typename std::remove_reference<Args>::type...>>;
 };
 
-template<typename... Args, typename T>
-std::function<void(Args...) > spyInto(T& result) {
+template<typename R, typename... Args, typename T>
+std::function<R(Args...) > spyInto(T& result) {
 	return [&result](Args... args) {
 		result.emplace_back(args...);
 	};

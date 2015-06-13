@@ -10,8 +10,9 @@
 // std
 #include <fstream>
 // pro
-#include "vl/gl/model.hpp"
 #include "vl/gl/gl_contexts.hpp"
+#include "vl/gl/log.hpp"
+#include "vl/gl/model.hpp"
 #include "vl/gl/shader.hpp"
 #include "vl/gl/uniform.hpp"
 #include "vl/gl/vgl.hpp"
@@ -84,25 +85,25 @@ bool ModelImpl::unloadGL() {
 	return true;
 }
 
-void ModelImpl::render() {
+void ModelImpl::render(vl::gl::GL& gl) {
 	glBindVertexArray(vao);
 	checkGL();
 
-	renderNode(model.lods[0].rootNodeID);
+	renderNode(model.lods[0].rootNodeID, gl);
 
 	glBindVertexArray(0);
 	checkGL();
 }
 
-void ModelImpl::renderNode(uint16_t id) {
-	gl::pushMMat();
-	gl::MMat() *= model.nodes[id].transformation;
-	glsl::Mmat = gl::MMat();
-	glsl::MVPmat = gl::MVPMat();
+void ModelImpl::renderNode(uint16_t id, vl::gl::GL& gl) {
+	gl.pushMatrixModel();
+	gl.matrixModel() *= model.nodes[id].transformation;
+	glsl::Mmat = gl.matrixModel();
+	glsl::MVPmat = gl.matrixMVP();
 	//node->material->get<std::string>("diffuseTexture") //<<<Bind Textures here
 	//vl::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
 
-	if (gl::MMat()[0][0] * gl::MMat()[1][1] * gl::MMat()[2][2] < 0) {
+	if (gl.matrixModel()[0][0] * gl.matrixModel()[1][1] * gl.matrixModel()[2][2] < 0) {
 		glFrontFace(GL_CCW);
 	} else {
 		glFrontFace(GL_CW);
@@ -119,10 +120,10 @@ void ModelImpl::renderNode(uint16_t id) {
 	}
 
 	for (auto childID : model.nodes[id].childrenIDs) {
-		renderNode(childID);
+		renderNode(childID, gl);
 	}
 
-	gl::popMMat();
+	gl.popMatrixModel();
 	checkGL();
 }
 

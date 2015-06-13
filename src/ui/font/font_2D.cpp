@@ -3,6 +3,7 @@
 // hpp
 #include "font_2D.hpp"
 // vl
+#include <vl/gl/log.hpp>
 #include <vl/gl/vgl.hpp>
 
 namespace vl {

@@ -9,6 +9,8 @@
 #include <string>
 #include <memory>
 #include <vector>
+// pro
+#include "vl/gl/vgl.hpp"
 
 namespace vl {
 namespace gl {
@@ -45,8 +47,8 @@ public:
 	}
 
 	ModelImpl(const std::string& name, ModelContext* context);
-	void render();
-	void renderNode(uint16_t id);
+	void render(vl::gl::GL&);
+	void renderNode(uint16_t id, vl::gl::GL&);
 	bool loaded();
 	virtual ~ModelImpl();
 };

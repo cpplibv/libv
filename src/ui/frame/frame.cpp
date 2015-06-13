@@ -19,7 +19,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 std::mutex core_m;
-std::unique_ptr<vl::Context> coreContext;
+std::unique_ptr<vl::WorkerThread> coreContext;
 std::set<Frame*> frames;
 std::mutex activeFrames_m;
 std::set<Frame*> activeFrames;
@@ -27,7 +27,7 @@ vl::Semaphore noActiveFrame(true);
 
 void initCore() {
 	VLOG_DEBUG(vl::ui::log(), "Initialize Core / GLFW Context");
-	coreContext = std::make_unique<vl::Context>("Core / GLFW");
+	coreContext = std::make_unique<vl::WorkerThread>("Core / GLFW");
 
 	coreContext->executeSync([] {
 		glfwSetErrorCallback(detail::errorCallbackGLFW);
@@ -753,7 +753,6 @@ bool Frame::isVisible() const {
 const Monitor* Frame::getCurrentMonitor() const {
 	return Monitor::getMonitorAt(pos + size / 2);
 }
-
 
 // Frame Loop ----------------------------------------------------------
 

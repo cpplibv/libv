@@ -9,27 +9,27 @@
 namespace vl {
 
 class Semaphore {
-	std::atomic<bool> passed;
+	bool passed;
 	std::mutex mutex;
 	std::condition_variable cv;
 public:
 	void raise() {
-		std::unique_lock<std::mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		passed = true;
 		cv.notify_all();
 	}
 	void reset() {
-		std::unique_lock<std::mutex> lock(mutex);
+		std::lock_guard<std::mutex> lock(mutex);
 		passed = false;
 	}
 	void wait() {
 		std::unique_lock<std::mutex> lock(mutex);
-		if (!passed.load())
-			cv.wait(lock, [this]{
-				return passed.load();
-			});
+		cv.wait(lock, [this]{
+			return passed;
+		});
 	}
 	
 	Semaphore(bool passed = false) : passed(passed) { }
 };
+
 } //namespace vl

@@ -1,156 +1,218 @@
-// File: resourceManager.hpp, Created on 2014. november 28. 21:18, Author: Vader
+// File:   resource_manager.hpp
 
 #pragma once
 
+// vl
+#include <vl/cache.hpp>
+#include <vl/context_id.hpp>
 // std
-#include <mutex>
-#include <algorithm>
-#include <cassert>
-#include <memory>
-#include <set>
-
-#include <iostream>
+#include <functional>
+// pro
+#include "worker_thread.hpp"
+#include "semaphore.hpp"
 
 namespace vl {
 
-template<typename T> class ResourceManager;
-template<typename T> class ResourceScope;
+struct TestResourceIOData {
+	int n = 0;
+	TestResourceIOData(int n) : n(n) { }
+	bool load() {
+		return true;
+	}
+	bool unload() {
+		return true;
+	}
+	bool operator<(const TestResourceIOData& r) const {
+		return n < r.n;
+	}
+	//	friend bool operator<(int t, const TestResourceIOData& r) {
+	//		return t < r.n;
+	//	}
+	//	friend bool operator<(const TestResourceIOData& r, int t) {
+	//		return r.n < t;
+	//	}
+	friend bool operator<(const std::tuple<int>& t, const TestResourceIOData& r) {
+		return std::get<0>(t) < r.n;
+	}
+	friend bool operator<(const TestResourceIOData& r, const std::tuple<int>& t) {
+		return r.n < std::get<0>(t);
+	}
+};
 
-//------------------------------------------------------------------------------------------
+struct TestResourceGLData {
+	int n = 0;
+	vl::Semaphore loaded;
+	TestResourceGLData(int n) :
+		n(n) { }
+	bool load() {
+		loaded.raise();
+		return true;
+	}
+	bool unload() {
+		loaded.reset();
+		return true;
+	}
+	bool operator<(const TestResourceGLData& r) const {
+		return n < r.n;
+	}
+	//	friend bool operator<(int t, const TestResourceGLData& r) {
+	//		return t < r.n;
+	//	}
+	//	friend bool operator<(const TestResourceGLData& r, int t) {
+	//		return r.n < t;
+	//	}
+	friend bool operator<(const std::tuple<int>& t, const TestResourceGLData& r) {
+		return std::get<0>(t) < r.n;
+	}
+	friend bool operator<(const TestResourceGLData& r, const std::tuple<int>& t) {
+		return r.n < std::get<0>(t);
+	}
+};
 
-template<typename T>
-class Resource {
+namespace detail {
+
+template <typename T>
+inline auto applicableFunction_Load(T& p) -> decltype(p.load()) {
+	return p.load();
+}
+//template <typename T>
+//inline auto load(std::shared_ptr<T> p) -> decltype(load(*p)) {
+//inline bool applicableFunctionLoad(std::shared_ptr<T> p) {
+//	return load(*p);
+//}
+template <typename T>
+inline auto applicableFunction_Unload(T& p) -> decltype(p.unload()) {
+	return p.unload();
+}
+//template <typename T>
+//inline auto applicableFunctionUnload(std::shared_ptr<T> p) -> decltype(unload(*p)) {
+//	return unload(*p);
+//}
+
+} //namespace detail
+
+template <typename T>
+struct ContextLoader {
+
+	struct Comparator : vl::less {
+		template <typename... Args>
+		inline bool operator()(const std::tuple<ThreadID, int, Args...>& t, const ContextLoader<T>& v) const {
+			//Cutting down the front of the tuple to absorb context info, not too happy about this solution.
+			return vl::less::operator()(reinterpret_cast<const std::tuple < Args...>&> (std::get<2>(t)), v.object);
+		}
+		template <typename... Args>
+		inline bool operator()(const ContextLoader<T>& v, const std::tuple<ThreadID, int, Args...>& t) const {
+			//Cutting down the front of the tuple to absorb context info, not too happy about this solution.
+			return vl::less::operator()(v.object, reinterpret_cast<const std::tuple < Args...>&> (std::get<2>(t)));
+		}
+		template<typename Arg, typename = typename
+		vl::disable_if<vl::is_less_comparable<std::tuple<Arg>, T>>::type, typename = typename
+		vl::enable_if<vl::is_less_comparable<Arg, T>>::type>
+		inline bool operator()(const std::tuple<ThreadID, int, Arg>& t, const ContextLoader<T>& v) const {
+			return vl::less::operator()(std::get<2>(t), v.object);
+		}
+		template<typename Arg, typename = typename
+		vl::disable_if<vl::is_less_comparable<T, std::tuple<Arg>>>::type, typename = typename
+		vl::enable_if<vl::is_less_comparable<T, Arg>>::type>
+		inline bool operator()(const ContextLoader<T>& v, const std::tuple<ThreadID, int, Arg>& t) const {
+			return vl::less::operator()(v.object, std::get<2>(t));
+		}
+		inline bool operator()(const ContextLoader<T>& a, const ContextLoader<T>& b) const {
+			return vl::less::operator()(a, b);
+		}
+	};
+
+	ThreadID contextID;
+	int prio;
+	T object;
+	T* operator->() {
+		return &object;
+	}
+	const T* operator->() const {
+		return &object;
+	}
+	template <typename... Args>
+	ContextLoader(const ThreadID& contextID, int prio, Args&&... args) :
+		contextID(contextID),
+		prio(prio),
+		object(std::forward<Args>(args)...) {
+		::vl::detail::applicableFunction_Load(object);
+	}
+	~ContextLoader() {
+		::vl::detail::applicableFunction_Unload(object);
+	}
+	inline bool operator<(const ContextLoader<T>& v) const {
+		return object < v.object;
+	}
+};
+
+//struct LoadStep {
+//	ThreadID contextID;
+//	std::function<bool()> work;
+//	int priority;
+//	std::shared_ptr<LoadStep> nextStep;
+//
+//	LoadStep(ThreadID contextID, std::function<bool() > work, int priority) :
+//		contextID(contextID), work(work), priority(priority) { }
+//};
+//
+//class TestResourceManager;
+//
+//class LoadSequence {
+//	friend class TestResourceManager;
+//	std::shared_ptr<LoadStep> firstStep;
+//	std::shared_ptr<LoadStep> lastStep;
+//public:
+//	LoadSequence() = default;
+//	template<typename K, typename... Args>
+//	LoadSequence& step(const ThreadID& contextID, int priority, std::shared_ptr<K> target, Args&&... args) {
+//		//who, what, how
+//		auto newStep = std::make_shared<LoadStep>(contextID, [&target] {
+//			::vl::detail::applicableFunctionLoad(target);
+//			return true;
+//		}, priority);
+//
+//		if (!firstStep)
+//			firstStep = lastStep = newStep;
+//		else
+//			lastStep = lastStep->nextStep = newStep;
+//
+//		return *this;
+//	}
+//};
+
+using ContextedTestResourceIOData = ContextLoader<TestResourceIOData>;
+using ContextedTestResourceGLData = ContextLoader<TestResourceGLData>;
+
+class TestResourceManager {
 private:
-	std::shared_ptr<T> ptr;
+	vl::WorkerThread contextIO;
+	vl::WorkerThread contextGL;
+	vl::Cache<ContextedTestResourceIOData, ContextedTestResourceIOData::Comparator> cacheIO;
+	vl::Cache<ContextedTestResourceGLData, ContextedTestResourceGLData::Comparator> cacheGL;
 
 public:
-	inline T* operator->() {
-		return ptr.get();
+	template <typename... Args>
+	std::shared_ptr<ContextedTestResourceIOData> getIO(Args&&... args) {
+		return cacheIO.get(std::forward<Args>(args)...);
 	}
-	inline const T* operator->() const {
-		return ptr.get();
-	}
-	inline T& operator*() {
-		return *ptr.get();
-	}
-	inline const T& operator*() const {
-		return *ptr.get();
-	}
-	inline T& data() {
-		return *ptr.get();
-	}
-	inline const T& data() const {
-		return *ptr.get();
-	}
-	template<typename... Args>
-	Resource(ResourceManager<T>& resourceManager, Args&&... args) : ptr(resourceManager.request(std::forward<Args>(args)...)) { }
-	template<typename... Args>
-	Resource(ResourceScope<T>& resourceScope, Args&&... args) : ptr(resourceScope.request(std::forward<Args>(args)...)) { }
-	virtual ~Resource() = default;
-};
-
-//------------------------------------------------------------------------------------------
-
-struct ChachedResourceArgumentComparator {
-	template<typename T, typename... Args>
-	inline bool operator()(const std::tuple<Args...>& args, const std::weak_ptr<T>&cr) const {
-		assert(!cr.expired());
-		return args < *cr.lock();
-	}
-	template<typename T, typename... Args>
-	inline bool operator()(const std::weak_ptr<T>&cr, const std::tuple<Args...>& args) const {
-		assert(!cr.expired());
-		return *cr.lock() < args;
+	template <typename... Args>
+	std::shared_ptr<ContextedTestResourceGLData> getGL(Args&&... args) {
+		return cacheGL.get(std::forward<Args>(args)...);
 	}
 };
 
-template<typename T>
-struct ChachedResourceComparator {
-	inline bool operator()(const std::weak_ptr<T>& lhs, const std::weak_ptr<T>&rhs) const {
-		assert(!rhs.expired() && !lhs.expired());
-		return *lhs.lock() < *rhs.lock();
+struct TestResource {
+	std::shared_ptr<ContextedTestResourceIOData> ioData;
+	std::shared_ptr<ContextedTestResourceGLData> glData;
+	TestResource(TestResourceManager& rm, int n) : n(n) {
+		ioData = rm.getIO(ThreadID::IO, 50, n + 1);
+		glData = rm.getGL(ThreadID::GL, 50, n - 1);
+		//		glData->loaded.wait();
+		glData->object.loaded.wait();
 	}
-	inline bool operator()(const std::weak_ptr<T>& lhs, const T& rhs) const {
-		assert(!lhs.expired());
-		return *lhs.lock() < rhs;
-	}
-	inline bool operator()(const T& lhs, const std::weak_ptr<T>&rhs) const {
-		assert(!rhs.expired());
-		return lhs < *rhs.lock();
-	}
-};
-
-//------------------------------------------------------------------------------------------
-
-template<typename T> //, typename Allocator = std::allocator<T>>
-//TODO P2: Custom allocator (VERY important) for you know... reasons
-//Or maybe type ereased allocators? / deleter?
-class ResourceManager {
-	friend class Resource<T>;
-	friend class ResourceScope<T>;
 private:
-	std::mutex cache_m;
-	std::set<std::weak_ptr<T>, ChachedResourceComparator<T>> cache;
-
-private:
-	template<typename... Args>
-	std::shared_ptr<T> request(Args&&... args) {
-		std::shared_ptr<T> resource;
-		std::unique_lock<std::mutex> lock_guard(cache_m);
-		auto result = std::equal_range(cache.begin(), cache.end(), std::make_tuple(args...), ChachedResourceArgumentComparator());
-
-		if (result.first != result.second)
-			resource = result.first->lock();
-
-		if (!resource)
-			resource.reset(new T(args...), [this](T*& ptr) {
-				std::unique_lock<std::mutex> lock_guard(cache_m);
-				//auto result = std::equal_range(cache.begin(), cache.end(), *ptr, ChachedResourceComparatorAllowingExpiered<T>());
-				//assert(result.first != result.second);
-				//cache.erase(result.first);
-
-				auto it = cache.begin();
-				while (it != cache.end()) { //lin search!
-					if (it->expired()) {
-						cache.erase(it++);
-						break;
-					} else
-						++it;
-					}
-				delete ptr;
-			});
-
-		cache.emplace(resource);
-
-		return resource;
-	}
-public:
-	ResourceManager() = default;
-	ResourceManager(const ResourceManager&) = delete;
-	ResourceManager& operator=(const ResourceManager&) = delete;
-	virtual ~ResourceManager() = default;
-};
-
-//------------------------------------------------------------------------------------------
-
-template<typename T>
-class ResourceScope {
-	friend class Resource<T>;
-private:
-	ResourceManager<T>& rm;
-	std::mutex keep_alive_m;
-	std::set<std::shared_ptr<T>> keep_alive;
-private:
-	template<typename... Args>
-	std::shared_ptr<T> request(Args&&... args) {
-		std::shared_ptr<T> result(rm.request(std::forward<Args>(args)...));
-		std::unique_lock<std::mutex> lock_guard(keep_alive_m);
-		keep_alive.insert(result);
-		return result;
-	}
-public:
-	ResourceScope(ResourceManager<T>& rm) : rm(rm) { }
-	ResourceScope(ResourceScope<T>& rs) : rm(rs.rm) { }
+	int n;
 };
 
 } //namespace vl

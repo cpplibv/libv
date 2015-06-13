@@ -7,10 +7,13 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 // vl
+#include <vl/resource_manager.hpp>
 // std
 #include <map>
 #include <memory>
 #include <vector>
+// pro
+#include "vl/gl/log.hpp"
 
 namespace vl {
 namespace gl {
@@ -63,31 +66,64 @@ enum class TextureType : uint32_t {
 
 // Shader --------------------------------------------------------------
 
-class Shader {
-private:
-	static int nextUniformIndex;
-	static std::vector<std::string>& uniforms();
-	static Shader* currentShader;
+class ShaderFile {
+	std::string path;
+	std::string text;
 public:
-	static int registerUniform(const std::string& name);
-	static GLint getUniformLocation(int name);
-private:
-	std::string name;
-	std::unique_ptr<int[] > uniformLocs;
-	std::string fs, gs, vs;
-	GLuint id;
-public:
-	Shader(const std::string& name, const std::string& vs, const std::string& fs);
-	Shader(const std::string& name, const std::string& vs, const std::string& gs, const std::string& fs);
-	void useProgram();
-	void loadProgram();
-	void unloadProgram();
-	void reloadProgram();
-	virtual ~Shader();
+	ShaderFile(std::string path) : path(path) {
+		std::ifstream file(path, std::ios::in);
+		if (file) {
+			std::ostringstream buffer;
+			buffer << file.rdbuf();
+			file.close();
+			text = buffer.str();
+		} else
+			VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", text);
 
-public:
-	void printActiveUniforms();
+		//std::ifstream shaderFile(path, std::ios::in);
+		//if (shaderFile.is_open()) {
+		//	std::string line;
+		//	while (std::getline(shaderFile, line))
+		//		text += "\n" + line;
+		//	shaderFile.close();
+		//} else
+		//	VLOG_ERROR(vl::gl::log(), std::string("Failed to open file: ") + text);
+	}
 };
+
+class Shader {
+	Resource<ShaderFile> fs, gs, vs;
+public:
+	Shader() { }
+};
+
+Resource<Shader> toonShader;
+
+//class Shader {
+//private:
+//	static int nextUniformIndex;
+//	static std::vector<std::string>& uniforms();
+//	static Shader* currentShader;
+//public:
+//	static int registerUniform(const std::string& name);
+//	static GLint getUniformLocation(int name);
+//private:
+//	std::string name;
+//	std::unique_ptr<int[] > uniformLocs;
+//	std::string fs, gs, vs;
+//	GLuint id;
+//public:
+//	Shader(const std::string& name, const std::string& vs, const std::string& fs);
+//	Shader(const std::string& name, const std::string& vs, const std::string& gs, const std::string& fs);
+//	void useProgram();
+//	void loadProgram();
+//	void unloadProgram();
+//	void reloadProgram();
+//	virtual ~Shader();
+//
+//public:
+//	void printActiveUniforms();
+//};
 
 } //namespace gl
 } //namespace vl

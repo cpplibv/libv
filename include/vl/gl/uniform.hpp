@@ -10,6 +10,7 @@
 
 namespace vl {
 namespace gl {
+
 // Uniform -------------------------------------------------------------
 
 template <typename T>

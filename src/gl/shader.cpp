@@ -12,8 +12,8 @@ namespace gl {
 namespace detail {
 
 std::string readShaderFile(const std::string& file) {
-	std::ifstream shaderFile(file, std::ios::in);
 	std::string result;
+	std::ifstream shaderFile(file, std::ios::in);
 	if (shaderFile.is_open()) {
 		std::string line;
 		while (std::getline(shaderFile, line))
@@ -85,6 +85,7 @@ GLuint loadShaderProgram(const std::string& program, const std::string& vs, cons
 	checkGL();
 	return id;
 }
+
 } //namespace detail
 
 // Shader --------------------------------------------------------------
@@ -165,6 +166,7 @@ void Shader::printActiveUniforms() {
 			VLOG_INFO(vl::gl::log(), std::string("\t") + uniforms()[i]);
 	}
 }
+
 } //namespace gl
 } //namespace vl
 

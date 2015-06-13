@@ -20,7 +20,7 @@
 
 namespace vl {
 
-class Context {
+class WorkerThread {
 	class Task {
 		int priority;
 		std::condition_variable_any* executed_cv;
@@ -137,9 +137,9 @@ private:
 	}
 
 public:
-	Context(const std::string& name) : name(name), thread(&Context::run, this) { }
-	Context() : Context("Unnamed") { }
-	virtual ~Context() {
+	WorkerThread(const std::string& name) : name(name), thread(&WorkerThread::run, this) { }
+	WorkerThread() : WorkerThread("Unnamed") { }
+	virtual ~WorkerThread() {
 		terminate();
 		join();
 	}

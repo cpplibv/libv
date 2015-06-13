@@ -2,16 +2,16 @@
 
 TODO
 
-# Installation
+## Installation
 
-clone\n
-make ext\n
-make\n
+git clone
+make ext
+make
 
-# Moduls
+## Moduls
 
 TODO
 
-# License
+## License
 
 TODO

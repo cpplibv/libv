@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <vl/context.hpp>
+#include <vl/worker_thread.hpp>
 
 namespace vl {
 namespace gl {

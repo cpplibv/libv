@@ -11,15 +11,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 // pro
+#include "vl/gl/log.hpp"
 #include "vl/gl/model.hpp"
 #include "vl/gl/shader.hpp"
+#include "vl/gl/texture.hpp"
 #include "vl/gl/uniform.hpp"
 #include "vl/gl/vgl.hpp"
-#include "vl/gl/texture.hpp"
 
 //<<< http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
-
-using namespace vl;
 
 GLFWwindow* window;
 float angle = 0;
@@ -45,7 +44,7 @@ void initGLFW() {
 	}
 	glfwSetWindowPos(window, 100, 100);
 	glfwMakeContextCurrent(window);
-//	glfwSwapInterval(0);
+	//	glfwSwapInterval(0);
 	glfwSwapInterval(1);
 	checkGL();
 }
@@ -88,7 +87,7 @@ void initGL() {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
-//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	checkGL();
@@ -100,22 +99,23 @@ void initGLSL() {
 
 /* ---------------------------------------------------------------------------- */
 
-vl::Context ioctx("IO");
-vl::Context glctx("GL");
-vl::gl::ModelContext context(glctx, ioctx);
-vl::gl::TextureContext txctx(glctx, ioctx);
+vl::WorkerThread* ioctx;
+vl::WorkerThread* glctx;
+vl::gl::ModelContext* mlctx;
+vl::gl::TextureContext* txctx;
 
 vl::gl::Shader* shaderSimple;
-gl::ModelManager* modelManager;
-gl::TextureManager* textureManager;
-gl::Texture* texture1;
-gl::Texture* texture2;
-gl::Texture* texture3;
-gl::Model* model1;
-gl::Model* model2;
-gl::Model* model3;
-gl::Model* model4;
-gl::Model* model5;
+vl::gl::ModelManager* modelManager;
+vl::gl::TextureManager* textureManager;
+vl::gl::Texture* texture1;
+vl::gl::Texture* texture2;
+vl::gl::Texture* texture3;
+vl::gl::Model* model1;
+vl::gl::Model* model2;
+vl::gl::Model* model3;
+vl::gl::Model* model4;
+vl::gl::Model* model5;
+vl::gl::GL gl;
 
 void loop() {
 	checkGL();
@@ -126,50 +126,50 @@ void loop() {
 	angle += deltaTime * 30;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	gl::pushPMat();
-	gl::pushVMat();
-	gl::pushMMat();
+	gl.pushMatrixProjection();
+	gl.pushMatrixView();
+	gl.pushMatrixModel();
 
-	gl::PMat() = glm::perspective(1.f, 900.f / 600.f, 1.f, 1000.f);
-	gl::VMat() = glm::lookAt(glm::vec3(20.f, 15.f, 20.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-	gl::VMat() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
+	gl.matrixProjection() = glm::perspective(1.f, 900.f / 600.f, 1.f, 1000.f);
+	gl.matrixView() = glm::lookAt(glm::vec3(20.f, 15.f, 20.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
 
-	gl::MMat() *= glm::translate(glm::vec3(0, 0, -16));
-	model1->render();
-	gl::MMat() *= glm::translate(glm::vec3(0, 0, 8));
-	model2->render();
-	gl::MMat() *= glm::translate(glm::vec3(0, 0, 8));
-	model3->render();
-	gl::MMat() *= glm::translate(glm::vec3(0, 0, 8));
-	model4->render();
-	
-	glsl::textureDiffuseSampler = static_cast<uint32_t>(gl::TextureType::diffuse);
-	glsl::textureNormalSampler = static_cast<uint32_t>(gl::TextureType::normal);
-	glsl::textureAmbientSampler = static_cast<uint32_t>(gl::TextureType::ambient);
-	
-	gl::MMat() *= glm::translate(glm::vec3(0, 0, 8));
-	gl::MMat() *= glm::scale(glm::vec3(3, 3, 3));
-	texture1->bind(gl::TextureType::diffuse); //d
-	texture2->bind(gl::TextureType::normal); //n
-	texture3->bind(gl::TextureType::ambient); //a
-	model5->render();
-	texture3->unbind(gl::TextureType::ambient); //a
-	texture2->unbind(gl::TextureType::normal); //n
-	texture1->unbind(gl::TextureType::diffuse); //d
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -16));
+	model1->render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model2->render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model3->render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model4->render(gl);
 
-	gl::popMMat();
-	gl::popVMat();
-	gl::popPMat();
+	vl::glsl::textureDiffuseSampler = static_cast<uint32_t> (vl::gl::TextureType::diffuse);
+	vl::glsl::textureNormalSampler = static_cast<uint32_t> (vl::gl::TextureType::normal);
+	vl::glsl::textureAmbientSampler = static_cast<uint32_t> (vl::gl::TextureType::ambient);
+
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	gl.matrixModel() *= glm::scale(glm::vec3(3, 3, 3));
+	texture1->bind(vl::gl::TextureType::diffuse); //d
+	texture2->bind(vl::gl::TextureType::normal); //n
+	texture3->bind(vl::gl::TextureType::ambient); //a
+	model5->render(gl);
+	texture3->unbind(vl::gl::TextureType::ambient); //a
+	texture2->unbind(vl::gl::TextureType::normal); //n
+	texture1->unbind(vl::gl::TextureType::diffuse); //d
+
+	gl.popMatrixModel();
+	gl.popMatrixView();
+	gl.popMatrixProjection();
 
 	glfwSwapBuffers(window);
 	glfwPollEvents();
 	checkGL();
 
 	if (!glfwWindowShouldClose(window)) {
-		context.gl.executeAsync(loop);
+		glctx->executeAsync(loop);
 	} else {
 		glfwTerminate();
-		context.gl.terminate();
+		glctx->terminate();
 	}
 }
 
@@ -179,8 +179,8 @@ void main2() {
 	initGL();
 	initGLSL();
 
-	shaderSimple = new gl::Shader("Debug", "Data/Shader/debug0.vs", "Data/Shader/debug0.fs");
-//	shaderSimple = new gl::Shader("Simple", "Data/Shader/simple.vs", "Data/Shader/simple.fs");
+	shaderSimple = new vl::gl::Shader("Debug", "Data/Shader/debug0.vs", "Data/Shader/debug0.fs");
+	//shaderSimple = new vl::gl::Shader("Simple", "Data/Shader/simple.vs", "Data/Shader/simple.fs");
 	shaderSimple->loadProgram();
 	shaderSimple->printActiveUniforms();
 	shaderSimple->useProgram();
@@ -191,25 +191,51 @@ void main2() {
 int main(int, char**) {
 	vl::log().output(std::cout);
 
-	context.gl.executeSync(main2);
+	ioctx = new vl::WorkerThread("IO");
+	glctx = new vl::WorkerThread("GL");
+	mlctx = new vl::gl::ModelContext(*glctx, *ioctx);
+	txctx = new vl::gl::TextureContext(*glctx, *ioctx);
 
-	textureManager = new gl::TextureManager(&txctx);
-	modelManager = new gl::ModelManager(&context);
-//	texture1 = new gl::Texture(*textureManager, "Data/Texture/6poly_metal_01_diffuse.dds");
-	texture1 = new gl::Texture(*textureManager, "Data/Texture/asteorid_02_diffuse.dds");
-	texture2 = new gl::Texture(*textureManager, "Data/Texture/asteorid_02_normal.dds");
-	texture3 = new gl::Texture(*textureManager, "Data/Texture/asteorid_02_ambient.dds");
-	model1 = new gl::Model(*modelManager, "test_group.dae.pb");
-	model2 = new gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
-	model3 = new gl::Model(*modelManager, "test_sp.dae.pb");
-	model4 = new gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
-	model5 = new gl::Model(*modelManager, "asteroid_02.dae.pb");
+	glctx->executeSync(main2);
 
-	context.gl.executeAsync(loop);
+	textureManager = new vl::gl::TextureManager(txctx);
+	modelManager = new vl::gl::ModelManager(mlctx);
 
-	context.gl.join();
-	context.io.terminate();
-	context.io.join();
+	texture1 = new vl::gl::Texture(*textureManager, "Data/Texture/asteorid_02_diffuse.dds");
+	texture2 = new vl::gl::Texture(*textureManager, "Data/Texture/asteorid_02_normal.dds");
+	texture3 = new vl::gl::Texture(*textureManager, "Data/Texture/asteorid_02_ambient.dds");
+	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
+	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
+	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
+	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
+	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
+
+	glctx->executeAsync(loop);
+
+	glctx->join();
+	ioctx->terminate();
+	ioctx->join();
+
+	//delete shaderSimple;
+
+	delete texture1;
+	delete texture2;
+	delete texture3;
+
+	delete model1;
+	delete model2;
+	delete model3;
+	delete model4;
+	delete model5;
+
+	delete modelManager;
+	delete textureManager;
+
+	delete ioctx;
+	delete glctx;
+
+	delete mlctx;
+	delete txctx;
 
 	return 0;
 }

@@ -6,10 +6,9 @@
 #include <memory>
 
 namespace vl {
-//=== std::function
 
 template <typename RType, typename... Args>
-struct Callable {
+struct Callable { //=== std::function
 	virtual RType operator()(Args... args) = 0;
 	virtual ~Callable() = 0;
 };

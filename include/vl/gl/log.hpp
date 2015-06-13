@@ -11,7 +11,7 @@ namespace vl {
 namespace gl {
 
 inline Log& log() {
-	static Log log("gl", vl::log());
+	static Log log("gl", ::vl::log());
 	return log;
 }
 

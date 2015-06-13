@@ -7,11 +7,7 @@
 #include <glm/glm.hpp>
 // std
 #include <stack>
-// pro
-#include "vl/gl/log.hpp"
 
-//#define MEMBER_OFFSET(s,m) (nullptr + (offsetof(s,m)))
-//#define BUFFER_OFFSET(i) (nullptr + (i))
 #define MEMBER_OFFSET(s,m) ((char *)NULL + (offsetof(s,m)))
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
@@ -22,26 +18,32 @@
 namespace vl {
 namespace gl {
 
-glm::mat4& MMat();
-glm::mat4& VMat();
-glm::mat4& PMat();
-glm::mat4& TMat();
-glm::mat4 MVPMat();
+class GL {
+private:
+	glm::mat4 matrixTexture_;
+	std::stack<glm::mat4> matrixStackModel;
+	std::stack<glm::mat4> matrixStackView;
+	std::stack<glm::mat4> matrixStackProjection;
+public:
+	glm::mat4& matrixModel();
+	glm::mat4& matrixView();
+	glm::mat4& matrixProjection();
+	const glm::mat4& matrixTexture() const ;
+	glm::mat4 matrixMVP();
 
-void popMMat();
-void popVMat();
-void popPMat();
+	void popMatrixModel();
+	void popMatrixView();
+	void popMatrixProjection();
 
-void pushMMat();
-void pushMMat(const glm::mat4&);
-void pushVMat();
-void pushVMat(const glm::mat4&);
-void pushPMat();
-void pushPMat(const glm::mat4&);
-
-//Debug
-void renderCube(float x = 0, float y = 0, float z = 0, float size = 0.5f);
-void renderXYZ(float x = 0, float y = 0, float z = 0, float size = 2);
+	void pushMatrixModel();
+	void pushMatrixModel(const glm::mat4&);
+	void pushMatrixView();
+	void pushMatrixView(const glm::mat4&);
+	void pushMatrixProjection();
+	void pushMatrixProjection(const glm::mat4&);
+	
+	GL();
+};
 
 } //namespace gl
 } //namespace vl

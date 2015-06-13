@@ -13,6 +13,8 @@
 namespace vl {
 namespace gl {
 
+class GL;
+
 class ModelManager : public vl::ResourceManager<detail::ModelImpl> {
 public:
 	ModelContext* context;
@@ -21,7 +23,7 @@ public:
 
 class Model : public vl::Resource<detail::ModelImpl> {
 public:
-	void render(/*RenderState*/);
+	void render(vl::gl::GL& gl);
 public:
 	Model(ModelManager& resourceManager, const std::string& filePath);
 };

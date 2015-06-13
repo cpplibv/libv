@@ -5,8 +5,9 @@
 // ext
 #include <gli/gli.hpp>
 // pro
-#include "vl/gl/vgl.hpp"
 #include "vl/gl/gl_contexts.hpp"
+#include "vl/gl/log.hpp"
+#include "vl/gl/vgl.hpp"
 
 //http://gli.g-truc.net/0.5.1/code.html
 

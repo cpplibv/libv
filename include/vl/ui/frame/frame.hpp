@@ -5,7 +5,7 @@
 // conf
 #include "vl/ui/config.hpp"
 // vl
-#include <vl/context.hpp>
+#include <vl/worker_thread.hpp>
 #include <vl/sig/signal.hpp>
 #include <vl/timer.hpp>
 // std
@@ -227,7 +227,7 @@ private:
 	std::atomic<bool> forcedClose;
 
 private:
-	vl::Context context;
+	vl::WorkerThread context;
 
 	GLFWwindow* window;
 	GLFWwindow* shareWindow = nullptr;

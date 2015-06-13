@@ -17,10 +17,14 @@
 //			- Single-threaded
 //			- Multithreaded Global
 //			- Multithreaded Local))
-//TODO P5: Adaptiv Signal// This is somewhat important
-//				- [in/out]put (same, generic lambda...)
-//TODO P5: Routing Signal
-//				+ [set/get]Condition(SignalRouter)
+//
+//
+//TODO P5: AdaptivSignal [in/out]put (same, generic lambda...)
+//TODO P5: RoutingSignal [set/get]Condition(SignalRouter)
+//TODO P5: UniqueSignal
+//TODO P5: PrioritySignal
+//
+//
 //TODO P5: c++14 workaround for index_sequence if c++14 is not present
 //TODO P5: Switching from functional to union magic to eliminate dynamic memory allocation
 //
@@ -52,8 +56,12 @@ struct is_non_void : std::is_same<typename std::is_void<T>::type, std::false_typ
 
 namespace vl {
 
+// -------------------------------------------------------------------------------------------------
+
 template <typename RType>
 class Accumulator;
+
+// === Signal ======================================================================================
 
 template <typename RType, typename... Args>
 class SignalImpl : public TrackableBase {
@@ -65,48 +73,122 @@ protected:
 
 	Accumulator<RType>* accumulator;
 protected:
-	virtual void connect(TrackableBase* ptr, bool reflect = true);
-	virtual void disconnect(TrackableBase* ptr, bool reflect = true);
+	virtual void connect(TrackableBase* ptr, bool reflect = true) {
+		if (reflect)
+			ptr->connect(this, false);
+	}
+	virtual void disconnect(TrackableBase* ptr, bool reflect = true) {
+		outputs.erase(ptr);
+		inputs.erase(ptr);
+
+		if (reflect && ptr)
+			ptr->disconnect(this, false);
+	}
+	// ---------------------------------------------------------------------------------------------
 public:
-	SignalImpl();
-	SignalImpl(Accumulator<RType>* accumulator);
+	SignalImpl() :
+		accumulator(Accumulator<RType>::get()) { }
+	SignalImpl(Accumulator<RType>* accumulator) :
+		accumulator(accumulator) { }
+	// ---------------------------------------------------------------------------------------------
 public:
-	Accumulator<RType>* getAccumulator() const;
-	void setAccumulator(Accumulator<RType>* accumulator);
+	inline Accumulator<RType>* getAccumulator() const {
+		return accumulator;
+	}
+	inline void setAccumulator(Accumulator<RType>* accumulator) {
+		this->accumulator = accumulator;
+	}
+	// ---------------------------------------------------------------------------------------------
 public:
-	virtual RType fire(Args... args);
+	virtual RType fire(Args... args) {
+		return fireImpl(std::forward<Args>(args)...);
+	}
+
 protected:
 	template <typename R2 = RType, typename = typename std::enable_if<std::is_void<R2>::value>::type>
-	RType fireImpl(Args... args);
+	RType fireImpl(Args... args) {
+		for (auto& output : outputs) {
+			(*output.second)(std::forward<Args>(args)...);
+		}
+	}
 	template <typename R2 = RType, typename = typename std::enable_if<is_non_void<R2>::value>::type>
-	RType fireImpl(Args... args, int /*ignored*/ = 0);
+	RType fireImpl(Args... args, int /*ignored*/ = 0) {
+		RType result = accumulator->begin();
+		for (auto& output : outputs) {
+			if (!accumulator->add(result, (*output.second)(std::forward<Args>(args)...)))
+				return result;
+		}
+		return result;
+	}
 
+	// ---------------------------------------------------------------------------------------------
 public:
-	void clearInput();
-	void clearOutput();
+	void clearInput() {
+		while (!inputs.empty())
+			disconnect(*inputs.begin());
+	}
+	void clearOutput() {
+		while (!outputs.empty())
+			disconnect(outputs.begin()->first);
+	}
+	inline size_t inputSize() const {
+		return inputs.size();
+	}
+	inline size_t outputSize() const {
+		return outputs.size();
+	}
 
-	size_t inputSize() const;
-	size_t outputSize() const;
-	void input(SignalImpl<RType, Args...>& sig);
-	void input(SignalImpl<RType, Args...> * const sig);
+	// ---------------------------------------------------------------------------------------------
+	inline void input(SignalImpl<RType, Args...>& sig) {
+		input(&sig);
+	}
+	void input(SignalImpl<RType, Args...> * const sig) {
+		sig->output(&SignalImpl<RType, Args...>::fire, this);
+		inputs.emplace(sig);
+	}
 
-	void operator()(const std::function<RType(Args...)>& func);
-	template<typename Object>
-	void operator()(RType(Object::*func)(Args...), Object& obj);
-	template<typename Object>
-	void operator()(RType(Object::*func)(Args...), Object* obj);
-	void operator()(SignalImpl<RType, Args...>& slot);
-	void operator()(SignalImpl<RType, Args...> * const slot);
+	// ---------------------------------------------------------------------------------------------
+	inline void operator()(const std::function<RType(Args...)>& func) {
+		return this->output(func);
+	}
+	template<typename Object> inline void operator()(RType(Object::*func)(Args...), Object& obj) {
+		return this->output(func, obj);
+	}
+	template<typename Object> inline void operator()(RType(Object::*func)(Args...), Object* obj) {
+		return this->output(func, obj);
+	}
+	inline void operator()(SignalImpl<RType, Args...>& slot) {
+		return this->output(slot);
+	}
+	inline void operator()(SignalImpl<RType, Args...> * const slot) {
+		return this->output(slot);
+	}
 
-	void output(const std::function<RType(Args...)>& func);
-	template<typename Object>
-	void output(RType(Object::*func)(Args...), Object& obj);
-	template<typename Object>
-	void output(RType(Object::*func)(Args...), Object* obj);
-	void output(SignalImpl<RType, Args...>& slot);
-	void output(SignalImpl<RType, Args...> * const slot);
+	// ---------------------------------------------------------------------------------------------
+	void output(const std::function<RType(Args...)>& func) {
+		outputs.emplace(nullptr, CallablePtr(new CallableImpl<RType, Args...>(func)));
+	}
+	template<typename Object> inline void output(RType(Object::*func)(Args...), Object& obj) {
+		output(func, &obj);
+	}
+	template<typename Object> void output(RType(Object::*func)(Args...), Object* obj) {
+		static_assert(std::is_base_of<TrackableBase, Object>::value,
+				"Object type has to be Derived from TrackableBase (You may want to consider inheriting from vl::Trackable).");
+		outputs.emplace(obj, CallablePtr(new CallableImpl<RType, Args...>(obj, func)));
+		static_cast<TrackableBase*> (obj)->connect(this, false);
+	}
+	inline void output(SignalImpl<RType, Args...>& slot) {
+		output(&slot);
+	}
+	inline void output(SignalImpl<RType, Args...> * const slot) {
+		slot->input(this);
+	}
 
-	virtual ~SignalImpl();
+	// ---------------------------------------------------------------------------------------------
+	virtual ~SignalImpl() {
+		clearInput();
+		clearOutput();
+	}
 };
 
 template<typename... Args>
@@ -119,151 +201,7 @@ struct Signal<R(Args...)> : public SignalImpl<R, Args...> {
 	using SignalImpl<R, Args...>::SignalImpl;
 };
 
-//==============================================================================
-template <typename RType, typename... Args>
-SignalImpl<RType, Args...>::SignalImpl() :
-	accumulator(Accumulator<RType>::get()) { }
-template <typename RType, typename... Args>
-SignalImpl<RType, Args...>::SignalImpl(Accumulator<RType>* accumulator) :
-	accumulator(accumulator) { }
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline Accumulator<RType>* SignalImpl<RType, Args...>::getAccumulator() const {
-	return accumulator;
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::setAccumulator(Accumulator<RType>* accumulator) {
-	this->accumulator = accumulator;
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-void SignalImpl<RType, Args...>::connect(TrackableBase* ptr, bool reflect) {
-	if (reflect)
-		ptr->connect(this, false);
-}
-template <typename RType, typename... Args>
-void SignalImpl<RType, Args...>::disconnect(TrackableBase* ptr, bool reflect) {
-	outputs.erase(ptr);
-	inputs.erase(ptr);
-
-	if (reflect && ptr)
-		ptr->disconnect(this, false);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args> template <typename, typename>
-inline RType SignalImpl<RType, Args...>::fireImpl(Args... args) {
-	for (auto& output : outputs) {
-		(*output.second)(std::forward<Args>(args)...);
-	}
-}
-template <typename RType, typename... Args> template <typename, typename>
-inline RType SignalImpl<RType, Args...>::fireImpl(Args... args, int /*ignored*/) {
-	RType result = accumulator->begin();
-	for (auto& output : outputs) {
-		if (!accumulator->add(result, (*output.second)(std::forward<Args>(args)...)))
-			return result;
-	}
-	return result;
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-RType SignalImpl<RType, Args...>::fire(Args... args) {
-	return fireImpl(std::forward<Args>(args)...);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::operator()(const std::function<RType(Args...)>& func) {
-	return this->output(func);
-}
-template <typename RType, typename... Args> template <typename Object>
-inline void SignalImpl<RType, Args...>::operator()(RType(Object::*func)(Args...), Object& obj) {
-	return this->output(func, obj);
-}
-template <typename RType, typename... Args> template <typename Object>
-inline void SignalImpl<RType, Args...>::operator()(RType(Object::*func)(Args...), Object * const obj) {
-	return this->output(func, obj);
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::operator()(SignalImpl<RType, Args...>& slot) {
-	return this->output(slot);
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::operator()(SignalImpl<RType, Args...> * const slot) {
-	return this->output(slot);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::output(const std::function<RType(Args...)>& func) {
-	outputs.emplace(nullptr, CallablePtr(new CallableImpl<RType, Args...>(func)));
-}
-template <typename RType, typename... Args> template <typename Object>
-inline void SignalImpl<RType, Args...>::output(RType(Object::*func)(Args...), Object& obj) {
-	output(func, &obj);
-}
-template <typename RType, typename... Args> template <typename Object>
-inline void SignalImpl<RType, Args...>::output(RType(Object::*func)(Args...), Object * const obj) {
-	static_assert(std::is_base_of<TrackableBase, Object>::value,
-			"Object type has to be Derived from TrackableBase (You may want to consider inheriting from Trackable).");
-	outputs.emplace(obj, CallablePtr(new CallableImpl<RType, Args...>(obj, func)));
-	static_cast<TrackableBase*> (obj)->connect(this, false);
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::output(SignalImpl<RType, Args...>& slot) {
-	output(&slot);
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::output(SignalImpl<RType, Args...> * const slot) {
-	slot->input(this);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::clearInput() {
-	while (!inputs.empty())
-		disconnect(*inputs.begin());
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::clearOutput() {
-	while (!outputs.empty())
-		disconnect(outputs.begin()->first);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline size_t SignalImpl<RType, Args...>::outputSize() const {
-	return outputs.size();
-}
-template <typename RType, typename... Args>
-inline size_t SignalImpl<RType, Args...>::inputSize() const {
-	return inputs.size();
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::input(SignalImpl<RType, Args...>& sig) {
-	input(&sig);
-}
-template <typename RType, typename... Args>
-inline void SignalImpl<RType, Args...>::input(SignalImpl<RType, Args...> * const sig) {
-	sig->output(&SignalImpl<RType, Args...>::fire, this);
-	inputs.emplace(sig);
-}
-
-//------------------------------------------------------------------------------
-template <typename RType, typename... Args>
-SignalImpl<RType, Args...>::~SignalImpl() {
-	clearInput();
-	clearOutput();
-}
-
-//==============================================================================
-//==============================================================================
+// === CapacitivSignal =============================================================================
 
 template <typename... Args>
 class CapacitivSignalImpl : public SignalImpl<void, Args...> {
@@ -271,13 +209,22 @@ private:
 	std::vector<std::tuple<typename std::remove_reference<Args>::type...>> argQue;
 private:
 	template<std::size_t... Is>
-	inline void flushHelper(std::index_sequence<Is...>);
+	inline void flushHelper(std::index_sequence<Is...>) {
+		for (auto& item : argQue) {
+			SignalImpl<void, Args...>::fire(std::get<Is>(item)...);
+		}
+		argQue.clear();
+	}
 public:
-	virtual void fire(Args... args) override;
-	inline void flush();
+	virtual void fire(Args... args) override {
+		argQue.emplace_back(args...);
+	}
+	inline void flush() {
+		flushHelper(std::index_sequence_for < Args...>{});
+	}
 };
 
-//------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 template<typename... T>
 struct CapacitivSignal : public CapacitivSignalImpl<T...> {
@@ -290,28 +237,74 @@ struct CapacitivSignal<R(T...)> : public CapacitivSignalImpl<T...> {
 	using CapacitivSignalImpl<T...>::CapacitivSignalImpl;
 };
 
-//==============================================================================
-template<typename... Args>
-template<std::size_t... Is>
-inline void CapacitivSignalImpl<Args...>::flushHelper(std::index_sequence<Is...>) {
-	for (auto& item : argQue) {
-		SignalImpl<void, Args...>::fire(std::get<Is>(item)...);
+// === ConditionalSignal ===========================================================================
+
+template <typename R, typename... Args>
+struct ConditionalSignalImpl : public SignalImpl<R, Args...> {
+	bool enabled = true;
+public:
+	inline void enable() {
+		enabled = true;
 	}
-	argQue.clear();
-}
+	inline void disable() {
+		enabled = false;
+	}
+	virtual R fire(Args... args) override {
+		if (enabled)
+			return SignalImpl < R, Args...>::fire(std::forward<Args>(args)...);
+	}
+};
 
-//------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+
 template<typename... Args>
-void CapacitivSignalImpl<Args...>::fire(Args... args) {
-	argQue.emplace_back(args...);
-}
+struct ConditionalSignal : public ConditionalSignalImpl<void, Args...> {
+	using ConditionalSignalImpl<void, Args...>::ConditionalSignalImpl;
+};
 
-//------------------------------------------------------------------------------
-template<typename... Args>
-inline void CapacitivSignalImpl<Args...>::flush() {
-	flushHelper(std::index_sequence_for < Args...>{});
-}
-
-//------------------------------------------------------------------------------
+template<typename R, typename... Args>
+struct ConditionalSignal<R(Args...)> : public ConditionalSignalImpl<R, Args...> {
+	using ConditionalSignalImpl<R, Args...>::ConditionalSignalImpl;
+};
 
 } //namespace vl
+
+
+
+
+//template<typename CallSignature, typename... Moduls> struct SignalBase;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Adaptiv;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Capacitiv;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Conditional;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Priority;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Routing;
+//template<typename CallSignature, typename Modul, typename... Moduls> struct Unique;
+
+
+//template<typename Base, typename R, typename... Args> struct A;
+//template<typename Base, typename R, typename... Args> struct B;
+//template<typename Base, typename R, typename... Args> struct C;
+//
+//template<template<typename...> class Base, typename R, typename... BaseArgs, typename... Args>
+//struct A<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
+//	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
+//
+//	int a;
+//};
+//
+//template<template<typename...> class Base, typename R, typename... BaseArgs, typename... Args>
+//struct B<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
+//	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
+//
+//	int b;
+//};
+//
+//template<template<template<template<typename...> class> class> class Base, typename R, typename... BaseArgs, typename... Args>
+//struct C<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
+////	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
+//	using FireReturn = R;
+//
+//	int c;
+//};
+//
+//
