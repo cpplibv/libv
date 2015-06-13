@@ -5,11 +5,11 @@
 // vl
 #include <vl/cache.hpp>
 #include <vl/context_id.hpp>
+#include <vl/efl.hpp>
+#include <vl/semaphore.hpp>
+#include <vl/worker_thread.hpp>
 // std
 #include <functional>
-// pro
-#include "worker_thread.hpp"
-#include "semaphore.hpp"
 
 namespace vl {
 
@@ -71,23 +71,28 @@ struct TestResourceGLData {
 
 namespace detail {
 
-template <typename T>
+template <typename T,
+typename = vl::disable_if<vl::is_efl_loadable<T>>,
+typename = vl::enable_if<vl::is_member_loadable<T>>>
 inline auto applicableFunction_Load(T& p) -> decltype(p.load()) {
 	return p.load();
 }
-//template <typename T>
-//inline auto load(std::shared_ptr<T> p) -> decltype(load(*p)) {
-//inline bool applicableFunctionLoad(std::shared_ptr<T> p) {
-//	return load(*p);
-//}
-template <typename T>
+template <typename T,
+typename = vl::enable_if<vl::is_efl_loadable<T>>>
+inline auto applicableFunction_Load(T& p) -> decltype(::vl::efl::load(p)) {
+	return ::vl::efl::load(p);
+}
+template <typename T,
+typename = vl::disable_if<vl::is_efl_unloadable<T>>,
+typename = vl::enable_if<vl::is_member_unloadable<T>>>
 inline auto applicableFunction_Unload(T& p) -> decltype(p.unload()) {
 	return p.unload();
 }
-//template <typename T>
-//inline auto applicableFunctionUnload(std::shared_ptr<T> p) -> decltype(unload(*p)) {
-//	return unload(*p);
-//}
+template <typename T,
+typename = vl::enable_if<vl::is_efl_unloadable<T>>>
+inline auto applicableFunction_Unload(T& p) -> decltype(::vl::efl::unload(*p)) {
+	return ::vl::efl::unload(*p);
+}
 
 } //namespace detail
 
@@ -105,14 +110,14 @@ struct ContextLoader {
 			//Cutting down the front of the tuple to absorb context info, not too happy about this solution.
 			return vl::less::operator()(v.object, reinterpret_cast<const std::tuple < Args...>&> (std::get<2>(t)));
 		}
-		template<typename Arg, 
-		typename = vl::disable_if<vl::is_less_comparable<std::tuple<Arg>, T>>, 
+		template<typename Arg,
+		typename = vl::disable_if<vl::is_less_comparable<std::tuple<Arg>, T>>,
 		typename = vl::enable_if<vl::is_less_comparable<Arg, T>>>
 		inline bool operator()(const std::tuple<ThreadID, int, Arg>& t, const ContextLoader<T>& v) const {
 			return vl::less::operator()(std::get<2>(t), v.object);
 		}
 		template<typename Arg,
-		typename = vl::disable_if<vl::is_less_comparable<T, std::tuple<Arg>>>, 
+		typename = vl::disable_if<vl::is_less_comparable<T, std::tuple<Arg>>>,
 		typename = vl::enable_if<vl::is_less_comparable<T, Arg>>>
 		inline bool operator()(const ContextLoader<T>& v, const std::tuple<ThreadID, int, Arg>& t) const {
 			return vl::less::operator()(v.object, std::get<2>(t));

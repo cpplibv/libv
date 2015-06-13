@@ -2,15 +2,15 @@
 
 #pragma once
 
+// vl
+#include <vl/operator.hpp>
+#include <vl/type_traits.hpp>
 // std
 #include <algorithm>
 #include <cassert>
 #include <memory>
 #include <mutex>
 #include <set>
-// vl
-#include <vl/operator.hpp>
-#include <vl/type_traits.hpp>
 
 namespace vl {
 
@@ -28,15 +28,15 @@ struct ChachedArgumentComparator : Comparator {
 		assert(!cr.expired());
 		return Comparator::operator()(*cr.lock(), args);
 	}
-	template<typename L, 
-	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>, 
+	template<typename L,
+	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>,
 	typename = vl::enable_if<vl::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const std::weak_ptr<T>& cr) const {
 		assert(!cr.expired());
 		return Comparator::operator()(std::get<0>(args), *cr.lock());
 	}
 	template<typename L,
-	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>, 
+	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>,
 	typename = vl::enable_if<vl::is_less_comparable<L, T>>>
 	inline bool operator()(const std::weak_ptr<T>& cr, const std::tuple<L>& args) const {
 		assert(!cr.expired());
@@ -81,9 +81,9 @@ public:
 			resource.reset(new T(args...), [this](T*& ptr) {
 				std::unique_lock<std::mutex> lock_guard(cache_m);
 				auto result = std::equal_range(cache.begin(), cache.end(), *ptr, ChachedComparator<Comparator, T>());
-						assert(result.first != result.second);
-						cache.erase(result.first);
-						delete ptr;
+				assert(result.first != result.second);
+				cache.erase(result.first);
+				delete ptr;
 			});
 			cache.emplace(resource);
 		}
@@ -93,7 +93,7 @@ public:
 		return cache.size();
 	}
 public:
-	Cache() { }
+	Cache() = default;
 	Cache(const Cache&) = delete;
 	Cache& operator=(const Cache&) = delete;
 	virtual ~Cache() = default;
