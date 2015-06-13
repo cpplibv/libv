@@ -9,6 +9,7 @@
 // vl
 #include <vl/resource_manager.hpp>
 // std
+#include <fstream>
 #include <map>
 #include <memory>
 #include <vector>

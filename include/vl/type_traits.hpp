@@ -19,10 +19,10 @@ using void_t = typename voider<Args...>::type;
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-using disable_if = std::enable_if<!T::value>;
+using disable_if = typename std::enable_if<!T::value>::type;
 
 template <typename T>
-using enable_if = std::enable_if<T::value>;
+using enable_if = typename std::enable_if<T::value>::type;
 
 // -------------------------------------------------------------------------------------------------
 

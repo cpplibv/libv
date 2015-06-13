@@ -105,15 +105,15 @@ struct ContextLoader {
 			//Cutting down the front of the tuple to absorb context info, not too happy about this solution.
 			return vl::less::operator()(v.object, reinterpret_cast<const std::tuple < Args...>&> (std::get<2>(t)));
 		}
-		template<typename Arg, typename = typename
-		vl::disable_if<vl::is_less_comparable<std::tuple<Arg>, T>>::type, typename = typename
-		vl::enable_if<vl::is_less_comparable<Arg, T>>::type>
+		template<typename Arg, 
+		typename = vl::disable_if<vl::is_less_comparable<std::tuple<Arg>, T>>, 
+		typename = vl::enable_if<vl::is_less_comparable<Arg, T>>>
 		inline bool operator()(const std::tuple<ThreadID, int, Arg>& t, const ContextLoader<T>& v) const {
 			return vl::less::operator()(std::get<2>(t), v.object);
 		}
-		template<typename Arg, typename = typename
-		vl::disable_if<vl::is_less_comparable<T, std::tuple<Arg>>>::type, typename = typename
-		vl::enable_if<vl::is_less_comparable<T, Arg>>::type>
+		template<typename Arg,
+		typename = vl::disable_if<vl::is_less_comparable<T, std::tuple<Arg>>>, 
+		typename = vl::enable_if<vl::is_less_comparable<T, Arg>>>
 		inline bool operator()(const ContextLoader<T>& v, const std::tuple<ThreadID, int, Arg>& t) const {
 			return vl::less::operator()(v.object, std::get<2>(t));
 		}

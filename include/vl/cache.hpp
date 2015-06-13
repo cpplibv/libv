@@ -2,11 +2,13 @@
 
 #pragma once
 
+// std
+#include <algorithm>
 #include <cassert>
-#include <mutex>
 #include <memory>
+#include <mutex>
 #include <set>
-
+// vl
 #include <vl/operator.hpp>
 #include <vl/type_traits.hpp>
 
@@ -26,16 +28,16 @@ struct ChachedArgumentComparator : Comparator {
 		assert(!cr.expired());
 		return Comparator::operator()(*cr.lock(), args);
 	}
-	template<typename L, typename = typename
-	vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>::type, typename = typename
-	vl::enable_if<vl::is_less_comparable<L, T>>::type>
+	template<typename L, 
+	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>, 
+	typename = vl::enable_if<vl::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const std::weak_ptr<T>& cr) const {
 		assert(!cr.expired());
 		return Comparator::operator()(std::get<0>(args), *cr.lock());
 	}
-	template<typename L, typename = typename
-	vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>::type, typename = typename
-	vl::enable_if<vl::is_less_comparable<L, T>>::type>
+	template<typename L,
+	typename = vl::disable_if<vl::is_less_comparable<std::tuple<L>, T>>, 
+	typename = vl::enable_if<vl::is_less_comparable<L, T>>>
 	inline bool operator()(const std::weak_ptr<T>& cr, const std::tuple<L>& args) const {
 		assert(!cr.expired());
 		return Comparator::operator()(*cr.lock(), std::get<0>(args));
