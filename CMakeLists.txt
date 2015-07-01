@@ -1,3 +1,4 @@
+#
 cmake_minimum_required (VERSION 3.1)
 project (vl)
 include(ExternalProject)
@@ -5,32 +6,28 @@ include(ExternalProject)
 include(cmake/util.cmake)
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 
+# --------------------------------------------------------------------------------------------------
+
 #enable_testing()
 #set(CMAKE_VERBOSE_MAKEFILE off)
 
-#Definitions
-#IF DEBUG TODO
+#DefinitionsTODO
+#IF DEBUG
 add_definitions(-Ofast)
 #add_definitions(-O2)
-#EF DEBUG TODO
+#EF DEBUG
 #add_definitions(-O0)
 #add_definitions(-ggdb)
-#FI DEBUG TODO
-
-#if(NOT PIC)
-#	add_definitions(-fPIC)
-#endif()
+#FI DEBUG
 
 add_definitions(-m64)
 add_definitions(-std=c++14)
-add_definitions(-Wall -Wextra -Wno-comment)
-
-add_definitions(-Wno-unused-local-typedefs) #Boost...
-add_definitions(-Wno-strict-aliasing) #Until i dont fix gli and glm
 
 #Macro
 add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_FORCE_RADIANS)
+
+# --------------------------------------------------------------------------------------------------
 
 #Paths
 set(PATH_BIN ${PROJECT_SOURCE_DIR}/bin)
@@ -47,7 +44,18 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
 
 #Variables
-set(TOOLSET gcc)
+set(TOOLSET)
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	add_compile_options(/Wall)
+	set(TOOLSET msvc)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	add_compile_options(-Weverything -Wconversion -Wno-comment)
+	set(TOOLSET clang)
+elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	add_compile_options(-Wall -Wextra -Wconversion -Wno-comment)
+	set(TOOLSET gcc)
+endif()
 
 if(WIN32)
 	set(LIB_OPENGL opengl32)
@@ -69,7 +77,7 @@ ExternalProject_Add(ext_unittest
 	INSTALL_DIR ${PATH_EXT}/unittest
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/unittest
 	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""
+	BUILD_COMMAND ""  #catch is header only, skip tests
 	INSTALL_COMMAND 
 		mkdir -p ${PATH_EXT}/unittest/ &&
 		cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
@@ -104,6 +112,7 @@ list(APPEND EXTERNAL_PROJECT_LIST ext_glm)
 ExternalProject_Add(ext_glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG master
+	BUILD_COMMAND "" #glm is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/glm
 	INSTALL_DIR ${PATH_EXT}/glm
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
@@ -114,6 +123,7 @@ list(APPEND EXTERNAL_PROJECT_LIST ext_gli)
 ExternalProject_Add(ext_gli 
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.5.1.1
+	BUILD_COMMAND "" #gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
 	INSTALL_DIR ${PATH_EXT}/gli
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
@@ -134,51 +144,6 @@ ExternalProject_Add(ext_freetype
 )
 
 list(APPEND EXTERNAL_PROJECT_LIST ext_assimp)
-set(ASSIMP_SKIP_LIST 
-"-DASSIMP_BUILD_NO_X_IMPORTER"
-"-DASSIMP_BUILD_NO_3DS_IMPORTER"
-"-DASSIMP_BUILD_NO_MD3_IMPORTER"
-"-DASSIMP_BUILD_NO_MDL_IMPORTER"
-"-DASSIMP_BUILD_NO_MD2_IMPORTER"
-"-DASSIMP_BUILD_NO_PLY_IMPORTER"
-"-DASSIMP_BUILD_NO_ASE_IMPORTER"
-"-DASSIMP_BUILD_NO_OBJ_IMPORTER"
-"-DASSIMP_BUILD_NO_HMP_IMPORTER"
-"-DASSIMP_BUILD_NO_SMD_IMPORTER"
-"-DASSIMP_BUILD_NO_MDC_IMPORTER"
-"-DASSIMP_BUILD_NO_MD5_IMPORTER"
-"-DASSIMP_BUILD_NO_STL_IMPORTER"
-"-DASSIMP_BUILD_NO_LWO_IMPORTER"
-"-DASSIMP_BUILD_NO_DXF_IMPORTER"
-"-DASSIMP_BUILD_NO_NFF_IMPORTER"
-"-DASSIMP_BUILD_NO_RAW_IMPORTER"
-"-DASSIMP_BUILD_NO_OFF_IMPORTER"
-"-DASSIMP_BUILD_NO_AC_IMPORTER"
-"-DASSIMP_BUILD_NO_BVH_IMPORTER"
-"-DASSIMP_BUILD_NO_IRRMESH_IMPORTER"
-"-DASSIMP_BUILD_NO_IRR_IMPORTER"
-"-DASSIMP_BUILD_NO_Q3D_IMPORTER"
-"-DASSIMP_BUILD_NO_B3D_IMPORTER"
-"-DASSIMP_BUILD_NO_COLLADA_IMPORTER"
-"-DASSIMP_BUILD_NO_TERRAGEN_IMPORTER"
-"-DASSIMP_BUILD_NO_CSM_IMPORTER"
-"-DASSIMP_BUILD_NO_3D_IMPORTER"
-"-DASSIMP_BUILD_NO_LWS_IMPORTER"
-"-DASSIMP_BUILD_NO_OGRE_IMPORTER"
-"-DASSIMP_BUILD_NO_OPENGEX_IMPORTER"
-"-DASSIMP_BUILD_NO_MS3D_IMPORTER"
-"-DASSIMP_BUILD_NO_COB_IMPORTER"
-"-DASSIMP_BUILD_NO_BLEND_IMPORTER"
-"-DASSIMP_BUILD_NO_Q3BSP_IMPORTER"
-"-DASSIMP_BUILD_NO_NDO_IMPORTER"
-"-DASSIMP_BUILD_NO_IFC_IMPORTER"
-"-DASSIMP_BUILD_NO_XGL_IMPORTER"
-"-DASSIMP_BUILD_NO_FBX_IMPORTER"
-"-DASSIMP_BUILD_NO_ASSBIN_IMPORTER"
-"-DASSIMP_BUILD_NO_C4D_IMPORTER")
-string(REPLACE ";" " " ASSIMP_SKIP_STR "${ASSIMP_SKIP_LIST}")
-#TODO P2: assimp no importers
-
 ExternalProject_Add(ext_assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
 	GIT_TAG master
@@ -191,6 +156,47 @@ ExternalProject_Add(ext_assimp
 		-DASSIMP_BUILD_TESTS=OFF
 		-DBUILD_SHARED_LIBS=OFF
 		-DASSIMP_NO_EXPORT=ON
+		-DASSIMP_BUILD_X_IMPORTER=OFF
+		-DASSIMP_BUILD_3DS_IMPORTER=OFF
+		-DASSIMP_BUILD_MD3_IMPORTER=OFF
+		-DASSIMP_BUILD_MDL_IMPORTER=OFF
+		-DASSIMP_BUILD_MD2_IMPORTER=OFF
+		-DASSIMP_BUILD_PLY_IMPORTER=OFF
+		-DASSIMP_BUILD_ASE_IMPORTER=OFF
+		-DASSIMP_BUILD_OBJ_IMPORTER=OFF
+		-DASSIMP_BUILD_HMP_IMPORTER=OFF
+		-DASSIMP_BUILD_SMD_IMPORTER=OFF
+		-DASSIMP_BUILD_MDC_IMPORTER=OFF
+		-DASSIMP_BUILD_MD5_IMPORTER=OFF
+		-DASSIMP_BUILD_STL_IMPORTER=OFF
+		-DASSIMP_BUILD_LWO_IMPORTER=OFF
+		-DASSIMP_BUILD_DXF_IMPORTER=OFF
+		-DASSIMP_BUILD_NFF_IMPORTER=OFF
+		-DASSIMP_BUILD_RAW_IMPORTER=OFF
+		-DASSIMP_BUILD_OFF_IMPORTER=OFF
+		-DASSIMP_BUILD_AC_IMPORTER=OFF
+		-DASSIMP_BUILD_BVH_IMPORTER=OFF
+		-DASSIMP_BUILD_IRRMESH_IMPORTER=OFF
+		-DASSIMP_BUILD_IRR_IMPORTER=OFF
+		-DASSIMP_BUILD_Q3D_IMPORTER=OFF
+		-DASSIMP_BUILD_B3D_IMPORTER=OFF
+		-DASSIMP_BUILD_COLLADA_IMPORTER=OFF
+		-DASSIMP_BUILD_TERRAGEN_IMPORTER=OFF
+		-DASSIMP_BUILD_CSM_IMPORTER=OFF
+		-DASSIMP_BUILD_3D_IMPORTER=OFF
+		-DASSIMP_BUILD_LWS_IMPORTER=OFF
+		-DASSIMP_BUILD_OGRE_IMPORTER=OFF
+		-DASSIMP_BUILD_OPENGEX_IMPORTER=OFF
+		-DASSIMP_BUILD_MS3D_IMPORTER=OFF
+		-DASSIMP_BUILD_COB_IMPORTER=OFF
+		-DASSIMP_BUILD_BLEND_IMPORTER=OFF
+		-DASSIMP_BUILD_Q3BSP_IMPORTER=OFF
+		-DASSIMP_BUILD_NDO_IMPORTER=OFF
+		-DASSIMP_BUILD_IFC_IMPORTER=OFF
+		-DASSIMP_BUILD_XGL_IMPORTER=OFF
+		-DASSIMP_BUILD_FBX_IMPORTER=OFF
+		-DASSIMP_BUILD_ASSBIN_IMPORTER=OFF
+		-DASSIMP_BUILD_C4D_IMPORTER=OFF
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -222,7 +228,8 @@ ExternalProject_Add(ext_boost
 		--address-model=64
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
-		--without-context --without-coroutine #workaround for missing ml64 on win, until not used i don't care
+		--with-serialization
+		--with-system
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	EXCLUDE_FROM_ALL 1
@@ -237,14 +244,14 @@ include_directories (${PATH_INC})
 include_directories (${PATH_SRC})
 
 #Externals
-include_directories(${PATH_EXT}/assimp/include)
-include_directories(${PATH_EXT}/boost/include)
-include_directories(${PATH_EXT}/freetype/include/freetype2)
-include_directories(${PATH_EXT}/glew/include)
-include_directories(${PATH_EXT}/glfw/include)
-include_directories(${PATH_EXT}/gli/include)
-include_directories(${PATH_EXT}/glm/include)
-include_directories(${PATH_EXT}/unittest/include)
+include_directories(SYSTEM ${PATH_EXT}/assimp/include)
+include_directories(SYSTEM ${PATH_EXT}/boost/include)
+include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
+include_directories(SYSTEM ${PATH_EXT}/glew/include)
+include_directories(SYSTEM ${PATH_EXT}/glfw/include)
+include_directories(SYSTEM ${PATH_EXT}/gli/include)
+include_directories(SYSTEM ${PATH_EXT}/glm/include)
+include_directories(SYSTEM ${PATH_EXT}/unittest/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)
