@@ -1,30 +1,41 @@
+Új fajta signal: timerSignal
+Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
+Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
 
+https://github.com/sakra/cotire
 
-// Context Task Priority levels for each operation
-//
-//	50 Render But based on time, measure it ?
-//
-//		110 *Unload Texture
-//		120 *Unload Model
-//	130 Unload UITexture
-//	140 Unload Font
-//		150 Unload CSS
-//		160 Unload Layout
-//	170 Unload DefaultFont
-//	180 Unload Shader
-//	210 Shader
-//	220 DefaultFont
-//		230 Layout
-//		240 CSS
-//	250 Font
-//	260 UITexture
-//		270 *Model
-//		280 *Texture
+P1 - std::future family
 
+Priority levels for each operation
 
-top layer std::functional and std forward!
+        Task        |  GL  |  IO  | Note
+:------------------ | ----:| ----:|:----------------------------------------------------------------
+ Default UIShader   |   10 |   10 | Unloading as a normal Shader
+ Default Shader     |   20 |   20 |
+ Default Font       |   30 |   30 |
+ Default UITexture  |   40 |   40 | Unloading as a normal Texture
+ Default Model      |   50 |   50 |
+ Default Texture    |   60 |   60 |
+ Render-Immediate   |  110 |   -  | Placed into the que by a timer when render time window runs out
+ Unload Texture     |  210 |  210 |
+ Unload Model       |  220 |  220 |
+ Unload Font        |  240 |  240 |
+ Unload CSS         |   ?  |  250 | Work in progress
+ Unload UILayout    |   ?  |  260 | Work in progress
+ Unload Shader      |  270 |  270 |
+ Load UIShader      |  310 |  310 | Unloading as a normal Shader
+ Load Shader        |  320 |  320 |
+ Load UILayout      |   ?  |  330 | Work in progress
+ Load CSS           |   ?  |  340 | Work in progress
+ Load Font          |  350 |  350 |
+ Load UITexture     |  360 |  360 | Unloading as a normal Texture
+ Load Model         |  370 |  370 |
+ Load Texture       |  380 |  380 |
+ Render-Residuary   |  500 |   -  | Always stays in que as last operation
 
-Move frame from disconnected a monitor
+top layer std::function and forward!
+
+Move frame from disconnected monitor
 
 Tracing every event for right state enums / defines / handlers:
 	Char
@@ -68,7 +79,6 @@ Render Target
 Shadow Pass
 Multi Pass
 
-VM3 Static mesh
 VM4 Animated mesh
 
 http://www.oldunreal.com/editing/s3tc/ARB_texture_compression.pdf
@@ -77,6 +87,36 @@ OpenGL Reference page: https://www.opengl.org/sdk/docs/man/
 
 
 
+
+
+----
+
+Adopt TCLAP http://tclap.sourceforge.net is suitable
+
+Contexted Resource
+vl::log(__VL_ERROR__, __VL_POC__, __VL_GL__, "msg", args...)
+struct vl::POC = position of code
+Beside Component's shared_ptr provide a way of non owning ptr which is visible at call:
+	container.add(testComponent, vl::non_owning); //simular as std::adopt_lock
+Timed Event / Timer Support / Timer thread
+Resettable and clearable timer / timer tasks
+Implement Latch / Barrier based on open standard
+
+
+Config Entry:
+	- default
+	- description
+	- isset
+	- name
+	- type
+	- value
+
+
+Optimizing for prefetcher.
+Optimizing for minimum number of opengl bind.
+In ui static and dynamic render options for different components
+Resource pack
+The idea of dynamic renderer
 
 
 ----

@@ -1,27 +1,35 @@
 # VL
 
-TODO
+TODO: Introduction
 
-## Installation
+### Installation
 
+TODO: Detailed list for needed programs (sh/cmd, git, compiler, cmake)
 - git clone
+- mkdir build
+- cd build
+- cmake -G"Unix Makefiles" ..
 - make ext
 - make
 
-## Moduls
+### Moduls
 
 TODO
 
-## Namespaces
+### Namespaces
 
-- ::vl - V Library
-- ::vl::efl - External Function Location
-- ::vl::gl - Open GL
-- ::vl::sig - Signal-Slot
-- ::vl::ui - User Interface
-- ::vl::vm3 - VM3 Model format
-- ::vl::vm3imp - VM3 Model format importer
+- vl - V Library
+test description
+- vl::efl - External Function Location
+- vl::efl::lookup - External Function Lookup
+test description
+- vl::gl - OpenGL
+test description
+- vl::sig - Signal-Slot
+- vl::ui - User Interface
+- vl::vm3 - VM3 Model format
+- vl::vm3imp - VM3 Model format importer
 
-## License
+### License
 
 TODO
