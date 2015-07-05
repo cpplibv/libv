@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include <atomic>
 #include <mutex>
 #include <condition_variable>
 
@@ -24,11 +23,10 @@ public:
 	}
 	void wait() {
 		std::unique_lock<std::mutex> lock(mutex);
-		cv.wait(lock, [this]{
-			return passed;
-		});
+		while(!passed)
+			cv.wait(lock);
 	}
-	
+
 	Semaphore(bool passed = false) : passed(passed) { }
 };
 
