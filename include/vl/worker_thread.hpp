@@ -3,8 +3,6 @@
 #pragma once
 
 // std
-#include <atomic>
-#include <cassert>
 #include <condition_variable>
 #include <functional>
 #include <mutex>
@@ -13,6 +11,7 @@
 #include <thread>
 // pro
 #include <vl/log.hpp>
+#include <vl/semaphore.hpp>
 
 #ifndef VL_DEFAULT_CONTEXT_TASK_PRIORITY
 #    define VL_DEFAULT_CONTEXT_TASK_PRIORITY 300
@@ -21,35 +20,24 @@
 namespace vl {
 
 class WorkerThread {
+
 	class Task {
 		int priority;
-		std::condition_variable_any* executed_cv;
 		std::function<void() > function;
-		std::recursive_mutex* mtx;
-		std::atomic<bool>* done;
+		vl::Semaphore* done;
 	public:
 		Task() { }
 		template<typename F, typename = decltype(std::declval<F>()()) >
-		Task(F&& func,
-				int priority,
-				std::condition_variable_any* cv = nullptr,
-				std::recursive_mutex* mtx = nullptr,
-				std::atomic<bool>* done = nullptr) :
+		Task(F&& func, int priority, vl::Semaphore* done = nullptr) :
 			priority(priority),
-			executed_cv(cv),
-			function(std::forward<F>(func)),
-			mtx(mtx),
 			done(done) { }
 		void execute() {
 			function();
-			if (executed_cv) {
-				std::lock_guard<std::recursive_mutex> lk(*mtx);
-				*done = true;
-				executed_cv->notify_all();
-			}
+			if (done)
+				done->raise();
 		}
-		bool operator<(const Task& right) const {
-			return priority < right.priority;
+		bool operator<(const Task& rhs) const {
+			return priority < rhs.priority;
 		}
 	};
 
@@ -57,10 +45,10 @@ class WorkerThread {
 	std::recursive_mutex que_m;
 	std::priority_queue<Task> que;
 
-	std::atomic<bool> terminateFlag{false};
+	bool terminateFlag = false;
 
-	std::string name;
 	std::thread thread;
+	std::string name;
 
 private:
 	inline void processImpl() {
@@ -87,15 +75,11 @@ public:
 	template<typename F, typename = decltype(std::declval<F>()())>
 	void executeSync(F&& func, int priority = VL_DEFAULT_CONTEXT_TASK_PRIORITY) {
 		if (std::this_thread::get_id() != thread.get_id()) {
-			std::condition_variable_any executed_cv;
-			std::unique_lock<std::recursive_mutex> lk(que_m);
-			std::atomic<bool> done{false};
-
-			que.emplace(std::forward<F>(func), priority, &executed_cv, &que_m, &done);
+			std::lock_guard<std::recursive_mutex> lk(que_m);
+			vl::Semaphore done;
+			que.emplace(std::forward<F>(func), priority, &done);
 			recieved_cv.notify_all();
-			executed_cv.wait(lk, [&done] {
-				return done.load();
-			});
+			done.wait();
 		} else
 			func();
 	}
@@ -105,10 +89,10 @@ public:
 		recieved_cv.notify_all();
 	}
 	void join() {
-		static std::mutex join_m;
-		std::lock_guard<std::mutex> lk(join_m);
-		if (thread.joinable())
+		try {
 			thread.join();
+		} catch (std::system_error&) {
+		}
 	}
 	inline auto get_id() {
 		return thread.get_id();
@@ -119,25 +103,26 @@ private:
 		while (!terminateFlag) {
 			{
 				std::unique_lock<std::recursive_mutex> lk(que_m);
-				recieved_cv.wait(lk, [this] {
-					return terminateFlag.load() || !que.empty();
-				});
+				while (!terminateFlag && que.empty())
+					recieved_cv.wait(lk);
 			}
 			try {
 				processImpl();
 			} catch (const std::exception& ex) {
-				VLOG_ERROR(vl::log(), "Exception occurred in [%s] context: %s", name, ex.what());
+				VLOG_ERROR(vl::log(), "Unhandled exception occurred in WorkerThread [%s]: %s", name, ex.what());
 			}
 		}
 		try {
 			processImpl();
 		} catch (const std::exception& ex) {
-			VLOG_ERROR(vl::log(), "Exception occurred in [%s] context: %s", name, ex.what());
+			VLOG_ERROR(vl::log(), "Unhandled exception occurred in WorkerThread [%s]: %s", name, ex.what());
 		}
 	}
 
 public:
-	WorkerThread(const std::string& name) : name(name), thread(&WorkerThread::run, this) { }
+	WorkerThread(const std::string& name) :
+		thread(&WorkerThread::run, this),
+		name(name) { }
 	WorkerThread() : WorkerThread("Unnamed") { }
 	virtual ~WorkerThread() {
 		terminate();
@@ -146,3 +131,7 @@ public:
 };
 
 } //namespace vl
+
+//TODO P4: run ből jó lenne kiszedni a redundanciát
+//TODO P4: imo processImpl and run can be merged
+
