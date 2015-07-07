@@ -4,7 +4,9 @@
 
 // vl
 #include <vl/operator.hpp>
+#include <vl/tuple.hpp>
 #include <vl/type_traits.hpp>
+#include <vl/utility.hpp>
 // std
 #include <algorithm>
 #include <cassert>
@@ -71,19 +73,22 @@ public:
 	std::shared_ptr<T> get(Args&&... args) {
 		std::shared_ptr<T> resource;
 		std::unique_lock<std::mutex> lock_guard(cache_m);
+
+		std::tuple<Args&&...> argsPack(std::forward<Args>(args)...);
 		auto result = std::equal_range(cache.begin(), cache.end(),
-				std::make_tuple(args...), ChachedArgumentComparator<Comparator, T>());
+				argsPack, ChachedArgumentComparator<Comparator, T>());
 
 		if (result.first != result.second)
 			resource = result.first->lock();
 
 		if (!resource) {
-			resource.reset(new T(args...), [this](T*& ptr) {
+			T * (*newAddr)(Args&&...) = &vl::new_f;
+			resource.reset(vl::forward_from_tuple(newAddr, std::move(argsPack)), [this](T*& ptr) {
 				std::unique_lock<std::mutex> lock_guard(cache_m);
 				auto result = std::equal_range(cache.begin(), cache.end(), *ptr, ChachedComparator<Comparator, T>());
-				assert(result.first != result.second);
-				cache.erase(result.first);
-				delete ptr;
+						assert(result.first != result.second);
+						cache.erase(result.first);
+						delete ptr;
 			});
 			cache.emplace(resource);
 		}
@@ -98,5 +103,7 @@ public:
 	Cache& operator=(const Cache&) = delete;
 	virtual ~Cache() = default;
 };
+
+//------------------------------------------------------------------------------------------
 
 } //namespace vl

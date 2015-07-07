@@ -1,7 +1,7 @@
 // File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
 
 #include <catch.hpp>
-#include "vl/cache.hpp"
+#include <vl/cache.hpp>
 #include "cache_test_util.hpp"
 
 int TestRA::instanceNumber = 0;
@@ -67,5 +67,16 @@ TEST_CASE("Cache should handle convertible arguments") {
 	CHECK(v0.get() == v1.get());
 	auto v2 = rc.get("y");
 	CHECK(v0.get() != v2.get());
+}
+
+TEST_CASE("Cache should handle non copyable argument lvalue reference", "[static]") {
+	Cache<TestRNonCopyArged> rc;
+	NonCopyable a0;
+	auto v0 = rc.get(a0);
+}
+
+TEST_CASE("Cache should handle non copyable argument rvalue reference", "[static]") {
+	Cache<TestRNonCopyArged> rc;
+	auto v0 = rc.get(NonCopyable());
 }
 
