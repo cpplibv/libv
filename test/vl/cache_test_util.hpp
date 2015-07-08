@@ -69,3 +69,25 @@ private:
 		return false;
 	}
 };
+
+struct TestRM {
+	static int instanceNumber;
+	TestRM(int n, int m) : n0(n), n1(m) {
+		++instanceNumber;
+	}
+	~TestRM() {
+		--instanceNumber;
+	}
+	bool operator<(const TestRM& r) const {
+		return n0 + n1 < r.n0 + r.n1;
+	}
+	int n0;
+	int n1;
+private:
+	friend bool operator<(const std::tuple<int, int>& t, const TestRM& r) {
+		return std::get<0>(t) + std::get<1>(t) < r.n0 + r.n1;
+	}
+	friend bool operator<(const TestRM& r, const std::tuple<int, int>& t) {
+		return r.n0 + r.n1 < std::get<0>(t) + std::get<1>(t);
+	}
+};

@@ -82,7 +82,7 @@ public:
 			resource = result.first->lock();
 
 		if (!resource) {
-			T * (*newAddr)(Args&&...) = &vl::new_f;
+			T* (*newAddr)(Args&&...) = &vl::new_f;
 			resource.reset(vl::forward_from_tuple(newAddr, std::move(argsPack)), [this](T*& ptr) {
 				std::unique_lock<std::mutex> lock_guard(cache_m);
 				auto result = std::equal_range(cache.begin(), cache.end(), *ptr, ChachedComparator<Comparator, T>());
