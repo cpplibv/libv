@@ -14,7 +14,7 @@
 #include <vl/semaphore.hpp>
 
 #ifndef VL_DEFAULT_CONTEXT_TASK_PRIORITY
-#    define VL_DEFAULT_CONTEXT_TASK_PRIORITY 300
+#    define VL_DEFAULT_CONTEXT_TASK_PRIORITY 500
 #endif
 
 namespace vl {
@@ -27,6 +27,7 @@ class WorkerThread {
 		vl::Semaphore* done;
 	public:
 		Task() { }
+		Task(Task&&) = default;
 		template<typename F, typename = decltype(std::declval<F>()()) >
 		Task(F&& func, int priority, vl::Semaphore* done = nullptr) :
 			priority(priority),
@@ -51,17 +52,22 @@ class WorkerThread {
 	std::string name;
 
 private:
-	inline void processImpl() {
-		Task cmd;
-		while (true) {
-			{
-				std::lock_guard<std::recursive_mutex> lk(que_m);
-				if (que.empty())
-					return;
-				cmd = std::move(que.top());
-				que.pop();
+	inline void process() {
+		try {
+			Task cmd;
+			while (true) {
+				{
+					std::lock_guard<std::recursive_mutex> lk(que_m);
+					if (que.empty())
+						return;
+					cmd = std::move(que.top());
+					que.pop();
+				}
+				cmd.execute();
 			}
-			cmd.execute();
+		} catch (const std::exception& ex) {
+			VLOG_ERROR(vl::log(),
+					"Unhandled exception occurred in WorkerThread [%s]: %s", name, ex.what());
 		}
 	}
 
@@ -75,10 +81,12 @@ public:
 	template<typename F, typename = decltype(std::declval<F>()())>
 	void executeSync(F&& func, int priority = VL_DEFAULT_CONTEXT_TASK_PRIORITY) {
 		if (std::this_thread::get_id() != thread.get_id()) {
-			std::lock_guard<std::recursive_mutex> lk(que_m);
 			vl::Semaphore done;
-			que.emplace(std::forward<F>(func), priority, &done);
-			recieved_cv.notify_all();
+			{
+				std::lock_guard<std::recursive_mutex> lk(que_m);
+				que.emplace(std::forward<F>(func), priority, &done);
+				recieved_cv.notify_all();
+			}
 			done.wait();
 		} else
 			func();
@@ -106,17 +114,9 @@ private:
 				while (!terminateFlag && que.empty())
 					recieved_cv.wait(lk);
 			}
-			try {
-				processImpl();
-			} catch (const std::exception& ex) {
-				VLOG_ERROR(vl::log(), "Unhandled exception occurred in WorkerThread [%s]: %s", name, ex.what());
-			}
+			process();
 		}
-		try {
-			processImpl();
-		} catch (const std::exception& ex) {
-			VLOG_ERROR(vl::log(), "Unhandled exception occurred in WorkerThread [%s]: %s", name, ex.what());
-		}
+		process();
 	}
 
 public:
@@ -131,7 +131,3 @@ public:
 };
 
 } //namespace vl
-
-//TODO P4: run ből jó lenne kiszedni a redundanciát
-//TODO P4: imo processImpl and run can be merged
-

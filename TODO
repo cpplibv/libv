@@ -31,7 +31,7 @@ Priority levels for each operation
  Load UITexture     |  360 |  360 | Unloading as a normal Texture
  Load Model         |  370 |  370 |
  Load Texture       |  380 |  380 |
- Render-Residuary   |  500 |   -  | Always stays in que as last operation
+ Render-Residual    | 1000 |   -  | Always stays in queue as last operation
 
 top layer std::function and forward!
 
