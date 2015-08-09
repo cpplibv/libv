@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "vl/sig/signal.hpp"
+#include <vl/sig/signal.hpp>
 
 #include <functional>
 #include <vector>

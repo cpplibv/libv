@@ -3,7 +3,7 @@
 #include <catch.hpp>
 
 #include "signal_test_util.hpp"
-#include "vl/sig/signal.hpp"
+#include <vl/sig/signal.hpp>
 
 using vl::Signal;
 using vl::CapacitivSignal;
@@ -396,21 +396,3 @@ TEST_CASE("ConditionalSignal Test") {
 		CHECK(result.size() == 1u);
 	}
 }
-
-// === CustomSignal ================================================================================
-
-//#include <iostream>
-//
-//TEST_CASE("Signal chaining") {
-//	CustomSignal<void(int), Conditional, Capacitiv, Priority> source;
-////	std::cout << source.ca << std::endl;
-//	
-////	A<void(int), B> a;
-////	a.a;
-////	a.b;
-//
-//	M<A, B, C> magic;
-//	
-//	A<void(int), B<C<>>> ab;
-//	ab.b;
-//}

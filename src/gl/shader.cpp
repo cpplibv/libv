@@ -1,11 +1,11 @@
 // File: Shader.cpp, Created on 2014. december 7. 13:03, Author: Vader
 
 // hpp
-#include "vl/gl/shader.hpp"
+#include <vl/gl/shader.hpp>
 // std
 #include <fstream>
 // pro
-#include "vl/gl/log.hpp"
+#include <vl/gl/log.hpp>
 
 namespace vl {
 namespace gl {

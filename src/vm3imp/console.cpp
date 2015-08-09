@@ -1,7 +1,7 @@
 // File: console.cpp, Created on 2015. március 27. 2:48, Author: Vader
 
 // hpp
-#include "vl/vm3imp/console.hpp"
+#include <vl/vm3imp/console.hpp>
 // vl
 #include <vl/string.hpp>
 // std

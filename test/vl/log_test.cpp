@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "vl/log.hpp"
+#include <vl/log.hpp>
 
 bool isLogMatch(const std::string&, int, std::vector<std::string>, const std::string &) {
 	//	bool isLogMatch(const std::string& log, int severity, std::vector<std::string> modul, const std::string & msg) {
@@ -93,10 +93,6 @@ TEST_CASE("macro") {
 	VLOG_WARN(log0, "Hello World!");
 	VLOG_ERROR(log0, "Hello World!");
 	VLOG_FATAL(log0, "Hello World!");
-}
-
-TEST_CASE("vlLog") {
-	VLOG_INFO(vl::log(), "Hello World!");
 }
 
 TEST_CASE("coopWithFormatString") {

@@ -1,6 +1,6 @@
 // File: Material.cpp, Created on 2015. január 17. 7:50, Author: Vader
 
-#include "vl/vm3/material.hpp"
+#include <vl/vm3/material.hpp>
 
 namespace vl {
 	namespace vm3 {

@@ -118,8 +118,8 @@ inline std::ostream& operator<<(std::ostream& os, const LogRecord& r) {
 	//		os << "" << r.time.time_of_day() << " ";
 	os << "s" << r.severity << " ";
 	os << "t" << std::this_thread::get_id() << " ";
-	for (int i = r.logSource.size() - 1; i >= 0; i--)
-		os << "[" << r.logSource[i]->getName() << "]";
+	for (size_t i = r.logSource.size(); i > 0; i--)
+		os << "[" << r.logSource[i - 1]->getName() << "]";
 	if (r.severity >= VLOG_SEVERITY_NOTIF || r.severity == VLOG_SEVERITY_TRACE)
 		os << " " << r.file << '@' << r.function << ':' << r.line << " -";
 	os << ' ' << r.message << '\n' << std::flush;

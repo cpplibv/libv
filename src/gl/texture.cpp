@@ -1,10 +1,10 @@
 // File: Texture.cpp, Created on 2014. december 6. 22:44, Author: Vader
 
 // hpp
-#include "vl/gl/texture.hpp"
+#include <vl/gl/texture.hpp>
 // pro
-#include "vl/gl/detail/texture_impl.hpp"
-#include "vl/gl/shader.hpp"
+#include <vl/gl/detail/texture_impl.hpp>
+#include <vl/gl/shader.hpp>
 
 namespace vl {
 namespace gl {

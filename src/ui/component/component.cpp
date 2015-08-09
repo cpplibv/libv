@@ -1,9 +1,9 @@
 // File: Component.cpp, Created on 2014. január 7. 7:58, Author: Vader
 
 // hpp
-#include "vl/ui/component/component.hpp"
+#include <vl/ui/component/component.hpp>
 // pro
-#include "vl/ui/frame/frame.hpp"
+#include <vl/ui/frame/frame.hpp>
 
 namespace vl {
 namespace ui {

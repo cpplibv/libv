@@ -1,7 +1,7 @@
 // File: Properties.cpp, Created on 2014. április 24. 13:35, Author: Vader
 
 // hpp
-#include "vl/ui/layout/properties.hpp"
+#include <vl/ui/layout/properties.hpp>
 
 namespace vl {
 namespace ui {

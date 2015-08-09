@@ -1,12 +1,12 @@
 // File: ProtectedContainer.cpp, Created on 2014. január 7. 6:05, Author: Vader
 
 // hpp
-#include "vl/ui/component/container.hpp"
+#include <vl/ui/component/container.hpp>
 // std
 #include <algorithm>
 // pro
-#include "vl/ui/layout/properties.hpp"
-#include "vl/ui/layout/layout_manager.hpp"
+#include <vl/ui/layout/properties.hpp>
+#include <vl/ui/layout/layout_manager.hpp>
 
 namespace vl {
 namespace ui {

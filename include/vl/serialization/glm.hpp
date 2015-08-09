@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "vl/serialization/nvp.hpp"
+#include <vl/serialization/nvp.hpp>
 #include <boost/serialization/array.hpp>
 #include <glm/glm.hpp>
 

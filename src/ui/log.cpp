@@ -1,7 +1,7 @@
 // File: Log.cpp, Created on 2013. augusztus 22. 21:29, Author: Vader
 
 // hpp
-#include "vl/ui/log.hpp"
+#include <vl/ui/log.hpp>
 // std
 #include <mutex>
 #include <set>

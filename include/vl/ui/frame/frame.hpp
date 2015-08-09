@@ -3,7 +3,7 @@
 #pragma once
 
 // conf
-#include "vl/ui/config.hpp"
+#include <vl/ui/config.hpp>
 // vl
 #include <vl/worker_thread.hpp>
 #include <vl/sig/signal.hpp>
@@ -18,10 +18,10 @@
 #include <string>
 #include <thread>
 // pro
-#include "vl/ui/component/component.hpp"
-#include "vl/ui/events/events.hpp"
-#include "vl/ui/monitor.hpp"
-#include "vl/ui/render/renderer.hpp"
+#include <vl/ui/component/component.hpp>
+#include <vl/ui/events/events.hpp>
+#include <vl/ui/monitor.hpp>
+#include <vl/ui/render/renderer.hpp>
 
 class GLFWwindow;
 class GLFWmonitor;

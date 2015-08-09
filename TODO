@@ -1,3 +1,7 @@
+
+
+http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
+
 Új fajta signal: timerSignal
 Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
 Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
@@ -8,30 +12,30 @@ P1 - std::future family
 
 Priority levels for each operation
 
-        Task        |  GL  |  IO  | Note
-:------------------ | ----:| ----:|:----------------------------------------------------------------
- Default UIShader   |   10 |   10 | Unloading as a normal Shader
- Default Shader     |   20 |   20 |
- Default Font       |   30 |   30 |
- Default UITexture  |   40 |   40 | Unloading as a normal Texture
- Default Model      |   50 |   50 |
- Default Texture    |   60 |   60 |
- Render-Immediate   |  110 |   -  | Placed into the que by a timer when render time window runs out
- Unload Texture     |  210 |  210 |
- Unload Model       |  220 |  220 |
- Unload Font        |  240 |  240 |
- Unload CSS         |   ?  |  250 | Work in progress
- Unload UILayout    |   ?  |  260 | Work in progress
- Unload Shader      |  270 |  270 |
- Load UIShader      |  310 |  310 | Unloading as a normal Shader
- Load Shader        |  320 |  320 |
- Load UILayout      |   ?  |  330 | Work in progress
- Load CSS           |   ?  |  340 | Work in progress
- Load Font          |  350 |  350 |
- Load UITexture     |  360 |  360 | Unloading as a normal Texture
- Load Model         |  370 |  370 |
- Load Texture       |  380 |  380 |
- Render-Residual    | 1000 |   -  | Always stays in queue as last operation
+        Task        |   GL  |   IO  | Note
+:------------------ | -----:| -----:|:--------------------------------------------------------------
+ Default UIShader   |   100 |   100 | Unloading as a normal Shader
+ Default Shader     |   200 |   200 |
+ Default Font       |   300 |   300 |
+ Default UITexture  |   400 |   400 | Unloading as a normal Texture
+ Default Model      |   500 |   500 |
+ Default Texture    |   600 |   600 |
+ Render-Immediate   |  1100 |   -   | Starts by a timer when render time-window runs out
+ Unload Texture     |  2100 |  2100 |
+ Unload Model       |  2200 |  2200 |
+ Unload Font        |  2400 |  2400 |
+ Unload CSS         |   ?   |  2500 | Work in progress
+ Unload UILayout    |   ?   |  2600 | Work in progress
+ Unload Shader      |  2700 |  2700 |
+ Load UIShader      |  3100 |  3100 | Unloading as a normal Shader
+ Load Shader        |  3200 |  3200 |
+ Load UILayout      |   ?   |  3300 | Work in progress
+ Load CSS           |   ?   |  3400 | Work in progress
+ Load Font          |  3500 |  3500 |
+ Load UITexture     |  3600 |  3600 | Unloading as a normal Texture
+ Load Model         |  3700 |  3700 |
+ Load Texture       |  3800 |  3800 |
+ Render-Residual    | 10000 |   -   | Always stays in queue as last operation
 
 top layer std::function and forward!
 
@@ -200,4 +204,4 @@ void vglPassFullScreenQuad() {
 void vglViewportFullScreen() {
 	glViewport(0, 0, options.graphics.resolution.get().x
 			, options.graphics.resolution.get().y);
-} 
+}

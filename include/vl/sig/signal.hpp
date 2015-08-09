@@ -50,10 +50,6 @@
 #include "callable.hpp"
 #include "trackable.hpp"
 
-template <typename T>
-struct is_non_void : std::is_same<typename std::is_void<T>::type, std::false_type::type> {
-};
-
 namespace vl {
 
 // -------------------------------------------------------------------------------------------------
@@ -73,11 +69,11 @@ protected:
 
 	Accumulator<RType>* accumulator;
 protected:
-	virtual void connect(TrackableBase* ptr, bool reflect = true) {
+	virtual void connect(TrackableBase* ptr, bool reflect = true) override {
 		if (reflect)
 			ptr->connect(this, false);
 	}
-	virtual void disconnect(TrackableBase* ptr, bool reflect = true) {
+	virtual void disconnect(TrackableBase* ptr, bool reflect = true) override {
 		outputs.erase(ptr);
 		inputs.erase(ptr);
 
@@ -87,9 +83,11 @@ protected:
 	// ---------------------------------------------------------------------------------------------
 public:
 	SignalImpl() :
-		accumulator(Accumulator<RType>::get()) { }
+		accumulator(Accumulator<RType>::get()) {
+	}
 	SignalImpl(Accumulator<RType>* accumulator) :
-		accumulator(accumulator) { }
+		accumulator(accumulator) {
+	}
 	// ---------------------------------------------------------------------------------------------
 public:
 	inline Accumulator<RType>* getAccumulator() const {
@@ -105,13 +103,15 @@ public:
 	}
 
 protected:
-	template <typename R2 = RType, typename = typename std::enable_if<std::is_void<R2>::value>::type>
+	template <typename R2 = RType, typename =
+	typename std::enable_if<std::is_void<R2>::value>::type>
 	RType fireImpl(Args... args) {
 		for (auto& output : outputs) {
 			(*output.second)(std::forward<Args>(args)...);
 		}
 	}
-	template <typename R2 = RType, typename = typename std::enable_if<is_non_void<R2>::value>::type>
+	template <typename R2 = RType, typename =
+	typename std::enable_if<!std::is_void<R2>::value>::type>
 	RType fireImpl(Args... args, int /*ignored*/ = 0) {
 		RType result = accumulator->begin();
 		for (auto& output : outputs) {
@@ -145,6 +145,12 @@ public:
 	void input(SignalImpl<RType, Args...> * const sig) {
 		sig->output(&SignalImpl<RType, Args...>::fire, this);
 		inputs.emplace(sig);
+	}
+	inline void operator<<(SignalImpl<RType, Args...>& sig) {
+		input(sig);
+	}
+	inline void operator<<(SignalImpl<RType, Args...> * const sig) {
+		input(sig);
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -182,6 +188,12 @@ public:
 	}
 	inline void output(SignalImpl<RType, Args...> * const slot) {
 		slot->input(this);
+	}
+	inline void operator>>(SignalImpl<RType, Args...>& sig) {
+		output(sig);
+	}
+	inline void operator>>(SignalImpl<RType, Args...> * const sig) {
+		output(sig);
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -268,43 +280,3 @@ struct ConditionalSignal<R(Args...)> : public ConditionalSignalImpl<R, Args...> 
 };
 
 } //namespace vl
-
-
-
-
-//template<typename CallSignature, typename... Moduls> struct SignalBase;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Adaptiv;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Capacitiv;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Conditional;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Priority;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Routing;
-//template<typename CallSignature, typename Modul, typename... Moduls> struct Unique;
-
-
-//template<typename Base, typename R, typename... Args> struct A;
-//template<typename Base, typename R, typename... Args> struct B;
-//template<typename Base, typename R, typename... Args> struct C;
-//
-//template<template<typename...> class Base, typename R, typename... BaseArgs, typename... Args>
-//struct A<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
-//	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
-//
-//	int a;
-//};
-//
-//template<template<typename...> class Base, typename R, typename... BaseArgs, typename... Args>
-//struct B<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
-//	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
-//
-//	int b;
-//};
-//
-//template<template<template<template<typename...> class> class> class Base, typename R, typename... BaseArgs, typename... Args>
-//struct C<R(Args...), Base<BaseArgs...>> : Base<R(Args...), BaseArgs...> {
-////	using FireReturn = typename Base<R(Args...), BaseArgs...>::FireReturn;
-//	using FireReturn = R;
-//
-//	int c;
-//};
-//
-//

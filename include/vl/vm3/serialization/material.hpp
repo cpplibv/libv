@@ -3,9 +3,9 @@
 #pragma once
 
 // hpp
-#include "vl/vm3/material.hpp"
+#include <vl/vm3/material.hpp>
 // config
-#include "vl/vm3/config.hpp"
+#include <vl/vm3/config.hpp>
 // external
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/split_free.hpp>

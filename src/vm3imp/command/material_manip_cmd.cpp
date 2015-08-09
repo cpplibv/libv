@@ -1,12 +1,12 @@
 // File: material_manip.cpp, Created on 2015. március 27. 2:38, Author: Vader
 
 // hpp
-#include "vl/vm3imp/command/material_manip_cmd.hpp"
+#include <vl/vm3imp/command/material_manip_cmd.hpp>
 // std
 #include <fstream>
 // pro
-#include "vl/vm3/model.hpp"
-#include "vl/vm3imp/opened_model.hpp"
+#include <vl/vm3/model.hpp>
+#include <vl/vm3imp/opened_model.hpp>
 
 namespace vl {
 namespace vm3 {

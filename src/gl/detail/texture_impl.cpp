@@ -1,13 +1,13 @@
 // File: TextureImpl.cpp, Created on 2014. november 28. 17:45, Author: Vader
 
 // hpp
-#include "vl/gl/detail/texture_impl.hpp"
+#include <vl/gl/detail/texture_impl.hpp>
 // ext
 #include <gli/gli.hpp>
 // pro
-#include "vl/gl/gl_contexts.hpp"
-#include "vl/gl/log.hpp"
-#include "vl/gl/vgl.hpp"
+#include <vl/gl/gl_contexts.hpp>
+#include <vl/gl/log.hpp>
+#include <vl/gl/vgl.hpp>
 
 //http://gli.g-truc.net/0.5.1/code.html
 

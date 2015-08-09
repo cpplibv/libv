@@ -1,6 +1,6 @@
 // File: Light.cpp, Created on 2014. december 19. 13:12, Author: Vader
 
-#include "vl/gl/light.hpp"
+#include <vl/gl/light.hpp>
 
 
 namespace vl {

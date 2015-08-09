@@ -1,11 +1,11 @@
 // File: Model.cpp, Created on 2014. december 6. 22:44, Author: Vader
 
 // hpp
-#include "vl/gl/model.hpp"
+#include <vl/gl/model.hpp>
 // vl
 #include <vl/vm3/model.hpp>
 // pro
-#include "vl/gl/vgl.hpp"
+#include <vl/gl/vgl.hpp>
 
 namespace vl {
 namespace gl {

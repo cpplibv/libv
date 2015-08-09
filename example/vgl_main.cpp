@@ -5,18 +5,18 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
 // vl
-#include <vl/context.hpp>
+#include <vl/worker_thread.hpp>
 // std
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 // pro
-#include "vl/gl/log.hpp"
-#include "vl/gl/model.hpp"
-#include "vl/gl/shader.hpp"
-#include "vl/gl/texture.hpp"
-#include "vl/gl/uniform.hpp"
-#include "vl/gl/vgl.hpp"
+#include <vl/gl/log.hpp>
+#include <vl/gl/model.hpp>
+#include <vl/gl/shader.hpp>
+#include <vl/gl/texture.hpp>
+#include <vl/gl/uniform.hpp>
+#include <vl/gl/vgl.hpp>
 
 //<<< http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 

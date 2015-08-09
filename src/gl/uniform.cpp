@@ -1,6 +1,6 @@
 // File: Uniform.cpp, Created on 2014. december 19. 13:45, Author: Vader
 
-#include "vl/gl/uniform.hpp"
+#include <vl/gl/uniform.hpp>
 
 namespace vl {
 namespace gl {

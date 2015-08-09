@@ -17,7 +17,7 @@
 
 #include <sstream>
 
-#include "vl/vm3/serialization/model.hpp"
+#include <vl/vm3/serialization/model.hpp>
 
 using namespace vl;
 using namespace vl::vm3;

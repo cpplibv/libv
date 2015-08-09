@@ -3,12 +3,12 @@
 #pragma once
 
 // vl
-#include <vl/resource_manager.hpp>
+#include <vl/resource.hpp>
 // std
 #include <memory>
 // pro
-#include "vl/gl/detail/texture_impl.hpp"
-#include "vl/gl/gl_contexts.hpp"
+#include <vl/gl/detail/texture_impl.hpp>
+#include <vl/gl/gl_contexts.hpp>
 #include "shader.hpp"
 
 namespace vl {

@@ -8,7 +8,7 @@
 // std
 #include <vector>
 // pro
-#include "vl/ui/events/events.hpp"
+#include <vl/ui/events/events.hpp>
 
 class GLFWvidmode;
 class GLFWmonitor;

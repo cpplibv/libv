@@ -14,8 +14,8 @@
 
 #include <sstream>
 
-#include "vl/vm3/serialization/material.hpp"
-#include "vl/vm3/material_property_visitor.hpp"
+#include <vl/vm3/serialization/material.hpp>
+#include <vl/vm3/material_property_visitor.hpp>
 
 using namespace vl;
 using namespace vl::vm3;

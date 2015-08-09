@@ -1,7 +1,7 @@
 // File: Log.cpp, Created on 2015. február 2. 5:12, Author: Vader
 
 // hpp
-#include "vl/gl/log.hpp"
+#include <vl/gl/log.hpp>
 // ext
 #include <GL/glew.h>
 

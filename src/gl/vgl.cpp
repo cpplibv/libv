@@ -1,7 +1,7 @@
 // File: vgl.cpp, Created on 2014. november 25. 12:14, Author: Vader
 
 // hpp
-#include "vl/gl/vgl.hpp"
+#include <vl/gl/vgl.hpp>
 // ext
 #include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>

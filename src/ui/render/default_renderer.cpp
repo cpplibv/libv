@@ -1,11 +1,11 @@
 // File: DefaultRenderer.cpp, Created on 2014. április 24. 12:16, Author: Vader
 
 // hpp
-#include "vl/ui/render/default_renderer.hpp"
+#include <vl/ui/render/default_renderer.hpp>
 // ext
 #include <GL/glew.h>
 // pro
-#include "vl/ui/component/quad.hpp"
+#include <vl/ui/component/quad.hpp>
 
 namespace vl {
 namespace ui {

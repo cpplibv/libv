@@ -5,7 +5,7 @@
 // std
 #include <memory>
 // pro
-#include "vl/vm3/model.hpp"
+#include <vl/vm3/model.hpp>
 
 namespace vl {
 namespace vm3 {

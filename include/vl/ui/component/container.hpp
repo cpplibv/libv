@@ -6,7 +6,7 @@
 #include <memory>
 #include <vector>
 // pro
-#include "vl/ui/component/component.hpp"
+#include <vl/ui/component/component.hpp>
 
 namespace vl {
 namespace ui {

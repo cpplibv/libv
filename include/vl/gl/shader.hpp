@@ -7,14 +7,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 // vl
-#include <vl/resource_manager.hpp>
+#include <vl/resource.hpp>
 // std
 #include <fstream>
 #include <map>
 #include <memory>
 #include <vector>
 // pro
-#include "vl/gl/log.hpp"
+#include <vl/gl/log.hpp>
 
 namespace vl {
 namespace gl {

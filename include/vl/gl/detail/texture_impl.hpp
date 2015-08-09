@@ -9,7 +9,7 @@
 #include <memory>
 #include <string>
 // pro
-#include "vl/gl/shader.hpp"
+#include <vl/gl/shader.hpp>
 
 
 namespace gli {

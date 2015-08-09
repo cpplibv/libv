@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 #include <iostream>
-#include "vl/vec.hpp"
+#include <vl/vec.hpp>
 
 using namespace vl;
 

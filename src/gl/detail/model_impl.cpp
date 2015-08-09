@@ -1,7 +1,7 @@
 // File: model.cpp, Created on 2014. november 28. 17:45, Author: Vader
 
 // hpp
-#include "vl/gl/detail/model_impl.hpp"
+#include <vl/gl/detail/model_impl.hpp>
 // ext
 #include <GL/glew.h>
 // vl
@@ -10,12 +10,12 @@
 // std
 #include <fstream>
 // pro
-#include "vl/gl/gl_contexts.hpp"
-#include "vl/gl/log.hpp"
-#include "vl/gl/model.hpp"
-#include "vl/gl/shader.hpp"
-#include "vl/gl/uniform.hpp"
-#include "vl/gl/vgl.hpp"
+#include <vl/gl/gl_contexts.hpp>
+#include <vl/gl/log.hpp>
+#include <vl/gl/model.hpp>
+#include <vl/gl/shader.hpp>
+#include <vl/gl/uniform.hpp>
+#include <vl/gl/vgl.hpp>
 
 namespace vl {
 namespace gl {

@@ -1,13 +1,13 @@
 // File: panel.cpp, Created on 2015. április 8. 14:32, Author: Vader
 
 // hpp
-#include "vl/ui/component/label.hpp"
+#include <vl/ui/component/label.hpp>
 // vl
 #include <ui/font/font_2D.hpp>
 // ext
 #include <GL/glew.h>
 // pro
-#include "vl/ui/log.hpp"
+#include <vl/ui/log.hpp>
 
 namespace vl {
 namespace ui {

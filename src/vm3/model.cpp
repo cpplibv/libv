@@ -1,7 +1,7 @@
 // File: Model.cpp, Created on 2015. január 17. 7:21, Author: Vader
 
 // hpp
-#include "vl/vm3/serialization/model.hpp"
+#include <vl/vm3/serialization/model.hpp>
 // ext
 #include <boost/archive/portable_iarchive.hpp>
 #include <boost/archive/portable_oarchive.hpp>

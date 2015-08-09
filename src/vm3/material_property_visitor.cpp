@@ -1,7 +1,7 @@
 // File: MaterialPropertyVisitor.cpp, Created on 2015. február 14. 21:24, Author: Vader
 
-#include "vl/vm3/material.hpp"
-#include "vl/vm3/material_property_visitor.hpp"
+#include <vl/vm3/material.hpp>
+#include <vl/vm3/material_property_visitor.hpp>
 
 namespace vl {
 	namespace vm3 {

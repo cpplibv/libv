@@ -1,7 +1,7 @@
 // File: Frame.cpp, Created on 2013. szeptember 27. 16:00, Author: Vader
 
 // hpp
-#include "vl/ui/frame/frame.hpp"
+#include <vl/ui/frame/frame.hpp>
 // ext
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -10,8 +10,8 @@
 #include <vl/semaphore.hpp>
 #include <vl/gl/vgl.hpp>
 // pro
-#include "vl/ui/log.hpp"
-#include "vl/timer.hpp"
+#include <vl/ui/log.hpp>
+#include <vl/timer.hpp>
 
 namespace vl {
 namespace ui {

@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 #include <string>
-#include "vl/varidic_map.hpp"
+#include <vl/varidic_map.hpp>
 
 TEST_CASE("set") {
 	vl::VaridicMap map;

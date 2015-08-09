@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <vl/log.hpp>
-#include <vl/context.hpp>
+#include <vl/worker_thread.hpp>
 
 int main(int, char**) {
 	vl::log().output(std::cout);

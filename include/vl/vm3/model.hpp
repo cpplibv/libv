@@ -7,7 +7,7 @@
 // std
 #include <vector>
 // pro
-#include "vl/vm3/material.hpp"
+#include <vl/vm3/material.hpp>
 
 //TODO P2: Use dynarray instead of vector
 //TODO P2: Use pointers instead of IDs

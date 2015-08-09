@@ -5,8 +5,8 @@
 // ext
 #include <GL/glew.h>
 // pro
-#include "vl/gl/light.hpp"
-#include "vl/gl/shader.hpp"
+#include <vl/gl/light.hpp>
+#include <vl/gl/shader.hpp>
 
 namespace vl {
 namespace gl {

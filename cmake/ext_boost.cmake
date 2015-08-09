@@ -1,3 +1,7 @@
+#
+
+# --------------------------------------------------------------------------------------------------
+
 set(Boost_Version 1.58.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 
@@ -17,10 +21,6 @@ ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
 	URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.zip
 	URL_MD5 b0605a9323f1e960f7434dbbd95a7a5c
-	#UPDATE_COMMAND ${PATH_EXT_SRC}/boost/src/ext_boost/bootstrap gcc
-	#UPDATE_COMMAND bootstrap gcc
-	#CONFIGURE_COMMAND "bootstrap gcc"
-	#CONFIGURE_COMMAND bootstrap.bat gcc
 	CONFIGURE_COMMAND bootstrap.sh gcc
 	BUILD_COMMAND b2
 		install

@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-#include "vl/file_system.hpp"
+#include <vl/file_system.hpp>
 
 TEST_CASE("getDirFull") {
 	auto filePath0 = "D:/X-Files/Cpp/test/main.cpp";

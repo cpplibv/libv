@@ -3,14 +3,14 @@
 #pragma once
 
 // hpp
-#include "vl/vm3/model.hpp"
+#include <vl/vm3/model.hpp>
 // conf
-#include "vl/vm3/config.hpp"
+#include <vl/vm3/config.hpp>
 // vl
 #include <vl/serialization/nvp.hpp>
 #include <vl/serialization/glm.hpp>
 // pro
-#include "vl/vm3/serialization/material.hpp"
+#include <vl/vm3/serialization/material.hpp>
 
 namespace vl {
 namespace vm3 {

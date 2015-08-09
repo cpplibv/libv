@@ -4,12 +4,12 @@
 
 // vl
 #include <vl/vec.hpp>
-#include <vl/memory.hpp>
 // std
+#include <memory>
 #include <string>
 // pro
-#include "vl/ui/layout/properties.hpp"
-#include "vl/ui/render/renderer.hpp"
+#include <vl/ui/layout/properties.hpp>
+#include <vl/ui/render/renderer.hpp>
 
 namespace vl {
 namespace ui {
@@ -66,7 +66,7 @@ public:
 	virtual ~Component();
 };
 
-using ComponentPtr = ::vl::shared_or_raw_ptr<Component>;
+using ComponentPtr = std::shared_ptr<Component>;
 
 } //namespace ui
 } //namespace vl

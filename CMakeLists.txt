@@ -1,24 +1,34 @@
 #
+
 cmake_minimum_required (VERSION 3.1)
 project (vl)
 include(ExternalProject)
 
 include(cmake/util.cmake)
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
+message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # --------------------------------------------------------------------------------------------------
 
-#enable_testing()
-#set(CMAKE_VERBOSE_MAKEFILE off)
+# TODO P2: flag or build options to turn on/off sanitizes
+# TODO P2: debug symbol automated turn on/off
+# TODO P3: backward compatibility for pre gcc 5.1 because suggest-override
+# TODO P3: test clang build
+# TODO P5: test msvc build
 
-#DefinitionsTODO
-#IF DEBUG
-add_definitions(-Ofast)
-#add_definitions(-O2)
-#EF DEBUG
-#add_definitions(-O0)
-#add_definitions(-ggdb)
-#FI DEBUG
+# --------------------------------------------------------------------------------------------------
+
+#set(CMAKE_VERBOSE_MAKEFILE off)
+#set(CMAKE_BUILD_TYPE "DEBUG")
+
+#Definitions
+if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	add_definitions(-O0)
+	add_definitions(-ggdb3)
+else() #elseif(CMAKE_BUILD_TYPE EQUAL "RELEASE")
+	add_definitions(-Ofast)
+endif()
 
 add_definitions(-m64)
 add_definitions(-std=c++14)
@@ -31,6 +41,7 @@ add_definitions(-DGLM_FORCE_RADIANS)
 
 #Paths
 set(PATH_BIN ${PROJECT_SOURCE_DIR}/bin)
+set(PATH_BLD build)
 set(PATH_LIB ${PROJECT_SOURCE_DIR}/lib)
 set(PATH_PRJ ${CMAKE_CURRENT_SOURCE_DIR})
 set(PATH_EXT ${PATH_PRJ}/ext)
@@ -47,14 +58,29 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
 set(TOOLSET)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+
 	add_compile_options(/Wall)
 	set(TOOLSET msvc)
+
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	add_compile_options(-Weverything -Wconversion -Wno-comment)
+
+	add_compile_options(-Weverything -Wconversion -Wmissing-override -Wno-comment)
 	set(TOOLSET clang)
+
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+
 	add_compile_options(-Wall -Wextra -Wconversion -Wno-comment)
+	#add_compile_options(-Wsuggest-override) #IF > GNU 5.1
+
+	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+		#add_compile_options(-fsanitize=address)
+		#add_compile_options(-fsanitize=kernel-address)
+		#add_compile_options(-fsanitize=leak)
+		#add_compile_options(-fsanitize=thread)
+		#add_compile_options(-fsanitize=undefined)
+	endif()
 	set(TOOLSET gcc)
+
 endif()
 
 if(WIN32)
@@ -78,7 +104,7 @@ ExternalProject_Add(ext_unittest
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/unittest
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  #catch is header only, skip tests
-	INSTALL_COMMAND 
+	INSTALL_COMMAND
 		mkdir -p ${PATH_EXT}/unittest/ &&
 		cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
 	EXCLUDE_FROM_ALL 1
@@ -90,7 +116,7 @@ ExternalProject_Add(ext_glfw
 	GIT_TAG 3.1.1
 	PREFIX ${PATH_EXT_SRC}/glfw
 	INSTALL_DIR ${PATH_EXT}/glfw
-	CMAKE_ARGS 
+	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
 		-DGLFW_BUILD_EXAMPLES=OFF
 		-DGLFW_BUILD_TESTS=OFF
@@ -120,14 +146,14 @@ ExternalProject_Add(ext_glm
 )
 
 list(APPEND EXTERNAL_PROJECT_LIST ext_gli)
-ExternalProject_Add(ext_gli 
+ExternalProject_Add(ext_gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.5.1.1
 	BUILD_COMMAND "" #gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
 	INSTALL_DIR ${PATH_EXT}/gli
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
-	INSTALL_COMMAND 
+	INSTALL_COMMAND
 		mkdir -p ${PATH_EXT}/gli/include/gli/ &&
 		cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
 	EXCLUDE_FROM_ALL 1
@@ -213,7 +239,7 @@ else()
 	set(ext_boost_b2_command cmd.exe //c b2.exe)
 endif()
 
-message(STATUS "Boost_Version: " ${Boost_Version})
+message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
 	URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.zip
@@ -312,19 +338,19 @@ target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
 target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 freetype vgl)
 
 #Link - Tests
-target_link_libraries(vgl_test    vgl)
-target_link_libraries(vl_test     )
-target_link_libraries(vm3_test    vm3 boost_serialization-mt-s)
-target_link_libraries(vm3imp_test vm3)
-target_link_libraries(vsig_test   )
-target_link_libraries(vui_test    )
+target_link_libraries(vgl_test    -static vgl)
+target_link_libraries(vl_test     -static )
+target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
+target_link_libraries(vm3imp_test -static vm3)
+target_link_libraries(vsig_test   -static )
+target_link_libraries(vui_test    -static )
 
 #Link - Executables
 target_link_libraries(vgl_main    -static glew glfw3 vgl)
 target_link_libraries(vgl_main2   -static vgl)
-target_link_libraries(vl_main     -static)
+target_link_libraries(vl_main     -static )
 target_link_libraries(vm3_main    -static vm3)
 target_link_libraries(vm3imp_main -static vm3imp)
-target_link_libraries(vsig_main   -static)
+target_link_libraries(vsig_main   -static )
 target_link_libraries(vui_main    -static vui)
 target_link_libraries(vui_main2   -static vui)

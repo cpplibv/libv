@@ -2,8 +2,6 @@
 
 #pragma once
 
-// vl
-#include <vl/efl.hpp>
 // std
 #include <type_traits>
 
@@ -21,11 +19,11 @@ using void_t = typename voider<Args...>::type;
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
+template <typename... T>
 struct always_true : std::true_type {
 };
 
-template <typename T>
+template <typename... T>
 struct always_false : std::false_type {
 };
 
@@ -48,25 +46,6 @@ struct is_less_comparable<T, L, void_t<decltype(
 		)>> : std::true_type { };
 
 // =================================================================================================
-// is_efl_loadable
-
-template <typename T, typename = void> struct is_efl_loadable : std::false_type {
-};
-template <typename T>
-struct is_efl_loadable<T, void_t<decltype(
-		::vl::efl::load(std::declval<T&>())
-		)>> : std::true_type { };
-
-// -------------------------------------------------------------------------------------------------
-// is_efl_unloadable
-
-template <typename T, typename = void> struct is_efl_unloadable : std::false_type {
-};
-template <typename T>
-struct is_efl_unloadable<T, void_t<decltype(
-		::vl::efl::unload(std::declval<T&>())
-		)>> : std::true_type { };
-
 // -------------------------------------------------------------------------------------------------
 // is_member_loadable
 
