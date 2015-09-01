@@ -7,10 +7,7 @@ be aware that i will need copyright for every contribution into vl
 
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
-Új fajta signal: timerSignal
-Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
-Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
-
+Optimalizált fordítás - cmake:
 https://github.com/sakra/cotire
 
 P1 - std::future family
@@ -121,9 +118,10 @@ http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 ----
 
-Adopt TCLAP http://tclap.sourceforge.net is suitable
+Adopt TCLAP http://tclap.sourceforge.net if suitable
 
 Contexted Resource
+
 vl::log(__VL_ERROR__, __VL_POC__, __VL_GL__, "msg", args...)
 struct vl::POC = position of code
 Beside Component's shared_ptr provide a way of non owning ptr which is visible at call:
