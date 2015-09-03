@@ -9,6 +9,6 @@
 !test/
 
 !.gitignore
-!TODO
+!TODO.md
 !CMakeLists.txt
 !README.md
