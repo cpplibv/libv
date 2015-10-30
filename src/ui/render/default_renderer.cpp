@@ -17,14 +17,14 @@ void DefaultRenderer::operator()(const Quad* v) {
 	glPushMatrix();
 	glMatrixMode(GL_MODELVIEW);
 	glViewport(pos.x, pos.y, size.x, size.y);
-	gluOrtho2D(0, size.x, 0, size.y);
+	gluOrtho2D(0.f, size.x, 0.f, size.y);
 
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor4f(v->id, 0, v->blue, 1);
-	glVertex3f(0, 0, 0);
-	glVertex3f(size.x, 0, 0);
-	glVertex3f(0, size.y, 0);
-	glVertex3f(size.x, size.y, 0);
+	glColor4f(v->id, 0.f, v->blue, 1.f);
+	glVertex3f(0.f, 0.f, 0.f);
+	glVertex3f(size.x, 0.f, 0.f);
+	glVertex3f(0.f, size.y, 0.f);
+	glVertex3f(size.x, size.y, 0.f.f);
 	glEnd();
 	glPopMatrix();
 }

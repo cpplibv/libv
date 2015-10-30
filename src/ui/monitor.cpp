@@ -68,8 +68,7 @@ Monitor* Monitor::getMonitorAt(const ivec2& coord) {
 			minid = &monitor.second;
 		}
 	}
-
-	//??? assert nullptr
+	assert(minid != nullptr);
 	return minid;
 }
 

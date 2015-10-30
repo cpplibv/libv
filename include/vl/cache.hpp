@@ -17,6 +17,13 @@
 
 namespace vl {
 
+// TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
+//  wrapper where the cached object is an other wrapper and with the use of the shared_ptr member
+//  magic ctor
+
+// TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
+//	newing the sharedptr and the resource
+
 // -------------------------------------------------------------------------------------------------
 
 template<typename BaseComparator, typename T>
@@ -82,12 +89,12 @@ class Cache {
 		bool alive = true;
 	};
 
-	struct CacheWatch : T {
+	struct CachedObject : T {
 		std::shared_ptr<CacheInternal> internal;
 		using T::T;
 	};
 private:
-	using Type = CacheWatch;
+	using Type = CachedObject;
 	using Container = std::set<std::weak_ptr<Type>, ChachedComparator<Comparator, Type>>;
 
 private:
@@ -132,14 +139,14 @@ private:
 			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
 	};
 
-//	template<size_t... Is, typename... Args>
-//	struct Arguments<ignore<Is...>, Args...> {
-//		std::tuple<Args&&...> all;
-//		decltype(vl::mask_tuple(all, std::index_sequence<Is...>())) comp;
-//		Arguments(Args&&... args) :
-//			all(std::forward<Args>(args)...),
-//			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
-//	};
+	//	template<size_t... Is, typename... Args>
+	//	struct Arguments<ignore<Is...>, Args...> {
+	//		std::tuple<Args&&...> all;
+	//		decltype(vl::mask_tuple(all, std::index_sequence<Is...>())) comp;
+	//		Arguments(Args&&... args) :
+	//			all(std::forward<Args>(args)...),
+	//			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
+	//	};
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -174,10 +181,11 @@ public:
 
 public:
 	template<typename CompareOptions = void, typename... Args>
-	std::shared_ptr<Type> get(Args&&... args) {
+	std::shared_ptr<T> get(Args&&... args) {
 		//static_assert comparable
 		//static_assert constructor
 		//static_assert compare out indexing
+		//static_assert and sfiane for invalid CompareOptions
 		return getImpl<CompareOptions>(std::forward<Args>(args)...);
 	}
 	inline typename Container::size_type size() {
@@ -208,12 +216,14 @@ class LoaderCache {
 		bool alive = true;
 	};
 
-	struct CacheWatch : T {
+	struct CachedObject : T {
 		std::shared_ptr<CacheInternal> internal;
 		using T::T;
+		using T::load;
+		using T::unload;
 	};
 private:
-	using Type = CacheWatch;
+	using Type = CachedObject;
 	using Container = std::set<std::weak_ptr<Type>, ChachedComparator<Comparator, Type>>;
 
 private:
@@ -231,7 +241,7 @@ private:
 				cache.erase(result.first);
 			}
 		}
-		ptr->unload(std::shared_ptr<T>(ptr)); //implicit delete
+		ptr->unload(std::shared_ptr<T>(ptr)); //implicit delete via shared_ptr
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -258,14 +268,14 @@ private:
 			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
 	};
 
-//	template<size_t... Is, typename... Args>
-//	struct Arguments<ignore<Is...>, Args...> {
-//		std::tuple<Args&&...> all;
-//		decltype(vl::mask_tuple(all, std::index_sequence<Is...>())) comp;
-//		Arguments(Args&&... args) :
-//			all(std::forward<Args>(args)...),
-//			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
-//	};
+	//	template<size_t... Is, typename... Args>
+	//	struct Arguments<ignore<Is...>, Args...> {
+	//		std::tuple<Args&&...> all;
+	//		decltype(vl::mask_tuple(all, std::index_sequence<Is...>())) comp;
+	//		Arguments(Args&&... args) :
+	//			all(std::forward<Args>(args)...),
+	//			comp(vl::mask_tuple(all, std::index_sequence<Is...>())) { }
+	//	};
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -301,10 +311,11 @@ public:
 
 public:
 	template<typename CompareOptions = void, typename... Args>
-	std::shared_ptr<Type> get(Args&&... args) {
-		//static_assert comparable
-		//static_assert constructor
-		//static_assert compare out indexing
+	std::shared_ptr<T> get(Args&&... args) {
+		//TODO P3: static_assert comparable
+		//TODO P3: static_assert constructor
+		//TODO P3: static_assert compare out indexing
+		//TODO P3: static_assert and sfiane for invalid CompareOptions
 		return getImpl<CompareOptions>(std::forward<Args>(args)...);
 	}
 	inline typename Container::size_type size() {

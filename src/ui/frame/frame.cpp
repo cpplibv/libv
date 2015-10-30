@@ -254,7 +254,7 @@ void Frame::update() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::showImpl() {
-	assert(std::this_thread::get_id() == context.get_id());
+	assert(std::this_thread::get_id() == context.getID());
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 
 	if (!window) {
@@ -271,7 +271,7 @@ void Frame::showImpl() {
 }
 
 void Frame::hideImpl() {
-	assert(std::this_thread::get_id() == context.get_id());
+	assert(std::this_thread::get_id() == context.getID());
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 
 	if (window)
@@ -280,7 +280,7 @@ void Frame::hideImpl() {
 }
 
 void Frame::restoreImpl() {
-	assert(std::this_thread::get_id() == context.get_id());
+	assert(std::this_thread::get_id() == context.getID());
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 
 	if (window)
@@ -289,7 +289,7 @@ void Frame::restoreImpl() {
 }
 
 void Frame::minimalizeImpl() {
-	assert(std::this_thread::get_id() == context.get_id());
+	assert(std::this_thread::get_id() == context.getID());
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 
 	if (window)
@@ -489,8 +489,8 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, openGLProfile);
 	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	//glfwWindowHint(GLFW_FOCUSED, ); 
-	//glfwWindowHint(GLFW_FLOATING, ); 
+	//glfwWindowHint(GLFW_FOCUSED, );
+	//glfwWindowHint(GLFW_FLOATING, );
 	//glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION);
 	//TODO P4: Hint GLFW_FOCUSED
 	//TODO P4: Hint GLFW_FLOATING
@@ -825,22 +825,22 @@ Frame::~Frame() {
 } //namespace ui
 } //namespace vl
 
-//Char           
-//CharMods       
-//CursorEnter    
-//CursorPos      
-//Drop           
+//Char
+//CharMods
+//CursorEnter
+//CursorPos
+//Drop
 //FramebufferSize
-//Key            
-//MouseButton    
-//Scroll         
-//WindowClose    
-//WindowFocus    
-//WindowIconify  
-//WindowPos      
-//WindowRefresh  
-//WindowSize     
-//Monitor        
+//Key
+//MouseButton
+//Scroll
+//WindowClose
+//WindowFocus
+//WindowIconify
+//WindowPos
+//WindowRefresh
+//WindowSize
+//Monitor
 
 //Char
 //CharMods

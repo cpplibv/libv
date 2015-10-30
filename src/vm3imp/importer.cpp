@@ -23,7 +23,7 @@ std::string to_vl_technique(int tech) {
 	switch (tech) {
 	case aiShadingMode_Flat: return "flat";
 	case aiShadingMode_Gouraud: return "gouraud";
-		//We should explode in any case if a bullshit shader is comming and ask for guidance
+		//We should explode in any case if a bullshit shader is coming and ask for guidance
 		//(outdated:) Gouraud is rarely used to redirect it to lambert as the default shading mode
 	case aiShadingMode_Phong: return "phong";
 	case aiShadingMode_Blinn: return "blinn";
@@ -85,7 +85,7 @@ void Importer::importMaterials(Model& model, const aiScene* scene) {
 		//TEXOP(t,n)
 		//MAPPING(t,n)
 		//UVWSRC(t,n)
-		//MAPPINGMODE_U(t,n) 	
+		//MAPPINGMODE_U(t,n)
 		//MAPPINGMODE_V(t,n)
 		//TEXMAP_AXIS(t,n)
 		//TEXFLAGS(t,n)

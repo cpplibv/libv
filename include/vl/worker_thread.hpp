@@ -59,7 +59,7 @@ class WorkerThread {
 	std::mutex exceptionHistory_m;
 	std::condition_variable_any recieved_cv;
 	std::priority_queue<Task, std::vector<Task>,
-			std::greater<typename std::vector<Task>::value_type>> que;
+	std::greater<typename std::vector<Task>::value_type>> que;
 	std::recursive_mutex que_m;
 
 	size_t defaultPriority;
@@ -131,8 +131,8 @@ public:
 	}
 	void join() {
 		try {
-			//			if (thread.joinable())
-			thread.join();
+			if (thread.joinable())
+				thread.join();
 		} catch (std::system_error& ex) {
 			VLOG_DEBUG(vl::log(), "Exception during joining WorkerThread [%s]: %s", name, ex.what());
 		}

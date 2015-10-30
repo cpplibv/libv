@@ -2,16 +2,14 @@
 
 #pragma once
 
-#include <vl/context.hpp>
-
 namespace vl {
 namespace gl {
 
 struct ModelContext {
-	vl::Context& gl;
-	vl::Context& io;
-
-	ModelContext(vl::Context& gl, vl::Context& io) : gl(gl), io(io) { }
+//	vl::Context& gl;
+//	vl::Context& io;
+//
+//	ModelContext(vl::Context& gl, vl::Context& io) : gl(gl), io(io) { }
 };
 
 } //namespace gl

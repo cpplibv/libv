@@ -2,107 +2,92 @@
 
 #pragma once
 
-// vl
-#include <vl/cache.hpp>
-#include <vl/context.hpp>
-#include <vl/worker_thread.hpp>
 // std
 #include <memory>
-
-#include <iostream>
+#include <mutex>
+#include <vector>
+#include <atomic>
 
 namespace vl {
 
-
 // -------------------------------------------------------------------------------------------------
 
-struct ContextHost {
-	virtual std::shared_ptr<vl::WorkerThread> get(vl::ContextID contextID) = 0;
+enum class ResourceState {
+	READY,
+	UNREADY,
+	FAILED
 };
 
-class LoadStep {
+class Resource {
+	// TODO P3: This is awful slow... lock free it!
 private:
-	std::shared_ptr<vl::WorkerThread> worker;
-	std::shared_ptr<std::function<void()>> func;
-public:
-	std::shared_ptr<LoadStep> nextStep;
-	void execute() {
-		worker->executeAsync([func = func, nextStep = nextStep]{
-			(*func)();
-			if (nextStep)
-				nextStep->execute();
-		});
+	ResourceState state{ResourceState::UNREADY};
+	mutable std::recursive_mutex mutex;
+	std::vector<Resource*> dependents;
+	std::vector<Resource*> dependencies;
+	std::function<void() > callback;
+
+protected:
+	void addDependency(const std::shared_ptr<Resource>& r) {
+		if (!r)
+			return;
+
+		std::unique_lock < decltype(mutex) > lockdep(r->mutex);
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		r->dependents.emplace_back(this);
+		lockdep.unlock();
+
+		if (callback)
+			callback();
 	}
-public:
-	LoadStep(
-			std::shared_ptr<vl::WorkerThread> worker,
-			std::shared_ptr<std::function<void()>> func) :
-		worker(worker),
-		func(func) { }
-};
+	void setDependencyCallback(std::function<void() > callback) {
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		this->callback = callback;
+		if (callback)
+			callback();
+	}
+	void changeResourceState(ResourceState state) {
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		this->state = state;
 
-class FunctionSequence {
-private:
-	std::shared_ptr<ContextHost> contextHost;
-	std::shared_ptr<LoadStep> firstStep;
-	std::shared_ptr<LoadStep> lastStep;
-private:
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	void addStep(vl::ContextID contextID, R(T::*mfn)(Args...), std::weak_ptr<T> obj, FArgs&&... args) {
-		auto func = std::make_shared<std::function<void()>>([ = ](){
-			if (auto target = obj.lock())
-				(target.get()->*mfn)(std::move(args)...);
-		});
-		auto context = contextHost->get(contextID);
-
-		auto step = std::make_shared<LoadStep>(context, func);
-
-		if (!firstStep) {
-			lastStep = firstStep = step;
-		} else {
-			lastStep->nextStep = step;
-			lastStep = lastStep->nextStep;
+		for (const auto& dependent : dependents) {
+			std::lock_guard < decltype(mutex) > lock(dependent->mutex);
+			if (dependent->callback)
+				dependent->callback();
 		}
 	}
-public:
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepIO(R(T::*mfunc)(Args...), std::weak_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::IO, mfunc, obj, std::forward<FArgs>(args)...);
+	bool isEveryDependency(const ResourceState state) const {
+		decltype(dependencies) tmpDependencies;
+		{
+			std::lock_guard < decltype(mutex) > lock(mutex);
+			tmpDependencies = dependents;
+		}
+
+		for (const auto& dependency : tmpDependencies) {
+			std::lock_guard < decltype(mutex) > lock(dependency->mutex);
+			if (state != dependency->state)
+				return false;
+		}
+		return true;
 	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepIO(R(T::*mfunc)(Args...), std::shared_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::IO, mfunc, std::weak_ptr<T>(obj), std::forward<FArgs>(args)...);
+	bool isAnyDependency(const ResourceState state) const {
+		decltype(dependencies) tmpDependencies;
+		{
+			std::lock_guard < decltype(mutex) > lock(mutex);
+			tmpDependencies = dependencies;
+		}
+
+		for (const auto& dependency : tmpDependencies) {
+			std::lock_guard < decltype(mutex) > lock(dependency->mutex);
+			if (state == dependency->state)
+				return true;
+		}
+		return false;
 	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepGL(R(T::*mfunc)(Args...), std::weak_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::GL, mfunc, obj, std::forward<FArgs>(args)...);
+	ResourceState getResourceState() const {
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		return state;
 	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepGL(R(T::*mfunc)(Args...), std::shared_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::GL, mfunc, std::weak_ptr<T>(obj), std::forward<FArgs>(args)...);
-	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepAny(R(T::*mfunc)(Args...), std::weak_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::ANY, mfunc, obj, std::forward<FArgs>(args)...);
-	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepAny(R(T::*mfunc)(Args...), std::shared_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::ANY, mfunc, std::weak_ptr<T>(obj), std::forward<FArgs>(args)...);
-	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepNet(R(T::*mfunc)(Args...), std::weak_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::NET, mfunc, obj, std::forward<FArgs>(args)...);
-	}
-	template <typename T, typename R, typename... Args, typename... FArgs>
-	inline void addStepNet(R(T::*mfunc)(Args...), std::shared_ptr<T> obj, FArgs&&... args) {
-		addStep(vl::ContextID::NET, mfunc, std::weak_ptr<T>(obj), std::forward<FArgs>(args)...);
-	}
-	void execute() {
-		if (firstStep)
-			firstStep->execute();
-	}
-public:
-	FunctionSequence(std::shared_ptr<ContextHost> ex) : contextHost(ex) { }
 };
 
 } //namespace vl

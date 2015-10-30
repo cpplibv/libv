@@ -9,20 +9,20 @@
 namespace vl {
 namespace gl {
 
-Texture::Texture(TextureManager& resourceManager, const std::string& filePath) :
-	vl::Resource<detail::TextureImpl>(resourceManager, filePath, resourceManager.context) { }
-
-void Texture::bind(TextureType type) {
-	if (data().loaded())
-		data().bind(type);
-}
-
-void Texture::unbind(TextureType type) {
-	if (data().loaded())
-		data().unbind(type);
-}
-
-Texture::~Texture() { }
+//Texture::Texture(TextureManager& resourceManager, const std::string& filePath) :
+//	vl::Resource<detail::TextureImpl>(resourceManager, filePath, resourceManager.context) { }
+//
+//void Texture::bind(TextureType type) {
+//	if (data().loaded())
+//		data().bind(type);
+//}
+//
+//void Texture::unbind(TextureType type) {
+//	if (data().loaded())
+//		data().unbind(type);
+//}
+//
+//Texture::~Texture() { }
 
 } //namespace gl
 } //namespace vl

@@ -1,3 +1,8 @@
+move everything from vl to libv
+
+license
+https://www.youtube.com/watch?v=cJIi-hIlCQM
+be aware that i will need copyright for every contribution into vl
 
 
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
@@ -11,31 +16,51 @@ https://github.com/sakra/cotire
 P1 - std::future family
 
 Priority levels for each operation
+IN - in-context operation (fast and not context sensitive)
+       GL Task        | Priority | Note
+:-------------------- | --------:|:-----------------------------------------------------------------
+ D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
+ D.ShaderProgram      |   1150   | Unloading as ShaderProgram
+ D.UIShader           |   1200   | Unloading as Shader
+ D.Shader             |   1250   | Unloading as Shader
+ D.Font               |   1300   | Unloading as Font
+ D.UITexture          |   1400   | Unloading as Texture
+ D.Model              |   1500   | Unloading as Model
+ D.Texture            |   1600   | Unloading as Texture
+ Render-Immediate     |   2000   | Starts by a timer when render time-window runs out
+ Unload Texture       |   3100   |
+ Unload Model         |   3200   |
+ Unload Font          |   3300   |
+ Unload ShaderProgram |   3400   |
+ Unload Shader        |   3500   |
+ Load UIShaderProgram |   4100   | Unloading as ShaderProgram
+ Load ShaderProgram   |   4150   |
+ Load UIShader        |   4200   | Unloading as Shader
+ Load Shader          |   4250   |
+ Load Font            |   4300   |
+ Load UITexture       |   4400   |
+ Load Model           |   4500   |
+ Load Texture         |   4600   |
+ Render-Residual      |   9900   | Always stays in queue as last operation
 
-        Task        |   GL  |   IO  | Note
-:------------------ | -----:| -----:|:--------------------------------------------------------------
- Default UIShader   |   100 |   100 | Unloading as a normal Shader
- Default Shader     |   200 |   200 |
- Default Font       |   300 |   300 |
- Default UITexture  |   400 |   400 | Unloading as a normal Texture
- Default Model      |   500 |   500 |
- Default Texture    |   600 |   600 |
- Render-Immediate   |  1100 |   -   | Starts by a timer when render time-window runs out
- Unload Texture     |  2100 |  2100 |
- Unload Model       |  2200 |  2200 |
- Unload Font        |  2400 |  2400 |
- Unload CSS         |   ?   |  2500 | Work in progress
- Unload UILayout    |   ?   |  2600 | Work in progress
- Unload Shader      |  2700 |  2700 |
- Load UIShader      |  3100 |  3100 | Unloading as a normal Shader
- Load Shader        |  3200 |  3200 |
- Load UILayout      |   ?   |  3300 | Work in progress
- Load CSS           |   ?   |  3400 | Work in progress
- Load Font          |  3500 |  3500 |
- Load UITexture     |  3600 |  3600 | Unloading as a normal Texture
- Load Model         |  3700 |  3700 |
- Load Texture       |  3800 |  3800 |
- Render-Residual    | 10000 |   -   | Always stays in queue as last operation
+       IO Task        | Priority | Note
+:-------------------- | --------:|:-----------------------------------------------------------------
+ D.UIShader File      |   1100   | Unloading as Shader File
+ D.Shader File        |   1200   | Unloading as Shader File
+ D.Font               |   1300   | Unloading as Font
+ D.UITexture          |   1400   | Unloading as Texture
+ D.Model              |   1500   | Unloading as Model
+ D.Texture            |   1600   | Unloading as Texture
+ Unload Texture       |    IN    |
+ Unload Model         |    IN    |
+ Unload Font          |    IN    |
+ Unload Shader File   |    IN    |
+ Load UIShader File   |   4100   | Unloading as Shader File
+ Load Shader File     |   4150   |
+ Load Font            |   4300   |
+ Load UITexture       |   4400   |
+ Load Model           |   4500   |
+ Load Texture         |   4600   |
 
 top layer std::function and forward!
 
@@ -90,8 +115,7 @@ http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
 OpenGL Reference page: https://www.opengl.org/sdk/docs/man/
 
 
-
-
+http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 ----
 
@@ -205,3 +229,12 @@ void vglViewportFullScreen() {
 	glViewport(0, 0, options.graphics.resolution.get().x
 			, options.graphics.resolution.get().y);
 }
+
+
+// Trace - Only when I would be "tracing" the code and trying to find one part of a function specifically
+// Debug - Information that is diagnostically helpful to people more than just developers (IT, sysadmins, etc)
+// Info - Generally useful information to log (service start/stop, configuration assumptions, etc). Info I want to always have available but usually dont care about under normal circumstances. This is my out-of-the-box config level
+// Notif -
+// Warn - Anything that can potentially cause application oddities, but for which I am automatically recoverring (such as switching from a primary to backup server, retrying an operation, missing secondary data, etc)
+// Error - Any error which is fatal to the operation but not the service or application (cant open a required file, missing data, etc). These errors will force user (administrator, or direct user) intervention. These are usually reserved (in my apps) for incorrect connection strings, missing services, etc.
+// Fatal - Any error that is forcing a shutdown of the service or application to prevent data loss (or further data loss). I reserve these only for the most heinous errors and situations where there is guaranteed to have been data corruption or loss.

@@ -19,12 +19,9 @@ TODO
 ### Namespaces
 
 - vl - V Library
-test description
 - vl::efl - External Function Location
 - vl::efl::lookup - External Function Lookup
-test description
 - vl::gl - OpenGL
-test description
 - vl::sig - Signal-Slot
 - vl::ui - User Interface
 - vl::vm3 - VM3 Model format
@@ -32,4 +29,4 @@ test description
 
 ### License
 
-TODO
+All rights reserved. (Note: When i will have time i will grant a more permissive license. :))

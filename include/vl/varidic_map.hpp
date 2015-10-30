@@ -2,17 +2,16 @@
 
 #pragma once
 
-
 // vl
 #include <vl/void_guard.hpp>
 // std
 #include <map>
 #include <memory>
 
-//TODO P3: Implement some kind of foreach 
+//TODO P3: Implement some kind of foreach
 //TODO P5: Implement remaining and simular functionality from map for example : operator[]
-//TODO P5: Implement ~~constness to: at / [] / lenght / etc...
-//TODO P5: Add functionality for custom address type 
+//TODO P5: Implement ~~constness to: at / operator[] / lenght / etc...
+//TODO P5: Add functionality for custom address type
 //				(idea: need to switch back to template addressing and both type and
 //				value is important (hard (imo impossible)))
 
@@ -25,7 +24,7 @@ struct VaridicMap {
 	class Address {
 	private:
 		friend class VaridicMap;
-		const Address_t address = nextAddress();
+		const Address_t address = VaridicMap::nextAddress();
 	public:
 		const T defaultValue;
 
@@ -58,7 +57,7 @@ inline T* VaridicMap::atPtrImpl(const VaridicMap::Address<T>& address) const {
 //------------------------------------------------------------------------------
 template<typename T, typename... Args>
 inline void VaridicMap::set(const VaridicMap::Address<T>& address, const Args&... args) {
-	dataMap[address.address] = std::unique_ptr<VoidGuardBase>(new VoidGuard<T> (args...)); //C++14: make unique
+	dataMap[address.address] = std::unique_ptr<VoidGuardBase>(new VoidGuard<T> (args...));
 }
 template<typename T>
 inline T& VaridicMap::at(const VaridicMap::Address<T>& address) {

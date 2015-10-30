@@ -9,7 +9,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
-#include <functional> 
+#include <functional>
 #include <cctype>
 #include <locale>
 
@@ -17,7 +17,6 @@ namespace vl {
 namespace detail {
 
 //Template magic for snprintf and std::string
-
 template <typename T> struct CType {
 	using type = T;
 };
@@ -48,25 +47,24 @@ std::string format(const std::string& pattern, const Args&... args) {
 // -------------------------------------------------------------------------------------------------
 
 // trim from start
-inline std::string &ltrim(std::string &s) {
+inline std::string& trim_begin(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
 
 // trim from end
-inline std::string &rtrim(std::string &s) {
+inline std::string& trim_end(std::string &s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
 
 // trim from both ends
 inline std::string &trim(std::string &s) {
-	return ltrim(rtrim(s));
+	return trim_begin(trim_end(s));
 }
 
 // -------------------------------------------------------------------------------------------------
-
-template <typename = void> void unicode_to_utf8(char* out, unsigned int unicode) {
+template <typename = void> void unicode_to_utf8(char* out, uint32_t unicode) {
 	if (unicode <= 0x7f) {
 		out[0] = static_cast<char> (unicode);
 		out[1] = '\0';
@@ -88,7 +86,7 @@ template <typename = void> void unicode_to_utf8(char* out, unsigned int unicode)
 	}
 }
 
-template <typename = void> std::string unicode_to_utf8(unsigned int unicode) {
+template <typename = void> std::string unicode_to_utf8(uint32_t unicode) {
 	char buf[5];
 	unicode_to_utf8(buf, unicode);
 	return std::string(buf);

@@ -1,46 +1,58 @@
-// File:   dependent_task.hpp
+// File:   task_task.hpp
 
 #pragma once
 
 #include <mutex>
 #include <vector>
 #include <functional>
-//#include <boost/container/small_vector.hpp>
 
 namespace vl {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename T>
-class DependentTask {
+template<typename T = void>
+class TaskFlag {
 	bool passed;
-	T _result;
+	T result_;
 	std::mutex mutex;
 	std::vector<std::function<void(T)>> targets; //TODO P1: use small_vector
 public:
 	void complete(T result) {
 		std::lock_guard<std::mutex> lock(mutex);
 		passed = true;
-		result = result;
+		result_ = result;
 		for (auto& target : targets)
-			target(_result);
+			target(result_);
 		targets.clear();
+	}
+	void undo() {
+		std::lock_guard<std::mutex> lock(mutex);
+		passed = false;
+		result_ = T{};
 	}
 	void subsribe(std::function<void(T)>&& cb) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (passed)
-			cb(_result);
+			cb(result_);
 		else
 			targets.emplace_back(std::move(cb));
 	}
-	DependentTask() : passed(false) { }
+	inline bool isComplete() {
+		std::lock_guard<std::mutex> lock(mutex);
+		return passed;
+	}
+	inline T result() {
+		std::lock_guard<std::mutex> lock(mutex);
+		return result_;
+	}
+	TaskFlag() : passed(false) { }
 };
 
 template<>
-class DependentTask<void> {
+class TaskFlag<void> {
 	bool passed;
 	std::mutex mutex;
-	std::vector<std::function<void()>> targets; //TODO P1: use small_vector
+	std::vector<std::function<void() >> targets; //TODO P1: use small_vector
 public:
 	void complete() {
 		std::lock_guard<std::mutex> lock(mutex);
@@ -49,6 +61,10 @@ public:
 			target();
 		targets.clear();
 	}
+	void undo() {
+		std::lock_guard<std::mutex> lock(mutex);
+		passed = false;
+	}
 	void subsribe(std::function<void()>&& cb) {
 		std::lock_guard<std::mutex> lock(mutex);
 		if (passed)
@@ -56,7 +72,11 @@ public:
 		else
 			targets.emplace_back(std::move(cb));
 	}
-	DependentTask() : passed(false) { }
+	inline bool isComplete() {
+		std::lock_guard<std::mutex> lock(mutex);
+		return passed;
+	}
+	TaskFlag() : passed(false) { }
 };
 
 } //namespace vl

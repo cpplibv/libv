@@ -31,11 +31,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Frame : public Trackable<> {
+class Frame : public Trackable {
 	//Every time a "frame" word is used it is referring to the entire window with
-	//	its VUI objects, handlers, events, states etc... A frame can be exits 
-	//	without a window (exp: its not showed yet). A frame temporary can have 
-	//	multiple window at the same time (exp: switching to undecorated (for 
+	//	its VUI objects, handlers, events, states etc... A frame can be exits
+	//	without a window (exp: its not showed yet). A frame temporary can have
+	//	multiple window at the same time (exp: switching to undecorated (for
 	//	"copying" gl context)).
 	//Every time a "window" word is used it is referring to the glfw (/ operation
 	//	system) window. A window is always part of a frame.
@@ -89,29 +89,29 @@ public:
 	static const TypeCloseOperation ON_CLOSE_DEFAULT_EXIT = 0; // - Close, others DCO.
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration close and
-	 * force every frame to close after their current iteration even if the 
+	 * force every frame to close after their current iteration even if the
 	 * frames default close operation is not closing the frame
 	 * @note Does not interrupt current iteration
 	 * @note Does not interrupt other frames current iterations
 	 * @group Default Close Operation */
 	static const TypeCloseOperation ON_CLOSE_EXIT = 1; //         - Close every frame
 	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration hide the 
+	 * setWindowShouldClose(true) then after the current iteration hide the
 	 * frame. The frame can be restored by calling show()
 	 * @note Does not interrupt current iteration
 	 * @note Can be forced to close by calling close(), closing that way will
-	 * produce onClose event, and also does not interrupt current iteration 
+	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
 	static const TypeCloseOperation ON_CLOSE_HIDE = 2; //         - Hide frame
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration does nothing.
 	 * @note Does not interrupt current iteration
 	 * @note Can be forced to close by calling close(), closing that way will
-	 * produce onClose event, and also does not interrupt current iteration 
+	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
 	static const TypeCloseOperation ON_CLOSE_DO_NOTHING = 3; //   - No operation
 	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration close the 
+	 * setWindowShouldClose(true) then after the current iteration close the
 	 * frame
 	 * @note Does not interrupt current iteration
 	 * @group Default Close Operation */
@@ -131,14 +131,14 @@ private:
 	//	void cmdFrameCreate();
 	/**
 	 * @note If this function fail the member window will be set to nullptr
-	 * @note This function may only be called by the Frame context. 
+	 * @note This function may only be called by the Frame context.
 	 */
 	void cmdFrameRecreate();
 	//	void cmdFrameDestroy();
 
 	/**
 	 * @note If this function fail the member window will be set to nullptr
-	 * @note This function may only be called from the Core thread. 
+	 * @note This function may only be called from the Core thread.
 	 */
 	void cmdCoreCreate();
 	void cmdCoreRecreate();
@@ -218,7 +218,7 @@ public:
 	Signal<bool(Frame*) > onClose;
 	/** Event invoked if the frame is closed by frame's thread.
 	 * Can't be used for interrupting close.
-	 * Event occures when the window is ALREADY CLOSED, 
+	 * Event occures when the window is ALREADY CLOSED,
 	 * but the Frame object is not deconstructed yet. */
 	Signal<Frame*> onClosed;
 

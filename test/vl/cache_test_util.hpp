@@ -91,3 +91,54 @@ private:
 		return r.n0 + r.n1 < std::get<0>(t) + std::get<1>(t);
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+struct LoadableTestResource {
+	int n;
+	int loaded = 0;
+	int* unloaded = nullptr;
+	LoadableTestResource(int n) : n(n) { }
+	void load(std::shared_ptr<LoadableTestResource>) {
+		++loaded;
+	}
+	void unload(std::shared_ptr<LoadableTestResource>) {
+		if (unloaded)
+			++(*unloaded);
+	}
+	bool operator<(const LoadableTestResource& r) const {
+		return n < r.n;
+	}
+	friend bool operator<(int t, const LoadableTestResource& r) {
+		return t < r.n;
+	}
+	friend bool operator<(const LoadableTestResource& r, int t) {
+		return r.n < t;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct LoadableTestResourceB {
+	int n;
+	int argCount;
+	template<typename... Args>
+	LoadableTestResourceB(int n, Args...) : n(n), argCount(sizeof...(Args) + 1) { }
+	void load(std::shared_ptr<LoadableTestResourceB>) { }
+	void unload(std::shared_ptr<LoadableTestResourceB>) { }
+	bool operator<(const LoadableTestResourceB& r) const {
+		return n < r.n;
+	}
+	friend bool operator<(int t, const LoadableTestResourceB& r) {
+		return t < r.n;
+	}
+	friend bool operator<(const LoadableTestResourceB& r, int t) {
+		return r.n < t;
+	}
+	friend bool operator<(const std::tuple<int, int>& t, const LoadableTestResourceB& r) {
+		return std::get<0>(t) < r.n;
+	}
+	friend bool operator<(const LoadableTestResourceB& r, const std::tuple<int, int>& t) {
+		return r.n < std::get<0>(t);
+	}
+};

@@ -5,15 +5,12 @@
 // ext
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+// vl
+#include <vl/worker_thread.hpp>
 // std
 #include <stack>
 
-#define MEMBER_OFFSET(s,m) ((char *)NULL + (offsetof(s,m)))
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-//Math
-
-#define PI 3.1415926535897932384626433832795f
+#define PI 3.1415926535897932384626433832795
 
 namespace vl {
 namespace gl {
@@ -41,7 +38,7 @@ public:
 	void pushMatrixView(const glm::mat4&);
 	void pushMatrixProjection();
 	void pushMatrixProjection(const glm::mat4&);
-	
+
 	GL();
 };
 

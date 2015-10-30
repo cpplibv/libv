@@ -10,16 +10,16 @@
 namespace vl {
 namespace gl {
 
-ModelManager::ModelManager(ModelContext* context) :
-	context(context) { }
-
-Model::Model(ModelManager& resourceManager, const std::string& filePath) :
-	vl::Resource<detail::ModelImpl>(resourceManager, filePath, resourceManager.context) { }
-
-void Model::render(vl::gl::GL& gl) {
-	if (data().loaded())
-		data().render(gl);
-}
+//ModelManager::ModelManager(ModelContext* context) :
+//	context(context) { }
+//
+//Model::Model(ModelManager& resourceManager, const std::string& filePath) :
+//	vl::Resource<detail::ModelImpl>(resourceManager, filePath, resourceManager.context) { }
+//
+//void Model::render(vl::gl::GL& gl) {
+//	if (data().loaded())
+//		data().render(gl);
+//}
 
 } //namespace gl
 } //namespace vl

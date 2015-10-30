@@ -8,25 +8,25 @@
 #include <memory>
 // pro
 #include <vl/gl/detail/model_impl.hpp>
-#include <vl/gl/gl_contexts.hpp>
 
 namespace vl {
 namespace gl {
 
-class GL;
-
-class ModelManager : public vl::ResourceManager<detail::ModelImpl> {
-public:
-	ModelContext* context;
-	ModelManager(ModelContext* context);
-};
-
-class Model : public vl::Resource<detail::ModelImpl> {
-public:
-	void render(vl::gl::GL& gl);
-public:
-	Model(ModelManager& resourceManager, const std::string& filePath);
-};
+//class GL;
+//
+//class ModelManager : public vl::ResourceManager<detail::ModelImpl> {
+//public:
+//	vl::WorkerThread& io;
+//	vl::WorkerThread& gl;
+//	ModelManager(vl::WorkerThread& io, vl::WorkerThread& gl) : io(io), gl(gl) { }
+//};
+//
+//class Model : public vl::Resource<detail::ModelImpl> {
+//public:
+//	void render(vl::gl::GL& gl);
+//public:
+//	Model(ModelManager& resourceManager, const std::string& filePath);
+//};
 
 } //namespace gl
 } //namespace vl

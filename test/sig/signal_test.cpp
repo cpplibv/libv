@@ -4,10 +4,12 @@
 
 #include "signal_test_util.hpp"
 #include <vl/sig/signal.hpp>
+#include <thread>
 
 using vl::Signal;
 using vl::CapacitivSignal;
-using vl::ConditionalSignal;
+using vl::SwitchSignal;
+using vl::HistorySignal;
 
 TEST_CASE("SignalConstruct") {
 	Signal<> testObj;
@@ -115,7 +117,7 @@ TEST_CASE("SignalOutputStaticFunction") {
 
 TEST_CASE("SignalOutputMemberFunction") {
 	Signal<> source;
-	auto target = dummyType<>();
+	dummyType<> target;
 
 	source.output(&dummyType<>::memberFunction, target);
 	CHECK(source.inputSize() == 0u);
@@ -193,7 +195,7 @@ TEST_CASE("SignalFireArgs") {
 
 	source.fire(0, 1);
 	source.fire(1, 2);
-	CHECK(result.size() == 2u);
+	REQUIRE(result.size() == 2u);
 	CHECK(result[0] == std::make_tuple(0, 1));
 	CHECK(result[1] == std::make_tuple(1, 2));
 }
@@ -205,7 +207,7 @@ TEST_CASE("SignalFireConstArgs") {
 
 	source.fire(0, 1);
 	source.fire(1, 2);
-	CHECK(result.size() == 2u);
+	REQUIRE(result.size() == 2u);
 	CHECK(result[0] == std::make_tuple(0, 1));
 	CHECK(result[1] == std::make_tuple(1, 2));
 }
@@ -220,8 +222,8 @@ TEST_CASE("SignalFireStringArgs") {
 
 	source.fire(hello, "World!");
 	source.fire(hello, world);
-	CHECK(result.size() == 2u);
 
+	REQUIRE(result.size() == 2u);
 	CHECK(std::get<0>(result[0]) == hello);
 	CHECK(std::get<1>(result[0]) == "World!");
 	CHECK(std::get<1>(result[0]) == world);
@@ -338,8 +340,26 @@ TEST_CASE("SignalReturnDefaultAccumulation") {
 
 
 
+// === MultiThread =================================================================================
 
+void foo(Signal<int>* s) {
+	for (int i = 0; i < 1000; i++) {
+		s->fire(i);
+	}
+}
 
+TEST_CASE("Signal multi thread stress") {
+	Signal<int> source;
+	Signal<int> target;
+
+	std::thread t0(foo, &source);
+	std::thread t1(foo, &source);
+
+	source.output(target);
+
+	t0.join();
+	t1.join();
+}
 
 // === CapacitivSignal =============================================================================
 
@@ -371,10 +391,10 @@ TEST_CASE("CapacitivSignal Test") {
 	}
 }
 
-// === ConditionalSignal ===========================================================================
+// === SwitchSignal ===========================================================================
 
-TEST_CASE("ConditionalSignal Test") {
-	ConditionalSignal<int> source;
+TEST_CASE("SwitchSignal Test") {
+	SwitchSignal<int> source;
 	SpyResultTypeFor(source) result;
 	source.output(spyInto<void, int>(result));
 
@@ -394,5 +414,38 @@ TEST_CASE("ConditionalSignal Test") {
 		source.enable();
 		source.fire(0);
 		CHECK(result.size() == 1u);
+	}
+}
+
+// === HistorySignal ===============================================================================
+
+TEST_CASE("HistorySignal Test") {
+	HistorySignal<int> source;
+	SpyResultTypeFor(source) result;
+
+	SECTION("Connection without history result no output") {
+		source.output(spyInto<void, int>(result));
+		CHECK(result.size() == 0u);
+	}
+
+	SECTION("Fire after connection result output from fire") {
+		source.output(spyInto<void, int>(result));
+		source.fire(42);
+		REQUIRE(result.size() == 1u);
+		CHECK(std::get<0>(result[0]) == 42);
+	}
+
+	//	SECTION("Fire before connection result output from histroy") {
+	//		source.fire(42);
+	//		source.output(spyInto<void, int>(result));
+	//		REQUIRE(result.size() == 1u);
+	//		CHECK(std::get<0>(result[0]) == 42);
+	//	}
+
+	SECTION("Connection with cleared history result no output") {
+		source.fire(42);
+		source.clearHistory();
+		source.output(spyInto<void, int>(result));
+		CHECK(result.size() == 0u);
 	}
 }
