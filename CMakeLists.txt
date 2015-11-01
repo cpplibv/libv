@@ -70,7 +70,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
 	add_compile_options(-Wall -Wextra -Wconversion -Wno-comment)
-	#add_compile_options(-Wsuggest-override) #IF > GNU 5.1
+	add_compile_options(-Wsuggest-override) #IF > GNU 5.1
 
 	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
 		#add_compile_options(-fsanitize=address)
@@ -148,7 +148,7 @@ ExternalProject_Add(ext_glm
 list(APPEND EXTERNAL_PROJECT_LIST ext_gli)
 ExternalProject_Add(ext_gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0.5.1.1
+	GIT_TAG 0.7.0.0
 	BUILD_COMMAND "" #gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
 	INSTALL_DIR ${PATH_EXT}/gli
@@ -319,7 +319,6 @@ add_executable(vui_test    ${vui_test_src})
 
 #Executables
 add_executable(vgl_main    ${PATH_EXP}/vgl_main.cpp)
-add_executable(vgl_main2   ${PATH_EXP}/vgl_main2.cpp)
 add_executable(vl_main     ${PATH_EXP}/vl_main.cpp)
 add_executable(vm3_main    ${PATH_EXP}/vm3_main.cpp)
 add_executable(vm3imp_main ${PATH_EXP}/vm3imp_main.cpp)
@@ -347,7 +346,6 @@ target_link_libraries(vui_test    -static )
 
 #Link - Executables
 target_link_libraries(vgl_main    -static glew glfw3 vgl)
-target_link_libraries(vgl_main2   -static vgl)
 target_link_libraries(vl_main     -static )
 target_link_libraries(vm3_main    -static vm3)
 target_link_libraries(vm3imp_main -static vm3imp)

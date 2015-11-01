@@ -11,7 +11,7 @@
 #include <vl/ui/component/quad.hpp>
 #include <vl/ui/component/panel.hpp>
 #include <vl/ui/component/label.hpp>
-#include <vl/gl/vgl.hpp>
+#include <vl/gl/gl.hpp>
 
 using namespace vl;
 using namespace vl::ui;

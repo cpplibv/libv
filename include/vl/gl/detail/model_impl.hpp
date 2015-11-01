@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 // pro
-#include <vl/gl/vgl.hpp>
+#include <vl/gl/gl.hpp>
 
 namespace vl {
 namespace gl {

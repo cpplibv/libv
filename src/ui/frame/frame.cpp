@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 // vl
 #include <vl/semaphore.hpp>
-#include <vl/gl/vgl.hpp>
+#include <vl/gl/gl.hpp>
 // pro
 #include <vl/ui/log.hpp>
 #include <vl/timer.hpp>

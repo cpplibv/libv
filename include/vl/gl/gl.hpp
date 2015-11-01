@@ -42,5 +42,7 @@ public:
 	GL();
 };
 
+void renderCube(float x, float y, float z, float size);
+
 } //namespace gl
 } //namespace vl

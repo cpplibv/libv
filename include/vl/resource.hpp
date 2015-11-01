@@ -27,6 +27,8 @@ private:
 	std::vector<Resource*> dependencies;
 	std::function<void() > callback;
 
+	// TODO P5: After vsig is usable in some atomic form, use it for this callback.
+
 protected:
 	void addDependency(const std::shared_ptr<Resource>& r) {
 		if (!r)

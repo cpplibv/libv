@@ -35,26 +35,26 @@ namespace vl {
 		public:
 			MaterialPropertyPrinter(std::ostream& stream = std::cout);
 
-			void visit(const std::string& name, const int& value);
-			void visit(const std::string& name, const float& value);
-			void visit(const std::string& name, const double& value);
-			void visit(const std::string& name, const std::string& value);
-			void visit(const std::string& name, const ivec2& value);
-			void visit(const std::string& name, const ivec3& value);
-			void visit(const std::string& name, const ivec4& value);
-			void visit(const std::string& name, const vec2& value);
-			void visit(const std::string& name, const vec3& value);
-			void visit(const std::string& name, const vec4& value);
-			void visit(const std::string& name, const dvec2& value);
-			void visit(const std::string& name, const dvec3& value);
-			void visit(const std::string& name, const dvec4& value);
+			void visit(const std::string& name, const int& value) override;
+			void visit(const std::string& name, const float& value) override;
+			void visit(const std::string& name, const double& value) override;
+			void visit(const std::string& name, const std::string& value) override;
+			void visit(const std::string& name, const ivec2& value) override;
+			void visit(const std::string& name, const ivec3& value) override;
+			void visit(const std::string& name, const ivec4& value) override;
+			void visit(const std::string& name, const vec2& value) override;
+			void visit(const std::string& name, const vec3& value) override;
+			void visit(const std::string& name, const vec4& value) override;
+			void visit(const std::string& name, const dvec2& value) override;
+			void visit(const std::string& name, const dvec3& value) override;
+			void visit(const std::string& name, const dvec4& value) override;
 		};
 
 		class MaterialPropertyCounter : public MaterialPropertyVisitor {
 #define VM3_PROPERTY_VISITOR_TYPE_HELPER(TYPE, NAME) \
 			private: int _num##NAME = 0; \
 			public: inline int num##NAME() { return _num##NAME; } \
-			void visit(const std::string&, const TYPE&);
+			void visit(const std::string&, const TYPE&) override;
 			VM3_PROPERTY_VISITOR_TYPE_HELPER(int, Int)
 			VM3_PROPERTY_VISITOR_TYPE_HELPER(float, Float)
 			VM3_PROPERTY_VISITOR_TYPE_HELPER(double, Double)
@@ -76,19 +76,19 @@ namespace vl {
 		public:
 			MaterialPropertyCopier(Material& target);
 		private:
-			void visit(const std::string& name, const int& value);
-			void visit(const std::string& name, const float& value);
-			void visit(const std::string& name, const double& value);
-			void visit(const std::string& name, const std::string& value);
-			void visit(const std::string& name, const ivec2& value);
-			void visit(const std::string& name, const ivec3& value);
-			void visit(const std::string& name, const ivec4& value);
-			void visit(const std::string& name, const vec2& value);
-			void visit(const std::string& name, const vec3& value);
-			void visit(const std::string& name, const vec4& value);
-			void visit(const std::string& name, const dvec2& value);
-			void visit(const std::string& name, const dvec3& value);
-			void visit(const std::string& name, const dvec4& value);
+			void visit(const std::string& name, const int& value) override;
+			void visit(const std::string& name, const float& value) override;
+			void visit(const std::string& name, const double& value) override;
+			void visit(const std::string& name, const std::string& value) override;
+			void visit(const std::string& name, const ivec2& value) override;
+			void visit(const std::string& name, const ivec3& value) override;
+			void visit(const std::string& name, const ivec4& value) override;
+			void visit(const std::string& name, const vec2& value) override;
+			void visit(const std::string& name, const vec3& value) override;
+			void visit(const std::string& name, const vec4& value) override;
+			void visit(const std::string& name, const dvec2& value) override;
+			void visit(const std::string& name, const dvec3& value) override;
+			void visit(const std::string& name, const dvec4& value) override;
 		};
 	} //namespace vm3
 } //namespace vl

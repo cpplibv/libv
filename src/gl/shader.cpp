@@ -11,23 +11,24 @@
 #include <memory>
 // pro
 #include <vl/gl/log.hpp>
-#include <vl/gl/shader_service.hpp>
+#include <vl/gl/services.hpp>
 
 namespace vl {
 namespace gl {
 
 // TextFile --------------------------------------------------------------------------------------
 
-TextFile::TextFile(const std::string& path, ShaderService* shaderService) :
-	path(path),
-	shaderService(shaderService) { }
+TextFile::TextFile(ServiceShader * const service, const std::string& filePath) :
+	filePath(filePath),
+	service(service) { }
 
 void TextFile::loadIO() {
-	std::ifstream file(path, std::ios::in);
+	VLOG_TRACE(vl::gl::log(), "IO Loading text file: [%s]", filePath);
+	std::ifstream file(filePath, std::ios::in);
 	iostate = file.rdstate();
 
 	if (file) {
-		VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", path);
+		VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", filePath);
 		changeResourceState(ResourceState::FAILED);
 	} else {
 		std::ostringstream buffer;
@@ -39,8 +40,9 @@ void TextFile::loadIO() {
 }
 
 void TextFile::unloadIO() {
-	text.clear();
+	VLOG_TRACE(vl::gl::log(), "IO Unloading text file: [%s]", filePath);
 	changeResourceState(ResourceState::UNREADY);
+	text.clear();
 }
 
 void TextFile::reload() {
@@ -51,7 +53,7 @@ void TextFile::reload() {
 
 void TextFile::load(const std::shared_ptr<TextFile>& self) {
 	const auto self_wp = std::weak_ptr<TextFile>(self);
-	shaderService->threadGL.executeAsync([self_wp] {
+	service->threadIO->executeAsync([self_wp] {
 		if (const auto self_sp = self_wp.lock()) {
 			self_sp->loadIO();
 		}
@@ -63,30 +65,31 @@ void TextFile::unload(const std::shared_ptr<TextFile>&) {
 }
 
 bool TextFile::operator<(const TextFile& r) const {
-	return path < r.path;
+	return filePath < r.filePath;
 }
 
-bool operator<(const std::string& path, const TextFile& r) {
-	return path < r.path;
+bool operator<(const std::string& filePath, const TextFile& r) {
+	return filePath < r.filePath;
 }
 
-bool operator<(const TextFile& r, const std::string& path) {
-	return r.path < path;
+bool operator<(const TextFile& r, const std::string& filePath) {
+	return r.filePath < filePath;
 }
 
 // Shader --------------------------------------------------------------------------------------
 
-Shader::Shader(const std::string& path, ShaderService* shaderService) :
-	path(path),
-	shaderService(shaderService) {
+Shader::Shader(ServiceShader * const service, const std::string& filePath) :
+	filePath(filePath),
+	service(service) {
 
-	sourceFile = shaderService->cacheTextFile.get<vl::use < 0 >> (path, shaderService);
+	sourceFile = service->cacheTextFile.get<vl::use < 1 >> (service, filePath);
 }
 
 void Shader::loadGL() {
+	VLOG_TRACE(vl::gl::log(), "GL Loading shader: [%s]", filePath);
 	GLuint type = 0;
 	//TODO P3: boost file system extension detections
-	switch (path[path.length() - 2]) {
+	switch (filePath[filePath.length() - 2]) {
 	case 'f':
 		type = GL_FRAGMENT_SHADER;
 		break;
@@ -118,19 +121,22 @@ void Shader::loadGL() {
 		errorMessage.resize(infoLength);
 		glGetShaderInfoLog(shaderID, infoLength, nullptr, &errorMessage[0]);
 
-		VLOG_ERROR(vl::gl::log(), "Failed to compile [%s]: %s", path, errorMessage);
+		VLOG_ERROR(vl::gl::log(), "Failed to compile [%s]: %s", filePath, errorMessage);
 
 		unloadGL();
+		changeResourceState(ResourceState::FAILED);
+	} else {
+		changeResourceState(ResourceState::READY);
 	}
 
 	checkGL();
-	changeResourceState(ResourceState::READY);
 }
 
 void Shader::unloadGL() {
+	VLOG_TRACE(vl::gl::log(), "GL Unloading shader: [%s]", filePath);
+	changeResourceState(ResourceState::UNREADY);
 	glDeleteShader(shaderID);
 	checkGL();
-	changeResourceState(ResourceState::UNREADY);
 }
 
 void Shader::load(const std::shared_ptr<Shader>& self) {
@@ -139,7 +145,7 @@ void Shader::load(const std::shared_ptr<Shader>& self) {
 	const auto self_wp = std::weak_ptr<Shader>(self);
 	setDependencyCallback([this, self_wp] {
 		if (!isEveryDependency(ResourceState::READY)) return;
-		shaderService->threadGL.executeAsync([self_wp] {
+		service->threadGL->executeAsync([self_wp] {
 			if (const auto self_sp = self_wp.lock()) {
 				self_sp->loadGL();
 			}
@@ -148,42 +154,43 @@ void Shader::load(const std::shared_ptr<Shader>& self) {
 }
 
 void Shader::unload(const std::shared_ptr<Shader>& self) {
-	shaderService->threadGL.executeAsync([self] {
+	service->threadGL->executeAsync([self] {
 		self->unloadGL();
 	}, priority);
 }
 
 bool Shader::operator<(const Shader& r) const {
-	return path < r.path;
+	return filePath < r.filePath;
 }
 
-bool operator<(const std::string& path, const Shader& r) {
-	return path < r.path;
+bool operator<(const std::string& filePath, const Shader& r) {
+	return filePath < r.filePath;
 }
 
-bool operator<(const Shader& r, const std::string& path) {
-	return r.path < path;
+bool operator<(const Shader& r, const std::string& filePath) {
+	return r.filePath < filePath;
 }
 
 // ShaderProgramImpl ------------------------------------------------------------------------------------------
 
 ShaderProgramImpl::ShaderProgramImpl(
+		ServiceShader * const service,
 		const std::string& name,
 		const std::string& fsPath,
 		const std::string& gsPath,
-		const std::string& vsPath,
-		ShaderService* shaderService) :
+		const std::string& vsPath) :
 	name(name),
-	shaderService(shaderService) {
+	service(service) {
 	if (!fsPath.empty())
-		fs = shaderService->cacheShader.get<vl::use < 0 >> (fsPath, shaderService);
+		fs = service->cacheShader.get<vl::use < 1 >> (service, fsPath);
 	if (!gsPath.empty())
-		gs = shaderService->cacheShader.get<vl::use < 0 >> (gsPath, shaderService);
+		gs = service->cacheShader.get<vl::use < 1 >> (service, gsPath);
 	if (!vsPath.empty())
-		vs = shaderService->cacheShader.get<vl::use < 0 >> (vsPath, shaderService);
+		vs = service->cacheShader.get<vl::use < 1 >> (service, vsPath);
 }
 
 void ShaderProgramImpl::loadGL() {
+	VLOG_TRACE(vl::gl::log(), "GL Loading shader program: [%s]", name);
 	programID = glCreateProgram();
 
 	if (vs)
@@ -214,9 +221,10 @@ void ShaderProgramImpl::loadGL() {
 }
 
 void ShaderProgramImpl::unloadGL() {
+	VLOG_TRACE(vl::gl::log(), "GL Unloading shader program: [%s]", name);
+	changeResourceState(ResourceState::UNREADY);
 	glDeleteProgram(programID);
 	checkGL();
-	changeResourceState(ResourceState::UNREADY);
 }
 
 void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
@@ -227,7 +235,7 @@ void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
 	const auto self_wp = std::weak_ptr<ShaderProgramImpl>(self);
 	setDependencyCallback([this, self_wp] {
 		if (!isEveryDependency(ResourceState::READY)) return;
-		shaderService->threadGL.executeAsync([self_wp] {
+		service->threadGL->executeAsync([self_wp] {
 			if (const auto self_sp = self_wp.lock()) {
 				self_sp->loadGL();
 			}
@@ -236,7 +244,7 @@ void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
 }
 
 void ShaderProgramImpl::unload(const std::shared_ptr<ShaderProgramImpl>& self) {
-	shaderService->threadGL.executeAsync([self] {
+	service->threadGL->executeAsync([self] {
 		self->unloadGL();
 	}, priority);
 }
@@ -255,17 +263,17 @@ bool operator<(const ShaderProgramImpl& r, const std::string& name) {
 
 // ShaderProgram -----------------------------------------------------------------------------------
 
-ShaderProgram::ShaderProgram(const std::string& name,
+ShaderProgram::ShaderProgram(
+		ServiceShader* const service,
+		const std::string& name,
 		const std::string& fsPath,
 		const std::string& gsPath,
-		const std::string& vsPath,
-		ShaderService* shaderService) {
+		const std::string& vsPath) {
 
 	(void) name;
 	(void) fsPath;
 	(void) gsPath;
 	(void) vsPath;
-	(void) shaderService;
 
 	//<<<
 }

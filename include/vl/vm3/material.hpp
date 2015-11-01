@@ -19,19 +19,19 @@ namespace vl {
 		template<typename T>
 		struct MaterialProperty : public MaterialPropertyBase {
 			T data;
-			void accept(MaterialPropertyVisitor& visitor, const std::string& name) const {
+			void accept(MaterialPropertyVisitor& visitor, const std::string& name) const override {
 				visitor.visit(name, data);
 			}
 			template<typename... Args>
 			MaterialProperty(Args&&... args) : data(std::forward<Args>(args)...) { }
 		};
-		
+
 		//------------------------------------------------------------------------------------------
 
 		class MaterialSerialization;
 		class Material {
 			friend class MaterialSerialization;
-			
+
 			std::string name;
 			std::string shader;
 			std::map<std::string, std::unique_ptr<MaterialPropertyBase>> properties;

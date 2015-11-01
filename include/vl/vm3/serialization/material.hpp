@@ -25,7 +25,7 @@ namespace vl {
 			MaterialPropertySerializer(Archive& ar) : ar(ar) { }
 
 #define VM3_PROPERTY_VISITOR_TYPE_HELPER(TYPE, ID) \
-		void visit(const std::string& id, const TYPE& value) { \
+		void visit(const std::string& id, const TYPE& value) override { \
 			uint16_t type = ID; \
 			ar & VL_NVP(type); \
 			ar & VL_NVP(id); \

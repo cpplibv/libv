@@ -13,7 +13,7 @@
 #include <vl/gl/model.hpp>
 #include <vl/gl/shader.hpp>
 #include <vl/gl/uniform.hpp>
-#include <vl/gl/vgl.hpp>
+#include <vl/gl/gl.hpp>
 
 namespace vl {
 namespace gl {

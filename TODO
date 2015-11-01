@@ -19,6 +19,7 @@ Priority levels for each operation
 IN - in-context operation (fast and not context sensitive)
        GL Task        | Priority | Note
 :-------------------- | --------:|:-----------------------------------------------------------------
+ Initialization       |   0000   |
  D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
  D.ShaderProgram      |   1150   | Unloading as ShaderProgram
  D.UIShader           |   1200   | Unloading as Shader
@@ -41,6 +42,7 @@ IN - in-context operation (fast and not context sensitive)
  Load UITexture       |   4400   |
  Load Model           |   4500   |
  Load Texture         |   4600   |
+ Termination          |   9800   |
  Render-Residual      |   9900   | Always stays in queue as last operation
 
        IO Task        | Priority | Note

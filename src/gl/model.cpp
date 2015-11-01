@@ -5,7 +5,7 @@
 // vl
 #include <vl/vm3/model.hpp>
 // pro
-#include <vl/gl/vgl.hpp>
+#include <vl/gl/gl.hpp>
 
 namespace vl {
 namespace gl {

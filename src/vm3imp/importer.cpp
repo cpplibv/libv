@@ -7,7 +7,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
-#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 // vl
 #include <vl/vec.hpp>
 // std
