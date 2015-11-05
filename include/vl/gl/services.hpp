@@ -5,7 +5,7 @@
 // vl
 #include <vl/cache.hpp>
 #include <vl/worker_thread.hpp>
-#include <vl/gl/detail/texture_impl.hpp> // TODO P1: So yeh... i dont like this.
+#include <vl/gl/detail/texture_impl.hpp> //TODO P1: So yeh... i dont like this.
 
 namespace vl {
 namespace gl {

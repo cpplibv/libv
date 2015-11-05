@@ -82,7 +82,7 @@ void TextureImpl::loadGL() {
 	glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, Format.Swizzle[2]);
 	glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, Format.Swizzle[3]);
 
-	// TODO P5: Min and mag filter data will be separated and handled by a sampler.
+	//TODO P5: Min and mag filter data will be separated and handled by a sampler.
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, texture->levels() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 	glTexParameteri(target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

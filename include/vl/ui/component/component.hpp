@@ -49,7 +49,7 @@ public:
 		set(address, std::forward<Value>(value));
 		set(std::forward<Args>(args)...);
 	}
-	// TODO P4: change to proxy operator() syntax (that result is less template generated) (see boost po)
+	//TODO P4: change to proxy operator() syntax (that result is less template generated) (see boost po)
 
 	template<typename T>
 	T get(const PropertyMap::Address<T>& address) const {

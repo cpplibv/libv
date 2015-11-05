@@ -65,7 +65,8 @@ constexpr GLuint ATTRIBUTE_BITANGENT = 15; //Same as TEX7
 
 // TextureType -------------------------------------------------------------------------------------
 
-// TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp-s)
+//TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp-s)
+
 enum class TextureType : GLuint {
 	diffuse = 0,
 	normal = 1,
@@ -95,7 +96,7 @@ enum class TextureType : GLuint {
 class TextFile : public std::enable_shared_from_this<TextFile>, public vl::Resource {
 private:
 	const size_t priority = 0; //<<< Default priority
-	std::string filePath; // TODO P3: namespace fs = boost::filesystem;
+	std::string filePath; //TODO P3: namespace fs = boost::filesystem;
 	std::string text;
 private:
 	std::ios::iostate iostate;
@@ -104,9 +105,10 @@ private:
 
 public:
 	TextFile(ServiceShader * const service, const std::string& filePath);
-	const std::string& getText() const {
+	inline const std::string& getText() const {
 		return text;
 	}
+	virtual ~TextFile();
 
 private:
 	void loadIO();
@@ -138,9 +140,11 @@ private:
 
 public:
 	Shader(ServiceShader * const service, const std::string& filePath);
-	auto getShaderID() const {
+	inline auto getShaderID() const {
 		return shaderID;
 	}
+	virtual ~Shader();
+
 private:
 	void loadGL();
 	void unloadGL();
@@ -174,6 +178,8 @@ public:
 			const std::string& fsPath,
 			const std::string& gsPath,
 			const std::string& vsPath);
+	virtual ~ShaderProgramImpl();
+
 private:
 	void loadGL();
 	void unloadGL();
@@ -190,17 +196,23 @@ public:
 // ShaderProgram -----------------------------------------------------------------------------------
 
 class ShaderProgram {
-	GLuint shaderProgramID;
+	//	GLuint shaderProgramID = 0;
 	std::shared_ptr<ShaderProgramImpl> impl;
 public:
 	ShaderProgram(
 			ServiceShader * const service,
 			const std::string& name,
 			const std::string& fsPath,
+			const std::string& vsPath);
+
+	ShaderProgram(
+			ServiceShader * const service,
+			const std::string& name,
+			const std::string& fsPath,
 			const std::string& gsPath,
 			const std::string& vsPath);
-private:
-	void callback(const std::shared_ptr<ShaderProgram>&);
+	virtual ~ShaderProgram() { }
+
 };
 
 // -------------------------------------------------------------------------------------------------

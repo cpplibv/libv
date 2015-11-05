@@ -13,6 +13,15 @@
 
 #include <vl/string.hpp>
 
+//TODO P2: Log system should use string prefix or string params that identify the modul and not
+//			a log object.
+//TODO P2: Log system should minimalize stream mutex lock time (eighter by a thread and/or
+//			the result string is already prepared before lock)
+//TODO P3: Log system should provide an interface to name threads.
+//			And / Or interact with worker thread name. AHHHAAA! Thread local string!
+//TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
+//			system analysis
+
 #define __VFILENAME__ (std::strrchr(__FILE__, '/') + 1)
 
 #define VLOG_SEVERITY_TRACE 1

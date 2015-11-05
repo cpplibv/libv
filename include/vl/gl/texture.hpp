@@ -22,13 +22,13 @@ class TextureImpl;
 
 class Texture : public vl::Resource {
 private:
-//	GLuint textureID;
+	//TODO P2:	GLuint textureID;
 	std::shared_ptr<detail::TextureImpl> impl;
 public:
 	void bind(TextureType);
 	void unbind(TextureType);
 public:
-	Texture(ServiceTexture* const service, const std::string& filePath);
+	Texture(ServiceTexture * const service, const std::string& filePath);
 	virtual ~Texture();
 };
 

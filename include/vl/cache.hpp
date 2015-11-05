@@ -17,11 +17,11 @@
 
 namespace vl {
 
-// TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
+//TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
 //  wrapper where the cached object is an other wrapper and with the use of the shared_ptr member
 //  magic ctor
 
-// TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
+//TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
 //	newing the sharedptr and the resource
 
 // -------------------------------------------------------------------------------------------------

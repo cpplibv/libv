@@ -19,16 +19,14 @@ enum class ResourceState {
 };
 
 class Resource {
-	// TODO P3: This is awful slow... lock free it!
+	//TODO P3: This is awful slow... lock free it!
+	//TODO P5: After vsig is usable in some atomic form, use it for this callback.
 private:
 	ResourceState state{ResourceState::UNREADY};
 	mutable std::recursive_mutex mutex;
 	std::vector<Resource*> dependents;
 	std::vector<Resource*> dependencies;
 	std::function<void() > callback;
-
-	// TODO P5: After vsig is usable in some atomic form, use it for this callback.
-
 protected:
 	void addDependency(const std::shared_ptr<Resource>& r) {
 		if (!r)
@@ -37,6 +35,7 @@ protected:
 		std::unique_lock < decltype(mutex) > lockdep(r->mutex);
 		std::lock_guard < decltype(mutex) > lock(mutex);
 		r->dependents.emplace_back(this);
+		dependencies.emplace_back(r.get());
 		lockdep.unlock();
 
 		if (callback)
@@ -62,7 +61,7 @@ protected:
 		decltype(dependencies) tmpDependencies;
 		{
 			std::lock_guard < decltype(mutex) > lock(mutex);
-			tmpDependencies = dependents;
+			tmpDependencies = dependencies;
 		}
 
 		for (const auto& dependency : tmpDependencies) {

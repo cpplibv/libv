@@ -44,7 +44,7 @@ void CommandMaterialPropertyList::execute() {
 		return;
 	}
 
-	// TODO: mat not found
+	//TODO: mat not found
 	for (auto& elem : openedModel->materials) {
 		if (elem.getName() == materialName.value()) {
 			MaterialPropertyPrinter printer;
@@ -69,7 +69,7 @@ void CommandMaterialPropertyRemove::execute() {
 		std::cout << "No model opened." << std::endl;
 		return;
 	}
-	// TODO: mat not found
+	//TODO: mat not found
 	for (auto& elem : openedModel->materials) {
 		if (elem.getName() == materialName.value()) {
 			elem.remove(propertyName.value());

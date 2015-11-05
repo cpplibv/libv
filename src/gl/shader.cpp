@@ -3,7 +3,7 @@
 // hpp
 #include <vl/gl/shader.hpp>
 // ext
-#include <GL/glew.h> // Including this is not nessessary due to the only use is for GLuint and GLint
+#include <GL/glew.h>
 //#include <glm/glm.hpp>
 //#include <glm/gtc/type_ptr.hpp>
 // std
@@ -22,21 +22,26 @@ TextFile::TextFile(ServiceShader * const service, const std::string& filePath) :
 	filePath(filePath),
 	service(service) { }
 
+TextFile::~TextFile() {
+	setDependencyCallback(nullptr);
+}
+
 void TextFile::loadIO() {
 	VLOG_TRACE(vl::gl::log(), "IO Loading text file: [%s]", filePath);
 	std::ifstream file(filePath, std::ios::in);
 	iostate = file.rdstate();
 
-	if (file) {
+	if (!file) {
 		VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", filePath);
 		changeResourceState(ResourceState::FAILED);
-	} else {
-		std::ostringstream buffer;
-		buffer << file.rdbuf();
-		file.close();
-		text = buffer.str();
-		changeResourceState(ResourceState::READY);
+		return;
 	}
+
+	std::ostringstream buffer;
+	buffer << file.rdbuf();
+	file.close();
+	text = buffer.str();
+	changeResourceState(ResourceState::READY);
 }
 
 void TextFile::unloadIO() {
@@ -53,7 +58,8 @@ void TextFile::reload() {
 
 void TextFile::load(const std::shared_ptr<TextFile>& self) {
 	const auto self_wp = std::weak_ptr<TextFile>(self);
-	service->threadIO->executeAsync([self_wp] {
+	service->threadIO->executeAsync([this, self_wp] {
+		if (!isEveryDependency(ResourceState::READY)) return;
 		if (const auto self_sp = self_wp.lock()) {
 			self_sp->loadIO();
 		}
@@ -83,6 +89,10 @@ Shader::Shader(ServiceShader * const service, const std::string& filePath) :
 	service(service) {
 
 	sourceFile = service->cacheTextFile.get<vl::use < 1 >> (service, filePath);
+}
+
+Shader::~Shader() {
+	setDependencyCallback(nullptr);
 }
 
 void Shader::loadGL() {
@@ -134,6 +144,7 @@ void Shader::loadGL() {
 
 void Shader::unloadGL() {
 	VLOG_TRACE(vl::gl::log(), "GL Unloading shader: [%s]", filePath);
+	checkGL();
 	changeResourceState(ResourceState::UNREADY);
 	glDeleteShader(shaderID);
 	checkGL();
@@ -145,7 +156,7 @@ void Shader::load(const std::shared_ptr<Shader>& self) {
 	const auto self_wp = std::weak_ptr<Shader>(self);
 	setDependencyCallback([this, self_wp] {
 		if (!isEveryDependency(ResourceState::READY)) return;
-		service->threadGL->executeAsync([self_wp] {
+		service->threadGL->executeAsync([this, self_wp] {
 			if (const auto self_sp = self_wp.lock()) {
 				self_sp->loadGL();
 			}
@@ -187,6 +198,10 @@ ShaderProgramImpl::ShaderProgramImpl(
 		gs = service->cacheShader.get<vl::use < 1 >> (service, gsPath);
 	if (!vsPath.empty())
 		vs = service->cacheShader.get<vl::use < 1 >> (service, vsPath);
+}
+
+ShaderProgramImpl::~ShaderProgramImpl() {
+	setDependencyCallback(nullptr);
 }
 
 void ShaderProgramImpl::loadGL() {
@@ -234,6 +249,7 @@ void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
 
 	const auto self_wp = std::weak_ptr<ShaderProgramImpl>(self);
 	setDependencyCallback([this, self_wp] {
+//		VLOG_TRACE(vl::gl::log(), "Trace: %s [%s]", __PRETTY_FUNCTION__, name);
 		if (!isEveryDependency(ResourceState::READY)) return;
 		service->threadGL->executeAsync([self_wp] {
 			if (const auto self_sp = self_wp.lock()) {
@@ -264,21 +280,19 @@ bool operator<(const ShaderProgramImpl& r, const std::string& name) {
 // ShaderProgram -----------------------------------------------------------------------------------
 
 ShaderProgram::ShaderProgram(
-		ServiceShader* const service,
+		ServiceShader * const service,
+		const std::string& name,
+		const std::string& fsPath,
+		const std::string& vsPath) :
+	ShaderProgram(service, name, fsPath, "", vsPath) { }
+
+ShaderProgram::ShaderProgram(
+		ServiceShader * const service,
 		const std::string& name,
 		const std::string& fsPath,
 		const std::string& gsPath,
-		const std::string& vsPath) {
-
-	(void) name;
-	(void) fsPath;
-	(void) gsPath;
-	(void) vsPath;
-
-	//<<<
-}
-
-void ShaderProgram::callback(const std::shared_ptr<ShaderProgram>&) { }
+		const std::string& vsPath) :
+	impl(service->cacheShaderProgramImpl.get<vl::use < 1 >> (service, name, fsPath, gsPath, vsPath)) { }
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

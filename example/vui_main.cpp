@@ -334,7 +334,7 @@ int main(int, char**) {
 //
 ////	std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 //
-//// TODO P~: NB ticket
+////TODO P~: NB ticket
 ////------------------------------------------------------------------------------
 ////Using code completion with template types cause unnecessary "typename",
 ////"typename..." inserted

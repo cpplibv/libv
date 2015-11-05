@@ -47,7 +47,7 @@ void initGLFW() {
 	}
 	glfwSetWindowPos(window, 100, 100);
 	glfwMakeContextCurrent(window);
-//		glfwSwapInterval(0);
+	//		glfwSwapInterval(0);
 	glfwSwapInterval(1);
 	checkGL();
 }
@@ -109,7 +109,7 @@ void initGLSL() {
 std::unique_ptr<vl::WorkerThread> threadIO;
 std::unique_ptr<vl::WorkerThread> threadGL;
 
-std::shared_ptr<vl::gl::Shader> shaderSimple;
+std::shared_ptr<vl::gl::ShaderProgram> shaderSimple;
 //std::shared_ptr<vl::gl::ModelManager> modelManager;
 //std::shared_ptr<vl::gl::TextureManager> textureManager;
 std::shared_ptr<vl::gl::Texture> texture1;
@@ -145,22 +145,22 @@ void loop_gl() {
 	gl.matrixView() = glm::lookAt(glm::vec3(20.f, 15.f, 20.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
 
+	// ---------------------------------------------------------------------------------------------
+	// Debug block
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glMultMatrixf(glm::value_ptr(gl.matrixMVP()));
-	//	glMatrixMode(GL_PROJECTION);
-	//	glLoadIdentity();
-	//	glMultMatrixf();
 
-	texture1->bind(vl::gl::TextureType::diffuse);
-	vl::gl::renderCube(-9, 0, 0, 4.0f);
-	texture1->unbind(vl::gl::TextureType::diffuse);
-	texture2->bind(vl::gl::TextureType::diffuse);
-	vl::gl::renderCube(0, 0, 0, 5.0f);
-	texture2->unbind(vl::gl::TextureType::diffuse);
-	texture3->bind(vl::gl::TextureType::diffuse);
-	vl::gl::renderCube(11, 0, 0, 6.0f);
-	texture3->unbind(vl::gl::TextureType::diffuse);
+	//	texture1->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
+	//	texture1->unbind(vl::gl::TextureType::diffuse);
+	//	texture2->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(0, 0, 0, 5.0f);
+	//	texture2->unbind(vl::gl::TextureType::diffuse);
+	//	texture3->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(11, 0, 0, 6.0f);
+	//	texture3->unbind(vl::gl::TextureType::diffuse);
+	// ---------------------------------------------------------------------------------------------
 
 	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -16));
 	//	model1->render(gl);
@@ -231,6 +231,7 @@ void term_gl() {
 	checkGL();
 
 	threadGL->executeAsync([] {
+		checkGL();
 		glfwTerminate();
 		threadGL->terminate(); // Allowing GL thread to join into main
 	}, 9800);
@@ -243,12 +244,14 @@ int main(int, char**) {
 	threadGL.reset(new vl::WorkerThread("GL"));
 
 	vl::gl::ServiceTexture st(threadIO.get(), threadGL.get());
+	vl::gl::ServiceShader ss(threadIO.get(), threadGL.get());
 
 	threadGL->executeSync(main_gl);
 
-	texture1 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_diffuse.dds");
-	texture2 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_normal.dds");
-	texture3 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_ambient.dds");
+	shaderSimple = std::make_shared<vl::gl::ShaderProgram>(&ss, "Simple Debug", "Data/Shader/debug0.fs", "Data/Shader/debug0.vs");
+	//	texture1 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_diffuse.dds");
+	//	texture2 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_normal.dds");
+	//	texture3 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_ambient.dds");
 	//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
 	//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
 	//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
@@ -266,5 +269,3 @@ int main(int, char**) {
 
 	return 0;
 }
-
-// TODO P3: Log system should provide an interface to name threads. And / Or interact with worker thread name. AHHHAAA! Thread local string!

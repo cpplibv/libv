@@ -7,46 +7,48 @@
 
 //TODO P1: Use ordered small vector for Signal-Slot-Trackable
 //TODO P1: Rework Signal-Slot multithreading with shared_reqursive_mutex
-//			http://en.cppreference.com/w/cpp/thread/shared_mutex
+// 			http://en.cppreference.com/w/cpp/thread/shared_mutex
+//			Or with lock free way, or both...
 //TODO P1: Investigate copy constructor ?? ??
 //TODO P1: Rework connection and trackable objects
+//TODO P2: Branch signals into two: sync and async signals, this will ease my pain about them...
 //TODO P2: Is it solved to properly forwarding && references?
 //TODO P2: Move CapacitivSignal into separate file
 //TODO P3: Remove reference, remove constness from results type?
 //TODO P5: AdaptivSignal [in/out]put (same, generic lambda...)
 //TODO P5: RoutingSignal [set/get]Condition(SignalRouter)
 //TODO P5: PrioritySignal - Modified capacitiv where the storage is a priority que
-//			May consider a "predicate" function for generating priority
+// 			May consider a "predicate" function for generating priority
 //TODO P5: UniqueSignal - Modified capacitiv where the storage is unique
-//			May consider a "compare" function for determining uniqueness
+// 			May consider a "compare" function for determining uniqueness
 //TODO P5: ConditionalSignal - Forward the call only if the predicate function allows it
 //TODO P5: HistorySignal - Stores and forward calls but distibute them to late subsribers.
 //TODO P5: TransformSignal - Manipulating the arguments flowing through it using a
-//			manipulator function. Similar to std::transform.
+// 			manipulator function. Similar to std::transform.
 //TODO P5: AsnycSignal - Put the fire method and the arguments into a worker
-//			thread que to call this signal in async mode. (template executer?)
+// 			thread que to call this signal in async mode. (template executer?)
 //TODO P5: SnycSignal - Put the fire method and the arguments into a worker
-//			thread que to call this signal in sync mode. (template executer?)
+// 			thread que to call this signal in sync mode. (template executer?)
 //TODO P5: C++14 workaround for index_sequence if C++14 is not present
 //TODO P5: Doxygen Signal-Slot
 //TODO P5: Documenation of Signal-Slot. The boost version may be relevant
-//			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/reference.html
+// 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/reference.html
 //TODO P5: Turotial of Signal-Slot. The boost version may be relevant
-//			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/tutorial.html
+// 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/tutorial.html
 //
 //TODO P2: Change from trackable to shared or weak ptr
-//			signal target variable ami egy shared_ptr és a signal kap róla
-//			egy weak_ptr-t így amikor külden rá infot csak kidobja magából, ígykönnyen
-//			lehet "lokális változót" asnyc módosítani
+// 			signal target variable ami egy shared_ptr és a signal kap róla
+// 			egy weak_ptr-t így amikor külden rá infot csak kidobja magából, ígykönnyen
+// 			lehet "lokális változót" asnyc módosítani
 //TODO P?: Accumulator refactor into object?
 //TODO P?: Make a connection object to trackables and move thread policy into it (?)
-//??: kurva jó lenne ha Signal<> onClose; -nál
-//			Signal<void, VFrame*> onClose; e helyett azt tudnám mondani, hogy
-//			Signal<> onClose(generic lambda::_0, this);
-//			igy kibaszott zsirúl lehetne hivni onClose();-al onClose(this); helyett
-//			(na jól van, talán ez nem szükséges)
-//Fact: Signal ctor needs to be able to handle an adaptor
-//Fact: It is possible to do adaptiv slots! it is very possible generic lambda
+// ??: kurva jó lenne ha Signal<> onClose; -nál
+// 			Signal<void, VFrame*> onClose; e helyett azt tudnám mondani, hogy
+// 			Signal<> onClose(generic lambda::_0, this);
+// 			igy kibaszott zsirúl lehetne hivni onClose();-al onClose(this); helyett
+// 			(na jól van, talán ez nem szükséges)
+// Fact: Signal ctor needs to be able to handle an adaptor?
+// Fact: It is possible to do adaptiv slots! it is very possible generic lambda
 
 #include <map>
 #include <memory>
@@ -260,7 +262,7 @@ private:
 		}
 	}
 public:
-	// TODO P5: History signal output auto-flush
+	//TODO P5: History signal output auto-flush
 	//	template<typename... Args>
 	//	void output(Args... args) {
 	//		flushHelper(std::index_sequence_for<Args...>{});
