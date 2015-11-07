@@ -184,7 +184,7 @@ bool operator<(const Shader& r, const std::string& filePath) {
 
 // ShaderProgramImpl ------------------------------------------------------------------------------------------
 
-ShaderProgramImpl::ShaderProgramImpl(
+ShaderProgram::ShaderProgram(
 		ServiceShader * const service,
 		const std::string& name,
 		const std::string& fsPath,
@@ -200,11 +200,11 @@ ShaderProgramImpl::ShaderProgramImpl(
 		vs = service->cacheShader.get<vl::use < 1 >> (service, vsPath);
 }
 
-ShaderProgramImpl::~ShaderProgramImpl() {
+ShaderProgram::~ShaderProgram() {
 	setDependencyCallback(nullptr);
 }
 
-void ShaderProgramImpl::loadGL() {
+void ShaderProgram::loadGL() {
 	VLOG_TRACE(vl::gl::log(), "GL Loading shader program: [%s]", name);
 	programID = glCreateProgram();
 
@@ -235,21 +235,20 @@ void ShaderProgramImpl::loadGL() {
 	changeResourceState(ResourceState::READY);
 }
 
-void ShaderProgramImpl::unloadGL() {
+void ShaderProgram::unloadGL() {
 	VLOG_TRACE(vl::gl::log(), "GL Unloading shader program: [%s]", name);
 	changeResourceState(ResourceState::UNREADY);
 	glDeleteProgram(programID);
 	checkGL();
 }
 
-void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
+void ShaderProgram::load(const std::shared_ptr<ShaderProgram>& self) {
 	addDependency(fs);
 	addDependency(gs);
 	addDependency(vs);
 
-	const auto self_wp = std::weak_ptr<ShaderProgramImpl>(self);
+	const auto self_wp = std::weak_ptr<ShaderProgram>(self);
 	setDependencyCallback([this, self_wp] {
-//		VLOG_TRACE(vl::gl::log(), "Trace: %s [%s]", __PRETTY_FUNCTION__, name);
 		if (!isEveryDependency(ResourceState::READY)) return;
 		service->threadGL->executeAsync([self_wp] {
 			if (const auto self_sp = self_wp.lock()) {
@@ -259,40 +258,40 @@ void ShaderProgramImpl::load(const std::shared_ptr<ShaderProgramImpl>& self) {
 	});
 }
 
-void ShaderProgramImpl::unload(const std::shared_ptr<ShaderProgramImpl>& self) {
+void ShaderProgram::unload(const std::shared_ptr<ShaderProgram>& self) {
 	service->threadGL->executeAsync([self] {
 		self->unloadGL();
 	}, priority);
 }
 
-bool ShaderProgramImpl::operator<(const ShaderProgramImpl& r) const {
+bool ShaderProgram::operator<(const ShaderProgram& r) const {
 	return name < r.name;
 }
 
-bool operator<(const std::string& name, const ShaderProgramImpl& r) {
+bool operator<(const std::string& name, const ShaderProgram& r) {
 	return name < r.name;
 }
 
-bool operator<(const ShaderProgramImpl& r, const std::string& name) {
+bool operator<(const ShaderProgram& r, const std::string& name) {
 	return r.name < name;
 }
 
 // ShaderProgram -----------------------------------------------------------------------------------
 
-ShaderProgram::ShaderProgram(
+ShaderProgramProxy::ShaderProgramProxy(
 		ServiceShader * const service,
 		const std::string& name,
 		const std::string& fsPath,
 		const std::string& vsPath) :
-	ShaderProgram(service, name, fsPath, "", vsPath) { }
+	ShaderProgramProxy(service, name, fsPath, "", vsPath) { }
 
-ShaderProgram::ShaderProgram(
+ShaderProgramProxy::ShaderProgramProxy(
 		ServiceShader * const service,
 		const std::string& name,
 		const std::string& fsPath,
 		const std::string& gsPath,
 		const std::string& vsPath) :
-	impl(service->cacheShaderProgramImpl.get<vl::use < 1 >> (service, name, fsPath, gsPath, vsPath)) { }
+	impl(service->cacheShaderProgram.get<vl::use < 1 >> (service, name, fsPath, gsPath, vsPath)) { }
 
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------

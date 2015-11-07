@@ -109,9 +109,8 @@ void initGLSL() {
 std::unique_ptr<vl::WorkerThread> threadIO;
 std::unique_ptr<vl::WorkerThread> threadGL;
 
-std::shared_ptr<vl::gl::ShaderProgram> shaderSimple;
-//std::shared_ptr<vl::gl::ModelManager> modelManager;
-//std::shared_ptr<vl::gl::TextureManager> textureManager;
+std::shared_ptr<vl::gl::ShaderProgramProxy> shaderDebug;
+std::shared_ptr<vl::gl::ShaderProgramProxy> shaderDepth;
 std::shared_ptr<vl::gl::Texture> texture1;
 std::shared_ptr<vl::gl::Texture> texture2;
 std::shared_ptr<vl::gl::Texture> texture3;
@@ -151,15 +150,15 @@ void loop_gl() {
 	glLoadIdentity();
 	glMultMatrixf(glm::value_ptr(gl.matrixMVP()));
 
-	//	texture1->bind(vl::gl::TextureType::diffuse);
-	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
-	//	texture1->unbind(vl::gl::TextureType::diffuse);
-	//	texture2->bind(vl::gl::TextureType::diffuse);
-	//	vl::gl::renderCube(0, 0, 0, 5.0f);
-	//	texture2->unbind(vl::gl::TextureType::diffuse);
-	//	texture3->bind(vl::gl::TextureType::diffuse);
-	//	vl::gl::renderCube(11, 0, 0, 6.0f);
-	//	texture3->unbind(vl::gl::TextureType::diffuse);
+//	texture1->bind(vl::gl::TextureType::diffuse);
+//	vl::gl::renderCube(-9, 0, 0, 4.0f);
+//	texture1->unbind(vl::gl::TextureType::diffuse);
+//	texture2->bind(vl::gl::TextureType::diffuse);
+//	vl::gl::renderCube(0, 0, 0, 5.0f);
+//	texture2->unbind(vl::gl::TextureType::diffuse);
+//	texture3->bind(vl::gl::TextureType::diffuse);
+//	vl::gl::renderCube(11, 0, 0, 6.0f);
+//	texture3->unbind(vl::gl::TextureType::diffuse);
 	// ---------------------------------------------------------------------------------------------
 
 	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -16));
@@ -205,9 +204,6 @@ void main_gl() {
 	initGL();
 	initGLSL();
 
-	//	shaderSimple = new vl::gl::Shader("Debug", "Data/Shader/debug0.vs", "Data/Shader/debug0.fs");
-	//	//shaderSimple = new vl::gl::Shader("Simple", "Data/Shader/simple.vs", "Data/Shader/simple.fs");
-	//	shaderSimple->loadProgram();
 	//	shaderSimple->printActiveUniforms();
 	//	shaderSimple->useProgram();
 
@@ -216,7 +212,8 @@ void main_gl() {
 
 void term_gl() {
 	checkGL();
-	shaderSimple.reset();
+	shaderDebug.reset();
+	shaderDepth.reset();
 
 	texture1.reset();
 	texture2.reset();
@@ -248,10 +245,11 @@ int main(int, char**) {
 
 	threadGL->executeSync(main_gl);
 
-	shaderSimple = std::make_shared<vl::gl::ShaderProgram>(&ss, "Simple Debug", "Data/Shader/debug0.fs", "Data/Shader/debug0.vs");
-	//	texture1 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_diffuse.dds");
-	//	texture2 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_normal.dds");
-	//	texture3 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_ambient.dds");
+	shaderDebug = std::make_shared<vl::gl::ShaderProgramProxy>(&ss, "Simple Debug", "Data/Shader/debug0.fs", "Data/Shader/debug0.vs");
+	shaderDepth = std::make_shared<vl::gl::ShaderProgramProxy>(&ss, "Simple Depth", "Data/Shader/depth.fs", "Data/Shader/depth.vs");
+	texture1 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_diffuse.dds");
+	texture2 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_normal.dds");
+	texture3 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_ambient.dds");
 	//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
 	//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
 	//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");

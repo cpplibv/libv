@@ -1,3 +1,6 @@
+Base class for lights and cameras...
+
+
 move everything from vl to libv
 
 license
@@ -87,7 +90,54 @@ Tracing every event for right state enums / defines / handlers:
 What is GLFW_USE_DWM_SWAP_INTERVAL?.... Test it off
 
 
+Priority levels for each operation
+IN - in-context operation (FAST and not context sensitive)
+       GL Task        | Priority | Note
+:-------------------- | --------:|:-----------------------------------------------------------------
+ Initialization       |   0100   |
+ D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
+ D.ShaderProgram      |   1150   | Unloading as ShaderProgram
+ D.UIShader           |   1200   | Unloading as Shader
+ D.Shader             |   1250   | Unloading as Shader
+ D.Font               |   1300   | Unloading as Font
+ D.UITexture          |   1400   | Unloading as Texture
+ D.Model              |   1500   | Unloading as Model
+ D.Texture            |   1600   | Unloading as Texture
+ Render-Immediate     |   2000   | Starts by a timer when render time-window runs out
+ Unload Texture       |   3100   |
+ Unload Model         |   3200   |
+ Unload Font          |   3300   |
+ Unload ShaderProgram |   3400   |
+ Unload Shader        |   3500   |
+ Load UIShaderProgram |   4100   | Unloading as ShaderProgram
+ Load ShaderProgram   |   4150   |
+ Load UIShader        |   4200   | Unloading as Shader
+ Load Shader          |   4250   |
+ Load Font            |   4300   |
+ Load UITexture       |   4400   |
+ Load Model           |   4500   |
+ Load Texture         |   4600   |
+ Termination          |   9800   |
+ Render-Residual      |   9900   | Always stays in queue as last operation
 
+       IO Task        | Priority | Note
+:-------------------- | --------:|:-----------------------------------------------------------------
+ D.UIShader File      |   1100   | Unloading as Shader File
+ D.Shader File        |   1200   | Unloading as Shader File
+ D.Font               |   1300   | Unloading as Font
+ D.UITexture          |   1400   | Unloading as Texture
+ D.Model              |   1500   | Unloading as Model
+ D.Texture            |   1600   | Unloading as Texture
+ Unload Texture       |    IN    |
+ Unload Model         |    IN    |
+ Unload Font          |    IN    |
+ Unload Shader File   |    IN    |
+ Load UIShader File   |   4100   | Unloading as Shader File
+ Load Shader File     |   4150   |
+ Load Font            |   4300   |
+ Load UITexture       |   4400   |
+ Load Model           |   4500   |
+ Load Texture         |   4600   |
 
 
 variant

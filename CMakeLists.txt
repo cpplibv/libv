@@ -20,7 +20,8 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 # --------------------------------------------------------------------------------------------------
 
 #set(CMAKE_VERBOSE_MAKEFILE off)
-#set(CMAKE_BUILD_TYPE "DEBUG")
+set(CMAKE_BUILD_TYPE "DEBUG")
+#set(CMAKE_BUILD_TYPE "RELEASE")
 
 #Definitions
 if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
@@ -73,7 +74,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	add_compile_options(-Wsuggest-override) #IF > GNU 5.1
 
 	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
-		#add_compile_options(-fsanitize=address)
+		add_compile_options(-fsanitize=address)
 		#add_compile_options(-fsanitize=kernel-address)
 		#add_compile_options(-fsanitize=leak)
 		#add_compile_options(-fsanitize=thread)
@@ -326,7 +327,7 @@ add_executable(vsig_main   ${PATH_EXP}/vsig_main.cpp)
 add_executable(vui_main    ${PATH_EXP}/vui_main.cpp)
 add_executable(vui_main2   ${PATH_EXP}/vui_main2.cpp)
 
-#Costum Targets
+#Custom Targets
 add_custom_target(externals DEPENDS ${EXTERNAL_PROJECT_LIST})
 add_custom_target(ext DEPENDS externals)
 

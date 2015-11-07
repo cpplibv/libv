@@ -32,7 +32,7 @@ struct ServiceIO {
 
 class TextFile;
 class Shader;
-class ShaderProgramImpl;
+class ShaderProgram;
 
 struct ServiceShader : ServiceIO, ServiceGL {
 	ServiceShader(vl::WorkerThread* threadIO, vl::WorkerThread* threadGL) :
@@ -40,7 +40,7 @@ struct ServiceShader : ServiceIO, ServiceGL {
 
 	vl::LoaderCache<TextFile> cacheTextFile;
 	vl::LoaderCache<Shader> cacheShader;
-	vl::LoaderCache<ShaderProgramImpl> cacheShaderProgramImpl;
+	vl::LoaderCache<ShaderProgram> cacheShaderProgram;
 };
 
 // ServiceTexture ----------------------------------------------------------------------------------

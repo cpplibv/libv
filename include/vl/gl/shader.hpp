@@ -1,4 +1,4 @@
-// File: ShaderProgramImpl.hpp, Created on 2014. december 7. 12:56, Author: Vader
+// File: shader.hpp, Created on 2014. december 7. 12:56, Author: Vader
 
 #pragma once
 
@@ -158,9 +158,9 @@ public:
 	friend bool operator<(const Shader& r, const std::string& filePath);
 };
 
-// ShaderProgramImpl -----------------------------------------------------------------------------------
+// ShaderProgram -----------------------------------------------------------------------------------
 
-class ShaderProgramImpl : public vl::Resource {
+class ShaderProgram : public vl::Resource {
 private:
 	const size_t priority = 0; //<<< Default priority
 	std::string name;
@@ -172,46 +172,46 @@ private:
 	ServiceShader* service;
 
 public:
-	ShaderProgramImpl(
+	ShaderProgram(
 			ServiceShader * const service,
 			const std::string& name,
 			const std::string& fsPath,
 			const std::string& gsPath,
 			const std::string& vsPath);
-	virtual ~ShaderProgramImpl();
+	virtual ~ShaderProgram();
 
 private:
 	void loadGL();
 	void unloadGL();
 
 protected:
-	void load(const std::shared_ptr<ShaderProgramImpl>& self);
-	void unload(const std::shared_ptr<ShaderProgramImpl>& self);
+	void load(const std::shared_ptr<ShaderProgram>& self);
+	void unload(const std::shared_ptr<ShaderProgram>& self);
 public:
-	bool operator<(const ShaderProgramImpl& r) const;
-	friend bool operator<(const std::string& name, const ShaderProgramImpl& r);
-	friend bool operator<(const ShaderProgramImpl& r, const std::string& name);
+	bool operator<(const ShaderProgram& r) const;
+	friend bool operator<(const std::string& name, const ShaderProgram& r);
+	friend bool operator<(const ShaderProgram& r, const std::string& name);
 };
 
 // ShaderProgram -----------------------------------------------------------------------------------
 
-class ShaderProgram {
+class ShaderProgramProxy {
 	//	GLuint shaderProgramID = 0;
-	std::shared_ptr<ShaderProgramImpl> impl;
+	std::shared_ptr<ShaderProgram> impl;
 public:
-	ShaderProgram(
+	ShaderProgramProxy(
 			ServiceShader * const service,
 			const std::string& name,
 			const std::string& fsPath,
 			const std::string& vsPath);
 
-	ShaderProgram(
+	ShaderProgramProxy(
 			ServiceShader * const service,
 			const std::string& name,
 			const std::string& fsPath,
 			const std::string& gsPath,
 			const std::string& vsPath);
-	virtual ~ShaderProgram() { }
+	virtual ~ShaderProgramProxy() { }
 
 };
 
