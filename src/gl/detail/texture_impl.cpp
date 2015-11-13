@@ -109,6 +109,7 @@ void TextureImpl::loadGL() {
 	default: assert(0);
 		break;
 	}
+
 	for (std::size_t Layer = 0; Layer < texture->layers(); ++Layer)
 		for (std::size_t Face = 0; Face < texture->faces(); ++Face)
 			for (std::size_t Level = 0; Level < texture->levels(); ++Level) {

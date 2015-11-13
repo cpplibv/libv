@@ -65,7 +65,7 @@ constexpr GLuint ATTRIBUTE_BITANGENT = 15; //Same as TEX7
 
 // TextureType -------------------------------------------------------------------------------------
 
-//TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp-s)
+//TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp)
 
 enum class TextureType : GLuint {
 	diffuse = 0,
@@ -193,7 +193,7 @@ public:
 	friend bool operator<(const ShaderProgram& r, const std::string& name);
 };
 
-// ShaderProgram -----------------------------------------------------------------------------------
+// ShaderProgramProxy ------------------------------------------------------------------------------
 
 class ShaderProgramProxy {
 	//	GLuint shaderProgramID = 0;

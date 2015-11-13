@@ -7,11 +7,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 // vl
+#include <vl/timer.hpp>
 #include <vl/worker_thread.hpp>
 // std
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 // pro
 #include <vl/gl/gl.hpp>
 #include <vl/gl/log.hpp>
@@ -21,59 +23,50 @@
 #include <vl/gl/texture.hpp>
 #include <vl/gl/uniform.hpp>
 
-GLFWwindow* window;
+// -------------------------------------------------------------------------------------------------
+struct MyFrame {
+	GLFWwindow* window;
+	const char* title;
+	float r, g, b;
+	std::thread* th;
+	vl::gl::GL gl;
+	//	vl::WorkerThread thread;
+
+	MyFrame(GLFWwindow* window, const char* title, float r, float g, float b, std::thread* th) :
+		window(window),
+		title(title),
+		r(r), g(g), b(b),
+		th(th) { }
+};
+
+// -------------------------------------------------------------------------------------------------
+
+std::unique_ptr<vl::WorkerThread> threadIO;
+
+std::shared_ptr<vl::gl::ShaderProgramProxy> shaderDebug, shaderDepth;
+std::shared_ptr<vl::gl::Texture> texture0, texture1, texture2;
+//std::shared_ptr<vl::gl::Model> model0, model1, model2, model3, model4;
+
+std::unique_ptr<vl::gl::ServiceShader> ss;
+std::unique_ptr<vl::gl::ServiceTexture> st;
+
 float angle = 0;
 
-void errcb(int code, const char* ptr) {
-	VLOG_ERROR(vl::log(), "GLFW %d: %s", code, ptr);
-}
+std::atomic_bool running{true};
 
-void initGLFW() {
-	glfwSetErrorCallback(errcb);
-	if (!glfwInit())
-		return VLOG_ERROR(vl::log(), "Failed to initialize GLFW.");
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-
-	window = glfwCreateWindow(900, 600, "VGL Demo", nullptr, nullptr);
-	if (!window) {
-		glfwTerminate();
-		return VLOG_ERROR(vl::log(), "Failed to create GLFW window.");
-	}
-	glfwSetWindowPos(window, 100, 100);
-	glfwMakeContextCurrent(window);
-	//		glfwSwapInterval(0);
-	glfwSwapInterval(1);
-	checkGL();
-}
+// -------------------------------------------------------------------------------------------------
 
 #define checkGLEWSupport(ext) VLOG_INFO(vl::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
-	//	glewExperimental = true;
 	if (GLenum err = glewInit() != GLEW_OK)
 		VLOG_ERROR(vl::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
-	checkGL();
 
 	VLOG_INFO(vl::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
 	VLOG_INFO(vl::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
 	VLOG_INFO(vl::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
-	checkGL();
 
-	checkGLEWSupport(GL_VERSION_3_0);
-	checkGLEWSupport(GL_VERSION_3_1);
-	checkGLEWSupport(GL_VERSION_3_2);
 	checkGLEWSupport(GL_VERSION_3_3);
-	checkGLEWSupport(GL_VERSION_4_0);
-	checkGLEWSupport(GL_VERSION_4_1);
-	checkGLEWSupport(GL_VERSION_4_2);
-	checkGLEWSupport(GL_VERSION_4_3);
-	checkGLEWSupport(GL_VERSION_4_4);
 	checkGLEWSupport(GL_VERSION_4_5);
 	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
 	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
@@ -82,8 +75,6 @@ void initGLEW() {
 }
 
 void initGL() {
-	glClearColor(0.942f, 0.981f, 0.957f, 1.0f);
-
 	glEnable(GL_DEPTH_TEST); //Depth
 	glDepthFunc(GL_LESS);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
@@ -94,9 +85,7 @@ void initGL() {
 
 	glEnable(GL_TEXTURE_2D);
 
-	//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
+	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
 	checkGL();
 }
 
@@ -104,37 +93,16 @@ void initGLSL() {
 	checkGL();
 }
 
-// -------------------------------------------------------------------------------------------------
-
-std::unique_ptr<vl::WorkerThread> threadIO;
-std::unique_ptr<vl::WorkerThread> threadGL;
-
-std::shared_ptr<vl::gl::ShaderProgramProxy> shaderDebug;
-std::shared_ptr<vl::gl::ShaderProgramProxy> shaderDepth;
-std::shared_ptr<vl::gl::Texture> texture1;
-std::shared_ptr<vl::gl::Texture> texture2;
-std::shared_ptr<vl::gl::Texture> texture3;
-//std::shared_ptr<vl::gl::Model> model1;
-//std::shared_ptr<vl::gl::Model> model2;
-//std::shared_ptr<vl::gl::Model> model3;
-//std::shared_ptr<vl::gl::Model> model4;
-//std::shared_ptr<vl::gl::Model> model5;
-vl::gl::GL gl;
+static void error_callback(int code, const char* description) {
+	VLOG_ERROR(vl::log(), "GLFW %d: %s", code, description);
+}
 
 // -------------------------------------------------------------------------------------------------
 
-void term_gl();
+static void thread_init(MyFrame*) { }
 
-// =================================================================================================
-
-void loop_gl() {
-	checkGL();
-	static double prevTime = 0;
-	double currentTime = glfwGetTime();
-	double deltaTime = currentTime - prevTime;
-	prevTime = currentTime;
-	angle += static_cast<float> (deltaTime * 30);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+static void thread_render(MyFrame* data) {
+	auto& gl = data->gl;
 
 	gl.pushMatrixProjection();
 	gl.pushMatrixView();
@@ -145,20 +113,20 @@ void loop_gl() {
 	gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
 
 	// ---------------------------------------------------------------------------------------------
-	// Debug block
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glMultMatrixf(glm::value_ptr(gl.matrixMVP()));
 
-//	texture1->bind(vl::gl::TextureType::diffuse);
-//	vl::gl::renderCube(-9, 0, 0, 4.0f);
-//	texture1->unbind(vl::gl::TextureType::diffuse);
-//	texture2->bind(vl::gl::TextureType::diffuse);
-//	vl::gl::renderCube(0, 0, 0, 5.0f);
-//	texture2->unbind(vl::gl::TextureType::diffuse);
-//	texture3->bind(vl::gl::TextureType::diffuse);
-//	vl::gl::renderCube(11, 0, 0, 6.0f);
-//	texture3->unbind(vl::gl::TextureType::diffuse);
+	//	texture0->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
+	//	texture0->unbind(vl::gl::TextureType::diffuse);
+	//	texture1->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(0, 0, 0, 5.0f);
+	//	texture1->unbind(vl::gl::TextureType::diffuse);
+	//	texture2->bind(vl::gl::TextureType::diffuse);
+	//	vl::gl::renderCube(11, 0, 0, 6.0f);
+	//	texture2->unbind(vl::gl::TextureType::diffuse);
+
 	// ---------------------------------------------------------------------------------------------
 
 	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -16));
@@ -188,82 +156,125 @@ void loop_gl() {
 	gl.popMatrixView();
 	gl.popMatrixProjection();
 
-	glfwSwapBuffers(window);
-	glfwPollEvents();
 	checkGL();
-
-	if (!glfwWindowShouldClose(window))
-		threadGL->executeAsync(loop_gl);
-	else
-		term_gl();
 }
 
-void main_gl() {
-	initGLFW();
+static void thread_main(MyFrame *data) {
+	glfwMakeContextCurrent(data->window);
+	glfwSwapInterval(1);
+
 	initGLEW();
 	initGL();
 	initGLSL();
 
-	//	shaderSimple->printActiveUniforms();
-	//	shaderSimple->useProgram();
+	thread_init(data);
 
-	checkGL();
-}
-
-void term_gl() {
-	checkGL();
-	shaderDebug.reset();
-	shaderDepth.reset();
-
-	texture1.reset();
-	texture2.reset();
-	texture3.reset();
-
-	//	model1.reset();
-	//	model2.reset();
-	//	model3.reset();
-	//	model4.reset();
-	//	model5.reset();
-
-	checkGL();
-
-	threadGL->executeAsync([] {
+	vl::Timer timer;
+	size_t time = 0, i = 0;
+	while (running) {
+		const float v = (float) fabs(sin(glfwGetTime() * 2.f));
+		glClearColor(data->r * v, data->g * v, data->b * v, 0.f);
+		glClear(GL_COLOR_BUFFER_BIT);
 		checkGL();
-		glfwTerminate();
-		threadGL->terminate(); // Allowing GL thread to join into main
-	}, 9800);
+
+		thread_render(data);
+
+		glfwSwapBuffers(data->window);
+
+		i++;
+		time += timer.time().count();
+		if (time > 1'000'000'000) {
+			VLOG_INFO(vl::log(), "FPS in window [%s]: %d", data->title, i);
+			i = 0;
+			time -= 1'000'000'000;
+		}
+	}
+
+	checkGL();
+	glfwMakeContextCurrent(nullptr);
 }
 
-int main(int, char**) {
-	vl::log().output(std::cout);
+// -------------------------------------------------------------------------------------------------
 
-	threadIO.reset(new vl::WorkerThread("IO"));
-	threadGL.reset(new vl::WorkerThread("GL"));
-
-	vl::gl::ServiceTexture st(threadIO.get(), threadGL.get());
-	vl::gl::ServiceShader ss(threadIO.get(), threadGL.get());
-
-	threadGL->executeSync(main_gl);
-
-	shaderDebug = std::make_shared<vl::gl::ShaderProgramProxy>(&ss, "Simple Debug", "Data/Shader/debug0.fs", "Data/Shader/debug0.vs");
-	shaderDepth = std::make_shared<vl::gl::ShaderProgramProxy>(&ss, "Simple Depth", "Data/Shader/depth.fs", "Data/Shader/depth.vs");
-	texture1 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_diffuse.dds");
-	texture2 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_normal.dds");
-	texture3 = std::make_shared<vl::gl::Texture>(&st, "Data/Texture/asteorid_02_ambient.dds");
+void init() {
+	shaderDebug = std::make_shared<vl::gl::ShaderProgramProxy>(ss.get(), "Simple Debug", "Data/Shader/debug0.fs", "Data/Shader/debug0.vs");
+	shaderDepth = std::make_shared<vl::gl::ShaderProgramProxy>(ss.get(), "Simple Depth", "Data/Shader/depth.fs", "Data/Shader/depth.vs");
+	texture0 = std::make_shared<vl::gl::Texture>(st.get(), "Data/Texture/asteorid_02_diffuse.dds");
+	texture1 = std::make_shared<vl::gl::Texture>(st.get(), "Data/Texture/asteorid_02_normal.dds");
+	texture2 = std::make_shared<vl::gl::Texture>(st.get(), "Data/Texture/asteorid_02_ambient.dds");
 	//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
 	//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
 	//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
 	//	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
 	//	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
-
-	threadGL->executeAsync(loop_gl);
-
-	threadGL->join();
-	threadIO->terminate();
-	threadIO->join();
-
-	threadGL.reset();
-	threadIO.reset();
-
-	return 0;
 }
+
+void term() {
+	shaderDebug.reset();
+	shaderDepth.reset();
+	texture0.reset();
+	texture1.reset();
+	texture2.reset();
+}
+
+int main(void) {
+	vl::log().output(std::cout);
+
+	MyFrame frames[] = {
+		{nullptr, "Example 0", 1.0f, 0.8f, 0.8f, nullptr},
+		{nullptr, "Example 1", 0.8f, 1.0f, 0.8f, nullptr},
+		{nullptr, "Example 2", 0.8f, 0.8f, 1.0f, nullptr}
+	};
+	const int count = 3;
+
+	glfwSetErrorCallback(error_callback);
+
+	if (!glfwInit()) {
+		VLOG_ERROR(vl::log(), "Failed to initialize GLFW.");
+		exit(EXIT_FAILURE);
+	}
+
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+
+	auto globalGLContext = glfwCreateWindow(50, 50, "", nullptr, nullptr);
+
+	init();
+
+	for (int i = 0; i < count; i++) {
+		frames[i].window = glfwCreateWindow(200, 200, frames[i].title, nullptr, globalGLContext);
+		if (!frames[i].window) {
+			glfwTerminate();
+			VLOG_ERROR(vl::log(), "Failed to create GLFW window.");
+			exit(EXIT_FAILURE);
+		}
+
+		glfwSetWindowPos(frames[i].window, 200 + 250 * i, 200);
+		glfwShowWindow(frames[i].window);
+
+		std::thread* th = new std::thread(thread_main, &frames[i]);
+		frames[i].th = th;
+	}
+
+	while (running) {
+		glfwWaitEvents();
+
+		for (int i = 0; i < count; i++) {
+			if (glfwWindowShouldClose(frames[i].window))
+				running = GL_FALSE;
+		}
+	}
+
+	for (int i = 0; i < count; i++)
+		frames[i].th->join();
+
+	term();
+	glfwTerminate();
+
+	exit(EXIT_SUCCESS);
+}
+
+//	std::this_thread::sleep_for(std::chrono::seconds(2));

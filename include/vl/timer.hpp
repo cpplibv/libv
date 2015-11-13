@@ -23,10 +23,11 @@ public:
 	clock::duration lastTurn() {
 		return _lastTurn;
 	}
-	void time() {
+	clock::duration time() {
 		auto ct = std::chrono::steady_clock::now();
 		_lastTurn = ct - startTime;
 		startTime = ct;
+		return _lastTurn;
 	}
 };
 
