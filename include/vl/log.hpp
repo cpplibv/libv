@@ -13,6 +13,7 @@
 
 #include <vl/string.hpp>
 
+//TODO P1: Change from printf to fmt
 //TODO P2: Log system should use string prefix or string params that identify the modul and not
 //			a log object.
 //TODO P2: Log system should minimalize stream mutex lock time (eighter by a thread and/or

@@ -10,26 +10,61 @@
 #include <vl/gl/shader.hpp> // only for TextureType
 #include <vl/gl/types.hpp>
 
+// -------------------------------------------------------------------------------------------------
+
+namespace gli {
+struct texture;
+} //namespace gli
+
+namespace boost {
+namespace filesystem {
+struct path;
+} //namespace filesystem
+namespace asio {
+struct const_buffer;
+} //namespace asio
+} //namespace boost
+
+// -------------------------------------------------------------------------------------------------
+
 namespace vl {
 namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-class ServiceTexture;
-namespace detail {
-class TextureImpl;
-} //namespace detail
+constexpr const char DEFAULT_TEXTURE_NAME[] = "--UNNAMED--";
 
-class Texture : public vl::Resource {
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * @note Non-virtual class
+ */
+class Texture {
 private:
-	//TODO P2:	GLuint textureID;
-	std::shared_ptr<detail::TextureImpl> impl;
+	GLuint textureID = 0;
+	GLenum target;
+	std::unique_ptr<gli::texture> texture;
+	std::string name;
+
+private:
+	void init(const char* data, size_t size);
+	void loadGL();
+	void unloadGL();
+
+public:
+	Texture(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_TEXTURE_NAME);
+	Texture(const boost::filesystem::path& filePath);
+	Texture(const boost::filesystem::path& filePath, const std::string& name);
+	Texture(const char* data, size_t size, const std::string& name = DEFAULT_TEXTURE_NAME);
+
+	~Texture();
 public:
 	void bind(TextureType);
 	void unbind(TextureType);
-public:
-	Texture(ServiceTexture * const service, const std::string& filePath);
-	virtual ~Texture();
+	//	inline GLuint getTextureID() const {
+	//		return textureID;
+	//	}
+
 };
 
 // -------------------------------------------------------------------------------------------------

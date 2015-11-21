@@ -257,6 +257,7 @@ ExternalProject_Add(ext_boost
 		--layout=tagged
 		--with-serialization
 		--with-system
+		--with-filesystem
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	EXCLUDE_FROM_ALL 1
@@ -346,7 +347,7 @@ target_link_libraries(vsig_test   -static )
 target_link_libraries(vui_test    -static )
 
 #Link - Executables
-target_link_libraries(vgl_main    -static glew glfw3 vgl)
+target_link_libraries(vgl_main    -static glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vl_main     -static )
 target_link_libraries(vm3_main    -static vm3)
 target_link_libraries(vm3imp_main -static vm3imp)

@@ -28,6 +28,7 @@ enum class ResourceState {
 //TODO P3: This Resource is awful slow... lock free it!
 //TODO P4: Generalization of a ResourceProxy
 //TODO P5: After vsig is usable in some atomic form, use it for this callback.
+
 class Resource {
 private:
 	ResourceState state{ResourceState::UNREADY};
@@ -115,5 +116,7 @@ protected:
 		// Seg fault
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace vl

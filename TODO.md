@@ -2,6 +2,8 @@ Base class for lights and cameras...
 
 
 move everything from vl to libv
+vl([^a-zA-Z0-9_]|$)
+libv$1
 
 license
 https://www.youtube.com/watch?v=cJIi-hIlCQM

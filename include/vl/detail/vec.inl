@@ -1,48 +1,48 @@
 // File: Vec.inl, Created on 2014. november 28. 17:45, Author: Vader
 
-#ifndef VLIB_VEC_INLINE
-#    define VLIB_VEC_INLINE
+#ifndef VL_VEC_INLINE
+#    define VL_VEC_INLINE
 
 // <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec helpers ...">
 #    define __v2get(p1,p2)       /** Composite a new vector based on members @return The new vector */\
                        inline vec2_t<T> p1##p2() const noexcept {        \
-                            return vec2_t<T>(p1,p2);} 
+                            return vec2_t<T>(p1,p2);}
 #    define __v3get(p1,p2,p3)    /** Composite a new vector based on members @return The new vector */\
                        inline vec3_t<T> p1##p2##p3() const noexcept {    \
-                           return vec3_t<T>(p1,p2,p3);} 
+                           return vec3_t<T>(p1,p2,p3);}
 #    define __v4get(p1,p2,p3,p4) /** Composite a new vector based on members @return The new vector */\
 					   inline vec4_t<T> p1##p2##p3##p4() const noexcept {\
                            return vec4_t<T>(p1,p2,p3,p4);}
 
-#    define __v22p1(p1)      __v2get(p1,x)       __v2get(p1,y)       
-#    define __v22            __v22p1(x)          __v22p1(y)          
-#    define __v23p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    
-#    define __v23p1(p1)      __v23p2(p1,x)       __v23p2(p1,y)       
-#    define __v23            __v23p1(x)          __v23p1(y)          
-#    define __v24p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) 
-#    define __v24p2(p1,p2)   __v24p3(p1,p2,x)    __v24p3(p1,p2,y)    
-#    define __v24p1(p1)	     __v24p2(p1,x)       __v24p2(p1,y)       
-#    define __v24            __v24p1(x)          __v24p1(y)          
+#    define __v22p1(p1)      __v2get(p1,x)       __v2get(p1,y)
+#    define __v22            __v22p1(x)          __v22p1(y)
+#    define __v23p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)
+#    define __v23p1(p1)      __v23p2(p1,x)       __v23p2(p1,y)
+#    define __v23            __v23p1(x)          __v23p1(y)
+#    define __v24p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y)
+#    define __v24p2(p1,p2)   __v24p3(p1,p2,x)    __v24p3(p1,p2,y)
+#    define __v24p1(p1)	     __v24p2(p1,x)       __v24p2(p1,y)
+#    define __v24            __v24p1(x)          __v24p1(y)
 
-#    define __v32p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)       
-#    define __v32            __v32p1(x)          __v32p1(y)          __v32p1(z)          
-#    define __v33p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)    
-#    define __v33p1(p1)      __v33p2(p1,x)       __v33p2(p1,y)       __v33p2(p1,z)       
-#    define __v33            __v33p1(x)          __v33p1(y)          __v33p1(z)          
-#    define __v34p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z) 
-#    define __v34p2(p1,p2)   __v34p3(p1,p2,x)    __v34p3(p1,p2,y)    __v34p3(p1,p2,z)    
-#    define __v34p1(p1)	     __v34p2(p1,x)       __v34p2(p1,y)       __v34p2(p1,z)       
-#    define __v34            __v34p1(x)          __v34p1(y)          __v34p1(z)          
+#    define __v32p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)
+#    define __v32            __v32p1(x)          __v32p1(y)          __v32p1(z)
+#    define __v33p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)
+#    define __v33p1(p1)      __v33p2(p1,x)       __v33p2(p1,y)       __v33p2(p1,z)
+#    define __v33            __v33p1(x)          __v33p1(y)          __v33p1(z)
+#    define __v34p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z)
+#    define __v34p2(p1,p2)   __v34p3(p1,p2,x)    __v34p3(p1,p2,y)    __v34p3(p1,p2,z)
+#    define __v34p1(p1)	     __v34p2(p1,x)       __v34p2(p1,y)       __v34p2(p1,z)
+#    define __v34            __v34p1(x)          __v34p1(y)          __v34p1(z)
 
-#    define __v42p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)       __v2get(p1,w)       
-#    define __v42            __v42p1(x)          __v42p1(y)          __v42p1(z)          __v42p1(w)          
-#    define __v43p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)    __v3get(p1,p2,w)    
-#    define __v43p1(p1)      __v43p2(p1,x)       __v43p2(p1,y)       __v43p2(p1,z)       __v43p2(p1,w)       
-#    define __v43            __v43p1(x)          __v43p1(y)          __v43p1(z)          __v43p1(w)          
-#    define __v44p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z) __v4get(p1,p2,p3,w) 
-#    define __v44p2(p1,p2)   __v44p3(p1,p2,x)    __v44p3(p1,p2,y)    __v44p3(p1,p2,z)    __v44p3(p1,p2,w)    
-#    define __v44p1(p1)	     __v44p2(p1,x)       __v44p2(p1,y)       __v44p2(p1,z)       __v44p2(p1,w)       
-#    define __v44            __v44p1(x)          __v44p1(y)          __v44p1(z)          __v44p1(w)          
+#    define __v42p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)       __v2get(p1,w)
+#    define __v42            __v42p1(x)          __v42p1(y)          __v42p1(z)          __v42p1(w)
+#    define __v43p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)    __v3get(p1,p2,w)
+#    define __v43p1(p1)      __v43p2(p1,x)       __v43p2(p1,y)       __v43p2(p1,z)       __v43p2(p1,w)
+#    define __v43            __v43p1(x)          __v43p1(y)          __v43p1(z)          __v43p1(w)
+#    define __v44p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z) __v4get(p1,p2,p3,w)
+#    define __v44p2(p1,p2)   __v44p3(p1,p2,x)    __v44p3(p1,p2,y)    __v44p3(p1,p2,z)    __v44p3(p1,p2,w)
+#    define __v44p1(p1)	     __v44p2(p1,x)       __v44p2(p1,y)       __v44p2(p1,z)       __v44p2(p1,w)
+#    define __v44            __v44p1(x)          __v44p1(y)          __v44p1(z)          __v44p1(w)
 // </editor-fold>
 
 #    define implement_vec2_custom_vec2_gets __v22
@@ -166,7 +166,7 @@ struct VEC_NAME {
 		T ptr[VEC_DIM];
 	};
 
-#if VEC_DIM == 2	
+#if VEC_DIM == 2
 	explicit VEC_NAME(T x = 0, T y = 0) noexcept : x(x), y(y) { }
 #elif VEC_DIM == 3
 	explicit VEC_NAME(T x = 0, T y = 0, T z = 0) noexcept : x(x), y(y), z(z) { }
@@ -181,7 +181,7 @@ struct VEC_NAME {
 	explicit VEC_NAME(const vec3_t<T>& xyz, T w = 0) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	explicit VEC_NAME(T x, const vec3_t<T>& yzw) noexcept : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 #endif
-	
+
 	VEC_NAME(const VEC_NAME& v) noexcept = default;
 	VEC_NAME(VEC_NAME&& v) noexcept = default;
 	template<typename K>
@@ -270,7 +270,7 @@ struct VEC_NAME {
 
 	//==========================================================================
 
-#if VEC_DIM == 2	
+#if VEC_DIM == 2
 	implement_vec2_custom_vec2_gets
 	implement_vec2_custom_vec3_gets
 	implement_vec2_custom_vec4_gets
