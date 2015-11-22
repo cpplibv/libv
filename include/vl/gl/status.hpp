@@ -21,8 +21,7 @@ inline std::string glGetShaderCompileMessage(GLuint shaderID) {
 	int infoLength;
 	glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLength);
 
-	std::string errorMessage;
-	errorMessage.resize(infoLength);
+	result.resize(infoLength);
 	glGetShaderInfoLog(shaderID, infoLength, nullptr, &result[0]);
 	return result;
 }
@@ -40,8 +39,7 @@ inline std::string glGetProgamLinkMessage(GLuint programID) {
 	int infoLength;
 	glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLength);
 
-	std::string errorMessage;
-	errorMessage.resize(infoLength);
+	result.resize(infoLength);
 	glGetProgramInfoLog(programID, infoLength, nullptr, &result[0]);
 	return result;
 }

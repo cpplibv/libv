@@ -25,12 +25,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-std::unique_ptr<vl::WorkerThread> threadIO;
-
-std::shared_ptr<vl::gl::ShaderProgram> shaderDebug, shaderDepth;
-std::shared_ptr<vl::gl::Texture> texture0, texture1, texture2;
-//std::shared_ptr<vl::gl::Model> model0, model1, model2, model3, model4;
-
 float angle = 0;
 
 std::atomic_bool running{true};
@@ -82,7 +76,57 @@ static void error_callback(int code, const char* description) {
 
 // -------------------------------------------------------------------------------------------------
 
-void render(vl::gl::GL& gl) {
+struct Example {
+	vl::gl::GL gl;
+	vl::gl::ShaderProgram shaderDebug;
+	vl::gl::ShaderProgram shaderDepth;
+	vl::gl::Texture texture0;
+	vl::gl::Texture texture1;
+	vl::gl::Texture texture2;
+	//vl::gl::Model model0, model1, model2, model3, model4;
+
+	vl::gl::Uniform<glm::mat4> glslMVPmat;
+	vl::gl::Uniform<glm::mat4> glslMmat;
+	vl::gl::Uniform<vl::gl::TextureType> glslTextureDiffuseSampler;
+	vl::gl::Uniform<vl::gl::TextureType> glslTextureNormalSampler;
+	vl::gl::Uniform<vl::gl::TextureType> glslTextureAmbientSampler;
+
+	Example() :
+		shaderDebug("Debug 0",
+		std::make_shared<vl::gl::ShaderVertex>("Data/Shader/debug0.vs"),
+		std::make_shared<vl::gl::ShaderFragment>("Data/Shader/debug0.fs")),
+		shaderDepth("Depth 0",
+		std::make_shared<vl::gl::ShaderVertex>("Data/Shader/depth.vs"),
+		std::make_shared<vl::gl::ShaderFragment>("Data/Shader/depth.fs")),
+		texture0("Data/Texture/asteorid_02_diffuse.dds"),
+		texture1("Data/Texture/asteorid_02_normal.dds"),
+		texture2("Data/Texture/asteorid_02_ambient.dds"),
+
+		glslMVPmat(shaderDebug, "MVPmat"),
+		glslMmat(shaderDebug, "Mmat"),
+		glslTextureDiffuseSampler(shaderDebug, "textureDiffuseSampler"),
+		glslTextureNormalSampler(shaderDebug, "textureNormalSampler"),
+		glslTextureAmbientSampler(shaderDebug, "textureAmbientSampler") {
+
+		//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
+		//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
+		//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
+		//	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
+		//	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
+		checkGL();
+
+		shaderDebug.use();
+		glslTextureDiffuseSampler = vl::gl::TextureType::diffuse;
+		glslTextureNormalSampler = vl::gl::TextureType::normal;
+		glslTextureAmbientSampler = vl::gl::TextureType::ambient;
+		checkGL();
+	}
+	void render();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+void Example::render() {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -95,21 +139,28 @@ void render(vl::gl::GL& gl) {
 	gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
 
 	// ---------------------------------------------------------------------------------------------
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glMultMatrixf(glm::value_ptr(gl.matrixMVP()));
 
-	texture0->bind(vl::gl::TextureType::diffuse);
+	shaderDebug.use();
+	checkGL();
+
+	glslMVPmat = gl.matrixMVP();
+	glslMmat = gl.matrixModel();
+
+	// TODO P4: Binding a texture to an uniform instead of TextureType sounds like a good idea.
+
+	texture0.bind(vl::gl::TextureType::diffuse);
+	texture1.bind(vl::gl::TextureType::normal);
+	texture2.bind(vl::gl::TextureType::ambient);
+	checkGL();
+
 	vl::gl::renderCube(-9, 0, 0, 4.0f);
-	texture0->unbind(vl::gl::TextureType::diffuse);
-	texture1->bind(vl::gl::TextureType::diffuse);
 	vl::gl::renderCube(0, 0, 0, 5.0f);
-	texture1->unbind(vl::gl::TextureType::diffuse);
-	texture2->bind(vl::gl::TextureType::diffuse);
 	vl::gl::renderCube(11, 0, 0, 6.0f);
-	texture2->unbind(vl::gl::TextureType::diffuse);
+
+	texture2.unbind(vl::gl::TextureType::ambient);
+	texture1.unbind(vl::gl::TextureType::normal);
+	texture0.unbind(vl::gl::TextureType::diffuse);
+	checkGL();
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -149,32 +200,6 @@ void init() {
 	initGLEW();
 	initGL();
 	initGLSL();
-
-	shaderDebug = std::make_shared<vl::gl::ShaderProgram>("debug0",
-			std::make_shared<vl::gl::ShaderVertex>("Data/Shader/debug0.vs"),
-			std::make_shared<vl::gl::ShaderFragment>("Data/Shader/debug0.fs"));
-
-	shaderDepth = std::make_shared<vl::gl::ShaderProgram>("depth0",
-			std::make_shared<vl::gl::ShaderVertex>("Data/Shader/depth.vs"),
-			std::make_shared<vl::gl::ShaderFragment>("Data/Shader/depth.fs"));
-
-	texture0 = std::make_shared<vl::gl::Texture>("Data/Texture/asteorid_02_diffuse.dds");
-	texture1 = std::make_shared<vl::gl::Texture>("Data/Texture/asteorid_02_normal.dds");
-	texture2 = std::make_shared<vl::gl::Texture>("Data/Texture/asteorid_02_ambient.dds");
-
-	//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
-	//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
-	//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
-	//	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
-	//	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
-}
-
-void term() {
-	shaderDebug.reset();
-	shaderDepth.reset();
-	texture0.reset();
-	texture1.reset();
-	texture2.reset();
 }
 
 int main(void) {
@@ -207,30 +232,32 @@ int main(void) {
 
 	init();
 
-	vl::gl::GL gl;
-	vl::Timer timer;
-	size_t time = 0, i = 0;
+	{
+		Example example;
 
-	while (!glfwWindowShouldClose(window)) {
-		checkGL();
-		render(gl);
+		vl::Timer timer;
+		size_t time = 0, i = 0;
 
-		/* Swap front and back buffers */
-		glfwSwapBuffers(window);
 
-		/* Poll for and process events */
-		glfwPollEvents();
+		while (!glfwWindowShouldClose(window)) {
+			checkGL();
+			example.render();
 
-		i++;
-		time += timer.time().count();
-		if (time > 1'000'000'000) {
-			VLOG_INFO(vl::log(), "FPS: %d", i);
-			i = 0;
-			time -= 1'000'000'000;
+			/* Swap front and back buffers */
+			glfwSwapBuffers(window);
+
+			/* Poll for and process events */
+			glfwPollEvents();
+
+			i++;
+			time += timer.time().count();
+			if (time > 1'000'000'000) {
+				VLOG_INFO(vl::log(), "FPS: %d", i);
+				i = 0;
+				time -= 1'000'000'000;
+			}
 		}
 	}
-
-	term();
 	glfwMakeContextCurrent(nullptr);
 	glfwTerminate();
 

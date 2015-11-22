@@ -3,10 +3,14 @@
 #pragma once
 
 // ext
+#include <boost/container/flat_map.hpp>
 #include <GL/glew.h>
 // std
 #include <memory>
 
+
+
+#include <iostream>
 // -------------------------------------------------------------------------------------------------
 
 namespace boost {
@@ -34,6 +38,10 @@ constexpr const char DEFAULT_SHADER_TYPE_NAME[] = "--default--";
 constexpr const char SHADER_TYPE_VERTEX_NAME[] = "vertex";
 constexpr const char SHADER_TYPE_GEOMETRY_NAME[] = "geometry";
 constexpr const char SHADER_TYPE_FRAGMENT_NAME[] = "fragment";
+
+// toString ----------------------------------------------------------------------------------------
+
+const char* shaderTypeToString(GLenum type);
 
 // Attribute ---------------------------------------------------------------------------------------
 
@@ -65,7 +73,7 @@ enum class Attribute : GLuint {
 
 //TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp)
 
-enum class TextureType : GLuint {
+enum class TextureType : uint32_t {
 	diffuse = 0,
 	normal = 1,
 	specular = 2,
@@ -109,15 +117,18 @@ public:
 			const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
 	BaseShader(
 			const char* data, size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+
+	void init(const char* source);
+private:
+	void loadGL(const char* source);
+	void unloadGL();
+
+public:
 	inline auto id() const {
 		return shaderID;
 	}
 
 	~BaseShader();
-
-private:
-	void loadGL(const char* source);
-	void unloadGL();
 };
 
 // ShaderHelper ------------------------------------------------------------------------------------
@@ -147,9 +158,19 @@ using ShaderFragment = detail::ShaderHelper<GL_FRAGMENT_SHADER, DEFAULT_SHADER_F
 // ShaderProgram -----------------------------------------------------------------------------------
 
 class ShaderProgram {
+	struct UniformInfo {
+		GLint location;
+		GLint index;
+		GLint size;
+		GLenum type;
+	};
 private:
 	GLuint programID = 0;
 	std::string name;
+
+private:
+//	boost::container::flat_map<std::string, UniformInfo> addressesAttribute;
+	boost::container::flat_map<std::string, UniformInfo> addressesUniform;
 
 private:
 	std::shared_ptr<BaseShader> shaderVertex;
@@ -172,7 +193,22 @@ public:
 
 private:
 	void loadGL();
+	void mapAttributes();
+	void mapUniforms();
 	void unloadGL();
+
+public:
+	void use();
+	//	inline GLuint id() const {
+	//		return programID;
+	//	}
+	inline GLint getActiveUniformLocation(const std::string& name) const {
+		try {
+			return addressesUniform.at(name).location;
+		} catch (const std::out_of_range& ex) { // <<< performance (it in an "init function" but still...)
+			return -1;
+		}
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

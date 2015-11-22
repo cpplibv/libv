@@ -1,12 +1,16 @@
+Colors:
+0.236f, 0.311f, 0.311f
+58, 255, 255
+Neat little page for similar and alternativ color picking: http://www.colorhexa.com/3affce
+
 Base class for lights and cameras...
 
 
 move everything from vl to libv
-vl([^a-zA-Z0-9_]|$)
-libv$1
+vl([^a-zA-Z0-9_]|$)			libv$1
 
-license
-https://www.youtube.com/watch?v=cJIi-hIlCQM
+
+license		https://www.youtube.com/watch?v=cJIi-hIlCQM
 be aware that i will need copyright for every contribution into vl
 
 
@@ -150,8 +154,6 @@ two phase lookup, what, why, how?
 
 -----
 CMake resource folder
-Move loadResource to Resource
-Texture
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
 Skeleton animation
 
@@ -172,16 +174,14 @@ http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 Adopt TCLAP http://tclap.sourceforge.net if suitable
 
-Contexted Resource
-
 vl::log(__VL_ERROR__, __VL_POC__, __VL_GL__, "msg", args...)
 struct vl::POC = position of code
+
 Beside Component's shared_ptr provide a way of non owning ptr which is visible at call:
 	container.add(testComponent, vl::non_owning); //simular as std::adopt_lock
+
 Timed Event / Timer Support / Timer thread
 Resettable and clearable timer / timer tasks
-Implement Latch / Barrier based on open standard
-
 
 Config Entry:
 	- default
@@ -191,24 +191,16 @@ Config Entry:
 	- type
 	- value
 
-
 Optimizing for prefetcher.
 Optimizing for minimum number of opengl bind.
 In ui static and dynamic render options for different components
 Resource pack
-The idea of dynamic renderer
-
 
 ----
 Fresnel shader - Atmosphere
 Cook-Torrance shader - Metal
 Minnaert - More depth?
 OrenNayar - More avg lambert
-
-
-
-
-
 
 
 > RANDOM
@@ -224,23 +216,12 @@ int rnd(int n, URNG &engine) {
 }
 
 
-
-
 diffuse(1.0f, 1.0f, 1.0f, 1.0f),
 specular(0.8f, 0.8f, 0.8f, 1.0f),
 emission(0.0f, 0.0f, 0.0f, 1.0f),
 ambient(0.1f, 0.1f, 0.1f, 1.0f),
 reflective(1.0f, 1.0f, 1.0f, 1.0f),
 shininess(32.0f) { }
-
-
-
-
-
-
-
-
-
 
 
 GLuint fullScreenQuadVBO;

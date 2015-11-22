@@ -17,17 +17,6 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-static const auto toString(GLenum type) {
-	if (type == GL_VERTEX_SHADER)
-		return SHADER_TYPE_VERTEX_NAME;
-	if (type == GL_GEOMETRY_SHADER)
-		return SHADER_TYPE_GEOMETRY_NAME;
-	if (type == GL_FRAGMENT_SHADER)
-		return SHADER_TYPE_FRAGMENT_NAME;
-
-	return DEFAULT_SHADER_TYPE_NAME;
-}
-
 static std::string readTextFile(const boost::filesystem::path& filePath) {
 	std::string result;
 	boost::filesystem::ifstream file;
@@ -46,6 +35,19 @@ static std::string readTextFile(const boost::filesystem::path& filePath) {
 	return result;
 }
 
+// toString ----------------------------------------------------------------------------------------
+
+const char* shaderTypeToString(GLenum type) {
+	if (type == GL_VERTEX_SHADER)
+		return SHADER_TYPE_VERTEX_NAME;
+	if (type == GL_GEOMETRY_SHADER)
+		return SHADER_TYPE_GEOMETRY_NAME;
+	if (type == GL_FRAGMENT_SHADER)
+		return SHADER_TYPE_FRAGMENT_NAME;
+
+	return DEFAULT_SHADER_TYPE_NAME;
+}
+
 // Shader --------------------------------------------------------------------------------------
 
 BaseShader::BaseShader(
@@ -61,7 +63,7 @@ BaseShader::BaseShader(
 	name(name) {
 
 	const auto data = readTextFile(filePath);
-	loadGL(data.data());
+	init(data.data());
 }
 
 BaseShader::BaseShader(
@@ -69,7 +71,11 @@ BaseShader::BaseShader(
 	type(type),
 	name(name) {
 
-	loadGL(data);
+	init(data);
+}
+
+void BaseShader::init(const char* source) {
+	loadGL(source);
 }
 
 BaseShader::~BaseShader() {
@@ -79,26 +85,22 @@ BaseShader::~BaseShader() {
 // -------------------------------------------------------------------------------------------------
 
 void BaseShader::loadGL(const char* source) {
-	VLOG_TRACE(vl::gl::log(), "GL Loading %s shader: [%s]", toString(type), name);
+	VLOG_TRACE(vl::gl::log(), "GL Loading %s shader: [%s]", shaderTypeToString(type), name);
 	shaderID = glCreateShader(type);
 
-	//			const auto sourcePtr = source.c_str();
-	//			glShaderSource(shaderID, 1, &sourcePtr, nullptr);
 	glShaderSource(shaderID, 1, &source, nullptr);
 	glCompileShader(shaderID);
 
 	if (!glGetShaderCompileStatus(shaderID)) {
-
 		VLOG_ERROR(vl::gl::log(), "Failed to compile %s shader [%s]: %s",
-				toString(type), name, glGetShaderCompileMessage(shaderID));
+				shaderTypeToString(type), name, glGetShaderCompileMessage(shaderID));
 		unloadGL();
 	}
 	checkGL();
 }
 
 void BaseShader::unloadGL() {
-
-	VLOG_TRACE(vl::gl::log(), "GL Unloading %s shader: [%s]", toString(type), name);
+	VLOG_TRACE(vl::gl::log(), "GL Unloading %s shader: [%s]", shaderTypeToString(type), name);
 	glDeleteShader(shaderID);
 	checkGL();
 }
@@ -114,14 +116,15 @@ ShaderProgram::ShaderProgram(
 	shaderVertex(shaderVertex),
 	shaderGeometry(shaderGeometry),
 	shaderFragment(shaderFragment) {
-
 	loadGL();
+	mapUniforms();
 }
 
 ShaderProgram::~ShaderProgram() {
-
 	unloadGL();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void ShaderProgram::loadGL() {
 	VLOG_TRACE(vl::gl::log(), "GL Loading shader program: [%s]", name);
@@ -137,11 +140,48 @@ void ShaderProgram::loadGL() {
 	glLinkProgram(programID);
 
 	if (!glGetProgamLinkStatus(programID)) {
-
 		VLOG_ERROR(vl::gl::log(), "Failed to link [%s]: %s", name, glGetProgamLinkMessage(programID));
 		unloadGL();
 	}
 	checkGL();
+}
+
+void ShaderProgram::mapAttributes() {
+	//	glGetProgramiv(programID, GL_ACTIVE_ATTRIBUTES, &count);
+	//	glGetActiveAttrib (shaderID, i, bufSize, &length, &size, &type, name);
+}
+
+void ShaderProgram::mapUniforms() {
+	if (!programID)
+		return;
+
+	GLint count;
+	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &count);
+	for (GLint i = 0; i < count; ++i) {
+		char uniformName[255];
+		GLint uniformNameLenght;
+		GLint uniformSize;
+		GLenum uniformType;
+		glGetActiveUniform(programID, i, sizeof (uniformName),
+				&uniformNameLenght, &uniformSize, &uniformType, uniformName);
+		uniformName[uniformNameLenght] = '\0';
+
+		if (uniformSize == 1) {
+			GLint uniformLocation = glGetUniformLocation(programID, uniformName);
+			addressesUniform.emplace(uniformName,
+					UniformInfo{uniformLocation, i, uniformSize, uniformType});
+		} else {
+			*std::strrchr(uniformName, '[') = '\0';
+			std::string uniformSubName;
+			for (int j = 0; j < uniformSize; j++) {
+				uniformSubName = vl::format("%s[%d]", uniformName, j);
+				GLint uniformLocation = glGetUniformLocation(programID, uniformSubName.c_str());
+
+				addressesUniform.emplace(uniformSubName,
+						UniformInfo{uniformLocation, i, uniformSize, uniformType});
+			}
+		}
+	}
 }
 
 void ShaderProgram::unloadGL() {
@@ -153,7 +193,11 @@ void ShaderProgram::unloadGL() {
 
 // -------------------------------------------------------------------------------------------------
 
+void ShaderProgram::use() {
+	glUseProgram(programID);
+}
 
+// -------------------------------------------------------------------------------------------------
 
 } //namespace gl
 } //namespace vl

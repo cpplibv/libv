@@ -61,10 +61,6 @@ public:
 public:
 	void bind(TextureType);
 	void unbind(TextureType);
-	//	inline GLuint getTextureID() const {
-	//		return textureID;
-	//	}
-
 };
 
 // -------------------------------------------------------------------------------------------------
