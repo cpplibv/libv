@@ -1,8 +1,9 @@
 // File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
 
+#include <vl/vec.hpp>
+
 #include <catch.hpp>
 #include <iostream>
-#include <vl/vec.hpp>
 
 using namespace vl;
 
@@ -19,12 +20,10 @@ TEST_CASE("unionValue") {
 	CHECK(42 == vec.x);
 	CHECK(42 == vec.r);
 	CHECK(42 == vec.s);
-	CHECK(42 == vec.u);
 	CHECK(42 == vec.ptr[0]);
 	CHECK(1 == vec.y);
 	CHECK(1 == vec.g);
 	CHECK(1 == vec.t);
-	CHECK(1 == vec.v);
 	CHECK(1 == vec.ptr[1]);
 	CHECK(2 == vec.z);
 	CHECK(2 == vec.b);
@@ -49,12 +48,10 @@ TEST_CASE("unionAddress") {
 	CHECK(&vec.x == &vec.ptr[0]);
 	CHECK(&vec.x == &vec.r);
 	CHECK(&vec.x == &vec.s);
-	CHECK(&vec.x == &vec.u);
 
 	CHECK(&vec.y == &vec.ptr[1]);
 	CHECK(&vec.y == &vec.g);
 	CHECK(&vec.y == &vec.t);
-	CHECK(&vec.y == &vec.v);
 
 	CHECK(&vec.z == &vec.ptr[2]);
 	CHECK(&vec.z == &vec.b);
