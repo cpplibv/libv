@@ -7,7 +7,8 @@
 namespace eos {
 
 	// this value is written to the top of the stream
-	const signed char magic_byte = 'l' ^ 'i' ^ 'b' ^ 'v';
+//	const signed char magic_byte = 'l' ^ 'i' ^ 'b' ^ 'v'; // <<< Signature change
+	const signed char magic_byte = 'e' | 'o' | 's';
 
 	// flag for fp serialization
 	const unsigned no_infnan = 64;

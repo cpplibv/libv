@@ -34,7 +34,7 @@ template<typename OArchive, typename IArchive>
 void modelArchiveTester(std::iostream& stream) {
 	Model model_orig;
 	Model model_target;
-	
+
 //	model_orig.set("numDim", 3);
 //	model_orig.set<std::string>("diffuseTexture", "diffuseTexture.dds");
 
@@ -44,7 +44,7 @@ void modelArchiveTester(std::iostream& stream) {
 	IArchive iar(stream);
 	iar >> BOOST_SERIALIZATION_NVP(model_target);
 
-	CHECK(model_orig.getName() == model_target.getName());
+	CHECK((model_orig.getName() == model_target.getName()));
 
 //	CHECK(!model_target.get<std::string>("notSet"));
 //	CHECK(model_target.get<int>("numDim"));

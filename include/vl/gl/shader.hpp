@@ -8,9 +8,6 @@
 // std
 #include <memory>
 
-
-
-#include <iostream>
 // -------------------------------------------------------------------------------------------------
 
 namespace boost {
@@ -43,60 +40,6 @@ constexpr const char SHADER_TYPE_FRAGMENT_NAME[] = "fragment";
 
 const char* shaderTypeToString(GLenum type);
 
-// Attribute ---------------------------------------------------------------------------------------
-
-enum class Attribute : GLuint {
-	position = 0,
-	psize = 1,
-	normal = 2,
-	diffuse = 3,
-	color0 = 3, //Same as DIFFUSE
-	specular = 4,
-	color1 = 4, //Same as SPECULAR
-	fogcoord = 5,
-	tessfactor = 5, //Same as FOG
-	boneweight = 6,
-	boneindices = 7,
-	texcoord0 = 8,
-	texcoord1 = 9,
-	texcoord2 = 10,
-	texcoord3 = 11,
-	texcoord4 = 12,
-	texcoord5 = 13,
-	texcoord6 = 14,
-	tangent = 14, //Same as TEX6
-	texcoord7 = 15,
-	bitangent = 15, //Same as TEX7
-};
-
-// TextureType -------------------------------------------------------------------------------------
-
-//TODO P2: Consider moving this to an other file? (and remove the includes from texture.hpp)
-
-enum class TextureType : uint32_t {
-	diffuse = 0,
-	normal = 1,
-	specular = 2,
-	emission = 3,
-	environment = 4,
-	pass = 5,
-	ambient = 6,
-	//	_7 = 7,
-	//	_8 = 8,
-	//	_9 = 9,
-	shadow0 = 10,
-	shadow1 = 11,
-	shadow2 = 12,
-	shadow3 = 13,
-	shadow4 = 14,
-	shadow5 = 15,
-	shadow6 = 16,
-	shadow7 = 17,
-	//	_18 = 18,
-	//	_19 = 19,
-	//	_20 = 20,
-};
-
 // BaseShader --------------------------------------------------------------------------------------
 
 /**
@@ -116,7 +59,7 @@ public:
 	BaseShader(
 			const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
 	BaseShader(
-			const char* data, size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+			const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
 
 	void init(const char* source);
 private:
@@ -143,7 +86,7 @@ struct ShaderHelper : public BaseShader {
 		BaseShader(filePath, TYPE) { }
 	ShaderHelper(const boost::filesystem::path& filePath, const std::string& name) :
 		BaseShader(filePath, TYPE, name) { }
-	ShaderHelper(const char* data, size_t size, const std::string& name = DEFAULT_NAME) :
+	ShaderHelper(const char* data, const size_t size, const std::string& name = DEFAULT_NAME) :
 		BaseShader(data, size, TYPE, name) { }
 };
 

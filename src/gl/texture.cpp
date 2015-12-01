@@ -5,34 +5,15 @@
 // ext
 #include <boost/asio/buffer.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/fstream.hpp>
 #include <GL/glew.h>
 #include <gli/gli.hpp>
+// vl
+#include <vl/read_file.hpp>
 // pro
 #include <vl/gl/log.hpp>
 
 namespace vl {
 namespace gl {
-
-// -------------------------------------------------------------------------------------------------
-
-static std::string readBinaryFile(const boost::filesystem::path& filePath) {
-	std::string result;
-	boost::filesystem::ifstream file;
-	file.open(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
-
-	if (!file) {
-		VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", filePath.string());
-		return result;
-	}
-
-	std::ostringstream buffer;
-	buffer << file.rdbuf();
-	file.close();
-	result = buffer.str();
-
-	return result;
-}
 
 // Texture -----------------------------------------------------------------------------------------
 
@@ -44,11 +25,11 @@ Texture::Texture(const boost::filesystem::path& filePath) :
 
 Texture::Texture(const boost::filesystem::path& filePath, const std::string& name) :
 	name(name) {
-	const auto data = readBinaryFile(filePath);
+	const auto data = readFile(filePath, std::ios_base::binary);
 	init(data.data(), data.size());
 }
 
-Texture::Texture(const char* data, size_t size, const std::string& name) :
+Texture::Texture(const char* data, const size_t size, const std::string& name) :
 	name(name) {
 	init(data, size);
 }
@@ -59,7 +40,7 @@ Texture::~Texture() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Texture::init(const char* data, size_t size) {
+void Texture::init(const char* data, const size_t size) {
 	if (!data || size <= sizeof(gli::detail::ddsHeader)) {
 		VLOG_WARN(vl::gl::log(), "Invalid texture data: [%s]", name);
 		texture.reset();

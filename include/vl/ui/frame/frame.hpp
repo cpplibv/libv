@@ -5,9 +5,10 @@
 // conf
 #include <vl/ui/config.hpp>
 // vl
-#include <vl/worker_thread.hpp>
+#include <vl/memory.hpp>
 #include <vl/sig/signal.hpp>
 #include <vl/timer.hpp>
+#include <vl/worker_thread.hpp>
 // std
 #include <atomic>
 #include <condition_variable>
@@ -305,7 +306,8 @@ public:
 	void setOpenGLSamples(int samples);
 	void setOpenGLVersion(int major, int minor);
 
-	void setContent(ComponentPtr content);
+	void setContent(const observer_ptr<Component>& content);
+	void setContent(const shared_ptr<Component>& content);
 	void setCloseOperation(const TypeCloseOperation& operation);
 	void setDecoration(bool decorated);
 	void setDisplayMode(const TypeDisplayMode& mode);
@@ -315,7 +317,7 @@ public:
 	void setSize(int x, int y);
 	void setTitle(const std::string& title);
 
-	ComponentPtr getContent();
+	observer_ptr<Component> getContent();
 	TypeCloseOperation getCloseOperation() const;
 	TypeDisplayMode getDisplayMode() const;
 	ivec2 getSize() const;

@@ -15,18 +15,18 @@
 
 using namespace vl;
 using namespace vl::ui;
+
 class TestFrame : public Frame {
 	Panel pn;
 	Label lbl;
 
 	void init() {
 		lbl.setText("Hello UI!");
-		setContent(pn);
-		pn.add(lbl);
+		setContent(make_observer(&pn));
+		pn.add(make_observer(&lbl));
 	}
 
 public:
-
 	TestFrame(const std::string& title) :
 		Frame(title) {
 		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize() / 2);
@@ -55,7 +55,7 @@ public:
 int main(int, char**) {
 	vl::log().output(std::cout);
 	TestFrame f1("TestFrame");
-	f1.onChar([](const EventChar & e) {
+	f1.onChar.output([](const EventChar & e) {
 		std::cout << e.utf8 << std::endl;
 	});
 	f1.join();
@@ -64,9 +64,9 @@ int main(int, char**) {
 
 // -------------------------------------------------------------------------------------------------
 
-//#define GLFW_PRESS 1
-//#define GLFW_KEY_ESCAPE 1
-//
+////#define GLFW_PRESS 1
+////#define GLFW_KEY_ESCAPE 1
+////
 //class MyFrame : public Frame,
 //public ListenerChar, public ListenerCursorEnter, public ListenerCursorPos,
 //public ListenerFramebufferSize, public ListenerKey, public ListenerMouseButton,

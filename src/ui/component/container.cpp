@@ -13,11 +13,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void ProtectedContainer::add(ComponentPtr component) {
+void ProtectedContainer::add(const observer_ptr<Component>& component){
 	assert(!component->getParent());
 
 	component->setParent(this);
-	components.emplace_back(std::move(component));
+	components.emplace_back(component);
+}
+void ProtectedContainer::add(const shared_ptr<Component>& component){
+	assert(!component->getParent());
+
+	component->setParent(this);
+	components.emplace_back(component);
 }
 
 //void ProtectedContainer::remove(ComponentPtr component) {

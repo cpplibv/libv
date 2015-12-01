@@ -81,11 +81,11 @@ Vertex::Vertex(const vec3& position, const vec3& normal, const vec3& tangent,
 RenderPrimitiv::RenderPrimitiv() :
 	first(0), count(0) { }
 
-RenderPrimitiv::RenderPrimitiv(unsigned int first, unsigned int count) :
+RenderPrimitiv::RenderPrimitiv(size_t first, size_t count) :
 	first(first), count(count) { }
 
 void RenderPrimitiv::render() {
-	glDrawArrays(GL_TRIANGLES, first, count);
+	glDrawArrays(GL_TRIANGLES, static_cast<GLsizei>(first), static_cast<GLint>(count));
 }
 
 } //namespace ui

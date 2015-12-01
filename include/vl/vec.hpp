@@ -9,9 +9,16 @@
 
 //TODO P1: glm implicit cast for vec
 //TODO P1: vec implicit cast for glm
+//TODO PMSVC: Disable warnings for nameless struct on MSVC
+//#pragma warning(push)
+//#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
+//#pragma warning(pop)
+
+//TODO P3: remove static_casts from the vecs
 //TODO P5: perfect forwarding for constructors
 //TODO P5: conditional noexcept
 //TODO P5: macro for debug asserts
+//TODO P5: make sure every function is sfiane frendly
 
 namespace vl {
 
@@ -71,6 +78,10 @@ namespace vl {
 
 // vec_base_t --------------------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-pedantic"
+// nonstandard extension used : nameless struct/union
+
 template <size_t N, typename T> struct vec_base_t {
 	T ptr[N];
 
@@ -89,7 +100,8 @@ template <typename T> struct vec_base_t<2, T> {
 		T ptr[2];
 	};
 
-	explicit vec_base_t(T x = 0, T y = 0) noexcept : x(x), y(y) { }
+	explicit vec_base_t() noexcept : x(), y() { }
+	explicit vec_base_t(T x, T y) noexcept : x(x), y(y) { }
 
 	implement_vec2_to_vec2_gets
 	implement_vec2_to_vec3_gets
@@ -106,9 +118,10 @@ template <typename T> struct vec_base_t<3, T> {
 		T ptr[3];
 	};
 
-	explicit vec_base_t(T x = 0, T y = 0, T z = 0) noexcept : x(x), y(y), z(z) { }
+	explicit vec_base_t() noexcept : x(), y(), z() { }
+	explicit vec_base_t(T x, T y, T z) noexcept : x(x), y(y), z(z) { }
 	explicit vec_base_t(T x, const vec_base_t<2, T>& yz) noexcept : x(x), y(yz.x), z(yz.y) { }
-	explicit vec_base_t(const vec_base_t<2, T>& xy, T z = 0) noexcept : x(xy.x), y(xy.y), z(z) { }
+	explicit vec_base_t(const vec_base_t<2, T>& xy, T z) noexcept : x(xy.x), y(xy.y), z(z) { }
 
 	implement_vec3_to_vec2_gets
 	implement_vec3_to_vec3_gets
@@ -126,12 +139,13 @@ template <typename T> struct vec_base_t<4, T> {
 		T ptr[4];
 	};
 
-	explicit vec_base_t(T x = 0, T y = 0, T z = 0, T w = 0) noexcept : x(x), y(y), z(z), w(w) { }
-	explicit vec_base_t(const vec_base_t<2, T>& xy, T z = 0, T w = 0) noexcept : x(xy.x), y(xy.y), z(z), w(w) { }
-	explicit vec_base_t(T x, const vec_base_t<2, T>& yz, T w = 0) noexcept : x(x), y(yz.x), z(yz.y), w(w) { }
+	explicit vec_base_t() noexcept : x(), y(), z(), w() { }
+	explicit vec_base_t(T x, T y, T z, T w) noexcept : x(x), y(y), z(z), w(w) { }
+	explicit vec_base_t(const vec_base_t<2, T>& xy, T z, T w) noexcept : x(xy.x), y(xy.y), z(z), w(w) { }
+	explicit vec_base_t(T x, const vec_base_t<2, T>& yz, T w) noexcept : x(x), y(yz.x), z(yz.y), w(w) { }
 	explicit vec_base_t(T x, T y, const vec_base_t<2, T>& zw) noexcept : x(x), y(y), z(zw.x), w(zw.y) { }
 	explicit vec_base_t(const vec_base_t<2, T>& xy, const vec_base_t<2, T>& zw) noexcept : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
-	explicit vec_base_t(const vec_base_t<3, T>& xyz, T w = 0) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
+	explicit vec_base_t(const vec_base_t<3, T>& xyz, T w) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	explicit vec_base_t(T x, const vec_base_t<3, T>& yzw) noexcept : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 
 	implement_vec4_to_vec2_gets
@@ -139,6 +153,7 @@ template <typename T> struct vec_base_t<4, T> {
 	implement_vec4_to_vec4_gets
 };
 
+#pragma GCC diagnostic pop
 // vec_helper_t forward ----------------------------------------------------------------------------
 
 template <size_t N, typename T, typename = std::make_index_sequence<N>>
@@ -186,23 +201,20 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 
 	using vec_base_t<N, T>::vec_base_t;
 
+	inline vec_helper_t() : vec_base_t<N, T>() { }
+
+	// cast ----------------------------------------------------------------------------------------
+
 	template<typename K>
-	explicit vec_helper_t(const vec_helper_t<N, K>& rhs) :
-		vec_base_t<N, T>(static_cast<T>(rhs.ptr[Indices])...){}
+	inline operator vec_helper_t<N, K>() { // explicit ?
+		return vec_helper_t<N, K>(static_cast<K>(this->ptr[Indices])...);
+	}
 
 	// operator= -----------------------------------------------------------------------------------
 
 	inline vec_helper_t<N, T>& operator=(const vec_helper_t<N, T>& rhs) noexcept {
 		(void) std::initializer_list<int>{
 			((void) (this->ptr[Indices] = rhs.ptr[Indices]), 0)...
-		};
-		return *this;
-	}
-
-	template<typename K>
-	inline vec_helper_t<N, T>& operator=(const vec_helper_t<N, T>& rhs) noexcept {
-		(void) std::initializer_list<int>{
-			((void) (this->ptr[Indices] = static_cast<T>(rhs.ptr[Indices])), 0)...
 		};
 		return *this;
 	}
@@ -447,7 +459,7 @@ inline bool operator>=(const K& lhs, const vec_helper_t<N, T>& rhs) noexcept {
 
 // operator<<(ostream, vec) ------------------------------------------------------------------------
 
-template<size_t N, typename T, typename K, size_t... Indices>
+template<size_t N, typename T, size_t... Indices>
 inline std::ostream& operator<<(
 	std::ostream& os, const vec_helper_t<N, T, std::index_sequence<Indices...>>& v) {
 	(void) std::initializer_list<int>{
@@ -479,10 +491,6 @@ template <typename T> using vec2_t = vec_t<2, T>;
 template <typename T> using vec3_t = vec_t<3, T>;
 template <typename T> using vec4_t = vec_t<4, T>;
 
-using vec2 = vec2_t<float>;
-using vec3 = vec3_t<float>;
-using vec4 = vec4_t<float>;
-
 using fvec2 = vec2_t<float>;
 using fvec3 = vec3_t<float>;
 using fvec4 = vec4_t<float>;
@@ -495,5 +503,9 @@ using ivec4 = vec4_t<int32_t>;
 using lvec2 = vec2_t<int64_t>;
 using lvec3 = vec3_t<int64_t>;
 using lvec4 = vec4_t<int64_t>;
+
+using vec2 = vec2_t<float>;
+using vec3 = vec3_t<float>;
+using vec4 = vec4_t<float>;
 
 } //namespace vl

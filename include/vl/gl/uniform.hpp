@@ -6,8 +6,8 @@
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
 // pro
-//#include <vl/gl/light.hpp>
 #include <vl/gl/shader.hpp>
+#include <vl/gl/gl.hpp>
 
 namespace vl {
 namespace gl {
@@ -83,40 +83,13 @@ template <typename T>
 class Uniform {
 private:
 	GLint location;
-//	std::string name;
 public:
 	Uniform(const ShaderProgram& shaderProgram, const std::string& name) :
 		location(shaderProgram.getActiveUniformLocation(name)) { }
-//		location(shaderProgram.getActiveUniformLocation(name)),
-//		name(name) { }
 	inline void operator=(const T& val) {
-		glUniform(location, val);
+		vl::gl::glUniform(location, val);
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-//struct UniformLight {
-//	Uniform<int> type;
-//	Uniform<bool> enabled;
-//
-//	Uniform<glm::vec3> position;
-//	Uniform<glm::vec3> direction;
-//	Uniform<glm::vec4> diffuse;
-//	Uniform<glm::vec4> specular;
-//
-//	Uniform<double> range;
-//	Uniform<double> intensity;
-//	Uniform<double> innerCosAngle;
-//	Uniform<double> outerCosAngle;
-//
-//	Uniform<bool> shadowCast;
-//	Uniform<int> shadowMapSampler;
-//	Uniform<glm::mat4> shadowMVPTmat;
-//
-//	UniformLight(const std::string& name);
-//	void operator=(const Light &v);
-//};
 
 // -------------------------------------------------------------------------------------------------
 

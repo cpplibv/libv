@@ -17,7 +17,7 @@ namespace vl {
 			static void importMaterials(Model& model, const aiScene* scene);
 			static void importMeshes(Model& model, const aiScene* scene);
 			static void importNodes(Model& model, const aiScene* scene);
-			static void importNodes(Model& model, const aiScene* scene, uint16_t nodeID, const aiNode* nd);
+			static void importNodes(Model& model, const aiScene* scene, uint32_t nodeID, const aiNode* nd);
 			static void importLod(Model& model, const aiScene* scene);
 			static void importGeometry(Model& model, const aiScene* scene);
 		public:

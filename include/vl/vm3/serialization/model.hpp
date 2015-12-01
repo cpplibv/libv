@@ -15,25 +15,33 @@
 namespace vl {
 namespace vm3 {
 
+constexpr const char VM3_MODEL_MAGIC_BYTE[] = "d99575d0-ddf8-4462-8338-0f6755913d73/VM3";
+
+// -------------------------------------------------------------------------------------------------
+
 struct ModelSerialization {
 	template<typename Archive>
 	static inline void serialize(Archive& ar, ::vl::vm3::Model& var, const unsigned int) {
 		ar & VL_NVP_NAMED("name", var.name);
 		ar & VL_NVP_NAMED("materials", var.materials);
 		ar & VL_NVP_NAMED("meshes", var.meshes);
-//		ar & VL_NVP_NAMED("nodes", var.nodes);
-//		ar & VL_NVP_NAMED("rootNode", var.rootNode);
 		ar & VL_NVP_NAMED("nodes", var.nodes);
+		//		ar & VL_NVP_NAMED("rootNode", var.rootNode);
 		ar & VL_NVP_NAMED("lods", var.lods);
 		ar & VL_NVP_NAMED("vertices", var.vertices);
 		ar & VL_NVP_NAMED("indices", var.indices);
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace vm3
 } //namespace vl
-#include <iostream>
+
 namespace boost {
 namespace serialization {
+
+// -------------------------------------------------------------------------------------------------
 template<typename Archive>
 void serialize(Archive& ar, ::vl::vm3::Vertex& var, const unsigned int) {
 	ar & VL_NVP_NAMED("position", var.position);
@@ -71,5 +79,8 @@ template<typename Archive>
 void serialize(Archive& ar, ::vl::vm3::Model& var, const unsigned int ver) {
 	::vl::vm3::ModelSerialization::serialize(ar, var, ver);
 }
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace boost
 } //namespace serialization

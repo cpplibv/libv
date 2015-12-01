@@ -1,15 +1,18 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
-#include <iostream>
-#include <sstream>
-#include <fstream>
-
+// ext
 //#include <boost/serialization/serialization.hpp>
 //#include <boost/archive/portable_iarchive.hpp>
 //#include <boost/archive/portable_oarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
-
+// vl
+#include <vl/read_file.hpp>
+// std
+#include <iostream>
+#include <sstream>
+#include <fstream>
+// pro
 //#include <vl/vm3/material.hpp>
 //#include <vl/vm3/material_property_visitor.hpp>
 //#include <vl/vm3/model.hpp>
@@ -56,8 +59,8 @@ int main(int, char **) {
 		model.save(ofs);
 	}
 	{
-		std::ifstream ifs("test_file_bin", std::ios_base::binary);
-		model.load(ifs);
+		auto data = vl::readFile("test_file_bin", std::ios_base::binary);
+		model.load(data.data(), data.size());
 	}
 
 	MaterialPropertyPrinter printer;

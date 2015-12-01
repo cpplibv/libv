@@ -29,7 +29,7 @@ class Argument : public ArgumentBase {
 	bool _set = false;
 public:
 	Argument(const std::string& argument) : ArgumentBase(argument) { }
-	void setValue(const std::string& newValue) {
+	virtual void setValue(const std::string& newValue) override {
 		_set = true;
 		std::stringstream(newValue) >> _value;
 	}
@@ -51,7 +51,7 @@ class Argument<std::string> : public ArgumentBase {
 	bool _set = false;
 public:
 	Argument(const std::string& argument) : ArgumentBase(argument) { }
-	void setValue(const std::string& newValue) {
+	virtual void setValue(const std::string& newValue) override {
 		_set = true;
 		_value = newValue;
 	}

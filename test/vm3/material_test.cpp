@@ -64,8 +64,8 @@ TEST_CASE("materialPropertyGetProxy") {
 	auto resultBad = material.get<std::string>("notSet");
 	auto resultGood = material.get<std::string>("diffuseTexture");
 
-	CHECK(resultBad == false);
-	CHECK(resultGood == true);
+	CHECK_FALSE(resultBad);
+	CHECK(resultGood);
 	CHECK(*resultGood == "diffuseTexture.dds");
 }
 
@@ -85,14 +85,14 @@ void materialArchiveTester(std::iostream& stream) {
 	IArchive iar(stream);
 	iar >> BOOST_SERIALIZATION_NVP(material_target);
 
-	CHECK(material_orig.getName() == material_target.getName());
-	CHECK(material_orig.getShader() == material_target.getShader());
+	CHECK((material_orig.getName() == material_target.getName()));
+	CHECK((material_orig.getShader() == material_target.getShader()));
 
 	CHECK(!material_target.get<std::string>("notSet"));
 	CHECK(material_target.get<int>("numDim"));
-	CHECK(*material_target.get<int>("numDim") == 3);
+	CHECK((*material_target.get<int>("numDim") == 3));
 	CHECK(material_target.get<std::string>("diffuseTexture"));
-	CHECK(*material_target.get<std::string>("diffuseTexture") == "diffuseTexture.dds");
+	CHECK((*material_target.get<std::string>("diffuseTexture") == "diffuseTexture.dds"));
 }
 
 TEST_CASE("materialSerializationWithArchives") {

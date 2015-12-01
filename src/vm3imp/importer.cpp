@@ -7,6 +7,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
+#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 // vl
 #include <vl/vec.hpp>
@@ -123,7 +124,7 @@ void Importer::importNodes(Model& model, const aiScene* scene) {
 	model.nodes[0].transformation *= glm::scale(glm::vec3(100, 100, 100));
 }
 
-void Importer::importNodes(Model& model, const aiScene* scene, uint16_t nodeID, const aiNode* aiNode) {
+void Importer::importNodes(Model& model, const aiScene* scene, uint32_t nodeID, const aiNode* aiNode) {
 	model.nodes[nodeID].parentID = 0;
 	model.nodes[nodeID].name = aiNode->mName.C_Str();
 	aiMatrix4x4 m = aiNode->mTransformation;
@@ -139,10 +140,12 @@ void Importer::importNodes(Model& model, const aiScene* scene, uint16_t nodeID, 
 	}
 
 	for (unsigned int i = 0; i < aiNode->mNumChildren; i++) {
+		uint32_t childNodeID = static_cast<uint32_t>(model.nodes.size() - 1);
+
 		model.nodes.emplace_back();
 		model.nodes[model.nodes.size() - 1].parentID = nodeID;
-		model.nodes[nodeID].childrenIDs.push_back(model.nodes.size() - 1);
-		importNodes(model, scene, model.nodes.size() - 1, aiNode->mChildren[i]);
+		model.nodes[nodeID].childrenIDs.push_back(childNodeID);
+		importNodes(model, scene, childNodeID, aiNode->mChildren[i]);
 	}
 }
 

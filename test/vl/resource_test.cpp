@@ -14,8 +14,6 @@ using namespace vl;
 
 TEST_CASE("Cache comparator can handle ignore option for single argument") {
 
-	for (int i = 0; i < 500000; i++) {
-
 	ResourceService rs;
 	LoaderCache<TestResource> rc;
 	auto r0 = rc.get<use < 1 >> (&rs, 1);
@@ -28,5 +26,4 @@ TEST_CASE("Cache comparator can handle ignore option for single argument") {
 
 	CHECK(r0->depsLoaded == true);
 	CHECK(r1->depsLoaded == true);
-	}
 }

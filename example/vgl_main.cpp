@@ -75,7 +75,6 @@ static void error_callback(int code, const char* description) {
 }
 
 // -------------------------------------------------------------------------------------------------
-
 struct Example {
 	vl::gl::GL gl;
 	vl::gl::ShaderProgram shaderDebug;
@@ -83,7 +82,11 @@ struct Example {
 	vl::gl::Texture texture0;
 	vl::gl::Texture texture1;
 	vl::gl::Texture texture2;
-	//vl::gl::Model model0, model1, model2, model3, model4;
+	vl::gl::Model model0;
+	vl::gl::Model model1;
+	vl::gl::Model model2;
+	vl::gl::Model model3;
+	vl::gl::Model model4;
 
 	vl::gl::Uniform<glm::mat4> glslMVPmat;
 	vl::gl::Uniform<glm::mat4> glslMmat;
@@ -102,17 +105,17 @@ struct Example {
 		texture1("Data/Texture/asteorid_02_normal.dds"),
 		texture2("Data/Texture/asteorid_02_ambient.dds"),
 
+		model0("Data/Model/test_group.dae.pb.vm3"),
+		model1("Data/Model/fighter_01_eltanin.dae.pb.vm3"),
+		model2("Data/Model/test_sp.dae.pb.vm3"),
+		model3("Data/Model/projectile_missile_01_hellfire.0001.dae.pb.vm3"),
+		model4("Data/Model/asteroid_02.dae.pb.vm3"),
+
 		glslMVPmat(shaderDebug, "MVPmat"),
 		glslMmat(shaderDebug, "Mmat"),
 		glslTextureDiffuseSampler(shaderDebug, "textureDiffuseSampler"),
 		glslTextureNormalSampler(shaderDebug, "textureNormalSampler"),
 		glslTextureAmbientSampler(shaderDebug, "textureAmbientSampler") {
-
-		//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
-		//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
-		//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
-		//	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
-		//	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
 		checkGL();
 
 		shaderDebug.use();
@@ -148,44 +151,44 @@ void Example::render() {
 
 	// TODO P4: Binding a texture to an uniform instead of TextureType sounds like a good idea.
 
+	// ---------------------------------------------------------------------------------------------
+
+	//	texture0.bind(vl::gl::TextureType::diffuse);
+	//	texture1.bind(vl::gl::TextureType::normal);
+	//	texture2.bind(vl::gl::TextureType::ambient);
+	//	checkGL();
+	//
+	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
+	//	vl::gl::renderCube(0, 0, 0, 5.0f);
+	//	vl::gl::renderCube(11, 0, 0, 6.0f);
+	//
+	//	texture2.unbind(vl::gl::TextureType::ambient);
+	//	texture1.unbind(vl::gl::TextureType::normal);
+	//	texture0.unbind(vl::gl::TextureType::diffuse);
+	//	checkGL();
+
+	// ---------------------------------------------------------------------------------------------
+
 	texture0.bind(vl::gl::TextureType::diffuse);
 	texture1.bind(vl::gl::TextureType::normal);
 	texture2.bind(vl::gl::TextureType::ambient);
-	checkGL();
 
-	vl::gl::renderCube(-9, 0, 0, 4.0f);
-	vl::gl::renderCube(0, 0, 0, 5.0f);
-	vl::gl::renderCube(11, 0, 0, 6.0f);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -20));
+	model0.render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model1.render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model2.render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model3.render(gl);
+	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
+	model4.render(gl);
 
 	texture2.unbind(vl::gl::TextureType::ambient);
 	texture1.unbind(vl::gl::TextureType::normal);
 	texture0.unbind(vl::gl::TextureType::diffuse);
-	checkGL();
 
 	// ---------------------------------------------------------------------------------------------
-
-	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -16));
-	//	model1->render(gl);
-	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
-	//	model2->render(gl);
-	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
-	//	model3->render(gl);
-	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
-	//	model4->render(gl);
-	//
-	//	vl::glsl::textureDiffuseSampler = static_cast<uint32_t> (vl::gl::TextureType::diffuse);
-	//	vl::glsl::textureNormalSampler = static_cast<uint32_t> (vl::gl::TextureType::normal);
-	//	vl::glsl::textureAmbientSampler = static_cast<uint32_t> (vl::gl::TextureType::ambient);
-	//
-	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
-	//	gl.matrixModel() *= glm::scale(glm::vec3(3, 3, 3));
-	//	texture1->bind(vl::gl::TextureType::diffuse); //d
-	//	texture2->bind(vl::gl::TextureType::normal); //n
-	//	texture3->bind(vl::gl::TextureType::ambient); //a
-	//	model5->render(gl);
-	//	texture3->unbind(vl::gl::TextureType::ambient); //a
-	//	texture2->unbind(vl::gl::TextureType::normal); //n
-	//	texture1->unbind(vl::gl::TextureType::diffuse); //d
 
 	gl.popMatrixModel();
 	gl.popMatrixView();

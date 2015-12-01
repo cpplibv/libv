@@ -8,6 +8,9 @@
 
 namespace boost {
 namespace serialization {
+
+// -------------------------------------------------------------------------------------------------
+
 template<typename Archive, typename T, ::glm::precision P>
 inline void serialize(Archive& ar, ::glm::tvec2<T, P>& var, const unsigned int) {
 	ar & VL_NVP_NAMED("x", var.x);
@@ -38,5 +41,8 @@ template<typename Archive, typename T, ::glm::precision P>
 inline void serialize(Archive& ar, ::glm::tmat4x4<T, P>& var, const unsigned int) {
 	ar & VL_NVP_NAMED("mat4x4", boost::serialization::make_array(&var[0], var.length()));
 }
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace serialization
 } //namespace boost

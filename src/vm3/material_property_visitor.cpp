@@ -10,7 +10,7 @@ namespace vl {
 
 #define VM3_PROPERTY_VISITOR_TYPE_HELPER(TYPE) \
 		void MaterialPropertyPrinter::visit(const std::string& name, const TYPE& value) { \
-			stream << name << ": " << value << std::endl; } 
+			stream << name << ": " << value << std::endl; }
 
 		VM3_PROPERTY_VISITOR_TYPE_HELPER(int)
 		VM3_PROPERTY_VISITOR_TYPE_HELPER(float)

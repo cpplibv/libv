@@ -14,17 +14,10 @@ out vec4 color;
 
 void main() {
 	vec3 normal = normalize(fragmentNormalW);
-	//color = texture2D( textureDiffuseSampler, fragmentUV ).rgba * fragmentColor;
-	//color = fragmentColor;
 
-	//color = material.diffuse * (vec4(fragmentNormal * 0.5 + vec3(0.5, 0.5, 0.5), 1));
-	//color = vec4(normal * 0.5 + vec3(0.5, 0.5, 0.5), 1);
 	vec4 diffuseTex = texture2D(textureDiffuseSampler, fragmentUV, 0).rgba;
 	vec4 ambientTex = texture2D(textureAmbientSampler, fragmentUV, 0).rgba;
 	vec4 normalTex = texture2D(textureNormalSampler, fragmentUV, 0).rgba;
 
-	//color = diffuseTex * ambientTex; // + normalTex;
-	color = diffuseTex * ambientTex + normalTex;
-	//color = diffuseTex * ambientTex + normalTex;
-	//color = vec4(1, 0, 0, 0.5);
+	color = diffuseTex * ambientTex;
 }

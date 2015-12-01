@@ -36,10 +36,10 @@ public:
 		static AccumulatorLogicalAnd<T> instance;
 		return &instance;
 	}
-	virtual T begin() {
+	virtual T begin() override {
 		return 1;
 	}
-	virtual bool add(T& result, const T& value) {
+	virtual bool add(T& result, const T& value) override {
 		result = result && value;
 		return false;
 	}
@@ -52,10 +52,10 @@ public:
 		static AccumulatorLogicalOr<T> instance;
 		return &instance;
 	}
-	virtual T begin() {
+	virtual T begin() override {
 		return 1;
 	}
-	virtual bool add(T& result, const T& value) {
+	virtual bool add(T& result, const T& value) override {
 		result = result || value;
 		return false;
 	}

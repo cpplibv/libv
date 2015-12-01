@@ -33,7 +33,7 @@ namespace vl {
 				assert(ptr != nullptr);
 				return *ptr = std::forward<K>(v);
 			}
-			operator bool() const {
+			explicit operator bool() const {
 				return ptr != nullptr;
 			}
 		};

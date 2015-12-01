@@ -34,7 +34,7 @@ int main(int, char**) {
 	f1.setPosition(400, 300);
 	f1.show();
 
-	f1.onChar([](const EventChar & e) {
+	f1.onChar.output([](const EventChar & e) {
 		std::cout << e.unicode << std::endl;
 	});
 

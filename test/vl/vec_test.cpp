@@ -82,12 +82,15 @@ TEST_CASE("dimMacro") {
 }
 
 TEST_CASE("ctor") {
+	vec2 vec2d;
 	vec2 vec20(1, 2);
 	vec2 vec21(vec20);
+	vec3 vec3d;
 	vec3 vec30(1, 2, 3);
 	vec3 vec31(1, vec20);
 	vec3 vec32(vec20, 3);
 	vec3 vec33(vec30);
+	vec4 vec4d;
 	vec4 vec40(1, 2, 3, 4);
 	vec4 vec41(vec20, 3, 4);
 	vec4 vec42(1, vec20, 4);
@@ -97,12 +100,15 @@ TEST_CASE("ctor") {
 	vec4 vec46(1, vec30);
 	vec4 vec47(vec40);
 
+	CHECK(vec2d == vec2(0, 0));
 	CHECK(vec20 == vec2(1, 2));
 	CHECK(vec21 == vec2(1, 2));
+	CHECK(vec3d == vec3(0, 0, 0));
 	CHECK(vec30 == vec3(1, 2, 3));
 	CHECK(vec31 == vec3(1, 1, 2));
 	CHECK(vec32 == vec3(1, 2, 3));
 	CHECK(vec33 == vec3(1, 2, 3));
+	CHECK(vec4d == vec4(0, 0, 0, 0));
 	CHECK(vec40 == vec4(1, 2, 3, 4));
 	CHECK(vec41 == vec4(1, 2, 3, 4));
 	CHECK(vec42 == vec4(1, 1, 2, 4));

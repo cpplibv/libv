@@ -7,7 +7,7 @@
 // std
 #include <memory>
 // pro
-#include <vl/gl/shader.hpp> // only for TextureType
+#include <vl/gl/gl.hpp>
 #include <vl/gl/types.hpp>
 
 // -------------------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ private:
 	std::string name;
 
 private:
-	void init(const char* data, size_t size);
+	void init(const char* data, const size_t size);
 	void loadGL();
 	void unloadGL();
 
@@ -55,7 +55,7 @@ public:
 	Texture(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_TEXTURE_NAME);
 	Texture(const boost::filesystem::path& filePath);
 	Texture(const boost::filesystem::path& filePath, const std::string& name);
-	Texture(const char* data, size_t size, const std::string& name = DEFAULT_TEXTURE_NAME);
+	Texture(const char* data, const size_t size, const std::string& name = DEFAULT_TEXTURE_NAME);
 
 	~Texture();
 public:

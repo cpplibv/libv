@@ -101,7 +101,7 @@ namespace vl {
 	} //namespace vm3
 } //namespace vl
 
-BOOST_SERIALIZATION_SPLIT_FREE(::vl::vm3::Material);
+BOOST_SERIALIZATION_SPLIT_FREE(::vl::vm3::Material)
 
 namespace boost {
 	namespace serialization {

@@ -8,6 +8,7 @@ Base class for lights and cameras...
 
 move everything from vl to libv
 vl([^a-zA-Z0-9_]|$)			libv$1
+VL([^a-zA-Z0-9_]|$)			LIBV$1
 
 
 license		https://www.youtube.com/watch?v=cJIi-hIlCQM
@@ -215,6 +216,27 @@ int rnd(int n, URNG &engine) {
     return dist(engine, params);
 }
 
+//struct UniformLight {
+//	Uniform<int> type;
+//	Uniform<bool> enabled;
+//
+//	Uniform<glm::vec3> position;
+//	Uniform<glm::vec3> direction;
+//	Uniform<glm::vec4> diffuse;
+//	Uniform<glm::vec4> specular;
+//
+//	Uniform<double> range;
+//	Uniform<double> intensity;
+//	Uniform<double> innerCosAngle;
+//	Uniform<double> outerCosAngle;
+//
+//	Uniform<bool> shadowCast;
+//	Uniform<int> shadowMapSampler;
+//	Uniform<glm::mat4> shadowMVPTmat;
+//
+//	UniformLight(const std::string& name);
+//	void operator=(const Light &v);
+//};
 
 diffuse(1.0f, 1.0f, 1.0f, 1.0f),
 specular(0.8f, 0.8f, 0.8f, 1.0f),

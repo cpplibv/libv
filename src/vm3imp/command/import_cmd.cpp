@@ -3,14 +3,15 @@
 // hpp
 #include <vl/vm3imp/command/import_cmd.hpp>
 // ext
-#include <boost/serialization/serialization.hpp>
-//#include <boost/archive/portable_iarchive.hpp>
 #include <boost/archive/portable_oarchive.hpp>
+//#include <boost/archive/portable_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 //#include <boost/archive/xml_iarchive.hpp>
+#include <boost/serialization/serialization.hpp>
 // vl
 //#include <vl/log.hpp>
 //#include <vl/string.hpp>
+#include <vl/read_file.hpp>
 // std
 #include <iostream>
 #include <fstream>
@@ -20,6 +21,7 @@
 #include <vl/vm3/serialization/model.hpp>
 #include <vl/vm3imp/console.hpp>
 #include <vl/vm3imp/opened_model.hpp>
+
 
 namespace vl {
 namespace vm3 {
@@ -33,7 +35,8 @@ CommandOpen::CommandOpen() :
 
 void CommandOpen::execute() {
 	openedModel.reset(new Model());
-	openedModel->load(std::ifstream(filePath.value(), std::ios::binary));
+	auto data = vl::readFile(filePath.value(), std::ios::binary);
+	openedModel->load(data.data(), data.size());
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -110,12 +113,16 @@ void CommandImport::execute() {
 	vl::vm3::Model model;
 	vl::vm3::Importer::import(model, filePath.value());
 	{
-		std::ofstream ofs(vl::file_path::removeExtension(filePath.value()) + ".vm3.xml");
+		boost::filesystem::path path(filePath.value());
+		path.replace_extension(".vm3.xml");
+		std::ofstream ofs(path.string());
 		boost::archive::xml_oarchive oar(ofs);
 		oar << VL_NVP(model);
 	}
 	{
-		std::ofstream ofs(vl::file_path::removeExtension(filePath.value()) + ".vm3", std::ios_base::binary);
+		boost::filesystem::path path(filePath.value());
+		path.replace_extension(".vm3");
+		std::ofstream ofs(path.string(), std::ios_base::binary);
 		eos::portable_oarchive oar(ofs);
 		oar << VL_NVP(model);
 	}

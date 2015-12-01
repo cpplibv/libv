@@ -15,11 +15,9 @@ struct DataIO : vl::Resource {
 
 	bool ready = false;
 	void load(std::shared_ptr<DataIO>) {
-		std::cout << n << " IO load" << std::endl;
 		changeResourceState(vl::ResourceState::READY);
 	}
 	void unload(std::shared_ptr<DataIO>) {
-		std::cout << n << " IO unload" << std::endl;
 		changeResourceState(vl::ResourceState::UNREADY);
 	}
 	bool operator<(const DataIO& r) const {
@@ -40,11 +38,9 @@ struct DataGL : vl::Resource {
 	DataGL(int n) :
 		n(n) { }
 	void load(std::shared_ptr<DataGL>) {
-		std::cout << n << " GL load" << std::endl;
 		changeResourceState(vl::ResourceState::READY);
 	}
 	void unload(std::shared_ptr<DataGL>) {
-		std::cout << n << " GL unload" << std::endl;
 		changeResourceState(vl::ResourceState::UNREADY);
 	}
 	bool operator<(const DataGL& r) const {

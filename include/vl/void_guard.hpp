@@ -21,7 +21,8 @@ public:
 template <typename T>
 struct VoidGuard : public VoidGuardBase {
 	template <typename... Args>
-	VoidGuard(Args&&... args) : VoidGuardBase(reinterpret_cast<void*> (new T(std::forward<Args>(args)...))) { }
+	VoidGuard(Args&&... args) :
+		VoidGuardBase(reinterpret_cast<void*> (new T(std::forward<Args>(args)...))) { }
 	virtual ~VoidGuard() {
 		delete reinterpret_cast<T*> (getPtr());
 	}

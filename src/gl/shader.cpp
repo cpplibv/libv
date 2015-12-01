@@ -5,35 +5,16 @@
 // ext
 #include <boost/asio/buffer.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/filesystem/fstream.hpp>
+// vl
+#include <vl/read_file.hpp>
 // std
 #include <memory>
 // pro
 #include <vl/gl/log.hpp>
-#include <vl/gl/status.hpp>
+#include <vl/gl/gl.hpp>
 
 namespace vl {
 namespace gl {
-
-// -------------------------------------------------------------------------------------------------
-
-static std::string readTextFile(const boost::filesystem::path& filePath) {
-	std::string result;
-	boost::filesystem::ifstream file;
-	file.open(filePath.c_str());
-
-	if (!file) {
-		VLOG_ERROR(vl::gl::log(), "Failed to open file: [%s]", filePath.string());
-		return result;
-	}
-
-	std::ostringstream buffer;
-	buffer << file.rdbuf();
-	file.close();
-	result = buffer.str();
-
-	return result;
-}
 
 // toString ----------------------------------------------------------------------------------------
 
@@ -62,12 +43,12 @@ BaseShader::BaseShader(
 	type(type),
 	name(name) {
 
-	const auto data = readTextFile(filePath);
+	const auto data = readFile(filePath);
 	init(data.data());
 }
 
 BaseShader::BaseShader(
-		const char* data, size_t, const GLenum type, const std::string& name) :
+		const char* data, const size_t, const GLenum type, const std::string& name) :
 	type(type),
 	name(name) {
 
@@ -91,9 +72,9 @@ void BaseShader::loadGL(const char* source) {
 	glShaderSource(shaderID, 1, &source, nullptr);
 	glCompileShader(shaderID);
 
-	if (!glGetShaderCompileStatus(shaderID)) {
+	if (!getShaderCompileStatus(shaderID)) {
 		VLOG_ERROR(vl::gl::log(), "Failed to compile %s shader [%s]: %s",
-				shaderTypeToString(type), name, glGetShaderCompileMessage(shaderID));
+				shaderTypeToString(type), name, getShaderCompileMessage(shaderID));
 		unloadGL();
 	}
 	checkGL();
@@ -139,8 +120,8 @@ void ShaderProgram::loadGL() {
 
 	glLinkProgram(programID);
 
-	if (!glGetProgamLinkStatus(programID)) {
-		VLOG_ERROR(vl::gl::log(), "Failed to link [%s]: %s", name, glGetProgamLinkMessage(programID));
+	if (!getProgamLinkStatus(programID)) {
+		VLOG_ERROR(vl::gl::log(), "Failed to link [%s]: %s", name, getProgamLinkMessage(programID));
 		unloadGL();
 	}
 	checkGL();

@@ -2,7 +2,10 @@
 
 #pragma once
 
+// ext
 #include <boost/serialization/nvp.hpp>
+// vl
+#include <vl/vm3/config.hpp>
 
 #ifdef VM3_NO_XML_ARCHIVE
 #    define VL_NVP(NAME) NAME

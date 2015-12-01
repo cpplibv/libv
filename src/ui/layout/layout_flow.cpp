@@ -7,6 +7,7 @@
 // pro
 #include <vl/ui/layout/layout_flow.hpp>
 #include <vl/ui/component/container.hpp>
+#include <vl/ui/component/component.hpp>
 
 namespace vl {
 namespace ui {
@@ -24,18 +25,18 @@ struct LayoutFlow::AlignmentImpl {
 };
 
 const LayoutFlow::OrienationImpl EXPAND_DATA[] = {
-	{ivec3(0, 1), ivec3(1, 0), ivec3(0, +1), 0, ivec3(-1, 0), 1}, //UP_LEFT
-	{ivec3(0, 1), ivec3(1, 0), ivec3(0, +1), 0, ivec3(+1, 0), 0}, //UP_RIGHT
-	{ivec3(0, 1), ivec3(1, 0), ivec3(0, -1), 1, ivec3(-1, 0), 1}, //DOWN_LEFT
-	{ivec3(0, 1), ivec3(1, 0), ivec3(0, -1), 1, ivec3(+1, 0), 0}, //DOWN_RIGHT
-	{ivec3(1, 0), ivec3(0, 1), ivec3(-1, 0), 1, ivec3(0, +1), 0}, //LEFT_UP
-	{ivec3(1, 0), ivec3(0, 1), ivec3(-1, 0), 1, ivec3(0, -1), 1}, //LEFT_DOWN
-	{ivec3(1, 0), ivec3(0, 1), ivec3(+1, 0), 0, ivec3(0, +1), 0}, //RIGHT_UP
-	{ivec3(1, 0), ivec3(0, 1), ivec3(+1, 0), 0, ivec3(0, -1), 1}, //RIGHT_DOWN
+	{ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, +1, 0), 0, ivec3(-1, 0, 0), 1}, //UP_LEFT
+	{ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, +1, 0), 0, ivec3(+1, 0, 0), 0}, //UP_RIGHT
+	{ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, -1, 0), 1, ivec3(-1, 0, 0), 1}, //DOWN_LEFT
+	{ivec3(0, 1, 0), ivec3(1, 0, 0), ivec3(0, -1, 0), 1, ivec3(+1, 0, 0), 0}, //DOWN_RIGHT
+	{ivec3(1, 0, 0), ivec3(0, 1, 0), ivec3(-1, 0, 0), 1, ivec3(0, +1, 0), 0}, //LEFT_UP
+	{ivec3(1, 0, 0), ivec3(0, 1, 0), ivec3(-1, 0, 0), 1, ivec3(0, -1, 0), 1}, //LEFT_DOWN
+	{ivec3(1, 0, 0), ivec3(0, 1, 0), ivec3(+1, 0, 0), 0, ivec3(0, +1, 0), 0}, //RIGHT_UP
+	{ivec3(1, 0, 0), ivec3(0, 1, 0), ivec3(+1, 0, 0), 0, ivec3(0, -1, 0), 1}, //RIGHT_DOWN
 };
-const LayoutFlow::AlignmentImpl ALIGNMENT_DATA[] = {
-	//TODO P5: Cleanup a bit
-};
+//const LayoutFlow::AlignmentImpl ALIGNMENT_DATA[] = {
+//	//TODO P5: Cleanup a bit
+//};
 
 LayoutFlow::Orienation const LayoutFlow::ORIENTATION_UP_LEFT = &EXPAND_DATA[0];
 LayoutFlow::Orienation const LayoutFlow::ORIENTATION_UP_RIGHT = &EXPAND_DATA[1];
@@ -46,15 +47,15 @@ LayoutFlow::Orienation const LayoutFlow::ORIENTATION_LEFT_DOWN = &EXPAND_DATA[5]
 LayoutFlow::Orienation const LayoutFlow::ORIENTATION_RIGHT_UP = &EXPAND_DATA[6];
 LayoutFlow::Orienation const LayoutFlow::ORIENTATION_RIGHT_DOWN = &EXPAND_DATA[7];
 
-const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_CENTER_DATA = {vec3(0.5f, 0.0f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_LEFT_DATA = {vec3(0.0f, 0.0f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_RIGHT_DATA = {vec3(1.0f, 0.0f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_CENTER_DATA = {vec3(0.5f, 0.5f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_LEFT_DATA = {vec3(0.0f, 0.5f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_RIGHT_DATA = {vec3(1.0f, 0.5f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_CENTER_DATA = {vec3(0.5f, 1.0f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_LEFT_DATA = {vec3(0.0f, 1.0f)};
-const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_RIGHT_DATA = {vec3(1.0f, 1.0f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_CENTER_DATA = {vec3(0.5f, 0.0f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_LEFT_DATA = {vec3(0.0f, 0.0f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_BOTTOM_RIGHT_DATA = {vec3(1.0f, 0.0f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_CENTER_DATA = {vec3(0.5f, 0.5f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_LEFT_DATA = {vec3(0.0f, 0.5f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_CENTER_RIGHT_DATA = {vec3(1.0f, 0.5f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_CENTER_DATA = {vec3(0.5f, 1.0f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_LEFT_DATA = {vec3(0.0f, 1.0f, 0.f)};
+const LayoutFlow::AlignmentImpl ALIGNMENT_TOP_RIGHT_DATA = {vec3(1.0f, 1.0f, 0.f)};
 
 LayoutFlow::Alignment const LayoutFlow::ALIGNMENT_BOTTOM_CENTER = &ALIGNMENT_BOTTOM_CENTER_DATA;
 LayoutFlow::Alignment const LayoutFlow::ALIGNMENT_BOTTOM_LEFT = &ALIGNMENT_BOTTOM_LEFT_DATA;
@@ -146,14 +147,14 @@ void LayoutFlow::layout(Container::iterator begin, Container::iterator end, Comp
 	auto lines = buildLines(begin, end, sizeContainer, orientation);
 	auto sizeContent = Line::accumlateSize(lines);
 
-	ivec3 cursorContent = ivec3((sizeContainer - sizeContent) * lineAlign->data);
+	auto cursorContent = ivec3((sizeContainer - sizeContent) * lineAlign->data);
 	ivec3 cursorLine;
 	if (orientation->invertedSecondaryExpand) std::reverse(lines.begin(), lines.end());
 	for (auto line : lines) {
 		cursorLine = ivec3(
 				(sizeContent - line.getSize()) * align->data * orientation->primaryMask +
 				cursorLine * orientation->secondaryMask);
-		ivec3 cursorComponent = ivec3(0, 0);
+		auto cursorComponent = ivec3(0, 0, 0);
 		auto lineComponents = line.getCompoments();
 		if (orientation->invertedPrimaryExpand) std::reverse(lineComponents.begin(), lineComponents.end());
 		for (auto comp : lineComponents) {

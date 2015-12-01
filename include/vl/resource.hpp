@@ -23,8 +23,7 @@ enum class ResourceState {
 //		now, but there will be segfaults...
 //TODO P2: ResourceScope: The real ownership will be at the scope and only observer_ptr-s in
 //		resources? Think about it...
-//TODO P3: Make the communication one direction only (Resource -> Dependent) with the registration as
-//		only exception.
+//TODO P3: Make the communication one direction only (Resource -> Dependent)
 //TODO P3: This Resource is awful slow... lock free it!
 //TODO P4: Generalization of a ResourceProxy
 //TODO P5: After vsig is usable in some atomic form, use it for this callback.

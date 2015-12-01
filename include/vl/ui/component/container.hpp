@@ -29,7 +29,8 @@ private:
 	std::shared_ptr<LayoutManager> layoutManager;
 
 protected:
-	void add(ComponentPtr ptr);
+	void add(const observer_ptr<Component>& component);
+	void add(const shared_ptr<Component>& component);
 	//	void remove(ComponentPtr);
 
 	void setLayout(std::shared_ptr<LayoutManager> manager);
@@ -49,7 +50,7 @@ protected:
 	void invalidateComponents();
 	void renderComponents(Renderer& renderer);
 	void updateComponents();
-	
+
 public:
 	virtual void build(Renderer& renderer) override;
 	virtual void destroy(Renderer& renderer) override;

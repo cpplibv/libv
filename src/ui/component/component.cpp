@@ -16,15 +16,15 @@ namespace ui {
 //	return false;
 //}
 
-void Component::build(Renderer& renderer) { }
+void Component::build(Renderer&) { }
 
-void Component::destroy(Renderer& renderer) { }
+void Component::destroy(Renderer&) { }
 
 void Component::invalidate() {
 	invalid = true;
 }
 
-void Component::render(Renderer& renderer) { }
+void Component::render(Renderer&) { }
 
 void Component::update() { }
 
@@ -62,11 +62,11 @@ ProtectedContainer* Component::getParent() const {
 
 Component::Component() { }
 
-Component::Component(ivec2 size) {
+Component::Component(ivec3 size) {
 	properties.set(Property::Size, size);
 }
 
-Component::Component(ivec2 size, ivec2 pos) {
+Component::Component(ivec3 size, ivec3 pos) {
 	properties.set(Property::Size, size);
 	properties.set(Property::Position, pos);
 }

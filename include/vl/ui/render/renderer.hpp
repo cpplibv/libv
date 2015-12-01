@@ -52,11 +52,11 @@ struct Vertex {
 // -------------------------------------------------------------------------------------------------
 
 class RenderPrimitiv {
-	unsigned int first;
-	unsigned int count;
+	size_t first;
+	size_t count;
 public:
 	RenderPrimitiv();
-	RenderPrimitiv(unsigned int first, unsigned int count);
+	RenderPrimitiv(size_t first, size_t count);
 
 	void render();
 };

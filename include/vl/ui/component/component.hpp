@@ -3,6 +3,7 @@
 #pragma once
 
 // vl
+#include <vl/memory.hpp>
 #include <vl/vec.hpp>
 // std
 #include <memory>
@@ -50,7 +51,6 @@ public:
 		set(std::forward<Args>(args)...);
 	}
 	//TODO P4: change to proxy operator() syntax (that result is less template generated) (see boost po)
-
 	template<typename T>
 	T get(const PropertyMap::Address<T>& address) const {
 		return properties.get(address);
@@ -63,12 +63,59 @@ public:
 	virtual void update();
 
 	Component();
-	Component(ivec2 size);
-	Component(ivec2 size, ivec2 pos);
+	Component(ivec3 size);
+	Component(ivec3 size, ivec3 pos);
 	virtual ~Component();
 };
 
-using ComponentPtr = std::shared_ptr<Component>;
+struct ComponentPtr {
+	observer_ptr<Component> ptr;
+	shared_ptr<Component> sp;
+
+	explicit inline ComponentPtr(std::nullptr_t) noexcept : ptr(nullptr) { }
+	explicit inline ComponentPtr(const observer_ptr<Component>& ptr) noexcept : ptr(ptr) { }
+	explicit inline ComponentPtr(observer_ptr<Component>&& ptr) noexcept : ptr(ptr) { }
+	explicit inline ComponentPtr(const shared_ptr<Component>& sp) noexcept : ptr(sp.get()), sp(sp) { }
+	explicit inline ComponentPtr(shared_ptr<Component>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
+
+	ComponentPtr& operator=(const observer_ptr<Component>& ptr) {
+		this->ptr = ptr;
+		return *this;
+	}
+	ComponentPtr& operator=(observer_ptr<Component>&& ptr) {
+		this->ptr = ptr;
+		return *this;
+	}
+	ComponentPtr& operator=(const shared_ptr<Component>& sp) {
+		this->ptr = observer_ptr<Component>(sp.get());
+		this->sp = sp;
+		return *this;
+	}
+	ComponentPtr& operator=(shared_ptr<Component>&& sp) {
+		this->ptr = observer_ptr<Component>(sp.get());
+		this->sp = std::move(sp);
+		return *this;
+	}
+
+	inline Component* get() const noexcept {
+		return ptr.get();
+	}
+	inline Component& operator*() const {
+		return *ptr.get();
+	}
+	inline Component* operator->() const noexcept {
+		return ptr.get();
+	}
+	inline operator Component*() const noexcept {
+		return ptr.get();
+	}
+	inline operator observer_ptr<Component>() const noexcept {
+		return ptr;
+	}
+	explicit inline operator bool() const noexcept {
+		return ptr != nullptr;
+	}
+};
 
 } //namespace ui
 } //namespace vl

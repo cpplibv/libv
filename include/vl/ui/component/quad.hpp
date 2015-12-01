@@ -28,7 +28,7 @@ struct Quad : public Component {
 			diretion = !diretion;
 		blue += diretion ? 0.01f : -0.01f;
 	}
-	virtual void render(Renderer& renderer) override {
+	virtual void render(Renderer&) override {
 		quad.render();
 		//		DefaultRenderer::render(this);
 	}

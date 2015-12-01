@@ -382,7 +382,10 @@ void Frame::setOpenGLRefreshRate(int rate) {
 		});
 }
 
-void Frame::setContent(ComponentPtr content) {
+void Frame::setContent(const observer_ptr<Component>& content){
+	this->content = content;
+}
+void Frame::setContent(const shared_ptr<Component>& content){
 	this->content = content;
 }
 
@@ -663,7 +666,7 @@ void Frame::glfwCallback(const EventWindowRefresh&) { }
 void Frame::glfwCallback(const EventWindowSize& e) {
 	size = e.size; //TODO P4: Whenever we set change size we have to change content Property::Size too
 	if (content)
-		content->set(Property::Size, size);
+		content->set(Property::Size, ivec3(size, 0));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -722,7 +725,7 @@ void Frame::distributeEvents() {
 
 // Getters -----------------------------------------------------------------------------------------
 
-ComponentPtr Frame::getContent() {
+observer_ptr<Component> Frame::getContent() {
 	return content;
 }
 

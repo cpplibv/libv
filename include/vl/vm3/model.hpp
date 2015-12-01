@@ -37,24 +37,24 @@ struct Mesh {
 	uint32_t baseIndex;
 	uint32_t baseVertex;
 	uint32_t numIndices;
-	uint16_t materialID;
+	uint32_t materialID;
 	//bounding box ?
 };
 
 struct Node {
 	//bounding box ?
 	std::string name;
-	uint16_t parentID;
+	uint32_t parentID;
 	//bool visibility;
 	glm::mat4 transformation;
-	std::vector<uint16_t> meshIDs;
-	std::vector<uint16_t> childrenIDs;
+	std::vector<uint32_t> meshIDs;
+	std::vector<uint32_t> childrenIDs;
 };
 
 struct LOD {
 	double rangeNear; //threshold for increasing LOD
 	double rangeFar; //threshold for decreasing LOD
-	uint16_t rootNodeID;
+	uint32_t rootNodeID;
 };
 
 struct ModelSerialization;
@@ -88,11 +88,12 @@ public:
 
 public:
 	Model();
-	Model(std::istream& filePath);
-	bool load(std::istream& file);
-	bool load(std::istream&& file);
+
+	bool load(const char* data, const size_t size);
+
 	bool save(std::ostream& file) const;
 	bool save(std::ostream&& file) const;
+
 	void addMaterial(const Material& mat) {
 		materials.emplace_back(mat);
 	}
