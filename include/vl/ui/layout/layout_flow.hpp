@@ -8,6 +8,8 @@
 namespace vl {
 namespace ui {
 
+// -------------------------------------------------------------------------------------------------
+
 class LayoutFlow : public LayoutManager {
 public:
 	class OrienationImpl;
@@ -42,6 +44,7 @@ private:
 	Alignment align = ALIGNMENT_TOP_RIGHT;
 	Alignment lineAlign = ALIGNMENT_BOTTOM_LEFT;
 public:
+	LayoutFlow() = default;
 	LayoutFlow(Orienation orientation, Alignment align, Alignment lineAlign);
 	void setOrientation(Orienation orientation) {
 		this->orientation = orientation;
@@ -59,6 +62,8 @@ public:
 	virtual void layout(Container::iterator begin, Container::iterator end, Component* target) override;
 };
 
+// -------------------------------------------------------------------------------------------------
+
 } //namespace ui
 } //namespace vl
 
@@ -68,30 +73,6 @@ public:
 //  ivec2 minimumLayoutSize(VContainer parent);
 //  void layoutContainer(VContainer parent);
 
-
-//  void addLayoutComponent(Component comp, Object constraints);
-//  public Dimension maximumLayoutSize(Container target);
-//  public float getLayoutAlignmentX(Container target);
-//  public float getLayoutAlignmentY(Container target);
-//  public void invalidateLayout(Container target);
-
-
-///*
-// * Defines the interface for classes that know how to lay out
-// * <code>Container</code>s.
-// * <p>
-// * Swing's painting architecture assumes the children of a
-// * <code>JComponent</code> do not overlap.  If a
-// * <code>JComponent</code>'s <code>LayoutManager</code> allows
-// * children to overlap, the <code>JComponent</code> must override
-// * <code>isOptimizedDrawingEnabled</code> to return false.
-// *
-// * @see Container
-// * @see javax.swing.JComponent#isOptimizedDrawingEnabled
-// *
-// * @author      Sami Shaio
-// * @author      Arthur van Hoff
-// */
 //public interface LayoutManager {
 //    /**
 //     * If the layout manager uses a per-component string,

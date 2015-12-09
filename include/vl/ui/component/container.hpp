@@ -15,9 +15,13 @@ class LayoutManager;
 
 // -------------------------------------------------------------------------------------------------
 
+/**
+ * ProtectedContainer is a base container which only maintains Component's public interface making
+ * it ideal for use as a base for those component which containerness preferred to stay hidden.
+ */
 class ProtectedContainer : public Component {
 private:
-	using Store = std::vector<ComponentPtr>;
+	using Store = std::vector<adaptive_ptr<Component>>;
 protected:
 	using const_iterator = Store::const_iterator;
 	using const_reverse_iterator = Store::const_reverse_iterator;
@@ -25,15 +29,16 @@ protected:
 	using reverse_iterator = Store::reverse_iterator;
 
 private:
-	Store components;
-	std::shared_ptr<LayoutManager> layoutManager;
+	std::vector<adaptive_ptr<Component>> components;
+	adaptive_ptr<LayoutManager> layoutManager;
 
 protected:
 	void add(const observer_ptr<Component>& component);
 	void add(const shared_ptr<Component>& component);
-	//	void remove(ComponentPtr);
-
-	void setLayout(std::shared_ptr<LayoutManager> manager);
+	void remove(const observer_ptr<Component>& component);
+	void remove(const shared_ptr<Component>& component);
+	void setLayout(const observer_ptr<LayoutManager>& manager);
+	void setLayout(const shared_ptr<LayoutManager>& manager);
 
 	const_iterator begin() const;
 	const_iterator end() const;
@@ -70,6 +75,7 @@ struct Container : public ProtectedContainer {
 	using ProtectedContainer::reverse_iterator;
 
 	using ProtectedContainer::add;
+	using ProtectedContainer::remove;
 	using ProtectedContainer::setLayout;
 
 	using ProtectedContainer::begin;
@@ -85,9 +91,9 @@ struct Container : public ProtectedContainer {
 
 //	std::begin
 //	std::end
-//	std::vector<ComponentPtr> findComponentAt(int, int);
+//	std::vector<adaptive_ptr<Component>> findComponentAt(int, int);
 //	void setFocusPolicy(...);
-//	ComponentPtr getComponent(int);
-//	std::vector<ComponentPtr> getComponentAt(int, int);
+//	adaptive_ptr<Component> getComponent(int);
+//	std::vector<adaptive_ptr<Component>> getComponentAt(int, int);
 //	int getComponentCount();
-//	ComponentPtr getFocusOwner();
+//	adaptive_ptr<Component> getFocusOwner();

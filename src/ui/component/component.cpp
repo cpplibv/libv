@@ -8,6 +8,8 @@
 namespace vl {
 namespace ui {
 
+// -------------------------------------------------------------------------------------------------
+
 //bool Component::isActive() const {
 //	return false;
 //}
@@ -63,15 +65,17 @@ ProtectedContainer* Component::getParent() const {
 Component::Component() { }
 
 Component::Component(ivec3 size) {
-	properties.set(Property::Size, size);
+	set(Property::Size, size);
 }
 
 Component::Component(ivec3 size, ivec3 pos) {
-	properties.set(Property::Size, size);
-	properties.set(Property::Position, pos);
+	set(Property::Size, size);
+	set(Property::Position, pos);
 }
 
 Component::~Component() { }
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace ui
 } //namespace vl

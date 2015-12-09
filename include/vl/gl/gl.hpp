@@ -96,7 +96,7 @@ enum class VertexAttribType : GLenum {
 
 class GL {
 private:
-	glm::mat4 matrixTexture_;
+	glm::mat4 matrixTexture_; // Make it static constexpr...
 	std::stack<glm::mat4> matrixStackModel;
 	std::stack<glm::mat4> matrixStackView;
 	std::stack<glm::mat4> matrixStackProjection;

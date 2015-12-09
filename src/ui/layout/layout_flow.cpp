@@ -1,6 +1,7 @@
 // File: LayoutManager.cpp, Created on 2014. január 7. 15:23, Author: Vader
 
 // vl
+#include <vl/memory.hpp>
 #include <vl/vec.hpp>
 // std
 #include <algorithm>
@@ -11,6 +12,8 @@
 
 namespace vl {
 namespace ui {
+
+//TODO P2: change vec based dimension indexing into index based (position[dimIndex])
 
 struct LayoutFlow::OrienationImpl {
 	ivec3 primaryMask;
@@ -69,14 +72,14 @@ LayoutFlow::Alignment const LayoutFlow::ALIGNMENT_TOP_RIGHT = &ALIGNMENT_TOP_RIG
 
 class Line {
 private:
-	std::vector<ComponentPtr> compoments;
+	std::vector<adaptive_ptr<Component>> compoments;
 	ivec3 size;
 	LayoutFlow::Orienation orientation;
 public:
 
 	Line(LayoutFlow::Orienation orientation) : orientation(orientation) { }
 
-	inline void add(ComponentPtr comp) {
+	inline void add(adaptive_ptr<Component> comp) {
 		compoments.push_back(comp);
 		auto compSize = comp->get(Property::Size);
 		size = maxByComponents(size, compSize) * orientation->secondaryMask +
@@ -91,7 +94,7 @@ public:
 		return orientation;
 	}
 
-	inline std::vector<ComponentPtr> getCompoments() const {
+	inline std::vector<adaptive_ptr<Component>> getCompoments() const {
 		return compoments;
 	}
 

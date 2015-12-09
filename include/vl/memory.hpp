@@ -133,3 +133,62 @@ struct hash<::vl::observer_ptr<T>>
 };
 
 } //namespace std
+
+// adaptive_ptr ====================================================================================
+
+namespace vl {
+
+template<typename T>
+class adaptive_ptr {
+private:
+	observer_ptr<T> ptr;
+	shared_ptr<T> sp;
+
+public:
+	inline adaptive_ptr() noexcept : ptr(nullptr) { }
+	explicit inline adaptive_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
+	explicit inline adaptive_ptr(const observer_ptr<T>& ptr) noexcept : ptr(ptr) { }
+	explicit inline adaptive_ptr(observer_ptr<T>&& ptr) noexcept : ptr(ptr) { }
+	explicit inline adaptive_ptr(const shared_ptr<T>& sp) noexcept : ptr(sp.get()), sp(sp) { }
+	explicit inline adaptive_ptr(shared_ptr<T>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
+
+	adaptive_ptr& operator=(const observer_ptr<T>& ptr) {
+		this->ptr = ptr;
+		return *this;
+	}
+	adaptive_ptr& operator=(observer_ptr<T>&& ptr) {
+		this->ptr = ptr;
+		return *this;
+	}
+	adaptive_ptr& operator=(const shared_ptr<T>& sp) {
+		this->ptr = observer_ptr<T>(sp.get());
+		this->sp = sp;
+		return *this;
+	}
+	adaptive_ptr& operator=(shared_ptr<T>&& sp) {
+		this->ptr = observer_ptr<T>(sp.get());
+		this->sp = std::move(sp); //swap?
+		return *this;
+	}
+
+	inline T* get() const noexcept {
+		return ptr.get();
+	}
+	inline T& operator*() const {
+		return *ptr.get();
+	}
+	inline T* operator->() const noexcept {
+		return ptr.get();
+	}
+	inline operator T*() const noexcept {
+		return ptr.get();
+	}
+	inline operator observer_ptr<T>() const noexcept {
+		return ptr;
+	}
+	explicit inline operator bool() const noexcept {
+		return ptr != nullptr;
+	}
+};
+
+} //namespace vl

@@ -2,35 +2,43 @@
 
 // hpp
 #include <vl/ui/component/container.hpp>
+// ext
+#include <glm/gtc/matrix_transform.hpp>
 // std
 #include <algorithm>
 // pro
 #include <vl/ui/layout/properties.hpp>
 #include <vl/ui/layout/layout_manager.hpp>
 
+#include <iostream>
+
 namespace vl {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void ProtectedContainer::add(const observer_ptr<Component>& component){
-	assert(!component->getParent());
-
-	component->setParent(this);
-	components.emplace_back(component);
-}
-void ProtectedContainer::add(const shared_ptr<Component>& component){
+void ProtectedContainer::add(const observer_ptr<Component>& component) {
 	assert(!component->getParent());
 
 	component->setParent(this);
 	components.emplace_back(component);
 }
 
-//void ProtectedContainer::remove(ComponentPtr component) {
+void ProtectedContainer::add(const shared_ptr<Component>& component) {
+	assert(!component->getParent());
+
+	component->setParent(this);
+	components.emplace_back(component);
+}
+
+//void ProtectedContainer::remove(adaptive_ptr<Component> component) {
 //	components.erase(std::remove(components.begin(), components.end(), component), components.end());
 //}
 
-void ProtectedContainer::setLayout(std::shared_ptr<LayoutManager> manager) {
+void ProtectedContainer::setLayout(const observer_ptr<LayoutManager>& manager) {
+	this->layoutManager = manager;
+}
+void ProtectedContainer::setLayout(const shared_ptr<LayoutManager>& manager) {
 	this->layoutManager = manager;
 }
 
@@ -121,10 +129,11 @@ void ProtectedContainer::updateComponents() {
 
 void ProtectedContainer::build(Renderer& renderer) {
 	buildComponents(renderer);
-	if (layoutManager != nullptr) {
-//		layoutManager->layoutContainer(this);
+	if (layoutManager) {
+		//		layoutManager->layoutContainer(this);
 		layoutManager->layout(begin(), end(), this);
 	} //TODO P4: else default layout mrg
+	validate();
 }
 
 void ProtectedContainer::destroy(Renderer& renderer) {
@@ -136,6 +145,10 @@ void ProtectedContainer::invalidate() {
 }
 
 void ProtectedContainer::render(Renderer& renderer) {
+	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, size.x, size.y);
+	renderer.pushMatrixView(glm::ortho(0, size.x, 0, size.y, 1000, -1000));
 	renderComponents(renderer);
 }
 

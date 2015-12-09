@@ -6,6 +6,7 @@
 #include <vl/memory.hpp>
 #include <vl/vec.hpp>
 // std
+#include <atomic>
 #include <memory>
 #include <string>
 // pro
@@ -22,12 +23,12 @@ class Component {
 private:
 	ProtectedContainer* parent = nullptr;
 	Frame* frame = nullptr;
+protected:
 	ivec3 pos;
 	ivec3 size;
 	std::string name;
 
-	bool invalid = false;
-protected:
+	std::atomic<bool> invalid{true};
 	PropertyMap properties;
 public:
 	//	bool isActive() const;
@@ -56,71 +57,27 @@ public:
 		return properties.get(address);
 	}
 
+public:
+	bool isInvalid() const {
+		return invalid;
+	}
+	void validate(){
+		invalid = false;
+	}
+
+public:
 	virtual void build(Renderer& renderer);
 	virtual void destroy(Renderer& renderer);
 	virtual void invalidate();
 	virtual void render(Renderer& renderer);
 	virtual void update();
 
+public:
 	Component();
 	Component(ivec3 size);
 	Component(ivec3 size, ivec3 pos);
 	virtual ~Component();
 };
 
-struct ComponentPtr {
-	observer_ptr<Component> ptr;
-	shared_ptr<Component> sp;
-
-	explicit inline ComponentPtr(std::nullptr_t) noexcept : ptr(nullptr) { }
-	explicit inline ComponentPtr(const observer_ptr<Component>& ptr) noexcept : ptr(ptr) { }
-	explicit inline ComponentPtr(observer_ptr<Component>&& ptr) noexcept : ptr(ptr) { }
-	explicit inline ComponentPtr(const shared_ptr<Component>& sp) noexcept : ptr(sp.get()), sp(sp) { }
-	explicit inline ComponentPtr(shared_ptr<Component>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
-
-	ComponentPtr& operator=(const observer_ptr<Component>& ptr) {
-		this->ptr = ptr;
-		return *this;
-	}
-	ComponentPtr& operator=(observer_ptr<Component>&& ptr) {
-		this->ptr = ptr;
-		return *this;
-	}
-	ComponentPtr& operator=(const shared_ptr<Component>& sp) {
-		this->ptr = observer_ptr<Component>(sp.get());
-		this->sp = sp;
-		return *this;
-	}
-	ComponentPtr& operator=(shared_ptr<Component>&& sp) {
-		this->ptr = observer_ptr<Component>(sp.get());
-		this->sp = std::move(sp);
-		return *this;
-	}
-
-	inline Component* get() const noexcept {
-		return ptr.get();
-	}
-	inline Component& operator*() const {
-		return *ptr.get();
-	}
-	inline Component* operator->() const noexcept {
-		return ptr.get();
-	}
-	inline operator Component*() const noexcept {
-		return ptr.get();
-	}
-	inline operator observer_ptr<Component>() const noexcept {
-		return ptr;
-	}
-	explicit inline operator bool() const noexcept {
-		return ptr != nullptr;
-	}
-};
-
 } //namespace ui
 } //namespace vl
-
-//	void getComponentOrientation();
-//	int getComponentZOrder(ComponentPtr);
-//	Font2D getFont();
-//	void invalidate();

@@ -2,16 +2,17 @@
 
 #pragma once
 
+// vl
+#include <ui/font/font_2D.hpp>
 //pro
 #include <vl/ui/component/component.hpp>
-#include <vl/ui/render/default_renderer.hpp>
 
 namespace vl {
 namespace ui {
 
 class Label : public Component {
 private:
-	//Font2D deafultFont;
+	Font2D deafultFont;
 	std::string text;
 	//Font2D font;
 public:

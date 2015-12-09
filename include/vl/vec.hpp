@@ -9,12 +9,15 @@
 
 //TODO P1: glm implicit cast for vec
 //TODO P1: vec implicit cast for glm
+//TODO P1: constexpr
 //TODO PMSVC: Disable warnings for nameless struct on MSVC
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
-
-//TODO P3: remove static_casts from the vecs
+//TODO P3: remove static_casts from the vecs let implicit cast take place
+//TODO P3: add static_vec_cast
+//TODO P5: operator- with one argument
+//TODO P5: operator+ with one argument
 //TODO P5: perfect forwarding for constructors
 //TODO P5: conditional noexcept
 //TODO P5: macro for debug asserts
@@ -24,14 +27,14 @@ namespace vl {
 
 // <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
 #define __v2get(p1,p2)       /** Composite a new vector based on members @return The new vector */\
-                   inline vec_base_t<2, T> p1##p2() const noexcept {        \
-                        return vec_base_t<2, T>(p1,p2);}
+                   inline vec_helper_t<2, T> p1##p2() const noexcept {        \
+                        return vec_helper_t<2, T>(p1,p2);}
 #define __v3get(p1,p2,p3)    /** Composite a new vector based on members @return The new vector */\
-                   inline vec_base_t<3, T> p1##p2##p3() const noexcept {    \
-                       return vec_base_t<3, T>(p1,p2,p3);}
+                   inline vec_helper_t<3, T> p1##p2##p3() const noexcept {    \
+                       return vec_helper_t<3, T>(p1,p2,p3);}
 #define __v4get(p1,p2,p3,p4) /** Composite a new vector based on members @return The new vector */\
-				   inline vec_base_t<4, T> p1##p2##p3##p4() const noexcept {\
-                       return vec_base_t<4, T>(p1,p2,p3,p4);}
+				   inline vec_helper_t<4, T> p1##p2##p3##p4() const noexcept {\
+                       return vec_helper_t<4, T>(p1,p2,p3,p4);}
 
 #define __v22p1(p1)      __v2get(p1,x)       __v2get(p1,y)
 #define __v22            __v22p1(x)          __v22p1(y)
@@ -74,7 +77,10 @@ namespace vl {
 #define implement_vec4_to_vec3_gets __v43
 #define implement_vec4_to_vec4_gets __v44
 
-// -------------------------------------------------------------------------------------------------
+// vec_helper_t forward ----------------------------------------------------------------------------
+
+template <size_t N, typename T, typename = std::make_index_sequence<N>>
+struct vec_helper_t;
 
 // vec_base_t --------------------------------------------------------------------------------------
 
@@ -154,10 +160,6 @@ template <typename T> struct vec_base_t<4, T> {
 };
 
 #pragma GCC diagnostic pop
-// vec_helper_t forward ----------------------------------------------------------------------------
-
-template <size_t N, typename T, typename = std::make_index_sequence<N>>
-struct vec_helper_t;
 
 // vec_iteration_helper ----------------------------------------------------------------------------
 

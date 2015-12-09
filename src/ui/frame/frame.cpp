@@ -5,7 +5,6 @@
 // ext
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
 // vl
 #include <vl/semaphore.hpp>
 #include <vl/gl/gl.hpp>
@@ -13,17 +12,40 @@
 #include <vl/ui/log.hpp>
 #include <vl/timer.hpp>
 
+//TODO P1: organize glfw glfwPostEmptyEvent(), glfwWaitEvents()
+//TODO P2: review size handling (in container too)
+//TODO P3: provide async and sync version of setters that require context change like setDecoration
+//TODO P3: replace bind with lambda in this file where suitable
+
 namespace vl {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-std::mutex core_m;
-std::unique_ptr<vl::WorkerThread> coreContext;
-std::set<Frame*> frames;
-std::mutex activeFrames_m;
-std::set<Frame*> activeFrames;
-vl::Semaphore noActiveFrame(true);
+//struct UICore {
+//	//	xy organize glfw glfwPostEmptyEvent(), glfwWaitEvents() and shit.
+//	template<typename F, typename = decltype(std::declval<F>()())>
+//	void executeSync(F&& func, size_t priority);
+//	template<typename F, typename = decltype(std::declval<F>()())>
+//	void executeAsync(F&& func, size_t priority);
+//
+//	void addTask(const std::function<void()>& func) {
+//
+//		glfwPostEmptyEvent();
+//	}
+//	void loop() {
+//		while (true) {
+//			glfwWaitEvents();
+//		}
+//	}
+//};
+
+static std::mutex core_m;
+static std::unique_ptr<vl::WorkerThread> coreContext;
+static std::set<Frame*> frames;
+static std::mutex activeFrames_m;
+static std::set<Frame*> activeFrames;
+static vl::Semaphore noActiveFrame(true);
 
 void initCore() {
 	VLOG_DEBUG(vl::ui::log(), "Initialize Core / GLFW Context");
@@ -90,7 +112,6 @@ void unregisterFrame(Frame* frame) {
 }
 
 // -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
 
 void Frame::joinAll() {
 	VLOG_DEBUG(vl::ui::log(), "Joining every frame");
@@ -113,13 +134,15 @@ void Frame::closeAllDefault() {
 
 // -------------------------------------------------------------------------------------------------
 
+const Frame::TypeDisplayMode Frame::DISPLAY_MODE_WINDOWED = 0;
+const Frame::TypeDisplayMode Frame::DISPLAY_MODE_BORDERLESS = 1;
+const Frame::TypeDisplayMode Frame::DISPLAY_MODE_FULLSCREEN = 2;
+
 const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_ANY = GLFW_OPENGL_ANY_PROFILE;
 const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_COMPAT = GLFW_OPENGL_COMPAT_PROFILE;
 const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_CORE = GLFW_OPENGL_CORE_PROFILE;
 
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_WINDOWED = 0;
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_BORDERLESS = 1;
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_FULLSCREEN = 2;
+const Frame::TypeOpenGLRefreshRate Frame::REFRESH_RATE_DONT_CARE = GLFW_DONT_CARE;
 
 const Frame::TypeCloseOperation Frame::ON_CLOSE_DEFAULT_EXIT;
 const Frame::TypeCloseOperation Frame::ON_CLOSE_EXIT;
@@ -204,50 +227,43 @@ bool Frame::isUpdateSkipable() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Frame::build() {
+void Frame::baseBuild() {
 	timerBuild.reset();
-	glViewport(0, 0, size.x, size.y);
-	if (content) {
-		content->build(renderer);
-		invalidated = false;
-	}
+	build(renderer);
 	timerBuild.time();
 }
 
-void Frame::destroy() {
+void Frame::baseDestroy() {
 	timerDestroy.reset();
+	destroy(renderer);
 	timerDestroy.time();
 }
 
-void Frame::invalidate() {
-	invalidated = true;
-	if (content)
-		content->invalidate();
+void Frame::baseInvalidate() {
+	invalidate();
 }
 
-void Frame::render() {
-	if (!isRenderSkipable() && content && window) {
-		if (invalidated)
-			build();
+void Frame::baseRender() {
+	if (isRenderSkipable() || !window)
+		return;
+	if (isInvalid())
+		baseBuild();
 
-		timerRender.reset();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glViewport(0, 0, size.x, size.y);
-		renderer.push(glm::ortho(0, 0, size.x, size.y, -1000, 1000));
-		content->render(renderer);
-		timerRender.time();
+	timerRender.reset();
+	render(renderer);
+	timerRender.time();
 
-		timerSwap.reset();
-		glfwSwapBuffers(window);
-		timerSwap.time();
-	}
+	timerSwap.reset();
+	glfwSwapBuffers(window);
+	timerSwap.time();
 }
 
-void Frame::update() {
+void Frame::baseUpdate() {
+	if (isUpdateSkipable())
+		return;
+
 	timerUpdate.reset();
-	if (!isUpdateSkipable() && content) {
-		content->update();
-	}
+	update();
 	timerUpdate.time();
 }
 
@@ -382,12 +398,13 @@ void Frame::setOpenGLRefreshRate(int rate) {
 		});
 }
 
-void Frame::setContent(const observer_ptr<Component>& content){
-	this->content = content;
-}
-void Frame::setContent(const shared_ptr<Component>& content){
-	this->content = content;
-}
+//void Frame::setContent(const observer_ptr<Component>& content) {
+//	this->content = content;
+//}
+//
+//void Frame::setContent(const shared_ptr<Component>& content) {
+//	this->content = content;
+//}
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
@@ -442,7 +459,7 @@ void Frame::setSize(int x, int y) {
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 	context.executeAsync([this, x, y] {
 		VLOG_TRACE(vl::ui::log(), __PRETTY_FUNCTION__);
-		this->size = ivec2(x, y);
+		this->size = ivec3(x, y, this->size.z);
 		if (window)
 				coreContext->executeSync(std::bind(glfwSetWindowSize, window, size.x, pos.y));
 		});
@@ -454,8 +471,10 @@ void Frame::setTitle(const std::string& title) {
 		VLOG_TRACE(vl::ui::log(), __PRETTY_FUNCTION__);
 		this->title = title;
 		if (window)
-				coreContext->executeSync(std::bind(glfwSetWindowTitle, window, title.c_str()));
-		});
+				coreContext->executeSync([this, title] {
+					glfwSetWindowTitle(window, title.c_str());
+				});
+	});
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -488,12 +507,13 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersionMajor);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGLVersionMinor);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //TODO P4: Hint GLFW_OPENGL_FORWARD_COMPAT
+	//TODO P5: Disable deprecated openGL functionality by enable forward compat
+	//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, openGLProfile);
 	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 	//glfwWindowHint(GLFW_FOCUSED, );
-	//glfwWindowHint(GLFW_FLOATING, );
+	//glfwWindowHint(GLFW_FLOATING, ); // Always on top
 	//glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION);
 	//TODO P4: Hint GLFW_FOCUSED
 	//TODO P4: Hint GLFW_FLOATING
@@ -511,7 +531,8 @@ void Frame::cmdCoreCreate() {
 	} else if (displayMode == DISPLAY_MODE_BORDERLESS) {
 		VLOG_INFO(vl::ui::log(), "Switching frame [%s] to borderless mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		size = ivec2(mode->width, mode->height);
+		size.x = mode->width;
+		size.y = mode->height;
 		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
@@ -524,7 +545,7 @@ void Frame::cmdCoreCreate() {
 		VLOG_ERROR(vl::ui::log(), "GLFW window creation failed");
 		return;
 	}
-	invalidate();
+	baseInvalidate();
 	registerEventCallbacks(this, window);
 	activateFrame(this);
 
@@ -641,8 +662,13 @@ void Frame::glfwCallback(const EventCursorPos&) { }
 
 void Frame::glfwCallback(const EventDrop&) { }
 
-void Frame::glfwCallback(const EventFramebufferSize&) {
-	//	invalidate();
+void Frame::glfwCallback(const EventFramebufferSize& e) {
+	if (size.xy() == e.size)
+		return;
+
+	size = ivec3(e.size, size.z);
+	set(Property::Size, size);
+	baseInvalidate();
 }
 
 void Frame::glfwCallback(const EventKey&) { }
@@ -653,20 +679,23 @@ void Frame::glfwCallback(const EventScroll&) { }
 
 void Frame::glfwCallback(const EventWindowClose&) { }
 
-void Frame::glfwCallback(const EventWindowFocus&) { }
+void Frame::glfwCallback(const EventWindowFocus&) {
+//	VLOG_TRACE(vl::ui::log(), "Not implemented yet.");
+}
 
-void Frame::glfwCallback(const EventWindowIconify&) { }
+void Frame::glfwCallback(const EventWindowIconify& e) {
+	minimalized = e.iconified;
+}
 
 void Frame::glfwCallback(const EventWindowPos& e) {
 	pos = e.position;
 }
 
-void Frame::glfwCallback(const EventWindowRefresh&) { }
+void Frame::glfwCallback(const EventWindowRefresh&) {
+}
 
-void Frame::glfwCallback(const EventWindowSize& e) {
-	size = e.size; //TODO P4: Whenever we set change size we have to change content Property::Size too
-	if (content)
-		content->set(Property::Size, ivec3(size, 0));
+void Frame::glfwCallback(const EventWindowSize&) {
+	// EventFramebufferSize event handles this operation
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -725,10 +754,6 @@ void Frame::distributeEvents() {
 
 // Getters -----------------------------------------------------------------------------------------
 
-observer_ptr<Component> Frame::getContent() {
-	return content;
-}
-
 Frame::TypeCloseOperation Frame::getCloseOperation() const {
 	return defaultCloseOperation;
 }
@@ -737,7 +762,7 @@ Frame::TypeDisplayMode Frame::getDisplayMode() const {
 	return displayMode;
 }
 
-ivec2 Frame::getSize() const {
+ivec3 Frame::getSize() const {
 	return size;
 }
 
@@ -754,7 +779,7 @@ bool Frame::isVisible() const {
 }
 
 const Monitor* Frame::getCurrentMonitor() const {
-	return Monitor::getMonitorAt(pos + size / 2);
+	return Monitor::getMonitorAt(pos + size.xy() / 2);
 }
 
 // Frame Loop ----------------------------------------------------------
@@ -768,7 +793,7 @@ void Frame::loop() {
 	timerLoop.reset();
 
 	timerPoll.reset();
-	coreContext->executeSync(glfwPollEvents);
+	coreContext->executeSync(glfwPollEvents); // <<< remove this as soon wait event is active
 	timerPoll.time();
 	timerEvent.reset();
 	distributeEvents();
@@ -779,17 +804,19 @@ void Frame::loop() {
 		return;
 	}
 
-	update();
-	render();
+	baseUpdate();
+	baseRender();
 
-	context.executeAsync(std::bind(&Frame::loop, this));
+	context.executeAsync([this] {
+		loop();
+	});
 	timerLoop.time();
 	timerOffLoop.reset();
 }
 
 void Frame::term() {
 	VLOG_DEBUG(vl::ui::log(), "Frame terminate ");
-	destroy();
+	baseDestroy();
 
 	coreContext->executeAsync(std::bind(&Frame::cmdCoreDestroy, this));
 	context.terminate();
@@ -801,18 +828,10 @@ void Frame::term() {
 
 Frame::Frame(const std::string& title, unsigned int width, unsigned int height) :
 	onClose(AccumulatorLogicalAnd<bool>::get()),
-	forcedClose(false),
 	context(vl::format("Frame - %s", title)),
-	window(nullptr),
-	size(width, height),
-	openGLRefreshRate(GLFW_DONT_CARE),
-	decorated(true),
-	hidden(true),
-	minimalized(false),
-	resizable(true),
-	invalidated(true),
-	title(title),
-	content(nullptr) {
+//	size(width, height),
+	title(title) {
+	size = ivec3(width, height, 2000);
 	registerFrame(this);
 	initEvents();
 }

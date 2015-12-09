@@ -146,11 +146,8 @@ public:
 	//		return programID;
 	//	}
 	inline GLint getActiveUniformLocation(const std::string& name) const {
-		try {
-			return addressesUniform.at(name).location;
-		} catch (const std::out_of_range& ex) { // <<< performance (it in an "init function" but still...)
-			return -1;
-		}
+		const auto it = addressesUniform.find(name);
+		return it == addressesUniform.end() ? -1 : it->second.location;
 	}
 };
 

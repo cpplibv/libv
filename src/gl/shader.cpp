@@ -98,6 +98,7 @@ ShaderProgram::ShaderProgram(
 	shaderGeometry(shaderGeometry),
 	shaderFragment(shaderFragment) {
 	loadGL();
+	mapAttributes();
 	mapUniforms();
 }
 

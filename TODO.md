@@ -1,3 +1,7 @@
+cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
+much pain to integrate
+
+
 Colors:
 0.236f, 0.311f, 0.311f
 58, 255, 255

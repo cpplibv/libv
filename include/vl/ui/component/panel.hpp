@@ -2,10 +2,7 @@
 
 #pragma once
 
-//pro
-#include <vl/ui/component/component.hpp>
 #include <vl/ui/component/container.hpp>
-#include <vl/ui/render/default_renderer.hpp>
 
 namespace vl {
 namespace ui {

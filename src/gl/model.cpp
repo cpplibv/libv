@@ -121,7 +121,7 @@ void Model::renderNode(uint32_t id, vl::gl::GL& gl) {
 	gl.pushMatrixModel();
 	gl.matrixModel() *= model.nodes[id].transformation;
 //	uniformMmat = gl.matrixModel();
-//	uniformMVPmat = gl.matrixMVP();
+//	uniformMVPmat = gl.matrixMVP(); //<<<Assign uniforms
 	//node->material->get<std::string>("diffuseTexture") //<<<Bind Textures here
 	//vl::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
 

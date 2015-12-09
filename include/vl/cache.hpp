@@ -24,6 +24,13 @@ namespace vl {
 //TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
 //	newing the sharedptr and the resource
 
+//TODO P4: Loader cache helyett cache foreign construtorral!! ZSENIÁLLIS!!
+//A chacheinternalWrapping osztálya kap egy +arg-ot amivel ő foreign constructálja
+//http://gerardmeier.com/foreign-constructors-cpp
+//és talán kaphatna egy másik objektumot ami descturcálja és igazából a shared_ptr deleterje!!
+
+//TODO P1: cache for forward declared types?
+
 // -------------------------------------------------------------------------------------------------
 
 template<typename BaseComparator, typename T>

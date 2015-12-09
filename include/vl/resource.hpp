@@ -2,6 +2,8 @@
 
 #pragma once
 
+// ext
+#include <boost/container/flat_map.hpp>
 // std
 #include <algorithm>
 #include <functional>
@@ -13,38 +15,35 @@ namespace vl {
 
 // -------------------------------------------------------------------------------------------------
 
+//TODO P2: ResourceScope: The real ownership will be at the scope and only observer_ptr-s in
+//		resources? Think about it...
+//TODO P4: Generalization of a ResourceProxy
+//IDEA: After vsig is usable in some atomic form, use it for this callback.
+//IDEA: Is there a possibilty for lock freeing this?
+
 enum class ResourceState {
 	READY,
 	UNREADY,
 	FAILED
 };
 
-//TODO P0: This Resource is bad. Contains multiple data race. I MUST rewrite it! I leave it here for
-//		now, but there will be segfaults...
-//TODO P2: ResourceScope: The real ownership will be at the scope and only observer_ptr-s in
-//		resources? Think about it...
-//TODO P3: Make the communication one direction only (Resource -> Dependent)
-//TODO P3: This Resource is awful slow... lock free it!
-//TODO P4: Generalization of a ResourceProxy
-//TODO P5: After vsig is usable in some atomic form, use it for this callback.
-
 class Resource {
 private:
 	ResourceState state{ResourceState::UNREADY};
 	mutable std::recursive_mutex mutex;
 	std::vector<Resource*> dependents;
-	std::vector<Resource*> dependencies;
-	std::function<void() > callback;
+	boost::container::flat_map<Resource*, ResourceState> dependencies;
+	std::function<void()> callback;
 protected:
-	void addDependency(const std::shared_ptr<Resource>& r) {
-		if (!r)
+	void addDependency(const std::shared_ptr<Resource>& dependency) {
+		if (!dependency)
 			return;
 
-		std::unique_lock < decltype(mutex) > lockdep(r->mutex);
+		std::unique_lock < decltype(mutex) > dependency_lock(dependency->mutex);
 		std::lock_guard < decltype(mutex) > lock(mutex);
-		r->dependents.emplace_back(this);
-		dependencies.emplace_back(r.get());
-		lockdep.unlock();
+		dependency->dependents.emplace_back(this);
+		dependencies.emplace(dependency.get(), dependency->state);
+		dependency_lock.unlock();
 
 		if (callback)
 			callback();
@@ -61,36 +60,23 @@ protected:
 
 		for (const auto& dependent : dependents) {
 			std::lock_guard < decltype(mutex) > lock(dependent->mutex);
+			dependent->dependencies[this] = state;
 			if (dependent->callback)
 				dependent->callback();
 		}
 	}
 	bool isEveryDependency(const ResourceState state) const {
-		decltype(dependencies) tmpDependencies;
-		{
-			std::lock_guard < decltype(mutex) > lock(mutex);
-			tmpDependencies = dependencies;
-		}
-		// Race Cond
-
-		for (const auto& dependency : tmpDependencies) {
-			std::lock_guard < decltype(mutex) > lock(dependency->mutex);
-			if (state != dependency->state)
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		for (const auto& dependency : dependencies) {
+			if (dependency.second != state)
 				return false;
 		}
 		return true;
 	}
 	bool isAnyDependency(const ResourceState state) const {
-		decltype(dependencies) tmpDependencies;
-		{
-			std::lock_guard < decltype(mutex) > lock(mutex);
-			tmpDependencies = dependencies;
-		}
-		// Race Cond
-
-		for (const auto& dependency : tmpDependencies) {
-			std::lock_guard < decltype(mutex) > lock(dependency->mutex);
-			if (state == dependency->state)
+		std::lock_guard < decltype(mutex) > lock(mutex);
+		for (const auto& dependency : dependencies) {
+			if (dependency.second == state)
 				return true;
 		}
 		return false;
@@ -100,19 +86,16 @@ protected:
 		return state;
 	}
 	virtual ~Resource() {
-		decltype(dependencies) tmpDependencies;
 		{
 			std::lock_guard < decltype(mutex) > lock(mutex);
-			tmpDependencies = dependencies;
+			callback = nullptr;
 		}
-		// Race Cond
 
-		for (const auto& dependency : tmpDependencies) {
-			std::lock_guard < decltype(mutex) > lock(dependency->mutex);
-			auto& vec = dependency->dependents;
+		for (const auto& dependency : dependencies) {
+			std::lock_guard<decltype(mutex)> dependency_lock(dependency.first->mutex);
+			auto& vec = dependency.first->dependents;
 			vec.erase(std::remove(vec.begin(), vec.end(), this), vec.end());
 		}
-		// Seg fault
 	}
 };
 

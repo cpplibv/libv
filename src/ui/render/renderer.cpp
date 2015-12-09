@@ -8,6 +8,8 @@
 namespace vl {
 namespace ui {
 
+// -------------------------------------------------------------------------------------------------
+
 RenderPrimitiv Renderer::quad(const vec3& pos, const vec3& size, const vec2& txbl, const vec2& txtr) {
 	float xmin = pos.x;
 	float xmax = pos.x + size.x;
@@ -41,30 +43,6 @@ RenderPrimitiv Renderer::triangle(
 
 // -------------------------------------------------------------------------------------------------
 
-void Renderer::clear() {
-	data.clear();
-}
-
-void Renderer::pop() {
-	mxStack.pop();
-}
-
-glm::mat4& Renderer::top() {
-	return mxStack.top();
-}
-
-void Renderer::push(const glm::mat4& m) {
-	mxStack.push(mxStack.top() * m);
-}
-
-void Renderer::push() {
-	mxStack.push(mxStack.top());
-}
-
-void Renderer::upload() { }
-
-// -------------------------------------------------------------------------------------------------
-
 Vertex::Vertex() { }
 
 Vertex::Vertex(const vec3& position, const vec3& normal, const vec3& tangent,
@@ -85,7 +63,7 @@ RenderPrimitiv::RenderPrimitiv(size_t first, size_t count) :
 	first(first), count(count) { }
 
 void RenderPrimitiv::render() {
-	glDrawArrays(GL_TRIANGLES, static_cast<GLsizei>(first), static_cast<GLint>(count));
+	glDrawArrays(GL_TRIANGLES, static_cast<GLsizei> (first), static_cast<GLint> (count));
 }
 
 } //namespace ui

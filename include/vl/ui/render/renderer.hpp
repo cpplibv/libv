@@ -6,6 +6,7 @@
 #include <glm/mat4x4.hpp>
 // vl
 #include <vl/vec.hpp>
+#include <vl/gl/gl.hpp>
 // std
 #include <stack>
 #include <vector>
@@ -16,19 +17,14 @@ namespace ui {
 class RenderPrimitiv;
 class Vertex;
 
-class Renderer {
+class Renderer : public gl::GL {
 	std::vector<Vertex> data;
-	std::stack<glm::mat4> mxStack;
 public:
+
 	RenderPrimitiv quad(const vec3& pos, const vec3& size,
 			const vec2& txbl = vec2(0, 0), const vec2& txtr = vec2(1, 1));
 	RenderPrimitiv triangle(const vec3& a, const vec3& b, const vec3& c,
 			const vec2& ta, const vec2& tb, const vec2& tc);
-
-	void push();
-	void push(const glm::mat4&);
-	void pop();
-	glm::mat4& top();
 
 	void upload();
 	void clear();

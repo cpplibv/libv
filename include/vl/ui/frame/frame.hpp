@@ -20,6 +20,7 @@
 #include <thread>
 // pro
 #include <vl/ui/component/component.hpp>
+#include <vl/ui/component/panel.hpp>
 #include <vl/ui/events/events.hpp>
 #include <vl/ui/monitor.hpp>
 #include <vl/ui/render/renderer.hpp>
@@ -32,12 +33,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Frame : public Trackable {
+class Frame : public Trackable, private ProtectedContainer {
 	//Every time a "frame" word is used it is referring to the entire window with
 	//	its VUI objects, handlers, events, states etc... A frame can be exits
 	//	without a window (exp: its not showed yet). A frame temporary can have
 	//	multiple window at the same time (exp: switching to undecorated (for
-	//	"copying" gl context)).
+	//	"sharing" gl context)).
 	//Every time a "window" word is used it is referring to the glfw (/ operation
 	//	system) window. A window is always part of a frame.
 
@@ -45,6 +46,7 @@ public:
 	using TypeCloseOperation = int;
 	using TypeDisplayMode = int;
 	using TypeOpenGLProfile = int;
+	using TypeOpenGLRefreshRate = int;
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -61,6 +63,8 @@ public:
 	static const TypeOpenGLProfile OPENGL_PROFILE_ANY;
 	static const TypeOpenGLProfile OPENGL_PROFILE_COMPAT;
 	static const TypeOpenGLProfile OPENGL_PROFILE_CORE;
+
+	static const TypeOpenGLRefreshRate REFRESH_RATE_DONT_CARE;
 
 	// Close ---------------------------------------------------------------------------------------
 
@@ -225,32 +229,30 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 private:
-	std::atomic<bool> forcedClose;
+	std::atomic<bool> forcedClose{false};
 
 private:
 	vl::WorkerThread context;
 
-	GLFWwindow* window;
+	GLFWwindow* window = nullptr;
 	GLFWwindow* shareWindow = nullptr;
 
 private:
 	unsigned int swapInterval = 1;
 	ivec2 pos;
-	ivec2 size;
+//	ivec2 size;
 
 private:
 	TypeOpenGLProfile openGLProfile = OPENGL_PROFILE_COMPAT;
-	int openGLRefreshRate;
+	int openGLRefreshRate = REFRESH_RATE_DONT_CARE;
 	int openGLSamples = 0;
 	int openGLVersionMajor = 3;
 	int openGLVersionMinor = 3;
 
-	bool decorated;
-	bool hidden;
-	bool minimalized;
-	bool resizable;
-
-	std::atomic<bool> invalidated;
+	bool decorated = true;
+	bool hidden = true;
+	bool minimalized = false;
+	bool resizable = true;
 
 	TypeCloseOperation defaultCloseOperation = ON_CLOSE_DISPOSE;
 	TypeDisplayMode displayMode = DISPLAY_MODE_WINDOWED;
@@ -258,9 +260,8 @@ private:
 	std::string title;
 
 private:
-	ComponentPtr content;
-protected: // or getter?
 	Renderer renderer;
+	//!!! I could make a layout manager only for Frame if i need to
 
 private:
 	Timer timerBuild;
@@ -290,15 +291,27 @@ public:
 	void show();
 	void showAsync();
 
-protected:
-	virtual void build();
-	virtual void destroy();
+private:
+	void baseBuild();
+	void baseDestroy();
+	void baseInvalidate();
+	void baseRender();
+	void baseUpdate();
+
+	//protected:
+	//	virtual void build();
+	//	virtual void destroy();
 	//	virtual void invalidate();
-	virtual void render();
-	virtual void update();
+	//	virtual void render();
+	//	virtual void update();
+
+	//public:
+	//	virtual void invalidate();
 
 public:
-	virtual void invalidate();
+	using ProtectedContainer::add;
+	using ProtectedContainer::remove;
+	using ProtectedContainer::setLayout;
 
 public:
 	void setOpenGLProfile(TypeOpenGLProfile profile);
@@ -306,8 +319,6 @@ public:
 	void setOpenGLSamples(int samples);
 	void setOpenGLVersion(int major, int minor);
 
-	void setContent(const observer_ptr<Component>& content);
-	void setContent(const shared_ptr<Component>& content);
 	void setCloseOperation(const TypeCloseOperation& operation);
 	void setDecoration(bool decorated);
 	void setDisplayMode(const TypeDisplayMode& mode);
@@ -317,10 +328,9 @@ public:
 	void setSize(int x, int y);
 	void setTitle(const std::string& title);
 
-	observer_ptr<Component> getContent();
 	TypeCloseOperation getCloseOperation() const;
 	TypeDisplayMode getDisplayMode() const;
-	ivec2 getSize() const;
+	ivec3 getSize() const;
 	std::string getTitle() const;
 	//	unsigned int getWidth() const;
 	// * * *
