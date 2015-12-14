@@ -9,6 +9,7 @@
 #include <vl/sig/signal.hpp>
 #include <vl/timer.hpp>
 #include <vl/worker_thread.hpp>
+#include <vl/utility.hpp>
 // std
 #include <atomic>
 #include <condition_variable>
@@ -48,6 +49,9 @@ public:
 	using TypeOpenGLProfile = int;
 	using TypeOpenGLRefreshRate = int;
 	using TypeOpenGLSamples = int;
+
+//	VL_STRONG_TYPEDEF(int, FrameCloseOperation)
+//	VL_STRONG_TYPEDEF(int, ProgramCloseOperation)
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -94,7 +98,7 @@ public:
 	 * @note May or may not produce onClose event on the other frames
 	 * (depending on their default close operation)
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DEFAULT_EXIT = 0; // - Close, others DCO.
+	static const TypeCloseOperation ON_CLOSE_DEFAULT_EXIT; // - Close, others DCO.
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration close and
 	 * force every frame to close after their current iteration even if the
@@ -102,7 +106,7 @@ public:
 	 * @note Does not interrupt current iteration
 	 * @note Does not interrupt other frames current iterations
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_EXIT = 1; //         - Close every frame
+	static const TypeCloseOperation ON_CLOSE_EXIT; //         - Close every frame
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration hide the
 	 * frame. The frame can be restored by calling show()
@@ -110,20 +114,20 @@ public:
 	 * @note Can be forced to close by calling close(), closing that way will
 	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_HIDE = 2; //         - Hide frame
+	static const TypeCloseOperation ON_CLOSE_HIDE; //         - Hide frame
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration does nothing.
 	 * @note Does not interrupt current iteration
 	 * @note Can be forced to close by calling close(), closing that way will
 	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DO_NOTHING = 3; //   - No operation
+	static const TypeCloseOperation ON_CLOSE_DO_NOTHING; //   - No operation
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration close the
 	 * frame
 	 * @note Does not interrupt current iteration
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DISPOSE = 4; //      - Close the frame
+	static const TypeCloseOperation ON_CLOSE_DISPOSE; //      - Close the frame
 
 public:
 	void closeDefault();
@@ -136,13 +140,12 @@ protected:
 	// ---------------------------------------------------------------------------------------------
 
 private:
-	//	void cmdFrameCreate();
 	/**
 	 * @note If this function fail the member window will be set to nullptr
 	 * @note This function may only be called by the Frame context.
 	 */
 	void cmdFrameRecreate();
-	//	void cmdFrameDestroy();
+	void cmdFrameDestroy();
 
 	/**
 	 * @note If this function fail the member window will be set to nullptr
@@ -226,8 +229,8 @@ public:
 	Signal<bool(Frame*) > onClose;
 	/** Event invoked if the frame is closed by frame's thread.
 	 * Can't be used for interrupting close.
-	 * Event occures when the window is ALREADY CLOSED,
-	 * but the Frame object is not deconstructed yet. */
+	 * Event occurs when the window is ALREADY CLOSED,
+	 * but the Frame object is not destructed yet. */
 	Signal<Frame*> onClosed;
 
 	// ---------------------------------------------------------------------------------------------
@@ -307,9 +310,6 @@ protected:
 	using ProtectedContainer::render;
 	using ProtectedContainer::update;
 
-	//public:
-	//	virtual void invalidate();
-
 public:
 	using ProtectedContainer::add;
 	using ProtectedContainer::remove;
@@ -334,7 +334,6 @@ public:
 	TypeDisplayMode getDisplayMode() const;
 	ivec3 getSize() const;
 	std::string getTitle() const;
-	//	unsigned int getWidth() const;
 	// * * *
 
 	bool isDecorated()const;

@@ -1,5 +1,37 @@
 
 
+STACK:
+
+-- commit --
+
+fix frame setters
+-- commit --
+
+funny enough but i think logging has a very high priority
+log thread naming
+-- commit --
+
+fix frame close operation
+-- commit --
+
+check frame and compontnet build / render / destroy / etc...
+find reason of crach on destructor
+-- commit --
+
+string2D
+-- commit --
+
+font shader
+-- commit --
+
+font cache
+-- commit --
+
+shader cache
+-- commit --
+
+// -------------------------------------------------------------------------------------------------
+
 Rename example folder to sandbox
 Create example folder with some of it...
 
@@ -12,14 +44,14 @@ Colors:
 0.236f, 0.311f, 0.311f
 0.500f, 0.170f, 0.090f
 0.227f, 1.000f, 0.810f
-Neat little page for similar and alternativ color picking: http://www.colorhexa.com/3affce
+Neat little page for similar and alternative color picking: http://www.colorhexa.com/3affce
 
 Base class for lights and cameras...
 
 
 move everything from vl to libv
 vl([^a-zA-Z0-9_]|$)			libv$1
-VL([^a-zA-Z0-9_]|$)			LIBV$1
+VL([^a-zA-Z0-9]|$)			LIBV$1
 
 
 license		https://www.youtube.com/watch?v=cJIi-hIlCQM

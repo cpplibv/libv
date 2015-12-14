@@ -203,7 +203,7 @@ class String2D {
 
 	std::string text;
 	std::vector<Font2D::Character> data;
-	void setText(const std::string& text) { }
+	void setText(const std::string&) { }
 	void render() { }
 };
 

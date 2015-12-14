@@ -6,14 +6,13 @@
 #include <iostream>
 #include <string>
 // pro
-#include <vl/ui/log.hpp>
-#include <vl/gl/log.hpp>
-#include <vl/ui/frame/frame.hpp>
-#include <vl/ui/component/panel.hpp>
-#include <vl/ui/component/label.hpp>
 #include <vl/gl/gl.hpp>
-
-#include "vl/ui/layout/layout_flow.hpp"
+#include <vl/gl/log.hpp>
+#include <vl/ui/component/label.hpp>
+#include <vl/ui/component/panel.hpp>
+#include <vl/ui/frame/frame.hpp>
+#include <vl/ui/layout/layout_flow.hpp>
+#include <vl/ui/log.hpp>
 
 using namespace vl;
 using namespace vl::ui;
@@ -84,9 +83,9 @@ public:
 		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
 		setSize(512, 512);
-//		setDecoration(false);
+		setDecoration(false);
 		init();
-		show();
+		showAsync();
 	}
 
 	virtual void build(Renderer& renderer) override {

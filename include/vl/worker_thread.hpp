@@ -124,7 +124,7 @@ public:
 	inline void executeSync(F&& func) {
 		executeSync(std::forward<F>(func), defaultPriority);
 	}
-	void terminate() {
+	void stop() {
 		std::lock_guard<std::recursive_mutex> lk(que_m);
 		terminateFlag = true;
 		recieved_cv.notify_all();
@@ -171,7 +171,7 @@ public:
 	WorkerThread(size_t defaultPriority) : WorkerThread(VL_DEFAULT_WORKERTHREAD_NAME, defaultPriority) { }
 	WorkerThread() : WorkerThread(VL_DEFAULT_WORKERTHREAD_NAME, VL_DEFAULT_WORKERTHREAD_TASK_PRIORITY) { }
 	virtual ~WorkerThread() {
-		terminate();
+		stop();
 		join();
 	}
 };
