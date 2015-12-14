@@ -1,13 +1,13 @@
 // File: DefaultRenderer.cpp, Created on 2014. április 24. 12:16, Author: Vader
 
 // hpp
-#include <vl/ui/render/default_renderer.hpp>
+#include <libv/ui/render/default_renderer.hpp>
 // ext
 #include <GL/glew.h>
 // pro
-#include <vl/ui/component/quad.hpp>
+#include <libv/ui/component/quad.hpp>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 void DefaultRenderer::operator()(const Quad* v) {
@@ -32,4 +32,4 @@ void DefaultRenderer::operator()(const Quad* v) {
 }
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

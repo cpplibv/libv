@@ -1,9 +1,9 @@
 // File: Light.cpp, Created on 2014. december 19. 13:12, Author: Vader
 
-#include <vl/gl/light.hpp>
+#include <libv/gl/light.hpp>
 
 
-namespace vl {
+namespace libv {
 	namespace gl {
 		// Light ---------------------------------------------------------------
 
@@ -21,4 +21,4 @@ namespace vl {
 			shadowCast(false) { }
 
 	} //namespace gl
-} //namespace vl
+} //namespace libv

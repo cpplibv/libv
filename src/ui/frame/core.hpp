@@ -4,7 +4,7 @@
 
 #include <functional>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -24,4 +24,4 @@ void unregisterFrame(Frame* frame);
 // -------------------------------------------------------------------------------------------------
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

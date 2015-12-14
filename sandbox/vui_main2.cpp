@@ -5,15 +5,15 @@
 #include <iostream>
 #include <iomanip>
 
-//#include <vl/ui/vui.hpp>
-#include <vl/ui/log.hpp>
-#include <vl/ui/frame/frame.hpp>
-#include <vl/ui/component/quad.hpp>
+//#include <libv/ui/vui.hpp>
+#include <libv/ui/log.hpp>
+#include <libv/ui/frame/frame.hpp>
+#include <libv/ui/component/quad.hpp>
 
 using namespace std;
 using namespace std::literals;
-using namespace vl;
-using namespace vl::ui;
+using namespace libv;
+using namespace libv::ui;
 
 //class VFrame : public Frame {
 //public:
@@ -27,7 +27,7 @@ using namespace vl::ui;
 //};
 
 int main(int, char**) {
-	vl::log().output(std::cout);
+	libv::log().output(std::cout);
 
 	Frame f1("1");
 	//	f1.setContent(new Quad());

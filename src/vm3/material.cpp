@@ -1,8 +1,8 @@
 // File: Material.cpp, Created on 2015. január 17. 7:50, Author: Vader
 
-#include <vl/vm3/material.hpp>
+#include <libv/vm3/material.hpp>
 
-namespace vl {
+namespace libv {
 	namespace vm3 {
 
 		MaterialPropertyBase::~MaterialPropertyBase() { }
@@ -44,4 +44,4 @@ namespace vl {
 			return shader;
 		}
 	} //namespace vm3
-} //namespace vl
+} //namespace libv

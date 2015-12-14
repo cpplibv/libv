@@ -1,11 +1,11 @@
 // File: ui_render_vbo.cpp, Created on 2015. április 30. 0:09, Author: Vader
 
 // hpp
-#include <vl/ui/render/renderer.hpp>
+#include <libv/ui/render/renderer.hpp>
 // ext
 #include <GL/glew.h>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -67,4 +67,4 @@ void RenderPrimitiv::render() {
 }
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

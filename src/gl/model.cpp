@@ -1,25 +1,25 @@
 // File: model.cpp, Created on 2014. november 28. 17:45, Author: Vader
 
 // hpp
-#include <vl/gl/model.hpp>
+#include <libv/gl/model.hpp>
 // ext
 #include <GL/glew.h>
 #include <boost/asio/buffer.hpp>
 #include <boost/filesystem/path.hpp>
-// vl
-#include <vl/read_file.hpp>
-#include <vl/utility.hpp>
-#include <vl/vm3/model.hpp>
+// libv
+#include <libv/read_file.hpp>
+#include <libv/utility.hpp>
+#include <libv/vm3/model.hpp>
 // std
 #include <fstream>
 // pro
-#include <vl/gl/log.hpp>
-#include <vl/gl/model.hpp>
-#include <vl/gl/shader.hpp>
-#include <vl/gl/uniform.hpp>
-#include <vl/gl/gl.hpp>
+#include <libv/gl/log.hpp>
+#include <libv/gl/model.hpp>
+#include <libv/gl/shader.hpp>
+#include <libv/gl/uniform.hpp>
+#include <libv/gl/gl.hpp>
 
-namespace vl {
+namespace libv {
 namespace gl {
 
 // TODO P2: Model default ctor and load function with the same params as the ctors
@@ -47,7 +47,7 @@ Model::Model(const char* data, size_t size, const std::string& name) :
 
 void Model::init(const char* data, size_t size) {
 	if (!model.load(data, size)) {
-		VLOG_ERROR(vl::gl::log(), "Failed to load model: [%s]", name);
+		VLOG_ERROR(libv::gl::log(), "Failed to load model: [%s]", name);
 		return;
 	}
 	loadGL();
@@ -60,7 +60,7 @@ Model::~Model() {
 // -------------------------------------------------------------------------------------------------
 
 void Model::loadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Loading model: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Loading model: [%s]", name);
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo_vertex);
@@ -100,14 +100,14 @@ void Model::loadGL() {
 }
 
 void Model::unloadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Unloading model: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Unloading model: [%s]", name);
 
 	glDeleteBuffers(1, &vbo_index);
 	glDeleteBuffers(1, &vbo_vertex);
 	glDeleteVertexArrays(1, &vao);
 }
 
-void Model::render(vl::gl::GL& gl) {
+void Model::render(libv::gl::GL& gl) {
 	glBindVertexArray(vao);
 	checkGL();
 
@@ -117,13 +117,13 @@ void Model::render(vl::gl::GL& gl) {
 	checkGL();
 }
 
-void Model::renderNode(uint32_t id, vl::gl::GL& gl) {
+void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 	gl.pushMatrixModel();
 	gl.matrixModel() *= model.nodes[id].transformation;
 //	uniformMmat = gl.matrixModel();
 //	uniformMVPmat = gl.matrixMVP(); //<<<Assign uniforms
 	//node->material->get<std::string>("diffuseTexture") //<<<Bind Textures here
-	//vl::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
+	//libv::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
 
 	if (gl.matrixModel()[0][0] * gl.matrixModel()[1][1] * gl.matrixModel()[2][2] < 0) {
 		glFrontFace(GL_CCW);
@@ -149,4 +149,4 @@ void Model::renderNode(uint32_t id, vl::gl::GL& gl) {
 }
 
 } //namespace gl
-} //namespace vl
+} //namespace libv

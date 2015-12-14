@@ -1,19 +1,19 @@
 // File: ShaderProgram.cpp, Created on 2014. december 7. 13:03, Author: Vader
 
 // hpp
-#include <vl/gl/shader.hpp>
+#include <libv/gl/shader.hpp>
 // ext
 #include <boost/asio/buffer.hpp>
 #include <boost/filesystem/path.hpp>
-// vl
-#include <vl/read_file.hpp>
+// libv
+#include <libv/read_file.hpp>
 // std
 #include <memory>
 // pro
-#include <vl/gl/log.hpp>
-#include <vl/gl/gl.hpp>
+#include <libv/gl/log.hpp>
+#include <libv/gl/gl.hpp>
 
-namespace vl {
+namespace libv {
 namespace gl {
 
 // toString ----------------------------------------------------------------------------------------
@@ -66,14 +66,14 @@ BaseShader::~BaseShader() {
 // -------------------------------------------------------------------------------------------------
 
 void BaseShader::loadGL(const char* source) {
-	VLOG_TRACE(vl::gl::log(), "GL Loading %s shader: [%s]", shaderTypeToString(type), name);
+	VLOG_TRACE(libv::gl::log(), "GL Loading %s shader: [%s]", shaderTypeToString(type), name);
 	shaderID = glCreateShader(type);
 
 	glShaderSource(shaderID, 1, &source, nullptr);
 	glCompileShader(shaderID);
 
 	if (!getShaderCompileStatus(shaderID)) {
-		VLOG_ERROR(vl::gl::log(), "Failed to compile %s shader [%s]: %s",
+		VLOG_ERROR(libv::gl::log(), "Failed to compile %s shader [%s]: %s",
 				shaderTypeToString(type), name, getShaderCompileMessage(shaderID));
 		unloadGL();
 	}
@@ -81,7 +81,7 @@ void BaseShader::loadGL(const char* source) {
 }
 
 void BaseShader::unloadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Unloading %s shader: [%s]", shaderTypeToString(type), name);
+	VLOG_TRACE(libv::gl::log(), "GL Unloading %s shader: [%s]", shaderTypeToString(type), name);
 	glDeleteShader(shaderID);
 	checkGL();
 }
@@ -109,7 +109,7 @@ ShaderProgram::~ShaderProgram() {
 // -------------------------------------------------------------------------------------------------
 
 void ShaderProgram::loadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Loading shader program: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Loading shader program: [%s]", name);
 	programID = glCreateProgram();
 
 	if (shaderVertex)
@@ -122,7 +122,7 @@ void ShaderProgram::loadGL() {
 	glLinkProgram(programID);
 
 	if (!getProgamLinkStatus(programID)) {
-		VLOG_ERROR(vl::gl::log(), "Failed to link [%s]: %s", name, getProgamLinkMessage(programID));
+		VLOG_ERROR(libv::gl::log(), "Failed to link [%s]: %s", name, getProgamLinkMessage(programID));
 		unloadGL();
 	}
 	checkGL();
@@ -156,7 +156,7 @@ void ShaderProgram::mapUniforms() {
 			*std::strrchr(uniformName, '[') = '\0';
 			std::string uniformSubName;
 			for (int j = 0; j < uniformSize; j++) {
-				uniformSubName = vl::format("%s[%d]", uniformName, j);
+				uniformSubName = libv::format("%s[%d]", uniformName, j);
 				GLint uniformLocation = glGetUniformLocation(programID, uniformSubName.c_str());
 
 				addressesUniform.emplace(uniformSubName,
@@ -167,7 +167,7 @@ void ShaderProgram::mapUniforms() {
 }
 
 void ShaderProgram::unloadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Unloading shader program: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Unloading shader program: [%s]", name);
 	glDeleteProgram(programID);
 	programID = 0;
 	checkGL();
@@ -182,7 +182,7 @@ void ShaderProgram::use() {
 // -------------------------------------------------------------------------------------------------
 
 } //namespace gl
-} //namespace vl
+} //namespace libv
 
 
 // -------------------------------------------------------------------------------------------------

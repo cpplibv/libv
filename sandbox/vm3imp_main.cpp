@@ -1,18 +1,18 @@
 // File: vm3_importer.cpp, Created on 2015. február 18. 18:22, Author: Vader
 
-// vl
-#include <vl/log.hpp>
+// libv
+#include <libv/log.hpp>
 // std
 #include <iostream>
 // pro
-#include <vl/vm3imp/console.hpp>
-#include <vl/vm3imp/command/import_cmd.hpp>
-#include <vl/vm3imp/command/material_manip_cmd.hpp>
+#include <libv/vm3imp/console.hpp>
+#include <libv/vm3imp/command/import_cmd.hpp>
+#include <libv/vm3imp/command/material_manip_cmd.hpp>
 
-using namespace vl;
+using namespace libv;
 
 int main(int argc, char** argv) {
-	vl::log().output(std::cout);
+	libv::log().output(std::cout);
 
 	std::string line;
 	for (int i = 1; i < argc; i++)

@@ -1,13 +1,13 @@
 // File: console.cpp, Created on 2015. március 27. 2:48, Author: Vader
 
 // hpp
-#include <vl/vm3imp/console.hpp>
-// vl
-#include <vl/string.hpp>
+#include <libv/vm3imp/console.hpp>
+// libv
+#include <libv/string.hpp>
 // std
 #include <iostream>
 
-namespace vl {
+namespace libv {
 namespace vm3 {
 
 // -------------------------------------------------------------------------------------------------
@@ -32,11 +32,11 @@ std::vector<std::string> splitCommandLine(const std::string& line) {
 		result.push_back(curr_word);
 
 	for (auto& word : result) {
-		word = vl::trim(word);
+		word = libv::trim(word);
 		auto size = word.size();
 		if(size > 1 && word[0] == '"' && word[size - 1] == '"')
 			word = word.substr(1, size - 2);
-		word = vl::trim(word);
+		word = libv::trim(word);
 	}
 	return result;
 }
@@ -171,4 +171,4 @@ void Console::execute(const std::string& cmd) {
 // -------------------------------------------------------------------------------------------------
 
 } //namespace vm3
-} //namespace vl
+} //namespace libv

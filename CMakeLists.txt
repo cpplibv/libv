@@ -1,7 +1,7 @@
 #
 
 cmake_minimum_required (VERSION 3.1)
-project (vl)
+project (libv)
 include(ExternalProject)
 
 include(cmake/util.cmake)
@@ -305,7 +305,7 @@ link_directories(${PATH_EXT}/glfw/lib)
 
 #Sources
 file(GLOB_RECURSE vgl_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/gl/*.cpp)
-file(GLOB_RECURSE vl_src          RELATIVE ${PATH_PRJ} ${PATH_SRC}/vl/*.cpp)
+file(GLOB_RECURSE libv_src          RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
 file(GLOB_RECURSE vm3_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3/*.cpp)
 file(GLOB_RECURSE vm3imp_src      RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/sig/*.cpp)
@@ -313,7 +313,7 @@ file(GLOB_RECURSE vui_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/ui/*.cpp)
 
 #Test Sources
 file(GLOB_RECURSE vgl_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/gl/*.cpp)
-file(GLOB_RECURSE vl_test_src     RELATIVE ${PATH_PRJ} ${PATH_TST}/vl/*.cpp)
+file(GLOB_RECURSE libv_test_src     RELATIVE ${PATH_PRJ} ${PATH_TST}/libv/*.cpp)
 file(GLOB_RECURSE vm3_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3/*.cpp)
 file(GLOB_RECURSE vm3imp_test_src RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/sig/*.cpp)
@@ -321,7 +321,7 @@ file(GLOB_RECURSE vui_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
 
 #Libraries
 add_library(vgl    STATIC ${vgl_src})
-add_library(vl     STATIC ${vl_src})
+add_library(libv   STATIC ${libv_src})
 add_library(vm3    STATIC ${vm3_src})
 add_library(vm3imp STATIC ${vm3imp_src})
 add_library(vsig   STATIC ${vsig_src})
@@ -329,7 +329,7 @@ add_library(vui    STATIC ${vui_src})
 
 #Tests
 add_executable(vgl_test    ${vgl_test_src})
-add_executable(vl_test     ${vl_test_src})
+add_executable(libv_test   ${libv_test_src})
 add_executable(vm3_test    ${vm3_test_src})
 add_executable(vm3imp_test ${vm3imp_test_src})
 add_executable(vsig_test   ${vsig_test_src})
@@ -337,7 +337,7 @@ add_executable(vui_test    ${vui_test_src})
 
 #Sandbox - Executables
 add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
-add_executable(vl_main     ${PATH_SNB}/vl_main.cpp)
+add_executable(libv_main   ${PATH_SNB}/libv_main.cpp)
 add_executable(vm3_main    ${PATH_SNB}/vm3_main.cpp)
 add_executable(vm3imp_main ${PATH_SNB}/vm3imp_main.cpp)
 add_executable(vsig_main   ${PATH_SNB}/vsig_main.cpp)
@@ -358,7 +358,7 @@ target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
 
 #Link - Tests
 target_link_libraries(vgl_test    -static vgl)
-target_link_libraries(vl_test     -static )
+target_link_libraries(libv_test   -static )
 target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
 target_link_libraries(vm3imp_test -static vm3)
 target_link_libraries(vsig_test   -static )
@@ -366,7 +366,7 @@ target_link_libraries(vui_test    -static )
 
 #Link - Executables
 target_link_libraries(vgl_main    -static glew glfw3 vgl)
-target_link_libraries(vl_main     -static cppformat)
+target_link_libraries(libv_main   -static cppformat)
 target_link_libraries(vm3_main    -static vm3 boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3imp_main -static vm3imp boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vsig_main   -static )

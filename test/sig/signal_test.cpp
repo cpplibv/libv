@@ -3,13 +3,13 @@
 #include <catch.hpp>
 
 #include "signal_test_util.hpp"
-#include <vl/sig/signal.hpp>
+#include <libv/sig/signal.hpp>
 #include <thread>
 
-using vl::Signal;
-using vl::CapacitivSignal;
-using vl::SwitchSignal;
-using vl::HistorySignal;
+using libv::Signal;
+using libv::CapacitivSignal;
+using libv::SwitchSignal;
+using libv::HistorySignal;
 
 TEST_CASE("SignalConstruct") {
 	Signal<> testObj;

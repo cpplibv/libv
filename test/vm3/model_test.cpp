@@ -17,10 +17,10 @@
 
 #include <sstream>
 
-#include <vl/vm3/serialization/model.hpp>
+#include <libv/vm3/serialization/model.hpp>
 
-using namespace vl;
-using namespace vl::vm3;
+using namespace libv;
+using namespace libv::vm3;
 
 TEST_CASE("modelBasic") {
 	Model model;

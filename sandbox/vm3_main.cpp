@@ -6,19 +6,19 @@
 //#include <boost/archive/portable_oarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
-// vl
-#include <vl/read_file.hpp>
+// libv
+#include <libv/read_file.hpp>
 // std
 #include <iostream>
 #include <sstream>
 #include <fstream>
 // pro
-//#include <vl/vm3/material.hpp>
-//#include <vl/vm3/material_property_visitor.hpp>
-//#include <vl/vm3/model.hpp>
-#include <vl/vm3/serialization/model.hpp>
+//#include <libv/vm3/material.hpp>
+//#include <libv/vm3/material_property_visitor.hpp>
+//#include <libv/vm3/model.hpp>
+#include <libv/vm3/serialization/model.hpp>
 
-using namespace vl::vm3;
+using namespace libv::vm3;
 
 int main(int, char **) {
 	Model model;
@@ -27,7 +27,7 @@ int main(int, char **) {
 	material1.set("test", 42);
 	material1.set("testf", 42.1f);
 	material1.set("testd", 42.2);
-	material1.set("victor", vl::dvec3(4, 3, 543.32));
+	material1.set("victor", libv::dvec3(4, 3, 543.32));
 	material1.set("zzz", 0xffff);
 	material1.set<std::string>("diffuseTexture", "diffuseTexture.dds");
 	material1.set<std::string>("emissionTexture", "emissionTexture.dds");
@@ -47,19 +47,19 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("test_file_xml");
 		boost::archive::xml_oarchive oar(ofs);
-		oar << VL_NVP(model);
+		oar << LIBV_NVP(model);
 	}
 	{
 		std::ifstream ifs("test_file_xml");
 		boost::archive::xml_iarchive iar(ifs);
-		iar >> VL_NVP(model);
+		iar >> LIBV_NVP(model);
 	}
 	{
 		std::ofstream ofs("test_file_bin", std::ios_base::binary);
 		model.save(ofs);
 	}
 	{
-		auto data = vl::readFile("test_file_bin", std::ios_base::binary);
+		auto data = libv::readFile("test_file_bin", std::ios_base::binary);
 		model.load(data.data(), data.size());
 	}
 

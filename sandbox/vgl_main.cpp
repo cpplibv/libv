@@ -7,21 +7,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/rotate_vector.hpp>
-// vl
-#include <vl/timer.hpp>
-#include <vl/worker_thread.hpp>
+// libv
+#include <libv/timer.hpp>
+#include <libv/worker_thread.hpp>
 // std
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <iostream>
 // pro
-#include <vl/gl/gl.hpp>
-#include <vl/gl/log.hpp>
-#include <vl/gl/model.hpp>
-#include <vl/gl/shader.hpp>
-#include <vl/gl/texture.hpp>
-#include <vl/gl/uniform.hpp>
+#include <libv/gl/gl.hpp>
+#include <libv/gl/log.hpp>
+#include <libv/gl/model.hpp>
+#include <libv/gl/shader.hpp>
+#include <libv/gl/texture.hpp>
+#include <libv/gl/uniform.hpp>
 
 // -------------------------------------------------------------------------------------------------
 
@@ -33,15 +33,15 @@ std::atomic_bool running{true};
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 900
 
-#define checkGLEWSupport(ext) VLOG_INFO(vl::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define checkGLEWSupport(ext) VLOG_INFO(libv::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		VLOG_ERROR(vl::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		VLOG_ERROR(libv::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	VLOG_INFO(vl::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	VLOG_INFO(vl::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	VLOG_INFO(vl::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
+	VLOG_INFO(libv::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	VLOG_INFO(libv::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	VLOG_INFO(libv::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
 
 	checkGLEWSupport(GL_VERSION_3_3);
 	checkGLEWSupport(GL_VERSION_4_5);
@@ -71,36 +71,36 @@ void initGLSL() {
 }
 
 static void error_callback(int code, const char* description) {
-	VLOG_ERROR(vl::log(), "GLFW %d: %s", code, description);
+	VLOG_ERROR(libv::log(), "GLFW %d: %s", code, description);
 }
 
 // -------------------------------------------------------------------------------------------------
 struct Example {
-	vl::gl::GL gl;
-	vl::gl::ShaderProgram shaderDebug;
-	vl::gl::ShaderProgram shaderDepth;
-	vl::gl::Texture texture0;
-	vl::gl::Texture texture1;
-	vl::gl::Texture texture2;
-	vl::gl::Model model0;
-	vl::gl::Model model1;
-	vl::gl::Model model2;
-	vl::gl::Model model3;
-	vl::gl::Model model4;
+	libv::gl::GL gl;
+	libv::gl::ShaderProgram shaderDebug;
+	libv::gl::ShaderProgram shaderDepth;
+	libv::gl::Texture texture0;
+	libv::gl::Texture texture1;
+	libv::gl::Texture texture2;
+	libv::gl::Model model0;
+	libv::gl::Model model1;
+	libv::gl::Model model2;
+	libv::gl::Model model3;
+	libv::gl::Model model4;
 
-	vl::gl::Uniform<glm::mat4> glslMVPmat;
-	vl::gl::Uniform<glm::mat4> glslMmat;
-	vl::gl::Uniform<vl::gl::TextureType> glslTextureDiffuseSampler;
-	vl::gl::Uniform<vl::gl::TextureType> glslTextureNormalSampler;
-	vl::gl::Uniform<vl::gl::TextureType> glslTextureAmbientSampler;
+	libv::gl::Uniform<glm::mat4> glslMVPmat;
+	libv::gl::Uniform<glm::mat4> glslMmat;
+	libv::gl::Uniform<libv::gl::TextureType> glslTextureDiffuseSampler;
+	libv::gl::Uniform<libv::gl::TextureType> glslTextureNormalSampler;
+	libv::gl::Uniform<libv::gl::TextureType> glslTextureAmbientSampler;
 
 	Example() :
 		shaderDebug("Debug 0",
-		std::make_shared<vl::gl::ShaderVertex>("Data/Shader/debug0.vs"),
-		std::make_shared<vl::gl::ShaderFragment>("Data/Shader/debug0.fs")),
+		std::make_shared<libv::gl::ShaderVertex>("Data/Shader/debug0.vs"),
+		std::make_shared<libv::gl::ShaderFragment>("Data/Shader/debug0.fs")),
 		shaderDepth("Depth 0",
-		std::make_shared<vl::gl::ShaderVertex>("Data/Shader/depth.vs"),
-		std::make_shared<vl::gl::ShaderFragment>("Data/Shader/depth.fs")),
+		std::make_shared<libv::gl::ShaderVertex>("Data/Shader/depth.vs"),
+		std::make_shared<libv::gl::ShaderFragment>("Data/Shader/depth.fs")),
 		texture0("Data/Texture/asteorid_02_diffuse.dds"),
 		texture1("Data/Texture/asteorid_02_normal.dds"),
 		texture2("Data/Texture/asteorid_02_ambient.dds"),
@@ -119,9 +119,9 @@ struct Example {
 		checkGL();
 
 		shaderDebug.use();
-		glslTextureDiffuseSampler = vl::gl::TextureType::diffuse;
-		glslTextureNormalSampler = vl::gl::TextureType::normal;
-		glslTextureAmbientSampler = vl::gl::TextureType::ambient;
+		glslTextureDiffuseSampler = libv::gl::TextureType::diffuse;
+		glslTextureNormalSampler = libv::gl::TextureType::normal;
+		glslTextureAmbientSampler = libv::gl::TextureType::ambient;
 		checkGL();
 	}
 	void render();
@@ -153,25 +153,25 @@ void Example::render() {
 
 	// ---------------------------------------------------------------------------------------------
 
-	//	texture0.bind(vl::gl::TextureType::diffuse);
-	//	texture1.bind(vl::gl::TextureType::normal);
-	//	texture2.bind(vl::gl::TextureType::ambient);
+	//	texture0.bind(libv::gl::TextureType::diffuse);
+	//	texture1.bind(libv::gl::TextureType::normal);
+	//	texture2.bind(libv::gl::TextureType::ambient);
 	//	checkGL();
 	//
-	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
-	//	vl::gl::renderCube(0, 0, 0, 5.0f);
-	//	vl::gl::renderCube(11, 0, 0, 6.0f);
+	//	libv::gl::renderCube(-9, 0, 0, 4.0f);
+	//	libv::gl::renderCube(0, 0, 0, 5.0f);
+	//	libv::gl::renderCube(11, 0, 0, 6.0f);
 	//
-	//	texture2.unbind(vl::gl::TextureType::ambient);
-	//	texture1.unbind(vl::gl::TextureType::normal);
-	//	texture0.unbind(vl::gl::TextureType::diffuse);
+	//	texture2.unbind(libv::gl::TextureType::ambient);
+	//	texture1.unbind(libv::gl::TextureType::normal);
+	//	texture0.unbind(libv::gl::TextureType::diffuse);
 	//	checkGL();
 
 	// ---------------------------------------------------------------------------------------------
 
-	texture0.bind(vl::gl::TextureType::diffuse);
-	texture1.bind(vl::gl::TextureType::normal);
-	texture2.bind(vl::gl::TextureType::ambient);
+	texture0.bind(libv::gl::TextureType::diffuse);
+	texture1.bind(libv::gl::TextureType::normal);
+	texture2.bind(libv::gl::TextureType::ambient);
 
 	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, -20));
 	model0.render(gl);
@@ -184,9 +184,9 @@ void Example::render() {
 	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
 	model4.render(gl);
 
-	texture2.unbind(vl::gl::TextureType::ambient);
-	texture1.unbind(vl::gl::TextureType::normal);
-	texture0.unbind(vl::gl::TextureType::diffuse);
+	texture2.unbind(libv::gl::TextureType::ambient);
+	texture1.unbind(libv::gl::TextureType::normal);
+	texture0.unbind(libv::gl::TextureType::diffuse);
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -206,12 +206,12 @@ void init() {
 }
 
 int main(void) {
-	vl::log().output(std::cout);
+	libv::log().output(std::cout);
 
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		VLOG_ERROR(vl::log(), "Failed to initialize GLFW.");
+		VLOG_ERROR(libv::log(), "Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -225,7 +225,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		VLOG_ERROR(vl::log(), "Failed to create GLFW window.");
+		VLOG_ERROR(libv::log(), "Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -238,7 +238,7 @@ int main(void) {
 	{
 		Example example;
 
-		vl::Timer timer;
+		libv::Timer timer;
 		size_t time = 0, i = 0;
 
 
@@ -255,7 +255,7 @@ int main(void) {
 			i++;
 			time += timer.time().count();
 			if (time > 1'000'000'000) {
-				VLOG_INFO(vl::log(), "FPS: %d", i);
+				VLOG_INFO(libv::log(), "FPS: %d", i);
 				i = 0;
 				time -= 1'000'000'000;
 			}
@@ -282,8 +282,8 @@ int main(void) {
 //	const char* title;
 //	float r, g, b;
 //	std::thread* th;
-//	vl::gl::GL gl;
-//	//	vl::WorkerThread thread;
+//	libv::gl::GL gl;
+//	//	libv::WorkerThread thread;
 //
 //	MyFrame(GLFWwindow* window, const char* title, float r, float g, float b, std::thread* th) :
 //		window(window),
@@ -294,11 +294,11 @@ int main(void) {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//std::unique_ptr<vl::WorkerThread> threadIO;
+//std::unique_ptr<libv::WorkerThread> threadIO;
 //
-//std::shared_ptr<vl::gl::ShaderProgram> shaderDebug, shaderDepth;
-//std::shared_ptr<vl::gl::Texture> texture0, texture1, texture2;
-////std::shared_ptr<vl::gl::Model> model0, model1, model2, model3, model4;
+//std::shared_ptr<libv::gl::ShaderProgram> shaderDebug, shaderDepth;
+//std::shared_ptr<libv::gl::Texture> texture0, texture1, texture2;
+////std::shared_ptr<libv::gl::Model> model0, model1, model2, model3, model4;
 //
 //float angle = 0;
 //
@@ -306,15 +306,15 @@ int main(void) {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//#define checkGLEWSupport(ext) VLOG_INFO(vl::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+//#define checkGLEWSupport(ext) VLOG_INFO(libv::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 //
 //void initGLEW() {
 //	if (GLenum err = glewInit() != GLEW_OK)
-//		VLOG_ERROR(vl::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+//		VLOG_ERROR(libv::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 //
-//	VLOG_INFO(vl::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-//	VLOG_INFO(vl::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-//	VLOG_INFO(vl::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
+//	VLOG_INFO(libv::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+//	VLOG_INFO(libv::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+//	VLOG_INFO(libv::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
 //
 //	checkGLEWSupport(GL_VERSION_3_3);
 //	checkGLEWSupport(GL_VERSION_4_5);
@@ -344,7 +344,7 @@ int main(void) {
 //}
 //
 //static void error_callback(int code, const char* description) {
-//	VLOG_ERROR(vl::log(), "GLFW %d: %s", code, description);
+//	VLOG_ERROR(libv::log(), "GLFW %d: %s", code, description);
 //}
 //
 //// -------------------------------------------------------------------------------------------------
@@ -367,15 +367,15 @@ int main(void) {
 //	glLoadIdentity();
 //	glMultMatrixf(glm::value_ptr(gl.matrixMVP()));
 //
-//	//	texture0->bind(vl::gl::TextureType::diffuse);
-//	//	vl::gl::renderCube(-9, 0, 0, 4.0f);
-//	//	texture0->unbind(vl::gl::TextureType::diffuse);
-//	//	texture1->bind(vl::gl::TextureType::diffuse);
-//	//	vl::gl::renderCube(0, 0, 0, 5.0f);
-//	//	texture1->unbind(vl::gl::TextureType::diffuse);
-//	//	texture2->bind(vl::gl::TextureType::diffuse);
-//	//	vl::gl::renderCube(11, 0, 0, 6.0f);
-//	//	texture2->unbind(vl::gl::TextureType::diffuse);
+//	//	texture0->bind(libv::gl::TextureType::diffuse);
+//	//	libv::gl::renderCube(-9, 0, 0, 4.0f);
+//	//	texture0->unbind(libv::gl::TextureType::diffuse);
+//	//	texture1->bind(libv::gl::TextureType::diffuse);
+//	//	libv::gl::renderCube(0, 0, 0, 5.0f);
+//	//	texture1->unbind(libv::gl::TextureType::diffuse);
+//	//	texture2->bind(libv::gl::TextureType::diffuse);
+//	//	libv::gl::renderCube(11, 0, 0, 6.0f);
+//	//	texture2->unbind(libv::gl::TextureType::diffuse);
 //
 //	// ---------------------------------------------------------------------------------------------
 //
@@ -388,19 +388,19 @@ int main(void) {
 //	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
 //	//	model4->render(gl);
 //	//
-//	//	vl::glsl::textureDiffuseSampler = static_cast<uint32_t> (vl::gl::TextureType::diffuse);
-//	//	vl::glsl::textureNormalSampler = static_cast<uint32_t> (vl::gl::TextureType::normal);
-//	//	vl::glsl::textureAmbientSampler = static_cast<uint32_t> (vl::gl::TextureType::ambient);
+//	//	libv::glsl::textureDiffuseSampler = static_cast<uint32_t> (libv::gl::TextureType::diffuse);
+//	//	libv::glsl::textureNormalSampler = static_cast<uint32_t> (libv::gl::TextureType::normal);
+//	//	libv::glsl::textureAmbientSampler = static_cast<uint32_t> (libv::gl::TextureType::ambient);
 //	//
 //	//	gl.matrixModel() *= glm::translate(glm::vec3(0, 0, 8));
 //	//	gl.matrixModel() *= glm::scale(glm::vec3(3, 3, 3));
-//	//	texture1->bind(vl::gl::TextureType::diffuse); //d
-//	//	texture2->bind(vl::gl::TextureType::normal); //n
-//	//	texture3->bind(vl::gl::TextureType::ambient); //a
+//	//	texture1->bind(libv::gl::TextureType::diffuse); //d
+//	//	texture2->bind(libv::gl::TextureType::normal); //n
+//	//	texture3->bind(libv::gl::TextureType::ambient); //a
 //	//	model5->render(gl);
-//	//	texture3->unbind(vl::gl::TextureType::ambient); //a
-//	//	texture2->unbind(vl::gl::TextureType::normal); //n
-//	//	texture1->unbind(vl::gl::TextureType::diffuse); //d
+//	//	texture3->unbind(libv::gl::TextureType::ambient); //a
+//	//	texture2->unbind(libv::gl::TextureType::normal); //n
+//	//	texture1->unbind(libv::gl::TextureType::diffuse); //d
 //
 //	gl.popMatrixModel();
 //	gl.popMatrixView();
@@ -419,7 +419,7 @@ int main(void) {
 //
 //	thread_init(data);
 //
-//	vl::Timer timer;
+//	libv::Timer timer;
 //	size_t time = 0, i = 0;
 //	while (running) {
 //		const float v = (float) fabs(sin(glfwGetTime() * 2.f));
@@ -434,7 +434,7 @@ int main(void) {
 //		i++;
 //		time += timer.time().count();
 //		if (time > 1'000'000'000) {
-//			VLOG_INFO(vl::log(), "FPS in window [%s]: %d", data->title, i);
+//			VLOG_INFO(libv::log(), "FPS in window [%s]: %d", data->title, i);
 //			i = 0;
 //			time -= 1'000'000'000;
 //		}
@@ -447,23 +447,23 @@ int main(void) {
 //// -------------------------------------------------------------------------------------------------
 //
 //void init() {
-//	shaderDebug = std::make_shared<vl::gl::ShaderProgram>("Simple Debug",
-//			std::make_shared<vl::gl::Shader>("Data/Shader/debug0.vs"),
-//			std::make_shared<vl::gl::Shader>("Data/Shader/debug0.fs"));
-//	shaderDepth = std::make_shared<vl::gl::ShaderProgram>("Simple Depth",
-//			std::make_shared<vl::gl::Shader>("Data/Shader/depth.vs"),
-//			std::make_shared<vl::gl::Shader>("Data/Shader/depth.fs"));
-//	texture0 = std::make_shared<vl::gl::Texture>(
+//	shaderDebug = std::make_shared<libv::gl::ShaderProgram>("Simple Debug",
+//			std::make_shared<libv::gl::Shader>("Data/Shader/debug0.vs"),
+//			std::make_shared<libv::gl::Shader>("Data/Shader/debug0.fs"));
+//	shaderDepth = std::make_shared<libv::gl::ShaderProgram>("Simple Depth",
+//			std::make_shared<libv::gl::Shader>("Data/Shader/depth.vs"),
+//			std::make_shared<libv::gl::Shader>("Data/Shader/depth.fs"));
+//	texture0 = std::make_shared<libv::gl::Texture>(
 //			"Data/Texture/asteorid_02_diffuse.dds");
-//	texture1 = std::make_shared<vl::gl::Texture>(
+//	texture1 = std::make_shared<libv::gl::Texture>(
 //			"Data/Texture/asteorid_02_normal.dds");
-//	texture2 = std::make_shared<vl::gl::Texture>(
+//	texture2 = std::make_shared<libv::gl::Texture>(
 //			"Data/Texture/asteorid_02_ambient.dds");
-//	//	model1 = new vl::gl::Model(*modelManager, "test_group.dae.pb");
-//	//	model2 = new vl::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
-//	//	model3 = new vl::gl::Model(*modelManager, "test_sp.dae.pb");
-//	//	model4 = new vl::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
-//	//	model5 = new vl::gl::Model(*modelManager, "asteroid_02.dae.pb");
+//	//	model1 = new libv::gl::Model(*modelManager, "test_group.dae.pb");
+//	//	model2 = new libv::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
+//	//	model3 = new libv::gl::Model(*modelManager, "test_sp.dae.pb");
+//	//	model4 = new libv::gl::Model(*modelManager, "projectile_missile_01_hellfire.0001.dae.pb");
+//	//	model5 = new libv::gl::Model(*modelManager, "asteroid_02.dae.pb");
 //}
 //
 //void term() {
@@ -475,7 +475,7 @@ int main(void) {
 //}
 //
 //int main(void) {
-//	vl::log().output(std::cout);
+//	libv::log().output(std::cout);
 //
 //	MyFrame frames[] = {
 //		{nullptr, "Example 0", 1.0f, 0.8f, 0.8f, nullptr},
@@ -487,7 +487,7 @@ int main(void) {
 //	glfwSetErrorCallback(error_callback);
 //
 //	if (!glfwInit()) {
-//		VLOG_ERROR(vl::log(), "Failed to initialize GLFW.");
+//		VLOG_ERROR(libv::log(), "Failed to initialize GLFW.");
 //		exit(EXIT_FAILURE);
 //	}
 //
@@ -505,7 +505,7 @@ int main(void) {
 //		frames[i].window = glfwCreateWindow(200, 200, frames[i].title, nullptr, globalGLContext);
 //		if (!frames[i].window) {
 //			glfwTerminate();
-//			VLOG_ERROR(vl::log(), "Failed to create GLFW window.");
+//			VLOG_ERROR(libv::log(), "Failed to create GLFW window.");
 //			exit(EXIT_FAILURE);
 //		}
 //

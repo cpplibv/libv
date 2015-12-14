@@ -1,14 +1,14 @@
 // File: monitor.cpp, Created on 2015. április 9. 20:44, Author: Vader
 
 // hpp
-#include <vl/ui/monitor.hpp>
+#include <libv/ui/monitor.hpp>
 // ext
 #include <GLFW/glfw3.h>
 // std
 #include <limits>
 
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -86,4 +86,4 @@ Monitor::Monitor(GLFWmonitor* monitor) {
 // -------------------------------------------------------------------------------------------------
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

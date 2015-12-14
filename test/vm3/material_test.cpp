@@ -14,11 +14,11 @@
 
 #include <sstream>
 
-#include <vl/vm3/serialization/material.hpp>
-#include <vl/vm3/material_property_visitor.hpp>
+#include <libv/vm3/serialization/material.hpp>
+#include <libv/vm3/material_property_visitor.hpp>
 
-using namespace vl;
-using namespace vl::vm3;
+using namespace libv;
+using namespace libv::vm3;
 
 TEST_CASE("materialBasic") {
 	Material material0;

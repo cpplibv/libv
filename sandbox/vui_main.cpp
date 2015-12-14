@@ -6,26 +6,26 @@
 #include <iostream>
 #include <string>
 // pro
-#include <vl/gl/gl.hpp>
-#include <vl/gl/log.hpp>
-#include <vl/ui/component/label.hpp>
-#include <vl/ui/component/panel.hpp>
-#include <vl/ui/frame/frame.hpp>
-#include <vl/ui/layout/layout_flow.hpp>
-#include <vl/ui/log.hpp>
+#include <libv/gl/gl.hpp>
+#include <libv/gl/log.hpp>
+#include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel.hpp>
+#include <libv/ui/frame/frame.hpp>
+#include <libv/ui/layout/layout_flow.hpp>
+#include <libv/ui/log.hpp>
 
-using namespace vl;
-using namespace vl::ui;
+using namespace libv;
+using namespace libv::ui;
 
-#define checkGLEWSupport(ext) VLOG_INFO(vl::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define checkGLEWSupport(ext) VLOG_INFO(libv::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		VLOG_ERROR(vl::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		VLOG_ERROR(libv::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	VLOG_INFO(vl::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	VLOG_INFO(vl::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	VLOG_INFO(vl::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
+	VLOG_INFO(libv::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	VLOG_INFO(libv::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	VLOG_INFO(libv::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
 
 	checkGLEWSupport(GL_VERSION_3_3);
 	checkGLEWSupport(GL_VERSION_4_5);
@@ -112,7 +112,7 @@ public:
 };
 
 int main(int, char**) {
-	vl::log().output(std::cout);
+	libv::log().output(std::cout);
 
 	TestFrame f1("TestFrame");
 	f1.join();

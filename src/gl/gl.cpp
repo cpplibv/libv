@@ -1,11 +1,11 @@
 // File: vgl.cpp, Created on 2014. november 25. 12:14, Author: Vader
 
 // hpp
-#include <vl/gl/gl.hpp>
+#include <libv/gl/gl.hpp>
 // ext
 #include <GL/glew.h>
 
-namespace vl {
+namespace libv {
 namespace gl {
 
 void renderCube(float x, float y, float z, float size) {
@@ -96,4 +96,4 @@ void renderCube(float x, float y, float z, float size) {
 //}
 
 } //namespace gl
-} //namespace vl
+} //namespace libv

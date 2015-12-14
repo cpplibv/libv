@@ -1,29 +1,29 @@
 // File: import_cmd.cpp, Created on 2015. március 27. 5:16, Author: Vader
 
 // hpp
-#include <vl/vm3imp/command/import_cmd.hpp>
+#include <libv/vm3imp/command/import_cmd.hpp>
 // ext
 #include <boost/archive/portable_oarchive.hpp>
 //#include <boost/archive/portable_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 //#include <boost/archive/xml_iarchive.hpp>
 #include <boost/serialization/serialization.hpp>
-// vl
-//#include <vl/log.hpp>
-//#include <vl/string.hpp>
-#include <vl/read_file.hpp>
+// libv
+//#include <libv/log.hpp>
+//#include <libv/string.hpp>
+#include <libv/read_file.hpp>
 // std
 #include <iostream>
 #include <fstream>
 // pro
-#include <vl/vm3/importer.hpp>
-//#include <vl/vm3/log.hpp>
-#include <vl/vm3/serialization/model.hpp>
-#include <vl/vm3imp/console.hpp>
-#include <vl/vm3imp/opened_model.hpp>
+#include <libv/vm3/importer.hpp>
+//#include <libv/vm3/log.hpp>
+#include <libv/vm3/serialization/model.hpp>
+#include <libv/vm3imp/console.hpp>
+#include <libv/vm3imp/opened_model.hpp>
 
 
-namespace vl {
+namespace libv {
 namespace vm3 {
 
 CommandOpen::CommandOpen() :
@@ -35,7 +35,7 @@ CommandOpen::CommandOpen() :
 
 void CommandOpen::execute() {
 	openedModel.reset(new Model());
-	auto data = vl::readFile(filePath.value(), std::ios::binary);
+	auto data = libv::readFile(filePath.value(), std::ios::binary);
 	openedModel->load(data.data(), data.size());
 }
 
@@ -57,7 +57,7 @@ void CommandSave::execute() {
 	if (text.set()) {
 		std::ofstream ofs(openedModel->getName() + ".xml");
 		boost::archive::xml_oarchive oar(ofs);
-		oar << VL_NVP_NAMED("model", *openedModel);
+		oar << LIBV_NVP_NAMED("model", *openedModel);
 	} else
 		openedModel->save(std::ofstream(openedModel->getName() + ".vm3", std::ios_base::binary));
 }
@@ -82,7 +82,7 @@ void CommandSaveAs::execute() {
 	if (text.set()) {
 		std::ofstream ofs(filePath.value());
 		boost::archive::xml_oarchive oar(ofs);
-		oar << VL_NVP_NAMED("model", *openedModel);
+		oar << LIBV_NVP_NAMED("model", *openedModel);
 	} else
 		openedModel->save(std::ofstream(filePath.value(), std::ios_base::binary));
 
@@ -110,23 +110,23 @@ void CommandImport::execute() {
 		std::cout << "Importing model from file: " << filePath.value() << std::endl;
 	}
 
-	vl::vm3::Model model;
-	vl::vm3::Importer::import(model, filePath.value());
+	libv::vm3::Model model;
+	libv::vm3::Importer::import(model, filePath.value());
 	{
 		boost::filesystem::path path(filePath.value());
 		path.replace_extension(".vm3.xml");
 		std::ofstream ofs(path.string());
 		boost::archive::xml_oarchive oar(ofs);
-		oar << VL_NVP(model);
+		oar << LIBV_NVP(model);
 	}
 	{
 		boost::filesystem::path path(filePath.value());
 		path.replace_extension(".vm3");
 		std::ofstream ofs(path.string(), std::ios_base::binary);
 		eos::portable_oarchive oar(ofs);
-		oar << VL_NVP(model);
+		oar << LIBV_NVP(model);
 	}
 }
 
 } //namespace vm3
-} //namespace vl
+} //namespace libv

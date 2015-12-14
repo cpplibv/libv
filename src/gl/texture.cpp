@@ -1,18 +1,18 @@
 // File: Texture.cpp, Created on 2014. december 6. 22:44, Author: Vader
 
 // hpp
-#include <vl/gl/texture.hpp>
+#include <libv/gl/texture.hpp>
 // ext
 #include <boost/asio/buffer.hpp>
 #include <boost/filesystem/path.hpp>
 #include <GL/glew.h>
 #include <gli/gli.hpp>
-// vl
-#include <vl/read_file.hpp>
+// libv
+#include <libv/read_file.hpp>
 // pro
-#include <vl/gl/log.hpp>
+#include <libv/gl/log.hpp>
 
-namespace vl {
+namespace libv {
 namespace gl {
 
 // Texture -----------------------------------------------------------------------------------------
@@ -42,14 +42,14 @@ Texture::~Texture() {
 
 void Texture::init(const char* data, const size_t size) {
 	if (!data || size <= sizeof(gli::detail::ddsHeader)) {
-		VLOG_WARN(vl::gl::log(), "Invalid texture data: [%s]", name);
+		VLOG_WARN(libv::gl::log(), "Invalid texture data: [%s]", name);
 		texture.reset();
 		return;
 	}
 	texture = std::make_unique<gli::texture>(gli::load(data, size));
 
 	if (texture->empty()) {
-		VLOG_WARN(vl::gl::log(), "Failed to load texture [%s]", name);
+		VLOG_WARN(libv::gl::log(), "Failed to load texture [%s]", name);
 		texture.reset();
 		return;
 	}
@@ -82,7 +82,7 @@ void Texture::unbind(TextureType type) {
 // -------------------------------------------------------------------------------------------------
 
 void Texture::loadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Loading texture: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Loading texture: [%s]", name);
 	assert(!texture->empty());
 
 	gli::gl GL;
@@ -189,7 +189,7 @@ void Texture::loadGL() {
 }
 
 void Texture::unloadGL() {
-	VLOG_TRACE(vl::gl::log(), "GL Unloading texture: [%s]", name);
+	VLOG_TRACE(libv::gl::log(), "GL Unloading texture: [%s]", name);
 
 	const auto temp = textureID;
 	textureID = 0;
@@ -199,4 +199,4 @@ void Texture::unloadGL() {
 }
 
 } //namespace gl
-} //namespace vl
+} //namespace libv

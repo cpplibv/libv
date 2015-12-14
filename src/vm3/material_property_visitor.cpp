@@ -1,9 +1,9 @@
 // File: MaterialPropertyVisitor.cpp, Created on 2015. február 14. 21:24, Author: Vader
 
-#include <vl/vm3/material.hpp>
-#include <vl/vm3/material_property_visitor.hpp>
+#include <libv/vm3/material.hpp>
+#include <libv/vm3/material_property_visitor.hpp>
 
-namespace vl {
+namespace libv {
 	namespace vm3 {
 		MaterialPropertyPrinter::MaterialPropertyPrinter(std::ostream& stream) :
 			stream(stream) { }
@@ -62,4 +62,4 @@ namespace vl {
 		VM3_PROPERTY_VISITOR_TYPE_HELPER(dvec4)
 #undef VM3_PROPERTY_VISITOR_TYPE_HELPER
 	} //namespace vm3
-} //namespace vl
+} //namespace libv

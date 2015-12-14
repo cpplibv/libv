@@ -1,18 +1,18 @@
 // File: ProtectedContainer.cpp, Created on 2014. január 7. 6:05, Author: Vader
 
 // hpp
-#include <vl/ui/component/container.hpp>
+#include <libv/ui/component/container.hpp>
 // ext
 #include <glm/gtc/matrix_transform.hpp>
 // std
 #include <algorithm>
 // pro
-#include <vl/ui/layout/properties.hpp>
-#include <vl/ui/layout/layout_manager.hpp>
+#include <libv/ui/layout/properties.hpp>
+#include <libv/ui/layout/layout_manager.hpp>
 
 #include <iostream>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -159,5 +159,5 @@ void ProtectedContainer::update() {
 // -------------------------------------------------------------------------------------------------
 
 } //namespace ui
-} //namespace vl
+} //namespace libv
 

@@ -2,9 +2,6 @@
 
 STACK:
 
-sanbox example renames
--- commit --
-
 funny enough but i think logging has a very high priority
 log thread naming
 -- commit --
@@ -46,13 +43,8 @@ Neat little page for similar and alternative color picking: http://www.colorhexa
 Base class for lights and cameras...
 
 
-move everything from vl to libv
-vl([^a-zA-Z0-9_]|$)			libv$1
-VL([^a-zA-Z0-9]|$)			LIBV$1
-
-
 license		https://www.youtube.com/watch?v=cJIi-hIlCQM
-be aware that i will need copyright for every contribution into vl
+be aware that i will need copyright for every contribution into libv
 
 
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
@@ -215,11 +207,11 @@ http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 Adopt TCLAP http://tclap.sourceforge.net if suitable
 
-vl::log(__VL_ERROR__, __VL_POC__, __VL_GL__, "msg", args...)
-struct vl::POC = position of code
+vl::log(__LIBV_ERROR__, __LIBV_POC__, __LIBV_GL__, "msg", args...)
+struct libv::POC = position of code
 
 Beside Component's shared_ptr provide a way of non owning ptr which is visible at call:
-	container.add(testComponent, vl::non_owning); //simular as std::adopt_lock
+	container.add(testComponent, libv::non_owning); //simular as std::adopt_lock
 
 Timed Event / Timer Support / Timer thread
 Resettable and clearable timer / timer tasks

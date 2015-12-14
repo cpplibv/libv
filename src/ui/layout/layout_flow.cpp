@@ -1,16 +1,16 @@
 // File: LayoutManager.cpp, Created on 2014. január 7. 15:23, Author: Vader
 
-// vl
-#include <vl/memory.hpp>
-#include <vl/vec.hpp>
+// libv
+#include <libv/memory.hpp>
+#include <libv/vec.hpp>
 // std
 #include <algorithm>
 // pro
-#include <vl/ui/layout/layout_flow.hpp>
-#include <vl/ui/component/container.hpp>
-#include <vl/ui/component/component.hpp>
+#include <libv/ui/layout/layout_flow.hpp>
+#include <libv/ui/component/container.hpp>
+#include <libv/ui/component/component.hpp>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 //TODO P2: change vec based dimension indexing into index based (position[dimIndex])
@@ -174,4 +174,4 @@ void LayoutFlow::layout(Container::iterator begin, Container::iterator end, Comp
 }
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

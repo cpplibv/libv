@@ -15,10 +15,10 @@
 #include <typeinfo>
 #include <unordered_set>
 
-//#include <vl/sig/signal.hpp>
+//#include <libv/sig/signal.hpp>
 //
-//vl::Signal<void(int)> sig0;
-//vl::Signal<void(int)> sig1;
+//libv::Signal<void(int)> sig0;
+//libv::Signal<void(int)> sig1;
 //
 //void task() {
 //	for (int i = 0; i < 10000; i++) {

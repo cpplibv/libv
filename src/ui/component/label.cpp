@@ -1,15 +1,15 @@
 // File: panel.cpp, Created on 2015. április 8. 14:32, Author: Vader
 
 // hpp
-#include <vl/ui/component/label.hpp>
+#include <libv/ui/component/label.hpp>
 // ext
 #include <boost/filesystem/path.hpp>
 #include <GL/glew.h>
 // pro
-#include <vl/ui/log.hpp>
-#include <vl/gl/log.hpp>
+#include <libv/ui/log.hpp>
+#include <libv/gl/log.hpp>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 void Label::setText(const std::string& text) {
@@ -18,19 +18,19 @@ void Label::setText(const std::string& text) {
 }
 
 void Label::build(Renderer&) {
-	VLOG_TRACE(vl::ui::log(), "Build Label");
+	VLOG_TRACE(libv::ui::log(), "Build Label");
 	if (!deafultFont.isLoaded())
 		deafultFont.load("Data/Font/cour.ttf");
 }
 
 void Label::destroy(Renderer&) {
-	VLOG_TRACE(vl::ui::log(), "Destroy Label");
+	VLOG_TRACE(libv::ui::log(), "Destroy Label");
 	if (deafultFont.isLoaded())
 		deafultFont.unload();
 }
 
 void Label::render(Renderer& renderer) {
-	//	VLOG_TRACE(vl::ui::log(), "Render Label");
+	//	VLOG_TRACE(libv::ui::log(), "Render Label");
 
 	(void) renderer;
 	//	gluOrtho2D(0, 512, 0, 512);
@@ -58,4 +58,4 @@ void Label::render(Renderer& renderer) {
 }
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

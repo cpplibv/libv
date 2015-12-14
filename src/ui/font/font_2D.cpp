@@ -1,7 +1,7 @@
 // File: Font2D.cpp, Created on 2014. november 30. 14:32, Author: Vader
 
 // hpp
-#include <vl/ui/font/font_2D.hpp>
+#include <libv/ui/font/font_2D.hpp>
 // ext
 #include <boost/filesystem/path.hpp>
 #include <ft2build.h>
@@ -10,16 +10,16 @@
 #include FT_MODULE_H
 #include FT_OUTLINE_H
 #include FT_TRIGONOMETRY_H
-// vl
-#include <vl/read_file.hpp>
-#include <vl/vec.hpp>
-#include <vl/ui/log.hpp>
-#include <vl/gl/log.hpp>
-#include <vl/gl/gl.hpp>
+// libv
+#include <libv/read_file.hpp>
+#include <libv/vec.hpp>
+#include <libv/ui/log.hpp>
+#include <libv/gl/log.hpp>
+#include <libv/gl/gl.hpp>
 // std
 #include <atomic>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -36,7 +36,7 @@ static std::atomic<size_t> FT_LibUseCount{0};
 Font2D::Font2D() {
 	if (!ftLib)
 		if (auto err = FT_Init_FreeType(&ftLib))
-			VLOG_ERROR(vl::ui::log(), "FT_Init_FreeType failed: [%d]", err);
+			VLOG_ERROR(libv::ui::log(), "FT_Init_FreeType failed: [%d]", err);
 	++FT_LibUseCount;
 
 	for (size_t i = 0; i < textureData.size(); ++i) {
@@ -57,7 +57,7 @@ Font2D::~Font2D() {
 		unload();
 	if (!--FT_LibUseCount)
 		if (auto err = FT_Done_FreeType(ftLib))
-			VLOG_ERROR(vl::ui::log(), "FT_Done_FreeType failed: [%d]", err);
+			VLOG_ERROR(libv::ui::log(), "FT_Done_FreeType failed: [%d]", err);
 }
 
 void Font2D::load(const boost::filesystem::path& filePath) {
@@ -73,7 +73,7 @@ void Font2D::load(const void* data, const size_t size) {
 void Font2D::loadFace() {
 	if (auto err = FT_New_Memory_Face(ftLib,
 			reinterpret_cast<const FT_Byte*> (fileContent.data()), fileContent.size(), 0, &face))
-		return VLOG_ERROR(vl::ui::log(), "FT_New_Memory_Face failed: [%d]", err);
+		return VLOG_ERROR(libv::ui::log(), "FT_New_Memory_Face failed: [%d]", err);
 
 	setSize(activeFontSize);
 
@@ -107,7 +107,7 @@ void Font2D::setSize(int px) {
 		return;
 
 	if (auto err = FT_Set_Char_Size(face, activeFontSize << 6, activeFontSize << 6, 96, 96))
-		return VLOG_ERROR(vl::ui::log(), "FT_Set_Char_Size failed: [%d]", err);
+		return VLOG_ERROR(libv::ui::log(), "FT_Set_Char_Size failed: [%d]", err);
 }
 
 int Font2D::getLineAdvance() const {
@@ -129,11 +129,11 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
 	if (auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
-		VLOG_ERROR(vl::ui::log(), "FT_Load_Glyph failed: [%d]", err);
+		VLOG_ERROR(libv::ui::log(), "FT_Load_Glyph failed: [%d]", err);
 	if (auto err = FT_Get_Glyph(face->glyph, &glyph))
-		VLOG_ERROR(vl::ui::log(), "FT_Get_Glyph failed: [%d]", err);
+		VLOG_ERROR(libv::ui::log(), "FT_Get_Glyph failed: [%d]", err);
 	if (auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true))
-		VLOG_ERROR(vl::ui::log(), "FT_Glyph_To_Bitmap failed: [%d]", err);
+		VLOG_ERROR(libv::ui::log(), "FT_Glyph_To_Bitmap failed: [%d]", err);
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph> (glyph);
 	const auto bitmap = bitmapGlyph->bitmap;
@@ -150,7 +150,7 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 		texturePen = ivec2(0, textureNextLine);
 
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
-		VLOG_ERROR(vl::ui::log(), "Failed to render character: Not enough place in font texture: "
+		VLOG_ERROR(libv::ui::log(), "Failed to render character: Not enough place in font texture: "
 				"unicode: [%d] size: [%dpx] bitmap size: [%d,%d], pen pos: [%d,%d]",
 				unicode, activeFontSize, bitmapWidth, bitmapHeight, texturePen.x, texturePen.y);
 		return defaultCharacter;
@@ -228,7 +228,7 @@ void Font2D::unbind() {
 // -------------------------------------------------------------------------------------------------
 
 } //namespace ui
-} //namespace vl
+} //namespace libv
 
 
 // Texture Fill algorithm (painfully basic version)

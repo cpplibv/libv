@@ -1,7 +1,7 @@
 // File: Importer.cpp, Created on 2015. február 18. 20:08, Author: Vader
 
 // hpp
-#include <vl/vm3/importer.hpp>
+#include <libv/vm3/importer.hpp>
 // ext
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -9,18 +9,18 @@
 #include <assimp/scene.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-// vl
-#include <vl/vec.hpp>
+// libv
+#include <libv/vec.hpp>
 // std
 #include <vector>
 // pro
-#include <vl/vm3/model.hpp>
-#include <vl/vm3/log.hpp>
+#include <libv/vm3/model.hpp>
+#include <libv/vm3/log.hpp>
 
-namespace vl {
+namespace libv {
 namespace vm3 {
 
-std::string to_vl_technique(int tech) {
+std::string to_libv_technique(int tech) {
 	switch (tech) {
 	case aiShadingMode_Flat: return "flat";
 	case aiShadingMode_Gouraud: return "gouraud";
@@ -53,18 +53,18 @@ void Importer::importMaterials(Model& model, const aiScene* scene) {
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_NAME, ai_str))
 			materials[i].setName(std::string(ai_str.C_Str()));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_SHADING_MODEL, ai_int))
-			materials[i].setShader(to_vl_technique(ai_int));
+			materials[i].setShader(to_libv_technique(ai_int));
 
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_DIFFUSE, ai_col4))
-			materials[i].set("color_diffuse", vl::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_diffuse", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_SPECULAR, ai_col4))
-			materials[i].set("color_specular", vl::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_specular", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_AMBIENT, ai_col4))
-			materials[i].set("color_ambient", vl::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_ambient", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_EMISSIVE, ai_col4))
-			materials[i].set("color_emissive", vl::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_emissive", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_REFLECTIVE, ai_col4))
-			materials[i].set("color_reflective", vl::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_reflective", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_SHININESS, ai_float))
 			materials[i].set("shininess", ai_float);
@@ -183,7 +183,7 @@ void Importer::importGeometry(Model& model, const aiScene* scene) {
 		for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
 			const aiFace& face = mesh->mFaces[j];
 			if (face.mNumIndices != 3) {
-				VLOG_WARN(vl::vm3::log(), "Illegal number of vertex (%d) in a face of a mesh: %s", face.mNumIndices, mesh->mName.C_Str());
+				VLOG_WARN(libv::vm3::log(), "Illegal number of vertex (%d) in a face of a mesh: %s", face.mNumIndices, mesh->mName.C_Str());
 				continue;
 			}
 			model.indices.push_back(face.mIndices[0]);
@@ -200,7 +200,7 @@ bool Importer::import(Model& model, const std::string& filePath) {
 	const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipUVs);
 
 	if (!scene) {
-		VLOG_ERROR(vl::vm3::log(), "Failed to import model [%s]: %s", filePath, importer.GetErrorString());
+		VLOG_ERROR(libv::vm3::log(), "Failed to import model [%s]: %s", filePath, importer.GetErrorString());
 		return false;
 	}
 
@@ -215,7 +215,7 @@ bool Importer::import(Model& model, const std::string& filePath) {
 }
 
 } //namespace vm3
-} //namespace vl
+} //namespace libv
 
 
 
@@ -260,29 +260,29 @@ bool Importer::import(Model& model, const std::string& filePath) {
 //for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 //	aiString Path;
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_AMBIENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_AMBIENT Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_AMBIENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_DIFFUSE Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_DIFFUSE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DISPLACEMENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_DISPLACEMENT Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_DISPLACEMENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_EMISSIVE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_EMISSIVE Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_EMISSIVE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_HEIGHT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_HEIGHT Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_HEIGHT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_LIGHTMAP, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_LIGHTMAP Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_LIGHTMAP Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NONE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_NONE Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_NONE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NORMALS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_NORMALS Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_NORMALS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_OPACITY, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_OPACITY Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_OPACITY Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_REFLECTION, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_REFLECTION Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_REFLECTION Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SHININESS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_SHININESS Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_SHININESS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SPECULAR, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_SPECULAR Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_SPECULAR Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_UNKNOWN, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(vl::gl::log(), "aiTextureType_UNKNOWN Texture: %s", Path.data);
+//		VLOG_TRACE(libv::gl::log(), "aiTextureType_UNKNOWN Texture: %s", Path.data);
 //}

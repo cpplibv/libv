@@ -1,14 +1,14 @@
 // File: Model.cpp, Created on 2015. január 17. 7:21, Author: Vader
 
 // hpp
-#include <vl/vm3/serialization/model.hpp>
+#include <libv/vm3/serialization/model.hpp>
 // ext
 #include <boost/archive/portable_iarchive.hpp>
 #include <boost/archive/portable_oarchive.hpp>
 // std
 #include <iostream>
 
-namespace vl {
+namespace libv {
 namespace vm3 {
 
 Model::Model() : name("--unknown--") { }
@@ -38,7 +38,7 @@ bool Model::load(const char* data, const size_t size) {
 	//	}
 
 	eos::portable_iarchive ar(is);
-	ar >> VL_NVP_NAMED("model", *this);
+	ar >> LIBV_NVP_NAMED("model", *this);
 	return true; //<<< Model load fail
 }
 
@@ -46,7 +46,7 @@ bool Model::save(std::ostream& os) const {
 	//<<< Activate magic bytes
 	//	os << VM3_MODEL_MAGIC_BYTE;
 	eos::portable_oarchive ar(os);
-	ar << VL_NVP_NAMED("model", *this);
+	ar << LIBV_NVP_NAMED("model", *this);
 
 	return true; //<<< Model save fail
 }

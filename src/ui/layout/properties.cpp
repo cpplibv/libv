@@ -1,9 +1,9 @@
 // File: Properties.cpp, Created on 2014. április 24. 13:35, Author: Vader
 
 // hpp
-#include <vl/ui/layout/properties.hpp>
+#include <libv/ui/layout/properties.hpp>
 
-namespace vl {
+namespace libv {
 namespace ui {
 
 namespace Property {
@@ -18,4 +18,4 @@ PropertyMap::Address<ivec4> Pedding(0, 0, 0, 0);
 } //namespace Property
 
 } //namespace ui
-} //namespace vl
+} //namespace libv

@@ -1,8 +1,8 @@
 // File: Uniform.cpp, Created on 2014. december 19. 13:45, Author: Vader
 
-#include <vl/gl/uniform.hpp>
+#include <libv/gl/uniform.hpp>
 
-namespace vl {
+namespace libv {
 namespace gl {
 
 // UniformMaterial -----------------------------------------------------
@@ -87,4 +87,4 @@ namespace glsl {
 //};
 
 } //namespace glsl
-} //namespace vl
+} //namespace libv
