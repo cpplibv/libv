@@ -1,9 +1,9 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
-#include <iostream>
+#include <cppformat/format.h>
 
 int main(int, char **) {
-	std::cout << "VL is header only." << std::endl;
+	fmt::print("Hello, {}!", "world");
 
 	return 0;
 }

@@ -2,13 +2,17 @@
 
 STACK:
 
+adopt fmt
 -- commit --
 
-fix frame setters
+sanbox example renames
 -- commit --
 
 funny enough but i think logging has a very high priority
 log thread naming
+-- commit --
+
+fix frame setters
 -- commit --
 
 fix frame close operation

@@ -137,6 +137,19 @@ ExternalProject_Add(ext_glew
 	EXCLUDE_FROM_ALL 1
 )
 
+list(APPEND EXTERNAL_PROJECT_LIST ext_cppformat)
+ExternalProject_Add(ext_cppformat
+	GIT_REPOSITORY https://github.com/cppformat/cppformat.git
+	GIT_TAG master
+	PREFIX ${PATH_EXT_SRC}/cppformat
+	INSTALL_DIR ${PATH_EXT}/cppformat
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cppformat
+	CMAKE_ARGS
+		-DFMT_DOC=OFF
+		-DFMT_TEST=OFF
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND EXTERNAL_PROJECT_LIST ext_glm)
 ExternalProject_Add(ext_glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -274,6 +287,7 @@ include_directories (${PATH_SRC})
 #Externals
 include_directories(SYSTEM ${PATH_EXT}/assimp/include)
 include_directories(SYSTEM ${PATH_EXT}/boost/include)
+include_directories(SYSTEM ${PATH_EXT}/cppformat/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
 include_directories(SYSTEM ${PATH_EXT}/glfw/include)
@@ -283,6 +297,7 @@ include_directories(SYSTEM ${PATH_EXT}/unittest/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)
+link_directories(${PATH_EXT}/cppformat/lib)
 link_directories(${PATH_EXT}/freetype/lib)
 link_directories(${PATH_EXT}/glew/lib)
 link_directories(${PATH_EXT}/glfw/lib)
@@ -350,7 +365,7 @@ target_link_libraries(vui_test    -static )
 
 #Link - Executables
 target_link_libraries(vgl_main    -static glew glfw3 vgl)
-target_link_libraries(vl_main     -static )
+target_link_libraries(vl_main     -static cppformat)
 target_link_libraries(vm3_main    -static vm3 boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3imp_main -static vm3imp boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vsig_main   -static )
