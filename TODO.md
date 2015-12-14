@@ -2,9 +2,6 @@
 
 STACK:
 
-adopt fmt
--- commit --
-
 sanbox example renames
 -- commit --
 
@@ -35,10 +32,6 @@ shader cache
 -- commit --
 
 // -------------------------------------------------------------------------------------------------
-
-Rename example folder to sandbox
-Create example folder with some of it...
-
 
 cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
 much pain to integrate

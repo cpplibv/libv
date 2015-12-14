@@ -5,6 +5,7 @@
 !cmake/
 !example/
 !include/
+!sandbox/
 !src/
 !test/
 
