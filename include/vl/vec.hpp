@@ -20,6 +20,8 @@
 //TODO P5: operator+ with one argument
 //TODO P5: perfect forwarding for constructors
 //TODO P5: conditional noexcept
+//TODO P5: fast compate operator with vec and skalar by comparing skalar² and veclenght²
+//TODO P5: reuse rvalues where possible ?
 //TODO P5: macro for debug asserts
 //TODO P5: make sure every function is sfiane frendly
 
@@ -502,9 +504,15 @@ using dvec4 = vec4_t<double>;
 using ivec2 = vec2_t<int32_t>;
 using ivec3 = vec3_t<int32_t>;
 using ivec4 = vec4_t<int32_t>;
+using uivec2 = vec2_t<uint32_t>;
+using uivec3 = vec3_t<uint32_t>;
+using uivec4 = vec4_t<uint32_t>;
 using lvec2 = vec2_t<int64_t>;
 using lvec3 = vec3_t<int64_t>;
 using lvec4 = vec4_t<int64_t>;
+using ulvec2 = vec2_t<uint64_t>;
+using ulvec3 = vec3_t<uint64_t>;
+using ulvec4 = vec4_t<uint64_t>;
 
 using vec2 = vec2_t<float>;
 using vec3 = vec3_t<float>;

@@ -47,6 +47,7 @@ public:
 	using TypeDisplayMode = int;
 	using TypeOpenGLProfile = int;
 	using TypeOpenGLRefreshRate = int;
+	using TypeOpenGLSamples = int;
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -65,6 +66,8 @@ public:
 	static const TypeOpenGLProfile OPENGL_PROFILE_CORE;
 
 	static const TypeOpenGLRefreshRate REFRESH_RATE_DONT_CARE;
+
+	static const TypeOpenGLSamples SAMPLES_DONT_CARE;
 
 	// Close ---------------------------------------------------------------------------------------
 
@@ -240,12 +243,11 @@ private:
 private:
 	unsigned int swapInterval = 1;
 	ivec2 pos;
-//	ivec2 size;
 
 private:
 	TypeOpenGLProfile openGLProfile = OPENGL_PROFILE_COMPAT;
-	int openGLRefreshRate = REFRESH_RATE_DONT_CARE;
-	int openGLSamples = 0;
+	TypeOpenGLRefreshRate openGLRefreshRate = REFRESH_RATE_DONT_CARE;
+	TypeOpenGLSamples openGLSamples = SAMPLES_DONT_CARE;
 	int openGLVersionMajor = 3;
 	int openGLVersionMinor = 3;
 
@@ -298,12 +300,12 @@ private:
 	void baseRender();
 	void baseUpdate();
 
-	//protected:
-	//	virtual void build();
-	//	virtual void destroy();
-	//	virtual void invalidate();
-	//	virtual void render();
-	//	virtual void update();
+protected:
+	using ProtectedContainer::build;
+	using ProtectedContainer::destroy;
+	using ProtectedContainer::invalidate;
+	using ProtectedContainer::render;
+	using ProtectedContainer::update;
 
 	//public:
 	//	virtual void invalidate();
@@ -315,8 +317,8 @@ public:
 
 public:
 	void setOpenGLProfile(TypeOpenGLProfile profile);
-	void setOpenGLRefreshRate(int rate);
-	void setOpenGLSamples(int samples);
+	void setOpenGLRefreshRate(TypeOpenGLRefreshRate rate);
+	void setOpenGLSamples(TypeOpenGLSamples samples);
 	void setOpenGLVersion(int major, int minor);
 
 	void setCloseOperation(const TypeCloseOperation& operation);

@@ -333,10 +333,12 @@ add_custom_target(externals DEPENDS ${EXTERNAL_PROJECT_LIST})
 add_custom_target(ext DEPENDS externals)
 
 #Link - Libraries
-target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3 boost_serialization-mt-s)
+target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3
+							boost_serialization-mt-s boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3    -static boost_serialization-mt-s)
 target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
-target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 freetype vgl)
+target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
+							boost_system-mt-s boost_filesystem-mt-s freetype vgl)
 
 #Link - Tests
 target_link_libraries(vgl_test    -static vgl)
@@ -347,7 +349,7 @@ target_link_libraries(vsig_test   -static )
 target_link_libraries(vui_test    -static )
 
 #Link - Executables
-target_link_libraries(vgl_main    -static glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vgl_main    -static glew glfw3 vgl)
 target_link_libraries(vl_main     -static )
 target_link_libraries(vm3_main    -static vm3 boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3imp_main -static vm3imp boost_system-mt-s boost_filesystem-mt-s)

@@ -1,269 +1,369 @@
 // File: Font2D.cpp, Created on 2014. november 30. 14:32, Author: Vader
 
 // hpp
-#include "font_2D.hpp"
+#include <vl/ui/font/font_2D.hpp>
+// ext
+#include <boost/filesystem/path.hpp>
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include FT_GLYPH_H
+#include FT_MODULE_H
+#include FT_OUTLINE_H
+#include FT_TRIGONOMETRY_H
 // vl
+#include <vl/read_file.hpp>
+#include <vl/vec.hpp>
+#include <vl/ui/log.hpp>
 #include <vl/gl/log.hpp>
 #include <vl/gl/gl.hpp>
+// std
+#include <atomic>
 
 namespace vl {
 namespace ui {
 
-inline int next_p2(int a) {
-	int rval = 1;
-	while (rval < a) rval <<= 1;
-	return rval;
+// -------------------------------------------------------------------------------------------------
+
+static constexpr const char ADDITIONAL_PREFETCH_CHAR_LIST[] = "!@#\\/%?|()[]{}<>+*_,.-=^'\"";
+
+// -------------------------------------------------------------------------------------------------
+
+static FT_Library ftLib = nullptr;
+static std::atomic<size_t> FT_LibUseCount{0};
+
+// -------------------------------------------------------------------------------------------------
+
+Font2D::Font2D() {
+	if (!ftLib)
+		if (auto err = FT_Init_FreeType(&ftLib))
+			VLOG_ERROR(vl::ui::log(), "FT_Init_FreeType failed: [%d]", err);
+	++FT_LibUseCount;
+
+	for (size_t i = 0; i < textureData.size(); ++i) {
+		textureData[i] = 0;
+	}
 }
 
-inline unsigned int next_p2(unsigned int a) {
-	unsigned int rval = 1;
-	while (rval < a) rval <<= 1;
-	return rval;
+Font2D::Font2D(const boost::filesystem::path& filePath) : Font2D() {
+	load(filePath);
 }
 
-Font2D::Font2D() : alignH(FONT2D_ALIGN_LEFT), alignV(FONT2D_ALIGN_TOP) { }
+Font2D::Font2D(const void* data, const size_t size) : Font2D() {
+	load(data, size);
+}
 
 Font2D::~Font2D() {
-	clean();
+	if (textureID)
+		unload();
+	if (!--FT_LibUseCount)
+		if (auto err = FT_Done_FreeType(ftLib))
+			VLOG_ERROR(vl::ui::log(), "FT_Done_FreeType failed: [%d]", err);
 }
 
-void Font2D::load(const std::string &fname, unsigned int h) {
-	this->height = h;
-	this->lineHeight = 3;
-
-	//	std::string filePath = GAME_FONT_FOLDER + fname;
-	std::string filePath = fname;
-
-	FT_Library library; // Create And Initilize A FreeType Font.
-	FT_Face face;
-	if (FT_Init_FreeType(&library))
-		std::cout << "FT_Init_FreeType failed." << std::endl;
-	if (FT_New_Face(library, filePath.c_str(), 0, &face))
-		std::cout << "FT_New_Face failed. [" << filePath << "]" << std::endl;
-	if (FT_Set_Char_Size(face, h << 6, h << 6, 96, 96))
-		std::cout << "FT_Set_Char_Size failed. [" << h << "]" << std::endl;
-
-	makeChars(face);
-
-	FT_Done_Face(face); // We Don't Need The Face Information Now That The Display
-	FT_Done_FreeType(library); // Lists Have Been Created, So We Free The Assosiated Resources.
+void Font2D::load(const boost::filesystem::path& filePath) {
+	fileContent = readFile(filePath, std::ios_base::binary);
+	loadFace();
 }
 
-void Font2D::clean() {
-	glDeleteTextures(1, &texture);
+void Font2D::load(const void* data, const size_t size) {
+	fileContent = std::string(static_cast<const char*> (data), size);
+	loadFace();
 }
 
-void Font2D::makeChars(FT_Face face) {
-	FT_Glyph glyphs[256];
-	unsigned int charWidth(0), charHeight(0);
+void Font2D::loadFace() {
+	if (auto err = FT_New_Memory_Face(ftLib,
+			reinterpret_cast<const FT_Byte*> (fileContent.data()), fileContent.size(), 0, &face))
+		return VLOG_ERROR(vl::ui::log(), "FT_New_Memory_Face failed: [%d]", err);
 
-	for (int ch = 0; ch < 256; ch++) { //Get bitmaps
-		FT_Glyph& glyph = glyphs[ch];
-		int charpos = FT_Get_Char_Index(face, ch);
-		//		if (charpos)
-		//			std::cout << "FT_Get_Char_Index failed: " << ch << std::endl; //This fail is acceptable
-		if (FT_Load_Glyph(face, charpos, FT_LOAD_DEFAULT))// Load The Glyph For Our Character.
-			std::cout << "FT_Load_Glyph failed." << std::endl;
-		if (FT_Get_Glyph(face->glyph, &glyph))// Move The Face's Glyph Into A Glyph Object.
-			std::cout << "FT_Get_Glyph failed." << std::endl;
-		FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal, 0, 1); // Convert The Glyph To A Bitmap.
-		FT_BitmapGlyph bitmapglyph = (FT_BitmapGlyph) glyphs[ch];
+	setSize(activeFontSize);
 
-		if (bitmapglyph->bitmap.width > charWidth)
-			charWidth = bitmapglyph->bitmap.width;
-		if (bitmapglyph->bitmap.rows > charHeight)
-			charHeight = bitmapglyph->bitmap.rows;
+	defaultCharacter = getCharacter(0);
+	for (unsigned int i = '0'; i <= '9'; ++i)
+		getCharacter(i);
+	for (unsigned int i = 'A'; i <= 'Z'; ++i)
+		getCharacter(i);
+	for (unsigned int i = 'a'; i <= 'z'; ++i)
+		getCharacter(i);
+	for (unsigned int i = 0; i < sizeof (ADDITIONAL_PREFETCH_CHAR_LIST) - 1; ++i)
+		getCharacter(ADDITIONAL_PREFETCH_CHAR_LIST[i]);
+}
 
-		chars[ch].width = (float) (face->glyph->advance.x >> 6);
+void Font2D::unload() {
+	glDeleteTextures(1, &textureID);
+	textureID = 0;
+	FT_Done_Face(face);
+	face = nullptr;
+}
 
+// -------------------------------------------------------------------------------------------------
+
+bool Font2D::isLoaded() const {
+	return face != nullptr;
+}
+
+void Font2D::setSize(int px) {
+	activeFontSize = px;
+	if (!face)
+		return;
+
+	if (auto err = FT_Set_Char_Size(face, activeFontSize << 6, activeFontSize << 6, 96, 96))
+		return VLOG_ERROR(vl::ui::log(), "FT_Set_Char_Size failed: [%d]", err);
+}
+
+int Font2D::getLineAdvance() const {
+	return face->height;
+}
+
+const Font2D::Character & Font2D::getCharacter(unsigned int unicode) {
+	const auto infoIndex = CharacterIndex{unicode, activeFontSize};
+	auto infoIt = characterInfos.find(infoIndex);
+	if (infoIt == characterInfos.end()) {
+		infoIt = characterInfos.emplace(infoIndex, renderCharacter(unicode)).first;
+	}
+	return infoIt->second;
+}
+
+Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
+	FT_Glyph glyph = nullptr;
+
+	int charIndex = FT_Get_Char_Index(face, unicode);
+
+	if (auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
+		VLOG_ERROR(vl::ui::log(), "FT_Load_Glyph failed: [%d]", err);
+	if (auto err = FT_Get_Glyph(face->glyph, &glyph))
+		VLOG_ERROR(vl::ui::log(), "FT_Get_Glyph failed: [%d]", err);
+	if (auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true))
+		VLOG_ERROR(vl::ui::log(), "FT_Glyph_To_Bitmap failed: [%d]", err);
+
+	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph> (glyph);
+	const auto bitmap = bitmapGlyph->bitmap;
+	const auto bitmapWidth = bitmap.width;
+	const auto bitmapHeight = bitmap.rows;
+
+	Character result;
+	result.advance.x = glyph->advance.x / 64.f; //<<< validate
+	result.advance.y = glyph->advance.y / 64.f;
+	//	result.advance.x = glyph->advance.x >> 6;
+	//	result.advance.y = glyph->advance.y >> 6;
+
+	if (texturePen.x + bitmapWidth > textureSize.x) // Warp to new line
+		texturePen = ivec2(0, textureNextLine);
+
+	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
+		VLOG_ERROR(vl::ui::log(), "Failed to render character: Not enough place in font texture: "
+				"unicode: [%d] size: [%dpx] bitmap size: [%d,%d], pen pos: [%d,%d]",
+				unicode, activeFontSize, bitmapWidth, bitmapHeight, texturePen.x, texturePen.y);
+		return defaultCharacter;
 	}
 
-	unsigned int width = next_p2(charWidth * 16);
-	unsigned int height = next_p2(charHeight * 16);
+	if (texturePen.y + bitmapHeight > textureNextLine) // Expand current line
+		textureNextLine = texturePen.y + bitmapHeight;
 
-	std::vector<GLubyte> data;
-	data.resize(2 * width * height);
+	for (size_t y = 0; y < bitmap.rows; ++y) {
+		for (size_t x = 0; x < bitmap.width; ++x) {
+			const auto bitmapIndex = (bitmapHeight - y - 1) * bitmap.pitch + x;
+			const auto textureIndex = (texturePen.y + y) * textureSize.x + texturePen.x + x;
 
-	for (unsigned int i = 0; i < width * height; i++) {
-		data[i * 2] = 255;
-		data[i * 2 + 1] = 0;
-	}
-
-	for (unsigned int i = 0; i < 16; i++) { //row
-		for (unsigned int j = 0; j < 16; j++) { //col
-
-			int ch = i * 16 + j;
-			FT_BitmapGlyph glyph = (FT_BitmapGlyph) glyphs[ch];
-			FT_Bitmap& bitmap = glyph->bitmap;
-
-			float x0 = (float) (j * charWidth) / (float) width;
-			float y0 = (float) (i * charHeight) / (float) height;
-			float x1 = (float) (j * charWidth + bitmap.width) / (float) width;
-			float y1 = (float) (i * charHeight + bitmap.rows) / (float) height;
-			float left = (float) glyph->left;
-			float top = (float) (glyph->top - bitmap.rows);
-
-			chars[ch].textureCoord[0] = vec2(x0, y1);
-			chars[ch].textureCoord[1] = vec2(x1, y1);
-			chars[ch].textureCoord[2] = vec2(x0, y0);
-			chars[ch].textureCoord[3] = vec2(x1, y0);
-			chars[ch].vertexCoord[0] = vec2(left, top);
-			chars[ch].vertexCoord[1] = vec2(left + (float) bitmap.width, top);
-			chars[ch].vertexCoord[2] = vec2(left, top + (float) bitmap.rows);
-			chars[ch].vertexCoord[3] = vec2(left + (float) bitmap.width, top + (float) bitmap.rows);
-
-			for (unsigned int k = 0; k < bitmap.rows; k++) { //bitmap row
-				for (unsigned int l = 0; l < bitmap.width; l++) { //bitmap col
-					data[(j * charWidth + l + (i * charHeight + k) * width) * 2 + 1] = bitmap.buffer[l + bitmap.width * k];
-				}
-			}
+			textureData[textureIndex] = bitmap.buffer[bitmapIndex];
 		}
 	}
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	const auto tx0 = (texturePen.x) / textureSize.x;
+	const auto tx1 = (texturePen.x + bitmapWidth) / textureSize.x;
+	const auto ty0 = (texturePen.y) / textureSize.y;
+	const auto ty1 = (texturePen.y + bitmapHeight) / textureSize.y;
+	result.textureCoord[0] = vec2(tx0, ty0);
+	result.textureCoord[1] = vec2(tx1, ty0);
+	result.textureCoord[2] = vec2(tx1, ty1);
+	result.textureCoord[3] = vec2(tx0, ty1);
+	// <<< validate texture and pixel coord if they are ok (0.5ness)
+	// and if its ok that the chars dont have any gap in the texture?
+
+	const auto vx0 = bitmapGlyph->left;
+	const auto vx1 = bitmapGlyph->left + bitmapWidth;
+	const auto vy0 = bitmapGlyph->top;
+	const auto vy1 = bitmapGlyph->top + bitmapHeight;
+	result.textureCoord[0] = vec2(vx0, vy0);
+	result.textureCoord[1] = vec2(vx1, vy0);
+	result.textureCoord[2] = vec2(vx1, vy1);
+	result.textureCoord[3] = vec2(vx0, vy1);
+
+	texturePen.x += bitmapWidth; // Progress pen
+	FT_Done_Glyph(glyph);
+
+	dirty = true;
+	return result;
+}
+
+void Font2D::uploadTexture() {
+	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, 0x812F);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, 0x812F);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, data.data());
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, textureSize.x, textureSize.y, 0, GL_LUMINANCE,
+			GL_UNSIGNED_BYTE, textureData.data());
 	glBindTexture(GL_TEXTURE_2D, 0);
 	checkGL();
+}
 
-	for (unsigned int ch = 0; ch < 256; ch++) { //free glyphs
-		FT_Done_Glyph(glyphs[ch]);
+void Font2D::bind() {
+	if (dirty) {
+		glGenTextures(1, &textureID);
+		uploadTexture();
+		dirty = false;
 	}
+
+	gl::activeTexture(gl::TextureType::diffuse);
+	glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void Font2D::begin() {
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glBegin(GL_QUADS);
-}
-
-void Font2D::end() {
-	glEnd();
+void Font2D::unbind() {
 	glBindTexture(GL_TEXTURE_2D, 0);
-	glDisable(GL_TEXTURE_2D);
 }
 
-float Font2D::getLineWidth(const char * text, int i) {
-	float result = 0;
-	while (text[i] != '\n' && text[i] != '\0')
-		result += this->chars[(unsigned char) text[i++]].width;
-	return result;
-}
-
-int Font2D::getLineNumber(const char * text) {
-	int i = 0, result = 1;
-	while (text[i] != '\0') {
-		if (text[i] == '\n')
-			result++;
-		i++;
-	}
-	return result;
-}
-
-void Font2D::printf(float x, float y, const char *fmt, ...) {
-	char text[256];
-
-	va_list ap; // Pointer To List Of Arguments
-	if (fmt == NULL) // If There's No Text
-		*text = 0; // Do Nothing
-	else {
-		va_start(ap, fmt); // Parses The String For Variables
-		vsprintf(text, fmt, ap); // And Converts Symbols To Actual Numbers
-		va_end(ap); // Results Are Stored In Text
-		text[255] = '\0'; //not sure if its need, but dont hurt.
-	}
-
-	vec2 pen(
-			x - std::floor(getLineWidth(text, 0) * this->alignH),
-			y - (float) this->height + std::floor((float) getLineNumber(text) * ((float) this->height + (float) this->lineHeight) * this->alignV));
-	int i = 0;
-	while (text[i] != '\0') {
-		unsigned char ch = text[i];
-		if (text[i] == '\n') {
-			pen.x = x - std::floor(getLineWidth(text, i + 1) * this->alignH);
-			pen.y -= (float) this->lineHeight + (float) this->height;
-		} else {
-			glTexCoord2f(this->chars[ch].textureCoord[0].x, this->chars[ch].textureCoord[0].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[0].x, pen.y + this->chars[ch].vertexCoord[0].y);
-			glTexCoord2f(this->chars[ch].textureCoord[1].x, this->chars[ch].textureCoord[1].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[1].x, pen.y + this->chars[ch].vertexCoord[1].y);
-			glTexCoord2f(this->chars[ch].textureCoord[3].x, this->chars[ch].textureCoord[3].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[3].x, pen.y + this->chars[ch].vertexCoord[3].y);
-			glTexCoord2f(this->chars[ch].textureCoord[2].x, this->chars[ch].textureCoord[2].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[2].x, pen.y + this->chars[ch].vertexCoord[2].y);
-			pen.x += this->chars[ch].width;
-		}
-		i++;
-	}
-}
-
-int Hex2Int(char n) {
-	if (n >= '0' && n <= '9')
-		return (n - '0');
-	else
-		if (n >= 'A' && n <= 'F')
-		return (n - 'A' + 10);
-	else
-		return 0;
-}
-
-void Font2D::print(float x, float y, const char *text) {
-	//chars
-	// \0 - 00 - end mark
-	// \n - 13 -  new line
-	//str
-	// "\" - protector
-	// "#" - hex color start (#FFFFFF)
-	vec2 pen(
-			x - std::floor(getLineWidth(text, 0) * this->alignH),
-			y - (float) this->height + std::floor((float) getLineNumber(text) * ((float) this->height + (float) this->lineHeight) * this->alignV));
-	int i = 0;
-
-	while (text[i] != '\0') {
-		unsigned char ch = text[i];
-		if (text[i] == '\n') {
-			pen.x = x - std::floor(getLineWidth(text, i + 1) * this->alignH);
-			pen.y -= (float) this->lineHeight + (float) this->height;
-		} else if (text[i] == '#' && (i == 0 || text[i - 1] != '\\')) { //pass if "#" but not if "\#"
-			glColor4f(
-					(float) (Hex2Int(text[i + 1])*16 + Hex2Int(text[i + 2])) / 255.0f,
-					(float) (Hex2Int(text[i + 3])*16 + Hex2Int(text[i + 4])) / 255.0f,
-					(float) (Hex2Int(text[i + 5])*16 + Hex2Int(text[i + 6])) / 255.0f,
-					1.0f);
-			i += 6;
-		} else if (text[i] == '\\' && text[i + 1] == '#') { //if char is a protector -> do nothing
-		} else {
-			glTexCoord2f(this->chars[ch].textureCoord[0].x, this->chars[ch].textureCoord[0].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[0].x, pen.y + this->chars[ch].vertexCoord[0].y);
-			glTexCoord2f(this->chars[ch].textureCoord[1].x, this->chars[ch].textureCoord[1].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[1].x, pen.y + this->chars[ch].vertexCoord[1].y);
-			glTexCoord2f(this->chars[ch].textureCoord[3].x, this->chars[ch].textureCoord[3].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[3].x, pen.y + this->chars[ch].vertexCoord[3].y);
-			glTexCoord2f(this->chars[ch].textureCoord[2].x, this->chars[ch].textureCoord[2].y);
-			glVertex2f(pen.x + this->chars[ch].vertexCoord[2].x, pen.y + this->chars[ch].vertexCoord[2].y);
-			pen.x += this->chars[ch].width;
-		}
-		i++;
-	}
-}
-
-void Font2D::alignHorizontal(float x) {
-	this->alignH = x;
-}
-
-void Font2D::alignVertical(float x) {
-	this->alignV = x;
-}
-
-void Font2D::align(float horizontal, float vertical) {
-	this->alignH = horizontal;
-	this->alignV = vertical;
-}
+// -------------------------------------------------------------------------------------------------
 
 } //namespace ui
 } //namespace vl
+
+
+// Texture Fill algorithm (painfully basic version)
+//
+//                    Y+      texturePen.x   textureSize.x
+//                    ^          |                |
+//                    |          V                V
+//   textureSize.y -> +---------------------------+
+//                    |                           |
+//                    |                           |
+// textureNextLine -> |                           |
+//                    |#  ## ## #+--+             | A
+//                    |##### ## #|  |             | | bitmapSize.y
+//    texturePen.y -> |##########+--+             | V
+//                    |###   ########  #### ##  ##|
+//                    |####  ############## ######|
+//                    |###########################|
+//                   -+---------------------------+-> X+
+//                0,0 |          <-->
+//                         bitmapSize.x
+
+
+//float Font2D::getLineWidth(const char * text, int i) {
+//	float result = 0;
+//	while (text[i] != '\n' && text[i] != '\0')
+//		result += this->chars[(unsigned char) text[i++]].width;
+//	return result;
+//}
+//
+//int Font2D::getLineNumber(const char * text) {
+//	int i = 0, result = 1;
+//	while (text[i] != '\0') {
+//		if (text[i] == '\n')
+//			result++;
+//		i++;
+//	}
+//	return result;
+//}
+//
+//void Font2D::printf(float x, float y, const char *fmt, ...) {
+//	char text[256];
+//
+//	va_list ap; // Pointer To List Of Arguments
+//	if (fmt == NULL) // If There's No Text
+//		*text = 0; // Do Nothing
+//	else {
+//		va_start(ap, fmt); // Parses The String For Variables
+//		vsprintf(text, fmt, ap); // And Converts Symbols To Actual Numbers
+//		va_end(ap); // Results Are Stored In Text
+//		text[255] = '\0'; //not sure if its need, but dont hurt.
+//	}
+//
+//	vec2 pen(
+//			x - std::floor(getLineWidth(text, 0) * this->alignH),
+//			y - (float) this->height + std::floor((float) getLineNumber(text) * ((float) this->height + (float) this->lineHeight) * this->alignV));
+//	int i = 0;
+//	while (text[i] != '\0') {
+//		unsigned char ch = text[i];
+//		if (text[i] == '\n') {
+//			pen.x = x - std::floor(getLineWidth(text, i + 1) * this->alignH);
+//			pen.y -= (float) this->lineHeight + (float) this->height;
+//		} else {
+//			glTexCoord2f(this->chars[ch].textureCoord[0].x, this->chars[ch].textureCoord[0].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[0].x, pen.y + this->chars[ch].vertexCoord[0].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[1].x, this->chars[ch].textureCoord[1].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[1].x, pen.y + this->chars[ch].vertexCoord[1].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[3].x, this->chars[ch].textureCoord[3].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[3].x, pen.y + this->chars[ch].vertexCoord[3].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[2].x, this->chars[ch].textureCoord[2].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[2].x, pen.y + this->chars[ch].vertexCoord[2].y);
+//			pen.x += this->chars[ch].width;
+//		}
+//		i++;
+//	}
+//}
+//
+//int Hex2Int(char n) {
+//	if (n >= '0' && n <= '9')
+//		return (n - '0');
+//	else
+//		if (n >= 'A' && n <= 'F')
+//		return (n - 'A' + 10);
+//	else
+//		return 0;
+//}
+//
+//void Font2D::print(float x, float y, const char *text) {
+//	//chars
+//	// \0 - 00 - end mark
+//	// \n - 13 -  new line
+//	//str
+//	// "\" - protector
+//	// "#" - hex color start (#FFFFFF)
+//	vec2 pen(
+//			x - std::floor(getLineWidth(text, 0) * this->alignH),
+//			y - (float) this->height + std::floor((float) getLineNumber(text) * ((float) this->height + (float) this->lineHeight) * this->alignV));
+//	int i = 0;
+//
+//	while (text[i] != '\0') {
+//		unsigned char ch = text[i];
+//		if (text[i] == '\n') {
+//			pen.x = x - std::floor(getLineWidth(text, i + 1) * this->alignH);
+//			pen.y -= (float) this->lineHeight + (float) this->height;
+//		} else if (text[i] == '#' && (i == 0 || text[i - 1] != '\\')) { //pass if "#" but not if "\#"
+//			glColor4f(
+//					(float) (Hex2Int(text[i + 1])*16 + Hex2Int(text[i + 2])) / 255.0f,
+//					(float) (Hex2Int(text[i + 3])*16 + Hex2Int(text[i + 4])) / 255.0f,
+//					(float) (Hex2Int(text[i + 5])*16 + Hex2Int(text[i + 6])) / 255.0f,
+//					1.0f);
+//			i += 6;
+//		} else if (text[i] == '\\' && text[i + 1] == '#') { //if char is a protector -> do nothing
+//		} else {
+//			glTexCoord2f(this->chars[ch].textureCoord[0].x, this->chars[ch].textureCoord[0].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[0].x, pen.y + this->chars[ch].vertexCoord[0].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[1].x, this->chars[ch].textureCoord[1].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[1].x, pen.y + this->chars[ch].vertexCoord[1].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[3].x, this->chars[ch].textureCoord[3].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[3].x, pen.y + this->chars[ch].vertexCoord[3].y);
+//			glTexCoord2f(this->chars[ch].textureCoord[2].x, this->chars[ch].textureCoord[2].y);
+//			glVertex2f(pen.x + this->chars[ch].vertexCoord[2].x, pen.y + this->chars[ch].vertexCoord[2].y);
+//			pen.x += this->chars[ch].width;
+//		}
+//		i++;
+//	}
+//}
+//
+//void Font2D::alignHorizontal(float x) {
+//	this->alignH = x;
+//}
+//
+//void Font2D::alignVertical(float x) {
+//	this->alignV = x;
+//}
+//
+//void Font2D::align(float horizontal, float vertical) {
+//	this->alignH = horizontal;
+//	this->alignV = vertical;
+//}

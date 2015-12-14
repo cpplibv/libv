@@ -10,6 +10,8 @@
 // std
 #include <stack>
 
+#include "types.hpp"
+
 #define PI 3.1415926535897932384626433832795
 
 namespace vl {
@@ -184,6 +186,12 @@ inline std::string getProgamLinkMessage(GLuint programID) {
 	result.resize(infoLength);
 	glGetProgramInfoLog(programID, infoLength, nullptr, &result[0]);
 	return result;
+}
+
+// glActiveTexture -----------------------------------------------------------------------
+
+inline void activeTexture(const vl::gl::TextureType& textureType) {
+	glActiveTexture(GL_TEXTURE0 + static_cast<GLuint>(textureType));
 }
 
 // glEnableVertexAttribArray -----------------------------------------------------------------------

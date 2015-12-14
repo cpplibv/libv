@@ -7,6 +7,7 @@
 #include <string>
 // pro
 #include <vl/ui/log.hpp>
+#include <vl/gl/log.hpp>
 #include <vl/ui/frame/frame.hpp>
 #include <vl/ui/component/panel.hpp>
 #include <vl/ui/component/label.hpp>
@@ -16,6 +17,40 @@
 
 using namespace vl;
 using namespace vl::ui;
+
+#define checkGLEWSupport(ext) VLOG_INFO(vl::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+
+void initGLEW() {
+	if (GLenum err = glewInit() != GLEW_OK)
+		VLOG_ERROR(vl::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+
+	VLOG_INFO(vl::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	VLOG_INFO(vl::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	VLOG_INFO(vl::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
+
+	checkGLEWSupport(GL_VERSION_3_3);
+	checkGLEWSupport(GL_VERSION_4_5);
+	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
+	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
+
+	checkGL();
+}
+
+void initGL() {
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEPTH_TEST); //Depth
+	glDepthFunc(GL_LESS);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
+	glEnable(GL_BLEND); //Alpha
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+	glFrontFace(GL_CCW); //Counter clockwise polys only
+
+	glEnable(GL_TEXTURE_2D);
+
+	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
+	checkGL();
+}
 
 class TestFrame : public Frame {
 	Label lbl;
@@ -48,9 +83,17 @@ public:
 		setCloseOperation(ON_CLOSE_DISPOSE);
 		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
-		setDecoration(false);
+		setSize(512, 512);
+//		setDecoration(false);
 		init();
 		show();
+	}
+
+	virtual void build(Renderer& renderer) override {
+		initGLEW();
+		initGL();
+//		std::this_thread::sleep_for(std::chrono::seconds(2));
+		Frame::build(renderer);
 	}
 
 //	virtual void render() override {

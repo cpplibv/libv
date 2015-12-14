@@ -18,7 +18,9 @@ namespace ui {
 //	return false;
 //}
 
-void Component::build(Renderer&) { }
+void Component::build(Renderer&) {
+	invalid = false;
+}
 
 void Component::destroy(Renderer&) { }
 
@@ -26,7 +28,9 @@ void Component::invalidate() {
 	invalid = true;
 }
 
-void Component::render(Renderer&) { }
+void Component::render(Renderer&) {
+
+}
 
 void Component::update() { }
 

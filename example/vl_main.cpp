@@ -4,6 +4,6 @@
 
 int main(int, char **) {
 	std::cout << "VL is header only." << std::endl;
-	
+
 	return 0;
 }

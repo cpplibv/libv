@@ -144,6 +144,8 @@ const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_CORE = GLFW_OPENGL_CORE_PRO
 
 const Frame::TypeOpenGLRefreshRate Frame::REFRESH_RATE_DONT_CARE = GLFW_DONT_CARE;
 
+const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
+
 const Frame::TypeCloseOperation Frame::ON_CLOSE_DEFAULT_EXIT;
 const Frame::TypeCloseOperation Frame::ON_CLOSE_EXIT;
 const Frame::TypeCloseOperation Frame::ON_CLOSE_HIDE;
@@ -231,6 +233,7 @@ void Frame::baseBuild() {
 	timerBuild.reset();
 	build(renderer);
 	timerBuild.time();
+	validate();
 }
 
 void Frame::baseDestroy() {
@@ -378,7 +381,7 @@ void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 		});
 }
 
-void Frame::setOpenGLSamples(int samples) {
+void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
 	context.executeAsync([this, samples] {
 		VLOG_TRACE(vl::ui::log(), __PRETTY_FUNCTION__);
@@ -397,14 +400,6 @@ void Frame::setOpenGLRefreshRate(int rate) {
 				cmdFrameRecreate();
 		});
 }
-
-//void Frame::setContent(const observer_ptr<Component>& content) {
-//	this->content = content;
-//}
-//
-//void Frame::setContent(const shared_ptr<Component>& content) {
-//	this->content = content;
-//}
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
 	VLOG_TRACE(vl::ui::log(), "%s [%s]", __PRETTY_FUNCTION__, title);
@@ -502,25 +497,36 @@ void Frame::cmdCoreCreate() {
 	VLOG_DEBUG(vl::ui::log(), "Create window for frame [%s]", title);
 
 	glfwDefaultWindowHints();
-	glfwWindowHint(GLFW_DECORATED, decorated);
-	glfwWindowHint(GLFW_VISIBLE, false);
-	glfwWindowHint(GLFW_RESIZABLE, resizable);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersionMajor);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, openGLVersionMinor);
-	//TODO P5: Disable deprecated openGL functionality by enable forward compat
-	//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, openGLProfile);
-	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
+	glfwWindowHint(GLFW_DECORATED, decorated);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	//glfwWindowHint(GLFW_FOCUSED, );
-	//glfwWindowHint(GLFW_FLOATING, ); // Always on top
-	//glfwWindowHint(GLFW_CONTEXT_ROBUSTNESS, GLFW_NO_RESET_NOTIFICATION);
-	//TODO P4: Hint GLFW_FOCUSED
-	//TODO P4: Hint GLFW_FLOATING
-	//TODO P4: Hint GLFW_CONTEXT_ROBUSTNESS
-	//TODO P3: Hint max refres rate, GLFW_REFRESH_RATE maximum = GLFW_DONT_CARE
-	//TODO P5: context sharing
+	glfwWindowHint(GLFW_FLOATING, false); // Always on top
+	glfwWindowHint(GLFW_FOCUSED, true); // Initial focus
+	glfwWindowHint(GLFW_OPENGL_PROFILE, openGLProfile);
 	glfwWindowHint(GLFW_REFRESH_RATE, openGLRefreshRate);
+	glfwWindowHint(GLFW_RESIZABLE, resizable);
+	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
+	glfwWindowHint(GLFW_VISIBLE, false); // Always false, after creation set to real value
+
+	//TODO P4: Map glfw hint GLFW_FLOATING
+	//TODO P4: Map glfw hint GLFW_FOCUSED
+	//TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+	//TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
+	//TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
+	//TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
+	//TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
+	//TODO P5: Support glfw hint GLFW_STEREO
+	//TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
+
+	//TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
+	//TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
+	//TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
+	//TODO P5: Context sharing
+
+	// No plans for mapping these glfw hints:
+	//GLFW_ACCUM_RED_BITS, GLFW_ACCUM_GREEN_BITS, GLFW_ACCUM_BLUE_BITS, GLFW_ACCUM_ALPHA_BITS,
+	//GLFW_AUX_BUFFERS, GLFW_CLIENT_API, GLFW_DOUBLEBUFFER
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
 		VLOG_INFO(vl::ui::log(), "Switching frame [%s] to full screen mode", title);

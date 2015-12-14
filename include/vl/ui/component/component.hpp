@@ -66,10 +66,25 @@ public:
 	}
 
 public:
+	/** OpenGL control function. Called before render if the object was previously invalidated.
+	 * @param renderer
+	 * @note Called by render function
+	 * @context GL */
 	virtual void build(Renderer& renderer);
+	/** OpenGL control function. Called before the object is destroyed to cleanup OpenGL resources.
+	 * @param renderer
+	 * @note Called by UI
+	 * @context GL */
 	virtual void destroy(Renderer& renderer);
+	/** Invalidates the object requesting it to rebuild before the next render.
+	 * @context ANY */
 	virtual void invalidate();
+	/** OpenGL control function. Renders the object.
+	 * @context ANY */
 	virtual void render(Renderer& renderer);
+	/** General control function. Updates the object.
+	 * @note Called even if the object is not rendered.
+	 * @context ANY */
 	virtual void update();
 
 public:

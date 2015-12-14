@@ -1,10 +1,17 @@
+
+
+Rename example folder to sandbox
+Create example folder with some of it...
+
+
 cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
 much pain to integrate
 
 
 Colors:
 0.236f, 0.311f, 0.311f
-58, 255, 255
+0.500f, 0.170f, 0.090f
+0.227f, 1.000f, 0.810f
 Neat little page for similar and alternativ color picking: http://www.colorhexa.com/3affce
 
 Base class for lights and cameras...

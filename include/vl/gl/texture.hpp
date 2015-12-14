@@ -36,6 +36,8 @@ constexpr const char DEFAULT_TEXTURE_NAME[] = "--UNNAMED--";
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: Switch to const boost::iostreams::array_source& from boost::asio::const_buffer
+
 /**
  * @note Non-virtual class
  */

@@ -3,9 +3,11 @@
 // hpp
 #include <vl/ui/component/label.hpp>
 // ext
+#include <boost/filesystem/path.hpp>
 #include <GL/glew.h>
 // pro
 #include <vl/ui/log.hpp>
+#include <vl/gl/log.hpp>
 
 namespace vl {
 namespace ui {
@@ -15,31 +17,44 @@ void Label::setText(const std::string& text) {
 	invalidate();
 }
 
-void Label::build(Renderer& renderer) {
+void Label::build(Renderer&) {
 	VLOG_TRACE(vl::ui::log(), "Build Label");
-
-	deafultFont.load("Data/Font/cour.ttf", 12);
+	if (!deafultFont.isLoaded())
+		deafultFont.load("Data/Font/cour.ttf");
 }
 
 void Label::destroy(Renderer&) {
 	VLOG_TRACE(vl::ui::log(), "Destroy Label");
-	deafultFont.clean();
+	if (deafultFont.isLoaded())
+		deafultFont.unload();
 }
 
 void Label::render(Renderer& renderer) {
-	//VLOG_TRACE(vl::ui::log(), "Render Label");
+	//	VLOG_TRACE(vl::ui::log(), "Render Label");
 
-//	glBegin(GL_QUADS);
-//	glColor3f(0.50f, 0.17f, 0.09f);
-//	glVertex2f(-0.10f, -0.10f);
-//	glVertex2f(0.10f, -0.10f);
-//	glVertex2f(0.10f, 0.10f);
-//	glVertex2f(-0.10f, 0.10f);
-//	glEnd();
+	(void) renderer;
+	//	gluOrtho2D(0, 512, 0, 512);
+	glEnable(GL_TEXTURE_2D);
+	//<<< This is an articaft here due to vui_main should already set up this
+	deafultFont.bind();
+	glBegin(GL_QUADS);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0, 0);
+	glVertex2f(-1.0f, -1.0f);
+	glTexCoord2f(1, 0);
+	glVertex2f(+1.0f, -1.0f);
+	glTexCoord2f(1, 1);
+	glVertex2f(+1.0f, +1.0f);
+	glTexCoord2f(0, 1);
+	glVertex2f(-1.0f, +1.0f);
+	glEnd();
+	deafultFont.unbind();
 
-	deafultFont.begin();
-	deafultFont.print(-0.10f, -0.10f, text.c_str());
-	deafultFont.end();
+	checkGL();
+
+	//	deafultFont.bind();
+	//	deafultFont.print(-0.10f, -0.10f, text.c_str());
+	//	deafultFont.unbind();
 }
 
 } //namespace ui
