@@ -10,6 +10,7 @@
 #include <cstring>
 #include <ostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 //#include <mutex>
@@ -37,8 +38,8 @@
 #define LIBV_TRACE(...) ::libv::log(LIBV_POC, ::libv::Trace, "libv", __VA_ARGS__);
 #define LIBV_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv", __VA_ARGS__);
 #define LIBV_INFO( ...) ::libv::log(LIBV_POC, ::libv::Info , "libv", __VA_ARGS__);
-#define LIBV_WARN( ...) ::libv::log(LIBV_POC, ::libv::Debug, "libv", __VA_ARGS__);
-#define LIBV_ERROR(...) ::libv::log(LIBV_POC, ::libv::Warn , "libv", __VA_ARGS__);
+#define LIBV_WARN( ...) ::libv::log(LIBV_POC, ::libv::Warn , "libv", __VA_ARGS__);
+#define LIBV_ERROR(...) ::libv::log(LIBV_POC, ::libv::Error, "libv", __VA_ARGS__);
 #define LIBV_FATAL(...) ::libv::log(LIBV_POC, ::libv::Fatal, "libv", __VA_ARGS__);
 
 namespace libv {
@@ -48,12 +49,12 @@ namespace libv {
 //LIBV_STRONG_TYPEDEF(int, Severity);
 using Severity = int;
 
-constexpr Severity Trace{100};
-constexpr Severity Debug{200};
-constexpr Severity Info{300};
-constexpr Severity Warn{400};
-constexpr Severity Error{500};
-constexpr Severity Fatal{600};
+constexpr Severity Trace{1};
+constexpr Severity Debug{2};
+constexpr Severity Info{3};
+constexpr Severity Warn{4};
+constexpr Severity Error{5};
+constexpr Severity Fatal{6};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -134,7 +135,7 @@ private:
 	std::vector<Rule> rules;
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
-	std::string format = "{severity} [{modul}] {message}\n";
+	std::string format = "{thread} {severity} [{modul}] {message}\n";
 
 private:
 	bool notable(Severity severity, const std::string& modul) {
@@ -223,7 +224,9 @@ public:
 					fmt::arg("severity", severity),
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
-					fmt::arg("func", poc.func) //...
+					fmt::arg("func", poc.func),
+					fmt::arg("thread", std::this_thread::get_id())
+					//...
 					);
 			for (auto& output : outputs) {
 				*output << record;

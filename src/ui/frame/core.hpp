@@ -11,8 +11,6 @@ namespace ui {
 
 struct Frame;
 
-// -------------------------------------------------------------------------------------------------
-
 void coreExec(const std::function<void()>&);
 void coreExec(std::function<void()>&&);
 

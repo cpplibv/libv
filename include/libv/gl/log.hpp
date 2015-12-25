@@ -10,8 +10,8 @@
 #define LIBV_GL_TRACE(...) ::libv::log(LIBV_POC, ::libv::Trace, "libv.gl", __VA_ARGS__);
 #define LIBV_GL_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.gl", __VA_ARGS__);
 #define LIBV_GL_INFO( ...) ::libv::log(LIBV_POC, ::libv::Info , "libv.gl", __VA_ARGS__);
-#define LIBV_GL_WARN( ...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.gl", __VA_ARGS__);
-#define LIBV_GL_ERROR(...) ::libv::log(LIBV_POC, ::libv::Warn , "libv.gl", __VA_ARGS__);
+#define LIBV_GL_WARN( ...) ::libv::log(LIBV_POC, ::libv::Warn , "libv.gl", __VA_ARGS__);
+#define LIBV_GL_ERROR(...) ::libv::log(LIBV_POC, ::libv::Error, "libv.gl", __VA_ARGS__);
 #define LIBV_GL_FATAL(...) ::libv::log(LIBV_POC, ::libv::Fatal, "libv.gl", __VA_ARGS__);
 
 namespace libv {

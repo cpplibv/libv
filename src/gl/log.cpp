@@ -12,8 +12,7 @@ namespace detail {
 void logOGLError(const char* func, const char* file, int line) {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
-		::libv::log(
-				CodePosition{file, func, line}, ::libv::Error, "libv.gl",
+		::libv::log(CodePosition{file, func, line}, ::libv::Error, "libv.gl",
 				"OpenGL: %s", reinterpret_cast<const char*> (gluErrorString(err)));
 }
 } //namespace detail

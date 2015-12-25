@@ -1,16 +1,13 @@
 
 STACK:
 
-fully adapt new log system in ui
+fix frame setters
 -- commit --
 
 LIBV_STRONG_TYPEDEF(int, Severity);
 -- commit --
 
 log thread naming
--- commit --
-
-fix frame setters
 -- commit --
 
 fix frame close operation
@@ -33,6 +30,9 @@ shader cache
 -- commit --
 
 remove vm3 from gl
+-- commit --
+
+glEnable(GL_DEBUG_OUTPUT);
 -- commit --
 
 // -------------------------------------------------------------------------------------------------

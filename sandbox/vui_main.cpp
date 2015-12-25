@@ -36,7 +36,6 @@ void initGLEW() {
 }
 
 void initGL() {
-	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEPTH_TEST); //Depth
 	glDepthFunc(GL_LESS);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
@@ -117,6 +116,7 @@ int main(int, char**) {
 	TestFrame f1("TestFrame");
 	f1.join();
 
+	std::cout << std::flush;
 	return 0;
 }
 
