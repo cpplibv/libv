@@ -36,7 +36,7 @@ static std::atomic<size_t> FT_LibUseCount{0};
 Font2D::Font2D() {
 	if (!ftLib)
 		if (auto err = FT_Init_FreeType(&ftLib))
-			VLOG_ERROR(libv::ui::log(), "FT_Init_FreeType failed: [%d]", err);
+			LIBV_UI_ERROR("FT_Init_FreeType failed: [%d]", err);
 	++FT_LibUseCount;
 
 	for (size_t i = 0; i < textureData.size(); ++i) {
@@ -57,7 +57,7 @@ Font2D::~Font2D() {
 		unload();
 	if (!--FT_LibUseCount)
 		if (auto err = FT_Done_FreeType(ftLib))
-			VLOG_ERROR(libv::ui::log(), "FT_Done_FreeType failed: [%d]", err);
+			LIBV_UI_ERROR("FT_Done_FreeType failed: [%d]", err);
 }
 
 void Font2D::load(const boost::filesystem::path& filePath) {
@@ -73,7 +73,7 @@ void Font2D::load(const void* data, const size_t size) {
 void Font2D::loadFace() {
 	if (auto err = FT_New_Memory_Face(ftLib,
 			reinterpret_cast<const FT_Byte*> (fileContent.data()), fileContent.size(), 0, &face))
-		return VLOG_ERROR(libv::ui::log(), "FT_New_Memory_Face failed: [%d]", err);
+		return LIBV_UI_ERROR("FT_New_Memory_Face failed: [%d]", err);
 
 	setSize(activeFontSize);
 
@@ -107,7 +107,7 @@ void Font2D::setSize(int px) {
 		return;
 
 	if (auto err = FT_Set_Char_Size(face, activeFontSize << 6, activeFontSize << 6, 96, 96))
-		return VLOG_ERROR(libv::ui::log(), "FT_Set_Char_Size failed: [%d]", err);
+		return LIBV_UI_ERROR("FT_Set_Char_Size failed: [%d]", err);
 }
 
 int Font2D::getLineAdvance() const {
@@ -129,11 +129,11 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
 	if (auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
-		VLOG_ERROR(libv::ui::log(), "FT_Load_Glyph failed: [%d]", err);
+		LIBV_UI_ERROR("FT_Load_Glyph failed: [%d]", err);
 	if (auto err = FT_Get_Glyph(face->glyph, &glyph))
-		VLOG_ERROR(libv::ui::log(), "FT_Get_Glyph failed: [%d]", err);
+		LIBV_UI_ERROR("FT_Get_Glyph failed: [%d]", err);
 	if (auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true))
-		VLOG_ERROR(libv::ui::log(), "FT_Glyph_To_Bitmap failed: [%d]", err);
+		LIBV_UI_ERROR("FT_Glyph_To_Bitmap failed: [%d]", err);
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph> (glyph);
 	const auto bitmap = bitmapGlyph->bitmap;
@@ -150,7 +150,7 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 		texturePen = ivec2(0, textureNextLine);
 
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
-		VLOG_ERROR(libv::ui::log(), "Failed to render character: Not enough place in font texture: "
+		LIBV_UI_ERROR("Failed to render character: Not enough place in font texture: "
 				"unicode: [%d] size: [%dpx] bitmap size: [%d,%d], pen pos: [%d,%d]",
 				unicode, activeFontSize, bitmapWidth, bitmapHeight, texturePen.x, texturePen.y);
 		return defaultCharacter;

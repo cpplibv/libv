@@ -10,7 +10,7 @@
 #include <string>
 #include <thread>
 // pro
-#include <libv/log.hpp>
+#include <libv/log/log.hpp>
 #include <libv/semaphore.hpp>
 
 #ifndef LIBV_DEFAULT_WORKERTHREAD_TASK_PRIORITY
@@ -84,13 +84,13 @@ private:
 			} catch (std::exception& ex) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				VLOG_DEBUG(libv::log(), "Exception occurred in [%s] WorkerThread. "
+				LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. "
 						"Last exception: [%s].", name, ex.what(), exceptionHistory.size());
 			} catch (...) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				VLOG_DEBUG(libv::log(), "Exception occurred in [%s] WorkerThread. "
+				LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. ", name, exceptionHistory.size());
 			}
 		}
@@ -134,7 +134,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			VLOG_DEBUG(libv::log(), "Exception during joining WorkerThread [%s]: %s", name, ex.what());
+			LIBV_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
 		}
 	}
 	inline auto getID() {

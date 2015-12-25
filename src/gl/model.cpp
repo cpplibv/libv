@@ -47,7 +47,7 @@ Model::Model(const char* data, size_t size, const std::string& name) :
 
 void Model::init(const char* data, size_t size) {
 	if (!model.load(data, size)) {
-		VLOG_ERROR(libv::gl::log(), "Failed to load model: [%s]", name);
+		LIBV_GL_ERROR("Failed to load model: [%s]", name);
 		return;
 	}
 	loadGL();
@@ -60,7 +60,7 @@ Model::~Model() {
 // -------------------------------------------------------------------------------------------------
 
 void Model::loadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Loading model: [%s]", name);
+	LIBV_GL_TRACE("GL Loading model: [%s]", name);
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo_vertex);
@@ -100,7 +100,7 @@ void Model::loadGL() {
 }
 
 void Model::unloadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Unloading model: [%s]", name);
+	LIBV_GL_TRACE("GL Unloading model: [%s]", name);
 
 	glDeleteBuffers(1, &vbo_index);
 	glDeleteBuffers(1, &vbo_vertex);

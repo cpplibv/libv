@@ -2,13 +2,11 @@
 
 #pragma once
 
-#include <libv/log.hpp>
+#include <libv/log/log.hpp>
 
-namespace libv {
-namespace vm3 {
-inline Log& log() {
-	static Log log("vm3", libv::log());
-	return log;
-}
-}
-}
+#define LIBV_VM3_TRACE(...) ::libv::log(LIBV_POC, ::libv::Trace, "libv.vm3", __VA_ARGS__);
+#define LIBV_VM3_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.vm3", __VA_ARGS__);
+#define LIBV_VM3_INFO( ...) ::libv::log(LIBV_POC, ::libv::Info , "libv.vm3", __VA_ARGS__);
+#define LIBV_VM3_WARN( ...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.vm3", __VA_ARGS__);
+#define LIBV_VM3_ERROR(...) ::libv::log(LIBV_POC, ::libv::Warn , "libv.vm3", __VA_ARGS__);
+#define LIBV_VM3_FATAL(...) ::libv::log(LIBV_POC, ::libv::Fatal, "libv.vm3", __VA_ARGS__);

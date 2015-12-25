@@ -71,10 +71,10 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
-	add_compile_options(-Wall -Wextra -Wno-comment)
-	#add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
+#	add_compile_options(-Wall -Wextra -Wno-comment)
+	add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
 	#add_compile_options(-Wall -Wextra -Wconversion -Wpedantic -Wno-comment)
-	add_compile_options(-Wsuggest-override) #TODO P5: IF > GNU 5.1
+	#add_compile_options(-Wsuggest-override) #TODO P5: IF > GNU 5.1
 
 	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
 		#add_compile_options(-fsanitize=address)
@@ -145,7 +145,6 @@ ExternalProject_Add(ext_cppformat
 	PREFIX ${PATH_EXT_SRC}/cppformat
 	INSTALL_DIR ${PATH_EXT}/cppformat
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cppformat
-	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
 	EXCLUDE_FROM_ALL 1
@@ -304,40 +303,45 @@ link_directories(${PATH_EXT}/glew/lib)
 link_directories(${PATH_EXT}/glfw/lib)
 
 #Sources
+file(GLOB_RECURSE libv_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
 file(GLOB_RECURSE vgl_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/gl/*.cpp)
-file(GLOB_RECURSE libv_src          RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
+file(GLOB_RECURSE vlog_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/log/*.cpp)
 file(GLOB_RECURSE vm3_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3/*.cpp)
 file(GLOB_RECURSE vm3imp_src      RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/sig/*.cpp)
 file(GLOB_RECURSE vui_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/ui/*.cpp)
 
 #Test Sources
+file(GLOB_RECURSE libv_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/libv/*.cpp)
 file(GLOB_RECURSE vgl_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/gl/*.cpp)
-file(GLOB_RECURSE libv_test_src     RELATIVE ${PATH_PRJ} ${PATH_TST}/libv/*.cpp)
+file(GLOB_RECURSE vlog_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/log/*.cpp)
 file(GLOB_RECURSE vm3_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3/*.cpp)
 file(GLOB_RECURSE vm3imp_test_src RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/sig/*.cpp)
 file(GLOB_RECURSE vui_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
 
 #Libraries
-add_library(vgl    STATIC ${vgl_src})
 add_library(libv   STATIC ${libv_src})
+add_library(vgl    STATIC ${vgl_src})
+add_library(vlog   STATIC ${vlog_src})
 add_library(vm3    STATIC ${vm3_src})
 add_library(vm3imp STATIC ${vm3imp_src})
 add_library(vsig   STATIC ${vsig_src})
 add_library(vui    STATIC ${vui_src})
 
 #Tests
-add_executable(vgl_test    ${vgl_test_src})
 add_executable(libv_test   ${libv_test_src})
+add_executable(vgl_test    ${vgl_test_src})
+add_executable(vlog_test   ${vlog_test_src})
 add_executable(vm3_test    ${vm3_test_src})
 add_executable(vm3imp_test ${vm3imp_test_src})
 add_executable(vsig_test   ${vsig_test_src})
 add_executable(vui_test    ${vui_test_src})
 
 #Sandbox - Executables
-add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
 add_executable(libv_main   ${PATH_SNB}/libv_main.cpp)
+add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
+add_executable(vlog_main   ${PATH_SNB}/vlog_main.cpp)
 add_executable(vm3_main    ${PATH_SNB}/vm3_main.cpp)
 add_executable(vm3imp_main ${PATH_SNB}/vm3imp_main.cpp)
 add_executable(vsig_main   ${PATH_SNB}/vsig_main.cpp)
@@ -349,26 +353,29 @@ add_custom_target(externals DEPENDS ${EXTERNAL_PROJECT_LIST})
 add_custom_target(ext DEPENDS externals)
 
 #Link - Libraries
+target_link_libraries(vlog   -static)
 target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3
 							boost_serialization-mt-s boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3    -static boost_serialization-mt-s)
-target_link_libraries(vm3imp -static vm3 assimp zlibstatic)
-target_link_libraries(vui    -static glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
+target_link_libraries(vm3imp -static vm3 cppformat assimp zlibstatic)
+target_link_libraries(vui    -static cppformat glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
 							boost_system-mt-s boost_filesystem-mt-s freetype vgl)
 
 #Link - Tests
-target_link_libraries(vgl_test    -static vgl)
 target_link_libraries(libv_test   -static )
+target_link_libraries(vgl_test    -static vgl)
+target_link_libraries(vlog_test   -static cppformat)
 target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
 target_link_libraries(vm3imp_test -static vm3)
 target_link_libraries(vsig_test   -static )
 target_link_libraries(vui_test    -static )
 
 #Link - Executables
-target_link_libraries(vgl_main    -static glew glfw3 vgl)
-target_link_libraries(libv_main   -static cppformat)
-target_link_libraries(vm3_main    -static vm3 boost_system-mt-s boost_filesystem-mt-s)
-target_link_libraries(vm3imp_main -static vm3imp boost_system-mt-s boost_filesystem-mt-s)
-target_link_libraries(vsig_main   -static )
-target_link_libraries(vui_main    -static vui)
-target_link_libraries(vui_main2   -static vui)
+target_link_libraries(libv_main   -static vlog cppformat)
+target_link_libraries(vgl_main    -static vlog cppformat glew glfw3 vgl)
+target_link_libraries(vlog_main   -static cppformat)
+target_link_libraries(vm3_main    -static vlog cppformat vm3 boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vm3imp_main -static vlog cppformat vm3imp boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vsig_main   -static vlog cppformat)
+target_link_libraries(vui_main    -static vlog cppformat vui)
+target_link_libraries(vui_main2   -static vlog cppformat vui)

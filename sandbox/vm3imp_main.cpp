@@ -1,7 +1,7 @@
 // File: vm3_importer.cpp, Created on 2015. február 18. 18:22, Author: Vader
 
 // libv
-#include <libv/log.hpp>
+#include <libv/log/log.hpp>
 // std
 #include <iostream>
 // pro
@@ -12,7 +12,7 @@
 using namespace libv;
 
 int main(int argc, char** argv) {
-	libv::log().output(std::cout);
+	std::cout << libv::log;
 
 	std::string line;
 	for (int i = 1; i < argc; i++)

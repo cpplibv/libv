@@ -21,6 +21,8 @@
 using namespace libv::vm3;
 
 int main(int, char **) {
+	std::cout << libv::log;
+
 	Model model;
 
 	Material material1("Metal", "Phong-E-v2");

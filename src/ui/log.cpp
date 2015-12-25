@@ -13,8 +13,7 @@ namespace ui {
 namespace detail {
 
 void errorCallbackGLFW(int code, const char * msg) {
-	libv::ui::log().log(VLOG_SEVERITY_ERROR, 
-			libv::format("[GLFW3]: %d - %s", code, msg), "LIB:GLFW3", "-", -1);
+	::libv::log(LIBV_POC, ::libv::Error, "libv.ui", "[GLFW3]: %d - %s", code, msg);
 }
 
 } //namespace detail

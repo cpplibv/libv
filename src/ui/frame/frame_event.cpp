@@ -19,7 +19,7 @@ void glfwCallback(GLFWwindow* window, Args... args) {
 	try {
 		(windowHandlers.at(window)->*que).fire(E(args...));
 	} catch (const std::out_of_range& e) {
-		VLOG_ERROR(libv::ui::log(), "Unhandeled event. No event handler (frame) assigned to this window.");
+		LIBV_UI_ERROR("Unhandeled event. No event handler (frame) assigned to this window.");
 	}
 }
 
@@ -93,7 +93,7 @@ void Frame::glfwCallback(const EventScroll&) { }
 void Frame::glfwCallback(const EventWindowClose&) { }
 
 void Frame::glfwCallback(const EventWindowFocus&) {
-//	VLOG_TRACE(libv::ui::log(), "Not implemented yet.");
+//	LIBV_UI_TRACE("Not implemented yet.");
 }
 
 void Frame::glfwCallback(const EventWindowIconify& e) {

@@ -6,7 +6,9 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/fstream.hpp>
 // libv
-#include <libv/log.hpp>
+#include <libv/log/log.hpp>
+// std
+#include <sstream>
 
 namespace libv {
 
@@ -18,7 +20,7 @@ inline std::string readFile(const boost::filesystem::path& filePath, const std::
 	file.open(filePath.c_str(), std::ios_base::in | mode);
 
 	if (!file) {
-		VLOG_ERROR(libv::log(), "Failed to open file: [%s]", filePath.string());
+		LIBV_ERROR("Failed to open file: [%s]", filePath.string());
 		return result;
 	}
 

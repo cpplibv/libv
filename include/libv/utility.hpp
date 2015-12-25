@@ -34,6 +34,8 @@ struct new_t {
 // Strong Typedef ----------------------------------------------------------------------------------
 // Based on boost strong typedef <boost/serialization/strong_typedef.hpp>
 
+// TODO P4: constexpr
+
 #define LIBV_STRONG_TYPEDEF(T, D)                                                                    \
 struct D {                                                                                         \
 	T t;                                                                                           \

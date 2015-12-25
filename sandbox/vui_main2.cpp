@@ -27,7 +27,7 @@ using namespace libv::ui;
 //};
 
 int main(int, char**) {
-	libv::log().output(std::cout);
+	std::cout << libv::log;
 
 	Frame f1("1");
 	//	f1.setContent(new Quad());

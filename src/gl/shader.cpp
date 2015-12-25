@@ -66,14 +66,14 @@ BaseShader::~BaseShader() {
 // -------------------------------------------------------------------------------------------------
 
 void BaseShader::loadGL(const char* source) {
-	VLOG_TRACE(libv::gl::log(), "GL Loading %s shader: [%s]", shaderTypeToString(type), name);
+	LIBV_GL_TRACE("GL Loading %s shader: [%s]", shaderTypeToString(type), name);
 	shaderID = glCreateShader(type);
 
 	glShaderSource(shaderID, 1, &source, nullptr);
 	glCompileShader(shaderID);
 
 	if (!getShaderCompileStatus(shaderID)) {
-		VLOG_ERROR(libv::gl::log(), "Failed to compile %s shader [%s]: %s",
+		LIBV_GL_ERROR("Failed to compile %s shader [%s]: %s",
 				shaderTypeToString(type), name, getShaderCompileMessage(shaderID));
 		unloadGL();
 	}
@@ -81,7 +81,7 @@ void BaseShader::loadGL(const char* source) {
 }
 
 void BaseShader::unloadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Unloading %s shader: [%s]", shaderTypeToString(type), name);
+	LIBV_GL_TRACE("GL Unloading %s shader: [%s]", shaderTypeToString(type), name);
 	glDeleteShader(shaderID);
 	checkGL();
 }
@@ -109,7 +109,7 @@ ShaderProgram::~ShaderProgram() {
 // -------------------------------------------------------------------------------------------------
 
 void ShaderProgram::loadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Loading shader program: [%s]", name);
+	LIBV_GL_TRACE("GL Loading shader program: [%s]", name);
 	programID = glCreateProgram();
 
 	if (shaderVertex)
@@ -122,7 +122,7 @@ void ShaderProgram::loadGL() {
 	glLinkProgram(programID);
 
 	if (!getProgamLinkStatus(programID)) {
-		VLOG_ERROR(libv::gl::log(), "Failed to link [%s]: %s", name, getProgamLinkMessage(programID));
+		LIBV_GL_ERROR("Failed to link [%s]: %s", name, getProgamLinkMessage(programID));
 		unloadGL();
 	}
 	checkGL();
@@ -156,7 +156,7 @@ void ShaderProgram::mapUniforms() {
 			*std::strrchr(uniformName, '[') = '\0';
 			std::string uniformSubName;
 			for (int j = 0; j < uniformSize; j++) {
-				uniformSubName = libv::format("%s[%d]", uniformName, j);
+				uniformSubName = fmt::sprintf("%s[%d]", uniformName, j);
 				GLint uniformLocation = glGetUniformLocation(programID, uniformSubName.c_str());
 
 				addressesUniform.emplace(uniformSubName,
@@ -167,7 +167,7 @@ void ShaderProgram::mapUniforms() {
 }
 
 void ShaderProgram::unloadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Unloading shader program: [%s]", name);
+	LIBV_GL_TRACE("GL Unloading shader program: [%s]", name);
 	glDeleteProgram(programID);
 	programID = 0;
 	checkGL();

@@ -1,8 +1,12 @@
 
-
 STACK:
 
-funny enough but i think logging has a very high priority
+fully adapt new log system in ui
+-- commit --
+
+LIBV_STRONG_TYPEDEF(int, Severity);
+-- commit --
+
 log thread naming
 -- commit --
 
@@ -13,7 +17,7 @@ fix frame close operation
 -- commit --
 
 check frame and compontnet build / render / destroy / etc...
-find reason of crach on destructor
+find reason of crash on destructor
 -- commit --
 
 string2D
@@ -27,6 +31,24 @@ font cache
 
 shader cache
 -- commit --
+
+remove vm3 from gl
+-- commit --
+
+// -------------------------------------------------------------------------------------------------
+
+Idea for rendering lasers:
+
+Most of the work will be done by the shader.
+2 quad rendered common edge is the center of the laser.
+Both quad has the same texture space, but one of them is flipped.
+By texture coord shader can calculate the distance from center.
+Texture is seamless cloud-like mostly longish pattern with.
+Animation is based on uniform offset for texture.
+There can be multiple texture with different animation offset direction.
+Low alpha values on edges. Opacity can be transformed from linear to some exponential.
+Multiple quad-pair could be used along the same laser.
+Each low angle eye-normals quad has decreased opacity or even better if per-fragment calculated.
 
 // -------------------------------------------------------------------------------------------------
 
@@ -207,12 +229,6 @@ http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 Adopt TCLAP http://tclap.sourceforge.net if suitable
 
-vl::log(__LIBV_ERROR__, __LIBV_POC__, __LIBV_GL__, "msg", args...)
-struct libv::POC = position of code
-
-Beside Component's shared_ptr provide a way of non owning ptr which is visible at call:
-	container.add(testComponent, libv::non_owning); //simular as std::adopt_lock
-
 Timed Event / Timer Support / Timer thread
 Resettable and clearable timer / timer tasks
 
@@ -226,7 +242,6 @@ Config Entry:
 
 Optimizing for prefetcher.
 Optimizing for minimum number of opengl bind.
-In ui static and dynamic render options for different components
 Resource pack
 
 ----

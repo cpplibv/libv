@@ -6,15 +6,16 @@
 #include <GL/glew.h>
 
 namespace libv {
-	namespace gl {
-		namespace detail {
+namespace gl {
+namespace detail {
 
-			void logOGLError(const char* func, const char* file, int line) {
-				GLenum err = glGetError();
-				if (err != GL_NO_ERROR) {
-					libv::gl::log().log(VLOG_SEVERITY_ERROR, std::string("OpenGL: ") + reinterpret_cast<const char*> (gluErrorString(err)), file, func, line);
-				}
-			}
-		} //namespace detail
-	} //namespace gl
+void logOGLError(const char* func, const char* file, int line) {
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+		::libv::log(
+				CodePosition{file, func, line}, ::libv::Error, "libv.gl",
+				"OpenGL: %s", reinterpret_cast<const char*> (gluErrorString(err)));
+}
+} //namespace detail
+} //namespace gl
 } //namespace libv

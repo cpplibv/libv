@@ -183,7 +183,7 @@ void Importer::importGeometry(Model& model, const aiScene* scene) {
 		for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
 			const aiFace& face = mesh->mFaces[j];
 			if (face.mNumIndices != 3) {
-				VLOG_WARN(libv::vm3::log(), "Illegal number of vertex (%d) in a face of a mesh: %s", face.mNumIndices, mesh->mName.C_Str());
+				LIBV_VM3_WARN("Illegal number of vertex (%d) in a face of a mesh: %s", face.mNumIndices, mesh->mName.C_Str());
 				continue;
 			}
 			model.indices.push_back(face.mIndices[0]);
@@ -200,7 +200,7 @@ bool Importer::import(Model& model, const std::string& filePath) {
 	const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipUVs);
 
 	if (!scene) {
-		VLOG_ERROR(libv::vm3::log(), "Failed to import model [%s]: %s", filePath, importer.GetErrorString());
+		LIBV_VM3_ERROR("Failed to import model [%s]: %s", filePath, importer.GetErrorString());
 		return false;
 	}
 
@@ -260,29 +260,29 @@ bool Importer::import(Model& model, const std::string& filePath) {
 //for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 //	aiString Path;
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_AMBIENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_AMBIENT Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_AMBIENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_DIFFUSE Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_DIFFUSE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DISPLACEMENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_DISPLACEMENT Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_DISPLACEMENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_EMISSIVE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_EMISSIVE Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_EMISSIVE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_HEIGHT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_HEIGHT Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_HEIGHT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_LIGHTMAP, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_LIGHTMAP Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_LIGHTMAP Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NONE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_NONE Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_NONE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NORMALS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_NORMALS Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_NORMALS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_OPACITY, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_OPACITY Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_OPACITY Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_REFLECTION, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_REFLECTION Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_REFLECTION Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SHININESS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_SHININESS Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_SHININESS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SPECULAR, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_SPECULAR Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_SPECULAR Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_UNKNOWN, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		VLOG_TRACE(libv::gl::log(), "aiTextureType_UNKNOWN Texture: %s", Path.data);
+//		LIBV_GL_TRACE("aiTextureType_UNKNOWN Texture: %s", Path.data);
 //}

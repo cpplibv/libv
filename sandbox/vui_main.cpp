@@ -17,15 +17,15 @@
 using namespace libv;
 using namespace libv::ui;
 
-#define checkGLEWSupport(ext) VLOG_INFO(libv::log(), "GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define checkGLEWSupport(ext) LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		VLOG_ERROR(libv::log(), "Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	VLOG_INFO(libv::log(), "GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	VLOG_INFO(libv::log(), "GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	VLOG_INFO(libv::log(), "GL Version: %s", (const char*) glGetString(GL_VERSION));
+	LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 
 	checkGLEWSupport(GL_VERSION_3_3);
 	checkGLEWSupport(GL_VERSION_4_5);
@@ -112,7 +112,7 @@ public:
 };
 
 int main(int, char**) {
-	libv::log().output(std::cout);
+	std::cout << libv::log;
 
 	TestFrame f1("TestFrame");
 	f1.join();

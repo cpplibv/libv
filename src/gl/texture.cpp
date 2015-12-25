@@ -42,14 +42,14 @@ Texture::~Texture() {
 
 void Texture::init(const char* data, const size_t size) {
 	if (!data || size <= sizeof(gli::detail::ddsHeader)) {
-		VLOG_WARN(libv::gl::log(), "Invalid texture data: [%s]", name);
+		LIBV_GL_WARN("Invalid texture data: [%s]", name);
 		texture.reset();
 		return;
 	}
 	texture = std::make_unique<gli::texture>(gli::load(data, size));
 
 	if (texture->empty()) {
-		VLOG_WARN(libv::gl::log(), "Failed to load texture [%s]", name);
+		LIBV_GL_WARN("Failed to load texture [%s]", name);
 		texture.reset();
 		return;
 	}
@@ -82,7 +82,7 @@ void Texture::unbind(TextureType type) {
 // -------------------------------------------------------------------------------------------------
 
 void Texture::loadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Loading texture: [%s]", name);
+	LIBV_GL_TRACE("GL Loading texture: [%s]", name);
 	assert(!texture->empty());
 
 	gli::gl GL;
@@ -189,7 +189,7 @@ void Texture::loadGL() {
 }
 
 void Texture::unloadGL() {
-	VLOG_TRACE(libv::gl::log(), "GL Unloading texture: [%s]", name);
+	LIBV_GL_TRACE("GL Unloading texture: [%s]", name);
 
 	const auto temp = textureID;
 	textureID = 0;

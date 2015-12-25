@@ -39,10 +39,10 @@ private:
 private:
 
 	void init() {
-		VLOG_INFO(libv::ui::log(), "Initialize Core / GLFW Context");
+		LIBV_UI_INFO("Initialize Core / GLFW Context");
 		glfwSetErrorCallback(detail::errorCallbackGLFW);
 		if (!glfwInit())
-			return VLOG_ERROR(libv::ui::log(), "Failed to initialize GLFW");
+			return LIBV_UI_ERROR("Failed to initialize GLFW");
 
 		glfwSetMonitorCallback(glfwMonitorCallback);
 
@@ -51,7 +51,7 @@ private:
 		for (int i = 0; i < numMonitor; i++) {
 			glfwMonitorCallback(monitors[i], GLFW_CONNECTED);
 		}
-		VLOG_DEBUG(libv::ui::log(), "Initialized Core / GLFW Context");
+		LIBV_UI_DEBUG("Initialized Core / GLFW Context");
 	}
 
 	void waitEvent() {
@@ -65,10 +65,10 @@ private:
 	}
 
 	void term() {
-		VLOG_INFO(libv::ui::log(), "Terminate Core / GLFW Context");
+		LIBV_UI_INFO("Terminate Core / GLFW Context");
 		glfwSetMonitorCallback(nullptr);
 		glfwTerminate();
-		VLOG_DEBUG(libv::ui::log(), "Terminated Core / GLFW Context");
+		LIBV_UI_DEBUG("Terminated Core / GLFW Context");
 	}
 public:
 
@@ -129,14 +129,14 @@ void terminateCore() {
 // -------------------------------------------------------------------------------------------------
 
 void activateFrame(Frame* frame) {
-	VLOG_DEBUG(libv::ui::log(), "Activate frame [%s]", frame->getTitle());
+	LIBV_UI_DEBUG("Activate frame [%s]", frame->getTitle());
 	std::lock_guard<std::mutex> lk(activeFrames_m);
 	activeFrames.insert(frame);
 	noActiveFrame.reset();
 }
 
 void deactivateFrame(Frame* frame) {
-	VLOG_DEBUG(libv::ui::log(), "Deactivate frame [%s]", frame->getTitle());
+	LIBV_UI_DEBUG("Deactivate frame [%s]", frame->getTitle());
 	std::lock_guard<std::mutex> lk(activeFrames_m);
 	activeFrames.erase(frame);
 	if (activeFrames.size() == 0)
@@ -145,7 +145,7 @@ void deactivateFrame(Frame* frame) {
 
 void registerFrame(Frame* frame) {
 	std::lock_guard<std::mutex> lk(frames_m);
-	VLOG_DEBUG(libv::ui::log(), "Register frame [%s]", frame->getTitle());
+	LIBV_UI_DEBUG("Register frame [%s]", frame->getTitle());
 	if (frames.size() == 0)
 		initCore();
 	frames.insert(frame);
@@ -153,7 +153,7 @@ void registerFrame(Frame* frame) {
 
 void unregisterFrame(Frame* frame) {
 	std::lock_guard<std::mutex> lk(frames_m);
-	VLOG_DEBUG(libv::ui::log(), "Unregister frame [%s]", frame->getTitle());
+	LIBV_UI_DEBUG("Unregister frame [%s]", frame->getTitle());
 	frames.erase(frame);
 	if (frames.size() == 0)
 		terminateCore();
@@ -162,19 +162,19 @@ void unregisterFrame(Frame* frame) {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::joinAll() {
-	VLOG_DEBUG(libv::ui::log(), "Joining every frame");
+	LIBV_UI_DEBUG("Joining every frame");
 	noActiveFrame.wait();
 }
 
 void Frame::closeAllForce() {
-	VLOG_DEBUG(libv::ui::log(), "Forced close every frame");
+	LIBV_UI_DEBUG("Forced close every frame");
 	std::lock_guard<std::mutex> lk(frames_m);
 	for (auto frame : frames)
 		frame->closeForce();
 }
 
 void Frame::closeAllDefault() {
-	VLOG_DEBUG(libv::ui::log(), "Default close every frame");
+	LIBV_UI_DEBUG("Default close every frame");
 	std::lock_guard<std::mutex> lk(frames_m);
 	for (auto frame : frames)
 		frame->closeDefault();
@@ -183,7 +183,7 @@ void Frame::closeAllDefault() {
 // =================================================================================================
 
 void Frame::cmdCoreCreate() {
-	VLOG_DEBUG(libv::ui::log(), "Create window for frame [%s]", title);
+	LIBV_UI_DEBUG("Create window for frame [%s]", title);
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersionMajor);
@@ -218,12 +218,12 @@ void Frame::cmdCoreCreate() {
 	//GLFW_AUX_BUFFERS, GLFW_CLIENT_API, GLFW_DOUBLEBUFFER
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
-		VLOG_INFO(libv::ui::log(), "Switching frame [%s] to full screen mode", title);
+		LIBV_UI_INFO("Switching frame [%s] to full screen mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 		window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), shareWindow);
 	} else if (displayMode == DISPLAY_MODE_BORDERLESS) {
-		VLOG_INFO(libv::ui::log(), "Switching frame [%s] to borderless mode", title);
+		LIBV_UI_INFO("Switching frame [%s] to borderless mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 
@@ -236,7 +236,7 @@ void Frame::cmdCoreCreate() {
 		window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, shareWindow);
 	}
 	if (!window) {
-		VLOG_ERROR(libv::ui::log(), "GLFW window creation failed");
+		LIBV_UI_ERROR("GLFW window creation failed");
 		return;
 	}
 
@@ -251,11 +251,11 @@ void Frame::cmdCoreCreate() {
 	activateFrame(this);
 	baseInvalidate();
 
-	VLOG_DEBUG(libv::ui::log(), "Window creation was successful");
+	LIBV_UI_DEBUG("Window creation was successful");
 }
 
 void Frame::cmdCoreRecreate() {
-	VLOG_DEBUG(libv::ui::log(), "Recreate window for frame [%s]", title);
+	LIBV_UI_DEBUG("Recreate window for frame [%s]", title);
 	assert(window && "Requires a valid window");
 
 	shareWindow = window;
@@ -263,12 +263,12 @@ void Frame::cmdCoreRecreate() {
 
 	cmdCoreCreate();
 	if (!window) {
-		VLOG_ERROR(libv::ui::log(), "Rollback to previous window");
+		LIBV_UI_ERROR("Rollback to previous window");
 		window = shareWindow;
 		shareWindow = nullptr;
 		return;
 	} else {
-		VLOG_TRACE(libv::ui::log(), "Destroy previous window");
+		LIBV_UI_TRACE("Destroy previous window");
 		glfwDestroyWindow(shareWindow);
 		unregisterEventCallbacks(shareWindow);
 		shareWindow = nullptr;
@@ -278,7 +278,7 @@ void Frame::cmdCoreRecreate() {
 }
 
 void Frame::cmdCoreDestroy() {
-	VLOG_DEBUG(libv::ui::log(), "Destroy window for frame [%s]", title);
+	LIBV_UI_DEBUG("Destroy window for frame [%s]", title);
 
 	if (window) {
 		deactivateFrame(this);
@@ -289,8 +289,8 @@ void Frame::cmdCoreDestroy() {
 }
 
 void Frame::cmdCoreUpdateDisplayMode() {
-	VLOG_DEBUG(libv::ui::log(), "Update display mode for frame [%s]", title);
-	VLOG_ERROR(libv::ui::log(), "Not Implemented Yet"); //TODO P5: cmdCoreUpdateDisplayMode
+	LIBV_UI_DEBUG("Update display mode for frame [%s]", title);
+	LIBV_UI_ERROR("Not Implemented Yet"); //TODO P5: cmdCoreUpdateDisplayMode
 }
 
 // -------------------------------------------------------------------------------------------------

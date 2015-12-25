@@ -18,24 +18,23 @@ void Label::setText(const std::string& text) {
 }
 
 void Label::build(Renderer&) {
-	VLOG_TRACE(libv::ui::log(), "Build Label");
+	LIBV_UI_TRACE("Build Label");
 	if (!deafultFont.isLoaded())
 		deafultFont.load("Data/Font/cour.ttf");
 }
 
 void Label::destroy(Renderer&) {
-	VLOG_TRACE(libv::ui::log(), "Destroy Label");
+	LIBV_UI_TRACE("Destroy Label");
 	if (deafultFont.isLoaded())
 		deafultFont.unload();
 }
 
 void Label::render(Renderer& renderer) {
-	//	VLOG_TRACE(libv::ui::log(), "Render Label");
+	//	LIBV_UI_TRACE("Render Label");
 
 	(void) renderer;
 	//	gluOrtho2D(0, 512, 0, 512);
-	glEnable(GL_TEXTURE_2D);
-	//<<< This is an articaft here due to vui_main should already set up this
+	glEnable(GL_TEXTURE_2D); //<<< This is an articaft here due to vui_main should already set up this
 	deafultFont.bind();
 	glBegin(GL_QUADS);
 	glColor3f(1, 1, 1);
