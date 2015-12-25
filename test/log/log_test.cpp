@@ -153,9 +153,28 @@ TEST_CASE("Logger should handle module and equal severity filter") {
 	CHECK(!isLogged(stream, "Hello 2 Error!"));
 }
 
+TEST_CASE("Logger should handle different but prefixed modules") {
+	std::stringstream stream;
+	libv::Logger log;
+
+	log.deny("a", libv::Trace);
+	log.deny("a.a", libv::Trace);
+	stream << log;
+	log(LIBV_POC, libv::Trace, "aa", "Hello aa Trace!");
+	log(LIBV_POC, libv::Trace, "aa.aa", "Hello aa.aa Trace!");
+	log(LIBV_POC, libv::Trace, "a", "Hello a Trace!");
+	log(LIBV_POC, libv::Trace, "a.a", "Hello a.a Trace!");
+
+	CHECK(isLogged(stream, "Hello aa Trace!"));
+	CHECK(isLogged(stream, "Hello aa.aa Trace!"));
+	CHECK(!isLogged(stream, "Hello a Trace!"));
+	CHECK(!isLogged(stream, "Hello a.a Trace!"));
+}
+
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("Logger integrity test 00") {
+
 	std::stringstream stream;
 	libv::Logger log;
 

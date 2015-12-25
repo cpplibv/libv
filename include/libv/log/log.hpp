@@ -83,33 +83,38 @@ class Logger {
 		Severity severity = Trace;
 		bool allow;
 		MatcherFunction matcher;
+	private:
+		bool isSubModul(const std::string& submodul) const {
+			const auto isPrefix = submodul.compare(0, modul.size(), modul) == 0;
+			const auto isEqualLenght = submodul.size() == modul.size();
+
+			return isPrefix && (isEqualLenght
+					|| (submodul.size() > modul.size() && submodul[modul.size()] == '.'));
+		}
 	public:
 		bool matcher_any(Severity, const std::string&) const {
 			return true;
 		}
 		bool matcher_modul(Severity, const std::string& modul) const {
-			return modul.compare(0, this->modul.size(), this->modul) == 0;
+			return isSubModul(modul);
 		}
 		bool matcher_severity_equal(Severity severity, const std::string&) const {
 			return severity == this->severity;
 		}
 		bool matcher_modul_severity_equal(Severity severity, const std::string& modul) const {
-			return modul.compare(0, this->modul.size(), this->modul) == 0
-					&& severity == this->severity;
+			return isSubModul(modul) && severity == this->severity;
 		}
 		bool matcher_severity_above(Severity severity, const std::string&) const {
 			return severity > this->severity;
 		}
 		bool matcher_modul_severity_above(Severity severity, const std::string& modul) const {
-			return modul.compare(0, this->modul.size(), this->modul) == 0
-					&& severity > this->severity;
+			return isSubModul(modul) && severity > this->severity;
 		}
 		bool matcher_severity_below(Severity severity, const std::string&) const {
 			return severity < this->severity;
 		}
 		bool matcher_modul_severity_below(Severity severity, const std::string& modul) const {
-			return modul.compare(0, this->modul.size(), this->modul) == 0
-					&& severity < this->severity;
+			return isSubModul(modul) && severity < this->severity;
 		}
 	public:
 		MatchResult match(Severity severity, const std::string& modul) const {
