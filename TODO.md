@@ -1,7 +1,6 @@
 
 STACK:
 
-fix frame setters
 -- commit --
 
 LIBV_STRONG_TYPEDEF(int, Severity);

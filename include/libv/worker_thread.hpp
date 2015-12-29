@@ -24,10 +24,16 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: Documenation
+// TODO P5: Handle WorkerThread::counter overflow in Task::operator>
+
+// -------------------------------------------------------------------------------------------------
+
 class WorkerThread {
 
 	class Task {
 		size_t priority;
+		size_t number;
 		std::function<void() > function;
 		libv::Semaphore* done;
 	public:
@@ -35,8 +41,9 @@ class WorkerThread {
 		Task(const Task&) = default;
 		Task& operator=(const Task&) = default;
 		template<typename F, typename = decltype(std::declval<F>()()) >
-		explicit Task(F&& func, size_t priority, libv::Semaphore* done = nullptr) :
+		Task(F&& func, size_t priority, size_t number, libv::Semaphore* done = nullptr) :
 			priority(priority),
+			number(number),
 			function(func),
 			done(done) { }
 		void execute() {
@@ -51,7 +58,8 @@ class WorkerThread {
 			}
 		}
 		bool operator>(const Task& rhs) const {
-			return priority > rhs.priority;
+			return priority > rhs.priority
+					|| (priority == rhs.priority && number > rhs.number);
 		}
 	};
 
@@ -62,6 +70,7 @@ class WorkerThread {
 			std::greater<typename std::vector<Task>::value_type>> que;
 	std::recursive_mutex que_m;
 
+	size_t counter = 0;
 	size_t defaultPriority;
 	bool terminateFlag = false;
 
@@ -86,7 +95,7 @@ private:
 				exceptionHistory.emplace(std::current_exception());
 				LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. "
-						"Last exception: [%s].", name, ex.what(), exceptionHistory.size());
+						"Exception message: [%s].", name, ex.what(), exceptionHistory.size());
 			} catch (...) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
@@ -100,7 +109,7 @@ public:
 	template<typename F, typename = decltype(std::declval<F>()())>
 	void executeAsync(F&& func, size_t priority) {
 		std::lock_guard<std::recursive_mutex> lk(que_m);
-		que.emplace(std::forward<F>(func), priority);
+		que.emplace(std::forward<F>(func), counter++, priority);
 		recieved_cv.notify_all();
 	}
 	template<typename F, typename = decltype(std::declval<F>()())>
@@ -113,7 +122,7 @@ public:
 			libv::Semaphore done;
 			{
 				std::lock_guard<std::recursive_mutex> lk(que_m);
-				que.emplace(std::forward<F>(func), priority, &done);
+				que.emplace(std::forward<F>(func), counter++, priority, &done);
 				recieved_cv.notify_all();
 			}
 			done.wait();

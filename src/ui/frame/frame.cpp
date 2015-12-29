@@ -13,7 +13,6 @@
 #include "core.hpp"
 
 //TODO P2: review size handling (in container too)
-//TODO P3: provide async and sync version of setters that require context change like setDecoration
 
 namespace libv {
 namespace ui {
@@ -45,13 +44,13 @@ const Frame::TypeCloseOperation Frame::ON_CLOSE_DISPOSE = 4;
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+	LIBV_UI_FRAME_TRACE("Close default frame [%s]", title);
 	if (window)
 		glfwSetWindowShouldClose(window, true);
 }
 
 void Frame::closeForce() {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+	LIBV_UI_FRAME_TRACE("Close force frame [%s]", title);
 	forcedClose = true;
 }
 
@@ -162,98 +161,54 @@ void Frame::baseUpdate() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Frame::showImpl() {
-	assert(std::this_thread::get_id() == context.getID());
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-
-	if (!window) {
-		coreExec(std::bind(&Frame::cmdCoreCreate, this));
-		if (window) {
-			glfwMakeContextCurrent(window);
-			context.executeAsync(std::bind(&Frame::init, this));
-		}
-	}
-	if (window)
-		coreExec(std::bind(glfwShowWindow, window));
-
-	hidden = false;
-}
-
-void Frame::hideImpl() {
-	assert(std::this_thread::get_id() == context.getID());
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-
-	if (window)
-		coreExec(std::bind(glfwHideWindow, window));
-	hidden = true;
-}
-
-void Frame::restoreImpl() {
-	assert(std::this_thread::get_id() == context.getID());
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-
-	if (window)
-		coreExec(std::bind(glfwRestoreWindow, window));
-	minimalized = false;
-}
-
-void Frame::minimalizeImpl() {
-	assert(std::this_thread::get_id() == context.getID());
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-
-	if (window)
-		coreExec(std::bind(glfwIconifyWindow, window));
-	minimalized = true;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 void Frame::show() {
-	LIBV_UI_FRAME_INFO("Show frame [%s] synchronously", title);
-	context.executeSync(std::bind(&Frame::showImpl, this));
-}
-
-void Frame::showAsync() {
-	LIBV_UI_FRAME_INFO("Show frame [%s] asynchronously", title);
-	context.executeAsync(std::bind(&Frame::showImpl, this));
+	context.executeAsync([this] {
+		LIBV_UI_FRAME_TRACE("Show frame [%s]", title);
+		if (!window) {
+			coreExec(std::bind(&Frame::cmdCoreCreate, this));
+			if (window) {
+				glfwMakeContextCurrent(window);
+						context.executeAsync(std::bind(&Frame::init, this));
+			}
+		}
+		if (window)
+				coreExec(std::bind(glfwShowWindow, window));
+				hidden = false;
+		});
 }
 
 void Frame::hide() {
-	LIBV_UI_FRAME_INFO("Hide frame [%s] synchronously", title);
-	context.executeSync(std::bind(&Frame::hideImpl, this));
-}
-
-void Frame::hideAsync() {
-	LIBV_UI_FRAME_INFO("Hide frame [%s] asynchronously", title);
-	context.executeAsync(std::bind(&Frame::hideImpl, this));
-}
-
-void Frame::minimalize() {
-	LIBV_UI_FRAME_INFO("Minimalize frame [%s] synchronously", title);
-	context.executeSync(std::bind(&Frame::minimalizeImpl, this));
-}
-
-void Frame::minimalizeAsync() {
-	LIBV_UI_FRAME_INFO("Minimalize frame [%s] asynchronously", title);
-	context.executeAsync(std::bind(&Frame::minimalizeImpl, this));
+	context.executeAsync([this] {
+		LIBV_UI_FRAME_TRACE("Hide frame [%s]", title);
+		if (window)
+				coreExec(std::bind(glfwHideWindow, window));
+				hidden = true;
+		});
 }
 
 void Frame::restore() {
-	LIBV_UI_FRAME_INFO("Restore frame [%s] synchronously", title);
-	context.executeSync(std::bind(&Frame::restoreImpl, this));
+	context.executeAsync([this] {
+		LIBV_UI_FRAME_TRACE("Restore frame [%s]", title);
+		if (window)
+				coreExec(std::bind(glfwRestoreWindow, window));
+				minimalized = false;
+		});
 }
 
-void Frame::restoreAsync() {
-	LIBV_UI_FRAME_INFO("Restore frame [%s] asynchronously", title);
-	context.executeAsync(std::bind(&Frame::restoreImpl, this));
+void Frame::minimalize() {
+	context.executeAsync([this] {
+		LIBV_UI_FRAME_TRACE("Minimalize frame [%s]", title);
+		if (window)
+				coreExec(std::bind(glfwIconifyWindow, window));
+				minimalized = true;
+		});
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::setOpenGLVersion(int major, int minor) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, major, minor] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame OpenGLVersion of [%s] to [%d.%d]", title, major, minor);
 		this->openGLVersionMajor = major;
 				this->openGLVersionMinor = minor;
 		if (window)
@@ -262,9 +217,8 @@ void Frame::setOpenGLVersion(int major, int minor) {
 }
 
 void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, profile] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame OpenGLProfile of [%s] to [%d]", title, profile);
 		this->openGLProfile = profile;
 		if (window)
 				cmdFrameRecreate();
@@ -272,9 +226,8 @@ void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 }
 
 void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, samples] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame OpenGLSamples of [%s] to [%d]", title, samples);
 		this->openGLSamples = samples;
 		if (window)
 				cmdFrameRecreate();
@@ -282,9 +235,8 @@ void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 }
 
 void Frame::setOpenGLRefreshRate(int rate) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, rate] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame OpenGLRefreshRate of [%s] to [%d]", title, rate);
 		this->openGLRefreshRate = rate;
 		if (window)
 				cmdFrameRecreate();
@@ -292,14 +244,13 @@ void Frame::setOpenGLRefreshRate(int rate) {
 }
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+	LIBV_UI_FRAME_TRACE("Set frame CloseOperation of [%s] to [%d]", title, operation);
 	defaultCloseOperation = operation;
 }
 
 void Frame::setDecoration(bool decorated) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, decorated] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame Decoration of [%s] to [%d]", title, decorated);
 		this->decorated = decorated;
 		if (window)
 				cmdFrameRecreate();
@@ -307,9 +258,8 @@ void Frame::setDecoration(bool decorated) {
 }
 
 void Frame::setDisplayMode(const TypeDisplayMode& mode) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, mode] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame DisplayMode of [%s] to [%d]", title, mode);
 		this->displayMode = mode;
 		if (window)
 				cmdFrameRecreate();
@@ -321,19 +271,17 @@ void Frame::setPosition(int x, int y) {
 }
 
 void Frame::setPosition(const ivec2& newpos) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, newpos] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
 		this->pos = newpos;
 		if (window)
 				coreExec(std::bind(glfwSetWindowPos, window, pos.x, pos.y));
 		});
 }
 
-void Frame::setResizeable(bool resizable) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+void Frame::setResizable(bool resizable) {
 	context.executeAsync([this, resizable] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame Resizable of [%s] to [%d]", title, resizable);
 		this->resizable = resizable;
 		if (window)
 				cmdFrameRecreate();
@@ -341,19 +289,21 @@ void Frame::setResizeable(bool resizable) {
 }
 
 void Frame::setSize(int x, int y) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-	context.executeAsync([this, x, y] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
-		this->size = ivec3(x, y, this->size.z);
+	setSize(ivec2(x, y));
+}
+
+void Frame::setSize(const ivec2& newsize) {
+	context.executeAsync([this, newsize] {
+		LIBV_UI_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
+		this->size = ivec3(newsize, this->size.z);
 		if (window)
 				coreExec(std::bind(glfwSetWindowSize, window, size.x, pos.y));
 		});
 }
 
 void Frame::setTitle(const std::string& title) {
-	LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
 	context.executeAsync([this, title] {
-		LIBV_UI_FRAME_TRACE("%s:%d on [%s]", __FUNCTION__, __LINE__, title);
+		LIBV_UI_FRAME_TRACE("Set frame Title of [%s] to [%s]", this->title, title);
 		this->title = title;
 		if (window)
 				coreExec([this, title] {
@@ -417,7 +367,7 @@ void Frame::init() {
 }
 
 void Frame::loop() {
-//	LIBV_UI_FRAME_DEBUG("Frame loop");
+	//	LIBV_UI_FRAME_DEBUG("Frame loop");
 	timerOffLoop.time();
 	timerLoop.reset();
 
@@ -441,7 +391,7 @@ void Frame::loop() {
 }
 
 void Frame::term() {
-	LIBV_UI_FRAME_DEBUG("Frame terminate ");
+	LIBV_UI_FRAME_DEBUG("Frame terminate");
 	baseDestroy();
 
 	context.executeSync(std::bind(&Frame::cmdFrameDestroy, this));

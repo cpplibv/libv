@@ -84,7 +84,7 @@ public:
 		setSize(512, 512);
 		setDecoration(false);
 		init();
-		showAsync();
+		show();
 	}
 
 	virtual void build(Renderer& renderer) override {
@@ -116,7 +116,6 @@ int main(int, char**) {
 	TestFrame f1("TestFrame");
 	f1.join();
 
-	std::cout << std::flush;
 	return 0;
 }
 

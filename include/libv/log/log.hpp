@@ -229,7 +229,7 @@ public:
 					//...
 					);
 			for (auto& output : outputs) {
-				*output << record;
+				*output << record << std::flush;
 			}
 		}
 	}

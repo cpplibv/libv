@@ -26,6 +26,8 @@
 #include <libv/ui/monitor.hpp>
 #include <libv/ui/render/renderer.hpp>
 
+// TODO P3: Documenation asynchronicity of show and setters
+
 class GLFWwindow;
 class GLFWmonitor;
 
@@ -266,7 +268,6 @@ private:
 
 private:
 	Renderer renderer;
-	//!!! I could make a layout manager only for Frame if i need to
 
 private:
 	Timer timerBuild;
@@ -280,21 +281,11 @@ private:
 	Timer timerUpdate;
 
 	// ---------------------------------------------------------------------------------------------
-private:
-	void hideImpl();
-	void minimalizeImpl();
-	void restoreImpl();
-	void showImpl();
-
 public:
 	void hide();
-	void hideAsync();
 	void minimalize();
-	void minimalizeAsync();
 	void restore();
-	void restoreAsync();
 	void show();
-	void showAsync();
 
 private:
 	void baseBuild();
@@ -325,9 +316,10 @@ public:
 	void setDecoration(bool decorated);
 	void setDisplayMode(const TypeDisplayMode& mode);
 	void setPosition(int x, int y);
-	void setPosition(const ivec2& y);
-	void setResizeable(bool resizeable);
+	void setPosition(const ivec2& pos);
+	void setResizable(bool resizable);
 	void setSize(int x, int y);
+	void setSize(const ivec2& size);
 	void setTitle(const std::string& title);
 
 	TypeCloseOperation getCloseOperation() const;

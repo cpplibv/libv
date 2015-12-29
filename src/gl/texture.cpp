@@ -86,17 +86,17 @@ void Texture::loadGL() {
 	assert(!texture->empty());
 
 	gli::gl GL;
-	gli::gl::format const Format = GL.translate(texture->format());
+	const gli::gl::format format = GL.translate(texture->format());
 	target = GL.translate(texture->target());
 	GLuint tmpTargetID = 0;
 	glGenTextures(1, &tmpTargetID);
 	glBindTexture(target, tmpTargetID);
 	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, static_cast<GLint> (texture->levels() - 1));
-	glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, Format.Swizzle[0]);
-	glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, Format.Swizzle[1]);
-	glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, Format.Swizzle[2]);
-	glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, Format.Swizzle[3]);
+	glTexParameteri(target, GL_TEXTURE_SWIZZLE_R, format.Swizzle[0]);
+	glTexParameteri(target, GL_TEXTURE_SWIZZLE_G, format.Swizzle[1]);
+	glTexParameteri(target, GL_TEXTURE_SWIZZLE_B, format.Swizzle[2]);
+	glTexParameteri(target, GL_TEXTURE_SWIZZLE_A, format.Swizzle[3]);
 
 	//TODO P5: Min and mag filter data will be separated and handled by the sampler.
 	glTexParameteri(target, GL_TEXTURE_MIN_FILTER, texture->levels() > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
@@ -106,20 +106,20 @@ void Texture::loadGL() {
 	GLsizei const FaceTotal = static_cast<GLsizei> (texture->layers() * texture->faces());
 	switch (texture->target()) {
 	case gli::TARGET_1D:
-		glTexStorage1D(target, static_cast<GLint> (texture->levels()), Format.Internal, Dimensions.x);
+		glTexStorage1D(target, static_cast<GLint> (texture->levels()), format.Internal, Dimensions.x);
 		break;
 	case gli::TARGET_1D_ARRAY:
 	case gli::TARGET_2D:
 	case gli::TARGET_CUBE:
 		glTexStorage2D(
-				target, static_cast<GLint> (texture->levels()), Format.Internal,
+				target, static_cast<GLint> (texture->levels()), format.Internal,
 				Dimensions.x, texture->target() == gli::TARGET_2D ? Dimensions.y : FaceTotal);
 		break;
 	case gli::TARGET_2D_ARRAY:
 	case gli::TARGET_3D:
 	case gli::TARGET_CUBE_ARRAY:
 		glTexStorage3D(
-				target, static_cast<GLint> (texture->levels()), Format.Internal,
+				target, static_cast<GLint> (texture->levels()), format.Internal,
 				Dimensions.x, Dimensions.y, texture->target() == gli::TARGET_3D ? Dimensions.z : FaceTotal);
 		break;
 	default: assert(0);
@@ -138,11 +138,11 @@ void Texture::loadGL() {
 					if (gli::is_compressed(texture->format()))
 						glCompressedTexSubImage1D(
 							target, static_cast<GLint> (Level), 0, Dimensions.x,
-							Format.Internal, static_cast<GLsizei> (texture->size(Level)),
+							format.Internal, static_cast<GLsizei> (texture->size(Level)),
 							texture->data(Layer, Face, Level));
 					else
 						glTexSubImage1D(
-							target, static_cast<GLint> (Level), 0, Dimensions.x, Format.External, Format.Type,
+							target, static_cast<GLint> (Level), 0, Dimensions.x, format.External, format.Type,
 							texture->data(Layer, Face, Level));
 					break;
 				case gli::TARGET_1D_ARRAY:
@@ -152,13 +152,13 @@ void Texture::loadGL() {
 						glCompressedTexSubImage2D(
 							target, static_cast<GLint> (Level), 0, 0,
 							Dimensions.x, texture->target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions.y,
-							Format.Internal, static_cast<GLsizei> (texture->size(Level)),
+							format.Internal, static_cast<GLsizei> (texture->size(Level)),
 							texture->data(Layer, Face, Level));
 					else
 						glTexSubImage2D(
 							target, static_cast<GLint> (Level), 0, 0,
 							Dimensions.x, texture->target() == gli::TARGET_1D_ARRAY ? LayerGL : Dimensions.y,
-							Format.External, Format.Type, texture->data(Layer, Face, Level));
+							format.External, format.Type, texture->data(Layer, Face, Level));
 					break;
 				case gli::TARGET_2D_ARRAY:
 				case gli::TARGET_3D:
@@ -167,13 +167,13 @@ void Texture::loadGL() {
 						glCompressedTexSubImage3D(
 							target, static_cast<GLint> (Level), 0, 0, 0,
 							Dimensions.x, Dimensions.y, texture->target() == gli::TARGET_3D ? Dimensions.z : LayerGL,
-							Format.Internal, static_cast<GLsizei> (texture->size(Level)),
+							format.Internal, static_cast<GLsizei> (texture->size(Level)),
 							texture->data(Layer, Face, Level));
 					else
 						glTexSubImage3D(
 							target, static_cast<GLint> (Level), 0, 0, 0,
 							Dimensions.x, Dimensions.y, texture->target() == gli::TARGET_3D ? Dimensions.z : LayerGL,
-							Format.External, Format.Type, texture->data(Layer, Face, Level));
+							format.External, format.Type, texture->data(Layer, Face, Level));
 					break;
 				default: assert(0);
 					break;
