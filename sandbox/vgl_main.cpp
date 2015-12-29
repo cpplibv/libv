@@ -33,15 +33,15 @@ std::atomic_bool running{true};
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 900
 
-#define checkGLEWSupport(ext) LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 
 	checkGLEWSupport(GL_VERSION_3_3);
 	checkGLEWSupport(GL_VERSION_4_5);
@@ -71,7 +71,7 @@ void initGLSL() {
 }
 
 static void error_callback(int code, const char* description) {
-	LIBV_ERROR("GLFW %d: %s", code, description);
+	LIBV_LIBV_ERROR("GLFW %d: %s", code, description);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ int main(void) {
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		LIBV_ERROR("Failed to initialize GLFW.");
+		LIBV_LIBV_ERROR("Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -225,7 +225,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		LIBV_ERROR("Failed to create GLFW window.");
+		LIBV_LIBV_ERROR("Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -255,7 +255,7 @@ int main(void) {
 			i++;
 			time += timer.time().count();
 			if (time > 1'000'000'000) {
-				LIBV_INFO("FPS: %d", i);
+				LIBV_LIBV_INFO("FPS: %d", i);
 				i = 0;
 				time -= 1'000'000'000;
 			}
@@ -306,15 +306,15 @@ int main(void) {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//#define checkGLEWSupport(ext) LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+//#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 //
 //void initGLEW() {
 //	if (GLenum err = glewInit() != GLEW_OK)
-//		LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+//		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 //
-//	LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-//	LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-//	LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+//	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+//	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+//	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 //
 //	checkGLEWSupport(GL_VERSION_3_3);
 //	checkGLEWSupport(GL_VERSION_4_5);
@@ -344,7 +344,7 @@ int main(void) {
 //}
 //
 //static void error_callback(int code, const char* description) {
-//	LIBV_ERROR("GLFW %d: %s", code, description);
+//	LIBV_LIBV_ERROR("GLFW %d: %s", code, description);
 //}
 //
 //// -------------------------------------------------------------------------------------------------
@@ -434,7 +434,7 @@ int main(void) {
 //		i++;
 //		time += timer.time().count();
 //		if (time > 1'000'000'000) {
-//			LIBV_INFO("FPS in window [%s]: %d", data->title, i);
+//			LIBV_LIBV_INFO("FPS in window [%s]: %d", data->title, i);
 //			i = 0;
 //			time -= 1'000'000'000;
 //		}
@@ -487,7 +487,7 @@ int main(void) {
 //	glfwSetErrorCallback(error_callback);
 //
 //	if (!glfwInit()) {
-//		LIBV_ERROR("Failed to initialize GLFW.");
+//		LIBV_LIBV_ERROR("Failed to initialize GLFW.");
 //		exit(EXIT_FAILURE);
 //	}
 //
@@ -505,7 +505,7 @@ int main(void) {
 //		frames[i].window = glfwCreateWindow(200, 200, frames[i].title, nullptr, globalGLContext);
 //		if (!frames[i].window) {
 //			glfwTerminate();
-//			LIBV_ERROR("Failed to create GLFW window.");
+//			LIBV_LIBV_ERROR("Failed to create GLFW window.");
 //			exit(EXIT_FAILURE);
 //		}
 //

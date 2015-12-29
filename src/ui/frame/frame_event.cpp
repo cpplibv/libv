@@ -97,7 +97,7 @@ void Frame::glfwCallback(const EventWindowFocus&) {
 }
 
 void Frame::glfwCallback(const EventWindowIconify& e) {
-	minimalized = e.iconified;
+	minimized = e.iconified;
 }
 
 void Frame::glfwCallback(const EventWindowPos& e) {

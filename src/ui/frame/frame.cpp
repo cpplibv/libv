@@ -35,11 +35,10 @@ const Frame::TypeOpenGLRefreshRate Frame::REFRESH_RATE_DONT_CARE = GLFW_DONT_CAR
 
 const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
 
-const Frame::TypeCloseOperation Frame::ON_CLOSE_DEFAULT_EXIT = 0;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_EXIT = 1;
+const Frame::TypeCloseOperation Frame::ON_CLOSE_DISPOSE = 0;
+const Frame::TypeCloseOperation Frame::ON_CLOSE_DO_NOTHING = 1;
 const Frame::TypeCloseOperation Frame::ON_CLOSE_HIDE = 2;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_DO_NOTHING = 3;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_DISPOSE = 4;
+const Frame::TypeCloseOperation Frame::ON_CLOSE_MINIMIZE = 3;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -59,49 +58,40 @@ void Frame::join() {
 }
 
 bool Frame::isFrameShouldClose() {
-	//ON_CLOSE_DEFAULT_EXIT - Close this, default close other frames
-	//ON_CLOSE_EXIT         - Close every frame
-	//ON_CLOSE_HIDE         - Hide frame
-	//ON_CLOSE_DO_NOTHING   - No operation
 	//ON_CLOSE_DISPOSE      - Close the frame
-	if (forcedClose) { //In case of forced close return true
+	//ON_CLOSE_DO_NOTHING   - No operation
+	//ON_CLOSE_HIDE         - Hide frame
+	//ON_CLOSE_MINIMIZE     - Minimize frame
+
+	if (forcedClose) { // If we are forced to close
 		onClose.fire(this);
 		return true;
 	}
 
-	if (!window)
+	if (!window) // If there is still no window
 		return false;
 
 	bool shouldClose = glfwWindowShouldClose(window);
-	if (shouldClose) {
+	if (shouldClose) { // Fire on close event which can change the outcome
 		shouldClose = onClose.fire(this);
 	}
-	switch (defaultCloseOperation) {
-	case ON_CLOSE_DEFAULT_EXIT:
-		if (shouldClose) {
-			closeAllDefault();
-		}
-		break;
-	case ON_CLOSE_EXIT:
-		if (shouldClose) {
-			closeAllForce(); //forced
-		}
-		break;
-	case ON_CLOSE_HIDE:
-		if (shouldClose) {
+
+	if (shouldClose) { // On close let DCO handle
+		switch (defaultCloseOperation) {
+		case ON_CLOSE_DISPOSE: default:
+			return true;
+		case ON_CLOSE_DO_NOTHING:
+			glfwSetWindowShouldClose(window, false);
+			return false;
+		case ON_CLOSE_HIDE:
 			glfwSetWindowShouldClose(window, false);
 			hide();
-		}
-		shouldClose = false;
-		break;
-	case ON_CLOSE_DO_NOTHING:
-		if (shouldClose) {
+			return false;
+		case ON_CLOSE_MINIMIZE:
 			glfwSetWindowShouldClose(window, false);
-			shouldClose = false;
+			minimize();
+			return false;
 		}
-		break;
-	case ON_CLOSE_DISPOSE:
-	default: break;
 	}
 	return shouldClose;
 }
@@ -109,7 +99,7 @@ bool Frame::isFrameShouldClose() {
 // -------------------------------------------------------------------------------------------------
 
 bool Frame::isRenderSkipable() {
-	return hidden || minimalized;
+	return hidden || minimized;
 }
 
 bool Frame::isUpdateSkipable() {
@@ -191,16 +181,16 @@ void Frame::restore() {
 		LIBV_UI_FRAME_TRACE("Restore frame [%s]", title);
 		if (window)
 				coreExec(std::bind(glfwRestoreWindow, window));
-				minimalized = false;
+				minimized = false;
 		});
 }
 
-void Frame::minimalize() {
+void Frame::minimize() {
 	context.executeAsync([this] {
-		LIBV_UI_FRAME_TRACE("Minimalize frame [%s]", title);
+		LIBV_UI_FRAME_TRACE("Minimize frame [%s]", title);
 		if (window)
 				coreExec(std::bind(glfwIconifyWindow, window));
-				minimalized = true;
+				minimized = true;
 		});
 }
 
@@ -335,7 +325,7 @@ bool Frame::isDecorated() const {
 }
 
 bool Frame::isVisible() const {
-	return !hidden && !minimalized && window;
+	return !hidden && !minimized && window;
 }
 
 const Monitor* Frame::getCurrentMonitor() const {

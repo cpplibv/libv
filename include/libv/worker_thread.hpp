@@ -24,7 +24,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: Documenation
+// TODO P5: Documentation
 // TODO P5: Handle WorkerThread::counter overflow in Task::operator>
 
 // -------------------------------------------------------------------------------------------------
@@ -93,13 +93,13 @@ private:
 			} catch (std::exception& ex) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
+				LIBV_LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. "
 						"Exception message: [%s].", name, ex.what(), exceptionHistory.size());
 			} catch (...) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
+				LIBV_LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. ", name, exceptionHistory.size());
 			}
 		}
@@ -143,7 +143,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			LIBV_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
+			LIBV_LIBV_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
 		}
 	}
 	inline auto getID() {

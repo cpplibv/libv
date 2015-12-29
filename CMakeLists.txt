@@ -71,10 +71,9 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
-#	add_compile_options(-Wall -Wextra -Wno-comment)
 	add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
 	#add_compile_options(-Wall -Wextra -Wconversion -Wpedantic -Wno-comment)
-	#add_compile_options(-Wsuggest-override) #TODO P5: IF > GNU 5.1
+	add_compile_options(-Wsuggest-override) #TODO P5: IF > GNU 5.1
 
 	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
 		#add_compile_options(-fsanitize=address)

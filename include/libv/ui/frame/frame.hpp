@@ -26,7 +26,7 @@
 #include <libv/ui/monitor.hpp>
 #include <libv/ui/render/renderer.hpp>
 
-// TODO P3: Documenation asynchronicity of show and setters
+// TODO P3: Documentation asynchronicity of show and setters
 
 class GLFWwindow;
 class GLFWmonitor;
@@ -52,8 +52,8 @@ public:
 	using TypeOpenGLRefreshRate = int;
 	using TypeOpenGLSamples = int;
 
-//	LIBV_STRONG_TYPEDEF(int, FrameCloseOperation)
-//	LIBV_STRONG_TYPEDEF(int, ProgramCloseOperation)
+	//	LIBV_STRONG_TYPEDEF(int, FrameCloseOperation)
+	//	LIBV_STRONG_TYPEDEF(int, ProgramCloseOperation)
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -78,37 +78,19 @@ public:
 	// Close ---------------------------------------------------------------------------------------
 
 public:
-	//TODO P5: There are more DCO:
-	// Operation on current frame:
-	//		DISPOSE
-	//		DO_NOTHING
-	//		HIDE
-	//		MINIMALIZE
-	// Operation on every other frame:
-	//		DEFAULT
-	//		DISPOSE
-	//		DO_NOTHING
-	//		HIDE
-	//		MINIMALIZE
-
 	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration close and
-	 * make every other frame to execute their default close operation
-	 * after their current iteration
+	 * setWindowShouldClose(true) then after the current iteration close the
+	 * frame
 	 * @note Does not interrupt current iteration
-	 * @note Does not interrupt other frames current iterations
-	 * @note May or may not produce onClose event on the other frames
-	 * (depending on their default close operation)
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DEFAULT_EXIT; // - Close, others DCO.
+	static const TypeCloseOperation ON_CLOSE_DISPOSE; //      - Close the frame
 	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration close and
-	 * force every frame to close after their current iteration even if the
-	 * frames default close operation is not closing the frame
+	 * setWindowShouldClose(true) then after the current iteration does nothing.
 	 * @note Does not interrupt current iteration
-	 * @note Does not interrupt other frames current iterations
+	 * @note Can be forced to close by calling close(), closing that way will
+	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_EXIT; //         - Close every frame
+	static const TypeCloseOperation ON_CLOSE_DO_NOTHING; //   - No operation
 	/** If the frame receive a close signal (from OS) or from setting
 	 * setWindowShouldClose(true) then after the current iteration hide the
 	 * frame. The frame can be restored by calling show()
@@ -118,18 +100,13 @@ public:
 	 * @group Default Close Operation */
 	static const TypeCloseOperation ON_CLOSE_HIDE; //         - Hide frame
 	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration does nothing.
+	 * setWindowShouldClose(true) then after the current iteration minimize the
+	 * frame. The frame can be restored by calling restore()
 	 * @note Does not interrupt current iteration
 	 * @note Can be forced to close by calling close(), closing that way will
 	 * produce onClose event, and also does not interrupt current iteration
 	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DO_NOTHING; //   - No operation
-	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration close the
-	 * frame
-	 * @note Does not interrupt current iteration
-	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DISPOSE; //      - Close the frame
+	static const TypeCloseOperation ON_CLOSE_MINIMIZE; //     - Minimize frame
 
 public:
 	void closeDefault();
@@ -258,7 +235,7 @@ private:
 
 	bool decorated = true;
 	bool hidden = true;
-	bool minimalized = false;
+	bool minimized = false;
 	bool resizable = true;
 
 	TypeCloseOperation defaultCloseOperation = ON_CLOSE_DISPOSE;
@@ -283,7 +260,7 @@ private:
 	// ---------------------------------------------------------------------------------------------
 public:
 	void hide();
-	void minimalize();
+	void minimize();
 	void restore();
 	void show();
 

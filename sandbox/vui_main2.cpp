@@ -39,7 +39,7 @@ int main(int, char**) {
 	});
 
 	std::this_thread::sleep_for(500ms);
-	f1.minimalize();
+	f1.minimize();
 	std::this_thread::sleep_for(500ms);
 	f1.restore();
 	std::this_thread::sleep_for(500ms);

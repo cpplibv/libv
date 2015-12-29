@@ -1,19 +1,7 @@
-
-STACK:
-
--- commit --
-
-LIBV_STRONG_TYPEDEF(int, Severity);
--- commit --
-
-log thread naming
--- commit --
-
-fix frame close operation
--- commit --
+--- STACK ------------------------------------------------------------------------------------------
 
 check frame and compontnet build / render / destroy / etc...
-find reason of crash on destructor
+find reason of crash on destructor (left-right=0 div)
 -- commit --
 
 string2D
@@ -33,6 +21,16 @@ remove vm3 from gl
 
 glEnable(GL_DEBUG_OUTPUT);
 -- commit --
+
+
+--- AWAITING ---------------------------------------------------------------------------------------
+
+take a look at frame and component events
+
+--- ABANDONED --------------------------------------------------------------------------------------
+
+LIBV_STRONG_TYPEDEF(int, Severity);
+log thread naming
 
 // -------------------------------------------------------------------------------------------------
 

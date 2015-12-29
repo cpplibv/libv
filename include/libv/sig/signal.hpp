@@ -33,7 +33,7 @@
 //TODO P5: SnycSignal - Put the fire method and the arguments into a worker
 // 			thread que to call this signal in sync mode. (template executer?)
 
-//TODO PD: Documenation of Signal-Slot. The boost version may be relevant
+//TODO PD: Documentation of Signal-Slot. The boost version may be relevant
 // 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/reference.html
 //TODO PD: Turotial of Signal-Slot. The boost version may be relevant
 // 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/tutorial.html

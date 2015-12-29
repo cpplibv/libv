@@ -35,12 +35,19 @@
 
 #define LIBV_POC ::libv::CodePosition{__VFILENAME__, __FUNCTION__, __LINE__}
 
-#define LIBV_TRACE(...) ::libv::log(LIBV_POC, ::libv::Trace, "libv", __VA_ARGS__);
-#define LIBV_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv", __VA_ARGS__);
-#define LIBV_INFO( ...) ::libv::log(LIBV_POC, ::libv::Info , "libv", __VA_ARGS__);
-#define LIBV_WARN( ...) ::libv::log(LIBV_POC, ::libv::Warn , "libv", __VA_ARGS__);
-#define LIBV_ERROR(...) ::libv::log(LIBV_POC, ::libv::Error, "libv", __VA_ARGS__);
-#define LIBV_FATAL(...) ::libv::log(LIBV_POC, ::libv::Fatal, "libv", __VA_ARGS__);
+#define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
+#define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
+#define LIBV_INFO( Module, ...) ::libv::log(LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
+#define LIBV_WARN( Module, ...) ::libv::log(LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
+#define LIBV_ERROR(Module, ...) ::libv::log(LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
+#define LIBV_FATAL(Module, ...) ::libv::log(LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
+
+#define LIBV_LIBV_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__);
+#define LIBV_LIBV_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__);
+#define LIBV_LIBV_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__);
+#define LIBV_LIBV_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__);
+#define LIBV_LIBV_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
+#define LIBV_LIBV_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
 
 namespace libv {
 
