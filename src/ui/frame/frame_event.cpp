@@ -81,7 +81,7 @@ void Frame::glfwCallback(const EventFramebufferSize& e) {
 
 	size = ivec3(e.size, size.z);
 	set(Property::Size, size);
-	baseInvalidate();
+	frameInvalidate();
 }
 
 void Frame::glfwCallback(const EventKey&) { }

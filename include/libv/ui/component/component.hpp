@@ -58,12 +58,8 @@ public:
 	}
 
 public:
-	bool isInvalid() const {
-		return invalid;
-	}
-	void validate(){
-		invalid = false;
-	}
+	bool isInvalid() const;
+	void validate();
 
 public:
 	/** OpenGL control function. Called before render if the object was previously invalidated.

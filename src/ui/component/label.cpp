@@ -17,25 +17,46 @@ void Label::setText(const std::string& text) {
 	invalidate();
 }
 
-void Label::build(Renderer&) {
-	LIBV_UI_TRACE("Build Label");
-	if (!deafultFont.isLoaded())
+void Label::build(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Build Label");
+	if (!deafultFont.isLoaded()) {
+		LIBV_UI_COMPONENT_TRACE("Load Font");
 		deafultFont.load("Data/Font/cour.ttf");
+	}
+	Component::build(renderer);
 }
 
-void Label::destroy(Renderer&) {
-	LIBV_UI_TRACE("Destroy Label");
-	if (deafultFont.isLoaded())
+void Label::destroy(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Destroy Label");
+	if (deafultFont.isLoaded()) {
+		LIBV_UI_COMPONENT_TRACE("Unload Font");
 		deafultFont.unload();
+	}
+	Component::destroy(renderer);
 }
 
 void Label::render(Renderer& renderer) {
-	//	LIBV_UI_TRACE("Render Label");
+	//	LIBV_UI_COMPONENT_TRACE("Render Label");
 
 	(void) renderer;
-	//	gluOrtho2D(0, 512, 0, 512);
-	glEnable(GL_TEXTURE_2D); //<<< This is an articaft here due to vui_main should already set up this
+//		gluOrtho2D(0, 512, 0, 512);
+	glEnable(GL_TEXTURE_2D);
+	//<<< This is an articaft here due to "vui_main" should already set up this
+	//Or not... due to ui should handle any gl "outside" state
 	deafultFont.bind();
+
+	//	glBegin(GL_QUADS);
+	//	glColor3f(1, 1, 1);
+	//	glTexCoord2f(0, 0);
+	//	glVertex2f(0.0f, 0.0f);
+	//	glTexCoord2f(1, 0);
+	//	glVertex2f(512.0f, 0.0f);
+	//	glTexCoord2f(1, 1);
+	//	glVertex2f(512.0f, 512.0f);
+	//	glTexCoord2f(0, 1);
+	//	glVertex2f(0.0f, 512.0f);
+	//	glEnd();
+
 	glBegin(GL_QUADS);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0, 0);
@@ -47,6 +68,7 @@ void Label::render(Renderer& renderer) {
 	glTexCoord2f(0, 1);
 	glVertex2f(-1.0f, +1.0f);
 	glEnd();
+
 	deafultFont.unbind();
 
 	checkGL();

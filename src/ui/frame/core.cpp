@@ -249,7 +249,7 @@ void Frame::cmdCoreCreate() {
 
 	registerEventCallbacks(this, window);
 	activateFrame(this);
-	baseInvalidate();
+	frameInvalidate();
 
 	LIBV_UI_CORE_DEBUG("Window creation was successful");
 }
@@ -269,8 +269,8 @@ void Frame::cmdCoreRecreate() {
 		return;
 	} else {
 		LIBV_UI_CORE_TRACE("Destroy previous window");
-		glfwDestroyWindow(shareWindow);
 		unregisterEventCallbacks(shareWindow);
+		glfwDestroyWindow(shareWindow);
 		shareWindow = nullptr;
 	}
 	if (!hidden)

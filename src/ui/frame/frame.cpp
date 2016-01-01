@@ -35,11 +35,6 @@ const Frame::TypeOpenGLRefreshRate Frame::REFRESH_RATE_DONT_CARE = GLFW_DONT_CAR
 
 const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
 
-const Frame::TypeCloseOperation Frame::ON_CLOSE_DISPOSE = 0;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_DO_NOTHING = 1;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_HIDE = 2;
-const Frame::TypeCloseOperation Frame::ON_CLOSE_MINIMIZE = 3;
-
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
@@ -58,11 +53,6 @@ void Frame::join() {
 }
 
 bool Frame::isFrameShouldClose() {
-	//ON_CLOSE_DISPOSE      - Close the frame
-	//ON_CLOSE_DO_NOTHING   - No operation
-	//ON_CLOSE_HIDE         - Hide frame
-	//ON_CLOSE_MINIMIZE     - Minimize frame
-
 	if (forcedClose) { // If we are forced to close
 		onClose.fire(this);
 		return true;
@@ -78,7 +68,7 @@ bool Frame::isFrameShouldClose() {
 
 	if (shouldClose) { // On close let DCO handle
 		switch (defaultCloseOperation) {
-		case ON_CLOSE_DISPOSE: default:
+		case ON_CLOSE_DISPOSE:
 			return true;
 		case ON_CLOSE_DO_NOTHING:
 			glfwSetWindowShouldClose(window, false);
@@ -106,47 +96,66 @@ bool Frame::isUpdateSkipable() {
 	return false;
 }
 
-// -------------------------------------------------------------------------------------------------
+// Frame container linkage -------------------------------------------------------------------------
 
-void Frame::baseBuild() {
-	timerBuild.reset();
-	build(renderer);
-	timerBuild.time();
-	validate();
+void Frame::frameBuild() {
+	this->build(renderer);
 }
 
-void Frame::baseDestroy() {
-	timerDestroy.reset();
-	destroy(renderer);
-	timerDestroy.time();
+void Frame::frameDestroy() {
+	this->destroy(renderer);
 }
 
-void Frame::baseInvalidate() {
-	invalidate();
+void Frame::frameInvalidate() {
+	this->invalidate();
 }
 
-void Frame::baseRender() {
+void Frame::frameRender() {
 	if (isRenderSkipable() || !window)
 		return;
 	if (isInvalid())
-		baseBuild();
+		frameBuild();
 
-	timerRender.reset();
-	render(renderer);
-	timerRender.time();
-
-	timerSwap.reset();
+	this->render(renderer);
 	glfwSwapBuffers(window);
-	timerSwap.time();
 }
 
-void Frame::baseUpdate() {
+void Frame::frameUpdate() {
 	if (isUpdateSkipable())
 		return;
+	this->update();
+}
 
-	timerUpdate.reset();
-	update();
-	timerUpdate.time();
+// Frame Loop --------------------------------------------------------------------------------------
+
+void Frame::loopInit() {
+	LIBV_UI_FRAME_DEBUG("Frame init");
+	context.executeAsync(std::bind(&Frame::loop, this));
+}
+
+void Frame::loop() {
+	//	LIBV_UI_FRAME_DEBUG("Frame loop");
+	distributeEvents();
+
+	if (isFrameShouldClose()) {
+		loopTerminate();
+		return;
+	}
+
+	frameUpdate();
+	frameRender();
+
+	context.executeAsync(std::bind(&Frame::loop, this));
+}
+
+void Frame::loopTerminate() {
+	LIBV_UI_FRAME_DEBUG("Frame terminate");
+	frameDestroy();
+
+	cmdFrameDestroy();
+	context.stop();
+
+	onClosed.fire(this);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -158,7 +167,7 @@ void Frame::show() {
 			coreExec(std::bind(&Frame::cmdCoreCreate, this));
 			if (window) {
 				glfwMakeContextCurrent(window);
-						context.executeAsync(std::bind(&Frame::init, this));
+						context.executeAsync(std::bind(&Frame::loopInit, this));
 			}
 		}
 		if (window)
@@ -347,47 +356,6 @@ void Frame::cmdFrameRecreate() {
 void Frame::cmdFrameDestroy() {
 	glfwMakeContextCurrent(nullptr);
 	coreExec(std::bind(&Frame::cmdCoreDestroy, this));
-}
-
-// Frame Loop --------------------------------------------------------------------------------------
-
-void Frame::init() {
-	LIBV_UI_FRAME_DEBUG("Frame init");
-	context.executeAsync(std::bind(&Frame::loop, this));
-}
-
-void Frame::loop() {
-	//	LIBV_UI_FRAME_DEBUG("Frame loop");
-	timerOffLoop.time();
-	timerLoop.reset();
-
-	timerEvent.reset();
-	distributeEvents();
-	timerEvent.time();
-
-	if (isFrameShouldClose()) {
-		term();
-		return;
-	}
-
-	baseUpdate();
-	baseRender();
-
-	context.executeAsync([this] {
-		loop();
-	});
-	timerLoop.time();
-	timerOffLoop.reset();
-}
-
-void Frame::term() {
-	LIBV_UI_FRAME_DEBUG("Frame terminate");
-	baseDestroy();
-
-	context.executeSync(std::bind(&Frame::cmdFrameDestroy, this));
-	context.stop();
-
-	onClosed.fire(this);
 }
 
 // -------------------------------------------------------------------------------------------------

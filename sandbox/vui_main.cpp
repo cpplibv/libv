@@ -18,6 +18,7 @@ using namespace libv;
 using namespace libv::ui;
 
 void noisyEvents(Frame& frame) {
+	(void) frame;
 	//	frame.onChar.output([](const EventChar & e) {
 	//		LIBV_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
 	//	frame.onCharMods.output([](const EventCharMods & e) {
@@ -79,7 +80,7 @@ void initGL() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
 	glEnable(GL_BLEND); //Alpha
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
 	glEnable(GL_TEXTURE_2D);
@@ -116,15 +117,14 @@ public:
 		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
 		setSize(512, 512);
-		setDecoration(false);
 		init();
 		show();
 	}
 
 	virtual void build(Renderer& renderer) override {
+		LIBV_UI_FRAME_DEBUG("Build Frame");
 		initGLEW();
 		initGL();
-		//		std::this_thread::sleep_for(std::chrono::seconds(2));
 		Frame::build(renderer);
 	}
 
@@ -146,6 +146,11 @@ public:
 
 int main(int, char**) {
 	std::cout << libv::log;
+	libv::log.allow("libv.ui.component");
+	libv::log.allow("libv.ui.frame");
+	libv::log.allow("libv.ui.glfw");
+	libv::log.allow_above(libv::Info);
+	libv::log.deny();
 
 	TestFrame f1("TestFrame");
 	f1.join();

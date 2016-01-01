@@ -7,10 +7,12 @@
 // std
 #include <algorithm>
 // pro
+#include <libv/ui/log.hpp>
 #include <libv/ui/layout/properties.hpp>
 #include <libv/ui/layout/layout_manager.hpp>
 
-#include <iostream>
+//TODO P4: default layout mrg
+//TODO P4: invalidate in not virtual!
 
 namespace libv {
 namespace ui {
@@ -128,26 +130,33 @@ void ProtectedContainer::updateComponents() {
 //	glPopMatrix();
 
 void ProtectedContainer::build(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Build Container");
 	buildComponents(renderer);
+
 	if (layoutManager) {
-		//		layoutManager->layoutContainer(this);
 		layoutManager->layout(begin(), end(), this);
-	} //TODO P4: else default layout mrg
-	validate();
+	}
+	Component::validate();
 }
 
 void ProtectedContainer::destroy(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Destroy Container");
 	destroyComponents(renderer);
 }
 
 void ProtectedContainer::invalidate() {
+	LIBV_UI_COMPONENT_TRACE("Invalidate Container");
+	Component::invalidate();
 	invalidateComponents();
 }
 
 void ProtectedContainer::render(Renderer& renderer) {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, size.x, size.y);
+	glViewport(pos.x, pos.y, size.x, size.y);
+
+//	LIBV_UI_COMPONENT_TRACE("%d %d %d %d", pos.x, pos.y, size.x, size.y);
+
 	renderer.pushMatrixView(glm::ortho(0, size.x, 0, size.y, 1000, -1000));
 	renderComponents(renderer);
 }

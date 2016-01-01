@@ -9,6 +9,7 @@
 
 //TODO P1: glm implicit cast for vec
 //TODO P1: vec implicit cast for glm
+//TODO P1: refactor to force unrolled loops some of the template magic
 //TODO P1: constexpr
 //TODO PMSVC: Disable warnings for nameless struct on MSVC
 //#pragma warning(push)

@@ -7,7 +7,6 @@
 // libv
 #include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
-#include <libv/timer.hpp>
 #include <libv/worker_thread.hpp>
 #include <libv/utility.hpp>
 // std
@@ -46,14 +45,10 @@ class Frame : public Trackable, private ProtectedContainer {
 	//	system) window. A window is always part of a frame.
 
 public:
-	using TypeCloseOperation = int;
 	using TypeDisplayMode = int;
 	using TypeOpenGLProfile = int;
 	using TypeOpenGLRefreshRate = int;
 	using TypeOpenGLSamples = int;
-
-	//	LIBV_STRONG_TYPEDEF(int, FrameCloseOperation)
-	//	LIBV_STRONG_TYPEDEF(int, ProgramCloseOperation)
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -78,35 +73,37 @@ public:
 	// Close ---------------------------------------------------------------------------------------
 
 public:
-	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration close the
-	 * frame
-	 * @note Does not interrupt current iteration
-	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DISPOSE; //      - Close the frame
-	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration does nothing.
-	 * @note Does not interrupt current iteration
-	 * @note Can be forced to close by calling close(), closing that way will
-	 * produce onClose event, and also does not interrupt current iteration
-	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_DO_NOTHING; //   - No operation
-	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration hide the
-	 * frame. The frame can be restored by calling show()
-	 * @note Does not interrupt current iteration
-	 * @note Can be forced to close by calling close(), closing that way will
-	 * produce onClose event, and also does not interrupt current iteration
-	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_HIDE; //         - Hide frame
-	/** If the frame receive a close signal (from OS) or from setting
-	 * setWindowShouldClose(true) then after the current iteration minimize the
-	 * frame. The frame can be restored by calling restore()
-	 * @note Does not interrupt current iteration
-	 * @note Can be forced to close by calling close(), closing that way will
-	 * produce onClose event, and also does not interrupt current iteration
-	 * @group Default Close Operation */
-	static const TypeCloseOperation ON_CLOSE_MINIMIZE; //     - Minimize frame
+	enum TypeCloseOperation {
+		/** If the frame receive a close signal (from OS) or from setting
+		 * setWindowShouldClose(true) then after the current iteration close the
+		 * frame
+		 * @note Does not interrupt current iteration
+		 * @group Default Close Operation */
+		ON_CLOSE_DISPOSE, //      - Close the frame
+		/** If the frame receive a close signal (from OS) or from setting
+		 * setWindowShouldClose(true) then after the current iteration does nothing.
+		 * @note Does not interrupt current iteration
+		 * @note Can be forced to close by calling close(), closing that way will
+		 * produce onClose event, and also does not interrupt current iteration
+		 * @group Default Close Operation */
+		ON_CLOSE_DO_NOTHING, //   - No operation
+		/** If the frame receive a close signal (from OS) or from setting
+		 * setWindowShouldClose(true) then after the current iteration hide the
+		 * frame. The frame can be restored by calling show()
+		 * @note Does not interrupt current iteration
+		 * @note Can be forced to close by calling close(), closing that way will
+		 * produce onClose event, and also does not interrupt current iteration
+		 * @group Default Close Operation */
+		ON_CLOSE_HIDE, //         - Hide frame
+		/** If the frame receive a close signal (from OS) or from setting
+		 * setWindowShouldClose(true) then after the current iteration minimize the
+		 * frame. The frame can be restored by calling restore()
+		 * @note Does not interrupt current iteration
+		 * @note Can be forced to close by calling close(), closing that way will
+		 * produce onClose event, and also does not interrupt current iteration
+		 * @group Default Close Operation */
+		ON_CLOSE_MINIMIZE //      - Minimize frame
+	};
 
 public:
 	void closeDefault();
@@ -246,17 +243,6 @@ private:
 private:
 	Renderer renderer;
 
-private:
-	Timer timerBuild;
-	Timer timerDestroy;
-	Timer timerEvent;
-	Timer timerLoop;
-	Timer timerOffLoop;
-	Timer timerPoll;
-	Timer timerRender;
-	Timer timerSwap;
-	Timer timerUpdate;
-
 	// ---------------------------------------------------------------------------------------------
 public:
 	void hide();
@@ -265,11 +251,11 @@ public:
 	void show();
 
 private:
-	void baseBuild();
-	void baseDestroy();
-	void baseInvalidate();
-	void baseRender();
-	void baseUpdate();
+	void frameBuild();
+	void frameDestroy();
+	void frameInvalidate();
+	void frameRender();
+	void frameUpdate();
 
 protected:
 	using ProtectedContainer::build;
@@ -311,9 +297,9 @@ public:
 
 	const Monitor* getCurrentMonitor() const;
 private:
-	void init();
+	void loopInit();
 	void loop();
-	void term();
+	void loopTerminate();
 public:
 	Frame(unsigned int width = DEFAULT_FRAME_WIDTH,
 			unsigned int height = DEFAULT_FRAME_HEIGHT);

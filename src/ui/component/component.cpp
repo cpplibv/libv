@@ -4,35 +4,43 @@
 #include <libv/ui/component/component.hpp>
 // pro
 #include <libv/ui/frame/frame.hpp>
+#include <libv/ui/log.hpp>
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-//bool Component::isActive() const {
-//	return false;
-//}
-//
-//bool Component::isFocused() const {
-//	return false;
-//}
-
 void Component::build(Renderer&) {
-	invalid = false;
+	LIBV_UI_COMPONENT_TRACE("Build Component");
+	validate();
 }
 
-void Component::destroy(Renderer&) { }
+void Component::destroy(Renderer&) {
+	LIBV_UI_COMPONENT_TRACE("Destroy Component");
+}
 
 void Component::invalidate() {
+	LIBV_UI_COMPONENT_TRACE("Invalidate Component");
 	invalid = true;
 }
 
 void Component::render(Renderer&) {
-
 }
 
 void Component::update() { }
+
+// -------------------------------------------------------------------------------------------------
+
+void Component::validate() {
+	invalid = false;
+}
+
+bool Component::isInvalid() const {
+	return invalid;
+}
+
+// -------------------------------------------------------------------------------------------------
 
 void Component::setDisplayPosition(const ivec3& pos) {
 	this->pos = pos;
@@ -50,6 +58,8 @@ void Component::setDisplaySize(const ivec3& size) {
 	//invalidate();
 }
 
+// -------------------------------------------------------------------------------------------------
+
 ivec3 Component::getDisplayPosition() const {
 	return pos;
 }
@@ -65,6 +75,8 @@ Frame* Component::getFrame() const {
 ProtectedContainer* Component::getParent() const {
 	return parent;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 Component::Component() { }
 

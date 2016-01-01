@@ -46,6 +46,13 @@
 #define LIBV_UI_EVENT_ERROR(...) LIBV_ERROR("libv.ui.event", __VA_ARGS__);
 #define LIBV_UI_EVENT_FATAL(...) LIBV_FATAL("libv.ui.event", __VA_ARGS__);
 
+#define LIBV_UI_COMPONENT_TRACE(...) LIBV_TRACE("libv.ui.component", __VA_ARGS__);
+#define LIBV_UI_COMPONENT_DEBUG(...) LIBV_DEBUG("libv.ui.component", __VA_ARGS__);
+#define LIBV_UI_COMPONENT_INFO( ...) LIBV_INFO( "libv.ui.component", __VA_ARGS__);
+#define LIBV_UI_COMPONENT_WARN( ...) LIBV_WARN( "libv.ui.component", __VA_ARGS__);
+#define LIBV_UI_COMPONENT_ERROR(...) LIBV_ERROR("libv.ui.component", __VA_ARGS__);
+#define LIBV_UI_COMPONENT_FATAL(...) LIBV_FATAL("libv.ui.component", __VA_ARGS__);
+
 namespace libv {
 namespace ui {
 namespace detail {

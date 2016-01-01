@@ -1,9 +1,5 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-check frame and compontnet build / render / destroy / etc...
-find reason of crash on destructor (left-right=0 div)
--- commit --
-
 string2D
 -- commit --
 
@@ -19,9 +15,12 @@ shader cache
 remove vm3 from gl
 -- commit --
 
-glEnable(GL_DEBUG_OUTPUT);
+FIX: Size management - find reason of dib by zero? (left-right=0 div)
+FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized
 -- commit --
 
+glEnable(GL_DEBUG_OUTPUT);
+-- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -248,6 +247,8 @@ Minnaert - More depth?
 OrenNayar - More avg lambert
 
 
+--- PASTEBIN ---------------------------------------------------------------------------------------
+
 > RANDOM
 template<class URNG>
 int rnd(int n, URNG &engine) {
@@ -329,3 +330,4 @@ void vglViewportFullScreen() {
 			, options.graphics.resolution.get().y);
 }
 
+std::this_thread::sleep_for(std::chrono::seconds(2));
