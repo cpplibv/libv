@@ -8,13 +8,14 @@
 namespace libv {
 
 class VoidGuardBase {
-	void* ptr;
+private:
+	void* ptr_;
 public:
-	inline void* getPtr() const {
-		return ptr;
+	inline void* ptr() const {
+		return ptr_;
 	}
 	VoidGuardBase() { }
-	VoidGuardBase(void* ptr) : ptr(ptr) { }
+	VoidGuardBase(void* ptr) : ptr_(ptr) { }
 	virtual ~VoidGuardBase() { }
 };
 
@@ -24,7 +25,8 @@ struct VoidGuard : public VoidGuardBase {
 	VoidGuard(Args&&... args) :
 		VoidGuardBase(reinterpret_cast<void*> (new T(std::forward<Args>(args)...))) { }
 	virtual ~VoidGuard() {
-		delete reinterpret_cast<T*> (getPtr());
+		delete reinterpret_cast<T*>(ptr());
 	}
 };
+
 } //namespace libv

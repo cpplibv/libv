@@ -9,7 +9,7 @@
 namespace libv {
 namespace ui {
 
-using PropertyMap = VaridicMap;
+using PropertyMap = VaridicMap<>;
 
 namespace Property {
 

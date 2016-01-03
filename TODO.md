@@ -1,6 +1,12 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+container and component API
+-- commit --
+
 string2D
+-- commit --
+
+label
 -- commit --
 
 font shader
@@ -15,15 +21,13 @@ shader cache
 remove vm3 from gl
 -- commit --
 
-FIX: Size management - find reason of dib by zero? (left-right=0 div)
+FIX: Size management - find reason of div by zero? (left-right=0 div)
 FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized
--- commit --
-
-glEnable(GL_DEBUG_OUTPUT);
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events
 
 --- ABANDONED --------------------------------------------------------------------------------------
@@ -47,6 +51,9 @@ Multiple quad-pair could be used along the same laser.
 Each low angle eye-normals quad has decreased opacity or even better if per-fragment calculated.
 
 // -------------------------------------------------------------------------------------------------
+
+Fully separating the ui from the frame handler is completely possible and desirable.
+It is also possible do it without any dependency between the two with an additional UIFrame class.
 
 cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
 much pain to integrate
