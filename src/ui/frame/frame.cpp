@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/frame/frame.hpp>
 // ext
+#include <cppformat/format.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv
@@ -116,6 +117,9 @@ void Frame::frameRender() {
 	if (isInvalid())
 		frameBuild();
 
+	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glViewport(0, 0, getDisplaySize().x, getDisplaySize().y);
 	this->render(renderer);
 	glfwSwapBuffers(window);
 }
@@ -294,9 +298,9 @@ void Frame::setSize(int x, int y) {
 void Frame::setSize(const ivec2& newsize) {
 	context.executeAsync([this, newsize] {
 		LIBV_UI_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
-		this->size = ivec3(newsize, this->size.z);
+		setDisplaySize(ivec3(newsize, getDisplaySize().z));
 		if (window)
-				coreExec(std::bind(glfwSetWindowSize, window, size.x, pos.y));
+				coreExec(std::bind(glfwSetWindowSize, window, getDisplaySize().x, pos.y));
 		});
 }
 
@@ -322,7 +326,7 @@ Frame::TypeDisplayMode Frame::getDisplayMode() const {
 }
 
 ivec3 Frame::getSize() const {
-	return size;
+	return getDisplaySize();
 }
 
 std::string Frame::getTitle() const {
@@ -338,7 +342,7 @@ bool Frame::isVisible() const {
 }
 
 const Monitor* Frame::getCurrentMonitor() const {
-	return Monitor::getMonitorAt(pos + size.xy() / 2);
+	return Monitor::getMonitorAt(pos + getDisplaySize().xy() / 2);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -362,9 +366,9 @@ void Frame::cmdFrameDestroy() {
 
 Frame::Frame(const std::string& title, unsigned int width, unsigned int height) :
 	onClose(AccumulatorLogicalAnd<bool>::get()),
-	context(libv::format("Frame - %s", title)),
+	context(fmt::sprintf("Frame - %s", title)),
 	title(title) {
-	size = ivec3(width, height, 2000);
+	setDisplaySize(ivec3(width, height, 2000));
 	registerFrame(this);
 	initEvents();
 }

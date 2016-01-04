@@ -193,7 +193,7 @@ struct vec_iteration_helper<N, N> {
 	}
 	template<typename T>
 	static inline T lengthSquare(const vec_helper_t<N, T>&) noexcept {
-		return 0;
+		return T();
 	}
 };
 

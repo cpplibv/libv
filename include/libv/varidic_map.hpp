@@ -58,7 +58,7 @@ struct VaridicMap {
 	template <typename T> bool remove(const VaridicMap::Address<T>& address);
 	size_t size() const;
 	template <typename T, typename... Args> inline void set(const VaridicMap::Address<T>& address, Args&&... args);
-	inline SetterProxy& set();
+	inline SetterProxy set();
 
 private:
 	static inline Address_t nextAddress() {
@@ -124,7 +124,7 @@ inline void VaridicMap<Container>::set(const VaridicMap<Container>::Address<T>& 
 	dataMap[address.address] = std::make_pair(value->ptr(), std::move(value));
 }
 template<template<typename...> class Container>
-inline typename VaridicMap<Container>::SetterProxy& VaridicMap<Container>::set(){
+inline typename VaridicMap<Container>::SetterProxy VaridicMap<Container>::set(){
 	return {*this};
 }
 template<template<typename...> class Container>

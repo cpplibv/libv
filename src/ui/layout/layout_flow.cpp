@@ -6,9 +6,10 @@
 // std
 #include <algorithm>
 // pro
-#include <libv/ui/layout/layout_flow.hpp>
-#include <libv/ui/component/container.hpp>
 #include <libv/ui/component/component.hpp>
+#include <libv/ui/component/container.hpp>
+#include <libv/ui/layout/layout_flow.hpp>
+#include <libv/ui/log.hpp>
 
 namespace libv {
 namespace ui {
@@ -117,7 +118,7 @@ std::vector<Line> buildLines(
 		LayoutFlow::Orienation orientation) {
 
 	std::vector<Line> lines;
-	auto numComp = begin - end;
+	auto numComp = std::distance(begin, end);
 	int i = 0;
 	while (i < numComp) {
 		Line currentLine(orientation);
@@ -145,7 +146,8 @@ LayoutFlow::LayoutFlow(Orienation orientation, Alignment align, Alignment lineAl
 //}
 
 void LayoutFlow::layout(Container::iterator begin, Container::iterator end, Component* target) {
-//void LayoutFlow::layoutContainer(ProtectedContainer* target) {
+	LIBV_UI_LAYOUT_TRACE("LayoutFlow Layout");
+
 	auto sizeContainer = target->get(Property::Size);
 	auto lines = buildLines(begin, end, sizeContainer, orientation);
 	auto sizeContent = Line::accumlateSize(lines);

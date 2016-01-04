@@ -13,11 +13,12 @@ namespace ui {
 class Label : public Component {
 private:
 	Font2D deafultFont;
+//	String2D text;
 	std::string text;
 	//Font2D font;
 public:
 	void setText(const std::string& text);
-public:
+protected:
 	virtual void build(Renderer& renderer) override;
 	virtual void destroy(Renderer& renderer) override;
 	virtual void render(Renderer& renderer) override;

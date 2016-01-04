@@ -13,48 +13,50 @@
 #include <libv/ui/layout/properties.hpp>
 #include <libv/ui/render/renderer.hpp>
 
+// TODO P4: Protect component DisplayPosition and DisplaySize and Parent
+
 namespace libv {
 namespace ui {
 
 class Frame;
-class ProtectedContainer;
+class Container;
 
 class Component {
 private:
-	ProtectedContainer* parent = nullptr;
-	Frame* frame = nullptr;
+	Container* parent = nullptr;
+	Frame* frame_ = nullptr;
 protected:
-	ivec3 pos;
-	ivec3 size;
-	std::string name;
+	std::string propertyID;
+	std::string propertyClass;
+
+	ivec3 displayPosition;
+	ivec3 displaySize;
 
 	std::atomic<bool> invalid{true};
 	PropertyMap properties;
-public:
-	//	bool isActive() const;
-	//	bool isFocused() const;
 
-	Frame* getFrame() const;
-	ProtectedContainer* getParent() const;
+public:
+	void setDisplayPosition(const ivec3& pos);
+	void setDisplaySize(const ivec3& size);
 	ivec3 getDisplayPosition() const;
 	ivec3 getDisplaySize() const;
 
-	void setParent(ProtectedContainer* parent);
-	void setDisplayPosition(const ivec3& pos);
-	void setDisplaySize(const ivec3& size);
+	Container* getParent() const;
+	void setParent(Container* parent);
+	Frame* frame() const;
+
+public:
+	template<typename T>
+	T get(const PropertyMap::Address<T>& address) const {
+		return properties.get(address);
+	}
+
 	template <typename T, typename Value>
 	void set(const PropertyMap::Address<T>& address, Value&& value) {
 		properties.set(address, std::forward<Value>(value));
 	}
-	template <typename T, typename Value, typename... Args>
-	void set(const PropertyMap::Address<T>& address, Value&& value, Args&&... args) {
-		set(address, std::forward<Value>(value));
-		set(std::forward<Args>(args)...);
-	}
-	//TODO P4: change to proxy operator() syntax (that result is less template generated) (see boost po)
-	template<typename T>
-	T get(const PropertyMap::Address<T>& address) const {
-		return properties.get(address);
+	PropertyMap::SetterProxy set() {
+		return properties.set();
 	}
 
 public:
@@ -90,5 +92,27 @@ public:
 	virtual ~Component();
 };
 
+//class Component : public Component {
+//private:
+//	using Component::getDisplayPosition;
+//	using Component::getDisplaySize;
+//	using Component::setDisplayPosition;
+//	using Component::setDisplaySize;
+//	using Component::setParent;
+//protected:
+//	using Component::getParent;
+//
+//protected:
+//	using Component::build;
+//	using Component::destroy;
+//	using Component::invalidate;
+//	using Component::render;
+//	using Component::update;
+//};
+
 } //namespace ui
 } //namespace libv
+
+
+//	bool isActive() const;
+//	bool isFocused() const;

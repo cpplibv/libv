@@ -233,7 +233,7 @@ void Frame::cmdCoreCreate() {
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 		window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), shareWindow);
 	} else if (displayMode == DISPLAY_MODE_WINDOWED) {
-		window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, shareWindow);
+		window = glfwCreateWindow(getDisplaySize().x, getDisplaySize().y, title.c_str(), nullptr, shareWindow);
 	}
 	if (!window) {
 		LIBV_UI_CORE_ERROR("GLFW window creation failed");

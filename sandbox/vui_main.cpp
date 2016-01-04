@@ -94,6 +94,7 @@ class TestFrame : public Frame {
 
 	void init() {
 		lbl.setText("Hello UI!");
+		lbl.set(Property::Size, ivec3(512, 512, 0));
 		add(make_observer(&lbl));
 
 		setLayout(make_observer(&lf));
@@ -149,6 +150,7 @@ int main(int, char**) {
 	libv::log.allow("libv.ui.component");
 	libv::log.allow("libv.ui.frame");
 	libv::log.allow("libv.ui.glfw");
+	libv::log.allow("libv.ui.layout");
 	libv::log.allow_above(libv::Info);
 	libv::log.deny();
 

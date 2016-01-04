@@ -2,6 +2,8 @@
 
 #pragma once
 
+// ext
+#include <boost/container/flat_map.hpp>
 // libv
 #include <libv/varidic_map.hpp>
 #include <libv/vec.hpp>
@@ -9,7 +11,7 @@
 namespace libv {
 namespace ui {
 
-using PropertyMap = VaridicMap<>;
+using PropertyMap = VaridicMap<::boost::container::flat_map>;
 
 namespace Property {
 

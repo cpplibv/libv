@@ -53,6 +53,13 @@
 #define LIBV_UI_COMPONENT_ERROR(...) LIBV_ERROR("libv.ui.component", __VA_ARGS__);
 #define LIBV_UI_COMPONENT_FATAL(...) LIBV_FATAL("libv.ui.component", __VA_ARGS__);
 
+#define LIBV_UI_LAYOUT_TRACE(...) LIBV_TRACE("libv.ui.layout", __VA_ARGS__);
+#define LIBV_UI_LAYOUT_DEBUG(...) LIBV_DEBUG("libv.ui.layout", __VA_ARGS__);
+#define LIBV_UI_LAYOUT_INFO( ...) LIBV_INFO( "libv.ui.layout", __VA_ARGS__);
+#define LIBV_UI_LAYOUT_WARN( ...) LIBV_WARN( "libv.ui.layout", __VA_ARGS__);
+#define LIBV_UI_LAYOUT_ERROR(...) LIBV_ERROR("libv.ui.layout", __VA_ARGS__);
+#define LIBV_UI_LAYOUT_FATAL(...) LIBV_FATAL("libv.ui.layout", __VA_ARGS__);
+
 namespace libv {
 namespace ui {
 namespace detail {

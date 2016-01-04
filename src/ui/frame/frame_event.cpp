@@ -76,11 +76,11 @@ void Frame::glfwCallback(const EventCursorPos&) { }
 void Frame::glfwCallback(const EventDrop&) { }
 
 void Frame::glfwCallback(const EventFramebufferSize& e) {
-	if (size.xy() == e.size)
+	if (getDisplaySize().xy() == e.size)
 		return;
 
-	size = ivec3(e.size, size.z);
-	set(Property::Size, size);
+	setDisplaySize(ivec3(e.size, getDisplaySize().z));
+	set(Property::Size, getDisplaySize());
 	frameInvalidate();
 }
 

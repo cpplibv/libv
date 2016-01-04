@@ -42,18 +42,19 @@ bool Component::isInvalid() const {
 
 // -------------------------------------------------------------------------------------------------
 
-void Component::setDisplayPosition(const ivec3& pos) {
-	this->pos = pos;
+void Component::setDisplayPosition(const ivec3& position) {
+	this->displayPosition = position;
 	//boundsChanged()
 	//invalidate();
 }
 
-void Component::setParent(ProtectedContainer* parent) {
+void Component::setParent(Container* parent) {
 	this->parent = parent;
+	this->frame_ = parent->frame();
 }
 
 void Component::setDisplaySize(const ivec3& size) {
-	this->size = size;
+	this->displaySize = size;
 	//onResize();
 	//invalidate();
 }
@@ -61,18 +62,18 @@ void Component::setDisplaySize(const ivec3& size) {
 // -------------------------------------------------------------------------------------------------
 
 ivec3 Component::getDisplayPosition() const {
-	return pos;
+	return displayPosition;
 }
 
 ivec3 Component::getDisplaySize() const {
-	return size;
+	return displaySize;
 }
 
-Frame* Component::getFrame() const {
-	return frame;
+Frame* Component::frame() const {
+	return frame_;
 }
 
-ProtectedContainer* Component::getParent() const {
+Container* Component::getParent() const {
 	return parent;
 }
 

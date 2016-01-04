@@ -7,10 +7,11 @@
 #include <glm/glm.hpp>
 // libv
 #include <libv/worker_thread.hpp>
+#include <libv/vec.hpp>
 // std
 #include <stack>
 
-#include "types.hpp"
+//#include "types.hpp"
 
 #define PI 3.1415926535897932384626433832795
 
@@ -188,22 +189,26 @@ inline std::string getProgamLinkMessage(GLuint programID) {
 	return result;
 }
 
-// glActiveTexture -----------------------------------------------------------------------
+// glViewport --------------------------------------------------------------------------------------
+inline void viewport(::libv::ivec2 pos, ::libv::ivec2 size) {
+	glViewport(pos.x, pos.y, size.x, size.y);
+}
 
-inline void activeTexture(const libv::gl::TextureType& textureType) {
+// glActiveTexture ---------------------------------------------------------------------------------
+inline void activeTexture(const ::libv::gl::TextureType& textureType) {
 	glActiveTexture(GL_TEXTURE0 + static_cast<GLuint>(textureType));
 }
 
 // glEnableVertexAttribArray -----------------------------------------------------------------------
-inline void enableVertexAttribArray(const libv::gl::Attribute& attribute) {
+inline void enableVertexAttribArray(const ::libv::gl::Attribute& attribute) {
 	glEnableVertexAttribArray(static_cast<GLuint>(attribute));
 }
 
 // glVertexAttribPointer ---------------------------------------------------------------------------
 inline void vertexAttribPointer(
-		const libv::gl::Attribute& attribute,
+		const ::libv::gl::Attribute& attribute,
 		GLint size,
-		const libv::gl::VertexAttribType& type,
+		const ::libv::gl::VertexAttribType& type,
 		GLboolean normalized,
 		GLsizei stride,
 		const GLvoid* pointer) {
@@ -216,9 +221,9 @@ inline void vertexAttribPointer(
 			pointer);
 }
 inline void vertexAttribIPointer(
-		const libv::gl::Attribute& attribute,
+		const ::libv::gl::Attribute& attribute,
 		GLint size,
-		const libv::gl::VertexAttribType& type,
+		const ::libv::gl::VertexAttribType& type,
 		GLsizei stride,
 		const GLvoid* pointer) {
 	glVertexAttribIPointer(
@@ -229,7 +234,7 @@ inline void vertexAttribIPointer(
 			pointer);
 }
 inline void vertexAttribLPointer(
-		const libv::gl::Attribute& attribute,
+		const ::libv::gl::Attribute& attribute,
 		GLint size,
 		GLsizei stride,
 		const GLvoid* pointer) {

@@ -211,6 +211,7 @@ void Font2D::uploadTexture() {
 }
 
 void Font2D::bind() {
+	glEnable(GL_TEXTURE_2D);
 	if (dirty) {
 		glGenTextures(1, &textureID);
 		uploadTexture();

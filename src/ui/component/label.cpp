@@ -35,14 +35,8 @@ void Label::destroy(Renderer& renderer) {
 	Component::destroy(renderer);
 }
 
-void Label::render(Renderer& renderer) {
+void Label::render(Renderer&) {
 	//	LIBV_UI_COMPONENT_TRACE("Render Label");
-
-	(void) renderer;
-//		gluOrtho2D(0, 512, 0, 512);
-	glEnable(GL_TEXTURE_2D);
-	//<<< This is an articaft here due to "vui_main" should already set up this
-	//Or not... due to ui should handle any gl "outside" state
 	deafultFont.bind();
 
 	//	glBegin(GL_QUADS);

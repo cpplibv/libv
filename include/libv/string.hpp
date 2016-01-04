@@ -3,65 +3,25 @@
 #pragma once
 
 // std
-#include <memory>
 #include <string>
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-#include <functional>
-#include <cctype>
-#include <locale>
 
 namespace libv {
-namespace detail {
-
-//Template magic for snprintf and std::string
-template <typename T> struct CType {
-	using type = T;
-};
-
-template <> struct CType<const std::string&> {
-	using type = const char*;
-};
-
-template<typename T> inline typename CType<const T&>::type toCType(const T& var) {
-	return var;
-}
-
-template<> inline const char* toCType<std::string>(const std::string& var) {
-	return var.c_str();
-}
-
-} //namespace detail
-
-// -------------------------------------------------------------------------------------------------
-template<typename... Args>
-std::string format(const std::string& pattern, const Args&... args) {
-	size_t size = snprintf(nullptr, 0, pattern.c_str(), detail::toCType<Args>(args)...) + 1;
-	std::unique_ptr<char[] > buf(new char[size]);
-	snprintf(buf.get(), size, pattern.c_str(), detail::toCType<Args>(args)...);
-	return std::string(buf.get(), buf.get() + size);
-}
 
 // -------------------------------------------------------------------------------------------------
 
-// trim from start
-inline std::string& trim_begin(std::string &s) {
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
-	return s;
-}
-
-// trim from end
-inline std::string& trim_end(std::string &s) {
-	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-	return s;
-}
-
-// trim from both ends
-inline std::string &trim(std::string &s) {
-	return trim_begin(trim_end(s));
-}
+//inline std::string& trim_begin(std::string &s) {
+//	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
+//	return s;
+//}
+//
+//inline std::string& trim_end(std::string &s) {
+//	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+//	return s;
+//}
+//
+//inline std::string &trim(std::string &s) {
+//	return trim_begin(trim_end(s));
+//}
 
 // -------------------------------------------------------------------------------------------------
 template <typename = void> void unicode_to_utf8(char* out, uint32_t unicode) {
