@@ -1,7 +1,7 @@
 // File: panel.cpp, Created on 2015. április 8. 14:32, Author: Vader
 
 // hpp
-#include <libv/ui/component/panel.hpp>
+#include <libv/ui/container/panel.hpp>
 // ext
 #include <glm/gtx/transform.hpp>
 

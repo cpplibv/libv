@@ -9,7 +9,7 @@
 #include <libv/gl/gl.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel_flow.hpp>
+#include <libv/ui/container/panel_flow.hpp>
 #include <libv/ui/frame/frame.hpp>
 #include <libv/ui/log.hpp>
 

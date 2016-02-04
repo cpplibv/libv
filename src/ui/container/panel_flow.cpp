@@ -1,7 +1,7 @@
 // File: panel_flow.cpp, Created on 2016.01.22. 14:32, Author: Vader
 
 // hpp
-#include <libv/ui/component/panel_flow.hpp>
+#include <libv/ui/container/panel_flow.hpp>
 // ext
 #include <boost/range/adaptor/reversed.hpp>
 #include <glm/gtc/matrix_transform.hpp>

@@ -11,7 +11,7 @@
 #include <string>
 // pro
 #include <libv/ui/component/ui.hpp>
-#include <libv/ui/layout/properties.hpp>
+#include <libv/ui/properties.hpp>
 #include <libv/ui/render/renderer.hpp>
 
 // TODO P4: Protect component DisplayPosition, DisplaySize, Parent and Frame?

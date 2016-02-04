@@ -3,7 +3,7 @@
 #pragma once
 
 #include <libv/ui/component/component.hpp>
-#include <libv/ui/component/container.hpp>
+#include <libv/ui/container/container.hpp>
 
 namespace libv {
 namespace ui {

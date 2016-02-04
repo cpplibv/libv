@@ -1,14 +1,4 @@
-http://www.gotw.ca/publications/mill18.htm
-Remove layout -> container should / can handle everything layout related
-
 --- STACK ------------------------------------------------------------------------------------------
-
-remove layout and its folder
--- commit --
-
-add container folder
-rename PanelFlow to Flow
--- commit --
 
 string2D
 -- commit --

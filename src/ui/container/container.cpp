@@ -1,15 +1,15 @@
 // File: Container.cpp, Created on 2014. január 7. 6:05, Author: Vader
 
 // hpp
-#include <libv/ui/component/container.hpp>
+#include <libv/ui/container/container.hpp>
 // ext
 #include <glm/gtx/transform.hpp>
 // std
 #include <algorithm>
 // pro
 #include <libv/ui/component/component.hpp>
-#include <libv/ui/layout/properties.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/properties.hpp>
 
 //TODO P4: default layout mrg (dummy fix size max overlapping? or flow?)
 //TODO P4: invalidate in not virtual!

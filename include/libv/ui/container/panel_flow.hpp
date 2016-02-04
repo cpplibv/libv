@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <libv/ui/component/panel.hpp>
+#include <libv/ui/container/panel.hpp>
 
 namespace libv {
 namespace ui {

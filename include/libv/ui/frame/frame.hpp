@@ -20,7 +20,7 @@
 #include <thread>
 // pro
 #include <libv/ui/component/component.hpp>
-#include <libv/ui/component/panel.hpp>
+#include <libv/ui/container/panel.hpp>
 #include <libv/ui/component/ui.hpp>
 #include <libv/ui/events/events.hpp>
 #include <libv/ui/monitor.hpp>

@@ -35,7 +35,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-
 // Terminology:
 // font family: arial
 // font face: arial italic
@@ -185,26 +184,6 @@ private:
 	void loadFace();
 	Character renderCharacter(unsigned int unicode);
 	void uploadTexture();
-};
-
-// -------------------------------------------------------------------------------------------------
-
-enum class Anchor {
-	Top,
-	Center,
-	Bottom,
-	Right,
-	Left
-};
-
-class String2D {
-	Anchor halign = Anchor::Center;
-	Anchor valign = Anchor::Center;
-
-	std::string text;
-	std::vector<Font2D::Character> data;
-	void setText(const std::string&) { }
-	void render() { }
 };
 
 // -------------------------------------------------------------------------------------------------
