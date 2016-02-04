@@ -5,6 +5,7 @@
 // ext
 #include <boost/filesystem/path.hpp>
 #include <GL/glew.h>
+#include <glm/gtc/matrix_transform.hpp>
 // pro
 #include <libv/ui/log.hpp>
 #include <libv/gl/log.hpp>
@@ -13,30 +14,38 @@ namespace libv {
 namespace ui {
 
 void Label::setText(const std::string& text) {
+	LIBV_UI_COMPONENT_TRACE("Set label text to [%s]", text);
 	this->text = text;
 	invalidate();
 }
 
-void Label::build(Renderer& renderer) {
+void Label::doBuild(Renderer&) {
 	LIBV_UI_COMPONENT_TRACE("Build Label");
 	if (!deafultFont.isLoaded()) {
 		LIBV_UI_COMPONENT_TRACE("Load Font");
 		deafultFont.load("Data/Font/cour.ttf");
 	}
-	Component::build(renderer);
 }
 
-void Label::destroy(Renderer& renderer) {
+void Label::doDestroy(Renderer&) {
 	LIBV_UI_COMPONENT_TRACE("Destroy Label");
 	if (deafultFont.isLoaded()) {
 		LIBV_UI_COMPONENT_TRACE("Unload Font");
 		deafultFont.unload();
 	}
-	Component::destroy(renderer);
 }
 
-void Label::render(Renderer&) {
+void Label::doRender(Renderer& gl) {
 	//	LIBV_UI_COMPONENT_TRACE("Render Label");
+
+	const auto position = getDisplayPosition();
+	const auto size = getDisplaySize();
+
+	gl.pushMatrixView(glm::ortho(
+			position.x, position.x + size.x,
+			position.y, position.y + size.y,
+			1000.f, -1000.f));
+
 	deafultFont.bind();
 
 	//	glBegin(GL_QUADS);

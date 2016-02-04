@@ -13,8 +13,6 @@
 #include <libv/timer.hpp>
 #include "core.hpp"
 
-//TODO P2: review size handling (in container too)
-
 namespace libv {
 namespace ui {
 
@@ -89,77 +87,28 @@ bool Frame::isFrameShouldClose() {
 
 // -------------------------------------------------------------------------------------------------
 
-bool Frame::isRenderSkipable() {
+bool Frame::isRefreshSkipable() {
 	return hidden || minimized;
 }
 
-bool Frame::isUpdateSkipable() {
-	return false;
+// Frame ui linkage --------------------------------------------------------------------------------
+
+void Frame::addComponent(const observer_ptr<Component>& component) {
+	ui.add(component);
 }
 
-// Frame container linkage -------------------------------------------------------------------------
-
-void Frame::frameBuild() {
-	this->build(renderer);
+void Frame::addComponent(const shared_ptr<Component>& component) {
+	ui.add(component);
 }
 
-void Frame::frameDestroy() {
-	this->destroy(renderer);
+void Frame::removeComponent(const observer_ptr<Component>&) {
+	LIBV_UI_FRAME_ERROR("Not implemented yet.");
+	//	ui.remove(component);
 }
 
-void Frame::frameInvalidate() {
-	this->invalidate();
-}
-
-void Frame::frameRender() {
-	if (isRenderSkipable() || !window)
-		return;
-	if (isInvalid())
-		frameBuild();
-
-	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glViewport(0, 0, getDisplaySize().x, getDisplaySize().y);
-	this->render(renderer);
-	glfwSwapBuffers(window);
-}
-
-void Frame::frameUpdate() {
-	if (isUpdateSkipable())
-		return;
-	this->update();
-}
-
-// Frame Loop --------------------------------------------------------------------------------------
-
-void Frame::loopInit() {
-	LIBV_UI_FRAME_DEBUG("Frame init");
-	context.executeAsync(std::bind(&Frame::loop, this));
-}
-
-void Frame::loop() {
-	//	LIBV_UI_FRAME_DEBUG("Frame loop");
-	distributeEvents();
-
-	if (isFrameShouldClose()) {
-		loopTerminate();
-		return;
-	}
-
-	frameUpdate();
-	frameRender();
-
-	context.executeAsync(std::bind(&Frame::loop, this));
-}
-
-void Frame::loopTerminate() {
-	LIBV_UI_FRAME_DEBUG("Frame terminate");
-	frameDestroy();
-
-	cmdFrameDestroy();
-	context.stop();
-
-	onClosed.fire(this);
+void Frame::removeComponent(const shared_ptr<Component>&) {
+	LIBV_UI_FRAME_ERROR("Not implemented yet.");
+	//	ui.remove(component);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -168,11 +117,7 @@ void Frame::show() {
 	context.executeAsync([this] {
 		LIBV_UI_FRAME_TRACE("Show frame [%s]", title);
 		if (!window) {
-			coreExec(std::bind(&Frame::cmdCoreCreate, this));
-			if (window) {
-				glfwMakeContextCurrent(window);
-						context.executeAsync(std::bind(&Frame::loopInit, this));
-			}
+			cmdFrameCreate();
 		}
 		if (window)
 				coreExec(std::bind(glfwShowWindow, window));
@@ -273,12 +218,12 @@ void Frame::setPosition(int x, int y) {
 	setPosition(ivec2(x, y));
 }
 
-void Frame::setPosition(const ivec2& newpos) {
+void Frame::setPosition(ivec2 newpos) {
 	context.executeAsync([this, newpos] {
 		LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
-		this->pos = newpos;
+		this->position = newpos;
 		if (window)
-				coreExec(std::bind(glfwSetWindowPos, window, pos.x, pos.y));
+				coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
 		});
 }
 
@@ -295,12 +240,12 @@ void Frame::setSize(int x, int y) {
 	setSize(ivec2(x, y));
 }
 
-void Frame::setSize(const ivec2& newsize) {
+void Frame::setSize(ivec2 newsize) {
 	context.executeAsync([this, newsize] {
 		LIBV_UI_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
-		setDisplaySize(ivec3(newsize, getDisplaySize().z));
+		size = newsize;
 		if (window)
-				coreExec(std::bind(glfwSetWindowSize, window, getDisplaySize().x, pos.y));
+				coreExec(std::bind(glfwSetWindowSize, window, size.x, position.y));
 		});
 }
 
@@ -325,8 +270,8 @@ Frame::TypeDisplayMode Frame::getDisplayMode() const {
 	return displayMode;
 }
 
-ivec3 Frame::getSize() const {
-	return getDisplaySize();
+ivec2 Frame::getSize() const {
+	return size;
 }
 
 std::string Frame::getTitle() const {
@@ -342,10 +287,19 @@ bool Frame::isVisible() const {
 }
 
 const Monitor* Frame::getCurrentMonitor() const {
-	return Monitor::getMonitorAt(pos + getDisplaySize().xy() / 2);
+	return Monitor::getMonitorAt(position + size / 2);
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void Frame::cmdFrameCreate() {
+	coreExec(std::bind(&Frame::cmdCoreCreate, this));
+	if (window) {
+		glfwMakeContextCurrent(window);
+		context.executeAsync(std::bind(&Frame::loopInit, this));
+		initContext();
+	}
+}
 
 void Frame::cmdFrameRecreate() {
 	assert(window);
@@ -354,12 +308,58 @@ void Frame::cmdFrameRecreate() {
 	coreExec(std::bind(&Frame::cmdCoreRecreate, this));
 	if (window) {
 		glfwMakeContextCurrent(window);
+		initContext();
 	}
 }
 
 void Frame::cmdFrameDestroy() {
 	glfwMakeContextCurrent(nullptr);
 	coreExec(std::bind(&Frame::cmdCoreDestroy, this));
+	termContext();
+}
+
+// Frame Loop --------------------------------------------------------------------------------------
+
+void Frame::loopInit() {
+	LIBV_UI_FRAME_DEBUG("Frame init");
+
+	context.executeAsync(std::bind(&Frame::loop, this));
+}
+
+void Frame::loop() {
+	//LIBV_UI_FRAME_DEBUG("Frame loop");
+	distributeEvents();
+
+	if (isFrameShouldClose()) {
+		loopTerminate();
+		return;
+	}
+
+	if (!isRefreshSkipable() && window) {
+		ui.refresh();
+		glfwSwapBuffers(window);
+	}
+
+	context.executeAsync(std::bind(&Frame::loop, this));
+}
+
+void Frame::loopTerminate() {
+	LIBV_UI_FRAME_DEBUG("Frame terminate");
+
+	cmdFrameDestroy();
+	context.stop();
+
+	onClosed.fire(this);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Frame::initContext() {
+	LIBV_UI_FRAME_DEBUG("Initialize context - NOP");
+}
+
+void Frame::termContext() {
+	LIBV_UI_FRAME_DEBUG("Terminate context - NOP");
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -368,9 +368,10 @@ Frame::Frame(const std::string& title, unsigned int width, unsigned int height) 
 	onClose(AccumulatorLogicalAnd<bool>::get()),
 	context(fmt::sprintf("Frame - %s", title)),
 	title(title) {
-	setDisplaySize(ivec3(width, height, 2000));
+	size = ivec2(width, height);
 	registerFrame(this);
 	initEvents();
+	ui.attach(make_observer(this));
 }
 
 Frame::Frame(unsigned int width, unsigned int height) :

@@ -16,6 +16,11 @@
 // 			signal target variable ami egy shared_ptr és a signal kap róla
 // 			egy weak_ptr-t így amikor külden rá infot csak kidobja magából, ígykönnyen
 // 			lehet "lokális változót" asnyc módosítani
+//TODO P2: Add "Signal Hub" approach where signals are light weight and a main hub stores
+//			everything and member signal "markers" (or what should i call them...) are just an
+//			accessors to the hub wrapping the necessary minimal information.
+//			SignalHub is a trackable
+//			Both method should be kept
 //TODO P3: Remove reference, remove constness from results type?
 
 //TODO P5: AdaptivSignal [in/out]put (same, generic lambda...)
@@ -25,13 +30,14 @@
 //TODO P5: UniqueSignal - Modified capacitiv where the storage is unique
 // 			May consider a "compare" function for determining uniqueness
 //TODO P5: ConditionalSignal - Forward the call only if the predicate function allows it
-//TODO P5: HistorySignal - Stores and forward calls but distibute them to late subsribers.
+//TODO P5: HistorySignal - Stores and forward calls but also distibute them to late subsribers.
+//			Also a template size_t N for limit max call memory number
 //TODO P5: TransformSignal - Manipulating the arguments flowing through it using a
 // 			manipulator function. Similar to std::transform.
 //TODO P5: AsnycSignal - Put the fire method and the arguments into a worker
-// 			thread que to call this signal in async mode. (template executer?)
+// 			thread que to call this signal in async mode. (template executor?)
 //TODO P5: SnycSignal - Put the fire method and the arguments into a worker
-// 			thread que to call this signal in sync mode. (template executer?)
+// 			thread que to call this signal in sync mode. (template executor?)
 
 //TODO PD: Documentation of Signal-Slot. The boost version may be relevant
 // 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/reference.html

@@ -9,9 +9,8 @@
 #include <libv/gl/gl.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel.hpp>
+#include <libv/ui/component/panel_flow.hpp>
 #include <libv/ui/frame/frame.hpp>
-#include <libv/ui/layout/layout_flow.hpp>
 #include <libv/ui/log.hpp>
 
 using namespace libv;
@@ -19,41 +18,41 @@ using namespace libv::ui;
 
 void noisyEvents(Frame& frame) {
 	(void) frame;
-	//	frame.onChar.output([](const EventChar & e) {
-	//		LIBV_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
-	//	frame.onCharMods.output([](const EventCharMods & e) {
-	//		LIBV_UI_EVENT_TRACE("Event CharMods: %d %u %s", e.mods, e.unicode, e.utf8); });
-	//	frame.onCursorEnter.output([](const EventCursorEnter & e) {
-	//		LIBV_UI_EVENT_TRACE("Event CursorEnter: %d", e.entered); });
-	//	frame.onCursorPos.output([](const EventCursorPos & e) {
-	//		LIBV_UI_EVENT_TRACE("Event CursorPos: %f %f", e.xpos, e.ypos); });
-	//	frame.onDrop.output([](const EventDrop & e) {
-	//		LIBV_UI_EVENT_TRACE("Event Drop: %d ...", e.strings.size()); });
-	//	frame.onFramebufferSize.output([](const EventFramebufferSize & e) {
-	//		LIBV_UI_EVENT_TRACE("Event FramebufferSize: %d %d", e.size.x, e.size.y); });
-	//	frame.onKey.output([](const EventKey & e) {
-	//		LIBV_UI_EVENT_TRACE("Event Key: %d %d %d %d", e.action, e.key, e.mode, e.scancode); });
-	//	frame.onMouseButton.output([](const EventMouseButton & e) {
-	//		LIBV_UI_EVENT_TRACE("Event MouseButton: %d %d %d", e.action, e.button, e.mods); });
-	//	frame.onScroll.output([](const EventScroll & e) {
-	//		LIBV_UI_EVENT_TRACE("Event Scroll: %f %f", e.xoffset, e.yoffset); });
-	//	frame.onWindowClose.output([](const EventWindowClose &) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowClose"); });
-	//	frame.onWindowFocus.output([](const EventWindowFocus & e) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowFocus: %d", e.focused); });
-	//	frame.onWindowIconify.output([](const EventWindowIconify & e) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowIconify: %d", e.iconified); });
-	//	frame.onWindowPos.output([](const EventWindowPos & e) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowPos: %d, %d", e.position.x, e.position.y); });
-	//	frame.onWindowRefresh.output([](const EventWindowRefresh &) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowRefresh"); });
-	//	frame.onWindowSize.output([](const EventWindowSize & e) {
-	//		LIBV_UI_EVENT_TRACE("Event WindowSize: %d %d", e.size.x, e.size.y); });
+	frame.onChar.output([](const EventChar & e) {
+		LIBV_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
+	frame.onCharMods.output([](const EventCharMods & e) {
+		LIBV_UI_EVENT_TRACE("Event CharMods: %d %u %s", e.mods, e.unicode, e.utf8); });
+	frame.onCursorEnter.output([](const EventCursorEnter & e) {
+		LIBV_UI_EVENT_TRACE("Event CursorEnter: %d", e.entered); });
+	frame.onCursorPos.output([](const EventCursorPos & e) {
+		LIBV_UI_EVENT_TRACE("Event CursorPos: %f %f", e.xpos, e.ypos); });
+	frame.onDrop.output([](const EventDrop & e) {
+		LIBV_UI_EVENT_TRACE("Event Drop: %d ...", e.strings.size()); });
+	frame.onFramebufferSize.output([](const EventFramebufferSize & e) {
+		LIBV_UI_EVENT_TRACE("Event FramebufferSize: %d %d", e.size.x, e.size.y); });
+	frame.onKey.output([](const EventKey & e) {
+		LIBV_UI_EVENT_TRACE("Event Key: %d %d %d %d", e.action, e.key, e.mode, e.scancode); });
+	frame.onMouseButton.output([](const EventMouseButton & e) {
+		LIBV_UI_EVENT_TRACE("Event MouseButton: %d %d %d", e.action, e.button, e.mods); });
+	frame.onScroll.output([](const EventScroll & e) {
+		LIBV_UI_EVENT_TRACE("Event Scroll: %f %f", e.xoffset, e.yoffset); });
+	frame.onWindowClose.output([](const EventWindowClose &) {
+		LIBV_UI_EVENT_TRACE("Event WindowClose"); });
+	frame.onWindowFocus.output([](const EventWindowFocus & e) {
+		LIBV_UI_EVENT_TRACE("Event WindowFocus: %d", e.focused); });
+	frame.onWindowIconify.output([](const EventWindowIconify & e) {
+		LIBV_UI_EVENT_TRACE("Event WindowIconify: %d", e.iconified); });
+	frame.onWindowPos.output([](const EventWindowPos & e) {
+		LIBV_UI_EVENT_TRACE("Event WindowPos: %d, %d", e.position.x, e.position.y); });
+	frame.onWindowRefresh.output([](const EventWindowRefresh &) {
+		LIBV_UI_EVENT_TRACE("Event WindowRefresh"); });
+	frame.onWindowSize.output([](const EventWindowSize & e) {
+		LIBV_UI_EVENT_TRACE("Event WindowSize: %d %d", e.size.x, e.size.y); });
 
-	//	frame.onClose.output([](Frame* f) {
-	//		LIBV_UI_EVENT_TRACE("Event onClose: %d", f); return true; });
-	//	frame.onClosed.output([](Frame* f) {
-	//		LIBV_UI_EVENT_TRACE("Event onClosed: %d", f); });
+	//		frame.onClose.output([](Frame* f) {
+	//			LIBV_UI_EVENT_TRACE("Event onClose: %d", f); return true; });
+	//		frame.onClosed.output([](Frame* f) {
+	//			LIBV_UI_EVENT_TRACE("Event onClosed: %d", f); });
 }
 
 #define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
@@ -88,16 +87,20 @@ void initGL() {
 	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
 	checkGL();
 }
+
 class TestFrame : public Frame {
 	Label lbl;
-	LayoutFlow lf;
+	PanelFlow lf;
 
 	void init() {
+		lbl.setComponentID("Label");
 		lbl.setText("Hello UI!");
 		lbl.set(Property::Size, ivec3(512, 512, 0));
-		add(make_observer(&lbl));
 
-		setLayout(make_observer(&lf));
+		lf.setComponentID("Panel");
+		lf.add(make_observer(&lbl));
+
+		addComponent(make_observer(&lf));
 
 		onKey.output([this](const EventKey & e) {
 			if (e.key == 256)
@@ -110,10 +113,9 @@ class TestFrame : public Frame {
 	}
 
 public:
-
 	TestFrame(const std::string& title) : Frame(title) {
 		noisyEvents(*this);
-		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize().xy() / 2);
+		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize() / 2);
 		setCloseOperation(ON_CLOSE_DISPOSE);
 		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
@@ -122,11 +124,15 @@ public:
 		show();
 	}
 
-	virtual void build(Renderer& renderer) override {
-		LIBV_UI_FRAME_DEBUG("Build Frame");
+private:
+	virtual void initContext() override {
+		LIBV_UI_FRAME_DEBUG("Initialize context");
 		initGLEW();
 		initGL();
-		Frame::build(renderer);
+	}
+
+	virtual void termContext() override {
+		LIBV_UI_FRAME_DEBUG("Terminate context");
 	}
 
 	//	virtual void render() override {
@@ -148,6 +154,7 @@ public:
 int main(int, char**) {
 	std::cout << libv::log;
 	libv::log.allow("libv.ui.component");
+	//	libv::log.allow("libv.ui.event");
 	libv::log.allow("libv.ui.frame");
 	libv::log.allow("libv.ui.glfw");
 	libv::log.allow("libv.ui.layout");

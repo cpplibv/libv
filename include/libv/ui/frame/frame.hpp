@@ -21,11 +21,12 @@
 // pro
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/component/panel.hpp>
+#include <libv/ui/component/ui.hpp>
 #include <libv/ui/events/events.hpp>
 #include <libv/ui/monitor.hpp>
-#include <libv/ui/render/renderer.hpp>
 
-// TODO P3: Documentation asynchronicity of show and setters
+//TODO P2: onClosed and initContext and termContext should make something about there names...
+//TODO P3: future proxy for frame async operations: frame.show().wait();
 
 class GLFWwindow;
 class GLFWmonitor;
@@ -33,9 +34,11 @@ class GLFWmonitor;
 namespace libv {
 namespace ui {
 
+class Component;
+
 // -------------------------------------------------------------------------------------------------
 
-class Frame : public Trackable, private ProtectedContainer {
+class Frame : public Trackable {
 	//Every time a "frame" word is used it is referring to the entire window with
 	//	its VUI objects, handlers, events, states etc... A frame can be exits
 	//	without a window (exp: its not showed yet). A frame temporary can have
@@ -116,6 +119,7 @@ protected:
 	// ---------------------------------------------------------------------------------------------
 
 private:
+	void cmdFrameCreate();
 	/**
 	 * @note If this function fail the member window will be set to nullptr
 	 * @note This function may only be called by the Frame context.
@@ -134,8 +138,7 @@ private:
 	void cmdCoreUpdateDisplayMode();
 
 protected:
-	bool isRenderSkipable();
-	bool isUpdateSkipable();
+	bool isRefreshSkipable();
 
 	// Event Callbacks and Listeners ---------------------------------------------------------------
 private:
@@ -158,7 +161,6 @@ private:
 	void glfwCallback(const EventWindowPos&);
 	void glfwCallback(const EventWindowRefresh&);
 	void glfwCallback(const EventWindowSize&);
-	void glfwCallback(const EventMonitor&);
 
 private:
 	void initEvents();
@@ -221,7 +223,8 @@ private:
 
 private:
 	unsigned int swapInterval = 1;
-	ivec2 pos;
+	ivec2 position;
+	ivec2 size;
 
 private:
 	TypeOpenGLProfile openGLProfile = OPENGL_PROFILE_COMPAT;
@@ -240,8 +243,15 @@ private:
 
 	std::string title;
 
+	// ---------------------------------------------------------------------------------------------
 private:
-	Renderer renderer;
+	UI ui;
+
+public:
+	void addComponent(const observer_ptr<Component>& component);
+	void addComponent(const shared_ptr<Component>& component);
+	void removeComponent(const observer_ptr<Component>& component);
+	void removeComponent(const shared_ptr<Component>& component);
 
 	// ---------------------------------------------------------------------------------------------
 public:
@@ -249,25 +259,6 @@ public:
 	void minimize();
 	void restore();
 	void show();
-
-private:
-	void frameBuild();
-	void frameDestroy();
-	void frameInvalidate();
-	void frameRender();
-	void frameUpdate();
-
-protected:
-	using ProtectedContainer::build;
-	using ProtectedContainer::destroy;
-	using ProtectedContainer::invalidate;
-	using ProtectedContainer::render;
-	using ProtectedContainer::update;
-
-public:
-	using ProtectedContainer::add;
-	using ProtectedContainer::remove;
-	using ProtectedContainer::setLayout;
 
 public:
 	void setOpenGLProfile(TypeOpenGLProfile profile);
@@ -279,15 +270,15 @@ public:
 	void setDecoration(bool decorated);
 	void setDisplayMode(const TypeDisplayMode& mode);
 	void setPosition(int x, int y);
-	void setPosition(const ivec2& pos);
+	void setPosition(ivec2 pos);
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
-	void setSize(const ivec2& size);
+	void setSize(ivec2 size);
 	void setTitle(const std::string& title);
 
 	TypeCloseOperation getCloseOperation() const;
 	TypeDisplayMode getDisplayMode() const;
-	ivec3 getSize() const;
+	ivec2 getSize() const;
 	std::string getTitle() const;
 	// * * *
 
@@ -296,10 +287,16 @@ public:
 	// * * *
 
 	const Monitor* getCurrentMonitor() const;
+
 private:
 	void loopInit();
 	void loop();
 	void loopTerminate();
+
+private:
+	virtual void initContext();
+	virtual void termContext();
+
 public:
 	Frame(unsigned int width = DEFAULT_FRAME_WIDTH,
 			unsigned int height = DEFAULT_FRAME_HEIGHT);

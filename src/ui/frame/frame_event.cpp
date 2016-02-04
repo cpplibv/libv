@@ -7,6 +7,8 @@
 // pro
 #include <libv/ui/log.hpp>
 
+// TODO P5: Limit cursor pos event pre-fire to 1 (solution maybe to use unique signal que)
+
 namespace libv {
 namespace ui {
 
@@ -19,7 +21,7 @@ void glfwCallback(GLFWwindow* window, Args... args) {
 	try {
 		(windowHandlers.at(window)->*que).fire(E(args...));
 	} catch (const std::out_of_range& e) {
-		LIBV_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this window.");
+		LIBV_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 
@@ -43,7 +45,7 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetWindowSizeCallback(window, ::libv::ui::glfwCallback<EventWindowSize, &Frame::eventQueWindowSize, int, int>);
 }
 
-void Frame::unregisterEventCallbacks(GLFWwindow * window) {
+void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 	glfwSetCharCallback(window, nullptr);
 	glfwSetCursorEnterCallback(window, nullptr);
 	glfwSetCursorPosCallback(window, nullptr);
@@ -59,11 +61,12 @@ void Frame::unregisterEventCallbacks(GLFWwindow * window) {
 	glfwSetWindowSizeCallback(window, nullptr);
 
 	windowHandlers.erase(window);
-	//sub for every monitor
-	//glfwSetMonitorCallback(nullptr);
 }
 
 // -------------------------------------------------------------------------------------------------
+
+// These event callbacks called after the first iteration of the loop after the event occurred.
+// These are the realization of an event on the frame object itself.
 
 void Frame::glfwCallback(const EventChar&) { }
 
@@ -76,12 +79,7 @@ void Frame::glfwCallback(const EventCursorPos&) { }
 void Frame::glfwCallback(const EventDrop&) { }
 
 void Frame::glfwCallback(const EventFramebufferSize& e) {
-	if (getDisplaySize().xy() == e.size)
-		return;
-
-	setDisplaySize(ivec3(e.size, getDisplaySize().z));
-	set(Property::Size, getDisplaySize());
-	frameInvalidate();
+	size = e.size;
 }
 
 void Frame::glfwCallback(const EventKey&) { }
@@ -92,24 +90,19 @@ void Frame::glfwCallback(const EventScroll&) { }
 
 void Frame::glfwCallback(const EventWindowClose&) { }
 
-void Frame::glfwCallback(const EventWindowFocus&) {
-//	LIBV_UI_TRACE("Not implemented yet.");
-}
+void Frame::glfwCallback(const EventWindowFocus&) { }
 
 void Frame::glfwCallback(const EventWindowIconify& e) {
 	minimized = e.iconified;
 }
 
 void Frame::glfwCallback(const EventWindowPos& e) {
-	pos = e.position;
+	position = e.position;
 }
 
-void Frame::glfwCallback(const EventWindowRefresh&) {
-}
+void Frame::glfwCallback(const EventWindowRefresh&) { }
 
-void Frame::glfwCallback(const EventWindowSize&) {
-	// EventFramebufferSize event handles this operation
-}
+void Frame::glfwCallback(const EventWindowSize&) { }
 
 // -------------------------------------------------------------------------------------------------
 

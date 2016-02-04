@@ -1,4 +1,14 @@
+http://www.gotw.ca/publications/mill18.htm
+Remove layout -> container should / can handle everything layout related
+
 --- STACK ------------------------------------------------------------------------------------------
+
+remove layout and its folder
+-- commit --
+
+add container folder
+rename PanelFlow to Flow
+-- commit --
 
 string2D
 -- commit --
@@ -19,13 +29,22 @@ remove vm3 from gl
 -- commit --
 
 FIX: Size management - find reason of div by zero? (left-right=0 div)
-FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized
+FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
+-- commit --
+
+?kill def renderer
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+protection againts wrong layouts: skip the render of zero sized comps?
+LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events
+replace every raw ptr with a smart counter part (incl observer_ptr)
+look after and variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
+look after any
+moving vec costume getter functions from member to public -> reducing symbols...
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
@@ -49,12 +68,22 @@ Each low angle eye-normals quad has decreased opacity or even better if per-frag
 
 // -------------------------------------------------------------------------------------------------
 
+Idea for world gen:
+
+"Weighted entries useful in Arrays that can be randomly picked from."
+http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
+http://devmag.org.za/2009/04/25/perlin-noise/
+http://gamedev.stackexchange.com/questions/31241/random-map-generation
+
+// -------------------------------------------------------------------------------------------------
+
 Fully separating the ui from the frame handler is completely possible and desirable.
-It is also possible do it without any dependency between the two with an additional UIFrame class.
+It is also possible do it without any dependency between the two with an additional "UIFrame lib".
 
 cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
 much pain to integrate
 
+// -------------------------------------------------------------------------------------------------
 
 Colors:
 0.236f, 0.311f, 0.311f

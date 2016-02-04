@@ -15,3 +15,22 @@ int main(int, char **) {
 
 	return 0;
 }
+
+//#include <iostream>
+//#include "libv/vec.hpp"
+//
+//int main(int, char **) {
+////	int ax = 0, ay = 0;
+////	int bx = 0, by = 0;
+////	auto cx = ax + bx;
+////	auto cy = ay + by;
+//
+//	libv::ivec2 a;
+//	libv::ivec2 b;
+//	auto c = a + b;
+//
+//	std::cout << c.x << c.y << std::endl;
+////	std::cout << cx << cy << std::endl;
+//
+//	return 0;
+//}

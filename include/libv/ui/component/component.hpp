@@ -10,47 +10,42 @@
 #include <memory>
 #include <string>
 // pro
+#include <libv/ui/component/ui.hpp>
 #include <libv/ui/layout/properties.hpp>
 #include <libv/ui/render/renderer.hpp>
 
-// TODO P4: Protect component DisplayPosition and DisplaySize and Parent
+// TODO P4: Protect component DisplayPosition, DisplaySize, Parent and Frame?
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
 
 class Frame;
 class Container;
 
 class Component {
-private:
-	Container* parent = nullptr;
-	Frame* frame_ = nullptr;
 protected:
-	std::string propertyID;
-	std::string propertyClass;
+	std::string componentID;
+	std::string componentClass;
 
-	ivec3 displayPosition;
-	ivec3 displaySize;
+	vec3 displayPosition;
+	vec3 displaySize;
 
 	std::atomic<bool> invalid{true};
 	PropertyMap properties;
 
 public:
-	void setDisplayPosition(const ivec3& pos);
-	void setDisplaySize(const ivec3& size);
-	ivec3 getDisplayPosition() const;
-	ivec3 getDisplaySize() const;
-
-	Container* getParent() const;
-	void setParent(Container* parent);
-	Frame* frame() const;
+	vec3 getDisplayPosition() const;
+	vec3 getDisplaySize() const;
+	void setDisplayPosition(vec3 pos);
+	void setDisplaySize(vec3 size);
 
 public:
 	template<typename T>
 	T get(const PropertyMap::Address<T>& address) const {
-		return properties.get(address);
+		return *properties.get(address); //!!! <<< nullptr!
 	}
-
 	template <typename T, typename Value>
 	void set(const PropertyMap::Address<T>& address, Value&& value) {
 		properties.set(address, std::forward<Value>(value));
@@ -58,61 +53,51 @@ public:
 	PropertyMap::SetterProxy set() {
 		return properties.set();
 	}
+	void setComponentID(std::string componentID) {
+		this->componentID = componentID;
+	}
 
-public:
-	bool isInvalid() const;
+protected:
 	void validate();
-
-public:
-	/** OpenGL control function. Called before render if the object was previously invalidated.
-	 * @param renderer
-	 * @note Called by render function
-	 * @context GL */
-	virtual void build(Renderer& renderer);
-	/** OpenGL control function. Called before the object is destroyed to cleanup OpenGL resources.
-	 * @param renderer
-	 * @note Called by UI
-	 * @context GL */
-	virtual void destroy(Renderer& renderer);
 	/** Invalidates the object requesting it to rebuild before the next render.
 	 * @context ANY */
-	virtual void invalidate();
-	/** OpenGL control function. Renders the object.
-	 * @context ANY */
-	virtual void render(Renderer& renderer);
-	/** General control function. Updates the object.
-	 * @note Called even if the object is not rendered.
-	 * @context ANY */
-	virtual void update();
+	void invalidate();
+	bool isInvalid() const;
+
+public:
+	void visit(std::function<void(libv::observer_ptr<Component>)>&);
+private:
+	virtual void doVisit(std::function<void(libv::observer_ptr<Component>)>&);
+
+public:
+	/** Control function. Called before render if the object was previously invalidated.
+	 * @param renderer - The render context
+	 * @note Does not require of previous destroy
+	 * @context GL */
+	void build(Renderer& renderer);
+	/** Control function. Called before the object is destroyed to cleanup OpenGL resources.
+	 * @param renderer - The render context
+	 * @note Does not require of previous build
+	 * @context GL */
+	void destroy(Renderer& renderer);
+	/** Control function. Renders the object.
+	 * @note Does not require of previous build
+	 * @param renderer - The render context
+	 * @context GL */
+	void render(Renderer& renderer);
+
+private:
+	virtual void doBuild(Renderer& renderer) = 0;
+	virtual void doDestroy(Renderer& renderer) = 0;
+	virtual void doRender(Renderer& renderer) = 0;
 
 public:
 	Component();
-	Component(ivec3 size);
-	Component(ivec3 size, ivec3 pos);
+	Component(const std::string& componentID, const std::string& componentClass);
 	virtual ~Component();
 };
 
-//class Component : public Component {
-//private:
-//	using Component::getDisplayPosition;
-//	using Component::getDisplaySize;
-//	using Component::setDisplayPosition;
-//	using Component::setDisplaySize;
-//	using Component::setParent;
-//protected:
-//	using Component::getParent;
-//
-//protected:
-//	using Component::build;
-//	using Component::destroy;
-//	using Component::invalidate;
-//	using Component::render;
-//	using Component::update;
-//};
+// -------------------------------------------------------------------------------------------------
 
 } //namespace ui
 } //namespace libv
-
-
-//	bool isActive() const;
-//	bool isFocused() const;

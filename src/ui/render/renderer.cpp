@@ -10,7 +10,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-RenderPrimitiv Renderer::quad(const vec3& pos, const vec3& size, const vec2& txbl, const vec2& txtr) {
+RenderPrimitiv Renderer::quad(vec3 pos, vec3 size, vec2 txbl, vec2 txtr) {
 	float xmin = pos.x;
 	float xmax = pos.x + size.x;
 	float ymin = pos.y;
@@ -32,8 +32,8 @@ RenderPrimitiv Renderer::quad(const vec3& pos, const vec3& size, const vec2& txb
 }
 
 RenderPrimitiv Renderer::triangle(
-		const vec3& a, const vec3& b, const vec3& c,
-		const vec2& ta, const vec2& tb, const vec2& tc) {
+		vec3 a, vec3 b, vec3 c,
+		vec2 ta, vec2 tb, vec2 tc) {
 	data.emplace_back(a, vec3(0, 0, 1), vec3(0, 1, 0), vec3(1, 0, 0), ta);
 	data.emplace_back(b, vec3(0, 0, 1), vec3(0, 1, 0), vec3(1, 0, 0), tb);
 	data.emplace_back(c, vec3(0, 0, 1), vec3(0, 1, 0), vec3(1, 0, 0), tc);
@@ -45,8 +45,8 @@ RenderPrimitiv Renderer::triangle(
 
 Vertex::Vertex() { }
 
-Vertex::Vertex(const vec3& position, const vec3& normal, const vec3& tangent,
-		const vec3& bitangent, const vec2& texCoord0) :
+Vertex::Vertex(vec3 position, vec3 normal, vec3 tangent,
+		vec3 bitangent, vec2 texCoord0) :
 	position(position),
 	normal(normal),
 	tangent(tangent),

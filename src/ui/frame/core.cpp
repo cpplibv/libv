@@ -214,8 +214,13 @@ void Frame::cmdCoreCreate() {
 	//TODO P5: Context sharing
 
 	// No plans for mapping these glfw hints:
-	//GLFW_ACCUM_RED_BITS, GLFW_ACCUM_GREEN_BITS, GLFW_ACCUM_BLUE_BITS, GLFW_ACCUM_ALPHA_BITS,
-	//GLFW_AUX_BUFFERS, GLFW_CLIENT_API, GLFW_DOUBLEBUFFER
+	// GLFW_ACCUM_RED_BITS,
+	// GLFW_ACCUM_GREEN_BITS,
+	// GLFW_ACCUM_BLUE_BITS,
+	// GLFW_ACCUM_ALPHA_BITS,
+	// GLFW_AUX_BUFFERS,
+	// GLFW_CLIENT_API,
+	// GLFW_DOUBLEBUFFER
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
 		LIBV_UI_CORE_INFO("Switching frame [%s] to full screen mode", title);
@@ -233,7 +238,7 @@ void Frame::cmdCoreCreate() {
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 		window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), shareWindow);
 	} else if (displayMode == DISPLAY_MODE_WINDOWED) {
-		window = glfwCreateWindow(getDisplaySize().x, getDisplaySize().y, title.c_str(), nullptr, shareWindow);
+		window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, shareWindow);
 	}
 	if (!window) {
 		LIBV_UI_CORE_ERROR("GLFW window creation failed");
@@ -244,12 +249,11 @@ void Frame::cmdCoreCreate() {
 	} else if (displayMode == DISPLAY_MODE_BORDERLESS) {
 		glfwSetWindowPos(window, 0, 0);
 	} else if (displayMode == DISPLAY_MODE_WINDOWED) {
-		glfwSetWindowPos(window, pos.x, pos.y);
+		glfwSetWindowPos(window, position.x, position.y);
 	}
 
 	registerEventCallbacks(this, window);
 	activateFrame(this);
-	frameInvalidate();
 
 	LIBV_UI_CORE_DEBUG("Window creation was successful");
 }

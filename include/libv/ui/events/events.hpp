@@ -66,7 +66,7 @@ struct EventDrop {
 struct EventFramebufferSize {
 	ivec2 size;
 	EventFramebufferSize(int width, int height) : size(width, height) { }
-	EventFramebufferSize(const ivec2& size) : size(size) { }
+	EventFramebufferSize(ivec2 size) : size(size) { }
 	EventFramebufferSize(const EventFramebufferSize& orig) = default;
 };
 
@@ -117,7 +117,7 @@ struct EventWindowIconify {
 struct EventWindowPos {
 	ivec2 position;
 	EventWindowPos(int x, int y) : position(x, y) { }
-	EventWindowPos(const ivec2& position) : position(position) { }
+	EventWindowPos(ivec2 position) : position(position) { }
 	EventWindowPos(const EventWindowPos& orig) = default;
 };
 
@@ -127,7 +127,7 @@ struct EventWindowRefresh {
 struct EventWindowSize {
 	ivec2 size;
 	EventWindowSize(int x, int y) : size(x, y) { }
-	EventWindowSize(const ivec2& size) : size(size) { }
+	EventWindowSize(ivec2 size) : size(size) { }
 	EventWindowSize(const EventWindowSize& orig) = default;
 };
 

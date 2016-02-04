@@ -53,7 +53,7 @@ int distFromSection(int a, int b, int p) {
 		return 0;
 }
 
-Monitor* Monitor::getMonitorAt(const ivec2& coord) {
+Monitor* Monitor::getMonitorAt(ivec2 coord) {
 	//TODO P5: std::min_element with lambda
 	int min = std::numeric_limits<int>::max();
 

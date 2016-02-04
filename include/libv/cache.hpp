@@ -13,8 +13,6 @@
 #include <mutex>
 #include <set>
 
-#include <iostream>
-
 namespace libv {
 
 //TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache

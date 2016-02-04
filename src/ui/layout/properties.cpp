@@ -8,12 +8,11 @@ namespace ui {
 
 namespace Property {
 
-PropertyMap::Address<ivec3> Size(50, 50, 0);
-PropertyMap::Address<ivec3> Position(0, 0, 0);
-PropertyMap::Address<ivec4> Border(0, 0, 0, 0);
-PropertyMap::Address<ivec4> Margin(0, 0, 0, 0);
-PropertyMap::Address<ivec4> Pedding(0, 0, 0, 0);
-//TODO P3: Property defaults per layout manager ?
+PropertyMap::Address<vec3> Size;
+PropertyMap::Address<vec3> Position;
+PropertyMap::Address<vec4> Border;
+PropertyMap::Address<vec4> Margin;
+PropertyMap::Address<vec4> Pedding;
 
 } //namespace Property
 

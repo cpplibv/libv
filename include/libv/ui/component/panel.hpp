@@ -2,13 +2,23 @@
 
 #pragma once
 
+#include <libv/ui/component/component.hpp>
 #include <libv/ui/component/container.hpp>
 
 namespace libv {
 namespace ui {
 
-struct Panel : public Container {
+// -------------------------------------------------------------------------------------------------
+
+class BasePanel : public Container, public Component {
+	virtual void doBuild(Renderer& renderer) override;
+	virtual void doDestroy(Renderer& renderer) override;
+	virtual void doRender(Renderer& renderer) override;
+public:
+	virtual ~BasePanel() = default;
 };
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace ui
 } //namespace libv

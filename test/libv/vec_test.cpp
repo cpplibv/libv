@@ -3,7 +3,6 @@
 #include <libv/vec.hpp>
 
 #include <catch.hpp>
-#include <iostream>
 
 using namespace libv;
 

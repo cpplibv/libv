@@ -11,29 +11,34 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void Component::build(Renderer&) {
-	LIBV_UI_COMPONENT_TRACE("Build Component");
-	validate();
+void Component::setDisplayPosition(vec3 position) {
+	this->displayPosition = position;
+	invalidate();
 }
 
-void Component::destroy(Renderer&) {
-	LIBV_UI_COMPONENT_TRACE("Destroy Component");
+void Component::setDisplaySize(vec3 size) {
+	this->displaySize = size;
+	invalidate();
 }
 
-void Component::invalidate() {
-	LIBV_UI_COMPONENT_TRACE("Invalidate Component");
-	invalid = true;
+vec3 Component::getDisplayPosition() const {
+	return displayPosition;
 }
 
-void Component::render(Renderer&) {
+vec3 Component::getDisplaySize() const {
+	return displaySize;
 }
-
-void Component::update() { }
 
 // -------------------------------------------------------------------------------------------------
 
 void Component::validate() {
+	LIBV_UI_COMPONENT_TRACE("Validate Component [%s]", componentID);
 	invalid = false;
+}
+
+void Component::invalidate() {
+	LIBV_UI_COMPONENT_TRACE("Invalidate Component [%s]", componentID);
+	invalid = true;
 }
 
 bool Component::isInvalid() const {
@@ -42,53 +47,41 @@ bool Component::isInvalid() const {
 
 // -------------------------------------------------------------------------------------------------
 
-void Component::setDisplayPosition(const ivec3& position) {
-	this->displayPosition = position;
-	//boundsChanged()
-	//invalidate();
+void Component::visit(std::function<void(libv::observer_ptr<Component>)>& func) {
+	doVisit(func);
 }
 
-void Component::setParent(Container* parent) {
-	this->parent = parent;
-	this->frame_ = parent->frame();
-}
-
-void Component::setDisplaySize(const ivec3& size) {
-	this->displaySize = size;
-	//onResize();
-	//invalidate();
+void Component::doVisit(std::function<void(libv::observer_ptr<Component>)>& func) {
+	func(make_observer(this));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-ivec3 Component::getDisplayPosition() const {
-	return displayPosition;
+void Component::build(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Build Component [%s]", componentID);
+	doBuild(renderer);
+	validate();
 }
 
-ivec3 Component::getDisplaySize() const {
-	return displaySize;
+void Component::destroy(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Destroy Component [%s]", componentID);
+	doDestroy(renderer);
 }
 
-Frame* Component::frame() const {
-	return frame_;
-}
+void Component::render(Renderer& renderer) {
+	if (isInvalid())
+		build(renderer);
 
-Container* Component::getParent() const {
-	return parent;
+	doRender(renderer);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 Component::Component() { }
 
-Component::Component(ivec3 size) {
-	set(Property::Size, size);
-}
-
-Component::Component(ivec3 size, ivec3 pos) {
-	set(Property::Size, size);
-	set(Property::Position, pos);
-}
+Component::Component(const std::string& componentID, const std::string& componentClass) :
+	componentID(componentID),
+	componentClass(componentClass) { }
 
 Component::~Component() { }
 
