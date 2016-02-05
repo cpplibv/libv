@@ -29,7 +29,7 @@ struct DynamicVisitable : public DynamicVisitableBase {
 		if (auto ptr = dynamic_cast<DynamicVisitor<Derived>*> (visitor)) {
 			(*ptr)(static_cast<Derived*> (this));
 		} else {
-			throw std::invalid_argument(""); //TODO P5: give it a message
+			throw std::invalid_argument(""); // TODO P5: give it a message
 		}
 	}
 };

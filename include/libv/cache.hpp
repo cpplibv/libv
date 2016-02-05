@@ -15,19 +15,19 @@
 
 namespace libv {
 
-//TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
+// TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
 //  wrapper where the cached object is an other wrapper and with the use of the shared_ptr member
 //  magic ctor
 
-//TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
+// TODO P2: i cant use std::make_shared in caches but i can emulate it! Allocation and Placement
 //	newing the sharedptr and the resource
 
-//TODO P4: Loader cache helyett cache foreign construtorral!! ZSENIÁLLIS!!
+// TODO P4: Loader cache helyett cache foreign construtorral!! ZSENIÁLLIS!!
 //A chacheinternalWrapping osztálya kap egy +arg-ot amivel ő foreign constructálja
 //http://gerardmeier.com/foreign-constructors-cpp
 //és talán kaphatna egy másik objektumot ami descturcálja és igazából a shared_ptr deleterje!!
 
-//TODO P1: cache for forward declared types?
+// TODO P1: cache for forward declared types?
 
 // -------------------------------------------------------------------------------------------------
 
@@ -317,10 +317,10 @@ public:
 public:
 	template<typename CompareOptions = void, typename... Args>
 	std::shared_ptr<T> get(Args&&... args) {
-		//TODO P3: static_assert comparable
-		//TODO P3: static_assert constructor
-		//TODO P3: static_assert compare out indexing
-		//TODO P3: static_assert and sfiane for invalid CompareOptions
+		// TODO P3: static_assert comparable
+		// TODO P3: static_assert constructor
+		// TODO P3: static_assert compare out indexing
+		// TODO P3: static_assert and sfiane for invalid CompareOptions
 		return getImpl<CompareOptions>(std::forward<Args>(args)...);
 	}
 	inline typename Container::size_type size() {

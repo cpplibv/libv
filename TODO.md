@@ -35,6 +35,7 @@ replace every raw ptr with a smart counter part (incl observer_ptr)
 look after and variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
 look after any
 moving vec costume getter functions from member to public -> reducing symbols...
+provide exception free api EVERYWHERE!
 
 --- ABANDONED --------------------------------------------------------------------------------------
 

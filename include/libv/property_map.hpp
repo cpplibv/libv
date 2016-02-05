@@ -9,17 +9,17 @@
 #include <map>
 #include <memory>
 
-//TODO P4: Adopt boost::optional for getters
-//TODO P4: Adopt boost::any
-//TODO P4: Restriction for POD and use "merged" allocation and usage of small_vector
-//TODO P5: Implement some kind of foreach (Maybe external function as / or "callback" for it?)
-//TODO P5: Add functionality for custom address type
+// TODO P4: Adopt boost::optional for getters
+// TODO P4: Adopt boost::any
+// TODO P4: Restriction for POD and use "merged" allocation and usage of small_vector
+// TODO P5: Implement some kind of foreach (Maybe external function as / or "callback" for it?)
+// TODO P5: Add functionality for custom address type
 //				(idea: need to switch back to template addressing and both type and
 //				value is important (hard (imo impossible)))
 //				i think it is possible, however then address should provide more features such as
 //				default...
-//TODO P5: default_value or pair as return type for specific getters? (?mimic std::map?)
-//TODO P5: I think it is possible to eliminate one indirection without UB. Slicing without data is safe?
+// TODO P5: default_value or pair as return type for specific getters? (?mimic std::map?)
+// TODO P5: I think it is possible to eliminate one indirection without UB. Slicing without data is safe?
 //				Implemented a funny pair fix to it, but i think this also can be eliminated
 
 namespace libv {

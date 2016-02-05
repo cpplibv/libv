@@ -120,7 +120,7 @@ void Importer::importNodes(Model& model, const aiScene* scene) {
 	model.nodes.resize(1);
 	importNodes(model, scene, 0, scene->mRootNode);
 
-	//TODO P4: Prompt for Unit scale factor
+	// TODO P4: Prompt for Unit scale factor
 	model.nodes[0].transformation *= glm::scale(glm::vec3(100, 100, 100));
 }
 
@@ -193,7 +193,7 @@ void Importer::importGeometry(Model& model, const aiScene* scene) {
 	}
 }
 
-//TODO P2: flag for adding opposite version on a mesh indices if it is oddly mirrored
+// TODO P2: flag for adding opposite version on a mesh indices if it is oddly mirrored
 
 bool Importer::import(Model& model, const std::string& filePath) {
 	Assimp::Importer importer;

@@ -9,17 +9,14 @@
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
-
 inline std::string& trim_begin(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), std::not1(std::ptr_fun<int, int>(std::isspace))));
 	return s;
 }
-
 inline std::string& trim_end(std::string &s) {
 	s.erase(std::find_if(s.rbegin(), s.rend(), std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
 	return s;
 }
-
 inline std::string& trim(std::string &s) {
 	return trim_begin(trim_end(s));
 }
@@ -46,11 +43,12 @@ template <typename = void> void unicode_to_utf8(char* out, uint32_t unicode) {
 		out[4] = '\0';
 	}
 }
-
 template <typename = void> std::string unicode_to_utf8(uint32_t unicode) {
 	char buf[5];
 	unicode_to_utf8(buf, unicode);
 	return std::string(buf);
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace libv

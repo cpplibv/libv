@@ -41,19 +41,19 @@ namespace ui {
 // advance: distance between origin points
 // kerning: difference in advance depending on the next/previous char
 
-//TODO P1: Kerning now. It is the correct way.
-//TODO P3: Font2D formated version which is btw more than font, its String2D
-//TODO P3: Font size by dpi and pt (only set size and indexing is the problem)
-//TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
-//TODO P3: Default load 'not found' char and use it as a fallback
-//TODO P4: enum class Weight { Bold, Normal };
-//TODO P4: Vertical lines
-//TODO P4: Freetype error handling (Check return locations)
-//TODO P5: Slant slant = Slant::Normal;
-//TODO P5: Improved texture usage algorithm
-//TODO P5: Ctor with std::array_view
-//TODO P5: default font texture size into nice constexpr variable
-//TODO PLog: Log group libv-ui-freetype for freetype err msgs
+// TODO P1: Kerning now. It is the correct way.
+// TODO P3: Font2D formated version which is btw more than font, its String2D
+// TODO P3: Font size by dpi and pt (only set size and indexing is the problem)
+// TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
+// TODO P3: Default load 'not found' char and use it as a fallback
+// TODO P4: enum class Weight { Bold, Normal };
+// TODO P4: Vertical lines
+// TODO P4: Freetype error handling (Check return locations)
+// TODO P5: Slant slant = Slant::Normal;
+// TODO P5: Improved texture usage algorithm
+// TODO P5: Ctor with std::array_view
+// TODO P5: default font texture size into nice constexpr variable
+// TODO PLog: Log group libv-ui-freetype for freetype err msgs
 
 constexpr const size_t DEFAULT_FONT2D_TEXTURE_WIDTH = 512;
 constexpr const size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
@@ -76,7 +76,6 @@ class ShaderFont2D {
  */
 class Font2D {
 public:
-
 	struct Character {
 		vec2 vertexCoord[4];
 		vec2 textureCoord[4];

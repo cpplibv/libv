@@ -16,7 +16,7 @@
 //using Renderable = DynamicVisitable<T>;
 //using RenderableBase = DynamicVisitableBase;
 
-//TODO P3: give function to validate {visitor - visitable} assignment ? ~~ kind of
+// TODO P3: give function to validate {visitor - visitable} assignment ? ~~ kind of
 
 //Felmerült bennem az a gondolat, hogy a rendererek varidic map szerüen legyen hozzárendelve a
 //a renderablekhez

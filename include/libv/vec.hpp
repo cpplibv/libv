@@ -7,26 +7,26 @@
 #include <ostream>
 #include <utility>
 
-//TODO P1: glm implicit cast for vec
-//TODO P1: vec implicit cast for glm
-//TODO P1: refactor to force unrolled loops to remove some of the template magic
-//TODO P1: constexpr vec
-//TODO PMSVC: Disable warnings for nameless struct on MSVC
+// TODO P1: glm implicit cast for vec
+// TODO P1: vec implicit cast for glm
+// TODO P1: refactor to force unrolled loops to remove some of the template magic
+// TODO P1: constexpr vec
+// TODO PMSVC: Disable warnings for nameless struct on MSVC
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
-//TODO P3: remove static_casts from the vecs let implicit cast take place
-//TODO P4: remove template recursion
-//TODO P4: deduce return type everywhere
-//TODO P3: add static_vec_cast
-//TODO P5: operator- with one argument
-//TODO P5: operator+ with one argument
-//TODO P5: perfect forwarding for constructors
-//TODO P5: conditional noexcept
-//TODO P5: fast compare operator with vec and skalar by comparing skalar² and veclenght²
-//TODO P5: reuse rvalues where possible ?
-//TODO P5: macro for debug asserts
-//TODO P5: make sure every function is sfiane frendly
+// TODO P3: remove static_casts from the vecs let implicit cast take place
+// TODO P4: remove template recursion
+// TODO P4: deduce return type everywhere
+// TODO P3: add static_vec_cast
+// TODO P5: operator- with one argument
+// TODO P5: operator+ with one argument
+// TODO P5: perfect forwarding for constructors
+// TODO P5: conditional noexcept
+// TODO P5: fast compare operator with vec and skalar by comparing skalar² and veclenght²
+// TODO P5: reuse rvalues where possible ?
+// TODO P5: macro for debug asserts
+// TODO P5: make sure every function is sfiane frendly
 
 namespace libv {
 

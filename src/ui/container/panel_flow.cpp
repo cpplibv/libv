@@ -13,6 +13,8 @@
 // pro
 #include <libv/ui/log.hpp>
 
+// TODO P5: rename Align to Anchor?
+
 namespace libv {
 namespace ui {
 
@@ -102,7 +104,7 @@ public:
 	static vec3 accumlateSize(const std::vector<Line>& lines) {
 		vec3 result;
 		for (auto line : lines) {
-			//TODO P5: EXTRA large object may "brake" the orientation... look it up
+			// TODO P5: EXTRA large object may "brake" the orientation... look it up
 
 			result = maxByComponents(result, line.getSize()) * line.getOrientation().primaryMask +
 					(result + line.getSize()) * line.getOrientation().secondaryMask;

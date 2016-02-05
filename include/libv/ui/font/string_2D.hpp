@@ -24,13 +24,40 @@ enum class Anchor {
 };
 
 class String2D {
+public:
+	struct Character {
+		vec2 vertexCoord[4];
+		vec2 textureCoord[4];
+	};
+private:
 	Anchor halign = Anchor::Center;
 	Anchor valign = Anchor::Center;
 
-	std::string text;
-	std::vector<Font2D::Character> data;
-	void setText(const std::string&) { }
-	void render() { }
+	std::string rawText;
+	std::vector<String2D::Character> data;
+
+	ivec2 size{0, 0};
+
+	//VBO
+	//VBA
+
+	Font2D deafultFont;
+
+public:
+	String2D() = default;
+	String2D(const std::string& text, Anchor halign = Anchor::Center, Anchor valign = Anchor::Center);
+
+public:
+	void setText(const std::string& text);
+	void setSize(ivec2 size);
+
+public:
+	void build();
+	void destroy();
+	void render();
+
+private:
+	void buildImpl();
 };
 
 // -------------------------------------------------------------------------------------------------

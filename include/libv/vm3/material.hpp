@@ -40,7 +40,7 @@ namespace libv {
 			Material();
 			Material(const std::string& name, const std::string& shader);
 			Material(const Material& orig);
-			//TODO P5: operator=
+			// TODO P5: operator=
 
 			void setName(const std::string& name);
 			void setShader(const std::string& shader);

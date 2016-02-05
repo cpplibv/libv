@@ -25,8 +25,8 @@
 #include <libv/ui/events/events.hpp>
 #include <libv/ui/monitor.hpp>
 
-//TODO P2: onClosed and initContext and termContext should make something about there names...
-//TODO P3: future proxy for frame async operations: frame.show().wait();
+// TODO P2: onClosed and initContext and termContext should make something about there names...
+// TODO P3: future proxy for frame async operations: frame.show().wait();
 
 class GLFWwindow;
 class GLFWmonitor;

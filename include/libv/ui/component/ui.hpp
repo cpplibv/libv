@@ -8,6 +8,8 @@
 // pro
 #include <libv/ui/container/container.hpp>
 
+// TODO P3: Create UIID and UIClass string "aliases" for components and use it to address string
+//		ambiguity on constructors. Name could vary, but suggested to stay short
 // TODO P4: UI Event should not come from directly from frame but from open signals? (remove attach)
 // TODO P4: Render ui into a separate frame buffer, or option set its target
 

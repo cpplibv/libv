@@ -15,7 +15,7 @@ class TaskFlag {
 	bool passed;
 	T result_;
 	std::mutex mutex;
-	std::vector<std::function<void(T)>> targets; //TODO P1: use small_vector
+	std::vector<std::function<void(T)>> targets; // TODO P1: use small_vector
 public:
 	void complete(T result) {
 		std::lock_guard<std::mutex> lock(mutex);
@@ -52,7 +52,7 @@ template<>
 class TaskFlag<void> {
 	bool passed;
 	std::mutex mutex;
-	std::vector<std::function<void() >> targets; //TODO P1: use small_vector
+	std::vector<std::function<void() >> targets; // TODO P1: use small_vector
 public:
 	void complete() {
 		std::lock_guard<std::mutex> lock(mutex);

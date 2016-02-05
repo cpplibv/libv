@@ -9,9 +9,9 @@
 // pro
 #include <libv/vm3/material.hpp>
 
-//TODO P2: Use dynarray instead of vector
-//TODO P2: Use pointers instead of IDs
-//TODO P5: drop boost serialization for vm3
+// TODO P2: Use dynarray instead of vector
+// TODO P2: Use pointers instead of IDs
+// TODO P5: drop boost serialization for vm3
 
 namespace libv {
 namespace vm3 {

@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/ui/font/font_2D.hpp>
+#include <libv/ui/font/string_2D.hpp>
 //pro
 #include <libv/ui/component/component.hpp>
 
@@ -12,10 +12,12 @@ namespace ui {
 
 class Label : public Component {
 private:
-	Font2D deafultFont;
-	// String2D text;
-	std::string text;
-	// Font2D font;
+	String2D text;
+public:
+	Label() = default;
+	Label(const std::string& componentID, const std::string& componentClass) :
+		Component(componentID, componentClass) { }
+
 public:
 	void setText(const std::string& text);
 protected:

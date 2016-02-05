@@ -15,9 +15,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-//TODO P2: ResourceScope: The real ownership will be at the scope and only observer_ptr-s in
+// TODO P2: ResourceScope: The real ownership will be at the scope and only observer_ptr-s in
 //		resources? Think about it...
-//TODO P4: Generalization of a ResourceProxy
+// TODO P4: Generalization of a ResourceProxy
 //IDEA: After vsig is usable in some atomic form, use it for this callback.
 //IDEA: Is there a possibilty for lock freeing this?
 

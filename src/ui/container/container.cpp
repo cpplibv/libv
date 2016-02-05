@@ -11,10 +11,10 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/properties.hpp>
 
-//TODO P4: default layout mrg (dummy fix size max overlapping? or flow?)
-//TODO P4: invalidate in not virtual!
-//TODO P4: build could be eliminated? do your stuff in render?
-//TODO P4: more definite size management (mostly for frame! and its event) (sorry about this task)
+// TODO P4: default layout mrg (dummy fix size max overlapping? or flow?)
+// TODO P4: invalidate in not virtual!
+// TODO P4: build could be eliminated? do your stuff in render?
+// TODO P4: more definite size management (mostly for frame! and its event) (sorry about this task)
 
 namespace libv {
 namespace ui {

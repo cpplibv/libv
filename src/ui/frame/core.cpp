@@ -198,20 +198,20 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 
-	//TODO P4: Map glfw hint GLFW_FLOATING
-	//TODO P4: Map glfw hint GLFW_FOCUSED
-	//TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
-	//TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
-	//TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
-	//TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
-	//TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
-	//TODO P5: Support glfw hint GLFW_STEREO
-	//TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
+	// TODO P4: Map glfw hint GLFW_FLOATING
+	// TODO P4: Map glfw hint GLFW_FOCUSED
+	// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+	// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
+	// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
+	// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
+	// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
+	// TODO P5: Support glfw hint GLFW_STEREO
+	// TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
 
-	//TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
-	//TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
-	//TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
-	//TODO P5: Context sharing
+	// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
+	// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
+	// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
+	// TODO P5: Context sharing
 
 	// No plans for mapping these glfw hints:
 	// GLFW_ACCUM_RED_BITS,
@@ -294,7 +294,7 @@ void Frame::cmdCoreDestroy() {
 
 void Frame::cmdCoreUpdateDisplayMode() {
 	LIBV_UI_CORE_DEBUG("Update display mode for frame [%s]", title);
-	LIBV_UI_CORE_ERROR("Not Implemented Yet"); //TODO P5: cmdCoreUpdateDisplayMode
+	LIBV_UI_CORE_ERROR("Not Implemented Yet"); // TODO P5: cmdCoreUpdateDisplayMode
 }
 
 // -------------------------------------------------------------------------------------------------

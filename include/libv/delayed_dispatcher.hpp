@@ -2,8 +2,8 @@
 
 #pragma once
 
-//TODO P4: Rename to DelayedFunction or AsyncFunction(!)
-//TODO P5: Use std::function
+// TODO P4: Rename to DelayedFunction or AsyncFunction(!)
+// TODO P5: Use std::function
 
 namespace libv {
 

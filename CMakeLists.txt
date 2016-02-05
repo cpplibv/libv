@@ -11,6 +11,7 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # --------------------------------------------------------------------------------------------------
 
+# TODO P2: use cmake copy function instead of "cp"
 # TODO P2: flag or build options to turn on/off sanitizes
 # TODO P2: debug symbol automated turn on/off
 # TODO P3: backward compatibility for pre gcc 5.1 because suggest-override
@@ -107,15 +108,28 @@ endif()
 
 set(EXTERNAL_PROJECT_LIST)
 
+list(APPEND EXTERNAL_PROJECT_LIST ext_utf8cpp)
+ExternalProject_Add(ext_utf8cpp
+	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
+	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
+	PREFIX ${PATH_EXT_SRC}/utf8cpp
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""  # header only, skip tests
+	INSTALL_COMMAND
+		mkdir -p ${PATH_EXT}/utf8cpp/ &&
+		mkdir -p ${PATH_EXT}/utf8cpp/include &&
+		mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp &&
+		cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
 ExternalProject_Add(ext_unittest
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
 	GIT_TAG master
 	PREFIX ${PATH_EXT_SRC}/unittest
-	INSTALL_DIR ${PATH_EXT}/unittest
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/unittest
 	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  #catch is header only, skip tests
+	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		mkdir -p ${PATH_EXT}/unittest/ &&
 		cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
@@ -302,6 +316,7 @@ include_directories(SYSTEM ${PATH_EXT}/glfw/include)
 include_directories(SYSTEM ${PATH_EXT}/gli/include)
 include_directories(SYSTEM ${PATH_EXT}/glm/include)
 include_directories(SYSTEM ${PATH_EXT}/unittest/include)
+include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)

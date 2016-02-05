@@ -15,10 +15,10 @@
 
 //#include <mutex>
 
-//TODO P1: catch exception of fmt::format on bad format
-//TODO P3: Log system should provide an interface to name threads.
+// TODO P1: catch exception of fmt::format on bad format
+// TODO P3: Log system should provide an interface to name threads.
 //			And / Or interact with worker thread name. AHHHAAA! Thread local string!
-//TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
+// TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
 //			system analysis
 
 // -------------------------------------------------------------------------------------------------

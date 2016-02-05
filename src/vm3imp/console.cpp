@@ -12,7 +12,7 @@ namespace vm3 {
 
 // -------------------------------------------------------------------------------------------------
 
-//TODO P3: split line at ;
+// TODO P3: split line at ;
 std::vector<std::string> splitCommandLine(const std::string& line) {
 	std::vector<std::string> result;
 	bool in_quotes = false;
@@ -128,7 +128,7 @@ void Console::execute(const std::string& cmd) {
 				for (auto* arg : argQue) {
 					std::cout << "Missing argument: [" << arg->description << "]" << std::endl;
 				}
-				//return; //TODO: optional argument
+				//return; // TODO: optional argument
 				break; //Validate this... most likely breaks something?
 			}
 
