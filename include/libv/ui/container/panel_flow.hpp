@@ -4,6 +4,8 @@
 
 #include <libv/ui/container/panel.hpp>
 
+// TODO P4: Adopt NewLine property
+
 namespace libv {
 namespace ui {
 

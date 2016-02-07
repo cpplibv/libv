@@ -15,6 +15,7 @@ using PropertyMap = BasicPropertyMap<::boost::container::flat_map>;
 
 namespace Property {
 
+extern PropertyMap::Address<bool> NewLine;
 extern PropertyMap::Address<vec3> Position;
 extern PropertyMap::Address<vec3> Size;
 extern PropertyMap::Address<vec4> Border;

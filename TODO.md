@@ -1,12 +1,15 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-label
+label layout and string2D size
 -- commit --
 
 cleanup / review the full render process
 -- commit --
 
 use VAO for string
+-- commit --
+
+sandbox multiple label under each other
 -- commit --
 
 font cache
@@ -27,6 +30,7 @@ FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+rename folder Data -> res
 protection againts wrong layouts: skip the render of zero sized components?
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);

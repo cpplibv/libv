@@ -41,7 +41,7 @@ void String2D::build() {
 	if (!deafultFont.isLoaded()) {
 		LIBV_UI_COMPONENT_TRACE("Load Font");
 		deafultFont.setSize(12);
-		deafultFont.load("Data/Font/cour.ttf");
+		deafultFont.load("res/font/cour.ttf");
 		checkGL();
 	}
 

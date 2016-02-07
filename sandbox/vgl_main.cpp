@@ -96,20 +96,20 @@ struct Example {
 
 	Example() :
 		shaderDebug("Debug 0",
-		std::make_shared<libv::gl::ShaderVertex>("Data/Shader/debug0.vs"),
-		std::make_shared<libv::gl::ShaderFragment>("Data/Shader/debug0.fs")),
+		std::make_shared<libv::gl::ShaderVertex>("res/shader/debug0.vs"),
+		std::make_shared<libv::gl::ShaderFragment>("res/shader/debug0.fs")),
 		shaderDepth("Depth 0",
-		std::make_shared<libv::gl::ShaderVertex>("Data/Shader/depth.vs"),
-		std::make_shared<libv::gl::ShaderFragment>("Data/Shader/depth.fs")),
-		texture0("Data/Texture/asteorid_02_diffuse.dds"),
-		texture1("Data/Texture/asteorid_02_normal.dds"),
-		texture2("Data/Texture/asteorid_02_ambient.dds"),
+		std::make_shared<libv::gl::ShaderVertex>("res/shader/depth.vs"),
+		std::make_shared<libv::gl::ShaderFragment>("res/shader/depth.fs")),
+		texture0("res/texture/asteorid_02_diffuse.dds"),
+		texture1("res/texture/asteorid_02_normal.dds"),
+		texture2("res/texture/asteorid_02_ambient.dds"),
 
-		model0("Data/Model/test_group.dae.pb.vm3"),
-		model1("Data/Model/fighter_01_eltanin.dae.pb.vm3"),
-		model2("Data/Model/test_sp.dae.pb.vm3"),
-		model3("Data/Model/projectile_missile_01_hellfire.0001.dae.pb.vm3"),
-		model4("Data/Model/asteroid_02.dae.pb.vm3"),
+		model0("res/model/test_group.dae.pb.vm3"),
+		model1("res/model/fighter_01_eltanin.dae.pb.vm3"),
+		model2("res/model/test_sp.dae.pb.vm3"),
+		model3("res/model/projectile_missile_01_hellfire.0001.dae.pb.vm3"),
+		model4("res/model/asteroid_02.dae.pb.vm3"),
 
 		glslMVPmat(shaderDebug, "MVPmat"),
 		glslMmat(shaderDebug, "Mmat"),
@@ -448,17 +448,17 @@ int main(void) {
 //
 //void init() {
 //	shaderDebug = std::make_shared<libv::gl::ShaderProgram>("Simple Debug",
-//			std::make_shared<libv::gl::Shader>("Data/Shader/debug0.vs"),
-//			std::make_shared<libv::gl::Shader>("Data/Shader/debug0.fs"));
+//			std::make_shared<libv::gl::Shader>("res/shader/debug0.vs"),
+//			std::make_shared<libv::gl::Shader>("res/shader/debug0.fs"));
 //	shaderDepth = std::make_shared<libv::gl::ShaderProgram>("Simple Depth",
-//			std::make_shared<libv::gl::Shader>("Data/Shader/depth.vs"),
-//			std::make_shared<libv::gl::Shader>("Data/Shader/depth.fs"));
+//			std::make_shared<libv::gl::Shader>("res/shader/depth.vs"),
+//			std::make_shared<libv::gl::Shader>("res/shader/depth.fs"));
 //	texture0 = std::make_shared<libv::gl::Texture>(
-//			"Data/Texture/asteorid_02_diffuse.dds");
+//			"res/texture/asteorid_02_diffuse.dds");
 //	texture1 = std::make_shared<libv::gl::Texture>(
-//			"Data/Texture/asteorid_02_normal.dds");
+//			"res/texture/asteorid_02_normal.dds");
 //	texture2 = std::make_shared<libv::gl::Texture>(
-//			"Data/Texture/asteorid_02_ambient.dds");
+//			"res/texture/asteorid_02_ambient.dds");
 //	//	model1 = new libv::gl::Model(*modelManager, "test_group.dae.pb");
 //	//	model2 = new libv::gl::Model(*modelManager, "fighter_01_eltanin.dae.pb");
 //	//	model3 = new libv::gl::Model(*modelManager, "test_sp.dae.pb");

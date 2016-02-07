@@ -3,8 +3,6 @@
 // hpp
 #include <libv/ui/component/label.hpp>
 // ext
-//#include <boost/filesystem/path.hpp>
-//#include <GL/glew.h>
 #include <glm/gtc/matrix_transform.hpp>
 // pro
 #include <libv/ui/log.hpp>

@@ -8,8 +8,9 @@ namespace ui {
 
 namespace Property {
 
-PropertyMap::Address<vec3> Size;
+PropertyMap::Address<bool> NewLine;
 PropertyMap::Address<vec3> Position;
+PropertyMap::Address<vec3> Size;
 PropertyMap::Address<vec4> Border;
 PropertyMap::Address<vec4> Margin;
 PropertyMap::Address<vec4> Pedding;
