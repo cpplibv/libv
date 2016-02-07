@@ -142,7 +142,8 @@ private:
 	std::vector<Rule> rules;
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
-	std::string format = "{thread} {severity} [{modul}] {message}\n";
+//	std::string format = "{thread} {severity} [{modul}] {message}\n";
+	std::string format = "{thread} {severity} [{modul}] {message} <{func}:{file}:{line}>\n";
 
 private:
 	bool notable(Severity severity, const std::string& modul) {

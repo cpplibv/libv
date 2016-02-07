@@ -55,11 +55,10 @@ public:
 	Model(const boost::filesystem::path& filePath, const std::string& name);
 	Model(const char* data, const size_t size, const std::string& name = DEFAULT_MODEL_NAME);
 
-	void init(const char* data, const size_t size);
-
 	virtual ~Model();
 
 private:
+	void init(const char* data, const size_t size);
 	void loadGL();
 	void unloadGL();
 

@@ -39,18 +39,18 @@ namespace ui {
 // font family: arial
 // font face: arial italic
 // advance: distance between origin points
-// kerning: difference in advance depending on the next/previous char
+// kering: difference in advance depending on the next/previous char
 
-// TODO P1: Kerning now. It is the correct way.
 // TODO P3: Font2D formated version which is btw more than font, its String2D
 // TODO P3: Font size by dpi and pt (only set size and indexing is the problem)
 // TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
-// TODO P3: Default load 'not found' char and use it as a fallback
 // TODO P4: enum class Weight { Bold, Normal };
 // TODO P4: Vertical lines
-// TODO P4: Freetype error handling (Check return locations)
+// TODO P4: Freetype error handling (Check return locations) for memory leaks (?)
 // TODO P5: Slant slant = Slant::Normal;
-// TODO P5: Improved texture usage algorithm
+// TODO P5: Improved texture usage algorithm (and there is a way to reallocate a new bigger texture)
+//		either use pixel space texture coords end set uniforms for shader and in the shader recalc tx
+//		or observing dependents and invalidating them... first method preferred?
 // TODO P5: Ctor with std::array_view
 // TODO P5: default font texture size into nice constexpr variable
 // TODO PLog: Log group libv-ui-freetype for freetype err msgs
@@ -85,7 +85,7 @@ public:
 private:
 
 	struct CharacterIndex {
-		unsigned int unicode;
+		uint32_t unicode;
 		unsigned int pxSize;
 		bool operator<(const CharacterIndex& rhs) const {
 			return unicode < rhs.unicode || (unicode == rhs.unicode && pxSize < rhs.pxSize);
@@ -162,11 +162,12 @@ public:
 	 * @context ANY
 	 */
 	int getLineAdvance() const;
+	ivec2 getKerning(uint32_t left, uint32_t right) const;
 	/**
 	 * @state This operation requires loaded state
 	 * @context GL
 	 */
-	const Character& getCharacter(unsigned int unicode);
+	const Character& getCharacter(uint32_t unicode);
 	/** Bind the font's shader and texture to the openGL state machine
 	 * @prerequirment GL_TEXTURE_2D has to be enabled
 	 * @state This operation requires loaded state
@@ -181,7 +182,7 @@ public:
 
 private:
 	void loadFace();
-	Character renderCharacter(unsigned int unicode);
+	Character renderCharacter(uint32_t unicode);
 	void uploadTexture();
 };
 

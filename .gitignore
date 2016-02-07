@@ -1,10 +1,10 @@
 /*
 /*/
 
-!Data/
 !cmake/
 !example/
 !include/
+!res/
 !sandbox/
 !src/
 !test/

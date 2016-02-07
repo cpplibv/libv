@@ -153,13 +153,16 @@ private:
 
 int main(int, char**) {
 	std::cout << libv::log;
-	libv::log.allow("libv.ui.component");
-	//	libv::log.allow("libv.ui.event");
-	libv::log.allow("libv.ui.frame");
-	libv::log.allow("libv.ui.glfw");
-	libv::log.allow("libv.ui.layout");
-	libv::log.allow_above(libv::Info);
-	libv::log.deny();
+//	libv::log.allow("libv.ui.component");
+//	//	libv::log.allow("libv.ui.event");
+//	libv::log.allow("libv.ui.frame");
+//	libv::log.allow("libv.ui.glfw");
+//	libv::log.allow("libv.ui.layout");
+//	libv::log.allow("libv.gl");
+//	libv::log.allow_above(libv::Info);
+//	libv::log.deny();
+
+	libv::log.deny("libv.ui.event");
 
 	TestFrame f1("TestFrame");
 	f1.join();

@@ -33,15 +33,14 @@ void Label::doRender(Renderer& gl) {
 	//	LIBV_UI_COMPONENT_TRACE("Render Label");
 
 	const auto position = getDisplayPosition();
-	const auto size = getDisplaySize();
+//	const auto size = getDisplaySize();
 
-	gl.pushMatrixView(glm::ortho(
-			position.x, position.x + size.x,
-			position.y, position.y + size.y,
-			1000.f, -1000.f));
+	gl.pushMatrixModel();
+	glm::translate(gl.matrixModel(), glm::vec3(position.x, position.y, position.z)); // vec-glm
 
-	text.render();
+	text.render(gl);
 
+	gl.popMatrixModel();
 	checkGL();
 }
 

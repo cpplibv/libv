@@ -35,7 +35,7 @@ static std::atomic<size_t> FT_LibUseCount{0};
 
 Font2D::Font2D() {
 	if (!ftLib)
-		if (auto err = FT_Init_FreeType(&ftLib))
+		if (const auto err = FT_Init_FreeType(&ftLib))
 			LIBV_UI_FT_ERROR("FT_Init_FreeType failed: [%d]", err);
 	++FT_LibUseCount;
 
@@ -56,7 +56,7 @@ Font2D::~Font2D() {
 	if (textureID)
 		unload();
 	if (!--FT_LibUseCount)
-		if (auto err = FT_Done_FreeType(ftLib))
+		if (const auto err = FT_Done_FreeType(ftLib))
 			LIBV_UI_FT_ERROR("FT_Done_FreeType failed: [%d]", err);
 }
 
@@ -71,7 +71,7 @@ void Font2D::load(const void* data, const size_t size) {
 }
 
 void Font2D::loadFace() {
-	if (auto err = FT_New_Memory_Face(ftLib,
+	if (const auto err = FT_New_Memory_Face(ftLib,
 			reinterpret_cast<const FT_Byte*> (fileContent.data()), fileContent.size(), 0, &face))
 		return LIBV_UI_FT_ERROR("FT_New_Memory_Face failed: [%d]", err);
 
@@ -106,7 +106,7 @@ void Font2D::setSize(int px) {
 	if (!face)
 		return;
 
-	if (auto err = FT_Set_Char_Size(face, activeFontSize << 6, activeFontSize << 6, 96, 96))
+	if (const auto err = FT_Set_Char_Size(face, activeFontSize << 6, activeFontSize << 6, 96, 96))
 		return LIBV_UI_FT_ERROR("FT_Set_Char_Size failed: [%d]", err);
 }
 
@@ -114,7 +114,23 @@ int Font2D::getLineAdvance() const {
 	return face->height;
 }
 
-const Font2D::Character & Font2D::getCharacter(unsigned int unicode) {
+ivec2 Font2D::getKerning(uint32_t left, uint32_t right) const {
+	FT_Vector kerning;
+	kerning.x = 0;
+	kerning.y = 0;
+
+	if (FT_HAS_KERNING(face)) {
+		int leftID = FT_Get_Char_Index(face, left);
+		int rightID = FT_Get_Char_Index(face, right);
+
+		if (const auto err = FT_Get_Kerning(face, leftID, rightID, FT_KERNING_DEFAULT, &kerning))
+			LIBV_UI_FT_ERROR("FT_Get_Kerning failed: [%d]", err);
+	}
+
+	return ivec2(kerning.x >> 6, kerning.y >> 6); // 26.6 float
+}
+
+const Font2D::Character & Font2D::getCharacter(uint32_t unicode) {
 	const auto infoIndex = CharacterIndex{unicode, activeFontSize};
 	auto infoIt = characterInfos.find(infoIndex);
 	if (infoIt == characterInfos.end()) {
@@ -123,28 +139,26 @@ const Font2D::Character & Font2D::getCharacter(unsigned int unicode) {
 	return infoIt->second;
 }
 
-Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
+Font2D::Character Font2D::renderCharacter(uint32_t unicode) {
 	FT_Glyph glyph = nullptr;
 
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
-	if (auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
+	if (const auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
 		LIBV_UI_FT_ERROR("FT_Load_Glyph failed: [%d]", err);
-	if (auto err = FT_Get_Glyph(face->glyph, &glyph))
+	if (const auto err = FT_Get_Glyph(face->glyph, &glyph))
 		LIBV_UI_FT_ERROR("FT_Get_Glyph failed: [%d]", err);
-	if (auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true))
+	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, nullptr, true))
 		LIBV_UI_FT_ERROR("FT_Glyph_To_Bitmap failed: [%d]", err);
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph> (glyph);
 	const auto bitmap = bitmapGlyph->bitmap;
-	const auto bitmapWidth = bitmap.width;
-	const auto bitmapHeight = bitmap.rows;
+	const auto bitmapWidth = int64_t{bitmap.width};
+	const auto bitmapHeight = int64_t{bitmap.rows};
 
 	Character result;
-	result.advance.x = glyph->advance.x / 64.f; //<<< validate
-	result.advance.y = glyph->advance.y / 64.f;
-	//	result.advance.x = glyph->advance.x >> 6;
-	//	result.advance.y = glyph->advance.y >> 6;
+	result.advance.x = glyph->advance.x / 65536.0f; // 16.16 float
+	result.advance.y = glyph->advance.y / 65536.0f; // 16.16 float
 
 	if (texturePen.x + bitmapWidth > textureSize.x) // Warp to new line
 		texturePen = ivec2(0, textureNextLine);
@@ -168,10 +182,10 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 		}
 	}
 
-	const auto tx0 = (texturePen.x) / textureSize.x;
-	const auto tx1 = (texturePen.x + bitmapWidth) / textureSize.x;
-	const auto ty0 = (texturePen.y) / textureSize.y;
-	const auto ty1 = (texturePen.y + bitmapHeight) / textureSize.y;
+	const auto tx0 = float(texturePen.x) / textureSize.x;
+	const auto tx1 = float(texturePen.x + bitmapWidth) / textureSize.x;
+	const auto ty0 = float(texturePen.y) / textureSize.y;
+	const auto ty1 = float(texturePen.y + bitmapHeight) / textureSize.y;
 	result.textureCoord[0] = vec2(tx0, ty0);
 	result.textureCoord[1] = vec2(tx1, ty0);
 	result.textureCoord[2] = vec2(tx1, ty1);
@@ -181,12 +195,13 @@ Font2D::Character Font2D::renderCharacter(unsigned int unicode) {
 
 	const auto vx0 = bitmapGlyph->left;
 	const auto vx1 = bitmapGlyph->left + bitmapWidth;
-	const auto vy0 = bitmapGlyph->top;
-	const auto vy1 = bitmapGlyph->top + bitmapHeight;
-	result.textureCoord[0] = vec2(vx0, vy0);
-	result.textureCoord[1] = vec2(vx1, vy0);
-	result.textureCoord[2] = vec2(vx1, vy1);
-	result.textureCoord[3] = vec2(vx0, vy1);
+	const auto vy0 = bitmapGlyph->top - bitmapHeight;
+	const auto vy1 = bitmapGlyph->top;
+
+	result.vertexCoord[0] = vec2(vx0, vy0);
+	result.vertexCoord[1] = vec2(vx1, vy0);
+	result.vertexCoord[2] = vec2(vx1, vy1);
+	result.vertexCoord[3] = vec2(vx0, vy1);
 
 	texturePen.x += bitmapWidth; // Progress pen
 	FT_Done_Glyph(glyph);
@@ -220,6 +235,7 @@ void Font2D::bind() {
 
 	gl::activeTexture(gl::TextureType::diffuse);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+	checkGL();
 }
 
 void Font2D::unbind() {

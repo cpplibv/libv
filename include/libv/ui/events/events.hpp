@@ -23,19 +23,19 @@ class Monitor;
 class Frame;
 
 struct EventChar {
-	unsigned int unicode;
+	uint32_t unicode;
 	char utf8[5];
-	EventChar(unsigned int unicode) : unicode(unicode) {
+	EventChar(uint32_t unicode) : unicode(unicode) {
 		libv::unicode_to_utf8(utf8, unicode);
 	}
 	EventChar(const EventChar& orig) = default;
 };
 
 struct EventCharMods {
-	unsigned int unicode;
+	uint32_t unicode;
 	int mods;
 	char utf8[5];
-	EventCharMods(unsigned int unicode, int mods) : unicode(unicode), mods(mods) {
+	EventCharMods(uint32_t unicode, int mods) : unicode(unicode), mods(mods) {
 		libv::unicode_to_utf8(utf8, unicode);
 	}
 	EventCharMods(const EventCharMods& orig) = default;

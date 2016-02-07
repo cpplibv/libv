@@ -23,7 +23,6 @@ namespace libv {
 namespace gl {
 
 // TODO P2: Model default ctor and load function with the same params as the ctors
-// TODO P2: Shader default ctor and load function with the same params as the ctors
 // TODO P2: Texture default ctor and load function with the same params as the ctors
 
 // -------------------------------------------------------------------------------------------------

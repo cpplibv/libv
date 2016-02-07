@@ -7,8 +7,8 @@
 #include <ostream>
 #include <utility>
 
-// TODO P1: glm implicit cast for vec
-// TODO P1: vec implicit cast for glm
+// TODO P1: glm implicit cast for vec // marked in code with "vec-glm" uses
+// TODO P1: vec implicit cast for glm // marked in code with "vec-glm" uses
 // TODO P1: refactor to force unrolled loops to remove some of the template magic
 // TODO P1: constexpr vec
 // TODO PMSVC: Disable warnings for nameless struct on MSVC
@@ -484,14 +484,25 @@ inline std::ostream& operator<<(
 	return os;
 }
 
-// maxByComponents ---------------------------------------------------------------------------------
+// maxByDimensions ---------------------------------------------------------------------------------
 
 template<size_t N, typename T, size_t... Indices>
-inline vec_helper_t<N, T> maxByComponents(
+inline vec_helper_t<N, T> maxByDimensions(
 	const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs,
 	const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs) noexcept {
 	return vec_helper_t<N, T>(
 				std::max(lhs.ptr[Indices], rhs.ptr[Indices])...
+			);
+}
+
+// minByDimensions ---------------------------------------------------------------------------------
+
+template<size_t N, typename T, size_t... Indices>
+inline vec_helper_t<N, T> minByDimensions(
+	const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs,
+	const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs) noexcept {
+	return vec_helper_t<N, T>(
+				std::min(lhs.ptr[Indices], rhs.ptr[Indices])...
 			);
 }
 

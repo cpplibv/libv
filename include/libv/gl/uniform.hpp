@@ -84,8 +84,12 @@ class Uniform {
 private:
 	GLint location;
 public:
+	Uniform() = default;
 	Uniform(const ShaderProgram& shaderProgram, const std::string& name) :
 		location(shaderProgram.getActiveUniformLocation(name)) { }
+	void assign(const ShaderProgram& shaderProgram, const std::string& name) {
+		location = shaderProgram.getActiveUniformLocation(name);
+	}
 	inline void operator=(const T& val) {
 		libv::gl::glUniform(location, val);
 	}

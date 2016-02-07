@@ -20,8 +20,9 @@ void BasePanel::doDestroy(Renderer& gl) {
 }
 
 void BasePanel::doRender(Renderer& gl) {
-//	gl.pushMatrixView(glm::translate(displayPosition));
-	gl.pushMatrixView(glm::translate(glm::vec3(displayPosition.x, displayPosition.y, displayPosition.z)));
+	gl.pushMatrixView();
+	glm::translate(gl.matrixMVP(), glm::vec3(displayPosition.x, displayPosition.y, displayPosition.z));
+	// vec-glm
 	Container::renderComponents(gl);
 	gl.popMatrixView();
 }

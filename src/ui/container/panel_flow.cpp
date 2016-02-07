@@ -85,7 +85,7 @@ public:
 	inline void add(adaptive_ptr<Component> comp) {
 		compoments.push_back(comp);
 		auto compSize = comp->get(Property::Size);
-		size = maxByComponents(size, compSize) * orientData.secondaryMask +
+		size = maxByDimensions(size, compSize) * orientData.secondaryMask +
 				(size + compSize) * orientData.primaryMask;
 	}
 
@@ -106,7 +106,7 @@ public:
 		for (auto line : lines) {
 			// TODO P5: EXTRA large object may "brake" the orientation... look it up
 
-			result = maxByComponents(result, line.getSize()) * line.getOrientation().primaryMask +
+			result = maxByDimensions(result, line.getSize()) * line.getOrientation().primaryMask +
 					(result + line.getSize()) * line.getOrientation().secondaryMask;
 		}
 		return result;

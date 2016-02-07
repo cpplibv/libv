@@ -61,7 +61,7 @@ void UI::render() {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::viewport(position, size);
-	gl.pushMatrixView(glm::ortho(position.x, position.x + size.x, position.y, position.y + size.y, 1000, -1000));
+	gl.pushMatrixView(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
 
 	Container::renderComponents(gl);
 

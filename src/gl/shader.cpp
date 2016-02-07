@@ -31,6 +31,8 @@ const char* shaderTypeToString(GLenum type) {
 
 // Shader --------------------------------------------------------------------------------------
 
+BaseShader::BaseShader() { }
+
 BaseShader::BaseShader(
 		const boost::asio::const_buffer& data, const GLenum type, const std::string& name) :
 	BaseShader(boost::asio::buffer_cast<const char*>(data), boost::asio::buffer_size(data), type, name) { }
@@ -38,25 +40,19 @@ BaseShader::BaseShader(
 BaseShader::BaseShader(const boost::filesystem::path& filePath, const GLenum type) :
 	BaseShader(filePath, type, filePath.string()) { }
 
-BaseShader::BaseShader(
-		const boost::filesystem::path& filePath, const GLenum type, const std::string& name) :
+BaseShader::BaseShader(const boost::filesystem::path& filePath, const GLenum type, const std::string& name) :
 	type(type),
 	name(name) {
 
 	const auto data = readFile(filePath);
-	init(data.data());
+	loadImpl(data.data());
 }
 
-BaseShader::BaseShader(
-		const char* data, const size_t, const GLenum type, const std::string& name) :
+BaseShader::BaseShader(const char* data, const size_t, const GLenum type, const std::string& name) :
 	type(type),
 	name(name) {
 
-	init(data);
-}
-
-void BaseShader::init(const char* source) {
-	loadGL(source);
+	loadImpl(data);
 }
 
 BaseShader::~BaseShader() {
@@ -64,6 +60,35 @@ BaseShader::~BaseShader() {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void BaseShader::load(const boost::asio::const_buffer& data, const GLenum type, const std::string& name) {
+	load(boost::asio::buffer_cast<const char*>(data), boost::asio::buffer_size(data), type, name);
+}
+
+void BaseShader::load(const boost::filesystem::path& filePath, const GLenum type) {
+	load(filePath, type, filePath.string());
+}
+
+void BaseShader::load(const boost::filesystem::path& filePath, const GLenum type, const std::string& name) {
+	this->type = type;
+	this->name = name;
+
+	const auto data = readFile(filePath);
+	loadImpl(data.data());
+}
+
+void BaseShader::load(const char* data, const size_t, const GLenum type, const std::string& name) {
+	this->type = type;
+	this->name = name;
+
+	loadImpl(data);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BaseShader::loadImpl(const char* source) {
+	loadGL(source);
+}
 
 void BaseShader::loadGL(const char* source) {
 	LIBV_GL_TRACE("GL Loading %s shader: [%s]", shaderTypeToString(type), name);
@@ -100,6 +125,18 @@ ShaderProgram::ShaderProgram(
 	loadGL();
 	mapAttributes();
 	mapUniforms();
+}
+
+void ShaderProgram::load(const std::string& name, const std::shared_ptr<BaseShader>& shaderVertex, const std::shared_ptr<BaseShader>& shaderFragment) {
+	load(name, shaderVertex, shaderFragment, nullptr);
+}
+
+void ShaderProgram::load(const std::string& name, const std::shared_ptr<BaseShader>& shaderVertex, const std::shared_ptr<BaseShader>& shaderFragment, const std::shared_ptr<BaseShader>& shaderGeometry) {
+	this->name = name;
+	this->shaderVertex = shaderVertex;
+	this->shaderFragment = shaderFragment;
+	this->shaderGeometry = shaderGeometry;
+	loadGL();
 }
 
 ShaderProgram::~ShaderProgram() {
@@ -188,35 +225,3 @@ void ShaderProgram::use() {
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
-
-//uniformLocs[i] = glGetUniformLocation(id, uniforms().at(i).c_str());
-//
-//void GL::useProgram(ShaderProgram&) { ...
-//	glUseProgram(id); ...
-//	currentShaderProgram = this;
-//}
-//
-//void useProgram();
-//void printActiveUniforms();
-//void infos();
-
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
-
-//glm::mat4 Light::getPmat() {
-//	if (type == spotLight)
-//		return perspective<float>(acos(outerCosAngle) * 180.0f / PI * 2, 1.0f, range / 15.0f, range); //2szeres outer sz�g, mivel nek�nk nem a 'fele' kell hanem a teljes 'sug�r'
-//	else if (type == dirLight)
-//		return ortho<float>(-90, 90, -90, 90, -90, 90);
-//	else //if (type == pointLight)
-//		return ortho<float>(-30, 30, -30, 30, -10, 150);
-//}
-//
-//glm::mat4 Light::getVmat() {
-//	if (type == spotLight)
-//		return lookAt(position, position + direction, glm::glm::vec3(0, 1, 0));
-//	else if (type == dirLight)
-//		return lookAt(glm::vec3(0, 0, 0), direction, glm::glm::vec3(0, 1, 0));
-//	else //if (type == pointLight)
-//		return ortho<float>(-30, 30, -30, 30, -10, 150);
-//}

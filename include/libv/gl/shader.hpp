@@ -48,21 +48,24 @@ const char* shaderTypeToString(GLenum type);
 class BaseShader {
 private:
 	GLuint shaderID = 0;
-	const GLenum type;
+	GLenum type;
 	std::string name;
 
 public:
-	BaseShader(
-			const boost::asio::const_buffer& data, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
-	BaseShader(
-			const boost::filesystem::path& filePath, const GLenum type);
-	BaseShader(
-			const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
-	BaseShader(
-			const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+	BaseShader();
+	BaseShader(const boost::asio::const_buffer& data, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+	BaseShader(const boost::filesystem::path& filePath, const GLenum type);
+	BaseShader(const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
+	BaseShader(const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+	~BaseShader();
 
-	void init(const char* source);
+	void load(const boost::asio::const_buffer& data, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+	void load(const boost::filesystem::path& filePath, const GLenum type);
+	void load(const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
+	void load(const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+
 private:
+	void loadImpl(const char* source);
 	void loadGL(const char* source);
 	void unloadGL();
 
@@ -71,7 +74,6 @@ public:
 		return shaderID;
 	}
 
-	~BaseShader();
 };
 
 // ShaderHelper ------------------------------------------------------------------------------------
@@ -80,6 +82,7 @@ namespace detail {
 
 template<GLenum TYPE, const char* DEFAULT_NAME>
 struct ShaderHelper : public BaseShader {
+	ShaderHelper() = default;
 	ShaderHelper(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_NAME) :
 		BaseShader(data, TYPE, name) { }
 	ShaderHelper(const boost::filesystem::path& filePath) :
@@ -88,6 +91,18 @@ struct ShaderHelper : public BaseShader {
 		BaseShader(filePath, TYPE, name) { }
 	ShaderHelper(const char* data, const size_t size, const std::string& name = DEFAULT_NAME) :
 		BaseShader(data, size, TYPE, name) { }
+	void load(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_NAME) {
+		BaseShader::load(data, TYPE, name);
+	}
+	void load(const boost::filesystem::path& filePath) {
+		BaseShader::load(filePath, TYPE);
+	}
+	void load(const boost::filesystem::path& filePath, const std::string& name) {
+		BaseShader::load(filePath, TYPE, name);
+	}
+	void load(const char* data, const size_t size, const std::string& name = DEFAULT_NAME) {
+		BaseShader::load(data, size, TYPE, name);
+	}
 };
 
 } //namespace detail
@@ -101,6 +116,7 @@ using ShaderFragment = detail::ShaderHelper<GL_FRAGMENT_SHADER, DEFAULT_SHADER_F
 // ShaderProgram -----------------------------------------------------------------------------------
 
 class ShaderProgram {
+
 	struct UniformInfo {
 		GLint location;
 		GLint index;
@@ -112,7 +128,7 @@ private:
 	std::string name;
 
 private:
-//	boost::container::flat_map<std::string, UniformInfo> addressesAttribute;
+	//	boost::container::flat_map<std::string, UniformInfo> addressesAttribute;
 	boost::container::flat_map<std::string, UniformInfo> addressesUniform;
 
 private:
@@ -121,16 +137,27 @@ private:
 	std::shared_ptr<BaseShader> shaderFragment;
 
 public:
+	ShaderProgram() = default;
 	ShaderProgram(
 			const std::string& name,
 			const std::shared_ptr<BaseShader>& shaderVertex,
 			const std::shared_ptr<BaseShader>& shaderFragment) :
-		ShaderProgram(name, shaderVertex, nullptr, shaderFragment) { }
+		ShaderProgram(name, shaderVertex, shaderFragment, nullptr) { }
 	ShaderProgram(
 			const std::string& name,
 			const std::shared_ptr<BaseShader>& shaderVertex,
-			const std::shared_ptr<BaseShader>& shaderGeometry,
+			const std::shared_ptr<BaseShader>& shaderFragment,
+			const std::shared_ptr<BaseShader>& shaderGeometry);
+
+	void load(
+			const std::string& name,
+			const std::shared_ptr<BaseShader>& shaderVertex,
 			const std::shared_ptr<BaseShader>& shaderFragment);
+	void load(
+			const std::string& name,
+			const std::shared_ptr<BaseShader>& shaderVertex,
+			const std::shared_ptr<BaseShader>& shaderFragment,
+			const std::shared_ptr<BaseShader>& shaderGeometry);
 
 	virtual ~ShaderProgram();
 
@@ -139,6 +166,11 @@ private:
 	void mapAttributes();
 	void mapUniforms();
 	void unloadGL();
+
+public:
+	bool isLoaded() {
+		return programID;
+	}
 
 public:
 	void use();

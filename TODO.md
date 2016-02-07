@@ -1,12 +1,12 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-string2D
--- commit --
-
 label
 -- commit --
 
-font shader
+cleanup / review the full render process
+-- commit --
+
+use VAO for string
 -- commit --
 
 font cache
@@ -27,7 +27,7 @@ FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-protection againts wrong layouts: skip the render of zero sized comps?
+protection againts wrong layouts: skip the render of zero sized components?
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events
@@ -353,5 +353,25 @@ void vglViewportFullScreen() {
 	glViewport(0, 0, options.graphics.resolution.get().x
 			, options.graphics.resolution.get().y);
 }
+
+
+//glm::mat4 Light::getPmat() {
+//	if (type == spotLight)
+//		return perspective<float>(acos(outerCosAngle) * 180.0f / PI * 2, 1.0f, range / 15.0f, range); //2szeres outer sz�g, mivel nek�nk nem a 'fele' kell hanem a teljes 'sug�r'
+//	else if (type == dirLight)
+//		return ortho<float>(-90, 90, -90, 90, -90, 90);
+//	else //if (type == pointLight)
+//		return ortho<float>(-30, 30, -30, 30, -10, 150);
+//}
+//
+//glm::mat4 Light::getVmat() {
+//	if (type == spotLight)
+//		return lookAt(position, position + direction, glm::glm::vec3(0, 1, 0));
+//	else if (type == dirLight)
+//		return lookAt(glm::vec3(0, 0, 0), direction, glm::glm::vec3(0, 1, 0));
+//	else //if (type == pointLight)
+//		return ortho<float>(-30, 30, -30, 30, -10, 150);
+//}
+
 
 std::this_thread::sleep_for(std::chrono::seconds(2));

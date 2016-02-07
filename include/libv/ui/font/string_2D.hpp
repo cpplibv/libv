@@ -3,12 +3,14 @@
 #pragma once
 
 // libv
+#include <libv/gl/shader.hpp>
 #include <libv/vec.hpp>
 // std
 #include <string>
 #include <vector>
 // pro
 #include <libv/ui/font/font_2D.hpp>
+#include <libv/ui/render/renderer.hpp>
 
 namespace libv {
 namespace ui {
@@ -26,22 +28,28 @@ enum class Anchor {
 class String2D {
 public:
 	struct Character {
-		vec2 vertexCoord[4];
-		vec2 textureCoord[4];
+		vec2 vertexCoord[6];
+		vec2 textureCoord[6];
 	};
 private:
 	Anchor halign = Anchor::Center;
 	Anchor valign = Anchor::Center;
 
+	ivec2 size;
+	ivec2 layoutedSize;
+
 	std::string rawText;
 	std::vector<String2D::Character> data;
-
-	ivec2 size{0, 0};
 
 	//VBO
 	//VBA
 
 	Font2D deafultFont;
+	std::shared_ptr<gl::ShaderProgram> defaultShader;
+	gl::Uniform<glm::mat4> uniformMVPmat;
+	gl::Uniform<gl::TextureType> uniformTextureSampler;
+	// TODO P2: Uniform Aliases!
+	// TODO P5: Shader should be part of the "font descriptor" to allow same font with multiple shader...
 
 public:
 	String2D() = default;
@@ -54,7 +62,7 @@ public:
 public:
 	void build();
 	void destroy();
-	void render();
+	void render(Renderer& gl);
 
 private:
 	void buildImpl();
