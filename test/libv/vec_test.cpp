@@ -3,6 +3,7 @@
 #include <libv/vec.hpp>
 
 #include <catch.hpp>
+#include <string>
 
 using namespace libv;
 
@@ -161,5 +162,178 @@ TEST_CASE("normalize") {
 	CHECK(2 < vec0);
 	CHECK(2 > vec0.normalized());
 
-	CHECK(1 == Approx(vec0.normalized().length()).epsilon(0.0001));
+	CHECK(1 == Approx(vec0.normalized().length()));
+}
+
+TEST_CASE("Custom getter functions") {
+	ivec4 vec0(1, 2, 3, 4);
+
+	CHECK(vec0.xy() == ivec2(1, 2));
+	CHECK(vec0.xyz() == ivec3(1, 2, 3));
+	CHECK(vec0.xyzw() == vec0);
+
+	CHECK(vec0.xxww() == ivec4(1, 1, 4, 4));
+
+	CHECK(vec0[0] == 1);
+	CHECK(vec0[1] == 2);
+	CHECK(vec0[2] == 3);
+	CHECK(vec0[3] == 4);
+}
+
+TEST_CASE("Copy ctor from different type") {
+	vec4 v0(1.1, 2.1, 3.1, 4.1);
+	ivec4 v1(v0);
+
+	CHECK(v1 == ivec4(1, 2, 3, 4));
+}
+
+TEST_CASE("Non trivially destructible type") {
+	vec_t<2, std::string> v0("x", "y");
+
+	CHECK(v0[0] == "x");
+	CHECK(v0[1] == "y");
+}
+
+TEST_CASE("Operator=") {
+	vec_t<2, float> v0(1.1, 2.1);
+	vec_t<2, float> v1(4.1, 5.1);
+	vec_t<2, int> v2(1, 2);
+
+	v0 = v1;
+	v2 = v0;
+
+	CHECK(v2 == ivec2(4, 5));
+}
+
+TEST_CASE("Operator*=") {
+	vec_t<2, int> v0(1, 2);
+
+	vec_t<2, int> v1(1, 1);
+	vec_t<2, int> v2(4, 4);
+	vec_t<2, int> v3(2, 2);
+	vec_t<2, int> v4(3, 0);
+
+	v0 += v1;
+	CHECK(v0 == ivec2(2, 3));
+	v0 *= v2;
+	CHECK(v0 == ivec2(8, 12));
+	v0 /= v3;
+	CHECK(v0 == ivec2(4, 6));
+	v0 -= v4;
+	CHECK(v0 == ivec2(1, 6));
+}
+
+TEST_CASE("length") {
+	vec_t<2, float> v0(0, 10);
+	vec_t<2, float> v1(10, 10);
+
+	CHECK(10.0f == Approx(v0.length()));
+	CHECK(100.0f == Approx(v0.lengthSquare()));
+	CHECK(14.1421f == Approx(v1.length()));
+	CHECK(200.0f == Approx(v1.lengthSquare()));
+}
+
+TEST_CASE("operator*(vec, vec)") {
+	vec_t<2, int> v0(1, 2);
+
+	vec_t<2, int> v1(1, 1);
+	vec_t<2, int> v2(4, 4);
+	vec_t<2, int> v3(2, 2);
+	vec_t<2, int> v4(3, 0);
+
+	auto r0 = (v0 + v1);
+	auto r1 = (v0 * v2);
+	auto r2 = (v0 / v3);
+	auto r3 = (v0 - v4);
+
+	static_assert(std::is_same<vec_t<2, int>, decltype(r0)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r1)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r2)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r3)>::value, "Wrong result type.");
+
+	CHECK((v0 + v1) == ivec2(2, 3));
+	CHECK((v0 * v2) == ivec2(4, 8));
+	CHECK((v0 / v3) == ivec2(0, 1));
+	CHECK((v0 - v4) == ivec2(-2, 2));
+}
+
+TEST_CASE("operator*(vec, vec) with different types") {
+	vec_t<2, float> v0(1, 2);
+
+	vec_t<2, int> v1(1, 1);
+	vec_t<2, int> v2(4, 4);
+	vec_t<2, int> v3(2, 2);
+	vec_t<2, int> v4(3, 0);
+
+	auto r0 = (v0 + v1);
+	auto r1 = (v0 * v2);
+	auto r2 = (v0 / v3);
+	auto r3 = (v0 - v4);
+
+	static_assert(std::is_same<vec_t<2, float>, decltype(r0)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r1)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r2)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r3)>::value, "Wrong result type.");
+
+	CHECK(r0 == fvec2(2, 3));
+	CHECK(r1 == fvec2(4, 8));
+	CHECK(r2 == fvec2(0.5f, 1));
+	CHECK(r3 == fvec2(-2, 2));
+}
+
+TEST_CASE("operator*(vec, skalar)") {
+	vec_t<2, int> v0(4, 8);
+
+	int v1 = 2;
+	int v2 = 8;
+
+	auto r0 = (v0 * v1);
+	auto r1 = (v0 / v2);
+	auto r2 = (v1 * v0);
+	auto r3 = (v2 / v0);
+
+	static_assert(std::is_same<vec_t<2, int>, decltype(r0)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r1)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r2)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r3)>::value, "Wrong result type.");
+
+	CHECK(r0 == ivec2(8, 16));
+	CHECK(r1 == ivec2(0, 1));
+	CHECK(r2 == ivec2(8, 16));
+	CHECK(r3 == ivec2(2, 1));
+}
+
+TEST_CASE("operator*(vec, skalar) with different types") {
+	vec_t<2, int> v0(4, 8);
+
+	float v1 = 2;
+	float v2 = 8;
+
+	auto r0 = (v0 * v1);
+	auto r1 = (v0 / v2);
+	auto r2 = (v1 * v0);
+	auto r3 = (v2 / v0);
+
+	static_assert(std::is_same<vec_t<2, float>, decltype(r0)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r1)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r2)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, float>, decltype(r3)>::value, "Wrong result type.");
+
+	CHECK(r0 == fvec2(8, 16));
+	CHECK(r1 == fvec2(0.5f, 1));
+	CHECK(r2 == fvec2(8, 16));
+	CHECK(r3 == fvec2(2, 1));
+}
+
+TEST_CASE("operator+") {
+	vec_t<2, int> v0(4, 8);
+
+	auto r0 = +v0;
+	auto r1 = -v0;
+
+	static_assert(std::is_same<vec_t<2, int>, decltype(r0)>::value, "Wrong result type.");
+	static_assert(std::is_same<vec_t<2, int>, decltype(r1)>::value, "Wrong result type.");
+
+	CHECK(r0 == ivec2(4, 8));
+	CHECK(r1 == ivec2(-4, -8));
 }
