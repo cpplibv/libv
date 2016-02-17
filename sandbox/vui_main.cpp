@@ -89,22 +89,47 @@ void initGL() {
 }
 
 class TestFrame : public Frame {
-	Label lbl;
+	Label lbl0;
+	Label lbl1;
 	PanelFlow lf;
 
 	void init() {
-		lbl.setComponentID("Label");
-		lbl.setText("Hello UI!");
-		lbl.set(Property::Size, ivec3(512, 512, 0));
+		lbl0.setComponentID("Label0");
+		lbl0.setText("Label0 with interactivity! ");
+		lbl0.set()
+			(Property::Size, vec3(256, 256, 0))
+//			(Property::NewLine, false)
+		;
+
+		lbl1.setComponentID("Label1");
+		lbl1.setText("Label1 with some text on it.");
+		lbl1.set()
+			(Property::Size, vec3(256, 256, 0))
+//			(Property::NewLine, false)
+		;
 
 		lf.setComponentID("Panel");
-		lf.add(make_observer(&lbl));
+		lf.add(make_observer(&lbl1));
+		lf.add(make_observer(&lbl0));
 
 		addComponent(make_observer(&lf));
+
+		onChar.output([this](auto e) {
+			lbl0.setText(lbl0.getText() + e.utf8);
+		});
 
 		onKey.output([this](const EventKey & e) {
 			if (e.key == 256)
 				closeDefault();
+			if (e.key == 257)
+				lbl0.setText("");
+			if (e.key == 259 && e.action != 0) {
+				auto t = lbl0.getText();
+				if (t.size() > 0) {
+					t.pop_back();
+					lbl0.setText(t);
+				}
+			}
 
 			if (e.key == 'X') {
 				setDecoration(!isDecorated());
@@ -113,6 +138,7 @@ class TestFrame : public Frame {
 	}
 
 public:
+
 	TestFrame(const std::string& title) : Frame(title) {
 		noisyEvents(*this);
 		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize() / 2);
@@ -125,6 +151,7 @@ public:
 	}
 
 private:
+
 	virtual void initContext() override {
 		LIBV_UI_FRAME_DEBUG("Initialize context");
 		initGLEW();
@@ -153,14 +180,14 @@ private:
 
 int main(int, char**) {
 	std::cout << libv::log;
-//	libv::log.allow("libv.ui.component");
-//	//	libv::log.allow("libv.ui.event");
-//	libv::log.allow("libv.ui.frame");
-//	libv::log.allow("libv.ui.glfw");
-//	libv::log.allow("libv.ui.layout");
-//	libv::log.allow("libv.gl");
-//	libv::log.allow_above(libv::Info);
-//	libv::log.deny();
+	//	libv::log.allow("libv.ui.component");
+	////	libv::log.allow("libv.ui.event");
+	//	libv::log.allow("libv.ui.frame");
+	//	libv::log.allow("libv.ui.glfw");
+	//	libv::log.allow("libv.ui.layout");
+	//	libv::log.allow("libv.gl");
+	//	libv::log.allow_above(libv::Info);
+	//	libv::log.deny();
 
 	libv::log.deny("libv.ui.event");
 

@@ -162,6 +162,11 @@ public:
 	 * @context ANY
 	 */
 	int getLineAdvance() const;
+	/**
+	 * @state This operation requires loaded state
+	 * @context ANY
+	 */
+	int getDescender() const;
 	ivec2 getKerning(uint32_t left, uint32_t right) const;
 	/**
 	 * @state This operation requires loaded state

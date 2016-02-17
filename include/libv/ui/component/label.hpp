@@ -20,6 +20,10 @@ public:
 
 public:
 	void setText(const std::string& text);
+	std::string getText() const {
+		return text.getText();
+	}
+
 protected:
 	virtual void doBuild(Renderer& renderer) override;
 	virtual void doDestroy(Renderer& renderer) override;

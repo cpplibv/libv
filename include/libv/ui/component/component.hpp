@@ -44,7 +44,8 @@ public:
 public:
 	template<typename T>
 	T get(const PropertyMap::Address<T>& address) const {
-		return *properties.get(address); //!!! <<< nullptr!
+		auto ptr = properties.get(address);
+		return ptr ? *ptr : T();
 	}
 	template <typename T, typename Value>
 	void set(const PropertyMap::Address<T>& address, Value&& value) {

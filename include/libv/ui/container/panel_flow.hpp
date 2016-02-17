@@ -36,19 +36,19 @@ public:
 	static const Orient ORIENT_RIGHT_DOWN;
 
 private:
-	Align align = ALIGN_TOP_RIGHT;
-	Align lineAlign = ALIGN_BOTTOM_LEFT;
+	Align align = ALIGN_BOTTOM_LEFT;
+	Align alignContent = ALIGN_TOP_LEFT;
 	Orient orient = ORIENT_RIGHT_DOWN;
 
 public:
 	PanelFlow() = default;
-	PanelFlow(Orient orientation, Align align, Align lineAlign);
+	PanelFlow(Orient orientation, Align align, Align alignContent);
 	virtual ~PanelFlow() = default;
 
 public:
 	void setOrient(Orient orient);
 	void setAlign(Align align);
-	void setLineAlign(Align lineAlign);
+	void setAlignContent(Align alignContent);
 
 private:
 	virtual void doBuild(Renderer& renderer) override;

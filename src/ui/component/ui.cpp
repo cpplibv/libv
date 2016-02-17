@@ -61,11 +61,11 @@ void UI::render() {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::viewport(position, size);
-	gl.pushMatrixView(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
+	gl.pushMatrixProjection(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
 
 	Container::renderComponents(gl);
 
-	gl.popMatrixView();
+	gl.popMatrixProjection();
 }
 
 // -------------------------------------------------------------------------------------------------

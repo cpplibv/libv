@@ -77,16 +77,20 @@ class Line {
 private:
 	std::vector<adaptive_ptr<Component>> compoments;
 	vec3 size;
-	const Orient& orientData;
+	const Orient* orientData;
 public:
 
-	Line(const Orient& orientation) : orientData(orientation) { }
+	Line(const Orient& orientation) : orientData(&orientation) { }
+	Line(const Line&) = default;
+	Line(Line&&) = default;
+	Line& operator=(const Line&) = default;
+	Line& operator=(Line&&) = default;
 
 	inline void add(adaptive_ptr<Component> comp) {
 		compoments.push_back(comp);
 		auto compSize = comp->get(Property::Size);
-		size = maxByDimensions(size, compSize) * orientData.secondaryMask +
-				(size + compSize) * orientData.primaryMask;
+		size = maxByDimensions(size, compSize) * orientData->secondaryMask +
+				(size + compSize) * orientData->primaryMask;
 	}
 
 	inline vec3 getSize() const {
@@ -94,7 +98,7 @@ public:
 	}
 
 	const Orient& getOrientation() const {
-		return orientData;
+		return *orientData;
 	}
 
 	inline std::vector<adaptive_ptr<Component>> getCompoments() const {
@@ -104,8 +108,6 @@ public:
 	static vec3 accumlateSize(const std::vector<Line>& lines) {
 		vec3 result;
 		for (auto line : lines) {
-			// TODO P5: EXTRA large object may "brake" the orientation... look it up
-
 			result = maxByDimensions(result, line.getSize()) * line.getOrientation().primaryMask +
 					(result + line.getSize()) * line.getOrientation().secondaryMask;
 		}
@@ -137,9 +139,9 @@ std::vector<Line> buildLines(
 
 // PanelFlow =======================================================================================
 
-PanelFlow::PanelFlow(Orient orient, Align align, Align lineAlign) :
+PanelFlow::PanelFlow(Orient orient, Align align, Align alignContent) :
 	align(align),
-	lineAlign(lineAlign),
+	alignContent(alignContent),
 	orient(orient) { }
 
 // -------------------------------------------------------------------------------------------------
@@ -148,8 +150,8 @@ void PanelFlow::setAlign(Align align) {
 	this->align = align;
 }
 
-void PanelFlow::setLineAlign(Align lineAlign) {
-	this->lineAlign = lineAlign;
+void PanelFlow::setAlignContent(Align alignContent) {
+	this->alignContent = alignContent;
 }
 
 void PanelFlow::setOrient(Orient orient) {
@@ -170,38 +172,48 @@ void PanelFlow::layoutImpl() {
 
 	const auto& currentOrient = orienationTable[orient];
 	const auto& currentAlign = alignmentTable[align];
-	const auto& currentLineAlign = alignmentTable[lineAlign];
+	const auto& currentAlignContent = alignmentTable[alignContent];
+
+	const auto dim1 = [&](auto v) {
+		return v * currentOrient.primaryMask;
+	};
+	const auto dim2 = [&](auto v) {
+		return v * currentOrient.secondaryMask;
+	};
 
 	auto sizeContainer = getDisplaySize();
 	auto lines = buildLines(begin, end, sizeContainer, currentOrient);
 	auto sizeContent = Line::accumlateSize(lines);
 
-	auto cursorContent = vec3((sizeContainer - sizeContent) * currentLineAlign);
-	vec3 cursorLine;
+	auto penContent = (sizeContainer - sizeContent) * currentAlignContent;
+	vec3 penLine;
 
-	const auto lineIndexFrom = currentOrient.invertedSecondaryExpand ? lines.size() - 1 : -1;
-	const auto lineIndexTo = currentOrient.invertedSecondaryExpand ? 0 : lines.size();
+	const auto lineIndexFrom = currentOrient.invertedSecondaryExpand ? lines.size() - 1 : 0;
+	const auto lineIndexTo = currentOrient.invertedSecondaryExpand ? -1 : lines.size();
 	const auto lineIndexStep = currentOrient.invertedSecondaryExpand ? -1 : 1;
 
-	for (size_t i = lineIndexFrom; i != lineIndexTo; i += lineIndexStep) {
+	for (auto i = lineIndexFrom; i != lineIndexTo; i += lineIndexStep) {
 		const auto& line = lines[i];
+		const auto sizeLine = line.getSize();
 
-		cursorLine = vec3((sizeContent - line.getSize()) * currentAlign * currentOrient.primaryMask
-				+ cursorLine * currentOrient.secondaryMask);
-		vec3 cursorComponent;
+		vec3 penComponent;
+		penLine = dim1((sizeContent - sizeLine) * currentAlign) + dim2(penLine);
 		auto lineComponents = line.getCompoments();
+
 		if (currentOrient.invertedPrimaryExpand)
 			std::reverse(lineComponents.begin(), lineComponents.end());
+
 		for (auto comp : lineComponents) {
-			comp->setDisplayPosition(vec3(
-					(cursorContent + cursorLine + cursorComponent) +
-					((line.getSize() - comp->get(Property::Size)) *
-					currentAlign * currentOrient.secondaryMask)
-					));
-			comp->setDisplaySize(comp->get(Property::Size));
-			cursorComponent += vec3(comp->get(Property::Size) * currentOrient.primaryMask);
+			const auto pen = penLine + penContent + penComponent;
+			const auto sizeComponent = comp->get(Property::Size);
+			const auto baselineOffset = dim2((sizeLine - sizeComponent) * currentAlign);
+
+			comp->setDisplayPosition(pen + baselineOffset);
+			comp->setDisplaySize(sizeComponent);
+
+			penComponent += dim1(sizeComponent);
 		}
-		cursorLine += line.getSize() * currentOrient.secondaryMask;
+		penLine += dim2(sizeLine);
 	}
 }
 

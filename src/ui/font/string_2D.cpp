@@ -5,7 +5,7 @@
 // ext
 #include <boost/filesystem/path.hpp>
 #include <GL/glew.h>
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 #include <utf8cpp/utf8.h>
 // libv
 #include <libv/ui/log.hpp>
@@ -71,12 +71,14 @@ void String2D::destroy() {
 }
 
 void String2D::render(Renderer& gl) {
+	gl.pushMatrixModel();
+	gl.matrixModel() *= glm::translate(glm::vec3(0, -deafultFont.getDescender(), 0));
+
 	defaultShader->use();
 	deafultFont.bind();
 	checkGL();
 
-//	uniformMVPmat = gl.matrixMVP();
-	uniformMVPmat = glm::ortho(0.0f, 512.0f, 0.0f, 512.0f, -1000.0f, 1000.0f);
+	uniformMVPmat = gl.matrixMVP();
 	uniformTextureSampler = gl::TextureType::diffuse;
 	checkGL();
 
@@ -93,6 +95,7 @@ void String2D::render(Renderer& gl) {
 	deafultFont.unbind();
 	glUseProgram(0);
 	checkGL();
+	gl.popMatrixModel();
 }
 
 // -------------------------------------------------------------------------------------------------

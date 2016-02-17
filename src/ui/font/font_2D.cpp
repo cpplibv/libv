@@ -114,6 +114,10 @@ int Font2D::getLineAdvance() const {
 	return face->height;
 }
 
+int Font2D::getDescender() const {
+	return face->descender >> 6;
+}
+
 ivec2 Font2D::getKerning(uint32_t left, uint32_t right) const {
 	FT_Vector kerning;
 	kerning.x = 0;
@@ -161,7 +165,7 @@ Font2D::Character Font2D::renderCharacter(uint32_t unicode) {
 	result.advance.y = glyph->advance.y / 65536.0f; // 16.16 float
 
 	if (texturePen.x + bitmapWidth > textureSize.x) // Warp to new line
-		texturePen = ivec2(0, textureNextLine);
+		texturePen = uivec2(0, textureNextLine);
 
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
 		LIBV_UI_FT_ERROR("Failed to render character: Not enough place in font texture: "

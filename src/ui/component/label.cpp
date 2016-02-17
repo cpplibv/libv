@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/component/label.hpp>
 // ext
-#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 // pro
 #include <libv/ui/log.hpp>
 #include <libv/gl/log.hpp>
@@ -28,13 +28,12 @@ void Label::doDestroy(Renderer&) {
 }
 
 void Label::doRender(Renderer& gl) {
-	//	LIBV_UI_COMPONENT_TRACE("Render Label");
+	//LIBV_UI_COMPONENT_TRACE("Render Label");
 
 	const auto position = getDisplayPosition();
-//	const auto size = getDisplaySize();
 
 	gl.pushMatrixModel();
-	glm::translate(gl.matrixModel(), glm::vec3(position.x, position.y, position.z)); // vec-glm
+	gl.matrixModel() *= glm::translate(glm::vec3(position.x, position.y, position.z)); // vec-glm
 
 	text.render(gl);
 

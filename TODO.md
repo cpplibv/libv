@@ -1,12 +1,21 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-label layout and string2D size
+fundation of size layout (idea of inline-block)
+-- commit --
+
+string2D size respect (new line)
+-- commit --
+
+label size based on string2D content
+-- commit --
+
+elevate line in string based on descent
 -- commit --
 
 cleanup / review the full render process
 -- commit --
 
-use VAO for string
+use VAO for string2D
 -- commit --
 
 sandbox multiple label under each other
@@ -30,7 +39,6 @@ FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-rename folder Data -> res
 protection againts wrong layouts: skip the render of zero sized components?
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
@@ -40,6 +48,7 @@ look after and variant https://isocpp.org/blog/2016/01/cpp-language-support-for-
 look after any
 moving vec costume getter functions from member to public -> reducing symbols...
 provide exception free api EVERYWHERE!
+seg fault in resource! (just run libv_test in debug...) // however it will be rewritten
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
@@ -79,6 +88,8 @@ cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep i
 much pain to integrate
 
 // -------------------------------------------------------------------------------------------------
+
+separate pattern and color would make a huge difference in a lot of cases
 
 Colors:
 0.236f, 0.311f, 0.311f

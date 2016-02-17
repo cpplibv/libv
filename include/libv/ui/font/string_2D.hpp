@@ -46,9 +46,8 @@ private:
 
 	Font2D deafultFont;
 	std::shared_ptr<gl::ShaderProgram> defaultShader;
-	gl::Uniform<glm::mat4> uniformMVPmat;
-	gl::Uniform<gl::TextureType> uniformTextureSampler;
-	// TODO P2: Uniform Aliases!
+	gl::Uniform_fmat4 uniformMVPmat;
+	gl::Uniform_texture uniformTextureSampler;
 	// TODO P5: Shader should be part of the "font descriptor" to allow same font with multiple shader...
 
 public:
@@ -58,6 +57,10 @@ public:
 public:
 	void setText(const std::string& text);
 	void setSize(ivec2 size);
+
+	std::string getText() const {
+		return rawText;
+	}
 
 public:
 	void build();
