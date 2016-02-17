@@ -19,19 +19,19 @@ using PropertyAddress = PropertyMap::Address<::boost::optional<T>>;
 namespace Property {
 
 enum class LayoutType {
-	Element = 0, // Position the component before laying it out. Expand to container
+	Element, // Position the component before laying it out. Expand to container
 	Block // Layout the component before positioning it. Shrink to content
 };
 
 using SizeType = fvec3;
 
-extern PropertyMap::Address<LayoutType> Layout;
-//extern PropertyMap::Address<bool> NewLine;    // After the component a new line char is interpreted
-//extern PropertyMap::Address<vec3> Position;   // Relative position to the parent
-extern PropertyMap::Address<SizeType> Size;	  //
-//extern PropertyMap::Address<vec4> Border;	    //
-//extern PropertyMap::Address<vec4> Margin;	    //
-//extern PropertyMap::Address<vec4> Pedding;    //
+extern PropertyAddress<LayoutType> Layout;
+//extern PropertyAddress<bool> NewLine;    // After the component a new line char is interpreted
+//extern PropertyAddress<vec3> Position;   // Relative position to the parent
+extern PropertyAddress<SizeType> Size;	  //
+//extern PropertyAddress<vec4> Border;	    //
+//extern PropertyAddress<vec4> Margin;	    //
+//extern PropertyAddress<vec4> Pedding;    //
 
 } //namespace Property
 

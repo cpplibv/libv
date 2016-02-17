@@ -58,6 +58,10 @@ public:
 	void setText(const std::string& text);
 	void setSize(ivec2 size);
 
+	ivec2 getLayoutedSize() const {
+		return layoutedSize;
+	}
+
 	std::string getText() const {
 		return rawText;
 	}

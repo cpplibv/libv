@@ -1,12 +1,6 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-fundation of size layout (idea of inline-block)
--- commit --
-
 string2D size respect (new line)
--- commit --
-
-label size based on string2D content
 -- commit --
 
 elevate line in string based on descent
@@ -39,7 +33,7 @@ FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-protection againts wrong layouts: skip the render of zero sized components?
+pretty flow, refactor line, build line, accum line...
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events

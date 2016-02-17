@@ -87,30 +87,37 @@ void initGL() {
 	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
 	checkGL();
 }
-
 class TestFrame : public Frame {
 	Label lbl0;
 	Label lbl1;
+	Label lbl2;
 	PanelFlow lf;
 
 	void init() {
 		lbl0.setComponentID("Label0");
 		lbl0.setText("Label0 with interactivity! ");
 		lbl0.set()
-			(Property::Size, vec3(256, 256, 0))
-//			(Property::NewLine, false)
+//			(Property::Size, vec3(256, 256, 0))
+			(Property::Layout, Property::LayoutType::Block)
 		;
 
 		lbl1.setComponentID("Label1");
 		lbl1.setText("Label1 with some text on it.");
 		lbl1.set()
-			(Property::Size, vec3(256, 256, 0))
-//			(Property::NewLine, false)
+//			(Property::Size, vec3(256, 256, 0))
+			(Property::Layout, Property::LayoutType::Block)
+		;
+
+		lbl2.setComponentID("Label2");
+		lbl2.setText("Label2 with some text on it.");
+		lbl2.set()
+			(Property::Layout, Property::LayoutType::Block)
 		;
 
 		lf.setComponentID("Panel");
 		lf.add(make_observer(&lbl1));
 		lf.add(make_observer(&lbl0));
+		lf.add(make_observer(&lbl2));
 
 		addComponent(make_observer(&lf));
 

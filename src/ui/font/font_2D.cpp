@@ -111,11 +111,11 @@ void Font2D::setSize(int px) {
 }
 
 int Font2D::getLineAdvance() const {
-	return face->height;
+	return face->size->metrics.height >> 6; // 26.6 format
 }
 
 int Font2D::getDescender() const {
-	return face->descender >> 6;
+	return face->size->metrics.descender >> 6; // 26.6 format
 }
 
 ivec2 Font2D::getKerning(uint32_t left, uint32_t right) const {

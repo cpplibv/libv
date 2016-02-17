@@ -20,6 +20,7 @@ void Label::setText(const std::string& text) {
 void Label::doBuild(Renderer&) {
 	LIBV_UI_COMPONENT_TRACE("Build Label");
 	text.build();
+	set(Property::Size, vec3(text.getLayoutedSize(), 0));
 }
 
 void Label::doDestroy(Renderer&) {
@@ -31,6 +32,9 @@ void Label::doRender(Renderer& gl) {
 	//LIBV_UI_COMPONENT_TRACE("Render Label");
 
 	const auto position = getDisplayPosition();
+	const auto size = getDisplaySize();
+	LIBV_UI_LAYOUT_TRACE("LayoutNFO [%s]: pos(%.1f,%.1f,%.1f), size(%.1f,%.1f,%.1f)",
+			componentID, position.x, position.y, position.z, size.x, size.y, size.z);
 
 	gl.pushMatrixModel();
 	gl.matrixModel() *= glm::translate(glm::vec3(position.x, position.y, position.z)); // vec-glm

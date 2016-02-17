@@ -4,7 +4,6 @@
 #include <libv/ui/container/panel_flow.hpp>
 // ext
 #include <boost/range/adaptor/reversed.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 // libv
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
@@ -72,10 +71,25 @@ const PanelFlow::Orient PanelFlow::ORIENT_LEFT_DOWN = 5;
 const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_UP = 6;
 const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_DOWN = 7;
 
+// -------------------------------------------------------------------------------------------------
+
+vec3 getComponentSize(observer_ptr<Component> component) {
+	auto property = component->get(Property::Size);
+	if (property)
+		return *property;
+
+	auto layout = component->get(Property::Layout);
+	if (layout == Property::LayoutType::Block)
+		return vec3(256, 128, 0);
+	else
+		return vec3(256, 128, 0);
+}
+
 // Line ============================================================================================
+
 class Line {
 private:
-	std::vector<adaptive_ptr<Component>> compoments;
+	std::vector<observer_ptr<Component>> compoments;
 	vec3 size;
 	const Orient* orientData;
 public:
@@ -86,9 +100,9 @@ public:
 	Line& operator=(const Line&) = default;
 	Line& operator=(Line&&) = default;
 
-	inline void add(adaptive_ptr<Component> comp) {
+	inline void add(observer_ptr<Component> comp) {
 		compoments.push_back(comp);
-		auto compSize = comp->get(Property::Size);
+		auto compSize = getComponentSize(comp);
 		size = maxByDimensions(size, compSize) * orientData->secondaryMask +
 				(size + compSize) * orientData->primaryMask;
 	}
@@ -101,7 +115,7 @@ public:
 		return *orientData;
 	}
 
-	inline std::vector<adaptive_ptr<Component>> getCompoments() const {
+	inline std::vector<observer_ptr<Component>> getCompoments() const {
 		return compoments;
 	}
 
@@ -131,7 +145,7 @@ std::vector<Line> buildLines(
 			i++;
 		} while (i < numComp &&
 				containerSize * orientData.primaryMask >=
-				(currentLine.getSize() + (*(begin + i))->get(Property::Size)) * orientData.primaryMask);
+				(currentLine.getSize() + getComponentSize(*(begin + i))) * orientData.primaryMask);
 		lines.push_back(currentLine);
 	}
 	return lines;
@@ -160,12 +174,13 @@ void PanelFlow::setOrient(Orient orient) {
 
 // -------------------------------------------------------------------------------------------------
 
-void PanelFlow::doBuild(Renderer&) {
-	layoutImpl();
-}
-
-void PanelFlow::layoutImpl() {
+void PanelFlow::doBuild(Renderer& gl) {
 	LIBV_UI_LAYOUT_TRACE("PanelFlow Layout");
+	for (auto& component : components) {
+		if (*component->get(Property::Layout) == Property::LayoutType::Block) {
+			component->build(gl);
+		}
+	}
 
 	auto begin = components.begin();
 	auto end = components.end();
@@ -181,9 +196,9 @@ void PanelFlow::layoutImpl() {
 		return v * currentOrient.secondaryMask;
 	};
 
-	auto sizeContainer = getDisplaySize();
-	auto lines = buildLines(begin, end, sizeContainer, currentOrient);
-	auto sizeContent = Line::accumlateSize(lines);
+	const auto sizeContainer = getDisplaySize();
+	const auto lines = buildLines(begin, end, sizeContainer, currentOrient);
+	const auto sizeContent = Line::accumlateSize(lines);
 
 	auto penContent = (sizeContainer - sizeContent) * currentAlignContent;
 	vec3 penLine;
@@ -203,13 +218,13 @@ void PanelFlow::layoutImpl() {
 		if (currentOrient.invertedPrimaryExpand)
 			std::reverse(lineComponents.begin(), lineComponents.end());
 
-		for (auto comp : lineComponents) {
+		for (auto& component : lineComponents) {
 			const auto pen = penLine + penContent + penComponent;
-			const auto sizeComponent = comp->get(Property::Size);
+			const auto sizeComponent = getComponentSize(component);
 			const auto baselineOffset = dim2((sizeLine - sizeComponent) * currentAlign);
 
-			comp->setDisplayPosition(pen + baselineOffset);
-			comp->setDisplaySize(sizeComponent);
+			component->setDisplayPosition(pen + baselineOffset);
+			component->setDisplaySize(sizeComponent);
 
 			penComponent += dim1(sizeComponent);
 		}

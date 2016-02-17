@@ -149,8 +149,9 @@ void String2D::buildImpl() {
 			boundsMin = minByDimensions(boundsMin, charInfo.vertexCoord[i]);
 		}
 	}
+	auto lineCount = 1;
 
-	layoutedSize = boundsMax - boundsMin;
+	layoutedSize = ivec2((boundsMax - boundsMin).x, lineCount * deafultFont.getLineAdvance()) ;
 }
 
 // -------------------------------------------------------------------------------------------------
