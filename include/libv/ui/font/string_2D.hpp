@@ -12,6 +12,12 @@
 #include <libv/ui/font/font_2D.hpp>
 #include <libv/ui/render/renderer.hpp>
 
+// TODO P2: fix new line 'inverting'
+// TODO P2: String2D alignments (yee, the part where FLOW Layout is kind of familiar...)
+// TODO P3: Format
+// TODO P4: multi font
+// TODO P4: multi shader
+
 namespace libv {
 namespace ui {
 
@@ -35,7 +41,7 @@ private:
 	Anchor halign = Anchor::Center;
 	Anchor valign = Anchor::Center;
 
-	ivec2 size;
+	ivec2 maxSize;
 	ivec2 layoutedSize;
 
 	std::string rawText;

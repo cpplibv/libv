@@ -19,7 +19,7 @@ template <typename T>
 struct is_efl_loadable<T, void_t<decltype(
 		::libv::efl::load(std::declval<T&>())
 		)>> : std::true_type { };
-		
+
 // --- is_efl_unloadable ---
 template <typename T, typename = void> struct is_efl_unloadable : std::false_type {
 };
@@ -27,7 +27,7 @@ template <typename T>
 struct is_efl_unloadable<T, void_t<decltype(
 		::libv::efl::unload(std::declval<T&>())
 		)>> : std::true_type { };
-		
+
 namespace efl { // ---------------------------------------------------------------------------------
 namespace lookup { // ------------------------------------------------------------------------------
 

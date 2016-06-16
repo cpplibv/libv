@@ -2,16 +2,14 @@
 
 #pragma once
 
-#include <libv/ui/container/panel.hpp>
-
-// TODO P4: Adopt NewLine property
+#include <libv/ui/container/container.hpp>
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFlow : public BasePanel {
+class PanelFlow : public Container {
 public:
 	using Align = size_t;
 	using Orient = size_t;
@@ -36,9 +34,9 @@ public:
 	static const Orient ORIENT_RIGHT_DOWN;
 
 private:
-	Align align = ALIGN_BOTTOM_LEFT;
-	Align alignContent = ALIGN_TOP_LEFT;
-	Orient orient = ORIENT_RIGHT_DOWN;
+	Align indexAlign = ALIGN_BOTTOM_LEFT;
+	Align indexAlignContent = ALIGN_TOP_LEFT;
+	Orient indexOrient = ORIENT_RIGHT_DOWN;
 
 public:
 	PanelFlow() = default;
@@ -51,8 +49,7 @@ public:
 	void setAlignContent(Align alignContent);
 
 private:
-	virtual void doBuild(Renderer& renderer) override;
-	void layoutImpl();
+	virtual Layout doLayout(const Layout& parentLayout) override;
 };
 
 // -------------------------------------------------------------------------------------------------

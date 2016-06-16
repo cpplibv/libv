@@ -2,17 +2,15 @@
 
 // hpp
 #include <libv/ui/container/panel_flow.hpp>
-// ext
-#include <boost/range/adaptor/reversed.hpp>
 // libv
+#include <libv/adaptor.hpp>
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
 // std
 #include <algorithm>
 // pro
+#include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
-
-// TODO P5: rename Align to Anchor?
 
 namespace libv {
 namespace ui {
@@ -21,35 +19,33 @@ namespace ui {
 
 using Align = vec3;
 struct Orient {
-	vec3 primaryMask;
-	vec3 secondaryMask;
-	vec3 primaryExpand;
+	size_t primaryDimension;
+	size_t secondaryDimension;
 	bool invertedPrimaryExpand;
-	vec3 secondaryExpand;
 	bool invertedSecondaryExpand;
 };
 
 static const Align alignmentTable[] = {
-	{0.5f, 0.0f, 0.f}, //BOTTOM_CENTER
-	{0.0f, 0.0f, 0.f}, //BOTTOM_LEFT
-	{1.0f, 0.0f, 0.f}, //BOTTOM_RIGHT
-	{0.5f, 0.5f, 0.f}, //CENTER_CENTER
-	{0.0f, 0.5f, 0.f}, //CENTER_LEFT
-	{1.0f, 0.5f, 0.f}, //CENTER_RIGHT
-	{0.5f, 1.0f, 0.f}, //TOP_CENTER
-	{0.0f, 1.0f, 0.f}, //TOP_LEFT
-	{1.0f, 1.0f, 0.f}, //TOP_RIGHT
+	{0.5f, 0.0f, 0.f}, //0 BOTTOM_CENTER
+	{0.0f, 0.0f, 0.f}, //1 BOTTOM_LEFT
+	{1.0f, 0.0f, 0.f}, //2 BOTTOM_RIGHT
+	{0.5f, 0.5f, 0.f}, //3 CENTER_CENTER
+	{0.0f, 0.5f, 0.f}, //4 CENTER_LEFT
+	{1.0f, 0.5f, 0.f}, //5 CENTER_RIGHT
+	{0.5f, 1.0f, 0.f}, //6 TOP_CENTER
+	{0.0f, 1.0f, 0.f}, //7 TOP_LEFT
+	{1.0f, 1.0f, 0.f}, //8 TOP_RIGHT
 };
 
 static const Orient orienationTable[] = {
-	{vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, +1, 0), 0, vec3(-1, 0, 0), 1}, //UP_LEFT
-	{vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, +1, 0), 0, vec3(+1, 0, 0), 0}, //UP_RIGHT
-	{vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, -1, 0), 1, vec3(-1, 0, 0), 1}, //DOWN_LEFT
-	{vec3(0, 1, 0), vec3(1, 0, 0), vec3(0, -1, 0), 1, vec3(+1, 0, 0), 0}, //DOWN_RIGHT
-	{vec3(1, 0, 0), vec3(0, 1, 0), vec3(-1, 0, 0), 1, vec3(0, +1, 0), 0}, //LEFT_UP
-	{vec3(1, 0, 0), vec3(0, 1, 0), vec3(-1, 0, 0), 1, vec3(0, -1, 0), 1}, //LEFT_DOWN
-	{vec3(1, 0, 0), vec3(0, 1, 0), vec3(+1, 0, 0), 0, vec3(0, +1, 0), 0}, //RIGHT_UP
-	{vec3(1, 0, 0), vec3(0, 1, 0), vec3(+1, 0, 0), 0, vec3(0, -1, 0), 1}, //RIGHT_DOWN
+	{1, 0, 0, 1}, //0 UP_LEFT
+	{1, 0, 0, 0}, //1 UP_RIGHT
+	{1, 0, 1, 1}, //2 DOWN_LEFT
+	{1, 0, 1, 0}, //3 DOWN_RIGHT
+	{0, 1, 1, 0}, //4 LEFT_UP
+	{0, 1, 1, 1}, //5 LEFT_DOWN
+	{0, 1, 0, 0}, //6 RIGHT_UP
+	{0, 1, 0, 1}, //7 RIGHT_DOWN
 };
 
 const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_CENTER = 0;
@@ -73,163 +69,122 @@ const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_DOWN = 7;
 
 // -------------------------------------------------------------------------------------------------
 
-vec3 getComponentSize(observer_ptr<Component> component) {
-	auto property = component->get(Property::Size);
-	if (property)
-		return *property;
-
-	auto layout = component->get(Property::Layout);
-	if (layout == Property::LayoutType::Block)
-		return vec3(256, 128, 0);
-	else
-		return vec3(256, 128, 0);
+namespace {
+vec3 getComponentSize(Component& component) {
+	auto property = component.get(Property::Size);
+	return property ? *property : vec3();
+}
 }
 
 // Line ============================================================================================
 
-class Line {
-private:
-	std::vector<observer_ptr<Component>> compoments;
+struct Line {
+	std::vector<observer_ptr<Container::ContainedComponent>> compoments;
 	vec3 size;
-	const Orient* orientData;
-public:
-
-	Line(const Orient& orientation) : orientData(&orientation) { }
-	Line(const Line&) = default;
-	Line(Line&&) = default;
-	Line& operator=(const Line&) = default;
-	Line& operator=(Line&&) = default;
-
-	inline void add(observer_ptr<Component> comp) {
-		compoments.push_back(comp);
-		auto compSize = getComponentSize(comp);
-		size = maxByDimensions(size, compSize) * orientData->secondaryMask +
-				(size + compSize) * orientData->primaryMask;
-	}
-
-	inline vec3 getSize() const {
-		return size;
-	}
-
-	const Orient& getOrientation() const {
-		return *orientData;
-	}
-
-	inline std::vector<observer_ptr<Component>> getCompoments() const {
-		return compoments;
-	}
-
-	static vec3 accumlateSize(const std::vector<Line>& lines) {
-		vec3 result;
-		for (auto line : lines) {
-			result = maxByDimensions(result, line.getSize()) * line.getOrientation().primaryMask +
-					(result + line.getSize()) * line.getOrientation().secondaryMask;
-		}
-		return result;
-	}
 };
 
-std::vector<Line> buildLines(
-		Container::Store::const_iterator begin,
-		Container::Store::const_iterator end,
-		vec3 containerSize,
-		const Orient& orientData) {
+struct BuiltLines {
+	std::vector<Line> lines;
+	vec3 size;
+};
+
+BuiltLines buildLines(Container::Store& components, vec3 parentSize, const Orient& orient) {
+	const auto dim1 = orient.primaryDimension;
+	const auto dim2 = orient.secondaryDimension;
 
 	std::vector<Line> lines;
-	auto numComp = std::distance(begin, end);
-	int i = 0;
-	while (i < numComp) {
-		Line currentLine(orientData);
-		do {
-			currentLine.add(*(begin + i));
-			i++;
-		} while (i < numComp &&
-				containerSize * orientData.primaryMask >=
-				(currentLine.getSize() + getComponentSize(*(begin + i))) * orientData.primaryMask);
-		lines.push_back(currentLine);
+	lines.emplace_back();
+	size_t last = 0;
+	vec3 sumSize;
+
+	for (auto& comp : components) {
+		const auto compSize = comp.info.size;
+
+		if (!lines[last].compoments.empty() && lines[last].size[dim1] + compSize[dim1] > parentSize[dim1]) {
+			lines.emplace_back();
+			++last;
+		}
+
+		lines[last].compoments.emplace_back(&comp);
+		lines[last].size[dim1] += compSize[dim1];
+		lines[last].size[dim2] = std::max(lines[last].size[dim2], compSize[dim2]);
 	}
-	return lines;
+
+	for (auto& line : lines) {
+		sumSize[dim1] = std::max(sumSize[dim1], line.size[dim1]);
+		sumSize[dim2] += line.size[dim2];
+	}
+
+	return BuiltLines{std::move(lines), sumSize};
 }
 
 // PanelFlow =======================================================================================
 
 PanelFlow::PanelFlow(Orient orient, Align align, Align alignContent) :
-	align(align),
-	alignContent(alignContent),
-	orient(orient) { }
+	indexAlign(align),
+	indexAlignContent(alignContent),
+	indexOrient(orient) { }
 
 // -------------------------------------------------------------------------------------------------
 
 void PanelFlow::setAlign(Align align) {
-	this->align = align;
+	this->indexAlign = align;
 }
 
 void PanelFlow::setAlignContent(Align alignContent) {
-	this->alignContent = alignContent;
+	this->indexAlignContent = alignContent;
 }
 
 void PanelFlow::setOrient(Orient orient) {
-	this->orient = orient;
+	this->indexOrient = orient;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void PanelFlow::doBuild(Renderer& gl) {
-	LIBV_UI_LAYOUT_TRACE("PanelFlow Layout");
+Layout PanelFlow::doLayout(const Layout&) {
+	const auto sizeContainer = getComponentSize(*this);
+	Layout layout(sizeContainer);
+
 	for (auto& component : components) {
-		if (*component->get(Property::Layout) == Property::LayoutType::Block) {
-			component->build(gl);
-		}
+		const auto childLayout = component.ptr->layout(layout);
+		component.info.size = childLayout.size;
 	}
 
-	auto begin = components.begin();
-	auto end = components.end();
+	const auto& orient = orienationTable[indexOrient];
+	const auto& align = alignmentTable[indexAlign];
+	const auto& alignContent = alignmentTable[indexAlignContent];
 
-	const auto& currentOrient = orienationTable[orient];
-	const auto& currentAlign = alignmentTable[align];
-	const auto& currentAlignContent = alignmentTable[alignContent];
+	const auto dim1 = orient.primaryDimension;
+	const auto dim2 = orient.secondaryDimension;
 
-	const auto dim1 = [&](auto v) {
-		return v * currentOrient.primaryMask;
-	};
-	const auto dim2 = [&](auto v) {
-		return v * currentOrient.secondaryMask;
-	};
+	const auto builtLines = buildLines(components, sizeContainer, orient);
+	const auto& lines = builtLines.lines;
+	const auto& sizeContent = builtLines.size;
 
-	const auto sizeContainer = getDisplaySize();
-	const auto lines = buildLines(begin, end, sizeContainer, currentOrient);
-	const auto sizeContent = Line::accumlateSize(lines);
+	auto origToContent = (sizeContainer - sizeContent) * alignContent;
+	vec3 contentToLine;
 
-	auto penContent = (sizeContainer - sizeContent) * currentAlignContent;
-	vec3 penLine;
+	for (const auto& line : lines | reverse_if(orient.invertedSecondaryExpand)) {
+		const auto sizeLine = line.size;
+		vec3 lineToComponent;
 
-	const auto lineIndexFrom = currentOrient.invertedSecondaryExpand ? lines.size() - 1 : 0;
-	const auto lineIndexTo = currentOrient.invertedSecondaryExpand ? -1 : lines.size();
-	const auto lineIndexStep = currentOrient.invertedSecondaryExpand ? -1 : 1;
+		contentToLine[dim1] = (sizeContent[dim1] - sizeLine[dim1]) * align[dim1];
+		const auto& lineComponents = line.compoments;
 
-	for (auto i = lineIndexFrom; i != lineIndexTo; i += lineIndexStep) {
-		const auto& line = lines[i];
-		const auto sizeLine = line.getSize();
+		for (auto& component : lineComponents | reverse_if(orient.invertedPrimaryExpand)) {
+			const auto pen = origToContent + contentToLine + lineToComponent;
+			const auto sizeComponent = component->info.size;
+			vec3 baselineOffset;
+			baselineOffset[dim2] = (sizeLine[dim2] - sizeComponent[dim2]) * align[dim2];
 
-		vec3 penComponent;
-		penLine = dim1((sizeContent - sizeLine) * currentAlign) + dim2(penLine);
-		auto lineComponents = line.getCompoments();
+			component->info.offset = pen + baselineOffset;
 
-		if (currentOrient.invertedPrimaryExpand)
-			std::reverse(lineComponents.begin(), lineComponents.end());
-
-		for (auto& component : lineComponents) {
-			const auto pen = penLine + penContent + penComponent;
-			const auto sizeComponent = getComponentSize(component);
-			const auto baselineOffset = dim2((sizeLine - sizeComponent) * currentAlign);
-
-			component->setDisplayPosition(pen + baselineOffset);
-			component->setDisplaySize(sizeComponent);
-
-			penComponent += dim1(sizeComponent);
+			lineToComponent[dim1] += sizeComponent[dim1];
 		}
-		penLine += dim2(sizeLine);
+		contentToLine[dim2] += sizeLine[dim2];
 	}
+
+	return layout;
 }
 
 } //namespace ui

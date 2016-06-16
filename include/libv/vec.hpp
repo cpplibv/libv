@@ -2,15 +2,21 @@
 
 #pragma once
 
+// ext
+#ifdef LIBV_USE_GLM_BRIDGE
+#    include <glm/vec2.hpp>
+#    include <glm/vec3.hpp>
+#    include <glm/vec4.hpp>
+#endif
+// std
 #include <cassert>
 #include <cmath>
 #include <ostream>
 #include <utility>
-
+// pro
 #include <libv/type_traits.hpp>
 
 // TODO P1: add static_vec_cast
-// TODO P1: glm implicit cast for vec // marked in code with "vec-glm" uses
 // TODO P1: vec implicit cast for glm // marked in code with "vec-glm" uses
 // TODO P1: refactor to force unrolled loops to remove some of the template magic ?
 // TODO P1: constexpr vec // this will be fun...
@@ -142,6 +148,12 @@ struct vec_base_t<2, T, enable_if<std::is_trivially_destructible<T>>> {
 	template <typename T0, typename T1>
 	vec_base_t(T0 x, T1 y) noexcept : x(x), y(y) { }
 
+#ifdef LIBV_USE_GLM_BRIDGE
+	explicit operator glm::tvec2<T>(){
+		return glm::tvec2<T>(x, y);
+	}
+#endif
+
 	implement_vec2_to_vec2_gets
 	implement_vec2_to_vec3_gets
 	implement_vec2_to_vec4_gets
@@ -165,6 +177,12 @@ struct vec_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
 	vec_base_t(T0 x, const vec_base_t<2, T1>& yz) noexcept : x(x), y(yz.x), z(yz.y) { }
 	template <typename T0, typename T1>
 	vec_base_t(const vec_base_t<2, T0>& xy, T1 z) noexcept : x(xy.x), y(xy.y), z(z) { }
+
+#ifdef LIBV_USE_GLM_BRIDGE
+	explicit operator glm::tvec3<T>(){
+		return glm::tvec3<T>(x, y, z);
+	}
+#endif
 
 	implement_vec3_to_vec2_gets
 	implement_vec3_to_vec3_gets
@@ -198,6 +216,12 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 	vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	template <typename T0, typename T1>
 	vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) noexcept : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
+
+#ifdef LIBV_USE_GLM_BRIDGE
+	explicit operator glm::tvec4<T>(){
+		return glm::tvec4<T>(x, y, z, w);
+	}
+#endif
 
 	implement_vec4_to_vec2_gets
 	implement_vec4_to_vec3_gets

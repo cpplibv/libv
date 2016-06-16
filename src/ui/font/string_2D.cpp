@@ -32,7 +32,7 @@ void String2D::setText(const std::string& text) {
 }
 
 void String2D::setSize(ivec2 size) {
-	this->size = size;
+	this->maxSize = size;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -108,13 +108,27 @@ void String2D::buildImpl() {
 	ivec2 pen;
 	uint32_t prev = 0;
 
-	vec2 boundsMin;
-	vec2 boundsMax;
+	size_t lineCount = 1;
+	int width = 0;
+
+	const auto newLine = [&]{
+		width = std::max(width, pen.x);
+		++lineCount;
+		pen.x = 0;
+		pen.y += deafultFont.getLineAdvance();
+	};
 
 	while (iter != end) {
-		auto current = utf8::next(iter, end); // TODO P2: handle 'invalid' utf8 exceptions
-		auto fontCharInfo = deafultFont.getCharacter(current);
+		auto current = utf8::next(iter, end);
+		// TODO P2: handle 'invalid' utf8 exceptions (handle should be on set!)
 
+		if (current == '\n') {
+			newLine();
+			prev = current;
+			continue;
+		}
+
+		auto fontCharInfo = deafultFont.getCharacter(current);
 		pen += deafultFont.getKerning(prev, current);
 
 		Character charInfo;
@@ -133,25 +147,15 @@ void String2D::buildImpl() {
 		charInfo.vertexCoord[5] = pen + fontCharInfo.vertexCoord[0];
 
 		pen.x += fontCharInfo.advance.x;
-
-		// TODO P2: New line
-		// TODO P2: Size
-		// TODO P2: Auto Size
-		// TODO P2: Usage of flow layout
-		// TODO P3: multi font
-		// TODO P3: Format
+		if (maxSize.x > 0 && pen.x > maxSize.x)
+			newLine();
 
 		data.push_back(charInfo);
 		prev = current;
-
-		for (int i = 0; i < 6; i++) {
-			boundsMax = maxByDimensions(boundsMax, charInfo.vertexCoord[i]);
-			boundsMin = minByDimensions(boundsMin, charInfo.vertexCoord[i]);
-		}
 	}
-	auto lineCount = 1;
+	width = std::max(width, pen.x);
 
-	layoutedSize = ivec2((boundsMax - boundsMin).x, lineCount * deafultFont.getLineAdvance()) ;
+	layoutedSize = ivec2(width, lineCount * deafultFont.getLineAdvance()) ;
 }
 
 // -------------------------------------------------------------------------------------------------

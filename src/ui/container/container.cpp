@@ -8,6 +8,7 @@
 #include <algorithm>
 // pro
 #include <libv/ui/component/component.hpp>
+#include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/properties.hpp>
 
@@ -22,11 +23,37 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 void Container::add(const observer_ptr<Component>& component) {
-	components.emplace_back(component);
+	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
+			component->getComponentID(), this->getComponentID());
+	components.emplace_back(make_adaptive(component));
+	invalidate();
 }
 
 void Container::add(const shared_ptr<Component>& component) {
-	components.emplace_back(component);
+	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
+			component->getComponentID(), this->getComponentID());
+	components.emplace_back(make_adaptive(component));
+	invalidate();
+}
+
+void Container::addObserver(const observer_ptr<Component>& component) {
+	add(component);
+}
+
+void Container::addObserver(Component& component) {
+	add(make_observer(&component));
+}
+
+void Container::addObserver(Component * const component) {
+	add(make_observer(component));
+}
+
+void Container::addShared(const shared_ptr<Component>& component) {
+	add(component);
+}
+
+void Container::addShared(Component* const component) {
+	add(shared_ptr<Component>(component));
 }
 
 //void Container::remove(const observer_ptr<Component>& component) {
@@ -39,38 +66,40 @@ void Container::add(const shared_ptr<Component>& component) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Container::buildComponents(Renderer& renderer) {
-	doBuildComponents(renderer);
-}
+//Layout Container::doLayout(const Layout& layout) {
+//	LIBV_UI_COMPONENT_TRACE("Layout Container [%s]", componentID);
+//	for (auto& component : components) {
+//		component.ptr->layout(layout);
+//	}
+//}
 
-void Container::destroyComponents(Renderer& renderer) {
-	doDestroyComponents(renderer);
-}
-
-void Container::renderComponents(Renderer& renderer) {
-	doRenderComponents(renderer);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void Container::doBuildComponents(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Build Container");
+void Container::doBuild(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Build Container [%s]", componentID);
 	for (auto& component : components) {
-		component->build(renderer);
+		component.ptr->build(renderer);
 	}
 }
 
-void Container::doDestroyComponents(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Destroy Container");
+void Container::doDestroy(Renderer& renderer) {
+	LIBV_UI_COMPONENT_TRACE("Destroy Container [%s]", componentID);
 	for (auto& component : components) {
-		component->destroy(renderer);
+		component.ptr->destroy(renderer);
 	}
 }
 
-void Container::doRenderComponents(Renderer& gl) {
+void Container::doRender(Renderer& gl) {
+	gl.pushMatrixView();
+
 	for (auto& component : components) {
-		component->render(gl);
+		gl.pushMatrixModel();
+
+		auto offset = component.info.offset;
+		gl.matrixModel() *= glm::translate(glm::vec3(offset));
+		component.ptr->render(gl);
+
+		gl.popMatrixModel();
 	}
+	gl.popMatrixView();
 }
 
 // -------------------------------------------------------------------------------------------------

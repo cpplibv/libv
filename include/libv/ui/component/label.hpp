@@ -25,6 +25,7 @@ public:
 	}
 
 protected:
+	virtual Layout doLayout(const Layout& parentLayout) override;
 	virtual void doBuild(Renderer& renderer) override;
 	virtual void doDestroy(Renderer& renderer) override;
 	virtual void doRender(Renderer& renderer) override;

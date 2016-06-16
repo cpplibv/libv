@@ -21,8 +21,8 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 # --------------------------------------------------------------------------------------------------
 
 #set(CMAKE_VERBOSE_MAKEFILE off)
-#set(CMAKE_BUILD_TYPE "DEBUG")
-set(CMAKE_BUILD_TYPE "RELEASE")
+set(CMAKE_BUILD_TYPE "DEBUG")
+#set(CMAKE_BUILD_TYPE "RELEASE")
 
 #Definitions
 if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
@@ -35,9 +35,11 @@ endif()
 add_definitions(-m64)
 add_definitions(-std=c++14)
 
-#Macro
+#Macro - Ext
 add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_FORCE_RADIANS)
+#Macro - Pro
+add_definitions(-DLIBV_USE_GLM_BRIDGE)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -391,7 +393,7 @@ target_link_libraries(vlog_test   -static cppformat)
 target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
 target_link_libraries(vm3imp_test -static vm3)
 target_link_libraries(vsig_test   -static )
-target_link_libraries(vui_test    -static )
+target_link_libraries(vui_test    -static vui cppformat vlog)
 
 #Link - Executables
 target_link_libraries(libv_main   -static vlog cppformat)

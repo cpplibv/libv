@@ -6,7 +6,9 @@
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
 // pro
-#include <libv/ui/container/container.hpp>
+//#include <libv/ui/container/panel.hpp>
+#include <libv/ui/container/panel_flow.hpp>
+#include <libv/ui/render/renderer.hpp>
 
 // TODO P3: Create UIID and UIClass string "aliases" for components and use it to address string
 //		ambiguity on constructors. Name could vary, but suggested to stay short
@@ -25,10 +27,12 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class Frame;
+class Component;
 
-class UI : public Container {
+class UI {
 private:
-	Renderer gl;
+	Renderer gl; //<<< Layout layout;
+	PanelFlow content; //TODO P5: Change to a more primitive panel
 
 	ivec2 position;
 	ivec2 size;
@@ -55,8 +59,8 @@ public:
 	void attach(observer_ptr<Frame> frame);
 	void refresh();
 
-private:
-	virtual void doBuildComponents(Renderer& renderer) override;
+	void add(const observer_ptr<Component>& component);
+	void add(const shared_ptr<Component>& component);
 
 public:
 	UI();

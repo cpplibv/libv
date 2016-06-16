@@ -9,6 +9,12 @@
 
 namespace libv {
 
+// -------------------------------------------------------------------------------------------------
+
+template<typename T>
+class adaptive_ptr;
+
+
 // shared_ptr ======================================================================================
 template<typename T>
 using shared_ptr = std::shared_ptr<T>;
@@ -33,8 +39,9 @@ public:
 	using pointer = T*;
 	// ---------------------------------------------------------------------------------------------
 	constexpr inline observer_ptr() noexcept : ptr(nullptr) { }
-	constexpr inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
+	constexpr explicit inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
+	constexpr explicit inline observer_ptr(const adaptive_ptr<T>& p) noexcept : ptr(p.get()) { }
 	template<typename K>
 	constexpr inline observer_ptr(observer_ptr<K> other) noexcept : ptr(other.get()) { }
 	// ---------------------------------------------------------------------------------------------
@@ -190,5 +197,22 @@ public:
 		return ptr != nullptr;
 	}
 };
+
+template <typename T>
+inline adaptive_ptr<T> make_adaptive(const observer_ptr<T>& ptr) noexcept {
+	return adaptive_ptr<T>(ptr);
+}
+template <typename T>
+inline adaptive_ptr<T> make_adaptive(observer_ptr<T>&& ptr) noexcept {
+	return adaptive_ptr<T>(ptr);
+}
+template <typename T>
+inline adaptive_ptr<T> make_adaptive(const shared_ptr<T>& ptr) noexcept {
+	return adaptive_ptr<T>(ptr);
+}
+template <typename T>
+inline adaptive_ptr<T> make_adaptive(shared_ptr<T>&& ptr) noexcept {
+	return adaptive_ptr<T>(ptr);
+}
 
 } //namespace libv

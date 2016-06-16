@@ -4,6 +4,7 @@
 #include <libv/ui/component/ui.hpp>
 // ext
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
 // libv
 #include <libv/gl/gl.hpp>
 // pro
@@ -48,12 +49,12 @@ void UI::setSize(ivec2 size) {
 // -------------------------------------------------------------------------------------------------
 
 void UI::build() {
-	buildComponents(gl);
+	content.build(gl);
 	validate();
 }
 
 void UI::destroy() {
-	destroyComponents(gl);
+	content.destroy(gl);
 	invalidate();
 }
 
@@ -61,9 +62,15 @@ void UI::render() {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::viewport(position, size);
-	gl.pushMatrixProjection(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
+//	gl.pushMatrixProjection(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
 
-	Container::renderComponents(gl);
+	auto x0 = position.x;
+	auto x1 = position.x + size.x;
+	auto y0 = position.y;
+	auto y1 = position.y + size.y;
+	gl.pushMatrixProjection(glm::ortho<float>(x0, x1, y0, y1));
+
+	content.render(gl);
 
 	gl.popMatrixProjection();
 }
@@ -87,20 +94,19 @@ void UI::refresh() {
 	render();
 }
 
-// -------------------------------------------------------------------------------------------------
+void UI::add(const observer_ptr<Component>& component) {
+	content.add(component);
+}
 
-void UI::doBuildComponents(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Build UI");
-	for (auto& component : components) {
-		component->setDisplaySize(vec3(size, 0));
-		component->setDisplayPosition(vec3());
-		component->build(renderer);
-	}
+void UI::add(const shared_ptr<Component>& component) {
+	content.add(component);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-UI::UI() { }
+UI::UI() {
+	content.setComponentID("Root");
+}
 
 UI::~UI() { }
 

@@ -22,6 +22,8 @@
 //			SignalHub is a trackable
 //			Both method should be kept
 // TODO P3: Remove reference, remove constness from results type?
+// TODO P3: In Signal Hub-Proxy a connection can be represented with only 1 ptr where the last last
+//			bit of the address can represent the direction!
 
 // TODO P5: AdaptivSignal [in/out]put (same, generic lambda...)
 // TODO P5: RoutingSignal [set/get]Condition(SignalRouter)
@@ -39,6 +41,10 @@
 // TODO P5: SnycSignal - Put the fire method and the arguments into a worker
 // 			thread que to call this signal in sync mode. (template executor?)
 
+// TODO P5: Another raw idea for light weight signals: SignalPtr which is only a pointer to the real
+//			signal. It could also store some additional information such as FilterSignalPtr could
+//			store the filter information that will be applied to the output. (Component::onClick
+//			could be a FilterSignalPtr that points to the UI signal and stores the boundaries)
 // TODO PD: Documentation of Signal-Slot. The boost version may be relevant
 // 			http://www.boost.org/doc/libs/1_59_0/doc/html/signals2/reference.html
 // TODO PD: Turotial of Signal-Slot. The boost version may be relevant

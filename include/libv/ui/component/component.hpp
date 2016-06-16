@@ -5,12 +5,13 @@
 // libv
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
+#include <libv/sig/signal.hpp>
 // std
 #include <atomic>
 #include <memory>
 #include <string>
 // pro
-#include <libv/ui/component/ui.hpp>
+//#include <libv/ui/component/ui.hpp>
 #include <libv/ui/properties.hpp>
 #include <libv/ui/render/renderer.hpp>
 
@@ -21,42 +22,46 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Frame;
-class Container;
+//class Frame;
+//class Container;
+class Layout;
 
 class Component {
 protected:
 	std::string componentID;
 	std::string componentClass;
 
-	vec3 displayPosition;
-	vec3 displaySize;
-
 	std::atomic<bool> invalid{true};
 	PropertyMap properties;
 
 public:
-	vec3 getDisplayPosition() const;
-	vec3 getDisplaySize() const;
-	void setDisplayPosition(vec3 pos);
-	void setDisplaySize(vec3 size);
-
-public:
 	template<typename T>
-	T get(const PropertyMap::Address<T>& address) const {
-		auto ptr = properties.get(address);
-		return ptr ? *ptr : T();
+	decltype(auto) get(const PropertyAddress<T>& address) const {
+		return properties.get(address);
 	}
 	template <typename T, typename Value>
-	void set(const PropertyMap::Address<T>& address, Value&& value) {
+	void set(const PropertyAddress<T>& address, Value&& value) {
+//		onPropertyChange.fire();
+		onLayoutChange.fire();
+		invalidate();
 		properties.set(address, std::forward<Value>(value));
 	}
 	PropertyMap::SetterProxy set() {
+//		onPropertyChange.fire();
+		invalidate();
 		return properties.set();
+	}
+	const std::string& getComponentID() {
+		return this->componentID;
 	}
 	void setComponentID(std::string componentID) {
 		this->componentID = componentID;
 	}
+
+public:
+//	Signal<> onPropertyChange;
+//	Signal<> onInvalidation;
+	Signal<> onLayoutChange;
 
 protected:
 	void validate();
@@ -65,12 +70,17 @@ protected:
 	void invalidate();
 	bool isInvalid() const;
 
-public:
-	void visit(std::function<void(libv::observer_ptr<Component>)>&);
-private:
-	virtual void doVisit(std::function<void(libv::observer_ptr<Component>)>&);
+//public:
+//	void visit(std::function<void(Component&)>&);
+//private:
+//	virtual void doVisit(std::function<void(Component&)>&);
 
 public:
+	/** Layout the underlying component into the received layout.
+	 * @param layout - The owner layout
+	 * @context ANY */
+	Layout layout(const Layout& parentLayout);
+
 	/** Control function. Called before render if the object was previously invalidated.
 	 * @param renderer - The render context
 	 * @note Does not require of previous destroy
@@ -88,6 +98,7 @@ public:
 	void render(Renderer& renderer);
 
 private:
+	virtual Layout doLayout(const Layout& parentLayout);
 	virtual void doBuild(Renderer& renderer) = 0;
 	virtual void doDestroy(Renderer& renderer) = 0;
 	virtual void doRender(Renderer& renderer) = 0;

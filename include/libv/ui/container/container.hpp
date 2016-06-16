@@ -8,18 +8,29 @@
 #include <memory>
 #include <vector>
 // pro
+#include <libv/ui/component/component.hpp>
 #include <libv/ui/render/renderer.hpp>
 
 namespace libv {
 namespace ui {
 
-class Component;
-
 // -------------------------------------------------------------------------------------------------
 
-class Container {
+class Container : public Component {
 public:
-	using Store = std::vector<adaptive_ptr<Component>>;
+	struct LayoutInfo {
+		vec3 size;
+		vec3 offset;
+	};
+	struct ContainedComponent {
+		LayoutInfo info;
+		adaptive_ptr<Component> ptr;
+
+		ContainedComponent(adaptive_ptr<Component> component) : ptr(component) { }
+	};
+
+public:
+	using Store = std::vector<ContainedComponent>;
 
 protected:
 	Store components;
@@ -27,18 +38,23 @@ protected:
 public:
 	void add(const observer_ptr<Component>& component);
 	void add(const shared_ptr<Component>& component);
+	void addObserver(const observer_ptr<Component>& component);
+//	void addObserver(const shared_ptr<Component>& component); // Hazardous
+	void addObserver(Component& component);
+	void addObserver(Component* const component);
+//	void addShared(const observer_ptr<Component>& component); // Hazardous
+	void addShared(const shared_ptr<Component>& component);
+//	void addShared(Component& component); // Hazardous
+	void addShared(Component* const component);
+
 //	void remove(const observer_ptr<Component>& component);
 //	void remove(const shared_ptr<Component>& component);
 
-public:
-	void buildComponents(Renderer& renderer);
-	void destroyComponents(Renderer& renderer);
-	void renderComponents(Renderer& renderer);
-
 private:
-	virtual void doBuildComponents(Renderer& renderer);
-	virtual void doDestroyComponents(Renderer& renderer);
-	virtual void doRenderComponents(Renderer& renderer);
+	virtual Layout doLayout(const Layout& parentLayout) override = 0;
+	virtual void doBuild(Renderer& renderer) override;
+	virtual void doDestroy(Renderer& renderer) override;
+	virtual void doRender(Renderer& renderer) override;
 
 public:
 	Container() = default;

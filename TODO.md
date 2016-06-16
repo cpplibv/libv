@@ -1,18 +1,22 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-string2D size respect (new line)
+alignment and orient hard type
+alignment and orient to property
+rename align to anchor?
 -- commit --
 
-elevate line in string based on descent
+use new layout from frame or whatever (automated layout not manual call...)
+layout in build?
+cache old layout result
+check render
 -- commit --
 
-cleanup / review the full render process
+rework renderer
+opengl independent api in ui
+4 way: template or linkage or external or dynamic
 -- commit --
 
 use VAO for string2D
--- commit --
-
-sandbox multiple label under each other
 -- commit --
 
 font cache
@@ -24,15 +28,19 @@ shader cache
 remove vm3 from gl
 -- commit --
 
-FIX: Size management - find reason of div by zero? (left-right=0 div)
-FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
+?kill def renderer
 -- commit --
 
-?kill def renderer
+merge vsig back and create vmeta and vtmta (too many tamplate argument)
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+c++ opengl api
+a system where every property used by a component is listed and described to check invalid configurations (boost serialization like function)
+PanelFlow::statics to enums
+no opengl include in ui, some kind of link as ui-opengl
+intel vtune
 pretty flow, refactor line, build line, accum line...
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
@@ -41,13 +49,16 @@ replace every raw ptr with a smart counter part (incl observer_ptr)
 look after and variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
 look after any
 moving vec costume getter functions from member to public -> reducing symbols...
-provide exception free api EVERYWHERE!
+provide exception free alternative api EVERYWHERE! hehehehehe.
 seg fault in resource! (just run libv_test in debug...) // however it will be rewritten
+FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
+layout invalidation with change bitmask: OFFSET_BIT, SIZE_BIT, STRUCTURE_BIT? ...
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
 LIBV_STRONG_TYPEDEF(int, Severity);
 log thread naming
+logger client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
 
 // -------------------------------------------------------------------------------------------------
 
@@ -72,6 +83,12 @@ Idea for world gen:
 http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
 http://devmag.org.za/2009/04/25/perlin-noise/
 http://gamedev.stackexchange.com/questions/31241/random-map-generation
+
+// -------------------------------------------------------------------------------------------------
+
+I dont know yet what it could be used for, but this is could be VERY handy!
+sfiane + decltype + operator ,
+decltype(os << obj, void())
 
 // -------------------------------------------------------------------------------------------------
 
@@ -182,7 +199,8 @@ What is GLFW_USE_DWM_SWAP_INTERVAL?.... Test it off
 
 Priority levels for each operation
 IN - in-context operation (FAST and not context sensitive)
-       GL Task        | Priority | Note
+
+ GL Task              | Priority | Note
 :-------------------- | --------:|:-----------------------------------------------------------------
  Initialization       |   0100   |
  D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
@@ -210,7 +228,7 @@ IN - in-context operation (FAST and not context sensitive)
  Termination          |   9800   |
  Render-Residual      |   9900   | Always stays in queue as last operation
 
-       IO Task        | Priority | Note
+ IO Task              | Priority | Note
 :-------------------- | --------:|:-----------------------------------------------------------------
  D.UIShader File      |   1100   | Unloading as Shader File
  D.Shader File        |   1200   | Unloading as Shader File
@@ -218,10 +236,10 @@ IN - in-context operation (FAST and not context sensitive)
  D.UITexture          |   1400   | Unloading as Texture
  D.Model              |   1500   | Unloading as Model
  D.Texture            |   1600   | Unloading as Texture
- Unload Texture       |    IN    |
- Unload Model         |    IN    |
- Unload Font          |    IN    |
- Unload Shader File   |    IN    |
+ Unload Texture       |     IN   |
+ Unload Model         |     IN   |
+ Unload Font          |     IN   |
+ Unload Shader File   |     IN   |
  Load UIShader File   |   4100   | Unloading as Shader File
  Load Shader File     |   4150   |
  Load Font            |   4300   |

@@ -8,13 +8,15 @@ namespace ui {
 
 namespace Property {
 
-PropertyAddress<LayoutType> Layout;
-PropertyAddress<bool> NewLine;
-PropertyAddress<vec3> Position;
+//PropertyAddress<Align> Alignment;
+//PropertyAddress<Align> AlignmentContent;
+//PropertyAddress<Orient> Orientation;
+//PropertyAddress<bool> NewLine;
+//PropertyAddress<vec4> Border;
+//PropertyAddress<vec4> Margin;
+//PropertyAddress<vec4> Pedding;
+//PropertyAddress<vec3> Position;
 PropertyAddress<SizeType> Size;
-PropertyAddress<vec4> Border;
-PropertyAddress<vec4> Margin;
-PropertyAddress<vec4> Pedding;
 
 } //namespace Property
 
