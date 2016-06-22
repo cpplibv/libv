@@ -36,10 +36,11 @@ public:
 void glfwMonitorCallback(GLFWmonitor*, int);
 
 struct Monitor {
-public:
 	static std::map<GLFWmonitor*, Monitor> monitors;
-	static Monitor* getMonitorAt(ivec2 coord);
 	static Signal<const EventMonitor&> onMonitor;
+public:
+	static Monitor* getMonitorAt(ivec2 coord);
+	static Monitor* getPrimaryMonitor();
 
 public:
 	std::string name;

@@ -66,14 +66,12 @@ void Container::addShared(Component * const component) {
 // -------------------------------------------------------------------------------------------------
 
 void Container::doBuild(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Build Container [%s]", componentID);
 	for (auto& component : components) {
 		component.ptr->build(renderer);
 	}
 }
 
 void Container::doDestroy(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Destroy Container [%s]", componentID);
 	for (auto& component : components) {
 		component.ptr->destroy(renderer);
 	}

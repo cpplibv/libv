@@ -14,12 +14,6 @@
 // TODO P4: UI Event should not come from directly from frame but from open signals? (remove attach)
 // TODO P4: Render ui into a separate frame buffer, or option set its target
 
-// Random statements about UI:
-// Not knowing your parent is fun
-// Not remembering your roots is kind of fun too
-// Container is not a component
-// Merging layout management with container should improve our system
-
 namespace libv {
 namespace ui {
 
@@ -30,7 +24,7 @@ class Component;
 
 class UI {
 private:
-	Renderer gl; //<<< Layout layout;
+	Renderer gl; //Layout layout;
 	PanelFlow content; //TODO P5: Change to a more primitive panel
 
 	ivec2 position;

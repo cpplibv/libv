@@ -72,6 +72,10 @@ Monitor* Monitor::getMonitorAt(ivec2 coord) {
 	return minid;
 }
 
+Monitor* Monitor::getPrimaryMonitor() {
+	return &monitors.at(glfwGetPrimaryMonitor());
+}
+
 Monitor::Monitor(GLFWmonitor* monitor) {
 	currentVideoMode = glfwGetVideoMode(monitor);
 	name = glfwGetMonitorName(monitor);

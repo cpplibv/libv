@@ -72,6 +72,13 @@ public:
 
 	static const TypeOpenGLSamples SAMPLES_DONT_CARE;
 
+	enum FramePosition {
+		POSITION_CENTER_CURRENT_MONITOR,
+		POSITION_CENTER_PRIMARY_MONITOR
+		//CENTER_MONITOR_N
+		//Additional smart position based on demand.
+	};
+
 	// Close ---------------------------------------------------------------------------------------
 
 public:
@@ -270,12 +277,7 @@ public:
 	void setDisplayMode(const TypeDisplayMode& mode);
 	void setPosition(int x, int y);
 	void setPosition(ivec2 pos);
-// TODO P4: Neat positioning setters for Frame
-//	void setPosition(const FramePosEnum&);
-//	or
-//	void setPositionToCenterOfCurrent();
-//	void setPositionToCenterOfPrimary();
-//	void setPositionToCenterOfMonitor(const Monitor&);
+	void setPosition(FramePosition pos);
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
 	void setSize(ivec2 size);

@@ -158,7 +158,7 @@ void Frame::setOpenGLVersion(int major, int minor) {
 	context.executeAsync([this, major, minor] {
 		LIBV_UI_FRAME_TRACE("Set frame OpenGLVersion of [%s] to [%d.%d]", title, major, minor);
 		this->openGLVersionMajor = major;
-				this->openGLVersionMinor = minor;
+		this->openGLVersionMinor = minor;
 		if (window)
 				cmdFrameRecreate();
 		});
@@ -225,6 +225,31 @@ void Frame::setPosition(ivec2 newpos) {
 		if (window)
 				coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
 		});
+}
+
+void Frame::setPosition(FramePosition pos) {
+	switch (pos) {
+	case POSITION_CENTER_CURRENT_MONITOR:
+		context.executeAsync([this] {
+			auto* monitor = getCurrentMonitor();
+			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
+			LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of current monitor", title, newpos.x, newpos.y);
+			this->position = newpos;
+			if (window)
+					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+			});
+		break;
+	case POSITION_CENTER_PRIMARY_MONITOR:
+		context.executeAsync([this] {
+			auto* monitor = Monitor::getPrimaryMonitor();
+			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
+			LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of primary monitor", title, newpos.x, newpos.y);
+			this->position = newpos;
+			if (window)
+					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+			});
+		break;
+	}
 }
 
 void Frame::setResizable(bool resizable) {

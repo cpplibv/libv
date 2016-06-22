@@ -1,5 +1,8 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+layout on frame size change
+-- commit --
+
 alignment and orient hard type
 alignment and orient to property
 rename align to anchor?

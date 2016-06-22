@@ -136,11 +136,6 @@ class TestFrame : public Frame {
 				closeDefault();
 			if (e.key == 257 && e.action != 0)
 				lbl0.setText(lbl0.getText() + '\n');
-			if (e.key == 'A') {
-				LayoutInfo layoutRoot(vec3(1024, 1024, 0));
-				lf.layout(layoutRoot);
-				lf.set();
-			}
 			if (e.key == 259 && e.action != 0) {
 				auto t = lbl0.getText();
 				if (t.size() > 0) {
@@ -158,10 +153,10 @@ class TestFrame : public Frame {
 public:
 	TestFrame(const std::string& title) : Frame(title) {
 		noisyEvents(*this);
-		setSize(1024, 1024); // <<< These operations are async, fix it. (async is fine, but here could be sync)
-		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - ivec2(512, 512));
+		setSize(1024, 1024);
+		setPosition(POSITION_CENTER_CURRENT_MONITOR);
 		setCloseOperation(ON_CLOSE_DISPOSE);
-		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
+		setOpenGLProfile(OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
 		init();
 		show();
