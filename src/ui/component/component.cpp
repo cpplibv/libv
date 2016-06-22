@@ -44,9 +44,16 @@ bool Component::isInvalid() const {
 
 LayoutInfo Component::layout(const LayoutInfo& parentLayout) {
 	LIBV_UI_COMPONENT_TRACE("Layout [%s]", componentID);
-	auto l = doLayout(parentLayout);
-	LIBV_UI_COMPONENT_TRACE("Result Layout [%s] [%f,%f,%f]", componentID, l.size.x, l.size.y, l.size.z);
-	return l;
+
+	if (isInvalid() || lastParentLayoutInfo != parentLayout) {
+		lastResultLayoutInfo = doLayout(parentLayout);
+		LIBV_UI_COMPONENT_TRACE("Result from Layout [%s] [%f,%f,%f]", componentID,
+				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
+	} else
+		LIBV_UI_COMPONENT_TRACE("Result from Cache [%s] [%f,%f,%f]", componentID,
+				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
+
+	return lastResultLayoutInfo;
 }
 
 void Component::build(Renderer& renderer) {
@@ -61,7 +68,7 @@ void Component::destroy(Renderer& renderer) {
 }
 
 void Component::render(Renderer& renderer) {
-//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log msg
+	//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log msg
 	doRender(renderer);
 }
 

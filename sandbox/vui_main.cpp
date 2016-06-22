@@ -121,12 +121,8 @@ class TestFrame : public Frame {
 //			(Property::Size, vec3(100%, 100%, 0));
 		;
 
-//		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);
-//		lf.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
-//		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
-
-		lf.setAlign(PanelFlow::ALIGN_BOTTOM_CENTER);
-		lf.setAlignContent(PanelFlow::ALIGN_TOP_CENTER);
+		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);
+		lf.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
 		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
 
 		addComponent(make_observer(&lf));

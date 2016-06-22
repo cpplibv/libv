@@ -25,13 +25,16 @@ class ParentAccessor;
 
 class Component {
 	friend class ParentAccessor;
+protected:
+	std::atomic<bool> invalid{true};
 private:
 	observer_ptr<Component> parent;
+	LayoutInfo lastParentLayoutInfo;
+	LayoutInfo lastResultLayoutInfo;
 protected:
 	std::string componentID;
 	std::string componentClass;
 
-	std::atomic<bool> invalid{true};
 	PropertyMap properties;
 
 public:
@@ -63,10 +66,10 @@ protected:
 public:
 	bool isInvalid() const;
 
-//public:
-//	void visit(std::function<void(Component&)>&);
-//private:
-//	virtual void doVisit(std::function<void(Component&)>&);
+	//public:
+	//	void visit(std::function<void(Component&)>&);
+	//private:
+	//	virtual void doVisit(std::function<void(Component&)>&);
 
 public:
 	/** Layout the underlying component into the received layout.

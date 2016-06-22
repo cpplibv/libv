@@ -84,8 +84,6 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 }
 
 TEST_CASE("UI Layout system should handle dynamic layout components2") {
-	std::cout << libv::log;
-	{
 	TestPanel panel("Panel");
 	TestQuadDynamicLayout quad0("Quad0");
 	TestQuadDynamicLayout quad1("Quad1");
@@ -118,8 +116,6 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 		CHECK(components[1].info.offset == vec3(0, 580, 0));
 		CHECK(components[2].info.offset == vec3(300, 580, 0));
 	}
-	}
-	libv::log.deny();
 }
 
 //
