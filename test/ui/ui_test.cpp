@@ -28,7 +28,7 @@ TEST_CASE("UI Layout system should handle basic layout components") {
 	panel.add(make_observer(&quad1));
 	panel.add(make_observer(&quad2));
 
-	Layout layoutRoot(vec3(16, 512, 0));
+	LayoutInfo layoutRoot(vec3(16, 512, 0));
 
 	SECTION("") {
 		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
@@ -63,7 +63,7 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 	panel.addObserver(quad1);
 	panel.addObserver(quad2);
 
-	Layout layoutRoot(vec3(16, 512, 0));
+	LayoutInfo layoutRoot(vec3(16, 512, 0));
 
 	SECTION("") {
 		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
@@ -100,7 +100,7 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 	panel.addObserver(quad1);
 	panel.addObserver(quad2);
 
-	Layout layoutRoot(vec3(1000, 1000, 0));
+	LayoutInfo layoutRoot(vec3(1000, 1000, 0));
 
 	SECTION("") {
 		panel.setAlign(PanelFlow::ALIGN_TOP_LEFT);
@@ -135,9 +135,5 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 // - - - ViewPort 1r, 1r
 //
 
-TEST_CASE("UI Layout system should handle not layoutable components") {
-	std::cout << libv::log;
-	{
-	}
-	libv::log.deny();
-}
+//TEST_CASE("UI Layout system should handle not layoutable components") {
+//}

@@ -59,17 +59,5 @@ public:
 
 // =================================================================================================
 
-//class Quad;
-//
-//class DefaultRenderer {
-//public:
-//	template<typename Object>
-//	void render(const Object* obj) {
-//		render(obj);
-//	}
-//private:
-////	virtual void render(const Quad* v);
-//};
-
 } //namespace ui
 } //namespace libv

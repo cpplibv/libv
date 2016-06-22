@@ -10,8 +10,8 @@
 #include <string>
 #include <vector>
 
-// TODO P5: Most of the event should get a Frame* as member
-// TODO P5: Review every event and change int to bool, and (double, double) to dvec2
+// TODO P5: Most of the event should get a observer_ptr<Frame> as member
+// TODO P5: Review every event and change int to bool or enum, and (double, double) to dvec2
 // TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
 
 namespace libv {

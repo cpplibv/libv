@@ -270,6 +270,12 @@ public:
 	void setDisplayMode(const TypeDisplayMode& mode);
 	void setPosition(int x, int y);
 	void setPosition(ivec2 pos);
+// TODO P4: Neat positioning setters for Frame
+//	void setPosition(const FramePosEnum&);
+//	or
+//	void setPositionToCenterOfCurrent();
+//	void setPositionToCenterOfPrimary();
+//	void setPositionToCenterOfMonitor(const Monitor&);
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
 	void setSize(ivec2 size);

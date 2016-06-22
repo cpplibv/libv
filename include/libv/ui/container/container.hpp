@@ -18,12 +18,12 @@ namespace ui {
 
 class Container : public Component {
 public:
-	struct LayoutInfo {
+	struct LayoutResult {
 		vec3 size;
 		vec3 offset;
 	};
 	struct ContainedComponent {
-		LayoutInfo info;
+		LayoutResult info;
 		adaptive_ptr<Component> ptr;
 
 		ContainedComponent(adaptive_ptr<Component> component) : ptr(component) { }
@@ -39,19 +39,19 @@ public:
 	void add(const observer_ptr<Component>& component);
 	void add(const shared_ptr<Component>& component);
 	void addObserver(const observer_ptr<Component>& component);
-//	void addObserver(const shared_ptr<Component>& component); // Hazardous
+	//void addObserver(const shared_ptr<Component>& component); // Hazardous
 	void addObserver(Component& component);
 	void addObserver(Component* const component);
-//	void addShared(const observer_ptr<Component>& component); // Hazardous
+	//void addShared(const observer_ptr<Component>& component); // Hazardous
 	void addShared(const shared_ptr<Component>& component);
-//	void addShared(Component& component); // Hazardous
+	//void addShared(Component& component); // Hazardous
 	void addShared(Component* const component);
 
 //	void remove(const observer_ptr<Component>& component);
 //	void remove(const shared_ptr<Component>& component);
 
 private:
-	virtual Layout doLayout(const Layout& parentLayout) override = 0;
+	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) override = 0;
 	virtual void doBuild(Renderer& renderer) override;
 	virtual void doDestroy(Renderer& renderer) override;
 	virtual void doRender(Renderer& renderer) override;

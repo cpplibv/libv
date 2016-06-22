@@ -11,8 +11,8 @@ struct TestQuad : public libv::ui::Component {
 		setComponentID(id);
 	}
 private:
-	virtual libv::ui::Layout doLayout(const libv::ui::Layout&) override {
-		libv::ui::Layout layout(*get(libv::ui::Property::Size));
+	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo&) override {
+		libv::ui::LayoutInfo layout(*get(libv::ui::Property::Size));
 		return layout;
 	}
 	virtual void doBuild(libv::ui::Renderer&) override { }
@@ -26,8 +26,8 @@ struct TestQuadDynamicLayout : public libv::ui::Component {
 		setComponentID(id);
 	}
 private:
-	virtual libv::ui::Layout doLayout(const libv::ui::Layout&) override {
-		libv::ui::Layout layout(size);
+	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo&) override {
+		libv::ui::LayoutInfo layout(size);
 		return layout;
 	}
 	virtual void doBuild(libv::ui::Renderer&) override { }

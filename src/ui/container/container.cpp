@@ -12,11 +12,6 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/properties.hpp>
 
-// TODO P4: default layout mrg (dummy fix size max overlapping? or flow?)
-// TODO P4: invalidate in not virtual!
-// TODO P4: build could be eliminated? do your stuff in render?
-// TODO P4: more definite size management (mostly for frame! and its event) (sorry about this task)
-
 namespace libv {
 namespace ui {
 
@@ -26,6 +21,7 @@ void Container::add(const observer_ptr<Component>& component) {
 	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
 			component->getComponentID(), this->getComponentID());
 	components.emplace_back(make_adaptive(component));
+	ParentAccessor::setParent(component, make_observer(this));
 	invalidate();
 }
 
@@ -33,6 +29,7 @@ void Container::add(const shared_ptr<Component>& component) {
 	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
 			component->getComponentID(), this->getComponentID());
 	components.emplace_back(make_adaptive(component));
+	ParentAccessor::setParent(make_observer(component), make_observer(this));
 	invalidate();
 }
 
@@ -52,26 +49,21 @@ void Container::addShared(const shared_ptr<Component>& component) {
 	add(component);
 }
 
-void Container::addShared(Component* const component) {
+void Container::addShared(Component * const component) {
 	add(shared_ptr<Component>(component));
 }
 
 //void Container::remove(const observer_ptr<Component>& component) {
 //	components.erase(std::remove(components.begin(), components.end(), component), components.end());
+//	ParentAccessor::setParent(component, make_observer(nullptr));
 //}
 //
 //void Container::remove(const shared_ptr<Component>& component) {
 //	components.erase(std::remove(components.begin(), components.end(), component), components.end());
+//	ParentAccessor::setParent(component, make_observer(nullptr));
 //}
 
 // -------------------------------------------------------------------------------------------------
-
-//Layout Container::doLayout(const Layout& layout) {
-//	LIBV_UI_COMPONENT_TRACE("Layout Container [%s]", componentID);
-//	for (auto& component : components) {
-//		component.ptr->layout(layout);
-//	}
-//}
 
 void Container::doBuild(Renderer& renderer) {
 	LIBV_UI_COMPONENT_TRACE("Build Container [%s]", componentID);
@@ -88,18 +80,14 @@ void Container::doDestroy(Renderer& renderer) {
 }
 
 void Container::doRender(Renderer& gl) {
-	gl.pushMatrixView();
-
 	for (auto& component : components) {
 		gl.pushMatrixModel();
 
-		auto offset = component.info.offset;
-		gl.matrixModel() *= glm::translate(glm::vec3(offset));
+		gl.matrixModel() *= glm::translate(glm::vec3(component.info.offset));
 		component.ptr->render(gl);
 
 		gl.popMatrixModel();
 	}
-	gl.popMatrixView();
 }
 
 // -------------------------------------------------------------------------------------------------

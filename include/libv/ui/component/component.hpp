@@ -11,22 +11,22 @@
 #include <memory>
 #include <string>
 // pro
-//#include <libv/ui/component/ui.hpp>
+#include <libv/ui/layout.hpp>
 #include <libv/ui/properties.hpp>
 #include <libv/ui/render/renderer.hpp>
-
-// TODO P4: Protect component DisplayPosition, DisplaySize, Parent and Frame?
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-//class Frame;
-//class Container;
-class Layout;
+class LayoutInfo;
+class ParentAccessor;
 
 class Component {
+	friend class ParentAccessor;
+private:
+	observer_ptr<Component> parent;
 protected:
 	std::string componentID;
 	std::string componentClass;
@@ -41,13 +41,10 @@ public:
 	}
 	template <typename T, typename Value>
 	void set(const PropertyAddress<T>& address, Value&& value) {
-//		onPropertyChange.fire();
-		onLayoutChange.fire();
 		invalidate();
 		properties.set(address, std::forward<Value>(value));
 	}
 	PropertyMap::SetterProxy set() {
-//		onPropertyChange.fire();
 		invalidate();
 		return properties.set();
 	}
@@ -58,16 +55,12 @@ public:
 		this->componentID = componentID;
 	}
 
-public:
-//	Signal<> onPropertyChange;
-//	Signal<> onInvalidation;
-	Signal<> onLayoutChange;
-
 protected:
 	void validate();
 	/** Invalidates the object requesting it to rebuild before the next render.
 	 * @context ANY */
 	void invalidate();
+public:
 	bool isInvalid() const;
 
 //public:
@@ -79,7 +72,7 @@ public:
 	/** Layout the underlying component into the received layout.
 	 * @param layout - The owner layout
 	 * @context ANY */
-	Layout layout(const Layout& parentLayout);
+	LayoutInfo layout(const LayoutInfo& parentLayout);
 
 	/** Control function. Called before render if the object was previously invalidated.
 	 * @param renderer - The render context
@@ -98,7 +91,7 @@ public:
 	void render(Renderer& renderer);
 
 private:
-	virtual Layout doLayout(const Layout& parentLayout);
+	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout);
 	virtual void doBuild(Renderer& renderer) = 0;
 	virtual void doDestroy(Renderer& renderer) = 0;
 	virtual void doRender(Renderer& renderer) = 0;
@@ -107,6 +100,14 @@ public:
 	Component();
 	Component(const std::string& componentID, const std::string& componentClass);
 	virtual ~Component();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct ParentAccessor {
+	static void setParent(const observer_ptr<Component>& component, const observer_ptr<Component>& parent) {
+		component->parent = parent;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

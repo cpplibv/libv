@@ -7,9 +7,12 @@
 #include <glm/gtx/transform.hpp>
 // libv
 #include <libv/gl/gl.hpp>
+#include <libv/gl/log.hpp>
 // pro
 #include <libv/ui/frame/frame.hpp>
+#include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
+
 
 namespace libv {
 namespace ui {
@@ -17,7 +20,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 bool UI::isInvalid() const {
-	return !valid;
+	return !valid || content.isInvalid();
 }
 
 void UI::validate() {
@@ -49,20 +52,23 @@ void UI::setSize(ivec2 size) {
 // -------------------------------------------------------------------------------------------------
 
 void UI::build() {
+	LayoutInfo root(vec3(size, 0));
+	content.layout(root);
 	content.build(gl);
 	validate();
+	checkGL();
 }
 
 void UI::destroy() {
 	content.destroy(gl);
 	invalidate();
+	checkGL();
 }
 
 void UI::render() {
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::viewport(position, size);
-//	gl.pushMatrixProjection(glm::ortho<float>(position.x, position.x + size.x, position.y, position.y + size.y));
 
 	auto x0 = position.x;
 	auto x1 = position.x + size.x;
@@ -73,6 +79,7 @@ void UI::render() {
 	content.render(gl);
 
 	gl.popMatrixProjection();
+	checkGL();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -88,9 +95,8 @@ void UI::attach(observer_ptr<Frame> frame) {
 }
 
 void UI::refresh() {
-	if (isInvalid()) {
+	if (isInvalid())
 		build();
-	}
 	render();
 }
 
@@ -105,7 +111,10 @@ void UI::add(const shared_ptr<Component>& component) {
 // -------------------------------------------------------------------------------------------------
 
 UI::UI() {
-	content.setComponentID("Root");
+	content.setComponentID("UIRoot");
+	content.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
+	content.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
+	content.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
 }
 
 UI::~UI() { }

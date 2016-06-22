@@ -1,14 +1,19 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+cache layout result
+-- commit --
+
 alignment and orient hard type
 alignment and orient to property
 rename align to anchor?
 -- commit --
 
-use new layout from frame or whatever (automated layout not manual call...)
-layout in build?
-cache old layout result
-check render
+size property %
+-- commit --
+
+component property
+a system where every property used by a component is listed and described to
+check invalid configurations (boost serialization like function)
 -- commit --
 
 rework renderer
@@ -16,6 +21,7 @@ opengl independent api in ui
 4 way: template or linkage or external or dynamic
 -- commit --
 
+use VBO for string2D
 use VAO for string2D
 -- commit --
 
@@ -36,12 +42,11 @@ merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+think layout as a graph instad of a stack..., just think and see whats going on with that approach
 c++ opengl api
-a system where every property used by a component is listed and described to check invalid configurations (boost serialization like function)
 PanelFlow::statics to enums
 no opengl include in ui, some kind of link as ui-opengl
 intel vtune
-pretty flow, refactor line, build line, accum line...
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events

@@ -20,9 +20,10 @@ void Component::validate() {
 void Component::invalidate() {
 	if (!invalid) {
 		LIBV_UI_COMPONENT_TRACE("Invalidate [%s]", componentID);
+		invalid = true;
+		if (parent)
+			parent->invalidate();
 	}
-	invalid = true;
-//	onInvalidation.fire();
 }
 
 bool Component::isInvalid() const {
@@ -41,7 +42,7 @@ bool Component::isInvalid() const {
 
 // -------------------------------------------------------------------------------------------------
 
-Layout Component::layout(const Layout& parentLayout) {
+LayoutInfo Component::layout(const LayoutInfo& parentLayout) {
 	LIBV_UI_COMPONENT_TRACE("Layout [%s]", componentID);
 	auto l = doLayout(parentLayout);
 	LIBV_UI_COMPONENT_TRACE("Result Layout [%s] [%f,%f,%f]", componentID, l.size.x, l.size.y, l.size.z);
@@ -60,18 +61,15 @@ void Component::destroy(Renderer& renderer) {
 }
 
 void Component::render(Renderer& renderer) {
-//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID);
-	if (isInvalid())
-		build(renderer);
-
+//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log msg
 	doRender(renderer);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-Layout Component::doLayout(const Layout&) {
+LayoutInfo Component::doLayout(const LayoutInfo&) {
 	auto property = get(Property::Size);
-	return Layout(property ? *property : vec3());
+	return LayoutInfo(property ? *property : vec3());
 }
 
 // -------------------------------------------------------------------------------------------------

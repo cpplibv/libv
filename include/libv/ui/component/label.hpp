@@ -24,8 +24,16 @@ public:
 		return text.getText();
 	}
 
+// TODO P2: PropertyArchive, serialize_property
+//	template <typename PropertyArchive>
+//	void serialize_property(PropertyArchive& ar) {
+//		ar & PropertyDescriptor(Property::Size, Mandatory, "Determines the maximum size of the text");
+//		ar & PropertyDescriptor(Property::Boundary, Optional, "Determines the boundary policy");
+//		ar & PropertyDescriptor(Property::Align, Default(LEFT), "Alignment of the text");
+//		ar & PropertyDescriptor(Property::Orient, Default(RIGHT), "Orientation of the text");
+//	}
 protected:
-	virtual Layout doLayout(const Layout& parentLayout) override;
+	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) override;
 	virtual void doBuild(Renderer& renderer) override;
 	virtual void doDestroy(Renderer& renderer) override;
 	virtual void doRender(Renderer& renderer) override;

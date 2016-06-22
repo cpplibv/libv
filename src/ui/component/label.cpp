@@ -12,15 +12,13 @@
 namespace libv {
 namespace ui {
 
-void Label::setText(const std::string& text) {
-	LIBV_UI_COMPONENT_TRACE("Set label text to [%s]", text);
-	this->text.setText(text);
+void Label::setText(const std::string& str) {
+	LIBV_UI_COMPONENT_TRACE("Set label text to [%s]", str);
 	invalidate();
+	text.setText(str);
 }
 
-Layout Label::doLayout(const Layout&) {
-	LIBV_UI_COMPONENT_TRACE("Layout Component [%s]", componentID);
-
+LayoutInfo Label::doLayout(const LayoutInfo&) {
 	auto property = get(Property::Size);
 	text.setSize(property ? ivec2(property->xy()) : ivec2());
 	text.build();
@@ -28,17 +26,14 @@ Layout Label::doLayout(const Layout&) {
 }
 
 void Label::doBuild(Renderer&) {
-	LIBV_UI_COMPONENT_TRACE("Build Label");
 	text.build();
 }
 
 void Label::doDestroy(Renderer&) {
-	LIBV_UI_COMPONENT_TRACE("Destroy Label");
 	text.destroy();
 }
 
 void Label::doRender(Renderer& gl) {
-//	LIBV_UI_COMPONENT_TRACE("Render Label");
 	text.render(gl);
 }
 

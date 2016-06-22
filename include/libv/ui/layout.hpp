@@ -11,27 +11,18 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-//class Layout {
-//private:
-//	vec3 containerSize;
-//	vec3 componentSize;
-//public:
-//	Layout(vec3 containerSize) : containerSize(containerSize) { }
-//	vec3 getComponentSize() const {
-//		return componentSize;
-//	}
-//	vec3 getSize() const {
-//		return containerSize;
-//	}
-//	void setComponentSize(vec3 size) {
-//		componentSize = size;
-//	}
-//};
-
-struct Layout {
+struct LayoutInfo {
 	vec3 size;
 
-	Layout(vec3 size) : size(size) { }
+	LayoutInfo(vec3 size = vec3()) : size(size) { }
+	LayoutInfo& operator=(const LayoutInfo& right) = default;
+
+	bool operator!=(const LayoutInfo& rhs) const {
+		return size != rhs.size;
+	}
+	bool operator==(const LayoutInfo& rhs) const {
+		return size == rhs.size;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

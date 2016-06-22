@@ -49,7 +49,7 @@ public:
 	void setAlignContent(Align alignContent);
 
 private:
-	virtual Layout doLayout(const Layout& parentLayout) override;
+	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) override;
 };
 
 // -------------------------------------------------------------------------------------------------

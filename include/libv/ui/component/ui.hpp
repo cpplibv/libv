@@ -6,7 +6,6 @@
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
 // pro
-//#include <libv/ui/container/panel.hpp>
 #include <libv/ui/container/panel_flow.hpp>
 #include <libv/ui/render/renderer.hpp>
 

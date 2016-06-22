@@ -17,6 +17,29 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_CENTER = 0;
+const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_LEFT = 1;
+const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_RIGHT = 2;
+const PanelFlow::Align PanelFlow::ALIGN_CENTER_CENTER = 3;
+const PanelFlow::Align PanelFlow::ALIGN_CENTER_LEFT = 4;
+const PanelFlow::Align PanelFlow::ALIGN_CENTER_RIGHT = 5;
+const PanelFlow::Align PanelFlow::ALIGN_TOP_CENTER = 6;
+const PanelFlow::Align PanelFlow::ALIGN_TOP_LEFT = 7;
+const PanelFlow::Align PanelFlow::ALIGN_TOP_RIGHT = 8;
+
+const PanelFlow::Orient PanelFlow::ORIENT_UP_LEFT = 0;
+const PanelFlow::Orient PanelFlow::ORIENT_UP_RIGHT = 1;
+const PanelFlow::Orient PanelFlow::ORIENT_DOWN_LEFT = 2;
+const PanelFlow::Orient PanelFlow::ORIENT_DOWN_RIGHT = 3;
+const PanelFlow::Orient PanelFlow::ORIENT_LEFT_UP = 4;
+const PanelFlow::Orient PanelFlow::ORIENT_LEFT_DOWN = 5;
+const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_UP = 6;
+const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_DOWN = 7;
+
+// -------------------------------------------------------------------------------------------------
+
+namespace {
+
 using Align = vec3;
 struct Orient {
 	size_t primaryDimension;
@@ -48,35 +71,12 @@ static const Orient orienationTable[] = {
 	{0, 1, 0, 1}, //7 RIGHT_DOWN
 };
 
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_CENTER = 0;
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_LEFT = 1;
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_RIGHT = 2;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_CENTER = 3;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_LEFT = 4;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_RIGHT = 5;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_CENTER = 6;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_LEFT = 7;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_RIGHT = 8;
-
-const PanelFlow::Orient PanelFlow::ORIENT_UP_LEFT = 0;
-const PanelFlow::Orient PanelFlow::ORIENT_UP_RIGHT = 1;
-const PanelFlow::Orient PanelFlow::ORIENT_DOWN_LEFT = 2;
-const PanelFlow::Orient PanelFlow::ORIENT_DOWN_RIGHT = 3;
-const PanelFlow::Orient PanelFlow::ORIENT_LEFT_UP = 4;
-const PanelFlow::Orient PanelFlow::ORIENT_LEFT_DOWN = 5;
-const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_UP = 6;
-const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_DOWN = 7;
-
 // -------------------------------------------------------------------------------------------------
 
-namespace {
 vec3 getComponentSize(Component& component) {
 	auto property = component.get(Property::Size);
 	return property ? *property : vec3();
 }
-}
-
-// Line ============================================================================================
 
 struct Line {
 	std::vector<observer_ptr<Container::ContainedComponent>> compoments;
@@ -118,6 +118,8 @@ BuiltLines buildLines(Container::Store& components, vec3 parentSize, const Orien
 	return BuiltLines{std::move(lines), sumSize};
 }
 
+} //namespace
+
 // PanelFlow =======================================================================================
 
 PanelFlow::PanelFlow(Orient orient, Align align, Align alignContent) :
@@ -128,22 +130,25 @@ PanelFlow::PanelFlow(Orient orient, Align align, Align alignContent) :
 // -------------------------------------------------------------------------------------------------
 
 void PanelFlow::setAlign(Align align) {
+	invalidate();
 	this->indexAlign = align;
 }
 
 void PanelFlow::setAlignContent(Align alignContent) {
+	invalidate();
 	this->indexAlignContent = alignContent;
 }
 
 void PanelFlow::setOrient(Orient orient) {
+	invalidate();
 	this->indexOrient = orient;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-Layout PanelFlow::doLayout(const Layout&) {
+LayoutInfo PanelFlow::doLayout(const LayoutInfo&) {
 	const auto sizeContainer = getComponentSize(*this);
-	Layout layout(sizeContainer);
+	LayoutInfo layout(sizeContainer);
 
 	for (auto& component : components) {
 		const auto childLayout = component.ptr->layout(layout);

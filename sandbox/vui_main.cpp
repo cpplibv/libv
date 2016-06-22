@@ -99,19 +99,17 @@ class TestFrame : public Frame {
 		lbl0.setComponentID("Label0");
 		lbl0.setText("Label0 with interactivity!");
 		lbl0.set()
-//			(Property::Size, vec3(512, 512, 0))
+//			(Property::Size, vec3(1024, 1024, 0))
 		;
 
 		lbl1.setComponentID("Label1");
 		lbl1.setText("Label1 with some text on it.");
 //		lbl1.set()
-//			(Property::Layout, Property::LayoutType::Block)
 //		;
 
 		lbl2.setComponentID("Label2");
 		lbl2.setText("Label2 with some text on it.");
 //		lbl2.set()
-//			(Property::Layout, Property::LayoutType::Block)
 //		;
 
 		lf.setComponentID("Panel");
@@ -120,14 +118,16 @@ class TestFrame : public Frame {
 		lf.add(make_observer(&lbl2));
 		lf.set()
 			(Property::Size, vec3(1024, 1024, 0));
+//			(Property::Size, vec3(100%, 100%, 0));
 		;
-		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);
-		lf.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
-		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
 
-//		lf.setAlign(PanelFlow::ALIGN_BOTTOM_CENTER);
-//		lf.setAlignContent(PanelFlow::ALIGN_TOP_CENTER);
+//		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);
+//		lf.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
 //		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
+
+		lf.setAlign(PanelFlow::ALIGN_BOTTOM_CENTER);
+		lf.setAlignContent(PanelFlow::ALIGN_TOP_CENTER);
+		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
 
 		addComponent(make_observer(&lf));
 
@@ -141,7 +141,7 @@ class TestFrame : public Frame {
 			if (e.key == 257 && e.action != 0)
 				lbl0.setText(lbl0.getText() + '\n');
 			if (e.key == 'A') {
-				Layout layoutRoot(vec3(1024, 1024, 0));
+				LayoutInfo layoutRoot(vec3(1024, 1024, 0));
 				lf.layout(layoutRoot);
 				lf.set();
 			}
@@ -160,14 +160,13 @@ class TestFrame : public Frame {
 	}
 
 public:
-
 	TestFrame(const std::string& title) : Frame(title) {
 		noisyEvents(*this);
-		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - getSize() / 2);
+		setSize(1024, 1024); // <<< These operations are async, fix it. (async is fine, but here could be sync)
+		setPosition(getCurrentMonitor()->currentVideoMode.size / 2 - ivec2(512, 512));
 		setCloseOperation(ON_CLOSE_DISPOSE);
 		setOpenGLProfile(Frame::OPENGL_PROFILE_COMPAT);
 		setOpenGLVersion(3, 3);
-		setSize(1024, 1024);
 		init();
 		show();
 	}
@@ -202,7 +201,7 @@ private:
 int main(int, char**) {
 	std::cout << libv::log;
 	//	libv::log.allow("libv.ui.component");
-	////	libv::log.allow("libv.ui.event");
+	//	libv::log.allow("libv.ui.event");
 	//	libv::log.allow("libv.ui.frame");
 	//	libv::log.allow("libv.ui.glfw");
 	//	libv::log.allow("libv.ui.layout");
