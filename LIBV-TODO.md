@@ -37,6 +37,7 @@ merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+Graph based layout
 ADL
 think layout as a graph instad of a stack..., just think and see whats going on with that approach
 c++ opengl api

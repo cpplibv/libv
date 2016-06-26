@@ -10,6 +10,6 @@
 !test/
 
 !.gitignore
-!TODO.md
+!LIBV-TODO.md
 !CMakeLists.txt
 !README.md
