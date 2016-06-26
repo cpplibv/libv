@@ -99,26 +99,27 @@ class TestFrame : public Frame {
 		lbl0.setComponentID("Label0");
 		lbl0.setText("Label0 with interactivity!");
 		lbl0.set()
-//			(Property::Size, vec3(1024, 1024, 0))
+			(Property::Size, percent(100), nospec(), 0);
 		;
 
 		lbl1.setComponentID("Label1");
 		lbl1.setText("Label1 with some text on it.");
-//		lbl1.set()
-//		;
+		lbl1.set()
+			(Property::Size, percent(100), nospec(), 0);
+		;
 
 		lbl2.setComponentID("Label2");
 		lbl2.setText("Label2 with some text on it.");
-//		lbl2.set()
-//		;
+		lbl2.set()
+			(Property::Size, percent(100), nospec(), 0);
+		;
 
 		lf.setComponentID("Panel");
 		lf.add(make_observer(&lbl0));
 		lf.add(make_observer(&lbl1));
 		lf.add(make_observer(&lbl2));
 		lf.set()
-			(Property::Size, vec3(1024, 1024, 0));
-//			(Property::Size, vec3(100%, 100%, 0));
+			(Property::Size, percent(100), percent(100), 0);
 		;
 
 		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);

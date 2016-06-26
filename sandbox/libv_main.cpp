@@ -12,7 +12,7 @@ struct B {
 };
 
 struct D : A {
-	void foo(B& v){
+	void foo(B& /*v*/){
 //		v.x++;
 	}
 };

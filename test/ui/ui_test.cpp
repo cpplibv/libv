@@ -19,10 +19,10 @@ TEST_CASE("UI Layout system should handle basic layout components") {
 	TestQuad quad1("Quad1");
 	TestQuad quad2("Quad2");
 
-	panel.set(Property::Size, vec3(16, 512, 0));
-	quad0.set(Property::Size, vec3(2, 64, 0));
-	quad1.set(Property::Size, vec3(4, 128, 0));
-	quad2.set(Property::Size, vec3(8, 256, 0));
+	panel.set(Property::Size, 16, 512, 0);
+	quad0.set(Property::Size, 2, 64, 0);
+	quad1.set(Property::Size, 4, 128, 0);
+	quad2.set(Property::Size, 8, 256, 0);
 
 	panel.add(make_observer(&quad0));
 	panel.add(make_observer(&quad1));
@@ -54,7 +54,7 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 	TestQuadDynamicLayout quad1("Quad1");
 	TestQuadDynamicLayout quad2("Quad2");
 
-	panel.set(Property::Size, vec3(16, 512, 0));
+	panel.set(Property::Size, 16, 512, 0);
 	quad0.size = vec3(2, 64, 0);
 	quad1.size = vec3(4, 128, 0);
 	quad2.size = vec3(8, 256, 0);
@@ -89,7 +89,7 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 	TestQuadDynamicLayout quad1("Quad1");
 	TestQuadDynamicLayout quad2("Quad2");
 
-	panel.set(Property::Size, vec3(1000, 1000, 0));
+	panel.set(Property::Size, 1000, 1000, 0);
 	quad0.size = vec3(800, 400, 0);
 	quad1.size = vec3(300, 20, 0);
 	quad2.size = vec3(300, 20, 0);
@@ -118,6 +118,43 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 	}
 }
 
+TEST_CASE("UI Layout system should handle percent as ratio sizes") {
+	TestPanel panel("Panel");
+	TestQuad quad0("Quad0");
+	TestQuad quad1("Quad1");
+	TestQuad quad2("Quad2");
+
+	panel.set(Property::Size, 500, 500, 0);
+	quad0.set(Property::Size, 100, 100, 0);
+	quad1.set(Property::Size, percent(40), percent(40), 0);
+	quad2.set(Property::Size, percent(40), percent(40), 0);
+
+	panel.add(make_observer(&quad0));
+	panel.add(make_observer(&quad1));
+	panel.add(make_observer(&quad2));
+
+	LayoutInfo layoutRoot;
+
+	SECTION("") {
+		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
+		panel.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
+		panel.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+
+		panel.layout(layoutRoot);
+		auto& components = panel.getComponents();
+
+		REQUIRE(components.size() == 3);
+		CHECK(components[0].info.size == vec3(100, 100, 0));
+		CHECK(components[1].info.size == vec3(200, 200, 0));
+		CHECK(components[2].info.size == vec3(200, 200, 0));
+		CHECK(components[0].info.offset == vec3(000, 0, 0));
+		CHECK(components[1].info.offset == vec3(100, 0, 0));
+		CHECK(components[2].info.offset == vec3(300, 0, 0));
+	}
+}
+
+
+// Dream:
 //
 // Root 1000px, 700px
 // - Panel 1r, 1r
@@ -130,6 +167,3 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 // - - SideR 1r, 1r
 // - - - ViewPort 1r, 1r
 //
-
-//TEST_CASE("UI Layout system should handle not layoutable components") {
-//}

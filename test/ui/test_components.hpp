@@ -5,15 +5,16 @@
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/container/panel_flow.hpp>
 #include <libv/ui/layout.hpp>
+#include <libv/ui/properties_eval.hpp>
 
 struct TestQuad : public libv::ui::Component {
 	TestQuad(const std::string& id) {
 		setComponentID(id);
 	}
 private:
-	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo&) override {
-		libv::ui::LayoutInfo layout(*get(libv::ui::Property::Size));
-		return layout;
+	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo& parentLayoutInfo) override {
+		libv::ui::LayoutInfo result(libv::ui::evalLayoutSize(parentLayoutInfo, *this));
+		return result;
 	}
 	virtual void doBuild(libv::ui::Renderer&) override { }
 	virtual void doDestroy(libv::ui::Renderer&) override { }

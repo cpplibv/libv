@@ -8,6 +8,7 @@
 #include <libv/gl/log.hpp>
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/properties_eval.hpp>
 
 namespace libv {
 namespace ui {
@@ -18,11 +19,12 @@ void Label::setText(const std::string& str) {
 	text.setText(str);
 }
 
-LayoutInfo Label::doLayout(const LayoutInfo&) {
-	auto property = get(Property::Size);
-	text.setSize(property ? ivec2(property->xy()) : ivec2());
+LayoutInfo Label::doLayout(const LayoutInfo& parentLayoutInfo) {
+	auto size = vec_static_cast<int>(evalLayoutSize(parentLayoutInfo, *this).xy());
+	text.setSize(size);
 	text.build();
-	return vec3(text.getLayoutedSize(), 0);
+	auto result = maxByDimensions(size, text.getLayoutedSize());
+	return vec3(result, 0);
 }
 
 void Label::doBuild(Renderer&) {

@@ -2,111 +2,208 @@
 
 #pragma once
 
-// ext
-#include <boost/optional.hpp>
 // libv
+#include <libv/memory.hpp>
 #include <libv/void_guard.hpp>
 // std
 #include <atomic>
 #include <map>
 #include <memory>
 
-// TODO P2: Remove exceptions
-// TODO P4: Adopt boost::optional for getters
-// TODO P4: Adopt boost::any
-// TODO P4: Restriction for POD and use "merged" allocation and usage of small_vector
+// TODO P4: Adopt boost::any and eliminate VoidGuard
+// TODO P4: Restriction for ("POD" not pod but something that can be copied OR would only be POD be good?
+//			, would need an additional lookup map?, its a map... flat map... but map. small_flat_map?)
+//			and use "merged" allocation and usage of small_vector
+//			So lost in prev sentence... nvm: so one map will stay, this will be flat_map yep,
+//			but to memory allocation for VoidGuards could be merged into one cache frendly small_vector
 // TODO P5: Implement some kind of foreach (Maybe external function as / or "callback" for it?)
-// TODO P5: Add functionality for custom address type
-//				(idea: need to switch back to template addressing and both type and
-//				value is important (hard (imo impossible)))
-//				i think it is possible, however then address should provide more features such as
-//				default...
-// TODO P5: default_value or pair as return type for specific getters? (?mimic std::map?)
-// TODO P5: I think it is possible to eliminate one indirection without UB. Slicing without data is safe?
-//				Implemented a funny pair fix to it, but i think this also can be eliminated
 
 namespace libv {
 
 template<template<typename...> class Container = std::map>
-struct BasicPropertyMap {
-	using Address_t = int;
+struct BasicMultiTypeMap {
+	using Address_t = size_t;
 	using Value_t = std::pair<void*, std::unique_ptr<VoidGuardBase>>;
 
 private:
 	Container<Address_t, Value_t> dataMap;
 
+	// Key -----------------------------------------------------------------------------------------
 public:
 	template<typename T>
-	class Address {
-		friend class BasicPropertyMap<Container>;
-		const Address_t address = BasicPropertyMap<Container>::nextAddress();
+	class Key {
+		friend class BasicMultiTypeMap<Container>;
+		const Address_t address = BasicMultiTypeMap<Container>::nextAddress();
 	public:
-		Address() = default;
+		Key() = default;
 	};
 
-	class SetterProxy {
-		friend class BasicPropertyMap<Container>;
-		BasicPropertyMap<Container>& object;
-		SetterProxy(BasicPropertyMap<Container>& object) : object(object) { }
+	// OptionalValue -------------------------------------------------------------------------------
+public:
+	template<typename T>
+	class OptionalValue {
+	private:
+		T* ptr;
 	public:
-		template<typename T, typename... Args>
-		inline SetterProxy& operator()(const BasicPropertyMap<Container>::Address<T>& address, Args&&... args) {
-			object.set(address, std::forward<Args>(args)...);
-			return *this;
+		OptionalValue(T* ptr) : ptr(ptr) { }
+		T& operator*() {
+			return *ptr;
+		}
+		const T& operator*() const {
+			return *ptr;
+		}
+		T* operator->() noexcept {
+			return ptr;
+		}
+		const T* operator->() const noexcept {
+			return ptr;
+		}
+		explicit operator bool() const noexcept {
+			return ptr != nullptr;
+		}
+		bool is_initialized() const noexcept {
+			return ptr != nullptr;
+		}
+		T& value() {
+			return *ptr;
+		}
+		const T& value() const {
+			return *ptr;
 		}
 	};
-	template <typename T> boost::optional<T&> get(const BasicPropertyMap<Container>::Address<T>& address) {
-		try {
-			return boost::optional<T&>(atElement(address));
-		} catch (const std::out_of_range& e) {
-			return boost::optional<T&>();
+
+	// Element access ------------------------------------------------------------------------------
+public:
+	/// Access specified element with bounds checking
+	template <typename T> T& at(const Key<T>& key) {
+		return *reinterpret_cast<T*> (dataMap.at(key.address).first);
+	}
+	/// Access specified element with bounds checking
+	template <typename T> const T& at(const Key<T>& key) const {
+		return *reinterpret_cast<const T*> (dataMap.at(key.address).first);
+	}
+	/// Access specified element performs an insertion if such key does not already exist.
+	template <typename T> T& operator[](const Key<T>& key) {
+		auto it = dataMap.find(key.address);
+		if (it == dataMap.end()) {
+			std::unique_ptr<VoidGuardBase> value(new VoidGuard<T>());
+			auto ptr = value->ptr();
+			dataMap.emplace(key.address, std::make_pair(value->ptr(), std::move(value)));
+			return *reinterpret_cast<T*> (ptr);
+		} else {
+			return *reinterpret_cast<T*> (it->second.first);
 		}
 	}
-	template <typename T> const boost::optional<T&> get(const BasicPropertyMap<Container>::Address<T>& address) const {
-		try {
-			return boost::optional<T&>(atElement(address));
-		} catch (const std::out_of_range& e) {
-			return boost::optional<T&>();
-		}
+
+	// Capacity ------------------------------------------------------------------------------------
+public:
+	/// Checks whether the container is empty
+	bool empty() {
+		return dataMap.empty();
 	}
-	template <typename T> boost::optional<T&> operator[](const BasicPropertyMap<Container>::Address<T>& address) {
-		return boost::optional<T&>(atElement(address));
-	}
-	template <typename T> const boost::optional<T&> operator[](const BasicPropertyMap<Container>::Address<T>& address) const {
-		return boost::optional<T&>(atElement(address));
-	}
-	template <typename T> bool remove(const BasicPropertyMap<Container>::Address<T>& address) {
-		try {
-			dataMap.erase(address.address);
-			return true;
-		} catch (const std::out_of_range& e) {
-			return false;
-		}
-	}
-	size_t size() const {
+	/// returns the number of elements
+	size_t size() {
 		return dataMap.size();
 	}
-	template <typename T, typename... Args>
-	inline void set(const BasicPropertyMap<Container>::Address<T>& address, Args&&... args) {
-		std::unique_ptr<VoidGuardBase> value(new VoidGuard<T> (std::forward<Args>(args)...));
-		dataMap[address.address] = std::make_pair(value->ptr(), std::move(value));
+
+	// Modifiers -----------------------------------------------------------------------------------
+public:
+	/// clears the contents
+	void clear() {
+		return dataMap.clear();
 	}
-	inline SetterProxy set() {
-		return SetterProxy(*this);
+	/// inserts elements
+	template <typename T> T& insert(const Key<T>& key, const T& value) {
+		std::unique_ptr<VoidGuardBase> voidValue(new VoidGuard<T>(value));
+		auto ptr = voidValue->ptr();
+		dataMap.emplace(key.address, std::make_pair(voidValue->ptr(), std::move(voidValue)));
+		return *reinterpret_cast<T*> (ptr);
+	}
+	/// constructs element in-place
+	template <typename T, typename... Args> T& emplace(const Key<T>& key, Args&&... args) {
+		std::unique_ptr<VoidGuardBase> voidValue(new VoidGuard<T>(std::forward<Args>(args)...));
+		auto ptr = voidValue->ptr();
+		dataMap.emplace(key.address, std::make_pair(voidValue->ptr(), std::move(voidValue)));
+		return *reinterpret_cast<T*> (ptr);
+	}
+	/// erases elements
+	template <typename T> void erase(const Key<T>& key) {
+		dataMap.erase(key.address);
 	}
 
+	// Lookup  -------------------------------------------------------------------------------------
+public:
+	/// finds element with specific key
+	template <typename T> OptionalValue<T> find(const Key<T>& key) const {
+		auto it = dataMap.find(key.address);
+		if (it != dataMap.end()) {
+			return OptionalValue<T>(reinterpret_cast<T*> (it->second.first));
+		} else {
+			return OptionalValue<T>(nullptr);
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------
 private:
-	static inline Address_t nextAddress() {
+	static inline Address_t nextAddress() { // TODO P5: move this out from a template class...
 		static std::atomic<Address_t> lastAddress{0};
 		return ++lastAddress;
-	}
-	template <typename T> T& atElement(const BasicPropertyMap<Container>::Address<T>& address) const {
-		return *(reinterpret_cast<T*> (dataMap.at(address.address).first));
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
+template<template<typename...> class Container = std::map>
+class BasicPropertyMap {
+	BasicMultiTypeMap<Container> map;
+public:
+	template <typename T>
+	using Key = typename BasicMultiTypeMap<Container>::template Key<T>;
+
+	// SetterProxy ---------------------------------------------------------------------------------
+public:
+	class SetterProxy {
+		friend class BasicPropertyMap<Container>;
+		BasicPropertyMap<Container>& object;
+		SetterProxy(BasicPropertyMap<Container>& object) : object(object) { }
+	public:
+		template<typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
+		inline SetterProxy& operator()(const Key<T>& key, Args&&... args) {
+			object.set(key, std::forward<Args>(args)...);
+			return *this;
+		}
+	};
+
+	// Setters -------------------------------------------------------------------------------------
+	template <typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
+	inline void set(const Key<T>& key, Args&&... args) {
+		auto it = map.find(key);
+		if(it.is_initialized())
+			it.value() = T(std::forward<Args>(args)...);
+		else
+			map.emplace(key, std::forward<Args>(args)...);
+	}
+	inline SetterProxy set() {
+		return SetterProxy(*this);
+	}
+
+	// Getters -------------------------------------------------------------------------------------
+	template <typename T> auto get(const Key<T>& key) -> decltype(map.find(key)) {
+		return map.find(key);
+	}
+	template <typename T> auto get(const Key<T>& key) const -> decltype(map.find(key)) {
+		return map.find(key);
+	}
+
+	// Modifiers -----------------------------------------------------------------------------------
+	template <typename T> void remove(const Key<T>& key) {
+		map.erase(key);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+using MultiTypeMap = BasicMultiTypeMap<>;
 using PropertyMap = BasicPropertyMap<>;
 
 } //namespace libv

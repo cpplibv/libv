@@ -1,14 +1,8 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-layout on frame size change
--- commit --
-
 alignment and orient hard type
 alignment and orient to property
 rename align to anchor?
--- commit --
-
-size property %
 -- commit --
 
 component property
@@ -31,6 +25,7 @@ font cache
 shader cache
 -- commit --
 
+i "fucked up" vgl "rework" it
 remove vm3 from gl
 -- commit --
 
@@ -42,6 +37,7 @@ merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+ADL
 think layout as a graph instad of a stack..., just think and see whats going on with that approach
 c++ opengl api
 PanelFlow::statics to enums

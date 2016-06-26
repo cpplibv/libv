@@ -13,7 +13,6 @@
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
 
-
 namespace libv {
 namespace ui {
 
@@ -115,6 +114,7 @@ UI::UI() {
 	content.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
 	content.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
 	content.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+	content.set(Property::Size, percent(100), percent(100), 0);
 }
 
 UI::~UI() { }

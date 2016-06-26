@@ -47,11 +47,16 @@ public:
 		invalidate();
 		properties.set(address, std::forward<Value>(value));
 	}
+	template <typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
+	void set(const PropertyAddress<T>& address, Args&&... args) {
+		invalidate();
+		properties.set(address, T(std::forward<Args>(args)...));
+	}
 	PropertyMap::SetterProxy set() {
 		invalidate();
 		return properties.set();
 	}
-	const std::string& getComponentID() {
+	const std::string& getComponentID() const {
 		return this->componentID;
 	}
 	void setComponentID(std::string componentID) {
@@ -94,7 +99,7 @@ public:
 	void render(Renderer& renderer);
 
 private:
-	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout);
+	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) = 0;
 	virtual void doBuild(Renderer& renderer) = 0;
 	virtual void doDestroy(Renderer& renderer) = 0;
 	virtual void doRender(Renderer& renderer) = 0;

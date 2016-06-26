@@ -15,18 +15,47 @@ namespace ui {
 
 using PropertyMap = BasicPropertyMap<::boost::container::flat_map>;
 template <typename T>
-using PropertyAddress = PropertyMap::Address<T>;
+using PropertyAddress = PropertyMap::Key<T>;
+
+// LayoutSize --------------------------------------------------------------------------------------
+
+struct LayoutSize {
+	using Unit = uint8_t;
+
+	static constexpr Unit PX = 0;
+	static constexpr Unit PERCENT = 1;
+	static constexpr Unit NOSPEC = 2;
+	// static constexpr Type RATIO = 0;
+public:
+	float value;
+	Unit type;
+
+public:
+	LayoutSize(float value = 0.0f, Unit type = PX) : value(value), type(type) { }
+};
+
+inline LayoutSize percent(float v){
+	return LayoutSize(v, LayoutSize::PERCENT);
+}
+inline LayoutSize px(float v){
+	return LayoutSize(v, LayoutSize::PX);
+}
+inline LayoutSize nospec(float v = 0){
+	return LayoutSize(v, LayoutSize::NOSPEC);
+}
+
+using LayoutSizeVec = vec3_t<LayoutSize>;
 
 namespace Property {
 
 // Types -------------------------------------------------------------------------------------------
 
-using SizeType = vec3;
 
 // -------------------------------------------------------------------------------------------------
 
 /// The preferred size of the component
-extern PropertyAddress<SizeType> Size;
+//extern PropertyAddress<LayoutSizeVec> Size;
+extern PropertyAddress<LayoutSizeVec> Size;
 ///// The alignment of the contained elements
 //extern PropertyAddress<Align> Alignment;
 ///// The alignment of the content's bounding box inside the component's bounding box

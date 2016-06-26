@@ -240,7 +240,7 @@ struct vec_iteration_helper {
 	}
 	template<typename T, typename K>
 	static inline bool ne(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) noexcept {
-		return lhs.ptr[I] != rhs.ptr[I] && vec_iteration_helper<N, I + 1 > ::ne(lhs, rhs);
+		return lhs.ptr[I] != rhs.ptr[I] || vec_iteration_helper<N, I + 1 > ::ne(lhs, rhs);
 	}
 	template<typename T>
 	static inline decltype(auto) lengthSquare(const vec_helper_t<N, T>& v) noexcept {
@@ -256,7 +256,7 @@ struct vec_iteration_helper<N, N> {
 	}
 	template<typename T, typename K>
 	static inline bool ne(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) noexcept {
-		return true;
+		return false;
 	}
 	template<typename T>
 	static inline T lengthSquare(const vec_helper_t<N, T>&) noexcept {
@@ -273,7 +273,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 
 	using vec_base_t<N, T>::vec_base_t;
 	inline vec_helper_t() : vec_base_t<N, T>() { }
-	template<typename K>
+	template<typename K, typename = decltype(T(std::declval<const K&>()))>
 	explicit inline vec_helper_t(const vec_helper_t<N, K>& v) :
 			vec_base_t<N, T>(static_cast<T>(v.ptr[Indices])...) { }
 
@@ -569,6 +569,14 @@ inline vec_t<N, T> minByDimensions(
 	return vec_t<N, T>(
 			std::min(lhs.ptr[Indices], rhs.ptr[Indices])...
 			);
+}
+
+// vec_static_cast ---------------------------------------------------------------------------------
+
+template<typename K, size_t N, typename T, size_t... Indices>
+inline vec_t<N, K> vec_static_cast(
+		const vec_helper_t<N, T, std::index_sequence<Indices...>>& vec) noexcept {
+	return vec_t<N, K>(static_cast<K>(vec.ptr[Indices])...);
 }
 
 // =================================================================================================

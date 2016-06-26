@@ -11,6 +11,7 @@
 // pro
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/properties_eval.hpp>
 
 namespace libv {
 namespace ui {
@@ -72,11 +73,6 @@ static const Orient orienationTable[] = {
 };
 
 // -------------------------------------------------------------------------------------------------
-
-vec3 getComponentSize(Component& component) {
-	auto property = component.get(Property::Size);
-	return property ? *property : vec3();
-}
 
 struct Line {
 	std::vector<observer_ptr<Container::ContainedComponent>> compoments;
@@ -146,8 +142,8 @@ void PanelFlow::setOrient(Orient orient) {
 
 // -------------------------------------------------------------------------------------------------
 
-LayoutInfo PanelFlow::doLayout(const LayoutInfo&) {
-	const auto sizeContainer = getComponentSize(*this);
+LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
+	const auto sizeContainer = evalLayoutSize(parentLayoutInfo, *this);
 	LayoutInfo layout(sizeContainer);
 
 	for (auto& component : components) {

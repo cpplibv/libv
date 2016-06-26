@@ -16,7 +16,7 @@ namespace Property {
 //PropertyAddress<vec4> Margin;
 //PropertyAddress<vec4> Pedding;
 //PropertyAddress<vec3> Position;
-PropertyAddress<SizeType> Size;
+PropertyAddress<LayoutSizeVec> Size;
 
 } //namespace Property
 

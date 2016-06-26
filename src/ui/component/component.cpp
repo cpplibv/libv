@@ -46,11 +46,12 @@ LayoutInfo Component::layout(const LayoutInfo& parentLayout) {
 	LIBV_UI_COMPONENT_TRACE("Layout [%s]", componentID);
 
 	if (isInvalid() || lastParentLayoutInfo != parentLayout) {
+		lastParentLayoutInfo = parentLayout;
 		lastResultLayoutInfo = doLayout(parentLayout);
-		LIBV_UI_COMPONENT_TRACE("Result from Layout [%s] [%f,%f,%f]", componentID,
+		LIBV_UI_COMPONENT_TRACE("Result from Layout [%s] [%.1f,%.1f,%.1f]", componentID,
 				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
 	} else
-		LIBV_UI_COMPONENT_TRACE("Result from Cache [%s] [%f,%f,%f]", componentID,
+		LIBV_UI_COMPONENT_TRACE("Result from Cache [%s] [%.1f,%.1f,%.1f]", componentID,
 				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
 
 	return lastResultLayoutInfo;
@@ -68,15 +69,8 @@ void Component::destroy(Renderer& renderer) {
 }
 
 void Component::render(Renderer& renderer) {
-	//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log msg
+	//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log
 	doRender(renderer);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-LayoutInfo Component::doLayout(const LayoutInfo&) {
-	auto property = get(Property::Size);
-	return LayoutInfo(property ? *property : vec3());
 }
 
 // -------------------------------------------------------------------------------------------------
