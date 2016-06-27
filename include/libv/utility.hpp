@@ -3,6 +3,7 @@
 #pragma once
 
 #include <utility>
+#include <thread>
 
 // -------------------------------------------------------------------------------------------------
 
@@ -26,6 +27,15 @@ struct new_t {
 		return new T(std::forward<Args>(args)...);
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+inline uint64_t get_this_thread_id() {
+	static_assert(sizeof (std::thread::id) == sizeof (uint64_t), "thead::id size is not 64bit");
+	auto id = std::this_thread::get_id();
+	uint64_t* ptr = reinterpret_cast<uint64_t*>(&id);
+	return (*ptr);
+}
 
 // -------------------------------------------------------------------------------------------------
 

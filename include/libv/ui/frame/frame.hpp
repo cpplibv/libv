@@ -24,6 +24,7 @@
 #include <libv/ui/events/events.hpp>
 #include <libv/ui/monitor.hpp>
 
+// TODO P2: i feel there is waaaay to much include here. even if not... eliminate some.
 // TODO P2: onClosed and initContext and termContext should make something about there names...
 // TODO P3: future proxy for frame async operations: frame.show().wait();
 
@@ -75,8 +76,7 @@ public:
 	enum FramePosition {
 		POSITION_CENTER_CURRENT_MONITOR,
 		POSITION_CENTER_PRIMARY_MONITOR
-		//CENTER_MONITOR_N
-		//Additional smart position based on demand.
+		//POSITION_CENTER_NTH_MONITOR and additional smart position based on demand.
 	};
 
 	// Close ---------------------------------------------------------------------------------------

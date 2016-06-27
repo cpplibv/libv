@@ -85,7 +85,7 @@ void initGL() {
 
 	glEnable(GL_TEXTURE_2D);
 
-	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	checkGL();
 }
 

@@ -75,8 +75,11 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
 	add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
-	#add_compile_options(-Wall -Wextra -Wconversion -Wpedantic -Wno-comment)
-	add_compile_options(-Wsuggest-override) #TODO P5: IF > GNU 5.1
+	#add_compile_options(-Wconversion)
+
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
+		add_compile_options(-Wsuggest-override)
+	endif()
 
 	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
 		#add_compile_options(-fsanitize=address)
@@ -128,7 +131,7 @@ ExternalProject_Add(ext_utf8cpp
 list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
 ExternalProject_Add(ext_unittest
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
-	GIT_TAG master
+	GIT_TAG v1.5.6
 	PREFIX ${PATH_EXT_SRC}/unittest
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
@@ -162,13 +165,13 @@ ExternalProject_Add(ext_glew
 	EXCLUDE_FROM_ALL 1
 )
 
-list(APPEND EXTERNAL_PROJECT_LIST ext_cppformat)
-ExternalProject_Add(ext_cppformat
-	GIT_REPOSITORY https://github.com/cppformat/cppformat.git
+list(APPEND EXTERNAL_PROJECT_LIST ext_fmt)
+ExternalProject_Add(ext_fmt
+	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG master
-	PREFIX ${PATH_EXT_SRC}/cppformat
-	INSTALL_DIR ${PATH_EXT}/cppformat
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cppformat
+	PREFIX ${PATH_EXT_SRC}/fmt
+	INSTALL_DIR ${PATH_EXT}/fmt
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
 	EXCLUDE_FROM_ALL 1
@@ -311,7 +314,7 @@ include_directories (${PATH_SRC})
 #Externals
 include_directories(SYSTEM ${PATH_EXT}/assimp/include)
 include_directories(SYSTEM ${PATH_EXT}/boost/include)
-include_directories(SYSTEM ${PATH_EXT}/cppformat/include)
+include_directories(SYSTEM ${PATH_EXT}/fmt/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
 include_directories(SYSTEM ${PATH_EXT}/glfw/include)
@@ -322,10 +325,12 @@ include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)
-link_directories(${PATH_EXT}/cppformat/lib)
+link_directories(${PATH_EXT}/fmt/lib)
 link_directories(${PATH_EXT}/freetype/lib)
 link_directories(${PATH_EXT}/glew/lib)
 link_directories(${PATH_EXT}/glfw/lib)
+
+# Sources ------------------------------------------------------------------------------------------
 
 #Sources
 file(GLOB_RECURSE libv_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
@@ -345,6 +350,8 @@ file(GLOB_RECURSE vm3imp_test_src RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/sig/*.cpp)
 file(GLOB_RECURSE vui_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
 
+# Targets ------------------------------------------------------------------------------------------
+
 #Libraries
 add_library(libv   STATIC ${libv_src})
 add_library(vgl    STATIC ${vgl_src})
@@ -354,7 +361,7 @@ add_library(vm3imp STATIC ${vm3imp_src})
 add_library(vsig   STATIC ${vsig_src})
 add_library(vui    STATIC ${vui_src})
 
-#Tests
+#Executables - Tests
 add_executable(libv_test   ${libv_test_src})
 add_executable(vgl_test    ${vgl_test_src})
 add_executable(vlog_test   ${vlog_test_src})
@@ -363,7 +370,7 @@ add_executable(vm3imp_test ${vm3imp_test_src})
 add_executable(vsig_test   ${vsig_test_src})
 add_executable(vui_test    ${vui_test_src})
 
-#Sandbox - Executables
+#Executables - Sandbox
 add_executable(libv_main   ${PATH_SNB}/libv_main.cpp)
 add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
 add_executable(vlog_main   ${PATH_SNB}/vlog_main.cpp)
@@ -377,30 +384,32 @@ add_executable(vui_main2   ${PATH_SNB}/vui_main2.cpp)
 add_custom_target(externals DEPENDS ${EXTERNAL_PROJECT_LIST})
 add_custom_target(ext DEPENDS externals)
 
+# Linkage ------------------------------------------------------------------------------------------
+
 #Link - Libraries
 target_link_libraries(vlog   -static)
 target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3
 							boost_serialization-mt-s boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3    -static boost_serialization-mt-s)
-target_link_libraries(vm3imp -static vm3 cppformat assimp zlibstatic)
-target_link_libraries(vui    -static cppformat glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
+target_link_libraries(vm3imp -static vm3 fmt assimp zlibstatic)
+target_link_libraries(vui    -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
 							boost_system-mt-s boost_filesystem-mt-s freetype vgl)
 
 #Link - Tests
 target_link_libraries(libv_test   -static )
 target_link_libraries(vgl_test    -static vgl)
-target_link_libraries(vlog_test   -static cppformat)
+target_link_libraries(vlog_test   -static fmt)
 target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
 target_link_libraries(vm3imp_test -static vm3)
 target_link_libraries(vsig_test   -static )
-target_link_libraries(vui_test    -static vui cppformat vlog)
+target_link_libraries(vui_test    -static vui fmt vlog)
 
 #Link - Executables
-target_link_libraries(libv_main   -static vlog cppformat)
-target_link_libraries(vgl_main    -static vlog cppformat glew glfw3 vgl)
-target_link_libraries(vlog_main   -static cppformat)
-target_link_libraries(vm3_main    -static vlog cppformat vm3 boost_system-mt-s boost_filesystem-mt-s)
-target_link_libraries(vm3imp_main -static vlog cppformat vm3imp boost_system-mt-s boost_filesystem-mt-s)
-target_link_libraries(vsig_main   -static vlog cppformat)
-target_link_libraries(vui_main    -static vlog cppformat vui)
-target_link_libraries(vui_main2   -static vlog cppformat vui)
+target_link_libraries(libv_main   -static vlog fmt)
+target_link_libraries(vgl_main    -static vlog fmt glew glfw3 vgl)
+target_link_libraries(vlog_main   -static fmt)
+target_link_libraries(vm3_main    -static vlog fmt vm3 boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vm3imp_main -static vlog fmt vm3imp boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vsig_main   -static vlog fmt)
+target_link_libraries(vui_main    -static vlog fmt vui)
+target_link_libraries(vui_main2   -static vlog fmt vui)

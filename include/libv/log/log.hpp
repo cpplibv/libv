@@ -3,7 +3,8 @@
 #pragma once
 
 // ext
-#include <cppformat/format.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 // libv
 #include <libv/utility.hpp>
 // std
@@ -142,8 +143,8 @@ private:
 	std::vector<Rule> rules;
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
-//	std::string format = "{thread} {severity} [{modul}] {message}\n";
-	std::string format = "{thread} {severity} [{modul}] {message} <{func}:{file}:{line}>\n";
+//	std::string format = "{thread} {severity} [{module}] {message}\n";
+	std::string format = "{thread} {severity} [{module}] {message} <{func}:{file}:{line}>\n";
 
 private:
 	bool notable(Severity severity, const std::string& modul) {
@@ -228,12 +229,12 @@ public:
 			const auto message = fmt::sprintf(format, std::forward<Args>(args)...);
 			const auto record = fmt::format(this->format,
 					fmt::arg("message", message),
-					fmt::arg("modul", modul),
+					fmt::arg("module", modul),
 					fmt::arg("severity", severity),
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
-					fmt::arg("thread", std::this_thread::get_id())
+					fmt::arg("thread", get_this_thread_id())
 					//...
 					);
 			for (auto& output : outputs) {

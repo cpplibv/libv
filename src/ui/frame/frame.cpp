@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/frame/frame.hpp>
 // ext
-#include <cppformat/format.h>
+#include <fmt/format.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv

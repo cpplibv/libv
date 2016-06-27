@@ -15,6 +15,17 @@ opengl independent api in ui
 4 way: template or linkage or external or dynamic
 -- commit --
 
+do not warn label without property size
+-- commit --
+
+component shortcut property setters for component specific modifier methods
+setComponentID => set()(Component::ID, "MainMenuTitle")
+setText		   => set()(Label::Text, "Main Menu");
+-- commit --
+
+percent is kind of shit... should be ratio and use the leftover (not statically assigned) space not all
+-- commit --
+
 use VBO for string2D
 use VAO for string2D
 -- commit --
@@ -64,27 +75,45 @@ logger client - network connected different app (real time log viewer) with retr
 
 // -------------------------------------------------------------------------------------------------
 
-Idea for rendering lasers:
+Window mode switching
 
-Most of the work will be done by the shader.
-2 quad rendered common edge is the center of the laser.
-Both quad has the same texture space, but one of them is flipped.
-By texture coord shader can calculate the distance from center.
-Texture is seamless cloud-like mostly longish pattern with.
-Animation is based on uniform offset for texture.
-There can be multiple texture with different animation offset direction.
-Low alpha values on edges. Opacity can be transformed from linear to some exponential.
-Multiple quad-pair could be used along the same laser.
-Each low angle eye-normals quad has decreased opacity or even better if per-fragment calculated.
+GLFW now supports switching between windowed and full screen modes and updating the monitor and desired resolution and refresh rate of full screen windows with glfwSetWindowMonitor.
+Window maxmimization support
 
-// -------------------------------------------------------------------------------------------------
+GLFW now supports window maximization with glfwMaximizeWindow and the GLFW_MAXIMIZED window hint and attribute.
+Window input focus control
 
-Idea for world gen:
+GLFW now supports giving windows input focus with glfwFocusWindow.
+Window size limit support
 
-"Weighted entries useful in Arrays that can be randomly picked from."
-http://www-cs-students.stanford.edu/~amitp/game-programming/polygon-map-generation/
-http://devmag.org.za/2009/04/25/perlin-noise/
-http://gamedev.stackexchange.com/questions/31241/random-map-generation
+GLFW now supports setting both absolute and relative window size limits with glfwSetWindowSizeLimits and glfwSetWindowAspectRatio.
+Localized key names
+
+GLFW now supports querying the localized name of printable keys with glfwGetKeyName, either by key token or by scancode.
+Wait for events with timeout
+
+GLFW now supports waiting for events for a set amount of time with glfwWaitEventsTimeout.
+Window icon support
+
+GLFW now supports setting the icon of windows with glfwSetWindowIcon.
+Raw timer access
+
+GLFW now supports raw timer values with glfwGetTimerValue and glfwGetTimerFrequency.
+Joystick connection callback
+
+GLFW now supports notifying when a joystick has been connected or disconnected with glfwSetJoystickCallback.
+Context-less windows
+
+GLFW now supports creating windows without a OpenGL or OpenGL ES context with GLFW_NO_API.
+Run-time context creation API selection
+
+GLFW now supports selecting the context creation API at run-time with the GLFW_CONTEXT_CREATION_API window hint value.
+Error-free context creation
+
+GLFW now supports creating OpenGL and OpenGL ES contexts that do not emit errors with the GLFW_CONTEXT_NO_ERROR window hint, provided the machine supports the GL_KHR_no_error extension.
+CMake config-file package support
+
+GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
 
 // -------------------------------------------------------------------------------------------------
 
@@ -101,14 +130,6 @@ cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep i
 much pain to integrate
 
 // -------------------------------------------------------------------------------------------------
-
-separate pattern and color would make a huge difference in a lot of cases
-
-Colors:
-0.236f, 0.311f, 0.311f
-0.500f, 0.170f, 0.090f
-0.227f, 1.000f, 0.810f
-Neat little page for similar and alternative color picking: http://www.colorhexa.com/3affce
 
 Base class for lights and cameras...
 
@@ -195,9 +216,71 @@ Tracing every event for right state enums / defines / handlers:
 	WindowSize
 	Monitor
 
+// -------------------------------------------------------------------------------------------------
+
+Update to GLFW 3.2
 
 What is GLFW_USE_DWM_SWAP_INTERVAL?.... Test it off
 
+Support for Vulkan
+GLFW now supports basic integration with Vulkan with glfwVulkanSupported, glfwGetRequiredInstanceExtensions, glfwGetInstanceProcAddress, glfwGetPhysicalDevicePresentationSupport and glfwCreateWindowSurface. Vulkan header inclusion can be selected with GLFW_INCLUDE_VULKAN.
+// Dont care / what is it?
+
+Window mode switching
+GLFW now supports switching between windowed and full screen modes and updating the monitor and desired resolution and refresh rate of full screen windows with glfwSetWindowMonitor.
+// Must adopt
+
+Window maxmimization support
+GLFW now supports window maximization with glfwMaximizeWindow and the GLFW_MAXIMIZED window hint and attribute.
+// Must adopt
+
+Window input focus control
+GLFW now supports giving windows input focus with glfwFocusWindow.
+// Must adopt
+
+Window size limit support
+GLFW now supports setting both absolute and relative window size limits with glfwSetWindowSizeLimits and glfwSetWindowAspectRatio.
+// Must adopt
+
+Localized key names
+GLFW now supports querying the localized name of printable keys with glfwGetKeyName, either by key token or by scancode.
+// What is it? Adopt if useful. Is this keyboard layout related?
+
+Wait for events with timeout
+GLFW now supports waiting for events for a set amount of time with glfwWaitEventsTimeout.
+// No use for me
+
+Window icon support
+GLFW now supports setting the icon of windows with glfwSetWindowIcon.
+// Must adopt
+
+Raw timer access
+GLFW now supports raw timer values with glfwGetTimerValue and glfwGetTimerFrequency.
+// No use for me
+
+Joystick connection callback
+GLFW now supports notifying when a joystick has been connected or disconnected with glfwSetJoystickCallback.
+// Must adopt
+
+Context-less windows
+GLFW now supports creating windows without a OpenGL or OpenGL ES context with GLFW_NO_API.
+// Could be useful but currently no plan for it. Document is as a TODO with very low priority
+
+Run-time context creation API selection
+GLFW now supports selecting the context creation API at run-time with the GLFW_CONTEXT_CREATION_API window hint value.
+// What? Maybe not needed
+
+Error-free context creation
+GLFW now supports creating OpenGL and OpenGL ES contexts that do not emit errors with the GLFW_CONTEXT_NO_ERROR window hint, provided the machine supports the GL_KHR_no_error extension.
+// Maybe not needed
+
+CMake config-file package support
+GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
+// What? Maybe not needed
+
+
+
+// -------------------------------------------------------------------------------------------------
 
 Priority levels for each operation
 IN - in-context operation (FAST and not context sensitive)
@@ -299,6 +382,41 @@ Cook-Torrance shader - Metal
 Minnaert - More depth?
 OrenNayar - More avg lambert
 
+
+--- LIB Merge --------------------------------------------------------------------------------------
+
+
+http://stackoverflow.com/questions/13128/how-to-combine-several-c-c-libraries-into-one
+
+http://stackoverflow.com/questions/3821916/how-to-merge-two-ar-static-libraries-into-one
+
+There are at least three ways to do this natively. The first and most portable way is to use libtool. After having built the other libraries also with libtool, you can combine them just by adding the .la libs to an automake libaz_la_LIBADD variable, or directly from a Makefile with something like:
+
+libtool --mode=link cc -static -o libaz.la libabc.la libxyz.la
+
+The other two are at least available when using GNU ar. You can use an MRI script (named for example libaz.mri), such as:
+
+create libaz.a
+addlib libabc.a
+addlib libxyz.a
+save
+end
+
+and then execute ar as:
+
+ar -M <libaz.mri
+
+Or you can use a thin archive (option -T), which will allow adding other archives without getting them nested inside, although the downside is that if you want to distribute the static library, the detached object will be missing:
+
+ar -rcT libaz.a libabc.a libxyz.a
+
+All the above methods gracefully handle overlapping member names from the original archives.
+
+Otherwise, you'd have to unpack into different directories and repack again, to avoid replacing overlapping member names:
+
+mkdir abc; cd abc; ar -x ../libabc.a
+mkdir xyz; cd xyz; ar -x ../libxyz.a
+ar -qc libaz.a abc xyz
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
