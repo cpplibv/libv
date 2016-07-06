@@ -20,15 +20,16 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # --------------------------------------------------------------------------------------------------
 
-#set(CMAKE_VERBOSE_MAKEFILE off)
-set(CMAKE_BUILD_TYPE "DEBUG")
-#set(CMAKE_BUILD_TYPE "RELEASE")
+#set(CMAKE_VERBOSE_MAKEFILE on)
+set(CMAKE_VERBOSE_MAKEFILE off)
+#set(CMAKE_BUILD_TYPE "DEBUG")
+set(CMAKE_BUILD_TYPE "RELEASE")
 
 #Definitions
-if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_definitions(-O0)
 	add_definitions(-ggdb3)
-else() #elseif(CMAKE_BUILD_TYPE EQUAL "RELEASE")
+else() #elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	add_definitions(-Ofast)
 endif()
 
@@ -77,16 +78,21 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
 	#add_compile_options(-Wconversion)
 
-	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-		add_compile_options(-Wsuggest-override)
-	endif()
+	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
+			add_compile_options(-Wsuggest-override)
+		endif()
 
-	if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+		add_compile_options(-fno-omit-frame-pointer)
+
+		# Sanitizers current only available on unix
 		#add_compile_options(-fsanitize=address)
 		#add_compile_options(-fsanitize=kernel-address)
 		#add_compile_options(-fsanitize=leak)
 		#add_compile_options(-fsanitize=thread)
 		#add_compile_options(-fsanitize=undefined)
+		#link_libraries(ubsan)
+		#link_libraries(asan)
 	endif()
 	set(TOOLSET gcc)
 

@@ -31,9 +31,9 @@ TEST_CASE("UI Layout system should handle basic layout components") {
 	LayoutInfo layoutRoot(vec3(16, 512, 0));
 
 	SECTION("") {
-		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+		panel.setAlign(ALIGN_BOTTOM_LEFT);
+		panel.setAnchor(ALIGN_BOTTOM_LEFT);
+		panel.setOrient(ORIENT_RIGHT_UP);
 
 		panel.layout(layoutRoot);
 		auto& components = panel.getComponents();
@@ -66,9 +66,9 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 	LayoutInfo layoutRoot(vec3(16, 512, 0));
 
 	SECTION("") {
-		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+		panel.setAlign(ALIGN_BOTTOM_LEFT);
+		panel.setAnchor(ALIGN_BOTTOM_LEFT);
+		panel.setOrient(ORIENT_RIGHT_UP);
 
 		panel.layout(layoutRoot);
 		auto& components = panel.getComponents();
@@ -101,9 +101,9 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 	LayoutInfo layoutRoot(vec3(1000, 1000, 0));
 
 	SECTION("") {
-		panel.setAlign(PanelFlow::ALIGN_TOP_LEFT);
-		panel.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
-		panel.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
+		panel.setAlign(ALIGN_TOP_LEFT);
+		panel.setAnchor(ALIGN_TOP_LEFT);
+		panel.setOrient(ORIENT_RIGHT_DOWN);
 
 		panel.layout(layoutRoot);
 		auto& components = panel.getComponents();
@@ -136,9 +136,9 @@ TEST_CASE("UI Layout system should handle percent as ratio sizes") {
 	LayoutInfo layoutRoot;
 
 	SECTION("") {
-		panel.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-		panel.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+		panel.setAlign(ALIGN_BOTTOM_LEFT);
+		panel.setAnchor(ALIGN_BOTTOM_LEFT);
+		panel.setOrient(ORIENT_RIGHT_UP);
 
 		panel.layout(layoutRoot);
 		auto& components = panel.getComponents();
@@ -147,7 +147,7 @@ TEST_CASE("UI Layout system should handle percent as ratio sizes") {
 		CHECK(components[0].info.size == vec3(100, 100, 0));
 		CHECK(components[1].info.size == vec3(200, 200, 0));
 		CHECK(components[2].info.size == vec3(200, 200, 0));
-		CHECK(components[0].info.offset == vec3(000, 0, 0));
+		CHECK(components[0].info.offset == vec3(0, 0, 0));
 		CHECK(components[1].info.offset == vec3(100, 0, 0));
 		CHECK(components[2].info.offset == vec3(300, 0, 0));
 	}

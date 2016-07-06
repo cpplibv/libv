@@ -56,38 +56,23 @@ void noisyEvents(Frame& frame) {
 	//			LIBV_UI_EVENT_TRACE("Event onClosed: %d", f); });
 }
 
-#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
-
-void initGLEW() {
-	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
-
-	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
-
-	checkGLEWSupport(GL_VERSION_3_3);
-	checkGLEWSupport(GL_VERSION_4_5);
-	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
-	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
-
-	checkGL();
-}
-
-void initGL() {
-	glEnable(GL_DEPTH_TEST); //Depth
-	glDepthFunc(GL_LESS);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
-	glEnable(GL_BLEND); //Alpha
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW); //Counter clockwise polys only
-
-	glEnable(GL_TEXTURE_2D);
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	checkGL();
-}
+//#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+//
+//void initGLEW() {
+//	if (GLenum err = glewInit() != GLEW_OK)
+//		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+//
+//	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+//	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+//	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+//
+//	checkGLEWSupport(GL_VERSION_3_3);
+//	checkGLEWSupport(GL_VERSION_4_5);
+//	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
+//	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
+//
+//	checkGL();
+//}
 
 class TestFrame : public Frame {
 	Label lbl0;
@@ -122,9 +107,9 @@ class TestFrame : public Frame {
 			(Property::Size, percent(100), percent(100), 0);
 		;
 
-		lf.setAlign(PanelFlow::ALIGN_TOP_LEFT);
-		lf.setAlignContent(PanelFlow::ALIGN_TOP_LEFT);
-		lf.setOrient(PanelFlow::ORIENT_RIGHT_DOWN);
+		lf.setAlign(ALIGN_TOP_LEFT);
+		lf.setAnchor(ALIGN_TOP_LEFT);
+		lf.setOrient(ORIENT_RIGHT_DOWN);
 
 		addComponent(make_observer(&lf));
 
@@ -162,32 +147,6 @@ public:
 		init();
 		show();
 	}
-
-private:
-	virtual void initContext() override {
-		LIBV_UI_FRAME_DEBUG("Initialize context");
-		initGLEW();
-		initGL();
-	}
-
-	virtual void termContext() override {
-		LIBV_UI_FRAME_DEBUG("Terminate context");
-	}
-
-	//	virtual void render() override {
-	//		glClearColor(0.236f, 0.311f, 0.311f, 0.f);
-	//		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	////		glViewport(0, 0, getSize().x, getSize().y);
-	//
-	//		getContent()->render(renderer);
-	//		//std::cout << " build  : " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastBuildDuration).count() / 1000000.0;
-	//		//std::cout << " destroy: " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastDestroyDuration).count() / 1000000.0;
-	//		//std::cout << " loop   : " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastLoopDuration).count() / 1000000.0;
-	//		//std::cout << " render : " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastRenderDuration).count() / 1000000.0;
-	//		//std::cout << " swap   : " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastSwapDuration).count() / 1000000.0;
-	//		//std::cout << " update : " << std::chrono::duration_cast<std::chrono::nanoseconds>(lastUpdateDuration).count() / 1000000.0;
-	//		//std::cout << std::endl;
-	//	}
 };
 
 int main(int, char**) {

@@ -76,7 +76,6 @@ public:
 	enum FramePosition {
 		POSITION_CENTER_CURRENT_MONITOR,
 		POSITION_CENTER_PRIMARY_MONITOR
-		//POSITION_CENTER_NTH_MONITOR and additional smart position based on demand.
 	};
 
 	// Close ---------------------------------------------------------------------------------------
@@ -301,8 +300,8 @@ private:
 	void loopTerminate();
 
 private:
-	virtual void initContext();
-	virtual void termContext();
+	void initContext();
+	void termContext();
 
 public:
 	Frame(unsigned int width = DEFAULT_FRAME_WIDTH,

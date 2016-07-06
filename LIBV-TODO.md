@@ -1,10 +1,5 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-alignment and orient hard type
-alignment and orient to property
-rename align to anchor?
--- commit --
-
 component property
 a system where every property used by a component is listed and described to
 check invalid configurations (boost serialization like function)
@@ -16,10 +11,11 @@ opengl independent api in ui
 -- commit --
 
 do not warn label without property size
+...optional property use deafult would solve that one
 -- commit --
 
 component shortcut property setters for component specific modifier methods
-setComponentID => set()(Component::ID, "MainMenuTitle")
+setComponentID => set()(Component::ID, "main-menu-title")
 setText		   => set()(Label::Text, "Main Menu");
 -- commit --
 
@@ -48,8 +44,10 @@ merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+btn / regions
 Graph based layout
-ADL
+Layout Property: what is the situation with per-component but container based properties?
+what is ADL
 think layout as a graph instad of a stack..., just think and see whats going on with that approach
 c++ opengl api
 PanelFlow::statics to enums

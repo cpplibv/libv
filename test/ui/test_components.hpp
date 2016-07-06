@@ -13,8 +13,7 @@ struct TestQuad : public libv::ui::Component {
 	}
 private:
 	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo& parentLayoutInfo) override {
-		libv::ui::LayoutInfo result(libv::ui::evalLayoutSize(parentLayoutInfo, *this));
-		return result;
+		return libv::ui::evalLayoutSize(parentLayoutInfo, *this);
 	}
 	virtual void doBuild(libv::ui::Renderer&) override { }
 	virtual void doDestroy(libv::ui::Renderer&) override { }
@@ -28,8 +27,7 @@ struct TestQuadDynamicLayout : public libv::ui::Component {
 	}
 private:
 	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo&) override {
-		libv::ui::LayoutInfo layout(size);
-		return layout;
+		return libv::ui::LayoutInfo(size);
 	}
 	virtual void doBuild(libv::ui::Renderer&) override { }
 	virtual void doDestroy(libv::ui::Renderer&) override { }

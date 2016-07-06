@@ -16,8 +16,6 @@
 // pro
 #include <libv/type_traits.hpp>
 
-// TODO P1: add static_vec_cast
-// TODO P1: vec implicit cast for glm // marked in code with "vec-glm" uses
 // TODO P1: refactor to force unrolled loops to remove some of the template magic ?
 // TODO P1: constexpr vec // this will be fun...
 // TODO PMSVC: Disable warnings for nameless struct on MSVC
@@ -28,7 +26,7 @@
 // TODO P5: perfect forwarding for constructors
 // TODO P5: conditional noexcept // this will be fun...
 // TODO P5: fast compare operator with vec and skalar by comparing skalar² and veclenght²
-// TODO P5: reuse rvalues where possible ?
+// TODO P5: reuse rvalues where possible ?  4 function
 // TODO P5: macro for debug asserts
 // TODO P5: make sure every function is sfiane frendly based on vec's T and it is producing a nice
 //		error message not 7 page of template monster
@@ -123,7 +121,7 @@ using is_vec_n_dim_t = typename is_vec_n_dim<N, T>::type;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-pedantic"
-// nonstandard extension used : nameless struct/union
+// nonstandard extension used : nameless struct / union
 
 template <size_t N, typename T, typename = void>
 struct vec_base_t {
@@ -236,11 +234,11 @@ template<size_t N, size_t I = 0 >
 struct vec_iteration_helper {
 	template<typename T, typename K>
 	static inline bool eq(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) noexcept {
-		return lhs.ptr[I] == rhs.ptr[I] && vec_iteration_helper<N, I + 1 > ::eq(lhs, rhs);
+		return lhs.ptr[I] == rhs.ptr[I] && vec_iteration_helper<N, I + 1>::eq(lhs, rhs);
 	}
 	template<typename T, typename K>
 	static inline bool ne(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) noexcept {
-		return lhs.ptr[I] != rhs.ptr[I] || vec_iteration_helper<N, I + 1 > ::ne(lhs, rhs);
+		return lhs.ptr[I] != rhs.ptr[I] || vec_iteration_helper<N, I + 1>::ne(lhs, rhs);
 	}
 	template<typename T>
 	static inline decltype(auto) lengthSquare(const vec_helper_t<N, T>& v) noexcept {

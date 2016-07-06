@@ -380,11 +380,17 @@ void Frame::loopTerminate() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::initContext() {
-	LIBV_UI_FRAME_DEBUG("Initialize context - NOP");
+	LIBV_UI_FRAME_DEBUG("Initialize context");
+	if (GLenum err = glewInit() != GLEW_OK)
+		LIBV_UI_FRAME_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+
+	LIBV_UI_FRAME_DEBUG("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	LIBV_UI_FRAME_DEBUG("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	LIBV_UI_FRAME_DEBUG("GL Version: %s", (const char*) glGetString(GL_VERSION));
 }
 
 void Frame::termContext() {
-	LIBV_UI_FRAME_DEBUG("Terminate context - NOP");
+	LIBV_UI_FRAME_DEBUG("Terminate context");
 }
 
 // -------------------------------------------------------------------------------------------------

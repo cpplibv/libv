@@ -9,7 +9,8 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-inline vec3 implEvalLayoutSize(const LayoutInfo& parent, const LayoutSizeVec& size) {
+inline vec3 evalLayoutSize(const LayoutInfo& parent, const Component& component) {
+	auto size = component.getOrDefault(Property::Size);
 	vec3 result;
 
 	for (int i = 0; i < 3; i++) {
@@ -29,17 +30,6 @@ inline vec3 implEvalLayoutSize(const LayoutInfo& parent, const LayoutSizeVec& si
 		}
 	}
 	return result;
-}
-
-inline vec3 evalLayoutSize(const LayoutInfo& parentInfo, const Component& component) {
-	auto compSizeProperty = component.get(Property::Size);
-	if (!compSizeProperty.is_initialized()) {
-		LIBV_UI_LAYOUT_WARN("Component [%s] has no Size Property but its parent relays on it. "
-				"Default value (100,100,0) is used.", component.getComponentID());
-		return vec3(100, 100, 0);
-	} else {
-		return implEvalLayoutSize(parentInfo, compSizeProperty.value());
-	}
 }
 
 // -------------------------------------------------------------------------------------------------

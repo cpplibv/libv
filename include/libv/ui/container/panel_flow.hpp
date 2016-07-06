@@ -3,6 +3,7 @@
 #pragma once
 
 #include <libv/ui/container/container.hpp>
+#include <libv/ui/properties.hpp>
 
 namespace libv {
 namespace ui {
@@ -11,42 +12,19 @@ namespace ui {
 
 class PanelFlow : public Container {
 public:
-	using Align = size_t;
-	using Orient = size_t;
-
-	static const Align ALIGN_BOTTOM_CENTER;
-	static const Align ALIGN_BOTTOM_LEFT;
-	static const Align ALIGN_BOTTOM_RIGHT;
-	static const Align ALIGN_CENTER_CENTER;
-	static const Align ALIGN_CENTER_LEFT;
-	static const Align ALIGN_CENTER_RIGHT;
-	static const Align ALIGN_TOP_CENTER;
-	static const Align ALIGN_TOP_LEFT;
-	static const Align ALIGN_TOP_RIGHT;
-
-	static const Orient ORIENT_UP_LEFT;
-	static const Orient ORIENT_UP_RIGHT;
-	static const Orient ORIENT_DOWN_LEFT;
-	static const Orient ORIENT_DOWN_RIGHT;
-	static const Orient ORIENT_LEFT_UP;
-	static const Orient ORIENT_LEFT_DOWN;
-	static const Orient ORIENT_RIGHT_UP;
-	static const Orient ORIENT_RIGHT_DOWN;
-
-private:
-	Align indexAlign = ALIGN_BOTTOM_LEFT;
-	Align indexAlignContent = ALIGN_TOP_LEFT;
-	Orient indexOrient = ORIENT_RIGHT_DOWN;
-
-public:
 	PanelFlow() = default;
-	PanelFlow(Orient orientation, Align align, Align alignContent);
 	virtual ~PanelFlow() = default;
 
 public:
-	void setOrient(Orient orient);
-	void setAlign(Align align);
-	void setAlignContent(Align alignContent);
+	inline void setAlign(LayoutAlign align) {
+		set(Property::Align, align);
+	}
+	inline void setAnchor(LayoutAlign content) {
+		set(Property::Anchor, content);
+	}
+	inline void setOrient(LayoutOrient orient) {
+		set(Property::Orient, orient);
+	}
 
 private:
 	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) override;

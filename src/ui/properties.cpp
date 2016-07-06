@@ -6,19 +6,20 @@
 namespace libv {
 namespace ui {
 
+// -------------------------------------------------------------------------------------------------
+
 namespace Property {
 
-//PropertyAddress<Align> Alignment;
-//PropertyAddress<Align> AlignmentContent;
-//PropertyAddress<Orient> Orientation;
-//PropertyAddress<bool> NewLine;
-//PropertyAddress<vec4> Border;
-//PropertyAddress<vec4> Margin;
-//PropertyAddress<vec4> Pedding;
-//PropertyAddress<vec3> Position;
-PropertyAddress<LayoutSizeVec> Size;
+PropertyAddress<LayoutID>		ID("id", "");
+PropertyAddress<LayoutClass>	Class("class", "");
+PropertyAddress<LayoutSizeVec>	Size("size", LayoutSizeVec(px(100), px(100), 0));
+PropertyAddress<LayoutAlign>	Align("align", 0);
+PropertyAddress<LayoutAlign>	Anchor("content", 0);
+PropertyAddress<LayoutOrient>	Orient("orient", 0);
 
 } //namespace Property
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace ui
 } //namespace libv

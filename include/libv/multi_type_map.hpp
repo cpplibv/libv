@@ -20,6 +20,14 @@
 
 namespace libv {
 
+struct AddressProvider {
+	using Address_t = size_t;
+	static inline Address_t nextAddress() {
+		static std::atomic<Address_t> lastAddress{0};
+		return ++lastAddress;
+	}
+};
+
 template<template<typename...> class Container = std::map>
 struct BasicMultiTypeMap {
 	using Address_t = size_t;
@@ -33,7 +41,7 @@ public:
 	template<typename T>
 	class Key {
 		friend class BasicMultiTypeMap<Container>;
-		const Address_t address = BasicMultiTypeMap<Container>::nextAddress();
+		const Address_t address = AddressProvider::nextAddress();
 	public:
 		Key() = default;
 	};
@@ -144,66 +152,10 @@ public:
 	}
 
 	// ---------------------------------------------------------------------------------------------
-private:
-	static inline Address_t nextAddress() { // TODO P5: move this out from a template class...
-		static std::atomic<Address_t> lastAddress{0};
-		return ++lastAddress;
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-template<template<typename...> class Container = std::map>
-class BasicPropertyMap {
-	BasicMultiTypeMap<Container> map;
-public:
-	template <typename T>
-	using Key = typename BasicMultiTypeMap<Container>::template Key<T>;
-
-	// SetterProxy ---------------------------------------------------------------------------------
-public:
-	class SetterProxy {
-		friend class BasicPropertyMap<Container>;
-		BasicPropertyMap<Container>& object;
-		SetterProxy(BasicPropertyMap<Container>& object) : object(object) { }
-	public:
-		template<typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
-		inline SetterProxy& operator()(const Key<T>& key, Args&&... args) {
-			object.set(key, std::forward<Args>(args)...);
-			return *this;
-		}
-	};
-
-	// Setters -------------------------------------------------------------------------------------
-	template <typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
-	inline void set(const Key<T>& key, Args&&... args) {
-		auto it = map.find(key);
-		if(it.is_initialized())
-			it.value() = T(std::forward<Args>(args)...);
-		else
-			map.emplace(key, std::forward<Args>(args)...);
-	}
-	inline SetterProxy set() {
-		return SetterProxy(*this);
-	}
-
-	// Getters -------------------------------------------------------------------------------------
-	template <typename T> auto get(const Key<T>& key) -> decltype(map.find(key)) {
-		return map.find(key);
-	}
-	template <typename T> auto get(const Key<T>& key) const -> decltype(map.find(key)) {
-		return map.find(key);
-	}
-
-	// Modifiers -----------------------------------------------------------------------------------
-	template <typename T> void remove(const Key<T>& key) {
-		map.erase(key);
-	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
 using MultiTypeMap = BasicMultiTypeMap<>;
-using PropertyMap = BasicPropertyMap<>;
 
 } //namespace libv

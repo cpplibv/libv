@@ -1,15 +1,5 @@
 # LIBV
 
-TODO P2: Introduction
-
-### Installation
-
-- cmake
-- make ext
-- make
-
-### License
-
-TODO P3
+This library is not complete yet. Go away. Maybe look back in a year or so.
 
 All rights reserved.

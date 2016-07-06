@@ -18,27 +18,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_CENTER = 0;
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_LEFT = 1;
-const PanelFlow::Align PanelFlow::ALIGN_BOTTOM_RIGHT = 2;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_CENTER = 3;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_LEFT = 4;
-const PanelFlow::Align PanelFlow::ALIGN_CENTER_RIGHT = 5;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_CENTER = 6;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_LEFT = 7;
-const PanelFlow::Align PanelFlow::ALIGN_TOP_RIGHT = 8;
-
-const PanelFlow::Orient PanelFlow::ORIENT_UP_LEFT = 0;
-const PanelFlow::Orient PanelFlow::ORIENT_UP_RIGHT = 1;
-const PanelFlow::Orient PanelFlow::ORIENT_DOWN_LEFT = 2;
-const PanelFlow::Orient PanelFlow::ORIENT_DOWN_RIGHT = 3;
-const PanelFlow::Orient PanelFlow::ORIENT_LEFT_UP = 4;
-const PanelFlow::Orient PanelFlow::ORIENT_LEFT_DOWN = 5;
-const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_UP = 6;
-const PanelFlow::Orient PanelFlow::ORIENT_RIGHT_DOWN = 7;
-
-// -------------------------------------------------------------------------------------------------
-
 namespace {
 
 using Align = vec3;
@@ -118,30 +97,6 @@ BuiltLines buildLines(Container::Store& components, vec3 parentSize, const Orien
 
 // PanelFlow =======================================================================================
 
-PanelFlow::PanelFlow(Orient orient, Align align, Align alignContent) :
-	indexAlign(align),
-	indexAlignContent(alignContent),
-	indexOrient(orient) { }
-
-// -------------------------------------------------------------------------------------------------
-
-void PanelFlow::setAlign(Align align) {
-	invalidate();
-	this->indexAlign = align;
-}
-
-void PanelFlow::setAlignContent(Align alignContent) {
-	invalidate();
-	this->indexAlignContent = alignContent;
-}
-
-void PanelFlow::setOrient(Orient orient) {
-	invalidate();
-	this->indexOrient = orient;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 	const auto sizeContainer = evalLayoutSize(parentLayoutInfo, *this);
 	LayoutInfo layout(sizeContainer);
@@ -151,9 +106,13 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 		component.info.size = childLayout.size;
 	}
 
-	const auto& orient = orienationTable[indexOrient];
+	const auto indexAlign = getOrUse(Property::Align, ALIGN_BOTTOM_LEFT);
+	const auto indexAnchor = getOrUse(Property::Anchor, ALIGN_TOP_LEFT);
+	const auto indexOrient = getOrUse(Property::Orient, ORIENT_RIGHT_DOWN);
+
 	const auto& align = alignmentTable[indexAlign];
-	const auto& alignContent = alignmentTable[indexAlignContent];
+	const auto& contentAnchor = alignmentTable[indexAnchor];
+	const auto& orient = orienationTable[indexOrient];
 
 	const auto dim1 = orient.primaryDimension;
 	const auto dim2 = orient.secondaryDimension;
@@ -162,7 +121,7 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 	const auto& lines = builtLines.lines;
 	const auto& sizeContent = builtLines.size;
 
-	auto origToContent = (sizeContainer - sizeContent) * alignContent;
+	auto origToContent = (sizeContainer - sizeContent) * contentAnchor;
 	vec3 contentToLine;
 
 	for (const auto& line : lines | reverse_if(orient.invertedSecondaryExpand)) {

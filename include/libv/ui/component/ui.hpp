@@ -38,8 +38,6 @@ private:
 	void validate();
 
 public:
-	ivec2 getPosition() const;
-	void setPosition(ivec2 position);
 	ivec2 getSize() const;
 	void setSize(ivec2 size);
 

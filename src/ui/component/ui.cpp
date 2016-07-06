@@ -32,14 +32,6 @@ void UI::invalidate() {
 
 // -------------------------------------------------------------------------------------------------
 
-ivec2 UI::getPosition() const {
-	return position;
-}
-
-void UI::setPosition(ivec2 position) {
-	this->position = position;
-}
-
 ivec2 UI::getSize() const {
 	return size;
 }
@@ -65,6 +57,19 @@ void UI::destroy() {
 }
 
 void UI::render() {
+	glEnable(GL_DEPTH_TEST); //Depth
+	glDepthFunc(GL_LESS);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
+	glEnable(GL_BLEND); //Alpha
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW); //Counter clockwise polys only
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	glEnable(GL_TEXTURE_2D);
+
+	checkGL();
+
 	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	gl::viewport(position, size);
@@ -111,9 +116,9 @@ void UI::add(const shared_ptr<Component>& component) {
 
 UI::UI() {
 	content.setComponentID("UIRoot");
-	content.setAlign(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-	content.setAlignContent(ui::PanelFlow::ALIGN_BOTTOM_LEFT);
-	content.setOrient(ui::PanelFlow::ORIENT_RIGHT_UP);
+	content.setAlign(ui::ALIGN_BOTTOM_LEFT);
+	content.setAnchor(ui::ALIGN_BOTTOM_LEFT);
+	content.setOrient(ui::ORIENT_RIGHT_UP);
 	content.set(Property::Size, percent(100), percent(100), 0);
 }
 

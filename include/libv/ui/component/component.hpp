@@ -39,8 +39,16 @@ protected:
 
 public:
 	template<typename T>
-	decltype(auto) get(const PropertyAddress<T>& address) const {
+	inline decltype(auto) get(const PropertyAddress<T>& address) const {
 		return properties.get(address);
+	}
+	template <typename T>
+	inline decltype(auto) getOrUse(const PropertyAddress<T>& address, const T& def) const {
+		return properties.getOrUse(address, def);
+	}
+	template <typename T>
+	inline decltype(auto) getOrDefault(const PropertyAddress<T>& address) const {
+		return properties.getOrDefault(address);
 	}
 	template <typename T, typename Value>
 	void set(const PropertyAddress<T>& address, Value&& value) {
