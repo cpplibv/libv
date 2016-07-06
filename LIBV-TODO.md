@@ -1,27 +1,5 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-component property
-a system where every property used by a component is listed and described to
-check invalid configurations (boost serialization like function)
--- commit --
-
-rework renderer
-opengl independent api in ui
-4 way: template or linkage or external or dynamic
--- commit --
-
-do not warn label without property size
-...optional property use deafult would solve that one
--- commit --
-
-component shortcut property setters for component specific modifier methods
-setComponentID => set()(Component::ID, "main-menu-title")
-setText		   => set()(Label::Text, "Main Menu");
--- commit --
-
-percent is kind of shit... should be ratio and use the leftover (not statically assigned) space not all
--- commit --
-
 use VBO for string2D
 use VAO for string2D
 -- commit --
@@ -32,38 +10,39 @@ font cache
 shader cache
 -- commit --
 
-i "fucked up" vgl "rework" it
+btn / regions
+-- commit --
+
+not too hard but i "fucked up" vgl "rework" it
 remove vm3 from gl
 -- commit --
 
-?kill def renderer
--- commit --
-
-merge vsig back and create vmeta and vtmta (too many tamplate argument)
+?kill def renderer if there is still any
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-btn / regions
-Graph based layout
+size percent should use the leftover space not the whole parent
+size ratio
 Layout Property: what is the situation with per-component but container based properties?
-what is ADL
+what is and how to use ADL
 think layout as a graph instad of a stack..., just think and see whats going on with that approach
-c++ opengl api
-PanelFlow::statics to enums
-no opengl include in ui, some kind of link as ui-opengl
+hard type (enum) align anchor and orient
 intel vtune
 LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 glEnable(GL_DEBUG_OUTPUT);
 take a look at frame and component events
 replace every raw ptr with a smart counter part (incl observer_ptr)
-look after and variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
+look after variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
 look after any
 moving vec costume getter functions from member to public -> reducing symbols...
 provide exception free alternative api EVERYWHERE! hehehehehe.
 seg fault in resource! (just run libv_test in debug...) // however it will be rewritten
 FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
-layout invalidation with change bitmask: OFFSET_BIT, SIZE_BIT, STRUCTURE_BIT? ...
+ui - component property serialization and validation
+rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
+setText => set()(Label::Text, "Main Menu");
+merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
@@ -276,7 +255,38 @@ CMake config-file package support
 GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
 // What? Maybe not needed
 
+// -------------------------------------------------------------------------------------------------
 
+I dont know yet what it could be used for, but this is could be VERY handy!
+sfiane + decltype + operator ,
+decltype(os << obj, void())
+
+// -------------------------------------------------------------------------------------------------
+
+Fully separating the ui from the frame handler is completely possible and desirable.
+It is also possible do it without any dependency between the two with an additional "UIFrame lib".
+
+cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
+much pain to integrate
+
+// -------------------------------------------------------------------------------------------------
+
+Base class for lights and cameras...
+
+
+license		https://www.youtube.com/watch?v=cJIi-hIlCQM
+be aware that i will need copyright for every contribution into libv
+
+
+http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
+
+Optimalizált fordítás - cmake:
+https://github.com/sakra/cotire
+
+
+Új fajta signal: timerSignal
+Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
+Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
 
 // -------------------------------------------------------------------------------------------------
 
