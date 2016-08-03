@@ -3,183 +3,129 @@
 #pragma once
 
 // ext
-#include <boost/container/flat_map.hpp>
 #include <GL/glew.h>
 // std
-#include <memory>
-
-// -------------------------------------------------------------------------------------------------
-
-namespace boost {
-namespace filesystem {
-struct path;
-} //namespace filesystem
-namespace asio {
-struct const_buffer;
-} //namespace asio
-} //namespace boost
-
-// -------------------------------------------------------------------------------------------------
+#include <string>
+// libv
+#include <libv/utility.hpp>
+// pro
+//#include <libv/gl/gl.hpp>
+#include <libv/gl/enum.hpp>
 
 namespace libv {
 namespace gl {
 
-// -------------------------------------------------------------------------------------------------
-
-constexpr const char DEFAULT_SHADER_NAME[] = "--UNNAMED--";
-constexpr const char DEFAULT_SHADER_VERTEX_NAME[] = "--UNNAMED-VERTEX--";
-constexpr const char DEFAULT_SHADER_GEOMETRY_NAME[] = "--UNNAMED-GEOMETRY--";
-constexpr const char DEFAULT_SHADER_FRAGMENT_NAME[] = "--UNNAMED-FRAGMENT--";
-
-constexpr const char DEFAULT_SHADER_TYPE_NAME[] = "--default--";
-constexpr const char SHADER_TYPE_VERTEX_NAME[] = "vertex";
-constexpr const char SHADER_TYPE_GEOMETRY_NAME[] = "geometry";
-constexpr const char SHADER_TYPE_FRAGMENT_NAME[] = "fragment";
-
-// toString ----------------------------------------------------------------------------------------
-
-const char* shaderTypeToString(GLenum type);
-
 // BaseShader --------------------------------------------------------------------------------------
 
-/**
- * @note Non-virtual class
- */
 class BaseShader {
 private:
 	GLuint shaderID = 0;
-	GLenum type;
-	std::string name;
+
+protected:
+	inline BaseShader() = default;
+	inline BaseShader(const BaseShader&) = delete;
+	inline BaseShader(BaseShader&&) = delete;
+	inline ~BaseShader() = default;
 
 public:
-	BaseShader();
-	BaseShader(const boost::asio::const_buffer& data, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
-	BaseShader(const boost::filesystem::path& filePath, const GLenum type);
-	BaseShader(const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
-	BaseShader(const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
-	~BaseShader();
+	inline bool status() {
+		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
+		GLint result;
+		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
+		LIBV_GL_DEBUG_CHECK_GL();
+		return result;
+	}
 
-	void load(const boost::asio::const_buffer& data, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
-	void load(const boost::filesystem::path& filePath, const GLenum type);
-	void load(const boost::filesystem::path& filePath, const GLenum type, const std::string& name);
-	void load(const char* data, const size_t size, const GLenum type, const std::string& name = DEFAULT_SHADER_NAME);
+	std::string info() {
+		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
+		int infoLength;
+		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLength);
 
-private:
-	void loadImpl(const char* source);
-	void loadGL(const char* source);
-	void unloadGL();
+		std::string result;
+		result.resize(infoLength);
+		glGetShaderInfoLog(shaderID, infoLength, nullptr, &result[0]);
+		LIBV_GL_DEBUG_CHECK_GL();
+		return result;
+	}
+
+	inline void create(ShaderType type) {
+		LIBV_GL_DEBUG_ASSERT(shaderID == 0);
+		shaderID = glCreateShader(to_value(type));
+		LIBV_GL_DEBUG_CHECK_GL();
+		if (shaderID == 0)
+			LIBV_LOG_GL_ERROR("Failed to create %s shader", to_string(type));
+	}
+
+	inline void destroy() {
+		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
+		glDeleteShader(shaderID);
+		shaderID = 0;
+		LIBV_GL_DEBUG_CHECK_GL();
+	}
+
+	inline void compile(const char* sourceStr, const GLint size) {
+		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
+		glShaderSource(shaderID, 1, &sourceStr, &size);
+		LIBV_GL_DEBUG_CHECK_GL();
+		glCompileShader(shaderID);
+		LIBV_GL_DEBUG_CHECK_GL();
+		if (!status())
+			LIBV_LOG_GL_ERROR("Failed to compile shader:\n%s", info());
+	}
+
+	inline void compile(const std::string& sourceStr) {
+		compile(sourceStr.c_str(), sourceStr.size());
+	}
+
+	inline void createCompile(const char* sourceStr, const GLint size, ShaderType type) {
+		create(type);
+		compile(sourceStr, size);
+	}
+
+	inline void createCompile(const std::string& sourceStr, ShaderType type) {
+		createCompile(sourceStr.c_str(), sourceStr.size(), type);
+	}
 
 public:
 	inline auto id() const {
 		return shaderID;
 	}
-
-};
-
-// ShaderHelper ------------------------------------------------------------------------------------
-
-namespace detail {
-
-template<GLenum TYPE, const char* DEFAULT_NAME>
-struct ShaderHelper : public BaseShader {
-	ShaderHelper() = default;
-	ShaderHelper(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_NAME) :
-		BaseShader(data, TYPE, name) { }
-	ShaderHelper(const boost::filesystem::path& filePath) :
-		BaseShader(filePath, TYPE) { }
-	ShaderHelper(const boost::filesystem::path& filePath, const std::string& name) :
-		BaseShader(filePath, TYPE, name) { }
-	ShaderHelper(const char* data, const size_t size, const std::string& name = DEFAULT_NAME) :
-		BaseShader(data, size, TYPE, name) { }
-	void load(const boost::asio::const_buffer& data, const std::string& name = DEFAULT_NAME) {
-		BaseShader::load(data, TYPE, name);
-	}
-	void load(const boost::filesystem::path& filePath) {
-		BaseShader::load(filePath, TYPE);
-	}
-	void load(const boost::filesystem::path& filePath, const std::string& name) {
-		BaseShader::load(filePath, TYPE, name);
-	}
-	void load(const char* data, const size_t size, const std::string& name = DEFAULT_NAME) {
-		BaseShader::load(data, size, TYPE, name);
+	inline operator GLuint() const {
+		return shaderID;
 	}
 };
 
-} //namespace detail
+// ShaderAC ----------------------------------------------------------------------------------------
 
-// ShaderAliases -----------------------------------------------------------------------------------
-
-using ShaderVertex = detail::ShaderHelper<GL_VERTEX_SHADER, DEFAULT_SHADER_VERTEX_NAME>;
-using ShaderGeometry = detail::ShaderHelper<GL_GEOMETRY_SHADER, DEFAULT_SHADER_GEOMETRY_NAME>;
-using ShaderFragment = detail::ShaderHelper<GL_FRAGMENT_SHADER, DEFAULT_SHADER_FRAGMENT_NAME>;
-
-// ShaderProgram -----------------------------------------------------------------------------------
-
-class ShaderProgram {
-
-	struct UniformInfo {
-		GLint location;
-		GLint index;
-		GLint size;
-		GLenum type;
-	};
-private:
-	GLuint programID = 0;
-	std::string name;
-
-private:
-	//	boost::container::flat_map<std::string, UniformInfo> addressesAttribute;
-	boost::container::flat_map<std::string, UniformInfo> addressesUniform;
-
-private:
-	std::shared_ptr<BaseShader> shaderVertex;
-	std::shared_ptr<BaseShader> shaderGeometry;
-	std::shared_ptr<BaseShader> shaderFragment;
-
+class ShaderAC : public BaseShader {
 public:
-	ShaderProgram() = default;
-	ShaderProgram(
-			const std::string& name,
-			const std::shared_ptr<BaseShader>& shaderVertex,
-			const std::shared_ptr<BaseShader>& shaderFragment) :
-		ShaderProgram(name, shaderVertex, shaderFragment, nullptr) { }
-	ShaderProgram(
-			const std::string& name,
-			const std::shared_ptr<BaseShader>& shaderVertex,
-			const std::shared_ptr<BaseShader>& shaderFragment,
-			const std::shared_ptr<BaseShader>& shaderGeometry);
-
-	void load(
-			const std::string& name,
-			const std::shared_ptr<BaseShader>& shaderVertex,
-			const std::shared_ptr<BaseShader>& shaderFragment);
-	void load(
-			const std::string& name,
-			const std::shared_ptr<BaseShader>& shaderVertex,
-			const std::shared_ptr<BaseShader>& shaderFragment,
-			const std::shared_ptr<BaseShader>& shaderGeometry);
-
-	virtual ~ShaderProgram();
-
-private:
-	void loadGL();
-	void mapAttributes();
-	void mapUniforms();
-	void unloadGL();
-
-public:
-	bool isLoaded() {
-		return programID;
+	inline ShaderAC() {
 	}
+	inline ShaderAC(ShaderType type) {
+		create(type);
+	}
+	inline ShaderAC(const char* sourceStr, const size_t size, ShaderType type) {
+		createCompile(sourceStr, size, type);
+	}
+	inline ShaderAC(const std::string& sourceStr, ShaderType type) :
+		ShaderAC(sourceStr.c_str(), sourceStr.size(), type) { }
+	inline ShaderAC(const ShaderAC&) = delete;
+	inline ShaderAC(ShaderAC&&) = delete;
+	inline ~ShaderAC() {
+		if (id())
+			destroy();
+	}
+};
 
+using Shader = ShaderAC;
+
+// ShaderNC ----------------------------------------------------------------------------------------
+
+class ShaderNC : public BaseShader {
 public:
-	void use();
-	//	inline GLuint id() const {
-	//		return programID;
-	//	}
-	inline GLint getActiveUniformLocation(const std::string& name) const {
-		const auto it = addressesUniform.find(name);
-		return it == addressesUniform.end() ? -1 : it->second.location;
+	inline ShaderNC() = default;
+	inline ~ShaderNC() {
+		LIBV_GL_DEBUG_ASSERT(id() == 0);
 	}
 };
 

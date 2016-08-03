@@ -8,6 +8,22 @@
 namespace libv {
 namespace gl {
 
+// -------------------------------------------------------------------------------------------------
+
+const char* to_string(ShaderType type) {
+	switch (type) {
+	default:
+	case ShaderType::Vertex: return SHADER_TYPE_VERTEX_NAME;
+	case ShaderType::Geometry: return SHADER_TYPE_GEOMETRY_NAME;
+	case ShaderType::Fragment: return SHADER_TYPE_FRAGMENT_NAME;
+	case ShaderType::Compute: return SHADER_TYPE_COMPUTE_NAME;
+	case ShaderType::TessControl: return SHADER_TYPE_TESS_CONTROL_NAME;
+	case ShaderType::TessEvaluation: return SHADER_TYPE_TESS_EVALUATION_NAME;
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void renderCube(float x, float y, float z, float size) {
 	glBegin(GL_QUADS);
 
@@ -94,6 +110,8 @@ void renderCube(float x, float y, float z, float size) {
 //	glEnd();
 //	glColor3f(1, 1, 1);
 //}
+
+// -------------------------------------------------------------------------------------------------
 
 } //namespace gl
 } //namespace libv

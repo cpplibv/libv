@@ -1,5 +1,25 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+http://learnopengl.com/#!Advanced-OpenGL/Advanced-GLSL
+http://learnopengl.com/code_viewer.php?code=advanced/advanced_glsl_uniform_buffer_objects
+http://learnopengl.com/#!Advanced-OpenGL/Cubemaps
+
+
+gl proper matrix stack
+gl matrix stacks and manipulation interface
+-- commit --
+
+GL: enable disable clear mask stencil fill mode bind texture bind framebuffer...
+-- commit --
+
+sky box
+math for reflection
+glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS)
+-- commit --
+
+adopting new vgl in ui
+-- commit --
+
 use VBO for string2D
 use VAO for string2D
 -- commit --
@@ -13,15 +33,15 @@ shader cache
 btn / regions
 -- commit --
 
-not too hard but i "fucked up" vgl "rework" it
-remove vm3 from gl
--- commit --
-
 ?kill def renderer if there is still any
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
+gl uniformbuffer?
+gl framebuffer
+gl renderbuffer
+gl templated buffer and texture for binding
 size percent should use the leftover space not the whole parent
 size ratio
 Layout Property: what is the situation with per-component but container based properties?
@@ -266,8 +286,11 @@ decltype(os << obj, void())
 Fully separating the ui from the frame handler is completely possible and desirable.
 It is also possible do it without any dependency between the two with an additional "UIFrame lib".
 
-cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
-much pain to integrate
+// -------------------------------------------------------------------------------------------------
+
+operator| on enums
+https://www.youtube.com/watch?v=cZ3TNrRzHfM
+http://cppcast.com/2016/07/gabriel-dos-reis/
 
 // -------------------------------------------------------------------------------------------------
 
@@ -527,6 +550,236 @@ void vglViewportFullScreen() {
 //	else //if (type == pointLight)
 //		return ortho<float>(-30, 30, -30, 30, -10, 150);
 //}
+
+
+
+
+
+
+
+
+class Model {
+private:
+	uint32_t vao;
+	uint32_t vbo_vertex;
+	uint32_t vbo_index;
+
+private:
+	libv::vm3::Model model;
+	std::string name;
+
+private:
+//	libv::gl::Uniform<glm::mat4> uniformMVPmat;
+//	libv::gl::Uniform<glm::mat4> uniformMmat;
+
+public:
+	Model(const char* data, const size_t size, const std::string& name = DEFAULT_MODEL_NAME);
+
+	virtual ~Model();
+
+private:
+	void init(const char* data, const size_t size);
+	void loadGL();
+	void unloadGL();
+
+public:
+	inline const std::string& getName() const {
+		return name;
+	}
+	void render(libv::gl::GL&);
+	void renderNode(uint32_t id, libv::gl::GL&);
+	bool loaded();
+};
+
+Model::Model(const char* data, size_t size, const std::string& name) :
+	name(name) {
+	init(data, size);
+}
+
+void Model::init(const char* data, size_t size) {
+	if (!model.load(data, size)) {
+		LIBV_GL_ERROR("Failed to load model: [%s]", name);
+		return;
+	}
+	loadGL();
+}
+
+Model::~Model() {
+	unloadGL();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Model::loadGL() {
+	LIBV_GL_TRACE("GL Loading model: [%s]", name);
+
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo_vertex);
+	glGenBuffers(1, &vbo_index);
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof (vm3::Vertex) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
+	checkGL();
+
+	enableVertexAttribArray(Attribute::position);
+	vertexAttribPointer(Attribute::position, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, position));
+	enableVertexAttribArray(Attribute::normal);
+	vertexAttribPointer(Attribute::normal, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, normal));
+	enableVertexAttribArray(Attribute::tangent);
+	vertexAttribPointer(Attribute::tangent, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, tangent));
+	enableVertexAttribArray(Attribute::bitangent);
+	vertexAttribPointer(Attribute::bitangent, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, bitangent));
+	enableVertexAttribArray(Attribute::texcoord0);
+	vertexAttribPointer(Attribute::texcoord0, 2, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, texCoord0));
+	enableVertexAttribArray(Attribute::boneindices);
+	vertexAttribIPointer(Attribute::boneindices, 4, VertexAttribType::INT, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneID));
+	enableVertexAttribArray(Attribute::boneweight);
+	vertexAttribPointer(Attribute::boneweight, 4, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneWieght));
+	checkGL();
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_index);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof (model.indices[0]) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
+	checkGL();
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	checkGL();
+}
+
+void Model::unloadGL() {
+	LIBV_GL_TRACE("GL Unloading model: [%s]", name);
+
+	glDeleteBuffers(1, &vbo_index);
+	glDeleteBuffers(1, &vbo_vertex);
+	glDeleteVertexArrays(1, &vao);
+}
+
+void Model::render(libv::gl::GL& gl) {
+	glBindVertexArray(vao);
+	checkGL();
+
+	renderNode(model.lods[0].rootNodeID, gl);
+
+	glBindVertexArray(0);
+	checkGL();
+}
+
+void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
+	gl.pushMatrixModel();
+	gl.matrixModel() *= model.nodes[id].transformation;
+//	uniformMmat = gl.matrixModel();
+//	uniformMVPmat = gl.matrixMVP(); //<<<Assign uniforms
+	//node->material->get<std::string>("diffuseTexture") //<<<Bind Textures here
+	//libv::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
+
+	if (gl.matrixModel()[0][0] * gl.matrixModel()[1][1] * gl.matrixModel()[2][2] < 0) {
+		glFrontFace(GL_CCW);
+	} else {
+		glFrontFace(GL_CW);
+	}
+
+	for (auto meshID : model.nodes[id].meshIDs) {
+		glDrawElementsBaseVertex(GL_TRIANGLES,
+				model.meshes[meshID].numIndices,
+				GL_UNSIGNED_INT,
+				(void*) (sizeof (GLuint) * model.meshes[meshID].baseIndex),
+				model.meshes[meshID].baseVertex);
+		checkGL();
+	}
+
+	for (auto childID : model.nodes[id].childrenIDs) {
+		renderNode(childID, gl);
+	}
+
+	gl.popMatrixModel();
+	checkGL();
+}
+
+
+//		model0("res/model/test_group.dae.pb.vm3"),
+//		model1("res/model/fighter_01_eltanin.dae.pb.vm3"),
+//		model2("res/model/test_sp.dae.pb.vm3"),
+//		model3("res/model/projectile_missile_01_hellfire.0001.dae.pb.vm3"),
+//		model4("res/model/asteroid_02.dae.pb.vm3")
+
+
+// Light -------------------------------------------------------------------------------------------
+
+struct LightType {
+	static const int point = 0;
+	static const int dir = 1;
+	static const int spot = 2;
+};
+
+struct Light {
+	int type;
+	bool enabled; //0 false 1 true
+
+	glm::dvec3 position;
+	glm::dvec3 direction;
+	glm::vec4 diffuse;
+	glm::vec4 specular;
+
+	double range;
+	double intensity;
+	double innerCosAngle; // Angles closer to 1 produce tighter cones
+	double outerCosAngle; // Angles of -1 will emulate point lights.
+
+	bool shadowCast; //0 false 1 true
+	//			GLuint frameBuffer;
+	//			GLuint shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
+	//			GLuint shadowMapSampler;
+	unsigned int frameBuffer;
+	unsigned int shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
+	unsigned int shadowMapSampler;
+	glm::dmat4 shadowMVPTmat; //MVPT mat
+
+	glm::dmat4 getVmat();
+	glm::dmat4 getPmat();
+	Light();
+	~Light();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+Light::Light() :
+	type(LightType::point),
+	enabled(true),
+	position(0, 0, 0),
+	direction(1, 0, 0),
+	diffuse(1, 1, 1, 1),
+	specular(1.0f, 1.0f, 1.0f, 1.0f),
+	range(75.0f),
+	intensity(1.0f),
+	innerCosAngle(0.8f),
+	outerCosAngle(0.6f),
+	shadowCast(false) { }
+
+// -------------------------------------------------------------------------------------------------
+
+
+// Planned attribute locations:
+//   0  |     position  |             |
+//   1  |       normal  |     psize   |
+//   2  |      diffuse  |    color0   |
+//   3  |     specular  |    color1   |
+//   4  |   boneweight  |             |
+//   5  |  boneindices  |             |
+//   6  |               |    tangent  |
+//   7  |               |  bitangent  |
+//   8  |               |  texcoord0  |
+//   9  |   tessfactor  |  texcoord1  |
+//  10  |     instVec0  |  texcoord2  |
+//  11  |     instVec1  |  texcoord3  |
+//  12  |   instMatrix  |  texcoord4  |
+//  13  |   ^^^^^^^^^^  |  texcoord5  |
+//  14  |   ^^^^^^^^^^  |  texcoord6  |
+//  15  |   ^^^^^^^^^^  |  texcoord7  |
+
 
 
 std::this_thread::sleep_for(std::chrono::seconds(2));

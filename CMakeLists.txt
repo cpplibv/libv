@@ -22,8 +22,8 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 #set(CMAKE_VERBOSE_MAKEFILE on)
 set(CMAKE_VERBOSE_MAKEFILE off)
-#set(CMAKE_BUILD_TYPE "DEBUG")
-set(CMAKE_BUILD_TYPE "RELEASE")
+set(CMAKE_BUILD_TYPE "DEBUG")
+#set(CMAKE_BUILD_TYPE "RELEASE")
 
 #Definitions
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
@@ -186,7 +186,7 @@ ExternalProject_Add(ext_fmt
 list(APPEND EXTERNAL_PROJECT_LIST ext_glm)
 ExternalProject_Add(ext_glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG master
+	GIT_TAG 0.9.8
 	BUILD_COMMAND "" #glm is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/glm
 	INSTALL_DIR ${PATH_EXT}/glm
@@ -197,7 +197,7 @@ ExternalProject_Add(ext_glm
 list(APPEND EXTERNAL_PROJECT_LIST ext_gli)
 ExternalProject_Add(ext_gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0.7.0.0
+	GIT_TAG 0.8.1.0
 	BUILD_COMMAND "" #gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
 	INSTALL_DIR ${PATH_EXT}/gli
@@ -379,6 +379,7 @@ add_executable(vui_test    ${vui_test_src})
 #Executables - Sandbox
 add_executable(libv_main   ${PATH_SNB}/libv_main.cpp)
 add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
+add_executable(vgl_main2   ${PATH_SNB}/vgl_main2.cpp)
 add_executable(vlog_main   ${PATH_SNB}/vlog_main.cpp)
 add_executable(vm3_main    ${PATH_SNB}/vm3_main.cpp)
 add_executable(vm3imp_main ${PATH_SNB}/vm3imp_main.cpp)
@@ -394,8 +395,7 @@ add_custom_target(ext DEPENDS externals)
 
 #Link - Libraries
 target_link_libraries(vlog   -static)
-target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU} vm3
-							boost_serialization-mt-s boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU})
 target_link_libraries(vm3    -static boost_serialization-mt-s)
 target_link_libraries(vm3imp -static vm3 fmt assimp zlibstatic)
 target_link_libraries(vui    -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
@@ -412,7 +412,8 @@ target_link_libraries(vui_test    -static vui fmt vlog)
 
 #Link - Executables
 target_link_libraries(libv_main   -static vlog fmt)
-target_link_libraries(vgl_main    -static vlog fmt glew glfw3 vgl)
+target_link_libraries(vgl_main    -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
+target_link_libraries(vgl_main2   -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vlog_main   -static fmt)
 target_link_libraries(vm3_main    -static vlog fmt vm3 boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vm3imp_main -static vlog fmt vm3imp boost_system-mt-s boost_filesystem-mt-s)

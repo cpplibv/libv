@@ -20,16 +20,19 @@
 
 namespace libv {
 
-struct AddressProvider {
+namespace detail {
+struct BasicMultiTypeMapAddressProvider {
 	using Address_t = size_t;
 	static inline Address_t nextAddress() {
 		static std::atomic<Address_t> lastAddress{0};
 		return ++lastAddress;
 	}
 };
+} //namespace detail
 
 template<template<typename...> class Container = std::map>
 struct BasicMultiTypeMap {
+private:
 	using Address_t = size_t;
 	using Value_t = std::pair<void*, std::unique_ptr<VoidGuardBase>>;
 
@@ -41,7 +44,7 @@ public:
 	template<typename T>
 	class Key {
 		friend class BasicMultiTypeMap<Container>;
-		const Address_t address = AddressProvider::nextAddress();
+		const Address_t address = detail::BasicMultiTypeMapAddressProvider::nextAddress();
 	public:
 		Key() = default;
 	};

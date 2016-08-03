@@ -1,11 +1,11 @@
 #version 330 core
 
 layout(location = 0) in vec3 vertexPos;
-layout(location = 2) in vec3 vertexNormal;
-layout(location = 3) in vec4 vertexColor;
+layout(location = 1) in vec3 vertexNormal;
+layout(location = 2) in vec4 vertexColor;
+layout(location = 6) in vec3 vertexTangent;
+layout(location = 7) in vec3 vertexBitangent;
 layout(location = 8) in vec2 vertexUV;
-layout(location = 14) in vec3 vertexTangent;
-layout(location = 15) in vec3 vertexBitangent;
 
 uniform mat4 MVPmat;
 uniform mat4 Mmat;

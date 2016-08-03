@@ -39,6 +39,13 @@ inline uint64_t get_this_thread_id() {
 
 // -------------------------------------------------------------------------------------------------
 
+template<typename E, typename = typename std::enable_if<std::is_enum<E>::value>::type>
+constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
+   return static_cast<typename std::underlying_type<E>::type>(std::forward<E>(e));
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace libv
 
 // Strong Typedef ----------------------------------------------------------------------------------

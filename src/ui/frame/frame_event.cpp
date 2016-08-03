@@ -107,22 +107,6 @@ void Frame::glfwCallback(const EventWindowSize&) { }
 // -------------------------------------------------------------------------------------------------
 
 void Frame::initEvents() {
-	eventQueChar.output(onChar);
-	eventQueCharMods.output(onCharMods);
-	eventQueCursorEnter.output(onCursorEnter);
-	eventQueCursorPos.output(onCursorPos);
-	eventQueDrop.output(onDrop);
-	eventQueFramebufferSize.output(onFramebufferSize);
-	eventQueKey.output(onKey);
-	eventQueMouseButton.output(onMouseButton);
-	eventQueScroll.output(onScroll);
-	eventQueWindowClose.output(onWindowClose);
-	eventQueWindowFocus.output(onWindowFocus);
-	eventQueWindowIconify.output(onWindowIconify);
-	eventQueWindowPos.output(onWindowPos);
-	eventQueWindowRefresh.output(onWindowRefresh);
-	eventQueWindowSize.output(onWindowSize);
-
 	eventQueChar.output(&Frame::glfwCallback, this);
 	eventQueCharMods.output(&Frame::glfwCallback, this);
 	eventQueCursorEnter.output(&Frame::glfwCallback, this);
@@ -138,6 +122,22 @@ void Frame::initEvents() {
 	eventQueWindowPos.output(&Frame::glfwCallback, this);
 	eventQueWindowRefresh.output(&Frame::glfwCallback, this);
 	eventQueWindowSize.output(&Frame::glfwCallback, this);
+
+	eventQueChar.output(onChar);
+	eventQueCharMods.output(onCharMods);
+	eventQueCursorEnter.output(onCursorEnter);
+	eventQueCursorPos.output(onCursorPos);
+	eventQueDrop.output(onDrop);
+	eventQueFramebufferSize.output(onFramebufferSize);
+	eventQueKey.output(onKey);
+	eventQueMouseButton.output(onMouseButton);
+	eventQueScroll.output(onScroll);
+	eventQueWindowClose.output(onWindowClose);
+	eventQueWindowFocus.output(onWindowFocus);
+	eventQueWindowIconify.output(onWindowIconify);
+	eventQueWindowPos.output(onWindowPos);
+	eventQueWindowRefresh.output(onWindowRefresh);
+	eventQueWindowSize.output(onWindowSize);
 }
 
 void Frame::distributeEvents() {

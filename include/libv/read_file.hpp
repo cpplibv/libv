@@ -32,6 +32,14 @@ inline std::string readFile(const boost::filesystem::path& filePath, const std::
 	return result;
 }
 
+inline std::string readFileBinary(const boost::filesystem::path& filePath) {
+	return readFile(filePath, std::ios_base::binary);
+}
+
+inline std::string readFileText(const boost::filesystem::path& filePath) {
+	return readFile(filePath);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } //namespace libv
