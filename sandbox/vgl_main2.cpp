@@ -23,7 +23,6 @@
 #include <libv/gl/program.hpp>
 #include <libv/gl/shader.hpp>
 #include <libv/gl/texture.hpp>
-#include <libv/gl/uniform.hpp>
 #include <libv/gl/vertex_buffer.hpp>
 
 // -------------------------------------------------------------------------------------------------
@@ -36,7 +35,7 @@ std::atomic_bool running{true};
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 900
 
-#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define CHECK_GLEW_SUPPORT(ext) LIBV_LIBV_INFO("%-46s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
@@ -46,14 +45,14 @@ void initGLEW() {
 	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
 	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 
-	checkGLEWSupport(GL_VERSION_3_3);
-	checkGLEWSupport(GL_VERSION_4_5);
-	checkGLEWSupport(GL_ARB_direct_state_access);
-	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
-	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
-	checkGLEWSupport(GL_ARB_sampler_objects);
-	checkGLEWSupport(GL_ARB_vertex_attrib_64bit);
-	checkGLEWSupport(GL_ARB_vertex_attrib_binding);
+	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
+	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
+	CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
+	CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
+	CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
+	CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
+	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
+	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
 
 	checkGL();
 }
@@ -64,7 +63,7 @@ void initGL() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
 	glEnable(GL_BLEND); //Alpha
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
 	glEnable(GL_TEXTURE_2D);
@@ -85,6 +84,15 @@ static void error_callback(int code, const char* description) {
 struct Example {
 	libv::gl::GL gl;
 
+	libv::gl::AttributeFixLocation<glm::vec3> attributePosition;
+	libv::gl::AttributeFixLocation<glm::vec2> attributeUV;
+
+	libv::gl::Shader shaderTest1Frag;
+	libv::gl::Shader shaderTest1Vert;
+	libv::gl::Program programTest1;
+	libv::gl::Uniform<glm::mat4> uniformTest1MVPmat;
+	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest1TextureDiffuseSampler;
+
 	libv::gl::Shader shaderTest2Frag;
 	libv::gl::Shader shaderTest2Vert;
 	libv::gl::Program programTest2;
@@ -92,56 +100,100 @@ struct Example {
 	libv::gl::Uniform<glm::mat4> uniformTest2Mmat;
 	libv::gl::Uniform<glm::vec3> uniformTest2EyePosW;
 	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest2TextureSkySampler;
-	libv::gl::Attribute<glm::vec3> attributeTest2Position;
 
 	libv::gl::VertexBuffer bufferVertexData;
 	libv::gl::VertexBuffer bufferVertexIndices;
 	libv::gl::VertexArray vertexArray;
 
-	libv::gl::Texture textureSky;
+	libv::gl::Texture2DGuard texturePlane;
+	libv::gl::TextureCubeGuard textureSky;
 
 	struct Vertex {
 		glm::vec3 position;
-		glm::vec4 color;
 		glm::vec2 uv;
 
-		Vertex(glm::vec3 position, glm::vec4 color, glm::vec2 uv) :
-			position(position), color(color), uv(uv) { }
+		Vertex(glm::vec3 position, glm::vec2 uv) :
+			position(position), uv(uv) { }
 	};
 
 	Example() {
 		Vertex dataVertex[]{
-			Vertex{glm::vec3(-1.f, -1.f, 0.f), glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(+1.f, -1.f, 0.f), glm::vec4(1.f, 1.f, 0.f, 1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(+1.f, +1.f, 0.f), glm::vec4(0.f, 1.f, 1.f, 1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(-1.f, +1.f, 0.f), glm::vec4(0.f, 0.f, 1.f, 1.f), glm::vec2(0.f, 1.f)}
+			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 1.f)},
+
+			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(0.f, 1.f)},
+
+			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 1.f)},
+
+			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)},
+
+			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)},
+
+			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 0.f)},
+			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
+			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
+			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)}
 		};
 
-		unsigned int dataIndices[]{0, 2, 1, 0, 3, 2};
+		uint32_t dataIndices[]{
+			 0,  1,  2,  0,  2,  3,
+			 4,  5,  6,  4,  6,  7,
+			 8,  9, 10,  8, 10, 11,
+			12, 13, 14, 12, 14, 15,
+			16, 17, 18, 16, 18, 19,
+			20, 21, 22, 20, 22, 23
+		};
+
+		attributePosition = 0;
+		attributeUV = 8;
 
 		shaderTest2Frag.createCompile(libv::readFileText("res/shader/test2.fs"), libv::gl::ShaderType::Fragment);
 		shaderTest2Vert.createCompile(libv::readFileText("res/shader/test2.vs"), libv::gl::ShaderType::Vertex);
 		programTest2.link(shaderTest2Frag, shaderTest2Vert);
-		programTest2.bind(uniformTest2MVPmat, "MVPmat");
-		programTest2.bind(uniformTest2Mmat, "Mmat");
-		programTest2.bind(uniformTest2EyePosW, "eyePosW");
-		programTest2.bind(uniformTest2TextureSkySampler, "textureSkySampler");
-		programTest2.bind(attributeTest2Position, "vertexPos");
+		programTest2.assign(uniformTest2MVPmat, "MVPmat");
+		programTest2.assign(uniformTest2Mmat, "Mmat");
+		programTest2.assign(uniformTest2EyePosW, "eyePosW");
+		programTest2.assign(uniformTest2TextureSkySampler, "textureSkySampler");
+
+		shaderTest1Frag.createCompile(libv::readFileText("res/shader/test1.fs"), libv::gl::ShaderType::Fragment);
+		shaderTest1Vert.createCompile(libv::readFileText("res/shader/test1.vs"), libv::gl::ShaderType::Vertex);
+		programTest1.link(shaderTest1Frag, shaderTest1Vert);
+		programTest1.assign(uniformTest1MVPmat, "MVPmat");
+		programTest1.assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
 		bufferVertexData.data(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
 		bufferVertexIndices.data(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
 
-		vertexArray.bindAttribute(bufferVertexData, attributeTest0Position, sizeof(Vertex), offsetof(Vertex, position), false);
-		vertexArray.bindAttribute(bufferVertexData, attributeTest0Color, sizeof(Vertex), offsetof(Vertex, color), false);
+		vertexArray.bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position), false);
+		vertexArray.bindAttribute(bufferVertexData, attributeUV, sizeof(Vertex), offsetof(Vertex, uv), false);
 		vertexArray.bindElements(bufferVertexIndices);
 
-		textureSky.storage2D(libv::gl::TextureBindTarget::CubeMap, 1, libv::gl::InternalFormat::RGBA8, 2, 2);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyX1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyX0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyY1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyY0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyZ1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyZ0);
+		auto dataPlane = libv::readFileBinary("res/texture/6poly_metal_01_diffuse.dds");
+		texturePlane.createFromDDS(dataPlane.data(), dataPlane.size());
+		auto dataSky = libv::readFileBinary("res/texture/sky/merged2.dds");
+		textureSky.createFromDDS(dataSky.data(), dataSky.size());
+
+		programTest1.use();
+		uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
+
+		programTest2.use();
+		uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
+
+		checkGL();
 	}
 
 	void render() {
@@ -152,23 +204,42 @@ struct Example {
 		gl.pushMatrixView();
 		gl.pushMatrixModel();
 
+		angle += 0.5f;
+
 		gl.matrixProjection() = glm::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
 		gl.matrixView() = glm::lookAt(glm::vec3(5.f, 3.f, 5.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 		gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
 
-		angle += 0.5f;
+		// Draw Sky
+		{
+			glDisable(GL_DEPTH_TEST);
+			glFrontFace(GL_CW); // Cheat for the sake of sandbox
+			auto eye = glm::vec3(glm::inverse(gl.matrixView())[3]);
+			gl.pushMatrixModel();
+			gl.matrixModel() *= glm::translate(eye);
+			gl.matrixModel() *= glm::scale(glm::vec3(3, 3, 3));
+			programTest2.use();
+			gl.activeTexture(libv::gl::TextureChannel::sky);
+			textureSky.bind();
+			uniformTest2MVPmat = gl.matrixMVP();
+			uniformTest2Mmat = gl.matrixModel();
+			uniformTest2EyePosW = eye;
+			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
+			textureSky.unbind();
+			gl.popMatrixModel();
+			glFrontFace(GL_CCW); // Cheat for the sake of sandbox
+			glEnable(GL_DEPTH_TEST);
+		}
 
-		// ---------------------------------------------------------------------------------------------
-
-		// TODO P4: Binding a texture to an uniform instead of TextureType sounds like a good idea.
-
-		programTest2.use();
-		textureSky.bind(libv::gl::TextureChannel::sky);
-		uniformTest2MVPmat = gl.matrixMVP();
-		uniformTest2Mmat = gl.matrixModel();
-		uniformTest2EyePosW = glm::vec3(glm::inverse(gl.matrixView())[3]);
-		uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
-		gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 6, 0);
+		// Draw world
+		{
+			programTest1.use();
+			gl.activeTexture(libv::gl::TextureChannel::diffuse);
+			texturePlane.bind();
+			uniformTest1MVPmat = gl.matrixMVP();
+			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
+			texturePlane.unbind();
+		}
 
 		checkGL();
 
@@ -234,10 +305,10 @@ int main(void) {
 
 			i++;
 			time += timer.time().count();
-			if (time > 1'000'000'000) {
+			if (time > 1000000000) {
 				LIBV_LIBV_INFO("FPS: %d", i);
 				i = 0;
-				time -= 1'000'000'000;
+				time -= 1000000000;
 			}
 		}
 	}

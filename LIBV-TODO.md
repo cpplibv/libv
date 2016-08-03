@@ -9,12 +9,10 @@ gl proper matrix stack
 gl matrix stacks and manipulation interface
 -- commit --
 
-GL: enable disable clear mask stencil fill mode bind texture bind framebuffer...
+adopt texture like guard solution to every vgl resource?
 -- commit --
 
-sky box
-math for reflection
-glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS)
+GL: enable disable clear mask stencil fill mode bind texture bind framebuffer...
 -- commit --
 
 adopting new vgl in ui
@@ -22,6 +20,9 @@ adopting new vgl in ui
 
 use VBO for string2D
 use VAO for string2D
+-- commit --
+
+cache_ptr
 -- commit --
 
 font cache

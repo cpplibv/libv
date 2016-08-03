@@ -23,7 +23,6 @@
 #include <libv/gl/program.hpp>
 #include <libv/gl/shader.hpp>
 #include <libv/gl/texture.hpp>
-#include <libv/gl/uniform.hpp>
 #include <libv/gl/vertex_buffer.hpp>
 
 // -------------------------------------------------------------------------------------------------
@@ -64,7 +63,7 @@ void initGL() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
 	glEnable(GL_BLEND); //Alpha
 	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
+	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
 	glEnable(GL_TEXTURE_2D);
