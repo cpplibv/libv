@@ -197,55 +197,50 @@ struct Example {
 	}
 
 	void render() {
-		glClearColor(0.236f, 0.311f, 0.311f, 0.f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
+		gl.clear();
 
-		gl.pushMatrixProjection();
-		gl.pushMatrixView();
-		gl.pushMatrixModel();
+		auto pStackGuard = gl.projection.pushGuard();
+		auto vStackGuard = gl.view.pushGuard();
+		auto mStackGuard = gl.model.pushGuard();
 
 		angle += 0.5f;
 
-		gl.matrixProjection() = glm::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
-		gl.matrixView() = glm::lookAt(glm::vec3(5.f, 3.f, 5.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-		gl.matrixView() *= glm::rotate(angle / 90, glm::vec3(0, 1, 0));
+		gl.projection.setToPerspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
+		gl.view.setToLookAt(glm::vec3(5.f, 3.f, 5.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+		gl.view.rotate(angle / 90, glm::vec3(0, 1, 0));
+		gl.model.identity();
 
 		// Draw Sky
 		{
-			glDisable(GL_DEPTH_TEST);
-			glFrontFace(GL_CW); // Cheat for the sake of sandbox
-			auto eye = glm::vec3(glm::inverse(gl.matrixView())[3]);
-			gl.pushMatrixModel();
-			gl.matrixModel() *= glm::translate(eye);
-			gl.matrixModel() *= glm::scale(glm::vec3(3, 3, 3));
+			auto mStackGuard = gl.model.pushGuard();
+			gl.model.translate(gl.view.eye());
+			gl.model.scale(3, 3, 3);
+
+			auto dCapabilityGuard = gl.disableGuard(libv::gl::Capability::DepthTest);
+			gl.frontFaceCW(); // Cheat for the sake of sandbox
 			programTest2.use();
 			gl.activeTexture(libv::gl::TextureChannel::sky);
-			textureSky.bind();
-			uniformTest2MVPmat = gl.matrixMVP();
-			uniformTest2Mmat = gl.matrixModel();
-			uniformTest2EyePosW = eye;
+			auto sBindGuard = textureSky.bindGuard();
+			uniformTest2MVPmat = gl.mvp();
+			uniformTest2Mmat = gl.model;
+			uniformTest2EyePosW = gl.view.eye();
+
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
-			textureSky.unbind();
-			gl.popMatrixModel();
-			glFrontFace(GL_CCW); // Cheat for the sake of sandbox
-			glEnable(GL_DEPTH_TEST);
+
+			gl.frontFaceCCW(); // Cheat for the sake of sandbox
 		}
 
 		// Draw world
 		{
 			programTest1.use();
 			gl.activeTexture(libv::gl::TextureChannel::diffuse);
-			texturePlane.bind();
-			uniformTest1MVPmat = gl.matrixMVP();
+			auto pBindGuard = texturePlane.bindGuard();
+			uniformTest1MVPmat = gl.mvp();
+
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
-			texturePlane.unbind();
+
 		}
-
-		checkGL();
-
-		gl.popMatrixModel();
-		gl.popMatrixView();
-		gl.popMatrixProjection();
 
 		checkGL();
 	}

@@ -6,6 +6,7 @@
 #include <memory>
 // pro
 #include <libv/gl/enum.hpp>
+#include <libv/gl/guard.hpp>
 
 namespace libv {
 namespace gl {
@@ -52,18 +53,17 @@ public:
 		LIBV_GL_DEBUG_CHECK_GL();
 		textureID = 0;
 	}
-	inline void adopt(GLenum target, GLuint id) {
+	inline void adopt(GLuint id) {
 		LIBV_GL_DEBUG_ASSERT(textureID == 0);
 		textureID = id;
-		to_value(BindTarget) = target;
-	}
-	inline void adopt(TextureBindTarget target, GLuint id) {
-		adopt(to_value(target), id);
 	}
 	inline void bind() {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glBindTexture(to_value(BindTarget), textureID);
 		LIBV_GL_DEBUG_CHECK_GL();
+	}
+	inline BindGuard<Texture<BindTarget>> bindGuard() {
+		return BindGuard<Texture<BindTarget>>(*this);
 	}
 	inline void unbind() {
 		LIBV_GL_DEBUG_ASSERT(to_value(BindTarget) != 0);

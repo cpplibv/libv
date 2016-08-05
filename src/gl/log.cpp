@@ -8,7 +8,7 @@
 namespace libv {
 namespace gl {
 namespace detail {
-
+// <<< why the would this be here and not in the header?, nvm i know why, doesnt matter, put it in h
 void logOGLError(const char* func, const char* file, int line) {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)

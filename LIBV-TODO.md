@@ -1,19 +1,11 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+thread wait: https://www.youtube.com/watch?v=mPxIegd9J3w&list=PLHTh1InhhwT75gykhs7pqcR_uSiG601oh&index=43
+
 http://learnopengl.com/#!Advanced-OpenGL/Advanced-GLSL
 http://learnopengl.com/code_viewer.php?code=advanced/advanced_glsl_uniform_buffer_objects
 http://learnopengl.com/#!Advanced-OpenGL/Cubemaps
 
-
-gl proper matrix stack
-gl matrix stacks and manipulation interface
--- commit --
-
-adopt texture like guard solution to every vgl resource?
--- commit --
-
-GL: enable disable clear mask stencil fill mode bind texture bind framebuffer...
--- commit --
 
 adopting new vgl in ui
 -- commit --
@@ -39,30 +31,31 @@ btn / regions
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-gl uniformbuffer?
-gl framebuffer
-gl renderbuffer
-gl templated buffer and texture for binding
-size percent should use the leftover space not the whole parent
-size ratio
-Layout Property: what is the situation with per-component but container based properties?
-what is and how to use ADL
-think layout as a graph instad of a stack..., just think and see whats going on with that approach
-hard type (enum) align anchor and orient
-intel vtune
-LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
-glEnable(GL_DEBUG_OUTPUT);
-take a look at frame and component events
-replace every raw ptr with a smart counter part (incl observer_ptr)
-look after variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
-look after any
-moving vec costume getter functions from member to public -> reducing symbols...
-provide exception free alternative api EVERYWHERE! hehehehehe.
+gl: uniformbuffer?
+gl: framebuffer
+gl: renderbuffer
+gl: templated buffer for binding
+gl: remove irrelevant member function from templated textures
+gl: glEnable(GL_DEBUG_OUTPUT);
+layout: size percent should use the leftover space not the whole parent
+layout: size ratio
+layout: Layout Property: what is the situation with per-component but container based properties?
+layout: think layout as a graph instad of a stack..., just think and see whats going on with that approach
+layout: hard type (enum) align anchor and orient
+ui: setText => set()(Label::Text, "Main Menu");
+ui: take a look at frame and component events
+ui: component property serialization and validation
+ui: rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
+cpp: what is and how to use ADL
+cpp: intel vtune
+cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
+cpp: look after variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
+cpp: look after any
+libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
+libv: provide exception free alternative api EVERYWHERE! hehehehehe.
+libv: move vec costume getter functions from member to public -> reducing symbols...
 seg fault in resource! (just run libv_test in debug...) // however it will be rewritten
 FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
-ui - component property serialization and validation
-rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
-setText => set()(Label::Text, "Main Menu");
 merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 --- ABANDONED --------------------------------------------------------------------------------------
@@ -781,6 +774,155 @@ Light::Light() :
 //  14  |   ^^^^^^^^^^  |  texcoord6  |
 //  15  |   ^^^^^^^^^^  |  texcoord7  |
 
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
+class Framebuffer {
+public:
+	Framebuffer(const Framebuffer& other);
+	Framebuffer(uint width, uint height, uchar color = 32, uchar depth = 24);
+	~Framebuffer();
+
+	operator GLuint() const;
+	const Framebuffer& operator=(const Framebuffer& other);
+
+	const Texture& GetTexture();
+	const Texture& GetDepthTexture();
+
+private:
+	static GC gc;
+	GLuint obj;
+	Texture texColor;
+	Texture texDepth;
+};
+
+
+// -------------------------------------------------------------------------------------------------
+
+class Renderbuffer {
+public:
+	Renderbuffer();
+	Renderbuffer(const Renderbuffer& other);
+	Renderbuffer(uint width, uint height, InternalFormat::internal_format_t format);
+
+	~Renderbuffer();
+
+	operator GLuint() const;
+	const Renderbuffer& operator=(const Renderbuffer& other);
+
+	void Storage(uint width, uint height, InternalFormat::internal_format_t format);
+
+private:
+	static GC gc;
+	GLuint obj;
+};
+
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
+
+#    define PUSHSTATE() GLint restoreId; glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &restoreId );
+#    define POPSTATE() glBindFramebuffer( GL_DRAW_FRAMEBUFFER, restoreId );
+Framebuffer::Framebuffer(const Framebuffer& other) {
+	gc.Copy(other.obj, obj);
+	texColor = other.texColor;
+	texDepth = other.texDepth;
+}
+Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
+	PUSHSTATE()
+
+	// Determine appropriate formats
+	InternalFormat::internal_format_t colorFormat;
+	if (color == 24) colorFormat = InternalFormat::RGB;
+	else if (color == 32) colorFormat = InternalFormat::RGBA;
+	else throw FramebufferException();
+
+	InternalFormat::internal_format_t depthFormat;
+	if (depth == 8) depthFormat = InternalFormat::DepthComponent;
+	else if (depth == 16) depthFormat = InternalFormat::DepthComponent16;
+	else if (depth == 24) depthFormat = InternalFormat::DepthComponent24;
+	else if (depth == 32) depthFormat = InternalFormat::DepthComponent32F;
+	else throw FramebufferException();
+
+	// Create FBO
+	gc.Create(obj, glGenFramebuffers, glDeleteFramebuffers);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, obj);
+
+	// Create texture to hold color buffer
+	texColor.Image2D(0, DataType::UnsignedByte, Format::RGBA, width, height, colorFormat);
+	texColor.SetWrapping(GL::Wrapping::ClampEdge, GL::Wrapping::ClampEdge);
+	texColor.SetFilters(GL::Filter::Linear, GL::Filter::Linear);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColor, 0);
+
+	// Create renderbuffer to hold depth buffer
+	if (depth > 0) {
+		glBindTexture(GL_TEXTURE_2D, texDepth);
+		glTexImage2D(GL_TEXTURE_2D, 0, depthFormat, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+		texDepth.SetWrapping(GL::Wrapping::ClampEdge, GL::Wrapping::ClampEdge);
+		texDepth.SetFilters(GL::Filter::Nearest, GL::Filter::Nearest);
+		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texDepth, 0);
+	}
+
+	// Check
+	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		throw FramebufferException();
+
+	POPSTATE()
+}
+Framebuffer::~Framebuffer() {
+	gc.Destroy(obj);
+}
+Framebuffer::operator GLuint() const {
+	return obj;
+}
+const Framebuffer& Framebuffer::operator=(const Framebuffer& other) {
+	gc.Copy(other.obj, obj, true);
+	texColor = other.texColor;
+	texDepth = other.texDepth;
+
+	return *this;
+}
+const Texture& Framebuffer::GetTexture() {
+	return texColor;
+}
+const Texture& Framebuffer::GetDepthTexture() {
+	return texDepth;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+GC Framebuffer::gc;
+Renderbuffer::Renderbuffer() {
+	gc.Create(obj, glGenRenderbuffers, glDeleteRenderbuffers);
+}
+Renderbuffer::Renderbuffer(const Renderbuffer& other) {
+	gc.Copy(other.obj, obj);
+}
+Renderbuffer::Renderbuffer(uint width, uint height, InternalFormat::internal_format_t format) {
+	gc.Create(obj, glGenRenderbuffers, glDeleteRenderbuffers);
+	Storage(width, height, format);
+}
+Renderbuffer::~Renderbuffer() {
+	gc.Destroy(obj);
+}
+Renderbuffer::operator GLuint() const {
+	return obj;
+}
+const Renderbuffer& Renderbuffer::operator=(const Renderbuffer& other) {
+	gc.Copy(other.obj, obj, true);
+	return *this;
+}
+void Renderbuffer::Storage(uint width, uint height, InternalFormat::internal_format_t format) {
+	glBindRenderbuffer(GL_RENDERBUFFER, obj);
+	glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
+}
+
+GC Renderbuffer::gc;
+
+}
 
 std::this_thread::sleep_for(std::chrono::seconds(2));
