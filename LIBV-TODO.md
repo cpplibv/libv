@@ -1,13 +1,15 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-thread wait: https://www.youtube.com/watch?v=mPxIegd9J3w&list=PLHTh1InhhwT75gykhs7pqcR_uSiG601oh&index=43
+cache!!!!
+-- commit --
 
-http://learnopengl.com/#!Advanced-OpenGL/Advanced-GLSL
-http://learnopengl.com/code_viewer.php?code=advanced/advanced_glsl_uniform_buffer_objects
-http://learnopengl.com/#!Advanced-OpenGL/Cubemaps
-
-
+ShaderAC / NC -> ShaderGuard or GLGuard<Shader>?
+ProgramAC / NC -> ProgramGuard or GLGuard<Program>?
 adopting new vgl in ui
+-- commit --
+
+kill gl/log.cpp
+kill gl/gl.cpp
 -- commit --
 
 use VBO for string2D

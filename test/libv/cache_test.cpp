@@ -2,6 +2,7 @@
 
 #include <catch.hpp>
 #include <libv/cache.hpp>
+#include <thread>
 #include "cache_test_util.hpp"
 
 int TestRA::instanceNumber = 0;
@@ -10,6 +11,43 @@ int TestRM::instanceNumber = 0;
 
 using libv::Cache;
 using libv::LoaderCache;
+
+// Forward Declarable ------------------------------------------------------------------------------
+
+TEST_CASE("Cache can use forward declared type") {
+	struct TypeFwd;
+	libv::Cache<TypeFwd> cache;
+	CHECK(cache.size() == 0);
+}
+
+struct TypeFwd2;
+void cacheForwardRest(libv::Cache<TypeFwd2>& cache);
+
+TEST_CASE("Cache can use forward declared type and use it when complete") {
+	libv::Cache<TypeFwd2> cache;
+	cacheForwardRest(cache);
+}
+
+struct TypeFwd2 {
+	int size;
+	TypeFwd2(int size) : size(size) { }
+
+	bool operator<(const TypeFwd2& r) const {
+		return size < r.size;
+	}
+	friend bool operator<(int t, const TypeFwd2& r) {
+		return t < r.size;
+	}
+	friend bool operator<(const TypeFwd2& r, int t) {
+		return r.size < t;
+	}
+};
+
+void cacheForwardRest(libv::Cache<TypeFwd2>& cache) {
+	auto x = cache.get(2);
+	CHECK(x->size == 2);
+	CHECK(cache.size() == 1);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -86,18 +124,18 @@ TEST_CASE("Cache should handle convertible arguments") {
 
 TEST_CASE("Cache should handle non copyable argument lvalue reference", "[static]") {
 	Cache<TestRNonCopyArged> rc;
-	NonCopyable a0;
+	NonCopyable a0(3);
 	auto v0 = rc.get(a0);
 }
 
 TEST_CASE("Cache should handle non copyable argument prvalue reference", "[static]") {
 	Cache<TestRNonCopyArged> rc;
-	auto v0 = rc.get(NonCopyable());
+	auto v0 = rc.get(NonCopyable(3));
 }
 
 TEST_CASE("Cache should handle non copyable argument rvalue reference", "[static]") {
 	Cache<TestRNonCopyArged> rc;
-	NonCopyable a0;
+	NonCopyable a0(3);
 	auto v0 = rc.get(std::move(a0));
 }
 
@@ -208,3 +246,31 @@ TEST_CASE("LoaderCache comparator can handle use option for match even different
 //	CHECK(r1->n == 42);
 //	CHECK(r1->argCount == 2u);
 //}
+
+// multithread -------------------------------------------------------------------------------------
+
+void foo22(Cache<LoadableTestResource>* c) {
+	for (size_t i = 0; i < 1000; ++i) {
+		auto x0 = c->get(i+0);
+		auto x1 = c->get(i+1);
+		auto x2 = c->get(i+2);
+		auto x3 = c->get(i+3);
+		auto x4 = c->get(i+4);
+		auto x5 = c->get(i+5);
+		auto x6 = c->get(i+6);
+		auto x7 = c->get(i+7);
+		auto x8 = c->get(i+8);
+		auto x9 = c->get(i+9);
+	}
+}
+
+TEST_CASE("Cache multithread stress") {
+	Cache<LoadableTestResource> c;
+	std::thread t0(foo22, &c);
+	std::thread t1(foo22, &c);
+	std::thread t2(foo22, &c);
+	t0.join();
+	t1.join();
+	t2.join();
+	CHECK(c.size() == 0);
+}

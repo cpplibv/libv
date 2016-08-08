@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <utility>
+#include <memory>
 #include <thread>
+#include <utility>
 
 // -------------------------------------------------------------------------------------------------
 
@@ -46,6 +47,24 @@ constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T, typename U>
+inline bool equals(const std::weak_ptr<T>& t, const std::weak_ptr<U>& u) {
+	return !t.owner_before(u) && !u.owner_before(t);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void hash_combine(std::size_t&) { }
+
+template <typename T, typename... Rest>
+inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
+    hash_combine(seed, rest...);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } //namespace libv
 
 // Strong Typedef ----------------------------------------------------------------------------------
@@ -53,7 +72,7 @@ constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
 
 // TODO P4: constexpr
 
-#define LIBV_STRONG_TYPEDEF(T, D)                                                                    \
+#define LIBV_STRONG_TYPEDEF(T, D)                                                                  \
 struct D {                                                                                         \
 	T t;                                                                                           \
 	explicit D(const T t_) : t(t_) {};                                                             \
@@ -66,5 +85,16 @@ struct D {                                                                      
 	bool operator==(const D & rhs) const { return t == rhs.t; }                                    \
 	bool operator<(const D & rhs) const { return t < rhs.t; }                                      \
 };
+
+// -------------------------------------------------------------------------------------------------
+
+#define LIBV_MAKE_HASHABLE(type, ...)                                                              \
+namespace std {                                                                                    \
+	template<> struct hash<type> {                                                                 \
+		std::size_t operator()(const type &t) const {                                              \
+			std::size_t ret = 0;                                                                   \
+			hash_combine(ret, __VA_ARGS__);                                                        \
+			return ret;                                                                            \
+}};}
 
 // -------------------------------------------------------------------------------------------------

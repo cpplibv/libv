@@ -38,11 +38,11 @@ using enable_if = typename std::enable_if<T::value>::type;
 // =================================================================================================
 // is_less_comparable
 
-template <typename T, typename L, typename = void> struct is_less_comparable : std::false_type {
+template <typename L, typename R, typename = void> struct is_less_comparable : std::false_type {
 };
-template <typename T, typename L>
-struct is_less_comparable<T, L, void_t<decltype(
-		std::declval<const T&>() < std::declval<const L&>()
+template <typename L, typename R>
+struct is_less_comparable<L, R, void_t<decltype(
+		std::declval<const L&>() < std::declval<const R&>()
 		)>> : std::true_type { };
 
 // =================================================================================================

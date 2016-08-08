@@ -52,21 +52,23 @@ private:
 };
 
 struct NonCopyable {
-	NonCopyable() {}
+	int n;
+	NonCopyable(int n) : n(n) { }
 	NonCopyable(const NonCopyable&) = delete;
 };
 struct TestRNonCopyArged {
-	TestRNonCopyArged(const NonCopyable&) {
-	}
-	bool operator<(const TestRNonCopyArged&) const {
-		return true;
+	int n;
+	TestRNonCopyArged(int n) : n(n) { }
+	TestRNonCopyArged(const NonCopyable& o) : n(o.n) { }
+	bool operator<(const TestRNonCopyArged& o) const {
+		return n < o.n;
 	}
 private:
-	friend bool operator<(const NonCopyable&, const TestRNonCopyArged&) {
-		return true;
+	friend bool operator<(const NonCopyable& l, const TestRNonCopyArged& r) {
+		return l.n < r.n;
 	}
-	friend bool operator<(const TestRNonCopyArged&, const NonCopyable&) {
-		return false;
+	friend bool operator<(const TestRNonCopyArged& l, const NonCopyable& r) {
+		return l.n < r.n;
 	}
 };
 
