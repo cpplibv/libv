@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <atomic>
+
 struct TestRA {
 	static int instanceNumber;
 	TestRA(const std::string& n) : n(n) {
@@ -98,13 +100,15 @@ private:
 
 struct LoadableTestResource {
 	int n;
+	int id;
+	static std::atomic<int> nextid;
 	int loaded = 0;
 	int* unloaded = nullptr;
-	LoadableTestResource(int n) : n(n) { }
-	void load(std::shared_ptr<LoadableTestResource>) {
+	LoadableTestResource(int n) : n(n) , id(nextid++) { }
+	void load(const std::shared_ptr<LoadableTestResource>&) {
 		++loaded;
 	}
-	void unload(std::shared_ptr<LoadableTestResource>) {
+	void unload(const std::shared_ptr<LoadableTestResource>&) {
 		if (unloaded)
 			++(*unloaded);
 	}
@@ -126,8 +130,8 @@ struct LoadableTestResourceB {
 	int argCount;
 	template<typename... Args>
 	LoadableTestResourceB(int n, Args...) : n(n), argCount(sizeof...(Args) + 1) { }
-	void load(std::shared_ptr<LoadableTestResourceB>) { }
-	void unload(std::shared_ptr<LoadableTestResourceB>) { }
+	void load(const std::shared_ptr<LoadableTestResourceB>&) { }
+	void unload(const std::shared_ptr<LoadableTestResourceB>&) { }
 	bool operator<(const LoadableTestResourceB& r) const {
 		return n < r.n;
 	}

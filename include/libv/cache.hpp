@@ -5,73 +5,16 @@
 // libv
 #include <libv/tuple.hpp>
 #include <libv/type_traits.hpp>
-#include <libv/utility.hpp>
 // std
 #include <algorithm>
 #include <cassert>
 #include <memory>
 #include <mutex>
 #include <set>
-#include <iostream>
 
 namespace libv {
 
-// TODO P1: loader cache
-// TODO P1: loader cache for forward declared types?
-// TODO P2: loader cache std::make_shared
-// TODO P5: Possible that the redundant code with loader cache can be eliminated with a cache
-//  wrapper where the cached object is an other wrapper and with the use of the shared_ptr member
-//  magic ctor
-
-// TODO P4: Loader cache helyett cache foreign construtorral!! ZSENIÁLLIS!!
-//A chachecacheTrackerWrapping osztálya kap egy +arg-ot amivel ő foreign constructálja
-//http://gerardmeier.com/foreign-constructors-cpp
-//és talán kaphatna egy másik objektumot ami descturcálja és igazából a shared_ptr deleterje!!
-
-// -------------------------------------------------------------------------------------------------
-
-template<typename BaseComparator, typename T>
-struct CachedArgumentComparator : BaseComparator {
-	template<typename... Args>
-	inline bool operator()(const std::tuple<Args...>& args, const std::weak_ptr<T>& cr) const {
-		assert(!cr.expired());
-		return BaseComparator::operator()(args, *cr.lock());
-	}
-	template<typename... Args>
-	inline bool operator()(const std::weak_ptr<T>& cr, const std::tuple<Args...>& args) const {
-		assert(!cr.expired());
-		return BaseComparator::operator()(*cr.lock(), args);
-	}
-	template<typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
-	inline bool operator()(const std::tuple<L>& args, const std::weak_ptr<T>& cr) const {
-		assert(!cr.expired());
-		return BaseComparator::operator()(std::get<0>(args), *cr.lock());
-	}
-	template<typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
-	inline bool operator()(const std::weak_ptr<T>& cr, const std::tuple<L>& args) const {
-		assert(!cr.expired());
-		return BaseComparator::operator()(*cr.lock(), std::get<0>(args));
-	}
-};
-
-template<typename BaseComparator, typename T>
-struct CachedComparator : BaseComparator {
-	inline bool operator()(const std::weak_ptr<T>& lhs, const std::weak_ptr<T>&rhs) const {
-		assert(!lhs.expired());
-		assert(!rhs.expired());
-		return BaseComparator::operator()(*lhs.lock(), *rhs.lock());
-	}
-	inline bool operator()(const std::weak_ptr<T>& lhs, const T& rhs) const {
-		return !lhs.expired() && BaseComparator::operator()(*lhs.lock(), rhs);
-	}
-	inline bool operator()(const T& lhs, const std::weak_ptr<T>&rhs) const {
-		return !rhs.expired() && BaseComparator::operator()(lhs, *rhs.lock());
-	}
-};
+// TODO P2: loader cache: merge the two shared_ptr into one shared which allocator / deallocator creates another one
 
 // -------------------------------------------------------------------------------------------------
 
@@ -184,7 +127,7 @@ private:
 
 private:
 	template<typename CompareOptions, typename... Args>
-	inline std::shared_ptr<T> getImpl(Args&&... args) {
+	std::shared_ptr<T> getImpl(Args&&... args) {
 
 		struct CachedObject {
 			T object;
@@ -206,7 +149,7 @@ private:
 
 				auto it = equalRange.first;
 				while (it != equalRange.second) {
-					if (it->weak.expired()) {
+					if (&object == it->ptr) {
 						storage.erase(it);
 						return;
 					}
@@ -216,9 +159,9 @@ private:
 			}
 		};
 
-		Arguments<CompareOptions, Args...> arguments(std::forward<Args>(args)...);
-
 		std::lock_guard<std::mutex> lk(cacheTracker->mutex);
+
+		Arguments<CompareOptions, Args...> arguments(std::forward<Args>(args)...);
 
 		const auto equalRange = storage.equal_range(arguments.comp);
 
@@ -242,7 +185,7 @@ private:
 
 public:
 	template <typename CompareOptions = void, typename... Args>
-	std::shared_ptr<T> get(Args&&... args) {
+	inline std::shared_ptr<T> get(Args&&... args) {
 		//static_assert comparable
 		//static_assert constructor
 		//static_assert compare out indexing
@@ -269,134 +212,68 @@ public:
 	}
 };
 
-// =================================================================================================
+// LoaderCache =================================================================================================
+
+template <typename T>
+struct LoadableResource {
+	std::shared_ptr<T> obj_ptr;
+
+	template <typename... Args>
+	inline LoadableResource(Args&&... args) : obj_ptr(std::make_shared<T>(std::forward<Args>(args)...)) {
+		obj_ptr->load(obj_ptr);
+	}
+	virtual ~LoadableResource() {
+		obj_ptr->unload(obj_ptr);
+	}
+
+	bool operator<(const LoadableResource<T>& r) const {
+		return *obj_ptr < *r.obj_ptr;
+	}
+	template<typename... Args>
+	friend inline bool operator<(const std::tuple<Args...>& args, const LoadableResource<T>& r) {
+		return args < *r.obj_ptr;
+	}
+	template<typename... Args>
+	friend inline bool operator<(const LoadableResource<T>& l, const std::tuple<Args...>& args) {
+		return *l.obj_ptr < args;
+	}
+	template<typename L,
+	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
+	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	friend inline bool operator<(const std::tuple<L>& args, const LoadableResource<T>& r) {
+		return std::get<0>(args) < *r.obj_ptr;
+	}
+	template<typename L,
+	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
+	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	friend inline bool operator<(const LoadableResource<T>& l, const std::tuple<L>& args) {
+		return *l.obj_ptr < std::get<0>(args);
+	}
+};
 
 template<typename T, typename Comparator = std::less<void>>
-class LoaderCache {
-
-	struct CacheTracker {
-		std::mutex mutex;
-		bool alive = true;
-	};
-
-	struct CachedObject : T {
-		std::shared_ptr<CacheTracker> cacheTracker;
-		using T::T;
-		using T::load;
-		using T::unload;
-	};
+struct LoaderCache : private Cache<LoadableResource<T>, Comparator> {
 private:
-	using Type = CachedObject;
-	using Container = std::set<std::weak_ptr<Type>, CachedComparator<Comparator, Type>>;
-
-private:
-	std::shared_ptr<CacheTracker> cacheTracker;
-	Container cache;
-
-private:
-	void remove(Type* ptr) {
-		{
-			std::lock_guard<std::mutex> lk(ptr->cacheTracker->mutex);
-			if (ptr->cacheTracker->alive) {
-				auto result = std::equal_range(cache.begin(), cache.end(), *ptr,
-						CachedComparator<Comparator, Type>());
-				assert(result.first != result.second);
-				cache.erase(result.first);
-			}
-		}
-		ptr->unload(std::shared_ptr<T>(ptr)); //implicit delete via shared_ptr
-	}
-
-	// ---------------------------------------------------------------------------------------------
-
-private:
-	template<typename CompareOptions, typename... Args>
-	struct Arguments;
-
-	template<typename... Args>
-	struct Arguments<void, Args...> {
-		std::tuple<Args&&...> all;
-		std::tuple<Args&&...>& comp;
-		Arguments(Args&&... args) :
-			all(std::forward<Args>(args)...),
-			comp(all) { }
-	};
-
-	template<size_t... Is, typename... Args>
-	struct Arguments<use<Is...>, Args...> {
-		std::tuple<Args&&...> all;
-		decltype(libv::mask_tuple(all, std::index_sequence<Is...>())) comp;
-		Arguments(Args&&... args) :
-			all(std::forward<Args>(args)...),
-			comp(libv::mask_tuple(all, std::index_sequence<Is...>())) { }
-	};
-
-	//	template<size_t... Is, typename... Args>
-	//	struct Arguments<ignore<Is...>, Args...> {
-	//		std::tuple<Args&&...> all;
-	//		decltype(libv::mask_tuple(all, std::index_sequence<Is...>())) comp;
-	//		Arguments(Args&&... args) :
-	//			all(std::forward<Args>(args)...),
-	//			comp(libv::mask_tuple(all, std::index_sequence<Is...>())) { }
-	//	};
-
-	// ---------------------------------------------------------------------------------------------
-
+	using Base = Cache<LoadableResource<T>, Comparator>;
 public:
-	template<typename CompareOptions, typename... Args>
-	inline std::shared_ptr<Type> getImpl(Args&&... args) {
-		std::shared_ptr<Type> resource;
-
-		Arguments<CompareOptions, Args...> arguments(std::forward<Args>(args)...);
-		{
-			std::lock_guard<std::mutex> lk(cacheTracker->mutex);
-
-			auto result = std::equal_range(cache.begin(), cache.end(),
-					arguments.comp, CachedArgumentComparator<Comparator, Type>());
-
-			if (result.first != result.second) {
-				assert(!result.first->expired());
-				return result.first->lock();
-			}
-
-			Type * (*newAddr)(Args&&...) = &libv::new_f;
-			resource = std::shared_ptr<Type>(
-					libv::forward_from_tuple(newAddr, std::move(arguments.all)),
-					[this](Type * ptr) {
-						remove(ptr);
-					});
-			resource->cacheTracker = cacheTracker;
-			cache.emplace(resource);
-		}
-		resource->load(resource);
-		return resource;
-	}
-
-public:
-	template<typename CompareOptions = void, typename... Args>
-	std::shared_ptr<T> get(Args&&... args) {
-		// TODO P3: static_assert comparable
-		// TODO P3: static_assert constructor
-		// TODO P3: static_assert compare out indexing
-		// TODO P3: static_assert and sfiane for invalid CompareOptions
-		return getImpl<CompareOptions>(std::forward<Args>(args)...);
-	}
-	inline typename Container::size_type size() {
-		return cache.size();
-	}
-
-public:
-	LoaderCache() {
-		cacheTracker = std::make_shared<CacheTracker>();
-	}
+	using Base::size;
 	LoaderCache(const LoaderCache&) = delete;
 	LoaderCache(LoaderCache&&) = delete;
 	LoaderCache& operator=(const LoaderCache&) = delete;
 	LoaderCache& operator=(LoaderCache&&) = delete;
-	virtual ~LoaderCache() {
-		std::lock_guard<std::mutex> lk(cacheTracker->mutex);
-		cacheTracker->alive = false;
+public:
+	template <typename CompareOptions = void, typename... Args>
+	std::shared_ptr<T> get(Args&&... args) {
+		//static_assert comparable
+		//static_assert constructor
+		//static_assert compare out indexing
+		//static_assert and sfiane for invalid CompareOptions
+		std::shared_ptr<LoadableResource<T>> sp = Base::template get<CompareOptions>(std::forward<Args>(args)...);
+		return std::shared_ptr<T>(sp, sp->obj_ptr.get());
 	}
+public:
+	LoaderCache() = default;
+	~LoaderCache() = default;
 };
 
 // -------------------------------------------------------------------------------------------------

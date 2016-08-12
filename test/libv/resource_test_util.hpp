@@ -14,10 +14,10 @@ struct DataIO : libv::Resource {
 		n(n) { }
 
 	bool ready = false;
-	void load(std::shared_ptr<DataIO>) {
+	void load(const std::shared_ptr<DataIO>&) {
 		changeResourceState(libv::ResourceState::READY);
 	}
-	void unload(std::shared_ptr<DataIO>) {
+	void unload(const std::shared_ptr<DataIO>&) {
 		changeResourceState(libv::ResourceState::UNREADY);
 	}
 	bool operator<(const DataIO& r) const {
@@ -37,10 +37,10 @@ struct DataGL : libv::Resource {
 	int n;
 	DataGL(int n) :
 		n(n) { }
-	void load(std::shared_ptr<DataGL>) {
+	void load(const std::shared_ptr<DataGL>&) {
 		changeResourceState(libv::ResourceState::READY);
 	}
-	void unload(std::shared_ptr<DataGL>) {
+	void unload(const std::shared_ptr<DataGL>&) {
 		changeResourceState(libv::ResourceState::UNREADY);
 	}
 	bool operator<(const DataGL& r) const {
@@ -76,7 +76,7 @@ struct TestResource : libv::Resource {
 		dataIO = rm->cacheDataIO.get(n);
 		dataGL = rm->cacheDataGL.get(n);
 	}
-	void load(std::shared_ptr<TestResource>) {
+	void load(const std::shared_ptr<TestResource>&) {
 		addDependency(dataIO);
 		addDependency(dataGL);
 
@@ -85,7 +85,7 @@ struct TestResource : libv::Resource {
 			depsLoaded = true;
 		});
 	}
-	void unload(std::shared_ptr<TestResource>) { }
+	void unload(const std::shared_ptr<TestResource>&) { }
 	bool operator<(const TestResource& r) const {
 		return n < r.n;
 	}

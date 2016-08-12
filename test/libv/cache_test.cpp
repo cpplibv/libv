@@ -1,13 +1,16 @@
 // File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
 
 #include <catch.hpp>
+
 #include <libv/cache.hpp>
 #include <thread>
+
 #include "cache_test_util.hpp"
 
 int TestRA::instanceNumber = 0;
 int TestRB::instanceNumber = 0;
 int TestRM::instanceNumber = 0;
+std::atomic<int> LoadableTestResource::nextid{0};
 
 using libv::Cache;
 using libv::LoaderCache;
@@ -44,6 +47,43 @@ struct TypeFwd2 {
 };
 
 void cacheForwardRest(libv::Cache<TypeFwd2>& cache) {
+	auto x = cache.get(2);
+	CHECK(x->size == 2);
+	CHECK(cache.size() == 1);
+}
+
+TEST_CASE("LoaderCache can use forward declared type") {
+	struct TypeFwd;
+	libv::LoaderCache<TypeFwd> cache;
+	CHECK(cache.size() == 0);
+}
+
+struct TypeFwd3;
+void cacheForwardRest2(libv::LoaderCache<TypeFwd3>& cache);
+
+TEST_CASE("LoaderCache can use forward declared type and use it when complete") {
+	libv::LoaderCache<TypeFwd3> cache;
+	cacheForwardRest2(cache);
+}
+
+struct TypeFwd3 {
+	int size;
+	TypeFwd3(int size) : size(size) { }
+
+	void load(const std::shared_ptr<TypeFwd3>&) {}
+	void unload(const std::shared_ptr<TypeFwd3>&) {}
+	bool operator<(const TypeFwd3& r) const {
+		return size < r.size;
+	}
+	friend bool operator<(int t, const TypeFwd3& r) {
+		return t < r.size;
+	}
+	friend bool operator<(const TypeFwd3& r, int t) {
+		return r.size < t;
+	}
+};
+
+void cacheForwardRest2(libv::LoaderCache<TypeFwd3>& cache) {
 	auto x = cache.get(2);
 	CHECK(x->size == 2);
 	CHECK(cache.size() == 1);
@@ -249,8 +289,8 @@ TEST_CASE("LoaderCache comparator can handle use option for match even different
 
 // multithread -------------------------------------------------------------------------------------
 
-void foo22(Cache<LoadableTestResource>* c) {
-	for (size_t i = 0; i < 1000; ++i) {
+void cacheUseTask(Cache<LoadableTestResource>* c) {
+	for (size_t i = 0; i < 20; ++i) {
 		auto x0 = c->get(i+0);
 		auto x1 = c->get(i+1);
 		auto x2 = c->get(i+2);
@@ -266,9 +306,35 @@ void foo22(Cache<LoadableTestResource>* c) {
 
 TEST_CASE("Cache multithread stress") {
 	Cache<LoadableTestResource> c;
-	std::thread t0(foo22, &c);
-	std::thread t1(foo22, &c);
-	std::thread t2(foo22, &c);
+	std::thread t0(cacheUseTask, &c);
+	std::thread t1(cacheUseTask, &c);
+	std::thread t2(cacheUseTask, &c);
+	t0.join();
+	t1.join();
+	t2.join();
+	CHECK(c.size() == 0);
+}
+
+void loaderCacheUseTask(LoaderCache<LoadableTestResource>* c) {
+	for (size_t i = 0; i < 1000; ++i) {
+		auto x0 = c->get(i+0);
+		auto x1 = c->get(i+1);
+		auto x2 = c->get(i+2);
+		auto x3 = c->get(i+3);
+		auto x4 = c->get(i+4);
+		auto x5 = c->get(i+5);
+		auto x6 = c->get(i+6);
+		auto x7 = c->get(i+7);
+		auto x8 = c->get(i+8);
+		auto x9 = c->get(i+9);
+	}
+}
+
+TEST_CASE("LoaderCache multithread stress") {
+	LoaderCache<LoadableTestResource> c;
+	std::thread t0(loaderCacheUseTask, &c);
+	std::thread t1(loaderCacheUseTask, &c);
+	std::thread t2(loaderCacheUseTask, &c);
 	t0.join();
 	t1.join();
 	t2.join();

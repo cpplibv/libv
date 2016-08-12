@@ -1,15 +1,13 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
+#include <algorithm>
+#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <memory>
-#include <vector>
 #include <set>
-#include <algorithm>
 #include <unordered_map>
-#include <ctime>
-#include <chrono>
-
-//#include <libv/cache.hpp>
+#include <vector>
 
 struct N {
 	char data[200];
