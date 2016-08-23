@@ -139,8 +139,7 @@ inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {
 namespace std {
 
 template<typename T>
-struct hash<::libv::observer_ptr<T>>
-{
+struct hash<::libv::observer_ptr<T>> {
 	inline size_t operator()(::libv::observer_ptr<T> p) {
 		return hash<T*>()(p.get());
 	}
