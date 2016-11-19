@@ -35,15 +35,15 @@ std::atomic_bool running{true};
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 900
 
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LIBV_INFO("%-46s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_INFO("%-46s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		LIBV_LOG_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+	LIBV_LOG_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	LIBV_LOG_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	LIBV_LOG_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 
 	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
 	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
@@ -66,8 +66,6 @@ void initGL() {
 	glCullFace(GL_BACK);
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
-	glEnable(GL_TEXTURE_2D);
-
 	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
 	checkGL();
 }
@@ -77,7 +75,7 @@ void initGLSL() {
 }
 
 static void error_callback(int code, const char* description) {
-	LIBV_LIBV_ERROR("GLFW %d: %s", code, description);
+	LIBV_LOG_ERROR("GLFW %d: %s", code, description);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -88,28 +86,28 @@ struct Example {
 	libv::gl::AttributeFixLocation<glm::vec4> attributeColor;
 	libv::gl::AttributeFixLocation<glm::vec2> attributeTex0;
 
-	libv::gl::Shader shaderTest0Frag;
-	libv::gl::Shader shaderTest0Vert;
-	libv::gl::Program programTest0;
+	libv::gl::GuardedShader shaderTest0Frag;
+	libv::gl::GuardedShader shaderTest0Vert;
+	libv::gl::GuardedProgram programTest0;
 	libv::gl::Uniform<glm::mat4> uniformTest0MVPmat;
 
-	libv::gl::Shader shaderTest1Frag;
-	libv::gl::Shader shaderTest1Vert;
-	libv::gl::Program programTest1;
+	libv::gl::GuardedShader shaderTest1Frag;
+	libv::gl::GuardedShader shaderTest1Vert;
+	libv::gl::GuardedProgram programTest1;
 	libv::gl::Uniform<glm::mat4> uniformTest1MVPmat;
 	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest1TextureDiffuseSampler;
 
-	libv::gl::Shader shaderTest2Frag;
-	libv::gl::Shader shaderTest2Vert;
-	libv::gl::Program programTest2;
+	libv::gl::GuardedShader shaderTest2Frag;
+	libv::gl::GuardedShader shaderTest2Vert;
+	libv::gl::GuardedProgram programTest2;
 	libv::gl::Uniform<glm::mat4> uniformTest2MVPmat;
 	libv::gl::Uniform<glm::mat4> uniformTest2Mmat;
 	libv::gl::Uniform<glm::vec3> uniformTest2EyePosW;
 	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest2TextureSkySampler;
 
-	libv::gl::Shader shaderDepthFrag;
-	libv::gl::Shader shaderDepthVert;
-	libv::gl::Program programDepth;
+	libv::gl::GuardedShader shaderDepthFrag;
+	libv::gl::GuardedShader shaderDepthVert;
+	libv::gl::GuardedProgram programDepth;
 	libv::gl::Uniform<glm::mat4> uniformDepthMVPmat;
 
 	libv::gl::VertexBuffer bufferVertexData;
@@ -129,11 +127,11 @@ struct Example {
 	};
 
 	Example() {
-		LIBV_LIBV_INFO("%-46s [ %9d ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
-		LIBV_LIBV_INFO("%-46s [ %9d ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
-		LIBV_LIBV_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
-		LIBV_LIBV_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
-		LIBV_LIBV_INFO("%-46s [ %9d ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
+		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
+		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
+		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
+		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
 
 		Vertex dataVertex[]{
 			Vertex{glm::vec3(-1.f, -1.f, 0.f), glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0.f, 0.f)},
@@ -162,33 +160,34 @@ struct Example {
 		attributeColor = 2;
 		attributeTex0 = 8;
 
-		shaderTest0Frag.createCompile(libv::readFileText("res/shader/test0.fs"), libv::gl::ShaderType::Fragment);
-		shaderTest0Vert.createCompile(libv::readFileText("res/shader/test0.vs"), libv::gl::ShaderType::Vertex);
+		shaderTest0Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test0.fs"));
+		shaderTest0Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test0.vs"));
 		programTest0.link(shaderTest0Frag, shaderTest0Vert);
 		programTest0.assign(uniformTest0MVPmat, "MVPmat");
 
-		shaderTest1Frag.createCompile(libv::readFileText("res/shader/test1.fs"), libv::gl::ShaderType::Fragment);
-		shaderTest1Vert.createCompile(libv::readFileText("res/shader/test1.vs"), libv::gl::ShaderType::Vertex);
+		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test1.fs"));
+		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test1.vs"));
 		programTest1.link(shaderTest1Frag, shaderTest1Vert);
 		programTest1.assign(uniformTest1MVPmat, "MVPmat");
 		programTest1.assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
-		shaderTest2Frag.createCompile(libv::readFileText("res/shader/test2.fs"), libv::gl::ShaderType::Fragment);
-		shaderTest2Vert.createCompile(libv::readFileText("res/shader/test2.vs"), libv::gl::ShaderType::Vertex);
+		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test2.fs"));
+		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test2.vs"));
 		programTest2.link(shaderTest2Frag, shaderTest2Vert);
 		programTest2.assign(uniformTest2MVPmat, "MVPmat");
 		programTest2.assign(uniformTest2Mmat, "Mmat");
 		programTest2.assign(uniformTest2EyePosW, "eyePosW");
 		programTest2.assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
-		shaderDepthFrag.createCompile(libv::readFileText("res/shader/depth.fs"), libv::gl::ShaderType::Fragment);
-		shaderDepthVert.createCompile(libv::readFileText("res/shader/depth.vs"), libv::gl::ShaderType::Vertex);
+		shaderDepthFrag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/depth.fs"));
+		shaderDepthVert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/depth.vs"));
 		programDepth.link(shaderDepthFrag, shaderDepthVert);
 		programDepth.assign(uniformDepthMVPmat, "MVPmat");
 
-		bufferVertexData.data(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
-		bufferVertexIndices.data(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
+		bufferVertexData.createData(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
+		bufferVertexIndices.createData(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
 
+		vertexArray.create();
 		vertexArray.bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position), false);
 		vertexArray.bindAttribute(bufferVertexData, attributeColor, sizeof(Vertex), offsetof(Vertex, color), false);
 		vertexArray.bindAttribute(bufferVertexData, attributeTex0, sizeof(Vertex), offsetof(Vertex, uv), false);
@@ -285,7 +284,7 @@ int main(void) {
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		LIBV_LIBV_ERROR("Failed to initialize GLFW.");
+		LIBV_LOG_ERROR("Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -299,7 +298,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		LIBV_LIBV_ERROR("Failed to create GLFW window.");
+		LIBV_LOG_ERROR("Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -326,7 +325,7 @@ int main(void) {
 			i++;
 			time += timer.time().count();
 			if (time > 1000000000) {
-				LIBV_LIBV_INFO("FPS: %d", i);
+				LIBV_LOG_INFO("FPS: %d", i);
 				i = 0;
 				time -= 1000000000;
 			}

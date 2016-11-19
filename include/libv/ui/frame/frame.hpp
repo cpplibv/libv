@@ -2,7 +2,7 @@
 
 #pragma once
 
-// conf
+// cfg
 #include <libv/ui/config.hpp>
 // libv
 #include <libv/memory.hpp>

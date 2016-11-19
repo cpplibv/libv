@@ -13,15 +13,16 @@
 // pro
 #include <libv/ui/layout.hpp>
 #include <libv/ui/properties.hpp>
-#include <libv/ui/render/renderer.hpp>
 
 namespace libv {
 namespace ui {
 
-// -------------------------------------------------------------------------------------------------
-
 class LayoutInfo;
 class ParentAccessor;
+class UI;
+class Context;
+
+// -------------------------------------------------------------------------------------------------
 
 class Component {
 	friend class ParentAccessor;
@@ -29,6 +30,8 @@ protected:
 	std::atomic<bool> invalid{true};
 private:
 	observer_ptr<Component> parent;
+	observer_ptr<UI> ui;
+	// TODO P4: parent and ui ptrs are currently hectic: root component: real ui and null as parent; every other component: null ui and real parent
 	LayoutInfo lastParentLayoutInfo;
 	LayoutInfo lastResultLayoutInfo;
 protected:
@@ -70,8 +73,8 @@ public:
 	void setComponentID(std::string componentID) {
 		this->componentID = componentID;
 	}
-
 protected:
+	Context& getContext();
 	void validate();
 	/** Invalidates the object requesting it to rebuild before the next render.
 	 * @context ANY */
@@ -94,23 +97,23 @@ public:
 	 * @param renderer - The render context
 	 * @note Does not require of previous destroy
 	 * @context GL */
-	void build(Renderer& renderer);
+	void build(Context& context);
 	/** Control function. Called before the object is destroyed to cleanup OpenGL resources.
 	 * @param renderer - The render context
 	 * @note Does not require of previous build
 	 * @context GL */
-	void destroy(Renderer& renderer);
+	void destroy(Context& context);
 	/** Control function. Renders the object.
 	 * @note Does not require of previous build
 	 * @param renderer - The render context
 	 * @context GL */
-	void render(Renderer& renderer);
+	void render(Context& context);
 
 private:
 	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) = 0;
-	virtual void doBuild(Renderer& renderer) = 0;
-	virtual void doDestroy(Renderer& renderer) = 0;
-	virtual void doRender(Renderer& renderer) = 0;
+	virtual void doBuild(Context& context) = 0;
+	virtual void doDestroy(Context& context) = 0;
+	virtual void doRender(Context& context) = 0;
 
 public:
 	Component();
@@ -123,6 +126,9 @@ public:
 struct ParentAccessor {
 	static void setParent(const observer_ptr<Component>& component, const observer_ptr<Component>& parent) {
 		component->parent = parent;
+	}
+	static void setUI(const observer_ptr<Component>& component, const observer_ptr<UI>& ui) {
+		component->ui = ui;
 	}
 };
 

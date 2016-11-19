@@ -12,14 +12,21 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+Context& Component::getContext() {
+	auto pit = parent;
+	while (pit->parent)
+		pit = pit->parent;
+	return pit->ui->getContext();
+}
+
 void Component::validate() {
-	LIBV_UI_COMPONENT_TRACE("Validate [%s]", componentID);
+	LIBV_LOG_UI_COMPONENT_TRACE("Validate [%s]", componentID);
 	invalid = false;
 }
 
 void Component::invalidate() {
 	if (!invalid) {
-		LIBV_UI_COMPONENT_TRACE("Invalidate [%s]", componentID);
+		LIBV_LOG_UI_COMPONENT_TRACE("Invalidate [%s]", componentID);
 		invalid = true;
 		if (parent)
 			parent->invalidate();
@@ -43,34 +50,34 @@ bool Component::isInvalid() const {
 // -------------------------------------------------------------------------------------------------
 
 LayoutInfo Component::layout(const LayoutInfo& parentLayout) {
-	LIBV_UI_COMPONENT_TRACE("Layout [%s]", componentID);
+	LIBV_LOG_UI_COMPONENT_TRACE("Layout [%s]", componentID);
 
 	if (isInvalid() || lastParentLayoutInfo != parentLayout) {
 		lastParentLayoutInfo = parentLayout;
 		lastResultLayoutInfo = doLayout(parentLayout);
-		LIBV_UI_COMPONENT_TRACE("Result from Layout [%s] [%.1f,%.1f,%.1f]", componentID,
+		LIBV_LOG_UI_COMPONENT_TRACE("Result from Layout [%s] [%.1f,%.1f,%.1f]", componentID,
 				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
 	} else
-		LIBV_UI_COMPONENT_TRACE("Result from Cache [%s] [%.1f,%.1f,%.1f]", componentID,
+		LIBV_LOG_UI_COMPONENT_TRACE("Result from Cache [%s] [%.1f,%.1f,%.1f]", componentID,
 				lastResultLayoutInfo.size.x, lastResultLayoutInfo.size.y, lastResultLayoutInfo.size.z);
 
 	return lastResultLayoutInfo;
 }
 
-void Component::build(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Build [%s]", componentID);
-	doBuild(renderer);
+void Component::build(Context& context) {
+	LIBV_LOG_UI_COMPONENT_TRACE("Build [%s]", componentID);
+	doBuild(context);
 	validate();
 }
 
-void Component::destroy(Renderer& renderer) {
-	LIBV_UI_COMPONENT_TRACE("Destroy [%s]", componentID);
-	doDestroy(renderer);
+void Component::destroy(Context& context) {
+	LIBV_LOG_UI_COMPONENT_TRACE("Destroy [%s]", componentID);
+	doDestroy(context);
 }
 
-void Component::render(Renderer& renderer) {
-	//	LIBV_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log
-	doRender(renderer);
+void Component::render(Context& context) {
+	//	LIBV_LOG_UI_COMPONENT_TRACE("Render [%s]", componentID); // Until no better log sys too hot log
+	doRender(context);
 }
 
 // -------------------------------------------------------------------------------------------------

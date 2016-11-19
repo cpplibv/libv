@@ -61,7 +61,7 @@ int main(int, char **) {
 		model.save(ofs);
 	}
 	{
-		auto data = libv::readFile("test_file_bin", std::ios_base::binary);
+		auto data = libv::read_file("test_file_bin");
 		model.load(data.data(), data.size());
 	}
 

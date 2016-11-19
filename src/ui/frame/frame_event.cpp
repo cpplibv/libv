@@ -21,7 +21,7 @@ void glfwCallback(GLFWwindow* window, Args... args) {
 	try {
 		(windowHandlers.at(window)->*que).fire(E(args...));
 	} catch (const std::out_of_range& e) {
-		LIBV_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this GLFW window.");
+		LIBV_LOG_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 

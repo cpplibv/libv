@@ -15,9 +15,9 @@ private:
 	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo& parentLayoutInfo) override {
 		return libv::ui::evalLayoutSize(parentLayoutInfo, *this);
 	}
-	virtual void doBuild(libv::ui::Renderer&) override { }
-	virtual void doDestroy(libv::ui::Renderer&) override { }
-	virtual void doRender(libv::ui::Renderer&) override { }
+	virtual void doBuild(libv::ui::Context&) override { }
+	virtual void doDestroy(libv::ui::Context&) override { }
+	virtual void doRender(libv::ui::Context&) override { }
 };
 
 struct TestQuadDynamicLayout : public libv::ui::Component {
@@ -29,9 +29,9 @@ private:
 	virtual libv::ui::LayoutInfo doLayout(const libv::ui::LayoutInfo&) override {
 		return libv::ui::LayoutInfo(size);
 	}
-	virtual void doBuild(libv::ui::Renderer&) override { }
-	virtual void doDestroy(libv::ui::Renderer&) override { }
-	virtual void doRender(libv::ui::Renderer&) override { }
+	virtual void doBuild(libv::ui::Context&) override { }
+	virtual void doDestroy(libv::ui::Context&) override { }
+	virtual void doRender(libv::ui::Context&) override { }
 };
 
 struct TestPanel : public libv::ui::PanelFlow {

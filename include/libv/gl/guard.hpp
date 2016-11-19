@@ -7,6 +7,8 @@
 namespace libv {
 namespace gl {
 
+// TODO P1: boost stack_guard trick is there: and const X& = make_guard();
+
 template <typename Stack>
 class StackGuard {
 	Stack& stack;

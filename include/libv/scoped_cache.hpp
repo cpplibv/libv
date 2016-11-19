@@ -27,7 +27,7 @@ template <typename T>
 struct cache_ptr_host {
 	// For multi-thread support scoped cache's mutex will "guard" our host object
 	// NOTE: Codes are based on the relative memory position between counter and data!
-	mutable std::atomic_int counter{0};
+	mutable std::atomic_size_t counter{0};
 	mutable T data;
 
 	template <typename... Args>
@@ -316,6 +316,9 @@ public:
 	}
 	void clear() {
 		std::lock_guard<std::mutex> lk(mutex);
+		for (auto it = storage.begin(); it != storage.end(); ++it) {
+			assert((*it)->counter.load() == 0);
+		}
 		storage.clear();
 	}
 	void cleanup() {

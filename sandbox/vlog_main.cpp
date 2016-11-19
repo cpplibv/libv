@@ -3,7 +3,7 @@
 #include <libv/log/log.hpp>
 #include <iostream>
 
-#define LIBV_INNER_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.sandbox.inner", __VA_ARGS__)
+#define LIBV_LOG_INNER_DEBUG(...) ::libv::log(LIBV_POC, ::libv::Debug, "libv.sandbox.inner", __VA_ARGS__)
 
 int main(int, char **) {
 //	auto filtered_log = libv::log.filter();
@@ -16,7 +16,7 @@ int main(int, char **) {
 //
 //	filtered_log << libv::inner::log;
 //	libv::inner::log(libv::Debug, "libv.sandbox.inner", "Hello World!", LIBV_POC);
-//	LIBV_INNER_DEBUG("Hello World!");
+//	LIBV_LOG_INNER_DEBUG("Hello World!");
 
 	return 0;
 }

@@ -5,12 +5,14 @@
 // ext
 #include <GL/glew.h>
 // pro
-#include <libv/utility.hpp>
-#include <libv/gl/log.hpp>
+#include <libv/utility.hpp> // TODO P5: remove include
+#include <libv/gl/log.hpp> // TODO P5: remove include its for checkGL
 
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_GL_DEBUG
+// TODO P5: find a good place for these assert functions
+
+#define LIBV_GL_DEBUG // TODO P5: debug flag
 
 #ifdef LIBV_GL_DEBUG
 #    define LIBV_GL_DEBUG_CHECK_GL() checkGL()
@@ -66,11 +68,12 @@ enum class BufferTarget {
 };
 
 enum class Capability {
-	TextureCubeMapSeamless = GL_TEXTURE_CUBE_MAP_SEAMLESS,
-	DepthTest = GL_DEPTH_TEST,
-	StencilTest = GL_STENCIL_TEST,
 	CullFace = GL_CULL_FACE,
+	DepthTest = GL_DEPTH_TEST,
 	RasterizerDiscard = GL_RASTERIZER_DISCARD,
+	ScissorTest = GL_SCISSOR_TEST,
+	StencilTest = GL_STENCIL_TEST,
+	TextureCubeMapSeamless = GL_TEXTURE_CUBE_MAP_SEAMLESS,
 };
 
 enum class Primitive {
@@ -396,7 +399,17 @@ constexpr const char SHADER_TYPE_COMPUTE_NAME[] = "compute";
 constexpr const char SHADER_TYPE_TESS_CONTROL_NAME[] = "tesscontrol";
 constexpr const char SHADER_TYPE_TESS_EVALUATION_NAME[] = "tessevaluation";
 
-const char* to_string(ShaderType type);
+inline const char* to_string(ShaderType type) {
+	switch (type) {
+	default:
+	case ShaderType::Vertex: return SHADER_TYPE_VERTEX_NAME;
+	case ShaderType::Geometry: return SHADER_TYPE_GEOMETRY_NAME;
+	case ShaderType::Fragment: return SHADER_TYPE_FRAGMENT_NAME;
+	case ShaderType::Compute: return SHADER_TYPE_COMPUTE_NAME;
+	case ShaderType::TessControl: return SHADER_TYPE_TESS_CONTROL_NAME;
+	case ShaderType::TessEvaluation: return SHADER_TYPE_TESS_EVALUATION_NAME;
+	}
+}
 
 // TextureType -------------------------------------------------------------------------------------
 

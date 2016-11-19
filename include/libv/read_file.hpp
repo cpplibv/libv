@@ -14,13 +14,13 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-inline std::string readFile(const boost::filesystem::path& filePath, const std::ios_base::openmode& mode = std::ios_base::in) {
+inline std::string read_file(const boost::filesystem::path& filePath) {
 	std::string result;
 	boost::filesystem::ifstream file;
-	file.open(filePath.c_str(), std::ios_base::in | mode);
+	file.open(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
 
 	if (!file) {
-		LIBV_LIBV_ERROR("Failed to open file: [%s]", filePath.string());
+		LIBV_LOG_ERROR("Failed to open file: [%s]", filePath.string());
 		return result;
 	}
 
@@ -32,12 +32,39 @@ inline std::string readFile(const boost::filesystem::path& filePath, const std::
 	return result;
 }
 
-inline std::string readFileBinary(const boost::filesystem::path& filePath) {
-	return readFile(filePath, std::ios_base::binary);
-}
+// -------------------------------------------------------------------------------------------------
 
-inline std::string readFileText(const boost::filesystem::path& filePath) {
-	return readFile(filePath);
+enum class ReadFileError : uint8_t {
+	OK = 0,
+	FailedOpen,
+//	NotFound,
+	InvalidPath,
+	//	NoPermission,
+};
+
+inline std::string read_file(const boost::filesystem::path& filePath, ReadFileError& er) {
+	std::string result;
+
+	if (filePath.filename().empty()) {
+		er = ReadFileError::InvalidPath;
+		return result;
+	}
+
+	boost::filesystem::ifstream file;
+	file.open(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
+
+	if (!file) {
+		er = ReadFileError::FailedOpen;
+		return result;
+	}
+
+	std::ostringstream buffer;
+	buffer << file.rdbuf();
+	file.close();
+	result = buffer.str();
+
+	er = ReadFileError::OK;
+	return result;
 }
 
 // -------------------------------------------------------------------------------------------------

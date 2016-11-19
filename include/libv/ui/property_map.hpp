@@ -20,19 +20,19 @@ public:
 	struct Key : BasicMultiTypeMap<Container>::template Key<T> {
 	private:
 		std::string name_;
-		T deafultValue_;
+		T defaultValue_;
 		public:
-		Key(std::string name, T deafultValue) :
+		Key(std::string name, T defaultValue) :
 			BasicMultiTypeMap<Container>::template Key<T>(),
 			name_(name),
-			deafultValue_(deafultValue) { }
+			defaultValue_(defaultValue) { }
 
 		const std::string& name() const {
 			return name_;
 		}
 
 		const T& defaultValue() const {
-			return deafultValue_;
+			return defaultValue_;
 		}
 	};
 

@@ -18,19 +18,9 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-bool UI::isInvalid() const {
-	return !valid || content.isInvalid();
+Context& UI::getContext() {
+	return context;
 }
-
-void UI::validate() {
-	valid = true;
-}
-
-void UI::invalidate() {
-	valid = false;
-}
-
-// -------------------------------------------------------------------------------------------------
 
 ivec2 UI::getSize() const {
 	return size;
@@ -43,46 +33,52 @@ void UI::setSize(ivec2 size) {
 // -------------------------------------------------------------------------------------------------
 
 void UI::build() {
-	LayoutInfo root(vec3(size, 0));
-	content.layout(root);
-	content.build(gl);
-	validate();
+	if (!valid) {
+		context.load();
+	}
+	if (content.isInvalid()) {
+		LayoutInfo root(vec3(size, 0));
+		content.layout(root);
+		content.build(context);
+	}
+	valid = true;
 	checkGL();
 }
 
 void UI::destroy() {
-	content.destroy(gl);
-	invalidate();
+	content.destroy(context);
+	context.unload();
+	valid = false;
 	checkGL();
 }
 
 void UI::render() {
-	glEnable(GL_DEPTH_TEST); //Depth
-	glDepthFunc(GL_LESS);
+	context.refresh();
+
+	context.gl.enable(gl::Capability::DepthTest);
+	glDepthFunc(GL_LESS); // TODO P1: continue GL wrapping
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
 	glEnable(GL_BLEND); //Alpha
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW); //Counter clockwise polys only
+	context.gl.frontFaceCCW();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	glEnable(GL_TEXTURE_2D);
 
 	checkGL();
 
-	glClearColor(0.236f, 0.311f, 0.311f, 0.f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	gl::viewport(position, size);
+	context.gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
+	context.gl.clear();
+	context.gl.viewport(position, size);
 
 	auto x0 = position.x;
 	auto x1 = position.x + size.x;
 	auto y0 = position.y;
 	auto y1 = position.y + size.y;
-	gl.pushMatrixProjection(glm::ortho<float>(x0, x1, y0, y1));
+	auto pStackGuard = context.gl.projection.pushGuard();
+	context.gl.projection.setToOrtho(x0, x1, y0, y1);
 
-	content.render(gl);
+	content.render(context);
 
-	gl.popMatrixProjection();
 	checkGL();
 }
 
@@ -91,7 +87,7 @@ void UI::render() {
 void UI::attach(observer_ptr<Frame> frame) {
 	frame->onWindowSize.output([this](auto e) {
 		this->setSize(e.size);
-		this->invalidate();
+		this->content.set(Property::Size, px(e.size.x), px(e.size.y), 0);
 	});
 	frame->onClosed.output([this](auto /*frame*/) {
 		this->destroy();
@@ -99,8 +95,7 @@ void UI::attach(observer_ptr<Frame> frame) {
 }
 
 void UI::refresh() {
-	if (isInvalid())
-		build();
+	build();
 	render();
 }
 
@@ -120,6 +115,7 @@ UI::UI() {
 	content.setAnchor(ui::ALIGN_BOTTOM_LEFT);
 	content.setOrient(ui::ORIENT_RIGHT_UP);
 	content.set(Property::Size, percent(100), percent(100), 0);
+	ParentAccessor::setUI(make_observer(content), make_observer(this));
 }
 
 UI::~UI() { }

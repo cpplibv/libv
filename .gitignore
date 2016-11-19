@@ -1,15 +1,15 @@
 /*
 /*/
 
-!cmake/
-!example/
-!include/
-!res/
-!sandbox/
-!src/
-!test/
+!/cmake/
+!/example/
+!/include/
+!/res/
+!/sandbox/
+!/src/
+!/test/
 
-!.gitignore
-!LIBV-TODO.md
-!CMakeLists.txt
-!README.md
+!/.gitignore
+!/LIBV-TODO.md
+!/CMakeLists.txt
+!/README.md

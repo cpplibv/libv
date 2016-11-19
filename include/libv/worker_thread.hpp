@@ -32,8 +32,8 @@ namespace libv {
 class WorkerThread {
 
 	class Task {
-		size_t priority;
-		size_t number;
+		uint32_t priority;
+		uint32_t number;
 		std::function<void() > function;
 		libv::Semaphore* done;
 	public:
@@ -41,7 +41,7 @@ class WorkerThread {
 		Task(const Task&) = default;
 		Task& operator=(const Task&) = default;
 		template<typename F, typename = decltype(std::declval<F>()()) >
-		Task(F&& func, size_t priority, size_t number, libv::Semaphore* done = nullptr) :
+		Task(F&& func, uint32_t priority, uint32_t number, libv::Semaphore* done = nullptr) :
 			priority(priority),
 			number(number),
 			function(func),
@@ -70,9 +70,9 @@ class WorkerThread {
 			std::greater<typename std::vector<Task>::value_type>> que;
 	std::recursive_mutex que_m;
 
-	size_t counter = 0;
-	size_t defaultPriority;
-	bool terminateFlag = false;
+	uint32_t counter = 0;
+	uint32_t defaultPriority;
+	volatile bool terminateFlag = false;
 
 	std::thread thread;
 	std::string name;
@@ -93,13 +93,13 @@ private:
 			} catch (std::exception& ex) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				LIBV_LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
+				LIBV_LOG_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. "
 						"Exception message: [%s].", name, ex.what(), exceptionHistory.size());
 			} catch (...) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				LIBV_LIBV_DEBUG("Exception occurred in [%s] WorkerThread. "
+				LIBV_LOG_DEBUG("Exception occurred in [%s] WorkerThread. "
 						"[%d] unhandled exception in queue. ", name, exceptionHistory.size());
 			}
 		}
@@ -107,7 +107,7 @@ private:
 
 public:
 	template<typename F, typename = decltype(std::declval<F>()())>
-	void executeAsync(F&& func, size_t priority) {
+	void executeAsync(F&& func, uint32_t priority) {
 		std::lock_guard<std::recursive_mutex> lk(que_m);
 		que.emplace(std::forward<F>(func), counter++, priority);
 		recieved_cv.notify_all();
@@ -117,7 +117,7 @@ public:
 		executeAsync(std::forward<F>(func), defaultPriority);
 	}
 	template<typename F, typename = decltype(std::declval<F>()())>
-	void executeSync(F&& func, size_t priority) {
+	void executeSync(F&& func, uint32_t priority) {
 		if (std::this_thread::get_id() != thread.get_id()) {
 			libv::Semaphore done;
 			{
@@ -143,7 +143,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			LIBV_LIBV_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
+			LIBV_LOG_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
 		}
 	}
 	inline auto getID() {
@@ -172,12 +172,12 @@ private:
 	}
 
 public:
-	WorkerThread(const std::string& name, size_t defaultPriority) :
+	WorkerThread(const std::string& name, uint32_t defaultPriority) :
 		defaultPriority(defaultPriority),
 		thread(&WorkerThread::run, this),
 		name(name) { }
 	WorkerThread(const std::string& name) : WorkerThread(name, LIBV_DEFAULT_WORKERTHREAD_TASK_PRIORITY) { }
-	WorkerThread(size_t defaultPriority) : WorkerThread(LIBV_DEFAULT_WORKERTHREAD_NAME, defaultPriority) { }
+	WorkerThread(uint32_t defaultPriority) : WorkerThread(LIBV_DEFAULT_WORKERTHREAD_NAME, defaultPriority) { }
 	WorkerThread() : WorkerThread(LIBV_DEFAULT_WORKERTHREAD_NAME, LIBV_DEFAULT_WORKERTHREAD_TASK_PRIORITY) { }
 	virtual ~WorkerThread() {
 		stop();

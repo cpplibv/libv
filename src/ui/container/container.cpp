@@ -11,6 +11,7 @@
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/properties.hpp>
+#include <libv/ui/render/context.hpp>
 
 namespace libv {
 namespace ui {
@@ -18,16 +19,14 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 void Container::add(const observer_ptr<Component>& component) {
-	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
-			component->getComponentID(), this->getComponentID());
+	LIBV_LOG_UI_COMPONENT_TRACE("Add component [%s] to container [%s]", component->getComponentID(), this->getComponentID());
 	components.emplace_back(make_adaptive(component));
 	ParentAccessor::setParent(component, make_observer(this));
 	invalidate();
 }
 
 void Container::add(const shared_ptr<Component>& component) {
-	LIBV_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",
-			component->getComponentID(), this->getComponentID());
+	LIBV_LOG_UI_COMPONENT_TRACE("Add component [%s] to container [%s]",	component->getComponentID(), this->getComponentID());
 	components.emplace_back(make_adaptive(component));
 	ParentAccessor::setParent(make_observer(component), make_observer(this));
 	invalidate();
@@ -65,26 +64,25 @@ void Container::addShared(Component * const component) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Container::doBuild(Renderer& renderer) {
+void Container::doBuild(Context& context) {
 	for (auto& component : components) {
-		component.ptr->build(renderer);
+		component.ptr->build(context);
 	}
 }
 
-void Container::doDestroy(Renderer& renderer) {
+void Container::doDestroy(Context& context) {
 	for (auto& component : components) {
-		component.ptr->destroy(renderer);
+		component.ptr->destroy(context);
 	}
 }
 
-void Container::doRender(Renderer& gl) {
+void Container::doRender(Context& context) {
 	for (auto& component : components) {
-		gl.pushMatrixModel();
+		auto mStackGuard = context.gl.model.pushGuard();
 
-		gl.matrixModel() *= glm::translate(glm::vec3(component.info.offset));
-		component.ptr->render(gl);
+		context.gl.model.translate(component.info.offset);
 
-		gl.popMatrixModel();
+		component.ptr->render(context);
 	}
 }
 

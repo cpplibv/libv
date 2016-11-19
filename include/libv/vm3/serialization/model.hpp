@@ -4,7 +4,7 @@
 
 // hpp
 #include <libv/vm3/model.hpp>
-// conf
+// cfg
 #include <libv/vm3/config.hpp>
 // libv
 #include <libv/serialization/nvp.hpp>

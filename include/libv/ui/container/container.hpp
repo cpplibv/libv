@@ -9,10 +9,11 @@
 #include <vector>
 // pro
 #include <libv/ui/component/component.hpp>
-#include <libv/ui/render/renderer.hpp>
 
 namespace libv {
 namespace ui {
+
+class Context;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -52,9 +53,9 @@ public:
 
 private:
 	virtual LayoutInfo doLayout(const LayoutInfo& parentLayout) override = 0;
-	virtual void doBuild(Renderer& renderer) override;
-	virtual void doDestroy(Renderer& renderer) override;
-	virtual void doRender(Renderer& renderer) override;
+	virtual void doBuild(Context& context) override;
+	virtual void doDestroy(Context& context) override;
+	virtual void doRender(Context& context) override;
 
 public:
 	Container() = default;

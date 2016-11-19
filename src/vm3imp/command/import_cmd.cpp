@@ -35,7 +35,7 @@ CommandOpen::CommandOpen() :
 
 void CommandOpen::execute() {
 	openedModel.reset(new Model());
-	auto data = libv::readFile(filePath.value(), std::ios::binary);
+	auto data = libv::read_file(filePath.value());
 	openedModel->load(data.data(), data.size());
 }
 

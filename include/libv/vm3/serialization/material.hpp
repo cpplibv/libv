@@ -4,7 +4,7 @@
 
 // hpp
 #include <libv/vm3/material.hpp>
-// config
+// cfgig
 #include <libv/vm3/config.hpp>
 // external
 #include <boost/serialization/vector.hpp>

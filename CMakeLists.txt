@@ -5,6 +5,13 @@ project (libv)
 include(ExternalProject)
 
 include(cmake/util.cmake)
+
+# --------------------------------------------------------------------------------------------------
+
+set(CMAKE_VERBOSE_MAKEFILE off)
+set(CMAKE_BUILD_TYPE "DEBUG")
+#set(CMAKE_BUILD_TYPE "RELEASE")
+
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
@@ -20,21 +27,18 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # --------------------------------------------------------------------------------------------------
 
-#set(CMAKE_VERBOSE_MAKEFILE on)
-set(CMAKE_VERBOSE_MAKEFILE off)
-set(CMAKE_BUILD_TYPE "DEBUG")
-#set(CMAKE_BUILD_TYPE "RELEASE")
-
 #Definitions
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_definitions(-O0)
 	add_definitions(-ggdb3)
-else() #elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	add_definitions(-Ofast)
+else()
+	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
 endif()
 
 add_definitions(-m64)
-add_definitions(-std=c++14)
+add_definitions(-std=c++17)
 
 #Macro - Ext
 add_definitions(-DGLEW_STATIC)
@@ -70,21 +74,36 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-	add_compile_options(-Weverything -Wconversion -Wmissing-override -Wno-comment)
+	add_compile_options(-Weverything -Wmissing-override -Wno-comment
+#		-Wconversion
+		)
 	set(TOOLSET clang)
 
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
-	add_compile_options(-Wall -Wextra -Wno-comment -Wpedantic)
-	#add_compile_options(-Wconversion)
+	add_compile_options(-Wall -Wextra -Wpedantic -Wno-comment
+#		-Wcast-qual
+##		-Wconversion
+#		-Wdelete-non-virtual-dtor
+#		-Wduplicated-cond
+#		-Wfloat-equal
+#		-Winline
+#		-Wnon-virtual-dtor
+#		-Wold-style-cast
+##		-Wshadow=compatible-local
+#		-Wsuggest-final-methods
+#		-Wsuggest-final-types
+#		-Wundef
+#		-Wuseless-cast
+		)
+
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
+		add_compile_options(-Wsuggest-override)
+	endif()
 
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-			add_compile_options(-Wsuggest-override)
-		endif()
 
 		add_compile_options(-fno-omit-frame-pointer)
-
 		# Sanitizers current only available on unix
 		#add_compile_options(-fsanitize=address)
 		#add_compile_options(-fsanitize=kernel-address)
@@ -127,10 +146,10 @@ ExternalProject_Add(ext_utf8cpp
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
-		mkdir -p ${PATH_EXT}/utf8cpp/ &&
-		mkdir -p ${PATH_EXT}/utf8cpp/include &&
-		mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp &&
-		cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
+		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/
+		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include
+		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -142,8 +161,8 @@ ExternalProject_Add(ext_unittest
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
-		mkdir -p ${PATH_EXT}/unittest/ &&
-		cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
+		COMMAND mkdir -p ${PATH_EXT}/unittest/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -174,7 +193,7 @@ ExternalProject_Add(ext_glew
 list(APPEND EXTERNAL_PROJECT_LIST ext_fmt)
 ExternalProject_Add(ext_fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG master
+	GIT_TAG 94d387c
 	PREFIX ${PATH_EXT_SRC}/fmt
 	INSTALL_DIR ${PATH_EXT}/fmt
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
@@ -203,8 +222,21 @@ ExternalProject_Add(ext_gli
 	INSTALL_DIR ${PATH_EXT}/gli
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
 	INSTALL_COMMAND
-		mkdir -p ${PATH_EXT}/gli/include/gli/ &&
-		cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
+		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND EXTERNAL_PROJECT_LIST ext_range)
+ExternalProject_Add(ext_range
+	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
+	GIT_TAG a2425e6b9acd2a354f0a3693857956138dcf53a0
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND "" #range is header only, skip tests
+	PREFIX ${PATH_EXT_SRC}/range
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/range/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -221,7 +253,7 @@ ExternalProject_Add(ext_freetype
 list(APPEND EXTERNAL_PROJECT_LIST ext_assimp)
 ExternalProject_Add(ext_assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
-	GIT_TAG master
+	GIT_TAG v3.3
 	PREFIX ${PATH_EXT_SRC}/assimp
 	INSTALL_DIR ${PATH_EXT}/assimp
 	CMAKE_ARGS
@@ -233,6 +265,7 @@ ExternalProject_Add(ext_assimp
 		-DASSIMP_NO_EXPORT=ON
 		-DASSIMP_BUILD_3DS_IMPORTER=OFF
 		-DASSIMP_BUILD_3D_IMPORTER=OFF
+		-DASSIMP_BUILD_3MF_IMPORTER=OFF
 		-DASSIMP_BUILD_AC_IMPORTER=OFF
 		-DASSIMP_BUILD_ASE_IMPORTER=OFF
 		-DASSIMP_BUILD_ASSBIN_IMPORTER=OFF
@@ -244,6 +277,7 @@ ExternalProject_Add(ext_assimp
 		-DASSIMP_BUILD_CSM_IMPORTER=OFF
 		-DASSIMP_BUILD_DXF_IMPORTER=OFF
 		-DASSIMP_BUILD_FBX_IMPORTER=OFF
+		-DASSIMP_BUILD_GLTF_IMPORTER=OFF
 		-DASSIMP_BUILD_HMP_IMPORTER=OFF
 		-DASSIMP_BUILD_IFC_IMPORTER=OFF
 		# -DASSIMP_BUILD_IRR_IMPORTER=OFF re-disable if assimp provide build options for correct disable
@@ -265,6 +299,7 @@ ExternalProject_Add(ext_assimp
 		-DASSIMP_BUILD_Q3BSP_IMPORTER=OFF
 		-DASSIMP_BUILD_Q3D_IMPORTER=OFF
 		-DASSIMP_BUILD_RAW_IMPORTER=OFF
+		-DASSIMP_BUILD_SIB_IMPORTER=OFF
 		-DASSIMP_BUILD_SMD_IMPORTER=OFF
 		-DASSIMP_BUILD_STL_IMPORTER=OFF
 		-DASSIMP_BUILD_TERRAGEN_IMPORTER=OFF
@@ -274,7 +309,7 @@ ExternalProject_Add(ext_assimp
 )
 
 list(APPEND EXTERNAL_PROJECT_LIST ext_boost)
-set(Boost_Version 1.58.0)
+set(Boost_Version 1.61.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 
 set(ext_boost_bootstrap_command)
@@ -290,7 +325,7 @@ message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
 	URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.zip
-	URL_MD5 b0605a9323f1e960f7434dbbd95a7a5c
+	URL_MD5 015ae4afa6f3e597232bfe1dab949ace
 	CONFIGURE_COMMAND ${ext_boost_bootstrap_command}
 	BUILD_COMMAND ${ext_boost_b2_command} install
 		toolset=${TOOLSET}
@@ -326,6 +361,7 @@ include_directories(SYSTEM ${PATH_EXT}/glew/include)
 include_directories(SYSTEM ${PATH_EXT}/glfw/include)
 include_directories(SYSTEM ${PATH_EXT}/gli/include)
 include_directories(SYSTEM ${PATH_EXT}/glm/include)
+include_directories(SYSTEM ${PATH_EXT}/range/include)
 include_directories(SYSTEM ${PATH_EXT}/unittest/include)
 include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 

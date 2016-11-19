@@ -290,7 +290,7 @@ TEST_CASE("LoaderCache comparator can handle use option for match even different
 // multithread -------------------------------------------------------------------------------------
 
 void cacheUseTask(Cache<LoadableTestResource>* c) {
-	for (size_t i = 0; i < 20; ++i) {
+	for (size_t i = 0; i < 200; ++i) {
 		auto x0 = c->get(i+0);
 		auto x1 = c->get(i+1);
 		auto x2 = c->get(i+2);
@@ -316,7 +316,7 @@ TEST_CASE("Cache multithread stress") {
 }
 
 void loaderCacheUseTask(LoaderCache<LoadableTestResource>* c) {
-	for (size_t i = 0; i < 1000; ++i) {
+	for (size_t i = 0; i < 200; ++i) {
 		auto x0 = c->get(i+0);
 		auto x1 = c->get(i+1);
 		auto x2 = c->get(i+2);

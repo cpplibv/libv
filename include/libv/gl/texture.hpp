@@ -24,8 +24,8 @@ protected:
 public:
 	inline Texture() = default;
 	inline Texture(const Texture&) = delete;
-	inline Texture(Texture&& other) {
-		std::swap(textureID, other.textureID);
+	inline Texture(Texture&& orig) noexcept : textureID(orig.textureID) {
+		orig.textureID = 0;
 	}
 	inline ~Texture() {
 		LIBV_GL_DEBUG_ASSERT(id() == 0);
@@ -259,12 +259,11 @@ struct TextureGuard : public Texture<BindTarget> {
 
 // TextureAliases ----------------------------------------------------------------------------------
 
-using Texture2D = Texture<TextureBindTarget::_2D>;
-using TextureCube = Texture<TextureBindTarget::CubeMap>;
+struct Texture2D : Texture<TextureBindTarget::_2D> {};
+struct TextureCube : Texture<TextureBindTarget::CubeMap> {};
 
 using Texture2DGuard = TextureGuard<TextureBindTarget::_2D>;
 using TextureCubeGuard = TextureGuard<TextureBindTarget::CubeMap>;
-
 
 // Sampler -----------------------------------------------------------------------------------------
 

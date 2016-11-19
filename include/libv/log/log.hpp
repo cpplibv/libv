@@ -23,18 +23,18 @@
 //			system analysis
 
 // -------------------------------------------------------------------------------------------------
-// Trace - Only when I would be "tracing" the code and trying to find one part of a func specifically
-// Debug - Information that is diagnostically helpful to people more than just developers (IT, sysadmins, etc)
-// Info - Generally useful information to log (service start/stop, configuration assumptions, etc). Info I want to always have available but usually dont care about under normal circumstances. This is my out-of-the-box config level
-// Warn - Anything that can potentially cause application oddities, but for which I am automatically recoverring (such as switching from a primary to backup server, retrying an operation, missing secondary data, etc)
-// Error - Any error which is fatal to the operation but not the service or application (cant open a required file, missing data, etc). These errors will force user (administrator, or direct user) intervention. These are usually reserved (in my apps) for incorrect connection strings, missing services, etc.
-// Fatal - Any error that is forcing a shutdown of the service or application to prevent data loss (or further data loss). I reserve these only for the most heinous errors and situations where there is guaranteed to have been data corruption or loss.
+// Trace - Only when tracing the code and execution steps
+// Debug - Information that can be is diagnostically helpful
+// Info  - Generally useful information to log (service start/stop, configuration assumptions, etc). Info is always available but is not important under normal circumstances
+// Warn  - Anything that could cause application oddities, but for which automatically recovering is possible (switching to backup server, retrying an operation, etc)
+// Error - Any error which is fatal to the operation but not the service or application. Usually requires user intervention (missing file)
+// Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 // -------------------------------------------------------------------------------------------------
 
 
-#define __VFILENAME__ (std::strrchr(__FILE__, '/') + 1)
+#define __LIBV_SHORT_FILE__ (std::strrchr(__FILE__, '/') + 1)
 
-#define LIBV_POC ::libv::CodePosition{__VFILENAME__, __FUNCTION__, __LINE__}
+#define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_FILE__, __FUNCTION__, __LINE__}
 
 #define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
 #define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
@@ -43,12 +43,12 @@
 #define LIBV_ERROR(Module, ...) ::libv::log(LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
 #define LIBV_FATAL(Module, ...) ::libv::log(LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
 
-#define LIBV_LIBV_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__);
-#define LIBV_LIBV_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__);
-#define LIBV_LIBV_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__);
-#define LIBV_LIBV_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__);
-#define LIBV_LIBV_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
-#define LIBV_LIBV_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
+#define LIBV_LOG_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__);
+#define LIBV_LOG_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__);
+#define LIBV_LOG_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__);
+#define LIBV_LOG_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__);
+#define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
+#define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
 
 namespace libv {
 
@@ -144,7 +144,7 @@ private:
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
 //	std::string format = "{thread} {severity} [{module}] {message}\n";
-	std::string format = "{thread} {severity} [{module}] {message} <{func}:{file}:{line}>\n";
+	std::string format = "{thread} {severity} [{module}] {message} <{file}:{line}>\n";
 
 private:
 	bool notable(Severity severity, const std::string& modul) {

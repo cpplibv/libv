@@ -2,12 +2,12 @@
 
 #pragma once
 
-// vl
+// libv
 #include <libv/memory.hpp>
 #include <libv/vec.hpp>
 // pro
 #include <libv/ui/container/panel_flow.hpp>
-#include <libv/ui/render/renderer.hpp>
+#include <libv/ui/render/context.hpp>
 
 // TODO P3: Create UIID and UIClass string "aliases" for components and use it to address string
 //		ambiguity on constructors. Name could vary, but suggested to stay short
@@ -19,12 +19,24 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+// UI process orders:
+//
+// events
+// IO tasks
+// GL tasks
+// build
+// layout
+// render
+// destroy
+
+// -------------------------------------------------------------------------------------------------
+
 class Frame;
 class Component;
 
 class UI {
 private:
-	Renderer gl; //Layout layout;
+	Context context; //Layout layout;
 	PanelFlow content; //TODO P5: Change to a more primitive panel
 
 	ivec2 position;
@@ -32,12 +44,8 @@ private:
 
 	bool valid = false;
 
-private:
-	bool isInvalid() const;
-	void invalidate();
-	void validate();
-
 public:
+	Context& getContext();
 	ivec2 getSize() const;
 	void setSize(ivec2 size);
 
@@ -57,7 +65,6 @@ public:
 	UI();
 	virtual ~UI();
 };
-
 
 // -------------------------------------------------------------------------------------------------
 

@@ -15,17 +15,21 @@
 namespace libv {
 namespace gl {
 
-// BaseShader --------------------------------------------------------------------------------------
+// Shader --------------------------------------------------------------------------------------
 
-class BaseShader {
+class Shader {
 private:
 	GLuint shaderID = 0;
 
-protected:
-	inline BaseShader() = default;
-	inline BaseShader(const BaseShader&) = delete;
-	inline BaseShader(BaseShader&&) = delete;
-	inline ~BaseShader() = default;
+public:
+	inline Shader() = default;
+	inline Shader(const Shader&) = delete;
+	inline Shader(Shader&& orig) noexcept : shaderID(orig.shaderID) {
+		orig.shaderID = 0;
+	}
+	inline ~Shader() {
+		LIBV_GL_DEBUG_ASSERT(shaderID == 0);
+	}
 
 public:
 	inline bool status() {
@@ -77,13 +81,13 @@ public:
 		compile(sourceStr.c_str(), sourceStr.size());
 	}
 
-	inline void createCompile(const char* sourceStr, const GLint size, ShaderType type) {
+	inline void createCompile(ShaderType type, const char* sourceStr, const GLint size) {
 		create(type);
 		compile(sourceStr, size);
 	}
 
-	inline void createCompile(const std::string& sourceStr, ShaderType type) {
-		createCompile(sourceStr.c_str(), sourceStr.size(), type);
+	inline void createCompile(ShaderType type, const std::string& sourceStr) {
+		createCompile(type, sourceStr.c_str(), sourceStr.size());
 	}
 
 public:
@@ -95,37 +99,26 @@ public:
 	}
 };
 
-// ShaderAC ----------------------------------------------------------------------------------------
+// GuardedShader ----------------------------------------------------------------------------------------
 
-class ShaderAC : public BaseShader {
+class GuardedShader : public Shader {
 public:
-	inline ShaderAC() {
+	inline GuardedShader() {
 	}
-	inline ShaderAC(ShaderType type) {
+	inline GuardedShader(ShaderType type) {
 		create(type);
 	}
-	inline ShaderAC(const char* sourceStr, const size_t size, ShaderType type) {
-		createCompile(sourceStr, size, type);
+	inline GuardedShader(ShaderType type, const char* sourceStr, const size_t size) {
+		createCompile(type, sourceStr, size);
 	}
-	inline ShaderAC(const std::string& sourceStr, ShaderType type) :
-		ShaderAC(sourceStr.c_str(), sourceStr.size(), type) { }
-	inline ShaderAC(const ShaderAC&) = delete;
-	inline ShaderAC(ShaderAC&&) = delete;
-	inline ~ShaderAC() {
+	inline GuardedShader(ShaderType type, const std::string& sourceStr) :
+		GuardedShader(type, sourceStr.c_str(), sourceStr.size()) { }
+	inline GuardedShader(const GuardedShader&) = delete;
+	inline GuardedShader(Shader&& orig) : Shader(std::move(orig)) {}
+	inline GuardedShader(GuardedShader&& orig) : Shader(std::move(orig)) {}
+	inline ~GuardedShader() {
 		if (id())
 			destroy();
-	}
-};
-
-using Shader = ShaderAC;
-
-// ShaderNC ----------------------------------------------------------------------------------------
-
-class ShaderNC : public BaseShader {
-public:
-	inline ShaderNC() = default;
-	inline ~ShaderNC() {
-		LIBV_GL_DEBUG_ASSERT(id() == 0);
 	}
 };
 

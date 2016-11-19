@@ -7,7 +7,7 @@
 #include <functional>
 #include <memory>
 
-#include "type_traits.hpp"
+#include <libv/type_traits.hpp>
 
 namespace libv {
 
@@ -30,7 +30,6 @@ template<typename T, typename Deleter = std::default_delete<T>>
 using unique_ptr = std::unique_ptr<T, Deleter>;
 
 // observer_ptr ====================================================================================
-
 // This implementation is no 100% percent, but close enough for now.
 
 template<typename T>
@@ -88,19 +87,19 @@ inline bool operator!=(observer_ptr<T1> p1, observer_ptr<T2> p2) {
 }
 template<typename T>
 inline bool operator==(observer_ptr<T> p, std::nullptr_t) noexcept {
-	return !p;
+	return p.get() == nullptr;
 }
 template<typename T>
 inline bool operator==(std::nullptr_t, observer_ptr<T> p) noexcept {
-	return !p;
+	return nullptr == p.get();
 }
 template<typename T>
 inline bool operator!=(observer_ptr<T> p, std::nullptr_t) noexcept {
-	return (bool)p;
+	return p.get() != nullptr;
 }
 template<typename T>
 inline bool operator!=(std::nullptr_t, observer_ptr<T> p) noexcept {
-	return (bool)p;
+	return nullptr != p.get();
 }
 template<typename T1, typename T2>
 inline bool operator<(observer_ptr<T1> p1, observer_ptr<T2> p2) {
@@ -128,6 +127,10 @@ inline void swap(observer_ptr<T> & p1, observer_ptr<T> & p2) noexcept {
 template<typename T>
 inline observer_ptr<T> make_observer(T* p) noexcept {
 	return observer_ptr<T>(p);
+}
+template<typename T>
+inline observer_ptr<T> make_observer(T& p) noexcept {
+	return observer_ptr<T>(&p);
 }
 template<typename T>
 inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {

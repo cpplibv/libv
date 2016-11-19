@@ -111,6 +111,7 @@ operator|(const BireversedectionalRange& r, reverse_if_forwarder forwarder) {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: move reverse_if into new range lib view namespace
 const detail::reverse_if_forwarder reverse_if(bool reversed = false) {
 	return detail::reverse_if_forwarder{reversed};
 }

@@ -129,6 +129,7 @@ private:
 	template<typename CompareOptions, typename... Args>
 	std::shared_ptr<T> getImpl(Args&&... args) {
 
+		// This is a member class to allow forward declared type
 		struct CachedObject {
 			T object;
 			std::shared_ptr<CacheTracker> cacheTracker;
@@ -206,7 +207,7 @@ public:
 	Cache(Cache&&) = delete;
 	Cache& operator=(const Cache&) = delete;
 	Cache& operator=(Cache&&) = delete;
-	virtual ~Cache() {
+	~Cache() {
 		std::lock_guard<std::mutex> lk(cacheTracker->mutex);
 		cacheTracker->alive = false;
 	}

@@ -11,8 +11,6 @@
 #define MEMBER_OFFSET(s,m) ((char *)NULL + (offsetof(s,m)))
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-// -------------------------------------------------------------------------------------------------
-
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
@@ -61,6 +59,13 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
     std::hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
     hash_combine(seed, rest...);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template<typename T, size_t N>
+inline constexpr size_t count_of(const T (&)[N]) {
+	return N;
 }
 
 // -------------------------------------------------------------------------------------------------

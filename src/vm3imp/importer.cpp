@@ -260,29 +260,29 @@ bool Importer::import(Model& model, const std::string& filePath) {
 //for (unsigned int i = 0; i < scene->mNumMaterials; i++) {
 //	aiString Path;
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_AMBIENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_AMBIENT Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_AMBIENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_DIFFUSE Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_DIFFUSE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_DISPLACEMENT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_DISPLACEMENT Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_DISPLACEMENT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_EMISSIVE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_EMISSIVE Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_EMISSIVE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_HEIGHT, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_HEIGHT Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_HEIGHT Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_LIGHTMAP, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_LIGHTMAP Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_LIGHTMAP Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NONE, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_NONE Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_NONE Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_NORMALS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_NORMALS Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_NORMALS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_OPACITY, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_OPACITY Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_OPACITY Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_REFLECTION, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_REFLECTION Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_REFLECTION Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SHININESS, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_SHININESS Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_SHININESS Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_SPECULAR, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_SPECULAR Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_SPECULAR Texture: %s", Path.data);
 //	if (scene->mMaterials[i]->GetTexture(aiTextureType_UNKNOWN, 0, &Path, nullptr, nullptr, nullptr, nullptr, nullptr) == AI_SUCCESS)
-//		LIBV_GL_TRACE("aiTextureType_UNKNOWN Texture: %s", Path.data);
+//		LIBV_LOG_GL_TRACE("aiTextureType_UNKNOWN Texture: %s", Path.data);
 //}

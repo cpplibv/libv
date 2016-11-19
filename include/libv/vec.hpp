@@ -120,7 +120,7 @@ using is_vec_n_dim_t = typename is_vec_n_dim<N, T>::type;
 // vec_base_t --------------------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-pedantic"
+#pragma GCC diagnostic ignored "-Wpedantic"
 // nonstandard extension used : nameless struct / union
 
 template <size_t N, typename T, typename = void>
@@ -147,8 +147,14 @@ struct vec_base_t<2, T, enable_if<std::is_trivially_destructible<T>>> {
 	vec_base_t(T0 x, T1 y) noexcept : x(x), y(y) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	explicit operator glm::tvec2<T>(){
+	operator glm::tvec2<T>() const {
 		return glm::tvec2<T>(x, y);
+	}
+	operator glm::tvec2<T>& () {
+		return *reinterpret_cast<glm::tvec2<T>*>(this);
+	}
+	operator const glm::tvec2<T>& () const {
+		return *reinterpret_cast<const glm::tvec2<T>*>(this);
 	}
 #endif
 
@@ -177,8 +183,14 @@ struct vec_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
 	vec_base_t(const vec_base_t<2, T0>& xy, T1 z) noexcept : x(xy.x), y(xy.y), z(z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	explicit operator glm::tvec3<T>(){
+	operator glm::tvec3<T>() const {
 		return glm::tvec3<T>(x, y, z);
+	}
+	operator glm::tvec3<T>& () {
+		return *reinterpret_cast<glm::tvec3<T>*>(this);
+	}
+	operator const glm::tvec3<T>& () const {
+		return *reinterpret_cast<const glm::tvec3<T>*>(this);
 	}
 #endif
 
@@ -216,8 +228,14 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 	vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) noexcept : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	explicit operator glm::tvec4<T>(){
+	operator glm::tvec4<T>() const {
 		return glm::tvec4<T>(x, y, z, w);
+	}
+	operator glm::tvec4<T>& () {
+		return *reinterpret_cast<glm::tvec4<T>*>(this);
+	}
+	operator const glm::tvec4<T>& () const {
+		return *reinterpret_cast<const glm::tvec4<T>*>(this);
 	}
 #endif
 

@@ -17,7 +17,7 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseShader;
+class Shader;
 
 template <typename T>
 class Uniform;
@@ -25,17 +25,21 @@ class Uniform;
 template <typename T>
 class BaseAttribute;
 
-// BaseProgram -------------------------------------------------------------------------------------
+// Program -------------------------------------------------------------------------------------
 
-class BaseProgram {
+class Program {
 private:
 	GLuint programID = 0;
 
-protected:
-	inline BaseProgram() = default;
-	inline BaseProgram(const BaseProgram&) = delete;
-	inline BaseProgram(BaseProgram&&) = delete;
-	inline ~BaseProgram() = default;
+public:
+	inline Program() { }
+	inline Program(const Program&) = delete;
+	inline Program(Program&& orig) noexcept : programID(orig.programID) {
+		orig.programID = 0;
+	}
+	inline ~Program() {
+		LIBV_GL_DEBUG_ASSERT(programID == 0);
+	}
 
 public:
 	inline bool status() const {
@@ -69,7 +73,7 @@ public:
 		programID = 0;
 		LIBV_GL_DEBUG_CHECK_GL();
 	}
-	inline void link(const BaseShader& vertex, const BaseShader& fragment) {
+	inline void link(const Shader& vertex, const Shader& fragment) {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		glAttachShader(programID, vertex);
 		glAttachShader(programID, fragment);
@@ -79,7 +83,7 @@ public:
 		if (!status())
 			LIBV_LOG_GL_ERROR("Failed to link program:\n%s", info());
 	}
-	inline void link(const BaseShader& vertex, const BaseShader& fragment, const BaseShader& geometry) {
+	inline void link(const Shader& vertex, const Shader& fragment, const Shader& geometry) {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		glAttachShader(programID, vertex);
 		glAttachShader(programID, fragment);
@@ -90,11 +94,11 @@ public:
 		if (!status())
 			LIBV_LOG_GL_ERROR("Failed to link program:\n%s", info());
 	}
-	inline void createLink(const BaseShader& vertex, const BaseShader& fragment) {
+	inline void createLink(const Shader& vertex, const Shader& fragment) {
 		create();
 		link(vertex, fragment);
 	}
-	inline void createLink(const BaseShader& vertex, const BaseShader& fragment, const BaseShader& geometry) {
+	inline void createLink(const Shader& vertex, const Shader& fragment, const Shader& geometry) {
 		create();
 		link(vertex, fragment, geometry);
 	}
@@ -127,36 +131,25 @@ public:
 	}
 };
 
-// ProgramAC ---------------------------------------------------------------------------------------
+// Guarded -----------------------------------------------------------------------------------------
 
-class ProgramAC : public BaseProgram {
-public:
-	inline ProgramAC() {
+struct GuardedProgram : Program {
+	inline GuardedProgram() {
 		create();
 	}
-	inline ProgramAC(const BaseShader& vertex, const BaseShader& fragment) {
+	inline GuardedProgram(const Shader& vertex, const Shader& fragment) {
 		createLink(vertex, fragment);
 	}
-	inline ProgramAC(const BaseShader& vertex, const BaseShader& fragment, const BaseShader& geometry) {
+	inline GuardedProgram(const Shader& vertex, const Shader& fragment, const Shader& geometry) {
 		createLink(vertex, fragment, geometry);
 	}
-	inline ProgramAC(const ProgramAC&) = delete;
-	inline ProgramAC(ProgramAC&&) = delete;
-	inline ~ProgramAC() {
+	inline GuardedProgram(const Program&) = delete;
+	inline GuardedProgram(const GuardedProgram&) = delete;
+	inline GuardedProgram(Program&& orig) : Program(std::move(orig)) {}
+	inline GuardedProgram(GuardedProgram&& orig) : Program(std::move(orig)) {}
+	~GuardedProgram() {
 		if (id())
 			destroy();
-	}
-};
-
-using Program = ProgramAC;
-
-// ProgramNC ---------------------------------------------------------------------------------------
-
-class ProgramNC : public BaseProgram {
-public:
-	inline ProgramNC() = default;
-	inline ~ProgramNC() {
-		LIBV_GL_DEBUG_ASSERT(id() == 0);
 	}
 };
 
@@ -239,19 +232,19 @@ private:
 	GLint location;
 
 public:
-	inline void assign(const BaseProgram& program, const char* name) {
+	inline void assign(const Program& program, const char* name) {
 		LIBV_GL_DEBUG_ASSERT(program.id() != 0);
 		location = glGetUniformLocation(program, name);
 		LIBV_GL_DEBUG_CHECK_GL();
 	}
-	inline void assign(const BaseProgram& program, const std::string& name) {
+	inline void assign(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
 	}
 	Uniform() = default;
-	inline Uniform(const BaseProgram& program, const char* name) {
+	inline Uniform(const Program& program, const char* name) {
 		assign(program, name);
 	}
-	inline Uniform(const BaseProgram& program, const std::string& name) {
+	inline Uniform(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
 	}
 	inline void operator=(const T& val) {
@@ -380,19 +373,19 @@ template <> struct BaseAttribute<glm::dvec4> : public BaseAttributeCore {
 template <typename T>
 class AttributeLocation : public BaseAttribute<T> {
 public:
-	inline void assign(const BaseProgram& program, const char* name) {
+	inline void assign(const Program& program, const char* name) {
 		LIBV_GL_DEBUG_ASSERT(program.id() != 0);
 		this->location = glGetAttribLocation(program, name);
 		LIBV_GL_DEBUG_CHECK_GL();
 	}
-	inline void assign(const BaseProgram& program, const std::string& name) {
+	inline void assign(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
 	}
 	AttributeLocation() = default;
-	inline AttributeLocation(const BaseProgram& program, const char* name) {
+	inline AttributeLocation(const Program& program, const char* name) {
 		assign(program, name);
 	}
-	inline AttributeLocation(const BaseProgram& program, const std::string& name) {
+	inline AttributeLocation(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
 	}
 };
@@ -414,6 +407,11 @@ public:
 		this->location = location;
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+using Attribute = AttributeFixLocation<T>;
 
 // -------------------------------------------------------------------------------------------------
 

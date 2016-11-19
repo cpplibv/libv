@@ -19,7 +19,7 @@ struct LayoutSize {
 	static constexpr Unit PX = 0;
 	static constexpr Unit PERCENT = 1;
 	static constexpr Unit NOSPEC = 2;
-	// static constexpr Type RATIO = 0;
+	static constexpr Unit RATIO = 3;
 public:
 	float value;
 	Unit type;
@@ -28,6 +28,10 @@ public:
 	LayoutSize() : value(0.f), type(NOSPEC) { }
 	LayoutSize(float value, Unit type = PX) : value(value), type(type) { }
 };
+inline LayoutSize ratio(float v) {
+	// TODO P3: implement ratio in layout size
+	return LayoutSize(v, LayoutSize::RATIO);
+}
 inline LayoutSize percent(float v) {
 	return LayoutSize(v, LayoutSize::PERCENT);
 }

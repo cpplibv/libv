@@ -5,8 +5,9 @@
 // ext
 #include <GL/glew.h>
 #include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
 // libv
 #include <libv/vec.hpp>
 // std
@@ -20,7 +21,7 @@
 namespace libv {
 namespace gl {
 
-class BaseVertexArray;
+class VertexArray;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -137,12 +138,22 @@ public:
 		LIBV_GL_DEBUG_CHECK_GL();
 		return n;
 	}
+	inline GLint getCurrentAvailableVideoMemory() const {
+//		int availableKB[4];
+//		if (GLEW_NVX_gpu_memory_info)
+//			glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &availableKB[0]);
+//		int temp = GLEW_ATI_meminfo;
+//		if (GLEW_ATI_meminfo)
+//			glGetIntegerv(GL_TEXTURE_FREE_MEMORY_ATI, availableKB);
+//		return availableKB[0];
+		return 0;
+	}
 
 public:
 	inline void activeTexture(TextureChannel channel);
-	//	inline void drawArrays(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t offset);
-	inline void drawElements(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset);
-	inline void drawElementsBaseVertex(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset);
+	inline void drawArrays(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t vertexOffset);
+	inline void drawElements(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset);
+	inline void drawElementsBaseVertex(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset);
 	inline void viewport(ivec2 pos, ivec2 size);
 
 	inline void enable(Capability capability);
@@ -181,9 +192,92 @@ public:
 
 // Debug -------------------------------------------------------------------------------------------
 
-void renderCube(float x, float y, float z, float size);
+inline void renderCube(float x, float y, float z, float size) {
+	glBegin(GL_QUADS);
 
-// -------------------------------------------------------------------------------------------------
+	//Right
+	glNormal3f(1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x + size, y - size, z - size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x + size, y - size, z + size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x + size, y + size, z + size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x + size, y + size, z - size);
+
+	//Left
+	glNormal3f(-1.0f, 0.0f, 0.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x - size, y - size, z - size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x - size, y + size, z - size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x - size, y + size, z + size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x - size, y - size, z + size);
+
+	//Top
+	glNormal3f(0.0f, 1.0f, 0.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x - size, y + size, z - size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x + size, y + size, z - size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x + size, y + size, z + size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x - size, y + size, z + size);
+
+	//Bottom
+	glNormal3f(0.0f, -1.0f, 0.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x - size, y - size, z - size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x - size, y - size, z + size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x + size, y - size, z + size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x + size, y - size, z - size);
+
+	//Near
+	glNormal3f(0.0f, 0.0f, -1.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x - size, y - size, z - size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x + size, y - size, z - size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x + size, y + size, z - size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x - size, y + size, z - size);
+
+	//Far
+	glNormal3f(0.0f, 0.0f, 1.0f);
+	glTexCoord2f(0, 0);
+	glVertex3f(x - size, y - size, z + size);
+	glTexCoord2f(0, 1);
+	glVertex3f(x - size, y + size, z + size);
+	glTexCoord2f(1, 1);
+	glVertex3f(x + size, y + size, z + size);
+	glTexCoord2f(1, 0);
+	glVertex3f(x + size, y - size, z + size);
+
+	glEnd();
+}
+
+inline void renderXYZ(float x, float y, float z, float size) {
+	glBegin(GL_LINES);
+	glColor3f(1, 0, 0);
+	glVertex3f(x, y, z);
+	glVertex3f(x + size, y, z);
+	glColor3f(0, 1, 0);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y + size, z);
+	glColor3f(0, 0, 1);
+	glVertex3f(x, y, z);
+	glVertex3f(x, y, z + size);
+	glEnd();
+	glColor3f(1, 1, 1);
+}
 
 // =================================================================================================
 inline MatrixStack::MatrixStack() {
@@ -341,21 +435,21 @@ inline void GL::activeTexture(TextureChannel channel) {
 	glActiveTexture(GL_TEXTURE0 + to_value(channel));
 	LIBV_GL_DEBUG_CHECK_GL();
 }
-//inline void GL::drawArrays(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t offset) {
-//	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
-//	glBindVertexArray(vao);
-//	glDrawArrays(to_value(mode), offset, vertexCount);
-//	LIBV_GL_DEBUG_CHECK_GL();
-//	glBindVertexArray(0);
-//}
-inline void GL::drawElements(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset) {
+inline void GL::drawArrays(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t vertexOffset) {
+	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
+	glBindVertexArray(vao);
+	glDrawArrays(to_value(mode), vertexOffset, vertexCount);
+	LIBV_GL_DEBUG_CHECK_GL();
+	glBindVertexArray(0);
+}
+inline void GL::drawElements(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
 	glDrawElements(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset));
 	LIBV_GL_DEBUG_CHECK_GL();
 	glBindVertexArray(0);
 }
-inline void GL::drawElementsBaseVertex(const BaseVertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) {
+inline void GL::drawElementsBaseVertex(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
 	glDrawElementsBaseVertex(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset), vertexOffset);

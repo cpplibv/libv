@@ -3,7 +3,7 @@
 #pragma once
 
 // external
-// vLib
+// libv
 // std
 #include <stdexcept>
 // project

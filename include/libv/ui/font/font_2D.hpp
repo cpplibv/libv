@@ -5,9 +5,8 @@
 // ext
 #include <boost/container/flat_map.hpp>
 // libv
-#include <libv/gl/shader.hpp>
-#include <libv/gl/types.hpp>
-#include <libv/gl/uniform.hpp>
+#include <libv/gl/guard.hpp>
+#include <libv/gl/texture.hpp>
 #include <libv/vec.hpp>
 // std
 #include <array>
@@ -17,18 +16,6 @@
 
 struct FT_FaceRec_;
 using FT_Face = FT_FaceRec_*;
-struct FT_SizeRec_;
-using FT_Size = FT_SizeRec_*;
-
-// Boost forward declarations ------------------------------------------------------------------
-
-namespace boost {
-namespace filesystem {
-class path;
-} //namespace filesystem
-} //namespace boost
-
-// -------------------------------------------------------------------------------------------------
 
 namespace libv {
 namespace ui {
@@ -60,17 +47,23 @@ constexpr const size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
 
 // -------------------------------------------------------------------------------------------------
 
-class ShaderFont2D {
-	libv::gl::ShaderProgram shaderProgram;
-	libv::gl::Uniform<glm::mat4> MVPmat;
-	// Shader
-	// Uniform MVPmat
-	// Uniform Color
-};
+//class ShaderFont2D {
+//	libv::gl::ShaderNC fs;
+//	libv::gl::ShaderNC vs;
+//	libv::gl::ProgramNC program;
+//
+//	libv::gl::Uniform<glm::mat4> MVPmat;
+//	// Uniform MVPmat
+//	// Uniform Color
+//};
 
 // -------------------------------------------------------------------------------------------------
 
 /**
+ * Font2D is a primitive wrapper.
+ * Loading, unloading and updating has multiple steps, manual and thread sensitive.
+ * Font2D is responsibly to providing char information, glyph texture (and divisor in the future).
+ * Font2D is NOT responsibly to rendering, aligning, layouting or shading.
  * @context GL / ANY
  * @threadsafety single threaded
  */
@@ -83,31 +76,31 @@ public:
 	};
 
 private:
-
 	struct CharacterIndex {
 		uint32_t unicode;
-		unsigned int pxSize;
+		uint32_t pxSize;
 		bool operator<(const CharacterIndex& rhs) const {
 			return unicode < rhs.unicode || (unicode == rhs.unicode && pxSize < rhs.pxSize);
 		}
 	};
-private:
-	GLuint textureID = 0;
-	unsigned int activeFontSize = 12; // in px
-	bool dirty = true;
 
 private:
+	bool dirty = true;
+	gl::Texture2D texture;
+
+private:
+	uint32_t currentSize;
+	std::string fontData;
 	FT_Face face = nullptr;
-	std::string fileContent;
-	boost::container::flat_map<int, FT_Size> sizes;
+
+private:
+	uivec2 textureSize{DEFAULT_FONT2D_TEXTURE_WIDTH, DEFAULT_FONT2D_TEXTURE_HEIGHT};
+	uivec2 texturePen{0, 0};
+	uint32_t textureNextLine = 0;
+	std::array<GLubyte, DEFAULT_FONT2D_TEXTURE_WIDTH * DEFAULT_FONT2D_TEXTURE_HEIGHT> textureData;
 
 private:
 	boost::container::flat_map<CharacterIndex, Character> characterInfos;
-	Character defaultCharacter;
-	uivec2 textureSize{DEFAULT_FONT2D_TEXTURE_WIDTH, DEFAULT_FONT2D_TEXTURE_HEIGHT};
-	uivec2 texturePen{0, 0};
-	unsigned int textureNextLine = 0;
-	std::array<GLubyte, DEFAULT_FONT2D_TEXTURE_WIDTH * DEFAULT_FONT2D_TEXTURE_HEIGHT> textureData;
 
 public:
 	/**
@@ -115,70 +108,66 @@ public:
 	 */
 	Font2D();
 	/**
-	 * @context GL
-	 */
-	Font2D(const boost::filesystem::path& filePath);
-	/**
-	 * @param data begining of the font file's content
-	 * @param size size of the font file
-	 * @note the data will be copied into an internal storage,
-	 * deallocation of data is possible after the function return
-	 * @context GL
-	 */
-	Font2D(const void* data, const size_t size);
-	/**
-	 * @context GL / ANY - Can only be called from ANY context when the object is not loaded.
-	 * (For example after a successful unload member function call)
+	 * @context ANY - Can only be called from ANY context when the object is unloaded.
 	 */
 	~Font2D();
 
 	/**
-	 * @context ANY
-	 */
-	void load(const boost::filesystem::path& filePath);
-	/**
-	 * @param data begining of the font file's content
+	 * @param data beginning of the font file's content
 	 * @param size size of the font file
 	 * @note the data will be copied into an internal storage,
 	 * deallocation of data is possible after the function return
 	 * @context ANY
 	 */
-	void load(const void* data, const size_t size);
+	void loadFont(const void* data, const size_t size);
+	/**
+	 * @context ANY
+	 */
+	void unloadFont();
 
 	/**
 	 * @context GL
 	 */
-	void unload();
-
-	bool isLoaded() const;
-	/** Set the active font size
-	 * @param px size in pixel
-	 * @state This operation requires loaded state
-	 * @context ANY
-	 */
-	void setSize(int px);
+	void loadGL();
 	/**
-	 * @state This operation requires loaded state
-	 * @context ANY
-	 */
-	int getLineAdvance() const;
-	/**
-	 * @state This operation requires loaded state
-	 * @context ANY
-	 */
-	int getDescender() const;
-	ivec2 getKerning(uint32_t left, uint32_t right) const;
-	/**
-	 * @state This operation requires loaded state
 	 * @context GL
 	 */
-	const Character& getCharacter(uint32_t unicode);
-	/** Bind the font's shader and texture to the openGL state machine
-	 * @prerequirment GL_TEXTURE_2D has to be enabled
+	void updateGL();
+	/**
+	 * @context GL
+	 */
+	void unloadGL();
+
+	/**
+	 * @state This operation requires loaded state
+	 * @context ANY
+	 */
+	int getLineAdvance(uint32_t size);
+	/**
+	 * @state This operation requires loaded state
+	 * @context ANY
+	 */
+	int getDescender(uint32_t size);
+	/**
+	 * @context ANY
+	 */
+	ivec2 getKerning(uint32_t left, uint32_t right, uint32_t size);
+	/**
+	 * @state This operation requires loaded state
+	 * @context ANY
+	 */
+	const Character& getCharacter(uint32_t unicode, uint32_t size);
+
+	/** Bind the font's texture to the openGL state machine
 	 * @state This operation requires loaded state
 	 * @context GL
 	 */
 	void bind();
+	/** Bind the font's texture to the openGL state machine
+	 * @state This operation requires loaded state
+	 * @context GL
+	 */
+	gl::BindGuard<Font2D> bindGuard();
 	/** Unbind the font's shader and texture to the openGL state machine
 	 * @state This operation requires loaded state
 	 * @context GL
@@ -186,9 +175,9 @@ public:
 	void unbind();
 
 private:
-	void loadFace();
-	Character renderCharacter(uint32_t unicode);
-	void uploadTexture();
+	Character renderCharacter(uint32_t unicode, uint32_t size);
+	void updateTexture();
+	void changeSizeOnDemand(uint32_t size);
 };
 
 // -------------------------------------------------------------------------------------------------

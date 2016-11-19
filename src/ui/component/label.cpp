@@ -14,7 +14,7 @@ namespace libv {
 namespace ui {
 
 void Label::setText(const std::string& str) {
-	LIBV_UI_COMPONENT_TRACE("Set label text to [%s]", str);
+	LIBV_LOG_UI_COMPONENT_TRACE("Set label text to [%s]", str);
 	invalidate();
 	text.setText(str);
 }
@@ -22,21 +22,21 @@ void Label::setText(const std::string& str) {
 LayoutInfo Label::doLayout(const LayoutInfo& parentLayoutInfo) {
 	auto size = vec_static_cast<int>(evalLayoutSize(parentLayoutInfo, *this).xy());
 	text.setSize(size);
-	text.build();
+	text.build(getContext());
 	auto result = maxByDimensions(size, text.getLayoutedSize());
 	return vec3(result, 0);
 }
 
-void Label::doBuild(Renderer&) {
-	text.build();
+void Label::doBuild(Context& context) {
+	text.build(context);
 }
 
-void Label::doDestroy(Renderer&) {
-	text.destroy();
+void Label::doDestroy(Context& context) {
+	text.destroy(context);
 }
 
-void Label::doRender(Renderer& gl) {
-	text.render(gl);
+void Label::doRender(Context& context) {
+	text.render(context);
 }
 
 } //namespace ui

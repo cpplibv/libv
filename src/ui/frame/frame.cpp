@@ -37,13 +37,13 @@ const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
-	LIBV_UI_FRAME_TRACE("Close default frame [%s]", title);
+	LIBV_LOG_FRAME_TRACE("Close default frame [%s]", title);
 	if (window)
 		glfwSetWindowShouldClose(window, true);
 }
 
 void Frame::closeForce() {
-	LIBV_UI_FRAME_TRACE("Close force frame [%s]", title);
+	LIBV_LOG_FRAME_TRACE("Close force frame [%s]", title);
 	forcedClose = true;
 }
 
@@ -102,12 +102,12 @@ void Frame::addComponent(const shared_ptr<Component>& component) {
 }
 
 void Frame::removeComponent(const observer_ptr<Component>&) {
-	LIBV_UI_FRAME_ERROR("Not implemented yet.");
+	LIBV_LOG_FRAME_ERROR("Not implemented yet.");
 	//	ui.remove(component);
 }
 
 void Frame::removeComponent(const shared_ptr<Component>&) {
-	LIBV_UI_FRAME_ERROR("Not implemented yet.");
+	LIBV_LOG_FRAME_ERROR("Not implemented yet.");
 	//	ui.remove(component);
 }
 
@@ -115,48 +115,52 @@ void Frame::removeComponent(const shared_ptr<Component>&) {
 
 void Frame::show() {
 	context.executeAsync([this] {
-		LIBV_UI_FRAME_TRACE("Show frame [%s]", title);
+		LIBV_LOG_FRAME_TRACE("Show frame [%s]", title);
 		if (!window) {
 			cmdFrameCreate();
 		}
-		if (window)
-				coreExec(std::bind(glfwShowWindow, window));
-				hidden = false;
-		});
+		if (window) {
+			coreExec(std::bind(glfwShowWindow, window));
+					hidden = false;
+		}
+	});
 }
 
 void Frame::hide() {
 	context.executeAsync([this] {
-		LIBV_UI_FRAME_TRACE("Hide frame [%s]", title);
-		if (window)
-				coreExec(std::bind(glfwHideWindow, window));
-				hidden = true;
-		});
+		LIBV_LOG_FRAME_TRACE("Hide frame [%s]", title);
+		if (window) {
+			coreExec(std::bind(glfwHideWindow, window));
+					hidden = true;
+		}
+	});
 }
 
 void Frame::restore() {
 	context.executeAsync([this] {
-		LIBV_UI_FRAME_TRACE("Restore frame [%s]", title);
-		if (window)
-				coreExec(std::bind(glfwRestoreWindow, window));
-				minimized = false;
-		});
+		LIBV_LOG_FRAME_TRACE("Restore frame [%s]", title);
+		if (window) {
+			coreExec(std::bind(glfwRestoreWindow, window));
+					minimized = false;
+		}
+	});
 }
 
 void Frame::minimize() {
 	context.executeAsync([this] {
-		LIBV_UI_FRAME_TRACE("Minimize frame [%s]", title);
-		if (window)
-				coreExec(std::bind(glfwIconifyWindow, window));
-				minimized = true;
-		});
+		LIBV_LOG_FRAME_TRACE("Minimize frame [%s]", title);
+		if (window) {
+			coreExec(std::bind(glfwIconifyWindow, window));
+					minimized = true;
+		}
+	});
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::setOpenGLVersion(int major, int minor) {
 	context.executeAsync([this, major, minor] {
-		LIBV_UI_FRAME_TRACE("Set frame OpenGLVersion of [%s] to [%d.%d]", title, major, minor);
+		LIBV_LOG_FRAME_TRACE("Set frame OpenGLVersion of [%s] to [%d.%d]", title, major, minor);
 		this->openGLVersionMajor = major;
 		this->openGLVersionMinor = minor;
 		if (window)
@@ -166,7 +170,7 @@ void Frame::setOpenGLVersion(int major, int minor) {
 
 void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 	context.executeAsync([this, profile] {
-		LIBV_UI_FRAME_TRACE("Set frame OpenGLProfile of [%s] to [%d]", title, profile);
+		LIBV_LOG_FRAME_TRACE("Set frame OpenGLProfile of [%s] to [%d]", title, profile);
 		this->openGLProfile = profile;
 		if (window)
 				cmdFrameRecreate();
@@ -175,7 +179,7 @@ void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 
 void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 	context.executeAsync([this, samples] {
-		LIBV_UI_FRAME_TRACE("Set frame OpenGLSamples of [%s] to [%d]", title, samples);
+		LIBV_LOG_FRAME_TRACE("Set frame OpenGLSamples of [%s] to [%d]", title, samples);
 		this->openGLSamples = samples;
 		if (window)
 				cmdFrameRecreate();
@@ -184,7 +188,7 @@ void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 
 void Frame::setOpenGLRefreshRate(int rate) {
 	context.executeAsync([this, rate] {
-		LIBV_UI_FRAME_TRACE("Set frame OpenGLRefreshRate of [%s] to [%d]", title, rate);
+		LIBV_LOG_FRAME_TRACE("Set frame OpenGLRefreshRate of [%s] to [%d]", title, rate);
 		this->openGLRefreshRate = rate;
 		if (window)
 				cmdFrameRecreate();
@@ -192,13 +196,13 @@ void Frame::setOpenGLRefreshRate(int rate) {
 }
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
-	LIBV_UI_FRAME_TRACE("Set frame CloseOperation of [%s] to [%d]", title, operation);
+	LIBV_LOG_FRAME_TRACE("Set frame CloseOperation of [%s] to [%d]", title, operation);
 	defaultCloseOperation = operation;
 }
 
 void Frame::setDecoration(bool decorated) {
 	context.executeAsync([this, decorated] {
-		LIBV_UI_FRAME_TRACE("Set frame Decoration of [%s] to [%d]", title, decorated);
+		LIBV_LOG_FRAME_TRACE("Set frame Decoration of [%s] to [%d]", title, decorated);
 		this->decorated = decorated;
 		if (window)
 				cmdFrameRecreate();
@@ -207,7 +211,7 @@ void Frame::setDecoration(bool decorated) {
 
 void Frame::setDisplayMode(const TypeDisplayMode& mode) {
 	context.executeAsync([this, mode] {
-		LIBV_UI_FRAME_TRACE("Set frame DisplayMode of [%s] to [%d]", title, mode);
+		LIBV_LOG_FRAME_TRACE("Set frame DisplayMode of [%s] to [%d]", title, mode);
 		this->displayMode = mode;
 		if (window)
 				cmdFrameRecreate();
@@ -220,7 +224,7 @@ void Frame::setPosition(int x, int y) {
 
 void Frame::setPosition(ivec2 newpos) {
 	context.executeAsync([this, newpos] {
-		LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
+		LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
 		this->position = newpos;
 		if (window)
 				coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -233,7 +237,7 @@ void Frame::setPosition(FramePosition pos) {
 		context.executeAsync([this] {
 			auto* monitor = getCurrentMonitor();
 			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
-			LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of current monitor", title, newpos.x, newpos.y);
+			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of current monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
 					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -243,7 +247,7 @@ void Frame::setPosition(FramePosition pos) {
 		context.executeAsync([this] {
 			auto* monitor = Monitor::getPrimaryMonitor();
 			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
-			LIBV_UI_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of primary monitor", title, newpos.x, newpos.y);
+			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of primary monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
 					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -254,7 +258,7 @@ void Frame::setPosition(FramePosition pos) {
 
 void Frame::setResizable(bool resizable) {
 	context.executeAsync([this, resizable] {
-		LIBV_UI_FRAME_TRACE("Set frame Resizable of [%s] to [%d]", title, resizable);
+		LIBV_LOG_FRAME_TRACE("Set frame Resizable of [%s] to [%d]", title, resizable);
 		this->resizable = resizable;
 		if (window)
 				cmdFrameRecreate();
@@ -267,7 +271,7 @@ void Frame::setSize(int x, int y) {
 
 void Frame::setSize(ivec2 newsize) {
 	context.executeAsync([this, newsize] {
-		LIBV_UI_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
+		LIBV_LOG_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
 		size = newsize;
 		if (window)
 				coreExec(std::bind(glfwSetWindowSize, window, size.x, position.y));
@@ -276,7 +280,7 @@ void Frame::setSize(ivec2 newsize) {
 
 void Frame::setTitle(const std::string& title) {
 	context.executeAsync([this, title] {
-		LIBV_UI_FRAME_TRACE("Set frame Title of [%s] to [%s]", this->title, title);
+		LIBV_LOG_FRAME_TRACE("Set frame Title of [%s] to [%s]", this->title, title);
 		this->title = title;
 		if (window)
 				coreExec([this, title] {
@@ -346,13 +350,13 @@ void Frame::cmdFrameDestroy() {
 // Frame Loop --------------------------------------------------------------------------------------
 
 void Frame::loopInit() {
-	LIBV_UI_FRAME_DEBUG("Frame init");
+	LIBV_LOG_FRAME_DEBUG("Frame init");
 
 	context.executeAsync(std::bind(&Frame::loop, this));
 }
 
 void Frame::loop() {
-	//LIBV_UI_FRAME_DEBUG("Frame loop");
+	//LIBV_LOG_FRAME_DEBUG("Frame loop");
 	distributeEvents();
 
 	if (isFrameShouldClose()) {
@@ -369,7 +373,7 @@ void Frame::loop() {
 }
 
 void Frame::loopTerminate() {
-	LIBV_UI_FRAME_DEBUG("Frame terminate");
+	LIBV_LOG_FRAME_DEBUG("Frame terminate");
 
 	cmdFrameDestroy();
 	context.stop();
@@ -380,17 +384,18 @@ void Frame::loopTerminate() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::initContext() {
-	LIBV_UI_FRAME_DEBUG("Initialize context");
-	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_UI_FRAME_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+	LIBV_LOG_FRAME_DEBUG("Initialize context");
+	GLenum err = glewInit(); // TODO P1: Move glew init into core!
+	if (err != GLEW_OK)
+		LIBV_LOG_FRAME_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	LIBV_UI_FRAME_DEBUG("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_UI_FRAME_DEBUG("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_UI_FRAME_DEBUG("GL Version: %s", (const char*) glGetString(GL_VERSION));
+	LIBV_LOG_FRAME_DEBUG("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+	LIBV_LOG_FRAME_DEBUG("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+	LIBV_LOG_FRAME_DEBUG("GL Version: %s", (const char*) glGetString(GL_VERSION));
 }
 
 void Frame::termContext() {
-	LIBV_UI_FRAME_DEBUG("Terminate context");
+	LIBV_LOG_FRAME_DEBUG("Terminate context");
 }
 
 // -------------------------------------------------------------------------------------------------

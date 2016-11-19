@@ -1,11 +1,45 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-cache!!!!
+implement burnt in defaults
+improve string2d
 -- commit --
 
-ShaderAC / NC -> ShaderGuard or GLGuard<Shader>?
-ProgramAC / NC -> ProgramGuard or GLGuard<Program>?
-adopting new vgl in ui
+build all
+run all
+fix all
+-- commit --
+
+rename #include <libv/ui/resource/resource_fwd.hpp> to #include <libv/ui/resource/fwd.hpp>
+-- commit --
+
+replace "//namespace" with "// namespace"
+replace "//TODO" with "// TODO"
+replace "//Note" with "// Note"
+-- commit --
+
+state based ui
+separate control and data!
+-- commit --
+
+2 1 [libv.ui.component] Destroy [UIRoot] <destroy:component.cpp:71>
+2 5 [libv.gl] OpenGL: invalid operation <destroy:ui.cpp:60>
+-- commit --
+
+c++17 vec
+rename vec_t to tvec
+remove vec member getters
+-- commit --
+
+ui resource local proxies
+-- commit --
+
+hunt down GCC 7.0+ comments
+-- commit --
+
+libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
+-- commit --
+
+change vec default to double
 -- commit --
 
 kill gl/log.cpp
@@ -16,23 +50,37 @@ use VBO for string2D
 use VAO for string2D
 -- commit --
 
-cache_ptr
--- commit --
-
-font cache
--- commit --
-
-shader cache
--- commit --
-
 btn / regions
 -- commit --
 
 ?kill def renderer if there is still any
 -- commit --
 
+move ui out of frame
+-- commit --
+
+flow layout const auto& in layout algo
+-- commit --
+
+change log severity into bit-mask
+-- commit --
+
+frame calling show after show may brake things?
+dual ("lock") check every frame operations
+-- commit --
+
+ptr base for observer, cached, etc...
+-- commit --
+
 --- AWAITING ---------------------------------------------------------------------------------------
 
+doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
+resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
+resource: forbid usage of absolute paths
+resource: forbid usage of relative paths with starting ..
+netbeans link: Terminal able to open links to files with absolute paths now. You can print a hyperlink in terminal with an escape sequence. Example of such sequence: fprintf(stdout, "(\033]10;%s;%s\007)]\n", "/home/ilia/NetBeansProjects/CppApplication_48/main.cpp:20", "main.cpp:20"); where :lineNumber is optional.
+asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
+cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 gl: uniformbuffer?
 gl: framebuffer
 gl: renderbuffer
@@ -44,10 +92,14 @@ layout: size ratio
 layout: Layout Property: what is the situation with per-component but container based properties?
 layout: think layout as a graph instad of a stack..., just think and see whats going on with that approach
 layout: hard type (enum) align anchor and orient
+frame: split from ui
+ui / frame: remove default own thread, give them an io_service like executor
 ui: setText => set()(Label::Text, "Main Menu");
 ui: take a look at frame and component events
 ui: component property serialization and validation
 ui: rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
+cpp / delegate / vsig: http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11
+cpp: clarify Arg&& and template vs auto type deduction rules
 cpp: what is and how to use ADL
 cpp: intel vtune
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
@@ -56,9 +108,11 @@ cpp: look after any
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: provide exception free alternative api EVERYWHERE! hehehehehe.
 libv: move vec costume getter functions from member to public -> reducing symbols...
-seg fault in resource! (just run libv_test in debug...) // however it will be rewritten
 FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
 merge vsig back and create vmeta and vtmta (too many tamplate argument)
+
+Set default displayed tab size for your repository
+http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/23522945#23522945
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
@@ -69,50 +123,50 @@ logger client - network connected different app (real time log viewer) with retr
 // -------------------------------------------------------------------------------------------------
 
 Window mode switching
-
 GLFW now supports switching between windowed and full screen modes and updating the monitor and desired resolution and refresh rate of full screen windows with glfwSetWindowMonitor.
+
 Window maxmimization support
-
 GLFW now supports window maximization with glfwMaximizeWindow and the GLFW_MAXIMIZED window hint and attribute.
+
 Window input focus control
-
 GLFW now supports giving windows input focus with glfwFocusWindow.
+
 Window size limit support
-
 GLFW now supports setting both absolute and relative window size limits with glfwSetWindowSizeLimits and glfwSetWindowAspectRatio.
+
 Localized key names
-
 GLFW now supports querying the localized name of printable keys with glfwGetKeyName, either by key token or by scancode.
+
 Wait for events with timeout
-
 GLFW now supports waiting for events for a set amount of time with glfwWaitEventsTimeout.
+
 Window icon support
-
 GLFW now supports setting the icon of windows with glfwSetWindowIcon.
+
 Raw timer access
-
 GLFW now supports raw timer values with glfwGetTimerValue and glfwGetTimerFrequency.
+
 Joystick connection callback
-
 GLFW now supports notifying when a joystick has been connected or disconnected with glfwSetJoystickCallback.
+
 Context-less windows
-
 GLFW now supports creating windows without a OpenGL or OpenGL ES context with GLFW_NO_API.
+
 Run-time context creation API selection
-
 GLFW now supports selecting the context creation API at run-time with the GLFW_CONTEXT_CREATION_API window hint value.
+
 Error-free context creation
-
 GLFW now supports creating OpenGL and OpenGL ES contexts that do not emit errors with the GLFW_CONTEXT_NO_ERROR window hint, provided the machine supports the GL_KHR_no_error extension.
-CMake config-file package support
 
+CMake config-file package support
 GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
 
 // -------------------------------------------------------------------------------------------------
 
 I dont know yet what it could be used for, but this is could be VERY handy!
-sfiane + decltype + operator ,
+sfinae + decltype + operator ,
 decltype(os << obj, void())
+yeee i get it now: void to regular void by: "(void_expression, regular_void)" and operator,(T, regular_void)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -306,6 +360,57 @@ https://github.com/sakra/cotire
 Új fajta signal: timerSignal
 Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
 Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
+
+// -------------------------------------------------------------------------------------------------
+
+/**
+ * rounds to nearest, to even on tie
+ */
+template <class To, class Rep, class Period>
+To round(const duration<Rep, Period>& d) {
+	typedef typename common_type<To, duration<Rep, Period> >::type result_type;
+	result_type diff0;
+	result_type diff1;
+
+	To t0 = duration_cast<To>(d);
+	To t1 = t0;
+	if (t0 > d) {
+		--t1;
+		diff0 = t0 - d;
+		diff1 = d - t1;
+	} else {
+		++t1;
+		diff0 = d - t0;
+		diff1 = t1 - d;
+	}
+
+	if (diff0 == diff1) {
+		if (t0.count() & 1)
+			return t1;
+		return t0;
+	} else if (diff0 < diff1)
+		return t0;
+	return t1;
+}
+/**
+ * rounds up
+ */
+template <class To, class Rep, class Period>
+To ceil(const duration<Rep, Period>& d) {
+	To t = duration_cast<To>(d);
+	if (t < d)
+		++t;
+	return t;
+}
+/**
+ * rounds down
+ */
+template <class To, class Rep, class Period>
+To floor(const duration<Rep, Period>& d) {
+	To t = duration_cast<To>(d);
+	if (t > d) --t;
+	return t;
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -594,7 +699,7 @@ Model::Model(const char* data, size_t size, const std::string& name) :
 
 void Model::init(const char* data, size_t size) {
 	if (!model.load(data, size)) {
-		LIBV_GL_ERROR("Failed to load model: [%s]", name);
+		LIBV_LOG_GL_ERROR("Failed to load model: [%s]", name);
 		return;
 	}
 	loadGL();
@@ -607,7 +712,7 @@ Model::~Model() {
 // -------------------------------------------------------------------------------------------------
 
 void Model::loadGL() {
-	LIBV_GL_TRACE("GL Loading model: [%s]", name);
+	LIBV_LOG_GL_TRACE("GL Loading model: [%s]", name);
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo_vertex);
@@ -647,7 +752,7 @@ void Model::loadGL() {
 }
 
 void Model::unloadGL() {
-	LIBV_GL_TRACE("GL Unloading model: [%s]", name);
+	LIBV_LOG_GL_TRACE("GL Unloading model: [%s]", name);
 
 	glDeleteBuffers(1, &vbo_index);
 	glDeleteBuffers(1, &vbo_vertex);
@@ -928,3 +1033,47 @@ GC Renderbuffer::gc;
 }
 
 std::this_thread::sleep_for(std::chrono::seconds(2));
+
+// -------------------------------------------------------------------------------------------------
+// UI idea: its horribly wrong, that is not the point.
+
+<style>
+	.menu-scene {
+		size = 100% 100%;
+		orient = down-right;
+	}
+	.menu {
+		size = 100% 1r;
+		align = bottom-right;
+	}
+	.menu-footer {
+		size = 100% 30px;
+		align = center-center;
+		aligncontent = center-center;
+		orient = down-right;
+	}
+</style>
+
+<flow id="menu-scene">
+	<flow id="menu">
+		<label id="main-menu-title" class="title">
+			Main Menu
+		</label>
+		<button id="main-menu-newgame" class="main-menu-element">
+			New Game
+			<onclick console="new_game"/>
+		</button>
+		<button id="main-menu-exitgame" class="main-menu-element">
+			Exit Game
+			<onclick console="exit"/>
+		</button>
+	</flow>
+	<flow id="menu-footer">
+		<label id="main-menu-version" class="title">
+			<!--<text>v1.00</text>-->
+			<!--<text>{VERSION_SHORT_DISPLAY}</text>-->
+			${VERSION_SHORT_DISPLAY}
+		</label>
+	</flow>
+</flow>
+

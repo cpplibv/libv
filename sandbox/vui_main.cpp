@@ -19,52 +19,52 @@ using namespace libv::ui;
 
 void noisyEvents(Frame& frame) {
 	(void) frame;
-	frame.onChar.output([](const EventChar & e) {
-		LIBV_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
-	frame.onCharMods.output([](const EventCharMods & e) {
-		LIBV_UI_EVENT_TRACE("Event CharMods: %d %u %s", e.mods, e.unicode, e.utf8); });
-	frame.onCursorEnter.output([](const EventCursorEnter & e) {
-		LIBV_UI_EVENT_TRACE("Event CursorEnter: %d", e.entered); });
-	frame.onCursorPos.output([](const EventCursorPos & e) {
-		LIBV_UI_EVENT_TRACE("Event CursorPos: %f %f", e.xpos, e.ypos); });
-	frame.onDrop.output([](const EventDrop & e) {
-		LIBV_UI_EVENT_TRACE("Event Drop: %d ...", e.strings.size()); });
-	frame.onFramebufferSize.output([](const EventFramebufferSize & e) {
-		LIBV_UI_EVENT_TRACE("Event FramebufferSize: %d %d", e.size.x, e.size.y); });
-	frame.onKey.output([](const EventKey & e) {
-		LIBV_UI_EVENT_TRACE("Event Key: %d %d %d %d", e.action, e.key, e.mode, e.scancode); });
-	frame.onMouseButton.output([](const EventMouseButton & e) {
-		LIBV_UI_EVENT_TRACE("Event MouseButton: %d %d %d", e.action, e.button, e.mods); });
-	frame.onScroll.output([](const EventScroll & e) {
-		LIBV_UI_EVENT_TRACE("Event Scroll: %f %f", e.xoffset, e.yoffset); });
+	frame.onChar.output([](const EventChar& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
+	frame.onCharMods.output([](const EventCharMods& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event CharMods: %d %u %s", e.mods, e.unicode, e.utf8); });
+	frame.onCursorEnter.output([](const EventCursorEnter& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event CursorEnter: %d", e.entered); });
+	frame.onCursorPos.output([](const EventCursorPos& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event CursorPos: %f %f", e.xpos, e.ypos); });
+	frame.onDrop.output([](const EventDrop& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event Drop: %d ...", e.strings.size()); });
+	frame.onFramebufferSize.output([](const EventFramebufferSize& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event FramebufferSize: %d %d", e.size.x, e.size.y); });
+	frame.onKey.output([](const EventKey& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event Key: %d %d %d %d", e.action, e.key, e.mode, e.scancode); });
+	frame.onMouseButton.output([](const EventMouseButton& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event MouseButton: %d %d %d", e.action, e.button, e.mods); });
+	frame.onScroll.output([](const EventScroll& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event Scroll: %f %f", e.xoffset, e.yoffset); });
 	frame.onWindowClose.output([](const EventWindowClose &) {
-		LIBV_UI_EVENT_TRACE("Event WindowClose"); });
-	frame.onWindowFocus.output([](const EventWindowFocus & e) {
-		LIBV_UI_EVENT_TRACE("Event WindowFocus: %d", e.focused); });
-	frame.onWindowIconify.output([](const EventWindowIconify & e) {
-		LIBV_UI_EVENT_TRACE("Event WindowIconify: %d", e.iconified); });
-	frame.onWindowPos.output([](const EventWindowPos & e) {
-		LIBV_UI_EVENT_TRACE("Event WindowPos: %d, %d", e.position.x, e.position.y); });
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowClose"); });
+	frame.onWindowFocus.output([](const EventWindowFocus& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowFocus: %d", e.focused); });
+	frame.onWindowIconify.output([](const EventWindowIconify& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowIconify: %d", e.iconified); });
+	frame.onWindowPos.output([](const EventWindowPos& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowPos: %d, %d", e.position.x, e.position.y); });
 	frame.onWindowRefresh.output([](const EventWindowRefresh &) {
-		LIBV_UI_EVENT_TRACE("Event WindowRefresh"); });
-	frame.onWindowSize.output([](const EventWindowSize & e) {
-		LIBV_UI_EVENT_TRACE("Event WindowSize: %d %d", e.size.x, e.size.y); });
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowRefresh"); });
+	frame.onWindowSize.output([](const EventWindowSize& e) {
+		LIBV_LOG_UI_EVENT_TRACE("Event WindowSize: %d %d", e.size.x, e.size.y); });
 
 	//		frame.onClose.output([](Frame* f) {
-	//			LIBV_UI_EVENT_TRACE("Event onClose: %d", f); return true; });
+	//			LIBV_LOG_UI_EVENT_TRACE("Event onClose: %d", f); return true; });
 	//		frame.onClosed.output([](Frame* f) {
-	//			LIBV_UI_EVENT_TRACE("Event onClosed: %d", f); });
+	//			LIBV_LOG_UI_EVENT_TRACE("Event onClosed: %d", f); });
 }
 
-//#define checkGLEWSupport(ext) LIBV_LIBV_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+//#define checkGLEWSupport(ext) LIBV_LOG_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 //
 //void initGLEW() {
 //	if (GLenum err = glewInit() != GLEW_OK)
-//		LIBV_LIBV_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+//		LIBV_LOG_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 //
-//	LIBV_LIBV_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-//	LIBV_LIBV_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-//	LIBV_LIBV_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+//	LIBV_LOG_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
+//	LIBV_LOG_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
+//	LIBV_LOG_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 //
 //	checkGLEWSupport(GL_VERSION_3_3);
 //	checkGLEWSupport(GL_VERSION_4_5);
@@ -73,7 +73,6 @@ void noisyEvents(Frame& frame) {
 //
 //	checkGL();
 //}
-
 class TestFrame : public Frame {
 	Label lbl0;
 	Label lbl1;
@@ -81,30 +80,130 @@ class TestFrame : public Frame {
 	PanelFlow lf;
 
 	void init() {
+//
+// -----
+//
+//		lbl0.set()
+//				(Property::ID, "Label0")
+//				(Property::Size, percent(100), nospec(), 0)
+//				(Label::Text, "Label0 with interactivity!")
+//		;
+//
+//		lbl1.set()
+//				(Property::ID, "Label1")
+//				(Property::Size, percent(100), nospec(), 0)
+//				(Label::Text, "Label0 with interactivity!")
+//		;
+//
+//		lbl2.set()
+//				(Property::ID, "Label2")
+//				(Property::Size, percent(100), nospec(), 0)
+//				(Label::Text, "Label0 with interactivity!")
+//		;
+//
+// -----
+//
+//		lbl0.set(),
+//				Property::ID = "Label0",
+//				Property::Size = SizeType(percent(100), nospec(), 0),
+//				Label::Text = "Label0 with interactivity!";
+//
+//		lbl1.set(),
+//				Property::ID = "Label1",
+//				Property::Size = SizeType(percent(100), nospec(), 0),
+//				Label::Text = "Label1 with interactivity!";
+//
+//		lbl2.set(),
+//				Property::ID = "Label2",
+//				Property::Size = SizeType(percent(100), nospec(), 0),
+//				Label::Text = "Label2 with interactivity!";
+//
+// -----
+//
+//		lbl0.set(Property::ID) = "Label0";
+//		lbl0.set(Property::Size) = SizeType(percent(100), nospec(), 0);
+//		lbl0.set(Label::Text) = "Label0 with interactivity!";
+//
+//		lbl1.set(Property::ID) = "Label1";
+//		lbl1.set(Property::Size) = SizeType(percent(100), nospec(), 0);
+//		lbl1.set(Label::Text) = "Label1 with interactivity!";
+//
+//		lbl2.set(Property::ID) = "Label2";
+//		lbl2.set(Property::Size) = SizeType(percent(100), nospec(), 0);
+//		lbl2.set(Label::Text) = "Label2 with interactivity!";
+//
+// -----
+//
+//		lbl0.set(Property::ID)("Label0");
+//		lbl0.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl0.set(Label::Text)("Label0 with interactivity!");
+//
+//		lbl1.set(Property::ID)("Label1");
+//		lbl1.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl1.set(Label::Text)("Label1 with interactivity!");
+//
+//		lbl2.set(Property::ID)("Label2");
+//		lbl2.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl2.set(Label::Text)("Label2 with interactivity!");
+//
+// -----
+//
+//		lbl0.set(Property::ID) = "Label0";
+//		lbl0.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl0.set(Label::Text) = "Label0 with interactivity!";
+//
+//		lbl1.set(Property::ID) = "Label1";
+//		lbl1.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl1.set(Label::Text) = "Label1 with interactivity!";
+//
+//		lbl2.set(Property::ID) = "Label2";
+//		lbl2.set(Property::Size)(percent(100), nospec(), 0);
+//		lbl2.set(Label::Text) = "Label2 with interactivity!";
+//
+// -----
+//
+//		lbl0[Property::ID] = "Label0";
+//		lbl0[Property::Size](percent(100), nospec(), 0);
+//		lbl0[Label::Text] = "Label0 with interactivity!";
+//
+//		lbl1[Property::ID] = "Label1";
+//		lbl1[Property::Size](percent(100), nospec(), 0);
+//		lbl1[Label::Text] = "Label1 with interactivity!";
+//
+//		lbl2[Property::ID] = "Label2";
+//		lbl2[Property::Size](percent(100), nospec(), 0);
+//		lbl2[Label::Text] = "Label2 with interactivity!";
+//
+// -----
+
+
 		lbl0.setComponentID("Label0");
-		lbl0.setText("Label0 with interactivity!");
+//		lbl0.setText("Label0 with interactivity!");
+//		lbl0.setText("[color=1 0 0 1]red[/color] Label0 with interactivity!");
+		lbl0.setText("[color=1 0 0 1]red[/color] [color=0.4 1 0.4 0.5]transparent light [size=40]green[/color] [font=res/font/Achafexp.ttf]The other[/size] font AV[/font]");
 		lbl0.set()
-			(Property::Size, percent(100), nospec(), 0)
-		;
+				(Property::Size, percent(100), nospec(), 0)
+				;
 
 		lbl1.setComponentID("Label1");
-		lbl1.setText("Label1 with some text on it.");
+		lbl1.setText("Label1 with some text on it.\n"
+		"[color=1 0 0 1]red[/color] [color=0.4 1 0.4 0.5]transparent light [size=40]green[/color] [font=res/font/Achafexp.ttf]The other[/size] font AV[/font]");
 		lbl1.set()
-			(Property::Size, percent(100), nospec(), 0)
-		;
+				(Property::Size, percent(100), nospec(), 0)
+				;
 
 		lbl2.setComponentID("Label2");
-		lbl2.setText("Label2 with some text on it.");
+		lbl2.setText("[color=1 1 1 0.3]Label2 with some text on it.[/color]");
 		lbl2.set()
-			(Property::Size, percent(100), nospec(), 0)
-		;
+				(Property::Size, percent(100), nospec(), 0)
+				;
 
 		lf.setComponentID("Panel");
 		lf.add(make_observer(&lbl0));
 		lf.add(make_observer(&lbl1));
 		lf.add(make_observer(&lbl2));
 		lf.set()
-			(Property::Size, percent(100), percent(100), 0);
+				(Property::Size, ratio(100), percent(100), 0);
 		;
 
 		lf.setAlign(ALIGN_TOP_LEFT);
@@ -117,29 +216,29 @@ class TestFrame : public Frame {
 			lbl0.setText(lbl0.getText() + e.utf8);
 		});
 
-		onKey.output([this](const EventKey & e) {
+		onKey.output([this](const EventKey& e) {
 			if (e.key == 256)
 				closeDefault();
-			if (e.key == 257 && e.action != 0)
-				lbl0.setText(lbl0.getText() + '\n');
-			if (e.key == 259 && e.action != 0) {
-				auto t = lbl0.getText();
-				if (t.size() > 0) {
-					t.pop_back();
-					lbl0.setText(t);
-				}
-			}
+			//			if (e.key == 257 && e.action != 0)
+			//				lbl0.setText(lbl0.getText() + '\n');
+			//			if (e.key == 259 && e.action != 0) {
+			//				auto t = lbl0.getText();
+			//				if (t.size() > 0) {
+			//					t.pop_back();
+			//					lbl0.setText(t);
+			//				}
+			//			}
 
-			if (e.key == 'X') {
+			if (e.key == 'X')
 				setDecoration(!isDecorated());
-			}
 		});
 	}
 
 public:
+
 	TestFrame(const std::string& title) : Frame(title) {
 		noisyEvents(*this);
-		setSize(1024, 1024);
+		setSize(1200, 750);
 		setPosition(POSITION_CENTER_CURRENT_MONITOR);
 		setCloseOperation(ON_CLOSE_DISPOSE);
 		setOpenGLProfile(OPENGL_PROFILE_COMPAT);
@@ -157,10 +256,10 @@ int main(int, char**) {
 	//	libv::log.allow("libv.ui.glfw");
 	//	libv::log.allow("libv.ui.layout");
 	//	libv::log.allow("libv.gl");
-	//	libv::log.allow_above(libv::Info);
 	//	libv::log.deny();
 
 	libv::log.deny("libv.ui.event");
+	libv::log.allow();
 
 	TestFrame f1("TestFrame");
 	f1.join();
