@@ -1,15 +1,20 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+handle fails - apply fallback
+	failed file
+	failed shader
+	failed program
+	failed (corrupt) font
 implement burnt in defaults
-improve string2d
 -- commit --
 
-build all
-run all
-fix all
+fix freetype raii
 -- commit --
 
 rename #include <libv/ui/resource/resource_fwd.hpp> to #include <libv/ui/resource/fwd.hpp>
+-- commit --
+
+ResourceStepResult and ResourceState to enum
 -- commit --
 
 replace "//namespace" with "// namespace"
@@ -95,6 +100,8 @@ layout: hard type (enum) align anchor and orient
 frame: split from ui
 ui / frame: remove default own thread, give them an io_service like executor
 ui: setText => set()(Label::Text, "Main Menu");
+ui: skip setter   ^^ () by making it a member instead of a function -> set(Label::Text, "Main Menu");
+ui: component if invalid was, then does nothing on invalidation
 ui: take a look at frame and component events
 ui: component property serialization and validation
 ui: rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic

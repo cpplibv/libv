@@ -12,7 +12,7 @@
 #include <array>
 #include <string>
 
-// Freetype2 forward declarations ------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 struct FT_FaceRec_;
 using FT_Face = FT_FaceRec_*;
@@ -26,36 +26,19 @@ namespace ui {
 // font family: arial
 // font face: arial italic
 // advance: distance between origin points
-// kering: difference in advance depending on the next/previous char
+// kering: difference in advance depending on the current/previous char
 
-// TODO P3: Font2D formated version which is btw more than font, its String2D
-// TODO P3: Font size by dpi and pt (only set size and indexing is the problem)
+// TODO P3: Font size by dpi and pt or px (only set size and indexing is the problem)
 // TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
 // TODO P4: enum class Weight { Bold, Normal };
 // TODO P4: Vertical lines
 // TODO P4: Freetype error handling (Check return locations) for memory leaks (?)
 // TODO P5: Slant slant = Slant::Normal;
 // TODO P5: Improved texture usage algorithm (and there is a way to reallocate a new bigger texture)
-//		either use pixel space texture coords end set uniforms for shader and in the shader recalc tx
-//		or observing dependents and invalidating them... first method preferred?
-// TODO P5: Ctor with std::array_view
-// TODO P5: default font texture size into nice constexpr variable
-// TODO PLog: Log group libv-ui-freetype for freetype err msgs
+//			use pixel space texture coords end set uniforms for vertex shader
 
 constexpr const size_t DEFAULT_FONT2D_TEXTURE_WIDTH = 512;
 constexpr const size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
-
-// -------------------------------------------------------------------------------------------------
-
-//class ShaderFont2D {
-//	libv::gl::ShaderNC fs;
-//	libv::gl::ShaderNC vs;
-//	libv::gl::ProgramNC program;
-//
-//	libv::gl::Uniform<glm::mat4> MVPmat;
-//	// Uniform MVPmat
-//	// Uniform Color
-//};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -92,6 +75,7 @@ private:
 	uint32_t currentSize;
 	std::string fontData;
 	FT_Face face = nullptr;
+	// TODO P2: unique_ptr for FT_Face
 
 private:
 	uivec2 textureSize{DEFAULT_FONT2D_TEXTURE_WIDTH, DEFAULT_FONT2D_TEXTURE_HEIGHT};

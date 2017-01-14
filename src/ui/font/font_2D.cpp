@@ -16,8 +16,8 @@
 #include <libv/gl/gl.hpp>
 // std
 #include <atomic>
-
-#include "libv/ui/config.hpp"
+// pro
+#include <libv/ui/config.hpp>
 
 namespace libv {
 namespace ui {
@@ -92,7 +92,8 @@ void Font2D::loadGL() {
 	texture.create();
 	auto tBindGuard = texture.bindGuard();
 	texture.setMagFilter(gl::MagFilter::Linear);
-	texture.setMinFilter(gl::MinFilter::Linear); // <<< validate Linear filters
+	texture.setMinFilter(gl::MinFilter::Linear);
+	// TODO P4: validate Linear filters
 
 	LIBV_GL_DEBUG_CHECK_GL();
 }
@@ -123,7 +124,6 @@ int Font2D::getLineAdvance(uint32_t size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	changeSizeOnDemand(size);
 
-	// TODO P1: something something face->glyph->advance is better than metrics doc of FT_Set_Transform
 	return face->size->metrics.height >> 6; // 26.6 format
 }
 

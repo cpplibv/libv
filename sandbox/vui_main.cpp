@@ -176,32 +176,36 @@ class TestFrame : public Frame {
 //
 // -----
 
-
 		lbl0.setComponentID("Label0");
-//		lbl0.setText("Label0 with interactivity!");
-//		lbl0.setText("[color=1 0 0 1]red[/color] Label0 with interactivity!");
-		lbl0.setText("[color=1 0 0 1]red[/color] [color=0.4 1 0.4 0.5]transparent light [size=40]green[/color] [font=res/font/Achafexp.ttf]The other[/size] font AV[/font]");
+		lbl0.setText(
+				"line -1 transparent light \n"
+				"line 0 transparent light [size=40]gA|\"Áreen[/size]\n"
+				"line 1 transparent light [size=40]gA|\"Áreen[/size]\n"
+				"line 2 transparent light [size=40]gA|\"Áreen[/size]\n"
+				"line 3 transparent light [size=40]gA|\"Áreen[/size]\n"
+				"line 4 transparent light [size=40]gA|\"Áreen[/size]\n"
+				);
 		lbl0.set()
 				(Property::Size, percent(100), nospec(), 0)
 				;
 
 		lbl1.setComponentID("Label1");
 		lbl1.setText("Label1 with some text on it.\n"
-		"[color=1 0 0 1]red[/color] [color=0.4 1 0.4 0.5]transparent light [size=40]green[/color] [font=res/font/Achafexp.ttf]The other[/size] font AV[/font]");
+					"[color=#F00]re[color=#FFF4]d[/color] [color=#6F68]transparent[/color] light [size=40]green[/color] [font=res/font/Achafexp.ttf]The other[/size] font AV[/font]");
 		lbl1.set()
 				(Property::Size, percent(100), nospec(), 0)
 				;
 
 		lbl2.setComponentID("Label2");
-		lbl2.setText("[color=1 1 1 0.3]Label2 with some text on it.[/color]");
+		lbl2.setText("[color=#FFF4]Label2 with some text on it.[/color]");
 		lbl2.set()
 				(Property::Size, percent(100), nospec(), 0)
 				;
 
 		lf.setComponentID("Panel");
-		lf.add(make_observer(&lbl0));
-		lf.add(make_observer(&lbl1));
-		lf.add(make_observer(&lbl2));
+		lf.add(make_observer(lbl0));
+		lf.add(make_observer(lbl1));
+		lf.add(make_observer(lbl2));
 		lf.set()
 				(Property::Size, ratio(100), percent(100), 0);
 		;
@@ -210,7 +214,7 @@ class TestFrame : public Frame {
 		lf.setAnchor(ALIGN_TOP_LEFT);
 		lf.setOrient(ORIENT_RIGHT_DOWN);
 
-		addComponent(make_observer(&lf));
+		addComponent(make_observer(lf));
 
 		onChar.output([this](auto e) {
 			lbl0.setText(lbl0.getText() + e.utf8);

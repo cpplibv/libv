@@ -16,9 +16,6 @@
 
 // TODO P2: fix new line 'inverting'
 // TODO P2: String2D alignments (yee, the part where FLOW Layout is kind of familiar...)
-// TODO P3: Format
-// TODO P4: multi font
-// TODO P4: multi program
 
 //newline       \n
 //tab           \t
@@ -57,8 +54,7 @@ private:
 		struct Vertex {
 			vec2 position;
 			vec2 texture0;
-		};
-		Vertex vertices[6];
+		} vertices[6];
 
 		Character(ivec2 offset, const Font2D::Character& ch) {
 			vertices[0].position = offset + ch.vertexCoord[0];

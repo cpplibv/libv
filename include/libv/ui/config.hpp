@@ -3,14 +3,13 @@
 #pragma once
 
 #include <cassert>
-//#include <cinttypes>
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: include xy log and check
+// TODO P4: include xy log and check (for checkGL)
 // TODO P4: LIBV_UI_* -> LIBV_LOG_UI_*
 // TODO P4: LIBV_UI_DEBUG_ -> LIBV_UI_DEBUG
-// TODO P5: find a good place for these assert functions
+// TODO P5: find a good place for these assert functions something something assert.hpp
 
 #ifndef LIBV_UI_DEBUG
 #    define LIBV_UI_DEBUG // TODO P5: debug flag
@@ -52,28 +51,6 @@ constexpr const char DEFAULT_PROGRAM_FILEPATH[] = "res/shader/ui/default";
 
 constexpr const char DEFAULT_FONT_VS_FILEPATH[] = "res/shader/font.vs";
 constexpr const char DEFAULT_FONT_FS_FILEPATH[] = "res/shader/font.fs";
-
-
-//namespace Priorities {
-//
-//constexpr uint32_t INLINE = 0;
-//
-//// GL:
-//constexpr uint32_t GL_FONT2D_UNLOAD = 1;
-//constexpr uint32_t GL_PROGRAM_UNLOAD = 2;
-//constexpr uint32_t GL_SHADER_UNLOAD = 3;
-//
-//constexpr uint32_t GL_SHADER_LOAD = 4;
-//constexpr uint32_t GL_PROGRAM_LOAD = 5;
-//constexpr uint32_t GL_FONT2D_LOAD = 6;
-//
-//// IO:
-//constexpr uint32_t IO_FONT2D_UNLOAD = 1;
-//
-//constexpr uint32_t IO_SHADER_LOAD = 2;
-//constexpr uint32_t IO_FONT2D_LOAD = 3;
-//
-//} //namespace Priority
 
 // -------------------------------------------------------------------------------------------------
 

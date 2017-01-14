@@ -9,8 +9,8 @@ include(cmake/util.cmake)
 # --------------------------------------------------------------------------------------------------
 
 set(CMAKE_VERBOSE_MAKEFILE off)
-set(CMAKE_BUILD_TYPE "DEBUG")
-#set(CMAKE_BUILD_TYPE "RELEASE")
+#set(CMAKE_BUILD_TYPE "DEBUG")
+set(CMAKE_BUILD_TYPE "RELEASE")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
@@ -21,7 +21,6 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 # TODO P2: use cmake copy function instead of "cp"
 # TODO P2: flag or build options to turn on/off sanitizes
 # TODO P2: debug symbol automated turn on/off
-# TODO P3: backward compatibility for pre gcc 5.1 because suggest-override
 # TODO P3: test clang build
 # TODO P5: test msvc build
 
@@ -45,6 +44,8 @@ add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_FORCE_RADIANS)
 #Macro - Pro
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
+#Macro - Assert
+add_definitions(-DNDEBUG)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -230,7 +231,7 @@ ExternalProject_Add(ext_gli
 list(APPEND EXTERNAL_PROJECT_LIST ext_range)
 ExternalProject_Add(ext_range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG a2425e6b9acd2a354f0a3693857956138dcf53a0
+	GIT_TAG bab29767cce120e11872d79a2537bc6f0be76963
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" #range is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/range
@@ -390,6 +391,7 @@ file(GLOB_RECURSE vlog_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/log/*.cpp)
 file(GLOB_RECURSE vm3_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3/*.cpp)
 file(GLOB_RECURSE vm3imp_test_src RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3imp/*.cpp)
 file(GLOB_RECURSE vsig_test_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/sig/*.cpp)
+file(GLOB_RECURSE vparse_test_src RELATIVE ${PATH_PRJ} ${PATH_TST}/parse/*.cpp)
 file(GLOB_RECURSE vui_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
 
 # Targets ------------------------------------------------------------------------------------------
@@ -409,6 +411,7 @@ add_executable(vgl_test    ${vgl_test_src})
 add_executable(vlog_test   ${vlog_test_src})
 add_executable(vm3_test    ${vm3_test_src})
 add_executable(vm3imp_test ${vm3imp_test_src})
+add_executable(vparse_test ${vparse_test_src})
 add_executable(vsig_test   ${vsig_test_src})
 add_executable(vui_test    ${vui_test_src})
 
@@ -443,6 +446,7 @@ target_link_libraries(vgl_test    -static vgl)
 target_link_libraries(vlog_test   -static fmt)
 target_link_libraries(vm3_test    -static vm3 boost_serialization-mt-s)
 target_link_libraries(vm3imp_test -static vm3)
+target_link_libraries(vparse_test -static )
 target_link_libraries(vsig_test   -static )
 target_link_libraries(vui_test    -static vui fmt vlog)
 
