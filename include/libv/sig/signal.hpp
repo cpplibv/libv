@@ -335,4 +335,4 @@ struct HistorySignal<R(T...)> : public HistorySignalImpl<T...> {
 	using HistorySignalImpl<T...>::HistorySignalImpl;
 };
 
-} //namespace libv
+} // namespace libv

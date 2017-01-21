@@ -63,5 +63,5 @@ MaterialPropertyCopier::MaterialPropertyCopier(Material& target) : target(&targe
 	VM3_PROPERTY_VISITOR_TYPE_HELPER(dvec4)
 #undef VM3_PROPERTY_VISITOR_TYPE_HELPER
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

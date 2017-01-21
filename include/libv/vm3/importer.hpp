@@ -23,5 +23,5 @@ namespace libv {
 		public:
 			static bool import(Model& model, const std::string& filePath);
 		};
-	} //namespace vm3
-} //namespace libv
+	} // namespace vm3
+} // namespace libv

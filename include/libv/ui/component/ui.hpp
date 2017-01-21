@@ -37,7 +37,7 @@ class Component;
 class UI {
 private:
 	Context context; //Layout layout;
-	PanelFlow content; //TODO P5: Change to a more primitive panel
+	PanelFlow content; // TODO P5: Change to a more primitive panel
 
 	ivec2 position;
 	ivec2 size;
@@ -68,5 +68,5 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

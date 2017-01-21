@@ -208,5 +208,5 @@ struct VertexArrayGuard : public VertexArray {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace gl
-} //namespace libv
+} // namespace gl
+} // namespace libv

@@ -272,4 +272,4 @@ inline std::string toString(Severity value) {
 	}
 }
 
-} //namespace libv
+} // namespace libv

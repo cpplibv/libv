@@ -12,8 +12,8 @@
 namespace boost {
 namespace filesystem {
 class path;
-} //namespace filesystem
-} //namespace boost
+} // namespace filesystem
+} // namespace boost
 
 namespace libv {
 namespace ui {
@@ -57,5 +57,5 @@ struct ResourceProvider {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

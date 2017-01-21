@@ -93,7 +93,7 @@ BuiltLines buildLines(Container::Store& components, vec3 parentSize, const Orien
 	return BuiltLines{std::move(lines), sumSize};
 }
 
-} //namespace
+} // namespace
 
 // PanelFlow =======================================================================================
 
@@ -147,5 +147,5 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 	return layout;
 }
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

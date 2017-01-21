@@ -299,5 +299,5 @@ void Frame::cmdCoreUpdateDisplayMode() {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

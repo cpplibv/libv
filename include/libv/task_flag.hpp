@@ -79,4 +79,4 @@ public:
 	TaskFlag() : passed(false) { }
 };
 
-} //namespace libv
+} // namespace libv

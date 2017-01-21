@@ -21,8 +21,8 @@ struct Tag {
 	std::string value;
 };
 
-} //namespace parse
-} //namespace libv
+} // namespace parse
+} // namespace libv
 
 BOOST_FUSION_ADAPT_STRUCT(
     ::libv::parse::Tag,
@@ -95,5 +95,5 @@ std::vector<Tag> parseTextTag(const std::string& str) {
 }
 
 
-} //namespace parse
-} //namespace libv
+} // namespace parse
+} // namespace libv

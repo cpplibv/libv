@@ -76,5 +76,5 @@ enum class ResourceState {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

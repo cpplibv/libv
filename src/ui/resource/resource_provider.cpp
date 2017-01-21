@@ -62,5 +62,5 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

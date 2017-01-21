@@ -76,6 +76,6 @@ void errorCallbackGLFW(int code, const char* msg) {
 	::libv::log(LIBV_POC, ::libv::Error, "libv.ui.glfw", "%d - %s", code, msg);
 }
 
-} //namespace detail
-} //namespace ui
-} //namespace libv
+} // namespace detail
+} // namespace ui
+} // namespace libv

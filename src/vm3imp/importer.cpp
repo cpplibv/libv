@@ -214,8 +214,8 @@ bool Importer::import(Model& model, const std::string& filePath) {
 	return true;
 }
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv
 
 
 

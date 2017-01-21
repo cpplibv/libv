@@ -89,5 +89,5 @@ Monitor::Monitor(GLFWmonitor* monitor) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

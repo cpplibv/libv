@@ -68,4 +68,4 @@ struct is_member_unloadable<T, void_t<decltype(
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

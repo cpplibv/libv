@@ -373,5 +373,5 @@ color to_color(const std::string& str) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace parse
-} //namespace libv
+} // namespace parse
+} // namespace libv

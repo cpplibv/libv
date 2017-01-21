@@ -12,5 +12,5 @@ namespace vm3 {
 
 extern std::unique_ptr<Model> openedModel;
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

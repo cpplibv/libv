@@ -51,4 +51,4 @@ template <typename = void> std::string unicode_to_utf8(uint32_t unicode) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

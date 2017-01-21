@@ -23,7 +23,7 @@ File::Status convertRFEtoFS(ReadFileError e) {
 	}
 }
 
-} //namespace
+} // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -52,5 +52,5 @@ File::File(const boost::filesystem::path& path_) : path_(path_) { }
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

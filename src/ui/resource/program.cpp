@@ -53,5 +53,5 @@ constexpr UIProgram::Step UIProgram::ResourceUnloadSequence[];
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

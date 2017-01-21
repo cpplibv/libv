@@ -7,5 +7,5 @@ namespace ui {
 
 // GLFW wrappers / constants here...
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

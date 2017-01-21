@@ -61,4 +61,4 @@ public:
 	}
 };
 
-} //namespace libv
+} // namespace libv

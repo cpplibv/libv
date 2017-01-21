@@ -69,4 +69,4 @@ inline std::string read_file(const boost::filesystem::path& filePath, ReadFileEr
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

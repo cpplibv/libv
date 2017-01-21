@@ -137,7 +137,7 @@ inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {
 	return observer_ptr<T>(p);
 }
 
-} //namespace libv
+} // namespace libv
 
 namespace std {
 
@@ -148,7 +148,7 @@ struct hash<::libv::observer_ptr<T>> {
 	}
 };
 
-} //namespace std
+} // namespace std
 
 // adaptive_ptr ====================================================================================
 
@@ -224,4 +224,4 @@ inline adaptive_ptr<T> make_adaptive(shared_ptr<T>&& ptr) noexcept {
 	return adaptive_ptr<T>(ptr);
 }
 
-} //namespace libv
+} // namespace libv

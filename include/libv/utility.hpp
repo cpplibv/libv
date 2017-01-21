@@ -70,7 +70,7 @@ inline constexpr size_t count_of(const T (&)[N]) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv
 
 // Strong Typedef ----------------------------------------------------------------------------------
 // Based on boost strong typedef <boost/serialization/strong_typedef.hpp>

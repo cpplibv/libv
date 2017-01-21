@@ -107,7 +107,7 @@ operator|(const BireversedectionalRange& r, reverse_if_forwarder forwarder) {
 	return reversed_if_range<const BireversedectionalRange>(r, forwarder.reversed);
 }
 
-} //namespace detail
+} // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 
@@ -134,4 +134,4 @@ reverse_if(const BireversedectionalRange& rng, bool reversed = false) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

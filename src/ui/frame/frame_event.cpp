@@ -160,8 +160,8 @@ void Frame::distributeEvents() {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv
 
 
 //Char

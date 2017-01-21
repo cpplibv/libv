@@ -55,5 +55,5 @@ bool Model::save(std::ostream&& os) const {
 	return save(os);
 }
 
-} //namespace gl
-} //namespace vlib
+} // namespace gl
+} // namespace vlib

@@ -17,9 +17,9 @@ PropertyAddress<LayoutAlign>	Align("align", 0);
 PropertyAddress<LayoutAlign>	Anchor("content", 0);
 PropertyAddress<LayoutOrient>	Orient("orient", 0);
 
-} //namespace Property
+} // namespace Property
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

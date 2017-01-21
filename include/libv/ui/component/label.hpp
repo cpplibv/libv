@@ -38,5 +38,5 @@ protected:
 	virtual void doRender(Context& context) override;
 };
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

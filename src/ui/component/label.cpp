@@ -39,5 +39,5 @@ void Label::doRender(Context& context) {
 	text.render(context);
 }
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

@@ -464,5 +464,5 @@ enum class AttributeType {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace gl
-} //namespace libv
+} // namespace gl
+} // namespace libv

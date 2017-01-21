@@ -28,6 +28,6 @@ inline bool logOGLError(const char* func, const char* file, int line) {
 	return err != GL_NO_ERROR;
 }
 
-} //namespace detail
-} //namespace gl
-} //namespace libv
+} // namespace detail
+} // namespace gl
+} // namespace libv

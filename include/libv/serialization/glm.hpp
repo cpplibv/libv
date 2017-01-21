@@ -44,5 +44,5 @@ inline void serialize(Archive& ar, ::glm::tmat4x4<T, P>& var, const unsigned int
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace serialization
-} //namespace boost
+} // namespace serialization
+} // namespace boost

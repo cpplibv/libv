@@ -7,4 +7,4 @@ namespace libv {
 
 Logger log;
 
-} //namespace libv
+} // namespace libv

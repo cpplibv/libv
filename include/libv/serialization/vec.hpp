@@ -51,5 +51,5 @@ struct tracking_level<::libv::vec_t<N, T>> {
 };
 
 
-} //namespace serialization
-} //namespace boost
+} // namespace serialization
+} // namespace boost

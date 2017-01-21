@@ -13,7 +13,7 @@ namespace gl {
 
 namespace detail {
 GLuint gliCreateTexture(char const* data, std::size_t size);
-} //namespace detail
+} // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 template <TextureBindTarget BindTarget>
@@ -294,8 +294,8 @@ struct Sampler {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace gl
-} //namespace libv
+} // namespace gl
+} // namespace libv
 
 
 // =================================================================================================

@@ -99,5 +99,5 @@ public:
 	}
 	virtual ~Model() { }
 };
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

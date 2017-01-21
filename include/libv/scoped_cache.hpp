@@ -171,7 +171,7 @@ inline void swap(cache_ptr<T> & p1, cache_ptr<T> & p2) noexcept {
 	p1.swap(p2);
 }
 
-} //namespace libv
+} // namespace libv
 
 namespace std {
 
@@ -182,7 +182,7 @@ struct hash<::libv::cache_ptr<T>> {
 	}
 };
 
-} //namespace std
+} // namespace std
 
 namespace libv {
 
@@ -346,4 +346,4 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

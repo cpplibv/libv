@@ -91,7 +91,7 @@ ResourceView<T> cacheStore(Cache& cache, const Key& key, Args&&... args) {
 	return res_view;
 }
 
-} //namespace
+} // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -181,5 +181,5 @@ UITexture2D_view ResourceProviderImpl::texture(const boost::filesystem::path& fi
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

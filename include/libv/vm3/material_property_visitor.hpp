@@ -90,5 +90,5 @@ private:
 	void visit(const std::string& name, const dvec3& value) override;
 	void visit(const std::string& name, const dvec4& value) override;
 };
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

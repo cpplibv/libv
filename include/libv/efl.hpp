@@ -10,7 +10,7 @@ namespace efl { // -------------------------------------------------------------
 void load();
 void unload();
 
-} //namespace efl // -------------------------------------------------------------------------------
+} // namespace efl // -------------------------------------------------------------------------------
 
 // --- is_efl_loadable -----------------------------------------------------------------------------
 template <typename T, typename = void> struct is_efl_loadable : std::false_type {
@@ -77,6 +77,6 @@ inline auto unload(T& p) -> decltype(::libv::efl::unload(*p)) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace lookup
-} //namespace efl
-} //namespace libv
+} // namespace lookup
+} // namespace efl
+} // namespace libv

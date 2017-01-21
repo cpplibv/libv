@@ -54,9 +54,9 @@ public:
 	Trackable(const Trackable& other) = delete;
 };
 
-} //namespace libv
+} // namespace libv
 
-//namespace libv {
+// namespace libv {
 //
 //struct TrackableBase {
 //	virtual void connect(TrackableBase* ptr) = 0;
@@ -121,4 +121,4 @@ public:
 //	}
 //};
 //
-//} //namespace libv
+//} // namespace libv

@@ -626,4 +626,4 @@ using vec2 = vec2_t<float>;
 using vec3 = vec3_t<float>;
 using vec4 = vec4_t<float>;
 
-} //namespace libv
+} // namespace libv

@@ -43,5 +43,5 @@ namespace libv {
 		const std::string& Material::getShader() const {
 			return shader;
 		}
-	} //namespace vm3
-} //namespace libv
+	} // namespace vm3
+} // namespace libv

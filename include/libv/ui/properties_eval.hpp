@@ -34,5 +34,5 @@ inline vec3 evalLayoutSize(const LayoutInfo& parent, const Component& component)
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

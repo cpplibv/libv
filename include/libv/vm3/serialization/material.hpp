@@ -98,8 +98,8 @@ namespace libv {
 				}
 			}
 		};
-	} //namespace vm3
-} //namespace libv
+	} // namespace vm3
+} // namespace libv
 
 BOOST_SERIALIZATION_SPLIT_FREE(::libv::vm3::Material)
 
@@ -113,5 +113,5 @@ namespace boost {
 		static void load(Archive& ar, ::libv::vm3::Material& var, const unsigned int ver) {
 			::libv::vm3::MaterialSerialization::load(ar, var, ver);
 		}
-	} //namespace boost
-} //namespace serialization
+	} // namespace boost
+} // namespace serialization

@@ -133,6 +133,6 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 	LIBV_GL_DEBUG_CHECK_GL();
 	return TextureName;
 }
-} //namespace detail
-} //namespace gl
-} //namespace libv
+} // namespace detail
+} // namespace gl
+} // namespace libv

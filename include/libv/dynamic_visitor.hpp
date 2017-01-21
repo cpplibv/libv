@@ -34,4 +34,4 @@ struct DynamicVisitable : public DynamicVisitableBase {
 	}
 };
 
-} //namespace libv
+} // namespace libv

@@ -34,5 +34,5 @@ struct CommandMaterialPropertySet : public Command {
 	virtual void execute() override;
 };
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

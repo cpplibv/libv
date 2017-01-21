@@ -316,5 +316,5 @@ public:
 	virtual ~Frame();
 };
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

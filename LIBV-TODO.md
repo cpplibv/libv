@@ -17,11 +17,6 @@ rename #include <libv/ui/resource/resource_fwd.hpp> to #include <libv/ui/resourc
 ResourceStepResult and ResourceState to enum
 -- commit --
 
-replace "//namespace" with "// namespace"
-replace "//TODO" with "// TODO"
-replace "//Note" with "// Note"
--- commit --
-
 state based ui
 separate control and data!
 -- commit --

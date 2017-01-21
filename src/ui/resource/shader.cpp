@@ -50,5 +50,5 @@ constexpr UIShader::Step UIShader::ResourceUnloadSequence[];
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

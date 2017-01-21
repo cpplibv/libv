@@ -415,8 +415,8 @@ using Attribute = AttributeFixLocation<T>;
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace gl
-} //namespace libv
+} // namespace gl
+} // namespace libv
 
 
 //Returned Symbolic Contant | Shader Uniform Type

@@ -98,5 +98,5 @@ using PropertyAddress = PropertyMap::Key<T>;
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

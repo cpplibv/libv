@@ -22,5 +22,5 @@ constexpr UITexture2D::Step UITexture2D::ResourceUnloadSequence[];
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

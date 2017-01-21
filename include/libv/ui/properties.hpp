@@ -106,9 +106,9 @@ extern PropertyAddress<LayoutOrient> Orient;
 //extern PropertyAddress<vec4> Margin;
 //extern PropertyAddress<vec4> Pedding;
 
-} //namespace Property
+} // namespace Property
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

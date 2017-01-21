@@ -494,5 +494,5 @@ inline void GL::frontFaceCW() {
 	LIBV_GL_DEBUG_CHECK_GL();
 }
 
-} //namespace gl
-} //namespace libv
+} // namespace gl
+} // namespace libv

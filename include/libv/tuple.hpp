@@ -32,4 +32,4 @@ decltype(Tuple<typename std::tuple_element<Is, Tuple<Args...>>::type...>(std::fo
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace libv
+} // namespace libv

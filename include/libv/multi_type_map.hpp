@@ -28,7 +28,7 @@ struct BasicMultiTypeMapAddressProvider {
 		return ++lastAddress;
 	}
 };
-} //namespace detail
+} // namespace detail
 
 template<template<typename...> class Container = std::map>
 struct BasicMultiTypeMap {
@@ -159,4 +159,4 @@ public:
 
 using MultiTypeMap = BasicMultiTypeMap<>;
 
-} //namespace libv
+} // namespace libv

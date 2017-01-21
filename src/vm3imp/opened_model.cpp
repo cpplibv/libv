@@ -8,5 +8,5 @@ namespace vm3 {
 
 std::unique_ptr<Model> openedModel;
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

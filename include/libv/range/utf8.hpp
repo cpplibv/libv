@@ -49,7 +49,7 @@ struct uft8_to_codepoint_view : aux_uft8_to_unicode_view {
 		aux_uft8_to_unicode_view(s.begin(), s.end()) { }
 };
 
-} //namespace detail
+} // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 
@@ -73,5 +73,5 @@ struct uft8_to_codepoint_fn {
 
 RANGES_INLINE_VARIABLE(ranges::view::view<uft8_to_codepoint_fn>, uft8_to_codepoint)
 
-} //namespace view
-} //namespace libv
+} // namespace view
+} // namespace libv

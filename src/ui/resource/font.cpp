@@ -41,5 +41,5 @@ constexpr UIFont2D::Step UIFont2D::ResourceUnloadSequence[];
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

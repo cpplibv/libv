@@ -284,5 +284,5 @@ void String2D::buildImpl(Context& context) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

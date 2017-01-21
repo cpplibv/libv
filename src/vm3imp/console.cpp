@@ -170,5 +170,5 @@ void Console::execute(const std::string& cmd) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv

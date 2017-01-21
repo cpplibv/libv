@@ -30,5 +30,5 @@ using UIShader_view = ResourceView<UIShader>;
 using UIProgram_view = ResourceView<UIProgram>;
 using UITexture2D_view = ResourceView<UITexture2D>;
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

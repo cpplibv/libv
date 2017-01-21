@@ -35,8 +35,8 @@ struct ModelSerialization {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace vm3
-} //namespace libv
+} // namespace vm3
+} // namespace libv
 
 namespace boost {
 namespace serialization {
@@ -82,5 +82,5 @@ void serialize(Archive& ar, ::libv::vm3::Model& var, const unsigned int ver) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace boost
-} //namespace serialization
+} // namespace boost
+} // namespace serialization

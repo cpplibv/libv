@@ -14,7 +14,7 @@
 // TODO P5: Review every event and change int to bool or enum, and (double, double) to dvec2
 // TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
 
-//namespace Key {
+// namespace Key {
 //enum key_t {
 //	Unknown,
 //	F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
@@ -145,5 +145,5 @@ struct EventWindowSize {
 	EventWindowSize(const EventWindowSize& orig) = default;
 };
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

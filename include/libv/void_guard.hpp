@@ -29,4 +29,4 @@ struct VoidGuard : public VoidGuardBase {
 	}
 };
 
-} //namespace libv
+} // namespace libv

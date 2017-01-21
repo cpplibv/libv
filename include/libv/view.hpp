@@ -166,7 +166,7 @@ inline void swap(view_ptr<T>& p1, view_ptr<T>& p2) noexcept {
 //	return view_ptr<T>(std::forward<Args>(args)...);
 //}
 
-} //namespace libv
+} // namespace libv
 
 // -------------------------------------------------------------------------------------------------
 
@@ -180,5 +180,5 @@ struct hash<::libv::view_ptr<T>>
 	}
 };
 
-} //namespace std
+} // namespace std
 

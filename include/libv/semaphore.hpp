@@ -29,4 +29,4 @@ public:
 	Semaphore(bool passed = false) : passed(passed) { }
 };
 
-} //namespace libv
+} // namespace libv

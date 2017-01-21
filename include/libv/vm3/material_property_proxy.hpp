@@ -37,5 +37,5 @@ namespace libv {
 				return ptr != nullptr;
 			}
 		};
-	} //namespace vm3
-} //namespace libv
+	} // namespace vm3
+} // namespace libv

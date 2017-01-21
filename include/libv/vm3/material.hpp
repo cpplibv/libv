@@ -85,5 +85,5 @@ namespace libv {
 				return get<T>(name);
 			}
 		};
-	} //namespace vm3
-} //namespace libv
+	} // namespace vm3
+} // namespace libv

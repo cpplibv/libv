@@ -42,7 +42,7 @@ void decFreetypeLibRef() {
 			LIBV_LOG_UI_FT_ERROR("FT_Done_FreeType failed: [%d]", err);
 }
 
-} //namespace
+} // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -269,8 +269,8 @@ void Font2D::unbind() {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv
 
 
 // Texture Fill algorithm (painfully basic version)

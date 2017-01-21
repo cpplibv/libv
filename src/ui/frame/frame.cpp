@@ -419,5 +419,5 @@ Frame::~Frame() {
 	unregisterFrame(this);
 }
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv

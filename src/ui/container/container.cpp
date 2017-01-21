@@ -88,5 +88,5 @@ void Container::doRender(Context& context) {
 
 // -------------------------------------------------------------------------------------------------
 
-} //namespace ui
-} //namespace libv
+} // namespace ui
+} // namespace libv
