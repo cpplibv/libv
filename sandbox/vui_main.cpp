@@ -18,45 +18,28 @@ using namespace libv;
 using namespace libv::ui;
 
 void noisyEvents(Frame& frame) {
-	(void) frame;
-	frame.onChar.output([](const EventChar& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event Char: %u %s", e.unicode, e.utf8); });
-	frame.onCharMods.output([](const EventCharMods& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event CharMods: %d %u %s", e.mods, e.unicode, e.utf8); });
-	frame.onCursorEnter.output([](const EventCursorEnter& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event CursorEnter: %d", e.entered); });
-	frame.onCursorPos.output([](const EventCursorPos& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event CursorPos: %f %f", e.xpos, e.ypos); });
-	frame.onDrop.output([](const EventDrop& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event Drop: %d ...", e.strings.size()); });
-	frame.onFramebufferSize.output([](const EventFramebufferSize& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event FramebufferSize: %d %d", e.size.x, e.size.y); });
-	frame.onKey.output([](const EventKey& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event Key: %d %d %d %d", e.action, e.key, e.mode, e.scancode); });
-	frame.onMouseButton.output([](const EventMouseButton& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event MouseButton: %d %d %d", e.action, e.button, e.mods); });
-	frame.onScroll.output([](const EventScroll& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event Scroll: %f %f", e.xoffset, e.yoffset); });
-	frame.onWindowClose.output([](const EventWindowClose &) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowClose"); });
-	frame.onWindowFocus.output([](const EventWindowFocus& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowFocus: %d", e.focused); });
-	frame.onWindowIconify.output([](const EventWindowIconify& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowIconify: %d", e.iconified); });
-	frame.onWindowPos.output([](const EventWindowPos& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowPos: %d, %d", e.position.x, e.position.y); });
-	frame.onWindowRefresh.output([](const EventWindowRefresh &) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowRefresh"); });
-	frame.onWindowSize.output([](const EventWindowSize& e) {
-		LIBV_LOG_UI_EVENT_TRACE("Event WindowSize: %d %d", e.size.x, e.size.y); });
+	const auto pretty_print_to_log = [](const auto& event) {
+		LIBV_LOG_UI_EVENT_TRACE("Event: %s", event.toPrettyString());
+	};
 
-	//		frame.onClose.output([](Frame* f) {
-	//			LIBV_LOG_UI_EVENT_TRACE("Event onClose: %d", f); return true; });
-	//		frame.onClosed.output([](Frame* f) {
-	//			LIBV_LOG_UI_EVENT_TRACE("Event onClosed: %d", f); });
+	frame.onChar.output(pretty_print_to_log);
+	frame.onCharMods.output(pretty_print_to_log);
+	frame.onDrop.output(pretty_print_to_log);
+	frame.onFramebufferSize.output(pretty_print_to_log);
+	frame.onKey.output(pretty_print_to_log);
+	frame.onMouseButton.output(pretty_print_to_log);
+	frame.onMouseEnter.output(pretty_print_to_log);
+	frame.onMousePosition.output(pretty_print_to_log);
+	frame.onMouseScroll.output(pretty_print_to_log);
+	frame.onWindowClose.output(pretty_print_to_log);
+	frame.onWindowFocus.output(pretty_print_to_log);
+	frame.onWindowIconify.output(pretty_print_to_log);
+	frame.onWindowPosition.output(pretty_print_to_log);
+	frame.onWindowRefresh.output(pretty_print_to_log);
+	frame.onWindowSize.output(pretty_print_to_log);
 }
 
-//#define checkGLEWSupport(ext) LIBV_LOG_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+//#define LIBV_GL_CHECKEWSupport(ext) LIBV_LOG_INFO("GLEW: %-40s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
 //
 //void initGLEW() {
 //	if (GLenum err = glewInit() != GLEW_OK)
@@ -66,12 +49,12 @@ void noisyEvents(Frame& frame) {
 //	LIBV_LOG_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
 //	LIBV_LOG_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
 //
-//	checkGLEWSupport(GL_VERSION_3_3);
-//	checkGLEWSupport(GL_VERSION_4_5);
-//	checkGLEWSupport(GL_ARB_draw_elements_base_vertex);
-//	checkGLEWSupport(GL_ARB_gpu_shader_fp64);
+//	LIBV_GL_CHECKEWSupport(GL_VERSION_3_3);
+//	LIBV_GL_CHECKEWSupport(GL_VERSION_4_5);
+//	LIBV_GL_CHECKEWSupport(GL_ARB_draw_elements_base_vertex);
+//	LIBV_GL_CHECKEWSupport(GL_ARB_gpu_shader_fp64);
 //
-//	checkGL();
+//	LIBV_GL_CHECK();
 //}
 class TestFrame : public Frame {
 	Label lbl0;
@@ -262,8 +245,12 @@ int main(int, char**) {
 	//	libv::log.allow("libv.gl");
 	//	libv::log.deny();
 
-	libv::log.deny("libv.ui.event");
-	libv::log.allow();
+	libv::log.allow("libv.ui.event");
+	libv::log.deny();
+
+//	libv::log.deny("libv.ui.event");
+//	libv::log.deny("libv.ui.resource");
+//	libv::log.allow();
 
 	TestFrame f1("TestFrame");
 	f1.join();

@@ -7,25 +7,19 @@
 // libv
 #include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
-#include <libv/worker_thread.hpp>
 #include <libv/utility.hpp>
+#include <libv/worker_thread.hpp>
 // std
 #include <atomic>
-#include <condition_variable>
-#include <map>
-#include <memory>
-#include <mutex>
-#include <set>
+#include <array>
 #include <string>
-#include <thread>
 // pro
 #include <libv/ui/component/component.hpp>
 #include <libv/ui/component/ui.hpp>
 #include <libv/ui/events/events.hpp>
+#include <libv/ui/events/inputs.hpp>
 #include <libv/ui/monitor.hpp>
 
-// TODO P2: i feel there is waaaay to much include here. even if not... eliminate some.
-// TODO P2: onClosed and initContext and termContext should make something about there names...
 // TODO P3: future proxy for frame async operations: frame.show().wait();
 
 class GLFWwindow;
@@ -153,17 +147,17 @@ private:
 private:
 	void glfwCallback(const EventChar&);
 	void glfwCallback(const EventCharMods&);
-	void glfwCallback(const EventCursorEnter&);
-	void glfwCallback(const EventCursorPos&);
 	void glfwCallback(const EventDrop&);
 	void glfwCallback(const EventFramebufferSize&);
 	void glfwCallback(const EventKey&);
 	void glfwCallback(const EventMouseButton&);
-	void glfwCallback(const EventScroll&);
+	void glfwCallback(const EventMouseEnter&);
+	void glfwCallback(const EventMousePosition&);
+	void glfwCallback(const EventMouseScroll&);
 	void glfwCallback(const EventWindowClose&);
 	void glfwCallback(const EventWindowFocus&);
 	void glfwCallback(const EventWindowIconify&);
-	void glfwCallback(const EventWindowPos&);
+	void glfwCallback(const EventWindowPosition&);
 	void glfwCallback(const EventWindowRefresh&);
 	void glfwCallback(const EventWindowSize&);
 
@@ -172,44 +166,50 @@ private:
 	void distributeEvents();
 
 private:
-	CapacitivSignal<const EventChar&> eventQueChar;
-	CapacitivSignal<const EventCharMods&> eventQueCharMods;
-	CapacitivSignal<const EventCursorEnter&> eventQueCursorEnter;
-	CapacitivSignal<const EventCursorPos&> eventQueCursorPos;
-	CapacitivSignal<const EventDrop&> eventQueDrop;
-	CapacitivSignal<const EventFramebufferSize&> eventQueFramebufferSize;
-	CapacitivSignal<const EventKey&> eventQueKey;
-	CapacitivSignal<const EventMouseButton&> eventQueMouseButton;
-	CapacitivSignal<const EventScroll&> eventQueScroll;
-	CapacitivSignal<const EventWindowClose&> eventQueWindowClose;
-	CapacitivSignal<const EventWindowFocus&> eventQueWindowFocus;
-	CapacitivSignal<const EventWindowIconify&> eventQueWindowIconify;
-	CapacitivSignal<const EventWindowPos&> eventQueWindowPos;
-	CapacitivSignal<const EventWindowRefresh&> eventQueWindowRefresh;
-	CapacitivSignal<const EventWindowSize&> eventQueWindowSize;
+	template <typename T>
+	using EventQue = CapacitivSignal<const T&>;
+
+	EventQue<EventChar> eventQueChar;
+	EventQue<EventCharMods> eventQueCharMods;
+	EventQue<EventDrop> eventQueDrop;
+	EventQue<EventFramebufferSize> eventQueFramebufferSize;
+	EventQue<EventKey> eventQueKey;
+	EventQue<EventMouseButton> eventQueMouseButton;
+	EventQue<EventMouseEnter> eventQueMouseEnter;
+	EventQue<EventMousePosition> eventQueMousePosition;
+	EventQue<EventMouseScroll> eventQueMouseScroll;
+	EventQue<EventWindowClose> eventQueWindowClose;
+	EventQue<EventWindowFocus> eventQueWindowFocus;
+	EventQue<EventWindowIconify> eventQueWindowIconify;
+	EventQue<EventWindowPosition> eventQueWindowPosition;
+	EventQue<EventWindowRefresh> eventQueWindowRefresh;
+	EventQue<EventWindowSize> eventQueWindowSize;
 
 public:
-	Signal<const EventChar&> onChar;
-	Signal<const EventCharMods&> onCharMods;
-	Signal<const EventCursorEnter&> onCursorEnter;
-	Signal<const EventCursorPos&> onCursorPos;
-	Signal<const EventDrop&> onDrop;
-	Signal<const EventFramebufferSize&> onFramebufferSize;
-	Signal<const EventKey&> onKey;
-	Signal<const EventMouseButton&> onMouseButton;
-	Signal<const EventScroll&> onScroll;
-	Signal<const EventWindowClose&> onWindowClose;
-	Signal<const EventWindowFocus&> onWindowFocus;
-	Signal<const EventWindowIconify&> onWindowIconify;
-	Signal<const EventWindowPos&> onWindowPos;
-	Signal<const EventWindowRefresh&> onWindowRefresh;
-	Signal<const EventWindowSize&> onWindowSize;
+	template <typename T>
+	using Event = Signal<const T&>;
+
+	Event<EventChar> onChar;
+	Event<EventCharMods> onCharMods;
+	Event<EventDrop> onDrop;
+	Event<EventFramebufferSize> onFramebufferSize;
+	Event<EventKey> onKey;
+	Event<EventMouseButton> onMouseButton;
+	Event<EventMouseEnter> onMouseEnter;
+	Event<EventMousePosition> onMousePosition;
+	Event<EventMouseScroll> onMouseScroll;
+	Event<EventWindowClose> onWindowClose;
+	Event<EventWindowFocus> onWindowFocus;
+	Event<EventWindowIconify> onWindowIconify;
+	Event<EventWindowPosition> onWindowPosition;
+	Event<EventWindowRefresh> onWindowRefresh;
+	Event<EventWindowSize> onWindowSize;
 
 	/** Event invoked on frame closing by frame's thread. Usable for interrupting close.
 	 * This event occures even if the default close operation does not close the frame.
 	 * If the returned value is False the closing operation will be interrupted.
 	 * @return False: interrupt close; True: proceed */
-	Signal<bool(Frame*) > onClose;
+	Signal<bool(Frame*)> onClose;
 	/** Event invoked if the frame is closed by frame's thread.
 	 * Can't be used for interrupting close.
 	 * Event occurs when the window is ALREADY CLOSED,
@@ -247,6 +247,11 @@ private:
 	TypeDisplayMode displayMode = DISPLAY_MODE_WINDOWED;
 
 	std::string title;
+
+	std::array<std::atomic<KeyState>, to_value(Key::Last)> keyStates;
+	std::array<std::atomic<KeyState>, to_value(Mouse::Last)> mouseStates;
+	std::atomic<uint64_t> mousePosition{0}; // coded as x:24.8 y:24.8
+	std::atomic<uint64_t> scrollPosition{0}; // coded as x:24.8 y:24.8
 
 	// ---------------------------------------------------------------------------------------------
 private:
@@ -292,7 +297,23 @@ public:
 	bool isVisible() const;
 	// * * *
 
-	const Monitor* getCurrentMonitor() const;
+	const Monitor& getCurrentMonitor() const;
+
+public:
+	KeyState getKey(Key key);
+	bool isKeyPressed(Key key);
+	bool isKeyReleased(Key key);
+
+	KeyState getMouse(Mouse key);
+	bool isMousePressed(Mouse key);
+	bool isMouseReleased(Mouse key);
+
+	fvec2 getMousePosition();
+	fvec2 getScrollPosition();
+
+	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 private:
 	void loopInit();

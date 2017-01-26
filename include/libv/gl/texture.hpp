@@ -7,6 +7,8 @@
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/guard.hpp>
+#include <libv/gl/log.hpp>
+
 
 namespace libv {
 namespace gl {
@@ -37,7 +39,7 @@ public:
 	inline void create() {
 		LIBV_GL_DEBUG_ASSERT(textureID == 0);
 		glGenTextures(1, &textureID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (textureID == 0)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
@@ -50,7 +52,7 @@ public:
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glDeleteTextures(1, &textureID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		textureID = 0;
 	}
 	inline void adopt(GLuint id) {
@@ -60,7 +62,7 @@ public:
 	inline void bind() {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glBindTexture(to_value(BindTarget), textureID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline BindGuard<Texture<BindTarget>> bindGuard() {
 		return BindGuard<Texture<BindTarget>>(*this);
@@ -68,131 +70,131 @@ public:
 	inline void unbind() {
 		LIBV_GL_DEBUG_ASSERT(to_value(BindTarget) != 0);
 		glBindTexture(to_value(BindTarget), 0);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage1D(size_t levels, InternalFormat internalFormat, uint32_t width) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexStorage1D(to_value(BindTarget), levels, to_value(internalFormat), width);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage2D(size_t levels, InternalFormat internalFormat, uint32_t width, uint32_t height) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexStorage2D(to_value(BindTarget), levels, to_value(internalFormat), width, height);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage3D(size_t levels, InternalFormat internalFormat, uint32_t width, uint32_t height, uint32_t depth) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexStorage3D(to_value(BindTarget), levels, to_value(internalFormat), width, height, depth);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image1D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexImage1D(to_value(BindTarget), level, to_value(internalFormat), width, 0, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image2D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexImage2D(to_value(BindTarget), level, to_value(internalFormat), width, height, 0, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image3D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, uint32_t depth, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexImage3D(to_value(BindTarget), level, to_value(internalFormat), width, height, depth, 0, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage1D(size_t level, int32_t xOffset, Format dataFormat, DataType dataType, uint32_t width, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexSubImage1D(to_value(BindTarget), level, xOffset, width, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage2D(size_t level, int32_t xOffset, int32_t yOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexSubImage2D(to_value(BindTarget), level, xOffset, yOffset, width, height, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage2D(CubeSide cubeSide, size_t level, int32_t xOffset, int32_t yOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexSubImage2D(to_value(cubeSide), level, xOffset, yOffset, width, height, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage3D(size_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, uint32_t depth, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glTexSubImage3D(to_value(BindTarget), level, xOffset, yOffset, zOffset, width, height, depth, to_value(dataFormat), to_value(dataType), data);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setDepthStencilMode(DepthStencilMode mode) {
 		glTexParameteri(to_value(BindTarget), GL_DEPTH_STENCIL_TEXTURE_MODE, to_value(mode));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setBaseLevel(size_t level) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_BASE_LEVEL, level);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setMaxLevel(size_t level) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MAX_LEVEL, level);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setBorderColor(float r, float g, float b, float a) {
 		float value[]{r, g, b, a};
 		glTexParameterfv(to_value(BindTarget), GL_TEXTURE_BORDER_COLOR, value);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setBorderColor(GLint r, GLint g, GLint b, GLint a) {
 		GLint value[]{r, g, b, a};
 		glTexParameteriv(to_value(BindTarget), GL_TEXTURE_BORDER_COLOR, value);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setCompareMode(CompareMode mode) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_COMPARE_MODE, to_value(mode));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setCompareFunc(TestFunction func) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_COMPARE_FUNC, to_value(func));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setLODBias(float bias) {
 		glTexParameterf(to_value(BindTarget), GL_TEXTURE_LOD_BIAS, bias);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setMagFilter(MagFilter filter) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MAG_FILTER, to_value(filter));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setMaxLOD(float value) {
 		glTexParameterf(to_value(BindTarget), GL_TEXTURE_MAX_LOD, value);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setMinFilter(MinFilter filter) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MIN_FILTER, to_value(filter));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setMinLOD(float value) {
 		glTexParameterf(to_value(BindTarget), GL_TEXTURE_MIN_LOD, value);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzle(GLint r, GLint g, GLint b, GLint a) {
 		GLint value[]{r, g, b, a};
 		glTexParameteriv(to_value(BindTarget), GL_TEXTURE_SWIZZLE_RGBA, value);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzle(Swizzle r, Swizzle g, Swizzle b, Swizzle a) {
 		setSwizzle(to_value(r), to_value(g), to_value(b), to_value(a));
 	}
 	inline void setSwizzleR(GLint swizzle) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_SWIZZLE_R, swizzle);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzleG(GLint swizzle) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_SWIZZLE_G, swizzle);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzleB(GLint swizzle) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_SWIZZLE_B, swizzle);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzleA(GLint swizzle) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_SWIZZLE_A, swizzle);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setSwizzleR(Swizzle swizzle) {
 		setSwizzleR(to_value(swizzle));
@@ -209,25 +211,25 @@ public:
 	inline void setWrap(Wrap s, Wrap t) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_S, to_value(s));
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_T, to_value(t));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setWrap(Wrap s, Wrap t, Wrap r) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_S, to_value(s));
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_T, to_value(t));
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_R, to_value(r));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setWrapS(Wrap wrap) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_S, to_value(wrap));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setWrapT(Wrap wrap) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_T, to_value(wrap));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void setWrapR(Wrap wrap) {
 		glTexParameteri(to_value(BindTarget), GL_TEXTURE_WRAP_R, to_value(wrap));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 public:
@@ -322,7 +324,7 @@ struct Sampler {
 //		glTexImage1D(target, i, internalFormat, width, 0, format, type, nullptr);
 //		width = std::max(1, (width / 2));
 //	}
-//	LIBV_GL_DEBUG_CHECK_GL();
+//	LIBV_GL_DEBUG_CHECK();
 //}
 //
 //inline void emulateStorage2D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height) {
@@ -362,7 +364,7 @@ struct Sampler {
 //			height = std::max(1, (height / 2));
 //		}
 //	}
-//	LIBV_GL_DEBUG_CHECK_GL();
+//	LIBV_GL_DEBUG_CHECK();
 //}
 //inline void emulateStorage3D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height, uint32_t depth) {
 //	glGenTextures(3, &textureID);
@@ -391,5 +393,5 @@ struct Sampler {
 //			height = std::max(1, (height / 2));
 //		}
 //	}
-//	LIBV_GL_DEBUG_CHECK_GL();
+//	LIBV_GL_DEBUG_CHECK();
 //}

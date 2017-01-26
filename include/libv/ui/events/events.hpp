@@ -2,6 +2,9 @@
 
 #pragma once
 
+// ext
+#include <boost/algorithm/string/join.hpp> // toPrettyString
+#include <fmt/format.h> // toPrettyString
 // libv
 #include <libv/string.hpp>
 #include <libv/vec.hpp>
@@ -9,24 +12,15 @@
 #include <cstring>
 #include <string>
 #include <vector>
+// pro
+#include <libv/ui/events/inputs.hpp>
+#include <libv/utility.hpp>
 
 // TODO P5: Most of the event should get a observer_ptr<Frame> as member
 // TODO P5: Review every event and change int to bool or enum, and (double, double) to dvec2
 // TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
-
-// namespace Key {
-//enum key_t {
-//	Unknown,
-//	F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12,
-//	A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
-//	Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9,
-//	LeftBracket, RightBracket, Semicolon, Comma, Period, Quote, Slash, Backslash, Tilde, Equals, Hyphen,
-//	Escape, Control, Shift, Alt, Space, Enter, Backspace, Tab, PageUp, PageDown, End, Home, Insert, Delete, Pause,
-//	Left, Right, Up, Down,
-//	Numpad0, Numpad1, Numpad2, Numpad3, Numpad4, Numpad5, Numpad6, Numpad7, Numpad8, Numpad9,
-//	Add, Subtract, Multiply, Divide
-//};
-//}
+//			EventWindowRefresh is not that simple, i think i have to work with it to 'force' refresh
+//			if context is frozen due to event qua 'lock' in glfw (moving window)
 
 namespace libv {
 namespace ui {
@@ -42,7 +36,10 @@ struct EventChar {
 	EventChar(uint32_t unicode) : unicode(unicode) {
 		libv::unicode_to_utf8(utf8, unicode);
 	}
-	EventChar(const EventChar& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Char: unicode = {}, utf8 = {}", unicode, utf8);
+	}
 };
 
 struct EventCharMods {
@@ -52,19 +49,10 @@ struct EventCharMods {
 	EventCharMods(uint32_t unicode, int mods) : unicode(unicode), mods(mods) {
 		libv::unicode_to_utf8(utf8, unicode);
 	}
-	EventCharMods(const EventCharMods& orig) = default;
-};
 
-struct EventCursorEnter {
-	int entered;
-	EventCursorEnter(int entered) : entered(entered) { }
-	EventCursorEnter(const EventCursorEnter& orig) = default;
-};
-
-struct EventCursorPos {
-	double xpos, ypos;
-	EventCursorPos(double xpos, double ypos) : xpos(xpos), ypos(ypos) { }
-	EventCursorPos(const EventCursorPos& orig) = default;
+	std::string toPrettyString() const {
+		return fmt::format("Char Mods: unicode = {}, utf8 = {}, mode = {}", unicode, utf8, mods);
+	}
 };
 
 struct EventDrop {
@@ -74,75 +62,135 @@ struct EventDrop {
 			strings.emplace_back(path[i]);
 	}
 	EventDrop(std::vector<std::string> strings) : strings(strings) { }
-	EventDrop(const EventDrop& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Drop: size = {}, contents: \n\"{}\"",
+				strings.size(), boost::algorithm::join(strings, "\"\n\""));
+	}
 };
 
 struct EventFramebufferSize {
 	ivec2 size;
 	EventFramebufferSize(int width, int height) : size(width, height) { }
 	EventFramebufferSize(ivec2 size) : size(size) { }
-	EventFramebufferSize(const EventFramebufferSize& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Framebuffer Size: size = ({}, {})", size.x, size.y);
+	}
 };
 
 struct EventKey {
-	int key, scancode, action, mode;
+	Key key;
+	int scancode, action, mode;
 	// TODO P4: Strongly typed enums for these variables, action?, mode?
 	EventKey(int key, int scancode, int action, int mode) :
-		key(key), scancode(scancode), action(action), mode(mode) { }
-	EventKey(const EventKey& orig) = default;
+		key(static_cast<Key>(key)), scancode(scancode), action(action), mode(mode) { }
 
+	std::string toPrettyString() const {
+		return fmt::format("Key: key = {}, scancode = {}, action = {}, mode = {}",
+				to_value(key), scancode, action, mode);
+	}
 };
 
 struct EventMonitor {
-	const Monitor* monitor;
+	const Monitor& monitor;
 	int event;
-	EventMonitor(const Monitor* monitor, int event) : monitor(monitor), event(event) { }
-	EventMonitor(const EventMonitor& orig) = default;
+	EventMonitor(const Monitor& monitor, int event) : monitor(monitor), event(event) { }
+
+	std::string toPrettyString() const {
+//		return fmt::format("Monitor: name = {}, event = {}", monitor.name, event);
+		return fmt::format("Monitor: event = {}", event);
+	}
 };
 
 struct EventMouseButton {
-	int button, action, mods;
+	Mouse button;
+	int action, mods;
 	EventMouseButton(int button, int action, int mods) :
-		button(button), action(action), mods(mods) { }
-	EventMouseButton(const EventMouseButton& orig) = default;
+		button(static_cast<Mouse>(button)), action(action), mods(mods) { }
+
+	std::string toPrettyString() const {
+		return fmt::format("Mouse Button: button = {}, action = {}, mods = {}", to_value(button), action, mods);
+	}
 };
 
-struct EventScroll {
-	double xoffset, yoffset;
-	EventScroll(double xoffset, double yoffset) : xoffset(xoffset), yoffset(yoffset) { }
-	EventScroll(const EventScroll& orig) = default;
+struct EventMouseEnter {
+	int entered;
+	EventMouseEnter(int entered) : entered(entered) { }
+
+	std::string toPrettyString() const {
+		return fmt::format("Mouse Enter: entered = {}", entered);
+	}
+};
+
+struct EventMousePosition {
+	dvec2 position;
+	EventMousePosition(double xpos, double ypos) : position(xpos, ypos) { }
+	EventMousePosition(dvec2 position) : position(position) { }
+
+	std::string toPrettyString() const {
+		return fmt::format("Mouse Position: position = ({}, {})", position.x, position.y);
+	}
+};
+
+struct EventMouseScroll {
+	dvec2 offset;
+	EventMouseScroll(double xoffset, double yoffset) : offset(xoffset, yoffset) { }
+	EventMouseScroll(dvec2 offset) : offset(offset) { }
+
+	std::string toPrettyString() const {
+		return fmt::format("Mouse Scroll: offset = ({}, {})", offset.x, offset.y);
+	}
 };
 
 struct EventWindowClose {
+	std::string toPrettyString() const {
+		return "Window Close";
+	}
 };
 
 struct EventWindowFocus {
 	int focused;
 	EventWindowFocus(int focused) : focused(focused) { }
-	EventWindowFocus(const EventWindowFocus& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Window Focus: focused = {}", focused);
+	}
 };
 
 struct EventWindowIconify {
 	int iconified;
 	EventWindowIconify(int iconified) : iconified(iconified) { }
-	EventWindowIconify(const EventWindowIconify& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Window Iconify: iconified = {}", iconified);
+	}
 };
 
-struct EventWindowPos {
+struct EventWindowPosition {
 	ivec2 position;
-	EventWindowPos(int x, int y) : position(x, y) { }
-	EventWindowPos(ivec2 position) : position(position) { }
-	EventWindowPos(const EventWindowPos& orig) = default;
+	EventWindowPosition(int x, int y) : position(x, y) { }
+	EventWindowPosition(ivec2 position) : position(position) { }
+
+	std::string toPrettyString() const {
+		return fmt::format("Window Position: position = ({}, {})", position.x, position.y);
+	}
 };
 
 struct EventWindowRefresh {
+	std::string toPrettyString() const {
+		return "Window Refresh";
+	}
 };
 
 struct EventWindowSize {
 	ivec2 size;
 	EventWindowSize(int x, int y) : size(x, y) { }
 	EventWindowSize(ivec2 size) : size(size) { }
-	EventWindowSize(const EventWindowSize& orig) = default;
+
+	std::string toPrettyString() const {
+		return fmt::format("Window Size: size = ({}, {})", size.x, size.y);
+	}
 };
 
 } // namespace ui

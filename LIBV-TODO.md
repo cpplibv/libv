@@ -260,7 +260,7 @@ Tracing every event for right state enums / defines / handlers:
 	WindowClose
 	WindowFocus
 	WindowIconify
-	WindowPos
+	WindowPosition
 	WindowRefresh
 	WindowSize
 	Monitor
@@ -724,7 +724,7 @@ void Model::loadGL() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
 	glBufferData(GL_ARRAY_BUFFER, sizeof (vm3::Vertex) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
-	checkGL();
+	LIBV_GL_CHECK();
 
 	enableVertexAttribArray(Attribute::position);
 	vertexAttribPointer(Attribute::position, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, position));
@@ -740,17 +740,17 @@ void Model::loadGL() {
 	vertexAttribIPointer(Attribute::boneindices, 4, VertexAttribType::INT, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneID));
 	enableVertexAttribArray(Attribute::boneweight);
 	vertexAttribPointer(Attribute::boneweight, 4, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneWieght));
-	checkGL();
+	LIBV_GL_CHECK();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_index);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof (model.indices[0]) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
-	checkGL();
+	LIBV_GL_CHECK();
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void Model::unloadGL() {
@@ -763,12 +763,12 @@ void Model::unloadGL() {
 
 void Model::render(libv::gl::GL& gl) {
 	glBindVertexArray(vao);
-	checkGL();
+	LIBV_GL_CHECK();
 
 	renderNode(model.lods[0].rootNodeID, gl);
 
 	glBindVertexArray(0);
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
@@ -791,7 +791,7 @@ void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 				GL_UNSIGNED_INT,
 				(void*) (sizeof (GLuint) * model.meshes[meshID].baseIndex),
 				model.meshes[meshID].baseVertex);
-		checkGL();
+		LIBV_GL_CHECK();
 	}
 
 	for (auto childID : model.nodes[id].childrenIDs) {
@@ -799,7 +799,7 @@ void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 	}
 
 	gl.popMatrixModel();
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 

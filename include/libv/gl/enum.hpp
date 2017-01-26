@@ -4,25 +4,8 @@
 
 // ext
 #include <GL/glew.h>
-// pro
-#include <libv/utility.hpp> // TODO P5: remove include
-#include <libv/gl/log.hpp> // TODO P5: remove include its for checkGL
 
 // -------------------------------------------------------------------------------------------------
-
-// TODO P5: find a good place for these assert functions
-
-#define LIBV_GL_DEBUG // TODO P5: debug flag
-
-#ifdef LIBV_GL_DEBUG
-#    define LIBV_GL_DEBUG_CHECK_GL() checkGL()
-#    define LIBV_GL_DEBUG_ASSERT(X) assert((X))
-#    define LIBV_GL_DEBUG_ASSERT_STATIC(X, M) static_assert((X), M)
-#else
-#    define LIBV_GL_DEBUG_CHECK_GL() {}
-#    define LIBV_GL_DEBUG_ASSERT(X) {}
-#    define LIBV_GL_DEBUG_ASSERT_STATIC(X) {}
-#endif
 
 namespace libv {
 namespace gl {
@@ -460,6 +443,20 @@ enum class AttributeType {
 	//Acceptable by glVertexAttribPointer:
 	//Acceptable by glVertexAttribLPointer:
 	DOUBLE = GL_DOUBLE,
+};
+
+// -------------------------------------------------------------------------------------------------
+
+enum class Face {
+	Back = GL_BACK,
+	Front = GL_FRONT,
+	FrontAndBack = GL_FRONT_AND_BACK,
+};
+
+enum class Mode {
+	Fill = GL_FILL,
+	Line = GL_LINE,
+	Point = GL_POINT,
 };
 
 // -------------------------------------------------------------------------------------------------

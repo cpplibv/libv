@@ -117,7 +117,7 @@ private:
 
 public:
 	Component();
-	Component(const std::string& componentID, const std::string& componentClass);
+	Component(const std::string& componentID, const std::string& componentClass = "");
 	virtual ~Component();
 };
 

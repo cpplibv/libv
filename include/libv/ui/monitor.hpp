@@ -39,8 +39,8 @@ struct Monitor {
 	static std::map<GLFWmonitor*, Monitor> monitors;
 	static Signal<const EventMonitor&> onMonitor;
 public:
-	static Monitor* getMonitorAt(ivec2 coord);
-	static Monitor* getPrimaryMonitor();
+	static Monitor& getMonitorAt(ivec2 coord);
+	static Monitor& getPrimaryMonitor();
 
 public:
 	std::string name;

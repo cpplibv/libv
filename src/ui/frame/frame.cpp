@@ -7,11 +7,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv
+#include <libv/fixed.hpp>
 #include <libv/gl/gl.hpp>
 // pro
 #include <libv/ui/log.hpp>
 #include <libv/timer.hpp>
 #include "core.hpp"
+
 
 namespace libv {
 namespace ui {
@@ -235,8 +237,8 @@ void Frame::setPosition(FramePosition pos) {
 	switch (pos) {
 	case POSITION_CENTER_CURRENT_MONITOR:
 		context.executeAsync([this] {
-			auto* monitor = getCurrentMonitor();
-			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
+			auto& monitor = getCurrentMonitor();
+			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
 			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of current monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
@@ -245,8 +247,8 @@ void Frame::setPosition(FramePosition pos) {
 		break;
 	case POSITION_CENTER_PRIMARY_MONITOR:
 		context.executeAsync([this] {
-			auto* monitor = Monitor::getPrimaryMonitor();
-			auto newpos = monitor->position + monitor->currentVideoMode.size / 2 - size / 2;
+			auto& monitor = Monitor::getPrimaryMonitor();
+			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
 			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of primary monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
@@ -315,8 +317,62 @@ bool Frame::isVisible() const {
 	return !hidden && !minimized && window;
 }
 
-const Monitor* Frame::getCurrentMonitor() const {
+const Monitor& Frame::getCurrentMonitor() const {
 	return Monitor::getMonitorAt(position + size / 2);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+KeyState Frame::getKey(Key key) {
+	if (key == Key::Unknown)
+		return KeyState::released;
+	if (to_value(key) >= to_value(Key::Last))
+		return KeyState::released;
+	return keyStates[to_value(key)].load();
+}
+
+bool Frame::isKeyPressed(Key key) {
+	return getKey(key) == KeyState::pressed;
+}
+
+bool Frame::isKeyReleased(Key key) {
+	return getKey(key) == KeyState::released;
+}
+
+KeyState Frame::getMouse(Mouse key) {
+//	if (key == Mouse::Unknown)
+//		return KeyState::released;
+	if (to_value(key) >= to_value(Mouse::Last))
+		return KeyState::released;
+	return mouseStates[to_value(key)].load();
+}
+
+bool Frame::isMousePressed(Mouse key) {
+	return getMouse(key) == KeyState::pressed;
+}
+
+bool Frame::isMouseReleased(Mouse key) {
+	return getMouse(key) == KeyState::released;
+}
+
+fvec2 Frame::getMousePosition() {
+	const auto raw = mousePosition.load();
+
+	// The value stored in atomic mousePosition is coded as x:s24.8 y:s24.8
+	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
+    auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
+
+	return fvec2(convert_from_s_24_8(x), convert_from_s_24_8(y));
+}
+
+fvec2 Frame::getScrollPosition() {
+	const auto raw = scrollPosition.load();
+
+	// The value stored in atomic wheelPosition is coded as x:s24.8 y:s24.8
+	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
+    auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
+
+	return fvec2(convert_from_s_24_8(x), convert_from_s_24_8(y));
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -7,10 +7,9 @@
 // libv
 #include <libv/gl/gl.hpp>
 #include <libv/memory.hpp>
-//#include <libv/scoped_cache.hpp>
 #include <libv/vec.hpp>
 // std
-//#include <memory>
+#include <chrono>
 #include <vector>
 // pro
 #include <libv/ui/resource/resource_fwd.hpp>
@@ -91,11 +90,21 @@ public:
 	//	void sync(ThreadAffinity aff, std::function<void()> func);
 };
 
+struct ContextStat {
+	std::chrono::duration<double> elapsed_time;
+
+	std::chrono::time_point<std::chrono::steady_clock> previous_render;
+	std::chrono::time_point<std::chrono::steady_clock> current_render;
+
+	ContextStat();
+};
+
 struct Context {
 	gl::GL gl;
 	ContextResource resource;
 	ContextConfig config;
 	ContextExecutor executor;
+	ContextStat stat;
 
 	Context();
 

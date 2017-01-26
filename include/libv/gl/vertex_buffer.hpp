@@ -6,7 +6,9 @@
 #include <GL/glew.h>
 // pro
 #include <libv/gl/enum.hpp>
+#include <libv/gl/log.hpp>
 #include <libv/gl/program.hpp>
+
 
 namespace libv {
 namespace gl {
@@ -29,7 +31,7 @@ public:
 	inline void create() {
 		LIBV_GL_DEBUG_ASSERT(id_ == 0);
 		glGenBuffers(1, &id_);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (id_ == 0)
 			LIBV_LOG_GL_ERROR("Failed to create VertexBuffer");
 	}
@@ -37,7 +39,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glDeleteBuffers(1, &id_);
 		id_ = 0;
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 	//	inline void data(const void* dataPtr, size_t length, BufferUsage usage) {
@@ -45,7 +47,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindBuffer(GL_ARRAY_BUFFER, id_);
 		glBufferData(GL_ARRAY_BUFFER, length, dataPtr, to_value(usage));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 	//	inline void subData(const void* dataPtr, size_t offset, size_t length) {
@@ -53,7 +55,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindBuffer(GL_ARRAY_BUFFER, id_);
 		glBufferSubData(GL_ARRAY_BUFFER, offset, length, dataPtr);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 	//	inline void getSubData(void* dataPtr, size_t offset, size_t length) {
@@ -61,7 +63,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindBuffer(GL_ARRAY_BUFFER, id_);
 		glGetBufferSubData(GL_ARRAY_BUFFER, offset, length, dataPtr);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void createData(const void* dataPtr, GLsizeiptr length, BufferUsage usage) {
 		create();
@@ -114,7 +116,7 @@ public:
 	inline void create() {
 		LIBV_GL_DEBUG_ASSERT(id_ == 0);
 		glGenVertexArrays(1, &id_);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (id_ == 0)
 			LIBV_LOG_GL_ERROR("Failed to create VertexArray");
 	}
@@ -122,7 +124,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glDeleteVertexArrays(1, &id_);
 		id_ = 0;
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	template <typename T>
 	inline void bindAttribute(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset, bool normalized) {
@@ -138,7 +140,7 @@ public:
 				normalized,
 				stride,
 				reinterpret_cast<const GLvoid*> (offset));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	template <typename T>
 	inline void bindAttributeInt(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset) {
@@ -153,7 +155,7 @@ public:
 				BaseAttribute<T>::attributeType,
 				stride,
 				reinterpret_cast<const GLvoid*> (offset));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	template <typename T>
 	inline void bindAttributeDouble(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset) {
@@ -169,19 +171,19 @@ public:
 				BaseAttribute<T>::attributeType,
 				stride,
 				reinterpret_cast<const GLvoid*> (offset));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void bindElements(const VertexBuffer& elements) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindVertexArray(id_);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elements);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void bindTransformFeedback(GLuint index, const VertexBuffer& buffer) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindVertexArray(id_);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 public:

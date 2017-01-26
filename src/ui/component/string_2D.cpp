@@ -62,14 +62,14 @@ void String2D::build(Context& context) {
 		buildImpl(context);
 		renderChanged = false;
 	}
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 void String2D::destroy(Context&) {
 	segments.clear();
 	vao.destroy();
 	vbo.destroy();
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 void String2D::render(Context& context) {
@@ -77,11 +77,7 @@ void String2D::render(Context& context) {
 		auto dDisableGuard = context.gl.disableGuard(gl::Capability::DepthTest);
 		auto mStackGuard = context.gl.model.pushGuard();
 
-//		context.gl.model.translate(0, -150, 0);
 		context.gl.model.translate(0, +layoutedSize.y, 0);
-//		context.gl.model.translate(0, -defaultFont.getDescender(), 0); // full text size except first line
-//		context.gl.model.translate(0, -150, 0); // full text size except first line
-//		context.gl.model.translate(150, 0, 0); // full text size except first line
 
 		for (const auto& segment : segments) {
 			segment.program->use();
@@ -97,7 +93,7 @@ void String2D::render(Context& context) {
 	}
 	glUseProgram(0);
 
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -278,7 +274,7 @@ void String2D::buildImpl(Context& context) {
 	//	vao.bindAttribute(vbo, 0, &Character::Vertex::vertexCoord, false);
 	//	vao.bindAttribute(vbo, 8, &Character::Vertex::textureCoord, false);
 
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 	LIBV_LOG_UI_COMPONENT_TRACE("Built string2D [%s]", rawText);
 }
 

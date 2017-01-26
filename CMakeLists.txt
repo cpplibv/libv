@@ -42,7 +42,9 @@ add_definitions(-std=c++17)
 #Macro - Ext
 add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_FORCE_RADIANS)
-#Macro - Pro
+#Macro - GLM
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+#Macro - Libv
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
 #Macro - Assert
 add_definitions(-DNDEBUG)
@@ -154,16 +156,16 @@ ExternalProject_Add(ext_utf8cpp
 	EXCLUDE_FROM_ALL 1
 )
 
-list(APPEND EXTERNAL_PROJECT_LIST ext_unittest)
-ExternalProject_Add(ext_unittest
+list(APPEND EXTERNAL_PROJECT_LIST ext_catch)
+ExternalProject_Add(ext_catch
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
 	GIT_TAG v1.5.6
-	PREFIX ${PATH_EXT_SRC}/unittest
+	PREFIX ${PATH_EXT_SRC}/catch
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/unittest/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/unittest/src/ext_unittest/include/ ${PATH_EXT}/unittest/
+		COMMAND mkdir -p ${PATH_EXT}/catch/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -356,6 +358,7 @@ include_directories (${PATH_SRC})
 #Externals
 include_directories(SYSTEM ${PATH_EXT}/assimp/include)
 include_directories(SYSTEM ${PATH_EXT}/boost/include)
+include_directories(SYSTEM ${PATH_EXT}/catch/include)
 include_directories(SYSTEM ${PATH_EXT}/fmt/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
@@ -363,7 +366,6 @@ include_directories(SYSTEM ${PATH_EXT}/glfw/include)
 include_directories(SYSTEM ${PATH_EXT}/gli/include)
 include_directories(SYSTEM ${PATH_EXT}/glm/include)
 include_directories(SYSTEM ${PATH_EXT}/range/include)
-include_directories(SYSTEM ${PATH_EXT}/unittest/include)
 include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
 link_directories(${PATH_EXT}/assimp/lib)

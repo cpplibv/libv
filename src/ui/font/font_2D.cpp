@@ -95,7 +95,7 @@ void Font2D::loadGL() {
 	texture.setMinFilter(gl::MinFilter::Linear);
 	// TODO P4: validate Linear filters
 
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 void Font2D::updateGL() {
@@ -107,7 +107,7 @@ void Font2D::updateGL() {
 	updateTexture();
 	dirty = false;
 
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 void Font2D::unloadGL() {
@@ -115,7 +115,7 @@ void Font2D::unloadGL() {
 
 	texture.destroy();
 
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -242,7 +242,7 @@ void Font2D::updateTexture() {
 	auto tBindGuard = texture.bindGuard();
 	texture.image2D(0, gl::InternalFormat::Luminance8, gl::Format::RED, gl::DataType::UnsignedByte,
 			textureSize.x, textureSize.y, textureData.data());
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 void Font2D::changeSizeOnDemand(uint32_t size) {

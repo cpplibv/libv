@@ -42,14 +42,14 @@ void UI::build() {
 		content.build(context);
 	}
 	valid = true;
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void UI::destroy() {
 	content.destroy(context);
 	context.unload();
 	valid = false;
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void UI::render() {
@@ -64,7 +64,7 @@ void UI::render() {
 	context.gl.frontFaceCCW();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	checkGL();
+	LIBV_GL_CHECK();
 
 	context.gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
 	context.gl.clear();
@@ -79,7 +79,7 @@ void UI::render() {
 
 	content.render(context);
 
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 // -------------------------------------------------------------------------------------------------

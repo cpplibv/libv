@@ -38,7 +38,7 @@ void glfwMonitorCallback(GLFWmonitor* monitor, int status) {
 	} catch (const std::out_of_range&) {
 		m = &Monitor::monitors.emplace(monitor, monitor).first->second;
 	}
-	Monitor::onMonitor.fire(EventMonitor(m, status));
+	Monitor::onMonitor.fire(EventMonitor(*m, status));
 }
 
 std::map<GLFWmonitor*, Monitor> Monitor::monitors;
@@ -53,7 +53,7 @@ int distFromSection(int a, int b, int p) {
 		return 0;
 }
 
-Monitor* Monitor::getMonitorAt(ivec2 coord) {
+Monitor& Monitor::getMonitorAt(ivec2 coord) {
 	// TODO P5: std::min_element with lambda
 	int min = std::numeric_limits<int>::max();
 
@@ -69,11 +69,11 @@ Monitor* Monitor::getMonitorAt(ivec2 coord) {
 		}
 	}
 	assert(minid != nullptr);
-	return minid;
+	return *minid;
 }
 
-Monitor* Monitor::getPrimaryMonitor() {
-	return &monitors.at(glfwGetPrimaryMonitor());
+Monitor& Monitor::getPrimaryMonitor() {
+	return monitors.at(glfwGetPrimaryMonitor());
 }
 
 Monitor::Monitor(GLFWmonitor* monitor) {

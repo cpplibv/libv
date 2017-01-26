@@ -91,6 +91,39 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+template<size_t FACE>
+struct PolygonModeSelector {
+	inline void point() {
+		glPolygonMode(FACE, GL_POINT);
+		LIBV_GL_DEBUG_CHECK();
+	}
+	inline void line() {
+		glPolygonMode(FACE, GL_LINE);
+		LIBV_GL_DEBUG_CHECK();
+	}
+	inline void fill() {
+		glPolygonMode(FACE, GL_FILL);
+		LIBV_GL_DEBUG_CHECK();
+	}
+	inline void operator()(Mode mode) {
+		glPolygonMode(FACE, to_value(mode));
+		LIBV_GL_DEBUG_CHECK();
+	}
+};
+
+struct PolygonModeSetter {
+	PolygonModeSelector<GL_BACK> front;
+	PolygonModeSelector<GL_FRONT> back;
+	PolygonModeSelector<GL_FRONT_AND_BACK> frontAndBack;
+
+	inline void operator()(Face face, Mode mode) {
+		glPolygonMode(to_value(face), to_value(mode));
+		LIBV_GL_DEBUG_CHECK();
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 class GL {
 private:
 	glm::mat4 matrixTexture_; // Make it static constexpr...
@@ -111,31 +144,31 @@ public:
 	inline GLint getMaxUniformBlockSize() const {
 		GLint n;
 		glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &n);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return n;
 	}
 	inline GLint getMaxUniformBufferBindings() const {
 		GLint n;
 		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &n);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return n;
 	}
 	inline GLint getMaxVertexAttribs() const {
 		GLint n;
 		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return n;
 	}
 	inline GLint getMaxVertexUniformComponents() const {
 		GLint n;
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &n);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return n;
 	}
 	inline GLint getMaxCombinedTextureImageUnits() const {
 		GLint n;
 		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &n);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return n;
 	}
 	inline GLint getCurrentAvailableVideoMemory() const {
@@ -167,15 +200,18 @@ public:
 
 	inline void frontFaceCCW();
 	inline void frontFaceCW();
+
+	PolygonModeSetter polygonMode;
+
 	//	void depthMask(bool writeEnabled);
 	//	void stencilMask(bool writeEnabled);
 	//	void stencilMask(uint mask);
 	//
 	//	void stencilFunc(TestFunction::test_function_t function, int reference, uint mask = ~0);
 	//	void stencilOp(StencilAction::stencil_action_t fail, StencilAction::stencil_action_t zfail, StencilAction::stencil_action_t pass);
-	//
-	//	void useProgram(const Program& program);
-	//
+
+	inline void use(const Program& program);
+
 	//	void bindTexture(const Texture& texture, uchar unit);
 	//
 	//	void bindFramebuffer(const Framebuffer& framebuffer);
@@ -433,40 +469,40 @@ inline MatrixStack& MatrixStack::setToLookAt(const glm::vec3& eye, const glm::ve
 // =================================================================================================
 inline void GL::activeTexture(TextureChannel channel) {
 	glActiveTexture(GL_TEXTURE0 + to_value(channel));
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::drawArrays(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t vertexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
 	glDrawArrays(to_value(mode), vertexOffset, vertexCount);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }
 inline void GL::drawElements(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
 	glDrawElements(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset));
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }
 inline void GL::drawElementsBaseVertex(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
 	glDrawElementsBaseVertex(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset), vertexOffset);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }
 inline void GL::viewport(ivec2 pos, ivec2 size) {
 	glViewport(pos.x, pos.y, size.x, size.y);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::enable(Capability capability) {
 	glEnable(to_value(capability));
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::disable(Capability capability) {
 	glDisable(to_value(capability));
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline EnableGuard<GL, Capability> GL::enableGuard(Capability capability) {
 	return EnableGuard<GL, Capability>(*this, capability);
@@ -475,23 +511,28 @@ inline DisableGuard<GL, Capability> GL::disableGuard(Capability capability) {
 	return DisableGuard<GL, Capability>(*this, capability);
 }
 inline void GL::clearColor(const glm::vec4& col) {
-	clearColor(col.r, col.g, col.b, col.a);
+	glClearColor(col.r, col.g, col.b, col.a);
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::clearColor(float r, float g, float b, float a) {
 	glClearColor(r, g, b, a);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::clear(Buffer buffers) {
 	glClear(to_value(buffers));
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::frontFaceCCW() {
 	glFrontFace(GL_CCW);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 }
 inline void GL::frontFaceCW() {
 	glFrontFace(GL_CW);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
+}
+inline void GL::use(const Program& program) {
+	program.use();
+	LIBV_GL_DEBUG_CHECK();
 }
 
 } // namespace gl

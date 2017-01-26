@@ -9,8 +9,9 @@
 // libv
 #include <libv/utility.hpp>
 // pro
-//#include <libv/gl/gl.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/log.hpp>
+
 
 namespace libv {
 namespace gl {
@@ -36,7 +37,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
 		GLint result;
 		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return result;
 	}
 
@@ -48,14 +49,14 @@ public:
 		std::string result;
 		result.resize(infoLength);
 		glGetShaderInfoLog(shaderID, infoLength, nullptr, &result[0]);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return result;
 	}
 
 	inline void create(ShaderType type) {
 		LIBV_GL_DEBUG_ASSERT(shaderID == 0);
 		shaderID = glCreateShader(to_value(type));
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (shaderID == 0)
 			LIBV_LOG_GL_ERROR("Failed to create %s shader", to_string(type));
 	}
@@ -64,15 +65,15 @@ public:
 		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
 		glDeleteShader(shaderID);
 		shaderID = 0;
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 	inline void compile(const char* sourceStr, const GLint size) {
 		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
 		glShaderSource(shaderID, 1, &sourceStr, &size);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		glCompileShader(shaderID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (!status())
 			LIBV_LOG_GL_ERROR("Failed to compile shader:\n%s", info());
 	}

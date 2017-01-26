@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #include <gli/gli.hpp>
 
-#include <iostream>
+
 // -------------------------------------------------------------------------------------------------
 
 namespace libv {
@@ -33,7 +33,7 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_G, Format.Swizzles[1]);
 	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_B, Format.Swizzles[2]);
 	glTexParameteri(Target, GL_TEXTURE_SWIZZLE_A, Format.Swizzles[3]);
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 
 	glm::tvec3<GLsizei> const Extent(Texture.extent());
 	GLsizei const FaceTotal = static_cast<GLsizei> (Texture.layers() * Texture.faces());
@@ -62,7 +62,7 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 		assert(0);
 		break;
 	}
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 
 	for (std::size_t Layer = 0; Layer < Texture.layers(); ++Layer)
 		for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
@@ -130,7 +130,7 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 					break;
 				}
 			}
-	LIBV_GL_DEBUG_CHECK_GL();
+	LIBV_GL_DEBUG_CHECK();
 	return TextureName;
 }
 } // namespace detail

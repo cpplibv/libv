@@ -139,6 +139,13 @@ void ContextExecutor::process() {
 
 // -------------------------------------------------------------------------------------------------
 
+ContextStat::ContextStat() {
+	previous_render = current_render;
+	current_render = std::chrono::steady_clock::now();
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Context::Context() : resource(make_observer(this)) { }
 
 void Context::load() {
@@ -147,7 +154,12 @@ void Context::load() {
 
 void Context::refresh() {
 	executor.process();
-//	resource.refresh();
+
+	stat.previous_render = stat.current_render;
+	stat.current_render = std::chrono::steady_clock::now();
+	stat.elapsed_time = stat.current_render - stat.previous_render;
+
+	//	resource.refresh();
 }
 
 void Context::unload() {

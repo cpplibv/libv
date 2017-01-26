@@ -6,7 +6,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: include xy log and check (for checkGL)
+// TODO P4: include xy log and check (for LIBV_GL_CHECK)
 // TODO P4: LIBV_UI_* -> LIBV_LOG_UI_*
 // TODO P4: LIBV_UI_DEBUG_ -> LIBV_UI_DEBUG
 // TODO P5: find a good place for these assert functions something something assert.hpp
@@ -20,7 +20,7 @@
 #    define LIBV_UI_DEBUG_ASSERT_CONTEXT(X) {} // TODO P5: assert context
 #    define LIBV_UI_DEBUG_ASSERT_STATIC(X, M) static_assert((X), (M))
 #    define LIBV_UI_DEBUG_ASSERT_THREAD(X) {} // TODO P5: assert thread
-#    define LIBV_UI_DEBUG_CHECK_GL() checkGL()
+#    define LIBV_UI_DEBUG_CHECK_GL() LIBV_GL_CHECK()
 #else
 #    define LIBV_UI_DEBUG_ASSERT(X) {}
 #    define LIBV_UI_DEBUG_ASSERT_CONTEXT(X) {} // TODO P5: assert context

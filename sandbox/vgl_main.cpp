@@ -54,24 +54,7 @@ void initGLEW() {
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
 
-	checkGL();
-}
-
-void initGL() {
-	glEnable(GL_DEPTH_TEST); //Depth
-	glDepthFunc(GL_LESS);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
-	glEnable(GL_BLEND); //Alpha
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW); //Counter clockwise polys only
-
-	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
-	checkGL();
-}
-
-void initGLSL() {
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 static void error_callback(int code, const char* description) {
@@ -132,6 +115,16 @@ struct Example {
 		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
 		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
 		LIBV_LOG_INFO("%-46s [ %9d ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+
+		glEnable(GL_DEPTH_TEST); //Depth
+		glDepthFunc(GL_LESS);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
+		glEnable(GL_BLEND); //Alpha
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW); //Counter clockwise polys only
+
+		gl.polygonMode.frontAndBack(true ? libv::gl::Mode::Fill : libv::gl::Mode::Line);
 
 		Vertex dataVertex[]{
 			Vertex{glm::vec3(-1.f, -1.f, 0.f), glm::vec4(1.f, 0.f, 0.f, 1.f), glm::vec2(0.f, 0.f)},
@@ -266,7 +259,7 @@ struct Example {
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 6, 0);
 		}
 
-		checkGL();
+		LIBV_GL_CHECK();
 	}
 };
 
@@ -274,8 +267,6 @@ struct Example {
 
 void init() {
 	initGLEW();
-	initGL();
-	initGLSL();
 }
 
 int main(void) {
@@ -316,7 +307,7 @@ int main(void) {
 
 
 		while (!glfwWindowShouldClose(window)) {
-			checkGL();
+			LIBV_GL_CHECK();
 			example.render();
 
 			glfwSwapBuffers(window);

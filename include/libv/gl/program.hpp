@@ -8,8 +8,8 @@
 // std
 #include <string>
 // pro
-//#include <libv/gl/gl.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/log.hpp>
 #include <libv/gl/shader.hpp>
 
 namespace libv {
@@ -46,7 +46,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		GLint result;
 		glGetProgramiv(programID, GL_LINK_STATUS, &result);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return result;
 	}
 	inline std::string info() const {
@@ -57,13 +57,13 @@ public:
 		std::string result;
 		result.resize(infoLength);
 		glGetProgramInfoLog(programID, infoLength, nullptr, &result[0]);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		return result;
 	}
 	inline void create() {
 		LIBV_GL_DEBUG_ASSERT(programID == 0);
 		programID = glCreateProgram();
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (programID == 0)
 			LIBV_LOG_GL_ERROR("Failed to create program");
 	}
@@ -71,15 +71,15 @@ public:
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		glDeleteProgram(programID);
 		programID = 0;
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void link(const Shader& vertex, const Shader& fragment) {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		glAttachShader(programID, vertex);
 		glAttachShader(programID, fragment);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		glLinkProgram(programID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (!status())
 			LIBV_LOG_GL_ERROR("Failed to link program:\n%s", info());
 	}
@@ -88,9 +88,9 @@ public:
 		glAttachShader(programID, vertex);
 		glAttachShader(programID, fragment);
 		glAttachShader(programID, geometry);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		glLinkProgram(programID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 		if (!status())
 			LIBV_LOG_GL_ERROR("Failed to link program:\n%s", info());
 	}
@@ -102,10 +102,10 @@ public:
 		create();
 		link(vertex, fragment, geometry);
 	}
-	inline void use() {
+	inline void use() const {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
 		glUseProgram(programID);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 
 public:
@@ -235,7 +235,7 @@ public:
 	inline void assign(const Program& program, const char* name) {
 		LIBV_GL_DEBUG_ASSERT(program.id() != 0);
 		location = glGetUniformLocation(program, name);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void assign(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
@@ -376,7 +376,7 @@ public:
 	inline void assign(const Program& program, const char* name) {
 		LIBV_GL_DEBUG_ASSERT(program.id() != 0);
 		this->location = glGetAttribLocation(program, name);
-		LIBV_GL_DEBUG_CHECK_GL();
+		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void assign(const Program& program, const std::string& name) {
 		assign(program, name.c_str());

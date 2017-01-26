@@ -54,7 +54,7 @@ void initGLEW() {
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
 
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void initGL() {
@@ -67,11 +67,11 @@ void initGL() {
 	glFrontFace(GL_CCW); //Counter clockwise polys only
 
 	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 void initGLSL() {
-	checkGL();
+	LIBV_GL_CHECK();
 }
 
 static void error_callback(int code, const char* description) {
@@ -192,7 +192,7 @@ struct Example {
 		programTest2.use();
 		uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
 
-		checkGL();
+		LIBV_GL_CHECK();
 	}
 
 	void render() {
@@ -240,7 +240,7 @@ struct Example {
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
 		}
 
-		checkGL();
+		LIBV_GL_CHECK();
 	}
 };
 
@@ -290,7 +290,7 @@ int main(void) {
 
 
 		while (!glfwWindowShouldClose(window)) {
-			checkGL();
+			LIBV_GL_CHECK();
 			example.render();
 
 			glfwSwapBuffers(window);

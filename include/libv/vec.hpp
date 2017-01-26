@@ -16,13 +16,14 @@
 // pro
 #include <libv/type_traits.hpp>
 
-// TODO P1: refactor to force unrolled loops to remove some of the template magic ?
+// TODO P1: define in this header LIBV_USE_GLM_BRIDGE with __has_include
+// TODO P1: vec ctor with addition type tag for static_cast
+// TODO P1: C++17 fold expressions
 // TODO P1: constexpr vec // this will be fun...
-// TODO PMSVC: Disable warnings for nameless struct on MSVC
+// TODO PMSVC: Disable warnings for nameless struct on MSVC maybe:
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
-// TODO P4: remove template recursion // Just a little left with iterators
 // TODO P5: perfect forwarding for constructors
 // TODO P5: conditional noexcept // this will be fun...
 // TODO P5: fast compare operator with vec and skalar by comparing skalar² and veclenght²
