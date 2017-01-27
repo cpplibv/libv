@@ -50,6 +50,11 @@ public:
 		LIBV_GL_DEBUG_CHECK();
 	}
 
+	template <typename Container>
+	inline void data(const Container& values, BufferUsage usage) {
+		this->data(values.data(), values.size() * sizeof(typename Container::value_type), usage);
+	}
+
 	//	inline void subData(const void* dataPtr, size_t offset, size_t length) {
 	inline void subData(const void* dataPtr, GLintptr offset, GLsizeiptr length) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
@@ -173,6 +178,36 @@ public:
 				reinterpret_cast<const GLvoid*> (offset));
 		LIBV_GL_DEBUG_CHECK();
 	}
+	// ---
+	template <typename T, typename M>
+	inline void bindAttribute(const VertexBuffer& buffer, GLint attribute, M T::* member, bool normalized) {
+		bindAttribute(
+				buffer,
+				AttributeFixLocation<M>(attribute),
+				sizeof (T),
+				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member)),
+				normalized
+				);
+	}
+	template <typename T, typename M>
+	inline void bindAttributeInt(const VertexBuffer& buffer, GLint attribute, M T::* member) {
+		bindAttributeInt(
+				buffer,
+				AttributeFixLocation<M>(attribute),
+				sizeof (T),
+				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member))
+				);
+	}
+	template <typename T, typename M>
+	inline void bindAttributeDouble(const VertexBuffer& buffer, GLint attribute, M T::* member) {
+		bindAttributeDouble(
+				buffer,
+				AttributeFixLocation<M>(attribute),
+				sizeof (T),
+				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member))
+				);
+	}
+	// ---
 	inline void bindElements(const VertexBuffer& elements) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindVertexArray(id_);

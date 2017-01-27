@@ -5,12 +5,15 @@
 // ext
 #include <GL/glew.h>
 #include <glm/gtc/type_ptr.hpp>
+// libv
+#include <libv/vec.hpp>
 // std
 #include <string>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/gl/shader.hpp>
+
 
 namespace libv {
 namespace gl {
@@ -321,6 +324,51 @@ template <> struct BaseAttribute<float> : public BaseAttributeCore {
 template <> struct BaseAttribute<double> : public BaseAttributeCore {
 	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
 	static constexpr GLint attributeSize = 1;
+};
+
+template <> struct BaseAttribute<libv::ivec2> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::INT);
+	static constexpr GLint attributeSize = 2;
+};
+
+template <> struct BaseAttribute<libv::fvec2> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
+	static constexpr GLint attributeSize = 2;
+};
+
+template <> struct BaseAttribute<libv::dvec2> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
+	static constexpr GLint attributeSize = 2;
+};
+
+template <> struct BaseAttribute<libv::ivec3> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::INT);
+	static constexpr GLint attributeSize = 3;
+};
+
+template <> struct BaseAttribute<libv::fvec3> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
+	static constexpr GLint attributeSize = 3;
+};
+
+template <> struct BaseAttribute<libv::dvec3> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
+	static constexpr GLint attributeSize = 3;
+};
+
+template <> struct BaseAttribute<libv::ivec4> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::INT);
+	static constexpr GLint attributeSize = 3;
+};
+
+template <> struct BaseAttribute<libv::fvec4> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
+	static constexpr GLint attributeSize = 4;
+};
+
+template <> struct BaseAttribute<libv::dvec4> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
+	static constexpr GLint attributeSize = 4;
 };
 
 template <> struct BaseAttribute<glm::ivec2> : public BaseAttributeCore {
