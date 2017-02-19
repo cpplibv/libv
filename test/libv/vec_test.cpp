@@ -158,11 +158,11 @@ TEST_CASE("normalize") {
 	dvec2 vec0(15, 15);
 
 	CHECK(vec0 > 2);
-	CHECK(vec0.normalized() < 2);
+	CHECK(vec0.normalize_copy() < 2);
 	CHECK(2 < vec0);
-	CHECK(2 > vec0.normalized());
+	CHECK(2 > vec0.normalize_copy());
 
-	CHECK(1 == Approx(vec0.normalized().length()));
+	CHECK(1 == Approx(vec0.normalize_copy().length()));
 }
 
 TEST_CASE("Custom getter functions") {

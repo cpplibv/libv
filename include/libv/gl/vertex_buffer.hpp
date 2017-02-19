@@ -4,6 +4,8 @@
 
 // ext
 #include <GL/glew.h>
+// libv
+#include <libv/utility.hpp>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/log.hpp>
@@ -178,25 +180,23 @@ public:
 				reinterpret_cast<const GLvoid*> (offset));
 		LIBV_GL_DEBUG_CHECK();
 	}
-	// ---
 	template <typename T, typename M>
 	inline void bindAttribute(const VertexBuffer& buffer, GLint attribute, M T::* member, bool normalized) {
 		bindAttribute(
 				buffer,
 				AttributeFixLocation<M>(attribute),
 				sizeof (T),
-				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member)),
-				normalized
-				);
+				member_offset(member),
+				normalized);
 	}
+
 	template <typename T, typename M>
 	inline void bindAttributeInt(const VertexBuffer& buffer, GLint attribute, M T::* member) {
 		bindAttributeInt(
 				buffer,
 				AttributeFixLocation<M>(attribute),
 				sizeof (T),
-				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member))
-				);
+				member_offset(member));
 	}
 	template <typename T, typename M>
 	inline void bindAttributeDouble(const VertexBuffer& buffer, GLint attribute, M T::* member) {
@@ -204,10 +204,8 @@ public:
 				buffer,
 				AttributeFixLocation<M>(attribute),
 				sizeof (T),
-				reinterpret_cast<size_t> (&(static_cast<T*> (nullptr)->*member))
-				);
+				member_offset(member));
 	}
-	// ---
 	inline void bindElements(const VertexBuffer& elements) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glBindVertexArray(id_);

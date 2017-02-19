@@ -204,7 +204,7 @@ class TestFrame : public Frame {
 		});
 
 		onKey.output([this](const EventKey& e) {
-			if (e.key == 256)
+			if (e.key == Key::Escape)
 				closeDefault();
 			//			if (e.key == 257 && e.action != 0)
 			//				lbl0.setText(lbl0.getText() + '\n');
@@ -216,7 +216,7 @@ class TestFrame : public Frame {
 			//				}
 			//			}
 
-			if (e.key == 'X')
+			if (e.key == Key::X)
 				setDecoration(!isDecorated());
 		});
 	}

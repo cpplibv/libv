@@ -8,10 +8,14 @@
 
 // -------------------------------------------------------------------------------------------------
 
-#define MEMBER_OFFSET(s,m) ((char *)NULL + (offsetof(s,m)))
-#define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
 namespace libv {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T, typename M>
+constexpr inline size_t member_offset(M T::* member) {
+	return sizeof (char[reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member))]);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -30,7 +34,7 @@ struct new_t {
 // -------------------------------------------------------------------------------------------------
 
 inline uint64_t get_this_thread_id() {
-	static_assert(sizeof (std::thread::id) == sizeof (uint64_t), "thead::id size is not 64bit");
+	static_assert(sizeof (std::thread::id) == sizeof (uint64_t), "thread::id size is not 64bit");
 	auto id = std::this_thread::get_id();
 	uint64_t* ptr = reinterpret_cast<uint64_t*>(&id);
 	return (*ptr);

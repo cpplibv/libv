@@ -54,6 +54,7 @@ public:
 	inline MatrixStack& translate(const glm::vec3& v);
 	inline MatrixStack& translate(float x, float y, float z);
 	inline MatrixStack& scale(const glm::vec3& v);
+	inline MatrixStack& scale(float s);
 	inline MatrixStack& scale(float x, float y, float z);
 	inline MatrixStack& rotateX(float ang);
 	inline MatrixStack& rotateY(float ang);
@@ -70,6 +71,7 @@ public:
 	inline MatrixStack& operator*=(const glm::mat4& m);
 
 	inline glm::vec3 eye() const;
+//	inline libv::fvec3 eye() const;
 	inline glm::mat4 operator*(const glm::mat4& m) const;
 	inline glm::vec4 operator*(const glm::vec4& v) const;
 	inline glm::mat4 operator*(const MatrixStack& ms) const;
@@ -207,7 +209,7 @@ public:
 	//	void stencilMask(bool writeEnabled);
 	//	void stencilMask(uint mask);
 	//
-	//	void stencilFunc(TestFunction::test_function_t function, int reference, uint mask = ~0);
+	//	void stencilFunc(TestFunctiris::test_function_t function, int reference, uint mask = ~0);
 	//	void stencilOp(StencilAction::stencil_action_t fail, StencilAction::stencil_action_t zfail, StencilAction::stencil_action_t pass);
 
 	inline void use(const Program& program);
@@ -356,6 +358,10 @@ inline MatrixStack& MatrixStack::scale(const glm::vec3& v) {
 	stack.top() = glm::scale(stack.top(), v);
 	return *this;
 }
+inline MatrixStack& MatrixStack::scale(float v) {
+	stack.top() = glm::scale(stack.top(), glm::vec3(v, v, v));
+	return *this;
+}
 inline MatrixStack& MatrixStack::scale(float x, float y, float z) {
 	stack.top() = glm::scale(stack.top(), glm::vec3(x, y, z));
 	return *this;
@@ -415,6 +421,10 @@ inline MatrixStack& MatrixStack::operator*=(const glm::mat4& m) {
 inline glm::vec3 MatrixStack::eye() const {
 	return glm::vec3(glm::inverse(stack.top())[3]);
 }
+//inline libv::fvec3 MatrixStack::eye() const {
+//	const auto& tmp = glm::inverse(stack.top())[3];
+//	return libv::fvec3(tmp[0], tmp[1], tmp[2]);
+//}
 inline glm::mat4 MatrixStack::operator*(const glm::mat4& m) const {
 	return stack.top() * m;
 }

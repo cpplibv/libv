@@ -130,7 +130,7 @@ struct vec_base_t {
 
 	vec_base_t() = default;
 	template <typename... Args, typename = typename std::enable_if<sizeof...(Args) == N>::type>
-	vec_base_t(Args&&... values) noexcept : ptr{std::forward<Args>(values)...} { }
+	explicit vec_base_t(Args&&... values) noexcept : ptr{std::forward<Args>(values)...} { }
 };
 
 template <typename T>
@@ -311,7 +311,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 
 	// operator= -----------------------------------------------------------------------------------
 	template<typename K>
-	inline vec_t<N, T>& operator=(const vec_helper_t<N, K, std::index_sequence<Indices...>>& rhs) noexcept {
+	inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) noexcept {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] = rhs.ptr[Indices]), 0)...
 		};
@@ -378,6 +378,21 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	// ---------------------------------------------------------------------------------------------
+
+	template <typename A, typename B>
+	inline decltype(auto) gcc6_dot_helper(A a, B b, size_t i) const noexcept { // GCC 7.0+: remove
+		return a[i] * b[i];
+	}
+
+	/** Return the vector and the given vectors dot product
+	 * @note Does not change the original vector
+	 * @return The dot product */
+	template<typename K>
+	inline decltype(auto) dot(const vec_t<N, K>& other) const noexcept {
+//		return ((this->ptr[Indices] * other.ptr[Indices]) + ...);
+		return (gcc6_dot_helper(*this, other, Indices) + ...); // GCC 7.0+: remove
+	}
+	// ---------------------------------------------------------------------------------------------
 	/** Return the square length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
@@ -404,7 +419,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	 * @template K The minimum precision type Default: T
 	 * @return The normalized vector */
 	template<typename K = T>
-	inline auto normalized() const noexcept
+	inline auto normalize_copy() const noexcept
 	-> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
 		assert(lengthSquare() != 0);
 		return *this / length();
@@ -626,5 +641,28 @@ using ulvec4 = vec4_t<uint64_t>;
 using vec2 = vec2_t<float>;
 using vec3 = vec3_t<float>;
 using vec4 = vec4_t<float>;
+
+//using vec2f = vec2_t<float>;
+//using vec3f = vec3_t<float>;
+//using vec4f = vec4_t<float>;
+//using vec2d = vec2_t<double>;
+//using vec3d = vec3_t<double>;
+//using vec4d = vec4_t<double>;
+//using vec2i = vec2_t<int32_t>;
+//using vec3i = vec3_t<int32_t>;
+//using vec4i = vec4_t<int32_t>;
+//using vec2ui = vec2_t<uint32_t>;
+//using vec3ui = vec3_t<uint32_t>;
+//using vec4ui = vec4_t<uint32_t>;
+//using vec2l = vec2_t<int64_t>;
+//using vec3l = vec3_t<int64_t>;
+//using vec4l = vec4_t<int64_t>;
+//using vec2ul = vec2_t<uint64_t>;
+//using vec3ul = vec3_t<uint64_t>;
+//using vec4ul = vec4_t<uint64_t>;
+//
+//using vec2 = vec2d;
+//using vec3 = vec3d;
+//using vec4 = vec4d;
 
 } // namespace libv

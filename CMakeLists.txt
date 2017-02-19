@@ -149,8 +149,6 @@ ExternalProject_Add(ext_utf8cpp
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/
-		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include
 		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 	EXCLUDE_FROM_ALL 1

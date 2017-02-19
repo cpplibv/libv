@@ -8,6 +8,12 @@ handle fails - apply fallback
 implement burnt in defaults
 -- commit --
 
+replace "template<" with "template <"
+-- commit --
+
+frame mouse coord remap of by 1 in Y, just -1 should be fine
+-- commit --
+
 fix freetype raii
 -- commit --
 
@@ -100,6 +106,7 @@ ui: component if invalid was, then does nothing on invalidation
 ui: take a look at frame and component events
 ui: component property serialization and validation
 ui: rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
+ui: ProgramDescriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 cpp / delegate / vsig: http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11
 cpp: clarify Arg&& and template vs auto type deduction rules
 cpp: what is and how to use ADL

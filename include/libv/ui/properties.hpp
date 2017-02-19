@@ -92,7 +92,7 @@ extern PropertyAddress<LayoutSizeVec> Size;
 /// The alignment of the contained elements
 extern PropertyAddress<LayoutAlign> Align;
 
-/// The alignment of the content's bounding box inside the component's bounding box
+/// The alignment of the content bounding box inside the components bounding box
 extern PropertyAddress<LayoutAlign> Anchor;
 
 /// The orientation of the content. "Line direction"
@@ -104,7 +104,7 @@ extern PropertyAddress<LayoutOrient> Orient;
 //extern PropertyAddress<vec3> Position;
 //extern PropertyAddress<vec4> Border;
 //extern PropertyAddress<vec4> Margin;
-//extern PropertyAddress<vec4> Pedding;
+//extern PropertyAddress<vec4> Padding;
 
 } // namespace Property
 

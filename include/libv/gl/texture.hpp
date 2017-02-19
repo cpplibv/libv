@@ -49,6 +49,12 @@ public:
 		if (textureID == 0)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
+	inline void createFromDDS(const std::string& data) {
+		LIBV_GL_DEBUG_ASSERT(textureID == 0);
+		textureID = detail::gliCreateTexture(data.data(), data.size());
+		if (textureID == 0)
+			LIBV_LOG_GL_ERROR("Failed to create texture.");
+	}
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(textureID != 0);
 		glDeleteTextures(1, &textureID);
