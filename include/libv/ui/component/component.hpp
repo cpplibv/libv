@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/memory.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/sig/signal.hpp>
 // std
 #include <atomic>

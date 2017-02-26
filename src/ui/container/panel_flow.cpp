@@ -5,7 +5,7 @@
 // libv
 #include <libv/adaptor.hpp>
 #include <libv/memory.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <algorithm>
 // pro
@@ -20,7 +20,7 @@ namespace ui {
 
 namespace {
 
-using Align = vec3;
+using Align = vec3f;
 struct Orient {
 	size_t primaryDimension;
 	size_t secondaryDimension;
@@ -55,22 +55,22 @@ static const Orient orienationTable[] = {
 
 struct Line {
 	std::vector<observer_ptr<Container::ContainedComponent>> compoments;
-	vec3 size;
+	vec3f size;
 };
 
 struct BuiltLines {
 	std::vector<Line> lines;
-	vec3 size;
+	vec3f size;
 };
 
-BuiltLines buildLines(Container::Store& components, vec3 parentSize, const Orient& orient) {
+BuiltLines buildLines(Container::Store& components, vec3f parentSize, const Orient& orient) {
 	const auto dim1 = orient.primaryDimension;
 	const auto dim2 = orient.secondaryDimension;
 
 	std::vector<Line> lines;
 	lines.emplace_back();
 	size_t last = 0;
-	vec3 sumSize;
+	vec3f sumSize;
 
 	for (auto& comp : components) {
 		const auto compSize = comp.info.size;
@@ -122,11 +122,11 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 	const auto& sizeContent = builtLines.size;
 
 	auto origToContent = (sizeContainer - sizeContent) * contentAnchor;
-	vec3 contentToLine;
+	vec3f contentToLine;
 
 	for (const auto& line : lines | reverse_if(orient.invertedSecondaryExpand)) {
 		const auto sizeLine = line.size;
-		vec3 lineToComponent;
+		vec3f lineToComponent;
 
 		contentToLine[dim1] = (sizeContent[dim1] - sizeLine[dim1]) * align[dim1];
 		const auto& lineComponents = line.compoments;
@@ -134,7 +134,7 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 		for (auto& component : lineComponents | reverse_if(orient.invertedPrimaryExpand)) {
 			const auto pen = origToContent + contentToLine + lineToComponent;
 			const auto sizeComponent = component->info.size;
-			vec3 baselineOffset;
+			vec3f baselineOffset;
 			baselineOffset[dim2] = (sizeLine[dim2] - sizeComponent[dim2]) * align[dim2];
 
 			component->info.offset = pen + baselineOffset;

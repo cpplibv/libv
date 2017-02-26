@@ -45,9 +45,9 @@ private:
 	Status status_ = Status::NotLoaded;
 
 public:
-	gl::Uniform_fmat4 uniformMVPmat;
+	gl::Uniform_mat4f uniformMVPmat;
 	gl::Uniform_texture uniformTextureSampler;
-	gl::Uniform_fvec4 uniformColor;
+	gl::Uniform_vec4f uniformColor;
 
 public:
 	Status status() const {

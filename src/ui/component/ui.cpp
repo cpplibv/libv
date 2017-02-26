@@ -2,9 +2,6 @@
 
 // hpp
 #include <libv/ui/component/ui.hpp>
-// ext
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/transform.hpp>
 // libv
 #include <libv/gl/gl.hpp>
 #include <libv/gl/log.hpp>
@@ -22,11 +19,11 @@ Context& UI::getContext() {
 	return context;
 }
 
-ivec2 UI::getSize() const {
+vec2i UI::getSize() const {
 	return size;
 }
 
-void UI::setSize(ivec2 size) {
+void UI::setSize(vec2i size) {
 	this->size = size;
 }
 
@@ -37,7 +34,7 @@ void UI::build() {
 		context.load();
 	}
 	if (content.isInvalid()) {
-		LayoutInfo root(vec3(size, 0));
+		LayoutInfo root(vec3f(size, 0));
 		content.layout(root);
 		content.build(context);
 	}
@@ -75,7 +72,7 @@ void UI::render() {
 	auto y0 = position.y;
 	auto y1 = position.y + size.y;
 	auto pStackGuard = context.gl.projection.pushGuard();
-	context.gl.projection.setToOrtho(x0, x1, y0, y1);
+	context.gl.projection = libv::ortho<float>(x0, x1, y0, y1);
 
 	content.render(context);
 

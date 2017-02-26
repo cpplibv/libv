@@ -2,8 +2,6 @@
 
 // hpp
 #include <libv/ui/container/container.hpp>
-// ext
-#include <glm/gtx/transform.hpp>
 // std
 #include <algorithm>
 // pro

@@ -4,9 +4,9 @@
 
 // ext
 #include <GL/glew.h>
-#include <glm/gtc/type_ptr.hpp>
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/mat.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <string>
 // pro
@@ -183,48 +183,55 @@ inline void uniform(GLint location, const double& value) {
 	glUniform1d(location, value);
 }
 // 2D Vector
-inline void uniform(GLint location, const glm::ivec2& value) {
+inline void uniform(GLint location, const libv::vec2i& value) {
 	glUniform2i(location, value.x, value.y);
 }
-inline void uniform(GLint location, const glm::fvec2& value) {
+inline void uniform(GLint location, const libv::vec2f& value) {
 	glUniform2f(location, value.x, value.y);
 }
-inline void uniform(GLint location, const glm::dvec2& value) {
+inline void uniform(GLint location, const libv::vec2d& value) {
 	glUniform2d(location, value.x, value.y);
 }
 // 3D Vector
-inline void uniform(GLint location, const glm::ivec3& value) {
+inline void uniform(GLint location, const libv::vec3i& value) {
 	glUniform3i(location, value.x, value.y, value.z);
 }
-inline void uniform(GLint location, const glm::fvec3& value) {
+inline void uniform(GLint location, const libv::vec3f& value) {
 	glUniform3f(location, value.x, value.y, value.z);
 }
-inline void uniform(GLint location, const glm::dvec3& value) {
+inline void uniform(GLint location, const libv::vec3d& value) {
 	glUniform3d(location, value.x, value.y, value.z);
 }
 // 4D Vector
-inline void uniform(GLint location, const glm::ivec4& value) {
+inline void uniform(GLint location, const libv::vec4i& value) {
 	glUniform4i(location, value.x, value.y, value.z, value.w);
 }
-inline void uniform(GLint location, const glm::fvec4& value) {
+inline void uniform(GLint location, const libv::vec4f& value) {
 	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
-inline void uniform(GLint location, const glm::dvec4& value) {
+inline void uniform(GLint location, const libv::vec4d& value) {
 	glUniform4d(location, value.x, value.y, value.z, value.w);
 }
-// 3x3 Matrix
-inline void uniform(GLint location, const glm::fmat3& value) {
-	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(value));
+// 2x2 Matrix
+inline void uniform(GLint location, const libv::mat2f& value) {
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
 }
-inline void uniform(GLint location, const glm::dmat3& value) {
-	glUniformMatrix3dv(location, 1, GL_FALSE, glm::value_ptr(value));
+inline void uniform(GLint location, const libv::mat2d& value) {
+	glUniformMatrix3dv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
+}
+// 3x3 Matrix
+inline void uniform(GLint location, const libv::mat3f& value) {
+	glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
+}
+inline void uniform(GLint location, const libv::mat3d& value) {
+	glUniformMatrix3dv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
 }
 // 4x4 Matrix
-inline void uniform(GLint location, const glm::fmat4& value) {
-	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value));
+inline void uniform(GLint location, const libv::mat4f& value) {
+	glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
 }
-inline void uniform(GLint location, const glm::dmat4& value) {
-	glUniformMatrix4dv(location, 1, GL_FALSE, glm::value_ptr(value));
+inline void uniform(GLint location, const libv::mat4d& value) {
+	glUniformMatrix4dv(location, 1, GL_FALSE, glm::value_ptr(to_glm(value)));
 }
 
 // Uniform -----------------------------------------------------------------------------------------
@@ -271,23 +278,26 @@ using Uniform_int = Uniform<int>;
 using Uniform_float = Uniform<float>;
 using Uniform_double = Uniform<double>;
 
-using Uniform_ivec2 = Uniform<glm::ivec2>;
-using Uniform_fvec2 = Uniform<glm::fvec2>;
-using Uniform_dvec2 = Uniform<glm::dvec2>;
+using Uniform_vec2i = Uniform<libv::vec2i>;
+using Uniform_vec2f = Uniform<libv::vec2f>;
+using Uniform_vec2d = Uniform<libv::vec2d>;
 
-using Uniform_ivec3 = Uniform<glm::ivec3>;
-using Uniform_fvec3 = Uniform<glm::fvec3>;
-using Uniform_dvec3 = Uniform<glm::dvec3>;
+using Uniform_vec3i = Uniform<libv::vec3i>;
+using Uniform_vec3f = Uniform<libv::vec3f>;
+using Uniform_vec3d = Uniform<libv::vec3d>;
 
-using Uniform_ivec4 = Uniform<glm::ivec4>;
-using Uniform_fvec4 = Uniform<glm::fvec4>;
-using Uniform_dvec4 = Uniform<glm::dvec4>;
+using Uniform_vec4i = Uniform<libv::vec4i>;
+using Uniform_vec4f = Uniform<libv::vec4f>;
+using Uniform_vec4d = Uniform<libv::vec4d>;
 
-using Uniform_fmat3 = Uniform<glm::fmat3>;
-using Uniform_dmat3 = Uniform<glm::dmat3>;
+using Uniform_mat2f = Uniform<libv::mat2f>;
+using Uniform_mat2d = Uniform<libv::mat2d>;
 
-using Uniform_fmat4 = Uniform<glm::fmat4>;
-using Uniform_dmat4 = Uniform<glm::dmat4>;
+using Uniform_mat3f = Uniform<libv::mat3f>;
+using Uniform_mat3d = Uniform<libv::mat3d>;
+
+using Uniform_mat4f = Uniform<libv::mat4f>;
+using Uniform_mat4d = Uniform<libv::mat4d>;
 
 // BaseAttribute -----------------------------------------------------------------------------------
 
@@ -326,94 +336,10 @@ template <> struct BaseAttribute<double> : public BaseAttributeCore {
 	static constexpr GLint attributeSize = 1;
 };
 
-template <> struct BaseAttribute<libv::ivec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<libv::fvec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<libv::dvec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<libv::ivec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<libv::fvec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<libv::dvec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<libv::ivec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<libv::fvec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 4;
-};
-
-template <> struct BaseAttribute<libv::dvec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 4;
-};
-
-template <> struct BaseAttribute<glm::ivec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<glm::fvec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<glm::dvec2> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 2;
-};
-
-template <> struct BaseAttribute<glm::ivec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<glm::fvec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<glm::dvec3> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<glm::ivec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::INT);
-	static constexpr GLint attributeSize = 3;
-};
-
-template <> struct BaseAttribute<glm::fvec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::FLOAT);
-	static constexpr GLint attributeSize = 4;
-};
-
-template <> struct BaseAttribute<glm::dvec4> : public BaseAttributeCore {
-	static constexpr GLenum attributeType = to_value(AttributeType::DOUBLE);
-	static constexpr GLint attributeSize = 4;
+template <size_t N, typename T>
+struct BaseAttribute<libv::vec_t<N, T>> : public BaseAttributeCore {
+	static constexpr GLenum attributeType = BaseAttribute<T>::attributeType;
+	static constexpr GLint attributeSize = N;
 };
 
 // AttributeLocation -------------------------------------------------------------------------------
@@ -474,39 +400,39 @@ using Attribute = AttributeFixLocation<T>;
 //GL_FLOAT_VEC3, "vec3"
 //GL_FLOAT_VEC4, "vec4"
 //GL_DOUBLE, "double"
-//GL_DOUBLE_VEC2, "dvec2"
-//GL_DOUBLE_VEC3, "dvec3"
-//GL_DOUBLE_VEC4, "dvec4"
+//GL_DOUBLE_VEC2, "vec2d"
+//GL_DOUBLE_VEC3, "vec3d"
+//GL_DOUBLE_VEC4, "vec4d"
 //GL_INT, "int"
-//GL_INT_VEC2, "ivec2"
-//GL_INT_VEC3, "ivec3"
-//GL_INT_VEC4, "ivec4"
+//GL_INT_VEC2, "vec2i"
+//GL_INT_VEC3, "vec3i"
+//GL_INT_VEC4, "vec4i"
 //GL_UNSIGNED_INT, "unsigned, "int"
-//GL_UNSIGNED_INT_VEC2, "uvec2"
-//GL_UNSIGNED_INT_VEC3, "uvec3"
-//GL_UNSIGNED_INT_VEC4, "uvec4"
+//GL_UNSIGNED_INT_VEC2, "vec2u"
+//GL_UNSIGNED_INT_VEC3, "vec3u"
+//GL_UNSIGNED_INT_VEC4, "vec4u"
 //GL_BOOL, "bool"
-//GL_BOOL_VEC2, "bvec2"
-//GL_BOOL_VEC3, "bvec3"
-//GL_BOOL_VEC4, "bvec4"
-//GL_FLOAT_MAT2, "mat2"
-//GL_FLOAT_MAT3, "mat3"
-//GL_FLOAT_MAT4, "mat4"
-//GL_FLOAT_MAT2x3, "mat2x3"
-//GL_FLOAT_MAT2x4, "mat2x4"
-//GL_FLOAT_MAT3x2, "mat3x2"
-//GL_FLOAT_MAT3x4, "mat3x4"
-//GL_FLOAT_MAT4x2, "mat4x2"
-//GL_FLOAT_MAT4x3, "mat4x3"
-//GL_DOUBLE_MAT2, "dmat2"
-//GL_DOUBLE_MAT3, "dmat3"
-//GL_DOUBLE_MAT4, "dmat4"
-//GL_DOUBLE_MAT2x3, "dmat2x3"
-//GL_DOUBLE_MAT2x4, "dmat2x4"
-//GL_DOUBLE_MAT3x2, "dmat3x2"
-//GL_DOUBLE_MAT3x4, "dmat3x4"
-//GL_DOUBLE_MAT4x2, "dmat4x2"
-//GL_DOUBLE_MAT4x3, "dmat4x3"
+//GL_BOOL_VEC2, "vec2b"
+//GL_BOOL_VEC3, "vec3b"
+//GL_BOOL_VEC4, "vec4b"
+//GL_FLOAT_MAT2, "mat2f"
+//GL_FLOAT_MAT3, "mat3f"
+//GL_FLOAT_MAT4, "mat4f"
+//GL_FLOAT_MAT2x3, "mat2x3f"
+//GL_FLOAT_MAT2x4, "mat2x4f"
+//GL_FLOAT_MAT3x2, "mat3x2f"
+//GL_FLOAT_MAT3x4, "mat3x4f"
+//GL_FLOAT_MAT4x2, "mat4x2f"
+//GL_FLOAT_MAT4x3, "mat4x3f"
+//GL_DOUBLE_MAT2, "mat2d"
+//GL_DOUBLE_MAT3, "mat3d"
+//GL_DOUBLE_MAT4, "mat4d"
+//GL_DOUBLE_MAT2x3, "mat2x3d"
+//GL_DOUBLE_MAT2x4, "mat2x4d"
+//GL_DOUBLE_MAT3x2, "mat3x2d"
+//GL_DOUBLE_MAT3x4, "mat3x4d"
+//GL_DOUBLE_MAT4x2, "mat4x2d"
+//GL_DOUBLE_MAT4x3, "mat4x3d"
 //GL_SAMPLER_1D, "sampler1D"
 //GL_SAMPLER_2D, "sampler2D"
 //GL_SAMPLER_3D, "sampler3D"

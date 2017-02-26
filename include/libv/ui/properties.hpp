@@ -6,7 +6,7 @@
 #include <string>
 // libv
 #include <libv/ui/property_map.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 
 namespace libv {
 namespace ui {

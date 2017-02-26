@@ -32,7 +32,6 @@ separate control and data!
 -- commit --
 
 c++17 vec
-rename vec_t to tvec
 remove vec member getters
 -- commit --
 
@@ -829,8 +828,8 @@ struct Light {
 	int type;
 	bool enabled; //0 false 1 true
 
-	glm::dvec3 position;
-	glm::dvec3 direction;
+	glm::vec3d position;
+	glm::vec3d direction;
 	glm::vec4 diffuse;
 	glm::vec4 specular;
 
@@ -846,10 +845,10 @@ struct Light {
 	unsigned int frameBuffer;
 	unsigned int shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
 	unsigned int shadowMapSampler;
-	glm::dmat4 shadowMVPTmat; //MVPT mat
+	glm::mat4d shadowMVPTmat; //MVPT mat
 
-	glm::dmat4 getVmat();
-	glm::dmat4 getPmat();
+	glm::mat4d getVmat();
+	glm::mat4d getPmat();
 	Light();
 	~Light();
 };

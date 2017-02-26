@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/sig/signal.hpp>
 // std
 #include <vector>
@@ -20,9 +20,9 @@ namespace ui {
 
 struct VideoMode {
 public:
-	ivec3 colorBits;
+	vec3i colorBits;
 	int refreshRate;
-	ivec2 size;
+	vec2i size;
 
 public:
 	VideoMode();
@@ -39,12 +39,12 @@ struct Monitor {
 	static std::map<GLFWmonitor*, Monitor> monitors;
 	static Signal<const EventMonitor&> onMonitor;
 public:
-	static Monitor& getMonitorAt(ivec2 coord);
+	static Monitor& getMonitorAt(vec2i coord);
 	static Monitor& getPrimaryMonitor();
 
 public:
 	std::string name;
-	ivec2 position;
+	vec2i position;
 	VideoMode currentVideoMode;
 	std::vector<VideoMode> videoModes;
 

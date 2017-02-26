@@ -21,9 +21,9 @@ VideoMode::VideoMode(const GLFWvidmode* vidmode) :
 	size(vidmode->width, vidmode->height) { }
 
 VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) {
-	colorBits = ivec3(vidmode->redBits, vidmode->greenBits, vidmode->blueBits);
+	colorBits = vec3i(vidmode->redBits, vidmode->greenBits, vidmode->blueBits);
 	refreshRate = vidmode->refreshRate;
-	size = ivec2(vidmode->width, vidmode->height);
+	size = vec2i(vidmode->width, vidmode->height);
 	return *this;
 }
 
@@ -53,7 +53,7 @@ int distFromSection(int a, int b, int p) {
 		return 0;
 }
 
-Monitor& Monitor::getMonitorAt(ivec2 coord) {
+Monitor& Monitor::getMonitorAt(vec2i coord) {
 	// TODO P5: std::min_element with lambda
 	int min = std::numeric_limits<int>::max();
 

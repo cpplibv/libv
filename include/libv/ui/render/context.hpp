@@ -7,7 +7,7 @@
 // libv
 #include <libv/gl/gl.hpp>
 #include <libv/memory.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <chrono>
 #include <vector>
@@ -72,7 +72,7 @@ public:
 };
 
 struct ContextConfig {
-	fvec4 defaultFontColor{1, 1, 1, 1};
+	vec4f defaultFontColor{1, 1, 1, 1};
 	uint32_t defaultFontSize{12};
 };
 

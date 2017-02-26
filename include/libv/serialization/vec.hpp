@@ -4,7 +4,7 @@
 
 #include <boost/serialization/array.hpp>
 #include <libv/serialization/nvp.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 
 namespace boost {
 namespace serialization {

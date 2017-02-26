@@ -9,9 +9,9 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-inline vec3 evalLayoutSize(const LayoutInfo& parent, const Component& component) {
+inline vec3f evalLayoutSize(const LayoutInfo& parent, const Component& component) {
 	auto size = component.getOrDefault(Property::Size);
-	vec3 result;
+	vec3f result;
 
 	for (int i = 0; i < 3; i++) {
 		switch (size[i].type) {

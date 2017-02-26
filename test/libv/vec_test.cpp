@@ -1,6 +1,6 @@
 // File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
 
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 
 #include <catch.hpp>
 #include <string>
@@ -8,7 +8,7 @@
 using namespace libv;
 
 TEST_CASE("unionValue") {
-	vec4 vec(0, 1, 2, 3);
+	vec4f vec(0, 1, 2, 3);
 
 	CHECK(0 == vec.x);
 	CHECK(1 == vec.y);
@@ -65,97 +65,97 @@ TEST_CASE("unionAddress") {
 }
 
 TEST_CASE("dimMacro") {
-	vec2 veca2(1, 2);
-	vec3 veca3(1, 2, 3);
-	vec4 veca4(1, 2, 3, 4);
-	vec2 vecb2(1, 2);
-	vec3 vecb3(1, 2, 3);
-	vec4 vecb4(1, 2, 3, 4);
+	vec2u veca2(1, 2);
+	vec3u veca3(1, 2, 3);
+	vec4u veca4(1, 2, 3, 4);
+	vec2u vecb2(1, 2);
+	vec3u vecb3(1, 2, 3);
+	vec4u vecb4(1, 2, 3, 4);
 
 	veca2 += vecb2;
 	veca3 += vecb3;
 	veca4 += vecb4;
 
-	CHECK(veca2 == vec2(2, 4));
-	CHECK(veca3 == vec3(2, 4, 6));
-	CHECK(veca4 == vec4(2, 4, 6, 8));
+	CHECK(veca2 == vec2f(2, 4));
+	CHECK(veca3 == vec3f(2, 4, 6));
+	CHECK(veca4 == vec4f(2, 4, 6, 8));
 }
 
 TEST_CASE("ctor") {
-	vec2 vec2d;
-	vec2 vec20(1, 2);
-	vec2 vec21(vec20);
-	vec3 vec3d;
-	vec3 vec30(1, 2, 3);
-	vec3 vec31(1, vec20);
-	vec3 vec32(vec20, 3);
-	vec3 vec33(vec30);
-	vec4 vec4d;
-	vec4 vec40(1, 2, 3, 4);
-	vec4 vec41(vec20, 3, 4);
-	vec4 vec42(1, vec20, 4);
-	vec4 vec43(1, 2, vec20);
-	vec4 vec44(vec20, vec20);
-	vec4 vec45(vec30, 4);
-	vec4 vec46(1, vec30);
-	vec4 vec47(vec40);
+	vec2f vec2d;
+	vec2f vec20(1, 2);
+	vec2f vec21(vec20);
+	vec3f vec3d;
+	vec3f vec30(1, 2, 3);
+	vec3f vec31(1, vec20);
+	vec3f vec32(vec20, 3);
+	vec3f vec33(vec30);
+	vec4f vec4d;
+	vec4f vec40(1, 2, 3, 4);
+	vec4f vec41(vec20, 3, 4);
+	vec4f vec42(1, vec20, 4);
+	vec4f vec43(1, 2, vec20);
+	vec4f vec44(vec20, vec20);
+	vec4f vec45(vec30, 4);
+	vec4f vec46(1, vec30);
+	vec4f vec47(vec40);
 
-	CHECK(vec2d == vec2(0, 0));
-	CHECK(vec20 == vec2(1, 2));
-	CHECK(vec21 == vec2(1, 2));
-	CHECK(vec3d == vec3(0, 0, 0));
-	CHECK(vec30 == vec3(1, 2, 3));
-	CHECK(vec31 == vec3(1, 1, 2));
-	CHECK(vec32 == vec3(1, 2, 3));
-	CHECK(vec33 == vec3(1, 2, 3));
-	CHECK(vec4d == vec4(0, 0, 0, 0));
-	CHECK(vec40 == vec4(1, 2, 3, 4));
-	CHECK(vec41 == vec4(1, 2, 3, 4));
-	CHECK(vec42 == vec4(1, 1, 2, 4));
-	CHECK(vec43 == vec4(1, 2, 1, 2));
-	CHECK(vec44 == vec4(1, 2, 1, 2));
-	CHECK(vec45 == vec4(1, 2, 3, 4));
-	CHECK(vec46 == vec4(1, 1, 2, 3));
-	CHECK(vec47 == vec4(1, 2, 3, 4));
+	CHECK(vec2d == vec2f(0, 0));
+	CHECK(vec20 == vec2f(1, 2));
+	CHECK(vec21 == vec2f(1, 2));
+	CHECK(vec3d == vec3f(0, 0, 0));
+	CHECK(vec30 == vec3f(1, 2, 3));
+	CHECK(vec31 == vec3f(1, 1, 2));
+	CHECK(vec32 == vec3f(1, 2, 3));
+	CHECK(vec33 == vec3f(1, 2, 3));
+	CHECK(vec4d == vec4f(0, 0, 0, 0));
+	CHECK(vec40 == vec4f(1, 2, 3, 4));
+	CHECK(vec41 == vec4f(1, 2, 3, 4));
+	CHECK(vec42 == vec4f(1, 1, 2, 4));
+	CHECK(vec43 == vec4f(1, 2, 1, 2));
+	CHECK(vec44 == vec4f(1, 2, 1, 2));
+	CHECK(vec45 == vec4f(1, 2, 3, 4));
+	CHECK(vec46 == vec4f(1, 1, 2, 3));
+	CHECK(vec47 == vec4f(1, 2, 3, 4));
 
-	vec2 vec200(1.2f, 2.2f);
-	vec3 vec300(1.8f, 2.2f, 3.6f);
-	vec4 vec400(1.2f, 2.3f, 3.2f, 4.7f);
-	ivec2 vec201(vec200);
-	ivec3 vec301(vec300);
-	ivec4 vec401(vec400);
+	vec2f vec200(1.2f, 2.2f);
+	vec3f vec300(1.8f, 2.2f, 3.6f);
+	vec4f vec400(1.2f, 2.3f, 3.2f, 4.7f);
+	vec2i vec201(vec200);
+	vec3i vec301(vec300);
+	vec4i vec401(vec400);
 
-	CHECK(vec200 != vec2(1, 2));
-	CHECK(vec300 != vec3(1, 2, 3));
-	CHECK(vec400 != vec4(1, 2, 3, 4));
-	CHECK(vec201 == vec2(1, 2));
-	CHECK(vec301 == vec3(1, 2, 3));
-	CHECK(vec401 == vec4(1, 2, 3, 4));
-	CHECK(vec200 != ivec2(1, 2));
-	CHECK(vec300 != ivec3(1, 2, 3));
-	CHECK(vec400 != ivec4(1, 2, 3, 4));
-	CHECK(vec201 == ivec2(1, 2));
-	CHECK(vec301 == ivec3(1, 2, 3));
-	CHECK(vec401 == ivec4(1, 2, 3, 4));
+	CHECK(vec200 != vec2f(1, 2));
+	CHECK(vec300 != vec3f(1, 2, 3));
+	CHECK(vec400 != vec4f(1, 2, 3, 4));
+	CHECK(vec201 == vec2f(1, 2));
+	CHECK(vec301 == vec3f(1, 2, 3));
+	CHECK(vec401 == vec4f(1, 2, 3, 4));
+	CHECK(vec200 != vec2i(1, 2));
+	CHECK(vec300 != vec3i(1, 2, 3));
+	CHECK(vec400 != vec4i(1, 2, 3, 4));
+	CHECK(vec201 == vec2i(1, 2));
+	CHECK(vec301 == vec3i(1, 2, 3));
+	CHECK(vec401 == vec4i(1, 2, 3, 4));
 }
 
 TEST_CASE("nonMemberOperator") {
-	dvec3 vec0(1.5, 4.2, 3.14);
+	vec3d vec0(1.5, 4.2, 3.14);
 
-	dvec3 vec1 = vec0 / 2;
-	dvec3 vec2 = 0.5 * vec0;
+	vec3d vec1 = vec0 / 2;
+	vec3d vec2 = 0.5 * vec0;
 	vec0 *= 0.5f;
 
-	CHECK(vec0 == dvec3(0.75, 2.1, 1.57));
-	CHECK(dvec3(0.75, 2.1, 1.57) == vec0);
-	CHECK(vec1 == dvec3(0.75, 2.1, 1.57));
-	CHECK(dvec3(0.75, 2.1, 1.57) == vec1);
-	CHECK(vec2 == dvec3(0.75, 2.1, 1.57));
-	CHECK(dvec3(0.75, 2.1, 1.57) == vec2);
+	CHECK(vec0 == vec3d(0.75, 2.1, 1.57));
+	CHECK(vec3d(0.75, 2.1, 1.57) == vec0);
+	CHECK(vec1 == vec3d(0.75, 2.1, 1.57));
+	CHECK(vec3d(0.75, 2.1, 1.57) == vec1);
+	CHECK(vec2 == vec3d(0.75, 2.1, 1.57));
+	CHECK(vec3d(0.75, 2.1, 1.57) == vec2);
 }
 
 TEST_CASE("normalize") {
-	dvec2 vec0(15, 15);
+	vec2d vec0(15, 15);
 
 	CHECK(vec0 > 2);
 	CHECK(vec0.normalize_copy() < 2);
@@ -166,13 +166,13 @@ TEST_CASE("normalize") {
 }
 
 TEST_CASE("Custom getter functions") {
-	ivec4 vec0(1, 2, 3, 4);
+	vec4i vec0(1, 2, 3, 4);
 
-	CHECK(vec0.xy() == ivec2(1, 2));
-	CHECK(vec0.xyz() == ivec3(1, 2, 3));
+	CHECK(vec0.xy() == vec2i(1, 2));
+	CHECK(vec0.xyz() == vec3i(1, 2, 3));
 	CHECK(vec0.xyzw() == vec0);
 
-	CHECK(vec0.xxww() == ivec4(1, 1, 4, 4));
+	CHECK(vec0.xxww() == vec4i(1, 1, 4, 4));
 
 	CHECK(vec0[0] == 1);
 	CHECK(vec0[1] == 2);
@@ -181,10 +181,10 @@ TEST_CASE("Custom getter functions") {
 }
 
 TEST_CASE("Copy ctor from different type") {
-	vec4 v0(1.1, 2.1, 3.1, 4.1);
-	ivec4 v1(v0);
+	vec4d v0(1.1, 2.1, 3.1, 4.1);
+	vec4i v1(v0);
 
-	CHECK(v1 == ivec4(1, 2, 3, 4));
+	CHECK(v1 == vec4i(1, 2, 3, 4));
 }
 
 TEST_CASE("Non trivially destructible type") {
@@ -202,7 +202,7 @@ TEST_CASE("Operator=") {
 	v0 = v1;
 	v2 = v0;
 
-	CHECK(v2 == ivec2(4, 5));
+	CHECK(v2 == vec2i(4, 5));
 }
 
 TEST_CASE("Operator*=") {
@@ -214,13 +214,13 @@ TEST_CASE("Operator*=") {
 	vec_t<2, int> v4(3, 0);
 
 	v0 += v1;
-	CHECK(v0 == ivec2(2, 3));
+	CHECK(v0 == vec2i(2, 3));
 	v0 *= v2;
-	CHECK(v0 == ivec2(8, 12));
+	CHECK(v0 == vec2i(8, 12));
 	v0 /= v3;
-	CHECK(v0 == ivec2(4, 6));
+	CHECK(v0 == vec2i(4, 6));
 	v0 -= v4;
-	CHECK(v0 == ivec2(1, 6));
+	CHECK(v0 == vec2i(1, 6));
 }
 
 TEST_CASE("length") {
@@ -251,10 +251,10 @@ TEST_CASE("operator*(vec, vec)") {
 	static_assert(std::is_same<vec_t<2, int>, decltype(r2)>::value, "Wrong result type.");
 	static_assert(std::is_same<vec_t<2, int>, decltype(r3)>::value, "Wrong result type.");
 
-	CHECK((v0 + v1) == ivec2(2, 3));
-	CHECK((v0 * v2) == ivec2(4, 8));
-	CHECK((v0 / v3) == ivec2(0, 1));
-	CHECK((v0 - v4) == ivec2(-2, 2));
+	CHECK((v0 + v1) == vec2i(2, 3));
+	CHECK((v0 * v2) == vec2i(4, 8));
+	CHECK((v0 / v3) == vec2i(0, 1));
+	CHECK((v0 - v4) == vec2i(-2, 2));
 }
 
 TEST_CASE("operator*(vec, vec) with different types") {
@@ -275,10 +275,10 @@ TEST_CASE("operator*(vec, vec) with different types") {
 	static_assert(std::is_same<vec_t<2, float>, decltype(r2)>::value, "Wrong result type.");
 	static_assert(std::is_same<vec_t<2, float>, decltype(r3)>::value, "Wrong result type.");
 
-	CHECK(r0 == fvec2(2, 3));
-	CHECK(r1 == fvec2(4, 8));
-	CHECK(r2 == fvec2(0.5f, 1));
-	CHECK(r3 == fvec2(-2, 2));
+	CHECK(r0 == vec2f(2, 3));
+	CHECK(r1 == vec2f(4, 8));
+	CHECK(r2 == vec2f(0.5f, 1));
+	CHECK(r3 == vec2f(-2, 2));
 }
 
 TEST_CASE("operator*(vec, skalar)") {
@@ -297,10 +297,10 @@ TEST_CASE("operator*(vec, skalar)") {
 	static_assert(std::is_same<vec_t<2, int>, decltype(r2)>::value, "Wrong result type.");
 	static_assert(std::is_same<vec_t<2, int>, decltype(r3)>::value, "Wrong result type.");
 
-	CHECK(r0 == ivec2(8, 16));
-	CHECK(r1 == ivec2(0, 1));
-	CHECK(r2 == ivec2(8, 16));
-	CHECK(r3 == ivec2(2, 1));
+	CHECK(r0 == vec2i(8, 16));
+	CHECK(r1 == vec2i(0, 1));
+	CHECK(r2 == vec2i(8, 16));
+	CHECK(r3 == vec2i(2, 1));
 }
 
 TEST_CASE("operator*(vec, skalar) with different types") {
@@ -319,10 +319,10 @@ TEST_CASE("operator*(vec, skalar) with different types") {
 	static_assert(std::is_same<vec_t<2, float>, decltype(r2)>::value, "Wrong result type.");
 	static_assert(std::is_same<vec_t<2, float>, decltype(r3)>::value, "Wrong result type.");
 
-	CHECK(r0 == fvec2(8, 16));
-	CHECK(r1 == fvec2(0.5f, 1));
-	CHECK(r2 == fvec2(8, 16));
-	CHECK(r3 == fvec2(2, 1));
+	CHECK(r0 == vec2f(8, 16));
+	CHECK(r1 == vec2f(0.5f, 1));
+	CHECK(r2 == vec2f(8, 16));
+	CHECK(r3 == vec2f(2, 1));
 }
 
 TEST_CASE("operator+") {
@@ -334,6 +334,6 @@ TEST_CASE("operator+") {
 	static_assert(std::is_same<vec_t<2, int>, decltype(r0)>::value, "Wrong result type.");
 	static_assert(std::is_same<vec_t<2, int>, decltype(r1)>::value, "Wrong result type.");
 
-	CHECK(r0 == ivec2(4, 8));
-	CHECK(r1 == ivec2(-4, -8));
+	CHECK(r0 == vec2i(4, 8));
+	CHECK(r1 == vec2i(-4, -8));
 }

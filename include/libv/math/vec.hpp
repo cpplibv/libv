@@ -16,18 +16,17 @@
 // pro
 #include <libv/type_traits.hpp>
 
-// TODO P1: define in this header LIBV_USE_GLM_BRIDGE with __has_include
 // TODO P1: vec ctor with addition type tag for static_cast
-// TODO P1: C++17 fold expressions
+// TODO P1: GCC 7.0+ C++17 fold expressions
 // TODO P1: constexpr vec // this will be fun...
 // TODO PMSVC: Disable warnings for nameless struct on MSVC maybe:
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
 // TODO P5: perfect forwarding for constructors
-// TODO P5: conditional noexcept // this will be fun...
-// TODO P5: fast compare operator with vec and skalar by comparing skalar² and veclenght²
-// TODO P5: reuse rvalues where possible ?  4 function
+// TODO P5: conditional // this will be fun...
+// TODO P5: fast compare operator with vec and scalar by comparing scalar² and veclenght²
+// TODO P5: reuse rvalues where possible ? 4 function
 // TODO P5: macro for debug asserts
 // TODO P5: make sure every function is sfiane frendly based on vec's T and it is producing a nice
 //		error message not 7 page of template monster
@@ -36,13 +35,13 @@ namespace libv {
 
 // <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
 #define __v2get(p1,p2)       /** Composite a new vector based on members @return The new vector */\
-                   inline vec_t<2, T> p1##p2() const noexcept {        \
+                   inline vec_t<2, T> p1##p2() const {        \
                         return vec_t<2, T>(this->p1,this->p2);}
 #define __v3get(p1,p2,p3)    /** Composite a new vector based on members @return The new vector */\
-                   inline vec_t<3, T> p1##p2##p3() const noexcept {    \
+                   inline vec_t<3, T> p1##p2##p3() const {    \
                        return vec_t<3, T>(this->p1,this->p2,this->p3);}
 #define __v4get(p1,p2,p3,p4) /** Composite a new vector based on members @return The new vector */\
-				   inline vec_t<4, T> p1##p2##p3##p4() const noexcept {\
+				   inline vec_t<4, T> p1##p2##p3##p4() const {\
                        return vec_t<4, T>(this->p1,this->p2,this->p3,this->p4);}
 
 #define __v22p1(p1)      __v2get(p1,x)       __v2get(p1,y)
@@ -86,7 +85,7 @@ namespace libv {
 #define implement_vec4_to_vec3_gets __v43
 #define implement_vec4_to_vec4_gets __v44
 
-// vec_helper_t forward -----------------------------------------------------------------------------
+// vec_helper_t forward ----------------------------------------------------------------------------
 
 template <size_t N, typename T>
 struct vec_t;
@@ -130,7 +129,7 @@ struct vec_base_t {
 
 	vec_base_t() = default;
 	template <typename... Args, typename = typename std::enable_if<sizeof...(Args) == N>::type>
-	explicit vec_base_t(Args&&... values) noexcept : ptr{std::forward<Args>(values)...} { }
+	explicit vec_base_t(Args&&... values) : ptr{std::forward<Args>(values)...} { }
 };
 
 template <typename T>
@@ -143,9 +142,9 @@ struct vec_base_t<2, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[2];
 	};
 
-	vec_base_t() noexcept : x(), y() { }
+	vec_base_t() : x(), y() { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, T1 y) noexcept : x(x), y(y) { }
+	vec_base_t(T0 x, T1 y) : x(x), y(y) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
 	operator glm::tvec2<T>() const {
@@ -175,13 +174,13 @@ struct vec_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[3];
 	};
 
-	vec_base_t() noexcept : x(), y(), z() { }
+	vec_base_t() : x(), y(), z() { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, T1 y, T2 z) noexcept : x(x), y(y), z(z) { }
+	vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, const vec_base_t<2, T1>& yz) noexcept : x(x), y(yz.x), z(yz.y) { }
+	vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<2, T0>& xy, T1 z) noexcept : x(xy.x), y(xy.y), z(z) { }
+	vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
 	operator glm::tvec3<T>() const {
@@ -212,21 +211,21 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[4];
 	};
 
-	vec_base_t() noexcept : x(), y(), z(), w() { }
+	vec_base_t() : x(), y(), z(), w() { }
 	template <typename T0, typename T1, typename T2, typename T3>
-	vec_base_t(T0 x, T1 y, T2 z, T3 w) noexcept : x(x), y(y), z(z), w(w) { }
+	vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) noexcept : x(xy.x), y(xy.y), z(z), w(w) { }
+	vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) noexcept : x(x), y(yz.x), z(yz.y), w(w) { }
+	vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) noexcept : x(x), y(y), z(zw.x), w(zw.y) { }
+	vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) noexcept : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
+	vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) noexcept : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
+	vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) noexcept : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
+	vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
 	operator glm::tvec4<T>() const {
@@ -252,15 +251,15 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 template<size_t N, size_t I = 0 >
 struct vec_iteration_helper {
 	template<typename T, typename K>
-	static inline bool eq(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) noexcept {
+	static inline bool eq(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) {
 		return lhs.ptr[I] == rhs.ptr[I] && vec_iteration_helper<N, I + 1>::eq(lhs, rhs);
 	}
 	template<typename T, typename K>
-	static inline bool ne(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) noexcept {
+	static inline bool ne(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) {
 		return lhs.ptr[I] != rhs.ptr[I] || vec_iteration_helper<N, I + 1>::ne(lhs, rhs);
 	}
 	template<typename T>
-	static inline decltype(auto) lengthSquare(const vec_helper_t<N, T>& v) noexcept {
+	static inline decltype(auto) lengthSquare(const vec_helper_t<N, T>& v) {
 		return v.ptr[I] * v.ptr[I] + vec_iteration_helper<N, I + 1 >::lengthSquare(v);
 	}
 };
@@ -268,15 +267,15 @@ struct vec_iteration_helper {
 template<size_t N>
 struct vec_iteration_helper<N, N> {
 	template<typename T, typename K>
-	static inline bool eq(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) noexcept {
+	static inline bool eq(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) {
 		return true;
 	}
 	template<typename T, typename K>
-	static inline bool ne(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) noexcept {
+	static inline bool ne(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) {
 		return false;
 	}
 	template<typename T>
-	static inline T lengthSquare(const vec_helper_t<N, T>&) noexcept {
+	static inline T lengthSquare(const vec_helper_t<N, T>&) {
 		return T();
 	}
 };
@@ -302,25 +301,25 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	//	}
 
 	// operator[] ----------------------------------------------------------------------------------
-	inline T& operator[](size_t i) noexcept {
+	inline T& operator[](size_t i) {
 		return this->ptr[i];
 	}
-	inline const T& operator[](size_t i) const noexcept {
+	inline const T& operator[](size_t i) const {
 		return this->ptr[i];
 	}
 
 	// operator= -----------------------------------------------------------------------------------
 	template<typename K>
-	inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) noexcept {
+	inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] = rhs.ptr[Indices]), 0)...
 		};
 		return static_cast<vec_t<N, T>&>(*this);
 	}
 
-	// operator*=(skalar) --------------------------------------------------------------------------
+	// operator*=(scalar) --------------------------------------------------------------------------
 	template<typename K, typename = disable_if<is_vec_n_dim_t<N, K>>>
-	inline vec_t<N, T>& operator*=(const K& v) noexcept {
+	inline vec_t<N, T>& operator*=(const K& v) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] *= v), 0)...
 		};
@@ -328,7 +327,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	template<typename K, typename = disable_if<is_vec_n_dim_t<N, K>>>
-	inline vec_t<N, T>& operator/=(const K& v) noexcept {
+	inline vec_t<N, T>& operator/=(const K& v) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] /= v), 0)...
 		};
@@ -337,7 +336,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 
 	// operator*=(vec) -----------------------------------------------------------------------------
 	template<typename K>
-	inline vec_t<N, T>& operator+=(const vec_t<N, K>& rhs) noexcept {
+	inline vec_t<N, T>& operator+=(const vec_t<N, K>& rhs) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] += rhs.ptr[Indices]), 0)...
 		};
@@ -345,7 +344,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	template<typename K>
-	inline vec_t<N, T>& operator-=(const vec_t<N, K>& rhs) noexcept {
+	inline vec_t<N, T>& operator-=(const vec_t<N, K>& rhs) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] -= rhs.ptr[Indices]), 0)...
 		};
@@ -353,7 +352,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	template<typename K>
-	inline vec_t<N, T>& operator*=(const vec_t<N, K>& rhs) noexcept {
+	inline vec_t<N, T>& operator*=(const vec_t<N, K>& rhs) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] *= rhs.ptr[Indices]), 0)...
 		};
@@ -361,7 +360,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	template<typename K>
-	inline vec_t<N, T>& operator/=(const vec_t<N, K>& rhs) noexcept {
+	inline vec_t<N, T>& operator/=(const vec_t<N, K>& rhs) {
 		(void) std::initializer_list<int> {
 			((void) (this->ptr[Indices] /= rhs.ptr[Indices]), 0)...
 		};
@@ -369,18 +368,18 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	}
 
 	// operator+ -----------------------------------------------------------------------------------
-	inline vec_t<N, T> operator+() const noexcept {
+	inline vec_t<N, T> operator+() const {
 		return vec_t<N, T>(+this->ptr[Indices]...);
 	}
 
-	inline vec_t<N, T> operator-() const noexcept {
+	inline vec_t<N, T> operator-() const {
 		return vec_t<N, T>(-this->ptr[Indices]...);
 	}
 
 	// ---------------------------------------------------------------------------------------------
 
 	template <typename A, typename B>
-	inline decltype(auto) gcc6_dot_helper(A a, B b, size_t i) const noexcept { // GCC 7.0+: remove
+	inline decltype(auto) gcc6_dot_helper(A a, B b, size_t i) const { // GCC 7.0+: remove
 		return a[i] * b[i];
 	}
 
@@ -388,7 +387,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	 * @note Does not change the original vector
 	 * @return The dot product */
 	template<typename K>
-	inline decltype(auto) dot(const vec_t<N, K>& other) const noexcept {
+	inline decltype(auto) dot(const vec_t<N, K>& other) const {
 //		return ((this->ptr[Indices] * other.ptr[Indices]) + ...);
 		return (gcc6_dot_helper(*this, other, Indices) + ...); // GCC 7.0+: remove
 	}
@@ -396,20 +395,20 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	/** Return the square length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
-	inline decltype(auto) lengthSquare() const noexcept {
+	inline decltype(auto) lengthSquare() const {
 		return vec_iteration_helper<N>::lengthSquare(*this);
 	}
 
 	/** Return the length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
-	inline decltype(auto) length() const noexcept {
+	inline decltype(auto) length() const {
 		return std::sqrt(lengthSquare());
 	}
 
 	/** Normalize the vector (by divide each component by the length)
 	 * @return The vector */
-	inline vec_t<N, T>& normalize() noexcept {
+	inline vec_t<N, T>& normalize() {
 		assert(lengthSquare() != 0);
 		return operator/=(length());
 	}
@@ -419,7 +418,7 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	 * @template K The minimum precision type Default: T
 	 * @return The normalized vector */
 	template<typename K = T>
-	inline auto normalize_copy() const noexcept
+	inline auto normalize_copy() const
 	-> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
 		assert(lengthSquare() != 0);
 		return *this / length();
@@ -441,11 +440,16 @@ template <size_t N, typename T> struct vec_t : vec_helper_t<N, T> {
 	using vec_helper_t<N, T>::operator=;
 };
 
+//template<typename... Args>
+//constexpr inline decltype(auto) make_vec(Args&&... args) {
+//	return vec_t<sizeof...(args), std::common_type_t<Args...>>(std::forward<Args>(args)...);
+//}
+
 // operator*(vec, vec) -----------------------------------------------------------------------------
 template<size_t N, typename T, typename K, size_t... Indices>
 inline auto operator-(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs) noexcept
+		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
 -> vec_t<N, decltype(std::declval<T>() - std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() - std::declval<K>())>(
 			(lhs.ptr[Indices] - rhs.ptr[Indices])...
@@ -454,7 +458,7 @@ inline auto operator-(
 template<size_t N, typename T, typename K, size_t... Indices>
 inline auto operator+(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs) noexcept
+		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
 -> vec_t<N, decltype(std::declval<T>() + std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() + std::declval<K>())>(
 			(lhs.ptr[Indices] + rhs.ptr[Indices])...
@@ -463,7 +467,7 @@ inline auto operator+(
 template<size_t N, typename T, typename K, size_t... Indices>
 inline auto operator*(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs) noexcept
+		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
 -> vec_t<N, decltype(std::declval<T>() * std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() * std::declval<K>())>(
 			(lhs.ptr[Indices] * rhs.ptr[Indices])...
@@ -472,104 +476,143 @@ inline auto operator*(
 template<size_t N, typename T, typename K, size_t... Indices>
 inline auto operator/(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs) noexcept
+		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
 -> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() / std::declval<K>())>(
 			(lhs.ptr[Indices] / rhs.ptr[Indices])...
 			);
 }
 
-// operator*(vec, skalar) --------------------------------------------------------------------------
+//// TODO P5: improve some vec operators with make vec and common type
+//
+//template<size_t N, typename T, typename K, size_t... Indices>
+//constexpr inline decltype(auto) operator/(
+//		const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs,
+//		const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs) {
+//	return make_vec((lhs[Indices] / rhs[Indices])...);
+//}
+
+// operator*(vec, scalar) --------------------------------------------------------------------------
 template<size_t N, typename T, typename K, size_t... Indices,
 typename = disable_if<is_vec_n_dim_t<N, K>>>
 inline auto operator*(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
-noexcept -> vec_t<N, decltype(std::declval<T>() * std::declval<K>())> {
+-> vec_t<N, decltype(std::declval<T>() * std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() * std::declval<K>())>((lhs.ptr[Indices] * rhs)...);
 }
 
 template<size_t N, typename T, typename K, size_t... Indices,
 typename = disable_if<is_vec_n_dim_t<N, K>>>
 inline auto operator*(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
-noexcept -> vec_t<N, decltype(std::declval<K>() * std::declval<T>())> {
+-> vec_t<N, decltype(std::declval<K>() * std::declval<T>())> {
 	return vec_t<N, decltype(std::declval<K>() * std::declval<T>())>((lhs * rhs.ptr[Indices])...);
 }
 
-// operator/(vec, skalar) --------------------------------------------------------------------------
+// operator/(vec, scalar) --------------------------------------------------------------------------
 template<size_t N, typename T, typename K, size_t... Indices,
 typename = disable_if<is_vec_n_dim_t<N, K>>>
 inline auto operator/(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
-noexcept -> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
+-> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
 	return vec_t<N, decltype(std::declval<T>() / std::declval<K>())>((lhs.ptr[Indices] / rhs)...);
 }
 
 template<size_t N, typename T, typename K, size_t... Indices,
 typename = disable_if<is_vec_n_dim_t<N, K>>>
 inline auto operator/(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
-noexcept -> vec_t<N, decltype(std::declval<K>() / std::declval<T>())> {
+-> vec_t<N, decltype(std::declval<K>() / std::declval<T>())> {
 	return vec_t<N, decltype(std::declval<K>() / std::declval<T>())>((lhs / rhs.ptr[Indices])...);
+}
+
+// operator-(vec, scalar) --------------------------------------------------------------------------
+template<size_t N, typename T, typename K, size_t... Indices,
+typename = disable_if<is_vec_n_dim_t<N, K>>>
+inline auto operator-(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
+-> vec_t<N, decltype(std::declval<T>() - std::declval<K>())> {
+	return vec_t<N, decltype(std::declval<T>() - std::declval<K>())>((lhs.ptr[Indices] - rhs)...);
+}
+
+template<size_t N, typename T, typename K, size_t... Indices,
+typename = disable_if<is_vec_n_dim_t<N, K>>>
+inline auto operator-(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
+-> vec_t<N, decltype(std::declval<K>() - std::declval<T>())> {
+	return vec_t<N, decltype(std::declval<K>() - std::declval<T>())>((lhs - rhs.ptr[Indices])...);
+}
+
+// operator+(vec, scalar) --------------------------------------------------------------------------
+template<size_t N, typename T, typename K, size_t... Indices,
+typename = disable_if<is_vec_n_dim_t<N, K>>>
+inline auto operator+(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
+-> vec_t<N, decltype(std::declval<T>() + std::declval<K>())> {
+	return vec_t<N, decltype(std::declval<T>() + std::declval<K>())>((lhs.ptr[Indices] + rhs)...);
+}
+
+template<size_t N, typename T, typename K, size_t... Indices,
+typename = disable_if<is_vec_n_dim_t<N, K>>>
+inline auto operator+(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
+-> vec_t<N, decltype(std::declval<K>() + std::declval<T>())> {
+	return vec_t<N, decltype(std::declval<K>() + std::declval<T>())>((lhs + rhs.ptr[Indices])...);
 }
 
 // operator==(vec, vec) ----------------------------------------------------------------------------
 template<size_t N, typename T, typename K>
-inline bool operator==(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator==(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return vec_iteration_helper<N>::eq(lhs, rhs);
 }
 template<size_t N, typename T, typename K>
-inline bool operator!=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator!=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return vec_iteration_helper<N>::ne(lhs, rhs);
 }
 
 // operator<(vec, vec) -----------------------------------------------------------------------------
 template<size_t N, typename T, typename K>
-inline bool operator<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return lhs.lengthSquare() < rhs.lengthSquare();
 }
 template<size_t N, typename T, typename K>
-inline bool operator<=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator<=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return lhs.lengthSquare() <= rhs.lengthSquare();
 }
 template<size_t N, typename T, typename K>
-inline bool operator>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return lhs.lengthSquare() > rhs.lengthSquare();
 }
 template<size_t N, typename T, typename K>
-inline bool operator>=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
+inline bool operator>=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return lhs.lengthSquare() >= rhs.lengthSquare();
 }
 
-// operator<(vec, skalar) --------------------------------------------------------------------------
+// operator<(vec, scalar) --------------------------------------------------------------------------
 template<size_t N, typename T, typename K>
-inline bool operator<(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+inline bool operator<(const vec_t<N, T>& lhs, const K& rhs) {
 	return lhs.length() < rhs;
 }
 template<size_t N, typename T, typename K>
-inline bool operator<=(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+inline bool operator<=(const vec_t<N, T>& lhs, const K& rhs) {
 	return lhs.length() <= rhs;
 }
 template<size_t N, typename T, typename K>
-inline bool operator>(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+inline bool operator>(const vec_t<N, T>& lhs, const K& rhs) {
 	return lhs.length() > rhs;
 }
 template<size_t N, typename T, typename K>
-inline bool operator>=(const vec_t<N, T>& lhs, const K& rhs) noexcept {
+inline bool operator>=(const vec_t<N, T>& lhs, const K& rhs) {
 	return lhs.length() >= rhs;
 }
 
-// operator<(skalar, vec) --------------------------------------------------------------------------
+// operator<(scalar, vec) --------------------------------------------------------------------------
 template<size_t N, typename T, typename K>
-inline bool operator<(const K& lhs, const vec_t<N, T>& rhs) noexcept {
+inline bool operator<(const K& lhs, const vec_t<N, T>& rhs) {
 	return lhs < rhs.length();
 }
 template<size_t N, typename T, typename K>
-inline bool operator<=(const K& lhs, const vec_t<N, T>& rhs) noexcept {
+inline bool operator<=(const K& lhs, const vec_t<N, T>& rhs) {
 	return lhs <= rhs.length();
 }
 template<size_t N, typename T, typename K>
-inline bool operator>(const K& lhs, const vec_t<N, T>& rhs) noexcept {
+inline bool operator>(const K& lhs, const vec_t<N, T>& rhs) {
 	return lhs > rhs.length();
 }
 template<size_t N, typename T, typename K>
-inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) noexcept {
+inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
 	return lhs >= rhs.length();
 }
 
@@ -587,7 +630,7 @@ inline std::ostream& operator<<(
 template<size_t N, typename T, size_t... Indices>
 inline vec_t<N, T> maxByDimensions(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) noexcept {
+		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) {
 	return vec_t<N, T>(
 			std::max(lhs.ptr[Indices], rhs.ptr[Indices])...
 			);
@@ -597,7 +640,7 @@ inline vec_t<N, T> maxByDimensions(
 template<size_t N, typename T, size_t... Indices>
 inline vec_t<N, T> minByDimensions(
 		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) noexcept {
+		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) {
 	return vec_t<N, T>(
 			std::min(lhs.ptr[Indices], rhs.ptr[Indices])...
 			);
@@ -607,11 +650,35 @@ inline vec_t<N, T> minByDimensions(
 
 template<typename K, size_t N, typename T, size_t... Indices>
 inline vec_t<N, K> vec_static_cast(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>& vec) noexcept {
+		const vec_helper_t<N, T, std::index_sequence<Indices...>>& vec) {
 	return vec_t<N, K>(static_cast<K>(vec.ptr[Indices])...);
 }
 
 // =================================================================================================
+
+#ifdef LIBV_USE_GLM_BRIDGE
+
+#define LIBV_VEC_GLM_CONVERTER(N)                                                                  \
+template <typename T> inline decltype(auto) from_glm(glm::tvec##N<T>& v) {                         \
+	return reinterpret_cast<vec_t<N, T>&>(v);                                                      \
+}                                                                                                  \
+template <typename T> inline decltype(auto) from_glm(const glm::tvec##N<T>& v) {                   \
+	return reinterpret_cast<const vec_t<N, T>&>(v);                                                \
+}                                                                                                  \
+template <typename T> inline decltype(auto) to_glm(vec_t<N, T>& v) {                               \
+	return reinterpret_cast<glm::tvec##N<T>&>(v);                                                  \
+}                                                                                                  \
+template <typename T> inline decltype(auto) to_glm(const vec_t<N, T>& v) {                         \
+	return reinterpret_cast<const glm::tvec##N<T>&>(v);                                            \
+}
+
+LIBV_VEC_GLM_CONVERTER(2)
+LIBV_VEC_GLM_CONVERTER(3)
+LIBV_VEC_GLM_CONVERTER(4)
+
+#undef LIBV_VEC_GLM_CONVERTER
+
+#endif
 
 // aliases -----------------------------------------------------------------------------------------
 
@@ -619,50 +686,30 @@ template <typename T> using vec2_t = vec_t<2, T>;
 template <typename T> using vec3_t = vec_t<3, T>;
 template <typename T> using vec4_t = vec_t<4, T>;
 
-using fvec2 = vec2_t<float>;
-using fvec3 = vec3_t<float>;
-using fvec4 = vec4_t<float>;
-using dvec2 = vec2_t<double>;
-using dvec3 = vec3_t<double>;
-using dvec4 = vec4_t<double>;
-using ivec2 = vec2_t<int32_t>;
-using ivec3 = vec3_t<int32_t>;
-using ivec4 = vec4_t<int32_t>;
-using uivec2 = vec2_t<uint32_t>;
-using uivec3 = vec3_t<uint32_t>;
-using uivec4 = vec4_t<uint32_t>;
-using lvec2 = vec2_t<int64_t>;
-using lvec3 = vec3_t<int64_t>;
-using lvec4 = vec4_t<int64_t>;
-using ulvec2 = vec2_t<uint64_t>;
-using ulvec3 = vec3_t<uint64_t>;
-using ulvec4 = vec4_t<uint64_t>;
+using vec2f = vec2_t<float>;
+using vec3f = vec3_t<float>;
+using vec4f = vec4_t<float>;
+using vec2d = vec2_t<double>;
+using vec3d = vec3_t<double>;
+using vec4d = vec4_t<double>;
+using vec2i = vec2_t<int32_t>;
+using vec3i = vec3_t<int32_t>;
+using vec4i = vec4_t<int32_t>;
+using vec2u = vec2_t<uint32_t>;
+using vec3u = vec3_t<uint32_t>;
+using vec4u = vec4_t<uint32_t>;
+using vec2ui = vec2_t<uint32_t>;
+using vec3ui = vec3_t<uint32_t>;
+using vec4ui = vec4_t<uint32_t>;
+using vec2l = vec2_t<int64_t>;
+using vec3l = vec3_t<int64_t>;
+using vec4l = vec4_t<int64_t>;
+using vec2ul = vec2_t<uint64_t>;
+using vec3ul = vec3_t<uint64_t>;
+using vec4ul = vec4_t<uint64_t>;
 
-using vec2 = vec2_t<float>;
-using vec3 = vec3_t<float>;
-using vec4 = vec4_t<float>;
-
-//using vec2f = vec2_t<float>;
-//using vec3f = vec3_t<float>;
-//using vec4f = vec4_t<float>;
-//using vec2d = vec2_t<double>;
-//using vec3d = vec3_t<double>;
-//using vec4d = vec4_t<double>;
-//using vec2i = vec2_t<int32_t>;
-//using vec3i = vec3_t<int32_t>;
-//using vec4i = vec4_t<int32_t>;
-//using vec2ui = vec2_t<uint32_t>;
-//using vec3ui = vec3_t<uint32_t>;
-//using vec4ui = vec4_t<uint32_t>;
-//using vec2l = vec2_t<int64_t>;
-//using vec3l = vec3_t<int64_t>;
-//using vec4l = vec4_t<int64_t>;
-//using vec2ul = vec2_t<uint64_t>;
-//using vec3ul = vec3_t<uint64_t>;
-//using vec4ul = vec4_t<uint64_t>;
-//
-//using vec2 = vec2d;
-//using vec3 = vec3d;
-//using vec4 = vec4d;
+//using vec2 = vec2f;
+//using vec3 = vec3f;
+//using vec4 = vec4f;
 
 } // namespace libv

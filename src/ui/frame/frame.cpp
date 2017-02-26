@@ -221,10 +221,10 @@ void Frame::setDisplayMode(const TypeDisplayMode& mode) {
 }
 
 void Frame::setPosition(int x, int y) {
-	setPosition(ivec2(x, y));
+	setPosition(vec2i(x, y));
 }
 
-void Frame::setPosition(ivec2 newpos) {
+void Frame::setPosition(vec2i newpos) {
 	context.executeAsync([this, newpos] {
 		LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
 		this->position = newpos;
@@ -268,10 +268,10 @@ void Frame::setResizable(bool resizable) {
 }
 
 void Frame::setSize(int x, int y) {
-	setSize(ivec2(x, y));
+	setSize(vec2i(x, y));
 }
 
-void Frame::setSize(ivec2 newsize) {
+void Frame::setSize(vec2i newsize) {
 	context.executeAsync([this, newsize] {
 		LIBV_LOG_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
 		size = newsize;
@@ -301,7 +301,7 @@ Frame::TypeDisplayMode Frame::getDisplayMode() const {
 	return displayMode;
 }
 
-ivec2 Frame::getSize() const {
+vec2i Frame::getSize() const {
 	return size;
 }
 
@@ -355,24 +355,24 @@ bool Frame::isMouseReleased(Mouse key) {
 	return getMouse(key) == KeyState::released;
 }
 
-fvec2 Frame::getMousePosition() {
+vec2f Frame::getMousePosition() {
 	const auto raw = mousePosition.load();
 
 	// The value stored in atomic mousePosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return fvec2(convert_from_s_24_8(x), convert_from_s_24_8(y));
+	return vec2f(convert_from_s_24_8(x), convert_from_s_24_8(y));
 }
 
-fvec2 Frame::getScrollPosition() {
+vec2f Frame::getScrollPosition() {
 	const auto raw = scrollPosition.load();
 
 	// The value stored in atomic wheelPosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return fvec2(convert_from_s_24_8(x), convert_from_s_24_8(y));
+	return vec2f(convert_from_s_24_8(x), convert_from_s_24_8(y));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -460,7 +460,7 @@ Frame::Frame(const std::string& title, unsigned int width, unsigned int height) 
 	onClose(AccumulatorLogicalAnd<bool>::get()),
 	context(fmt::sprintf("Frame - %s", title)),
 	title(title) {
-	size = ivec2(width, height);
+	size = vec2i(width, height);
 	registerFrame(this);
 	initEvents();
 	ui.attach(make_observer(this));

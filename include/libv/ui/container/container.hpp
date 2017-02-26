@@ -20,8 +20,8 @@ class Context;
 class Container : public Component {
 public:
 	struct LayoutResult {
-		vec3 size;
-		vec3 offset;
+		vec3f size;
+		vec3f offset;
 	};
 	struct ContainedComponent {
 		LayoutResult info;

@@ -7,7 +7,7 @@
 // libv
 #include <libv/gl/guard.hpp>
 #include <libv/gl/texture.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <array>
 #include <string>
@@ -53,9 +53,9 @@ constexpr const size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
 class Font2D {
 public:
 	struct Character {
-		vec2 vertexCoord[4];
-		vec2 textureCoord[4];
-		vec2 advance; // The pen offset for the next character position
+		vec2f vertexCoord[4];
+		vec2f textureCoord[4];
+		vec2f advance; // The pen offset for the next character position
 	};
 
 private:
@@ -78,8 +78,8 @@ private:
 	// TODO P2: unique_ptr for FT_Face
 
 private:
-	uivec2 textureSize{DEFAULT_FONT2D_TEXTURE_WIDTH, DEFAULT_FONT2D_TEXTURE_HEIGHT};
-	uivec2 texturePen{0, 0};
+	vec2ui textureSize{DEFAULT_FONT2D_TEXTURE_WIDTH, DEFAULT_FONT2D_TEXTURE_HEIGHT};
+	vec2ui texturePen{0, 0};
 	uint32_t textureNextLine = 0;
 	std::array<GLubyte, DEFAULT_FONT2D_TEXTURE_WIDTH * DEFAULT_FONT2D_TEXTURE_HEIGHT> textureData;
 
@@ -135,7 +135,7 @@ public:
 	/**
 	 * @context ANY
 	 */
-	ivec2 getKerning(uint32_t left, uint32_t right, uint32_t size);
+	vec2i getKerning(uint32_t left, uint32_t right, uint32_t size);
 	/**
 	 * @state This operation requires loaded state
 	 * @context ANY

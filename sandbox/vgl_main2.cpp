@@ -4,9 +4,6 @@
 #include <boost/filesystem.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/rotate_vector.hpp>
 // libv
 #include <libv/read_file.hpp>
 #include <libv/timer.hpp>
@@ -82,22 +79,22 @@ static void error_callback(int code, const char* description) {
 struct Example {
 	libv::gl::GL gl;
 
-	libv::gl::AttributeFixLocation<glm::vec3> attributePosition;
-	libv::gl::AttributeFixLocation<glm::vec2> attributeUV;
+	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition;
+	libv::gl::AttributeFixLocation<libv::vec2f> attributeUV;
 
 	libv::gl::GuardedShader shaderTest1Frag;
 	libv::gl::GuardedShader shaderTest1Vert;
 	libv::gl::GuardedProgram programTest1;
-	libv::gl::Uniform<glm::mat4> uniformTest1MVPmat;
-	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest1TextureDiffuseSampler;
+	libv::gl::Uniform_mat4f uniformTest1MVPmat;
+	libv::gl::Uniform_texture uniformTest1TextureDiffuseSampler;
 
 	libv::gl::GuardedShader shaderTest2Frag;
 	libv::gl::GuardedShader shaderTest2Vert;
 	libv::gl::GuardedProgram programTest2;
-	libv::gl::Uniform<glm::mat4> uniformTest2MVPmat;
-	libv::gl::Uniform<glm::mat4> uniformTest2Mmat;
-	libv::gl::Uniform<glm::vec3> uniformTest2EyePosW;
-	libv::gl::Uniform<libv::gl::TextureChannel> uniformTest2TextureSkySampler;
+	libv::gl::Uniform_mat4f uniformTest2MVPmat;
+	libv::gl::Uniform_mat4f uniformTest2Mmat;
+	libv::gl::Uniform_vec3f uniformTest2EyePosW;
+	libv::gl::Uniform_texture uniformTest2TextureSkySampler;
 
 	libv::gl::VertexBuffer bufferVertexData;
 	libv::gl::VertexBuffer bufferVertexIndices;
@@ -107,44 +104,44 @@ struct Example {
 	libv::gl::TextureCubeGuard textureSky;
 
 	struct Vertex {
-		glm::vec3 position;
-		glm::vec2 uv;
+		libv::vec3f position;
+		libv::vec2f uv;
 
-		Vertex(glm::vec3 position, glm::vec2 uv) :
+		Vertex(libv::vec3f position, libv::vec2f uv) :
 			position(position), uv(uv) { }
 	};
 
 	Example() {
 		Vertex dataVertex[]{
-			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 1.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, +1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, +1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, +1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(-1.f, +1.f, +1.f), libv::vec2f(0.f, 1.f)},
 
-			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(0.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, -1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, -1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, -1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(-1.f, +1.f, -1.f), libv::vec2f(0.f, 1.f)},
 
-			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, +1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, -1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, +1.f, -1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, +1.f, +1.f), libv::vec2f(0.f, 1.f)},
 
-			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, -1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, -1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, +1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, +1.f), libv::vec2f(0.f, 1.f)},
 
-			Vertex{glm::vec3(+1.f, -1.f, -1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(+1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(+1.f, +1.f, +1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(+1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, -1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, -1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(+1.f, +1.f, +1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(+1.f, -1.f, +1.f), libv::vec2f(0.f, 1.f)},
 
-			Vertex{glm::vec3(-1.f, +1.f, +1.f), glm::vec2(0.f, 0.f)},
-			Vertex{glm::vec3(-1.f, +1.f, -1.f), glm::vec2(1.f, 0.f)},
-			Vertex{glm::vec3(-1.f, -1.f, -1.f), glm::vec2(1.f, 1.f)},
-			Vertex{glm::vec3(-1.f, -1.f, +1.f), glm::vec2(0.f, 1.f)}
+			Vertex{libv::vec3f(-1.f, +1.f, +1.f), libv::vec2f(0.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, +1.f, -1.f), libv::vec2f(1.f, 0.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, -1.f), libv::vec2f(1.f, 1.f)},
+			Vertex{libv::vec3f(-1.f, -1.f, +1.f), libv::vec2f(0.f, 1.f)}
 		};
 
 		uint32_t dataIndices[]{
@@ -205,16 +202,16 @@ struct Example {
 
 		angle += 0.5f;
 
-		gl.projection.setToPerspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
-		gl.view.setToLookAt(glm::vec3(5.f, 3.f, 5.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-		gl.view.rotate(angle / 90, glm::vec3(0, 1, 0));
-		gl.model.identity();
+		gl.projection = libv::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
+		gl.view = libv::lookAt(libv::vec3f(5.f, 3.f, 5.f), libv::vec3f(0.f, 0.f, 0.f), libv::vec3f(0.f, 1.f, 0.f));
+		gl.view.rotate(angle / 90.f, libv::vec3f(0.f, 1.f, 0.f));
+		gl.model = libv::identity<4, float>();
 
 		// Draw Sky
 		{
 			auto mStackGuard = gl.model.pushGuard();
-			gl.model.translate(gl.view.eye());
-			gl.model.scale(3, 3, 3);
+			gl.model.translate(gl.eye());
+			gl.model.scale(libv::vec3f(3.f, 3.f, 3.f));
 
 			auto dCapabilityGuard = gl.disableGuard(libv::gl::Capability::DepthTest);
 			gl.frontFaceCW(); // Cheat for the sake of sandbox
@@ -223,7 +220,7 @@ struct Example {
 			auto sBindGuard = textureSky.bindGuard();
 			uniformTest2MVPmat = gl.mvp();
 			uniformTest2Mmat = gl.model;
-			uniformTest2EyePosW = gl.view.eye();
+			uniformTest2EyePosW = gl.eye();
 
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
 

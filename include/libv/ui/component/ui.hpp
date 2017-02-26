@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/memory.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/container/panel_flow.hpp>
 #include <libv/ui/render/context.hpp>
@@ -39,15 +39,15 @@ private:
 	Context context; //Layout layout;
 	PanelFlow content; // TODO P5: Change to a more primitive panel
 
-	ivec2 position;
-	ivec2 size;
+	vec2i position;
+	vec2i size;
 
 	bool valid = false;
 
 public:
 	Context& getContext();
-	ivec2 getSize() const;
-	void setSize(ivec2 size);
+	vec2i getSize() const;
+	void setSize(vec2i size);
 
 private:
 	void build();

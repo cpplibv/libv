@@ -7,7 +7,7 @@
 #include <fmt/format.h> // toPrettyString
 // libv
 #include <libv/string.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <cstring>
 #include <string>
@@ -17,7 +17,7 @@
 #include <libv/utility.hpp>
 
 // TODO P5: Most of the event should get a observer_ptr<Frame> as member
-// TODO P5: Review every event and change int to bool or enum, and (double, double) to dvec2
+// TODO P5: Review every event and change int to bool or enum, and (double, double) to vec2d
 // TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
 //			EventWindowRefresh is not that simple, i think i have to work with it to 'force' refresh
 //			if context is frozen due to event qua 'lock' in glfw (moving window)
@@ -70,9 +70,9 @@ struct EventDrop {
 };
 
 struct EventFramebufferSize {
-	ivec2 size;
+	vec2i size;
 	EventFramebufferSize(int width, int height) : size(width, height) { }
-	EventFramebufferSize(ivec2 size) : size(size) { }
+	EventFramebufferSize(vec2i size) : size(size) { }
 
 	std::string toPrettyString() const {
 		return fmt::format("Framebuffer Size: size = ({}, {})", size.x, size.y);
@@ -124,9 +124,9 @@ struct EventMouseEnter {
 };
 
 struct EventMousePosition {
-	dvec2 position;
+	vec2d position;
 	EventMousePosition(double xpos, double ypos) : position(xpos, ypos) { }
-	EventMousePosition(dvec2 position) : position(position) { }
+	EventMousePosition(vec2d position) : position(position) { }
 
 	std::string toPrettyString() const {
 		return fmt::format("Mouse Position: position = ({}, {})", position.x, position.y);
@@ -134,9 +134,9 @@ struct EventMousePosition {
 };
 
 struct EventMouseScroll {
-	dvec2 offset;
+	vec2d offset;
 	EventMouseScroll(double xoffset, double yoffset) : offset(xoffset, yoffset) { }
-	EventMouseScroll(dvec2 offset) : offset(offset) { }
+	EventMouseScroll(vec2d offset) : offset(offset) { }
 
 	std::string toPrettyString() const {
 		return fmt::format("Mouse Scroll: offset = ({}, {})", offset.x, offset.y);
@@ -168,9 +168,9 @@ struct EventWindowIconify {
 };
 
 struct EventWindowPosition {
-	ivec2 position;
+	vec2i position;
 	EventWindowPosition(int x, int y) : position(x, y) { }
-	EventWindowPosition(ivec2 position) : position(position) { }
+	EventWindowPosition(vec2i position) : position(position) { }
 
 	std::string toPrettyString() const {
 		return fmt::format("Window Position: position = ({}, {})", position.x, position.y);
@@ -184,9 +184,9 @@ struct EventWindowRefresh {
 };
 
 struct EventWindowSize {
-	ivec2 size;
+	vec2i size;
 	EventWindowSize(int x, int y) : size(x, y) { }
-	EventWindowSize(ivec2 size) : size(size) { }
+	EventWindowSize(vec2i size) : size(size) { }
 
 	std::string toPrettyString() const {
 		return fmt::format("Window Size: size = ({}, {})", size.x, size.y);

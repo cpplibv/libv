@@ -2,8 +2,6 @@
 
 // hpp
 #include <libv/ui/component/label.hpp>
-// ext
-#include <glm/gtx/transform.hpp>
 // pro
 #include <libv/gl/log.hpp>
 #include <libv/ui/layout.hpp>
@@ -24,7 +22,7 @@ LayoutInfo Label::doLayout(const LayoutInfo& parentLayoutInfo) {
 	text.setSize(size);
 	text.build(getContext());
 	auto result = maxByDimensions(size, text.getLayoutedSize());
-	return vec3(result, 0);
+	return vec3f(result, 0);
 }
 
 void Label::doBuild(Context& context) {

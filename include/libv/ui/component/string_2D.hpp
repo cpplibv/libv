@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/gl/vertex_buffer.hpp>
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <string>
 #include <vector>
@@ -52,11 +52,11 @@ private:
 
 	struct Character {
 		struct Vertex {
-			vec2 position;
-			vec2 texture0;
+			vec2f position;
+			vec2f texture0;
 		} vertices[6];
 
-		Character(ivec2 offset, const Font2D::Character& ch) {
+		Character(vec2i offset, const Font2D::Character& ch) {
 			vertices[0].position = offset + ch.vertexCoord[0];
 			vertices[1].position = offset + ch.vertexCoord[1];
 			vertices[2].position = offset + ch.vertexCoord[2];
@@ -78,13 +78,13 @@ private:
 		uint32_t vertexCount = 0;
 		UIFont2D_view font;
 		UIProgram_view program;
-		fvec4 color;
+		vec4f color;
 		uint32_t size;
 
 		Segment(uint32_t vertexStart,
 				const UIFont2D_view& font,
 				const UIProgram_view& program,
-				fvec4 color,
+				vec4f color,
 				uint32_t size) :
 			vertexStart(vertexStart),
 			font(font),
@@ -96,8 +96,8 @@ private:
 	Anchor halign = Anchor::Center;
 	Anchor valign = Anchor::Center;
 
-	ivec2 maxSize;
-	ivec2 layoutedSize;
+	vec2i maxSize;
+	vec2i layoutedSize;
 
 	bool renderChanged = true;
 	std::string rawText;
@@ -113,9 +113,9 @@ public:
 
 public:
 	void setText(const std::string& text);
-	void setSize(ivec2 size);
+	void setSize(vec2i size);
 
-	ivec2 getLayoutedSize() const {
+	vec2i getLayoutedSize() const {
 		return layoutedSize;
 	}
 
@@ -124,7 +124,7 @@ public:
 	}
 
 public:
-	ivec2 layout();
+	vec2i layout();
 	void build(Context& context);
 	void destroy(Context& context);
 	void render(Context& context);

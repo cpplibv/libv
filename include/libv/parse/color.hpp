@@ -6,7 +6,7 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <string>
 
@@ -17,7 +17,7 @@ namespace parse {
 
 // -------------------------------------------------------------------------------------------------
 
-using color = libv::fvec4;
+using color = libv::vec4f;
 
 color to_color(const std::string& str) {
 

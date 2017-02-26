@@ -21,7 +21,7 @@ private:
 };
 
 struct TestQuadDynamicLayout : public libv::ui::Component {
-	libv::vec3 size;
+	libv::vec3f size;
 	TestQuadDynamicLayout(const std::string& id) {
 		setComponentID(id);
 	}

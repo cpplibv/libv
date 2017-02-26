@@ -4,9 +4,7 @@
 #include <libv/ui/component/string_2D.hpp>
 // ext
 #include <GL/glew.h>
-//#include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem/path.hpp>
-#include <glm/gtx/transform.hpp>
 #include <utf8cpp/utf8.h>
 // libv
 #include <libv/gl/gl.hpp>
@@ -46,15 +44,15 @@ void String2D::setText(const std::string& text) {
 	renderChanged = true;
 }
 
-void String2D::setSize(ivec2 size) {
+void String2D::setSize(vec2i size) {
 	maxSize = size;
 	renderChanged = true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-ivec2 String2D::layout() {
-	return ivec2();
+vec2i String2D::layout() {
+	return vec2i();
 }
 
 void String2D::build(Context& context) {
@@ -77,7 +75,7 @@ void String2D::render(Context& context) {
 		auto dDisableGuard = context.gl.disableGuard(gl::Capability::DepthTest);
 		auto mStackGuard = context.gl.model.pushGuard();
 
-		context.gl.model.translate(0, +layoutedSize.y, 0);
+		context.gl.model.translate(libv::vec3f(0, +layoutedSize.y, 0));
 
 		for (const auto& segment : segments) {
 			segment.program->use();
@@ -101,7 +99,7 @@ struct String2D::Builder {
 	struct Line {
 		uint32_t start = 0;
 		uint32_t last = 0;
-		ivec2 size;
+		vec2i size;
 	};
 
 	// TODO P2: Base font by property
@@ -118,7 +116,7 @@ struct String2D::Builder {
 
 	std::stack<UIFont2D_view> stackFont;
 	std::stack<UIProgram_view> stackProgram;
-	std::stack<fvec4> stackColor;
+	std::stack<vec4f> stackColor;
 	std::stack<uint32_t> stackSize;
 
 	std::vector<String2D::Segment> segments;
@@ -130,8 +128,8 @@ struct String2D::Builder {
 	uint32_t currentChar = 0;
 
 	int32_t pen = 0;
-	ivec2 boundingBox;
-	ivec2 layoutSize;
+	vec2i boundingBox;
+	vec2i layoutSize;
 
 private:
 	void outputText(const std::string& text) {
@@ -146,7 +144,7 @@ private:
 			lines.emplace_back();
 
 			lines.back().start = characters.size();
-			lines.back().size = ivec2(0, 0);
+			lines.back().size = vec2i(0, 0);
 		};
 
 		for (const auto& codePoint : text | view::uft8_to_codepoint) {
@@ -166,7 +164,7 @@ private:
 			if (boundingBox.x > 0 && (pen + currentGlyph.advance.x) > boundingBox.x)
 				outputNewLine();
 
-			characters.emplace_back(ivec2(pen, 0), currentGlyph);
+			characters.emplace_back(vec2i(pen, 0), currentGlyph);
 			pen += currentGlyph.advance.x;
 
 			lines.back().size.x = pen;
@@ -192,7 +190,7 @@ public:
 
 		lines.emplace_back();
 		lines.back().start = 0;
-		lines.back().size = ivec2(0, 0);
+		lines.back().size = vec2i(0, 0);
 
 		for (const auto& tag : tags) {
 			if (tag.name.empty()) {
@@ -237,7 +235,7 @@ public:
 		segments.back().vertexCount = characters.size() * 6 - segments.back().vertexStart;
 	}
 
-	Builder(Context& context, ivec2 maxSize) :
+	Builder(Context& context, vec2i maxSize) :
 		context(context),
 		stackFont({context.resource.font("res/font/default.ttf")}),
 		stackProgram({context.resource.program("res/shader/font")}),
@@ -264,8 +262,8 @@ void String2D::buildImpl(Context& context) {
 		vbo.create();
 		vao.create();
 
-		vao.bindAttribute(vbo, gl::Attribute<glm::vec2>(0), sizeof (Character::Vertex), offsetof(Character::Vertex, position), false);
-		vao.bindAttribute(vbo, gl::Attribute<glm::vec2>(8), sizeof (Character::Vertex), offsetof(Character::Vertex, texture0), false);
+		vao.bindAttribute(vbo, gl::Attribute<libv::vec2f>(0), sizeof (Character::Vertex), offsetof(Character::Vertex, position), false);
+		vao.bindAttribute(vbo, gl::Attribute<libv::vec2f>(8), sizeof (Character::Vertex), offsetof(Character::Vertex, texture0), false);
 	}
 
 	vbo.data(characters.data(), characters.size() * sizeof (characters[0]), gl::BufferUsage::StaticDraw);

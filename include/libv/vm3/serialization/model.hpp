@@ -7,8 +7,9 @@
 // cfg
 #include <libv/vm3/config.hpp>
 // libv
+#include <libv/serialization/mat.hpp>
 #include <libv/serialization/nvp.hpp>
-#include <libv/serialization/glm.hpp>
+#include <libv/serialization/vec.hpp>
 // pro
 #include <libv/vm3/serialization/material.hpp>
 

@@ -29,7 +29,7 @@ int main(int, char **) {
 	material1.set("test", 42);
 	material1.set("testf", 42.1f);
 	material1.set("testd", 42.2);
-	material1.set("victor", libv::dvec3(4, 3, 543.32));
+	material1.set("victor", libv::vec3d(4, 3, 543.32));
 	material1.set("zzz", 0xffff);
 	material1.set<std::string>("diffuseTexture", "diffuseTexture.dds");
 	material1.set<std::string>("emissionTexture", "emissionTexture.dds");

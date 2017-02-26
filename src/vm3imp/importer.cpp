@@ -7,10 +7,8 @@
 #include <assimp/postprocess.h>
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <vector>
 // pro
@@ -56,15 +54,15 @@ void Importer::importMaterials(Model& model, const aiScene* scene) {
 			materials[i].setShader(to_libv_technique(ai_int));
 
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_DIFFUSE, ai_col4))
-			materials[i].set("color_diffuse", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_diffuse", libv::vec4f(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_SPECULAR, ai_col4))
-			materials[i].set("color_specular", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_specular", libv::vec4f(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_AMBIENT, ai_col4))
-			materials[i].set("color_ambient", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_ambient", libv::vec4f(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_EMISSIVE, ai_col4))
-			materials[i].set("color_emissive", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_emissive", libv::vec4f(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_COLOR_REFLECTIVE, ai_col4))
-			materials[i].set("color_reflective", libv::vec4(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
+			materials[i].set("color_reflective", libv::vec4f(ai_col4.r, ai_col4.g, ai_col4.b, ai_col4.a));
 
 		if (AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_SHININESS, ai_float))
 			materials[i].set("shininess", ai_float);
@@ -121,7 +119,7 @@ void Importer::importNodes(Model& model, const aiScene* scene) {
 	importNodes(model, scene, 0, scene->mRootNode);
 
 	// TODO P4: Prompt for Unit scale factor
-	model.nodes[0].transformation *= glm::scale(glm::vec3(100, 100, 100));
+	model.nodes[0].transformation.scale(libv::vec3f(100.f, 100.f, 100.f));
 }
 
 void Importer::importNodes(Model& model, const aiScene* scene, uint32_t nodeID, const aiNode* aiNode) {
@@ -129,7 +127,7 @@ void Importer::importNodes(Model& model, const aiScene* scene, uint32_t nodeID, 
 	model.nodes[nodeID].name = aiNode->mName.C_Str();
 	aiMatrix4x4 m = aiNode->mTransformation;
 	aiTransposeMatrix4(&m);
-	model.nodes[nodeID].transformation = glm::mat4(
+	model.nodes[nodeID].transformation = libv::mat4f(
 			m.a1, m.a2, m.a3, m.a4,
 			m.b1, m.b2, m.b3, m.b4,
 			m.c1, m.c2, m.c3, m.c4,
@@ -169,12 +167,12 @@ void Importer::importGeometry(Model& model, const aiScene* scene) {
 			const aiVector3D* pTexCoord = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][j]) : &Zero3D;
 
 			Vertex vertex;
-			vertex.position = glm::vec3(pPos->x, pPos->y, pPos->z);
-			vertex.normal = glm::vec3(pNormal->x, pNormal->y, pNormal->z);
-			vertex.tangent = glm::vec3(pTangent->x, pTangent->y, pTangent->z);
-			vertex.bitangent = glm::vec3(pBitangent->x, pBitangent->y, pBitangent->z);
-			vertex.texCoord0 = glm::vec2(pTexCoord->x, pTexCoord->y);
-			//vertex.boneID = ivec4();
+			vertex.position = libv::vec3f(pPos->x, pPos->y, pPos->z);
+			vertex.normal = libv::vec3f(pNormal->x, pNormal->y, pNormal->z);
+			vertex.tangent = libv::vec3f(pTangent->x, pTangent->y, pTangent->z);
+			vertex.bitangent = libv::vec3f(pBitangent->x, pBitangent->y, pBitangent->z);
+			vertex.texCoord0 = libv::vec2f(pTexCoord->x, pTexCoord->y);
+			//vertex.boneID = vec4i();
 			//vertex.boneWieght = vec4();
 
 			model.vertices.push_back(vertex);

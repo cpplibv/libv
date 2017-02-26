@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/log.hpp>
 
@@ -15,8 +15,8 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct LayoutInfo {
-	vec3 size;
-	LayoutInfo(vec3 size = vec3()) : size(size) { }
+	vec3f size;
+	LayoutInfo(vec3f size = vec3f()) : size(size) { }
 	LayoutInfo& operator=(const LayoutInfo& right) = default;
 	bool operator!=(const LayoutInfo& rhs) const {
 		return size != rhs.size;

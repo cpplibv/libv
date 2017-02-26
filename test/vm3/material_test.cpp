@@ -129,7 +129,7 @@ TEST_CASE("materialVisitor") {
 	Material material;
 	material.set("numDim0", 3);
 	material.set("numDim1", 4);
-	material.set("color", vec4(0,1,2,1));
+	material.set("color", vec4f(0,1,2,1));
 	material.set<std::string>("diffuseTexture", "diffuseTexture.dds");
 
 	MaterialPropertyCounter counter;

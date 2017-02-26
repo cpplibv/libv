@@ -2,8 +2,9 @@
 
 #pragma once
 
-// ext
-#include <glm/glm.hpp>
+// libv
+#include <libv/math/mat.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <vector>
 // pro
@@ -12,6 +13,7 @@
 // TODO P2: Use dynarray instead of vector
 // TODO P2: Use pointers instead of IDs
 // TODO P5: drop boost serialization for vm3
+
 
 namespace libv {
 namespace vm3 {
@@ -23,13 +25,13 @@ struct AnimationChannel {
 };
 
 struct Vertex {
-	glm::vec3 position;
-	glm::vec3 normal;
-	glm::vec3 tangent;
-	glm::vec3 bitangent;
-	glm::vec2 texCoord0;
-	glm::ivec4 boneID;
-	glm::vec4 boneWieght;
+	libv::vec3f position;
+	libv::vec3f normal;
+	libv::vec3f tangent;
+	libv::vec3f bitangent;
+	libv::vec2f texCoord0;
+	libv::vec4i boneID;
+	libv::vec4f boneWieght;
 };
 
 struct Mesh {
@@ -46,7 +48,7 @@ struct Node {
 	std::string name;
 	uint32_t parentID;
 	//bool visibility;
-	glm::mat4 transformation;
+	libv::mat4f transformation;
 	std::vector<uint32_t> meshIDs;
 	std::vector<uint32_t> childrenIDs;
 };

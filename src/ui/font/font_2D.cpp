@@ -10,7 +10,7 @@
 #include FT_OUTLINE_H
 #include FT_TRIGONOMETRY_H
 // libv
-#include <libv/vec.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/gl/gl.hpp>
@@ -77,7 +77,7 @@ void Font2D::unloadFont() {
 	FT_Done_Face(face);
 	face = nullptr;
 
-	texturePen = uivec2();
+	texturePen = vec2ui();
 	textureNextLine = 0;
 	textureData.fill(0);
 
@@ -134,7 +134,7 @@ int Font2D::getDescender(uint32_t size) {
 	return face->size->metrics.descender >> 6; // 26.6 format
 }
 
-ivec2 Font2D::getKerning(uint32_t left, uint32_t right, uint32_t size) {
+vec2i Font2D::getKerning(uint32_t left, uint32_t right, uint32_t size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	changeSizeOnDemand(size);
 
@@ -150,7 +150,7 @@ ivec2 Font2D::getKerning(uint32_t left, uint32_t right, uint32_t size) {
 			LIBV_LOG_UI_FT_ERROR("FT_Get_Kerning failed: [%d]", err);
 	}
 
-	return ivec2(kerning.x >> 6, kerning.y >> 6); // 26.6 float
+	return vec2i(kerning.x >> 6, kerning.y >> 6); // 26.6 float
 }
 
 const Font2D::Character& Font2D::getCharacter(uint32_t unicode, uint32_t size) {
@@ -189,7 +189,7 @@ Font2D::Character Font2D::renderCharacter(uint32_t unicode, uint32_t size) {
 	result.advance.y = glyph->advance.y / 65536.0f; // 16.16 float
 
 	if (texturePen.x + bitmapWidth > textureSize.x) // Warp to new line
-		texturePen = uivec2(0, textureNextLine + 1); // Leaves 1 px gap between lines
+		texturePen = vec2ui(0, textureNextLine + 1); // Leaves 1 px gap between lines
 
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
 		LIBV_LOG_UI_FT_ERROR("Failed to render character: Not enough space in font texture: "
@@ -215,10 +215,10 @@ Font2D::Character Font2D::renderCharacter(uint32_t unicode, uint32_t size) {
 	const auto tx1 = float(texturePen.x + bitmapWidth) / textureSize.x;
 	const auto ty0 = float(texturePen.y) / textureSize.y;
 	const auto ty1 = float(texturePen.y + bitmapHeight) / textureSize.y;
-	result.textureCoord[0] = vec2(tx0, ty0);
-	result.textureCoord[1] = vec2(tx1, ty0);
-	result.textureCoord[2] = vec2(tx1, ty1);
-	result.textureCoord[3] = vec2(tx0, ty1);
+	result.textureCoord[0] = vec2f(tx0, ty0);
+	result.textureCoord[1] = vec2f(tx1, ty0);
+	result.textureCoord[2] = vec2f(tx1, ty1);
+	result.textureCoord[3] = vec2f(tx0, ty1);
 	// <<< validate texture and pixel coord if they are ok (0.5ness)
 
 	const auto vx0 = bitmapGlyph->left;
@@ -226,10 +226,10 @@ Font2D::Character Font2D::renderCharacter(uint32_t unicode, uint32_t size) {
 	const auto vy0 = bitmapGlyph->top - bitmapHeight;
 	const auto vy1 = bitmapGlyph->top;
 
-	result.vertexCoord[0] = vec2(vx0, vy0);
-	result.vertexCoord[1] = vec2(vx1, vy0);
-	result.vertexCoord[2] = vec2(vx1, vy1);
-	result.vertexCoord[3] = vec2(vx0, vy1);
+	result.vertexCoord[0] = vec2f(vx0, vy0);
+	result.vertexCoord[1] = vec2f(vx1, vy0);
+	result.vertexCoord[2] = vec2f(vx1, vy1);
+	result.vertexCoord[3] = vec2f(vx0, vy1);
 
 	texturePen.x += bitmapWidth + 1; // Progress pen. Leaves 1 px gap between chars
 	FT_Done_Glyph(glyph);

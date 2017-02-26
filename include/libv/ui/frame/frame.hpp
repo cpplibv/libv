@@ -228,8 +228,8 @@ private:
 
 private:
 	unsigned int swapInterval = 1;
-	ivec2 position;
-	ivec2 size;
+	vec2i position;
+	vec2i size;
 
 private:
 	TypeOpenGLProfile openGLProfile = OPENGL_PROFILE_COMPAT;
@@ -280,16 +280,16 @@ public:
 	void setDecoration(bool decorated);
 	void setDisplayMode(const TypeDisplayMode& mode);
 	void setPosition(int x, int y);
-	void setPosition(ivec2 pos);
+	void setPosition(vec2i pos);
 	void setPosition(FramePosition pos);
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
-	void setSize(ivec2 size);
+	void setSize(vec2i size);
 	void setTitle(const std::string& title);
 
 	TypeCloseOperation getCloseOperation() const;
 	TypeDisplayMode getDisplayMode() const;
-	ivec2 getSize() const;
+	vec2i getSize() const;
 	std::string getTitle() const;
 	// * * *
 
@@ -308,8 +308,8 @@ public:
 	bool isMousePressed(Mouse key);
 	bool isMouseReleased(Mouse key);
 
-	fvec2 getMousePosition();
-	fvec2 getScrollPosition();
+	vec2f getMousePosition();
+	vec2f getScrollPosition();
 
 	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);

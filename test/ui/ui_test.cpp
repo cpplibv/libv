@@ -28,7 +28,7 @@ TEST_CASE("UI Layout system should handle basic layout components") {
 	panel.add(make_observer(&quad1));
 	panel.add(make_observer(&quad2));
 
-	LayoutInfo layoutRoot(vec3(16, 512, 0));
+	LayoutInfo layoutRoot(vec3f(16, 512, 0));
 
 	SECTION("") {
 		panel.setAlign(ALIGN_BOTTOM_LEFT);
@@ -39,12 +39,12 @@ TEST_CASE("UI Layout system should handle basic layout components") {
 		auto& components = panel.getComponents();
 
 		REQUIRE(components.size() == 3);
-		CHECK(components[0].info.size == vec3(2, 64, 0));
-		CHECK(components[1].info.size == vec3(4, 128, 0));
-		CHECK(components[2].info.size == vec3(8, 256, 0));
-		CHECK(components[0].info.offset == vec3(0, 0, 0));
-		CHECK(components[1].info.offset == vec3(2, 0, 0));
-		CHECK(components[2].info.offset == vec3(6, 0, 0));
+		CHECK(components[0].info.size == vec3f(2, 64, 0));
+		CHECK(components[1].info.size == vec3f(4, 128, 0));
+		CHECK(components[2].info.size == vec3f(8, 256, 0));
+		CHECK(components[0].info.offset == vec3f(0, 0, 0));
+		CHECK(components[1].info.offset == vec3f(2, 0, 0));
+		CHECK(components[2].info.offset == vec3f(6, 0, 0));
 	}
 }
 
@@ -55,15 +55,15 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 	TestQuadDynamicLayout quad2("Quad2");
 
 	panel.set(Property::Size, 16, 512, 0);
-	quad0.size = vec3(2, 64, 0);
-	quad1.size = vec3(4, 128, 0);
-	quad2.size = vec3(8, 256, 0);
+	quad0.size = vec3f(2, 64, 0);
+	quad1.size = vec3f(4, 128, 0);
+	quad2.size = vec3f(8, 256, 0);
 
 	panel.addObserver(quad0);
 	panel.addObserver(quad1);
 	panel.addObserver(quad2);
 
-	LayoutInfo layoutRoot(vec3(16, 512, 0));
+	LayoutInfo layoutRoot(vec3f(16, 512, 0));
 
 	SECTION("") {
 		panel.setAlign(ALIGN_BOTTOM_LEFT);
@@ -74,12 +74,12 @@ TEST_CASE("UI Layout system should handle dynamic layout components") {
 		auto& components = panel.getComponents();
 
 		REQUIRE(components.size() == 3);
-		CHECK(components[0].info.size == vec3(2, 64, 0));
-		CHECK(components[1].info.size == vec3(4, 128, 0));
-		CHECK(components[2].info.size == vec3(8, 256, 0));
-		CHECK(components[0].info.offset == vec3(0, 0, 0));
-		CHECK(components[1].info.offset == vec3(2, 0, 0));
-		CHECK(components[2].info.offset == vec3(6, 0, 0));
+		CHECK(components[0].info.size == vec3f(2, 64, 0));
+		CHECK(components[1].info.size == vec3f(4, 128, 0));
+		CHECK(components[2].info.size == vec3f(8, 256, 0));
+		CHECK(components[0].info.offset == vec3f(0, 0, 0));
+		CHECK(components[1].info.offset == vec3f(2, 0, 0));
+		CHECK(components[2].info.offset == vec3f(6, 0, 0));
 	}
 }
 
@@ -90,15 +90,15 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 	TestQuadDynamicLayout quad2("Quad2");
 
 	panel.set(Property::Size, 1000, 1000, 0);
-	quad0.size = vec3(800, 400, 0);
-	quad1.size = vec3(300, 20, 0);
-	quad2.size = vec3(300, 20, 0);
+	quad0.size = vec3f(800, 400, 0);
+	quad1.size = vec3f(300, 20, 0);
+	quad2.size = vec3f(300, 20, 0);
 
 	panel.addObserver(quad0);
 	panel.addObserver(quad1);
 	panel.addObserver(quad2);
 
-	LayoutInfo layoutRoot(vec3(1000, 1000, 0));
+	LayoutInfo layoutRoot(vec3f(1000, 1000, 0));
 
 	SECTION("") {
 		panel.setAlign(ALIGN_TOP_LEFT);
@@ -109,12 +109,12 @@ TEST_CASE("UI Layout system should handle dynamic layout components2") {
 		auto& components = panel.getComponents();
 
 		REQUIRE(components.size() == 3);
-		CHECK(components[0].info.size == vec3(800, 400, 0));
-		CHECK(components[1].info.size == vec3(300, 20, 0));
-		CHECK(components[2].info.size == vec3(300, 20, 0));
-		CHECK(components[0].info.offset == vec3(0, 600, 0));
-		CHECK(components[1].info.offset == vec3(0, 580, 0));
-		CHECK(components[2].info.offset == vec3(300, 580, 0));
+		CHECK(components[0].info.size == vec3f(800, 400, 0));
+		CHECK(components[1].info.size == vec3f(300, 20, 0));
+		CHECK(components[2].info.size == vec3f(300, 20, 0));
+		CHECK(components[0].info.offset == vec3f(0, 600, 0));
+		CHECK(components[1].info.offset == vec3f(0, 580, 0));
+		CHECK(components[2].info.offset == vec3f(300, 580, 0));
 	}
 }
 
@@ -144,12 +144,12 @@ TEST_CASE("UI Layout system should handle percent as ratio sizes") {
 		auto& components = panel.getComponents();
 
 		REQUIRE(components.size() == 3);
-		CHECK(components[0].info.size == vec3(100, 100, 0));
-		CHECK(components[1].info.size == vec3(200, 200, 0));
-		CHECK(components[2].info.size == vec3(200, 200, 0));
-		CHECK(components[0].info.offset == vec3(0, 0, 0));
-		CHECK(components[1].info.offset == vec3(100, 0, 0));
-		CHECK(components[2].info.offset == vec3(300, 0, 0));
+		CHECK(components[0].info.size == vec3f(100, 100, 0));
+		CHECK(components[1].info.size == vec3f(200, 200, 0));
+		CHECK(components[2].info.size == vec3f(200, 200, 0));
+		CHECK(components[0].info.offset == vec3f(0, 0, 0));
+		CHECK(components[1].info.offset == vec3f(100, 0, 0));
+		CHECK(components[2].info.offset == vec3f(300, 0, 0));
 	}
 }
 
