@@ -63,7 +63,7 @@ void UI::render() {
 
 	LIBV_GL_CHECK();
 
-	context.gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
+//	context.gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
 	context.gl.clear();
 	context.gl.viewport(position, size);
 

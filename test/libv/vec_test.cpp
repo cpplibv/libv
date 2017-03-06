@@ -168,11 +168,10 @@ TEST_CASE("normalize") {
 TEST_CASE("Custom getter functions") {
 	vec4i vec0(1, 2, 3, 4);
 
-	CHECK(vec0.xy() == vec2i(1, 2));
-	CHECK(vec0.xyz() == vec3i(1, 2, 3));
-	CHECK(vec0.xyzw() == vec0);
-
-	CHECK(vec0.xxww() == vec4i(1, 1, 4, 4));
+	CHECK(vec::xy(vec0) == vec2i(1, 2));
+	CHECK(vec::xyz(vec0) == vec3i(1, 2, 3));
+	CHECK(vec::xyzw(vec0) == vec0);
+	CHECK(vec::xxww(vec0) == vec4i(1, 1, 4, 4));
 
 	CHECK(vec0[0] == 1);
 	CHECK(vec0[1] == 2);
@@ -228,9 +227,9 @@ TEST_CASE("length") {
 	vec_t<2, float> v1(10, 10);
 
 	CHECK(10.0f == Approx(v0.length()));
-	CHECK(100.0f == Approx(v0.lengthSquare()));
+	CHECK(100.0f == Approx(v0.lengthSQ()));
 	CHECK(14.1421f == Approx(v1.length()));
-	CHECK(200.0f == Approx(v1.lengthSquare()));
+	CHECK(200.0f == Approx(v1.lengthSQ()));
 }
 
 TEST_CASE("operator*(vec, vec)") {

@@ -15,107 +15,37 @@
 #include <utility>
 // pro
 #include <libv/type_traits.hpp>
+#include <libv/utility.hpp>
 
-// TODO P1: vec ctor with addition type tag for static_cast
 // TODO P1: GCC 7.0+ C++17 fold expressions
-// TODO P1: constexpr vec // this will be fun...
+// TODO P5: perfect forwarding for constructors
+// TODO P5: reuse rvalues where possible ? 4 function
+// TODO P5: macro for debug asserts
+// TODO P5: make sure every function is sfiane friendly based on vec's T and it is producing a nice
+//		error message not 7 page of template monster
 // TODO PMSVC: Disable warnings for nameless struct on MSVC maybe:
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
-// TODO P5: perfect forwarding for constructors
-// TODO P5: conditional // this will be fun...
-// TODO P5: fast compare operator with vec and scalar by comparing scalar² and veclenght²
-// TODO P5: reuse rvalues where possible ? 4 function
-// TODO P5: macro for debug asserts
-// TODO P5: make sure every function is sfiane frendly based on vec's T and it is producing a nice
-//		error message not 7 page of template monster
 
 namespace libv {
 
-// <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
-#define __v2get(p1,p2)       /** Composite a new vector based on members @return The new vector */\
-                   inline vec_t<2, T> p1##p2() const {        \
-                        return vec_t<2, T>(this->p1,this->p2);}
-#define __v3get(p1,p2,p3)    /** Composite a new vector based on members @return The new vector */\
-                   inline vec_t<3, T> p1##p2##p3() const {    \
-                       return vec_t<3, T>(this->p1,this->p2,this->p3);}
-#define __v4get(p1,p2,p3,p4) /** Composite a new vector based on members @return The new vector */\
-				   inline vec_t<4, T> p1##p2##p3##p4() const {\
-                       return vec_t<4, T>(this->p1,this->p2,this->p3,this->p4);}
-
-#define __v22p1(p1)      __v2get(p1,x)       __v2get(p1,y)
-#define __v22            __v22p1(x)          __v22p1(y)
-#define __v23p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)
-#define __v23p1(p1)      __v23p2(p1,x)       __v23p2(p1,y)
-#define __v23            __v23p1(x)          __v23p1(y)
-#define __v24p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y)
-#define __v24p2(p1,p2)   __v24p3(p1,p2,x)    __v24p3(p1,p2,y)
-#define __v24p1(p1)      __v24p2(p1,x)       __v24p2(p1,y)
-#define __v24            __v24p1(x)          __v24p1(y)
-
-#define __v32p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)
-#define __v32            __v32p1(x)          __v32p1(y)          __v32p1(z)
-#define __v33p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)
-#define __v33p1(p1)      __v33p2(p1,x)       __v33p2(p1,y)       __v33p2(p1,z)
-#define __v33            __v33p1(x)          __v33p1(y)          __v33p1(z)
-#define __v34p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z)
-#define __v34p2(p1,p2)   __v34p3(p1,p2,x)    __v34p3(p1,p2,y)    __v34p3(p1,p2,z)
-#define __v34p1(p1)      __v34p2(p1,x)       __v34p2(p1,y)       __v34p2(p1,z)
-#define __v34            __v34p1(x)          __v34p1(y)          __v34p1(z)
-
-#define __v42p1(p1)      __v2get(p1,x)       __v2get(p1,y)       __v2get(p1,z)       __v2get(p1,w)
-#define __v42            __v42p1(x)          __v42p1(y)          __v42p1(z)          __v42p1(w)
-#define __v43p2(p1,p2)   __v3get(p1,p2,x)    __v3get(p1,p2,y)    __v3get(p1,p2,z)    __v3get(p1,p2,w)
-#define __v43p1(p1)      __v43p2(p1,x)       __v43p2(p1,y)       __v43p2(p1,z)       __v43p2(p1,w)
-#define __v43            __v43p1(x)          __v43p1(y)          __v43p1(z)          __v43p1(w)
-#define __v44p3(p1,p2,p3)__v4get(p1,p2,p3,x) __v4get(p1,p2,p3,y) __v4get(p1,p2,p3,z) __v4get(p1,p2,p3,w)
-#define __v44p2(p1,p2)   __v44p3(p1,p2,x)    __v44p3(p1,p2,y)    __v44p3(p1,p2,z)    __v44p3(p1,p2,w)
-#define __v44p1(p1)      __v44p2(p1,x)       __v44p2(p1,y)       __v44p2(p1,z)       __v44p2(p1,w)
-#define __v44            __v44p1(x)          __v44p1(y)          __v44p1(z)          __v44p1(w)
-// </editor-fold>
-
-#define implement_vec2_to_vec2_gets __v22
-#define implement_vec2_to_vec3_gets __v23
-#define implement_vec2_to_vec4_gets __v24
-#define implement_vec3_to_vec2_gets __v32
-#define implement_vec3_to_vec3_gets __v33
-#define implement_vec3_to_vec4_gets __v34
-#define implement_vec4_to_vec2_gets __v42
-#define implement_vec4_to_vec3_gets __v43
-#define implement_vec4_to_vec4_gets __v44
-
-// vec_helper_t forward ----------------------------------------------------------------------------
+// vec_t forward -----------------------------------------------------------------------------------
 
 template <size_t N, typename T>
 struct vec_t;
 
-template <size_t N, typename T, typename = std::make_index_sequence<N>>
-struct vec_helper_t;
+// build / make helper functions -------------------------------------------------------------------
 
-// type_trait --------------------------------------------------------------------------------------
+template <size_t N, typename F, size_t... Indices>
+constexpr inline auto build_vec_helper(F&& func, std::index_sequence<Indices...>) {
+	return vec_t<N, decltype(std::declval<F>()(std::declval<size_t>()))>(func(Indices)...);
+}
 
-template <typename T>
-struct is_vec : std::false_type {
-};
-
-template <size_t N, typename T>
-struct is_vec<vec_t<N, T>> : std::true_type {
-};
-
-template <typename T>
-using is_vec_t = typename is_vec<T>::type;
-
-template <size_t N, typename V>
-struct is_vec_n_dim : std::false_type {
-};
-
-template <size_t N, typename T>
-struct is_vec_n_dim<N, vec_t<N, T>> : std::true_type {
-};
-
-template <size_t N, typename T>
-using is_vec_n_dim_t = typename is_vec_n_dim<N, T>::type;
+template <size_t N, typename F>
+constexpr inline auto build_vec(F&& func) {
+	return build_vec_helper<N>(std::forward<F>(func), std::make_index_sequence<N>{});
+}
 
 // vec_base_t --------------------------------------------------------------------------------------
 
@@ -129,7 +59,7 @@ struct vec_base_t {
 
 	vec_base_t() = default;
 	template <typename... Args, typename = typename std::enable_if<sizeof...(Args) == N>::type>
-	explicit vec_base_t(Args&&... values) : ptr{std::forward<Args>(values)...} { }
+	constexpr explicit vec_base_t(Args&&... values) : ptr{std::forward<Args>(values)...} { }
 };
 
 template <typename T>
@@ -142,25 +72,21 @@ struct vec_base_t<2, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[2];
 	};
 
-	vec_base_t() : x(), y() { }
+	constexpr vec_base_t() : x(), y() { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, T1 y) : x(x), y(y) { }
+	constexpr vec_base_t(T0 x, T1 y) : x(x), y(y) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	operator glm::tvec2<T>() const {
+	constexpr operator glm::tvec2<T>() const {
 		return glm::tvec2<T>(x, y);
 	}
-	operator glm::tvec2<T>& () {
+	constexpr operator glm::tvec2<T>& () {
 		return *reinterpret_cast<glm::tvec2<T>*>(this);
 	}
-	operator const glm::tvec2<T>& () const {
+	constexpr operator const glm::tvec2<T>& () const {
 		return *reinterpret_cast<const glm::tvec2<T>*>(this);
 	}
 #endif
-
-	implement_vec2_to_vec2_gets
-	implement_vec2_to_vec3_gets
-	implement_vec2_to_vec4_gets
 };
 
 template <typename T>
@@ -174,29 +100,25 @@ struct vec_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[3];
 	};
 
-	vec_base_t() : x(), y(), z() { }
+	constexpr vec_base_t() : x(), y(), z() { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
+	constexpr vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
+	constexpr vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
+	constexpr vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	operator glm::tvec3<T>() const {
+	constexpr operator glm::tvec3<T>() const {
 		return glm::tvec3<T>(x, y, z);
 	}
-	operator glm::tvec3<T>& () {
+	constexpr operator glm::tvec3<T>& () {
 		return *reinterpret_cast<glm::tvec3<T>*>(this);
 	}
-	operator const glm::tvec3<T>& () const {
+	constexpr operator const glm::tvec3<T>& () const {
 		return *reinterpret_cast<const glm::tvec3<T>*>(this);
 	}
 #endif
-
-	implement_vec3_to_vec2_gets
-	implement_vec3_to_vec3_gets
-	implement_vec3_to_vec4_gets
 };
 
 template <typename T>
@@ -211,205 +133,145 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[4];
 	};
 
-	vec_base_t() : x(), y(), z(), w() { }
+	constexpr vec_base_t() : x(), y(), z(), w() { }
 	template <typename T0, typename T1, typename T2, typename T3>
-	vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
+	constexpr vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
+	constexpr vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
+	constexpr vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
+	constexpr vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
+	constexpr vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
+	constexpr vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	template <typename T0, typename T1>
-	vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
+	constexpr vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 
 #ifdef LIBV_USE_GLM_BRIDGE
-	operator glm::tvec4<T>() const {
+	constexpr operator glm::tvec4<T>() const {
 		return glm::tvec4<T>(x, y, z, w);
 	}
-	operator glm::tvec4<T>& () {
+	constexpr operator glm::tvec4<T>& () {
 		return *reinterpret_cast<glm::tvec4<T>*>(this);
 	}
-	operator const glm::tvec4<T>& () const {
+	constexpr operator const glm::tvec4<T>& () const {
 		return *reinterpret_cast<const glm::tvec4<T>*>(this);
 	}
 #endif
-
-	implement_vec4_to_vec2_gets
-	implement_vec4_to_vec3_gets
-	implement_vec4_to_vec4_gets
 };
 
 #pragma GCC diagnostic pop
 
-// vec_iteration_helper ----------------------------------------------------------------------------
+// vec_t -------------------------------------------------------------------------------------
 
-template<size_t N, size_t I = 0 >
-struct vec_iteration_helper {
-	template<typename T, typename K>
-	static inline bool eq(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) {
-		return lhs.ptr[I] == rhs.ptr[I] && vec_iteration_helper<N, I + 1>::eq(lhs, rhs);
-	}
-	template<typename T, typename K>
-	static inline bool ne(const vec_helper_t<N, T>& lhs, const vec_helper_t<N, K>& rhs) {
-		return lhs.ptr[I] != rhs.ptr[I] || vec_iteration_helper<N, I + 1>::ne(lhs, rhs);
-	}
-	template<typename T>
-	static inline decltype(auto) lengthSquare(const vec_helper_t<N, T>& v) {
-		return v.ptr[I] * v.ptr[I] + vec_iteration_helper<N, I + 1 >::lengthSquare(v);
-	}
-};
+template <size_t N, typename T>
+struct vec_t : vec_base_t<N, T> {
 
-template<size_t N>
-struct vec_iteration_helper<N, N> {
-	template<typename T, typename K>
-	static inline bool eq(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) {
-		return true;
-	}
-	template<typename T, typename K>
-	static inline bool ne(const vec_helper_t<N, T>&, const vec_helper_t<N, K>&) {
-		return false;
-	}
-	template<typename T>
-	static inline T lengthSquare(const vec_helper_t<N, T>&) {
-		return T();
-	}
-};
-
-// vec_helper_t -------------------------------------------------------------------------------------
-
-template <size_t N, typename T, size_t... Indices>
-struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
+	static constexpr size_t dim = N;
+	using value_type = T;
 
 	// constructors --------------------------------------------------------------------------------
 
 	using vec_base_t<N, T>::vec_base_t;
-	inline vec_helper_t() : vec_base_t<N, T>() { }
-	template<typename K, typename = decltype(T(std::declval<const K&>()))>
-	explicit inline vec_helper_t(const vec_helper_t<N, K>& v) :
-			vec_base_t<N, T>(static_cast<T>(v.ptr[Indices])...) { }
+	constexpr inline vec_t() : vec_base_t<N, T>() { }
 
-	// cast ----------------------------------------------------------------------------------------
-
-	//	template<typename K>
-	//	explicit inline operator vec_helper_t<N, K>() { // explicit ?
-	//		return vec_t<N, K>(static_cast<K>(this->ptr[Indices])...);
-	//	}
+	template <typename K, typename = decltype(T(std::declval<const K&>()))>
+	constexpr explicit inline vec_t(const vec_t<N, K>& vec) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] = vec.ptr[index]; });
+	}
 
 	// operator[] ----------------------------------------------------------------------------------
-	inline T& operator[](size_t i) {
+	constexpr inline T& operator[](size_t i) {
 		return this->ptr[i];
 	}
-	inline const T& operator[](size_t i) const {
+	constexpr inline const T& operator[](size_t i) const {
 		return this->ptr[i];
 	}
 
 	// operator= -----------------------------------------------------------------------------------
-	template<typename K>
-	inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] = rhs.ptr[Indices]), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] = rhs.ptr[index]; });
+		return *this;
 	}
 
 	// operator*=(scalar) --------------------------------------------------------------------------
-	template<typename K, typename = disable_if<is_vec_n_dim_t<N, K>>>
-	inline vec_t<N, T>& operator*=(const K& v) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] *= v), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator+=(const K& v) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] += v; });
+		return *this;
 	}
-
-	template<typename K, typename = disable_if<is_vec_n_dim_t<N, K>>>
-	inline vec_t<N, T>& operator/=(const K& v) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] /= v), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator-=(const K& v) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] -= v; });
+		return *this;
+	}
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator*=(const K& v) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] *= v; });
+		return *this;
+	}
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator/=(const K& v) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] /= v; });
+		return *this;
 	}
 
 	// operator*=(vec) -----------------------------------------------------------------------------
-	template<typename K>
-	inline vec_t<N, T>& operator+=(const vec_t<N, K>& rhs) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] += rhs.ptr[Indices]), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator+=(const vec_t<N, K>& rhs) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] += rhs.ptr[index]; });
+		return *this;
 	}
-
-	template<typename K>
-	inline vec_t<N, T>& operator-=(const vec_t<N, K>& rhs) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] -= rhs.ptr[Indices]), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator-=(const vec_t<N, K>& rhs) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] -= rhs.ptr[index]; });
+		return *this;
 	}
-
-	template<typename K>
-	inline vec_t<N, T>& operator*=(const vec_t<N, K>& rhs) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] *= rhs.ptr[Indices]), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator*=(const vec_t<N, K>& rhs) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] *= rhs.ptr[index]; });
+		return *this;
 	}
-
-	template<typename K>
-	inline vec_t<N, T>& operator/=(const vec_t<N, K>& rhs) {
-		(void) std::initializer_list<int> {
-			((void) (this->ptr[Indices] /= rhs.ptr[Indices]), 0)...
-		};
-		return static_cast<vec_t<N, T>&>(*this);
+	template <typename K>
+	constexpr inline vec_t<N, T>& operator/=(const vec_t<N, K>& rhs) {
+		libv::n_times<N>([&](auto index) { this->ptr[index] /= rhs.ptr[index]; });
+		return *this;
 	}
 
 	// operator+ -----------------------------------------------------------------------------------
-	inline vec_t<N, T> operator+() const {
-		return vec_t<N, T>(+this->ptr[Indices]...);
+	constexpr inline vec_t<N, T> operator+() const {
+		return build_vec<N>([&](auto index) { return +this->ptr[index]; });
 	}
 
-	inline vec_t<N, T> operator-() const {
-		return vec_t<N, T>(-this->ptr[Indices]...);
+	constexpr inline vec_t<N, T> operator-() const {
+		return build_vec<N>([&](auto index) { return -this->ptr[index]; });
 	}
 
 	// ---------------------------------------------------------------------------------------------
 
-	template <typename A, typename B>
-	inline decltype(auto) gcc6_dot_helper(A a, B b, size_t i) const { // GCC 7.0+: remove
-		return a[i] * b[i];
-	}
-
-	/** Return the vector and the given vectors dot product
-	 * @note Does not change the original vector
-	 * @return The dot product */
-	template<typename K>
-	inline decltype(auto) dot(const vec_t<N, K>& other) const {
-//		return ((this->ptr[Indices] * other.ptr[Indices]) + ...);
-		return (gcc6_dot_helper(*this, other, Indices) + ...); // GCC 7.0+: remove
-	}
-	// ---------------------------------------------------------------------------------------------
 	/** Return the square length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
-	inline decltype(auto) lengthSquare() const {
-		return vec_iteration_helper<N>::lengthSquare(*this);
+	constexpr inline decltype(auto) lengthSQ() const {
+		T result{};
+		n_times<N>([&](auto index) { result += this->ptr[index] * this->ptr[index]; });
+		return result;
 	}
 
 	/** Return the length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
-	inline decltype(auto) length() const {
-		return std::sqrt(lengthSquare());
+	constexpr inline decltype(auto) length() const {
+		return std::sqrt(lengthSQ());
 	}
 
 	/** Normalize the vector (by divide each component by the length)
 	 * @return The vector */
-	inline vec_t<N, T>& normalize() {
-		assert(lengthSquare() != 0);
+	constexpr inline vec_t<N, T>& normalize() {
+		assert(lengthSQ() != 0);
 		return operator/=(length());
 	}
 
@@ -417,258 +279,255 @@ struct vec_helper_t<N, T, std::index_sequence<Indices...>> : vec_base_t<N, T> {
 	 * @note Does not change the original vector
 	 * @template K The minimum precision type Default: T
 	 * @return The normalized vector */
-	template<typename K = T>
-	inline auto normalize_copy() const
-	-> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
-		assert(lengthSquare() != 0);
-		return *this / length();
+	template <typename K = T>
+	constexpr inline auto normalize_copy() const {
+		assert(lengthSQ() != 0);
+		auto l = length();
+		return build_vec<N>([&](auto index) { return this->ptr[index] / l; });
 	}
 
 	// observers -----------------------------------------------------------------------------------
-	template<typename F>
-	void sequential_foreach(F&& func) {
-		(void) std::initializer_list<int> {
-			((void) (func(this->ptr[Indices])), 0)...
-		};
+	template <typename F>
+	constexpr inline void sequential_foreach(F&& func) {
+		n_times<N>([&](auto index) { func(this->ptr[index]); });
 	}
 };
 
-// vec_t -------------------------------------------------------------------------------------------
-
-template <size_t N, typename T> struct vec_t : vec_helper_t<N, T> {
-	using vec_helper_t<N, T>::vec_helper_t;
-	using vec_helper_t<N, T>::operator=;
-};
-
-//template<typename... Args>
-//constexpr inline decltype(auto) make_vec(Args&&... args) {
-//	return vec_t<sizeof...(args), std::common_type_t<Args...>>(std::forward<Args>(args)...);
-//}
-
 // operator*(vec, vec) -----------------------------------------------------------------------------
-template<size_t N, typename T, typename K, size_t... Indices>
-inline auto operator-(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
--> vec_t<N, decltype(std::declval<T>() - std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() - std::declval<K>())>(
-			(lhs.ptr[Indices] - rhs.ptr[Indices])...
-			);
-}
-template<size_t N, typename T, typename K, size_t... Indices>
-inline auto operator+(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
--> vec_t<N, decltype(std::declval<T>() + std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() + std::declval<K>())>(
-			(lhs.ptr[Indices] + rhs.ptr[Indices])...
-			);
-}
-template<size_t N, typename T, typename K, size_t... Indices>
-inline auto operator*(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
--> vec_t<N, decltype(std::declval<T>() * std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() * std::declval<K>())>(
-			(lhs.ptr[Indices] * rhs.ptr[Indices])...
-			);
-}
-template<size_t N, typename T, typename K, size_t... Indices>
-inline auto operator/(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, K, std::index_sequence<Indices...>>&rhs)
--> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() / std::declval<K>())>(
-			(lhs.ptr[Indices] / rhs.ptr[Indices])...
-			);
-}
 
-//// TODO P5: improve some vec operators with make vec and common type
-//
-//template<size_t N, typename T, typename K, size_t... Indices>
-//constexpr inline decltype(auto) operator/(
-//		const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs,
-//		const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs) {
-//	return make_vec((lhs[Indices] / rhs[Indices])...);
-//}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator+(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] + rhs.ptr[index]; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator-(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] - rhs.ptr[index]; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator*(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] * rhs.ptr[index]; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator/(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] / rhs.ptr[index]; });
+}
 
 // operator*(vec, scalar) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator*(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
--> vec_t<N, decltype(std::declval<T>() * std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() * std::declval<K>())>((lhs.ptr[Indices] * rhs)...);
+
+template <size_t N, typename T, typename K>
+constexpr inline auto operator+(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] + rhs; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator-(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] - rhs; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator*(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] * rhs; });
+}
+template <size_t N, typename T, typename K>
+constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return lhs.ptr[index] / rhs; });
 }
 
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator*(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
--> vec_t<N, decltype(std::declval<K>() * std::declval<T>())> {
-	return vec_t<N, decltype(std::declval<K>() * std::declval<T>())>((lhs * rhs.ptr[Indices])...);
-}
+// operator*(scalar, vec) --------------------------------------------------------------------------
 
-// operator/(vec, scalar) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator/(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
--> vec_t<N, decltype(std::declval<T>() / std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() / std::declval<K>())>((lhs.ptr[Indices] / rhs)...);
+template <size_t N, typename T, typename K>
+constexpr inline auto operator+(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs + rhs.ptr[index]; });
 }
-
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator/(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
--> vec_t<N, decltype(std::declval<K>() / std::declval<T>())> {
-	return vec_t<N, decltype(std::declval<K>() / std::declval<T>())>((lhs / rhs.ptr[Indices])...);
+template <size_t N, typename T, typename K>
+constexpr inline auto operator-(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs - rhs.ptr[index]; });
 }
-
-// operator-(vec, scalar) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator-(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
--> vec_t<N, decltype(std::declval<T>() - std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() - std::declval<K>())>((lhs.ptr[Indices] - rhs)...);
+template <size_t N, typename T, typename K>
+constexpr inline auto operator*(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs * rhs.ptr[index]; });
 }
-
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator-(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
--> vec_t<N, decltype(std::declval<K>() - std::declval<T>())> {
-	return vec_t<N, decltype(std::declval<K>() - std::declval<T>())>((lhs - rhs.ptr[Indices])...);
-}
-
-// operator+(vec, scalar) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator+(const vec_helper_t<N, T, std::index_sequence<Indices...>>& lhs, const K& rhs)
--> vec_t<N, decltype(std::declval<T>() + std::declval<K>())> {
-	return vec_t<N, decltype(std::declval<T>() + std::declval<K>())>((lhs.ptr[Indices] + rhs)...);
-}
-
-template<size_t N, typename T, typename K, size_t... Indices,
-typename = disable_if<is_vec_n_dim_t<N, K>>>
-inline auto operator+(const K& lhs, const vec_helper_t<N, T, std::index_sequence<Indices...>>& rhs)
--> vec_t<N, decltype(std::declval<K>() + std::declval<T>())> {
-	return vec_t<N, decltype(std::declval<K>() + std::declval<T>())>((lhs + rhs.ptr[Indices])...);
+template <size_t N, typename T, typename K>
+constexpr inline auto operator/(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return lhs / rhs.ptr[index]; });
 }
 
 // operator==(vec, vec) ----------------------------------------------------------------------------
-template<size_t N, typename T, typename K>
-inline bool operator==(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return vec_iteration_helper<N>::eq(lhs, rhs);
+template <size_t N, typename T, typename K>
+constexpr inline bool operator==(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	bool result = true;
+	n_times<N>([&](auto index) { result = result && lhs.ptr[index] == rhs.ptr[index]; });
+	return result;
 }
-template<size_t N, typename T, typename K>
-inline bool operator!=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return vec_iteration_helper<N>::ne(lhs, rhs);
+template <size_t N, typename T, typename K>
+constexpr inline bool operator!=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	bool result = false;
+	n_times<N>([&](auto index) { result = result || lhs.ptr[index] != rhs.ptr[index]; });
+	return result;
 }
 
 // operator<(vec, vec) -----------------------------------------------------------------------------
-template<size_t N, typename T, typename K>
-inline bool operator<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return lhs.lengthSquare() < rhs.lengthSquare();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return lhs.lengthSQ() < rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator<=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return lhs.lengthSquare() <= rhs.lengthSquare();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return lhs.lengthSQ() <= rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return lhs.lengthSquare() > rhs.lengthSquare();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return lhs.lengthSQ() > rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator>=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return lhs.lengthSquare() >= rhs.lengthSquare();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return lhs.lengthSQ() >= rhs.lengthSQ();
 }
 
 // operator<(vec, scalar) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K>
-inline bool operator<(const vec_t<N, T>& lhs, const K& rhs) {
-	return lhs.length() < rhs;
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<(const vec_t<N, T>& lhs, const K& rhs) {
+	return lhs.lengthSQ() < rhs * rhs;
 }
-template<size_t N, typename T, typename K>
-inline bool operator<=(const vec_t<N, T>& lhs, const K& rhs) {
-	return lhs.length() <= rhs;
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<=(const vec_t<N, T>& lhs, const K& rhs) {
+	return lhs.lengthSQ() <= rhs * rhs;
 }
-template<size_t N, typename T, typename K>
-inline bool operator>(const vec_t<N, T>& lhs, const K& rhs) {
-	return lhs.length() > rhs;
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>(const vec_t<N, T>& lhs, const K& rhs) {
+	return lhs.lengthSQ() > rhs * rhs;
 }
-template<size_t N, typename T, typename K>
-inline bool operator>=(const vec_t<N, T>& lhs, const K& rhs) {
-	return lhs.length() >= rhs;
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>=(const vec_t<N, T>& lhs, const K& rhs) {
+	return lhs.lengthSQ() >= rhs * rhs;
 }
 
 // operator<(scalar, vec) --------------------------------------------------------------------------
-template<size_t N, typename T, typename K>
-inline bool operator<(const K& lhs, const vec_t<N, T>& rhs) {
-	return lhs < rhs.length();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<(const K& lhs, const vec_t<N, T>& rhs) {
+	return lhs * lhs < rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator<=(const K& lhs, const vec_t<N, T>& rhs) {
-	return lhs <= rhs.length();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator<=(const K& lhs, const vec_t<N, T>& rhs) {
+	return lhs * lhs <= rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator>(const K& lhs, const vec_t<N, T>& rhs) {
-	return lhs > rhs.length();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>(const K& lhs, const vec_t<N, T>& rhs) {
+	return lhs * lhs > rhs.lengthSQ();
 }
-template<size_t N, typename T, typename K>
-inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
-	return lhs >= rhs.length();
+template <size_t N, typename T, typename K>
+constexpr inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
+	return lhs * lhs >= rhs.lengthSQ();
 }
 
 // operator<<(ostream, vec) ------------------------------------------------------------------------
-template<size_t N, typename T, size_t... Indices>
-inline std::ostream& operator<<(
-		std::ostream& os, const vec_helper_t<N, T, std::index_sequence<Indices...>>&v) {
-	(void) std::initializer_list<int> {
-		((void) (os << v.ptr[Indices] << ' '), 0)...
-	};
+template <size_t N, typename T>
+constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& vec) {
+	n_times<N>([&](auto index) { os << vec.ptr[index] << ' '; });
 	return os;
 }
 
-// maxByDimensions ---------------------------------------------------------------------------------
-template<size_t N, typename T, size_t... Indices>
-inline vec_t<N, T> maxByDimensions(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) {
-	return vec_t<N, T>(
-			std::max(lhs.ptr[Indices], rhs.ptr[Indices])...
-			);
+namespace vec { // vec utility namespace -----------------------------------------------------------
+
+// <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
+#define __libv_vec_get2(p1,p2)                                                                     \
+	template <size_t N, typename T>                                                                \
+	constexpr inline ::libv::vec_t<2, T> p1##p2(const ::libv::vec_t<N, T>& vec) {                  \
+		return ::libv::vec_t<2, T>(vec.p1, vec.p2);                                                \
+	}
+#define __libv_vec_get3(p1,p2,p3)                                                                  \
+	template <size_t N, typename T>                                                                \
+	constexpr inline ::libv::vec_t<3, T> p1##p2##p3(const ::libv::vec_t<N, T>& vec) {              \
+		return ::libv::vec_t<3, T>(vec.p1, vec.p2, vec.p3);                                        \
+	}
+#define __libv_vec_get4(p1,p2,p3,p4)                                                               \
+	template <size_t N, typename T>                                                                \
+	constexpr inline ::libv::vec_t<4, T> p1##p2##p3##p4(const ::libv::vec_t<N, T>& vec) {          \
+		return ::libv::vec_t<4, T>(vec.p1, vec.p2, vec.p3, vec.p4);                                \
+	}
+
+#define __libv_vec_2p1(p1)      __libv_vec_get2(p1,x)      __libv_vec_get2(p1,y)      __libv_vec_get2(p1,z)      __libv_vec_get2(p1,w)
+#define __libv_vec_2            __libv_vec_2p1(x)          __libv_vec_2p1(y)          __libv_vec_2p1(z)          __libv_vec_2p1(w)
+#define __libv_vec_3p2(p1,p2)   __libv_vec_get3(p1,p2,x)   __libv_vec_get3(p1,p2,y)   __libv_vec_get3(p1,p2,z)   __libv_vec_get3(p1,p2,w)
+#define __libv_vec_3p1(p1)      __libv_vec_3p2(p1,x)       __libv_vec_3p2(p1,y)       __libv_vec_3p2(p1,z)       __libv_vec_3p2(p1,w)
+#define __libv_vec_3            __libv_vec_3p1(x)          __libv_vec_3p1(y)          __libv_vec_3p1(z)          __libv_vec_3p1(w)
+#define __libv_vec_4p3(p1,p2,p3)__libv_vec_get4(p1,p2,p3,x)__libv_vec_get4(p1,p2,p3,y)__libv_vec_get4(p1,p2,p3,z)__libv_vec_get4(p1,p2,p3,w)
+#define __libv_vec_4p2(p1,p2)   __libv_vec_4p3(p1,p2,x)    __libv_vec_4p3(p1,p2,y)    __libv_vec_4p3(p1,p2,z)    __libv_vec_4p3(p1,p2,w)
+#define __libv_vec_4p1(p1)      __libv_vec_4p2(p1,x)       __libv_vec_4p2(p1,y)       __libv_vec_4p2(p1,z)       __libv_vec_4p2(p1,w)
+#define __libv_vec_4            __libv_vec_4p1(x)          __libv_vec_4p1(y)          __libv_vec_4p1(z)          __libv_vec_4p1(w)
+
+#define implement_to_vec2_gets() __libv_vec_2
+#define implement_to_vec3_gets() __libv_vec_3
+#define implement_to_vec4_gets() __libv_vec_4
+// </editor-fold>
+
+implement_to_vec2_gets()
+implement_to_vec3_gets()
+implement_to_vec4_gets()
+
+/// \return The dot product of the two vector
+template <size_t N, typename T, typename K>
+constexpr inline auto dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	std::common_type_t<T, K> result{};
+	n_times<N>([&](auto index) { result += lhs.ptr[index] * rhs.ptr[index]; });
+	return result;
 }
 
-// minByDimensions ---------------------------------------------------------------------------------
-template<size_t N, typename T, size_t... Indices>
-inline vec_t<N, T> minByDimensions(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&lhs,
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>&rhs) {
-	return vec_t<N, T>(
-			std::min(lhs.ptr[Indices], rhs.ptr[Indices])...
-			);
+/// \return The cross product of the two vector
+template <typename T, typename K>
+constexpr inline auto cross(const vec_t<3, T>& lhs, const vec_t<3, K>& rhs) {
+	return vec_t<3, T>(
+			lhs.y * rhs.z - lhs.z * rhs.y,
+			lhs.z * rhs.x - lhs.x * rhs.z,
+			lhs.x * rhs.y - lhs.y * rhs.x);
 }
 
-// vec_static_cast ---------------------------------------------------------------------------------
-
-template<typename K, size_t N, typename T, size_t... Indices>
-inline vec_t<N, K> vec_static_cast(
-		const vec_helper_t<N, T, std::index_sequence<Indices...>>& vec) {
-	return vec_t<N, K>(static_cast<K>(vec.ptr[Indices])...);
+/// \return The minimum vector with the smaller value on each dimension from the two vector
+template <size_t N, typename T, typename K>
+constexpr inline auto max(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return std::max(lhs.ptr[index], rhs.ptr[index]); });
 }
+
+/// \return The maximum vector with the bigger value on each dimension from the two vector
+template <size_t N, typename T, typename K>
+constexpr inline auto min(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return std::min(lhs.ptr[index], rhs.ptr[index]); });
+}
+
+/// \return The static casted vector to the requested K type
+template <typename K, size_t N, typename T>
+constexpr inline auto cast(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](auto index) { return static_cast<K>(vec.ptr[index]); });
+}
+
+template <size_t N, typename T>
+constexpr inline auto round(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](auto index) { return std::round(vec.ptr[index]); });
+}
+template <size_t N, typename T>
+constexpr inline auto lround(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](auto index) { return std::lround(vec.ptr[index]); });
+}
+template <size_t N, typename T>
+constexpr inline auto llround(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](auto index) { return std::llround(vec.ptr[index]); });
+}
+
+} // namespace vec ---------------------------------------------------------------------------------
 
 // =================================================================================================
 
 #ifdef LIBV_USE_GLM_BRIDGE
 
 #define LIBV_VEC_GLM_CONVERTER(N)                                                                  \
-template <typename T> inline decltype(auto) from_glm(glm::tvec##N<T>& v) {                         \
+template <typename T> constexpr inline decltype(auto) from_glm(glm::tvec##N<T>& v) {               \
 	return reinterpret_cast<vec_t<N, T>&>(v);                                                      \
 }                                                                                                  \
-template <typename T> inline decltype(auto) from_glm(const glm::tvec##N<T>& v) {                   \
+template <typename T> constexpr inline decltype(auto) from_glm(const glm::tvec##N<T>& v) {         \
 	return reinterpret_cast<const vec_t<N, T>&>(v);                                                \
 }                                                                                                  \
-template <typename T> inline decltype(auto) to_glm(vec_t<N, T>& v) {                               \
+template <typename T> constexpr inline decltype(auto) to_glm(vec_t<N, T>& v) {                     \
 	return reinterpret_cast<glm::tvec##N<T>&>(v);                                                  \
 }                                                                                                  \
-template <typename T> inline decltype(auto) to_glm(const vec_t<N, T>& v) {                         \
+template <typename T> constexpr inline decltype(auto) to_glm(const vec_t<N, T>& v) {               \
 	return reinterpret_cast<const glm::tvec##N<T>&>(v);                                            \
 }
 
@@ -708,8 +567,8 @@ using vec2ul = vec2_t<uint64_t>;
 using vec3ul = vec3_t<uint64_t>;
 using vec4ul = vec4_t<uint64_t>;
 
-//using vec2 = vec2f;
-//using vec3 = vec3f;
-//using vec4 = vec4f;
+//using vec2 = vec2d;
+//using vec3 = vec3d;
+//using vec4 = vec4d;
 
 } // namespace libv

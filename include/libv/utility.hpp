@@ -19,6 +19,20 @@ constexpr inline size_t member_offset(M T::* member) {
 
 // -------------------------------------------------------------------------------------------------
 
+template<size_t N, typename F, size_t... Indices>
+constexpr inline void n_times_helper(F&& func, std::index_sequence<Indices...>) {
+	(void) std::initializer_list<int> {
+		((void) (func(Indices)), 0)...
+	};
+}
+
+template<size_t N, typename F>
+constexpr inline void n_times(F&& func) {
+	n_times_helper<N>(std::forward<F>(func), std::make_index_sequence<N>{});
+}
+
+// -------------------------------------------------------------------------------------------------
+
 template<typename T, typename... Args>
 inline T* new_f(Args&&... args) {
 	return new T(std::forward<Args>(args)...);
@@ -68,7 +82,7 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
 // -------------------------------------------------------------------------------------------------
 
 template<typename T, size_t N>
-inline constexpr size_t count_of(const T (&)[N]) {
+constexpr inline size_t count_of(const T (&)[N]) {
 	return N;
 }
 

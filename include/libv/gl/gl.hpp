@@ -176,7 +176,7 @@ public:
 		return projection * view * model;
 	}
 	inline libv::vec3f eye() const {
-		return view.top().inverse_copy()[3].xyz();
+		return libv::vec::xyz(view.top().inverse_copy()[3]);
 	}
 	inline const libv::mat4f& getMatrixTexture() const {
 		return matrixTexture_;

@@ -18,10 +18,11 @@ void Label::setText(const std::string& str) {
 }
 
 LayoutInfo Label::doLayout(const LayoutInfo& parentLayoutInfo) {
-	auto size = vec_static_cast<int>(evalLayoutSize(parentLayoutInfo, *this).xy());
+	auto size = vec::cast<int32_t>(vec::lround(vec::xy(evalLayoutSize(parentLayoutInfo, *this))));
+
 	text.setSize(size);
 	text.build(getContext());
-	auto result = maxByDimensions(size, text.getLayoutedSize());
+	auto result = vec::max(size, text.getLayoutedSize());
 	return vec3f(result, 0);
 }
 
