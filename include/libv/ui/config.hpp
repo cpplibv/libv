@@ -29,16 +29,13 @@
 #    define LIBV_UI_DEBUG_CHECK_GL() {}
 #endif
 
-#define LIBV_UI_ASSERT_CONTEXT(X) {} // TODO P5: assert context
-#define LIBV_UI_ASSERT_THREAD(X) {} // TODO P5: assert thread
+//#define LIBV_UI_ASSERT_CONTEXT(X) {} // TODO P5: assert context
+//#define LIBV_UI_ASSERT_THREAD(X) {} // TODO P5: assert thread
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-constexpr unsigned int DEFAULT_FRAME_WIDTH = 640;
-constexpr unsigned int DEFAULT_FRAME_HEIGHT = 480;
 
 constexpr const char DEFAULT_FONT_TTF_FILEPATH[] = "res/font/default.ttf";
 

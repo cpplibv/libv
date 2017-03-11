@@ -3,7 +3,7 @@
 #pragma once
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 
 //http://www.glfw.org/docs/latest/group__keys.html
@@ -157,5 +157,5 @@ enum class Mouse : int32_t {
 	Last = Button7,
 };
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

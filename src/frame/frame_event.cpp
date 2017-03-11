@@ -1,19 +1,20 @@
 // File: core.cpp, Created on 2015. április 12. 2:28, Author: Vader
 
 // hpp
-#include <libv/ui/frame/frame.hpp>
+#include <libv/frame/frame.hpp>
 // ext
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/fixed.hpp>
 // pro
-#include <libv/ui/log.hpp>
+#include <libv/frame/log.hpp>
 
-
-// TODO P3: Limit cursor pos event pre-fire to 1 (solution maybe to use unique signal que)
+#include <iostream>
+#include <iomanip>
+// TODO P3: Limit cursor position event pre-fire to 1 (solution maybe to use unique signal queue)
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ void glfwCallback(GLFWwindow* window, Args... args) {
 	try {
 		(windowHandlers.at(window)->*que).fire(E(args...));
 	} catch (const std::out_of_range& e) {
-		LIBV_LOG_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this GLFW window.");
+		LIBV_LOG_FRAME_EVENT_ERROR("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 
@@ -33,30 +34,30 @@ void glfwMousePositionCallback(GLFWwindow* window, double x, double y) {
 	try {
 		auto frame = windowHandlers.at(window);
 		auto size = frame->getSize();
-		(frame->*que).fire(E(x, size.y - y));
+		(frame->*que).fire(E(x, size.y - y - 1));
 	} catch (const std::out_of_range& e) {
-		LIBV_LOG_UI_EVENT_ERROR("Unhandeled event. No event handler (frame) assigned to this GLFW window.");
+		LIBV_LOG_FRAME_EVENT_ERROR("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	windowHandlers[window] = frame;
 
-	glfwSetCharCallback(window, ::libv::ui::glfwCallback<EventChar, &Frame::eventQueChar, unsigned int>);
-	glfwSetCharModsCallback(window, ::libv::ui::glfwCallback<EventCharMods, &Frame::eventQueCharMods, unsigned int, int>);
-	glfwSetCursorEnterCallback(window, ::libv::ui::glfwCallback<EventMouseEnter, &Frame::eventQueMouseEnter, int>);
-	glfwSetCursorPosCallback(window, ::libv::ui::glfwMousePositionCallback<EventMousePosition, &Frame::eventQueMousePosition>);
-	glfwSetDropCallback(window, ::libv::ui::glfwCallback<EventDrop, &Frame::eventQueDrop, int, const char**>);
-	glfwSetFramebufferSizeCallback(window, ::libv::ui::glfwCallback<EventFramebufferSize, &Frame::eventQueFramebufferSize, int, int>);
-	glfwSetKeyCallback(window, ::libv::ui::glfwCallback<EventKey, &Frame::eventQueKey, int, int, int, int>);
-	glfwSetMouseButtonCallback(window, ::libv::ui::glfwCallback<EventMouseButton, &Frame::eventQueMouseButton, int, int, int>);
-	glfwSetScrollCallback(window, ::libv::ui::glfwCallback<EventMouseScroll, &Frame::eventQueMouseScroll, double, double>);
-	glfwSetWindowCloseCallback(window, ::libv::ui::glfwCallback<EventWindowClose, &Frame::eventQueWindowClose>);
-	glfwSetWindowFocusCallback(window, ::libv::ui::glfwCallback<EventWindowFocus, &Frame::eventQueWindowFocus, int>);
-	glfwSetWindowIconifyCallback(window, ::libv::ui::glfwCallback<EventWindowIconify, &Frame::eventQueWindowIconify, int>);
-	glfwSetWindowPosCallback(window, ::libv::ui::glfwCallback<EventWindowPosition, &Frame::eventQueWindowPosition, int, int>);
-	glfwSetWindowRefreshCallback(window, ::libv::ui::glfwCallback<EventWindowRefresh, &Frame::eventQueWindowRefresh>);
-	glfwSetWindowSizeCallback(window, ::libv::ui::glfwCallback<EventWindowSize, &Frame::eventQueWindowSize, int, int>);
+	glfwSetCharCallback(window, ::libv::frame::glfwCallback<EventChar, &Frame::eventQueChar, unsigned int>);
+	glfwSetCharModsCallback(window, ::libv::frame::glfwCallback<EventCharMods, &Frame::eventQueCharMods, unsigned int, int>);
+	glfwSetCursorEnterCallback(window, ::libv::frame::glfwCallback<EventMouseEnter, &Frame::eventQueMouseEnter, int>);
+	glfwSetCursorPosCallback(window, ::libv::frame::glfwMousePositionCallback<EventMousePosition, &Frame::eventQueMousePosition>);
+	glfwSetDropCallback(window, ::libv::frame::glfwCallback<EventDrop, &Frame::eventQueDrop, int, const char**>);
+	glfwSetFramebufferSizeCallback(window, ::libv::frame::glfwCallback<EventFramebufferSize, &Frame::eventQueFramebufferSize, int, int>);
+	glfwSetKeyCallback(window, ::libv::frame::glfwCallback<EventKey, &Frame::eventQueKey, int, int, int, int>);
+	glfwSetMouseButtonCallback(window, ::libv::frame::glfwCallback<EventMouseButton, &Frame::eventQueMouseButton, int, int, int>);
+	glfwSetScrollCallback(window, ::libv::frame::glfwCallback<EventMouseScroll, &Frame::eventQueMouseScroll, double, double>);
+	glfwSetWindowCloseCallback(window, ::libv::frame::glfwCallback<EventWindowClose, &Frame::eventQueWindowClose>);
+	glfwSetWindowFocusCallback(window, ::libv::frame::glfwCallback<EventWindowFocus, &Frame::eventQueWindowFocus, int>);
+	glfwSetWindowIconifyCallback(window, ::libv::frame::glfwCallback<EventWindowIconify, &Frame::eventQueWindowIconify, int>);
+	glfwSetWindowPosCallback(window, ::libv::frame::glfwCallback<EventWindowPosition, &Frame::eventQueWindowPosition, int, int>);
+	glfwSetWindowRefreshCallback(window, ::libv::frame::glfwCallback<EventWindowRefresh, &Frame::eventQueWindowRefresh>);
+	glfwSetWindowSizeCallback(window, ::libv::frame::glfwCallback<EventWindowSize, &Frame::eventQueWindowSize, int, int>);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
@@ -186,7 +187,7 @@ void Frame::distributeEvents() {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
+} // namespace frame
 } // namespace libv
 
 

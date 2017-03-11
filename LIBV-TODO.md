@@ -1,5 +1,17 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+split ui and frame
+-- commit --
+
+unique capacitive signal
+-- commit --
+
+fix frame.core
+-- commit --
+
+fix font.freetype
+-- commit --
+
 handle fails - apply fallback
 	failed file
 	failed shader

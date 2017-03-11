@@ -5,7 +5,7 @@
 #include <functional>
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -21,5 +21,5 @@ void unregisterFrame(Frame* frame);
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

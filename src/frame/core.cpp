@@ -2,7 +2,7 @@
 
 // hpp
 #include "core.hpp"
-#include <libv/ui/frame/frame.hpp>
+#include <libv/frame/frame.hpp>
 // ext
 #include <GLFW/glfw3.h>
 // libv
@@ -11,10 +11,10 @@
 #include <atomic>
 #include <memory>
 // pro
-#include <libv/ui/log.hpp>
+#include <libv/frame/log.hpp>
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -299,5 +299,5 @@ void Frame::cmdCoreUpdateDisplayMode() {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <libv/ui/events/inputs.hpp>
+#include <libv/frame/inputs.hpp>
 #include <libv/utility.hpp>
 
 // TODO P5: Most of the event should get a observer_ptr<Frame> as member
@@ -23,7 +23,7 @@
 //			if context is frozen due to event qua 'lock' in glfw (moving window)
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -193,5 +193,5 @@ struct EventWindowSize {
 	}
 };
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

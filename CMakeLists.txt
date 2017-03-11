@@ -170,7 +170,7 @@ ExternalProject_Add(ext_catch
 list(APPEND EXTERNAL_PROJECT_LIST ext_glfw)
 ExternalProject_Add(ext_glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
-	GIT_TAG 3.1.1
+	GIT_TAG 3.2.1
 	PREFIX ${PATH_EXT_SRC}/glfw
 	INSTALL_DIR ${PATH_EXT}/glfw
 	CMAKE_ARGS
@@ -377,6 +377,7 @@ link_directories(${PATH_EXT}/glfw/lib)
 
 #Sources
 file(GLOB_RECURSE libv_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
+file(GLOB_RECURSE vframe_src      RELATIVE ${PATH_PRJ} ${PATH_SRC}/frame/*.cpp)
 file(GLOB_RECURSE vgl_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/gl/*.cpp)
 file(GLOB_RECURSE vlog_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/log/*.cpp)
 file(GLOB_RECURSE vm3_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3/*.cpp)
@@ -398,6 +399,7 @@ file(GLOB_RECURSE vui_test_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
 
 #Libraries
 add_library(libv   STATIC ${libv_src})
+add_library(vframe STATIC ${vframe_src})
 add_library(vgl    STATIC ${vgl_src})
 add_library(vlog   STATIC ${vlog_src})
 add_library(vm3    STATIC ${vm3_src})
@@ -417,6 +419,7 @@ add_executable(vui_test    ${vui_test_src})
 
 #Executables - Sandbox
 add_executable(libv_main   ${PATH_SNB}/libv_main.cpp)
+add_executable(vframe_main ${PATH_SNB}/vframe_main.cpp)
 add_executable(vgl_main    ${PATH_SNB}/vgl_main.cpp)
 add_executable(vgl_main2   ${PATH_SNB}/vgl_main2.cpp)
 add_executable(vlog_main   ${PATH_SNB}/vlog_main.cpp)
@@ -433,12 +436,15 @@ add_custom_target(ext DEPENDS externals)
 # Linkage ------------------------------------------------------------------------------------------
 
 #Link - Libraries
-target_link_libraries(vlog   -static)
+target_link_libraries(vframe -static fmt glfw3 gdi32 ${LIB_OPENGL} ${LIB_GLU})
 target_link_libraries(vgl    -static glew ${LIB_OPENGL} ${LIB_GLU})
+target_link_libraries(vlog   -static)
 target_link_libraries(vm3    -static boost_serialization-mt-s)
 target_link_libraries(vm3imp -static vm3 fmt assimp zlibstatic)
 target_link_libraries(vui    -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
 							boost_system-mt-s boost_filesystem-mt-s freetype vgl)
+#target_link_libraries(vframe -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32
+#							boost_system-mt-s boost_filesystem-mt-s freetype vgl)
 
 #Link - Tests
 target_link_libraries(libv_test   -static )
@@ -452,6 +458,7 @@ target_link_libraries(vui_test    -static vui fmt vlog)
 
 #Link - Executables
 target_link_libraries(libv_main   -static vlog fmt)
+target_link_libraries(vframe_main -static vlog fmt vframe)
 target_link_libraries(vgl_main    -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vgl_main2   -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s)
 target_link_libraries(vlog_main   -static fmt)

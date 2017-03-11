@@ -8,13 +8,13 @@
 // std
 #include <vector>
 // pro
-#include <libv/ui/events/events.hpp>
+#include <libv/frame/events.hpp>
 
 class GLFWvidmode;
 class GLFWmonitor;
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -54,5 +54,5 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

@@ -14,11 +14,12 @@
 #include <array>
 #include <string>
 // pro
-#include <libv/ui/component/component.hpp>
-#include <libv/ui/component/ui.hpp>
-#include <libv/ui/events/events.hpp>
-#include <libv/ui/events/inputs.hpp>
-#include <libv/ui/monitor.hpp>
+#include <libv/frame/events.hpp>
+#include <libv/frame/inputs.hpp>
+#include <libv/frame/monitor.hpp>
+//#include <libv/ui/component/component.hpp>
+//#include <libv/ui/component/ui.hpp>
+
 
 // TODO P3: future proxy for frame async operations: frame.show().wait();
 
@@ -26,7 +27,7 @@ class GLFWwindow;
 class GLFWmonitor;
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 class Component;
 
@@ -254,16 +255,6 @@ private:
 	std::atomic<uint64_t> scrollPosition{0}; // coded as x:24.8 y:24.8
 
 	// ---------------------------------------------------------------------------------------------
-private:
-	UI ui;
-
-public:
-	void addComponent(const observer_ptr<Component>& component);
-	void addComponent(const shared_ptr<Component>& component);
-	void removeComponent(const observer_ptr<Component>& component);
-	void removeComponent(const shared_ptr<Component>& component);
-
-	// ---------------------------------------------------------------------------------------------
 public:
 	void hide();
 	void minimize();
@@ -325,11 +316,8 @@ private:
 	void termContext();
 
 public:
-	Frame(unsigned int width = DEFAULT_FRAME_WIDTH,
-			unsigned int height = DEFAULT_FRAME_HEIGHT);
-	Frame(const std::string& title,
-			unsigned int width = DEFAULT_FRAME_WIDTH,
-			unsigned int height = DEFAULT_FRAME_HEIGHT);
+	Frame(unsigned int width, unsigned int height);
+	Frame(const std::string& title, unsigned int width, unsigned int height);
 	Frame(const Frame&) = delete;
 	Frame(Frame&&) = delete;
 	Frame& operator=(const Frame&) = delete;
@@ -337,5 +325,8 @@ public:
 	virtual ~Frame();
 };
 
-} // namespace ui
+} // namespace frame
+
+using Frame = frame::Frame;
+
 } // namespace libv

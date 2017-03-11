@@ -15,6 +15,11 @@
 // TODO P4: Render ui into a separate frame buffer, or option set its target
 
 namespace libv {
+namespace frame {
+class Frame;
+} // namespace frame
+using Frame = frame::Frame;
+
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
@@ -31,7 +36,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Frame;
 class Component;
 
 class UI {

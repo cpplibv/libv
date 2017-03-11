@@ -1,7 +1,7 @@
 // File: monitor.cpp, Created on 2015. április 9. 20:44, Author: Vader
 
 // hpp
-#include <libv/ui/monitor.hpp>
+#include <libv/frame/monitor.hpp>
 // ext
 #include <GLFW/glfw3.h>
 // std
@@ -9,7 +9,7 @@
 
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,8 @@ void glfwMonitorCallback(GLFWmonitor* monitor, int status) {
 std::map<GLFWmonitor*, Monitor> Monitor::monitors;
 Signal<const EventMonitor&> Monitor::onMonitor;
 
-int distFromSection(int a, int b, int p) {
+template <typename T>
+T distFromSection(T a, T b, T p) {
 	if (p < a)
 		return a - p;
 	else if (p > b)
@@ -59,9 +60,9 @@ Monitor& Monitor::getMonitorAt(vec2i coord) {
 
 	Monitor* minid = nullptr;
 	for (auto& monitor : monitors) {
-		int xdist = distFromSection(monitor.second.position.x, monitor.second.position.x + monitor.second.currentVideoMode.size.x, coord.x);
-		int ydist = distFromSection(monitor.second.position.y, monitor.second.position.y + monitor.second.currentVideoMode.size.y, coord.y);
-		int dist = xdist * xdist + ydist * ydist;
+		auto xdist = distFromSection(monitor.second.position.x, monitor.second.position.x + monitor.second.currentVideoMode.size.x, coord.x);
+		auto ydist = distFromSection(monitor.second.position.y, monitor.second.position.y + monitor.second.currentVideoMode.size.y, coord.y);
+		auto dist = xdist * xdist + ydist * ydist;
 
 		if (dist < min) {
 			min = dist;
@@ -89,5 +90,5 @@ Monitor::Monitor(GLFWmonitor* monitor) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace ui
+} // namespace frame
 } // namespace libv

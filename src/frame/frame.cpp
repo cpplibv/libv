@@ -1,22 +1,19 @@
 // File: Frame.cpp, Created on 2013. szeptember 27. 16:00, Author: Vader
 
 // hpp
-#include <libv/ui/frame/frame.hpp>
+#include <libv/frame/frame.hpp>
 // ext
 #include <fmt/format.h>
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/fixed.hpp>
-#include <libv/gl/gl.hpp>
 // pro
-#include <libv/ui/log.hpp>
-#include <libv/timer.hpp>
+#include <libv/frame/log.hpp>
 #include "core.hpp"
 
 
 namespace libv {
-namespace ui {
+namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -91,26 +88,6 @@ bool Frame::isFrameShouldClose() {
 
 bool Frame::isRefreshSkipable() {
 	return hidden || minimized;
-}
-
-// Frame ui linkage --------------------------------------------------------------------------------
-
-void Frame::addComponent(const observer_ptr<Component>& component) {
-	ui.add(component);
-}
-
-void Frame::addComponent(const shared_ptr<Component>& component) {
-	ui.add(component);
-}
-
-void Frame::removeComponent(const observer_ptr<Component>&) {
-	LIBV_LOG_FRAME_ERROR("Not implemented yet.");
-	//	ui.remove(component);
-}
-
-void Frame::removeComponent(const shared_ptr<Component>&) {
-	LIBV_LOG_FRAME_ERROR("Not implemented yet.");
-	//	ui.remove(component);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -412,7 +389,6 @@ void Frame::loopInit() {
 }
 
 void Frame::loop() {
-	//LIBV_LOG_FRAME_DEBUG("Frame loop");
 	distributeEvents();
 
 	if (isFrameShouldClose()) {
@@ -421,7 +397,8 @@ void Frame::loop() {
 	}
 
 	if (!isRefreshSkipable() && window) {
-		ui.refresh();
+		// !!! onUpdate
+
 		glfwSwapBuffers(window);
 	}
 
@@ -441,17 +418,14 @@ void Frame::loopTerminate() {
 
 void Frame::initContext() {
 	LIBV_LOG_FRAME_DEBUG("Initialize context");
-	GLenum err = glewInit(); // TODO P1: Move glew init into core!
-	if (err != GLEW_OK)
-		LIBV_LOG_FRAME_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
 
-	LIBV_LOG_FRAME_DEBUG("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_LOG_FRAME_DEBUG("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_LOG_FRAME_DEBUG("GL Version: %s", (const char*) glGetString(GL_VERSION));
+	// !!! onInit
 }
 
 void Frame::termContext() {
 	LIBV_LOG_FRAME_DEBUG("Terminate context");
+
+	// !!! onTerminate
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -463,7 +437,6 @@ Frame::Frame(const std::string& title, unsigned int width, unsigned int height) 
 	size = vec2i(width, height);
 	registerFrame(this);
 	initEvents();
-	ui.attach(make_observer(this));
 }
 
 Frame::Frame(unsigned int width, unsigned int height) :
@@ -475,5 +448,5 @@ Frame::~Frame() {
 	unregisterFrame(this);
 }
 
-} // namespace ui
+} // namespace frame
 } // namespace libv
