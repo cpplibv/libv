@@ -36,7 +36,7 @@ struct ignore {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename BaseComparator, typename T>
+template <typename BaseComparator, typename T>
 struct CacheComparator : BaseComparator {
 	using is_transparent = void;
 	inline bool operator()(const CachePtr<T>& lhs, const T& rhs) const {
@@ -49,21 +49,21 @@ struct CacheComparator : BaseComparator {
 		return BaseComparator::operator()(*lhs.ptr, *rhs.ptr);
 	}
 	//
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const std::tuple<Args...>& args, const CachePtr<T>& cr) const {
 		return BaseComparator::operator()(args, *cr.ptr);
 	}
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const CachePtr<T>& cr, const std::tuple<Args...>& args) const {
 		return BaseComparator::operator()(*cr.ptr, args);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const CachePtr<T>& cr) const {
 		return BaseComparator::operator()(std::get<0>(args), *cr.ptr);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const CachePtr<T>& cr, const std::tuple<L>& args) const {
@@ -126,7 +126,7 @@ private:
 	// ---------------------------------------------------------------------------------------------
 
 private:
-	template<typename CompareOptions, typename... Args>
+	template <typename CompareOptions, typename... Args>
 	std::shared_ptr<T> getImpl(Args&&... args) {
 
 		// This is a member class to allow forward declared type
@@ -230,21 +230,21 @@ struct LoadableResource {
 	bool operator<(const LoadableResource<T>& r) const {
 		return *obj_ptr < *r.obj_ptr;
 	}
-	template<typename... Args>
+	template <typename... Args>
 	friend inline bool operator<(const std::tuple<Args...>& args, const LoadableResource<T>& r) {
 		return args < *r.obj_ptr;
 	}
-	template<typename... Args>
+	template <typename... Args>
 	friend inline bool operator<(const LoadableResource<T>& l, const std::tuple<Args...>& args) {
 		return *l.obj_ptr < args;
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	friend inline bool operator<(const std::tuple<L>& args, const LoadableResource<T>& r) {
 		return std::get<0>(args) < *r.obj_ptr;
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	friend inline bool operator<(const LoadableResource<T>& l, const std::tuple<L>& args) {
@@ -252,7 +252,7 @@ struct LoadableResource {
 	}
 };
 
-template<typename T, typename Comparator = std::less<void>>
+template <typename T, typename Comparator = std::less<void>>
 struct LoaderCache : private Cache<LoadableResource<T>, Comparator> {
 private:
 	using Base = Cache<LoadableResource<T>, Comparator>;

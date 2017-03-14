@@ -36,7 +36,7 @@ namespace libv {
 namespace frame {
 namespace detail {
 
-template<typename = void>
+template <typename = void>
 void errorCallbackGLFW(int code, const char* msg) {
 	::libv::log(LIBV_POC, ::libv::Error, "libv.frame.glfw", "%d - %s", code, msg);
 }

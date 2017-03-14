@@ -223,7 +223,7 @@ public:
 	}
 
 public:
-	template<typename... Args>
+	template <typename... Args>
 	void log(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
 		if (notable(severity, modul)) {
 			const auto message = fmt::sprintf(format, std::forward<Args>(args)...);
@@ -242,7 +242,7 @@ public:
 			}
 		}
 	}
-	template<typename... Args>
+	template <typename... Args>
 	void operator()(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
 		this->log(poc, severity, modul, format, std::forward<Args>(args)...);
 	}

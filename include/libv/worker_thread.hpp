@@ -40,7 +40,7 @@ class WorkerThread {
 		Task() { }
 		Task(const Task&) = default;
 		Task& operator=(const Task&) = default;
-		template<typename F, typename = decltype(std::declval<F>()()) >
+		template <typename F, typename = decltype(std::declval<F>()()) >
 		Task(F&& func, uint32_t priority, uint32_t number, libv::Semaphore* done = nullptr) :
 			priority(priority),
 			number(number),
@@ -106,17 +106,17 @@ private:
 	}
 
 public:
-	template<typename F, typename = decltype(std::declval<F>()())>
+	template <typename F, typename = decltype(std::declval<F>()())>
 	void executeAsync(F&& func, uint32_t priority) {
 		std::lock_guard<std::recursive_mutex> lk(que_m);
 		que.emplace(std::forward<F>(func), counter++, priority);
 		recieved_cv.notify_all();
 	}
-	template<typename F, typename = decltype(std::declval<F>()())>
+	template <typename F, typename = decltype(std::declval<F>()())>
 	inline void executeAsync(F&& func) {
 		executeAsync(std::forward<F>(func), defaultPriority);
 	}
-	template<typename F, typename = decltype(std::declval<F>()())>
+	template <typename F, typename = decltype(std::declval<F>()())>
 	void executeSync(F&& func, uint32_t priority) {
 		if (std::this_thread::get_id() != thread.get_id()) {
 			libv::Semaphore done;
@@ -129,7 +129,7 @@ public:
 		} else
 			func();
 	}
-	template<typename F, typename = decltype(std::declval<F>()())>
+	template <typename F, typename = decltype(std::declval<F>()())>
 	inline void executeSync(F&& func) {
 		executeSync(std::forward<F>(func), defaultPriority);
 	}

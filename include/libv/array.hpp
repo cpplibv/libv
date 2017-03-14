@@ -4,7 +4,7 @@
 
 namespace std {
 
-//template< DefaultConstructible T >
+//template < DefaultConstructible T >
 
 template <typename T>
 struct dynarray {

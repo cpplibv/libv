@@ -12,7 +12,7 @@
 #include <chrono>
 #include <vector>
 // pro
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 
 namespace boost {
 namespace filesystem {

@@ -30,7 +30,7 @@ struct BasicMultiTypeMapAddressProvider {
 };
 } // namespace detail
 
-template<template<typename...> class Container = std::map>
+template <template <typename...> class Container = std::map>
 struct BasicMultiTypeMap {
 private:
 	using Address_t = size_t;
@@ -41,7 +41,7 @@ private:
 
 	// Key -----------------------------------------------------------------------------------------
 public:
-	template<typename T>
+	template <typename T>
 	class Key {
 		friend class BasicMultiTypeMap<Container>;
 		const Address_t address = detail::BasicMultiTypeMapAddressProvider::nextAddress();
@@ -51,7 +51,7 @@ public:
 
 	// OptionalValue -------------------------------------------------------------------------------
 public:
-	template<typename T>
+	template <typename T>
 	class OptionalValue {
 	private:
 		T* ptr;

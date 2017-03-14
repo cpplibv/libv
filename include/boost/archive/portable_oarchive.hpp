@@ -173,7 +173,7 @@ namespace eos {
 	{
 		// workaround for gcc: use a dummy struct
 		// as additional argument type for overloading
-		template<int> struct dummy { dummy(int) {}};
+		template <int> struct dummy { dummy(int) {}};
 
 		// stores a signed char directly to stream
 		void save_signed_char(const signed char& c)
@@ -204,7 +204,7 @@ namespace eos {
 
 	public:
 		//! Save string types.
-		template<class C, class T, class A>
+		template <class C, class T, class A>
 		void save(const std::basic_string<C, T, A>& s)
 		{
 			// implementation only valid for narrow string

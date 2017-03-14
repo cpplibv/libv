@@ -128,7 +128,7 @@ struct LoadableTestResource {
 struct LoadableTestResourceB {
 	int n;
 	int argCount;
-	template<typename... Args>
+	template <typename... Args>
 	LoadableTestResourceB(int n, Args...) : n(n), argCount(sizeof...(Args) + 1) { }
 	void load(const std::shared_ptr<LoadableTestResourceB>&) { }
 	void unload(const std::shared_ptr<LoadableTestResourceB>&) { }

@@ -6,7 +6,7 @@
 
 namespace libv {
 	namespace vm3 {
-		template<typename T>
+		template <typename T>
 		class MaterialPropertyProxy {
 			T* ptr;
 		public:
@@ -28,7 +28,7 @@ namespace libv {
 				assert(ptr != nullptr);
 				return *ptr;
 			}
-			template<typename K>
+			template <typename K>
 			T& operator=(K&& v) {
 				assert(ptr != nullptr);
 				return *ptr = std::forward<K>(v);

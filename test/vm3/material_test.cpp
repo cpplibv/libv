@@ -71,7 +71,7 @@ TEST_CASE("materialPropertyGetProxy") {
 
 // --- Serialization -------------------------------------------------------------------------------
 
-template<typename OArchive, typename IArchive>
+template <typename OArchive, typename IArchive>
 void materialArchiveTester(std::iostream& stream) {
 	Material material_orig("Metal", "Phong-E-v2");
 	Material material_target;

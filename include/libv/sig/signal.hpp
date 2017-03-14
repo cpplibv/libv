@@ -183,10 +183,10 @@ public:
 		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
 		outputs.emplace(nullptr, func);
 	}
-	template<typename Object> inline void output(RType(Object::*func)(Args...), Object& obj) {
+	template <typename Object> inline void output(RType(Object::*func)(Args...), Object& obj) {
 		output(func, &obj);
 	}
-	template<typename Object> void output(RType(Object::*func)(Args...), Object* obj) {
+	template <typename Object> void output(RType(Object::*func)(Args...), Object* obj) {
 		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
 		static_assert(std::is_base_of<TrackableBase, Object>::value,
 				"Object type has to be Derived from TrackableBase "
@@ -219,7 +219,7 @@ class CapacitivSignalImpl : public SignalImpl<void, Args...> {
 private:
 	std::vector<std::tuple<typename std::remove_reference<Args>::type...>> argQue;
 private:
-	template<std::size_t... Is>
+	template <std::size_t... Is>
 	inline void flushHelper(std::index_sequence<Is...>) {
 		for (auto& item : argQue) {
 			SignalImpl<void, Args...>::fire(std::get<Is>(item)...);
@@ -265,14 +265,14 @@ class HistorySignalImpl : public SignalImpl<void, Args...> {
 private:
 	std::vector<std::tuple<typename std::remove_reference<Args>::type...>> history;
 private:
-	template<typename F, std::size_t... Is>
+	template <typename F, std::size_t... Is>
 	inline void flushHelper(F&& func, std::index_sequence<Is...>) {
 		for (auto& item : history) {
 			func(std::get<Is>(item)...);
 		}
 	}
 public:
-	//	template<typename... Args>
+	//	template <typename... Args>
 	//	void output(Args... args) {
 	//		flushHelper(std::index_sequence_for<Args...>{});
 	//	}
@@ -293,43 +293,43 @@ public:
 
 // === Aliases =====================================================================================
 
-template<typename... Args>
+template <typename... Args>
 struct Signal : public SignalImpl<void, Args...> {
 	using SignalImpl<void, Args...>::SignalImpl;
 };
 
-template<typename R, typename... Args>
+template <typename R, typename... Args>
 struct Signal<R(Args...)> : public SignalImpl<R, Args...> {
 	using SignalImpl<R, Args...>::SignalImpl;
 };
 
-template<typename... T>
+template <typename... T>
 struct CapacitivSignal : public CapacitivSignalImpl<T...> {
 	using CapacitivSignalImpl<T...>::CapacitivSignalImpl;
 };
 
-template<typename R, typename... T>
+template <typename R, typename... T>
 struct CapacitivSignal<R(T...)> : public CapacitivSignalImpl<T...> {
 	static_assert(!std::is_same<R, void>::value, "Return type must be void in CapacitivSignal");
 	using CapacitivSignalImpl<T...>::CapacitivSignalImpl;
 };
 
-template<typename... Args>
+template <typename... Args>
 struct SwitchSignal : public SwitchSignalImpl<void, Args...> {
 	using SwitchSignalImpl<void, Args...>::SwitchSignalImpl;
 };
 
-template<typename R, typename... Args>
+template <typename R, typename... Args>
 struct SwitchSignal<R(Args...)> : public SwitchSignalImpl<R, Args...> {
 	using SwitchSignalImpl<R, Args...>::SwitchSignalImpl;
 };
 
-template<typename... T>
+template <typename... T>
 struct HistorySignal : public HistorySignalImpl<T...> {
 	using HistorySignalImpl<T...>::HistorySignalImpl;
 };
 
-template<typename R, typename... T>
+template <typename R, typename... T>
 struct HistorySignal<R(T...)> : public HistorySignalImpl<T...> {
 	static_assert(!std::is_same<R, void>::value, "Return type must be void in HistorySignal");
 	using HistorySignalImpl<T...>::HistorySignalImpl;

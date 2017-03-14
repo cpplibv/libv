@@ -130,7 +130,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-template<size_t FACE>
+template <size_t FACE>
 struct PolygonModeSelector {
 	inline void point() {
 		glPolygonMode(FACE, GL_POINT);

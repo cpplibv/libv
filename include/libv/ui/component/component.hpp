@@ -41,7 +41,7 @@ protected:
 	PropertyMap properties;
 
 public:
-	template<typename T>
+	template <typename T>
 	inline decltype(auto) get(const PropertyAddress<T>& address) const {
 		return properties.get(address);
 	}

@@ -13,26 +13,26 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename T>
+template <typename T>
 class adaptive_ptr;
 
 
 // shared_ptr ======================================================================================
-template<typename T>
+template <typename T>
 using shared_ptr = std::shared_ptr<T>;
 
 // weak_ptr ========================================================================================
-template<typename T>
+template <typename T>
 using weak_ptr = std::weak_ptr<T>;
 
 // unique_ptr ======================================================================================
-template<typename T, typename Deleter = std::default_delete<T>>
+template <typename T, typename Deleter = std::default_delete<T>>
 using unique_ptr = std::unique_ptr<T, Deleter>;
 
 // observer_ptr ====================================================================================
 // This implementation is no 100% percent, but close enough for now.
 
-template<typename T>
+template <typename T>
 class observer_ptr {
 	T* ptr;
 public:
@@ -44,7 +44,7 @@ public:
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
 	constexpr explicit inline observer_ptr(const adaptive_ptr<T>& p) noexcept : ptr(p.get()) { }
 	constexpr explicit inline observer_ptr(const shared_ptr<T>& p) noexcept : ptr(p.get()) { }
-	template<typename K, typename = enable_if<std::is_base_of<T, K>>>
+	template <typename K, typename = enable_if<std::is_base_of<T, K>>>
 	constexpr inline observer_ptr(const observer_ptr<K>& other) noexcept : ptr(other.get()) { }
 	// ---------------------------------------------------------------------------------------------
 	constexpr inline T* get() const noexcept {
@@ -71,68 +71,68 @@ public:
 	constexpr inline void reset(T* p = nullptr) noexcept {
 		ptr = p;
 	}
-	template<typename K>
+	template <typename K>
 	constexpr inline void swap(observer_ptr<K>& other) noexcept {
 		using std::swap;
 		swap(ptr, other.ptr);
 	}
 };
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator==(observer_ptr<T1> p1, observer_ptr<T2> p2) {
 	return p1.get() == p2.get();
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator!=(observer_ptr<T1> p1, observer_ptr<T2> p2) {
 	return !(p1 == p2);
 }
-template<typename T>
+template <typename T>
 inline bool operator==(observer_ptr<T> p, std::nullptr_t) noexcept {
 	return p.get() == nullptr;
 }
-template<typename T>
+template <typename T>
 inline bool operator==(std::nullptr_t, observer_ptr<T> p) noexcept {
 	return nullptr == p.get();
 }
-template<typename T>
+template <typename T>
 inline bool operator!=(observer_ptr<T> p, std::nullptr_t) noexcept {
 	return p.get() != nullptr;
 }
-template<typename T>
+template <typename T>
 inline bool operator!=(std::nullptr_t, observer_ptr<T> p) noexcept {
 	return nullptr != p.get();
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator<(observer_ptr<T1> p1, observer_ptr<T2> p2) {
 	return std::less<T1*>()(p1.get(), p2.get());
 	// return std::less<T3>()( p1.get(), p2.get() );
 	// where T3 is the composite T* type (C++14 §5) of T1* and T2*.
 }
-template<typename T>
+template <typename T>
 inline bool operator>(observer_ptr<T> p1, observer_ptr<T> p2) {
 	return p2 < p1;
 }
-template<typename T>
+template <typename T>
 inline bool operator<=(observer_ptr<T> p1, observer_ptr<T> p2) {
 	return !(p2 < p1);
 }
-template<typename T>
+template <typename T>
 inline bool operator>=(observer_ptr<T> p1, observer_ptr<T> p2) {
 	return !(p1 < p2);
 }
 // specialized algorithms --------------------------------------------------------------------------
-template<typename T>
+template <typename T>
 inline void swap(observer_ptr<T> & p1, observer_ptr<T> & p2) noexcept {
 	p1.swap(p2);
 }
-template<typename T>
+template <typename T>
 inline observer_ptr<T> make_observer(T* p) noexcept {
 	return observer_ptr<T>(p);
 }
-template<typename T>
+template <typename T>
 inline observer_ptr<T> make_observer(T& p) noexcept {
 	return observer_ptr<T>(&p);
 }
-template<typename T>
+template <typename T>
 inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {
 	return observer_ptr<T>(p);
 }
@@ -141,7 +141,7 @@ inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {
 
 namespace std {
 
-template<typename T>
+template <typename T>
 struct hash<::libv::observer_ptr<T>> {
 	inline size_t operator()(::libv::observer_ptr<T> p) {
 		return hash<T*>()(p.get());
@@ -154,7 +154,7 @@ struct hash<::libv::observer_ptr<T>> {
 
 namespace libv {
 
-template<typename T>
+template <typename T>
 class adaptive_ptr {
 private:
 	observer_ptr<T> ptr;

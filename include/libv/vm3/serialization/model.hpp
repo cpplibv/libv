@@ -21,7 +21,7 @@ constexpr const char VM3_MODEL_MAGIC_BYTE[] = "d99575d0-ddf8-4462-8338-0f6755913
 // -------------------------------------------------------------------------------------------------
 
 struct ModelSerialization {
-	template<typename Archive>
+	template <typename Archive>
 	static inline void serialize(Archive& ar, ::libv::vm3::Model& var, const unsigned int) {
 		ar & LIBV_NVP_NAMED("name", var.name);
 		ar & LIBV_NVP_NAMED("materials", var.materials);
@@ -43,7 +43,7 @@ namespace boost {
 namespace serialization {
 
 // -------------------------------------------------------------------------------------------------
-template<typename Archive>
+template <typename Archive>
 void serialize(Archive& ar, ::libv::vm3::Vertex& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("position", var.position);
 	ar & LIBV_NVP_NAMED("normal", var.normal);
@@ -53,7 +53,7 @@ void serialize(Archive& ar, ::libv::vm3::Vertex& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("boneID", var.boneID);
 	ar & LIBV_NVP_NAMED("boneWieght", var.boneWieght);
 }
-template<typename Archive>
+template <typename Archive>
 void serialize(Archive& ar, ::libv::vm3::Mesh& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("name", var.name);
 	ar & LIBV_NVP_NAMED("baseIndex", var.baseIndex);
@@ -61,7 +61,7 @@ void serialize(Archive& ar, ::libv::vm3::Mesh& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("numIndices", var.numIndices);
 	ar & LIBV_NVP_NAMED("material", var.materialID);
 }
-template<typename Archive>
+template <typename Archive>
 void serialize(Archive& ar, ::libv::vm3::Node& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("name", var.name);
 	ar & LIBV_NVP_NAMED("parent", var.parentID);
@@ -70,13 +70,13 @@ void serialize(Archive& ar, ::libv::vm3::Node& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("meshes", var.meshIDs);
 	ar & LIBV_NVP_NAMED("children", var.childrenIDs);
 }
-template<typename Archive>
+template <typename Archive>
 void serialize(Archive& ar, ::libv::vm3::LOD& var, const unsigned int) {
 	ar & LIBV_NVP_NAMED("rangeNear", var.rangeNear);
 	ar & LIBV_NVP_NAMED("rangeFar", var.rangeFar);
 	ar & LIBV_NVP_NAMED("rootNode", var.rootNodeID);
 }
-template<typename Archive>
+template <typename Archive>
 void serialize(Archive& ar, ::libv::vm3::Model& var, const unsigned int ver) {
 	::libv::vm3::ModelSerialization::serialize(ar, var, ver);
 }

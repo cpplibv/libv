@@ -53,16 +53,16 @@ public:
 		if (ptr)
 			++*(reinterpret_cast<std::atomic_int*>(ptr) - 1);
 	}
-	template<typename K, typename = enable_if<std::is_base_of<T, K>>>
+	template <typename K, typename = enable_if<std::is_base_of<T, K>>>
 	constexpr explicit inline cache_ptr(cache_ptr<K> other) noexcept : ptr(other.get()) {
 		other.ptr = nullptr;
 	}
-	template<typename K, typename = enable_if<std::is_base_of<T, K>>>
+	template <typename K, typename = enable_if<std::is_base_of<T, K>>>
 	constexpr explicit inline cache_ptr(const cache_ptr<K>& other) noexcept : ptr(other.get()) {
 		if (ptr)
 			++*(reinterpret_cast<std::atomic_int*>(ptr) - 1);
 	}
-	template<typename K, typename = enable_if<std::is_base_of<T, K>>>
+	template <typename K, typename = enable_if<std::is_base_of<T, K>>>
 	constexpr explicit inline cache_ptr(cache_ptr<K>&& other) noexcept : ptr(other.get()) {
 		other.ptr = nullptr;
 	}
@@ -117,56 +117,56 @@ public:
 			--*(reinterpret_cast<std::atomic_int*>(ptr) - 1);
 		ptr = nullptr;
 	}
-	template<typename K>
+	template <typename K>
 	constexpr inline void swap(cache_ptr<K>& other) noexcept {
 		using std::swap;
 		swap(ptr, other.ptr);
 	}
 };
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator==(cache_ptr<T1> p1, cache_ptr<T2> p2) {
 	return p1.get() == p2.get();
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator!=(cache_ptr<T1> p1, cache_ptr<T2> p2) {
 	return !(p1 == p2);
 }
-template<typename T>
+template <typename T>
 inline bool operator==(cache_ptr<T> p, std::nullptr_t) noexcept {
 	return !p;
 }
-template<typename T>
+template <typename T>
 inline bool operator==(std::nullptr_t, cache_ptr<T> p) noexcept {
 	return !p;
 }
-template<typename T>
+template <typename T>
 inline bool operator!=(cache_ptr<T> p, std::nullptr_t) noexcept {
 	return (bool)p;
 }
-template<typename T>
+template <typename T>
 inline bool operator!=(std::nullptr_t, cache_ptr<T> p) noexcept {
 	return (bool)p;
 }
-template<typename T1, typename T2>
+template <typename T1, typename T2>
 inline bool operator<(cache_ptr<T1> p1, cache_ptr<T2> p2) {
 	return std::less<T1*>()(p1.get(), p2.get());
 	// return std::less<T3>()( p1.get(), p2.get() );
 	// where T3 is the composite T* type (C++14 §5) of T1* and T2*.
 }
-template<typename T>
+template <typename T>
 inline bool operator>(cache_ptr<T> p1, cache_ptr<T> p2) {
 	return p2 < p1;
 }
-template<typename T>
+template <typename T>
 inline bool operator<=(cache_ptr<T> p1, cache_ptr<T> p2) {
 	return !(p2 < p1);
 }
-template<typename T>
+template <typename T>
 inline bool operator>=(cache_ptr<T> p1, cache_ptr<T> p2) {
 	return !(p1 < p2);
 }
 // specialized algorithms --------------------------------------------------------------------------
-template<typename T>
+template <typename T>
 inline void swap(cache_ptr<T> & p1, cache_ptr<T> & p2) noexcept {
 	p1.swap(p2);
 }
@@ -175,7 +175,7 @@ inline void swap(cache_ptr<T> & p1, cache_ptr<T> & p2) noexcept {
 
 namespace std {
 
-template<typename T>
+template <typename T>
 struct hash<::libv::cache_ptr<T>> {
 	inline size_t operator()(::libv::cache_ptr<T> p) {
 		return hash<T*>()(p.get());
@@ -198,7 +198,7 @@ struct ignore {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename BaseComparator, typename T>
+template <typename BaseComparator, typename T>
 struct ScopedCacheComparator : BaseComparator {
 	using is_transparent = void;
 	inline bool operator()(const std::unique_ptr<cache_ptr_host<T>>& lhs, const T& rhs) const {
@@ -211,21 +211,21 @@ struct ScopedCacheComparator : BaseComparator {
 		return BaseComparator::operator()(lhs->data, rhs->data);
 	}
 	//
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const std::tuple<Args...>& args, const std::unique_ptr<cache_ptr_host<T>>& cr) const {
 		return BaseComparator::operator()(args, cr->data);
 	}
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const std::unique_ptr<cache_ptr_host<T>>& cr, const std::tuple<Args...>& args) const {
 		return BaseComparator::operator()(cr->data, args);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const std::unique_ptr<cache_ptr_host<T>>& cr) const {
 		return BaseComparator::operator()(std::get<0>(args), cr->data);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const std::unique_ptr<cache_ptr_host<T>>& cr, const std::tuple<L>& args) const {
@@ -281,7 +281,7 @@ private:
 	// ---------------------------------------------------------------------------------------------
 
 private:
-	template<typename CompareOptions, typename... Args>
+	template <typename CompareOptions, typename... Args>
 	std::pair<cache_ptr<T>, bool> getImpl(Args&&... args) {
 		Arguments<CompareOptions, Args...> arguments(std::forward<Args>(args)...);
 

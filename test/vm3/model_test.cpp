@@ -30,7 +30,7 @@ TEST_CASE("modelBasic") {
 
 // --- Serialization -------------------------------------------------------------------------------
 
-template<typename OArchive, typename IArchive>
+template <typename OArchive, typename IArchive>
 void modelArchiveTester(std::iostream& stream) {
 	Model model_orig;
 	Model model_target;

@@ -1,20 +1,14 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+adopt ui - frame separation
+-- commit --
+
 handle fails - apply fallback
 	failed file
 	failed shader
 	failed program
 	failed (corrupt) font
 implement burnt in defaults
--- commit --
-
-replace "template<" with "template <"
--- commit --
-
-fix freetype raii
--- commit --
-
-rename #include <libv/ui/resource/resource_fwd.hpp> to #include <libv/ui/resource/fwd.hpp>
 -- commit --
 
 ResourceStepResult and ResourceState to enum
@@ -29,7 +23,6 @@ separate control and data!
 -- commit --
 
 c++17 vec
-remove vec member getters
 -- commit --
 
 ui resource local proxies
@@ -39,9 +32,6 @@ hunt down GCC 7.0+ comments
 -- commit --
 
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
--- commit --
-
-change vec default to double
 -- commit --
 
 kill gl/log.cpp
@@ -55,12 +45,6 @@ use VAO for string2D
 btn / regions
 -- commit --
 
-?kill def renderer if there is still any
--- commit --
-
-move ui out of frame
--- commit --
-
 flow layout const auto& in layout algo
 -- commit --
 
@@ -68,10 +52,10 @@ change log severity into bit-mask
 -- commit --
 
 frame calling show after show may brake things?
-dual ("lock") check every frame operations
+dual check lock every frame operations
 -- commit --
 
-ptr base for observer, cached, etc...
+base ptr for pointer like object: observer, cached, etc... or macro?
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
@@ -558,7 +542,7 @@ ar -qc libaz.a abc xyz
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
 > RANDOM
-template<class URNG>
+template <class URNG>
 int rnd(int n, URNG &engine) {
     using dist_t = std::uniform_int_distribution<>;
     using param_t = dist_t::param_type;

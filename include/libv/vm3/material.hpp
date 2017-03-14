@@ -16,13 +16,13 @@ namespace libv {
 			virtual ~MaterialPropertyBase();
 		};
 
-		template<typename T>
+		template <typename T>
 		struct MaterialProperty : public MaterialPropertyBase {
 			T data;
 			void accept(MaterialPropertyVisitor& visitor, const std::string& name) const override {
 				visitor.visit(name, data);
 			}
-			template<typename... Args>
+			template <typename... Args>
 			MaterialProperty(Args&&... args) : data(std::forward<Args>(args)...) { }
 		};
 
@@ -50,7 +50,7 @@ namespace libv {
 				properties.erase(name);
 			}
 			void accept(MaterialPropertyVisitor& visitor) const;
-			template<typename T>
+			template <typename T>
 			void set(const std::string& name, const T& data) {
 				if (auto it = get<T>(name)) {
 					it = data;
@@ -59,7 +59,7 @@ namespace libv {
 					properties.emplace(name, std::move(ptr));
 				}
 			}
-			template<typename T>
+			template <typename T>
 			bool get(const std::string& name, T& target) const {
 				auto it = properties.find(name);
 				if (it != properties.end()) {
@@ -70,7 +70,7 @@ namespace libv {
 				}
 				return false;
 			}
-			template<typename T>
+			template <typename T>
 			MaterialPropertyProxy<T> get(const std::string& name) {
 				auto it = properties.find(name);
 				if (it != properties.end()) {
@@ -80,7 +80,7 @@ namespace libv {
 				}
 				return nullptr;
 			}
-			template<typename T>
+			template <typename T>
 			inline const MaterialPropertyProxy<T> get(const std::string& name) const {
 				return get<T>(name);
 			}

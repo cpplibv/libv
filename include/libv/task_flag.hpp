@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename T = void>
+template <typename T = void>
 class TaskFlag {
 	bool passed;
 	T result_;
@@ -48,7 +48,7 @@ public:
 	TaskFlag() : passed(false) { }
 };
 
-template<>
+template <>
 class TaskFlag<void> {
 	bool passed;
 	std::mutex mutex;

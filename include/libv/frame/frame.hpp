@@ -17,11 +17,12 @@
 #include <libv/frame/events.hpp>
 #include <libv/frame/inputs.hpp>
 #include <libv/frame/monitor.hpp>
-//#include <libv/ui/component/component.hpp>
-//#include <libv/ui/component/ui.hpp>
 
 
-// TODO P3: future proxy for frame async operations: frame.show().wait();
+// TODO P3: future proxy for frame async operations: frame.show().wait(); easy implementation:
+//			add member Frame::wait()
+//			member with async task return Frame&
+//			Wait throws in a dummy task and waits for it.
 
 class GLFWwindow;
 class GLFWmonitor;

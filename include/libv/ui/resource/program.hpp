@@ -6,7 +6,7 @@
 #include <libv/gl/program.hpp>
 // pro
 #include <libv/ui/resource/resource.hpp>
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 
 namespace libv {
 namespace ui {

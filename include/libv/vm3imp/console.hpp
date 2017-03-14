@@ -23,7 +23,7 @@ public:
 	virtual void reset() = 0;
 };
 
-template<typename T>
+template <typename T>
 class Argument : public ArgumentBase {
 	T _value;
 	bool _set = false;
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-template<>
+template <>
 class Argument<std::string> : public ArgumentBase {
 	std::string _value;
 	bool _set = false;
@@ -74,7 +74,7 @@ class Flag {
 	std::vector<ArgumentBase*> args;
 	bool _set = false;
 public:
-	template<typename... Args>
+	template <typename... Args>
 	Flag(const std::vector<std::string>& aliases, const std::string& description, Args&... args) :
 		description(description),
 		aliases(aliases),
@@ -107,7 +107,7 @@ private:
 	Flag* findFlag(Command* command, const std::string& searchedFlag);
 	Command* findCommand(const std::string& cmd);
 public:
-	template<typename T>
+	template <typename T>
 	void add() {
 		commands.emplace_back(new T());
 	}

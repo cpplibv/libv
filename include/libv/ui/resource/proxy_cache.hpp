@@ -34,7 +34,7 @@ struct ignore {
 
 // -------------------------------------------------------------------------------------------------
 
-template<typename BaseComparator, typename T>
+template <typename BaseComparator, typename T>
 struct IntrusiveCacheComparator : BaseComparator {
 	using is_transparent = void;
 	inline bool operator()(const std::unique_ptr<T>& lhs, const T& rhs) const {
@@ -47,21 +47,21 @@ struct IntrusiveCacheComparator : BaseComparator {
 		return BaseComparator::operator()(*lhs, *rhs);
 	}
 	//
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const std::tuple<Args...>& args, const std::unique_ptr<T>& cr) const {
 		return BaseComparator::operator()(args, *cr);
 	}
-	template<typename... Args>
+	template <typename... Args>
 	inline bool operator()(const std::unique_ptr<T>& cr, const std::tuple<Args...>& args) const {
 		return BaseComparator::operator()(*cr, args);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const std::unique_ptr<T>& cr) const {
 		return BaseComparator::operator()(std::get<0>(args), *cr);
 	}
-	template<typename L,
+	template <typename L,
 	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
 	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
 	inline bool operator()(const std::unique_ptr<T>& cr, const std::tuple<L>& args) const {
@@ -117,7 +117,7 @@ private:
 	// ---------------------------------------------------------------------------------------------
 
 private:
-	template<typename CompareOptions, typename... Args>
+	template <typename CompareOptions, typename... Args>
 	std::pair<boost::intrusive_ptr<T>, bool> getImpl(Args&&... args) {
 		Arguments<CompareOptions, Args...> arguments(std::forward<Args>(args)...);
 

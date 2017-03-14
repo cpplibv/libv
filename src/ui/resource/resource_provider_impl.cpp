@@ -10,7 +10,7 @@
 #include <libv/ui/resource/file.hpp>
 #include <libv/ui/resource/font.hpp>
 #include <libv/ui/resource/program.hpp>
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 #include <libv/ui/resource/shader.hpp>
 #include <libv/ui/resource/texture.hpp>
 

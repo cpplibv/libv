@@ -18,7 +18,7 @@
 namespace libv {
 	namespace vm3 {
 
-		template<typename Archive>
+		template <typename Archive>
 		class MaterialPropertySerializer : public MaterialPropertyVisitor {
 			Archive& ar;
 		public:
@@ -45,7 +45,7 @@ namespace libv {
 			VM3_PROPERTY_VISITOR_TYPE_HELPER(vec4d, 0x0032)
 #undef VM3_PROPERTY_VISITOR_TYPE_HELPER
 		};
-		template<typename Archive>
+		template <typename Archive>
 		std::unique_ptr<MaterialPropertyBase> deserializeMaterialProperty(uint16_t type, Archive& ar) {
 			switch (type) {
 #define VM3_PROPERTY_DESERIALIZE_TYPE_HELPER(TYPE, ID) case ID: { TYPE value; ar & LIBV_NVP(value); \
@@ -69,7 +69,7 @@ namespace libv {
 		}
 
 		struct MaterialSerialization {
-			template<class Archive>
+			template <class Archive>
 			static inline void save(Archive& ar, const ::libv::vm3::Material& var, const unsigned int) {
 				ar & LIBV_NVP_NAMED("name", var.name);
 				ar & LIBV_NVP_NAMED("shader", var.shader);
@@ -81,7 +81,7 @@ namespace libv {
 					item.second->accept(mps, item.first);
 				}
 			}
-			template<class Archive>
+			template <class Archive>
 			static inline void load(Archive& ar, ::libv::vm3::Material& var, const unsigned int) {
 				ar & LIBV_NVP_NAMED("name", var.name);
 				ar & LIBV_NVP_NAMED("shader", var.shader);
@@ -105,11 +105,11 @@ BOOST_SERIALIZATION_SPLIT_FREE(::libv::vm3::Material)
 
 namespace boost {
 	namespace serialization {
-		template<class Archive>
+		template <class Archive>
 		static void save(Archive& ar, const ::libv::vm3::Material& var, const unsigned int ver) {
 			::libv::vm3::MaterialSerialization::save(ar, var, ver);
 		}
-		template<class Archive>
+		template <class Archive>
 		static void load(Archive& ar, ::libv::vm3::Material& var, const unsigned int ver) {
 			::libv::vm3::MaterialSerialization::load(ar, var, ver);
 		}

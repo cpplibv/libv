@@ -55,7 +55,7 @@ struct uft8_to_codepoint_view : aux_uft8_to_unicode_view {
 
 struct uft8_to_codepoint_fn {
 
-	template<typename Rng>
+	template <typename Rng>
 	auto operator()(Rng&& rng) const {
 		return detail::uft8_to_codepoint_view(std::forward<Rng>(rng));
 		//return detail::uft8_to_codepoint_view<ranges::view::all_t<Rng>>(

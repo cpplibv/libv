@@ -4,17 +4,12 @@
 
 // cfg
 #include <libv/ui/config.hpp>
-//// ext
-//#include <boost/container/small_vector.hpp>
 // libv
 #include <libv/memory.hpp>
-//#include <libv/utility.hpp>
-//#include <libv/worker_thread.hpp>
 // std
 #include <atomic>
-//#include <map>
 // pro
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 
 // -------------------------------------------------------------------------------------------------
 

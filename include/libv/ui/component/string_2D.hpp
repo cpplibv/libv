@@ -12,7 +12,7 @@
 //#include <libv/ui/font/font_2D.hpp>
 #include <libv/ui/resource/font.hpp>
 #include <libv/ui/resource/program.hpp>
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 
 // TODO P2: fix new line 'inverting'
 // TODO P2: String2D alignments (yee, the part where FLOW Layout is kind of familiar...)

@@ -13,7 +13,7 @@
 #include <memory>
 #include <mutex>
 // pro
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 #include <libv/ui/resource/resource_provider.hpp>
 //#include <libv/ui/resource/program.hpp>
 //#include <libv/ui/resource/shader.hpp>

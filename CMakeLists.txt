@@ -231,7 +231,7 @@ ExternalProject_Add(ext_gli
 list(APPEND EXTERNAL_PROJECT_LIST ext_range)
 ExternalProject_Add(ext_range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG bab29767cce120e11872d79a2537bc6f0be76963
+	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" #range is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/range

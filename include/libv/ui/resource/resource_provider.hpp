@@ -5,7 +5,7 @@
 // std
 #include <string>
 // pro
-#include <libv/ui/resource/resource_fwd.hpp>
+#include <libv/ui/resource/fwd.hpp>
 
 // -------------------------------------------------------------------------------------------------
 

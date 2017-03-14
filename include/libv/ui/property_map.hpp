@@ -12,7 +12,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-template<template<typename...> class Container = std::map>
+template <template <typename...> class Container = std::map>
 class BasicPropertyMap {
 	BasicMultiTypeMap<Container> map;
 public:
@@ -44,7 +44,7 @@ public:
 		BasicPropertyMap<Container>& object;
 		SetterProxy(BasicPropertyMap<Container>& object) : object(object) { }
 	public:
-		template<typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
+		template <typename T, typename... Args, typename = decltype(T(std::declval<Args>()...))>
 		inline SetterProxy& operator()(const Key<T>& key, Args&&... args) {
 			object.set(key, std::forward<Args>(args)...);
 			return *this;
