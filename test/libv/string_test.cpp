@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-#include <libv/string.hpp>
+#include <libv/utf8.hpp>
 
 //SUITE(SplitCommandLineTest) {
 //	TEST_CASE("splitChar") {

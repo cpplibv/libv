@@ -2,8 +2,10 @@
 
 // hpp
 #include <libv/vm3imp/console.hpp>
+// ext
+#include <boost/algorithm/string/trim.hpp>
 // libv
-#include <libv/string.hpp>
+#include <libv/utf8.hpp>
 // std
 #include <iostream>
 
@@ -32,11 +34,11 @@ std::vector<std::string> splitCommandLine(const std::string& line) {
 		result.push_back(curr_word);
 
 	for (auto& word : result) {
-		word = libv::trim(word);
+		boost::algorithm::trim(word);
 		auto size = word.size();
 		if(size > 1 && word[0] == '"' && word[size - 1] == '"')
 			word = word.substr(1, size - 2);
-		word = libv::trim(word);
+		boost::algorithm::trim(word);
 	}
 	return result;
 }
@@ -124,7 +126,7 @@ void Console::execute(const std::string& cmd) {
 
 		while (!argQue.empty() || (!lineQue.empty() && lineQue.front()[0] == '-')) {
 			if (lineQue.empty()) {
-				
+
 				for (auto* arg : argQue) {
 					std::cout << "Missing argument: [" << arg->description << "]" << std::endl;
 				}
