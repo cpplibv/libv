@@ -1,8 +1,5 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-fix font.freetype
--- commit --
-
 handle fails - apply fallback
 	failed file
 	failed shader

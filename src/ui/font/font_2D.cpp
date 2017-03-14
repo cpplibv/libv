@@ -16,6 +16,7 @@
 #include <libv/gl/gl.hpp>
 // std
 #include <atomic>
+#include <mutex>
 // pro
 #include <libv/ui/config.hpp>
 
@@ -26,10 +27,12 @@ namespace ui {
 
 namespace {
 
-static FT_Library ftLib = nullptr; // <<< Mutex ?!
-static std::atomic<size_t> FT_LibUseCount{0};
+FT_Library ftLib = nullptr;
+std::atomic<size_t> FT_LibUseCount{0};
+std::mutex ftLib_m;
 
 void incFreetypeLibRef() {
+	std::lock_guard<std::mutex> lock(ftLib_m);
 	if (!ftLib)
 		if (const auto err = FT_Init_FreeType(&ftLib))
 			LIBV_LOG_UI_FT_ERROR("FT_Init_FreeType failed: [%d]", err);
@@ -37,6 +40,7 @@ void incFreetypeLibRef() {
 }
 
 void decFreetypeLibRef() {
+	std::lock_guard<std::mutex> lock(ftLib_m);
 	if (!--FT_LibUseCount)
 		if (const auto err = FT_Done_FreeType(ftLib))
 			LIBV_LOG_UI_FT_ERROR("FT_Done_FreeType failed: [%d]", err);
@@ -291,53 +295,3 @@ void Font2D::unbind() {
 //                   -+---------------------------+-> X+
 //                0,0 |          <-->
 //                         bitmapSize.x
-
-//int Hex2Int(char n) {
-//	if (n >= '0' && n <= '9')
-//		return (n - '0');
-//	else
-//		if (n >= 'A' && n <= 'F')
-//		return (n - 'A' + 10);
-//	else
-//		return 0;
-//}
-//
-//void Font2D::print(float x, float y, const char *text) {
-//	//chars
-//	// \0 - 00 - end mark
-//	// \n - 13 -  new line
-//	//str
-//	// "\" - protector
-//	// "#" - hex color start (#FFFFFF)
-//	vec2 pen(
-//			x - std::floor(getLineWidth(text, 0) * this->alignH),
-//			y - (float) this->height + std::floor((float) getLineNumber(text) * ((float) this->height + (float) this->lineHeight) * this->alignV));
-//	int i = 0;
-//
-//	while (text[i] != '\0') {
-//		unsigned char ch = text[i];
-//		if (text[i] == '\n') {
-//			pen.x = x - std::floor(getLineWidth(text, i + 1) * this->alignH);
-//			pen.y -= (float) this->lineHeight + (float) this->height;
-//		} else if (text[i] == '#' && (i == 0 || text[i - 1] != '\\')) { //pass if "#" but not if "\#"
-//			glColor4f(
-//					(float) (Hex2Int(text[i + 1])*16 + Hex2Int(text[i + 2])) / 255.0f,
-//					(float) (Hex2Int(text[i + 3])*16 + Hex2Int(text[i + 4])) / 255.0f,
-//					(float) (Hex2Int(text[i + 5])*16 + Hex2Int(text[i + 6])) / 255.0f,
-//					1.0f);
-//			i += 6;
-//		} else if (text[i] == '\\' && text[i + 1] == '#') { //if char is a protector -> do nothing
-//		} else {
-//			glTexCoord2f(this->chars[ch].textureCoord[0].x, this->chars[ch].textureCoord[0].y);
-//			glVertex2f(pen.x + this->chars[ch].vertexCoord[0].x, pen.y + this->chars[ch].vertexCoord[0].y);
-//			glTexCoord2f(this->chars[ch].textureCoord[1].x, this->chars[ch].textureCoord[1].y);
-//			glVertex2f(pen.x + this->chars[ch].vertexCoord[1].x, pen.y + this->chars[ch].vertexCoord[1].y);
-//			glTexCoord2f(this->chars[ch].textureCoord[3].x, this->chars[ch].textureCoord[3].y);
-//			glVertex2f(pen.x + this->chars[ch].vertexCoord[3].x, pen.y + this->chars[ch].vertexCoord[3].y);
-//			glTexCoord2f(this->chars[ch].textureCoord[2].x, this->chars[ch].textureCoord[2].y);
-//			glVertex2f(pen.x + this->chars[ch].vertexCoord[2].x, pen.y + this->chars[ch].vertexCoord[2].y);
-//			pen.x += this->chars[ch].width;
-//		}
-//		i++;
-//	}
-//}
