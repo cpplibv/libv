@@ -29,7 +29,17 @@ class GLFWmonitor;
 namespace libv {
 namespace frame {
 
-class Component;
+// -------------------------------------------------------------------------------------------------
+
+class Core;
+
+struct CoreProxy {
+	std::shared_ptr<Core> core;
+	void exec(const std::function<void()>&);
+	void exec(std::function<void()>&&);
+	CoreProxy();
+	~CoreProxy();
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -47,12 +57,6 @@ public:
 	using TypeOpenGLProfile = int;
 	using TypeOpenGLRefreshRate = int;
 	using TypeOpenGLSamples = int;
-
-	// ---------------------------------------------------------------------------------------------
-public:
-	static void joinAll();
-	static void closeAllDefault();
-	static void closeAllForce();
 
 	// ---------------------------------------------------------------------------------------------
 
@@ -155,7 +159,6 @@ private:
 	void glfwCallback(const EventMouseEnter&);
 	void glfwCallback(const EventMousePosition&);
 	void glfwCallback(const EventMouseScroll&);
-	void glfwCallback(const EventWindowClose&);
 	void glfwCallback(const EventWindowFocus&);
 	void glfwCallback(const EventWindowIconify&);
 	void glfwCallback(const EventWindowPosition&);
@@ -163,7 +166,7 @@ private:
 	void glfwCallback(const EventWindowSize&);
 
 private:
-	void initEvents();
+	void initEventQueues();
 	void distributeEvents();
 
 private:
@@ -179,7 +182,6 @@ private:
 	EventQue<EventMouseEnter> eventQueMouseEnter;
 	EventQue<EventMousePosition> eventQueMousePosition;
 	EventQue<EventMouseScroll> eventQueMouseScroll;
-	EventQue<EventWindowClose> eventQueWindowClose;
 	EventQue<EventWindowFocus> eventQueWindowFocus;
 	EventQue<EventWindowIconify> eventQueWindowIconify;
 	EventQue<EventWindowPosition> eventQueWindowPosition;
@@ -199,7 +201,6 @@ public:
 	Event<EventMouseEnter> onMouseEnter;
 	Event<EventMousePosition> onMousePosition;
 	Event<EventMouseScroll> onMouseScroll;
-	Event<EventWindowClose> onWindowClose;
 	Event<EventWindowFocus> onWindowFocus;
 	Event<EventWindowIconify> onWindowIconify;
 	Event<EventWindowPosition> onWindowPosition;
@@ -207,15 +208,12 @@ public:
 	Event<EventWindowSize> onWindowSize;
 
 	/** Event invoked on frame closing by frame's thread. Usable for interrupting close.
-	 * This event occures even if the default close operation does not close the frame.
-	 * If the returned value is False the closing operation will be interrupted.
-	 * @return False: interrupt close; True: proceed */
-	Signal<bool(Frame*)> onClose;
-	/** Event invoked if the frame is closed by frame's thread.
-	 * Can't be used for interrupting close.
-	 * Event occurs when the window is ALREADY CLOSED,
-	 * but the Frame object is not destructed yet. */
-	Signal<Frame*> onClosed;
+	 * This event occurs even if the default close operation does not close the frame. */
+	Event<EventCloseRequest> onCloseRequest;
+
+	Event<EventContextInitialization> onContextInitialization;
+	Event<EventContextRefresh> onContextRefresh;
+	Event<EventContextTerminate> onContextTerminate;
 
 	// ---------------------------------------------------------------------------------------------
 private:
@@ -226,6 +224,8 @@ private:
 
 	GLFWwindow* window = nullptr;
 	GLFWwindow* shareWindow = nullptr;
+
+	CoreProxy core;
 
 private:
 	unsigned int swapInterval = 1;
@@ -277,6 +277,8 @@ public:
 	void setSize(int x, int y);
 	void setSize(vec2i size);
 	void setTitle(const std::string& title);
+//	void setWindowSizeLimits(int minx, int miny, int maxx, int maxy);
+//	void setWindowSizeLimits(vec2i min, vec2i max);
 
 	TypeCloseOperation getCloseOperation() const;
 	TypeDisplayMode getDisplayMode() const;
@@ -310,10 +312,8 @@ private:
 	void loopInit();
 	void loop();
 	void loopTerminate();
-
-private:
-	void initContext();
-	void termContext();
+	void contextInit();
+	void contextTerminate();
 
 public:
 	Frame(unsigned int width, unsigned int height);

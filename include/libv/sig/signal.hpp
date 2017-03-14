@@ -237,7 +237,7 @@ public:
 	}
 };
 
-// === SwitchSignal ===========================================================================
+// === SwitchSignal ================================================================================
 
 template <typename R, typename... Args>
 struct SwitchSignalImpl : public SignalImpl<R, Args...> {

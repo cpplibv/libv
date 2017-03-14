@@ -1,14 +1,5 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-split ui and frame
--- commit --
-
-unique capacitive signal
--- commit --
-
-fix frame.core
--- commit --
-
 fix font.freetype
 -- commit --
 
@@ -21,9 +12,6 @@ implement burnt in defaults
 -- commit --
 
 replace "template<" with "template <"
--- commit --
-
-frame mouse coord remap of by 1 in Y, just -1 should be fine
 -- commit --
 
 fix freetype raii

@@ -23,12 +23,17 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onMouseEnter.output(pretty_print_to_log);
 	frame.onMousePosition.output(pretty_print_to_log);
 	frame.onMouseScroll.output(pretty_print_to_log);
-	frame.onWindowClose.output(pretty_print_to_log);
 	frame.onWindowFocus.output(pretty_print_to_log);
 	frame.onWindowIconify.output(pretty_print_to_log);
 	frame.onWindowPosition.output(pretty_print_to_log);
 	frame.onWindowRefresh.output(pretty_print_to_log);
 	frame.onWindowSize.output(pretty_print_to_log);
+
+	frame.onCloseRequest.output(pretty_print_to_log);
+
+	frame.onContextInitialization.output(pretty_print_to_log);
+	frame.onContextRefresh.output(pretty_print_to_log);
+	frame.onContextTerminate.output(pretty_print_to_log);
 }
 
 class TestFrame : public libv::frame::Frame {
@@ -44,10 +49,8 @@ public:
 		onKey.output([this](const auto& e) {
 			if (e.key == Key::Escape)
 				this->closeDefault();
-
 			if (e.key == Key::X)
 				this->setDecoration(!this->isDecorated());
-
 			if (e.key == Key::C)
 				this->setPosition(POSITION_CENTER_CURRENT_MONITOR);
 		});
@@ -57,7 +60,7 @@ public:
 int main(int, char**) {
 	std::cout << libv::log;
 
-	libv::log.allow("libv.frame.event");
+//	libv::log.allow("libv.frame.event");
 //	libv::log.deny();
 
 	TestFrame f1("TestFrame");
@@ -65,5 +68,3 @@ int main(int, char**) {
 
 	return 0;
 }
-
-// -------------------------------------------------------------------------------------------------

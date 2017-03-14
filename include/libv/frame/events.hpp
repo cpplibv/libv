@@ -143,12 +143,6 @@ struct EventMouseScroll {
 	}
 };
 
-struct EventWindowClose {
-	std::string toPrettyString() const {
-		return "Window Close";
-	}
-};
-
 struct EventWindowFocus {
 	int focused;
 	EventWindowFocus(int focused) : focused(focused) { }
@@ -192,6 +186,45 @@ struct EventWindowSize {
 		return fmt::format("Window Size: size = ({}, {})", size.x, size.y);
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+struct EventCloseRequest {
+private:
+	mutable bool abortClose = false;
+public:
+	void abort() const {
+		abortClose = true;
+	}
+	bool isAborted() const {
+		return abortClose;
+	}
+	std::string toPrettyString() const {
+		return "Close Request";
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct EventContextInitialization {
+	std::string toPrettyString() const {
+		return "Context Initialization";
+	}
+};
+
+struct EventContextRefresh {
+	std::string toPrettyString() const {
+		return "Context Refresh";
+	}
+};
+
+struct EventContextTerminate {
+	std::string toPrettyString() const {
+		return "Context Terminate";
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace frame
 } // namespace libv

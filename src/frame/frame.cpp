@@ -9,7 +9,6 @@
 #include <libv/fixed.hpp>
 // pro
 #include <libv/frame/log.hpp>
-#include "core.hpp"
 
 
 namespace libv {
@@ -52,7 +51,7 @@ void Frame::join() {
 
 bool Frame::isFrameShouldClose() {
 	if (forcedClose) { // If we are forced to close
-		onClose.fire(this);
+		onCloseRequest.fire(EventCloseRequest());
 		return true;
 	}
 
@@ -61,7 +60,9 @@ bool Frame::isFrameShouldClose() {
 
 	bool shouldClose = glfwWindowShouldClose(window);
 	if (shouldClose) { // Fire on close event which can change the outcome
-		shouldClose = onClose.fire(this);
+		EventCloseRequest ecr;
+		onCloseRequest.fire(ecr);
+		shouldClose = !ecr.isAborted();
 	}
 
 	if (shouldClose) { // On close let DCO handle
@@ -99,7 +100,7 @@ void Frame::show() {
 			cmdFrameCreate();
 		}
 		if (window) {
-			coreExec(std::bind(glfwShowWindow, window));
+			core.exec(std::bind(glfwShowWindow, window));
 					hidden = false;
 		}
 	});
@@ -109,7 +110,7 @@ void Frame::hide() {
 	context.executeAsync([this] {
 		LIBV_LOG_FRAME_TRACE("Hide frame [%s]", title);
 		if (window) {
-			coreExec(std::bind(glfwHideWindow, window));
+			core.exec(std::bind(glfwHideWindow, window));
 					hidden = true;
 		}
 	});
@@ -119,7 +120,7 @@ void Frame::restore() {
 	context.executeAsync([this] {
 		LIBV_LOG_FRAME_TRACE("Restore frame [%s]", title);
 		if (window) {
-			coreExec(std::bind(glfwRestoreWindow, window));
+			core.exec(std::bind(glfwRestoreWindow, window));
 					minimized = false;
 		}
 	});
@@ -129,7 +130,7 @@ void Frame::minimize() {
 	context.executeAsync([this] {
 		LIBV_LOG_FRAME_TRACE("Minimize frame [%s]", title);
 		if (window) {
-			coreExec(std::bind(glfwIconifyWindow, window));
+			core.exec(std::bind(glfwIconifyWindow, window));
 					minimized = true;
 		}
 	});
@@ -206,7 +207,7 @@ void Frame::setPosition(vec2i newpos) {
 		LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d]", title, newpos.x, newpos.y);
 		this->position = newpos;
 		if (window)
-				coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
 		});
 }
 
@@ -219,7 +220,7 @@ void Frame::setPosition(FramePosition pos) {
 			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of current monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
-					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+					core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
 			});
 		break;
 	case POSITION_CENTER_PRIMARY_MONITOR:
@@ -229,7 +230,7 @@ void Frame::setPosition(FramePosition pos) {
 			LIBV_LOG_FRAME_TRACE("Set frame Position of [%s] to [%d, %d] as center of primary monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
-					coreExec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+					core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
 			});
 		break;
 	}
@@ -253,7 +254,7 @@ void Frame::setSize(vec2i newsize) {
 		LIBV_LOG_FRAME_TRACE("Set frame Size of [%s] to [%d, %d]", title, newsize.x, newsize.y);
 		size = newsize;
 		if (window)
-				coreExec(std::bind(glfwSetWindowSize, window, size.x, position.y));
+				core.exec(std::bind(glfwSetWindowSize, window, size.x, position.y));
 		});
 }
 
@@ -262,7 +263,7 @@ void Frame::setTitle(const std::string& title) {
 		LIBV_LOG_FRAME_TRACE("Set frame Title of [%s] to [%s]", this->title, title);
 		this->title = title;
 		if (window)
-				coreExec([this, title] {
+				core.exec([this, title] {
 					glfwSetWindowTitle(window, title.c_str());
 				});
 	});
@@ -355,11 +356,11 @@ vec2f Frame::getScrollPosition() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdFrameCreate() {
-	coreExec(std::bind(&Frame::cmdCoreCreate, this));
+	core.exec(std::bind(&Frame::cmdCoreCreate, this));
 	if (window) {
 		glfwMakeContextCurrent(window);
 		context.executeAsync(std::bind(&Frame::loopInit, this));
-		initContext();
+		contextInit();
 	}
 }
 
@@ -367,23 +368,23 @@ void Frame::cmdFrameRecreate() {
 	assert(window);
 
 	glfwMakeContextCurrent(nullptr);
-	coreExec(std::bind(&Frame::cmdCoreRecreate, this));
+	core.exec(std::bind(&Frame::cmdCoreRecreate, this));
 	if (window) {
 		glfwMakeContextCurrent(window);
-		initContext();
+		contextInit();
 	}
 }
 
 void Frame::cmdFrameDestroy() {
+	contextTerminate();
 	glfwMakeContextCurrent(nullptr);
-	coreExec(std::bind(&Frame::cmdCoreDestroy, this));
-	termContext();
+	core.exec(std::bind(&Frame::cmdCoreDestroy, this));
 }
 
 // Frame Loop --------------------------------------------------------------------------------------
 
 void Frame::loopInit() {
-	LIBV_LOG_FRAME_DEBUG("Frame init");
+	LIBV_LOG_FRAME_DEBUG("Frame entering loop");
 
 	context.executeAsync(std::bind(&Frame::loop, this));
 }
@@ -393,50 +394,39 @@ void Frame::loop() {
 
 	if (isFrameShouldClose()) {
 		loopTerminate();
-		return;
+	} else {
+		if (!isRefreshSkipable() && window) {
+			onContextRefresh.fire(EventContextRefresh());
+
+			glfwSwapBuffers(window);
+		}
+
+		context.executeAsync(std::bind(&Frame::loop, this));
 	}
-
-	if (!isRefreshSkipable() && window) {
-		// !!! onUpdate
-
-		glfwSwapBuffers(window);
-	}
-
-	context.executeAsync(std::bind(&Frame::loop, this));
 }
 
 void Frame::loopTerminate() {
-	LIBV_LOG_FRAME_DEBUG("Frame terminate");
-
+	LIBV_LOG_FRAME_DEBUG("Frame exiting loop");
 	cmdFrameDestroy();
 	context.stop();
-
-	onClosed.fire(this);
 }
 
-// -------------------------------------------------------------------------------------------------
-
-void Frame::initContext() {
-	LIBV_LOG_FRAME_DEBUG("Initialize context");
-
-	// !!! onInit
+void Frame::contextInit() {
+	onContextInitialization.fire(EventContextInitialization());
 }
 
-void Frame::termContext() {
-	LIBV_LOG_FRAME_DEBUG("Terminate context");
-
-	// !!! onTerminate
+void Frame::contextTerminate() {
+	onContextTerminate.fire(EventContextTerminate());
 }
 
 // -------------------------------------------------------------------------------------------------
 
 Frame::Frame(const std::string& title, unsigned int width, unsigned int height) :
-	onClose(AccumulatorLogicalAnd<bool>::get()),
 	context(fmt::sprintf("Frame - %s", title)),
 	title(title) {
 	size = vec2i(width, height);
-	registerFrame(this);
-	initEvents();
+
+	initEventQueues();
 }
 
 Frame::Frame(unsigned int width, unsigned int height) :
@@ -445,7 +435,6 @@ Frame::Frame(unsigned int width, unsigned int height) :
 Frame::~Frame() {
 	closeForce();
 	join();
-	unregisterFrame(this);
 }
 
 } // namespace frame

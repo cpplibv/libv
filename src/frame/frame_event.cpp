@@ -9,8 +9,7 @@
 // pro
 #include <libv/frame/log.hpp>
 
-#include <iostream>
-#include <iomanip>
+
 // TODO P3: Limit cursor position event pre-fire to 1 (solution maybe to use unique signal queue)
 
 namespace libv {
@@ -52,7 +51,6 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetKeyCallback(window, ::libv::frame::glfwCallback<EventKey, &Frame::eventQueKey, int, int, int, int>);
 	glfwSetMouseButtonCallback(window, ::libv::frame::glfwCallback<EventMouseButton, &Frame::eventQueMouseButton, int, int, int>);
 	glfwSetScrollCallback(window, ::libv::frame::glfwCallback<EventMouseScroll, &Frame::eventQueMouseScroll, double, double>);
-	glfwSetWindowCloseCallback(window, ::libv::frame::glfwCallback<EventWindowClose, &Frame::eventQueWindowClose>);
 	glfwSetWindowFocusCallback(window, ::libv::frame::glfwCallback<EventWindowFocus, &Frame::eventQueWindowFocus, int>);
 	glfwSetWindowIconifyCallback(window, ::libv::frame::glfwCallback<EventWindowIconify, &Frame::eventQueWindowIconify, int>);
 	glfwSetWindowPosCallback(window, ::libv::frame::glfwCallback<EventWindowPosition, &Frame::eventQueWindowPosition, int, int>);
@@ -68,7 +66,6 @@ void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 	glfwSetKeyCallback(window, nullptr);
 	glfwSetMouseButtonCallback(window, nullptr);
 	glfwSetScrollCallback(window, nullptr);
-	glfwSetWindowCloseCallback(window, nullptr);
 	glfwSetWindowFocusCallback(window, nullptr);
 	glfwSetWindowIconifyCallback(window, nullptr);
 	glfwSetWindowPosCallback(window, nullptr);
@@ -115,8 +112,6 @@ void Frame::glfwCallback(const EventMouseScroll& e) {
 			(convert_to_s_24_8(e.offset.x + old.x)) << 32) | convert_to_s_24_8(e.offset.y + old.y);
 }
 
-void Frame::glfwCallback(const EventWindowClose&) { }
-
 void Frame::glfwCallback(const EventWindowFocus&) { }
 
 void Frame::glfwCallback(const EventWindowIconify& e) {
@@ -133,7 +128,7 @@ void Frame::glfwCallback(const EventWindowSize&) { }
 
 // -------------------------------------------------------------------------------------------------
 
-void Frame::initEvents() {
+void Frame::initEventQueues() {
 	eventQueChar.output(&Frame::glfwCallback, this);
 	eventQueCharMods.output(&Frame::glfwCallback, this);
 	eventQueDrop.output(&Frame::glfwCallback, this);
@@ -143,7 +138,6 @@ void Frame::initEvents() {
 	eventQueMouseEnter.output(&Frame::glfwCallback, this);
 	eventQueMousePosition.output(&Frame::glfwCallback, this);
 	eventQueMouseScroll.output(&Frame::glfwCallback, this);
-	eventQueWindowClose.output(&Frame::glfwCallback, this);
 	eventQueWindowFocus.output(&Frame::glfwCallback, this);
 	eventQueWindowIconify.output(&Frame::glfwCallback, this);
 	eventQueWindowPosition.output(&Frame::glfwCallback, this);
@@ -159,7 +153,6 @@ void Frame::initEvents() {
 	eventQueMouseEnter.output(onMouseEnter);
 	eventQueMousePosition.output(onMousePosition);
 	eventQueMouseScroll.output(onMouseScroll);
-	eventQueWindowClose.output(onWindowClose);
 	eventQueWindowFocus.output(onWindowFocus);
 	eventQueWindowIconify.output(onWindowIconify);
 	eventQueWindowPosition.output(onWindowPosition);
@@ -177,7 +170,6 @@ void Frame::distributeEvents() {
 	eventQueMouseEnter.flush();
 	eventQueMousePosition.flush();
 	eventQueMouseScroll.flush();
-	eventQueWindowClose.flush();
 	eventQueWindowFocus.flush();
 	eventQueWindowIconify.flush();
 	eventQueWindowPosition.flush();

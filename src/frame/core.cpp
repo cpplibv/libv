@@ -1,7 +1,6 @@
 // File: core.cpp, Created on 2015. április 12. 2:28, Author: Vader
 
 // hpp
-#include "core.hpp"
 #include <libv/frame/frame.hpp>
 // ext
 #include <GLFW/glfw3.h>
@@ -10,32 +9,51 @@
 // std
 #include <atomic>
 #include <memory>
+#include <mutex>
 // pro
 #include <libv/frame/log.hpp>
+
+
+// TODO P4: Map glfw hint GLFW_FLOATING
+// TODO P4: Map glfw hint GLFW_FOCUSED
+// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
+// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
+// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
+// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
+// TODO P5: Support glfw hint GLFW_STEREO
+// TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
+
+// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
+// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
+// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
+// TODO P5: Context sharing
+
+// No plans for mapping these glfw hints:
+// GLFW_ACCUM_RED_BITS,
+// GLFW_ACCUM_GREEN_BITS,
+// GLFW_ACCUM_BLUE_BITS,
+// GLFW_ACCUM_ALPHA_BITS,
+// GLFW_AUX_BUFFERS,
+// GLFW_CLIENT_API,
+// GLFW_DOUBLEBUFFER
 
 namespace libv {
 namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-std::mutex frames_m;
-std::set<Frame*> frames;
-std::mutex activeFrames_m;
-std::set<Frame*> activeFrames;
-libv::Semaphore noActiveFrame(true);
-
-// -------------------------------------------------------------------------------------------------
 class Core {
 	// Priorities:
 	// Init            0
 	// Task           50
 	// WaitEvent     150
 	// Terminate     200
-
 private:
 	libv::WorkerThread thread;
 	std::atomic_bool stopWait{false};
 	std::mutex mutex;
+
 private:
 
 	void init() {
@@ -51,7 +69,6 @@ private:
 		for (int i = 0; i < numMonitor; i++) {
 			glfwMonitorCallback(monitors[i], GLFW_CONNECTED);
 		}
-		LIBV_LOG_FRAME_CORE_DEBUG("Initialized Core / GLFW Context");
 	}
 
 	void waitEvent() {
@@ -68,7 +85,7 @@ private:
 		LIBV_LOG_FRAME_CORE_INFO("Terminate Core / GLFW Context");
 		glfwSetMonitorCallback(nullptr);
 		glfwTerminate();
-		LIBV_LOG_FRAME_CORE_DEBUG("Terminated Core / GLFW Context");
+		glfwSetErrorCallback(nullptr);
 	}
 public:
 
@@ -104,83 +121,32 @@ public:
 	}
 };
 
-static std::unique_ptr<Core> core;
-
 // -------------------------------------------------------------------------------------------------
 
-void coreExec(const std::function<void()>& func) {
+std::mutex core_m;
+std::weak_ptr<Core> core_wp;
+
+void CoreProxy::exec(const std::function<void()>& func) {
 	core->execute(func);
 }
 
-void coreExec(std::function<void()>&& func) {
+void CoreProxy::exec(std::function<void()>&& func) {
 	core->execute(std::move(func));
 }
 
-// -------------------------------------------------------------------------------------------------
-
-void initCore() {
-	core = std::make_unique<Core>();
+CoreProxy::CoreProxy() {
+	std::lock_guard<std::mutex> lock(core_m);
+	core = core_wp.lock();
+	if (!core)
+		core_wp = core = std::make_shared<Core>();
 }
 
-void terminateCore() {
-	core.reset(nullptr);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void activateFrame(Frame* frame) {
-	LIBV_LOG_FRAME_CORE_DEBUG("Activate frame [%s]", frame->getTitle());
-	std::lock_guard<std::mutex> lk(activeFrames_m);
-	activeFrames.insert(frame);
-	noActiveFrame.reset();
-}
-
-void deactivateFrame(Frame* frame) {
-	LIBV_LOG_FRAME_CORE_DEBUG("Deactivate frame [%s]", frame->getTitle());
-	std::lock_guard<std::mutex> lk(activeFrames_m);
-	activeFrames.erase(frame);
-	if (activeFrames.size() == 0)
-		noActiveFrame.raise();
-}
-
-void registerFrame(Frame* frame) {
-	std::lock_guard<std::mutex> lk(frames_m);
-	LIBV_LOG_FRAME_CORE_DEBUG("Register frame [%s]", frame->getTitle());
-	if (frames.size() == 0)
-		initCore();
-	frames.insert(frame);
-}
-
-void unregisterFrame(Frame* frame) {
-	std::lock_guard<std::mutex> lk(frames_m);
-	LIBV_LOG_FRAME_CORE_DEBUG("Unregister frame [%s]", frame->getTitle());
-	frames.erase(frame);
-	if (frames.size() == 0)
-		terminateCore();
+CoreProxy::~CoreProxy() {
+	std::lock_guard<std::mutex> lock(core_m);
+	core.reset();
 }
 
 // -------------------------------------------------------------------------------------------------
-
-void Frame::joinAll() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Joining every frame");
-	noActiveFrame.wait();
-}
-
-void Frame::closeAllForce() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Forced close every frame");
-	std::lock_guard<std::mutex> lk(frames_m);
-	for (auto frame : frames)
-		frame->closeForce();
-}
-
-void Frame::closeAllDefault() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Default close every frame");
-	std::lock_guard<std::mutex> lk(frames_m);
-	for (auto frame : frames)
-		frame->closeDefault();
-}
-
-// =================================================================================================
 
 void Frame::cmdCoreCreate() {
 	LIBV_LOG_FRAME_CORE_DEBUG("Create window for frame [%s]", title);
@@ -197,30 +163,6 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_RESIZABLE, resizable);
 	glfwWindowHint(GLFW_SAMPLES, openGLSamples);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
-
-	// TODO P4: Map glfw hint GLFW_FLOATING
-	// TODO P4: Map glfw hint GLFW_FOCUSED
-	// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
-	// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
-	// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
-	// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
-	// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
-	// TODO P5: Support glfw hint GLFW_STEREO
-	// TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
-
-	// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
-	// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
-	// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
-	// TODO P5: Context sharing
-
-	// No plans for mapping these glfw hints:
-	// GLFW_ACCUM_RED_BITS,
-	// GLFW_ACCUM_GREEN_BITS,
-	// GLFW_ACCUM_BLUE_BITS,
-	// GLFW_ACCUM_ALPHA_BITS,
-	// GLFW_AUX_BUFFERS,
-	// GLFW_CLIENT_API,
-	// GLFW_DOUBLEBUFFER
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
 		LIBV_LOG_FRAME_CORE_INFO("Switching frame [%s] to full screen mode", title);
@@ -253,7 +195,6 @@ void Frame::cmdCoreCreate() {
 	}
 
 	registerEventCallbacks(this, window);
-	activateFrame(this);
 
 	LIBV_LOG_FRAME_CORE_DEBUG("Window creation was successful");
 }
@@ -285,7 +226,6 @@ void Frame::cmdCoreDestroy() {
 	LIBV_LOG_FRAME_CORE_DEBUG("Destroy window for frame [%s]", title);
 
 	if (window) {
-		deactivateFrame(this);
 		unregisterEventCallbacks(window);
 		glfwDestroyWindow(window);
 		window = nullptr;
