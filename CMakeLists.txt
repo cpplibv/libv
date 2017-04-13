@@ -26,31 +26,6 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # --------------------------------------------------------------------------------------------------
 
-#Definitions
-if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-	add_definitions(-O0)
-	add_definitions(-ggdb3)
-elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-	add_definitions(-Ofast)
-else()
-	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
-endif()
-
-add_definitions(-m64)
-add_definitions(-std=c++17)
-
-#Macro - Ext
-add_definitions(-DGLEW_STATIC)
-add_definitions(-DGLM_FORCE_RADIANS)
-#Macro - GLM
-add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
-#Macro - Libv
-add_definitions(-DLIBV_USE_GLM_BRIDGE)
-#Macro - Assert
-add_definitions(-DNDEBUG)
-
-# --------------------------------------------------------------------------------------------------
-
 #Paths
 set(PATH_BIN ${PROJECT_SOURCE_DIR}/bin)
 set(PATH_BLD build)
@@ -66,6 +41,8 @@ set(PATH_TST test)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
+
+# --------------------------------------------------------------------------------------------------
 
 #Variables
 set(TOOLSET)
@@ -119,6 +96,34 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(TOOLSET gcc)
 
 endif()
+
+string(LENGTH ${PATH_PRJ}_ LIBV_SHORT_PATH_CUTOFF)
+
+# --------------------------------------------------------------------------------------------------
+
+#Definitions
+if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+	add_definitions(-O0)
+	add_definitions(-ggdb3)
+elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+	add_definitions(-Ofast)
+else()
+	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
+endif()
+
+add_definitions(-m64)
+add_definitions(-std=c++17)
+
+#Macro - Ext
+add_definitions(-DGLEW_STATIC)
+add_definitions(-DGLM_FORCE_RADIANS)
+#Macro - GLM
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+#Macro - Libv
+add_definitions(-DLIBV_USE_GLM_BRIDGE)
+add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
+#Macro - Assert
+add_definitions(-DNDEBUG)
 
 # --------------------------------------------------------------------------------------------------
 

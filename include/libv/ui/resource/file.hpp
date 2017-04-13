@@ -21,7 +21,7 @@ private:
 	ResourceStepResult unload();
 
 public:
-	static constexpr const char ResourceLabel[] = "File";
+	static constexpr char ResourceLabel[] = "File";
 	static constexpr Step ResourceLoadSequence[] = {
 		{load, ThreadAffinity::IO}
 	};

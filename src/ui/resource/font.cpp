@@ -35,7 +35,7 @@ ResourceStepResult UIFont2D::unloadGL() {
 	return ResourceStepResult::OK;
 }
 
-constexpr const char UIFont2D::ResourceLabel[];
+constexpr char UIFont2D::ResourceLabel[];
 constexpr UIFont2D::Step UIFont2D::ResourceLoadSequence[];
 constexpr UIFont2D::Step UIFont2D::ResourceUnloadSequence[];
 

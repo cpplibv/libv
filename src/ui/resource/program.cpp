@@ -47,7 +47,7 @@ ResourceStepResult UIProgram::unload() {
 	return ResourceStepResult::OK;
 }
 
-constexpr const char UIProgram::ResourceLabel[];
+constexpr char UIProgram::ResourceLabel[];
 constexpr UIProgram::Step UIProgram::ResourceLoadSequence[];
 constexpr UIProgram::Step UIProgram::ResourceUnloadSequence[];
 

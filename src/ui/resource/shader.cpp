@@ -44,7 +44,7 @@ ResourceStepResult UIShader::unloadGL() {
 	return ResourceStepResult::OK;
 }
 
-constexpr const char UIShader::ResourceLabel[];
+constexpr char UIShader::ResourceLabel[];
 constexpr UIShader::Step UIShader::ResourceLoadSequence[];
 constexpr UIShader::Step UIShader::ResourceUnloadSequence[];
 

@@ -31,10 +31,15 @@
 // Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: Move __LIBV_SHORT_FILE__ and __LIBV_SHORT_PATH__ into a better place
+#ifndef LIBV_SHORT_PATH_CUTOFF
+#    define LIBV_SHORT_PATH_CUTOFF 0
+#endif
 
 #define __LIBV_SHORT_FILE__ (std::strrchr(__FILE__, '/') + 1)
+#define __LIBV_SHORT_PATH__ (__FILE__ + LIBV_SHORT_PATH_CUTOFF)
 
-#define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_FILE__, __FUNCTION__, __LINE__}
+#define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_PATH__, __FUNCTION__, __LINE__}
 
 #define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
 #define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
@@ -49,6 +54,20 @@
 #define LIBV_LOG_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__);
 #define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
 #define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
+
+#define LIBV_LOG2_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
+#define LIBV_LOG2_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
+#define LIBV_LOG2_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
+#define LIBV_LOG2_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
+#define LIBV_LOG2_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
+#define LIBV_LOG2_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
+
+#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_TRACE("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_DEBUG("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_INFO( "libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_WARN( "libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_ERROR("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_FATAL("libv", __VA_ARGS__);
 
 namespace libv {
 
@@ -71,6 +90,8 @@ struct CodePosition {
 	const char* func;
 	const int line;
 };
+
+struct tag_format2 {};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -243,8 +264,31 @@ public:
 		}
 	}
 	template <typename... Args>
+	void log(tag_format2, CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
+		if (notable(severity, modul)) {
+			const auto message = fmt::format(format, std::forward<Args>(args)...);
+			const auto record = fmt::format(this->format,
+					fmt::arg("message", message),
+					fmt::arg("module", modul),
+					fmt::arg("severity", severity),
+					fmt::arg("line", poc.line),
+					fmt::arg("file", poc.file),
+					fmt::arg("func", poc.func),
+					fmt::arg("thread", get_this_thread_id())
+					//...
+					);
+			for (auto& output : outputs) {
+				*output << record << std::flush;
+			}
+		}
+	}
+	template <typename... Args>
 	void operator()(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
 		this->log(poc, severity, modul, format, std::forward<Args>(args)...);
+	}
+	template <typename... Args>
+	void operator()(tag_format2 tag, CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
+		this->log(tag, poc, severity, modul, format, std::forward<Args>(args)...);
 	}
 	friend std::ostream& operator<<(std::ostream& os, ::libv::Logger& l);
 };

@@ -19,7 +19,7 @@ private:
 	ResourceStepResult unload();
 
 public:
-	static constexpr const char ResourceLabel[] = "Program";
+	static constexpr char ResourceLabel[] = "Program";
 	static constexpr Step ResourceLoadSequence[] = {
 		{load, ThreadAffinity::GL}
 	};

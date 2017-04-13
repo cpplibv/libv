@@ -16,7 +16,7 @@ ResourceStepResult UITexture2D::unload() {
 	return ResourceStepResult::OK;
 }
 
-constexpr const char UITexture2D::ResourceLabel[];
+constexpr char UITexture2D::ResourceLabel[];
 constexpr UITexture2D::Step UITexture2D::ResourceLoadSequence[];
 constexpr UITexture2D::Step UITexture2D::ResourceUnloadSequence[];
 

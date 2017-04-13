@@ -37,8 +37,8 @@ namespace ui {
 // TODO P5: Improved texture usage algorithm (and there is a way to reallocate a new bigger texture)
 //			use pixel space texture coords end set uniforms for vertex shader
 
-constexpr const size_t DEFAULT_FONT2D_TEXTURE_WIDTH = 512;
-constexpr const size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
+constexpr size_t DEFAULT_FONT2D_TEXTURE_WIDTH = 512;
+constexpr size_t DEFAULT_FONT2D_TEXTURE_HEIGHT = 512;
 
 // -------------------------------------------------------------------------------------------------
 

@@ -375,12 +375,12 @@ enum class ShaderType {
 	TessEvaluation = GL_TESS_EVALUATION_SHADER,
 };
 
-constexpr const char SHADER_TYPE_VERTEX_NAME[] = "vertex";
-constexpr const char SHADER_TYPE_GEOMETRY_NAME[] = "geometry";
-constexpr const char SHADER_TYPE_FRAGMENT_NAME[] = "fragment";
-constexpr const char SHADER_TYPE_COMPUTE_NAME[] = "compute";
-constexpr const char SHADER_TYPE_TESS_CONTROL_NAME[] = "tesscontrol";
-constexpr const char SHADER_TYPE_TESS_EVALUATION_NAME[] = "tessevaluation";
+constexpr char SHADER_TYPE_VERTEX_NAME[] = "vertex";
+constexpr char SHADER_TYPE_GEOMETRY_NAME[] = "geometry";
+constexpr char SHADER_TYPE_FRAGMENT_NAME[] = "fragment";
+constexpr char SHADER_TYPE_COMPUTE_NAME[] = "compute";
+constexpr char SHADER_TYPE_TESS_CONTROL_NAME[] = "tesscontrol";
+constexpr char SHADER_TYPE_TESS_EVALUATION_NAME[] = "tessevaluation";
 
 inline const char* to_string(ShaderType type) {
 	switch (type) {

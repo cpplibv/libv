@@ -42,7 +42,7 @@ ResourceStepResult File::unload() {
 	return ResourceStepResult::OK;
 }
 
-constexpr const char File::ResourceLabel[];
+constexpr char File::ResourceLabel[];
 constexpr File::Step File::ResourceLoadSequence[];
 constexpr File::Step File::ResourceUnloadSequence[];
 

@@ -17,7 +17,7 @@ private:
 	ResourceStepResult loadGL();
 	ResourceStepResult unloadGL();
 public:
-	static constexpr const char ResourceLabel[] = "Shader";
+	static constexpr char ResourceLabel[] = "Shader";
 	static constexpr Step ResourceLoadSequence[] = {
 		{loadGL, ThreadAffinity::GL}
 	};

@@ -16,7 +16,7 @@
 namespace libv {
 namespace vm3 {
 
-constexpr const char VM3_MODEL_MAGIC_BYTE[] = "d99575d0-ddf8-4462-8338-0f6755913d73/VM3";
+constexpr char VM3_MODEL_MAGIC_BYTE[] = "d99575d0-ddf8-4462-8338-0f6755913d73/VM3";
 
 // -------------------------------------------------------------------------------------------------
 

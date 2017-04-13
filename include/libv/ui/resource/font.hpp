@@ -27,7 +27,7 @@ private:
 	ResourceStepResult unloadGL();
 
 public:
-	static constexpr const char ResourceLabel[] = "Font2D";
+	static constexpr char ResourceLabel[] = "Font2D";
 	static constexpr Step ResourceLoadSequence[] = {
 		{loadIN, ThreadAffinity::ANY},
 		{loadGL, ThreadAffinity::GL}

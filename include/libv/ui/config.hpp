@@ -37,17 +37,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr const char DEFAULT_FONT_TTF_FILEPATH[] = "res/font/default.ttf";
+constexpr char DEFAULT_FONT_TTF_FILEPATH[] = "res/font/default.ttf";
 
-//constexpr const char FOLDER_SHADER[] = "res/shader/";
+//constexpr char FOLDER_SHADER[] = "res/shader/";
 
-constexpr const char DEFAULT_PROGRAM_FILEPATH[] = "res/shader/ui/default";
+constexpr char DEFAULT_PROGRAM_FILEPATH[] = "res/shader/ui/default";
 
-//constexpr const char DEFAULT_PROGRAM_VS_FILEPATH[] = "res/shader/ui/default.vs";
-//constexpr const char DEFAULT_PROGRAM_FS_FILEPATH[] = "res/shader/ui/default.fs";
+//constexpr char DEFAULT_PROGRAM_VS_FILEPATH[] = "res/shader/ui/default.vs";
+//constexpr char DEFAULT_PROGRAM_FS_FILEPATH[] = "res/shader/ui/default.fs";
 
-constexpr const char DEFAULT_FONT_VS_FILEPATH[] = "res/shader/font.vs";
-constexpr const char DEFAULT_FONT_FS_FILEPATH[] = "res/shader/font.fs";
+constexpr char DEFAULT_FONT_VS_FILEPATH[] = "res/shader/font.vs";
+constexpr char DEFAULT_FONT_FS_FILEPATH[] = "res/shader/font.fs";
 
 // -------------------------------------------------------------------------------------------------
 
