@@ -1,4 +1,4 @@
-// File:   intrusive_cache.hpp Author: Vader Created on 2016. szeptember 19., 5:32
+// File: intrusive_cache.hpp Author: Vader Created on 2016. szeptember 19., 5:32
 
 #pragma once
 
@@ -6,7 +6,7 @@
 #include <boost/intrusive_ptr.hpp>
 // libv
 #include <libv/tuple.hpp>
-#include <libv/type_traits.hpp>
+#include <libv/utility/type_traits.hpp>
 // std
 #include <cassert>
 #include <memory>

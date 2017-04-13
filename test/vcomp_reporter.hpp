@@ -1,4 +1,4 @@
-// File:   TestReporter.hpp Author: Vader Created on 2017. január 13., 20:29
+// File: TestReporter.hpp Author: Vader Created on 2017. január 13., 20:29
 
 #pragma once
 

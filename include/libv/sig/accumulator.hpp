@@ -8,6 +8,7 @@ template <typename T>
 class Accumulator {
 protected:
 	Accumulator() { }
+	virtual ~Accumulator() { }
 public:
 	static Accumulator<T>* get() {
 		static Accumulator<T> instance;

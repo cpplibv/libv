@@ -1,4 +1,4 @@
-// File:   utility.hpp
+// File: utility.hpp
 
 #pragma once
 

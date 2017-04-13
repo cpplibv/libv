@@ -1,8 +1,10 @@
-// File:   fixed.hpp Author: Vader Created on 2017. január 26., 0:20
+// File: fixed.hpp Author: Vader Created on 2017. január 26., 0:20
 
 #pragma once
 
+// std
 #include <cmath>
+
 
 namespace libv {
 

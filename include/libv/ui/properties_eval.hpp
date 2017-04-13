@@ -1,4 +1,4 @@
-// File:   properties_eval.hpp Author: Vader Created on 2016. június 26., 18:27
+// File: properties_eval.hpp Author: Vader Created on 2016. június 26., 18:27
 
 #pragma once
 

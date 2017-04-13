@@ -1,4 +1,4 @@
-// File:   enum.hpp Author: Vader Created on 2016. július 27., 4:55
+// File: enum.hpp Author: Vader Created on 2016. július 27., 4:55
 
 #pragma once
 

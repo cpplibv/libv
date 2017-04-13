@@ -7,7 +7,7 @@
 // libv
 #include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
-#include <libv/utility.hpp>
+#include <libv/utility/utility.hpp>
 #include <libv/worker_thread.hpp>
 // std
 #include <atomic>

@@ -19,16 +19,14 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 struct VideoMode {
-public:
 	vec3i colorBits;
 	int refreshRate;
 	vec2i size;
 
-public:
-	VideoMode();
+	VideoMode() = default;
 	VideoMode(const GLFWvidmode* vidmode);
 	VideoMode& operator=(const GLFWvidmode* vidmode);
-	virtual ~VideoMode();
+	~VideoMode() = default;
 };
 
 // -------------------------------------------------------------------------------------------------

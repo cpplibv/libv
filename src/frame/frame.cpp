@@ -6,7 +6,7 @@
 #include <fmt/format.h>
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/fixed.hpp>
+#include <libv/math/fixed_point.hpp>
 // pro
 #include <libv/frame/log.hpp>
 

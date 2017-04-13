@@ -1,4 +1,4 @@
-// File:   file.hpp Author: Vader Created on 2016. szeptember 6., 15:23
+// File: file.hpp Author: Vader Created on 2016. szeptember 6., 15:23
 
 #pragma once
 

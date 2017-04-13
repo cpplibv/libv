@@ -6,11 +6,11 @@
 #include <iostream>
 #include <string>
 // pro
+#include <libv/frame/frame.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/container/panel_flow.hpp>
-#include <libv/ui/frame/frame.hpp>
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
 
@@ -43,11 +43,11 @@ void noisyEvents(Frame& frame) {
 //
 //void initGLEW() {
 //	if (GLenum err = glewInit() != GLEW_OK)
-//		LIBV_LOG_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+//		LIBV_LOG_ERROR("Failed to initialize glew: %s", glewGetErrorString(err));
 //
-//	LIBV_LOG_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-//	LIBV_LOG_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-//	LIBV_LOG_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+//	LIBV_LOG_INFO("GL Vendor: %s", glGetString(GL_VENDOR));
+//	LIBV_LOG_INFO("GL Renderer: %s", glGetString(GL_RENDERER));
+//	LIBV_LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
 //
 //	LIBV_GL_CHECKEWSupport(GL_VERSION_3_3);
 //	LIBV_GL_CHECKEWSupport(GL_VERSION_4_5);

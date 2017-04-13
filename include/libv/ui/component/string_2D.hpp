@@ -1,4 +1,4 @@
-// File:   string_2D.hpp Author: Vader Created on 2016. február 4., 6:25
+// File: string_2D.hpp Author: Vader Created on 2016. február 4., 6:25
 
 #pragma once
 

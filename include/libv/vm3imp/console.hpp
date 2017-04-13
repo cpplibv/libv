@@ -21,6 +21,7 @@ public:
 	ArgumentBase(const std::string& description);
 	virtual void setValue(const std::string& value) = 0;
 	virtual void reset() = 0;
+	virtual ~ArgumentBase() {}
 };
 
 template <typename T>
@@ -99,6 +100,7 @@ protected:
 public:
 	virtual void execute() = 0;
 	void reset();
+	virtual ~Command() = default;
 };
 
 class Console {

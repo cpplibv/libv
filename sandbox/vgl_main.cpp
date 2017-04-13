@@ -36,11 +36,11 @@ std::atomic_bool running{true};
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LOG_ERROR("Failed to initialize glew: %s", (const char*) glewGetErrorString(err));
+		LIBV_LOG_ERROR("Failed to initialize glew: %s", glewGetErrorString(err));
 
-	LIBV_LOG_INFO("GL Vendor: %s", (const char*) glGetString(GL_VENDOR));
-	LIBV_LOG_INFO("GL Renderer: %s", (const char*) glGetString(GL_RENDERER));
-	LIBV_LOG_INFO("GL Version: %s", (const char*) glGetString(GL_VERSION));
+	LIBV_LOG_INFO("GL Vendor: %s", glGetString(GL_VENDOR));
+	LIBV_LOG_INFO("GL Renderer: %s", glGetString(GL_RENDERER));
+	LIBV_LOG_INFO("GL Version: %s", glGetString(GL_VERSION));
 
 	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
 	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);

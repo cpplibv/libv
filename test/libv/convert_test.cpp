@@ -2,7 +2,8 @@
 
 #include <catch.hpp>
 
-#include <libv/fixed.hpp>
+#include <libv/math/fixed_point.hpp>
+
 
 using namespace libv;
 

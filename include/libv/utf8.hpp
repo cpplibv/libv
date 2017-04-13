@@ -5,9 +5,11 @@
 // std
 #include <string>
 
+
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
+
 template <typename = void> void unicode_to_utf8(char* out, uint32_t unicode) {
 	if (unicode <= 0x7f) {
 		out[0] = static_cast<char> (unicode);

@@ -3,8 +3,8 @@
 // hpp
 #include <libv/vm3/serialization/model.hpp>
 // ext
-#include <boost/archive/portable_iarchive.hpp>
-#include <boost/archive/portable_oarchive.hpp>
+#include <libv/serialization/archive/portable_iarchive.hpp>
+#include <libv/serialization/archive/portable_oarchive.hpp>
 // std
 #include <iostream>
 
@@ -37,7 +37,7 @@ bool Model::load(const char* data, const size_t size) {
 	//		return false;
 	//	}
 
-	eos::portable_iarchive ar(is);
+	libv::archive::portable_iarchive ar(is);
 	ar >> LIBV_NVP_NAMED("model", *this);
 	return true; //<<< Model load fail
 }
@@ -45,7 +45,7 @@ bool Model::load(const char* data, const size_t size) {
 bool Model::save(std::ostream& os) const {
 	//<<< Activate magic bytes
 	//	os << VM3_MODEL_MAGIC_BYTE;
-	eos::portable_oarchive ar(os);
+	libv::archive::portable_oarchive ar(os);
 	ar << LIBV_NVP_NAMED("model", *this);
 
 	return true; //<<< Model save fail

@@ -1,4 +1,4 @@
-// File:   guard.hpp
+// File: guard.hpp
 
 #pragma once
 

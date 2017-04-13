@@ -1,4 +1,4 @@
-// File:   matrix.hpp Author: Vader Created on 2017. február 19., 19:55
+// File: matrix.hpp Author: Vader Created on 2017. február 19., 19:55
 
 #pragma once
 
@@ -116,10 +116,10 @@ struct mat_base_t<2, T> {
 	glm::tmat2x2<T> mx;
 
 	inline mat_base_t() = default;
-	inline mat_base_t(const T& v) : mx(v) { }
+	inline mat_base_t(T v) : mx(v) { }
 	inline mat_base_t(
-			const T& m00, const T& m01,
-			const T& m10, const T& m11) :
+			T m00, T m01,
+			T m10, T m11) :
 		mx(
 			m00, m01,
 			m10, m11) { }
@@ -130,11 +130,11 @@ struct mat_base_t<3, T> {
 	glm::tmat3x3<T> mx;
 
 	inline mat_base_t() = default;
-	inline mat_base_t(const T& v) : mx(v) { }
+	inline mat_base_t(T v) : mx(v) { }
 	inline mat_base_t(
-			const T& m00, const T& m01, const T& m02,
-			const T& m10, const T& m11, const T& m12,
-			const T& m20, const T& m21, const T& m22) :
+			T m00, T m01, T m02,
+			T m10, T m11, T m12,
+			T m20, T m21, T m22) :
 		mx(
 			m00, m01, m02,
 			m10, m11, m12,
@@ -146,12 +146,12 @@ struct mat_base_t<4, T> {
 	glm::tmat4x4<T> mx;
 
 	inline mat_base_t() = default;
-	inline mat_base_t(const T& v) : mx(v) { }
+	inline mat_base_t(T v) : mx(v) { }
 	inline mat_base_t(
-			const T& m00, const T& m01, const T& m02, const T& m03,
-			const T& m10, const T& m11, const T& m12, const T& m13,
-			const T& m20, const T& m21, const T& m22, const T& m23,
-			const T& m30, const T& m31, const T& m32, const T& m33) :
+			T m00, T m01, T m02, T m03,
+			T m10, T m11, T m12, T m13,
+			T m20, T m21, T m22, T m23,
+			T m30, T m31, T m32, T m33) :
 		mx(
 			m00, m01, m02, m03,
 			m10, m11, m12, m13,
@@ -258,7 +258,7 @@ inline mat_t<4, T> lookAt(const libv::vec3_t<T>& eye, const libv::vec3_t<T>& tar
 }
 
 template <typename T>
-inline mat_t<4, T> ortho(const T& left, const T& right, const T& bottom, const T& top) {
+inline mat_t<4, T> ortho(T left, T right, T bottom, T top) {
 	return from_glm(glm::ortho<T>(left, right, bottom, top));
 }
 

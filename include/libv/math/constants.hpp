@@ -1,4 +1,4 @@
-// File:   constants.hpp Author: Vader Created on 2017. február 27., 1:03
+// File: constants.hpp Author: Vader Created on 2017. február 27., 1:03
 
 #pragma once
 

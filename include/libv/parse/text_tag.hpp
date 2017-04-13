@@ -1,4 +1,4 @@
-// File:   text_tag.hpp Author: Vader Created on 2017. január 18., 0:26
+// File: text_tag.hpp Author: Vader Created on 2017. január 18., 0:26
 
 #pragma once
 

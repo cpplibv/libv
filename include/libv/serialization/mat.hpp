@@ -1,4 +1,4 @@
-// File:   mat.hpp Author: Vader Created on 2017. február 26., 15:57
+// File: mat.hpp Author: Vader Created on 2017. február 26., 15:57
 
 #pragma once
 

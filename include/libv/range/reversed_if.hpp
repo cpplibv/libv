@@ -1,4 +1,4 @@
-// File:   adaptor.hpp Author: Vader Created on 2016. június 1., 5:04
+// File: adaptor.hpp Author: Vader Created on 2016. június 1., 5:04
 
 #pragma once
 
@@ -13,6 +13,7 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P2: migrate from boost adaptors to range v3
 // TODO P5: reversed_if adaptor degrades iterators from random_access to bidirectional
 
 template <typename Iter>

@@ -1,4 +1,4 @@
-// File:   resource_manager_test_util.hpp
+// File: resource_manager_test_util.hpp
 
 #pragma once
 

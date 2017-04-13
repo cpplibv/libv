@@ -1,4 +1,4 @@
-// File:   test_components.hpp Author: Vader Created on 2016. április 4., 16:09
+// File: test_components.hpp Author: Vader Created on 2016. április 4., 16:09
 
 #pragma once
 

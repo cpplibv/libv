@@ -10,29 +10,29 @@ using namespace libv;
 TEST_CASE("unionValue") {
 	vec4f vec(0, 1, 2, 3);
 
-	CHECK(0 == vec.x);
-	CHECK(1 == vec.y);
-	CHECK(2 == vec.z);
-	CHECK(3 == vec.w);
+	CHECK(0.f == vec.x);
+	CHECK(1.f == vec.y);
+	CHECK(2.f == vec.z);
+	CHECK(3.f == vec.w);
 
 	vec.x = 42;
 
-	CHECK(42 == vec.x);
-	CHECK(42 == vec.r);
-	CHECK(42 == vec.s);
-	CHECK(42 == vec.ptr[0]);
-	CHECK(1 == vec.y);
-	CHECK(1 == vec.g);
-	CHECK(1 == vec.t);
-	CHECK(1 == vec.ptr[1]);
-	CHECK(2 == vec.z);
-	CHECK(2 == vec.b);
-	CHECK(2 == vec.p);
-	CHECK(2 == vec.ptr[2]);
-	CHECK(3 == vec.w);
-	CHECK(3 == vec.a);
-	CHECK(3 == vec.q);
-	CHECK(3 == vec.ptr[3]);
+	CHECK(42.f == vec.x);
+	CHECK(42.f == vec.r);
+	CHECK(42.f == vec.s);
+	CHECK(42.f == vec.ptr[0]);
+	CHECK(1.f == vec.y);
+	CHECK(1.f == vec.g);
+	CHECK(1.f == vec.t);
+	CHECK(1.f == vec.ptr[1]);
+	CHECK(2.f == vec.z);
+	CHECK(2.f == vec.b);
+	CHECK(2.f == vec.p);
+	CHECK(2.f == vec.ptr[2]);
+	CHECK(3.f == vec.w);
+	CHECK(3.f == vec.a);
+	CHECK(3.f == vec.q);
+	CHECK(3.f == vec.ptr[3]);
 
 	CHECK((4 * sizeof (float)) == sizeof (vec));
 }

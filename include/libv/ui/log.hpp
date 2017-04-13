@@ -39,37 +39,37 @@
 #define LIBV_LOG_UI_LAYOUT_ERROR(...) LIBV_ERROR("libv.ui.layout", __VA_ARGS__);
 #define LIBV_LOG_UI_LAYOUT_FATAL(...) LIBV_FATAL("libv.ui.layout", __VA_ARGS__);
 
-#define LIBV_LOG2_UI_TRACE(...) LIBV_LOG2_TRACE("libv.ui", __VA_ARGS__);
-#define LIBV_LOG2_UI_DEBUG(...) LIBV_LOG2_DEBUG("libv.ui", __VA_ARGS__);
-#define LIBV_LOG2_UI_INFO( ...) LIBV_LOG2_INFO( "libv.ui", __VA_ARGS__);
-#define LIBV_LOG2_UI_WARN( ...) LIBV_LOG2_WARN( "libv.ui", __VA_ARGS__);
-#define LIBV_LOG2_UI_ERROR(...) LIBV_LOG2_ERROR("libv.ui", __VA_ARGS__);
-#define LIBV_LOG2_UI_FATAL(...) LIBV_LOG2_FATAL("libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_TRACE(...) LIBV_LOG2_BASE_TRACE("libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_INFO( ...) LIBV_LOG2_BASE_INFO( "libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_WARN( ...) LIBV_LOG2_BASE_WARN( "libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_ERROR(...) LIBV_LOG2_BASE_ERROR("libv.ui", __VA_ARGS__);
+#define LIBV_LOG2_UI_FATAL(...) LIBV_LOG2_BASE_FATAL("libv.ui", __VA_ARGS__);
 
-#define LIBV_LOG2_UI_FT_TRACE(...) LIBV_LOG2_TRACE("libv.ui.ft", __VA_ARGS__);
-#define LIBV_LOG2_UI_FT_DEBUG(...) LIBV_LOG2_DEBUG("libv.ui.ft", __VA_ARGS__);
-#define LIBV_LOG2_UI_FT_INFO( ...) LIBV_LOG2_INFO( "libv.ui.ft", __VA_ARGS__);
-#define LIBV_LOG2_UI_FT_WARN( ...) LIBV_LOG2_WARN( "libv.ui.ft", __VA_ARGS__);
-#define LIBV_LOG2_UI_FT_ERROR(...) LIBV_LOG2_ERROR("libv.ui.ft", __VA_ARGS__);
-#define LIBV_LOG2_UI_FT_FATAL(...) LIBV_LOG2_FATAL("libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_TRACE(...) LIBV_LOG2_BASE_TRACE("libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_INFO( ...) LIBV_LOG2_BASE_INFO( "libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_WARN( ...) LIBV_LOG2_BASE_WARN( "libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_ERROR(...) LIBV_LOG2_BASE_ERROR("libv.ui.ft", __VA_ARGS__);
+#define LIBV_LOG2_UI_FT_FATAL(...) LIBV_LOG2_BASE_FATAL("libv.ui.ft", __VA_ARGS__);
 
-#define LIBV_LOG2_UI_COMPONENT_TRACE(...) LIBV_LOG2_TRACE("libv.ui.component", __VA_ARGS__);
-#define LIBV_LOG2_UI_COMPONENT_DEBUG(...) LIBV_LOG2_DEBUG("libv.ui.component", __VA_ARGS__);
-#define LIBV_LOG2_UI_COMPONENT_INFO( ...) LIBV_LOG2_INFO( "libv.ui.component", __VA_ARGS__);
-#define LIBV_LOG2_UI_COMPONENT_WARN( ...) LIBV_LOG2_WARN( "libv.ui.component", __VA_ARGS__);
-#define LIBV_LOG2_UI_COMPONENT_ERROR(...) LIBV_LOG2_ERROR("libv.ui.component", __VA_ARGS__);
-#define LIBV_LOG2_UI_COMPONENT_FATAL(...) LIBV_LOG2_FATAL("libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_TRACE(...) LIBV_LOG2_BASE_TRACE("libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_INFO( ...) LIBV_LOG2_BASE_INFO( "libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_WARN( ...) LIBV_LOG2_BASE_WARN( "libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_ERROR(...) LIBV_LOG2_BASE_ERROR("libv.ui.component", __VA_ARGS__);
+#define LIBV_LOG2_UI_COMPONENT_FATAL(...) LIBV_LOG2_BASE_FATAL("libv.ui.component", __VA_ARGS__);
 
-#define LIBV_LOG2_UI_RESOURCE_TRACE(...) LIBV_LOG2_TRACE("libv.ui.resource", __VA_ARGS__);
-#define LIBV_LOG2_UI_RESOURCE_DEBUG(...) LIBV_LOG2_DEBUG("libv.ui.resource", __VA_ARGS__);
-#define LIBV_LOG2_UI_RESOURCE_INFO( ...) LIBV_LOG2_INFO( "libv.ui.resource", __VA_ARGS__);
-#define LIBV_LOG2_UI_RESOURCE_WARN( ...) LIBV_LOG2_WARN( "libv.ui.resource", __VA_ARGS__);
-#define LIBV_LOG2_UI_RESOURCE_ERROR(...) LIBV_LOG2_ERROR("libv.ui.resource", __VA_ARGS__);
-#define LIBV_LOG2_UI_RESOURCE_FATAL(...) LIBV_LOG2_FATAL("libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_TRACE(...) LIBV_LOG2_BASE_TRACE("libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_INFO( ...) LIBV_LOG2_BASE_INFO( "libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_WARN( ...) LIBV_LOG2_BASE_WARN( "libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_ERROR(...) LIBV_LOG2_BASE_ERROR("libv.ui.resource", __VA_ARGS__);
+#define LIBV_LOG2_UI_RESOURCE_FATAL(...) LIBV_LOG2_BASE_FATAL("libv.ui.resource", __VA_ARGS__);
 
-#define LIBV_LOG2_UI_LAYOUT_TRACE(...) LIBV_LOG2_TRACE("libv.ui.layout", __VA_ARGS__);
-#define LIBV_LOG2_UI_LAYOUT_DEBUG(...) LIBV_LOG2_DEBUG("libv.ui.layout", __VA_ARGS__);
-#define LIBV_LOG2_UI_LAYOUT_INFO( ...) LIBV_LOG2_INFO( "libv.ui.layout", __VA_ARGS__);
-#define LIBV_LOG2_UI_LAYOUT_WARN( ...) LIBV_LOG2_WARN( "libv.ui.layout", __VA_ARGS__);
-#define LIBV_LOG2_UI_LAYOUT_ERROR(...) LIBV_LOG2_ERROR("libv.ui.layout", __VA_ARGS__);
-#define LIBV_LOG2_UI_LAYOUT_FATAL(...) LIBV_LOG2_FATAL("libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_TRACE(...) LIBV_LOG2_BASE_TRACE("libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_INFO( ...) LIBV_LOG2_BASE_INFO( "libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_WARN( ...) LIBV_LOG2_BASE_WARN( "libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_ERROR(...) LIBV_LOG2_BASE_ERROR("libv.ui.layout", __VA_ARGS__);
+#define LIBV_LOG2_UI_LAYOUT_FATAL(...) LIBV_LOG2_BASE_FATAL("libv.ui.layout", __VA_ARGS__);

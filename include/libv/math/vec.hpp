@@ -14,12 +14,13 @@
 #include <ostream>
 #include <utility>
 // pro
-#include <libv/type_traits.hpp>
-#include <libv/utility.hpp>
+#include <libv/utility/type_traits.hpp>
+#include <libv/utility/utility.hpp>
 
-// TODO P1: GCC 7.0+ C++17 fold expressions
+
+// TODO P5: ADL for custom gets
 // TODO P5: perfect forwarding for constructors
-// TODO P5: reuse rvalues where possible ? 4 function
+// TODO P5: reuse rvalues where possible ? 4 function ?? compile time ?
 // TODO P5: macro for debug asserts
 // TODO P5: make sure every function is sfiane friendly based on vec's T and it is producing a nice
 //		error message not 7 page of template monster

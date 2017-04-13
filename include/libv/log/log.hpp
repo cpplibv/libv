@@ -6,14 +6,13 @@
 #include <fmt/format.h>
 #include <fmt/printf.h>
 // libv
-#include <libv/utility.hpp>
+#include <libv/defines.hpp>
+#include <libv/utility/utility.hpp>
 // std
-#include <cstring>
 #include <ostream>
 #include <string>
-#include <thread>
+//#include <thread>
 #include <vector>
-
 //#include <mutex>
 
 // TODO P1: catch exception of fmt::format on bad format
@@ -31,16 +30,6 @@
 // Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: Move __LIBV_SHORT_FILE__ and __LIBV_SHORT_PATH__ into a better place
-#ifndef LIBV_SHORT_PATH_CUTOFF
-#    define LIBV_SHORT_PATH_CUTOFF 0
-#endif
-
-#define __LIBV_SHORT_FILE__ (std::strrchr(__FILE__, '/') + 1)
-#define __LIBV_SHORT_PATH__ (__FILE__ + LIBV_SHORT_PATH_CUTOFF)
-
-#define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_PATH__, __FUNCTION__, __LINE__}
-
 #define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
 #define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
 #define LIBV_INFO( Module, ...) ::libv::log(LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
@@ -55,19 +44,19 @@
 #define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
 #define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
 
-#define LIBV_LOG2_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
-#define LIBV_LOG2_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
-#define LIBV_LOG2_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
-#define LIBV_LOG2_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
-#define LIBV_LOG2_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
-#define LIBV_LOG2_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
 
-#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_TRACE("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_DEBUG("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_INFO( "libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_WARN( "libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_ERROR("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_FATAL("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_BASE_TRACE("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_BASE_INFO( "libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_BASE_WARN( "libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_BASE_ERROR("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_BASE_FATAL("libv", __VA_ARGS__);
 
 namespace libv {
 
@@ -244,6 +233,7 @@ public:
 	}
 
 public:
+	// TODO P2: Do not inline!
 	template <typename... Args>
 	void log(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
 		if (notable(severity, modul)) {
@@ -263,6 +253,7 @@ public:
 			}
 		}
 	}
+	// TODO P2: Do not inline!
 	template <typename... Args>
 	void log(tag_format2, CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
 		if (notable(severity, modul)) {

@@ -1,4 +1,4 @@
-// File:   ui_texture.hpp Author: Vader Created on 2016. szeptember 6., 15:21
+// File: ui_texture.hpp Author: Vader Created on 2016. szeptember 6., 15:21
 
 #pragma once
 

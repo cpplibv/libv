@@ -1,32 +1,32 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-adopt ui - frame separation
+format cmake call() to call ()
 -- commit --
 
-handle fails - apply fallback
-	failed file
-	failed shader
-	failed program
-	failed (corrupt) font
-implement burnt in defaults
--- commit --
+	adopt ui - frame separation
+	-- commit --
 
-ResourceStepResult and ResourceState to enum
--- commit --
+	handle fails - apply fallback
+		failed file
+		failed shader
+		failed program
+		failed (corrupt) font
+	implement burnt in defaults
+	-- commit --
 
-state based ui
-separate control and data!
--- commit --
+	ResourceStepResult and ResourceState to enum
+	-- commit --
 
-2 1 [libv.ui.component] Destroy [UIRoot] <destroy:component.cpp:71>
-2 5 [libv.gl] OpenGL: invalid operation <destroy:ui.cpp:60>
--- commit --
+	state based ui
+	separate control and data!
+	-- commit --
 
-c++17 vec
--- commit --
+	2 1 [libv.ui.component] Destroy [UIRoot] <destroy:component.cpp:71>
+	2 5 [libv.gl] OpenGL: invalid operation <destroy:ui.cpp:60>
+	-- commit --
 
-ui resource local proxies
--- commit --
+	ui resource local proxies
+	-- commit --
 
 hunt down GCC 7.0+ comments
 -- commit --
@@ -34,18 +34,7 @@ hunt down GCC 7.0+ comments
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
 -- commit --
 
-kill gl/log.cpp
-kill gl/gl.cpp
--- commit --
-
-use VBO for string2D
-use VAO for string2D
--- commit --
-
 btn / regions
--- commit --
-
-flow layout const auto& in layout algo
 -- commit --
 
 change log severity into bit-mask
@@ -55,7 +44,7 @@ frame calling show after show may brake things?
 dual check lock every frame operations
 -- commit --
 
-base ptr for pointer like object: observer, cached, etc... or macro?
+pointer facade for: observer, cached, view, adaptive, etc...
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
@@ -64,40 +53,28 @@ doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
-netbeans link: Terminal able to open links to files with absolute paths now. You can print a hyperlink in terminal with an escape sequence. Example of such sequence: fprintf(stdout, "(\033]10;%s;%s\007)]\n", "/home/ilia/NetBeansProjects/CppApplication_48/main.cpp:20", "main.cpp:20"); where :lineNumber is optional.
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
+cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 gl: uniformbuffer?
 gl: framebuffer
 gl: renderbuffer
 gl: templated buffer for binding
 gl: remove irrelevant member function from templated textures
 gl: glEnable(GL_DEBUG_OUTPUT);
-layout: size percent should use the leftover space not the whole parent
-layout: size ratio
-layout: Layout Property: what is the situation with per-component but container based properties?
+layout: size percent and ratio should use the leftover space not the whole parent or provide option for both way
 layout: think layout as a graph instad of a stack..., just think and see whats going on with that approach
 layout: hard type (enum) align anchor and orient
-frame: split from ui
 ui / frame: remove default own thread, give them an io_service like executor
 ui: setText => set()(Label::Text, "Main Menu");
 ui: skip setter   ^^ () by making it a member instead of a function -> set(Label::Text, "Main Menu");
 ui: component if invalid was, then does nothing on invalidation
 ui: take a look at frame and component events
-ui: component property serialization and validation
-ui: rework renderer - opengl independent api in ui - 4 way: template or linkage or external or dynamic
-ui: ProgramDescriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
-cpp / delegate / vsig: http://codereview.stackexchange.com/questions/14730/impossibly-fast-delegate-in-c11
-cpp: clarify Arg&& and template vs auto type deduction rules
-cpp: what is and how to use ADL
-cpp: intel vtune
+ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+cpp: clarify template vs auto type deduction rules
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
-cpp: look after variant https://isocpp.org/blog/2016/01/cpp-language-support-for-pattern-matching-and-variants
-cpp: look after any
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: provide exception free alternative api EVERYWHERE! hehehehehe.
-libv: move vec costume getter functions from member to public -> reducing symbols...
-FIX: 3 5 [libv.ui.glfw] 65537 - The GLFW library is not initialized // This is a core issue
 merge vsig back and create vmeta and vtmta (too many tamplate argument)
 
 Set default displayed tab size for your repository

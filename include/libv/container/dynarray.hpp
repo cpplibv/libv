@@ -2,9 +2,13 @@
 
 #pragma once
 
-namespace std {
+// std
+#include <exception>
 
-//template < DefaultConstructible T >
+
+namespace libv {
+
+// -------------------------------------------------------------------------------------------------
 
 template <typename T>
 struct dynarray {
@@ -26,7 +30,7 @@ private:
 
 	// helper functions:
 	void check(size_type n) {
-		if (n >= count) throw out_of_range("dynarray");
+		if (n >= count) throw std::out_of_range("dynarray");
 	}
 	T* alloc(size_type n) {
 		return reinterpret_cast<T*> (new char[ n * sizeof (T) ]);
@@ -51,7 +55,7 @@ public:
 	dynarray(const dynarray& d)
 		: store(alloc(d.count)), count(d.count) {
 		try {
-			uninitialized_copy(d.begin(), d.end(), begin());
+			std::uninitialized_copy(d.begin(), d.end(), begin());
 		} catch (...) {
 			delete store;
 			throw;
@@ -143,4 +147,6 @@ public:
 	}
 };
 
-} // namespace std
+// -------------------------------------------------------------------------------------------------
+
+} // namespace libv

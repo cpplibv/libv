@@ -3,15 +3,16 @@
 // hpp
 #include <libv/ui/container/panel_flow.hpp>
 // libv
-#include <libv/adaptor.hpp>
-#include <libv/memory.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/memory.hpp>
+#include <libv/range/reversed_if.hpp>
 // std
 #include <algorithm>
 // pro
 #include <libv/ui/layout.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/properties_eval.hpp>
+
 
 namespace libv {
 namespace ui {
@@ -106,9 +107,9 @@ LayoutInfo PanelFlow::doLayout(const LayoutInfo& parentLayoutInfo) {
 		component.info.size = childLayout.size;
 	}
 
-	const auto indexAlign = getOrUse(Property::Align, ALIGN_BOTTOM_LEFT);
-	const auto indexAnchor = getOrUse(Property::Anchor, ALIGN_TOP_LEFT);
-	const auto indexOrient = getOrUse(Property::Orient, ORIENT_RIGHT_DOWN);
+	const auto& indexAlign = getOrUse(Property::Align, ALIGN_BOTTOM_LEFT);
+	const auto& indexAnchor = getOrUse(Property::Anchor, ALIGN_TOP_LEFT);
+	const auto& indexOrient = getOrUse(Property::Orient, ORIENT_RIGHT_DOWN);
 
 	const auto& align = alignmentTable[indexAlign];
 	const auto& contentAnchor = alignmentTable[indexAnchor];

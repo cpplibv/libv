@@ -1,10 +1,10 @@
-// File:   resource_cache.hpp
+// File: resource_cache.hpp
 
 #pragma once
 
 // libv
-#include <libv/tuple.hpp>
-#include <libv/type_traits.hpp>
+#include <libv/utility/tuple.hpp>
+#include <libv/utility/type_traits.hpp>
 // std
 #include <algorithm>
 #include <cassert>

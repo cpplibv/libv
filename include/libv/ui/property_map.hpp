@@ -1,11 +1,12 @@
-// File:   property_map.hpp Author: Vader Created on 2016. július 4., 10:36
+// File: property_map.hpp Author: Vader Created on 2016. július 4., 10:36
 
 #pragma once
 
 // ext
 #include <boost/container/flat_map.hpp>
 // libv
-#include <libv/multi_type_map.hpp>
+#include <libv/container/multi_type_map.hpp>
+
 
 namespace libv {
 namespace ui {

@@ -5,7 +5,10 @@
 // std
 #include <utility>
 
+
 namespace libv {
+
+// TODO P1: kill VoidGuardBase. Use std::any
 
 class VoidGuardBase {
 private:

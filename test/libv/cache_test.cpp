@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-#include <libv/cache.hpp>
+#include <libv/container/cache.hpp>
 #include <thread>
 
 #include "cache_test_util.hpp"

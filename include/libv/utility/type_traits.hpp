@@ -5,6 +5,7 @@
 // std
 #include <type_traits>
 
+
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
@@ -43,27 +44,6 @@ template <typename L, typename R, typename = void> struct is_less_comparable : s
 template <typename L, typename R>
 struct is_less_comparable<L, R, void_t<decltype(
 		std::declval<const L&>() < std::declval<const R&>()
-		)>> : std::true_type { };
-
-// =================================================================================================
-// -------------------------------------------------------------------------------------------------
-// is_member_loadable
-
-template <typename T, typename = void> struct is_member_loadable : std::false_type {
-};
-template <typename T>
-struct is_member_loadable<T, void_t<decltype(
-		std::declval<T&>().load()
-		)>> : std::true_type { };
-
-// -------------------------------------------------------------------------------------------------
-// is_member_unloadable
-
-template <typename T, typename = void> struct is_member_unloadable : std::false_type {
-};
-template <typename T>
-struct is_member_unloadable<T, void_t<decltype(
-		std::declval<T&>().unload()
 		)>> : std::true_type { };
 
 // -------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-// File:   observer_ptr.hpp
+// File: observer_ptr.hpp
 
 #pragma once
 
@@ -7,7 +7,8 @@
 #include <functional>
 #include <memory>
 
-#include <libv/type_traits.hpp>
+#include <libv/utility/type_traits.hpp>
+
 
 namespace libv {
 

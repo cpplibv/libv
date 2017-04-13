@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 #include <libv/ui/events/inputs.hpp>
-#include <libv/utility.hpp>
+#include <libv/utility/utility.hpp>
 
 using namespace libv;
 using namespace libv::ui;

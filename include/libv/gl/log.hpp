@@ -34,7 +34,8 @@ namespace libv {
 namespace gl {
 namespace detail {
 
-inline bool logOGLError(const char* func, const char* file, int line) {
+template <typename = void>
+bool logOGLError(const char* func, const char* file, int line) {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
 		::libv::log(CodePosition{file, func, line}, ::libv::Error, "libv.gl",

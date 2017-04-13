@@ -1,4 +1,4 @@
-// File:   ui.hpp Author: Vader Created on 2016. január 7., 6:35
+// File: ui.hpp Author: Vader Created on 2016. január 7., 6:35
 
 // hpp
 #include <libv/ui/component/ui.hpp>

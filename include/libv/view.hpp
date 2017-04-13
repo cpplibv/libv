@@ -1,10 +1,11 @@
-// File:   view.hpp Author: Vader Created on 2016. december 27., 19:39
+// File: view.hpp Author: Vader Created on 2016. december 27., 19:39
 
 #pragma once
 
 // std
 #include <atomic>
 #include <utility>
+
 
 namespace libv {
 

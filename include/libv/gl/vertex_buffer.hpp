@@ -1,11 +1,11 @@
-// File:   vertex_buffer.hpp Author: Vader Created on 2016. július 17., 0:51
+// File: vertex_buffer.hpp Author: Vader Created on 2016. július 17., 0:51
 
 #pragma once
 
 // ext
 #include <GL/glew.h>
 // libv
-#include <libv/utility.hpp>
+#include <libv/utility/utility.hpp>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/log.hpp>

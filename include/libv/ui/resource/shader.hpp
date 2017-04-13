@@ -1,4 +1,4 @@
-// File:   ui_shader.hpp Author: Vader Created on 2016. szeptember 6., 15:20
+// File: ui_shader.hpp Author: Vader Created on 2016. szeptember 6., 15:20
 
 #pragma once
 

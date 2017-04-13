@@ -1,4 +1,4 @@
-//// File:   utf8.hpp Author: Vader Created on 2017. január 19., 1:07
+//// File: utf8.hpp Author: Vader Created on 2017. január 19., 1:07
 
 #pragma once
 

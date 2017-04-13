@@ -13,8 +13,6 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-VideoMode::VideoMode() { }
-
 VideoMode::VideoMode(const GLFWvidmode* vidmode) :
 	colorBits(vidmode->redBits, vidmode->greenBits, vidmode->blueBits),
 	refreshRate(vidmode->refreshRate),
@@ -26,8 +24,6 @@ VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) {
 	size = vec2i(vidmode->width, vidmode->height);
 	return *this;
 }
-
-VideoMode::~VideoMode() { }
 
 // -------------------------------------------------------------------------------------------------
 
