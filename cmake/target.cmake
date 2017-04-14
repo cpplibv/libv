@@ -37,10 +37,12 @@ function(create_executable)
 		message(FATAL_ERROR "At least one SOURCE should be given.")
     endif()
 
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_sources})
+
 
     list(LENGTH arg_targets number_found)
 	if(number_found EQUAL 1)
-		add_executable(${arg_targets} ${arg_sources})
+		add_executable(${arg_targets} ${matching_sources})
 	else()
 		message(FATAL_ERROR "Exactly one TARGET should be given. Passed: ${arg_targets}")
     endif()
@@ -55,10 +57,11 @@ function(create_executable)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	message("Target: ${arg_targets}")
-	message("	Source: ${arg_sources}")
-	message("	Link:   ${arg_links}")
-	message("	Group:  ${arg_groups}")
+#	message("Target: ${arg_targets}")
+#	message("	Glob:   ${arg_sources}")
+#	message("	Source: ${matching_sources}")
+#	message("	Link:   ${arg_links}")
+#	message("	Group:  ${arg_groups}")
 endfunction()
 
 # --------------------------------------------------------------------------------------------------
@@ -97,11 +100,13 @@ function(create_library)
 		message(FATAL_ERROR "At least one SOURCE should be given.")
     endif()
 
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_sources})
+
 
     list(LENGTH arg_targets number_found)
 	if(number_found EQUAL 1)
 		# TODO P5: Add option to STATIC and other flags to be passed into add_library
-		add_library(${arg_targets} STATIC ${arg_sources})
+		add_library(${arg_targets} STATIC ${matching_sources})
 	else()
 		message(FATAL_ERROR "Exactly one TARGET should be given. Passed: ${arg_targets}")
     endif()
@@ -116,10 +121,11 @@ function(create_library)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	message("Target: ${arg_targets}")
-	message("	Source: ${arg_sources}")
-	message("	Link:   ${arg_links}")
-	message("	Group:  ${arg_groups}")
+#	message("Target: ${arg_targets}")
+#	message("	Glob:   ${arg_sources}")
+#	message("	Source: ${matching_sources}")
+#	message("	Link:   ${arg_links}")
+#	message("	Group:  ${arg_groups}")
 endfunction()
 
 # --------------------------------------------------------------------------------------------------

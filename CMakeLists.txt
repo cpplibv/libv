@@ -385,65 +385,58 @@ set(GROUP_UNIT_TEST)
 
 # Libraries ----------------------------------------------------------------------------------------
 
-file(GLOB_RECURSE libv_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/libv/*.cpp)
-file(GLOB_RECURSE vframe_src      RELATIVE ${PATH_PRJ} ${PATH_SRC}/frame/*.cpp)
-file(GLOB_RECURSE vgl_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/gl/*.cpp)
-file(GLOB_RECURSE vlog_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/log/*.cpp)
-file(GLOB_RECURSE vm3_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3/*.cpp)
-file(GLOB_RECURSE vm3imp_src      RELATIVE ${PATH_PRJ} ${PATH_SRC}/vm3imp/*.cpp)
-file(GLOB_RECURSE vsig_src        RELATIVE ${PATH_PRJ} ${PATH_SRC}/sig/*.cpp)
-file(GLOB_RECURSE vui_src         RELATIVE ${PATH_PRJ} ${PATH_SRC}/ui/*.cpp)
-
 create_library(
 	TARGET libv
-	SOURCE ${libv_src}
+	SOURCE ${PATH_SRC}/libv/*.cpp
+	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vframe
-	SOURCE ${vframe_src}
+	SOURCE ${PATH_SRC}/frame/*.cpp
 	LINK   -static fmt glfw3 gdi32 ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vgl
-	SOURCE ${vgl_src}
+	SOURCE ${PATH_SRC}/gl/*.cpp
 	LINK   -static glew ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vlog
-	SOURCE ${vlog_src}
+	SOURCE ${PATH_SRC}/log/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vm3
-	SOURCE ${vm3_src}
+	SOURCE ${PATH_SRC}/vm3/*.cpp
 	LINK   -static boost_serialization-mt-s
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vm3imp
-	SOURCE ${vm3imp_src}
+	SOURCE ${PATH_SRC}/vm3imp/*.cpp
 	LINK   -static vm3 fmt assimp zlibstatic
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vsig
-	SOURCE ${vsig_src}
+	SOURCE ${PATH_SRC}/sig/*.cpp
+	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 #create_library(
 #	TARGET vui
-#	SOURCE ${vui_src}
+#	SOURCE ${PATH_SRC}/ui/*.cpp
 #	LINK   -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype vgl
 #	GROUP  GROUP_LIBRARY
 #)
@@ -529,68 +522,58 @@ create_executable(
 
 # Tests --------------------------------------------------------------------------------------------
 
-# Sources
-file(GLOB_RECURSE test_libv_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/libv/*.cpp)
-file(GLOB_RECURSE test_vgl_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/gl/*.cpp)
-file(GLOB_RECURSE test_vlog_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/log/*.cpp)
-file(GLOB_RECURSE test_vm3_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3/*.cpp)
-file(GLOB_RECURSE test_vm3imp_src RELATIVE ${PATH_PRJ} ${PATH_TST}/vm3imp/*.cpp)
-file(GLOB_RECURSE test_vparse_src RELATIVE ${PATH_PRJ} ${PATH_TST}/parse/*.cpp)
-file(GLOB_RECURSE test_vsig_src   RELATIVE ${PATH_PRJ} ${PATH_TST}/sig/*.cpp)
-file(GLOB_RECURSE test_vui_src    RELATIVE ${PATH_PRJ} ${PATH_TST}/ui/*.cpp)
-
 create_executable(
 	TARGET test_libv
-	SOURCE ${test_libv_src}
+	SOURCE ${PATH_TST}/libv/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vgl
-	SOURCE ${test_vgl_src}
+	SOURCE ${PATH_TST}/gl/*.cpp
 	LINK   -static vgl
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vlog
-	SOURCE ${test_vlog_src}
+	SOURCE ${PATH_TST}/log/*.cpp
 	LINK   -static fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vm3
-	SOURCE ${test_vm3_src}
+	SOURCE ${PATH_TST}/vm3/*.cpp
 	LINK   -static vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vm3imp
-	SOURCE ${test_vm3imp_src}
+	SOURCE ${PATH_TST}/vm3imp/*.cpp
 	LINK   -static vm3
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vparse
-	SOURCE ${test_vparse_src}
+	SOURCE ${PATH_TST}/parse/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vsig
-	SOURCE ${test_vsig_src}
+	SOURCE ${PATH_TST}/sig/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 #create_executable(
 #	TARGET test_vui
-#	SOURCE ${test_vui_src}
+#	SOURCE ${PATH_TST}/ui/*.cpp
 #	LINK   -static vui fmt vlog
 #	GROUP  GROUP_UNIT_TEST
 #)
