@@ -7,7 +7,7 @@
 
 //#include <libv/ui/vui.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/frame/frame.hpp>
+#include <libv/frame/frame.hpp>
 //#include <libv/ui/component/quad.hpp>
 
 using namespace std;

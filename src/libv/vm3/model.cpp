@@ -39,7 +39,8 @@ bool Model::load(const char* data, const size_t size) {
 
 	libv::archive::portable_iarchive ar(is);
 	ar >> LIBV_NVP_NAMED("model", *this);
-	return true; //<<< Model load fail
+	return true;
+	// TODO P2: Handle model load fail
 }
 
 bool Model::save(std::ostream& os) const {
@@ -48,7 +49,8 @@ bool Model::save(std::ostream& os) const {
 	libv::archive::portable_oarchive ar(os);
 	ar << LIBV_NVP_NAMED("model", *this);
 
-	return true; //<<< Model save fail
+	// TODO P2: Handle model save fail
+	return true;
 }
 
 bool Model::save(std::ostream&& os) const {

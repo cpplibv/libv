@@ -580,6 +580,13 @@ create_executable(
 #	GROUP  GROUP_UNIT_TEST
 #)
 
+create_executable(
+	TARGET test_vframe
+	SOURCE ${PATH_TST}/libv/frame/*.cpp
+	LINK   -static
+	GROUP  GROUP_UNIT_TEST
+)
+
 # groups -------------------------------------------------------------------------------------------
 
 add_custom_target(group_library DEPENDS ${GROUP_LIBRARY})
