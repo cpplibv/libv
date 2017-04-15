@@ -44,8 +44,6 @@ using portable_iprimitive =
 class portable_iarchive :
 public portable_iprimitive,
 public boost::archive::basic_binary_iarchive<portable_iarchive> {
-	// only needed for Robert's hack in basic_binary_iarchive::init
-	friend class boost::archive::basic_binary_iarchive<portable_iarchive>;
 
 	template <int> struct ignore {
 		ignore(int) { }
