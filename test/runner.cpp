@@ -3,7 +3,7 @@
 #define CATCH_CONFIG_RUNNER
 
 #include <catch.hpp>
-#include "vcomp_reporter.hpp"
+#include "simple_reporter.hpp"
 
 int main(int argc, char* const argv[]) {
 	Catch::Session session; // There must be exactly one instance
