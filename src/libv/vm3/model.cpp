@@ -27,7 +27,7 @@ bool Model::load(const char* data, const size_t size) {
 	MemoryBuffer buff(const_cast<char*>(data), size);
 	std::istream is(&buff);
 
-	//<<< Activate magic bytes
+	// TODO P4: VM3_MODEL_MAGIC_HEADER with version number
 	//	char magicBtye[sizeof (VM3_MODEL_MAGIC_BYTE)];
 	//	const auto streamPosition = is.tellg();
 	//	is.read(magicBtye, sizeof (magicBtye));
@@ -43,8 +43,8 @@ bool Model::load(const char* data, const size_t size) {
 }
 
 bool Model::save(std::ostream& os) const {
-	//<<< Activate magic bytes
-	//	os << VM3_MODEL_MAGIC_BYTE;
+	// TODO P4: VM3_MODEL_MAGIC_HEADER with version number
+	//	os << VM3_MODEL_MAGIC_HEADER;
 	libv::archive::portable_oarchive ar(os);
 	ar << LIBV_NVP_NAMED("model", *this);
 

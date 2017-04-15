@@ -389,56 +389,56 @@ set(GROUP_UNIT_TEST)
 
 create_library(
 	TARGET libv
-	SOURCE ${PATH_SRC}/libv/*.cpp
+	SOURCE ${PATH_SRC}/libv/libv/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vframe
-	SOURCE ${PATH_SRC}/frame/*.cpp
+	SOURCE ${PATH_SRC}/libv/frame/*.cpp
 	LINK   -static fmt glfw3 gdi32 ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vgl
-	SOURCE ${PATH_SRC}/gl/*.cpp
+	SOURCE ${PATH_SRC}/libv/gl/*.cpp
 	LINK   -static glew ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vlog
-	SOURCE ${PATH_SRC}/log/*.cpp
+	SOURCE ${PATH_SRC}/libv/log/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vm3
-	SOURCE ${PATH_SRC}/vm3/*.cpp
+	SOURCE ${PATH_SRC}/libv/vm3/*.cpp
 	LINK   -static boost_serialization-mt-s
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vm3imp
-	SOURCE ${PATH_SRC}/vm3imp/*.cpp
+	SOURCE ${PATH_SRC}/libv/vm3imp/*.cpp
 	LINK   -static vm3 fmt assimp zlibstatic
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET vsig
-	SOURCE ${PATH_SRC}/sig/*.cpp
+	SOURCE ${PATH_SRC}/libv/sig/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 #create_library(
 #	TARGET vui
-#	SOURCE ${PATH_SRC}/ui/*.cpp
+#	SOURCE ${PATH_SRC}/libv/ui/*.cpp
 #	LINK   -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype vgl
 #	GROUP  GROUP_LIBRARY
 #)
@@ -526,56 +526,56 @@ create_executable(
 
 create_executable(
 	TARGET test_libv
-	SOURCE ${PATH_TST}/libv/*.cpp
+	SOURCE ${PATH_TST}/libv/libv/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vgl
-	SOURCE ${PATH_TST}/gl/*.cpp
+	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	LINK   -static vgl
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vlog
-	SOURCE ${PATH_TST}/log/*.cpp
+	SOURCE ${PATH_TST}/libv/log/*.cpp
 	LINK   -static fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vm3
-	SOURCE ${PATH_TST}/vm3/*.cpp
+	SOURCE ${PATH_TST}/libv/vm3/*.cpp
 	LINK   -static vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vm3imp
-	SOURCE ${PATH_TST}/vm3imp/*.cpp
+	SOURCE ${PATH_TST}/libv/vm3imp/*.cpp
 	LINK   -static vm3
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vparse
-	SOURCE ${PATH_TST}/parse/*.cpp
+	SOURCE ${PATH_TST}/libv/parse/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
 	TARGET test_vsig
-	SOURCE ${PATH_TST}/sig/*.cpp
+	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
 
 #create_executable(
 #	TARGET test_vui
-#	SOURCE ${PATH_TST}/ui/*.cpp
+#	SOURCE ${PATH_TST}/libv/ui/*.cpp
 #	LINK   -static vui fmt vlog
 #	GROUP  GROUP_UNIT_TEST
 #)
