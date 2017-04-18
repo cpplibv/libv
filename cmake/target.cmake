@@ -4,128 +4,116 @@
 # --------------------------------------------------------------------------------------------------
 
 function(create_executable)
-    set(arguments ${ARGN})
+    cmake_parse_arguments(arg "" "TARGET" "SOURCE;OBJECT;LINK;GROUP" ${ARGN})
 
-	set(arg_sources)
-	set(arg_targets)
-	set(arg_links)
-	set(arg_groups)
 
-	set(selected_arg_list)
-
-	foreach(argument ${arguments})
-		if(argument STREQUAL "SOURCE")
-			set(selected_arg_list arg_sources)
-		elseif(argument STREQUAL "TARGET")
-			set(selected_arg_list arg_targets)
-		elseif(argument STREQUAL "LINK")
-			set(selected_arg_list arg_links)
-		elseif(argument STREQUAL "GROUP")
-			set(selected_arg_list arg_groups)
-		else()
-			if("${selected_arg_list}" STREQUAL "")
-				message(FATAL_ERROR "Uncategorized argument: ${arguments}")
-			else()
-				list(APPEND ${selected_arg_list} ${argument})
-			endif()
+    list(LENGTH arg_SOURCE number_found)
+	if(number_found EQUAL 0)
+		list(LENGTH arg_OBJECT number_found)
+		if(number_found EQUAL 0)
+			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
 		endif()
+    endif()
+
+
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+	foreach(obj ${arg_OBJECT})
+		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
 
 
-    list(LENGTH arg_sources number_found)
-	if(number_found EQUAL 0)
-		message(FATAL_ERROR "At least one SOURCE should be given.")
-    endif()
-
-	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_sources})
+	add_executable(${arg_TARGET} ${matching_sources})
+	target_link_libraries(${arg_TARGET} ${arg_LINK})
 
 
-    list(LENGTH arg_targets number_found)
-	if(number_found EQUAL 1)
-		add_executable(${arg_targets} ${matching_sources})
-	else()
-		message(FATAL_ERROR "Exactly one TARGET should be given. Passed: ${arg_targets}")
-    endif()
-
-
-	target_link_libraries(${arg_targets} ${arg_links})
-
-
-	foreach(group ${arg_groups})
+	foreach(group ${arg_GROUP})
 		set(group_members ${${group}})
-		list(APPEND group_members ${arg_targets})
+		list(APPEND group_members ${arg_TARGET})
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-#	message("Target: ${arg_targets}")
-#	message("	Glob:   ${arg_sources}")
+#	message("Target: ${arg_TARGET}")
+#	message("	Glob:   ${arg_SOURCE}")
 #	message("	Source: ${matching_sources}")
-#	message("	Link:   ${arg_links}")
-#	message("	Group:  ${arg_groups}")
+#	message("	Object: ${arg_OBJECT}")
+#	message("	Link:   ${arg_LINK}")
+#	message("	Group:  ${arg_GROUP}")
 endfunction()
 
 # --------------------------------------------------------------------------------------------------
 
 function(create_library)
-    set(arguments ${ARGN})
+    cmake_parse_arguments(arg "" "TARGET" "SOURCE;OBJECT;LINK;GROUP" ${ARGN})
 
-	set(arg_sources)
-	set(arg_targets)
-	set(arg_links)
-	set(arg_groups)
 
-	set(selected_arg_list)
-
-	foreach(argument ${arguments})
-		if(argument STREQUAL "SOURCE")
-			set(selected_arg_list arg_sources)
-		elseif(argument STREQUAL "TARGET")
-			set(selected_arg_list arg_targets)
-		elseif(argument STREQUAL "LINK")
-			set(selected_arg_list arg_links)
-		elseif(argument STREQUAL "GROUP")
-			set(selected_arg_list arg_groups)
-		else()
-			if("${selected_arg_list}" STREQUAL "")
-				message(FATAL_ERROR "Uncategorized argument: ${arguments}")
-			else()
-				list(APPEND ${selected_arg_list} ${argument})
-			endif()
+    list(LENGTH arg_SOURCE number_found)
+	if(number_found EQUAL 0)
+		list(LENGTH arg_OBJECT number_found)
+		if(number_found EQUAL 0)
+			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
 		endif()
+    endif()
+
+
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+	foreach(obj ${arg_OBJECT})
+		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
 
 
-    list(LENGTH arg_sources number_found)
-	if(number_found EQUAL 0)
-		message(FATAL_ERROR "At least one SOURCE should be given.")
-    endif()
-
-	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_sources})
+	add_library(${arg_TARGET} STATIC ${matching_sources} ${target_objects})
+	target_link_libraries(${arg_TARGET} ${arg_LINK})
 
 
-    list(LENGTH arg_targets number_found)
-	if(number_found EQUAL 1)
-		# TODO P5: Add option to STATIC and other flags to be passed into add_library
-		add_library(${arg_targets} STATIC ${matching_sources})
-	else()
-		message(FATAL_ERROR "Exactly one TARGET should be given. Passed: ${arg_targets}")
-    endif()
-
-
-	target_link_libraries(${arg_targets} ${arg_links})
-
-
-	foreach(group ${arg_groups})
+	foreach(group ${arg_GROUP})
 		set(group_members ${${group}})
-		list(APPEND group_members ${arg_targets})
+		list(APPEND group_members ${arg_TARGET})
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-#	message("Target: ${arg_targets}")
-#	message("	Glob:   ${arg_sources}")
+#	message("Target: ${arg_TARGET}")
+#	message("	Glob:   ${arg_SOURCE}")
 #	message("	Source: ${matching_sources}")
-#	message("	Link:   ${arg_links}")
-#	message("	Group:  ${arg_groups}")
+#	message("	Object: ${arg_OBJECT}")
+#	message("	Link:   ${arg_LINK}")
+#	message("	Group:  ${arg_GROUP}")
+endfunction()
+
+# --------------------------------------------------------------------------------------------------
+
+function(create_object)
+    cmake_parse_arguments(arg "" "TARGET" "SOURCE;OBJECT;GROUP" ${ARGN})
+
+
+    list(LENGTH arg_SOURCE number_found)
+	if(number_found EQUAL 0)
+		list(LENGTH arg_OBJECT number_found)
+		if(number_found EQUAL 0)
+			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
+		endif()
+    endif()
+
+
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+	foreach(obj ${arg_OBJECT})
+		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
+	endforeach()
+
+
+	add_library(${arg_TARGET} OBJECT ${matching_sources})
+
+
+	foreach(group ${arg_GROUP})
+		set(group_members ${${group}})
+		list(APPEND group_members ${arg_TARGET})
+		set(${group} ${group_members} PARENT_SCOPE)
+	endforeach()
+
+#	message("Target: ${arg_TARGET}")
+#	message("	Glob:   ${arg_SOURCE}")
+#	message("	Source: ${matching_sources}")
+#	message("	Object: ${arg_OBJECT}")
+#	message("	Group:  ${arg_GROUP}")
 endfunction()
 
 # --------------------------------------------------------------------------------------------------

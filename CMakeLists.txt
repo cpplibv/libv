@@ -524,19 +524,15 @@ create_executable(
 
 # Tests --------------------------------------------------------------------------------------------
 
-# TODO P3: support cmake object library https://cmake.org/Wiki/CMake/Tutorials/Object_Library
-#create_object(
-#	TARGET obj_test_runner
-#	SOURCE ${PATH_TST}/runner.cpp
-#	TYPE   OBJECT
-#	LINK   -static
-#	GROUP  GROUP_UNIT_TEST
-#)
+create_object(
+	TARGET obj_test_runner
+	SOURCE ${PATH_TST}/runner.cpp
+)
 
 create_executable(
 	TARGET test_libv
 	SOURCE ${PATH_TST}/libv/libv/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
@@ -544,7 +540,7 @@ create_executable(
 create_executable(
 	TARGET test_vgl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static vgl
 	GROUP  GROUP_UNIT_TEST
 )
@@ -552,7 +548,7 @@ create_executable(
 create_executable(
 	TARGET test_vlog
 	SOURCE ${PATH_TST}/libv/log/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static fmt
 	GROUP  GROUP_UNIT_TEST
 )
@@ -560,7 +556,7 @@ create_executable(
 create_executable(
 	TARGET test_vm3
 	SOURCE ${PATH_TST}/libv/vm3/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
@@ -568,7 +564,7 @@ create_executable(
 create_executable(
 	TARGET test_vparse
 	SOURCE ${PATH_TST}/libv/parse/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
@@ -576,7 +572,7 @@ create_executable(
 create_executable(
 	TARGET test_vsig
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )
@@ -584,7 +580,7 @@ create_executable(
 #create_executable(
 #	TARGET test_vui
 #	SOURCE ${PATH_TST}/libv/ui/*.cpp
-#	SOURCE ${PATH_TST}/runner.cpp
+#	OBJECT obj_test_runner
 #	LINK   -static vui fmt vlog
 #	GROUP  GROUP_UNIT_TEST
 #)
@@ -592,7 +588,7 @@ create_executable(
 create_executable(
 	TARGET test_vframe
 	SOURCE ${PATH_TST}/libv/frame/*.cpp
-	SOURCE ${PATH_TST}/runner.cpp
+	OBJECT obj_test_runner
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
 )

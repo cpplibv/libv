@@ -7,6 +7,8 @@
 // libv
 #include <libv/vm3/config.hpp>
 
+// TODO P5: kill this file
+
 #ifdef VM3_NO_XML_ARCHIVE
 #    define LIBV_NVP(NAME) NAME
 #    define LIBV_NVP_NAMED(NAME, VAR) VAR
