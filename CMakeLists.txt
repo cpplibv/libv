@@ -395,51 +395,51 @@ create_library(
 )
 
 create_library(
-	TARGET vframe
+	TARGET libv_frame
 	SOURCE ${PATH_SRC}/libv/frame/*.cpp
 	LINK   -static fmt glfw3 gdi32 ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
-	TARGET vgl
+	TARGET libv_gl
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
 	LINK   -static glew ${LIB_OPENGL} ${LIB_GLU}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
-	TARGET vlog
+	TARGET libv_log
 	SOURCE ${PATH_SRC}/libv/log/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
-	TARGET vm3
+	TARGET libv_vm3
 	SOURCE ${PATH_SRC}/libv/vm3/*.cpp
 	LINK   -static boost_serialization-mt-s
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
-	TARGET vm3imp
+	TARGET libv_vm3imp
 	SOURCE ${PATH_SRC}/libv/vm3imp/*.cpp
-	LINK   -static vm3 fmt assimp zlibstatic
+	LINK   -static libv_vm3 fmt assimp zlibstatic
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
-	TARGET vsig
+	TARGET libv_sig
 	SOURCE ${PATH_SRC}/libv/sig/*.cpp
 	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
 #create_library(
-#	TARGET vui
+	#	TARGET libv_ui
 #	SOURCE ${PATH_SRC}/libv/ui/*.cpp
-#	LINK   -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype vgl
+#	LINK   -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype libv_gl
 #	GROUP  GROUP_LIBRARY
 #)
 
@@ -448,77 +448,77 @@ create_library(
 create_executable(
 	TARGET sandbox_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
-	LINK   -static vlog fmt
+	LINK   -static libv_log fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vframe
-	SOURCE ${PATH_SNB}/vframe_main.cpp
-	LINK   -static vlog fmt vframe
+	TARGET sandbox_libv_frame
+	SOURCE ${PATH_SNB}/libv_frame_main.cpp
+	LINK   -static libv_log fmt libv_frame
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vgl
-	SOURCE ${PATH_SNB}/vgl_main.cpp
-	LINK   -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s
+	TARGET sandbox_libv_gl
+	SOURCE ${PATH_SNB}/libv_gl_main.cpp
+	LINK   -static libv_log fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vgl2
-	SOURCE ${PATH_SNB}/vgl_main2.cpp
-	LINK   -static vlog fmt glew glfw3 vgl boost_system-mt-s boost_filesystem-mt-s
+	TARGET sandbox_libv_gl2
+	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
+	LINK   -static libv_log fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vlog
-	SOURCE ${PATH_SNB}/vlog_main.cpp
+	TARGET sandbox_libv_log
+	SOURCE ${PATH_SNB}/libv_log_main.cpp
 	LINK   -static fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vm3
-	SOURCE ${PATH_SNB}/vm3_main.cpp
-	LINK   -static vlog fmt vm3 boost_system-mt-s boost_filesystem-mt-s
+	TARGET sandbox_libv_vm3
+	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
+	LINK   -static libv_log fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vm3imp
-	SOURCE ${PATH_SNB}/vm3imp_main.cpp
-	LINK   -static vlog fmt vm3imp boost_system-mt-s boost_filesystem-mt-s
+	TARGET sandbox_libv_vm3imp
+	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
+	LINK   -static libv_log fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vserialize
-	SOURCE ${PATH_SNB}/vserialize_main.cpp
+	TARGET sandbox_libv_serialize
+	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
 	LINK   -static boost_serialization-mt-s boost_system-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
-	TARGET sandbox_vsig
-	SOURCE ${PATH_SNB}/vsig_main.cpp
-	LINK   -static vlog fmt
+	TARGET sandbox_libv_sig
+	SOURCE ${PATH_SNB}/libv_sig_main.cpp
+	LINK   -static libv_log fmt
 	GROUP  GROUP_SANDBOX
 )
 
 #create_executable(
-#	TARGET sandbox_vui
-#	SOURCE ${PATH_SNB}/vui_main.cpp
-#	LINK   -static vlog fmt vui
+#	TARGET sandbox_libv_ui
+#	SOURCE ${PATH_SNB}/libv_ui_main.cpp
+#	LINK   -static libv_log fmt libv_ui
 #	GROUP  GROUP_SANDBOX
 #)
 #
 #create_executable(
-#	TARGET sandbox_vui2
-#	SOURCE ${PATH_SNB}/vui_main2.cpp
-#	LINK   -static vlog fmt vui
+#	TARGET sandbox_libv_ui2
+#	SOURCE ${PATH_SNB}/libv_ui_main2.cpp
+#	LINK   -static libv_log fmt libv_ui
 #	GROUP  GROUP_SANDBOX
 #)
 
@@ -538,15 +538,15 @@ create_executable(
 )
 
 create_executable(
-	TARGET test_vgl
+	TARGET test_libv_gl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static vgl
+	LINK   -static libv_gl
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
-	TARGET test_vlog
+	TARGET test_libv_log
 	SOURCE ${PATH_TST}/libv/log/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static fmt
@@ -554,15 +554,15 @@ create_executable(
 )
 
 create_executable(
-	TARGET test_vm3
+	TARGET test_libv_vm3
 	SOURCE ${PATH_TST}/libv/vm3/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static vm3 boost_serialization-mt-s
+	LINK   -static libv_vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
 
 create_executable(
-	TARGET test_vparse
+	TARGET test_libv_parse
 	SOURCE ${PATH_TST}/libv/parse/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static
@@ -570,7 +570,7 @@ create_executable(
 )
 
 create_executable(
-	TARGET test_vsig
+	TARGET test_libv_sig
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static
@@ -578,15 +578,15 @@ create_executable(
 )
 
 #create_executable(
-#	TARGET test_vui
+#	TARGET test_libv_ui
 #	SOURCE ${PATH_TST}/libv/ui/*.cpp
 #	OBJECT obj_test_runner
-#	LINK   -static vui fmt vlog
+#	LINK   -static libv_ui fmt libv_log
 #	GROUP  GROUP_UNIT_TEST
 #)
 
 create_executable(
-	TARGET test_vframe
+	TARGET test_libv_frame
 	SOURCE ${PATH_TST}/libv/frame/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static
