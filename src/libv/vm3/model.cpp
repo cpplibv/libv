@@ -3,8 +3,8 @@
 // hpp
 #include <libv/vm3/serialization/model.hpp>
 // ext
-#include <libv/serialization/archive/portable_iarchive.hpp>
-#include <libv/serialization/archive/portable_oarchive.hpp>
+#include <libv/serialization/archive/binary_portable_in.hpp>
+#include <libv/serialization/archive/binary_portable_out.hpp>
 // std
 #include <iostream>
 
@@ -37,7 +37,7 @@ bool Model::load(const char* data, const size_t size) {
 	//		return false;
 	//	}
 
-	libv::archive::portable_iarchive ar(is);
+	libv::archive::BinaryPortableIn ar(is);
 	ar >> LIBV_NVP_NAMED("model", *this);
 	return true;
 	// TODO P2: Handle model load fail
@@ -46,7 +46,7 @@ bool Model::load(const char* data, const size_t size) {
 bool Model::save(std::ostream& os) const {
 	// TODO P4: VM3_MODEL_MAGIC_HEADER with version number
 	//	os << VM3_MODEL_MAGIC_HEADER;
-	libv::archive::portable_oarchive ar(os);
+	libv::archive::BinaryPortableOut ar(os);
 	ar << LIBV_NVP_NAMED("model", *this);
 
 	// TODO P2: Handle model save fail

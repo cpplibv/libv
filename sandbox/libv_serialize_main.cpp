@@ -7,8 +7,8 @@
 #include <boost/serialization/vector.hpp>
 // libv
 #include <libv/read_file.hpp>
-#include <libv/serialization/archive/portable_iarchive.hpp>
-#include <libv/serialization/archive/portable_oarchive.hpp>
+#include <libv/serialization/archive/binary_portable_in.hpp>
+#include <libv/serialization/archive/binary_portable_out.hpp>
 #include <libv/serialization/nvp.hpp>
 // std
 #include <fstream>
@@ -87,12 +87,12 @@ int main(int, char **) {
 
 	{
 		std::ofstream ofs("test_file_bin");
-		libv::archive::portable_oarchive oar(ofs);
+		libv::archive::BinaryPortableOut oar(ofs);
 		oar << LIBV_NVP(object_out);
 	}
 	{
 		std::ifstream ifs("test_file_bin");
-		libv::archive::portable_iarchive iar(ifs);
+		libv::archive::BinaryPortableIn iar(ifs);
 		iar >> LIBV_NVP(object_in);
 	}
 

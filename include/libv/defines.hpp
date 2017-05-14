@@ -7,7 +7,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: Move __LIBV_SHORT_FILE__ and __LIBV_SHORT_PATH__ into a better place
 #ifndef LIBV_SHORT_PATH_CUTOFF
 #    define LIBV_SHORT_PATH_CUTOFF 0
 #endif
@@ -15,6 +14,7 @@
 #define __LIBV_SHORT_FILE__ (std::strrchr(__FILE__, '/') + 1)
 #define __LIBV_SHORT_PATH__ (__FILE__ + LIBV_SHORT_PATH_CUTOFF)
 
+// TODO P5: We need LIBV_POC definition included in this header.
 #define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_PATH__, __FUNCTION__, __LINE__}
 
 // -------------------------------------------------------------------------------------------------

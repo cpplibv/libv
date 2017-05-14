@@ -3,8 +3,8 @@
 // hpp
 #include <libv/vm3imp/command/import_cmd.hpp>
 // ext
-#include <libv/serialization/archive/portable_oarchive.hpp>
-//#include <libv/serialization/archive/portable_iarchive.hpp>
+#include <libv/serialization/archive/binary_portable_out.hpp>
+//#include <libv/serialization/archive/binary_portable_in.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 //#include <boost/archive/xml_iarchive.hpp>
 #include <boost/serialization/serialization.hpp>
@@ -123,7 +123,7 @@ void CommandImport::execute() {
 		boost::filesystem::path path(filePath.value());
 		path.replace_extension(".vm3");
 		std::ofstream ofs(path.string(), std::ios_base::binary);
-		libv::archive::portable_oarchive oar(ofs);
+		libv::archive::BinaryPortableOut oar(ofs);
 		oar << LIBV_NVP(model);
 	}
 }

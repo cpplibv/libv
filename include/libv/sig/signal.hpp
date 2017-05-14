@@ -37,7 +37,7 @@
 //: UniqueSignal - Modified capacitiv where the storage is unique
 //	May consider a "compare" function for determining uniqueness
 //: ConditionalSignal - Forward the call only if the predicate function allows it
-//: HistorySignal - Stores and forward calls but also distibute them to late subsribers.
+//: HistorySignal - Stores and forward calls but also distibute them to late subscribers.
 //	Also a template size_t N for limit max call memory number
 //: TransformSignal - Manipulating the arguments flowing through it using a
 //	manipulator function. Similar to std::transform.
@@ -60,6 +60,7 @@
 //Fact: Signal ctor needs to be able to handle an adaptor?
 //Fact: It is possible to do adaptiv slots! it is very possible generic lambda?
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -84,7 +85,7 @@ class SignalImpl : public TrackableBase {
 protected:
 	mutable std::recursive_mutex mutex;
 	std::multiset<TrackableBase*> inputs;
-	std::multimap<TrackableBase*, std::function<RType(Args...) >> outputs;
+	std::multimap<TrackableBase*, std::function<RType(Args...)>> outputs;
 
 	Accumulator<RType>* accumulator;
 protected:

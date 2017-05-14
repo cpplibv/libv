@@ -18,7 +18,7 @@
 // std
 #include <ostream>
 // pro
-#include <libv/serialization/archive/portable_archive_exception.hpp>
+#include <libv/serialization/archive/binary_portable_exception.hpp>
 
 // namespace alias
 namespace fp = boost::spirit::math;
@@ -28,10 +28,10 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-class portable_oarchive;
+class BinaryPortableOut;
 
 using portable_oprimitive =
-		boost::archive::basic_binary_oprimitive<portable_oarchive, std::ostream::char_type, std::ostream::traits_type>;
+		boost::archive::basic_binary_oprimitive<BinaryPortableOut, std::ostream::char_type, std::ostream::traits_type>;
 
 /**
  * \brief Portable binary output archive using little endian format.
@@ -41,11 +41,12 @@ using portable_oprimitive =
  * primarily of three different save implementations for integral types,
  * floating point types and string types.
  */
-class portable_oarchive :
+class BinaryPortableOut :
 public portable_oprimitive,
-public boost::archive::basic_binary_oarchive<portable_oarchive> {
+public boost::archive::basic_binary_oarchive<BinaryPortableOut> {
 
-	template <int> struct ignore {
+	template <int>
+	struct ignore {
 		ignore(int) { }
 	};
 
@@ -169,14 +170,14 @@ public:
 
 		save(bits);
 	}
-	portable_oarchive(std::ostream& os, unsigned flags = 0) :
+	BinaryPortableOut(std::ostream& os, unsigned flags = 0) :
 		portable_oprimitive(*os.rdbuf(), flags & boost::archive::no_codecvt),
-		boost::archive::basic_binary_oarchive<portable_oarchive>(flags) {
+		boost::archive::basic_binary_oarchive<BinaryPortableOut>(flags) {
 		init(flags);
 	}
-	portable_oarchive(std::streambuf& sb, unsigned flags = 0) :
+	BinaryPortableOut(std::streambuf& sb, unsigned flags = 0) :
 		portable_oprimitive(sb, flags & boost::archive::no_codecvt),
-		boost::archive::basic_binary_oarchive<portable_oarchive>(flags) {
+		boost::archive::basic_binary_oarchive<BinaryPortableOut>(flags) {
 		init(flags);
 	}
 	void save(const boost::archive::library_version_type& version) {
@@ -216,9 +217,9 @@ namespace boost {
 namespace archive {
 
 // explicitly instantiation
-template class detail::archive_serializer_map<libv::archive::portable_oarchive>;
+template class detail::archive_serializer_map<libv::archive::BinaryPortableOut>;
 
 } // namespace archive
 } // namespace boost
 
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(::libv::archive::portable_oarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(::libv::archive::BinaryPortableOut)

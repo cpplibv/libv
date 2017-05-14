@@ -10,23 +10,19 @@ include(cmake/target.cmake)
 # --------------------------------------------------------------------------------------------------
 
 set(CMAKE_VERBOSE_MAKEFILE off)
-# set(CMAKE_BUILD_TYPE "DEBUG")
+#set(CMAKE_BUILD_TYPE "DEBUG")
 set(CMAKE_BUILD_TYPE "RELEASE")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
-# --------------------------------------------------------------------------------------------------
+# TODO ---------------------------------------------------------------------------------------------
 
-# TODO P2: use cmake copy function instead of "cp"
-# TODO P2: flag or build options to turn on/off sanitizes
-# TODO P2: debug symbol automated turn on/off
-# TODO P3: test clang build
 
-# --------------------------------------------------------------------------------------------------
 
-# Paths
+# Paths --------------------------------------------------------------------------------------------
+
 set(PATH_BIN ${PROJECT_SOURCE_DIR}/bin)
 set(PATH_BLD build)
 set(PATH_LIB ${PROJECT_SOURCE_DIR}/lib)
@@ -42,9 +38,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PATH_BIN})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
 
-# --------------------------------------------------------------------------------------------------
+# Variables ----------------------------------------------------------------------------------------
 
-# Variables
 set(TOOLSET)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
@@ -98,9 +93,29 @@ endif()
 
 string(LENGTH ${PATH_PRJ}_ LIBV_SHORT_PATH_CUTOFF)
 
-# --------------------------------------------------------------------------------------------------
+# Git ----------------------------------------------------------------------------------------------
 
-# Definitions
+# Get the current working branch
+execute_process(
+  COMMAND git rev-parse --abbrev-ref HEAD
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_BRANCH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Get the latest abbreviated commit hash of the working branch
+execute_process(
+  COMMAND git rev-parse --short=8 head
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+  OUTPUT_VARIABLE GIT_COMMIT_HASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
+add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
+
+# Definitions --------------------------------------------------------------------------------------
+
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_definitions(-O0)
 	add_definitions(-ggdb3)
@@ -353,7 +368,7 @@ ExternalProject_Add(ext_boost
 	INSTALL_COMMAND ""
 )
 
-# --------------------------------------------------------------------------------------------------
+# Directories --------------------------------------------------------------------------------------
 
 # Includes
 include_directories(${PATH_INC})

@@ -19,9 +19,9 @@ constexpr unsigned no_infnan = 64; // flag for fp serialization
 const boost::archive::library_version_type archive_version(boost::archive::BOOST_ARCHIVE_VERSION()); // version of the linked boost archive library
 
 
-struct PortableBinaryArhiveException : boost::archive::archive_exception {
+struct PortableBinaryArchiveException : boost::archive::archive_exception {
 	std::string msg;
-	PortableBinaryArhiveException(const std::string& msg) :
+	PortableBinaryArchiveException(const std::string& msg) :
 		boost::archive::archive_exception(other_exception),
 		msg(msg) { };
 	const char* what() const noexcept override {
@@ -29,22 +29,22 @@ struct PortableBinaryArhiveException : boost::archive::archive_exception {
 	}
 };
 
-struct NegativUnsignedException : PortableBinaryArhiveException {
+struct NegativUnsignedException : PortableBinaryArchiveException {
 	NegativUnsignedException() :
-		PortableBinaryArhiveException("Cannot read a negative number into an unsigned type") {}
+		PortableBinaryArchiveException("Cannot read a negative number into an unsigned type") {}
 };
 
-struct IntegerSizeException : PortableBinaryArhiveException {
+struct IntegerSizeException : PortableBinaryArchiveException {
 	IntegerSizeException(size_t size) :
-		PortableBinaryArhiveException("Requested integer size exceeds type size: ") {
+		PortableBinaryArchiveException("Requested integer size exceeds type size: ") {
 		msg += std::to_string(size);
 	}
 };
 
-struct IllegalFloatException : PortableBinaryArhiveException {
+struct IllegalFloatException : PortableBinaryArchiveException {
 	template <typename T>
 	IllegalFloatException(T value) :
-		PortableBinaryArhiveException("Serialization of illegal floating point value: ") {
+		PortableBinaryArchiveException("Serialization of illegal floating point value: ") {
 		msg += std::to_string(value);
 	}
 };

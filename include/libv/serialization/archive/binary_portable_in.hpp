@@ -18,7 +18,7 @@
 // std
 #include <istream>
 // pro
-#include <libv/serialization/archive/portable_archive_exception.hpp>
+#include <libv/serialization/archive/binary_portable_exception.hpp>
 
 // namespace alias
 namespace fp = boost::spirit::math;
@@ -28,10 +28,10 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-class portable_iarchive;
+class BinaryPortableIn;
 
 using portable_iprimitive =
-		boost::archive::basic_binary_iprimitive<portable_iarchive, std::istream::char_type, std::istream::traits_type>;
+		boost::archive::basic_binary_iprimitive<BinaryPortableIn, std::istream::char_type, std::istream::traits_type>;
 
 /**
  * \brief Portable binary input archive using little endian format.
@@ -41,11 +41,12 @@ using portable_iprimitive =
  * primarily of three different save implementations for integral types,
  * floating point types and string types.
  */
-class portable_iarchive :
+class BinaryPortableIn :
 public portable_iprimitive,
-public boost::archive::basic_binary_iarchive<portable_iarchive> {
+public boost::archive::basic_binary_iarchive<BinaryPortableIn> {
 
-	template <int> struct ignore {
+	template <int>
+	struct ignore {
 		ignore(int) { }
 	};
 
@@ -172,14 +173,14 @@ public:
 				&& fp::fpclassify(t) == (int) FP_SUBNORMAL) // GCC4
 			throw IllegalFloatException(t);
 	}
-	portable_iarchive(std::istream& is, unsigned flags = 0) :
+	BinaryPortableIn(std::istream& is, unsigned flags = 0) :
 		portable_iprimitive(*is.rdbuf(), flags & boost::archive::no_codecvt),
-		boost::archive::basic_binary_iarchive<portable_iarchive>(flags) {
+		boost::archive::basic_binary_iarchive<BinaryPortableIn>(flags) {
 		init(flags);
 	}
-	portable_iarchive(std::streambuf& sb, unsigned flags = 0) :
+	BinaryPortableIn(std::streambuf& sb, unsigned flags = 0) :
 		portable_iprimitive(sb, flags & boost::archive::no_codecvt),
-		boost::archive::basic_binary_iarchive<portable_iarchive>(flags) {
+		boost::archive::basic_binary_iarchive<BinaryPortableIn>(flags) {
 		init(flags);
 	}
 	void load(boost::archive::library_version_type& version) {
@@ -219,9 +220,9 @@ namespace boost {
 namespace archive {
 
 // explicitly instantiation
-template class detail::archive_serializer_map<libv::archive::portable_iarchive>;
+template class detail::archive_serializer_map<libv::archive::BinaryPortableIn>;
 
 } // namespace archive
 } // namespace boost
 
-BOOST_SERIALIZATION_REGISTER_ARCHIVE(::libv::archive::portable_iarchive)
+BOOST_SERIALIZATION_REGISTER_ARCHIVE(::libv::archive::BinaryPortableIn)

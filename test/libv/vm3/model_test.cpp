@@ -12,8 +12,8 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/vector.hpp>
-#include <libv/serialization/archive/portable_iarchive.hpp>
-#include <libv/serialization/archive/portable_oarchive.hpp>
+#include <libv/serialization/archive/binary_portable_in.hpp>
+#include <libv/serialization/archive/binary_portable_out.hpp>
 
 #include <sstream>
 
@@ -64,8 +64,8 @@ TEST_CASE("modelSerializationWithArchives") {
 #ifndef VM3_NO_PORTABLE_BINARY_ARCHIVE
 	std::stringstream sspb(std::stringstream::binary | std::ios_base::out | std::ios_base::in);
 	modelArchiveTester<
-			libv::archive::portable_oarchive,
-			libv::archive::portable_iarchive>(sspb);
+			libv::archive::BinaryPortableOut,
+			libv::archive::BinaryPortableIn>(sspb);
 #endif
 
 #ifndef VM3_NO_TEXT_ARCHIVE

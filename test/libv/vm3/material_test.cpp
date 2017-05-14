@@ -9,8 +9,8 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/serialization/serialization.hpp>
-#include <libv/serialization/archive/portable_iarchive.hpp>
-#include <libv/serialization/archive/portable_oarchive.hpp>
+#include <libv/serialization/archive/binary_portable_in.hpp>
+#include <libv/serialization/archive/binary_portable_out.hpp>
 
 #include <sstream>
 
@@ -106,8 +106,8 @@ TEST_CASE("materialSerializationWithArchives") {
 #ifndef VM3_NO_PORTABLE_BINARY_ARCHIVE
 	std::stringstream sspb(std::stringstream::binary | std::ios_base::out | std::ios_base::in);
 	materialArchiveTester<
-			libv::archive::portable_oarchive,
-			libv::archive::portable_iarchive>(sspb);
+			libv::archive::BinaryPortableOut,
+			libv::archive::BinaryPortableIn>(sspb);
 #endif
 
 #ifndef VM3_NO_TEXT_ARCHIVE

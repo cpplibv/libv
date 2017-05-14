@@ -2,7 +2,7 @@
 
 cmake: what are interface targets
 cmake: can there be multiple definition error during linkage if definition are the same?
-cmake: check what is linking does on a lib
+cmake: check what linking does on a lib
 
 -- commit --
 
