@@ -30,33 +30,33 @@
 // Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
-#define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
-#define LIBV_INFO( Module, ...) ::libv::log(LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
-#define LIBV_WARN( Module, ...) ::libv::log(LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
-#define LIBV_ERROR(Module, ...) ::libv::log(LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
-#define LIBV_FATAL(Module, ...) ::libv::log(LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
+#define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__)
+#define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__)
+#define LIBV_INFO( Module, ...) ::libv::log(LIBV_POC, ::libv::Info , Module, __VA_ARGS__)
+#define LIBV_WARN( Module, ...) ::libv::log(LIBV_POC, ::libv::Warn , Module, __VA_ARGS__)
+#define LIBV_ERROR(Module, ...) ::libv::log(LIBV_POC, ::libv::Error, Module, __VA_ARGS__)
+#define LIBV_FATAL(Module, ...) ::libv::log(LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__)
 
-#define LIBV_LOG_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__);
-#define LIBV_LOG_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__);
-#define LIBV_LOG_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__);
-#define LIBV_LOG_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__);
-#define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__);
-#define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__);
+#define LIBV_LOG_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__)
+#define LIBV_LOG_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__)
+#define LIBV_LOG_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__)
+#define LIBV_LOG_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__)
+#define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__)
+#define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__)
 
-#define LIBV_LOG2_BASE_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__);
-#define LIBV_LOG2_BASE_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__);
-#define LIBV_LOG2_BASE_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__);
-#define LIBV_LOG2_BASE_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__);
-#define LIBV_LOG2_BASE_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__);
-#define LIBV_LOG2_BASE_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__);
+#define LIBV_LOG2_BASE_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__)
+#define LIBV_LOG2_BASE_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__)
+#define LIBV_LOG2_BASE_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__)
+#define LIBV_LOG2_BASE_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__)
+#define LIBV_LOG2_BASE_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__)
+#define LIBV_LOG2_BASE_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__)
 
-#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_BASE_TRACE("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_BASE_INFO( "libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_BASE_WARN( "libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_BASE_ERROR("libv", __VA_ARGS__);
-#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_BASE_FATAL("libv", __VA_ARGS__);
+#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_BASE_TRACE("libv", __VA_ARGS__)
+#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv", __VA_ARGS__)
+#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_BASE_INFO( "libv", __VA_ARGS__)
+#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_BASE_WARN( "libv", __VA_ARGS__)
+#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_BASE_ERROR("libv", __VA_ARGS__)
+#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_BASE_FATAL("libv", __VA_ARGS__)
 
 namespace libv {
 
