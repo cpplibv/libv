@@ -1,0 +1,167 @@
+// File: portable_binary.hpp Author: Vader Created on 2017. 05. 21., 16:07
+
+#pragma once
+
+// ext
+#include <cereal/cereal.hpp>
+// std
+#include <istream>
+#include <limits>
+#include <ostream>
+
+
+namespace libv {
+namespace archive {
+
+// -------------------------------------------------------------------------------------------------
+
+namespace detail {
+
+constexpr inline bool is_big_endian() {
+	union {
+		uint32_t i;
+		char c[4];
+	} bint = {0x01020304};
+
+	return bint.c[0] == 1;
+}
+
+template <size_t DataSize>
+inline void swap_bytes(uint8_t* data) {
+	for (size_t i = 0, end = DataSize / 2; i < end; ++i)
+		std::swap(data[i], data[DataSize - i - 1]);
+}
+
+} // namespace detail ------------------------------------------------------------------------------
+
+class CerealPortableBinaryOutput : public cereal::OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision> {
+
+private:
+	std::ostream& os;
+
+public:
+	/// Construct, outputting to the provided stream
+	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
+	CerealPortableBinaryOutput(std::ostream& stream) :
+		OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision>(this),
+		os(stream) {
+	}
+
+	~CerealPortableBinaryOutput() noexcept = default;
+
+	template <size_t DataSize>
+	inline void saveBinary(const void* const data, size_t size) {
+		size_t writtenSize = 0;
+
+		if (detail::is_big_endian())
+			writtenSize = static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data), size));
+		else
+			for (size_t i = 0; i < size; i += DataSize)
+				for (size_t j = 0; j < DataSize; ++j)
+					writtenSize += static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data) + DataSize - j - 1 + i, 1));
+
+		if (writtenSize != size)
+			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class CerealPortableBinaryInput : public cereal::InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision> {
+
+private:
+	std::istream& is;
+
+public:
+	/// Construct, loading from the provided stream
+	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
+	CerealPortableBinaryInput(std::istream& stream) :
+		InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision>(this),
+		is(stream) {
+	}
+
+	~CerealPortableBinaryInput() noexcept = default;
+
+	template <size_t DataSize>
+	inline void loadBinary(void* const data, size_t size) {
+		auto const readSize = static_cast<size_t>(is.rdbuf()->sgetn(reinterpret_cast<char*>(data), size));
+
+		if (readSize != size)
+			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
+
+		if (!detail::is_big_endian())
+			for (size_t i = 0; i < size; i += DataSize)
+				detail::swap_bytes<DataSize>(reinterpret_cast<uint8_t*>(data) + i);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+// Common BinaryArchive serialization functions
+
+/// Saving for POD types to portable binary
+template<class T> inline
+typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, T const& t) {
+	static_assert( !std::is_floating_point<T>::value ||
+			(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
+			"Portable binary only supports IEEE 754 standardized floating point");
+	ar.template saveBinary<sizeof (T)>(std::addressof(t), sizeof (t));
+}
+
+/// Loading for POD types from portable binary
+template<class T> inline
+typename std::enable_if<std::is_arithmetic<T>::value, void>::type
+CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, T& t) {
+	static_assert( !std::is_floating_point<T>::value ||
+			(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
+			"Portable binary only supports IEEE 754 standardized floating point");
+	ar.template loadBinary<sizeof (T)>(std::addressof(t), sizeof (t));
+}
+
+/// Serializing NVP types to portable binary
+template <class Archive, class T> inline
+CEREAL_ARCHIVE_RESTRICT(CerealPortableBinaryInput, CerealPortableBinaryOutput)
+CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::NameValuePair<T>& t) {
+	ar(t.value);
+}
+
+/// Serializing SizeTags to portable binary
+template <class Archive, class T> inline
+CEREAL_ARCHIVE_RESTRICT(CerealPortableBinaryInput, CerealPortableBinaryOutput)
+CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::SizeTag<T>& t) {
+	ar(t.size);
+}
+
+/// Saving binary data to portable binary
+template <class T> inline
+void CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, cereal::BinaryData<T> const& bd) {
+	using TT = typename std::remove_pointer<T>::type;
+	static_assert( !std::is_floating_point<TT>::value ||
+			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
+			"Portable binary only supports IEEE 754 standardized floating point");
+
+	ar.template saveBinary<sizeof (TT)>(bd.data, static_cast<size_t>(bd.size));
+}
+
+/// Loading binary data from portable binary
+template <class T> inline
+void CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, cereal::BinaryData<T>& bd) {
+	using TT = typename std::remove_pointer<T>::type;
+	static_assert( !std::is_floating_point<TT>::value ||
+			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
+			"Portable binary only supports IEEE 754 standardized floating point");
+
+	ar.template loadBinary<sizeof (TT)>(bd.data, static_cast<size_t>(bd.size));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace archive
+} // namespace libv
+
+// register archives for polymorphic support
+CEREAL_REGISTER_ARCHIVE(::libv::archive::CerealPortableBinaryOutput)
+CEREAL_REGISTER_ARCHIVE(::libv::archive::CerealPortableBinaryInput)
+
+// tie input and output archives together
+CEREAL_SETUP_ARCHIVE_TRAITS(::libv::archive::CerealPortableBinaryInput, ::libv::archive::CerealPortableBinaryOutput)

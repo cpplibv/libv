@@ -9,6 +9,8 @@
 #include <cereal/archives/xml.hpp>
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/binary.hpp>
+// libv
+#include <libv/serialization/archive/cereal_binary_portable.hpp>
 // std
 #include <iostream>
 #include <memory>
@@ -78,17 +80,37 @@ int main() {
 	Test object_out;
 	object_out.name = "name";
 	object_out.dead = true;
-	object_out.size = 45365;
+	object_out.size = 0x01020304;
 	object_out.data.emplace_back(2);
 	object_out.data.emplace_back(3);
 	object_out.data.emplace_back(4.36535435);
 	object_out.data.emplace_back(5.23653463);
-	object_out.shader = std::make_shared<Inner>("xz");
+	object_out.shader = std::make_shared<Inner>("inner_value");
 
 	Test object_in;
 
 	{
-		std::stringstream ss;
+		std::stringstream ss(std::ios::in | std::ios::out | std::ios::binary);
+
+		{
+			libv::archive::CerealPortableBinaryOutput oar(ss);
+			oar << cereal::make_nvp<libv::archive::CerealPortableBinaryOutput>("object", object_out);
+		}
+
+		std::cout << std::endl;
+		std::cout << hex_dump(ss.str()) << std::endl;
+		std::cout << std::endl;
+
+		{
+			libv::archive::CerealPortableBinaryInput iar(ss);
+			iar >> cereal::make_nvp<libv::archive::CerealPortableBinaryInput>("object", object_in);
+		}
+	}
+
+	std::cout << (object_out == object_in) << std::endl;
+
+	{
+		std::stringstream ss(std::ios::in | std::ios::out | std::ios::binary);
 
 		{
 			cereal::PortableBinaryOutputArchive oar(ss);
@@ -104,6 +126,8 @@ int main() {
 			iar >> cereal::make_nvp<cereal::PortableBinaryInputArchive>("object", object_in);
 		}
 	}
+
+	std::cout << (object_out == object_in) << std::endl;
 
 	{
 		std::stringstream ss;
@@ -123,6 +147,8 @@ int main() {
 		}
 	}
 
+	std::cout << (object_out == object_in) << std::endl;
+
 	{
 		std::stringstream ss;
 
@@ -141,6 +167,8 @@ int main() {
 		}
 	}
 
+	std::cout << (object_out == object_in) << std::endl;
+
 	{
 		std::stringstream ss;
 
@@ -158,6 +186,8 @@ int main() {
 			iar >> cereal::make_nvp<cereal::XMLInputArchive>("object", object_in);
 		}
 	}
+
+	std::cout << (object_out == object_in) << std::endl;
 
 	return 0;
 }
