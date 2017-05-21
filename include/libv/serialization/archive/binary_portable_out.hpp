@@ -74,7 +74,7 @@ public:
 		portable_oprimitive::save(s);
 	}
 	void save(bool b) {
-		 // Intended conversion bool-to-bool to avoid non 0 or 1 value to be serialized
+		 // Intended conversion from bool to bool to avoid non 0 or 1 value to be serialized
 		save_signed_char(b ? true : false);
 	}
 	/**
@@ -137,7 +137,7 @@ public:
 	 */
 	template <typename T>
 	typename std::enable_if<boost::is_floating_point<T>::value>::type
-	save(const T & t, ignore<3> = 0) {
+	save(const T& t, ignore<3> = 0) {
 		typedef typename fp::detail::fp_traits<T>::type traits;
 
 		// if the no_infnan flag is set we must throw here
@@ -184,7 +184,7 @@ public:
 		save(static_cast<uint_least16_t> (version));
 	}
 	void save(const boost::archive::class_id_type& class_id) {
-		save(static_cast<int_least16_t> (class_id)); // has operator (int) ??!
+		save(static_cast<int_least16_t> (class_id));
 	}
 	void save(const boost::serialization::item_version_type& class_id) {
 		save(static_cast<uint_least32_t> (class_id));

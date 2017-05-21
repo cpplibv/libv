@@ -2,19 +2,43 @@
 
 #pragma once
 
+#ifndef LIBV_USE_SERIALIZATION_CEREAL // ===========================================================
+
 // ext
-#include <boost/serialization/nvp.hpp>
+#    include <boost/serialization/nvp.hpp>
 // libv
-#include <libv/vm3/config.hpp>
+#    include <libv/vm3/config.hpp>
 
-// TODO P5: kill this file
+#    ifdef VM3_NO_XML_ARCHIVE
+#        define LIBV_NVP(NAME) NAME
+#        define LIBV_NVP_NAMED(NAME, VAR) VAR
+#        define LIBV_NVP_BASE_OBJECT(BASE) ::boost::serialization::base_object<BASE>(*this)
+#    else
+#        define LIBV_NVP(NAME) ::BOOST_SERIALIZATION_NVP(NAME)
+#        define LIBV_NVP_NAMED(NAME, VAR) ::boost::serialization::make_nvp(NAME, VAR)
+#        define LIBV_NVP_BASE_OBJECT(BASE) ::BOOST_SERIALIZATION_BASE_OBJECT_NVP(BASE)
+#    endif
 
-#ifdef VM3_NO_XML_ARCHIVE
-#    define LIBV_NVP(NAME) NAME
-#    define LIBV_NVP_NAMED(NAME, VAR) VAR
-#    define LIBV_NVP_BASE_OBJECT(BASE) ::boost::serialization::base_object<BASE>(*this)
-#else
-#    define LIBV_NVP(NAME) ::BOOST_SERIALIZATION_NVP(NAME)
-#    define LIBV_NVP_NAMED(NAME, VAR) ::boost::serialization::make_nvp(NAME, VAR)
-#    define LIBV_NVP_BASE_OBJECT(BASE) ::BOOST_SERIALIZATION_BASE_OBJECT_NVP(BASE)
-#endif
+#else // ===========================================================================================
+
+// ext
+#    include <cereal/cereal.hpp>
+
+#    define LIBV_NVP(NAME) CEREAL_NVP(NAME)
+#    define LIBV_NVP_NAMED(NAME, VAR) CEREAL_NVP_(NAME, VAR)
+
+namespace libv {
+namespace serialization {
+
+// -------------------------------------------------------------------------------------------------
+
+//
+// Cereal nvp proxy here
+//
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace serialization
+} // namespace libv
+
+#endif // ==========================================================================================

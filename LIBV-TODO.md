@@ -34,6 +34,9 @@ cmake: check what linking does on a lib
 hunt down GCC 7.0+ comments
 -- commit --
 
+migrate from boost.serialization to cereal: http://uscilab.github.io/cereal/index.html
+-- commit --
+
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
 -- commit --
 

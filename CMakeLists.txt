@@ -186,6 +186,17 @@ ExternalProject_Add(ext_catch
 	EXCLUDE_FROM_ALL 1
 )
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_cereal)
+ExternalProject_Add(ext_cereal
+	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
+	GIT_TAG v1.2.2
+	PREFIX ${PATH_EXT_SRC}/cereal
+	CMAKE_ARGS
+		-DJUST_INSTALL_CEREAL=ON
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND GROUP_EXTERNAL_PROJECT ext_glfw)
 ExternalProject_Add(ext_glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -378,6 +389,7 @@ include_directories(${PATH_SRC})
 include_directories(SYSTEM ${PATH_EXT}/assimp/include)
 include_directories(SYSTEM ${PATH_EXT}/boost/include)
 include_directories(SYSTEM ${PATH_EXT}/catch/include)
+include_directories(SYSTEM ${PATH_EXT}/cereal/include)
 include_directories(SYSTEM ${PATH_EXT}/fmt/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
@@ -513,6 +525,13 @@ create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
 	LINK   -static boost_serialization-mt-s boost_system-mt-s
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
+	TARGET sandbox_libv_serialize_cereal
+	SOURCE ${PATH_SNB}/libv_serialize_cereal_main.cpp
+	LINK   -static
 	GROUP  GROUP_SANDBOX
 )
 
