@@ -17,13 +17,14 @@ namespace archive {
 
 namespace detail {
 
-constexpr inline bool is_big_endian() {
-	union {
-		uint32_t i;
-		char c[4];
-	} bint = {0x01020304};
+inline bool is_big_endian() {
+	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
+	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 1;
+}
 
-	return bint.c[0] == 1;
+inline bool is_little_endian() {
+	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
+	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 4;
 }
 
 template <size_t DataSize>
@@ -37,6 +38,7 @@ inline void swap_bytes(uint8_t* data) {
 class CerealPortableBinaryOutput : public cereal::OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision> {
 
 private:
+	bool convertEndian;
 	std::ostream& os;
 
 public:
@@ -44,6 +46,7 @@ public:
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
 	CerealPortableBinaryOutput(std::ostream& stream) :
 		OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision>(this),
+		convertEndian(detail::is_little_endian()),
 		os(stream) {
 	}
 
@@ -53,12 +56,12 @@ public:
 	inline void saveBinary(const void* const data, size_t size) {
 		size_t writtenSize = 0;
 
-		if (detail::is_big_endian())
-			writtenSize = static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data), size));
-		else
+		if (convertEndian)
 			for (size_t i = 0; i < size; i += DataSize)
 				for (size_t j = 0; j < DataSize; ++j)
 					writtenSize += static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data) + DataSize - j - 1 + i, 1));
+		else
+			writtenSize = static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data), size));
 
 		if (writtenSize != size)
 			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
@@ -70,6 +73,7 @@ public:
 class CerealPortableBinaryInput : public cereal::InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision> {
 
 private:
+	bool convertEndian;
 	std::istream& is;
 
 public:
@@ -77,6 +81,7 @@ public:
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
 	CerealPortableBinaryInput(std::istream& stream) :
 		InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision>(this),
+		convertEndian(detail::is_little_endian()),
 		is(stream) {
 	}
 
@@ -89,7 +94,7 @@ public:
 		if (readSize != size)
 			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
 
-		if (!detail::is_big_endian())
+		if (convertEndian)
 			for (size_t i = 0; i < size; i += DataSize)
 				detail::swap_bytes<DataSize>(reinterpret_cast<uint8_t*>(data) + i);
 	}

@@ -2,8 +2,8 @@
 
 cmake_minimum_required(VERSION 3.7)
 project(libv)
-include(ExternalProject)
 
+include(ExternalProject)
 include(cmake/util.cmake)
 include(cmake/target.cmake)
 
@@ -130,9 +130,8 @@ add_definitions(-std=c++17)
 
 # Macro - Ext
 add_definitions(-DGLEW_STATIC)
-add_definitions(-DGLM_FORCE_RADIANS)
-# Macro - GLM
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+add_definitions(-DGLM_FORCE_RADIANS)
 # Macro - Libv
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})

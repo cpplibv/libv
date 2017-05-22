@@ -47,6 +47,7 @@ struct new_t {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: rename to current_thread_id() and move to utility/thread.hpp
 inline uint64_t get_this_thread_id() {
 	static_assert(sizeof (std::thread::id) == sizeof (uint64_t), "thread::id size is not 64bit");
 	auto id = std::this_thread::get_id();
