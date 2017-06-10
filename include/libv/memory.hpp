@@ -2,12 +2,13 @@
 
 #pragma once
 
+// std
 #include <algorithm>
 #include <cassert>
 #include <functional>
 #include <memory>
-
-#include <libv/utility/type_traits.hpp>
+// pro
+#include <libv/meta/type_traits.hpp>
 
 
 namespace libv {
@@ -16,7 +17,6 @@ namespace libv {
 
 template <typename T>
 class adaptive_ptr;
-
 
 // shared_ptr ======================================================================================
 template <typename T>

@@ -6,7 +6,6 @@
 #include <thread>
 #include <utility>
 
-// -------------------------------------------------------------------------------------------------
 
 namespace libv {
 
@@ -15,20 +14,6 @@ namespace libv {
 template <typename T, typename M>
 constexpr inline size_t member_offset(M T::* member) {
 	return sizeof (char[reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member))]);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <size_t N, typename F, size_t... Indices>
-constexpr inline void n_times_helper(F&& func, std::index_sequence<Indices...>) {
-	(void) std::initializer_list<int> {
-		((void) (func(Indices)), 0)...
-	};
-}
-
-template <size_t N, typename F>
-constexpr inline void n_times(F&& func) {
-	n_times_helper<N>(std::forward<F>(func), std::make_index_sequence<N>{});
 }
 
 // -------------------------------------------------------------------------------------------------

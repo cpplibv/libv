@@ -14,7 +14,8 @@
 #include <ostream>
 #include <utility>
 // pro
-#include <libv/utility/type_traits.hpp>
+#include <libv/meta/n_times.hpp>
+#include <libv/meta/type_traits.hpp>
 #include <libv/utility/utility.hpp>
 
 
@@ -38,15 +39,30 @@ struct vec_t;
 
 // build / make helper functions -------------------------------------------------------------------
 
-template <size_t N, typename F, size_t... Indices>
-constexpr inline auto build_vec_helper(F&& func, std::index_sequence<Indices...>) {
-	return vec_t<N, decltype(std::declval<F>()(std::declval<size_t>()))>(func(Indices)...);
+template <size_t N, typename F>
+constexpr inline decltype(auto) build_vec(F&& func) {
+	return libv::call_with_n_index<N>([&](const auto... indices) {
+		return vec_t<N, decltype(func(std::declval<size_t>()))>(func(indices)...);
+	});
 }
 
-template <size_t N, typename F>
-constexpr inline auto build_vec(F&& func) {
-	return build_vec_helper<N>(std::forward<F>(func), std::make_index_sequence<N>{});
-}
+// vec bridges -------------------------------------------------------------------------------------
+
+template <typename Vec, typename Target>
+struct enable_implicit_vec_cast {};
+
+#ifdef LIBV_USE_GLM_BRIDGE
+
+template <typename T, glm::precision P>
+struct enable_implicit_vec_cast<vec_t<1, T>, glm::tvec1<T, P>> { using type = void; };
+template <typename T, glm::precision P>
+struct enable_implicit_vec_cast<vec_t<2, T>, glm::tvec2<T, P>> { using type = void; };
+template <typename T, glm::precision P>
+struct enable_implicit_vec_cast<vec_t<3, T>, glm::tvec3<T, P>> { using type = void; };
+template <typename T, glm::precision P>
+struct enable_implicit_vec_cast<vec_t<4, T>, glm::tvec4<T, P>> { using type = void; };
+
+#endif
 
 // vec_base_t --------------------------------------------------------------------------------------
 
@@ -60,7 +76,7 @@ struct vec_base_t {
 
 	vec_base_t() = default;
 	template <typename... Args, typename = typename std::enable_if<sizeof...(Args) == N>::type>
-	constexpr explicit vec_base_t(Args&&... values) : ptr{std::forward<Args>(values)...} { }
+	constexpr inline explicit vec_base_t(Args&&... values) : ptr{std::forward<Args>(values)...} { }
 };
 
 template <typename T>
@@ -73,21 +89,9 @@ struct vec_base_t<2, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[2];
 	};
 
-	constexpr vec_base_t() : x(), y() { }
+	constexpr inline vec_base_t() : x(), y() { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(T0 x, T1 y) : x(x), y(y) { }
-
-#ifdef LIBV_USE_GLM_BRIDGE
-	constexpr operator glm::tvec2<T>() const {
-		return glm::tvec2<T>(x, y);
-	}
-	constexpr operator glm::tvec2<T>& () {
-		return *reinterpret_cast<glm::tvec2<T>*>(this);
-	}
-	constexpr operator const glm::tvec2<T>& () const {
-		return *reinterpret_cast<const glm::tvec2<T>*>(this);
-	}
-#endif
+	constexpr inline vec_base_t(T0 x, T1 y) : x(x), y(y) { }
 };
 
 template <typename T>
@@ -101,25 +105,13 @@ struct vec_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[3];
 	};
 
-	constexpr vec_base_t() : x(), y(), z() { }
+	constexpr inline vec_base_t() : x(), y(), z() { }
 	template <typename T0, typename T1, typename T2>
-	constexpr vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
+	constexpr inline vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
+	constexpr inline vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
-
-#ifdef LIBV_USE_GLM_BRIDGE
-	constexpr operator glm::tvec3<T>() const {
-		return glm::tvec3<T>(x, y, z);
-	}
-	constexpr operator glm::tvec3<T>& () {
-		return *reinterpret_cast<glm::tvec3<T>*>(this);
-	}
-	constexpr operator const glm::tvec3<T>& () const {
-		return *reinterpret_cast<const glm::tvec3<T>*>(this);
-	}
-#endif
+	constexpr inline vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
 };
 
 template <typename T>
@@ -134,53 +126,60 @@ struct vec_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
 		T ptr[4];
 	};
 
-	constexpr vec_base_t() : x(), y(), z(), w() { }
+	constexpr inline vec_base_t() : x(), y(), z(), w() { }
 	template <typename T0, typename T1, typename T2, typename T3>
-	constexpr vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
+	constexpr inline vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	constexpr vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
+	constexpr inline vec_base_t(const vec_base_t<2, T0>& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	constexpr vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
+	constexpr inline vec_base_t(T0 x, const vec_base_t<2, T1>& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
 	template <typename T0, typename T1, typename T2>
-	constexpr vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
+	constexpr inline vec_base_t(T0 x, T1 y, const vec_base_t<2, T2>& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
+	constexpr inline vec_base_t(const vec_base_t<2, T0>& xy, const vec_base_t<2, T1>& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
+	constexpr inline vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	template <typename T0, typename T1>
-	constexpr vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
-
-#ifdef LIBV_USE_GLM_BRIDGE
-	constexpr operator glm::tvec4<T>() const {
-		return glm::tvec4<T>(x, y, z, w);
-	}
-	constexpr operator glm::tvec4<T>& () {
-		return *reinterpret_cast<glm::tvec4<T>*>(this);
-	}
-	constexpr operator const glm::tvec4<T>& () const {
-		return *reinterpret_cast<const glm::tvec4<T>*>(this);
-	}
-#endif
+	constexpr inline vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 };
 
 #pragma GCC diagnostic pop
 
-// vec_t -------------------------------------------------------------------------------------
+// vec_t -------------------------------------------------------------------------------------------
 
 template <size_t N, typename T>
 struct vec_t : vec_base_t<N, T> {
 
-	static constexpr size_t dim = N;
+	static constexpr inline size_t dim = N;
 	using value_type = T;
 
 	// constructors --------------------------------------------------------------------------------
-
 	using vec_base_t<N, T>::vec_base_t;
 	constexpr inline vec_t() : vec_base_t<N, T>() { }
 
 	template <typename K, typename = decltype(T(std::declval<const K&>()))>
 	constexpr explicit inline vec_t(const vec_t<N, K>& vec) {
 		libv::n_times<N>([&](auto index) { this->ptr[index] = vec.ptr[index]; });
+	}
+
+	// converters ----------------------------------------------------------------------------------
+	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
+	constexpr inline operator K() const {
+		return libv::call_with_n_index([&](const auto... indices) {
+			return K{this->ptr[indices]...};
+		});
+	}
+	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
+	constexpr inline operator K&() & {
+		return reinterpret_cast<K&>(*this);
+	}
+	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
+	constexpr inline operator const K&() const & {
+		return reinterpret_cast<const K&>(*this);
+	}
+	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
+	constexpr inline operator K&&() && {
+		return reinterpret_cast<K&&>(*this);
 	}
 
 	// operator[] ----------------------------------------------------------------------------------
@@ -426,9 +425,8 @@ constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& v
 	return os;
 }
 
-namespace vec { // vec utility namespace -----------------------------------------------------------
+inline namespace vec { // vec utility namespace ----------------------------------------------------
 
-// <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
 #define __libv_vec_get2(p1,p2)                                                                     \
 	template <size_t N, typename T>                                                                \
 	constexpr inline ::libv::vec_t<2, T> p1##p2(const ::libv::vec_t<N, T>& vec) {                  \
@@ -445,24 +443,59 @@ namespace vec { // vec utility namespace ---------------------------------------
 		return ::libv::vec_t<4, T>(vec.p1, vec.p2, vec.p3, vec.p4);                                \
 	}
 
+// <editor-fold defaultstate="collapsed" desc="Generated Internal Macros: Custom vec to vec getters ...">
+
 #define __libv_vec_2p1(p1)      __libv_vec_get2(p1,x)      __libv_vec_get2(p1,y)      __libv_vec_get2(p1,z)      __libv_vec_get2(p1,w)
-#define __libv_vec_2            __libv_vec_2p1(x)          __libv_vec_2p1(y)          __libv_vec_2p1(z)          __libv_vec_2p1(w)
+#define LIBV_IMPLEMENT_TO_VEC2_GETS() __libv_vec_2p1(x)    __libv_vec_2p1(y)          __libv_vec_2p1(z)          __libv_vec_2p1(w)
 #define __libv_vec_3p2(p1,p2)   __libv_vec_get3(p1,p2,x)   __libv_vec_get3(p1,p2,y)   __libv_vec_get3(p1,p2,z)   __libv_vec_get3(p1,p2,w)
 #define __libv_vec_3p1(p1)      __libv_vec_3p2(p1,x)       __libv_vec_3p2(p1,y)       __libv_vec_3p2(p1,z)       __libv_vec_3p2(p1,w)
-#define __libv_vec_3            __libv_vec_3p1(x)          __libv_vec_3p1(y)          __libv_vec_3p1(z)          __libv_vec_3p1(w)
+#define LIBV_IMPLEMENT_TO_VEC3_GETS() __libv_vec_3p1(x)    __libv_vec_3p1(y)          __libv_vec_3p1(z)          __libv_vec_3p1(w)
 #define __libv_vec_4p3(p1,p2,p3)__libv_vec_get4(p1,p2,p3,x)__libv_vec_get4(p1,p2,p3,y)__libv_vec_get4(p1,p2,p3,z)__libv_vec_get4(p1,p2,p3,w)
 #define __libv_vec_4p2(p1,p2)   __libv_vec_4p3(p1,p2,x)    __libv_vec_4p3(p1,p2,y)    __libv_vec_4p3(p1,p2,z)    __libv_vec_4p3(p1,p2,w)
 #define __libv_vec_4p1(p1)      __libv_vec_4p2(p1,x)       __libv_vec_4p2(p1,y)       __libv_vec_4p2(p1,z)       __libv_vec_4p2(p1,w)
-#define __libv_vec_4            __libv_vec_4p1(x)          __libv_vec_4p1(y)          __libv_vec_4p1(z)          __libv_vec_4p1(w)
-
-#define implement_to_vec2_gets() __libv_vec_2
-#define implement_to_vec3_gets() __libv_vec_3
-#define implement_to_vec4_gets() __libv_vec_4
+#define LIBV_IMPLEMENT_TO_VEC4_GETS() __libv_vec_4p1(x)    __libv_vec_4p1(y)          __libv_vec_4p1(z)          __libv_vec_4p1(w)
 // </editor-fold>
 
-implement_to_vec2_gets()
-implement_to_vec3_gets()
-implement_to_vec4_gets()
+LIBV_IMPLEMENT_TO_VEC2_GETS()
+LIBV_IMPLEMENT_TO_VEC3_GETS()
+LIBV_IMPLEMENT_TO_VEC4_GETS()
+
+#undef LIBV_IMPLEMENT_TO_VEC2_GETS
+#undef LIBV_IMPLEMENT_TO_VEC3_GETS
+#undef LIBV_IMPLEMENT_TO_VEC4_GETS
+
+template <size_t N, typename T> constexpr inline T& x(vec_t<N, T>& vec) {
+	static_assert(N > 0, "vec_t with less then 1 dimension does not have 'x' coordinate");
+	return vec.ptr[0];
+}
+template <size_t N, typename T> constexpr inline T& y(vec_t<N, T>& vec) {
+	static_assert(N > 1, "vec_t with less then 2 dimension does not have 'y' coordinate");
+	return vec.ptr[1];
+}
+template <size_t N, typename T> constexpr inline T& z(vec_t<N, T>& vec) {
+	static_assert(N > 2, "vec_t with less then 3 dimension does not have 'z' coordinate");
+	return vec.ptr[2];
+}
+template <size_t N, typename T> constexpr inline T& w(vec_t<N, T>& vec) {
+	static_assert(N > 3, "vec_t with less then 4 dimension does not have 'w' coordinate");
+	return vec.ptr[3];
+}
+template <size_t N, typename T> constexpr inline const T& x(const vec_t<N, T>& vec) {
+	static_assert(N > 0, "vec_t with less then 1 dimension does not have 'x' coordinate");
+	return vec.ptr[0];
+}
+template <size_t N, typename T> constexpr inline const T& y(const vec_t<N, T>& vec) {
+	static_assert(N > 1, "vec_t with less then 2 dimension does not have 'y' coordinate");
+	return vec.ptr[1];
+}
+template <size_t N, typename T> constexpr inline const T& z(const vec_t<N, T>& vec) {
+	static_assert(N > 2, "vec_t with less then 3 dimension does not have 'z' coordinate");
+	return vec.ptr[2];
+}
+template <size_t N, typename T> constexpr inline const T& w(const vec_t<N, T>& vec) {
+	static_assert(N > 3, "vec_t with less then 4 dimension does not have 'w' coordinate");
+	return vec.ptr[3];
+}
 
 /// \return The dot product of the two vector
 template <size_t N, typename T, typename K>

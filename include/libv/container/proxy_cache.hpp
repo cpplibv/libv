@@ -6,7 +6,7 @@
 #include <boost/intrusive_ptr.hpp>
 // libv
 #include <libv/utility/tuple.hpp>
-#include <libv/utility/type_traits.hpp>
+#include <libv/meta/type_traits.hpp>
 // std
 #include <cassert>
 #include <memory>
