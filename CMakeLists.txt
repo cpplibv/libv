@@ -145,15 +145,8 @@ if(NOT WIN32)
 endif()
 
 # --------------------------------------------------------------------------------------------------
-# TODO P3: find openGL
 
-if(WIN32)
-	set(LIB_OPENGL opengl32)
-	set(LIB_GLU glu32)
-else()
-	set(LIB_OPENGL GL)
-	set(LIB_GLU GLU)
-endif()
+find_package(OpenGL REQUIRED)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -191,8 +184,8 @@ ExternalProject_Add(ext_cereal
 	GIT_TAG v1.2.2
 	PREFIX ${PATH_EXT_SRC}/cereal
 	CMAKE_ARGS
-		-DJUST_INSTALL_CEREAL=ON
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
+		-DJUST_INSTALL_CEREAL=ON
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -201,7 +194,6 @@ ExternalProject_Add(ext_glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	GIT_TAG 3.2.1
 	PREFIX ${PATH_EXT_SRC}/glfw
-	INSTALL_DIR ${PATH_EXT}/glfw
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
 		-DGLFW_BUILD_EXAMPLES=OFF
@@ -215,8 +207,8 @@ ExternalProject_Add(ext_glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	GIT_TAG glew-cmake-1.11.0
 	PREFIX ${PATH_EXT_SRC}/glew
-	INSTALL_DIR ${PATH_EXT}/glew
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -225,8 +217,8 @@ ExternalProject_Add(ext_fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG 94d387c
 	PREFIX ${PATH_EXT_SRC}/fmt
-	INSTALL_DIR ${PATH_EXT}/fmt
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
 	EXCLUDE_FROM_ALL 1
@@ -238,8 +230,8 @@ ExternalProject_Add(ext_glm
 	GIT_TAG 0.9.8
 	BUILD_COMMAND "" # glm is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/glm
-	INSTALL_DIR ${PATH_EXT}/glm
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -249,8 +241,8 @@ ExternalProject_Add(ext_gli
 	GIT_TAG 0.8.1.0
 	BUILD_COMMAND "" # gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
-	INSTALL_DIR ${PATH_EXT}/gli
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
@@ -275,8 +267,8 @@ ExternalProject_Add(ext_freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG VER-2-5-5
 	PREFIX ${PATH_EXT_SRC}/freetype
-	INSTALL_DIR ${PATH_EXT}/freetype
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -285,10 +277,9 @@ ExternalProject_Add(ext_assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
 	GIT_TAG v3.3.1
 	PREFIX ${PATH_EXT_SRC}/assimp
-	INSTALL_DIR ${PATH_EXT}/assimp
 	CMAKE_ARGS
-		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/assimp
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 		-DBUILD_SHARED_LIBS=OFF
 		-DASSIMP_NO_EXPORT=ON
 		-DASSIMP_BUILD_ASSIMP_TOOLS=OFF
@@ -374,7 +365,6 @@ ExternalProject_Add(ext_boost
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	EXCLUDE_FROM_ALL 1
-	INSTALL_DIR ${PATH_EXT}/boost
 	INSTALL_COMMAND ""
 )
 
@@ -423,14 +413,14 @@ create_library(
 create_library(
 	TARGET libv_frame
 	SOURCE ${PATH_SRC}/libv/frame/*.cpp
-	LINK   -static fmt glfw3 gdi32 ${LIB_OPENGL} ${LIB_GLU}
+	LINK   -static fmt glfw3 gdi32 ${OPENGL_LIBRARIES}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET libv_gl
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
-	LINK   -static glew ${LIB_OPENGL} ${LIB_GLU}
+	LINK   -static glew ${OPENGL_LIBRARIES}
 	GROUP  GROUP_LIBRARY
 )
 
@@ -465,7 +455,7 @@ create_library(
 #create_library(
 	#	TARGET libv_ui
 #	SOURCE ${PATH_SRC}/libv/ui/*.cpp
-#	LINK   -static fmt glew glfw3 ${LIB_OPENGL} ${LIB_GLU} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype libv_gl
+#	LINK   -static fmt glew glfw3 ${OPENGL_LIBRARIES} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype libv_gl
 #	GROUP  GROUP_LIBRARY
 #)
 
