@@ -10,8 +10,8 @@
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/split_free.hpp>
 // libv
-#include <libv/serialization/vec.hpp>
-#include <libv/serialization/glm.hpp>
+#include <libv/serialization/types/glm.hpp>
+#include <libv/serialization/types/vec.hpp>
 // std
 // pro
 

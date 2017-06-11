@@ -1,27 +1,27 @@
 // File: vserialize_main.cpp, Created on 2017. 04. 14. 15:09, Author: Vader
 
+#define LIBV_USE_SERIALIZATION_CEREAL
+
 // ext
-#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/xml.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
-#include <cereal/archives/json.hpp>
-#include <cereal/archives/xml.hpp>
-#include <cereal/archives/portable_binary.hpp>
-#include <cereal/archives/binary.hpp>
 // libv
 #include <libv/serialization/archive/cereal_binary_portable.hpp>
+#include <libv/serialization/serialization.hpp>
+#include <libv/serialization/types/std_variant.hpp>
 // std
+#include <iomanip>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <iomanip>
 
-
-#define LIBV_NVP(N) CEREAL_NVP(N)
-#define LIBV_NVP2(N, V) CEREAL_NVP_(N, V)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -41,6 +41,7 @@ struct Test {
 	std::string name = "xz";
 	std::shared_ptr<Inner> shader;
 	std::vector<double> data;
+	std::variant<int, double, std::string> variant;
 	bool dead = false;
 	int32_t size = 500100;
 
@@ -49,6 +50,7 @@ struct Test {
 		ar & LIBV_NVP(name);
 		ar & LIBV_NVP(shader);
 		ar & LIBV_NVP(data);
+		ar & LIBV_NVP(variant);
 		ar & LIBV_NVP(dead);
 		ar & LIBV_NVP(size);
 	}
@@ -76,6 +78,8 @@ inline std::string hex_dump(const std::string& s) {
 	return result;
 }
 
+// TODO P5: Basically this file could be a unit test
+
 int main() {
 	Test object_out;
 	object_out.name = "name";
@@ -85,6 +89,7 @@ int main() {
 	object_out.data.emplace_back(3);
 	object_out.data.emplace_back(4.36535435);
 	object_out.data.emplace_back(5.23653463);
+	object_out.variant = "variant_value";
 	object_out.shader = std::make_shared<Inner>("inner_value");
 
 	Test object_in;

@@ -129,6 +129,7 @@ add_definitions(-m64)
 add_definitions(-std=c++17)
 
 # Macro - Ext
+add_definitions(-DCEREAL_XML_STRING_VALUE="root")
 add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
