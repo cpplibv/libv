@@ -13,6 +13,7 @@
 // libv
 #include <libv/serialization/archive/cereal_binary_portable.hpp>
 #include <libv/serialization/serialization.hpp>
+#include <libv/serialization/types/boost_flat_map.hpp>
 #include <libv/serialization/types/std_variant.hpp>
 // std
 #include <iomanip>
@@ -42,6 +43,8 @@ struct Test {
 	std::shared_ptr<Inner> shader;
 	std::vector<double> data;
 	std::variant<int, double, std::string> variant;
+	boost::container::flat_map<int, std::string> flat_map;
+	boost::container::flat_map<int, double> flat_map_empty;
 	bool dead = false;
 	int32_t size = 500100;
 
@@ -51,6 +54,8 @@ struct Test {
 		ar & LIBV_NVP(shader);
 		ar & LIBV_NVP(data);
 		ar & LIBV_NVP(variant);
+		ar & LIBV_NVP(flat_map);
+		ar & LIBV_NVP(flat_map_empty);
 		ar & LIBV_NVP(dead);
 		ar & LIBV_NVP(size);
 	}
@@ -59,6 +64,9 @@ struct Test {
 		return name == rhs.name &&
 				data == rhs.data &&
 				(shader && rhs.shader ? shader->x == rhs.shader->x : shader == rhs.shader) &&
+				variant == rhs.variant &&
+				flat_map == rhs.flat_map &&
+				flat_map_empty == rhs.flat_map_empty &&
 				dead == rhs.dead &&
 				size == rhs.size;
 	}
@@ -90,6 +98,10 @@ int main() {
 	object_out.data.emplace_back(4.36535435);
 	object_out.data.emplace_back(5.23653463);
 	object_out.variant = "variant_value";
+	object_out.flat_map.emplace(11, "5.11");
+	object_out.flat_map.emplace(12, "5.12");
+	object_out.flat_map.emplace(13, "5.13");
+	object_out.flat_map.emplace(14, "5.14");
 	object_out.shader = std::make_shared<Inner>("inner_value");
 
 	Test object_in;

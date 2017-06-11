@@ -6,7 +6,6 @@
 #include <variant>
 // pro
 #include <libv/serialization/serialization.hpp>
-#include <libv/serialization/nvp.hpp>
 
 
 namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
@@ -14,8 +13,8 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N, typename Archive, typename... Types> inline
-void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types...>& variant) {
+template <size_t N, typename Archive, typename... Types>
+inline void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types...>& variant) {
 	if (N == index) {
 		std::decay_t<decltype(std::get<N>(variant))> value;
 		ar & LIBV_NVP(value);
@@ -26,8 +25,8 @@ void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types...>& va
 
 } // namespace detail ------------------------------------------------------------------------------
 
-template <typename Archive, typename... Types> inline
-void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const std::variant<Types...>& variant) {
+template <typename Archive, typename... Types>
+inline void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	const auto index = static_cast<uint8_t>(variant.index());
@@ -37,8 +36,8 @@ void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const std::variant<Types
 	}, variant);
 }
 
-template <typename Archive, typename... Types> inline
-void LIBV_SERIALIZATION_LOAD_FUNCTION_NAME(Archive& ar, std::variant<Types...>& variant) {
+template <typename Archive, typename... Types>
+inline void LIBV_SERIALIZATION_LOAD_FUNCTION_NAME(Archive& ar, std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	uint8_t index;
