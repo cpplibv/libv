@@ -13,6 +13,7 @@
 // libv
 #include <libv/serialization/archive/cereal_binary_portable.hpp>
 #include <libv/serialization/serialization.hpp>
+#include <libv/serialization/memberwise.hpp>
 #include <libv/serialization/types/boost_flat_map.hpp>
 #include <libv/serialization/types/std_variant.hpp>
 // std
@@ -25,6 +26,14 @@
 
 
 // -------------------------------------------------------------------------------------------------
+
+struct Memberwise {
+	using libv_serialize_memberwise = void;
+
+	std::string a;
+	double b;
+	std::variant<int, double, std::string> c;
+};
 
 struct Inner {
 	std::string x;
@@ -47,6 +56,7 @@ struct Test {
 	boost::container::flat_map<int, double> flat_map_empty;
 	bool dead = false;
 	int32_t size = 500100;
+	Memberwise memberwise;
 
 	template <class Archive>
 	inline void serialize(Archive& ar) {
@@ -58,6 +68,7 @@ struct Test {
 		ar & LIBV_NVP(flat_map_empty);
 		ar & LIBV_NVP(dead);
 		ar & LIBV_NVP(size);
+		ar & LIBV_NVP(memberwise);
 	}
 
 	bool operator==(const Test& rhs) const {
@@ -68,7 +79,10 @@ struct Test {
 				flat_map == rhs.flat_map &&
 				flat_map_empty == rhs.flat_map_empty &&
 				dead == rhs.dead &&
-				size == rhs.size;
+				size == rhs.size &&
+				memberwise.a == rhs.memberwise.a &&
+				memberwise.b == rhs.memberwise.b &&
+				memberwise.c == rhs.memberwise.c;
 	}
 };
 
@@ -103,6 +117,9 @@ int main() {
 	object_out.flat_map.emplace(13, "5.13");
 	object_out.flat_map.emplace(14, "5.14");
 	object_out.shader = std::make_shared<Inner>("inner_value");
+	object_out.memberwise.a = "memberwise.a value";
+	object_out.memberwise.b = 43;
+	object_out.memberwise.c = "memberwise variant";
 
 	Test object_in;
 

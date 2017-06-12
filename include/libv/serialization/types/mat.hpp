@@ -6,7 +6,8 @@
 #include <boost/serialization/array.hpp>
 // libv
 #include <libv/math/mat.hpp>
-#include <libv/serialization/nvp.hpp>
+#include <libv/serialization/serialization.hpp>
+
 
 namespace boost {
 namespace serialization {

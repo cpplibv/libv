@@ -4,9 +4,7 @@
 
 // hpp
 #include <libv/vm3/material.hpp>
-// cfgig
-#include <libv/vm3/config.hpp>
-// external
+// ext
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/split_free.hpp>
 // libv

@@ -3,11 +3,14 @@
 #pragma once
 
 #include <boost/serialization/array.hpp>
-#include <libv/serialization/nvp.hpp>
+#include <libv/serialization/serialization.hpp>
 #include <libv/math/vec.hpp>
+
 
 namespace boost {
 namespace serialization {
+
+// -------------------------------------------------------------------------------------------------
 
 template <typename Archive, typename T>
 inline void serialize(Archive& ar, ::libv::vec2_t<T>& var, const unsigned int) {
@@ -50,6 +53,7 @@ struct tracking_level<::libv::vec_t<N, T>> {
 	BOOST_STATIC_CONSTANT(int, value = tracking_level::type::value);
 };
 
+// -------------------------------------------------------------------------------------------------
 
 } // namespace serialization
 } // namespace boost
