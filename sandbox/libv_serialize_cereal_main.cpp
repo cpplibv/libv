@@ -33,17 +33,17 @@ struct SimpleServerFieldSet {
 	std::string name{};
 	uint16_t players_current{};
 
-	LIBV_META_MEMBER_LIST {
+	LIBV_META_MEMBER_ACCESS {
 		LIBV_META_MEMBER(0, has_mod);
 		LIBV_META_MEMBER(1, name);
 		LIBV_META_MEMBER(2, players_current);
 	}
 
-	LIBV_SERIALIAZTION_ENABLE_MEMBER();
+	LIBV_SERIALIAZTION_ENABLE_MEMBER
 };
 
 struct Memberwise {
-	LIBV_SERIALIAZTION_ENABLE_MEMBERWISE();
+	LIBV_SERIALIAZTION_ENABLE_MEMBERWISE
 
 	std::string a;
 	double b;

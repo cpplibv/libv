@@ -10,8 +10,6 @@
 #include <libv/serialization/serialization.hpp>
 
 
-#define LIBV_SERIALIAZTION_ENABLE_MEMBERWISE() using __libv_serialiaztion_enable_memberwise = void
-
 namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------

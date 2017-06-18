@@ -3,7 +3,7 @@
 #define LIBV_USE_SERIALIZATION_CEREAL
 
 // libv
-#include <libv/meta/member.hpp>
+#include <libv/meta/member_access.hpp>
 #include <libv/serialization/member.hpp>
 #include <libv/serialization/serialization.hpp>
 // std
@@ -57,7 +57,7 @@ struct ServerFieldSet {
 	Field<uint16_t> players_current{};
 	Field<uint16_t> players_limit{};
 
-	LIBV_META_MEMBER_LIST {
+	LIBV_META_MEMBER_ACCESS {
 		LIBV_META_MEMBER(0, has_mod);
 		LIBV_META_MEMBER(1, has_password);
 		LIBV_META_MEMBER(2, map);
@@ -66,8 +66,31 @@ struct ServerFieldSet {
 		LIBV_META_MEMBER(5, players_limit);
 	}
 
-	LIBV_SERIALIAZTION_ENABLE_MEMBER();
+	LIBV_SERIALIAZTION_ENABLE_MEMBER
 };
+
+
+
+// TODO P4: There is a possibility for an alternative syntax which could be better:
+//#define LIBV_META_MEMBER2(TYPE, NAME, INIT) \
+//	TYPE NAME INIT; \
+//	auto& __member_access(std::integral_constant<size_t, Index>) { return NAME; } \
+//	const auto& __member_access(std::integral_constant<size_t, Index>) const { return NAME; }
+//		...
+//		...
+//	template <template <typename> class Field>
+//	struct ServerFieldSet {
+//		LIBV_META_MEMBER2_LIST
+//		LIBV_META_MEMBER2(Field<bool>, has_mod, {});
+//		LIBV_META_MEMBER2(Field<bool>, has_password, {});
+//		LIBV_META_MEMBER2(Field<std::string>, map, {});
+//		LIBV_META_MEMBER2(Field<std::string>, name, {});
+//		LIBV_META_MEMBER2(Field<uint16_t>, players_current, {});
+//		LIBV_META_MEMBER2(Field<uint16_t>, players_limit, = 0);
+//		LIBV_META_MEMBER2(Field<uint16_t>, players_limit, = 0);
+//
+//		LIBV_SERIALIAZTION_ENABLE_MEMBER2
+//	};
 
 // -------------------------------------------------------------------------------------------------
 

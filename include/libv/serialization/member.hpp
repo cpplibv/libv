@@ -3,14 +3,10 @@
 #pragma once
 
 // libv
-#include <libv/meta/member.hpp>
+#include <libv/meta/member_access.hpp>
 // pro
 #include <libv/serialization/serialization.hpp>
 
-
-// -------------------------------------------------------------------------------------------------
-
-#define LIBV_SERIALIAZTION_ENABLE_MEMBER() using __libv_serialiaztion_enable_member = void
 
 namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 
