@@ -433,6 +433,13 @@ create_library(
 )
 
 create_library(
+	TARGET libv_sig
+	SOURCE ${PATH_SRC}/libv/sig/*.cpp
+	LINK   -static
+	GROUP  GROUP_LIBRARY
+)
+
+create_library(
 	TARGET libv_vm3
 	SOURCE ${PATH_SRC}/libv/vm3/*.cpp
 	LINK   -static boost_serialization-mt-s
@@ -443,13 +450,6 @@ create_library(
 	TARGET libv_vm3imp
 	SOURCE ${PATH_SRC}/libv/vm3imp/*.cpp
 	LINK   -static libv_vm3 fmt assimp zlibstatic
-	GROUP  GROUP_LIBRARY
-)
-
-create_library(
-	TARGET libv_sig
-	SOURCE ${PATH_SRC}/libv/sig/*.cpp
-	LINK   -static
 	GROUP  GROUP_LIBRARY
 )
 
@@ -466,13 +466,6 @@ create_executable(
 	TARGET sandbox_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
 	LINK   -static libv_log fmt
-	GROUP  GROUP_SANDBOX
-)
-
-create_executable(
-	TARGET sandbox_libv_member
-	SOURCE ${PATH_SNB}/libv_member_main.cpp
-	LINK   -static
 	GROUP  GROUP_SANDBOX
 )
 
@@ -505,16 +498,9 @@ create_executable(
 )
 
 create_executable(
-	TARGET sandbox_libv_vm3
-	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
-	LINK   -static libv_log fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
-	GROUP  GROUP_SANDBOX
-)
-
-create_executable(
-	TARGET sandbox_libv_vm3imp
-	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
-	LINK   -static libv_log fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
+	TARGET sandbox_libv_member
+	SOURCE ${PATH_SNB}/libv_member_main.cpp
+	LINK   -static
 	GROUP  GROUP_SANDBOX
 )
 
@@ -536,6 +522,20 @@ create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE ${PATH_SNB}/libv_sig_main.cpp
 	LINK   -static libv_log fmt
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
+	TARGET sandbox_libv_vm3
+	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
+	LINK   -static libv_log fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
+	TARGET sandbox_libv_vm3imp
+	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
+	LINK   -static libv_log fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
@@ -569,6 +569,14 @@ create_executable(
 )
 
 create_executable(
+	TARGET test_libv_frame
+	SOURCE ${PATH_TST}/libv/frame/*.cpp
+	OBJECT obj_test_runner
+	LINK   -static
+	GROUP  GROUP_UNIT_TEST
+)
+
+create_executable(
 	TARGET test_libv_gl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	OBJECT obj_test_runner
@@ -581,14 +589,6 @@ create_executable(
 	SOURCE ${PATH_TST}/libv/log/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static fmt
-	GROUP  GROUP_UNIT_TEST
-)
-
-create_executable(
-	TARGET test_libv_vm3
-	SOURCE ${PATH_TST}/libv/vm3/*.cpp
-	OBJECT obj_test_runner
-	LINK   -static libv_vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -608,6 +608,14 @@ create_executable(
 	GROUP  GROUP_UNIT_TEST
 )
 
+create_executable(
+	TARGET test_libv_vm3
+	SOURCE ${PATH_TST}/libv/vm3/*.cpp
+	OBJECT obj_test_runner
+	LINK   -static libv_vm3 boost_serialization-mt-s
+	GROUP  GROUP_UNIT_TEST
+)
+
 #create_executable(
 #	TARGET test_libv_ui
 #	SOURCE ${PATH_TST}/libv/ui/*.cpp
@@ -615,14 +623,6 @@ create_executable(
 #	LINK   -static libv_ui fmt libv_log
 #	GROUP  GROUP_UNIT_TEST
 #)
-
-create_executable(
-	TARGET test_libv_frame
-	SOURCE ${PATH_TST}/libv/frame/*.cpp
-	OBJECT obj_test_runner
-	LINK   -static
-	GROUP  GROUP_UNIT_TEST
-)
 
 # groups -------------------------------------------------------------------------------------------
 
