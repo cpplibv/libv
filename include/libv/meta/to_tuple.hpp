@@ -36,7 +36,7 @@ template <typename T, size_t L = 0u, size_t R = sizeof (T) + 1u >
 inline constexpr size_t to_tuple_size_f() {
 	constexpr size_t M = (L + R) / 2u;
 	if constexpr (M == 0)
-		return std::is_empty<T>{} ? 0u : throw "Unable to determine number of elements";
+		return std::is_empty<T>{} ? 0u : throw std::runtime_error("Unable to determine number of elements");
 	else if constexpr (L == M)
 		return M;
 	else if constexpr (is_braces_constructible_n<T, M>{})

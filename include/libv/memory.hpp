@@ -45,7 +45,7 @@ public:
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
 	constexpr explicit inline observer_ptr(const adaptive_ptr<T>& p) noexcept : ptr(p.get()) { }
 	constexpr explicit inline observer_ptr(const shared_ptr<T>& p) noexcept : ptr(p.get()) { }
-	template <typename K, typename = enable_if<std::is_base_of<T, K>>>
+	template <typename K, typename = std::enable_if_t<std::is_base_of_v<T, K>>>
 	constexpr inline observer_ptr(const observer_ptr<K>& other) noexcept : ptr(other.get()) { }
 	// ---------------------------------------------------------------------------------------------
 	constexpr inline T* get() const noexcept {

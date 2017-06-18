@@ -56,14 +56,14 @@ struct IntrusiveCacheComparator : BaseComparator {
 		return BaseComparator::operator()(*cr, args);
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const std::unique_ptr<T>& cr) const {
 		return BaseComparator::operator()(std::get<0>(args), *cr);
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	inline bool operator()(const std::unique_ptr<T>& cr, const std::tuple<L>& args) const {
 		return BaseComparator::operator()(*cr, std::get<0>(args));
 	}

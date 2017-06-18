@@ -12,8 +12,9 @@
 #include <cereal/types/vector.hpp>
 // libv
 #include <libv/serialization/archive/cereal_binary_portable.hpp>
-#include <libv/serialization/serialization.hpp>
+#include <libv/serialization/member.hpp>
 #include <libv/serialization/memberwise.hpp>
+#include <libv/serialization/serialization.hpp>
 #include <libv/serialization/types/boost_flat_map.hpp>
 #include <libv/serialization/types/std_variant.hpp>
 // std
@@ -27,8 +28,22 @@
 
 // -------------------------------------------------------------------------------------------------
 
+struct SimpleServerFieldSet {
+	bool has_mod{};
+	std::string name{};
+	uint16_t players_current{};
+
+	LIBV_META_MEMBER_LIST {
+		LIBV_META_MEMBER(0, has_mod);
+		LIBV_META_MEMBER(1, name);
+		LIBV_META_MEMBER(2, players_current);
+	}
+
+	LIBV_SERIALIAZTION_ENABLE_MEMBER();
+};
+
 struct Memberwise {
-	using libv_serialize_memberwise = void;
+	LIBV_SERIALIAZTION_ENABLE_MEMBERWISE();
 
 	std::string a;
 	double b;
@@ -57,6 +72,7 @@ struct Test {
 	bool dead = false;
 	int32_t size = 500100;
 	Memberwise memberwise;
+	SimpleServerFieldSet server;
 
 	template <class Archive>
 	inline void serialize(Archive& ar) {
@@ -69,6 +85,7 @@ struct Test {
 		ar & LIBV_NVP(dead);
 		ar & LIBV_NVP(size);
 		ar & LIBV_NVP(memberwise);
+		ar & LIBV_NVP(server);
 	}
 
 	bool operator==(const Test& rhs) const {
@@ -82,7 +99,10 @@ struct Test {
 				size == rhs.size &&
 				memberwise.a == rhs.memberwise.a &&
 				memberwise.b == rhs.memberwise.b &&
-				memberwise.c == rhs.memberwise.c;
+				memberwise.c == rhs.memberwise.c &&
+				server.has_mod == rhs.server.has_mod &&
+				server.name == rhs.server.name &&
+				server.players_current == rhs.server.players_current;
 	}
 };
 
@@ -120,6 +140,9 @@ int main() {
 	object_out.memberwise.a = "memberwise.a value";
 	object_out.memberwise.b = 43;
 	object_out.memberwise.c = "memberwise variant";
+	object_out.server.has_mod = true;
+	object_out.server.name = "member string";
+	object_out.server.players_current = 6398;
 
 	Test object_in;
 

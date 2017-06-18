@@ -58,14 +58,14 @@ struct CacheComparator : BaseComparator {
 		return BaseComparator::operator()(*cr.ptr, args);
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	inline bool operator()(const std::tuple<L>& args, const CachePtr<T>& cr) const {
 		return BaseComparator::operator()(std::get<0>(args), *cr.ptr);
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	inline bool operator()(const CachePtr<T>& cr, const std::tuple<L>& args) const {
 		return BaseComparator::operator()(*cr.ptr, std::get<0>(args));
 	}
@@ -239,14 +239,14 @@ struct LoadableResource {
 		return *l.obj_ptr < args;
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	friend inline bool operator<(const std::tuple<L>& args, const LoadableResource<T>& r) {
 		return std::get<0>(args) < *r.obj_ptr;
 	}
 	template <typename L,
-	typename = libv::disable_if<libv::is_less_comparable<std::tuple<L>, T>>,
-	typename = libv::enable_if<libv::is_less_comparable<L, T>>>
+	typename = meta::disable_if<meta::is_less_comparable<std::tuple<L>, T>>,
+	typename = meta::enable_if<meta::is_less_comparable<L, T>>>
 	friend inline bool operator<(const LoadableResource<T>& l, const std::tuple<L>& args) {
 		return *l.obj_ptr < std::get<0>(args);
 	}

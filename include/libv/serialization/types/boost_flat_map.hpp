@@ -13,7 +13,7 @@ namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Archive, typename... Args>
-inline void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const boost::container::flat_map<Args...>& map) {
+inline void save(Archive& ar, const boost::container::flat_map<Args...>& map) {
 	const auto size = map.size();
 	ar & LIBV_NVP(size);
 
@@ -24,7 +24,7 @@ inline void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const boost::cont
 }
 
 template <typename Archive, typename... Args>
-inline void LIBV_SERIALIZATION_LOAD_FUNCTION_NAME(Archive& ar, boost::container::flat_map<Args...>& map) {
+inline void load(Archive& ar, boost::container::flat_map<Args...>& map) {
 	size_t size;
 	ar & LIBV_NVP(size);
 	map.reserve(size);

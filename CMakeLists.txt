@@ -470,6 +470,13 @@ create_executable(
 )
 
 create_executable(
+	TARGET sandbox_libv_member
+	SOURCE ${PATH_SNB}/libv_member_main.cpp
+	LINK   -static
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE ${PATH_SNB}/libv_frame_main.cpp
 	LINK   -static libv_log fmt libv_frame

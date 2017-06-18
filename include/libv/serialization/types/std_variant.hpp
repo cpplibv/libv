@@ -26,7 +26,7 @@ inline void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types.
 } // namespace detail ------------------------------------------------------------------------------
 
 template <typename Archive, typename... Types>
-inline void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const std::variant<Types...>& variant) {
+inline void save(Archive& ar, const std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	const auto index = static_cast<uint8_t>(variant.index());
@@ -37,7 +37,7 @@ inline void LIBV_SERIALIZATION_SAVE_FUNCTION_NAME(Archive& ar, const std::varian
 }
 
 template <typename Archive, typename... Types>
-inline void LIBV_SERIALIZATION_LOAD_FUNCTION_NAME(Archive& ar, std::variant<Types...>& variant) {
+inline void load(Archive& ar, std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	uint8_t index;
