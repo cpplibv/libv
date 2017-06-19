@@ -12,7 +12,7 @@
 #include <cereal/types/vector.hpp>
 // libv
 #include <libv/serialization/archive/cereal_binary_portable.hpp>
-#include <libv/serialization/member.hpp>
+#include <libv/serialization/reflection.hpp>
 #include <libv/serialization/memberwise.hpp>
 #include <libv/serialization/serialization.hpp>
 #include <libv/serialization/types/boost_flat_map.hpp>
@@ -33,13 +33,10 @@ struct SimpleServerFieldSet {
 	std::string name{};
 	uint16_t players_current{};
 
-	LIBV_META_MEMBER_ACCESS {
-		LIBV_META_MEMBER(0, has_mod);
-		LIBV_META_MEMBER(1, name);
-		LIBV_META_MEMBER(2, players_current);
-	}
-
-	LIBV_SERIALIAZTION_ENABLE_MEMBER
+	LIBV_REFLECTION_MEMBER(has_mod);
+	LIBV_REFLECTION_MEMBER(name);
+	LIBV_REFLECTION_MEMBER(players_current);
+	LIBV_SERIALIAZTION_ENABLE_REFLECTION
 };
 
 struct Memberwise {
@@ -54,7 +51,7 @@ struct Inner {
 	std::string x;
 
 	Inner() { }
-	Inner(std::string x) : x(x) { }
+	Inner(std::string xv) : x(xv) { }
 
 	template <class Archive>
 	inline void serialize(Archive& ar) {

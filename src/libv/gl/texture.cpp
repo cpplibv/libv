@@ -68,7 +68,7 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 		for (std::size_t Face = 0; Face < Texture.faces(); ++Face)
 			for (std::size_t Level = 0; Level < Texture.levels(); ++Level) {
 				GLsizei const LayerGL = static_cast<GLsizei> (Layer);
-				glm::tvec3<GLsizei> Extent(Texture.extent(Level));
+				glm::tvec3<GLsizei> Extent2(Texture.extent(Level));
 				Target = gli::is_target_cube(Texture.target())
 						? static_cast<GLenum> (GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face)
 						: Target;
@@ -77,12 +77,12 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 				case gli::TARGET_1D:
 					if (gli::is_compressed(Texture.format()))
 						glCompressedTexSubImage1D(
-							Target, static_cast<GLint> (Level), 0, Extent.x,
+							Target, static_cast<GLint> (Level), 0, Extent2.x,
 							Format.Internal, static_cast<GLsizei> (Texture.size(Level)),
 							Texture.data(Layer, Face, Level));
 					else
 						glTexSubImage1D(
-							Target, static_cast<GLint> (Level), 0, Extent.x,
+							Target, static_cast<GLint> (Level), 0, Extent2.x,
 							Format.External, Format.Type,
 							Texture.data(Layer, Face, Level));
 					break;
@@ -93,16 +93,16 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 						glCompressedTexSubImage2D(
 							Target, static_cast<GLint> (Level),
 							0, 0,
-							Extent.x,
-							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+							Extent2.x,
+							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent2.y,
 							Format.Internal, static_cast<GLsizei> (Texture.size(Level)),
 							Texture.data(Layer, Face, Level));
 					else
 						glTexSubImage2D(
 							Target, static_cast<GLint> (Level),
 							0, 0,
-							Extent.x,
-							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent.y,
+							Extent2.x,
+							Texture.target() == gli::TARGET_1D_ARRAY ? LayerGL : Extent2.y,
 							Format.External, Format.Type,
 							Texture.data(Layer, Face, Level));
 					break;
@@ -113,16 +113,16 @@ GLuint gliCreateTexture(char const* data, std::size_t size) {
 						glCompressedTexSubImage3D(
 							Target, static_cast<GLint> (Level),
 							0, 0, 0,
-							Extent.x, Extent.y,
-							Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+							Extent2.x, Extent2.y,
+							Texture.target() == gli::TARGET_3D ? Extent2.z : LayerGL,
 							Format.Internal, static_cast<GLsizei> (Texture.size(Level)),
 							Texture.data(Layer, Face, Level));
 					else
 						glTexSubImage3D(
 							Target, static_cast<GLint> (Level),
 							0, 0, 0,
-							Extent.x, Extent.y,
-							Texture.target() == gli::TARGET_3D ? Extent.z : LayerGL,
+							Extent2.x, Extent2.y,
+							Texture.target() == gli::TARGET_3D ? Extent2.z : LayerGL,
 							Format.External, Format.Type,
 							Texture.data(Layer, Face, Level));
 					break;

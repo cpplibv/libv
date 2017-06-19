@@ -3,8 +3,8 @@
 #define LIBV_USE_SERIALIZATION_CEREAL
 
 // libv
-#include <libv/meta/member_access.hpp>
-#include <libv/serialization/member.hpp>
+#include <libv/meta/reflection_access.hpp>
+#include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
 // std
 #include <iostream>
@@ -13,11 +13,6 @@
 
 
 // -------------------------------------------------------------------------------------------------
-
-template <typename Key, template <typename> class FieldSet>
-struct Table {
-	// ...
-};
 
 template <typename T> using UpdateField = std::optional<T>;
 template <typename T> using StateField = T;
@@ -29,7 +24,7 @@ struct Update : FieldSet<UpdateField> {
 template <template <template <typename> class> class FieldSet>
 struct State : FieldSet<StateField> {
 	State& operator+=(const Update<FieldSet>& update) {
-		libv::meta::interleave_member_value([](auto& lhs, const auto& rhs) {
+		libv::meta::interleave_member_reference([](auto& lhs, const auto& rhs) {
 			if (rhs)
 				lhs = *rhs;
 		}, *this, update);
@@ -38,7 +33,7 @@ struct State : FieldSet<StateField> {
 
 	Update<FieldSet> operator-(const State<FieldSet>& rhsState) {
 		Update<FieldSet> resultUpdate;
-		libv::meta::interleave_member_value([](auto& result, const auto& lhs, const auto& rhs) {
+		libv::meta::interleave_member_reference([](auto& result, const auto& lhs, const auto& rhs) {
 			if (lhs != rhs)
 				result = lhs;
 		}, resultUpdate, *this, rhsState);
@@ -57,40 +52,14 @@ struct ServerFieldSet {
 	Field<uint16_t> players_current{};
 	Field<uint16_t> players_limit{};
 
-	LIBV_META_MEMBER_ACCESS {
-		LIBV_META_MEMBER(0, has_mod);
-		LIBV_META_MEMBER(1, has_password);
-		LIBV_META_MEMBER(2, map);
-		LIBV_META_MEMBER(3, name);
-		LIBV_META_MEMBER(4, players_current);
-		LIBV_META_MEMBER(5, players_limit);
-	}
-
-	LIBV_SERIALIAZTION_ENABLE_MEMBER
+	LIBV_REFLECTION_MEMBER(has_mod);
+	LIBV_REFLECTION_MEMBER(has_password);
+	LIBV_REFLECTION_MEMBER(map);
+	LIBV_REFLECTION_MEMBER(name);
+	LIBV_REFLECTION_MEMBER(players_current);
+	LIBV_REFLECTION_MEMBER(players_limit);
+	LIBV_SERIALIAZTION_ENABLE_REFLECTION
 };
-
-
-
-// TODO P4: There is a possibility for an alternative syntax which could be better:
-//#define LIBV_META_MEMBER2(TYPE, NAME, INIT) \
-//	TYPE NAME INIT; \
-//	auto& __member_access(std::integral_constant<size_t, Index>) { return NAME; } \
-//	const auto& __member_access(std::integral_constant<size_t, Index>) const { return NAME; }
-//		...
-//		...
-//	template <template <typename> class Field>
-//	struct ServerFieldSet {
-//		LIBV_META_MEMBER2_LIST
-//		LIBV_META_MEMBER2(Field<bool>, has_mod, {});
-//		LIBV_META_MEMBER2(Field<bool>, has_password, {});
-//		LIBV_META_MEMBER2(Field<std::string>, map, {});
-//		LIBV_META_MEMBER2(Field<std::string>, name, {});
-//		LIBV_META_MEMBER2(Field<uint16_t>, players_current, {});
-//		LIBV_META_MEMBER2(Field<uint16_t>, players_limit, = 0);
-//		LIBV_META_MEMBER2(Field<uint16_t>, players_limit, = 0);
-//
-//		LIBV_SERIALIAZTION_ENABLE_MEMBER2
-//	};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -113,31 +82,30 @@ int main(int, char**) {
 	update01.players_limit = 8;
 
 	State<ServerFieldSet> row1;
-	libv::meta::foreach_member_nvp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nvp(update00, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+	std::cout << "\n - "; libv::meta::foreach_member_nrp(update00, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
 	row1 += update00;
-	libv::meta::foreach_member_nvp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nvp(update01, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+	std::cout << "\n - "; libv::meta::foreach_member_nrp(update01, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
 	row1 += update01;
-	libv::meta::foreach_member_nvp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
 
 	Update<ServerFieldSet> update10;
 	update00.has_password = true;
 	update10.map = "Spiral v2";
 
 	State<ServerFieldSet> row2;
-	libv::meta::foreach_member_nvp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nvp(update10, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+	libv::meta::foreach_member_nrp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+	std::cout << "\n - "; libv::meta::foreach_member_nrp(update10, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
 	row2 += update10;
-	libv::meta::foreach_member_nvp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+	libv::meta::foreach_member_nrp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
 
 	auto diff = row2 - row1;
-	std::cout << "\n - "; libv::meta::foreach_member_nvp(diff, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+	std::cout << "\n - "; libv::meta::foreach_member_nrp(diff, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
 
 	row1 += diff;
 	auto diff2 = row2 - row1;
-	std::cout << "\n - "; libv::meta::foreach_member_nvp(diff2, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
-
+	std::cout << "\n - "; libv::meta::foreach_member_nrp(diff2, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
 	return 0;
 }
 

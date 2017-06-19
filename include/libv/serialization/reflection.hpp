@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/meta/member_access.hpp>
+#include <libv/meta/reflection_access.hpp>
 // pro
 #include <libv/serialization/serialization.hpp>
 
@@ -12,16 +12,16 @@ namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_member>
+template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_reflection>
 inline void save(Archive& ar, const T& object, std::integral_constant<size_t, 2001> = {}) {
-	libv::meta::foreach_member_nvp(object, [&](const auto& name, const auto& value) {
+	libv::meta::foreach_member_nrp(object, [&](const auto& name, const auto& value) {
 		ar & LIBV_NVP_NAMED(name, value);
 	});
 }
 
-template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_member>
+template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_reflection>
 inline void load(Archive& ar, T& object, std::integral_constant<size_t, 2001> = {}) {
-	libv::meta::foreach_member_nvp(object, [&](const auto& name, auto& value) {
+	libv::meta::foreach_member_nrp(object, [&](const auto& name, auto& value) {
 		ar & LIBV_NVP_NAMED(name, value);
 	});
 }

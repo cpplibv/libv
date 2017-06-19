@@ -69,11 +69,14 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 # 		-Wsuggest-final-types
 ## 		-Wfloat-equal
 ## 		-Wconversion
-## 		-Wshadow-compatible-local # gcc 7+
 		)
 
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
 		add_compile_options(-Wsuggest-override)
+	endif()
+
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
+		add_compile_options(-Wshadow-compatible-local)
 	endif()
 
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")

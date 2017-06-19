@@ -94,6 +94,7 @@ BOOST_PP_REPEAT(LIBV_TO_TUPLE_MAX, LIBV_TO_TUPLE_SPECIALIZATION, nil)
 #undef LIBV_TO_TUPLE_SPECIALIZATION
 #undef LIBV_TO_TUPLE_P
 
+// Workaround end
 // =================================================================================================
 
 template <typename T, typename = struct current_value, size_t = LIBV_TO_TUPLE_MAX, typename = struct required_value, size_t N>
