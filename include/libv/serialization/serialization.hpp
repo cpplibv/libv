@@ -2,6 +2,9 @@
 
 #pragma once
 
+#include <libv/serialization/enable.hpp>
+
+
 #ifndef LIBV_USE_SERIALIZATION_CEREAL // ===========================================================
 
 // ext
@@ -26,7 +29,3 @@
 #    define LIBV_SERIALIZATION_EXTENSION_NAMESPACE cereal
 
 #endif // ==========================================================================================
-
-
-#define LIBV_SERIALIAZTION_ENABLE_MEMBER using __libv_serialiaztion_enable_member = void;
-#define LIBV_SERIALIAZTION_ENABLE_MEMBERWISE using __libv_serialiaztion_enable_memberwise = void;
