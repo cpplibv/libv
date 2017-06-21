@@ -456,13 +456,6 @@ create_library(
 	GROUP  GROUP_LIBRARY
 )
 
-#create_library(
-	#	TARGET libv_ui
-#	SOURCE ${PATH_SRC}/libv/ui/*.cpp
-#	LINK   -static fmt glew glfw3 ${OPENGL_LIBRARIES} gdi32 boost_system-mt-s boost_filesystem-mt-s freetype libv_gl
-#	GROUP  GROUP_LIBRARY
-#)
-
 # Sandboxes ----------------------------------------------------------------------------------------
 
 create_executable(
@@ -542,20 +535,6 @@ create_executable(
 	GROUP  GROUP_SANDBOX
 )
 
-#create_executable(
-#	TARGET sandbox_libv_ui
-#	SOURCE ${PATH_SNB}/libv_ui_main.cpp
-#	LINK   -static libv_log fmt libv_ui
-#	GROUP  GROUP_SANDBOX
-#)
-#
-#create_executable(
-#	TARGET sandbox_libv_ui2
-#	SOURCE ${PATH_SNB}/libv_ui_main2.cpp
-#	LINK   -static libv_log fmt libv_ui
-#	GROUP  GROUP_SANDBOX
-#)
-
 # Tests --------------------------------------------------------------------------------------------
 
 create_object(
@@ -618,14 +597,6 @@ create_executable(
 	LINK   -static libv_vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
-
-#create_executable(
-#	TARGET test_libv_ui
-#	SOURCE ${PATH_TST}/libv/ui/*.cpp
-#	OBJECT obj_test_runner
-#	LINK   -static libv_ui fmt libv_log
-#	GROUP  GROUP_UNIT_TEST
-#)
 
 # groups -------------------------------------------------------------------------------------------
 

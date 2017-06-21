@@ -3,7 +3,7 @@
 #pragma once
 
 // cfg
-#include <libv/ui/config.hpp>
+#include <libv/frame/config.hpp>
 // libv
 #include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
