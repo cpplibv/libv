@@ -14,8 +14,18 @@
 #define __LIBV_SHORT_FILE__ (std::strrchr(__FILE__, '/') + 1)
 #define __LIBV_SHORT_PATH__ (__FILE__ + LIBV_SHORT_PATH_CUTOFF)
 
-// TODO P5: We need LIBV_POC definition included in this header.
+// -------------------------------------------------------------------------------------------------
+
+namespace libv {
+
+struct CodePosition {
+	const char* file;
+	const char* func;
+	const int line;
+};
+
 #define LIBV_POC ::libv::CodePosition{__LIBV_SHORT_PATH__, __FUNCTION__, __LINE__}
 
 // -------------------------------------------------------------------------------------------------
 
+} // namespace libv
