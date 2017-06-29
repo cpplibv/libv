@@ -93,14 +93,9 @@ private:
 			} catch (std::exception& ex) {
 				std::lock_guard<std::mutex> lk(exceptionHistory_m);
 				exceptionHistory.emplace(std::current_exception());
-				LIBV_LOG_DEBUG("Exception occurred in [%s] WorkerThread. "
-						"[%d] unhandled exception in queue. "
-						"Exception message: [%s].", name, ex.what(), exceptionHistory.size());
-			} catch (...) {
-				std::lock_guard<std::mutex> lk(exceptionHistory_m);
-				exceptionHistory.emplace(std::current_exception());
-				LIBV_LOG_DEBUG("Exception occurred in [%s] WorkerThread. "
-						"[%d] unhandled exception in queue. ", name, exceptionHistory.size());
+				LIBV_LOG_LIBV_ERROR("Exception occurred in {} WorkerThread. "
+						"{} unhandled exception in queue. "
+						"Exception message: {}.", name, ex.what(), exceptionHistory.size());
 			}
 		}
 	}
@@ -143,7 +138,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			LIBV_LOG_DEBUG("Exception during joining WorkerThread [%s]: %s", name, ex.what());
+			LIBV_LOG_LIBV_DEBUG("Exception during joining WorkerThread {}: {}", name, ex.what());
 		}
 	}
 	inline auto getID() {

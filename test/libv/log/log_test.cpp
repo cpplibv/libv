@@ -38,9 +38,9 @@ TEST_CASE("Logger should format extra arguments") {
 	libv::Logger log;
 
 	stream << log;
-	log(LIBV_POC, libv::Trace, "test", "Hello World! %.2f", 10.0f);
+	log(LIBV_POC, libv::Trace, "test", "Hello World! {}", 10);
 
-	CHECK(isLogged(stream, "Hello World! 10.00"));
+	CHECK(isLogged(stream, "Hello World! 10"));
 }
 
 TEST_CASE("Logger should handle empty allow filter") {

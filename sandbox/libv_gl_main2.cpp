@@ -32,15 +32,15 @@ std::atomic_bool running{true};
 #define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH 900
 
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_INFO("%-46s %s", #ext, glewIsSupported(#ext) ? "[ SUPPORTED ]" : "[UNSUPPORTED]")
+#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LOG_ERROR("Failed to initialize glew: %s", glewGetErrorString(err));
+		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
 
-	LIBV_LOG_INFO("GL Vendor: %s", static_cast<const unsigned char*>(glGetString(GL_VENDOR)));
-	LIBV_LOG_INFO("GL Renderer: %s", static_cast<const unsigned char*>(glGetString(GL_RENDERER)));
-	LIBV_LOG_INFO("GL Version: %s", static_cast<const unsigned char*>(glGetString(GL_VERSION)));
+	LIBV_LOG_LIBV_INFO("GL Vendor: {}", static_cast<const unsigned char*>(glGetString(GL_VENDOR)));
+	LIBV_LOG_LIBV_INFO("GL Renderer: {}", static_cast<const unsigned char*>(glGetString(GL_RENDERER)));
+	LIBV_LOG_LIBV_INFO("GL Version: {}", static_cast<const unsigned char*>(glGetString(GL_VERSION)));
 
 	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
 	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
@@ -72,7 +72,7 @@ void initGLSL() {
 }
 
 static void error_callback(int code, const char* description) {
-	LIBV_LOG_ERROR("GLFW %d: %s", code, description);
+	LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -255,7 +255,7 @@ int main(void) {
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		LIBV_LOG_ERROR("Failed to initialize GLFW.");
+		LIBV_LOG_LIBV_ERROR("Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -269,7 +269,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		LIBV_LOG_ERROR("Failed to create GLFW window.");
+		LIBV_LOG_LIBV_ERROR("Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -296,7 +296,7 @@ int main(void) {
 			i++;
 			time += timer.time().count();
 			if (time > 1000000000) {
-				LIBV_LOG_INFO("FPS: %d", i);
+				LIBV_LOG_LIBV_INFO("FPS: {}", i);
 				i = 0;
 				time -= 1000000000;
 			}

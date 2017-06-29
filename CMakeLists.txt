@@ -429,13 +429,6 @@ create_library(
 )
 
 create_library(
-	TARGET libv_log
-	SOURCE ${PATH_SRC}/libv/log/*.cpp
-	LINK   -static
-	GROUP  GROUP_LIBRARY
-)
-
-create_library(
 	TARGET libv_sig
 	SOURCE ${PATH_SRC}/libv/sig/*.cpp
 	LINK   -static
@@ -461,28 +454,28 @@ create_library(
 create_executable(
 	TARGET sandbox_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
-	LINK   -static libv_log fmt
+	LINK   -static fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE ${PATH_SNB}/libv_frame_main.cpp
-	LINK   -static libv_log fmt libv_frame
+	LINK   -static fmt libv_frame
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE ${PATH_SNB}/libv_gl_main.cpp
-	LINK   -static libv_log fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   -static libv_log fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
@@ -517,21 +510,21 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE ${PATH_SNB}/libv_sig_main.cpp
-	LINK   -static libv_log fmt
+	LINK   -static fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_vm3
 	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
-	LINK   -static libv_log fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_vm3imp
 	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
-	LINK   -static libv_log fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
 	GROUP  GROUP_SANDBOX
 )
 

@@ -11,7 +11,7 @@ using libv::frame::Key;
 
 void noisyEvents(libv::Frame& frame) {
 	const auto pretty_print_to_log = [](const auto& event) {
-		LIBV_LOG_FRAME_EVENT_TRACE("Event: %s", event.toPrettyString());
+		LIBV_LOG_FRAME_EVENT_TRACE("Event: {}", event.toPrettyString());
 	};
 
 	frame.onChar.output(pretty_print_to_log);

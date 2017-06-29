@@ -11,11 +11,9 @@
 // std
 #include <ostream>
 #include <string>
-//#include <thread>
 #include <vector>
-//#include <mutex>
 
-// TODO P1: catch exception of fmt::format on bad format
+
 // TODO P3: Log system should provide an interface to name threads.
 //			And / Or interact with worker thread name. AHHHAAA! Thread local string!
 // TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
@@ -30,33 +28,19 @@
 // Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_TRACE(Module, ...) ::libv::log(LIBV_POC, ::libv::Trace, Module, __VA_ARGS__)
-#define LIBV_DEBUG(Module, ...) ::libv::log(LIBV_POC, ::libv::Debug, Module, __VA_ARGS__)
-#define LIBV_INFO( Module, ...) ::libv::log(LIBV_POC, ::libv::Info , Module, __VA_ARGS__)
-#define LIBV_WARN( Module, ...) ::libv::log(LIBV_POC, ::libv::Warn , Module, __VA_ARGS__)
-#define LIBV_ERROR(Module, ...) ::libv::log(LIBV_POC, ::libv::Error, Module, __VA_ARGS__)
-#define LIBV_FATAL(Module, ...) ::libv::log(LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_TRACE(Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_DEBUG(Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_INFO( Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Info , Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_WARN( Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_ERROR(Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Error, Module, __VA_ARGS__)
+#define LIBV_LOG_BASE_FATAL(Module, ...) ::libv::call_log(::libv::log, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__)
 
-#define LIBV_LOG_TRACE(...) LIBV_TRACE("libv", __VA_ARGS__)
-#define LIBV_LOG_DEBUG(...) LIBV_DEBUG("libv", __VA_ARGS__)
-#define LIBV_LOG_INFO( ...) LIBV_INFO( "libv", __VA_ARGS__)
-#define LIBV_LOG_WARN( ...) LIBV_WARN( "libv", __VA_ARGS__)
-#define LIBV_LOG_ERROR(...) LIBV_ERROR("libv", __VA_ARGS__)
-#define LIBV_LOG_FATAL(...) LIBV_FATAL("libv", __VA_ARGS__)
-
-#define LIBV_LOG2_BASE_TRACE(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Trace, Module, __VA_ARGS__)
-#define LIBV_LOG2_BASE_DEBUG(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Debug, Module, __VA_ARGS__)
-#define LIBV_LOG2_BASE_INFO( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Info , Module, __VA_ARGS__)
-#define LIBV_LOG2_BASE_WARN( Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Warn , Module, __VA_ARGS__)
-#define LIBV_LOG2_BASE_ERROR(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Error, Module, __VA_ARGS__)
-#define LIBV_LOG2_BASE_FATAL(Module, ...) ::libv::log(::libv::tag_format2{}, LIBV_POC, ::libv::Fatal, Module, __VA_ARGS__)
-
-#define LIBV_LOG2_LIBV_TRACE(...) LIBV_LOG2_BASE_TRACE("libv", __VA_ARGS__)
-#define LIBV_LOG2_LIBV_DEBUG(...) LIBV_LOG2_BASE_DEBUG("libv", __VA_ARGS__)
-#define LIBV_LOG2_LIBV_INFO( ...) LIBV_LOG2_BASE_INFO( "libv", __VA_ARGS__)
-#define LIBV_LOG2_LIBV_WARN( ...) LIBV_LOG2_BASE_WARN( "libv", __VA_ARGS__)
-#define LIBV_LOG2_LIBV_ERROR(...) LIBV_LOG2_BASE_ERROR("libv", __VA_ARGS__)
-#define LIBV_LOG2_LIBV_FATAL(...) LIBV_LOG2_BASE_FATAL("libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_TRACE(...) LIBV_LOG_BASE_TRACE("libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_DEBUG(...) LIBV_LOG_BASE_DEBUG("libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_INFO( ...) LIBV_LOG_BASE_INFO( "libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_WARN( ...) LIBV_LOG_BASE_WARN( "libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_ERROR(...) LIBV_LOG_BASE_ERROR("libv", __VA_ARGS__)
+#define LIBV_LOG_LIBV_FATAL(...) LIBV_LOG_BASE_FATAL("libv", __VA_ARGS__)
 
 namespace libv {
 
@@ -72,13 +56,78 @@ constexpr Severity Warn{4};
 constexpr Severity Error{5};
 constexpr Severity Fatal{6};
 
+inline std::string toString(Severity value) {
+	switch (value) {
+	case ::libv::Trace: return "Trace";
+	case ::libv::Debug: return "Debug";
+	case ::libv::Info: return "Info ";
+	case ::libv::Warn: return "Warn ";
+	case ::libv::Error: return "Error";
+	case ::libv::Fatal: return "Fatal";
+	default: return "Undefined";
+	}
+}
+
+inline std::string toColorString(Severity value) {
+	switch (value) {
+	case ::libv::Trace: return "\u001B[37mTrace\u001B[0m";
+	case ::libv::Debug: return "\u001B[37mDebug\u001B[0m";
+	case ::libv::Info: return  "\u001B[32mInfo \u001B[0m";
+	case ::libv::Warn: return  "\u001B[33mWarn \u001B[0m";
+	case ::libv::Error: return "\u001B[31mError\u001B[0m";
+	case ::libv::Fatal: return "\u001B[35mFatal\u001B[0m";
+	default: return "Undefined";
+	}
+}
+
 // -------------------------------------------------------------------------------------------------
 
 struct tag_format2 {};
 
-// -------------------------------------------------------------------------------------------------
+template <typename Format>
+constexpr auto color_args(Format&& format) {
+	// Note: This function could be implemented in a true constexpr way is the call makes it possible, and yes I know how ugly this is.
+	std::string result;
+	const auto size = [&] {
+		if constexpr (std::is_same_v<std::decay_t<Format>, const char*>)
+			return std::strlen(format);
+		else
+			return std::size(format);
+	}();
+	result.reserve(size + 32);
 
-struct Logger;
+	size_t open = 0;
+	size_t close = 0;
+	for (size_t i = 0; i < size; ++i) {
+		if (format[i] == '{') {
+			if (i + 1 < size && format[i + 1] == '{') {
+				result += "{{";
+				++i;
+			} else {
+				result += "\u001B[36m{";
+				++open;
+			}
+		} else if (format[i] == '}') {
+			if (open == close && i + 1 < size && format[i + 1] == '}') {
+				result += "}}";
+				++i;
+			} else {
+				result += "}\u001B[0m";
+				++close;
+			}
+		} else {
+			result.push_back(format[i]);
+		}
+	}
+	if (open != close)
+		result += "\u001B[0m";
+	return result;
+}
+
+template <typename Log, typename Module, typename Format, typename... Args>
+constexpr inline void call_log(Log&& log, CodePosition poc, Severity severity, Module&& module, Format&& format, Args&&... args) {
+	log(poc, severity, std::forward<Module>(module), log.isColored() ? color_args(std::forward<Format>(format)) : std::forward<Format>(format), std::forward<Args>(args)...);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -92,68 +141,65 @@ class Logger {
 	struct Rule {
 		using MatcherFunction = bool (Rule::*)(Severity, const std::string&) const;
 	private:
-		std::string modul{""};
+		std::string module{""};
 		Severity severity = Trace;
 		bool allow;
 		MatcherFunction matcher;
 	private:
-		bool isSubModul(const std::string& submodul) const {
-			const auto isPrefix = submodul.compare(0, modul.size(), modul) == 0;
-			const auto isEqualLenght = submodul.size() == modul.size();
+		bool isSubModul(const std::string& submodule) const {
+			const auto isPrefix = submodule.compare(0, module.size(), module) == 0;
+			const auto isEqualLenght = submodule.size() == module.size();
 
 			return isPrefix && (isEqualLenght
-					|| (submodul.size() > modul.size() && submodul[modul.size()] == '.'));
+					|| (submodule.size() > module.size() && submodule[module.size()] == '.'));
 		}
 	public:
 		bool matcher_any(Severity, const std::string&) const {
 			return true;
 		}
-		bool matcher_modul(Severity, const std::string& modul) const {
-			return isSubModul(modul);
+		bool matcher_module(Severity, const std::string& module) const {
+			return isSubModul(module);
 		}
 		bool matcher_severity_equal(Severity severity, const std::string&) const {
 			return severity == this->severity;
 		}
-		bool matcher_modul_severity_equal(Severity severity, const std::string& modul) const {
-			return isSubModul(modul) && severity == this->severity;
+		bool matcher_module_severity_equal(Severity severity, const std::string& module) const {
+			return isSubModul(module) && severity == this->severity;
 		}
 		bool matcher_severity_above(Severity severity, const std::string&) const {
 			return severity > this->severity;
 		}
-		bool matcher_modul_severity_above(Severity severity, const std::string& modul) const {
-			return isSubModul(modul) && severity > this->severity;
+		bool matcher_module_severity_above(Severity severity, const std::string& module) const {
+			return isSubModul(module) && severity > this->severity;
 		}
 		bool matcher_severity_below(Severity severity, const std::string&) const {
 			return severity < this->severity;
 		}
-		bool matcher_modul_severity_below(Severity severity, const std::string& modul) const {
-			return isSubModul(modul) && severity < this->severity;
+		bool matcher_module_severity_below(Severity severity, const std::string& module) const {
+			return isSubModul(module) && severity < this->severity;
 		}
 	public:
-		MatchResult match(Severity severity, const std::string& modul) const {
-			return
-			{
-				(this->*matcher)(severity, modul), allow
-			};
+		MatchResult match(Severity severity, const std::string& module) const {
+			return {(this->*matcher)(severity, module), allow};
 		}
 	public:
-		Rule(const std::string& modul,
+		Rule(const std::string& module,
 				Severity severity,
 				bool allow,
 				MatcherFunction matcher) :
-			modul(modul), severity(severity), allow(allow), matcher(matcher) { }
+			module(module), severity(severity), allow(allow), matcher(matcher) { }
 	};
 private:
+	bool colored = true;
 	std::vector<Rule> rules;
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
-//	std::string format = "{thread} {severity} [{module}] {message}\n";
-	std::string format = "{thread} {severity} [{module}] {message} <{file}:{line}>\n";
+	std::string format = "{severity} {thread} {module}: {message} <{file}:{line}>\n";
 
 private:
-	bool notable(Severity severity, const std::string& modul) {
+	bool notable(Severity severity, const std::string& module) {
 		for (const auto& rule : rules) {
-			const auto matchResult = rule.match(severity, modul);
+			const auto matchResult = rule.match(severity, module);
 			if (matchResult.matched)
 				return matchResult.allow;
 		}
@@ -165,97 +211,88 @@ public:
 		rules.emplace_back("", Trace, true, &Rule::matcher_any);
 		return *this;
 	}
-	Logger& allow(const std::string& modul) {
-		rules.emplace_back(modul, Trace, true, &Rule::matcher_modul);
+	Logger& allow(const std::string& module) {
+		rules.emplace_back(module, Trace, true, &Rule::matcher_module);
 		return *this;
 	}
 	Logger& allow(Severity severity) {
 		rules.emplace_back("", severity, true, &Rule::matcher_severity_equal);
 		return *this;
 	}
-	Logger& allow(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, true, &Rule::matcher_modul_severity_equal);
+	Logger& allow(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_equal);
 		return *this;
 	}
 	Logger& allow_above(Severity severity) {
 		rules.emplace_back("", severity, true, &Rule::matcher_severity_above);
 		return *this;
 	}
-	Logger& allow_above(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, true, &Rule::matcher_modul_severity_above);
+	Logger& allow_above(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_above);
 		return *this;
 	}
 	Logger& allow_below(Severity severity) {
 		rules.emplace_back("", severity, true, &Rule::matcher_severity_below);
 		return *this;
 	}
-	Logger& allow_below(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, true, &Rule::matcher_modul_severity_below);
+	Logger& allow_below(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, true, &Rule::matcher_module_severity_below);
 		return *this;
 	}
 	Logger& deny() {
 		rules.emplace_back("", Trace, false, &Rule::matcher_any);
 		return *this;
 	}
-	Logger& deny(const std::string& modul) {
-		rules.emplace_back(modul, Trace, false, &Rule::matcher_modul);
+	Logger& deny(const std::string& module) {
+		rules.emplace_back(module, Trace, false, &Rule::matcher_module);
 		return *this;
 	}
 	Logger& deny(Severity severity) {
 		rules.emplace_back("", severity, false, &Rule::matcher_severity_equal);
 		return *this;
 	}
-	Logger& deny(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, false, &Rule::matcher_modul_severity_equal);
+	Logger& deny(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_equal);
 		return *this;
 	}
 	Logger& deny_above(Severity severity) {
 		rules.emplace_back("", severity, false, &Rule::matcher_severity_above);
 		return *this;
 	}
-	Logger& deny_above(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, false, &Rule::matcher_modul_severity_above);
+	Logger& deny_above(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_above);
 		return *this;
 	}
 	Logger& deny_below(Severity severity) {
 		rules.emplace_back("", severity, false, &Rule::matcher_severity_below);
 		return *this;
 	}
-	Logger& deny_below(const std::string& modul, Severity severity) {
-		rules.emplace_back(modul, severity, false, &Rule::matcher_modul_severity_below);
+	Logger& deny_below(const std::string& module, Severity severity) {
+		rules.emplace_back(module, severity, false, &Rule::matcher_module_severity_below);
 		return *this;
+	}
+
+public:
+	bool isColored() {
+		return colored;
 	}
 
 public:
 	// TODO P2: Do not inline!
 	template <typename... Args>
-	void log(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
-		if (notable(severity, modul)) {
-			const auto message = fmt::sprintf(format, std::forward<Args>(args)...);
-			const auto record = fmt::format(this->format,
-					fmt::arg("message", message),
-					fmt::arg("module", modul),
-					fmt::arg("severity", severity),
-					fmt::arg("line", poc.line),
-					fmt::arg("file", poc.file),
-					fmt::arg("func", poc.func),
-					fmt::arg("thread", get_this_thread_id())
-					//...
-					);
-			for (auto& output : outputs) {
-				*output << record << std::flush;
+	void log(CodePosition poc, Severity severity, const std::string& module, const std::string& format, Args&&... args) {
+		if (notable(severity, module)) {
+			std::string message;
+			try {
+				message = fmt::format(format, std::forward<Args>(args)...);
+			} catch (const fmt::FormatError& ex) {
+				message = fmt::format("INVALID format string \"{}\" reason \"{}\"", format, ex.what());
 			}
-		}
-	}
-	// TODO P2: Do not inline!
-	template <typename... Args>
-	void log(tag_format2, CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
-		if (notable(severity, modul)) {
-			const auto message = fmt::format(format, std::forward<Args>(args)...);
+
 			const auto record = fmt::format(this->format,
 					fmt::arg("message", message),
-					fmt::arg("module", modul),
-					fmt::arg("severity", severity),
+					fmt::arg("module", module),
+					fmt::arg("severity", colored ? toColorString(severity) : toString(severity)),
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
@@ -268,12 +305,8 @@ public:
 		}
 	}
 	template <typename... Args>
-	void operator()(CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
-		this->log(poc, severity, modul, format, std::forward<Args>(args)...);
-	}
-	template <typename... Args>
-	void operator()(tag_format2 tag, CodePosition poc, Severity severity, const std::string& modul, const std::string& format, Args&&... args) {
-		this->log(tag, poc, severity, modul, format, std::forward<Args>(args)...);
+	void operator()(CodePosition poc, Severity severity, const std::string& module, const std::string& format, Args&&... args) {
+		this->log(poc, severity, module, format, std::forward<Args>(args)...);
 	}
 	friend std::ostream& operator<<(std::ostream& os, ::libv::Logger& l);
 };
@@ -286,19 +319,8 @@ inline std::ostream& operator<<(std::ostream& os, ::libv::Logger& l) {
 
 // -------------------------------------------------------------------------------------------------
 
-extern Logger log;
+inline Logger log;
 
 // -------------------------------------------------------------------------------------------------
-inline std::string toString(Severity value) {
-	switch (value) {
-	case ::libv::Trace: return "Trace";
-	case ::libv::Debug: return "Debug";
-	case ::libv::Info: return "Info";
-	case ::libv::Warn: return "Warn";
-	case ::libv::Error: return "Error";
-	case ::libv::Fatal: return "Fatal";
-	default: return "Undef";
-	}
-}
 
 } // namespace libv

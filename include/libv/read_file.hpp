@@ -20,7 +20,7 @@ inline std::string read_file(const boost::filesystem::path& filePath) {
 	file.open(filePath.c_str(), std::ios_base::in | std::ios_base::binary);
 
 	if (!file) {
-		LIBV_LOG_ERROR("Failed to open file: [%s]", filePath.string());
+		LIBV_LOG_LIBV_ERROR("Failed to open file: {}", filePath.string());
 		return result;
 	}
 

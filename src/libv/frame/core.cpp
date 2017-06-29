@@ -149,7 +149,7 @@ CoreProxy::~CoreProxy() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdCoreCreate() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Create window for frame [%s]", title);
+	LIBV_LOG_FRAME_CORE_DEBUG("Create window for frame {}", title);
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersionMajor);
@@ -165,12 +165,12 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
-		LIBV_LOG_FRAME_CORE_INFO("Switching frame [%s] to full screen mode", title);
+		LIBV_LOG_FRAME_CORE_INFO("Switching frame {} to full screen mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 		window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), shareWindow);
 	} else if (displayMode == DISPLAY_MODE_BORDERLESS) {
-		LIBV_LOG_FRAME_CORE_INFO("Switching frame [%s] to borderless mode", title);
+		LIBV_LOG_FRAME_CORE_INFO("Switching frame {} to borderless mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 
@@ -200,7 +200,7 @@ void Frame::cmdCoreCreate() {
 }
 
 void Frame::cmdCoreRecreate() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Recreate window for frame [%s]", title);
+	LIBV_LOG_FRAME_CORE_DEBUG("Recreate window for frame {}", title);
 	assert(window && "Requires a valid window");
 
 	shareWindow = window;
@@ -223,7 +223,7 @@ void Frame::cmdCoreRecreate() {
 }
 
 void Frame::cmdCoreDestroy() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Destroy window for frame [%s]", title);
+	LIBV_LOG_FRAME_CORE_DEBUG("Destroy window for frame {}", title);
 
 	if (window) {
 		unregisterEventCallbacks(window);
@@ -233,7 +233,7 @@ void Frame::cmdCoreDestroy() {
 }
 
 void Frame::cmdCoreUpdateDisplayMode() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Update display mode for frame [%s]", title);
+	LIBV_LOG_FRAME_CORE_DEBUG("Update display mode for frame {}", title);
 	LIBV_LOG_FRAME_CORE_ERROR("Not Implemented Yet"); // TODO P5: cmdCoreUpdateDisplayMode
 }
 

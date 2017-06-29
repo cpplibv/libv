@@ -23,12 +23,12 @@
 
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_LOG_GL_TRACE(...) LIBV_TRACE("libv.gl", __VA_ARGS__)
-#define LIBV_LOG_GL_DEBUG(...) LIBV_DEBUG("libv.gl", __VA_ARGS__)
-#define LIBV_LOG_GL_INFO( ...) LIBV_INFO( "libv.gl", __VA_ARGS__)
-#define LIBV_LOG_GL_WARN( ...) LIBV_WARN( "libv.gl", __VA_ARGS__)
-#define LIBV_LOG_GL_ERROR(...) LIBV_ERROR("libv.gl", __VA_ARGS__)
-#define LIBV_LOG_GL_FATAL(...) LIBV_FATAL("libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_TRACE(...) LIBV_LOG_BASE_TRACE("libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_DEBUG(...) LIBV_LOG_BASE_DEBUG("libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_INFO( ...) LIBV_LOG_BASE_INFO( "libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_WARN( ...) LIBV_LOG_BASE_WARN( "libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_ERROR(...) LIBV_LOG_BASE_ERROR("libv.gl", __VA_ARGS__)
+#define LIBV_LOG_GL_FATAL(...) LIBV_LOG_BASE_FATAL("libv.gl", __VA_ARGS__)
 
 namespace libv {
 namespace gl {
@@ -39,7 +39,7 @@ bool logOGLError(const char* func, const char* file, int line) {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
 		::libv::log(CodePosition{file, func, line}, ::libv::Error, "libv.gl",
-				"OpenGL: %s: %s", func, gluErrorString(err));
+				"OpenGL: {}: {}", func, gluErrorString(err));
 	return err != GL_NO_ERROR;
 }
 

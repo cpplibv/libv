@@ -58,7 +58,7 @@ public:
 		shaderID = glCreateShader(to_value(type));
 		LIBV_GL_DEBUG_CHECK();
 		if (shaderID == 0)
-			LIBV_LOG_GL_ERROR("Failed to create %s shader", to_string(type));
+			LIBV_LOG_GL_ERROR("Failed to create {} shader", to_string(type));
 	}
 
 	inline void destroy() {
@@ -75,7 +75,7 @@ public:
 		glCompileShader(shaderID);
 		LIBV_GL_DEBUG_CHECK();
 		if (!status())
-			LIBV_LOG_GL_ERROR("Failed to compile shader:\n%s", info());
+			LIBV_LOG_GL_ERROR("Failed to compile shader:\n{}", info());
 	}
 
 	inline void compile(const std::string& sourceStr) {

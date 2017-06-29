@@ -49,5 +49,5 @@ derived_level<0> __libv_reflection_next_index(derived_level<0>);
 		inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) const { \
 			return ::libv::meta::detail::make_member_wrapper(#NAME, NAME); }
 
-#define LIBV_REFLECTION_MEMBER_NONE() \
+#define LIBV_REFLECTION_EMPTY() \
 		static constexpr ::libv::meta::derived_level<0> __libv_reflection_next_index(::libv::meta::derived_level<0>)
