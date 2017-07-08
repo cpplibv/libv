@@ -101,7 +101,7 @@ void Frame::show() {
 		}
 		if (window) {
 			core.exec(std::bind(glfwShowWindow, window));
-					hidden = false;
+			hidden = false;
 		}
 	});
 }
@@ -111,7 +111,7 @@ void Frame::hide() {
 		LIBV_LOG_FRAME_TRACE("Hide frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwHideWindow, window));
-					hidden = true;
+			hidden = true;
 		}
 	});
 }
@@ -121,7 +121,7 @@ void Frame::restore() {
 		LIBV_LOG_FRAME_TRACE("Restore frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwRestoreWindow, window));
-					minimized = false;
+			minimized = false;
 		}
 	});
 }
@@ -131,7 +131,7 @@ void Frame::minimize() {
 		LIBV_LOG_FRAME_TRACE("Minimize frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwIconifyWindow, window));
-					minimized = true;
+			minimized = true;
 		}
 	});
 }
@@ -144,8 +144,8 @@ void Frame::setOpenGLVersion(int major, int minor) {
 		this->openGLVersionMajor = major;
 		this->openGLVersionMinor = minor;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
@@ -153,8 +153,8 @@ void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 		LIBV_LOG_FRAME_TRACE("Set frame OpenGLProfile of {} to {}", title, profile);
 		this->openGLProfile = profile;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
@@ -162,8 +162,8 @@ void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 		LIBV_LOG_FRAME_TRACE("Set frame OpenGLSamples of {} to {}", title, samples);
 		this->openGLSamples = samples;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setOpenGLRefreshRate(int rate) {
@@ -171,8 +171,8 @@ void Frame::setOpenGLRefreshRate(int rate) {
 		LIBV_LOG_FRAME_TRACE("Set frame OpenGLRefreshRate of {} to {}", title, rate);
 		this->openGLRefreshRate = rate;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
@@ -185,8 +185,8 @@ void Frame::setDecoration(bool decorated) {
 		LIBV_LOG_FRAME_TRACE("Set frame Decoration of {} to {}", title, decorated);
 		this->decorated = decorated;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setDisplayMode(const TypeDisplayMode& mode) {
@@ -194,8 +194,8 @@ void Frame::setDisplayMode(const TypeDisplayMode& mode) {
 		LIBV_LOG_FRAME_TRACE("Set frame DisplayMode of {} to {}", title, mode);
 		this->displayMode = mode;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setPosition(int x, int y) {
@@ -207,8 +207,8 @@ void Frame::setPosition(vec2i newpos) {
 		LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {}", title, newpos.x, newpos.y);
 		this->position = newpos;
 		if (window)
-				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
-		});
+			core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+	});
 }
 
 void Frame::setPosition(FramePosition pos) {
@@ -220,8 +220,8 @@ void Frame::setPosition(FramePosition pos) {
 			LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {} as center of current monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
-					core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
-			});
+				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+		});
 		break;
 	case POSITION_CENTER_PRIMARY_MONITOR:
 		context.executeAsync([this] {
@@ -230,8 +230,8 @@ void Frame::setPosition(FramePosition pos) {
 			LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {} as center of primary monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
-					core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
-			});
+				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+		});
 		break;
 	}
 }
@@ -241,8 +241,8 @@ void Frame::setResizable(bool resizable) {
 		LIBV_LOG_FRAME_TRACE("Set frame Resizable of {} to {}", title, resizable);
 		this->resizable = resizable;
 		if (window)
-				cmdFrameRecreate();
-		});
+			cmdFrameRecreate();
+	});
 }
 
 void Frame::setSize(int x, int y) {
@@ -254,8 +254,8 @@ void Frame::setSize(vec2i newsize) {
 		LIBV_LOG_FRAME_TRACE("Set frame Size of {} to {}, {}", title, newsize.x, newsize.y);
 		size = newsize;
 		if (window)
-				core.exec(std::bind(glfwSetWindowSize, window, size.x, position.y));
-		});
+			core.exec(std::bind(glfwSetWindowSize, window, size.x, position.y));
+	});
 }
 
 void Frame::setTitle(const std::string& title) {
@@ -263,9 +263,9 @@ void Frame::setTitle(const std::string& title) {
 		LIBV_LOG_FRAME_TRACE("Set frame Title of {} to {}", this->title, title);
 		this->title = title;
 		if (window)
-				core.exec([this, title] {
-					glfwSetWindowTitle(window, title.c_str());
-				});
+			core.exec([this, title] {
+				glfwSetWindowTitle(window, title.c_str());
+			});
 	});
 }
 
@@ -412,17 +412,19 @@ void Frame::loopTerminate() {
 }
 
 void Frame::contextInit() {
+	LIBV_LOG_FRAME_DEBUG("Frame context initializing");
 	onContextInitialization.fire(EventContextInitialization());
 }
 
 void Frame::contextTerminate() {
+	LIBV_LOG_FRAME_DEBUG("Frame context terminating");
 	onContextTerminate.fire(EventContextTerminate());
 }
 
 // -------------------------------------------------------------------------------------------------
 
 Frame::Frame(const std::string& title, unsigned int width, unsigned int height) :
-	context(fmt::format("Frame - {}", title)),
+	context(fmt::format("Thread of {}", title)),
 	title(title) {
 	size = vec2i(width, height);
 

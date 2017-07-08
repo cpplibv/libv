@@ -74,7 +74,7 @@ private:
 	void waitEvent() {
 		glfwWaitEvents();
 		if (!stopWait)
-			thread.executeAsync(std::bind(&Core::waitEvent, this), 150);
+			thread.executeAsync(std::bind(&Core::waitEvent, this));
 	}
 
 	void interruptWait() {
@@ -93,31 +93,31 @@ public:
 		std::lock_guard<std::mutex> lk(mutex);
 		stopWait = true;
 		interruptWait();
-		thread.executeSync(std::move(func), 50);
+		thread.executeSync(std::move(func));
 		stopWait = false;
-		thread.executeAsync(std::bind(&Core::waitEvent, this), 150);
+		thread.executeAsync(std::bind(&Core::waitEvent, this));
 	}
 
 	void execute(const std::function<void()>& func) {
 		std::lock_guard<std::mutex> lk(mutex);
 		stopWait = true;
 		interruptWait();
-		thread.executeSync(func, 50);
+		thread.executeSync(func);
 		stopWait = false;
-		thread.executeAsync(std::bind(&Core::waitEvent, this), 150);
+		thread.executeAsync(std::bind(&Core::waitEvent, this));
 	}
 
 	Core() {
 		std::lock_guard<std::mutex> lk(mutex);
-		thread.executeSync(std::bind(&Core::init, this), 0);
-		thread.executeAsync(std::bind(&Core::waitEvent, this), 150);
+		thread.executeSync(std::bind(&Core::init, this));
+		thread.executeAsync(std::bind(&Core::waitEvent, this));
 	}
 
 	~Core() {
 		std::lock_guard<std::mutex> lk(mutex);
 		stopWait = true;
 		interruptWait();
-		thread.executeSync(std::bind(&Core::term, this), 200);
+		thread.executeSync(std::bind(&Core::term, this));
 	}
 };
 
