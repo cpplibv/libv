@@ -6,7 +6,6 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 // libv
-#include <libv/read_file.hpp>
 #include <libv/serialization/archive/binary_portable_in.hpp>
 #include <libv/serialization/archive/binary_portable_out.hpp>
 #include <libv/serialization/serialization.hpp>

@@ -5,8 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/read_file.hpp>
-#include <libv/timer.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/timer.hpp>
 #include <libv/worker_thread.hpp>
 // std
 #include <atomic>
