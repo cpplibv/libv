@@ -156,6 +156,21 @@ find_package(OpenGL REQUIRED)
 
 set(GROUP_EXTERNAL_PROJECT)
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_efsw)
+ExternalProject_Add(ext_efsw
+	GIT_REPOSITORY https://github.com/mnafees/efsw.git
+	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
+	PREFIX ${PATH_EXT_SRC}/efsw
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/efsw/include
+		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/ext_efsw/include/ ${PATH_EXT}/efsw/include/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/ext_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND GROUP_EXTERNAL_PROJECT ext_utf8cpp)
 ExternalProject_Add(ext_utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
