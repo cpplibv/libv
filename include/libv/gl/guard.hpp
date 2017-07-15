@@ -8,6 +8,7 @@ namespace libv {
 namespace gl {
 
 // TODO P1: boost stack_guard trick is there: and const X& = make_guard();
+//			No longer needed stack_guard hack. just use c++17 gce
 
 template <typename Stack>
 class StackGuard {

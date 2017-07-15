@@ -278,7 +278,7 @@ public:
 	}
 
 public:
-	// TODO P2: Do not inline!
+	// TODO P2: Never inline
 	template <typename... Args>
 	void log(CodePosition poc, Severity severity, const std::string& module, const std::string& format, Args&&... args) {
 		if (notable(severity, module)) {

@@ -474,6 +474,13 @@ create_executable(
 )
 
 create_executable(
+	TARGET sandbox_libv_ecs
+	SOURCE ${PATH_SNB}/libv_ecs_main.cpp
+	LINK   -static fmt
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE ${PATH_SNB}/libv_frame_main.cpp
 	LINK   -static fmt libv_frame
@@ -553,6 +560,14 @@ create_object(
 create_executable(
 	TARGET test_libv
 	SOURCE ${PATH_TST}/libv/libv/*.cpp
+	OBJECT obj_test_runner
+	LINK   -static
+	GROUP  GROUP_UNIT_TEST
+)
+
+create_executable(
+	TARGET test_libv_ecs
+	SOURCE ${PATH_TST}/libv/ecs/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static
 	GROUP  GROUP_UNIT_TEST
