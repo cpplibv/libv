@@ -29,6 +29,10 @@ private:
 	boost::container::flat_map<EntityID, T> storage;
 
 public:
+	inline auto size() {
+		return storage.size();
+	}
+
 	inline T& operator[](EntityID id) {
 		return storage[id];
 	}

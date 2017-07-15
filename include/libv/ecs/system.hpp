@@ -69,6 +69,15 @@ public: // component -----------------------------------------------------------
 		return storage<Cs>(Cs::ID).emplace(owner, std::forward<Args>(args)...);
 	}
 
+	template <typename C>
+	C& insertComponent(EntityID owner, C&& component) {
+		const auto entityit = entities.find(owner);
+		if (entityit != entities.end())
+			entityit->components.set(C::ID);
+
+		return storage<typename C::type>(C::ID).insert(owner, std::forward<C>(component));
+	}
+
 public: // foreach ---------------------------------------------------------------------------------
 	template <typename... Cs, typename F>
 	void foreach(F&& f) {
@@ -125,6 +134,11 @@ public: // get -----------------------------------------------------------------
 public: // -----------------------------------------------------------------------------------------
 	size_t entityCount() {
 		return entities.size();
+	}
+
+	template <typename C>
+	size_t componentCount() {
+		return storage<typename C::type>(C::ID).size();
 	}
 
 	void clear() {

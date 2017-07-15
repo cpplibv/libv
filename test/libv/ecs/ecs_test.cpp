@@ -50,14 +50,26 @@ TEST_CASE("basic create and foreach on ecs", "[ecs]") {
 	CHECK(es.entityCount() == 1);
 }
 
-TEST_CASE("emplace component", "[ecs]") {
+TEST_CASE("insert or emplace component", "[ecs]") {
 	libv::ecs::System es;
 
 	const auto entity = es.create();
 
-	es.emplaceComponent<TestCompA>(entity);
-	es.emplaceComponent<TestCompB>(entity, 42);
-	es.emplaceComponent<TestCompC>(entity, 43, 44);
+	SECTION("emplace") {
+		es.emplaceComponent<TestCompA>(entity);
+		es.emplaceComponent<TestCompB>(entity, 42);
+		es.emplaceComponent<TestCompC>(entity, 43, 44);
+	}
+	SECTION("emplace move") {
+		es.emplaceComponent<TestCompA>(entity, TestCompA{});
+		es.emplaceComponent<TestCompB>(entity, TestCompB{42});
+		es.emplaceComponent<TestCompC>(entity, TestCompC{43, 44});
+	}
+	SECTION("insert") {
+		es.insertComponent(entity, TestCompA{});
+		es.insertComponent(entity, TestCompB{42});
+		es.insertComponent(entity, TestCompC{43, 44});
+	}
 
 	size_t foreach_run_count = 0;
 	es.foreach<TestCompA, TestCompB, TestCompC>([&](const auto& a, const auto& b, const auto& c) {
@@ -75,6 +87,9 @@ TEST_CASE("emplace component", "[ecs]") {
 
 	CHECK(foreach_run_count == 1);
 	CHECK(es.entityCount() == 1);
+	CHECK(es.componentCount<TestCompA>() == 1);
+	CHECK(es.componentCount<TestCompB>() == 1);
+	CHECK(es.componentCount<TestCompC>() == 1);
 }
 
 TEST_CASE("non matching foreach", "[ecs]") {
