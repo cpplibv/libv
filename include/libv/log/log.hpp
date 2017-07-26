@@ -10,6 +10,7 @@
 #include <libv/utility/utility.hpp>
 // std
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -286,7 +287,10 @@ public:
 			try {
 				message = fmt::format(format, std::forward<Args>(args)...);
 			} catch (const fmt::FormatError& ex) {
-				message = fmt::format("INVALID format string \"{}\" reason \"{}\"", format, ex.what());
+				message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", format, ex.what());
+				std::ostringstream argument_ss;
+				((argument_ss << " \"" << std::forward<Args>(args) << "\","), ...);
+				message += argument_ss.str();
 			}
 
 			const auto record = fmt::format(this->format,
@@ -297,7 +301,6 @@ public:
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
 					fmt::arg("thread", get_this_thread_id())
-					//...
 					);
 			for (auto& output : outputs) {
 				*output << record << std::flush;

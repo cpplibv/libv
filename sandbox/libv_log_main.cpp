@@ -29,6 +29,10 @@ int main(int, char **) {
 	std::string format2 = "Hello {{{:^ 30.6}}}{{{:X}}}!";
 	LIBV_LOG_LOGSANDBOX_TRACE(format2, -12.5454323, 43);
 	LIBV_LOG_LOGSANDBOX_TRACE("Bad format {", -12.5454323, 43);
+	LIBV_LOG_LOGSANDBOX_TRACE("Bad format { 2 { text text", -12.5454323, 43);
+	LIBV_LOG_LOGSANDBOX_TRACE("Bad format { 2 { text } text", 43);
+	LIBV_LOG_LOGSANDBOX_TRACE("Bad format {}");
+	LIBV_LOG_LOGSANDBOX_TRACE("Bad format {:.3f}", "x");
 
 	LIBV_LOG_LOGSANDBOX_TRACE("Hello World!");
 	LIBV_LOG_LOGSANDBOX_DEBUG("Hello World!");
