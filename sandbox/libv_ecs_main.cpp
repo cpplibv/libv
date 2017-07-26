@@ -35,15 +35,14 @@ int main(int, char**) {
 		libv::ecs::System es;
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
-			es.create<A, B, C, D>([] (auto& a, auto& b, auto& c, auto& d) {
+			es.create<A, B, C, D>([] (auto& a, auto&...) {
 				a.value = 0;
 			});
 		}
 
 		timer.reset();
 
-		size_t i = 0;
-		es.foreach<A, B, C, D>([&](auto& a, auto& b, auto& c, auto& d){
+		es.foreach<A, B, C, D>([&](auto& a, auto&...){
 			result += a.value % mod;
 		});
 
@@ -53,15 +52,15 @@ int main(int, char**) {
 		libv::ecs::System es;
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
-			es.create<A, B, C, D>([] (auto& a, auto& b, auto& c, auto& d) {
+			es.create<A, B, C, D>([] (auto& a, auto&...) {
 				a.value = 0;
 			});
 		}
 
 		timer.reset();
 
-		size_t i = 0;
 		es.foreach_children<A, B, C, D>(0, [&](auto& e, auto& a, auto&...) {
+			(void) e;
 			result += a.value % mod;
 		});
 
@@ -96,6 +95,7 @@ int main(int, char**) {
 		timer.reset();
 
 		es.foreach_children<ABCDE>(0, [&](auto& e, auto& a) {
+			(void) e;
 			result += a.value % mod;
 		});
 
