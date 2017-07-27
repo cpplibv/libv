@@ -33,14 +33,20 @@ TEST_CASE("basic create", "[ecs]") {
 	CHECK(es.entityCount() == 1);
 }
 
-TEST_CASE("basic create and foreach on ecs", "[ecs]") {
+TEST_CASE("entity creation with component", "[ecs]") {
 	libv::ecs::System es;
-
-	const auto entity = es.create<TestCompA>([](auto& a) {
-		a.value0 = 1;
-	});
-
 	uint32_t resultA = 0;
+
+	SECTION("create function") {
+		es.create<TestCompA>([](auto& a) {
+			a.value0 = 1;
+		});
+	}
+
+	SECTION("emplace component") {
+		es.create_insert(TestCompA{1});
+	}
+
 	es.foreach<TestCompA>([&](const auto& a) {
 		++resultA;
 		CHECK(a.value0 == 1);
@@ -48,6 +54,37 @@ TEST_CASE("basic create and foreach on ecs", "[ecs]") {
 
 	CHECK(resultA == 1);
 	CHECK(es.entityCount() == 1);
+	CHECK(es.componentCount<TestCompA>() == 1);
+}
+
+TEST_CASE("entity creation with components", "[ecs]") {
+	libv::ecs::System es;
+	uint32_t resultA = 0;
+	uint32_t resultB = 0;
+
+	SECTION("create function") {
+		es.create<TestCompA, TestCompB>([](auto& a, auto& b) {
+			a.value0 = 1;
+			b.value0 = 2;
+		});
+	}
+
+	SECTION("emplace component") {
+		es.create_insert(TestCompA{1}, TestCompB{2});
+	}
+
+	es.foreach<TestCompA, TestCompB>([&](const auto& a, const auto& b) {
+		++resultA;
+		++resultB;
+		CHECK(a.value0 == 1);
+		CHECK(b.value0 == 2);
+	});
+
+	CHECK(resultA == 1);
+	CHECK(resultB == 1);
+	CHECK(es.entityCount() == 1);
+	CHECK(es.componentCount<TestCompA>() == 1);
+	CHECK(es.componentCount<TestCompB>() == 1);
 }
 
 TEST_CASE("insert or emplace component", "[ecs]") {

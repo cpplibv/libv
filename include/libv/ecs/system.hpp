@@ -46,7 +46,7 @@ public: // create --------------------------------------------------------------
 
 	template <typename... Cs, typename F>
 	inline EntityID create(F&& f) {
-		return create<Cs...>(0, std::forward<F>(f));
+		return create<Cs...>(EntityID{0}, std::forward<F>(f));
 	}
 
 	template <typename... Cs>
@@ -57,6 +57,20 @@ public: // create --------------------------------------------------------------
 	template <typename... Cs>
 	inline EntityID create() {
 		return create<Cs...>([](Cs&...){});
+	}
+
+	template <typename... Cs>
+	inline EntityID create_insert(EntityID parentID, Cs&&... cs) {
+		auto id = (parentID << 32) + (++nextID & 0xFFFFFFFF);
+		entities.emplace(id, make_bitset<Cs::ID...>());
+
+		(storage<typename Cs::type>(Cs::ID).insert(id, std::forward<Cs>(cs)), ...);
+		return id;
+	}
+
+	template <typename Head, typename... Cs, typename = std::enable_if_t<!std::is_same_v<Head, EntityID>>>
+	inline EntityID create_insert(Head&& head, Cs&&... cs) {
+		return create_insert(EntityID{0}, std::forward<Head>(head), std::forward<Cs>(cs)...);
 	}
 
 public: // component -------------------------------------------------------------------------------
