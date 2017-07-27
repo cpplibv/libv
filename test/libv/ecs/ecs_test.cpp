@@ -25,7 +25,7 @@ using TestCompC = Value3<3>;
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("basic create", "[ecs]") {
+TEST_CASE("basic create", "[libv.ecs]") {
 	libv::ecs::System es;
 	CHECK(es.entityCount() == 0);
 
@@ -33,7 +33,7 @@ TEST_CASE("basic create", "[ecs]") {
 	CHECK(es.entityCount() == 1);
 }
 
-TEST_CASE("entity creation with component", "[ecs]") {
+TEST_CASE("entity creation with component", "[libv.ecs]") {
 	libv::ecs::System es;
 	uint32_t resultA = 0;
 
@@ -57,7 +57,7 @@ TEST_CASE("entity creation with component", "[ecs]") {
 	CHECK(es.componentCount<TestCompA>() == 1);
 }
 
-TEST_CASE("entity creation with components", "[ecs]") {
+TEST_CASE("entity creation with components", "[libv.ecs]") {
 	libv::ecs::System es;
 	uint32_t resultA = 0;
 	uint32_t resultB = 0;
@@ -87,7 +87,7 @@ TEST_CASE("entity creation with components", "[ecs]") {
 	CHECK(es.componentCount<TestCompB>() == 1);
 }
 
-TEST_CASE("insert or emplace component", "[ecs]") {
+TEST_CASE("insert or emplace component", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity = es.create();
@@ -129,7 +129,7 @@ TEST_CASE("insert or emplace component", "[ecs]") {
 	CHECK(es.componentCount<TestCompC>() == 1);
 }
 
-TEST_CASE("non matching foreach", "[ecs]") {
+TEST_CASE("non matching foreach", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();
@@ -149,7 +149,7 @@ TEST_CASE("non matching foreach", "[ecs]") {
 	CHECK(es.entityCount() == 2);
 }
 
-TEST_CASE("non existing component store", "[ecs]") {
+TEST_CASE("non existing component store", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();
@@ -165,7 +165,7 @@ TEST_CASE("non existing component store", "[ecs]") {
 	CHECK(es.entityCount() == 1);
 }
 
-TEST_CASE("foreach children", "[ecs]") {
+TEST_CASE("foreach children", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto parent0 = es.create();
@@ -208,7 +208,7 @@ TEST_CASE("foreach children", "[ecs]") {
 	CHECK(foreach_run_count1 == 3);
 }
 
-TEST_CASE("optional component request", "[ecs]") {
+TEST_CASE("optional component request", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();
@@ -232,7 +232,7 @@ TEST_CASE("optional component request", "[ecs]") {
 	CHECK(foreach_run_count == 2);
 }
 
-TEST_CASE("hybrid optional and basic component request", "[ecs]") {
+TEST_CASE("hybrid optional and basic component request", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	size_t expected_foreach_run_count = 0;
@@ -302,7 +302,7 @@ TEST_CASE("hybrid optional and basic component request", "[ecs]") {
 	CHECK(foreach_run_count == expected_foreach_run_count);
 }
 
-TEST_CASE("foreach component", "[ecs]") {
+TEST_CASE("foreach component", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();
@@ -341,7 +341,7 @@ TEST_CASE("foreach component", "[ecs]") {
 	CHECK(foreach_run_left == 0);
 }
 
-TEST_CASE("get simple", "[ecs]") {
+TEST_CASE("get simple", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();
@@ -356,7 +356,7 @@ TEST_CASE("get simple", "[ecs]") {
 	CHECK(foreach_run_left == 0);
 }
 
-TEST_CASE("get optional", "[ecs]") {
+TEST_CASE("get optional", "[libv.ecs]") {
 	libv::ecs::System es;
 
 	const auto entity0 = es.create();

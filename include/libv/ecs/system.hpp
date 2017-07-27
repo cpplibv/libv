@@ -63,7 +63,6 @@ public: // create --------------------------------------------------------------
 	inline EntityID create_insert(EntityID parentID, Cs&&... cs) {
 		auto id = (parentID << 32) + (++nextID & 0xFFFFFFFF);
 		entities.emplace(id, make_bitset<Cs::ID...>());
-
 		(storage<typename Cs::type>(Cs::ID).insert(id, std::forward<Cs>(cs)), ...);
 		return id;
 	}
