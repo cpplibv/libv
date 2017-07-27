@@ -67,7 +67,7 @@ public: // create --------------------------------------------------------------
 		return id;
 	}
 
-	template <typename Head, typename... Cs, typename = std::enable_if_t<!std::is_same_v<Head, EntityID>>>
+	template <typename Head, typename... Cs, typename = std::enable_if_t<!std::is_same_v<std::decay_t<Head>, EntityID>>>
 	inline EntityID create_insert(Head&& head, Cs&&... cs) {
 		return create_insert(EntityID{0}, std::forward<Head>(head), std::forward<Cs>(cs)...);
 	}

@@ -62,15 +62,34 @@ TEST_CASE("entity creation with components", "[libv.ecs]") {
 	uint32_t resultA = 0;
 	uint32_t resultB = 0;
 
-	SECTION("create function") {
-		es.create<TestCompA, TestCompB>([](auto& a, auto& b) {
-			a.value0 = 1;
-			b.value0 = 2;
-		});
-	}
+	SECTION("create as child of root") {
+		SECTION("create function") {
+			es.create<TestCompA, TestCompB>([](auto& a, auto& b) {
+				a.value0 = 1;
+				b.value0 = 2;
+			});
+		}
 
-	SECTION("emplace component") {
-		es.create_insert(TestCompA{1}, TestCompB{2});
+		SECTION("emplace component") {
+			es.create_insert(TestCompA{1}, TestCompB{2});
+		}
+
+		CHECK(es.entityCount() == 1);
+	}
+	SECTION("create as child") {
+		const auto parent = es.create();
+		SECTION("create function") {
+			es.create<TestCompA, TestCompB>(parent, [](auto& a, auto& b) {
+				a.value0 = 1;
+				b.value0 = 2;
+			});
+		}
+
+		SECTION("emplace component") {
+			es.create_insert(parent, TestCompA{1}, TestCompB{2});
+		}
+
+		CHECK(es.entityCount() == 2);
 	}
 
 	es.foreach<TestCompA, TestCompB>([&](const auto& a, const auto& b) {
@@ -82,7 +101,6 @@ TEST_CASE("entity creation with components", "[libv.ecs]") {
 
 	CHECK(resultA == 1);
 	CHECK(resultB == 1);
-	CHECK(es.entityCount() == 1);
 	CHECK(es.componentCount<TestCompA>() == 1);
 	CHECK(es.componentCount<TestCompB>() == 1);
 }
