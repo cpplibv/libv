@@ -13,24 +13,36 @@ class Timer {
 public:
 	using clock = std::chrono::steady_clock;
 private:
-	clock::time_point startTime;
-	clock::duration _lastTurn;
+	clock::time_point time_;
 public:
-	Timer() : startTime(std::chrono::steady_clock::now()) { }
-	clock::duration elapsed() {
-		return std::chrono::steady_clock::now() - startTime;
+	inline Timer() : time_(std::chrono::steady_clock::now()) { }
+
+	inline clock::duration elapsed() {
+		return std::chrono::steady_clock::now() - time_;
 	}
-	void reset() {
-		startTime = std::chrono::steady_clock::now();
+
+	inline void reset() {
+		time_ = std::chrono::steady_clock::now();
 	}
-	clock::duration lastTurn() {
-		return _lastTurn;
-	}
-	clock::duration time() {
+
+	inline clock::duration time() {
 		auto ct = std::chrono::steady_clock::now();
-		_lastTurn = ct - startTime;
-		startTime = ct;
-		return _lastTurn;
+		auto lastTurn = ct - time_;
+		time_ = ct;
+		return lastTurn;
+	}
+
+	inline decltype(auto) time_s() {
+		return std::chrono::duration_cast<std::chrono::seconds>(time());
+	}
+	inline decltype(auto) time_ms() {
+		return std::chrono::duration_cast<std::chrono::milliseconds>(time());
+	}
+	inline decltype(auto) time_us() {
+		return std::chrono::duration_cast<std::chrono::microseconds>(time());
+	}
+	inline decltype(auto) time_ns() {
+		return std::chrono::duration_cast<std::chrono::nanoseconds>(time());
 	}
 };
 

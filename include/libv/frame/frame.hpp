@@ -287,7 +287,7 @@ public:
 	std::string getTitle() const;
 	// * * *
 
-	bool isDecorated()const;
+	bool isDecorated() const;
 	bool isVisible() const;
 	// * * *
 
