@@ -89,11 +89,6 @@ public:
 	}
 
 	template <typename T>
-	inline void clear() {
-		data.clear();
-	}
-
-	template <typename T>
 	inline void push_back(const T value) {
 		const auto size = data_.size();
 
@@ -112,7 +107,7 @@ public:
 
 	template <typename T>
 	inline T& at(size_t index) {
-		return reinterpret_cast<T&>(data_[sizeof(T) * index]);
+		return *(data<T>() + index);
 	}
 };
 using RemoteMeshAttributes = boost::container::small_vector<RemoteMeshAttribute, 4>;
@@ -205,9 +200,6 @@ public:
 	}
 	inline void resize(const size_t count) {
 		ptr[ptr_index].resize<T>(count);
-	}
-	inline void clear() {
-		ptr[ptr_index].clear<T>();
 	}
 };
 
@@ -335,10 +327,6 @@ public:
 	inline void resize(const size_t count) {
 		ref.data.resize(count);
 	}
-
-	inline void clear() {
-		ref.data.clear();
-	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -385,6 +373,11 @@ public:
 	[[nodiscard]] MeshIndices index() {
 		remote->dirty = true;
 		return MeshIndices{remote->indices};
+	}
+
+	void clear() {
+		// TODO P5: Think about if replacing is the best way to clear
+		remote = std::make_shared<RemoteMesh>(remote->primitive, remote->usage);
 	}
 
 	void reserve(size_t vertex_count, size_t index_count) {

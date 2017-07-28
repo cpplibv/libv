@@ -6,6 +6,7 @@
 #include <libv/gl/gl.hpp>
 #include <libv/gl/texture.hpp>
 // pro
+#include <libv/glr/assert.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -44,6 +45,9 @@ void Texture::load(libv::gl::Image image) noexcept {
 }
 
 void Texture::image(int32_t level, int32_t offset, int32_t size, const void* data) noexcept {
+	LIBV_GLR_DEBUG_ASSERT(level < static_cast<int32_t>(remote->levels.size()));
+	LIBV_GLR_DEBUG_ASSERT(level >= 0);
+
 	const auto target = remote->data.data()
 			+ remote->levels[level].offset
 			+ offset * remote->pixelSize;
@@ -57,6 +61,9 @@ void Texture::image(int32_t level, int32_t offset, int32_t size, const void* dat
 }
 
 void Texture::image(int32_t level, libv::vec2i offset, libv::vec2i size, const void* data) noexcept {
+	LIBV_GLR_DEBUG_ASSERT(level < static_cast<int32_t>(remote->levels.size()));
+	LIBV_GLR_DEBUG_ASSERT(level >= 0);
+
 	if (offset == libv::vec2i{0, 0} && libv::vec3i(size, 1) == remote->levels[level].size) {
 		const auto target = remote->data.data() + remote->levels[level].offset;
 		std::memcpy(target, data, size.x * size.y * remote->pixelSize);
@@ -81,6 +88,9 @@ void Texture::image(int32_t level, libv::vec2i offset, libv::vec2i size, const v
 }
 
 void Texture::image(int32_t level, libv::vec3i offset, libv::vec3i size, const void* data) noexcept {
+	LIBV_GLR_DEBUG_ASSERT(level < static_cast<int32_t>(remote->levels.size()));
+	LIBV_GLR_DEBUG_ASSERT(level >= 0);
+
 	if (offset == libv::vec3i{0, 0, 0} && size == remote->levels[level].size) {
 		const auto target = remote->data.data() + remote->levels[level].offset;
 		std::memcpy(target, data, size.x * size.y * size.z * remote->pixelSize);
@@ -191,6 +201,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 				break;
 			case libv::gl::TextureTarget::CubeMap:
 				// TODO P1: libv.glr: Implement cube map image
+				LIBV_GLR_DEBUG_ASSERT(false);
 //				gl(texture).subImage(libv::gl::CubeSide::PositiveX, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
 //				gl(texture).subImage(libv::gl::CubeSide::NegativeX, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
 //				gl(texture).subImage(libv::gl::CubeSide::PositiveY, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
@@ -204,6 +215,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 				break;
 			case libv::gl::TextureTarget::CubeMapArray:
 				// TODO P1: libv.glr: Implement cube map array image
+				LIBV_GLR_DEBUG_ASSERT(false);
 				break;
 			}
 		}

@@ -8,7 +8,6 @@
 #include <libv/math/vec.hpp>
 #include <libv/utility/observer_ptr.hpp>
 // std
-#include <cstring>
 #include <memory>
 #include <optional>
 // pro
@@ -52,7 +51,7 @@ struct RemoteTexture {
 		libv::vec3i size;
 		int32_t offset;
 	};
-	boost::container::small_vector<Level, 3> levels;
+	boost::container::small_vector<Level, 1> levels;
 	libv::gl::TextureTarget target;
 	libv::gl::Format format;
 	libv::gl::DataType dataType;

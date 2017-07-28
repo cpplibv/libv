@@ -146,24 +146,125 @@
 //
 //
 // =================================================================================================
+//
+//// ext
+//#include <fmt/printf.h>
+//// std
+//#include <iostream>
+//// pro
+//#include <libv/math/vec.hpp>
+//
+//
+//int main() {
+//	float u0{0.0}; fmt::print("{:40.60}\n", u0);
+//	float u1{-0.0}; fmt::print("{:40.60}\n", u1);
+//	float u2{1.0}; fmt::print("{:40.60}\n", u2);
+//	float u3{-1.0}; fmt::print("{:40.60}\n", u3);
+//	float u4{0.11111111111111111111111111111111f}; fmt::print("{:40.60}\n", u4);
+//
+//	libv::vec3f v0{0.11111111111111111111111111111111f, 0, 0}; fmt::print("{}\n", v0);
+//
+//
+//	return 0;
+//}
+//
+// =================================================================================================
 
 // ext
 #include <fmt/printf.h>
 // std
+#include <filesystem>
 #include <iostream>
-// pro
-#include <libv/math/vec.hpp>
+#include <optional>
 
+
+//std::optional<std::filesystem::path> resolve(
+//		const std::filesystem::path& path,
+//		const std::filesystem::path& base) {
+//
+//
+//}
+
+std::optional<std::filesystem::path> resolve(const std::filesystem::path& path) {
+	const auto res_folder = std::filesystem::path("res/font");
+
+	std::error_code ec;
+//	const auto normalized = path.lexically_normal();
+
+	fmt::print("is_relative: {}, is_absolute: {}\n", path.is_relative(), path.is_absolute());
+	const auto normalized = std::filesystem::canonical(res_folder / path, ec);
+
+	if (ec) {
+		fmt::print("cannonical: {} {}\n", ec, ec.message());
+		return std::nullopt;
+	}
+
+	fmt::print("is_relative: {}, is_absolute: {}\n", normalized.is_relative(), normalized.is_absolute());
+
+//	if (normalized.empty())
+//		return std::nullopt;
+//
+//	if (normalized.is_absolute())
+//		return std::nullopt;
+//
+//	if (*normalized.begin() == "..")
+//		return std::nullopt;
+//
+//	if (*normalized.begin() == "/")
+//		return std::nullopt;
+//
+//	if (normalized.has_root_path())
+//		return std::nullopt;
+
+	fmt::print("normalized: {}\n", normalized.generic_string());
+//	return res_folder / normalized;
+
+	const auto relative = std::filesystem::relative(normalized, ec);
+
+	if (ec) {
+		fmt::print("relative:   {} {}\n", ec, ec.message());
+		return std::nullopt;
+	}
+	fmt::print("relative:   {}\n", relative.generic_string());
+
+	return relative;
+}
+
+void print(const std::filesystem::path& path) {
+	fmt::print("path:       {}\n", path.generic_string());
+//	auto x = resolve(path, "res");
+	auto x = resolve(path);
+	if (x)
+		fmt::print("resolved:   {}\n\n", x->generic_string());
+	else
+		fmt::print("false\n\n");
+}
 
 int main() {
-	float u0{0.0}; fmt::print("{:40.60}\n", u0);
-	float u1{-0.0}; fmt::print("{:40.60}\n", u1);
-	float u2{1.0}; fmt::print("{:40.60}\n", u2);
-	float u3{-1.0}; fmt::print("{:40.60}\n", u3);
-	float u4{0.11111111111111111111111111111111f}; fmt::print("{:40.60}\n", u4);
+	fmt::print("current_path: {}\n\n", std::filesystem::current_path().generic_string());
+	print("consola.ttf");
+	print("base/consola.ttf");
+	print("base/../consola.ttf");
+	print("../consola.ttf");
+	print("./consola.ttf");
+	print("../../res/font/consola.ttf");
+	print("E:\\res/font/consola.ttf");
+	print("E:\\res/../font/consola.ttf");
+	print("E:/res/font/consola.ttf");
+	print("E://res/../font/consola.ttf");
+	print("C:res/../font/consola.ttf");
+	print("//font/consola.ttf");
+	print("/c/font/consola.ttf");
+	print("c/font/consola.ttf");
 
-	libv::vec3f v0{0.11111111111111111111111111111111f, 0, 0}; fmt::print("{}\n", v0);
 
+	std::error_code ec;
+	std::filesystem::path base = "base";
+	std::filesystem::path target = "target";
+	std::filesystem::path result = base / target;
+
+	result = std::filesystem::canonical(result, ec);
+	fmt::print("[{}]\n\n", result.generic_string());
 
 	return 0;
 }

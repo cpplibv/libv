@@ -8,7 +8,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: include a header that has checkGL
 // TODO P5: find a good place for these assert functions something something assert.hpp
 // TODO P5: implement assert context
 // TODO P5: implement assert thread

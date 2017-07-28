@@ -94,7 +94,7 @@ public:
 		return value_;
 	}
 	constexpr inline explicit operator bool() const noexcept {
-		return bool{value_};
+		return value_ != 0;
 	}
 
 	constexpr inline flag_enum& set(const flag_enum f) noexcept {

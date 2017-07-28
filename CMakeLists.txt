@@ -25,8 +25,6 @@ message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-# TODO P2: Adopt GCC experimental concepts:
-#			add_compile_options(-std=c++2a -fconcepts -Dconcept="concept bool")
 # TODO P3: Use the correct OpenGL linking cmake build-in options
 # TODO P4: Think about and try to remove PATH_EXT_IDE
 # ... see in Iris CMakeLists.txt
@@ -127,7 +125,7 @@ add_compile_options(-m64)
 add_compile_options(-std=c++2a -fconcepts)
 add_definitions(-Dconcept="concept bool")
 
-#Sparing tooling from supporting requires
+# Sparing tooling from supporting requires, for now.
 add_definitions(-D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
 #wish_add_ide_definition("LIBV_REQUIRES(...)" " ")
 
@@ -437,6 +435,7 @@ wish_create_external(
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/sol/ ${PATH_EXT}/sol/include/sol/
+	LINK ext_lua
 	DEFINE SOL_USE_BOOST
 )
 
@@ -527,6 +526,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_ui STATIC
+	SOURCE src/libv/ui/*.cpp
+	LINK   libv_glr ext_freetype ext_utf8cpp
+)
+
+wish_create_library(
 	TARGET libv_parse INTERFACE
 	LINK   ext_boost
 	LINK   libv_math # Remove?
@@ -575,7 +580,7 @@ wish_create_group(GROUP_SANDBOX) # Sandboxes -----------------------------------
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range stdc++fs
 )
 
 wish_create_executable(
@@ -686,6 +691,12 @@ wish_create_executable(
 	LINK   libv_log libv_vm4imp
 )
 
+wish_create_executable(
+	TARGET sandbox_libv_ui
+	SOURCE sandbox/libv_ui_main.cpp
+	LINK   libv_log libv_ui libv_frame libv_utility
+)
+
 wish_end_group()
 
 # Tests --------------------------------------------------------------------------------------------
@@ -758,6 +769,13 @@ wish_create_executable(
 	SOURCE test/libv/utility/*.cpp
 	LINK   obj_test_runner libv_utility
 )
+
+#wish_create_executable(
+#	TARGET test_libv_ui
+#	SOURCE ${PATH_TST}/libv/ui/*.cpp
+#	OBJECT obj_test_runner
+#	LINK   libv_ui fmt libv_log
+#)
 
 wish_end_group()
 

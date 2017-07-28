@@ -14,13 +14,107 @@ libv.glr: Destroy, Remote ptr, GC
 libv.glr: Cleanup mesh API and its includes, split sources as necessary
 libv.gl: simplify the functionality, no auto create or destroy, no createData, createLink, plain structs
 libv.glr: Texture manipulation, generation
+libv.ui: Font2D
+libv.ui: String2D
+libv.ui: Font cache
+libv.ui: Revive UI with minimal set
+libv.ui: Label
+libv.ui: font loading
+libv.ui: context / gl unload que
+libv.ui: shader / program unload que
+libv.ui: vao / vbo unload que
+libv.ui: Render position and render size aka mvp matrix
+libv.ui: Rebase ui4 on top of glr
+libv.ui: Kill and leftover of ui4
+libv.ui.font: font check if bearing is calculated in the font engine
+libv.ui.font: Bearing
+libv.ui.font: Right side bearing
+libv.ui: late attach
+libv.ui: selective flag propagation
+libv.ui: Program cache
+libv.ui: shader / program loading
+libv.ui: Revive quad
+libv.ui: String2D justify also applies to the last line
+libv.ui: Revive image
+libv.ui: Solution to the ui context access problem: components should not initiate resource request? Setters should receive the resource type itself
+libv.ui: Texture cache
+libv.ui: Texture load
+libv.ui: Revive stretch
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.glr: Procedural gizmo mesh
+libv.ui: Parse color: source file and pretty API
+libv.ui: properties
+libv.ui: property inheritance / override
+libv.ui: properties for font
 
-libv.ui: Rebase ui4 on top of glr
+libv.ui: cleanup context_ui redundant codes
+libv.ui: context_ui and libv.gl:image verify that non texture2D aka targets are matching the requested target
+
+libv.glr: RemoteTexture should have its own header file
+
+libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
+libv.glr: Mesh attributes should use a single VBO
+
+libv.ui: Label text change layout invalidation (lazy?)
+
+libv.ui: Hide component internals
+libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible
+
+libv.ui: Focus
+libv.ui: Event Input
+libv.ui: Input field
+libv.ui: Button
+
+libv.ui: List or Table - Not owning container view
+libv.ui: Make a sandbox for a input->button->label->list
+
+libv.ui: scroll pane
+
+libv.ui: lua binding
+libv.ui: None of the module functions should be virtual (?)
+
+libv.ui: String2D would be nice to have both last line and non last line justify
+
+libv.meta: PLEASE rename n_times.hpp
+
+libv.ui: Can something be done about: change render position and change render size flags
+libv.ui: Can something be done about: layout pass member variables in component_base, they are a lot of memory
+libv.ui: I am sure that LastSize and LastPosition can be removed from component_base!
+
+libv.ui: layout strong and week invalidation
+
+libv.ui: font failure to load means fallback
+libv.ui: shader failure to load means fallback
+libv.ui: shader dynamic loading from file
+
+libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
+
+libv.ui: context_render: move out of module, it is not one
+
+libv.ui: constraints: a way of syncing data between the world and the ui
+libv.ui: ui <-> 3D layout linkage: planet names and additional informations are part of the ui and not the scene
+		ui therefore has to access the game state (trivial, but this code has to happen now)
+
+libv.ui.warning: warning if percent used inside a content is invalid
+
+libv.ecui: component: Passive Label - verify
+libv.ecui: component: Passive Image - verify
+libv.ecui: component: Passive TableImage - verify
+libv.ecui: component: Interactive Button
+libv.ecui: layout: Flow
+libv.ecui: layout: Float
+libv.ecui: layout: 2D <-> 3D based on game state
+libv.ecui: layout: Line - verify
+libv.ecui: layout: Default (everything overlapped max)
+libv.ecui: group: RadioButton
+libv.ecui: wrapper: Scroll
+libv.ecui: wrapper: Splitter
+libv.ecui: composite: TextField (Label, TableImage, Label, +Events)
+
+libv.ecui: state based ui, separate control and data!
+libv.ecui: ui resource local proxies
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
@@ -39,7 +133,7 @@ libv.ui: libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
 libv.ui: implement some ui stuff: btn / regions
 
 libv.ui: text
-libv.ui.font: font check if bearing is calculated in the font engine
+libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
 
 libv.glr: shadow
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);

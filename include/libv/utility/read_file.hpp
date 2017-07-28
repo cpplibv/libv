@@ -2,6 +2,8 @@
 
 #pragma once
 
+// ext
+#include <fmt/format.h>
 // libv
 #include <libv/log/log.hpp>
 // std
@@ -82,14 +84,14 @@ template <typename = void>
 	return std::move(buffer).str();
 }
 
-struct result_read_file {
-	std::string data;
-	std::error_code ec;
-};
-
 template <typename = void>
-[[nodiscard]] result_read_file read_file_ec(const std::filesystem::path& filePath) {
-	result_read_file result;
+[[nodiscard]] auto read_file_ec(const std::filesystem::path& filePath) {
+	struct Result {
+		std::string data;
+		std::error_code ec;
+	};
+
+	Result result;
 	result.data = read_file(filePath, result.ec);
 	return result;
 }

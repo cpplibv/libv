@@ -16,10 +16,6 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr char DEFAULT_FRAME_NAME[] = "";
-
-// -------------------------------------------------------------------------------------------------
-
 const Frame::TypeDisplayMode Frame::DISPLAY_MODE_WINDOWED = 0;
 const Frame::TypeDisplayMode Frame::DISPLAY_MODE_BORDERLESS = 1;
 const Frame::TypeDisplayMode Frame::DISPLAY_MODE_FULLSCREEN = 2;
@@ -432,7 +428,7 @@ Frame::Frame(const std::string& title, int32_t width, int32_t height) :
 }
 
 Frame::Frame(int32_t width, int32_t height) :
-	Frame(DEFAULT_FRAME_NAME, width, height) { }
+	Frame("", width, height) { }
 
 Frame::~Frame() {
 	closeForce();
