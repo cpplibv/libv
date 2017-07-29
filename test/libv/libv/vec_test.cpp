@@ -19,19 +19,19 @@ TEST_CASE("unionValue") {
 	CHECK(42.f == vec.x);
 	CHECK(42.f == vec.r);
 	CHECK(42.f == vec.s);
-	CHECK(42.f == vec.ptr[0]);
+	CHECK(42.f == vec.data[0]);
 	CHECK(1.f == vec.y);
 	CHECK(1.f == vec.g);
 	CHECK(1.f == vec.t);
-	CHECK(1.f == vec.ptr[1]);
+	CHECK(1.f == vec.data[1]);
 	CHECK(2.f == vec.z);
 	CHECK(2.f == vec.b);
 	CHECK(2.f == vec.p);
-	CHECK(2.f == vec.ptr[2]);
+	CHECK(2.f == vec.data[2]);
 	CHECK(3.f == vec.w);
 	CHECK(3.f == vec.a);
 	CHECK(3.f == vec.q);
-	CHECK(3.f == vec.ptr[3]);
+	CHECK(3.f == vec.data[3]);
 
 	CHECK((4 * sizeof (float)) == sizeof (vec));
 }
@@ -39,24 +39,24 @@ TEST_CASE("unionValue") {
 TEST_CASE("unionAddress") {
 	libv::vec4_t<double> vec(0, 1, 2, 3);
 
-	CHECK(&vec.x == vec.ptr);
-	CHECK(&vec.y == vec.ptr + 1);
-	CHECK(&vec.z == vec.ptr + 2);
-	CHECK(&vec.w == vec.ptr + 3);
+	CHECK(&vec.x == &vec.data[0]);
+	CHECK(&vec.y == &vec.data[0] + 1);
+	CHECK(&vec.z == &vec.data[0] + 2);
+	CHECK(&vec.w == &vec.data[0] + 3);
 
-	CHECK(&vec.x == &vec.ptr[0]);
+	CHECK(&vec.x == &vec.data[0]);
 	CHECK(&vec.x == &vec.r);
 	CHECK(&vec.x == &vec.s);
 
-	CHECK(&vec.y == &vec.ptr[1]);
+	CHECK(&vec.y == &vec.data[1]);
 	CHECK(&vec.y == &vec.g);
 	CHECK(&vec.y == &vec.t);
 
-	CHECK(&vec.z == &vec.ptr[2]);
+	CHECK(&vec.z == &vec.data[2]);
 	CHECK(&vec.z == &vec.b);
 	CHECK(&vec.z == &vec.p);
 
-	CHECK(&vec.w == &vec.ptr[3]);
+	CHECK(&vec.w == &vec.data[3]);
 	CHECK(&vec.w == &vec.a);
 	CHECK(&vec.w == &vec.q);
 
@@ -212,7 +212,7 @@ TEST_CASE("Non trivially destructible type") {
 	CHECK(v0[1] == "y");
 }
 
-TEST_CASE("Operator=") {
+TEST_CASE("operator=") {
 	libv::vec_t<2, float> v0(1.1, 2.1);
 	libv::vec_t<2, float> v1(4.1, 5.1);
 	libv::vec_t<2, int> v2(1, 2);
@@ -223,7 +223,92 @@ TEST_CASE("Operator=") {
 	CHECK(v2 == libv::vec2i(4, 5));
 }
 
-TEST_CASE("Operator*=") {
+template <typename Tag>
+struct CtorCounter {
+	inline static size_t default_ctor = 0;
+	inline static size_t copy_ctor = 0;
+	inline static size_t move_ctor = 0;
+	inline static size_t copy_assign = 0;
+	inline static size_t move_assign = 0;
+	inline static size_t dtor = 0;
+
+	inline static void reset () {
+		default_ctor = 0;
+		copy_ctor = 0;
+		move_ctor = 0;
+		copy_assign = 0;
+		move_assign = 0;
+		dtor = 0;
+	}
+
+	CtorCounter() { ++default_ctor; }
+	CtorCounter(const CtorCounter&) { ++copy_ctor; }
+	CtorCounter(CtorCounter&&) { ++move_ctor; }
+	CtorCounter& operator=(const CtorCounter&) { ++copy_assign; return *this; }
+	CtorCounter& operator=(CtorCounter&&) { ++move_assign; return *this; }
+	~CtorCounter() { ++dtor; }
+};
+
+TEST_CASE("copy / move assignment") {
+	class Tag;
+	using A = CtorCounter<Tag>;
+
+	{
+		libv::vec_t<3, A> v0{};
+		libv::vec_t<3, A> v1{};
+		auto make_prvalue = []{ return libv::vec_t<3, A>{}; }; // Guaranteed copy elision
+
+		v0 = v1;
+		v0 = std::move(v1);
+		v0 = make_prvalue();
+	}
+
+	CHECK(A::default_ctor == 9);
+	CHECK(A::copy_ctor == 0);
+	CHECK(A::move_ctor == 0);
+	CHECK(A::copy_assign == 3);
+	CHECK(A::move_assign == 6);
+	CHECK(A::dtor == 9);
+}
+
+TEST_CASE("copy / move ctor") {
+	class Tag;
+	using A = CtorCounter<Tag>;
+
+	{
+		libv::vec_t<3, A> v1{};
+		auto make_prvalue = []{ return libv::vec_t<3, A>{}; }; // Guaranteed copy elision
+
+		SECTION("=") {
+			auto r0 = v1;
+			auto r1 = std::move(v1);
+			auto r2 = make_prvalue();
+			(void) r0; (void) r1; (void) r2;
+		}
+
+		SECTION("()") {
+			auto r0(v1);
+			auto r1(std::move(v1));
+			auto r2(make_prvalue());
+		}
+
+		SECTION("{}") {
+			auto r0{v1};
+			auto r1{std::move(v1)};
+			auto r2{make_prvalue()};
+		}
+	}
+
+	CHECK(A::default_ctor == 6);
+	CHECK(A::copy_ctor == 3);
+	CHECK(A::move_ctor == 3);
+	CHECK(A::copy_assign == 0);
+	CHECK(A::move_assign == 0);
+	CHECK(A::dtor == 12);
+	A::reset();
+}
+
+TEST_CASE("operator*=") {
 	libv::vec_t<2, int> v0(1, 2);
 
 	libv::vec_t<2, int> v1(1, 1);
@@ -344,14 +429,24 @@ TEST_CASE("operator*(vec, skalar) with different types") {
 }
 
 TEST_CASE("operator+") {
-	libv::vec_t<2, int> v0(4, 8);
+	libv::vec_t<2, int> v0(+4, +8);
+	libv::vec_t<2, int> v1(-4, +8);
+	libv::vec_t<2, int> v2(-4, -8);
 
-	auto r0 = +v0;
-	auto r1 = -v0;
+	auto r00 = +v0;
+	auto r01 = -v0;
+	auto r10 = +v1;
+	auto r11 = -v1;
+	auto r20 = +v2;
+	auto r21 = -v2;
 
-	static_assert(std::is_same<libv::vec_t<2, int>, decltype(r0)>::value, "Wrong result type.");
-	static_assert(std::is_same<libv::vec_t<2, int>, decltype(r1)>::value, "Wrong result type.");
+	static_assert(std::is_same<libv::vec_t<2, int>, decltype(r00)>::value, "Wrong result type.");
+	static_assert(std::is_same<libv::vec_t<2, int>, decltype(r01)>::value, "Wrong result type.");
 
-	CHECK(r0 == libv::vec2i(4, 8));
-	CHECK(r1 == libv::vec2i(-4, -8));
+	CHECK(r00 == libv::vec2i(+4, +8));
+	CHECK(r01 == libv::vec2i(-4, -8));
+	CHECK(r10 == libv::vec2i(-4, +8));
+	CHECK(r11 == libv::vec2i(+4, -8));
+	CHECK(r20 == libv::vec2i(-4, -8));
+	CHECK(r21 == libv::vec2i(+4, +8));
 }
