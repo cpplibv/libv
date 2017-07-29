@@ -4,6 +4,7 @@
 
 // ext
 #include <boost/serialization/array.hpp>
+#include <boost/serialization/array_wrapper.hpp>
 // libv
 #include <libv/math/mat.hpp>
 #include <libv/serialization/serialization.hpp>

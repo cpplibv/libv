@@ -351,7 +351,7 @@ ExternalProject_Add(ext_assimp
 )
 
 list(APPEND GROUP_EXTERNAL_PROJECT ext_boost)
-set(Boost_Version 1.63.0)
+set(Boost_Version 1.64.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 
 set(ext_boost_bootstrap_command)
@@ -366,8 +366,8 @@ endif()
 message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
-	URL http://downloads.sourceforge.net/project/boost/boost/${Boost_Version}/boost_${Boost_Version_Underscore}.zip
-	URL_MD5 3c706b3fc749884ea5510c39474fd732
+	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
+	URL_MD5 36093e4018aecd5b0e31e80457ac5fc1
 	CONFIGURE_COMMAND ${ext_boost_bootstrap_command}
 	BUILD_COMMAND ${ext_boost_b2_command} install
 		toolset=${TOOLSET}
