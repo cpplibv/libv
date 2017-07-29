@@ -1,7 +1,6 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
 // ext
-#include <boost/filesystem.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv

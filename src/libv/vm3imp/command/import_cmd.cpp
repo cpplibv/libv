@@ -13,8 +13,10 @@
 //#include <libv/string.hpp>
 #include <libv/utility/read_file.hpp>
 // std
-#include <iostream>
+#include <experimental/filesystem>
+namespace std { namespace filesystem = experimental::filesystem; } /*FILESYSTEM_SUPPORT*/
 #include <fstream>
+#include <iostream>
 // pro
 #include <libv/vm3/importer.hpp>
 //#include <libv/vm3/log.hpp>
@@ -93,9 +95,9 @@ void CommandSaveAs::execute() {
 CommandImport::CommandImport() :
 	filePath("Input file name"),
 	verbose({"v", "-verbose"}, "Verbose mode"),
-test({"t", "-test"}, "Test mode"),
-output_file("Output file name"),
-manual_output({"o", "-output"}, "Output file name", output_file) {
+	test({"t", "-test"}, "Test mode"),
+	output_file("Output file name"),
+	manual_output({"o", "-output"}, "Output file name", output_file) {
 	registerAlias("import");
 	registerAlias("imp");
 	registerAlias("vm3imp");
@@ -113,16 +115,16 @@ void CommandImport::execute() {
 	libv::vm3::Model model;
 	libv::vm3::Importer::import(model, filePath.value());
 	{
-		boost::filesystem::path path(filePath.value());
+		std::filesystem::path path(filePath.value());
 		path.replace_extension(".vm3.xml");
-		std::ofstream ofs(path.string());
+		std::ofstream ofs(path.string() /*FILESYSTEM_SUPPORT*/);
 		boost::archive::xml_oarchive oar(ofs);
 		oar << LIBV_NVP(model);
 	}
 	{
-		boost::filesystem::path path(filePath.value());
+		std::filesystem::path path(filePath.value());
 		path.replace_extension(".vm3");
-		std::ofstream ofs(path.string(), std::ios_base::binary);
+		std::ofstream ofs(path.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::binary);
 		libv::archive::BinaryPortableOut oar(ofs);
 		oar << LIBV_NVP(model);
 	}

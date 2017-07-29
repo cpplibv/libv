@@ -1,7 +1,6 @@
 // File: vgl2_main.cpp, Created on 2016.07.30. at 09:27, Author: Vader
 
 // ext
-#include <boost/filesystem.hpp>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <libv/utility/read_file.hpp>

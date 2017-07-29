@@ -17,7 +17,7 @@ namespace serialization {
 
 template <typename Archive, size_t N, typename T>
 inline void serialize(Archive& ar, ::libv::mat_t<N, T>& var, const unsigned int) {
-	ar & LIBV_NVP_NAMED("mat", boost::serialization::make_array(libv::value_ptr(var), N * N));
+	ar & LIBV_NVP_NAMED("mat", boost::serialization::make_array(::libv::value_ptr(var), N * N));
 }
 
 // -------------------------------------------------------------------------------------------------

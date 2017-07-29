@@ -19,7 +19,7 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-
+# ... see in Iris CMakeLists.txt
 
 # Paths --------------------------------------------------------------------------------------------
 
@@ -378,9 +378,8 @@ ExternalProject_Add(ext_boost
 		--address-model=64
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
-		--with-serialization
+		--with-serialization # Removal in progress
 		--with-system
-		--with-filesystem
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	EXCLUDE_FROM_ALL 1
@@ -490,14 +489,14 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE ${PATH_SNB}/libv_gl_main.cpp
-	LINK   -static fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt glew glfw3 libv_gl stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   -static fmt glew glfw3 libv_gl boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt glew glfw3 libv_gl stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
@@ -539,14 +538,14 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_vm3
 	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
-	LINK   -static fmt libv_vm3 boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt libv_vm3 stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_vm3imp
 	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
-	LINK   -static fmt libv_vm3imp boost_system-mt-s boost_filesystem-mt-s
+	LINK   -static fmt libv_vm3imp stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 

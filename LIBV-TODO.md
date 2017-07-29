@@ -32,6 +32,7 @@ cmake: check what linking does on a lib
 	-- commit --
 
 hunt down GCC 7.0+ comments
+FILESYSTEM_SUPPORT
 -- commit --
 
 migrate from boost.serialization to cereal: http://uscilab.github.io/cereal/index.html
