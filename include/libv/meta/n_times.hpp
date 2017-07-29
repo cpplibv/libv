@@ -12,7 +12,7 @@ namespace meta {
 
 template <typename F, size_t... Indices>
 constexpr inline void n_times_helper(F&& func, std::index_sequence<Indices...>) {
-	((void) func(Indices), ...);
+	((void) func(std::integral_constant<size_t, Indices>{}), ...);
 }
 
 template <size_t N, typename F>

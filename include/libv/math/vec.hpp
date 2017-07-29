@@ -446,7 +446,11 @@ constexpr inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
 // operator<<(ostream, vec) ------------------------------------------------------------------------
 template <typename OStream, size_t N, typename T>
 constexpr inline OStream& operator<<(OStream& os, const vec_t<N, T>& vec) {
-	meta::n_times<N>([&](auto index) { os << vec.data[index] << ' '; });
+	meta::n_times<N>([&](auto index) {
+		if constexpr (decltype(index)::value != 0)
+			os << ' ';
+		os << vec.data[index];
+	});
 	return os;
 }
 
