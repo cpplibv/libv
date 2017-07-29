@@ -6,6 +6,36 @@
 #include <string>
 
 
+// -------------------------------------------------------------------------------------------------
+
+template <typename Tag>
+struct CtorCounter {
+	inline static size_t default_ctor = 0;
+	inline static size_t copy_ctor = 0;
+	inline static size_t move_ctor = 0;
+	inline static size_t copy_assign = 0;
+	inline static size_t move_assign = 0;
+	inline static size_t dtor = 0;
+
+	inline static void reset () {
+		default_ctor = 0;
+		copy_ctor = 0;
+		move_ctor = 0;
+		copy_assign = 0;
+		move_assign = 0;
+		dtor = 0;
+	}
+
+	CtorCounter() { ++default_ctor; }
+	CtorCounter(const CtorCounter&) { ++copy_ctor; }
+	CtorCounter(CtorCounter&&) { ++move_ctor; }
+	CtorCounter& operator=(const CtorCounter&) { ++copy_assign; return *this; }
+	CtorCounter& operator=(CtorCounter&&) { ++move_assign; return *this; }
+	~CtorCounter() { ++dtor; }
+};
+
+// -------------------------------------------------------------------------------------------------
+
 TEST_CASE("unionValue") {
 	libv::vec4f vec(0, 1, 2, 3);
 
@@ -223,32 +253,6 @@ TEST_CASE("operator=") {
 	CHECK(v2 == libv::vec2i(4, 5));
 }
 
-template <typename Tag>
-struct CtorCounter {
-	inline static size_t default_ctor = 0;
-	inline static size_t copy_ctor = 0;
-	inline static size_t move_ctor = 0;
-	inline static size_t copy_assign = 0;
-	inline static size_t move_assign = 0;
-	inline static size_t dtor = 0;
-
-	inline static void reset () {
-		default_ctor = 0;
-		copy_ctor = 0;
-		move_ctor = 0;
-		copy_assign = 0;
-		move_assign = 0;
-		dtor = 0;
-	}
-
-	CtorCounter() { ++default_ctor; }
-	CtorCounter(const CtorCounter&) { ++copy_ctor; }
-	CtorCounter(CtorCounter&&) { ++move_ctor; }
-	CtorCounter& operator=(const CtorCounter&) { ++copy_assign; return *this; }
-	CtorCounter& operator=(CtorCounter&&) { ++move_assign; return *this; }
-	~CtorCounter() { ++dtor; }
-};
-
 TEST_CASE("copy / move assignment") {
 	class Tag;
 	using A = CtorCounter<Tag>;
@@ -278,6 +282,73 @@ TEST_CASE("copy / move ctor") {
 	{
 		libv::vec_t<3, A> v1{};
 		auto make_prvalue = []{ return libv::vec_t<3, A>{}; }; // Guaranteed copy elision
+
+		SECTION("=") {
+			auto r0 = v1;
+			auto r1 = std::move(v1);
+			auto r2 = make_prvalue();
+			(void) r0; (void) r1; (void) r2;
+		}
+
+		SECTION("()") {
+			auto r0(v1);
+			auto r1(std::move(v1));
+			auto r2(make_prvalue());
+		}
+
+		SECTION("{}") {
+			auto r0{v1};
+			auto r1{std::move(v1)};
+			auto r2{make_prvalue()};
+		}
+	}
+
+	CHECK(A::default_ctor == 6);
+	CHECK(A::copy_ctor == 3);
+	CHECK(A::move_ctor == 3);
+	CHECK(A::copy_assign == 0);
+	CHECK(A::move_assign == 0);
+	CHECK(A::dtor == 12);
+	A::reset();
+}
+
+TEST_CASE("copy / move assignment with non trivial payload") {
+	class Tag;
+	using A = CtorCounter<Tag>;
+	struct Payload {
+		A counter;
+		std::string payload;
+	};
+
+	{
+		libv::vec_t<3, Payload> v0{};
+		libv::vec_t<3, Payload> v1{};
+		auto make_prvalue = []{ return libv::vec_t<3, Payload>{}; }; // Guaranteed copy elision
+
+		v0 = v1;
+		v0 = std::move(v1);
+		v0 = make_prvalue();
+	}
+
+	CHECK(A::default_ctor == 9);
+	CHECK(A::copy_ctor == 0);
+	CHECK(A::move_ctor == 0);
+	CHECK(A::copy_assign == 3);
+	CHECK(A::move_assign == 6);
+	CHECK(A::dtor == 9);
+}
+
+TEST_CASE("copy / move ctor with non trivial payload") {
+	class Tag;
+	using A = CtorCounter<Tag>;
+	struct Payload {
+		A counter;
+		std::string payload;
+	};
+
+	{
+		libv::vec_t<3, Payload> v1{};
+		auto make_prvalue = []{ return libv::vec_t<3, Payload>{}; }; // Guaranteed copy elision
 
 		SECTION("=") {
 			auto r0 = v1;
