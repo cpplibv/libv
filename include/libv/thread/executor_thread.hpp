@@ -12,14 +12,14 @@
 #include <thread>
 // pro
 #include <libv/log/log.hpp>
-#include <libv/semaphore.hpp>
+#include <libv/thread/semaphore.hpp>
 
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-class WorkerThread {
+class ExecutorThread {
 	std::queue<std::function<void()>> queue;
 	std::mutex queue_m;
 	std::condition_variable recieved_cv;
@@ -57,7 +57,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			LIBV_LOG_LIBV_ERROR("Exception during joining WorkerThread {}: {}", name, ex.what());
+			LIBV_LOG_LIBV_ERROR("Exception during joining ExecutorThread {}: {}", name, ex.what());
 		}
 	}
 
@@ -81,7 +81,7 @@ private:
 			try {
 				task();
 			} catch (std::exception& ex) {
-				LIBV_LOG_LIBV_ERROR("Exception occurred in {} WorkerThread: {}", name, ex.what());
+				LIBV_LOG_LIBV_ERROR("Exception occurred in {} ExecutorThread: {}", name, ex.what());
 			}
 		}
 	}
@@ -99,10 +99,10 @@ private:
 	}
 
 public:
-	WorkerThread(const std::string& name = "UNNAMED") :
-		thread(&WorkerThread::run, this),
+	ExecutorThread(const std::string& name = "UNNAMED") :
+		thread(&ExecutorThread::run, this),
 		name(name) { }
-	virtual ~WorkerThread() {
+	virtual ~ExecutorThread() {
 		stop();
 		join();
 	}

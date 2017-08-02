@@ -7,8 +7,8 @@
 // libv
 #include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
+#include <libv/thread/executor_thread.hpp>
 #include <libv/utility/utility.hpp>
-#include <libv/worker_thread.hpp>
 // std
 #include <atomic>
 #include <array>
@@ -221,7 +221,7 @@ private:
 	std::atomic<bool> forcedClose{false};
 
 private:
-	libv::WorkerThread context;
+	libv::ExecutorThread context;
 
 	GLFWwindow* window = nullptr;
 	GLFWwindow* shareWindow = nullptr;

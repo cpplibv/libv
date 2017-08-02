@@ -5,7 +5,7 @@
 // ext
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/semaphore.hpp>
+#include <libv/thread/semaphore.hpp>
 // std
 #include <atomic>
 #include <memory>
@@ -50,7 +50,7 @@ class Core {
 	// WaitEvent     150
 	// Terminate     200
 private:
-	libv::WorkerThread thread;
+	libv::ExecutorThread thread;
 	std::atomic_bool stopWait{false};
 	std::mutex mutex;
 
