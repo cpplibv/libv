@@ -32,12 +32,11 @@ struct new_t {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: rename to current_thread_id() and move to utility/thread.hpp
-inline uint64_t get_this_thread_id() {
-	static_assert(sizeof (std::thread::id) == sizeof (uint64_t), "thread::id size is not 64bit");
+// TODO P5: move to thread/number(?).hpp
+inline size_t current_thread_number() {
+	static_assert(sizeof (std::thread::id) == sizeof (size_t), "thread::id size is not matching size_t");
 	auto id = std::this_thread::get_id();
-	uint64_t* ptr = reinterpret_cast<uint64_t*>(&id);
-	return (*ptr);
+	return reinterpret_cast<size_t&>(id);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -45,13 +44,6 @@ inline uint64_t get_this_thread_id() {
 template <typename E, typename = typename std::enable_if<std::is_enum<E>::value>::type>
 constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
    return static_cast<typename std::underlying_type<E>::type>(std::forward<E>(e));
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T, typename U>
-inline bool equals(const std::weak_ptr<T>& t, const std::weak_ptr<U>& u) {
-	return !t.owner_before(u) && !u.owner_before(t);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -99,7 +91,7 @@ struct D {                                                                      
 
 #define LIBV_MAKE_HASHABLE(type, ...)                                                              \
 namespace std {                                                                                    \
-	template <> struct hash<type> {                                                                 \
+	template <> struct hash<type> {                                                                \
 		std::size_t operator()(const type &t) const {                                              \
 			std::size_t ret = 0;                                                                   \
 			hash_combine(ret, __VA_ARGS__);                                                        \

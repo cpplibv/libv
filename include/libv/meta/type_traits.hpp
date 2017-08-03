@@ -10,14 +10,6 @@ namespace libv {
 namespace meta {
 
 // -------------------------------------------------------------------------------------------------
-
-template <typename T>
-using disable_if = typename std::enable_if<!T::value>::type;
-
-template <typename T>
-using enable_if = typename std::enable_if<T::value>::type;
-
-// =================================================================================================
 // is_less_comparable
 
 template <typename L, typename R, typename = void> struct is_less_comparable : std::false_type {

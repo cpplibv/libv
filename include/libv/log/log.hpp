@@ -300,7 +300,7 @@ public:
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
-					fmt::arg("thread", get_this_thread_id())
+					fmt::arg("thread", current_thread_number())
 					);
 			for (auto& output : outputs) {
 				*output << record << std::flush;

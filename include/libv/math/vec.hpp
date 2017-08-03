@@ -16,15 +16,14 @@
 // pro
 #include <libv/meta/n_times.hpp>
 #include <libv/meta/type_traits.hpp>
-#include <libv/utility/utility.hpp>
 
 
-// TODO P5: perfect forwarding for constructors
-// TODO P5: reuse rvalues where possible ? 4 function ?? compile time ?
-// TODO P5: macro for debug asserts
-// TODO P5: make sure every function is sfiane friendly based on vec's T and it is producing a nice
-//		error message not 7 page of template monster
-// TODO PMSVC: Disable warnings for nameless struct on MSVC maybe:
+// TODO P4: vec noexcept
+// TODO P5: macro for debug asserts (mostly for div by 0)
+
+// NOTE: Use concepts to enable every operation based on underlying types
+// NOTE: Perfect forwarding is possible, seams like does not worth +600 line template
+// NOTE: MSVC: Disable warnings for nameless struct on MSVC maybe:
 //#pragma warning(push)
 //#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
 //#pragma warning(pop)
@@ -207,11 +206,14 @@ struct vec_t : vec_base_t<N, T> {
 	}
 
 	// operator[] ----------------------------------------------------------------------------------
-	constexpr inline T& operator[](size_t i) {
+	constexpr inline T& operator[](size_t i) & {
 		return this->data[i];
 	}
-	constexpr inline const T& operator[](size_t i) const {
+	constexpr inline const T& operator[](size_t i) const & {
 		return this->data[i];
+	}
+	constexpr inline T&& operator[](size_t i) && {
+		return std::move(this->data[i]);
 	}
 
 	// operator= -----------------------------------------------------------------------------------

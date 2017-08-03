@@ -4,8 +4,6 @@
 #include <libv/vm3imp/console.hpp>
 // ext
 #include <boost/algorithm/string/trim.hpp>
-// libv
-#include <libv/utf8.hpp>
 // std
 #include <iostream>
 

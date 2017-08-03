@@ -6,7 +6,7 @@
 #include <boost/algorithm/string/join.hpp> // toPrettyString
 #include <fmt/format.h> // toPrettyString
 // libv
-#include <libv/utf8.hpp>
+#include <libv/utility/utf8.hpp>
 #include <libv/math/vec.hpp>
 // std
 #include <cstring>

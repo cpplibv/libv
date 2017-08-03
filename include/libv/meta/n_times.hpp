@@ -24,7 +24,7 @@ constexpr inline void n_times(F&& func) {
 
 template <typename F, size_t... Indices>
 constexpr inline decltype(auto) call_with_n_index_helper(F&& func, std::index_sequence<Indices...>) {
-	return func(Indices...);
+	return func(std::integral_constant<size_t, Indices>{}...);
 }
 
 template <size_t N, typename F>
