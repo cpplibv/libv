@@ -140,8 +140,9 @@ public: // get -----------------------------------------------------------------
 		const auto entityit = entities.find(id);
 		const auto requiredBits = make_required_bitset<Cs...>();
 
-		if ((entityit->components & requiredBits) == requiredBits)
-			f(storage<typename Cs::type>(Cs::ID).template get<Cs>(id)...);
+		if (entityit != entities.end())
+			if ((entityit->components & requiredBits) == requiredBits)
+				f(storage<typename Cs::type>(Cs::ID).template get<Cs>(id)...);
 	}
 
 public: // -----------------------------------------------------------------------------------------

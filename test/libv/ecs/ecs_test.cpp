@@ -374,6 +374,22 @@ TEST_CASE("get simple", "[libv.ecs]") {
 	CHECK(foreach_run_left == 0);
 }
 
+TEST_CASE("get not such entity and not found", "[libv.ecs]") {
+	libv::ecs::System es;
+
+	const auto entity0 = es.create();
+
+	bool found = false;
+	es.get<TestCompA>(entity0, [&](auto&&) {
+		found = true;
+	});
+	es.get<TestCompA>(156, [&](auto&&) {
+		found = true;
+	});
+
+	CHECK(found == false);
+}
+
 TEST_CASE("get optional", "[libv.ecs]") {
 	libv::ecs::System es;
 
