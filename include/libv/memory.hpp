@@ -55,7 +55,7 @@ public:
 		return assert(ptr != nullptr), *ptr;
 	}
 	constexpr inline T* operator->() const noexcept {
-		return ptr;
+		return assert(ptr != nullptr), ptr;
 	}
 	constexpr explicit inline operator bool() const noexcept {
 		return ptr != nullptr;

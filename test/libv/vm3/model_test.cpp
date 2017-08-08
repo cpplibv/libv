@@ -68,18 +68,18 @@ TEST_CASE("modelSerializationWithArchives") {
 			libv::archive::BinaryPortableIn>(sspb);
 #endif
 
-#ifndef VM3_NO_TEXT_ARCHIVE
-	std::stringstream sst;
-	modelArchiveTester<
-			boost::archive::text_oarchive,
-			boost::archive::text_iarchive>(sst);
-#endif
-
-#ifndef VM3_NO_XML_ARCHIVE
-	std::stringstream ssx;
-	modelArchiveTester<
-			boost::archive::xml_oarchive,
-			boost::archive::xml_iarchive>(ssx);
-#endif
+//#ifndef VM3_NO_TEXT_ARCHIVE
+//	std::stringstream sst;
+//	modelArchiveTester<
+//			boost::archive::text_oarchive,
+//			boost::archive::text_iarchive>(sst);
+//#endif
+//
+//#ifndef VM3_NO_XML_ARCHIVE
+//	std::stringstream ssx;
+//	modelArchiveTester<
+//			boost::archive::xml_oarchive,
+//			boost::archive::xml_iarchive>(ssx);
+//#endif
 }
 
