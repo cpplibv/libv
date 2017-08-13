@@ -111,16 +111,20 @@ struct Example {
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxTextureSize());
 
-		glEnable(GL_DEPTH_TEST); //Depth
-		glDepthFunc(GL_LESS);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
-		glEnable(GL_BLEND); //Alpha
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-		glFrontFace(GL_CCW); //Counter clockwise polys only
+		gl.capability.blend.enable();
+		gl.depthFunction.less();
 
-		gl.polygonMode.frontAndBack(true ? libv::gl::Mode::Fill : libv::gl::Mode::Line);
+		gl.capability.depthTest.enable();
+		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
+
+		gl.capability.cullFace.enable();
+		gl.cullFace.back();
+		gl.frontFace.ccw();
+
+		gl.polygonMode(true ? libv::gl::Mode::Fill : libv::gl::Mode::Line);
 
 		Vertex dataVertex[]{
 			Vertex{libv::vec3f(-1.f, -1.f, 0.f), libv::vec4f(1.f, 0.f, 0.f, 1.f), libv::vec2f(0.f, 0.f)},
@@ -260,10 +264,6 @@ struct Example {
 
 // -------------------------------------------------------------------------------------------------
 
-void init() {
-	initGLEW();
-}
-
 int main(void) {
 	std::cout << libv::log;
 
@@ -292,7 +292,7 @@ int main(void) {
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
-	init();
+	initGLEW();
 
 	{
 		Example example;

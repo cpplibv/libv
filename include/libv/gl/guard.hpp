@@ -4,12 +4,35 @@
 
 #include <utility>
 
+
 namespace libv {
 namespace gl {
 
-// TODO P1: boost stack_guard trick is there: and const X& = make_guard();
-//			No longer needed stack_guard hack. just use c++17 gce
+// -------------------------------------------------------------------------------------------------
 
+template <typename F>
+class Guard {
+	F action;
+public:
+	Guard() = delete;
+	Guard(const Guard&) = delete;
+	Guard(Guard&&) = delete;
+	Guard& operator=(const Guard&) = delete;
+	Guard& operator=(Guard&&) = delete;
+
+	template <typename CF>
+	inline explicit Guard(CF&& func) : action(std::forward<CF>(func)) {}
+
+	inline ~Guard() {
+		action();
+	}
+};
+
+template <typename CF> Guard(CF&&) -> Guard<std::decay_t<CF>>;
+
+// -------------------------------------------------------------------------------------------------
+
+// TODO P4: Remove this old guards and use the simple Guard
 template <typename Stack>
 class StackGuard {
 	Stack& stack;

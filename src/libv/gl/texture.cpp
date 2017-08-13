@@ -13,7 +13,7 @@ namespace libv {
 namespace gl {
 namespace detail {
 
-/// Filename can be KTX, KMG or DDS files
+/// Data can be KTX, KMG or DDS files
 
 GLuint gliCreateTexture(char const* data, std::size_t size) {
 	gli::texture Texture = gli::load(data, size);

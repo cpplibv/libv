@@ -279,6 +279,14 @@ struct vec_t : vec_base_t<N, T> {
 
 	// ---------------------------------------------------------------------------------------------
 
+	constexpr inline decltype(auto) ptr() {
+		return &this->data[0];
+	}
+
+	constexpr inline decltype(auto) ptr() const {
+		return &this->data[0];
+	}
+
 	/** Return the square length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */

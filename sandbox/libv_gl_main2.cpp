@@ -3,6 +3,7 @@
 // ext
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+// libv
 #include <libv/thread/executor_thread.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
@@ -36,9 +37,9 @@ void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
 		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
 
-	LIBV_LOG_LIBV_INFO("GL Vendor: {}", static_cast<const unsigned char*>(glGetString(GL_VENDOR)));
-	LIBV_LOG_LIBV_INFO("GL Renderer: {}", static_cast<const unsigned char*>(glGetString(GL_RENDERER)));
-	LIBV_LOG_LIBV_INFO("GL Version: {}", static_cast<const unsigned char*>(glGetString(GL_VERSION)));
+	LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
+	LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
+	LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
 
 	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
 	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
@@ -49,23 +50,6 @@ void initGLEW() {
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
 	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
 
-	LIBV_GL_CHECK();
-}
-
-void initGL() {
-	glEnable(GL_DEPTH_TEST); //Depth
-	glDepthFunc(GL_LESS);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
-	glEnable(GL_BLEND); //Alpha
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glFrontFace(GL_CCW); //Counter clockwise polys only
-
-	glPolygonMode(GL_FRONT_AND_BACK, true ? GL_FILL : GL_LINE);
-	LIBV_GL_CHECK();
-}
-
-void initGLSL() {
 	LIBV_GL_CHECK();
 }
 
@@ -110,6 +94,29 @@ struct Example {
 	};
 
 	Example() {
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
+
+		gl.capability.blend.enable();
+		gl.capability.cullFace.enable();
+		gl.capability.depthTest.enable();
+		gl.depthFunction.less();
+		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
+
+//		gl.blend.source(libv::gl::BlendFunction::SourceAlpha);
+//		gl.blend.destination(libv::gl::BlendFunction::One_Minus_SourceAlpha);
+//
+//		gl.blend.source.sourceAlpha();
+//		gl.blend.destination.one_Minus_SourceAlpha();
+
+		gl.cullFace.back();
+		gl.frontFace.ccw();
+		gl.polygonMode(true ? libv::gl::Mode::Fill : libv::gl::Mode::Line);
+
 		Vertex dataVertex[]{
 			Vertex{libv::vec3f(-1.f, -1.f, +1.f), libv::vec2f(0.f, 0.f)},
 			Vertex{libv::vec3f(+1.f, -1.f, +1.f), libv::vec2f(1.f, 0.f)},
@@ -207,29 +214,27 @@ struct Example {
 
 		// Draw Sky
 		{
-			auto mStackGuard = gl.model.pushGuard();
+			auto gurad_modelStack = gl.model.pushGuard();
 			gl.model.translate(gl.eye());
 			gl.model.scale(libv::vec3f(3.f, 3.f, 3.f));
 
-			auto dCapabilityGuard = gl.disableGuard(libv::gl::Capability::DepthTest);
-			gl.frontFaceCW(); // Cheat for the sake of sandbox
+			auto guard_depth = gl.capability.depthTest.disable_guard();
+			auto guard_frontFace = gl.frontFace.cw_guard(); // Cheat for the sake of sandbox
 			programTest2.use();
 			gl.activeTexture(libv::gl::TextureChannel::sky);
-			auto sBindGuard = textureSky.bindGuard();
+			auto guard_textureBind = textureSky.bindGuard();
 			uniformTest2MVPmat = gl.mvp();
 			uniformTest2Mmat = gl.model;
 			uniformTest2EyePosW = gl.eye();
 
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
-
-			gl.frontFaceCCW(); // Cheat for the sake of sandbox
 		}
 
 		// Draw world
 		{
 			programTest1.use();
 			gl.activeTexture(libv::gl::TextureChannel::diffuse);
-			auto pBindGuard = texturePlane.bindGuard();
+			auto guard_textureBind = texturePlane.bindGuard();
 			uniformTest1MVPmat = gl.mvp();
 
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
@@ -240,12 +245,6 @@ struct Example {
 };
 
 // -------------------------------------------------------------------------------------------------
-
-void init() {
-	initGLEW();
-	initGL();
-	initGLSL();
-}
 
 int main(void) {
 	std::cout << libv::log;
@@ -275,7 +274,7 @@ int main(void) {
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
-	init();
+	initGLEW();
 
 	{
 		Example example;
@@ -305,5 +304,3 @@ int main(void) {
 
 	return 0;
 }
-
-//	std::this_thread::sleep_for(std::chrono::seconds(2));

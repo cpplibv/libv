@@ -5,6 +5,7 @@
 // ext
 #include <GL/glew.h>
 
+
 // -------------------------------------------------------------------------------------------------
 
 namespace libv {
@@ -51,6 +52,7 @@ enum class BufferTarget {
 };
 
 enum class Capability {
+	Blend = GL_BLEND,
 	CullFace = GL_CULL_FACE,
 	DepthTest = GL_DEPTH_TEST,
 	RasterizerDiscard = GL_RASTERIZER_DISCARD,
@@ -216,6 +218,28 @@ enum class TestFunction {
 	NotEqual = GL_NOTEQUAL,
 	Always = GL_ALWAYS,
 	Never = GL_NEVER,
+};
+
+enum class BlendFunction {
+	ConstantAlpha = GL_CONSTANT_ALPHA,
+	ConstantColor = GL_CONSTANT_COLOR,
+	DestinationAlpha = GL_DST_ALPHA,
+	DestinationColor = GL_DST_COLOR,
+	One = GL_ONE,
+	One_Minus_ConstantAlpha = GL_ONE_MINUS_CONSTANT_ALPHA,
+	One_Minus_ConstantColor = GL_ONE_MINUS_CONSTANT_COLOR,
+	One_Minus_DestinationAlpha = GL_ONE_MINUS_DST_ALPHA,
+	One_Minus_DestinationColor = GL_ONE_MINUS_DST_COLOR,
+	One_Minus_Source1Alpha = GL_ONE_MINUS_SRC1_ALPHA,
+	One_Minus_Source1Color = GL_ONE_MINUS_SRC1_COLOR,
+	One_Minus_SourceAlpha = GL_ONE_MINUS_SRC_ALPHA,
+	One_Minus_SourceColor = GL_ONE_MINUS_SRC_COLOR,
+	Source1Alpha = GL_SRC1_ALPHA,
+	Source1Color = GL_SRC1_COLOR,
+	SourceAlpha = GL_SRC_ALPHA,
+	SourceAlphaSaturate = GL_SRC_ALPHA_SATURATE,
+	SourceColor = GL_SRC_COLOR,
+	Zero = GL_ZERO,
 };
 
 enum class MagFilter {
@@ -447,16 +471,20 @@ enum class AttributeType {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Face {
+enum class CullFace {
 	Back = GL_BACK,
 	Front = GL_FRONT,
-	FrontAndBack = GL_FRONT_AND_BACK,
 };
 
 enum class Mode {
 	Fill = GL_FILL,
 	Line = GL_LINE,
 	Point = GL_POINT,
+};
+
+enum class FrontFace {
+	CCW = GL_CCW,
+	CW = GL_CW,
 };
 
 // -------------------------------------------------------------------------------------------------
