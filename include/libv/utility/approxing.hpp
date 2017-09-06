@@ -48,7 +48,7 @@ struct Approxing {
 	}
 
 	template <typename OS> friend OS& operator<<(OS& os, const Approxing& av) {
-		os << '~' << av.value;
+		os << av.value << "±" << av.epsilon;
 		return os;
 	}
 };
