@@ -2,32 +2,41 @@
 
 #pragma once
 
-#include <atomic>
+// std
 #include <condition_variable>
+#include <mutex>
 
 
 namespace libv {
+
+// -------------------------------------------------------------------------------------------------
 
 class Semaphore {
 	bool passed;
 	mutable std::mutex mutex;
 	mutable std::condition_variable cv;
+
 public:
-	void raise() {
-		std::lock_guard<std::mutex> lock(mutex);
+	inline void raise() {
+		std::unique_lock<std::mutex> lock(mutex);
 		passed = true;
 		cv.notify_all();
 	}
-	void reset() {
-		std::lock_guard<std::mutex> lock(mutex);
+
+	inline void reset() {
+		std::unique_lock<std::mutex> lock(mutex);
 		passed = false;
 	}
-	void wait() const {
+
+	inline void wait() const {
 		std::unique_lock<std::mutex> lock(mutex);
 		while (!passed)
 			cv.wait(lock);
 	}
-	Semaphore(bool passed = false) : passed(passed) { }
+
+	inline explicit Semaphore(bool passed = false) : passed(passed) { }
 };
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace libv
