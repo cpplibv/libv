@@ -19,6 +19,12 @@
 
 
 // TODO P4: vec noexcept
+//	example:
+//		template <size_t N, typename T, typename K>
+//		constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) LIBV_RETURNS(
+//			build_vec<N>([&](auto index) { return lhs.data[index] / rhs; }
+//		)
+//
 // TODO P5: macro for debug asserts (mostly for div by 0)
 
 // NOTE: Use concepts to enable every operation based on underlying types
