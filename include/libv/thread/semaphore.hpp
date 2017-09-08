@@ -11,8 +11,10 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: This is more like a latch. Implement a semaphore and rename this to some kind of latch.
 class Semaphore {
 	bool passed;
+	// Note: If you touch any of this logic you WILL introduce a race condition.
 	mutable std::mutex mutex;
 	mutable std::condition_variable cv;
 
