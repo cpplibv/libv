@@ -235,25 +235,16 @@ ExternalProject_Add(ext_assimp
 )
 
 list(APPEND GROUP_EXTERNAL_PROJECT ext_boost)
-set(Boost_Version 1.64.0)
+set(Boost_Version 1.65.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
-
-set(ext_boost_bootstrap_command)
-if(NOT WIN32)
-	set(ext_boost_bootstrap_command ./bootstrap.sh)
-	set(ext_boost_b2_command ./b2 --ignore-site-config)
-else()
-	set(ext_boost_bootstrap_command cmd.exe //c bootstrap.bat ${TOOLSET})
-	set(ext_boost_b2_command cmd.exe //c b2.exe)
-endif()
 
 message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
 	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
-	URL_MD5 36093e4018aecd5b0e31e80457ac5fc1
-	CONFIGURE_COMMAND ${ext_boost_bootstrap_command}
-	BUILD_COMMAND ${ext_boost_b2_command} install
+	URL_MD5 eb1e11262e0cfc6949d054f6d8d25dc6
+	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
+	BUILD_COMMAND ./b2 --ignore-site-config install
 		toolset=${TOOLSET}
 		variant=release
 		link=static
