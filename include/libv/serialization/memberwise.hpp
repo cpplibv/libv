@@ -18,14 +18,14 @@ template <typename Archive, typename T, typename = typename T::__libv_serialiazt
 inline void save(Archive& ar, const T& object, std::integral_constant<size_t, 2000> = {}) {
 	auto tuple = libv::meta::to_tuple(object);
 	ar & LIBV_NVP(tuple);
-	// TODO P2: direct serialization of tuple
+	// TODO P2: direct serialization of tuple members
 }
 
 template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_memberwise>
 inline void load(Archive& ar, T& object, std::integral_constant<size_t, 2000> = {}) {
 	libv::meta::to_tuple_type_t<T> tuple;
 	ar & LIBV_NVP(tuple);
-	// TODO P2: direct serialization of tuple
+	// TODO P2: direct serialization of tuple members
 	object = libv::meta::make_from_tuple_using_braces<T>(tuple);
 }
 

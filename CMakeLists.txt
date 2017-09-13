@@ -508,8 +508,8 @@ create_executable(
 )
 
 create_executable(
-	TARGET sandbox_libv_member
-	SOURCE ${PATH_SNB}/libv_member_main.cpp
+	TARGET sandbox_libv_reflection
+	SOURCE ${PATH_SNB}/libv_reflection_main.cpp
 	LINK   -static
 	GROUP  GROUP_SANDBOX
 )

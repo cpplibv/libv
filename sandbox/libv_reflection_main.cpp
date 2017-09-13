@@ -1,4 +1,4 @@
-// File: meta_main.cpp Author: Vader Created on 2017. június 16., 6:42
+// File: meta_main.cpp - Created on 2017.06.16. 06:42 - Author: Vader
 
 #define LIBV_USE_SERIALIZATION_CEREAL
 
@@ -63,6 +63,21 @@ struct ServerFieldSet {
 
 // -------------------------------------------------------------------------------------------------
 
+auto printRow = [] (const auto& obj) {
+	std::cout << "State  - ";
+	libv::meta::foreach_member_nrp(obj, [](const auto& name, const auto& value) {
+		std::cout << name << ":\u001B[36m" << value << "\u001B[0m ";
+	}); std::cout << '\n';
+};
+
+auto printUpdate = [] (const auto& obj) {
+	std::cout << "Update - ";
+	libv::meta::foreach_member_nrp(obj, [](const auto& name, const auto& value) {
+		 if (value)
+			 std::cout << name << ":\u001B[36m" << *value << "\u001B[0m ";
+	}); std::cout << '\n';
+};
+
 int main(int, char**) {
 //	using ServerID = uint64_t;
 //	const auto serverID = ServerID{29444};
@@ -82,35 +97,41 @@ int main(int, char**) {
 	update01.players_limit = 8;
 
 	State<ServerFieldSet> row1;
-	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nrp(update00, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printRow(row1);
+	printUpdate(update00);
+
 	row1 += update00;
-	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nrp(update01, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printRow(row1);
+	printUpdate(update01);
+
 	row1 += update01;
-	libv::meta::foreach_member_nrp(row1, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printRow(row1);
 
 	Update<ServerFieldSet> update10;
 	update00.has_password = true;
 	update10.map = "Spiral v2";
 
 	State<ServerFieldSet> row2;
-	libv::meta::foreach_member_nrp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
-	std::cout << "\n - "; libv::meta::foreach_member_nrp(update10, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+	printRow(row2);
+	printUpdate(update10);
+
 	row2 += update10;
-	libv::meta::foreach_member_nrp(row2, [](const auto& name, const auto& value) { std::cout << name << ":\u001B[36m" << value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printRow(row2);
 
 	auto diff = row2 - row1;
-	std::cout << "\n - "; libv::meta::foreach_member_nrp(diff, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printUpdate(diff);
 
 	row1 += diff;
 	auto diff2 = row2 - row1;
-	std::cout << "\n - "; libv::meta::foreach_member_nrp(diff2, [](const auto& name, const auto& value) { if (value) std::cout << name << ":\u001B[36m" << *value << "\u001B[0m "; }); std::cout << std::endl;
+
+	printUpdate(diff2);
+
 	return 0;
 }
 
 // =================================================================================================
-
-
-
-
