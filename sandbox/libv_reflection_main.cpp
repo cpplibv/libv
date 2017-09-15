@@ -3,7 +3,7 @@
 #define LIBV_USE_SERIALIZATION_CEREAL
 
 // libv
-#include <libv/meta/reflection_access.hpp>
+#include <libv/meta/reflection.hpp>
 #include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
 // std
@@ -52,12 +52,12 @@ struct ServerFieldSet {
 	Field<uint16_t> players_current{};
 	Field<uint16_t> players_limit{};
 
-	LIBV_REFLECTION_MEMBER(has_mod);
-	LIBV_REFLECTION_MEMBER(has_password);
-	LIBV_REFLECTION_MEMBER(map);
-	LIBV_REFLECTION_MEMBER(name);
-	LIBV_REFLECTION_MEMBER(players_current);
-	LIBV_REFLECTION_MEMBER(players_limit);
+	LIBV_REFLECTION_ACCESS(has_mod);
+	LIBV_REFLECTION_ACCESS(has_password);
+	LIBV_REFLECTION_ACCESS(map);
+	LIBV_REFLECTION_ACCESS(name);
+	LIBV_REFLECTION_ACCESS(players_current);
+	LIBV_REFLECTION_ACCESS(players_limit);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION
 };
 

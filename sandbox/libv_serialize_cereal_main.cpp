@@ -33,9 +33,9 @@ struct SimpleServerFieldSet {
 	std::string name{};
 	uint16_t players_current{};
 
-	LIBV_REFLECTION_MEMBER(has_mod);
-	LIBV_REFLECTION_MEMBER(name);
-	LIBV_REFLECTION_MEMBER(players_current);
+	LIBV_REFLECTION_ACCESS(has_mod);
+	LIBV_REFLECTION_ACCESS(name);
+	LIBV_REFLECTION_ACCESS(players_current);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION
 };
 
