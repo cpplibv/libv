@@ -515,6 +515,13 @@ create_executable(
 )
 
 create_executable(
+	TARGET sandbox_libv_reflection2
+	SOURCE ${PATH_SNB}/libv_reflection2_main.cpp
+	LINK   -static
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
 	LINK   -static boost_serialization-mt-s boost_system-mt-s

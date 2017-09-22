@@ -60,7 +60,7 @@ struct ServerFieldSet {
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(players_current);
 	LIBV_REFLECTION_ACCESS(players_limit);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION
+	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------
