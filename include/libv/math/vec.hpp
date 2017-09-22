@@ -25,6 +25,7 @@
 //			build_vec<N>([&](auto index) { return lhs.data[index] / rhs; }
 //		)
 //
+// TODO P5: use warning disable macros with: _Pragma("argument")
 // TODO P5: macro for debug asserts (mostly for div by 0)
 
 // NOTE: Use concepts to enable every operation based on underlying types

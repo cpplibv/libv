@@ -7,9 +7,11 @@
 #include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
 // std
+#include <iomanip>
 #include <iostream>
 #include <optional>
-#include <sstream>
+#include <string>
+#include <string_view>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -63,18 +65,32 @@ struct ServerFieldSet {
 
 // -------------------------------------------------------------------------------------------------
 
+auto printHeader = [] (const auto& obj) {
+	std::cout << "       ";
+	libv::meta::foreach_member_name(obj, [](const auto& name) {
+		std::cout << "| " << std::setw(11) << std::string_view(name).substr(0, 11) << ' ';
+	}); std::cout << '\n';
+	std::cout << "-------";
+	libv::meta::foreach_member_name(obj, [](const auto& name) {
+		(void) name;
+		std::cout << "+-------------";
+	}); std::cout << '\n';
+};
+
 auto printRow = [] (const auto& obj) {
-	std::cout << "State  - ";
-	libv::meta::foreach_member_nrp(obj, [](const auto& name, const auto& value) {
-		std::cout << name << ":\u001B[36m" << value << "\u001B[0m ";
+	std::cout << "State  ";
+	libv::meta::foreach_member_reference(obj, [](const auto& value) {
+		std::cout << "| \u001B[36m" << std::setw(11) << value << "\u001B[0m ";
 	}); std::cout << '\n';
 };
 
 auto printUpdate = [] (const auto& obj) {
-	std::cout << "Update - ";
-	libv::meta::foreach_member_nrp(obj, [](const auto& name, const auto& value) {
+	std::cout << "Update ";
+	libv::meta::foreach_member_reference(obj, [](const auto& value) {
 		 if (value)
-			 std::cout << name << ":\u001B[36m" << *value << "\u001B[0m ";
+			std::cout << "| \u001B[33m" << std::setw(11) << *value << "\u001B[0m ";
+		 else
+			std::cout << "|      ~      ";
 	}); std::cout << '\n';
 };
 
@@ -84,8 +100,11 @@ int main(int, char**) {
 //
 //	libv::meta::Table<ServerID, ServerFieldSet> table;
 
+	std::cout << std::boolalpha;
+	printHeader(State<ServerFieldSet>{});
+
 	Update<ServerFieldSet> update00;
-	update00.has_mod = false;
+	update00.has_mod = true;
 	update00.has_password = false;
 	update00.map = "Disk v1";
 	update00.name = "Liviotora";
@@ -109,6 +128,8 @@ int main(int, char**) {
 	row1 += update01;
 
 	printRow(row1);
+
+	std::cout << "\n\n"; // -----
 
 	Update<ServerFieldSet> update10;
 	update00.has_password = true;

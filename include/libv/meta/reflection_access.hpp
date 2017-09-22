@@ -23,7 +23,7 @@ struct member_wrapper {
 };
 
 template <typename T>
-constexpr inline auto make_member_wrapper(const char* name, T& reference) {
+constexpr inline auto make_member_wrapper(const char* name, T& reference) noexcept {
 	return member_wrapper<T>{name, reference};
 }
 
@@ -44,9 +44,9 @@ derived_level<0> __libv_reflection_next_index(derived_level<0>);
 #define LIBV_REFLECTION_ACCESS(NAME) \
 		static constexpr ::libv::meta::derived_level<decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value + 1> \
 			__libv_reflection_next_index(::libv::meta::derived_level<decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value + 1>); \
-		constexpr inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) { \
+		inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) noexcept { \
 			return ::libv::meta::detail::make_member_wrapper(#NAME, NAME); } \
-		constexpr inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) const { \
+		inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) const noexcept { \
 			return ::libv::meta::detail::make_member_wrapper(#NAME, NAME); }
 
 #define LIBV_REFLECTION_EMPTY() \
