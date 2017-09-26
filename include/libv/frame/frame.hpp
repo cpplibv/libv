@@ -302,8 +302,8 @@ public:
 	bool isMousePressed(Mouse key);
 	bool isMouseReleased(Mouse key);
 
-	vec2f getMousePosition();
-	vec2f getScrollPosition();
+	vec2d getMousePosition();
+	vec2d getScrollPosition();
 
 	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);

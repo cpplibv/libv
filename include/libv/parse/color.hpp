@@ -364,7 +364,7 @@ color to_color(const std::string& str) {
 			hsv_color[translate_hsv] |
 			hsva_color[translate_hsv];
 
-	color color(1, 1, 1, 1);
+	color color(1.f, 1.f, 1.f, 1.f);
 
 	phrase_parse(str.begin(), str.end(), color_rule, x3::space, color);
 

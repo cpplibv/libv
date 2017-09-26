@@ -173,7 +173,7 @@ TEST_CASE("nonMemberOperator") {
 
 	libv::vec3d vec1 = vec0 / 2;
 	libv::vec3d vec2 = 0.5 * vec0;
-	vec0 *= 0.5f;
+	vec0 *= 0.5;
 
 	CHECK(vec0 == libv::vec3d(0.75, 2.1, 1.57));
 	CHECK(libv::vec3d(0.75, 2.1, 1.57) == vec0);

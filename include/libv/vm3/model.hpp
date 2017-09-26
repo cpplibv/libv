@@ -99,7 +99,7 @@ public:
 	void addMaterial(const Material& mat) {
 		materials.emplace_back(mat);
 	}
-	virtual ~Model() { }
+	~Model() { }
 };
 } // namespace vm3
 } // namespace libv

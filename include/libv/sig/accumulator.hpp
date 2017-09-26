@@ -31,7 +31,7 @@ struct Accumulator<void> {
 };
 
 template <typename T>
-class AccumulatorLogicalAnd : public Accumulator<T> {
+class AccumulatorLogicalAnd final : public Accumulator<T> {
 public:
 	static Accumulator<T>* get() {
 		static AccumulatorLogicalAnd<T> instance;
@@ -47,7 +47,7 @@ public:
 };
 
 template <typename T>
-class AccumulatorLogicalOr : public Accumulator<T> {
+class AccumulatorLogicalOr final : public Accumulator<T> {
 public:
 	static Accumulator<T>* get() {
 		static AccumulatorLogicalOr<T> instance;

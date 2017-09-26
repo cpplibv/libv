@@ -175,10 +175,30 @@ public:
 
 using ServerID = uint64_t;
 
+struct BatchUpdate {
+	std::vector<ServerID> add;
+	std::vector<ServerID> remove;
+	std::vector<std::pair<ServerID, Update<ServerFieldSet>>> updates;
+};
+
+class Master {
+	FieldSetTable<ServerID, ServerFieldSet> servers;
+
+	std::function<void(BatchUpdate&)> send;
+};
+class Server {
+	ServerID id;
+	State<ServerFieldSet> state;
+
+	std::function<void(Update<ServerFieldSet>&)> send;
+};
+class Client {
+	FieldSetTable<ServerID, ServerFieldSet> servers;
+};
+
 
 int main(int, char**) {
 	std::cout << std::boolalpha;
-	FieldSetTable<ServerID, ServerFieldSet> table;
 
 	Update<ServerFieldSet> update00;
 	update00.has_mod = true;
@@ -192,6 +212,22 @@ int main(int, char**) {
 	update01.players_current = 6;
 	update01.players_limit = 8;
 
+
+	std::vector<Client> clients;
+	std::vector<Server> servers;
+	Master master;
+
+
+
+//	master.send = [&](auto&& updates) {
+//		for (auto& client : clients)
+//			client.receive(updates);
+//	};
+//	for (auto& server : servers) {
+//		server.send = [&](auto&& updates) {
+//			master.receive(updates);
+//		};
+//	}
 
 //	table.emplace(29444, State<ServerFieldSet>{});
 //	table.update(29444, update00);

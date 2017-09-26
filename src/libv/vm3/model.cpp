@@ -58,4 +58,4 @@ bool Model::save(std::ostream&& os) const {
 }
 
 } // namespace gl
-} // namespace vlib
+} // namespace libv

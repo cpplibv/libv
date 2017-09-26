@@ -79,7 +79,7 @@ public:
 	}
 
 	inline void compile(const std::string& sourceStr) {
-		compile(sourceStr.c_str(), sourceStr.size());
+		compile(sourceStr.c_str(), static_cast<GLint>(sourceStr.size()));
 	}
 
 	inline void createCompile(ShaderType type, const char* sourceStr, const GLint size) {
@@ -88,7 +88,7 @@ public:
 	}
 
 	inline void createCompile(ShaderType type, const std::string& sourceStr) {
-		createCompile(type, sourceStr.c_str(), sourceStr.size());
+		createCompile(type, sourceStr.c_str(), static_cast<GLint>(sourceStr.size()));
 	}
 
 public:
@@ -110,7 +110,7 @@ public:
 		create(type);
 	}
 	inline GuardedShader(ShaderType type, const char* sourceStr, const size_t size) {
-		createCompile(type, sourceStr, size);
+		createCompile(type, sourceStr, static_cast<GLint>(size));
 	}
 	inline GuardedShader(ShaderType type, const std::string& sourceStr) :
 		GuardedShader(type, sourceStr.c_str(), sourceStr.size()) { }

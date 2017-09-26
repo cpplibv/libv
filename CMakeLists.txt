@@ -59,24 +59,39 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	add_compile_options(-Wall -Wextra -Wpedantic -Wno-comment
 		-Wcast-qual
 		-Wdelete-non-virtual-dtor
+		-Wdouble-promotion
 		-Wduplicated-cond
+		-Wlogical-op
 		-Wnon-virtual-dtor
+		-Wnull-dereference
 		-Wold-style-cast
 		-Wundef
-# 		-Wuseless-cast
+
+# Enablement in progress:
+#		-Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
+# 		-Wconversion # 130+, most of it is in vec and the rest is in gl
+
+# Only enable time-to-time to check on what is going on:
 # 		-Winline
-# 		-Wsuggest-final-methods
-# 		-Wsuggest-final-types
-## 		-Wfloat-equal
-## 		-Wconversion
+# 		-Wsuggest-final-methods # in signal 50+ function
+# 		-Wsuggest-final-types # in signal 1 type
+
+# Most likely will never be used:
+# 		-Wfloat-equal # in tests 40+ false positive
 		)
 
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-		add_compile_options(-Wsuggest-override)
+		add_compile_options(
+			-Wsuggest-override
+		)
 	endif()
 
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-		add_compile_options(-Wshadow-compatible-local)
+		add_compile_options(
+			-Wduplicated-branches
+			-Wrestrict
+			-Wshadow-compatible-local
+		)
 	endif()
 
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")

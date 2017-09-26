@@ -333,24 +333,24 @@ bool Frame::isMouseReleased(Mouse key) {
 	return getMouse(key) == KeyState::released;
 }
 
-vec2f Frame::getMousePosition() {
+vec2d Frame::getMousePosition() {
 	const auto raw = mousePosition.load();
 
 	// The value stored in atomic mousePosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return vec2f(convert_from_s_24_8(x), convert_from_s_24_8(y));
+	return {convert_from_s_24_8<double>(x), convert_from_s_24_8<double>(y)};
 }
 
-vec2f Frame::getScrollPosition() {
+vec2d Frame::getScrollPosition() {
 	const auto raw = scrollPosition.load();
 
 	// The value stored in atomic wheelPosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return vec2f(convert_from_s_24_8(x), convert_from_s_24_8(y));
+	return {convert_from_s_24_8<double>(x), convert_from_s_24_8<double>(y)};
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -11,13 +11,6 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T, typename M>
-constexpr inline size_t member_offset(M T::* member) {
-	return sizeof (char[reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member))]);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename T, typename... Args>
 inline T* new_f(Args&&... args) {
 	return new T(std::forward<Args>(args)...);
@@ -32,7 +25,7 @@ struct new_t {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: move to thread/number(?).hpp
+// TODO P5: move to thread/number(?).hpp, also maybe rename to libv::thread::number() and name()
 inline size_t current_thread_number() {
 	static_assert(sizeof (std::thread::id) == sizeof (size_t), "thread::id size is not matching size_t");
 	auto id = std::this_thread::get_id();
@@ -48,6 +41,8 @@ constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
 
 // -------------------------------------------------------------------------------------------------
 
+namespace detail {
+
 inline void hash_combine(std::size_t&) { }
 
 template <typename T, typename... Rest>
@@ -55,6 +50,15 @@ inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
     std::hash<T> hasher;
     seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
     hash_combine(seed, rest...);
+}
+
+} // namespace detail
+
+template <typename... Args>
+constexpr inline size_t hash_combine(Args&&... args) {
+	size_t seed = 0;
+	detail::hash_combine(seed, std::forward<Args>(args)...);
+	return seed;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -72,7 +76,7 @@ constexpr inline size_t count_of(const T (&)[N]) {
 // Based on boost strong typedef <boost/serialization/strong_typedef.hpp>
 
 // TODO P4: constexpr
-
+// TODO P5: move to utility/strong_typedef(?).hpp
 #define LIBV_STRONG_TYPEDEF(T, D)                                                                  \
 struct D {                                                                                         \
 	T t;                                                                                           \
@@ -93,9 +97,7 @@ struct D {                                                                      
 namespace std {                                                                                    \
 	template <> struct hash<type> {                                                                \
 		std::size_t operator()(const type &t) const {                                              \
-			std::size_t ret = 0;                                                                   \
-			hash_combine(ret, __VA_ARGS__);                                                        \
-			return ret;                                                                            \
+			return ::libv::hash_combine(__VA_ARGS__);                                              \
 }};}
 
 // -------------------------------------------------------------------------------------------------

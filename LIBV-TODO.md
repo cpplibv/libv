@@ -80,6 +80,10 @@ ui: take a look at frame and component events
 ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 cpp: clarify template vs auto type deduction rules
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
+cpp.proposal: _ec - ec postfix exception free overload with error code as return value
+cpp.proposal: namespace :: {} - a way to open the global :: namespace from any other namespace
+cpp.proposal: namespace ::std {} - a way to open any namespace given absolute path from any other namespace
+cpp.proposal: implicit - keyword that would replace explicit but instead of blacklist, whitelist
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: provide exception free alternative api EVERYWHERE! hehehehehe.
 merge vsig back and create vmeta and vtmta (too many tamplate argument)

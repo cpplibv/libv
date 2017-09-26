@@ -583,21 +583,21 @@ inline void GL::activeTexture(TextureChannel channel) {
 inline void GL::drawArrays(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t vertexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
-	glDrawArrays(to_value(mode), vertexOffset, vertexCount);
+	glDrawArrays(to_value(mode), static_cast<GLint>(vertexOffset), static_cast<GLsizei>(vertexCount));
 	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }
 inline void GL::drawElements(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
-	glDrawElements(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset));
+	glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset));
 	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }
 inline void GL::drawElementsBaseVertex(const VertexArray& vao, Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) {
 	LIBV_GL_DEBUG_ASSERT(vao.id() != 0);
 	glBindVertexArray(vao);
-	glDrawElementsBaseVertex(to_value(mode), vertexCount, GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset), vertexOffset);
+	glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
 	LIBV_GL_DEBUG_CHECK();
 	glBindVertexArray(0);
 }

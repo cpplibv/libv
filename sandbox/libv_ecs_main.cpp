@@ -46,7 +46,7 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS: " << timer.time().count() / 1000.0 / 1000.0 << "ms" << std::endl;
+		std::cout << "ECS: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms" << std::endl;
 	}
 	{
 		libv::ecs::System es;
@@ -64,7 +64,7 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECScs: " << timer.time().count() / 1000.0 / 1000.0 << "ms" << std::endl;
+		std::cout << "ECScs: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms" << std::endl;
 	}
 	{
 		libv::ecs::System es;
@@ -81,7 +81,7 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS2: " << timer.time().count() / 1000.0 / 1000.0 << "ms"  << std::endl;
+		std::cout << "ECS2: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms"  << std::endl;
 	}
 	{
 		libv::ecs::System es;
@@ -99,7 +99,7 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS2ch: " << timer.time().count() / 1000.0 / 1000.0 << "ms"  << std::endl;
+		std::cout << "ECS2ch: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms"  << std::endl;
 	}
 	{
 		for (size_t i = 0; i < 2'000'000; ++i) {
@@ -114,7 +114,7 @@ int main(int, char**) {
 			result += r[i]->value % mod;
 		}
 
-		std::cout << "RAW: " << timer.time().count() / 1000.0 / 1000.0 << result << "ms"  << std::endl;
+		std::cout << "RAW: " << static_cast<float>(timer.time_us().count()) / 1000.f << result << "ms"  << std::endl;
 	}
 	{
 		for (size_t i = 0; i < 2'000'000; ++i) {
@@ -129,7 +129,7 @@ int main(int, char**) {
 			result += r2[i].value % mod;
 		}
 
-		std::cout << "loc: " << timer.time().count() / 1000.0 / 1000.0 << result << "ms"  << std::endl;
+		std::cout << "loc: " << static_cast<float>(timer.time_us().count()) / 1000.f << result << "ms"  << std::endl;
 	}
 
 	return 0;

@@ -5,7 +5,7 @@
 // ext
 #include <GL/glew.h>
 // libv
-#include <libv/utility/utility.hpp>
+#include <libv/utility/member_offset.hpp>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/log.hpp>

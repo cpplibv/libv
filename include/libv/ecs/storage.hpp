@@ -24,7 +24,7 @@ struct ComponentStorageBase {
 };
 
 template <typename T>
-struct ComponentStorage : public ComponentStorageBase {
+struct ComponentStorage final : public ComponentStorageBase {
 private:
 	boost::container::flat_map<EntityID, T> storage;
 
