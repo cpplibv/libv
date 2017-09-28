@@ -249,7 +249,7 @@ ExternalProject_Add(ext_glew
 list(APPEND GROUP_EXTERNAL_PROJECT ext_fmt)
 ExternalProject_Add(ext_fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 94d387c
+	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
 	PREFIX ${PATH_EXT_SRC}/fmt
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
