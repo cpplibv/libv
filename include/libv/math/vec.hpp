@@ -107,6 +107,8 @@ struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 
 	template <typename T0, typename T1>
 	constexpr inline vec_base_t(T0 x, T1 y) : x(x), y(y) { }
+	template <typename T0>
+	constexpr inline explicit vec_base_t(const T0& xy) : x(xy.x), y(xy.y) { }
 };
 
 template <typename T>
@@ -132,6 +134,8 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t(T0 x, const vec_base_t<2, T1>& yz) : x(x), y(yz.x), z(yz.y) { }
 	template <typename T0, typename T1>
 	constexpr inline vec_base_t(const vec_base_t<2, T0>& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
+	template <typename T0>
+	constexpr inline explicit vec_base_t(const T0& xyz) : x(xyz.x), y(xyz.y), z(xyz.z) { }
 };
 
 template <typename T>
@@ -166,6 +170,8 @@ struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t(const vec_base_t<3, T0>& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
 	template <typename T0, typename T1>
 	constexpr inline vec_base_t(T0 x, const vec_base_t<3, T1>& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
+	template <typename T0>
+	constexpr inline explicit vec_base_t(const T0& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z), w(xyzw.w) { }
 };
 
 #pragma GCC diagnostic pop
@@ -598,6 +604,31 @@ constexpr inline bool approx(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs, L&&
 		result = result && std::abs(lhs.data[index] - rhs.data[index]) < epsilon;
 	});
 	return result;
+}
+
+template <typename T>
+constexpr inline decltype(auto) from_rgba(const T& v) {
+	return vec_t<4, decltype(v.r)>{v.r, v.g, v.b, v.a};
+}
+template <typename T>
+constexpr inline decltype(auto) from_rgb(const T& v) {
+	return vec_t<3, decltype(v.r)>{v.r, v.g, v.b};
+}
+template <typename T>
+constexpr inline decltype(auto) from_rg(const T& v) {
+	return vec_t<2, decltype(v.r)>{v.r, v.g};
+}
+template <typename T>
+constexpr inline decltype(auto) from_xyzw(const T& v) {
+	return vec_t<4, decltype(v.x)>{v.x, v.y, v.z, v.w};
+}
+template <typename T>
+constexpr inline decltype(auto) from_xyz(const T& v) {
+	return vec_t<3, decltype(v.x)>{v.x, v.y, v.z};
+}
+template <typename T>
+constexpr inline decltype(auto) from_xy(const T& v) {
+	return vec_t<2, decltype(v.x)>{v.x, v.y};
 }
 
 } // namespace vec ---------------------------------------------------------------------------------
