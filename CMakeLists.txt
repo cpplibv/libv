@@ -135,10 +135,14 @@ add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
 # Definitions --------------------------------------------------------------------------------------
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-	add_definitions(-O0)
+	add_definitions(-Og)
 	add_definitions(-ggdb3)
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	add_definitions(-Ofast)
+#	add_definitions(-flto)
+#	SET(CMAKE_AR "gcc-ar")
+#	SET(CMAKE_NM "gcc-nm")
+#	SET(CMAKE_RANLIB "gcc-ranlib")
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
 endif()
@@ -152,8 +156,8 @@ add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
 # Macro - Libv
-add_definitions(-DLIBV_USE_GLM_BRIDGE)
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
+add_definitions(-DLIBV_USE_GLM_BRIDGE)
 # Macro - Assert
 add_definitions(-DNDEBUG)
 
