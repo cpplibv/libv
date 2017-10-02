@@ -30,7 +30,7 @@ inline void save(Archive& ar, const std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	const auto index = static_cast<uint8_t>(variant.index());
-	ar & LIBV_NVP(index);
+	ar & LIBV_NVP_NAMED("type", index);
 	std::visit([&](const auto& value) {
 		ar & LIBV_NVP(value);
 	}, variant);
@@ -41,7 +41,7 @@ inline void load(Archive& ar, std::variant<Types...>& variant) {
 	static_assert(sizeof...(Types) < 256, "Variant serialization only supported up to 255 type.");
 
 	uint8_t index;
-	ar & LIBV_NVP(index);
+	ar & LIBV_NVP_NAMED("type", index);
 	if (index >= sizeof...(Types))
 		throw cereal::Exception("Invalid 'index' when deserializing std::variant");
 

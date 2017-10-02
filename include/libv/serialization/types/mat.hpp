@@ -2,25 +2,23 @@
 
 #pragma once
 
-// ext
-#include <boost/serialization/array.hpp>
-#include <boost/serialization/array_wrapper.hpp>
+// hpp
+#include <libv/math/vec.hpp>
 // libv
-#include <libv/math/mat.hpp>
 #include <libv/serialization/serialization.hpp>
 
 
-namespace boost {
-namespace serialization {
+namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename Archive, size_t N, typename T>
 inline void serialize(Archive& ar, ::libv::mat_t<N, T>& var, const unsigned int) {
-	ar & LIBV_NVP_NAMED("mat", boost::serialization::make_array(::libv::value_ptr(var), N * N));
+	for (size_t i = 0; i < N * N; ++i)
+		ar(::libv::value_ptr(var)[i]);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace serialization
-} // namespace boost
+} // namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE
+

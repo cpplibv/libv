@@ -2,30 +2,13 @@
 
 #pragma once
 
+// ext
+#include <cereal/cereal.hpp>
+// pro
 #include <libv/serialization/enable.hpp>
 
 
-#ifndef LIBV_USE_SERIALIZATION_CEREAL // ===========================================================
+#define LIBV_NVP(NAME) CEREAL_NVP(NAME)
+#define LIBV_NVP_NAMED(NAME, VAR) CEREAL_NVP_(NAME, VAR)
 
-// ext
-#    include <boost/serialization/nvp.hpp>
-#    include <boost/serialization/serialization.hpp>
-
-
-#    define LIBV_NVP(NAME) ::BOOST_SERIALIZATION_NVP(NAME)
-#    define LIBV_NVP_NAMED(NAME, VAR) ::boost::serialization::make_nvp(NAME, VAR)
-
-#    define LIBV_SERIALIZATION_EXTENSION_NAMESPACE boost::serialization
-
-#else // ===========================================================================================
-
-// ext
-#    include <cereal/cereal.hpp>
-
-
-#    define LIBV_NVP(NAME) CEREAL_NVP(NAME)
-#    define LIBV_NVP_NAMED(NAME, VAR) CEREAL_NVP_(NAME, VAR)
-
-#    define LIBV_SERIALIZATION_EXTENSION_NAMESPACE cereal
-
-#endif // ==========================================================================================
+#define LIBV_SERIALIZATION_EXTENSION_NAMESPACE cereal

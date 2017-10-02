@@ -482,6 +482,13 @@ create_library(
 	GROUP  GROUP_LIBRARY
 )
 
+create_library(
+	TARGET libv_vm4imp
+	SOURCE ${PATH_SRC}/libv/vm4imp/*.cpp
+	LINK   -static fmt assimp zlibstatic
+	GROUP  GROUP_LIBRARY
+)
+
 # Sandboxes ----------------------------------------------------------------------------------------
 
 create_executable(
@@ -572,6 +579,13 @@ create_executable(
 	TARGET sandbox_libv_vm3imp
 	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
 	LINK   -static fmt libv_vm3imp stdc++fs
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
+	TARGET sandbox_libv_vm4imp
+	SOURCE ${PATH_SNB}/libv_vm4imp_main.cpp
+	LINK   -static fmt libv_vm4imp stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
