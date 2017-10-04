@@ -1,12 +1,11 @@
 // File: vserialize_main.cpp, Created on 2017. 04. 14. 15:09, Author: Vader
 
-// ext
-#include <cereal/types/memory.hpp>
-#include <cereal/types/vector.hpp>
 // libv
 #include <libv/serialization/archive/binary.hpp>
 #include <libv/serialization/archive/xml.hpp>
 #include <libv/serialization/serialization.hpp>
+#include <libv/serialization/types/std_memory.hpp>
+#include <libv/serialization/types/std_vector.hpp>
 // std
 #include <fstream>
 #include <iostream>
@@ -73,6 +72,7 @@ int main(int, char **) {
 		std::ofstream ofs("test_file_xml");
 		libv::archive::XMLOutput oar(ofs);
 		oar << cereal::make_nvp<libv::archive::XMLOutput>("object", object_out);
+		// TODO P1: Solve the NVP situation with cereal: replace cereal::make_nvp<Archive>("object", object_out) with something.
 	}
 	{
 		std::ifstream ifs("test_file_xml");
