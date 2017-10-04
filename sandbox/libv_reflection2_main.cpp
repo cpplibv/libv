@@ -1,7 +1,5 @@
 // File: meta_main.cpp - Created on 2017.06.16. 06:42 - Author: Vader
 
-#define LIBV_USE_SERIALIZATION_CEREAL
-
 // libv
 #include <libv/meta/reflection.hpp>
 #include <libv/serialization/reflection.hpp>

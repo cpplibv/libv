@@ -155,6 +155,7 @@ add_definitions(-DCEREAL_XML_STRING_VALUE="root")
 add_definitions(-DGLEW_STATIC)
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 add_definitions(-DGLM_FORCE_RADIANS)
+add_definitions(-DSOL_USE_BOOST)
 # Macro - Libv
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
@@ -384,6 +385,17 @@ ExternalProject_Add(ext_glm
 	EXCLUDE_FROM_ALL 1
 )
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_lua)
+ExternalProject_Add(ext_lua
+	GIT_REPOSITORY https://github.com/LuaDist/lua.git
+	GIT_TAG 5.3.2
+	PREFIX ${PATH_EXT_SRC}/lua
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/lua
+		-DBUILD_SHARED_LIBS=OFF
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND GROUP_EXTERNAL_PROJECT ext_range)
 ExternalProject_Add(ext_range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
@@ -394,6 +406,19 @@ ExternalProject_Add(ext_range
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_sol)
+ExternalProject_Add(ext_sol
+	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
+	GIT_TAG 16fc7d87ff0b9c2fc18268a420e0b058a67060a1
+	PREFIX ${PATH_EXT_SRC}/sol
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/ext_sol/sol/ ${PATH_EXT}/sol/include/sol/
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -429,7 +454,9 @@ include_directories(SYSTEM ${PATH_EXT}/glew/include)
 include_directories(SYSTEM ${PATH_EXT}/glfw/include)
 include_directories(SYSTEM ${PATH_EXT}/gli/include)
 include_directories(SYSTEM ${PATH_EXT}/glm/include)
+include_directories(SYSTEM ${PATH_EXT}/lua/include)
 include_directories(SYSTEM ${PATH_EXT}/range/include)
+include_directories(SYSTEM ${PATH_EXT}/sol/include)
 include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
@@ -439,6 +466,7 @@ link_directories(${PATH_EXT}/fmt/lib)
 link_directories(${PATH_EXT}/freetype/lib)
 link_directories(${PATH_EXT}/glew/lib)
 link_directories(${PATH_EXT}/glfw/lib)
+link_directories(${PATH_EXT}/lua/lib)
 
 # === Targets ======================================================================================
 
