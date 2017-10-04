@@ -1,5 +1,10 @@
 --- STACK ------------------------------------------------------------------------------------------
 
+look up lib: Clara
+look up Catch2
+update assimp to 4.x
+-- commit --
+
 cmake: what are interface targets
 cmake: can there be multiple definition error during linkage if definition are the same?
 cmake: check what linking does on a lib

@@ -261,8 +261,7 @@ std::optional<Model> import(const std::string& filePath) {
 		return {};
 	}
 
-	std::optional<Model> model;
-	model.emplace();
+	auto model = std::optional<Model>{std::in_place};
 
 	model->name = scene->mRootNode->mName.C_Str();
 	importMaterials(*model, scene);
