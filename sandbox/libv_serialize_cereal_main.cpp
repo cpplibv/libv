@@ -9,7 +9,7 @@
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 // libv
-#include <libv/serialization/archive/cereal_binary_portable.hpp>
+#include <libv/serialization/archive/binary.hpp>
 #include <libv/serialization/reflection.hpp>
 #include <libv/serialization/memberwise.hpp>
 #include <libv/serialization/serialization.hpp>
@@ -145,8 +145,8 @@ int main() {
 		std::stringstream ss(std::ios::in | std::ios::out | std::ios::binary);
 
 		{
-			libv::archive::CerealPortableBinaryOutput oar(ss);
-			oar << cereal::make_nvp<libv::archive::CerealPortableBinaryOutput>("object", object_out);
+			libv::archive::BinaryOutput oar(ss);
+			oar << cereal::make_nvp<libv::archive::BinaryOutput>("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -154,8 +154,8 @@ int main() {
 		std::cout << std::endl;
 
 		{
-			libv::archive::CerealPortableBinaryInput iar(ss);
-			iar >> cereal::make_nvp<libv::archive::CerealPortableBinaryInput>("object", object_in);
+			libv::archive::BinaryInput iar(ss);
+			iar >> cereal::make_nvp<libv::archive::BinaryInput>("object", object_in);
 		}
 	}
 

@@ -1,10 +1,10 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
 // ext
-#include <cereal/archives/json.hpp>
 #include <fmt/format.h>
 // libv
-#include <libv/serialization/archive/cereal_binary_portable.hpp>
+#include <libv/serialization/archive/binary.hpp>
+#include <libv/serialization/archive/json.hpp>
 #include <libv/serialization/types/std_optional.hpp>
 #include <libv/utility/read_file.hpp>
 // std
@@ -28,13 +28,13 @@ int main(int, char **) {
 
 	{
 		std::ofstream ofs("model_test_file.json.vm4", std::ios::out | std::ios::binary);
-		cereal::JSONOutputArchive oar(ofs);
-		oar << cereal::make_nvp<cereal::JSONOutputArchive>("model", model);
+		libv::archive::JSONOutput oar(ofs);
+		oar << cereal::make_nvp<libv::archive::JSONOutput>("model", model);
 	}
 	{
 		std::ofstream ofs("model_test_file.vm4", std::ios::out | std::ios::binary);
-		libv::archive::CerealPortableBinaryOutput oar(ofs);
-		oar << cereal::make_nvp<libv::archive::CerealPortableBinaryOutput>("model", *model);
+		libv::archive::BinaryOutput oar(ofs);
+		oar << cereal::make_nvp<libv::archive::BinaryOutput>("model", *model);
 	}
 
 	for (const auto& material : model->materials) {

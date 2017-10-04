@@ -35,7 +35,7 @@ inline void swap_bytes(uint8_t* data) {
 
 } // namespace detail ------------------------------------------------------------------------------
 
-class CerealPortableBinaryOutput : public cereal::OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision> {
+class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
 
 private:
 	bool convertEndian;
@@ -44,13 +44,13 @@ private:
 public:
 	/// Construct, outputting to the provided stream
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
-	CerealPortableBinaryOutput(std::ostream& stream) :
-		OutputArchive<CerealPortableBinaryOutput, cereal::AllowEmptyClassElision>(this),
+	BinaryOutput(std::ostream& stream) :
+		OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision>(this),
 		convertEndian(detail::is_little_endian()),
 		os(stream) {
 	}
 
-	~CerealPortableBinaryOutput() noexcept = default;
+	~BinaryOutput() noexcept = default;
 
 	template <size_t DataSize>
 	inline void saveBinary(const void* const data, size_t size) {
@@ -70,7 +70,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-class CerealPortableBinaryInput : public cereal::InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision> {
+class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
 
 private:
 	bool convertEndian;
@@ -79,13 +79,13 @@ private:
 public:
 	/// Construct, loading from the provided stream
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
-	CerealPortableBinaryInput(std::istream& stream) :
-		InputArchive<CerealPortableBinaryInput, cereal::AllowEmptyClassElision>(this),
+	BinaryInput(std::istream& stream) :
+		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
 		convertEndian(detail::is_little_endian()),
 		is(stream) {
 	}
 
-	~CerealPortableBinaryInput() noexcept = default;
+	~BinaryInput() noexcept = default;
 
 	template <size_t DataSize>
 	inline void loadBinary(void* const data, size_t size) {
@@ -106,7 +106,7 @@ public:
 /// Saving for POD types to portable binary
 template<class T> inline
 typename std::enable_if<std::is_arithmetic<T>::value, void>::type
-CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, T const& t) {
+CEREAL_SAVE_FUNCTION_NAME(BinaryOutput& ar, T const& t) {
 	static_assert( !std::is_floating_point<T>::value ||
 			(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
 			"Portable binary only supports IEEE 754 standardized floating point");
@@ -116,7 +116,7 @@ CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, T const& t) {
 /// Loading for POD types from portable binary
 template<class T> inline
 typename std::enable_if<std::is_arithmetic<T>::value, void>::type
-CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, T& t) {
+CEREAL_LOAD_FUNCTION_NAME(BinaryInput& ar, T& t) {
 	static_assert( !std::is_floating_point<T>::value ||
 			(std::is_floating_point<T>::value && std::numeric_limits<T>::is_iec559),
 			"Portable binary only supports IEEE 754 standardized floating point");
@@ -125,21 +125,21 @@ CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, T& t) {
 
 /// Serializing NVP types to portable binary
 template <class Archive, class T> inline
-CEREAL_ARCHIVE_RESTRICT(CerealPortableBinaryInput, CerealPortableBinaryOutput)
+CEREAL_ARCHIVE_RESTRICT(BinaryInput, BinaryOutput)
 CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::NameValuePair<T>& t) {
 	ar(t.value);
 }
 
 /// Serializing SizeTags to portable binary
 template <class Archive, class T> inline
-CEREAL_ARCHIVE_RESTRICT(CerealPortableBinaryInput, CerealPortableBinaryOutput)
+CEREAL_ARCHIVE_RESTRICT(BinaryInput, BinaryOutput)
 CEREAL_SERIALIZE_FUNCTION_NAME(Archive& ar, cereal::SizeTag<T>& t) {
 	ar(t.size);
 }
 
 /// Saving binary data to portable binary
 template <class T> inline
-void CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, cereal::BinaryData<T> const& bd) {
+void CEREAL_SAVE_FUNCTION_NAME(BinaryOutput& ar, cereal::BinaryData<T> const& bd) {
 	using TT = typename std::remove_pointer<T>::type;
 	static_assert( !std::is_floating_point<TT>::value ||
 			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
@@ -150,7 +150,7 @@ void CEREAL_SAVE_FUNCTION_NAME(CerealPortableBinaryOutput& ar, cereal::BinaryDat
 
 /// Loading binary data from portable binary
 template <class T> inline
-void CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, cereal::BinaryData<T>& bd) {
+void CEREAL_LOAD_FUNCTION_NAME(BinaryInput& ar, cereal::BinaryData<T>& bd) {
 	using TT = typename std::remove_pointer<T>::type;
 	static_assert( !std::is_floating_point<TT>::value ||
 			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
@@ -165,8 +165,8 @@ void CEREAL_LOAD_FUNCTION_NAME(CerealPortableBinaryInput& ar, cereal::BinaryData
 } // namespace libv
 
 // register archives for polymorphic support
-CEREAL_REGISTER_ARCHIVE(::libv::archive::CerealPortableBinaryOutput)
-CEREAL_REGISTER_ARCHIVE(::libv::archive::CerealPortableBinaryInput)
+CEREAL_REGISTER_ARCHIVE(::libv::archive::BinaryOutput)
+CEREAL_REGISTER_ARCHIVE(::libv::archive::BinaryInput)
 
 // tie input and output archives together
-CEREAL_SETUP_ARCHIVE_TRAITS(::libv::archive::CerealPortableBinaryInput, ::libv::archive::CerealPortableBinaryOutput)
+CEREAL_SETUP_ARCHIVE_TRAITS(::libv::archive::BinaryInput, ::libv::archive::BinaryOutput)
