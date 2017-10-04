@@ -9,7 +9,7 @@ namespace libv {
 
 template <typename T, typename M>
 constexpr inline size_t member_offset(M T::* member) {
-	return sizeof (char[reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member))]);
+	return reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
 }
 
 // -------------------------------------------------------------------------------------------------
