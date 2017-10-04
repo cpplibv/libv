@@ -182,6 +182,7 @@ ExternalProject_Add(ext_efsw
 	PREFIX ${PATH_EXT_SRC}/efsw
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
+	# TODO P3: this ext_efsw install command looks off
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/efsw/include
 		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
@@ -224,6 +225,19 @@ ExternalProject_Add(ext_cereal
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
 		-DJUST_INSTALL_CEREAL=ON
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_clara)
+ExternalProject_Add(ext_clara
+	GIT_REPOSITORY https://github.com/philsquared/Clara.git
+	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
+	PREFIX ${PATH_EXT_SRC}/clara
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""  # header only, skip tests
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
 	EXCLUDE_FROM_ALL 1
 )
 
@@ -416,6 +430,7 @@ include_directories(SYSTEM ${PATH_EXT}/assimp/include)
 include_directories(SYSTEM ${PATH_EXT}/boost/include)
 include_directories(SYSTEM ${PATH_EXT}/catch/include)
 include_directories(SYSTEM ${PATH_EXT}/cereal/include)
+include_directories(SYSTEM ${PATH_EXT}/clara/include)
 include_directories(SYSTEM ${PATH_EXT}/fmt/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
