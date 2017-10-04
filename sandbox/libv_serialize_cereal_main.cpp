@@ -1,7 +1,5 @@
 // File: vserialize_main.cpp, Created on 2017. 04. 14. 15:09, Author: Vader
 
-#define LIBV_USE_SERIALIZATION_CEREAL
-
 // ext
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>

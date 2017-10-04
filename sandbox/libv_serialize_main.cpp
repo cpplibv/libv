@@ -1,13 +1,11 @@
 // File: vserialize_main.cpp, Created on 2017. 04. 14. 15:09, Author: Vader
 
 // ext
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/serialization/shared_ptr.hpp>
-#include <boost/serialization/vector.hpp>
+#include <cereal/archives/xml.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 // libv
-#include <libv/serialization/archive/binary_portable_in.hpp>
-#include <libv/serialization/archive/binary_portable_out.hpp>
+#include <libv/serialization/archive/cereal_binary_portable.hpp>
 #include <libv/serialization/serialization.hpp>
 // std
 #include <fstream>
@@ -73,27 +71,28 @@ int main(int, char **) {
 
 	{
 		std::ofstream ofs("test_file_xml");
-		boost::archive::xml_oarchive oar(ofs);
-		oar << LIBV_NVP(object_out);
+		cereal::XMLOutputArchive oar(ofs);
+		oar << cereal::make_nvp<libv::archive::CerealPortableBinaryOutput>("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_xml");
-		boost::archive::xml_iarchive iar(ifs);
-		iar >> LIBV_NVP(object_in);
+		cereal::XMLInputArchive iar(ifs);
+		iar >> cereal::make_nvp<libv::archive::CerealPortableBinaryInput>("object", object_in);
 	}
 
 	std::cout << (object_in == object_out) << std::endl;
 
 	{
 		std::ofstream ofs("test_file_bin");
-		libv::archive::BinaryPortableOut oar(ofs);
-		oar << LIBV_NVP(object_out);
+		libv::archive::CerealPortableBinaryOutput oar(ofs);
+		oar << cereal::make_nvp<libv::archive::CerealPortableBinaryOutput>("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_bin");
-		libv::archive::BinaryPortableIn iar(ifs);
-		iar >> LIBV_NVP(object_in);
+		libv::archive::CerealPortableBinaryInput iar(ifs);
+		iar >> cereal::make_nvp<libv::archive::CerealPortableBinaryInput>("object", object_in);
 	}
+
 
 	std::cout << (object_in == object_out) << std::endl;
 

@@ -1,46 +1,22 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-look up lib: Clara
+look up lib: Clara, most important questions are multi, optional, required, default arguments
 look up Catch2
 update assimp to 4.x
 -- commit --
 
 cmake: what are interface targets
-cmake: can there be multiple definition error during linkage if definition are the same?
+cmake: can there be multiple definition error during linkage if two lib contains the same definition
 cmake: check what linking does on a lib
-
 -- commit --
-
-	adopt ui - frame separation
-	-- commit --
-
-	handle fails - apply fallback
-		failed file
-		failed shader
-		failed program
-		failed (corrupt) font
-	implement burnt in defaults
-	-- commit --
-
-	ResourceStepResult and ResourceState to enum
-	-- commit --
 
 	state based ui
 	separate control and data!
-	-- commit --
-
-	2 1 [libv.ui.component] Destroy [UIRoot] <destroy:component.cpp:71>
-	2 5 [libv.gl] OpenGL: invalid operation <destroy:ui.cpp:60>
-	-- commit --
-
 	ui resource local proxies
 	-- commit --
 
 hunt down GCC 7.0+ comments
 FILESYSTEM_SUPPORT
--- commit --
-
-migrate from boost.serialization to cereal: http://uscilab.github.io/cereal/index.html
 -- commit --
 
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
@@ -149,14 +125,6 @@ I dont know yet what it could be used for, but this is could be VERY handy!
 sfinae + decltype + operator ,
 decltype(os << obj, void())
 yeee i get it now: void to regular void by: "(void_expression, regular_void)" and operator,(T, regular_void)
-
-// -------------------------------------------------------------------------------------------------
-
-Fully separating the ui from the frame handler is completely possible and desirable.
-It is also possible do it without any dependency between the two with an additional "UIFrame lib".
-
-cutting vm3 from vgl? has some advantage and vui doesnt need it... so why keep it around if it too
-much pain to integrate
 
 // -------------------------------------------------------------------------------------------------
 

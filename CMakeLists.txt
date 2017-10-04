@@ -262,7 +262,6 @@ ExternalProject_Add(ext_boost
 		--address-model=64
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
-		--with-serialization # Removal in progress
 		--with-system
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
@@ -487,20 +486,6 @@ create_library(
 )
 
 create_library(
-	TARGET libv_vm3
-	SOURCE ${PATH_SRC}/libv/vm3/*.cpp
-	LINK   -static boost_serialization-mt-s
-	GROUP  GROUP_LIBRARY
-)
-
-create_library(
-	TARGET libv_vm3imp
-	SOURCE ${PATH_SRC}/libv/vm3imp/*.cpp
-	LINK   -static libv_vm3 fmt assimp zlibstatic
-	GROUP  GROUP_LIBRARY
-)
-
-create_library(
 	TARGET libv_vm4imp
 	SOURCE ${PATH_SRC}/libv/vm4imp/*.cpp
 	LINK   -static fmt assimp zlibstatic
@@ -587,20 +572,6 @@ create_executable(
 )
 
 create_executable(
-	TARGET sandbox_libv_vm3
-	SOURCE ${PATH_SNB}/libv_vm3_main.cpp
-	LINK   -static fmt libv_vm3 stdc++fs
-	GROUP  GROUP_SANDBOX
-)
-
-create_executable(
-	TARGET sandbox_libv_vm3imp
-	SOURCE ${PATH_SNB}/libv_vm3imp_main.cpp
-	LINK   -static fmt libv_vm3imp stdc++fs
-	GROUP  GROUP_SANDBOX
-)
-
-create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE ${PATH_SNB}/libv_vm4imp_main.cpp
 	LINK   -static fmt libv_vm4imp stdc++fs
@@ -667,14 +638,6 @@ create_executable(
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	OBJECT obj_test_runner
 	LINK   -static
-	GROUP  GROUP_UNIT_TEST
-)
-
-create_executable(
-	TARGET test_libv_vm3
-	SOURCE ${PATH_TST}/libv/vm3/*.cpp
-	OBJECT obj_test_runner
-	LINK   -static libv_vm3 boost_serialization-mt-s
 	GROUP  GROUP_UNIT_TEST
 )
 
