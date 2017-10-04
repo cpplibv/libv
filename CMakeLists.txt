@@ -175,155 +175,6 @@ find_package(OpenGL REQUIRED)
 
 set(GROUP_EXTERNAL_PROJECT)
 
-list(APPEND GROUP_EXTERNAL_PROJECT ext_efsw)
-ExternalProject_Add(ext_efsw
-	GIT_REPOSITORY https://github.com/mnafees/efsw.git
-	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
-	PREFIX ${PATH_EXT_SRC}/efsw
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
-	# TODO P3: this ext_efsw install command looks off
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/efsw/include
-		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/ext_efsw/include/ ${PATH_EXT}/efsw/include/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/ext_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_utf8cpp)
-ExternalProject_Add(ext_utf8cpp
-	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
-	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
-	PREFIX ${PATH_EXT_SRC}/utf8cpp
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_catch)
-ExternalProject_Add(ext_catch
-	GIT_REPOSITORY https://github.com/philsquared/Catch.git
-	GIT_TAG v1.5.6
-	PREFIX ${PATH_EXT_SRC}/catch
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/catch/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_cereal)
-ExternalProject_Add(ext_cereal
-	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
-	GIT_TAG v1.2.2
-	PREFIX ${PATH_EXT_SRC}/cereal
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
-		-DJUST_INSTALL_CEREAL=ON
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_clara)
-ExternalProject_Add(ext_clara
-	GIT_REPOSITORY https://github.com/philsquared/Clara.git
-	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
-	PREFIX ${PATH_EXT_SRC}/clara
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_glfw)
-ExternalProject_Add(ext_glfw
-	GIT_REPOSITORY https://github.com/glfw/glfw.git
-	GIT_TAG 3.2.1
-	PREFIX ${PATH_EXT_SRC}/glfw
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
-		-DGLFW_BUILD_EXAMPLES=OFF
-		-DGLFW_BUILD_TESTS=OFF
-		-DGLFW_BUILD_DOCS=OFF
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_glew)
-ExternalProject_Add(ext_glew
-	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-	GIT_TAG glew-cmake-1.11.0
-	PREFIX ${PATH_EXT_SRC}/glew
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_fmt)
-ExternalProject_Add(ext_fmt
-	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
-	PREFIX ${PATH_EXT_SRC}/fmt
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
-		-DFMT_DOC=OFF
-		-DFMT_TEST=OFF
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_glm)
-ExternalProject_Add(ext_glm
-	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.8
-	BUILD_COMMAND "" # glm is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/glm
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_gli)
-ExternalProject_Add(ext_gli
-	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0.8.1.0
-	BUILD_COMMAND "" # gli is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/gli
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_range)
-ExternalProject_Add(ext_range
-	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND "" # range is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/range
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/range/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
-	EXCLUDE_FROM_ALL 1
-)
-
-list(APPEND GROUP_EXTERNAL_PROJECT ext_freetype)
-ExternalProject_Add(ext_freetype
-	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
-	GIT_TAG VER-2-5-5
-	PREFIX ${PATH_EXT_SRC}/freetype
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
-	EXCLUDE_FROM_ALL 1
-)
-
 list(APPEND GROUP_EXTERNAL_PROJECT ext_assimp)
 ExternalProject_Add(ext_assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
@@ -419,6 +270,156 @@ ExternalProject_Add(ext_boost
 	INSTALL_COMMAND ""
 )
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_catch)
+ExternalProject_Add(ext_catch
+	GIT_REPOSITORY https://github.com/philsquared/Catch.git
+	GIT_TAG v1.5.6
+	PREFIX ${PATH_EXT_SRC}/catch
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""  # header only, skip tests
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/catch/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_cereal)
+ExternalProject_Add(ext_cereal
+	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
+	GIT_TAG v1.2.2
+	PREFIX ${PATH_EXT_SRC}/cereal
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
+		-DJUST_INSTALL_CEREAL=ON
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_clara)
+ExternalProject_Add(ext_clara
+	GIT_REPOSITORY https://github.com/philsquared/Clara.git
+	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
+	PREFIX ${PATH_EXT_SRC}/clara
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""  # header only, skip tests
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
+	EXCLUDE_FROM_ALL 1
+)
+
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_efsw)
+ExternalProject_Add(ext_efsw
+	GIT_REPOSITORY https://github.com/mnafees/efsw.git
+	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
+	PREFIX ${PATH_EXT_SRC}/efsw
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
+	# TODO P3: this ext_efsw install command looks off
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/efsw/include
+		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/ext_efsw/include/ ${PATH_EXT}/efsw/include/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/ext_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_fmt)
+ExternalProject_Add(ext_fmt
+	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
+	PREFIX ${PATH_EXT_SRC}/fmt
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
+		-DFMT_DOC=OFF
+		-DFMT_TEST=OFF
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_freetype)
+ExternalProject_Add(ext_freetype
+	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
+	GIT_TAG VER-2-5-5
+	PREFIX ${PATH_EXT_SRC}/freetype
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_glew)
+ExternalProject_Add(ext_glew
+	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
+	GIT_TAG glew-cmake-1.11.0
+	PREFIX ${PATH_EXT_SRC}/glew
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_glfw)
+ExternalProject_Add(ext_glfw
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
+	GIT_TAG 3.2.1
+	PREFIX ${PATH_EXT_SRC}/glfw
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
+		-DGLFW_BUILD_EXAMPLES=OFF
+		-DGLFW_BUILD_TESTS=OFF
+		-DGLFW_BUILD_DOCS=OFF
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_gli)
+ExternalProject_Add(ext_gli
+	GIT_REPOSITORY https://github.com/g-truc/gli.git
+	GIT_TAG 0.8.1.0
+	BUILD_COMMAND "" # gli is header only, skip tests
+	PREFIX ${PATH_EXT_SRC}/gli
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_glm)
+ExternalProject_Add(ext_glm
+	GIT_REPOSITORY https://github.com/g-truc/glm.git
+	GIT_TAG 0.9.8
+	BUILD_COMMAND "" # glm is header only, skip tests
+	PREFIX ${PATH_EXT_SRC}/glm
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_range)
+ExternalProject_Add(ext_range
+	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
+	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND "" # range is header only, skip tests
+	PREFIX ${PATH_EXT_SRC}/range
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/range/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
+	EXCLUDE_FROM_ALL 1
+)
+
+list(APPEND GROUP_EXTERNAL_PROJECT ext_utf8cpp)
+ExternalProject_Add(ext_utf8cpp
+	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
+	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
+	PREFIX ${PATH_EXT_SRC}/utf8cpp
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ""  # header only, skip tests
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
+	EXCLUDE_FROM_ALL 1
+)
+
 # Directories --------------------------------------------------------------------------------------
 
 # Includes
@@ -431,6 +432,7 @@ include_directories(SYSTEM ${PATH_EXT}/boost/include)
 include_directories(SYSTEM ${PATH_EXT}/catch/include)
 include_directories(SYSTEM ${PATH_EXT}/cereal/include)
 include_directories(SYSTEM ${PATH_EXT}/clara/include)
+include_directories(SYSTEM ${PATH_EXT}/efsw/include)
 include_directories(SYSTEM ${PATH_EXT}/fmt/include)
 include_directories(SYSTEM ${PATH_EXT}/freetype/include/freetype2)
 include_directories(SYSTEM ${PATH_EXT}/glew/include)
@@ -442,6 +444,7 @@ include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
 link_directories(${PATH_EXT}/assimp/lib)
 link_directories(${PATH_EXT}/boost/lib)
+link_directories(${PATH_EXT}/efsw/lib)
 link_directories(${PATH_EXT}/fmt/lib)
 link_directories(${PATH_EXT}/freetype/lib)
 link_directories(${PATH_EXT}/glew/lib)
