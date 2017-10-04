@@ -5,9 +5,9 @@
 // hpp
 #include <libv/vm4/model.hpp>
 // libv
+#include <libv/math/mat_serialization.hpp>
+#include <libv/math/vec_serialization.hpp>
 #include <libv/serialization/reflection.hpp>
-#include <libv/serialization/types/mat.hpp>
 #include <libv/serialization/types/std_string.hpp>
 #include <libv/serialization/types/std_vector.hpp>
-#include <libv/serialization/types/vec.hpp>
 #include <libv/vm4/serialization/material.hpp>
