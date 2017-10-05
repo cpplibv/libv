@@ -71,13 +71,12 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("test_file_xml");
 		libv::archive::XMLOutput oar(ofs);
-		oar << cereal::make_nvp<libv::archive::XMLOutput>("object", object_out);
-		// TODO P1: Solve the NVP situation with cereal: replace cereal::make_nvp<Archive>("object", object_out) with something.
+		oar << LIBV_NVP_NAMED("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_xml");
 		libv::archive::XMLInput iar(ifs);
-		iar >> cereal::make_nvp<libv::archive::XMLInput>("object", object_in);
+		iar >> LIBV_NVP_NAMED("object", object_in);
 	}
 
 	std::cout << (object_in == object_out) << std::endl;
@@ -85,12 +84,12 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("test_file_bin");
 		libv::archive::BinaryOutput oar(ofs);
-		oar << cereal::make_nvp<libv::archive::BinaryOutput>("object", object_out);
+		oar << LIBV_NVP_NAMED("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_bin");
 		libv::archive::BinaryInput iar(ifs);
-		iar >> cereal::make_nvp<libv::archive::BinaryInput>("object", object_in);
+		iar >> LIBV_NVP_NAMED("object", object_in);
 	}
 
 

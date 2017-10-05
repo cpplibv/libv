@@ -10,8 +10,11 @@
 // std
 #include <string>
 
+
 namespace libv {
 namespace view {
+
+// -------------------------------------------------------------------------------------------------
 
 //https://github.com/tcbrindle/utf_ranges/blob/master/include/tcb/utf_ranges/view/utf_convert.hpp
 
@@ -72,6 +75,8 @@ struct uft8_to_codepoint_fn {
 };
 
 RANGES_INLINE_VARIABLE(ranges::view::view<uft8_to_codepoint_fn>, uft8_to_codepoint)
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace view
 } // namespace libv

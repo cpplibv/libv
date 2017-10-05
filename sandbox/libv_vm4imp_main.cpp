@@ -29,12 +29,12 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("model_test_file.json.vm4", std::ios::out | std::ios::binary);
 		libv::archive::JSONOutput oar(ofs);
-		oar << cereal::make_nvp<libv::archive::JSONOutput>("model", model);
+		oar << LIBV_NVP_NAMED("model", model);
 	}
 	{
 		std::ofstream ofs("model_test_file.vm4", std::ios::out | std::ios::binary);
 		libv::archive::BinaryOutput oar(ofs);
-		oar << cereal::make_nvp<libv::archive::BinaryOutput>("model", *model);
+		oar << LIBV_NVP_NAMED("model", *model);
 	}
 
 	for (const auto& material : model->materials) {

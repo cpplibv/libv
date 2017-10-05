@@ -146,7 +146,7 @@ int main() {
 
 		{
 			libv::archive::BinaryOutput oar(ss);
-			oar << cereal::make_nvp<libv::archive::BinaryOutput>("object", object_out);
+			oar << LIBV_NVP_NAMED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -155,7 +155,7 @@ int main() {
 
 		{
 			libv::archive::BinaryInput iar(ss);
-			iar >> cereal::make_nvp<libv::archive::BinaryInput>("object", object_in);
+			iar >> LIBV_NVP_NAMED("object", object_in);
 		}
 	}
 
@@ -166,7 +166,7 @@ int main() {
 
 		{
 			cereal::PortableBinaryOutputArchive oar(ss);
-			oar << cereal::make_nvp<cereal::PortableBinaryOutputArchive>("object", object_out);
+			oar << LIBV_NVP_NAMED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -175,7 +175,7 @@ int main() {
 
 		{
 			cereal::PortableBinaryInputArchive iar(ss);
-			iar >> cereal::make_nvp<cereal::PortableBinaryInputArchive>("object", object_in);
+			iar >> LIBV_NVP_NAMED("object", object_in);
 		}
 	}
 
@@ -186,7 +186,7 @@ int main() {
 
 		{
 			cereal::BinaryOutputArchive oar(ss);
-			oar << cereal::make_nvp<cereal::BinaryOutputArchive>("object", object_out);
+			oar << LIBV_NVP_NAMED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -195,7 +195,7 @@ int main() {
 
 		{
 			cereal::BinaryInputArchive iar(ss);
-			iar >> cereal::make_nvp<cereal::BinaryInputArchive>("object", object_in);
+			iar >> LIBV_NVP_NAMED("object", object_in);
 		}
 	}
 
@@ -206,7 +206,7 @@ int main() {
 
 		{
 			cereal::JSONOutputArchive oar(ss);
-			oar << cereal::make_nvp<cereal::JSONOutputArchive>("object", object_out);
+			oar << LIBV_NVP_NAMED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -215,7 +215,7 @@ int main() {
 
 		{
 			cereal::JSONInputArchive iar(ss);
-			iar >> cereal::make_nvp<cereal::JSONInputArchive>("object", object_in);
+			iar >> LIBV_NVP_NAMED("object", object_in);
 		}
 	}
 
@@ -226,7 +226,7 @@ int main() {
 
 		{
 			cereal::XMLOutputArchive oar(ss);
-			oar << cereal::make_nvp<cereal::XMLOutputArchive>("object", object_out);
+			oar << LIBV_NVP_NAMED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -235,7 +235,7 @@ int main() {
 
 		{
 			cereal::XMLInputArchive iar(ss);
-			iar >> cereal::make_nvp<cereal::XMLInputArchive>("object", object_in);
+			iar >> LIBV_NVP_NAMED("object", object_in);
 		}
 	}
 
