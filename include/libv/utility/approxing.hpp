@@ -10,16 +10,22 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
+/// Epsilon is 10^Precision
+/// @param T
+/// @param Precision
+template <typename T, int Precision = -4>
 struct Approxing {
-	T value;
-	T epsilon = 0.0001;
+	constexpr static const T epsilon = std::pow<T>(10, Precision);
 
-	Approxing(T value) : value(value) { }
+	T value;
+
+	Approxing() = default;
+	template <typename TC>
+	Approxing(TC&& value) : value(std::forward<TC>(value)) { }
 
 	template <typename V>
 	friend bool operator==(const Approxing& lhs, const V& rhs) {
-		return std::abs(lhs.value - rhs) <= lhs.epsilon;
+		return std::abs(lhs.value - rhs) <= epsilon;
 	}
 
 	template <typename V>

@@ -1,6 +1,6 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-look up lib: Clara, most important questions are multi, optional, required, default arguments
+look up lib: Clara, most important questions are: multi, optional, required, positional and default arguments
 look up Catch2
 update assimp to 4.x
 -- commit --
