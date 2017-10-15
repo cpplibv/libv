@@ -4,6 +4,7 @@
 
 // std
 #include <cmath>
+#include <type_traits>
 
 
 namespace libv {
@@ -20,25 +21,40 @@ struct Approxing {
 	T value;
 
 	Approxing() = default;
-	template <typename TC>
-	Approxing(TC&& value) : value(std::forward<TC>(value)) { }
+	template <typename TC> Approxing(TC&& value) : value(std::forward<TC>(value)) { }
 
-	template <typename V>
-	friend bool operator==(const Approxing& lhs, const V& rhs) {
+	template <typename V> friend inline bool operator==(const Approxing& lhs, const V& rhs) {
 		return std::abs(lhs.value - rhs) <= epsilon;
 	}
 
-	template <typename V>
-	friend bool operator==(const V& lhs, const Approxing& rhs) {
+	template <typename V> friend inline bool operator==(const V& lhs, const Approxing& rhs) {
 		return rhs == lhs;
 	}
 
-	template <typename OS>
-	friend OS& operator<<(OS& os, const Approxing& av) {
+	template <typename V> friend inline bool operator>(const Approxing& lhs, const V& rhs) {
+		return lhs + epsilon > rhs;
+	}
+
+	template <typename V> friend inline bool operator>(const V& lhs, const Approxing& rhs) {
+		return lhs > rhs - epsilon;
+	}
+
+	template <typename V> friend inline bool operator<(const Approxing& lhs, const V& rhs) {
+		return !(rhs > lhs);
+	}
+
+	template <typename V> friend inline bool operator<(const V& lhs, const Approxing& rhs) {
+		return !(rhs > lhs);
+	}
+
+	template <typename OS> friend OS& operator<<(OS& os, const Approxing& av) {
 		os << '~' << av.value;
 		return os;
 	}
 };
+
+template <typename TC>
+Approxing(TC&& value) -> Approxing<std::decay_t<TC>>;
 
 // -------------------------------------------------------------------------------------------------
 
