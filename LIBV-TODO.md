@@ -37,37 +37,36 @@ pointer facade for: observer, cached, view, adaptive, etc...
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
-doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
-resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
-resource: forbid usage of absolute paths
-resource: forbid usage of relative paths with starting ..
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
-gl: uniformbuffer?
-gl: framebuffer
-gl: renderbuffer
-gl: templated buffer for binding
-gl: remove irrelevant member function from templated textures
-gl: glEnable(GL_DEBUG_OUTPUT);
-layout: size percent and ratio should use the leftover space not the whole parent or provide option for both way
-layout: think layout as a graph instad of a stack..., just think and see whats going on with that approach
-layout: hard type (enum) align anchor and orient
-ui / frame: remove default own thread, give them an io_service like executor
-ui: setText => set()(Label::Text, "Main Menu");
-ui: skip setter   ^^ () by making it a member instead of a function -> set(Label::Text, "Main Menu");
-ui: component if invalid was, then does nothing on invalidation
-ui: take a look at frame and component events
-ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
-cpp: clarify template vs auto type deduction rules
-cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 cpp.proposal: _ec - ec postfix exception free overload with error code as return value
+cpp.proposal: implicit - keyword that would replace explicit but instead of blacklist, whitelist
 cpp.proposal: namespace :: {} - a way to open the global :: namespace from any other namespace
 cpp.proposal: namespace ::std {} - a way to open any namespace given absolute path from any other namespace
-cpp.proposal: implicit - keyword that would replace explicit but instead of blacklist, whitelist
+cpp: clarify template vs auto type deduction rules
+cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
+doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
+frame.core: remove core
+frame: Move frame from disconnected monitor
+gl: framebuffer
+gl: glEnable(GL_DEBUG_OUTPUT);
+gl: remove irrelevant member function from templated textures
+gl: renderbuffer
+gl: templated buffer for binding
+gl: uniformbuffer?
+layout: hard type (enum) align anchor and orient
+layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
+libv.log: log thread naming
+libv.sig: merge back and place meta (too many tamplate argument) into libv.meta
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: provide exception free alternative api EVERYWHERE! hehehehehe.
-merge vsig back and create vmeta and vtmta (too many tamplate argument)
+resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
+resource: forbid usage of absolute paths
+resource: forbid usage of relative paths with starting ..
+ui / frame: remove default own thread, give them an io_service like executor
+ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+ui: take a look at frame and component events
 
 Set default displayed tab size for your repository
 http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/23522945#23522945
@@ -75,8 +74,8 @@ http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/2352
 --- ABANDONED --------------------------------------------------------------------------------------
 
 LIBV_STRONG_TYPEDEF(int, Severity);
-log thread naming
-logger client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
+logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
+logger: binlog
 
 // -------------------------------------------------------------------------------------------------
 
@@ -131,22 +130,17 @@ yeee i get it now: void to regular void by: "(void_expression, regular_void)" an
 Base class for lights and cameras...
 
 
-license		https://www.youtube.com/watch?v=cJIi-hIlCQM
-be aware that i will need copyright for every contribution into libv
-
-
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
 Optimalizált fordítás - cmake:
 https://github.com/sakra/cotire
 
-P1 - std::future family
 
 Priority levels for each operation
 IN - in-context operation (fast and not context sensitive)
-       GL Task        | Priority | Note
+ GL Task              | Priority | Note
 :-------------------- | --------:|:-----------------------------------------------------------------
- Initialization       |   0000   |
+ Initialization       |   0100   |
  D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
  D.ShaderProgram      |   1150   | Unloading as ShaderProgram
  D.UIShader           |   1200   | Unloading as Shader
@@ -172,7 +166,7 @@ IN - in-context operation (fast and not context sensitive)
  Termination          |   9800   |
  Render-Residual      |   9900   | Always stays in queue as last operation
 
-       IO Task        | Priority | Note
+ IO Task              | Priority | Note
 :-------------------- | --------:|:-----------------------------------------------------------------
  D.UIShader File      |   1100   | Unloading as Shader File
  D.Shader File        |   1200   | Unloading as Shader File
@@ -180,20 +174,16 @@ IN - in-context operation (fast and not context sensitive)
  D.UITexture          |   1400   | Unloading as Texture
  D.Model              |   1500   | Unloading as Model
  D.Texture            |   1600   | Unloading as Texture
- Unload Texture       |    IN    |
- Unload Model         |    IN    |
- Unload Font          |    IN    |
- Unload Shader File   |    IN    |
+ Unload Texture       |     IN   |
+ Unload Model         |     IN   |
+ Unload Font          |     IN   |
+ Unload Shader File   |     IN   |
  Load UIShader File   |   4100   | Unloading as Shader File
  Load Shader File     |   4150   |
  Load Font            |   4300   |
  Load UITexture       |   4400   |
  Load Model           |   4500   |
  Load Texture         |   4600   |
-
-top layer std::function and forward!
-
-Move frame from disconnected monitor
 
 Tracing every event for right state enums / defines / handlers:
 	Char
@@ -215,97 +205,11 @@ Tracing every event for right state enums / defines / handlers:
 
 // -------------------------------------------------------------------------------------------------
 
-Update to GLFW 3.2
-
-What is GLFW_USE_DWM_SWAP_INTERVAL?.... Test it off
-
-Support for Vulkan
-GLFW now supports basic integration with Vulkan with glfwVulkanSupported, glfwGetRequiredInstanceExtensions, glfwGetInstanceProcAddress, glfwGetPhysicalDevicePresentationSupport and glfwCreateWindowSurface. Vulkan header inclusion can be selected with GLFW_INCLUDE_VULKAN.
-// Dont care / what is it?
-
-Window mode switching
-GLFW now supports switching between windowed and full screen modes and updating the monitor and desired resolution and refresh rate of full screen windows with glfwSetWindowMonitor.
-// Must adopt
-
-Window maxmimization support
-GLFW now supports window maximization with glfwMaximizeWindow and the GLFW_MAXIMIZED window hint and attribute.
-// Must adopt
-
-Window input focus control
-GLFW now supports giving windows input focus with glfwFocusWindow.
-// Must adopt
-
-Window size limit support
-GLFW now supports setting both absolute and relative window size limits with glfwSetWindowSizeLimits and glfwSetWindowAspectRatio.
-// Must adopt
-
-Localized key names
-GLFW now supports querying the localized name of printable keys with glfwGetKeyName, either by key token or by scancode.
-// What is it? Adopt if useful. Is this keyboard layout related?
-
-Wait for events with timeout
-GLFW now supports waiting for events for a set amount of time with glfwWaitEventsTimeout.
-// No use for me
-
-Window icon support
-GLFW now supports setting the icon of windows with glfwSetWindowIcon.
-// Must adopt
-
-Raw timer access
-GLFW now supports raw timer values with glfwGetTimerValue and glfwGetTimerFrequency.
-// No use for me
-
-Joystick connection callback
-GLFW now supports notifying when a joystick has been connected or disconnected with glfwSetJoystickCallback.
-// Must adopt
-
-Context-less windows
-GLFW now supports creating windows without a OpenGL or OpenGL ES context with GLFW_NO_API.
-// Could be useful but currently no plan for it. Document is as a TODO with very low priority
-
-Run-time context creation API selection
-GLFW now supports selecting the context creation API at run-time with the GLFW_CONTEXT_CREATION_API window hint value.
-// What? Maybe not needed
-
-Error-free context creation
-GLFW now supports creating OpenGL and OpenGL ES contexts that do not emit errors with the GLFW_CONTEXT_NO_ERROR window hint, provided the machine supports the GL_KHR_no_error extension.
-// Maybe not needed
-
-CMake config-file package support
-GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
-// What? Maybe not needed
-
-// -------------------------------------------------------------------------------------------------
-
-I dont know yet what it could be used for, but this is could be VERY handy!
-sfiane + decltype + operator ,
-decltype(os << obj, void())
-
-// -------------------------------------------------------------------------------------------------
-
-Fully separating the ui from the frame handler is completely possible and desirable.
-It is also possible do it without any dependency between the two with an additional "UIFrame lib".
-
-// -------------------------------------------------------------------------------------------------
-
 operator| on enums
 https://www.youtube.com/watch?v=cZ3TNrRzHfM
 http://cppcast.com/2016/07/gabriel-dos-reis/
 
 // -------------------------------------------------------------------------------------------------
-
-Base class for lights and cameras...
-
-
-license		https://www.youtube.com/watch?v=cJIi-hIlCQM
-be aware that i will need copyright for every contribution into libv
-
-
-http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
-
-Optimalizált fordítás - cmake:
-https://github.com/sakra/cotire
-
 
 Új fajta signal: timerSignal
 Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
@@ -364,64 +268,6 @@ To floor(const duration<Rep, Period>& d) {
 
 // -------------------------------------------------------------------------------------------------
 
-Priority levels for each operation
-IN - in-context operation (FAST and not context sensitive)
-
- GL Task              | Priority | Note
-:-------------------- | --------:|:-----------------------------------------------------------------
- Initialization       |   0100   |
- D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
- D.ShaderProgram      |   1150   | Unloading as ShaderProgram
- D.UIShader           |   1200   | Unloading as Shader
- D.Shader             |   1250   | Unloading as Shader
- D.Font               |   1300   | Unloading as Font
- D.UITexture          |   1400   | Unloading as Texture
- D.Model              |   1500   | Unloading as Model
- D.Texture            |   1600   | Unloading as Texture
- Render-Immediate     |   2000   | Starts by a timer when render time-window runs out
- Unload Texture       |   3100   |
- Unload Model         |   3200   |
- Unload Font          |   3300   |
- Unload ShaderProgram |   3400   |
- Unload Shader        |   3500   |
- Load UIShaderProgram |   4100   | Unloading as ShaderProgram
- Load ShaderProgram   |   4150   |
- Load UIShader        |   4200   | Unloading as Shader
- Load Shader          |   4250   |
- Load Font            |   4300   |
- Load UITexture       |   4400   |
- Load Model           |   4500   |
- Load Texture         |   4600   |
- Termination          |   9800   |
- Render-Residual      |   9900   | Always stays in queue as last operation
-
- IO Task              | Priority | Note
-:-------------------- | --------:|:-----------------------------------------------------------------
- D.UIShader File      |   1100   | Unloading as Shader File
- D.Shader File        |   1200   | Unloading as Shader File
- D.Font               |   1300   | Unloading as Font
- D.UITexture          |   1400   | Unloading as Texture
- D.Model              |   1500   | Unloading as Model
- D.Texture            |   1600   | Unloading as Texture
- Unload Texture       |     IN   |
- Unload Model         |     IN   |
- Unload Font          |     IN   |
- Unload Shader File   |     IN   |
- Load UIShader File   |   4100   | Unloading as Shader File
- Load Shader File     |   4150   |
- Load Font            |   4300   |
- Load UITexture       |   4400   |
- Load Model           |   4500   |
- Load Texture         |   4600   |
-
-
-variant
-https://github.com/JasonL9000/cppcon14
-
-
-two phase lookup, what, why, how?
-
------
 CMake resource folder
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
 Skeleton animation
@@ -436,34 +282,18 @@ http://www.oldunreal.com/editing/s3tc/ARB_texture_compression.pdf
 http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
 OpenGL Reference page: https://www.opengl.org/sdk/docs/man/
 
-
 http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
 
 ----
 
 Adopt TCLAP http://tclap.sourceforge.net if suitable
 
-Timed Event / Timer Support / Timer thread
-Resettable and clearable timer / timer tasks
-
-Config Entry:
-	- default
-	- description
-	- isset
-	- name
-	- type
-	- value
-
-Optimizing for prefetcher.
-Optimizing for minimum number of opengl bind.
-Resource pack
-
 ----
+
 Fresnel shader - Atmosphere
 Cook-Torrance shader - Metal
 Minnaert - More depth?
 OrenNayar - More avg lambert
-
 
 --- LIB Merge --------------------------------------------------------------------------------------
 
@@ -751,13 +581,6 @@ void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 }
 
 
-//		model0("res/model/test_group.dae.pb.vm3"),
-//		model1("res/model/fighter_01_eltanin.dae.pb.vm3"),
-//		model2("res/model/test_sp.dae.pb.vm3"),
-//		model3("res/model/projectile_missile_01_hellfire.0001.dae.pb.vm3"),
-//		model4("res/model/asteroid_02.dae.pb.vm3")
-
-
 // Light -------------------------------------------------------------------------------------------
 
 struct LightType {
@@ -981,49 +804,3 @@ void Renderbuffer::Storage(uint width, uint height, InternalFormat::internal_for
 GC Renderbuffer::gc;
 
 }
-
-std::this_thread::sleep_for(std::chrono::seconds(2));
-
-// -------------------------------------------------------------------------------------------------
-// UI idea: its horribly wrong, that is not the point.
-
-<style>
-	.menu-scene {
-		size = 100% 100%;
-		orient = down-right;
-	}
-	.menu {
-		size = 100% 1r;
-		align = bottom-right;
-	}
-	.menu-footer {
-		size = 100% 30px;
-		align = center-center;
-		aligncontent = center-center;
-		orient = down-right;
-	}
-</style>
-
-<flow id="menu-scene">
-	<flow id="menu">
-		<label id="main-menu-title" class="title">
-			Main Menu
-		</label>
-		<button id="main-menu-newgame" class="main-menu-element">
-			New Game
-			<onclick console="new_game"/>
-		</button>
-		<button id="main-menu-exitgame" class="main-menu-element">
-			Exit Game
-			<onclick console="exit"/>
-		</button>
-	</flow>
-	<flow id="menu-footer">
-		<label id="main-menu-version" class="title">
-			<!--<text>v1.00</text>-->
-			<!--<text>{VERSION_SHORT_DISPLAY}</text>-->
-			${VERSION_SHORT_DISPLAY}
-		</label>
-	</flow>
-</flow>
-
