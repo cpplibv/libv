@@ -64,6 +64,13 @@ constexpr inline void foreach_member_name(T&& object, F&& func) noexcept {
 }
 
 template <typename T, typename F>
+constexpr inline void foreach_member_pointer(T&& object, F&& func) noexcept {
+	foreach_member(std::forward<T>(object), [&](auto&& member) {
+		func(member.member_pointer);
+	});
+}
+
+template <typename T, typename F>
 constexpr inline void foreach_member_reference(T&& object, F&& func) noexcept {
 	foreach_member(std::forward<T>(object), [&](auto&& member) {
 		func(member.reference);
@@ -95,6 +102,7 @@ constexpr inline void interleave_member_reference(Func&& func, Head&& head, Tail
 using detail::foreach_member;
 using detail::foreach_member_name;
 using detail::foreach_member_nrp;
+using detail::foreach_member_pointer;
 using detail::foreach_member_reference;
 using detail::interleave_member_reference;
 using detail::member_count_v;

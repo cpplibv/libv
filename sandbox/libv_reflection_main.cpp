@@ -4,6 +4,7 @@
 #include <libv/meta/reflection.hpp>
 #include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
+#include <libv/utility/member_offset.hpp>
 // std
 #include <iomanip>
 #include <iostream>
@@ -47,17 +48,17 @@ template <template <typename> class Field>
 struct ServerFieldSet {
 	Field<bool> has_mod{};
 	Field<bool> has_password{};
-	Field<std::string> map{};
-	Field<std::string> name{};
 	Field<uint16_t> players_current{};
 	Field<uint16_t> players_limit{};
+	Field<std::string> map{};
+	Field<std::string> name{};
 
 	LIBV_REFLECTION_ACCESS(has_mod);
 	LIBV_REFLECTION_ACCESS(has_password);
-	LIBV_REFLECTION_ACCESS(map);
-	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(players_current);
 	LIBV_REFLECTION_ACCESS(players_limit);
+	LIBV_REFLECTION_ACCESS(map);
+	LIBV_REFLECTION_ACCESS(name);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
 };
 
@@ -149,6 +150,18 @@ int main(int, char**) {
 	auto diff2 = row2 - row1;
 
 	printUpdate(diff2);
+
+	// TODO P5: create a proper unit test for reflection
+
+	libv::meta::foreach_member_pointer(row1, [](auto&& member_pointer) {
+		std::cout << libv::member_offset(member_pointer) << ", ";
+	});
+
+	std::cout << std::endl;
+
+	libv::meta::foreach_member_pointer(update00, [](auto&& member_pointer) {
+		std::cout << libv::member_offset(member_pointer) << ", ";
+	});
 
 	return 0;
 }
