@@ -53,8 +53,8 @@ struct Approxing {
 	}
 };
 
-template <typename TC>
-Approxing(TC&& value) -> Approxing<std::decay_t<TC>>;
+template <typename T>
+Approxing(T) -> Approxing<T>;
 
 // -------------------------------------------------------------------------------------------------
 

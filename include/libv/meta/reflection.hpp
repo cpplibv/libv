@@ -40,38 +40,38 @@ constexpr inline decltype(auto) member_reference(T&& object) noexcept {
 // foreach -----------------------------------------------------------------------------------------
 
 template <typename T, typename F, size_t... Indices>
-constexpr inline void foreach_member_helper(T&& object, F&& func, std::index_sequence<Indices...>) noexcept {
+constexpr inline void foreach_member_helper(T&& object, F&& func, std::index_sequence<Indices...>) {
 	(func(member_info<Indices>(object)), ...);
 }
 
 template <typename T, typename F>
-constexpr inline void foreach_member(T&& object, F&& func) noexcept {
+constexpr inline void foreach_member(T&& object, F&& func) {
 	foreach_member_helper(std::forward<T>(object), std::forward<F>(func), std::make_index_sequence<member_count_v<T>>{});
 }
 
 template <typename T, typename F>
-constexpr inline void foreach_member_nrp(T&& object, F&& func) noexcept {
+constexpr inline void foreach_member_nrp(T&& object, F&& func) {
 	foreach_member(std::forward<T>(object), [&](auto&& member) {
 		func(member.name, member.reference);
 	});
 }
 
 template <typename T, typename F>
-constexpr inline void foreach_member_name(T&& object, F&& func) noexcept {
+constexpr inline void foreach_member_name(T&& object, F&& func) {
 	foreach_member(std::forward<T>(object), [&](auto&& member) {
 		func(member.name);
 	});
 }
 
 template <typename T, typename F>
-constexpr inline void foreach_member_pointer(T&& object, F&& func) noexcept {
+constexpr inline void foreach_member_pointer(T&& object, F&& func) {
 	foreach_member(std::forward<T>(object), [&](auto&& member) {
 		func(member.member_pointer);
 	});
 }
 
 template <typename T, typename F>
-constexpr inline void foreach_member_reference(T&& object, F&& func) noexcept {
+constexpr inline void foreach_member_reference(T&& object, F&& func) {
 	foreach_member(std::forward<T>(object), [&](auto&& member) {
 		func(member.reference);
 	});
@@ -80,17 +80,17 @@ constexpr inline void foreach_member_reference(T&& object, F&& func) noexcept {
 // interleave --------------------------------------------------------------------------------------
 
 template <size_t Index, typename Func, typename... Args>
-constexpr inline void interleave_member_value_helper2(Func& func, Args&... args) noexcept {
+constexpr inline void interleave_member_value_helper2(Func& func, Args&... args) {
 	func(member_reference<Index>(args)...);
 }
 
 template <typename Func, typename... Args, size_t... Indices>
-constexpr inline void interleave_member_value_helper(Func& func, std::index_sequence<Indices...>, Args&... args) noexcept {
+constexpr inline void interleave_member_value_helper(Func& func, std::index_sequence<Indices...>, Args&... args) {
 	(interleave_member_value_helper2<Indices>(func, args...), ...);
 }
 
 template <typename Func, typename Head, typename... Tail>
-constexpr inline void interleave_member_reference(Func&& func, Head&& head, Tail&&... tail) noexcept {
+constexpr inline void interleave_member_reference(Func&& func, Head&& head, Tail&&... tail) {
 	static_assert(((member_count_v<Head> == member_count_v<Tail>) && ...), "Different number of members in interleaved objects");
 	interleave_member_value_helper(func, std::make_index_sequence<member_count_v<Head>>{}, head, tail...);
 }
