@@ -11,7 +11,8 @@ include(cmake/target.cmake)
 
 set(CMAKE_VERBOSE_MAKEFILE off)
 #set(CMAKE_BUILD_TYPE "DEBUG")
-set(CMAKE_BUILD_TYPE "RELEASE")
+#set(CMAKE_BUILD_TYPE "RELEASE")
+set(CMAKE_BUILD_TYPE "DEV")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${PROCESSOR_COUNT}")
@@ -134,6 +135,8 @@ add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
 
 # Definitions --------------------------------------------------------------------------------------
 
+set(USE_STATIC_LINK)
+
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_definitions(-Og)
 	add_definitions(-ggdb3)
@@ -143,6 +146,9 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 #	SET(CMAKE_AR "gcc-ar")
 #	SET(CMAKE_NM "gcc-nm")
 #	SET(CMAKE_RANLIB "gcc-ranlib")
+	set(USE_STATIC_LINK -static)
+elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
+	add_definitions(-Ofast)
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
 endif()
@@ -479,35 +485,35 @@ set(GROUP_UNIT_TEST)
 create_library(
 	TARGET libv
 	SOURCE ${PATH_SRC}/libv/libv/*.cpp
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET libv_frame
 	SOURCE ${PATH_SRC}/libv/frame/*.cpp
-	LINK   -static fmt glfw3 gdi32 ${OPENGL_LIBRARIES}
+	LINK   ${USE_STATIC_LINK} fmt glfw3 gdi32 ${OPENGL_LIBRARIES}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET libv_gl
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
-	LINK   -static glew ${OPENGL_LIBRARIES}
+	LINK   ${USE_STATIC_LINK} glew ${OPENGL_LIBRARIES}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET libv_sig
 	SOURCE ${PATH_SRC}/libv/sig/*.cpp
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_LIBRARY
 )
 
 create_library(
 	TARGET libv_vm4imp
 	SOURCE ${PATH_SRC}/libv/vm4imp/*.cpp
-	LINK   -static fmt assimp zlibstatic
+	LINK   ${USE_STATIC_LINK} fmt assimp zlibstatic
 	GROUP  GROUP_LIBRARY
 )
 
@@ -516,84 +522,84 @@ create_library(
 create_executable(
 	TARGET sandbox_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
-	LINK   -static fmt
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_ecs
 	SOURCE ${PATH_SNB}/libv_ecs_main.cpp
-	LINK   -static fmt
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE ${PATH_SNB}/libv_frame_main.cpp
-	LINK   -static fmt libv_frame
+	LINK   ${USE_STATIC_LINK} fmt libv_frame
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE ${PATH_SNB}/libv_gl_main.cpp
-	LINK   -static fmt glew glfw3 libv_gl stdc++fs
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   -static fmt glew glfw3 libv_gl stdc++fs
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_log
 	SOURCE ${PATH_SNB}/libv_log_main.cpp
-	LINK   -static fmt
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE ${PATH_SNB}/libv_reflection_main.cpp
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE ${PATH_SNB}/libv_reflection2_main.cpp
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
-	LINK   -static boost_serialization-mt-s boost_system-mt-s
+	LINK   ${USE_STATIC_LINK} boost_serialization-mt-s boost_system-mt-s
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_serialize_cereal
 	SOURCE ${PATH_SNB}/libv_serialize_cereal_main.cpp
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE ${PATH_SNB}/libv_sig_main.cpp
-	LINK   -static fmt
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE ${PATH_SNB}/libv_vm4imp_main.cpp
-	LINK   -static fmt libv_vm4imp stdc++fs
+	LINK   ${USE_STATIC_LINK} fmt libv_vm4imp stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
@@ -608,7 +614,7 @@ create_executable(
 	TARGET test_libv
 	SOURCE ${PATH_TST}/libv/libv/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -616,7 +622,7 @@ create_executable(
 	TARGET test_libv_ecs
 	SOURCE ${PATH_TST}/libv/ecs/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -624,7 +630,7 @@ create_executable(
 	TARGET test_libv_frame
 	SOURCE ${PATH_TST}/libv/frame/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -632,7 +638,7 @@ create_executable(
 	TARGET test_libv_gl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static libv_gl
+	LINK   ${USE_STATIC_LINK} libv_gl
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -640,7 +646,7 @@ create_executable(
 	TARGET test_libv_log
 	SOURCE ${PATH_TST}/libv/log/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static fmt
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -648,7 +654,7 @@ create_executable(
 	TARGET test_libv_parse
 	SOURCE ${PATH_TST}/libv/parse/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -656,7 +662,7 @@ create_executable(
 	TARGET test_libv_sig
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	OBJECT obj_test_runner
-	LINK   -static
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_UNIT_TEST
 )
 
