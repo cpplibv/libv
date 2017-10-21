@@ -8,6 +8,8 @@
 #include <istream>
 #include <limits>
 #include <ostream>
+// libv
+#include <libv/utility/endian.hpp>
 
 
 namespace libv {
@@ -16,16 +18,6 @@ namespace archive {
 // -------------------------------------------------------------------------------------------------
 
 namespace detail {
-
-inline bool is_big_endian() {
-	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
-	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 1;
-}
-
-inline bool is_little_endian() {
-	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
-	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 4;
-}
 
 template <size_t DataSize>
 inline void swap_bytes(uint8_t* data) {
@@ -46,7 +38,7 @@ public:
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
 	BinaryOutput(std::ostream& stream) :
 		OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision>(this),
-		convertEndian(detail::is_little_endian()),
+		convertEndian(is_little_endian()),
 		os(stream) {
 	}
 
@@ -81,7 +73,7 @@ public:
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
 	BinaryInput(std::istream& stream) :
 		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
-		convertEndian(detail::is_little_endian()),
+		convertEndian(is_little_endian()),
 		is(stream) {
 	}
 
