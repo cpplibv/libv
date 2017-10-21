@@ -4,6 +4,8 @@
 
 // std
 #include <string>
+// libv
+#include <libv/thread/number.hpp>
 
 
 namespace libv {
@@ -12,7 +14,7 @@ namespace libv {
 
 namespace detail {
 
-inline thread_local std::string thread_name = "unnamed";
+inline thread_local std::string thread_name;
 
 } // namespace detail
 

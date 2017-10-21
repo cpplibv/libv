@@ -16,10 +16,10 @@
 #include <vector>
 
 
-// TODO P3: Log system should provide an interface to name threads.
-//			And / Or interact with worker thread name. AHHHAAA! Thread local string!
+// TODO P3: Log system should provide an interface to name threads. And it most likely will not be
+//			thread_local but a map inside the log system, or better a "specific log message".
 // TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
-//			system analysis
+//			system analysis, or binary logging...
 
 // -------------------------------------------------------------------------------------------------
 // Trace - Only when tracing the code and execution steps
@@ -196,7 +196,7 @@ private:
 	std::vector<Rule> rules;
 	std::vector<std::ostream*> outputs;
 	//std::vector<Logger*> outputs;
-	std::string format = "{severity} {thread} {module}: {message} <{file}:{line}>\n";
+	std::string format = "{severity} {thread_id} {module}: {message} <{file}:{line}>\n";
 
 private:
 	bool notable(Severity severity, const std::string& module) {
@@ -301,7 +301,7 @@ public:
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
-					fmt::arg("thread", thread_number())
+					fmt::arg("thread_id", thread_number())
 					);
 			for (auto& output : outputs) {
 				*output << record << std::flush;
