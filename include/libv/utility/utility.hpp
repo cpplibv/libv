@@ -10,45 +10,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T, typename... Args>
-inline T* new_f(Args&&... args) {
-	return new T(std::forward<Args>(args)...);
-}
-
-struct new_t {
-	template <typename T, typename... Args>
-	inline T* operator()(Args&&... args) {
-		return new T(std::forward<Args>(args)...);
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename E, typename = typename std::enable_if<std::is_enum<E>::value>::type>
 constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
    return static_cast<typename std::underlying_type<E>::type>(std::forward<E>(e));
-}
-
-// -------------------------------------------------------------------------------------------------
-
-namespace detail {
-
-inline void hash_combine(std::size_t&) { }
-
-template <typename T, typename... Rest>
-inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
-    std::hash<T> hasher;
-	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	hash_combine(seed, rest...);
-}
-
-} // namespace detail
-
-template <typename... Args>
-constexpr inline size_t hash_combine(Args&&... args) {
-	size_t seed = 0;
-	detail::hash_combine(seed, std::forward<Args>(args)...);
-	return seed;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -80,14 +44,5 @@ struct D {                                                                      
 	bool operator==(const D & rhs) const { return t == rhs.t; }                                    \
 	bool operator<(const D & rhs) const { return t < rhs.t; }                                      \
 };
-
-// -------------------------------------------------------------------------------------------------
-
-#define LIBV_MAKE_HASHABLE(type, ...)                                                              \
-namespace std {                                                                                    \
-	template <> struct hash<type> {                                                                \
-		std::size_t operator()(const type &t) const {                                              \
-			return ::libv::hash_combine(__VA_ARGS__);                                              \
-}};}
 
 // -------------------------------------------------------------------------------------------------
