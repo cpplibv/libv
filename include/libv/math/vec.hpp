@@ -18,26 +18,22 @@
 #include <libv/meta/type_traits.hpp>
 
 
+// TODO P2: use 'concepts' for N dim vector for: from_xyzw, xyz, xy, rgba, ...
 // TODO P2: I think the whole glm bridge could be resolved by a pretty rough template conversion function
-//			Concept for: something has x y z w and sizes, member offsets, full size are equal then allow conversion
-// TODO P3: instead of LIBV_USE_GLM_BRIDGE macro use #if __has_include(<glm/vec2.hpp>)
-// TODO P4: vec noexcept
-//	example:
+//			Concept for: something has x y z w and sizes, member offsets, full size are equal then allow conversion to and from that type
+// TODO P4: vec noexcept example with the only problem that a lambda cannot be part of an unevaluated context:
 //		template <size_t N, typename T, typename K>
 //		constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) LIBV_RETURNS(
 //			build_vec<N>([&](auto index) { return lhs.data[index] / rhs; }
 //		)
-//
 // TODO P5: use warning disable macros with: _Pragma("argument")
-// TODO P5: macro for debug asserts (mostly for div by 0)
-// TODO PC: use 'concepts' for N dim vector for: from_xyzw, xyz, xy, rgba, ...
 
 // NOTE: Use concepts to enable every operation based on underlying types
 // NOTE: Perfect forwarding is possible, seams like does not worth +600 line template
 // NOTE: MSVC: Disable warnings for nameless struct on MSVC maybe:
-//#pragma warning(push)
-//#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
-//#pragma warning(pop)
+//		#pragma warning(push)
+//		#pragma warning(disable:4201) // warning C4201: nonstandard extension used : nameless struct/union
+//		#pragma warning(pop)
 
 namespace libv {
 

@@ -87,5 +87,7 @@ public:
 // TODO P2: use_guard for use / use(0)
 // TODO P2: create_guard for create / destroy
 
+// -------------------------------------------------------------------------------------------------
+
 } // namespace gl
 } // namespace libv

@@ -6,10 +6,10 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: include xy log and check (for LIBV_GL_CHECK)
-// TODO P4: LIBV_FRAME_* -> LIBV_LOG_FRAME_*
-// TODO P4: LIBV_FRAME_DEBUG_ -> LIBV_FRAME_DEBUG
+// TODO P4: include a header that has LIBV_GL_CHECK
 // TODO P5: find a good place for these assert functions something something assert.hpp
+// TODO P5: implement assert context
+// TODO P5: implement assert thread
 
 #ifndef LIBV_FRAME_DEBUG
 #    define LIBV_FRAME_DEBUG // TODO P5: debug flag
@@ -17,20 +17,20 @@
 
 #ifdef LIBV_FRAME_DEBUG
 #    define LIBV_FRAME_DEBUG_ASSERT(X) assert((X))
-#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {} // TODO P5: assert context
+#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
 #    define LIBV_FRAME_DEBUG_ASSERT_STATIC(X, M) static_assert((X), (M))
-#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {} // TODO P5: assert thread
+#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
 #    define LIBV_FRAME_DEBUG_CHECK_GL() LIBV_GL_CHECK()
 #else
 #    define LIBV_FRAME_DEBUG_ASSERT(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {} // TODO P5: assert context
+#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
 #    define LIBV_FRAME_DEBUG_ASSERT_STATIC(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {} // TODO P5: assert thread
+#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
 #    define LIBV_FRAME_DEBUG_CHECK_GL() {}
 #endif
 
-#define LIBV_FRAME_ASSERT_CONTEXT(X) {} // TODO P5: assert context
-#define LIBV_FRAME_ASSERT_THREAD(X) {} // TODO P5: assert thread
+#define LIBV_FRAME_ASSERT_CONTEXT(X) {}
+#define LIBV_FRAME_ASSERT_THREAD(X) {}
 
 namespace libv {
 namespace frame {

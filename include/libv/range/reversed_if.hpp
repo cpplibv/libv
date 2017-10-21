@@ -8,6 +8,7 @@
 // std
 #include <iterator>
 
+
 namespace libv {
 namespace detail {
 
@@ -15,6 +16,7 @@ namespace detail {
 
 // TODO P2: migrate from boost adaptors to range v3
 // TODO P5: reversed_if adaptor degrades iterators from random_access to bidirectional
+// TODO P5: move reverse_if into new range lib view namespace
 
 template <typename Iter>
 struct reversed_if_iterator : std::iterator<std::bidirectional_iterator_tag, typename Iter::value_type> {
@@ -112,7 +114,6 @@ operator|(const BireversedectionalRange& r, reverse_if_forwarder forwarder) {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: move reverse_if into new range lib view namespace
 const detail::reverse_if_forwarder reverse_if(bool reversed = false) {
 	return detail::reverse_if_forwarder{reversed};
 }

@@ -12,6 +12,7 @@ namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: Implement vec serialization based on vec 2,3,4 concepts, this solves glm too
 template <typename Archive, typename T>
 inline void serialize(Archive& ar, ::libv::vec2_t<T>& var) {
 	ar & LIBV_NVP_NAMED("x", var.x);
