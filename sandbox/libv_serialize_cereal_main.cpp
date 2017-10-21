@@ -5,19 +5,21 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/xml.hpp>
-#include <cereal/types/memory.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
 // libv
 #include <libv/serialization/archive/binary.hpp>
-#include <libv/serialization/reflection.hpp>
 #include <libv/serialization/memberwise.hpp>
+#include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
 #include <libv/serialization/types/boost_flat_map.hpp>
+#include <libv/serialization/types/std_map.hpp>
+#include <libv/serialization/types/std_memory.hpp>
+#include <libv/serialization/types/std_string.hpp>
 #include <libv/serialization/types/std_variant.hpp>
+#include <libv/serialization/types/std_vector.hpp>
 // std
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -64,6 +66,7 @@ struct Test {
 	std::variant<int, double, std::string> variant;
 	boost::container::flat_map<int, std::string> flat_map;
 	boost::container::flat_map<int, double> flat_map_empty;
+	std::map<int, std::string> std_map;
 	bool dead = false;
 	int32_t size = 500100;
 	Memberwise memberwise;
@@ -77,6 +80,7 @@ struct Test {
 		ar & LIBV_NVP(variant);
 		ar & LIBV_NVP(flat_map);
 		ar & LIBV_NVP(flat_map_empty);
+		ar & LIBV_NVP(std_map);
 		ar & LIBV_NVP(dead);
 		ar & LIBV_NVP(size);
 		ar & LIBV_NVP(memberwise);
@@ -90,6 +94,7 @@ struct Test {
 				variant == rhs.variant &&
 				flat_map == rhs.flat_map &&
 				flat_map_empty == rhs.flat_map_empty &&
+				std_map == rhs.std_map &&
 				dead == rhs.dead &&
 				size == rhs.size &&
 				memberwise.a == rhs.memberwise.a &&
@@ -131,6 +136,10 @@ int main() {
 	object_out.flat_map.emplace(12, "5.12");
 	object_out.flat_map.emplace(13, "5.13");
 	object_out.flat_map.emplace(14, "5.14");
+	object_out.std_map.emplace(11, "5.11");
+	object_out.std_map.emplace(12, "5.12");
+	object_out.std_map.emplace(13, "5.13");
+	object_out.std_map.emplace(14, "5.14");
 	object_out.shader = std::make_shared<Inner>("inner_value");
 	object_out.memberwise.a = "memberwise.a value";
 	object_out.memberwise.b = 43;
