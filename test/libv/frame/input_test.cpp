@@ -5,7 +5,7 @@
 
 #include <GLFW/glfw3.h>
 #include <libv/frame/inputs.hpp>
-#include <libv/utility/utility.hpp>
+#include <libv/utility/enum.hpp>
 
 // -------------------------------------------------------------------------------------------------
 

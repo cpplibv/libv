@@ -8,7 +8,7 @@
 // libv
 #include <libv/thread/number.hpp>
 #include <libv/utility/code_position.hpp>
-#include <libv/utility/utility.hpp>
+#include <libv/utility/enum.hpp>
 // std
 #include <ostream>
 #include <sstream>

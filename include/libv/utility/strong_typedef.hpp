@@ -1,36 +1,12 @@
-// File: utility.hpp
+// File: strong_typedef.hpp - Created on 2017.10.21. 03:20 - Author: Vader
 
 #pragma once
 
-#include <memory>
-#include <utility>
-
-
-namespace libv {
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename E, typename = typename std::enable_if<std::is_enum<E>::value>::type>
-constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
-   return static_cast<typename std::underlying_type<E>::type>(std::forward<E>(e));
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T, size_t N>
-constexpr inline size_t count_of(const T (&)[N]) {
-	return N;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-} // namespace libv
 
 // Strong Typedef ----------------------------------------------------------------------------------
 // Based on boost strong typedef <boost/serialization/strong_typedef.hpp>
+// But take a look at this article http://foonathan.net/blog/2016/10/19/strong-typedefs.html
 
-// TODO P4: constexpr
-// TODO P5: move to utility/strong_typedef(?).hpp
 #define LIBV_STRONG_TYPEDEF(T, D)                                                                  \
 struct D {                                                                                         \
 	T t;                                                                                           \
@@ -44,5 +20,3 @@ struct D {                                                                      
 	bool operator==(const D & rhs) const { return t == rhs.t; }                                    \
 	bool operator<(const D & rhs) const { return t < rhs.t; }                                      \
 };
-
-// -------------------------------------------------------------------------------------------------

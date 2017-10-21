@@ -7,7 +7,7 @@
 // std
 #include <string>
 // libv
-#include <libv/utility/utility.hpp>
+#include <libv/utility/enum.hpp>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/log.hpp>
