@@ -3,7 +3,6 @@
 #pragma once
 
 #include <memory>
-#include <thread>
 #include <utility>
 
 
@@ -25,15 +24,6 @@ struct new_t {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: move to thread/number(?).hpp, also maybe rename to libv::thread::number() and name()
-inline size_t current_thread_number() {
-	static_assert(sizeof (std::thread::id) == sizeof (size_t), "thread::id size is not matching size_t");
-	auto id = std::this_thread::get_id();
-	return reinterpret_cast<size_t&>(id);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename E, typename = typename std::enable_if<std::is_enum<E>::value>::type>
 constexpr auto to_value(E e) -> typename std::underlying_type<E>::type {
    return static_cast<typename std::underlying_type<E>::type>(std::forward<E>(e));
@@ -48,8 +38,8 @@ inline void hash_combine(std::size_t&) { }
 template <typename T, typename... Rest>
 inline void hash_combine(std::size_t& seed, const T& v, Rest... rest) {
     std::hash<T> hasher;
-    seed ^= hasher(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-    hash_combine(seed, rest...);
+	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	hash_combine(seed, rest...);
 }
 
 } // namespace detail

@@ -6,6 +6,7 @@
 #include <fmt/format.h>
 #include <fmt/printf.h>
 // libv
+#include <libv/thread/number.hpp>
 #include <libv/utility/code_position.hpp>
 #include <libv/utility/utility.hpp>
 // std
@@ -300,7 +301,7 @@ public:
 					fmt::arg("line", poc.line),
 					fmt::arg("file", poc.file),
 					fmt::arg("func", poc.func),
-					fmt::arg("thread", current_thread_number())
+					fmt::arg("thread", thread_number())
 					);
 			for (auto& output : outputs) {
 				*output << record << std::flush;
