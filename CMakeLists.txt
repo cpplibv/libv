@@ -614,7 +614,7 @@ create_executable(
 	TARGET test_libv
 	SOURCE ${PATH_TST}/libv/libv/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -622,7 +622,7 @@ create_executable(
 	TARGET test_libv_ecs
 	SOURCE ${PATH_TST}/libv/ecs/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -630,7 +630,7 @@ create_executable(
 	TARGET test_libv_frame
 	SOURCE ${PATH_TST}/libv/frame/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -638,7 +638,7 @@ create_executable(
 	TARGET test_libv_gl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_gl
+	LINK   ${USE_STATIC_LINK} fmt libv_gl
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -654,7 +654,7 @@ create_executable(
 	TARGET test_libv_parse
 	SOURCE ${PATH_TST}/libv/parse/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
@@ -662,7 +662,7 @@ create_executable(
 	TARGET test_libv_sig
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_UNIT_TEST
 )
 
