@@ -12,21 +12,17 @@ namespace libv {
 
 namespace detail {
 
-inline void hash_combine(size_t&) { }
-
-template <typename T, typename... Rest>
-inline void hash_combine(size_t& seed, const T& v, Rest... rest) {
-	std::hash<T> hasher;
-	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-	hash_combine(seed, rest...);
+template<typename T>
+constexpr inline void aux_hash_combine(size_t& seed, const T& val) noexcept {
+	seed ^= std::hash<T>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 } // namespace detail
 
-template <typename... Args>
-constexpr inline size_t hash_combine(Args&&... args) {
+template<typename... Types>
+constexpr inline size_t hash_combine(const Types&... args) noexcept {
 	size_t seed = 0;
-	detail::hash_combine(seed, std::forward<Args>(args)...);
+	(detail::aux_hash_combine(seed, args), ...);
 	return seed;
 }
 
