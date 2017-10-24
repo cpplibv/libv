@@ -118,7 +118,6 @@ struct Example {
 
 		gl.capability.depthTest.enable();
 		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
-//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); //Alpha Type
 
 		gl.capability.cullFace.enable();
 		gl.cullFace.back();

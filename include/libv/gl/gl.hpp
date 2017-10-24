@@ -388,36 +388,28 @@ public:
 		return matrixTexture_;
 	}
 
+private:
+	template <typename T, typename P>
+	inline T getInteger(P param) const {
+		T value;
+		glGetIntegerv(param, &value);
+		return value;
+	}
 public:
 	inline GLint getMaxUniformBlockSize() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_UNIFORM_BLOCK_SIZE);
 	}
 	inline GLint getMaxUniformBufferBindings() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_UNIFORM_BUFFER_BINDINGS);
 	}
 	inline GLint getMaxVertexAttribs() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_VERTEX_ATTRIBS);
 	}
 	inline GLint getMaxVertexUniformComponents() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_COMPONENTS, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_VERTEX_UNIFORM_COMPONENTS);
 	}
 	inline GLint getMaxCombinedTextureImageUnits() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 	}
 	inline GLint getCurrentAvailableVideoMemory() const {
 //		int availableKB[4];
@@ -430,10 +422,7 @@ public:
 		return 0;
 	}
 	inline GLint getMaxTextureSize() const {
-		GLint n;
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &n);
-		LIBV_GL_DEBUG_CHECK();
-		return n;
+		return getInteger<GLint>(GL_MAX_TEXTURE_SIZE);
 	}
 
 public:
