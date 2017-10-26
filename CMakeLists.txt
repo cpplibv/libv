@@ -402,6 +402,19 @@ ExternalProject_Add(ext_lua
 	EXCLUDE_FROM_ALL 1
 )
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_net_ts)
+ExternalProject_Add(ext_net_ts
+	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
+	GIT_TAG 6bf74be013e104e2893de245bc3379a6f3f20d54
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND "" # net_ts is header only, skip tests
+	PREFIX ${PATH_EXT_SRC}/net_ts
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/net_ts/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/ext_net_ts/include/ ${PATH_EXT}/net_ts/
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND GROUP_EXTERNAL_PROJECT ext_range)
 ExternalProject_Add(ext_range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
@@ -461,6 +474,7 @@ include_directories(SYSTEM ${PATH_EXT}/glfw/include)
 include_directories(SYSTEM ${PATH_EXT}/gli/include)
 include_directories(SYSTEM ${PATH_EXT}/glm/include)
 include_directories(SYSTEM ${PATH_EXT}/lua/include)
+include_directories(SYSTEM ${PATH_EXT}/net_ts/include)
 include_directories(SYSTEM ${PATH_EXT}/range/include)
 include_directories(SYSTEM ${PATH_EXT}/sol/include)
 include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
@@ -578,7 +592,7 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
-	LINK   ${USE_STATIC_LINK} boost_serialization-mt-s boost_system-mt-s
+	LINK   ${USE_STATIC_LINK}
 	GROUP  GROUP_SANDBOX
 )
 
