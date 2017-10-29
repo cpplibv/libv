@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <boost/algorithm/string/join.hpp> // toPrettyString
-#include <fmt/format.h> // toPrettyString
+#include <boost/algorithm/string/join.hpp> // toPrettyString, move that to cpp
+#include <fmt/format.h> // toPrettyString, move that to cpp
 // libv
 #include <libv/utility/utf8.hpp>
 #include <libv/math/vec.hpp>
@@ -15,6 +15,7 @@
 // pro
 #include <libv/frame/inputs.hpp>
 #include <libv/utility/enum.hpp>
+
 
 // TODO P5: Most of the event should get a observer_ptr<Frame> as member, or even better: Frame&!
 // TODO P5: Review every event and change int to bool or enum, and (double, double) to vec2d
@@ -34,7 +35,7 @@ struct EventChar {
 	uint32_t unicode;
 	char utf8[5];
 	EventChar(uint32_t unicode) : unicode(unicode) {
-		libv::unicode_to_utf8(utf8, unicode);
+		libv::unicode_to_utf8(unicode, utf8);
 	}
 
 	std::string toPrettyString() const {
@@ -47,7 +48,7 @@ struct EventCharMods {
 	int mods;
 	char utf8[5];
 	EventCharMods(uint32_t unicode, int mods) : unicode(unicode), mods(mods) {
-		libv::unicode_to_utf8(utf8, unicode);
+		libv::unicode_to_utf8(unicode, utf8);
 	}
 
 	std::string toPrettyString() const {

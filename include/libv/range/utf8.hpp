@@ -16,8 +16,6 @@ namespace view {
 
 // -------------------------------------------------------------------------------------------------
 
-//https://github.com/tcbrindle/utf_ranges/blob/master/include/tcb/utf_ranges/view/utf_convert.hpp
-
 namespace detail {
 
 // Note: range v3 currently freaks out if it sees a constructor in view_facade with only one
@@ -40,9 +38,11 @@ class aux_uft8_to_unicode_view : public ranges::view_facade<aux_uft8_to_unicode_
 
 public:
 	inline aux_uft8_to_unicode_view() :
-		iter_(), end_(iter_) { }
+		iter_(),
+		end_(iter_) { }
 	inline aux_uft8_to_unicode_view(std::string::const_iterator iter_, std::string::const_iterator end_) :
-		iter_(iter_), end_(end_) { }
+		iter_(iter_),
+		end_(end_) { }
 };
 
 struct uft8_to_codepoint_view : aux_uft8_to_unicode_view {
@@ -61,15 +61,11 @@ struct uft8_to_codepoint_fn {
 	template <typename Rng>
 	auto operator()(Rng&& rng) const {
 		return detail::uft8_to_codepoint_view(std::forward<Rng>(rng));
-		//return detail::uft8_to_codepoint_view<ranges::view::all_t<Rng>>(
-		//		ranges::view::all(std::forward<Rng>(rng)));
 	}
 	auto operator()() const {
 		return [](auto&& rng) {
 			using Rng = decltype(rng);
 			return detail::uft8_to_codepoint_view(std::forward<Rng>(rng));
-			//return detail::uft8_to_codepoint_view<ranges::view::all_t<Rng>>(
-			//		ranges::view::all(std::forward<Rng>(rng)));
 		};
 	}
 };
