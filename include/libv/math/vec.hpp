@@ -18,6 +18,7 @@
 #include <libv/meta/type_traits.hpp>
 
 
+// TODO P1: conditionally explicit ctors: 41:00 https://www.youtube.com/watch?v=ybaE9qlhHvw
 // TODO P2: use 'concepts' for N dim vector for: from_xyzw, xyz, xy, rgba, ...
 // TODO P2: I think the whole glm bridge could be resolved by a pretty rough template conversion function
 //			Concept for: something has x y z w and sizes, member offsets, full size are equal then allow conversion to and from that type

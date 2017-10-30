@@ -77,6 +77,14 @@ http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/2352
 LIBV_STRONG_TYPEDEF(int, Severity);
 logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
 logger: binlog
+cpp.compile: things I want to know about my compile time:
+		- Instantiation time, count, location and arguments for every template and their size in binary (inline = 0)
+		- List of headers included for every translation unit
+		- Size of the resulting translation unit
+		- Symbol content of the translation unit
+		- Lists of translation units that includes (even if transitively) a given header
+		- clang patch: https://www.youtube.com/watch?v=NPWQ7xKfIHQ
+		- record in CI history per commit changes in every statistics
 
 // -------------------------------------------------------------------------------------------------
 

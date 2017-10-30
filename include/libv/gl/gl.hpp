@@ -9,16 +9,16 @@
 #include <libv/math/vec.hpp>
 // std
 #include <stack>
+#include <vector>
 // pro
 #include <libv/gl/enum.hpp>
 #include <libv/gl/guard.hpp>
 #include <libv/gl/log.hpp>
 #include <libv/gl/vertex_buffer.hpp>
 
+
 namespace libv {
 namespace gl {
-
-class VertexArray;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ inline float deg(float radians) {
 template <typename Mat>
 class MatrixStack {
 private:
-	std::stack<Mat> stack;
+	std::stack<Mat, std::vector<Mat>> stack;
 
 public:
 	using value_type = Mat;
@@ -54,11 +54,13 @@ public:
 		stack.top() = mx;
 		return *this;
 	}
-	inline StackGuard<MatrixStack<Mat>> pushGuard() {
-		return StackGuard<MatrixStack>(*this, stack.top());
+	[[nodiscard]] inline auto push_guard() noexcept {
+		push();
+		return Guard([this] { pop(); });
 	}
-	inline StackGuard<MatrixStack<Mat>> pushGuard(const Mat& mx) {
-		return StackGuard<MatrixStack>(*this, mx);
+	[[nodiscard]] inline auto push_guard(const Mat& mx) noexcept {
+		push(mx);
+		return Guard([this] { pop(); });
 	}
 	inline MatrixStack<Mat>& pop() {
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
@@ -366,12 +368,7 @@ struct PolygonModeSetter {
 
 // -------------------------------------------------------------------------------------------------
 
-class GL {
-private:
-	libv::mat4f matrixTexture_; // Make it static constexpr...
-
-	TextureChannel currentActiveTexture;
-
+struct GL {
 public:
 	MatrixStack<libv::mat4f> model;
 	MatrixStack<libv::mat4f> view;
@@ -384,8 +381,12 @@ public:
 	inline libv::vec3f eye() const {
 		return libv::vec::xyz(view.top().inverse_copy()[3]);
 	}
-	inline const libv::mat4f& getMatrixTexture() const {
-		return matrixTexture_;
+	inline libv::mat4f getMatrixTexture() const {
+		return libv::mat4f{
+				0.5f, 0.0f, 0.0f, 0.0f,
+				0.0f, 0.5f, 0.0f, 0.0f,
+				0.0f, 0.0f, 0.5f, 0.0f,
+				0.5f, 0.5f, 0.5f, 1.0f};
 	}
 
 private:
@@ -443,6 +444,10 @@ public:
 	FrontFaceSetter frontFace;
 	PolygonModeSetter polygonMode;
 
+protected:
+	TextureChannel currentActiveTexture;
+
+public:
 	//	void depthMask(bool writeEnabled);
 	//	void stencilMask(bool writeEnabled);
 	//	void stencilMask(uint mask);
@@ -459,106 +464,7 @@ public:
 	//
 	//	void beginTransformFeedback(Primitive::primitive_t mode);
 	//	void endTransformFeedback();
-	GL() :
-		matrixTexture_(
-			0.5f, 0.0f, 0.0f, 0.0f,
-			0.0f, 0.5f, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.5f, 0.0f,
-			0.5f, 0.5f, 0.5f, 1.0f) { }
 };
-
-// Debug -------------------------------------------------------------------------------------------
-
-// <editor-fold defaultstate="collapsed" desc="inline void renderCube(float x, float y, float z, float size) {...">
-inline void renderCube(float x, float y, float z, float size) {
-	glBegin(GL_QUADS);
-
-	//Right
-	glNormal3f(1.0f, 0.0f, 0.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x + size, y - size, z - size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x + size, y - size, z + size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x + size, y + size, z + size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x + size, y + size, z - size);
-
-	//Left
-	glNormal3f(-1.0f, 0.0f, 0.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x - size, y - size, z - size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x - size, y + size, z - size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x - size, y + size, z + size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x - size, y - size, z + size);
-
-	//Top
-	glNormal3f(0.0f, 1.0f, 0.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x - size, y + size, z - size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x + size, y + size, z - size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x + size, y + size, z + size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x - size, y + size, z + size);
-
-	//Bottom
-	glNormal3f(0.0f, -1.0f, 0.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x - size, y - size, z - size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x - size, y - size, z + size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x + size, y - size, z + size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x + size, y - size, z - size);
-
-	//Near
-	glNormal3f(0.0f, 0.0f, -1.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x - size, y - size, z - size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x + size, y - size, z - size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x + size, y + size, z - size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x - size, y + size, z - size);
-
-	//Far
-	glNormal3f(0.0f, 0.0f, 1.0f);
-	glTexCoord2f(0, 0);
-	glVertex3f(x - size, y - size, z + size);
-	glTexCoord2f(0, 1);
-	glVertex3f(x - size, y + size, z + size);
-	glTexCoord2f(1, 1);
-	glVertex3f(x + size, y + size, z + size);
-	glTexCoord2f(1, 0);
-	glVertex3f(x + size, y - size, z + size);
-
-	glEnd();
-}
-// </editor-fold>
-
-// <editor-fold defaultstate="collapsed" desc="inline void renderXYZ(float x, float y, float z, float size) {...">
-inline void renderXYZ(float x, float y, float z, float size) {
-	glBegin(GL_LINES);
-	glColor3f(1, 0, 0);
-	glVertex3f(x, y, z);
-	glVertex3f(x + size, y, z);
-	glColor3f(0, 1, 0);
-	glVertex3f(x, y, z);
-	glVertex3f(x, y + size, z);
-	glColor3f(0, 0, 1);
-	glVertex3f(x, y, z);
-	glVertex3f(x, y, z + size);
-	glEnd();
-	glColor3f(1, 1, 1);
-}
-// </editor-fold>
 
 // =================================================================================================
 
@@ -610,6 +516,8 @@ inline void GL::use(const Program& program) {
 	program.use();
 	LIBV_GL_DEBUG_CHECK();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace gl
 } // namespace libv

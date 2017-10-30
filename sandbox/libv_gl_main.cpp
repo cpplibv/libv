@@ -211,9 +211,9 @@ struct Example {
 		gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
 		gl.clear();
 
-		auto pStackGuard = gl.projection.pushGuard();
-		auto vStackGuard = gl.view.pushGuard();
-		auto mStackGuard = gl.model.pushGuard();
+		auto pStackGuard = gl.projection.push_guard();
+		auto vStackGuard = gl.view.push_guard();
+		auto mStackGuard = gl.model.push_guard();
 
 		angle += 0.5f;
 
