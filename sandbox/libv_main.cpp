@@ -18,7 +18,7 @@
 #include <iostream>
 #include <libv/parse/color.hpp>
 #include <libv/parse/text_tag.hpp>
-#include <libv/range/utf8.hpp>
+#include <libv/range/view_uft8_codepoints.hpp>
 #include <map>
 #include <memory>
 #include <range/v3/algorithm/copy.hpp>
@@ -55,7 +55,7 @@ int main() {
 //			"[tag=\"țûɾ ấɖḯƥĭṩčįɳ]ġ >\\]<ḝłįʈ, \\\\]șếᶑ] \"]"
 //			"[tag=\"țûɾ ấɖḯƥĭṩčįɳ]ġ \"ᶁⱺ ẽḭŭŝḿꝋď ]ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đôȇ ᵯáᶇā ąⱡîɋṹẵ.";
 //
-////	for (const auto& ch : in | libv::view::uft8_to_codepoint) {
+////	for (const auto& ch : in | libv::view::uft8_codepoints) {
 ////		std::cout << ch << ' ';
 ////	}
 //
