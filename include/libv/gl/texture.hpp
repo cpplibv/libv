@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
 // std
 #include <memory>
 // pro
@@ -14,59 +16,64 @@ namespace libv {
 namespace gl {
 
 namespace detail {
+
+/// Supported formats: KTX, KMG or DDS
 GLuint gliCreateTexture(char const* data, std::size_t size);
+
 } // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 template <TextureBindTarget BindTarget>
 class Texture {
+	static constexpr GLuint invalidID = 0;
+
 protected:
-	GLuint textureID = 0;
+	GLuint textureID = invalidID;
 
 public:
 	inline Texture() = default;
 	inline Texture(const Texture&) = delete;
 	inline Texture(Texture&& orig) noexcept : textureID(orig.textureID) {
-		orig.textureID = 0;
+		orig.textureID = invalidID;
 	}
 	inline ~Texture() {
-		LIBV_GL_DEBUG_ASSERT(id() == 0);
+		LIBV_GL_DEBUG_ASSERT(id() == invalidID);
 	}
 
 public:
 	//inline void generateMipmap()?
 
 	inline void create() {
-		LIBV_GL_DEBUG_ASSERT(textureID == 0);
+		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
 		glGenTextures(1, &textureID);
 		LIBV_GL_DEBUG_CHECK();
-		if (textureID == 0)
+		if (textureID == invalidID)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
 	inline void createFromDDS(const char* data, const size_t size) {
-		LIBV_GL_DEBUG_ASSERT(textureID == 0);
+		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
 		textureID = detail::gliCreateTexture(data, size);
-		if (textureID == 0)
+		if (textureID == invalidID)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
 	inline void createFromDDS(const std::string& data) {
-		LIBV_GL_DEBUG_ASSERT(textureID == 0);
+		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
 		textureID = detail::gliCreateTexture(data.data(), data.size());
-		if (textureID == 0)
+		if (textureID == invalidID)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
 	inline void destroy() {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glDeleteTextures(1, &textureID);
 		LIBV_GL_DEBUG_CHECK();
-		textureID = 0;
+		textureID = invalidID;
 	}
 	inline void adopt(GLuint id) {
-		LIBV_GL_DEBUG_ASSERT(textureID == 0);
+		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
 		textureID = id;
 	}
 	inline void bind() {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glBindTexture(to_value(BindTarget), textureID);
 		LIBV_GL_DEBUG_CHECK();
 	}
@@ -74,60 +81,72 @@ public:
 		return BindGuard<Texture<BindTarget>>(*this);
 	}
 	inline void unbind() {
-		LIBV_GL_DEBUG_ASSERT(to_value(BindTarget) != 0);
-		glBindTexture(to_value(BindTarget), 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
+		glBindTexture(to_value(BindTarget), invalidID);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage1D(size_t levels, InternalFormat internalFormat, uint32_t width) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexStorage1D(to_value(BindTarget), levels, to_value(internalFormat), width);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage2D(size_t levels, InternalFormat internalFormat, uint32_t width, uint32_t height) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexStorage2D(to_value(BindTarget), levels, to_value(internalFormat), width, height);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void storage3D(size_t levels, InternalFormat internalFormat, uint32_t width, uint32_t height, uint32_t depth) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexStorage3D(to_value(BindTarget), levels, to_value(internalFormat), width, height, depth);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image1D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexImage1D(to_value(BindTarget), level, to_value(internalFormat), width, 0, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image2D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexImage2D(to_value(BindTarget), level, to_value(internalFormat), width, height, 0, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void image3D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, uint32_t depth, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexImage3D(to_value(BindTarget), level, to_value(internalFormat), width, height, depth, 0, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage1D(size_t level, int32_t xOffset, Format dataFormat, DataType dataType, uint32_t width, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexSubImage1D(to_value(BindTarget), level, xOffset, width, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage2D(size_t level, int32_t xOffset, int32_t yOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexSubImage2D(to_value(BindTarget), level, xOffset, yOffset, width, height, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage2D(CubeSide cubeSide, size_t level, int32_t xOffset, int32_t yOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexSubImage2D(to_value(cubeSide), level, xOffset, yOffset, width, height, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
 	inline void subImage3D(size_t level, int32_t xOffset, int32_t yOffset, int32_t zOffset, Format dataFormat, DataType dataType, uint32_t width, uint32_t height, uint32_t depth, const void* data) {
-		LIBV_GL_DEBUG_ASSERT(textureID != 0);
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexSubImage3D(to_value(BindTarget), level, xOffset, yOffset, zOffset, width, height, depth, to_value(dataFormat), to_value(dataType), data);
 		LIBV_GL_DEBUG_CHECK();
 	}
+
+public:
+	inline libv::vec2i getSize2D(size_t level = 0) {
+		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
+		libv::vec2i result;
+		glGetTexLevelParameteriv(to_value(BindTarget), level, GL_TEXTURE_WIDTH, &result.x);
+		glGetTexLevelParameteriv(to_value(BindTarget), level, GL_TEXTURE_HEIGHT, &result.y);
+		LIBV_GL_DEBUG_CHECK();
+		return result;
+	}
+
+public:
 	inline void setDepthStencilMode(DepthStencilMode mode) {
 		glTexParameteri(to_value(BindTarget), GL_DEPTH_STENCIL_TEXTURE_MODE, to_value(mode));
 		LIBV_GL_DEBUG_CHECK();
@@ -315,7 +334,7 @@ struct Sampler {
 //
 //inline void emulateStorage1D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width) {
 //	glGenTextures(1, &textureID);
-//	if (textureID == 0)
+//	if (textureID == invalidID)
 //		LIBV_LOG_GL_ERROR("Failed to create 1D texture", to_string(type));
 //
 //	// Simulating glTexStorage1D for pre 4.2 compatibility
@@ -335,7 +354,7 @@ struct Sampler {
 //
 //inline void emulateStorage2D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height) {
 //	glGenTextures(1, &textureID);
-//	if (textureID == 0)
+//	if (textureID == invalidID)
 //		LIBV_LOG_GL_ERROR("Failed to create 2D texture", to_string(type));
 //
 //	// Simulating glTexStorage2D for pre 4.2 compatibility
@@ -374,7 +393,7 @@ struct Sampler {
 //}
 //inline void emulateStorage3D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height, uint32_t depth) {
 //	glGenTextures(3, &textureID);
-//	if (textureID == 0)
+//	if (textureID == invalidID)
 //		LIBV_LOG_GL_ERROR("Failed to create 2D texture", to_string(type));
 //
 //	// Simulating glTexStorage3D for pre 4.2 compatibility

@@ -572,11 +572,31 @@ template <size_t N, typename T, typename K>
 constexpr inline auto max(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return std::max(lhs.data[index], rhs.data[index]); });
 }
+/// \return The minimum vector with the smaller value on each dimension
+template <size_t N, typename T, typename K>
+constexpr inline auto max(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return std::max(lhs.data[index], rhs); });
+}
+/// \return The minimum vector with the smaller value on each dimension
+template <size_t N, typename T, typename K>
+constexpr inline auto max(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return std::max(lhs, rhs.data[index]); });
+}
 
-/// \return The maximum vector with the bigger value on each dimension from the two vector
+/// \return The maximum vector with the greater value on each dimension from the two vector
 template <size_t N, typename T, typename K>
 constexpr inline auto min(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return std::min(lhs.data[index], rhs.data[index]); });
+}
+/// \return The minimum vector with the greater value on each dimension
+template <size_t N, typename T, typename K>
+constexpr inline auto min(const vec_t<N, T>& lhs, const K& rhs) {
+	return build_vec<N>([&](auto index) { return std::min(lhs.data[index], rhs); });
+}
+/// \return The minimum vector with the greater value on each dimension
+template <size_t N, typename T, typename K>
+constexpr inline auto min(const T& lhs, const vec_t<N, K>& rhs) {
+	return build_vec<N>([&](auto index) { return std::min(lhs, rhs.data[index]); });
 }
 
 /// \return The static casted vector to the requested K type
@@ -687,5 +707,8 @@ using vec4l = vec4_t<int64_t>;
 using vec2ul = vec2_t<uint64_t>;
 using vec3ul = vec3_t<uint64_t>;
 using vec4ul = vec4_t<uint64_t>;
+using vec2z = vec2_t<size_t>;
+using vec3z = vec3_t<size_t>;
+using vec4z = vec4_t<size_t>;
 
 } // namespace libv

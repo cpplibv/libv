@@ -77,6 +77,9 @@ public:
 		stack.top() = mat;
 		return *this;
 	}
+	inline decltype(auto) operator*(const vec4_t<T>& v) {
+		return stack.top() * v;
+	}
 	inline decltype(auto) operator*(const Mat& mat) const {
 		return stack.top() * mat;
 	}
