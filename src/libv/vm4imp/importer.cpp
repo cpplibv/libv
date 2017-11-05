@@ -254,7 +254,7 @@ void importGeometry(Model& model, const aiScene* scene) {
 
 std::optional<Model> import(const std::string& filePath) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality | aiProcess_FlipUVs);
+	const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (!scene) {
 		LIBV_LOG_VM4_ERROR("Failed to import model {}: {}", filePath, importer.GetErrorString());
