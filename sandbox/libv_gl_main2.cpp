@@ -20,6 +20,8 @@
 #include <libv/gl/shader.hpp>
 #include <libv/gl/texture.hpp>
 #include <libv/gl/vertex_buffer.hpp>
+#include <libv/gl/image.hpp>
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -184,9 +186,11 @@ struct Example {
 		vertexArray.bindElements(bufferVertexIndices);
 
 		auto dataPlane = libv::read_file("res/texture/6poly_metal_01_diffuse.dds");
-		texturePlane.createFromDDS(dataPlane.data(), dataPlane.size());
+		auto imagePlane = libv::gl::Image(dataPlane);
+		texturePlane.adopt(imagePlane.createTexture());
 		auto dataSky = libv::read_file("res/texture/sky/merged2.dds");
-		textureSky.createFromDDS(dataSky.data(), dataSky.size());
+		auto imageSky = libv::gl::Image(dataSky);
+		textureSky.adopt(imageSky.createTexture());
 
 		programTest1.use();
 		uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;

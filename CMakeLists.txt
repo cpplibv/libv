@@ -428,6 +428,16 @@ ExternalProject_Add(ext_range
 	EXCLUDE_FROM_ALL 1
 )
 
+list(APPEND GROUP_EXTERNAL_PROJECT ext_soil)
+ExternalProject_Add(ext_soil
+	GIT_REPOSITORY https://github.com/xosdy/soil.git
+	GIT_TAG master
+	PREFIX ${PATH_EXT_SRC}/soil
+	CMAKE_ARGS
+		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/soil
+	EXCLUDE_FROM_ALL 1
+)
+
 list(APPEND GROUP_EXTERNAL_PROJECT ext_sol)
 ExternalProject_Add(ext_sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
@@ -476,6 +486,7 @@ include_directories(SYSTEM ${PATH_EXT}/glm/include)
 include_directories(SYSTEM ${PATH_EXT}/lua/include)
 include_directories(SYSTEM ${PATH_EXT}/net_ts/include)
 include_directories(SYSTEM ${PATH_EXT}/range/include)
+include_directories(SYSTEM ${PATH_EXT}/soil/include)
 include_directories(SYSTEM ${PATH_EXT}/sol/include)
 include_directories(SYSTEM ${PATH_EXT}/utf8cpp/include)
 
@@ -487,6 +498,7 @@ link_directories(${PATH_EXT}/freetype/lib)
 link_directories(${PATH_EXT}/glew/lib)
 link_directories(${PATH_EXT}/glfw/lib)
 link_directories(${PATH_EXT}/lua/lib)
+link_directories(${PATH_EXT}/soil/lib)
 
 # === Targets ======================================================================================
 
@@ -564,7 +576,7 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs soil
 	GROUP  GROUP_SANDBOX
 )
 

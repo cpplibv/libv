@@ -15,14 +15,6 @@
 namespace libv {
 namespace gl {
 
-namespace detail {
-
-/// Supported formats: KTX, KMG or DDS
-GLuint gliCreateTexture(char const* data, std::size_t size);
-
-} // namespace detail
-
-// -------------------------------------------------------------------------------------------------
 template <TextureBindTarget BindTarget>
 class Texture {
 	static constexpr GLuint invalidID = 0;
@@ -47,18 +39,6 @@ public:
 		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
 		glGenTextures(1, &textureID);
 		LIBV_GL_DEBUG_CHECK();
-		if (textureID == invalidID)
-			LIBV_LOG_GL_ERROR("Failed to create texture.");
-	}
-	inline void createFromDDS(const char* data, const size_t size) {
-		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
-		textureID = detail::gliCreateTexture(data, size);
-		if (textureID == invalidID)
-			LIBV_LOG_GL_ERROR("Failed to create texture.");
-	}
-	inline void createFromDDS(const std::string& data) {
-		LIBV_GL_DEBUG_ASSERT(textureID == invalidID);
-		textureID = detail::gliCreateTexture(data.data(), data.size());
 		if (textureID == invalidID)
 			LIBV_LOG_GL_ERROR("Failed to create texture.");
 	}
