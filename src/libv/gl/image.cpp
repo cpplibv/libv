@@ -27,6 +27,7 @@ std::unique_ptr<Image::Pimpl> loadGLI(const char* data, size_t dataSize) {
 Image::Image(const char* data, size_t dataSize) {
 	if (!pimpl) pimpl = loadGLI(data, dataSize);
 	if (!pimpl) pimpl = loadSOIL(data, dataSize);
+	if (!pimpl) throw InvalidImageFormatException{};
 }
 
 Image::Image(const std::string& data) : Image(data.data(), data.size()) {

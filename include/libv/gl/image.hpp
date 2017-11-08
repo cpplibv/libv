@@ -15,6 +15,16 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
+class InvalidImageFormatException : public std::exception {
+public:
+	InvalidImageFormatException() noexcept { }
+	virtual const char* what() const noexcept override {
+		return "InvalidImageFormatException";
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 struct Image {
 	struct Pimpl;
 

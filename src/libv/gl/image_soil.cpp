@@ -18,7 +18,7 @@ ImageSOIL::ImageSOIL(const char* data, std::size_t dataSize) {
 }
 
 GLuint ImageSOIL::createTexture() {
-	const auto id = SOIL_create_OGL_texture(textureData, imageSize.x, imageSize.y, channels, SOIL_CREATE_NEW_ID, 0);
+	const auto id = SOIL_create_OGL_texture(textureData, imageSize.x, imageSize.y, channels, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 	LIBV_GL_DEBUG_CHECK();
 	return id;
 }

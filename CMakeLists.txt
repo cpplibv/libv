@@ -520,7 +520,7 @@ create_library(
 create_library(
 	TARGET libv_gl
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
-	LINK   ${USE_STATIC_LINK} glew ${OPENGL_LIBRARIES}
+	LINK   ${USE_STATIC_LINK} glew ${OPENGL_LIBRARIES} soil
 	GROUP  GROUP_LIBRARY
 )
 
@@ -564,14 +564,14 @@ create_executable(
 create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE ${PATH_SNB}/libv_gl_main.cpp
-	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl soil stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 
 create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl stdc++fs soil
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl soil stdc++fs
 	GROUP  GROUP_SANDBOX
 )
 

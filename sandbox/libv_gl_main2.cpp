@@ -185,7 +185,7 @@ struct Example {
 		vertexArray.bindAttribute(bufferVertexData, attributeUV, sizeof(Vertex), offsetof(Vertex, uv), false);
 		vertexArray.bindElements(bufferVertexIndices);
 
-		auto dataPlane = libv::read_file("res/texture/6poly_metal_01_diffuse.dds");
+		auto dataPlane = libv::read_file("res/texture/6poly_metal_01_diffuse.png");
 		auto imagePlane = libv::gl::Image(dataPlane);
 		texturePlane.adopt(imagePlane.createTexture());
 		auto dataSky = libv::read_file("res/texture/sky/merged2.dds");
