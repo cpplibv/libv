@@ -19,6 +19,7 @@
 
 
 // TODO P1: conditionally explicit ctors: 41:00 https://www.youtube.com/watch?v=ybaE9qlhHvw
+// TODO P2: move swizzle custom getters back into member
 // TODO P2: use 'concepts' for N dim vector for: from_xyzw, xyz, xy, rgba, ...
 // TODO P2: I think the whole glm bridge could be resolved by a pretty rough template conversion function
 //			Concept for: something has x y z w and sizes, member offsets, full size are equal then allow conversion to and from that type
@@ -51,24 +52,6 @@ constexpr inline decltype(auto) build_vec(F&& func) {
 		return vec_t<N, decltype(func(std::declval<size_t>()))>(func(indices)...);
 	});
 }
-
-// vec bridges -------------------------------------------------------------------------------------
-
-template <typename Vec, typename Target>
-struct enable_implicit_vec_cast {};
-
-#ifdef LIBV_USE_GLM_BRIDGE
-
-template <typename T, glm::precision P>
-struct enable_implicit_vec_cast<vec_t<1, T>, glm::tvec1<T, P>> { using type = void; };
-template <typename T, glm::precision P>
-struct enable_implicit_vec_cast<vec_t<2, T>, glm::tvec2<T, P>> { using type = void; };
-template <typename T, glm::precision P>
-struct enable_implicit_vec_cast<vec_t<3, T>, glm::tvec3<T, P>> { using type = void; };
-template <typename T, glm::precision P>
-struct enable_implicit_vec_cast<vec_t<4, T>, glm::tvec4<T, P>> { using type = void; };
-
-#endif
 
 // vec_base_t --------------------------------------------------------------------------------------
 
@@ -197,26 +180,6 @@ struct vec_t : vec_base_t<N, T> {
 	template <typename K, typename = decltype(T(std::declval<const K&>()))>
 	constexpr explicit inline vec_t(const vec_t<N, K>& vec) {
 		meta::n_times<N>([&](auto index) { this->data[index] = vec.data[index]; });
-	}
-
-	// converters ----------------------------------------------------------------------------------
-	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
-	constexpr inline operator K() const {
-		return meta::call_with_n_index([&](const auto... indices) {
-			return K{this->data[indices]...};
-		});
-	}
-	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
-	constexpr inline operator K&() & {
-		return reinterpret_cast<K&>(*this);
-	}
-	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
-	constexpr inline operator const K&() const & {
-		return reinterpret_cast<const K&>(*this);
-	}
-	template <typename K, typename = typename enable_implicit_vec_cast<vec_t<N, T>, K>::type>
-	constexpr inline operator K&&() && {
-		return reinterpret_cast<K&&>(*this);
 	}
 
 	// operator[] ----------------------------------------------------------------------------------
@@ -658,23 +621,24 @@ constexpr inline decltype(auto) from_xy(const T& v) {
 
 #ifdef LIBV_USE_GLM_BRIDGE
 
-#define LIBV_VEC_GLM_CONVERTER(N)                                                                  \
-template <typename T> constexpr inline decltype(auto) from_glm(glm::tvec##N<T>& v) {               \
-	return reinterpret_cast<vec_t<N, T>&>(v);                                                      \
-}                                                                                                  \
-template <typename T> constexpr inline decltype(auto) from_glm(const glm::tvec##N<T>& v) {         \
-	return reinterpret_cast<const vec_t<N, T>&>(v);                                                \
-}                                                                                                  \
-template <typename T> constexpr inline decltype(auto) to_glm(vec_t<N, T>& v) {                     \
-	return reinterpret_cast<glm::tvec##N<T>&>(v);                                                  \
-}                                                                                                  \
-template <typename T> constexpr inline decltype(auto) to_glm(const vec_t<N, T>& v) {               \
-	return reinterpret_cast<const glm::tvec##N<T>&>(v);                                            \
+template <typename T> constexpr inline auto from_glm(const glm::tvec2<T>& v) {
+	return vec_t<2, T>(v.x, v.y);
 }
-
-LIBV_VEC_GLM_CONVERTER(2)
-LIBV_VEC_GLM_CONVERTER(3)
-LIBV_VEC_GLM_CONVERTER(4)
+template <typename T> constexpr inline auto from_glm(const glm::tvec3<T>& v) {
+	return vec_t<3, T>(v.x, v.y, v.z);
+}
+template <typename T> constexpr inline auto from_glm(const glm::tvec4<T>& v) {
+	return vec_t<4, T>(v.x, v.y, v.z, v.w);
+}
+template <typename T> constexpr inline auto to_glm(const vec_t<2, T>& v) {
+	return glm::tvec2<T>(v.x, v.y);
+}
+template <typename T> constexpr inline auto to_glm(const vec_t<3, T>& v) {
+	return glm::tvec3<T>(v.x, v.y, v.z);
+}
+template <typename T> constexpr inline auto to_glm(const vec_t<4, T>& v) {
+	return glm::tvec4<T>(v.x, v.y, v.z, v.w);
+}
 
 #undef LIBV_VEC_GLM_CONVERTER
 

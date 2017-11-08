@@ -11,15 +11,15 @@
 
 // -------------------------------------------------------------------------------------------------
 
-#ifdef NDEBUG
+//#ifdef NDEBUG
 #    define LIBV_GL_DEBUG_CHECK() LIBV_GL_CHECK()
 #    define LIBV_GL_DEBUG_ASSERT(X) assert((X))
 #    define LIBV_GL_DEBUG_ASSERT_STATIC(X, M) static_assert((X), M)
-#else
-#    define LIBV_GL_DEBUG_CHECK() {}
-#    define LIBV_GL_DEBUG_ASSERT(X) {}
-#    define LIBV_GL_DEBUG_ASSERT_STATIC(X) {}
-#endif
+//#else
+//#    define LIBV_GL_DEBUG_CHECK() {}
+//#    define LIBV_GL_DEBUG_ASSERT(X) {}
+//#    define LIBV_GL_DEBUG_ASSERT_STATIC(X) {}
+//#endif
 
 // -------------------------------------------------------------------------------------------------
 

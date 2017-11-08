@@ -205,9 +205,9 @@ struct Example {
 		gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
 		gl.clear();
 
-		auto pStackGuard = gl.projection.push_guard();
-		auto vStackGuard = gl.view.push_guard();
-		auto mStackGuard = gl.model.push_guard();
+		const auto pStackGuard = gl.projection.push_guard();
+		const auto vStackGuard = gl.view.push_guard();
+		const auto mStackGuard = gl.model.push_guard();
 
 		angle += 0.5f;
 
@@ -218,8 +218,10 @@ struct Example {
 
 		// Draw Sky
 		{
+			auto eye = gl.eye();
+
 			auto gurad_modelStack = gl.model.push_guard();
-			gl.model.translate(gl.eye());
+			gl.model.translate(eye);
 			gl.model.scale(libv::vec3f(3.f, 3.f, 3.f));
 
 			auto guard_depth = gl.capability.depthTest.disable_guard();
@@ -229,7 +231,7 @@ struct Example {
 			auto guard_textureBind = textureSky.bindGuard();
 			uniformTest2MVPmat = gl.mvp();
 			uniformTest2Mmat = gl.model;
-			uniformTest2EyePosW = gl.eye();
+			uniformTest2EyePosW = eye;
 
 			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 36, 0);
 		}

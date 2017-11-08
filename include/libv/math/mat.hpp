@@ -46,17 +46,6 @@ namespace libv {
 //		T value[9];
 //	};
 //
-//#ifdef LIBV_USE_GLM_BRIDGE
-//	operator glm::tmat3x3<T>() const {
-//		return glm::tmat3x3<T>(m00, m01, m02, m10, m11, m12, m20, m21, m22);
-//	}
-//	operator glm::tmat3x3<T>& () {
-//		return *reinterpret_cast<glm::tmat3x3<T>*> (this);
-//	}
-//	operator const glm::tmat3x3<T>& () const {
-//		return *reinterpret_cast<const glm::tmat3x3<T>*> (this);
-//	}
-//#endif
 //};
 //
 //template <typename T>
@@ -78,21 +67,6 @@ namespace libv {
 //		T value[16];
 //	};
 //
-//#ifdef LIBV_USE_GLM_BRIDGE
-//	operator glm::tmat4x4<T>() const {
-//		return glm::tmat4x4<T>(
-//				m00, m01, m02, m03,
-//				m10, m11, m12, m13,
-//				m20, m21, m22, m23,
-//				m30, m31, m32, m33);
-//	}
-//	operator glm::tmat4x4<T>& () {
-//		return *reinterpret_cast<glm::tmat4x4<T>*> (this);
-//	}
-//	operator const glm::tmat4x4<T>& () const {
-//		return *reinterpret_cast<const glm::tmat4x4<T>*> (this);
-//	}
-//#endif
 //};
 //
 //#pragma GCC diagnostic pop
@@ -117,6 +91,7 @@ struct mat_base_t<2, T> {
 
 	inline mat_base_t() = default;
 	inline mat_base_t(T v) : mx(v) { }
+	inline mat_base_t(glm::tmat2x2<T> mx) : mx(mx) { }
 	inline mat_base_t(
 			T m00, T m01,
 			T m10, T m11) :
@@ -131,6 +106,7 @@ struct mat_base_t<3, T> {
 
 	inline mat_base_t() = default;
 	inline mat_base_t(T v) : mx(v) { }
+	inline mat_base_t(glm::tmat3x3<T> mx) : mx(mx) { }
 	inline mat_base_t(
 			T m00, T m01, T m02,
 			T m10, T m11, T m12,
@@ -147,6 +123,7 @@ struct mat_base_t<4, T> {
 
 	inline mat_base_t() = default;
 	inline mat_base_t(T v) : mx(v) { }
+	inline mat_base_t(glm::tmat4x4<T> mx) : mx(mx) { }
 	inline mat_base_t(
 			T m00, T m01, T m02, T m03,
 			T m10, T m11, T m12, T m13,
@@ -162,26 +139,24 @@ struct mat_base_t<4, T> {
 template <size_t N, typename T>
 struct mat_t;
 
-#define LIBV_MAT_GLM_CONVERTER(N)                                                                  \
-template <typename T> inline decltype(auto) to_glm(libv::mat_t<N, T>& m) {                         \
-	return reinterpret_cast<glm::tmat##N##x##N<T>&>(m);                                            \
-}                                                                                                  \
-template <typename T> inline decltype(auto) to_glm(const libv::mat_t<N, T>& m) {                   \
-	return reinterpret_cast<const glm::tmat##N##x##N<T>&>(m);                                      \
-}                                                                                                  \
-template <typename T> inline decltype(auto) from_glm(glm::tmat##N##x##N<T>& m) {                   \
-	return reinterpret_cast<mat_t<N, T>&>(m);                                                      \
-}                                                                                                  \
-template <typename T> inline decltype(auto) from_glm(const glm::tmat##N##x##N<T>& m) {             \
-	return reinterpret_cast<const mat_t<N, T>&>(m);                                                \
+template <typename T> inline auto to_glm(const mat_t<2, T>& m) {
+	return m.mx;
 }
-
-LIBV_MAT_GLM_CONVERTER(2)
-LIBV_MAT_GLM_CONVERTER(3)
-LIBV_MAT_GLM_CONVERTER(4)
-
-#undef LIBV_MAT_GLM_CONVERTER
-
+template <typename T> inline auto to_glm(const mat_t<3, T>& m) {
+	return m.mx;
+}
+template <typename T> inline auto to_glm(const mat_t<4, T>& m) {
+	return m.mx;
+}
+template <typename T> inline auto from_glm(const glm::tmat2x2<T>& m) {
+	return mat_t<2, T>{m};
+}
+template <typename T> inline auto from_glm(const glm::tmat3x3<T>& m) {
+	return mat_t<3, T>{m};
+}
+template <typename T> inline auto from_glm(const glm::tmat4x4<T>& m) {
+	return mat_t<4, T>{m};
+}
 
 template <size_t N, typename T>
 struct mat_t : mat_base_t<N, T> {
@@ -201,26 +176,26 @@ struct mat_t : mat_base_t<N, T> {
 		return from_glm(glm::inverse(this->mx));
 	}
 	inline mat_t<N, T>& rotate(T angle, const libv::vec3_t<T>& axis) {
-		this->mx = glm::rotate(this->mx, angle, to_glm(axis));
+		this->mx *= glm::rotate(glm::mat4{1.0f}, angle, to_glm(axis));
 		return *this;
 	}
 	inline mat_t<N, T> rotate_copy(T angle, const libv::vec3_t<T>& axis) const {
-		return from_glm(glm::rotate(this->mx, angle, to_glm(axis)));
+		return from_glm(this->mx * glm::rotate(glm::mat4{1.0f}, angle, to_glm(axis)));
 	}
 	//rotate(const glm::quat& quat);
 	inline mat_t<N, T>& scale(const libv::vec3_t<T>& v) {
-		this->mx = glm::scale(this->mx, to_glm(v));
+		this->mx *= glm::scale(glm::mat4{1.0f}, to_glm(v));
 		return *this;
 	}
 	inline mat_t<N, T> scale_copy(T angle, const libv::vec3_t<T>& v) const {
-		return from_glm(glm::scale(this->mx, to_glm(v)));
+		return from_glm(this->mx * glm::scale(glm::mat4{1.0f}, to_glm(v)));
 	}
 	inline mat_t<N, T>& translate(const libv::vec3_t<T>& v) {
-		this->mx = glm::translate(this->mx, to_glm(v));
+		this->mx *= glm::translate(glm::mat4{1.0f}, to_glm(v));
 		return *this;
 	}
 	inline mat_t<N, T> translate_copy(const libv::vec3_t<T>& v) const {
-		return from_glm(glm::translate(this->mx, to_glm(v)));
+		return from_glm(this->mx * glm::translate(glm::mat4{1.0f}, to_glm(v)));
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -235,11 +210,11 @@ struct mat_t : mat_base_t<N, T> {
 	inline mat_t<N, T> operator*(const mat_t<N, T>& mat) const {
 		return from_glm(this->mx * mat.mx);
 	}
-	inline vec_t<N, T>& operator[](size_t col) {
-		return from_glm(this->mx[col]);
+	inline decltype(auto) operator[](size_t col) {
+		return this->mx[col];
 	}
-	inline const vec_t<N, T>& operator[](size_t col) const {
-		return from_glm(this->mx[col]);
+	inline decltype(auto) operator[](size_t col) const {
+		return this->mx[col];
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -290,10 +265,6 @@ using mat4f = mat4_t<float>;
 using mat2d = mat2_t<double>;
 using mat3d = mat3_t<double>;
 using mat4d = mat4_t<double>;
-
-//using mat2 = mat2f;
-//using mat3 = mat3f;
-//using mat4 = mat4f;
 
 // -------------------------------------------------------------------------------------------------
 

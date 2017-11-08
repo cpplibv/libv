@@ -66,6 +66,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		-Wnon-virtual-dtor
 		-Wnull-dereference
 		-Wold-style-cast
+		-Wsuggest-override
 		-Wundef
 
 # Enablement in progress:
@@ -80,12 +81,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 # Most likely will never be used:
 # 		-Wfloat-equal # in tests 40+ false positive
 		)
-
-	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
-		add_compile_options(
-			-Wsuggest-override
-		)
-	endif()
 
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
 		add_compile_options(
@@ -369,7 +364,7 @@ ExternalProject_Add(ext_glfw
 list(APPEND GROUP_EXTERNAL_PROJECT ext_gli)
 ExternalProject_Add(ext_gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0.8.1.0
+	GIT_TAG 0.8.2.0
 	BUILD_COMMAND "" # gli is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/gli
 	CMAKE_ARGS
@@ -383,7 +378,7 @@ ExternalProject_Add(ext_gli
 list(APPEND GROUP_EXTERNAL_PROJECT ext_glm)
 ExternalProject_Add(ext_glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.8
+	GIT_TAG 0.9.8.5
 	BUILD_COMMAND "" # glm is header only, skip tests
 	PREFIX ${PATH_EXT_SRC}/glm
 	CMAKE_ARGS
@@ -546,7 +541,7 @@ create_library(
 # Sandboxes ----------------------------------------------------------------------------------------
 
 create_executable(
-	TARGET sandbox_libv
+	TARGET sandbox_libv_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
 	LINK   ${USE_STATIC_LINK} fmt
 	GROUP  GROUP_SANDBOX

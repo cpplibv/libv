@@ -46,12 +46,12 @@ public:
 		stack.emplace(static_cast<T>(1.0));
 	}
 	inline MatrixStack<Mat>& push() {
-		stack.push(stack.top());
+		stack.push(top());
 		return *this;
 	}
 	inline MatrixStack<Mat>& push(const Mat& mx) {
-		stack.push(*this);
-		stack.top() = mx;
+		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
+		stack.push(mx);
 		return *this;
 	}
 	[[nodiscard]] inline auto push_guard() noexcept {
@@ -63,71 +63,79 @@ public:
 		return Guard([this] { pop(); });
 	}
 	inline MatrixStack<Mat>& pop() {
-		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
+		LIBV_GL_DEBUG_ASSERT(stack.size() > 1);
 		stack.pop();
 		return *this;
 	}
 	inline decltype(auto) top() const {
+		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
 		return stack.top();
 	}
 	inline decltype(auto) top() {
+		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
 		return stack.top();
 	}
 	inline MatrixStack& operator=(const Mat& mat) {
-		stack.top() = mat;
+		top() = mat;
 		return *this;
 	}
-	inline decltype(auto) operator*(const vec4_t<T>& v) {
-		return stack.top() * v;
+	inline decltype(auto) operator*(const vec4_t<T>& v) const {
+		return top() * v;
 	}
 	inline decltype(auto) operator*(const Mat& mat) const {
-		return stack.top() * mat;
+		return top() * mat;
 	}
 	inline decltype(auto) operator*(const MatrixStack<Mat>& ms) const {
-		return stack.top() * ms.stack.top();
+		return top() * ms.top();
 	}
 	inline operator Mat() const {
-		return stack.top();
+		return top();
 	}
 	inline operator Mat&() {
-		return stack.top();
+		return top();
 	}
 	inline operator const Mat&() const {
-		return stack.top();
+		return top();
 	}
 
 	// ---------------------------------------------------------------------------------------------
 
 	inline decltype(auto) rotate(const T& a, const vec3_t<T>& v) {
-		stack.top().rotate(a, v);
+		top().rotate(a, v);
 		return *this;
 	}
 
 	inline decltype(auto) scale(const T& s) {
-		stack.top().scale(vec3_t<T>(s, s, s));
+		top().scale(vec3_t<T>(s, s, s));
 		return *this;
 	}
 	inline decltype(auto) scale(const T& x, const T& y, const T& z) {
-		stack.top().scale(vec3_t<T>(x, y, z));
+		top().scale(vec3_t<T>(x, y, z));
 		return *this;
 	}
 	inline decltype(auto) scale(const vec3_t<T>& v) {
-		stack.top().scale(v);
+		top().scale(v);
 		return *this;
 	}
 
 	inline decltype(auto) translate(const T& x, const T& y, const T& z) {
-		stack.top().translate(vec3_t<T>(x, y, z));
+		top().translate(vec3_t<T>(x, y, z));
 		return *this;
 	}
 	inline decltype(auto) translate(const vec3_t<T>& v) {
-		stack.top().translate(v);
+		top().translate(v);
 		return *this;
 	}
 
 	inline decltype(auto) identity() {
-		stack.top() = libv::identity<4, T>();
+		top() = libv::identity<4, T>();
 		return *this;
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+	inline decltype(auto) size() const {
+		return stack.size();
 	}
 
 };
@@ -382,7 +390,7 @@ public:
 		return projection * view * model;
 	}
 	inline libv::vec3f eye() const {
-		return libv::vec::xyz(view.top().inverse_copy()[3]);
+		return xyz(from_glm(view.top().inverse_copy()[3]));
 	}
 	inline libv::mat4f getMatrixTexture() const {
 		return libv::mat4f{
