@@ -423,7 +423,7 @@ void Frame::contextTerminate() {
 
 // -------------------------------------------------------------------------------------------------
 
-Frame::Frame(const std::string& title, unsigned int width, unsigned int height) :
+Frame::Frame(const std::string& title, int32_t width, int32_t height) :
 	context(fmt::format("Thread of {}", title)),
 	title(title) {
 	size = vec2i(width, height);
@@ -431,7 +431,7 @@ Frame::Frame(const std::string& title, unsigned int width, unsigned int height) 
 	initEventQueues();
 }
 
-Frame::Frame(unsigned int width, unsigned int height) :
+Frame::Frame(int32_t width, int32_t height) :
 	Frame(DEFAULT_FRAME_NAME, width, height) { }
 
 Frame::~Frame() {

@@ -111,7 +111,7 @@ struct Example {
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxTextureSize());
+		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
 
 		gl.capability.blend.enable();
 		gl.depthFunction.less();

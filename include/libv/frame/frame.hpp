@@ -317,8 +317,8 @@ private:
 	void contextTerminate();
 
 public:
-	Frame(unsigned int width, unsigned int height);
-	Frame(const std::string& title, unsigned int width, unsigned int height);
+	Frame(int32_t width, int32_t height);
+	Frame(const std::string& title, int32_t width, int32_t height);
 	Frame(const Frame&) = delete;
 	Frame(Frame&&) = delete;
 	Frame& operator=(const Frame&) = delete;

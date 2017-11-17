@@ -10,12 +10,10 @@ cmake: can there be multiple definition error during linkage if two lib contains
 cmake: check what linking does on a lib
 -- commit --
 
-	state based ui
-	separate control and data!
-	ui resource local proxies
-	-- commit --
+add structured binding support for vec_t
+-- commit --
 
-hunt down GCC 7.0+ comments
+hunt down GCC 7.0+ comments // only GCC 8+ will support filesystem :(
 FILESYSTEM_SUPPORT
 -- commit --
 
