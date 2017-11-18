@@ -16,7 +16,7 @@ namespace libv {
 /// @param Precision
 template <typename T, int Precision = -4>
 struct Approxing {
-	static constexpr const T epsilon = std::pow<T>(10, Precision);
+	static constexpr T epsilon = std::pow<T>(10, Precision);
 
 	T value;
 

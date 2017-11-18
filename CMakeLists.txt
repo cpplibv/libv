@@ -576,6 +576,13 @@ create_executable(
 )
 
 create_executable(
+	TARGET sandbox_libv_gl3
+	SOURCE ${PATH_SNB}/libv_gl_main3.cpp
+	LINK   ${USE_STATIC_LINK} fmt glew glfw3 libv_gl soil stdc++fs
+	GROUP  GROUP_SANDBOX
+)
+
+create_executable(
 	TARGET sandbox_libv_log
 	SOURCE ${PATH_SNB}/libv_log_main.cpp
 	LINK   ${USE_STATIC_LINK} fmt

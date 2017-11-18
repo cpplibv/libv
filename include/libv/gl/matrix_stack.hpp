@@ -2,8 +2,14 @@
 
 #pragma once
 
+// std
+#include <stack>
+#include <vector>
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/utility/guard.hpp>
+// pro
+#include <libv/gl/log.hpp>
 
 
 namespace libv {

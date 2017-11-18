@@ -5,6 +5,7 @@
 // ext
 #include <GL/glew.h>
 // libv
+#include <libv/utility/guard.hpp>
 #include <libv/utility/member_offset.hpp>
 // pro
 #include <libv/gl/enum.hpp>
@@ -86,23 +87,6 @@ public:
 	}
 };
 
-// VertexBufferGuard --------------------------------------------------------------------------------
-
-struct VertexBufferGuard : public VertexBuffer {
-	inline VertexBufferGuard() {
-		create();
-	}
-	inline VertexBufferGuard(const void* dataPtr, GLsizeiptr length, BufferUsage usage) {
-		createData(dataPtr, length, usage);
-	}
-	inline VertexBufferGuard(const VertexBufferGuard&) = delete;
-	inline VertexBufferGuard(VertexBufferGuard&&) = delete;
-	inline ~VertexBufferGuard() {
-		if (id_)
-			destroy();
-	}
-};
-
 // =================================================================================================
 
 /** @note Vertex Arrays cannot be shared between multiple openGL contexts */
@@ -127,18 +111,59 @@ public:
 		if (id_ == 0)
 			LIBV_LOG_GL_ERROR("Failed to create VertexArray");
 	}
+
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		glDeleteVertexArrays(1, &id_);
 		id_ = 0;
 		LIBV_GL_DEBUG_CHECK();
 	}
+
+	inline void bind() noexcept {
+	    glBindVertexArray(id_);
+		LIBV_GL_DEBUG_CHECK();
+	}
+
+	inline void unbind() noexcept {
+	    glBindVertexArray(0);
+		LIBV_GL_DEBUG_CHECK();
+	}
+
+	[[nodiscard]] inline auto bind_guard() noexcept {
+	    glBindVertexArray(id_);
+		LIBV_GL_DEBUG_CHECK();
+
+		return Guard([this] {
+			glBindVertexArray(0);
+			LIBV_GL_DEBUG_CHECK();
+		});
+	}
+
+	// TODO P4: reverse the order of offset and count (for all overload)
+	inline void drawArrays(Primitive mode, size_t vertexCount, size_t vertexOffset) {
+		LIBV_GL_DEBUG_ASSERT(id_ != 0);
+		glDrawArrays(to_value(mode), static_cast<GLint>(vertexOffset), static_cast<GLsizei>(vertexCount));
+		LIBV_GL_DEBUG_CHECK();
+	}
+
+	inline void drawElements(Primitive mode, size_t vertexCount, size_t indexOffset) {
+		LIBV_GL_DEBUG_ASSERT(id_ != 0);
+		glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset));
+		LIBV_GL_DEBUG_CHECK();
+	}
+
+	inline void drawElementsBaseVertex(Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) {
+		LIBV_GL_DEBUG_ASSERT(id_ != 0);
+		glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, reinterpret_cast<void*> (sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
+		LIBV_GL_DEBUG_CHECK();
+	}
+
 	template <typename T>
 	inline void bindAttribute(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset, bool normalized) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		if (attribute.id() == -1)
 			return;
-		glBindVertexArray(id_);
+
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		glEnableVertexAttribArray(attribute);
 		glVertexAttribPointer(attribute,
@@ -149,12 +174,13 @@ public:
 				reinterpret_cast<const GLvoid*> (offset));
 		LIBV_GL_DEBUG_CHECK();
 	}
+
 	template <typename T>
 	inline void bindAttributeInt(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		if (attribute.id() == -1)
 			return;
-		glBindVertexArray(id_);
+
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		glEnableVertexAttribArray(attribute);
 		glVertexAttribIPointer(attribute,
@@ -164,13 +190,14 @@ public:
 				reinterpret_cast<const GLvoid*> (offset));
 		LIBV_GL_DEBUG_CHECK();
 	}
+
 	template <typename T>
 	inline void bindAttributeDouble(const VertexBuffer& buffer, const BaseAttribute<T>& attribute, size_t stride, size_t offset) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
 		LIBV_GL_DEBUG_ASSERT_STATIC(BaseAttribute<T>::attributeType == to_value(AttributeType::DOUBLE), "");
 		if (attribute.id() == -1)
 			return;
-		glBindVertexArray(id_);
+
 		glBindBuffer(GL_ARRAY_BUFFER, buffer);
 		glEnableVertexAttribArray(attribute);
 		glVertexAttribLPointer(attribute,
@@ -180,6 +207,7 @@ public:
 				reinterpret_cast<const GLvoid*> (offset));
 		LIBV_GL_DEBUG_CHECK();
 	}
+
 	template <typename T, typename M>
 	inline void bindAttribute(const VertexBuffer& buffer, GLint attribute, M T::* member, bool normalized) {
 		bindAttribute(
@@ -198,6 +226,7 @@ public:
 				sizeof (T),
 				member_offset(member));
 	}
+
 	template <typename T, typename M>
 	inline void bindAttributeDouble(const VertexBuffer& buffer, GLint attribute, M T::* member) {
 		bindAttributeDouble(
@@ -206,15 +235,15 @@ public:
 				sizeof (T),
 				member_offset(member));
 	}
+
 	inline void bindElements(const VertexBuffer& elements) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
-		glBindVertexArray(id_);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elements);
 		LIBV_GL_DEBUG_CHECK();
 	}
+
 	inline void bindTransformFeedback(GLuint index, const VertexBuffer& buffer) {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
-		glBindVertexArray(id_);
 		glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer);
 		LIBV_GL_DEBUG_CHECK();
 	}
@@ -223,21 +252,9 @@ public:
 	inline auto id() const {
 		return id_;
 	}
+
 	inline operator GLuint() const {
 		return id_;
-	}
-};
-
-// VertexArrayGuard --------------------------------------------------------------------------------
-
-struct VertexArrayGuard : public VertexArray {
-	inline VertexArrayGuard() = default;
-	inline VertexArrayGuard(const VertexArrayGuard&) = delete;
-	inline VertexArrayGuard(VertexArray&&) = delete;
-
-	inline ~VertexArrayGuard() {
-		if (this->id_)
-			this->destroy();
 	}
 };
 

@@ -4,7 +4,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/thread/executor_thread.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
@@ -23,42 +22,14 @@
 
 // -------------------------------------------------------------------------------------------------
 
-float angle = 0;
-
-std::atomic_bool running{true};
-
-// -------------------------------------------------------------------------------------------------
-#define WINDOW_HEIGHT 600
-#define WINDOW_WIDTH 900
-
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
-
-void initGLEW() {
-	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
-	LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
-	LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
-
-	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
-	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
-	CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
-	CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
-	CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
-	CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
-
-	LIBV_GL_CHECK();
-}
-
-static void error_callback(int code, const char* description) {
-	LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
-}
+constexpr uint32_t WINDOW_HEIGHT = 600;
+constexpr uint32_t WINDOW_WIDTH = 900;
 
 // -------------------------------------------------------------------------------------------------
-struct Example {
+
+struct Sandbox {
+	float angle = 0;
+
 	libv::gl::GL gl;
 
 	libv::gl::AttributeFixLocation<libv::vec3f> attributePosition;
@@ -105,7 +76,7 @@ struct Example {
 			position(position), color(color), uv(uv) { }
 	};
 
-	Example() {
+	Sandbox() {
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
@@ -180,10 +151,13 @@ struct Example {
 		bufferVertexIndices.createData(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
 
 		vertexArray.create();
-		vertexArray.bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position), false);
-		vertexArray.bindAttribute(bufferVertexData, attributeColor, sizeof(Vertex), offsetof(Vertex, color), false);
-		vertexArray.bindAttribute(bufferVertexData, attributeTex0, sizeof(Vertex), offsetof(Vertex, uv), false);
-		vertexArray.bindElements(bufferVertexIndices);
+		{
+			auto vao_guard = vertexArray.bind_guard();
+			vertexArray.bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position), false);
+			vertexArray.bindAttribute(bufferVertexData, attributeColor, sizeof(Vertex), offsetof(Vertex, color), false);
+			vertexArray.bindAttribute(bufferVertexData, attributeTex0, sizeof(Vertex), offsetof(Vertex, uv), false);
+			vertexArray.bindElements(bufferVertexIndices);
+		}
 
 		texture0.create();
 		texture0.bind();
@@ -230,7 +204,8 @@ struct Example {
 		{
 			programTest0.use();
 			uniformTest0MVPmat = gl.mvp();
-			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 6, 0);
+			auto vao_guard = vertexArray.bind_guard();
+			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
 		}
 
 		gl.model.translate(libv::vec3f(+0, +2, +0));
@@ -241,7 +216,9 @@ struct Example {
 			auto tBindGuard = texture0.bindGuard();
 			uniformTest1MVPmat = gl.mvp();
 			uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
-			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 6, 0);
+
+			auto vao_guard = vertexArray.bind_guard();
+			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
 		}
 
 		gl.model.translate(libv::vec3f(+2, +0, +0));
@@ -254,14 +231,46 @@ struct Example {
 			uniformTest2Mmat = gl.model;
 			uniformTest2EyePosW = gl.eye();
 			uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
-			gl.drawElements(vertexArray, libv::gl::Primitive::Triangles, 6, 0);
+
+			auto vao_guard = vertexArray.bind_guard();
+			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
 		}
 
 		LIBV_GL_CHECK();
 	}
 };
 
+// Runner ------------------------------------------------------------------------------------------
+
+#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
+
+void initGLEW() {
+	if (GLenum err = glewInit() != GLEW_OK)
+		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
+
+	LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
+	LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
+	LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
+
+	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
+	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
+	CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
+	CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
+	CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
+	CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
+	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
+	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
+
+	LIBV_GL_CHECK();
+}
+
+static void error_callback(int code, const char* description) {
+	LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
+}
+
 // -------------------------------------------------------------------------------------------------
+
+auto running = std::atomic_bool{true};
 
 int main(void) {
 	std::cout << libv::log;
@@ -289,20 +298,23 @@ int main(void) {
 	glfwSetWindowPos(window, 200, 200);
 
 	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, [](GLFWwindow*, int key, int, int, int) {
+		if (key == GLFW_KEY_ESCAPE)
+			running = false;
+	});
 	glfwSwapInterval(1);
 
 	initGLEW();
 
 	{
-		Example example;
+		Sandbox sandbox;
 
 		libv::Timer timer;
 		size_t time = 0, i = 0;
 
-
-		while (!glfwWindowShouldClose(window)) {
+		while (running && !glfwWindowShouldClose(window)) {
 			LIBV_GL_CHECK();
-			example.render();
+			sandbox.render();
 
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -317,13 +329,8 @@ int main(void) {
 		}
 	}
 	glfwMakeContextCurrent(nullptr);
+	glfwDestroyWindow(window);
 	glfwTerminate();
 
 	return 0;
 }
-
-//	std::this_thread::sleep_for(std::chrono::seconds(2));
-
-//libv::gl::renderCube(-1.0f, 0, 0, 0.4f);
-//libv::gl::renderCube(+0.0f, 0, 0, 0.6f);
-//libv::gl::renderCube(+1.4f, 0, 0, 0.8f);

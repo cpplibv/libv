@@ -10,6 +10,9 @@ cmake: can there be multiple definition error during linkage if two lib contains
 cmake: check what linking does on a lib
 -- commit --
 
+rename gl::GL to~ gl::GLstate
+-- commit --
+
 add structured binding support for vec_t
 -- commit --
 
