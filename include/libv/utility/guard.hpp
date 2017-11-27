@@ -2,11 +2,11 @@
 
 #pragma once
 
+// std
 #include <utility>
 
 
 namespace libv {
-namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -32,19 +32,4 @@ template <typename CF> Guard(CF&&) -> Guard<std::decay_t<CF>>;
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Target>
-class BindGuard {
-	Target& target;
-public:
-	inline BindGuard(Target& target) : target(target) {
-		target.bind();
-	}
-	inline ~BindGuard() {
-		target.unbind();
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-} // namespace gl
 } // namespace libv

@@ -8,12 +8,27 @@
 #include <memory>
 // pro
 #include <libv/gl/enum.hpp>
-#include <libv/gl/guard.hpp>
 #include <libv/gl/log.hpp>
 
 
 namespace libv {
 namespace gl {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Target>
+class BindGuard {
+	Target& target;
+public:
+	inline BindGuard(Target& target) : target(target) {
+		target.bind();
+	}
+	inline ~BindGuard() {
+		target.unbind();
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
 
 template <TextureBindTarget BindTarget>
 class Texture {
