@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include "libv/meta/n_times.hpp"
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -64,28 +66,28 @@ struct ServerFieldSet {
 
 // -------------------------------------------------------------------------------------------------
 
-auto printHeader = [] (const auto& obj) {
+template <typename T>
+auto printHeader = [] () {
 	std::cout << "       ";
-	libv::meta::foreach_member_name(obj, [](const auto& name) {
+	libv::meta::foreach_static_member_name<T>([] (const auto& name) {
 		std::cout << "| " << std::setw(11) << std::string_view(name).substr(0, 11) << ' ';
 	}); std::cout << '\n';
 	std::cout << "-------";
-	libv::meta::foreach_member_name(obj, [](const auto& name) {
-		(void) name;
+	libv::meta::n_times<libv::meta::member_count_v<T>>([] {
 		std::cout << "+-------------";
 	}); std::cout << '\n';
 };
 
 auto printRow = [] (const auto& obj) {
 	std::cout << "State  ";
-	libv::meta::foreach_member_reference(obj, [](const auto& value) {
+	libv::meta::foreach_member_reference(obj, [] (const auto& value) {
 		std::cout << "| \u001B[36m" << std::setw(11) << value << "\u001B[0m ";
 	}); std::cout << '\n';
 };
 
 auto printUpdate = [] (const auto& obj) {
 	std::cout << "Update ";
-	libv::meta::foreach_member_reference(obj, [](const auto& value) {
+	libv::meta::foreach_member_reference(obj, [] (const auto& value) {
 		 if (value)
 			std::cout << "| \u001B[33m" << std::setw(11) << *value << "\u001B[0m ";
 		 else
@@ -100,7 +102,7 @@ int main(int, char**) {
 //	libv::meta::Table<ServerID, ServerFieldSet> table;
 
 	std::cout << std::boolalpha;
-	printHeader(State<ServerFieldSet>{});
+	printHeader<State<ServerFieldSet>>();
 
 	Update<ServerFieldSet> update00;
 	update00.has_mod = true;
@@ -153,13 +155,13 @@ int main(int, char**) {
 
 	// TODO P5: create a proper unit test for reflection
 
-	libv::meta::foreach_member_pointer(row1, [](auto&& member_pointer) {
+	libv::meta::foreach_static_member_pointer<decltype(row1)>([](auto&& member_pointer) {
 		std::cout << libv::member_offset(member_pointer) << ", ";
 	});
 
 	std::cout << std::endl;
 
-	libv::meta::foreach_member_pointer(update00, [](auto&& member_pointer) {
+	libv::meta::foreach_static_member_pointer<decltype(update00)>([](auto&& member_pointer) {
 		std::cout << libv::member_offset(member_pointer) << ", ";
 	});
 

@@ -1,6 +1,7 @@
 // File: meta_main.cpp - Created on 2017.06.16. 06:42 - Author: Vader
 
 // libv
+#include <libv/meta/n_times.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/serialization/reflection.hpp>
 #include <libv/serialization/serialization.hpp>
@@ -63,14 +64,14 @@ struct ServerFieldSet {
 
 // -------------------------------------------------------------------------------------------------
 
-auto printHeader = [] (const auto& obj) {
-	std::cout << "            ";
-	libv::meta::foreach_member_name(obj, [](const auto& name) {
+template <typename T>
+auto printHeader = [] () {
+	std::cout << "       ";
+	libv::meta::foreach_static_member_name<T>([] (const auto& name) {
 		std::cout << "| " << std::setw(11) << std::string_view(name).substr(0, 11) << ' ';
 	}); std::cout << '\n';
-	std::cout << "------------";
-	libv::meta::foreach_member_name(obj, [](const auto& name) {
-		(void) name;
+	std::cout << "-------";
+	libv::meta::n_times<libv::meta::member_count_v<T>>([] {
 		std::cout << "+-------------";
 	}); std::cout << '\n';
 };
@@ -160,7 +161,7 @@ public:
 //	}
 //
 //	void print() {
-//		printHeader(State<FieldSet>{});
+//		printHeader<State<FieldSet>>();
 //		for (const auto& [key, row] : map) {
 //			std::cout << std::setw(11) << key << ' ';
 //			printRow(row);
