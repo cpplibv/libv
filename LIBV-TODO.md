@@ -62,7 +62,7 @@ layout: think layout as a graph instead of a stack..., just think and see whats 
 libv.log: log thread naming
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
-libv: provide exception free alternative api EVERYWHERE! hehehehehe.
+libv: provide exception free alternative API.
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
@@ -86,6 +86,23 @@ cpp.compile: things I want to know about my compile time:
 		- Lists of translation units that includes (even if transitively) a given header
 		- clang patch: https://www.youtube.com/watch?v=NPWQ7xKfIHQ
 		- record in CI history per commit changes in every statistics
+
+// -------------------------------------------------------------------------------------------------
+
+Adopt boost stacktrace with backtrace backend
+
+#list(APPEND GROUP_EXTERNAL_PROJECT ext_backtrace)
+#ExternalProject_Add(ext_backtrace
+#	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
+#	GIT_TAG master
+#	PREFIX ${PATH_EXT_SRC}/backtrace
+#	CONFIGURE_COMMAND "configure"
+#	BUILD_COMMAND "make"
+#	INSTALL_COMMAND
+#		COMMAND mkdir -p ${PATH_EXT}/backtrace/lib/backtrace
+#		COMMAND cp -f -T ${PATH_EXT_SRC}/backtrace/src/ext_backtrace/.libs/libbacktrace.a ${PATH_EXT}/backtrace/lib/libbacktrace.a
+#	EXCLUDE_FROM_ALL 1
+#)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -227,57 +244,6 @@ Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet
 
 // -------------------------------------------------------------------------------------------------
 
-/**
- * rounds to nearest, to even on tie
- */
-template <class To, class Rep, class Period>
-To round(const duration<Rep, Period>& d) {
-	typedef typename common_type<To, duration<Rep, Period> >::type result_type;
-	result_type diff0;
-	result_type diff1;
-
-	To t0 = duration_cast<To>(d);
-	To t1 = t0;
-	if (t0 > d) {
-		--t1;
-		diff0 = t0 - d;
-		diff1 = d - t1;
-	} else {
-		++t1;
-		diff0 = d - t0;
-		diff1 = t1 - d;
-	}
-
-	if (diff0 == diff1) {
-		if (t0.count() & 1)
-			return t1;
-		return t0;
-	} else if (diff0 < diff1)
-		return t0;
-	return t1;
-}
-/**
- * rounds up
- */
-template <class To, class Rep, class Period>
-To ceil(const duration<Rep, Period>& d) {
-	To t = duration_cast<To>(d);
-	if (t < d)
-		++t;
-	return t;
-}
-/**
- * rounds down
- */
-template <class To, class Rep, class Period>
-To floor(const duration<Rep, Period>& d) {
-	To t = duration_cast<To>(d);
-	if (t > d) --t;
-	return t;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 CMake resource folder
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
 Skeleton animation
@@ -305,8 +271,8 @@ Cook-Torrance shader - Metal
 Minnaert - More depth?
 OrenNayar - More avg lambert
 
---- LIB Merge --------------------------------------------------------------------------------------
 
+--- LIB Merge --------------------------------------------------------------------------------------
 
 http://stackoverflow.com/questions/13128/how-to-combine-several-c-c-libraries-into-one
 
@@ -339,6 +305,7 @@ Otherwise, you'd have to unpack into different directories and repack again, to 
 mkdir abc; cd abc; ar -x ../libabc.a
 mkdir xyz; cd xyz; ar -x ../libxyz.a
 ar -qc libaz.a abc xyz
+
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
@@ -600,51 +567,33 @@ struct LightType {
 };
 
 struct Light {
-	int type;
-	bool enabled; //0 false 1 true
+	int type = LightType::point;
+	bool enabled = true;
 
-	glm::vec3d position;
-	glm::vec3d direction;
-	glm::vec4 diffuse;
-	glm::vec4 specular;
+	glm::vec3 position = {0, 0, 0};
+	glm::vec3 direction = {1, 0, 0};
+	glm::vec4 diffuse = {1, 1, 1, 1};
+	glm::vec4 specular = {1, 1, 1, 1};
 
-	double range;
-	double intensity;
-	double innerCosAngle; // Angles closer to 1 produce tighter cones
-	double outerCosAngle; // Angles of -1 will emulate point lights.
+	double range = 75.0;
+	double intensity = 1.0;
+	double innerCosAngle = 0.8; // Angles closer to 1 produce tighter cones
+	double outerCosAngle = 0.6; // Angles of -1 will emulate point lights.
 
-	bool shadowCast; //0 false 1 true
+	bool shadowCast = false;
 	//			GLuint frameBuffer;
 	//			GLuint shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
 	//			GLuint shadowMapSampler;
 	unsigned int frameBuffer;
 	unsigned int shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
 	unsigned int shadowMapSampler;
-	glm::mat4d shadowMVPTmat; //MVPT mat
+	glm::mat4 shadowMVPTmat; //MVPT mat
 
-	glm::mat4d getVmat();
-	glm::mat4d getPmat();
-	Light();
-	~Light();
+	glm::mat4 getVmat();
+	glm::mat4 getPmat();
 };
 
 // -------------------------------------------------------------------------------------------------
-
-Light::Light() :
-	type(LightType::point),
-	enabled(true),
-	position(0, 0, 0),
-	direction(1, 0, 0),
-	diffuse(1, 1, 1, 1),
-	specular(1.0f, 1.0f, 1.0f, 1.0f),
-	range(75.0f),
-	intensity(1.0f),
-	innerCosAngle(0.8f),
-	outerCosAngle(0.6f),
-	shadowCast(false) { }
-
-// -------------------------------------------------------------------------------------------------
-
 
 // Planned attribute locations:
 //   0  |     position  |             |
@@ -664,8 +613,6 @@ Light::Light() :
 //  14  |   ^^^^^^^^^^  |  texcoord6  |
 //  15  |   ^^^^^^^^^^  |  texcoord7  |
 
-// -------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------
 // -------------------------------------------------------------------------------------------------
 
 class Framebuffer {
@@ -687,7 +634,6 @@ private:
 	Texture texDepth;
 };
 
-
 // -------------------------------------------------------------------------------------------------
 
 class Renderbuffer {
@@ -708,12 +654,10 @@ private:
 	GLuint obj;
 };
 
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
 // =================================================================================================
 
+
+// =================================================================================================
 
 #    define PUSHSTATE() GLint restoreId; glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &restoreId );
 #    define POPSTATE() glBindFramebuffer( GL_DRAW_FRAMEBUFFER, restoreId );

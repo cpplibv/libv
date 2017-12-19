@@ -50,9 +50,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 
-	add_compile_options(-Weverything -Wmissing-override -Wno-comment
-# 		-Wconversion
-		)
+	add_compile_options(-Weverything -Wmissing-override -Wno-comment -Wconversion)
 	set(TOOLSET clang)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -72,14 +70,12 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 # Enablement in progress:
 #		-Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
 # 		-Wconversion # 130+, most of it is in vec and the rest is in gl
+# 		-Wfloat-equal # in tests 40+ false positive
 
 # Only enable time-to-time to check on what is going on:
 # 		-Winline
 # 		-Wsuggest-final-methods # in signal 50+ function
 # 		-Wsuggest-final-types # in signal 1 type
-
-# Most likely will never be used:
-# 		-Wfloat-equal # in tests 40+ false positive
 		)
 
 	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
@@ -91,8 +87,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	endif()
 
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-
-		add_compile_options(-fno-omit-frame-pointer)
 		# Sanitizers current only available on unix
 		# add_compile_options(-fsanitize=address)
 		# add_compile_options(-fsanitize=kernel-address)
@@ -133,11 +127,13 @@ add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
 set(USE_STATIC_LINK)
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-	add_definitions(-Og)
-	add_definitions(-ggdb3)
+	add_compile_options(-Og)
+	add_compile_options(-ggdb3)
+	add_compile_options(-fno-omit-frame-pointer)
+
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-	add_definitions(-Ofast)
-#	add_definitions(-flto)
+	add_compile_options(-Ofast)
+#	add_compile_options(-flto)
 #	SET(CMAKE_AR "gcc-ar")
 #	SET(CMAKE_NM "gcc-nm")
 #	SET(CMAKE_RANLIB "gcc-ranlib")
@@ -237,14 +233,13 @@ ExternalProject_Add(ext_assimp
 )
 
 list(APPEND GROUP_EXTERNAL_PROJECT ext_boost)
-set(Boost_Version 1.65.0)
+set(Boost_Version 1.66.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 
 message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
 	PREFIX ${PATH_EXT_SRC}/boost
 	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
-	URL_MD5 eb1e11262e0cfc6949d054f6d8d25dc6
 	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
 	BUILD_COMMAND ./b2 --ignore-site-config install
 		toolset=${TOOLSET}
@@ -252,10 +247,11 @@ ExternalProject_Add(ext_boost
 		link=static
 		runtime-link=static
 		threading=multi
-		--address-model=64
+		address-model=64
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
 		--with-system
+#		--with-stacktrace
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	EXCLUDE_FROM_ALL 1
