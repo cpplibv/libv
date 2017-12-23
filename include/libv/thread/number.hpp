@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/bit_cast.hpp>
 // std
 #include <thread>
 
@@ -11,9 +13,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 inline uint64_t thread_number() {
-	static_assert(sizeof (std::thread::id) <= sizeof (uint64_t), "thread::id size is greater then uint64_t");
-	auto id = std::this_thread::get_id();
-	return reinterpret_cast<uint64_t&>(id);
+	return libv::bit_cast<uint64_t>(std::this_thread::get_id());
 }
 
 // -------------------------------------------------------------------------------------------------

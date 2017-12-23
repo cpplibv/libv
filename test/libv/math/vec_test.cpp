@@ -10,14 +10,14 @@
 
 template <typename Tag>
 struct CtorCounter {
-	static inline size_t default_ctor = 0;
-	static inline size_t copy_ctor = 0;
-	static inline size_t move_ctor = 0;
-	static inline size_t copy_assign = 0;
-	static inline size_t move_assign = 0;
-	static inline size_t dtor = 0;
+	inline static size_t default_ctor = 0;
+	inline static size_t copy_ctor = 0;
+	inline static size_t move_ctor = 0;
+	inline static size_t copy_assign = 0;
+	inline static size_t move_assign = 0;
+	inline static size_t dtor = 0;
 
-	static inline void reset () {
+	inline static void reset () {
 		default_ctor = 0;
 		copy_ctor = 0;
 		move_ctor = 0;

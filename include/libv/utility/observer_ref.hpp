@@ -111,7 +111,7 @@ constexpr inline observer_ref<T> make_observer_ref(T* p) noexcept {
 }
 template <typename T>
 constexpr inline observer_ref<T> make_observer_ref(T& p) noexcept {
-	return observer_ref<T>(&p);
+	return observer_ref<T>(std::addressof(p));
 }
 template <typename T>
 constexpr inline observer_ref<T> make_observer_ref(const std::shared_ptr<T>& p) noexcept {

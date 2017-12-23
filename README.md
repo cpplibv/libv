@@ -1,14 +1,40 @@
 # LIBV
 
-This library is a side project that contains some of the reusable codebase of a closed source project.
-This library is not complete yet and developed parallel.
+This library contains some reusable code, enjoy.
+This library is not complete yet.
 Documentation will follow after some degree of feature-completeness occurs.
+
+## Libraries
+
+ Library      | API          | Feature Set  | Note
+:------------ | ------------ | ------------ |:--------------------------------------------------------------
+algorithm     | stable       | lazy eval    |
+concept       | -            | -            | Not published yet
+container     | stable       | lazy eval    |
+ecs           | experimental | lazy eval    | Entity component system
+frame         | stable       | complete*    | A Frame handler library for OpenGL contexts and event handling
+gl            | experimental | partial      | A C++ OpenGL API wrapper library
+glr           | experimental | under dev    | A Remote Deferred OpenGL renderer library
+log           | stable       | partial      | Logging library
+lua           | stable       | partial      | Lua binding for libv types and utilities
+math          | stable       | partial      |
+meta          | stable       | lazy eval    | Meta programming utilities and reflection facilities
+net           | internal use | under dev    |
+parse         | experimental | lazy eval    | Parsers based on boost::spirit::x3
+range         | stable       | lazy eval    | Various range views based on range::v3
+serialization | stable       | lazy eval    |
+sig           | deprecated   | complete     | A Signal-Slot paradigm implementation
+sig2          | stable       | complete     | Not published yet
+thread        | experimental | lazy eval    | Various thread utility classes and functions
+ui            | deprecated   | experimental |
+ui4           | temporary    | under dev    | GUI library above openGL
+utility       | stable       | lazy eval    | Various utility classes and functions
+vm4           | unstable     | incomplete   | VM4 Model and animation format
+vm4imp        | stable       | complete     | VM4 model format importer
 
 ## Upcoming features
 
-- New library: libv.ecui - UI backend using libv.gl and libv.ecs.
-- New library: libv.vm4 - Model and animation format. Replacement for the legacy codebase of vm3.
-- Improvement: libv.gl - Add state caching to avoid redundant calls to the OpenGL state machine.
+- TODO
 
 ## Install
 

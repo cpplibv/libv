@@ -12,15 +12,20 @@ namespace libv {
 
 // TODO P5: bit abstraction could be improved with bits abstraction, this should be in its own header.
 //			Note: investigate the possibility of bits being std::bitset<?>
+//			Note: bit(i) could be -> bits, makes life easier
 //			bit(1, 2, 3) -> bits;
 //			bit(1) | bit(2) -> bits;
-//			bitflag | bit(1) -> bitflag;                     DONE
-//			bitflag | bits -> bitflag;
+//			flag_enum | bit(1) -> flag_enum;                     DONE
+//			flag_enum | bits -> flag_enum;
 //			Motivation:
-//			bitflag<...> green = bit(1);                     DONE
-//			bitflag<...> blue  = green | bit(2);             DONE
-//			bitflag<...> blue  = green | bit(2) | bit(3);    DONE
-//			bitflag<...> alpha = bit(1, 2) ^ blue | bit(4);
+//			flag_enum<...> green = bit(1);                     DONE
+//			flag_enum<...> blue  = green | bit(2);             DONE
+//			flag_enum<...> blue  = green | bit(2) | bit(3);    DONE
+//			flag_enum<...> alpha = bit(1, 2) ^ blue | bit(4);
+//
+//bits bit(int index) {
+//	return bits(1 << index);
+//}
 
 struct bit {
 private:
@@ -35,11 +40,11 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 /// @usage \code
-/// using colorflag = bitflag<uint8_t, struct colorflag_tag>;
-/// constexpr static colorflag red   = bit(0);
-/// constexpr static colorflag green = bit(1);
-/// constexpr static colorflag blue  = bit(2);
-/// constexpr static colorflag alpha = bit(3);
+/// using colorflag = flag_enum<uint8_t, struct colorflag_tag>;
+/// static constexpr colorflag red   = bit(0);
+/// static constexpr colorflag green = bit(1);
+/// static constexpr colorflag blue  = bit(2);
+/// static constexpr colorflag alpha = bit(3);
 /// \endcode
 ///
 template<typename Underlying, typename Tag>
@@ -90,6 +95,31 @@ public:
 	}
 	constexpr inline explicit operator bool() const noexcept {
 		return bool{value_};
+	}
+
+	constexpr inline flag_enum& set(const flag_enum f) noexcept {
+		value_ |= f.value_;
+		return *this;
+	}
+	constexpr inline flag_enum& set(const bit f) noexcept {
+		value_ |= (Underlying{1} << f.index());
+		return *this;
+	}
+	constexpr inline flag_enum& reset(const flag_enum f) noexcept {
+		value_ &= ~f.value_;
+		return *this;
+	}
+	constexpr inline flag_enum& reset(const bit f) noexcept {
+		value_ &= ~(Underlying{1} << f.index());
+		return *this;
+	}
+	constexpr inline flag_enum& flip(const flag_enum f) noexcept {
+		value_ ^= f.value_;
+		return *this;
+	}
+	constexpr inline flag_enum& flip(const bit f) noexcept {
+		value_ ^= (Underlying{1} << f.index());
+		return *this;
 	}
 
 	constexpr inline flag_enum operator~() const noexcept {

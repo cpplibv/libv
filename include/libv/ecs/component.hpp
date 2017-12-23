@@ -16,8 +16,8 @@ struct Component {
 	using optional = Component<CRTP, TID, true>;
 	using type = CRTP;
 
-	inline static constexpr ComponentSystemID ID = TID;
-	inline static constexpr bool is_optional_v = Optional;
+	static constexpr ComponentSystemID ID = TID;
+	static constexpr bool is_optional_v = Optional;
 };
 
 // -------------------------------------------------------------------------------------------------

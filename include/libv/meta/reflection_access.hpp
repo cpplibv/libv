@@ -63,7 +63,7 @@ derived_level<0> __libv_reflection_next_index(derived_level<0>);
 #define LIBV_REFLECTION_ACCESS(NAME) \
 		static constexpr ::libv::meta::derived_level<decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value + 1> \
 			__libv_reflection_next_index(::libv::meta::derived_level<decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value + 1>); \
-		template <typename Self> static constexpr inline auto __libv_reflection_static(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) noexcept { \
+		template <typename Self> static constexpr auto __libv_reflection_static(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) noexcept { \
 			return ::libv::meta::detail::make_static_wrapper(#NAME, &Self:: NAME ); } \
 		inline auto __libv_reflection_member(std::integral_constant<size_t, decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value - 1>) noexcept { \
 			return ::libv::meta::detail::make_member_wrapper(#NAME, NAME, &decltype(std::decay_t<decltype(*this)>{}):: NAME ); } \

@@ -98,7 +98,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	endif()
 endif()
 
-# Definitions --------------------------------------------------------------------------------------
+# Flags --------------------------------------------------------------------------------------------
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-Og)
@@ -120,11 +120,19 @@ else()
 endif()
 
 add_compile_options(-m64)
-add_compile_options(-std=c++17)
-#add_compile_options(-std=c++2a)
+#add_compile_options(-std=c++17)
 
-# Macro - Assert
-add_definitions(-DNDEBUG)
+# Tooling ------------------------------------------------------------------------------------------
+
+add_compile_options(-std=c++2a -fconcepts)
+add_definitions(-Dconcept="concept bool")
+
+#Sparing tooling from supporting requires
+add_definitions(-D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
+#wish_add_ide_definition("LIBV_REQUIRES(...)" " ")
+
+# Definitions --------------------------------------------------------------------------------------
+
 # Macro - Git
 add_definitions(-DGIT_BRANCH="${WISH_GIT_BRANCH}")
 add_definitions(-DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
@@ -457,6 +465,10 @@ wish_end_group()
 wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
 
 wish_create_library(
+	TARGET libv_algorithm INTERFACE
+)
+
+wish_create_library(
 	TARGET libv_container INTERFACE
 )
 
@@ -478,8 +490,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_glr INTERFACE
-	LINK   ext_boost
+	TARGET libv_glr STATIC
+	SOURCE src/libv/glr/*.cpp
+	LINK   libv_gl ext_boost
 )
 
 wish_create_library(
@@ -560,7 +573,7 @@ wish_create_group(GROUP_SANDBOX) # Sandboxes -----------------------------------
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log ext_boost ext_boost_stacktrace
+	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(
@@ -587,10 +600,16 @@ wish_create_executable(
 	LINK   libv_log libv_gl libv_utility ext_glfw
 )
 
+#wish_create_executable(
+#	TARGET sandbox_libv_gl3
+#	SOURCE sandbox/libv_gl_main3.cpp
+#	LINK   libv_log libv_gl libv_utility ext_boost ext_glfw
+#)
+
 wish_create_executable(
-	TARGET sandbox_libv_gl3
-	SOURCE sandbox/libv_gl_main3.cpp
-	LINK   libv_log libv_gl libv_utility ext_boost ext_glfw
+	TARGET sandbox_libv_glr
+	SOURCE sandbox/libv_glr_main.cpp
+	LINK   libv_log libv_gl libv_glr libv_utility libv_math ext_glfw
 )
 
 wish_create_executable(
@@ -682,6 +701,12 @@ wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
 	LINK   obj_test_runner libv_frame
+)
+
+wish_create_executable(
+	TARGET test_libv_glr
+	SOURCE test/libv/glr/*.cpp
+	LINK   obj_test_runner libv_glr libv_math libv_meta
 )
 
 wish_create_executable(

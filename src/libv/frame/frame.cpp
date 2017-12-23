@@ -340,7 +340,7 @@ vec2d Frame::getMousePosition() {
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return {convert_from_s_24_8<double>(x), convert_from_s_24_8<double>(y)};
+	return {convert_from_s24_8<double>(x), convert_from_s24_8<double>(y)};
 }
 
 vec2d Frame::getScrollPosition() {
@@ -350,7 +350,7 @@ vec2d Frame::getScrollPosition() {
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
     auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
 
-	return {convert_from_s_24_8<double>(x), convert_from_s_24_8<double>(y)};
+	return {convert_from_s24_8<double>(x), convert_from_s24_8<double>(y)};
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -1,37 +1,75 @@
+--- DONE -------------------------------------------------------------------------------------------
+
+libv.glr: Implement shader / program API
+libv.glr: Implement Uniform Buffers and Uniform Blocks
+libv.glr: Implement UBO layout std140
+libv.glr: Generate glsl code for uniform blocks from the C++ code, not the other way around
+libv.glr: Uniform<T>
+libv.glr: UniformStream
+libv.glr: Solve UniformStream batch counting
+libv.glr: Texture
+libv.gl: cleanup program1/2 shader1/2
+libv.gl: cleanup texture1/2
+libv.glr: Destroy, Remote ptr, GC
+libv.glr: Cleanup mesh API and its includes, split sources as necessary
+libv.gl: simplify the functionality, no auto create or destroy, no createData, createLink, plain structs
+
 --- STACK ------------------------------------------------------------------------------------------
 
-rename gl::GL to~ gl::GLState gl::GLstate
--- commit --
+libv.glr: Procedural gizmo mesh
+libv.glr: Texture manipulation, generation
 
-add / check structured binding support for vec_t
--- commit --
+libv.ui: Rebase ui4 on top of glr
+libv.glr: UniformBlockSharedView_std140
 
-libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
--- commit --
+libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
+libv.glr: Implement sub-mesh API
+libv.glr: Fix uniform naming mess, Reduce the number of public members
+libv.glr: vm4
+libv.gl: https://learnopengl.com/PBR/Lighting
+libv.glr: frame buffer
+libv.glr: render target
+libv.glr: post-processing emission / bloom
+libv.glr: post-processing gamma
+libv.glr: post-processing haze
 
-btn / regions
--- commit --
+libv.utility: Rename approxing.hpp to approx.hpp and the class name too
+libv.utility: add/verify structured binding support for vec_t
+libv.ui: libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
+libv.ui: implement some ui stuff: btn / regions
 
-frame calling show after show may brake things?
-dual check lock every async frame operations
--- commit --
+libv.ui: text
+libv.ui.font: font check if bearing is calculated in the font engine
 
-pointer facade for: observer_ptr, observer_ref, etc...
--- commit --
+libv.glr: shadow
+libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);
+libv.glr+: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading
+libv.glr+: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
+libv.glr+: HDR https://learnopengl.com/Advanced-Lighting/HDR
+libv.glr+: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
 
-implement erase_unstable: x[index] = std::move(x[last]); x.erase(last)
--- commit --
+libv.glr++: Tiled-Deferred-Shading
+
+libv.frame: frame calling show after show may brake things?
+libv.frame: dual check lock every async frame operations
+
+libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
+libv.utility: implement erase_unstable: x[index] = std::move(x[last]); x.erase(last)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cli: Clara, most important questions are: multi, optional, required, positional and default arguments
 			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
+cmake: can there be multiple definition error during linkage if two lib contains the same definition or will a later be ignored
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
+cpp.proposal: P2 std::uninitialized
+		- ability to declare a primitive variable with explicitly uninitialized value
+		- int variable = std::uninitialized;
 cpp.proposal: P2 add auto ctor call to return MyType(arg0, arg1); => return (arg0, arg1);
 		- decltype(auto) foo();
 		- auto foo();
@@ -43,6 +81,7 @@ cpp.proposal: P2 std::argument_with _name<T>: void foo(std::with_call_name<const
 		Questions: Is whitespace included? Newlines? Expressions? Whitespace in expressions? Constexpr? Just do what macros do?
 cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
+cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
 cpp: (adaptive) radix tree - O(1) lookup
 cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
 cpp: clarify template vs auto type deduction rules
@@ -50,8 +89,9 @@ cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
 frame.core: remove core
-frame: Move frame from disconnected monitor
+frame: Move frames from disconnected monitor / off-screen
 frame: remove default own thread, give them an io_context like executor
+gl: docs http://docs.gl
 gl: framebuffer
 gl: glEnable(GL_DEBUG_OUTPUT);
 gl: remove irrelevant member function from templated textures
@@ -61,13 +101,16 @@ gl: uniformbuffer?
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 layout: hard type (enum) align anchor and orient
 layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
+learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
+libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
+libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv.log: log thread naming
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, that is too many template)
 libv.utility: Make a proper copy-pastable noisy type
-libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
+net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html
 observe: https://github.com/bkaradzic/bgfx
 observe: https://github.com/hugoam/mud
@@ -116,23 +159,6 @@ cpp.compile: things I want to know about my compile time:
 		- clang patch: https://www.youtube.com/watch?v=NPWQ7xKfIHQ
 		- record in CI history per commit changes in every statistics
 		- https://github.com/google/bloaty
-
-// -------------------------------------------------------------------------------------------------
-
-Adopt boost stacktrace with backtrace backend
-
-#list(APPEND GROUP_EXTERNAL_PROJECT ext_backtrace)
-#ExternalProject_Add(ext_backtrace
-#	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
-#	GIT_TAG master
-#	PREFIX ${PATH_EXT_SRC}/backtrace
-#	CONFIGURE_COMMAND "configure"
-#	BUILD_COMMAND "make"
-#	INSTALL_COMMAND
-#		COMMAND mkdir -p ${PATH_EXT}/backtrace/lib/backtrace
-#		COMMAND cp -f -T ${PATH_EXT_SRC}/backtrace/src/ext_backtrace/.libs/libbacktrace.a ${PATH_EXT}/backtrace/lib/libbacktrace.a
-#	EXCLUDE_FROM_ALL 1
-#)
 
 // -------------------------------------------------------------------------------------------------
 
@@ -339,17 +365,68 @@ ar -qc libaz.a abc xyz
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
-> RANDOM
-template <class URNG>
-int rnd(int n, URNG &engine) {
-    using dist_t = std::uniform_int_distribution<>;
-    using param_t = dist_t::param_type;
+// Argument parsing
 
-    static dist_t dist;
-    param_t params{0,n-1};
+// Missing: default value, optional is there, and its fine, but default would be nicer.
+// Missing: commands / sub commands / sub-sub commands
 
-    return dist(engine, params);
+auto args = libv::arg::ArgumentParser();
+
+const auto input_file = args.required<std::string>
+		("input_file")
+		["-i"]["--input"]
+		("File path of the binary input file");
+
+const auto output_file = args.optional<std::string>
+		("output_file")
+		["-o"]["--output"]
+		("File path of the generated C++ output");
+
+const auto function_name = args.optional<std::string>
+		("function_name")
+		["-f"]["--function"]
+		("Name of the generated function");
+
+const auto indexes = args.multiple<std::string>
+		("indexes_name")
+		["-i"]["--index"]
+		("Indexes of something")
+		.at_least(1).at_most(5);
+
+const auto flag = args.flag
+		("flag")
+		["-f"]["--flag"]
+		("Flag for something");
+
+const auto rest = args.rest;
+
+args.positional(input_file, output_file, function_name, indexes);
+
+args.require(output_file && function_name || flag);
+args.require_no_unused();
+
+if (args.parse(argc, argv)) {
+	std::err << args.error_message(100) << args.usage(100);
+	std::exit(1);
 }
+
+std::cout << args.report(100);
+
+// API:
+
+args.flag               (name)[flag]+(description)?
+args.multiple<T>        (name)[flag]+(description)?
+args.optional<T>        (name)[flag]+(description)?
+args.required<T>        (name)[flag]+(description)?
+args.positional         (arg0, arg1)
+args.require            (arg0 && arg1 || arg2)
+args.require_no_unused  ()
+args.parse              (argc, argv)
+args.error_message      (width)
+args.report             (width)
+args.usage              (width)
+
+-------------------------------------------
 
 //struct UniformLight {
 //	Uniform<int> type;
@@ -438,9 +515,6 @@ void vglViewportFullScreen() {
 //	else //if (type == pointLight)
 //		return ortho<float>(-30, 30, -30, 30, -10, 150);
 //}
-
-
-
 
 
 
@@ -628,20 +702,20 @@ struct Light {
 // Planned attribute locations:
 //   0  |     position  |             |
 //   1  |       normal  |     psize   |
-//   2  |      diffuse  |    color0   |
-//   3  |     specular  |    color1   |
+//   2  |               |   diffuse   |
+//   3  |               |  specular   |
 //   4  |   boneweight  |             |
 //   5  |  boneindices  |             |
-//   6  |               |    tangent  |
-//   7  |               |  bitangent  |
-//   8  |               |  texcoord0  |
+//   6  |      tangent  |             |
+//   7  |    bitangent  |             |
+//   8  |    texcoord0  |             |
 //   9  |   tessfactor  |  texcoord1  |
 //  10  |     instVec0  |  texcoord2  |
 //  11  |     instVec1  |  texcoord3  |
 //  12  |   instMatrix  |  texcoord4  |
-//  13  |   ^^^^^^^^^^  |  texcoord5  |
-//  14  |   ^^^^^^^^^^  |  texcoord6  |
-//  15  |   ^^^^^^^^^^  |  texcoord7  |
+//  13  |     ^^^^^     |  texcoord5  |
+//  14  |     ^^^^^     |  texcoord6  |
+//  15  |     ^^^^^     |  texcoord7  |
 
 // -------------------------------------------------------------------------------------------------
 
@@ -683,9 +757,6 @@ private:
 	static GC gc;
 	GLuint obj;
 };
-
-// =================================================================================================
-
 
 // =================================================================================================
 

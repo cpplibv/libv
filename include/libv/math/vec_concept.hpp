@@ -8,6 +8,9 @@
 #include <range/v3/utility/concepts.hpp>
 
 
+// TODO P2: Move this file to libv/concept/vec.hpp
+// TODO P2: Update this file to concepts language feature
+
 // -------------------------------------------------------------------------------------------------
 
 namespace libv {

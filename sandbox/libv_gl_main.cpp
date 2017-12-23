@@ -1,41 +1,35 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
+// hpp
+#include "libv_gl_runner.hpp"
 // ext
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 // libv
+#include <libv/math/angle.hpp>
 #include <libv/utility/read_file.hpp>
-#include <libv/utility/timer.hpp>
 // std
-#include <atomic>
-#include <cmath>
-#include <cstdio>
-#include <cstdlib>
+#include <chrono>
 #include <iostream>
 // pro
+#include <libv/gl/array_buffer.hpp>
+#include <libv/gl/check.hpp>
 #include <libv/gl/gl.hpp>
-#include <libv/gl/log.hpp>
 #include <libv/gl/program.hpp>
 #include <libv/gl/shader.hpp>
 #include <libv/gl/texture.hpp>
-#include <libv/gl/vertex_buffer.hpp>
+#include <libv/gl/uniform.hpp>
+#include <libv/gl/vertex_array.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
-
-constexpr uint32_t WINDOW_HEIGHT = 600;
-constexpr uint32_t WINDOW_WIDTH = 900;
-
-void checkGLSupport(const char* ext) {
-	log_sandbox.info("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
-}
+constexpr uint32_t WINDOW_WIDTH = 1280;
+constexpr uint32_t WINDOW_HEIGHT = 800;
 
 // -------------------------------------------------------------------------------------------------
 
 struct Sandbox {
-	float angle = 0;
+	float angle = 0.f;
 
 	libv::gl::GL gl;
 
@@ -43,36 +37,36 @@ struct Sandbox {
 	libv::gl::AttributeFixLocation<libv::vec4f> attributeColor;
 	libv::gl::AttributeFixLocation<libv::vec2f> attributeTex0;
 
-	libv::gl::GuardedShader shaderTest0Frag;
-	libv::gl::GuardedShader shaderTest0Vert;
-	libv::gl::GuardedProgram programTest0;
+	libv::gl::Shader shaderTest0Frag;
+	libv::gl::Shader shaderTest0Vert;
+	libv::gl::Program programTest0;
 	libv::gl::Uniform_mat4f uniformTest0MVPmat;
 
-	libv::gl::GuardedShader shaderTest1Frag;
-	libv::gl::GuardedShader shaderTest1Vert;
-	libv::gl::GuardedProgram programTest1;
+	libv::gl::Shader shaderTest1Frag;
+	libv::gl::Shader shaderTest1Vert;
+	libv::gl::Program programTest1;
 	libv::gl::Uniform_mat4f uniformTest1MVPmat;
 	libv::gl::Uniform_texture uniformTest1TextureDiffuseSampler;
 
-	libv::gl::GuardedShader shaderTest2Frag;
-	libv::gl::GuardedShader shaderTest2Vert;
-	libv::gl::GuardedProgram programTest2;
+	libv::gl::Shader shaderTest2Frag;
+	libv::gl::Shader shaderTest2Vert;
+	libv::gl::Program programTest2;
 	libv::gl::Uniform_mat4f uniformTest2MVPmat;
 	libv::gl::Uniform_mat4f uniformTest2Mmat;
 	libv::gl::Uniform_vec3f uniformTest2EyePosW;
 	libv::gl::Uniform_texture uniformTest2TextureSkySampler;
 
-	libv::gl::GuardedShader shaderDepthFrag;
-	libv::gl::GuardedShader shaderDepthVert;
-	libv::gl::GuardedProgram programDepth;
+	libv::gl::Shader shaderDepthFrag;
+	libv::gl::Shader shaderDepthVert;
+	libv::gl::Program programDepth;
 	libv::gl::Uniform_mat4f uniformDepthMVPmat;
 
-	libv::gl::VertexBuffer bufferVertexData;
-	libv::gl::VertexBuffer bufferVertexIndices;
+	libv::gl::ArrayBuffer bufferVertexData;
+	libv::gl::ArrayBuffer bufferVertexIndices;
 	libv::gl::VertexArray vertexArray;
 
-	libv::gl::Texture2DGuard texture0;
-	libv::gl::TextureCubeGuard textureSky;
+	libv::gl::Texture2D texture0;
+	libv::gl::TextureCube textureSky;
 
 	struct Vertex {
 		libv::vec3f position;
@@ -84,39 +78,14 @@ struct Sandbox {
 	};
 
 	Sandbox() {
-		log_sandbox.info("GL Vendor: {}", glGetString(GL_VENDOR));
-		log_sandbox.info("GL Renderer: {}", glGetString(GL_RENDERER));
-		log_sandbox.info("GL Version: {}", glGetString(GL_VERSION));
-
-		checkGLSupport("GL_VERSION_3_3");
-		checkGLSupport("GL_VERSION_4_5");
-		checkGLSupport("GL_ARB_direct_state_access");
-		checkGLSupport("GL_ARB_draw_elements_base_vertex");
-		checkGLSupport("GL_ARB_gpu_shader_fp64");
-		checkGLSupport("GL_ARB_sampler_objects");
-		checkGLSupport("GL_ARB_vertex_attrib_64bit");
-		checkGLSupport("GL_ARB_vertex_attrib_binding");
-
-		libv::gl::checkGL();
-
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
-		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
-
 		gl.capability.blend.enable();
-		gl.depthFunction.less();
-
-		gl.capability.depthTest.enable();
-		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
-
 		gl.capability.cullFace.enable();
+		gl.capability.depthTest.enable();
+		gl.depthFunction.less();
+		gl.blendFunction(libv::gl::BlendFunction::SourceAlpha, libv::gl::BlendFunction::One_Minus_SourceAlpha);
 		gl.cullFace.back();
 		gl.frontFace.ccw();
-
-		gl.polygonMode(true ? libv::gl::Mode::Fill : libv::gl::Mode::Line);
+		gl.polygonMode(true ? libv::gl::PolygonMode::Fill : libv::gl::PolygonMode::Line);
 
 		Vertex dataVertex[]{
 			Vertex{libv::vec3f(-1.f, -1.f, 0.f), libv::vec4f(1.f, 0.f, 0.f, 1.f), libv::vec2f(0.f, 0.f)},
@@ -145,62 +114,101 @@ struct Sandbox {
 		attributeColor = 2;
 		attributeTex0 = 8;
 
-		shaderTest0Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test0.fs"));
-		shaderTest0Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test0.vs"));
-		programTest0.link(shaderTest0Frag, shaderTest0Vert);
-		programTest0.assign(uniformTest0MVPmat, "MVPmat");
+		gl(shaderTest0Frag).create(libv::gl::ShaderType::Fragment);
+		gl(shaderTest0Frag).compile(libv::read_file_or_throw("res/shader/test0.fs"));
+		gl(shaderTest0Vert).create(libv::gl::ShaderType::Vertex);
+		gl(shaderTest0Vert).compile(libv::read_file_or_throw("res/shader/test0.vs"));
+		gl(programTest0).create();
+		gl(programTest0).link(shaderTest0Vert, shaderTest0Frag);
+		gl(programTest0).assign(uniformTest0MVPmat, "MVPmat");
 
-		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test1.fs"));
-		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test1.vs"));
-		programTest1.link(shaderTest1Frag, shaderTest1Vert);
-		programTest1.assign(uniformTest1MVPmat, "MVPmat");
-		programTest1.assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
+		gl(shaderTest1Frag).create(libv::gl::ShaderType::Fragment);
+		gl(shaderTest1Frag).compile(libv::read_file_or_throw("res/shader/test1.fs"));
+		gl(shaderTest1Vert).create(libv::gl::ShaderType::Vertex);
+		gl(shaderTest1Vert).compile(libv::read_file_or_throw("res/shader/test1.vs"));
+		gl(programTest1).create();
+		gl(programTest1).link(shaderTest1Frag, shaderTest1Vert);
+		gl(programTest1).assign(uniformTest1MVPmat, "MVPmat");
+		gl(programTest1).assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
-		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test2.fs"));
-		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test2.vs"));
-		programTest2.link(shaderTest2Frag, shaderTest2Vert);
-		programTest2.assign(uniformTest2MVPmat, "MVPmat");
-		programTest2.assign(uniformTest2Mmat, "Mmat");
-		programTest2.assign(uniformTest2EyePosW, "eyePosW");
-		programTest2.assign(uniformTest2TextureSkySampler, "textureSkySampler");
+		gl(shaderTest2Frag).create(libv::gl::ShaderType::Fragment);
+		gl(shaderTest2Frag).compile(libv::read_file_or_throw("res/shader/test2.fs"));
+		gl(shaderTest2Vert).create(libv::gl::ShaderType::Vertex);
+		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/test2.vs"));
+		gl(programTest2).create();
+		gl(programTest2).link(shaderTest2Frag, shaderTest2Vert);
+		gl(programTest2).assign(uniformTest2MVPmat, "MVPmat");
+		gl(programTest2).assign(uniformTest2Mmat, "Mmat");
+		gl(programTest2).assign(uniformTest2EyePosW, "eyePosW");
+		gl(programTest2).assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
-		shaderDepthFrag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/depth.fs"));
-		shaderDepthVert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/depth.vs"));
-		programDepth.link(shaderDepthFrag, shaderDepthVert);
-		programDepth.assign(uniformDepthMVPmat, "MVPmat");
+		gl(shaderDepthFrag).create(libv::gl::ShaderType::Fragment);
+		gl(shaderDepthFrag).compile(libv::read_file_or_throw("res/shader/depth.fs"));
+		gl(shaderDepthVert).create(libv::gl::ShaderType::Vertex);
+		gl(shaderDepthVert).compile(libv::read_file_or_throw("res/shader/depth.vs"));
+		gl(programDepth).create();
+		gl(programDepth).link(shaderDepthFrag, shaderDepthVert);
+		gl(programDepth).assign(uniformDepthMVPmat, "MVPmat");
 
-		bufferVertexData.createData(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
-		bufferVertexIndices.createData(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
+		gl(bufferVertexData).create();
+		gl(bufferVertexData).bind();
+		gl(bufferVertexData).data(&dataVertex[0], sizeof(dataVertex), libv::gl::BufferUsage::StaticDraw);
+		gl(bufferVertexIndices).create();
+		gl(bufferVertexIndices).bind();
+		gl(bufferVertexIndices).data(&dataIndices[0], sizeof(dataIndices), libv::gl::BufferUsage::StaticDraw);
 
-		vertexArray.create();
-		{
-			auto vao_guard = vertexArray.bind_guard();
-			vertexArray.bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position), false);
-			vertexArray.bindAttribute(bufferVertexData, attributeColor, sizeof(Vertex), offsetof(Vertex, color), false);
-			vertexArray.bindAttribute(bufferVertexData, attributeTex0, sizeof(Vertex), offsetof(Vertex, uv), false);
-			vertexArray.bindElements(bufferVertexIndices);
-		}
+		gl(vertexArray).create();
+		gl(vertexArray).bind();
+		gl(vertexArray).bindAttribute(bufferVertexData, attributePosition, sizeof(Vertex), offsetof(Vertex, position));
+		gl(vertexArray).bindAttribute(bufferVertexData, attributeColor, sizeof(Vertex), offsetof(Vertex, color));
+		gl(vertexArray).bindAttribute(bufferVertexData, attributeTex0, sizeof(Vertex), offsetof(Vertex, uv));
+		gl(vertexArray).bindElements(bufferVertexIndices);
 
-		texture0.create();
-		texture0.bind();
-		texture0.storage2D(1, libv::gl::InternalFormat::RGBA8, 2, 2);
-		texture0.subImage2D(0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UByte, 2, 2, dataTexture);
-		texture0.setMinFilter(libv::gl::MinFilter::Linear);
-		texture0.setMagFilter(libv::gl::MagFilter::Linear);
-		texture0.setWrapS(libv::gl::Wrap::ClampToEdge);
-		texture0.setWrapT(libv::gl::Wrap::ClampToEdge);
-		texture0.unbind();
+		gl(texture0).create();
+		gl(texture0).bind();
+		gl(texture0).storage(1, libv::gl::SizedInternalFormat::RGBA8, 2, 2);
+		gl(texture0).subImage(0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UByte, dataTexture);
+		gl(texture0).setMinFilter(libv::gl::MinFilter::Linear);
+		gl(texture0).setMagFilter(libv::gl::MagFilter::Linear);
+		gl(texture0).setWrapS(libv::gl::Wrap::ClampToEdge);
+		gl(texture0).setWrapT(libv::gl::Wrap::ClampToEdge);
 
-		textureSky.create();
-		textureSky.bind();
-		textureSky.storage2D(1, libv::gl::InternalFormat::RGBA8, 2, 2);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyX1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyX0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyY1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyY0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyZ1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyZ0);
-		textureSky.unbind();
+		gl(textureSky).create();
+		gl(textureSky).bind();
+		gl(textureSky).storage(1, libv::gl::CompressedFormat::RGBA_S3TC_DXT5_EXT, 2, 2);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveX, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyX1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeX, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyX0);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveY, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyY1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeY, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyY0);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveZ, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyZ1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeZ, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyZ0);
+	}
+
+	~Sandbox() {
+		gl(programTest0).destroy();
+		gl(programTest1).destroy();
+		gl(programTest2).destroy();
+		gl(programDepth).destroy();
+
+		gl(shaderTest0Frag).destroy();
+		gl(shaderTest0Vert).destroy();
+		gl(shaderTest1Frag).destroy();
+		gl(shaderTest1Vert).destroy();
+		gl(shaderTest2Frag).destroy();
+		gl(shaderTest2Vert).destroy();
+		gl(shaderDepthFrag).destroy();
+		gl(shaderDepthVert).destroy();
+
+		gl(texture0).destroy();
+		gl(textureSky).destroy();
+
+		gl(vertexArray).destroy();
+//		gl(bufferVertexData).destroy();
+//		gl(bufferVertexIndices).destroy();
+	}
+
+	void update(const std::chrono::duration<float> deltaTime) {
+		angle += 22.5f * deltaTime.count();
 	}
 
 	void render() {
@@ -211,12 +219,10 @@ struct Sandbox {
 		auto vStackGuard = gl.view.push_guard();
 		auto mStackGuard = gl.model.push_guard();
 
-		angle += 0.5f;
-
-		gl.projection = libv::perspective<float>(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
-		gl.view = libv::lookAt<float>(libv::vec3f(5.f, 3.f, 5.f), libv::vec3f(0.f, 0.f, 0.f), libv::vec3f(0.f, 1.f, 0.f));
-		gl.view.rotate(angle / 90.f, libv::vec3f(0.f, 1.f, 0.f));
-		gl.model = libv::identity<4, float>();
+		gl.projection = libv::mat4f::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
+		gl.view = libv::mat4f::lookAt({5.f, 3.f, 5.f}, {0.f, 0.f, 0.f}, {0.f, 1.f, 0.f});
+		gl.view.rotate(libv::Degrees{angle}, 0.f, 1.f, 0.f);
+		gl.model = libv::mat4f::identity();
 		// -----------------------------------------------------------------------------------------
 
 		// TODO P4: Binding a texture to an uniform instead of TextureType sounds like a good idea.
@@ -224,38 +230,41 @@ struct Sandbox {
 		gl.model.translate(libv::vec3f(-1, -1, +0));
 
 		{
-			programTest0.use();
+			gl(programTest0).use();
 			uniformTest0MVPmat = gl.mvp();
-			auto vao_guard = vertexArray.bind_guard();
-			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).bind();
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).unbind();
 		}
 
 		gl.model.translate(libv::vec3f(+0, +2, +0));
 
 		{
-			programTest1.use();
+			gl(programTest1).use();
 			gl.activeTexture(libv::gl::TextureChannel::diffuse);
-			auto tBindGuard = texture0.bindGuard();
+			gl(texture0).bind();
 			uniformTest1MVPmat = gl.mvp();
 			uniformTest1TextureDiffuseSampler = libv::gl::TextureChannel::diffuse;
 
-			auto vao_guard = vertexArray.bind_guard();
-			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).bind();
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).unbind();
 		}
 
 		gl.model.translate(libv::vec3f(+2, +0, +0));
 
 		{
-			programTest2.use();
+			gl(programTest2).use();
 			gl.activeTexture(libv::gl::TextureChannel::sky);
-			auto sBindGuard = textureSky.bindGuard();
+			gl(textureSky).bind();
 			uniformTest2MVPmat = gl.mvp();
 			uniformTest2Mmat = gl.model;
 			uniformTest2EyePosW = gl.eye();
 			uniformTest2TextureSkySampler = libv::gl::TextureChannel::sky;
 
-			auto vao_guard = vertexArray.bind_guard();
-			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).bind();
+			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 6, 0);
+			gl(vertexArray).unbind();
 		}
 
 		libv::gl::checkGL();
@@ -264,99 +273,7 @@ struct Sandbox {
 
 // Runner ------------------------------------------------------------------------------------------
 
-auto running = std::atomic_bool{true};
-
-int main(void) {
+int main() {
 	std::cout << libv::logger;
-
-	glfwSetErrorCallback([](int code, const char* description) {
-		log_sandbox.error("GLFW {}: {}", code, description);
-	});
-
-	if (!glfwInit()) {
-		log_sandbox.error("Failed to initialize GLFW.");
-		exit(EXIT_FAILURE);
-	}
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
-	GLFWwindow* window;
-
-	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
-	if (!window) {
-		glfwTerminate();
-		log_sandbox.error("Failed to create GLFW window.");
-		exit(EXIT_FAILURE);
-	}
-	glfwSetWindowPos(window, 200, 200);
-
-	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, [](GLFWwindow*, int key, int, int, int) {
-		if (key == GLFW_KEY_ESCAPE)
-			running = false;
-	});
-	glfwSwapInterval(1);
-
-	if (GLenum err = glewInit() != GLEW_OK)
-		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	libv::gl::checkGL();
-
-	{
-		Sandbox sandbox;
-
-		std::chrono::nanoseconds time_outside;
-		std::chrono::nanoseconds time_render;
-		std::chrono::nanoseconds time_swap;
-		std::chrono::nanoseconds time_poll;
-
-		libv::Timer timer;
-		libv::Timer print_timer;
-		size_t i = 0;
-
-		while (running && !glfwWindowShouldClose(window)) {
-			libv::gl::checkGL();
-			time_outside += timer.time();
-
-			sandbox.render();
-			time_render += timer.time();
-
-			glfwSwapBuffers(window);
-			time_swap += timer.time();
-
-			glfwPollEvents();
-			time_poll += timer.time();
-
-			i++;
-			if (print_timer.elapsed() > std::chrono::seconds(1)) {
-				print_timer.adjust(std::chrono::seconds(1));
-
-				log_sandbox.info("Frames: {}, Poll: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
-						i,
-						time_poll.count() / 1000.f / i,
-						time_render.count() / 1000.f / i,
-						time_outside.count() / 1000.f / i,
-						time_swap.count() / 1000.f / i,
-						(time_outside + time_render + time_swap + time_poll).count() / 1000.f / i
-				);
-				i = 0;
-
-				time_outside = time_outside.zero();
-				time_render = time_render.zero();
-				time_swap = time_swap.zero();
-				time_poll = time_poll.zero();
-			}
-		}
-	}
-	libv::gl::checkGL();
-	glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(window);
-	glfwTerminate();
-
-	return 0;
+	return run_sandbox<Sandbox>("Sandbox libv.GL1", WINDOW_HEIGHT, WINDOW_WIDTH);
 }
-
-// -------------------------------------------------------------------------------------------------

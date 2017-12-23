@@ -4,267 +4,189 @@
 
 // ext
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 #include <glm/mat2x2.hpp>
+#include <glm/mat2x3.hpp>
+#include <glm/mat2x4.hpp>
+#include <glm/mat3x2.hpp>
 #include <glm/mat3x3.hpp>
+#include <glm/mat3x4.hpp>
+#include <glm/mat4x2.hpp>
+#include <glm/mat4x3.hpp>
 #include <glm/mat4x4.hpp>
+// libv
+#include <libv/meta/resolve.hpp>
 // pro
+#include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>
 
 
 namespace libv {
 
-//// mat_base_t --------------------------------------------------------------------------------------
-//
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Wpedantic"
-//// nonstandard extension used : nameless struct / union
-//
-//template <size_t N, typename T, typename = void>
-//struct mat_base_t {
-//	T value[N * N];
-//
-//	vec_base_t() = default;
-//	template <typename... Args, typename = typename std::enable_if<sizeof...(Args) == N * N>::type>
-//	explicit mat_base_t(Args&&... values) noexcept : ptr{std::forward<Args>(values)...} { }
-//};
-//
-//template <typename T>
-//struct mat_base_t<3, T, enable_if<std::is_trivially_destructible<T>>> {
-//	union {
-//		struct {
-//			T
-//				m00, m01, m02,
-//				m10, m11, m12,
-//				m20, m21, m22;
-//		};
-//		struct {
-//			vec_t<3, T> col0;
-//			vec_t<3, T> col1;
-//			vec_t<3, T> col2;
-//		};
-//		T value[9];
-//	};
-//
-//};
-//
-//template <typename T>
-//struct mat_base_t<4, T, enable_if<std::is_trivially_destructible<T>>> {
-//	union {
-//		struct {
-//			T
-//				m00, m01, m02, m03,
-//				m10, m11, m12, m13,
-//				m20, m21, m22, m23,
-//				m30, m31, m32, m33;
-//		};
-//		struct {
-//			vec_t<4, T> col0;
-//			vec_t<4, T> col1;
-//			vec_t<4, T> col2;
-//			vec_t<4, T> col3;
-//		};
-//		T value[16];
-//	};
-//
-//};
-//
-//#pragma GCC diagnostic pop
-//
-//// -------------------------------------------------------------------------------------------------
-//
-//template <size_t N, typename T>
-//struct mat_helper_t : mat_base_t<N, T> {
-//
-//};
-
 // -------------------------------------------------------------------------------------------------
 
-
-template <size_t N, typename T>
-struct mat_base_t {
-};
-
-template <typename T>
-struct mat_base_t<2, T> {
-	glm::tmat2x2<T> mx;
-
-	inline mat_base_t() = default;
-	inline mat_base_t(T v) : mx(v) { }
-	inline mat_base_t(glm::tmat2x2<T> mx) : mx(mx) { }
-	inline mat_base_t(
-			T m00, T m01,
-			T m10, T m11) :
-		mx(
-			m00, m01,
-			m10, m11) { }
-};
-
-template <typename T>
-struct mat_base_t<3, T> {
-	glm::tmat3x3<T> mx;
-
-	inline mat_base_t() = default;
-	inline mat_base_t(T v) : mx(v) { }
-	inline mat_base_t(glm::tmat3x3<T> mx) : mx(mx) { }
-	inline mat_base_t(
-			T m00, T m01, T m02,
-			T m10, T m11, T m12,
-			T m20, T m21, T m22) :
-		mx(
-			m00, m01, m02,
-			m10, m11, m12,
-			m20, m21, m22) { }
-};
-
-template <typename T>
-struct mat_base_t<4, T> {
-	glm::tmat4x4<T> mx;
-
-	inline mat_base_t() = default;
-	inline mat_base_t(T v) : mx(v) { }
-	inline mat_base_t(glm::tmat4x4<T> mx) : mx(mx) { }
-	inline mat_base_t(
-			T m00, T m01, T m02, T m03,
-			T m10, T m11, T m12, T m13,
-			T m20, T m21, T m22, T m23,
-			T m30, T m31, T m32, T m33) :
-		mx(
-			m00, m01, m02, m03,
-			m10, m11, m12, m13,
-			m20, m21, m22, m23,
-			m30, m31, m32, m33) { }
-};
-
-template <size_t N, typename T>
-struct mat_t;
-
-template <typename T> inline auto to_glm(const mat_t<2, T>& m) {
-	return m.mx;
-}
-template <typename T> inline auto to_glm(const mat_t<3, T>& m) {
-	return m.mx;
-}
-template <typename T> inline auto to_glm(const mat_t<4, T>& m) {
-	return m.mx;
-}
-template <typename T> inline auto from_glm(const glm::tmat2x2<T>& m) {
-	return mat_t<2, T>{m};
-}
-template <typename T> inline auto from_glm(const glm::tmat3x3<T>& m) {
-	return mat_t<3, T>{m};
-}
-template <typename T> inline auto from_glm(const glm::tmat4x4<T>& m) {
-	return mat_t<4, T>{m};
-}
-
-template <size_t N, typename T>
-struct mat_t : mat_base_t<N, T> {
+template <size_t R, size_t C, typename T>
+struct mat_t : public glm::mat<static_cast<int>(R), static_cast<int>(C), T, glm::precision::highp> {
 	using value_type = T;
+	static constexpr size_t Column = C;
+	static constexpr size_t Row = R;
+	static constexpr int Ci = static_cast<int>(C);
+	static constexpr int Ri = static_cast<int>(R);
+
+public:
+	mat_t() : glm::mat<Ri, Ci, T, glm::precision::highp>() {}
+	using glm::mat<Ri, Ci, T, glm::precision::highp>::mat;
+	using glm::mat<Ri, Ci, T, glm::precision::highp>::operator=;
 
 	// ---------------------------------------------------------------------------------------------
 
-	using mat_base_t<N, T>::mat_base_t;
+private:
+	using mt = glm::mat<Ri, Ci, T, glm::precision::highp>;
+	inline mt& mx() {
+		return static_cast<mt&>(*this);
+	}
+	inline const mt& mx() const {
+		return static_cast<const mt&>(*this);
+	}
 
-	// ---------------------------------------------------------------------------------------------
+public:
+	T* data() {
+		return &mx()[0][0];
+	}
+	const T* data() const {
+		return &mx()[0][0];
+	}
 
-	inline mat_t<N, T>& inverse() {
-		this->mx = glm::inverse(this->mx);
+public:
+	inline mat_t& inverse() {
+		glm::inverse(mx());
 		return *this;
 	}
-	inline mat_t<N, T> inverse_copy() const {
-		return from_glm(glm::inverse(this->mx));
+	inline mat_t inverse_copy() const {
+		mat_t result;
+		result = glm::inverse(mx());
+		return result;
 	}
-	inline mat_t<N, T>& rotate(T angle, const libv::vec3_t<T>& axis) {
-		this->mx *= glm::rotate(glm::mat4{1.0f}, angle, to_glm(axis));
+
+	inline mat_t& rotate(const Radian<T> angle, const libv::vec3_t<T>& axis)
+			LIBV_REQUIRES(C == 4 && R == 4) {
+		mx() = glm::rotate(mx(), angle.value, to_glm(axis));
 		return *this;
 	}
-	inline mat_t<N, T> rotate_copy(T angle, const libv::vec3_t<T>& axis) const {
-		return from_glm(this->mx * glm::rotate(glm::mat4{1.0f}, angle, to_glm(axis)));
+	inline mat_t rotate_copy(const Radian<T> angle, const libv::vec3_t<T>& axis) const
+			LIBV_REQUIRES(C == 4 && R == 4) {
+		mat_t result;
+		result = glm::rotate(mx(), angle.value, to_glm(axis));
+		return result;
 	}
 	//rotate(const glm::quat& quat);
-	inline mat_t<N, T>& scale(const libv::vec3_t<T>& v) {
-		this->mx *= glm::scale(glm::mat4{1.0f}, to_glm(v));
+
+	inline mat_t& scale(const libv::vec3_t<T>& v) {
+		mx() = glm::scale(mx(), to_glm(v));
 		return *this;
 	}
-	inline mat_t<N, T> scale_copy(T angle, const libv::vec3_t<T>& v) const {
-		return from_glm(this->mx * glm::scale(glm::mat4{1.0f}, to_glm(v)));
+	inline mat_t scale_copy(T angle, const libv::vec3_t<T>& v) const {
+		mat_t result;
+		result = glm::scale(mx(), to_glm(v));
+		return result;
 	}
-	inline mat_t<N, T>& translate(const libv::vec3_t<T>& v) {
-		this->mx *= glm::translate(glm::mat4{1.0f}, to_glm(v));
+
+	inline mat_t& translate(const libv::vec3_t<T>& v) {
+		mx() = glm::translate(mx(), to_glm(v));
 		return *this;
 	}
-	inline mat_t<N, T> translate_copy(const libv::vec3_t<T>& v) const {
-		return from_glm(this->mx * glm::translate(glm::mat4{1.0f}, to_glm(v)));
+	inline mat_t translate_copy(const libv::vec3_t<T>& v) const {
+		mat_t result;
+		result = glm::translate(mx(), to_glm(v));
+		return result;
 	}
 
 	// ---------------------------------------------------------------------------------------------
 
-	inline mat_t<N, T>& operator=(const mat_t<N, T>& mat) & {
-		this->mx = mat.mx;
+	inline mat_t& operator=(const mat_t& mat) & {
+		mx() = mat.mx();
 		return *this;
 	}
-	inline vec_t<N, T> operator*(const vec_t<N, T>& vec) const {
-		return from_glm(this->mx * to_glm(vec));
+	inline vec_t<R, T> operator*(const vec_t<R, T>& vec) const {
+		return {mx() * to_glm(vec)};
 	}
-	inline mat_t<N, T> operator*(const mat_t<N, T>& mat) const {
-		return from_glm(this->mx * mat.mx);
+	inline mat_t operator*(const mat_t& mat) const {
+		mat_t result;
+		result = mx() * mat.mx();
+		return result;
 	}
 	inline decltype(auto) operator[](int col) {
-		return this->mx[col];
+		return mx()[col];
 	}
 	inline decltype(auto) operator[](int col) const {
-		return this->mx[col];
+		return mx()[col];
 	}
 
 	// ---------------------------------------------------------------------------------------------
+
+	static constexpr mat_t perspective(const T fovy, const T aspect, const T near, const T far) {
+		mat_t result;
+		result = glm::perspective<T>(fovy, aspect, near, far);
+		return result;
+	}
+
+	static constexpr mat_t lookAt(const libv::vec3_t<T> eye, const libv::vec3_t<T> target, const libv::vec3_t<T> up) {
+		mat_t result;
+		result = glm::lookAt<T>(to_glm(eye), to_glm(target), to_glm(up));
+		return result;
+	}
+
+	static constexpr mat_t ortho(const T left, const T right, const T bottom, const T top) {
+		mat_t result;
+		result = glm::ortho<T>(left, right, bottom, top);
+		return result;
+	}
+
+	static constexpr mat_t identity() {
+		return mat_t{1};
+	}
 };
-
-// global matrix creators --------------------------------------------------------------------------
-
-template <typename T>
-inline mat_t<4, T> perspective(T fovy, T aspect, T near, T far) {
-	return from_glm(glm::perspective<T>(fovy, aspect, near, far));
-}
-
-template <typename T>
-inline mat_t<4, T> lookAt(const libv::vec3_t<T>& eye, const libv::vec3_t<T>& target, const libv::vec3_t<T>& up) {
-	return from_glm(glm::lookAt<T>(to_glm(eye), to_glm(target), to_glm(up)));
-}
-
-template <typename T>
-inline mat_t<4, T> ortho(T left, T right, T bottom, T top) {
-	return from_glm(glm::ortho<T>(left, right, bottom, top));
-}
-
-template <size_t N, typename T>
-inline mat_t<N, T> identity() {
-	return mat_t<N, T>(static_cast<T>(1.0));
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <size_t N, typename T>
-inline T* value_ptr(mat_t<N, T>& mat) {
-	return &mat[0][0];
-}
-template <size_t N, typename T>
-inline const T* value_ptr(const mat_t<N, T>& mat) {
-	return &mat[0][0];
-}
 
 // aliases -----------------------------------------------------------------------------------------
 
-template <typename T> using mat2_t = mat_t<2, T>;
-template <typename T> using mat3_t = mat_t<3, T>;
-template <typename T> using mat4_t = mat_t<4, T>;
+template <typename T> using mat2x2_t = mat_t<2, 2, T>;
+template <typename T> using mat2x3_t = mat_t<2, 3, T>;
+template <typename T> using mat2x4_t = mat_t<2, 4, T>;
+template <typename T> using mat3x2_t = mat_t<3, 2, T>;
+template <typename T> using mat3x3_t = mat_t<3, 3, T>;
+template <typename T> using mat3x4_t = mat_t<3, 4, T>;
+template <typename T> using mat4x2_t = mat_t<4, 2, T>;
+template <typename T> using mat4x3_t = mat_t<4, 3, T>;
+template <typename T> using mat4x4_t = mat_t<4, 4, T>;
 
-using mat2f = mat2_t<float>;
-using mat3f = mat3_t<float>;
-using mat4f = mat4_t<float>;
-using mat2d = mat2_t<double>;
-using mat3d = mat3_t<double>;
-using mat4d = mat4_t<double>;
+template <typename T> using mat2_t = mat2x2_t<T>;
+template <typename T> using mat3_t = mat3x3_t<T>;
+template <typename T> using mat4_t = mat4x4_t<T>;
+
+using mat2x2f = mat2x2_t<float>;
+using mat2x3f = mat2x3_t<float>;
+using mat2x4f = mat2x4_t<float>;
+using mat2x2d = mat2x2_t<double>;
+using mat2x3d = mat2x3_t<double>;
+using mat2x4d = mat2x4_t<double>;
+using mat3x2f = mat3x2_t<float>;
+using mat3x3f = mat3x3_t<float>;
+using mat3x4f = mat3x4_t<float>;
+using mat3x2d = mat3x2_t<double>;
+using mat3x3d = mat3x3_t<double>;
+using mat3x4d = mat3x4_t<double>;
+using mat4x2f = mat4x2_t<float>;
+using mat4x3f = mat4x3_t<float>;
+using mat4x4f = mat4x4_t<float>;
+using mat4x2d = mat4x2_t<double>;
+using mat4x3d = mat4x3_t<double>;
+using mat4x4d = mat4x4_t<double>;
+
+using mat2f = mat2x2_t<float>;
+using mat3f = mat3x3_t<float>;
+using mat4f = mat4x4_t<float>;
+using mat2d = mat2x2_t<double>;
+using mat3d = mat3x3_t<double>;
+using mat4d = mat4x4_t<double>;
 
 // -------------------------------------------------------------------------------------------------
 

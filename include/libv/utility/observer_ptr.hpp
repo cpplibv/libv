@@ -24,7 +24,7 @@ public:
 	using pointer = T*;
 
 	constexpr inline observer_ptr() noexcept : ptr(nullptr) { }
-	constexpr explicit inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
+	constexpr inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
 	constexpr explicit inline observer_ptr(const std::shared_ptr<T>& p) noexcept : ptr(p.get()) { }
 	template <typename K, typename = std::enable_if_t<std::is_base_of_v<T, K>>>
@@ -45,6 +45,10 @@ public:
 	}
 	constexpr explicit inline operator T*() const noexcept {
 		return ptr;
+	}
+	constexpr inline observer_ptr& operator=(std::nullptr_t) & noexcept {
+		ptr = nullptr;
+		return *this;
 	}
 
 public:
@@ -117,7 +121,7 @@ constexpr inline observer_ptr<T> make_observer(T* p) noexcept {
 }
 template <typename T>
 constexpr inline observer_ptr<T> make_observer(T& p) noexcept {
-	return observer_ptr<T>(&p);
+	return observer_ptr<T>(std::addressof(p));
 }
 template <typename T>
 constexpr inline observer_ptr<T> make_observer(const std::shared_ptr<T>& p) noexcept {

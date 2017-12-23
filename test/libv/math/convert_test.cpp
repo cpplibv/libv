@@ -11,7 +11,7 @@ using namespace libv;
 
 template <typename T>
 T encode_decode(T value) {
-	return convert_from_s_24_8<T>(convert_to_s_24_8(value));
+	return convert_from_s24_8<T>(convert_to_s24_8(value));
 }
 
 TEST_CASE("encode decode") {

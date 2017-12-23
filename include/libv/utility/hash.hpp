@@ -10,19 +10,10 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-namespace detail {
-
-template<typename T>
-constexpr inline void aux_hash_combine(size_t& seed, const T& val) noexcept {
-	seed ^= std::hash<T>{}(val) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-}
-
-} // namespace detail
-
-template<typename... Types>
-constexpr inline size_t hash_combine(const Types&... args) noexcept {
+template<typename... Args>
+constexpr inline size_t hash_combine(const Args&... args) noexcept {
 	size_t seed = 0;
-	(detail::aux_hash_combine(seed, args), ...);
+	((void) (seed ^= std::hash<Args>{}(args) + 0x9e3779b9 + (seed << 6) + (seed >> 2)), ...);
 	return seed;
 }
 

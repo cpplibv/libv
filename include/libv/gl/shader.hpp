@@ -5,121 +5,79 @@
 // ext
 #include <GL/glew.h>
 // std
-#include <string>
+#include <string_view>
 // libv
 #include <libv/utility/enum.hpp>
 // pro
+#include <libv/gl/assert.hpp>
+#include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
-#include <libv/gl/log.hpp>
+#include <libv/gl/shader_object.hpp>
 
 
 namespace libv {
 namespace gl {
 
-// Shader --------------------------------------------------------------------------------------
+// Shader ------------------------------------------------------------------------------------------
 
-class Shader {
+class AccessShader {
 private:
-	GLuint shaderID = 0;
+	Shader& object;
 
 public:
-	inline Shader() = default;
-	inline Shader(const Shader&) = delete;
-	inline Shader(Shader&& orig) noexcept : shaderID(orig.shaderID) {
-		orig.shaderID = 0;
-	}
-	inline ~Shader() {
-		LIBV_GL_DEBUG_ASSERT(shaderID == 0);
-	}
+	AccessShader(Shader& object) :
+		object(object) { }
 
 public:
-	inline bool status() {
-		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
-		GLint result;
-		glGetShaderiv(shaderID, GL_COMPILE_STATUS, &result);
-		LIBV_GL_DEBUG_CHECK();
-		return result;
-	}
-
-	std::string info() {
-		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
-		int infoLength;
-		glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLength);
-
-		std::string result;
-		result.resize(infoLength);
-		glGetShaderInfoLog(shaderID, infoLength, nullptr, &result[0]);
-		LIBV_GL_DEBUG_CHECK();
-		return result;
-	}
-
 	inline void create(ShaderType type) {
-		LIBV_GL_DEBUG_ASSERT(shaderID == 0);
-		shaderID = glCreateShader(to_value(type));
-		LIBV_GL_DEBUG_CHECK();
-		if (shaderID == 0)
+		LIBV_GL_DEBUG_ASSERT(object.id == 0);
+		object.id = glCreateShader(to_value(type));
+		checkGL();
+		if (object.id == 0)
 			log_gl.error("Failed to create {} shader", to_string(type));
 	}
 
 	inline void destroy() {
-		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
-		glDeleteShader(shaderID);
-		shaderID = 0;
-		LIBV_GL_DEBUG_CHECK();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glDeleteShader(object.id);
+		object.id = 0;
+		checkGL();
 	}
 
+public:
+	inline bool status() {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		GLint result;
+		glGetShaderiv(object.id, GL_COMPILE_STATUS, &result);
+		checkGL();
+		return result;
+	}
+
+	std::string info() {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		int infoLength;
+		glGetShaderiv(object.id, GL_INFO_LOG_LENGTH, &infoLength);
+
+		std::string result;
+		result.resize(infoLength);
+		glGetShaderInfoLog(object.id, infoLength, nullptr, &result[0]);
+		checkGL();
+		return result;
+	}
+
+public:
 	inline void compile(const char* sourceStr, const GLint size) {
-		LIBV_GL_DEBUG_ASSERT(shaderID != 0);
-		glShaderSource(shaderID, 1, &sourceStr, &size);
-		LIBV_GL_DEBUG_CHECK();
-		glCompileShader(shaderID);
-		LIBV_GL_DEBUG_CHECK();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glShaderSource(object.id, 1, &sourceStr, &size);
+		checkGL();
+		glCompileShader(object.id);
+		checkGL();
 		if (!status())
 			log_gl.error("Failed to compile shader:\n{}", info());
 	}
 
-	inline void compile(const std::string& sourceStr) {
-		compile(sourceStr.c_str(), static_cast<GLint>(sourceStr.size()));
-	}
-
-	inline void createCompile(ShaderType type, const char* sourceStr, const GLint size) {
-		create(type);
-		compile(sourceStr, size);
-	}
-
-	inline void createCompile(ShaderType type, const std::string& sourceStr) {
-		createCompile(type, sourceStr.c_str(), static_cast<GLint>(sourceStr.size()));
-	}
-
-public:
-	inline auto id() const {
-		return shaderID;
-	}
-	inline operator GLuint() const {
-		return shaderID;
-	}
-};
-
-// GuardedShader ----------------------------------------------------------------------------------------
-
-class GuardedShader : public Shader {
-public:
-	inline GuardedShader() {
-	}
-	inline GuardedShader(ShaderType type) {
-		create(type);
-	}
-	inline GuardedShader(ShaderType type, const char* sourceStr, const size_t size) {
-		createCompile(type, sourceStr, static_cast<GLint>(size));
-	}
-	inline GuardedShader(ShaderType type, const std::string& sourceStr) :
-		GuardedShader(type, sourceStr.c_str(), sourceStr.size()) { }
-	inline GuardedShader(const GuardedShader&) = delete;
-	inline GuardedShader(Shader&& orig) : Shader(std::move(orig)) {}
-	inline GuardedShader(GuardedShader&& orig) : Shader(std::move(orig)) {}
-	inline ~GuardedShader() {
-		if (id())
-			destroy();
+	inline void compile(std::string_view source) {
+		compile(source.data(), static_cast<GLint>(source.size()));
 	}
 };
 

@@ -9,6 +9,8 @@
 #include <memory>
 #include <optional>
 #include <string_view>
+// pro
+#include <libv/gl/texture_object.hpp>
 
 
 namespace libv {
@@ -19,7 +21,7 @@ namespace detail {
 
 struct ImageImplementation {
 	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
-	[[nodiscard]] virtual uint32_t createTexture() const noexcept = 0;
+	[[nodiscard]] virtual Texture createTexture() const noexcept = 0;
 	virtual ~ImageImplementation() noexcept = default;
 };
 
@@ -34,7 +36,7 @@ public:
 	inline Image(std::shared_ptr<detail::ImageImplementation>&& impl) noexcept :
 		size_(impl ? impl->size() : libv::vec2i{}), // operator?: to suppress -Wnull-dereference
 		impl(std::move(impl)) {
-		assert("ImageImplementation cannot be null" && impl != null);
+		assert("ImageImplementation cannot be null" && this->impl != nullptr);
 	}
 
 public:
@@ -43,7 +45,7 @@ public:
 	}
 
 	/// @context OpenGL
-	[[nodiscard]] inline uint32_t createTexture() const noexcept {
+	[[nodiscard]] inline Texture createTexture() const noexcept {
 		return impl->createTexture();
 	}
 };
@@ -53,7 +55,7 @@ public:
 /// @supported KTX, KMG, DDS: GLI backend
 /// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
 /// @context ANY
-[[nodiscard]] std::optional<Image> load_image(const std::string_view data);
+[[nodiscard]] std::optional<Image> load_image(const std::string_view data) noexcept;
 
 /// @supported KTX, KMG, DDS: GLI backend
 /// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend

@@ -60,10 +60,10 @@ constexpr auto ff = []() { return false; };
 // State Machine
 struct tcp_release : libv::sml::state_machine {
 
-	constexpr static auto established = state<class established>;
-	constexpr static auto fin_wait_1 = state<class fin_wait_1>;
-	constexpr static auto fin_wait_2 = state<class fin_wait_2>;
-	constexpr static auto timed_wait = state<class timed_wait>;
+	static constexpr auto established = state<class established>;
+	static constexpr auto fin_wait_1 = state<class fin_wait_1>;
+	static constexpr auto fin_wait_2 = state<class fin_wait_2>;
+	static constexpr auto timed_wait = state<class timed_wait>;
 
 	/// Transition DSL: src_state + event [ guard ] / action = dst_state
 	auto operator()() const {

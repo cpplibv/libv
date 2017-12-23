@@ -11,10 +11,10 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-std::optional<Image> load_image_GLI(const std::string_view data);
-std::optional<Image> load_image_SOIL(const std::string_view data);
+std::optional<Image> load_image_GLI(const std::string_view data) noexcept;
+std::optional<Image> load_image_SOIL(const std::string_view data) noexcept;
 
-std::optional<Image> load_image(const std::string_view data) {
+std::optional<Image> load_image(const std::string_view data) noexcept {
 	std::optional<Image> result;
 
 	if (!result)
@@ -24,7 +24,7 @@ std::optional<Image> load_image(const std::string_view data) {
 		result = load_image_SOIL(data);
 
 	if (!result)
-		log_gl.error("Corrupted or not supported image format");
+		log_gl.error("Corrupted image or not supported format");
 
 	return result;
 }
@@ -35,7 +35,7 @@ Image load_image_or_throw(const std::string_view data) {
 	if (result.has_value())
 		return std::move(result.value());
 	else
-		throw std::invalid_argument{"Corrupted or not supported image format"};
+		throw std::invalid_argument{"Corrupted image or not supported format"};
 }
 
 // -------------------------------------------------------------------------------------------------

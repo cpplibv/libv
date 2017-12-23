@@ -7,7 +7,7 @@
 #include <iostream>
 // pro
 #include <libv/net/address.hpp>
-#include <libv/net/connection.hpp>
+//#include <libv/net/connection.hpp>
 #include <libv/net/io_context.hpp>
 
 #include <netts/socket.hpp>

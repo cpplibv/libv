@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <array>
 #include <type_traits>
 
 
@@ -30,6 +31,21 @@ template <typename L, typename R>
 struct is_ostreamable<L, R, std::void_t<decltype(
 		std::declval<L&>() << std::declval<const R&>()
 		)>> : std::true_type { };
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T, typename K, typename... Args>
+constexpr inline bool is_same_as_any_v = std::is_same_v<T, K> || (std::is_same_v<T, Args> || ...);
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T> struct is_array : std::false_type {};
+template <typename T, size_t N> struct is_array<std::array<T, N>> : std::true_type {};
+template <typename T> constexpr bool is_array_v = is_array<T>::value;
+
+template <typename T> struct array_size;
+template <typename T, size_t N> struct array_size<std::array<T, N>> : std::integral_constant<size_t, N> {};
+template <typename T> constexpr size_t array_size_v = array_size<T>::value;
 
 // -------------------------------------------------------------------------------------------------
 

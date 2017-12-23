@@ -6,10 +6,11 @@
 #include <stack>
 #include <vector>
 // libv
+#include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/guard.hpp>
 // pro
-#include <libv/gl/log.hpp>
+#include <libv/gl/assert.hpp>
 
 
 namespace libv {
@@ -85,16 +86,21 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 
-	inline decltype(auto) rotate(const T& a, const vec3_t<T>& v) {
+	inline decltype(auto) rotate(const Radian<T> a, const vec3_t<T>& v) {
 		top().rotate(a, v);
 		return *this;
 	}
 
-	inline decltype(auto) scale(const T& s) {
+	inline decltype(auto) rotate(const Radian<T> a, const T x, const T y, const T z) {
+		top().rotate(a, vec3_t<T>(x, y, z));
+		return *this;
+	}
+
+	inline decltype(auto) scale(const T s) {
 		top().scale(vec3_t<T>(s, s, s));
 		return *this;
 	}
-	inline decltype(auto) scale(const T& x, const T& y, const T& z) {
+	inline decltype(auto) scale(const T x, const T y, const T z) {
 		top().scale(vec3_t<T>(x, y, z));
 		return *this;
 	}
@@ -103,7 +109,7 @@ public:
 		return *this;
 	}
 
-	inline decltype(auto) translate(const T& x, const T& y, const T& z) {
+	inline decltype(auto) translate(const T x, const T y, const T z) {
 		top().translate(vec3_t<T>(x, y, z));
 		return *this;
 	}
@@ -113,7 +119,7 @@ public:
 	}
 
 	inline decltype(auto) identity() {
-		top() = libv::identity<4, T>();
+		top() = Mat::identity();
 		return *this;
 	}
 

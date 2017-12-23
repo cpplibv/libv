@@ -17,12 +17,11 @@ namespace parse {
 
 // -------------------------------------------------------------------------------------------------
 
-using color = libv::vec4f;
-
-color to_color(const std::string& str) {
+auto to_color(const std::string& str) {
 
 	namespace x3 = boost::spirit::x3;
 	using float4 = std::tuple<float, float, float, float>;
+	using color = libv::vec4f;
 
 	struct named_colors_ : x3::symbols<color> {
 		named_colors_() {
@@ -364,11 +363,11 @@ color to_color(const std::string& str) {
 			hsv_color[translate_hsv] |
 			hsva_color[translate_hsv];
 
-	color color(1.f, 1.f, 1.f, 1.f);
+	color result(1.f, 1.f, 1.f, 1.f);
 
-	phrase_parse(str.begin(), str.end(), color_rule, x3::space, color);
+	phrase_parse(str.begin(), str.end(), color_rule, x3::space, result);
 
-	return color;
+	return result;
 }
 
 // -------------------------------------------------------------------------------------------------

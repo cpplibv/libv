@@ -103,13 +103,13 @@ void Frame::glfwCallback(const EventMouseEnter&) { }
 
 void Frame::glfwCallback(const EventMousePosition& e) {
 	mousePosition = (static_cast<uint64_t>
-			(convert_to_s_24_8(e.position.x)) << 32) | convert_to_s_24_8(e.position.y);
+			(convert_to_s24_8(e.position.x)) << 32) | convert_to_s24_8(e.position.y);
 }
 
 void Frame::glfwCallback(const EventMouseScroll& e) {
 	auto old = getScrollPosition();
 	scrollPosition = (static_cast<uint64_t>
-			(convert_to_s_24_8(e.offset.x + old.x)) << 32) | convert_to_s_24_8(e.offset.y + old.y);
+			(convert_to_s24_8(e.offset.x + old.x)) << 32) | convert_to_s24_8(e.offset.y + old.y);
 }
 
 void Frame::glfwCallback(const EventWindowFocus&) { }

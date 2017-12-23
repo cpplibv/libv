@@ -11,20 +11,22 @@
 #include <libv/meta/n_times.hpp>
 #include <libv/meta/type_traits.hpp>
 // std
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <ostream>
 #include <utility>
-#include <array>
 // pro
 #include <libv/math/vec_concept.hpp>
 
 
-// TODO P1: conditionally explicit ctors: 41:00 https://www.youtube.com/watch?v=ybaE9qlhHvw or wait out explicit(bool)
+// TODO P1: Modify (bool operator<) to (vec<bool, N> operator<)
 // TODO P2: add swizzle custom getters back into member after measuring the impact, and consider the concept based swizzle too, so either both or only non-member
+//			Interesing presentation on vec: https://www.youtube.com/watch?v=8FoAxasNssA
 // TODO P2: use 'concepts' for N dim vector for: from_xyzw, xyz, xy, rgba, ...
 // TODO P2: I think the whole glm bridge could be resolved by a pretty rough template conversion function
 //			Concept allow conversion to and from that type
+// TODO P3: conditionally explicit ctors: 41:00 https://www.youtube.com/watch?v=ybaE9qlhHvw or wait out explicit(bool)
 // TODO P4: vec noexcept example with the only problem that a lambda cannot be part of an unevaluated context:
 //		template <size_t N, typename T, typename K, CONCEPT_REQUIRES_(not Vec<K, N>)>
 //		constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) LIBV_RETURNS(
@@ -662,6 +664,9 @@ template <typename T> using vec2_t = vec_t<2, T>;
 template <typename T> using vec3_t = vec_t<3, T>;
 template <typename T> using vec4_t = vec_t<4, T>;
 
+using vec2b = vec2_t<bool>;
+using vec3b = vec3_t<bool>;
+using vec4b = vec4_t<bool>;
 using vec2f = vec2_t<float>;
 using vec3f = vec3_t<float>;
 using vec4f = vec4_t<float>;

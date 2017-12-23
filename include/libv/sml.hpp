@@ -79,17 +79,17 @@ auto process_as_event(SM& sm) noexcept {
 
 struct state_machine {
 public:
-	constexpr static auto terminate = boost::sml::X;
+	static constexpr auto terminate = boost::sml::X;
 
 protected:
 	using _ = boost::sml::_;
 
-	template <typename T> constexpr static auto exception = boost::sml::exception<T>;
-	template <typename T> constexpr static auto on_ = boost::sml::event<T>;
-	template <typename T> constexpr static auto on_entry = boost::sml::on_entry<T>;
-	template <typename T> constexpr static auto on_exit = boost::sml::on_exit<T>;
-	template <typename T> constexpr static auto state = boost::sml::state<T>;
-	template <typename T> constexpr static auto unexpected_event = boost::sml::unexpected_event<T>;
+	template <typename T> static constexpr auto exception = boost::sml::exception<T>;
+	template <typename T> static constexpr auto on_ = boost::sml::event<T>;
+	template <typename T> static constexpr auto on_entry = boost::sml::on_entry<T>;
+	template <typename T> static constexpr auto on_exit = boost::sml::on_exit<T>;
+	template <typename T> static constexpr auto state = boost::sml::state<T>;
+	template <typename T> static constexpr auto unexpected_event = boost::sml::unexpected_event<T>;
 
 	template <typename... Args>
 	auto table(Args&&... args) const {

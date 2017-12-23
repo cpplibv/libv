@@ -6,7 +6,8 @@
 #include <GL/glew.h>
 #include <gli/gli.hpp>
 // pro
-#include <libv/gl/log.hpp>
+#include <libv/gl/check.hpp>
+#include <libv/gl/texture_object.hpp>
 
 
 namespace libv {
@@ -20,11 +21,11 @@ class ImageGLI : public detail::ImageImplementation {
 public:
 	ImageGLI(gli::texture&& texture) noexcept : texture(std::move(texture)) { }
 	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
-	[[nodiscard]] virtual uint32_t createTexture() const noexcept override;
+	[[nodiscard]] virtual Texture createTexture() const noexcept override;
 	virtual ~ImageGLI() noexcept override = default;
 };
 
-std::optional<Image> load_image_GLI(const std::string_view data) {
+std::optional<Image> load_image_GLI(const std::string_view data) noexcept {
 	auto texture = gli::load(data.data(), data.size());
 
 	if (texture.empty())
@@ -39,10 +40,11 @@ libv::vec2i ImageGLI::size() const noexcept {
 	return {texture.extent().x, texture.extent().y};
 }
 
-uint32_t ImageGLI::createTexture() const noexcept {
+Texture ImageGLI::createTexture() const noexcept {
 	gli::gl gli_gl(gli::gl::PROFILE_GL33);
 	const gli::gl::format format = gli_gl.translate(texture.format(), texture.swizzles());
 	GLenum target = gli_gl.translate(texture.target());
+	GLenum original_target = target;
 
 	GLuint textureID = 0;
 	glGenTextures(1, &textureID);
@@ -79,7 +81,7 @@ uint32_t ImageGLI::createTexture() const noexcept {
 				texture.target() == gli::TARGET_3D ? baseSize.z : faceTotal);
 		break;
 	default:
-		return textureID;
+		return {textureID, TextureTarget{original_target}};
 		break;
 	}
 	libv::gl::checkGL();
@@ -152,7 +154,7 @@ uint32_t ImageGLI::createTexture() const noexcept {
 	}
 
 	libv::gl::checkGL();
-	return textureID;
+	return {textureID, TextureTarget{original_target}};
 }
 
 // -------------------------------------------------------------------------------------------------
