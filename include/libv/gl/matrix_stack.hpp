@@ -60,7 +60,7 @@ public:
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
 		return stack.top();
 	}
-	inline MatrixStack& operator=(const Mat& mat) {
+	inline MatrixStack& operator=(const Mat& mat) & {
 		top() = mat;
 		return *this;
 	}

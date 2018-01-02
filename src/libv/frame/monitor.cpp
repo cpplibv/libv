@@ -18,7 +18,7 @@ VideoMode::VideoMode(const GLFWvidmode* vidmode) :
 	refreshRate(vidmode->refreshRate),
 	size(vidmode->width, vidmode->height) { }
 
-VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) {
+VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) & {
 	colorBits = vec3i(vidmode->redBits, vidmode->greenBits, vidmode->blueBits);
 	refreshRate = vidmode->refreshRate;
 	size = vec2i(vidmode->width, vidmode->height);

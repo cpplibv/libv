@@ -169,20 +169,20 @@ public:
 	explicit inline adaptive_ptr(const shared_ptr<T>& sp) noexcept : ptr(sp.get()), sp(sp) { }
 	explicit inline adaptive_ptr(shared_ptr<T>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
 
-	adaptive_ptr& operator=(const observer_ptr<T>& ptr) {
+	adaptive_ptr& operator=(const observer_ptr<T>& ptr) & {
 		this->ptr = ptr;
 		return *this;
 	}
-	adaptive_ptr& operator=(observer_ptr<T>&& ptr) {
+	adaptive_ptr& operator=(observer_ptr<T>&& ptr) & {
 		this->ptr = ptr;
 		return *this;
 	}
-	adaptive_ptr& operator=(const shared_ptr<T>& sp) {
+	adaptive_ptr& operator=(const shared_ptr<T>& sp) & {
 		this->ptr = observer_ptr<T>(sp.get());
 		this->sp = sp;
 		return *this;
 	}
-	adaptive_ptr& operator=(shared_ptr<T>&& sp) {
+	adaptive_ptr& operator=(shared_ptr<T>&& sp) & {
 		this->ptr = observer_ptr<T>(sp.get());
 		this->sp = std::move(sp); //swap?
 		return *this;

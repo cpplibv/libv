@@ -29,8 +29,8 @@ struct CtorCounter {
 	CtorCounter() { ++default_ctor; }
 	CtorCounter(const CtorCounter&) { ++copy_ctor; }
 	CtorCounter(CtorCounter&&) { ++move_ctor; }
-	CtorCounter& operator=(const CtorCounter&) { ++copy_assign; return *this; }
-	CtorCounter& operator=(CtorCounter&&) { ++move_assign; return *this; }
+	CtorCounter& operator=(const CtorCounter&) & { ++copy_assign; return *this; }
+	CtorCounter& operator=(CtorCounter&&) & { ++move_assign; return *this; }
 	~CtorCounter() { ++dtor; }
 };
 

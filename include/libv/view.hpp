@@ -65,7 +65,7 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 
-	view_ptr<T>& operator=(const view_ptr<T>& rhs) noexcept {
+	view_ptr<T>& operator=(const view_ptr<T>& rhs) & noexcept {
 		if (ref_count)
 			dec();
 		ptr = rhs.ptr;
@@ -74,7 +74,7 @@ public:
 		return *this;
 	}
 
-	view_ptr<T>& operator=(view_ptr<T>&& rhs) noexcept {
+	view_ptr<T>& operator=(view_ptr<T>&& rhs) & noexcept {
 		ptr = rhs.ptr;
 		rhs.ptr = nullptr;
 		ref_count = rhs.ref_count;

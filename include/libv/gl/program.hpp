@@ -257,7 +257,7 @@ public:
 	inline Uniform(const Program& program, const std::string& name) {
 		assign(program, name.c_str());
 	}
-	inline void operator=(const T& val) {
+	inline void operator=(const T& val) & {
 		libv::gl::uniform(location, val);
 	}
 public:
@@ -372,7 +372,7 @@ public:
 	inline void assign(GLint location) {
 		this->location = location;
 	}
-	inline AttributeFixLocation<T>& operator=(GLint location) {
+	inline AttributeFixLocation<T>& operator=(GLint location) & {
 		this->location = location;
 		return *this;
 	}

@@ -66,8 +66,8 @@ struct vec_base_t {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	template <typename... Args, typename = std::enable_if_t<sizeof...(Args) == N>>
 	constexpr inline explicit vec_base_t(Args&&... values) : data{std::forward<Args>(values)...} { }
@@ -86,8 +86,8 @@ struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	template <typename T0, typename T1>
 	constexpr inline vec_base_t(T0 x, T1 y) : x(x), y(y) { }
@@ -109,8 +109,8 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	template <typename T0, typename T1, typename T2>
 	constexpr inline vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
@@ -137,8 +137,8 @@ struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	template <typename T0, typename T1, typename T2, typename T3>
 	constexpr inline vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
@@ -172,8 +172,8 @@ struct vec_t : vec_base_t<N, T> {
 	constexpr inline vec_t() = default;
 	constexpr inline vec_t(const vec_t&) = default;
 	constexpr inline vec_t(vec_t&&) = default;
-	constexpr inline vec_t& operator=(const vec_t&) = default;
-	constexpr inline vec_t& operator=(vec_t&&) = default;
+	constexpr inline vec_t& operator=(const vec_t&) & = default;
+	constexpr inline vec_t& operator=(vec_t&&) & = default;
 
 	using vec_base_t<N, T>::vec_base_t;
 
@@ -196,7 +196,7 @@ struct vec_t : vec_base_t<N, T> {
 	// operator= -----------------------------------------------------------------------------------
 
 	template <typename K>
-	constexpr inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) {
+	constexpr inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) & {
 		meta::n_times_index<N>([&](auto index) { this->data[index] = rhs.data[index]; });
 		return *this;
 	}

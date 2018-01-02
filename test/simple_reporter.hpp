@@ -73,7 +73,6 @@ private:
 	};
 
 	class AssertionPrinter {
-		void operator=(AssertionPrinter const&);
 	public:
 		AssertionPrinter(std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages)
 			: stream(_stream)

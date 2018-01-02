@@ -25,7 +25,7 @@ struct VideoMode {
 
 	VideoMode() = default;
 	VideoMode(const GLFWvidmode* vidmode);
-	VideoMode& operator=(const GLFWvidmode* vidmode);
+	VideoMode& operator=(const GLFWvidmode* vidmode) &;
 	~VideoMode() = default;
 };
 

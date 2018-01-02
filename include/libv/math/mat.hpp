@@ -200,7 +200,7 @@ struct mat_t : mat_base_t<N, T> {
 
 	// ---------------------------------------------------------------------------------------------
 
-	inline mat_t<N, T>& operator=(const mat_t<N, T>& mat) {
+	inline mat_t<N, T>& operator=(const mat_t<N, T>& mat) & {
 		this->mx = mat.mx;
 		return *this;
 	}
