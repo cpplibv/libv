@@ -41,20 +41,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
 
 # Variables ----------------------------------------------------------------------------------------
 
-set(TOOLSET)
-
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-
 	add_compile_options(/Wall)
-	set(TOOLSET msvc)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-
 	add_compile_options(-Weverything -Wmissing-override -Wno-comment -Wconversion)
-	set(TOOLSET clang)
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-
 	add_compile_options(-Wall -Wextra -Wpedantic -Wno-comment
 		-Wcast-qual
 		-Wdelete-non-virtual-dtor
@@ -96,7 +89,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		# link_libraries(ubsan)
 		# link_libraries(asan)
 	endif()
-	set(TOOLSET gcc)
 endif()
 
 string(LENGTH ${PATH_PRJ}_ LIBV_SHORT_PATH_CUTOFF)
@@ -235,6 +227,15 @@ ExternalProject_Add(ext_assimp
 list(APPEND GROUP_EXTERNAL_PROJECT ext_boost)
 set(Boost_Version 1.66.0)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
+
+set(TOOLSET)
+if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	set(TOOLSET msvc)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	set(TOOLSET clang)
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set(TOOLSET gcc)
+endif()
 
 message(STATUS "Boost version: " ${Boost_Version})
 ExternalProject_Add(ext_boost
