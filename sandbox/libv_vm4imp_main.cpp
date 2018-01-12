@@ -11,8 +11,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <experimental/filesystem>
-namespace std { namespace filesystem = experimental::filesystem; } /*FILESYSTEM_SUPPORT*/
 // pro
 #include <libv/vm4/model.hpp>
 #include <libv/vm4/serialization/model.hpp>
