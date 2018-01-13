@@ -20,7 +20,6 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-# TODO P2: Put macro definitions per target
 # TODO P3: Use the correct OpenGL linking cmake build-in options
 # TODO P4: There is a way to include thread this via cmake built-in options
 # TODO P4: Instead of USE_STATIC_LINK use cmake default if possible
@@ -151,6 +150,11 @@ add_definitions(-DLIBV_USE_GLM_BRIDGE)
 # Macro - Assert
 add_definitions(-DNDEBUG)
 
+# Includes Directories -----------------------------------------------------------------------------
+
+include_directories(${PATH_INC})
+include_directories(${PATH_SRC})
+
 # --------------------------------------------------------------------------------------------------
 
 if(NOT WIN32)
@@ -223,7 +227,7 @@ create_external(
 		-DASSIMP_BUILD_X3D_IMPORTER=OFF
 		-DASSIMP_BUILD_XGL_IMPORTER=OFF
 		-DASSIMP_BUILD_X_IMPORTER=OFF
-	LINK assimp zlibstatic
+	LINK assimp IrrXML zlibstatic
 )
 
 set(Boost_Version 1.66.0)
@@ -435,11 +439,7 @@ create_external(
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 )
 
-# Directories --------------------------------------------------------------------------------------
-
-# Includes
-include_directories(${PATH_INC})
-include_directories(${PATH_SRC})
+end_group()
 
 # === Targets ======================================================================================
 
@@ -505,7 +505,8 @@ create_library(
 
 create_library(
 	TARGET libv_serialization INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost
+	LINK   ${USE_STATIC_LINK} ext_cereal
+	LINK   ext_boost # Remove
 )
 
 create_library(
@@ -526,7 +527,7 @@ create_library(
 
 create_library(
 	TARGET libv_vm4 INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost
+	LINK   ${USE_STATIC_LINK} libv_math libv_serialization ext_boost
 )
 
 create_library(

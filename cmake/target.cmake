@@ -22,6 +22,7 @@ function(create_external)
 	ExternalProject_Add(
 		get_${arg_NAME}
 		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
+		GIT_SHALLOW 1
 		EXCLUDE_FROM_ALL
 		${arg_UNPARSED_ARGUMENTS}
 	)
@@ -39,7 +40,7 @@ function(create_external)
 	endforeach()
 
 	# link
-	link_directories(${PATH_EXT}/ext_${arg_NAME}/lib)
+	link_directories(${PATH_EXT}/${arg_NAME}/lib)
 	target_link_libraries(ext_${arg_NAME} INTERFACE ${arg_LINK})
 
 	foreach(var_define ${arg_DEFINE})
