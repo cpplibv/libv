@@ -15,6 +15,43 @@ endmacro()
 
 # --------------------------------------------------------------------------------------------------
 
+# Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
+function(create_external)
+    cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK" ${ARGN})
+
+	ExternalProject_Add(
+		get_${arg_NAME}
+		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
+		EXCLUDE_FROM_ALL
+		${arg_UNPARSED_ARGUMENTS}
+	)
+
+	# add
+	add_library(ext_${arg_NAME} INTERFACE)
+
+	# include
+    list(LENGTH arg_INCLUDE number_found)
+	if(number_found EQUAL 0)
+		list(APPEND arg_INCLUDE include)
+    endif()
+	foreach(var_include ${arg_INCLUDE})
+		target_include_directories(ext_${arg_NAME} SYSTEM INTERFACE ${PATH_EXT}/${arg_NAME}/${var_include})
+	endforeach()
+
+	# link
+	link_directories(${PATH_EXT}/ext_${arg_NAME}/lib)
+	target_link_libraries(ext_${arg_NAME} INTERFACE ${arg_LINK})
+
+	# group
+	foreach(group ${__wish_current_groups})
+		set(group_members ${${group}})
+		list(APPEND group_members get_${arg_NAME})
+		set(${group} ${group_members} PARENT_SCOPE)
+	endforeach()
+endfunction()
+
+# --------------------------------------------------------------------------------------------------
+
 function(create_executable)
     cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
@@ -44,7 +81,7 @@ function(create_executable)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if (arg_DEBUG)
+	if(arg_DEBUG)
 		message("Target: ${arg_TARGET}")
 		message("	Glob:   ${arg_SOURCE}")
 		message("	Source: ${matching_sources}")
@@ -71,7 +108,7 @@ function(create_library)
 #    endif()
 
     list(LENGTH arg_SOURCE number_found)
-	if (NOT number_found EQUAL 0)
+	if(NOT number_found EQUAL 0)
 		file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
     endif()
 	foreach(obj ${arg_OBJECT})
@@ -79,7 +116,7 @@ function(create_library)
 	endforeach()
 
 
-	if (arg_STATIC)
+	if(arg_STATIC)
 		add_library(${arg_TARGET} STATIC ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} ${arg_LINK})
     elseif(arg_INTERFACE)
@@ -96,7 +133,7 @@ function(create_library)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if (arg_DEBUG)
+	if(arg_DEBUG)
 		message("Target: ${arg_TARGET}")
 		message("	Glob:   ${arg_SOURCE}")
 		message("	Source: ${matching_sources}")
@@ -138,7 +175,7 @@ function(create_object)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if (arg_DEBUG)
+	if(arg_DEBUG)
 		message("Target: ${arg_TARGET}")
 		message("	Glob:   ${arg_SOURCE}")
 		message("	Source: ${matching_sources}")

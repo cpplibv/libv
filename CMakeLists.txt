@@ -166,16 +166,12 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-# --------------------------------------------------------------------------------------------------
+create_group(GROUP_EXTERNAL_PROJECT) # External ----------------------------------------------------
 
-set(GROUP_EXTERNAL_PROJECT)
-
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_assimp)
-ExternalProject_Add(get_assimp
+create_external(
+	NAME assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
 	GIT_TAG v3.3.1
-	PREFIX ${PATH_EXT_SRC}/assimp
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/assimp
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
@@ -227,19 +223,13 @@ ExternalProject_Add(get_assimp
 		-DASSIMP_BUILD_TERRAGEN_IMPORTER=OFF
 		-DASSIMP_BUILD_XGL_IMPORTER=OFF
 		-DASSIMP_BUILD_X_IMPORTER=OFF
-	EXCLUDE_FROM_ALL
+	LINK assimp zlibstatic
 )
-add_library(ext_assimp INTERFACE)
-target_include_directories(ext_assimp SYSTEM INTERFACE ${PATH_EXT}/assimp/include)
-link_directories(${PATH_EXT}/assimp/lib)
-target_link_libraries(ext_assimp INTERFACE assimp zlibstatic)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_boost)
 set(Boost_Version 1.66.0)
-string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
-
 set(TOOLSET)
+string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
+message(STATUS "Boost version: " ${Boost_Version})
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	set(TOOLSET msvc)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -247,10 +237,8 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(TOOLSET gcc)
 endif()
-
-message(STATUS "Boost version: " ${Boost_Version})
-ExternalProject_Add(get_boost
-	PREFIX ${PATH_EXT_SRC}/boost
+create_external(
+	NAME boost
 	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
 	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
 	BUILD_COMMAND ./b2 --ignore-site-config install
@@ -266,66 +254,45 @@ ExternalProject_Add(get_boost
 #		--with-stacktrace
 		-j${PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
-	EXCLUDE_FROM_ALL
 	INSTALL_COMMAND ""
+	#LINK system stacktrace
 )
-add_library(ext_boost INTERFACE)
-target_include_directories(ext_boost SYSTEM INTERFACE ${PATH_EXT}/boost/include)
-#link_directories(${PATH_EXT}/boost/lib)
-#target_link_libraries(ext_boost INTERFACE system stacktrace)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_catch)
-ExternalProject_Add(get_catch
+create_external(
+	NAME catch
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
 	GIT_TAG v1.5.6
-	PREFIX ${PATH_EXT_SRC}/catch
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/catch/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_catch INTERFACE)
-target_include_directories(ext_catch SYSTEM INTERFACE ${PATH_EXT}/catch/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_cereal)
-ExternalProject_Add(get_cereal
+create_external(
+	NAME cereal
 	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
 	GIT_TAG v1.2.2
-	PREFIX ${PATH_EXT_SRC}/cereal
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
 		-DJUST_INSTALL_CEREAL=ON
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_cereal INTERFACE)
-target_include_directories(ext_catch SYSTEM INTERFACE ${PATH_EXT}/cereal/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_clara)
-ExternalProject_Add(get_clara
+create_external(
+	NAME clara
 	GIT_REPOSITORY https://github.com/philsquared/Clara.git
 	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
-	PREFIX ${PATH_EXT_SRC}/clara
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_clara INTERFACE)
-target_include_directories(ext_clara SYSTEM INTERFACE ${PATH_EXT}/clara/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_efsw)
-ExternalProject_Add(get_efsw
+create_external(
+	NAME efsw
 	GIT_REPOSITORY https://github.com/mnafees/efsw.git
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
-	PREFIX ${PATH_EXT_SRC}/efsw
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
 	# TODO P3: this ext_efsw install command looks off
@@ -334,213 +301,134 @@ ExternalProject_Add(get_efsw
 		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/ext_efsw/include/ ${PATH_EXT}/efsw/include/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/ext_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
-	EXCLUDE_FROM_ALL
+	LINK efsw
 )
-add_library(ext_efsw INTERFACE)
-target_include_directories(ext_efsw SYSTEM INTERFACE ${PATH_EXT}/efsw/include)
-link_directories(${PATH_EXT}/efsw/lib)
-target_link_libraries(ext_efsw INTERFACE efsw)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_fmt)
-ExternalProject_Add(get_fmt
+create_external(
+	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
-	PREFIX ${PATH_EXT_SRC}/fmt
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
-	EXCLUDE_FROM_ALL
+	LINK fmt
 )
-add_library(ext_fmt INTERFACE)
-target_include_directories(ext_fmt SYSTEM INTERFACE ${PATH_EXT}/fmt/include)
-link_directories(${PATH_EXT}/fmt/lib)
-target_link_libraries(ext_fmt INTERFACE fmt)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_freetype)
-ExternalProject_Add(get_freetype
+create_external(
+	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG VER-2-5-5
-	PREFIX ${PATH_EXT_SRC}/freetype
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
-	EXCLUDE_FROM_ALL
+	LINK glew
+	INCLUDEDIR include/freetype2
 )
-add_library(ext_freetype INTERFACE)
-target_include_directories(ext_freetype SYSTEM INTERFACE ${PATH_EXT}/freetype/include/freetype2)
-link_directories(${PATH_EXT}/freetype/lib)
-target_link_libraries(ext_freetype INTERFACE freetype)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_glew)
-ExternalProject_Add(get_glew
+create_external(
+	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	GIT_TAG glew-cmake-1.11.0
-	PREFIX ${PATH_EXT_SRC}/glew
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
-	EXCLUDE_FROM_ALL
+	LINK glew
 )
-add_library(ext_glew INTERFACE)
-target_include_directories(ext_glew SYSTEM INTERFACE ${PATH_EXT}/glew/include)
-link_directories(${PATH_EXT}/glew/lib)
-target_link_libraries(ext_glew INTERFACE glew)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_glfw)
-ExternalProject_Add(get_glfw
+create_external(
+	NAME glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	GIT_TAG 3.2.1
-	PREFIX ${PATH_EXT_SRC}/glfw
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
 		-DGLFW_BUILD_EXAMPLES=OFF
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
-	EXCLUDE_FROM_ALL
+	LINK glfw3 gdi32
 )
-add_library(ext_glfw INTERFACE)
-target_include_directories(ext_glfw SYSTEM INTERFACE ${PATH_EXT}/glfw/include)
-link_directories(${PATH_EXT}/glfw/lib)
-target_link_libraries(ext_glfw INTERFACE glfw3 gdi32)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_gli)
-ExternalProject_Add(get_gli
+create_external(
+	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.8.2.0
 	BUILD_COMMAND "" # gli is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/gli
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_gli INTERFACE)
-target_include_directories(ext_gli SYSTEM INTERFACE ${PATH_EXT}/gli/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_glm)
-ExternalProject_Add(get_glm
+create_external(
+	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG 0.9.8.5
 	BUILD_COMMAND "" # glm is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/glm
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_glm INTERFACE)
-target_include_directories(ext_glm SYSTEM INTERFACE ${PATH_EXT}/glm/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_lua)
-ExternalProject_Add(get_lua
+create_external(
+	NAME lua
 	GIT_REPOSITORY https://github.com/LuaDist/lua.git
 	GIT_TAG 5.3.2
-	PREFIX ${PATH_EXT_SRC}/lua
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/lua
 		-DBUILD_SHARED_LIBS=OFF
-	EXCLUDE_FROM_ALL
+	LINK lua
 )
-add_library(ext_lua INTERFACE)
-target_include_directories(ext_lua SYSTEM INTERFACE ${PATH_EXT}/lua/include)
-link_directories(${PATH_EXT}/lua/lib)
-target_link_libraries(ext_lua INTERFACE soil)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_net_ts)
-ExternalProject_Add(get_net_ts
+create_external(
+	NAME net_ts
 	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
 	GIT_TAG 6bf74be013e104e2893de245bc3379a6f3f20d54
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" # net_ts is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/net_ts
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/net_ts/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/ext_net_ts/include/ ${PATH_EXT}/net_ts/
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_net_ts INTERFACE)
-target_include_directories(ext_net_ts SYSTEM INTERFACE ${PATH_EXT}/net_ts/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_range)
-ExternalProject_Add(get_range
+create_external(
+	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
 	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" # range is header only, skip tests
-	PREFIX ${PATH_EXT_SRC}/range
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_range INTERFACE)
-target_include_directories(ext_range SYSTEM INTERFACE ${PATH_EXT}/range/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_soil)
-ExternalProject_Add(get_soil
+create_external(
+	NAME soil
 	GIT_REPOSITORY https://github.com/xosdy/soil.git
 	GIT_TAG master
-	PREFIX ${PATH_EXT_SRC}/soil
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/soil
-	EXCLUDE_FROM_ALL
+	LINK soil
 )
-add_library(ext_soil INTERFACE)
-target_include_directories(ext_soil SYSTEM INTERFACE ${PATH_EXT}/soil/include)
-link_directories(${PATH_EXT}/soil/lib)
-target_link_libraries(ext_soil INTERFACE soil)
 
-
-#create_external(
-#	NAME soil
-#	GIT_REPOSITORY https://github.com/xosdy/soil.git
-#	GIT_TAG master
-#	CMAKE_ARGS
-#		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/soil
-#	LINK soil
-#)
-
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_sol)
-ExternalProject_Add(get_sol
+create_external(
+	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
 	GIT_TAG 16fc7d87ff0b9c2fc18268a420e0b058a67060a1
-	PREFIX ${PATH_EXT_SRC}/sol
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/ext_sol/sol/ ${PATH_EXT}/sol/include/sol/
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_sol INTERFACE)
-target_include_directories(ext_sol SYSTEM INTERFACE ${PATH_EXT}/sol/include)
 
-
-list(APPEND GROUP_EXTERNAL_PROJECT get_utf8cpp)
-ExternalProject_Add(get_utf8cpp
+create_external(
+	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
 	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
-	PREFIX ${PATH_EXT_SRC}/utf8cpp
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
-	EXCLUDE_FROM_ALL
 )
-add_library(ext_utf8cpp INTERFACE)
-target_include_directories(ext_utf8cpp SYSTEM INTERFACE ${PATH_EXT}/utf8cpp/include)
 
 # Directories --------------------------------------------------------------------------------------
 
@@ -571,7 +459,7 @@ create_library(
 create_library(
 	TARGET libv_gl STATIC
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
-	LINK   ${USE_STATIC_LINK} libv_log ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
+	LINK   ${USE_STATIC_LINK} libv_log libv_math ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
 )
 
 create_library(
@@ -592,6 +480,7 @@ create_library(
 create_library(
 	TARGET libv_math INTERFACE
 	LINK   ${USE_STATIC_LINK}
+	LINK   ext_glm # Remove
 )
 
 create_library(
