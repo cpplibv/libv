@@ -20,9 +20,10 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-# TODO P2: There is a way to include thread this via cmake built-in options
-# TODO P2: Use the correct OpenGL linking cmake build-in options
-# TODO P2: Instead of USE_STATIC_LINK use cmake default if possible
+# TODO P2: Put macro definitions per target
+# TODO P3: Use the correct OpenGL linking cmake build-in options
+# TODO P4: There is a way to include thread this via cmake built-in options
+# TODO P4: Instead of USE_STATIC_LINK use cmake default if possible
 # ... see in Iris CMakeLists.txt
 
 # Paths --------------------------------------------------------------------------------------------
@@ -144,12 +145,6 @@ endif()
 add_definitions(-m64)
 add_definitions(-std=c++17)
 
-# Macro - Ext
-add_definitions(-DCEREAL_XML_STRING_VALUE="root")
-add_definitions(-DGLEW_STATIC)
-add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
-add_definitions(-DGLM_FORCE_RADIANS)
-add_definitions(-DSOL_USE_BOOST)
 # Macro - Libv
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
@@ -276,6 +271,7 @@ create_external(
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
 		-DJUST_INSTALL_CEREAL=ON
+	DEFINE CEREAL_XML_STRING_VALUE="root"
 )
 
 create_external(
@@ -321,7 +317,7 @@ create_external(
 	GIT_TAG VER-2-5-5
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
-	LINK glew
+	LINK freetype
 	INCLUDEDIR include/freetype2
 )
 
@@ -332,6 +328,7 @@ create_external(
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
 	LINK glew
+	DEFINE GLEW_STATIC
 )
 
 create_external(
@@ -365,6 +362,8 @@ create_external(
 	BUILD_COMMAND "" # glm is header only, skip tests
 	CMAKE_ARGS
 		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
+	DEFINE GLM_ENABLE_EXPERIMENTAL
+	DEFINE GLM_FORCE_RADIANS
 )
 
 create_external(
@@ -417,6 +416,7 @@ create_external(
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/ext_sol/sol/ ${PATH_EXT}/sol/include/sol/
+	DEFINE SOL_USE_BOOST
 )
 
 create_external(

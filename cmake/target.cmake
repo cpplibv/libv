@@ -17,7 +17,7 @@ endmacro()
 
 # Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
 function(create_external)
-    cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK" ${ARGN})
+    cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
 
 	ExternalProject_Add(
 		get_${arg_NAME}
@@ -41,6 +41,10 @@ function(create_external)
 	# link
 	link_directories(${PATH_EXT}/ext_${arg_NAME}/lib)
 	target_link_libraries(ext_${arg_NAME} INTERFACE ${arg_LINK})
+
+	foreach(var_define ${arg_DEFINE})
+		target_compile_definitions(ext_${arg_NAME} INTERFACE -D${var_define})
+	endforeach()
 
 	# group
 	foreach(group ${__wish_current_groups})
