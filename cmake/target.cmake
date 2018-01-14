@@ -31,8 +31,7 @@ function(create_external)
 	add_library(ext_${arg_NAME} INTERFACE)
 
 	# include
-    list(LENGTH arg_INCLUDE number_found)
-	if(number_found EQUAL 0)
+	if(NOT arg_INCLUDE)
 		list(APPEND arg_INCLUDE include)
     endif()
 	foreach(var_include ${arg_INCLUDE})
@@ -61,12 +60,8 @@ function(create_executable)
     cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 
-    list(LENGTH arg_SOURCE number_found)
-	if(number_found EQUAL 0)
-		list(LENGTH arg_OBJECT number_found)
-		if(number_found EQUAL 0)
-			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
-		endif()
+	if(NOT arg_SOURCE AND NOT arg_OBJECT)
+		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
     endif()
 
 
@@ -103,17 +98,12 @@ function(create_library)
 
 
     list(GET arg_TARGET 0 arg_target_name)
-#    list(LENGTH arg_SOURCE number_found)
-#	if(number_found EQUAL 0)
-#		list(LENGTH arg_OBJECT number_found)
-#		if(number_found EQUAL 0)
-#			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
-#			# TODO P5: Target might be INTERFACE
-#		endif()
+#	if(NOT arg_SOURCE AND NOT arg_OBJECT)
+#		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
+#		# TODO P5: Target might be INTERFACE
 #    endif()
 
-    list(LENGTH arg_SOURCE number_found)
-	if(NOT number_found EQUAL 0)
+	if(arg_SOURCE)
 		file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
     endif()
 	foreach(obj ${arg_OBJECT})
@@ -156,12 +146,8 @@ function(create_object)
     cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
 
 
-    list(LENGTH arg_SOURCE number_found)
-	if(number_found EQUAL 0)
-		list(LENGTH arg_OBJECT number_found)
-		if(number_found EQUAL 0)
-			message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
-		endif()
+	if(NOT arg_SOURCE AND NOT arg_OBJECT)
+		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
     endif()
 
 
