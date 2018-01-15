@@ -17,13 +17,13 @@ endmacro()
 
 # Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
 function(create_external)
-    cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
+	cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
 
 	ExternalProject_Add(
 		get_${arg_NAME}
 		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
 		GIT_SHALLOW 1
-		EXCLUDE_FROM_ALL
+		EXCLUDE_FROM_ALL 1
 		${arg_UNPARSED_ARGUMENTS}
 	)
 
@@ -33,7 +33,7 @@ function(create_external)
 	# include
 	if(NOT arg_INCLUDE)
 		list(APPEND arg_INCLUDE include)
-    endif()
+	endif()
 	foreach(var_include ${arg_INCLUDE})
 		target_include_directories(ext_${arg_NAME} SYSTEM INTERFACE ${PATH_EXT}/${arg_NAME}/${var_include})
 	endforeach()
@@ -57,12 +57,12 @@ endfunction()
 # --------------------------------------------------------------------------------------------------
 
 function(create_executable)
-    cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 
 	if(NOT arg_SOURCE AND NOT arg_OBJECT)
 		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
-    endif()
+	endif()
 
 
 	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
@@ -94,18 +94,18 @@ endfunction()
 # --------------------------------------------------------------------------------------------------
 
 function(create_library)
-    cmake_parse_arguments(arg "DEBUG;STATIC;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG;STATIC;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 
-    list(GET arg_TARGET 0 arg_target_name)
+	list(GET arg_TARGET 0 arg_target_name)
 #	if(NOT arg_SOURCE AND NOT arg_OBJECT)
 #		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
 #		# TODO P5: Target might be INTERFACE
-#    endif()
+#	endif()
 
 	if(arg_SOURCE)
 		file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
-    endif()
+	endif()
 	foreach(obj ${arg_OBJECT})
 		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
@@ -114,10 +114,10 @@ function(create_library)
 	if(arg_STATIC)
 		add_library(${arg_TARGET} STATIC ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} ${arg_LINK})
-    elseif(arg_INTERFACE)
+	elseif(arg_INTERFACE)
 		add_library(${arg_TARGET} INTERFACE ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} INTERFACE ${arg_LINK})
-    endif()
+	endif()
 
 #	add_library(${arg_TARGET} $<IF:$<BOOL:${arg_STATIC}>,"STATIC",""> $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${matching_sources} ${target_objects})
 #	target_link_libraries(${arg_TARGET} $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${arg_LINK})
@@ -143,12 +143,12 @@ endfunction()
 # --------------------------------------------------------------------------------------------------
 
 function(create_object)
-    cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
 
 
 	if(NOT arg_SOURCE AND NOT arg_OBJECT)
 		message(FATAL_ERROR "At least one SOURCE or OBJECT should be given.")
-    endif()
+	endif()
 
 
 	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})

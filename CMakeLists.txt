@@ -4,8 +4,9 @@ cmake_minimum_required(VERSION 3.7)
 project(libv)
 
 include(ExternalProject)
-include(cmake/util.cmake)
-include(cmake/target.cmake)
+include(cmake/wish_create.cmake)
+include(cmake/wish_git.cmake)
+include(cmake/wish_util.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -96,27 +97,6 @@ endif()
 
 string(LENGTH ${PATH_PRJ}_ LIBV_SHORT_PATH_CUTOFF)
 
-# Git ----------------------------------------------------------------------------------------------
-
-# Get the current working branch
-execute_process(
-  COMMAND git rev-parse --abbrev-ref HEAD
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_BRANCH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-# Get the latest abbreviated commit hash of the working branch
-execute_process(
-  COMMAND git rev-parse --short=8 head
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  OUTPUT_VARIABLE GIT_COMMIT_HASH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
-add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
-
 # Definitions --------------------------------------------------------------------------------------
 
 set(USE_STATIC_LINK)
@@ -144,11 +124,14 @@ endif()
 add_definitions(-m64)
 add_definitions(-std=c++17)
 
+# Macro - Assert
+add_definitions(-DNDEBUG)
+# Macro - Git
+add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
+add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
 # Macro - Libv
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
-# Macro - Assert
-add_definitions(-DNDEBUG)
 
 # Includes Directories -----------------------------------------------------------------------------
 
