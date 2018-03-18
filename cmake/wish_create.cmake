@@ -3,20 +3,20 @@
 
 # --------------------------------------------------------------------------------------------------
 
-set(__wish_current_groups)
+set(__wish_current_group_stack)
 
-macro(create_group arg_GROUP)
-	list(APPEND __wish_current_groups ${arg_GROUP})
+macro(wish_create_group arg_GROUP)
+	list(APPEND __wish_current_group_stack ${arg_GROUP})
 endmacro()
 
-macro(end_group)
-	list(REMOVE_AT __wish_current_groups -1)
+macro(wish_end_group)
+	list(REMOVE_AT __wish_current_group_stack -1)
 endmacro()
 
 # --------------------------------------------------------------------------------------------------
 
 # Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
-function(create_external)
+function(wish_create_external)
 	cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
 
 	ExternalProject_Add(
@@ -47,7 +47,7 @@ function(create_external)
 	endforeach()
 
 	# group
-	foreach(group ${__wish_current_groups})
+	foreach(group ${__wish_current_group_stack})
 		set(group_members ${${group}})
 		list(APPEND group_members get_${arg_NAME})
 		set(${group} ${group_members} PARENT_SCOPE)
@@ -56,7 +56,7 @@ endfunction()
 
 # --------------------------------------------------------------------------------------------------
 
-function(create_executable)
+function(wish_create_executable)
 	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 
@@ -75,7 +75,7 @@ function(create_executable)
 	target_link_libraries(${arg_TARGET} ${arg_LINK})
 
 
-	foreach(group ${__wish_current_groups})
+	foreach(group ${__wish_current_group_stack})
 		set(group_members ${${group}})
 		list(APPEND group_members ${arg_TARGET})
 		set(${group} ${group_members} PARENT_SCOPE)
@@ -87,13 +87,13 @@ function(create_executable)
 		message("	Source: ${matching_sources}")
 		message("	Object: ${arg_OBJECT}")
 		message("	Link:   ${arg_LINK}")
-		message("	Group:  ${__wish_current_groups}")
+		message("	Group:  ${__wish_current_group_stack}")
 	endif()
 endfunction()
 
 # --------------------------------------------------------------------------------------------------
 
-function(create_library)
+function(wish_create_library)
 	cmake_parse_arguments(arg "DEBUG;STATIC;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 
@@ -122,7 +122,7 @@ function(create_library)
 #	add_library(${arg_TARGET} $<IF:$<BOOL:${arg_STATIC}>,"STATIC",""> $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${matching_sources} ${target_objects})
 #	target_link_libraries(${arg_TARGET} $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${arg_LINK})
 
-	foreach(group ${__wish_current_groups})
+	foreach(group ${__wish_current_group_stack})
 		set(group_members ${${group}})
 		list(APPEND group_members ${arg_target_name})
 		set(${group} ${group_members} PARENT_SCOPE)
@@ -134,7 +134,7 @@ function(create_library)
 		message("	Source: ${matching_sources}")
 		message("	Object: ${arg_OBJECT}")
 		message("	Link:   ${arg_LINK}")
-		message("	Group:  ${__wish_current_groups}")
+		message("	Group:  ${__wish_current_group_stack}")
 		message("	Static: ${arg_STATIC}")
 		message("	Interf: ${arg_INTERFACE}")
 	endif()
@@ -142,7 +142,7 @@ endfunction()
 
 # --------------------------------------------------------------------------------------------------
 
-function(create_object)
+function(wish_create_object)
 	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
 
 
@@ -160,7 +160,7 @@ function(create_object)
 	add_library(${arg_TARGET} OBJECT ${matching_sources})
 
 
-	foreach(group ${__wish_current_groups})
+	foreach(group ${__wish_current_group_stack})
 		set(group_members ${${group}})
 		list(APPEND group_members ${arg_TARGET})
 		set(${group} ${group_members} PARENT_SCOPE)
@@ -171,7 +171,7 @@ function(create_object)
 		message("	Glob:   ${arg_SOURCE}")
 		message("	Source: ${matching_sources}")
 		message("	Object: ${arg_OBJECT}")
-		message("	Group:  ${__wish_current_groups}")
+		message("	Group:  ${__wish_current_group_stack}")
 	endif()
 endfunction()
 

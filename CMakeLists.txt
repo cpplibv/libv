@@ -148,9 +148,9 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
-create_group(GROUP_EXTERNAL_PROJECT) # External ----------------------------------------------------
+wish_create_group(GROUP_EXTERNAL_PROJECT) # External -----------------------------------------------
 
-create_external(
+wish_create_external(
 	NAME assimp
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
 	GIT_TAG v4.1.0
@@ -224,7 +224,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	set(TOOLSET gcc)
 endif()
-create_external(
+wish_create_external(
 	NAME boost
 	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
 	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
@@ -245,7 +245,7 @@ create_external(
 	#LINK system stacktrace
 )
 
-create_external(
+wish_create_external(
 	NAME catch
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
 	GIT_TAG v1.5.6
@@ -256,7 +256,7 @@ create_external(
 		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
 )
 
-create_external(
+wish_create_external(
 	NAME cereal
 	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
 	GIT_TAG v1.2.2
@@ -266,7 +266,7 @@ create_external(
 	DEFINE CEREAL_XML_STRING_VALUE="root"
 )
 
-create_external(
+wish_create_external(
 	NAME clara
 	GIT_REPOSITORY https://github.com/philsquared/Clara.git
 	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
@@ -277,7 +277,7 @@ create_external(
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
 )
 
-create_external(
+wish_create_external(
 	NAME efsw
 	GIT_REPOSITORY https://github.com/mnafees/efsw.git
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
@@ -292,7 +292,7 @@ create_external(
 	LINK efsw
 )
 
-create_external(
+wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
@@ -303,7 +303,7 @@ create_external(
 	LINK fmt
 )
 
-create_external(
+wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG VER-2-5-5
@@ -313,7 +313,7 @@ create_external(
 	INCLUDEDIR include/freetype2
 )
 
-create_external(
+wish_create_external(
 	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	GIT_TAG glew-cmake-1.11.0
@@ -323,7 +323,7 @@ create_external(
 	DEFINE GLEW_STATIC
 )
 
-create_external(
+wish_create_external(
 	NAME glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	GIT_TAG 3.2.1
@@ -335,7 +335,7 @@ create_external(
 	LINK glfw3 gdi32
 )
 
-create_external(
+wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.8.2.0
@@ -347,7 +347,7 @@ create_external(
 		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
 )
 
-create_external(
+wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG 0.9.8.5
@@ -358,7 +358,7 @@ create_external(
 	DEFINE GLM_FORCE_RADIANS
 )
 
-create_external(
+wish_create_external(
 	NAME lua
 	GIT_REPOSITORY https://github.com/LuaDist/lua.git
 	GIT_TAG 5.3.2
@@ -368,7 +368,7 @@ create_external(
 	LINK lua
 )
 
-create_external(
+wish_create_external(
 	NAME net_ts
 	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
 	GIT_TAG 6bf74be013e104e2893de245bc3379a6f3f20d54
@@ -379,7 +379,7 @@ create_external(
 		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/ext_net_ts/include/ ${PATH_EXT}/net_ts/
 )
 
-create_external(
+wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
 	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
@@ -390,7 +390,7 @@ create_external(
 		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
 )
 
-create_external(
+wish_create_external(
 	NAME soil
 	GIT_REPOSITORY https://github.com/xosdy/soil.git
 	GIT_TAG master
@@ -399,7 +399,7 @@ create_external(
 	LINK soil
 )
 
-create_external(
+wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
 	GIT_TAG 16fc7d87ff0b9c2fc18268a420e0b058a67060a1
@@ -411,7 +411,7 @@ create_external(
 	DEFINE SOL_USE_BOOST
 )
 
-create_external(
+wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
 	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
@@ -422,246 +422,246 @@ create_external(
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 )
 
-end_group()
+wish_end_group()
 
 # === Targets ======================================================================================
 
-create_group(GROUP_LIBRARY) # Libraries ------------------------------------------------------------
+wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
 
-create_library(
+wish_create_library(
 	TARGET libv_container INTERFACE
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_ecs INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_boost ext_range
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_frame STATIC
 	SOURCE ${PATH_SRC}/libv/frame/*.cpp
 	LINK   ${USE_STATIC_LINK} libv_log ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES}
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE ${PATH_SRC}/libv/gl/*.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_math ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_glr INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_boost
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_log INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_fmt
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_lua INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_sol ext_lua
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_math INTERFACE
 	LINK   ${USE_STATIC_LINK}
 	LINK   ext_glm # Remove
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_meta INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_boost
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_parse INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_boost
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_range INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_boost ext_range
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_serialization INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_cereal
 	LINK   ext_boost # Remove
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_sig STATIC
 	SOURCE ${PATH_SRC}/libv/sig/*.cpp
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_thread INTERFACE
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_utility INTERFACE
 	LINK   ${USE_STATIC_LINK} ext_efsw stdc++fs
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_vm4 INTERFACE
 	LINK   ${USE_STATIC_LINK} libv_math libv_serialization ext_boost
 )
 
-create_library(
+wish_create_library(
 	TARGET libv_vm4imp STATIC
 	SOURCE ${PATH_SRC}/libv/vm4imp/*.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_vm4 ext_assimp stdc++fs
 )
 
-end_group()
-create_group(GROUP_SANDBOX) # Sandboxes ------------------------------------------------------------
+wish_end_group()
+wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE ${PATH_SNB}/libv_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log ext_boost
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_ecs
 	SOURCE ${PATH_SNB}/libv_ecs_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE ${PATH_SNB}/libv_frame_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_frame
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE ${PATH_SNB}/libv_gl_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_gl3
 	SOURCE ${PATH_SNB}/libv_gl_main3.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_log
 	SOURCE ${PATH_SNB}/libv_log_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE ${PATH_SNB}/libv_reflection_main.cpp
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE ${PATH_SNB}/libv_reflection2_main.cpp
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
 	LINK   ${USE_STATIC_LINK}
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_serialize_cereal
 	SOURCE ${PATH_SNB}/libv_serialize_cereal_main.cpp
 	LINK   ${USE_STATIC_LINK} ext_boost
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE ${PATH_SNB}/libv_sig_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE ${PATH_SNB}/libv_vm4imp_main.cpp
 	LINK   ${USE_STATIC_LINK} libv_log libv_vm4imp
 )
 
-end_group()
+wish_end_group()
 
 # Tests --------------------------------------------------------------------------------------------
 
-create_object(
+wish_create_object(
 	TARGET obj_test_runner
 	SOURCE ${PATH_TST}/runner.cpp
 	LINK   ext_catch
 )
 
-create_group(GROUP_UNIT_TEST)
+wish_create_group(GROUP_UNIT_TEST)
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv
 	SOURCE ${PATH_TST}/libv/libv/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE ${PATH_TST}/libv/ecs/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE ${PATH_TST}/libv/frame/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_gl
 	SOURCE ${PATH_TST}/libv/gl/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log libv_gl
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_log
 	SOURCE ${PATH_TST}/libv/log/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE ${PATH_TST}/libv/parse/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-create_executable(
+wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE ${PATH_TST}/libv/sig/*.cpp
 	OBJECT obj_test_runner
 	LINK   ${USE_STATIC_LINK} libv_log
 )
 
-end_group()
+wish_end_group()
 
 # groups -------------------------------------------------------------------------------------------
 
