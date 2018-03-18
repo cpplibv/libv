@@ -4,6 +4,7 @@
 
 #include <libv/range/reversed_if.hpp>
 #include <iostream>
+#include <vector>
 
 
 //using namespace libv;

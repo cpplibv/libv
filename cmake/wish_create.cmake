@@ -53,7 +53,17 @@ endfunction()
 ## Defines get_NAME for fetching the ExternalProject and ext_NAME as lightweight INTERFACE target
 ## Unrecognized parameters after INCLUDEDIR, LINK or DEFINE are forbidden.
 function(wish_create_external)
-	cmake_parse_arguments(arg "DEBUG" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG;SKIP_CONFIGURE_AND_BUILD;SKIP_CONFIGURE;SKIP_BUILD" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
+
+	# options
+	set(command_str_configure)
+	set(command_str_build)
+	if(arg_SKIP_CONFIGURE_AND_BUILD OR arg_SKIP_CONFIGURE)
+		set(command_str_configure "CONFIGURE_COMMAND;echo;\"Skipping configure...\"")
+	endif()
+	if(arg_SKIP_CONFIGURE_AND_BUILD OR arg_SKIP_BUILD)
+		set(command_str_build "BUILD_COMMAND;echo;\"Skipping build...\"")
+	endif()
 
 	# add
 	ExternalProject_Add(
@@ -63,6 +73,8 @@ function(wish_create_external)
 			-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
 		GIT_SHALLOW 1
 		EXCLUDE_FROM_ALL 1
+		${command_str_configure}
+		${command_str_build}
 		${arg_UNPARSED_ARGUMENTS}
 	)
 	add_library(ext_${arg_NAME} INTERFACE)
@@ -107,6 +119,9 @@ function(wish_create_external)
 		message("	ExtSource : ${PATH_EXT_SRC}/${arg_NAME}")
 		message("	IncludeDir: ${arg_INCLUDEDIR}")
 		message("	Link      : ${arg_LINK}")
+		message("	SkipCfg   : ${arg_SKIP_CONFIGURE}")
+		message("	SkipBld   : ${arg_SKIP_BUILD}")
+		message("	SkipCfgBld: ${arg_SKIP_CONFIGURE_AND_BUILD}")
 		message("	Unparsed  : ${arg_UNPARSED_ARGUMENTS}")
 		message("	Group     : ${__wish_current_group_stack}")
 	endif()

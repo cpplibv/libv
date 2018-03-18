@@ -238,11 +238,10 @@ wish_create_external(
 	NAME catch
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
 	GIT_TAG v1.5.6
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/catch/include
-		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/include/
+		COMMAND mkdir -p ${PATH_EXT}/catch/include/catch/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/catch/src/get_catch/include/ ${PATH_EXT}/catch/include/catch/
 )
 
 wish_create_external(
@@ -258,11 +257,10 @@ wish_create_external(
 	NAME clara
 	GIT_REPOSITORY https://github.com/philsquared/Clara.git
 	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara/
+		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/get_clara/single_include ${PATH_EXT}/clara/include/clara/
 )
 
 wish_create_external(
@@ -271,10 +269,10 @@ wish_create_external(
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
 	# TODO P3: this ext_efsw install command looks off
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/efsw/include
-		COMMAND mkdir -p ${PATH_EXT}/efsw/lib
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/ext_efsw/include/ ${PATH_EXT}/efsw/include/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/ext_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
+		COMMAND mkdir -p ${PATH_EXT}/efsw/include/
+		COMMAND mkdir -p ${PATH_EXT}/efsw/lib/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/get_efsw/include/ ${PATH_EXT}/efsw/include/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/get_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
 	LINK efsw
 )
 
@@ -319,17 +317,17 @@ wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.8.2.0
-	BUILD_COMMAND "" # gli is header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli
-		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
+		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/get_gli/gli/ ${PATH_EXT}/gli/include/
 )
 
 wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG 0.9.8.5
-	BUILD_COMMAND "" # glm is header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	DEFINE GLM_ENABLE_EXPERIMENTAL
 	DEFINE GLM_FORCE_RADIANS
 )
@@ -346,23 +344,21 @@ wish_create_external(
 wish_create_external(
 	NAME net_ts
 	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
-	GIT_TAG 6bf74be013e104e2893de245bc3379a6f3f20d54
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND "" # net_ts is header only, skip tests
+	GIT_TAG 3524b4408d26a67af683bfd2aad6b0b6b5684b36
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/net_ts
-		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/ext_net_ts/include/ ${PATH_EXT}/net_ts/
+		COMMAND mkdir -p ${PATH_EXT}/net_ts/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/get_net_ts/include/ ${PATH_EXT}/net_ts/
 )
 
 wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
 	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND "" # range is header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/range
-		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
+		COMMAND mkdir -p ${PATH_EXT}/range/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/get_range/include/ ${PATH_EXT}/range/
 )
 
 wish_create_external(
@@ -376,11 +372,10 @@ wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
 	GIT_TAG 16fc7d87ff0b9c2fc18268a420e0b058a67060a1
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/ext_sol/sol/ ${PATH_EXT}/sol/include/sol/
+		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/sol/ ${PATH_EXT}/sol/include/sol/
 	DEFINE SOL_USE_BOOST
 )
 
@@ -388,11 +383,10 @@ wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
 	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ""  # header only, skip tests
+	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/ext_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
+		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/get_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 )
 
 wish_end_group()
