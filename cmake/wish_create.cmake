@@ -27,13 +27,17 @@ endmacro()
 
 # --- External -------------------------------------------------------------------------------------
 
-# Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
+## Defines get_NAME for fetching the ExternalProject and ext_NAME as lightweight INTERFACE target
+## Unrecognized parameters after INCLUDEDIR, LINK, DEFINE arguments are forbidden.
 function(wish_create_external)
 	cmake_parse_arguments(arg "DEBUG" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
 
+	# external add
 	ExternalProject_Add(
 		get_${arg_NAME}
 		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
+		CMAKE_ARGS
+			-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
 		GIT_SHALLOW 1
 		EXCLUDE_FROM_ALL 1
 		${arg_UNPARSED_ARGUMENTS}
@@ -68,6 +72,8 @@ function(wish_create_external)
 	if(arg_DEBUG OR __wish_global_debug)
 		message("External target: ext_${arg_NAME}, get_${arg_NAME}")
 		message("	Name      : ${arg_NAME}")
+		message("	ExtSource : ${PATH_EXT_SRC}/${arg_NAME}")
+		message("	ExtDir    : ${PATH_EXT}/${arg_NAME}")
 		message("	IncludeDir: ${arg_INCLUDEDIR}")
 		message("	Link      : ${arg_LINK}")
 		message("	Define    : ${arg_DEFINE}")

@@ -155,7 +155,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/assimp/assimp.git
 	GIT_TAG v4.1.0
 	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/assimp
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 		-DBUILD_SHARED_LIBS=OFF
 		-DASSIMP_NO_EXPORT=ON
@@ -261,7 +260,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
 	GIT_TAG v1.2.2
 	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/cereal
 		-DJUST_INSTALL_CEREAL=ON
 	DEFINE CEREAL_XML_STRING_VALUE="root"
 )
@@ -281,8 +279,6 @@ wish_create_external(
 	NAME efsw
 	GIT_REPOSITORY https://github.com/mnafees/efsw.git
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/efsw
 	# TODO P3: this ext_efsw install command looks off
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/efsw/include
@@ -297,7 +293,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
 	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/fmt
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
 	LINK fmt
@@ -307,8 +302,6 @@ wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG VER-2-5-5
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/freetype
 	LINK freetype
 	INCLUDEDIR include/freetype2
 )
@@ -317,8 +310,6 @@ wish_create_external(
 	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	GIT_TAG glew-cmake-1.11.0
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glew
 	LINK glew
 	DEFINE GLEW_STATIC
 )
@@ -328,7 +319,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	GIT_TAG 3.2.1
 	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glfw
 		-DGLFW_BUILD_EXAMPLES=OFF
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
@@ -340,8 +330,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
 	GIT_TAG 0.8.2.0
 	BUILD_COMMAND "" # gli is header only, skip tests
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/gli
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
@@ -352,8 +340,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG 0.9.8.5
 	BUILD_COMMAND "" # glm is header only, skip tests
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/glm
 	DEFINE GLM_ENABLE_EXPERIMENTAL
 	DEFINE GLM_FORCE_RADIANS
 )
@@ -363,7 +349,6 @@ wish_create_external(
 	GIT_REPOSITORY https://github.com/LuaDist/lua.git
 	GIT_TAG 5.3.2
 	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/lua
 		-DBUILD_SHARED_LIBS=OFF
 	LINK lua
 )
@@ -394,8 +379,6 @@ wish_create_external(
 	NAME soil
 	GIT_REPOSITORY https://github.com/xosdy/soil.git
 	GIT_TAG master
-	CMAKE_ARGS
-		-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/soil
 	LINK soil
 )
 
