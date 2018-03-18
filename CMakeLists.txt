@@ -22,28 +22,22 @@ message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 # TODO ---------------------------------------------------------------------------------------------
 
 # TODO P3: Use the correct OpenGL linking cmake build-in options
-# TODO P4: There is a way to include thread this via cmake built-in options
-# TODO P4: Instead of USE_STATIC_LINK use cmake default if possible
+# TODO P4: Think about and try to remove PATH_EXT_IDE
 # ... see in Iris CMakeLists.txt
 
 # Paths --------------------------------------------------------------------------------------------
 
-set(PATH_BIN ${PROJECT_SOURCE_DIR}/bin)
-set(PATH_BLD build)
-set(PATH_LIB ${PROJECT_SOURCE_DIR}/lib)
-set(PATH_PRJ ${CMAKE_CURRENT_SOURCE_DIR})
-set(PATH_EXT ${PATH_PRJ}/ext)
-set(PATH_EXT_SRC ${PATH_PRJ}/ext_src)
-set(PATH_INC include)
-set(PATH_SRC src)
-set(PATH_EXP example)
-set(PATH_SNB sandbox)
-set(PATH_TST test)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PATH_BIN})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PATH_BIN})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PATH_LIB})
+set(PATH_EXT_IDE ext)
+set(PATH_EXT     ${CMAKE_SOURCE_DIR}/ext)
+set(PATH_EXT_SRC ${CMAKE_SOURCE_DIR}/ext_src)
 
-# Variables ----------------------------------------------------------------------------------------
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+
+string(LENGTH ${CMAKE_SOURCE_DIR}_ LIBV_SHORT_PATH_CUTOFF)
+
+# Warning flags ------------------------------------------------------------------------------------
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 	add_compile_options(/Wall)
@@ -95,11 +89,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	endif()
 endif()
 
-string(LENGTH ${PATH_PRJ}_ LIBV_SHORT_PATH_CUTOFF)
-
 # Definitions --------------------------------------------------------------------------------------
-
-set(USE_STATIC_LINK)
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-Og)
@@ -112,7 +102,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 #	SET(CMAKE_AR "gcc-ar")
 #	SET(CMAKE_NM "gcc-nm")
 #	SET(CMAKE_RANLIB "gcc-ranlib")
-	set(USE_STATIC_LINK -static)
+	wish_static_link_std()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
 	add_definitions(-Ofast)
@@ -135,8 +125,8 @@ add_definitions(-DLIBV_USE_GLM_BRIDGE)
 
 # Includes Directories -----------------------------------------------------------------------------
 
-include_directories(${PATH_INC})
-include_directories(${PATH_SRC})
+include_directories(include)
+include_directories(src)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -252,7 +242,7 @@ wish_create_external(
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/catch/include
-		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/include
+		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/include/
 )
 
 wish_create_external(
@@ -272,7 +262,7 @@ wish_create_external(
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/ext_clara/single_include ${PATH_EXT}/clara/include/clara/
 )
 
 wish_create_external(
@@ -331,7 +321,7 @@ wish_create_external(
 	GIT_TAG 0.8.2.0
 	BUILD_COMMAND "" # gli is header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
+		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli
 		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/ext_gli/gli/ ${PATH_EXT}/gli/include/
 )
 
@@ -360,7 +350,7 @@ wish_create_external(
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" # net_ts is header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/net_ts/
+		COMMAND mkdir -p ${PATH_EXT}/net_ts
 		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/ext_net_ts/include/ ${PATH_EXT}/net_ts/
 )
 
@@ -371,7 +361,7 @@ wish_create_external(
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND "" # range is header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/range/
+		COMMAND mkdir -p ${PATH_EXT}/range
 		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/ext_range/include/ ${PATH_EXT}/range/
 )
 
@@ -413,93 +403,90 @@ wish_create_group(GROUP_LIBRARY) # Libraries -----------------------------------
 
 wish_create_library(
 	TARGET libv_container INTERFACE
-	LINK   ${USE_STATIC_LINK}
 )
 
 wish_create_library(
 	TARGET libv_ecs INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost ext_range
+	LINK   ext_boost ext_range
 )
 
 wish_create_library(
 	TARGET libv_frame STATIC
-	SOURCE ${PATH_SRC}/libv/frame/*.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_math ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES} Threads::Threads
+	SOURCE src/libv/frame/*.cpp
+	LINK   libv_log libv_math ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES} Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_gl STATIC
-	SOURCE ${PATH_SRC}/libv/gl/*.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_math ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
+	SOURCE src/libv/gl/*.cpp
+	LINK   libv_log libv_math ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
 )
 
 wish_create_library(
 	TARGET libv_glr INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost
+	LINK   ext_boost
 )
 
 wish_create_library(
 	TARGET libv_log INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_fmt Threads::Threads
+	LINK   ext_fmt Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_lua INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_sol ext_lua
+	LINK   ext_sol ext_lua
 )
 
 wish_create_library(
 	TARGET libv_math INTERFACE
-	LINK   ${USE_STATIC_LINK}
 	LINK   ext_glm # Remove (This will only happen with a vec concept)
 )
 
 wish_create_library(
 	TARGET libv_meta INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost
+	LINK   ext_boost
 )
 
 wish_create_library(
 	TARGET libv_parse INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost
+	LINK   ext_boost
 )
 
 wish_create_library(
 	TARGET libv_range INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_boost ext_range
+	LINK   ext_boost ext_range
 )
 
 wish_create_library(
 	TARGET libv_serialization INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_cereal
+	LINK   ext_cereal
 	LINK   ext_boost # Remove
 )
 
 wish_create_library(
 	TARGET libv_sig STATIC
-	SOURCE ${PATH_SRC}/libv/sig/*.cpp
-	LINK   ${USE_STATIC_LINK}
+	SOURCE src/libv/sig/*.cpp
 )
 
 wish_create_library(
 	TARGET libv_thread INTERFACE
-	LINK   ${USE_STATIC_LINK} Threads::Threads
+	LINK   Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_utility INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_efsw stdc++fs Threads::Threads
+	LINK   ext_efsw stdc++fs Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_vm4 INTERFACE
-	LINK   ${USE_STATIC_LINK} libv_math libv_serialization ext_boost
+	LINK   libv_math libv_serialization ext_boost
 )
 
 wish_create_library(
 	TARGET libv_vm4imp STATIC
-	SOURCE ${PATH_SRC}/libv/vm4imp/*.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_vm4 ext_assimp stdc++fs
+	SOURCE src/libv/vm4imp/*.cpp
+	LINK   libv_log libv_vm4 ext_assimp stdc++fs
 )
 
 wish_end_group()
@@ -507,80 +494,79 @@ wish_create_group(GROUP_SANDBOX) # Sandboxes -----------------------------------
 
 wish_create_executable(
 	TARGET sandbox_libv_libv
-	SOURCE ${PATH_SNB}/libv_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log ext_boost
+	SOURCE sandbox/libv_main.cpp
+	LINK   libv_log ext_boost
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_ecs
-	SOURCE ${PATH_SNB}/libv_ecs_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log
+	SOURCE sandbox/libv_ecs_main.cpp
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_frame
-	SOURCE ${PATH_SNB}/libv_frame_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_frame
+	SOURCE sandbox/libv_frame_main.cpp
+	LINK   libv_log libv_frame
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl
-	SOURCE ${PATH_SNB}/libv_gl_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
+	SOURCE sandbox/libv_gl_main.cpp
+	LINK   libv_log libv_gl ext_glfw stdc++fs
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl2
-	SOURCE ${PATH_SNB}/libv_gl_main2.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
+	SOURCE sandbox/libv_gl_main2.cpp
+	LINK   libv_log libv_gl ext_glfw stdc++fs
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl3
-	SOURCE ${PATH_SNB}/libv_gl_main3.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_gl ext_glfw stdc++fs
+	SOURCE sandbox/libv_gl_main3.cpp
+	LINK   libv_log libv_gl ext_glfw stdc++fs
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_log
-	SOURCE ${PATH_SNB}/libv_log_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log
+	SOURCE sandbox/libv_log_main.cpp
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection
-	SOURCE ${PATH_SNB}/libv_reflection_main.cpp
-	LINK   ${USE_STATIC_LINK}
+	SOURCE sandbox/libv_reflection_main.cpp
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection2
-	SOURCE ${PATH_SNB}/libv_reflection2_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_serialization
+	SOURCE sandbox/libv_reflection2_main.cpp
+	LINK   libv_serialization
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize
-	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_serialization
+	SOURCE sandbox/libv_serialize_main.cpp
+	LINK   libv_serialization
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize_cereal
-	SOURCE ${PATH_SNB}/libv_serialize_cereal_main.cpp
-	LINK   ${USE_STATIC_LINK} ext_boost
+	SOURCE sandbox/libv_serialize_cereal_main.cpp
+	LINK   ext_boost
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_sig
-	SOURCE ${PATH_SNB}/libv_sig_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log
+	SOURCE sandbox/libv_sig_main.cpp
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_vm4imp
-	SOURCE ${PATH_SNB}/libv_vm4imp_main.cpp
-	LINK   ${USE_STATIC_LINK} libv_log libv_vm4imp
+	SOURCE sandbox/libv_vm4imp_main.cpp
+	LINK   libv_log libv_vm4imp
 )
 
 wish_end_group()
@@ -589,7 +575,7 @@ wish_end_group()
 
 wish_create_object(
 	TARGET obj_test_runner
-	SOURCE ${PATH_TST}/runner.cpp
+	SOURCE test/runner.cpp
 	LINK   ext_catch
 )
 
@@ -597,51 +583,51 @@ wish_create_group(GROUP_UNIT_TEST)
 
 wish_create_executable(
 	TARGET test_libv
-	SOURCE ${PATH_TST}/libv/libv/*.cpp
+	SOURCE test/libv/libv/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_ecs
-	SOURCE ${PATH_TST}/libv/ecs/*.cpp
+	SOURCE test/libv/ecs/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_frame
-	SOURCE ${PATH_TST}/libv/frame/*.cpp
+	SOURCE test/libv/frame/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_gl
-	SOURCE ${PATH_TST}/libv/gl/*.cpp
+	SOURCE test/libv/gl/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log libv_gl
+	LINK   libv_log libv_gl
 )
 
 wish_create_executable(
 	TARGET test_libv_log
-	SOURCE ${PATH_TST}/libv/log/*.cpp
+	SOURCE test/libv/log/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_parse
-	SOURCE ${PATH_TST}/libv/parse/*.cpp
+	SOURCE test/libv/parse/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_sig
-	SOURCE ${PATH_TST}/libv/sig/*.cpp
+	SOURCE test/libv/sig/*.cpp
 	OBJECT obj_test_runner
-	LINK   ${USE_STATIC_LINK} libv_log
+	LINK   libv_log
 )
 
 wish_end_group()
@@ -654,3 +640,4 @@ add_custom_target(group_unit_test DEPENDS ${GROUP_UNIT_TEST})
 add_custom_target(group_externals DEPENDS ${GROUP_EXTERNAL_PROJECT})
 add_custom_target(ext DEPENDS group_externals)
 
+wish_create_ide_target()
