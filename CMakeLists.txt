@@ -140,13 +140,13 @@ include_directories(${PATH_SRC})
 
 # --------------------------------------------------------------------------------------------------
 
-if(NOT WIN32)
-	link_libraries(pthread)
-endif()
-
-# --------------------------------------------------------------------------------------------------
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_package(Threads REQUIRED)
 
 find_package(OpenGL REQUIRED)
+
+# === External =====================================================================================
 
 wish_create_group(GROUP_EXTERNAL_PROJECT) # External -----------------------------------------------
 
@@ -424,7 +424,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_frame STATIC
 	SOURCE ${PATH_SRC}/libv/frame/*.cpp
-	LINK   ${USE_STATIC_LINK} libv_log ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES}
+	LINK   ${USE_STATIC_LINK} libv_log libv_math ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES} Threads::Threads
 )
 
 wish_create_library(
@@ -440,7 +440,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_log INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_fmt
+	LINK   ${USE_STATIC_LINK} ext_fmt Threads::Threads
 )
 
 wish_create_library(
@@ -451,7 +451,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_math INTERFACE
 	LINK   ${USE_STATIC_LINK}
-	LINK   ext_glm # Remove
+	LINK   ext_glm # Remove (This will only happen with a vec concept)
 )
 
 wish_create_library(
@@ -483,12 +483,12 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_thread INTERFACE
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} Threads::Threads
 )
 
 wish_create_library(
 	TARGET libv_utility INTERFACE
-	LINK   ${USE_STATIC_LINK} ext_efsw stdc++fs
+	LINK   ${USE_STATIC_LINK} ext_efsw stdc++fs Threads::Threads
 )
 
 wish_create_library(
@@ -556,13 +556,13 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE ${PATH_SNB}/libv_reflection2_main.cpp
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} libv_serialization
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE ${PATH_SNB}/libv_serialize_main.cpp
-	LINK   ${USE_STATIC_LINK}
+	LINK   ${USE_STATIC_LINK} libv_serialization
 )
 
 wish_create_executable(
