@@ -16,7 +16,7 @@ set(CMAKE_VERBOSE_MAKEFILE off)
 set(CMAKE_BUILD_TYPE "DEV")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "Processor count: ${PROCESSOR_COUNT}")
+message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 
 # TODO ---------------------------------------------------------------------------------------------
@@ -127,8 +127,8 @@ add_definitions(-std=c++17)
 # Macro - Assert
 add_definitions(-DNDEBUG)
 # Macro - Git
-add_definitions(-DGIT_BRANCH="${GIT_BRANCH}")
-add_definitions(-DGIT_COMMIT_HASH="${GIT_COMMIT_HASH}")
+add_definitions(-DGIT_BRANCH="${WISH_GIT_BRANCH}")
+add_definitions(-DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
 # Macro - Libv
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
 add_definitions(-DLIBV_USE_GLM_BRIDGE)
@@ -238,7 +238,7 @@ wish_create_external(
 		--layout=tagged
 		--with-system
 #		--with-stacktrace
-		-j${PROCESSOR_COUNT}
+		-j${WISH_PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
 	INSTALL_COMMAND ""
 	#LINK system stacktrace
