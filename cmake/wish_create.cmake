@@ -1,7 +1,19 @@
 # File: target.cmake, Created on 2017. 04. 14. 16:49, Author: Vader
 
 
-# --------------------------------------------------------------------------------------------------
+# --- Debug ----------------------------------------------------------------------------------------
+
+set(__wish_global_debug 0)
+
+macro(wish_enable_debug)
+	set(__wish_global_debug 1)
+endmacro()
+
+macro(wish_disable_debug)
+	set(__wish_global_debug 0)
+endmacro()
+
+# --- Group ----------------------------------------------------------------------------------------
 
 set(__wish_current_group_stack)
 
@@ -13,11 +25,11 @@ macro(wish_end_group)
 	list(REMOVE_AT __wish_current_group_stack -1)
 endmacro()
 
-# --------------------------------------------------------------------------------------------------
+# --- External -------------------------------------------------------------------------------------
 
 # Defines get_NAME for fetching the ExternalProject and ext_NAME as INTERFACE target
 function(wish_create_external)
-	cmake_parse_arguments(arg "" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
 
 	ExternalProject_Add(
 		get_${arg_NAME}
@@ -31,10 +43,10 @@ function(wish_create_external)
 	add_library(ext_${arg_NAME} INTERFACE)
 
 	# include
-	if(NOT arg_INCLUDE)
-		list(APPEND arg_INCLUDE include)
+	if(NOT arg_INCLUDEDIR)
+		list(APPEND arg_INCLUDEDIR include)
 	endif()
-	foreach(var_include ${arg_INCLUDE})
+	foreach(var_include ${arg_INCLUDEDIR})
 		target_include_directories(ext_${arg_NAME} SYSTEM INTERFACE ${PATH_EXT}/${arg_NAME}/${var_include})
 	endforeach()
 
@@ -52,9 +64,19 @@ function(wish_create_external)
 		list(APPEND group_members get_${arg_NAME})
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
+
+	if(arg_DEBUG OR __wish_global_debug)
+		message("External target: ext_${arg_NAME}, get_${arg_NAME}")
+		message("	Name      : ${arg_NAME}")
+		message("	IncludeDir: ${arg_INCLUDEDIR}")
+		message("	Link      : ${arg_LINK}")
+		message("	Define    : ${arg_DEFINE}")
+		message("	Unparsed  : ${arg_UNPARSED_ARGUMENTS}")
+		message("	Group     : ${__wish_current_group_stack}")
+	endif()
 endfunction()
 
-# --------------------------------------------------------------------------------------------------
+# --- Executable -----------------------------------------------------------------------------------
 
 function(wish_create_executable)
 	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
@@ -81,17 +103,17 @@ function(wish_create_executable)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if(arg_DEBUG)
-		message("Target: ${arg_TARGET}")
-		message("	Glob:   ${arg_SOURCE}")
-		message("	Source: ${matching_sources}")
-		message("	Object: ${arg_OBJECT}")
-		message("	Link:   ${arg_LINK}")
-		message("	Group:  ${__wish_current_group_stack}")
+	if(arg_DEBUG OR __wish_global_debug)
+		message("Executable target: ${arg_TARGET}")
+		message("	Glob      : ${arg_SOURCE}")
+		message("	Source    : ${matching_sources}")
+		message("	Object    : ${arg_OBJECT}")
+		message("	Link      : ${arg_LINK}")
+		message("	Group     : ${__wish_current_group_stack}")
 	endif()
 endfunction()
 
-# --------------------------------------------------------------------------------------------------
+# --- Library --------------------------------------------------------------------------------------
 
 function(wish_create_library)
 	cmake_parse_arguments(arg "DEBUG;STATIC;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
@@ -128,19 +150,19 @@ function(wish_create_library)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if(arg_DEBUG)
-		message("Target: ${arg_TARGET}")
-		message("	Glob:   ${arg_SOURCE}")
-		message("	Source: ${matching_sources}")
-		message("	Object: ${arg_OBJECT}")
-		message("	Link:   ${arg_LINK}")
-		message("	Group:  ${__wish_current_group_stack}")
-		message("	Static: ${arg_STATIC}")
-		message("	Interf: ${arg_INTERFACE}")
+	if(arg_DEBUG OR __wish_global_debug)
+		message("Library target: ${arg_TARGET}")
+		message("	Glob      : ${arg_SOURCE}")
+		message("	Source    : ${matching_sources}")
+		message("	Object    : ${arg_OBJECT}")
+		message("	Link      : ${arg_LINK}")
+		message("	Static    : ${arg_STATIC}")
+		message("	Interface : ${arg_INTERFACE}")
+		message("	Group     : ${__wish_current_group_stack}")
 	endif()
 endfunction()
 
-# --------------------------------------------------------------------------------------------------
+# --- Object ---------------------------------------------------------------------------------------
 
 function(wish_create_object)
 	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
@@ -166,12 +188,12 @@ function(wish_create_object)
 		set(${group} ${group_members} PARENT_SCOPE)
 	endforeach()
 
-	if(arg_DEBUG)
-		message("Target: ${arg_TARGET}")
-		message("	Glob:   ${arg_SOURCE}")
-		message("	Source: ${matching_sources}")
-		message("	Object: ${arg_OBJECT}")
-		message("	Group:  ${__wish_current_group_stack}")
+	if(arg_DEBUG OR __wish_global_debug)
+		message("Object target: ${arg_TARGET}")
+		message("	Glob      :   ${arg_SOURCE}")
+		message("	Source    : ${matching_sources}")
+		message("	Object    : ${arg_OBJECT}")
+		message("	Group     : ${__wish_current_group_stack}")
 	endif()
 endfunction()
 
