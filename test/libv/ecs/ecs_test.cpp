@@ -1,6 +1,6 @@
 // File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
 
-#include <catch.hpp>
+#include <catch/catch.hpp>
 
 #include <libv/ecs/system.hpp>
 

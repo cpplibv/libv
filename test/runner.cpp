@@ -3,7 +3,7 @@
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_CONSOLE_WIDTH 100
 
-#include <catch.hpp>
+#include <catch/catch.hpp>
 #include "minimal_reporter.hpp"
 
 int main(int argc, char* const argv[]) {

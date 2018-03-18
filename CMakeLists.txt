@@ -251,8 +251,8 @@ wish_create_external(
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ""  # header only, skip tests
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/catch/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/
+		COMMAND mkdir -p ${PATH_EXT}/catch/include
+		COMMAND cp -r -f ${PATH_EXT_SRC}/catch/src/ext_catch/include/ ${PATH_EXT}/catch/include
 )
 
 wish_create_external(

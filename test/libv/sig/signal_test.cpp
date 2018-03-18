@@ -1,6 +1,6 @@
 // File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
 
-#include <catch.hpp>
+#include <catch/catch.hpp>
 
 #include "signal_test_util.hpp"
 #include <libv/sig/signal.hpp>

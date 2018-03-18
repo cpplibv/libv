@@ -1,7 +1,7 @@
 // File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
 
 // test
-#include <catch.hpp>
+#include <catch/catch.hpp>
 // hpp
 #include <libv/log/log.hpp>
 // std

@@ -1,7 +1,7 @@
 // File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
 
 
-#include <catch.hpp>
+#include <catch/catch.hpp>
 
 #include <GLFW/glfw3.h>
 #include <libv/frame/inputs.hpp>

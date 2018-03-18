@@ -2,7 +2,7 @@
 
 #include <libv/math/vec.hpp>
 
-#include <catch.hpp>
+#include <catch/catch.hpp>
 #include <string>
 
 
