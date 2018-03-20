@@ -3,7 +3,7 @@
 #pragma once
 
 #include <unordered_set>
-#include <reporters/catch_reporter_compact.hpp>
+#include <catch/reporters/catch_reporter_compact.hpp>
 #include <fmt/format.h>
 
 

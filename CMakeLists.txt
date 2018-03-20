@@ -567,61 +567,50 @@ wish_end_group()
 
 # Tests --------------------------------------------------------------------------------------------
 
-wish_create_object(
-	TARGET obj_test_runner
+# TODO P5: This should be an object library, but ran into troubles with target_link_libraries against object library
+wish_create_library(
+	TARGET obj_test_runner STATIC
 	SOURCE test/runner.cpp
-	LINK   ext_catch
+	LINK   ext_catch ext_fmt ext_boost
 )
 
 wish_create_group(GROUP_UNIT_TEST)
 
+# TODO P4: replace test_libv tester with one per sub library (math, range, ...)
 wish_create_executable(
 	TARGET test_libv
 	SOURCE test/libv/libv/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
+	LINK   obj_test_runner libv_log libv_math
 )
 
 wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
+	LINK   obj_test_runner libv_log libv_range
 )
 
 wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
-)
-
-wish_create_executable(
-	TARGET test_libv_gl
-	SOURCE test/libv/gl/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log libv_gl
+	LINK   obj_test_runner libv_log libv_frame
 )
 
 wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
+	LINK   obj_test_runner libv_log
 )
 
 wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE test/libv/parse/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
+	LINK   obj_test_runner libv_log libv_parse
 )
 
 wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE test/libv/sig/*.cpp
-	OBJECT obj_test_runner
-	LINK   libv_log
+	LINK   obj_test_runner libv_log libv_sig
 )
 
 wish_end_group()

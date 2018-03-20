@@ -146,6 +146,7 @@ function(wish_create_executable)
 	# add
 	add_executable(${arg_TARGET} ${matching_sources})
 	target_link_libraries(${arg_TARGET} ${arg_LINK} ${__wish_static_link_std})
+	target_link_libraries(${arg_TARGET} ${obj})
 
 	# group
 	foreach(group ${__wish_current_group_stack})
@@ -192,6 +193,8 @@ function(wish_create_library)
 	elseif(arg_INTERFACE)
 		add_library(${arg_TARGET} INTERFACE ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} INTERFACE ${arg_LINK})
+	else()
+		message(FATAL_ERROR "Library has to be either STATIC or INTERFACE")
 	endif()
 
 #	add_library(${arg_TARGET} $<IF:$<BOOL:${arg_STATIC}>,"STATIC",""> $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${matching_sources} ${target_objects})
@@ -220,7 +223,7 @@ endfunction()
 # --- Object ---------------------------------------------------------------------------------------
 
 function(wish_create_object)
-	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 	# check
 	if(NOT arg_SOURCE AND NOT arg_OBJECT)
@@ -246,8 +249,9 @@ function(wish_create_object)
 	# debug
 	if(arg_DEBUG OR __wish_global_debug)
 		message("Object target: ${arg_TARGET}")
-		message("	Glob      :   ${arg_SOURCE}")
+		message("	Glob      : ${arg_SOURCE}")
 		message("	Source    : ${matching_sources}")
+		message("	Link      : ${arg_LINK}")
 		message("	Object    : ${arg_OBJECT}")
 		message("	Group     : ${__wish_current_group_stack}")
 	endif()

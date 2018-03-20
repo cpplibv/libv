@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <reporters/catch_reporter_compact.hpp>
+#include <catch/reporters/catch_reporter_compact.hpp>
 
 namespace Catch {
 
