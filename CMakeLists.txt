@@ -444,6 +444,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_parse INTERFACE
 	LINK   ext_boost
+	LINK   libv_math # Remove?
 )
 
 wish_create_library(
@@ -571,46 +572,51 @@ wish_end_group()
 wish_create_library(
 	TARGET obj_test_runner STATIC
 	SOURCE test/runner.cpp
-	LINK   ext_catch ext_fmt ext_boost
+	LINK   libv_log ext_catch ext_fmt ext_boost
 )
 
 wish_create_group(GROUP_UNIT_TEST)
 
-# TODO P4: replace test_libv tester with one per sub library (math, range, ...)
-wish_create_executable(
-	TARGET test_libv
-	SOURCE test/libv/libv/*.cpp
-	LINK   obj_test_runner libv_log libv_math
-)
-
 wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
-	LINK   obj_test_runner libv_log libv_range
+	LINK   obj_test_runner libv_range
 )
 
 wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
-	LINK   obj_test_runner libv_log libv_frame
+	LINK   obj_test_runner libv_frame
 )
 
 wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
-	LINK   obj_test_runner libv_log
+	LINK   obj_test_runner
+)
+
+wish_create_executable(
+	TARGET test_libv_math
+	SOURCE test/libv/math/*.cpp
+	LINK   obj_test_runner libv_math
 )
 
 wish_create_executable(
 	TARGET test_libv_parse
 	SOURCE test/libv/parse/*.cpp
-	LINK   obj_test_runner libv_log libv_parse
+	LINK   obj_test_runner libv_parse
+)
+
+wish_create_executable(
+	TARGET test_libv_range
+	SOURCE test/libv/range/*.cpp
+	LINK   obj_test_runner libv_range
 )
 
 wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE test/libv/sig/*.cpp
-	LINK   obj_test_runner libv_log libv_sig
+	LINK   obj_test_runner libv_sig
 )
 
 wish_end_group()
@@ -621,6 +627,8 @@ add_custom_target(group_library DEPENDS ${GROUP_LIBRARY})
 add_custom_target(group_sandbox DEPENDS ${GROUP_SANDBOX})
 add_custom_target(group_unit_test DEPENDS ${GROUP_UNIT_TEST})
 add_custom_target(group_externals DEPENDS ${GROUP_EXTERNAL_PROJECT})
+
 add_custom_target(ext DEPENDS group_externals)
+add_custom_target(tests DEPENDS group_unit_test)
 
 wish_create_ide_target()
