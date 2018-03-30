@@ -19,12 +19,18 @@ struct always_true : std::true_type {
 };
 
 template <typename... T>
+bool always_true_v = always_true<T...>::value;
+
+template <typename... T>
 struct always_false : std::false_type {
 	template <typename... Args>
 	constexpr inline bool operator()(Args&&...) const {
 		return false;
 	}
 };
+
+template <typename... T>
+bool always_false_v = always_false<T...>::value;
 
 // -------------------------------------------------------------------------------------------------
 

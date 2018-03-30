@@ -8,14 +8,16 @@
 #    include <glm/vec3.hpp>
 #    include <glm/vec4.hpp>
 #endif
+// libv
+#include <libv/meta/n_times.hpp>
+#include <libv/meta/type_traits.hpp>
 // std
 #include <cassert>
 #include <cmath>
 #include <utility>
 #include <array>
 // pro
-#include <libv/meta/n_times.hpp>
-#include <libv/meta/type_traits.hpp>
+#include <libv/math/vec_concept.hpp>
 
 
 // TODO P1: conditionally explicit ctors: 41:00 https://www.youtube.com/watch?v=ybaE9qlhHvw or wait out explicit(bool)
@@ -517,6 +519,20 @@ template <size_t N, typename T> constexpr inline const T& w(const vec_t<N, T>& v
 	static_assert(N > 3, "vec_t with less then 4 dimension does not have 'w' coordinate");
 	return vec.data[3];
 }
+
+//template <size_t N, typename Vec>
+//decltype(auto) get(Vec&& vec) {
+//	if constexpr (N == 0 && LIBV_CONCEPT_VEC1234(Vec))
+//		return std::forward<Vec>(vec).x;
+//	else if constexpr (N == 1 && LIBV_CONCEPT_VEC234(Vec))
+//		return std::forward<Vec>(vec).y;
+//	else if constexpr (N == 2 && LIBV_CONCEPT_VEC34(Vec))
+//		return std::forward<Vec>(vec).z;
+//	else if constexpr (N == 3 && LIBV_CONCEPT_VEC4(Vec))
+//		return std::forward<Vec>(vec).w;
+//	else
+//		static_assert(libv::always_false_v<Vec>, "Requested dimension is missing from the given vector");
+//}
 
 /// \return The dot product of the two vector
 template <size_t N, typename T, typename K>
