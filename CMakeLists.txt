@@ -256,7 +256,7 @@ wish_create_external(
 wish_create_external(
 	NAME clara
 	GIT_REPOSITORY https://github.com/philsquared/Clara.git
-	GIT_TAG 20b5c3abdc0637f3e73479340b63d368f9e0f2ce
+	GIT_TAG v1.1.4
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara/
@@ -279,7 +279,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG bef89db6e7d10499a91affca7a933f264c7956d5
+	GIT_TAG 4.1.0
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
@@ -291,7 +291,7 @@ wish_create_external(
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG VER-2-5-5
 	LINK freetype
-	INCLUDEDIR include/freetype2
+	INCLUDE_DIR include/freetype2
 )
 
 wish_create_external(
@@ -327,7 +327,7 @@ wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
 	GIT_TAG 0.9.8.5
-	SKIP_CONFIGURE_AND_BUILD
+	SKIP_BUILD
 	DEFINE GLM_ENABLE_EXPERIMENTAL
 	DEFINE GLM_FORCE_RADIANS
 )
@@ -354,7 +354,7 @@ wish_create_external(
 wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG 0ed88b12844792a83d2d0919ef49a341fdca28d1
+	GIT_TAG 0.3.5
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/
@@ -371,7 +371,7 @@ wish_create_external(
 wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG 16fc7d87ff0b9c2fc18268a420e0b058a67060a1
+	GIT_TAG v2.19.5
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
@@ -382,7 +382,7 @@ wish_create_external(
 wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
-	GIT_TAG f029fcc2fbc7cd979925f198f7e6ca8170d45000
+	GIT_TAG 1537543999978d3a0464560a9a940d6140c6ba59
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp/

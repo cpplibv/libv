@@ -51,9 +51,9 @@ endfunction()
 # --- External -------------------------------------------------------------------------------------
 
 ## Defines get_NAME for fetching the ExternalProject and ext_NAME as lightweight INTERFACE target
-## Unrecognized parameters after INCLUDEDIR, LINK or DEFINE are forbidden.
+## Unrecognized parameters after INCLUDE_DIR, LINK or DEFINE are forbidden.
 function(wish_create_external)
-	cmake_parse_arguments(arg "DEBUG;SKIP_CONFIGURE_AND_BUILD;SKIP_CONFIGURE;SKIP_BUILD" "NAME" "INCLUDEDIR;LINK;DEFINE" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG;SKIP_CONFIGURE_AND_BUILD;SKIP_CONFIGURE;SKIP_BUILD" "NAME" "INCLUDE_DIR;LINK;DEFINE" ${ARGN})
 
 	# options
 	set(command_str_configure)
@@ -80,11 +80,11 @@ function(wish_create_external)
 	add_library(ext_${arg_NAME} INTERFACE)
 
 	# include
-	if(NOT arg_INCLUDEDIR)
-		list(APPEND arg_INCLUDEDIR include)
+	if(NOT arg_INCLUDE_DIR)
+		list(APPEND arg_INCLUDE_DIR include)
 	endif()
 	set(temp_list ${__wish_external_include_directories})
-	foreach(var_include ${arg_INCLUDEDIR})
+	foreach(var_include ${arg_INCLUDE_DIR})
 		target_include_directories(ext_${arg_NAME} SYSTEM INTERFACE ${PATH_EXT}/${arg_NAME}/${var_include})
 		list(APPEND temp_list ${PATH_EXT_IDE}/${arg_NAME}/${var_include})
 	endforeach()
@@ -117,7 +117,7 @@ function(wish_create_external)
 		message("	Define    : ${arg_DEFINE}")
 		message("	ExtDir    : ${PATH_EXT}/${arg_NAME}")
 		message("	ExtSource : ${PATH_EXT_SRC}/${arg_NAME}")
-		message("	IncludeDir: ${arg_INCLUDEDIR}")
+		message("	IncludeDir: ${arg_INCLUDE_DIR}")
 		message("	Link      : ${arg_LINK}")
 		message("	SkipCfg   : ${arg_SKIP_CONFIGURE}")
 		message("	SkipBld   : ${arg_SKIP_BUILD}")
