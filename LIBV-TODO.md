@@ -66,9 +66,10 @@ libv: provide exception free alternative API.
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
-ui / frame: remove default own thread, give them an io_service like executor
+frame: remove default own thread, give them an io_service like executor
 ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 ui: take a look at frame and component events
+ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
 
 Set default displayed tab size for your repository
 http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/23522945#23522945

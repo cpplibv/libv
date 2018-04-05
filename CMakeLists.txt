@@ -380,6 +380,16 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME sml
+	GIT_REPOSITORY https://github.com/boost-experimental/sml.git
+	GIT_TAG feee47d23dbc696eee05f2b14cee60e386622053
+	SKIP_CONFIGURE_AND_BUILD
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/sml/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/
+)
+
+wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
 	GIT_TAG 1537543999978d3a0464560a9a940d6140c6ba59
@@ -556,6 +566,12 @@ wish_create_executable(
 	TARGET sandbox_libv_sig
 	SOURCE sandbox/libv_sig_main.cpp
 	LINK   libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_sml
+	SOURCE sandbox/libv_sml_main.cpp
+	LINK   libv_log ext_sml
 )
 
 wish_create_executable(
