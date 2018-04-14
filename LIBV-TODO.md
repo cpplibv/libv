@@ -42,6 +42,7 @@ asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cpp.proposal: _ec - ec postfix exception free overload with error code as return value, (for constructors maybe operator bool or error getter, but that is far from perfect)
+cpp.proposal: operator^^ - logical XOR operator
 cpp.proposal: allow trailing comma for function arguments, its already there for arrays and enums
 cpp.proposal: implicit - keyword that would replace explicit but instead of blacklist, whitelist
 cpp.proposal: namespace :: {} - a way to open the global :: namespace from any other namespace
@@ -59,6 +60,7 @@ gl: templated buffer for binding
 gl: uniformbuffer?
 layout: hard type (enum) align anchor and orient
 layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
+libv.net: compression lib https://github.com/google/snappy
 libv.log: log thread naming
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header

@@ -128,7 +128,7 @@ add_definitions(-DLIBV_USE_GLM_BRIDGE)
 include_directories(include)
 include_directories(src)
 
-# --------------------------------------------------------------------------------------------------
+# === Package ======================================================================================
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
@@ -633,6 +633,12 @@ wish_create_executable(
 	TARGET test_libv_sig
 	SOURCE test/libv/sig/*.cpp
 	LINK   obj_test_runner libv_sig
+)
+
+wish_create_executable(
+	TARGET test_libv_utility
+	SOURCE test/libv/utility/*.cpp
+	LINK   obj_test_runner libv_utility
 )
 
 wish_end_group()
