@@ -55,7 +55,7 @@ public:
 		return projection * view * model;
 	}
 	inline const libv::vec3f eye() const {
-		return xyz(from_glm(view.top().inverse_copy()[3]));
+		return libv::vec::xyz(view.top().inverse_copy()[3]);
 	}
 	inline const libv::mat4f getMatrixTexture() const {
 		return libv::mat4f{

@@ -110,7 +110,7 @@ void importMaterials(Model& model, const aiScene* scene) {
 			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_V(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mappingmode_v", name, n), ai_int);
 			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_vec3); ++n)
-				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texmap_axis", name, n), libv::vec::from_xyz(ai_vec3));
+				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texmap_axis", name, n), vec3f(ai_vec3));
 			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texflags", name, n), ai_int);
 		};
@@ -201,15 +201,15 @@ void importGeometry(Model& model, const aiScene* scene) {
 		for (unsigned int j = 0; j < mesh->mNumVertices; j++) {
 			auto& vertex = model.vertices.emplace_back();
 
-			vertex.position = libv::vec::from_xyz(mesh->mVertices[j]);
+			vertex.position = libv::vec3f(mesh->mVertices[j]);
 			if (mesh->HasNormals())
-				vertex.normal = libv::vec::from_xyz(mesh->mNormals[j]);
+				vertex.normal = libv::vec3f(mesh->mNormals[j]);
 			if (mesh->HasTangentsAndBitangents()) {
-				vertex.tangent = libv::vec::from_xyz(mesh->mTangents[j]);
-				vertex.bitangent = libv::vec::from_xyz(mesh->mBitangents[j]);
+				vertex.tangent = libv::vec3f(mesh->mTangents[j]);
+				vertex.bitangent = libv::vec3f(mesh->mBitangents[j]);
 			}
 			if (mesh->HasTextureCoords(0))
-				vertex.texCoord0 = libv::vec::from_xy(mesh->mTextureCoords[0][j]);
+				vertex.texCoord0 = libv::vec::xy(mesh->mTextureCoords[0][j]);
 
 			if (mesh->HasBones()) {
 				//vertex.boneID = vec4i();

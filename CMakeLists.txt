@@ -121,7 +121,6 @@ add_definitions(-DGIT_BRANCH="${WISH_GIT_BRANCH}")
 add_definitions(-DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
 # Macro - Libv
 add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
-add_definitions(-DLIBV_USE_GLM_BRIDGE)
 
 # Includes Directories -----------------------------------------------------------------------------
 
