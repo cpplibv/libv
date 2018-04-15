@@ -1,9 +1,8 @@
-// File: observer_ptr.hpp
+// File: observer_ptr.hpp - Created on 2018.04.15. 03:37 - Author: Vader
 
 #pragma once
 
 // std
-#include <algorithm>
 #include <cassert>
 #include <functional>
 #include <memory>
@@ -13,11 +12,6 @@
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
-
-template <typename T>
-class adaptive_ptr;
-
-// observer_ptr ====================================================================================
 // This implementation is no 100% percent, but close enough for now.
 
 template <typename T>
@@ -31,7 +25,6 @@ public:
 	constexpr inline observer_ptr() noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
-	constexpr explicit inline observer_ptr(const adaptive_ptr<T>& p) noexcept : ptr(p.get()) { }
 	constexpr explicit inline observer_ptr(const std::shared_ptr<T>& p) noexcept : ptr(p.get()) { }
 	template <typename K, typename = std::enable_if_t<std::is_base_of_v<T, K>>>
 	constexpr inline observer_ptr(const observer_ptr<K>& other) noexcept : ptr(other.get()) { }
@@ -142,80 +135,6 @@ struct hash<::libv::observer_ptr<T>> {
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
 } // namespace std
-
-// adaptive_ptr ====================================================================================
-
-namespace libv {
-
-template <typename T>
-class adaptive_ptr {
-private:
-	observer_ptr<T> ptr;
-	std::shared_ptr<T> sp;
-
-public:
-	inline adaptive_ptr() noexcept : ptr(nullptr) { }
-	explicit inline adaptive_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
-	explicit inline adaptive_ptr(const observer_ptr<T>& ptr) noexcept : ptr(ptr) { }
-	explicit inline adaptive_ptr(observer_ptr<T>&& ptr) noexcept : ptr(ptr) { }
-	explicit inline adaptive_ptr(const std::shared_ptr<T>& sp) noexcept : ptr(sp.get()), sp(sp) { }
-	explicit inline adaptive_ptr(std::shared_ptr<T>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
-
-	adaptive_ptr& operator=(const observer_ptr<T>& ptr) & {
-		this->ptr = ptr;
-		return *this;
-	}
-	adaptive_ptr& operator=(observer_ptr<T>&& ptr) & {
-		this->ptr = ptr;
-		return *this;
-	}
-	adaptive_ptr& operator=(const std::shared_ptr<T>& sp) & {
-		this->ptr = observer_ptr<T>(sp.get());
-		this->sp = sp;
-		return *this;
-	}
-	adaptive_ptr& operator=(std::shared_ptr<T>&& sp) & {
-		this->ptr = observer_ptr<T>(sp.get());
-		this->sp = std::move(sp);
-		return *this;
-	}
-
-	inline T* get() const noexcept {
-		return ptr.get();
-	}
-	inline T& operator*() const {
-		return *ptr.get();
-	}
-	inline T* operator->() const noexcept {
-		return ptr.get();
-	}
-	inline operator T*() const noexcept {
-		return ptr.get();
-	}
-	inline operator observer_ptr<T>() const noexcept {
-		return ptr;
-	}
-	explicit inline operator bool() const noexcept {
-		return ptr != nullptr;
-	}
-};
-
-template <typename T>
-inline adaptive_ptr<T> make_adaptive(const observer_ptr<T>& ptr) noexcept {
-	return adaptive_ptr<T>(ptr);
-}
-template <typename T>
-inline adaptive_ptr<T> make_adaptive(observer_ptr<T>&& ptr) noexcept {
-	return adaptive_ptr<T>(ptr);
-}
-template <typename T>
-inline adaptive_ptr<T> make_adaptive(const std::shared_ptr<T>& ptr) noexcept {
-	return adaptive_ptr<T>(ptr);
-}
-template <typename T>
-inline adaptive_ptr<T> make_adaptive(std::shared_ptr<T>&& ptr) noexcept {
-	return adaptive_ptr<T>(ptr);
-}
-
-} // namespace libv

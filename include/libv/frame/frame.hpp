@@ -5,13 +5,13 @@
 // cfg
 #include <libv/frame/config.hpp>
 // libv
-#include <libv/memory.hpp>
 #include <libv/sig/signal.hpp>
 #include <libv/thread/executor_thread.hpp>
 #include <libv/utility/enum.hpp>
 // std
-#include <atomic>
 #include <array>
+#include <atomic>
+#include <memory>
 #include <string>
 // pro
 #include <libv/frame/events.hpp>

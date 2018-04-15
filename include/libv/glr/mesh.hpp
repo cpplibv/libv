@@ -5,12 +5,11 @@
 // ext
 #include <boost/intrusive_ptr.hpp>
 // libv
-#include <libv/memory.hpp>
 #include <libv/meta/reflection.hpp>
 // std
+#include <memory>
 #include <vector>
 
-// -------------------------------------------------------------------------------------------------
 
 namespace libv {
 namespace glr {
