@@ -7,8 +7,7 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-// pro
-#include <libv/meta/type_traits.hpp>
+#include <type_traits>
 
 
 namespace libv {
@@ -18,18 +17,6 @@ namespace libv {
 template <typename T>
 class adaptive_ptr;
 
-// shared_ptr ======================================================================================
-template <typename T>
-using shared_ptr = std::shared_ptr<T>;
-
-// weak_ptr ========================================================================================
-template <typename T>
-using weak_ptr = std::weak_ptr<T>;
-
-// unique_ptr ======================================================================================
-template <typename T, typename Deleter = std::default_delete<T>>
-using unique_ptr = std::unique_ptr<T, Deleter>;
-
 // observer_ptr ====================================================================================
 // This implementation is no 100% percent, but close enough for now.
 
@@ -38,16 +25,18 @@ class observer_ptr {
 	T* ptr;
 public:
 	using element_type = T;
+	using value_type = T;
 	using pointer = T*;
-	// ---------------------------------------------------------------------------------------------
+
 	constexpr inline observer_ptr() noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
 	constexpr explicit inline observer_ptr(const adaptive_ptr<T>& p) noexcept : ptr(p.get()) { }
-	constexpr explicit inline observer_ptr(const shared_ptr<T>& p) noexcept : ptr(p.get()) { }
+	constexpr explicit inline observer_ptr(const std::shared_ptr<T>& p) noexcept : ptr(p.get()) { }
 	template <typename K, typename = std::enable_if_t<std::is_base_of_v<T, K>>>
 	constexpr inline observer_ptr(const observer_ptr<K>& other) noexcept : ptr(other.get()) { }
-	// ---------------------------------------------------------------------------------------------
+
+public:
 	constexpr inline T* get() const noexcept {
 		return ptr;
 	}
@@ -63,7 +52,8 @@ public:
 	constexpr explicit inline operator T*() const noexcept {
 		return ptr;
 	}
-	// ---------------------------------------------------------------------------------------------
+
+public:
 	constexpr inline T* release() noexcept {
 		T * p(ptr);
 		reset();
@@ -78,6 +68,7 @@ public:
 		swap(ptr, other.ptr);
 	}
 };
+
 template <typename T1, typename T2>
 inline bool operator==(observer_ptr<T1> p1, observer_ptr<T2> p2) {
 	return p1.get() == p2.get();
@@ -120,7 +111,9 @@ template <typename T>
 inline bool operator>=(observer_ptr<T> p1, observer_ptr<T> p2) {
 	return !(p1 < p2);
 }
+
 // specialized algorithms --------------------------------------------------------------------------
+
 template <typename T>
 inline void swap(observer_ptr<T> & p1, observer_ptr<T> & p2) noexcept {
 	p1.swap(p2);
@@ -134,7 +127,7 @@ inline observer_ptr<T> make_observer(T& p) noexcept {
 	return observer_ptr<T>(&p);
 }
 template <typename T>
-inline observer_ptr<T> make_observer(const shared_ptr<T>& p) noexcept {
+inline observer_ptr<T> make_observer(const std::shared_ptr<T>& p) noexcept {
 	return observer_ptr<T>(p);
 }
 
@@ -159,15 +152,15 @@ template <typename T>
 class adaptive_ptr {
 private:
 	observer_ptr<T> ptr;
-	shared_ptr<T> sp;
+	std::shared_ptr<T> sp;
 
 public:
 	inline adaptive_ptr() noexcept : ptr(nullptr) { }
 	explicit inline adaptive_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
 	explicit inline adaptive_ptr(const observer_ptr<T>& ptr) noexcept : ptr(ptr) { }
 	explicit inline adaptive_ptr(observer_ptr<T>&& ptr) noexcept : ptr(ptr) { }
-	explicit inline adaptive_ptr(const shared_ptr<T>& sp) noexcept : ptr(sp.get()), sp(sp) { }
-	explicit inline adaptive_ptr(shared_ptr<T>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
+	explicit inline adaptive_ptr(const std::shared_ptr<T>& sp) noexcept : ptr(sp.get()), sp(sp) { }
+	explicit inline adaptive_ptr(std::shared_ptr<T>&& sp) noexcept : ptr(sp.get()), sp(std::move(sp)) { }
 
 	adaptive_ptr& operator=(const observer_ptr<T>& ptr) & {
 		this->ptr = ptr;
@@ -177,14 +170,14 @@ public:
 		this->ptr = ptr;
 		return *this;
 	}
-	adaptive_ptr& operator=(const shared_ptr<T>& sp) & {
+	adaptive_ptr& operator=(const std::shared_ptr<T>& sp) & {
 		this->ptr = observer_ptr<T>(sp.get());
 		this->sp = sp;
 		return *this;
 	}
-	adaptive_ptr& operator=(shared_ptr<T>&& sp) & {
+	adaptive_ptr& operator=(std::shared_ptr<T>&& sp) & {
 		this->ptr = observer_ptr<T>(sp.get());
-		this->sp = std::move(sp); //swap?
+		this->sp = std::move(sp);
 		return *this;
 	}
 
@@ -217,11 +210,11 @@ inline adaptive_ptr<T> make_adaptive(observer_ptr<T>&& ptr) noexcept {
 	return adaptive_ptr<T>(ptr);
 }
 template <typename T>
-inline adaptive_ptr<T> make_adaptive(const shared_ptr<T>& ptr) noexcept {
+inline adaptive_ptr<T> make_adaptive(const std::shared_ptr<T>& ptr) noexcept {
 	return adaptive_ptr<T>(ptr);
 }
 template <typename T>
-inline adaptive_ptr<T> make_adaptive(shared_ptr<T>&& ptr) noexcept {
+inline adaptive_ptr<T> make_adaptive(std::shared_ptr<T>&& ptr) noexcept {
 	return adaptive_ptr<T>(ptr);
 }
 

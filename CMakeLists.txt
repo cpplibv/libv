@@ -506,7 +506,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_ecs
 	SOURCE sandbox/libv_ecs_main.cpp
-	LINK   libv_log
+	LINK   libv_log libv_ecs
 )
 
 wish_create_executable(
@@ -530,7 +530,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_gl3
 	SOURCE sandbox/libv_gl_main3.cpp
-	LINK   libv_log libv_gl ext_glfw stdc++fs
+	LINK   libv_log libv_gl ext_boost ext_glfw stdc++fs
 )
 
 wish_create_executable(
@@ -542,6 +542,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE sandbox/libv_reflection_main.cpp
+	LINK   libv_serialization
 )
 
 wish_create_executable(
@@ -559,7 +560,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_serialize_cereal
 	SOURCE sandbox/libv_serialize_cereal_main.cpp
-	LINK   ext_boost
+	LINK   ext_boost ext_cereal
 )
 
 wish_create_executable(

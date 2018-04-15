@@ -20,6 +20,11 @@
 //			thread_local but a map inside the log system, or better a "specific log message".
 // TODO P4: Log system could get its own thread, later this can be useful for high stress debugs and
 //			system analysis, or binary logging...
+// TODO P4: {line_gap} assign the rest of the command line into this gap, this should also be supported in the messages in some form
+//			Most likely will be integrated into the serialization and output-formatter system
+// IDEA: Format string per route; most likely will be integrated into the serialization and output-formatter system
+//		libv::log.route_below(libv::Info, std::cout, "{severity} {thread_id} {module}: {message} <{file}:{line}>\n");
+//		libv::log.route(std::cout, "{severity} {module}: {message}\n");
 
 // -------------------------------------------------------------------------------------------------
 // Trace - Only when tracing the code and execution steps
@@ -48,7 +53,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-//LIBV_STRONG_TYPEDEF(int, Severity);
+// TODO P5: enum, or strong type LIBV_STRONG_TYPEDEF(int, Severity);
 using Severity = int;
 
 constexpr Severity Trace{1};
