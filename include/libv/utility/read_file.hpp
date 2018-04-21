@@ -15,7 +15,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-inline std::string read_file(const std::filesystem::path& filePath) {
+template <typename = void>
+std::string read_file(const std::filesystem::path& filePath) {
 	std::string result;
 	std::ifstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::in | std::ios_base::binary);
 
@@ -37,12 +38,14 @@ inline std::string read_file(const std::filesystem::path& filePath) {
 enum class ReadFileError : uint8_t {
 	OK = 0,
 	FailedOpen,
-//	NotFound,
+	//	NotFound,
 	InvalidPath,
 	//	NoPermission,
+	//	AlreadyOpened,
 };
 
-inline std::string read_file(const std::filesystem::path& filePath, ReadFileError& er) {
+template <typename = void>
+std::string read_file(const std::filesystem::path& filePath, ReadFileError& er) {
 	std::string result;
 
 	if (filePath.filename().empty()) {
@@ -63,6 +66,18 @@ inline std::string read_file(const std::filesystem::path& filePath, ReadFileErro
 	result = buffer.str();
 
 	er = ReadFileError::OK;
+	return result;
+}
+
+struct result_read_file {
+	std::string content;
+	ReadFileError ec;
+};
+
+template <typename = void>
+result_read_file read_file_ec(const std::filesystem::path& filePath) {
+	result_read_file result;
+	result.content = read_file(filePath, result.ec);
 	return result;
 }
 

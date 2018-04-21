@@ -67,6 +67,26 @@ struct Sandbox {
 	};
 
 	Sandbox() {
+#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
+
+		if (GLenum err = glewInit() != GLEW_OK)
+			LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
+
+		LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
+		LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
+		LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
+
+		CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
+		CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
+		CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
+		CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
+		CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
+		CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
+		CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
+		CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
+
+		LIBV_GL_CHECK();
+
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
 		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
@@ -228,40 +248,14 @@ struct Sandbox {
 
 // Runner ------------------------------------------------------------------------------------------
 
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
-
-void initGLEW() {
-	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
-	LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
-	LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
-
-	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
-	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
-	CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
-	CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
-	CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
-	CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
-
-	LIBV_GL_CHECK();
-}
-
-static void error_callback(int code, const char* description) {
-	LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 auto running = std::atomic_bool{true};
 
 int main(void) {
 	std::cout << libv::log;
 
-	glfwSetErrorCallback(error_callback);
+	glfwSetErrorCallback([](int code, const char* description) {
+		LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
+	});
 
 	if (!glfwInit()) {
 		LIBV_LOG_LIBV_ERROR("Failed to initialize GLFW.");
@@ -290,33 +284,58 @@ int main(void) {
 	});
 	glfwSwapInterval(1);
 
-	initGLEW();
-
 	{
 		Sandbox sandbox;
 
+		std::chrono::nanoseconds time_outside;
+		std::chrono::nanoseconds time_render;
+		std::chrono::nanoseconds time_swap;
+		std::chrono::nanoseconds time_poll;
+
 		libv::Timer timer;
-		size_t time = 0, i = 0;
+		libv::Timer print_timer;
+		size_t i = 0;
 
 		while (running && !glfwWindowShouldClose(window)) {
 			LIBV_GL_CHECK();
+			time_outside += timer.time();
+
 			sandbox.render();
+			time_render += timer.time();
 
 			glfwSwapBuffers(window);
+			time_swap += timer.time();
+
 			glfwPollEvents();
+			time_poll += timer.time();
 
 			i++;
-			time += timer.time().count();
-			if (time > 1000000000) {
-				LIBV_LOG_LIBV_INFO("FPS: {}", i);
+			if (print_timer.elapsed() > std::chrono::seconds(1)) {
+				print_timer.adjust(std::chrono::seconds(1));
+
+				LIBV_LOG_LIBV_INFO("Frames: {}, Poll: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
+						i,
+						time_poll.count() / 1000.f / i,
+						time_render.count() / 1000.f / i,
+						time_outside.count() / 1000.f / i,
+						time_swap.count() / 1000.f / i,
+						(time_outside + time_render + time_swap + time_poll).count() / 1000.f / i
+				);
 				i = 0;
-				time -= 1000000000;
+
+				time_outside = time_outside.zero();
+				time_render = time_render.zero();
+				time_swap = time_swap.zero();
+				time_poll = time_poll.zero();
 			}
 		}
 	}
+	LIBV_GL_CHECK();
 	glfwMakeContextCurrent(nullptr);
 	glfwDestroyWindow(window);
 	glfwTerminate();
 
 	return 0;
 }
+
+// -------------------------------------------------------------------------------------------------

@@ -21,6 +21,10 @@ public:
 		return std::chrono::steady_clock::now() - time_;
 	}
 
+	inline void adjust(clock::duration diff) {
+		time_ += diff;
+	}
+
 	inline void reset() {
 		time_ = std::chrono::steady_clock::now();
 	}
@@ -32,16 +36,16 @@ public:
 		return lastTurn;
 	}
 
-	inline decltype(auto) time_s() {
+	inline auto time_s() {
 		return std::chrono::duration_cast<std::chrono::seconds>(time());
 	}
-	inline decltype(auto) time_ms() {
+	inline auto time_ms() {
 		return std::chrono::duration_cast<std::chrono::milliseconds>(time());
 	}
-	inline decltype(auto) time_us() {
+	inline auto time_us() {
 		return std::chrono::duration_cast<std::chrono::microseconds>(time());
 	}
-	inline decltype(auto) time_ns() {
+	inline auto time_ns() {
 		return std::chrono::duration_cast<std::chrono::nanoseconds>(time());
 	}
 };

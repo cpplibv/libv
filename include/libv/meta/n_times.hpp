@@ -44,6 +44,8 @@ constexpr inline void for_constexpr(F&& func) {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
+
 /// Calls the given function N times
 /// @usage n_times\<10>( [] { do_work(i); } );
 template <size_t N, typename F>

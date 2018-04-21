@@ -36,7 +36,7 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onContextTerminate.output(pretty_print_to_log);
 }
 
-class TestFrame : public libv::frame::Frame {
+class TestFrame : public libv::Frame {
 public:
 	TestFrame(const std::string& title) : Frame(title, 1200, 750) {
 		setPosition(POSITION_CENTER_CURRENT_MONITOR);
