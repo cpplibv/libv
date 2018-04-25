@@ -7,6 +7,7 @@ include(ExternalProject)
 include(cmake/wish_create.cmake)
 include(cmake/wish_git.cmake)
 include(cmake/wish_util.cmake)
+include(cmake/wish_warning.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@ set(CMAKE_BUILD_TYPE "DEV")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CXX compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
@@ -39,46 +41,51 @@ string(LENGTH ${CMAKE_SOURCE_DIR}_ LIBV_SHORT_PATH_CUTOFF)
 
 # Warning flags ------------------------------------------------------------------------------------
 
-if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-	add_compile_options(/Wall)
+wish_warning(
+	MSVC /Wall
 
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-	add_compile_options(-Weverything -Wmissing-override -Wno-comment -Wconversion)
+	Clang -Weverything
+	Clang -Wmissing-override
+	Clang -Wno-comment
+	Clang -Wconversion
 
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-	add_compile_options(-Wall -Wextra -Wpedantic -Wno-comment
-		-Wcast-qual
-		-Wdelete-non-virtual-dtor
-		-Wdouble-promotion
-		-Wduplicated-cond
-		-Wlogical-op
-		-Wnon-virtual-dtor
-		-Wnull-dereference
-		-Wold-style-cast
-		-Wsuggest-override
-		-Wundef
+	GNU -Wall
+	GNU -Wextra
+	GNU -Wpedantic
+	GNU -Wcast-qual
+	GNU -Wdelete-non-virtual-dtor
+	GNU -Wdouble-promotion
+	GNU -Wduplicated-cond
+	GNU -Wlogical-op
+	GNU -Wnon-virtual-dtor
+	GNU -Wnull-dereference
+	GNU -Wold-style-cast
+	GNU -Wsuggest-override
+	GNU -Wundef
+	GNU -Warray-bounds
 
-# Enablement in progress:
-#		-Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
-# 		-Wconversion # 130+, most of it is in vec and the rest is in gl
-# 		-Wfloat-equal # in tests 40+ false positive
+	# Enablement in progress:
+	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
+	# GNU -Wconversion # 130+, most of it is in vec and the rest is in gl
+	# GNU -Wfloat-equal # in tests 40+ false positive
 
-# Only enable time-to-time to check on what is going on:
-# 		-Winline
-# 		-Wsuggest-final-methods # in signal 50+ function
-# 		-Wsuggest-final-types # in signal 1 type
-	)
+	# Only enable time-to-time to check on what is going on:
+	# GNU -Winline
+	# GNU -Wsuggest-final-methods # in signal 50+ function
+	# GNU -Wsuggest-final-types # in signal 1 type
 
-	if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 7.0)
-		add_compile_options(
-			-Wduplicated-branches
-			-Wrestrict
-			-Wshadow-compatible-local
-		)
-	endif()
+	GNU VERSION_GREATER 7.0 -Wduplicated-branches
+	GNU VERSION_GREATER 7.0 -Wrestrict
+	GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
+	GNU VERSION_GREATER 8.0 -Wcast-align=strict
 
+	# Warnings that I don't care about
+	GNU -Wno-comment
+)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-		# Sanitizers current only available on unix
+		# Sanitizers are current only available on unix
 		# add_compile_options(-fsanitize=address)
 		# add_compile_options(-fsanitize=kernel-address)
 		# add_compile_options(-fsanitize=leak)
@@ -105,14 +112,14 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	wish_static_link_std()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
-	add_definitions(-Ofast)
+	add_compile_options(-Ofast)
 
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
 endif()
 
-add_definitions(-m64)
-add_definitions(-std=c++17)
+add_compile_options(-m64)
+add_compile_options(-std=c++17)
 
 # Macro - Assert
 add_definitions(-DNDEBUG)
