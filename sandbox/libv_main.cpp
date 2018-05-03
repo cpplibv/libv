@@ -30,6 +30,7 @@
 //#include <unordered_map>
 //#include <utility>
 //#include <vector>
+#include <libv/utility/hex_dump.hpp>
 
 //http://ciere.com/cppnow15/x3_docs/index.html
 //http://ciere.com/cppnow15/x3_docs/spirit/tutorials/semantic_actions.html
@@ -65,6 +66,7 @@
 #include <iostream>
 
 int main() {
-	std::cout << "Hi" << std::endl;
+	//	std::cout << "Hi" << std::endl;
+	std::cout << libv::hex_dump("țûɾ ấɖḯƥĭṩčįɳ]ġ \"ᶁⱺ ẽḭŭŝḿꝋď ]ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đôȇ ᵯáᶇā ąⱡîɋṹẵ.") << std::endl;
 	return 0;
 }
