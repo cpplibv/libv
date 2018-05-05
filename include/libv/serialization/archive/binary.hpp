@@ -30,7 +30,6 @@ inline void swap_bytes(uint8_t* data) {
 class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
 
 private:
-	bool convertEndian;
 	std::ostream& os;
 
 public:
@@ -38,7 +37,6 @@ public:
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
 	BinaryOutput(std::ostream& stream) :
 		OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision>(this),
-		convertEndian(is_little_endian()),
 		os(stream) {
 	}
 
@@ -48,7 +46,7 @@ public:
 	inline void saveBinary(const void* const data, size_t size) {
 		size_t writtenSize = 0;
 
-		if (convertEndian)
+		if constexpr (!is_network_endian())
 			for (size_t i = 0; i < size; i += DataSize)
 				for (size_t j = 0; j < DataSize; ++j)
 					writtenSize += static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data) + DataSize - j - 1 + i, 1));
@@ -65,7 +63,6 @@ public:
 class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
 
 private:
-	bool convertEndian;
 	std::istream& is;
 
 public:
@@ -73,7 +70,6 @@ public:
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
 	BinaryInput(std::istream& stream) :
 		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
-		convertEndian(is_little_endian()),
 		is(stream) {
 	}
 
@@ -86,7 +82,7 @@ public:
 		if (readSize != size)
 			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
 
-		if (convertEndian)
+		if constexpr (!is_network_endian())
 			for (size_t i = 0; i < size; i += DataSize)
 				detail::swap_bytes<DataSize>(reinterpret_cast<uint8_t*>(data) + i);
 	}

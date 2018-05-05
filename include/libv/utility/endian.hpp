@@ -2,6 +2,9 @@
 
 #pragma once
 
+// ext
+// TODO P5: C++20 replace boost with standard
+#include <boost/detail/endian.hpp>
 // std
 #include <cstdint>
 
@@ -10,14 +13,24 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-inline bool is_big_endian() {
-	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
-	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 0x01;
+constexpr inline bool is_big_endian() {
+#ifdef BOOST_BIG_ENDIAN
+	return true;
+#else
+	return false;
+#endif
 }
 
-inline bool is_little_endian() {
-	volatile uint32_t endian_mark{0x01020304}; // Pinned in memory to read endianness at runtime
-	return reinterpret_cast<volatile uint8_t&>(endian_mark) == 0x04;
+constexpr inline bool is_little_endian() {
+#ifdef BOOST_LITTLE_ENDIAN
+	return true;
+#else
+	return false;
+#endif
+}
+
+constexpr inline bool is_network_endian() {
+	return is_big_endian();
 }
 
 // -------------------------------------------------------------------------------------------------
