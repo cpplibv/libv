@@ -9,7 +9,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "libv.sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
 
 using libv::frame::Key;
 

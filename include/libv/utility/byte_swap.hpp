@@ -63,10 +63,7 @@ constexpr inline T network_to_host(T var) {
 
 template <typename T>
 constexpr inline T host_to_network(T var) {
-	if constexpr (is_network_endian())
-		return var;
-	else
-		return byte_swap(var);
+	return network_to_host(var);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -230,6 +230,7 @@ private:
 				printIssue("explicitly");
 				printSourceInfo();
 				break;
+
 				// These cases are here to prevent compiler warnings
 			case ResultWas::Unknown:
 			case ResultWas::FailureBit:

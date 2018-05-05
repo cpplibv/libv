@@ -25,6 +25,8 @@ message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
+# TODO P2: Adopt GCC experimental concepts:
+#			add_compile_options(-std=c++2a -fconcepts -Dconcept="concept bool")
 # TODO P3: Use the correct OpenGL linking cmake build-in options
 # TODO P4: Think about and try to remove PATH_EXT_IDE
 # ... see in Iris CMakeLists.txt
@@ -46,7 +48,6 @@ wish_warning(
 
 	Clang -Weverything
 	Clang -Wmissing-override
-	Clang -Wno-comment
 	Clang -Wconversion
 
 	GNU -Wall
@@ -78,14 +79,15 @@ wish_warning(
 	GNU VERSION_GREATER 7.0 -Wrestrict
 	GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
 	GNU VERSION_GREATER 8.0 -Wcast-align=strict
+	GNU VERSION_GREATER 8.0 -Wmultistatement-macros
 
 	# Warnings that I don't care about
+	Clang -Wno-comment
 	GNU -Wno-comment
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 	if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-		# Sanitizers are current only available on unix
 		# add_compile_options(-fsanitize=address)
 		# add_compile_options(-fsanitize=kernel-address)
 		# add_compile_options(-fsanitize=leak)
@@ -119,6 +121,7 @@ endif()
 
 add_compile_options(-m64)
 add_compile_options(-std=c++17)
+#add_compile_options(-std=c++2a)
 
 # Macro - Assert
 add_definitions(-DNDEBUG)
@@ -390,6 +393,13 @@ wish_create_external(
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/net_ts/
 		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/get_net_ts/include/ ${PATH_EXT}/net_ts/
+	# TODO P3: Add support for linux link / define for net_ts
+	#	LINK $<IF:$<BOOL:${WIN32}>,
+	#			wsock32 ws2_32, # Win 32
+	#			 # Ubuntu 18.04
+	#		>
+	LINK wsock32 ws2_32
+	DEFINE _WIN32_WINNT=0x0501
 )
 
 wish_create_external(
@@ -494,6 +504,14 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_net STATIC
+	SOURCE src/libv/net/*.cpp
+	LINK   libv_log libv_utility libv_meta ext_boost ext_net_ts
+#	LINK   libv_serialization
+#	LINK   libv_utility libv_thread ext_boost
+)
+
+wish_create_library(
 	TARGET libv_parse INTERFACE
 	LINK   ext_boost
 	LINK   libv_math # Remove?
@@ -582,6 +600,24 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_net
+	SOURCE sandbox/libv_net_main.cpp
+	LINK   libv_net libv_log ext_sml
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_net_client
+	SOURCE sandbox/libv_net_client_main.cpp
+	LINK   libv_net libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_net_server
+	SOURCE sandbox/libv_net_server_main.cpp
+	LINK   libv_net libv_log
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE sandbox/libv_reflection_main.cpp
 	LINK   libv_serialization
@@ -658,6 +694,12 @@ wish_create_executable(
 	TARGET test_libv_math
 	SOURCE test/libv/math/*.cpp
 	LINK   obj_test_runner libv_math
+)
+
+wish_create_executable(
+	TARGET test_libv_net
+	SOURCE test/libv/net/*.cpp
+	LINK   obj_test_runner libv_net
 )
 
 wish_create_executable(

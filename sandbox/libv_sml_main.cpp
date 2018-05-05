@@ -1,9 +1,8 @@
 // File: main.cpp, Created on 2014. április 25. 21:23, Author: Vader
 
-// ext
-#include <boost/sml.hpp>
 // libv
 #include <libv/log/log.hpp>
+#include <libv/sml.hpp>
 // std
 #include <cassert>
 #include <iostream>
@@ -11,51 +10,28 @@
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T, typename OStream>
-void dump_transition(OStream& os) noexcept {
-	auto src_state = std::string{boost::sml::aux::string<typename T::src_state>{}.c_str()};
-	auto dst_state = std::string{boost::sml::aux::string<typename T::dst_state>{}.c_str()};
-	if (dst_state == "X")
-		dst_state = "[*]";
+struct my_logger {
+	template <class SM, class TEvent>
+	void log_process_event(const TEvent&) {
+		fmt::print("[{}][process_event] {}\n", typeid (SM).name(), typeid (TEvent).name());
+	}
 
-	if (T::initial)
-		os << "[*] --> " << src_state << '\n';
+	template <class SM, class TGuard, class TEvent>
+	void log_guard(const TGuard&, const TEvent&, bool result) {
+		fmt::print("[{}][guard] {} {} {}\n", typeid (SM).name(), typeid (TGuard).name(), typeid (TEvent).name(),
+				(result ? "[OK]" : "[Reject]"));
+	}
 
-	os << src_state << " --> " << dst_state;
+	template <class SM, class TAction, class TEvent>
+	void log_action(const TAction&, const TEvent&) {
+		fmt::print("[{}][action] {} {}\n", typeid (SM).name(), typeid (TAction).name(), typeid (TEvent).name());
+	}
 
-	const auto has_event = !boost::sml::aux::is_same<typename T::event, boost::sml::anonymous>::value;
-	const auto has_guard = !boost::sml::aux::is_same<typename T::guard, boost::sml::front::always>::value;
-	const auto has_action = !boost::sml::aux::is_same<typename T::action, boost::sml::front::none>::value;
-
-	if (has_event || has_guard || has_action)
-		os << " :";
-
-	if (has_event)
-		os << " " << boost::sml::aux::get_type_name<typename T::event > ();
-
-	if (has_guard)
-		os << " [" << boost::sml::aux::get_type_name<typename T::guard::type > () << "]";
-
-	if (has_action)
-		os << " / " << boost::sml::aux::get_type_name<typename T::action::type > ();
-
-	os << '\n';
-}
-
-template <template <typename...> typename T, typename... Ts, typename OStream>
-void dump_transitions(const T<Ts...>&, OStream& os) noexcept {
-	int _[]{0, (dump_transition<Ts>(os), 0)...};
-	(void) _;
-}
-
-template <typename SM, typename OStream>
-void dump(const SM&, OStream& os) noexcept {
-	os << "@startuml\n\n";
-	dump_transitions(typename SM::transitions{}, os);
-	os << "\n@enduml\n";
-}
-
-// -------------------------------------------------------------------------------------------------
+	template <class SM, class TSrcState, class TDstState>
+	void log_state_change(const TSrcState& src, const TDstState& dst) {
+		fmt::print("[{}][transition] {} -> {}\n", typeid (SM).name(), src.c_str(), dst.c_str());
+	}
+};
 
 // Dependencies
 struct Sender {
@@ -78,40 +54,51 @@ constexpr auto is_valid = [](const auto& event) { return event.valid; };
 constexpr auto send_fin = [](Sender& s) { s.send(EventFin{0}); };
 constexpr auto send_ack = [](const auto& event, Sender& s) { s.send(event); };
 
+constexpr auto tt = []() { return true; };
+constexpr auto ff = []() { return false; };
+
 // State Machine
-struct tcp_release {
+struct tcp_release : libv::sml::state_machine {
+
+	constexpr static auto established = state<class established>;
+	constexpr static auto fin_wait_1 = state<class fin_wait_1>;
+	constexpr static auto fin_wait_2 = state<class fin_wait_2>;
+	constexpr static auto timed_wait = state<class timed_wait>;
+
 	/// Transition DSL: src_state + event [ guard ] / action = dst_state
 	auto operator()() const {
-		using namespace boost::sml;
-		return make_transition_table(
-		   *"established"_s + event<EventRelease>          / send_fin  = "fin_wait_1"_s,
-			"fin_wait_1"_s  + event<EventAck> [ is_valid ]             = "fin_wait_2"_s,
-			"fin_wait_2"_s  + event<EventFin> [ is_valid ] / send_ack  = "timed_wait"_s,
-			"fin_wait_3"_s  + event<EventFin> [ is_valid ] / send_ack  = "fin_wait_1"_s,
-			"timed_wait"_s  + event<EventTimeout>                      = X
+		return table(
+			established + on_entry<_>[tt]          / []{ fmt::print("established tt\n"); },
+			established + on_entry<_>[ff]          / []{ fmt::print("established ff\n"); },
+			established + on_entry<_>              / []{ fmt::print("established entry\n"); },
+			established + on_exit<_>               / []{ fmt::print("established exit\n"); },
+		   *established + on_<EventRelease>        / send_fin = fin_wait_1,
+			fin_wait_1  + on_<EventAck> [is_valid]            = fin_wait_2,
+			fin_wait_2  + on_<EventFin> [is_valid] / send_ack = timed_wait,
+			timed_wait  + on_<EventTimeout>                   = terminate
 		);
 	}
 };
 
 int main() {
 	std::cout << libv::logger;
-	using namespace boost::sml;
 
 	Sender s{};
-	boost::sml::sm<tcp_release> sm{s}; // pass dependencies via ctor
-	dump(sm, std::cout);
+	my_logger ml{};
+	boost::sml::sm<tcp_release, boost::sml::logger<my_logger>> sm{s, ml}; // pass dependencies via constructor
+	libv::sml::to_plantuml(sm, std::cout);
 
-	assert(sm.is("established"_s));
+	assert(sm.is(tcp_release::established));
 
 	sm.process_event(EventRelease{}); // complexity O(1)
-	assert(sm.is("fin_wait_1"_s));
+	assert(sm.is(tcp_release::fin_wait_1));
 
 	sm.process_event(EventAck{true}); // prints 'send: 0'
-	assert(sm.is("fin_wait_2"_s));
+	assert(sm.is(tcp_release::fin_wait_2));
 
 	sm.process_event(EventFin{42, true}); // prints 'send: 42'
-	assert(sm.is("timed_wait"_s));
+	assert(sm.is(tcp_release::timed_wait));
 
 	sm.process_event(EventTimeout{});
-	assert(sm.is(boost::sml::X)); // terminated
+	assert(sm.is(tcp_release::terminate)); // terminated
 }

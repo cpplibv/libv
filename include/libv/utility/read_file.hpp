@@ -36,7 +36,7 @@ template <typename Fallback = std::string_view>
 		return std::string{std::forward<Fallback>(fallback)};
 	}
 
-	return buffer.str();
+	return std::move(buffer).str();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ template <typename = void>
 	if (file.fail())
 		throw std::system_error(errno, std::system_category(), fmt::format("Failed to read file: {}", filePath));
 
-	return buffer.str();
+	return std::move(buffer).str();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -79,7 +79,7 @@ template <typename = void>
 	}
 
 	ec.clear();
-	return buffer.str();
+	return std::move(buffer).str();
 }
 
 struct result_read_file {

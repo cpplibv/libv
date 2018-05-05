@@ -2,30 +2,43 @@
 
 #pragma once
 
-// std
-#include <algorithm>
-
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-constexpr inline decltype(auto) max(T&& a) noexcept {
-	return std::forward<T>(a);
-}
-template <typename T, typename ... Args>
-constexpr inline decltype(auto) max(T&& a, Args&&... args) noexcept {
-	return std::max(std::forward<T>(a), max(std::forward<Args>(args)...));
+namespace detail {
+
+template <typename T, typename... Args>
+constexpr inline auto max(const T& lhs, const Args&... args) noexcept {
+	if constexpr (sizeof...(args) == 0) {
+		return lhs;
+	} else {
+		auto rhs = max(args...);
+		return lhs > rhs ? lhs : rhs;
+	}
 }
 
-template <typename T>
-constexpr inline decltype(auto) min(T&& a) noexcept {
-	return std::forward<T>(a);
+template <typename T, typename... Args>
+constexpr inline auto min(const T& lhs, const Args&... args) noexcept {
+	if constexpr (sizeof...(args) == 0) {
+		return lhs;
+	} else {
+		auto rhs = min(args...);
+		return lhs < rhs ? lhs : rhs;
+	}
 }
-template <typename T, typename ... Args>
-constexpr inline decltype(auto) min(T&& a, Args&&... args) noexcept {
-	return std::min(min(std::forward<T>(a), std::forward<Args>(args)...));
+
+} // namespace detail
+
+template <typename... Args>
+constexpr inline auto max(const Args&... args) noexcept {
+	return detail::max(std::common_type_t<Args...>{args}...);
+}
+
+template <typename... Args>
+constexpr inline auto min(const Args&... args) noexcept {
+	return detail::min(std::common_type_t<Args...>{args}...);
 }
 
 // -------------------------------------------------------------------------------------------------

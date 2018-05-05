@@ -56,6 +56,8 @@ uint32_t ImageSOIL::createTexture() const noexcept {
 	// NOTE: SOIL_create_OGL_texture Fails in OpenGL 3.3 core profile
 	// SOIL_create_OGL_texture(storage.get(), size_.x, size_.y, channels, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 
+	// TODO P3: Would be nice to have on the fly compression requests
+
 	// Flip Y axis
 	const auto row_size = size_.x * channels;
 	auto row_tmp = libv::dynarray<uint8_t>{static_cast<size_t>(row_size)};

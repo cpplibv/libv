@@ -24,7 +24,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "libv.sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
 
 constexpr uint32_t WINDOW_HEIGHT = 600;
 constexpr uint32_t WINDOW_WIDTH = 900;

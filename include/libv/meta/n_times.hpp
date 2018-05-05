@@ -3,10 +3,10 @@
 #pragma once
 
 // std
-#include <cstddef> // consider dropping size_t usage in this file
+#include <cstddef> // consider changing size_t usage to tempalte T in this file
 #include <utility>
 
-// TODO P4: Rename this file to for_constexpr.hpp, for.hpp, loop.hpp or cycle.hpp
+// TODO P4: Rename this file to for_constexpr.hpp, constexpr_for, for.hpp, loop.hpp or cycle.hpp
 // TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
 // TODO P5: n_times and n_times_index can be merged based on F accepting a "size_t" or not
 // TODO P5: for_constexpr should iterate over [begin, end)

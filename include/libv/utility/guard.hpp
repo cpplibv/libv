@@ -10,6 +10,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P3: rename Guard file and class to scope_guard
+
 template <typename F>
 class Guard {
 	F action;
@@ -28,7 +30,8 @@ public:
 	}
 };
 
-template <typename CF> Guard(CF&&) -> Guard<std::decay_t<CF>>;
+template <typename F>
+Guard(F) -> Guard<F>;
 
 // -------------------------------------------------------------------------------------------------
 

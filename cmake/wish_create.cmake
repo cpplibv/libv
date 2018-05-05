@@ -38,7 +38,7 @@ endmacro()
 set(__wish_external_include_directories)
 set(__wish_external_defines)
 
-## Creates wish_ide target that can be used to obtain various informations IDE
+## Creates wish_ide target that can be used to obtain various information for IDEs
 function(wish_create_ide_target)
 	# TODO P5: list targets / libraries / executables
 	add_custom_target(wish_ide

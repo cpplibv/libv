@@ -8,7 +8,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "libv.sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
 
 int main(int, char **) {
 	std::cout << libv::logger;

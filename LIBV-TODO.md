@@ -1,19 +1,9 @@
 --- STACK ------------------------------------------------------------------------------------------
 
-look up lib: Clara, most important questions are: multi, optional, required, positional and default arguments
-look up Catch2
-update assimp to 4.x
+rename gl::GL to~ gl::GLState gl::GLstate
 -- commit --
 
-cmake: what are interface targets
-cmake: can there be multiple definition error during linkage if two lib contains the same definition
-cmake: check what linking does on a lib
--- commit --
-
-rename gl::GL to~ gl::GLstate
--- commit --
-
-add structured binding support for vec_t
+add / check structured binding support for vec_t
 -- commit --
 
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
@@ -22,63 +12,99 @@ libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
 btn / regions
 -- commit --
 
-change log severity into bit-mask
--- commit --
-
 frame calling show after show may brake things?
-dual check lock every frame operations
+dual check lock every async frame operations
 -- commit --
 
-pointer facade for: observer, cached, view, adaptive, etc...
+pointer facade for: observer_ptr, observer_ref, etc...
+-- commit --
+
+implement erase_unstable: x[index] = std::move(x[last]); x.erase(last)
 -- commit --
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
+cli: Clara, most important questions are: multi, optional, required, positional and default arguments
+			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
-cpp.proposal: P1 member_offset
-cpp.proposal: P2 operator^^ - logical XOR operator
-cpp.proposal: P2 stod, stol: support for string_view
-cpp.proposal: P3 allow trailing comma for function arguments, its already there for arrays and enums
-cpp.proposal: P4 namespace :: {} - a way to open the global :: namespace from any other namespace
-cpp.proposal: P4 namespace ::std {} - a way to open any namespace given absolute path from any other namespace
-cpp.proposal: P5 _ec - ec postfix exception free overload with error code as return value, (for constructors maybe operator bool or error getter, but that is far from perfect)
-cpp.proposal: P5 implicit - keyword that would replace explicit but instead of blacklist, whitelist
+cpp.proposal: P1 member_offset alternative for offsetof macro
+		- similar approach is [p0908r0]
+		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
+cpp.proposal: P2 add auto ctor call to return MyType(arg0, arg1); => return (arg0, arg1);
+		- decltype(auto) foo();
+		- auto foo();
+		- return (result);
+cpp.proposal: P2 std::argument_with _name<T>: void foo(std::with_call_name<const T&> arg) { std::cout << arg.name << “: ” << args.value << std::endl; }
+		void foo(variable) -> void foo(MAGIC(variable)) -> void foo(std::with_call_name{“variable”, variable});
+		void foo(exp + ression) -> void foo(MAGIC(exp + ression)) -> void foo(std::with_call_name{“exp + ression”, exp + ression});
+		Conversion would only fire after the overload resolution already took place. Or it would count as an implicit user defined conversion
+		Questions: Is whitespace included? Newlines? Expressions? Whitespace in expressions? Constexpr? Just do what macros do?
+cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
+cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
+cpp: (adaptive) radix tree - O(1) lookup
+cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
 cpp: clarify template vs auto type deduction rules
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
-cpp: (adaptive) radix tree - O(1) lookup
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
+ecs: existence / super-position based predication
 frame.core: remove core
 frame: Move frame from disconnected monitor
+frame: remove default own thread, give them an io_context like executor
 gl: framebuffer
 gl: glEnable(GL_DEBUG_OUTPUT);
 gl: remove irrelevant member function from templated textures
 gl: renderbuffer
 gl: templated buffer for binding
 gl: uniformbuffer?
+gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 layout: hard type (enum) align anchor and orient
 layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
-libv.net: compression lib https://github.com/google/snappy
 libv.log: log thread naming
-libv.sig: merge back and place meta (too many tamplate argument) into libv.meta
-libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
-libv: provide exception free alternative API.
+libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
+libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, that is too many template)
 libv.utility: Make a proper copy-pastable noisy type
+libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
+libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
+libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
+observe: https://bkaradzic.github.io/bgfx/examples.html
+observe: https://github.com/bkaradzic/bgfx
+observe: https://github.com/hugoam/mud
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
-frame: remove default own thread, give them an io_service like executor
-ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
-ui: take a look at frame and component events
 ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
+ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+ui: https://www.factorio.com/blog/post/fff-246
+ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
+ui: take a look at frame and component events
 
-Set default displayed tab size for your repository
-http://stackoverflow.com/questions/8833953/how-to-change-tab-size-on-github/23522945#23522945
+ide.options:
+	- profile:
+	- built-in:     built-in / plug-in / user-defined
+	- type:         string / color / font (or font_effect as one big blob)  / vec(2|3|4)
+	- name:         group_a.group_b.item
+	- base:         inherit_parent_project / reference(group_a.group_b.item)
+	- value:        value / alter / merge: value: rgb() / hex / "string" / x,y,z / ... ; alter: hsl / alter hex / alter x,y,z / ...
+	- effect:       value / alter / merge: underline / strikethrough / background
+	- scripted:     lua
+	profiles can inherit from other profiles
+	project profile: each project has a built in profile that can be used for project specific settings
+	online profiles / uri based profiles (if changes keep last N old versions, auto fetch on start)
+colorpicker:
+	- support all color space slider in one tab (all) and in different tabs too
+	- support all color spaces, swatches, rgb, hsv, hsl, hcl with each 2x1 dimension change option
+	- support auto relax color distances
+	- support lua profile reference (?)
+	- support lua operations
+	- support multi color pick at the same time, mouse select, list select
+	- support realtime result preview
+	- visualize color distances, distance "bubbles"
+	- visualize picked colors in sliders too
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
-LIBV_STRONG_TYPEDEF(int, Severity);
 logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
 logger: binlog
 cpp.compile: things I want to know about my compile time:
@@ -89,6 +115,7 @@ cpp.compile: things I want to know about my compile time:
 		- Lists of translation units that includes (even if transitively) a given header
 		- clang patch: https://www.youtube.com/watch?v=NPWQ7xKfIHQ
 		- record in CI history per commit changes in every statistics
+		- https://github.com/google/bloaty
 
 // -------------------------------------------------------------------------------------------------
 

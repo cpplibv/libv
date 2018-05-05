@@ -13,9 +13,13 @@ namespace libv {
 
 class BinaryLatch {
 	bool passed;
-	// Note: If you touch any of this logic you WILL introduce a race condition.
+
 	mutable std::mutex mutex;
 	mutable std::condition_variable cv;
+
+public:
+	inline explicit BinaryLatch(bool passed = false) :
+		passed(passed) { }
 
 public:
 	inline void raise() {
@@ -35,7 +39,17 @@ public:
 			cv.wait(lock);
 	}
 
-	inline explicit BinaryLatch(bool passed = false) : passed(passed) { }
+	template<typename Rep, typename Period>
+	inline bool wait_for(const std::chrono::duration<Rep, Period>& timeout) const {
+		std::unique_lock<std::mutex> lock(mutex);
+		return cv.wait_for(lock, timeout, [this]{ return passed; });
+	}
+
+	template<typename Clock, typename Duration>
+	inline bool wait_until(const std::chrono::time_point<Clock, Duration>& attime) const {
+		std::unique_lock<std::mutex> lock(mutex);
+		return cv.wait_until(lock, attime, [this]{ return passed; }) == std::cv_status::no_timeout;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
