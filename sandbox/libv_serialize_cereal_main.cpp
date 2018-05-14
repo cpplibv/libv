@@ -16,6 +16,7 @@
 #include <libv/serialization/types/std_string.hpp>
 #include <libv/serialization/types/std_variant.hpp>
 #include <libv/serialization/types/std_vector.hpp>
+#include <libv/utility/hex_dump.hpp>
 // std
 #include <iomanip>
 #include <iostream>
@@ -106,20 +107,6 @@ struct Test {
 	}
 };
 
-inline std::string hex_dump(const std::string& s) {
-	std::ostringstream ss;
-	ss << std::dec << s.size() << " - ";
-
-	for (size_t i = 0; i < s.size(); ++i) {
-		uint16_t c = static_cast<unsigned char>(s[i]);
-		ss << std::hex << std::setfill('0') << std::setw(2) << std::uppercase << c << ' ';
-	}
-
-	auto result = ss.str();
-	result.pop_back();
-	return result;
-}
-
 // TODO P5: Basically this file could be a unit test
 
 int main() {
@@ -159,7 +146,7 @@ int main() {
 		}
 
 		std::cout << std::endl;
-		std::cout << hex_dump(ss.str()) << std::endl;
+		std::cout << ss.str().size() << " - " << libv::hex_dump(ss.str()) << std::endl;
 		std::cout << std::endl;
 
 		{
@@ -179,7 +166,7 @@ int main() {
 		}
 
 		std::cout << std::endl;
-		std::cout << hex_dump(ss.str()) << std::endl;
+		std::cout << ss.str().size() << " - " << libv::hex_dump(ss.str()) << std::endl;
 		std::cout << std::endl;
 
 		{
@@ -199,7 +186,7 @@ int main() {
 		}
 
 		std::cout << std::endl;
-		std::cout << hex_dump(ss.str()) << std::endl;
+		std::cout << ss.str().size() << " - " << libv::hex_dump(ss.str()) << std::endl;
 		std::cout << std::endl;
 
 		{

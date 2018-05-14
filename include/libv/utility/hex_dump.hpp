@@ -17,7 +17,6 @@ namespace libv {
 
 inline std::string hex_dump(const std::string_view& s) {
 	std::ostringstream ss;
-	ss << std::dec << s.size();
 	ss << std::hex << std::setfill('0') << std::setw(2) << std::uppercase;
 	for (size_t i = 0; i < s.size(); ++i) {
 		if (i % 32 == 0)
