@@ -5,7 +5,7 @@
 // ext
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/thread/semaphore.hpp>
+#include <libv/thread/executor_thread.hpp>
 // std
 #include <atomic>
 #include <memory>
@@ -55,7 +55,6 @@ private:
 	std::mutex mutex;
 
 private:
-
 	void init() {
 		LIBV_LOG_FRAME_CORE_INFO("Initialize Core / GLFW Context");
 		glfwSetErrorCallback(detail::errorCallbackGLFW);

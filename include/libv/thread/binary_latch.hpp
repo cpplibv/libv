@@ -11,8 +11,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: This is more like a latch. Implement a semaphore and rename this to some kind of latch.
-class Semaphore {
+class BinaryLatch {
 	bool passed;
 	// Note: If you touch any of this logic you WILL introduce a race condition.
 	mutable std::mutex mutex;
@@ -36,7 +35,7 @@ public:
 			cv.wait(lock);
 	}
 
-	inline explicit Semaphore(bool passed = false) : passed(passed) { }
+	inline explicit BinaryLatch(bool passed = false) : passed(passed) { }
 };
 
 // -------------------------------------------------------------------------------------------------

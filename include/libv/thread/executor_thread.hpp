@@ -12,7 +12,7 @@
 #include <thread>
 // pro
 #include <libv/log/log.hpp>
-#include <libv/thread/semaphore.hpp>
+#include <libv/thread/binary_latch.hpp>
 
 
 namespace libv {
@@ -38,7 +38,7 @@ public:
 
 	template <typename F, typename = decltype(std::declval<F>()())>
 	void executeSync(F&& func) {
-		libv::Semaphore done;
+		libv::BinaryLatch done;
 		executeAsync([&done, f = std::forward<F>(func)]{
 			f();
 			done.raise();
