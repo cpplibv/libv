@@ -16,10 +16,6 @@ rename gl::GL to~ gl::GLstate
 add structured binding support for vec_t
 -- commit --
 
-hunt down GCC 7.0+ comments // only GCC 8+ will support filesystem :(
-FILESYSTEM_SUPPORT
--- commit --
-
 libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
 -- commit --
 

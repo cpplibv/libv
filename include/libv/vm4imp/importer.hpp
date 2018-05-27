@@ -5,8 +5,6 @@
 // std
 #include <optional>
 #include <string>
-#include <experimental/filesystem>
-namespace std { namespace filesystem = experimental::filesystem; } /*FILESYSTEM_SUPPORT*/
 
 
 namespace libv {

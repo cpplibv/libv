@@ -3,8 +3,7 @@
 #pragma once
 
 // std
-#include <experimental/filesystem>
-namespace std { namespace filesystem = experimental::filesystem; } /*FILESYSTEM_SUPPORT*/
+#include <filesystem>
 #include <fstream>
 #include <string_view>
 #include <system_error>
@@ -16,7 +15,7 @@ namespace libv {
 
 template <typename = void>
 void write_file_or_throw(const std::filesystem::path& filePath, std::string_view data) {
-	std::ofstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::out | std::ios_base::binary);
+	std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
 	if (!file)
 		throw std::system_error(errno, std::system_category(), fmt::format("Failed to open file: {}", filePath.string()));
@@ -32,7 +31,7 @@ void write_file_or_throw(const std::filesystem::path& filePath, std::string_view
 
 template <typename = void>
 void write_file(const std::filesystem::path& filePath, std::string_view data, std::error_code& ec) {
-	std::ofstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::out | std::ios_base::binary);
+	std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
 	if (!file) {
 		ec.assign(errno, std::system_category());

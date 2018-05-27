@@ -57,37 +57,12 @@ inline auto to_tuple_impl(T&&, std::integral_constant<size_t, 0>) noexcept {
 	return std::make_tuple();
 }
 
-// =================================================================================================
-// Workaround until GCC 7.2
-/*
 #define LIBV_TO_TUPLE_P(Z,N,_) , p ## N
 #define LIBV_TO_TUPLE_SPECIALIZATION(Z,N,_)                                                        \
 template <typename T>                                                                              \
 inline auto to_tuple_impl(T&& object, std::integral_constant<size_t, N + 1>) noexcept {            \
 		auto&& [p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil)] = object;                        \
 		return std::make_tuple(p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil));                  \
-}
-BOOST_PP_REPEAT(LIBV_TO_TUPLE_MAX, LIBV_TO_TUPLE_SPECIALIZATION, nil)
-
-#undef LIBV_TO_TUPLE_SPECIALIZATION
-#undef LIBV_TO_TUPLE_P
- */
-// =================================================================================================
-// GCC 7.1 Bug workaround version
-// https://gcc.gnu.org/bugzilla/show_bug.cgi?id=78939
-
-#define LIBV_TO_TUPLE_P(Z,N,_) , p ## N
-#define LIBV_TO_TUPLE_PC(Z,N,_) , const_cast<const decltype(p ## N)&>(p ## N)
-#define LIBV_TO_TUPLE_SPECIALIZATION(Z,N,_)                                                        \
-template <typename T>                                                                              \
-inline auto to_tuple_impl(const T& object, std::integral_constant<size_t, N + 1>) noexcept {       \
-	auto& [p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil)] = const_cast<T&>(object);             \
-	return std::make_tuple(p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_PC, nil));                     \
-}                                                                                                  \
-template <typename T>                                                                              \
-inline auto to_tuple_impl(T&& object, std::integral_constant<size_t, N + 1>) noexcept {            \
-	auto&& [p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil)] = object;                            \
-	return std::make_tuple(p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil));                      \
 }
 BOOST_PP_REPEAT(LIBV_TO_TUPLE_MAX, LIBV_TO_TUPLE_SPECIALIZATION, nil)
 

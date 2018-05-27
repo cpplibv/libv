@@ -502,7 +502,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_utility INTERFACE
-	LINK   ext_efsw stdc++fs Threads::Threads
+	LINK   ext_efsw Threads::Threads stdc++fs
 )
 
 wish_create_library(
@@ -513,7 +513,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_vm4imp STATIC
 	SOURCE src/libv/vm4imp/*.cpp
-	LINK   libv_log libv_vm4 ext_assimp stdc++fs
+	LINK   libv_log libv_vm4 ext_assimp
 )
 
 wish_end_group()
@@ -540,19 +540,19 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_gl
 	SOURCE sandbox/libv_gl_main.cpp
-	LINK   libv_log libv_gl ext_glfw stdc++fs
+	LINK   libv_log libv_gl libv_utility ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl2
 	SOURCE sandbox/libv_gl_main2.cpp
-	LINK   libv_log libv_gl ext_glfw stdc++fs
+	LINK   libv_log libv_gl libv_utility ext_glfw
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_gl3
 	SOURCE sandbox/libv_gl_main3.cpp
-	LINK   libv_log libv_gl ext_boost ext_glfw stdc++fs
+	LINK   libv_log libv_gl libv_utility ext_boost ext_glfw
 )
 
 wish_create_executable(
