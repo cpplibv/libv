@@ -24,7 +24,7 @@ void glfwCallback(GLFWwindow* window, Args... args) {
 	try {
 		(windowHandlers.at(window)->*que).fire(E(args...));
 	} catch (const std::out_of_range& e) {
-		LIBV_LOG_FRAME_EVENT_ERROR("Unhandled event. No event handler (frame) assigned to this GLFW window.");
+		log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 
@@ -35,7 +35,7 @@ void glfwMousePositionCallback(GLFWwindow* window, double x, double y) {
 		auto size = frame->getSize();
 		(frame->*que).fire(E(x, size.y - y - 1));
 	} catch (const std::out_of_range& e) {
-		LIBV_LOG_FRAME_EVENT_ERROR("Unhandled event. No event handler (frame) assigned to this GLFW window.");
+		log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 	}
 }
 

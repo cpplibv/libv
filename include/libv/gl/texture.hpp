@@ -55,7 +55,7 @@ public:
 		glGenTextures(1, &textureID);
 		LIBV_GL_DEBUG_CHECK();
 		if (textureID == invalidID)
-			LIBV_LOG_GL_ERROR("Failed to create texture.");
+			log_gl.error("Failed to create texture.");
 	}
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
@@ -330,7 +330,7 @@ struct Sampler {
 //inline void emulateStorage1D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width) {
 //	glGenTextures(1, &textureID);
 //	if (textureID == invalidID)
-//		LIBV_LOG_GL_ERROR("Failed to create 1D texture", to_string(type));
+//		log_gl.error("Failed to create 1D texture", to_string(type));
 //
 //	// Simulating glTexStorage1D for pre 4.2 compatibility
 //	DataType type = compatableDefaultType(target);
@@ -350,7 +350,7 @@ struct Sampler {
 //inline void emulateStorage2D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height) {
 //	glGenTextures(1, &textureID);
 //	if (textureID == invalidID)
-//		LIBV_LOG_GL_ERROR("Failed to create 2D texture", to_string(type));
+//		log_gl.error("Failed to create 2D texture", to_string(type));
 //
 //	// Simulating glTexStorage2D for pre 4.2 compatibility
 //	DataType type = compatableDefaultType(target);
@@ -389,7 +389,7 @@ struct Sampler {
 //inline void emulateStorage3D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height, uint32_t depth) {
 //	glGenTextures(3, &textureID);
 //	if (textureID == invalidID)
-//		LIBV_LOG_GL_ERROR("Failed to create 2D texture", to_string(type));
+//		log_gl.error("Failed to create 2D texture", to_string(type));
 //
 //	// Simulating glTexStorage3D for pre 4.2 compatibility
 //	DataType type = compatableDefaultType(target);

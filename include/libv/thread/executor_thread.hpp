@@ -57,7 +57,7 @@ public:
 			if (thread.joinable())
 				thread.join();
 		} catch (std::system_error& ex) {
-			LIBV_LOG_LIBV_ERROR("Exception during joining ExecutorThread {}: {}", name, ex.what());
+			log.error("Exception during joining ExecutorThread {}: {}", name, ex.what());
 		}
 	}
 
@@ -81,7 +81,7 @@ private:
 			try {
 				task();
 			} catch (std::exception& ex) {
-				LIBV_LOG_LIBV_ERROR("Exception occurred in {} ExecutorThread: {}", name, ex.what());
+				log.error("Exception occurred in {} ExecutorThread: {}", name, ex.what());
 			}
 		}
 	}

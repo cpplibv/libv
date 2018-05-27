@@ -28,8 +28,14 @@
 
 // -------------------------------------------------------------------------------------------------
 
+inline libv::LoggerModule log_sandbox{libv::logger, "libv.sandbox"};
+
 constexpr uint32_t WINDOW_HEIGHT = 600;
 constexpr uint32_t WINDOW_WIDTH = 900;
+
+void checkGLSupport(const char* ext) {
+	log_sandbox.info("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -56,12 +62,12 @@ struct Sandbox {
 	libv::gl::Uniform_mat4f uniformTest1MVPmat;
 
 	Sandbox() {
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
-//		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+//		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
 
 		// TODO P1: These should be queue functions, or not?, Maybe I do need to setup some defaults, and that is remote...
 		//			But! I will need a nicer syntax, so make gl private
@@ -125,7 +131,7 @@ struct Sandbox {
 		programTest1.createLink(shaderTest1Fragment, shaderTest1Vertex);
 		programTest1.assign(uniformTest1MVPmat, "MVPmat");
 
-		LIBV_GL_CHECK();
+		libv::gl::checkGL();
 	}
 
 	void render() {
@@ -159,7 +165,7 @@ struct Sandbox {
 		uniformTest1MVPmat = remote.gl.mvp();
 		remote.execute(std::move(queue));
 
-		LIBV_GL_CHECK();
+		libv::gl::checkGL();
 	}
 
 	~Sandbox() {
@@ -169,30 +175,30 @@ struct Sandbox {
 
 // Runner ------------------------------------------------------------------------------------------
 
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
+#define CHECK_GLEW_SUPPORT(ext) log_sandbox.info("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
 
 void initGLEW() {
 	if (GLenum err = glewInit() != GLEW_OK)
-		LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
+		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
 
-	LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
-	LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
-	LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
+	log_sandbox.info("GL Vendor: {}", glGetString(GL_VENDOR));
+	log_sandbox.info("GL Renderer: {}", glGetString(GL_RENDERER));
+	log_sandbox.info("GL Version: {}", glGetString(GL_VERSION));
 
-	CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
-	CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
-	CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
-	CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
-	CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
-	CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
-	CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
+	checkGLSupport("GL_VERSION_3_3");
+	checkGLSupport("GL_VERSION_4_5");
+	checkGLSupport("GL_ARB_direct_state_access");
+	checkGLSupport("GL_ARB_draw_elements_base_vertex");
+	checkGLSupport("GL_ARB_gpu_shader_fp64");
+	checkGLSupport("GL_ARB_sampler_objects");
+	checkGLSupport("GL_ARB_vertex_attrib_64bit");
+	checkGLSupport("GL_ARB_vertex_attrib_binding");
 
-	LIBV_GL_CHECK();
+	libv::gl::checkGL();
 }
 
 static void error_callback(int code, const char* description) {
-	LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
+	log_sandbox.error("GLFW {}: {}", code, description);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -205,7 +211,7 @@ int main(void) {
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		LIBV_LOG_LIBV_ERROR("Failed to initialize GLFW.");
+		log_sandbox.error("Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -219,7 +225,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		LIBV_LOG_LIBV_ERROR("Failed to create GLFW window.");
+		log_sandbox.error("Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -240,7 +246,7 @@ int main(void) {
 		size_t time = 0, i = 0;
 
 		while (running && !glfwWindowShouldClose(window)) {
-			LIBV_GL_CHECK();
+			libv::gl::checkGL();
 			sandbox.render();
 
 			glfwSwapBuffers(window);
@@ -249,7 +255,7 @@ int main(void) {
 			i++;
 			time += timer.time().count();
 			if (time > 1000000000) {
-				LIBV_LOG_LIBV_INFO("FPS: {}", i);
+				log_sandbox.info("FPS: {}", i);
 				i = 0;
 				time -= 1000000000;
 			}

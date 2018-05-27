@@ -68,7 +68,7 @@ public:
 		programID = glCreateProgram();
 		LIBV_GL_DEBUG_CHECK();
 		if (programID == 0)
-			LIBV_LOG_GL_ERROR("Failed to create program");
+			log_gl.error("Failed to create program");
 	}
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
@@ -84,7 +84,7 @@ public:
 		glLinkProgram(programID);
 		LIBV_GL_DEBUG_CHECK();
 		if (!status())
-			LIBV_LOG_GL_ERROR("Failed to link program:\n{}", info());
+			log_gl.error("Failed to link program:\n{}", info());
 	}
 	inline void link(const Shader& vertex, const Shader& fragment, const Shader& geometry) {
 		LIBV_GL_DEBUG_ASSERT(programID != 0);
@@ -95,7 +95,7 @@ public:
 		glLinkProgram(programID);
 		LIBV_GL_DEBUG_CHECK();
 		if (!status())
-			LIBV_LOG_GL_ERROR("Failed to link program:\n{}", info());
+			log_gl.error("Failed to link program:\n{}", info());
 	}
 	inline void createLink(const Shader& vertex, const Shader& fragment) {
 		create();

@@ -20,10 +20,17 @@
 #include <libv/gl/texture.hpp>
 #include <libv/gl/vertex_buffer.hpp>
 
+
 // -------------------------------------------------------------------------------------------------
+
+inline libv::LoggerModule log_sandbox{libv::logger, "libv.sandbox"};
 
 constexpr uint32_t WINDOW_HEIGHT = 600;
 constexpr uint32_t WINDOW_WIDTH = 900;
+
+void checkGLSupport(const char* ext) {
+	log_sandbox.info("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -77,31 +84,30 @@ struct Sandbox {
 	};
 
 	Sandbox() {
-#define CHECK_GLEW_SUPPORT(ext) LIBV_LOG_LIBV_INFO("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
 		if (GLenum err = glewInit() != GLEW_OK)
-			LIBV_LOG_LIBV_ERROR("Failed to initialize glew: {}", glewGetErrorString(err));
+			log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
 
-		LIBV_LOG_LIBV_INFO("GL Vendor: {}", glGetString(GL_VENDOR));
-		LIBV_LOG_LIBV_INFO("GL Renderer: {}", glGetString(GL_RENDERER));
-		LIBV_LOG_LIBV_INFO("GL Version: {}", glGetString(GL_VERSION));
+		log_sandbox.info("GL Vendor: {}", glGetString(GL_VENDOR));
+		log_sandbox.info("GL Renderer: {}", glGetString(GL_RENDERER));
+		log_sandbox.info("GL Version: {}", glGetString(GL_VERSION));
 
-		CHECK_GLEW_SUPPORT(GL_VERSION_3_3);
-		CHECK_GLEW_SUPPORT(GL_VERSION_4_5);
-		CHECK_GLEW_SUPPORT(GL_ARB_direct_state_access);
-		CHECK_GLEW_SUPPORT(GL_ARB_draw_elements_base_vertex);
-		CHECK_GLEW_SUPPORT(GL_ARB_gpu_shader_fp64);
-		CHECK_GLEW_SUPPORT(GL_ARB_sampler_objects);
-		CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_64bit);
-		CHECK_GLEW_SUPPORT(GL_ARB_vertex_attrib_binding);
+		checkGLSupport("GL_VERSION_3_3");
+		checkGLSupport("GL_VERSION_4_5");
+		checkGLSupport("GL_ARB_direct_state_access");
+		checkGLSupport("GL_ARB_draw_elements_base_vertex");
+		checkGLSupport("GL_ARB_gpu_shader_fp64");
+		checkGLSupport("GL_ARB_sampler_objects");
+		checkGLSupport("GL_ARB_vertex_attrib_64bit");
+		checkGLSupport("GL_ARB_vertex_attrib_binding");
 
-		LIBV_GL_CHECK();
+		libv::gl::checkGL();
 
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
-		LIBV_LOG_LIBV_INFO("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BLOCK_SIZE", gl.getMaxUniformBlockSize());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_UNIFORM_BUFFER_BINDINGS", gl.getMaxUniformBufferBindings());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_ATTRIBS", gl.getMaxVertexAttribs());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_VERTEX_UNIFORM_COMPONENTS", gl.getMaxVertexUniformComponents());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS", gl.getMaxCombinedTextureImageUnits());
+		log_sandbox.info("{:46} [ {:9} ]", "GL_MAX_TEXTURE_SIZE", gl.getMaxTextureSize());
 
 		gl.capability.blend.enable();
 		gl.depthFunction.less();
@@ -255,7 +261,7 @@ struct Sandbox {
 			vertexArray.drawElements(libv::gl::Primitive::Triangles, 6, 0);
 		}
 
-		LIBV_GL_CHECK();
+		libv::gl::checkGL();
 	}
 };
 
@@ -267,11 +273,11 @@ int main(void) {
 	std::cout << libv::logger;
 
 	glfwSetErrorCallback([](int code, const char* description) {
-		LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);
+		log_sandbox.error("GLFW {}: {}", code, description);
 	});
 
 	if (!glfwInit()) {
-		LIBV_LOG_LIBV_ERROR("Failed to initialize GLFW.");
+		log_sandbox.error("Failed to initialize GLFW.");
 		exit(EXIT_FAILURE);
 	}
 
@@ -285,7 +291,7 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		LIBV_LOG_LIBV_ERROR("Failed to create GLFW window.");
+		log_sandbox.error("Failed to create GLFW window.");
 		exit(EXIT_FAILURE);
 	}
 	glfwSetWindowPos(window, 200, 200);
@@ -310,7 +316,7 @@ int main(void) {
 		size_t i = 0;
 
 		while (running && !glfwWindowShouldClose(window)) {
-			LIBV_GL_CHECK();
+			libv::gl::checkGL();
 			time_outside += timer.time();
 
 			sandbox.render();
@@ -326,7 +332,7 @@ int main(void) {
 			if (print_timer.elapsed() > std::chrono::seconds(1)) {
 				print_timer.adjust(std::chrono::seconds(1));
 
-				LIBV_LOG_LIBV_INFO("Frames: {}, Poll: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
+				log_sandbox.info("Frames: {}, Poll: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
 						i,
 						time_poll.count() / 1000.f / i,
 						time_render.count() / 1000.f / i,
@@ -343,7 +349,7 @@ int main(void) {
 			}
 		}
 	}
-	LIBV_GL_CHECK();
+	libv::gl::checkGL();
 	glfwMakeContextCurrent(nullptr);
 	glfwDestroyWindow(window);
 	glfwTerminate();

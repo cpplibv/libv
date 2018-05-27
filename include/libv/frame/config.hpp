@@ -6,7 +6,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P4: include a header that has LIBV_GL_CHECK
+// TODO P4: include a header that has checkGL
 // TODO P5: find a good place for these assert functions something something assert.hpp
 // TODO P5: implement assert context
 // TODO P5: implement assert thread
@@ -20,7 +20,7 @@
 #    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
 #    define LIBV_FRAME_DEBUG_ASSERT_STATIC(X, M) static_assert((X), (M))
 #    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
-#    define LIBV_FRAME_DEBUG_CHECK_GL() LIBV_GL_CHECK()
+#    define LIBV_FRAME_DEBUG_CHECK_GL() checkGL()
 #else
 #    define LIBV_FRAME_DEBUG_ASSERT(X) {}
 #    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}

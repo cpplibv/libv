@@ -389,13 +389,6 @@ public:
 inline Logger logger;
 inline LoggerModule log{libv::logger, "libv"};
 
-#define LIBV_LOG_LIBV_TRACE(...) ::libv::log.trace(__VA_ARGS__)
-#define LIBV_LOG_LIBV_DEBUG(...) ::libv::log.debug(__VA_ARGS__)
-#define LIBV_LOG_LIBV_INFO( ...) ::libv::log.info (__VA_ARGS__)
-#define LIBV_LOG_LIBV_WARN( ...) ::libv::log.warn (__VA_ARGS__)
-#define LIBV_LOG_LIBV_ERROR(...) ::libv::log.error(__VA_ARGS__)
-#define LIBV_LOG_LIBV_FATAL(...) ::libv::log.fatal(__VA_ARGS__)
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv

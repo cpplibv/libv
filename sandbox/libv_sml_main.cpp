@@ -13,7 +13,7 @@
 struct Sender {
 	template<class TMsg>
 	constexpr void send(const TMsg& msg) {
-		LIBV_LOG_LIBV_INFO("send: {}", msg.id);
+		libv::log.info("send: {}", msg.id);
 	}
 };
 

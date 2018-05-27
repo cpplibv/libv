@@ -36,7 +36,7 @@ public:
 		glGenBuffers(1, &id_);
 		LIBV_GL_DEBUG_CHECK();
 		if (id_ == 0)
-			LIBV_LOG_GL_ERROR("Failed to create VertexBuffer");
+			log_gl.error("Failed to create VertexBuffer");
 	}
 	inline void destroy() {
 		LIBV_GL_DEBUG_ASSERT(id_ != 0);
@@ -109,7 +109,7 @@ public:
 		glGenVertexArrays(1, &id_);
 		LIBV_GL_DEBUG_CHECK();
 		if (id_ == 0)
-			LIBV_LOG_GL_ERROR("Failed to create VertexArray");
+			log_gl.error("Failed to create VertexArray");
 	}
 
 	inline void destroy() {

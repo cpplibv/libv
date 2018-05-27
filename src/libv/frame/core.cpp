@@ -56,13 +56,13 @@ private:
 
 private:
 	void init() {
-		LIBV_LOG_FRAME_CORE_INFO("Initialize Core / GLFW Context");
+		log_core.info("Initialize Core / GLFW Context");
 		glfwSetErrorCallback([] (int code, const char* msg) {
 			log_glfw.error("{} - {}", code, msg);
 		});
 
 		if (!glfwInit())
-			return LIBV_LOG_FRAME_CORE_ERROR("Failed to initialize GLFW");
+			return log_core.error("Failed to initialize GLFW");
 
 		glfwSetMonitorCallback(glfwMonitorCallback);
 
@@ -84,7 +84,7 @@ private:
 	}
 
 	void term() {
-		LIBV_LOG_FRAME_CORE_INFO("Terminate Core / GLFW Context");
+		log_core.info("Terminate Core / GLFW Context");
 		glfwSetMonitorCallback(nullptr);
 		glfwTerminate();
 		glfwSetErrorCallback(nullptr);
@@ -151,7 +151,7 @@ CoreProxy::~CoreProxy() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdCoreCreate() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Create window for frame {}", title);
+	log_core.debug("Create window for frame {}", title);
 
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, openGLVersionMajor);
@@ -167,12 +167,12 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 
 	if (displayMode == DISPLAY_MODE_FULLSCREEN) {
-		LIBV_LOG_FRAME_CORE_INFO("Switching frame {} to full screen mode", title);
+		log_core.info("Switching frame {} to full screen mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 		window = glfwCreateWindow(mode->width, mode->height, title.c_str(), glfwGetPrimaryMonitor(), shareWindow);
 	} else if (displayMode == DISPLAY_MODE_BORDERLESS) {
-		LIBV_LOG_FRAME_CORE_INFO("Switching frame {} to borderless mode", title);
+		log_core.info("Switching frame {} to borderless mode", title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
 
@@ -185,7 +185,7 @@ void Frame::cmdCoreCreate() {
 		window = glfwCreateWindow(size.x, size.y, title.c_str(), nullptr, shareWindow);
 	}
 	if (!window) {
-		LIBV_LOG_FRAME_CORE_ERROR("GLFW window creation failed");
+		log_core.error("GLFW window creation failed");
 		return;
 	}
 
@@ -198,11 +198,11 @@ void Frame::cmdCoreCreate() {
 
 	registerEventCallbacks(this, window);
 
-	LIBV_LOG_FRAME_CORE_DEBUG("Window creation was successful");
+	log_core.debug("Window creation was successful");
 }
 
 void Frame::cmdCoreRecreate() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Recreate window for frame {}", title);
+	log_core.debug("Recreate window for frame {}", title);
 	assert(window && "Requires a valid window");
 
 	shareWindow = window;
@@ -210,12 +210,12 @@ void Frame::cmdCoreRecreate() {
 
 	cmdCoreCreate();
 	if (!window) {
-		LIBV_LOG_FRAME_CORE_ERROR("Rollback to previous window");
+		log_core.error("Rollback to previous window");
 		window = shareWindow;
 		shareWindow = nullptr;
 		return;
 	} else {
-		LIBV_LOG_FRAME_CORE_TRACE("Destroy previous window");
+		log_core.trace("Destroy previous window");
 		unregisterEventCallbacks(shareWindow);
 		glfwDestroyWindow(shareWindow);
 		shareWindow = nullptr;
@@ -225,7 +225,7 @@ void Frame::cmdCoreRecreate() {
 }
 
 void Frame::cmdCoreDestroy() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Destroy window for frame {}", title);
+	log_core.debug("Destroy window for frame {}", title);
 
 	if (window) {
 		unregisterEventCallbacks(window);
@@ -235,8 +235,8 @@ void Frame::cmdCoreDestroy() {
 }
 
 void Frame::cmdCoreUpdateDisplayMode() {
-	LIBV_LOG_FRAME_CORE_DEBUG("Update display mode for frame {}", title);
-	LIBV_LOG_FRAME_CORE_ERROR("Not Implemented Yet"); // TODO P5: cmdCoreUpdateDisplayMode
+	log_core.debug("Update display mode for frame {}", title);
+	log_core.error("Not Implemented Yet"); // TODO P5: cmdCoreUpdateDisplayMode
 }
 
 // -------------------------------------------------------------------------------------------------

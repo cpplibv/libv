@@ -220,7 +220,7 @@ void importGeometry(Model& model, const aiScene* scene) {
 		for (unsigned int j = 0; j < mesh->mNumFaces; j++) {
 			const aiFace& face = mesh->mFaces[j];
 			if (face.mNumIndices != 3) {
-				LIBV_LOG_VM4_WARN("Illegal number of vertex {} in a face of a mesh: {}", face.mNumIndices, mesh->mName.C_Str());
+				log_vm4.warn("Illegal number of vertex {} in a face of a mesh: {}", face.mNumIndices, mesh->mName.C_Str());
 				continue;
 			}
 			model.indices.push_back(face.mIndices[0]);
@@ -257,7 +257,7 @@ std::optional<Model> import(const std::string& filePath) {
 	const aiScene* scene = importer.ReadFile(filePath, aiProcessPreset_TargetRealtime_MaxQuality);
 
 	if (!scene) {
-		LIBV_LOG_VM4_ERROR("Failed to import model {}: {}", filePath, importer.GetErrorString());
+		log_vm4.error("Failed to import model {}: {}", filePath, importer.GetErrorString());
 		return {};
 	}
 

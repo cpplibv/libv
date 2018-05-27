@@ -460,7 +460,7 @@ Model::Model(const char* data, size_t size, const std::string& name) :
 
 void Model::init(const char* data, size_t size) {
 	if (!model.load(data, size)) {
-		LIBV_LOG_GL_ERROR("Failed to load model: {}", name);
+		log_gl.error("Failed to load model: {}", name);
 		return;
 	}
 	loadGL();
@@ -473,7 +473,7 @@ Model::~Model() {
 // -------------------------------------------------------------------------------------------------
 
 void Model::loadGL() {
-	LIBV_LOG_GL_TRACE("GL Loading model: {}", name);
+	log_gl.trace("GL Loading model: {}", name);
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo_vertex);
@@ -483,7 +483,7 @@ void Model::loadGL() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
 	glBufferData(GL_ARRAY_BUFFER, sizeof (vm3::Vertex) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
-	LIBV_GL_CHECK();
+	checkGL();
 
 	enableVertexAttribArray(Attribute::position);
 	vertexAttribPointer(Attribute::position, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, position));
@@ -499,21 +499,21 @@ void Model::loadGL() {
 	vertexAttribIPointer(Attribute::boneindices, 4, VertexAttribType::INT, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneID));
 	enableVertexAttribArray(Attribute::boneweight);
 	vertexAttribPointer(Attribute::boneweight, 4, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneWieght));
-	LIBV_GL_CHECK();
+	checkGL();
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_index);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof (model.indices[0]) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
-	LIBV_GL_CHECK();
+	checkGL();
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	LIBV_GL_CHECK();
+	checkGL();
 }
 
 void Model::unloadGL() {
-	LIBV_LOG_GL_TRACE("GL Unloading model: {}", name);
+	log_gl.trace("GL Unloading model: {}", name);
 
 	glDeleteBuffers(1, &vbo_index);
 	glDeleteBuffers(1, &vbo_vertex);
@@ -522,12 +522,12 @@ void Model::unloadGL() {
 
 void Model::render(libv::gl::GL& gl) {
 	glBindVertexArray(vao);
-	LIBV_GL_CHECK();
+	checkGL();
 
 	renderNode(model.lods[0].rootNodeID, gl);
 
 	glBindVertexArray(0);
-	LIBV_GL_CHECK();
+	checkGL();
 }
 
 void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
@@ -550,7 +550,7 @@ void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 				GL_UNSIGNED_INT,
 				(void*) (sizeof (GLuint) * model.meshes[meshID].baseIndex),
 				model.meshes[meshID].baseVertex);
-		LIBV_GL_CHECK();
+		checkGL();
 	}
 
 	for (auto childID : model.nodes[id].childrenIDs) {
@@ -558,7 +558,7 @@ void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
 	}
 
 	gl.popMatrixModel();
-	LIBV_GL_CHECK();
+	checkGL();
 }
 
 

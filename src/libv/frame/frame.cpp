@@ -35,13 +35,13 @@ const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
-	LIBV_LOG_FRAME_TRACE("Close default frame {}", title);
+	log_frame.trace("Close default frame {}", title);
 	if (window)
 		glfwSetWindowShouldClose(window, true);
 }
 
 void Frame::closeForce() {
-	LIBV_LOG_FRAME_TRACE("Close force frame {}", title);
+	log_frame.trace("Close force frame {}", title);
 	forcedClose = true;
 }
 
@@ -95,7 +95,7 @@ bool Frame::isRefreshSkipable() {
 
 void Frame::show() {
 	context.executeAsync([this] {
-		LIBV_LOG_FRAME_TRACE("Show frame {}", title);
+		log_frame.trace("Show frame {}", title);
 		if (!window) {
 			cmdFrameCreate();
 		}
@@ -108,7 +108,7 @@ void Frame::show() {
 
 void Frame::hide() {
 	context.executeAsync([this] {
-		LIBV_LOG_FRAME_TRACE("Hide frame {}", title);
+		log_frame.trace("Hide frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwHideWindow, window));
 			hidden = true;
@@ -118,7 +118,7 @@ void Frame::hide() {
 
 void Frame::restore() {
 	context.executeAsync([this] {
-		LIBV_LOG_FRAME_TRACE("Restore frame {}", title);
+		log_frame.trace("Restore frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwRestoreWindow, window));
 			minimized = false;
@@ -128,7 +128,7 @@ void Frame::restore() {
 
 void Frame::minimize() {
 	context.executeAsync([this] {
-		LIBV_LOG_FRAME_TRACE("Minimize frame {}", title);
+		log_frame.trace("Minimize frame {}", title);
 		if (window) {
 			core.exec(std::bind(glfwIconifyWindow, window));
 			minimized = true;
@@ -140,7 +140,7 @@ void Frame::minimize() {
 
 void Frame::setOpenGLVersion(int major, int minor) {
 	context.executeAsync([this, major, minor] {
-		LIBV_LOG_FRAME_TRACE("Set frame OpenGLVersion of {} to {}.{}", title, major, minor);
+		log_frame.trace("Set frame OpenGLVersion of {} to {}.{}", title, major, minor);
 		this->openGLVersionMajor = major;
 		this->openGLVersionMinor = minor;
 		if (window)
@@ -150,7 +150,7 @@ void Frame::setOpenGLVersion(int major, int minor) {
 
 void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 	context.executeAsync([this, profile] {
-		LIBV_LOG_FRAME_TRACE("Set frame OpenGLProfile of {} to {}", title, profile);
+		log_frame.trace("Set frame OpenGLProfile of {} to {}", title, profile);
 		this->openGLProfile = profile;
 		if (window)
 			cmdFrameRecreate();
@@ -159,7 +159,7 @@ void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
 
 void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 	context.executeAsync([this, samples] {
-		LIBV_LOG_FRAME_TRACE("Set frame OpenGLSamples of {} to {}", title, samples);
+		log_frame.trace("Set frame OpenGLSamples of {} to {}", title, samples);
 		this->openGLSamples = samples;
 		if (window)
 			cmdFrameRecreate();
@@ -168,7 +168,7 @@ void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
 
 void Frame::setOpenGLRefreshRate(int rate) {
 	context.executeAsync([this, rate] {
-		LIBV_LOG_FRAME_TRACE("Set frame OpenGLRefreshRate of {} to {}", title, rate);
+		log_frame.trace("Set frame OpenGLRefreshRate of {} to {}", title, rate);
 		this->openGLRefreshRate = rate;
 		if (window)
 			cmdFrameRecreate();
@@ -176,13 +176,13 @@ void Frame::setOpenGLRefreshRate(int rate) {
 }
 
 void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
-	LIBV_LOG_FRAME_TRACE("Set frame CloseOperation of {} to {}", title, operation);
+	log_frame.trace("Set frame CloseOperation of {} to {}", title, operation);
 	defaultCloseOperation = operation;
 }
 
 void Frame::setDecoration(bool decorated) {
 	context.executeAsync([this, decorated] {
-		LIBV_LOG_FRAME_TRACE("Set frame Decoration of {} to {}", title, decorated);
+		log_frame.trace("Set frame Decoration of {} to {}", title, decorated);
 		this->decorated = decorated;
 		if (window)
 			cmdFrameRecreate();
@@ -191,7 +191,7 @@ void Frame::setDecoration(bool decorated) {
 
 void Frame::setDisplayMode(const TypeDisplayMode& mode) {
 	context.executeAsync([this, mode] {
-		LIBV_LOG_FRAME_TRACE("Set frame DisplayMode of {} to {}", title, mode);
+		log_frame.trace("Set frame DisplayMode of {} to {}", title, mode);
 		this->displayMode = mode;
 		if (window)
 			cmdFrameRecreate();
@@ -204,7 +204,7 @@ void Frame::setPosition(int x, int y) {
 
 void Frame::setPosition(vec2i newpos) {
 	context.executeAsync([this, newpos] {
-		LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {}", title, newpos.x, newpos.y);
+		log_frame.trace("Set frame Position of {} to {}, {}", title, newpos.x, newpos.y);
 		this->position = newpos;
 		if (window)
 			core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -217,7 +217,7 @@ void Frame::setPosition(FramePosition pos) {
 		context.executeAsync([this] {
 			auto& monitor = getCurrentMonitor();
 			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
-			LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {} as center of current monitor", title, newpos.x, newpos.y);
+			log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
 				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -227,7 +227,7 @@ void Frame::setPosition(FramePosition pos) {
 		context.executeAsync([this] {
 			auto& monitor = Monitor::getPrimaryMonitor();
 			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
-			LIBV_LOG_FRAME_TRACE("Set frame Position of {} to {}, {} as center of primary monitor", title, newpos.x, newpos.y);
+			log_frame.trace("Set frame Position of {} to {}, {} as center of primary monitor", title, newpos.x, newpos.y);
 			this->position = newpos;
 			if (window)
 				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
@@ -238,7 +238,7 @@ void Frame::setPosition(FramePosition pos) {
 
 void Frame::setResizable(bool resizable) {
 	context.executeAsync([this, resizable] {
-		LIBV_LOG_FRAME_TRACE("Set frame Resizable of {} to {}", title, resizable);
+		log_frame.trace("Set frame Resizable of {} to {}", title, resizable);
 		this->resizable = resizable;
 		if (window)
 			cmdFrameRecreate();
@@ -251,7 +251,7 @@ void Frame::setSize(int x, int y) {
 
 void Frame::setSize(vec2i newsize) {
 	context.executeAsync([this, newsize] {
-		LIBV_LOG_FRAME_TRACE("Set frame Size of {} to {}, {}", title, newsize.x, newsize.y);
+		log_frame.trace("Set frame Size of {} to {}, {}", title, newsize.x, newsize.y);
 		size = newsize;
 		if (window)
 			core.exec(std::bind(glfwSetWindowSize, window, size.x, position.y));
@@ -260,7 +260,7 @@ void Frame::setSize(vec2i newsize) {
 
 void Frame::setTitle(const std::string& title) {
 	context.executeAsync([this, title] {
-		LIBV_LOG_FRAME_TRACE("Set frame Title of {} to {}", this->title, title);
+		log_frame.trace("Set frame Title of {} to {}", this->title, title);
 		this->title = title;
 		if (window)
 			core.exec([this, title] {
@@ -384,7 +384,7 @@ void Frame::cmdFrameDestroy() {
 // Frame Loop --------------------------------------------------------------------------------------
 
 void Frame::loopInit() {
-	LIBV_LOG_FRAME_DEBUG("Frame entering loop");
+	log_frame.debug("Frame entering loop");
 
 	context.executeAsync(std::bind(&Frame::loop, this));
 }
@@ -406,18 +406,18 @@ void Frame::loop() {
 }
 
 void Frame::loopTerminate() {
-	LIBV_LOG_FRAME_DEBUG("Frame exiting loop");
+	log_frame.debug("Frame exiting loop");
 	cmdFrameDestroy();
 	context.stop();
 }
 
 void Frame::contextInit() {
-	LIBV_LOG_FRAME_DEBUG("Frame context initializing");
+	log_frame.debug("Frame context initializing");
 	onContextInitialization.fire(EventContextInitialization());
 }
 
 void Frame::contextTerminate() {
-	LIBV_LOG_FRAME_DEBUG("Frame context terminating");
+	log_frame.debug("Frame context terminating");
 	onContextTerminate.fire(EventContextTerminate());
 }
 

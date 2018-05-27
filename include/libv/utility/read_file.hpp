@@ -21,7 +21,7 @@ std::string read_file(const std::filesystem::path& filePath) {
 	std::ifstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::in | std::ios_base::binary);
 
 	if (!file) {
-		LIBV_LOG_LIBV_ERROR("Failed to open file: {}", filePath.string());
+		log.error("Failed to open file: {}", filePath.string());
 		return result;
 	}
 
