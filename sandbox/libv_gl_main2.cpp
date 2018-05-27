@@ -73,11 +73,6 @@ struct Sandbox {
 	};
 
 	Sandbox() {
-#define CHECK_GLEW_SUPPORT(ext) log_sandbox.info("{:46} [{}]", #ext, glewIsSupported(#ext) ? " SUPPORTED " : "UNSUPPORTED")
-
-		if (GLenum err = glewInit() != GLEW_OK)
-			log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
 		log_sandbox.info("GL Vendor: {}", glGetString(GL_VENDOR));
 		log_sandbox.info("GL Renderer: {}", glGetString(GL_RENDERER));
 		log_sandbox.info("GL Version: {}", glGetString(GL_VERSION));
@@ -290,6 +285,10 @@ int main(void) {
 	});
 	glfwSwapInterval(1);
 
+	// TODO P1: Make same fix for gl3 sandbox
+	// TODO P1: Make glew init part of libv.gl
+	if (GLenum err = glewInit() != GLEW_OK)
+		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
 	{
 		Sandbox sandbox;
 

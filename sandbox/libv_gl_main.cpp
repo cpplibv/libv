@@ -84,9 +84,6 @@ struct Sandbox {
 	};
 
 	Sandbox() {
-		if (GLenum err = glewInit() != GLEW_OK)
-			log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
 		log_sandbox.info("GL Vendor: {}", glGetString(GL_VENDOR));
 		log_sandbox.info("GL Renderer: {}", glGetString(GL_RENDERER));
 		log_sandbox.info("GL Version: {}", glGetString(GL_VERSION));
@@ -303,6 +300,8 @@ int main(void) {
 	});
 	glfwSwapInterval(1);
 
+	if (GLenum err = glewInit() != GLEW_OK)
+		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
 	{
 		Sandbox sandbox;
 
