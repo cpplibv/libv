@@ -41,6 +41,10 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+#ifndef LIBV_SHORT_PATH_CUTOFF
+#    define LIBV_SHORT_PATH_CUTOFF 0
+#endif
+
 class Logger {
 public:
 	enum class Severity {
