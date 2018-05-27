@@ -31,6 +31,12 @@ std::vector<ABCDE> r2;
 int main(int, char**) {
 	libv::Timer timer;
 
+// IDEA: es.range<...>() could yield an iterator pair
+//		libv::ecs::System es;
+//		for (auto& [a, b, c, d] : es.range<A, B, C, D>()) {
+//			// ...
+//		}
+
 	{
 		libv::ecs::System es;
 

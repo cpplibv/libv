@@ -1,7 +1,7 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
 // ext
-#include <fmt/format.h>
+#include <fmt/printf.h>
 // libv
 #include <libv/serialization/archive/binary.hpp>
 #include <libv/serialization/archive/json.hpp>
@@ -20,7 +20,7 @@
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char **) {
-	std::cout << libv::log;
+	std::cout << libv::logger;
 
 	const auto model = libv::vm4::import("res/model/fighter_01_eltanin.dae");
 

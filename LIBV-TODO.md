@@ -49,6 +49,7 @@ cpp.proposal: namespace :: {} - a way to open the global :: namespace from any o
 cpp.proposal: namespace ::std {} - a way to open any namespace given absolute path from any other namespace
 cpp: clarify template vs auto type deduction rules
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
+cpp: (adaptive) radix tree - O(1) lookup
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 frame.core: remove core
 frame: Move frame from disconnected monitor

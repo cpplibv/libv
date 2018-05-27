@@ -58,7 +58,7 @@ public:
 };
 
 int main(int, char**) {
-	std::cout << libv::log;
+	std::cout << libv::logger;
 
 //	libv::log.allow("libv.frame.event");
 //	libv::log.deny();

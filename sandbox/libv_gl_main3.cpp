@@ -200,7 +200,7 @@ static void error_callback(int code, const char* description) {
 auto running = std::atomic_bool{true};
 
 int main(void) {
-	std::cout << libv::log;
+	std::cout << libv::logger;
 
 	glfwSetErrorCallback(error_callback);
 

@@ -57,7 +57,10 @@ private:
 private:
 	void init() {
 		LIBV_LOG_FRAME_CORE_INFO("Initialize Core / GLFW Context");
-		glfwSetErrorCallback(detail::errorCallbackGLFW);
+		glfwSetErrorCallback([] (int code, const char* msg) {
+			log_glfw.error("{} - {}", code, msg);
+		});
+
 		if (!glfwInit())
 			return LIBV_LOG_FRAME_CORE_ERROR("Failed to initialize GLFW");
 

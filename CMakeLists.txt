@@ -285,7 +285,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 4.1.0
+	GIT_TAG 5.0.0
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF

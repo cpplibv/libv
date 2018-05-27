@@ -264,7 +264,7 @@ struct Sandbox {
 auto running = std::atomic_bool{true};
 
 int main(void) {
-	std::cout << libv::log;
+	std::cout << libv::logger;
 
 	glfwSetErrorCallback([](int code, const char* description) {
 		LIBV_LOG_LIBV_ERROR("GLFW {}: {}", code, description);

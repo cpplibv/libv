@@ -45,7 +45,7 @@ struct tcp_release {
 };
 
 int main() {
-	std::cout << libv::log;
+	std::cout << libv::logger;
 
 	Sender s{};
 	boost::sml::sm<tcp_release> sm{s}; // pass dependencies via ctor
