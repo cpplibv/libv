@@ -74,6 +74,12 @@ public:
 	constexpr inline bool match_mask(const flag_enum mask) const noexcept {
 		return (value_ & mask.value_) == mask.value_;
 	}
+	constexpr inline bool match_full(const flag_enum other) const noexcept {
+		return value_ == other.value_;
+	}
+	constexpr inline bool match_any(const flag_enum other) const noexcept {
+		return value_ & other.value_;
+	}
 
 public:
 	constexpr inline explicit operator Underlying() const noexcept {

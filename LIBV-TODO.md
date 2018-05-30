@@ -41,12 +41,14 @@ pointer facade for: observer, cached, view, adaptive, etc...
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
-cpp.proposal: _ec - ec postfix exception free overload with error code as return value, (for constructors maybe operator bool or error getter, but that is far from perfect)
-cpp.proposal: operator^^ - logical XOR operator
-cpp.proposal: allow trailing comma for function arguments, its already there for arrays and enums
-cpp.proposal: implicit - keyword that would replace explicit but instead of blacklist, whitelist
-cpp.proposal: namespace :: {} - a way to open the global :: namespace from any other namespace
-cpp.proposal: namespace ::std {} - a way to open any namespace given absolute path from any other namespace
+cpp.proposal: P1 member_offset
+cpp.proposal: P2 operator^^ - logical XOR operator
+cpp.proposal: P2 stod, stol: support for string_view
+cpp.proposal: P3 allow trailing comma for function arguments, its already there for arrays and enums
+cpp.proposal: P4 namespace :: {} - a way to open the global :: namespace from any other namespace
+cpp.proposal: P4 namespace ::std {} - a way to open any namespace given absolute path from any other namespace
+cpp.proposal: P5 _ec - ec postfix exception free overload with error code as return value, (for constructors maybe operator bool or error getter, but that is far from perfect)
+cpp.proposal: P5 implicit - keyword that would replace explicit but instead of blacklist, whitelist
 cpp: clarify template vs auto type deduction rules
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 cpp: (adaptive) radix tree - O(1) lookup

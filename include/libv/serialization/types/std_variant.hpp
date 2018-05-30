@@ -16,7 +16,7 @@ namespace detail {
 template <size_t N, typename Archive, typename... Types>
 inline void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types...>& variant) {
 	if (N == index) {
-		std::decay_t<decltype(std::get<N>(variant))> value;
+		std::variant_alternative_t<N, std::variant<Types...>> value;
 		ar & LIBV_NVP(value);
 		variant = std::move(value);
 	} else if constexpr (N + 1 < sizeof...(Types))
