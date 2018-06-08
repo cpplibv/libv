@@ -48,6 +48,32 @@ public:
 	inline auto time_ns() {
 		return std::chrono::duration_cast<std::chrono::nanoseconds>(time());
 	}
+
+	inline auto timef_s() {
+		return std::chrono::duration_cast<std::chrono::duration<float>>(time());
+	}
+	inline auto timef_ms() {
+		return std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(time());
+	}
+	inline auto timef_us() {
+		return std::chrono::duration_cast<std::chrono::duration<float, std::micro>>(time());
+	}
+	inline auto timef_ns() {
+		return std::chrono::duration_cast<std::chrono::duration<float, std::nano>>(time());
+	}
+
+	inline auto timed_s() {
+		return std::chrono::duration_cast<std::chrono::duration<double>>(time());
+	}
+	inline auto timed_ms() {
+		return std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(time());
+	}
+	inline auto timed_us() {
+		return std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(time());
+	}
+	inline auto timed_ns() {
+		return std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(time());
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
