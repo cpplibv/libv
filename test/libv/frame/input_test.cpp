@@ -156,5 +156,3 @@ TEST_CASE("Check Mouse consistency with GLFW") {
 
 	CHECK(libv::to_value(libv::frame::Mouse::Last) == GLFW_MOUSE_BUTTON_LAST);
 }
-
-

@@ -322,7 +322,7 @@ wish_create_external(
 wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 0.8.2.0
+	GIT_TAG 8e43030b3e12bb58a4663d85adc5c752f89099c0
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
@@ -332,7 +332,7 @@ wish_create_external(
 wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.8.5
+	GIT_TAG 0.9.9.0
 	SKIP_BUILD
 	DEFINE GLM_ENABLE_EXPERIMENTAL
 	DEFINE GLM_FORCE_RADIANS
@@ -388,7 +388,7 @@ wish_create_external(
 wish_create_external(
 	NAME sml
 	GIT_REPOSITORY https://github.com/boost-experimental/sml.git
-	GIT_TAG feee47d23dbc696eee05f2b14cee60e386622053
+	GIT_TAG 8968695b40ce1c9dad7ba78d8220f5b7bf458d08
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sml/
