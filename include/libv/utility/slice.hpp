@@ -50,16 +50,47 @@ constexpr inline std::string_view slice_view(const std::string_view str, int64_t
 	return std::string_view(str.data() + lo, hi - lo);
 }
 
-constexpr inline std::string slice_copy(const std::string_view str, int64_t lo, int64_t hi) {
+constexpr inline std::string_view slice_prefix_view(std::string_view str, std::string_view prefix) {
+	if (str.substr(0, prefix.size()) == prefix)
+		str.remove_prefix(prefix.size());
+	return str;
+}
+
+constexpr inline std::string_view slice_suffix_view(std::string_view str, const std::string_view suffix) {
+	if (str.substr(str.size() - suffix.size(), suffix.size()) == suffix)
+		str.remove_prefix(suffix.size());
+	return str;
+}
+
+inline std::string slice_copy(const std::string_view str, int64_t lo, int64_t hi) {
 	return std::string{slice_view(str, lo, hi)};
 }
 
-constexpr inline std::string slice_copy(const std::string_view str, int64_t cut) {
+inline std::string slice_copy(const std::string_view str, int64_t cut) {
 	return std::string{slice_view(str, cut)};
 }
 
-template <typename String> inline void slice_inplace(String& str, int64_t lo, int64_t hi);
-template <typename String> inline void slice_inplace(String& str, int64_t cut);
+inline std::string slice_prefix_copy(const std::string_view str, const std::string_view prefix) {
+	return std::string{slice_prefix_view(str, prefix)};
+}
+
+inline std::string slice_suffix_copy(const std::string_view str, const std::string_view suffix) {
+	return std::string{slice_suffix_view(str, suffix)};
+}
+
+// TODO P5: implement inplace slices
+
+template <typename String>
+inline void slice_inplace(String& str, int64_t lo, int64_t hi);
+
+template <typename String>
+inline void slice_inplace(String& str, int64_t cut);
+
+template <typename String>
+inline void slice_prefix_inplace(String& str, const std::string_view prefix);
+
+template <typename String>
+inline void slice_suffix_inplace(String& str, const std::string_view suffix);
 
 // -------------------------------------------------------------------------------------------------
 
