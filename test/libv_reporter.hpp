@@ -2,14 +2,44 @@
 
 #pragma once
 
-#include <catch/reporters/catch_reporter_compact.hpp>
+// ext
+#include <fmt/format.h>
+// libv
+#include <libv/utility/slice.hpp>
+// std
+#include <string_view>
+#include <unordered_set>
+// pro
+#include <catch/catch.hpp>
+
+// NOTE: This file is a mess. No time, don't care.
+
+namespace {
+
+#ifndef LIBV_SHORT_PATH_CUTOFF
+#    define LIBV_SHORT_PATH_CUTOFF 0
+#endif
+
+template <typename OS, typename Pos>
+OS& streamSourcePosition(OS& os, const Pos& pos) {
+	std::string_view file = pos.file;
+	file.remove_prefix(LIBV_SHORT_PATH_CUTOFF);
+
+	file = libv::slice_prefix_view(file, "tests/");
+	file = libv::slice_prefix_view(file, "test/");
+
+	return os << file << ":" << pos.line;
+}
+
+} // namespace
 
 namespace Catch {
 
-struct VCompReporter : StreamingReporterBase {
-	VCompReporter(ReporterConfig const& _config)
+struct LIBVMinimalReporter : StreamingReporterBase<LIBVMinimalReporter> {
+	std::unordered_set<std::string> reported_tests;
+	LIBVMinimalReporter(ReporterConfig const& _config)
 		: StreamingReporterBase(_config) { }
-	virtual ~VCompReporter() { }
+	virtual ~LIBVMinimalReporter() { }
 	static std::string getDescription() {
 		return "Reports test results on a single line, suitable for IDEs";
 	}
@@ -24,7 +54,6 @@ struct VCompReporter : StreamingReporterBase {
 	virtual void assertionStarting(AssertionInfo const&) override { }
 	virtual bool assertionEnded(AssertionStats const& _assertionStats) override {
 		AssertionResult const& result = _assertionStats.assertionResult;
-
 		bool printInfoMessages = true;
 
 		// Drop out if result was successful and we're not printing those
@@ -34,7 +63,15 @@ struct VCompReporter : StreamingReporterBase {
 			printInfoMessages = false;
 		}
 
-		AssertionPrinter printer(stream, _assertionStats, printInfoMessages);
+		if (!_assertionStats.assertionResult.succeeded() && reported_tests.emplace(currentTestCaseInfo->name).second) {
+
+			stream << "\nFAILED: ";
+			streamSourcePosition(stream, currentTestCaseInfo->lineInfo) << ": ";
+			stream << "\u001B[33m" << currentTestCaseInfo->name << "\u001B[0m ";
+			stream << currentTestCaseInfo->tagsAsString() << "\n";
+		}
+
+		AssertionPrinter printer(stream, _assertionStats, printInfoMessages, currentTestCaseInfo);
 		printer.print();
 
 		stream << std::endl;
@@ -48,6 +85,7 @@ struct VCompReporter : StreamingReporterBase {
 	}
 
 private:
+
 	struct SummaryColumn {
 		SummaryColumn(std::string const& _label, Colour::Code _colour)
 			: label(_label),
@@ -74,77 +112,64 @@ private:
 
 	class AssertionPrinter {
 	public:
-		AssertionPrinter(std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages)
+		AssertionPrinter(std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages, LazyStat<TestCaseInfo>& testInfo)
 			: stream(_stream)
 			, stats(_stats)
 			, result(_stats.assertionResult)
+			, testInfo(testInfo)
 			, messages(_stats.infoMessages)
 			, itMessage(_stats.infoMessages.begin())
 			, printInfoMessages(_printInfoMessages) { }
 		void print() {
 			itMessage = messages.begin();
 
+			std::string format;
+
 			switch (result.getResultType()) {
 			case ResultWas::Ok:
-				printResultType(Colour::ResultSuccess, passedString());
-				printSourceInfo();
+				printResultType(Colour::ResultSuccess, "Passed");
 				printOriginalExpression();
+				printSourceInfo();
 				printReconstructedExpression();
-				if (!result.hasExpression())
-					printRemainingMessages(Colour::None);
-				else
-					printRemainingMessages();
 				break;
 			case ResultWas::ExpressionFailed:
 				if (result.isOk())
-					printResultType(Colour::ResultSuccess, failedString() + std::string(" - but was ok"));
+					format = ""
+						"{source}: ok: \u001B[36m{expression}\u001B[0m"
+						"\n\t\teval: {evaluation}";
 				else
-					printResultType(Colour::Error, failedString());
-				printSourceInfo();
-				printOriginalExpression();
-				printReconstructedExpression();
-				printRemainingMessages();
+					format = ""
+						"{source}: \u001B[36m{expression}\u001B[0m"
+						"\n\t\teval: {evaluation}";
 				break;
 			case ResultWas::ThrewException:
-				printResultType(Colour::Error, failedString());
-				printSourceInfo();
-				printIssue("unexpected exception with message:");
-				printMessage();
-				printExpressionWas();
-				printRemainingMessages();
+				format = "{source}: unexpected exception in: \u001B[36m{expression}\u001B[0m"
+						"\n\t\twhat: {exception}";
 				break;
 			case ResultWas::FatalErrorCondition:
-				printResultType(Colour::Error, failedString());
-				printSourceInfo();
-				printIssue("fatal error condition with message:");
+				printResultType(Colour::Error, "");
+				printIssue("\tfatal error condition with message:");
 				printMessage();
-				printExpressionWas();
-				printRemainingMessages();
+				printOriginalExpression();
+				printSourceInfo();
 				break;
 			case ResultWas::DidntThrowException:
-				printResultType(Colour::Error, failedString());
-				printSourceInfo();
-				printIssue("expected exception, got none");
-				printExpressionWas();
-				printRemainingMessages();
+				format = "{source}: missing exception in: \u001B[36m{expression}\u001B[0m";
 				break;
 			case ResultWas::Info:
 				printResultType(Colour::None, "info");
-				printSourceInfo();
 				printMessage();
-				printRemainingMessages();
+				printSourceInfo();
 				break;
 			case ResultWas::Warning:
 				printResultType(Colour::None, "warning");
-				printSourceInfo();
 				printMessage();
-				printRemainingMessages();
+				printSourceInfo();
 				break;
 			case ResultWas::ExplicitFailure:
-				printResultType(Colour::Error, failedString());
-				printSourceInfo();
+				printResultType(Colour::Error, "failure");
 				printIssue("explicitly");
-				printRemainingMessages(Colour::None);
+				printSourceInfo();
 				break;
 				// These cases are here to prevent compiler warnings
 			case ResultWas::Unknown:
@@ -154,21 +179,29 @@ private:
 				printSourceInfo();
 				break;
 			}
+
+			std::string source = result.getSourceInfo().file != testInfo->lineInfo.file ?
+					fmt::format("\t{}:{}", result.getSourceInfo().file + LIBV_SHORT_PATH_CUTOFF + 5, result.getSourceInfo().line) :
+					fmt::format("{:6}", result.getSourceInfo().line);
+
+			stream << fmt::format(format,
+					fmt::arg("source", source),
+					fmt::arg("expression", result.hasExpression() ? result.getExpression() : ""),
+					fmt::arg("evaluation", result.hasExpandedExpression() ? result.getExpandedExpression() : ""),
+					fmt::arg("exception", result.hasMessage() ? getMessage() : std::string(""))
+					);
+
+			printRemainingMessages();
 		}
 
 	private:
 		static Colour::Code dimColour() {
 			return Colour::FileName;
 		}
-		static const char* failedString() {
-			return "FAILED";
-		}
-		static const char* passedString() {
-			return "PASSED";
-		}
 		void printSourceInfo() const {
 			Colour colourGuard(Colour::FileName);
-			stream << result.getSourceInfo() << ":";
+			stream << " @ ";
+			streamSourcePosition(stream, result.getSourceInfo()) << ":";
 		}
 		void printResultType(Colour::Code colour, std::string passOrFail) const {
 			if (!passOrFail.empty()) {
@@ -176,32 +209,25 @@ private:
 					Colour colourGuard(colour);
 					stream << passOrFail;
 				}
-				stream << ": ";
+				stream << " ";
 			}
 		}
 		void printIssue(std::string issue) const {
 			stream << " " << issue;
 		}
-		void printExpressionWas() {
-			if (result.hasExpression()) {
-				stream << ";";
-				{
-					Colour colour(dimColour());
-					stream << " expression was:";
-				}
-				printOriginalExpression();
-			}
-		}
 		void printOriginalExpression() const {
 			if (result.hasExpression()) {
-				stream << "\n\t" << result.getExpression();
+				//				if (new_line)
+				//					stream << "\n\t\texpr: " << result.getExpression();
+				//				else
+				stream << " " << result.getExpression();
 			}
 		}
 		void printReconstructedExpression() const {
 			if (result.hasExpandedExpression()) {
 				{
 					Colour colour(dimColour());
-					stream << "\n\tfor: ";
+					stream << "\n\t\teval: ";
 				}
 				stream << result.getExpandedExpression();
 			}
@@ -211,6 +237,12 @@ private:
 				stream << " '" << itMessage->message << "'";
 				++itMessage;
 			}
+		}
+		std::string getMessage() {
+			if (itMessage != messages.end())
+				return (itMessage++)->message;
+			else
+				return std::string("");
 		}
 		void printRemainingMessages(Colour::Code colour = dimColour()) {
 			if (itMessage == messages.end())
@@ -241,6 +273,7 @@ private:
 		std::ostream& stream;
 		AssertionStats const& stats;
 		AssertionResult const& result;
+		LazyStat<TestCaseInfo>& testInfo;
 		std::vector<MessageInfo> messages;
 		std::vector<MessageInfo>::const_iterator itMessage;
 		bool printInfoMessages;
@@ -370,6 +403,6 @@ private:
 	}
 };
 
-INTERNAL_CATCH_REGISTER_REPORTER("vcomp", VCompReporter)
+CATCH_REGISTER_REPORTER("libv_minimal", LIBVMinimalReporter)
 
-}
+} // namespace Catch

@@ -243,11 +243,11 @@ wish_create_external(
 wish_create_external(
 	NAME catch
 	GIT_REPOSITORY https://github.com/philsquared/Catch.git
-	GIT_TAG v1.5.6
+	GIT_TAG v2.2.3
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/catch/include/catch/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/catch/src/get_catch/include/ ${PATH_EXT}/catch/include/catch/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/catch/src/get_catch/single_include/ ${PATH_EXT}/catch/include/catch/
 )
 
 wish_create_external(
