@@ -155,16 +155,16 @@ struct Sandbox {
 		attributePosition = 0;
 		attributeUV = 8;
 
-		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test2.fs"));
-		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test2.vs"));
+		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test2.fs"));
+		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test2.vs"));
 		programTest2.link(shaderTest2Frag, shaderTest2Vert);
 		programTest2.assign(uniformTest2MVPmat, "MVPmat");
 		programTest2.assign(uniformTest2Mmat, "Mmat");
 		programTest2.assign(uniformTest2EyePosW, "eyePosW");
 		programTest2.assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
-		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test1.fs"));
-		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test1.vs"));
+		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test1.fs"));
+		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test1.vs"));
 		programTest1.link(shaderTest1Frag, shaderTest1Vert);
 		programTest1.assign(uniformTest1MVPmat, "MVPmat");
 		programTest1.assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
@@ -180,10 +180,10 @@ struct Sandbox {
 			vertexArray.bindElements(bufferVertexIndices);
 		}
 
-		auto dataPlane = libv::read_file("res/texture/6poly_metal_01_diffuse.png");
+		auto dataPlane = libv::read_file_or_throw("res/texture/6poly_metal_01_diffuse.png");
 		auto imagePlane = libv::gl::Image(dataPlane);
 		texturePlane.adopt(imagePlane.createTexture());
-		auto dataSky = libv::read_file("res/texture/sky/merged2.dds");
+		auto dataSky = libv::read_file_or_throw("res/texture/sky/merged2.dds");
 		auto imageSky = libv::gl::Image(dataSky);
 		textureSky.adopt(imageSky.createTexture());
 

@@ -126,8 +126,9 @@ struct Sandbox {
 
 		boxMesh.update(std::move(update));
 
-		shaderTest1Fragment.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/red.fs"));
-		shaderTest1Vertex.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/red.vs"));
+		// TODO P2: These read_file_or_throw exceptions here will leak openGL resources! Same goes for the other gl sandboxes
+		shaderTest1Fragment.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/red.fs"));
+		shaderTest1Vertex.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/red.vs"));
 		programTest1.createLink(shaderTest1Fragment, shaderTest1Vertex);
 		programTest1.assign(uniformTest1MVPmat, "MVPmat");
 
@@ -211,8 +212,8 @@ int main(void) {
 	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit()) {
-		log_sandbox.error("Failed to initialize GLFW.");
-		exit(EXIT_FAILURE);
+		log_sandbox.fatal("Failed to initialize GLFW.");
+		return EXIT_FAILURE;
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -225,8 +226,8 @@ int main(void) {
 	window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello World", nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
-		log_sandbox.error("Failed to create GLFW window.");
-		exit(EXIT_FAILURE);
+		log_sandbox.fatal("Failed to create GLFW window.");
+		return EXIT_FAILURE;
 	}
 	glfwSetWindowPos(window, 200, 200);
 
@@ -239,7 +240,7 @@ int main(void) {
 
 	initGLEW();
 
-	{
+	try {
 		Sandbox sandbox;
 
 		libv::Timer timer;
@@ -260,10 +261,20 @@ int main(void) {
 				time -= 1000000000;
 			}
 		}
-	}
-	glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(window);
-	glfwTerminate();
 
-	return 0;
+		glfwMakeContextCurrent(nullptr);
+		glfwDestroyWindow(window);
+		glfwTerminate();
+
+		return EXIT_SUCCESS;
+
+		// TODO P2: merge this exception handling, return EXIT, log.fatal with the rest of the gl sandboxes. This might require merging the glr branches first!
+	} catch (const std::system_error& e) {
+		log_sandbox.fatal("Exception caught: {} - {}: {}", e.what(), e.code(), e.code().message());
+		return EXIT_FAILURE;
+
+	} catch (const std::exception& e) {
+		log_sandbox.fatal("Exception caught: {}", e.what());
+		return EXIT_FAILURE;
+	}
 }

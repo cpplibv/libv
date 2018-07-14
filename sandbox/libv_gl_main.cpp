@@ -145,27 +145,27 @@ struct Sandbox {
 		attributeColor = 2;
 		attributeTex0 = 8;
 
-		shaderTest0Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test0.fs"));
-		shaderTest0Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test0.vs"));
+		shaderTest0Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test0.fs"));
+		shaderTest0Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test0.vs"));
 		programTest0.link(shaderTest0Frag, shaderTest0Vert);
 		programTest0.assign(uniformTest0MVPmat, "MVPmat");
 
-		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test1.fs"));
-		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test1.vs"));
+		shaderTest1Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test1.fs"));
+		shaderTest1Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test1.vs"));
 		programTest1.link(shaderTest1Frag, shaderTest1Vert);
 		programTest1.assign(uniformTest1MVPmat, "MVPmat");
 		programTest1.assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
-		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/test2.fs"));
-		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/test2.vs"));
+		shaderTest2Frag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/test2.fs"));
+		shaderTest2Vert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/test2.vs"));
 		programTest2.link(shaderTest2Frag, shaderTest2Vert);
 		programTest2.assign(uniformTest2MVPmat, "MVPmat");
 		programTest2.assign(uniformTest2Mmat, "Mmat");
 		programTest2.assign(uniformTest2EyePosW, "eyePosW");
 		programTest2.assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
-		shaderDepthFrag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file("res/shader/depth.fs"));
-		shaderDepthVert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file("res/shader/depth.vs"));
+		shaderDepthFrag.createCompile(libv::gl::ShaderType::Fragment, libv::read_file_or_throw("res/shader/depth.fs"));
+		shaderDepthVert.createCompile(libv::gl::ShaderType::Vertex, libv::read_file_or_throw("res/shader/depth.vs"));
 		programDepth.link(shaderDepthFrag, shaderDepthVert);
 		programDepth.assign(uniformDepthMVPmat, "MVPmat");
 

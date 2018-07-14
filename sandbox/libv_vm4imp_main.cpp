@@ -6,7 +6,6 @@
 #include <libv/serialization/archive/binary.hpp>
 #include <libv/serialization/archive/json.hpp>
 #include <libv/serialization/types/std_optional.hpp>
-#include <libv/utility/read_file.hpp>
 // std
 #include <iostream>
 #include <sstream>
