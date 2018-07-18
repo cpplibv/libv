@@ -9,6 +9,7 @@
 !/src/
 !/test/
 
+!/.editorconfig
 !/.gitignore
 !/LIBV-TODO.md
 !/CMakeLists.txt

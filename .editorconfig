@@ -1,0 +1,21 @@
+# EditorConfig: http://EditorConfig.org
+
+# Top-most .editorconfig
+root = true
+
+# Line ending
+[*]
+end_of_line = lf
+
+
+# Indentation by default
+[*]
+indent_style = tab
+indent_size = 4
+
+
+# Indentation for structured text files
+[*.{js,jsx,html,sass,scss,css,xml}]
+indent_style = tab
+indent_size = 2
+
