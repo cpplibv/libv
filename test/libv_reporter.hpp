@@ -12,6 +12,7 @@
 // pro
 #include <catch/catch.hpp>
 
+
 // NOTE: This file is a mess. No time, don't care.
 
 namespace {
@@ -35,25 +36,58 @@ OS& streamSourcePosition(OS& os, const Pos& pos) {
 
 namespace Catch {
 
-struct LIBVMinimalReporter : StreamingReporterBase<LIBVMinimalReporter> {
+// Format:
+//
+//  FAILED: {file}:{line}: {yellow}{test_name}{/yellow} {tags}
+//  	{source}: ok: {cyan}{expression}{/cyan}
+//  		eval: {evaluation}
+//
+//  FAILED: {file}:{line}: {yellow}{test_name}{/yellow} {tags}
+//  	{source}: {cyan}{expression}{/cyan}
+//  		eval: {evaluation}
+//
+//  FAILED: {file}:{line}: {yellow}{test_name}{/yellow} {tags}
+//  	{source}: unexpected exception in: {cyan}{expression}{/cyan}
+//  		what: {exception}
+//
+//  FAILED: {file}:{line}: {yellow}{test_name}{/yellow} {tags}
+//  	{source}: missing exception in: {cyan}{expression}{/cyan}
+//
+class LIBVMinimalReporter : public StreamingReporterBase<LIBVMinimalReporter> {
+private:
 	std::unordered_set<std::string> reported_tests;
-	LIBVMinimalReporter(ReporterConfig const& _config)
-		: StreamingReporterBase(_config) { }
-	virtual ~LIBVMinimalReporter() { }
+	std::vector<SectionInfo> sections;
+
+public:
+	LIBVMinimalReporter(const ReporterConfig& config) : StreamingReporterBase(config) { }
+	virtual ~LIBVMinimalReporter() = default;
+
 	static std::string getDescription() {
-		return "Reports test results on a single line, suitable for IDEs";
+		return "Reports test results in a compact minimalistic manner, suitable for developer";
 	}
+
+private:
 	virtual ReporterPreferences getPreferences() const override {
 		ReporterPreferences prefs;
 		prefs.shouldRedirectStdOut = false;
 		return prefs;
 	}
-	virtual void noMatchingTestCases(std::string const& spec) override {
+
+	virtual void noMatchingTestCases(const std::string& spec) override {
 		stream << "No test cases matched '" << spec << "'" << std::endl;
 	}
-	virtual void assertionStarting(AssertionInfo const&) override { }
-	virtual bool assertionEnded(AssertionStats const& _assertionStats) override {
-		AssertionResult const& result = _assertionStats.assertionResult;
+
+	virtual void skipTest(const TestCaseInfo& testInfo) override {
+		stream << "\nSKIPPED ";
+		streamSourcePosition(stream, testInfo.lineInfo) << ": ";
+		stream << "\u001B[33m" << testInfo.name << "\u001B[0m ";
+		stream << testInfo.tagsAsString() << "\n";
+	}
+
+	virtual void assertionStarting(const AssertionInfo&) override { }
+
+	virtual bool assertionEnded(const AssertionStats& _assertionStats) override {
+		const AssertionResult& result = _assertionStats.assertionResult;
 		bool printInfoMessages = true;
 
 		// Drop out if result was successful and we're not printing those
@@ -64,7 +98,6 @@ struct LIBVMinimalReporter : StreamingReporterBase<LIBVMinimalReporter> {
 		}
 
 		if (!_assertionStats.assertionResult.succeeded() && reported_tests.emplace(currentTestCaseInfo->name).second) {
-
 			stream << "\nFAILED: ";
 			streamSourcePosition(stream, currentTestCaseInfo->lineInfo) << ": ";
 			stream << "\u001B[33m" << currentTestCaseInfo->name << "\u001B[0m ";
@@ -72,54 +105,78 @@ struct LIBVMinimalReporter : StreamingReporterBase<LIBVMinimalReporter> {
 		}
 
 		AssertionPrinter printer(stream, _assertionStats, printInfoMessages, currentTestCaseInfo);
+//		AssertionPrinter printer(stream, _assertionStats, printInfoMessages, currentTestCaseInfo, sections, sections.size() - 1);
 		printer.print();
 
 		stream << std::endl;
 		return true;
 	}
-	virtual void testRunEnded(TestRunStats const& _testRunStats) override {
+
+	virtual void testRunEnded(const TestRunStats& _testRunStats) override {
 		printTotalsDivider(_testRunStats.totals);
 		printTotals(_testRunStats.totals);
 		stream << std::endl;
 		StreamingReporterBase::testRunEnded(_testRunStats);
 	}
 
-private:
+//	virtual void sectionStarting(const SectionInfo& sectionInfo) override {
+//		m_sectionStack.emplace_back(sectionInfo);
+//		sections = m_sectionStack;
+//	}
+//
+//	virtual void sectionEnded(const SectionStats&) override {
+//		m_sectionStack.pop_back();
+//	}
 
+private:
 	struct SummaryColumn {
-		SummaryColumn(std::string const& _label, Colour::Code _colour)
-			: label(_label),
-			colour(_colour) { }
+		std::string label;
+		Colour::Code colour;
+		std::vector<std::string> rows;
+
+		SummaryColumn(const std::string& label, Colour::Code colour) : label(label), colour(colour) { }
+
 		SummaryColumn addRow(std::size_t count) {
 			std::ostringstream oss;
 			oss << count;
 			std::string row = oss.str();
-			for (std::vector<std::string>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				while (it->size() < row.size())
-					*it = " " + *it;
-				while (it->size() > row.size())
+			for (auto it : rows) {
+				while (it.size() < row.size())
+					it = " " + it;
+				while (it.size() > row.size())
 					row = " " + row;
 			}
 			rows.push_back(row);
 			return *this;
 		}
-
-		std::string label;
-		Colour::Code colour;
-		std::vector<std::string> rows;
-
 	};
 
 	class AssertionPrinter {
+	private:
+		std::ostream& stream;
+		const AssertionStats& stats;
+		const AssertionResult& result;
+		LazyStat<TestCaseInfo>& testInfo;
+//		std::vector<SectionInfo>& sections;
+//		int sectionsDirty;
+		std::vector<MessageInfo> messages;
+		std::vector<MessageInfo>::const_iterator itMessage;
+		bool printInfoMessages;
+
 	public:
-		AssertionPrinter(std::ostream& _stream, AssertionStats const& _stats, bool _printInfoMessages, LazyStat<TestCaseInfo>& testInfo)
-			: stream(_stream)
-			, stats(_stats)
-			, result(_stats.assertionResult)
-			, testInfo(testInfo)
-			, messages(_stats.infoMessages)
-			, itMessage(_stats.infoMessages.begin())
-			, printInfoMessages(_printInfoMessages) { }
+		AssertionPrinter(std::ostream& _stream, const AssertionStats& _stats, bool _printInfoMessages,
+//				LazyStat<TestCaseInfo>& testInfo, std::vector<SectionInfo>& sections, int sectionsDirty) :
+				LazyStat<TestCaseInfo>& testInfo) :
+			stream(_stream),
+			stats(_stats),
+			result(_stats.assertionResult),
+			testInfo(testInfo),
+//			sections(sections),
+//			sectionsDirty(sectionsDirty),
+			messages(_stats.infoMessages),
+			itMessage(_stats.infoMessages.begin()),
+			printInfoMessages(_printInfoMessages) { }
+
 		void print() {
 			itMessage = messages.begin();
 
@@ -127,24 +184,24 @@ private:
 
 			switch (result.getResultType()) {
 			case ResultWas::Ok:
-				printResultType(Colour::ResultSuccess, "Passed");
-				printOriginalExpression();
-				printSourceInfo();
-				printReconstructedExpression();
 				break;
 			case ResultWas::ExpressionFailed:
 				if (result.isOk())
 					format = ""
-						"{source}: ok: \u001B[36m{expression}\u001B[0m"
-						"\n\t\teval: {evaluation}";
+//						"{section}"
+						"{source}: ok: \u001B[36m{expression}\u001B[0m\n"
+						"\t\teval: {evaluation}";
 				else
 					format = ""
-						"{source}: \u001B[36m{expression}\u001B[0m"
-						"\n\t\teval: {evaluation}";
+//						"{section}"
+						"{source}: \u001B[36m{expression}\u001B[0m\n"
+						"\t\teval: {evaluation}";
 				break;
 			case ResultWas::ThrewException:
-				format = "{source}: unexpected exception in: \u001B[36m{expression}\u001B[0m"
-						"\n\t\twhat: {exception}";
+				format = ""
+//						"{section}"
+						"{source}: unexpected exception in: \u001B[36m{expression}\u001B[0m\n"
+						"\t\twhat: {exception}";
 				break;
 			case ResultWas::FatalErrorCondition:
 				printResultType(Colour::Error, "");
@@ -154,7 +211,9 @@ private:
 				printSourceInfo();
 				break;
 			case ResultWas::DidntThrowException:
-				format = "{source}: missing exception in: \u001B[36m{expression}\u001B[0m";
+				format = ""
+//						"{section}"
+						"{source}: missing exception in: \u001B[36m{expression}\u001B[0m";
 				break;
 			case ResultWas::Info:
 				printResultType(Colour::None, "info");
@@ -184,7 +243,20 @@ private:
 					fmt::format("\t{}:{}", result.getSourceInfo().file + LIBV_SHORT_PATH_CUTOFF + 5, result.getSourceInfo().line) :
 					fmt::format("{:6}", result.getSourceInfo().line);
 
+//			std::string section;
+//			if (sectionsDirty > 0 && !sections.empty()) {
+//				for (size_t i = sections.size() - sectionsDirty; i < sections.size(); ++i) {
+//
+//					std::string section_source = sections[i].lineInfo.file != testInfo->lineInfo.file ?
+//							fmt::format("\t{}:{}", sections[i].lineInfo.file + LIBV_SHORT_PATH_CUTOFF + 5, sections[i].lineInfo.line) :
+//							fmt::format("{:6}", sections[i].lineInfo.line);
+//
+//					section += fmt::format("{}: Section: {}\n", section_source, sections[i].name);
+//				}
+//			}
+
 			stream << fmt::format(format,
+//					fmt::arg("section", section),
 					fmt::arg("source", source),
 					fmt::arg("expression", result.hasExpression() ? result.getExpression() : ""),
 					fmt::arg("evaluation", result.hasExpandedExpression() ? result.getExpandedExpression() : ""),
@@ -195,14 +267,12 @@ private:
 		}
 
 	private:
-		static Colour::Code dimColour() {
-			return Colour::FileName;
-		}
 		void printSourceInfo() const {
-			Colour colourGuard(Colour::FileName);
+//			Colour colourGuard(Colour::FileName);
 			stream << " @ ";
 			streamSourcePosition(stream, result.getSourceInfo()) << ":";
 		}
+
 		void printResultType(Colour::Code colour, std::string passOrFail) const {
 			if (!passOrFail.empty()) {
 				{
@@ -212,71 +282,48 @@ private:
 				stream << " ";
 			}
 		}
+
 		void printIssue(std::string issue) const {
 			stream << " " << issue;
 		}
+
 		void printOriginalExpression() const {
-			if (result.hasExpression()) {
-				//				if (new_line)
-				//					stream << "\n\t\texpr: " << result.getExpression();
-				//				else
+			if (result.hasExpression())
 				stream << " " << result.getExpression();
-			}
 		}
-		void printReconstructedExpression() const {
-			if (result.hasExpandedExpression()) {
-				{
-					Colour colour(dimColour());
-					stream << "\n\t\teval: ";
-				}
-				stream << result.getExpandedExpression();
-			}
-		}
+
 		void printMessage() {
 			if (itMessage != messages.end()) {
 				stream << " '" << itMessage->message << "'";
 				++itMessage;
 			}
 		}
+
 		std::string getMessage() {
 			if (itMessage != messages.end())
 				return (itMessage++)->message;
 			else
 				return std::string("");
 		}
-		void printRemainingMessages(Colour::Code colour = dimColour()) {
-			if (itMessage == messages.end())
+
+		void printRemainingMessages() {
+			auto end = messages.cend();
+
+			if (itMessage == end)
 				return;
 
-			// using messages.end() directly yields compilation error:
-			std::vector<MessageInfo>::const_iterator itEnd = messages.end();
-			const std::size_t N = static_cast<std::size_t> (std::distance(itMessage, itEnd));
+			stream << " with " << pluralise(std::distance(itMessage, end), "message") << ":";
 
-			{
-				Colour colourGuard(colour);
-				stream << " with " << pluralise(N, "message") << ":";
-			}
-
-			for (; itMessage != itEnd;) {
+			while(itMessage != end) {
 				// If this assertion is a warning ignore any INFO messages
 				if (printInfoMessages || itMessage->type != ResultWas::Info) {
 					stream << " '" << itMessage->message << "'";
-					if (++itMessage != itEnd) {
-						Colour colourGuard(dimColour());
+					if (++itMessage != end) {
 						stream << " and";
 					}
 				}
 			}
 		}
-
-	private:
-		std::ostream& stream;
-		AssertionStats const& stats;
-		AssertionResult const& result;
-		LazyStat<TestCaseInfo>& testInfo;
-		std::vector<MessageInfo> messages;
-		std::vector<MessageInfo>::const_iterator itMessage;
-		bool printInfoMessages;
 	};
 
 	// Colour, message variants:
@@ -285,41 +332,8 @@ private:
 	// - white: Passed [both/all] N test cases (no assertions).
 	// -   red: Failed N tests cases, failed M assertions.
 	// - green: Passed [both/all] N tests cases with M assertions.
-	std::string bothOrAll(std::size_t count) const {
-		return count == 1 ? "" : count == 2 ? "both " : "all ";
-	}
-	//	void printTotals(const Totals& totals) const {
-	//		if (totals.testCases.total() == 0) {
-	//			stream << "No tests ran.";
-	//		} else if (totals.testCases.failed == totals.testCases.total()) {
-	//			Colour colour(Colour::ResultError);
-	//			const std::string qualify_assertions_failed =
-	//					totals.assertions.failed == totals.assertions.total() ?
-	//					bothOrAll(totals.assertions.failed) : "";
-	//			stream <<
-	//					"Failed " << bothOrAll(totals.testCases.failed)
-	//					<< pluralise(totals.testCases.failed, "test case") << ", "
-	//					"failed " << qualify_assertions_failed <<
-	//					pluralise(totals.assertions.failed, "assertion") << ".";
-	//		} else if (totals.assertions.total() == 0) {
-	//			stream <<
-	//					"Passed " << bothOrAll(totals.testCases.total())
-	//					<< pluralise(totals.testCases.total(), "test case")
-	//					<< " (no assertions).";
-	//		} else if (totals.assertions.failed) {
-	//			Colour colour(Colour::ResultError);
-	//			stream <<
-	//					"Failed " << pluralise(totals.testCases.failed, "test case") << ", "
-	//					"failed " << pluralise(totals.assertions.failed, "assertion") << ".";
-	//		} else {
-	//			Colour colour(Colour::ResultSuccess);
-	//			stream <<
-	//					"Passed " << bothOrAll(totals.testCases.passed)
-	//					<< pluralise(totals.testCases.passed, "test case") <<
-	//					" with " << pluralise(totals.assertions.passed, "assertion") << ".";
-	//		}
-	//	}
-	void printTotals(Totals const& totals) {
+
+	void printTotals(const Totals& totals) {
 		if (totals.testCases.total() == 0) {
 			stream << Colour(Colour::Warning) << "No tests ran\n";
 		} else if (totals.assertions.total() > 0 && totals.testCases.allPassed()) {
@@ -348,7 +362,8 @@ private:
 			printSummaryRow("assertions", columns, 1);
 		}
 	}
-	void printSummaryRow(std::string const& label, std::vector<SummaryColumn> const& cols, std::size_t row) {
+
+	void printSummaryRow(const std::string& label, const std::vector<SummaryColumn>& cols, std::size_t row) {
 		for (std::vector<SummaryColumn>::const_iterator it = cols.begin(); it != cols.end(); ++it) {
 			std::string value = it->rows[row];
 			if (it->label.empty()) {
@@ -365,10 +380,12 @@ private:
 		}
 		stream << "\n";
 	}
+
 	static std::size_t makeRatio(std::size_t number, std::size_t total) {
 		std::size_t ratio = total > 0 ? CATCH_CONFIG_CONSOLE_WIDTH * number / total : 0;
 		return ( ratio == 0 && number > 0) ? 1 : ratio;
 	}
+
 	static std::size_t& findMax(std::size_t& i, std::size_t& j, std::size_t& k) {
 		if (i > j && i > k)
 			return i;
@@ -377,8 +394,11 @@ private:
 		else
 			return k;
 	}
-	void printTotalsDivider(Totals const& totals) {
-		if (totals.testCases.total() > 0) {
+
+	void printTotalsDivider(const Totals& totals) {
+		if (totals.testCases.total() == 0) {
+			stream << Colour(Colour::Warning) << std::string(CATCH_CONFIG_CONSOLE_WIDTH - 1, '-');
+		} else {
 			std::size_t failedRatio = makeRatio(totals.testCases.failed, totals.testCases.total());
 			std::size_t failedButOkRatio = makeRatio(totals.testCases.failedButOk, totals.testCases.total());
 			std::size_t passedRatio = makeRatio(totals.testCases.passed, totals.testCases.total());
@@ -393,13 +413,8 @@ private:
 				stream << Colour(Colour::ResultSuccess) << std::string(passedRatio, '-');
 			else
 				stream << Colour(Colour::Success) << std::string(passedRatio, '-');
-		} else {
-			stream << Colour(Colour::Warning) << std::string(CATCH_CONFIG_CONSOLE_WIDTH - 1, '-');
 		}
-		stream << "\n";
-	}
-	void printSummaryDivider() {
-		stream << getLineOfChars<'-'>() << "\n";
+		stream << '\n';
 	}
 };
 
