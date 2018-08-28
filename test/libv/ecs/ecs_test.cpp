@@ -1,7 +1,8 @@
 // Project: libv.ecs, File: test/libv/ecs/ecs_test.cpp, Author: Császár Mátyás [Vader]
 
+// hpp
 #include <catch/catch.hpp>
-
+// pro
 #include <libv/ecs/system.hpp>
 
 
@@ -357,7 +358,7 @@ TEST_CASE("foreach component", "[libv.ecs]") {
 		foreach_run_left = 2;
 	}
 
-	es.foreach_component<TestCompA>([&](auto&&) {
+	es.foreach<TestCompA>([&](auto&&) {
 		--foreach_run_left;
 	});
 
