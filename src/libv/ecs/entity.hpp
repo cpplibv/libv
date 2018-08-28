@@ -29,22 +29,22 @@ struct Entity {
 	// TODO P4: currently implicit ctor for boost::flat_set::find
 	inline Entity(EntityID id) : id(id) { }
 
-	explicit inline Entity(EntityID id, EntityComponents components) :
+	explicit inline Entity(EntityID id, EntityComponents components) noexcept :
 		id(id), components(components) { }
 
-	inline bool operator<(const Entity& rhs) const {
+	inline bool operator<(const Entity& rhs) const noexcept {
 		return id < rhs.id;
 	}
-	inline bool operator==(EntityID rhs) const {
+	inline bool operator==(EntityID rhs) const noexcept {
 		return id == rhs;
 	}
 };
 
 struct ChildOfCmp {
-	static inline bool operator()(const Entity& lhs, const EntityID& rhs) {
+	static inline bool operator()(const Entity& lhs, const EntityID& rhs) const noexcept {
 		return (lhs.id >> 32) < rhs;
 	}
-	static inline bool operator()(const EntityID& lhs, const Entity& rhs) {
+	static inline bool operator()(const EntityID& lhs, const Entity& rhs) const noexcept {
 		return lhs < (rhs.id >> 32);
 	}
 };

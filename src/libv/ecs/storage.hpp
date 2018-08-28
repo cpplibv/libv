@@ -27,36 +27,43 @@ template <typename T>
 struct ComponentStorage final : public ComponentStorageBase {
 private:
 	boost::container::flat_map<EntityID, T> storage;
+	// TODO P5: libv.ecs Optimization: split storage into 2 container, (implement a column sequential container...)
+	//			libv::segmented_row_set<EntityID, T> storage;
+	//			libv::segmented_cs_map<EntityID, T> storage; // cs = column sequential
 
 public:
-	inline auto size() {
+	inline auto size() const noexcept {
 		return storage.size();
 	}
 
-	inline T& operator[](EntityID id) {
+	inline T& operator[](EntityID id) noexcept {
+		return storage[id];
+	}
+
+	inline const T& operator[](EntityID id) const noexcept {
 		return storage[id];
 	}
 
 	template <typename K, typename = std::enable_if_t<std::is_same<T, K>::value>>
-	inline T& insert(EntityID id, K&& value) {
+	inline T& insert(EntityID id, K&& value) noexcept {
 		return storage.emplace(id, std::forward<K>(value)).first->second;
 	}
 
 	template <typename... Args>
-	inline T& emplace(EntityID owner, Args&&... args) {
+	inline T& emplace(EntityID owner, Args&&... args) noexcept {
 		return storage.emplace(std::piecewise_construct,
 				std::forward_as_tuple(owner),
 				std::forward_as_tuple(std::forward<Args>(args)...)).first->second;
 	}
 
 	template <typename F>
-	inline void foreach(F&& f) {
+	inline void foreach(F&& f) noexcept {
 		for (auto& comp : storage)
 			f(comp.second);
 	}
 
 	template <typename Component>
-	inline decltype(auto) creeper() {
+	inline decltype(auto) creeper() noexcept {
 		if constexpr(Component::is_optional_v) {
 			return creeper_optional();
 		} else {
@@ -65,7 +72,7 @@ public:
 	}
 
 	template <typename Component>
-	inline decltype(auto) get(EntityID id) {
+	inline decltype(auto) get(EntityID id) noexcept {
 		if constexpr(Component::is_optional_v) {
 			return get_optional(id);
 		} else {
@@ -74,7 +81,7 @@ public:
 	}
 
 private:
-	auto creeper_simple() {
+	inline auto creeper_simple() noexcept {
 		// - The requested IDs are strictly monotonically increasing
 		// - The requested ID will always be present in the container
 		// - The most likely match will be the element right after the current one
@@ -97,7 +104,7 @@ private:
 		};
 	}
 
-	auto creeper_optional() {
+	inline auto creeper_optional() noexcept {
 		// - The requested IDs are strictly monotonically increasing
 		// - The most likely match will be the element right after the current one
 
@@ -124,10 +131,11 @@ private:
 		};
 	}
 
-	auto& get_simple(EntityID id) {
+	inline auto& get_simple(EntityID id) noexcept {
 		return storage.find(id)->second;
 	}
-	auto* get_optional(EntityID id) {
+
+	inline auto* get_optional(EntityID id) noexcept {
 		const auto it = storage.find(id);
 		return it != storage.end() ? &it->second : nullptr;
 	}
