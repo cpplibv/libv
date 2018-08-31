@@ -322,7 +322,7 @@ wish_create_external(
 wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 8e43030b3e12bb58a4663d85adc5c752f89099c0
+	GIT_TAG 1893e5d2e9c6527e1aecf49ef7dd9c36889b33b3
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
@@ -332,8 +332,9 @@ wish_create_external(
 wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 0.9.9.0
-	SKIP_BUILD
+	GIT_TAG 49b508a1abdd592d9202676f7e95127587ff21c0
+	CMAKE_ARGS
+		-DGLM_TEST_ENABLE=OFF
 	DEFINE GLM_ENABLE_EXPERIMENTAL
 	DEFINE GLM_FORCE_RADIANS
 )
@@ -388,7 +389,7 @@ wish_create_external(
 wish_create_external(
 	NAME sml
 	GIT_REPOSITORY https://github.com/boost-experimental/sml.git
-	GIT_TAG 8968695b40ce1c9dad7ba78d8220f5b7bf458d08
+	GIT_TAG 7b6a54dd84067cfc3a42f869e2df1b65d38bd711
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sml/
@@ -398,7 +399,7 @@ wish_create_external(
 wish_create_external(
 	NAME utf8cpp
 	GIT_REPOSITORY https://github.com/nemtrif/utfcpp.git
-	GIT_TAG 1537543999978d3a0464560a9a940d6140c6ba59
+	GIT_TAG e6bde7819c60c453b720b5de8c7c5ee9ffd9805a
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp/

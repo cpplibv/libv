@@ -3,6 +3,7 @@
 // ext
 #include <fmt/printf.h>
 // libv
+#include <libv/log/log.hpp>
 #include <libv/serialization/archive/binary.hpp>
 #include <libv/serialization/archive/json.hpp>
 #include <libv/serialization/types/std_optional.hpp>

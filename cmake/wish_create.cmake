@@ -72,7 +72,7 @@ function(wish_create_external)
 		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
 		CMAKE_ARGS
 			-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
-		GIT_SHALLOW 1
+		#GIT_SHALLOW 1 # shallow fetch is not possible as long as SHA tags are used
 		EXCLUDE_FROM_ALL 1
 		${command_str_configure}
 		${command_str_build}

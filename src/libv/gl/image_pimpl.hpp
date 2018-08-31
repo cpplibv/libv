@@ -2,6 +2,9 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
+
 
 namespace libv {
 namespace gl {
