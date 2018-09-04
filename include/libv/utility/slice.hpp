@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <algorithm>
 #include <cassert>
 #include <string>
 #include <string_view>
@@ -12,52 +13,40 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Returns a string_view to the sub-string of characters in [lo, hi).
-/// If either of lo or hi is a negative value x, x is taken to be an offset from the end,
+
+/// Returns a string_view to the sub-string of characters in [\c lo, \c hi).
+/// If either of \c lo or \c hi is a negative value x, x is taken to be an offset from the end,
 /// and so x + size() is used instead.
+/// If either \c lo or \c hi would over index than the index is clamped to the size of the string.
 /// @param str - the source string
 /// @param lo - the index of the first requested character
 /// @param hi - the index of the last requested character
-/// @pre `0 \<= abs(lo) \<= size()`
-/// @pre `0 \<= abs(hi) \<= size()`
-/// @pre `lo \<= hi` This preconditions apply to the values used after size() is added to any negative number
 /// @example `slice_view("Hello world!",  0,  5) == "Hello"`
 /// @example `slice_view("Hello world!",  5, -1) == " world"`
 /// @example `slice_view("Hello world!", -7, -1) == " world"`
-constexpr inline std::string_view slice_view(const std::string_view str, int64_t lo, int64_t hi) noexcept {
-	if (lo < 0)
-		lo += str.size();
-	if (hi < 0)
-		hi += str.size();
+constexpr inline std::string_view slice_view(const std::string_view str, const int64_t lo, const int64_t hi) noexcept {
+	const auto size = static_cast<int64_t>(str.size());
 
-	assert(0 <= lo && lo <= str.size());
-	assert(0 <= hi && hi <= str.size());
-	assert(lo <= hi);
+	const auto index_lo = std::clamp(lo < 0 ? lo + size : lo, int64_t{0}, size);
+	const auto index_hi = std::clamp(hi < 0 ? hi + size : hi, int64_t{0}, size);
+	const auto length = static_cast<size_t>(std::max(index_hi - index_lo, int64_t{0}));
 
-	return std::string_view(str.data() + lo, hi - lo);
+	return std::string_view{str.data() + index_lo, length};
 }
 
 /// Returns a string_view to the sub-string of the
-/// - prefixing `abs(cut)` characters if `cut` is positive or
-/// - suffixing `abs(cut)` characters if `cut` is negative
+/// - prefixing `abs(\c cut)` characters if \c cut is positive or
+/// - suffixing `abs(\c cut)` characters if \c cut is negative
+/// If `abs(\c cut)` is greater then the length of the string, the whole string will be returned
 /// @param str - the source string
 /// @param cut - the number of characters requested
-/// @pre `0 \<= abs(cut) \<= size()`
 /// @example `slice_view("Hello world!", 5) == "Hello"`
 /// @example `slice_view("Hello world!", -6) == "world!"`
 constexpr inline std::string_view slice_view(const std::string_view str, const int64_t cut) noexcept {
-	int64_t lo = 0;
-	int64_t hi = cut;
-
-	if (cut < 0) {
-		lo = cut + str.size();
-		hi = str.size();
-	}
-
-	assert(0 <= lo && lo <= str.size());
-	assert(0 <= hi && hi <= str.size());
-
-	return std::string_view(str.data() + lo, hi - lo);
+	if (cut < 0)
+		return slice_view(str, str.size() + cut, str.size());
+	else
+		return slice_view(str, 0, cut);
 }
 
 constexpr inline std::string_view slice_prefix_view(const std::string_view str, const std::string_view prefix) {
