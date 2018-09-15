@@ -22,8 +22,9 @@ void write_file_or_throw(const std::filesystem::path& filePath, std::string_view
 		throw std::system_error(errno, std::system_category(), fmt::format("Failed to open file: {}", filePath.string()));
 
 	file.write(data.data(), data.size());
+	file.close();
 
-	if (file.bad())
+	if (file.fail())
 		throw std::system_error(errno, std::system_category(), fmt::format("Failed to write file: {}", filePath.string()));
 }
 
@@ -39,8 +40,9 @@ void write_file(const std::filesystem::path& filePath, std::string_view data, st
 	}
 
 	file.write(data.data(), data.size());
+	file.close();
 
-	if (file.bad()) {
+	if (file.fail()) {
 		ec.assign(errno, std::system_category());
 		return;
 	}

@@ -17,69 +17,69 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename = void>
-[[nodiscard]] std::string read_file_or_empty(const std::filesystem::path& filePath) {
-	std::string result;
+
+template <typename Fallback = std::string_view>
+[[nodiscard]] std::string read_file_or(const std::filesystem::path& filePath, Fallback&& fallback = "") {
 	std::ifstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::in | std::ios_base::binary);
 
 	if (!file) {
-		log.error("Failed to open file: {}", filePath.string());
-		return result;
+		log.error("Failed to open file: {}", filePath.string() /*FILESYSTEM_SUPPORT*/);
+		return std::string{std::forward<Fallback>(fallback)};
 	}
 
 	std::ostringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
-	result = buffer.str();
 
-	return result;
+	if (file.fail()) {
+		log.error("Failed to read file: {}", filePath.string() /*FILESYSTEM_SUPPORT*/);
+		return std::string{std::forward<Fallback>(fallback)};
+	}
+
+	return buffer.str();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename = void>
 [[nodiscard]] std::string read_file_or_throw(const std::filesystem::path& filePath) {
-	std::string result;
 	std::ifstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::in | std::ios_base::binary);
 
 	if (!file)
-		throw std::system_error(errno, std::system_category(), fmt::format("Failed to open file: {}", filePath.string()));
+		throw std::system_error(errno, std::system_category(), fmt::format("Failed to open file: {}", filePath.string() /*FILESYSTEM_SUPPORT*/));
 
 	std::ostringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
-	result = buffer.str();
 
-	if (file.bad())
-		throw std::system_error(errno, std::system_category(), fmt::format("Failed to read file: {}", filePath.string()));
+	if (file.fail())
+		throw std::system_error(errno, std::system_category(), fmt::format("Failed to read file: {}", filePath.string() /*FILESYSTEM_SUPPORT*/));
 
-	return result;
+	return buffer.str();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename = void>
 [[nodiscard]] std::string read_file(const std::filesystem::path& filePath, std::error_code& ec) {
-	std::string result;
 	std::ifstream file(filePath.string() /*FILESYSTEM_SUPPORT*/, std::ios_base::in | std::ios_base::binary);
 
 	if (!file) {
 		ec.assign(errno, std::system_category());
-		return result;
+		return "";
 	}
 
 	std::ostringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
-	result = buffer.str();
 
-	if (file.bad()) {
+	if (file.fail()) {
 		ec.assign(errno, std::system_category());
-		return result;
+		return "";
 	}
 
 	ec.clear();
-	return result;
+	return buffer.str();
 }
 
 struct result_read_file {
