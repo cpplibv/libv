@@ -3,8 +3,7 @@
 // hpp
 #include <libv/gl/image.hpp>
 // pro
-#include <libv/gl/image_gli.hpp>
-#include <libv/gl/image_soil.hpp>
+#include <libv/gl/log.hpp>
 
 
 namespace libv {
@@ -12,37 +11,32 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-std::unique_ptr<Image::Pimpl> loadSOIL(const char* data, size_t dataSize) {
-	auto texture = std::make_unique<ImageSOIL>(data, dataSize);
-	return texture->ok() ? std::unique_ptr<Image::Pimpl>{std::move(texture)} : nullptr;
+std::optional<Image> load_image_GLI(const std::string_view data);
+std::optional<Image> load_image_SOIL(const std::string_view data);
+
+std::optional<Image> load_image(const std::string_view data) {
+	std::optional<Image> result;
+
+	if (!result)
+		result = load_image_GLI(data);
+
+	if (!result)
+		result = load_image_SOIL(data);
+
+	if (!result)
+		log_gl.error("Corrupted or not supported image format");
+
+	return result;
 }
 
-std::unique_ptr<Image::Pimpl> loadGLI(const char* data, size_t dataSize) {
-	auto texture = std::make_unique<ImageGLI>(data, dataSize);
-	return texture->ok() ? std::unique_ptr<Image::Pimpl>{std::move(texture)} : nullptr;
+Image load_image_or_throw(const std::string_view data) {
+	auto result = load_image(data);
+
+	if (result.has_value())
+		return std::move(result.value());
+	else
+		throw std::invalid_argument{"Corrupted or not supported image format"};
 }
-
-// -------------------------------------------------------------------------------------------------
-
-Image::Image(const char* data, size_t dataSize) {
-	if (!pimpl) pimpl = loadGLI(data, dataSize);
-	if (!pimpl) pimpl = loadSOIL(data, dataSize);
-	if (!pimpl) throw InvalidImageFormatException{};
-}
-
-Image::Image(const std::string& data) : Image(data.data(), data.size()) {
-}
-
-Image::~Image() { }
-
-libv::vec2i Image::size() const {
-	return pimpl->imageSize;
-}
-
-GLuint Image::createTexture() {
-	return pimpl->createTexture();
-}
-
 
 // -------------------------------------------------------------------------------------------------
 

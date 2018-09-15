@@ -1,9 +1,10 @@
 // File: Texture.cpp, Created on 2014. december 6. 22:44, Author: Vader
 
 // hpp
-#include <libv/gl/image_gli.hpp>
+#include <libv/gl/image.hpp>
 // ext
 #include <GL/glew.h>
+#include <gli/gli.hpp>
 // pro
 #include <libv/gl/log.hpp>
 
@@ -13,24 +14,35 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-ImageGLI::ImageGLI(const char* data, std::size_t dataSize) :
-	texture(gli::load(data, dataSize)) {
+class ImageGLI : public detail::ImageImplementation {
+	gli::texture texture;
 
-	const auto gliSize = texture.extent();
-	imageSize.x = gliSize.x;
-	imageSize.y = gliSize.y;
+public:
+	ImageGLI(gli::texture&& texture) noexcept : texture(std::move(texture)) { }
+	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
+	[[nodiscard]] virtual uint32_t createTexture() const noexcept override;
+	virtual ~ImageGLI() noexcept override = default;
+};
+
+std::optional<Image> load_image_GLI(const std::string_view data) {
+	auto texture = gli::load(data.data(), data.size());
+
+	if (texture.empty())
+		return std::nullopt;
+	else
+		return std::optional<Image>{std::make_shared<ImageGLI>(std::move(texture))};
 }
 
-ImageGLI::~ImageGLI() { }
+// -------------------------------------------------------------------------------------------------
 
-bool ImageGLI::ok() const {
-	return !texture.empty();
+libv::vec2i ImageGLI::size() const noexcept {
+	return {texture.extent().x, texture.extent().y};
 }
 
-GLuint ImageGLI::createTexture() {
-	gli::gl GL(gli::gl::PROFILE_GL33);
-	const gli::gl::format Format = GL.translate(texture.format(), texture.swizzles());
-	GLenum Target = GL.translate(texture.target());
+uint32_t ImageGLI::createTexture() const noexcept {
+	gli::gl gli_gl(gli::gl::PROFILE_GL33);
+	const gli::gl::format Format = gli_gl.translate(texture.format(), texture.swizzles());
+	GLenum Target = gli_gl.translate(texture.target());
 
 	GLuint TextureName = 0;
 	glGenTextures(1, &TextureName);
@@ -44,7 +56,7 @@ GLuint ImageGLI::createTexture() {
 	LIBV_GL_DEBUG_CHECK();
 
 	const glm::tvec3<GLsizei> baseSize(texture.extent());
-	const GLsizei FaceTotal = static_cast<GLsizei> (texture.layers() * texture.faces());
+	const GLsizei FaceTotal = static_cast<GLsizei>(texture.layers() * texture.faces());
 
 	switch (texture.target()) {
 	case gli::TARGET_1D:

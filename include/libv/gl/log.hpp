@@ -27,7 +27,7 @@ inline LoggerModule log_gl{libv::logger, "libv.gl"};
 inline bool checkGL(source_location loc = source_location::current()) {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR)
-		log_gl.error({"OpenGL: {}: {}", loc}, gluErrorString(err));
+		log_gl.error({"OpenGL: {}: {}", loc}, err, gluErrorString(err));
 	return err != GL_NO_ERROR;
 }
 

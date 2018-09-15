@@ -205,7 +205,9 @@ wish_create_external(
 		-DASSIMP_BUILD_X3D_IMPORTER=OFF
 		-DASSIMP_BUILD_XGL_IMPORTER=OFF
 		-DASSIMP_BUILD_X_IMPORTER=OFF
-	LINK assimp IrrXML zlibstatic
+	LINK assimp
+	LINK IrrXML
+	LINK zlibstatic
 )
 
 set(Boost_Version 1.66.0)
@@ -316,7 +318,8 @@ wish_create_external(
 		-DGLFW_BUILD_EXAMPLES=OFF
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
-	LINK glfw3 gdi32
+	LINK glfw3
+	LINK gdi32
 )
 
 wish_create_external(
@@ -430,7 +433,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math ext_glew ext_gli ext_soil ${OPENGL_LIBRARIES}
+	LINK   libv_log libv_math ext_glew ext_boost ext_gli ext_soil ${OPENGL_LIBRARIES}
 )
 
 wish_create_library(

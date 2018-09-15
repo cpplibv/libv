@@ -281,7 +281,7 @@ private:
 		try {
 			message = fmt::format(isColored() ? color_args(fmt) : fmt, args...);
 		} catch (const fmt::format_error& ex) {
-			message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", format, ex.what());
+			message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", fmt, ex.what());
 			std::ostringstream argument_ss;
 			((argument_ss << " \"" << args << "\","), ...);
 			message += argument_ss.str();

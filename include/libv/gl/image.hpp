@@ -4,46 +4,67 @@
 
 // libv
 #include <libv/math/vec.hpp>
-// ext
-#include <GL/glew.h>
 // std
+#include <cassert>
 #include <memory>
+#include <optional>
+#include <string_view>
 
 
 namespace libv {
 namespace gl {
+namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-class InvalidImageFormatException : public std::exception {
+struct ImageImplementation {
+	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
+	[[nodiscard]] virtual uint32_t createTexture() const noexcept = 0;
+	virtual ~ImageImplementation() noexcept = default;
+};
+
+} // namespace detail ------------------------------------------------------------------------------
+
+class Image {
+private:
+	libv::vec2i size_;
+	std::shared_ptr<detail::ImageImplementation> impl;
+
 public:
-	InvalidImageFormatException() noexcept { }
-	virtual const char* what() const noexcept override {
-		return "InvalidImageFormatException";
+	inline Image(std::shared_ptr<detail::ImageImplementation>&& impl) noexcept :
+		size_(impl ? impl->size() : libv::vec2i{}), // operator?: to suppress -Wnull-dereference
+		impl(std::move(impl)) {
+		assert("ImageImplementation cannot be null" && impl != null);
+	}
+
+public:
+	[[nodiscard]] inline libv::vec2i size() const noexcept {
+		return size_;
+	}
+
+	/// @context OpenGL
+	[[nodiscard]] inline uint32_t createTexture() const noexcept {
+		return impl->createTexture();
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct Image {
-	struct Pimpl;
+/// @supported KTX, KMG, DDS: GLI backend
+/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+/// @context ANY
+[[nodiscard]] std::optional<Image> load_image(const std::string_view data);
 
-private:
-	std::unique_ptr<Pimpl> pimpl;
+/// @supported KTX, KMG, DDS: GLI backend
+/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+/// @context ANY
+// TODO P5: implement fallback image
+//[[nodiscard]] Image load_image_or(const std::string_view data, Fallback&& fallback = "");
 
-public:
-	/// @supported GLI backend: KTX, KMG, DDS
-	/// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR
-	Image(const char* data, std::size_t dataSize);
-	/// @supported GLI backend: KTX, KMG, DDS
-	/// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR
-	Image(const std::string& data);
-	~Image();
-
-	libv::vec2i size() const;
-
-	GLuint createTexture();
-};
+/// @supported KTX, KMG, DDS: GLI backend
+/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+/// @context ANY
+[[nodiscard]] Image load_image_or_throw(const std::string_view data);
 
 // -------------------------------------------------------------------------------------------------
 

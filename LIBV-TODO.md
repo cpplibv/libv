@@ -68,6 +68,7 @@ libv.log: log thread naming
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: provide exception free alternative API.
+libv.utility: Make a proper copy-pastable noisy type
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..

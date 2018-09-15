@@ -181,10 +181,11 @@ struct Sandbox {
 		}
 
 		auto dataPlane = libv::read_file_or_throw("res/texture/6poly_metal_01_diffuse.png");
-		auto imagePlane = libv::gl::Image(dataPlane);
+		auto imagePlane = libv::gl::load_image_or_throw(dataPlane);
 		texturePlane.adopt(imagePlane.createTexture());
+
 		auto dataSky = libv::read_file_or_throw("res/texture/sky/merged2.dds");
-		auto imageSky = libv::gl::Image(dataSky);
+		auto imageSky = libv::gl::load_image_or_throw(dataSky);
 		textureSky.adopt(imageSky.createTexture());
 
 		programTest1.use();
@@ -289,7 +290,8 @@ int main(void) {
 	// TODO P1: Make glew init part of libv.gl
 	if (GLenum err = glewInit() != GLEW_OK)
 		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-	{
+
+	try {
 		Sandbox sandbox;
 
 		std::chrono::nanoseconds time_outside;
@@ -334,7 +336,10 @@ int main(void) {
 				time_poll = time_poll.zero();
 			}
 		}
+	} catch (const std::exception& e) {
+		log_sandbox.fatal("Caught exception: {}", e.what());
 	}
+
 	libv::gl::checkGL();
 	glfwMakeContextCurrent(nullptr);
 	glfwDestroyWindow(window);
