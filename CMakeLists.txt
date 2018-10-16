@@ -20,6 +20,8 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
 message(STATUS "CXX compiler id: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "CXX compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
+message(STATUS "Git branch: ${WISH_GIT_BRANCH}")
+message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
@@ -238,7 +240,7 @@ wish_create_external(
 #		--with-stacktrace
 		-j${WISH_PROCESSOR_COUNT}
 	BUILD_IN_SOURCE 1
-	INSTALL_COMMAND ""
+	INSTALL_COMMAND "echo" "Skipping install..."
 	#LINK system stacktrace
 )
 
@@ -275,6 +277,8 @@ wish_create_external(
 	NAME efsw
 	GIT_REPOSITORY https://github.com/mnafees/efsw.git
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
+	CMAKE_ARGS
+		-DSTATIC_LIB=ON
 	# TODO P3: this ext_efsw install command looks off
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/efsw/include/
@@ -319,7 +323,10 @@ wish_create_external(
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
 	LINK glfw3
-	LINK gdi32
+	LINK $<IF:$<BOOL:${WIN32}>,
+			gdi32, # Win 32
+			dl X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt # Ubuntu 18.04
+		>
 )
 
 wish_create_external(
