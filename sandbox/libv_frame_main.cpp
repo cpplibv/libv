@@ -45,7 +45,7 @@ public:
 	TestFrame(const std::string& title) : Frame(title, 1200, 750) {
 		setPosition(POSITION_CENTER_CURRENT_MONITOR);
 		setCloseOperation(ON_CLOSE_DISPOSE);
-		setOpenGLProfile(OPENGL_PROFILE_COMPAT);
+		setOpenGLProfile(OPENGL_PROFILE_CORE);
 		setOpenGLVersion(3, 3);
 		show();
 

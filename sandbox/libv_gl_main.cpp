@@ -184,7 +184,7 @@ struct Sandbox {
 		texture0.create();
 		texture0.bind();
 		texture0.storage2D(1, libv::gl::InternalFormat::RGBA8, 2, 2);
-		texture0.subImage2D(0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedByte, 2, 2, dataTexture);
+		texture0.subImage2D(0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UByte, 2, 2, dataTexture);
 		texture0.setMinFilter(libv::gl::MinFilter::Linear);
 		texture0.setMagFilter(libv::gl::MagFilter::Linear);
 		texture0.setWrapS(libv::gl::Wrap::ClampToEdge);
@@ -194,12 +194,12 @@ struct Sandbox {
 		textureSky.create();
 		textureSky.bind();
 		textureSky.storage2D(1, libv::gl::InternalFormat::RGBA8, 2, 2);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyX1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyX0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyY1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyY0);
-		textureSky.subImage2D(libv::gl::CubeSide::PositiveZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyZ1);
-		textureSky.subImage2D(libv::gl::CubeSide::NegativeZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UnsignedInt_8_8_8_8, 2, 2, dataTextureSkyZ0);
+		textureSky.subImage2D(libv::gl::CubeSide::PositiveX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyX1);
+		textureSky.subImage2D(libv::gl::CubeSide::NegativeX, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyX0);
+		textureSky.subImage2D(libv::gl::CubeSide::PositiveY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyY1);
+		textureSky.subImage2D(libv::gl::CubeSide::NegativeY, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyY0);
+		textureSky.subImage2D(libv::gl::CubeSide::PositiveZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyZ1);
+		textureSky.subImage2D(libv::gl::CubeSide::NegativeZ, 0, 0, 0, libv::gl::Format::RGBA, libv::gl::DataType::UInt_8_8_8_8, 2, 2, dataTextureSkyZ0);
 		textureSky.unbind();
 	}
 
@@ -280,8 +280,8 @@ int main(void) {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
 	GLFWwindow* window;
 
@@ -302,6 +302,9 @@ int main(void) {
 
 	if (GLenum err = glewInit() != GLEW_OK)
 		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
+
+	libv::gl::checkGL();
+
 	{
 		Sandbox sandbox;
 

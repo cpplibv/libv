@@ -7,6 +7,9 @@
 #include <utility>
 
 // TODO P4: Rename this file to for_constexpr.hpp, for.hpp, loop.hpp or cycle.hpp
+// TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
+// TODO P5: n_times and n_times_index can be merged based on F accepting a "size_t" or not
+// TODO P5: for_constexpr should iterate over [begin, end)
 
 
 namespace libv {
@@ -46,8 +49,6 @@ constexpr inline void for_constexpr(F&& func) {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
-
 /// Calls the given function N times
 /// @usage n_times\<10>( [] { do_work(i); } );
 template <size_t N, typename F>
@@ -55,7 +56,6 @@ constexpr inline void n_times(F&& func) {
 	for_constexpr<0, N - 1>([&](auto) { func(); });
 }
 
-// TODO P5: n_times and n_times_index can be merged based on F accepting a "size_t" or not
 /// Calls the given function N times with indexes starting from 0 and ending with N-1
 /// @usage n_times_index\<10>( [] (auto i) { do_work(i); } );
 template <size_t N, typename F>

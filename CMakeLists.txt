@@ -309,7 +309,10 @@ wish_create_external(
 wish_create_external(
 	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-	GIT_TAG glew-cmake-1.11.0
+	GIT_TAG 679246fadb5780963151c676056772fedebab694
+	CMAKE_ARGS
+		-Dglew-cmake_BUILD_SHARED=OFF
+		-Dglew-cmake_BUILD_STATIC=ON
 	LINK glew
 	DEFINE GLEW_STATIC
 )

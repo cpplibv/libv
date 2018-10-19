@@ -95,6 +95,90 @@ public:
 		glTexStorage3D(to_value(BindTarget), levels, to_value(internalFormat), width, height, depth);
 		LIBV_GL_DEBUG_CHECK();
 	}
+
+	// Emulating glTexStorage for pre 4.2 compatibility:
+	//  Failed iteration on implementation due to compatableDefaultType.
+	//  Failed iteration on implementation due to compatableDefaultFormat.
+	//
+	//
+	//	inline void emulateStorage1D(TextureBindTarget BindTarget, InternalFormat internalFormat, size_t levels, uint32_t width) {
+	//		// Simulating glTexStorage1D for pre 4.2 compatibility
+	//		DataType type = compatableDefaultType(BindTarget);
+	//		Format format = compatableDefaultFormat(BindTarget);
+	//		glBindTexture(to_value(BindTarget), textureID);
+	//
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_BASE_LEVEL, 0);
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MAX_LEVEL, levels - 1);
+	//
+	//		for (size_t i = 0; i < levels; i++) {
+	//			glTexImage1D(to_value(BindTarget), i, internalFormat, width, 0, format, type, nullptr);
+	//			width = std::max(1, (width / 2));
+	//		}
+	//		libv::gl::checkGL();
+	//	}
+	//
+	//	inline void emulateStorage2D(InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height) {
+	//		// Simulating glTexStorage2D for pre 4.2 compatibility
+	//		DataType type = compatableDefaultType(BindTarget);
+	//		Format format = compatableDefaultFormat(BindTarget);
+	//		glBindTexture(to_value(BindTarget), textureID);
+	//
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_BASE_LEVEL, 0);
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MAX_LEVEL, levels - 1);
+	//
+	//		if (BindTarget == TextureBindTarget::CubeMap) {
+	//			for (size_t i = 0; i < levels; i++) {
+	//				glTexImage2D(to_value(CubeSide::PositiveX), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				glTexImage2D(to_value(CubeSide::NegativeX), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				glTexImage2D(to_value(CubeSide::PositiveY), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				glTexImage2D(to_value(CubeSide::NegativeY), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				glTexImage2D(to_value(CubeSide::PositiveZ), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				glTexImage2D(to_value(CubeSide::NegativeZ), i, internalFormat, width, height, 0, format, type, nullptr);
+	//
+	//				width = std::max(1, (width / 2));
+	//				height = std::max(1, (height / 2));
+	//			}
+	//		} else if (BindTarget == TextureBindTarget::_1DArray) {
+	//			for (size_t i = 0; i < levels; i++) {
+	//				glTexImage2D(to_value(BindTarget), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				width = std::max(1, (width / 2));
+	//			}
+	//		} else {
+	//			for (size_t i = 0; i < levels; i++) {
+	//				glTexImage2D(to_value(BindTarget), i, internalFormat, width, height, 0, format, type, nullptr);
+	//				width = std::max(1, (width / 2));
+	//				height = std::max(1, (height / 2));
+	//			}
+	//		}
+	//		libv::gl::checkGL();
+	//	}
+	//
+	//	inline void emulateStorage3D(InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height, uint32_t depth) {
+	//		// Simulating glTexStorage3D for pre 4.2 compatibility
+	//		DataType type = compatableDefaultType(BindTarget);
+	//		Format format = compatableDefaultFormat(BindTarget);
+	//		glBindTexture(to_value(BindTarget), textureID);
+	//
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_BASE_LEVEL, 0);
+	//		glTexParameteri(to_value(BindTarget), GL_TEXTURE_MAX_LEVEL, levels - 1);
+	//
+	//		if (BindTarget == TextureBindTarget::_3D) {
+	//			for (size_t i = 0; i < levels; i++) {
+	//				glTexImage3D(to_value(BindTarget), i, internalFormat, width, height, depth, 0, format, type, nullptr);
+	//				width = std::max(1, (width / 2));
+	//				height = std::max(1, (height / 2));
+	//				depth = std::max(1, (depth / 2));
+	//			}
+	//		} else {
+	//			for (size_t i = 0; i < levels; i++) {
+	//				glTexImage3D(to_value(BindTarget), i, internalFormat, width, height, depth, 0, format, type, nullptr);
+	//				width = std::max(1, (width / 2));
+	//				height = std::max(1, (height / 2));
+	//			}
+	//		}
+	//		libv::gl::checkGL();
+	//	}
+
 	inline void image1D(size_t level, InternalFormat internalFormat, Format dataFormat, DataType dataType, uint32_t width, const void* data) {
 		LIBV_GL_DEBUG_ASSERT(textureID != invalidID);
 		glTexImage1D(to_value(BindTarget), level, to_value(internalFormat), width, 0, to_value(dataFormat), to_value(dataType), data);
@@ -318,100 +402,3 @@ struct Sampler {
 
 } // namespace gl
 } // namespace libv
-
-
-// =================================================================================================
-
-// Emulating glTexStorage*D for pre 4.2 compatibility:
-//  Failed iteration on implementation due to compatableDefaultType.
-//  Failed iteration on implementation due to compatableDefaultFormat.
-//
-//
-//inline void emulateStorage1D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width) {
-//	glGenTextures(1, &textureID);
-//	if (textureID == invalidID)
-//		log_gl.error("Failed to create 1D texture", to_string(type));
-//
-//	// Simulating glTexStorage1D for pre 4.2 compatibility
-//	DataType type = compatableDefaultType(target);
-//	Format format = compatableDefaultFormat(target);
-//	glBindTexture(to_value(BindTarget), textureID);
-//
-//	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-//	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, levels - 1);
-//
-//	for (size_t i = 0; i < levels; i++) {
-//		glTexImage1D(target, i, internalFormat, width, 0, format, type, nullptr);
-//		width = std::max(1, (width / 2));
-//	}
-//	LIBV_GL_DEBUG_CHECK();
-//}
-//
-//inline void emulateStorage2D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height) {
-//	glGenTextures(1, &textureID);
-//	if (textureID == invalidID)
-//		log_gl.error("Failed to create 2D texture", to_string(type));
-//
-//	// Simulating glTexStorage2D for pre 4.2 compatibility
-//	DataType type = compatableDefaultType(target);
-//	Format format = compatableDefaultFormat(target);
-//	glBindTexture(to_value(BindTarget), textureID);
-//
-//	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-//	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, levels - 1);
-//
-//	if (target == TextureBindTarget::CubeMap) {
-//		for (size_t i = 0; i < levels; i++) {
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapPositiveX), i, internalFormat, width, height, 0, format, type, nullptr);
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapNegativeX), i, internalFormat, width, height, 0, format, type, nullptr);
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapPositiveY), i, internalFormat, width, height, 0, format, type, nullptr);
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapNegativeY), i, internalFormat, width, height, 0, format, type, nullptr);
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapPositiveZ), i, internalFormat, width, height, 0, format, type, nullptr);
-//			glTexImage2D(to_value(TextureTarget2D::CubeMapNegativeZ), i, internalFormat, width, height, 0, format, type, nullptr);
-//
-//			width = std::max(1, (width / 2));
-//			height = std::max(1, (height / 2));
-//		}
-//	} else if (target == TextureBindTarget::_1DArray) {
-//		for (size_t i = 0; i < levels; i++) {
-//			glTexImage2D(to_value(BindTarget), i, internalFormat, width, height, 0, format, type, nullptr);
-//			width = std::max(1, (width / 2));
-//		}
-//	} else {
-//		for (size_t i = 0; i < levels; i++) {
-//			glTexImage2D(to_value(BindTarget), i, internalFormat, width, height, 0, format, type, nullptr);
-//			width = std::max(1, (width / 2));
-//			height = std::max(1, (height / 2));
-//		}
-//	}
-//	LIBV_GL_DEBUG_CHECK();
-//}
-//inline void emulateStorage3D(TextureBindTarget target, InternalFormat internalFormat, size_t levels, uint32_t width, uint32_t height, uint32_t depth) {
-//	glGenTextures(3, &textureID);
-//	if (textureID == invalidID)
-//		log_gl.error("Failed to create 2D texture", to_string(type));
-//
-//	// Simulating glTexStorage3D for pre 4.2 compatibility
-//	DataType type = compatableDefaultType(target);
-//	Format format = compatableDefaultFormat(target);
-//	glBindTexture(to_value(BindTarget), textureID);
-//
-//	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
-//	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, levels - 1);
-//
-//	if (target == TextureBindTarget::_3D) {
-//		for (size_t i = 0; i < levels; i++) {
-//			glTexImage3D(target, i, internalFormat, width, height, depth, 0, format, type, nullptr);
-//			width = std::max(1, (width / 2));
-//			height = std::max(1, (height / 2));
-//			depth = std::max(1, (depth / 2));
-//		}
-//	} else {
-//		for (size_t i = 0; i < levels; i++) {
-//			glTexImage3D(target, i, internalFormat, width, height, depth, 0, format, type, nullptr);
-//			width = std::max(1, (width / 2));
-//			height = std::max(1, (height / 2));
-//		}
-//	}
-//	LIBV_GL_DEBUG_CHECK();
-//}
