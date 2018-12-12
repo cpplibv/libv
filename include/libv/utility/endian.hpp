@@ -4,7 +4,7 @@
 
 // ext
 // TODO P5: C++20 replace boost with standard
-#include <boost/detail/endian.hpp>
+#include <boost/predef/other/endian.h>
 // std
 #include <cstdint>
 

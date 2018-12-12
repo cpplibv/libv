@@ -213,7 +213,7 @@ wish_create_external(
 	LINK zlibstatic
 )
 
-set(Boost_Version 1.66.0)
+set(Boost_Version 1.69.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 message(STATUS "Boost version: " ${Boost_Version})
