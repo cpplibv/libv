@@ -17,14 +17,14 @@
 
 namespace {
 
-#ifndef LIBV_SHORT_PATH_CUTOFF
-#    define LIBV_SHORT_PATH_CUTOFF 0
+#ifndef WISH_SHORT_PATH_CUTOFF
+#    define WISH_SHORT_PATH_CUTOFF 0
 #endif
 
 template <typename OS, typename Pos>
 OS& streamSourcePosition(OS& os, const Pos& pos) {
 	std::string_view file = pos.file;
-	file.remove_prefix(LIBV_SHORT_PATH_CUTOFF);
+	file.remove_prefix(WISH_SHORT_PATH_CUTOFF);
 
 	file = libv::slice_prefix_view(file, "tests/");
 	file = libv::slice_prefix_view(file, "test/");
@@ -240,7 +240,7 @@ private:
 			}
 
 			std::string source = result.getSourceInfo().file != testInfo->lineInfo.file ?
-					fmt::format("\t{}:{}", result.getSourceInfo().file + LIBV_SHORT_PATH_CUTOFF + 5, result.getSourceInfo().line) :
+					fmt::format("\t{}:{}", result.getSourceInfo().file + WISH_SHORT_PATH_CUTOFF + 5, result.getSourceInfo().line) :
 					fmt::format("{:6}", result.getSourceInfo().line);
 
 //			std::string section;
@@ -248,7 +248,7 @@ private:
 //				for (size_t i = sections.size() - sectionsDirty; i < sections.size(); ++i) {
 //
 //					std::string section_source = sections[i].lineInfo.file != testInfo->lineInfo.file ?
-//							fmt::format("\t{}:{}", sections[i].lineInfo.file + LIBV_SHORT_PATH_CUTOFF + 5, sections[i].lineInfo.line) :
+//							fmt::format("\t{}:{}", sections[i].lineInfo.file + WISH_SHORT_PATH_CUTOFF + 5, sections[i].lineInfo.line) :
 //							fmt::format("{:6}", sections[i].lineInfo.line);
 //
 //					section += fmt::format("{}: Section: {}\n", section_source, sections[i].name);

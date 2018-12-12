@@ -1,6 +1,13 @@
 // File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
 
-//#include <algorithm>
+// ext
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/container/flat_map.hpp>
+#include <boost/core/demangle.hpp>
+#include <boost/stacktrace.hpp>
+#include <fmt/printf.h>
+//#include <boost/container/flat_map.hpp>
+//#include <boost/container/flat_set.hpp>
 //#include <boost/container/small_vector.hpp>
 //#include <boost/fusion/adapted/std_pair.hpp>
 //#include <boost/fusion/adapted/std_tuple.hpp>
@@ -8,29 +15,39 @@
 //#include <boost/spirit/home/x3.hpp>
 //#include <boost/spirit/home/x3/support/ast/variant.hpp>
 //#include <boost/variant.hpp>
-//#include <boost/container/flat_map.hpp>
-//#include <boost/container/flat_set.hpp>
-//#include <boost/container/small_vector.hpp>
-//#include <chrono>
-//#include <ctime>
-//#include <fstream>
-//#include <functional>
-//#include <libv/parse/color.hpp>
-//#include <libv/parse/text_tag.hpp>
-//#include <libv/range/view_uft8_codepoints.hpp>
-//#include <map>
-//#include <memory>
 //#include <range/v3/algorithm/copy.hpp>
 //#include <range/v3/algorithm/for_each.hpp>
 //#include <range/v3/all.hpp>
 //#include <range/v3/core.hpp>
 //#include <range/v3/view/reverse.hpp>
+// libv
+#include <libv/utility/slice.hpp>
+//#include <libv/parse/color.hpp>
+//#include <libv/parse/text_tag.hpp>
+//#include <libv/range/view_uft8_codepoints.hpp>
+//#include <libv/utility/endian.hpp>
+//#include <libv/utility/hex_dump.hpp>
+// std
+#include <iostream>
+#include <map>
+#include <regex>
+#include <string_view>
+//#include <algorithm>
+//#include <chrono>
+//#include <ctime>
+//#include <fstream>
+//#include <functional>
+//#include <map>
+//#include <memory>
 //#include <set>
 //#include <string>
 //#include <unordered_map>
 //#include <utility>
 //#include <vector>
-#include <libv/utility/hex_dump.hpp>
+
+#ifndef WISH_SHORT_PATH_PREFIX
+#    define WISH_SHORT_PATH_PREFIX ""
+#endif
 
 //http://ciere.com/cppnow15/x3_docs/index.html
 //http://ciere.com/cppnow15/x3_docs/spirit/tutorials/semantic_actions.html
@@ -61,12 +78,59 @@
 //	for (const auto& v : parsed_values) {
 //		std::cout << (!v.close ? " tag open: " : "tag close: ") << v.name << (v.value.empty() ? "" : " = ") << v.value << '\n';
 //	}
+//
+//	std::cout << "Hi" << std::endl;
+//	std::cout << libv::hex_dump("țûɾ ấɖḯƥĭṩčįɳ]ġ \"ᶁⱺ ẽḭŭŝḿꝋď ]ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đôȇ ᵯáᶇā ąⱡîɋṹẵ.") << std::endl;
+//	std::cout << libv::is_big_endian() << std::endl;
+//	std::cout << libv::is_little_endian() << std::endl;
+//	std::cout << libv::is_network_endian() << std::endl;
 
+void prettify(std::string& name) {
+	std::vector<std::pair<std::string_view, std::string_view>> replace_map{
+		{", ", ","},
+		{" >", ">"},
+		{"> ", ">"},
+		{"__cxx11::", ""},
+		{"std::basic_string<char,std::char_traits<char>,std::allocator<char>>", "std::string"},
+		{"std::basic_string_view<char,std::char_traits<char>>", "std::string_view"},
+	};
+	//	std::vector<std::pair<std::regex, std::string>> pattern_map{
+	//		{std::regex{"<(.*),boost::container::new_allocator<.*>>"}, "<$1>"},
+	//		{std::regex{"<(.*),std::allocator<.*>>"}, "<$1>"},
+	//		{std::regex{"<(.*),std::less<.*>>"}, "<$1>"},
+	//	};
+
+	for (const auto& [from, to] : replace_map)
+		boost::algorithm::replace_all(name, from, to);
+
+	//	for (const auto& [pattern, to] : pattern_map)
+	//		name = std::regex_replace(name, pattern, to);
+
+	boost::algorithm::replace_all(name, ",", ", ");
+}
+
+void bar(std::vector<std::vector<std::string>>) {
+	int i = 0;
+	for (const boost::stacktrace::frame& frame : boost::stacktrace::stacktrace()) {
+		auto name = boost::core::demangle(("_" + frame.name()).c_str());
+		prettify(name);
+
+		fmt::print(" {}# {:40} {}:{}\n",
+				i++,
+				name,
+				libv::slice_prefix_view(frame.source_file(), WISH_SHORT_PATH_PREFIX),
+				frame.source_line());
+	}
+}
+
+void foo(double, boost::container::flat_map<std::string_view, int>) {
+	bar({});
+}
 
 #include <iostream>
 
 int main() {
-	//	std::cout << "Hi" << std::endl;
-	std::cout << libv::hex_dump("țûɾ ấɖḯƥĭṩčįɳ]ġ \"ᶁⱺ ẽḭŭŝḿꝋď ]ṫĕᶆᶈṓɍ ỉñḉīḑȋᵭṵńť ṷŧ ḹẩḇőꝛế éȶ đôȇ ᵯáᶇā ąⱡîɋṹẵ.") << std::endl;
+	foo(0,{});
+
 	return 0;
 }

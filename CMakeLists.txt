@@ -39,8 +39,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
-string(LENGTH ${CMAKE_SOURCE_DIR}_ LIBV_SHORT_PATH_CUTOFF)
-
 # Warning flags ------------------------------------------------------------------------------------
 
 wish_warning(
@@ -103,7 +101,6 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-Og)
 	add_compile_options(-ggdb3)
-	add_compile_options(-fno-omit-frame-pointer)
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	add_compile_options(-Ofast)
@@ -129,7 +126,9 @@ add_definitions(-DNDEBUG)
 add_definitions(-DGIT_BRANCH="${WISH_GIT_BRANCH}")
 add_definitions(-DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
 # Macro - Libv
-add_definitions(-DLIBV_SHORT_PATH_CUTOFF=${LIBV_SHORT_PATH_CUTOFF})
+string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
+add_definitions(-DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF})
+add_definitions(-DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/")
 
 # Includes Directories -----------------------------------------------------------------------------
 
@@ -213,6 +212,21 @@ wish_create_external(
 	LINK zlibstatic
 )
 
+wish_create_external(
+	NAME libbacktrace
+	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
+	GIT_TAG 5a99ff7fed66b8ea8f09c9805c138524a7035ece
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND ./configure
+	BUILD_COMMAND make
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/libbacktrace/include/libbacktrace/
+		COMMAND mkdir -p ${PATH_EXT}/libbacktrace/lib/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/backtrace.h ${PATH_EXT}/libbacktrace/include/libbacktrace/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/.libs/libbacktrace.a ${PATH_EXT}/libbacktrace/lib/
+	LINK backtrace
+)
+
 set(Boost_Version 1.69.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
@@ -227,6 +241,7 @@ endif()
 wish_create_external(
 	NAME boost
 	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
+	BUILD_IN_SOURCE 1
 	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
 	BUILD_COMMAND ./b2 --ignore-site-config install
 		toolset=${TOOLSET}
@@ -238,11 +253,16 @@ wish_create_external(
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
 		--with-system
-#		--with-stacktrace
 		-j${WISH_PROCESSOR_COUNT}
-	BUILD_IN_SOURCE 1
 	INSTALL_COMMAND "echo" "Skipping install..."
-	#LINK system stacktrace
+
+	DEFINE BOOST_STACKTRACE_USE_BACKTRACE
+	DEFINE BOOST_STACKTRACE_BACKTRACE_INCLUDE_FILE=<libbacktrace/backtrace.h>
+)
+
+wish_create_library(
+	TARGET ext_boost_stacktrace INTERFACE
+	LINK ext_boost ext_libbacktrace ole32 dbgeng
 )
 
 wish_create_external(
@@ -522,7 +542,7 @@ wish_create_group(GROUP_SANDBOX) # Sandboxes -----------------------------------
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log ext_boost
+	LINK   libv_log ext_boost ext_boost_stacktrace
 )
 
 wish_create_executable(

@@ -41,8 +41,8 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-#ifndef LIBV_SHORT_PATH_CUTOFF
-#    define LIBV_SHORT_PATH_CUTOFF 0
+#ifndef WISH_SHORT_PATH_CUTOFF
+#    define WISH_SHORT_PATH_CUTOFF 0
 #endif
 
 class Logger {
@@ -297,7 +297,7 @@ private:
 				fmt::arg("module", module),
 				fmt::arg("severity", colored ? toColorString(severity) : toString(severity)),
 				fmt::arg("line", loc.line()),
-				fmt::arg("file", loc.file_name() + LIBV_SHORT_PATH_CUTOFF),
+				fmt::arg("file", loc.file_name() + WISH_SHORT_PATH_CUTOFF),
 				fmt::arg("function", loc.function_name()),
 				fmt::arg("column", loc.column()),
 				// fmt::arg("time", std::chrono::steady_clock::now()),
