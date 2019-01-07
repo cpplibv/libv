@@ -24,7 +24,7 @@ namespace {
 
 size_t num_server_thread = 1;
 size_t num_client_thread = 1;
-size_t test_port = 1800;
+uint16_t test_port = 1800;
 
 const auto msg_32 = "123456789_123456789_123456789_12";
 const auto msg_64 = "123456789_123456789_123456789_123456789_123456789_123456789_1234";

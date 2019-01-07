@@ -134,3 +134,26 @@ int main() {
 
 	return 0;
 }
+
+// =================================================================================================
+
+//// ext
+//#include <fmt/printf.h>
+//// std
+//#include <iostream>
+//// pro
+//#include <libv/math/vec.hpp>
+//
+//
+//int main() {
+//	float u0{0.0}; fmt::print("{:40.60}\n", u0);
+//	float u1{-0.0}; fmt::print("{:40.60}\n", u1);
+//	float u2{1.0}; fmt::print("{:40.60}\n", u2);
+//	float u3{-1.0}; fmt::print("{:40.60}\n", u3);
+//	float u4{0.11111111111111111111111111111111f}; fmt::print("{:40.60}\n", u4);
+//
+//	libv::vec3f v0{0.11111111111111111111111111111111f, 0, 0}; fmt::print("{}\n", v0);
+//
+//
+//	return 0;
+//}

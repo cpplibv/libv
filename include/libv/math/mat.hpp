@@ -210,10 +210,10 @@ struct mat_t : mat_base_t<N, T> {
 	inline mat_t<N, T> operator*(const mat_t<N, T>& mat) const {
 		return from_glm(this->mx * mat.mx);
 	}
-	inline decltype(auto) operator[](size_t col) {
+	inline decltype(auto) operator[](int col) {
 		return this->mx[col];
 	}
-	inline decltype(auto) operator[](size_t col) const {
+	inline decltype(auto) operator[](int col) const {
 		return this->mx[col];
 	}
 

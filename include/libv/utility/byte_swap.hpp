@@ -14,9 +14,10 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 constexpr inline uint16_t byte_swap(uint16_t var) {
-	return
+	return static_cast<uint16_t>(
 			((var << 1 * 8) & 0xFF00) |
-			((var >> 1 * 8) & 0x00FF);
+			((var >> 1 * 8) & 0x00FF)
+	);
 }
 
 constexpr inline uint32_t byte_swap(uint32_t var) {

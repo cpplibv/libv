@@ -57,7 +57,7 @@ public:
 	constexpr inline flag_enum(flag_enum&& rhs) noexcept = default;
 	constexpr inline explicit flag_enum(const Underlying value) noexcept : value_(value) { }
 
-	constexpr inline flag_enum(const bit bit_index) noexcept : value_(Underlying{1} << bit_index.index()) { }
+	constexpr inline flag_enum(const bit bit_index) noexcept : value_(static_cast<Underlying>(Underlying{1} << bit_index.index())) { }
 
 	constexpr inline flag_enum& operator=(const flag_enum& rhs) & noexcept = default;
 	constexpr inline flag_enum& operator=(flag_enum&& rhs) & noexcept = default;
@@ -93,7 +93,7 @@ public:
 	}
 
 	constexpr inline flag_enum operator~() const noexcept {
-		return flag_enum(~value_);
+		return flag_enum(static_cast<Underlying>(~value_));
 	}
 
 	constexpr inline bool operator==(const flag_enum f) const noexcept {
@@ -117,15 +117,15 @@ public:
 	}
 
 	constexpr inline flag_enum& operator|=(const bit rhs) & noexcept {
-		value_ |= (Underlying{1} << rhs.index());
+		value_ = static_cast<Underlying>(value_ | 1 << rhs.index());
 		return *this;
 	}
 	constexpr inline flag_enum& operator&=(const bit rhs) & noexcept {
-		value_ &= (Underlying{1} << rhs.index());
+		value_ = static_cast<Underlying>(value_ & 1 << rhs.index());
 		return *this;
 	}
 	constexpr inline flag_enum& operator^=(const bit rhs) & noexcept {
-		value_ ^= (Underlying{1} << rhs.index());
+		value_ = static_cast<Underlying>(value_ ^ 1 << rhs.index());
 		return *this;
 	}
 
@@ -140,23 +140,23 @@ public:
 	}
 
 	friend constexpr inline flag_enum operator|(const bit lhs, const flag_enum rhs) noexcept {
-		return flag_enum((Underlying{1} << lhs.index()) | rhs.value_);
+		return flag_enum(static_cast<Underlying>(Underlying{1} << lhs.index()) | rhs.value_);
 	}
 	friend constexpr inline flag_enum operator&(const bit lhs, const flag_enum rhs) noexcept {
-		return flag_enum((Underlying{1} << lhs.index()) & rhs.value_);
+		return flag_enum(static_cast<Underlying>(Underlying{1} << lhs.index()) & rhs.value_);
 	}
 	friend constexpr inline flag_enum operator^(const bit lhs, const flag_enum rhs) noexcept {
-		return flag_enum((Underlying{1} << lhs.index()) ^ rhs.value_);
+		return flag_enum(static_cast<Underlying>(Underlying{1} << lhs.index()) ^ rhs.value_);
 	}
 
 	friend constexpr inline flag_enum operator|(const flag_enum lhs, const bit rhs) noexcept {
-		return flag_enum(lhs.value_ | (Underlying{1} << rhs.index()));
+		return flag_enum(lhs.value_ | static_cast<Underlying>(Underlying{1} << rhs.index()));
 	}
 	friend constexpr inline flag_enum operator&(const flag_enum lhs, const bit rhs) noexcept {
-		return flag_enum(lhs.value_ & (Underlying{1} << rhs.index()));
+		return flag_enum(lhs.value_ & static_cast<Underlying>(Underlying{1} << rhs.index()));
 	}
 	friend constexpr inline flag_enum operator^(const flag_enum lhs, const bit rhs) noexcept {
-		return flag_enum(lhs.value_ ^ (Underlying{1} << rhs.index()));
+		return flag_enum(lhs.value_ ^ static_cast<Underlying>(Underlying{1} << rhs.index()));
 	}
 
 	template <typename OStream>

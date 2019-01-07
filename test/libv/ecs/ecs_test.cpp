@@ -7,7 +7,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N>
+template <libv::ecs::ComponentSystemID N>
 struct Value3 : libv::ecs::Component<Value3<N>, N> {
 	uint32_t value0 = 0;
 	uint32_t value1 = 0;

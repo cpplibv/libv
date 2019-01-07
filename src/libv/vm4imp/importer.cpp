@@ -95,23 +95,23 @@ void importMaterials(Model& model, const aiScene* scene) {
 			materials[i].properties.emplace("refraction", ai_float);
 
 		const auto loadTexture = [&](const auto& stack, const auto& name) {
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXTURE(stack, n), ai_str); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXTURE(stack, n), ai_str); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_path", name, n), std::string(ai_str.C_Str()));
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXBLEND(stack, n), ai_float); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXBLEND(stack, n), ai_float); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_blend", name, n), ai_float);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXOP(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXOP(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texop", name, n), ai_int);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPING(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPING(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mapping", name, n), ai_int);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_UVWSRC(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_UVWSRC(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_uvwsrc", name, n), ai_int);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_U(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_U(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mappingmode_u", name, n), ai_int);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_V(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_MAPPINGMODE_V(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_mappingmode_v", name, n), ai_int);
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_vec3); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_vec3); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texmap_axis", name, n), vec3f(ai_vec3));
-			for (size_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_int); ++n)
+			for (uint32_t n = 0; AI_SUCCESS == scene->mMaterials[i]->Get(AI_MATKEY_TEXMAP_AXIS(stack, n), ai_int); ++n)
 				materials[i].properties.emplace(fmt::format("texture_{}_{:02}_texflags", name, n), ai_int);
 		};
 

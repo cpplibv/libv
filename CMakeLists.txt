@@ -67,7 +67,7 @@ wish_warning(
 
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
-	# GNU -Wconversion # 130+, most of it is in vec and the rest is in gl
+	GNU -Wconversion # 130+, most of it is in vec and the rest is in gl
 	# GNU -Wfloat-equal # in tests 40+ false positive
 
 	# Only enable time-to-time to check on what is going on:

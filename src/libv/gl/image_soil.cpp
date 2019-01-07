@@ -36,7 +36,7 @@ std::optional<Image> load_image_SOIL(const std::string_view data) {
 	storage.reset(
 			SOIL_load_image_from_memory(
 					reinterpret_cast<const unsigned char*>(data.data()),
-					data.size(),
+					static_cast<int>(data.size()),
 					&size.x, &size.y, &channels,
 					SOIL_LOAD_AUTO));
 

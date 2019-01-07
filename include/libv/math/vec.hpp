@@ -13,6 +13,7 @@
 // std
 #include <cassert>
 #include <cmath>
+#include <ostream>
 #include <utility>
 #include <array>
 // pro
@@ -35,6 +36,7 @@
 //			build_vec<N>([&](auto index) { return lhs.data[index] / rhs.data[index]; }
 //		)
 // TODO P5: use warning disable macros with: _Pragma("argument")
+// TODO P5: implement operator%
 
 // NOTE: Use concepts to enable every operation based on underlying types
 // NOTE: Perfect forwarding is possible, but it seams like does not worth +600 line template
@@ -95,8 +97,7 @@ struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
-	template <typename T0, typename T1>
-	constexpr inline vec_base_t(T0 x, T1 y) : x(x), y(y) { }
+	constexpr inline vec_base_t(T x, T y) : x(x), y(y) { }
 	template <typename V0,
 			CONCEPT_REQUIRES_(Vec2<V0>())>
 	constexpr inline explicit vec_base_t(const V0& xy) : x(xy.x), y(xy.y) { }
@@ -119,14 +120,13 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
-	template <typename T0, typename T1, typename T2>
-	constexpr inline vec_base_t(T0 x, T1 y, T2 z) : x(x), y(y), z(z) { }
-	template <typename V0, typename T1,
+	constexpr inline vec_base_t(T x, T y, T z) : x(x), y(y), z(z) { }
+	template <typename V0,
 			CONCEPT_REQUIRES_(Vec2<V0>())>
-	constexpr inline vec_base_t(const V0& xy, T1 z) : x(xy.x), y(xy.y), z(z) { }
-	template <typename T0, typename V1,
-			CONCEPT_REQUIRES_(Vec2<V1>())>
-	constexpr inline vec_base_t(T0 x, const V1& yz) : x(x), y(yz.x), z(yz.y) { }
+	constexpr inline vec_base_t(const V0& xy, T z) : x(xy.x), y(xy.y), z(z) { }
+	template <typename V0,
+			CONCEPT_REQUIRES_(Vec2<V0>())>
+	constexpr inline vec_base_t(T x, const V0& yz) : x(x), y(yz.x), z(yz.y) { }
 	template <typename V0,
 			CONCEPT_REQUIRES_(Vec3<V0>())>
 	constexpr inline explicit vec_base_t(const V0& xyz) : x(xyz.x), y(xyz.y), z(xyz.z) { }
@@ -150,27 +150,26 @@ struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
-	template <typename T0, typename T1, typename T2, typename T3>
-	constexpr inline vec_base_t(T0 x, T1 y, T2 z, T3 w) : x(x), y(y), z(z), w(w) { }
-	template <typename V0, typename T1, typename T2,
+	constexpr inline vec_base_t(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
+	template <typename V0,
 			CONCEPT_REQUIRES_(Vec2<V0>())>
-	constexpr inline vec_base_t(const V0& xy, T1 z, T2 w) : x(xy.x), y(xy.y), z(z), w(w) { }
-	template <typename T0, typename V1, typename T2,
-			CONCEPT_REQUIRES_(Vec2<V1>())>
-	constexpr inline vec_base_t(T0 x, const V1& yz, T2 w) : x(x), y(yz.x), z(yz.y), w(w) { }
-	template <typename T0, typename T1, typename V2,
-			CONCEPT_REQUIRES_(Vec2<V2>())>
-	constexpr inline vec_base_t(T0 x, T1 y, const V2& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
+	constexpr inline vec_base_t(const V0& xy, T z, T w) : x(xy.x), y(xy.y), z(z), w(w) { }
+	template <typename V0,
+			CONCEPT_REQUIRES_(Vec2<V0>())>
+	constexpr inline vec_base_t(T x, const V0& yz, T w) : x(x), y(yz.x), z(yz.y), w(w) { }
+	template <typename V0,
+			CONCEPT_REQUIRES_(Vec2<V0>())>
+	constexpr inline vec_base_t(T x, T y, const V0& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
 	template <typename V0, typename V1,
 			CONCEPT_REQUIRES_(Vec2<V0>()),
 			CONCEPT_REQUIRES_(Vec2<V1>())>
 	constexpr inline vec_base_t(const V0& xy, const V1& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
-	template <typename V0, typename T1,
+	template <typename V0,
 			CONCEPT_REQUIRES_(Vec3<V0>())>
-	constexpr inline vec_base_t(const V0& xyz, T1 w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
-	template <typename T0, typename V1,
-			CONCEPT_REQUIRES_(Vec3<V1>())>
-	constexpr inline vec_base_t(T0 x, const V1& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
+	constexpr inline vec_base_t(const V0& xyz, T w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
+	template <typename V0,
+			CONCEPT_REQUIRES_(Vec3<V0>())>
+	constexpr inline vec_base_t(T x, const V0& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
 	template <typename V0,
 			CONCEPT_REQUIRES_(Vec4<V0>())>
 	constexpr inline explicit vec_base_t(const V0& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z), w(xyzw.w) { }
@@ -204,11 +203,6 @@ struct vec_t : vec_base_t<N, T> {
 	//		y(detail::index_into_vec_pack<1>(args...)),
 	//		z(detail::index_into_vec_pack<2>(args...)),
 	//		w(detail::index_into_vec_pack<3>(args...)) { }
-
-	template <typename K, typename = decltype(T(std::declval<const K&>()))>
-	constexpr explicit inline vec_t(const vec_t<N, K>& vec) {
-		meta::n_times_index<N>([&](auto index) { this->data[index] = vec.data[index]; });
-	}
 
 	// operator[] ----------------------------------------------------------------------------------
 	constexpr inline T& operator[](size_t i) & {
@@ -351,6 +345,10 @@ template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return lhs.data[index] / rhs.data[index]; });
 }
+//template <size_t N, typename T, typename K>
+//constexpr inline auto operator%(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
+//	return build_vec<N>([&](auto index) { return lhs.data[index] % rhs.data[index]; });
+//}
 
 // operator*(vec, scalar) --------------------------------------------------------------------------
 
@@ -370,6 +368,10 @@ template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) {
 	return build_vec<N>([&](auto index) { return lhs.data[index] / rhs; });
 }
+//template <size_t N, typename T, typename K>
+//constexpr inline auto operator%(const vec_t<N, T>& lhs, const K& rhs) {
+//	return build_vec<N>([&](auto index) { return lhs.data[index] % rhs; });
+//}
 
 // operator*(scalar, vec) --------------------------------------------------------------------------
 
@@ -389,6 +391,10 @@ template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const T& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return lhs / rhs.data[index]; });
 }
+//template <size_t N, typename T, typename K>
+//constexpr inline auto operator%(const T& lhs, const vec_t<N, K>& rhs) {
+//	return build_vec<N>([&](auto index) { return lhs % rhs.data[index]; });
+//}
 
 // operator==(vec, vec) ----------------------------------------------------------------------------
 template <size_t N, typename T, typename K>
@@ -459,10 +465,11 @@ constexpr inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
 }
 
 // operator<<(ostream, vec) ------------------------------------------------------------------------
-template <typename OStream, size_t N, typename T>
-constexpr inline OStream& operator<<(OStream& os, const vec_t<N, T>& vec) {
+template <size_t N, typename T,
+		typename = std::enable_if_t<libv::meta::is_ostreamable<std::ostream, T>::value>>
+constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& vec) {
 	meta::n_times_index<N>([&](auto index) {
-		if constexpr (decltype(index)::value != 0)
+		if constexpr (index != 0)
 			os << ' ';
 		os << vec.data[index];
 	});
@@ -592,7 +599,7 @@ constexpr inline auto min(const T& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return std::min(lhs, rhs.data[index]); });
 }
 
-/// \return The static casted vector to the requested K type
+/// \return The static_cast-ed vector to the requested K type
 template <typename K, size_t N, typename T>
 constexpr inline auto cast(const vec_t<N, T>& vec) {
 	return build_vec<N>([&](auto index) { return static_cast<K>(vec.data[index]); });

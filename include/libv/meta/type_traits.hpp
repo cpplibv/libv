@@ -14,9 +14,21 @@ namespace meta {
 
 template <typename L, typename R, typename = void> struct is_less_comparable : std::false_type {
 };
+
 template <typename L, typename R>
 struct is_less_comparable<L, R, std::void_t<decltype(
 		std::declval<const L&>() < std::declval<const R&>()
+		)>> : std::true_type { };
+
+// -------------------------------------------------------------------------------------------------
+// ostreamable
+
+template <typename L, typename R, typename = void> struct is_ostreamable : std::false_type {
+};
+
+template <typename L, typename R>
+struct is_ostreamable<L, R, std::void_t<decltype(
+		std::declval<L&>() << std::declval<const R&>()
 		)>> : std::true_type { };
 
 // -------------------------------------------------------------------------------------------------

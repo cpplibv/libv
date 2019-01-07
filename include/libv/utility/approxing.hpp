@@ -16,38 +16,49 @@ namespace libv {
 /// @param Precision
 template <typename T, int Precision = -4>
 struct Approxing {
-	static constexpr T epsilon = std::pow<T>(10, Precision);
+	static constexpr T epsilon = T{std::pow<T>(10, Precision)};
 
 	T value;
 
 	Approxing() = default;
-	template <typename TC> Approxing(TC&& value) : value(std::forward<TC>(value)) { }
+	inline Approxing(const Approxing& orig) = default;
+	inline Approxing(Approxing&& orig) = default;
 
-	template <typename V> friend inline bool operator==(const Approxing& lhs, const V& rhs) {
+	inline Approxing(T value) :
+		value(std::move(value)) { }
+
+	template <typename V>
+	friend inline bool operator==(const Approxing& lhs, const V& rhs) {
 		return std::abs(lhs.value - rhs) <= epsilon;
 	}
 
-	template <typename V> friend inline bool operator==(const V& lhs, const Approxing& rhs) {
+	template <typename V>
+	friend inline bool operator==(const V& lhs, const Approxing& rhs) {
 		return rhs == lhs;
 	}
 
-	template <typename V> friend inline bool operator>(const Approxing& lhs, const V& rhs) {
+	template <typename V>
+	friend inline bool operator>(const Approxing& lhs, const V& rhs) {
 		return lhs + epsilon > rhs;
 	}
 
-	template <typename V> friend inline bool operator>(const V& lhs, const Approxing& rhs) {
+	template <typename V>
+	friend inline bool operator>(const V& lhs, const Approxing& rhs) {
 		return lhs > rhs - epsilon;
 	}
 
-	template <typename V> friend inline bool operator<(const Approxing& lhs, const V& rhs) {
+	template <typename V>
+	friend inline bool operator<(const Approxing& lhs, const V& rhs) {
 		return !(rhs > lhs);
 	}
 
-	template <typename V> friend inline bool operator<(const V& lhs, const Approxing& rhs) {
+	template <typename V>
+	friend inline bool operator<(const V& lhs, const Approxing& rhs) {
 		return !(rhs > lhs);
 	}
 
-	template <typename OS> friend OS& operator<<(OS& os, const Approxing& av) {
+	template <typename OS>
+	friend OS& operator<<(OS& os, const Approxing& av) {
 		os << av.value << "±" << av.epsilon;
 		return os;
 	}
