@@ -86,13 +86,13 @@ Texture ImageSOIL::createTexture() const noexcept {
 			channels == 3 ? GL_RGB :
 			channels == 2 ? GL_RG :
 			channels == 1 ? GL_R : 0;
-	GLenum internalFormat = externalFormat;
+	GLenum Format = externalFormat;
 
 	glGenTextures(1, &textureID);
 	glBindTexture(target, textureID);
 	glTexParameteri(target, GL_TEXTURE_BASE_LEVEL, 0);
 	glTexParameteri(target, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexImage2D(target, 0, internalFormat, size_.x, size_.y, 0, externalFormat, externalType, storage.get());
+	glTexImage2D(target, 0, Format, size_.x, size_.y, 0, externalFormat, externalType, storage.get());
 
 	libv::gl::checkGL();
 	return {textureID, TextureTarget{target}};

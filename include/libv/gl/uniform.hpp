@@ -53,7 +53,7 @@ inline void uniform(const GLint location, const libv::vec2b value) noexcept {
 inline void uniform(const GLint location, const libv::vec2i value) noexcept {
 	glUniform2i(location, value.x, value.y);
 }
-inline void uniform(const GLint location, const libv::vec2u value) noexcept {
+inline void uniform(const GLint location, const libv::vec2ui value) noexcept {
 	glUniform2ui(location, value.x, value.y);
 }
 inline void uniform(const GLint location, const libv::vec2l value) noexcept {
@@ -76,7 +76,7 @@ inline void uniform(const GLint location, const libv::vec3b value) noexcept {
 inline void uniform(const GLint location, const libv::vec3i value) noexcept {
 	glUniform3i(location, value.x, value.y, value.z);
 }
-inline void uniform(const GLint location, const libv::vec3u value) noexcept {
+inline void uniform(const GLint location, const libv::vec3ui value) noexcept {
 	glUniform3ui(location, value.x, value.y, value.z);
 }
 inline void uniform(const GLint location, const libv::vec3l value) noexcept {
@@ -99,7 +99,7 @@ inline void uniform(const GLint location, const libv::vec4b value) noexcept {
 inline void uniform(const GLint location, const libv::vec4i value) noexcept {
 	glUniform4i(location, value.x, value.y, value.z, value.w);
 }
-inline void uniform(const GLint location, const libv::vec4u value) noexcept {
+inline void uniform(const GLint location, const libv::vec4ui value) noexcept {
 	glUniform4ui(location, value.x, value.y, value.z, value.w);
 }
 inline void uniform(const GLint location, const libv::vec4l value) noexcept {
@@ -210,9 +210,9 @@ using Uniform_vec4b = Uniform_t<libv::vec4b>;
 using Uniform_vec2i = Uniform_t<libv::vec2i>;
 using Uniform_vec3i = Uniform_t<libv::vec3i>;
 using Uniform_vec4i = Uniform_t<libv::vec4i>;
-using Uniform_vec2u = Uniform_t<libv::vec2u>;
-using Uniform_vec3u = Uniform_t<libv::vec3u>;
-using Uniform_vec4u = Uniform_t<libv::vec4u>;
+using Uniform_vec2ui = Uniform_t<libv::vec2ui>;
+using Uniform_vec3ui = Uniform_t<libv::vec3ui>;
+using Uniform_vec4ui = Uniform_t<libv::vec4ui>;
 using Uniform_vec2l = Uniform_t<libv::vec2l>;
 using Uniform_vec3l = Uniform_t<libv::vec3l>;
 using Uniform_vec4l = Uniform_t<libv::vec4l>;

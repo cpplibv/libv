@@ -157,11 +157,11 @@ struct UniformsComplex {
 };
 
 template <typename T>
-libv::vec3u test_info() {
+libv::vec3ui test_info() {
 	return {libv::glr::layout_std140_align<T>(), libv::glr::layout_std140_size<T>(), libv::glr::layout_std140_stride<T>()};
 }
 
-libv::vec3u info(uint32_t align, uint32_t size, uint32_t stride) {
+libv::vec3ui info(uint32_t align, uint32_t size, uint32_t stride) {
 	return {align, size, stride};
 }
 
@@ -186,9 +186,9 @@ TEST_CASE("Alignments for vector types", "[libv.glr.std140]") {
 	CHECK(test_info<libv::vec3i>() == info(16, 12, 16));
 	CHECK(test_info<libv::vec4i>() == info(16, 16, 16));
 
-	CHECK(test_info<libv::vec2u>() == info(8, 8, 8));
-	CHECK(test_info<libv::vec3u>() == info(16, 12, 16));
-	CHECK(test_info<libv::vec4u>() == info(16, 16, 16));
+	CHECK(test_info<libv::vec2ui>() == info(8, 8, 8));
+	CHECK(test_info<libv::vec3ui>() == info(16, 12, 16));
+	CHECK(test_info<libv::vec4ui>() == info(16, 16, 16));
 
 	CHECK(test_info<libv::vec2l>() == info(16, 16, 16));
 	CHECK(test_info<libv::vec3l>() == info(32, 24, 32));

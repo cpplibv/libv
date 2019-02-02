@@ -105,7 +105,7 @@ using UniformStream = detail::ImplUniformStream<
 		libv::gl::TextureChannel,
 		bool, int32_t, uint32_t, int64_t, uint64_t, float, double,
 		libv::vec2b, libv::vec3b, libv::vec4b,
-		libv::vec2i, libv::vec3i, libv::vec4i, libv::vec2u, libv::vec3u, libv::vec4u,
+		libv::vec2i, libv::vec3i, libv::vec4i, libv::vec2ui, libv::vec3ui, libv::vec4ui,
 		libv::vec2l, libv::vec3l, libv::vec4l, libv::vec2ul, libv::vec3ul, libv::vec4ul,
 		libv::vec2f, libv::vec3f, libv::vec4f, libv::vec2d, libv::vec3d, libv::vec4d,
 		libv::mat2x2f, libv::mat3x2f, libv::mat4x2f, libv::mat2x2f, libv::mat3x2f, libv::mat4x2f,

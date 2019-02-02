@@ -166,8 +166,8 @@ struct Sandbox {
 
 		gl(texture0).create();
 		gl(texture0).bind();
-		gl(texture0).storage(1, libv::gl::SizedInternalFormat::RGBA8, 2, 2);
-		gl(texture0).subImage(0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UByte, dataTexture);
+		gl(texture0).storage(1, libv::gl::FormatSized::RGBA8, 2, 2);
+		gl(texture0).subImage(0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U8, dataTexture);
 		gl(texture0).setMinFilter(libv::gl::MinFilter::Linear);
 		gl(texture0).setMagFilter(libv::gl::MagFilter::Linear);
 		gl(texture0).setWrapS(libv::gl::Wrap::ClampToEdge);
@@ -175,13 +175,13 @@ struct Sandbox {
 
 		gl(textureSky).create();
 		gl(textureSky).bind();
-		gl(textureSky).storage(1, libv::gl::CompressedFormat::RGBA_S3TC_DXT5_EXT, 2, 2);
-		gl(textureSky).subImage(libv::gl::CubeSide::PositiveX, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyX1);
-		gl(textureSky).subImage(libv::gl::CubeSide::NegativeX, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyX0);
-		gl(textureSky).subImage(libv::gl::CubeSide::PositiveY, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyY1);
-		gl(textureSky).subImage(libv::gl::CubeSide::NegativeY, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyY0);
-		gl(textureSky).subImage(libv::gl::CubeSide::PositiveZ, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyZ1);
-		gl(textureSky).subImage(libv::gl::CubeSide::NegativeZ, 0, 0, 0, 2, 2, libv::gl::BaseInternalFormat::RGBA, libv::gl::DataType::UInt_8_8_8_8, dataTextureSkyZ0);
+		gl(textureSky).storage(1, libv::gl::FormatCompressed::RGBA_S3TC_DXT5_EXT, 2, 2);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveX, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyX1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeX, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyX0);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveY, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyY1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeY, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyY0);
+		gl(textureSky).subImage(libv::gl::CubeSide::PositiveZ, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyZ1);
+		gl(textureSky).subImage(libv::gl::CubeSide::NegativeZ, 0, 0, 0, 2, 2, libv::gl::FormatBase::RGBA, libv::gl::DataType::U32_R8_G8_B8_A8, dataTextureSkyZ0);
 	}
 
 	~Sandbox() {

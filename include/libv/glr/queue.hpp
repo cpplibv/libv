@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/gl/gl.hpp>
 #include <libv/gl/matrix_stack.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>

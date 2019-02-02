@@ -43,9 +43,9 @@ struct ToStringLayouter {
 	std::string_view type_string(libv::meta::identity<libv::vec2i>) { return "vec2i"; }
 	std::string_view type_string(libv::meta::identity<libv::vec3i>) { return "vec3i"; }
 	std::string_view type_string(libv::meta::identity<libv::vec4i>) { return "vec4i"; }
-	std::string_view type_string(libv::meta::identity<libv::vec2u>) { return "vec2u"; }
-	std::string_view type_string(libv::meta::identity<libv::vec3u>) { return "vec3u"; }
-	std::string_view type_string(libv::meta::identity<libv::vec4u>) { return "vec4u"; }
+	std::string_view type_string(libv::meta::identity<libv::vec2ui>) { return "vec2u"; }
+	std::string_view type_string(libv::meta::identity<libv::vec3ui>) { return "vec3u"; }
+	std::string_view type_string(libv::meta::identity<libv::vec4ui>) { return "vec4u"; }
 	std::string_view type_string(libv::meta::identity<libv::vec2l>) { return "i64vec2"; }
 	std::string_view type_string(libv::meta::identity<libv::vec3l>) { return "i64vec3"; }
 	std::string_view type_string(libv::meta::identity<libv::vec4l>) { return "i64vec4"; }

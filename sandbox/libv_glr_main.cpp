@@ -6,7 +6,6 @@
 #include <GL/glew.h>
 // libv
 #include <libv/math/angle.hpp>
-#include <libv/utility/hex_dump.hpp>
 #include <libv/utility/read_file.hpp>
 // std
 #include <chrono>
@@ -192,14 +191,15 @@ struct Sandbox {
 	libv::glr::Uniform_float sphere_uniform_time;
 	libv::glr::Uniform_texture sphere_uniform_texture0;
 	libv::glr::Uniform_texture sphere_uniform_texture1;
-	libv::glr::Texture2D sphere_texture0;
-	libv::glr::Texture2D sphere_texture1;
+//	libv::glr::Texture2D sphere_texture0;
+	libv::glr::Texture sphere_texture0;
+	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture1;
 
 	libv::glr::Program sky_program;
 	libv::glr::Mesh sky_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Uniform_mat4f sky_uniform_MVPmat;
 	libv::glr::Uniform_texture sky_uniform_texture;
-	libv::glr::TextureCube sky_texture0;
+	libv::glr::Texture sky_texture0;
 
 	Sandbox() {
 		// Sphere
@@ -212,12 +212,18 @@ struct Sandbox {
 		sphere_program.assign(sphere_uniform_texture1, "texture1Sampler", textureChannel_normal);
 
 		const auto dataTexture0 = libv::read_file_or_throw("res/texture/hexagon_metal_0001_diffuse.dds");
-		const auto dataTexture1 = libv::read_file_or_throw("res/texture/hexagon_metal_0001_normal.dds");
 		auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
-		auto imageTexture1 = libv::gl::load_image_or_throw(dataTexture1);
+		sphere_texture0.load(std::move(imageTexture0));
 
-		sphere_texture0.image(std::move(imageTexture0));
-		sphere_texture1.image(std::move(imageTexture1));
+		const libv::vec4uc tex_data[] = {
+			{0, 0, 0, 255},
+			{255, 0, 0, 255},
+			{0, 255, 0, 255},
+			{255, 255, 0, 255},
+		};
+
+		sphere_texture1.storage(1, {2, 2});
+		sphere_texture1.image(0, {0, 0}, {2, 2}, tex_data);
 
 		{
 			auto position = sphere_mesh.attribute(attribute_position);
@@ -236,7 +242,7 @@ struct Sandbox {
 
 		const auto dataSky = libv::read_file_or_throw("res/texture/cube_debug_transparent.dds");
 		auto imageSky = libv::gl::load_image_or_throw(dataSky);
-		sky_texture0.image(std::move(imageSky));
+		sky_texture0.load(std::move(imageSky));
 
 		{
 //			auto position = sky_mesh.attribute(attribute_position);

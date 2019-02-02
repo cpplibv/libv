@@ -13,11 +13,11 @@ libv.gl: cleanup texture1/2
 libv.glr: Destroy, Remote ptr, GC
 libv.glr: Cleanup mesh API and its includes, split sources as necessary
 libv.gl: simplify the functionality, no auto create or destroy, no createData, createLink, plain structs
+libv.glr: Texture manipulation, generation
 
 --- STACK ------------------------------------------------------------------------------------------
 
 libv.glr: Procedural gizmo mesh
-libv.glr: Texture manipulation, generation
 
 libv.ui: Rebase ui4 on top of glr
 libv.glr: UniformBlockSharedView_std140
@@ -776,11 +776,11 @@ Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
 	else if (color == 32) colorFormat = InternalFormat::RGBA;
 	else throw FramebufferException();
 
-	InternalFormat::internal_format_t depthFormat;
-	if (depth == 8) depthFormat = InternalFormat::DepthComponent;
-	else if (depth == 16) depthFormat = InternalFormat::DepthComponent16;
-	else if (depth == 24) depthFormat = InternalFormat::DepthComponent24;
-	else if (depth == 32) depthFormat = InternalFormat::DepthComponent32F;
+	InternalFormat::internal_format_t FormatDepth;
+	if (depth == 8) FormatDepth = InternalFormat::DepthComponent;
+	else if (depth == 16) FormatDepth = InternalFormat::DepthComponent16;
+	else if (depth == 24) FormatDepth = InternalFormat::DepthComponent24;
+	else if (depth == 32) FormatDepth = InternalFormat::DepthComponent32F;
 	else throw FramebufferException();
 
 	// Create FBO
@@ -796,7 +796,7 @@ Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
 	// Create renderbuffer to hold depth buffer
 	if (depth > 0) {
 		glBindTexture(GL_TEXTURE_2D, texDepth);
-		glTexImage2D(GL_TEXTURE_2D, 0, depthFormat, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0, FormatDepth, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
 		texDepth.SetWrapping(GL::Wrapping::ClampEdge, GL::Wrapping::ClampEdge);
 		texDepth.SetFilters(GL::Filter::Nearest, GL::Filter::Nearest);
 		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texDepth, 0);

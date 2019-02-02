@@ -413,9 +413,9 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec2i>)   { return { 8,  8}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec3i>)   { return {16, 12}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec4i>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2u>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3u>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4u>)   { return {16, 16}; }
+//inline UnfirormLayoutRule rule_std140(identity<libv::vec2ui>)  { return { 8,  8}; }
+//inline UnfirormLayoutRule rule_std140(identity<libv::vec3ui>)  { return {16, 12}; }
+//inline UnfirormLayoutRule rule_std140(identity<libv::vec4ui>)  { return {16, 16}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec2l>)   { return {16, 16}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec3l>)   { return {32, 24}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec4l>)   { return {32, 32}; }

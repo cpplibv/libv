@@ -94,12 +94,12 @@ TEST_CASE("unionAddress") {
 }
 
 TEST_CASE("dimMacro") {
-	libv::vec2u veca2(1, 2);
-	libv::vec3u veca3(1, 2, 3);
-	libv::vec4u veca4(1, 2, 3, 4);
-	libv::vec2u vecb2(1, 2);
-	libv::vec3u vecb3(1, 2, 3);
-	libv::vec4u vecb4(1, 2, 3, 4);
+	libv::vec2ui veca2(1, 2);
+	libv::vec3ui veca3(1, 2, 3);
+	libv::vec4ui veca4(1, 2, 3, 4);
+	libv::vec2ui vecb2(1, 2);
+	libv::vec3ui vecb3(1, 2, 3);
+	libv::vec4ui vecb4(1, 2, 3, 4);
 
 	veca2 += vecb2;
 	veca3 += vecb3;

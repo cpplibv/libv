@@ -2,7 +2,9 @@
 
 #pragma once
 
+// std
 #include <cassert>
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -11,23 +13,10 @@
 // TODO P5: implement assert context
 // TODO P5: implement assert thread
 
-#ifndef LIBV_FRAME_DEBUG
-#    define LIBV_FRAME_DEBUG // TODO P5: debug flag
-#endif
-
-#ifdef LIBV_FRAME_DEBUG
-#    define LIBV_FRAME_DEBUG_ASSERT(X) assert((X))
-#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_STATIC(X, M) static_assert((X), (M))
-#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
-#    define LIBV_FRAME_DEBUG_CHECK_GL() checkGL()
-#else
-#    define LIBV_FRAME_DEBUG_ASSERT(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_STATIC(X) {}
-#    define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
-#    define LIBV_FRAME_DEBUG_CHECK_GL() {}
-#endif
+#define LIBV_FRAME_DEBUG_ASSERT(X) assert((X))
+#define LIBV_FRAME_DEBUG_ASSERT_CONTEXT(X) {}
+#define LIBV_FRAME_DEBUG_ASSERT_STATIC(X, M) static_assert((X), (M))
+#define LIBV_FRAME_DEBUG_ASSERT_THREAD(X) {}
 
 #define LIBV_FRAME_ASSERT_CONTEXT(X) {}
 #define LIBV_FRAME_ASSERT_THREAD(X) {}

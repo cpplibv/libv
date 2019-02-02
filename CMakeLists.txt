@@ -64,10 +64,10 @@ wish_warning(
 	GNU -Wsuggest-override
 	GNU -Wundef
 	GNU -Warray-bounds
+	GNU -Wconversion
 
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
-	GNU -Wconversion # 130+, most of it is in vec and the rest is in gl
 	# GNU -Wfloat-equal # in tests 40+ false positive
 
 	# Only enable time-to-time to check on what is going on:
@@ -105,7 +105,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-ggdb3)
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-	add_compile_options(-Ofast)
+	add_compile_options(-O3)
 #	add_compile_options(-flto)
 #	SET(CMAKE_AR "gcc-ar")
 #	SET(CMAKE_NM "gcc-nm")
@@ -113,7 +113,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	wish_static_link_std()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
-	add_compile_options(-Ofast)
+	add_compile_options(-O3)
 
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
@@ -333,8 +333,10 @@ wish_create_external(
 wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
-	GIT_TAG VER-2-5-5
-	LINK freetype
+	GIT_TAG f686ad46a3a9801ffa78063202250c68276330cb
+	# TODO P5: Create dedicated external target for bz2
+	# TODO P3: Create dedicated external target for zlibstatic
+	LINK freetype bz2 zlibstatic
 	INCLUDE_DIR include/freetype2
 )
 
@@ -609,7 +611,13 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_glr
 	SOURCE sandbox/libv_glr_main.cpp
-	LINK   libv_log libv_gl libv_glr libv_utility libv_math ext_glfw
+	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_glr2
+	SOURCE sandbox/libv_glr_main2.cpp
+	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
 )
 
 wish_create_executable(

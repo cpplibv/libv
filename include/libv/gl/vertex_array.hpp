@@ -98,7 +98,7 @@ public:
 				BaseAttribute<T>::attributeType,
 				false,
 				stride,
-				reinterpret_cast<const GLvoid*>(offset));
+				reinterpret_cast<const void*>(offset));
 		checkGL();
 	}
 
@@ -115,7 +115,7 @@ public:
 				BaseAttribute<T>::attributeSize,
 				BaseAttribute<T>::attributeType,
 				stride,
-				reinterpret_cast<const GLvoid*>(offset));
+				reinterpret_cast<const void*>(offset));
 		checkGL();
 	}
 
@@ -133,7 +133,7 @@ public:
 				BaseAttribute<T>::attributeSize,
 				BaseAttribute<T>::attributeType,
 				stride,
-				reinterpret_cast<const GLvoid*> (offset));
+				reinterpret_cast<const void*> (offset));
 		checkGL();
 	}
 
