@@ -3,6 +3,7 @@
 #pragma once
 
 // ext
+#include <boost/align/aligned_allocator.hpp>
 #include <boost/container/small_vector.hpp>
 // libv
 #include <libv/algorithm/associative.hpp>
@@ -49,7 +50,7 @@ public:
 	AttributeChannel channel;
 	libv::gl::AttributeType type;
 	int dim;
-	std::vector<std::byte> data;
+	std::vector<std::byte, boost::alignment::aligned_allocator<std::byte, 32>> data_;
 
 public:
 	RemoteMeshAttribute(AttributeChannel channel, libv::gl::AttributeType type, int dim) :
@@ -62,19 +63,29 @@ public:
 
 public:
 	template <typename T>
+	inline T* data() {
+		return reinterpret_cast<T*>(reinterpret_cast<void*>(data_.data()));
+	}
+
+	template <typename T>
+	inline const T* data() const {
+		return reinterpret_cast<const T*>(reinterpret_cast<const void*>(data_.data()));
+	}
+
+	template <typename T>
 	inline size_t size() const {
-		return data.size() / sizeof(T);
+		return data_.size() / sizeof(T);
 	}
 
 public:
 	template <typename T>
 	inline void reserve(size_t count) {
-		data.reserve(sizeof(T) * count);
+		data_.reserve(sizeof(T) * count);
 	}
 
 	template <typename T>
 	inline void resize(size_t count) {
-		data.resize(sizeof(T) * count);
+		data_.resize(sizeof(T) * count);
 	}
 
 	template <typename T>
@@ -84,24 +95,24 @@ public:
 
 	template <typename T>
 	inline void push_back(const T value) {
-		const auto size = data.size();
+		const auto size = data_.size();
 
-		data.resize(size + sizeof(T));
-		std::memcpy(data.data() + size, &value, sizeof(T));
+		data_.resize(size + sizeof(T));
+		std::memcpy(data_.data() + size, &value, sizeof(T));
 	}
 
 	template <typename T>
 	inline void push_back_all(const libv::span<const T> values) {
-		const auto size = data.size();
+		const auto size = data_.size();
 		const auto count = values.size();
 
-		data.resize(size + sizeof(T) * count);
-		std::memcpy(data.data() + size, values.data(), sizeof(T) * count);
+		data_.resize(size + sizeof(T) * count);
+		std::memcpy(data_.data() + size, values.data(), sizeof(T) * count);
 	}
 
 	template <typename T>
 	inline T& at(size_t index) {
-		return reinterpret_cast<T&>(data[sizeof(T) * index]);
+		return reinterpret_cast<T&>(data_[sizeof(T) * index]);
 	}
 };
 using RemoteMeshAttributes = boost::container::small_vector<RemoteMeshAttribute, 4>;
@@ -175,6 +186,14 @@ public:
 	}
 	inline const T& operator[](const size_t index) const {
 		return ptr[ptr_index].at<T>(index);
+	}
+
+public:
+	inline libv::span<T> view_last(const size_t count) {
+		return {
+				ptr[ptr_index].data<T>() + ptr[ptr_index].size<T>() - count,
+				static_cast<typename libv::span<T>::index_type>(count)
+		};
 	}
 
 public:
@@ -370,14 +389,14 @@ public:
 
 	void reserve(size_t vertex_count, size_t index_count) {
 		for (RemoteMeshAttribute& attribute : remote->attributes)
-			attribute.data.reserve(vertex_count);
+			attribute.data_.reserve(vertex_count);
 
 		remote->indices.data.reserve(index_count);
 	}
 
 	void resize(size_t vertex_count, size_t index_count) {
 		for (RemoteMeshAttribute& attribute : remote->attributes)
-			attribute.data.resize(vertex_count);
+			attribute.data_.resize(vertex_count);
 
 		remote->indices.data.resize(index_count);
 		remote->dirty = true;

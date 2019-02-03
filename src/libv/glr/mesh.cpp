@@ -40,7 +40,7 @@ void RemoteMesh::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 
 	for (RemoteMeshAttribute& attribute : attributes) {
 		gl(attribute.buffer).bind();
-		gl(attribute.buffer).data(attribute.data, usage);
+		gl(attribute.buffer).data(attribute.data_, usage);
 		gl(vao).bindAttribute(attribute.buffer, attribute.channel, attribute.type, attribute.dim, 0, 0);
 	}
 

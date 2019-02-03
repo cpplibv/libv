@@ -4,8 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-// std
-#include <cstdint>
 
 
 namespace libv {
