@@ -95,11 +95,18 @@ using SequenceNumber = uint32_t;
 struct QueueTaskMesh {
 	SequenceNumber sequenceNumber;
 	State state;
-	Program program;
-	Mesh mesh;
+	std::shared_ptr<RemoteProgram> program;
+	std::shared_ptr<RemoteMesh> mesh;
 
-	QueueTaskMesh(SequenceNumber sequenceNumber, State state, Program program, Mesh&& mesh) :
-		sequenceNumber(sequenceNumber), state(state), program(std::move(program)), mesh(std::move(mesh)) { }
+	QueueTaskMesh(
+			SequenceNumber sequenceNumber,
+			State state,
+			const std::shared_ptr<RemoteProgram>& program,
+			const std::shared_ptr<RemoteMesh>& mesh) :
+		sequenceNumber(sequenceNumber),
+		state(state),
+		program(program),
+		mesh(mesh) { }
 };
 
 struct QueueTaskClear {
@@ -137,7 +144,7 @@ public:
 	libv::gl::MatrixStack<libv::mat4f> projection;
 
 private:
-	std::stack<Program, std::vector<Program>> programStack;
+	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
 
 private:
 	std::vector<std::variant<QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture, QueueTaskClear, QueueTaskClearColor>> tasks;
@@ -212,7 +219,7 @@ public:
 public:
 	template <typename T>
 	void uniform(const Uniform_t<T> uniform, const T& value) {
-		programStack.top().uniform(uniform, value);
+		programStack.top()->uniformStream.set(uniform.location, value);
 	}
 
 	void uniform(UniformBlockUniqueView_std140&& view) {
@@ -226,15 +233,17 @@ public:
 //	void push_program(Program program) {}
 //	void push_program_guard() {}
 //	void push_program_guard(Program program) {}
-	void program(Program program_) {
-		programStack.top() = std::move(program_);
+	void program(const Program& program_) {
+		programStack.top() = AttorneyProgramRemote::remote(program_);
 	}
-	void render(Mesh mesh) {
-		auto& remoteProgram = AttorneyProgramRemote::remote(programStack.top());
-		remoteProgram.uniformStream.endBatch();
+	void render(const Mesh& mesh) {
+		programStack.top()->uniformStream.endBatch();
 
 		tasks.emplace_back(std::in_place_type<QueueTaskMesh>,
-				sequenceNumber, state.state(), programStack.top(), std::move(mesh));
+				sequenceNumber,
+				state.state(),
+				programStack.top(),
+				AttorneyMeshRemote::remote(mesh));
 	}
 
 private:
@@ -308,11 +317,8 @@ public:
 						currentState = task.state;
 					}
 
-					auto& remoteProgram = AttorneyProgramRemote::remote(task.program);
-					remoteProgram.use(gl, remote);
-
-					auto& remoteMesh = AttorneyMeshRemote::remote(task.mesh);
-					remoteMesh.render(gl, remote);
+					task.program->use(gl, remote);
+					task.mesh->render(gl, remote);
 				},
 				[&gl, &remote](const QueueTaskUniformBlock& task) {
 					task.view.remote->bind(gl, remote, task.view.binding, task.view.block);

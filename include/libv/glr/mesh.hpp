@@ -405,8 +405,8 @@ public:
 
 struct AttorneyMeshRemote {
 	friend class Queue;
-	inline static RemoteMesh& remote(const Mesh& mesh) {
-		return *mesh.remote;
+	inline static const std::shared_ptr<RemoteMesh>& remote(const Mesh& mesh) {
+		return mesh.remote;
 	}
 };
 
