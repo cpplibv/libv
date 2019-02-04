@@ -92,11 +92,11 @@ void Frame::glfwCallback(const EventFramebufferSize& e) {
 }
 
 void Frame::glfwCallback(const EventKey& e) {
-	keyStates[to_value(e.key)] = (e.action != GLFW_RELEASE) ? KeyState::pressed : KeyState::released;
+	keyStates[to_value(e.key)] = (e.action != Action::release) ? KeyState::pressed : KeyState::released;
 }
 
 void Frame::glfwCallback(const EventMouseButton& e) {
-	mouseStates[to_value(e.button)] = (e.action != GLFW_RELEASE) ? KeyState::pressed : KeyState::released;
+	mouseStates[to_value(e.button)] = (e.action != Action::release) ? KeyState::pressed : KeyState::released;
 }
 
 void Frame::glfwCallback(const EventMouseEnter&) { }

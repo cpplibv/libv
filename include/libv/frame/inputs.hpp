@@ -2,16 +2,39 @@
 
 #pragma once
 
+// std
+#include <cstdint>
+
+
 namespace libv {
 namespace frame {
 
+// -------------------------------------------------------------------------------------------------
 
 //http://www.glfw.org/docs/latest/group__keys.html
 // TODO P2: review glfwGetKeyName and glfwSetInputMode
 
+enum class MonitorEvent : int32_t {
+	connected = 0x00040001,
+	disconnected = 0x00040002,
+};
+
+enum class Action : int32_t {
+	release = 0,
+	press = 1,
+	repeat = 2,
+};
+
 enum class KeyState {
 	released = 0,
 	pressed = 1,
+};
+
+enum class KeyModifier : int32_t {
+	shift = 0x0001,
+ 	control = 0x0002,
+	alt = 0x0004,
+	super = 0x0008,
 };
 
 enum class Key : int32_t {
@@ -156,6 +179,8 @@ enum class Mouse : int32_t {
 
 	Last = Button7,
 };
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace frame
 } // namespace libv

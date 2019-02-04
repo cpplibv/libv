@@ -1,17 +1,38 @@
 // File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
 
-
+// hpp
 #include <catch/catch.hpp>
-
-#include <GLFW/glfw3.h>
-#include <libv/frame/inputs.hpp>
+// libv
 #include <libv/utility/enum.hpp>
+// ext
+#include <GLFW/glfw3.h>
+// pro
+#include <libv/frame/inputs.hpp>
+
 
 // -------------------------------------------------------------------------------------------------
+
+TEST_CASE("Check MonitorEvent consistency with GLFW") {
+	CHECK(libv::to_value(libv::frame::MonitorEvent::connected) == GLFW_CONNECTED);
+	CHECK(libv::to_value(libv::frame::MonitorEvent::disconnected) == GLFW_DISCONNECTED);
+}
+
+TEST_CASE("Check Action consistency with GLFW") {
+	CHECK(libv::to_value(libv::frame::Action::press) == GLFW_PRESS);
+	CHECK(libv::to_value(libv::frame::Action::release) == GLFW_RELEASE);
+	CHECK(libv::to_value(libv::frame::Action::repeat) == GLFW_REPEAT);
+}
 
 TEST_CASE("Check KeyState consistency with GLFW") {
 	CHECK(libv::to_value(libv::frame::KeyState::released) == GLFW_RELEASE);
 	CHECK(libv::to_value(libv::frame::KeyState::pressed) == GLFW_PRESS);
+}
+
+TEST_CASE("Check KeyModifier consistency with GLFW") {
+	CHECK(libv::to_value(libv::frame::KeyModifier::alt) == GLFW_MOD_ALT);
+	CHECK(libv::to_value(libv::frame::KeyModifier::control) == GLFW_MOD_CONTROL);
+	CHECK(libv::to_value(libv::frame::KeyModifier::shift) == GLFW_MOD_SHIFT);
+	CHECK(libv::to_value(libv::frame::KeyModifier::super) == GLFW_MOD_SUPER);
 }
 
 TEST_CASE("Check Key consistency with GLFW") {
