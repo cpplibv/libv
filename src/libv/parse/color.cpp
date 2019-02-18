@@ -375,7 +375,9 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 
 	color result(1.f, 1.f, 1.f, 1.f);
 
-	const auto success = x3::phrase_parse(str.begin(), str.end(), color_rule, x3::space, result);
+	auto it = str.begin();
+	auto success = x3::phrase_parse(it, str.end(), color_rule, x3::space, result);
+	success = success && it == str.end();
 
 	return success ? std::optional<color>{result} : std::nullopt;
 }

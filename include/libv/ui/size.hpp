@@ -43,12 +43,12 @@ struct SizeDim {
 
 	template <typename OStream>
 	friend OStream& operator<<(OStream& os, const SizeDim& size) {
-		if (size.pixel != 0.0f)
+		if (std::not_equal_to<float>()(size.pixel, 0.0f))
 			os << size.pixel << "px";
-		if (size.percent != 0.0f)
-			os << size.percent << "%";
-		if (size.ratio != 0.0f)
-			os << size.ratio << "r";
+		if (std::not_equal_to<float>()(size.percent, 0.0f))
+			os << size.percent << '%';
+		if (std::not_equal_to<float>()(size.ratio, 0.0f))
+			os << size.ratio << 'r';
 		if (size.content)
 			os << "C";
 		return os;
@@ -61,7 +61,7 @@ inline auto pixel(float value) {
 inline auto percent(float value) {
 	return SizeDim{0.0f, value, 0.0f, false};
 }
-inline auto ratio(float value) {
+inline auto ratio(float value = 1.0f) {
 	return SizeDim{0.0f, 0.0f, value, false};
 }
 inline auto content() {

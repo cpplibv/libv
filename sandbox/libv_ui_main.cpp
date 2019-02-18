@@ -6,7 +6,7 @@
 #include <libv/frame/frame.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/log/log.hpp>
-//#include <libv/parse/color.hpp>
+#include <libv/parse/color.hpp>
 // std
 #include <iostream>
 // pro
@@ -16,6 +16,7 @@
 #include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/ui.hpp>
 
 
@@ -93,16 +94,16 @@ public:
 		ui.attach(*this);
 		ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
 
-		label0->color(167.f / 255, 152.f / 255, 120.f / 255, 1.0f);
+		label0->color(libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
 		label0->setText("Hello, Label0!");
 		label1->setText("Hello, Label1!");
 		label2->setText("Hello, Label2!");
-		label2->propertySize = libv::ui::Size{libv::ui::content(), libv::ui::content(), libv::ui::content()};
-		quad0->color(134.f / 255, 189.f / 255, 111.f / 255, 0.8f);
+		label2->propertySize = libv::ui::parse_size_or_throw("C, C, C");
+		quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));
 		stretch0->image(ui.context().texture2D("stretch_border.png"));
-		stretch0->color(183.f / 255, 190.f / 255, 135.f / 255, 0.8f);
+		stretch0->color(libv::parse::parse_color_or_throw("rgba(183, 190, 135, 100%)"));
 		image0->image(ui.context().texture2D("atlas_ui_slate.png"));
-		image0->propertySize = libv::ui::Size{libv::ui::content(), libv::ui::content(), libv::ui::content()};
+		image0->propertySize = libv::ui::parse_size_or_throw("C, C, C");
 
 		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 		panel0->layout.alignVertical = libv::ui::Alignment::CENTER;

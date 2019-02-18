@@ -66,7 +66,7 @@ wish_warning(
 
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
-	# GNU -Wfloat-equal # in tests 40+ false positive
+	# GNU -Wfloat-equal # some in tests, and some in ui might be true positive
 
 	# Only enable time-to-time to check on what is going on:
 	# GNU -Winline
@@ -770,12 +770,11 @@ wish_create_executable(
 	LINK   obj_test_runner libv_utility
 )
 
-#wish_create_executable(
-#	TARGET test_libv_ui
-#	SOURCE ${PATH_TST}/libv/ui/*.cpp
-#	OBJECT obj_test_runner
-#	LINK   libv_ui fmt libv_log
-#)
+wish_create_executable(
+	TARGET test_libv_ui
+	SOURCE test/libv/ui/*.cpp
+	LINK   obj_test_runner libv_ui
+)
 
 wish_end_group()
 

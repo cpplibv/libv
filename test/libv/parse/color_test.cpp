@@ -97,6 +97,9 @@ TEST_CASE("parse color: test everything") {
 	CHECK(not parse_color_optional("hsl(14%,15.4%,16%)"));
 	CHECK(not parse_color_optional("hsla(14%,15.4%,16%, .3)"));
 	CHECK(not parse_color_optional("hsl (  14 %,   15 ,16)"));
+	CHECK(not parse_color_optional("#F0F1F"));
+	CHECK(not parse_color_optional("#F0F1F2F"));
+	CHECK(not parse_color_optional("#F0F1F2F3F4"));
 	CHECK(not parse_color_optional("F0F1F2"));
 	CHECK(not parse_color_optional("F0F1F2F3"));
 	CHECK(not parse_color_optional("14,15,16"));
