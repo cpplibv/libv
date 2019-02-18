@@ -528,13 +528,13 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
-	LINK   libv_glr ext_freetype ext_utf8cpp
+	LINK   libv_glr libv_parse ext_freetype ext_utf8cpp
 )
 
 wish_create_library(
-	TARGET libv_parse INTERFACE
-	LINK   ext_boost
-	LINK   libv_math # Remove?
+	TARGET libv_parse STATIC
+	SOURCE src/libv/parse/*.cpp
+	LINK   libv_math ext_boost
 )
 
 wish_create_library(

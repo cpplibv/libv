@@ -40,10 +40,11 @@ libv.ui: Solution to the ui context access problem: components should not initia
 libv.ui: Texture cache
 libv.ui: Texture load
 libv.ui: Revive stretch
+libv.parse: Parse color: source file and pretty API
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: Parse color: source file and pretty API
+libv.ui: Parse size
 libv.ui: properties
 libv.ui: property inheritance / override
 libv.ui: properties for font
