@@ -17,10 +17,33 @@
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
+
+// button	 			Clickable elements.
+// sprite-button	 	A button that displays an image rather than text.
+// checkbox	 			Clickable elements with a cross in the middle that can be turned off or on.
+// flow					Invisible containers that lay out children either horizontally or vertically.
+// frame	 			Grey semi-transparent boxes that contain other elements. They have a caption, and, just like flows, they lay out children either horizontally or vertically.
+// label	 			A piece of text.
+// progressbar	 		Indicate progress by displaying a partially filled bar.
+// table	 			An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
+// textfield	 		Boxes of text the user can type in.
+// radiobutton	 		Identical to checkbox except circular.
+// sprite	 			An element that shows an image.
+// scroll-pane	 		Similar to a flow but includes the ability to show and use scroll bars.
+// drop-down	 		A drop down list of other elements.
+// list-box	 			A list of other elements.
+// camera	 			A camera that shows the game at the given position on the given surface.
+// choose-elem-button	A button that lets the player pick one of an: item, entity, tile, or signal similar to the filter-select window.
+// text-box				A multi-line text box that supports selection and copy-paste.
+// slider				A number picker.
+// entity-preview		A preview of an entity.
+// split-pane
+// tab-pane
 
 inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
 
@@ -40,18 +63,15 @@ private:
 	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>();
 	std::shared_ptr<libv::ui::Image> image0 = std::make_shared<libv::ui::Image>();
 
-//private:
-//	libv::ui::FontSize size = 12;
-
 public:
 	void create() {
 		glewExperimental = true;
 		if (GLenum err = glewInit() != GLEW_OK)
 			log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
 
-		log_sandbox.debug("GL Vendor   {}", glGetString(GL_VENDOR));
-		log_sandbox.debug("GL Renderer {}", glGetString(GL_RENDERER));
-		log_sandbox.debug("GL Version  {}", glGetString(GL_VERSION));
+		log_sandbox.debug("GL Vendor     {}", glGetString(GL_VENDOR));
+		log_sandbox.debug("GL Renderer   {}", glGetString(GL_RENDERER));
+		log_sandbox.debug("GL Version    {}", glGetString(GL_VERSION));
 
 		remote.create();
 		remote.enableDebug();
@@ -85,8 +105,8 @@ public:
 	}
 
 public:
-	SandboxFrame(const std::string& title, int32_t x, int32_t y) :
-		Frame(title, x, y) {
+	SandboxFrame() :
+		Frame("UI sandbox", 1280, 800) {
 		setPosition(POSITION_CENTER_CURRENT_MONITOR);
 		setOpenGLProfile(OPENGL_PROFILE_CORE);
 		setOpenGLVersion(3, 3);
@@ -94,11 +114,19 @@ public:
 		ui.attach(*this);
 		ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
 
-		label0->color(libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
+		const auto style_label_01 = ui.context().style("style-label-01");
+		style_label_01->set("color", libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
+		style_label_01->set("font", ui.context().font("consola.ttf"));
+//		style_label_01->set("align", libv::ui::Anchor::Left);
+
+		label0->properties.set(style_label_01);
 		label0->setText("Hello, Label0!");
+		label1->properties.set(style_label_01);
 		label1->setText("Hello, Label1!");
+		label2->properties.set(style_label_01);
 		label2->setText("Hello, Label2!");
 		label2->propertySize = libv::ui::parse_size_or_throw("C, C, C");
+
 		quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));
 		stretch0->image(ui.context().texture2D("stretch_border.png"));
 		stretch0->color(libv::parse::parse_color_or_throw("rgba(183, 190, 135, 100%)"));
@@ -134,12 +162,16 @@ public:
 			if (e.key == libv::frame::Key::Backspace) {
 				label0->string.pop_back();
 				label2->string.pop_back();
+				label0->invalidate(libv::ui::Flag::invalidLayout);
+				label2->invalidate(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Pop back");
 			}
 
 			if (e.key == libv::frame::Key::Enter || e.key == libv::frame::Key::KPEnter) {
 				label0->string.push_back("\n");
 				label2->string.push_back("\n");
+				label0->invalidate(libv::ui::Flag::invalidLayout);
+				label2->invalidate(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Appending new line");
 			}
 
@@ -148,26 +180,26 @@ public:
 
 			switch (e.key) {
 			case libv::frame::Key::Num0:
-				label0->string.setAlign(libv::ui::Anchor::Left);
-				label2->string.setAlign(libv::ui::Anchor::Left);
+				label0->properties.align = libv::ui::Anchor::Left;
+				label2->properties.align = libv::ui::Anchor::Left;
 				log_sandbox.trace("Set anchor to {}", "Left");
 				break;
 
 			case libv::frame::Key::Num1:
-				label0->string.setAlign(libv::ui::Anchor::Center);
-				label2->string.setAlign(libv::ui::Anchor::Center);
+				label0->properties.align = libv::ui::Anchor::Center;
+				label2->properties.align = libv::ui::Anchor::Center;
 				log_sandbox.trace("Set anchor to {}", "Center");
 				break;
 
 			case libv::frame::Key::Num2:
-				label0->string.setAlign(libv::ui::Anchor::Right);
-				label2->string.setAlign(libv::ui::Anchor::Right);
+				label0->properties.align = libv::ui::Anchor::Right;
+				label2->properties.align = libv::ui::Anchor::Right;
 				log_sandbox.trace("Set anchor to {}", "Right");
 				break;
 
 			case libv::frame::Key::Num3:
-				label0->string.setAlign(libv::ui::Anchor::Justify);
-				label2->string.setAlign(libv::ui::Anchor::Justify);
+				label0->properties.align = libv::ui::Anchor::Justify;
+				label2->properties.align = libv::ui::Anchor::Justify;
 				log_sandbox.trace("Set anchor to {}", "Justify");
 				break;
 
@@ -178,6 +210,8 @@ public:
 		onChar.output([&](const libv::frame::EventChar& e) {
 			label0->string.push_back(e.utf8);
 			label2->string.push_back(e.utf8);
+			label0->invalidate(libv::ui::Flag::invalidLayout);
+			label2->invalidate(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8);
 		});
 		onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {
@@ -203,7 +237,7 @@ int main(int, char**) {
 //	libv::logger.deny();
 
 	{
-		SandboxFrame frame("UI sandbox", 1280, 800);
+		SandboxFrame frame;
 		frame.show();
 		frame.join();
 	}

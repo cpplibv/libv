@@ -11,6 +11,8 @@
 #include <vector>
 // pro
 #include <libv/ui/font_2D.hpp>
+#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/font_size.hpp>
 
 
 namespace libv {
@@ -19,7 +21,6 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class Font2D;
-using FontSize = int16_t;
 
 //	struct Font {
 //		FontEffect effect;   /// normal / outline / underline / strike-through ...
@@ -40,13 +41,6 @@ using FontSize = int16_t;
 //		uint64_t weight:16; // 8.8 fixed point
 //		uint64_t size:8;
 //	};
-
-enum class Anchor {
-	Left = 0,
-	Center = 1,
-	Right = 2,
-	Justify = 3,
-};
 
 class String2D {
 private:

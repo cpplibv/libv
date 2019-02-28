@@ -2,10 +2,13 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/intrusive_ptr.hpp>
 // std
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <typeinfo>
 #include <unordered_map>
 // pro
@@ -20,6 +23,7 @@ namespace ui {
 class Font2D;
 class Shader;
 class Texture2D;
+class Style;
 
 // TODO P4: Find a header for type info ref, and a better name
 using TypeInfoRef = std::reference_wrapper<const std::type_info>;
@@ -50,9 +54,12 @@ class ContextUI {
 	//			auto __ = cacheLookup(cacheFile, filePath);
 	//			auto __ = cacheStore(cacheFile, filePath, filePath);
 	// TODO P5: cleanup weak_ptr references with intrusive ptrs
+	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
 
 	std::shared_ptr<Font2D> fallback_font;
 	std::shared_ptr<Texture2D> fallback_texture2D;
+	libv::intrusive_ptr<Style> root_style;
+	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
 	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
 	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
@@ -79,10 +86,12 @@ public:
 			const std::filesystem::path& path_fonts = "font",
 			const std::filesystem::path& path_shaders = "shader",
 			const std::filesystem::path& path_textures = "texture");
+	~ContextUI();
 
 	std::shared_ptr<Font2D> font(const std::filesystem::path& path);
 	std::shared_ptr<Shader> shader(const std::string& name);
 	std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
+	libv::intrusive_ptr<Style> style(const std::string_view style_name);
 
 	template <typename T>
 		LIBV_REQUIRES(std::is_base_of_v<Shader, T>)

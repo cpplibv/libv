@@ -34,8 +34,7 @@ void LayoutLine::layoutPass1(const ContextLayoutPass1& environment, ComponentBas
 		if (fix < 0.01f) {
 			return fix;
 		} else if (percent > 99.99f) {
-			// TODO P3: Print layout stack
-			log_ui.error("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
+			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
 			return fix * 2.f;
 		} else {
 			return fix / (1.f - percent * 0.01f);

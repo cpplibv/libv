@@ -42,16 +42,40 @@ libv.ui: Texture load
 libv.ui: Revive stretch
 libv.parse: Parse color: source file and pretty API
 libv.ui: Parse size
+libv.ui.style: properties and minimalistic style, with only static one time read / setup support
+libv.ui.style: style-style inheritance, override and composition are the problem of the style definition system and isolated from the properties itself
+libv.ui.style: UI component's visualization and behaviour is controlled by properties; Properties are statically typed values; Styles are named dynamic collections of properties; Animations are real time changes of properties
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: properties
-libv.ui: property inheritance / override
-libv.ui: properties for font
+libv.ui.style: layout properties
+libv.ui.style: font properties
+
+libv.ui.style: style safe (parent) storage, replace observer_ref with something
+
+libv.ui.style: account for event based style changing or state based style declaration
+libv.ui.style: style and property update | might be optional, or the animation system itself
+libv.ui.style: style could store each component using them making invalidation possible, would listen to attach/detach
+
+libv.ui.style: complex composite component would result in "nested" property sets
+libv.ui.style: multiple style usage in a component would still be nice, maybe synthetized styles?
+
+libv.ui: switch foreach children to fill a std::vector<component*>, this vector should be a reusable memory, or (?) just a small_vector<, 32>
+
+wish: update cmake version and use add_compile_definitions() instead of add_definitions()
+wish: target_link_directories()
+wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file
+
+libv.ui: implement detach and component removal
+
+libv.ui: rename size's "content" to "dynamic"
+
+libv.frame: icon support
 
 libv.ui: cleanup context_ui redundant codes
-libv.ui: context_ui and libv.gl:image verify that non texture2D aka targets are matching the requested target
+libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 
+libv.glr: texture_fwd.hpp
 libv.glr: RemoteTexture should have its own header file
 
 libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
@@ -66,6 +90,12 @@ libv.ui: Focus
 libv.ui: Event Input
 libv.ui: Input field
 libv.ui: Button
+libv.ui: Color picker
+
+libv.ui: Floating layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
+
+libv.ui: Label select / copy from a label (?) if specific property is set for it
+libv.ui: Label link support (?)
 
 libv.ui: List or Table - Not owning container view
 libv.ui: Make a sandbox for a input->button->label->list
@@ -88,6 +118,8 @@ libv.ui: layout strong and week invalidation
 libv.ui: font failure to load means fallback
 libv.ui: shader failure to load means fallback
 libv.ui: shader dynamic loading from file
+
+libv.ui.text: render not found character
 
 libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
@@ -151,6 +183,11 @@ libv.frame: dual check lock every async frame operations
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 libv.utility: implement erase_unstable: x[index] = std::move(x[last]); x.erase(last)
 
+wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cmake_host_system_information.html#command:cmake_host_system_information
+wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
+wish: correct cmake target private/interface/public dependency (link and include) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
+wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
+
 --- AWAITING ---------------------------------------------------------------------------------------
 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
@@ -159,6 +196,7 @@ cli: Clara, most important questions are: multi, optional, required, positional 
 cmake: can there be multiple definition error during linkage if two lib contains the same definition or will a later be ignored
 cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
+cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency()
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
@@ -174,6 +212,10 @@ cpp.proposal: P2 std::argument_with _name<T>: void foo(std::with_call_name<const
 		void foo(exp + ression) -> void foo(MAGIC(exp + ression)) -> void foo(std::with_call_name{“exp + ression”, exp + ression});
 		Conversion would only fire after the overload resolution already took place. Or it would count as an implicit user defined conversion
 		Questions: Is whitespace included? Newlines? Expressions? Whitespace in expressions? Constexpr? Just do what macros do?
+cpp.proposal: P3 unrestricted template template parameters (and template concept parameters)
+		template <template<typename...> container> struct S{}; // Current syntax
+		template <template              container> struct S{}; // Proposed syntax
+		It was always possible to use a wrapper type and traffic such unrestricted template params as member template typedef
 cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
 cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
@@ -254,6 +296,8 @@ cpp.compile: things I want to know about my compile time:
 		- clang patch: https://www.youtube.com/watch?v=NPWQ7xKfIHQ
 		- record in CI history per commit changes in every statistics
 		- https://github.com/google/bloaty
+		- https://github.com/mikael-s-persson/templight
+		- https://www.cppdepend.com/
 
 // -------------------------------------------------------------------------------------------------
 

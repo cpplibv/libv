@@ -8652,7 +8652,7 @@ do. This function defaults to returning `std::forward<T>(v).as_failure()`.
 
 
 
-template <class T> OUTCOME_REQUIRES(requires(T &&v){{v.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
+template <class T> OUTCOME_REQUIRES(requires(T &&color){{color.as_failure()}}) decltype(auto) try_operation_return_as(T &&v)
 {
   return std::forward<T>(v).as_failure();
 }

@@ -9,6 +9,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/font_2D.hpp>
+#include <libv/ui/property.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 
 
@@ -22,11 +23,10 @@ Label::Label() :
 
 void Label::doAttach(ContextUI& context) {
 	// <<< P3: properites: font, size, color, alignment, shader(?)
-	font = context.font("consola.ttf");
+//	font = context.font("consola.ttf");
 	shader = context.shader<ShaderFont>();
-
-	string.setFont(font, 12u);
-	string.setAlign(Anchor::Left);
+	string.setFont(properties.font, properties.font_size);
+	string.setAlign(properties.align);
 }
 
 void Label::doLayoutPass1(const ContextLayoutPass1& environment) {
@@ -40,22 +40,24 @@ void Label::doLayoutPass2(const ContextLayoutPass2& environment) {
 }
 
 void Label::doRender(ContextRender& context) {
-//	context.gl.program(program);
-//	context.gl.uniform(uniformMVPmat, context.gl.mvp());
-//	context.gl.texture(font->texture, program->textureChannel);
-//	context.gl.render(string.mesh);
-
 	const auto guard_s = context.gl.state.push_guard();
 	const auto guard_m = context.gl.model.push_guard();
 	context.gl.model.translate(position);
 	context.gl.state.blendSrc_Source1Color();
 	context.gl.state.blendDst_One_Minus_Source1Color();
 
-	font->bind(context.gl, shader->textureChannel);
+//	if (style->changed()) {
+		string.setFont(properties.font, properties.font_size);
+		string.setAlign(properties.align);
+//	}
+
 	context.gl.program(*shader);
-	context.gl.uniform(shader->uniform_color, color_);
+	properties.font->bind(context.gl, shader->textureChannel);
+//	context.gl.texture(font->texture, program->textureChannel);
+	context.gl.uniform(shader->uniform_color, properties.color);
 	context.gl.uniform(shader->uniform_MVPmat, context.gl.mvp());
 	string.render(context.gl);
+//	context.gl.render(string.mesh);
 }
 
 // -------------------------------------------------------------------------------------------------

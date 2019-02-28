@@ -6,6 +6,7 @@
 #include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/component_base.hpp>
+#include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
 
 
@@ -22,12 +23,11 @@ class Font2D;
 class ShaderFont;
 
 struct Label : ComponentBase {
-private:
-	std::shared_ptr<Font2D> font; // <<< P4: Into properity font you go
-	std::shared_ptr<ShaderFont> shader;
 public: // <<< P1: public
 	String2D string;
-	libv::vec4f color_ = {1.f, 1.f, 1.f, 1.f}; // <<< P4: Into properity color_ you go
+//	StyleLabel_view style;
+	PropertySetLabel properties;
+	std::shared_ptr<ShaderFont> shader;
 
 public:
 	Label();
@@ -41,19 +41,19 @@ public:
 		return string.getString();
 	}
 
-public:
-	vec4f& color() {
-		return color_;
-	}
-	const vec4f& color() const {
-		return color_;
-	}
-	void color(const vec4f& color_) {
-		this->color_ = color_;
-	}
-	void color(float r, float g, float b, float a = 1.f) {
-		color({r, g, b, a});
-	}
+//public:
+//	vec4f& color() {
+//		return color_;
+//	}
+//	const vec4f& color() const {
+//		return color_;
+//	}
+//	void color(const vec4f& color_) {
+//		this->color_ = color_;
+//	}
+//	void color(float r, float g, float b, float a = 1.f) {
+//		color({r, g, b, a});
+//	}
 
 private:
 	virtual void doAttach(ContextUI& context) override;

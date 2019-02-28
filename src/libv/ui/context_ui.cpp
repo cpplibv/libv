@@ -10,6 +10,7 @@
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/raw_font_consolas_min.hpp>
+#include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 
 
@@ -88,6 +89,9 @@ ContextUI::ContextUI(
 	fallback_font = std::make_shared<Font2D>(
 			std::string{reinterpret_cast<const char*>(fallback_font_data.first), fallback_font_data.second}
 	);
+}
+
+ContextUI::~ContextUI() {
 }
 
 std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
@@ -183,6 +187,20 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	sp = std::make_shared<Texture2D>(std::move(*image));
 	cache_texture2D.emplace(std::move(key), sp);
 	return sp;
+}
+
+libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
+	// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
+	const auto it = styles.find(std::string(style_name));
+	if (it == styles.end()) {
+		// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
+//		const auto result = styles.emplace(std::string(style_name), libv::make_intrusive<Style>(std::string(style_name))).first->second;
+//		return result;
+		return styles.emplace(std::string(style_name), libv::make_intrusive<Style>(std::string(style_name))).first->second;
+
+	} else {
+		return it->second;
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -83,6 +83,10 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 
 	return success ? std::optional<Size>{
 			Size{std::get<0>(result), std::get<1>(result), std::get<2>(result)}} : std::nullopt;
+
+	// TODO P5: Would be nice to implement paring error diagnostics, x3 should support it
+	//	https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/annotation.html
+	//	https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/error_handling.html
 }
 
 // -------------------------------------------------------------------------------------------------

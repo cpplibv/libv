@@ -40,11 +40,11 @@ enum class KeyModifier : int32_t {
 enum class Key : int32_t {
 	Unknown = -1,
 	Space = 32,
-	Apostrophe = 39, // '
-	Comma = 44, // ,
-	Minus = 45, // -
-	Period = 46, // .
-	Slash = 47, // /
+	Apostrophe = 39, /// '
+	Comma = 44, /// ,
+	Minus = 45, /// -
+	Period = 46, /// .
+	Slash = 47, /// /
 	Num0 = 48,
 	Num1 = 49,
 	Num2 = 50,
@@ -55,8 +55,8 @@ enum class Key : int32_t {
 	Num7 = 55,
 	Num8 = 56,
 	Num9 = 57,
-	Semicolon = 59, // ;
-	Equals = 61, // =
+	Semicolon = 59, /// ;
+	Equals = 61, /// =
 	A = 65,
 	B = 66,
 	C = 67,
@@ -83,12 +83,12 @@ enum class Key : int32_t {
 	X = 88,
 	Y = 89,
 	Z = 90,
-	BracketOpen = 91, // [
-	Backslash = 92, // \ .
-	BracketClose = 93, // ]
-	Backtick = 96, // `
-	World1 = 161, // non-US #1
-	World2 = 162, // non-US #2
+	BracketOpen = 91, /// [
+	Backslash = 92, /// \ .
+	BracketClose = 93, /// ]
+	Backtick = 96, /// `
+	World1 = 161, /// non-US #1
+	World2 = 162, /// non-US #2
 	Escape = 256,
 	Enter = 257,
 	Tab = 258,

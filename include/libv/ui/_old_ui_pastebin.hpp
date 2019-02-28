@@ -181,42 +181,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-//struct FontEffect {};
-//struct FontFamily {};
-//struct FontSize {}; //font-size/line-height
-//struct FontStyle {}; //font-style - Specifies the font style. Default value is "normal". See font-style for possible values
-//struct FontVariant {}; //font-variant - Specifies the font variant. Default value is "normal". See font-variant for possible values
-//struct FontWeight {}; //font-weight - Specifies the font weight. Default value is "normal". See font-weight for possible values
-//
-//struct Text {};
-//
-//struct Program {};
-//
-//struct Alignment {};
-////struct Orientation {};
-//
-////struct TextAlignment {};
-//
-////struct Anchor {};
-////struct FontColor { vec4f value; };
-////	anchor
-////	background
-////	font_color = #FFFFFFFF
-////	layout = layout_float
-////	onUpdate = function: 000000000094a570
-////	zzz_children
-//
-//struct Image {
-//};
-//
-//struct Background {
-//};
-//
-////struct Layout {
-////};
-
-// -------------------------------------------------------------------------------------------------
-
 // Notes:
 // Things that I need to store in the backend:
 //
