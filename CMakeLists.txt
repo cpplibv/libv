@@ -304,6 +304,16 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME date
+	GIT_REPOSITORY https://github.com/HowardHinnant/date.git
+	GIT_TAG f782ae98f05572b80fe72f9c9e26ed25ff816132
+	CMAKE_ARGS
+		-DENABLE_DATE_TESTING=OFF
+#		-DUSE_SYSTEM_TZ_DB=ON
+		-DUSE_TZ_DB_IN_DOT=ON
+)
+
+wish_create_external(
 	NAME efsw
 	GIT_REPOSITORY https://github.com/mnafees/efsw.git
 	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
