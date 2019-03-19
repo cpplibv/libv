@@ -440,13 +440,13 @@ wish_create_external(
 wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG v2.19.5
+	GIT_TAG v2.20.6
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/sol/ ${PATH_EXT}/sol/include/sol/
 	LINK ext_lua
-	DEFINE SOL_USE_BOOST
+#	DEFINE SOL_USE_BOOST=1
 )
 
 wish_create_external(
@@ -512,8 +512,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_lua INTERFACE
-	LINK   ext_sol ext_lua
+	TARGET libv_lua STATIC
+	SOURCE src/libv/lua/*.cpp
+	LINK   ext_sol ext_lua ext_fmt libv_math
 )
 
 wish_create_library(
@@ -639,6 +640,12 @@ wish_create_executable(
 	TARGET sandbox_libv_log
 	SOURCE sandbox/libv_log_main.cpp
 	LINK   libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_lua
+	SOURCE sandbox/libv_lua_main.cpp
+	LINK   libv_log libv_lua
 )
 
 wish_create_executable(
