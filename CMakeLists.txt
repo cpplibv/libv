@@ -714,6 +714,12 @@ wish_create_executable(
 	LINK   libv_log libv_ui libv_frame libv_utility
 )
 
+wish_create_executable(
+	TARGET sandbox_libv_ui_lua
+	SOURCE sandbox/libv_ui_lua_main.cpp
+	LINK   libv_log libv_ui libv_frame libv_utility libv_lua
+)
+
 wish_end_group()
 
 # Tests --------------------------------------------------------------------------------------------
