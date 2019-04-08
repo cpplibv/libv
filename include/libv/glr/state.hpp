@@ -18,26 +18,29 @@ namespace glr {
 struct State {
 	using type = uint64_t;
 
-	type capabilityBlend:1;
-	type capabilityCullFace:1;
-	type capabilityDepthTest:1;
-	type capabilityRasterizerDiscard:1;
-	type capabilityScissorTest:1;
-	type capabilityStencilTest:1;
-	type capabilityTextureCubeMapSeamless:1;
+	type capabilityBlend:1 = 0;
+	type capabilityCullFace:1 = 0;
+	type capabilityDepthTest:1 = 0;
+	type capabilityRasterizerDiscard:1 = 0;
+	type capabilityScissorTest:1 = 0;
+	type capabilityStencilTest:1 = 0;
+	type capabilityTextureCubeMapSeamless:1 = 0;
+
+	/// 0 = disable, 1 = enable
+	type maskDepth:1 = 1;
 
 	/// 0 = CW,
 	/// 1 = CCW,
-	type frontFaceCCW:1;
+	type frontFaceCCW:1 = 1;
 
 	/// 0 = Back,
 	/// 1 = Front,
-	type cullFace:1;
+	type cullFace:1 = 1;
 
 	/// 0 = Fill,
 	/// 1 = Line,
 	/// 2 = Point,
-	type polygonMode:2;
+	type polygonMode:2 = 0;
 
 	/// 0 = LEqual,
 	/// 1 = GEqual,
@@ -47,7 +50,7 @@ struct State {
 	/// 5 = NotEqual,
 	/// 6 = Always,
 	/// 7 = Never,
-	type depthFunction:3;
+	type depthFunction:3 = 2;
 
 	///	0 = ConstantAlpha,
 	///	1 = ConstantColor,
@@ -68,7 +71,7 @@ struct State {
 	///	16 = SourceAlphaSaturate,
 	///	17 = SourceColor,
 	///	18 = Zero,
-	type blendSrcFunction:5;
+	type blendSrcFunction:5 = 15;
 
 	///	0 = ConstantAlpha,
 	///	1 = ConstantColor,
@@ -89,51 +92,19 @@ struct State {
 	///	16 = SourceAlphaSaturate,
 	///	17 = SourceColor,
 	///	18 = Zero,
-	type blendDstFunction:5;
+	type blendDstFunction:5 = 11;
 
-	/// 0 = CLIP_PLANE0,
-	/// 1 = CLIP_PLANE0 CLIP_PLANE1,
-	/// 2 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2,
-	/// 3 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3,
-	/// 4 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3 CLIP_PLANE4,
-	/// 5 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3 CLIP_PLANE4 CLIP_PLANE5,
-	type clipPlanes:3;
-
-	/// 0 = disable, 1 = enable
-	type maskDepth:1;
+	/// 0 = No clip plane active,
+	/// 1 = CLIP_PLANE0,
+	/// 2 = CLIP_PLANE0 CLIP_PLANE1,
+	/// 3 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2,
+	/// 4 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3,
+	/// 5 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3 CLIP_PLANE4,
+	/// 6 = CLIP_PLANE0 CLIP_PLANE1 CLIP_PLANE2 CLIP_PLANE3 CLIP_PLANE4 CLIP_PLANE5,
+	type clipPlanes:3 = 0;
 
 	///	unused zero initialized padding bits
-	type _reserved:36;
-
-	State() {
-		// C++20: bitfield inplace init: identifier(optional) attr(optional) : size brace-or-equal-initializer
-		capabilityBlend = 0;
-		capabilityCullFace = 0;
-		capabilityDepthTest = 0;
-		capabilityRasterizerDiscard = 0;
-		capabilityScissorTest = 0;
-		capabilityStencilTest = 0;
-		capabilityTextureCubeMapSeamless = 0;
-
-		maskDepth = 1;
-
-		frontFaceCCW = 1;
-
-		cullFace = 1;
-
-		polygonMode = 0;
-
-		depthFunction = 2;
-
-		blendSrcFunction = 15;
-		blendDstFunction = 11;
-
-		clipPlanes = 0;
-
-		_reserved = 0;
-
-		static_assert(sizeof(State) == sizeof(type), "layout error");
-	}
+	type _reserved:36 = 0;
 
 	bool operator==(const State& rhs) const {
 		return reinterpret_cast<const type&>(*this) == reinterpret_cast<const type&>(rhs);
@@ -143,6 +114,7 @@ struct State {
 		return !(*this == rhs);
 	}
 };
+static_assert(sizeof(State) == sizeof(State::type), "layout error");
 
 // -------------------------------------------------------------------------------------------------
 
