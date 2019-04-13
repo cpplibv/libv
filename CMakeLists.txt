@@ -57,7 +57,7 @@ wish_warning(
 	GNU -Wduplicated-cond
 	GNU -Wlogical-op
 	GNU -Wnon-virtual-dtor
-	GNU -Wnull-dereference
+	GNU -Wnull-dereference # Causes some false positives with libv.ecs System.create (suppressed)
 	GNU -Wold-style-cast
 	GNU -Wsuggest-override
 	GNU -Wundef
@@ -236,7 +236,7 @@ wish_create_external(
 	LINK backtrace
 )
 
-set(Boost_Version 1.69.0)
+set(Boost_Version 1.70.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 message(STATUS "Boost version: " ${Boost_Version})
@@ -265,6 +265,7 @@ wish_create_external(
 		-j${WISH_PROCESSOR_COUNT}
 	INSTALL_COMMAND "echo" "Skipping install..."
 
+	DEFINE BOOST_DLL_USE_STD_FS=1
 	DEFINE BOOST_STACKTRACE_USE_BACKTRACE
 	DEFINE BOOST_STACKTRACE_BACKTRACE_INCLUDE_FILE=<libbacktrace/backtrace.h>
 )
@@ -447,6 +448,7 @@ wish_create_external(
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/sol/ ${PATH_EXT}/sol/include/sol/
 	LINK ext_lua
 #	DEFINE SOL_USE_BOOST=1
+	DEFINE SOL_CXX17_FEATURES=1
 )
 
 wish_create_external(
@@ -539,7 +541,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
-	LINK   libv_glr libv_parse ext_freetype ext_utf8cpp
+	LINK   libv_glr libv_parse libv_lua ext_freetype ext_utf8cpp
 )
 
 wish_create_library(
