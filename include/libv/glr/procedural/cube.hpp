@@ -14,7 +14,7 @@ namespace glr {
 // TODO P5: Possible to make a Triangle Strip version
 template <typename Precision = float, typename Position, typename Normal, typename Texture0, typename Index>
 void generateCube(Position& position, Normal& normal, Texture0& texture0, Index& index) {
-	using in = uint32_t;
+	using in = typename Index::value_type;
 	using vec2 = libv::vec2_t<Precision>;
 	using vec3 = libv::vec3_t<Precision>;
 
@@ -69,7 +69,7 @@ void generateCube(Position& position, Normal& normal, Texture0& texture0, Index&
 
 template <typename Precision = float, typename Position, typename Index>
 void generateInnerCube(Position& position, Index& index) {
-	using in = uint32_t;
+	using in = typename Index::value_type;
 	using vec3 = libv::vec3_t<Precision>;
 
 	const in ioffset = static_cast<in>(position.size());
