@@ -5,6 +5,8 @@
 // ext
 #include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
+// libv
+#include <libv/utility/concat.hpp>
 // std
 #include <stdexcept>
 
@@ -24,11 +26,10 @@ libv::vec4f parse_color_or_throw(const std::string_view str) {
 	if (result)
 		return *result;
 	else
-		throw std::invalid_argument(std::string(str) + " is not a valid color");
+		throw std::invalid_argument(libv::concat("\"", str, "\" is not a valid color"));
 }
 
 std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
-
 	namespace x3 = boost::spirit::x3;
 	using float4 = std::tuple<float, float, float, float>;
 	using color = libv::vec4f;
@@ -284,9 +285,10 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 
 	const auto scale = [](float value) {
 		return [value](auto& ctx) {
-			if(_attr(ctx) > value)
+			if (_attr(ctx) > value)
 				_pass(ctx) = false;
-			_val(ctx) = _attr(ctx) * (1.0f / value);
+			else
+				_val(ctx) = _attr(ctx) * (1.0f / value);
 		};
 	};
 

@@ -89,6 +89,9 @@ TEST_CASE("parse color: test everything") {
 	CHECK(color(0.160f, 0.141f, 0.135f, 0.400f) == parse_color_or_throw("hsva(14,15.4%,16%,0.4)"));
 	CHECK(color(0.160f, 0.142f, 0.136f, 0.170f) == parse_color_or_throw("hsva ( 14, 15%, 16 % ,17% )"));
 
+	CHECK(color(0.800f, 0.800f, 0.800f, 1.000f) == parse_color_or_throw("hsva(  0°,  0%,  80%, 100%)"));
+	CHECK(color(0.800f, 0.800f, 0.800f, 1.000f) == parse_color_or_throw("hsva(0.0°,0.0%,  80%, 100%)"));
+
 	// ---------------------------------------------------------------------------------------------
 
 	CHECK(not parse_color_optional("rgb(-.14,.154,.9%)"));
