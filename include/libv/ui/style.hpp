@@ -7,7 +7,7 @@
 // libv
 #include <libv/utility/concat.hpp>
 #include <libv/utility/observer_ptr.hpp>
-#include <libv/utility/observer_ref.hpp>
+//#include <libv/utility/observer_ref.hpp>
 #include <libv/utility/intrusive_ptr.hpp>
 // std
 #include <stdexcept>
@@ -26,7 +26,9 @@ class Style : public libv::intrusive_base_unsafe<Style> {
 private:
 	std::vector<libv::intrusive_ptr<Style>> parents;
 //	std::unordered_set<libv::observer_ref<ComponentBase>> users;
-	boost::container::flat_map<std::string, PropertyValue, std::less<>> properties;
+//	boost::container::flat_map<std::string, PropertyDynamic, std::less<>> properties;
+//	boost::container::flat_set<PropertyDynamic, libv::variant_index> properties;
+	boost::container::flat_map<std::string, PropertyDynamic, std::less<>> properties;
 
 public:
 	const std::string style_name;
@@ -41,18 +43,25 @@ public:
 	}
 
 public:
-	void set(std::string property, PropertyValue value) {
+	void set(std::string property, PropertyDynamic value) {
 		properties.emplace(std::move(property), std::move(value));
 	}
 
 	template <typename T>
 	inline void set(std::string property, T&& value) {
-		set(std::move(property), PropertyValue{std::forward<T>(value)});
+		set(std::move(property), PropertyDynamic{std::forward<T>(value)});
+	}
+
+public:
+	template <typename F>
+	inline void foreach(F&& func) {
+		for (const auto& [key, value] : properties)
+			func(key, value);
 	}
 
 private:
-	[[nodiscard]] libv::observer_ptr<const PropertyValue> get_optional_variant(const std::string_view property) const {
-		libv::observer_ptr<const PropertyValue> result;
+	[[nodiscard]] libv::observer_ptr<const PropertyDynamic> get_optional_variant(const std::string_view property) const {
+		libv::observer_ptr<const PropertyDynamic> result;
 
 		const auto it = properties.find(property);
 		if (it != properties.end()) {
@@ -79,7 +88,7 @@ public:
 		}
 	}
 
-	[[nodiscard]] const PropertyValue& get_or_throw(const std::string_view property) const {
+	[[nodiscard]] const PropertyDynamic& get_or_throw(const std::string_view property) const {
 		const auto result = get_optional(property);
 		if (!result)
 			throw std::invalid_argument(libv::concat("Requested property \"", property, "\" is not found"));

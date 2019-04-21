@@ -22,7 +22,7 @@ void Panel::add(std::shared_ptr<ComponentBase> component) {
 
 	// TODO P3: libv.ui: implement setParent(this)
 	comp->parent = libv::make_observer_ref(this);
-	invalidate(comp->flags & Flag::maskPropagateUp);
+	invalidate(comp->flags & Flag::mask_propagateUp);
 }
 
 // -------------------------------------------------------------------------------------------------

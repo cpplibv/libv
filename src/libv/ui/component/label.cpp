@@ -54,7 +54,7 @@ void Label::doRender(ContextRender& context) {
 	context.gl.program(*shader);
 	properties.font->bind(context.gl, shader->textureChannel);
 //	context.gl.texture(font->texture, program->textureChannel);
-	context.gl.uniform(shader->uniform_color, properties.color);
+	context.gl.uniform(shader->uniform_color, properties.font_color);
 	context.gl.uniform(shader->uniform_MVPmat, context.gl.mvp());
 	string.render(context.gl);
 //	context.gl.render(string.mesh);

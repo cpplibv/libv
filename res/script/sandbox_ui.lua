@@ -1,8 +1,170 @@
 
 local dump = require("lib.util.dump")
-local ui = {}
 
 ----------------------------------------------------------------------------------------------------
+
+--local result = {}
+
+local colors = {
+	research = "hsva(240°, 40%, 100%, 100%)",
+	kredit   = "hsva(  0°, 40%, 100%, 100%)",
+	text     = "hsva(  0°,  0%,  80%, 100%)",
+	fps_low  = "hsva( 11°, 56%, 100%, 100%)",
+	fps_hold = "hsva( 56°, 56%, 100%, 100%)",
+	fps_high = "hsva(110°, 56%, 100%, 100%)",
+--	fps_high = ui.color_hsv(110, 56, 100, 100),
+--	fps_halt = fps_hold.adjust_hsv(15),
+}
+
+ui.style("info_bar") {
+--	align_vertical = "center",
+	anchor = ui.ANCHOR_TOP_CENTER,
+	background = "#00FF007F",
+--	background = ui.image("ui/star_map/info_bar.dds"),
+--	background = ui.stretch("ui/star_map/info_bar.dds", 0, 0, 15, 15, 30, 30, 45, 45),
+	font = "consola.ttf",
+	font_color = colors.text,
+	font_shader = "default",
+	font_size = 14,
+	layout = ui.layout_line(ui.ORIENT_LEFT_TO_RIGHT),
+--	layout_orient = ui.ORIENT_LEFT_TO_RIGHT,
+	size = "1r, 20px",
+}
+
+ui.style("info_bar.left") {
+	size = "dynamic, 1r",
+	background = "#00FF007F",
+	layout = ui.layout_line(ui.ORIENT_LEFT_TO_RIGHT),
+}
+
+ui.style("info_bar.balance") {
+	align = "right",
+	font_color = colors.kredit,
+	size = "100px, 1r",
+}
+
+ui.style("info_bar.time_control") {
+}
+
+ui.style("info_bar.time_control.button") {
+	size = "25px, 1r",
+	align = "center",
+}
+
+ui.style("info_bar.right") {
+	size = "dynamic, 1r",
+	background = "#00FF007F",
+	layout = ui.layout_line(ui.ORIENT_LEFT_TO_RIGHT),
+}
+
+ui.style("info_bar.fps") {
+	size = "100px, 1r",
+--	font_color = function (text)
+--		if (global.metrics.frame_delivery_rate > 0.99) then
+--			return colors.fps_high,
+--		elseif (global.metrics.frame_delivery_rate > 0.95) then
+--			return colors.fps_hold,
+--		else
+--			return colors.fps_low,
+--		end
+--	end
+}
+
+--dump(result, "result")
+
+--return ui.component("info_bar") {
+--	stlye = "info_bar",
+--
+--	ui.component("left") {
+--		stlye = "info_bar.left",
+--
+--		ui.component("time_control") {
+--			stlye = "info_bar.time_control",
+--
+--			ui.component {
+--				stlye = "info_bar.time_control.button",
+--				-- how does style / component reads the current mode (game state), speed buttons should reflect the current speed at all time, even if the change was from outside of the UI (network, mod or script)
+--				text = "||",
+--				onSubmit = function (event) game.speed(0) end,
+--			},
+--			ui.component {
+--				stlye = "info_bar.time_control.button",
+--				text = ">",
+--				onSubmit = function (event) game.speed(1) end,
+--			},
+--			ui.component {
+--				stlye = "info_bar.time_control.button",
+--				text = ">>",
+--				onSubmit = function (event) game.speed(2) end,
+--			},
+--			ui.component {
+--				stlye = "info_bar.time_control.button",
+--				text = ">>>",
+--				onSubmit = function (event) game.speed(3) end,
+--			},
+--		},
+--
+--		ui.component("time") {
+--			stlye = "info_bar.time",
+--
+--			text = "0000.00.00 00:00",
+--			text_width_min = string.len("0000.00.00 00:00"),
+--		},
+--
+--		ui.component("balance") {
+--			stlye = "info_bar.balance",
+--
+--			text = "0 :kredit:",
+--			onUpdate = function (event) event.component:set{text = game.current_player.kredit() .. " :kredit:"} end,
+----			onUpdate = function (event) event.component:set{text = "Update ran!"} end,
+----			onUpdate = function (event) event.component:set{text = current_player.balance .. ":kredit:"} end,
+--		},
+--	},
+--
+--	ui.component {
+--		size = "1r, 1r",
+--	},
+--
+--	ui.component("right") {
+--		stlye = "info_bar.right",
+--
+--		ui.component("fps") {
+--			stlye = "info_bar.fps",
+--
+--			text = "FPS: ",
+--			onUpdate = function (event) event.component:set{text = "FPS: "} end,
+----			event = {
+----				onUpdate = function (event)
+----					local change = {}
+----					if (1 / event.delta_time) < 59 then
+----						change.font_color = "#FF9999FF"
+----					else
+----						change.font_color = "#FFFFFFFF"
+----					end
+----					change.text = "FPS: "
+----					event.component:set{change}
+----				end,
+----			},
+--		},
+--	},
+--}
+
+
+
+return nil;
+
+
+
+
+--[[
+
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------
+
 
 --local component_mt = {
 --
@@ -36,29 +198,6 @@ ui.ANCHOR_TOP_CENTER = "ANCHOR_TOP_CENTER"
 ui.ORIENT_LEFT_TO_RIGHT = "ORIENT_LEFT_TO_RIGHT"
 
 ui.component = function (tab) return tab end
-
-----------------------------------------------------------------------------------------------------
-
--- Forced
---	enable/disable
---	show/hide
-
--- Non-Inheriting
---	name
---	size
---	background
---	layout
---	onEvent
-
--- Overrideable
---	font
---	font_size
---	font_shader
---	font_color
---	icon_enable
-
--- Additive
---	icon_set
 
 ----------------------------------------------------------------------------------------------------
 
@@ -199,3 +338,5 @@ star_map_ui:add("info_bar_top") {
 
 dump(star_map_ui, "star_map_ui")
 return star_map_ui
+
+]]

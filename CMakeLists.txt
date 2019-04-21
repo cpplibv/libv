@@ -762,7 +762,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET test_libv_lua
 	SOURCE test/libv/lua/*.cpp
-	LINK   obj_test_runner libv_lua
+	LINK   obj_test_runner libv_lua libv_parse
 )
 
 wish_create_executable(

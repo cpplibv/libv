@@ -2,6 +2,8 @@
 
 // hpp
 #include <libv/ui/component_base.hpp>
+// libv
+#include <libv/utility/concat.hpp>
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
@@ -36,7 +38,7 @@ ComponentBase::ComponentBase(std::string name) :
 }
 
 ComponentBase::ComponentBase(UnnamedTag, const std::string_view type) :
-	name(std::string(type) + '-' + std::to_string(nextID++)) {
+	name(libv::concat(type, '-', nextID++)) {
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -44,7 +46,7 @@ ComponentBase::ComponentBase(UnnamedTag, const std::string_view type) :
 void ComponentBase::invalidate(Flag_t flags_) {
 	flags.set(flags_);
 
-	const auto flagsUp = flags_ & Flag::maskPropagateUp;
+	const auto flagsUp = flags_ & Flag::mask_propagateUp;
 	for (auto it = parent; !it->flags.match_mask(flagsUp); it = it->parent)
 		it->flags.set(flagsUp);
 

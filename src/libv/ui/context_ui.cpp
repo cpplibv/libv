@@ -98,7 +98,8 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 	std::shared_ptr<Font2D> sp;
 
 	const auto lexically_normal = path.lexically_normal();
-	auto key = lexically_normal.generic_u8string();
+//	auto key = lexically_normal.generic_u8string();
+	auto key = lexically_normal.generic_string();
 
 	const auto it = cache_font.find(key);
 	if (it != cache_font.end()) {
@@ -142,7 +143,8 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	std::shared_ptr<Texture2D> sp;
 
 	const auto lexically_normal = path.lexically_normal();
-	auto key = lexically_normal.generic_u8string();
+//	auto key = lexically_normal.generic_u8string();
+	auto key = lexically_normal.generic_string();
 
 	const auto it = cache_texture2D.find(key);
 	if (it != cache_texture2D.end()) {

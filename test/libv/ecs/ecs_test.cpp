@@ -57,6 +57,9 @@ TEST_CASE("entity creation with component", "[libv.ecs]") {
 	CHECK(es.componentCount<TestCompA>() == 1);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
+
 TEST_CASE("entity creation with components", "[libv.ecs]") {
 	libv::ecs::System es;
 	uint32_t resultA = 0;
@@ -104,6 +107,8 @@ TEST_CASE("entity creation with components", "[libv.ecs]") {
 	CHECK(es.componentCount<TestCompA>() == 1);
 	CHECK(es.componentCount<TestCompB>() == 1);
 }
+
+#pragma GCC diagnostic pop
 
 TEST_CASE("insert or emplace component", "[libv.ecs]") {
 	libv::ecs::System es;

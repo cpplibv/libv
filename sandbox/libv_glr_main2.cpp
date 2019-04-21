@@ -11,20 +11,24 @@
 #include <chrono>
 #include <iostream>
 // pro
+#include <libv/glr/attribute.hpp>
+#include <libv/glr/layout_std140.hpp>
+#include <libv/glr/remote.hpp>
+#include <libv/glr/uniform.hpp>
+#include <libv/glr/uniform_block_binding.hpp>
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
 //#include <libv/glr/attribute.hpp>
+//#include <libv/glr/font.hpp>
 //#include <libv/glr/mesh.hpp>
 //#include <libv/glr/procedural/cube.hpp>
 //#include <libv/glr/procedural/sphere.hpp>
 //#include <libv/glr/program.hpp>
+//#include <libv/glr/text.hpp>
 //#include <libv/glr/texture.hpp>
 //#include <libv/glr/uniform.hpp>
 //#include <libv/glr/uniform_block_binding.hpp>
 //#include <libv/glr/uniform_buffer.hpp>
-#include <libv/glr/font.hpp>
-#include <libv/glr/remote.hpp>
-#include <libv/glr/text.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -55,7 +59,7 @@ in vec2 fragmentTexture0;
 
 out vec4 output;
 
-uniform sampler2D textureSampler;
+uniform sampler2D texture1Sampler;
 
 void main() {
 	output = texture(texture1Sampler, fragmentTexture0);
@@ -115,10 +119,21 @@ constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 constexpr auto attribute_font_xywh = libv::glr::Attribute<10, libv::vec4f>{};
 
+const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
+
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 
 // -------------------------------------------------------------------------------------------------
 
+struct SphereUniformLayout {
+	libv::glr::Uniform_mat4f MVPmat;
+	libv::glr::Uniform_mat4f Mmat;
+	libv::glr::Uniform_vec3f color;
+
+	LIBV_REFLECTION_ACCESS(MVPmat);
+	LIBV_REFLECTION_ACCESS(Mmat);
+	LIBV_REFLECTION_ACCESS(color);
+};
 const auto plane_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
 
 // -------------------------------------------------------------------------------------------------
@@ -155,10 +170,10 @@ struct Sandbox {
 			position(WINDOW_WIDTH, WINDOW_HEIGHT, 0);
 			position(0, WINDOW_HEIGHT, 0);
 
-			texture0(0, 0, 0);
-			texture0(1, 0, 0);
-			texture0(1, 1, 0);
-			texture0(0, 1, 0);
+			texture0(0, 0);
+			texture0(1, 0);
+			texture0(1, 1);
+			texture0(0, 1);
 
 			index.quad(0, 1, 2, 3);
 		}
@@ -199,6 +214,7 @@ struct Sandbox {
 	}
 
 	void update(const std::chrono::duration<float> deltaTime) {
+		(void) deltaTime;
 	}
 
 	void render() {
@@ -231,7 +247,7 @@ struct Sandbox {
 		gl.state.enableDepthTest();
 		gl.state.depthFunctionLess();
 
-		gl.setClearColor(0.236f, 0.311f, 0.311f, 1.0f);
+		gl.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
 		gl.clearColor();
 		gl.clearDepth();
 
@@ -244,15 +260,15 @@ struct Sandbox {
 //			gl.model.scale();
 			gl.program(plane_program);
 			gl.uniform(plane_uniform_MVPmat, gl.mvp());
-			gl.texture(font.texture, textureChannel_diffuse);
+//			gl.texture(font.texture, textureChannel_diffuse);
 			gl.render(plane_mesh);
 		}
 
 		{
 			gl.program(font_program);
 			gl.uniform(font_uniform_MVPmat, gl.mvp());
-			gl.texture(font.texture, textureChannel_diffuse);
-			gl.render(text.mesh);
+//			gl.texture(font.texture, textureChannel_diffuse);
+//			gl.render(text.mesh);
 		}
 	}
 };

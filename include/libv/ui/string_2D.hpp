@@ -11,7 +11,7 @@
 #include <vector>
 // pro
 #include <libv/ui/font_2D.hpp>
-#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/align.hpp>
 #include <libv/ui/property/font_size.hpp>
 
 
@@ -30,7 +30,7 @@ class Font2D;
 //		FontStyle style;     /// font-style - normal / italic / oblique
 //		FontVariant variant; /// font-variant - normal / small-caps
 //		FontWeight weight;   /// font-weight - normal / bold / bolder / lighter / %number%
-
+//
 //		FontFamily family;   /// font-family: Consolas
 //		uint64_t underline:1;
 //		uint64_t strike_through:1;
@@ -50,16 +50,16 @@ private:
 
 	std::shared_ptr<Font2D> font;
 	FontSize fontSize = 12u;
-	Anchor align = Anchor::Center;
+	AlignHorizontal align = AlignHorizontal::Center;
 	libv::vec2f limit;
 	libv::vec3f position;
 
 	std::string string;
 
 public:
-	String2D(std::string string = "", const Anchor align = Anchor::Center);
+	String2D(std::string string = "", const AlignHorizontal align = AlignHorizontal::Center);
 
-	void setAlign(const Anchor align);
+	void setAlign(const AlignHorizontal align);
 	void setFont(std::shared_ptr<Font2D> font);
 	void setFont(std::shared_ptr<Font2D> font, const FontSize fontSize);
 	void setLimit(const libv::vec2f limit);
@@ -72,7 +72,7 @@ public:
 	}
 	void setSize(const FontSize fontSize);
 	void setString(std::string string);
-	inline void set(const Anchor align_, const libv::vec3f position_, const libv::vec2f limit_, std::shared_ptr<Font2D> font_, const FontSize size_, std::string string_) {
+	inline void set(const AlignHorizontal align_, const libv::vec3f position_, const libv::vec2f limit_, std::shared_ptr<Font2D> font_, const FontSize size_, std::string string_) {
 		setAlign(align_);
 		setLimit(limit_);
 		setFont(std::move(font_), size_);

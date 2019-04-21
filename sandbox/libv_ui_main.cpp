@@ -85,7 +85,7 @@ public:
 	void render() {
 		auto gl = remote.queue();
 
-		gl.setClearColor(0.236f, 0.311f, 0.311f, 1.0f);
+		gl.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
 		gl.clearColor();
 		gl.clearDepth();
 
@@ -125,13 +125,13 @@ public:
 		label1->setText("Hello, Label1!");
 		label2->properties.set(style_label_01);
 		label2->setText("Hello, Label2!");
-		label2->propertySize = libv::ui::parse_size_or_throw("C, C, C");
+		label2->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 
 		quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));
 		stretch0->image(ui.context().texture2D("stretch_border.png"));
 		stretch0->color(libv::parse::parse_color_or_throw("rgba(183, 190, 135, 100%)"));
 		image0->image(ui.context().texture2D("atlas_ui_slate.png"));
-		image0->propertySize = libv::ui::parse_size_or_throw("C, C, C");
+		image0->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 
 		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 		panel0->layout.alignVertical = libv::ui::Alignment::CENTER;
@@ -180,26 +180,26 @@ public:
 
 			switch (e.key) {
 			case libv::frame::Key::Num0:
-				label0->properties.align = libv::ui::Anchor::Left;
-				label2->properties.align = libv::ui::Anchor::Left;
+				label0->properties.align = libv::ui::AlignHorizontal::Left;
+				label2->properties.align = libv::ui::AlignHorizontal::Left;
 				log_sandbox.trace("Set anchor to {}", "Left");
 				break;
 
 			case libv::frame::Key::Num1:
-				label0->properties.align = libv::ui::Anchor::Center;
-				label2->properties.align = libv::ui::Anchor::Center;
+				label0->properties.align = libv::ui::AlignHorizontal::Center;
+				label2->properties.align = libv::ui::AlignHorizontal::Center;
 				log_sandbox.trace("Set anchor to {}", "Center");
 				break;
 
 			case libv::frame::Key::Num2:
-				label0->properties.align = libv::ui::Anchor::Right;
-				label2->properties.align = libv::ui::Anchor::Right;
+				label0->properties.align = libv::ui::AlignHorizontal::Right;
+				label2->properties.align = libv::ui::AlignHorizontal::Right;
 				log_sandbox.trace("Set anchor to {}", "Right");
 				break;
 
 			case libv::frame::Key::Num3:
-				label0->properties.align = libv::ui::Anchor::Justify;
-				label2->properties.align = libv::ui::Anchor::Justify;
+				label0->properties.align = libv::ui::AlignHorizontal::Justify;
+				label2->properties.align = libv::ui::AlignHorizontal::Justify;
 				log_sandbox.trace("Set anchor to {}", "Justify");
 				break;
 

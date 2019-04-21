@@ -8,7 +8,7 @@
 // std
 #include <stdexcept>
 // pro
-#include <libv/ui/size.hpp>
+#include <libv/ui/property/size.hpp>
 
 
 namespace libv {
@@ -63,7 +63,8 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 				(x3::float_ >> x3::no_case[x3::lit("px")])[map_pixel] |
 				(x3::float_ >> x3::no_case[x3::lit("%")])[map_percent] |
 				(x3::float_ >> x3::no_case[x3::lit("r")])[map_ratio] |
-				x3::no_case[x3::lit("c")][map_content] |
+				x3::no_case[x3::lit("dynamic")][map_content] |
+				x3::no_case[x3::lit("d")][map_content] |
 				x3::lit("0")
 			);
 

@@ -14,7 +14,6 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct SizeDim {
-
 	float pixel = 0.0f;   /// Fixed size
 	float percent = 0.0f; /// Parent size percentile
 	float ratio = 1.0f;   /// Parent leftover space ratio
@@ -50,7 +49,7 @@ struct SizeDim {
 		if (std::not_equal_to<float>()(size.ratio, 0.0f))
 			os << size.ratio << 'r';
 		if (size.content)
-			os << "C";
+			os << "D";
 		return os;
 	}
 };

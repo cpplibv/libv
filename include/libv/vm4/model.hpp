@@ -106,6 +106,13 @@ struct Model {
 
 	std::vector<LOD> lods;
 
+//	std::vector<libv::vec3f> vertex_positions;
+//	std::vector<libv::vec3f> vertex_normals;
+//	std::vector<libv::vec3f> vertex_tangents;
+//	std::vector<libv::vec3f> vertex_bitangents;
+//	std::vector<libv::vec2f> vertex_texCoord0s;
+//	std::vector<libv::vec4i> vertex_boneIDs;
+//	std::vector<libv::vec4f> vertex_boneWieghts;
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -116,6 +123,13 @@ struct Model {
 	LIBV_REFLECTION_ACCESS(meshes);
 	LIBV_REFLECTION_ACCESS(nodes);
 	LIBV_REFLECTION_ACCESS(lods);
+//	LIBV_REFLECTION_ACCESS(vertex_positions);
+//	LIBV_REFLECTION_ACCESS(vertex_normals);
+//	LIBV_REFLECTION_ACCESS(vertex_tangents);
+//	LIBV_REFLECTION_ACCESS(vertex_bitangents);
+//	LIBV_REFLECTION_ACCESS(vertex_texCoord0s);
+//	LIBV_REFLECTION_ACCESS(vertex_boneIDs);
+//	LIBV_REFLECTION_ACCESS(vertex_boneWieghts);
 	LIBV_REFLECTION_ACCESS(vertices);
 	LIBV_REFLECTION_ACCESS(indices);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();

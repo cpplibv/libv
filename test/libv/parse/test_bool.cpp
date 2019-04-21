@@ -17,7 +17,7 @@ using libv::parse::parse_bool_optional;
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("parse bool: test everything") {
+TEST_CASE("parse bool: test everything", "[libv.parse]") {
 	CHECK(false == parse_bool_or_throw("false"));
 	CHECK(false == parse_bool_or_throw("False"));
 	CHECK(false == parse_bool_or_throw("FALSE"));

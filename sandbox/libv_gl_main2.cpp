@@ -196,7 +196,7 @@ struct Sandbox {
 	}
 
 	void render() {
-		gl.clearColor(0.236f, 0.311f, 0.311f, 1.f);
+		gl.clearColor(0.098f, 0.2f, 0.298f, 1.0f);
 		gl.clear();
 
 		const auto pStackGuard = gl.projection.push_guard();

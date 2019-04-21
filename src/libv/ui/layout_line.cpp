@@ -9,7 +9,7 @@
 #include <libv/ui/component_base.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/size.hpp>
+#include <libv/ui/property/size.hpp>
 
 
 namespace libv {

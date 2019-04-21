@@ -28,6 +28,9 @@ size_t result;
 std::vector<ABCDE*> r;
 std::vector<ABCDE> r2;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
+
 int main(int, char**) {
 	libv::Timer timer;
 
@@ -42,7 +45,7 @@ int main(int, char**) {
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
 			es.create<A, B, C, D>([] (auto& a, auto&...) {
-				a.value = 0;
+				a.value = 1;
 			});
 		}
 
@@ -52,14 +55,14 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms" << std::endl;
+		fmt::print("ECS:    {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
 		libv::ecs::System es;
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
 			es.create<A, B, C, D>([] (auto& a, auto&...) {
-				a.value = 0;
+				a.value = 1;
 			});
 		}
 
@@ -70,14 +73,14 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECScs: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms" << std::endl;
+		fmt::print("ECScs:  {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
 		libv::ecs::System es;
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
 			es.create<ABCDE>([] (auto& a) {
-				a.value = 0;
+				a.value = 1;
 			});
 		}
 
@@ -87,14 +90,14 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS2: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms"  << std::endl;
+		fmt::print("ECS2:   {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
 		libv::ecs::System es;
 
 		for (size_t i = 0; i < 2'000'000; ++i) {
 			es.create<ABCDE>([] (auto& a) {
-				a.value = 0;
+				a.value = 1;
 			});
 		}
 
@@ -105,7 +108,7 @@ int main(int, char**) {
 			result += a.value % mod;
 		});
 
-		std::cout << "ECS2ch: " << static_cast<float>(timer.time_us().count()) / 1000.f << "ms"  << std::endl;
+		fmt::print("ECS2ch: {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
 		for (size_t i = 0; i < 2'000'000; ++i) {
@@ -120,7 +123,7 @@ int main(int, char**) {
 			result += r[i]->value % mod;
 		}
 
-		std::cout << "RAW: " << static_cast<float>(timer.time_us().count()) / 1000.f << result << "ms"  << std::endl;
+		fmt::print("RAW:    {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
 		for (size_t i = 0; i < 2'000'000; ++i) {
@@ -135,8 +138,10 @@ int main(int, char**) {
 			result += r2[i].value % mod;
 		}
 
-		std::cout << "loc: " << static_cast<float>(timer.time_us().count()) / 1000.f << result << "ms"  << std::endl;
+		fmt::print("loc:    {:7.3f}ms\n", timer.timef_ms().count());
 	}
 
 	return 0;
 }
+
+#pragma GCC diagnostic pop

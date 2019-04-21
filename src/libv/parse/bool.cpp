@@ -55,8 +55,7 @@ std::optional<bool> parse_bool_optional(const std::string_view str) {
 	const auto bool_rule = x3::rule<class bool_rule, bool>{} =
 			x3::no_case[x3::lit("true")][value(true)] |
 			x3::no_case[x3::lit("false")][value(false)] |
-			x3::int_[value_from_int] |
-			x3::space[value(false)];
+			x3::int_[value_from_int];
 
 	bool result = false;
 

@@ -23,11 +23,11 @@ private:
 	std::vector<std::shared_ptr<ComponentBase>> components;
 
 private:
-	template <typename T> void ui_access(T&& access) {
+	template <typename T>
+	void ui_access(T&& access) {
 		access(layout);
-		for (auto& component : components){
+		for (auto& component : components)
 			access(*component);
-		}
 	}
 
 public:

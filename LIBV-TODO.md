@@ -51,6 +51,9 @@ GCC 9.1: Using <filesystem> does not require linking with -lstdc++fs now.
 
 libv.lua: object parser
 
+libv.glr.std140: constexpr static string to name structs
+libv.meta: rename if_void to lnv
+
 libv.ui: hard type (enum) align anchor and orient
 libv.ui.style: layout properties
 libv.ui.style: font properties
@@ -64,7 +67,7 @@ libv.ui.style: style could store each component using them making invalidation p
 libv.ui.style: complex composite component would result in "nested" property sets
 libv.ui.style: multiple style usage in a component would still be nice, maybe synthetized styles?
 
-libv.ui: switch foreach children to fill a std::vector<component*>, this vector should be a reusable memory, or (?) just a small_vector<, 32>
+libv.ui: switch foreach children to fill a std::vector<component*>, this vector should be a reusable memory, or (?) just a small_vector<, 32> on the stack
 
 wish: update cmake version and use add_compile_definitions() instead of add_definitions()
 wish: target_link_directories()
@@ -74,6 +77,7 @@ libv.ui: implement detach and component removal
 
 libv.ui: rename size's "content" to "dynamic"
 
+libv.frame: update glfw
 libv.frame: icon support
 
 libv.ui: cleanup context_ui redundant codes
@@ -94,6 +98,9 @@ libv.ui: Focus
 libv.ui: Event Input
 libv.ui: Input field
 libv.ui: Button
+
+libv.color: New libv.color library, color space conversion and manipulations, template color space, template representation
+libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
 libv.ui: Color picker
 
 libv.ui: Floating layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
@@ -174,12 +181,15 @@ libv.ui: Idea that a component could signal the UI if it want to execute a heavy
 
 libv.glr: shadow
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);
-libv.glr+: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading
-libv.glr+: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
-libv.glr+: HDR https://learnopengl.com/Advanced-Lighting/HDR
-libv.glr+: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
+libv.glr: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading
+libv.glr: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
+libv.glr: HDR https://learnopengl.com/Advanced-Lighting/HDR
+libv.glr: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
+libv.glr: FXAA
+libv.glr: SRAA
+libv.glr: Tiled-Deferred-Shading
 
-libv.glr++: Tiled-Deferred-Shading
+libv.vm4: Model viewer, display statistics of texture density and estimated texture pixel world space size
 
 libv.frame: frame calling show after show may brake things?
 libv.frame: dual check lock every async frame operations
@@ -197,8 +207,6 @@ wish: revisit catch object file linkage (only need to figure out a way to build 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cli: Clara, most important questions are: multi, optional, required, positional and default arguments
 			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
-cmake: can there be multiple definition error during linkage if two lib contains the same definition or will a later be ignored
-cmake: combine libs http://stackoverflow.com/questions/37924383/combining-several-static-libraries-into-one-using-cmake
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency()
 cpp.proposal: P1 member_offset alternative for offsetof macro
@@ -220,8 +228,15 @@ cpp.proposal: P3 unrestricted template template parameters (and template concept
 		template <template<typename...> container> struct S{}; // Current syntax
 		template <template              container> struct S{}; // Proposed syntax
 		It was always possible to use a wrapper type and traffic such unrestricted template params as member template typedef
+cpp.proposal: P3 generalized type pack "using... ", type pack in non template parameter context
+		using... types = int, double, std::string;
+		std::variant<types...> global;
+		Open question: issue of pack disambiguation in dependent name context: "dependent::pack types", "dependent::... types", "dependent::typepack types"
+cpp.proposal: P3 structured binding pack
+		auto& [...members] = object;
 cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
+
 cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
 cpp: (adaptive) radix tree - O(1) lookup
 cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
@@ -239,16 +254,14 @@ gl: remove irrelevant member function from templated textures
 gl: renderbuffer
 gl: templated buffer for binding
 gl: uniformbuffer?
-gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
-layout: hard type (enum) align anchor and orient
 layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
-libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
 libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv.log: log thread naming
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, that is too many template)
 libv.utility: Make a proper copy-pastable noisy type
+libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
@@ -258,6 +271,7 @@ observe: https://github.com/hugoam/mud
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
+true: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
 ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 ui: https://www.factorio.com/blog/post/fff-246
@@ -355,7 +369,6 @@ yeee i get it now: void to regular void by: "(void_expression, regular_void)" an
 
 Base class for lights and cameras...
 
-
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
 Optimalizált fordítás - cmake:
@@ -431,13 +444,7 @@ Tracing every event for right state enums / defines / handlers:
 
 // -------------------------------------------------------------------------------------------------
 
-operator| on enums
-https://www.youtube.com/watch?v=cZ3TNrRzHfM
-http://cppcast.com/2016/07/gabriel-dos-reis/
-
-// -------------------------------------------------------------------------------------------------
-
-Új fajta signal: timerSignal
+TimerSignal
 Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
 Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
 
@@ -453,15 +460,8 @@ Multi Pass
 
 VM4 Animated mesh
 
-http://www.oldunreal.com/editing/s3tc/ARB_texture_compression.pdf
 http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
-OpenGL Reference page: https://www.opengl.org/sdk/docs/man/
-
-http://hmijailblog.blogspot.hu/2013/09/type-punning-aliasing-unions-strict.html
-
-----
-
-Adopt TCLAP http://tclap.sourceforge.net if suitable
+OpenGL Reference page: https://www.khronos.org/registry/OpenGL-Refpages/gl4/
 
 ----
 
@@ -469,42 +469,6 @@ Fresnel shader - Atmosphere
 Cook-Torrance shader - Metal
 Minnaert - More depth?
 OrenNayar - More avg lambert
-
-
---- LIB Merge --------------------------------------------------------------------------------------
-
-http://stackoverflow.com/questions/13128/how-to-combine-several-c-c-libraries-into-one
-
-http://stackoverflow.com/questions/3821916/how-to-merge-two-ar-static-libraries-into-one
-
-There are at least three ways to do this natively. The first and most portable way is to use libtool. After having built the other libraries also with libtool, you can combine them just by adding the .la libs to an automake libaz_la_LIBADD variable, or directly from a Makefile with something like:
-
-libtool --mode=link cc -static -o libaz.la libabc.la libxyz.la
-
-The other two are at least available when using GNU ar. You can use an MRI script (named for example libaz.mri), such as:
-
-create libaz.a
-addlib libabc.a
-addlib libxyz.a
-save
-end
-
-and then execute ar as:
-
-ar -M <libaz.mri
-
-Or you can use a thin archive (option -T), which will allow adding other archives without getting them nested inside, although the downside is that if you want to distribute the static library, the detached object will be missing:
-
-ar -rcT libaz.a libabc.a libxyz.a
-
-All the above methods gracefully handle overlapping member names from the original archives.
-
-Otherwise, you'd have to unpack into different directories and repack again, to avoid replacing overlapping member names:
-
-mkdir abc; cd abc; ar -x ../libabc.a
-mkdir xyz; cd xyz; ar -x ../libxyz.a
-ar -qc libaz.a abc xyz
-
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
@@ -600,47 +564,6 @@ ambient(0.1f, 0.1f, 0.1f, 1.0f),
 reflective(1.0f, 1.0f, 1.0f, 1.0f),
 shininess(32.0f) { }
 
-
-GLuint fullScreenQuadVBO;
-
-void cleanFullScreenQuad() {
-	glDeleteBuffers(1, &fullScreenQuadVBO);
-}
-
-void initFullScreenQuad() {
-	float vertexData[]{
-		0.0f, 0.0f, -1.0f, -1.0f,
-		1.0f, 0.0f, 1.0f, -1.0f,
-		0.0f, 1.0f, -1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f
-	};
-
-	glGenBuffers(1, &fullScreenQuadVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
-	glBufferData(GL_ARRAY_BUFFER, (sizeof (float)) * 16, vertexData, GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void vglPassFullScreenQuad() {
-	glBindBuffer(GL_ARRAY_BUFFER, fullScreenQuadVBO);
-	glEnableVertexAttribArray(ATTRIBUTE_POSITION);
-	glEnableVertexAttribArray(ATTRIBUTE_TEXCOORD0);
-
-	glVertexAttribPointer(ATTRIBUTE_POSITION, 2, GL_FLOAT, GL_FALSE, sizeof (float) * 4, ((void*) (sizeof (float) * 2)));
-	glVertexAttribPointer(ATTRIBUTE_TEXCOORD0, 2, GL_FLOAT, GL_FALSE, sizeof (float) * 4, ((void*) (sizeof (float) * 0)));
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	glDisableVertexAttribArray(ATTRIBUTE_TEXCOORD0);
-	glDisableVertexAttribArray(ATTRIBUTE_POSITION);
-	//	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void vglViewportFullScreen() {
-	glViewport(0, 0, options.graphics.resolution.get().x
-			, options.graphics.resolution.get().y);
-}
-
-
 //glm::mat4 Light::getPmat() {
 //	if (type == spotLight)
 //		return perspective<float>(acos(outerCosAngle) * 180.0f / PI * 2, 1.0f, range / 15.0f, range); //2szeres outer sz�g, mivel nek�nk nem a 'fele' kell hanem a teljes 'sug�r'
@@ -658,10 +581,6 @@ void vglViewportFullScreen() {
 //	else //if (type == pointLight)
 //		return ortho<float>(-30, 30, -30, 30, -10, 150);
 //}
-
-
-
-
 
 class Model {
 private:
@@ -712,6 +631,7 @@ void Model::init(const char* data, size_t size) {
 Model::~Model() {
 	unloadGL();
 }
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -903,15 +823,13 @@ private:
 
 // =================================================================================================
 
-#    define PUSHSTATE() GLint restoreId; glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &restoreId );
-#    define POPSTATE() glBindFramebuffer( GL_DRAW_FRAMEBUFFER, restoreId );
 Framebuffer::Framebuffer(const Framebuffer& other) {
 	gc.Copy(other.obj, obj);
 	texColor = other.texColor;
 	texDepth = other.texDepth;
 }
 Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
-	PUSHSTATE()
+	GLint restoreId; glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &restoreId );
 
 	// Determine appropriate formats
 	InternalFormat::internal_format_t colorFormat;
@@ -949,7 +867,7 @@ Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
 	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		throw FramebufferException();
 
-	POPSTATE()
+	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, restoreId );
 }
 Framebuffer::~Framebuffer() {
 	gc.Destroy(obj);
@@ -1001,4 +919,92 @@ void Renderbuffer::Storage(uint width, uint height, InternalFormat::internal_for
 
 GC Renderbuffer::gc;
 
-}
+// -------------------------------------------------------------------------------------------------
+
+Additional cmake.wish ideas:
+
+wish_config(
+	TARGET                      __PARENT_TARGET_____TARGET__
+	FOLDER                      __PARENT_FOLDER__/__TARGET__
+	ALIAS                       __PARENT_ALIAS__::__TARGET__
+	SOURCE                      src/__FOLDER__/*.cpp
+	HEADER                      src/__FOLDER__/*.hpp
+
+	RESULT_PATH_BINARY_APP      bin/__FOLDER__/
+	RESULT_PATH_BINARY_EXAMPLE  bin/__FOLDER__/
+	RESULT_PATH_BINARY_SANDBOX  bin/__FOLDER__/
+	RESULT_PATH_BINARY_TEST     bin/__FOLDER__/
+	RESULT_PATH_HEADER          include/__FOLDER__/
+	RESULT_PATH_LIBRARY_DYNAMIC lib/__FOLDER__/
+	RESULT_PATH_LIBRARY_STATIC  lib/__FOLDER__/
+)
+
+string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+
+find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
+
+wish_create_base(
+	TARGET libv
+
+	WARNING GNU VERSION_GREATER 7.0 -Wduplicated-branches
+	WARNING GNU VERSION_GREATER 7.0 -Wrestrict
+	WARNING GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
+	WARNING GNU VERSION_GREATER 8.0 -Wcast-align=strict
+	WARNING GNU VERSION_GREATER 8.0 -Wmultistatement-macros
+
+	OPTION DEBUG -Og
+	OPTION DEBUG -ggdb3
+	OPTION RELEASE -O3
+	OPTION RELEASE -static
+	OPTION DEV -O3
+	OPTION -m64
+	OPTION -std=c++2a
+	OPTION -fconcepts
+
+	DEFINE -Dconcept="concept bool"
+	DEFINE -D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
+	IDE_DEFINE LIBV_REQUIRES(...)
+
+	DEFINE -DGIT_BRANCH="${WISH_GIT_BRANCH}"
+	DEFINE -DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
+	DEFINE -DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF}
+	DEFINE -DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/"
+)
+
+wish_create_library(
+	PARENT libv
+	TARGET vm4imp
+	LINK PUBLIC libv::log libv::vm4 ext::assimp
+)
+
+// -------------------------------------------------------------------------------------------------
+
+A - ALPHA
+B - BRAVO
+C - CHARLIE
+D - DELTA
+E - ECHO
+F - FOXTROT
+G - GOLF
+H - HOTEL
+I - INDIA
+J - JULIET
+K - KILO
+L - LIMA
+M - MIKE
+N - NOVEMBER
+O - OSCAR
+P - PAPA
+Q - QUEBEC
+R - ROMEO
+S - SIERRA
+T - TANGO
+U - UNIFORM
+V - VICTOR
+W - WHISKY
+X - X-RAY
+Y - YANKEE
+Z - ZULU

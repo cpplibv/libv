@@ -1,6 +1,9 @@
-// File:   color.hpp Author: Vader Created on 19 March 2019, 00:59
+// File:   orient.hpp Author: Vader Created on 22 March 2019, 08:02
 
 #pragma once
+
+// std
+#include <cstdint>
 
 
 namespace libv {
@@ -8,11 +11,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Anchor {
-	Left = 0,
-	Center = 1,
-	Right = 2,
-	Justify = 3,
+// TODO P4: Adopt Orientation in layout_line
+
+enum class Orientation2 : uint32_t {
+	BOTTOM_TO_TOP = 0,
+	LEFT_TO_RIGHT = 1,
+	RIGHT_TO_LEFT = 2,
+	TOP_TO_BOTTOM = 3,
 };
 
 // -------------------------------------------------------------------------------------------------

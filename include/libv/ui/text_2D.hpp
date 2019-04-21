@@ -39,14 +39,6 @@ class Context;
 
 // -------------------------------------------------------------------------------------------------
 
-enum class Anchor {
-	Top,
-	Center,
-	Bottom,
-	Right,
-	Left
-};
-
 class Text2D {
 private:
 	class Builder;

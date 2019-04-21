@@ -13,6 +13,7 @@
 #include <libv/utility/slice.hpp>
 // std
 #include <algorithm>
+#include <array>
 #include <optional>
 // pro
 #include <libv/ui/context_render.hpp>
@@ -27,20 +28,21 @@ namespace ui {
 
 namespace {
 
-static constexpr std::array AnchorTable = {0.0f, 0.5f, 1.0f, 0.0f};
+//                                               Left, Center, Right, Justify
+static constexpr std::array AlignHorizontalTable = {0.0f, 0.5f, 1.0f, 0.0f};
 
 } // namespace
 
 // -------------------------------------------------------------------------------------------------
 
-String2D::String2D(std::string string, const Anchor align) :
+String2D::String2D(std::string string, const AlignHorizontal align) :
 	align(align) {
 	setString(std::move(string));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void String2D::setAlign(const Anchor align_) {
+void String2D::setAlign(const AlignHorizontal align_) {
 	if (align != align_) {
 		align = align_;
 		dirty = true;
@@ -255,9 +257,9 @@ void String2D::layout() {
 	for (const auto& [index, line] : lines | ranges::view::enumerate) {
 		const auto leftover = contentWidth - line.width;
 
-		const auto offset = std::round(leftover * AnchorTable[to_value(align)]);
+		const auto offset = std::round(leftover * AlignHorizontalTable[to_value(align)]);
 		const auto isLastLine = static_cast<size_t>(index) == lines.size() - 1;
-		const auto justifyGap = (align == Anchor::Justify && !isLastLine) ?
+		const auto justifyGap = (align == AlignHorizontal::Justify && !isLastLine) ?
 				leftover / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) :
 				0.0f;
 

@@ -3,11 +3,11 @@
 #pragma once
 
 // ext
-#include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 #include <range/v3/iterator_range.hpp>
 // std
 #include <algorithm>
+#include <utility>
 // pro
 #include <libv/ecs/common.hpp>
 #include <libv/ecs/component.hpp>
@@ -22,15 +22,16 @@ namespace ecs {
 
 class System {
 private:
-	EntityID nextID = 0;
 	boost::container::flat_set<Entity> entities;
-	boost::container::flat_map<ComponentSystemID, std::unique_ptr<ComponentStorageBase>> storages;
+	// TODO P5: libv.ecs: place the hard coded numbers somewhere (64 component)
+	std::array<std::unique_ptr<ComponentStorageBase>, 64> storages;
+	EntityID nextID = 0;
 
 private:
 	template <typename T>
 	ComponentStorage<T>& storage(ComponentSystemID id) {
 		auto& storage_up = storages[id];
-		if (!storage_up)
+		if (storage_up == nullptr)
 			storage_up = std::make_unique<ComponentStorage<T>>();
 		return static_cast<ComponentStorage<T>&>(*storage_up);
 	}
@@ -40,7 +41,7 @@ public: // create --------------------------------------------------------------
 	EntityID create(EntityID parentID, F&& f) {
 		auto id = (parentID << 32) + (++nextID & 0xFFFFFFFF);
 		entities.emplace(id, make_bitset<Cs::ID...>());
-		f(storage<typename Cs::type>(Cs::ID)[id]...);
+		std::forward<F>(f)(storage<typename Cs::type>(Cs::ID)[id]...);
 		return id;
 	}
 
@@ -143,7 +144,7 @@ public: // get -----------------------------------------------------------------
 
 		if (entityit != entities.end())
 			if ((entityit->components & requiredBits) == requiredBits)
-				f(storage<typename Cs::type>(Cs::ID).template get<Cs>(id)...);
+				std::forward<F>(f)(storage<typename Cs::type>(Cs::ID).template get<Cs>(id)...);
 	}
 
 public: // -----------------------------------------------------------------------------------------
@@ -158,7 +159,8 @@ public: // ---------------------------------------------------------------------
 
 	void clear() {
 		entities.clear();
-		storages.clear();
+		for (auto& storage : storages)
+			storage.reset();
 		nextID = 0;
 	}
 };

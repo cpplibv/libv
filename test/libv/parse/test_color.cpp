@@ -18,7 +18,7 @@ using color = libv::vec4_t<libv::Approxing<float, -3>>;
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("parse color: test everything") {
+TEST_CASE("parse color: test everything", "[libv.parse]") {
 	CHECK(color(1.000f, 0.000f, 0.000f, 1.000f) == parse_color_or_throw("red"));
 	CHECK(color(0.753f, 0.753f, 0.753f, 1.000f) == parse_color_or_throw("silver"));
 	CHECK(color(0.498f, 1.000f, 0.831f, 1.000f) == parse_color_or_throw("aquamarine"));
