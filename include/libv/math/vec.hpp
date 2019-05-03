@@ -598,6 +598,12 @@ constexpr inline auto min(const T& lhs, const vec_t<N, K>& rhs) {
 	return build_vec<N>([&](auto index) { return std::min(lhs, rhs.data[index]); });
 }
 
+/// \return Clamps the vector's each dimension within the range of [\c high, \c low]
+template <size_t N, typename T>
+constexpr inline auto clamp(const vec_t<N, T>& vec, const T& low, const T& high) {
+	return build_vec<N>([&](auto index) { return std::clamp(vec.data[index], low, high); });
+}
+
 /// \return The static_cast-ed vector to the requested K type
 template <typename K, size_t N, typename T>
 constexpr inline auto cast(const vec_t<N, T>& vec) {
