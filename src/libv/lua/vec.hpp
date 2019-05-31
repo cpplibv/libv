@@ -44,7 +44,8 @@ template <typename T>
 void registerLuaVec2(sol::state& lua, const std::string& name) {
 	using V = typename T::value_type;
 
-	auto type = lua.create_simple_usertype<T>(
+	auto type = lua.new_usertype<T>(
+			name,
 			sol::call_constructor, sol::constructors<sol::types<V, V>>{}
 	);
 
@@ -56,14 +57,14 @@ void registerLuaVec2(sol::state& lua, const std::string& name) {
 	});
 
 	registerLuaVecCommon<V, T>(type);
-	lua.set_usertype(name, type);
 }
 
 template <typename T>
 void registerLuaVec3(sol::state& lua, const std::string& name) {
 	using V = typename T::value_type;
 
-	auto type = lua.create_simple_usertype<T>(
+	auto type = lua.new_usertype<T>(
+			name,
 			sol::call_constructor, sol::constructors<sol::types<V, V, V>>{}
 	);
 
@@ -76,14 +77,14 @@ void registerLuaVec3(sol::state& lua, const std::string& name) {
 	});
 
 	registerLuaVecCommon<V, T>(type);
-	lua.set_usertype(name, type);
 }
 
 template <typename T>
 void registerLuaVec4(sol::state& lua, const std::string& name) {
 	using V = typename T::value_type;
 
-	auto type = lua.create_simple_usertype<T>(
+	auto type = lua.new_usertype<T>(
+			name,
 			sol::call_constructor, sol::constructors<sol::types<V, V, V, V>>{}
 	);
 
@@ -97,7 +98,6 @@ void registerLuaVec4(sol::state& lua, const std::string& name) {
 	});
 
 	registerLuaVecCommon<V, T>(type);
-	lua.set_usertype(name, type);
 }
 
 // -------------------------------------------------------------------------------------------------

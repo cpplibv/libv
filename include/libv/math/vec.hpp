@@ -17,7 +17,7 @@
 #include <ostream>
 #include <utility>
 // pro
-#include <libv/math/vec_concept.hpp>
+#include <libv/concept/vec.hpp>
 
 
 // TODO P1: Modify (bool operator<) to (vec<bool, N> operator<)
@@ -100,8 +100,8 @@ struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	constexpr inline vec_base_t(T x, T y) : x(x), y(y) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline explicit vec_base_t(const V0& xy) : x(xy.x), y(xy.y) { }
 };
 
@@ -123,14 +123,14 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	constexpr inline vec_base_t(T x, T y, T z) : x(x), y(y), z(z) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline vec_base_t(const V0& xy, T z) : x(xy.x), y(xy.y), z(z) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline vec_base_t(T x, const V0& yz) : x(x), y(yz.x), z(yz.y) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec3<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec3<V0>)
 	constexpr inline explicit vec_base_t(const V0& xyz) : x(xyz.x), y(xyz.y), z(xyz.z) { }
 };
 
@@ -153,27 +153,26 @@ struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
 
 	constexpr inline vec_base_t(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline vec_base_t(const V0& xy, T z, T w) : x(xy.x), y(xy.y), z(z), w(w) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline vec_base_t(T x, const V0& yz, T w) : x(x), y(yz.x), z(yz.y), w(w) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec2<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec2<V0>)
 	constexpr inline vec_base_t(T x, T y, const V0& zw) : x(x), y(y), z(zw.x), w(zw.y) { }
-	template <typename V0, typename V1,
-			CONCEPT_REQUIRES_(Vec2<V0>()),
-			CONCEPT_REQUIRES_(Vec2<V1>())>
+	template <typename V0, typename V1>
+			LIBV_REQUIRES(Vec2<V0> && Vec2<V1>)
 	constexpr inline vec_base_t(const V0& xy, const V1& zw) : x(xy.x), y(xy.y), z(zw.x), w(zw.y) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec3<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec3<V0>)
 	constexpr inline vec_base_t(const V0& xyz, T w) : x(xyz.x), y(xyz.y), z(xyz.z), w(w) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec3<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec3<V0>)
 	constexpr inline vec_base_t(T x, const V0& yzw) : x(x), y(yzw.x), z(yzw.y), w(yzw.z) { }
-	template <typename V0,
-			CONCEPT_REQUIRES_(Vec4<V0>())>
+	template <typename V0>
+			LIBV_REQUIRES(Vec4<V0>)
 	constexpr inline explicit vec_base_t(const V0& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z), w(xyzw.w) { }
 };
 
@@ -218,7 +217,6 @@ struct vec_t : vec_base_t<N, T> {
 	}
 
 	// operator= -----------------------------------------------------------------------------------
-
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) & {
 		meta::n_times_index<N>([&](auto index) { this->data[index] = rhs.data[index]; });
@@ -559,9 +557,8 @@ constexpr inline auto dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 }
 
 /// \return The cross product of the two vector
-template <typename V0, typename V1,
-			CONCEPT_REQUIRES_(Vec3<V0>()),
-			CONCEPT_REQUIRES_(Vec3<V1>())>
+template <typename V0, typename V1>
+		LIBV_REQUIRES(Vec3<V0> && Vec3<V1>)
 constexpr inline auto cross(const V0& lhs, const V1& rhs) {
 	return vec_t<3, decltype(lhs.y * rhs.z - lhs.z * rhs.y)>(
 			lhs.y * rhs.z - lhs.z * rhs.y,

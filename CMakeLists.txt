@@ -118,12 +118,11 @@ else()
 endif()
 
 add_compile_options(-m64)
-#add_compile_options(-std=c++17)
+add_compile_options(-std=c++2a)
 
 # Tooling ------------------------------------------------------------------------------------------
 
-add_compile_options(-std=c++2a -fconcepts)
-add_definitions(-Dconcept="concept bool")
+add_compile_options(-fconcepts)
 
 # Sparing tooling from supporting requires, for now.
 add_definitions(-D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
@@ -441,14 +440,15 @@ wish_create_external(
 wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG v2.20.6
+	GIT_TAG v3.0.2
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/sol/ ${PATH_EXT}/sol/include/sol/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/include/sol/ ${PATH_EXT}/sol/include/sol/
 	LINK ext_lua
 #	DEFINE SOL_USE_BOOST=1
 	DEFINE SOL_CXX17_FEATURES=1
+	DEFINE SOL_CXX20_FEATURES=1
 )
 
 wish_create_external(
@@ -573,7 +573,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_utility INTERFACE
-	LINK   ext_efsw Threads::Threads stdc++fs
+	LINK   ext_efsw Threads::Threads
 )
 
 wish_create_library(
@@ -593,7 +593,7 @@ wish_create_group(GROUP_SANDBOX) # Sandboxes -----------------------------------
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range stdc++fs
+	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(
@@ -757,6 +757,12 @@ wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
 	LINK   obj_test_runner
+)
+
+wish_create_executable(
+	TARGET test_libv_lua
+	SOURCE test/libv/lua/*.cpp
+	LINK   obj_test_runner libv_lua
 )
 
 wish_create_executable(

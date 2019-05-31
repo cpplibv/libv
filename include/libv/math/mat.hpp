@@ -37,6 +37,10 @@ public:
 	using glm::mat<Ri, Ci, T, glm::precision::highp>::mat;
 	using glm::mat<Ri, Ci, T, glm::precision::highp>::operator=;
 
+	inline constexpr mat_t(const mat_t&) = default;
+	inline constexpr mat_t(mat_t&&) = default;
+	inline ~mat_t() = default;
+
 	// ---------------------------------------------------------------------------------------------
 
 private:
