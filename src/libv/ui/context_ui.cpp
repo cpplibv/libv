@@ -6,6 +6,7 @@
 #include <libv/gl/image.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>
+#include <libv/utility/timer.hpp>
 // pro
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
@@ -119,6 +120,8 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 		log_ui.trace("Font cache miss for: {} as {}", path, key);
 	}
 
+	libv::Timer timer;
+
 	const auto target = path_fonts / lexically_normal;
 
 	if (!secure_path(path_fonts, target, lexically_normal)) {
@@ -127,6 +130,8 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 		return sp;
 	}
 
+	const auto time_scan = timer.timef_ms();
+
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
 		log_ui.error("Failed to read font file: {}: {} {}. Using fallback font", target, file.ec, file.ec.message());
@@ -134,7 +139,14 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 		return sp;
 	}
 
+	const auto time_read = timer.timef_ms();
+
 	sp = std::make_shared<Font2D>(std::move(file.data));
+
+	const auto time_load = timer.timef_ms();
+	log_ui.trace("Font loaded: scan:{:5.1f}ms, read:{:5.1f}ms, load:{:5.1f}ms for {} as {}",
+			time_scan.count(), time_read.count(), time_load.count(), path, key);
+
 	cache_font.emplace(std::move(key), sp);
 	return sp;
 }
@@ -164,6 +176,8 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 		log_ui.trace("Texture2D cache miss for: {} as {}", path, key);
 	}
 
+	libv::Timer timer;
+
 	const auto target = path_textures / lexically_normal;
 
 	if (!secure_path(path_textures, target, lexically_normal)) {
@@ -172,12 +186,16 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 		return sp;
 	}
 
+	const auto time_scan = timer.timef_ms();
+
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
 		log_ui.error("Failed to read texture2D file: {}: {} {}. Using fallback texture2D", target, file.ec, file.ec.message());
 		sp = fallback_texture2D;
 		return sp;
 	}
+
+	const auto time_read = timer.timef_ms();
 
 	auto image = libv::gl::load_image(file.data);
 	if (!image) {
@@ -187,6 +205,11 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	}
 
 	sp = std::make_shared<Texture2D>(std::move(*image));
+
+	const auto time_load = timer.timef_ms();
+	log_ui.trace("Texture2D loaded: scan:{:5.1f}ms, read:{:5.1f}ms, create:{:5.1f}ms for {} as {}",
+			time_scan.count(), time_read.count(), time_load.count(), path, key);
+
 	cache_texture2D.emplace(std::move(key), sp);
 	return sp;
 }
