@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <string>
 #include <variant>
 // pro
 //#include <libv/ui/chrono.hpp>
@@ -21,13 +22,18 @@ namespace ui {
 class Font2D;
 using Font2D_view = std::shared_ptr<Font2D>;
 
+class Texture2D;
+using Texture2D_view = std::shared_ptr<Texture2D>;
+
 using PropertyDynamic = std::variant<
 		AlignHorizontal,
 		AlignVertical,
 		Color,
 		Font2D_view,
 		FontSize,
-		Size
+		Size,
+		Texture2D_view,
+		std::string // only for testing and development
 >;
 
 ////		bool,

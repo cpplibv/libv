@@ -4,10 +4,12 @@
 #include <libv/ui/ui_lua.hpp>
 // libv
 #include <libv/lua/lua.hpp>
+#include <libv/lua/object_parser.hpp>
 #include <libv/parse/bool.hpp>
 #include <libv/parse/color.hpp>
 // std
 #include <memory>
+#include <string>
 #include <string_view>
 // pro
 #include <libv/ui/context_ui.hpp>
@@ -29,215 +31,87 @@ class UI;
 
 namespace {
 
-////template <typename T, typename F>
-////auto parse(F&& parser) {
-////	return [parser_i = std::forward<F>(parser)](Style& style, const std::string_view& key, const sol::object& value) {
-////		if (!value.is<T>())
-////			return false;
-//////		log_ui.warn("Type match {}", value.as<std::string_view>());
-////
-////		auto result = std::forward<decltype(parser_i)>(parser_i)(value.as<T>());
-////		if (!result)
-////			return false;
-//////		log_ui.warn("Parsed {}", value.as<std::string_view>());
-////
-////		style.set(std::string(key), *result);
-////		return true;
-////	};
-////}
-////
-////template <typename T, typename F>
-////auto accept_as(F&& parser) {
-////	return [parser_i = std::forward<F>(parser)](Style& style, const std::string_view& key, const sol::object& value) {
-////		if (!value.is<T>())
-////			return false;
-//////		log_ui.warn("Type match {}", value.as<std::string_view>());
-////
-////		auto result = std::forward<decltype(parser_i)>(parser_i)(value.as<T>());
-//////		log_ui.warn("Parsed {}", value.as<std::string_view>());
-////
-////		style.set(std::string(key), result);
-////		return true;
-////	};
-////}
-////
-////template <typename LuaT, typename CppT = LuaT>
-////auto accept() {
-////	return [](Style& style, const std::string_view& key, const sol::object& value) {
-////		if (!value.is<LuaT>())
-////			return false;
-//////		log_ui.warn("Type match");
-////
-//////		log_ui.warn("Accepted {}", value.as<std::string_view>());
-////		if constexpr (std::is_same_v<LuaT, CppT>)
-////			style.set(std::string(key), value.as<LuaT>());
-////		else
-////			style.set(std::string(key), CppT{value.as<LuaT>()});
-////
-////		return true;
-////	};
-////}
-////
-////bool property(const auto& key, const auto& style, const auto& value, const auto& name, auto&&... acceptors) {
-////	if (name != key)
-////		return false;
-////
-////	return (std::forward<decltype(acceptors)>(acceptors)(*style, key, value) || ...);
-//}
-
-template <typename CppT, sol::type LuaType>
-struct LuaIndexSV {
-	using type = CppT;
-	static const sol::type lua_type = LuaType;
-	std::string_view index;
-};
-
-template <typename CppT, sol::type LuaType>
-struct LuaIndexI {
-	using type = CppT;
-	static const sol::type lua_type = LuaType;
-	int index;
-};
-
-//template <typename CppT, sol::type LuaType>
-//auto lua_arg(const std::string_view key) {
-//	return LuaIndexSV<CppT, LuaType>{key};
-//}
-//
-//template <typename CppT, sol::type LuaType>
-//auto lua_arg(const int key) {{
-//	return LuaIndexI<CppT, LuaType>{key};
-//}
-//
-//template <typename CppT, typename F>
-//bool parse_string(F&& func) {
-//}
-//
-//template <typename CppT, typename... Args>
-//bool accept_table(Args&&... args) {
-//}
-//
-//template <typename CppT, typename LuaT>
-//bool accept_usertype() {
-//}
-//
-//template <typename F>
-//bool transform_string(F&& func) {
-//}
-
 // -------------------------------------------------------------------------------------------------
 
-//struct LuaObjectParser {
-//	Style& style;
-//	const sol::object& var;
-//	const std::string_view key;
-//
-//	bool number() {
-//	}
-//
-//	bool string() {
-//		if (value.get_type() != sol::type::string)
-//			return false;
-//		return true;
-//	}
-//
-//	bool usertype() {
-//	}
-//
-//	template <typename CppT, typename... Args>
-//	bool table(Args&&... args) {
-//		if (value.get_type() != sol::type::table)
-//			return false;
-//
-//
-//
-//		[&]() {
-//		}(args)...;
-//		(typename decltype(args)::type(args::lua_type, args.index), ...);
-//
-//
-//		return true;
-//	}
-//
-//	void result() {
-//	}
-//};
+inline const auto pattern_color() noexcept {
+	return libv::lua::one_of(
+			libv::lua::string_parse(&libv::parse::parse_color_optional),
+			libv::lua::as<Color>(libv::lua::userdata<libv::vec4f>()),
+			libv::lua::transform(libv::lua::userdata<libv::vec3f>(), [](const libv::vec3f& vec) { return Color(vec, 1.f); }),
+			libv::lua::table<Color>(
+				libv::lua::member("r", libv::lua::number<float>()),
+				libv::lua::member("g", libv::lua::number<float>()),
+				libv::lua::member("b", libv::lua::number<float>()),
+				libv::lua::member("a", libv::lua::or_(libv::lua::number<float>(), 1.f))),
+			libv::lua::table<Color>(
+				libv::lua::member("x", libv::lua::number<float>()),
+				libv::lua::member("y", libv::lua::number<float>()),
+				libv::lua::member("z", libv::lua::number<float>()),
+				libv::lua::member("w", libv::lua::or_(libv::lua::number<float>(), 1.f))),
+			libv::lua::table<Color>(
+				libv::lua::member(1, libv::lua::number<float>()),
+				libv::lua::member(2, libv::lua::number<float>()),
+				libv::lua::member(3, libv::lua::number<float>()),
+				libv::lua::member(4, libv::lua::or_(libv::lua::number<float>(), 1.f)))
+	);
+}
 
-// -------------------------------------------------------------------------------------------------
+template <typename F>
+inline const auto pattern_protocol(std::string protocol, F&& func) {
+	auto parse_func = [protocol = std::move(protocol)](auto str) {
+		if (not str.starts_with(protocol))
+			return std::optional<std::string_view>(std::nullopt);
 
-bool process_style_property(UI& ui, Style& style, const std::string_view key, const sol::object& value) {
-//	LuaObjectParser parser(style, key, value);
-//
-//	if (key == "color") {
-//		parser.string<Color>(libv::parse::parse_color_optional) ||
-//		parser.usertype<Color, libv::vec4f>() ||
-//		parser.table<Color>(
-//				parser.index(
-//					parser.def_arg<float, sol::type::number>("r"),
-//					parser.def_arg<float, sol::type::number>("g"),
-//					parser.def_arg<float, sol::type::number>("b"),
-//					parser.def_arg<float, sol::type::number>("a")),
-//				parser.index(
-//					parser.def_arg<float, sol::type::number>("x"),
-//					parser.def_arg<float, sol::type::number>("y"),
-//					parser.def_arg<float, sol::type::number>("z"),
-//					parser.def_arg<float, sol::type::number>("w")),
-//				parser.index(
-//					parser.def_arg<float, sol::type::number>(1),
-//					parser.def_arg<float, sol::type::number>(2),
-//					parser.def_arg<float, sol::type::number>(3),
-//					parser.def_arg<float, sol::type::number>(4))
-//		);
-//	}
+		str.remove_prefix(protocol.size());
+		return std::optional<std::string_view>(str);
+	};
 
-//	if (property(key_sv, style_ip, value, "color",
-//			parse<std::string_view>(libv::parse::parse_color_optional),
-//			accept<libv::vec4f>()))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "font_size",
-//			accept<FontSize>()))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "font_color",
-//			parse<std::string_view>(libv::parse::parse_color_optional),
-//			accept<libv::vec4f>()))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "size",
-//			parse<std::string_view>(libv::ui::parse_size_optional)))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "align",
-//			parse<std::string_view>(libv::ui::parse_align_horizontal_optional)))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "align_vertical",
-//			parse<std::string_view>(libv::ui::parse_align_vertical_optional)))
-//		continue;
-//
-//	if (property(key_sv, style_ip, value, "font",
-//			accept_as<std::string_view>([&ui](auto path){ return ui.context().font(path); })))
-//		continue;
+	return libv::lua::transform(libv::lua::string_parse(std::move(parse_func)), std::forward<F>(func));
+}
 
+inline const auto pattern_background(UI& ui) noexcept {
+//	return libv::lua::string<std::string>();
+	return pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); });
+//	return libv::lua::variant(
+//			pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); }),
+////			pattern_protocol("color ", ),
+////			pattern_protocol("stretch ", ),
+//			libv::lua::string_parse(&libv::parse::parse_color_optional)
+//	);
+}
 
+void process_style_property(UI& ui, Style& style, const std::string_view key, const sol::object& value) {
+	const auto property = [&](const std::string_view name, const auto& pattern) {
+		if (name != key)
+			return false;
 
-//				if (property(key_sv, style_ip, value, "background",
-//						accept_as<std::string_view>([&ui](auto path){ return ui.context().font(path); })))
-//					continue;
+		auto reporter = libv::lua::ReportNoop{};
+		const auto result = libv::lua::parse(value, pattern, reporter);
+		if (result) {
+			style.set(std::string(name), *result);
+		} else {
+			// TODO P4: Detailed error message with libv.lua.object_parser reporter API
+			log_ui.warn("Failed to parse style {} property {} value \"{}\". Property is set to fallback value. Reason: {}",
+					style.style_name, key, value.as<std::string_view>(), reporter.reason());
+		}
 
-//						|| property("background", accept<int>())
-//						|| property("font_shader", accept<std::string_view>())
-//						|| property("layout", accept<std::string_view>())
-//						|| property("layout", accept<int>())
+		return true;
+	};
 
-//				log_ui.warn("Style size property value \"{}\" cannot be parsed. Style name: {}, key: {}, value: {}",
-//						value.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
-//				log_ui.warn("Style size property value has invalid type. Style name: {}, key: {}, value: {}, type: {}",
-//						key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
-//				log_ui.info("{}/{} = {}", style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
+	if (property("align", libv::lua::string_parse(&libv::ui::parse_align_horizontal_optional))) return;
+	if (property("align_vertical", libv::lua::string_parse(&libv::ui::parse_align_vertical_optional))) return;
+	if (property("background", pattern_background(ui))) return;
+	if (property("color", pattern_color())) return;
+	if (property("font", libv::lua::string_accept([&ui](const auto path){ return ui.context().font(path); }))) return;
+	if (property("font_color", pattern_color())) return;
+	if (property("font_outline", pattern_color())) return;
+	if (property("font_size", libv::lua::number<float>())) return;
+	if (property("size", libv::lua::string_parse(&libv::ui::parse_size_optional))) return;
+//	if (property("font_shader", libv::lua::string())) return;
+//	if (property("layout", libv::lua::string_parse(&libv::ui::parse_layout_optional))) return;
 
-	return false;
+	log_ui.warn("Ignoring unrecognized property style {} property {} value \"{}\".",
+			style.style_name, key, value.as<std::string_view>());
 }
 
 } // namespace
@@ -269,17 +143,14 @@ std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::f
 
 		return [style_ip, &ui](const sol::table& table) {
 			for (const auto& [key, value] : table) {
-				if (value.get_type() != sol::type::string) {
+				if (key.get_type() != sol::type::string) {
 					log_ui.warn("Style's property key \"{}\" is expected to be a string. Style name: {}, key: {}, value: {}",
 							key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
 					continue;
 				}
 
 				const auto key_sv = key.as<std::string_view>();
-				const auto accepted = process_style_property(ui, *style_ip, key_sv, value);
-
-				log_ui.warn_if(!accepted, "Style property key \"{}\" is unrecognized. Style name: {}, key: {}, value: {}",
-						key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
+				process_style_property(ui, *style_ip, key_sv, value);
 			}
 		};
 	});
@@ -311,8 +182,6 @@ std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::f
 
 	(void) ui;
 
-
-
 	// -------------------------------------------------------------------------------------------------
 
 	log_ui.trace("Parsed styles:");
@@ -322,7 +191,6 @@ std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::f
 				log_ui.trace("{}/{} = {}", name, key, var);
 			}, value);
 		});
-
 
 //	std::shared_ptr<ComponentBase>
 	return nullptr;

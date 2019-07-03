@@ -26,6 +26,9 @@ struct ReportLog {
 		(void) name;
 		(void) value;
 	}
+	inline auto reason() const {
+		return "";
+	}
 };
 
 struct Empty {
@@ -531,3 +534,30 @@ TEST_CASE("complex pattern: color and planet", "[libv.lua.op]") {
 //		[member2 name]:[member2 type]
 //		[member3 name]:[optional][member3 type]
 //		[unused][member4 name]:[member4 type]
+
+//Lua object is not a valid "Color"
+//	Candidate [Parsed String]
+//		Rejected: String is not a valid color format
+//	Candidate [Filtered String]
+//		Rejected: Maximum string length is 15
+//	Candidate [Userdata]
+//		Rejected: Type mismatch, Lua object is a [String]
+//	Candidate [RGB Table]
+//		Rejected:
+//		!   r:[Number] - Missing member
+//		!   g:[Number] - Missing member
+//		!   b:[Number] - Missing member
+//			a:[Optional Number] - Fallback to 1.0
+//	Candidate [XYZ Table]
+//		Rejected:
+//		!   x:[Number] - Type mismatch, Lua object is a [String]
+//		!   y:[Number] - Type mismatch, Lua object is a [String]
+//		!   z:[Number] - Missing member
+//			w:[Optional Number]=0.2
+//	Candidate [Array Table]
+//		Rejected:
+//			1:[Number]=1
+//			2:[Number]=1
+//			3:[Number]=1
+//			4:[Optional Number]=1
+//		!   5:[Unused]=1 - Unused member

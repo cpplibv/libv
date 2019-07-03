@@ -51,11 +51,11 @@ libv.glr.std140: constexpr static string to name structs
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.meta: rename if_void to lnv
-
 libv.ui: hard type (enum) align anchor and orient
 libv.ui.style: layout properties
 libv.ui.style: font properties
+
+libv.ui: make sandbox_ui.lua work
 
 libv.ui.style: style safe (parent) storage, replace observer_ref with something
 
@@ -142,6 +142,9 @@ libv.ui: ui <-> 3D layout linkage: planet names and additional informations are 
 
 libv.ui.warning: warning if percent used inside a content is invalid
 
+libv.ui: text
+libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
+
 libv.ecui: component: Passive Label - verify
 libv.ecui: component: Passive Image - verify
 libv.ecui: component: Passive TableImage - verify
@@ -159,6 +162,14 @@ libv.ecui: composite: TextField (Label, TableImage, Label, +Events)
 libv.ecui: state based ui, separate control and data!
 libv.ecui: ui resource local proxies
 
+libv.meta: rename if_void to lnv (as left non void) and make it variadic
+libv.utility: Rename approxing.hpp to approx.hpp and the class name too
+libv.utility: add/verify structured binding support for vec_t
+libv.utility: Slice is an algorithm and not a utility
+
+libv.ui: libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
+libv.ui: implement some ui stuff: btn / regions
+
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
 libv.glr: Fix uniform naming mess, Reduce the number of public members
@@ -170,13 +181,6 @@ libv.glr: post-processing emission / bloom
 libv.glr: post-processing gamma
 libv.glr: post-processing haze
 
-libv.utility: Rename approxing.hpp to approx.hpp and the class name too
-libv.utility: add/verify structured binding support for vec_t
-libv.ui: libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
-libv.ui: implement some ui stuff: btn / regions
-
-libv.ui: text
-libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
 
 libv.glr: shadow
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);

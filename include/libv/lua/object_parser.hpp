@@ -286,7 +286,7 @@ struct MatcherParser : String<> {
 	F func;
 
 	inline auto name() const noexcept {
-		return libv::concat(String::name(), '\'');
+		return libv::concat("Parsed ", String::name());
 	}
 
 	template <typename Reporter>
@@ -477,6 +477,11 @@ constexpr inline auto string_parse(F&& func) noexcept {
 	return detail::MatcherParser<std::remove_cvref_t<F>>{{}, std::forward<F>(func)};
 }
 
+template <typename F>
+constexpr inline auto string_accept(F&& func) noexcept {
+	return transform(string(), std::forward<F>(func));
+}
+
 // -------------------------------------------------------------------------------------------------
 
 struct ReportNoop {
@@ -488,6 +493,9 @@ struct ReportNoop {
 	inline void string_parse_failed(const std::string_view name, const std::string_view value) noexcept {
 		(void) name;
 		(void) value;
+	}
+	inline auto reason() const {
+		return "";
 	}
 };
 

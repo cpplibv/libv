@@ -44,6 +44,7 @@ ui.style("info_bar.balance") {
 }
 
 ui.style("info_bar.time_control") {
+--	background = "image stretch_border.png",
 }
 
 ui.style("info_bar.time_control.button") {
