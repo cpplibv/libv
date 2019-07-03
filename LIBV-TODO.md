@@ -46,12 +46,11 @@ libv.ui.style: properties and minimalistic style, with only static one time read
 libv.ui.style: style-style inheritance, override and composition are the problem of the style definition system and isolated from the properties itself
 libv.ui.style: UI component's visualization and behaviour is controlled by properties; Properties are statically typed values; Styles are named dynamic collections of properties; Animations are real time changes of properties
 GCC 9.1: Using <filesystem> does not require linking with -lstdc++fs now.
+libv.lua: object parser
+libv.glr.std140: constexpr static string to name structs
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.lua: object parser
-
-libv.glr.std140: constexpr static string to name structs
 libv.meta: rename if_void to lnv
 
 libv.ui: hard type (enum) align anchor and orient

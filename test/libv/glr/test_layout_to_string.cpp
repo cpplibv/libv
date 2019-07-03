@@ -8,7 +8,6 @@
 #include <libv/meta/reflection_access.hpp>
 // std
 #include <array>
-#include <regex>
 // pro
 #include <libv/glr/layout_to_string.hpp>
 #include <libv/glr/uniform.hpp>
@@ -19,6 +18,8 @@
 namespace {
 
 struct UniformsSimple {
+	static inline auto name() { return "UniformsSimple"; }
+
 	libv::glr::Uniform_t<libv::mat4f> _00_mat4f;
 	libv::glr::Uniform_t<libv::mat4f> _01_mat4f;
 	libv::glr::Uniform_t<libv::vec4f> _02_vec4f;
@@ -29,6 +30,8 @@ struct UniformsSimple {
 };
 
 struct UniformsNested {
+	static inline auto name() { return "UniformsNested"; }
+
 	libv::glr::Uniform_t<float> _00_float_;
 	libv::glr::Uniform_t<libv::vec3f> _01_vec3f_;
 	UniformsSimple _02_nested;
@@ -43,6 +46,8 @@ struct UniformsNested {
 };
 
 struct UniformsNestedNested {
+	static inline auto name() { return "UniformsNestedNested"; }
+
 	libv::glr::Uniform_t<float> _00_float_;
 	libv::glr::Uniform_t<libv::vec3f> _01_vec3f_;
 	UniformsNested _02_nested;
@@ -57,6 +62,8 @@ struct UniformsNestedNested {
 };
 
 struct UniformsComplexNestedA {
+	static inline auto name() { return "UniformsComplexNestedA"; }
+
 	libv::glr::Uniform_t<int32_t> _00_int32_;
 	libv::glr::Uniform_t<libv::vec2b> _01_vec2f_;
 
@@ -65,6 +72,8 @@ struct UniformsComplexNestedA {
 };
 
 struct UniformsComplexNestedB {
+	static inline auto name() { return "UniformsComplexNestedB"; }
+
 	libv::glr::Uniform_t<libv::vec3ui> _00_vec3ui;
 	libv::glr::Uniform_t<libv::vec2f> _01_vec2f_;
 	libv::glr::Uniform_t<std::array<float, 2 >> _02_2float;
@@ -79,6 +88,8 @@ struct UniformsComplexNestedB {
 };
 
 struct UniformsComplex {
+	static inline auto name() { return "UniformsComplex"; }
+
 	libv::glr::Uniform_t<float> _00_float_;
 	libv::glr::Uniform_t<libv::vec2f> _01_vec2f_;
 	libv::glr::Uniform_t<libv::vec3f> _02_vec3f_;
@@ -106,75 +117,75 @@ TEST_CASE("Layout to string UniformsSimple", "[libv.glr.to_string]") {
 	const auto layout = libv::glr::layout_to_string<UniformsSimple>("TestBlock");
 
 	const auto expected =
-R"(layout\(std140\) uniform TestBlock \{
+R"(layout(std140) uniform TestBlock {
 	mat4 _00_mat4f;
 	mat4 _01_mat4f;
 	vec4 _02_vec4f;
 };
 )";
 
-	CHECK(std::regex_match(layout, std::regex(expected)));
+	CHECK(layout == expected);
 }
 
 TEST_CASE("Layout to string UniformsNestedNested", "[libv.glr.to_string]") {
 	const auto layout = libv::glr::layout_to_string<UniformsNestedNested>("TestBlock");
 
 	const auto expected =
-R"(struct .*UniformsSimple.* \{
+R"(struct UniformsSimple {
 	mat4 _00_mat4f;
 	mat4 _01_mat4f;
 	vec4 _02_vec4f;
-\};
+};
 
-struct .*UniformsNested.* \{
+struct UniformsNested {
 	float _00_float_;
 	vec3 _01_vec3f_;
-	.*UniformsSimple.* _02_nested;
-	.*UniformsSimple.* _03_nested;
+	UniformsSimple _02_nested;
+	UniformsSimple _03_nested;
 	bool _04_tail__;
-\};
+};
 
-layout\(std140\) uniform TestBlock \{
+layout(std140) uniform TestBlock {
 	float _00_float_;
 	vec3 _01_vec3f_;
-	.*UniformsNested.* _02_nested;
+	UniformsNested _02_nested;
 	int _03_int32_;
 	bool _04_tail__;
-\};
+};
 )";
 
-	CHECK(std::regex_match(layout, std::regex(expected)));
+	CHECK(layout == expected);
 }
 
 TEST_CASE("Layout to string UniformsComplex", "[libv.glr.to_string]") {
 	const auto layout = libv::glr::layout_to_string<UniformsComplex>("TestBlock");
 
 	const auto expected =
-R"(struct .*UniformsComplexNestedA.* \{
+R"(struct UniformsComplexNestedA {
 	int _00_int32_;
 	vec2b _01_vec2f_;
-\};
+};
 
-struct .*UniformsComplexNestedB.* \{
+struct UniformsComplexNestedB {
 	vec3u _00_vec3ui;
 	vec2 _01_vec2f_;
-	float _02_2float\[2\];
+	float _02_2float[2];
 	vec2 _03_vec2f_;
-	mat3 _04_2mat2f\[2\];
-\};
+	mat3 _04_2mat2f[2];
+};
 
-layout\(std140\) uniform TestBlock \{
+layout(std140) uniform TestBlock {
 	float _00_float_;
 	vec2 _01_vec2f_;
 	vec3 _02_vec3f_;
-	.*UniformsComplexNestedA.* _03_nestA_;
+	UniformsComplexNestedA _03_nestA_;
 	float _04_float_;
-	float _05_2float\[2\];
+	float _05_2float[2];
 	mat2x3 _06_mat2f_;
-	.*UniformsComplexNestedB.* _07_2nestB\[2\];
+	UniformsComplexNestedB _07_2nestB[2];
 	bool _08_tail__;
-\};
+};
 )";
 
-	CHECK(std::regex_match(layout, std::regex(expected)));
+	CHECK(layout == expected);
 }

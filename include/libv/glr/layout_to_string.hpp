@@ -25,6 +25,17 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T>
+	LIBV_REQUIRES(requires { {T::name()} -> std::string; })
+inline void stream_struct_name(std::ostream& os) {
+	os << T::name();
+}
+
+template <typename T>
+inline void stream_struct_name(std::ostream& os) {
+	os << typeid(T).name();
+}
+
 struct ToStringLayouter {
 	std::ostream& os;
 	boost::container::flat_set<std::type_index> seen_types;
@@ -92,10 +103,10 @@ struct ToStringLayouter {
 					os << type_string(libv::meta::identity<typename M::value_type>{});
 
 			} else if constexpr (libv::meta::is_array_v<M>) {
-					os << typeid(typename M::value_type).name();
+				stream_struct_name<typename M::value_type>(os);
 
 			} else {
-				os << typeid(M).name();
+				stream_struct_name<M>(os);
 			}
 
 			os << ' ' << member.name;
@@ -117,7 +128,9 @@ struct ToStringLayouter {
 
 	template <typename T>
 	void print_struct() {
-		os << "struct " << typeid(T).name() << " {\n";
+		os << "struct ";
+		stream_struct_name<T>(os);
+		os << " {\n";
 		print_members<T>();
 		os << "};\n\n";
 	}
