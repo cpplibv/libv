@@ -24,10 +24,14 @@
 //			system analysis, or binary logging...
 // TODO P4: {line_gap} assign the rest of the command line into this gap, this should also be supported in the messages in some form
 //			Most likely will be integrated into the serialization and output-formatter system
+// TODO P5: Separate flag for argument coloring
+// TODO P5: Option for full line color (mostly for warning+ levels)
+// TODO P5: Better generic color handling, remove hard-coded color strings
+// TODO P5: Reorganize toString / toColorString / toColorShortString, generalize it
 // TODO P5: Specify / refine requirements for warning / error / fatal log levels
-//			warning - what happened, what that caused, how the recovery was done
-//			error - what happened, what that caused, what should be done by the user
-//			fatal - what happened, what that caused, what should be done by the user
+//			warning - what happened, what caused it, how the recovery was done
+//			error - what happened, what caused it, what should be done by the user
+//			fatal - what happened, what caused it, what should be done by the user
 // IDEA: Format string per route; most likely will be integrated into the serialization and output-formatter system
 //		libv::log.route_below(libv::Info, std::cout, "{severity} {thread_id} {module}: {message} <{file}:{line}>\n");
 //		libv::log.route(std::cout, "{severity} {module}: {message}\n");
@@ -82,6 +86,18 @@ private:
 		case Severity::Error: return "\u001B[31mError\u001B[0m";
 		case Severity::Fatal: return "\u001B[35mFatal\u001B[0m";
 		default: return "Undefined";
+		}
+	}
+
+	inline std::string_view toColorShortString(Severity value) {
+		switch (value) {
+		case Severity::Trace: return "\u001B[37mT\u001B[0m";
+		case Severity::Debug: return "\u001B[37mD\u001B[0m";
+		case Severity::Info: return  "\u001B[32mI\u001B[0m";
+		case Severity::Warn: return  "\u001B[33mW\u001B[0m";
+		case Severity::Error: return "\u001B[31mE\u001B[0m";
+		case Severity::Fatal: return "\u001B[35mF\u001B[0m";
+		default: return "?";
 		}
 	}
 
@@ -149,6 +165,7 @@ private:
 
 private:
 	bool colored = true;
+	bool levelShort_ = true;
 	std::vector<Rule> rules;
 	std::vector<libv::observer_ref<std::ostream>> outputs;
 	std::vector<libv::observer_ref<Logger>> outputChains;
@@ -239,6 +256,14 @@ public:
 		this->colored = colored;
 	}
 
+	bool isLevelShort() {
+		return levelShort_;
+	}
+
+	void levelShort(bool levelShort) {
+		this->levelShort_ = levelShort;
+	}
+
 private:
 	template <typename = void>
 	constexpr auto color_args(const std::string_view format) {
@@ -299,7 +324,9 @@ private:
 		const auto entry = fmt::format(this->format,
 				fmt::arg("message", message),
 				fmt::arg("module", module),
-				fmt::arg("severity", colored ? toColorString(severity) : toString(severity)),
+				fmt::arg("severity",
+						!colored ? toString(severity) :
+						levelShort_ ? toColorShortString(severity) : toColorString(severity)),
 				fmt::arg("line", loc.line()),
 				fmt::arg("file", loc.file_name() + WISH_SHORT_PATH_CUTOFF),
 				fmt::arg("function", loc.function_name()),
