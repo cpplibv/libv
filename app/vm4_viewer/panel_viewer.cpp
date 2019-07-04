@@ -13,14 +13,16 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-PanelViewer::PanelViewer() : libv::ui::Panel("PanelViewer") {
+PanelViewer::PanelViewer() : libv::ui::ComponentStatic<PanelViewer>("PanelViewer") {
 }
 
-void PanelViewer::create() {
-	add(panel_info);
-	add(label_info);
-
-	label_info->setText("Hello world!");
+//void PanelViewer::create() {
+//	add(panel_left);
+//	add(panel_help);
+//
+//	panel_left->add(label_info);
+//	label_info->setText("Hello world!");
+//	label_info->properties.font
 
 //	const auto style_label_01 = ui.context().style("style-label-01");
 //	style_label_01->set("color", libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
@@ -57,13 +59,13 @@ void PanelViewer::create() {
 //		panel1->add(stretch0);
 //
 //		ui.add(panel0);
-}
-
-void PanelViewer::render() {
-}
-
-void PanelViewer::destroy() {
-}
+//}
+//
+//void PanelViewer::render() {
+//}
+//
+//void PanelViewer::destroy() {
+//}
 
 // -------------------------------------------------------------------------------------------------
 

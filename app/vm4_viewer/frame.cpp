@@ -53,14 +53,16 @@ void VM4ViewerFrame::destroy() {
 	remote.destroy();
 }
 
-VM4ViewerFrame::VM4ViewerFrame() :
-	Frame("UI sandbox", 1280, 800) {
+VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
+	Frame("VM4 Viewer", config.window_width, config.window_height) {
 	setPosition(POSITION_CENTER_CURRENT_MONITOR);
 	setOpenGLProfile(OPENGL_PROFILE_CORE);
 	setOpenGLVersion(3, 3);
 	setOpenGLSamples(4);
 	ui.attach(*this);
-	ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
+	ui.setSize(
+			static_cast<float>(config.window_width),
+			static_cast<float>(config.window_height)); // TODO P4: auto detect size changes
 
 	panel = std::make_shared<app::PanelViewer>();
 	ui.add(panel);
@@ -84,6 +86,10 @@ VM4ViewerFrame::VM4ViewerFrame() :
 	});
 	onChar.output([&](const libv::frame::EventChar& e) {
 		(void) e;
+	});
+	onWindowSize.output([&](const libv::frame::EventWindowSize& e) {
+		config.window_width = e.size.x;
+		config.window_height = e.size.y;
 	});
 	onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {
 		create();

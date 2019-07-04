@@ -89,6 +89,13 @@ public:
 };
 
 // -------------------------------------------------------------------------------------------------
+
+struct Binary {
+	using input = BinaryInput;
+	using output = BinaryOutput;
+};
+
+// -------------------------------------------------------------------------------------------------
 // Common BinaryArchive serialization functions
 
 /// Saving for POD types to portable binary

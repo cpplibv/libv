@@ -15,6 +15,11 @@ namespace archive {
 using XMLInput = cereal::XMLInputArchive;
 using XMLOutput = cereal::XMLOutputArchive;
 
+struct XML {
+	using input = XMLInput;
+	using output = XMLOutput;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace archive

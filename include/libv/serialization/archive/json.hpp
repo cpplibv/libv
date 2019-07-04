@@ -15,6 +15,11 @@ namespace archive {
 using JSONInput = cereal::JSONInputArchive;
 using JSONOutput = cereal::JSONOutputArchive;
 
+struct JSON {
+	using input = JSONInput;
+	using output = JSONOutput;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace archive
