@@ -85,6 +85,7 @@ libv.utility: Rename approxing.hpp to approx.hpp and the class name too
 libv.frame: update glfw
 libv.frame: icon support
 
+libv.ui: use generic_path in context for logging and lookup
 libv.ui: cleanup context_ui redundant codes
 libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 

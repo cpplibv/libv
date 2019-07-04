@@ -1,5 +1,7 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
+// libv
+#include <libv/utility/generic_path.hpp>
 // std
 #include <iostream>
 // pro
@@ -34,7 +36,9 @@
 
 // -------------------------------------------------------------------------------------------------
 
-const auto DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
+const std::string DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
+const std::string DEFAULT_PROJECT_FOLDER = "project";
+const std::string DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -50,9 +54,23 @@ int main(int argc, const char** argv) {
 	const auto config_filename = std::filesystem::path(DEFAULT_CONFIG_FILENAME);
 	const auto config_path = path_dir / config_filename;
 
-	app::log_app.info("Started {}/{}", path_dir.generic_string(), path_bin.generic_string());
+	app::log_app.info("Started {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
 
 	app::ConfigViewer config(config_path);
+
+	const auto has_last_project = !config.recent_projects.empty();
+	const auto config_project_path = path_dir / DEFAULT_PROJECT_FOLDER / (has_last_project ? config.recent_projects[0] : DEFAULT_PROJECT_FILENAME);
+
+	app::ConfigProject config_project(config_project_path);
+	if (not has_last_project) {
+		config_project.location = libv::generic_path(path_dir);
+		config.recent_projects.emplace_back(libv::generic_path(config_project_path));
+	}
+
+	//	libv::erase(config.recent_models, model);
+	//	config.recent_models.emplace_back(model);
+	//	libv::erase(config.recent_projects, project);
+	//	config.recent_projects.emplace_back(project);
 
 	{
 		app::VM4ViewerFrame frame{config};
