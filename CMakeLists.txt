@@ -140,6 +140,7 @@ add_definitions(-DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/")
 
 # Includes Directories -----------------------------------------------------------------------------
 
+include_directories(app)
 include_directories(include)
 include_directories(src)
 
@@ -588,7 +589,19 @@ wish_create_library(
 )
 
 wish_end_group()
+wish_create_group(GROUP_APPLICATION) # APPLICATION -------------------------------------------------
+
+wish_create_executable(
+	TARGET app_vm4_viewer
+	#OUTPUT_NAME vm4_viewer
+	#RESOURCES
+	SOURCE app/vm4_viewer/*.cpp
+	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
+)
+
+wish_end_group()
 wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
+
 
 wish_create_executable(
 	TARGET sandbox_libv_libv
@@ -705,12 +718,6 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET sandbox_libv_vm4imp
-	SOURCE sandbox/libv_vm4imp_main.cpp
-	LINK   libv_log libv_vm4imp
-)
-
-wish_create_executable(
 	TARGET sandbox_libv_ui
 	SOURCE sandbox/libv_ui_main.cpp
 	LINK   libv_log libv_ui libv_frame libv_utility
@@ -720,6 +727,12 @@ wish_create_executable(
 	TARGET sandbox_libv_ui_lua
 	SOURCE sandbox/libv_ui_lua_main.cpp
 	LINK   libv_log libv_ui libv_frame libv_utility libv_lua
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_vm4imp
+	SOURCE sandbox/libv_vm4imp_main.cpp
+	LINK   libv_log libv_vm4imp
 )
 
 wish_end_group()
@@ -811,12 +824,16 @@ wish_end_group()
 
 # groups -------------------------------------------------------------------------------------------
 
-add_custom_target(group_library DEPENDS ${GROUP_LIBRARY})
-add_custom_target(group_sandbox DEPENDS ${GROUP_SANDBOX})
-add_custom_target(group_unit_test DEPENDS ${GROUP_UNIT_TEST})
-add_custom_target(group_externals DEPENDS ${GROUP_EXTERNAL_PROJECT})
+add_custom_target(group_application DEPENDS ${GROUP_APPLICATION})
+add_custom_target(group_externals   DEPENDS ${GROUP_EXTERNAL_PROJECT})
+add_custom_target(group_library     DEPENDS ${GROUP_LIBRARY})
+add_custom_target(group_sandbox     DEPENDS ${GROUP_SANDBOX})
+add_custom_target(group_unit_test   DEPENDS ${GROUP_UNIT_TEST})
 
-add_custom_target(ext DEPENDS group_externals)
-add_custom_target(tests DEPENDS group_unit_test)
+add_custom_target(app     DEPENDS group_application)
+add_custom_target(ext     DEPENDS group_externals)
+add_custom_target(lib     DEPENDS group_library)
+add_custom_target(sandbox DEPENDS group_sandbox)
+add_custom_target(test    DEPENDS group_unit_test)
 
 wish_create_ide_target()

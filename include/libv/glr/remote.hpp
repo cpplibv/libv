@@ -4,9 +4,9 @@
 
 // libv
 #include <libv/gl/assert.hpp>
+#include <libv/gl/buffer_object.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/gl.hpp>
-#include <libv/gl/buffer_object.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/gl/texture_object.hpp>
 #include <libv/gl/vertex_array_object.hpp>

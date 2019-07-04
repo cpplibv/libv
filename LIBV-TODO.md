@@ -51,6 +51,8 @@ libv.glr.std140: constexpr static string to name structs
 
 --- STACK ------------------------------------------------------------------------------------------
 
+app.vm4_viewer: start implementing a gui app to provide guidance to GUI development
+
 libv.ui: hard type (enum) align anchor and orient
 libv.ui.style: layout properties
 libv.ui.style: font properties
@@ -74,13 +76,19 @@ wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/fil
 
 libv.ui: implement detach and component removal
 
+libv.log: rename libv::logger to libv::logger_stream
 libv.ui: rename size's "content" to "dynamic"
+libv.meta: PLEASE rename n_times.hpp
+libv.meta: rename if_void to lnv (as left non void) and make it variadic
+libv.utility: Rename approxing.hpp to approx.hpp and the class name too
 
 libv.frame: update glfw
 libv.frame: icon support
 
 libv.ui: cleanup context_ui redundant codes
 libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
+
+wish: add support for OUTPUT_NAME and use it for the apps https://cmake.org/cmake/help/latest/prop_tgt/OUTPUT_NAME.html
 
 libv.glr: texture_fwd.hpp
 libv.glr: RemoteTexture should have its own header file
@@ -116,8 +124,6 @@ libv.ui: lua binding
 libv.ui: None of the module functions should be virtual (?)
 
 libv.ui: String2D would be nice to have both last line and non last line justify
-
-libv.meta: PLEASE rename n_times.hpp
 
 libv.ui: Can something be done about: change render position and change render size flags
 libv.ui: Can something be done about: layout pass member variables in component_base, they are a lot of memory
@@ -162,8 +168,6 @@ libv.ecui: composite: TextField (Label, TableImage, Label, +Events)
 libv.ecui: state based ui, separate control and data!
 libv.ecui: ui resource local proxies
 
-libv.meta: rename if_void to lnv (as left non void) and make it variadic
-libv.utility: Rename approxing.hpp to approx.hpp and the class name too
 libv.utility: add/verify structured binding support for vec_t
 libv.utility: Slice is an algorithm and not a utility
 
