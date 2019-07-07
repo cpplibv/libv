@@ -33,6 +33,10 @@ class ComponentStaticAccess {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: verify cardinalities (in attach time) of every module (0 layout, 0 child; 1 layout, 1+ child; etc...)
+//			log_ui.warn("More than one layout found for {}", path());
+// TODO P4: use ModuleAttach, ModuleRender, ModuleLayout concepts during static_access
+
 template <typename CRTP>
 class ComponentStatic : public ComponentBase {
 public:
@@ -43,66 +47,79 @@ public:
 		ComponentBase(UnnamedTag{}, type) { }
 
 private:
-	template <typename Base, typename Func>
-	inline void access_every(Func&& func) {
-		auto& self = static_cast<CRTP&>(*this);
-		ComponentStaticAccess::access(self, [&func](auto&& member) {
-			if constexpr (std::is_base_of_v<Base, std::decay_t<decltype(member)>>) {
-				func(std::forward<decltype(member)>(member));
-			}
-		});
+	constexpr inline auto& self() noexcept {
+		return static_cast<CRTP&>(*this);
+	}
+	constexpr inline const auto& self() const noexcept {
+		return static_cast<const CRTP&>(*this);
 	}
 
+private:
 	virtual void doAttach(ContextUI& context) override final {
-		// TODO P4: use ModuleAttach (??)
-		access_every<ComponentBase>([&context](ComponentBase& member) {
-			member.attach(context);
+		ComponentStaticAccess::access(self(), [&context](auto& member) {
+			if constexpr (std::is_base_of_v<ComponentBase, std::remove_cvref_t<decltype(member)>>)
+				member.attach(context);
 		});
 	};
+
 	virtual void doCreate(ContextRender& context) override final {
-		// TODO P4: use ModuleRender (?)
-		access_every<ComponentBase>([&context](ComponentBase& member) {
-			member.create(context);
+		ComponentStaticAccess::access(self(), [&context](auto& member) {
+			if constexpr (std::is_base_of_v<ComponentBase, std::remove_cvref_t<decltype(member)>>)
+				member.create(context);
 		});
 	};
+
 	virtual void doDestroy(ContextRender& context) override final {
-		access_every<ComponentBase>([&context](ComponentBase& member) {
-			member.destroy(context);
+		ComponentStaticAccess::access(self(), [&context](auto& member) {
+			if constexpr (std::is_base_of_v<ComponentBase, std::remove_cvref_t<decltype(member)>>)
+				member.destroy(context);
 		});
 	};
+
 	virtual void doRender(ContextRender& context) override final {
-		access_every<ComponentBase>([&context](ComponentBase& member) {
-			member.render(context);
+		ComponentStaticAccess::access(self(), [&context](auto& member) {
+			if constexpr (std::is_base_of_v<ComponentBase, std::remove_cvref_t<decltype(member)>>)
+				member.render(context);
 		});
 	};
 
 	virtual void doLayoutPass1(const ContextLayoutPass1& environment) override final {
-		// TODO P5: Find a more static place for the default layout (?)
-		LayoutDefault defaultLayout;
-		libv::observer_ref<ModuleLayout> layout = libv::make_observer_ref(defaultLayout);
+		bool layouted = false;
 
-		access_every<ModuleLayout>([&layout](auto&& member) {
-			// TODO P1: manual devirtualize layout (every modules) calls, 'member' has the correct static type
-			layout = libv::make_observer_ref(member);
+		ComponentStaticAccess::access(self(), [&environment, this, &layouted](auto& member) {
+			if constexpr (std::is_base_of_v<ModuleLayout, std::remove_cvref_t<decltype(member)>>) {
+				member.layoutPass1(environment, *this);
+				layouted = true;
+			}
 		});
 
-		layout->layoutPass1(environment, *this);
+		if (not layouted) {
+			LayoutDefault defaultLayout;
+			defaultLayout.layoutPass1(environment, *this);
+		}
 	}
 
 	virtual void doLayoutPass2(const ContextLayoutPass2& environment) override final {
-		LayoutDefault defaultLayout;
-		libv::observer_ref<ModuleLayout> layout = libv::make_observer_ref(defaultLayout);
+		bool layouted = false;
 
-		access_every<ModuleLayout>([&layout](auto&& member) {
-			// TODO P1: manual devirtualize layout (every modules) calls, 'member' has the correct static type
-			layout = libv::make_observer_ref(member);
+		ComponentStaticAccess::access(self(), [&environment, this, &layouted](auto& member) {
+			if constexpr (std::is_base_of_v<ModuleLayout, std::remove_cvref_t<decltype(member)>>) {
+				member.layoutPass2(environment, *this);
+				layouted = true;
+			}
 		});
 
-		layout->layoutPass2(environment, *this);
+		if (not layouted) {
+			LayoutDefault defaultLayout;
+			defaultLayout.layoutPass2(environment, *this);
+		}
 	}
 
 	virtual void doForeachChildren(const std::function<void(ComponentBase&)>& callback) override final {
-		access_every<ComponentBase>(callback);
+		ComponentStaticAccess::access(self(), [&callback](auto& member) {
+			if constexpr (std::is_base_of_v<ComponentBase, std::remove_cvref_t<decltype(member)>>)
+				callback(member);
+		});
 	}
 };
 
