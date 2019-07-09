@@ -46,6 +46,16 @@ constexpr inline typename Container::iterator upper_bound(Container& container, 
 	return std::upper_bound(container.begin(), container.end(), value);
 }
 
+template <typename Container, typename T>
+void erase(Container& c, const T& value) {
+	c.erase(std::remove(c.begin(), c.end(), value), c.end());
+}
+
+template <typename Container, typename Pred>
+void erase_if(Container& c, Pred&& pred) {
+	c.erase(std::remove_if(c.begin(), c.end(), std::forward<Pred>(pred)), c.end());
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv

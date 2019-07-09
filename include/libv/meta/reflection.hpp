@@ -44,6 +44,18 @@ constexpr inline decltype(auto) member_reference(T&& object) noexcept {
 	return member_info<Index>(object).reference;
 }
 
+// apply -------------------------------------------------------------------------------------------
+
+template <typename T, typename F, size_t... Indices>
+constexpr inline void apply_member_helper(T&& object, F&& func, std::index_sequence<Indices...>) {
+	std::forward<F>(func)(member_info<Indices>(object)...);
+}
+
+template <typename T, typename F>
+constexpr inline void apply_member(T&& object, F&& func) {
+	apply_member_helper(std::forward<T>(object), std::forward<F>(func), std::make_index_sequence<member_count_v<T>>{});
+}
+
 // foreach -----------------------------------------------------------------------------------------
 
 template <typename T, typename F, size_t... Indices>
@@ -132,6 +144,7 @@ constexpr inline void interleave_member_reference(Func&& func, Head&& head, Tail
 
 // -------------------------------------------------------------------------------------------------
 
+using detail::apply_member;
 using detail::foreach_member;
 using detail::foreach_member_name;
 using detail::foreach_member_nrp;

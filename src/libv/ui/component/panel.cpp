@@ -27,5 +27,23 @@ void Panel::add(std::shared_ptr<ComponentBase> component) {
 
 // -------------------------------------------------------------------------------------------------
 
+PanelObserver::PanelObserver() :
+	ComponentStatic<PanelObserver>(UnnamedTag{}, "panel") {
+}
+
+PanelObserver::PanelObserver(std::string name) :
+	ComponentStatic<PanelObserver>(std::move(name)) {
+}
+
+void PanelObserver::add(libv::observer_ref<ComponentBase> component) {
+	const auto& comp = components.emplace_back(std::move(component));
+
+	// TODO P3: libv.ui: implement setParent(this)
+	comp->parent = libv::make_observer_ref(this);
+	invalidate(comp->flags & Flag::mask_propagateUp);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace ui
 } // namespace libv

@@ -37,8 +37,8 @@
 // -------------------------------------------------------------------------------------------------
 
 const std::string DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
-const std::string DEFAULT_PROJECT_FOLDER = "project";
 const std::string DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
+const std::string DEFAULT_PROJECT_FOLDER = "project";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -57,20 +57,6 @@ int main(int argc, const char** argv) {
 	app::log_app.info("Started {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
 
 	app::ConfigViewer config(config_path);
-
-	const auto has_last_project = !config.recent_projects.empty();
-	const auto config_project_path = path_dir / DEFAULT_PROJECT_FOLDER / (has_last_project ? config.recent_projects[0] : DEFAULT_PROJECT_FILENAME);
-
-	app::ConfigProject config_project(config_project_path);
-	if (not has_last_project) {
-		config_project.location = libv::generic_path(path_dir);
-		config.recent_projects.emplace_back(libv::generic_path(config_project_path));
-	}
-
-	//	libv::erase(config.recent_models, model);
-	//	config.recent_models.emplace_back(model);
-	//	libv::erase(config.recent_projects, project);
-	//	config.recent_projects.emplace_back(project);
 
 	{
 		app::VM4ViewerFrame frame{config};

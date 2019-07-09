@@ -593,8 +593,10 @@ wish_create_group(GROUP_APPLICATION) # APPLICATION -----------------------------
 
 wish_create_executable(
 	TARGET app_vm4_viewer
+	#OUTPUT_FOLDER vm4_viewer
 	#OUTPUT_NAME vm4_viewer
-	#RESOURCES app/vm4_viewer
+	#OUTPUT_RESOURCE res
+	#RESOURCE app/vm4_viewer/res
 	SOURCE app/vm4_viewer/*.cpp
 	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
 )

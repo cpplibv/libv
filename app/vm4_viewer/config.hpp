@@ -98,7 +98,7 @@ public:
 		const auto config_file = libv::read_file_ec(file_path);
 
 		if (config_file.ec == std::errc::no_such_file_or_directory) {
-			app::log_app.warn("Config file is missing. Generating default config: {}", file_path_str);
+			app::log_app.warn("Missing config file {}. Generating default config.", file_path_str);
 
 			auto ec = libv::write_file_ec(file_path, serialize<libv::archive::JSON>(self()));
 			app::log_app.error_if(ec, "Failed to save config: {} {}:{}. Falling back to temporary default config.", file_path_str, ec, ec.message());
@@ -110,7 +110,7 @@ public:
 		} else {
 			try {
 				self() = deserialize<libv::archive::JSON, T>(std::move(config_file.data));
-				app::log_app.trace("Config loaded in {:5.1f}ms", timer.timef_ms().count());
+				app::log_app.trace("Loaded config {} in {:5.1f}ms", file_path_str, timer.timef_ms().count());
 
 			} catch (const cereal::Exception& e) {
 				app::log_app.error("Failed to deserialize config: {}. Regenerating default config.", e.what());

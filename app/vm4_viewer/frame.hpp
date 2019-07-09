@@ -17,6 +17,7 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 class PanelViewer;
+
 class VM4ViewerFrame : public libv::Frame {
 private:
 	libv::glr::Remote remote;

@@ -47,11 +47,16 @@ libv.ui.style: style-style inheritance, override and composition are the problem
 libv.ui.style: UI component's visualization and behaviour is controlled by properties; Properties are statically typed values; Styles are named dynamic collections of properties; Animations are real time changes of properties
 GCC 9.1: Using <filesystem> does not require linking with -lstdc++fs now.
 libv.lua: object parser
-libv.glr.std140: constexpr static string to name structs
+libv.glr.std140: constexpr static string to pretty name structs
 
 --- STACK ------------------------------------------------------------------------------------------
 
-app.vm4_viewer: start implementing a gui app to provide guidance to GUI development
+libv.ui: implement float container/layout based on the new container based layout property system
+libv.ui: rework panel container to the container based layout property system
+libv.ui: rework default layout to the container based layout property system
+libv.ui: add per component based property
+
+app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 
 libv.ui: hard type (enum) align anchor and orient
 libv.ui.style: layout properties
@@ -76,11 +81,14 @@ wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/fil
 
 libv.ui: implement detach and component removal
 
+libv.ui: rename ComponentBase to BaseComponent or even to Component (?)
 libv.log: rename libv::logger to libv::logger_stream
 libv.ui: rename size's "content" to "dynamic"
-libv.meta: PLEASE rename n_times.hpp
-libv.meta: rename if_void to lnv (as left non void) and make it variadic
+libv.meta: rename n_times.hpp to for_constexpr
+libv.meta: rename if_void to lnv (as leftmost-non-void) and make it variadic
 libv.utility: Rename approxing.hpp to approx.hpp and the class name too
+
+libv.math: make every vec / mat operator a hidden friend
 
 libv.frame: update glfw
 libv.frame: icon support
@@ -209,6 +217,8 @@ wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cma
 wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
 wish: correct cmake target private/interface/public dependency (link and include) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
 wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
+
+cpp: fixate keyword order: [[nodiscard]] virtual explicit constexpr inline static const void function() const&& noexcept override final;
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
