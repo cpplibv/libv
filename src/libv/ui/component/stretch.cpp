@@ -7,9 +7,8 @@
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
-#include <libv/ui/context_ui.hpp>
-#include <libv/ui/texture_2D.hpp>
 #include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -18,34 +17,24 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Stretch::Stretch() :
-	ComponentBase(UnnamedTag{}, "stretch") {}
+	ComponentBase(UnnamedTag{}, "stretch") { }
 
-void Stretch::image(std::shared_ptr<Texture2D> image_) {
-	this->image_ = std::move(image_);
-	// TODO P5: Could be restricted to only invalidate if layout is dependent on content
-	//			| But that should be taken care of by the system, and not individual decision on implementation sides
-	//			| This also applies for other components
-	//			| This might also requires the remove of the lstContext variable, but in that I am not sure
-	invalidate(Flag::invalidLayout | Flag::invalidRender);
-}
+Stretch::Stretch(std::string name) :
+	ComponentBase(std::move(name)) { }
 
-void Stretch::doAttach(ContextUI& context) {
-	shader = context.shader<ShaderImage>();
-}
+Stretch::Stretch(UnnamedTag, const std::string_view type) :
+	ComponentBase(UnnamedTag{}, type) { }
 
-void Stretch::doLayoutPass1(const ContextLayoutPass1& environment) {
-	(void) environment;
-	if (image_)
-		lastContent = {libv::vec::cast<float>(image_->size()), 0.f};
-	else
-		lastContent = {0, 0, 0};
+Stretch::~Stretch() { }
+
+// -------------------------------------------------------------------------------------------------
+
+void Stretch::doStyle() {
+	set(properties);
 }
 
 void Stretch::doRender(ContextRender& context) {
-	if (!image_)
-		return;
-
-	if (context.changedSize || flags.match_any(Flag::invalidRender)) {
+	if (context.changedSize) {
 		mesh.clear();
 		auto pos = mesh.attribute(attribute_position);
 		auto tex = mesh.attribute(attribute_texture0);
@@ -61,13 +50,13 @@ void Stretch::doRender(ContextRender& context) {
 		//
 		//      x0  x1  x2  x3
 
-		const auto borderPos = min(cast<float>(image_->size()), xy(size)) * 0.5f;
-		const auto borderTex = min(xy(size) / max(cast<float>(image_->size()), 1.0f) * 0.5f, 0.5f);
+		const auto borderPos = min(cast<float>(properties.image()->size()), xy(size())) * 0.5f;
+		const auto borderTex = min(xy(size()) / max(cast<float>(properties.image()->size()), 1.0f) * 0.5f, 0.5f);
 
 		const auto p0 = libv::vec2f{0.0f, 0.0f};
 		const auto p1 = borderPos;
-		const auto p2 = xy(size) - borderPos;
-		const auto p3 = xy(size);
+		const auto p2 = xy(size()) - borderPos;
+		const auto p3 = xy(size());
 
 		const auto t0 = libv::vec2f{0.0f, 0.0f};
 		const auto t1 = borderTex;
@@ -100,13 +89,18 @@ void Stretch::doRender(ContextRender& context) {
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position);
+	context.gl.model.translate(position());
 
-	context.gl.program(*shader);
-	context.gl.uniform(shader->uniform_color, color_);
-	context.gl.uniform(shader->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(image_->texture(), shader->textureChannel);
+	context.gl.program(*properties.image_shader());
+	context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
+	context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
+	context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
 	context.gl.render(mesh);
+}
+
+void Stretch::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
+	AccessLayout::lastContent(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
 }
 
 // -------------------------------------------------------------------------------------------------

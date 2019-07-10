@@ -33,7 +33,7 @@ struct Config {
 // -------------------------------------------------------------------------------------------------
 
 struct Session {
-	inline static int nextID = 0;
+	static inline int nextID = 0;
 	std::string id = fmt::format("Session-{}", nextID++);
 	libv::net::mtcp::ConnectionAsnycCB conn;
 
@@ -70,7 +70,7 @@ struct Session {
 };
 
 struct Server {
-	inline static int nextID = 0;
+	static inline int nextID = 0;
 	std::string id = fmt::format("Server-{}", nextID++);
 	libv::net::mtcp::AcceptorAsyncCB acceptor;
 	std::vector<std::shared_ptr<Session>> sessions;
@@ -102,7 +102,7 @@ struct Server {
 // -------------------------------------------------------------------------------------------------
 
 struct Client {
-	inline static int nextID = 0;
+	static inline int nextID = 0;
 	std::string id = fmt::format("Client-{}", nextID++);
 	libv::net::mtcp::ConnectionAsnycCB conn;
 

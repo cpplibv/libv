@@ -19,7 +19,7 @@ struct clock {
 
 	static constexpr bool is_steady = true;
 
-	inline static time_point now() noexcept {
+	static inline time_point now() noexcept {
 		return {std::chrono::steady_clock::now()};
 	}
 };

@@ -25,10 +25,10 @@ void VM4ViewerFrame::create() {
 	remote.create();
 	remote.enableDebug();
 
-	auto gl = remote.queue();
-	ui.create(gl);
-	remote.queue(std::move(gl));
-	remote.render();
+//	auto gl = remote.queue();
+//	ui.create(gl);
+//	remote.queue(std::move(gl));
+//	remote.execute();
 }
 
 void VM4ViewerFrame::render() {
@@ -41,14 +41,14 @@ void VM4ViewerFrame::render() {
 	ui.update(gl);
 
 	remote.queue(std::move(gl));
-	remote.render();
+	remote.execute();
 }
 
 void VM4ViewerFrame::destroy() {
 	auto gl = remote.queue();
 	ui.destroy(gl);
 	remote.queue(std::move(gl));
-	remote.render();
+	remote.execute();
 
 	remote.destroy();
 }
@@ -68,28 +68,39 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	ui.add(panel);
 
 	onKey.output([&](const libv::frame::EventKey& e) {
-		if (e.action == libv::frame::Action::release)
+		if (e.action == libv::input::Action::release)
 			return;
 
-		if (e.key == libv::frame::Key::Escape)
+		if (e.key == libv::input::Key::Escape)
 			closeDefault();
 
 		switch (e.key) {
-		case libv::frame::Key::Q: break;
-		case libv::frame::Key::W: break;
-		case libv::frame::Key::E: break;
-		case libv::frame::Key::A: break;
-		case libv::frame::Key::S: break;
-		case libv::frame::Key::D: break;
+		case libv::input::Key::Q: break;
+		case libv::input::Key::W: break;
+		case libv::input::Key::E: break;
+		case libv::input::Key::A: break;
+		case libv::input::Key::S: break;
+		case libv::input::Key::D: break;
 		default: break;
 		}
 	});
 	onChar.output([&](const libv::frame::EventChar& e) {
 		(void) e;
 	});
+	onKey.output([&](const libv::frame::EventKey& e) {
+		(void) e;
+
+		if (e.action == libv::input::Action::release)
+			panel->key(e.key);
+	});
+	onCharMods.output([&](const libv::frame::EventCharMods& e) {
+		(void) e;
+	});
 	onWindowSize.output([&](const libv::frame::EventWindowSize& e) {
-		config.window_width = e.size.x;
-		config.window_height = e.size.y;
+		if (config.save_window_size) {
+			config.window_width = e.size.x;
+			config.window_height = e.size.y;
+		}
 	});
 	onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {
 		create();

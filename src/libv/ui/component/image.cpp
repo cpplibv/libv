@@ -7,9 +7,8 @@
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
-#include <libv/ui/context_ui.hpp>
-#include <libv/ui/texture_2D.hpp>
 #include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -18,33 +17,23 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Image::Image() :
-	ComponentBase(UnnamedTag{}, "image") {}
+	ComponentBase(UnnamedTag{}, "image") { }
 
-void Image::image(std::shared_ptr<Texture2D> image_) {
-	this->image_ = std::move(image_);
-	// TODO P5: Could be restricted to only invalidate if layout is dependent on content
-	//			| But that should be taken care of by the system, and not individual decision on implementation sides
-	//			| This also applies for other components
-	//			| This might also requires the remove of the lstContext variable, but in that I am not sure
-	invalidate(Flag::invalidLayout);
-}
+Image::Image(std::string name) :
+	ComponentBase(std::move(name)) { }
 
-void Image::doAttach(ContextUI& context) {
-	shader = context.shader<ShaderImage>();
-}
+Image::Image(UnnamedTag, const std::string_view type) :
+	ComponentBase(UnnamedTag{}, type) { }
 
-void Image::doLayoutPass1(const ContextLayoutPass1& environment) {
-	(void) environment;
-	if (image_)
-		lastContent = {libv::vec::cast<float>(image_->size()), 0.f};
-	else
-		lastContent = {0, 0, 0};
+Image::~Image() { }
+
+// -------------------------------------------------------------------------------------------------
+
+void Image::doStyle() {
+	this->set(properties);
 }
 
 void Image::doRender(ContextRender& context) {
-	if (!image_)
-		return;
-
 	if (context.changedSize) {
 		mesh.clear();
 		auto pos = mesh.attribute(attribute_position);
@@ -52,9 +41,9 @@ void Image::doRender(ContextRender& context) {
 		auto index = mesh.index();
 
 		pos(0, 0, 0);
-		pos(size.x, 0, 0);
-		pos(size.x, size.y, 0);
-		pos(0, size.y, 0);
+		pos(size().x, 0, 0);
+		pos(size().x, size().y, 0);
+		pos(0, size().y, 0);
 
 		tex(0, 0);
 		tex(1, 0);
@@ -65,13 +54,18 @@ void Image::doRender(ContextRender& context) {
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position);
+	context.gl.model.translate(position());
 
-	context.gl.program(*shader);
-	context.gl.uniform(shader->uniform_color, color_);
-	context.gl.uniform(shader->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(image_->texture(), shader->textureChannel);
+	context.gl.program(*properties.image_shader());
+	context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
+	context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
+	context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
 	context.gl.render(mesh);
+}
+
+void Image::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
+	AccessLayout::lastContent(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -64,19 +64,20 @@ using HCLA64 = HCLA_t<uint64_t>;
 
 // Implementation status:
 //
-//     | HCL | HCV | HCY | HSL | HSV | RGB
-// ----+-----+-----+-----+-----+-----+-----
-// HCL |  -
-// HCV |        -
-// HCY |              -
-// HSL |                    -
-// HSV |                          -
-// RGB |                                -
+//     | HUE | HCL | HCV | HCY | HSL | HSV | RGB
+// ----+-----+-----+-----+-----+-----+-----+-----
+// HUE |  -
+// HCL |        -
+// HCV |              -
+// HCY |                    -
+// HSL |                          -
+// HSV |                                -
+// RGB |                                      -
 //
 
 template <typename Rep, typename TargetRep = Rep>
 inline RGBf HUEtoRGB(const Rep H) noexcept {
-	// TODO P1: Protect against integral overflow
+	// TODO P1: Protect against integral overflow (8 bit)
 
 	auto R = std::abs(H * 6 - 3) - 1;
 	auto G = 2 - std::abs(H * 6 - 2);

@@ -16,11 +16,20 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Quad::Quad() :
-	ComponentBase(UnnamedTag{}, "quad") {
-}
+	ComponentBase(UnnamedTag{}, "quad") { }
 
-void Quad::doAttach(ContextUI& context) {
-	shader = context.shader<ShaderQuad>();
+Quad::Quad(std::string name) :
+	ComponentBase(std::move(name)) { }
+
+Quad::Quad(UnnamedTag, const std::string_view type) :
+	ComponentBase(UnnamedTag{}, type) { }
+
+Quad::~Quad() { }
+
+// -------------------------------------------------------------------------------------------------
+
+void Quad::doStyle() {
+	set(properties);
 }
 
 void Quad::doRender(ContextRender& context) {
@@ -33,19 +42,19 @@ void Quad::doRender(ContextRender& context) {
 		// |/|
 		// 0-1
 		pos(0, 0, 0);
-		pos(size.x, 0, 0);
-		pos(size.x, size.y, 0);
-		pos(0, size.y, 0);
+		pos(size().x, 0, 0);
+		pos(size().x, size().y, 0);
+		pos(0, size().y, 0);
 
 		index.quad(0, 1, 2, 3);
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position);
+	context.gl.model.translate(position());
 
-	context.gl.program(*shader);
-	context.gl.uniform(shader->uniform_color, color_);
-	context.gl.uniform(shader->uniform_MVPmat, context.gl.mvp());
+	context.gl.program(*properties.quad_shader());
+	context.gl.uniform(properties.quad_shader()->uniform_color, properties.color());
+	context.gl.uniform(properties.quad_shader()->uniform_MVPmat, context.gl.mvp());
 	context.gl.render(mesh);
 }
 

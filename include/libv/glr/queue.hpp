@@ -136,6 +136,15 @@ struct QueueTaskTexture {
 		sequenceNumber(sequenceNumber), texture(std::move(texture)), channel(channel) { }
 };
 
+struct QueueTaskViewport {
+	SequenceNumber sequenceNumber;
+	libv::vec2i position;
+	libv::vec2i size;
+
+	QueueTaskViewport(SequenceNumber sequenceNumber, libv::vec2i position, libv::vec2i size) :
+		sequenceNumber(sequenceNumber), position(position), size(size) { }
+};
+
 struct Queue {
 public:
 	StateStack state;
@@ -147,7 +156,7 @@ private:
 	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
 
 private:
-	std::vector<std::variant<QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture, QueueTaskClear, QueueTaskClearColor>> tasks;
+	std::vector<std::variant<QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture, QueueTaskClear, QueueTaskClearColor, QueueTaskViewport>> tasks;
 	SequenceNumber sequenceNumber = 0;
 	State currentState;
 
@@ -217,6 +226,13 @@ public:
 	}
 
 public:
+	void viewport(libv::vec2f position, libv::vec2f size) {
+		tasks.emplace_back(std::in_place_type<QueueTaskViewport>,
+				sequenceNumber,
+				libv::vec::cast<int>(position),
+				libv::vec::cast<int>(size));
+	}
+
 	template <typename T>
 	void uniform(const Uniform_t<T> uniform, const T& value) {
 		programStack.top()->uniformStream.set(uniform.location, value);
@@ -247,7 +263,7 @@ public:
 	}
 
 private:
-	inline static void changeState(libv::gl::GL& gl, State target) {
+	static inline void changeState(libv::gl::GL& gl, State target) {
 		gl.capability.blend.set(target.capabilityBlend != 0);
 		gl.capability.cullFace.set(target.capabilityCullFace != 0);
 		gl.capability.depthTest.set(target.capabilityDepthTest != 0);
@@ -334,6 +350,9 @@ public:
 				},
 				[&gl](const QueueTaskClear& task) {
 					gl.clear(task.buffers);
+				},
+				[&gl](const QueueTaskViewport& task) {
+					gl.viewport(task.position, task.size);
 				});
 
 			std::visit(execution, task_variant);

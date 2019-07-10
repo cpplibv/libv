@@ -2,8 +2,11 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/enum.hpp>
 // std
 #include <cstdint>
+#include <string_view>
 
 
 namespace libv {
@@ -11,7 +14,7 @@ namespace input {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class MonitorEvent : uint32_t {
+enum class MonitorEvent : int32_t {
 	connected = 0x00040001,
 	disconnected = 0x00040002,
 };
@@ -27,12 +30,18 @@ enum class KeyState : int32_t {
 	pressed = 1,
 };
 
-enum class KeyModifier : uint32_t {
+enum class KeyModifier : int32_t {
+	none = 0x0000,
+
 	shift = 0x0001,
  	control = 0x0002,
 	alt = 0x0004,
 	super = 0x0008,
 };
+
+[[nodiscard]] constexpr inline KeyModifier operator|(KeyModifier lhs, KeyModifier rhs) noexcept {
+	return KeyModifier{libv::to_value(lhs) | libv::to_value(rhs)};
+}
 
 enum class Mouse : int32_t {
 	Button0 = 0,
@@ -47,6 +56,8 @@ enum class Mouse : int32_t {
 	Left = Button0,
 	Right = Button1,
 	Middle = Button2,
+
+	Last = Button7, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
 
 enum class Joystick : int32_t {
@@ -66,6 +77,8 @@ enum class Joystick : int32_t {
 	Button13 = 13,
 	Button14 = 14,
 	Button15 = 15,
+
+	Last = Button15, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
 
 enum class Key : int32_t {
@@ -190,7 +203,14 @@ enum class Key : int32_t {
 	AltRight = 346,
 	SuperRight = 347,
 	Menu = 348,
+
+	Last = Menu, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
+
+std::string_view to_string(const Action value);
+std::string_view to_string(const KeyState value);
+std::string_view to_string(const Key value);
+std::string_view to_string(const Mouse value);
 
 // -------------------------------------------------------------------------------------------------
 

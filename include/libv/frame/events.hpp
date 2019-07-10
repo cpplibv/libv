@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <libv/frame/inputs.hpp>
+#include <libv/input/inputs.hpp>
 
 
 // TODO P5: Most of the event should get a observer_ref<Frame> as member, or even better: Frame&!
@@ -34,8 +34,8 @@ struct EventChar {
 
 struct EventCharMods {
 	uint32_t unicode;
-	char utf8[5];
-	KeyModifier mods;
+	char utf8[5]; /// Null terminated utf8 representation of the unicode character
+	libv::input::KeyModifier mods;
 
 	EventCharMods(uint32_t unicode, int mods);
 	std::string toPrettyString() const;
@@ -56,23 +56,22 @@ struct EventDrop {
 };
 
 struct EventFramebufferSize {
-	vec2i size;
+	libv::vec2i size;
 
 	inline EventFramebufferSize(int width, int height) :
 		size(width, height) { }
-	inline EventFramebufferSize(vec2i size) :
+	inline EventFramebufferSize(libv::vec2i size) :
 		size(size) { }
 
 	std::string toPrettyString() const;
 };
 
 struct EventKey {
-	Key key;
+	libv::input::Key key;
 	int scancode;
-	Action action;
-	KeyModifier mods;
+	libv::input::Action action;
+	libv::input::KeyModifier mods;
 
-	// TODO P4: Strongly typed enums for these variables action
 	inline EventKey(int key, int scancode, int action, int mods) :
 		key{key},
 		scancode(scancode),
@@ -84,7 +83,7 @@ struct EventKey {
 
 struct EventMonitor {
 	const Monitor& monitor;
-	MonitorEvent event;
+	libv::input::MonitorEvent event;
 
 	inline EventMonitor(const Monitor& monitor, int event) :
 		monitor(monitor),
@@ -94,9 +93,9 @@ struct EventMonitor {
 };
 
 struct EventMouseButton {
-	Mouse button;
-	Action action;
-	KeyModifier mods;
+	libv::input::Mouse button;
+	libv::input::Action action;
+	libv::input::KeyModifier mods;
 
 	inline EventMouseButton(int button, int action, int mods) :
 		button{button},
@@ -116,22 +115,22 @@ struct EventMouseEnter {
 };
 
 struct EventMousePosition {
-	vec2d position;
+	libv::vec2d position;
 
 	inline EventMousePosition(double xpos, double ypos) :
 		position(xpos, ypos) { }
-	inline EventMousePosition(vec2d position) :
+	inline EventMousePosition(libv::vec2d position) :
 		position(position) { }
 
 	std::string toPrettyString() const;
 };
 
 struct EventMouseScroll {
-	vec2d offset;
+	libv::vec2d offset;
 
 	inline EventMouseScroll(double xoffset, double yoffset) :
 		offset(xoffset, yoffset) { }
-	inline EventMouseScroll(vec2d offset) :
+	inline EventMouseScroll(libv::vec2d offset) :
 		offset(offset) { }
 
 	std::string toPrettyString() const;
@@ -156,11 +155,11 @@ struct EventWindowIconify {
 };
 
 struct EventWindowPosition {
-	vec2i position;
+	libv::vec2i position;
 
 	inline EventWindowPosition(int x, int y) :
 		position(x, y) { }
-	inline EventWindowPosition(vec2i position) :
+	inline EventWindowPosition(libv::vec2i position) :
 		position(position) { }
 
 	std::string toPrettyString() const;
@@ -171,11 +170,11 @@ struct EventWindowRefresh {
 };
 
 struct EventWindowSize {
-	vec2i size;
+	libv::vec2i size;
 
 	inline EventWindowSize(int x, int y) :
 		size(x, y) { }
-	inline EventWindowSize(vec2i size) :
+	inline EventWindowSize(libv::vec2i size) :
 		size(size) { }
 
 	std::string toPrettyString() const;

@@ -13,7 +13,7 @@
 // pro
 #include <libv/ui/component/image.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel.hpp>
+#include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
@@ -55,8 +55,8 @@ private:
 
 private:
 //	std::shared_ptr<libv::ui::Button> button;
-	std::shared_ptr<libv::ui::Panel> panel0 = std::make_shared<libv::ui::Panel>();
-	std::shared_ptr<libv::ui::Panel> panel1 = std::make_shared<libv::ui::Panel>();
+	std::shared_ptr<libv::ui::PanelLine> panel0 = std::make_shared<libv::ui::PanelLine>();
+	std::shared_ptr<libv::ui::PanelLine> panel1 = std::make_shared<libv::ui::PanelLine>();
 	std::shared_ptr<libv::ui::Label> label0 = std::make_shared<libv::ui::Label>();
 	std::shared_ptr<libv::ui::Label> label1 = std::make_shared<libv::ui::Label>();
 	std::shared_ptr<libv::ui::Label> label2 = std::make_shared<libv::ui::Label>();
@@ -77,10 +77,10 @@ public:
 		remote.create();
 		remote.enableDebug();
 
-		auto gl = remote.queue();
-		ui.create(gl);
-		remote.queue(std::move(gl));
-		remote.render();
+//		auto gl = remote.queue();
+//		ui.create(gl);
+//		remote.queue(std::move(gl));
+//		remote.execute();
 	}
 
 	void render() {
@@ -93,14 +93,14 @@ public:
 		ui.update(gl);
 
 		remote.queue(std::move(gl));
-		remote.render();
+		remote.execute();
 	}
 
 	void destroy() {
 		auto gl = remote.queue();
-		ui.destroy(gl);
-		remote.queue(std::move(gl));
-		remote.render();
+//		ui.destroy(gl);
+//		remote.queue(std::move(gl));
+//		remote.render();
 
 		remote.destroy();
 	}
@@ -151,8 +151,6 @@ public:
 
 		ui.add(panel0);
 
-		// TODO P1: String2D content size should not include last inter glyph spacing
-
 		onKey.output([&](const libv::frame::EventKey& e) {
 			if (e.action == libv::input::Action::release)
 				return;
@@ -163,16 +161,16 @@ public:
 			if (e.key == libv::input::Key::Backspace) {
 				label0->string.pop_back();
 				label2->string.pop_back();
-				label0->invalidate(libv::ui::Flag::invalidLayout);
-				label2->invalidate(libv::ui::Flag::invalidLayout);
+				label0->flag(libv::ui::Flag::invalidLayout);
+				label2->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Pop back");
 			}
 
 			if (e.key == libv::input::Key::Enter || e.key == libv::input::Key::KPEnter) {
 				label0->string.push_back("\n");
 				label2->string.push_back("\n");
-				label0->invalidate(libv::ui::Flag::invalidLayout);
-				label2->invalidate(libv::ui::Flag::invalidLayout);
+				label0->flag(libv::ui::Flag::invalidLayout);
+				label2->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Appending new line");
 			}
 
@@ -211,8 +209,8 @@ public:
 		onChar.output([&](const libv::frame::EventChar& e) {
 			label0->string.push_back(e.utf8);
 			label2->string.push_back(e.utf8);
-			label0->invalidate(libv::ui::Flag::invalidLayout);
-			label2->invalidate(libv::ui::Flag::invalidLayout);
+			label0->flag(libv::ui::Flag::invalidLayout);
+			label2->flag(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8);
 		});
 		onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {

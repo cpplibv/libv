@@ -6,7 +6,7 @@
 #include <boost/align/aligned_allocator.hpp>
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/algorithm/associative.hpp>
+#include <libv/algorithm/linear_find.hpp>
 #include <libv/algorithm/container.hpp>
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/enum.hpp>
@@ -398,7 +398,7 @@ public:
 
 struct AttorneyMeshRemote {
 	friend class Queue;
-	inline static const std::shared_ptr<RemoteMesh>& remote(const Mesh& mesh) {
+	static inline const std::shared_ptr<RemoteMesh>& remote(const Mesh& mesh) {
 		return mesh.remote;
 	}
 };

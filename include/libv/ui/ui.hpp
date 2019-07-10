@@ -4,11 +4,12 @@
 
 // libv
 #include <libv/glr/queue_fwd.hpp>
+#include <libv/input/inputs.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/timer.hpp>
 // std
 #include <memory>
-#include <vector>
+// pro
+#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -34,13 +35,11 @@ namespace ui {
 
 class ComponentBase;
 class ContextUI;
-class Root;
+class ImplUI;
 
-struct UI {
+class UI {
 private:
-	std::unique_ptr<ContextUI> context_ui;
-	std::unique_ptr<Root> root;
-	libv::Timer timer;
+	std::unique_ptr<ImplUI> self;
 
 public:
 	UI();
@@ -51,19 +50,17 @@ public:
 	void setPosition(libv::vec3f position_) noexcept;
 	void setPosition(float x, float y, float z) noexcept;
 
+	void eventMouseEnter(bool entered);
+	void eventMouseButton(libv::input::Mouse button, libv::input::Action action);
+	void eventMousePosition(libv::vec2d position);
+	void eventMouseScroll(libv::vec2d offset);
+
 public:
-	ContextUI& context() {
-		return *context_ui;
-	}
+	ContextUI& context();
 	template <typename Frame> void attach(Frame& frame);
 
-private:
-	void attach();
-	void layout();
-	void render(libv::glr::Queue& gl);
-
-public: // <<< P1: libv.ui: I disagree with this public, to resolve this I think UI has to store its glr::Remote?
-	void create(libv::glr::Queue& gl);
+public:
+	// TODO P1: libv.ui I disagree with this public, to resolve this I think UI has to store its glr::Remote?, which is reasonable, might need some alteration
 	void update(libv::glr::Queue& gl);
 	void destroy(libv::glr::Queue& gl);
 };
@@ -72,7 +69,24 @@ public: // <<< P1: libv.ui: I disagree with this public, to resolve this I think
 
 template <typename Frame>
 void UI::attach(Frame& frame) {
-	(void) frame;
+	frame.onWindowSize.output([this](const auto& e) {
+		log_ui.trace("{}", e.toPrettyString());
+		this->setSize(static_cast<float>(e.size.x), static_cast<float>(e.size.y));
+	});
+
+	frame.onMouseEnter.output([this](const auto& e) {
+		this->eventMouseEnter(e.entered);
+	});
+	frame.onMouseButton.output([this](const auto& e) {
+		this->eventMouseButton(e.button, e.action);
+	});
+	frame.onMousePosition.output([this](const auto& e) {
+		this->eventMousePosition(e.position);
+	});
+	frame.onMouseScroll.output([this](const auto& e) {
+		this->eventMouseScroll(e.offset);
+	});
+
 //		frame.onContextInitialization.output([this](const auto&) {
 //			this->create();
 //		});

@@ -92,13 +92,13 @@ public:
 
 			if (e.key == libv::frame::Key::Backspace) {
 //				label0->string.pop_back();
-//				label0->invalidate(libv::ui::Flag::invalidLayout);
+//				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Pop back");
 			}
 
 			if (e.key == libv::frame::Key::Enter || e.key == libv::frame::Key::KPEnter) {
 //				label0->string.push_back("\n");
-//				label0->invalidate(libv::ui::Flag::invalidLayout);
+//				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Appending new line");
 			}
 
@@ -132,7 +132,7 @@ public:
 		});
 		onChar.output([&](const libv::frame::EventChar& e) {
 //			label0->string.push_back(e.utf8);
-//			label0->invalidate(libv::ui::Flag::invalidLayout);
+//			label0->flag(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8);
 		});
 		onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {

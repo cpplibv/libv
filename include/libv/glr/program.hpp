@@ -107,7 +107,7 @@ public:
 
 struct AttorneyProgramRemote {
 	friend class Queue;
-	inline static const std::shared_ptr<RemoteProgram>& remote(const Program& program) noexcept {
+	static inline const std::shared_ptr<RemoteProgram>& remote(const Program& program) noexcept {
 		return program.remote;
 	}
 };

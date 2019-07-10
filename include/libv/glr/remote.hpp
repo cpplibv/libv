@@ -99,7 +99,7 @@ public:
 
 public:
 	void create();
-	void render();
+	void execute();
 	void destroy();
 };
 

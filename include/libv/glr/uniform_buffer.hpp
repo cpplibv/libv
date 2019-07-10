@@ -168,7 +168,7 @@ public:
 
 struct AttorneyUniformBufferRemote {
 	friend class Queue;
-	inline static RemoteUniformBuffer& remote(const UniformBuffer& object) {
+	static inline RemoteUniformBuffer& remote(const UniformBuffer& object) {
 		return *object.remote;
 	}
 };

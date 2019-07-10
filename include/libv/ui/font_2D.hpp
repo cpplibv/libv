@@ -31,7 +31,7 @@ namespace ui {
 // advance: distance between origin points
 // kering: difference in advance depending on the current/previous char
 
-// TODO P1: Dynamic textureSize and resize, TextureRect might be useful to avoid uniforms
+// TODO P3: Dynamic textureSize and resize, TextureRect might be useful to avoid uniforms
 // TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
 // TODO P4: enum class Weight { Bold, Normal };
 // TODO P4: Freetype error handling (Check return locations) for memory leaks (?)
@@ -79,7 +79,7 @@ private:
 	// TODO P2: unique_ptr for FT_Face
 
 private:
-	libv::vec2i textureSize{512, 512};
+	libv::vec2i textureSize{1024, 1024};
 	libv::vec2i texturePen{1, 1}; // 1 px gap from border
 	int32_t textureNextLine = 0;
 

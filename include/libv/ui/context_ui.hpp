@@ -12,6 +12,7 @@
 #include <typeinfo>
 #include <unordered_map>
 // pro
+#include <libv/ui/event/mouse_table.hpp>
 #include <libv/ui/log.hpp>
 
 
@@ -58,7 +59,6 @@ class ContextUI {
 
 	std::shared_ptr<Font2D> fallback_font;
 	std::shared_ptr<Texture2D> fallback_texture2D;
-	libv::intrusive_ptr<Style> root_style;
 	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
 	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
@@ -68,6 +68,9 @@ class ContextUI {
 	std::filesystem::path path_fonts;
 	std::filesystem::path path_shaders;
 	std::filesystem::path path_textures;
+
+public:
+	MouseTable mouse;
 
 //	struct Config {
 //		struct Resource {
@@ -88,10 +91,19 @@ public:
 			const std::filesystem::path& path_textures = "texture");
 	~ContextUI();
 
+public:
+	bool isAnyStyleDirty() const noexcept;
+	void clearEveryStyleDirty() noexcept;
+
+public:
 	std::shared_ptr<Font2D> font(const std::filesystem::path& path);
 	std::shared_ptr<Shader> shader(const std::string& name);
 	std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
 	libv::intrusive_ptr<Style> style(const std::string_view style_name);
+
+	auto getFallbackTexture2D() const {
+		return fallback_texture2D;
+	}
 
 	template <typename T>
 		LIBV_REQUIRES(std::is_base_of_v<Shader, T>)

@@ -52,6 +52,18 @@ struct SizeDim {
 			os << "D";
 		return os;
 	}
+
+	friend constexpr inline bool operator==(const SizeDim& lhs, const SizeDim& rhs) noexcept {
+		return
+				lhs.pixel == rhs.pixel &&
+				lhs.percent == rhs.percent &&
+				lhs.ratio == rhs.ratio &&
+				lhs.content == rhs.content;
+	}
+	friend constexpr inline bool operator!=(const SizeDim& lhs, const SizeDim& rhs) noexcept {
+		return !(lhs == rhs);
+	}
+
 };
 
 inline auto pixel(float value) {
@@ -88,7 +100,48 @@ struct Size {
 		os << size.value;
 		return os;
 	}
+
+	friend constexpr inline bool operator==(const Size& lhs, const Size& rhs) noexcept {
+		return lhs.value == rhs.value;
+	}
+
+	friend constexpr inline bool operator!=(const Size& lhs, const Size& rhs) noexcept {
+		return lhs.value != rhs.value;
+	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+//	struct SizeStat {
+//		float fix = 0.f;
+//		float percent = 0.f;
+//
+//		void add(const SizeStat& stat) {
+//			fix += stat.fix;
+//			percent += stat.percent;
+//		}
+//
+//		void add(const Size& size, libv::vec3f content_, uint32_t dim) {
+//			fix += size[dim].pixel + (size[dim].content ? content_[dim] : 0.f);
+//			percent += size[dim].percent;
+//		}
+//
+//		void max(const Size& size, libv::vec3f content_, uint32_t dim) {
+//			fix = std::max(fix, size[dim].pixel + (size[dim].content ? content_[dim] : 0.f));
+//			percent = std::max(percent, size[dim].percent);
+//		}
+//
+//		float resolve(const ComponentBase& component) const {
+//			if (fix < 0.01f) {
+//				return fix;
+//			} else if (percent > 99.99f) {
+//				log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
+//				return fix * 2.f;
+//			} else {
+//				return fix / (1.f - percent * 0.01f);
+//			}
+//		}
+//	};
 
 // -------------------------------------------------------------------------------------------------
 

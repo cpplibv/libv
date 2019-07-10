@@ -5,6 +5,7 @@
 // cfg
 #include <libv/frame/config.hpp>
 // libv
+#include <libv/input/inputs.hpp>
 #include <libv/sig/signal.hpp>
 #include <libv/thread/executor_thread.hpp>
 #include <libv/utility/enum.hpp>
@@ -15,7 +16,6 @@
 #include <string>
 // pro
 #include <libv/frame/events.hpp>
-#include <libv/frame/inputs.hpp>
 #include <libv/frame/monitor.hpp>
 
 
@@ -250,8 +250,8 @@ private:
 
 	std::string title;
 
-	std::array<std::atomic<KeyState>, to_value(Key::Last)> keyStates;
-	std::array<std::atomic<KeyState>, to_value(Mouse::Last)> mouseStates;
+	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Key::Last)> keyStates;
+	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Mouse::Last)> mouseStates;
 	std::atomic<uint64_t> mousePosition{0}; // coded as x:24.8 y:24.8
 	std::atomic<uint64_t> scrollPosition{0}; // coded as x:24.8 y:24.8
 
@@ -294,13 +294,13 @@ public:
 	const Monitor& getCurrentMonitor() const;
 
 public:
-	KeyState getKey(Key key);
-	bool isKeyPressed(Key key);
-	bool isKeyReleased(Key key);
+	libv::input::KeyState getKey(libv::input::Key key);
+	bool isKeyPressed(libv::input::Key key);
+	bool isKeyReleased(libv::input::Key key);
 
-	KeyState getMouse(Mouse key);
-	bool isMousePressed(Mouse key);
-	bool isMouseReleased(Mouse key);
+	libv::input::KeyState getMouse(libv::input::Mouse key);
+	bool isMousePressed(libv::input::Mouse key);
+	bool isMouseReleased(libv::input::Mouse key);
 
 	vec2d getMousePosition();
 	vec2d getScrollPosition();

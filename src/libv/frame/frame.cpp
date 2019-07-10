@@ -297,36 +297,36 @@ const Monitor& Frame::getCurrentMonitor() const {
 
 // -------------------------------------------------------------------------------------------------
 
-KeyState Frame::getKey(Key key) {
-	if (key == Key::Unknown)
-		return KeyState::released;
-	if (to_value(key) >= to_value(Key::Last))
-		return KeyState::released;
+libv::input::KeyState Frame::getKey(libv::input::Key key) {
+	if (key == libv::input::Key::Unknown)
+		return libv::input::KeyState::released;
+	if (to_value(key) >= to_value(libv::input::Key::Last))
+		return libv::input::KeyState::released;
 	return keyStates[to_value(key)].load();
 }
 
-bool Frame::isKeyPressed(Key key) {
-	return getKey(key) == KeyState::pressed;
+bool Frame::isKeyPressed(libv::input::Key key) {
+	return getKey(key) == libv::input::KeyState::pressed;
 }
 
-bool Frame::isKeyReleased(Key key) {
-	return getKey(key) == KeyState::released;
+bool Frame::isKeyReleased(libv::input::Key key) {
+	return getKey(key) == libv::input::KeyState::released;
 }
 
-KeyState Frame::getMouse(Mouse key) {
+libv::input::KeyState Frame::getMouse(libv::input::Mouse key) {
 //	if (key == Mouse::Unknown)
 //		return KeyState::released;
-	if (to_value(key) >= to_value(Mouse::Last))
-		return KeyState::released;
+	if (to_value(key) >= to_value(libv::input::Mouse::Last))
+		return libv::input::KeyState::released;
 	return mouseStates[to_value(key)].load();
 }
 
-bool Frame::isMousePressed(Mouse key) {
-	return getMouse(key) == KeyState::pressed;
+bool Frame::isMousePressed(libv::input::Mouse key) {
+	return getMouse(key) == libv::input::KeyState::pressed;
 }
 
-bool Frame::isMouseReleased(Mouse key) {
-	return getMouse(key) == KeyState::released;
+bool Frame::isMouseReleased(libv::input::Mouse key) {
+	return getMouse(key) == libv::input::KeyState::released;
 }
 
 vec2d Frame::getMousePosition() {

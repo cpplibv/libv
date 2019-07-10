@@ -28,8 +28,8 @@ namespace ui {
 
 namespace {
 
-//                                               Left, Center, Right, Justify
-static constexpr std::array AlignHorizontalTable = {0.0f, 0.5f, 1.0f, 0.0f};
+//                                              Left, Center, Right, Justify, JustifyAll
+static constexpr std::array AlignHorizontalTable = {0.0f, 0.5f, 1.0f, 0.0f, 0.0f};
 
 } // namespace
 
@@ -259,9 +259,9 @@ void String2D::layout() {
 
 		const auto offset = std::round(leftover * AlignHorizontalTable[to_value(align)]);
 		const auto isLastLine = static_cast<size_t>(index) == lines.size() - 1;
-		const auto justifyGap = (align == AlignHorizontal::Justify && !isLastLine) ?
-				leftover / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) :
-				0.0f;
+		const auto isJustifyLine = align == AlignHorizontal::JustifyAll || (align == AlignHorizontal::Justify && !isLastLine);
+		const auto justifyGap = isJustifyLine ?
+				leftover / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) : 0.0f;
 
 		size_t i = line.begin;
 		auto justifyOffset = 0.0f;

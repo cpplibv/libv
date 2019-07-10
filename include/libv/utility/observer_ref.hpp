@@ -118,17 +118,17 @@ constexpr inline observer_ref<T> make_observer_ref(const std::shared_ptr<T>& p) 
 	return observer_ref<T>(p);
 }
 
+// -------------------------------------------------------------------------------------------------
+
 } // namespace libv
 
 namespace std {
 
 template <typename T>
 struct hash<::libv::observer_ref<T>> {
-	constexpr inline size_t operator()(::libv::observer_ref<T> p) {
-		return hash<T*>()(p.get());
+	constexpr inline size_t operator()(::libv::observer_ref<T> p) const noexcept {
+		return hash<T*>{}(p.get());
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
 
 } // namespace std

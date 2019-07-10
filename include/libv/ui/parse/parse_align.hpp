@@ -12,12 +12,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class AlignVertical;
+enum class AlignVertical : uint32_t;
 AlignVertical parse_align_vertical_or(const std::string_view str, const AlignVertical fallback);
 AlignVertical parse_align_vertical_or_throw(const std::string_view str);
 std::optional<AlignVertical> parse_align_vertical_optional(const std::string_view str);
 
-enum class AlignHorizontal;
+enum class AlignHorizontal : uint32_t;
 AlignHorizontal parse_align_horizontal_or(const std::string_view str, const AlignHorizontal fallback);
 AlignHorizontal parse_align_horizontal_or_throw(const std::string_view str);
 std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string_view str);

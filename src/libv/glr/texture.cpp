@@ -166,6 +166,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	}
 
 	if (dirty_storage) {
+		gl(texture).bind();
 		switch (target) {
 		case libv::gl::TextureTarget::_1D:
 			gl(texture).storage(static_cast<int32_t>(levels.size()), format, levels[0].size.x);
@@ -187,7 +188,8 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	}
 
 	if (dirty_data) {
-		// TODO P1: Implement proper sub image, be mindful that due to data layout the subimage have to be extended to a full dimension
+		gl(texture).bind();
+		// TODO P1: Implement proper sub image, be mindful that due to data layout the subimage have to be extended to secondary and tertiary dimension
 		for (int32_t i = 0; i < static_cast<int32_t>(levels.size()); ++i) {
 			switch (target) {
 			case libv::gl::TextureTarget::_1D:
@@ -200,8 +202,8 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 				gl(texture).subImage(i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
 				break;
 			case libv::gl::TextureTarget::CubeMap:
-				// TODO P1: libv.glr: Implement cube map image
-				LIBV_GLR_DEBUG_ASSERT(false);
+				// TODO P3: libv.glr: Implement cube map image
+				LIBV_GLR_DEBUG_ASSERT(false && "Not implemented yet");
 //				gl(texture).subImage(libv::gl::CubeSide::PositiveX, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
 //				gl(texture).subImage(libv::gl::CubeSide::NegativeX, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
 //				gl(texture).subImage(libv::gl::CubeSide::PositiveY, i, 0, 0, levels[i].size.x, levels[i].size.y, format.base, dataType, data.data() + levels[i].offset);
@@ -214,16 +216,19 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 				gl(texture).subImage(i, 0, 0, 0, levels[i].size.x, levels[i].size.y, levels[i].size.z, format.base, dataType, data.data() + levels[i].offset);
 				break;
 			case libv::gl::TextureTarget::CubeMapArray:
-				// TODO P1: libv.glr: Implement cube map array image
-				LIBV_GLR_DEBUG_ASSERT(false);
+				// TODO P3: libv.glr: Implement cube map array image
+				LIBV_GLR_DEBUG_ASSERT(false && "Not implemented yet");
 				break;
 			}
 		}
 
 		dirty_data = false;
+		dirty_dataMax = libv::vec3i{};
+		dirty_dataMin = levels[0].size;
 	}
 
 	if (dirty_filter) {
+		gl(texture).bind();
 		gl(texture).setMagFilter(magFilter);
 		gl(texture).setMinFilter(minFilter);
 		dirty_filter = false;

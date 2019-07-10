@@ -3,9 +3,13 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
+#include <libv/meta/reflection_access.hpp>
+// std
+#include <string>
+#include <string_view>
 // pro
 #include <libv/ui/component_base.hpp>
+#include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
 
@@ -15,51 +19,42 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ContextLayoutPass1;
-class ContextLayoutPass2;
-class ContextRender;
-class ContextUI;
-class Font2D;
-class ShaderFont;
-
 struct Label : ComponentBase {
-public: // <<< P1: public
+private:
+	struct PS {
+		PropertyAlignHorizontal align;
+		PropertyFont font;
+		PropertyFontColor font_color;
+		PropertyFontSize font_size;
+		PropertyShaderFont font_shader;
+
+		LIBV_REFLECTION_ACCESS(align);
+		LIBV_REFLECTION_ACCESS(font);
+		LIBV_REFLECTION_ACCESS(font_color);
+		LIBV_REFLECTION_ACCESS(font_shader);
+		LIBV_REFLECTION_ACCESS(font_size);
+	};
+
+private:
 	String2D string;
-//	StyleLabel_view style;
-	PropertySetLabel properties;
-	std::shared_ptr<ShaderFont> shader;
+public:
+	libv::ui::PropertySet<PS> properties;
 
 public:
 	Label();
+	Label(std::string name);
+	Label(UnnamedTag, const std::string_view type);
+	~Label();
 
 public:
-	inline void setText(std::string string_) {
-		string.setString(std::move(string_));
-		invalidate(Flag::invalidLayout);
-	}
-	inline const std::string& getText() const {
-		return string.getString();
-	}
-
-//public:
-//	vec4f& color() {
-//		return color_;
-//	}
-//	const vec4f& color() const {
-//		return color_;
-//	}
-//	void color(const vec4f& color_) {
-//		this->color_ = color_;
-//	}
-//	void color(float r, float g, float b, float a = 1.f) {
-//		color({r, g, b, a});
-//	}
+	void setText(std::string string_);
+	const std::string& getText() const;
 
 private:
-	virtual void doAttach(ContextUI& context) override;
-	virtual void doLayoutPass1(const ContextLayoutPass1& environment) override;
-	virtual void doLayoutPass2(const ContextLayoutPass2& environment) override;
+	virtual void doStyle() override;
 	virtual void doRender(ContextRender& context) override;
+	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
 };
 
 // -------------------------------------------------------------------------------------------------

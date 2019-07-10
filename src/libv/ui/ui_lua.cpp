@@ -16,6 +16,7 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/orientation.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
@@ -105,7 +106,7 @@ void process_style_property(UI& ui, Style& style, const std::string_view key, co
 	if (property("font", libv::lua::string_accept([&ui](const auto path){ return ui.context().font(path); }))) return;
 	if (property("font_color", pattern_color())) return;
 	if (property("font_outline", pattern_color())) return;
-	if (property("font_size", libv::lua::number<float>())) return;
+	if (property("font_size", libv::lua::as<FontSize>(libv::lua::number<float>()))) return;
 	if (property("size", libv::lua::string_parse(&libv::ui::parse_size_optional))) return;
 //	if (property("font_shader", libv::lua::string())) return;
 //	if (property("layout", libv::lua::string_parse(&libv::ui::parse_layout_optional))) return;
@@ -129,10 +130,10 @@ std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::f
 	ui_table["right"] = "right";
 	ui_table["top"] = "top";
 
-	ui_table["ORIENT_BOTTOM_TO_TOP"] = Orientation2::BOTTOM_TO_TOP;
-	ui_table["ORIENT_LEFT_TO_RIGHT"] = Orientation2::LEFT_TO_RIGHT;
-	ui_table["ORIENT_RIGHT_TO_LEFT"] = Orientation2::RIGHT_TO_LEFT;
-	ui_table["ORIENT_TOP_TO_BOTTOM"] = Orientation2::TOP_TO_BOTTOM;
+	ui_table["ORIENT_BOTTOM_TO_TOP"] = Orientation::BOTTOM_TO_TOP;
+	ui_table["ORIENT_LEFT_TO_RIGHT"] = Orientation::LEFT_TO_RIGHT;
+	ui_table["ORIENT_RIGHT_TO_LEFT"] = Orientation::RIGHT_TO_LEFT;
+	ui_table["ORIENT_TOP_TO_BOTTOM"] = Orientation::TOP_TO_BOTTOM;
 
 	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
 

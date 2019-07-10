@@ -63,7 +63,7 @@ private:
 
 private:
 	using ID = int64_t;
-	inline static std::atomic<ID> nextID = 0;
+	static inline std::atomic<ID> nextID = 0;
 	const ID id = nextID++; /// Informative ID for logging and monitoring
 
 private:

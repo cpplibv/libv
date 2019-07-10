@@ -348,6 +348,9 @@ public:
 			const std::string_view fmt,
 			const Args&... args) {
 
+		if (outputChains.empty() && outputs.empty())
+			return;
+
 		if (!notable(severity, module))
 			return;
 
@@ -390,42 +393,42 @@ public:
 	/// Level 1/6 log.
 	/// Trace - Only when tracing the code and execution steps
 	template <typename... Args>
-    inline void trace(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void trace(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Trace, fmt.location, fmt.value, args...);
 	}
 
 	/// Level 2/6 log.
 	/// Debug - Information that can be is diagnostically helpful
 	template <typename... Args>
-    inline void debug(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void debug(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Debug, fmt.location, fmt.value, args...);
 	}
 
 	/// Level 3/6 log.
 	/// Info  - Generally useful information to log (service start/stop, configuration assumptions, etc). Info is always available but is not important under normal circumstances
 	template <typename... Args>
-    inline void info(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void info(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Info, fmt.location, fmt.value, args...);
 	}
 
 	/// Level 4/6 log.
 	/// Warn  - Anything that could cause application oddities, but for which automatically recovering is possible (switching to backup server, retrying an operation, etc)
 	template <typename... Args>
-    inline void warn(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void warn(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Warn, fmt.location, fmt.value, args...);
 	}
 
 	/// Level 5/6 log.
 	/// Error - Any error which is fatal to the operation but not the service or application. Usually requires user intervention (missing file)
 	template <typename... Args>
-    inline void error(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void error(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Error, fmt.location, fmt.value, args...);
 	}
 
 	/// Level 6/6 log.
 	/// Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 	template <typename... Args>
-    inline void fatal(const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void fatal(const with_source_location<const std::string_view> fmt, const Args&... args) {
 		log.log(module, Logger::Severity::Fatal, fmt.location, fmt.value, args...);
 	}
 
@@ -433,7 +436,7 @@ public:
 	/// Level 1/6 log.
 	/// Trace - Only when tracing the code and execution steps
 	template <typename Bool, typename... Args>
-    inline void trace_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void trace_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Trace, fmt.location, fmt.value, args...);
 	}
@@ -441,7 +444,7 @@ public:
 	/// Level 2/6 log.
 	/// Debug - Information that can be is diagnostically helpful
 	template <typename Bool, typename... Args>
-    inline void debug_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void debug_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Debug, fmt.location, fmt.value, args...);
 	}
@@ -449,7 +452,7 @@ public:
 	/// Level 3/6 log.
 	/// Info  - Generally useful information to log (service start/stop, configuration assumptions, etc). Info is always available but is not important under normal circumstances
 	template <typename Bool, typename... Args>
-    inline void info_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void info_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Info, fmt.location, fmt.value, args...);
 	}
@@ -457,7 +460,7 @@ public:
 	/// Level 4/6 log.
 	/// Warn  - Anything that could cause application oddities, but for which automatically recovering is possible (switching to backup server, retrying an operation, etc)
 	template <typename Bool, typename... Args>
-    inline void warn_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void warn_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Warn, fmt.location, fmt.value, args...);
 	}
@@ -465,7 +468,7 @@ public:
 	/// Level 5/6 log.
 	/// Error - Any error which is fatal to the operation but not the service or application. Usually requires user intervention (missing file)
 	template <typename Bool, typename... Args>
-    inline void error_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void error_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Error, fmt.location, fmt.value, args...);
 	}
@@ -473,7 +476,7 @@ public:
 	/// Level 6/6 log.
 	/// Fatal - Any error that is forcing a shutdown of the service or application to prevent (further) data loss or corruption
 	template <typename Bool, typename... Args>
-    inline void fatal_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
+	inline void fatal_if(const Bool& condition, const with_source_location<const std::string_view> fmt, const Args&... args) {
 		if (condition)
 			log.log(module, Logger::Severity::Fatal, fmt.location, fmt.value, args...);
 	}

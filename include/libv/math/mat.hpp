@@ -144,6 +144,10 @@ public:
 		result = glm::ortho<T>(left, right, bottom, top);
 		return result;
 	}
+	
+	static constexpr inline mat_t ortho(const libv::vec2_t<T> position, const libv::vec2_t<T> size) {
+		return ortho(position.x, position.x + size.x, position.y, position.y + size.y);
+	}
 
 	static constexpr mat_t identity() {
 		return mat_t{1};

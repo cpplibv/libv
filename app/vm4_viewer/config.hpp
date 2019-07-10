@@ -28,11 +28,13 @@ namespace detail {
 struct ConfigViewer {
 	int window_height = 800;
 	int window_width = 1280;
+	int save_window_size = false;
 	std::vector<std::string> recent_projects;
 	std::vector<std::string> recent_models;
 
 	LIBV_REFLECTION_ACCESS(window_height);
 	LIBV_REFLECTION_ACCESS(window_width);
+	LIBV_REFLECTION_ACCESS(save_window_size);
 	LIBV_REFLECTION_ACCESS(recent_projects);
 	LIBV_REFLECTION_ACCESS(recent_models);
 };

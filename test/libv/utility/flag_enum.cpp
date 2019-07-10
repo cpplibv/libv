@@ -171,4 +171,20 @@ TEST_CASE("Mix operations with bit", "[flag_enum]") {
 	auto tmp_flag_5 = flag; CHECK((tmp_flag_5 &= libv::bit(5)).value() == 0b00100000);
 }
 
+TEST_CASE("reset", "[flag_enum]") {
+	test_flag flag_1{1};
+	test_flag flag_2{2};
+	auto flag_3 = flag_1 | flag_2;
+
+	CHECK(flag_3.value() == 0b00000011);
+	flag_3.reset(flag_1);
+	CHECK(flag_3.value() == 0b00000010);
+	flag_3.set(flag_1);
+	CHECK(flag_3.value() == 0b00000011);
+	flag_3.reset(flag_2);
+	CHECK(flag_3.value() == 0b00000001);
+	flag_3.reset(flag_1);
+	CHECK(flag_3.value() == 0b00000000);
+}
+
 // -------------------------------------------------------------------------------------------------

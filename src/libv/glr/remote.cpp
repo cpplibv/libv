@@ -77,7 +77,7 @@ void Remote::destroy() {
 	initalized = false;
 }
 
-void Remote::render() {
+void Remote::execute() {
 	for (auto& queue : queues) {
 		queue.execute(gl, *this);
 	}

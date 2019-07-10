@@ -128,7 +128,7 @@ public:
 
 class AttorneyTextureRemote {
 	friend class Queue;
-	inline static RemoteTexture& remote(const Texture& texture) noexcept {
+	static inline RemoteTexture& remote(const Texture& texture) noexcept {
 		return *texture.remote;
 	}
 };

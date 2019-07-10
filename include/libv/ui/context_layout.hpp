@@ -4,6 +4,8 @@
 
 // libv
 #include <libv/math/vec.hpp>
+// pro
+#include <libv/ui/event/mouse_table.hpp>
 
 
 namespace libv {
@@ -11,12 +13,18 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ContextLayoutPass1 {
+struct ContextLayout1 {
 };
 
-struct ContextLayoutPass2 {
+struct ContextLayout2 {
 	libv::vec3f position;
 	libv::vec3f size;
+	libv::ui::MouseOrder mouseOrder;
+
+	constexpr inline ContextLayout2(libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder mouseOrder) :
+		position(position),
+		size(size),
+		mouseOrder(mouseOrder) { }
 };
 
 // -------------------------------------------------------------------------------------------------

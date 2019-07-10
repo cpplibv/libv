@@ -42,11 +42,6 @@ void erase(Container& c, const T& value) {
 	c.erase(std::remove(c.begin(), c.end(), value), c.end());
 }
 
-template <typename Container, typename Pred>
-void erase_if(Container& c, Pred&& pred) {
-	c.erase(std::remove_if(c.begin(), c.end(), std::forward<Pred>(pred)), c.end());
-}
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv

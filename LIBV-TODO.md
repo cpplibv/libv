@@ -48,52 +48,204 @@ libv.ui.style: UI component's visualization and behaviour is controlled by prope
 GCC 9.1: Using <filesystem> does not require linking with -lstdc++fs now.
 libv.lua: object parser
 libv.glr.std140: constexpr static string to pretty name structs
-
---- STACK ------------------------------------------------------------------------------------------
-
 libv.ui: implement float container/layout based on the new container based layout property system
 libv.ui: rework panel container to the container based layout property system
 libv.ui: rework default layout to the container based layout property system
-libv.ui: add per component based property
-
-app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
-
+libv.glr: add viewport feature
+libv.ui: make window resize work
+libv.ui.style: style safe (parent) storage, replace observer_ref with intrusive_ptr
+libv.ui: context ptr in component
+libv.ui: attach must be called before create
+libv.ui: style auto inherit based on dots
+libv.ui: switch foreach children to fill a std::vector<component*>, this vector should be a reusable memory, or (?) just a small_vector<, 32> on the stack | layouts were promoted to containers
+libv.ui: integrate style into component and container
+libv.ui: auto-read container properties from component's styles
+libv.ui: auto-read component properties from component's styles
 libv.ui: hard type (enum) align anchor and orient
 libv.ui.style: layout properties
 libv.ui.style: font properties
+libv.ui: use generic_path in context for logging and lookup
+libv.ui: None of the module functions should be virtual (?) | they got removed
+libv.ui: context_render: move out of module, it is not one
+libv.ui: default * property should never be null, provide context access for the property system via archive
+libv.ui: manually assigned values to a property shall not be overridden by style (this will be related for animation)
+libv.ui: add component exclusive properties
+libv.ui: Structure properties and use libv reflection for property sets
+libv.ui: unify style and property function that are currently at 3 place (component_base::set/reset/value, propertySet::set, AccessComponent::style) (doStyle can stay, that is a different tale)
+libv.ui: setStyle should notify the parent, or signal a flag that its needs to restyled
+libv.ui: propagate property set change to actual invalidation of flags
+libv.ui: sort out property change auto invalidate flag
+libv.ui: releaseing a property override should trigger style lookup (reset function) if there is no style, give back the fallback value
+libv.ui: sort out flags, invalidation rules and validation traverses
+libv.ui: layout strong and week: flags/invalidations
+libv.ui: sort out component_base
+libv.ui: search and replace layoutPass -> layout
+libv.algorithm: Implement a bisect algorithm
+libv.range: Implement deinterleave view
+libv.ui: make layouts unit testable, its a must given the requirements, traits class for layout related types
+libv.ui: grid layout - every element has its own size
+libv.ui: port line layout and tests
+libv.ui: layouting with content size should not account for nested child non-requested content size: so image(100px, 100px) inside a panel(d,d): here panel should have 100px,100px size (and not the underlying image's size)
+libv.ui: port full layout and tests
+libv.ui: fix content size bug in full layout
+libv.ui: port float layout and tests
+libv.ui: fix content size bug in float layout
+libv.ui: basic panel base class to handle current panels
+libv.ui: remove / removaAll functions for every container
+libv.input: New lib to story input enums for frame, ui and hotkey
+libv.ui: MouseTable
+libv.ui: MouseWatcher
+libv.ui: MouseInterest
+libv.ui: MouseEvent
+libv.ui: Implement mouse order, for now as a simple depth counter passed along in ContextLayout2 (update the code in button dolayout2)
+libv.ui: button
+libv.ui: Events are mandatory at this point, implement them
+libv.ui: prettify EventMouse to have all the fancy accessors and query subevents
+libv.ui: hook up mouse window leave/enter
+libv.ui: layout, do not use component internal states as temp variables
+libv.ui: sort out lastPosition / lastSize (aka component layout caching)
+libv.ui: remove LastSize and LastPosition from component_base
+libv.ui.style: Instead of sub/unsub an alternative more safer API would be to traverse every component if any style changed and update components who actually needs it
+libv.ui: style should not track components, but restyle everything if style update happens as it should be extremely rare
+libv.ui: property should only invalidate if its != to previous value
+libv.frame: update glfw
+libv.ui: more foreach children usage, MORE and that could solve my Self/Child issue
+libv.ui: need doAttachSelf / doAttachChild separation, too easy to fuck-up watching a flag (?)
+libv.ui: childID
+libv.ui.style: Container child properties are not following style changes
+libv.ui.style: Container child properties are not following child's style changes
+libv.ui: more of property should only invalidate if its != to previous value
+libv.ui: implement component detach
+libv.ui: implement component remove
+libv.ui: implement layout flag
+libv.ui: implement render flag
+libv.ui: implement component destroy
+libv.ui: implement top level ui detach on exit
+libv.ui: implement top level ui destroy on exit
+libv.ui: Hide component internals
+libv.ui: kill every immediate importance TODO and make a proper commit
+libv.ui.style: account for event based style changing or state based style declaration
+libv.ui.style: style and property update | might be optional, or the animation system itself used for it | fullscan approch was implemented
+libv.ui.style: style could store each component using them making invalidation possible, would listen to attach/detach | fullscan
+libv.ui: implement detach and component removal
+libv.ui: wire in component create and destroy
+libv.ui: String2D would be nice to have both last line and non last line justify
+libv.ui: Label text change layout invalidation (lazy?) | verify
 
+--- STACK ------------------------------------------------------------------------------------------
+
+wish: rename LIBV_REQUIRES to WISH_REQUIRES | (?)
+wish: rename GIT_BRANCH and ..HASH to WISH_GIT_BRANCH and ..HASH | only the C++ macros, the cmake vars are correct
+libv.ui: rename ComponentBase to BaseComponent or even to Component (?) | (Component or BasicComponent might end up being a CRTP class)
+libv.log: rename libv::logger to libv::logger_stream
+libv.ui: rename size's "content" to "dynamic"
+libv.meta: rename n_times.hpp to for_constexpr
+libv.meta: rename if_void to lnv (as leftmost-non-void) and make it variadic
+libv.utility: rename approxing.hpp to approx.hpp and the class name too
+libv.frame: rename onContextInitialization, onContextRefresh, onContextTerminate to Create Update/Render Destroy
+libv.utility: Slice is an algorithm and not a utility
+
+frame
+	libv.frame: icon support
+	libv.frame: review the whole library
+	libv.frame: serialize events; and this will kill current signal-slot in frame
+	libv.sig: merge back the sig codebase
+	libv.sig: clean up the sig codebase
+	libv.frame: frame calling show after show may brake things?
+	libv.frame: dual check lock every async frame operations
+
+mouse
+	libv.ui: EventMouse add mouse states to fetch beside events
+	libv.ui: To access every input the following event order is important: update movement, broadcast and update button states one-by-one, broadcast movement. I think this will yield the most responsive experience
+	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
+
+event
+	libv.ui: focus / selection
+	libv.ui: keyboard input
+	libv.ui: input field
+	libv.ui: implement a button and other interactive components callback system aka: signal-slot
+	libv.ui: mouse event absorb/shield/plates
+	libv.ui: make sure absorb/shield/plates is easy to have/access for even non interactive components
+	libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass
+	libv.ui: if everything above is done re-read the requirements of mouse events and verify if all of them are met
+	libv.ui: EventMouse add keyboard states to fetch beside (mouse) events
+	libv.ui: Make a sandbox for a input->button->label->list
+
+component
+	libv.ui: layout padding
+	libv.ui: atlas definition/parsing
+	libv.ui: support atlas based images
+
+	libv.ui: clipping vertex shader (with on/off)
+	libv.ui: scroll pane | dont forget clip plane (scissors), and that would effect every ui shader!
+
+	libv.ui: list
+	libv.ui: table layout - only the columns and/or rows have size
+	libv.ui: not owning container view (list or table)
+
+style
+	libv.ui: parent depends on layout invalidation could be introduced into the property as function test just like fallback
+	libv.ui: verify that style change in child causes restyle in parent
+
+debug
+	libv.ui: direct access font texture
+	libv.ui: a way to debug / test / display every textures (font and other ui)
+
+cleanup
+	libv.ui: Implement / check on detach
+	libv.ui: Implement / check on destroy
+
+	libv.ui: change render position and change render size flags
+	libv.ui: layout pass member variables in component_base, they are a lot of memory
+	libv.ui: pimpl ContextUI or at least detach resource distributor
+
+properties
+	libv.ui: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
+	libv.ui: property system interaction with static_component system
+
+ui
+	libv.ui: static_component system
+	libv.ui: progress bar
+	libv.ui: add a glr::remote& to UI to simplify app::frame
+
+--- [[[ deadline: 2019.09.31 ]]] ---
+
+libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
+
+libv.ui: lua style parsing and lua file tracking with auto re-style
+
+libv.ui: Question: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner?
+libv.ui: Question: does style change means property update? | this could be a rare enough event to brute force the whole ui style refresh, but only if its not event driven
+
+libv.ui: include check everything / fwd everything
+
+libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
+libv.console: should depend on libv.arg
+
+libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
+
+app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
+app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
+
+--- [[[ deadline: 2019.10.30 ]]] ---
+
+libv.math: create vec_fwd and mat_fwd headers
+
+libv.ui: lua binding
 libv.ui: make sandbox_ui.lua work
 
-libv.ui.style: style safe (parent) storage, replace observer_ref with something
-
-libv.ui.style: account for event based style changing or state based style declaration
-libv.ui.style: style and property update | might be optional, or the animation system itself
-libv.ui.style: style could store each component using them making invalidation possible, would listen to attach/detach
+libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
+libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
 
 libv.ui.style: complex composite component would result in "nested" property sets
-libv.ui.style: multiple style usage in a component would still be nice, maybe synthetized styles?
-
-libv.ui: switch foreach children to fill a std::vector<component*>, this vector should be a reusable memory, or (?) just a small_vector<, 32> on the stack
+libv.ui: doLayout1 should use the return channel
 
 wish: update cmake version and use add_compile_definitions() instead of add_definitions()
 wish: target_link_directories()
 wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file
 
-libv.ui: implement detach and component removal
+libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
 
-libv.ui: rename ComponentBase to BaseComponent or even to Component (?)
-libv.log: rename libv::logger to libv::logger_stream
-libv.ui: rename size's "content" to "dynamic"
-libv.meta: rename n_times.hpp to for_constexpr
-libv.meta: rename if_void to lnv (as leftmost-non-void) and make it variadic
-libv.utility: Rename approxing.hpp to approx.hpp and the class name too
-
-libv.math: make every vec / mat operator a hidden friend
-
-libv.frame: update glfw
-libv.frame: icon support
-
-libv.ui: use generic_path in context for logging and lookup
 libv.ui: cleanup context_ui redundant codes
 libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 
@@ -105,88 +257,47 @@ libv.glr: RemoteTexture should have its own header file
 libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
 libv.glr: Mesh attributes should use a single VBO
 
-libv.ui: Label text change layout invalidation (lazy?)
-
-libv.ui: Hide component internals
 libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible
-
-libv.ui: Focus
-libv.ui: Event Input
-libv.ui: Input field
-libv.ui: Button
 
 libv.color: New libv.color library, color space conversion and manipulations, template color space, template representation
 libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
 libv.ui: Color picker
 
-libv.ui: Floating layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
+libv.ui: Docker layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
 
-libv.ui: Label select / copy from a label (?) if specific property is set for it
+libv.ui: Label select / copy from a label (?) if specific property is set for it | it sounds like a property
 libv.ui: Label link support (?)
 
-libv.ui: List or Table - Not owning container view
-libv.ui: Make a sandbox for a input->button->label->list
-
-libv.ui: scroll pane
-
-libv.ui: lua binding
-libv.ui: None of the module functions should be virtual (?)
-
-libv.ui: String2D would be nice to have both last line and non last line justify
-
-libv.ui: Can something be done about: change render position and change render size flags
-libv.ui: Can something be done about: layout pass member variables in component_base, they are a lot of memory
-libv.ui: I am sure that LastSize and LastPosition can be removed from component_base!
-
-libv.ui: layout strong and week invalidation
-
-libv.ui: font failure to load means fallback
-libv.ui: shader failure to load means fallback
+libv.ui: font failure to load means fallback | verify
+libv.ui: shader failure to load means fallback | verify
 libv.ui: shader dynamic loading from file
 
-libv.ui.text: render not found character
+libv.ui.font: render the not found character by 'hand'
 
 libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
 
-libv.ui: context_render: move out of module, it is not one
-
 libv.ui: constraints: a way of syncing data between the world and the ui
+libv.ui.layout: Flow
+libv.ui.layout: 2D <-> 3D based on game state
 libv.ui: ui <-> 3D layout linkage: planet names and additional informations are part of the ui and not the scene
 		ui therefore has to access the game state (trivial, but this code has to happen now)
 
-libv.ui.warning: warning if percent used inside a content is invalid
+libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras
 
-libv.ui: text
+libv.ui: text | easy text
 libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
 
-libv.ecui: component: Passive Label - verify
-libv.ecui: component: Passive Image - verify
-libv.ecui: component: Passive TableImage - verify
-libv.ecui: component: Interactive Button
-libv.ecui: layout: Flow
-libv.ecui: layout: Float
-libv.ecui: layout: 2D <-> 3D based on game state
-libv.ecui: layout: Line - verify
-libv.ecui: layout: Default (everything overlapped max)
-libv.ecui: group: RadioButton
-libv.ecui: wrapper: Scroll
-libv.ecui: wrapper: Splitter
-libv.ecui: composite: TextField (Label, TableImage, Label, +Events)
-
-libv.ecui: state based ui, separate control and data!
-libv.ecui: ui resource local proxies
+libv.ui: group: RadioButton
+libv.ui: Splitter
+libv.ui: composite: TextField (Label, TableImage, Label, +Events)
 
 libv.utility: add/verify structured binding support for vec_t
-libv.utility: Slice is an algorithm and not a utility
-
-libv.ui: libv/ui/render/context.hpp -> libv/ui/context.hpp (?)
-libv.ui: implement some ui stuff: btn / regions
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
 libv.glr: Fix uniform naming mess, Reduce the number of public members
-libv.glr: vm4
+libv.glr: vm4 | non trivial
 libv.gl: https://learnopengl.com/PBR/Lighting
 libv.glr: frame buffer
 libv.glr: render target
@@ -194,31 +305,31 @@ libv.glr: post-processing emission / bloom
 libv.glr: post-processing gamma
 libv.glr: post-processing haze
 
-
 libv.glr: shadow
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);
+libv.glr: Tiled Forward Shading (aka Forward+)
+			https://www.3dgep.com/forward-plus/
+libv.glr: Volume Tiled Forward Shading
+			https://www.3dgep.com/wp-content/uploads/2017/07/3910539_Jeremiah_van_Oosten_Volume_Tiled_Forward_Shading.pdf
 libv.glr: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading
+			https://www.3dgep.com/volume-tiled-forward-shading/
 libv.glr: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
 libv.glr: HDR https://learnopengl.com/Advanced-Lighting/HDR
 libv.glr: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
 libv.glr: FXAA
 libv.glr: SRAA
 libv.glr: Tiled-Deferred-Shading
-
-libv.vm4: Model viewer, display statistics of texture density and estimated texture pixel world space size
-
-libv.frame: frame calling show after show may brake things?
-libv.frame: dual check lock every async frame operations
+libv.glr: Order Independent Transparency (OIT)
 
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
-libv.utility: implement erase_unstable: x[index] = std::move(x[last]); x.erase(last)
 
 wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cmake_host_system_information.html#command:cmake_host_system_information
 wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
 wish: correct cmake target private/interface/public dependency (link and include) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
 wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
 
-cpp: fixate keyword order: [[nodiscard]] virtual explicit constexpr inline static const void function() const&& noexcept override final;
+libv.ecui: state based ui, separate control and data!
+libv.ecui: ui resource local proxies
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -226,7 +337,11 @@ asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cli: Clara, most important questions are: multi, optional, required, positional and default arguments
 			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
-cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency()
+cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency() | could I use separate cmake file for each ext and make a dependency on it ?
+color.math: colorspace of humans https://en.wikipedia.org/wiki/Lab_color_space
+color.math: http://graficaobscura.com/matrix/index.html
+color.picker: http://tristen.ca/hcl-picker/#/hlc/10/1/F68385/D1E468
+color.picker: https://tools.lgm.cl/colorpicker.html
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
@@ -254,17 +369,22 @@ cpp.proposal: P3 structured binding pack
 		auto& [...members] = object;
 cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
-
 cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
 cpp: (adaptive) radix tree - O(1) lookup
 cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
 cpp: clarify template vs auto type deduction rules
+cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inline const void&& function() const&& noexcept override final;
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
+ext: adopt and try out https://www.reactphysics3d.com/
+ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
+ext: compile time regex https://github.com/hanickadot/compile-time-regular-expressions
 frame.core: remove core
 frame: Move frames from disconnected monitor / off-screen
 frame: remove default own thread, give them an io_context like executor
+gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
+gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
 gl: docs http://docs.gl
 gl: framebuffer
 gl: glEnable(GL_DEBUG_OUTPUT);
@@ -272,16 +392,17 @@ gl: remove irrelevant member function from templated textures
 gl: renderbuffer
 gl: templated buffer for binding
 gl: uniformbuffer?
-layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
 libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv.log: log thread naming
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
+libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, that is too many template)
 libv.utility: Make a proper copy-pastable noisy type
 libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
+mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html
 observe: https://github.com/bkaradzic/bgfx
@@ -289,7 +410,7 @@ observe: https://github.com/hugoam/mud
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
-true: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
+ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
 ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
 ui: https://www.factorio.com/blog/post/fff-246
@@ -318,6 +439,10 @@ colorpicker:
 	- support realtime result preview
 	- visualize color distances, distance "bubbles"
 	- visualize picked colors in sliders too
+
+--- NOTE -------------------------------------------------------------------------------------------
+
+app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 
 --- ABANDONED --------------------------------------------------------------------------------------
 

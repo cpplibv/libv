@@ -4,11 +4,14 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/math/vec.hpp>
+#include <libv/meta/reflection_access.hpp>
 // std
 #include <string>
+#include <string_view>
 // pro
 #include <libv/ui/component_base.hpp>
+#include <libv/ui/property.hpp>
+#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -16,47 +19,34 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ContextLayoutPass1;
-class ContextRender;
-class ContextUI;
-class ShaderImage;
-class Texture2D;
-
 struct Stretch : ComponentBase {
 private:
-//	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
-	std::shared_ptr<ShaderImage> shader;
-	std::shared_ptr<Texture2D> image_;
+	struct PS {
+		PropertyColor color;
+		PropertyImage image;
+		PropertyShaderImage image_shader;
 
-	libv::vec4f color_ = {1.f, 1.f, 1.f, 1.f}; // <<< P4: Into properity color_ you go
+		LIBV_REFLECTION_ACCESS(color);
+		LIBV_REFLECTION_ACCESS(image);
+		LIBV_REFLECTION_ACCESS(image_shader);
+	};
+
+private:
+	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+public:
+	libv::ui::PropertySet<PS> properties;
 
 public:
 	Stretch();
-
-public:
-	void image(std::shared_ptr<Texture2D> image_);
-
-public:
-	vec4f& color() {
-		return color_;
-	}
-	const vec4f& color() const {
-		return color_;
-	}
-	void color(const vec4f& color_) {
-		this->color_ = color_;
-	}
-	void color(float r, float g, float b, float a = 1.f) {
-		color({r, g, b, a});
-	}
+	Stretch(std::string name);
+	Stretch(UnnamedTag, const std::string_view type);
+	~Stretch();
 
 private:
-	virtual void doAttach(ContextUI& context) override;
-	virtual void doLayoutPass1(const ContextLayoutPass1& environment) override;
+	virtual void doStyle() override;
 	virtual void doRender(ContextRender& context) override;
+	virtual void doLayout1(const ContextLayout1& environment) override;
 };
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

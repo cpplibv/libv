@@ -4,9 +4,14 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/math/vec.hpp>
+#include <libv/meta/reflection_access.hpp>
+// std
+#include <string>
+#include <string_view>
 // pro
 #include <libv/ui/component_base.hpp>
+#include <libv/ui/property.hpp>
+#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -14,36 +19,29 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ContextRender;
-class ContextUI;
-class ShaderQuad;
-
 struct Quad : ComponentBase {
 private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	std::shared_ptr<ShaderQuad> shader;
+	struct PS {
+		PropertyColor color;
+		PropertyShaderQuad quad_shader;
 
-	libv::vec4f color_ = {1.f, 1.f, 1.f, 1.f}; // <<< P4: Into properity color_ you go
+		LIBV_REFLECTION_ACCESS(color);
+		LIBV_REFLECTION_ACCESS(quad_shader);
+	};
+
+private:
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+public:
+	libv::ui::PropertySet<PS> properties;
 
 public:
 	Quad();
-
-public:
-	vec4f& color() {
-		return color_;
-	}
-	const vec4f& color() const {
-		return color_;
-	}
-	void color(const vec4f& color_) {
-		this->color_ = color_;
-	}
-	void color(float r, float g, float b, float a = 1.f) {
-		color({r, g, b, a});
-	}
+	Quad(std::string name);
+	Quad(UnnamedTag, const std::string_view type);
+	~Quad();
 
 private:
-	virtual void doAttach(ContextUI& context) override;
+	virtual void doStyle() override;
 	virtual void doRender(ContextRender& context) override;
 };
 

@@ -14,7 +14,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Range, typename Key>
-observer_ptr<typename Range::value_type> linear_find_optional(Range& range, const Key& key) {
+constexpr inline observer_ptr<typename Range::value_type> linear_find_optional(Range& range, const Key& key) {
 	const auto begin = std::begin(range);
 	const auto end = std::end(range);
 
@@ -23,12 +23,28 @@ observer_ptr<typename Range::value_type> linear_find_optional(Range& range, cons
 }
 
 template <typename Range, typename Pred>
-observer_ptr<typename Range::value_type> linear_find_if_optional(Range& range, const Pred& pred) {
+constexpr inline observer_ptr<typename Range::value_type> linear_find_if_optional(Range& range, const Pred& pred) {
 	const auto begin = std::begin(range);
 	const auto end = std::end(range);
 
 	const auto it = std::find_if(begin, end, pred);
 	return libv::make_observer(it != end ? std::addressof(*it) : nullptr);
+}
+
+template <typename Range, typename Key>
+constexpr inline auto linear_find_iterator(Range& range, const Key& key) {
+	const auto begin = std::begin(range);
+	const auto end = std::end(range);
+
+	return std::find(begin, end, key);
+}
+
+template <typename Range, typename Pred>
+constexpr inline auto linear_find_if_iterator(Range& range, const Pred& pred) {
+	const auto begin = std::begin(range);
+	const auto end = std::end(range);
+
+	return std::find_if(begin, end, pred);
 }
 
 // -------------------------------------------------------------------------------------------------

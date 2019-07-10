@@ -17,8 +17,10 @@
 // TODO P5: app.vm4_viewer: import model
 // TODO P5: app.vm4_viewer: display statistics
 // TODO P5: app.vm4_viewer: show model grey
-// TODO P5: app.vm4_viewer: show model wireframe
+// TODO P5: app.vm4_viewer: show model wireframe (GS based wireframe)
 // TODO P5: app.vm4_viewer: vm4 LOD support
+// TODO P5: app.vm4_viewer: pointless loading bar
+// TODO P5: app.vm4_viewer: thumbnail support, and auto generation (async operation)
 // TODO P5: app.vm4_viewer: display vm4 node hierarchy
 // TODO P5: app.vm4_viewer: show material information
 // TODO P5: app.vm4_viewer: show model texture information
@@ -44,6 +46,7 @@ const std::string DEFAULT_PROJECT_FOLDER = "project";
 
 int main(int argc, const char** argv) {
 	std::cout << libv::logger;
+//	libv::logger.deny_below(libv::Logger::Severity::Info);
 
 	(void) argc;
 	(void) argv;
@@ -54,7 +57,9 @@ int main(int argc, const char** argv) {
 	const auto config_filename = std::filesystem::path(DEFAULT_CONFIG_FILENAME);
 	const auto config_path = path_dir / config_filename;
 
-	app::log_app.info("Started {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
+	app::log_app.info("Current path  {}", libv::generic_path(std::filesystem::current_path()));
+	app::log_app.info("Executable    {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
+//	app::log_app.info("Last modified {}", std::filesystem::last_write_time(path));
 
 	app::ConfigViewer config(config_path);
 

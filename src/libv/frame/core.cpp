@@ -14,6 +14,7 @@
 #include <libv/frame/log.hpp>
 
 
+// TODO P3: DISPLAY_MODE_BORDERLESS is not perfect, fix it
 // TODO P4: Map glfw hint GLFW_FLOATING
 // TODO P4: Map glfw hint GLFW_FOCUSED
 // TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
@@ -89,8 +90,8 @@ private:
 		glfwTerminate();
 		glfwSetErrorCallback(nullptr);
 	}
-public:
 
+public:
 	void execute(std::function<void()>&& func) {
 		std::lock_guard<std::mutex> lk(mutex);
 		stopWait = true;

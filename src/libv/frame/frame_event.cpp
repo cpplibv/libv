@@ -92,11 +92,11 @@ void Frame::glfwCallback(const EventFramebufferSize& e) {
 }
 
 void Frame::glfwCallback(const EventKey& e) {
-	keyStates[to_value(e.key)] = (e.action != Action::release) ? KeyState::pressed : KeyState::released;
+	keyStates[to_value(e.key)] = (e.action != libv::input::Action::release) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 void Frame::glfwCallback(const EventMouseButton& e) {
-	mouseStates[to_value(e.button)] = (e.action != Action::release) ? KeyState::pressed : KeyState::released;
+	mouseStates[to_value(e.button)] = (e.action != libv::input::Action::release) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 void Frame::glfwCallback(const EventMouseEnter&) { }
@@ -167,9 +167,13 @@ void Frame::distributeEvents() {
 	eventQueFramebufferSize.flush();
 	eventQueKey.flush();
 	eventQueMouseButton.flush();
-	eventQueMouseEnter.flush();
+
+	// TODO P1: serialize events
 	eventQueMousePosition.flush();
 	eventQueMouseScroll.flush();
+	eventQueMouseEnter.flush(); // Enter is reordered to be the last mouse event so other events don't trigger false re-entry
+	//
+
 	eventQueWindowFocus.flush();
 	eventQueWindowIconify.flush();
 	eventQueWindowPosition.flush();

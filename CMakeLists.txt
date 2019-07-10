@@ -5,6 +5,7 @@ project(libv)
 
 include(ExternalProject)
 include(cmake/wish_create.cmake)
+include(cmake/wish_date.cmake)
 include(cmake/wish_git.cmake)
 include(cmake/wish_util.cmake)
 include(cmake/wish_warning.cmake)
@@ -13,8 +14,8 @@ include(cmake/wish_warning.cmake)
 
 set(CMAKE_VERBOSE_MAKEFILE off)
 #set(CMAKE_BUILD_TYPE "DEBUG")
-#set(CMAKE_BUILD_TYPE "RELEASE")
-set(CMAKE_BUILD_TYPE "DEV")
+set(CMAKE_BUILD_TYPE "RELEASE")
+#set(CMAKE_BUILD_TYPE "DEV")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
@@ -66,7 +67,7 @@ wish_warning(
 
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
-	# GNU -Wfloat-equal # some in tests, and some in ui might be true positive
+	# GNU -Wfloat-equal # some in tests, and some in ui might be true positive, ui got some true positive with ratio
 
 	# Only enable time-to-time to check on what is going on:
 	# GNU -Winline
@@ -127,6 +128,11 @@ add_compile_options(-fconcepts)
 # Sparing tooling from supporting requires, for now.
 add_definitions(-D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
 #wish_add_ide_definition("LIBV_REQUIRES(...)" " ")
+
+add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
+add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
+add_definitions(-DWISH_TIME_LONG="${WISH_TIME_LONG}")
+add_definitions(-DWISH_TIME_SHORT="${WISH_TIME_SHORT}")
 
 # Definitions --------------------------------------------------------------------------------------
 
@@ -527,7 +533,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_math INTERFACE
 	LINK   ext_glm # Remove (This will only happen with a vec concept)
-	LINK   ext_range # For concepts
+	LINK   ext_range # For concepts | # TODO P5: Do we still need this? Are we not using native concepts?
 )
 
 wish_create_library(

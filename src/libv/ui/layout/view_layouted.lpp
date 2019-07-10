@@ -1,0 +1,23 @@
+// File:   view_layouted.lpp Author: Vader Created on 04 September 2019, 08:08
+
+#pragma once
+
+// ext
+#include <range/v3/view/filter.hpp>
+
+
+namespace libv {
+namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+inline auto view_layouted() {
+	return ranges::view::filter([](const auto& child) {
+		return child.ptr->isLayouted();
+	});
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ui
+} // namespace libv

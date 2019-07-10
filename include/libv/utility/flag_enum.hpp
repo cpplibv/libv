@@ -68,10 +68,10 @@ public:
 	constexpr inline flag_enum& operator=(flag_enum&& rhs) & noexcept = default;
 
 public:
-	constexpr inline static flag_enum all() noexcept {
+	constexpr static inline flag_enum all() noexcept {
 		return flag_enum(~Underlying{0});
 	}
-	constexpr inline static flag_enum none() noexcept {
+	constexpr static inline flag_enum none() noexcept {
 		return flag_enum(Underlying{0});
 	}
 
@@ -106,7 +106,7 @@ public:
 		return *this;
 	}
 	constexpr inline flag_enum& reset(const flag_enum f) noexcept {
-		value_ &= ~f.value_;
+		value_ &= static_cast<Underlying>(~f.value_);
 		return *this;
 	}
 	constexpr inline flag_enum& reset(const bit f) noexcept {
@@ -119,6 +119,10 @@ public:
 	}
 	constexpr inline flag_enum& flip(const bit f) noexcept {
 		value_ ^= (Underlying{1} << f.index());
+		return *this;
+	}
+	constexpr inline flag_enum& clear() noexcept {
+		value_ = none();
 		return *this;
 	}
 
