@@ -424,6 +424,25 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME prometheus
+	GIT_REPOSITORY https://github.com/jupp0r/prometheus-cpp.git
+	GIT_TAG de66b57c42cc23b5b412ef4ae01697dbda259da4
+	CMAKE_ARGS
+		-DENABLE_TESTING=OFF
+	LINK prometheus-cpp-pull
+	LINK prometheus-cpp-push
+	LINK prometheus-cpp-core
+	LINK z
+
+	# TODO P3: Add support for linux link / define for net_ts
+	#	LINK $<IF:$<BOOL:${WIN32}>,
+	#			wsock32 ws2_32, # Win 32
+	#			 # Ubuntu 18.04
+	#		>
+	LINK wsock32 ws2_32
+)
+
+wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
 	GIT_TAG 08ef81acf5617366f8daa9d8b3b9bc8f7064ecf5
@@ -756,6 +775,12 @@ wish_create_executable(
 	TARGET sandbox_libv_lua
 	SOURCE sandbox/libv_lua_main.cpp
 	LINK   libv_log libv_lua
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_monitor
+	SOURCE sandbox/libv_monitor_main.cpp
+	LINK   ext_prometheus
 )
 
 wish_create_executable(
