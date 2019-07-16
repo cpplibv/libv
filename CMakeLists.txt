@@ -420,6 +420,18 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME mysqlclient
+#	URL https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.15-src.tar.gz
+	URL https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.15-src.zip
+#	SKIP_CONFIGURE_AND_BUILD
+#	INSTALL_COMMAND
+#		COMMAND mkdir -p ${PATH_EXT}/mysqlclient/include/
+#		COMMAND mkdir -p ${PATH_EXT}/mysqlclient/lib/
+#		COMMAND cp -r -f -T ${PATH_EXT_SRC}/mysqlclient/src/get_mysqlclient/include/ ${PATH_EXT}/mysqlclient/include/
+#		COMMAND cp -r -f -T ${PATH_EXT_SRC}/mysqlclient/src/get_mysqlclient/lib64/ ${PATH_EXT}/mysqlclient/lib/
+)
+
+wish_create_external(
 	NAME libbacktrace
 	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
 	GIT_TAG d0f5e95a87a4d3e0a1ed6c069b5dae7cbab3ed2a
@@ -519,6 +531,24 @@ wish_create_external(
 	INSTALL_COMMAND
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/sml/
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/include/
+)
+
+wish_create_external(
+	NAME sqlpp11
+	GIT_REPOSITORY https://github.com/rbock/sqlpp11.git
+	GIT_TAG 0.57
+	CMAKE_ARGS
+		-DHinnantDate_ROOT_DIR=${PATH_EXT}/date/
+)
+
+wish_create_external(
+	NAME sqlpp11_mysql
+	GIT_REPOSITORY https://github.com/rbock/sqlpp11-connector-mysql.git
+	GIT_TAG 0.25
+	CMAKE_ARGS
+#		-DHinnantDate_ROOT_DIR=${PATH_EXT}/date/
+		-DDATE_INCLUDE_DIR=${PATH_EXT}/date/include
+#		-DSQLPP11_INCLUDE_DIR=${PATH_EXT}/sqlpp11/include
 )
 
 wish_create_external(
