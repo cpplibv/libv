@@ -524,8 +524,38 @@ wish_create_external(
 wish_create_external(
 	NAME soil2
 	GIT_REPOSITORY https://github.com/VaderY/SOIL2.git
-	GIT_TAG master
-	LINK soil2 ${OPENGL_LIBRARIES}
+    GIT_TAG master
+    LINK soil2 ${OPENGL_LIBRARIES}
+)
+
+wish_create_external(
+	NAME sqlpp11
+	GIT_REPOSITORY https://github.com/rbock/sqlpp11.git
+	GIT_TAG 0.57
+	CMAKE_ARGS
+		-DHinnantDate_ROOT_DIR=${PATH_EXT}/date/
+)
+
+wish_create_external(
+	NAME sqlpp11_mysql
+	GIT_REPOSITORY https://github.com/rbock/sqlpp11-connector-mysql.git
+	GIT_TAG 0.25
+	CMAKE_ARGS
+#		-DHinnantDate_ROOT_DIR=${PATH_EXT}/date/
+		-DDATE_INCLUDE_DIR=${PATH_EXT}/date/include
+#		-DSQLPP11_INCLUDE_DIR=${PATH_EXT}/sqlpp11/include
+)
+
+wish_create_external(
+	NAME mysqlclient
+#	URL https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.15-src.tar.gz
+	URL https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.15-src.zip
+#	SKIP_CONFIGURE_AND_BUILD
+#	INSTALL_COMMAND
+#		COMMAND mkdir -p ${PATH_EXT}/mysqlclient/include/
+#		COMMAND mkdir -p ${PATH_EXT}/mysqlclient/lib/
+#		COMMAND cp -r -f -T ${PATH_EXT_SRC}/mysqlclient/src/get_mysqlclient/include/ ${PATH_EXT}/mysqlclient/include/
+#		COMMAND cp -r -f -T ${PATH_EXT_SRC}/mysqlclient/src/get_mysqlclient/lib64/ ${PATH_EXT}/mysqlclient/lib/
 )
 
 wish_create_external(
