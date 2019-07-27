@@ -363,7 +363,7 @@ wish_create_external(
 wish_create_external(
 	NAME glfw
 	GIT_REPOSITORY https://github.com/glfw/glfw.git
-	GIT_TAG 3.2.1
+	GIT_TAG efda4afb495be4779c152a96f7b3f52c54cbff32
 	CMAKE_ARGS
 		-DGLFW_BUILD_EXAMPLES=OFF
 		-DGLFW_BUILD_TESTS=OFF

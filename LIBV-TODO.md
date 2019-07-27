@@ -337,44 +337,82 @@ cpp.compile: things I want to know about my compile time:
 
 // -------------------------------------------------------------------------------------------------
 
-Window mode switching
-GLFW now supports switching between windowed and full screen modes and updating the monitor and desired resolution and refresh rate of full screen windows with glfwSetWindowMonitor.
+GLFW Update:
 
-Window maxmimization support
-GLFW now supports window maximization with glfwMaximizeWindow and the GLFW_MAXIMIZED window hint and attribute.
+Icons are preferred in 3 resolutions are: 16x16, 32x32, 48x48
 
-Window input focus control
-GLFW now supports giving windows input focus with glfwFocusWindow.
+Core
+	Added GLFW_TRANSPARENT_FRAMEBUFFER window hint and attribute for controlling per-pixel framebuffer transparency
+	Added glfwGetError function for querying the last error code and its description
+	Added glfwInitHint for setting initialization hints
+	Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
+	Added glfwSetErrorCallback, GLFWerrorfun and error type tokens for receiving error notifications
+	Added glfwSetMonitorUserPointer and glfwGetMonitorUserPointer for per-monitor user pointers
+	Added glfwSetWindowAttrib function for changing window attributes (#537)
+	Added glfwWaitEventsTimeout for waiting for events for a set amount of time
+	Added glfwWindowHintString for setting string type window hints (#893,#1139)
+	Deprecated window parameter of clipboard string functions
+	Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 
-Window size limit support
-GLFW now supports setting both absolute and relative window size limits with glfwSetWindowSizeLimits and glfwSetWindowAspectRatio.
+Frame
+	Added glfwCreateCursor, glfwCreateStandardCursor, glfwDestroyCursor and glfwSetCursor for managing system cursor images
+	Added glfwFocusWindow for giving windows input focus
+	Added glfwGetWindowFrameSize for retrieving the size of the frame around the client area of a window
+	Added glfwGetWindowOpacity and glfwSetWindowOpacity for controlling whole window transparency (#1089)
+	Added glfwMaximizeWindow for window maximization
+	Added glfwRequestWindowAttention function for requesting attention from the user
+	Added glfwSetWindowIcon for setting the icon of a window
+	Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
+	Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
+	Added glfwSetWindowSizeLimits and glfwSetWindowAspectRatio for setting absolute and relative window size limits
+	Deprecated charmods callback
+	glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
+	glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
+	glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
+	glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
+	glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
 
-Localized key names
-GLFW now supports querying the localized name of printable keys with glfwGetKeyName, either by key token or by scancode.
+Hints
+	Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
+	Added GLFW_FLOATING for creating always-on-top windowed mode windows
+	Added GLFW_FOCUSED window hint for controlling initial input focus
+	Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
+	Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
+	Added GLFW_JOYSTICK_HAT_BUTTONS init hint (#889)
+	Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
+	Added GLFW_MAXIMIZED for window maximization
+	Added GLFW_SCALE_TO_MONITOR window hint for automatic window resizing (#676,#1115)
+	Added glfwDefaultWindowHints for resetting all window hints to their default values
 
-Wait for events with timeout
-GLFW now supports waiting for events for a set amount of time with glfwWaitEventsTimeout.
+Input
+	Added glfwGetKeyName for querying the layout-specific name of printable keys
+	Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+	Added glfwRawMouseMotionSupported function for querying raw motion support (glfwRawMouseMotionSupported must be checked)
+	Added GLFW_RAW_MOUSE_MOTION input mode for selecting raw motion input (#125,#1400,#1401)
 
-Window icon support
-GLFW now supports setting the icon of windows with glfwSetWindowIcon.
+Joystick
+	Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
+	Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
+	Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
+	Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
+	Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
+	Added glfwSetJoystickCallback for joystick connection and disconnection events
+	Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
+	Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
 
-Raw timer access
-GLFW now supports raw timer values with glfwGetTimerValue and glfwGetTimerFrequency.
+Sample
+	Added 'cursor' simple cursor test programs
+	Added 'empty' test program for verifying posting of empty events
+	Added 'modes' video mode enumeration and setting test program
+	Added 'sharing' simple OpenGL object sharing test program
+	Added 'threads' simple multi-threaded rendering test program
+	Added 'windows' simple multi-window test program
 
-Joystick connection callback
-GLFW now supports notifying when a joystick has been connected or disconnected with glfwSetJoystickCallback.
+Monitor
+	Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
+	Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
+	Added glfwGetWindowContentScale, glfwGetMonitorContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 
-Context-less windows
-GLFW now supports creating windows without a OpenGL or OpenGL ES context with GLFW_NO_API.
-
-Run-time context creation API selection
-GLFW now supports selecting the context creation API at run-time with the GLFW_CONTEXT_CREATION_API window hint value.
-
-Error-free context creation
-GLFW now supports creating OpenGL and OpenGL ES contexts that do not emit errors with the GLFW_CONTEXT_NO_ERROR window hint, provided the machine supports the GL_KHR_no_error extension.
-
-CMake config-file package support
-GLFW now supports being used as a config-file package from other projects for easy linking with the library and its dependencies.
 
 // -------------------------------------------------------------------------------------------------
 
