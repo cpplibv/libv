@@ -37,6 +37,7 @@ struct EventKey {
 	libv::input::Key key;
 	libv::input::Scancode scancode;
 	libv::input::Action action;
+	// TODO P5: Remove Modifier mods
 	libv::input::KeyModifier mods;
 
 	std::string toPrettyString() const;
@@ -45,6 +46,7 @@ struct EventKey {
 struct EventMouseButton {
 	libv::input::MouseButton button;
 	libv::input::Action action;
+	// TODO P5: Remove Modifier mods
 	libv::input::KeyModifier mods;
 
 	std::string toPrettyString() const;

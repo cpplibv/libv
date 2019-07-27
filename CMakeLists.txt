@@ -132,6 +132,7 @@ add_compile_options(-fconcepts)
 # Sparing tooling from supporting requires, for now.
 add_definitions(-D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
 #wish_add_ide_definition("WISH_REQUIRES(...)" " ")
+add_definitions(-D "IDE_IGNORE\\(...\\)=__VA_ARGS__")
 
 add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
 add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
@@ -510,6 +511,14 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_control STATIC
+	SOURCE src/libv/control/*.cpp
+	LINK   libv_math libv_input libv_utility ext_fmt ext_boost ext_utf8cpp
+#	LINK   libv_input
+#	LINK   libv_math ext_fmt ext_boost ext_utf8cpp
+)
+
+wish_create_library(
 	TARGET libv_ecs INTERFACE
 	LINK   ext_boost ext_range
 )
@@ -645,13 +654,27 @@ wish_create_executable(
 )
 
 wish_end_group()
-wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
-
+wish_create_group(GROUP_EXAMPLE) # EXAMPLE ---------------------------------------------------------
 
 wish_create_executable(
-	TARGET sandbox_libv_libv
-	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log ext_boost ext_boost_stacktrace ext_glm ext_range
+	TARGET example_libv_control_camera
+	SOURCE example/control/camera/*.cpp
+	LINK   libv_control
+)
+
+wish_create_executable(
+	TARGET example_libv_control_hello
+	SOURCE example/control/hello/*.cpp
+	LINK   libv_control
+)
+
+wish_end_group()
+wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
+
+wish_create_executable(
+	TARGET sandbox_libv_control
+	SOURCE sandbox/libv_control_main.cpp
+	LINK   libv_log libv_control libv_frame libv_ui libv_utility
 )
 
 wish_create_executable(
@@ -706,6 +729,12 @@ wish_create_executable(
 	TARGET sandbox_libv_immer
 	SOURCE sandbox/libv_immer_main.cpp
 	LINK   ext_immer
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_libv
+	SOURCE sandbox/libv_main.cpp
+	LINK   libv_log libv_control ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(
@@ -831,6 +860,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET test_libv_control
+	SOURCE test/libv/control/*.cpp
+	LINK   obj_test_runner libv_control
+)
+
+wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
 	LINK   obj_test_runner libv_ecs libv_range
@@ -925,12 +960,14 @@ wish_end_group()
 # groups -------------------------------------------------------------------------------------------
 
 add_custom_target(group_application DEPENDS ${GROUP_APPLICATION})
+add_custom_target(group_example     DEPENDS ${GROUP_EXAMPLE})
 add_custom_target(group_externals   DEPENDS ${GROUP_EXTERNAL_PROJECT})
 add_custom_target(group_library     DEPENDS ${GROUP_LIBRARY})
 add_custom_target(group_sandbox     DEPENDS ${GROUP_SANDBOX})
 add_custom_target(group_unit_test   DEPENDS ${GROUP_UNIT_TEST})
 
 add_custom_target(app     DEPENDS group_application)
+add_custom_target(example DEPENDS group_example)
 add_custom_target(ext     DEPENDS group_externals)
 add_custom_target(lib     DEPENDS group_library)
 add_custom_target(sandbox DEPENDS group_sandbox)

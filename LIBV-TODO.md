@@ -368,6 +368,130 @@ app.vm4_viewer: shader should unsub from file watcher, ATM there is an issue dur
 app.vm4_viewer: solve 3 line of error while program reloading happens
 app.vm4_viewer: cleanup cpp shader codes
 app.vm4_viewer: ui feedback for glsl shader error, big red text
+libv.hotkey: Rename to libv.control
+libv.control: design API | multiple sub-system: normalization, routing, binding, conversion, action, context, presentation
+libv.control: context template static cast void* trick to set new context payload
+libv.control.sandbox: start a sandbox, compile a null operation
+libv.control.sandbox: compile/implement/run API front of feature_action
+libv.control.sandbox: compile/implement/run API front of feature_binary
+libv.control.sandbox: compile/implement/run API front of feature_analog
+libv.control: auto promote input to combination on demand in every context (preferably with overloads)
+libv.control: auto promote input to sequence on demand in every context (preferably with overloads)
+libv.control: auto promote combination to sequence on demand in every context (preferably with overloads)
+libv.control.sandbox: compile/implement/run API front of binding
+libv.control.sandbox: compile/implement/run API front of keycode/scancode input
+libv.control: Build internal SOW from input events
+libv.control.sandbox: compile/implement/run API front of update
+libv.control: InputID as_enum member function helpers, renaming of members getters
+libv.control: to_string for InputID
+libv.control: to_string for InputID enum members
+libv.control: change "--invalid--" to "<<invalid>>" and "<?>"
+libv.control: Move InputID tests to a test format
+libv.control: Improve InputID parse to handle mouse half dimension
+libv.control: Parsing joystick analog
+libv.control: Parsing joystick button
+libv.control: InputID Gamepad
+libv.control: Explicit Gamepad support
+libv.control: Gamepad support (except SOW)
+libv.control: Gamepad any support
+libv.control: Joystick any support
+libv.control: Parsing gamepad analog
+libv.input: Move Keycode parsing tests to libv.control and remove key parsing from libv.input
+libv.control: Gamepad SOW support
+libv.control: rename parse_input_sequence files
+libv.control: AnalogInputAction is not present in Input | invalid as it is present in inputID
+libv.control.parse: Active tests for keycode parsing
+libv.control: InputID alias matcher
+libv.control: InputID alias matcher tests
+libv.control: Routing: Every DIA x button
+libv.control: Routing: Every DIA x time
+libv.control: Routing: add binding states
+libv.control: design normalization layer
+libv.control: design routing layer
+libv.control: design binding and conversion layer
+libv.control: design context layer
+libv.control: design feature layer
+libv.control: Routing: maintain binding states
+libv.control: Routing combination of buttons
+libv.control.parse: Parsing gamepad button
+libv.control.parse: Test parsing invalid gamepad analog
+libv.control.parse: Test parsing invalid gamepad button
+libv.control: Routing issue: sequence checkpoint is uselessly too weak, "Ctrl+A, A" the first "A" release resets the checkpoint on the second step | solved by only reseting sequence from the last step
+libv.control: Button input processing
+libv.control: design presentation layer
+libv.control.parse: Input parsing
+libv.control.parse: Combination parsing
+libv.control.parse: Sequence parsing
+libv.control: Function to verify sequence rules
+libv.control.parse: Combination timeout parser | OR cut out combination timeout | choose latter | Invalidated
+libv.control: cut out combination timeout, make a global sequence timeout
+libv.control: Only Control level  sequence timeout, no per combination
+libv.control: libv/control/input.hpp is wrong name, it should be enum or someting like event enums, and Input class should have this header
+libv.control: implement rest of bind functions, call to parser
+libv.input: Add support for joysticks and game-pads
+libv.control: Sequence normalization
+libv.control: Sequence alias normalization
+libv.control: List binding fail conditions
+libv.control: Report binding errors, and fail if needed
+libv.control: Implement Controls::bind outcomes
+libv.control: Controls::bind and feature functions are not using ctors
+libv.control: Routing: Analog input processing
+libv.control: Routing: Time input processing
+libv.control: Routing: feature gather, and broadcast in step 2
+libv.control: Implement codepoint mapping
+libv.control: Routing: scancode
+libv.control: Routing: codepoint
+libv.control: Control level sequence timeout settings
+libv.control: Idea: sequence could mandate by rule to not have any funny dia for non last, hmmm, it should, even if I dont utalize this while coding... its really should. | verify does this, but verify is not yet really used
+libv.control: Idea: move dia from input to combination | what would it solve? | nothing, invalidated
+libv.control: AIA inside input ID is not a proper fit (!) blocking Analog input processing | I might be able to just ignore this one by two parameter | ignored with two parameter
+libv.control: scale and impulse settings for each input source (and for global)
+libv.control: Determine the correct scales, how each scale-er effect the final value (for simple and sequence case)
+libv.control: mouse is not diff but position based atm I think
+libv.control: mouse px is bad, use value normalized to shortest window dimension | both are needed: cannot change mouse sensitivity based on window or interactive area size without concent | mouse device px speed is the best solution | mouse px is ok if scaled
+libv.control: mouse hardcoded scale
+libv.control: Bind could use str instead of str_view, same goes for feature
+libv.control: cleanup or remove input_table.cpp/hpp and input_id.cpp | input_id.cpp stays
+libv.control: "2x4" to_string for sequence and combination | only name and symbol
+libv.control: Query if a binding has actually feature behind it
+libv.control: Feature register proxy
+libv.control: Feature register, a limited API view that only allows registering features
+libv.control: Feature auto-register solution to client global
+libv.control: Auto feature register, without the backed in global variable into the lib
+libv.control: Feature hash storage
+libv.control: Sequence builder | invalidated
+libv.control: Implement codepoint mapping observation
+libv.control: What is the format for IO? Json? Lua? XML? Text? | Some very rigid text for now
+libv.control: A way to quickly save and load bindings, aka binding serialization | Very plain text, bit painful
+libv.control: Design persistence layer
+libv.control: A way to quickly save and load settings: impulse, scale and timeout
+libv.control.parse: Automated test for every input_id: symbol, identifier and name to be parsable | not automated, but a decent test, automation would have not saved much time
+ext.x3: detect end of input, control and other parsers could benefit | x3::eoi
+libv.control.parse: Mouse scroll without dimension should default to Y, update symbol table and parser
+libv.control.parse: Mouse scroll should not require word_mouse | only if long names or mouse word are used so its not ambiguous
+libv.control.parse: InputID scroll parsing
+libv.control.parse: InputID parsing
+libv.control: reorganize files
+libv.control: Remove unused/commented codes
+libv.control: Cleanup first lines in every source file
+libv.control: Routing: Implement deadkey set single decision point
+libv.control: Routing: Sequences dead-key like behaviour
+libv.control: Routing: Idea: sequence can only progress to the next step if the current step is fully dissatisfied (maybe with the only exception to modifier keys, or a special flaggy thingy handwavey thing around dia); This would be the Netbeans way, but that does not allows holding down the modifiers and pressing keys and clion allows that | The Clion way is better
+libv.control: Routing: Time timeout sequences
+libv.control: Implement unbinding
+libv.control: Cleanup binding_outcome and unbinding_outcome
+libv.control: Binding storage (and active_bindings ptr stability)
+libv.control: Routing: Select bindings based on more specialized
+libv.control: Routing
+libv.control: Scale in analog member, they should be scale / time / impulse, and i should use them
+libv.control: Routing: record scale for entering active bindings | invalidated: killed button scales
+libv.control: Determine the correct scales for multi type combinations | invalidated: killed button scales
+libv.control: Scale implemented up to process functions, implement inside process and think about fullfilled binding
+libv.control: List (into the paper) what is: global/per source/per binding/per feature setting
+libv.control: Configuration and settings
+libv.control: Remove debug trace messages, CONTROL_DEBUG, iostream, etc...
+libv.control: 2 (+ 1) Example sandbox to presented in the paper
+
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -375,15 +499,392 @@ app.vm4_viewer: ui feedback for glsl shader error, big red text
 
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
+libv.control: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
+libv.control: introspection API should not see stated types | info type proxies
+libv.control: Binding binary operation setting and serialization
+
+
+Sequence: dead-key like behaviour
+		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
+
+		if there are dead-keys active
+			only consider dead-key set bindings
+		otherwise
+			consider every binding
+
+		if a combination got fulfilled
+			if it was a sequence's non-last combination or if it was not a sequence
+				collect into normal list
+			else
+				collect into ongoing_sequence list
+
+		select and filter (normal list AND ongoing_sequence list)
+		remove elements from ongoing_sequence that were not selected
+		broadcast among selected normal list
+
+
+		if (not ongoing_sequence.empty())
+			store ongoing_sequence as dead-key set and therefore enter dead-key mode
+
+
+		when to cancel a dead-key situation
+		if we are in a dead-key situation and any of the following occurs
+				event: that is not part of any new combination in dead-key set
+				event: not an opposite or holding of the previous history step of dead-key set
+				on time: sequence_timeout
+			then cancel dead-key situation by clearing the dead-key set and discarding the event
+
+
+
+
+libv.control: The control paper:
+	TODO notes:
+		Issue: Binding input sub sequence collusion
+			Given 'Shift + E' and 'E' binding, inputting 'Shift + E' will incorrectly satisfy both
+			Mistake:
+				Assumption: Inputs are serial
+				Reality: Input might be parallel (Throw grenade with Shift + F while WASD active)
+				Additional note: Multi combination inputs are expected to be serial at all times.
+				Additional note: Due to this, heuristic might be acceptable?
+
+			Solution A: (heuristic) prefer the more specialized bindings (? based on setting of the binding) | causes issues with non valid shortcuts matching a smaller one
+			Solution B: (at most internally) specify as the E version as not pressed: Shift [free] + E
+			Solution C: modifier bits, but that would introduce the inability to define custom modifiers
+			Solution D: per binding exclusivity definition:
+				- yield toward more specialized
+				- require exclusivity
+				- ignore independent
+				- allow non-interfering independent changes
+				- allow non-interleaving independent states
+				- ...
+
+			Solution placement 1: controls settings
+			Solution placement 2: per binding
+			Solution placement 3: per feature
+
+				Research required: both source and usage examples in multiple domain and programs
+				Document findings
+				Research required: feature based interruptibility matrix
+
+			Additional note:
+				Callbacks passed events could/should have an absorb flag. Binding and features could demand certain absorbs properties like only one absorb or allow subset sequences to be fired or allow parallel and so on...
+
+		Issue: Given 'E' and 'Shift + E' binding, inputting 'E' then pressing 'Shift' will do what? And why?
+
+		Issue: Need 2D input support (?), for example pie menu needs it too | that is UI absolute position
+
+		Click - Press > at most X time > Release
+		Double Click - Press > at most X time > Release > at most T time > Press > at most X time > Release
+
+		sequence (definition) + binding (info) + feature (name) [+ operation] = a single record
+
+	Outside of scope notes:
+		Issue: need a way to prevent scale above 1 on certain D->A time based bindings
+			Solution: just a flag for the analog feature to clamp scale to 0..1 or -1..1 before multiplying with time
+
+		Hidden features: option to register feature as non listable, but settable
+		Hidden binding: option to register a non listable binding, but still settable
+
+		Press type aka additional information on binding (AKA A/D converter):
+			N/A, Continuous (Hold), Press, Release, Double click, (Toggle), etc...
+			Threshold, Scale, Repeat rules, Offset, Ramp-up
+
+	sub-systems:
+		input normalization (definition): input id and parsing
+		routing                         : decision matrix
+		binding and conversion          :
+		context                         : injected objects
+		feature                         : callbacks
+		presentation                    : introspection
+		persistence                     : parsers and output streams, save and load of bindings
+
+	input sources:
+		keyboard
+			codepoint = codepoint resolution into keycode/scancode + warning on the UI unless it is part of the safe (A-Z0-9 and (?) more) range
+			keycode
+			modifier
+			scancode = warning on the UI
+		mouse
+			button
+			scroll
+			move
+		gamepad (and gamepad any)
+			button
+			analog
+		joystick (and joystick any)
+			button
+			analog
+		time
+		events (API)
+		context (API)
+
+	input type (used for binding information)
+		button - select state change edge
+		analog (as joystick or gamepad) - linearization, deadzone
+		movement - normalization px to 0..1
+
+	input event aliasing (event identification can produce alias events):
+		L/R Ctrl
+		L/R Shift
+		L/R Super
+		L/R Alt
+		Mouse X/X+/X-
+		Mouse Y/Y+/Y-
+		Scroll X/X+/X-
+		Scroll Y/Y+/Y-
+		Joystick Analog X/X+/X-
+		Joystick Analog Y/Y+/Y-
+		Any joystick (joystick without index)
+		Any gamepad (gamepad without index)
+
+	configuration and settings (wrong place here)
+		per source type
+			Analog: scale
+			Button: impulse/scale
+
+		per source (for gamepad and joystick)
+			Analog: scale
+			Button: impulse/scale
+
+		per binding
+			scale
+
+		per feature
+			Action: -
+			Binary: binary_operation
+			Analog: scale_analog/scale_binary <<< wrong
+
+	scales:
+		from event to binding
+			global time/button/analog/impulse
+			input type button/analog/impulse
+			optionally for multi devise input types per device button/analog/impulse
+			+1 hidden hard coded mouse / 600px
+
+		determine the correct scales
+		time scale/degrees/px/normalized_px/? scale
+		old scales are still somewhere in this paper, cleanup them
+
+	digital input action:
+		press   - input::press
+		release - input::release
+		repeat  - input::repeat
+		any     - maps to press, repeat, release
+		hold    - event on each frame if input is 1 (held down)
+		free    - event on each frame if input is 0 (released) (virtual, disabled to due logic)
+		auto    - maps to press, release and hold depending on output
+
+		tap - for <N sec                      (outside of scope of initial release) (digital)
+		double tap - for <N sec within <M sec (outside of scope of initial release) (digital)
+		hold - for N sec                      (outside of scope of initial release) (analog or digital)
+
+	feature:
+		types:
+			action: single action - void() // single shot event
+			binary: discrete binary state - void(bool state) // (accepts binary input, allows toggle)
+			analog: continuous control - void(float value) //
+
+	binding:
+		connect =      what      +  where  + (     how     +    do    )
+		binding = input sequence + feature + (conversation + operation)
+
+		binding operation on action features:
+			(no extra operation)
+
+		binding operation on binary features:
+			enable
+			disable
+			toggle
+			button state
+			inverted button state
+
+		binding operation on analog features:
+			scale (includes invert with negative scale)
+			(?) position
+			(?) difference
+			(?) dimension select
+			(?) dimension direction select
+			(?) dimension convert
+			(?) threshold
+			(?) multiple analog
+			(?) gamepad axis dead-zone
+			(?) gamepad axis linearization
+
+		exclusivity:
+			???
+
+		binding level:
+			Primary, binding information can be used to display on HUD
+			Secondary, binding information can be used to display in tutorial texts
+			Hidden
+
+	rule for input/combination/sequence:
+		sequence: only the last combination can be a non action dia or aia
+		combination: only one dia or aia can be an action (every aia can be considered an action, so only dia matters)
+		input: dia can have these values based on what inputID is
+		input: cannot have dia if inputID is analog
+		input: cannot have aia if inputID is button (solved by including aia in inputID)
+
+	context:
+		string + function_ptr + type_index + void* = context
+		if void* is nullptr then the context is inactive
+		context iteration order shall be deterministic
+
+		overloading: (ui.edit context can have different action sets based on focus)
+				context = function_ptr + type_index + void* (without string)
+
+	presentation:
+		ability to list every feature
+		ability to list every binding
+		ability to list every warnings / errors
+		ability to search in features / bindings
+		ability to search in features / bindings based on the current state
+		ability to search in features / bindings based on input sequence
+
+	interesting usages examples, things to investigate:
+		prefix collusion, especially for multi-stroke controls
+		example mouse movement while holding a button
+
+		app.editor.camera_orbit_X = Left Mouse + Mouse X
+		app.editor.camera_orbit_X = W
+		app.editor.camera_orbit_Z = Left Mouse + Right Mouse + Mouse Y
+		app.editor.grab_manipulator_under_cursor = Left Mouse
+		app.editor.move_selection_X = X + Mouse X * 2
+		app.editor.selection.to_upper = Ctrl + U, U
+
+		half control - how would walk forward and walk forward toggle look like
+
+		circle_quick_menu and mouse position | real name found: pie menu
+			app.editor.circle_quick_menu.open = Ctrl + Space
+			app.editor.circle_quick_menu.select = Click
+			app.editor.circle_quick_menu.select = Space
+			app.editor.circle_quick_menu.switch = Mouse // How would this one work?
+			app.editor.circle_quick_menu.ccw = Up
+			app.editor.circle_quick_menu.ccw = Left
+			app.editor.circle_quick_menu.cw = Down
+			app.editor.circle_quick_menu.cw = Right
+
+		right click to move command, long right click to move command with final direction/shape
+
+		granade wind and granade throw jó lenne kettő G [press] + G [release] helyett G [auto]
+			aka ez egy feature type lesz amivel az auto jól müködik együtt
+
+	NOTE:
+		32 context add / tick
+		32 context remove / tick
+		64 active context
+		64000 mouse position / tick (max if mouse position is rasterized, should be less with segment intersection)
+
+	Observations and research:
+		... in the xls
+
+
+libv.control: If I have enough time - IIHET
+	libv.control: IIHET: Binding profiles, and inheritance
+	libv.control: IIHET: Gamepad/joystick analog should be time related, but mouse and scroll are event based
+	libv.control: IIHET: Click and double click support would be nice
+	libv.control: IIHET: User should not be exposed to stated sequence (binding does that)
+	libv.control: IIHET: Idea: Stated and normal sequence common templated base class (?)
+	libv.control.parse: IIHET: identifier parsing (_ skipper or adjusting infos to match current parser)
+	libv.control: IIHET: Routing: Select sequence progression (beside bindings) based on more specialized
+
+libv.control: Integration queue:
+	libv.frame.input: Add support for joysticks and game-pads
+
+	libv.control: review glfwGetKeyName http://www.glfw.org/docs/latest/group__keys.html
+	libv.control: review glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
+	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+
+	glfw.joystick: Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
+	glfw.joystick: Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
+	glfw.joystick: Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
+	glfw.joystick: Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
+	glfw.joystick: Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
+	glfw.joystick: Added glfwSetJoystickCallback for joystick connection and disconnection events
+	glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
+	glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
+
+libv.control: Outside of paper scope - OOPS, but must implement
+	libv.control.routing: OOPS: Unrelated analog event cancels button sequence
+	libv.control: OOPS: Feature collection is collecting empty functions too
+	libv.control: OOPS: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
+
+libv.control: Outside of paper scope - OOPS
+	libv.control: OOPS: Split analog dimension to dimension and aia
+	libv.control: OOPS: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
+	libv.control: OOPS: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
+					In other word: an additional type between the current binding and feature, this would clean up string operations
+	libv.control: OOPS: Contexts information, state collusion information among contexts, use that for queries
+	libv.control: OOPS: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
+	libv.control.parse: OOPS: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
+	libv.control.parse: OOPS: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
+	libv.control.parse: OOPS: x3::eoi could improve matching, relax orders, optimize for most probably input
+	libv.control.parse: OOPS: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
+	libv.control: OOPS: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
+	libv.control: OOPS: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
+	libv.control: OOPS: event/feature chain interruptibility on colliding bindings:
+						add member to event: is_ambiguous
+						add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
+	libv.control: OOPS: Invalid sequence automated fixup | only if there is consent
+	libv.control: OOPS: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
+	libv.control: OOPS: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
+	libv.control: OOPS: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
+	libv.control: OOPS: feature registration show provide way for custom properties
+	libv.control: OOPS: hash based binding index for event where manually map everything to the most similar form
+	libv.control: OOPS: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
+	libv.control: OOPS: More introspection is possible: search feature by context with or without name
+	libv.control: OOPS: More introspection is possible: search binding with feature and sequence
+	libv.control: OOPS: More search possible: search_mode::wildcard (with . as the level separator)
+	libv.control: OOPS: More search possible: search_mode::any_word (with space as the word separator)
+	libv.control: OOPS: More search possible: search_mode::all_word (with space as the word separator)
+	libv.control: OOPS: Super flatten sequence and stated sequence
+	libv.control: OOPS: check_binding and check_feature are algorithm that should be generalized
+	libv.control: OOPS: Change in codepoint mapping can cause events with codepoint based inputs
+
+	libv.control.profile: OOPS: each binding entry would select: inherit (noop) / override / extend its parent binding entry
+
+	libv.control: OOPS: Idea: why not require codepoints to be inside the inputs events
+	libv.control: OOPS: Idea: dia as bitmask
+	libv.control: OOPS: Rep source type could be signed and analogs on negative, buttons on positive values
+	libv.control: OOPS: Ability to list every (active) context
+	libv.control: OOPS: Bind and profile api and serialization: override, empty override, append
+	libv.control: OOPS: A serialization... A serious one
+	libv.control: OOPS: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
+
+	libv.control: OOPS: libv::control -> libv::ctrl
+	libv.control: OOPS: Context level feature containers, or index so lookup faster (?)
+	libv.control: OOPS: Store more information about Context. Name, orthogonal and concurrent contexts
+	libv.control: OOPS: Idea of context groups, and under a group there are multiple types
+
+visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
+visual.grid: For grids expand and fade out line endings
+visual.grid: For grids fade out lines based on ray incident angle, lines should fade into the sky-box as seamlessly as possible
+visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
+visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
+cpp: move from to holds_alternative to get_if https://en.cppreference.com/w/cpp/utility/variant/get_if
 
 app.vm4_viewer: Camera controller class
-app.vm4_viewer: Camera controller class with lua binding
+app.vm4_viewer: Camera controller class jump controls with multiple interpolation type (linear camera motion is sickening, jumping camera movement/rotation should always ease out and in, in case of very long jumps skip in the middle segment)
 
 app.vm4_viewer: light source indicator
 app.vm4_viewer: camera pivot indicator
 app.vm4_viewer: camera orientation indicator
+app.vm4_viewer: ortho camera, and swapping
+
+app.vm4_viewer: Camera controller class with lua binding
+
+libv.input: rename EventKey::key to EventKey::keycode (?)
+libv.ui: MUST! Hide component memory management: sp<Label> -> Label = magic<ImplLabel> | AND move component creation to attach time -> that removes the ctor overhead, but add the issue that there can be no ctor arg passed
+libv.ui: MUST! Hide component parent management: thread local variable to hide UI* context in it?
+libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
+
+libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
+libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 
 app.vm4_viewer: light source mover
+
+app.vm4_viewer: Rulers: Display size rulers along the 3 dimension (3/6/9 value) of the max ranges
 
 app.vm4_viewer: Run time (and config time) options for debug tool toggles, or overlays: ui toggle buttons
 app.vm4_viewer: Add config option to auto open shader on errors: /netbeans/bin/netbeans64.exe --open {file}:{line}
@@ -393,6 +894,7 @@ app.vm4_viewer: Add config option for BS
 app.vm4_viewer: Add config option for grid-XY
 app.vm4_viewer: Add config option to not reset camera on model change
 
+libv.args: support or extension for the lib to support command line "late" commands, from a different process instance with a network hook
 app.vm4_viewer: Command line argument --open "file" to auto open file
 app.vm4_viewer: Command line argument --active open file in already running instance (overrides config option)
 
@@ -405,7 +907,12 @@ libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 
-libv.ui.raw: use constexpr std::span<const std::byte>
+app.bin_to_src: libv.arg-ify
+app.bin_to_src: command line argument for line length
+app.bin_to_src: use libv::span<const std::byte>
+app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
+
+libv: Update every file first lines with: // Project: LIBV, Author: Császár Mátyás [Vader], Email: vaderhun@gmail.com
 
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node
@@ -685,7 +1192,7 @@ overlay
 --- [[[ deadline: 2019.12.01 ]]] ---
 
 
-libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance | design API allow async (give next N passed entry or M failed entry)
+libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance | design API allow async/iterative (give next N passed entry or M failed (not matched) entry)
 
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
@@ -709,6 +1216,7 @@ wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cma
 wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
 wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
 wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
+wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
 
 libv.ui: Label select / copy from a label (?) if specific property is set for it | its a property
 
@@ -873,6 +1381,11 @@ libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 
 libv.fsw: Improve callback and tokens to not hold the mutex during event broadcast (callback), currently it is a deadlock
 
+libv.arg: recruit
+		(1) Tegye fel a kezét aki unja már, hogy nincsen értelmes argument parsing lib C++-hoz
+		(2) Tegye fel a kezét aki n
+		 ha van egy jó lib ötletem ami alkalmas lenne CPP FTW teamworkre
+		(Who would have guessed... Vader has a lib idea...)
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -936,7 +1449,7 @@ gold: And if thou gaze long at a finite automaton, a finite automaton also gazes
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 gold: existence / super-position based predication
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
-math: blue noise, a stable uniform noise
+math: blue noise, a stable uniform noise https://gist.github.com/pixelmager/5d25fa32987273b9608a2d2c6cc74bfa
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html
 observe: https://github.com/bkaradzic/bgfx
@@ -1020,6 +1533,7 @@ libv: generic general container storage
 --- NOTE -------------------------------------------------------------------------------------------
 
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
+bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
@@ -1051,15 +1565,6 @@ glfw.frame: Added glfwGetWindowOpacity and glfwSetWindowOpacity for controlling 
 
 glfw.input: Added glfwRawMouseMotionSupported function for querying raw motion support (glfwRawMouseMotionSupported must be checked)
 glfw.input: Added GLFW_RAW_MOUSE_MOTION input mode for selecting raw motion input (#125,#1400,#1401)
-
-glfw.joystick: Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
-glfw.joystick: Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
-glfw.joystick: Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
-glfw.joystick: Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
-glfw.joystick: Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
-glfw.joystick: Added glfwSetJoystickCallback for joystick connection and disconnection events
-glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
-glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
 
 glfw.sample: Added 'cursor' simple cursor test programs
 glfw.sample: Added 'empty' test program for verifying posting of empty events
@@ -1259,6 +1764,198 @@ wish_create_library(
 	TARGET vm4imp
 	LINK PUBLIC libv::log libv::vm4 ext::assimp
 )
+
+// -------------------------------------------------------------------------------------------------
+
+Additional cmake.wish ideas 2:
+
+wish_config(
+	TARGET                      __PARENT_TARGET_____TARGET__
+	FOLDER                      __PARENT_FOLDER__/__TARGET__
+	ALIAS                       __PARENT_ALIAS__::__TARGET__
+	SOURCE                      src/__FOLDER__/*.cpp
+	HEADER                      src/__FOLDER__/*.hpp
+
+	RESULT_PATH_BINARY_APP      bin/__FOLDER__/
+	RESULT_PATH_BINARY_EXAMPLE  bin/__FOLDER__/
+	RESULT_PATH_BINARY_SANDBOX  bin/__FOLDER__/
+	RESULT_PATH_BINARY_TEST     bin/__FOLDER__/
+	RESULT_PATH_HEADER          include/__FOLDER__/
+	RESULT_PATH_LIBRARY_DYNAMIC lib/__FOLDER__/
+	RESULT_PATH_LIBRARY_STATIC  lib/__FOLDER__/
+)
+
+string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+
+find_package(Threads REQUIRED)
+find_package(OpenGL REQUIRED)
+
+wish_create_base(
+	TARGET libv
+
+	WARNING GNU VERSION_GREATER 7.0 -Wduplicated-branches
+	WARNING GNU VERSION_GREATER 7.0 -Wrestrict
+	WARNING GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
+	WARNING GNU VERSION_GREATER 8.0 -Wcast-align=strict
+	WARNING GNU VERSION_GREATER 8.0 -Wmultistatement-macros
+
+	MODE DEBUG
+		OPTION -Og
+		OPTION -ggdb3
+	MODE RELEASE
+		OPTION -O3
+		OPTION -static
+	MODE DEV
+		OPTION -O3
+
+	OPTION -m64
+	OPTION -std=c++2a
+	OPTION -fconcepts
+
+	DEFINE -Dconcept="concept bool"
+	DEFINE -D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
+	IDE_DEFINE WISH_REQUIRES(...)
+
+	DEFINE -DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}"
+	DEFINE -DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
+	DEFINE -DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF}
+	DEFINE -DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/"
+)
+
+wish_create_library(
+	PARENT libv
+	TARGET vm4imp
+	LINK PUBLIC libv::log libv::vm4 ext::assimp
+)
+
+// -------------------------------------------------------------------------------------------------
+
+Additional lua.wish ideas:
+
+
+debug = mode("debug")
+release = mode("release")
+dev = mode("dev")
+
+config.target = "{PARENT_TARGET}_{TARGET}"
+config.folder = "{PARENT_FOLDER}/{TARGET}"
+config.alias  = "{PARENT_ALIAS}::{TARGET}"
+config.source = "src/{FOLDER}/**.cpp"
+config.header = "src/{FOLDER}/**.hpp"
+
+config.result_path_binary_app      = "bin/{FOLDER}/"
+config.result_path_binary_example  = "bin/{FOLDER}/"
+config.result_path_binary_sandbox  = "bin/{FOLDER}/"
+config.result_path_binary_test     = "bin/{FOLDER}/"
+config.result_path_header          = "include/{FOLDER}/"
+config.result_path_library_dynamic = "lib/{FOLDER}/"
+config.result_path_library_static  = "lib/{FOLDER}/"
+
+set.CMAKE_THREAD_PREFER_PTHREAD = "TRUE"
+set.THREADS_PREFER_PTHREAD_FLAG = "TRUE"
+
+find.package_require("Threads")
+find.package_require("OpenGL")
+
+
+ext_assimp = create_external("assimp", "https://github.com/assimp/assimp.git", "v5.0.0", {
+	BUILD_SHARED_LIBS = OFF,
+	CMAKE_EXPORT_COMPILE_COMMANDS = ON,
+	ASSIMP_BUILD_ASSIMP_TOOLS = OFF,
+	ASSIMP_BUILD_TESTS = OFF,
+	ASSIMP_BUILD_ZLIB = ON,
+	ASSIMP_NO_EXPORT = ON,
+
+	ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT = OFF,
+	ASSIMP_BUILD_FBX_IMPORTER = ON,
+})
+ext_assimp.link_public("assimp", "IrrXML", "zlibstatic")
+
+
+libv = create_base("libv")
+
+libv.warning("GNU VERSION_GREATER 7.0", "-Wduplicated-branches")
+libv.warning("GNU VERSION_GREATER 7.0", "-Wrestrict")
+libv.warning("GNU VERSION_GREATER 7.0", "-Wshadow-compatible-local")
+libv.warning("GNU VERSION_GREATER 8.0", "-Wcast-align=strict")
+libv.warning("GNU VERSION_GREATER 8.0", "-Wmultistatement-macros")
+
+libv.option(debug, "-Og")
+libv.option(debug, "--ggdb3")
+libv.option(release, "-O3")
+libv.option(release, "-static")
+libv.option(dev, "-O3")
+libv.option("-m64")
+libv.option("-std=c++2a")
+libv.option("-fconcepts")
+
+libv.define("concept=\"concept bool\"")
+libv.define("\"WISH_REQUIRES\\\\(...\\\\)=\\\"requires __VA_ARGS__\\\"\"")
+libv.ide_define("WISH_REQUIRES(...)")
+
+libv.define_wish_git_branch()
+libv.define_wish_git_commit()
+libv.define_wish_short_path_cutoff()
+libv.define_wish_short_path_prefix()
+
+libv_vm4imp = create_library(libv, "vm4imp");
+libv_vm4imp.link_public(libv_log libv_vm4 ext_assimp);
+
+
+// -------------------------------------------------------------------------------------------------
+
+Additional lua.wish ideas 2:
+
+
+debug = mode("debug")
+release = mode("release")
+dev = mode("dev")
+
+set.CMAKE_THREAD_PREFER_PTHREAD = "TRUE"
+set.THREADS_PREFER_PTHREAD_FLAG = "TRUE"
+find.package_require("Threads")
+find.package_require("OpenGL")
+
+
+ext_assimp = create_external("assimp", "https://github.com/assimp/assimp.git", "v5.0.0", {
+	BUILD_SHARED_LIBS = OFF,
+	CMAKE_EXPORT_COMPILE_COMMANDS = ON,
+	ASSIMP_BUILD_ASSIMP_TOOLS = OFF,
+	ASSIMP_BUILD_TESTS = OFF,
+	ASSIMP_BUILD_ZLIB = ON,
+	ASSIMP_NO_EXPORT = ON,
+
+	ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT = OFF,
+	ASSIMP_BUILD_FBX_IMPORTER = ON,
+})
+ext_assimp.link_public("assimp", "IrrXML", "zlibstatic")
+
+
+libv = create_base("libv")
+libv.warning_all()
+
+libv.option(debug, "-Og")
+libv.option(debug, "--ggdb3")
+libv.option(release, "-O3")
+libv.option(release, "-static")
+libv.option(dev, "-O3")
+libv.option("-m64")
+libv.option("-std=c++2a")
+libv.option("-fconcepts")
+
+libv.define("concept=\"concept bool\"")
+libv.define("\"WISH_REQUIRES\\\\(...\\\\)=\\\"requires __VA_ARGS__\\\"\"")
+libv.ide_define("WISH_REQUIRES(...)")
+
+libv.define_wish_git_branch()
+libv.define_wish_git_commit()
+libv.define_wish_short_path_cutoff()
+libv.define_wish_short_path_prefix()
+
+libv_vm4imp = create_library(libv, "vm4imp");
+libv_vm4imp.link_public(libv_log libv_vm4 ext_assimp);
 
 // -------------------------------------------------------------------------------------------------
 

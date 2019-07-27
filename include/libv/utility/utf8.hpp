@@ -6,6 +6,7 @@
 #include <utf8cpp/utf8.h>
 // std
 #include <array>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -37,6 +38,14 @@ template <typename = void>
 
 // -------------------------------------------------------------------------------------------------
 
+/// Returns true on success, returns false if end was reached before count step were taken
+template <typename octet_iterator, typename octet_sentinel>
+[[nodiscard]] bool next_unicode(octet_iterator& it, const octet_sentinel end, uint32_t& unicode) {
+	return utf8::internal::validate_next(it, end, unicode) == utf8::internal::UTF8_OK;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /// output size has to be at least 5 char (four octet + terminating zero)
 template <typename = void>
 void unicode_to_utf8_unchecked(uint32_t unicode, char* out) noexcept {
@@ -45,17 +54,15 @@ void unicode_to_utf8_unchecked(uint32_t unicode, char* out) noexcept {
 }
 
 template <typename = void>
-[[nodiscard]] std::string unicode_to_utf8_unchecked(uint32_t unicode) noexcept {
-	char buf[5];
-	unicode_to_utf8_unchecked(unicode, buf);
-	return std::string(buf);
-}
-
-template <typename = void>
 [[nodiscard]] auto unicode_to_utf8_array_unchecked(uint32_t unicode) noexcept {
 	std::array<char, 5> buf;
 	unicode_to_utf8_unchecked(unicode, buf.data());
 	return buf;
+}
+
+template <typename = void>
+[[nodiscard]] std::string unicode_to_utf8_unchecked(uint32_t unicode) noexcept {
+	return std::string(unicode_to_utf8_array_unchecked(unicode).data());
 }
 
 template <typename = void>

@@ -10,6 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P2: extract is the wrong name, it suggests removal. Rename to observe
 template <typename T, int Start, int Count = sizeof(T) * 8, typename Value>
 [[nodiscard]] constexpr inline T extract_high_bits(Value value) noexcept {
 	static_assert(Count >= 0, "");
