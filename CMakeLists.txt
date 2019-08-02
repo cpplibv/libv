@@ -751,9 +751,15 @@ wish_create_library(
 wish_create_group(GROUP_UNIT_TEST)
 
 wish_create_executable(
+	TARGET test_libv_algorithm
+	SOURCE test/libv/algorithm/*.cpp
+	LINK   obj_test_runner libv_algorithm
+)
+
+wish_create_executable(
 	TARGET test_libv_ecs
 	SOURCE test/libv/ecs/*.cpp
-	LINK   obj_test_runner libv_range
+	LINK   obj_test_runner libv_ecs libv_range
 )
 
 wish_create_executable(
