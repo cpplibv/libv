@@ -8,12 +8,45 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 ///
+/// Bisect
+/// If there are multiple roots, one will be chosen at pseudo random
+/// @param func - signature: Integral(T), negative return value root is greater, positive return value root is smaller, zero as return value root is found
+/// @param min - minimal value inclusive
+/// @param max - maximal value inclusive
+/// @return the first root found
+/// @example `bisect_3way([](int guess) { return guess - 5; }) == 5`
+///
+template <typename T, typename F>
+constexpr inline T bisect_3way(const F& func, T min, T max) noexcept(noexcept(func(min))) {
+	if (min > max)
+		std::swap(min, max);
+
+	while (true) {
+		if (min == max)
+			return min;
+
+		const auto guess = (min + max) / 2;
+		const auto hit = func(guess);
+
+		if (hit == 0)
+			return guess;
+		else if (hit < 0)
+			min = guess + 1;
+		else
+			max = guess - 1;
+	}
+
+	return min; // unreachable
+}
+
+///
 /// Bisect with initial up ramping
 /// If there are multiple roots, one will be chosen at pseudo random
 /// @param func - signature: Integral(T), negative return value root is greater, positive return value root is smaller, zero as return value root is found
 /// @param guess - initial hint
-/// @param step - initial step, if zero the first function result will be used as step
-/// @return the first found root
+/// @param step - initial step, if its zero the result of the first function call (with 0 as guess) multiplied with -1 will be used
+/// @return the first root found
+/// @example `bisect_rampup_3way([](int guess) { return guess - 5; }) == 5`
 ///
 template <typename T, typename F>
 constexpr inline T bisect_rampup_3way(const F& func, T guess = T{0}, T step = T{0}) noexcept(noexcept(func(guess))) {
@@ -43,27 +76,14 @@ constexpr inline T bisect_rampup_3way(const F& func, T guess = T{0}, T step = T{
 			step *= 2;
 		}
 
+	if (hit == 0)
+		return guess;
+
 	// Binary search
 	auto min = guess - step / 2 + 1;
 	auto max = guess - 1;
 
-	if (min > max)
-		std::swap(min, max);
-
-	while (hit != 0) {
-		if (min == max)
-			return min;
-
-		guess = (max + min) / 2;
-		hit = func(guess);
-
-		if (hit < 0)
-			min = guess + 1;
-		else
-			max = guess - 1;
-	}
-
-	return guess;
+	return bisect_3way(func, min, max);
 }
 
 // -------------------------------------------------------------------------------------------------
