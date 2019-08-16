@@ -3,6 +3,7 @@
 #pragma once
 
 // ext
+//#include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/view/all.hpp>
 #include <range/v3/view/view.hpp>
 #include <range/v3/view_facade.hpp>
@@ -76,3 +77,5 @@ RANGES_INLINE_VARIABLE(ranges::view::view<uft8_codepoints_fn>, uft8_codepoints)
 
 } // namespace view
 } // namespace libv
+
+//RANGES_SATISFY_BOOST_RANGE(::libv::view::detail::uft8_codepoints_view)
