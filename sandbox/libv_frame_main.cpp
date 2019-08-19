@@ -5,13 +5,14 @@
 // pro
 #include <libv/frame/frame.hpp>
 #include <libv/frame/log.hpp>
+#include <libv/input/inputs.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
 
-using libv::frame::Key;
+using libv::input::Key;
 
 void noisyEvents(libv::Frame& frame) {
 	const auto pretty_print_to_log = [](const auto& event) {

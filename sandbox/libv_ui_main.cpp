@@ -5,6 +5,7 @@
 // libv
 #include <libv/frame/frame.hpp>
 #include <libv/glr/remote.hpp>
+#include <libv/input/inputs.hpp>
 #include <libv/log/log.hpp>
 #include <libv/parse/color.hpp>
 // std
@@ -153,13 +154,13 @@ public:
 		// TODO P1: String2D content size should not include last inter glyph spacing
 
 		onKey.output([&](const libv::frame::EventKey& e) {
-			if (e.action == libv::frame::Action::release)
+			if (e.action == libv::input::Action::release)
 				return;
 
-			if (e.key == libv::frame::Key::Escape)
+			if (e.key == libv::input::Key::Escape)
 				closeDefault();
 
-			if (e.key == libv::frame::Key::Backspace) {
+			if (e.key == libv::input::Key::Backspace) {
 				label0->string.pop_back();
 				label2->string.pop_back();
 				label0->invalidate(libv::ui::Flag::invalidLayout);
@@ -167,7 +168,7 @@ public:
 				log_sandbox.trace("Pop back");
 			}
 
-			if (e.key == libv::frame::Key::Enter || e.key == libv::frame::Key::KPEnter) {
+			if (e.key == libv::input::Key::Enter || e.key == libv::input::Key::KPEnter) {
 				label0->string.push_back("\n");
 				label2->string.push_back("\n");
 				label0->invalidate(libv::ui::Flag::invalidLayout);
@@ -179,25 +180,25 @@ public:
 				return;
 
 			switch (e.key) {
-			case libv::frame::Key::Num0:
+			case libv::input::Key::Num0:
 				label0->properties.align = libv::ui::AlignHorizontal::Left;
 				label2->properties.align = libv::ui::AlignHorizontal::Left;
 				log_sandbox.trace("Set anchor to {}", "Left");
 				break;
 
-			case libv::frame::Key::Num1:
+			case libv::input::Key::Num1:
 				label0->properties.align = libv::ui::AlignHorizontal::Center;
 				label2->properties.align = libv::ui::AlignHorizontal::Center;
 				log_sandbox.trace("Set anchor to {}", "Center");
 				break;
 
-			case libv::frame::Key::Num2:
+			case libv::input::Key::Num2:
 				label0->properties.align = libv::ui::AlignHorizontal::Right;
 				label2->properties.align = libv::ui::AlignHorizontal::Right;
 				log_sandbox.trace("Set anchor to {}", "Right");
 				break;
 
-			case libv::frame::Key::Num3:
+			case libv::input::Key::Num3:
 				label0->properties.align = libv::ui::AlignHorizontal::Justify;
 				label2->properties.align = libv::ui::AlignHorizontal::Justify;
 				log_sandbox.trace("Set anchor to {}", "Justify");

@@ -7,14 +7,11 @@
 
 
 namespace libv {
-namespace frame {
+namespace input {
 
 // -------------------------------------------------------------------------------------------------
 
-//http://www.glfw.org/docs/latest/group__keys.html
-// TODO P2: review glfwGetKeyName and glfwSetInputMode
-
-enum class MonitorEvent : int32_t {
+enum class MonitorEvent : uint32_t {
 	connected = 0x00040001,
 	disconnected = 0x00040002,
 };
@@ -25,16 +22,50 @@ enum class Action : int32_t {
 	repeat = 2,
 };
 
-enum class KeyState {
+enum class KeyState : int32_t {
 	released = 0,
 	pressed = 1,
 };
 
-enum class KeyModifier : int32_t {
+enum class KeyModifier : uint32_t {
 	shift = 0x0001,
  	control = 0x0002,
 	alt = 0x0004,
 	super = 0x0008,
+};
+
+enum class Mouse : int32_t {
+	Button0 = 0,
+	Button1 = 1,
+	Button2 = 2,
+	Button3 = 3,
+	Button4 = 4,
+	Button5 = 5,
+	Button6 = 6,
+	Button7 = 7,
+
+	Left = Button0,
+	Right = Button1,
+	Middle = Button2,
+};
+
+enum class Joystick : int32_t {
+	Button0 = 0,
+	Button1 = 1,
+	Button2 = 2,
+	Button3 = 3,
+	Button4 = 4,
+	Button5 = 5,
+	Button6 = 6,
+	Button7 = 7,
+	Button8 = 8,
+	Button9 = 9,
+	Button10 = 10,
+	Button11 = 11,
+	Button12 = 12,
+	Button13 = 13,
+	Button14 = 14,
+	Button15 = 15,
 };
 
 enum class Key : int32_t {
@@ -159,25 +190,6 @@ enum class Key : int32_t {
 	AltRight = 346,
 	SuperRight = 347,
 	Menu = 348,
-
-	Last = Menu,
-};
-
-enum class Mouse : int32_t {
-	Button0 = 0,
-	Button1 = 1,
-	Button2 = 2,
-	Button3 = 3,
-	Button4 = 4,
-	Button5 = 5,
-	Button6 = 6,
-	Button7 = 7,
-
-	Left = Button0,
-	Right = Button1,
-	Middle = Button2,
-
-	Last = Button7,
 };
 
 // -------------------------------------------------------------------------------------------------
