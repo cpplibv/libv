@@ -14,7 +14,7 @@ namespace libv {
 /// @param min - minimal value inclusive
 /// @param max - maximal value inclusive
 /// @return the first root found
-/// @example `bisect_3way([](int guess) { return guess - 5; }) == 5`
+/// @example `bisect_3way([](int guess) { return guess - 5; }, 0, 10) == 5`
 ///
 template <typename T, typename F>
 constexpr inline T bisect_3way(const F& func, T min, T max) noexcept(noexcept(func(min))) {

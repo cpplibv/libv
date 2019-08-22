@@ -757,7 +757,7 @@ wish_create_group(GROUP_UNIT_TEST)
 wish_create_executable(
 	TARGET test_libv_algorithm
 	SOURCE test/libv/algorithm/*.cpp
-	LINK   obj_test_runner libv_algorithm
+	LINK   obj_test_runner libv_algorithm ext_range
 )
 
 wish_create_executable(

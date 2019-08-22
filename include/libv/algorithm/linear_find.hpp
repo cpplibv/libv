@@ -8,8 +8,6 @@
 // libv
 #include <libv/utility/observer_ptr.hpp>
 
-// TODO P5: Filename is a placeholder while a pattern is being established
-
 
 namespace libv {
 
