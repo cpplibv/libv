@@ -26,9 +26,13 @@ message(STATUS "Git commit: ${WISH_GIT_COMMIT_HASH}")
 
 # TODO ---------------------------------------------------------------------------------------------
 
-# TODO P3: Use the correct OpenGL linking cmake build-in options
-# TODO P4: Think about and try to remove PATH_EXT_IDE
-# ... see in Iris CMakeLists.txt
+# TODO P2: wish: debug symbol automated turn on/off
+# TODO P2: wish: use cmake copy function instead of "cp"
+# TODO P3: wish: add support for skipping library build/links via directly amending the sources of a dependency (only for DEV build)
+# TODO P3: wish: Use the correct OpenGL linking cmake build-in options
+# TODO P4: wish: inheritance for wish_create_executable and create_library
+# TODO P5: wish: modernize based on (GLOB will stay tho): https://www.youtube.com/watch?v=bsXLMQ6WgIk
+# TODO P5: wish: flag or build options to turn on/off sanitizes
 
 # Paths --------------------------------------------------------------------------------------------
 
@@ -308,16 +312,6 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME clara
-	GIT_REPOSITORY https://github.com/philsquared/Clara.git
-	GIT_TAG v1.1.4
-	SKIP_CONFIGURE_AND_BUILD
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/clara/include/clara/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/clara/src/get_clara/single_include ${PATH_EXT}/clara/include/clara/
-)
-
-wish_create_external(
 	NAME clip
 	GIT_REPOSITORY https://github.com/dacap/clip.git
 	GIT_TAG 3c8f05b5d71a4d5ea7125f074323307293332a92
@@ -541,6 +535,10 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_arg INTERFACE
+)
+
+wish_create_library(
 	TARGET libv_container INTERFACE
 )
 
@@ -662,7 +660,7 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/vm4_viewer/res
 	SOURCE app/vm4_viewer/*.cpp
-	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility 
+	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
 #	LINK   ext_date
 )
 
@@ -824,7 +822,8 @@ wish_end_group()
 
 # Tests --------------------------------------------------------------------------------------------
 
-# TODO P5: This should be an object library, but ran into troubles with target_link_libraries against object library
+# TODO P5: This should be an object library, but ran into troubles with target_link_libraries against object library,
+#			maybe an addition layer of interface would solve the problem
 wish_create_library(
 	TARGET obj_test_runner STATIC
 	SOURCE test/runner.cpp
@@ -837,6 +836,12 @@ wish_create_executable(
 	TARGET test_libv_algorithm
 	SOURCE test/libv/algorithm/*.cpp
 	LINK   obj_test_runner libv_algorithm ext_range
+)
+
+wish_create_executable(
+	TARGET test_libv_arg
+	SOURCE test/libv/arg/*.cpp
+	LINK   obj_test_runner libv_arg
 )
 
 wish_create_executable(
