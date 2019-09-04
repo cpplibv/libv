@@ -23,13 +23,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Button::Button() :
-	ComponentBase(UnnamedTag{}, "button") { }
+	BaseComponent(UnnamedTag{}, "button") { }
 
 Button::Button(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 Button::Button(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 Button::~Button() { }
 
@@ -117,7 +117,7 @@ void Button::doLayout1(const ContextLayout1& environment) {
 	const auto contentString = string.getContent(-1, -1);
 	const auto contentImage = libv::vec::cast<float>(properties.image()->size());
 
-	AccessLayout::lastContent(*this) = {libv::vec::max(contentString, contentImage), 0.f};
+	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
 void Button::doLayout2(const ContextLayout2& environment) {

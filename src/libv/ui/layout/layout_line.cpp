@@ -6,11 +6,11 @@
 #include <boost/container/small_vector.hpp>
 #include <range/v3/view/zip.hpp>
 // libv
-#include <libv/utility/approxing.hpp>
+#include <libv/utility/approx.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
 // pro
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
@@ -70,7 +70,7 @@ libv::vec3f LayoutLine::layout1(
 		const ContextLayout1& environment,
 		libv::span<Child> children,
 		const Properties& properties,
-		const ComponentBase& parent) {
+		const BaseComponent& parent) {
 
 	(void) environment;
 
@@ -85,9 +85,9 @@ libv::vec3f LayoutLine::layout1(
 	auto contentX = 0.f;
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
-		if (fix == libv::Approxing(0.f)) {
+		if (fix == libv::Approx(0.f)) {
 			return fix;
-		} else if (percent == libv::Approxing(100.f)) {
+		} else if (percent == libv::Approx(100.f)) {
 			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
 			return fix * 2.f;
 		} else {
@@ -100,16 +100,16 @@ libv::vec3f LayoutLine::layout1(
 
 		pixelX += child.properties.size()[_X_].pixel;
 		percentX += child.properties.size()[_X_].percent;
-		contentX += (child.properties.size()[_X_].content ? AccessLayout::lastContent(*child.ptr)[_X_] : 0.0f);
+		contentX += (child.properties.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_X_] : 0.0f);
 
 		result[_Y_] = libv::max(result[_Y_],
 				resolvePercent(
-						child.properties.size()[_Y_].pixel + (child.properties.size()[_Y_].content ? AccessLayout::lastContent(*child.ptr)[_Y_] : 0.0f),
+						child.properties.size()[_Y_].pixel + (child.properties.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Y_] : 0.0f),
 						child.properties.size()[_Y_].percent, *child.ptr));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
-						child.properties.size()[_Z_].pixel + (child.properties.size()[_Z_].content ? AccessLayout::lastContent(*child.ptr)[_Z_] : 0.0f),
+						child.properties.size()[_Z_].pixel + (child.properties.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Z_] : 0.0f),
 						child.properties.size()[_Z_].percent, *child.ptr));
 	}
 
@@ -122,7 +122,7 @@ void LayoutLine::layout2(
 		const ContextLayout2& environment,
 		libv::span<Child> children,
 		const Properties& properties,
-		const ComponentBase& parent) {
+		const BaseComponent& parent) {
 
 	(void) parent;
 
@@ -148,7 +148,7 @@ void LayoutLine::layout2(
 			childSize[index] =
 					child.properties.size()[index].pixel +
 					child.properties.size()[index].percent * 0.01f * environment.size[index] +
-					(child.properties.size()[index].content ? AccessLayout::lastContent(*child.ptr)[index] : 0.f);
+					(child.properties.size()[index].dynamic ? AccessLayout::lastDynamic(*child.ptr)[index] : 0.f);
 		});
 
 		sumRatioX += child.properties.size()[_X_].ratio;

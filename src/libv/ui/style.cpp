@@ -4,7 +4,7 @@
 // hpp
 #include <libv/ui/style.hpp>
 // pro
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/log.hpp>
 
 

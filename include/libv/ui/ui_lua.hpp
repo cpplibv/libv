@@ -18,9 +18,9 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class UI;
-class ComponentBase;
+class BaseComponent;
 
-std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file);
+std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file);
 
 // -------------------------------------------------------------------------------------------------
 

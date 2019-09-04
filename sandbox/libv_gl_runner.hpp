@@ -17,7 +17,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 // Runner ------------------------------------------------------------------------------------------
 

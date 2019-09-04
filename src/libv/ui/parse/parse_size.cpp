@@ -51,11 +51,11 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 		else
 			_val(ctx).ratio = _attr(ctx);
 	};
-	const auto map_content = [](auto& ctx) {
-		if (_val(ctx).content)
+	const auto map_dynamic = [](auto& ctx) {
+		if (_val(ctx).dynamic)
 			_pass(ctx) = false;
 		else
-			_val(ctx).content = true;
+			_val(ctx).dynamic = true;
 	};
 
 	const auto dimension = x3::rule<class dimension, SizeDim>{} =
@@ -63,8 +63,8 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 				(x3::float_ >> x3::no_case[x3::lit("px")])[map_pixel] |
 				(x3::float_ >> x3::no_case[x3::lit("%")])[map_percent] |
 				(x3::float_ >> x3::no_case[x3::lit("r")])[map_ratio] |
-				x3::no_case[x3::lit("dynamic")][map_content] |
-				x3::no_case[x3::lit("d")][map_content] |
+				x3::no_case[x3::lit("dynamic")][map_dynamic] |
+				x3::no_case[x3::lit("d")][map_dynamic] |
 				x3::lit("0")
 			);
 

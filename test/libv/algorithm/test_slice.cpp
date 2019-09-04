@@ -3,7 +3,7 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
-#include <libv/utility/slice.hpp>
+#include <libv/algorithm/slice.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

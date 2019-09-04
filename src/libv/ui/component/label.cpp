@@ -19,13 +19,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Label::Label() :
-	ComponentBase(UnnamedTag{}, "label") { }
+	BaseComponent(UnnamedTag{}, "label") { }
 
 Label::Label(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 Label::Label(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 Label::~Label() { }
 
@@ -70,7 +70,7 @@ void Label::doLayout1(const ContextLayout1& environment) {
 	string.setFont(properties.font(), properties.font_size());
 	string.setAlign(properties.align());
 	const auto content = string.getContent(-1, -1);
-	AccessLayout::lastContent(*this) = {content, 0.f};
+	AccessLayout::lastDynamic(*this) = {content, 0.f};
 }
 
 void Label::doLayout2(const ContextLayout2& environment) {

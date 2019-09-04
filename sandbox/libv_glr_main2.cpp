@@ -223,7 +223,7 @@ struct Sandbox {
 		render_remote(queue);
 
 		remote.queue(std::move(queue));
-		remote.render();
+		remote.execute();
 	}
 
 	void render_remote(libv::glr::Queue& gl) {
@@ -276,6 +276,6 @@ struct Sandbox {
 // Runner ------------------------------------------------------------------------------------------
 
 int main() {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 	return run_sandbox<Sandbox>("Sandbox libv.GL3", WINDOW_HEIGHT, WINDOW_WIDTH);
 }

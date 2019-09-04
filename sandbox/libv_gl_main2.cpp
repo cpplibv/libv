@@ -247,6 +247,6 @@ struct Sandbox {
 // Runner ------------------------------------------------------------------------------------------
 
 int main() {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 	return run_sandbox<Sandbox>("Sandbox libv.GL2", WINDOW_HEIGHT, WINDOW_WIDTH);
 }

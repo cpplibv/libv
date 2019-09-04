@@ -126,8 +126,8 @@ add_compile_options(-std=c++2a)
 add_compile_options(-fconcepts)
 
 # Sparing tooling from supporting requires, for now.
-add_definitions(-D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
-#wish_add_ide_definition("LIBV_REQUIRES(...)" " ")
+add_definitions(-D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
+#wish_add_ide_definition("WISH_REQUIRES(...)" " ")
 
 add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
 add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")
@@ -137,8 +137,8 @@ add_definitions(-DWISH_TIME_SHORT="${WISH_TIME_SHORT}")
 # Definitions --------------------------------------------------------------------------------------
 
 # Macro - Git
-add_definitions(-DGIT_BRANCH="${WISH_GIT_BRANCH}")
-add_definitions(-DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
+add_definitions(-DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}")
+add_definitions(-DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}")
 # Macro - Libv
 string(LENGTH ${CMAKE_SOURCE_DIR}_ WISH_SHORT_PATH_CUTOFF)
 add_definitions(-DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF})

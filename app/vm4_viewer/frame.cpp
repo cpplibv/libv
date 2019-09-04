@@ -102,13 +102,13 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 			config.window_height = e.size.y;
 		}
 	});
-	onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {
+	onContextCreate.output([&](const libv::frame::EventContextCreate&) {
 		create();
 	});
-	onContextRefresh.output([&](const libv::frame::EventContextRefresh&) {
+	onContextUpdate.output([&](const libv::frame::EventContextUpdate&) {
 		render();
 	});
-	onContextTerminate.output([&](const libv::frame::EventContextTerminate&) {
+	onContextDestroy.output([&](const libv::frame::EventContextDestroy&) {
 		destroy();
 	});
 }

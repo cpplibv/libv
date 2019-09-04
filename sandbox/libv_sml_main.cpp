@@ -81,7 +81,7 @@ struct tcp_release : libv::sml::state_machine {
 };
 
 int main() {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 	Sender s{};
 	my_logger ml{};

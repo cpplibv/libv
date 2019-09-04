@@ -1,4 +1,4 @@
-// File:   if_void.hpp Author: Vader Created on 31 May 2019, 22:38
+// File:   lnv.hpp Author: Vader Created on 31 May 2019, 22:38
 
 #pragma once
 
@@ -8,18 +8,23 @@ namespace meta {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: Make lnv variadic
+
+/// leftmost-non-void
 template <typename Test, typename Fallback>
-struct if_void {
+struct lnv {
 	using type = Test;
 };
 
+/// leftmost-non-void
 template <typename Fallback>
-struct if_void<void, Fallback> {
+struct lnv<void, Fallback> {
 	using type = Fallback;
 };
 
+/// leftmost-non-void
 template <typename Test, typename Fallback>
-using if_void_t = typename if_void<Test, Fallback>::type;
+using lnv_t = typename lnv<Test, Fallback>::type;
 
 // -------------------------------------------------------------------------------------------------
 

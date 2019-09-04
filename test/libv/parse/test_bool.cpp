@@ -3,7 +3,7 @@
 #include <catch/catch.hpp>
 
 #include <libv/parse/bool.hpp>
-#include <libv/utility/approxing.hpp>
+#include <libv/utility/approx.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

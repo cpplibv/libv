@@ -197,15 +197,15 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct EventContextInitialization {
+struct EventContextCreate {
 	std::string toPrettyString() const;
 };
 
-struct EventContextRefresh {
+struct EventContextUpdate {
 	std::string toPrettyString() const;
 };
 
-struct EventContextTerminate {
+struct EventContextDestroy {
 	std::string toPrettyString() const;
 };
 

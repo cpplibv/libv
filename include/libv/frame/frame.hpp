@@ -212,9 +212,9 @@ public:
 	 * This event occurs even if the default close operation does not close the frame. */
 	Event<EventCloseRequest> onCloseRequest;
 
-	Event<EventContextInitialization> onContextInitialization;
-	Event<EventContextRefresh> onContextRefresh;
-	Event<EventContextTerminate> onContextTerminate;
+	Event<EventContextCreate> onContextCreate;
+	Event<EventContextUpdate> onContextUpdate;
+	Event<EventContextDestroy> onContextDestroy;
 
 	// ---------------------------------------------------------------------------------------------
 private:

@@ -13,7 +13,7 @@
 // -------------------------------------------------------------------------------------------------
 
 int main() {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 	auto lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
 
@@ -29,6 +29,7 @@ int main() {
 		return v0 - v1
 	)");
 
+	(void) result;
 	assert(result == libv::vec3f(1, 0, -1));
 	assert(i == 1);
 

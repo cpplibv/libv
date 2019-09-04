@@ -9,7 +9,7 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
@@ -20,7 +20,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct LabelImage : ComponentBase {
+struct LabelImage : BaseComponent {
 private:
 	struct PS {
 		PropertyColor color;

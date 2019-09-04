@@ -106,7 +106,7 @@ public:
 	}
 
 	template <typename T>
-		LIBV_REQUIRES(std::is_base_of_v<Shader, T>)
+		WISH_REQUIRES(std::is_base_of_v<Shader, T>)
 	std::shared_ptr<T> shader() {
 		auto& wp = cache_typed_shader[typeid(T)];
 		auto sp = std::static_pointer_cast<T>(wp.lock());

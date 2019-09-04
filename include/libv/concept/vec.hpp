@@ -5,7 +5,7 @@
 // std
 #include <type_traits>
 // libv
-#include <libv/meta/if_void.hpp>
+#include <libv/meta/lnv.hpp>
 
 
 namespace libv {
@@ -16,14 +16,14 @@ namespace libv {
 /// @param Type - The Type to be tested
 /// @param Element - Optional parameter to specify the Element's Type
 /// @example Concept usage:\code
-/// template <typename V> LIBV_REQUIRES(Vec2<V>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec2<V>) void function(V& vec) {}\endcode
 /// @example Concept usage with Element type specified:\code
-/// template <typename V> LIBV_REQUIRES(Vec2<V, float>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec2<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
 concept bool Vec2 = requires(Vector vector) {
-		requires std::is_same_v<decltype(vector.x), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.y), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires sizeof(vector) == 2 * sizeof(libv::meta::if_void_t<Element, decltype(vector.x)>);
+		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires sizeof(vector) == 2 * sizeof(libv::meta::lnv_t<Element, decltype(vector.x)>);
 		requires &vector.x < &vector.y;
 };
 
@@ -31,15 +31,15 @@ concept bool Vec2 = requires(Vector vector) {
 /// @param Type - The Type to be tested
 /// @param Element - Optional parameter to specify the Element's Type
 /// @example Concept usage:\code
-/// template <typename V> LIBV_REQUIRES(Vec3<V>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec3<V>) void function(V& vec) {}\endcode
 /// @example Concept usage with Element type specified:\code
-/// template <typename V> LIBV_REQUIRES(Vec3<V, float>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec3<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
 concept bool Vec3 = requires(Vector vector) {
-		requires std::is_same_v<decltype(vector.x), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.y), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.z), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires sizeof(vector) == 3 * sizeof(libv::meta::if_void_t<Element, decltype(vector.x)>);
+		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.z), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires sizeof(vector) == 3 * sizeof(libv::meta::lnv_t<Element, decltype(vector.x)>);
 		requires &vector.x < &vector.y;
 		requires &vector.y < &vector.z;
 };
@@ -48,16 +48,16 @@ concept bool Vec3 = requires(Vector vector) {
 /// @param Type - The Type to be tested
 /// @param Element - Optional parameter to specify the Element's Type
 /// @example Concept usage:\code
-/// template <typename V> LIBV_REQUIRES(Vec4<V>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec4<V>) void function(V& vec) {}\endcode
 /// @example Concept usage with Element type specified:\code
-/// template <typename V> LIBV_REQUIRES(Vec4<V, float>) void function(V& vec) {}\endcode
+/// template <typename V> WISH_REQUIRES(Vec4<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
 concept bool Vec4 = requires(Vector vector) {
-		requires std::is_same_v<decltype(vector.x), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.y), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.z), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires std::is_same_v<decltype(vector.w), libv::meta::if_void_t<Element, decltype(vector.x)>>;
-		requires sizeof(vector) == 4 * sizeof(libv::meta::if_void_t<Element, decltype(vector.x)>);
+		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.z), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires std::is_same_v<decltype(vector.w), libv::meta::lnv_t<Element, decltype(vector.x)>>;
+		requires sizeof(vector) == 4 * sizeof(libv::meta::lnv_t<Element, decltype(vector.x)>);
 		requires &vector.x < &vector.y;
 		requires &vector.y < &vector.z;
 		requires &vector.z < &vector.w;
@@ -76,7 +76,7 @@ concept bool Vec4 = requires(Vector vector) {
 //template <typename Vector, size_t N, typename Element = void>
 //concept bool Vec = requires(Vector vector) {
 //		requires std::is_void_v<Element> || std::is_same_v<decltype(vector[0]), Element>;
-//		requires sizeof(vector) == N * sizeof(libv::meta::if_void_t<Element, decltype(vector[0])>);
+//		requires sizeof(vector) == N * sizeof(libv::meta::lnv_t<Element, decltype(vector[0])>);
 //};
 //
 //// -------------------------------------------------------------------------------------------------

@@ -45,8 +45,8 @@ const std::string DEFAULT_PROJECT_FOLDER = "project";
 // -------------------------------------------------------------------------------------------------
 
 int main(int argc, const char** argv) {
-	std::cout << libv::logger;
-//	libv::logger.deny_below(libv::Logger::Severity::Info);
+	std::cout << libv::logger_stream;
+//	libv::logger_stream.deny_below(libv::Logger::Severity::Info);
 
 	(void) argc;
 	(void) argv;

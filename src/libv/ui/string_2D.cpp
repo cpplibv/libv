@@ -10,7 +10,7 @@
 #include <libv/glr/queue.hpp>
 #include <libv/range/view_uft8_codepoints.hpp>
 #include <libv/utility/observer_ref.hpp>
-#include <libv/utility/slice.hpp>
+#include <libv/algorithm/slice.hpp>
 // std
 #include <algorithm>
 #include <array>

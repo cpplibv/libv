@@ -15,67 +15,67 @@ namespace libv {
 /// @param T
 /// @param Precision
 template <typename T, int Precision = -5>
-struct Approxing {
+struct Approx {
 	static constexpr T epsilon = T{std::pow<T>(10, Precision)};
 
 	T value;
 
-	Approxing() = default;
-	inline Approxing(const Approxing& orig) = default;
-	inline Approxing(Approxing&& orig) = default;
+	Approx() = default;
+	inline Approx(const Approx& orig) = default;
+	inline Approx(Approx&& orig) = default;
 
-	inline Approxing(T value) :
+	inline Approx(T value) :
 		value(std::move(value)) { }
 
 	template <typename V>
-	friend inline bool operator==(const Approxing& lhs, const V& rhs) {
+	friend inline bool operator==(const Approx& lhs, const V& rhs) {
 		return std::abs(lhs.value - rhs) <= epsilon;
 	}
 
 	template <typename V>
-	friend inline bool operator==(const V& lhs, const Approxing& rhs) {
+	friend inline bool operator==(const V& lhs, const Approx& rhs) {
 		return rhs == lhs;
 	}
 
 	template <typename V>
-	friend inline bool operator!=(const Approxing& lhs, const V& rhs) {
+	friend inline bool operator!=(const Approx& lhs, const V& rhs) {
 		return std::abs(lhs.value - rhs) > epsilon;
 	}
 
 	template <typename V>
-	friend inline bool operator!=(const V& lhs, const Approxing& rhs) {
+	friend inline bool operator!=(const V& lhs, const Approx& rhs) {
 		return rhs != lhs;
 	}
 
 	template <typename V>
-	friend inline bool operator>(const Approxing& lhs, const V& rhs) {
+	friend inline bool operator>(const Approx& lhs, const V& rhs) {
 		return lhs + epsilon > rhs;
 	}
 
 	template <typename V>
-	friend inline bool operator>(const V& lhs, const Approxing& rhs) {
+	friend inline bool operator>(const V& lhs, const Approx& rhs) {
 		return lhs > rhs - epsilon;
 	}
 
 	template <typename V>
-	friend inline bool operator<(const Approxing& lhs, const V& rhs) {
+	friend inline bool operator<(const Approx& lhs, const V& rhs) {
 		return !(rhs > lhs);
 	}
 
 	template <typename V>
-	friend inline bool operator<(const V& lhs, const Approxing& rhs) {
+	friend inline bool operator<(const V& lhs, const Approx& rhs) {
 		return !(rhs > lhs);
 	}
 
 	template <typename OS>
-	friend OS& operator<<(OS& os, const Approxing& av) {
+	friend OS& operator<<(OS& os, const Approx& av) {
 		os << av.value << "±" << av.epsilon;
 		return os;
 	}
 };
 
 template <typename T>
-Approxing(T) -> Approxing<T>;
+Approx(T) -> Approx<T>;
 
 // -------------------------------------------------------------------------------------------------
 

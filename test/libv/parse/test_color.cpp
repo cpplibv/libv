@@ -3,7 +3,7 @@
 #include <catch/catch.hpp>
 
 #include <libv/parse/color.hpp>
-#include <libv/utility/approxing.hpp>
+#include <libv/utility/approx.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -12,7 +12,7 @@ namespace {
 
 using libv::parse::parse_color_or_throw;
 using libv::parse::parse_color_optional;
-using color = libv::vec4_t<libv::Approxing<float, -3>>;
+using color = libv::vec4_t<libv::Approx<float, -3>>;
 
 } // namespace
 

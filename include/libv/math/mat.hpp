@@ -72,12 +72,12 @@ public:
 	}
 
 	inline mat_t& rotate(const Radian<T> angle, const libv::vec3_t<T>& axis)
-			LIBV_REQUIRES(C == 4 && R == 4) {
+			WISH_REQUIRES(C == 4 && R == 4) {
 		mx() = glm::rotate(mx(), angle.value, to_glm(axis));
 		return *this;
 	}
 	inline mat_t rotate_copy(const Radian<T> angle, const libv::vec3_t<T>& axis) const
-			LIBV_REQUIRES(C == 4 && R == 4) {
+			WISH_REQUIRES(C == 4 && R == 4) {
 		mat_t result;
 		result = glm::rotate(mx(), angle.value, to_glm(axis));
 		return result;

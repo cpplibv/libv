@@ -1,7 +1,7 @@
 // File: Component.cpp, Created on 2014. január 7. 7:58, Author: Vader
 
 // hpp
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 // std
@@ -17,19 +17,19 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-ComponentBase::ComponentBase(std::string name) :
+BaseComponent::BaseComponent(std::string name) :
 	name(std::move(name)) { }
 
-ComponentBase::ComponentBase(UnnamedTag, const std::string_view type) :
+BaseComponent::BaseComponent(UnnamedTag, const std::string_view type) :
 	name(libv::concat(type, '-', nextID++)) { }
 
-ComponentBase::~ComponentBase() {
+BaseComponent::~BaseComponent() {
 	log_ui.error_if(isAttached(), "Component is destructed in an attached state: {}", path());
 }
 
 // -------------------------------------------------------------------------------------------------
 
-std::string ComponentBase::path() const {
+std::string BaseComponent::path() const {
 	std::string result = name;
 
 	for (auto it = make_observer_ref(this); it != it->parent; it = it->parent)
@@ -38,7 +38,7 @@ std::string ComponentBase::path() const {
 	return result;
 }
 
-ContextUI& ComponentBase::context() const noexcept {
+ContextUI& BaseComponent::context() const noexcept {
 	if (context_ == nullptr) {
 		log_ui.fatal("Component has to be attached to acquire its context: {}", path());
 		assert(false && "Component has to be attached to acquire its context");
@@ -48,44 +48,44 @@ ContextUI& ComponentBase::context() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ComponentBase::flagSelf(Flag_t flags_) noexcept {
+void BaseComponent::flagSelf(Flag_t flags_) noexcept {
 	flags.set(flags_);
 }
 
-void ComponentBase::flagParents(Flag_t flags_) noexcept {
+void BaseComponent::flagParents(Flag_t flags_) noexcept {
 	for (auto it = parent; !it->flags.match_mask(flags_); it = it->parent)
 		it->flags.set(flags_);
 }
 
-void ComponentBase::flagAuto(Flag_t flags_) noexcept {
+void BaseComponent::flagAuto(Flag_t flags_) noexcept {
 	flagSelf(flags_ & Flag::mask_self);
 	flagParents(flags_ & Flag::mask_propagate);
 }
 
-void ComponentBase::flagForce(Flag_t flags_) noexcept {
+void BaseComponent::flagForce(Flag_t flags_) noexcept {
 	flagSelf(flags_);
 	flagParents(flags_);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ComponentBase::style(libv::intrusive_ptr<Style> newStyle) noexcept {
+void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 	style_ = std::move(newStyle);
 	flagAuto(Flag::pendingStyle);
 }
 
-void ComponentBase::markRemove() noexcept {
+void BaseComponent::markRemove() noexcept {
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
 
-	foreachChildren([](ComponentBase& child) {
+	foreachChildren([](BaseComponent& child) {
 		child.markRemove();
 	});
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ComponentBase::attach(ComponentBase& parent_) {
+void BaseComponent::attach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		context_ = libv::make_observer(parent_.context());
 		parent = libv::make_observer_ref(parent_);
@@ -99,7 +99,7 @@ void ComponentBase::attach(ComponentBase& parent_) {
 	}
 
 	if (flags.match_any(Flag::pendingAttachChild)) {
-		foreachChildren([this](ComponentBase& child) {
+		foreachChildren([this](BaseComponent& child) {
 			if (child.flags.match_any(Flag::pendingAttach))
 				child.attach(*this);
 		});
@@ -107,10 +107,10 @@ void ComponentBase::attach(ComponentBase& parent_) {
 	}
 }
 
-void ComponentBase::detach(ComponentBase& parent_) {
+void BaseComponent::detach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachChild)) {
 
-		doDetachChildren([this, &parent_](ComponentBase& child) {
+		doDetachChildren([this, &parent_](BaseComponent& child) {
 			bool remove = child.flags.match_any(Flag::pendingDetachSelf);
 
 			if (child.flags.match_any(Flag::pendingDetach))
@@ -134,14 +134,14 @@ void ComponentBase::detach(ComponentBase& parent_) {
 	}
 }
 
-void ComponentBase::style() {
+void BaseComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		doStyle();
 		parent->doStyle(childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
-		foreachChildren([](ComponentBase& child) {
+		foreachChildren([](BaseComponent& child) {
 			if (child.flags.match_any(Flag::pendingStyle))
 				child.style();
 		});
@@ -149,18 +149,18 @@ void ComponentBase::style() {
 	}
 }
 
-void ComponentBase::styleScan() {
+void BaseComponent::styleScan() {
 	if (flags.match_any(Flag::pendingStyleSelf) || (style_ && style_->isDirty())) {
 		doStyle();
 		parent->doStyle(childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
-	foreachChildren([](ComponentBase& child) {
+	foreachChildren([](BaseComponent& child) {
 		child.styleScan();
 	});
 }
 
-void ComponentBase::render(ContextRender& context) {
+void BaseComponent::render(ContextRender& context) {
 	ContextRender currentContext{
 		context.gl,
 		flags.match_any(Flag::updatedPosition | Flag::updatedSize),
@@ -177,7 +177,7 @@ void ComponentBase::render(ContextRender& context) {
 	//	if (flags.match_any(Flag::pendingRender)) {
 			doRender(currentContext);
 
-			foreachChildren([&currentContext](ComponentBase& child) {
+			foreachChildren([&currentContext](BaseComponent& child) {
 				child.render(currentContext);
 			});
 	//		flags.reset(Flag::pendingRender);
@@ -192,16 +192,16 @@ void ComponentBase::render(ContextRender& context) {
 	}
 }
 
-void ComponentBase::layout1(const ContextLayout1& environment) {
+void BaseComponent::layout1(const ContextLayout1& environment) {
 	bool dirty = flags.match_any(Flag::pendingLayout);
 
 	if (dirty) {
 		this->doLayout1(environment);
-		log_ui.trace("Layout content {:>11}, {}", lastContent, path());
+		log_ui.trace("Layout dynamic {:>11}, {}", lastDynamic, path());
 	}
 }
 
-void ComponentBase::layout2(const ContextLayout2& environment) {
+void BaseComponent::layout2(const ContextLayout2& environment) {
 //	log_ui.trace("Layout Pass2 {}", path());
 	bool dirty = flags.match_any(Flag::pendingLayout);
 
@@ -225,47 +225,47 @@ void ComponentBase::layout2(const ContextLayout2& environment) {
 	}
 }
 
-void ComponentBase::foreachChildren(libv::function_ref<void(ComponentBase&)> callback) {
+void BaseComponent::foreachChildren(libv::function_ref<void(BaseComponent&)> callback) {
 	doForeachChildren(callback);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ComponentBase::doAttach() { }
+void BaseComponent::doAttach() { }
 
-void ComponentBase::doDetach() { }
+void BaseComponent::doDetach() { }
 
-void ComponentBase::doDetachChildren(libv::function_ref<bool(ComponentBase&)> callback) {
+void BaseComponent::doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
 	(void) callback;
 }
 
-void ComponentBase::doStyle() { }
+void BaseComponent::doStyle() { }
 
-void ComponentBase::doStyle(uint32_t childID) {
+void BaseComponent::doStyle(uint32_t childID) {
 	(void) childID;
 }
 
-void ComponentBase::doCreate(ContextRender& context) {
+void BaseComponent::doCreate(ContextRender& context) {
 	(void) context;
 }
 
-void ComponentBase::doDestroy(ContextRender& context) {
+void BaseComponent::doDestroy(ContextRender& context) {
 	(void) context;
 }
 
-void ComponentBase::doRender(ContextRender& context) {
+void BaseComponent::doRender(ContextRender& context) {
 	(void) context;
 }
 
-void ComponentBase::doLayout1(const ContextLayout1& environment) {
+void BaseComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 }
 
-void ComponentBase::doLayout2(const ContextLayout2& environment) {
+void BaseComponent::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
 }
 
-void ComponentBase::doForeachChildren(libv::function_ref<void(ComponentBase&)> callback) {
+void BaseComponent::doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) {
 	(void) callback;
 }
 

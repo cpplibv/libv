@@ -4,10 +4,10 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/parse/parse_size.hpp>
-#include <libv/utility/approxing.hpp>
+#include <libv/utility/approx.hpp>
 // std
 #include <memory>
 #include <ostream>
@@ -17,8 +17,8 @@
 
 namespace {
 
-using Pos = libv::vec3_t<libv::Approxing<float>>;
-using Size = libv::vec3_t<libv::Approxing<float>>;
+using Pos = libv::vec3_t<libv::Approx<float>>;
+using Size = libv::vec3_t<libv::Approx<float>>;
 
 struct Bounds {
 	libv::vec3f position;
@@ -37,8 +37,8 @@ struct Bounds {
 		size(sx, sy, sz) { }
 
 	bool friend operator==(const Bounds& lhs, const Bounds& rhs) {
-		const auto rhs_pos_approx = libv::vec3_t<libv::Approxing<float>>{rhs.position};
-		const auto rhs_size_approx = libv::vec3_t<libv::Approxing<float>>{rhs.size};
+		const auto rhs_pos_approx = libv::vec3_t<libv::Approx<float>>{rhs.position};
+		const auto rhs_size_approx = libv::vec3_t<libv::Approx<float>>{rhs.size};
 		return lhs.position == rhs_pos_approx && lhs.size == rhs_size_approx;
 	}
 
@@ -47,14 +47,14 @@ struct Bounds {
 	}
 };
 
-class TestComponent : public libv::ui::ComponentBase {
+class TestComponent : public libv::ui::BaseComponent {
 public:
 	libv::vec3f dynamicSize = {};
 
-	TestComponent() : libv::ui::ComponentBase(libv::ui::UnnamedTag{}, "test") {};
+	TestComponent() : libv::ui::BaseComponent(libv::ui::UnnamedTag{}, "test") {};
 
 	virtual void doLayout1(const libv::ui::ContextLayout1&) override {
-		lastContent = dynamicSize;
+		libv::ui::AccessLayout::lastDynamic(*this) = dynamicSize;
 	}
 };
 

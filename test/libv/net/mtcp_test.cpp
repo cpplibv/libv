@@ -99,8 +99,8 @@ struct TestServer {
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("_ reg logger") {
-	std::cout << libv::logger;
-	libv::logger.setFormat("{severity} {thread_id:2} {module}: {message}\n");
+	std::cout << libv::logger_stream;
+	libv::logger_stream.setFormat("{severity} {thread_id:2} {module}: {message}\n");
 }
 
 TEST_CASE("MTCP Connection without any connect should handle errors") {

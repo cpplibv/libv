@@ -484,8 +484,8 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-inline Logger logger;
-inline LoggerModule log{libv::logger, "libv"};
+inline Logger logger_stream;
+inline LoggerModule log{libv::logger_stream, "libv"};
 
 // -------------------------------------------------------------------------------------------------
 

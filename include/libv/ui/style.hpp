@@ -24,7 +24,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ComponentBase;
+class BaseComponent;
 
 class Style : public libv::intrusive_base_unsafe<Style> {
 private:

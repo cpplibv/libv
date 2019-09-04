@@ -392,7 +392,7 @@ void Frame::loop() {
 		loopTerminate();
 	} else {
 		if (!isRefreshSkipable() && window) {
-			onContextRefresh.fire(EventContextRefresh());
+			onContextUpdate.fire(EventContextUpdate());
 
 			glfwSwapBuffers(window);
 		}
@@ -409,12 +409,12 @@ void Frame::loopTerminate() {
 
 void Frame::contextInit() {
 	log_frame.debug("Frame context initializing");
-	onContextInitialization.fire(EventContextInitialization());
+	onContextCreate.fire(EventContextCreate());
 }
 
 void Frame::contextTerminate() {
 	log_frame.debug("Frame context terminating");
-	onContextTerminate.fire(EventContextTerminate());
+	onContextDestroy.fire(EventContextDestroy());
 }
 
 // -------------------------------------------------------------------------------------------------

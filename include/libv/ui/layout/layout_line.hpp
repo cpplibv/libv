@@ -20,7 +20,7 @@ namespace ui {
 
 class ContextLayout1;
 class ContextLayout2;
-class ComponentBase;
+class BaseComponent;
 
 struct LayoutLine {
 	struct PS {
@@ -41,9 +41,9 @@ struct LayoutLine {
 
 	struct Child {
 		libv::ui::PropertySet<ChildPS> properties;
-		std::shared_ptr<ComponentBase> ptr;
+		std::shared_ptr<BaseComponent> ptr;
 
-		Child(std::shared_ptr<ComponentBase> ptr) : ptr(std::move(ptr)) {}
+		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
 	};
 
 	struct Properties : libv::ui::PropertySet<PS> {};
@@ -53,12 +53,12 @@ public:
 			const ContextLayout1& environment,
 			libv::span<Child> children,
 			const Properties& properties,
-			const ComponentBase& parent);
+			const BaseComponent& parent);
 	static void layout2(
 			const ContextLayout2& environment,
 			libv::span<Child> children,
 			const Properties& properties,
-			const ComponentBase& parent);
+			const BaseComponent& parent);
 };
 
 // -------------------------------------------------------------------------------------------------

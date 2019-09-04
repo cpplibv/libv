@@ -99,15 +99,15 @@ std::string EventCloseRequest::toPrettyString() const {
 
 // -------------------------------------------------------------------------------------------------
 
-std::string EventContextInitialization::toPrettyString() const {
+std::string EventContextCreate::toPrettyString() const {
 	return "Context Initialization";
 }
 
-std::string EventContextRefresh::toPrettyString() const {
+std::string EventContextUpdate::toPrettyString() const {
 	return "Context Refresh";
 }
 
-std::string EventContextTerminate::toPrettyString() const {
+std::string EventContextDestroy::toPrettyString() const {
 	return "Context Terminate";
 }
 

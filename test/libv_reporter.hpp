@@ -5,7 +5,7 @@
 // ext
 #include <fmt/format.h>
 // libv
-#include <libv/utility/slice.hpp>
+#include <libv/algorithm/slice.hpp>
 // std
 #include <string_view>
 #include <unordered_set>
@@ -13,7 +13,7 @@
 #include <catch/catch.hpp>
 
 
-// NOTE: This file is a mess. No time, don't care.
+// NOTE: This file is a mess. Its a test driver; No time, don't care.
 
 namespace {
 

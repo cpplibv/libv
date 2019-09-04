@@ -10,7 +10,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_app{libv::logger, "VM4Viewer"};
+inline libv::LoggerModule log_app{libv::logger_stream, "VM4Viewer"};
 
 // -------------------------------------------------------------------------------------------------
 

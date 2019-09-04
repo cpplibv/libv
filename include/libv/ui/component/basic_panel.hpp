@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 // pro
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/log.hpp>
 
 
@@ -20,7 +20,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
-class BasicPanel : public ComponentBase {
+class BasicPanel : public BaseComponent {
 public:
 	typename Layout::Properties properties;
 private:
@@ -33,32 +33,32 @@ public:
 	virtual ~BasicPanel();
 
 public:
-	typename Layout::Child& add(std::shared_ptr<ComponentBase> component);
-	void remove(const std::shared_ptr<ComponentBase>& component);
+	typename Layout::Child& add(std::shared_ptr<BaseComponent> component);
+	void remove(const std::shared_ptr<BaseComponent>& component);
 	void clear();
 
 protected:
-	virtual void doDetachChildren(libv::function_ref<bool(ComponentBase&)> callback) override;
+	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
 	virtual void doStyle() override;
 	virtual void doStyle(uint32_t childID) override;
 	virtual void doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
-	virtual void doForeachChildren(libv::function_ref<void(ComponentBase&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) override;
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel() :
-	ComponentBase(UnnamedTag{}, "basic-panel") { }
+	BaseComponent(UnnamedTag{}, "basic-panel") { }
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 template <typename Layout>
 BasicPanel<Layout>::~BasicPanel() {
@@ -67,7 +67,7 @@ BasicPanel<Layout>::~BasicPanel() {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
-typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<ComponentBase> component) {
+typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<BaseComponent> component) {
 	const auto childID = static_cast<uint32_t>(children.size());
 	auto& child = children.emplace_back(std::move(component));
 	flagForce(Flag::pendingAttachChild);
@@ -76,7 +76,7 @@ typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<ComponentBase> c
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::remove(const std::shared_ptr<ComponentBase>& component) {
+void BasicPanel<Layout>::remove(const std::shared_ptr<BaseComponent>& component) {
 	if (*(children.begin() + AccessParent::childID(*component)) != component) {
 		log_ui.error("Attempted to remove a non child element: {} from: {}", component->path(), path());
 		return;
@@ -94,7 +94,7 @@ void BasicPanel<Layout>::clear() {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
-void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(ComponentBase&)> callback) {
+void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
 	uint32_t numRemoved = 0;
 
 	libv::erase_if_stable(children, [&numRemoved, &callback](auto& child) {
@@ -121,7 +121,7 @@ void BasicPanel<Layout>::doStyle(uint32_t childID) {
 
 template <typename Layout>
 void BasicPanel<Layout>::doLayout1(const ContextLayout1& le) {
-	AccessLayout::lastContent(*this) = Layout::layout1(le, children, properties, *this);
+	AccessLayout::lastDynamic(*this) = Layout::layout1(le, children, properties, *this);
 }
 
 template <typename Layout>
@@ -130,7 +130,7 @@ void BasicPanel<Layout>::doLayout2(const ContextLayout2& le) {
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::doForeachChildren(libv::function_ref<void(ComponentBase&)> callback) {
+void BasicPanel<Layout>::doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) {
 	for (const auto& child : children)
 		callback(*child.ptr);
 }

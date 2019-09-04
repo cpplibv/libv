@@ -19,7 +19,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 struct Config {
 	uint16_t port = 25446;
@@ -157,8 +157,8 @@ void main_client() {
 }
 
 int main(int, char**) {
-	libv::logger.setFormat("{severity} {thread_id:2} {module:8}: {message}\n");
-	std::cout << libv::logger;
+	libv::logger_stream.setFormat("{severity} {thread_id:2} {module:8}: {message}\n");
+	std::cout << libv::logger_stream;
 	std::vector<std::thread> threads;
 
 	threads.emplace_back(main_server);

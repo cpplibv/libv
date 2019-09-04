@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/ui/component_base.hpp>
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
@@ -30,7 +30,7 @@ namespace ui {
 //	} state;
 //};
 
-class Button : public ComponentBase {
+class Button : public BaseComponent {
 private:
 	struct PS {
 		PropertyColor color;

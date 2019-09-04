@@ -221,7 +221,7 @@ TEST_CASE("layout float: simple test 0", "[libv.ui.layout.float]") {
 		CHECK(comp2.bounds().size == Size(12.f, 90.f, 0.f));
 	}
 
-	SECTION("content") {
+	SECTION("dynamic") {
 		comp0.size("D, D"); comp0.dynamic( 20, 100);
 		comp1.size("D, D"); comp1.dynamic( 30,  90);
 		comp2.size("D, D"); comp2.dynamic( 40,  80);

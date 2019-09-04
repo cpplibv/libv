@@ -131,9 +131,6 @@ libv.ui: implement detach and component removal
 libv.ui: wire in component create and destroy
 libv.ui: String2D would be nice to have both last line and non last line justify
 libv.ui: Label text change layout invalidation (lazy?) | verify
-
---- STACK ------------------------------------------------------------------------------------------
-
 wish: rename LIBV_REQUIRES to WISH_REQUIRES | (?)
 wish: rename GIT_BRANCH and ..HASH to WISH_GIT_BRANCH and ..HASH | only the C++ macros, the cmake vars are correct
 libv.ui: rename ComponentBase to BaseComponent or even to Component (?) | (Component or BasicComponent might end up being a CRTP class)
@@ -143,14 +140,17 @@ libv.meta: rename n_times.hpp to for_constexpr
 libv.meta: rename if_void to lnv (as leftmost-non-void) and make it variadic
 libv.utility: rename approxing.hpp to approx.hpp and the class name too
 libv.frame: rename onContextInitialization, onContextRefresh, onContextTerminate to Create Update/Render Destroy
-libv.utility: Slice is an algorithm and not a utility
+libv.utility: move Slice from utility to algorithm
+
+--- STACK ------------------------------------------------------------------------------------------
+
+libv.sig: merge back the sig codebase
+libv.sig: clean up the sig codebase
+libv.frame: serialize events; and this will kill current signal-slot in frame
+libv.frame: review the whole library
 
 frame
 	libv.frame: icon support
-	libv.frame: review the whole library
-	libv.frame: serialize events; and this will kill current signal-slot in frame
-	libv.sig: merge back the sig codebase
-	libv.sig: clean up the sig codebase
 	libv.frame: frame calling show after show may brake things?
 	libv.frame: dual check lock every async frame operations
 
@@ -1146,11 +1146,11 @@ wish_create_base(
 	OPTION -fconcepts
 
 	DEFINE -Dconcept="concept bool"
-	DEFINE -D "LIBV_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
-	IDE_DEFINE LIBV_REQUIRES(...)
+	DEFINE -D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\""
+	IDE_DEFINE WISH_REQUIRES(...)
 
-	DEFINE -DGIT_BRANCH="${WISH_GIT_BRANCH}"
-	DEFINE -DGIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
+	DEFINE -DWISH_GIT_BRANCH="${WISH_GIT_BRANCH}"
+	DEFINE -DWISH_GIT_COMMIT_HASH="${WISH_GIT_COMMIT_HASH}"
 	DEFINE -DWISH_SHORT_PATH_CUTOFF=${WISH_SHORT_PATH_CUTOFF}
 	DEFINE -DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/"
 )

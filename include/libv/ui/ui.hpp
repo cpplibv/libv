@@ -33,7 +33,7 @@ namespace ui {
 // TODO P5: (?) std::vector<adaptive_ptr<Component>> findComponentAt(int, int);
 // TODO P5: (?) std::vector<adaptive_ptr<Component>> getComponentAt(int, int);
 
-class ComponentBase;
+class BaseComponent;
 class ContextUI;
 class ImplUI;
 
@@ -44,7 +44,7 @@ private:
 public:
 	UI();
 	~UI();
-	void add(std::shared_ptr<ComponentBase> component);
+	void add(std::shared_ptr<BaseComponent> component);
 	void setSize(libv::vec3f size_) noexcept;
 	void setSize(float x, float y, float z = 0.f) noexcept;
 	void setPosition(libv::vec3f position_) noexcept;
@@ -87,13 +87,13 @@ void UI::attach(Frame& frame) {
 		this->eventMouseScroll(e.offset);
 	});
 
-//		frame.onContextInitialization.output([this](const auto&) {
+//		frame.onContextCreate.output([this](const auto&) {
 //			this->create();
 //		});
-//		frame.onContextRefresh.output([this](const auto&) {
+//		frame.onContextUpdate.output([this](const auto&) {
 //			this->update();
 //		});
-//		frame.onContextTerminate.output([this](const auto&) {
+//		frame.onContextDestroy.output([this](const auto&) {
 //			this->destroy();
 //		});
 
@@ -105,9 +105,9 @@ void UI::attach(Frame& frame) {
 	//		this->destroy();
 	//	});
 
-	//	frame.onContextInitialization.output(create, this);
-	//	frame.onContextRefresh.output(update, this);
-	//	frame.onContextTerminate.output(destroy, this);
+	//	frame.onContextCreate.output(create, this);
+	//	frame.onContextUpdate.output(update, this);
+	//	frame.onContextDestroy.output(destroy, this);
 
 	//	frame.onKey();
 	//	frame.onChar();

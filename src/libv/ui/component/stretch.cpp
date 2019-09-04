@@ -17,13 +17,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Stretch::Stretch() :
-	ComponentBase(UnnamedTag{}, "stretch") { }
+	BaseComponent(UnnamedTag{}, "stretch") { }
 
 Stretch::Stretch(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 Stretch::Stretch(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 Stretch::~Stretch() { }
 
@@ -100,7 +100,7 @@ void Stretch::doRender(ContextRender& context) {
 
 void Stretch::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	AccessLayout::lastContent(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
+	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
 }
 
 // -------------------------------------------------------------------------------------------------

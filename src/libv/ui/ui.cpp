@@ -78,7 +78,7 @@ UI::UI() {
 UI::~UI() {
 }
 
-void UI::add(std::shared_ptr<ComponentBase> component) {
+void UI::add(std::shared_ptr<BaseComponent> component) {
 	self->root.add(std::move(component));
 }
 

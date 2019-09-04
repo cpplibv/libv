@@ -11,10 +11,10 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-inline LoggerModule log_core{libv::logger, "libv.frame.core"};
-inline LoggerModule log_event{libv::logger, "libv.frame.event"};
-inline LoggerModule log_frame{libv::logger, "libv.frame"};
-inline LoggerModule log_glfw{libv::logger, "libv.frame.glfw"};
+inline LoggerModule log_core{libv::logger_stream, "libv.frame.core"};
+inline LoggerModule log_event{libv::logger_stream, "libv.frame.event"};
+inline LoggerModule log_frame{libv::logger_stream, "libv.frame"};
+inline LoggerModule log_glfw{libv::logger_stream, "libv.frame.glfw"};
 
 // -------------------------------------------------------------------------------------------------
 

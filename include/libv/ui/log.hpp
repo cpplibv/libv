@@ -11,8 +11,8 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_ui{libv::logger, "libv.ui"};
-inline libv::LoggerModule log_ui_ft{libv::logger, "libv.ui.ft"};
+inline libv::LoggerModule log_ui{libv::logger_stream, "libv.ui"};
+inline libv::LoggerModule log_ui_ft{libv::logger_stream, "libv.ui.ft"};
 
 // -------------------------------------------------------------------------------------------------
 

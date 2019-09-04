@@ -331,7 +331,7 @@ TEST_CASE("layout line: sizing one quad", "[libv.ui.layout.line]") {
 		CHECK(comp0.bounds().size == Size(200.f, 30.f, 0.f));
 	}
 
-	SECTION("content") {
+	SECTION("dynamic") {
 		comp0.size("D, D"); comp0.dynamic( 20, 100);
 
 		CHECK(layout.layout1(env1) == Size(20, 100, 0));

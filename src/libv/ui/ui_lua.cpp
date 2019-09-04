@@ -27,7 +27,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ComponentBase;
+class BaseComponent;
 class UI;
 
 namespace {
@@ -119,7 +119,7 @@ void process_style_property(UI& ui, Style& style, const std::string_view key, co
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
+std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
 
 	auto ui_table = lua.create_table();
 	ui_table["bottom"] = "bottom";
@@ -193,7 +193,7 @@ std::shared_ptr<ComponentBase> script_file(UI& ui, lua::State& lua, const std::f
 			}, value);
 		});
 
-//	std::shared_ptr<ComponentBase>
+//	std::shared_ptr<BaseComponent>
 	return nullptr;
 }
 

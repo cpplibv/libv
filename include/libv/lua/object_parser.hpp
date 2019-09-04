@@ -7,7 +7,7 @@
 #include <sol/table.hpp>
 #include <sol/types.hpp>
 // libv
-#include <libv/meta/if_void.hpp>
+#include <libv/meta/lnv.hpp>
 #include <libv/utility/concat.hpp>
 // std
 #include <string_view>
@@ -233,7 +233,7 @@ struct MatcherOneOf {
 
 template <typename Matcher, typename F>
 struct MatcherTransform : Matcher {
-	using CppType = std::invoke_result_t<F, libv::meta::if_void_t<typename Matcher::CppType, bool>>;
+	using CppType = std::invoke_result_t<F, libv::meta::lnv_t<typename Matcher::CppType, bool>>;
 	using EvalType = std::conditional_t<std::is_void_v<CppType>, bool, std::optional<CppType>>;
 
 	F func;

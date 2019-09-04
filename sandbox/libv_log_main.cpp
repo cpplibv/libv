@@ -8,10 +8,10 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 int main(int, char **) {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 	log_sandbox.trace("Hello World!");
 	log_sandbox.trace("Hello {}!", "World");

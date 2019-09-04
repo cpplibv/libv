@@ -16,13 +16,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Quad::Quad() :
-	ComponentBase(UnnamedTag{}, "quad") { }
+	BaseComponent(UnnamedTag{}, "quad") { }
 
 Quad::Quad(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 Quad::Quad(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 Quad::~Quad() { }
 

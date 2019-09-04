@@ -26,7 +26,7 @@ namespace detail {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-	LIBV_REQUIRES(requires { {T::name()} -> std::string; })
+	WISH_REQUIRES(requires { {T::name()} -> std::string; })
 inline void stream_struct_name(std::ostream& os) {
 	os << T::name();
 }

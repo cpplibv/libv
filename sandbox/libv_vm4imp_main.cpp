@@ -20,7 +20,7 @@
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char **) {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 	const auto model = libv::vm4::import("res/model/fighter_01_eltanin.dae");
 

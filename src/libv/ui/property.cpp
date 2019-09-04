@@ -35,7 +35,7 @@ PropertyShaderQuad::value_type PropertyShaderQuad::fallback(ContextUI& context) 
 }
 
 //Flag_t PropertySize::invalidate(const value_type& value) {
-//	if (value.value.x.content || value.value.y.content || value.value.z.content)
+//	if (value.value.x.dynamic || value.value.y.dynamic || value.value.z.dynamic)
 //		return Flag::pendingLayout;
 //	else
 //		return Flag::pendingLayoutSelf;

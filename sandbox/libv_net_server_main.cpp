@@ -20,7 +20,7 @@
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char**) {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 //	const auto address = libv::net::Address("localhost", 29446);
 //

@@ -5,6 +5,7 @@
 // libv
 #include <libv/frame/frame.hpp>
 #include <libv/glr/remote.hpp>
+#include <libv/input/inputs.hpp>
 #include <libv/log/log.hpp>
 // std
 #include <iostream>
@@ -16,7 +17,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 class SandboxFrame : public libv::Frame {
 private:
@@ -25,7 +26,7 @@ private:
 	libv::lua::State lua;
 
 private:
-	std::shared_ptr<libv::ui::ComponentBase> lua_component;
+	std::shared_ptr<libv::ui::BaseComponent> lua_component;
 
 public:
 	void create() {
@@ -40,10 +41,10 @@ public:
 		remote.create();
 		remote.enableDebug();
 
-		auto gl = remote.queue();
-		ui.create(gl);
-		remote.queue(std::move(gl));
-		remote.render();
+//		auto gl = remote.queue();
+//		ui.create(gl);
+//		remote.queue(std::move(gl));
+//		remote.execute();
 	}
 
 	void render() {
@@ -56,14 +57,14 @@ public:
 		ui.update(gl);
 
 		remote.queue(std::move(gl));
-		remote.render();
+		remote.execute();
 	}
 
 	void destroy() {
 		auto gl = remote.queue();
 		ui.destroy(gl);
 		remote.queue(std::move(gl));
-		remote.render();
+		remote.execute();
 
 		remote.destroy();
 	}
@@ -84,44 +85,44 @@ public:
 //		ui.add(lua_component);
 
 		onKey.output([&](const libv::frame::EventKey& e) {
-			if (e.action == libv::frame::Action::release)
+			if (e.action == libv::input::Action::release)
 				return;
 
-			if (e.key == libv::frame::Key::Escape)
+			if (e.key == libv::input::Key::Escape)
 				closeDefault();
 
-			if (e.key == libv::frame::Key::Backspace) {
+			if (e.key == libv::input::Key::Backspace) {
 //				label0->string.pop_back();
 //				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Pop back");
 			}
 
-			if (e.key == libv::frame::Key::Enter || e.key == libv::frame::Key::KPEnter) {
+			if (e.key == libv::input::Key::Enter || e.key == libv::input::Key::KPEnter) {
 //				label0->string.push_back("\n");
 //				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Appending new line");
 			}
 
-			if (e.mods != libv::frame::KeyModifier::control)
+			if (e.mods != libv::input::KeyModifier::control)
 				return;
 
 			switch (e.key) {
-			case libv::frame::Key::Num0:
+			case libv::input::Key::Num0:
 //				label0->properties.align = libv::ui::Anchor::Left;
 				log_sandbox.trace("Set anchor to {}", "Left");
 				break;
 
-			case libv::frame::Key::Num1:
+			case libv::input::Key::Num1:
 //				label0->properties.align = libv::ui::Anchor::Center;
 				log_sandbox.trace("Set anchor to {}", "Center");
 				break;
 
-			case libv::frame::Key::Num2:
+			case libv::input::Key::Num2:
 //				label0->properties.align = libv::ui::Anchor::Right;
 				log_sandbox.trace("Set anchor to {}", "Right");
 				break;
 
-			case libv::frame::Key::Num3:
+			case libv::input::Key::Num3:
 //				label0->properties.align = libv::ui::Anchor::Justify;
 				log_sandbox.trace("Set anchor to {}", "Justify");
 				break;
@@ -135,13 +136,13 @@ public:
 //			label0->flag(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8);
 		});
-		onContextInitialization.output([&](const libv::frame::EventContextInitialization&) {
+		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
 			create();
 		});
-		onContextRefresh.output([&](const libv::frame::EventContextRefresh&) {
+		onContextUpdate.output([&](const libv::frame::EventContextUpdate&) {
 			render();
 		});
-		onContextTerminate.output([&](const libv::frame::EventContextTerminate&) {
+		onContextDestroy.output([&](const libv::frame::EventContextDestroy&) {
 			destroy();
 		});
 	}
@@ -153,9 +154,9 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char**) {
-	std::cout << libv::logger;
-//	libv::logger.allow("libv.ui");
-//	libv::logger.deny();
+	std::cout << libv::logger_stream;
+//	libv::logger_stream.allow("libv.ui");
+//	libv::logger_stream.deny();
 
 	{
 		SandboxFrame frame;

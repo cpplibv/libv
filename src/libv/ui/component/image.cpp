@@ -17,13 +17,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Image::Image() :
-	ComponentBase(UnnamedTag{}, "image") { }
+	BaseComponent(UnnamedTag{}, "image") { }
 
 Image::Image(std::string name) :
-	ComponentBase(std::move(name)) { }
+	BaseComponent(std::move(name)) { }
 
 Image::Image(UnnamedTag, const std::string_view type) :
-	ComponentBase(UnnamedTag{}, type) { }
+	BaseComponent(UnnamedTag{}, type) { }
 
 Image::~Image() { }
 
@@ -65,7 +65,7 @@ void Image::doRender(ContextRender& context) {
 
 void Image::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	AccessLayout::lastContent(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
+	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -10,7 +10,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_sandbox{libv::logger, "sandbox"};
+inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 using libv::input::Key;
 
@@ -36,9 +36,9 @@ void noisyEvents(libv::Frame& frame) {
 
 	frame.onCloseRequest.output(pretty_print_to_log);
 
-	frame.onContextInitialization.output(pretty_print_to_log);
-	frame.onContextRefresh.output(pretty_print_to_log);
-	frame.onContextTerminate.output(pretty_print_to_log);
+	frame.onContextCreate.output(pretty_print_to_log);
+	frame.onContextUpdate.output(pretty_print_to_log);
+	frame.onContextDestroy.output(pretty_print_to_log);
 }
 
 class TestFrame : public libv::Frame {
@@ -63,7 +63,7 @@ public:
 };
 
 int main(int, char**) {
-	std::cout << libv::logger;
+	std::cout << libv::logger_stream;
 
 //	libv::log.allow("libv.frame.event");
 //	libv::log.deny();
