@@ -133,14 +133,24 @@ void Frame::cmdCoreCreate() {
 	log_core.debug("Create window for frame {}", self->title);
 
 	glfwDefaultWindowHints();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, self->openGLVersionMajor);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, self->openGLVersionMinor);
-	glfwWindowHint(GLFW_DECORATED, self->decorated);
+
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 	glfwWindowHint(GLFW_FLOATING, false); // Always on top
 	glfwWindowHint(GLFW_FOCUSED, true); // Initial focus
+	glfwWindowHint(GLFW_FOCUS_ON_SHOW, true); // Auto focus on show
+	//	GLFW_CENTER_CURSOR
+	//	GLFW_HOVERED
+	//	GLFW_JOYSTICK_HAT_BUTTONS
+	//	GLFW_LOCK_KEY_MODS
+	//	GLFW_SCALE_TO_MONITOR
+	//	GLFW_TRANSPARENT_FRAMEBUFFER
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, self->openGLVersionMajor);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, self->openGLVersionMinor);
+	glfwWindowHint(GLFW_DECORATED, self->decorated);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
 	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
+	glfwWindowHint(GLFW_MAXIMIZED, self->maximized);
 	glfwWindowHint(GLFW_RESIZABLE, self->resizable);
 	glfwWindowHint(GLFW_SAMPLES, libv::to_value(self->openGLSamples));
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation

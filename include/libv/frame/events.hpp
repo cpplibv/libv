@@ -131,6 +131,15 @@ struct EventWindowFocus {
 	std::string toPrettyString() const;
 };
 
+struct EventWindowMaximize {
+	bool maximized;
+
+	inline EventWindowMaximize(int maximized) :
+		maximized(maximized != 0) { }
+
+	std::string toPrettyString() const;
+};
+
 struct EventWindowMinimize {
 	bool minimized;
 
@@ -207,6 +216,7 @@ using Event = std::variant<
 		EventMousePosition,
 		EventMouseScroll,
 		EventWindowFocus,
+		EventWindowMaximize,
 		EventWindowMinimize,
 		EventWindowPosition,
 		EventWindowRefresh,

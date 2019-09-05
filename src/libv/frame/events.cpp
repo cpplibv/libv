@@ -65,6 +65,10 @@ std::string EventWindowFocus::toPrettyString() const {
 	return fmt::format("Window Focus: focused = {}", focused);
 }
 
+std::string EventWindowMaximize::toPrettyString() const {
+	return fmt::format("Window Maximize: maximized = {}", maximized);
+}
+
 std::string EventWindowMinimize::toPrettyString() const {
 	return fmt::format("Window Minimize: minimized = {}", minimized);
 }

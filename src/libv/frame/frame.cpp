@@ -183,9 +183,19 @@ void Frame::show() {
 void Frame::hide() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Hide frame {}", self->title);
+		self->hidden = true;
 		if (self->window) {
 			self->core.exec(std::bind(glfwHideWindow, self->window));
-			self->hidden = true;
+		}
+	});
+}
+
+void Frame::maximize() {
+	self->context.executeAsync([this] {
+		log_frame.trace("Maximize frame {}", self->title);
+		self->maximized = true;
+		if (self->window) {
+			self->core.exec(std::bind(glfwMaximizeWindow, self->window));
 		}
 	});
 }
@@ -193,9 +203,9 @@ void Frame::hide() {
 void Frame::minimize() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Minimize frame {}", self->title);
+		self->minimized = true;
 		if (self->window) {
 			self->core.exec(std::bind(glfwIconifyWindow, self->window));
-			self->minimized = true;
 		}
 	});
 }
@@ -203,9 +213,10 @@ void Frame::minimize() {
 void Frame::restore() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Restore frame {}", self->title);
+		self->minimized = false;
+		self->maximized = false;
 		if (self->window) {
 			self->core.exec(std::bind(glfwRestoreWindow, self->window));
-			self->minimized = false;
 		}
 	});
 }

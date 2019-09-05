@@ -30,6 +30,7 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onMousePosition.output(pretty_print_to_log);
 	frame.onMouseScroll.output(pretty_print_to_log);
 	frame.onWindowFocus.output(pretty_print_to_log);
+	frame.onWindowMaximize.output(pretty_print_to_log);
 	frame.onWindowMinimize.output(pretty_print_to_log);
 	frame.onWindowPosition.output(pretty_print_to_log);
 	frame.onWindowRefresh.output(pretty_print_to_log);
@@ -62,8 +63,46 @@ public:
 
 		noisyEvents(*this);
 		onKey.output([this](const auto& e) {
+			if (e.action != libv::input::Action::release)
+				return;
+
 			if (e.key == Key::Escape)
 				closeDefault();
+
+			// --- Q row
+
+			if (e.key == Key::Q)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->show(); });
+			if (e.key == Key::W)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->hide(); });
+			if (e.key == Key::E)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->maximize(); });
+			if (e.key == Key::R)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->minimize(); });
+			if (e.key == Key::T)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->restore(); });
+			if (e.key == Key::Y)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->focus(); });
+			if (e.key == Key::U)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
+
+			// --- A row
+
+			if (e.key == Key::A)
+				setDisplayMode(libv::Frame::DisplayMode::windowed);
+			if (e.key == Key::S)
+				setDisplayMode(libv::Frame::DisplayMode::borderless);
+			if (e.key == Key::D)
+				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
+
+			if (e.key == Key::F)
+				log_sandbox.trace("getFrameSize: {}", getFrameSize());
+			if (e.key == Key::G)
+				log_sandbox.trace("getSize: {}", getSize());
+			if (e.key == Key::H)
+				log_sandbox.trace("getPosition: {}", getPosition());
+
+			// --- Z row
 
 			if (e.key == Key::Z)
 				setResizable(!isResizable());
@@ -75,34 +114,6 @@ public:
 				setPosition(FramePosition::center_current_monitor);
 			if (e.key == Key::V)
 				setPosition(FramePosition::center_primary_monitor);
-
-			if (e.key == Key::A)
-				setDisplayMode(libv::Frame::DisplayMode::windowed);
-			if (e.key == Key::S)
-				setDisplayMode(libv::Frame::DisplayMode::borderless);
-			if (e.key == Key::D)
-				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
-
-			if (e.key == Key::Q)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->show(); });
-			if (e.key == Key::W)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->hide(); });
-			if (e.key == Key::E)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->minimize(); });
-			if (e.key == Key::R)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->restore(); });
-			if (e.key == Key::T)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->focus(); });
-			if (e.key == Key::Y)
-				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
-
-			if (e.key == Key::F)
-				log_sandbox.trace("getFrameSize: {}", getFrameSize());
-			if (e.key == Key::G)
-				log_sandbox.trace("getSize: {}", getSize());
-			if (e.key == Key::H)
-				log_sandbox.trace("getPosition: {}", getPosition());
-
 		});
 	}
 };

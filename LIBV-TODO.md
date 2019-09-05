@@ -153,6 +153,8 @@ libv.frame.glfw.frame: Added glfwGetWindowFrameSize for retrieving the size of t
 --- STACK ------------------------------------------------------------------------------------------
 
 libv.frame.glfw.frame: Added glfwMaximizeWindow for window maximization
+libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
+libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
 
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 libv.frame: remove "atomics"
@@ -167,7 +169,6 @@ libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window att
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 
 libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
-libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
 libv.frame.glfw.frame: Added glfwSetWindowSizeLimits and glfwSetWindowAspectRatio for setting absolute and relative window size limits
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
@@ -182,7 +183,6 @@ libv.frame.glfw.hint: Added GLFW_FOCUSED window hint for controlling initial inp
 libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
 libv.frame.glfw.hint: Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
 libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
-libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
 libv.frame.glfw.hint: Added glfwDefaultWindowHints for resetting all window hints to their default values
 
 libv.frame.glfw.input: Added glfwGetKeyName for querying the layout-specific name of printable keys

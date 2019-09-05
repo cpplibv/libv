@@ -61,9 +61,11 @@ public:
 	int openGLVersionMinor = 3;
 
 	bool decorated = true;
-	bool hidden = true;
-	bool minimized = false;
 	bool resizable = true;
+
+	bool hidden = true;
+	bool maximized = false;
+	bool minimized = false;
 
 	Frame::CloseOperation defaultCloseOperation = Frame::CloseOperation::dispose;
 	Frame::DisplayMode displayMode = Frame::DisplayMode::windowed;

@@ -139,6 +139,7 @@ public:
 	Event<EventMousePosition> onMousePosition;
 	Event<EventMouseScroll> onMouseScroll;
 	Event<EventWindowFocus> onWindowFocus;
+	Event<EventWindowMaximize> onWindowMaximize;
 	Event<EventWindowMinimize> onWindowMinimize;
 	Event<EventWindowPosition> onWindowPosition;
 	Event<EventWindowRefresh> onWindowRefresh;
@@ -214,6 +215,7 @@ protected:
 public:
 	void show();
 	void hide();
+	void maximize();
 	void minimize();
 	void restore();
 	/// The window should already be visible and not minimized.
