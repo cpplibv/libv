@@ -1,9 +1,10 @@
 // File: main.cpp, Created on 2013. augusztus 16. 11:59, Author: Vader
 
-// std
-#include <iostream>
 // libv
 #include <libv/input/inputs.hpp>
+// std
+#include <iostream>
+#include <thread>
 // pro
 #include <libv/frame/frame.hpp>
 #include <libv/frame/log.hpp>
@@ -37,8 +38,17 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onCloseRequest.output(pretty_print_to_log);
 
 	frame.onContextCreate.output(pretty_print_to_log);
-	frame.onContextUpdate.output(pretty_print_to_log);
+//	frame.onContextUpdate.output(pretty_print_to_log);
 	frame.onContextDestroy.output(pretty_print_to_log);
+}
+
+template <typename Rep, typename Per, typename F>
+void executeAfter(std::chrono::duration<Rep, Per> delay, F&& func) {
+	std::thread t([delay, f = std::forward<F>(func)]{
+		std::this_thread::sleep_for(delay);
+		std::forward<decltype(f)>(f)();
+	});
+	t.detach();
 }
 
 class TestFrame : public libv::Frame {
@@ -72,6 +82,17 @@ public:
 				setDisplayMode(libv::Frame::DisplayMode::borderless);
 			if (e.key == Key::D)
 				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
+
+			if (e.key == Key::Q)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->show(); });
+			if (e.key == Key::W)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->hide(); });
+			if (e.key == Key::E)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->minimize(); });
+			if (e.key == Key::R)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->restore(); });
+			if (e.key == Key::T)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->focus(); });
 
 		});
 	}

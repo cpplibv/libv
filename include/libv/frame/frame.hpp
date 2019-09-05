@@ -212,10 +212,12 @@ protected:
 	bool isFrameShouldClose();
 
 public:
+	void show();
 	void hide();
 	void minimize();
 	void restore();
-	void show();
+	/// The window should already be visible and not minimized.
+	void focus();
 
 public:
 	void setOpenGLProfile(OpenGLProfile profile);

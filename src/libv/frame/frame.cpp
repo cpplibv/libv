@@ -210,6 +210,16 @@ void Frame::restore() {
 	});
 }
 
+void Frame::focus() {
+	// Question? Does focus wants to be a creation hint that is only one times used?
+	self->context.executeAsync([this] {
+		log_frame.trace("Focus frame {}", self->title);
+		if (self->window) {
+			self->core.exec(std::bind(glfwFocusWindow, self->window));
+		}
+	});
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Frame::setOpenGLProfile(Frame::OpenGLProfile profile) {

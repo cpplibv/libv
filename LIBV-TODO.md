@@ -146,9 +146,12 @@ libv.frame.glfw.frame: Deprecated charmods callback
 libv.frame: serialize events
 libv.frame: Merge mouse position events (only if there was no intermediate event)
 libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
+libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus
 
 --- STACK ------------------------------------------------------------------------------------------
 
+libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
+libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 libv.frame: remove "atomics"
 libv.frame: replace fix state arrays with flat_maps
 
@@ -160,10 +163,8 @@ libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change 
 libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 
-libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus
 libv.frame.glfw.frame: Added glfwGetWindowFrameSize for retrieving the size of the frame around the client area of a window
 libv.frame.glfw.frame: Added glfwMaximizeWindow for window maximization
-libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
 libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
 libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
