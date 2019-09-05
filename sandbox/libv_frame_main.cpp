@@ -29,7 +29,7 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onMousePosition.output(pretty_print_to_log);
 	frame.onMouseScroll.output(pretty_print_to_log);
 	frame.onWindowFocus.output(pretty_print_to_log);
-	frame.onWindowIconify.output(pretty_print_to_log);
+	frame.onWindowMinimize.output(pretty_print_to_log);
 	frame.onWindowPosition.output(pretty_print_to_log);
 	frame.onWindowRefresh.output(pretty_print_to_log);
 	frame.onWindowSize.output(pretty_print_to_log);

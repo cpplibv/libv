@@ -63,26 +63,26 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetCursorPosCallback      (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
 	glfwSetScrollCallback         (window, DispatchGLFWEvent<EventMouseScroll    >::call);
 	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    >::call);
-	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowIconify  >::call);
+	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowMinimize >::call);
 	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::call);
 	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
 	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::call);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
-	glfwSetCharCallback(window, nullptr);
-	glfwSetCursorEnterCallback(window, nullptr);
-	glfwSetCursorPosCallback(window, nullptr);
-	glfwSetDropCallback(window, nullptr);
+	glfwSetCharCallback           (window, nullptr);
+	glfwSetCursorEnterCallback    (window, nullptr);
+	glfwSetCursorPosCallback      (window, nullptr);
+	glfwSetDropCallback           (window, nullptr);
 	glfwSetFramebufferSizeCallback(window, nullptr);
-	glfwSetKeyCallback(window, nullptr);
-	glfwSetMouseButtonCallback(window, nullptr);
-	glfwSetScrollCallback(window, nullptr);
-	glfwSetWindowFocusCallback(window, nullptr);
-	glfwSetWindowIconifyCallback(window, nullptr);
-	glfwSetWindowPosCallback(window, nullptr);
-	glfwSetWindowRefreshCallback(window, nullptr);
-	glfwSetWindowSizeCallback(window, nullptr);
+	glfwSetKeyCallback            (window, nullptr);
+	glfwSetMouseButtonCallback    (window, nullptr);
+	glfwSetScrollCallback         (window, nullptr);
+	glfwSetWindowFocusCallback    (window, nullptr);
+	glfwSetWindowIconifyCallback  (window, nullptr);
+	glfwSetWindowPosCallback      (window, nullptr);
+	glfwSetWindowRefreshCallback  (window, nullptr);
+	glfwSetWindowSizeCallback     (window, nullptr);
 
 	windowHandlers.erase(window);
 }
@@ -135,10 +135,10 @@ void Frame::distributeEvents() {
 			[this](const EventWindowFocus& e) {
 				onWindowFocus.fire(e);
 			},
-			[this](const EventWindowIconify& e) {
-				self->minimized = e.iconified;
+			[this](const EventWindowMinimize& e) {
+				self->minimized = e.minimized;
 
-				onWindowIconify.fire(e);
+				onWindowMinimize.fire(e);
 			},
 			[this](const EventWindowPosition& e) {
 				self->position = e.position;

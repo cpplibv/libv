@@ -190,22 +190,22 @@ void Frame::hide() {
 	});
 }
 
-void Frame::restore() {
-	self->context.executeAsync([this] {
-		log_frame.trace("Restore frame {}", self->title);
-		if (self->window) {
-			self->core.exec(std::bind(glfwRestoreWindow, self->window));
-			self->minimized = false;
-		}
-	});
-}
-
 void Frame::minimize() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Minimize frame {}", self->title);
 		if (self->window) {
 			self->core.exec(std::bind(glfwIconifyWindow, self->window));
 			self->minimized = true;
+		}
+	});
+}
+
+void Frame::restore() {
+	self->context.executeAsync([this] {
+		log_frame.trace("Restore frame {}", self->title);
+		if (self->window) {
+			self->core.exec(std::bind(glfwRestoreWindow, self->window));
+			self->minimized = false;
 		}
 	});
 }

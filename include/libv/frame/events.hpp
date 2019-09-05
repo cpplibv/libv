@@ -131,11 +131,11 @@ struct EventWindowFocus {
 	std::string toPrettyString() const;
 };
 
-struct EventWindowIconify {
-	bool iconified;
+struct EventWindowMinimize {
+	bool minimized;
 
-	inline EventWindowIconify(int iconified) :
-		iconified(iconified != 0) { }
+	inline EventWindowMinimize(int minimized) :
+		minimized(minimized != 0) { }
 
 	std::string toPrettyString() const;
 };
@@ -207,7 +207,7 @@ using Event = std::variant<
 		EventMousePosition,
 		EventMouseScroll,
 		EventWindowFocus,
-		EventWindowIconify,
+		EventWindowMinimize,
 		EventWindowPosition,
 		EventWindowRefresh,
 		EventWindowSize

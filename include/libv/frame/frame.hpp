@@ -139,7 +139,7 @@ public:
 	Event<EventMousePosition> onMousePosition;
 	Event<EventMouseScroll> onMouseScroll;
 	Event<EventWindowFocus> onWindowFocus;
-	Event<EventWindowIconify> onWindowIconify;
+	Event<EventWindowMinimize> onWindowMinimize;
 	Event<EventWindowPosition> onWindowPosition;
 	Event<EventWindowRefresh> onWindowRefresh;
 	Event<EventWindowSize> onWindowSize;
@@ -267,8 +267,8 @@ public:
 	void setClipboardString(const std::string& string);
 };
 
-} // namespace frame
+} // namespace frame -------------------------------------------------------------------------------
 
 using Frame = frame::Frame;
 
-} // namespace libv
+} // namespace libv --------------------------------------------------------------------------------

@@ -65,8 +65,8 @@ std::string EventWindowFocus::toPrettyString() const {
 	return fmt::format("Window Focus: focused = {}", focused);
 }
 
-std::string EventWindowIconify::toPrettyString() const {
-	return fmt::format("Window Iconify: iconified = {}", iconified);
+std::string EventWindowMinimize::toPrettyString() const {
+	return fmt::format("Window Minimize: minimized = {}", minimized);
 }
 
 std::string EventWindowPosition::toPrettyString() const {
