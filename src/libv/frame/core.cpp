@@ -17,31 +17,6 @@
 #include <libv/frame/monitor.hpp>
 
 
-// TODO P3: DISPLAY_MODE_BORDERLESS is not perfect, fix it
-// TODO P4: Map glfw hint GLFW_FLOATING
-// TODO P4: Map glfw hint GLFW_FOCUSED
-// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
-// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
-// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
-// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
-// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
-// TODO P5: Support glfw hint GLFW_STEREO
-// TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
-
-// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
-// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
-// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
-// TODO P5: Context sharing
-
-// No plans for mapping these glfw hints:
-// GLFW_ACCUM_RED_BITS,
-// GLFW_ACCUM_GREEN_BITS,
-// GLFW_ACCUM_BLUE_BITS,
-// GLFW_ACCUM_ALPHA_BITS,
-// GLFW_AUX_BUFFERS,
-// GLFW_CLIENT_API,
-// GLFW_DOUBLEBUFFER
-
 namespace libv {
 namespace frame {
 
@@ -173,13 +148,13 @@ void Frame::cmdCoreCreate() {
 	if (self->displayMode == DisplayMode::fullscreen) {
 		log_core.info("Switching frame {} to full screen mode", self->title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		self->eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
+		self->eventQueue.emplace_back(EventFramebufferSize(mode->width, mode->height));
 		self->window = glfwCreateWindow(mode->width, mode->height, self->title.c_str(), glfwGetPrimaryMonitor(), self->shareWindow);
 
 	} else if (self->displayMode == DisplayMode::borderless) {
 		log_core.info("Switching frame {} to borderless mode", self->title);
 		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		self->eventQueFramebufferSize.fire(EventFramebufferSize(mode->width, mode->height));
+		self->eventQueue.emplace_back(EventFramebufferSize(mode->width, mode->height));
 
 		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);

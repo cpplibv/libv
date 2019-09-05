@@ -6,12 +6,11 @@
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/math/fixed_point.hpp>
+#include <libv/utility/overload.hpp>
 // pro
-#include <libv/frame/log.hpp>
 #include <libv/frame/impl_frame.lpp>
+#include <libv/frame/log.hpp>
 
-
-// TODO P3: Limit cursor position event pre-fire to 1 (solution maybe to use unique signal queue)
 
 namespace libv {
 namespace frame {
@@ -21,14 +20,13 @@ namespace frame {
 // <<< P4: multi thread safety?
 std::map<GLFWwindow*, Frame*> windowHandlers;
 
-template <typename E, auto queue>
+template <typename E>
 struct DispatchGLFWEvent {
 	template <typename... Args>
 	static inline void call(GLFWwindow* window, Args... args) {
 		try {
 			Frame& frame = *windowHandlers.at(window);
-//			frame.realizeGLFWCallback(E(args...));
-			(frame.self.get()->*queue).fire(E(args...));
+			frame.self->eventQueue.emplace_back(E(args...));
 
 		} catch (const std::out_of_range& e) {
 			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
@@ -39,8 +37,7 @@ struct DispatchGLFWEvent {
 		try {
 			Frame& frame = *windowHandlers.at(window);
 			auto size = frame.getSize();
-//			frame.realizeGLFWCallback(E(x, size.y - y - 1));
-			(frame.self.get()->*queue).fire(E(x, size.y - y - 1));
+			frame.self->eventQueue.emplace_back(E(x, size.y - y - 1));
 
 		} catch (const std::out_of_range& e) {
 			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
@@ -51,33 +48,19 @@ struct DispatchGLFWEvent {
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	windowHandlers[window] = frame;
 
-	glfwSetCharCallback           (window, DispatchGLFWEvent<EventChar           , &ImplFrame::eventQueChar           >::call);
-	glfwSetCursorEnterCallback    (window, DispatchGLFWEvent<EventMouseEnter     , &ImplFrame::eventQueMouseEnter     >::call);
-	glfwSetCursorPosCallback      (window, DispatchGLFWEvent<EventMousePosition  , &ImplFrame::eventQueMousePosition  >::mouse);
-	glfwSetDropCallback           (window, DispatchGLFWEvent<EventDrop           , &ImplFrame::eventQueDrop           >::call);
-	glfwSetFramebufferSizeCallback(window, DispatchGLFWEvent<EventFramebufferSize, &ImplFrame::eventQueFramebufferSize>::call);
-	glfwSetKeyCallback            (window, DispatchGLFWEvent<EventKey            , &ImplFrame::eventQueKey            >::call);
-	glfwSetMouseButtonCallback    (window, DispatchGLFWEvent<EventMouseButton    , &ImplFrame::eventQueMouseButton    >::call);
-	glfwSetScrollCallback         (window, DispatchGLFWEvent<EventMouseScroll    , &ImplFrame::eventQueMouseScroll    >::call);
-	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    , &ImplFrame::eventQueWindowFocus    >::call);
-	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowIconify  , &ImplFrame::eventQueWindowIconify  >::call);
-	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition , &ImplFrame::eventQueWindowPosition >::call);
-	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  , &ImplFrame::eventQueWindowRefresh  >::call);
-	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     , &ImplFrame::eventQueWindowSize     >::call);
-
-//	glfwSetCharCallback(window, ::libv::frame::glfwCallback<EventChar, &ImplFrame::eventQueChar, unsigned int>);
-//	glfwSetCursorEnterCallback(window, ::libv::frame::glfwCallback<EventMouseEnter, &ImplFrame::eventQueMouseEnter, int>);
-//	glfwSetCursorPosCallback(window, ::libv::frame::glfwMousePositionCallback<EventMousePosition, &ImplFrame::eventQueMousePosition>);
-//	glfwSetDropCallback(window, ::libv::frame::glfwCallback<EventDrop, &ImplFrame::eventQueDrop, int, const char**>);
-//	glfwSetFramebufferSizeCallback(window, ::libv::frame::glfwCallback<EventFramebufferSize, &ImplFrame::eventQueFramebufferSize, int, int>);
-//	glfwSetKeyCallback(window, ::libv::frame::glfwCallback<EventKey, &ImplFrame::eventQueKey, int, int, int, int>);
-//	glfwSetMouseButtonCallback(window, ::libv::frame::glfwCallback<EventMouseButton, &ImplFrame::eventQueMouseButton, int, int, int>);
-//	glfwSetScrollCallback(window, ::libv::frame::glfwCallback<EventMouseScroll, &ImplFrame::eventQueMouseScroll, double, double>);
-//	glfwSetWindowFocusCallback(window, ::libv::frame::glfwCallback<EventWindowFocus, &ImplFrame::eventQueWindowFocus, int>);
-//	glfwSetWindowIconifyCallback(window, ::libv::frame::glfwCallback<EventWindowIconify, &ImplFrame::eventQueWindowIconify, int>);
-//	glfwSetWindowPosCallback(window, ::libv::frame::glfwCallback<EventWindowPosition, &ImplFrame::eventQueWindowPosition, int, int>);
-//	glfwSetWindowRefreshCallback(window, ::libv::frame::glfwCallback<EventWindowRefresh, &ImplFrame::eventQueWindowRefresh>);
-//	glfwSetWindowSizeCallback(window, ::libv::frame::glfwCallback<EventWindowSize, &ImplFrame::eventQueWindowSize, int, int>);
+	glfwSetCharCallback           (window, DispatchGLFWEvent<EventChar           >::call);
+	glfwSetDropCallback           (window, DispatchGLFWEvent<EventDrop           >::call);
+	glfwSetFramebufferSizeCallback(window, DispatchGLFWEvent<EventFramebufferSize>::call);
+	glfwSetKeyCallback            (window, DispatchGLFWEvent<EventKey            >::call);
+	glfwSetMouseButtonCallback    (window, DispatchGLFWEvent<EventMouseButton    >::call);
+	glfwSetCursorEnterCallback    (window, DispatchGLFWEvent<EventMouseEnter     >::call);
+	glfwSetCursorPosCallback      (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
+	glfwSetScrollCallback         (window, DispatchGLFWEvent<EventMouseScroll    >::call);
+	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    >::call);
+	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowIconify  >::call);
+	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::call);
+	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
+	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::call);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
@@ -100,123 +83,78 @@ void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 
 // -------------------------------------------------------------------------------------------------
 
-// These event callbacks called after the first iteration of the loop after the event occurred.
-// These are the realization of an event on the frame object itself. Most event is noop due to lack
-// of impact on the frame.
-
-void Frame::realizeGLFWCallback(const EventChar&) { }
-
-void Frame::realizeGLFWCallback(const EventDrop&) { }
-
-void Frame::realizeGLFWCallback(const EventFramebufferSize&) { }
-
-void Frame::realizeGLFWCallback(const EventKey& e) {
-	self->keyStates[to_value(e.key)] = (e.action != libv::input::Action::release) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
-}
-
-void Frame::realizeGLFWCallback(const EventMouseButton& e) {
-	self->mouseStates[to_value(e.button)] = (e.action != libv::input::Action::release) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
-}
-
-void Frame::realizeGLFWCallback(const EventMouseEnter&) { }
-
-void Frame::realizeGLFWCallback(const EventMousePosition& e) {
-	self->mousePosition = (static_cast<uint64_t>
-			(convert_to_s24_8(e.position.x)) << 32) | convert_to_s24_8(e.position.y);
-}
-
-void Frame::realizeGLFWCallback(const EventMouseScroll& e) {
-	auto old = getScrollPosition();
-	self->scrollPosition = (static_cast<uint64_t>
-			(convert_to_s24_8(e.offset.x + old.x)) << 32) | convert_to_s24_8(e.offset.y + old.y);
-}
-
-void Frame::realizeGLFWCallback(const EventWindowFocus&) { }
-
-void Frame::realizeGLFWCallback(const EventWindowIconify& e) {
-	self->minimized = e.iconified;
-}
-
-void Frame::realizeGLFWCallback(const EventWindowPosition& e) {
-	self->position = e.position;
-}
-
-void Frame::realizeGLFWCallback(const EventWindowRefresh&) { }
-
-void Frame::realizeGLFWCallback(const EventWindowSize& e) {
-	self->size = e.size;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void Frame::initEventQueues() {
-	self->eventQueChar.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueDrop.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueFramebufferSize.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueKey.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueMouseButton.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueMouseEnter.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueMousePosition.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueMouseScroll.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueWindowFocus.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueWindowIconify.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueWindowPosition.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueWindowRefresh.output(&Frame::realizeGLFWCallback, this);
-	self->eventQueWindowSize.output(&Frame::realizeGLFWCallback, this);
-
-	self->eventQueChar.output(onChar);
-	self->eventQueDrop.output(onDrop);
-	self->eventQueFramebufferSize.output(onFramebufferSize);
-	self->eventQueKey.output(onKey);
-	self->eventQueMouseButton.output(onMouseButton);
-	self->eventQueMouseEnter.output(onMouseEnter);
-	self->eventQueMousePosition.output(onMousePosition);
-	self->eventQueMouseScroll.output(onMouseScroll);
-	self->eventQueWindowFocus.output(onWindowFocus);
-	self->eventQueWindowIconify.output(onWindowIconify);
-	self->eventQueWindowPosition.output(onWindowPosition);
-	self->eventQueWindowRefresh.output(onWindowRefresh);
-	self->eventQueWindowSize.output(onWindowSize);
-}
-
 void Frame::distributeEvents() {
-	self->eventQueChar.flush();
-	self->eventQueDrop.flush();
-	self->eventQueFramebufferSize.flush();
-	self->eventQueKey.flush();
-	self->eventQueMouseButton.flush();
+	for (const auto& event : self->eventQueue) {
+		const auto visitor = libv::overload(
+			[this](const EventChar& e) {
+				onChar.fire(e);
+			},
+			[this](const EventDrop& e) {
+				onDrop.fire(e);
+			},
+			[this](const EventFramebufferSize& e) {
+				onFramebufferSize.fire(e);
+			},
+			[this](const EventKey& e) {
+				self->keyStates[to_value(e.key)] = (e.action != libv::input::Action::release) ?
+						libv::input::KeyState::pressed :
+						libv::input::KeyState::released;
 
-	// TODO P1: serialize events
-	self->eventQueMousePosition.flush();
-	self->eventQueMouseScroll.flush();
-	self->eventQueMouseEnter.flush(); // Enter is reordered to be the last mouse event so other events don't trigger false re-entry
-	//
+				onKey.fire(e);
+			},
+			[this](const EventMouseButton& e) {
+				self->mouseStates[to_value(e.button)] = (e.action != libv::input::Action::release) ?
+						libv::input::KeyState::pressed :
+						libv::input::KeyState::released;
 
-	self->eventQueWindowFocus.flush();
-	self->eventQueWindowIconify.flush();
-	self->eventQueWindowPosition.flush();
-	self->eventQueWindowRefresh.flush();
-	self->eventQueWindowSize.flush();
+				onMouseButton.fire(e);
+			},
+			[this](const EventMouseEnter& e) {
+				onMouseEnter.fire(e);
+			},
+			[this](const EventMousePosition& e) {
+				self->mousePosition = (static_cast<uint64_t>
+						(convert_to_s24_8(e.position.x)) << 32) | convert_to_s24_8(e.position.y);
+
+				onMousePosition.fire(e);
+			},
+			[this](const EventMouseScroll& e) {
+				auto old = getScrollPosition();
+				self->scrollPosition =
+						(static_cast<uint64_t>(convert_to_s24_8(e.offset.x + old.x)) << 32) |
+						convert_to_s24_8(e.offset.y + old.y);
+
+				onMouseScroll.fire(e);
+			},
+			[this](const EventWindowFocus& e) {
+				onWindowFocus.fire(e);
+			},
+			[this](const EventWindowIconify& e) {
+				self->minimized = e.iconified;
+
+				onWindowIconify.fire(e);
+			},
+			[this](const EventWindowPosition& e) {
+				self->position = e.position;
+
+				onWindowPosition.fire(e);
+			},
+			[this](const EventWindowRefresh& e) {
+				onWindowRefresh.fire(e);
+			},
+			[this](const EventWindowSize& e) {
+				self->size = e.size;
+
+				onWindowSize.fire(e);
+			}
+		);
+
+		std::visit(visitor, event);
+	}
+	self->eventQueue.clear();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 } // namespace frame
 } // namespace libv
-
-
-//Char
-//CursorEnter
-//CursorPos
-//Drop
-//FramebufferSize
-//Key
-//MouseButton
-//Scroll
-//WindowClose
-//WindowFocus
-//WindowIconify
-//WindowPosition
-//WindowRefresh
-//WindowSize
-//Monitor

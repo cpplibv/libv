@@ -13,13 +13,38 @@
 #include <libv/frame/events.hpp>
 
 
-// TODO P3: future proxy for frame async operations: frame.show().wait(); easy implementation:
+// TODO P2: future proxy for frame async operations: frame.show().wait(); easy implementation:
 //			add member Frame::wait()
 //			member with async task return Frame&
 //			Wait throws in a dummy task and waits for it.
+// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+// TODO P4: Map glfw hint GLFW_FLOATING
+// TODO P4: Map glfw hint GLFW_FOCUSED
+// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
+// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
+// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
+// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
+// TODO P5: Support glfw hint GLFW_STEREO
+// TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
+// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
+// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
+// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
+// TODO P5: Context sharing
+
+// No plans for mapping these glfw hints:
+// GLFW_ACCUM_RED_BITS,
+// GLFW_ACCUM_GREEN_BITS,
+// GLFW_ACCUM_BLUE_BITS,
+// GLFW_ACCUM_ALPHA_BITS,
+// GLFW_AUX_BUFFERS,
+// GLFW_CLIENT_API,
+// GLFW_DOUBLEBUFFER
+
 
 class GLFWwindow;
-class GLFWmonitor;
 
 namespace libv {
 namespace frame {
@@ -139,8 +164,7 @@ public:
 	Frame(libv::vec2i size);
 	virtual ~Frame();
 
-	// -------------------------------------------------------------------------------------------------
-private:
+private: // --------------------------------------------------------------------------------------------
 	void cmdFrameCreate();
 	/**
 	 * @note If this function fail the member window will be set to nullptr
@@ -159,35 +183,16 @@ private:
 
 	void cmdCoreUpdateDisplayMode();
 
-	// Event Callbacks and Listeners ---------------------------------------------------------------
-private:
-	template <typename E, auto queue>
+private: // --------------------------------------------------------------------------------------------
+	template <typename E>
 	friend class DispatchGLFWEvent;
 
-	void realizeGLFWCallback(const EventChar&);
-	void realizeGLFWCallback(const EventDrop&);
-	void realizeGLFWCallback(const EventFramebufferSize&);
-	void realizeGLFWCallback(const EventKey&);
-	void realizeGLFWCallback(const EventMouseButton&);
-	void realizeGLFWCallback(const EventMouseEnter&);
-	void realizeGLFWCallback(const EventMousePosition&);
-	void realizeGLFWCallback(const EventMouseScroll&);
-	void realizeGLFWCallback(const EventWindowFocus&);
-	void realizeGLFWCallback(const EventWindowIconify&);
-	void realizeGLFWCallback(const EventWindowPosition&);
-	void realizeGLFWCallback(const EventWindowRefresh&);
-	void realizeGLFWCallback(const EventWindowSize&);
-
-private:
 	static void registerEventCallbacks(Frame* frame, GLFWwindow* window);
 	static void unregisterEventCallbacks(GLFWwindow* window);
 
-private:
-	void initEventQueues();
 	void distributeEvents();
 
-	// ---------------------------------------------------------------------------------------------
-public:
+public: // ---------------------------------------------------------------------------------------------
 	void closeDefault();
 	void closeForce();
 	void join();
@@ -226,11 +231,11 @@ public:
 	DisplayMode getDisplayMode() const;
 	libv::vec2i getSize() const;
 	const std::string& getTitle() const;
-	// * * *
+	// ... Additional getters on demand
 
 	bool isDecorated() const;
 	bool isVisible() const;
-	// * * *
+	// ... Additional getters on demand
 
 	const Monitor& getCurrentMonitor() const;
 
@@ -245,10 +250,6 @@ public:
 
 	libv::vec2d getMousePosition();
 	libv::vec2d getScrollPosition();
-
-	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	// TODO P5: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 private:
 	void loopInit();

@@ -21,8 +21,6 @@ namespace frame {
 
 Frame::Frame(std::string title, libv::vec2i size) :
 	self(std::make_unique<ImplFrame>(title, size)) {
-
-	initEventQueues();
 }
 
 Frame::Frame(std::string title, int32_t width, int32_t height) :
