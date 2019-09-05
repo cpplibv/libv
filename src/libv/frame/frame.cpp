@@ -289,7 +289,7 @@ void Frame::setDecoration(bool decorated) {
 		log_frame.trace("Set frame Decoration of {} to {}", self->title, decorated);
 		self->decorated = decorated;
 		if (self->window)
-			cmdFrameRecreate();
+			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_DECORATED, decorated));
 	});
 }
 
@@ -360,7 +360,7 @@ void Frame::setResizable(bool resizable) {
 		log_frame.trace("Set frame Resizable of {} to {}", self->title, resizable);
 		self->resizable = resizable;
 		if (self->window)
-			cmdFrameRecreate();
+			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_RESIZABLE, resizable));
 	});
 }
 

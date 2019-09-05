@@ -154,17 +154,12 @@ libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximiz
 libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
 libv.frame.glfw.frame: Added glfwSetWindowSizeLimits for setting absolute window size limits
 libv.frame.glfw.frame: Added glfwSetWindowAspectRatio for setting relative window size limits
-
---- STACK ------------------------------------------------------------------------------------------
-
 libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
 
-libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
+--- STACK ------------------------------------------------------------------------------------------
+
 libv.frame: remove "atomics"
 libv.frame: replace fix state arrays with flat_maps
 
@@ -172,18 +167,26 @@ libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 libv.frame.glfw.core: Added glfwWaitEventsTimeout for waiting for events for a set amount of time
 
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
+libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
+libv.frame: Implement floating aka always on top
+
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
+libv.frame: implement setDisplayMode without cmdFrameRecreate
+
+libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 
 libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
 
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
+
 libv.frame.glfw.hint: Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
-libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
 libv.frame.glfw.hint: Added GLFW_FOCUSED window hint for controlling initial input focus
 libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
 libv.frame.glfw.hint: Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
 libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
-libv.frame.glfw.hint: Added glfwDefaultWindowHints for resetting all window hints to their default values
 
 libv.frame.glfw.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
 libv.frame.glfw.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
