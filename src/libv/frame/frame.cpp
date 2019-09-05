@@ -340,6 +340,21 @@ void Frame::setPosition(FramePosition pos) {
 	}
 }
 
+void Frame::setAspectRatio(libv::vec2i fraction) {
+	self->context.executeAsync([this, fraction] {
+		log_frame.trace("Set frame AspectRatio of {} to {}/{}", self->title, fraction.x, fraction.y);
+		self->aspectRatio = fraction;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowAspectRatio, self->window,
+					self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
+					self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y));
+	});
+}
+
+void Frame::setAspectRatio(int numer, int denom) {
+	setAspectRatio(libv::vec2i{numer, denom});
+}
+
 void Frame::setResizable(bool resizable) {
 	self->context.executeAsync([this, resizable] {
 		log_frame.trace("Set frame Resizable of {} to {}", self->title, resizable);

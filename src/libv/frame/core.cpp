@@ -187,6 +187,10 @@ void Frame::cmdCoreCreate() {
 			self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
 			self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y);
 
+	glfwSetWindowAspectRatio(self->window,
+			self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
+			self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
+
 	if (self->displayMode == DisplayMode::fullscreen) {
 
 	} else if (self->displayMode == DisplayMode::borderless) {

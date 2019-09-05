@@ -235,6 +235,11 @@ public:
 	void setPosition(libv::vec2i pos);
 	void setPosition(FramePosition pos);
 
+	/// Negative values interpreted as no aspect ratio constraint
+	void setAspectRatio(int numer, int denom);
+	/// Negative values interpreted as no aspect ratio constraint
+	void setAspectRatio(libv::vec2i fraction);
+
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
 	void setSize(libv::vec2i size);
@@ -255,6 +260,7 @@ public:
 	void setSizeLimitMax(int maxx, int maxy);
 	/// Negative values interpreted as no limit
 	void setSizeLimitMax(libv::vec2i max);
+
 
 	void setTitle(std::string title);
 //	void setWindowSizeLimits(int minx, int miny, int maxx, int maxy);

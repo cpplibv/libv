@@ -153,10 +153,9 @@ libv.frame.glfw.frame: Added glfwMaximizeWindow for window maximization
 libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
 libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
 libv.frame.glfw.frame: Added glfwSetWindowSizeLimits for setting absolute window size limits
+libv.frame.glfw.frame: Added glfwSetWindowAspectRatio for setting relative window size limits
 
 --- STACK ------------------------------------------------------------------------------------------
-
-libv.frame.glfw.frame: Added glfwSetWindowAspectRatio for setting relative window size limits
 
 libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows

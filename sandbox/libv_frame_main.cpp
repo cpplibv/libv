@@ -121,6 +121,11 @@ public:
 				setSizeLimit(-1, -1, 400, 300);
 			if (e.key == Key::M)
 				setSizeLimit(-1, -1, -1, -1);
+
+			if (e.key == Key::Comma)
+				setAspectRatio(16, 9);
+			if (e.key == Key::Period)
+				setAspectRatio(-1, -1);
 		});
 	}
 };
