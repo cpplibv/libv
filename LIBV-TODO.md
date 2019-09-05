@@ -159,12 +159,11 @@ libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing 
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
 libv.frame: remove unnecessary atomics
 libv.frame: replace fix state arrays with flat_maps
-
---- STACK ------------------------------------------------------------------------------------------
-
 libv.frame: Implement floating aka always on top
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
 libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
+
+--- STACK ------------------------------------------------------------------------------------------
 
 libv.frame.input: different key can release each other's key state (left/right shift), scancode should participate in insert/erase even for keys in some way
 

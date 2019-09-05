@@ -102,6 +102,11 @@ public:
 			if (e.key == Key::H)
 				log_sandbox.trace("getPosition: {}", getPosition());
 
+			if (e.key == Key::J)
+				setAlwaysOnTop(true);
+			if (e.key == Key::K)
+				setAlwaysOnTop(false);
+
 			// --- Z row
 
 			if (e.key == Key::Z)

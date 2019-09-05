@@ -350,6 +350,15 @@ void Frame::setAspectRatio(libv::vec2i fraction) {
 	});
 }
 
+void Frame::setAlwaysOnTop(bool alwaysOnTop) {
+	self->context.executeAsync([this, alwaysOnTop] {
+		log_frame.trace("Set frame AlwaysOnTop of {} to {}", self->title, alwaysOnTop);
+		self->alwaysOnTop = alwaysOnTop;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_FLOATING, alwaysOnTop));
+	});
+}
+
 void Frame::setAspectRatio(int numer, int denom) {
 	setAspectRatio(libv::vec2i{numer, denom});
 }

@@ -235,6 +235,8 @@ public:
 	void setPosition(libv::vec2i pos);
 	void setPosition(FramePosition pos);
 
+	void setAlwaysOnTop(bool alwaysOnTop);
+
 	/// Negative values interpreted as no aspect ratio constraint
 	void setAspectRatio(int numer, int denom);
 	/// Negative values interpreted as no aspect ratio constraint

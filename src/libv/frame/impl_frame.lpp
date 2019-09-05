@@ -67,6 +67,7 @@ public:
 
 	bool decorated = true;
 	bool resizable = true;
+	bool alwaysOnTop = false;
 
 	bool hidden = true;
 	bool maximized = false;

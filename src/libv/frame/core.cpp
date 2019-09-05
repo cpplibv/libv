@@ -135,7 +135,6 @@ void Frame::cmdCoreCreate() {
 	glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	glfwWindowHint(GLFW_FLOATING, false); // Always on top
 	glfwWindowHint(GLFW_FOCUSED, true); // Initial focus
 	glfwWindowHint(GLFW_FOCUS_ON_SHOW, true); // Auto focus on show
 	//	GLFW_CENTER_CURSOR
@@ -145,14 +144,15 @@ void Frame::cmdCoreCreate() {
 	//	GLFW_SCALE_TO_MONITOR
 	//	GLFW_TRANSPARENT_FRAMEBUFFER
 
+	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
+	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
+	glfwWindowHint(GLFW_SAMPLES, libv::to_value(self->openGLSamples));
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, self->openGLVersionMajor);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, self->openGLVersionMinor);
 	glfwWindowHint(GLFW_DECORATED, self->decorated);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
-	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
 	glfwWindowHint(GLFW_MAXIMIZED, self->maximized);
 	glfwWindowHint(GLFW_RESIZABLE, self->resizable);
-	glfwWindowHint(GLFW_SAMPLES, libv::to_value(self->openGLSamples));
+	glfwWindowHint(GLFW_FLOATING, self->alwaysOnTop);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 
 	if (self->displayMode == DisplayMode::fullscreen) {
