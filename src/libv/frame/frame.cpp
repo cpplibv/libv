@@ -372,8 +372,16 @@ Frame::DisplayMode Frame::getDisplayMode() const {
 	return self->displayMode;
 }
 
+libv::vec2i Frame::getPosition() const {
+	return self->position;
+}
+
 libv::vec2i Frame::getSize() const {
 	return self->size;
+}
+
+libv::vec4i Frame::getFrameSize() const {
+	return self->frameSize;
 }
 
 const std::string& Frame::getTitle() const {

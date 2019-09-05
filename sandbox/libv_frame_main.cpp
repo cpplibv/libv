@@ -96,6 +96,13 @@ public:
 			if (e.key == Key::Y)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
 
+			if (e.key == Key::F)
+				log_sandbox.trace("getFrameSize: {}", getFrameSize());
+			if (e.key == Key::G)
+				log_sandbox.trace("getSize: {}", getSize());
+			if (e.key == Key::H)
+				log_sandbox.trace("getPosition: {}", getPosition());
+
 		});
 	}
 };

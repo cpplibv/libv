@@ -51,6 +51,7 @@ public:
 	uint32_t swapInterval = 1;
 	libv::vec2i position = {};
 	libv::vec2i size;
+	libv::vec4i frameSize = {}; /// x - left, y - top, z - right, w - bottom
 
 public:
 	Frame::OpenGLProfile openGLProfile = Frame::OpenGLProfile::compat;

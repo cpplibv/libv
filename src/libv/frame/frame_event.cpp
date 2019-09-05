@@ -34,6 +34,23 @@ struct DispatchGLFWEvent {
 		}
 	}
 
+	template <typename... Args>
+	static inline void frame(GLFWwindow* window, Args... args) {
+		try {
+			Frame& frame = *windowHandlers.at(window);
+			frame.self->eventQueue.emplace_back(E(args...));
+
+			glfwGetWindowFrameSize(window,
+					&frame.self->frameSize.x,
+					&frame.self->frameSize.y,
+					&frame.self->frameSize.z,
+					&frame.self->frameSize.w);
+
+		} catch (const std::out_of_range& e) {
+			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
+		}
+	}
+
 	static inline void mouse(GLFWwindow* window, double x, double y) {
 		try {
 			Frame& frame = *windowHandlers.at(window);
@@ -63,10 +80,10 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetCursorPosCallback      (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
 	glfwSetScrollCallback         (window, DispatchGLFWEvent<EventMouseScroll    >::call);
 	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    >::call);
-	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowMinimize >::call);
-	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::call);
+	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowMinimize >::frame);
+	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::frame);
 	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
-	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::call);
+	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::frame);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {

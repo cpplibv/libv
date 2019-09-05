@@ -242,7 +242,9 @@ public:
 public:
 	CloseOperation getCloseOperation() const;
 	DisplayMode getDisplayMode() const;
+	libv::vec2i getPosition() const;
 	libv::vec2i getSize() const;
+	libv::vec4i getFrameSize() const; /// x - left, y - top, z - right, w - bottom
 	const std::string& getTitle() const;
 	// ... Additional getters on demand
 
