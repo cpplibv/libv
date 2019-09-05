@@ -8,6 +8,7 @@
 #include <libv/math/fixed_point.hpp>
 #include <libv/utility/overload.hpp>
 // pro
+#include <libv/frame/events.hpp>
 #include <libv/frame/impl_frame.lpp>
 #include <libv/frame/log.hpp>
 
@@ -36,8 +37,13 @@ struct DispatchGLFWEvent {
 	static inline void mouse(GLFWwindow* window, double x, double y) {
 		try {
 			Frame& frame = *windowHandlers.at(window);
+			std::vector<Event>& queue = frame.self->eventQueue;
 			auto size = frame.getSize();
-			frame.self->eventQueue.emplace_back(E(x, size.y - y - 1));
+
+			if (!queue.empty() && std::holds_alternative<E>(queue.back()))
+				std::get<E>(queue.back()).position = libv::vec2d{x, size.y - y - 1};
+			else
+				queue.emplace_back(E(x, size.y - y - 1));
 
 		} catch (const std::out_of_range& e) {
 			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");

@@ -144,10 +144,10 @@ libv.utility: move Slice from utility to algorithm
 libv.frame: update glfw
 libv.frame.glfw.frame: Deprecated charmods callback
 libv.frame: serialize events
+libv.frame: Merge mouse position events (only if there was no intermediate event)
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.frame: Limit cursor position event pre-fire to 1 (only if there was no intermediate event)
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return

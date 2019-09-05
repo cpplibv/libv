@@ -6,15 +6,11 @@
 #include <libv/math/vec.hpp>
 // std
 #include <string>
+#include <variant>
 #include <vector>
 // pro
 #include <libv/input/inputs.hpp>
 
-
-// TODO P5: Most of the event should get a observer_ref<Frame> as member, or even better: Frame&!
-// TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
-//			EventWindowRefresh is not that simple, i think i have to work with it to 'force' refresh
-//			if context is frozen due to event queue 'lock' in glfw (moving window)
 
 namespace libv {
 namespace frame {
@@ -22,7 +18,6 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 class Monitor;
-class Frame;
 
 struct EventChar {
 	uint32_t unicode;
@@ -199,6 +194,24 @@ struct EventContextUpdate {
 struct EventContextDestroy {
 	std::string toPrettyString() const;
 };
+
+// -------------------------------------------------------------------------------------------------
+
+using Event = std::variant<
+		EventChar,
+		EventDrop,
+		EventFramebufferSize,
+		EventKey,
+		EventMouseButton,
+		EventMouseEnter,
+		EventMousePosition,
+		EventMouseScroll,
+		EventWindowFocus,
+		EventWindowIconify,
+		EventWindowPosition,
+		EventWindowRefresh,
+		EventWindowSize
+>;
 
 // -------------------------------------------------------------------------------------------------
 

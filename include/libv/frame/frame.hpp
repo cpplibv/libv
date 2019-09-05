@@ -33,6 +33,10 @@
 // TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
 // TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
 // TODO P5: Context sharing
+// TODO P5: Most of the event should get a observer_ref<Frame> as member, or even better: Frame&!
+// TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
+//			EventWindowRefresh is not that simple, i think i have to work with it to 'force' refresh
+//			if context is frozen due to event queue 'lock' in glfw (moving window)
 
 // No plans for mapping these glfw hints:
 // GLFW_ACCUM_RED_BITS,
@@ -42,7 +46,6 @@
 // GLFW_AUX_BUFFERS,
 // GLFW_CLIENT_API,
 // GLFW_DOUBLEBUFFER
-
 
 class GLFWwindow;
 

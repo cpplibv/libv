@@ -35,22 +35,6 @@ struct CoreProxy {
 
 // -------------------------------------------------------------------------------------------------
 
-using Event = std::variant<
-		EventChar,
-		EventDrop,
-		EventFramebufferSize,
-		EventKey,
-		EventMouseButton,
-		EventMouseEnter,
-		EventMousePosition,
-		EventMouseScroll,
-		EventWindowFocus,
-		EventWindowIconify,
-		EventWindowPosition,
-		EventWindowRefresh,
-		EventWindowSize
->;
-
 class ImplFrame : public libv::Trackable {
 public:
 	std::atomic<bool> forcedClose{false};
