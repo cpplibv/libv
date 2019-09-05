@@ -102,6 +102,11 @@ public:
 	ExecutorThread(const std::string& name = "UNNAMED") :
 		thread(&ExecutorThread::run, this),
 		name(name) { }
+
+	void setName(std::string name) {
+		this->name = std::move(name);
+	}
+
 	virtual ~ExecutorThread() {
 		stop();
 		join();

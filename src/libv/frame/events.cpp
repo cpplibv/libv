@@ -26,16 +26,6 @@ std::string EventChar::toPrettyString() const {
 	return fmt::format("Char: unicode = {}, utf8 = {}", unicode, utf8);
 }
 
-EventCharMods::EventCharMods(uint32_t unicode, int mods) :
-	unicode(unicode),
-	mods{mods} {
-	libv::unicode_to_utf8(unicode, utf8);
-}
-
-std::string EventCharMods::toPrettyString() const {
-	return fmt::format("Char Mods: unicode = {}, utf8 = {}, mode = {}", unicode, utf8, to_value(mods));
-}
-
 std::string EventDrop::toPrettyString() const {
 	return fmt::format("Drop: size = {}, contents: \n\"{}\"",
 			strings.size(), boost::algorithm::join(strings, "\"\n\""));

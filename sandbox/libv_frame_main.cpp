@@ -20,7 +20,6 @@ void noisyEvents(libv::Frame& frame) {
 	};
 
 	frame.onChar.output(pretty_print_to_log);
-	frame.onCharMods.output(pretty_print_to_log);
 	frame.onDrop.output(pretty_print_to_log);
 	frame.onFramebufferSize.output(pretty_print_to_log);
 	frame.onKey.output(pretty_print_to_log);
@@ -43,10 +42,10 @@ void noisyEvents(libv::Frame& frame) {
 
 class TestFrame : public libv::Frame {
 public:
-	TestFrame(const std::string& title) : Frame(title, 1200, 750) {
-		setPosition(POSITION_CENTER_CURRENT_MONITOR);
-		setCloseOperation(ON_CLOSE_DISPOSE);
-		setOpenGLProfile(OPENGL_PROFILE_CORE);
+	TestFrame(const std::string& title) : Frame(title, 1280, 960) {
+		setPosition(FramePosition::center_current_monitor);
+		setCloseOperation(CloseOperation::dispose);
+		setOpenGLProfile(OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
 		show();
 
@@ -57,7 +56,7 @@ public:
 			if (e.key == Key::X)
 				this->setDecoration(!this->isDecorated());
 			if (e.key == Key::C)
-				this->setPosition(POSITION_CENTER_CURRENT_MONITOR);
+				this->setPosition(FramePosition::center_current_monitor);
 		});
 	}
 };

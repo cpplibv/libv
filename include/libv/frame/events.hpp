@@ -32,15 +32,6 @@ struct EventChar {
 	std::string toPrettyString() const;
 };
 
-struct EventCharMods {
-	uint32_t unicode;
-	char utf8[5]; /// Null terminated utf8 representation of the unicode character
-	libv::input::KeyModifier mods;
-
-	EventCharMods(uint32_t unicode, int mods);
-	std::string toPrettyString() const;
-};
-
 struct EventDrop {
 	std::vector<std::string> strings;
 

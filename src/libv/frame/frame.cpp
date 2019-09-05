@@ -7,8 +7,11 @@
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/math/fixed_point.hpp>
+#include <libv/thread/executor_thread.hpp>
 // pro
 #include <libv/frame/log.hpp>
+#include <libv/frame/impl_frame.lpp>
+#include <libv/frame/monitor.hpp>
 
 
 namespace libv {
@@ -16,45 +19,56 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_WINDOWED = 0;
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_BORDERLESS = 1;
-const Frame::TypeDisplayMode Frame::DISPLAY_MODE_FULLSCREEN = 2;
+Frame::Frame(std::string title, libv::vec2i size) :
+	self(std::make_unique<ImplFrame>(title, size)) {
 
-const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_ANY = GLFW_OPENGL_ANY_PROFILE;
-const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_COMPAT = GLFW_OPENGL_COMPAT_PROFILE;
-const Frame::TypeOpenGLProfile Frame::OPENGL_PROFILE_CORE = GLFW_OPENGL_CORE_PROFILE;
+	initEventQueues();
+}
 
-const Frame::TypeOpenGLRefreshRate Frame::REFRESH_RATE_DONT_CARE = GLFW_DONT_CARE;
+Frame::Frame(std::string title, int32_t width, int32_t height) :
+	Frame(std::move(title), libv::vec2i{width, height}) { }
 
-const Frame::TypeOpenGLSamples Frame::SAMPLES_DONT_CARE = GLFW_DONT_CARE;
+Frame::Frame(std::string title) :
+	Frame(std::move(title), libv::vec2i{1280, 960}) { }
+
+Frame::Frame(int32_t width, int32_t height) :
+	Frame("", libv::vec2i{width, height}) { }
+
+Frame::Frame(libv::vec2i size) :
+	Frame("", size) { }
+
+Frame::~Frame() {
+	closeForce();
+	join();
+}
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
-	log_frame.trace("Close default frame {}", title);
-	if (window)
-		glfwSetWindowShouldClose(window, true);
+	log_frame.trace("Close default frame {}", self->title);
+	if (self->window)
+		glfwSetWindowShouldClose(self->window, true);
 }
 
 void Frame::closeForce() {
-	log_frame.trace("Close force frame {}", title);
-	forcedClose = true;
+	log_frame.trace("Close force frame {}", self->title);
+	self->forcedClose = true;
 }
 
 void Frame::join() {
-	context.join();
+	self->context.join();
 }
 
 bool Frame::isFrameShouldClose() {
-	if (forcedClose) { // If we are forced to close
+	if (self->forcedClose) { // If we are forced to close
 		onCloseRequest.fire(EventCloseRequest());
 		return true;
 	}
 
-	if (!window) // If there is still no window
+	if (!self->window) // If there is still no self->window
 		return false;
 
-	bool shouldClose = glfwWindowShouldClose(window);
+	bool shouldClose = glfwWindowShouldClose(self->window);
 	if (shouldClose) { // Fire on close event which can change the outcome
 		EventCloseRequest ecr;
 		onCloseRequest.fire(ecr);
@@ -62,18 +76,18 @@ bool Frame::isFrameShouldClose() {
 	}
 
 	if (shouldClose) { // On close let DCO handle
-		switch (defaultCloseOperation) {
-		case ON_CLOSE_DISPOSE:
+		switch (self->defaultCloseOperation) {
+		case CloseOperation::dispose:
 			return true;
-		case ON_CLOSE_DO_NOTHING:
-			glfwSetWindowShouldClose(window, false);
+		case CloseOperation::do_nothing:
+			glfwSetWindowShouldClose(self->window, false);
 			return false;
-		case ON_CLOSE_HIDE:
-			glfwSetWindowShouldClose(window, false);
+		case CloseOperation::hide:
+			glfwSetWindowShouldClose(self->window, false);
 			hide();
 			return false;
-		case ON_CLOSE_MINIMIZE:
-			glfwSetWindowShouldClose(window, false);
+		case CloseOperation::minimize:
+			glfwSetWindowShouldClose(self->window, false);
 			minimize();
 			return false;
 		}
@@ -84,215 +98,217 @@ bool Frame::isFrameShouldClose() {
 // -------------------------------------------------------------------------------------------------
 
 bool Frame::isRefreshSkipable() {
-	return hidden || minimized;
+	return self->hidden || self->minimized;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::show() {
-	context.executeAsync([this] {
-		log_frame.trace("Show frame {}", title);
-		if (!window) {
+	self->context.executeAsync([this] {
+		log_frame.trace("Show frame {}", self->title);
+		if (!self->window) {
 			cmdFrameCreate();
 		}
-		if (window) {
-			core.exec(std::bind(glfwShowWindow, window));
-			hidden = false;
+		if (self->window) {
+			self->core.exec(std::bind(glfwShowWindow, self->window));
+			self->hidden = false;
 		}
 	});
 }
 
 void Frame::hide() {
-	context.executeAsync([this] {
-		log_frame.trace("Hide frame {}", title);
-		if (window) {
-			core.exec(std::bind(glfwHideWindow, window));
-			hidden = true;
+	self->context.executeAsync([this] {
+		log_frame.trace("Hide frame {}", self->title);
+		if (self->window) {
+			self->core.exec(std::bind(glfwHideWindow, self->window));
+			self->hidden = true;
 		}
 	});
 }
 
 void Frame::restore() {
-	context.executeAsync([this] {
-		log_frame.trace("Restore frame {}", title);
-		if (window) {
-			core.exec(std::bind(glfwRestoreWindow, window));
-			minimized = false;
+	self->context.executeAsync([this] {
+		log_frame.trace("Restore frame {}", self->title);
+		if (self->window) {
+			self->core.exec(std::bind(glfwRestoreWindow, self->window));
+			self->minimized = false;
 		}
 	});
 }
 
 void Frame::minimize() {
-	context.executeAsync([this] {
-		log_frame.trace("Minimize frame {}", title);
-		if (window) {
-			core.exec(std::bind(glfwIconifyWindow, window));
-			minimized = true;
+	self->context.executeAsync([this] {
+		log_frame.trace("Minimize frame {}", self->title);
+		if (self->window) {
+			self->core.exec(std::bind(glfwIconifyWindow, self->window));
+			self->minimized = true;
 		}
 	});
 }
 
 // -------------------------------------------------------------------------------------------------
 
+void Frame::setOpenGLProfile(Frame::OpenGLProfile profile) {
+	self->context.executeAsync([this, profile] {
+		log_frame.trace("Set frame OpenGLProfile of {} to {}", self->title, libv::to_value(profile));
+		self->openGLProfile = profile;
+		if (self->window)
+			cmdFrameRecreate();
+	});
+}
+
+void Frame::setOpenGLRefreshRate(Frame::OpenGLRefreshRate rate) {
+	self->context.executeAsync([this, rate] {
+		log_frame.trace("Set frame OpenGLRefreshRate of {} to {}", self->title, libv::to_value(rate));
+		self->openGLRefreshRate = rate;
+		if (self->window)
+			cmdFrameRecreate();
+	});
+}
+
+void Frame::setOpenGLSamples(Frame::OpenGLSamples samples) {
+	self->context.executeAsync([this, samples] {
+		log_frame.trace("Set frame OpenGLSamples of {} to {}", self->title, libv::to_value(samples));
+		self->openGLSamples = samples;
+		if (self->window)
+			cmdFrameRecreate();
+	});
+}
+
 void Frame::setOpenGLVersion(int major, int minor) {
-	context.executeAsync([this, major, minor] {
-		log_frame.trace("Set frame OpenGLVersion of {} to {}.{}", title, major, minor);
-		this->openGLVersionMajor = major;
-		this->openGLVersionMinor = minor;
-		if (window)
+	self->context.executeAsync([this, major, minor] {
+		log_frame.trace("Set frame OpenGLVersion of {} to {}.{}", self->title, major, minor);
+		self->openGLVersionMajor = major;
+		self->openGLVersionMinor = minor;
+		if (self->window)
 			cmdFrameRecreate();
 	});
 }
 
-void Frame::setOpenGLProfile(TypeOpenGLProfile profile) {
-	context.executeAsync([this, profile] {
-		log_frame.trace("Set frame OpenGLProfile of {} to {}", title, profile);
-		this->openGLProfile = profile;
-		if (window)
-			cmdFrameRecreate();
-	});
-}
+// ---
 
-void Frame::setOpenGLSamples(TypeOpenGLSamples samples) {
-	context.executeAsync([this, samples] {
-		log_frame.trace("Set frame OpenGLSamples of {} to {}", title, samples);
-		this->openGLSamples = samples;
-		if (window)
-			cmdFrameRecreate();
-	});
-}
-
-void Frame::setOpenGLRefreshRate(int rate) {
-	context.executeAsync([this, rate] {
-		log_frame.trace("Set frame OpenGLRefreshRate of {} to {}", title, rate);
-		this->openGLRefreshRate = rate;
-		if (window)
-			cmdFrameRecreate();
-	});
-}
-
-void Frame::setCloseOperation(const Frame::TypeCloseOperation& operation) {
-	log_frame.trace("Set frame CloseOperation of {} to {}", title, operation);
-	defaultCloseOperation = operation;
+void Frame::setCloseOperation(Frame::CloseOperation operation) {
+	log_frame.trace("Set frame CloseOperation of {} to {}", self->title, libv::to_value(operation));
+	self->defaultCloseOperation = operation;
 }
 
 void Frame::setDecoration(bool decorated) {
-	context.executeAsync([this, decorated] {
-		log_frame.trace("Set frame Decoration of {} to {}", title, decorated);
-		this->decorated = decorated;
-		if (window)
+	self->context.executeAsync([this, decorated] {
+		log_frame.trace("Set frame Decoration of {} to {}", self->title, decorated);
+		self->decorated = decorated;
+		if (self->window)
 			cmdFrameRecreate();
 	});
 }
 
-void Frame::setDisplayMode(const TypeDisplayMode& mode) {
-	context.executeAsync([this, mode] {
-		log_frame.trace("Set frame DisplayMode of {} to {}", title, mode);
-		this->displayMode = mode;
-		if (window)
+void Frame::setDisplayMode(Frame::DisplayMode mode) {
+	self->context.executeAsync([this, mode] {
+		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(mode));
+		self->displayMode = mode;
+		if (self->window)
 			cmdFrameRecreate();
 	});
 }
 
 void Frame::setPosition(int x, int y) {
-	setPosition(vec2i(x, y));
+	setPosition(libv::vec2i(x, y));
 }
 
-void Frame::setPosition(vec2i newpos) {
-	context.executeAsync([this, newpos] {
-		log_frame.trace("Set frame Position of {} to {}, {}", title, newpos.x, newpos.y);
-		this->position = newpos;
-		if (window)
-			core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+void Frame::setPosition(libv::vec2i newpos) {
+	self->context.executeAsync([this, newpos] {
+		log_frame.trace("Set frame Position of {} to {}, {}", self->title, newpos.x, newpos.y);
+		self->position = newpos;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 	});
 }
 
 void Frame::setPosition(FramePosition pos) {
 	switch (pos) {
-	case POSITION_CENTER_CURRENT_MONITOR:
-		context.executeAsync([this] {
+	case FramePosition::center_current_monitor:
+		self->context.executeAsync([this] {
 			auto& monitor = getCurrentMonitor();
-			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
-			log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", title, newpos.x, newpos.y);
-			this->position = newpos;
-			if (window)
-				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
+			log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", self->title, newpos.x, newpos.y);
+			self->position = newpos;
+			if (self->window)
+				self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 		});
 		break;
-	case POSITION_CENTER_PRIMARY_MONITOR:
-		context.executeAsync([this] {
+	case FramePosition::center_primary_monitor:
+		self->context.executeAsync([this] {
 			auto& monitor = Monitor::getPrimaryMonitor();
-			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - size / 2;
-			log_frame.trace("Set frame Position of {} to {}, {} as center of primary monitor", title, newpos.x, newpos.y);
-			this->position = newpos;
-			if (window)
-				core.exec(std::bind(glfwSetWindowPos, window, position.x, position.y));
+			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
+			log_frame.trace("Set frame Position of {} to {}, {} as center of primary monitor", self->title, newpos.x, newpos.y);
+			self->position = newpos;
+			if (self->window)
+				self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 		});
 		break;
 	}
 }
 
 void Frame::setResizable(bool resizable) {
-	context.executeAsync([this, resizable] {
-		log_frame.trace("Set frame Resizable of {} to {}", title, resizable);
-		this->resizable = resizable;
-		if (window)
+	self->context.executeAsync([this, resizable] {
+		log_frame.trace("Set frame Resizable of {} to {}", self->title, resizable);
+		self->resizable = resizable;
+		if (self->window)
 			cmdFrameRecreate();
 	});
 }
 
 void Frame::setSize(int x, int y) {
-	setSize(vec2i(x, y));
+	setSize(libv::vec2i(x, y));
 }
 
-void Frame::setSize(vec2i newsize) {
-	context.executeAsync([this, newsize] {
-		log_frame.trace("Set frame Size of {} to {}, {}", title, newsize.x, newsize.y);
-		size = newsize;
-		if (window)
-			core.exec(std::bind(glfwSetWindowSize, window, size.x, position.y));
+void Frame::setSize(libv::vec2i newsize) {
+	self->context.executeAsync([this, newsize] {
+		log_frame.trace("Set frame Size of {} to {}, {}", self->title, newsize.x, newsize.y);
+		self->size = newsize;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowSize, self->window, self->size.x, self->size.y));
 	});
 }
 
-void Frame::setTitle(const std::string& title) {
-	context.executeAsync([this, title] {
-		log_frame.trace("Set frame Title of {} to {}", this->title, title);
-		this->title = title;
-		if (window)
-			core.exec([this, title] {
-				glfwSetWindowTitle(window, title.c_str());
+void Frame::setTitle(std::string title) {
+	self->context.executeAsync([this, title = std::move(title)] {
+		log_frame.trace("Set frame Title of {} to {}", self->title, title);
+		self->title = std::move(title);
+		if (self->window)
+			self->core.exec([this] {
+				glfwSetWindowTitle(self->window, self->title.c_str());
 			});
 	});
 }
 
 // Getters -----------------------------------------------------------------------------------------
 
-Frame::TypeCloseOperation Frame::getCloseOperation() const {
-	return defaultCloseOperation;
+Frame::CloseOperation Frame::getCloseOperation() const {
+	return self->defaultCloseOperation;
 }
 
-Frame::TypeDisplayMode Frame::getDisplayMode() const {
-	return displayMode;
+Frame::DisplayMode Frame::getDisplayMode() const {
+	return self->displayMode;
 }
 
-vec2i Frame::getSize() const {
-	return size;
+libv::vec2i Frame::getSize() const {
+	return self->size;
 }
 
-std::string Frame::getTitle() const {
-	return title;
+const std::string& Frame::getTitle() const {
+	return self->title;
 }
 
 bool Frame::isDecorated() const {
-	return decorated;
+	return self->decorated;
 }
 
 bool Frame::isVisible() const {
-	return !hidden && !minimized && window;
+	return !self->hidden && !self->minimized && self->window;
 }
 
 const Monitor& Frame::getCurrentMonitor() const {
-	return Monitor::getMonitorAt(position + size / 2);
+	return Monitor::getMonitorAt(self->position + self->size / 2);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -300,9 +316,11 @@ const Monitor& Frame::getCurrentMonitor() const {
 libv::input::KeyState Frame::getKey(libv::input::Key key) {
 	if (key == libv::input::Key::Unknown)
 		return libv::input::KeyState::released;
+
 	if (to_value(key) >= to_value(libv::input::Key::Last))
 		return libv::input::KeyState::released;
-	return keyStates[to_value(key)].load();
+
+	return self->keyStates[to_value(key)].load();
 }
 
 bool Frame::isKeyPressed(libv::input::Key key) {
@@ -318,7 +336,7 @@ libv::input::KeyState Frame::getMouse(libv::input::Mouse key) {
 //		return KeyState::released;
 	if (to_value(key) >= to_value(libv::input::Mouse::Last))
 		return libv::input::KeyState::released;
-	return mouseStates[to_value(key)].load();
+	return self->mouseStates[to_value(key)].load();
 }
 
 bool Frame::isMousePressed(libv::input::Mouse key) {
@@ -329,8 +347,8 @@ bool Frame::isMouseReleased(libv::input::Mouse key) {
 	return getMouse(key) == libv::input::KeyState::released;
 }
 
-vec2d Frame::getMousePosition() {
-	const auto raw = mousePosition.load();
+libv::vec2d Frame::getMousePosition() {
+	const auto raw = self->mousePosition.load();
 
 	// The value stored in atomic mousePosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
@@ -339,8 +357,8 @@ vec2d Frame::getMousePosition() {
 	return {convert_from_s24_8<double>(x), convert_from_s24_8<double>(y)};
 }
 
-vec2d Frame::getScrollPosition() {
-	const auto raw = scrollPosition.load();
+libv::vec2d Frame::getScrollPosition() {
+	const auto raw = self->scrollPosition.load();
 
 	// The value stored in atomic wheelPosition is coded as x:s24.8 y:s24.8
 	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
@@ -352,29 +370,29 @@ vec2d Frame::getScrollPosition() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdFrameCreate() {
-	core.exec(std::bind(&Frame::cmdCoreCreate, this));
-	if (window) {
-		glfwMakeContextCurrent(window);
-		context.executeAsync(std::bind(&Frame::loopInit, this));
-		contextInit();
+	self->core.exec(std::bind(&Frame::cmdCoreCreate, this));
+	if (self->window) {
+		glfwMakeContextCurrent(self->window);
+		self->context.executeAsync(std::bind(&Frame::loopInit, this));
+		this->contextCreate();
 	}
 }
 
 void Frame::cmdFrameRecreate() {
-	assert(window);
+	assert(self->window);
 
 	glfwMakeContextCurrent(nullptr);
-	core.exec(std::bind(&Frame::cmdCoreRecreate, this));
-	if (window) {
-		glfwMakeContextCurrent(window);
-		contextInit();
+	self->core.exec(std::bind(&Frame::cmdCoreRecreate, this));
+	if (self->window) {
+		glfwMakeContextCurrent(self->window);
+		this->contextCreate();
 	}
 }
 
 void Frame::cmdFrameDestroy() {
-	contextTerminate();
+	this->contextDestroy();
 	glfwMakeContextCurrent(nullptr);
-	core.exec(std::bind(&Frame::cmdCoreDestroy, this));
+	self->core.exec(std::bind(&Frame::cmdCoreDestroy, this));
 }
 
 // Frame Loop --------------------------------------------------------------------------------------
@@ -382,7 +400,7 @@ void Frame::cmdFrameDestroy() {
 void Frame::loopInit() {
 	log_frame.debug("Frame entering loop");
 
-	context.executeAsync(std::bind(&Frame::loop, this));
+	self->context.executeAsync(std::bind(&Frame::loop, this));
 }
 
 void Frame::loop() {
@@ -391,49 +409,33 @@ void Frame::loop() {
 	if (isFrameShouldClose()) {
 		loopTerminate();
 	} else {
-		if (!isRefreshSkipable() && window) {
+		if (!isRefreshSkipable() && self->window) {
 			onContextUpdate.fire(EventContextUpdate());
 
-			glfwSwapBuffers(window);
+			glfwSwapBuffers(self->window);
 		}
 
-		context.executeAsync(std::bind(&Frame::loop, this));
+		self->context.executeAsync(std::bind(&Frame::loop, this));
 	}
 }
 
 void Frame::loopTerminate() {
 	log_frame.debug("Frame exiting loop");
 	cmdFrameDestroy();
-	context.stop();
+	self->context.stop();
 }
 
-void Frame::contextInit() {
-	log_frame.debug("Frame context initializing");
+void Frame::contextCreate() {
+	log_frame.debug("Frame context create");
 	onContextCreate.fire(EventContextCreate());
 }
 
-void Frame::contextTerminate() {
-	log_frame.debug("Frame context terminating");
+void Frame::contextDestroy() {
+	log_frame.debug("Frame context destroy");
 	onContextDestroy.fire(EventContextDestroy());
 }
 
 // -------------------------------------------------------------------------------------------------
-
-Frame::Frame(const std::string& title, int32_t width, int32_t height) :
-	context(fmt::format("Thread of {}", title)),
-	title(title) {
-	size = vec2i(width, height);
-
-	initEventQueues();
-}
-
-Frame::Frame(int32_t width, int32_t height) :
-	Frame("", width, height) { }
-
-Frame::~Frame() {
-	closeForce();
-	join();
-}
 
 } // namespace frame
 } // namespace libv

@@ -1,0 +1,103 @@
+// File:   impl_frame.lpp Author: Vader Created on 05 September 2019, 09:16
+
+#pragma once
+
+// hpp
+#include <libv/frame/frame.hpp>
+// ext
+#include <fmt/format.h>
+#include <GLFW/glfw3.h>
+// libv
+#include <libv/math/fixed_point.hpp>
+#include <libv/sig/signal.hpp>
+#include <libv/thread/executor_thread.hpp>
+// pro
+#include <libv/frame/log.hpp>
+
+
+namespace libv {
+namespace frame {
+
+// -------------------------------------------------------------------------------------------------
+
+class Core;
+
+struct CoreProxy {
+	std::shared_ptr<Core> core;
+	void exec(const std::function<void()>&);
+	void exec(std::function<void()>&&);
+	CoreProxy();
+	~CoreProxy();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class ImplFrame : public libv::Trackable {
+public:
+	template <typename T>
+	using EventQue = CapacitivSignal<const T&>;
+
+	EventQue<EventChar> eventQueChar;
+	EventQue<EventDrop> eventQueDrop;
+	EventQue<EventFramebufferSize> eventQueFramebufferSize;
+	EventQue<EventKey> eventQueKey;
+	EventQue<EventMouseButton> eventQueMouseButton;
+	EventQue<EventMouseEnter> eventQueMouseEnter;
+	EventQue<EventMousePosition> eventQueMousePosition;
+	EventQue<EventMouseScroll> eventQueMouseScroll;
+	EventQue<EventWindowFocus> eventQueWindowFocus;
+	EventQue<EventWindowIconify> eventQueWindowIconify;
+	EventQue<EventWindowPosition> eventQueWindowPosition;
+	EventQue<EventWindowRefresh> eventQueWindowRefresh;
+	EventQue<EventWindowSize> eventQueWindowSize;
+
+public:
+	std::atomic<bool> forcedClose{false};
+
+public:
+	libv::ExecutorThread context;
+
+	GLFWwindow* window = nullptr;
+	GLFWwindow* shareWindow = nullptr;
+
+	CoreProxy core;
+
+public:
+	uint32_t swapInterval = 1;
+	libv::vec2i position = {};
+	libv::vec2i size;
+
+public:
+	Frame::OpenGLProfile openGLProfile = Frame::OpenGLProfile::compat;
+	Frame::OpenGLRefreshRate openGLRefreshRate = Frame::OpenGLRefreshRate::dont_care;
+	Frame::OpenGLSamples openGLSamples = Frame::OpenGLSamples::dont_care;
+	int openGLVersionMajor = 3;
+	int openGLVersionMinor = 3;
+
+	bool decorated = true;
+	bool hidden = true;
+	bool minimized = false;
+	bool resizable = true;
+
+	Frame::CloseOperation defaultCloseOperation = Frame::CloseOperation::dispose;
+	Frame::DisplayMode displayMode = Frame::DisplayMode::windowed;
+
+	std::string title;
+
+public:
+	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Key::Last)> keyStates;
+	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Mouse::Last)> mouseStates;
+	std::atomic<uint64_t> mousePosition{0}; // coded as x:24.8 y:24.8
+	std::atomic<uint64_t> scrollPosition{0}; // coded as x:24.8 y:24.8
+
+public:
+	ImplFrame(std::string title, libv::vec2i size) :
+		context(fmt::format("Frame thread of {}", title)),
+		size(size),
+		title(std::move(title)) { }
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace frame
+} // namespace libv

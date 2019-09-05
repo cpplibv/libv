@@ -141,18 +141,58 @@ libv.meta: rename if_void to lnv (as leftmost-non-void) and make it variadic
 libv.utility: rename approxing.hpp to approx.hpp and the class name too
 libv.frame: rename onContextInitialization, onContextRefresh, onContextTerminate to Create Update/Render Destroy
 libv.utility: move Slice from utility to algorithm
+libv.frame: update glfw
+libv.frame.glfw.frame: Deprecated charmods callback
 
 --- STACK ------------------------------------------------------------------------------------------
 
+libv.frame: serialize events; and this will kill current signal-slot queues in frame
+
+libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
+libv.frame.glfw.core: Added glfwWindowHintString for setting string type window hints (#893,#1139)
+libv.frame.glfw.core: Added glfwWaitEventsTimeout for waiting for events for a set amount of time
+libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
+libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
+libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
+
+libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus
+libv.frame.glfw.frame: Added glfwGetWindowFrameSize for retrieving the size of the frame around the client area of a window
+libv.frame.glfw.frame: Added glfwMaximizeWindow for window maximization
+libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
+libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
+libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
+libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
+libv.frame.glfw.frame: Added glfwSetWindowSizeLimits and glfwSetWindowAspectRatio for setting absolute and relative window size limits
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
+
+libv.frame.glfw.hint: Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
+libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
+libv.frame.glfw.hint: Added GLFW_FOCUSED window hint for controlling initial input focus
+libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
+libv.frame.glfw.hint: Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
+libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
+libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
+libv.frame.glfw.hint: Added glfwDefaultWindowHints for resetting all window hints to their default values
+
+libv.frame.glfw.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+libv.frame.glfw.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+
+libv.frame.glfw.monitor: Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
+libv.frame.glfw.monitor: Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
+libv.frame.glfw.monitor: Added glfwGetWindowContentScale, glfwGetMonitorContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
+
+libv.frame: review and cleanup the whole library
+
 libv.sig: merge back the sig codebase
 libv.sig: clean up the sig codebase
-libv.frame: serialize events; and this will kill current signal-slot in frame
-libv.frame: review the whole library
 
-frame
-	libv.frame: icon support
-	libv.frame: frame calling show after show may brake things?
-	libv.frame: dual check lock every async frame operations
+--- [[[ deadline: 2019.09.08 ]]] ---
+
+libv.ui: use the following pattern for unnamed components: struct adopt_lock_t {}; static constexpr adopt_lock_t adopt_lock;
 
 mouse
 	libv.ui: EventMouse add mouse states to fetch beside events
@@ -211,6 +251,8 @@ ui
 --- [[[ deadline: 2019.09.31 ]]] ---
 
 libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
+
+libv.frame: icon support
 
 libv.ui: lua style parsing and lua file tracking with auto re-style
 
@@ -330,6 +372,9 @@ wish: revisit catch object file linkage (only need to figure out a way to build 
 
 libv.ecui: state based ui, separate control and data!
 libv.ecui: ui resource local proxies
+
+libv.frame: frame calling show after show may brake things?
+libv.frame: dual check lock every async frame operations
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -466,77 +511,38 @@ GLFW Update:
 
 Icons are preferred in 3 resolutions are: 16x16, 32x32, 48x48
 
-Core
-	Added GLFW_TRANSPARENT_FRAMEBUFFER window hint and attribute for controlling per-pixel framebuffer transparency
-	Added glfwGetError function for querying the last error code and its description
-	Added glfwInitHint for setting initialization hints
-	Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
-	Added glfwSetErrorCallback, GLFWerrorfun and error type tokens for receiving error notifications
-	Added glfwSetMonitorUserPointer and glfwGetMonitorUserPointer for per-monitor user pointers
-	Added glfwSetWindowAttrib function for changing window attributes (#537)
-	Added glfwWaitEventsTimeout for waiting for events for a set amount of time
-	Added glfwWindowHintString for setting string type window hints (#893,#1139)
-	Deprecated window parameter of clipboard string functions
-	Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
+// ---
 
-Frame
-	Added glfwCreateCursor, glfwCreateStandardCursor, glfwDestroyCursor and glfwSetCursor for managing system cursor images
-	Added glfwFocusWindow for giving windows input focus
-	Added glfwGetWindowFrameSize for retrieving the size of the frame around the client area of a window
-	Added glfwGetWindowOpacity and glfwSetWindowOpacity for controlling whole window transparency (#1089)
-	Added glfwMaximizeWindow for window maximization
-	Added glfwRequestWindowAttention function for requesting attention from the user
-	Added glfwSetWindowIcon for setting the icon of a window
-	Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
-	Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
-	Added glfwSetWindowSizeLimits and glfwSetWindowAspectRatio for setting absolute and relative window size limits
-	Deprecated charmods callback
-	glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
-	glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
-	glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
-	glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
-	glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
+glfw.core: Added glfwGetError function for querying the last error code and its description
+glfw.core: Added glfwInitHint for setting initialization hints
+glfw.core: Added glfwSetErrorCallback, GLFWerrorfun and error type tokens for receiving error notifications
+glfw.core: Added glfwSetMonitorUserPointer and glfwGetMonitorUserPointer for per-monitor user pointers
 
-Hints
-	Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
-	Added GLFW_FLOATING for creating always-on-top windowed mode windows
-	Added GLFW_FOCUSED window hint for controlling initial input focus
-	Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
-	Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
-	Added GLFW_JOYSTICK_HAT_BUTTONS init hint (#889)
-	Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
-	Added GLFW_MAXIMIZED for window maximization
-	Added GLFW_SCALE_TO_MONITOR window hint for automatic window resizing (#676,#1115)
-	Added glfwDefaultWindowHints for resetting all window hints to their default values
+glfw.frame: Added glfwCreateCursor, glfwCreateStandardCursor, glfwDestroyCursor and glfwSetCursor for managing system cursor images
+glfw.frame: Added glfwGetWindowOpacity and glfwSetWindowOpacity for controlling whole window transparency (#1089)
 
-Input
-	Added glfwGetKeyName for querying the layout-specific name of printable keys
-	Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-	Added glfwRawMouseMotionSupported function for querying raw motion support (glfwRawMouseMotionSupported must be checked)
-	Added GLFW_RAW_MOUSE_MOTION input mode for selecting raw motion input (#125,#1400,#1401)
+glfw.hint: Added GLFW_TRANSPARENT_FRAMEBUFFER window hint and attribute for controlling per-pixel framebuffer transparency
+glfw.hint: Added GLFW_JOYSTICK_HAT_BUTTONS init hint (#889)
+glfw.hint: Added GLFW_SCALE_TO_MONITOR window hint for automatic window resizing (#676,#1115)
 
-Joystick
-	Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
-	Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
-	Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
-	Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
-	Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
-	Added glfwSetJoystickCallback for joystick connection and disconnection events
-	Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
-	Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
+glfw.input: Added glfwRawMouseMotionSupported function for querying raw motion support (glfwRawMouseMotionSupported must be checked)
+glfw.input: Added GLFW_RAW_MOUSE_MOTION input mode for selecting raw motion input (#125,#1400,#1401)
 
-Sample
-	Added 'cursor' simple cursor test programs
-	Added 'empty' test program for verifying posting of empty events
-	Added 'modes' video mode enumeration and setting test program
-	Added 'sharing' simple OpenGL object sharing test program
-	Added 'threads' simple multi-threaded rendering test program
-	Added 'windows' simple multi-window test program
+glfw.joystick: Added glfwGetGamepadName function for querying the name provided by the gamepad mapping (#900)
+glfw.joystick: Added glfwGetGamepadState function, GLFW_GAMEPAD_* and GLFWgamepadstate for retrieving gamepad input state (#900)
+glfw.joystick: Added glfwGetJoystickGUID function for querying the SDL compatible GUID of a joystick (#900)
+glfw.joystick: Added glfwGetJoystickHats function for querying joystick hats (#889,#906,#934)
+glfw.joystick: Added glfwJoystickIsGamepad function for querying whether a joystick has a gamepad mapping
+glfw.joystick: Added glfwSetJoystickCallback for joystick connection and disconnection events
+glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
+glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
 
-Monitor
-	Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
-	Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
-	Added glfwGetWindowContentScale, glfwGetMonitorContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
+glfw.sample: Added 'cursor' simple cursor test programs
+glfw.sample: Added 'empty' test program for verifying posting of empty events
+glfw.sample: Added 'modes' video mode enumeration and setting test program
+glfw.sample: Added 'sharing' simple OpenGL object sharing test program
+glfw.sample: Added 'threads' simple multi-threaded rendering test program
+glfw.sample: Added 'windows' simple multi-window test program
 
 
 // -------------------------------------------------------------------------------------------------
