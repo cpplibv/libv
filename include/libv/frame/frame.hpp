@@ -236,6 +236,8 @@ public:
 	void setPosition(FramePosition pos);
 
 	void setAlwaysOnTop(bool alwaysOnTop);
+	void setInitialFocus(bool initialFocus);
+	void setFocusOnShow(bool focusOnShow);
 
 	/// Negative values interpreted as no aspect ratio constraint
 	void setAspectRatio(int numer, int denom);

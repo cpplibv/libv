@@ -359,6 +359,22 @@ void Frame::setAlwaysOnTop(bool alwaysOnTop) {
 	});
 }
 
+void Frame::setInitialFocus(bool initialFocus) {
+	self->context.executeAsync([this, initialFocus] {
+		log_frame.trace("Set frame initialFocus of {} to {}", self->title, initialFocus);
+		self->initialFocus = initialFocus;
+	});
+}
+
+void Frame::setFocusOnShow(bool focusOnShow) {
+	self->context.executeAsync([this, focusOnShow] {
+		log_frame.trace("Set frame FocusOnShow of {} to {}", self->title, focusOnShow);
+		self->focusOnShow = focusOnShow;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_FOCUS_ON_SHOW, focusOnShow));
+	});
+}
+
 void Frame::setAspectRatio(int numer, int denom) {
 	setAspectRatio(libv::vec2i{numer, denom});
 }

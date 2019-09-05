@@ -73,6 +73,9 @@ public:
 	bool maximized = false;
 	bool minimized = false;
 
+	bool initialFocus = true;
+	bool focusOnShow = true;
+
 	Frame::CloseOperation defaultCloseOperation = Frame::CloseOperation::dispose;
 	Frame::DisplayMode displayMode = Frame::DisplayMode::windowed;
 

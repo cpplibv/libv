@@ -135,8 +135,6 @@ void Frame::cmdCoreCreate() {
 	glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	glfwWindowHint(GLFW_FOCUSED, true); // Initial focus
-	glfwWindowHint(GLFW_FOCUS_ON_SHOW, true); // Auto focus on show
 	//	GLFW_CENTER_CURSOR
 	//	GLFW_HOVERED
 	//	GLFW_JOYSTICK_HAT_BUTTONS
@@ -152,6 +150,8 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_DECORATED, self->decorated);
 	glfwWindowHint(GLFW_MAXIMIZED, self->maximized);
 	glfwWindowHint(GLFW_RESIZABLE, self->resizable);
+	glfwWindowHint(GLFW_FOCUSED, self->initialFocus);
+	glfwWindowHint(GLFW_FOCUS_ON_SHOW, self->focusOnShow);
 	glfwWindowHint(GLFW_FLOATING, self->alwaysOnTop);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 

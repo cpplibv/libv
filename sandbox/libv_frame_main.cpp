@@ -107,6 +107,11 @@ public:
 			if (e.key == Key::K)
 				setAlwaysOnTop(false);
 
+			if (e.key == Key::L)
+				setFocusOnShow(true);
+			if (e.key == Key::Semicolon)
+				setFocusOnShow(false);
+
 			// --- Z row
 
 			if (e.key == Key::Z)
