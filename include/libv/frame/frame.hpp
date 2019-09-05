@@ -218,6 +218,7 @@ public:
 	void restore();
 	/// The window should already be visible and not minimized.
 	void focus();
+	void requestAttention();
 
 public:
 	void setOpenGLProfile(OpenGLProfile profile);

@@ -93,6 +93,8 @@ public:
 				executeAfter(std::chrono::seconds{5}, [this]{ this->restore(); });
 			if (e.key == Key::T)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->focus(); });
+			if (e.key == Key::Y)
+				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
 
 		});
 	}

@@ -147,10 +147,10 @@ libv.frame: serialize events
 libv.frame: Merge mouse position events (only if there was no intermediate event)
 libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
 libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus
+libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 libv.frame: remove "atomics"
 libv.frame: replace fix state arrays with flat_maps

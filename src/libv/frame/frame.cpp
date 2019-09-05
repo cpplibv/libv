@@ -211,12 +211,19 @@ void Frame::restore() {
 }
 
 void Frame::focus() {
-	// Question? Does focus wants to be a creation hint that is only one times used?
+	// Question? Does focus wants to be a creation hint as well that is only one times used?
 	self->context.executeAsync([this] {
 		log_frame.trace("Focus frame {}", self->title);
-		if (self->window) {
+		if (self->window)
 			self->core.exec(std::bind(glfwFocusWindow, self->window));
-		}
+	});
+}
+
+void Frame::requestAttention() {
+	self->context.executeAsync([this] {
+		log_frame.trace("Request Attention frame {}", self->title);
+		if (self->window)
+			self->core.exec(std::bind(glfwRequestWindowAttention, self->window));
 	});
 }
 
