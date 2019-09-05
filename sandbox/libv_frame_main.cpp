@@ -53,11 +53,26 @@ public:
 		noisyEvents(*this);
 		onKey.output([this](const auto& e) {
 			if (e.key == Key::Escape)
-				this->closeDefault();
+				closeDefault();
+
+			if (e.key == Key::Z)
+				setResizable(!isResizable());
+
 			if (e.key == Key::X)
-				this->setDecoration(!this->isDecorated());
+				setDecoration(!isDecorated());
+
 			if (e.key == Key::C)
-				this->setPosition(FramePosition::center_current_monitor);
+				setPosition(FramePosition::center_current_monitor);
+			if (e.key == Key::V)
+				setPosition(FramePosition::center_primary_monitor);
+
+			if (e.key == Key::A)
+				setDisplayMode(libv::Frame::DisplayMode::windowed);
+			if (e.key == Key::S)
+				setDisplayMode(libv::Frame::DisplayMode::borderless);
+			if (e.key == Key::D)
+				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
+
 		});
 	}
 };

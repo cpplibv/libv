@@ -145,16 +145,19 @@ libv.frame: update glfw
 libv.frame.glfw.frame: Deprecated charmods callback
 libv.frame: serialize events
 libv.frame: Merge mouse position events (only if there was no intermediate event)
+libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it
+libv.frame: remove "atomics"
+libv.frame: replace fix state arrays with flat_maps
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
-libv.frame.glfw.core: Added glfwWindowHintString for setting string type window hints (#893,#1139)
 libv.frame.glfw.core: Added glfwWaitEventsTimeout for waiting for events for a set amount of time
+
+libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
+
 libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
-libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 
 libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus

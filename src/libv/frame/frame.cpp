@@ -40,6 +40,74 @@ Frame::~Frame() {
 	join();
 }
 
+// Frame Loop --------------------------------------------------------------------------------------
+
+void Frame::loopInit() {
+	log_frame.debug("Frame entering loop");
+
+	self->context.executeAsync(std::bind(&Frame::loop, this));
+}
+
+void Frame::loop() {
+	distributeEvents();
+
+	if (isFrameShouldClose()) {
+		loopTerminate();
+	} else {
+		if (!isRefreshSkipable() && self->window) {
+			onContextUpdate.fire(EventContextUpdate());
+
+			glfwSwapBuffers(self->window);
+		}
+
+		self->context.executeAsync(std::bind(&Frame::loop, this));
+	}
+}
+
+void Frame::loopTerminate() {
+	log_frame.debug("Frame exiting loop");
+	cmdFrameDestroy();
+	self->context.stop();
+}
+
+void Frame::contextCreate() {
+	log_frame.debug("Frame context create");
+	onContextCreate.fire(EventContextCreate());
+}
+
+void Frame::contextDestroy() {
+	log_frame.debug("Frame context destroy");
+	onContextDestroy.fire(EventContextDestroy());
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Frame::cmdFrameCreate() {
+	self->core.exec(std::bind(&Frame::cmdCoreCreate, this));
+	if (self->window) {
+		glfwMakeContextCurrent(self->window);
+		self->context.executeAsync(std::bind(&Frame::loopInit, this));
+		this->contextCreate();
+	}
+}
+
+void Frame::cmdFrameRecreate() {
+	assert(self->window);
+
+	glfwMakeContextCurrent(nullptr);
+	self->core.exec(std::bind(&Frame::cmdCoreRecreate, this));
+	if (self->window) {
+		glfwMakeContextCurrent(self->window);
+		this->contextCreate();
+	}
+}
+
+void Frame::cmdFrameDestroy() {
+	this->contextDestroy();
+	glfwMakeContextCurrent(nullptr);
+	self->core.exec(std::bind(&Frame::cmdCoreDestroy, this));
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
@@ -55,6 +123,10 @@ void Frame::closeForce() {
 
 void Frame::join() {
 	self->context.join();
+}
+
+bool Frame::isRefreshSkipable() {
+	return self->hidden || self->minimized;
 }
 
 bool Frame::isFrameShouldClose() {
@@ -91,12 +163,6 @@ bool Frame::isFrameShouldClose() {
 		}
 	}
 	return shouldClose;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-bool Frame::isRefreshSkipable() {
-	return self->hidden || self->minimized;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -301,6 +367,10 @@ bool Frame::isDecorated() const {
 	return self->decorated;
 }
 
+bool Frame::isResizable() const {
+	return self->resizable;
+}
+
 bool Frame::isVisible() const {
 	return !self->hidden && !self->minimized && self->window;
 }
@@ -367,70 +437,16 @@ libv::vec2d Frame::getScrollPosition() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Frame::cmdFrameCreate() {
-	self->core.exec(std::bind(&Frame::cmdCoreCreate, this));
-	if (self->window) {
-		glfwMakeContextCurrent(self->window);
-		self->context.executeAsync(std::bind(&Frame::loopInit, this));
-		this->contextCreate();
-	}
+std::string Frame::getClipboardString() {
+	const char* text = glfwGetClipboardString(nullptr);
+	if (text != nullptr)
+		return std::string{text};
+	else
+		return std::string{""};
 }
 
-void Frame::cmdFrameRecreate() {
-	assert(self->window);
-
-	glfwMakeContextCurrent(nullptr);
-	self->core.exec(std::bind(&Frame::cmdCoreRecreate, this));
-	if (self->window) {
-		glfwMakeContextCurrent(self->window);
-		this->contextCreate();
-	}
-}
-
-void Frame::cmdFrameDestroy() {
-	this->contextDestroy();
-	glfwMakeContextCurrent(nullptr);
-	self->core.exec(std::bind(&Frame::cmdCoreDestroy, this));
-}
-
-// Frame Loop --------------------------------------------------------------------------------------
-
-void Frame::loopInit() {
-	log_frame.debug("Frame entering loop");
-
-	self->context.executeAsync(std::bind(&Frame::loop, this));
-}
-
-void Frame::loop() {
-	distributeEvents();
-
-	if (isFrameShouldClose()) {
-		loopTerminate();
-	} else {
-		if (!isRefreshSkipable() && self->window) {
-			onContextUpdate.fire(EventContextUpdate());
-
-			glfwSwapBuffers(self->window);
-		}
-
-		self->context.executeAsync(std::bind(&Frame::loop, this));
-	}
-}
-
-void Frame::loopTerminate() {
-	log_frame.debug("Frame exiting loop");
-	cmdFrameDestroy();
-	self->context.stop();
-}
-
-void Frame::contextCreate() {
-	log_frame.debug("Frame context create");
-	onContextCreate.fire(EventContextCreate());
-}
-
-void Frame::contextDestroy() {
-	log_frame.debug("Frame context destroy");
-	onContextDestroy.fire(EventContextDestroy());
+void Frame::setClipboardString(const std::string& string) {
+	glfwSetClipboardString(nullptr, string.c_str());
 }
 
 // -------------------------------------------------------------------------------------------------

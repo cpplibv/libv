@@ -168,6 +168,13 @@ public:
 	virtual ~Frame();
 
 private: // --------------------------------------------------------------------------------------------
+	void loopInit();
+	void loop();
+	void loopTerminate();
+	void contextCreate();
+	void contextDestroy();
+
+private: // --------------------------------------------------------------------------------------------
 	void cmdFrameCreate();
 	/**
 	 * @note If this function fail the member window will be set to nullptr
@@ -237,6 +244,7 @@ public:
 	// ... Additional getters on demand
 
 	bool isDecorated() const;
+	bool isResizable() const;
 	bool isVisible() const;
 	// ... Additional getters on demand
 
@@ -254,12 +262,9 @@ public:
 	libv::vec2d getMousePosition();
 	libv::vec2d getScrollPosition();
 
-private:
-	void loopInit();
-	void loop();
-	void loopTerminate();
-	void contextCreate();
-	void contextDestroy();
+public:
+	std::string getClipboardString();
+	void setClipboardString(const std::string& string);
 };
 
 } // namespace frame
