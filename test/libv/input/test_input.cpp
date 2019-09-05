@@ -33,6 +33,8 @@ TEST_CASE("Check KeyModifier consistency with GLFW") {
 	CHECK(libv::to_value(libv::input::KeyModifier::control) == GLFW_MOD_CONTROL);
 	CHECK(libv::to_value(libv::input::KeyModifier::shift) == GLFW_MOD_SHIFT);
 	CHECK(libv::to_value(libv::input::KeyModifier::super) == GLFW_MOD_SUPER);
+	CHECK(libv::to_value(libv::input::KeyModifier::caps_lock) == GLFW_MOD_CAPS_LOCK);
+	CHECK(libv::to_value(libv::input::KeyModifier::num_lock) == GLFW_MOD_NUM_LOCK);
 }
 
 TEST_CASE("Check Mouse consistency with GLFW") {

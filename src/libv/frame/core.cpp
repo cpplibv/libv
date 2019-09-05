@@ -135,13 +135,9 @@ void Frame::cmdCoreCreate() {
 	glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	//	GLFW_CENTER_CURSOR
-	//	GLFW_HOVERED
-	//	GLFW_JOYSTICK_HAT_BUTTONS
-	//	GLFW_LOCK_KEY_MODS
-	//	GLFW_SCALE_TO_MONITOR
-	//	GLFW_TRANSPARENT_FRAMEBUFFER
 
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true && self->openGLVersionMajor >= 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
 	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
 	glfwWindowHint(GLFW_SAMPLES, libv::to_value(self->openGLSamples));
@@ -190,6 +186,8 @@ void Frame::cmdCoreCreate() {
 	glfwSetWindowAspectRatio(self->window,
 			self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
 			self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
+
+	glfwSetInputMode(self->window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 
 	if (self->displayMode == DisplayMode::fullscreen) {
 

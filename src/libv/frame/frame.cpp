@@ -533,6 +533,7 @@ libv::vec2d Frame::getScrollPosition() {
 // -------------------------------------------------------------------------------------------------
 
 std::string Frame::getClipboardString() {
+	// <<< P1: 'main' thread is required
 	const char* text = glfwGetClipboardString(nullptr);
 	if (text != nullptr)
 		return std::string{text};
@@ -541,6 +542,7 @@ std::string Frame::getClipboardString() {
 }
 
 void Frame::setClipboardString(const std::string& string) {
+	// <<< P1: 'main' thread is required
 	glfwSetClipboardString(nullptr, string.c_str());
 }
 

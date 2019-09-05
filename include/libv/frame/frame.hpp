@@ -17,35 +17,29 @@
 //			add member Frame::wait()
 //			member with async task return Frame&
 //			Wait throws in a dummy task and waits for it.
-// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-// TODO P3: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-// TODO P4: Map glfw hint GLFW_FLOATING
-// TODO P4: Map glfw hint GLFW_FOCUSED
-// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
-// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY
+//
+// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+//
+// TODO P3: Support glfw hint GLFW_AUTO_ICONIFY
+// TODO P3: Support glfw hint GLFW_CENTER_CURSOR
+// TODO P3: Support glfw hint GLFW_DOUBLEBUFFER
+// TODO P3: Support glfw hint GLFW_JOYSTICK_HAT_BUTTONS
+//
+// TODO P4: Support glfw hint GLFW_SCALE_TO_MONITOR
 // TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
-// TODO P4: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
-// TODO P4: Support glfw hint GLFW_OPENGL_FORWARD_COMPAT
-// TODO P5: Support glfw hint GLFW_STEREO
+// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+//
+// TODO P5: Support glfw hint GLFW_TRANSPARENT_FRAMEBUFFER
 // TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
-// TODO P4: Disable deprecated openGL functionality by enable GLFW_OPENGL_FORWARD_COMPAT
-// TODO P4: Learn about GLFW_CONTEXT_ROBUSTNESS
-// TODO P4: Learn about GLFW_CONTEXT_RELEASE_BEHAVIOR
+// TODO P5: Support glfw hint GLFW_STEREO
+// TODO P5: Support glfw hint GLFW_CONTEXT_CREATION_API
+// TODO P5: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
+//
 // TODO P5: Context sharing
-// TODO P5: Most of the event should get a observer_ref<Frame> as member, or even better: Frame&!
-// TODO P5: Remove? EventWindowRefresh and EventWindowClose as they are handled by frame
-//			EventWindowRefresh is not that simple, i think i have to work with it to 'force' refresh
+// TODO P5: Understand EventWindowRefresh, i think i have to work with it to 'force' refresh
 //			if context is frozen due to event queue 'lock' in glfw (moving window)
-
-// No plans for mapping these glfw hints:
-// GLFW_ACCUM_RED_BITS,
-// GLFW_ACCUM_GREEN_BITS,
-// GLFW_ACCUM_BLUE_BITS,
-// GLFW_ACCUM_ALPHA_BITS,
-// GLFW_AUX_BUFFERS,
-// GLFW_CLIENT_API,
-// GLFW_DOUBLEBUFFER
 
 class GLFWwindow;
 

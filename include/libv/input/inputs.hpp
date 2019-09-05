@@ -37,6 +37,8 @@ enum class KeyModifier : int32_t {
  	control = 0x0002,
 	alt = 0x0004,
 	super = 0x0008,
+	caps_lock = 0x0010,
+	num_lock = 0x0020,
 };
 
 [[nodiscard]] constexpr inline KeyModifier operator|(KeyModifier lhs, KeyModifier rhs) noexcept {

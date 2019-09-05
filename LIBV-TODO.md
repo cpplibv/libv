@@ -163,10 +163,13 @@ libv.frame: Implement floating aka always on top
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
 libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
 libv.frame.glfw.hint: Added GLFW_FOCUSED window hint for controlling initial input focus
+libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
+libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
+libv.frame: glfwSetInputMode
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
@@ -188,11 +191,7 @@ libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
 
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
-
 libv.frame.glfw.hint: Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
-libv.frame.glfw.hint: Added GLFW_HOVERED window attribute for polling cursor hover state (#1166)
-libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
 
 libv.frame.glfw.monitor: Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
 libv.frame.glfw.monitor: Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
