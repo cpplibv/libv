@@ -355,11 +355,53 @@ void Frame::setSize(int x, int y) {
 
 void Frame::setSize(libv::vec2i newsize) {
 	self->context.executeAsync([this, newsize] {
-		log_frame.trace("Set frame Size of {} to {}, {}", self->title, newsize.x, newsize.y);
+		log_frame.trace("Set frame size of {} to {}", self->title, newsize);
 		self->size = newsize;
 		if (self->window)
 			self->core.exec(std::bind(glfwSetWindowSize, self->window, self->size.x, self->size.y));
 	});
+}
+
+void Frame::setSizeLimit(libv::vec2i min, libv::vec2i max) {
+	self->context.executeAsync([this, min, max] {
+		log_frame.trace("Set frame size limit of {} to {}, {}", self->title, min, max);
+		self->sizeLimitMax = max;
+		self->sizeLimitMin = min;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetWindowSizeLimits, self->window,
+					self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
+					self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
+					self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
+					self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y));
+	});
+}
+
+void Frame::setSizeLimit(int minx, int miny, int maxx, int maxy) {
+	setSizeLimit(libv::vec2i{minx, miny}, libv::vec2i{maxx, maxy});
+}
+
+void Frame::setSizeLimit(int minx, int miny, libv::vec2i max) {
+	setSizeLimit(libv::vec2i{minx, miny}, max);
+}
+
+void Frame::setSizeLimit(libv::vec2i min, int maxx, int maxy) {
+	setSizeLimit(min, libv::vec2i{maxx, maxy});
+}
+
+void Frame::setSizeLimitMin(int minx, int miny) {
+	setSizeLimit(libv::vec2i{minx, miny}, self->sizeLimitMax);
+}
+
+void Frame::setSizeLimitMin(libv::vec2i min) {
+	setSizeLimit(min, self->sizeLimitMax);
+}
+
+void Frame::setSizeLimitMax(int maxx, int maxy) {
+	setSizeLimit(self->sizeLimitMin, libv::vec2i{maxx, maxy});
+}
+
+void Frame::setSizeLimitMax(libv::vec2i max) {
+	setSizeLimit(self->sizeLimitMin, max);
 }
 
 void Frame::setTitle(std::string title) {

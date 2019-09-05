@@ -149,33 +149,34 @@ libv.frame.glfw.core: Deprecated window parameter of clipboard string functions
 libv.frame.glfw.frame: Added glfwFocusWindow for giving windows input focus
 libv.frame.glfw.frame: Added glfwRequestWindowAttention function for requesting attention from the user
 libv.frame.glfw.frame: Added glfwGetWindowFrameSize for retrieving the size of the frame around the client area of a window
-
---- STACK ------------------------------------------------------------------------------------------
-
 libv.frame.glfw.frame: Added glfwMaximizeWindow for window maximization
 libv.frame.glfw.frame: Added glfwSetWindowMaximizeCallback and GLFWwindowmaximizefun for receiving window maximization events (#778)
 libv.frame.glfw.hint: Added GLFW_MAXIMIZED for window maximization
+libv.frame.glfw.frame: Added glfwSetWindowSizeLimits for setting absolute window size limits
+
+--- STACK ------------------------------------------------------------------------------------------
+
+libv.frame.glfw.frame: Added glfwSetWindowAspectRatio for setting relative window size limits
+
+libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
 
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 libv.frame: remove "atomics"
 libv.frame: replace fix state arrays with flat_maps
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
+libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 libv.frame.glfw.core: Added glfwWaitEventsTimeout for waiting for events for a set amount of time
 
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
 
-libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
-libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
-
 libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
-libv.frame.glfw.frame: Added glfwSetWindowSizeLimits and glfwSetWindowAspectRatio for setting absolute and relative window size limits
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_AUTO_ICONIFY for existing windows
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
 
 libv.frame.glfw.hint: Added GLFW_CENTER_CURSOR window hint for controlling cursor centering (#749,#842)
 libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows

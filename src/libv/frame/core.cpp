@@ -181,6 +181,12 @@ void Frame::cmdCoreCreate() {
 		return;
 	}
 
+	glfwSetWindowSizeLimits(self->window,
+			self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
+			self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
+			self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
+			self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y);
+
 	if (self->displayMode == DisplayMode::fullscreen) {
 
 	} else if (self->displayMode == DisplayMode::borderless) {

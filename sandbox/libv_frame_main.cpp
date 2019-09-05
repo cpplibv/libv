@@ -114,6 +114,13 @@ public:
 				setPosition(FramePosition::center_current_monitor);
 			if (e.key == Key::V)
 				setPosition(FramePosition::center_primary_monitor);
+
+			if (e.key == Key::B)
+				setSizeLimit(200, 150, 400, 300);
+			if (e.key == Key::N)
+				setSizeLimit(-1, -1, 400, 300);
+			if (e.key == Key::M)
+				setSizeLimit(-1, -1, -1, -1);
 		});
 	}
 };

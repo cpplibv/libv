@@ -234,9 +234,28 @@ public:
 	void setPosition(int x, int y);
 	void setPosition(libv::vec2i pos);
 	void setPosition(FramePosition pos);
+
 	void setResizable(bool resizable);
 	void setSize(int x, int y);
 	void setSize(libv::vec2i size);
+
+	/// Negative values interpreted as no limit
+	void setSizeLimit(int minx, int miny, int maxx, int maxy);
+	/// Negative values interpreted as no limit
+	void setSizeLimit(int minx, int miny, libv::vec2i max);
+	/// Negative values interpreted as no limit
+	void setSizeLimit(libv::vec2i min, int maxx, int maxy);
+	/// Negative values interpreted as no limit
+	void setSizeLimit(libv::vec2i min, libv::vec2i max);
+	/// Negative values interpreted as no limit
+	void setSizeLimitMin(int minx, int miny);
+	/// Negative values interpreted as no limit
+	void setSizeLimitMin(libv::vec2i min);
+	/// Negative values interpreted as no limit
+	void setSizeLimitMax(int maxx, int maxy);
+	/// Negative values interpreted as no limit
+	void setSizeLimitMax(libv::vec2i max);
+
 	void setTitle(std::string title);
 //	void setWindowSizeLimits(int minx, int miny, int maxx, int maxy);
 //	void setWindowSizeLimits(libv::vec2i min, libv::vec2i max);
