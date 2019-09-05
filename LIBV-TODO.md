@@ -157,19 +157,20 @@ libv.frame.glfw.frame: Added glfwSetWindowAspectRatio for setting relative windo
 libv.frame.glfw.core: Added glfwSetWindowAttrib function for changing window attributes (#537)
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_DECORATED for existing windows
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_RESIZABLE for existing windows
+libv.frame: remove unnecessary atomics
+libv.frame: replace fix state arrays with flat_maps
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.frame: remove "atomics"
-libv.frame: replace fix state arrays with flat_maps
+libv.frame: Implement floating aka always on top
+libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
+libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
+
+libv.frame.input: different key can release each other's key state (left/right shift), scancode should participate in insert/erase even for keys in some way
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent
 libv.frame.glfw.core: Added glfwWaitEventsTimeout for waiting for events for a set amount of time
-
-libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FLOATING for existing windows
-libv.frame.glfw.hint: Added GLFW_FLOATING for creating always-on-top windowed mode windows
-libv.frame: Implement floating aka always on top
 
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
 libv.frame: implement setDisplayMode without cmdFrameRecreate

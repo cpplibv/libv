@@ -5,10 +5,10 @@
 // hpp
 #include <libv/frame/frame.hpp>
 // ext
+#include <boost/container/flat_set.hpp>
 #include <fmt/format.h>
-#include <GLFW/glfw3.h>
 // libv
-#include <libv/math/fixed_point.hpp>
+#include <libv/input/inputs.hpp>
 #include <libv/sig/signal.hpp>
 #include <libv/thread/executor_thread.hpp>
 // std
@@ -17,6 +17,8 @@
 #include <libv/frame/events.hpp>
 #include <libv/frame/log.hpp>
 
+
+class GLFWwindow;
 
 namespace libv {
 namespace frame {
@@ -79,17 +81,22 @@ public:
 	std::vector<Event> eventQueue;
 
 public:
-	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Key::Last)> keyStates;
-	std::array<std::atomic<libv::input::KeyState>, to_value(libv::input::Mouse::Last)> mouseStates;
-	std::atomic<uint64_t> mousePosition{0}; // coded as x:24.8 y:24.8
-	std::atomic<uint64_t> scrollPosition{0}; // coded as x:24.8 y:24.8
+	boost::container::flat_set<libv::input::Key> pressedKeys;
+	boost::container::flat_set<int> pressedScancodes;
+	boost::container::flat_set<libv::input::Mouse> pressedMouseButtons;
+
+	libv::vec2d mousePosition;
+	libv::vec2d scrollPosition;
 
 public:
 	ImplFrame(std::string title, libv::vec2i size) :
 		context(fmt::format("Frame thread of {}", title)),
 		size(size),
 		title(std::move(title)) {
+
 		eventQueue.reserve(16);
+		pressedKeys.reserve(16);
+		pressedMouseButtons.reserve(16);
 	}
 };
 

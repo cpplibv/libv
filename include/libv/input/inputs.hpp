@@ -56,8 +56,6 @@ enum class Mouse : int32_t {
 	Left = Button0,
 	Right = Button1,
 	Middle = Button2,
-
-	Last = Button7, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
 
 enum class Joystick : int32_t {
@@ -77,8 +75,6 @@ enum class Joystick : int32_t {
 	Button13 = 13,
 	Button14 = 14,
 	Button15 = 15,
-
-	Last = Button15, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
 
 enum class Key : int32_t {
@@ -203,8 +199,6 @@ enum class Key : int32_t {
 	AltRight = 346,
 	SuperRight = 347,
 	Menu = 348,
-
-	Last = Menu, // TODO P5: Remove once libv.frame no longer using arrays for keeping track of states
 };
 
 std::string_view to_string(const Action value);

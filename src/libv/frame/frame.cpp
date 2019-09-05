@@ -6,7 +6,6 @@
 #include <fmt/format.h>
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/math/fixed_point.hpp>
 #include <libv/thread/executor_thread.hpp>
 // pro
 #include <libv/frame/log.hpp>
@@ -475,57 +474,35 @@ const Monitor& Frame::getCurrentMonitor() const {
 // -------------------------------------------------------------------------------------------------
 
 libv::input::KeyState Frame::getKey(libv::input::Key key) {
-	if (key == libv::input::Key::Unknown)
-		return libv::input::KeyState::released;
-
-	if (to_value(key) >= to_value(libv::input::Key::Last))
-		return libv::input::KeyState::released;
-
-	return self->keyStates[to_value(key)].load();
+	return self->pressedKeys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 bool Frame::isKeyPressed(libv::input::Key key) {
-	return getKey(key) == libv::input::KeyState::pressed;
+	return self->pressedKeys.contains(key);
 }
 
 bool Frame::isKeyReleased(libv::input::Key key) {
-	return getKey(key) == libv::input::KeyState::released;
+	return not self->pressedKeys.contains(key);
 }
 
 libv::input::KeyState Frame::getMouse(libv::input::Mouse key) {
-//	if (key == Mouse::Unknown)
-//		return KeyState::released;
-	if (to_value(key) >= to_value(libv::input::Mouse::Last))
-		return libv::input::KeyState::released;
-	return self->mouseStates[to_value(key)].load();
+	return self->pressedMouseButtons.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 bool Frame::isMousePressed(libv::input::Mouse key) {
-	return getMouse(key) == libv::input::KeyState::pressed;
+	return self->pressedMouseButtons.contains(key);
 }
 
 bool Frame::isMouseReleased(libv::input::Mouse key) {
-	return getMouse(key) == libv::input::KeyState::released;
+	return not self->pressedMouseButtons.contains(key);
 }
 
 libv::vec2d Frame::getMousePosition() {
-	const auto raw = self->mousePosition.load();
-
-	// The value stored in atomic mousePosition is coded as x:s24.8 y:s24.8
-	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
-    auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
-
-	return {convert_from_s24_8<double>(x), convert_from_s24_8<double>(y)};
+	return self->mousePosition;
 }
 
 libv::vec2d Frame::getScrollPosition() {
-	const auto raw = self->scrollPosition.load();
-
-	// The value stored in atomic wheelPosition is coded as x:s24.8 y:s24.8
-	auto x = static_cast<uint32_t>((raw & 0xFFFFFFFF00000000) >> 32);
-    auto y = static_cast<uint32_t>((raw & 0x00000000FFFFFFFF));
-
-	return {convert_from_s24_8<double>(x), convert_from_s24_8<double>(y)};
+	return self->scrollPosition;
 }
 
 // -------------------------------------------------------------------------------------------------

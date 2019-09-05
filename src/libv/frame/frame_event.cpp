@@ -5,7 +5,6 @@
 // ext
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/math/fixed_point.hpp>
 #include <libv/utility/overload.hpp>
 // pro
 #include <libv/frame/events.hpp>
@@ -113,68 +112,69 @@ void Frame::distributeEvents() {
 		const auto visitor = libv::overload(
 			[this](const EventChar& e) {
 				onChar.fire(e);
-			},
-			[this](const EventDrop& e) {
+
+			}, [this](const EventDrop& e) {
 				onDrop.fire(e);
-			},
-			[this](const EventFramebufferSize& e) {
+
+			}, [this](const EventFramebufferSize& e) {
 				onFramebufferSize.fire(e);
-			},
-			[this](const EventKey& e) {
-				self->keyStates[to_value(e.key)] = (e.action != libv::input::Action::release) ?
-						libv::input::KeyState::pressed :
-						libv::input::KeyState::released;
+
+			}, [this](const EventKey& e) {
+				if (e.action != libv::input::Action::release) {
+					self->pressedKeys.insert(e.key);
+					self->pressedScancodes.insert(e.scancode);
+				} else {
+					self->pressedKeys.erase(e.key);
+					self->pressedScancodes.erase(e.scancode);
+				}
 
 				onKey.fire(e);
-			},
-			[this](const EventMouseButton& e) {
-				self->mouseStates[to_value(e.button)] = (e.action != libv::input::Action::release) ?
-						libv::input::KeyState::pressed :
-						libv::input::KeyState::released;
+
+			}, [this](const EventMouseButton& e) {
+				if (e.action != libv::input::Action::release)
+					self->pressedMouseButtons.insert(e.button);
+				else
+					self->pressedMouseButtons.erase(e.button);
 
 				onMouseButton.fire(e);
-			},
-			[this](const EventMouseEnter& e) {
+
+			}, [this](const EventMouseEnter& e) {
 				onMouseEnter.fire(e);
-			},
-			[this](const EventMousePosition& e) {
-				self->mousePosition = (static_cast<uint64_t>
-						(convert_to_s24_8(e.position.x)) << 32) | convert_to_s24_8(e.position.y);
+
+			}, [this](const EventMousePosition& e) {
+				self->mousePosition = e.position;
 
 				onMousePosition.fire(e);
-			},
-			[this](const EventMouseScroll& e) {
-				auto old = getScrollPosition();
-				self->scrollPosition =
-						(static_cast<uint64_t>(convert_to_s24_8(e.offset.x + old.x)) << 32) |
-						convert_to_s24_8(e.offset.y + old.y);
+
+			}, [this](const EventMouseScroll& e) {
+				self->scrollPosition += e.offset;
 
 				onMouseScroll.fire(e);
-			},
-			[this](const EventWindowFocus& e) {
+
+			}, [this](const EventWindowFocus& e) {
 				onWindowFocus.fire(e);
-			},
-			[this](const EventWindowMaximize& e) {
+
+			}, [this](const EventWindowMaximize& e) {
 				self->maximized = e.maximized;
 				self->minimized = false;
 
 				onWindowMaximize.fire(e);
-			},
-			[this](const EventWindowMinimize& e) {
+
+			}, [this](const EventWindowMinimize& e) {
 				self->maximized = false;
 				self->minimized = e.minimized;
 
 				onWindowMinimize.fire(e);
-			},
-			[this](const EventWindowPosition& e) {
+
+			}, [this](const EventWindowPosition& e) {
 				self->position = e.position;
 
 				onWindowPosition.fire(e);
-			},
-			[this](const EventWindowRefresh& e) {
+
+			}, [this](const EventWindowRefresh& e) {
 				onWindowRefresh.fire(e);
-			},
-			[this](const EventWindowSize& e) {
+
+			}, [this](const EventWindowSize& e) {
 				self->size = e.size;
 
 				onWindowSize.fire(e);
