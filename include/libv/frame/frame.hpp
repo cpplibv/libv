@@ -18,10 +18,6 @@
 //			member with async task return Frame&
 //			Wait throws in a dummy task and waits for it.
 //
-// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-// TODO P2: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-//
 // TODO P3: Support glfw hint GLFW_AUTO_ICONIFY
 // TODO P3: Support glfw hint GLFW_CENTER_CURSOR
 // TODO P3: Support glfw hint GLFW_DOUBLEBUFFER
@@ -57,6 +53,12 @@ class Frame : public Trackable {
 	// "window" - refers to the glfw (operation system) window. A window is always part of a frame.
 
 public: // -----------------------------------------------------------------------------------------
+	enum class CursorMode {
+		normal = 0x00034001, /// makes the cursor visible and behaving normally.
+		hidden = 0x00034002, /// makes the cursor invisible when it is over the content area of the window but does not restrict the cursor from leaving.
+		disabled = 0x00034003, /// hides and grabs the cursor, providing virtual and unlimited cursor movement. This is useful for implementing for example 3D camera controls.
+	};
+
 	enum class DisplayMode : int {
 		windowed = 0,
 		borderless = 1,
@@ -223,6 +225,7 @@ public:
 	void setOpenGLVersion(int major, int minor);
 
 	void setCloseOperation(CloseOperation operation);
+	void setCursorMode(CursorMode cursorMode);
 	void setDecoration(bool decorated);
 	void setDisplayMode(DisplayMode mode);
 	void setPosition(int x, int y);

@@ -283,6 +283,15 @@ void Frame::setCloseOperation(Frame::CloseOperation operation) {
 	self->defaultCloseOperation = operation;
 }
 
+void Frame::setCursorMode(Frame::CursorMode cursorMode) {
+	self->context.executeAsync([this, cursorMode] {
+		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(cursorMode));
+		self->cursorMode = cursorMode;
+		if (self->window)
+			self->core.exec(std::bind(glfwSetInputMode, self->window, GLFW_CURSOR, libv::to_value(cursorMode)));
+	});
+}
+
 void Frame::setDecoration(bool decorated) {
 	self->context.executeAsync([this, decorated] {
 		log_frame.trace("Set frame Decoration of {} to {}", self->title, decorated);
@@ -292,10 +301,10 @@ void Frame::setDecoration(bool decorated) {
 	});
 }
 
-void Frame::setDisplayMode(Frame::DisplayMode mode) {
-	self->context.executeAsync([this, mode] {
-		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(mode));
-		self->displayMode = mode;
+void Frame::setDisplayMode(Frame::DisplayMode displayMode) {
+	self->context.executeAsync([this, displayMode] {
+		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(displayMode));
+		self->displayMode = displayMode;
 		if (self->window)
 			cmdFrameRecreate();
 	});

@@ -86,6 +86,13 @@ public:
 			if (e.key == Key::U)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
 
+			if (e.key == Key::I)
+				setCursorMode(CursorMode::normal);
+			if (e.key == Key::O)
+				setCursorMode(CursorMode::hidden);
+			if (e.key == Key::P)
+				setCursorMode(CursorMode::disabled);
+
 			// --- A row
 
 			if (e.key == Key::A)

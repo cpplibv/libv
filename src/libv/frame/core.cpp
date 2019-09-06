@@ -188,6 +188,7 @@ void Frame::cmdCoreCreate() {
 			self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
 
 	glfwSetInputMode(self->window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
+	glfwSetInputMode(self->window, GLFW_CURSOR, libv::to_value(self->cursorMode));
 
 	if (self->displayMode == DisplayMode::fullscreen) {
 

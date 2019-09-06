@@ -166,10 +166,12 @@ libv.frame.glfw.hint: Added GLFW_FOCUSED window hint for controlling initial inp
 libv.frame.glfw.hint: Added GLFW_FOCUS_ON_SHOW window hint and attribute to control input focus on calling show window (#1189)
 libv.frame.glfw.hint: Added GLFW_LOCK_KEY_MODS input mode and GLFW_MOD_*_LOCK mod bits (#946)
 libv.frame.glfw.frame: glfwSetWindowAttrib supports GLFW_FOCUS_ON_SHOW for existing windows
+libv.frame: CursorMode and glfwSetInputMode
+libv.frame: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+libv.frame: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+libv.frame: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 --- STACK ------------------------------------------------------------------------------------------
-
-libv.frame: glfwSetInputMode
 
 libv.frame.glfw.core: Added glfwPostEmptyEvent for allowing secondary threads to cause glfwWaitEvents to return
 libv.frame.glfw.core: Removed requirement of at least one window for glfwWaitEvents and glfwPostEmptyEvent

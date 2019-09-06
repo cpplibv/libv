@@ -77,6 +77,7 @@ public:
 	bool focusOnShow = true;
 
 	Frame::CloseOperation defaultCloseOperation = Frame::CloseOperation::dispose;
+	Frame::CursorMode cursorMode = Frame::CursorMode::normal;
 	Frame::DisplayMode displayMode = Frame::DisplayMode::windowed;
 
 	std::string title;
