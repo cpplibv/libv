@@ -45,6 +45,7 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 class ImplFrame;
+class Icon;
 
 class Frame : public Trackable {
 	// "frame" - refers to the entire window with its Frame objects, handlers, events, states etc...
@@ -263,6 +264,9 @@ public:
 	void setSizeLimitMax(libv::vec2i max);
 
 	void setTitle(std::string title);
+
+	void setIcon(std::vector<Icon> icon);
+	void clearIcon();
 
 public:
 	CloseOperation getCloseOperation() const;

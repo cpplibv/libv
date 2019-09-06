@@ -3,10 +3,12 @@
 // libv
 #include <libv/input/inputs.hpp>
 // std
+#include <cmath>
 #include <iostream>
 #include <thread>
 // pro
 #include <libv/frame/frame.hpp>
+#include <libv/frame/icon.hpp>
 #include <libv/frame/log.hpp>
 
 
@@ -15,6 +17,23 @@
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 using libv::input::Key;
+
+libv::frame::Icon generate_icon(size_t size, libv::vec4uc color) {
+	libv::frame::Icon result;
+
+	result.size.x = static_cast<int>(size);
+	result.size.y = static_cast<int>(size);
+	result.pixels.resize(size * size);
+
+	const double radius = static_cast<double>(size - 1);
+
+	for (size_t x = 0; x < size; ++x)
+		for (size_t y = 0; y < size; ++y)
+			if (std::sqrt(static_cast<double>(x * x + y * y)) < radius)
+				result.pixels[y * size + x] = color;
+
+	return result;
+}
 
 void noisyEvents(libv::Frame& frame) {
 	const auto pretty_print_to_log = [](const auto& event) {
@@ -68,6 +87,15 @@ public:
 
 			if (e.key == Key::Escape)
 				closeDefault();
+
+			// --- 0 row
+
+			if (e.key == Key::Backtick)
+				clearIcon();
+			if (e.key == Key::Num1)
+				setIcon(std::vector<libv::frame::Icon>{generate_icon(16, {255, 0, 0, 255}), generate_icon(32, {255, 63, 127, 255}), generate_icon(48, {255, 127, 255, 255})});
+			if (e.key == Key::Num2)
+				setIcon(std::vector<libv::frame::Icon>{generate_icon(16, {0, 255, 0, 255}), generate_icon(32, {127, 255, 63, 255}), generate_icon(48, {255, 255, 127, 255})});
 
 			// --- Q row
 

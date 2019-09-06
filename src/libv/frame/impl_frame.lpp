@@ -15,6 +15,7 @@
 #include <variant>
 // pro
 #include <libv/frame/events.hpp>
+#include <libv/frame/icon.hpp>
 #include <libv/frame/log.hpp>
 
 
@@ -57,6 +58,10 @@ public:
 	libv::vec2i sizeLimitMax = {-1, -1};
 	libv::vec2i aspectRatio = {-1, -1};
 	libv::vec4i frameSize = {}; /// x - left, y - top, z - right, w - bottom
+
+public:
+	std::vector<GLFWimage> iconsGLFW;
+	std::vector<Icon> icons;
 
 public:
 	Frame::OpenGLProfile openGLProfile = Frame::OpenGLProfile::compat;

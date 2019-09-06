@@ -185,6 +185,8 @@ void Frame::cmdCoreCreate() {
 	glfwSetInputMode(self->window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 	glfwSetInputMode(self->window, GLFW_CURSOR, libv::to_value(self->cursorMode));
 
+	glfwSetWindowIcon(self->window, static_cast<int>(self->iconsGLFW.size()), self->iconsGLFW.data());
+
 	if (self->displayMode == DisplayMode::fullscreen) {
 
 	} else if (self->displayMode == DisplayMode::borderless) {

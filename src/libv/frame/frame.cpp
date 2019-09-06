@@ -463,6 +463,34 @@ void Frame::setTitle(std::string title) {
 	});
 }
 
+void Frame::setIcon(std::vector<Icon> icons) {
+	self->context.executeAsync([this, icons = std::move(icons)] {
+		self->icons = std::move(icons);
+		self->iconsGLFW.resize(self->icons.size());
+
+		for (size_t i = 0; i < self->icons.size(); ++i) {
+			self->iconsGLFW[i].width = self->icons[i].size.x;
+			self->iconsGLFW[i].height = self->icons[i].size.y;
+			self->iconsGLFW[i].pixels = self->icons[i].pixels[0].ptr();
+		}
+		if (self->window)
+			self->core.exec([this] {
+				glfwSetWindowIcon(self->window, static_cast<int>(self->iconsGLFW.size()), self->iconsGLFW.data());
+			});
+	});
+}
+
+void Frame::clearIcon() {
+	self->context.executeAsync([this] {
+		self->icons.clear();
+		self->iconsGLFW.clear();
+		if (self->window)
+			self->core.exec([this] {
+				glfwSetWindowIcon(self->window, 0, nullptr);
+			});
+	});
+}
+
 // Getters -----------------------------------------------------------------------------------------
 
 Frame::CloseOperation Frame::getCloseOperation() const {
