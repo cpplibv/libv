@@ -611,6 +611,12 @@ wish_create_executable(
 	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
 )
 
+wish_create_executable(
+	TARGET app_binary_to_source
+	SOURCE app/binary_to_source.cpp
+	LINK   ext_fmt libv_utility
+)
+
 wish_end_group()
 wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
 
