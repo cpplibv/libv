@@ -93,6 +93,11 @@ public:
 			if (e.key == Key::P)
 				setCursorMode(CursorMode::disabled);
 
+			if (e.key == Key::BracketOpen)
+				setClipboardString("Your clipboard now belongs to us.");
+			if (e.key == Key::BracketClose)
+				log_sandbox.trace("getClipboardString: {}", getClipboardString());
+
 			// --- A row
 
 			if (e.key == Key::A)

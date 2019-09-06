@@ -108,10 +108,10 @@ public:
 public:
 	SandboxFrame() :
 		Frame("UI sandbox", 1280, 800) {
-		setPosition(POSITION_CENTER_CURRENT_MONITOR);
-		setOpenGLProfile(OPENGL_PROFILE_CORE);
+		setPosition(FramePosition::center_current_monitor);
+		setOpenGLProfile(OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
-		setOpenGLSamples(4);
+		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
 		ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
 

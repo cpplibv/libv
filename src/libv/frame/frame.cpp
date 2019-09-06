@@ -507,7 +507,7 @@ const Monitor& Frame::getCurrentMonitor() const {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::input::KeyState Frame::getKey(libv::input::Key key) {
+libv::input::KeyState Frame::key(libv::input::Key key) {
 	return self->pressedKeys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
@@ -519,7 +519,7 @@ bool Frame::isKeyReleased(libv::input::Key key) {
 	return not self->pressedKeys.contains(key);
 }
 
-libv::input::KeyState Frame::getMouse(libv::input::Mouse key) {
+libv::input::KeyState Frame::mouse(libv::input::Mouse key) {
 	return self->pressedMouseButtons.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
@@ -542,17 +542,19 @@ libv::vec2d Frame::getScrollPosition() {
 // -------------------------------------------------------------------------------------------------
 
 std::string Frame::getClipboardString() {
-	// <<< P1: 'main' thread is required
-	const char* text = glfwGetClipboardString(nullptr);
-	if (text != nullptr)
-		return std::string{text};
-	else
-		return std::string{""};
+	std::string result;
+	self->core.exec([&result] {
+		const char* text = glfwGetClipboardString(nullptr);
+		if (text != nullptr)
+			result = text;
+	});
+	return result;
 }
 
 void Frame::setClipboardString(const std::string& string) {
-	// <<< P1: 'main' thread is required
-	glfwSetClipboardString(nullptr, string.c_str());
+	self->core.exec([&string] {
+		glfwSetClipboardString(nullptr, string.c_str());
+	});
 }
 
 // -------------------------------------------------------------------------------------------------

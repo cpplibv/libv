@@ -55,10 +55,10 @@ void VM4ViewerFrame::destroy() {
 
 VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	Frame("VM4 Viewer", config.window_width, config.window_height) {
-	setPosition(POSITION_CENTER_CURRENT_MONITOR);
-	setOpenGLProfile(OPENGL_PROFILE_CORE);
+	setPosition(FramePosition::center_current_monitor);
+	setOpenGLProfile(OpenGLProfile::core);
 	setOpenGLVersion(3, 3);
-	setOpenGLSamples(4);
+	setOpenGLSamples(OpenGLSamples{4});
 	ui.attach(*this);
 	ui.setSize(
 			static_cast<float>(config.window_width),
@@ -92,9 +92,6 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 
 		if (e.action == libv::input::Action::release)
 			panel->key(e.key);
-	});
-	onCharMods.output([&](const libv::frame::EventCharMods& e) {
-		(void) e;
 	});
 	onWindowSize.output([&](const libv::frame::EventWindowSize& e) {
 		if (config.save_window_size) {

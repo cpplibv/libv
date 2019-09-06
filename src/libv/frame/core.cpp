@@ -23,11 +23,6 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 class Core {
-	// Priorities:
-	// Init            0
-	// Task           50
-	// WaitEvent     150
-	// Terminate     200
 private:
 	libv::ExecutorThread thread;
 	std::atomic_bool stopWait{false};
@@ -35,7 +30,7 @@ private:
 
 private:
 	void init() {
-		log_core.info("Initialize Core / GLFW Context");
+		log_core.info("Initialize GLFW Context");
 		glfwSetErrorCallback([] (int code, const char* msg) {
 			log_glfw.error("{} - {}", code, msg);
 		});
@@ -63,7 +58,7 @@ private:
 	}
 
 	void term() {
-		log_core.info("Terminate Core / GLFW Context");
+		log_core.info("Terminate GLFW Context");
 		glfwSetMonitorCallback(nullptr);
 		glfwTerminate();
 		glfwSetErrorCallback(nullptr);

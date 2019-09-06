@@ -18,14 +18,14 @@
 //			member with async task return Frame&
 //			Wait throws in a dummy task and waits for it.
 //
-// TODO P3: Support glfw hint GLFW_AUTO_ICONIFY
-// TODO P3: Support glfw hint GLFW_CENTER_CURSOR
 // TODO P3: Support glfw hint GLFW_DOUBLEBUFFER
 // TODO P3: Support glfw hint GLFW_JOYSTICK_HAT_BUTTONS
 //
 // TODO P4: Support glfw hint GLFW_SCALE_TO_MONITOR
 // TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
 // TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY (can be set via glfwSetWindowAttrib)
+// TODO P4: Support glfw hint GLFW_CENTER_CURSOR
 //
 // TODO P5: Support glfw hint GLFW_TRANSPARENT_FRAMEBUFFER
 // TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
@@ -262,10 +262,7 @@ public:
 	/// Negative values interpreted as no limit
 	void setSizeLimitMax(libv::vec2i max);
 
-
 	void setTitle(std::string title);
-//	void setWindowSizeLimits(int minx, int miny, int maxx, int maxy);
-//	void setWindowSizeLimits(libv::vec2i min, libv::vec2i max);
 
 public:
 	CloseOperation getCloseOperation() const;
@@ -284,11 +281,11 @@ public:
 	const Monitor& getCurrentMonitor() const;
 
 public:
-	libv::input::KeyState getKey(libv::input::Key key);
+	libv::input::KeyState key(libv::input::Key key);
 	bool isKeyPressed(libv::input::Key key);
 	bool isKeyReleased(libv::input::Key key);
 
-	libv::input::KeyState getMouse(libv::input::Mouse key);
+	libv::input::KeyState mouse(libv::input::Mouse key);
 	bool isMousePressed(libv::input::Mouse key);
 	bool isMouseReleased(libv::input::Mouse key);
 
