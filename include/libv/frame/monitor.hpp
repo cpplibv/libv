@@ -20,9 +20,9 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 struct VideoMode {
-	vec3i colorBits;
+	libv::vec3i colorBits;
 	int refreshRate;
-	vec2i size;
+	libv::vec2i size;
 
 	VideoMode() = default;
 	VideoMode(const GLFWvidmode* vidmode);
@@ -37,13 +37,19 @@ void glfwMonitorCallback(GLFWmonitor*, int);
 struct Monitor {
 	static std::map<GLFWmonitor*, Monitor> monitors;
 	static Signal<const EventMonitor&> onMonitor;
+
 public:
-	static Monitor& getMonitorAt(vec2i coord);
+	static Monitor& getMonitorAt(libv::vec2i coord);
 	static Monitor& getPrimaryMonitor();
 
 public:
 	std::string name;
-	vec2i position;
+	libv::vec2i position;
+	libv::vec2i physicalSizeMM;
+	libv::vec2i workAreaPosition;
+	libv::vec2i workAreaSize;
+	libv::vec2f contentScale;
+
 	VideoMode currentVideoMode;
 	std::vector<VideoMode> videoModes;
 

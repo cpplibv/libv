@@ -132,7 +132,7 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true && self->openGLVersionMajor >= 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, self->openGLForwardCompat && self->openGLVersionMajor >= 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
 	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
 	glfwWindowHint(GLFW_SAMPLES, libv::to_value(self->openGLSamples));

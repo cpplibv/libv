@@ -10,6 +10,7 @@
 #include <libv/frame/frame.hpp>
 #include <libv/frame/icon.hpp>
 #include <libv/frame/log.hpp>
+#include <libv/frame/monitor.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -18,7 +19,7 @@ inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 using libv::input::Key;
 
-libv::frame::Icon generate_icon(size_t size, libv::vec4uc color) {
+libv::frame::Icon generateIcon(size_t size, libv::vec4uc color) {
 	libv::frame::Icon result;
 
 	result.size.x = static_cast<int>(size);
@@ -93,9 +94,9 @@ public:
 			if (e.key == Key::Backtick)
 				clearIcon();
 			if (e.key == Key::Num1)
-				setIcon(std::vector<libv::frame::Icon>{generate_icon(16, {255, 0, 0, 255}), generate_icon(32, {255, 63, 127, 255}), generate_icon(48, {255, 127, 255, 255})});
+				setIcon(std::vector<libv::frame::Icon>{generateIcon(16, {255, 0, 0, 255}), generateIcon(32, {255, 63, 127, 255}), generateIcon(48, {255, 127, 255, 255})});
 			if (e.key == Key::Num2)
-				setIcon(std::vector<libv::frame::Icon>{generate_icon(16, {0, 255, 0, 255}), generate_icon(32, {127, 255, 63, 255}), generate_icon(48, {255, 255, 127, 255})});
+				setIcon(std::vector<libv::frame::Icon>{generateIcon(16, {0, 255, 0, 255}), generateIcon(32, {127, 255, 63, 255}), generateIcon(48, {255, 255, 127, 255})});
 
 			// --- Q row
 
@@ -151,6 +152,14 @@ public:
 				setFocusOnShow(true);
 			if (e.key == Key::Semicolon)
 				setFocusOnShow(false);
+
+			if (e.key == Key::Apostrophe)
+				for (const auto& [_, monitor] : libv::frame::Monitor::monitors) {
+					log_sandbox.trace("{} pos {}, work pos {}, work size {}, content scale {}, physical mm {}", monitor.name, monitor.position, monitor.workAreaPosition, monitor.workAreaSize, monitor.contentScale, monitor.physicalSizeMM);
+					log_sandbox.trace("     >> size {}, rate {}, bits {}", monitor.currentVideoMode.size, monitor.currentVideoMode.refreshRate, monitor.currentVideoMode.colorBits);
+					for (const auto& mode : monitor.videoModes)
+						log_sandbox.trace("        size {}, rate {}, bits {}", mode.size, mode.refreshRate, mode.colorBits);
+				}
 
 			// --- Z row
 

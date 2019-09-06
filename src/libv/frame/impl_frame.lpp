@@ -69,6 +69,7 @@ public:
 	Frame::OpenGLSamples openGLSamples = Frame::OpenGLSamples::dont_care;
 	int openGLVersionMajor = 3;
 	int openGLVersionMinor = 3;
+	bool openGLForwardCompat = true;
 
 	bool decorated = true;
 	bool resizable = true;

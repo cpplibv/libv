@@ -76,7 +76,11 @@ Monitor& Monitor::getPrimaryMonitor() {
 Monitor::Monitor(GLFWmonitor* monitor) {
 	currentVideoMode = glfwGetVideoMode(monitor);
 	name = glfwGetMonitorName(monitor);
+	glfwGetMonitorContentScale(monitor, &contentScale.x, &contentScale.y);
+	glfwGetMonitorPhysicalSize(monitor, &physicalSizeMM.x, &physicalSizeMM.y);
 	glfwGetMonitorPos(monitor, &position.x, &position.y);
+	glfwGetMonitorWorkarea(monitor, &workAreaPosition.x, &workAreaPosition.y, &workAreaSize.x, &workAreaSize.y);
+
 	int n;
 	auto modes = glfwGetVideoModes(monitor, &n);
 	videoModes.reserve(n);

@@ -173,22 +173,22 @@ libv.frame: glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 libv.frame: fix clipboard thread
 libv.frame.glfw.frame: Added glfwSetWindowIcon for setting the icon of a window
 libv.frame: icon support, glfwSetWindowIcon(window, 2, images);, Preferred in 3 resolutions are: 16x16, 32x32, 48x48, (maybe as an extra 24x24, 64x64)
+libv.frame.glfw.monitor: Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
+libv.frame.glfw.monitor: Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
+libv.frame.glfw.monitor: Added glfwGetMonitorContentScale
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.frame.glfw.monitor: Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
-libv.frame.glfw.monitor: Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
-libv.frame.glfw.monitor: Added glfwGetWindowContentScale, glfwGetMonitorContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
-
-
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
 libv.frame: implement setDisplayMode without cmdFrameRecreate
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
 
+libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
+
 libv.frame: add a mutex to event callbacks and event queue
 libv.frame: add a mutex to windowHandlers
+libv.frame: add a mutex to monitors map
 
 libv.frame.input: Question should I couple scancode with key for each key states
 libv.frame: add a single state for show/hidden/maximized/minimized
@@ -547,6 +547,8 @@ glfw.sample: Added 'sharing' simple OpenGL object sharing test program
 glfw.sample: Added 'threads' simple multi-threaded rendering test program
 glfw.sample: Added 'windows' simple multi-window test program
 
+glfw: glfwSetMonitorUserPointer and glfwGetMonitorUserPointer
+glfw: glfwSetGammaRamp
 
 // -------------------------------------------------------------------------------------------------
 
