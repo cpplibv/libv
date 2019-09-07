@@ -417,7 +417,7 @@ wish_create_external(
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/net_ts/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/net_ts/src/get_net_ts/include/ ${PATH_EXT}/net_ts/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/net_ts/src/get_net_ts/include/ ${PATH_EXT}/net_ts/include/
 	# TODO P3: Add support for linux link / define for net_ts
 	#	LINK $<IF:$<BOOL:${WIN32}>,
 	#			wsock32 ws2_32, # Win 32
@@ -434,7 +434,26 @@ wish_create_external(
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/range/src/get_range/include/ ${PATH_EXT}/range/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/range/src/get_range/include/ ${PATH_EXT}/range/include/
+)
+
+wish_create_external(
+	NAME reactphysics3d
+	GIT_REPOSITORY https://github.com/DanielChappuis/reactphysics3d.git
+	GIT_TAG v0.7.1
+	CMAKE_ARGS
+		-DCMAKE_BUILD_TYPE="Release"
+
+	# INSTALL_COMMAND is a workaround for the incorrect install target where PUBLIC_HEADERs are used instead of install(DIRECTORY or FILE)
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/reactphysics3d/include
+		COMMAND mkdir -p ${PATH_EXT}/reactphysics3d/lib
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/reactphysics3d/src/get_reactphysics3d/src/ ${PATH_EXT}/reactphysics3d/include/reactphysics3d/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/reactphysics3d/src/get_reactphysics3d-build/lib/ ${PATH_EXT}/reactphysics3d/lib/
+
+	LINK reactphysics3d
+	# INCLUDE_DIR twice is a workaround for the incorrect include directives that would not account for the library root directory
+	INCLUDE_DIR include include/reactphysics3d
 )
 
 wish_create_external(
@@ -465,7 +484,7 @@ wish_create_external(
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/sml/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/include/
 )
 
 wish_create_external(
@@ -698,6 +717,12 @@ wish_create_executable(
 	TARGET sandbox_libv_net_server
 	SOURCE sandbox/libv_net_server_main.cpp
 	LINK   libv_net libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_physics
+	SOURCE sandbox/libv_physics_main.cpp
+	LINK   ext_reactphysics3d libv_math
 )
 
 wish_create_executable(
