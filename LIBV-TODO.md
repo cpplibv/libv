@@ -182,18 +182,14 @@ libv.frame: implement setDisplayMode without cmdFrameRecreate
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it | invalid events caused the issue, now they are discarded with workaround
 libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 libv.frame: cleanup core and core proxy
-
---- STACK ------------------------------------------------------------------------------------------
-
-libv.frame: Review threading and ownership models of the whole library
 libv.frame: add a mutex to event callbacks and event queue
 libv.frame: add a mutex to windowHandlers
 libv.frame: add a mutex to monitors map
 libv.frame: add a mutex to frame (its needs one because of the getters could access data members)
-
+libv.frame: Review threading and ownership models of the whole library | I just throw a bunch of mutex at the problem, I feel guilt
 libv.frame: cleanup includes
-libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
-libv.frame: cleanup global variables, at least place them next to each other and reason able thread access
+
+--- STACK ------------------------------------------------------------------------------------------
 
 libv.sig: merge back the sig codebase
 libv.sig: clean up the sig codebase
@@ -384,8 +380,11 @@ wish: revisit catch object file linkage (only need to figure out a way to build 
 libv.ecui: state based ui, separate control and data!
 libv.ecui: ui resource local proxies
 
-libv.frame: frame calling show after show may brake things?
-libv.frame: dual check lock every async frame operations
+libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
+libv.frame: cleanup monitor, provide a thread-safe access to monitors list
+libv.frame: cleanup global variables, at least place them next to each other and reason about thread access
+
+
 
 --- AWAITING ---------------------------------------------------------------------------------------
 

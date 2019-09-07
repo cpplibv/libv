@@ -6,40 +6,31 @@
 #include <libv/math/vec.hpp>
 #include <libv/sig/signal.hpp>
 // std
+#include <mutex>
 #include <vector>
 // pro
 #include <libv/frame/events.hpp>
 
+// -------------------------------------------------------------------------------------------------
 
-class GLFWvidmode;
 class GLFWmonitor;
 
 namespace libv {
 namespace frame {
 
-// -------------------------------------------------------------------------------------------------
-
 struct VideoMode {
 	libv::vec3i colorBits;
 	int refreshRate;
 	libv::vec2i size;
-
-	VideoMode() = default;
-	VideoMode(const GLFWvidmode* vidmode);
-	VideoMode& operator=(const GLFWvidmode* vidmode) &;
-	~VideoMode() = default;
 };
 
-// -------------------------------------------------------------------------------------------------
-
-void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status);
-
 struct Monitor {
+	static std::mutex monitors_m;
 	static std::map<GLFWmonitor*, Monitor> monitors;
 	static Signal<const EventMonitor&> onMonitor;
 
 public:
-	static Monitor& getMonitorAt(libv::vec2i coord);
+	static Monitor& getMonitorClosest(libv::vec2i coord);
 	static Monitor& getPrimaryMonitor();
 
 public:
@@ -58,7 +49,9 @@ public:
 	Monitor(GLFWmonitor* monitor);
 };
 
-// -------------------------------------------------------------------------------------------------
+void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status);
 
 } // namespace frame
 } // namespace libv
+
+// -------------------------------------------------------------------------------------------------

@@ -204,12 +204,15 @@ int main(int, char**) {
 		log_sandbox.trace("Event: {}", event.toPrettyString());
 	});
 
-	TestFrame f1("TestFrame1");
-	TestFrame f2("TestFrame2");
-	TestFrame f3("TestFrame3");
-	f1.join();
-	f2.join();
-	f3.join();
+	{
+		TestFrame f1("TestFrame1");
+		TestFrame f2("TestFrame2");
+		f1.join();
+		f2.join();
+	} {
+		TestFrame f3("TestFrame3");
+		f3.join();
+	}
 
 	return 0;
 }

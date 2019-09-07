@@ -6,6 +6,8 @@
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/utility/overload.hpp>
+// std
+#include <mutex>
 // pro
 #include <libv/frame/events.hpp>
 #include <libv/frame/impl_frame.lpp>
@@ -17,7 +19,7 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-// <<< P4: multi thread safety?
+std::mutex windowHandlers_m;
 std::map<GLFWwindow*, Frame*> windowHandlers;
 
 template <typename E>
@@ -25,7 +27,9 @@ struct DispatchGLFWEvent {
 	template <typename... Args>
 	static inline void call(GLFWwindow* window, Args... args) {
 		try {
+			std::lock_guard lock_handler(windowHandlers_m);
 			Frame& frame = *windowHandlers.at(window);
+			std::lock_guard lock_queue(frame.self->eventQueue_m);
 			frame.self->eventQueue.emplace_back(E(args...));
 
 		} catch (const std::out_of_range& e) {
@@ -36,7 +40,9 @@ struct DispatchGLFWEvent {
 	template <typename... Args>
 	static inline void frame(GLFWwindow* window, Args... args) {
 		try {
+			std::lock_guard lock_handler(windowHandlers_m);
 			Frame& frame = *windowHandlers.at(window);
+			std::lock_guard lock_queue(frame.self->eventQueue_m);
 			frame.self->eventQueue.emplace_back(E(args...));
 
 			glfwGetWindowFrameSize(window,
@@ -52,10 +58,12 @@ struct DispatchGLFWEvent {
 
 	static inline void mouse(GLFWwindow* window, double x, double y) {
 		try {
+			std::lock_guard lock_handler(windowHandlers_m);
 			Frame& frame = *windowHandlers.at(window);
 			std::vector<Event>& queue = frame.self->eventQueue;
 			auto size = frame.getSize();
 
+			std::lock_guard lock_queue(frame.self->eventQueue_m);
 			if (!queue.empty() && std::holds_alternative<E>(queue.back()))
 				std::get<E>(queue.back()).position = libv::vec2d{x, size.y - y - 1};
 			else
@@ -95,7 +103,10 @@ struct DispatchGLFWEvent {
 };
 
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
-	windowHandlers[window] = frame;
+	{
+		std::lock_guard lock(windowHandlers_m);
+		windowHandlers[window] = frame;
+	}
 
 	glfwSetCharCallback              (window, DispatchGLFWEvent<EventChar           >::call);
 	glfwSetWindowContentScaleCallback(window, DispatchGLFWEvent<EventContentScale   >::call);
@@ -131,19 +142,26 @@ void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 	glfwSetWindowRefreshCallback     (window, nullptr);
 	glfwSetWindowSizeCallback        (window, nullptr);
 
-	windowHandlers.erase(window);
+	{
+		std::lock_guard lock(windowHandlers_m);
+		windowHandlers.erase(window);
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::distributeEvents() {
+	std::lock_guard lock(self->eventQueue_m);
 	for (const auto& event : self->eventQueue) {
 		const auto visitor = libv::overload(
 			[this](const EventChar& e) {
 				onChar.fire(e);
 
 			}, [this](const EventContentScale& e) {
-				self->contentScale = e.scale;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->contentScale = e.scale;
+				}
 				onContentScale.fire(e);
 
 			}, [this](const EventDrop& e) {
@@ -156,33 +174,45 @@ void Frame::distributeEvents() {
 				onFramebufferSize.fire(e);
 
 			}, [this](const EventKey& e) {
-				if (e.action != libv::input::Action::release) {
-					self->pressedKeys.insert(e.key);
-					self->pressedScancodes.insert(e.scancode);
-				} else {
-					self->pressedKeys.erase(e.key);
-					self->pressedScancodes.erase(e.scancode);
+				{
+					std::lock_guard lock(self->frameState_m);
+					if (e.action != libv::input::Action::release) {
+						self->pressedKeys.insert(e.key);
+						self->pressedScancodes.insert(e.scancode);
+					} else {
+						self->pressedKeys.erase(e.key);
+						self->pressedScancodes.erase(e.scancode);
+					}
 				}
 
 				onKey.fire(e);
 
 			}, [this](const EventMaximize& e) {
-				self->maximized = e.maximized;
-				self->minimized = false;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->maximized = e.maximized;
+					self->minimized = false;
+				}
 
 				onMaximize.fire(e);
 
 			}, [this](const EventMinimize& e) {
-				self->maximized = false;
-				self->minimized = e.minimized;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->maximized = false;
+					self->minimized = e.minimized;
+				}
 
 				onMinimize.fire(e);
 
 			}, [this](const EventMouseButton& e) {
-				if (e.action != libv::input::Action::release)
-					self->pressedMouseButtons.insert(e.button);
-				else
-					self->pressedMouseButtons.erase(e.button);
+				{
+					std::lock_guard lock(self->frameState_m);
+					if (e.action != libv::input::Action::release)
+						self->pressedMouseButtons.insert(e.button);
+					else
+						self->pressedMouseButtons.erase(e.button);
+				}
 
 				onMouseButton.fire(e);
 
@@ -190,17 +220,26 @@ void Frame::distributeEvents() {
 				onMouseEnter.fire(e);
 
 			}, [this](const EventMousePosition& e) {
-				self->mousePosition = e.position;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->mousePosition = e.position;
+				}
 
 				onMousePosition.fire(e);
 
 			}, [this](const EventMouseScroll& e) {
-				self->scrollPosition += e.offset;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->scrollPosition += e.offset;
+				}
 
 				onMouseScroll.fire(e);
 
 			}, [this](const EventPosition& e) {
-				self->position = e.position;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->position = e.position;
+				}
 
 				onPosition.fire(e);
 
@@ -208,7 +247,10 @@ void Frame::distributeEvents() {
 				onRefresh.fire(e);
 
 			}, [this](const EventSize& e) {
-				self->size = e.size;
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->size = e.size;
+				}
 
 				onSize.fire(e);
 			}

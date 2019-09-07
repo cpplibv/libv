@@ -12,7 +12,6 @@
 #include <libv/thread/executor_thread.hpp>
 // std
 #include <mutex>
-#include <variant>
 // pro
 #include <libv/frame/core.lpp>
 #include <libv/frame/events.hpp>
@@ -37,7 +36,7 @@ public:
 
 	libv::ExecutorThread context;
 
-	std::shared_ptr<Core> core = getCore();
+	std::shared_ptr<Core> core = getCoreInstance();
 
 public:
 	uint32_t swapInterval = 1;
@@ -79,15 +78,17 @@ public:
 	std::string title;
 
 public:
-	std::vector<Event> eventQueue;
-
-public:
+	std::mutex frameState_m; /// Guards every state that is observable by getters
 	boost::container::flat_set<libv::input::Key> pressedKeys;
 	boost::container::flat_set<int> pressedScancodes;
 	boost::container::flat_set<libv::input::Mouse> pressedMouseButtons;
 
 	libv::vec2d mousePosition;
 	libv::vec2d scrollPosition;
+
+public:
+	std::mutex eventQueue_m; /// glfw documentation states that not just pulling even can cause event callbacks to fire, meaning unknown threads could enter
+	std::vector<Event> eventQueue;
 
 public:
 	ImplFrame(std::string title, libv::vec2i size) :

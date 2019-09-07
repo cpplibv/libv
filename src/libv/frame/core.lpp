@@ -36,7 +36,7 @@ public:
 	void execute(libv::function_ref<void()> func);
 };
 
-std::shared_ptr<Core> getCore();
+std::shared_ptr<Core> getCoreInstance();
 
 // -------------------------------------------------------------------------------------------------
 

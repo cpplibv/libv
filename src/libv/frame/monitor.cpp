@@ -13,30 +13,7 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-VideoMode::VideoMode(const GLFWvidmode* vidmode) :
-	colorBits(vidmode->redBits, vidmode->greenBits, vidmode->blueBits),
-	refreshRate(vidmode->refreshRate),
-	size(vidmode->width, vidmode->height) { }
-
-VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) & {
-	colorBits = vec3i(vidmode->redBits, vidmode->greenBits, vidmode->blueBits);
-	refreshRate = vidmode->refreshRate;
-	size = vec2i(vidmode->width, vidmode->height);
-	return *this;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status) {
-	Monitor* m;
-	try {
-		m = &Monitor::monitors.at(monitor);
-	} catch (const std::out_of_range&) {
-		m = &Monitor::monitors.emplace(monitor, monitor).first->second;
-	}
-	Monitor::onMonitor.fire(EventMonitor(*m, status));
-}
-
+std::mutex Monitor::monitors_m;
 std::map<GLFWmonitor*, Monitor> Monitor::monitors;
 Signal<const EventMonitor&> Monitor::onMonitor;
 
@@ -50,7 +27,8 @@ T distFromSection(T a, T b, T p) {
 		return 0;
 }
 
-Monitor& Monitor::getMonitorAt(vec2i coord) {
+Monitor& Monitor::getMonitorClosest(libv::vec2i coord) {
+	std::lock_guard lock(Monitor::monitors_m);
 	// TODO P5: std::min_element with lambda
 	int min = std::numeric_limits<int>::max();
 
@@ -70,12 +48,17 @@ Monitor& Monitor::getMonitorAt(vec2i coord) {
 }
 
 Monitor& Monitor::getPrimaryMonitor() {
+	std::lock_guard lock(Monitor::monitors_m);
 	return monitors.at(glfwGetPrimaryMonitor());
 }
 
 Monitor::Monitor(GLFWmonitor* monitor) {
 	handler = monitor;
-	currentVideoMode = glfwGetVideoMode(monitor);
+	const auto* currentMode = glfwGetVideoMode(monitor);
+	currentVideoMode.colorBits = libv::vec3i(currentMode->redBits, currentMode->greenBits, currentMode->blueBits);
+	currentVideoMode.refreshRate = currentMode->refreshRate;
+	currentVideoMode.size = libv::vec2i(currentMode->width, currentMode->height);
+
 	name = glfwGetMonitorName(monitor);
 	glfwGetMonitorContentScale(monitor, &contentScale.x, &contentScale.y);
 	glfwGetMonitorPhysicalSize(monitor, &physicalSizeMM.x, &physicalSizeMM.y);
@@ -85,8 +68,25 @@ Monitor::Monitor(GLFWmonitor* monitor) {
 	int n;
 	auto modes = glfwGetVideoModes(monitor, &n);
 	videoModes.reserve(n);
-	for (int i = 0; i < n; i++)
-		videoModes.emplace_back(&modes[i]);
+	for (int i = 0; i < n; i++) {
+		auto& mode = videoModes.emplace_back();
+
+		mode.colorBits = libv::vec3i(modes[i].redBits, modes[i].greenBits, modes[i].blueBits);
+		mode.refreshRate = modes[i].refreshRate;
+		mode.size = libv::vec2i(modes[i].width, modes[i].height);
+	}
+}
+
+void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status) {
+	std::lock_guard lock(Monitor::monitors_m);
+
+	Monitor* m;
+	try {
+		m = &Monitor::monitors.at(monitor);
+	} catch (const std::out_of_range&) {
+		m = &Monitor::monitors.emplace(monitor, monitor).first->second;
+	}
+	Monitor::onMonitor.fire(EventMonitor(*m, status));
 }
 
 // -------------------------------------------------------------------------------------------------

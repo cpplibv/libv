@@ -25,20 +25,20 @@ namespace frame {
 
 libv::thread::SingleInstance<Core> core;
 
-std::shared_ptr<Core> getCore() {
+std::shared_ptr<Core> getCoreInstance() {
 	return core.get();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 Core::Core() {
-	std::lock_guard<std::mutex> lk(mutex);
+	std::lock_guard lk(mutex);
 	thread.executeSync(std::bind(&Core::init, this));
 	thread.executeAsync(std::bind(&Core::waitEvent, this));
 }
 
 Core::~Core() {
-	std::lock_guard<std::mutex> lk(mutex);
+	std::lock_guard lk(mutex);
 	stopWait = true;
 	interruptWait();
 	thread.executeSync(std::bind(&Core::term, this));
@@ -80,7 +80,7 @@ void Core::term() {
 }
 
 void Core::execute(libv::function_ref<void()> func) {
-	std::lock_guard<std::mutex> lk(mutex);
+	std::lock_guard lk(mutex);
 	stopWait = true;
 	interruptWait();
 	thread.executeSync(func);

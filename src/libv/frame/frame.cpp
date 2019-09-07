@@ -3,10 +3,7 @@
 // hpp
 #include <libv/frame/frame.hpp>
 // ext
-#include <fmt/format.h>
 #include <GLFW/glfw3.h>
-// libv
-#include <libv/thread/executor_thread.hpp>
 // pro
 #include <libv/frame/core.lpp>
 #include <libv/frame/impl_frame.lpp>
@@ -54,7 +51,12 @@ void Frame::loop() {
 	if (isFrameShouldClose()) {
 		loopTerminate();
 	} else {
-		if (!isRefreshSkipable() && self->window) {
+		bool update;
+		{
+			std::lock_guard lock(self->frameState_m);
+			update = !self->hidden && !self->minimized && self->window;
+		}
+		if (update) {
 			onContextUpdate.fire(EventContextUpdate());
 
 			glfwSwapBuffers(self->window);
@@ -111,22 +113,20 @@ void Frame::cmdFrameDestroy() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::closeDefault() {
+	std::lock_guard lock(self->frameState_m);
 	log_frame.trace("Close default frame {}", self->title);
 	if (self->window)
 		glfwSetWindowShouldClose(self->window, true);
 }
 
 void Frame::closeForce() {
+	std::lock_guard lock(self->frameState_m);
 	log_frame.trace("Close force frame {}", self->title);
 	self->forcedClose = true;
 }
 
 void Frame::join() {
 	self->context.join();
-}
-
-bool Frame::isRefreshSkipable() {
-	return self->hidden || self->minimized;
 }
 
 bool Frame::isFrameShouldClose() {
@@ -145,6 +145,7 @@ bool Frame::isFrameShouldClose() {
 		shouldClose = !ecr.isAborted();
 	}
 
+	std::lock_guard lock(self->frameState_m);
 	if (shouldClose) { // On close let DCO handle
 		switch (self->defaultCloseOperation) {
 		case CloseOperation::dispose:
@@ -165,16 +166,24 @@ bool Frame::isFrameShouldClose() {
 	return shouldClose;
 }
 
+const Monitor& Frame::_getCurrentMonitor() const {
+	return Monitor::getMonitorClosest(self->position + self->size / 2);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Frame::show() {
 	self->context.executeAsync([this] {
-		log_frame.trace("Show frame {}", self->title);
+		{
+			std::lock_guard lock(self->frameState_m);
+			log_frame.trace("Show frame {}", self->title);
+		}
 		if (!self->window) {
 			cmdFrameCreate();
 		}
 		if (self->window) {
 			self->core->execute(std::bind(glfwShowWindow, self->window));
+			std::lock_guard lock(self->frameState_m);
 			self->hidden = false;
 		}
 	});
@@ -182,6 +191,7 @@ void Frame::show() {
 
 void Frame::hide() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Hide frame {}", self->title);
 		self->hidden = true;
 		if (self->window) {
@@ -192,6 +202,7 @@ void Frame::hide() {
 
 void Frame::maximize() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Maximize frame {}", self->title);
 		self->maximized = true;
 		if (self->window) {
@@ -202,6 +213,7 @@ void Frame::maximize() {
 
 void Frame::minimize() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Minimize frame {}", self->title);
 		self->minimized = true;
 		if (self->window) {
@@ -212,6 +224,7 @@ void Frame::minimize() {
 
 void Frame::restore() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Restore frame {}", self->title);
 		self->minimized = false;
 		self->maximized = false;
@@ -224,6 +237,7 @@ void Frame::restore() {
 void Frame::focus() {
 	// Question? Does focus wants to be a creation hint as well that is only one times used?
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Focus frame {}", self->title);
 		if (self->window)
 			self->core->execute(std::bind(glfwFocusWindow, self->window));
@@ -232,6 +246,7 @@ void Frame::focus() {
 
 void Frame::requestAttention() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Request Attention frame {}", self->title);
 		if (self->window)
 			self->core->execute(std::bind(glfwRequestWindowAttention, self->window));
@@ -242,6 +257,7 @@ void Frame::requestAttention() {
 
 void Frame::setOpenGLProfile(Frame::OpenGLProfile profile) {
 	self->context.executeAsync([this, profile] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame OpenGLProfile of {} to {}", self->title, libv::to_value(profile));
 		self->openGLProfile = profile;
 		if (self->window)
@@ -251,6 +267,7 @@ void Frame::setOpenGLProfile(Frame::OpenGLProfile profile) {
 
 void Frame::setOpenGLRefreshRate(Frame::OpenGLRefreshRate rate) {
 	self->context.executeAsync([this, rate] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame OpenGLRefreshRate of {} to {}", self->title, libv::to_value(rate));
 		self->openGLRefreshRate = rate;
 		if (self->window)
@@ -260,6 +277,7 @@ void Frame::setOpenGLRefreshRate(Frame::OpenGLRefreshRate rate) {
 
 void Frame::setOpenGLSamples(Frame::OpenGLSamples samples) {
 	self->context.executeAsync([this, samples] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame OpenGLSamples of {} to {}", self->title, libv::to_value(samples));
 		self->openGLSamples = samples;
 		if (self->window)
@@ -269,6 +287,7 @@ void Frame::setOpenGLSamples(Frame::OpenGLSamples samples) {
 
 void Frame::setOpenGLVersion(int major, int minor) {
 	self->context.executeAsync([this, major, minor] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame OpenGLVersion of {} to {}.{}", self->title, major, minor);
 		self->openGLVersionMajor = major;
 		self->openGLVersionMinor = minor;
@@ -280,12 +299,16 @@ void Frame::setOpenGLVersion(int major, int minor) {
 // ---
 
 void Frame::setCloseOperation(Frame::CloseOperation operation) {
-	log_frame.trace("Set frame CloseOperation of {} to {}", self->title, libv::to_value(operation));
-	self->defaultCloseOperation = operation;
+	self->context.executeAsync([this, operation] {
+		std::lock_guard lock(self->frameState_m);
+		log_frame.trace("Set frame CloseOperation of {} to {}", self->title, libv::to_value(operation));
+		self->defaultCloseOperation = operation;
+	});
 }
 
 void Frame::setCursorMode(Frame::CursorMode cursorMode) {
 	self->context.executeAsync([this, cursorMode] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame CursorMode of {} to {}", self->title, libv::to_value(cursorMode));
 		self->cursorMode = cursorMode;
 		if (self->window)
@@ -295,6 +318,7 @@ void Frame::setCursorMode(Frame::CursorMode cursorMode) {
 
 void Frame::setDecoration(bool decorated) {
 	self->context.executeAsync([this, decorated] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame Decoration of {} to {}", self->title, decorated);
 		self->decorated = decorated;
 		if (self->window)
@@ -304,13 +328,17 @@ void Frame::setDecoration(bool decorated) {
 
 void Frame::setDisplayMode(Frame::DisplayMode displayMode) {
 	self->context.executeAsync([this, displayMode] {
-		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(displayMode));
-		self->displayMode = displayMode;
-		if (!self->window)
-			return;
+		{
+			std::lock_guard lock(self->frameState_m);
+			log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(displayMode));
+			self->displayMode = displayMode;
+			if (!self->window)
+				return;
+		}
 
 		self->core->execute([this] {
-			const Monitor& monitor = getCurrentMonitor();
+			std::lock_guard lock(self->frameState_m);
+			const Monitor& monitor = _getCurrentMonitor();
 
 			switch (self->displayMode) {
 			case DisplayMode::windowed: {
@@ -356,6 +384,7 @@ void Frame::setPosition(int x, int y) {
 
 void Frame::setPosition(libv::vec2i newpos) {
 	self->context.executeAsync([this, newpos] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame Position of {} to {}, {}", self->title, newpos.x, newpos.y);
 		self->position = newpos;
 		if (self->window)
@@ -364,32 +393,21 @@ void Frame::setPosition(libv::vec2i newpos) {
 }
 
 void Frame::setPosition(FramePosition pos) {
-	switch (pos) {
-	case FramePosition::center_current_monitor:
-		self->context.executeAsync([this] {
-			auto& monitor = getCurrentMonitor();
-			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
-			log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", self->title, newpos.x, newpos.y);
-			self->position = newpos;
-			if (self->window)
-				self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
-		});
-		break;
-	case FramePosition::center_primary_monitor:
-		self->context.executeAsync([this] {
-			auto& monitor = Monitor::getPrimaryMonitor();
-			auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
-			log_frame.trace("Set frame Position of {} to {}, {} as center of primary monitor", self->title, newpos.x, newpos.y);
-			self->position = newpos;
-			if (self->window)
-				self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
-		});
-		break;
-	}
+	self->context.executeAsync([this, pos] {
+		std::lock_guard lock(self->frameState_m);
+		auto& monitor = pos == FramePosition::center_current_monitor ? _getCurrentMonitor() : Monitor::getPrimaryMonitor();
+
+		auto newpos = monitor.position + monitor.currentVideoMode.size / 2 - self->size / 2;
+		log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", self->title, newpos.x, newpos.y);
+		self->position = newpos;
+		if (self->window)
+			self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
+	});
 }
 
 void Frame::setAspectRatio(libv::vec2i fraction) {
 	self->context.executeAsync([this, fraction] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame AspectRatio of {} to {}/{}", self->title, fraction.x, fraction.y);
 		self->aspectRatio = fraction;
 		if (self->window)
@@ -401,6 +419,7 @@ void Frame::setAspectRatio(libv::vec2i fraction) {
 
 void Frame::setAlwaysOnTop(bool alwaysOnTop) {
 	self->context.executeAsync([this, alwaysOnTop] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame AlwaysOnTop of {} to {}", self->title, alwaysOnTop);
 		self->alwaysOnTop = alwaysOnTop;
 		if (self->window)
@@ -410,6 +429,7 @@ void Frame::setAlwaysOnTop(bool alwaysOnTop) {
 
 void Frame::setInitialFocus(bool initialFocus) {
 	self->context.executeAsync([this, initialFocus] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame initialFocus of {} to {}", self->title, initialFocus);
 		self->initialFocus = initialFocus;
 	});
@@ -417,6 +437,7 @@ void Frame::setInitialFocus(bool initialFocus) {
 
 void Frame::setFocusOnShow(bool focusOnShow) {
 	self->context.executeAsync([this, focusOnShow] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame FocusOnShow of {} to {}", self->title, focusOnShow);
 		self->focusOnShow = focusOnShow;
 		if (self->window)
@@ -430,6 +451,7 @@ void Frame::setAspectRatio(int numer, int denom) {
 
 void Frame::setResizable(bool resizable) {
 	self->context.executeAsync([this, resizable] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame Resizable of {} to {}", self->title, resizable);
 		self->resizable = resizable;
 		if (self->window)
@@ -443,6 +465,7 @@ void Frame::setSize(int x, int y) {
 
 void Frame::setSize(libv::vec2i newsize) {
 	self->context.executeAsync([this, newsize] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame size of {} to {}", self->title, newsize);
 		self->size = newsize;
 		if (self->window)
@@ -452,6 +475,7 @@ void Frame::setSize(libv::vec2i newsize) {
 
 void Frame::setSizeLimit(libv::vec2i min, libv::vec2i max) {
 	self->context.executeAsync([this, min, max] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame size limit of {} to {}, {}", self->title, min, max);
 		self->sizeLimitMax = max;
 		self->sizeLimitMin = min;
@@ -494,6 +518,7 @@ void Frame::setSizeLimitMax(libv::vec2i max) {
 
 void Frame::setTitle(std::string title) {
 	self->context.executeAsync([this, title = std::move(title)] {
+		std::lock_guard lock(self->frameState_m);
 		log_frame.trace("Set frame Title of {} to {}", self->title, title);
 		self->title = std::move(title);
 		if (self->window)
@@ -505,6 +530,8 @@ void Frame::setTitle(std::string title) {
 
 void Frame::setIcon(std::vector<Icon> icons) {
 	self->context.executeAsync([this, icons = std::move(icons)] {
+		std::lock_guard lock(self->frameState_m);
+		log_frame.trace("Set frame Icons of {} with {} icon", self->title, icons.size());
 		self->icons = std::move(icons);
 		self->iconsGLFW.resize(self->icons.size());
 
@@ -522,6 +549,8 @@ void Frame::setIcon(std::vector<Icon> icons) {
 
 void Frame::clearIcon() {
 	self->context.executeAsync([this] {
+		std::lock_guard lock(self->frameState_m);
+		log_frame.trace("Set frame clear Icons of {}", self->title);
 		self->icons.clear();
 		self->iconsGLFW.clear();
 		if (self->window)
@@ -534,80 +563,99 @@ void Frame::clearIcon() {
 // Getters -----------------------------------------------------------------------------------------
 
 Frame::CloseOperation Frame::getCloseOperation() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->defaultCloseOperation;
 }
 
 Frame::DisplayMode Frame::getDisplayMode() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->displayMode;
 }
 
 libv::vec2i Frame::getPosition() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->position;
 }
 
 libv::vec2i Frame::getSize() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->size;
 }
 
 libv::vec4i Frame::getFrameSize() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->frameSize;
 }
 
 libv::vec2f Frame::getContentScale() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->contentScale;
 }
 
-const std::string& Frame::getTitle() const {
+std::string Frame::getTitle() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->title;
 }
 
 bool Frame::isDecorated() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->decorated;
 }
 
 bool Frame::isResizable() const {
+	std::lock_guard lock(self->frameState_m);
 	return self->resizable;
 }
 
 bool Frame::isVisible() const {
+	std::lock_guard lock(self->frameState_m);
 	return !self->hidden && !self->minimized && self->window;
 }
 
 const Monitor& Frame::getCurrentMonitor() const {
-	return Monitor::getMonitorAt(self->position + self->size / 2);
+	std::lock_guard lock(self->frameState_m);
+	return _getCurrentMonitor();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 libv::input::KeyState Frame::key(libv::input::Key key) {
+	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 bool Frame::isKeyPressed(libv::input::Key key) {
+	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key);
 }
 
 bool Frame::isKeyReleased(libv::input::Key key) {
+	std::lock_guard lock(self->frameState_m);
 	return not self->pressedKeys.contains(key);
 }
 
 libv::input::KeyState Frame::mouse(libv::input::Mouse key) {
+	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
 bool Frame::isMousePressed(libv::input::Mouse key) {
+	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key);
 }
 
 bool Frame::isMouseReleased(libv::input::Mouse key) {
+	std::lock_guard lock(self->frameState_m);
 	return not self->pressedMouseButtons.contains(key);
 }
 
 libv::vec2d Frame::getMousePosition() {
+	std::lock_guard lock(self->frameState_m);
 	return self->mousePosition;
 }
 
 libv::vec2d Frame::getScrollPosition() {
+	std::lock_guard lock(self->frameState_m);
 	return self->scrollPosition;
 }
 

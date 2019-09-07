@@ -35,6 +35,9 @@ struct SingleInstanceProxy {
 /// @example `SingleInstance<std::string> var; std::shared_ptr<std::string> instance = var.get();`
 template <typename T>
 class SingleInstance {
+	template <typename Guard>
+	friend class detail::SingleInstanceProxy;
+
 private:
 	std::mutex mutex;
 	std::unique_ptr<T> variable;

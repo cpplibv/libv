@@ -221,9 +221,9 @@ public: // ---------------------------------------------------------------------
 	void closeForce();
 	void join();
 
-protected:
-	bool isRefreshSkipable();
+private:
 	bool isFrameShouldClose();
+	const Monitor& _getCurrentMonitor() const;
 
 public:
 	void show();
@@ -291,7 +291,7 @@ public:
 	libv::vec2i getSize() const;
 	libv::vec4i getFrameSize() const; /// x - left, y - top, z - right, w - bottom
 	libv::vec2f getContentScale() const;
-	const std::string& getTitle() const;
+	std::string getTitle() const;
 	// ... Additional getters on demand
 
 	bool isDecorated() const;
