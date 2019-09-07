@@ -207,8 +207,6 @@ private: // --------------------------------------------------------------------
 	void cmdCoreRecreate();
 	void cmdCoreDestroy();
 
-	void cmdCoreUpdateDisplayMode();
-
 private: // --------------------------------------------------------------------------------------------
 	template <typename E>
 	friend class DispatchGLFWEvent;

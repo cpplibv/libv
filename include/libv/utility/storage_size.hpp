@@ -2,7 +2,7 @@
 
 #pragma once
 
-//std
+// std
 #include <cstdint>
 
 

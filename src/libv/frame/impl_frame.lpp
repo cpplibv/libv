@@ -14,6 +14,7 @@
 #include <mutex>
 #include <variant>
 // pro
+#include <libv/frame/core.lpp>
 #include <libv/frame/events.hpp>
 #include <libv/frame/icon.hpp>
 #include <libv/frame/log.hpp>
@@ -26,29 +27,17 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-class Core;
-
-struct CoreProxy {
-	std::shared_ptr<Core> core;
-	void exec(const std::function<void()>&);
-	void exec(std::function<void()>&&);
-	CoreProxy();
-	~CoreProxy();
-};
-
-// -------------------------------------------------------------------------------------------------
-
 class ImplFrame : public libv::Trackable {
 public:
 	std::atomic<bool> forcedClose{false};
 
 public:
-	libv::ExecutorThread context;
-
 	GLFWwindow* window = nullptr;
 	GLFWwindow* shareWindow = nullptr;
 
-	CoreProxy core;
+	libv::ExecutorThread context;
+
+	std::shared_ptr<Core> core = getCore();
 
 public:
 	uint32_t swapInterval = 1;

@@ -8,8 +8,9 @@
 // libv
 #include <libv/thread/executor_thread.hpp>
 // pro
-#include <libv/frame/log.hpp>
+#include <libv/frame/core.lpp>
 #include <libv/frame/impl_frame.lpp>
+#include <libv/frame/log.hpp>
 #include <libv/frame/monitor.hpp>
 
 
@@ -82,7 +83,7 @@ void Frame::contextDestroy() {
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdFrameCreate() {
-	self->core.exec(std::bind(&Frame::cmdCoreCreate, this));
+	self->core->execute(std::bind(&Frame::cmdCoreCreate, this));
 	if (self->window) {
 		glfwMakeContextCurrent(self->window);
 		self->context.executeAsync(std::bind(&Frame::loopInit, this));
@@ -94,7 +95,7 @@ void Frame::cmdFrameRecreate() {
 	assert(self->window);
 
 	glfwMakeContextCurrent(nullptr);
-	self->core.exec(std::bind(&Frame::cmdCoreRecreate, this));
+	self->core->execute(std::bind(&Frame::cmdCoreRecreate, this));
 	if (self->window) {
 		glfwMakeContextCurrent(self->window);
 		this->contextCreate();
@@ -104,7 +105,7 @@ void Frame::cmdFrameRecreate() {
 void Frame::cmdFrameDestroy() {
 	this->contextDestroy();
 	glfwMakeContextCurrent(nullptr);
-	self->core.exec(std::bind(&Frame::cmdCoreDestroy, this));
+	self->core->execute(std::bind(&Frame::cmdCoreDestroy, this));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ void Frame::show() {
 			cmdFrameCreate();
 		}
 		if (self->window) {
-			self->core.exec(std::bind(glfwShowWindow, self->window));
+			self->core->execute(std::bind(glfwShowWindow, self->window));
 			self->hidden = false;
 		}
 	});
@@ -184,7 +185,7 @@ void Frame::hide() {
 		log_frame.trace("Hide frame {}", self->title);
 		self->hidden = true;
 		if (self->window) {
-			self->core.exec(std::bind(glfwHideWindow, self->window));
+			self->core->execute(std::bind(glfwHideWindow, self->window));
 		}
 	});
 }
@@ -194,7 +195,7 @@ void Frame::maximize() {
 		log_frame.trace("Maximize frame {}", self->title);
 		self->maximized = true;
 		if (self->window) {
-			self->core.exec(std::bind(glfwMaximizeWindow, self->window));
+			self->core->execute(std::bind(glfwMaximizeWindow, self->window));
 		}
 	});
 }
@@ -204,7 +205,7 @@ void Frame::minimize() {
 		log_frame.trace("Minimize frame {}", self->title);
 		self->minimized = true;
 		if (self->window) {
-			self->core.exec(std::bind(glfwIconifyWindow, self->window));
+			self->core->execute(std::bind(glfwIconifyWindow, self->window));
 		}
 	});
 }
@@ -215,7 +216,7 @@ void Frame::restore() {
 		self->minimized = false;
 		self->maximized = false;
 		if (self->window) {
-			self->core.exec(std::bind(glfwRestoreWindow, self->window));
+			self->core->execute(std::bind(glfwRestoreWindow, self->window));
 		}
 	});
 }
@@ -225,7 +226,7 @@ void Frame::focus() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Focus frame {}", self->title);
 		if (self->window)
-			self->core.exec(std::bind(glfwFocusWindow, self->window));
+			self->core->execute(std::bind(glfwFocusWindow, self->window));
 	});
 }
 
@@ -233,7 +234,7 @@ void Frame::requestAttention() {
 	self->context.executeAsync([this] {
 		log_frame.trace("Request Attention frame {}", self->title);
 		if (self->window)
-			self->core.exec(std::bind(glfwRequestWindowAttention, self->window));
+			self->core->execute(std::bind(glfwRequestWindowAttention, self->window));
 	});
 }
 
@@ -288,7 +289,7 @@ void Frame::setCursorMode(Frame::CursorMode cursorMode) {
 		log_frame.trace("Set frame CursorMode of {} to {}", self->title, libv::to_value(cursorMode));
 		self->cursorMode = cursorMode;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetInputMode, self->window, GLFW_CURSOR, libv::to_value(cursorMode)));
+			self->core->execute(std::bind(glfwSetInputMode, self->window, GLFW_CURSOR, libv::to_value(cursorMode)));
 	});
 }
 
@@ -297,7 +298,7 @@ void Frame::setDecoration(bool decorated) {
 		log_frame.trace("Set frame Decoration of {} to {}", self->title, decorated);
 		self->decorated = decorated;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_DECORATED, decorated));
+			self->core->execute(std::bind(glfwSetWindowAttrib, self->window, GLFW_DECORATED, decorated));
 	});
 }
 
@@ -308,7 +309,7 @@ void Frame::setDisplayMode(Frame::DisplayMode displayMode) {
 		if (!self->window)
 			return;
 
-		self->core.exec([this] {
+		self->core->execute([this] {
 			const Monitor& monitor = getCurrentMonitor();
 
 			switch (self->displayMode) {
@@ -358,7 +359,7 @@ void Frame::setPosition(libv::vec2i newpos) {
 		log_frame.trace("Set frame Position of {} to {}, {}", self->title, newpos.x, newpos.y);
 		self->position = newpos;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
+			self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 	});
 }
 
@@ -371,7 +372,7 @@ void Frame::setPosition(FramePosition pos) {
 			log_frame.trace("Set frame Position of {} to {}, {} as center of current monitor", self->title, newpos.x, newpos.y);
 			self->position = newpos;
 			if (self->window)
-				self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
+				self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 		});
 		break;
 	case FramePosition::center_primary_monitor:
@@ -381,7 +382,7 @@ void Frame::setPosition(FramePosition pos) {
 			log_frame.trace("Set frame Position of {} to {}, {} as center of primary monitor", self->title, newpos.x, newpos.y);
 			self->position = newpos;
 			if (self->window)
-				self->core.exec(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
+				self->core->execute(std::bind(glfwSetWindowPos, self->window, self->position.x, self->position.y));
 		});
 		break;
 	}
@@ -392,7 +393,7 @@ void Frame::setAspectRatio(libv::vec2i fraction) {
 		log_frame.trace("Set frame AspectRatio of {} to {}/{}", self->title, fraction.x, fraction.y);
 		self->aspectRatio = fraction;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowAspectRatio, self->window,
+			self->core->execute(std::bind(glfwSetWindowAspectRatio, self->window,
 					self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
 					self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y));
 	});
@@ -403,7 +404,7 @@ void Frame::setAlwaysOnTop(bool alwaysOnTop) {
 		log_frame.trace("Set frame AlwaysOnTop of {} to {}", self->title, alwaysOnTop);
 		self->alwaysOnTop = alwaysOnTop;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_FLOATING, alwaysOnTop));
+			self->core->execute(std::bind(glfwSetWindowAttrib, self->window, GLFW_FLOATING, alwaysOnTop));
 	});
 }
 
@@ -419,7 +420,7 @@ void Frame::setFocusOnShow(bool focusOnShow) {
 		log_frame.trace("Set frame FocusOnShow of {} to {}", self->title, focusOnShow);
 		self->focusOnShow = focusOnShow;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_FOCUS_ON_SHOW, focusOnShow));
+			self->core->execute(std::bind(glfwSetWindowAttrib, self->window, GLFW_FOCUS_ON_SHOW, focusOnShow));
 	});
 }
 
@@ -432,7 +433,7 @@ void Frame::setResizable(bool resizable) {
 		log_frame.trace("Set frame Resizable of {} to {}", self->title, resizable);
 		self->resizable = resizable;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowAttrib, self->window, GLFW_RESIZABLE, resizable));
+			self->core->execute(std::bind(glfwSetWindowAttrib, self->window, GLFW_RESIZABLE, resizable));
 	});
 }
 
@@ -445,7 +446,7 @@ void Frame::setSize(libv::vec2i newsize) {
 		log_frame.trace("Set frame size of {} to {}", self->title, newsize);
 		self->size = newsize;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowSize, self->window, self->size.x, self->size.y));
+			self->core->execute(std::bind(glfwSetWindowSize, self->window, self->size.x, self->size.y));
 	});
 }
 
@@ -455,7 +456,7 @@ void Frame::setSizeLimit(libv::vec2i min, libv::vec2i max) {
 		self->sizeLimitMax = max;
 		self->sizeLimitMin = min;
 		if (self->window)
-			self->core.exec(std::bind(glfwSetWindowSizeLimits, self->window,
+			self->core->execute(std::bind(glfwSetWindowSizeLimits, self->window,
 					self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
 					self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
 					self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
@@ -496,7 +497,7 @@ void Frame::setTitle(std::string title) {
 		log_frame.trace("Set frame Title of {} to {}", self->title, title);
 		self->title = std::move(title);
 		if (self->window)
-			self->core.exec([this] {
+			self->core->execute([this] {
 				glfwSetWindowTitle(self->window, self->title.c_str());
 			});
 	});
@@ -513,7 +514,7 @@ void Frame::setIcon(std::vector<Icon> icons) {
 			self->iconsGLFW[i].pixels = self->icons[i].pixels[0].ptr();
 		}
 		if (self->window)
-			self->core.exec([this] {
+			self->core->execute([this] {
 				glfwSetWindowIcon(self->window, static_cast<int>(self->iconsGLFW.size()), self->iconsGLFW.data());
 			});
 	});
@@ -524,7 +525,7 @@ void Frame::clearIcon() {
 		self->icons.clear();
 		self->iconsGLFW.clear();
 		if (self->window)
-			self->core.exec([this] {
+			self->core->execute([this] {
 				glfwSetWindowIcon(self->window, 0, nullptr);
 			});
 	});
@@ -614,7 +615,7 @@ libv::vec2d Frame::getScrollPosition() {
 
 std::string Frame::getClipboardString() {
 	std::string result;
-	self->core.exec([&result] {
+	self->core->execute([&result] {
 		const char* text = glfwGetClipboardString(nullptr);
 		if (text != nullptr)
 			result = text;
@@ -623,7 +624,7 @@ std::string Frame::getClipboardString() {
 }
 
 void Frame::setClipboardString(const std::string& string) {
-	self->core.exec([&string] {
+	self->core->execute([&string] {
 		glfwSetClipboardString(nullptr, string.c_str());
 	});
 }

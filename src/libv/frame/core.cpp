@@ -1,19 +1,20 @@
 // File: core.cpp, Created on 2015. április 12. 2:28, Author: Vader
 
 // hpp
-#include <libv/frame/frame.hpp>
+#include <libv/frame/core.lpp>
 // ext
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/thread/executor_thread.hpp>
+#include <libv/thread/single_instance.hpp>
 #include <libv/utility/enum.hpp>
 // std
 #include <atomic>
 #include <memory>
 #include <mutex>
 // pro
-#include <libv/frame/log.hpp>
+#include <libv/frame/frame.hpp>
 #include <libv/frame/impl_frame.lpp>
+#include <libv/frame/log.hpp>
 #include <libv/frame/monitor.hpp>
 
 
@@ -22,110 +23,75 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-class Core {
-private:
-	libv::ExecutorThread thread;
-	std::atomic_bool stopWait{false};
-	std::mutex mutex;
+libv::thread::SingleInstance<Core> core;
 
-private:
-	void init() {
-		log_core.info("Initialize GLFW Context");
-		glfwSetErrorCallback([] (int code, const char* msg) {
-			log_glfw.error("{} - {}", code, msg);
-		});
-
-		if (!glfwInit())
-			return log_core.error("Failed to initialize GLFW");
-
-		glfwSetMonitorCallback(dispatchGLFWMonitorEvent);
-
-		int numMonitor; //Simulate GLFW Monitor connections to initialize Monitors
-		auto monitors = glfwGetMonitors(&numMonitor);
-		for (int i = 0; i < numMonitor; i++) {
-			dispatchGLFWMonitorEvent(monitors[i], GLFW_CONNECTED);
-		}
-	}
-
-	void waitEvent() {
-		glfwWaitEvents();
-		if (!stopWait)
-			thread.executeAsync(std::bind(&Core::waitEvent, this));
-	}
-
-	void interruptWait() {
-		glfwPostEmptyEvent();
-	}
-
-	void term() {
-		log_core.info("Terminate GLFW Context");
-		glfwSetMonitorCallback(nullptr);
-		glfwTerminate();
-		glfwSetErrorCallback(nullptr);
-	}
-
-public:
-	void execute(std::function<void()>&& func) {
-		std::lock_guard<std::mutex> lk(mutex);
-		stopWait = true;
-		interruptWait();
-		thread.executeSync(std::move(func));
-		stopWait = false;
-		thread.executeAsync(std::bind(&Core::waitEvent, this));
-	}
-
-	void execute(const std::function<void()>& func) {
-		std::lock_guard<std::mutex> lk(mutex);
-		stopWait = true;
-		interruptWait();
-		thread.executeSync(func);
-		stopWait = false;
-		thread.executeAsync(std::bind(&Core::waitEvent, this));
-	}
-
-	Core() {
-		std::lock_guard<std::mutex> lk(mutex);
-		thread.executeSync(std::bind(&Core::init, this));
-		thread.executeAsync(std::bind(&Core::waitEvent, this));
-	}
-
-	~Core() {
-		std::lock_guard<std::mutex> lk(mutex);
-		stopWait = true;
-		interruptWait();
-		thread.executeSync(std::bind(&Core::term, this));
-	}
-};
+std::shared_ptr<Core> getCore() {
+	return core.get();
+}
 
 // -------------------------------------------------------------------------------------------------
 
-std::mutex core_m;
-std::weak_ptr<Core> core_wp;
-
-void CoreProxy::exec(const std::function<void()>& func) {
-	core->execute(func);
+Core::Core() {
+	std::lock_guard<std::mutex> lk(mutex);
+	thread.executeSync(std::bind(&Core::init, this));
+	thread.executeAsync(std::bind(&Core::waitEvent, this));
 }
 
-void CoreProxy::exec(std::function<void()>&& func) {
-	core->execute(std::move(func));
+Core::~Core() {
+	std::lock_guard<std::mutex> lk(mutex);
+	stopWait = true;
+	interruptWait();
+	thread.executeSync(std::bind(&Core::term, this));
 }
 
-CoreProxy::CoreProxy() {
-	std::lock_guard<std::mutex> lock(core_m);
-	core = core_wp.lock();
-	if (!core)
-		core_wp = core = std::make_shared<Core>();
+void Core::init() {
+	log_core.info("Initialize GLFW Context");
+	glfwSetErrorCallback([] (int code, const char* msg) {
+		log_glfw.error("{} - {}", code, msg);
+	});
+
+	if (!glfwInit())
+		return log_core.error("Failed to initialize GLFW");
+
+	glfwSetMonitorCallback(dispatchGLFWMonitorEvent);
+
+	int numMonitor; //Simulate GLFW Monitor connections to initialize Monitors
+	auto monitors = glfwGetMonitors(&numMonitor);
+	for (int i = 0; i < numMonitor; i++) {
+		dispatchGLFWMonitorEvent(monitors[i], GLFW_CONNECTED);
+	}
 }
 
-CoreProxy::~CoreProxy() {
-	std::lock_guard<std::mutex> lock(core_m);
-	core.reset();
+void Core::waitEvent() {
+	glfwWaitEvents();
+	if (!stopWait)
+		thread.executeAsync(std::bind(&Core::waitEvent, this));
+}
+
+void Core::interruptWait() {
+	glfwPostEmptyEvent();
+}
+
+void Core::term() {
+	log_core.info("Terminate GLFW Context");
+	glfwSetMonitorCallback(nullptr);
+	glfwTerminate();
+	glfwSetErrorCallback(nullptr);
+}
+
+void Core::execute(libv::function_ref<void()> func) {
+	std::lock_guard<std::mutex> lk(mutex);
+	stopWait = true;
+	interruptWait();
+	thread.executeSync(func);
+	stopWait = false;
+	thread.executeAsync(std::bind(&Core::waitEvent, this));
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Frame::cmdCoreCreate() {
-	log_core.debug("Create window for frame {}", self->title);
+	log_core.trace("Create window for frame {}", self->title);
 
 	glfwDefaultWindowHints();
 
@@ -215,7 +181,7 @@ void Frame::cmdCoreCreate() {
 }
 
 void Frame::cmdCoreRecreate() {
-	log_core.debug("Recreate window for frame {}", self->title);
+	log_core.trace("Recreate window for frame {}", self->title);
 	assert(window && "Requires a valid window");
 
 	self->shareWindow = self->window;
@@ -241,18 +207,13 @@ void Frame::cmdCoreRecreate() {
 }
 
 void Frame::cmdCoreDestroy() {
-	log_core.debug("Destroy window for frame {}", self->title);
+	log_core.trace("Destroy window for frame {}", self->title);
 
 	if (self->window) {
 		unregisterEventCallbacks(self->window);
 		glfwDestroyWindow(self->window);
 		self->window = nullptr;
 	}
-}
-
-void Frame::cmdCoreUpdateDisplayMode() {
-	log_core.debug("Update display mode for frame {}", self->title);
-	log_core.error("Not Implemented Yet"); // TODO P5: cmdCoreUpdateDisplayMode
 }
 
 // -------------------------------------------------------------------------------------------------

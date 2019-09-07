@@ -181,6 +181,7 @@ libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change 
 libv.frame: implement setDisplayMode without cmdFrameRecreate
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it | invalid events caused the issue, now they are discarded with workaround
 libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
+libv.frame: cleanup core and core proxy
 
 --- STACK ------------------------------------------------------------------------------------------
 
@@ -191,7 +192,6 @@ libv.frame: add a mutex to monitors map
 libv.frame: add a mutex to frame (its needs one because of the getters could access data members)
 
 libv.frame: cleanup includes
-libv.frame: cleanup core and core proxy
 libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
 libv.frame: cleanup global variables, at least place them next to each other and reason able thread access
 
