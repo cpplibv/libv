@@ -20,13 +20,13 @@ namespace ui {
 class PanelFloat : public BasicPanel<LayoutFloat> {
 public:
 	PanelFloat() :
-		BasicPanel<LayoutFloat>(UnnamedTag{}, "float") { }
+		BasicPanel<LayoutFloat>(UnnamedTag, "float") { }
 
 	PanelFloat(std::string name) :
 		BasicPanel<LayoutFloat>(std::move(name)) { }
 
-	PanelFloat(UnnamedTag, const std::string_view type) :
-		BasicPanel<LayoutFloat>(UnnamedTag{}, type) { }
+	PanelFloat(UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutFloat>(UnnamedTag, type) { }
 
 	virtual ~PanelFloat() = default;
 };

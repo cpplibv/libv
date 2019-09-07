@@ -20,13 +20,13 @@ namespace ui {
 class PanelFull : public BasicPanel<LayoutFull> {
 public:
 	PanelFull() :
-		BasicPanel<LayoutFull>(UnnamedTag{}, "full") { }
+		BasicPanel<LayoutFull>(UnnamedTag, "full") { }
 
 	PanelFull(std::string name) :
 		BasicPanel<LayoutFull>(std::move(name)) { }
 
-	PanelFull(UnnamedTag, const std::string_view type) :
-		BasicPanel<LayoutFull>(UnnamedTag{}, type) { }
+	PanelFull(UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutFull>(UnnamedTag, type) { }
 
 	virtual ~PanelFull() = default;
 };

@@ -31,7 +31,8 @@ class ContextUI;
 
 // -------------------------------------------------------------------------------------------------
 
-struct UnnamedTag {};
+struct UnnamedTag_t {};
+static constexpr UnnamedTag_t UnnamedTag;
 
 struct BaseComponent {
 	friend class AccessLayout;
@@ -62,7 +63,7 @@ public:
 
 public:
 	BaseComponent(std::string name);
-	BaseComponent(UnnamedTag, const std::string_view type);
+	BaseComponent(UnnamedTag_t, const std::string_view type);
 	virtual ~BaseComponent();
 
 public:

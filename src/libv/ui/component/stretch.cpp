@@ -17,13 +17,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Stretch::Stretch() :
-	BaseComponent(UnnamedTag{}, "stretch") { }
+	BaseComponent(UnnamedTag, "stretch") { }
 
 Stretch::Stretch(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-Stretch::Stretch(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+Stretch::Stretch(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 Stretch::~Stretch() { }
 

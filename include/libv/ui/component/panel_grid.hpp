@@ -20,13 +20,13 @@ namespace ui {
 class PanelGrid : public BasicPanel<LayoutGrid> {
 public:
 	PanelGrid() :
-		BasicPanel<LayoutGrid>(UnnamedTag{}, "grid") { }
+		BasicPanel<LayoutGrid>(UnnamedTag, "grid") { }
 
 	PanelGrid(std::string name) :
 		BasicPanel<LayoutGrid>(std::move(name)) { }
 
-	PanelGrid(UnnamedTag, const std::string_view type) :
-		BasicPanel<LayoutGrid>(UnnamedTag{}, type) { }
+	PanelGrid(UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutGrid>(UnnamedTag, type) { }
 
 	virtual ~PanelGrid() = default;
 };

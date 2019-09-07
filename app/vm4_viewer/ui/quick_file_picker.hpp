@@ -46,7 +46,7 @@ private:
 public:
 	QuickFilePicker();
 	QuickFilePicker(std::string name);
-	QuickFilePicker(libv::ui::UnnamedTag, const std::string_view type);
+	QuickFilePicker(libv::ui::UnnamedTag_t, const std::string_view type);
 	~QuickFilePicker();
 
 	void update_filelist();

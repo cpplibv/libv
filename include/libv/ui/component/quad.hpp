@@ -37,7 +37,7 @@ public:
 public:
 	Quad();
 	Quad(std::string name);
-	Quad(UnnamedTag, const std::string_view type);
+	Quad(UnnamedTag_t, const std::string_view type);
 	~Quad();
 
 private:

@@ -66,7 +66,7 @@ public:
 public:
 	Button();
 	Button(std::string name);
-	Button(UnnamedTag, const std::string_view type);
+	Button(UnnamedTag_t, const std::string_view type);
 	~Button();
 
 public:

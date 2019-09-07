@@ -188,15 +188,9 @@ libv.frame: add a mutex to monitors map
 libv.frame: add a mutex to frame (its needs one because of the getters could access data members)
 libv.frame: Review threading and ownership models of the whole library | I just throw a bunch of mutex at the problem, I feel guilt
 libv.frame: cleanup includes
+libv.ui: use the following pattern for unnamed components: struct adopt_lock_t {}; static constexpr adopt_lock_t adopt_lock;
 
 --- STACK ------------------------------------------------------------------------------------------
-
-libv.sig: merge back the sig codebase
-libv.sig: clean up the sig codebase
-
---- [[[ deadline: 2019.09.08 ]]] ---
-
-libv.ui: use the following pattern for unnamed components: struct adopt_lock_t {}; static constexpr adopt_lock_t adopt_lock;
 
 mouse
 	libv.ui: EventMouse add mouse states to fetch beside events
@@ -379,6 +373,8 @@ wish: revisit catch object file linkage (only need to figure out a way to build 
 
 libv.ecui: state based ui, separate control and data!
 libv.ecui: ui resource local proxies
+
+libv.sig: merge back the sig codebase rework a lighter version of the lib
 
 libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
 libv.frame: cleanup monitor, provide a thread-safe access to monitors list

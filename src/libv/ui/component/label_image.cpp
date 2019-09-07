@@ -21,13 +21,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 LabelImage::LabelImage() :
-	BaseComponent(UnnamedTag{}, "label-image") { }
+	BaseComponent(UnnamedTag, "label-image") { }
 
 LabelImage::LabelImage(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-LabelImage::LabelImage(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+LabelImage::LabelImage(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 LabelImage::~LabelImage() { }
 

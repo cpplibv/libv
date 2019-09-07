@@ -23,13 +23,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Button::Button() :
-	BaseComponent(UnnamedTag{}, "button") { }
+	BaseComponent(UnnamedTag, "button") { }
 
 Button::Button(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-Button::Button(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+Button::Button(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 Button::~Button() { }
 

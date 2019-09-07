@@ -39,7 +39,7 @@ public:
 public:
 	Image();
 	Image(std::string name);
-	Image(UnnamedTag, const std::string_view type);
+	Image(UnnamedTag_t, const std::string_view type);
 	~Image();
 
 private:

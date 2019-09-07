@@ -19,13 +19,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Label::Label() :
-	BaseComponent(UnnamedTag{}, "label") { }
+	BaseComponent(UnnamedTag, "label") { }
 
 Label::Label(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-Label::Label(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+Label::Label(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 Label::~Label() { }
 

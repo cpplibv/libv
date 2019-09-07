@@ -20,7 +20,7 @@ namespace ui {
 BaseComponent::BaseComponent(std::string name) :
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(UnnamedTag, const std::string_view type) :
+BaseComponent::BaseComponent(UnnamedTag_t, const std::string_view type) :
 	name(libv::concat(type, '-', nextID++)) { }
 
 BaseComponent::~BaseComponent() {

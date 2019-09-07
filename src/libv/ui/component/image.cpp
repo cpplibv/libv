@@ -17,13 +17,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 Image::Image() :
-	BaseComponent(UnnamedTag{}, "image") { }
+	BaseComponent(UnnamedTag, "image") { }
 
 Image::Image(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-Image::Image(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+Image::Image(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 Image::~Image() { }
 

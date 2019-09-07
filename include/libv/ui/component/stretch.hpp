@@ -39,7 +39,7 @@ public:
 public:
 	Stretch();
 	Stretch(std::string name);
-	Stretch(UnnamedTag, const std::string_view type);
+	Stretch(UnnamedTag_t, const std::string_view type);
 	~Stretch();
 
 private:

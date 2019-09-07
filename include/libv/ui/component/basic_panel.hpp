@@ -29,7 +29,7 @@ private:
 public:
 	BasicPanel();
 	BasicPanel(std::string name);
-	BasicPanel(UnnamedTag, const std::string_view type);
+	BasicPanel(UnnamedTag_t, const std::string_view type);
 	virtual ~BasicPanel();
 
 public:
@@ -50,15 +50,15 @@ protected:
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel() :
-	BaseComponent(UnnamedTag{}, "basic-panel") { }
+	BaseComponent(UnnamedTag, "basic-panel") { }
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel(std::string name) :
 	BaseComponent(std::move(name)) { }
 
 template <typename Layout>
-BasicPanel<Layout>::BasicPanel(UnnamedTag, const std::string_view type) :
-	BaseComponent(UnnamedTag{}, type) { }
+BasicPanel<Layout>::BasicPanel(UnnamedTag_t, const std::string_view type) :
+	BaseComponent(UnnamedTag, type) { }
 
 template <typename Layout>
 BasicPanel<Layout>::~BasicPanel() {
