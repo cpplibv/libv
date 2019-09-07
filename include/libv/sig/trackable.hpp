@@ -3,49 +3,128 @@
 #pragma once
 
 #include <map>
+#include <cassert>
 
+#include "thread_policy.hpp"
 
 namespace libv {
 
-struct TrackableBase {
-	virtual void connect(TrackableBase* ptr, bool reflect) = 0;
-	virtual void disconnect(TrackableBase* ptr, bool reflect) = 0;
-	virtual ~TrackableBase() { }
+// -------------------------------------------------------------------------------------------------
+
+namespace detail {
+
+template <typename ThreadPolicy>
+struct ConnectionPoint {
+	bool alive = true;
+	ThreadPolicy threadPolicy;
 };
 
-class Trackable : public TrackableBase {
-private:
-	std::map<TrackableBase*, int> connections;
-	std::recursive_mutex mutex;
+struct TrackableConnectionBase {
+	virtual bool readLock() = 0;
+	virtual void readUnlock() = 0;
+	virtual bool writeLock() = 0;
+	virtual void writeUnlock() = 0;
+};
 
-private:
-	inline void connect(TrackableBase* ptr, bool reflect = false) override {
-		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
-		++connections[ptr];
-
-		if (reflect)
-			ptr->connect(this, false);
+struct TrackableConnectionNoTrackable final : TrackableConnectionBase {
+	virtual bool readLock() override {
+		return true;
 	}
-	inline void disconnect(TrackableBase* ptr, bool reflect = false) override {
-		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
-		if (!--connections[ptr])
-			connections.erase(ptr);
-
-		if (reflect)
-			ptr->disconnect(this, false);
+	virtual void readUnlock() override { }
+	virtual bool writeLock() override {
+		return true;
 	}
+	virtual void writeUnlock() override { }
+};
+
+template <typename TP>
+struct TrackableConnectionTrackable final : TrackableConnectionBase {
+	std::shared_ptr<ConnectionPoint<TP>> sp;
+	TrackableConnectionTrackable(std::shared_ptr<ConnectionPoint<TP>> sp) : sp(std::move(sp)) { }
+	virtual bool readLock() override {
+		sp->threadPolicy.readLock();
+		return sp->alive;
+	}
+	virtual void readUnlock() override {
+		sp->threadPolicy.readUnlock();
+	}
+	virtual bool writeLock() override {
+		sp->threadPolicy.writeLock();
+		return sp->alive;
+	}
+	virtual void writeUnlock() override {
+		sp->threadPolicy.writeUnlock();
+	}
+};
+
+struct TrackableConnectionWeak final : TrackableConnectionBase {
+	std::shared_ptr<void> tr_sp;
+	std::weak_ptr<void> tr_wp;
+	TrackableConnectionWeak(const std::weak_ptr<void>& tr_wp) :
+		tr_wp(tr_wp) { }
+
+	virtual bool readLock() override {
+		tr_sp = tr_wp.lock();
+		return !tr_wp.expired();
+	}
+	virtual void readUnlock() override {
+		tr_sp.reset();
+	}
+	virtual bool writeLock() override {
+		tr_sp = tr_wp.lock();
+		return !tr_wp.expired();
+	}
+	virtual void writeUnlock() override {
+		tr_sp.reset();
+	}
+};
+} //namespace detail
+
+// -------------------------------------------------------------------------------------------------
+
+struct TrackableAccessor;
+
+struct TrackableBase {
+};
+
+template <typename ThreadPolicy>
+class TrackableThread : TrackableBase {
+	friend class TrackableAccessor;
+	std::shared_ptr<detail::ConnectionPoint<ThreadPolicy>> trackingPoint;
 protected:
-	inline void disconnectAll() {
-		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
-		while (!connections.empty())
-			this->disconnect(connections.begin()->first, true);
-	}
-	virtual ~Trackable() {
-		disconnectAll();
+	void disconnect() {
+		auto lock = make_write_lock_guard(trackingPoint->threadPolicy);
+		trackingPoint->alive = false;
 	}
 public:
-	Trackable() { };
-	Trackable(const Trackable& other) = delete;
+	TrackableThread() {
+		trackingPoint = std::make_shared<detail::ConnectionPoint<ThreadPolicy>>();
+	}
+	virtual ~TrackableThread() {
+		assert((ThreadPolicy::ALLOW_DISCONNECT_ON_DTOR || !trackingPoint->alive) &&
+				"Object reached Trackable base class destructor with live tracking point but the "
+				"used ThreadPolicy forbids this. In the most derived Object's destructor (before "
+				"any signal reached callback method could be invalid) use Trackable's disconnect() "
+				"member function or if hidden use TrackableAccessor::disconnect(Trackable&) static "
+				"member function to ensure thread safety.");
+		if (ThreadPolicy::ALLOW_DISCONNECT_ON_DTOR)
+			disconnect();
+	}
 };
 
-} // namespace libv
+using Trackable = TrackableThread<SingleThread>;
+
+struct TrackableAccessor {
+	template <typename ThreadPolicy>
+	static inline std::shared_ptr<detail::ConnectionPoint<ThreadPolicy>> getTrackingPoint(TrackableThread<ThreadPolicy>& t) {
+		return t.trackingPoint;
+	}
+	template <typename ThreadPolicy>
+	static inline void disconnect(TrackableThread<ThreadPolicy>& t) {
+		return t.disconnect();
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} //namespace libv
