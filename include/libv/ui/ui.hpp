@@ -69,7 +69,7 @@ public:
 
 template <typename Frame>
 void UI::attach(Frame& frame) {
-	frame.onWindowSize.output([this](const auto& e) {
+	frame.onSize.output([this](const auto& e) {
 		log_ui.trace("{}", e.toPrettyString());
 		this->setSize(static_cast<float>(e.size.x), static_cast<float>(e.size.y));
 	});
@@ -97,7 +97,7 @@ void UI::attach(Frame& frame) {
 //			this->destroy();
 //		});
 
-	//	frame->onWindowSize.output([this](auto e) {
+	//	frame->onSize.output([this](auto e) {
 	//		this->setSize(e.size);
 	//		this->content.set(Property::Size, px(e.size.x), px(e.size.y), 0);
 	//	});

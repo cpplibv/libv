@@ -44,18 +44,18 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onChar.output(pretty_print_to_log);
 	frame.onContentScale.output(pretty_print_to_log);
 	frame.onDrop.output(pretty_print_to_log);
+	frame.onFocus.output(pretty_print_to_log);
 	frame.onFramebufferSize.output(pretty_print_to_log);
 	frame.onKey.output(pretty_print_to_log);
+	frame.onMaximize.output(pretty_print_to_log);
+	frame.onMinimize.output(pretty_print_to_log);
 	frame.onMouseButton.output(pretty_print_to_log);
 	frame.onMouseEnter.output(pretty_print_to_log);
 //	frame.onMousePosition.output(pretty_print_to_log);
 	frame.onMouseScroll.output(pretty_print_to_log);
-	frame.onWindowFocus.output(pretty_print_to_log);
-	frame.onWindowMaximize.output(pretty_print_to_log);
-	frame.onWindowMinimize.output(pretty_print_to_log);
-	frame.onWindowPosition.output(pretty_print_to_log);
-	frame.onWindowRefresh.output(pretty_print_to_log);
-	frame.onWindowSize.output(pretty_print_to_log);
+	frame.onPosition.output(pretty_print_to_log);
+	frame.onRefresh.output(pretty_print_to_log);
+	frame.onSize.output(pretty_print_to_log);
 
 	frame.onCloseRequest.output(pretty_print_to_log);
 

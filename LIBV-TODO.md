@@ -184,18 +184,16 @@ libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentS
 
 --- STACK ------------------------------------------------------------------------------------------
 
+libv.frame: Review threading and ownership models of the whole library
 libv.frame: add a mutex to event callbacks and event queue
 libv.frame: add a mutex to windowHandlers
 libv.frame: add a mutex to monitors map
 libv.frame: add a mutex to frame (its needs one because of the getters could access data members)
 
-libv.frame: add a single state for show/hidden/maximized/minimized
-
-libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
-libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
-libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-
-libv.frame: review and cleanup the whole library
+libv.frame: cleanup includes
+libv.frame: cleanup core and core proxy
+libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
+libv.frame: cleanup global variables, at least place them next to each other and reason able thread access
 
 libv.sig: merge back the sig codebase
 libv.sig: clean up the sig codebase
@@ -212,6 +210,9 @@ mouse
 event
 	libv.ui: focus / selection
 	libv.ui: keyboard input
+	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
+	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
 	libv.ui: input field
 	libv.ui: implement a button and other interactive components callback system aka: signal-slot
 	libv.ui: mouse event absorb/shield/plates
@@ -558,98 +559,16 @@ yeee i get it now: void to regular void by: "(void_expression, regular_void)" an
 
 // -------------------------------------------------------------------------------------------------
 
-Base class for lights and cameras...
+Base class for lights and cameras
 
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
-Optimalizált fordítás - cmake:
-https://github.com/sakra/cotire
-
-
-Priority levels for each operation
-IN - in-context operation (fast and not context sensitive)
- GL Task              | Priority | Note
-:-------------------- | --------:|:-----------------------------------------------------------------
- Initialization       |   0100   |
- D.UIShaderProgram    |   1100   | Unloading as ShaderProgram
- D.ShaderProgram      |   1150   | Unloading as ShaderProgram
- D.UIShader           |   1200   | Unloading as Shader
- D.Shader             |   1250   | Unloading as Shader
- D.Font               |   1300   | Unloading as Font
- D.UITexture          |   1400   | Unloading as Texture
- D.Model              |   1500   | Unloading as Model
- D.Texture            |   1600   | Unloading as Texture
- Render-Immediate     |   2000   | Starts by a timer when render time-window runs out
- Unload Texture       |   3100   |
- Unload Model         |   3200   |
- Unload Font          |   3300   |
- Unload ShaderProgram |   3400   |
- Unload Shader        |   3500   |
- Load UIShaderProgram |   4100   | Unloading as ShaderProgram
- Load ShaderProgram   |   4150   |
- Load UIShader        |   4200   | Unloading as Shader
- Load Shader          |   4250   |
- Load Font            |   4300   |
- Load UITexture       |   4400   |
- Load Model           |   4500   |
- Load Texture         |   4600   |
- Termination          |   9800   |
- Render-Residual      |   9900   | Always stays in queue as last operation
-
- IO Task              | Priority | Note
-:-------------------- | --------:|:-----------------------------------------------------------------
- D.UIShader File      |   1100   | Unloading as Shader File
- D.Shader File        |   1200   | Unloading as Shader File
- D.Font               |   1300   | Unloading as Font
- D.UITexture          |   1400   | Unloading as Texture
- D.Model              |   1500   | Unloading as Model
- D.Texture            |   1600   | Unloading as Texture
- Unload Texture       |     IN   |
- Unload Model         |     IN   |
- Unload Font          |     IN   |
- Unload Shader File   |     IN   |
- Load UIShader File   |   4100   | Unloading as Shader File
- Load Shader File     |   4150   |
- Load Font            |   4300   |
- Load UITexture       |   4400   |
- Load Model           |   4500   |
- Load Texture         |   4600   |
-
-Tracing every event for right state enums / defines / handlers:
-	Char
-	CharMods
-	CursorEnter
-	CursorPos
-	Drop
-	FramebufferSize
-	Key
-	MouseButton
-	Scroll
-	WindowClose
-	WindowFocus
-	WindowIconify
-	WindowPosition
-	WindowRefresh
-	WindowSize
-	Monitor
-
-// -------------------------------------------------------------------------------------------------
-
-TimerSignal
-Mivel ez egy kicsit másabb, kell hozzá egy timer thread, meg az egész timer architektúra így nem a signal.hpp-ben kellene definiálni, hanem a timer.hpp-ban.
-Valszeg ez egy egyszerü kompizitciója egy timer-nek és egy signalnak... Lehet, hogy nem is kell ehez külön signal tipus, csak a timernek kell tudni signalba adni... majd meglátjuk
+Optimized compiling - cmake https://github.com/sakra/cotire
 
 // -------------------------------------------------------------------------------------------------
 
 CMake resource folder
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
-Skeleton animation
-
-Render Target
-Shadow Pass
-Multi Pass
-
-VM4 Animated mesh
 
 http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
 OpenGL Reference page: https://www.khronos.org/registry/OpenGL-Refpages/gl4/

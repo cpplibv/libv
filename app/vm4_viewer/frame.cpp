@@ -93,7 +93,7 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 		if (e.action == libv::input::Action::release)
 			panel->key(e.key);
 	});
-	onWindowSize.output([&](const libv::frame::EventWindowSize& e) {
+	onSize.output([&](const libv::frame::EventSize& e) {
 		if (config.save_window_size) {
 			config.window_width = e.size.x;
 			config.window_height = e.size.y;

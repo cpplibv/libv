@@ -13,19 +13,19 @@
 #include <libv/frame/events.hpp>
 
 
-// TODO P2: future proxy for frame async operations: frame.show().wait(); easy implementation:
+// TODO P3: future proxy for frame async operations: frame.show().wait(); easy implementation:
 //			add member Frame::wait()
 //			member with async task return Frame&
 //			Wait throws in a dummy task and waits for it.
 //
-// TODO P3: Support glfw hint GLFW_DOUBLEBUFFER
-// TODO P3: Support glfw hint GLFW_JOYSTICK_HAT_BUTTONS
+// TODO P4: Support glfw hint GLFW_DOUBLEBUFFER
+// TODO P4: Support glfw hint GLFW_JOYSTICK_HAT_BUTTONS
 //
-// TODO P4: Support glfw hint GLFW_SCALE_TO_MONITOR
-// TODO P4: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
-// TODO P4: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
-// TODO P4: Support glfw hint GLFW_AUTO_ICONIFY (can be set via glfwSetWindowAttrib)
-// TODO P4: Support glfw hint GLFW_CENTER_CURSOR
+// TODO P5: Support glfw hint GLFW_SCALE_TO_MONITOR
+// TODO P5: Support glfw hint GLFW_CONTEXT_ROBUSTNESS
+// TODO P5: Support glfw hint GLFW_OPENGL_DEBUG_CONTEXT
+// TODO P5: Support glfw hint GLFW_AUTO_ICONIFY (can be set via glfwSetWindowAttrib)
+// TODO P5: Support glfw hint GLFW_CENTER_CURSOR
 //
 // TODO P5: Support glfw hint GLFW_TRANSPARENT_FRAMEBUFFER
 // TODO P5: Support glfw hint GLFW_SRGB_CAPABLE
@@ -34,7 +34,7 @@
 // TODO P5: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
 //
 // TODO P5: Context sharing
-// TODO P5: Understand EventWindowRefresh, i think i have to work with it to 'force' refresh
+// TODO P5: Understand EventRefresh, i think i have to work with it to 'force' refresh
 //			if context is frozen due to event queue 'lock' in glfw (moving window)
 
 class GLFWwindow;
@@ -147,18 +147,18 @@ public:
 	Event<EventChar> onChar;
 	Event<EventContentScale> onContentScale;
 	Event<EventDrop> onDrop;
+	Event<EventFocus> onFocus;
 	Event<EventFramebufferSize> onFramebufferSize;
 	Event<EventKey> onKey;
+	Event<EventMaximize> onMaximize;
+	Event<EventMinimize> onMinimize;
 	Event<EventMouseButton> onMouseButton;
 	Event<EventMouseEnter> onMouseEnter;
 	Event<EventMousePosition> onMousePosition;
 	Event<EventMouseScroll> onMouseScroll;
-	Event<EventWindowFocus> onWindowFocus;
-	Event<EventWindowMaximize> onWindowMaximize;
-	Event<EventWindowMinimize> onWindowMinimize;
-	Event<EventWindowPosition> onWindowPosition;
-	Event<EventWindowRefresh> onWindowRefresh;
-	Event<EventWindowSize> onWindowSize;
+	Event<EventPosition> onPosition;
+	Event<EventRefresh> onRefresh;
+	Event<EventSize> onSize;
 
 	/// Event invoked on frame closing by frame's thread. Usable for interrupting close.
 	/// This event occurs even if the default close operation does not close the frame.

@@ -100,32 +100,32 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetCharCallback              (window, DispatchGLFWEvent<EventChar           >::call);
 	glfwSetWindowContentScaleCallback(window, DispatchGLFWEvent<EventContentScale   >::call);
 	glfwSetDropCallback              (window, DispatchGLFWEvent<EventDrop           >::call);
+	glfwSetWindowFocusCallback       (window, DispatchGLFWEvent<EventFocus          >::call);
 	glfwSetFramebufferSizeCallback   (window, DispatchGLFWEvent<EventFramebufferSize>::sizeFB);
 	glfwSetKeyCallback               (window, DispatchGLFWEvent<EventKey            >::call);
+	glfwSetWindowMaximizeCallback    (window, DispatchGLFWEvent<EventMaximize       >::frame);
+	glfwSetWindowIconifyCallback     (window, DispatchGLFWEvent<EventMinimize       >::frame);
 	glfwSetMouseButtonCallback       (window, DispatchGLFWEvent<EventMouseButton    >::call);
 	glfwSetCursorEnterCallback       (window, DispatchGLFWEvent<EventMouseEnter     >::call);
 	glfwSetCursorPosCallback         (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
 	glfwSetScrollCallback            (window, DispatchGLFWEvent<EventMouseScroll    >::call);
-	glfwSetWindowFocusCallback       (window, DispatchGLFWEvent<EventWindowFocus    >::call);
-	glfwSetWindowMaximizeCallback    (window, DispatchGLFWEvent<EventWindowMaximize >::frame);
-	glfwSetWindowIconifyCallback     (window, DispatchGLFWEvent<EventWindowMinimize >::frame);
-	glfwSetWindowPosCallback         (window, DispatchGLFWEvent<EventWindowPosition >::pos);
-	glfwSetWindowRefreshCallback     (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
-	glfwSetWindowSizeCallback        (window, DispatchGLFWEvent<EventWindowSize     >::sizeWS);
+	glfwSetWindowPosCallback         (window, DispatchGLFWEvent<EventPosition       >::pos);
+	glfwSetWindowRefreshCallback     (window, DispatchGLFWEvent<EventRefresh        >::call);
+	glfwSetWindowSizeCallback        (window, DispatchGLFWEvent<EventSize           >::sizeWS);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 	glfwSetCharCallback              (window, nullptr);
 	glfwSetWindowContentScaleCallback(window, nullptr);
-	glfwSetCursorEnterCallback       (window, nullptr);
-	glfwSetCursorPosCallback         (window, nullptr);
 	glfwSetDropCallback              (window, nullptr);
+	glfwSetWindowFocusCallback       (window, nullptr);
 	glfwSetFramebufferSizeCallback   (window, nullptr);
 	glfwSetKeyCallback               (window, nullptr);
-	glfwSetMouseButtonCallback       (window, nullptr);
-	glfwSetScrollCallback            (window, nullptr);
-	glfwSetWindowFocusCallback       (window, nullptr);
 	glfwSetWindowMaximizeCallback    (window, nullptr);
+	glfwSetMouseButtonCallback       (window, nullptr);
+	glfwSetCursorEnterCallback       (window, nullptr);
+	glfwSetCursorPosCallback         (window, nullptr);
+	glfwSetScrollCallback            (window, nullptr);
 	glfwSetWindowIconifyCallback     (window, nullptr);
 	glfwSetWindowPosCallback         (window, nullptr);
 	glfwSetWindowRefreshCallback     (window, nullptr);
@@ -149,6 +149,9 @@ void Frame::distributeEvents() {
 			}, [this](const EventDrop& e) {
 				onDrop.fire(e);
 
+			}, [this](const EventFocus& e) {
+				onFocus.fire(e);
+
 			}, [this](const EventFramebufferSize& e) {
 				onFramebufferSize.fire(e);
 
@@ -162,6 +165,18 @@ void Frame::distributeEvents() {
 				}
 
 				onKey.fire(e);
+
+			}, [this](const EventMaximize& e) {
+				self->maximized = e.maximized;
+				self->minimized = false;
+
+				onMaximize.fire(e);
+
+			}, [this](const EventMinimize& e) {
+				self->maximized = false;
+				self->minimized = e.minimized;
+
+				onMinimize.fire(e);
 
 			}, [this](const EventMouseButton& e) {
 				if (e.action != libv::input::Action::release)
@@ -184,33 +199,18 @@ void Frame::distributeEvents() {
 
 				onMouseScroll.fire(e);
 
-			}, [this](const EventWindowFocus& e) {
-				onWindowFocus.fire(e);
-
-			}, [this](const EventWindowMaximize& e) {
-				self->maximized = e.maximized;
-				self->minimized = false;
-
-				onWindowMaximize.fire(e);
-
-			}, [this](const EventWindowMinimize& e) {
-				self->maximized = false;
-				self->minimized = e.minimized;
-
-				onWindowMinimize.fire(e);
-
-			}, [this](const EventWindowPosition& e) {
+			}, [this](const EventPosition& e) {
 				self->position = e.position;
 
-				onWindowPosition.fire(e);
+				onPosition.fire(e);
 
-			}, [this](const EventWindowRefresh& e) {
-				onWindowRefresh.fire(e);
+			}, [this](const EventRefresh& e) {
+				onRefresh.fire(e);
 
-			}, [this](const EventWindowSize& e) {
+			}, [this](const EventSize& e) {
 				self->size = e.size;
 
-				onWindowSize.fire(e);
+				onSize.fire(e);
 			}
 		);
 

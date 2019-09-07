@@ -9,9 +9,9 @@
 #include <fmt/format.h>
 // libv
 #include <libv/input/inputs.hpp>
-#include <libv/sig/signal.hpp>
 #include <libv/thread/executor_thread.hpp>
 // std
+#include <mutex>
 #include <variant>
 // pro
 #include <libv/frame/events.hpp>

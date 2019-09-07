@@ -35,6 +35,10 @@ std::string EventDrop::toPrettyString() const {
 			strings.size(), boost::algorithm::join(strings, "\"\n\""));
 }
 
+std::string EventFocus::toPrettyString() const {
+	return fmt::format("Focus: focused = {}", focused);
+}
+
 std::string EventFramebufferSize::toPrettyString() const {
 	return fmt::format("Framebuffer Size: size = ({}, {})", size.x, size.y);
 }
@@ -42,6 +46,14 @@ std::string EventFramebufferSize::toPrettyString() const {
 std::string EventKey::toPrettyString() const {
 	return fmt::format("Key: key = {} ({}), scancode = {}, action = {} ({}), mode = {}",
 			libv::input::to_string(key), libv::to_value(key), scancode, libv::input::to_string(action), libv::to_value(action), libv::to_value(mods));
+}
+
+std::string EventMaximize::toPrettyString() const {
+	return fmt::format("Window Maximize: maximized = {}", maximized);
+}
+
+std::string EventMinimize::toPrettyString() const {
+	return fmt::format("Window Minimize: minimized = {}", minimized);
 }
 
 std::string EventMonitor::toPrettyString() const {
@@ -65,27 +77,15 @@ std::string EventMouseScroll::toPrettyString() const {
 	return fmt::format("Mouse Scroll: offset = ({}, {})", offset.x, offset.y);
 }
 
-std::string EventWindowFocus::toPrettyString() const {
-	return fmt::format("Window Focus: focused = {}", focused);
-}
-
-std::string EventWindowMaximize::toPrettyString() const {
-	return fmt::format("Window Maximize: maximized = {}", maximized);
-}
-
-std::string EventWindowMinimize::toPrettyString() const {
-	return fmt::format("Window Minimize: minimized = {}", minimized);
-}
-
-std::string EventWindowPosition::toPrettyString() const {
+std::string EventPosition::toPrettyString() const {
 	return fmt::format("Window Position: position = ({}, {})", position.x, position.y);
 }
 
-std::string EventWindowRefresh::toPrettyString() const {
+std::string EventRefresh::toPrettyString() const {
 	return "Window Refresh";
 }
 
-std::string EventWindowSize::toPrettyString() const {
+std::string EventSize::toPrettyString() const {
 	return fmt::format("Window Size: size = ({}, {})", size.x, size.y);
 }
 

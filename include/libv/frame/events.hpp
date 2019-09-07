@@ -52,6 +52,15 @@ struct EventDrop {
 	std::string toPrettyString() const;
 };
 
+struct EventFocus {
+	bool focused;
+
+	inline EventFocus(int focused) :
+		focused(focused != 0) { }
+
+	std::string toPrettyString() const;
+};
+
 struct EventFramebufferSize {
 	libv::vec2i size;
 
@@ -74,6 +83,24 @@ struct EventKey {
 		scancode(scancode),
 		action{action},
 		mods{mods} { }
+
+	std::string toPrettyString() const;
+};
+
+struct EventMaximize {
+	bool maximized;
+
+	inline EventMaximize(int maximized) :
+		maximized(maximized != 0) { }
+
+	std::string toPrettyString() const;
+};
+
+struct EventMinimize {
+	bool minimized;
+
+	inline EventMinimize(int minimized) :
+		minimized(minimized != 0) { }
 
 	std::string toPrettyString() const;
 };
@@ -133,54 +160,27 @@ struct EventMouseScroll {
 	std::string toPrettyString() const;
 };
 
-struct EventWindowFocus {
-	bool focused;
-
-	inline EventWindowFocus(int focused) :
-		focused(focused != 0) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventWindowMaximize {
-	bool maximized;
-
-	inline EventWindowMaximize(int maximized) :
-		maximized(maximized != 0) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventWindowMinimize {
-	bool minimized;
-
-	inline EventWindowMinimize(int minimized) :
-		minimized(minimized != 0) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventWindowPosition {
+struct EventPosition {
 	libv::vec2i position;
 
-	inline EventWindowPosition(int x, int y) :
+	inline EventPosition(int x, int y) :
 		position(x, y) { }
-	inline EventWindowPosition(libv::vec2i position) :
+	inline EventPosition(libv::vec2i position) :
 		position(position) { }
 
 	std::string toPrettyString() const;
 };
 
-struct EventWindowRefresh {
+struct EventRefresh {
 	std::string toPrettyString() const;
 };
 
-struct EventWindowSize {
+struct EventSize {
 	libv::vec2i size;
 
-	inline EventWindowSize(int x, int y) :
+	inline EventSize(int x, int y) :
 		size(x, y) { }
-	inline EventWindowSize(libv::vec2i size) :
+	inline EventSize(libv::vec2i size) :
 		size(size) { }
 
 	std::string toPrettyString() const;
@@ -221,18 +221,18 @@ using Event = std::variant<
 		EventChar,
 		EventContentScale,
 		EventDrop,
+		EventFocus,
 		EventFramebufferSize,
 		EventKey,
+		EventMaximize,
+		EventMinimize,
 		EventMouseButton,
 		EventMouseEnter,
 		EventMousePosition,
 		EventMouseScroll,
-		EventWindowFocus,
-		EventWindowMaximize,
-		EventWindowMinimize,
-		EventWindowPosition,
-		EventWindowRefresh,
-		EventWindowSize
+		EventPosition,
+		EventRefresh,
+		EventSize
 >;
 
 // -------------------------------------------------------------------------------------------------
