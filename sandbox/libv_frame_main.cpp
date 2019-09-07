@@ -42,6 +42,7 @@ void noisyEvents(libv::Frame& frame) {
 	};
 
 	frame.onChar.output(pretty_print_to_log);
+	frame.onContentScale.output(pretty_print_to_log);
 	frame.onDrop.output(pretty_print_to_log);
 	frame.onFramebufferSize.output(pretty_print_to_log);
 	frame.onKey.output(pretty_print_to_log);

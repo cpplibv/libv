@@ -27,6 +27,17 @@ struct EventChar {
 	std::string toPrettyString() const;
 };
 
+struct EventContentScale {
+	libv::vec2f scale;
+
+	inline EventContentScale(float xpos, float ypos) :
+		scale(xpos, ypos) { }
+	inline EventContentScale(libv::vec2f scale) :
+		scale(scale) { }
+
+	std::string toPrettyString() const;
+};
+
 struct EventDrop {
 	std::vector<std::string> strings;
 
@@ -208,6 +219,7 @@ struct EventContextDestroy {
 
 using Event = std::variant<
 		EventChar,
+		EventContentScale,
 		EventDrop,
 		EventFramebufferSize,
 		EventKey,

@@ -58,6 +58,7 @@ public:
 	libv::vec2i sizeLimitMax = {-1, -1};
 	libv::vec2i aspectRatio = {-1, -1};
 	libv::vec4i frameSize = {}; /// x - left, y - top, z - right, w - bottom
+	libv::vec2f contentScale = {1, 1};
 
 public:
 	std::vector<GLFWimage> iconsGLFW;

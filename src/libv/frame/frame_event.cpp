@@ -97,37 +97,39 @@ struct DispatchGLFWEvent {
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	windowHandlers[window] = frame;
 
-	glfwSetCharCallback           (window, DispatchGLFWEvent<EventChar           >::call);
-	glfwSetDropCallback           (window, DispatchGLFWEvent<EventDrop           >::call);
-	glfwSetFramebufferSizeCallback(window, DispatchGLFWEvent<EventFramebufferSize>::sizeFB);
-	glfwSetKeyCallback            (window, DispatchGLFWEvent<EventKey            >::call);
-	glfwSetMouseButtonCallback    (window, DispatchGLFWEvent<EventMouseButton    >::call);
-	glfwSetCursorEnterCallback    (window, DispatchGLFWEvent<EventMouseEnter     >::call);
-	glfwSetCursorPosCallback      (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
-	glfwSetScrollCallback         (window, DispatchGLFWEvent<EventMouseScroll    >::call);
-	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    >::call);
-	glfwSetWindowMaximizeCallback (window, DispatchGLFWEvent<EventWindowMaximize >::frame);
-	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowMinimize >::frame);
-	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::pos);
-	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
-	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::sizeWS);
+	glfwSetCharCallback              (window, DispatchGLFWEvent<EventChar           >::call);
+	glfwSetWindowContentScaleCallback(window, DispatchGLFWEvent<EventContentScale   >::call);
+	glfwSetDropCallback              (window, DispatchGLFWEvent<EventDrop           >::call);
+	glfwSetFramebufferSizeCallback   (window, DispatchGLFWEvent<EventFramebufferSize>::sizeFB);
+	glfwSetKeyCallback               (window, DispatchGLFWEvent<EventKey            >::call);
+	glfwSetMouseButtonCallback       (window, DispatchGLFWEvent<EventMouseButton    >::call);
+	glfwSetCursorEnterCallback       (window, DispatchGLFWEvent<EventMouseEnter     >::call);
+	glfwSetCursorPosCallback         (window, DispatchGLFWEvent<EventMousePosition  >::mouse);
+	glfwSetScrollCallback            (window, DispatchGLFWEvent<EventMouseScroll    >::call);
+	glfwSetWindowFocusCallback       (window, DispatchGLFWEvent<EventWindowFocus    >::call);
+	glfwSetWindowMaximizeCallback    (window, DispatchGLFWEvent<EventWindowMaximize >::frame);
+	glfwSetWindowIconifyCallback     (window, DispatchGLFWEvent<EventWindowMinimize >::frame);
+	glfwSetWindowPosCallback         (window, DispatchGLFWEvent<EventWindowPosition >::pos);
+	glfwSetWindowRefreshCallback     (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
+	glfwSetWindowSizeCallback        (window, DispatchGLFWEvent<EventWindowSize     >::sizeWS);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
-	glfwSetCharCallback           (window, nullptr);
-	glfwSetCursorEnterCallback    (window, nullptr);
-	glfwSetCursorPosCallback      (window, nullptr);
-	glfwSetDropCallback           (window, nullptr);
-	glfwSetFramebufferSizeCallback(window, nullptr);
-	glfwSetKeyCallback            (window, nullptr);
-	glfwSetMouseButtonCallback    (window, nullptr);
-	glfwSetScrollCallback         (window, nullptr);
-	glfwSetWindowFocusCallback    (window, nullptr);
-	glfwSetWindowMaximizeCallback (window, nullptr);
-	glfwSetWindowIconifyCallback  (window, nullptr);
-	glfwSetWindowPosCallback      (window, nullptr);
-	glfwSetWindowRefreshCallback  (window, nullptr);
-	glfwSetWindowSizeCallback     (window, nullptr);
+	glfwSetCharCallback              (window, nullptr);
+	glfwSetWindowContentScaleCallback(window, nullptr);
+	glfwSetCursorEnterCallback       (window, nullptr);
+	glfwSetCursorPosCallback         (window, nullptr);
+	glfwSetDropCallback              (window, nullptr);
+	glfwSetFramebufferSizeCallback   (window, nullptr);
+	glfwSetKeyCallback               (window, nullptr);
+	glfwSetMouseButtonCallback       (window, nullptr);
+	glfwSetScrollCallback            (window, nullptr);
+	glfwSetWindowFocusCallback       (window, nullptr);
+	glfwSetWindowMaximizeCallback    (window, nullptr);
+	glfwSetWindowIconifyCallback     (window, nullptr);
+	glfwSetWindowPosCallback         (window, nullptr);
+	glfwSetWindowRefreshCallback     (window, nullptr);
+	glfwSetWindowSizeCallback        (window, nullptr);
 
 	windowHandlers.erase(window);
 }
@@ -139,6 +141,10 @@ void Frame::distributeEvents() {
 		const auto visitor = libv::overload(
 			[this](const EventChar& e) {
 				onChar.fire(e);
+
+			}, [this](const EventContentScale& e) {
+				self->contentScale = e.scale;
+				onContentScale.fire(e);
 
 			}, [this](const EventDrop& e) {
 				onDrop.fire(e);

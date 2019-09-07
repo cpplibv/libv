@@ -145,6 +145,7 @@ public:
 	using Event = Signal<const T&>;
 
 	Event<EventChar> onChar;
+	Event<EventContentScale> onContentScale;
 	Event<EventDrop> onDrop;
 	Event<EventFramebufferSize> onFramebufferSize;
 	Event<EventKey> onKey;
@@ -291,6 +292,7 @@ public:
 	libv::vec2i getPosition() const;
 	libv::vec2i getSize() const;
 	libv::vec4i getFrameSize() const; /// x - left, y - top, z - right, w - bottom
+	libv::vec2f getContentScale() const;
 	const std::string& getTitle() const;
 	// ... Additional getters on demand
 

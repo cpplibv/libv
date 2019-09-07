@@ -180,10 +180,9 @@ libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
 libv.frame: implement setDisplayMode without cmdFrameRecreate
 libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it | invalid events caused the issue, now they are discarded with workaround
+libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 
 --- STACK ------------------------------------------------------------------------------------------
-
-libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 
 libv.frame: add a mutex to event callbacks and event queue
 libv.frame: add a mutex to windowHandlers

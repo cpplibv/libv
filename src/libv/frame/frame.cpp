@@ -552,6 +552,10 @@ libv::vec4i Frame::getFrameSize() const {
 	return self->frameSize;
 }
 
+libv::vec2f Frame::getContentScale() const {
+	return self->contentScale;
+}
+
 const std::string& Frame::getTitle() const {
 	return self->title;
 }

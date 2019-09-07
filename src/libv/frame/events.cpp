@@ -26,6 +26,10 @@ std::string EventChar::toPrettyString() const {
 	return fmt::format("Char: unicode = {}, utf8 = {}", unicode, utf8);
 }
 
+std::string EventContentScale::toPrettyString() const {
+	return fmt::format("Content Scale: scale = ({}, {})", scale.x, scale.y);
+}
+
 std::string EventDrop::toPrettyString() const {
 	return fmt::format("Drop: size = {}, contents: \n\"{}\"",
 			strings.size(), boost::algorithm::join(strings, "\"\n\""));
