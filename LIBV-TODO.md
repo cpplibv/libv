@@ -176,25 +176,25 @@ libv.frame: icon support, glfwSetWindowIcon(window, 2, images);, Preferred in 3 
 libv.frame.glfw.monitor: Added glfwGetMonitorPos, glfwGetMonitorPhysicalSize and glfwGetMonitorName for retrieving monitor properties
 libv.frame.glfw.monitor: Added glfwGetMonitorWorkarea function for retrieving the monitor work area (#920,#989,#1322)
 libv.frame.glfw.monitor: Added glfwGetMonitorContentScale
-
---- STACK ------------------------------------------------------------------------------------------
-
 libv.frame.glfw.frame: Added glfwSetWindowMonitor for switching between windowed and full screen modes and updating the monitor and desired video mode of full screen windows
 libv.frame: DISPLAY_MODE_BORDERLESS is not perfect, fix it | DisplayMode change itself has some issues
 libv.frame: implement setDisplayMode without cmdFrameRecreate
-libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it
+libv.frame: bug: hide then restore breaks something (the redraw?), repeated show fixes it | invalid events caused the issue, now they are discarded with workaround
+
+--- STACK ------------------------------------------------------------------------------------------
 
 libv.frame.glfw.frame: Added glfwGetWindowContentScale and glfwSetWindowContentScaleCallback for DPI-aware rendering
 
 libv.frame: add a mutex to event callbacks and event queue
 libv.frame: add a mutex to windowHandlers
 libv.frame: add a mutex to monitors map
+libv.frame: add a mutex to frame (its needs one because of the getters could access data members)
 
-libv.frame.input: Question should I couple scancode with key for each key states
 libv.frame: add a single state for show/hidden/maximized/minimized
 
-libv.frame.glfw.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
-libv.frame.glfw.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
+libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
 
 libv.frame: review and cleanup the whole library
 

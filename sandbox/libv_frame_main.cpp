@@ -47,7 +47,7 @@ void noisyEvents(libv::Frame& frame) {
 	frame.onKey.output(pretty_print_to_log);
 	frame.onMouseButton.output(pretty_print_to_log);
 	frame.onMouseEnter.output(pretty_print_to_log);
-	frame.onMousePosition.output(pretty_print_to_log);
+//	frame.onMousePosition.output(pretty_print_to_log);
 	frame.onMouseScroll.output(pretty_print_to_log);
 	frame.onWindowFocus.output(pretty_print_to_log);
 	frame.onWindowMaximize.output(pretty_print_to_log);
@@ -79,10 +79,12 @@ public:
 		setCloseOperation(CloseOperation::dispose);
 		setOpenGLProfile(OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
-		show();
 
 		noisyEvents(*this);
-		onKey.output([this](const auto& e) {
+
+		show();
+
+		onKey.output([this](const libv::frame::EventKey& e) {
 			if (e.action != libv::input::Action::release)
 				return;
 
@@ -127,39 +129,41 @@ public:
 			if (e.key == Key::BracketClose)
 				log_sandbox.trace("getClipboardString: {}", getClipboardString());
 
-			// --- A row
-
-			if (e.key == Key::A)
-				setDisplayMode(libv::Frame::DisplayMode::windowed);
-			if (e.key == Key::S)
-				setDisplayMode(libv::Frame::DisplayMode::borderless);
-			if (e.key == Key::D)
-				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
-
-			if (e.key == Key::F)
-				log_sandbox.trace("getFrameSize: {}", getFrameSize());
-			if (e.key == Key::G)
-				log_sandbox.trace("getSize: {}", getSize());
-			if (e.key == Key::H)
-				log_sandbox.trace("getPosition: {}", getPosition());
-
-			if (e.key == Key::J)
-				setAlwaysOnTop(true);
-			if (e.key == Key::K)
-				setAlwaysOnTop(false);
-
-			if (e.key == Key::L)
-				setFocusOnShow(true);
-			if (e.key == Key::Semicolon)
-				setFocusOnShow(false);
-
-			if (e.key == Key::Apostrophe)
+			if (e.key == Key::Backslash)
 				for (const auto& [_, monitor] : libv::frame::Monitor::monitors) {
 					log_sandbox.trace("{} pos {}, work pos {}, work size {}, content scale {}, physical mm {}", monitor.name, monitor.position, monitor.workAreaPosition, monitor.workAreaSize, monitor.contentScale, monitor.physicalSizeMM);
 					log_sandbox.trace("     >> size {}, rate {}, bits {}", monitor.currentVideoMode.size, monitor.currentVideoMode.refreshRate, monitor.currentVideoMode.colorBits);
 					for (const auto& mode : monitor.videoModes)
 						log_sandbox.trace("        size {}, rate {}, bits {}", mode.size, mode.refreshRate, mode.colorBits);
 				}
+
+			// --- A row
+
+			if (e.key == Key::A)
+				setDisplayMode(libv::Frame::DisplayMode::windowed);
+			if (e.key == Key::S)
+				setDisplayMode(libv::Frame::DisplayMode::borderless_maximized);
+			if (e.key == Key::D)
+				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
+			if (e.key == Key::F)
+				setDisplayMode(libv::Frame::DisplayMode::fullscreen_windowed);
+
+			if (e.key == Key::G)
+				log_sandbox.trace("getFrameSize: {}", getFrameSize());
+			if (e.key == Key::H)
+				log_sandbox.trace("getSize: {}", getSize());
+			if (e.key == Key::J)
+				log_sandbox.trace("getPosition: {}", getPosition());
+
+			if (e.key == Key::K)
+				setAlwaysOnTop(true);
+			if (e.key == Key::L)
+				setAlwaysOnTop(false);
+
+			if (e.key == Key::Semicolon)
+				setFocusOnShow(true);
+			if (e.key == Key::Apostrophe)
+				setFocusOnShow(false);
 
 			// --- Z row
 
@@ -194,6 +198,10 @@ int main(int, char**) {
 
 //	libv::log.allow("libv.frame.event");
 //	libv::log.deny();
+
+	libv::frame::Monitor::onMonitor.output([](const auto& event) {
+		log_sandbox.trace("Event: {}", event.toPrettyString());
+	});
 
 	TestFrame f1("TestFrame");
 	f1.join();

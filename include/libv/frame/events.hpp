@@ -21,7 +21,7 @@ class Monitor;
 
 struct EventChar {
 	uint32_t unicode;
-	char utf8[5]; /// Null terminated utf8 representation of the unicode character
+	char utf8[5]; /// Null terminated utf8 representation of the unicode character (one to four octet + terminating zero)
 
 	EventChar(uint32_t unicode);
 	std::string toPrettyString() const;

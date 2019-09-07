@@ -27,7 +27,7 @@ VideoMode& VideoMode::operator=(const GLFWvidmode* vidmode) & {
 
 // -------------------------------------------------------------------------------------------------
 
-void glfwMonitorCallback(GLFWmonitor* monitor, int status) {
+void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status) {
 	Monitor* m;
 	try {
 		m = &Monitor::monitors.at(monitor);
@@ -74,6 +74,7 @@ Monitor& Monitor::getPrimaryMonitor() {
 }
 
 Monitor::Monitor(GLFWmonitor* monitor) {
+	handler = monitor;
 	currentVideoMode = glfwGetVideoMode(monitor);
 	name = glfwGetMonitorName(monitor);
 	glfwGetMonitorContentScale(monitor, &contentScale.x, &contentScale.y);

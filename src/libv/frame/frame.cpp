@@ -285,7 +285,7 @@ void Frame::setCloseOperation(Frame::CloseOperation operation) {
 
 void Frame::setCursorMode(Frame::CursorMode cursorMode) {
 	self->context.executeAsync([this, cursorMode] {
-		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(cursorMode));
+		log_frame.trace("Set frame CursorMode of {} to {}", self->title, libv::to_value(cursorMode));
 		self->cursorMode = cursorMode;
 		if (self->window)
 			self->core.exec(std::bind(glfwSetInputMode, self->window, GLFW_CURSOR, libv::to_value(cursorMode)));
@@ -305,8 +305,47 @@ void Frame::setDisplayMode(Frame::DisplayMode displayMode) {
 	self->context.executeAsync([this, displayMode] {
 		log_frame.trace("Set frame DisplayMode of {} to {}", self->title, libv::to_value(displayMode));
 		self->displayMode = displayMode;
-		if (self->window)
-			cmdFrameRecreate();
+		if (!self->window)
+			return;
+
+		self->core.exec([this] {
+			const Monitor& monitor = getCurrentMonitor();
+
+			switch (self->displayMode) {
+			case DisplayMode::windowed: {
+				glfwSetWindowMonitor(self->window, nullptr, self->position.x, self->position.y, self->size.x, self->size.y, GLFW_DONT_CARE);
+				glfwSetWindowAttrib(self->window, GLFW_DECORATED, self->decorated);
+
+				glfwSetWindowSizeLimits(self->window,
+						self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
+						self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
+						self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
+						self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y);
+
+				glfwSetWindowAspectRatio(self->window,
+						self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
+						self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
+
+				break;
+			} case DisplayMode::borderless_maximized: {
+				glfwSetWindowAttrib(self->window, GLFW_DECORATED, false);
+				int workAreaX, workAreaY, workAreaWidth, workAreaHeight;
+				glfwGetMonitorWorkarea(monitor.handler, &workAreaX, &workAreaY, &workAreaWidth, &workAreaHeight);
+				glfwSetWindowMonitor(self->window, nullptr, workAreaX, workAreaY, workAreaWidth, workAreaHeight, GLFW_DONT_CARE);
+
+				break;
+			} case DisplayMode::fullscreen: {
+				glfwSetWindowMonitor(self->window, monitor.handler, 0, 0, self->size.x, self->size.y, libv::to_value(self->openGLRefreshRate));
+
+				break;
+			} case DisplayMode::fullscreen_windowed: {
+				const GLFWvidmode* mode = glfwGetVideoMode(monitor.handler);
+				glfwSetWindowMonitor(self->window, monitor.handler, 0, 0, mode->width, mode->height, mode->refreshRate);
+
+				break;
+			}}
+		});
+
 	});
 }
 

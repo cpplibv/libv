@@ -18,14 +18,6 @@ std::string_view to_string(const Action value) {
 	}
 }
 
-std::string_view to_string(const KeyState value) {
-	switch (value) {
-	default: return "unknown";
-	case KeyState::pressed: return "pressed";
-	case KeyState::released: return "released";
-	}
-}
-
 std::string_view to_string(const Key value) {
 	switch (value) {
 	default: return "Invalid";
@@ -153,17 +145,34 @@ std::string_view to_string(const Key value) {
 	}
 }
 
-std::string_view to_string(const Mouse value) {
+std::string_view to_string(const KeyState value) {
+	switch (value) {
+	default: return "unknown";
+	case KeyState::pressed: return "pressed";
+	case KeyState::released: return "released";
+	}
+}
+
+std::string_view to_string(const MonitorEvent value) {
 	switch (value) {
 	default: return "Unknown";
-	case Mouse::Button0: return "Mouse0";
-	case Mouse::Button1: return "Mouse1";
-	case Mouse::Button2: return "Mouse2";
-	case Mouse::Button3: return "Mouse3";
-	case Mouse::Button4: return "Mouse4";
-	case Mouse::Button5: return "Mouse5";
-	case Mouse::Button6: return "Mouse6";
-	case Mouse::Button7: return "Mouse7";
+	case MonitorEvent::connected: return "connected";
+	case MonitorEvent::disconnected: return "disconnected";
+	}
+}
+
+std::string_view to_string(const Mouse value) {
+	switch (value) {
+	default: return "unknown";
+	case Mouse::Left: return "left";
+	case Mouse::Right: return "right";
+	case Mouse::Middle: return "middle";
+
+	case Mouse::Button3: return "mouse3";
+	case Mouse::Button4: return "mouse4";
+	case Mouse::Button5: return "mouse5";
+	case Mouse::Button6: return "mouse6";
+	case Mouse::Button7: return "mouse7";
 	}
 }
 

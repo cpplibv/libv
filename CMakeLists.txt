@@ -498,7 +498,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_input INTERFACE
+	TARGET libv_input STATIC
+	SOURCE src/libv/input/*.cpp
 )
 
 wish_create_library(

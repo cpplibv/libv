@@ -61,9 +61,26 @@ public: // ---------------------------------------------------------------------
 	};
 
 	enum class DisplayMode : int {
-		windowed = 0,
-		borderless = 1,
-		fullscreen = 2,
+		/// monitor == nullptr, decorated = true
+		/// - position change possible
+		/// - size change possible
+		/// - refresh rate and color bit depth change not possible
+		windowed,
+		/// monitor == nullptr, decorated = false, size and position = monitor work area
+		/// - position change not possible
+		/// - size change not possible
+		/// - refresh rate and color bit depth change not possible
+		borderless_maximized,
+		/// monitor != nullptr,
+		/// - position change not possible
+		/// - size change possible
+		/// - refresh rate and color bit depth change possible
+		fullscreen,
+		/// monitor != nullptr, video mode = current
+		/// - position change not possible
+		/// - size change not possible
+		/// - refresh rate and color bit depth change not possible
+		fullscreen_windowed,
 	};
 
 	enum class OpenGLProfile : int {

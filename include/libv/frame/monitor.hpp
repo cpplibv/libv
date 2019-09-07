@@ -32,7 +32,7 @@ struct VideoMode {
 
 // -------------------------------------------------------------------------------------------------
 
-void glfwMonitorCallback(GLFWmonitor*, int);
+void dispatchGLFWMonitorEvent(GLFWmonitor* monitor, int status);
 
 struct Monitor {
 	static std::map<GLFWmonitor*, Monitor> monitors;
@@ -53,6 +53,7 @@ public:
 	VideoMode currentVideoMode;
 	std::vector<VideoMode> videoModes;
 
+	GLFWmonitor* handler;
 public:
 	Monitor(GLFWmonitor* monitor);
 };

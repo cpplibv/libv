@@ -204,8 +204,9 @@ enum class Key : int32_t {
 };
 
 std::string_view to_string(const Action value);
-std::string_view to_string(const KeyState value);
 std::string_view to_string(const Key value);
+std::string_view to_string(const KeyState value);
+std::string_view to_string(const MonitorEvent value);
 std::string_view to_string(const Mouse value);
 
 // -------------------------------------------------------------------------------------------------

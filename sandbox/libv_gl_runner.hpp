@@ -72,15 +72,80 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	GLFWwindow* window;
+	// --- Windowed ------------------------------------------------------------------------------------
 
-	window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
 	if (!window) {
 		glfwTerminate();
 		log_sandbox.fatal("Failed to create GLFW window.");
 		return EXIT_FAILURE;
 	}
 	glfwSetWindowPos(window, 200, 200);
+
+	// --- Windowed-Fullscreen -------------------------------------------------------------------------
+
+//	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+//	const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+//
+//	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+//	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+//	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+//	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+//	glfwWindowHint(GLFW_AUTO_ICONIFY, false);
+//
+//	GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, title.c_str(), monitor, nullptr);
+
+	// --- Fullscreen ----------------------------------------------------------------------------------
+
+//	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+////	glfwWindowHint(GLFW_AUTO_ICONIFY, true);
+//	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), monitor, nullptr);
+//	if (!window) {
+//		glfwTerminate();
+//		log_sandbox.fatal("Failed to create GLFW window.");
+//		return EXIT_FAILURE;
+//	}
+
+	// --- Windowed-Borderless -------------------------------------------------------------------------
+
+//	glfwWindowHint(GLFW_DECORATED, false);
+//	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
+//	if (!window) {
+//		glfwTerminate();
+//		log_sandbox.fatal("Failed to create GLFW window.");
+//		return EXIT_FAILURE;
+//	}
+
+	// --- Windowed-Borderless2 ------------------------------------------------------------------------
+
+//	glfwWindowHint(GLFW_DECORATED, false);
+//	glfwWindowHint(GLFW_MAXIMIZED, true);
+//	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
+//	if (!window) {
+//		glfwTerminate();
+//		log_sandbox.fatal("Failed to create GLFW window.");
+//		return EXIT_FAILURE;
+//	}
+
+	// --- Windowed-Borderless3 ------------------------------------------------------------------------
+
+//	glfwWindowHint(GLFW_DECORATED, false);
+//	glfwWindowHint(GLFW_VISIBLE, false);
+//	int ignore;
+//	GLFWmonitor* monitor = glfwGetMonitors(&ignore)[0];
+////	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+//	int x, y, w, h;
+//	glfwGetMonitorWorkarea(monitor, &x, &y, &w, &h);
+//	GLFWwindow* window = glfwCreateWindow(w, h, title.c_str(), nullptr, nullptr);
+//	if (!window) {
+//		glfwTerminate();
+//		log_sandbox.fatal("Failed to create GLFW window.");
+//		return EXIT_FAILURE;
+//	}
+//	glfwSetWindowPos(window, x, y);
+//	glfwShowWindow(window);
+
+	// -------------------------------------------------------------------------------------------------
 
 	glfwMakeContextCurrent(window);
 	glfwSetKeyCallback(window, [](GLFWwindow*, int key, int, int, int) {

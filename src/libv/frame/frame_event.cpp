@@ -65,6 +65,33 @@ struct DispatchGLFWEvent {
 			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 		}
 	}
+
+	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window size and framebuffer size to zero, and does not restore it on focus gain.
+	//		As a zero area window makes no sense it safe to discard these events
+	static inline void sizeFB(GLFWwindow* window, int x, int y) {
+		if (x == 0 && y == 0)
+			return log_event.warn("Discarded zero size FrameBufferSize event");
+
+		call(window, x, y);
+	}
+
+	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window size and framebuffer size to zero, and does not restore it on focus gain.
+	//		As a zero area window makes no sense it safe to discard these events
+	static inline void sizeWS(GLFWwindow* window, int x, int y) {
+		if (x == 0 && y == 0)
+			return log_event.warn("Discarded zero size WindowSize event");
+
+		frame(window, x, y);
+	}
+
+	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window position to (-32000, -32000), and does not restore it on focus gain.
+	//		As such position values would make no sense it safe to discard these events
+	static inline void pos(GLFWwindow* window, int x, int y) {
+		if (x == -32000 && y == -32000)
+			return log_event.warn("Discarded invalid WindowPosition event");
+
+		frame(window, x, y);
+	}
 };
 
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
@@ -72,7 +99,7 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 
 	glfwSetCharCallback           (window, DispatchGLFWEvent<EventChar           >::call);
 	glfwSetDropCallback           (window, DispatchGLFWEvent<EventDrop           >::call);
-	glfwSetFramebufferSizeCallback(window, DispatchGLFWEvent<EventFramebufferSize>::call);
+	glfwSetFramebufferSizeCallback(window, DispatchGLFWEvent<EventFramebufferSize>::sizeFB);
 	glfwSetKeyCallback            (window, DispatchGLFWEvent<EventKey            >::call);
 	glfwSetMouseButtonCallback    (window, DispatchGLFWEvent<EventMouseButton    >::call);
 	glfwSetCursorEnterCallback    (window, DispatchGLFWEvent<EventMouseEnter     >::call);
@@ -81,9 +108,9 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetWindowFocusCallback    (window, DispatchGLFWEvent<EventWindowFocus    >::call);
 	glfwSetWindowMaximizeCallback (window, DispatchGLFWEvent<EventWindowMaximize >::frame);
 	glfwSetWindowIconifyCallback  (window, DispatchGLFWEvent<EventWindowMinimize >::frame);
-	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::frame);
+	glfwSetWindowPosCallback      (window, DispatchGLFWEvent<EventWindowPosition >::pos);
 	glfwSetWindowRefreshCallback  (window, DispatchGLFWEvent<EventWindowRefresh  >::call);
-	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::frame);
+	glfwSetWindowSizeCallback     (window, DispatchGLFWEvent<EventWindowSize     >::sizeWS);
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {

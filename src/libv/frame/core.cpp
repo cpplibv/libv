@@ -38,12 +38,12 @@ private:
 		if (!glfwInit())
 			return log_core.error("Failed to initialize GLFW");
 
-		glfwSetMonitorCallback(glfwMonitorCallback);
+		glfwSetMonitorCallback(dispatchGLFWMonitorEvent);
 
 		int numMonitor; //Simulate GLFW Monitor connections to initialize Monitors
 		auto monitors = glfwGetMonitors(&numMonitor);
 		for (int i = 0; i < numMonitor; i++) {
-			glfwMonitorCallback(monitors[i], GLFW_CONNECTED);
+			dispatchGLFWMonitorEvent(monitors[i], GLFW_CONNECTED);
 		}
 	}
 
@@ -130,8 +130,8 @@ void Frame::cmdCoreCreate() {
 	glfwDefaultWindowHints();
 
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, self->openGLForwardCompat && self->openGLVersionMajor >= 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, libv::to_value(self->openGLProfile));
 	glfwWindowHint(GLFW_REFRESH_RATE, libv::to_value(self->openGLRefreshRate));
@@ -146,54 +146,68 @@ void Frame::cmdCoreCreate() {
 	glfwWindowHint(GLFW_FLOATING, self->alwaysOnTop);
 	glfwWindowHint(GLFW_VISIBLE, false); // Always false, set after window creation
 
-	if (self->displayMode == DisplayMode::fullscreen) {
-		log_core.info("Switching frame {} to full screen mode", self->title);
-		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		self->eventQueue.emplace_back(EventFramebufferSize(mode->width, mode->height));
-		self->window = glfwCreateWindow(mode->width, mode->height, self->title.c_str(), glfwGetPrimaryMonitor(), self->shareWindow);
+	GLFWmonitor* monitor = getCurrentMonitor().handler;
 
-	} else if (self->displayMode == DisplayMode::borderless) {
-		log_core.info("Switching frame {} to borderless mode", self->title);
-		const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		self->eventQueue.emplace_back(EventFramebufferSize(mode->width, mode->height));
+	switch (self->displayMode) {
+	case DisplayMode::windowed: {
+		glfwWindowHint(GLFW_DECORATED, true);
+		self->window = glfwCreateWindow(self->size.x, self->size.y, self->title.c_str(), nullptr, self->shareWindow);
+
+		if (!self->window)
+			return log_core.error("GLFW window creation failed");
+
+		glfwSetWindowPos(self->window, self->position.x, self->position.y);
+
+		glfwSetWindowSizeLimits(self->window,
+				self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
+				self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
+				self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
+				self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y);
+
+		glfwSetWindowAspectRatio(self->window,
+				self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
+				self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
+
+		break;
+	} case DisplayMode::borderless_maximized: {
+		glfwWindowHint(GLFW_DECORATED, false);
+
+		int workAreaX, workAreaY, workAreaWidth, workAreaHeight;
+		glfwGetMonitorWorkarea(monitor, &workAreaX, &workAreaY, &workAreaWidth, &workAreaHeight);
+		self->window = glfwCreateWindow(workAreaWidth, workAreaHeight, self->title.c_str(), nullptr, self->shareWindow);
+
+		if (!self->window)
+			return log_core.error("GLFW window creation failed");
+
+		glfwSetWindowPos(self->window, workAreaX, workAreaY);
+
+		break;
+	} case DisplayMode::fullscreen: {
+		self->window = glfwCreateWindow(self->size.x, self->size.y, self->title.c_str(), monitor, self->shareWindow);
+		if (!self->window)
+			return log_core.error("GLFW window creation failed");
+
+		break;
+	} case DisplayMode::fullscreen_windowed: {
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
 		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
 		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
 		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-		self->window = glfwCreateWindow(mode->width, mode->height, self->title.c_str(), glfwGetPrimaryMonitor(), self->shareWindow);
 
-	} else if (self->displayMode == DisplayMode::windowed) {
-		self->window = glfwCreateWindow(self->size.x, self->size.y, self->title.c_str(), nullptr, self->shareWindow);
-	}
+		self->window = glfwCreateWindow(mode->width, mode->height, self->title.c_str(), monitor, self->shareWindow);
 
-	if (!self->window) {
-		log_core.error("GLFW window creation failed");
-		return;
-	}
+		if (!self->window)
+			return log_core.error("GLFW window creation failed");
 
-	glfwSetWindowSizeLimits(self->window,
-			self->sizeLimitMin.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.x,
-			self->sizeLimitMin.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMin.y,
-			self->sizeLimitMax.x < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.x,
-			self->sizeLimitMax.y < 0 ? GLFW_DONT_CARE : self->sizeLimitMax.y);
-
-	glfwSetWindowAspectRatio(self->window,
-			self->aspectRatio.x < 0 ? GLFW_DONT_CARE : self->aspectRatio.x,
-			self->aspectRatio.y < 0 ? GLFW_DONT_CARE : self->aspectRatio.y);
+		break;
+	}}
 
 	glfwSetInputMode(self->window, GLFW_LOCK_KEY_MODS, GLFW_TRUE);
 	glfwSetInputMode(self->window, GLFW_CURSOR, libv::to_value(self->cursorMode));
 
 	glfwSetWindowIcon(self->window, static_cast<int>(self->iconsGLFW.size()), self->iconsGLFW.data());
-
-	if (self->displayMode == DisplayMode::fullscreen) {
-
-	} else if (self->displayMode == DisplayMode::borderless) {
-		glfwSetWindowPos(self->window, 0, 0);
-	} else if (self->displayMode == DisplayMode::windowed) {
-		glfwSetWindowPos(self->window, self->position.x, self->position.y);
-	}
 
 	registerEventCallbacks(this, self->window);
 
