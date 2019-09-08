@@ -36,6 +36,12 @@ static constexpr MouseInterest_t globalMovement = libv::bit(10);
 //static constexpr MouseInterest_t ______       = libv::bit(14);
 //static constexpr MouseInterest_t ______       = libv::bit(15);
 
+static constexpr MouseInterest_t mask_button =
+		press | release;
+
+static constexpr MouseInterest_t mask_scroll =
+		scroll;
+
 static constexpr MouseInterest_t mask_mouse =
 		press | release | movement | enter | leave | scroll |
 		singleClick | doubleClick | globalMovement;

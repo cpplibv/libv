@@ -1,7 +1,7 @@
 // File: events.hpp, Created on 2019. 02. 04. 23:42, Author: Vader
 
 // hpp
-#include <libv/input/inputs.hpp>
+#include <libv/input/input.hpp>
 
 
 namespace libv {

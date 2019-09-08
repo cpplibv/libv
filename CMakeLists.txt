@@ -515,12 +515,13 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_input STATIC
 	SOURCE src/libv/input/*.cpp
+	LINK   libv_math ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
 	TARGET libv_frame STATIC
 	SOURCE src/libv/frame/*.cpp
-	LINK   libv_log libv_math libv_input ext_boost ext_glfw ext_utf8cpp ${OPENGL_LIBRARIES} Threads::Threads
+	LINK   libv_log libv_math libv_input ext_boost ext_glfw ${OPENGL_LIBRARIES} Threads::Threads
 )
 
 wish_create_library(
@@ -566,12 +567,6 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_ui STATIC
-	SOURCE src/libv/ui/*.cpp
-	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp
-)
-
-wish_create_library(
 	TARGET libv_parse STATIC
 	SOURCE src/libv/parse/*.cpp
 	LINK   libv_math ext_boost
@@ -596,6 +591,12 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_thread INTERFACE
 	LINK   Threads::Threads
+)
+
+wish_create_library(
+	TARGET libv_ui STATIC
+	SOURCE src/libv/ui/*.cpp
+	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp
 )
 
 wish_create_library(

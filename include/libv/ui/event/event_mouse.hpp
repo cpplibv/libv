@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/input/inputs.hpp>
+#include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/optional_ref.hpp>
 // std

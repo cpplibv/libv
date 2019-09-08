@@ -1,7 +1,8 @@
 // File: main.cpp, Created on 2013. augusztus 16. 11:59, Author: Vader
 
 // libv
-#include <libv/input/inputs.hpp>
+#include <libv/input/event.hpp>
+#include <libv/input/input.hpp>
 // std
 #include <cmath>
 #include <iostream>
@@ -85,7 +86,7 @@ public:
 
 		show();
 
-		onKey.output([this](const libv::frame::EventKey& e) {
+		onKey.output([this](const libv::input::EventKey& e) {
 			if (e.action != libv::input::Action::release)
 				return;
 

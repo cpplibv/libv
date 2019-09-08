@@ -4,12 +4,10 @@
 
 // libv
 #include <libv/glr/queue_fwd.hpp>
-#include <libv/input/inputs.hpp>
+#include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 // std
 #include <memory>
-// pro
-#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -55,10 +53,12 @@ public:
 	void setPosition(float x, float y, float z) noexcept;
 
 public:
-	void eventMouseEnter(bool entered);
-	void eventMouseButton(libv::input::Mouse button, libv::input::Action action);
-	void eventMousePosition(libv::vec2d position);
-	void eventMouseScroll(libv::vec2d offset);
+	void event(const libv::input::EventChar& event);
+	void event(const libv::input::EventKey& event);
+	void event(const libv::input::EventMouseButton& event);
+	void event(const libv::input::EventMouseEnter& event);
+	void event(const libv::input::EventMousePosition& event);
+	void event(const libv::input::EventMouseScroll& event);
 
 public:
 	ContextUI& context();
@@ -80,21 +80,27 @@ private:
 template <typename Frame>
 void UI::attach(Frame& frame) {
 	frame.onSize.output([this](const auto& e) {
-		log_ui.trace("{}", e.toPrettyString());
 		this->setSize(static_cast<float>(e.size.x), static_cast<float>(e.size.y));
 	});
 
+	frame.onChar.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onKey.output([this](const auto& e) {
+		this->event(e);
+	});
+
 	frame.onMouseEnter.output([this](const auto& e) {
-		this->eventMouseEnter(e.entered);
+		this->event(e);
 	});
 	frame.onMouseButton.output([this](const auto& e) {
-		this->eventMouseButton(e.button, e.action);
+		this->event(e);
 	});
 	frame.onMousePosition.output([this](const auto& e) {
-		this->eventMousePosition(e.position);
+		this->event(e);
 	});
 	frame.onMouseScroll.output([this](const auto& e) {
-		this->eventMouseScroll(e.offset);
+		this->event(e);
 	});
 
 //		frame.onContextCreate.output([this](const auto&) {

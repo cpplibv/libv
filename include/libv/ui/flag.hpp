@@ -38,12 +38,12 @@ static constexpr Flag_t pendingRenderSelf     = libv::bit(15);
 
 static constexpr Flag_t pendingDetachChild    = libv::bit(16);
 static constexpr Flag_t pendingDetachSelf     = libv::bit(17);
-//static constexpr Flag_t ______              = libv::bit(18);
+static constexpr Flag_t pendingCreate         = libv::bit(18);
 //static constexpr Flag_t ______              = libv::bit(19);
-static constexpr Flag_t pendingCreate         = libv::bit(20);
-//static constexpr Flag_t pendingDestroy      = libv::bit(21);
-//static constexpr Flag_t pendingRender       = libv::bit(22);
-static constexpr Flag_t parentsDependOnLayout = libv::bit(23); /// Component layout change will affect parent's layout
+//static constexpr Flag_t ______              = libv::bit(20);
+//static constexpr Flag_t ______              = libv::bit(21);
+//static constexpr Flag_t ______              = libv::bit(22);
+//static constexpr Flag_t parentsDependOnLayout = libv::bit(23); /// Component layout change will affect parent's layout
 
 static constexpr Flag_t updatedSize           = libv::bit(24); /// Component's size was changed since it last render
 static constexpr Flag_t updatedPosition       = libv::bit(25); /// Component's position was changed since it last render
@@ -86,9 +86,8 @@ static constexpr Flag_t mask_self =
 		pendingDetachSelf |
 
 		pendingCreate |
-//		pendingDestroy |
 
-		parentsDependOnLayout |
+//		parentsDependOnLayout |
 
 		updatedSize |
 		updatedPosition;
@@ -104,7 +103,6 @@ static constexpr Flag_t mask_init =
 		pendingRenderSelf |
 
 		pendingCreate |
-//		pendingRender |
 
 		updatedSize |
 		updatedPosition;

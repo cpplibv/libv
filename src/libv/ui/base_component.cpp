@@ -81,7 +81,7 @@ Flag_t BaseComponent::flagForParent() noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void BaseComponent::focus() noexcept {
-	// TODO P5: It would be better if focus would be async
+	// Note: focus has to be sync to allow correct event processing
 	if (!isAttached())
 		log_ui.error("Attempted to focus a non-attached component. Attempt ignored.");
 
@@ -116,6 +116,18 @@ bool BaseComponent::isFocusableComponent() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+void BaseComponent::eventChar(BaseComponent& component, const libv::input::EventChar& event) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
+		if (i->onChar(event))
+			return;
+}
+
+void BaseComponent::eventKey(BaseComponent& component, const libv::input::EventKey& event) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
+		if (i->onKey(event))
+			return;
+}
+
 void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current) {
 	{
 		EventFocus event{false, true, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
@@ -131,6 +143,16 @@ void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current)
 }
 
 // -------------------------------------------------------------------------------------------------
+
+bool BaseComponent::onChar(const libv::input::EventChar& event) {
+	(void) event;
+	return false;
+}
+
+bool BaseComponent::onKey(const libv::input::EventKey& event) {
+	(void) event;
+	return false;
+}
 
 void BaseComponent::onFocusChange(const EventFocus& event) {
 	(void) event;

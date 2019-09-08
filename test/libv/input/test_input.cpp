@@ -7,7 +7,7 @@
 // ext
 #include <GLFW/glfw3.h>
 // pro
-#include <libv/input/inputs.hpp>
+#include <libv/input/input.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

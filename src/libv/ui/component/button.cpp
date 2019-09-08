@@ -37,7 +37,7 @@ Button::~Button() { }
 
 void Button::setText(std::string string_) {
 	string.setString(std::move(string_));
-	flagAuto(Flag::pendingLayout);
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 const std::string& Button::getText() const {

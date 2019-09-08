@@ -1,13 +1,16 @@
 // File: label.cpp - Created on 2017.11.05. 07:52 - Author: Vader
 
 // hpp
-#include <libv/ui/component/label_image.hpp>
+#include <libv/ui/component/input_field.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+#include <libv/input/event.hpp>
+#include <libv/utility/overload.hpp>
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/shader/shader_font.hpp>
@@ -20,35 +23,74 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-LabelImage::LabelImage() :
-	BaseComponent(UnnamedTag, "label-image") { }
+InputField::InputField() :
+	BaseComponent(UnnamedTag, "input-field") { }
 
-LabelImage::LabelImage(std::string name) :
+InputField::InputField(std::string name) :
 	BaseComponent(std::move(name)) { }
 
-LabelImage::LabelImage(UnnamedTag_t, const std::string_view type) :
+InputField::InputField(UnnamedTag_t, const std::string_view type) :
 	BaseComponent(UnnamedTag, type) { }
 
-LabelImage::~LabelImage() { }
+InputField::~InputField() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void LabelImage::setText(std::string string_) {
+void InputField::setText(std::string string_) {
 	string.setString(std::move(string_));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
-const std::string& LabelImage::getText() const {
+const std::string& InputField::getText() const {
 	return string.getString();
+}
+
+void InputField::setCallback(std::function<void(const EventMouse&)> callback) {
+	mouseWatcher.callback = std::move(callback);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void LabelImage::doStyle() {
+bool InputField::onChar(const libv::input::EventChar& event) {
+	string.push_back(event.utf8.data());
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	return true;
+}
+
+bool InputField::onKey(const libv::input::EventKey& event) {
+	if (event.key == libv::input::Key::Backspace) {
+		string.pop_back();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+	return false;
+}
+
+void InputField::onFocusChange(const EventFocus& event) {
+	(void) event;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void InputField::doAttach() {
+	flagAuto(Flag::focusable);
+
+	context().mouse.subscribe(mouseWatcher, MouseInterest::mask_button | MouseInterest::mask_scroll);
+	mouseWatcher.callback = [this](const EventMouse& mouse) {
+		if (mouse.isButton() || mouse.isScroll())
+			focus();
+	};
+}
+
+void InputField::doDetach() {
+	context().mouse.unsubscribe(mouseWatcher);
+}
+
+void InputField::doStyle() {
 	set(properties);
 }
 
-void LabelImage::doRender(ContextRender& context) {
+void InputField::doRender(ContextRender& context) {
 	if (context.changedSize) {
 		mesh.clear();
 		auto pos = mesh.attribute(attribute_position);
@@ -95,7 +137,7 @@ void LabelImage::doRender(ContextRender& context) {
 	}
 }
 
-void LabelImage::doLayout1(const ContextLayout1& environment) {
+void InputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 	string.setFont(properties.font(), properties.font_size());
 	string.setAlign(properties.align());
@@ -105,7 +147,12 @@ void LabelImage::doLayout1(const ContextLayout1& environment) {
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
-void LabelImage::doLayout2(const ContextLayout2& environment) {
+void InputField::doLayout2(const ContextLayout2& environment) {
+	context().mouse.update(
+			mouseWatcher,
+			libv::vec::xy(environment.position),
+			libv::vec::xy(environment.size),
+			environment.mouseOrder);
 	string.setLimit(libv::vec::xy(environment.size));
 }
 

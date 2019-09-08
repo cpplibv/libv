@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/utility/function_ref.hpp>
@@ -122,9 +123,13 @@ private:
 	bool isFocusableComponent() const noexcept;
 
 private:
+	static void eventChar(BaseComponent& component, const libv::input::EventChar& event);
+	static void eventKey(BaseComponent& component, const libv::input::EventKey& event);
 	static void focusChange(BaseComponent& previous, BaseComponent& current);
 
 private:
+	virtual bool onChar(const libv::input::EventChar& event); /// returns true if event is absorbed
+	virtual bool onKey(const libv::input::EventKey& event); /// returns true if event is absorbed
 	virtual void onFocusChange(const EventFocus& event);
 
 private:
@@ -204,6 +209,13 @@ struct AccessRoot : AccessLayout, AccessParent {
 	}
 	[[nodiscard]] static inline const auto& size(const BaseComponent& component) noexcept {
 		return component.size_;
+	}
+
+	static inline decltype(auto) eventChar(BaseComponent& component, const libv::input::EventChar& event) {
+		return BaseComponent::eventChar(component, event);
+	}
+	static inline decltype(auto) eventKey(BaseComponent& component, const libv::input::EventKey& event) {
+		return BaseComponent::eventKey(component, event);
 	}
 
 	static inline decltype(auto) attach(BaseComponent& component, BaseComponent& parent) {

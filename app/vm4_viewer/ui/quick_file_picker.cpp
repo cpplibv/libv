@@ -16,6 +16,7 @@
 //#include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp> // testing only, remove it
 #include <libv/ui/component/stretch.hpp> // testing only, remove it
+#include <libv/ui/component/input_field.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 //#include <libv/ui/shader/shader_font.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
@@ -111,6 +112,19 @@ void QuickFilePicker::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 	}
 
+	{
+		auto style = context().style("vm4pv.info.input");
+		style->set("align", libv::ui::AlignHorizontal::Left);
+		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("font", context().font("consola.ttf"));
+		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
+		style->set("font_size", libv::ui::FontSize{12});
+		style->set("image", context().texture2D("separator_bar_256x16.png"));
+		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
+		style->set("size", libv::ui::parse_size_or_throw("1rD, d"));
+	}
+
 	// -------------------------------------------------------------------------------------------------
 
 	update_filelist();
@@ -163,6 +177,20 @@ void QuickFilePicker::update_filelist() {
 		}
 		auto& child = add(panel_border);
 		child.ptr->set(child.properties.size, libv::ui::parse_size_or_throw("1rD, D"));
+	}
+
+	{
+		const auto input = std::make_shared<libv::ui::InputField>("input0");
+		input->style(context().style("vm4pv.info.input"));
+		input->setText("Input 0");
+		add(input);
+	}
+
+	{
+		const auto input = std::make_shared<libv::ui::InputField>("input1");
+		input->style(context().style("vm4pv.info.input"));
+		input->setText("Input 1");
+		add(input);
 	}
 
 	{

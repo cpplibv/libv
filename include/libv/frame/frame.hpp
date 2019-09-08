@@ -3,7 +3,8 @@
 #pragma once
 
 // libv
-#include <libv/input/inputs.hpp>
+#include <libv/input/event.hpp>
+#include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/sig/signal.hpp>
 // std
@@ -144,18 +145,18 @@ public:
 	template <typename T>
 	using Event = Signal<const T&>;
 
-	Event<EventChar> onChar;
+	Event<libv::input::EventChar> onChar;
 	Event<EventContentScale> onContentScale;
-	Event<EventDrop> onDrop;
+	Event<libv::input::EventDrop> onDrop;
 	Event<EventFocus> onFocus;
 	Event<EventFramebufferSize> onFramebufferSize;
-	Event<EventKey> onKey;
+	Event<libv::input::EventKey> onKey;
 	Event<EventMaximize> onMaximize;
 	Event<EventMinimize> onMinimize;
-	Event<EventMouseButton> onMouseButton;
-	Event<EventMouseEnter> onMouseEnter;
-	Event<EventMousePosition> onMousePosition;
-	Event<EventMouseScroll> onMouseScroll;
+	Event<libv::input::EventMouseButton> onMouseButton;
+	Event<libv::input::EventMouseEnter> onMouseEnter;
+	Event<libv::input::EventMousePosition> onMousePosition;
+	Event<libv::input::EventMouseScroll> onMouseScroll;
 	Event<EventPosition> onPosition;
 	Event<EventRefresh> onRefresh;
 	Event<EventSize> onSize;

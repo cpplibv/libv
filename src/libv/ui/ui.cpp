@@ -4,6 +4,7 @@
 #include <libv/ui/ui.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+#include <libv/input/event.hpp>
 #include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
@@ -45,30 +46,20 @@ public:
 
 class ImplUI {
 public:
-	struct UIMouseEnter {
-		bool entered;
-	};
-
-	struct UIMouseButton {
-		libv::input::Mouse button;
-		libv::input::Action action;
-	};
-
-	struct UIMousePosition {
-		libv::vec2d position;
-	};
-
-	struct UIMouseScroll {
-		libv::vec2d offset;
-	};
-
-	using UIMouseEvent = std::variant<UIMouseEnter, UIMouseButton, UIMousePosition, UIMouseScroll>;
+	using UIEvent = std::variant<
+			libv::input::EventChar,
+			libv::input::EventKey,
+			libv::input::EventMouseButton,
+			libv::input::EventMouseEnter,
+			libv::input::EventMousePosition,
+			libv::input::EventMouseScroll
+	>;
 
 public:
 	ContextUI context;
 	Root root;
 	libv::Timer timer;
-	std::vector<UIMouseEvent> mouseEvents;
+	std::vector<UIEvent> event_queue;
 	std::mutex mutex;
 
 	libv::observer_ref<BaseComponent> focused = libv::make_observer_ref(root);
@@ -137,24 +128,34 @@ void UI::setPosition(float x, float y, float z) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void UI::eventMouseEnter(bool entered) {
+void UI::event(const libv::input::EventChar& event) {
 	std::unique_lock lock{self->mutex};
-	self->mouseEvents.emplace_back(ImplUI::UIMouseEnter{entered});
+	self->event_queue.emplace_back(event);
 }
 
-void UI::eventMouseButton(libv::input::Mouse button, libv::input::Action action) {
+void UI::event(const libv::input::EventKey& event) {
 	std::unique_lock lock{self->mutex};
-	self->mouseEvents.emplace_back(ImplUI::UIMouseButton{button, action});
+	self->event_queue.emplace_back(event);
 }
 
-void UI::eventMousePosition(libv::vec2d position) {
+void UI::event(const libv::input::EventMouseButton& event) {
 	std::unique_lock lock{self->mutex};
-	self->mouseEvents.emplace_back(ImplUI::UIMousePosition{position});
+	self->event_queue.emplace_back(event);
 }
 
-void UI::eventMouseScroll(libv::vec2d offset) {
+void UI::event(const libv::input::EventMouseEnter& event) {
 	std::unique_lock lock{self->mutex};
-	self->mouseEvents.emplace_back(ImplUI::UIMouseScroll{offset});
+	self->event_queue.emplace_back(event);
+}
+
+void UI::event(const libv::input::EventMousePosition& event) {
+	std::unique_lock lock{self->mutex};
+	self->event_queue.emplace_back(event);
+}
+
+void UI::event(const libv::input::EventMouseScroll& event) {
+	std::unique_lock lock{self->mutex};
+	self->event_queue.emplace_back(event);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -177,21 +178,27 @@ void UI::update(libv::glr::Queue& gl) {
 		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock
 
 		std::unique_lock lock{self->mutex};
-		for (const auto& mouseEvent : self->mouseEvents) {
+		for (const auto& mouseEvent : self->event_queue) {
 			const auto visitor = libv::overload(
-				[this](const ImplUI::UIMouseEnter& event) {
+				[this](const libv::input::EventChar& event) {
+					AccessRoot::eventChar(*self->focused, event);
+				},
+				[this](const libv::input::EventKey& event) {
+					AccessRoot::eventKey(*self->focused, event);
+				},
+				[this](const libv::input::EventMouseEnter& event) {
 					if (event.entered)
 						self->context.mouse.event_enter();
 					else
 						self->context.mouse.event_leave();
 				},
-				[this](const ImplUI::UIMouseButton& event) {
+				[this](const libv::input::EventMouseButton& event) {
 					self->context.mouse.event_button(event.button, event.action);
 				},
-				[this](const ImplUI::UIMousePosition& event) {
+				[this](const libv::input::EventMousePosition& event) {
 					self->context.mouse.event_position(libv::vec::cast<float>(event.position));
 				},
-				[this](const ImplUI::UIMouseScroll& event) {
+				[this](const libv::input::EventMouseScroll& event) {
 					self->context.mouse.event_scroll(libv::vec::cast<float>(event.offset));
 				}
 			);
@@ -199,13 +206,14 @@ void UI::update(libv::glr::Queue& gl) {
 			std::visit(visitor, mouseEvent);
 		}
 
-		self->mouseEvents.clear();
+		self->event_queue.clear();
 	} {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 	} {
 		// --- Focus ---
-//		self->focusTravers(Degrees<float>{315});
+//		self->focusTravers(Degrees<float>{135}); // backward
+//		self->focusTravers(Degrees<float>{315}); // forward
 	} {
 //		// --- Update ---
 //		AccessRoot::update(self->root);

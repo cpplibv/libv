@@ -22,7 +22,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Button : public BaseComponent {
+class InputField : public BaseComponent {
 private:
 	struct PS {
 		PropertyColor color;
@@ -55,19 +55,23 @@ public:
 	libv::ui::PropertySet<PS> properties;
 
 public:
-	Button();
-	Button(std::string name);
-	Button(UnnamedTag_t, const std::string_view type);
-	~Button();
+	InputField();
+	InputField(std::string name);
+	InputField(UnnamedTag_t, const std::string_view type);
+	~InputField();
 
 public:
 	void setText(std::string string_);
 	const std::string& getText() const;
 
+	const std::string& getValue() const;
+
 	// TODO P1: libv.ui Think about a signal-slot pattern very hard
 	void setCallback(std::function<void(const EventMouse&)> callback);
 
 private:
+	virtual bool onChar(const libv::input::EventChar& event) override;
+	virtual bool onKey(const libv::input::EventKey& event) override;
 	virtual void onFocusChange(const EventFocus& event) override;
 
 private:

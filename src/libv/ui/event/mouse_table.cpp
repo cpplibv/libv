@@ -62,7 +62,7 @@ namespace ui {
 //
 //	- 1 callback (for memory footprint reasons, branching on variant is cheaper (ECS can change this))
 //	- Even with a hotkey system in place, There is viable usecases for querying keyboard (and other input) states in the event callbacks
-//	- To access every input the following event order is important: update movement, broadcast and update button states one-by-one, broadcast movement. I think this will yield the most responsive experience
+//	- Events (including focus, key, char and mouse) has to be broadcaster serialized
 //
 //	- By default every component should be click through
 //	- To prevent click through an absorb/shield/plate is necessary (for ui window or solid ui elements)
@@ -71,9 +71,9 @@ namespace ui {
 //	- If two area/region is affected by an event both should be notified
 //	- When an event dispatched to multiple handler the order should be deterministic (and logical) | (ehhh, kind of in order, within order it pseudo random)
 //
-//	- Every MouseRegion shall move with its owner (component) | aka update in doLayout2 | is there a way to automate it? | I think there is!
+//	- Every MouseRegion shall move with its owner (component) | aka update in doLayout2 | is there a way to automate it? | I think there is! | at least partially with another component based type sub
 //	- Every enter event is guaranteed to be paired with a leave event (unless an unsubscription, interest change or disable happens)
-//	- Layout should be an atomic step what mouse concerns, this means update cannot produce ANY event
+//	- Layout should be an atomic step what mouse concerns, this means layout update cannot produce ANY event
 //	- When layout changes but it stays above the same object(s) a mouse movement event with (0,0) should be sent
 //
 //	- Mouse events should move around focus | (not entirely true, but mouse event and focus/selection modules will interact)

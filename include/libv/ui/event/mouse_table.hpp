@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/input/inputs.hpp>
+#include <libv/input/input.hpp>
 // std
 #include <memory>
 // pro

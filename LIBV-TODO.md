@@ -199,50 +199,47 @@ libv.ui.focus: Focusable Components should store a flag if its focused (this als
 libv.ui.focus: Focus-traversal operation triggers a Focus-change event on both end
 libv.ui.focus: Direct focus can be triggered by code
 libv.ui.focus: Mouse events can trigger direct focus | non-automated version
+libv.ui: key input
+libv.ui: char input
+libv.ui.component: input field
+libv.ui.keyboard: keyboard event are forwarded directly to the focused object and traversed up the focus stack until intercepted
+libv.ui: Implement / check on detach
+libv.ui: Implement / check on destroy
+libv.ui: remove layout2 pass member variables in component_base
+libv.ui: Question: does style change means property update? | this could be a rare enough event to brute force the whole ui style refresh, but only if its not event driven | style does not change, style change is only supported for debug/development
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: key input
-libv.ui: text input
-libv.ui.component: input field
 
-libv.ui.keyboard: keyboard event are forwarded directly to the focused object and traversed up the focus stack until intercepted
-libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
-libv.ui.text: keyboard event are forwarded directly to the focused object and traversed up the focus stack until intercepted
 
-libv.ui: selection is something different them focus
-libv.ui.hotkey: hotkey system are an extension to the keyboard system
-libv.ui.hotkey: ui.focus-forward = tab
-libv.ui.hotkey: ui.focus-backward = shift+tab
-libv.ui.hotkey: ui.focus-tab-forward = ctrl+tab
-libv.ui.hotkey: ui.focus-tab-backward = ctrl+shift+tab
-libv.ui.hotkey: ui.press-button = space
-libv.ui.focus: Key/Hotkey events can trigger focus-traversal
+libv.ui.event: add a component based mouse event (virtual function) option BESIDE the current watcher one
+libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass
 
 libv.ui: component remove / detach does not remove certain flags from parent, parent have to rescan child to determine flags
 libv.ui: pimpl ui context
 
 
 mouse
-	libv.ui: EventMouse add mouse states to fetch beside events
 	libv.ui: To access every input the following event order is important: update movement, broadcast and update button states one-by-one, broadcast movement. I think this will yield the most responsive experience
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
-
-event
-	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
-	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
-	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-	libv.ui: implement a button and other interactive components callback system aka: signal-slot
 	libv.ui: mouse event absorb/shield/plates
 	libv.ui: make sure absorb/shield/plates is easy to have/access for even non interactive components
-	libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass
-	libv.ui: if everything above is done re-read the requirements of mouse events and verify if all of them are met
-	libv.ui: EventMouse add keyboard states to fetch beside (mouse) events
+	libv.ui: mouse event should contain a watcher relative coordinates too
+
+event
+	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
+	libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
+	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
+	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
+
+interactive
 	libv.ui: Make a sandbox for a input->button->label->list
+	libv.ui: implement button (and other interactive component) callback system aka: signal-slot
 
 component
 	libv.ui: layout padding
 	libv.ui: atlas definition/parsing
+	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
 	libv.ui: support atlas based images
 
 	libv.ui: clipping vertex shader (with on/off)
@@ -250,7 +247,12 @@ component
 
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
-	libv.ui: not owning container view (list or table)
+	libv.ui: not owning container views (list and/or table)
+
+properties
+	libv.ui: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
+	libv.ui.style: complex composite component would result in "nested" property sets
+	libv.ui: property system interaction with static_component system
 
 style
 	libv.ui: style property (literally a property that is a style ptr, useful for interactive components and their changes)
@@ -259,24 +261,53 @@ style
 
 debug
 	libv.ui: direct access font texture
-	libv.ui: a way to debug / test / display every textures (font and other ui)
+	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
+	libv.ui: ui debug view, tree display, property viewer (including setter)
 
 cleanup
-	libv.ui: Implement / check on detach
-	libv.ui: Implement / check on destroy
-
-	libv.ui: change render position and change render size flags
-	libv.ui: layout pass member variables in component_base, they are a lot of memory
+	libv.ui: remove layout1 pass member variables in component_base
+	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: pimpl ContextUI or at least detach resource distributor
-
-properties
-	libv.ui: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
-	libv.ui: property system interaction with static_component system
+	libv.ui: cleanup context_ui redundant codes
+	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 
 ui
 	libv.ui: static_component system
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
+
+--- [[[ deadline: 2019.09.30 ]]] ---
+
+hotkey
+	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
+	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
+	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
+	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
+	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
+	libv.ui.hotkey: hotkey system are an extension to the keyboard system
+	libv.ui.hotkey: ui.focus-backward = shift+tab
+	libv.ui.hotkey: ui.focus-forward = tab
+	libv.ui.hotkey: ui.focus-tab-backward = ctrl+shift+tab
+	libv.ui.hotkey: ui.focus-tab-forward = ctrl+tab
+	libv.ui.hotkey: ui.new-line = enter
+	libv.ui.hotkey: ui.select = space
+	libv.ui.hotkey: ui.send = ctrl+enter
+	libv.ui.hotkey: ui.text.jump-end = end
+	libv.ui.hotkey: ui.text.jump-home = home
+	libv.ui.hotkey: ui.text.remove-backward = backspace
+	libv.ui.hotkey: ui.text.remove-forward = delete
+	libv.ui.hotkey: ui.text.remove-word-backward = ctrl+backspace
+	libv.ui.hotkey: ui.text.remove-word-forward = ctrl+delete
+	libv.ui.hotkey: ui.text.select = lmb [hold]
+	libv.ui.hotkey: ui.text.select-left = shift+left
+	libv.ui.hotkey: ui.text.select-right = shift+right
+	libv.ui.hotkey: ui.text.select-word = lmb, lmb
+	libv.ui.hotkey: ui.text.select-word-left = ctrl+shift+left
+	libv.ui.hotkey: ui.text.select-word-right = ctrl+shift+right
+	libv.ui.hotkey: ui.redo = ctrl+[y]
+	libv.ui.hotkey: ui.undo = ctrl+[z]
+	libv.ui.hotkey: ui.redo-non-destructive // emacs style redo, not the default
+	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
 
 focus
 	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
@@ -285,16 +316,15 @@ focus
 	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
 	libv.ui.focus: Focus traversal order: position based
 
---- [[[ deadline: 2019.09.31 ]]] ---
+libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
+
+libv.sig: merge back the sig codebase rework a lighter version of the lib
 
 libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
-libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
+libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 
-libv.ui: lua style parsing and lua file tracking with auto re-style
-
-libv.ui: Question: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner?
-libv.ui: Question: does style change means property update? | this could be a rare enough event to brute force the whole ui style refresh, but only if its not event driven
+libv.ui: Question: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ?
 
 libv.ui: include check everything / fwd everything
 
@@ -306,37 +336,33 @@ libv.ui.style: (style exclusive / multiple) multiple style usage in a component 
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
---- [[[ deadline: 2019.10.30 ]]] ---
+--- [[[ deadline: 2019.10.31 ]]] ---
 
 libv.math: create vec_fwd and mat_fwd headers
 
-libv.ui: lua binding
+libv.ui: lua binding | or rather a lua component or prototype parsing
 libv.ui: make sandbox_ui.lua work
-
-libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
-libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
-
-libv.ui.style: complex composite component would result in "nested" property sets
-libv.ui: doLayout1 should use the return channel
 
 wish: update cmake version and use add_compile_definitions() instead of add_definitions()
 wish: target_link_directories()
 wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file
-
-libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
-
-libv.ui: cleanup context_ui redundant codes
-libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
-
 wish: add support for OUTPUT_NAME and use it for the apps https://cmake.org/cmake/help/latest/prop_tgt/OUTPUT_NAME.html
+wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cmake_host_system_information.html#command:cmake_host_system_information
+wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
+wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
+wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
 
-libv.glr: texture_fwd.hpp
-libv.glr: RemoteTexture should have its own header file
+libv.ui: Label select / copy from a label (?) if specific property is set for it | its a property
 
-libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
-libv.glr: Mesh attributes should use a single VBO
+libv.ui: font failure to load means fallback | verify
+libv.ui: shader failure to load means fallback | verify
+libv.ui: shader dynamic loading from file
+
+libv.ui.font: render the not found character by 'hand' (simple square)
 
 libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible
+
+libv.ppc: new Pre-Processor Compiler library, a cpp "like" pre-processor implementation for shader loading
 
 libv.color: New libv.color library, color space conversion and manipulations, template color space, template representation
 libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
@@ -344,15 +370,25 @@ libv.ui: Color picker
 
 libv.ui: Docker layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
 
-libv.ui: Label select / copy from a label (?) if specific property is set for it | it sounds like a property
+libv.ui: group: RadioButton
+libv.ui: Splitter
+libv.ui: composite: TextField (Label, TableImage, Label, +Events)
+
+libv.utility: add/verify structured binding support for vec_t
+
+libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras
+
+--- [[[ deadline: 2019.11.30 ]]] ---
+
+libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
+
+libv.glr: texture_fwd.hpp
+libv.glr: RemoteTexture should have its own header file
+
+libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
+libv.glr: Mesh attributes should use a single VBO
+
 libv.ui: Label link support (?)
-
-libv.ui: font failure to load means fallback | verify
-libv.ui: shader failure to load means fallback | verify
-libv.ui: shader dynamic loading from file
-
-libv.ui.font: render the not found character by 'hand'
-
 libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
 
@@ -362,16 +398,8 @@ libv.ui.layout: 2D <-> 3D based on game state
 libv.ui: ui <-> 3D layout linkage: planet names and additional informations are part of the ui and not the scene
 		ui therefore has to access the game state (trivial, but this code has to happen now)
 
-libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras
-
 libv.ui: text | easy text
 libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
-
-libv.ui: group: RadioButton
-libv.ui: Splitter
-libv.ui: composite: TextField (Label, TableImage, Label, +Events)
-
-libv.utility: add/verify structured binding support for vec_t
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
@@ -386,12 +414,9 @@ libv.glr: post-processing haze
 
 libv.glr: shadow
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);
-libv.glr: Tiled Forward Shading (aka Forward+)
-			https://www.3dgep.com/forward-plus/
-libv.glr: Volume Tiled Forward Shading
-			https://www.3dgep.com/wp-content/uploads/2017/07/3910539_Jeremiah_van_Oosten_Volume_Tiled_Forward_Shading.pdf
-libv.glr: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading
-			https://www.3dgep.com/volume-tiled-forward-shading/
+libv.glr: Tiled Forward Shading (aka Forward+) https://www.3dgep.com/forward-plus/
+libv.glr: Volume Tiled Forward Shading https://www.3dgep.com/wp-content/uploads/2017/07/3910539_Jeremiah_van_Oosten_Volume_Tiled_Forward_Shading.pdf
+libv.glr: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading and https://www.3dgep.com/volume-tiled-forward-shading/
 libv.glr: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
 libv.glr: HDR https://learnopengl.com/Advanced-Lighting/HDR
 libv.glr: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
@@ -400,21 +425,15 @@ libv.glr: SRAA
 libv.glr: Tiled-Deferred-Shading
 libv.glr: Order Independent Transparency (OIT)
 
-libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
-
-wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cmake_host_system_information.html#command:cmake_host_system_information
-wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
-wish: correct cmake target private/interface/public dependency (link and include) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
-wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
+--- [[[ deadline: 2019.12.31 ]]] ---
 
 libv.ecui: state based ui, separate control and data!
-libv.ecui: ui resource local proxies
-
-libv.sig: merge back the sig codebase rework a lighter version of the lib
 
 libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
 libv.frame: cleanup monitor, provide a thread-safe access to monitors list
 libv.frame: cleanup global variables, at least place them next to each other and reason about thread access
+
+libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 
 
 

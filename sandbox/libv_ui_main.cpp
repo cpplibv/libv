@@ -5,7 +5,8 @@
 // libv
 #include <libv/frame/frame.hpp>
 #include <libv/glr/remote.hpp>
-#include <libv/input/inputs.hpp>
+#include <libv/input/event.hpp>
+#include <libv/input/input.hpp>
 #include <libv/log/log.hpp>
 #include <libv/parse/color.hpp>
 // std
@@ -206,12 +207,12 @@ public:
 //				break;
 //			}
 //		});
-		onChar.output([&](const libv::frame::EventChar& e) {
+		onChar.output([&](const libv::input::EventChar& e) {
 //			label0->string.push_back(e.utf8);
 //			label2->string.push_back(e.utf8);
 //			label0->flag(libv::ui::Flag::invalidLayout);
 //			label2->flag(libv::ui::Flag::invalidLayout);
-			log_sandbox.trace("Append string {}", e.utf8);
+			log_sandbox.trace("Append string {}", e.utf8.data());
 		});
 		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
 			create();

@@ -4,12 +4,13 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/input/input.hpp>
+#include <libv/input/event.hpp>
 // std
+#include <array>
 #include <string>
 #include <variant>
 #include <vector>
-// pro
-#include <libv/input/inputs.hpp>
 
 
 namespace libv {
@@ -19,14 +20,6 @@ namespace frame {
 
 class Monitor;
 
-struct EventChar {
-	uint32_t unicode;
-	char utf8[5]; /// Null terminated utf8 representation of the unicode character (one to four octet + terminating zero)
-
-	EventChar(uint32_t unicode);
-	std::string toPrettyString() const;
-};
-
 struct EventContentScale {
 	libv::vec2f scale;
 
@@ -34,20 +27,6 @@ struct EventContentScale {
 		scale(xpos, ypos) { }
 	inline EventContentScale(libv::vec2f scale) :
 		scale(scale) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventDrop {
-	std::vector<std::string> strings;
-
-	inline EventDrop(int count, const char** path) {
-		strings.reserve(count);
-		for (int i = 0; i < count; i++)
-			strings.emplace_back(path[i]);
-	}
-	inline EventDrop(std::vector<std::string> strings) :
-		strings(std::move(strings)) { }
 
 	std::string toPrettyString() const;
 };
@@ -68,21 +47,6 @@ struct EventFramebufferSize {
 		size(width, height) { }
 	inline EventFramebufferSize(libv::vec2i size) :
 		size(size) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventKey {
-	libv::input::Key key;
-	int scancode;
-	libv::input::Action action;
-	libv::input::KeyModifier mods;
-
-	inline EventKey(int key, int scancode, int action, int mods) :
-		key{key},
-		scancode(scancode),
-		action{action},
-		mods{mods} { }
 
 	std::string toPrettyString() const;
 };
@@ -112,50 +76,6 @@ struct EventMonitor {
 	inline EventMonitor(const Monitor& monitor, int event) :
 		monitor(monitor),
 		event{event} { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventMouseButton {
-	libv::input::Mouse button;
-	libv::input::Action action;
-	libv::input::KeyModifier mods;
-
-	inline EventMouseButton(int button, int action, int mods) :
-		button{button},
-		action{action},
-		mods{mods} { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventMouseEnter {
-	bool entered;
-
-	inline EventMouseEnter(int entered) :
-		entered(entered != 0) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventMousePosition {
-	libv::vec2d position;
-
-	inline EventMousePosition(double xpos, double ypos) :
-		position(xpos, ypos) { }
-	inline EventMousePosition(libv::vec2d position) :
-		position(position) { }
-
-	std::string toPrettyString() const;
-};
-
-struct EventMouseScroll {
-	libv::vec2d offset;
-
-	inline EventMouseScroll(double xoffset, double yoffset) :
-		offset(xoffset, yoffset) { }
-	inline EventMouseScroll(libv::vec2d offset) :
-		offset(offset) { }
 
 	std::string toPrettyString() const;
 };
@@ -218,18 +138,18 @@ struct EventContextDestroy {
 // -------------------------------------------------------------------------------------------------
 
 using Event = std::variant<
-		EventChar,
+		libv::input::EventChar,
 		EventContentScale,
-		EventDrop,
+		libv::input::EventDrop,
 		EventFocus,
 		EventFramebufferSize,
-		EventKey,
+		libv::input::EventKey,
 		EventMaximize,
 		EventMinimize,
-		EventMouseButton,
-		EventMouseEnter,
-		EventMousePosition,
-		EventMouseScroll,
+		libv::input::EventMouseButton,
+		libv::input::EventMouseEnter,
+		libv::input::EventMousePosition,
+		libv::input::EventMouseScroll,
 		EventPosition,
 		EventRefresh,
 		EventSize

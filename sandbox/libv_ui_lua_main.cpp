@@ -5,7 +5,8 @@
 // libv
 #include <libv/frame/frame.hpp>
 #include <libv/glr/remote.hpp>
-#include <libv/input/inputs.hpp>
+#include <libv/input/event.hpp>
+#include <libv/input/input.hpp>
 #include <libv/log/log.hpp>
 // std
 #include <iostream>
@@ -84,7 +85,7 @@ public:
 		lua_component = libv::ui::script_file(ui, lua, "res/script/sandbox_ui.lua");
 //		ui.add(lua_component);
 
-		onKey.output([&](const libv::frame::EventKey& e) {
+		onKey.output([&](const libv::input::EventKey& e) {
 			if (e.action == libv::input::Action::release)
 				return;
 
@@ -131,10 +132,10 @@ public:
 				break;
 			}
 		});
-		onChar.output([&](const libv::frame::EventChar& e) {
+		onChar.output([&](const libv::input::EventChar& e) {
 //			label0->string.push_back(e.utf8);
 //			label0->flag(libv::ui::Flag::invalidLayout);
-			log_sandbox.trace("Append string {}", e.utf8);
+			log_sandbox.trace("Append string {}", e.utf8.data());
 		});
 		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
 			create();

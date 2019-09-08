@@ -67,7 +67,7 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	panel = std::make_shared<app::PanelViewer>();
 	ui.add(panel);
 
-	onKey.output([&](const libv::frame::EventKey& e) {
+	onKey.output([&](const libv::input::EventKey& e) {
 		if (e.action == libv::input::Action::release)
 			return;
 
@@ -84,10 +84,10 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 		default: break;
 		}
 	});
-	onChar.output([&](const libv::frame::EventChar& e) {
+	onChar.output([&](const libv::input::EventChar& e) {
 		(void) e;
 	});
-	onKey.output([&](const libv::frame::EventKey& e) {
+	onKey.output([&](const libv::input::EventKey& e) {
 		(void) e;
 
 		if (e.action == libv::input::Action::release)
