@@ -439,21 +439,11 @@ wish_create_external(
 
 wish_create_external(
 	NAME reactphysics3d
-	GIT_REPOSITORY https://github.com/DanielChappuis/reactphysics3d.git
-	GIT_TAG v0.7.1
+	GIT_REPOSITORY https://github.com/VaderY/reactphysics3d.git
+	GIT_TAG master
 	CMAKE_ARGS
 		-DCMAKE_BUILD_TYPE="Release"
-
-	# INSTALL_COMMAND is a workaround for the incorrect install target where PUBLIC_HEADERs are used instead of install(DIRECTORY or FILE)
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/reactphysics3d/include
-		COMMAND mkdir -p ${PATH_EXT}/reactphysics3d/lib
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/reactphysics3d/src/get_reactphysics3d/src/ ${PATH_EXT}/reactphysics3d/include/reactphysics3d/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/reactphysics3d/src/get_reactphysics3d-build/lib/ ${PATH_EXT}/reactphysics3d/lib/
-
 	LINK reactphysics3d
-	# INCLUDE_DIR twice is a workaround for the incorrect include directives that would not account for the library root directory
-	INCLUDE_DIR include include/reactphysics3d
 )
 
 wish_create_external(
