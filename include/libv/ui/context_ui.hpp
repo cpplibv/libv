@@ -21,10 +21,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class BaseComponent;
 class Font2D;
 class Shader;
-class Texture2D;
 class Style;
+class Texture2D;
+class UI;
 
 // TODO P4: Find a header for type info ref, and a better name
 using TypeInfoRef = std::reference_wrapper<const std::type_info>;
@@ -57,6 +59,8 @@ class ContextUI {
 	// TODO P5: cleanup weak_ptr references with intrusive ptrs
 	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
 
+	UI& ui;
+
 	std::shared_ptr<Font2D> fallback_font;
 	std::shared_ptr<Texture2D> fallback_texture2D;
 	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
@@ -85,6 +89,7 @@ public:
 
 public:
 	ContextUI(
+			UI& ui,
 			const std::filesystem::path& path_base = "res",
 			const std::filesystem::path& path_fonts = "font",
 			const std::filesystem::path& path_shaders = "shader",
@@ -94,6 +99,11 @@ public:
 public:
 	bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
+
+public:
+	void focus(BaseComponent& component);
+	void detachFocused(BaseComponent& component);
+	void detachFocusLinked(BaseComponent& component);
 
 public:
 	std::shared_ptr<Font2D> font(const std::filesystem::path& path);

@@ -50,7 +50,15 @@ void Button::setCallback(std::function<void(const EventMouse&)> callback) {
 
 // -------------------------------------------------------------------------------------------------
 
+void Button::onFocusChange(const EventFocus& event) {
+	(void) event;
+	// TODO P3: listen to hotkey event (ui.press-button)
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void Button::doAttach() {
+	flagAuto(Flag::focusable);
 //	context().mouse.subscribe(mouseWatcher, MouseInterest::release);
 	context().mouse.subscribe(mouseWatcher, MouseInterest::mask_mouse);
 }

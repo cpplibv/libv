@@ -33,7 +33,7 @@ template <typename T = float>
 struct Degrees {
 	T value;
 
-	explicit Degrees(T value) : value(value) { }
+	constexpr explicit Degrees(T value) : value(value) { }
 
 	constexpr inline operator Radian<T>() const {
 		return Radian<T>{deg_to_rad(value)};
@@ -44,7 +44,7 @@ template <typename T = float>
 struct Radian {
 	T value;
 
-	explicit Radian(T value) : value(value) { }
+	constexpr explicit Radian(T value) : value(value) { }
 
 	constexpr inline operator Degrees<T>() const {
 		return Degrees<T>{rad_to_deg(value)};

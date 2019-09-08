@@ -11,6 +11,7 @@
 #include <string_view>
 // pro
 #include <libv/ui/base_component.hpp>
+#include <libv/ui/event/focus_watcher.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
@@ -21,14 +22,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-//struct Focus {
-//	enum class state_t : int8_t {
-//		idle,
-//		focused,
-//		selected,
-//	} state;
-//};
 
 class Button : public BaseComponent {
 private:
@@ -57,7 +50,7 @@ private:
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	String2D string;
-//	Focus focus;
+	FocusWatcher focusWatcher;
 	MouseWatcher mouseWatcher;
 
 public:
@@ -75,6 +68,9 @@ public:
 
 	// TODO P1: libv.ui Think about a signal-slot pattern very hard
 	void setCallback(std::function<void(const EventMouse&)> callback);
+
+private:
+	virtual void onFocusChange(const EventFocus& event) override;
 
 private:
 	virtual void doAttach() override;

@@ -15,6 +15,7 @@
 #include <libv/ui/raw/texture2D_white256.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
+#include <libv/ui/ui.hpp>
 
 
 namespace libv {
@@ -66,10 +67,12 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 // -------------------------------------------------------------------------------------------------
 
 ContextUI::ContextUI(
+		UI& ui,
 		const std::filesystem::path& path_base,
 		const std::filesystem::path& path_fonts,
 		const std::filesystem::path& path_shaders,
-		const std::filesystem::path& path_textures) {
+		const std::filesystem::path& path_textures) :
+	ui(ui) {
 
 	std::error_code ec;
 	auto res = std::filesystem::canonical(path_base, ec);
@@ -115,6 +118,20 @@ bool ContextUI::isAnyStyleDirty() const noexcept {
 void ContextUI::clearEveryStyleDirty() noexcept {
 	for (const auto& [_, style_] : styles)
 		style_->clearDirty();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ContextUI::focus(BaseComponent& component) {
+	ui.focus(component);
+}
+
+void ContextUI::detachFocused(BaseComponent& component) {
+	ui.detachFocused(component);
+}
+
+void ContextUI::detachFocusLinked(BaseComponent& component) {
+	ui.detachFocusLinked(component);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -4,6 +4,8 @@
 #include <libv/ui/ui.hpp>
 // libv
 #include <libv/glr/queue.hpp>
+#include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
 #include <libv/utility/timer.hpp>
 // std
@@ -12,6 +14,7 @@
 #include <vector>
 // pro
 #include <libv/ui/component/panel_full.hpp>
+#include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_ui.hpp>
@@ -67,12 +70,46 @@ public:
 	libv::Timer timer;
 	std::vector<UIMouseEvent> mouseEvents;
 	std::mutex mutex;
+
+	libv::observer_ref<BaseComponent> focused = libv::make_observer_ref(root);
+
+public:
+	ImplUI(UI& ui) :
+		context(ui) { }
+
+public:
+	void focus(BaseComponent& component) {
+		if (libv::make_observer_ref(component) == focused)
+			return;
+
+		AccessRoot::focusChange(*focused, component);
+		focused = libv::make_observer_ref(component);
+
+		log_ui.debug("Focused: {}", focused->path());
+	}
+
+	void focusTravers(Degrees<float> direction) {
+		ContextFocusTravers context{libv::make_observer_ref(*focused), direction};
+
+		auto newFocus = AccessRoot::focusTravers(*focused, context, *focused);
+
+		if (newFocus == nullptr) // Loop around
+			newFocus = AccessRoot::focusTravers(root, context, root);
+
+		if (newFocus == nullptr) // Not found anything, back to root
+			newFocus = libv::make_observer(root);
+
+		AccessRoot::focusChange(*focused, *newFocus);
+		focused = libv::make_observer_ref(*newFocus);
+
+		log_ui.debug("Focused: {}", focused->path());
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
 UI::UI() {
-	self = std::make_unique<ImplUI>();
+	self = std::make_unique<ImplUI>(*this);
 }
 
 UI::~UI() {
@@ -167,6 +204,9 @@ void UI::update(libv::glr::Queue& gl) {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 	} {
+		// --- Focus ---
+//		self->focusTravers(Degrees<float>{315});
+	} {
 //		// --- Update ---
 //		AccessRoot::update(self->root);
 //	} {
@@ -231,6 +271,24 @@ void UI::destroy(libv::glr::Queue& gl) {
 		// --- Detach ---
 		AccessRoot::detach(self->root, self->root);
 	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void UI::focus(BaseComponent& component) {
+	self->focus(component);
+}
+
+void UI::detachFocused(BaseComponent& component) {
+	(void) component;
+
+	assert(&component == self->focused);
+	self->focusTravers(Degrees<float>{315});
+}
+
+void UI::detachFocusLinked(BaseComponent& component) {
+	(void) component;
+	// TODO P5: implement focus link
 }
 
 // -------------------------------------------------------------------------------------------------

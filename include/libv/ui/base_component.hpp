@@ -24,15 +24,21 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class ContextFocusTravers;
 class ContextLayout1;
 class ContextLayout2;
 class ContextRender;
 class ContextUI;
+class EventFocus;
 
 // -------------------------------------------------------------------------------------------------
 
 struct UnnamedTag_t {};
 static constexpr UnnamedTag_t UnnamedTag;
+
+using ChildID = int32_t;
+static constexpr ChildID ChildIDSelf = -2;
+static constexpr ChildID ChildIDNone = -1;
 
 struct BaseComponent {
 	friend class AccessLayout;
@@ -41,7 +47,7 @@ struct BaseComponent {
 
 private:
 	Flag_t flags = Flag::mask_init;
-	uint32_t childID = 0;
+	ChildID childID = 0;
 
 	libv::vec3f position_; /// Component position relative to parent in pixels
 	libv::vec3f size_; /// Component size in pixels
@@ -94,9 +100,13 @@ protected:
 	void flagAuto(Flag_t flags_) noexcept;
 	void flagForce(Flag_t flags_) noexcept;
 
+private:
+	Flag_t flagForParent() noexcept;
+
 public:
-	void style(libv::intrusive_ptr<Style> style) noexcept;
+	void focus() noexcept;
 	void markRemove() noexcept;
+	void style(libv::intrusive_ptr<Style> style) noexcept;
 
 public:
 	template <typename Property>
@@ -109,26 +119,37 @@ public:
 	[[nodiscard]] inline const typename Property::value_type& value(Property& property) const;
 
 private:
+	bool isFocusableComponent() const noexcept;
+
+private:
+	static void focusChange(BaseComponent& previous, BaseComponent& current);
+
+private:
+	virtual void onFocusChange(const EventFocus& event);
+
+private:
 	void attach(BaseComponent& parent);
 	void detach(BaseComponent& parent);
 	void style();
 	void styleScan();
+	libv::observer_ptr<BaseComponent> focusTravers(const ContextFocusTravers& context, BaseComponent& current);
 	void render(ContextRender& context);
 	void layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
-	void foreachChildren(libv::function_ref<void(BaseComponent&)> callback);
 
 private:
 	virtual void doAttach();
 	virtual void doDetach();
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback);
 	virtual void doStyle();
-	virtual void doStyle(uint32_t childID);
+	virtual void doStyle(ChildID childID);
+	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current);
 	virtual void doCreate(ContextRender& context);
 	virtual void doDestroy(ContextRender& context);
 	virtual void doRender(ContextRender& context);
 	virtual void doLayout1(const ContextLayout1& environment);
 	virtual void doLayout2(const ContextLayout2& environment);
+	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback);
 	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback);
 
 	// TWO PASS layout:
@@ -145,14 +166,23 @@ struct AccessParent {
 	[[nodiscard]] static inline const auto& childID(const BaseComponent& component) noexcept {
 		return component.childID;
 	}
+	static inline decltype(auto) isFocusableComponent(const BaseComponent& component) {
+		return component.isFocusableComponent();
+	}
+	static inline decltype(auto) isFocusableChild(const BaseComponent& component) {
+		return component.flags.match_any(Flag::focusableChild);
+	}
+	static inline decltype(auto) doFocusTravers(BaseComponent& component, const ContextFocusTravers& context, ChildID current) {
+		return component.doFocusTravers(context, current);
+	}
 };
 
 struct AccessLayout {
-	static inline decltype(auto) layout1(BaseComponent& component, const ContextLayout1& context) {
-		return component.layout1(context);
+	static inline decltype(auto) layout1(BaseComponent& component, const ContextLayout1& environment) {
+		return component.layout1(environment);
 	}
-	static inline decltype(auto) layout2(BaseComponent& component, const ContextLayout2& context) {
-		return component.layout2(context);
+	static inline decltype(auto) layout2(BaseComponent& component, const ContextLayout2& environment) {
+		return component.layout2(environment);
 	}
 	[[nodiscard]] static inline auto& lastDynamic(BaseComponent& component) {
 		return component.lastDynamic;
@@ -187,6 +217,12 @@ struct AccessRoot : AccessLayout, AccessParent {
 	}
 	static inline decltype(auto) styleScan(BaseComponent& component) {
 		return component.styleScan();
+	}
+	static inline decltype(auto) focusChange(BaseComponent& previous, BaseComponent& current) {
+		return BaseComponent::focusChange(previous, current);
+	}
+	static inline decltype(auto) focusTravers(BaseComponent& component, const ContextFocusTravers& context, BaseComponent& current) {
+		return component.focusTravers(context, current);
 	}
 	static inline decltype(auto) render(BaseComponent& component, ContextRender& context) {
 		return component.render(context);

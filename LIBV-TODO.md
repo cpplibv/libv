@@ -189,8 +189,39 @@ libv.frame: add a mutex to frame (its needs one because of the getters could acc
 libv.frame: Review threading and ownership models of the whole library | I just throw a bunch of mutex at the problem, I feel guilt
 libv.frame: cleanup includes
 libv.ui: use the following pattern for unnamed components: struct adopt_lock_t {}; static constexpr adopt_lock_t adopt_lock;
+libv.ui: focus - Two main operation: focus-traversal (finding the next focus target) and focus-change (event of focus change to the component selected by focus-traversal)
+libv.ui.focus: Focusable is new optional property (not the property system) and FocusableSelf / FocusableChild are new flags for it
+libv.ui.focus: Focus traversal order: component hierarchy
+libv.ui.focus: Focus-traversal with precise direction instead of just the 2/4/8 base direction (1 float is enough for angle)
+libv.ui.focus: UI should have a pointer to the currently focused object
+libv.ui.focus: Focus-change event
+libv.ui.focus: Focusable Components should store a flag if its focused (this also helps with detach)
+libv.ui.focus: Focus-traversal operation triggers a Focus-change event on both end
+libv.ui.focus: Direct focus can be triggered by code
+libv.ui.focus: Mouse events can trigger direct focus | non-automated version
 
 --- STACK ------------------------------------------------------------------------------------------
+
+libv.ui: key input
+libv.ui: text input
+libv.ui.component: input field
+
+libv.ui.keyboard: keyboard event are forwarded directly to the focused object and traversed up the focus stack until intercepted
+libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
+libv.ui.text: keyboard event are forwarded directly to the focused object and traversed up the focus stack until intercepted
+
+libv.ui: selection is something different them focus
+libv.ui.hotkey: hotkey system are an extension to the keyboard system
+libv.ui.hotkey: ui.focus-forward = tab
+libv.ui.hotkey: ui.focus-backward = shift+tab
+libv.ui.hotkey: ui.focus-tab-forward = ctrl+tab
+libv.ui.hotkey: ui.focus-tab-backward = ctrl+shift+tab
+libv.ui.hotkey: ui.press-button = space
+libv.ui.focus: Key/Hotkey events can trigger focus-traversal
+
+libv.ui: component remove / detach does not remove certain flags from parent, parent have to rescan child to determine flags
+libv.ui: pimpl ui context
+
 
 mouse
 	libv.ui: EventMouse add mouse states to fetch beside events
@@ -198,12 +229,9 @@ mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
 
 event
-	libv.ui: focus / selection
-	libv.ui: keyboard input
 	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
 	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
 	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-	libv.ui: input field
 	libv.ui: implement a button and other interactive components callback system aka: signal-slot
 	libv.ui: mouse event absorb/shield/plates
 	libv.ui: make sure absorb/shield/plates is easy to have/access for even non interactive components
@@ -225,6 +253,7 @@ component
 	libv.ui: not owning container view (list or table)
 
 style
+	libv.ui: style property (literally a property that is a style ptr, useful for interactive components and their changes)
 	libv.ui: parent depends on layout invalidation could be introduced into the property as function test just like fallback
 	libv.ui: verify that style change in child causes restyle in parent
 
@@ -248,6 +277,13 @@ ui
 	libv.ui: static_component system
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
+
+focus
+	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
+	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
+
+	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
+	libv.ui.focus: Focus traversal order: position based
 
 --- [[[ deadline: 2019.09.31 ]]] ---
 
@@ -428,7 +464,6 @@ cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inlin
 cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
-ext: adopt and try out https://www.reactphysics3d.com/
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
 ext: compile time regex https://github.com/hanickadot/compile-time-regular-expressions
 frame.core: remove core

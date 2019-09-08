@@ -7,8 +7,11 @@
 // std
 #include <cassert>
 // pro
+#include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/log.hpp>
 
 
@@ -67,20 +70,70 @@ void BaseComponent::flagForce(Flag_t flags_) noexcept {
 	flagParents(flags_);
 }
 
+Flag_t BaseComponent::flagForParent() noexcept {
+	const auto mask_propagatableSelf = Flag_t{Flag::mask_propagate.value() << 1};
+	const auto propagatableSelf = flags & mask_propagatableSelf;
+	const auto propagatableChild = flags & Flag::mask_propagate;
+
+	return Flag_t{propagatableSelf.value() >> 1} | propagatableChild;
+}
+
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
-	style_ = std::move(newStyle);
-	flagAuto(Flag::pendingStyle);
+void BaseComponent::focus() noexcept {
+	// TODO P5: It would be better if focus would be async
+	if (!isAttached())
+		log_ui.error("Attempted to focus a non-attached component. Attempt ignored.");
+
+	else if (!isFocusableComponent())
+		log_ui.error("Attempted to focus a non-focusable component. Attempt ignored.");
+
+	else
+		context().focus(*this);
 }
 
 void BaseComponent::markRemove() noexcept {
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
 
-	foreachChildren([](BaseComponent& child) {
+	doForeachChildren([](BaseComponent& child) {
 		child.markRemove();
 	});
+}
+
+void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
+	style_ = std::move(newStyle);
+	flagAuto(Flag::pendingStyle);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool BaseComponent::isFocusableComponent() const noexcept {
+	return !flags.match_any(Flag::pendingDetachSelf) &&
+			flags.match_any(Flag::render) &&
+			flags.match_any(Flag::focusableSelf);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current) {
+	{
+		EventFocus event{false, true, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
+		previous.onFocusChange(event);
+		previous.flags.reset(Flag::focused);
+	}
+
+	{
+		previous.flags.set(Flag::focused);
+		EventFocus event{true, false, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
+		current.onFocusChange(event);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BaseComponent::onFocusChange(const EventFocus& event) {
+	(void) event;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -99,7 +152,7 @@ void BaseComponent::attach(BaseComponent& parent_) {
 	}
 
 	if (flags.match_any(Flag::pendingAttachChild)) {
-		foreachChildren([this](BaseComponent& child) {
+		doForeachChildren([this](BaseComponent& child) {
 			if (child.flags.match_any(Flag::pendingAttach))
 				child.attach(*this);
 		});
@@ -127,6 +180,14 @@ void BaseComponent::detach(BaseComponent& parent_) {
 
 		doDetach();
 
+		if (flags.match_any(Flag::focused)) {
+			flags.reset(Flag::focusable);
+			context().detachFocused(*this);
+		}
+
+//		if (flags.match_any(Flag::focusLinked))
+//			context().detachFocusLinked(*this);
+
 		context_ = nullptr;
 		parent = libv::make_observer_ref(this);
 
@@ -141,7 +202,7 @@ void BaseComponent::style() {
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
-		foreachChildren([](BaseComponent& child) {
+		doForeachChildren([](BaseComponent& child) {
 			if (child.flags.match_any(Flag::pendingStyle))
 				child.style();
 		});
@@ -155,9 +216,21 @@ void BaseComponent::styleScan() {
 		parent->doStyle(childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
-	foreachChildren([](BaseComponent& child) {
+	doForeachChildren([](BaseComponent& child) {
 		child.styleScan();
 	});
+}
+
+libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocusTravers& context, BaseComponent& current) {
+	libv::observer_ptr<BaseComponent> result = current.doFocusTravers(context, ChildIDSelf);
+
+	auto ancestor = libv::make_observer_ref(current);
+	while (result == nullptr && ancestor != ancestor->parent) {
+		result = ancestor->parent->doFocusTravers(context, ancestor->childID);
+		ancestor = ancestor->parent;
+	}
+
+	return result;
 }
 
 void BaseComponent::render(ContextRender& context) {
@@ -177,7 +250,7 @@ void BaseComponent::render(ContextRender& context) {
 	//	if (flags.match_any(Flag::pendingRender)) {
 			doRender(currentContext);
 
-			foreachChildren([&currentContext](BaseComponent& child) {
+			doForeachChildren([&currentContext](BaseComponent& child) {
 				child.render(currentContext);
 			});
 	//		flags.reset(Flag::pendingRender);
@@ -225,10 +298,6 @@ void BaseComponent::layout2(const ContextLayout2& environment) {
 	}
 }
 
-void BaseComponent::foreachChildren(libv::function_ref<void(BaseComponent&)> callback) {
-	doForeachChildren(callback);
-}
-
 // -------------------------------------------------------------------------------------------------
 
 void BaseComponent::doAttach() { }
@@ -241,8 +310,18 @@ void BaseComponent::doDetachChildren(libv::function_ref<bool(BaseComponent&)> ca
 
 void BaseComponent::doStyle() { }
 
-void BaseComponent::doStyle(uint32_t childID) {
+void BaseComponent::doStyle(ChildID childID) {
 	(void) childID;
+}
+
+libv::observer_ptr<BaseComponent> BaseComponent::doFocusTravers(const ContextFocusTravers& context, ChildID current) {
+	(void) context;
+	(void) current;
+
+	if (current == ChildIDSelf || !isFocusableComponent())
+		return nullptr;
+
+	return libv::make_observer(this);
 }
 
 void BaseComponent::doCreate(ContextRender& context) {
@@ -263,6 +342,10 @@ void BaseComponent::doLayout1(const ContextLayout1& environment) {
 
 void BaseComponent::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
+}
+
+void BaseComponent::doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+	(void) callback;
 }
 
 void BaseComponent::doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) {

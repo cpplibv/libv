@@ -232,7 +232,10 @@ void PanelViewer::doAttach() {
 			button_close = std::make_shared<libv::ui::Button>("close");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->setText("Button0");
-			button_close->setCallback([](const libv::ui::EventMouse& event) {
+			button_close->setCallback([this](const libv::ui::EventMouse& event) {
+				if (event.isButton())
+					button_close->focus();
+
 				if (event.isButton())
 					log_app.trace("Button0 Click {} {}", libv::to_value(event.button().button),  libv::to_value(event.button().action));
 
@@ -266,7 +269,10 @@ void PanelViewer::doAttach() {
 			button_close = std::make_shared<libv::ui::Button>("button1");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->setText("Button1");
-			button_close->setCallback([](const libv::ui::EventMouse& event) {
+			button_close->setCallback([this](const libv::ui::EventMouse& event) {
+				if (event.isButton())
+					button_close->focus();
+
 				if (event.isButton())
 					log_app.trace("Button1 Click {} {}", libv::to_value(event.button().button),  libv::to_value(event.button().action));
 

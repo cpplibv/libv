@@ -38,18 +38,23 @@ class ContextUI;
 class ImplUI;
 
 class UI {
+	friend class ContextUI;
+
 private:
 	std::unique_ptr<ImplUI> self;
 
 public:
 	UI();
 	~UI();
+
+public:
 	void add(std::shared_ptr<BaseComponent> component);
 	void setSize(libv::vec3f size_) noexcept;
 	void setSize(float x, float y, float z = 0.f) noexcept;
 	void setPosition(libv::vec3f position_) noexcept;
 	void setPosition(float x, float y, float z) noexcept;
 
+public:
 	void eventMouseEnter(bool entered);
 	void eventMouseButton(libv::input::Mouse button, libv::input::Action action);
 	void eventMousePosition(libv::vec2d position);
@@ -63,6 +68,11 @@ public:
 	// TODO P1: libv.ui I disagree with this public, to resolve this I think UI has to store its glr::Remote?, which is reasonable, might need some alteration
 	void update(libv::glr::Queue& gl);
 	void destroy(libv::glr::Queue& gl);
+
+private:
+	void focus(BaseComponent& component);
+	void detachFocused(BaseComponent& component);
+	void detachFocusLinked(BaseComponent& component);
 };
 
 // -------------------------------------------------------------------------------------------------

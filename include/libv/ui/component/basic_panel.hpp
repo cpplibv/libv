@@ -11,6 +11,7 @@
 #include <vector>
 // pro
 #include <libv/ui/base_component.hpp>
+#include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/log.hpp>
 
 
@@ -40,9 +41,11 @@ public:
 protected:
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
 	virtual void doStyle() override;
-	virtual void doStyle(uint32_t childID) override;
+	virtual void doStyle(ChildID childID) override;
+	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current) override;
 	virtual void doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
+	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
 	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) override;
 };
 
@@ -68,7 +71,7 @@ BasicPanel<Layout>::~BasicPanel() {
 
 template <typename Layout>
 typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<BaseComponent> component) {
-	const auto childID = static_cast<uint32_t>(children.size());
+	const auto childID = static_cast<ChildID>(children.size());
 	auto& child = children.emplace_back(std::move(component));
 	flagForce(Flag::pendingAttachChild);
 	AccessParent::childID(*child.ptr) = childID;
@@ -95,7 +98,7 @@ void BasicPanel<Layout>::clear() {
 
 template <typename Layout>
 void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
-	uint32_t numRemoved = 0;
+	ChildID numRemoved = 0;
 
 	libv::erase_if_stable(children, [&numRemoved, &callback](auto& child) {
 		const bool remove = callback(*child.ptr);
@@ -115,8 +118,37 @@ void BasicPanel<Layout>::doStyle() {
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::doStyle(uint32_t childID) {
+void BasicPanel<Layout>::doStyle(ChildID childID) {
 	children[childID].ptr->set(children[childID].properties);
+}
+
+template <typename Layout>
+libv::observer_ptr<BaseComponent> BasicPanel<Layout>::doFocusTravers(const ContextFocusTravers& context, ChildID current) {
+	const ChildID dir = context.isForward() ? +1 : -1;
+	const ChildID end = context.isForward() ? static_cast<ChildID>(children.size()) : -1;
+	ChildID begin = context.isForward() ? 0 : static_cast<ChildID>(children.size() - 1);
+
+	if (current == ChildIDNone) {
+		// unrelated component is focused, focus self or iterate every children
+		if (AccessParent::isFocusableComponent(*this))
+			return libv::make_observer(this);
+
+	} else if (current == ChildIDSelf) {
+		// this component itself is currently focused, iterate every children
+
+	} else {
+		// one of the children is currently focused, iterate remaining children
+		begin = current + dir;
+	}
+
+	if (!AccessParent::isFocusableChild(*this))
+		return nullptr;
+
+	for (ChildID i = begin; i != end; i += dir)
+		if (auto hit = AccessParent::doFocusTravers(*children[i].ptr, context, ChildIDNone))
+			return hit;
+
+	return nullptr;
 }
 
 template <typename Layout>
@@ -127,6 +159,13 @@ void BasicPanel<Layout>::doLayout1(const ContextLayout1& le) {
 template <typename Layout>
 void BasicPanel<Layout>::doLayout2(const ContextLayout2& le) {
 	Layout::layout2(le, children, properties, *this);
+}
+
+template <typename Layout>
+void BasicPanel<Layout>::doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+	for (const auto& child : children)
+		if (not callback(*child.ptr))
+			return;
 }
 
 template <typename Layout>
