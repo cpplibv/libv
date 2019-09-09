@@ -402,6 +402,12 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME immer
+	GIT_REPOSITORY https://github.com/arximboldi/immer.git
+	GIT_TAG 559ab37543a7076f9cfe9002720b0d5ad6ffc12a
+)
+
+wish_create_external(
 	NAME lua
 	GIT_REPOSITORY https://github.com/LuaDist/lua.git
 	GIT_TAG 5.3.2
@@ -677,6 +683,12 @@ wish_create_executable(
 	TARGET sandbox_libv_glr2
 	SOURCE sandbox/libv_glr_main2.cpp
 	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_immer
+	SOURCE sandbox/libv_immer_main.cpp
+	LINK   ext_immer
 )
 
 wish_create_executable(
