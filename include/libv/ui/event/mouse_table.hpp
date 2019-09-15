@@ -33,11 +33,13 @@ public:
 	void subscribe(MouseWatcher& watcher, Flag_t interest);
 	void subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
+	void update(BaseComponent& watcher, Flag_t interest);
 	void update(BaseComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
+
 //	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, Flag_t interest, MouseOrder order);
-//	void update(MouseWatcher& watcher, Flag_t interest);
+	void update(MouseWatcher& watcher, Flag_t interest);
 	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseOrder order);

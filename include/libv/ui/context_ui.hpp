@@ -28,7 +28,7 @@ class Style;
 class Texture2D;
 class UI;
 
-// TODO P4: Find a header for type info ref, and a better name
+// TODO P4: Find a header for type info ref, and a better name, and wrap the 3 type with a single type
 using TypeInfoRef = std::reference_wrapper<const std::type_info>;
 
 struct TypeInfoRefHasher {

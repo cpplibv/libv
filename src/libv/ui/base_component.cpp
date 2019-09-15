@@ -51,23 +51,117 @@ ContextUI& BaseComponent::context() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::flagSelf(Flag_t flags_) noexcept {
+void BaseComponent::flagDirect(Flag_t flags_) noexcept {
 	flags.set(flags_);
 }
 
-void BaseComponent::flagParents(Flag_t flags_) noexcept {
+void BaseComponent::flagAncestors(Flag_t flags_) noexcept {
 	for (auto it = parent; !it->flags.match_mask(flags_); it = it->parent)
 		it->flags.set(flags_);
 }
 
 void BaseComponent::flagAuto(Flag_t flags_) noexcept {
-	flagSelf(flags_ & Flag::mask_self);
-	flagParents(flags_ & Flag::mask_propagate);
+	flagDirect(flags_ & Flag::mask_self);
+	flagAncestors(flags_ & Flag::mask_propagate);
 }
 
 void BaseComponent::flagForce(Flag_t flags_) noexcept {
-	flagSelf(flags_);
-	flagParents(flags_);
+	flagDirect(flags_);
+	flagAncestors(flags_);
+}
+
+void BaseComponent::flagPurge(Flag_t flags_) noexcept {
+	flags.reset(flags_ & Flag::mask_self);
+
+	for (auto it = parent; true; it = it->parent) {
+		Flag_t childFlags = Flag::none;
+
+		it->doForeachChildren([&childFlags](BaseComponent& child) {
+			childFlags |= child.flags;
+		});
+
+		if (it->flags.match_mask(Flag::mask_propagate, childFlags))
+			return;
+
+		it->flags.reset(Flag::mask_propagate);
+		it->flags.set(calculatePropagateFlags(childFlags));
+
+		if (it == it->parent)
+			return;
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BaseComponent::watchChar(bool value) noexcept {
+	if (value)
+		flags.set(Flag::watchChar);
+	else
+		flags.reset(Flag::watchChar);
+}
+
+void BaseComponent::watchKey(bool value) noexcept {
+	if (value)
+		flags.set(Flag::watchKey);
+	else
+		flags.reset(Flag::watchKey);
+}
+
+void BaseComponent::watchFocus(bool value) noexcept {
+	if (value) {
+		flagAuto(Flag::focusable | Flag::watchFocus);
+		return;
+	}
+
+	if (!flags.match_any(Flag::focusableSelf))
+		return;
+
+	if (flags.match_mask(Flag::focusableChild))
+		flags.reset(Flag::focusableSelf | Flag::watchFocus); // There is a child with focus, no need to purge flag
+	else
+		flagPurge(Flag::focusable | Flag::watchFocus);
+
+	if (isAttached() && flags.match_any(Flag::focused)) {
+		context().detachFocused(*this);
+	}
+}
+
+void BaseComponent::watchMouse(Flag_t interest) noexcept {
+	if (interest & ~Flag::mask_watchMouse) {
+		log_ui.error("Invalid argument passed to mouse watch: {}. Ignoring non mouse watch bits {}", interest, path());
+		interest &= Flag::mask_watchMouse;
+	}
+
+	// NOTE: pendingAttachSelf flag is used instead of isAttached to allow usage of this function in doAttach
+	if (!flags.match_any(Flag::pendingAttachSelf) && flags.match_mask(Flag::mask_watchMouse, interest)) { // Attached and there is a change
+		if (!interest) // no watched mouse event left, unsubscribe
+			context().mouse.unsubscribe(*this);
+
+		else if (!(flags & Flag::mask_watchMouse)) // start watching mouse events, subscribe
+			context().mouse.subscribe(*this, interest);
+
+		else // not subscribe and not unsubscribe but there is a change, update
+			context().mouse.update(*this, flags & interest & Flag::mask_watchMouse);
+	}
+
+	flags.reset(Flag::mask_watchMouse);
+	flags.set(interest);
+}
+
+bool BaseComponent::isWatchChar() const noexcept {
+	return flags.match_any(Flag::watchChar);
+}
+
+bool BaseComponent::isWatchKey() const noexcept {
+	return flags.match_any(Flag::watchKey);
+}
+
+bool BaseComponent::isWatchFocus() const noexcept {
+	return flags.match_any(Flag::watchFocus);
+}
+
+Flag_t BaseComponent::isWatchMouse() const noexcept {
+	return flags & Flag::mask_watchMouse;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -75,10 +169,10 @@ void BaseComponent::flagForce(Flag_t flags_) noexcept {
 void BaseComponent::focus() noexcept {
 	// Note: focus has to be sync to allow correct event processing
 	if (!isAttached())
-		log_ui.error("Attempted to focus a non-attached component. Attempt ignored.");
+		log_ui.error("Attempted to focus a non-attached component. Attempt ignored. {}", path());
 
 	else if (!isFocusableComponent())
-		log_ui.error("Attempted to focus a non-focusable component. Attempt ignored.");
+		log_ui.error("Attempted to focus a non-focusable component. Attempt ignored. {}", path());
 
 	else
 		context().focus(*this);
@@ -110,27 +204,29 @@ bool BaseComponent::isFocusableComponent() const noexcept {
 
 void BaseComponent::eventChar(BaseComponent& component, const libv::input::EventChar& event) {
 	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
-		if (i->onChar(event))
+		if (i->flags.match_any(Flag::watchChar) && i->onChar(event))
 			return;
 }
 
 void BaseComponent::eventKey(BaseComponent& component, const libv::input::EventKey& event) {
 	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
-		if (i->onKey(event))
+		if (i->flags.match_any(Flag::watchKey) && i->onKey(event))
 			return;
 }
 
 void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current) {
 	{
 		EventFocus event{false, true, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		previous.onFocus(event);
+		if (previous.flags.match_any(Flag::watchFocus))
+			previous.onFocus(event);
 		previous.flags.reset(Flag::focused);
 	}
 
 	{
-		previous.flags.set(Flag::focused);
+		current.flags.set(Flag::focused);
 		EventFocus event{true, false, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		current.onFocus(event);
+		if (previous.flags.match_any(Flag::watchFocus))
+			current.onFocus(event);
 	}
 }
 
@@ -166,7 +262,7 @@ void BaseComponent::attach(BaseComponent& parent_) {
 
 		doAttach();
 
-		flagParents(calculatePropagateFlags(flags)); // Trigger flag propagation
+		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
 
 		if (flags.match_any(Flag::mask_watchMouse))
 			context().mouse.subscribe(*this, flags & Flag::mask_watchMouse);
@@ -206,8 +302,6 @@ void BaseComponent::detach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachSelf)) {
 		log_ui.trace("Detaching {}", path());
 
-		doDetach();
-
 		if (flags.match_any(Flag::mask_watchMouse))
 			context().mouse.unsubscribe(*this);
 
@@ -218,6 +312,8 @@ void BaseComponent::detach(BaseComponent& parent_) {
 
 //		if (flags.match_any(Flag::focusLinked))
 //			context().detachFocusLinked(*this);
+
+		doDetach();
 
 		context_ = nullptr;
 		parent = libv::make_observer_ref(this);
@@ -245,11 +341,11 @@ void BaseComponent::styleScan() {
 	if (flags.match_any(Flag::pendingStyleSelf) || (style_ && style_->isDirty())) {
 		doStyle();
 		parent->doStyle(childID);
-		flags.reset(Flag::pendingStyleSelf);
 	}
 	doForeachChildren([](BaseComponent& child) {
 		child.styleScan();
 	});
+	flags.reset(Flag::pendingStyle);
 }
 
 libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocusTravers& context, BaseComponent& current) {
@@ -355,7 +451,6 @@ void BaseComponent::doStyle(ChildID childID) {
 
 libv::observer_ptr<BaseComponent> BaseComponent::doFocusTravers(const ContextFocusTravers& context, ChildID current) {
 	(void) context;
-	(void) current;
 
 	if (current == ChildIDSelf || !isFocusableComponent())
 		return nullptr;

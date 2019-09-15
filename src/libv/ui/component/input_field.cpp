@@ -64,8 +64,6 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 }
 
 void InputField::onFocus(const EventFocus& event) {
-	(void) event;
-
 	if (event.loss)
 		{} // Disable cursor
 	if (event.gain)
@@ -88,7 +86,10 @@ bool InputField::onMouse(const EventMouse& event) {
 // -------------------------------------------------------------------------------------------------
 
 void InputField::doAttach() {
-	flagAuto(Flag::focusable | Flag::watchMouseButton);
+	watchChar(true);
+	watchKey(true);
+	watchFocus(true);
+	watchMouse(Flag::watchMouseButton);
 }
 
 void InputField::doStyle() {

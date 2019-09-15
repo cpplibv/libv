@@ -73,10 +73,10 @@ public:
 		if (libv::make_observer_ref(component) == focused)
 			return;
 
+		log_ui.debug("Focus set from: {} to {}", focused->path(), component.path());
+
 		AccessRoot::focusChange(*focused, component);
 		focused = libv::make_observer_ref(component);
-
-		log_ui.debug("Focused: {}", focused->path());
 	}
 
 	void focusTravers(Degrees<float> direction) {
@@ -90,10 +90,10 @@ public:
 		if (newFocus == nullptr) // Not found anything, back to root
 			newFocus = libv::make_observer(root);
 
+		log_ui.debug("Focus travel from: {} to {}", focused->path(), newFocus->path());
+
 		AccessRoot::focusChange(*focused, *newFocus);
 		focused = libv::make_observer_ref(*newFocus);
-
-		log_ui.debug("Focused: {}", focused->path());
 	}
 };
 
@@ -175,7 +175,7 @@ void UI::update(libv::glr::Queue& gl) {
 		AccessRoot::attach(self->root, self->root);
 	} {
 		// --- Event ---
-		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock
+		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (reactive events to layout and attach changes)
 
 		std::unique_lock lock{self->mutex};
 		for (const auto& mouseEvent : self->event_queue) {

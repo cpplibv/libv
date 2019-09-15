@@ -212,28 +212,26 @@ libv.ui: automate MouseRegion update, request a component to be passed alongside
 libv.ui: consolidate MouseInterest flags
 libv.ui: flags set in ctor -> parent might not get the relevant *child flags, check on propagation (self/child masks)
 libv.ui: component detach does not remove certain flags from parent, parent have to rescan child to determine correct flags
+libv.ui: with capability oriented flags, the flags.reset should prompt reevaluation of flags in the parent ('set' part is taken care by flagAuto) | its already taken care by the top-down passes of the capabilities
+libv.ui: event oriented flags, reset should unsub from events | solved by separate set/get and flagPurge
+libv.ui: event oriented flags, set should sub for events | solved by separate set/get and flagPurge
+libv.ui: focus, key and char watcher and dynamic change of them
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: with capability oriented flags, the flags.reset should prompt reevaluation of flags in the parent ('set' part is taken care by flagAuto)
-
-libv.ui: with event oriented flags, the flags.reset should be elevated into its own function and should unsub from such events
-libv.ui: with event oriented flags, the flags.set should be elevated into its own function and should sub from such events
 
 libv.ui: pimpl ui context
 
 mouse
-	libv.ui: To access every input the following event order is important: update movement, broadcast and update button states one-by-one, broadcast movement. I think this will yield the most responsive experience
-	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
-	libv.ui: mouse event absorb/shield/plates
-	libv.ui: make sure absorb/shield/plates is easy to have/access for even non interactive components
-	libv.ui: mouse event should contain a watcher relative coordinates too
-	libv.ui: updating watcher (any property) without change should not yield any event
-	libv.ui: flatten EventMouse to combat variant complexity
+	libv.ui: window focus - mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
+	libv.ui: absorb - mouse event absorb/shield/plates
+	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
+	libv.ui: relative - mouse event should contain a watcher relative coordinates too
+	libv.ui: unchanged - updating watcher (any property) without change should not yield any event
+	libv.ui: flatten - flatten EventMouse to combat variant complexity
 
 event
 	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
-	libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
 	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
@@ -317,6 +315,7 @@ hotkey
 	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
 
 focus
+	libv.ui.focus: easy way to trigger Focus traversal from events/components
 	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
 	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
 
@@ -442,6 +441,7 @@ libv.frame: cleanup global variables, at least place them next to each other and
 
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 
+libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
 
 
 --- AWAITING ---------------------------------------------------------------------------------------

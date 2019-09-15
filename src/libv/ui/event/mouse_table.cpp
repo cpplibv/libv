@@ -162,6 +162,18 @@ void MouseTable::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f p
 	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
+void MouseTable::update(BaseComponent& component, Flag_t interest) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+		return entry.match(component);
+	});
+
+	if (it == self->entries.end())
+		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+
+	it->interest = interest;
+	it->pendingUpdate = true;
+}
+
 void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
 		return entry.match(component);
@@ -173,6 +185,18 @@ void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::ve
 	it->cornerBL = position;
 	it->cornerTR = position + size - 1.f;
 	it->order = order;
+	it->pendingUpdate = true;
+}
+
+void MouseTable::update(MouseWatcher& watcher, Flag_t interest) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+		return entry.match(watcher);
+	});
+
+	if (it == self->entries.end())
+		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", reinterpret_cast<size_t>(&watcher));
+
+	it->interest = interest;
 	it->pendingUpdate = true;
 }
 
@@ -407,7 +431,7 @@ void MouseTable::event_update() {
 	boost::container::small_vector<Hit, 8> hits;
 
 	for (ImplMouseTable::Entry& entry : self->entries) {
-		// In future when shielding happens this if will have to change
+		// <<< P5: In future when shielding happens this if will have to change
 		if (!entry.pendingUpdate)
 			continue;
 

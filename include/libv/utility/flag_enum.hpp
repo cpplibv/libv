@@ -79,6 +79,9 @@ public:
 	constexpr inline bool match_mask(const flag_enum mask) const noexcept {
 		return (value_ & mask.value_) == mask.value_;
 	}
+	constexpr inline bool match_mask(const flag_enum mask, const flag_enum other) const noexcept {
+		return (value_ & mask.value_) == (other.value_ & mask.value_);
+	}
 	constexpr inline bool match_full(const flag_enum other) const noexcept {
 		return value_ == other.value_;
 	}

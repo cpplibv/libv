@@ -97,11 +97,24 @@ public:
 	}
 
 protected:
-	void flagSelf(Flag_t flags_) noexcept;
-	void flagParents(Flag_t flags_) noexcept;
+	void flagDirect(Flag_t flags_) noexcept;
+	void flagAncestors(Flag_t flags_) noexcept;
 
 	void flagAuto(Flag_t flags_) noexcept;
 	void flagForce(Flag_t flags_) noexcept;
+
+private:
+	void flagPurge(Flag_t flags_) noexcept;
+
+protected:
+	void watchChar(bool value) noexcept;
+	void watchKey(bool value) noexcept;
+	void watchFocus(bool value) noexcept;
+	void watchMouse(Flag_t interest) noexcept;
+	[[nodiscard]] bool isWatchChar() const noexcept;
+	[[nodiscard]] bool isWatchKey() const noexcept;
+	[[nodiscard]] bool isWatchFocus() const noexcept;
+	[[nodiscard]] Flag_t isWatchMouse() const noexcept;
 
 public:
 	void focus() noexcept;
