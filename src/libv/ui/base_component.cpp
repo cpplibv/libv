@@ -185,17 +185,22 @@ void BaseComponent::attach(BaseComponent& parent_) {
 
 void BaseComponent::detach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachChild)) {
+		Flag_t childFlags = Flag::none;
 
-		doDetachChildren([this, &parent_](BaseComponent& child) {
+		doDetachChildren([this, &parent_, &childFlags](BaseComponent& child) {
 			bool remove = child.flags.match_any(Flag::pendingDetachSelf);
 
 			if (child.flags.match_any(Flag::pendingDetach))
 				child.detach(*this);
 
+			if (!remove)
+				childFlags |= child.flags;
+
 			return remove;
 		});
 
-		flags.reset(Flag::pendingDetachChild);
+		flags.reset(Flag::mask_propagate);
+		flags.set(calculatePropagateFlags(childFlags));
 	}
 
 	if (flags.match_any(Flag::pendingDetachSelf)) {

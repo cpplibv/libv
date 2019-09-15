@@ -211,13 +211,14 @@ libv.ui.event: add a component based mouse event (virtual function) option BESID
 libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass | added a component based watcher BESIDE the current watcher one
 libv.ui: consolidate MouseInterest flags
 libv.ui: flags set in ctor -> parent might not get the relevant *child flags, check on propagation (self/child masks)
+libv.ui: component detach does not remove certain flags from parent, parent have to rescan child to determine correct flags
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: component remove / detach does not remove certain flags from parent, parent have to rescan child to determine flags
+libv.ui: with capability oriented flags, the flags.reset should prompt reevaluation of flags in the parent ('set' part is taken care by flagAuto)
+
 libv.ui: with event oriented flags, the flags.reset should be elevated into its own function and should unsub from such events
 libv.ui: with event oriented flags, the flags.set should be elevated into its own function and should sub from such events
-libv.ui: with capability oriented flags, the flags.reset should prompt reevaluation of flags in the parent
 
 libv.ui: pimpl ui context
 
