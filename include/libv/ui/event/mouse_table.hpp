@@ -17,9 +17,9 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class EventMouse;
-class MouseWatcher;
+class BaseComponent;
 class ImplMouseTable;
+class MouseWatcher;
 
 class MouseTable {
 	std::unique_ptr<ImplMouseTable> self;
@@ -29,8 +29,11 @@ public:
 	~MouseTable();
 
 public:
+	void subscribe(BaseComponent& watcher, MouseInterest_t interest);
 	void subscribe(MouseWatcher& watcher, MouseInterest_t interest);
 	void subscribe(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
+
+	void update(BaseComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseInterest_t interest, MouseOrder order);
@@ -38,6 +41,8 @@ public:
 	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseOrder order);
+
+	void unsubscribe(BaseComponent& watcher);
 	void unsubscribe(MouseWatcher& watcher);
 
 	void event_enter();

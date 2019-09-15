@@ -47,21 +47,21 @@ static constexpr Flag_t pendingCreate         = libv::bit(18);
 
 static constexpr Flag_t updatedSize           = libv::bit(24); /// Component's size was changed since it last render
 static constexpr Flag_t updatedPosition       = libv::bit(25); /// Component's position was changed since it last render
-//static constexpr Flag_t ______              = libv::bit(26);
-//static constexpr Flag_t ______              = libv::bit(27);
-//static constexpr Flag_t ______              = libv::bit(28);
-//static constexpr Flag_t ______              = libv::bit(29);
-//static constexpr Flag_t ______              = libv::bit(30);
-//static constexpr Flag_t ______              = libv::bit(31);
+//static constexpr Flag_t watchChar             = libv::bit(26);
+//static constexpr Flag_t watchKey              = libv::bit(27);
+//static constexpr Flag_t watchFocus            = libv::bit(28);
+static constexpr Flag_t watchMouseButton      = libv::bit(29);
+static constexpr Flag_t watchMouseScroll      = libv::bit(30);
+static constexpr Flag_t watchMousePosition    = libv::bit(31);
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr Flag_t focusable        = focusableChild        | focusableSelf;
-static constexpr Flag_t pendingAttach    = pendingAttachChild    | pendingAttachSelf;
-static constexpr Flag_t pendingStyle     = pendingStyleChild     | pendingStyleSelf;
-static constexpr Flag_t pendingLayout    = pendingLayoutChild    | pendingLayoutSelf;
-static constexpr Flag_t pendingRender    = pendingRenderChild    | pendingRenderSelf;
-static constexpr Flag_t pendingDetach    = pendingDetachChild    | pendingDetachSelf;
+static constexpr Flag_t focusable        = focusableChild     | focusableSelf;
+static constexpr Flag_t pendingAttach    = pendingAttachChild | pendingAttachSelf;
+static constexpr Flag_t pendingStyle     = pendingStyleChild  | pendingStyleSelf;
+static constexpr Flag_t pendingLayout    = pendingLayoutChild | pendingLayoutSelf;
+static constexpr Flag_t pendingRender    = pendingRenderChild | pendingRenderSelf;
+static constexpr Flag_t pendingDetach    = pendingDetachChild | pendingDetachSelf;
 
 static constexpr Flag_t mask_propagate =
 		focusableChild |
@@ -90,7 +90,12 @@ static constexpr Flag_t mask_self =
 //		parentsDependOnLayout |
 
 		updatedSize |
-		updatedPosition;
+		updatedPosition |
+
+		watchMouseButton |
+		watchMouseScroll |
+		watchMousePosition
+;
 
 static constexpr Flag_t mask_init =
 //		enable |
@@ -106,6 +111,11 @@ static constexpr Flag_t mask_init =
 
 		updatedSize |
 		updatedPosition;
+
+static constexpr Flag_t mask_watchMouse =
+		watchMouseButton |
+		watchMouseScroll |
+		watchMousePosition;
 
 } // namespace flag
 

@@ -68,7 +68,7 @@ public:
 	void setCallback(std::function<void(const EventMouse&)> callback);
 
 private:
-	virtual void onFocusChange(const EventFocus& event) override;
+	virtual void onFocus(const EventFocus& event) override;
 
 private:
 	virtual void doAttach() override;

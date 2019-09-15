@@ -131,14 +131,14 @@ void BaseComponent::eventKey(BaseComponent& component, const libv::input::EventK
 void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current) {
 	{
 		EventFocus event{false, true, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		previous.onFocusChange(event);
+		previous.onFocus(event);
 		previous.flags.reset(Flag::focused);
 	}
 
 	{
 		previous.flags.set(Flag::focused);
 		EventFocus event{true, false, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		current.onFocusChange(event);
+		current.onFocus(event);
 	}
 }
 
@@ -154,8 +154,13 @@ bool BaseComponent::onKey(const libv::input::EventKey& event) {
 	return false;
 }
 
-void BaseComponent::onFocusChange(const EventFocus& event) {
+void BaseComponent::onFocus(const EventFocus& event) {
 	(void) event;
+}
+
+bool BaseComponent::onMouse(const EventMouse& event) {
+	(void) event;
+	return false;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -170,6 +175,20 @@ void BaseComponent::attach(BaseComponent& parent_) {
 		flagParents(flags & Flag::mask_propagate); // Trigger flag propagation
 
 		doAttach();
+
+		if (flags.match_any(Flag::mask_watchMouse)) {
+			auto interest = MouseInterest::none;
+
+			if (flags.match_any(Flag::watchMouseButton))
+				interest |= MouseInterest::mask_button;
+			if (flags.match_any(Flag::watchMousePosition))
+				interest |= MouseInterest::mask_position;
+			if (flags.match_any(Flag::watchMouseScroll))
+				interest |= MouseInterest::mask_scroll;
+
+			context().mouse.subscribe(*this, interest);
+		}
+
 		flags.reset(Flag::pendingAttachSelf);
 	}
 
@@ -201,6 +220,9 @@ void BaseComponent::detach(BaseComponent& parent_) {
 		log_ui.trace("Detaching {}", path());
 
 		doDetach();
+
+		if (flags.match_any(Flag::mask_watchMouse))
+			context().mouse.unsubscribe(*this);
 
 		if (flags.match_any(Flag::focused)) {
 			flags.reset(Flag::focusable);
@@ -298,21 +320,29 @@ void BaseComponent::layout1(const ContextLayout1& environment) {
 
 void BaseComponent::layout2(const ContextLayout2& environment) {
 //	log_ui.trace("Layout Pass2 {}", path());
-	bool dirty = flags.match_any(Flag::pendingLayout);
+	bool boundsChanged = false;
 
 	if (environment.position != position_) {
-		dirty = true;
+		boundsChanged = true;
 		flags.set(Flag::updatedPosition);
 		position_ = environment.position;
 	}
 
 	if (environment.size != size_) {
-		dirty = true;
+		boundsChanged = true;
 		flags.set(Flag::updatedSize);
 		size_ = environment.size;
 	}
 
-	if (dirty) {
+	if (boundsChanged && flags.match_any(Flag::mask_watchMouse)) {
+		context().mouse.update(
+			*this,
+			libv::vec::xy(environment.position),
+			libv::vec::xy(environment.size),
+			environment.mouseOrder);
+	}
+
+	if (boundsChanged || flags.match_any(Flag::pendingLayout)) {
 		this->doLayout2(environment);
 
 		flags.reset(Flag::pendingLayout);

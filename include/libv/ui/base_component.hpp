@@ -31,6 +31,7 @@ class ContextLayout2;
 class ContextRender;
 class ContextUI;
 class EventFocus;
+class EventMouse;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -42,6 +43,7 @@ static constexpr ChildID ChildIDSelf = -2;
 static constexpr ChildID ChildIDNone = -1;
 
 struct BaseComponent {
+	friend class AccessEvent;
 	friend class AccessLayout;
 	friend class AccessParent;
 	friend class AccessRoot;
@@ -130,7 +132,8 @@ private:
 private:
 	virtual bool onChar(const libv::input::EventChar& event); /// returns true if event is absorbed
 	virtual bool onKey(const libv::input::EventKey& event); /// returns true if event is absorbed
-	virtual void onFocusChange(const EventFocus& event);
+	virtual void onFocus(const EventFocus& event);
+	virtual bool onMouse(const EventMouse& event);
 
 private:
 	void attach(BaseComponent& parent);
@@ -163,6 +166,12 @@ private:
 };
 
 // -------------------------------------------------------------------------------------------------
+
+struct AccessEvent {
+	static inline decltype(auto) onMouse(BaseComponent& component, const EventMouse& event) {
+		return component.onMouse(event);
+	}
+};
 
 struct AccessParent {
 	[[nodiscard]] static inline auto& childID(BaseComponent& component) noexcept {
@@ -197,7 +206,7 @@ struct AccessLayout {
 	}
 };
 
-struct AccessRoot : AccessLayout, AccessParent {
+struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	[[nodiscard]] static inline auto& position(BaseComponent& component) noexcept {
 		return component.position_;
 	}

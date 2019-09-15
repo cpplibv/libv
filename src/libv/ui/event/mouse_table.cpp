@@ -11,9 +11,12 @@
 #include <libv/math/vec.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/observer_ref.hpp>
+#include <libv/utility/overload.hpp>
 // std
+#include <variant>
 #include <vector>
 // pro
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/event/mouse_interest.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
@@ -94,21 +97,47 @@ struct ImplMouseTable {
 		libv::vec2f cornerBL;
 		libv::vec2f cornerTR;
 		MouseOrder order;
-		libv::observer_ref<MouseWatcher> watcher;
+		std::variant<
+			libv::observer_ref<MouseWatcher>,
+			libv::observer_ref<BaseComponent>
+		> target;
 
 		bool over = false;
 		bool pendingUpdate = true;
 
 		Entry(MouseInterest_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
-			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), watcher(watcher) { }
+			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target(watcher) { }
+
+		Entry(MouseInterest_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<BaseComponent> component) :
+			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target(component) { }
+
+		inline void notify(const EventMouse& event) const {
+			const auto visitor = libv::overload(
+				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
+					if (watcher->callback)
+						watcher->callback(event);
+				},
+				[&event](const libv::observer_ref<BaseComponent>& component) {
+					AccessEvent::onMouse(*component, event);
+					// <<< P5: return value for shielding is discarded
+				}
+			);
+
+			std::visit(visitor, target);
+		}
+
+		inline bool match(MouseWatcher& watcher) const {
+			return std::holds_alternative<libv::observer_ref<MouseWatcher>>(target)
+					&& std::get<libv::observer_ref<MouseWatcher>>(target) == libv::make_observer_ref(watcher);
+		}
+
+		inline bool match(BaseComponent& component) const {
+			return std::holds_alternative<libv::observer_ref<BaseComponent>>(target)
+					&& std::get<libv::observer_ref<BaseComponent>>(target) == libv::make_observer_ref(component);
+		}
 	};
 
 	std::vector<Entry> entries;
-//	std::vector<uint32_t> updateIDs;
-//	std::vector<uint32_t> newSubscribtionIDs;
-//	std::vector<Update> updates;
-//	std::vector<libv::observer_ref<MouseWatcher>> updates;
-//	std::vector<libv::observer_ref<MouseWatcher>> hits;
 
 	libv::vec2f mouse_position;
 	libv::vec2f scroll_position;
@@ -122,6 +151,10 @@ MouseTable::MouseTable() :
 
 MouseTable::~MouseTable() { }
 
+void MouseTable::subscribe(BaseComponent& component, MouseInterest_t interest) {
+	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
+}
+
 void MouseTable::subscribe(MouseWatcher& watcher, MouseInterest_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
 }
@@ -130,9 +163,23 @@ void MouseTable::subscribe(MouseWatcher& watcher, MouseInterest_t interest, libv
 	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
+void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+		return entry.match(component);
+	});
+
+	if (it == self->entries.end())
+		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+
+	it->cornerBL = position;
+	it->cornerTR = position + size - 1.f;
+	it->order = order;
+	it->pendingUpdate = true;
+}
+
 void MouseTable::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
-		return entry.watcher == libv::make_observer_ref(watcher);
+		return entry.match(watcher);
 	});
 
 	if (it == self->entries.end())
@@ -144,9 +191,20 @@ void MouseTable::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f
 	it->pendingUpdate = true;
 }
 
+void MouseTable::unsubscribe(BaseComponent& component) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+		return entry.match(component);
+	});
+
+	if (it == self->entries.end())
+		return log_ui.warn("Attempted to unsubscribing a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+
+	libv::erase_unstable(self->entries, it);
+}
+
 void MouseTable::unsubscribe(MouseWatcher& watcher) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
-		return entry.watcher == libv::make_observer_ref(watcher);
+		return entry.match(watcher);
 	});
 
 	if (it == self->entries.end())
@@ -158,7 +216,7 @@ void MouseTable::unsubscribe(MouseWatcher& watcher) {
 // -------------------------------------------------------------------------------------------------
 
 void MouseTable::event_enter() {
-	// No-op, mouse position event will take care of it
+	// No-op, the mouse position event that follows will take care of it
 }
 
 void MouseTable::event_leave() {
@@ -198,8 +256,7 @@ void MouseTable::event_leave() {
 		event.enter = false;
 		event.leave = true;
 
-		if (hit.entry->watcher->callback)
-			hit.entry->watcher->callback(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
 	}
 }
 
@@ -239,8 +296,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 
 	// Notify hits in order
 	for (const Hit& hit : hits)
-		if (hit.entry->watcher->callback)
-			hit.entry->watcher->callback(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
 }
 
 void MouseTable::event_position(libv::vec2f position_new) {
@@ -295,8 +351,7 @@ void MouseTable::event_position(libv::vec2f position_new) {
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
-		if (hit.entry->watcher->callback)
-			hit.entry->watcher->callback(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
 	}
 }
 
@@ -336,8 +391,7 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 
 	// Notify hits in order
 	for (const Hit& hit : hits)
-		if (hit.entry->watcher->callback)
-			hit.entry->watcher->callback(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
 }
 
 void MouseTable::event_update() {
@@ -393,8 +447,7 @@ void MouseTable::event_update() {
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
-		if (hit.entry->watcher->callback)
-			hit.entry->watcher->callback(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
 	}
 }
 

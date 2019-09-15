@@ -10,6 +10,7 @@
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
@@ -45,10 +46,6 @@ const std::string& InputField::getText() const {
 	return string.getString();
 }
 
-void InputField::setCallback(std::function<void(const EventMouse&)> callback) {
-	mouseWatcher.callback = std::move(callback);
-}
-
 // -------------------------------------------------------------------------------------------------
 
 bool InputField::onChar(const libv::input::EventChar& event) {
@@ -58,7 +55,7 @@ bool InputField::onChar(const libv::input::EventChar& event) {
 }
 
 bool InputField::onKey(const libv::input::EventKey& event) {
-	if (event.key == libv::input::Key::Backspace) {
+	if (event.key == libv::input::Key::Backspace && event.action != libv::input::Action::release) {
 		string.pop_back();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		return true;
@@ -66,24 +63,26 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	return false;
 }
 
-void InputField::onFocusChange(const EventFocus& event) {
+void InputField::onFocus(const EventFocus& event) {
 	(void) event;
+
+	if (event.loss)
+		{} // Disable cursor
+	if (event.gain)
+		{} // Enable cursor
+}
+
+bool InputField::onMouse(const EventMouse& event) {
+	if (event.isButton())
+		focus();
+
+	return true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void InputField::doAttach() {
-	flagAuto(Flag::focusable);
-
-	context().mouse.subscribe(mouseWatcher, MouseInterest::mask_button | MouseInterest::mask_scroll);
-	mouseWatcher.callback = [this](const EventMouse& mouse) {
-		if (mouse.isButton() || mouse.isScroll())
-			focus();
-	};
-}
-
-void InputField::doDetach() {
-	context().mouse.unsubscribe(mouseWatcher);
+	flagAuto(Flag::focusable | Flag::watchMouseButton);
 }
 
 void InputField::doStyle() {
@@ -148,11 +147,6 @@ void InputField::doLayout1(const ContextLayout1& environment) {
 }
 
 void InputField::doLayout2(const ContextLayout2& environment) {
-	context().mouse.update(
-			mouseWatcher,
-			libv::vec::xy(environment.position),
-			libv::vec::xy(environment.size),
-			environment.mouseOrder);
 	string.setLimit(libv::vec::xy(environment.size));
 }
 

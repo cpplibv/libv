@@ -11,7 +11,6 @@
 #include <string_view>
 // pro
 #include <libv/ui/base_component.hpp>
-#include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
@@ -49,7 +48,6 @@ private:
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	String2D string;
-	MouseWatcher mouseWatcher;
 
 public:
 	libv::ui::PropertySet<PS> properties;
@@ -64,19 +62,14 @@ public:
 	void setText(std::string string_);
 	const std::string& getText() const;
 
-	const std::string& getValue() const;
-
-	// TODO P1: libv.ui Think about a signal-slot pattern very hard
-	void setCallback(std::function<void(const EventMouse&)> callback);
-
 private:
 	virtual bool onChar(const libv::input::EventChar& event) override;
 	virtual bool onKey(const libv::input::EventKey& event) override;
-	virtual void onFocusChange(const EventFocus& event) override;
+	virtual void onFocus(const EventFocus& event) override;
+	virtual bool onMouse(const EventMouse& event) override;
 
 private:
 	virtual void doAttach() override;
-	virtual void doDetach() override;
 	virtual void doStyle() override;
 	virtual void doRender(ContextRender& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
