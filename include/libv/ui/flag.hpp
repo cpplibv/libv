@@ -120,6 +120,14 @@ static constexpr Flag_t mask_watchMouse =
 
 } // namespace flag
 
+constexpr inline Flag_t calculatePropagateFlags(Flag_t flags) noexcept {
+	const auto mask_propagatableSelf = Flag_t{Flag::mask_propagate.value() << 1};
+	const auto propagatableSelf = flags & mask_propagatableSelf;
+	const auto propagatableChild = flags & Flag::mask_propagate;
+
+	return Flag_t{propagatableSelf.value() >> 1} | propagatableChild;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

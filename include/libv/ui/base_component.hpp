@@ -103,9 +103,6 @@ protected:
 	void flagAuto(Flag_t flags_) noexcept;
 	void flagForce(Flag_t flags_) noexcept;
 
-private:
-	Flag_t flagForParent() noexcept;
-
 public:
 	void focus() noexcept;
 	void markRemove() noexcept;

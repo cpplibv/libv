@@ -210,11 +210,10 @@ libv.ui: Question: does style change means property update? | this could be a ra
 libv.ui.event: add a component based mouse event (virtual function) option BESIDE the current watcher one
 libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass | added a component based watcher BESIDE the current watcher one
 libv.ui: consolidate MouseInterest flags
+libv.ui: flags set in ctor -> parent might not get the relevant *child flags, check on propagation (self/child masks)
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui: flags set in ctor -> parent might not get the relevant *child flags, check on propagation (self/child masks)
 libv.ui: component remove / detach does not remove certain flags from parent, parent have to rescan child to determine flags
 libv.ui: with event oriented flags, the flags.reset should be elevated into its own function and should unsub from such events
 libv.ui: with event oriented flags, the flags.set should be elevated into its own function and should sub from such events

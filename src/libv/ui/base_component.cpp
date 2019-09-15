@@ -70,14 +70,6 @@ void BaseComponent::flagForce(Flag_t flags_) noexcept {
 	flagParents(flags_);
 }
 
-Flag_t BaseComponent::flagForParent() noexcept {
-	const auto mask_propagatableSelf = Flag_t{Flag::mask_propagate.value() << 1};
-	const auto propagatableSelf = flags & mask_propagatableSelf;
-	const auto propagatableChild = flags & Flag::mask_propagate;
-
-	return Flag_t{propagatableSelf.value() >> 1} | propagatableChild;
-}
-
 // -------------------------------------------------------------------------------------------------
 
 void BaseComponent::focus() noexcept {
@@ -172,9 +164,9 @@ void BaseComponent::attach(BaseComponent& parent_) {
 
 		log_ui.trace("Attaching {}", path());
 
-		flagParents(flags & Flag::mask_propagate); // Trigger flag propagation
-
 		doAttach();
+
+		flagParents(calculatePropagateFlags(flags)); // Trigger flag propagation
 
 		if (flags.match_any(Flag::mask_watchMouse))
 			context().mouse.subscribe(*this, flags & Flag::mask_watchMouse);
