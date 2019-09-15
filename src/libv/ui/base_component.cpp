@@ -176,18 +176,8 @@ void BaseComponent::attach(BaseComponent& parent_) {
 
 		doAttach();
 
-		if (flags.match_any(Flag::mask_watchMouse)) {
-			auto interest = MouseInterest::none;
-
-			if (flags.match_any(Flag::watchMouseButton))
-				interest |= MouseInterest::mask_button;
-			if (flags.match_any(Flag::watchMousePosition))
-				interest |= MouseInterest::mask_position;
-			if (flags.match_any(Flag::watchMouseScroll))
-				interest |= MouseInterest::mask_scroll;
-
-			context().mouse.subscribe(*this, interest);
-		}
+		if (flags.match_any(Flag::mask_watchMouse))
+			context().mouse.subscribe(*this, flags & Flag::mask_watchMouse);
 
 		flags.reset(Flag::pendingAttachSelf);
 	}

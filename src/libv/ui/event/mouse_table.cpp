@@ -18,7 +18,6 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/event/mouse_interest.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/log.hpp>
 
@@ -93,7 +92,7 @@ namespace ui {
 
 struct ImplMouseTable {
 	struct Entry {
-		MouseInterest_t interest;
+		Flag_t interest;
 		libv::vec2f cornerBL;
 		libv::vec2f cornerTR;
 		MouseOrder order;
@@ -105,10 +104,10 @@ struct ImplMouseTable {
 		bool over = false;
 		bool pendingUpdate = true;
 
-		Entry(MouseInterest_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
+		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
 			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target(watcher) { }
 
-		Entry(MouseInterest_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<BaseComponent> component) :
+		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<BaseComponent> component) :
 			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target(component) { }
 
 		inline void notify(const EventMouse& event) const {
@@ -151,15 +150,15 @@ MouseTable::MouseTable() :
 
 MouseTable::~MouseTable() { }
 
-void MouseTable::subscribe(BaseComponent& component, MouseInterest_t interest) {
+void MouseTable::subscribe(BaseComponent& component, Flag_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
 }
 
-void MouseTable::subscribe(MouseWatcher& watcher, MouseInterest_t interest) {
+void MouseTable::subscribe(MouseWatcher& watcher, Flag_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
 }
 
-void MouseTable::subscribe(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+void MouseTable::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order) {
 	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
@@ -240,7 +239,7 @@ void MouseTable::event_leave() {
 
 		entry.over = false;
 
-		const bool interested = entry.interest.match_any(MouseInterest::leave);
+		const bool interested = entry.interest.match_any(Flag::watchMouseEnter);
 
 		if (interested)
 			hits.emplace_back(libv::make_observer_ref(entry));
@@ -281,10 +280,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 		if (!over)
 			continue;
 
-		const bool interested =
-				(action == libv::input::Action::press && entry.interest.match_any(MouseInterest::press)) ||
-				(action == libv::input::Action::release && entry.interest.match_any(MouseInterest::release));
-
+		const bool interested = entry.interest.match_any(Flag::watchMouseButton);
 		if (interested)
 			hits.emplace_back(libv::make_observer_ref(entry));
 	}
@@ -333,9 +329,8 @@ void MouseTable::event_position(libv::vec2f position_new) {
 		const bool leave = over_old && !over_new;
 
 		const bool interested =
-				entry.interest.match_any(MouseInterest::movement) ||
-				(enter && entry.interest.match_any(MouseInterest::enter)) ||
-				(leave && entry.interest.match_any(MouseInterest::leave));
+				entry.interest.match_any(Flag::watchMousePosition) ||
+				(over_old != over_new && entry.interest.match_any(Flag::watchMouseEnter));
 
 		if (interested)
 			hits.emplace_back(libv::make_observer_ref(entry), enter, leave);
@@ -377,8 +372,7 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 		if (!entry.over)
 			continue;
 
-		const bool interested =
-				entry.interest.match_any(MouseInterest::scroll);
+		const bool interested = entry.interest.match_any(Flag::watchMouseScroll);
 
 		if (interested)
 			hits.emplace_back(libv::make_observer_ref(entry));
@@ -429,9 +423,7 @@ void MouseTable::event_update() {
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		const bool interested =
-				(enter && entry.interest.match_any(MouseInterest::enter)) ||
-				(leave && entry.interest.match_any(MouseInterest::leave));
+		const bool interested = over_old != over_new && entry.interest.match_any(Flag::watchMouseEnter);
 
 		if (interested)
 			hits.emplace_back(libv::make_observer_ref(entry), enter, leave);

@@ -8,8 +8,8 @@
 // std
 #include <memory>
 // pro
-#include <libv/ui/event/mouse_interest.hpp>
 #include <libv/ui/event/mouse_order.hpp>
+#include <libv/ui/flag.hpp>
 
 
 namespace libv {
@@ -29,15 +29,15 @@ public:
 	~MouseTable();
 
 public:
-	void subscribe(BaseComponent& watcher, MouseInterest_t interest);
-	void subscribe(MouseWatcher& watcher, MouseInterest_t interest);
-	void subscribe(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
+	void subscribe(BaseComponent& watcher, Flag_t interest);
+	void subscribe(MouseWatcher& watcher, Flag_t interest);
+	void subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
 	void update(BaseComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
-//	void update(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
-//	void update(MouseWatcher& watcher, MouseInterest_t interest, libv::vec2f position, libv::vec2f size);
-//	void update(MouseWatcher& watcher, MouseInterest_t interest, MouseOrder order);
-//	void update(MouseWatcher& watcher, MouseInterest_t interest);
+//	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
+//	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size);
+//	void update(MouseWatcher& watcher, Flag_t interest, MouseOrder order);
+//	void update(MouseWatcher& watcher, Flag_t interest);
 	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseOrder order);

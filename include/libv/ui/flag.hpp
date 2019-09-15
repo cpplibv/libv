@@ -23,7 +23,7 @@ static constexpr Flag_t render                = libv::bit(1);
 static constexpr Flag_t layout                = libv::bit(2);
 //static constexpr Flag_t ______              = libv::bit(3);
 static constexpr Flag_t focused               = libv::bit(4);
-//static constexpr Flag_t focusLinked           = libv::bit(5);
+//static constexpr Flag_t focusLinked         = libv::bit(5);
 static constexpr Flag_t focusableChild        = libv::bit(6);
 static constexpr Flag_t focusableSelf         = libv::bit(7);
 
@@ -41,18 +41,18 @@ static constexpr Flag_t pendingDetachSelf     = libv::bit(17);
 static constexpr Flag_t pendingCreate         = libv::bit(18);
 //static constexpr Flag_t ______              = libv::bit(19);
 //static constexpr Flag_t ______              = libv::bit(20);
-//static constexpr Flag_t ______              = libv::bit(21);
-//static constexpr Flag_t ______              = libv::bit(22);
-//static constexpr Flag_t parentsDependOnLayout = libv::bit(23); /// Component layout change will affect parent's layout
+//static constexpr Flag_t parentsDependOnLayout = libv::bit(21); /// Component layout change will affect parent's layout
+static constexpr Flag_t updatedSize           = libv::bit(22); /// Component's size was changed since it last render
+static constexpr Flag_t updatedPosition       = libv::bit(23); /// Component's position was changed since it last render
 
-static constexpr Flag_t updatedSize           = libv::bit(24); /// Component's size was changed since it last render
-static constexpr Flag_t updatedPosition       = libv::bit(25); /// Component's position was changed since it last render
-//static constexpr Flag_t watchChar             = libv::bit(26);
-//static constexpr Flag_t watchKey              = libv::bit(27);
-//static constexpr Flag_t watchFocus            = libv::bit(28);
-static constexpr Flag_t watchMouseButton      = libv::bit(29);
+//static constexpr Flag_t watchChar           = libv::bit(24);
+//static constexpr Flag_t watchKey            = libv::bit(25);
+//static constexpr Flag_t watchFocus          = libv::bit(26);
+static constexpr Flag_t watchMouseButton      = libv::bit(27);
+static constexpr Flag_t watchMouseEnter       = libv::bit(28);
+static constexpr Flag_t watchMousePosition    = libv::bit(29);
 static constexpr Flag_t watchMouseScroll      = libv::bit(30);
-static constexpr Flag_t watchMousePosition    = libv::bit(31);
+//static constexpr Flag_t ______              = libv::bit(31);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -114,8 +114,9 @@ static constexpr Flag_t mask_init =
 
 static constexpr Flag_t mask_watchMouse =
 		watchMouseButton |
-		watchMouseScroll |
-		watchMousePosition;
+		watchMouseEnter |
+		watchMousePosition |
+		watchMouseScroll;
 
 } // namespace flag
 

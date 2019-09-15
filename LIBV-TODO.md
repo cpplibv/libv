@@ -209,8 +209,10 @@ libv.ui: remove layout2 pass member variables in component_base
 libv.ui: Question: does style change means property update? | this could be a rare enough event to brute force the whole ui style refresh, but only if its not event driven | style does not change, style change is only supported for debug/development
 libv.ui.event: add a component based mouse event (virtual function) option BESIDE the current watcher one
 libv.ui: automate MouseRegion update, request a component to be passed alongside the watcher, set a flag, if flag set, auto update in layout2 | only works if mouse region matches the component position and size, or if it does a separate pass | added a component based watcher BESIDE the current watcher one
+libv.ui: consolidate MouseInterest flags
 
 --- STACK ------------------------------------------------------------------------------------------
+
 
 libv.ui: flags set in ctor -> parent might not get the relevant *child flags, check on propagation (self/child masks)
 libv.ui: component remove / detach does not remove certain flags from parent, parent have to rescan child to determine flags
@@ -227,6 +229,7 @@ mouse
 	libv.ui: make sure absorb/shield/plates is easy to have/access for even non interactive components
 	libv.ui: mouse event should contain a watcher relative coordinates too
 	libv.ui: updating watcher (any property) without change should not yield any event
+	libv.ui: flatten EventMouse to combat variant complexity
 
 event
 	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe

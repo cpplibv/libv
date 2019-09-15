@@ -73,8 +73,14 @@ void InputField::onFocus(const EventFocus& event) {
 }
 
 bool InputField::onMouse(const EventMouse& event) {
-	if (event.isButton())
+	if (event.isButton() && event.button().action == libv::input::Action::press)
 		focus();
+
+	if (event.isMovement() && event.movement().enter)
+		{} // Set style to hover if not disabled
+
+	if (event.isMovement() && event.movement().leave)
+		{} // Set style to normal or disable
 
 	return true;
 }
