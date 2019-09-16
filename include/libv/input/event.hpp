@@ -10,6 +10,7 @@
 #include <variant>
 #include <vector>
 // pro
+#include <libv/input/event_fwd.hpp>
 #include <libv/input/input.hpp>
 
 

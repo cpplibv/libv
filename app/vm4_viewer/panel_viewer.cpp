@@ -71,10 +71,10 @@ void PanelViewer::doAttach() {
 		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
-		style->set("font_shader", context().shader<libv::ui::ShaderFont>());
+		style->set("font_shader", context().shaderFont());
 		style->set("font_size", libv::ui::FontSize{11});
-		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
-		style->set("quad_shader", context().shader<libv::ui::ShaderQuad>());
+		style->set("image_shader", context().shaderImage());
+		style->set("quad_shader", context().shaderQuad());
 	}
 
 	{
@@ -183,7 +183,7 @@ void PanelViewer::doAttach() {
 //	{
 //		auto style = context().style("vm4pv.info.border");
 //		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-//		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
+//		style->set("image_shader", context().shaderImage());
 //		style->set("image", context().texture2D("stretch_border.png"));
 //		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 //	}
@@ -191,7 +191,7 @@ void PanelViewer::doAttach() {
 	{
 		auto style = context().style("vm4pv.info.slim_border");
 		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
+		style->set("image_shader", context().shaderImage());
 		style->set("image", context().texture2D("slate_line_edge.png"));
 		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 	}
@@ -318,7 +318,7 @@ void PanelViewer::doAttach() {
 //			temp->set(temp->properties.align, libv::ui::AlignHorizontal::Right);
 //			temp->set(temp->properties.font, context().font("consola.ttf"));
 //			temp->set(temp->properties.font_color, libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-//			temp->set(temp->properties.font_shader, context().shader<libv::ui::ShaderFont>());
+//			temp->set(temp->properties.font_shader, context().shaderFont());
 //			temp->set(temp->properties.font_size, libv::ui::FontSize{12});
 //			temp->setText("Model");
 //

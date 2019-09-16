@@ -107,7 +107,7 @@ void QuickFilePicker::doAttach() {
 	{
 		auto style = context().style("vm4pv.info.slim_border");
 		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
+		style->set("image_shader", context().shaderImage());
 		style->set("image", context().texture2D("slate_line_edge.png"));
 		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 	}
@@ -121,7 +121,7 @@ void QuickFilePicker::doAttach() {
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("font_size", libv::ui::FontSize{12});
 		style->set("image", context().texture2D("separator_bar_256x16.png"));
-		style->set("image_shader", context().shader<libv::ui::ShaderImage>());
+		style->set("image_shader", context().shaderImage());
 		style->set("size", libv::ui::parse_size_or_throw("1rD, d"));
 	}
 

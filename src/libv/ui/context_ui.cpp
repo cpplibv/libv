@@ -8,11 +8,21 @@
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
+// std
+#include <filesystem>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <unordered_map>
 // pro
+#include <libv/ui/event/mouse_table.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/raw/font_consolas_min.hpp>
 #include <libv/ui/raw/texture2D_white256.hpp>
+#include <libv/ui/shader/shader_font.hpp>
+#include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 #include <libv/ui/ui.hpp>
@@ -20,6 +30,57 @@
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+struct Settings {
+	struct Resource {
+		std::filesystem::path path; /// Relative resource path base
+		// bool relative_path_only = true; /// Forbid requests with absolute path
+		// bool restict_under_base = true; /// Forbid requests that would leave the base path
+		// bool cache_fallback = true; /// Insert failed resource lookups into cache as the fallback value
+		// bool track_every = false; /// Track every resource and reload resource upon file change
+		// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
+	};
+
+	Resource font = {"res/font"};
+	Resource shader = {"res/shader"};
+	Resource texture = {"res/texture"};
+};
+
+struct ImplContextUI {
+	MouseTable mouse;
+
+	std::shared_ptr<Font2D> fallback_font;
+	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;
+
+	std::shared_ptr<Texture2D> fallback_texture2D;
+	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
+
+	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+
+//	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
+//	std::unordered_map<TypeInfoRef, std::weak_ptr<Shader>, TypeInfoRefHasher, TypeInfoRefEqualTo> cache_typed_shader;
+
+	std::weak_ptr<ShaderFont> shader_font;
+	std::weak_ptr<ShaderImage> shader_image;
+	std::weak_ptr<ShaderQuad> shader_quad;
+
+	Settings settings; // TODO P5: move Settings to UI, or just get settings from the UI in the ctor
+
+public:
+	template <typename T>
+	std::shared_ptr<T> getShader(std::weak_ptr<T>& wp, const std::string_view name) {
+		auto sp = wp.lock();
+		if (sp) {
+			log_ui.trace("Shader cache hit for: {}", name);
+		} else {
+			log_ui.trace("Shader cache miss for: {}", name);
+			wp = sp = std::make_shared<T>();
+		}
+		return sp;
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -66,49 +127,34 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 
 // -------------------------------------------------------------------------------------------------
 
-ContextUI::ContextUI(
-		UI& ui,
-		const std::filesystem::path& path_base,
-		const std::filesystem::path& path_fonts,
-		const std::filesystem::path& path_shaders,
-		const std::filesystem::path& path_textures) :
-	ui(ui) {
+ContextUI::ContextUI(UI& ui) :
+	self(std::make_unique<ImplContextUI>()),
+	ui(ui),
+	mouse(self->mouse) {
 
-	std::error_code ec;
-	auto res = std::filesystem::canonical(path_base, ec);
-	log_ui.info_if(!ec, "Using resource folder: {}", libv::generic_path(res));
-	log_ui.error_if(ec, "Failed to determining resource folder for {}: {} {}.", libv::generic_path(path_base), ec, ec.message());
-
-	this->path_fonts = std::filesystem::canonical(res / path_fonts, ec);
-	log_ui.info_if(!ec, "Using font resource folder: {}", libv::generic_path(this->path_fonts));
-	log_ui.error_if(ec, "Failed to determining font folder for {}: {} {}.", libv::generic_path(res / path_fonts), ec, ec.message());
-
-	this->path_shaders = std::filesystem::canonical(res / path_shaders, ec);
-	log_ui.info_if(!ec, "Using shader resource folder: {}", libv::generic_path(this->path_shaders));
-	log_ui.error_if(ec, "Failed to determining shader folder for {}: {} {}.", libv::generic_path(res / path_shaders), ec, ec.message());
-
-	this->path_textures = std::filesystem::canonical(res / path_textures, ec);
-	log_ui.info_if(!ec, "Using texture resource folder: {}", libv::generic_path(this->path_textures));
-	log_ui.error_if(ec, "Failed to determining texture folder for {}: {} {}.", libv::generic_path(res / path_textures), ec, ec.message());
+	log_ui.info("Resource base font:    {}", libv::generic_path(self->settings.font.path));
+	log_ui.info("Resource base shader:  {}", libv::generic_path(self->settings.shader.path));
+	log_ui.info("Resource base texture: {}", libv::generic_path(self->settings.texture.path));
 
 	const auto fallback_font_data = raw_font_consolas_min();
-	fallback_font = std::make_shared<Font2D>(
+	self->fallback_font = std::make_shared<Font2D>(
 			std::string{reinterpret_cast<const char*>(fallback_font_data.first), fallback_font_data.second}
 	);
 
 	const auto fallback_texture2D_data = raw_texture2D_white256();
-	fallback_texture2D = std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
+	self->fallback_texture2D = std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
 			{reinterpret_cast<const char*>(fallback_texture2D_data.first), fallback_texture2D_data.second})
 	);
 }
 
 ContextUI::~ContextUI() {
+	// For forward declared unique_ptr
 }
 
 // -------------------------------------------------------------------------------------------------
 
 bool ContextUI::isAnyStyleDirty() const noexcept {
-	for (const auto& [_, style_] : styles)
+	for (const auto& [_, style_] : self->styles)
 		if (style_->isDirty())
 			return true;
 
@@ -116,7 +162,7 @@ bool ContextUI::isAnyStyleDirty() const noexcept {
 }
 
 void ContextUI::clearEveryStyleDirty() noexcept {
-	for (const auto& [_, style_] : styles)
+	for (const auto& [_, style_] : self->styles)
 		style_->clearDirty();
 }
 
@@ -140,11 +186,10 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 	std::shared_ptr<Font2D> sp;
 
 	const auto lexically_normal = path.lexically_normal();
-//	auto key = lexically_normal.generic_u8string();
 	auto key = libv::generic_path(lexically_normal);
 
-	const auto it = cache_font.find(key);
-	if (it != cache_font.end()) {
+	const auto it = self->cache_font.find(key);
+	if (it != self->cache_font.end()) {
 		sp = it->second.lock();
 		if (sp) {
 			// Cache hit
@@ -154,7 +199,7 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 		} else {
 			// Cache expired
 			log_ui.trace("Font cache expired for: {} as {}", libv::generic_path(path), key);
-			cache_font.erase(it);
+			self->cache_font.erase(it);
 		}
 	} else {
 		// Cache miss
@@ -163,11 +208,11 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 
 	libv::Timer timer;
 
-	const auto target = path_fonts / lexically_normal;
+	const auto target = self->settings.font.path / lexically_normal;
 
-	if (!secure_path(path_fonts, target, lexically_normal)) {
+	if (!secure_path(self->settings.font.path, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback font");
-		sp = fallback_font;
+		sp = self->fallback_font;
 		return sp;
 	}
 
@@ -176,7 +221,7 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
 		log_ui.error("Failed to read font file: {}: {} {}. Using fallback font", libv::generic_path(target), file.ec, file.ec.message());
-		sp = fallback_font;
+		sp = self->fallback_font;
 		return sp;
 	}
 
@@ -188,7 +233,7 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 	log_ui.trace("Font loaded: scan:{:5.1f}ms, read:{:5.1f}ms, load:{:5.1f}ms for {} as {}",
 			time_scan.count(), time_read.count(), time_load.count(), libv::generic_path(path), key);
 
-	cache_font.emplace(std::move(key), sp);
+	self->cache_font.emplace(std::move(key), sp);
 	return sp;
 }
 
@@ -199,8 +244,8 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 //	auto key = lexically_normal.generic_u8string();
 	auto key = libv::generic_path(lexically_normal);
 
-	const auto it = cache_texture2D.find(key);
-	if (it != cache_texture2D.end()) {
+	const auto it = self->cache_texture2D.find(key);
+	if (it != self->cache_texture2D.end()) {
 		sp = it->second.lock();
 		if (sp) {
 			// Cache hit
@@ -210,7 +255,7 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 		} else {
 			// Cache expired
 			log_ui.trace("Texture2D cache expired for: {} as {}", libv::generic_path(path), key);
-			cache_texture2D.erase(it);
+			self->cache_texture2D.erase(it);
 		}
 	} else {
 		// Cache miss
@@ -219,11 +264,11 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 
 	libv::Timer timer;
 
-	const auto target = path_textures / lexically_normal;
+	const auto target = self->settings.texture.path / lexically_normal;
 
-	if (!secure_path(path_textures, target, lexically_normal)) {
+	if (!secure_path(self->settings.texture.path, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback texture2D");
-		sp = fallback_texture2D;
+		sp = self->fallback_texture2D;
 		return sp;
 	}
 
@@ -232,7 +277,7 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	auto file = libv::read_file_ec(target);
 	if (file.ec) {
 		log_ui.error("Failed to read texture2D file: {}: {} {}. Using fallback texture2D", libv::generic_path(target), file.ec, file.ec.message());
-		sp = fallback_texture2D;
+		sp = self->fallback_texture2D;
 		return sp;
 	}
 
@@ -241,7 +286,7 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	auto image = libv::gl::load_image(file.data);
 	if (!image) {
 		log_ui.error("Failed to load texture2D file: {}. Using fallback texture2D", libv::generic_path(target));
-		sp = fallback_texture2D;
+		sp = self->fallback_texture2D;
 		return sp;
 	}
 
@@ -251,17 +296,17 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	log_ui.trace("Texture2D loaded: scan:{:5.1f}ms, read:{:5.1f}ms, create:{:5.1f}ms for {} as {}",
 			time_scan.count(), time_read.count(), time_load.count(), libv::generic_path(path), key);
 
-	cache_texture2D.emplace(std::move(key), sp);
+	self->cache_texture2D.emplace(std::move(key), sp);
 	return sp;
 }
 
 libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
 	// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
-	const auto it = styles.find(std::string(style_name));
-	if (it != styles.end())
+	const auto it = self->styles.find(std::string(style_name));
+	if (it != self->styles.end())
 		return it->second;
 
-	const auto result = styles.emplace(style_name, libv::make_intrusive<Style>(std::string(style_name))).first->second;
+	const auto result = self->styles.emplace(style_name, libv::make_intrusive<Style>(std::string(style_name))).first->second;
 	const auto lastDot = style_name.rfind('.');
 
 	// Auto inherit based on dot naming hierarchy
@@ -271,6 +316,42 @@ libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
 	log_ui.trace("Created style {}", style_name);
 
 	return result;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::shared_ptr<ShaderFont> ContextUI::shaderFont() {
+	return self->getShader(self->shader_font, "ShaderFont");
+}
+
+std::shared_ptr<ShaderImage> ContextUI::shaderImage() {
+	return self->getShader(self->shader_image, "ShaderImage");
+}
+
+std::shared_ptr<ShaderQuad> ContextUI::shaderQuad() {
+	return self->getShader(self->shader_quad, "ShaderQuad");
+}
+
+//std::shared_ptr<Shader> ContextUI::shader(const std::string& name) {
+//	// Not implemented yet.
+//}
+//
+//std::shared_ptr<ShaderFont> ContextUI::shaderFont(const std::string_view name) {
+//	// Not implemented yet.
+//}
+//
+//std::shared_ptr<ShaderImage> ContextUI::shaderImage(const std::string_view name) {
+//	// Not implemented yet.
+//}
+//
+//std::shared_ptr<ShaderQuad> ContextUI::shaderQuad(const std::string_view name) {
+//	// Not implemented yet.
+//}
+
+// -------------------------------------------------------------------------------------------------
+
+std::shared_ptr<Texture2D> ContextUI::getFallbackTexture2D() const {
+	return self->fallback_texture2D;
 }
 
 // -------------------------------------------------------------------------------------------------

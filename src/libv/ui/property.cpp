@@ -23,15 +23,15 @@ PropertyFont::value_type PropertyFont::fallback(ContextUI& context) {
 }
 
 PropertyShaderFont::value_type PropertyShaderFont::fallback(ContextUI& context) {
-	return context.template shader<ShaderFont>();
+	return context.shaderFont();
 }
 
 PropertyShaderImage::value_type PropertyShaderImage::fallback(ContextUI& context) {
-	return context.template shader<ShaderImage>();
+	return context.shaderImage();
 }
 
 PropertyShaderQuad::value_type PropertyShaderQuad::fallback(ContextUI& context) {
-	return context.template shader<ShaderQuad>();
+	return context.shaderQuad();
 }
 
 //Flag_t PropertySize::invalidate(const value_type& value) {
