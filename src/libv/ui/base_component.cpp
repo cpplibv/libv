@@ -226,7 +226,7 @@ void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current)
 	{
 		current.flags.set(Flag::focused);
 		EventFocus event{true, false, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		if (previous.flags.match_any(Flag::watchFocus))
+		if (current.flags.match_any(Flag::watchFocus))
 			current.onFocus(event);
 	}
 }
