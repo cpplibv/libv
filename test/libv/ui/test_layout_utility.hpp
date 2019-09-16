@@ -7,6 +7,7 @@
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/style.hpp>
 #include <libv/utility/approx.hpp>
 // std
 #include <memory>

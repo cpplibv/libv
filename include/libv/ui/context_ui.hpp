@@ -10,7 +10,7 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/ui/style.hpp> // <<< P5: remove in favor of a fwd
+#include <libv/ui/style_fwd.hpp>
 
 
 namespace libv {

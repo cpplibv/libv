@@ -8,6 +8,7 @@
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 
 

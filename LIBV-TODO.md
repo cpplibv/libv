@@ -217,34 +217,33 @@ libv.ui: event oriented flags, reset should unsub from events | solved by separa
 libv.ui: event oriented flags, set should sub for events | solved by separate set/get and flagPurge
 libv.ui: focus, key and char watcher and dynamic change of them
 libv.ui: pimpl ContextUI
+libv.ui: style should be forward declared
 
 --- STACK ------------------------------------------------------------------------------------------
 
+libv.ui: Input field have/display cursor
 
-libv.ui: style should be forward declared, figure out intrusive_ptr forward declaration
-libv.ui: cleanup context_ui redundant codes
+libv.ui: layout padding
 
+libv.ui: direct access font texture | i think this will also improve texture bind codes, making them more uniform
 
 mouse
+	libv.ui: flatten - flatten EventMouse to combat variant complexity
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
 	libv.ui: absorb - mouse event absorb/shield/plates
 	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 	libv.ui: relative - mouse event should contain a watcher relative coordinates too
-	libv.ui: unchanged - updating watcher (any property) without change should not yield any event
-	libv.ui: flatten - flatten EventMouse to combat variant complexity
+	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
 
 event
 	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
-	libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
 interactive
-	libv.ui: Input field have/display cursor
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui: implement button (and other interactive component) callback system aka: signal-slot
 
 component
-	libv.ui: layout padding
 	libv.ui: atlas definition/parsing
 	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
 	libv.ui: support atlas based images
@@ -265,7 +264,6 @@ properties / style
 	libv.ui.style: verify that style change in child causes restyle in parent
 
 debug
-	libv.ui: direct access font texture | i think this will also improve texture bind codes, making them more uniform
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
@@ -279,6 +277,7 @@ ui
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
+	libv.ui: cleanup context_ui redundant codes
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
@@ -437,6 +436,7 @@ libv.ecui: state based ui, separate control and data!
 libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
 libv.frame: cleanup monitor, provide a thread-safe access to monitors list
 libv.frame: cleanup global variables, at least place them next to each other and reason about thread access
+libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
 
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 

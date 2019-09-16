@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/style_fwd.hpp>
 // ext
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
@@ -26,7 +28,12 @@ namespace ui {
 
 class BaseComponent;
 
-class Style : public libv::intrusive_base_unsafe<Style> {
+class Style {
+private:
+	int32_t ref_count = 0;
+	friend void intrusive_ptr_add_ref(Style*);
+	friend void intrusive_ptr_release(Style*);
+
 private:
 	bool dirty_ = false;
 	std::vector<libv::intrusive_ref<Style>> parents;

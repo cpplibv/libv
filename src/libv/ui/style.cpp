@@ -95,5 +95,16 @@ const PropertyDynamic& Style::get_or_throw(const std::string_view property) cons
 
 // -------------------------------------------------------------------------------------------------
 
+void intrusive_ptr_add_ref(Style* style) {
+	++style->ref_count;
+}
+
+void intrusive_ptr_release(Style* style) {
+	if (--style->ref_count == 0)
+		delete style;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 } // namespace ui
 } // namespace libv

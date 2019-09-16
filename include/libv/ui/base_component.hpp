@@ -16,8 +16,9 @@
 #include <type_traits>
 // pro
 #include <libv/ui/flag.hpp>
+#include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
-#include <libv/ui/style.hpp>
+#include <libv/ui/style_fwd.hpp>
 
 
 namespace libv {
@@ -124,10 +125,13 @@ public:
 public:
 	template <typename Property>
 	inline void set(Property& property, typename Property::value_type value);
-	template <typename PS>
+
+	template <typename PS, auto delay = [](Style& v) { return v; }>
 	inline void set(PropertySet<PS>& properties);
-	template <typename Property>
+
+	template <typename Property, auto delay = [](Style& v) { return v; }>
 	inline void reset(Property& property);
+
 	template <typename Property>
 	[[nodiscard]] inline const typename Property::value_type& value(Property& property) const;
 
@@ -276,7 +280,7 @@ inline void BaseComponent::set(Property& property, typename Property::value_type
 	}
 }
 
-template <typename PS>
+template <typename PS, auto delay>
 inline void BaseComponent::set(PropertySet<PS>& properties) {
 	// TODO P5: I think it is possible to "type erase" these style set functions with a minimal code on the user site (? template instantiated function pointers)
 	if (style_ == nullptr) {
@@ -311,7 +315,7 @@ inline void BaseComponent::set(PropertySet<PS>& properties) {
 
 			value_type value;
 
-			const auto& value_by_style = style_->get_optional<value_type>(property.name);
+			const auto& value_by_style = delay(*style_).template get_optional<value_type>(property.name);
 			if (value_by_style)
 				value = *value_by_style;
 			else
@@ -330,7 +334,7 @@ inline void BaseComponent::set(PropertySet<PS>& properties) {
 	}
 }
 
-template <typename Property>
+template <typename Property, auto delay>
 inline void BaseComponent::reset(Property& property) {
 	using value_type = typename Property::value_type;
 	constexpr bool is_fallback_function = std::is_invocable_v<decltype(property.fallback), ContextUI&>;
@@ -347,7 +351,7 @@ inline void BaseComponent::reset(Property& property) {
 		else
 			value = property.fallback;
 	} else {
-		const auto& value_by_style = style_->get_optional<value_type>(property.name);
+		const auto& value_by_style = delay(*style_).template get_optional<value_type>(property.name);
 		if (value_by_style)
 			value = *value_by_style;
 		else

@@ -8,6 +8,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
+#include <libv/ui/style.hpp>
 
 
 namespace libv {

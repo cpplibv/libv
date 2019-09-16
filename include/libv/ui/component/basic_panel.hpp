@@ -13,6 +13,7 @@
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/style.hpp>
 
 
 namespace libv {
