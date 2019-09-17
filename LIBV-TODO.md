@@ -218,10 +218,11 @@ libv.ui: event oriented flags, set should sub for events | solved by separate se
 libv.ui: focus, key and char watcher and dynamic change of them
 libv.ui: pimpl ContextUI
 libv.ui: style should be forward declared
+libv.ui: Input field have/display cursor
 
 --- STACK ------------------------------------------------------------------------------------------
 
-libv.ui: Input field have/display cursor
+libv.ui: Position InputField cursor correctly
 
 libv.ui: layout padding
 
@@ -295,6 +296,10 @@ hotkey
 	libv.ui.hotkey: ui.new-line = enter
 	libv.ui.hotkey: ui.select = space
 	libv.ui.hotkey: ui.send = ctrl+enter
+	libv.ui.hotkey: ui.text.cursor-down = down
+	libv.ui.hotkey: ui.text.cursor-left = left
+	libv.ui.hotkey: ui.text.cursor-right = right
+	libv.ui.hotkey: ui.text.cursor-up = up
 	libv.ui.hotkey: ui.text.jump-end = end
 	libv.ui.hotkey: ui.text.jump-home = home
 	libv.ui.hotkey: ui.text.remove-backward = backspace
@@ -307,8 +312,8 @@ hotkey
 	libv.ui.hotkey: ui.text.select-word = lmb, lmb
 	libv.ui.hotkey: ui.text.select-word-left = ctrl+shift+left
 	libv.ui.hotkey: ui.text.select-word-right = ctrl+shift+right
-	libv.ui.hotkey: ui.redo = ctrl+[y]
-	libv.ui.hotkey: ui.undo = ctrl+[z]
+	libv.ui.hotkey: ui.redo = ctrl+[y] // logical y key
+	libv.ui.hotkey: ui.undo = ctrl+[z] // logical z key
 	libv.ui.hotkey: ui.redo-non-destructive // emacs style redo, not the default
 	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
 

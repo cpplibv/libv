@@ -362,24 +362,22 @@ libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocus
 }
 
 void BaseComponent::render(ContextRender& context) {
-	ContextRender currentContext{
-		context.gl,
-		flags.match_any(Flag::updatedPosition | Flag::updatedSize),
-		flags.match_any(Flag::updatedPosition),
-		flags.match_any(Flag::updatedSize)};
-
 	if (isRendered()) {
+		context.changedLayout = flags.match_any(Flag::updatedPosition | Flag::updatedSize);
+		context.changedPosition = flags.match_any(Flag::updatedPosition);
+		context.changedSize = flags.match_any(Flag::updatedSize);
+
 		if (flags.match_any(Flag::pendingCreate)) {
-			doCreate(currentContext);
+			doCreate(context);
 			flags.reset(Flag::pendingCreate);
 		}
 
 		{
 	//	if (flags.match_any(Flag::pendingRender)) {
-			doRender(currentContext);
+			doRender(context);
 
-			doForeachChildren([&currentContext](BaseComponent& child) {
-				child.render(currentContext);
+			doForeachChildren([&context](BaseComponent& child) {
+				child.render(context);
 			});
 	//		flags.reset(Flag::pendingRender);
 		}
@@ -388,7 +386,7 @@ void BaseComponent::render(ContextRender& context) {
 	}
 
 	if (flags.match_any(Flag::pendingDetachSelf)) {
-		doDestroy(currentContext);
+		doDestroy(context);
 		return;
 	}
 }

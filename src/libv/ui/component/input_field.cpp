@@ -16,6 +16,7 @@
 #include <libv/ui/property.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
+#include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 
@@ -66,9 +67,14 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 
 void InputField::onFocus(const EventFocus& event) {
 	if (event.loss)
-		{} // Disable cursor
-	if (event.gain)
-		{} // Enable cursor
+		displayCursor = false;
+
+	if (event.gain) {
+		displayCursor = true;
+		cursorStartTime = clock::now();
+	}
+
+	flagAuto(Flag::pendingRender);
 }
 
 bool InputField::onMouse(const EventMouse& event) {
@@ -117,6 +123,27 @@ void InputField::doRender(ContextRender& context) {
 		index.quad(0, 1, 2, 3);
 	}
 
+//	if (true) { // TODO P5: on Font or on FontSize change would be the correct condition
+	if (context.changedSize) {
+		cursor_mesh.clear();
+		auto pos = cursor_mesh.attribute(attribute_position);
+		auto index = cursor_mesh.index();
+
+		const auto cursorHeight = properties.font()->getLineAdvance(properties.font_size());
+		// <<< P5: ui.settings for cursorWidth
+		const auto cursorWidth = std::floor(std::min((cursorHeight - 12.f) / 24.f + 2.f, 5.f));
+
+		// 3-2
+		// |/|
+		// 0-1
+		pos(0, 0, 0);
+		pos(cursorWidth, 0, 0);
+		pos(cursorWidth, cursorHeight, 0);
+		pos(0, cursorHeight, 0);
+
+		index.quad(0, 1, 2, 3);
+	}
+
 	const auto guard_m = context.gl.model.push_guard();
  	context.gl.model.translate(position());
 
@@ -141,6 +168,23 @@ void InputField::doRender(ContextRender& context) {
 		context.gl.uniform(properties.font_shader()->uniform_MVPmat, context.gl.mvp());
 		string.render(context.gl);
 	//	context.gl.render(string.mesh);
+	}
+
+	// <<< P3: ui.settings for cursor periods
+	constexpr auto cursor_show_period = std::chrono::milliseconds(350);
+	constexpr auto cursor_hide_period = std::chrono::milliseconds(350);
+
+	constexpr auto cursor_flash_period = cursor_show_period + cursor_hide_period;
+	const auto cursor_flash_iteration = time_mod(context.now - cursorStartTime, cursor_flash_period);
+
+	if (displayCursor && cursor_flash_iteration < cursor_show_period) {
+//		context.gl.model.translate(string.getPen());
+
+		context.gl.program(*properties.cursor_shader());
+		context.gl.uniform(properties.cursor_shader()->uniform_color, properties.font_color());
+//		context.gl.uniform(properties.cursor_shader()->uniform_color, properties.cursor_color()); // <<< P4: property name collusion
+		context.gl.uniform(properties.cursor_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.render(cursor_mesh);
 	}
 }
 

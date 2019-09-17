@@ -194,7 +194,7 @@ void String2D::layout() {
 	auto pen = libv::vec2f{0, heightAdjusment};
 	auto previousCodepoint = uint32_t{'\n'};
 	auto lines = boost::container::small_vector<Line, 1>{1};
-	auto line = observer_ref<Line>{lines.data()};
+	auto line = libv::observer_ref<Line>{lines.data()};
 	auto contentWidth = limit.x;
 
 	const auto finishLine = [&] {

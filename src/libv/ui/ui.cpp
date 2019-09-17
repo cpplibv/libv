@@ -14,6 +14,7 @@
 #include <variant>
 #include <vector>
 // pro
+#include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
@@ -258,7 +259,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 		gl.viewport(xy(AccessRoot::position(self->root)), xy(AccessRoot::size(self->root)));
 
-		ContextRender context{gl};
+		ContextRender context{gl, clock::now()};
 //		AccessRoot::create(self->root, context);
 		AccessRoot::render(self->root, context);
 //		AccessRoot::destroy(self->root, context);
@@ -273,7 +274,7 @@ void UI::destroy(libv::glr::Queue& gl) {
 
 	{
 		// --- Render ---
-		ContextRender context{gl};
+		ContextRender context{gl, clock::now()};
 		AccessRoot::render(self->root, context);
 	} {
 		// --- Detach ---

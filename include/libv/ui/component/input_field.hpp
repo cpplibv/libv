@@ -11,6 +11,7 @@
 #include <string_view>
 // pro
 #include <libv/ui/base_component.hpp>
+#include <libv/ui/chrono.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
@@ -34,6 +35,9 @@ private:
 		PropertyFontSize font_size;
 		PropertyShaderFont font_shader;
 
+//		PropertyColor cursor_color;
+		PropertyShaderQuad cursor_shader;
+
 		LIBV_REFLECTION_ACCESS(color);
 		LIBV_REFLECTION_ACCESS(image);
 		LIBV_REFLECTION_ACCESS(image_shader);
@@ -43,11 +47,19 @@ private:
 		LIBV_REFLECTION_ACCESS(font_color);
 		LIBV_REFLECTION_ACCESS(font_size);
 		LIBV_REFLECTION_ACCESS(font_shader);
+
+//		LIBV_REFLECTION_ACCESS(cursor_color);
+		LIBV_REFLECTION_ACCESS(cursor_shader);
 	};
 
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh cursor_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	String2D string;
+
+private:
+	bool displayCursor = false;
+	time_point cursorStartTime;
 
 public:
 	libv::ui::PropertySet<PS> properties;

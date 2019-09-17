@@ -27,6 +27,16 @@ struct clock {
 using time_duration = clock::duration;
 using time_point = clock::time_point;
 
+template <typename RepX, typename PeriodX, typename RepY, typename PeriodY>
+constexpr inline auto time_mod(std::chrono::duration<RepX, PeriodX> x, std::chrono::duration<RepY, PeriodY> y) noexcept {
+	using common_type = std::common_type_t<decltype(x), decltype(y)>;
+
+	common_type commonX{x};
+	common_type commonY{y};
+
+	return common_type{std::fmod(commonX.count(), commonY.count())};
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

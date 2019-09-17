@@ -8,6 +8,8 @@
 #include <libv/glr/queue_fwd.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
 #include <libv/math/vec.hpp>
+// pro
+#include <libv/ui/chrono.hpp>
 
 
 namespace libv {
@@ -33,6 +35,7 @@ constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 
 struct ContextRender {
 	libv::glr::Queue& gl;
+	time_point now;
 	bool changedLayout = false;   /// Components size or position has changed since last render call
 	bool changedPosition = false; /// Components position has changed since last render call
 	bool changedSize = false;     /// Components size has changed since last render call
