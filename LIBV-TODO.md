@@ -220,13 +220,20 @@ libv.ui: pimpl ContextUI
 libv.ui: style should be forward declared
 libv.ui: Input field have/display cursor
 libv.ui: direct access font texture | i think this will also improve texture bind codes, making them more uniform
+libv.ui: Position InputField cursor correctly
+libv.ui: Stream2D move back to utf8
+libv.ui: Stream2D merge back to String2D
+libv.ui: Shelf Stream2D as StringU2D
+libv.ui: String2D API get position of character between space, by index: 0 = before first char, 1 = before second char, size() and size()+k = after last character
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: String2D API is not enough to determine cursor position, flip it inside out (?)
-libv.ui: Position InputField cursor correctly
+libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
+
+libv.ui.style: mouse style code out of component_base (inside doStyle instead of change to an external thing)
+libv.ui.property: move around property system a bit > instead of reflection inside doStyle, use two function (?) Am I really .. (?) | the aim is to remove the necessity of actually storing the property
 
 libv.ui: layout padding
 
@@ -241,10 +248,6 @@ mouse
 event
 	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
-
-interactive
-	libv.ui: Make a sandbox for a input->button->label->list
-	libv.ui: implement button (and other interactive component) callback system aka: signal-slot
 
 component
 	libv.ui: atlas definition/parsing
@@ -270,19 +273,32 @@ debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
-cleanup
-	libv.ui: remove layout1 pass member variables in component_base
-	libv.ui: doLayout1 should use the return channel instead of member cache
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
-
 ui
+	libv.ui: on property change event / virtual function (?) called before layout1 if there was any change
 	libv.ui: static_component system
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
+
+cleanup
+	libv.ui: remove layout1 pass member variables in component_base
+	libv.ui: doLayout1 should use the return channel instead of member cache
+	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
+	libv.ui.font: line 179 not just log but return default on error
 
 --- [[[ deadline: 2019.09.30 ]]] ---
+
+interactive
+	libv.ui: String2D API to find nearest character position
+	libv.ui: Make a sandbox for a input->button->label->list
+	libv.ui: callback system for button (and other interactive component) aka: signal-slot
+	libv.ui.input_field: paste support
+	libv.ui.input_field: selection support
+	libv.ui.input_field: copy support
+	libv.ui.input_field: undo/redo support
+	libv.ui.input_field: input mask (this will possibly a different input_field type)
+	libv.ui.input_field: if text does not fit, crop/layer it and only display around cursor
 
 hotkey
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
@@ -344,12 +360,18 @@ libv.console: should depend on libv.arg
 
 libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
 
+libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
 --- [[[ deadline: 2019.10.31 ]]] ---
 
 libv.math: create vec_fwd and mat_fwd headers
+
+libv.gl: Implement a GLSL engine
+libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
+libv.gl.glsl: Warning option for crlf line ending.
+libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
 
 libv.ui: lua binding | or rather a lua component or prototype parsing
 libv.ui: make sandbox_ui.lua work
@@ -384,6 +406,8 @@ libv.ui: Docker layout with movable components (frames), who handles which respo
 libv.ui: group: RadioButton
 libv.ui: Splitter
 libv.ui: composite: TextField (Label, TableImage, Label, +Events)
+
+libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations
 
 libv.utility: add/verify structured binding support for vec_t
 
@@ -449,7 +473,6 @@ libv.frame.input: Question should I couple scancode with key for each key states
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 
 libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
-
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -1152,6 +1175,61 @@ wish_create_library(
 	TARGET vm4imp
 	LINK PUBLIC libv::log libv::vm4 ext::assimp
 )
+
+// --- GLSL Pre-processor --------------------------------------------------------------------------
+
+correct regex for include = R"qq(^[ \t]*#[ \t]*include[ \t]+(?:"(.*)"|<(.*)>).*)qq";
+
+auto foo(const std::string_view subject) {
+    return ctre::match<R"qq(^[ \t]*#[ \t]*include[ \t]+(?:"(.*)"|<(.*)>).*)qq">(subject);
+}
+
+std::optional<std::string_view> extract_number(std::string_view s) noexcept {
+	if (auto m = ctre::match<"[a-z]+([0-9]+)">(s)) {
+        return m.get<1>().to_view();
+    } else {
+        return std::nullopt;
+    }
+}
+
+std::string Shader::PreprocessIncludes(const std::string& source, const boost::filesystem::path& filename, int level /*= 0 */ ) {
+	PrintIndent();
+	if(level > 32)
+		LogAndThrow(ShaderException,"header inclusion depth limit reached, might be caused by cyclic header inclusion");
+	using namespace std;
+
+	static const boost::regex re("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
+	stringstream input;
+	stringstream output;
+	input << source;
+
+	size_t line_number = 1;
+	boost::smatch matches;
+
+	string line;
+	while(std::getline(input, line)) {
+		if (boost::regex_search(line, matches, re)) {
+			std::string include_file = matches[1];
+			std::string include_string;
+
+			try {
+				include_string = Core::FileIO::LoadTextFile(include_file);
+			} catch (Core::FileIO::FileNotFoundException& e) {
+				stringstream str;
+				str << filename.file_string() <<"(" << line_number << ") : fatal error: cannot open include file " << e.File();
+				LogAndThrow(ShaderException,str.str())
+			}
+			output << PreprocessIncludes(include_string, include_file, level + 1) << endl;
+																					// Why not here? (and as the first line)
+		} else {
+			output << "#line "<< line_number << " \"" << filename << "\"" << endl; // Why here? ^^^
+			output << line << endl;
+		}
+		++line_number;
+	}
+	PrintUnindent();
+	return output.str();
+}
 
 // -------------------------------------------------------------------------------------------------
 

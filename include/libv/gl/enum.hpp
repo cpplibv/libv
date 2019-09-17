@@ -263,9 +263,9 @@ enum class FormatBase : GLenum {
 	RG = 0x8227, /// GL_RG
 	RGB = 0x1907, /// GL_RGB
 	RGBA = 0x1908, /// GL_RGBA
-	DEPTH_COMPONENT = 0x1902, /// GL_DEPTH_COMPONENT
+	DEPTH = 0x1902, /// GL_DEPTH_COMPONENT
 	DEPTH_STENCIL = 0x84F9, /// GL_DEPTH_STENCIL
-	STENCIL_INDEX = 0x1901, /// GL_STENCIL_INDEX
+	STENCIL = 0x1901, /// GL_STENCIL_INDEX
 };
 
 enum class FormatCompressed : GLenum {
@@ -385,19 +385,19 @@ constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	case FormatBase::RG: return 2;
 	case FormatBase::RGB: return 3;
 	case FormatBase::RGBA: return 4;
-	case FormatBase::DEPTH_COMPONENT: return 1;
+	case FormatBase::DEPTH: return 1;
 	case FormatBase::DEPTH_STENCIL: return 2;
-	case FormatBase::STENCIL_INDEX: return 1;
+	case FormatBase::STENCIL: return 1;
 	}
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatDepth format) noexcept {
 	switch (format) {
 	default:
-	case FormatDepth::DEPTH_COMPONENT16:  return FormatBase::DEPTH_COMPONENT;
-	case FormatDepth::DEPTH_COMPONENT24:  return FormatBase::DEPTH_COMPONENT;
-	case FormatDepth::DEPTH_COMPONENT32:  return FormatBase::DEPTH_COMPONENT;
-	case FormatDepth::DEPTH_COMPONENT32F: return FormatBase::DEPTH_COMPONENT;
+	case FormatDepth::DEPTH_COMPONENT16:  return FormatBase::DEPTH;
+	case FormatDepth::DEPTH_COMPONENT24:  return FormatBase::DEPTH;
+	case FormatDepth::DEPTH_COMPONENT32:  return FormatBase::DEPTH;
+	case FormatDepth::DEPTH_COMPONENT32F: return FormatBase::DEPTH;
 	}
 }
 
@@ -412,10 +412,10 @@ constexpr inline FormatBase compatibleFormatBase(FormatDepthStencil format) noex
 constexpr inline FormatBase compatibleFormatBase(FormatStencil format) noexcept {
 	switch (format) {
 	default:
-	case FormatStencil::STENCIL_INDEX1:  return FormatBase::STENCIL_INDEX;
-	case FormatStencil::STENCIL_INDEX4:  return FormatBase::STENCIL_INDEX;
-	case FormatStencil::STENCIL_INDEX8:  return FormatBase::STENCIL_INDEX;
-	case FormatStencil::STENCIL_INDEX16: return FormatBase::STENCIL_INDEX;
+	case FormatStencil::STENCIL_INDEX1:  return FormatBase::STENCIL;
+	case FormatStencil::STENCIL_INDEX4:  return FormatBase::STENCIL;
+	case FormatStencil::STENCIL_INDEX8:  return FormatBase::STENCIL;
+	case FormatStencil::STENCIL_INDEX16: return FormatBase::STENCIL;
 	}
 }
 

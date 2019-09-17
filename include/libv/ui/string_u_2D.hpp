@@ -21,27 +21,7 @@ namespace ui {
 
 class Font2D;
 
-//	struct Font {
-//		FontEffect effect;   /// normal / outline / underline / strike-through ...
-//		FontFamily family;   /// font-family: Consolas
-//		FontSize size = 12;  /// font-size/line-height
-//		FontStretch stretch; /// font-stretch - normal / ultra-condensed / extra-condensed / condensed / semi-condensed / semi-expanded / expanded / extra-expanded / ultra-expanded
-//		FontStyle style;     /// font-style - normal / italic / oblique
-//		FontVariant variant; /// font-variant - normal / small-caps
-//		FontWeight weight;   /// font-weight - normal / bold / bolder / lighter / %number%
-//
-//		FontFamily family;   /// font-family: Consolas
-//		uint64_t underline:1;
-//		uint64_t strike_through:1;
-//		uint64_t small_caps:1;
-//		uint64_t italic:1;
-//		uint64_t stretch:8; // 4.4 fixed point
-//		uint64_t outline:12; // 8.4 fixed point
-//		uint64_t weight:16; // 8.8 fixed point
-//		uint64_t size:8;
-//	};
-
-class String2D {
+class StringU2D {
 private:
 	libv::glr::Mesh mesh_{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
@@ -52,10 +32,14 @@ private:
 	AlignHorizontal align = AlignHorizontal::Center;
 	libv::vec2f limit;
 
-	std::string string;
+	std::vector<uint32_t> codepoints;
+//	std::vector<libv::vec2f> positions;
+//	std::vector<libv::vec2f> lines;
+//	std::vector<uint32_t> lines;
+//	std::vector<uint32_t> words;
 
 public:
-	String2D();
+	StringU2D();
 
 public:
 	void setAlign(const AlignHorizontal align);
@@ -66,14 +50,14 @@ public:
 	inline void setLimit(const float x, const float y) { setLimit({x, y}); }
 
 public:
-	void push_back(uint32_t unicode);
+	void push_back(const uint32_t unicode);
 	void push_back(const std::string_view string_);
 	void pop_back();
 
 public:
-	inline const std::string& getString() const {
-		return string;
-	}
+//	inline const std::string& getString() const {
+//		return string;
+//	}
 
 	/// @param limit - The maximum available space that can be used to layout
 	/// @note Negative \c limit values are representing unbounded limits

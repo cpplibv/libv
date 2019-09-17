@@ -5,6 +5,7 @@
 // ext
 #include <utf8cpp/utf8.h>
 // std
+#include <array>
 #include <string>
 
 
@@ -22,6 +23,12 @@ template <typename = void> std::string unicode_to_utf8(uint32_t unicode) {
 	char buf[5];
 	unicode_to_utf8(unicode, buf);
 	return std::string(buf);
+}
+
+template <typename = void> auto unicode_to_utf8_array(uint32_t unicode) {
+	std::array<char, 5> buf;
+	unicode_to_utf8(unicode, buf.data());
+	return buf;
 }
 
 // -------------------------------------------------------------------------------------------------

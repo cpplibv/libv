@@ -52,17 +52,19 @@ private:
 		LIBV_REFLECTION_ACCESS(cursor_shader);
 	};
 
+public:
+	libv::ui::PropertySet<PS> properties;
+
 private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh quad_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh cursor_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	String2D string;
 
 private:
 	bool displayCursor = false;
 	time_point cursorStartTime;
 
-public:
-	libv::ui::PropertySet<PS> properties;
+private:
+	String2D text;
 
 public:
 	InputField();

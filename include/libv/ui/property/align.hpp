@@ -12,7 +12,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class AlignVertical : uint32_t {
+enum class AlignVertical : uint16_t {
 	Top = 0,
 	Center = 1,
 	Bottom = 2,
@@ -23,11 +23,11 @@ enum class AlignVertical : uint32_t {
 
 std::ostream& operator<<(std::ostream& os, const AlignVertical value);
 
-enum class AlignHorizontal : uint32_t {
+enum class AlignHorizontal : uint16_t {
 	Left = 0,
 	Center = 1,
 	Right = 2,
-	// TODO P5: libv.ui: it would be nice to have a baseline horizontal alignment, even if it wont be ever used, and is basically a left align, still.
+	// TODO P6: libv.ui: it would be nice to have a baseline horizontal alignment, even if it wont be ever used, and is basically a left align, still.
 	Justify = 3, /// Apply left alignment on the last line and justify every other line
 	JustifyAll = 4, /// Apply justify to every line including the last line
 };
