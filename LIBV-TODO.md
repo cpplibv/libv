@@ -225,7 +225,7 @@ libv.ui: direct access font texture | i think this will also improve texture bin
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: String2D API is not good enough to cursor position determination, flip it inside out (?)
+libv.ui: String2D API is not enough to determine cursor position, flip it inside out (?)
 libv.ui: Position InputField cursor correctly
 
 libv.ui: layout padding
@@ -391,6 +391,7 @@ libv.ui.warning: warning if percent used inside a content is invalid | not just 
 
 --- [[[ deadline: 2019.11.30 ]]] ---
 
+libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
 libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
 
 libv.glr: texture_fwd.hpp

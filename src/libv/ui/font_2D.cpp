@@ -195,10 +195,10 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 	result.bearing_top = static_cast<float>(bitmapGlyph->top);
 	result.bearing_bottom = result.advance.y - result.bearing_top - static_cast<float>(bitmapHeight);
 
-	result.tex[0].x = result.tex[3].x = static_cast<float>(texturePen.x) / static_cast<float>(textureSize.x);
-	result.tex[1].x = result.tex[2].x = static_cast<float>(texturePen.x + bitmapWidth) / static_cast<float>(textureSize.x);
-	result.tex[0].y = result.tex[1].y = static_cast<float>(texturePen.y) / static_cast<float>(textureSize.y);
-	result.tex[2].y = result.tex[3].y = static_cast<float>(texturePen.y + bitmapHeight) / static_cast<float>(textureSize.y);
+	result.tex[0].x = result.tex[3].x = static_cast<float>(texturePen.x);
+	result.tex[1].x = result.tex[2].x = static_cast<float>(texturePen.x + bitmapWidth);
+	result.tex[0].y = result.tex[1].y = static_cast<float>(texturePen.y);
+	result.tex[2].y = result.tex[3].y = static_cast<float>(texturePen.y + bitmapHeight);
 
 	result.pos[0].x = result.pos[3].x = static_cast<float>(bitmapGlyph->left);
 	result.pos[1].x = result.pos[2].x = static_cast<float>(bitmapGlyph->left + bitmapWidth);

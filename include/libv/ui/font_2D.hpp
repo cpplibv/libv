@@ -31,14 +31,12 @@ namespace ui {
 // advance: distance between origin points
 // kering: difference in advance depending on the current/previous char
 
-// TODO P3: Dynamic textureSize and resize, TextureRect might be useful to avoid uniforms
+// TODO P2: Freetype error handling (Check return locations) for memory leaks (?)
+//			use unique_ptr with custom deleter
 // TODO P3: Allow access of font faces other than zero (currently burnt in to FT_New_Memory_Face)
 // TODO P4: enum class Weight { Bold, Normal };
-// TODO P4: Freetype error handling (Check return locations) for memory leaks (?)
-//			use unique_ptr with custom deleter
 // TODO P5: Slant slant = Slant::Normal;
-// TODO P5: Improved texture usage algorithm (and there is a way to reallocate a new bigger texture)
-//			use pixel space texture coords end set uniforms for vertex shader
+// TODO P5: Improved texture usage algorithm (texture size reallocation is now possible) (Question: could it be stored as a one dimensional data? yes could mean no wasted space)
 // TODO P5: Gamma 1.8 + stem darkening in freetype: https://www.freetype.org/freetype2/docs/text-rendering-general.html
 
 // -------------------------------------------------------------------------------------------------
@@ -51,8 +49,8 @@ class Font2D {
 public:
 	struct Character {
 		libv::vec2f pos[4];
-		libv::vec2f tex[4];
-		libv::vec2f advance; // The pen offset for the next character position
+		libv::vec2f tex[4]; /// Texture coordinates in TEXEL-SPACE (and not in normalized texture space)
+		libv::vec2f advance; /// The pen offset for the next character position
 		float bearing_left = 0;
 		float bearing_right = 0;
 		float bearing_top = 0;

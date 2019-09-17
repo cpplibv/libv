@@ -149,9 +149,9 @@ void InputField::doRender(ContextRender& context) {
 
 	{
 		context.gl.program(*properties.image_shader());
+		context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
 		context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
 		context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
 		context.gl.render(mesh);
 	} {
 		const auto guard_s = context.gl.state.push_guard();

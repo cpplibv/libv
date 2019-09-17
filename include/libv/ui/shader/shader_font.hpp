@@ -47,7 +47,8 @@ struct ShaderFont : Shader {
 			uniform sampler2D textureSampler;
 
 			void main() {
-				vec3 sample = texture(textureSampler, fragmentTexture0).xyz;
+				ivec2 size = textureSize(textureSampler, 0);
+				vec3 sample = texture(textureSampler, fragmentTexture0 / size).xyz;
 				outputColor = color;
 				outputMask = vec4(sample, 1);
 			}
