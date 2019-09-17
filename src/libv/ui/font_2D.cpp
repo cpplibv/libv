@@ -71,9 +71,9 @@ Font2D::Font2D(std::string fontData) :
 		//			https://www.freetype.org/freetype2/docs/reference/ft2-error_code_values.html
 	}
 
-	texture.storage(1, textureSize);
-	texture.set(gl::MagFilter::Nearest);
-	texture.set(gl::MinFilter::Nearest);
+	texture_.storage(1, textureSize);
+	texture_.set(gl::MagFilter::Nearest);
+	texture_.set(gl::MinFilter::Nearest);
 
 	getCharacter(0, 12); // pre-fetch default char
 }
@@ -82,12 +82,6 @@ Font2D::~Font2D() {
 	std::lock_guard lock(freetype_lib_m);
 	FT_Done_Face(face);
 	_decFreetypeLibRef();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void Font2D::bind(libv::glr::Queue& gl, libv::gl::TextureChannel channel) {
-	gl.texture(texture, channel);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -186,7 +180,7 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 
 	for (int32_t y = 0; y < bitmapHeight; y++) {
 		// Freetypes bitmap is upside down, flipping during copy
-		texture.image(0,
+		texture_.image(0,
 				texturePen + libv::vec2i(0, bitmapHeight - y - 1),
 				{bitmapWidth, 1},
 				reinterpret_cast<const libv::vec3uc*>(bitmap.buffer + y * bitmap.pitch));

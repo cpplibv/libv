@@ -219,14 +219,16 @@ libv.ui: focus, key and char watcher and dynamic change of them
 libv.ui: pimpl ContextUI
 libv.ui: style should be forward declared
 libv.ui: Input field have/display cursor
+libv.ui: direct access font texture | i think this will also improve texture bind codes, making them more uniform
+
 
 --- STACK ------------------------------------------------------------------------------------------
 
+
+libv.ui: String2D API is not good enough to cursor position determination, flip it inside out (?)
 libv.ui: Position InputField cursor correctly
 
 libv.ui: layout padding
-
-libv.ui: direct access font texture | i think this will also improve texture bind codes, making them more uniform
 
 mouse
 	libv.ui: flatten - flatten EventMouse to combat variant complexity

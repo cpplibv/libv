@@ -43,7 +43,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Font2D is responsibly to providing char information, glyph texture (and divisor in the future).
+/// Font2D is responsibly to providing character information, glyph texture
 /// Font2D is NOT responsibly to rendering, aligning, laying out or shading.
 /// @context ANY
 /// @threadsafety single threaded
@@ -69,7 +69,7 @@ private:
 	};
 
 private:
-	libv::glr::Texture2D::R8_G8_B8 texture;
+	libv::glr::Texture2D::R8_G8_B8 texture_;
 
 private:
 	std::mutex face_m;
@@ -92,7 +92,9 @@ public:
 	~Font2D();
 
 public:
-	void bind(libv::glr::Queue& gl, libv::gl::TextureChannel channel);
+	const libv::glr::Texture2D::R8_G8_B8& texture() const {
+		return texture_;
+	}
 
 public:
 	float getLineAdvance(uint32_t size);

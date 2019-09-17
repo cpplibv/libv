@@ -162,8 +162,7 @@ void InputField::doRender(ContextRender& context) {
 		string.setAlign(properties.align());
 
 		context.gl.program(*properties.font_shader());
-		properties.font()->bind(context.gl, properties.font_shader()->textureChannel);
-	//	context.gl.texture(font->texture, program->textureChannel);
+		context.gl.texture(properties.font()->texture(), properties.font_shader()->textureChannel);
 		context.gl.uniform(properties.font_shader()->uniform_color, properties.font_color());
 		context.gl.uniform(properties.font_shader()->uniform_MVPmat, context.gl.mvp());
 		string.render(context.gl);
