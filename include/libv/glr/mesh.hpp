@@ -350,24 +350,26 @@ public:
 public:
 	template <typename T>
 	[[nodiscard]] MeshAttribute<typename T::value_type> attribute(T) {
-		const auto opt = libv::linear_find_optional(remote->attributes, T::channel);
-		if (!opt) {
-			using attribute_type = typename T::value_type;
-			using underlying_type = typename attribute_type::value_type;
-
-			static_assert(std::is_integral_v<underlying_type>
-					|| std::is_same_v<underlying_type, float>
-					|| std::is_same_v<underlying_type, double>,
-					"bindAttribute underlying_type template parameter not supported. Expected float, double or integral");
-
-			remote->attributes.emplace_back(
-					T::channel,
-					libv::gl::toAttributeType<underlying_type>(),
-					attribute_type::dim);
-		}
+		using attribute_type = typename T::value_type;
+		using underlying_type = typename attribute_type::value_type;
 
 		remote->dirty = true;
-		return MeshAttribute<typename T::value_type>{remote->attributes, remote->attributes.size() - 1};
+		auto it = libv::linear_find_iterator(remote->attributes, T::channel);
+
+		if (it != remote->attributes.end())
+			return MeshAttribute<attribute_type>{remote->attributes, static_cast<size_t>(std::distance(remote->attributes.begin(), it))};
+
+		static_assert(std::is_integral_v<underlying_type>
+				|| std::is_same_v<underlying_type, float>
+				|| std::is_same_v<underlying_type, double>,
+				"bindAttribute underlying_type template parameter not supported. Expected float, double or integral");
+
+		remote->attributes.emplace_back(
+				T::channel,
+				libv::gl::toAttributeType<underlying_type>(),
+				attribute_type::dim);
+
+		return MeshAttribute<attribute_type>{remote->attributes, remote->attributes.size() - 1};
 	}
 
 	[[nodiscard]] MeshIndices index() {
