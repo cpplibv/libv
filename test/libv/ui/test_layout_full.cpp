@@ -15,7 +15,7 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutFull> {
 	using BasicTestChild<libv::ui::LayoutFull>::BasicTestChild;
 
 	void size(std::string_view value) {
-		components[index].ptr->set(components[index].properties.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr->set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 };
 

@@ -31,7 +31,12 @@ Image::~Image() { }
 // -------------------------------------------------------------------------------------------------
 
 void Image::doStyle() {
-	this->set(properties);
+	this->set(property);
+}
+
+void Image::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
+	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(property.image()->size()), 0.f};
 }
 
 void Image::doRender(ContextRender& context) {
@@ -57,16 +62,11 @@ void Image::doRender(ContextRender& context) {
 	const auto guard_m = context.gl.model.push_guard();
 	context.gl.model.translate(position());
 
-	context.gl.program(*properties.image_shader());
-	context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
-	context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
+	context.gl.program(*property.image_shader());
+	context.gl.uniform(property.image_shader()->uniform_color, property.color());
+	context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
+	context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
 	context.gl.render(mesh);
-}
-
-void Image::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(properties.image()->size()), 0.f};
 }
 
 // -------------------------------------------------------------------------------------------------

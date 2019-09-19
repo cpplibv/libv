@@ -69,12 +69,12 @@ static constexpr AlignmentData AlignmentTableV[] = {
 libv::vec3f LayoutLine::layout1(
 		const ContextLayout1& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) environment;
 
-	const auto& orientData = OrientationTable[libv::to_value(properties.orientation())];
+	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
 	const auto _Z_ = orientData._Z_;
@@ -98,19 +98,19 @@ libv::vec3f LayoutLine::layout1(
 	for (const auto& child : children | view_layouted()) {
 		AccessLayout::layout1(*child.ptr, ContextLayout1{});
 
-		pixelX += child.properties.size()[_X_].pixel;
-		percentX += child.properties.size()[_X_].percent;
-		contentX += (child.properties.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_X_] : 0.0f);
+		pixelX += child.property.size()[_X_].pixel;
+		percentX += child.property.size()[_X_].percent;
+		contentX += (child.property.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_X_] : 0.0f);
 
 		result[_Y_] = libv::max(result[_Y_],
 				resolvePercent(
-						child.properties.size()[_Y_].pixel + (child.properties.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Y_] : 0.0f),
-						child.properties.size()[_Y_].percent, *child.ptr));
+						child.property.size()[_Y_].pixel + (child.property.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Y_] : 0.0f),
+						child.property.size()[_Y_].percent, *child.ptr));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
-						child.properties.size()[_Z_].pixel + (child.properties.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Z_] : 0.0f),
-						child.properties.size()[_Z_].percent, *child.ptr));
+						child.property.size()[_Z_].pixel + (child.property.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Z_] : 0.0f),
+						child.property.size()[_Z_].percent, *child.ptr));
 	}
 
 	result[_X_] = resolvePercent(pixelX + contentX, percentX, parent);
@@ -121,14 +121,14 @@ libv::vec3f LayoutLine::layout1(
 void LayoutLine::layout2(
 		const ContextLayout2& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) parent;
 
-	const auto& alignHData = AlignmentTableH[libv::to_value(properties.alignHorizontal())];
-	const auto& alignVData = AlignmentTableV[libv::to_value(properties.alignVertical())];
-	const auto& orientData = OrientationTable[libv::to_value(properties.orientation())];
+	const auto& alignHData = AlignmentTableH[libv::to_value(property.alignHorizontal())];
+	const auto& alignVData = AlignmentTableV[libv::to_value(property.alignVertical())];
+	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
 
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
@@ -146,12 +146,12 @@ void LayoutLine::layout2(
 
 		libv::meta::n_times_index<3>([&](auto&& index) {
 			childSize[index] =
-					child.properties.size()[index].pixel +
-					child.properties.size()[index].percent * 0.01f * environment.size[index] +
-					(child.properties.size()[index].dynamic ? AccessLayout::lastDynamic(*child.ptr)[index] : 0.f);
+					child.property.size()[index].pixel +
+					child.property.size()[index].percent * 0.01f * environment.size[index] +
+					(child.property.size()[index].dynamic ? AccessLayout::lastDynamic(*child.ptr)[index] : 0.f);
 		});
 
-		sumRatioX += child.properties.size()[_X_].ratio;
+		sumRatioX += child.property.size()[_X_].ratio;
 		contentX += childSize[_X_];
 	}
 
@@ -161,9 +161,9 @@ void LayoutLine::layout2(
 
 	for (const auto& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
 
-		childSize[_X_] += ratioScaledX * child.properties.size()[_X_].ratio;
-		if (child.properties.size()[_Y_].ratio > 0.f) childSize[_Y_] = environment.size[_Y_];
-		if (child.properties.size()[_Z_].ratio > 0.f) childSize[_Z_] = environment.size[_Z_];
+		childSize[_X_] += ratioScaledX * child.property.size()[_X_].ratio;
+		if (child.property.size()[_Y_].ratio > 0.f) childSize[_Y_] = environment.size[_Y_];
+		if (child.property.size()[_Z_].ratio > 0.f) childSize[_Z_] = environment.size[_Z_];
 
 		sizeContent[_X_] += childSize[_X_];
 		sizeContent[_Y_] = std::max(sizeContent[_Y_], childSize[_Y_]);

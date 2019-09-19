@@ -46,7 +46,21 @@ const std::string& LabelImage::getText() const {
 // -------------------------------------------------------------------------------------------------
 
 void LabelImage::doStyle() {
-	set(properties);
+	set(property);
+}
+
+void LabelImage::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
+	string.setFont(property.font(), property.font_size());
+	string.setAlign(property.align());
+	const auto contentString = string.getContent(-1, -1);
+	const auto contentImage = libv::vec::cast<float>(property.image()->size());
+
+	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
+}
+
+void LabelImage::doLayout2(const ContextLayout2& environment) {
+	string.setLimit(libv::vec::xy(environment.size));
 }
 
 void LabelImage::doRender(ContextRender& context) {
@@ -73,39 +87,25 @@ void LabelImage::doRender(ContextRender& context) {
  	context.gl.model.translate(position());
 
 	{
-		context.gl.program(*properties.image_shader());
-		context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
-		context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
+		context.gl.program(*property.image_shader());
+		context.gl.uniform(property.image_shader()->uniform_color, property.color());
+		context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
 		context.gl.render(mesh);
 	} {
 		const auto guard_s = context.gl.state.push_guard();
 		context.gl.state.blendSrc_Source1Color();
 		context.gl.state.blendDst_One_Minus_Source1Color();
 
-		string.setFont(properties.font(), properties.font_size());
-		string.setAlign(properties.align());
+		string.setFont(property.font(), property.font_size());
+		string.setAlign(property.align());
 
-		context.gl.program(*properties.font_shader());
-		context.gl.texture(properties.font()->texture(), properties.font_shader()->textureChannel);
-		context.gl.uniform(properties.font_shader()->uniform_color, properties.font_color());
-		context.gl.uniform(properties.font_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.program(*property.font_shader());
+		context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
+		context.gl.uniform(property.font_shader()->uniform_color, property.font_color());
+		context.gl.uniform(property.font_shader()->uniform_MVPmat, context.gl.mvp());
 		context.gl.render(string.mesh());
 	}
-}
-
-void LabelImage::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-	string.setFont(properties.font(), properties.font_size());
-	string.setAlign(properties.align());
-	const auto contentString = string.getContent(-1, -1);
-	const auto contentImage = libv::vec::cast<float>(properties.image()->size());
-
-	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
-}
-
-void LabelImage::doLayout2(const ContextLayout2& environment) {
-	string.setLimit(libv::vec::xy(environment.size));
 }
 
 // -------------------------------------------------------------------------------------------------

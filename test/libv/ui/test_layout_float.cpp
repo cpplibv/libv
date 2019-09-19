@@ -15,29 +15,29 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutFloat> {
 	using BasicTestChild<libv::ui::LayoutFloat>::BasicTestChild;
 
 	void size(std::string_view value) {
-		components[index].ptr->set(components[index].properties.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr->set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 
 	template <typename V>
 	void anchor_parent(V&& value) {
-		components[index].ptr->set(components[index].properties.anchor_parent, std::forward<V>(value));
+		components[index].ptr->set(components[index].property.anchor_parent, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void anchor_target(V&& value) {
-		components[index].ptr->set(components[index].properties.anchor_target, std::forward<V>(value));
+		components[index].ptr->set(components[index].property.anchor_target, std::forward<V>(value));
 	}
 };
 
 struct TestLayout : public BasicTestLayout<libv::ui::LayoutFloat, TestChild> {
 	template <typename V>
 	void snapToEdge(V&& value) {
-		ignore.set(properties.snapToEdge, std::forward<V>(value));
+		ignore.set(property.snapToEdge, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void squish(V&& value) {
-		ignore.set(properties.squish, std::forward<V>(value));
+		ignore.set(property.squish, std::forward<V>(value));
 	}
 };
 

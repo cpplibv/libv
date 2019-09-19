@@ -63,7 +63,7 @@ inline auto buildLayoutedChildrenRandomAccessRange(libv::span<LayoutGrid::Child>
 libv::vec3f LayoutGrid::layout1(
 		const ContextLayout1& environment,
 		libv::span<Child> everyChildren,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) parent;
@@ -71,8 +71,8 @@ libv::vec3f LayoutGrid::layout1(
 
 	const auto children = buildLayoutedChildrenRandomAccessRange(everyChildren);
 
-	const auto column_count = properties.column_count();
-	const auto& orient = Orientation2Table[libv::to_value(properties.orientation2())];
+	const auto column_count = property.column_count();
+	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;
@@ -83,8 +83,8 @@ libv::vec3f LayoutGrid::layout1(
 		AccessLayout::layout1(*child->ptr, ContextLayout1{});
 
 		result[_Z_] = std::max(result[_Z_],
-				child->properties.size()[_Z_].pixel +
-				(child->properties.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_Z_] : 0.f));
+				child->property.size()[_Z_].pixel +
+				(child->property.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_Z_] : 0.f));
 	}
 
 	const auto attemptX = [&](int32_t parentSize) {
@@ -97,9 +97,9 @@ libv::vec3f LayoutGrid::layout1(
 			float usedColumnSizeX = 0.f;
 			for (const auto& child : column) {
 				usedColumnSizeX = std::max(usedColumnSizeX,
-						child->properties.size()[_X_].pixel +
-						child->properties.size()[_X_].percent * parentSizeX * 0.01f +
-						(child->properties.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_X_] : 0.f));
+						child->property.size()[_X_].pixel +
+						child->property.size()[_X_].percent * parentSizeX * 0.01f +
+						(child->property.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_X_] : 0.f));
 			}
 			usedGridSizeX += usedColumnSizeX;
 		}
@@ -117,9 +117,9 @@ libv::vec3f LayoutGrid::layout1(
 			float usedRowSizeY = 0.f;
 			for (const auto& child : row) {
 				usedRowSizeY = std::max(usedRowSizeY,
-						child->properties.size()[_Y_].pixel +
-						child->properties.size()[_Y_].percent * parentSizeY * 0.01f +
-						(child->properties.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_Y_] : 0.f));
+						child->property.size()[_Y_].pixel +
+						child->property.size()[_Y_].percent * parentSizeY * 0.01f +
+						(child->property.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_Y_] : 0.f));
 			}
 			usedGridSizeY += usedRowSizeY;
 		}
@@ -137,7 +137,7 @@ libv::vec3f LayoutGrid::layout1(
 void LayoutGrid::layout2(
 		const ContextLayout2& environment,
 		libv::span<Child> everyChildren,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) parent;
@@ -145,8 +145,8 @@ void LayoutGrid::layout2(
 	const auto children = buildLayoutedChildrenRandomAccessRange(everyChildren);
 
 	// TODO P4: generalized a way for table lookup for various table lookup and handle invalid enum values
-	const auto column_count = properties.column_count();
-	const auto& orient = Orientation2Table[libv::to_value(properties.orientation2())];
+	const auto column_count = property.column_count();
+	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;
@@ -160,7 +160,7 @@ void LayoutGrid::layout2(
 
 		// Guarantee initial over-shoot by rewarding the whole parent size to the first found ratio
 		for (const auto& child : children) {
-			const auto ratio = child->properties.size()[_D_].ratio;
+			const auto ratio = child->property.size()[_D_].ratio;
 			if (ratio != libv::Approx(0.f)) {
 				ratioScale = environment.size[_D_] / ratio;
 				hasRatio = true;
@@ -183,14 +183,14 @@ void LayoutGrid::layout2(
 
 				for (const auto& child : firstDimension) {
 					const auto childSize =
-							child->properties.size()[_D_].pixel +
-							child->properties.size()[_D_].percent * environment.size[_D_] * 0.01f +
-							child->properties.size()[_D_].ratio * ratioScale +
-							(child->properties.size()[_D_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_D_] : 0.f);
+							child->property.size()[_D_].pixel +
+							child->property.size()[_D_].percent * environment.size[_D_] * 0.01f +
+							child->property.size()[_D_].ratio * ratioScale +
+							(child->property.size()[_D_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_D_] : 0.f);
 
 					if (childSize > firstSubDimSize) {
 						firstSubDimSize = childSize;
-						firstSubDimRatioCount = child->properties.size()[_D_].ratio;
+						firstSubDimRatioCount = child->property.size()[_D_].ratio;
 					}
 				}
 
@@ -217,7 +217,7 @@ void LayoutGrid::layout2(
 
 		// Guarantee initial over-shoot by rewarding the whole parent size to the first found ratio
 		for (const auto& child : children) {
-			const auto ratio = child->properties.size()[_D_].ratio;
+			const auto ratio = child->property.size()[_D_].ratio;
 			if (ratio != libv::Approx(0.f)) {
 				ratioScale = environment.size[_D_] / ratio;
 				hasRatio = true;
@@ -231,15 +231,15 @@ void LayoutGrid::layout2(
 
 		// Determine ratio contribution
 		for (const auto& child : children) {
-			if (child->properties.size()[_D_].ratio == libv::Approx(0.f))
+			if (child->property.size()[_D_].ratio == libv::Approx(0.f))
 				continue;
 
 			const auto used =
-					child->properties.size()[_D_].pixel +
-					child->properties.size()[_D_].percent * environment.size[_D_] * 0.01f +
-					(child->properties.size()[_D_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_D_] : 0.f);
+					child->property.size()[_D_].pixel +
+					child->property.size()[_D_].percent * environment.size[_D_] * 0.01f +
+					(child->property.size()[_D_].dynamic ? AccessLayout::lastDynamic(*child->ptr)[_D_] : 0.f);
 			const auto leftover = environment.size[_D_] - used;
-			const auto contribution = leftover / child->properties.size()[_D_].ratio;
+			const auto contribution = leftover / child->property.size()[_D_].ratio;
 
 			ratioScale = std::min(ratioScale, contribution);
 		}
@@ -263,10 +263,10 @@ void LayoutGrid::layout2(
 			auto& childSize = childSizes[y * column_count + x];
 
 			childSize = libv::build_vec<3>([&](const auto i) {
-				return child->properties.size()[i].pixel +
-						child->properties.size()[i].percent * environment.size[i] * 0.01f +
-						child->properties.size()[i].ratio * ratioContribution[i] +
-						(child->properties.size()[i].dynamic ? AccessLayout::lastDynamic(*child->ptr)[i] : 0.f);
+				return child->property.size()[i].pixel +
+						child->property.size()[i].percent * environment.size[i] * 0.01f +
+						child->property.size()[i].ratio * ratioContribution[i] +
+						(child->property.size()[i].dynamic ? AccessLayout::lastDynamic(*child->ptr)[i] : 0.f);
 			});
 
 			advanceX[x] = std::max(advanceX[x], childSize[_X_]);
@@ -281,7 +281,7 @@ void LayoutGrid::layout2(
 	sizeContent[_X_] = libv::sum(advanceX, 0);
 	sizeContent[_Y_] = libv::sum(advanceY, 0);
 
-	const auto originToContent = (environment.size - sizeContent) * properties.anchor_content();
+	const auto originToContent = (environment.size - sizeContent) * property.anchor_content();
 	const auto contentToStart = sizeContent * orient.start;
 	auto startToPen = vec3f{};
 
@@ -295,7 +295,7 @@ void LayoutGrid::layout2(
 			cellSize[_Z_] = environment.size[_Z_];
 
 			const auto penToCell = orient.penCorner * cellSize;
-			const auto cellToPosition = (cellSize - childSize) * child->properties.anchor();
+			const auto cellToPosition = (cellSize - childSize) * child->property.anchor();
 
 			const auto position = origin + originToContent + contentToStart + startToPen + penToCell + cellToPosition;
 			const auto roundedPosition = libv::vec::round(position);

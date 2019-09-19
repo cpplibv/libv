@@ -34,7 +34,7 @@ private:
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 public:
-	libv::ui::PropertySet<PS> properties;
+	libv::ui::PropertySet<PS> property;
 
 public:
 	Image();
@@ -44,8 +44,8 @@ public:
 
 private:
 	virtual void doStyle() override;
-	virtual void doRender(ContextRender& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual void doRender(ContextRender& context) override;
 };
 
 // -------------------------------------------------------------------------------------------------

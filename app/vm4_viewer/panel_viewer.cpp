@@ -63,8 +63,8 @@ void PanelViewer::key(libv::input::Key key) {
 }
 
 void PanelViewer::doAttach() {
-	set(properties.snapToEdge, false);
-	set(properties.squish, false);
+	set(property.snapToEdge, false);
+	set(property.squish, false);
 
 	{
 		auto style = context().style("vm4pv");
@@ -315,23 +315,23 @@ void PanelViewer::doAttach() {
 
 //		{
 //			auto temp = std::make_shared<libv::ui::Label>("text");
-//			temp->set(temp->properties.align, libv::ui::AlignHorizontal::Right);
-//			temp->set(temp->properties.font, context().font("consola.ttf"));
-//			temp->set(temp->properties.font_color, libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-//			temp->set(temp->properties.font_shader, context().shaderFont());
-//			temp->set(temp->properties.font_size, libv::ui::FontSize{12});
+//			temp->set(temp->property.align, libv::ui::AlignHorizontal::Right);
+//			temp->set(temp->property.font, context().font("consola.ttf"));
+//			temp->set(temp->property.font_color, libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+//			temp->set(temp->property.font_shader, context().shaderFont());
+//			temp->set(temp->property.font_size, libv::ui::FontSize{12});
 //			temp->setText("Model");
 //
 //			auto& child = panel_left->add(temp);
-//			child.ptr->set(child.properties.size, libv::ui::parse_size_or_throw("d, d"));
+//			child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("d, d"));
 //		}
 //
 //		{
 //			auto temp = std::make_shared<libv::ui::Quad>();
-//			temp->set(temp->properties.color, libv::parse::parse_color_or_throw("hsva(120°, 30%, 100%, 50%)"));
+//			temp->set(temp->property.color, libv::parse::parse_color_or_throw("hsva(120°, 30%, 100%, 50%)"));
 //
 //			auto& child = panel_left->add(temp);
-//			child.ptr->set(child.properties.size, libv::ui::parse_size_or_throw("100%, 50px"));
+//			child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("100%, 50px"));
 //		}
 //
 //		{
@@ -400,15 +400,15 @@ void PanelViewer::update_ui() {
 }
 
 void PanelViewer::update_info() {
-//	//		panel_info.properties.set(context().style("vm4_viewer.info"));
+//	//		panel_info.property.set(context().style("vm4_viewer.info"));
 //
-//	label_name.properties.set(context().style("vm4_viewer.info.name"));
+//	label_name.property.set(context().style("vm4_viewer.info.name"));
 //	label_name.setText(fmt::format(
 //			"Name: {}",
 //			scene.model.name
 //	));
 //
-//	label_file.properties.set(context().style("vm4_viewer.info.file"));
+//	label_file.property.set(context().style("vm4_viewer.info.file"));
 //	label_file.setText(fmt::format(
 //			"File:      {}"
 //			"Version:   {}"
@@ -421,7 +421,7 @@ void PanelViewer::update_info() {
 //			"Not Implemented Yet"
 //	));
 //
-//	label_info.properties.set(context().style("vm4_viewer.info.info"));
+//	label_info.property.set(context().style("vm4_viewer.info.info"));
 //	label_info.setText(fmt::format(
 //			"Vertex count:       {:9}\n"
 //			"Index count:        {:9}\n"
@@ -446,7 +446,7 @@ void PanelViewer::update_info() {
 //	for (const auto& lod : scene.model.lods) {
 //		auto& label = label_lod.emplace_back();
 //
-//		label.properties.set(context().style("vm4_viewer.info.lod"));
+//		label.property.set(context().style("vm4_viewer.info.lod"));
 //		label.setText(fmt::format(
 //				"Level: {}\n"
 //				"Range far:   {:12.6f}\n"
@@ -468,7 +468,7 @@ void PanelViewer::update_info() {
 //	for (const auto& material : scene.model.materials) {
 //		auto& label = label_material.emplace_back();
 //
-//		label.properties.set(context().style("vm4_viewer.info.material"));
+//		label.property.set(context().style("vm4_viewer.info.material"));
 //
 //		std::ostringstream ss;
 //		ss << fmt::format(
@@ -479,7 +479,7 @@ void PanelViewer::update_info() {
 //				material.name,
 //				material.shader
 //		);
-//		for (const auto& [key, data] : material.properties) {
+//		for (const auto& [key, data] : material.property) {
 //			std::visit([&key, &ss](const auto& value) {
 //				ss << fmt::format("\t{:20}: {}\n", key, value);
 //			}, data);
@@ -512,7 +512,7 @@ void PanelViewer::update_info() {
 
 	//		for (const auto& material : scene.model.materials) {
 	//			material.name;
-	//			material.properties.size();
+	//			material.property.size();
 	//			material.shader;
 	//		}
 	//
@@ -556,18 +556,18 @@ void PanelViewer::update_info() {
 //
 //	panel_left->add(label_info);
 //	label_info->setText("Hello world!");
-//	label_info->properties.font
+//	label_info->property.font
 
 //	const auto style_label_01 = ui.context().style("style-label-01");
 //	style_label_01->set("color", libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
 //	style_label_01->set("font", ui.context().font("consola.ttf"));
 //	style_label_01->set("align", libv::ui::Anchor::Left);
 //
-//	label0->properties.set(style_label_01);
+//	label0->property.set(style_label_01);
 //	label0->setText("Hello, Label0!");
-//	label1->properties.set(style_label_01);
+//	label1->property.set(style_label_01);
 //	label1->setText("Hello, Label1!");
-//	label2->properties.set(style_label_01);
+//	label2->property.set(style_label_01);
 //	label2->setText("Hello, Label2!");
 //	label2->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 //

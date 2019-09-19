@@ -32,7 +32,7 @@ private:
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 public:
-	libv::ui::PropertySet<PS> properties;
+	libv::ui::PropertySet<PS> property;
 
 public:
 	Quad();

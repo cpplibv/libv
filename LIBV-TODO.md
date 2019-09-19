@@ -230,10 +230,11 @@ libv.ui: String2D API get position of character between space, by index: 0 = bef
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
-
+libv.ui.property: detect or react to property changes
 libv.ui.style: mouse style code out of component_base (inside doStyle instead of change to an external thing)
 libv.ui.property: move around property system a bit > instead of reflection inside doStyle, use two function (?) Am I really .. (?) | the aim is to remove the necessity of actually storing the property
+
+libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
 
 libv.ui: layout padding
 

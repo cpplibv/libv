@@ -15,24 +15,24 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutLine> {
 	using BasicTestChild<libv::ui::LayoutLine>::BasicTestChild;
 
 	void size(std::string_view value) {
-		components[index].ptr->set(components[index].properties.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr->set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 };
 
 struct TestLayout : public BasicTestLayout<libv::ui::LayoutLine, TestChild> {
 	template <typename V>
 	void alignHorizontal(V&& value) {
-		ignore.set(properties.alignHorizontal, std::forward<V>(value));
+		ignore.set(property.alignHorizontal, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void alignVertical(V&& value) {
-		ignore.set(properties.alignVertical, std::forward<V>(value));
+		ignore.set(property.alignVertical, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void orientation(V&& value) {
-		ignore.set(properties.orientation, std::forward<V>(value));
+		ignore.set(property.orientation, std::forward<V>(value));
 	}
 };
 

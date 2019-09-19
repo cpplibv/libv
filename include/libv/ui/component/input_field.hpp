@@ -53,7 +53,7 @@ private:
 	};
 
 public:
-	libv::ui::PropertySet<PS> properties;
+	libv::ui::PropertySet<PS> property;
 
 private:
 	libv::glr::Mesh quad_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};

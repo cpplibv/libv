@@ -16,28 +16,28 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutGrid> {
 
 	template <typename V>
 	void anchor(V&& value) {
-		components[index].ptr->set(components[index].properties.anchor, std::forward<V>(value));
+		components[index].ptr->set(components[index].property.anchor, std::forward<V>(value));
 	}
 
 	void size(std::string_view value) {
-		components[index].ptr->set(components[index].properties.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr->set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 };
 
 struct TestLayout : public BasicTestLayout<libv::ui::LayoutGrid, TestChild> {
 	template <typename V>
 	void anchor_content(V&& value) {
-		ignore.set(properties.anchor_content, std::forward<V>(value));
+		ignore.set(property.anchor_content, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void orientation2(V&& value) {
-		ignore.set(properties.orientation2, std::forward<V>(value));
+		ignore.set(property.orientation2, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void column_count(V&& value) {
-		ignore.set(properties.column_count, std::forward<V>(value));
+		ignore.set(property.column_count, std::forward<V>(value));
 	}
 };
 

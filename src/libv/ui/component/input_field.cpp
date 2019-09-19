@@ -111,7 +111,7 @@ void InputField::doAttach() {
 }
 
 void InputField::doStyle() {
-	set(properties);
+	set(property);
 }
 
 void InputField::doRender(ContextRender& context) {
@@ -135,14 +135,14 @@ void InputField::doRender(ContextRender& context) {
 	}
 
 	// TODO P1: on Font or on FontSize change would be the correct condition
-//	if (properties.font.consumeChange() || properties.font_size.consumeChange()) {
+//	if (property.font.consumeChange() || property.font_size.consumeChange()) {
 	if (context.changedSize) {
 		cursor_mesh.clear();
 		auto pos = cursor_mesh.attribute(attribute_position);
 		auto index = cursor_mesh.index();
 
 		// <<< P5: ui.settings for cursorWidth (min = 2, max = 5, offset = 12, scale = 24)
-		const auto cursorHeight = properties.font()->getLineAdvance(properties.font_size());
+		const auto cursorHeight = property.font()->getLineAdvance(property.font_size());
 		const auto cursorWidth = std::floor(std::min((cursorHeight - 12.f) / 24.f + 2.f, 5.f));
 
 		// 3-2
@@ -160,23 +160,23 @@ void InputField::doRender(ContextRender& context) {
  	context.gl.model.translate(position());
 
 	{
-		context.gl.program(*properties.image_shader());
-		context.gl.texture(properties.image()->texture(), properties.image_shader()->textureChannel);
-		context.gl.uniform(properties.image_shader()->uniform_color, properties.color());
-		context.gl.uniform(properties.image_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.program(*property.image_shader());
+		context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
+		context.gl.uniform(property.image_shader()->uniform_color, property.color());
+		context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
 		context.gl.render(quad_mesh);
 	} {
 		const auto guard_s = context.gl.state.push_guard();
 		context.gl.state.blendSrc_Source1Color();
 		context.gl.state.blendDst_One_Minus_Source1Color();
 
-		text.setFont(properties.font(), properties.font_size());
-		text.setAlign(properties.align());
+		text.setFont(property.font(), property.font_size());
+		text.setAlign(property.align());
 
-		context.gl.program(*properties.font_shader());
-		context.gl.texture(properties.font()->texture(), properties.font_shader()->textureChannel);
-		context.gl.uniform(properties.font_shader()->uniform_color, properties.font_color());
-		context.gl.uniform(properties.font_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.program(*property.font_shader());
+		context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
+		context.gl.uniform(property.font_shader()->uniform_color, property.font_color());
+		context.gl.uniform(property.font_shader()->uniform_MVPmat, context.gl.mvp());
 		context.gl.render(text.mesh());
 	}
 
@@ -185,20 +185,20 @@ void InputField::doRender(ContextRender& context) {
 	if (displayCursor && cursor_flash_iteration < cursor_show_period) {
 		context.gl.model.translate({text.getCharacterPosition(), 0}); // <<< P2: Cursor get position should be only recalculated on cursor 'movement'
 
-		context.gl.program(*properties.cursor_shader());
-		context.gl.uniform(properties.cursor_shader()->uniform_color, properties.font_color());
-//		context.gl.uniform(properties.cursor_shader()->uniform_color, properties.cursor_color()); // <<< P4: properties name collusion
-		context.gl.uniform(properties.cursor_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.program(*property.cursor_shader());
+		context.gl.uniform(property.cursor_shader()->uniform_color, property.font_color());
+//		context.gl.uniform(property.cursor_shader()->uniform_color, property.cursor_color()); // <<< P4: property name collusion
+		context.gl.uniform(property.cursor_shader()->uniform_MVPmat, context.gl.mvp());
 		context.gl.render(cursor_mesh);
 	}
 }
 
 void InputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	text.setFont(properties.font(), properties.font_size());
-	text.setAlign(properties.align());
+	text.setFont(property.font(), property.font_size());
+	text.setAlign(property.align());
 	const auto contentString = text.getContent(-1, -1);
-	const auto contentImage = libv::vec::cast<float>(properties.image()->size());
+	const auto contentImage = libv::vec::cast<float>(property.image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }

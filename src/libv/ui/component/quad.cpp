@@ -30,7 +30,7 @@ Quad::~Quad() { }
 // -------------------------------------------------------------------------------------------------
 
 void Quad::doStyle() {
-	set(properties);
+	set(property);
 }
 
 void Quad::doRender(ContextRender& context) {
@@ -53,9 +53,9 @@ void Quad::doRender(ContextRender& context) {
 	const auto guard_m = context.gl.model.push_guard();
 	context.gl.model.translate(position());
 
-	context.gl.program(*properties.quad_shader());
-	context.gl.uniform(properties.quad_shader()->uniform_color, properties.color());
-	context.gl.uniform(properties.quad_shader()->uniform_MVPmat, context.gl.mvp());
+	context.gl.program(*property.quad_shader());
+	context.gl.uniform(property.quad_shader()->uniform_color, property.color());
+	context.gl.uniform(property.quad_shader()->uniform_MVPmat, context.gl.mvp());
 	context.gl.render(mesh);
 }
 

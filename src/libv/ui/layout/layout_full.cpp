@@ -21,12 +21,12 @@ namespace ui {
 libv::vec3f LayoutFull::layout1(
 		const ContextLayout1& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) environment;
 	(void) parent;
-	(void) properties;
+	(void) property;
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
 		if (fix == libv::Approx(0.f)) {
@@ -47,8 +47,8 @@ libv::vec3f LayoutFull::layout1(
 			result[dim] = libv::max(
 					result[dim],
 					resolvePercent(
-							child.properties.size()[dim].pixel + (child.properties.size()[dim].dynamic ? AccessLayout::lastDynamic(*child.ptr)[dim] : 0.f),
-							child.properties.size()[dim].percent, *child.ptr)
+							child.property.size()[dim].pixel + (child.property.size()[dim].dynamic ? AccessLayout::lastDynamic(*child.ptr)[dim] : 0.f),
+							child.property.size()[dim].percent, *child.ptr)
 			);
 		});
 	}
@@ -59,11 +59,11 @@ libv::vec3f LayoutFull::layout1(
 void LayoutFull::layout2(
 		const ContextLayout2& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) parent;
-	(void) properties;
+	(void) property;
 
 	for (const auto& child : children | view_layouted()) {
 		AccessLayout::layout2(

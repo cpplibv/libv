@@ -21,12 +21,12 @@ namespace ui {
 libv::vec3f LayoutFloat::layout1(
 		const ContextLayout1& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) environment;
 	(void) parent;
-	(void) properties;
+	(void) property;
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
 		if (fix == libv::Approx(0.f)) {
@@ -48,8 +48,8 @@ libv::vec3f LayoutFloat::layout1(
 			result[i] = libv::max(
 					result[i],
 					resolvePercent(
-							child.properties.size()[i].pixel + (child.properties.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f),
-							child.properties.size()[i].percent, *child.ptr)
+							child.property.size()[i].pixel + (child.property.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f),
+							child.property.size()[i].percent, *child.ptr)
 			);
 		});
 	}
@@ -60,11 +60,11 @@ libv::vec3f LayoutFloat::layout1(
 void LayoutFloat::layout2(
 		const ContextLayout2& environment,
 		libv::span<Child> children,
-		const Properties& properties,
+		const Properties& property,
 		const BaseComponent& parent) {
 
 	(void) parent;
-	(void) properties;
+	(void) property;
 
 	for (const auto& child : children | view_layouted()) {
 
@@ -72,23 +72,23 @@ void LayoutFloat::layout2(
 
 		auto size = libv::vec3f{};
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
-			const auto has_ratio = child.properties.size()[i].ratio != 0.f;
+			const auto has_ratio = child.property.size()[i].ratio != 0.f;
 
 			if (has_ratio)
 				size[i] = environment.size[i];
 			else
 				size[i] =
-						child.properties.size()[i].pixel +
-						child.properties.size()[i].percent * 0.01f * environment.size[i] +
-						(child.properties.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f);
+						child.property.size()[i].pixel +
+						child.property.size()[i].percent * 0.01f * environment.size[i] +
+						(child.property.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f);
 		});
 
 		// Position ---
 
 		const auto position =
 				+ environment.position
-				+ child.properties.anchor_parent() * environment.size
-				- child.properties.anchor_target() * size;
+				+ child.property.anchor_parent() * environment.size
+				- child.property.anchor_target() * size;
 
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;

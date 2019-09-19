@@ -24,7 +24,7 @@ namespace ui {
 template <typename Layout>
 class BasicPanel : public BaseComponent {
 public:
-	typename Layout::Properties properties;
+	typename Layout::Properties property;
 private:
 	std::vector<typename Layout::Child> children;
 
@@ -115,12 +115,12 @@ void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(BaseComponent&
 
 template <typename Layout>
 void BasicPanel<Layout>::doStyle() {
-	set(properties);
+	set(property);
 }
 
 template <typename Layout>
 void BasicPanel<Layout>::doStyle(ChildID childID) {
-	children[childID].ptr->set(children[childID].properties);
+	children[childID].ptr->set(children[childID].property);
 }
 
 template <typename Layout>
@@ -154,12 +154,12 @@ libv::observer_ptr<BaseComponent> BasicPanel<Layout>::doFocusTravers(const Conte
 
 template <typename Layout>
 void BasicPanel<Layout>::doLayout1(const ContextLayout1& le) {
-	AccessLayout::lastDynamic(*this) = Layout::layout1(le, children, properties, *this);
+	AccessLayout::lastDynamic(*this) = Layout::layout1(le, children, property, *this);
 }
 
 template <typename Layout>
 void BasicPanel<Layout>::doLayout2(const ContextLayout2& le) {
-	Layout::layout2(le, children, properties, *this);
+	Layout::layout2(le, children, property, *this);
 }
 
 template <typename Layout>

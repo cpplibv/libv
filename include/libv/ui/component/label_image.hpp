@@ -48,7 +48,7 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	String2D string;
 public:
-	libv::ui::PropertySet<PS> properties;
+	libv::ui::PropertySet<PS> property;
 
 public:
 	LabelImage();
@@ -62,9 +62,9 @@ public:
 
 private:
 	virtual void doStyle() override;
-	virtual void doRender(ContextRender& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
 };
 
 // -------------------------------------------------------------------------------------------------

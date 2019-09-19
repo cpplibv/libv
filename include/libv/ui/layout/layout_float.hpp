@@ -44,7 +44,7 @@ struct LayoutFloat {
 	};
 
 	struct Child {
-		libv::ui::PropertySet<ChildPS> properties;
+		libv::ui::PropertySet<ChildPS> property;
 		std::shared_ptr<BaseComponent> ptr;
 
 		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
@@ -56,12 +56,12 @@ public:
 	static libv::vec3f layout1(
 			const ContextLayout1& environment,
 			libv::span<Child> children,
-			const Properties& properties,
+			const Properties& property,
 			const BaseComponent& parent);
 	static void layout2(
 			const ContextLayout2& environment,
 			libv::span<Child> children,
-			const Properties& properties,
+			const Properties& property,
 			const BaseComponent& parent);
 };
 

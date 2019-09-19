@@ -91,27 +91,27 @@ template <typename T, typename TC>
 class BasicTestLayout {
 protected:
 	TestComponent ignore;
-	typename T::Properties properties;
+	typename T::Properties property;
 	std::vector<typename T::Child> components;
 
 public:
 	BasicTestLayout() {
-		ignore.set(properties); // Initialize properties with fallback values
+		ignore.set(property); // Initialize property with fallback values
 	}
 
 public:
 	TC add() {
 		auto& child = components.emplace_back(std::make_shared<TestComponent>());
-		child.ptr->set(child.properties); // Initialize child properties with fallback values
+		child.ptr->set(child.property); // Initialize child property with fallback values
 		return TC{components, components.size() - 1};
 	}
 
 	libv::vec3f layout1(libv::ui::ContextLayout1& le) {
-		return T::layout1(le, components, properties, ignore);
+		return T::layout1(le, components, property, ignore);
 	}
 
 	void layout2(libv::ui::ContextLayout2& le) {
-		return T::layout2(le, components, properties, ignore);
+		return T::layout2(le, components, property, ignore);
 	}
 };
 

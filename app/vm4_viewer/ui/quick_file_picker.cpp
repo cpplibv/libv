@@ -64,9 +64,9 @@ void QuickFilePicker::key(libv::input::Key key) {
 }
 
 void QuickFilePicker::doAttach() {
-	set(properties.alignHorizontal, libv::ui::AlignHorizontal::Left);
-	set(properties.alignVertical, libv::ui::AlignVertical::Top);
-	set(properties.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
+	set(property.alignHorizontal, libv::ui::AlignHorizontal::Left);
+	set(property.alignVertical, libv::ui::AlignVertical::Top);
+	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
 
 	{
 		auto style = context().style("vm4pv.file_list");
@@ -138,7 +138,7 @@ void QuickFilePicker::update_filelist() {
 		{
 			const auto temp = std::make_shared<libv::ui::Quad>("bg-quad");
 //			temp->style(context().style("vm4pv"));
-			temp->set(temp->properties.color, libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
+			temp->set(temp->property.color, libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
 			panel_border->add(temp);
 		} {
 			const auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -176,7 +176,7 @@ void QuickFilePicker::update_filelist() {
 			panel_border->add(panel_files);
 		}
 		auto& child = add(panel_border);
-		child.ptr->set(child.properties.size, libv::ui::parse_size_or_throw("1rD, D"));
+		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
 	}
 
 	{
@@ -203,7 +203,7 @@ void QuickFilePicker::update_filelist() {
 				"** Wildcard matching any recursive file or directory name"
 		);
 		auto& child = add(label_help);
-		child.ptr->set(child.properties.size, libv::ui::parse_size_or_throw("1rD, D"));
+		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
 	}
 }
 
