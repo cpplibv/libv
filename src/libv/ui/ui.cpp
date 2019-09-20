@@ -69,6 +69,9 @@ public:
 	ImplUI(UI& ui) :
 		context(ui) { }
 
+	ImplUI(UI& ui, const Settings& settings) :
+		context(ui, settings) { }
+
 public:
 	void focus(BaseComponent& component) {
 		if (libv::make_observer_ref(component) == focused)
@@ -102,6 +105,10 @@ public:
 
 UI::UI() {
 	self = std::make_unique<ImplUI>(*this);
+}
+
+UI::UI(const Settings& settings) {
+	self = std::make_unique<ImplUI>(*this, settings);
 }
 
 UI::~UI() {

@@ -225,18 +225,37 @@ libv.ui: Stream2D move back to utf8
 libv.ui: Stream2D merge back to String2D
 libv.ui: Shelf Stream2D as StringU2D
 libv.ui: String2D API get position of character between space, by index: 0 = before first char, 1 = before second char, size() and size()+k = after last character
+libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: on property change event / virtual function (?) called before layout1 if there was any change
 libv.ui.property: detect and/or react to property changes
 libv.ui.style: move style code out of component_base (inside doStyle instead of change to an external thing)
 libv.ui.property: move around property system a bit > instead of reflection inside doStyle, use two function (?) Am I really .. (?) | the aim is to remove the necessity of actually storing the property
-
-libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
+libv.ui.property: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
+libv.ui.style: complex composite component would result in "nested" property sets
 
 libv.ui: layout padding
+
+properties / style
+	libv.ui.property: property system interaction with static_component system
+	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes) | Have to account for cyclic owning references!
+	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
+	libv.ui.style: verify that style change in child causes restyle in parent
+
+debug
+	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
+	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
+
+cleanup
+	libv.ui: doLayout1 should use the return channel instead of member cache
+	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
+	libv.ui: cleanup context_ui redundant codes
+	libv.ui.font: line 179 not just log but return default on error
+	libv.ui: remove layout1 pass member variables in component_base
 
 mouse
 	libv.ui: flatten - flatten EventMouse to combat variant complexity
@@ -262,31 +281,12 @@ component
 	libv.ui: table layout - only the columns and/or rows have size
 	libv.ui: not owning container views (list and/or table)
 
-properties / style
-	libv.ui.property: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
-	libv.ui.style: complex composite component would result in "nested" property sets
-	libv.ui.property: property system interaction with static_component system
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
-	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
-	libv.ui.style: verify that style change in child causes restyle in parent
-
-debug
-	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
-	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
-
 ui
-	libv.ui: on property change event / virtual function (?) called before layout1 if there was any change
 	libv.ui: static_component system
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 
-cleanup
-	libv.ui: doLayout1 should use the return channel instead of member cache
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
-	libv.ui: cleanup context_ui redundant codes
-	libv.ui.font: line 179 not just log but return default on error
-	libv.ui: remove layout1 pass member variables in component_base
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 

@@ -25,14 +25,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-// <<< P3: ui.settings for cursor periods
-constexpr auto cursor_show_period = std::chrono::milliseconds(350);
-constexpr auto cursor_hide_period = std::chrono::milliseconds(350);
-
-constexpr auto cursor_flash_period = cursor_show_period + cursor_hide_period;
-
-// -------------------------------------------------------------------------------------------------
-
 InputField::InputField() :
 	BaseComponent(UnnamedTag, "input-field") { }
 
@@ -160,8 +152,8 @@ void InputField::doLayout2(const ContextLayout2& environment) {
 	cursorPosition = text.getCharacterPosition();
 }
 
-void InputField::doRender(ContextRender& context) {
-	if (context.changedSize) {
+void InputField::doRender(ContextRender& ctx) {
+	if (ctx.changedSize) {
 		quad_mesh.clear();
 		auto pos = quad_mesh.attribute(attribute_position);
 		auto tex = quad_mesh.attribute(attribute_texture0);
@@ -183,17 +175,20 @@ void InputField::doRender(ContextRender& context) {
 	// <<< P3: on Font or on FontSize change would be the correct condition
 //	const auto changedFont = property.font.consumeChange();
 //	const auto changedFontSize = property.font.consumeChange();
-	const auto changedFont = context.changedSize;
-	const auto changedFontSize = context.changedSize;
+	const auto changedFont = ctx.changedSize;
+	const auto changedFontSize = ctx.changedSize;
 
 	if (changedFont || changedFontSize) {
 		cursor_mesh.clear();
 		auto pos = cursor_mesh.attribute(attribute_position);
 		auto index = cursor_mesh.index();
 
-		// <<< P5: ui.settings for cursorWidth (min = 2, max = 5, offset = 12, scale = 24)
 		const auto cursorHeight = property.font()->getLineAdvance(property.font_size());
-		const auto cursorWidth = std::floor(std::min((cursorHeight - 12.f) / 24.f + 2.f, 5.f));
+		const auto max = context().settings.cursor_width_max;
+		const auto min = context().settings.cursor_width_min;
+		const auto offset = context().settings.cursor_width_offset;
+		const auto scale = context().settings.cursor_width_scale;
+		const auto cursorWidth = std::floor(std::min((cursorHeight - offset) / scale + min, max));
 
 		// 3-2
 		// |/|
@@ -206,40 +201,40 @@ void InputField::doRender(ContextRender& context) {
 		index.quad(0, 1, 2, 3);
 	}
 
-	const auto guard_m = context.gl.model.push_guard();
- 	context.gl.model.translate(position());
+	const auto guard_m = ctx.gl.model.push_guard();
+ 	ctx.gl.model.translate(position());
 
 	{
-		context.gl.program(*property.image_shader());
-		context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
-		context.gl.uniform(property.image_shader()->uniform_color, property.color());
-		context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.render(quad_mesh);
+		ctx.gl.program(*property.image_shader());
+		ctx.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
+		ctx.gl.uniform(property.image_shader()->uniform_color, property.color());
+		ctx.gl.uniform(property.image_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(quad_mesh);
 	} {
-		const auto guard_s = context.gl.state.push_guard();
-		context.gl.state.blendSrc_Source1Color();
-		context.gl.state.blendDst_One_Minus_Source1Color();
+		const auto guard_s = ctx.gl.state.push_guard();
+		ctx.gl.state.blendSrc_Source1Color();
+		ctx.gl.state.blendDst_One_Minus_Source1Color();
 
 		text.setFont(property.font(), property.font_size());
 		text.setAlign(property.align());
 
-		context.gl.program(*property.font_shader());
-		context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
-		context.gl.uniform(property.font_shader()->uniform_color, property.font_color());
-		context.gl.uniform(property.font_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.render(text.mesh());
+		ctx.gl.program(*property.font_shader());
+		ctx.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
+		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
+		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(text.mesh());
 	}
 
-	const auto cursor_flash_iteration = time_mod(context.now - cursorStartTime, cursor_flash_period);
+	const auto cursor_flash_iteration = time_mod(ctx.now - cursorStartTime, context().settings.cursor_flash_period);
 
-	if (isFocused() && cursor_flash_iteration < cursor_show_period) {
-		context.gl.model.translate({cursorPosition, 0});
+	if (isFocused() && cursor_flash_iteration < context().settings.cursor_show_period) {
+		ctx.gl.model.translate({cursorPosition, 0});
 
-		context.gl.program(*property.cursor_shader());
-		context.gl.uniform(property.cursor_shader()->uniform_color, property.font_color());
+		ctx.gl.program(*property.cursor_shader());
+		ctx.gl.uniform(property.cursor_shader()->uniform_color, property.font_color());
 //		context.gl.uniform(property.cursor_shader()->uniform_color, property.cursor_color()); // <<< P2: property name collusion
-		context.gl.uniform(property.cursor_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.render(cursor_mesh);
+		ctx.gl.uniform(property.cursor_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(cursor_mesh);
 	}
 }
 

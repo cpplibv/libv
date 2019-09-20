@@ -58,7 +58,6 @@ derived_level<0> __libv_reflection_next_index(derived_level<0>);
 } // namespace meta
 } // namespace libv
 
-// Note: Reflection could be extended with member function access on demand. Not sure on the usefulness.
 
 #define LIBV_REFLECTION_ACCESS(NAME) \
 		static constexpr ::libv::meta::derived_level<decltype(__libv_reflection_next_index(::libv::meta::derived_top{}))::value + 1> \

@@ -34,6 +34,7 @@ namespace ui {
 class BaseComponent;
 class ContextUI;
 class ImplUI;
+class Settings;
 
 class UI {
 	friend class ContextUI;
@@ -43,6 +44,7 @@ private:
 
 public:
 	UI();
+	UI(const Settings& setting);
 	~UI();
 
 public:

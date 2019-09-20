@@ -33,21 +33,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Settings {
-	struct Resource {
-		std::filesystem::path path; /// Relative resource path base
-		// bool relative_path_only = true; /// Forbid requests with absolute path
-		// bool restict_under_base = true; /// Forbid requests that would leave the base path
-		// bool cache_fallback = true; /// Insert failed resource lookups into cache as the fallback value
-		// bool track_every = false; /// Track every resource and reload resource upon file change
-		// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
-	};
-
-	Resource font = {"res/font"};
-	Resource shader = {"res/shader"};
-	Resource texture = {"res/texture"};
-};
-
 struct ImplContextUI {
 	MouseTable mouse;
 
@@ -65,8 +50,6 @@ struct ImplContextUI {
 	std::weak_ptr<ShaderFont> shader_font;
 	std::weak_ptr<ShaderImage> shader_image;
 	std::weak_ptr<ShaderQuad> shader_quad;
-
-	Settings settings; // TODO P5: move Settings to UI, or just get settings from the UI in the ctor
 
 public:
 	template <typename T>
@@ -127,14 +110,15 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 
 // -------------------------------------------------------------------------------------------------
 
-ContextUI::ContextUI(UI& ui) :
+ContextUI::ContextUI(UI& ui, Settings settings) :
 	self(std::make_unique<ImplContextUI>()),
 	ui(ui),
-	mouse(self->mouse) {
+	mouse(self->mouse),
+	settings(std::move(settings)) {
 
-	log_ui.info("Resource base font:    {}", libv::generic_path(self->settings.font.path));
-	log_ui.info("Resource base shader:  {}", libv::generic_path(self->settings.shader.path));
-	log_ui.info("Resource base texture: {}", libv::generic_path(self->settings.texture.path));
+	log_ui.info("Resource base font:    {}", libv::generic_path(settings.res_font.base_path));
+	log_ui.info("Resource base shader:  {}", libv::generic_path(settings.res_shader.base_path));
+	log_ui.info("Resource base texture: {}", libv::generic_path(settings.res_texture.base_path));
 
 	const auto fallback_font_data = raw_font_consolas_min();
 	self->fallback_font = std::make_shared<Font2D>(
@@ -208,9 +192,9 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 
 	libv::Timer timer;
 
-	const auto target = self->settings.font.path / lexically_normal;
+	const auto target = settings.res_font.base_path / lexically_normal;
 
-	if (!secure_path(self->settings.font.path, target, lexically_normal)) {
+	if (!secure_path(settings.res_font.base_path, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback font");
 		sp = self->fallback_font;
 		return sp;
@@ -264,9 +248,9 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 
 	libv::Timer timer;
 
-	const auto target = self->settings.texture.path / lexically_normal;
+	const auto target = settings.res_texture.base_path / lexically_normal;
 
-	if (!secure_path(self->settings.texture.path, target, lexically_normal)) {
+	if (!secure_path(settings.res_texture.base_path, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback texture2D");
 		sp = self->fallback_texture2D;
 		return sp;

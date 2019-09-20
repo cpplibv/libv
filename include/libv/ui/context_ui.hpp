@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 // pro
+#include <libv/ui/settings.hpp>
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -46,14 +47,14 @@ class ContextUI {
 	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
 
 	std::unique_ptr<ImplContextUI> self;
-//	ImplContextUI* self;
 
 	UI& ui;
 public:
 	MouseTable& mouse; // <<< P5: remove
+	Settings settings;
 
 public:
-	ContextUI(UI& ui);
+	ContextUI(UI& ui, Settings settings = Settings());
 	~ContextUI();
 
 public:
