@@ -75,6 +75,10 @@ public:
 		return string;
 	}
 
+	inline const std::shared_ptr<Font2D>& getFont() const {
+		return font;
+	}
+
 	/// @param limit - The maximum available space that can be used to layout
 	/// @note Negative \c limit values are representing unbounded limits
 	/// @return the necessary space to layout while obeying the \c limit

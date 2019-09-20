@@ -230,8 +230,8 @@ libv.ui: String2D API get position of character between space, by index: 0 = bef
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.property: detect or react to property changes
-libv.ui.style: mouse style code out of component_base (inside doStyle instead of change to an external thing)
+libv.ui.property: detect and/or react to property changes
+libv.ui.style: move style code out of component_base (inside doStyle instead of change to an external thing)
 libv.ui.property: move around property system a bit > instead of reflection inside doStyle, use two function (?) Am I really .. (?) | the aim is to remove the necessity of actually storing the property
 
 libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
@@ -282,11 +282,11 @@ ui
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 
 cleanup
-	libv.ui: remove layout1 pass member variables in component_base
 	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
 	libv.ui.font: line 179 not just log but return default on error
+	libv.ui: remove layout1 pass member variables in component_base
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
@@ -338,6 +338,7 @@ hotkey
 
 focus
 	libv.ui.focus: easy way to trigger Focus traversal from events/components
+	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further, only downside is the members in the event class previous and current would be invalid
 	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
 	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
 

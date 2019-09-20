@@ -89,6 +89,9 @@ public:
 	[[nodiscard]] inline bool isLayouted() noexcept {
 		return flags.match_any(Flag::layout);
 	}
+	[[nodiscard]] inline bool isFocused() noexcept {
+		return flags.match_any(Flag::focused);
+	}
 
 	[[nodiscard]] inline const libv::vec3f& position() const noexcept {
 		return position_;

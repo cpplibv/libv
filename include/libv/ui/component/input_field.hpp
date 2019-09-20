@@ -60,8 +60,8 @@ private:
 	libv::glr::Mesh cursor_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 private:
-	bool displayCursor = false;
 	time_point cursorStartTime;
+	libv::vec2f cursorPosition;
 
 private:
 	String2D text;
@@ -85,9 +85,9 @@ private:
 private:
 	virtual void doAttach() override;
 	virtual void doStyle() override;
-	virtual void doRender(ContextRender& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
 };
 
 // -------------------------------------------------------------------------------------------------
