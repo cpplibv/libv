@@ -276,7 +276,7 @@ TEST_CASE("Alignments for matrix types", "[libv.glr.std140]") {
 }
 
 TEST_CASE("Alignments for struct types", "[libv.glr.std140]") {
-	CHECK(test_info<UniformScalars<libv::meta::identity>>() == info(16, 64, 64));
+	CHECK(test_info<UniformScalars<libv::meta::identity_t>>() == info(16, 64, 64));
 
 	CHECK(test_info<UniformScalars<libv::vec2_t>>() == info(16, 112, 112));
 	CHECK(test_info<UniformScalars<libv::vec3_t>>() == info(32, 192, 192));
@@ -301,7 +301,7 @@ TEST_CASE("Alignments for struct types", "[libv.glr.std140]") {
 }
 
 TEST_CASE("Layout scalar types", "[libv.glr.std140]") {
-	const auto layout = libv::glr::layout_std140<UniformScalars<libv::meta::identity>>(uniformblock_test);
+	const auto layout = libv::glr::layout_std140<UniformScalars<libv::meta::identity_t>>(uniformblock_test);
 
 	CHECK(layout._00_bool__.location == 0);
 	CHECK(layout._01_int32_.location == 4);

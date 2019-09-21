@@ -395,7 +395,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 //	uint32_t size = 0;
 //};
 //
-//template <typename T> using identity = libv::meta::identity<T>;
+//template <typename T> using identity = libv::meta::identity_t<T>;
 //
 //inline UnfirormLayoutRule rule_std140(...) { static_assert }
 //
