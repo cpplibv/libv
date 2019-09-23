@@ -71,7 +71,7 @@ struct uft8_codepoints_fn {
 	}
 };
 
-RANGES_INLINE_VARIABLE(ranges::view::view<uft8_codepoints_fn>, uft8_codepoints)
+static constexpr ranges::view::view<uft8_codepoints_fn> uft8_codepoints{};
 
 // -------------------------------------------------------------------------------------------------
 

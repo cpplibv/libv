@@ -25,29 +25,29 @@ private:
 	static constexpr Index it_max = sizeof(Integral) * 8 - 1;
 
 private:
-	constexpr inline Index read() const {
+	constexpr inline Index read() const noexcept {
 		return it;
 	}
-	constexpr inline bool equal(ranges::default_sentinel) const {
+	constexpr inline bool equal(ranges::default_sentinel) const noexcept {
 		return it > it_max || integral < (1 << it);
 	}
-	constexpr inline void next() {
+	constexpr inline bool equal(const setbits_view& other) const noexcept {
+		return other.it == it;
+	}
+	constexpr inline void next() noexcept {
 		// C++20 bit operations, shift with count right zeros, etc...
 		//	size = popcount, next = countr_zero + 1
 		it++;
 		while ((integral & (1 << it)) == 0 && it <= it_max)
 			it++;
 	}
-	constexpr inline bool equal(const setbits_view& other) const {
-		return other.it == it;
-	}
 //	void prev() {
 //		--value_;
 //	}
 
 public:
-	constexpr inline setbits_view() {}
-	constexpr inline setbits_view(const Integral integral) : integral(integral) {
+	constexpr inline setbits_view() noexcept {}
+	constexpr inline setbits_view(const Integral integral) noexcept : integral(integral) {
 		if (integral != 0)
 			while ((integral & (1 << it)) == 0)
 				it++;
@@ -60,12 +60,12 @@ public:
 
 struct setbits_fn {
 	template <typename Integral>
-	constexpr inline auto operator()(const Integral integral) const {
+	constexpr inline auto operator()(const Integral integral) const noexcept {
 		return detail::setbits_view<Integral>(integral);
 	}
 };
 
-constexpr inline setbits_fn setbits{};
+static constexpr setbits_fn setbits{};
 
 // -------------------------------------------------------------------------------------------------
 

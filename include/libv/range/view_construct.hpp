@@ -29,7 +29,7 @@ struct construct_fn {
 };
 
 template <typename T>
-constexpr inline ranges::view::view<construct_fn<T>> construct{};
+static constexpr ranges::view::view<construct_fn<T>> construct{};
 
 // -------------------------------------------------------------------------------------------------
 

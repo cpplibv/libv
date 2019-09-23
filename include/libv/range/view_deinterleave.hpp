@@ -107,9 +107,9 @@ public:
 // In:  Range<T>
 // Out: Range<Range<T>>, where each inner range has $n$ or $n-1$ elements.
 struct deinterleave_fn {
-private:
 	friend ranges::view::view_access;
 
+private:
 	template<typename Int,
 			CONCEPT_REQUIRES_(ranges::Integral<Int>())>
 	static auto bind(deinterleave_fn deinterleave, Int n)
@@ -117,7 +117,7 @@ private:
 
 public:
 	template<typename Rng,
-			CONCEPT_REQUIRES_(ranges::RandomAccessRange<Rng>()) >
+			CONCEPT_REQUIRES_(ranges::RandomAccessRange<Rng>())>
 	detail::deinterleave_view<ranges::view::all_t<Rng>> operator()(Rng&& rng, ranges::range_difference_type_t<Rng> n) const {
 		return {ranges::view::all(static_cast<Rng&&>(rng)), n};
 	}
@@ -134,7 +134,7 @@ private:
 public:
 	template<typename Rng, typename T,
 			CONCEPT_REQUIRES_(!(ranges::RandomAccessRange<Rng>() && ranges::Integral<T>()))>
-	void operator()(Rng&& , T) const {
+	void operator()(Rng&&, T) const {
 		static_assert(ranges::RandomAccessRange<Rng>(),
 				"The first argument to view::deinterleave must satisfy the RandomAccessRange concept");
 		static_assert(ranges::Integral<T>(),
@@ -143,7 +143,7 @@ public:
 };
 
 /// \relates deinterleave_fn
-inline constexpr ranges::view::view<deinterleave_fn> deinterleave;
+static constexpr ranges::view::view<deinterleave_fn> deinterleave{};
 
 } // namespace view
 } // namespace libv
