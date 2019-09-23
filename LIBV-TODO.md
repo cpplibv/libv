@@ -523,7 +523,6 @@ cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
-ext: compile time regex https://github.com/hanickadot/compile-time-regular-expressions
 frame.core: remove core
 frame: Move frames from disconnected monitor / off-screen
 frame: remove default own thread, give them an io_context like executor

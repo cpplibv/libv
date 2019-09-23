@@ -311,6 +311,17 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME ctre
+	GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
+	GIT_TAG 42aab3969a1ea48ed146b55fb1e97e720da11849
+	CMAKE_ARGS
+		-DCTRE_BUILD_TESTS=OFF
+		-DCTRE_BUILD_PACKAGE=OFF
+		-DCTRE_BUILD_PACKAGE_DEB=OFF
+		-DCTRE_BUILD_PACKAGE_RPM=OFF
+)
+
+wish_create_external(
 	NAME date
 	GIT_REPOSITORY https://github.com/HowardHinnant/date.git
 	GIT_TAG f782ae98f05572b80fe72f9c9e26ed25ff816132
