@@ -348,13 +348,12 @@ libv.ui: Mouse event absorb/shield/plates
 libv.ui: alias any libv.input event in libv.ui for consistent access
 app.vm4_viewer: proper camera grab
 libv.ui: Rename mouse_table to context_mouse
+libv.gl: Implement a GLSL engine
+libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.gl: Implement a GLSL engine
-libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 
 app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
@@ -1129,61 +1128,6 @@ wish_create_library(
 	TARGET vm4imp
 	LINK PUBLIC libv::log libv::vm4 ext::assimp
 )
-
-// --- GLSL Pre-processor --------------------------------------------------------------------------
-
-correct regex for include = R"qq(^[ \t]*#[ \t]*include[ \t]+(?:"(.*)"|<(.*)>).*)qq";
-
-auto foo(const std::string_view subject) {
-    return ctre::match<R"qq(^[ \t]*#[ \t]*include[ \t]+(?:"(.*)"|<(.*)>).*)qq">(subject);
-}
-
-std::optional<std::string_view> extract_number(std::string_view s) noexcept {
-	if (auto m = ctre::match<"[a-z]+([0-9]+)">(s)) {
-        return m.get<1>().to_view();
-    } else {
-        return std::nullopt;
-    }
-}
-
-std::string Shader::PreprocessIncludes(const std::string& source, const boost::filesystem::path& filename, int level /*= 0 */ ) {
-	PrintIndent();
-	if(level > 32)
-		LogAndThrow(ShaderException,"header inclusion depth limit reached, might be caused by cyclic header inclusion");
-	using namespace std;
-
-	static const boost::regex re("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
-	stringstream input;
-	stringstream output;
-	input << source;
-
-	size_t line_number = 1;
-	boost::smatch matches;
-
-	string line;
-	while(std::getline(input, line)) {
-		if (boost::regex_search(line, matches, re)) {
-			std::string include_file = matches[1];
-			std::string include_string;
-
-			try {
-				include_string = Core::FileIO::LoadTextFile(include_file);
-			} catch (Core::FileIO::FileNotFoundException& e) {
-				stringstream str;
-				str << filename.file_string() <<"(" << line_number << ") : fatal error: cannot open include file " << e.File();
-				LogAndThrow(ShaderException,str.str())
-			}
-			output << PreprocessIncludes(include_string, include_file, level + 1) << endl;
-																					// Why not here? (and as the first line)
-		} else {
-			output << "#line "<< line_number << " \"" << filename << "\"" << endl; // Why here? ^^^
-			output << line << endl;
-		}
-		++line_number;
-	}
-	PrintUnindent();
-	return output.str();
-}
 
 // -------------------------------------------------------------------------------------------------
 

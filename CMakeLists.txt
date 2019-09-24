@@ -521,7 +521,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math ext_glew ext_boost ext_gli ext_soil ${OPENGL_LIBRARIES}
+	LINK   libv_log libv_math ext_ctre ext_glew ext_boost ext_gli ext_soil ${OPENGL_LIBRARIES}
 )
 
 wish_create_library(
@@ -832,6 +832,12 @@ wish_create_executable(
 	TARGET test_libv_input
 	SOURCE test/libv/input/*.cpp
 	LINK   obj_test_runner libv_input libv_utility ext_glfw
+)
+
+wish_create_executable(
+	TARGET test_libv_gl
+	SOURCE test/libv/gl/*.cpp
+	LINK   obj_test_runner libv_gl
 )
 
 wish_create_executable(
