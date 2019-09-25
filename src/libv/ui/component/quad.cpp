@@ -6,6 +6,7 @@
 #include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
@@ -29,8 +30,8 @@ Quad::~Quad() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void Quad::doStyle() {
-	set(property);
+void Quad::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 void Quad::doRender(ContextRender& context) {

@@ -10,6 +10,7 @@
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/log.hpp>
@@ -195,6 +196,12 @@ void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+ContextStyle BaseComponent::makeStyleContext() noexcept {
+	return ContextStyle{libv::make_observer(style_.get()), context().getFallbackStyle(), *this};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 bool BaseComponent::isFocusableComponent() const noexcept {
 	return !flags.match_any(Flag::pendingDetachSelf) &&
 			flags.match_any(Flag::render) &&
@@ -325,8 +332,9 @@ void BaseComponent::detach(BaseComponent& parent_) {
 
 void BaseComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
-		doStyle();
-		parent->doStyle(childID);
+		ContextStyle ctx = makeStyleContext();
+		doStyle(ctx);
+		parent->doStyle(ctx, childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
@@ -340,8 +348,9 @@ void BaseComponent::style() {
 
 void BaseComponent::styleScan() {
 	if (flags.match_any(Flag::pendingStyleSelf) || (style_ && style_->isDirty())) {
-		doStyle();
-		parent->doStyle(childID);
+		ContextStyle ctx = makeStyleContext();
+		doStyle(ctx);
+		parent->doStyle(ctx, childID);
 	}
 	doForeachChildren([](BaseComponent& child) {
 		child.styleScan();
@@ -442,9 +451,12 @@ void BaseComponent::doDetachChildren(libv::function_ref<bool(BaseComponent&)> ca
 	(void) callback;
 }
 
-void BaseComponent::doStyle() { }
+void BaseComponent::doStyle(ContextStyle& context) {
+	(void) context;
+}
 
-void BaseComponent::doStyle(ChildID childID) {
+void BaseComponent::doStyle(ContextStyle& context, ChildID childID) {
+	(void) context;
 	(void) childID;
 }
 

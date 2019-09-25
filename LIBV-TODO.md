@@ -226,36 +226,51 @@ libv.ui: Stream2D merge back to String2D
 libv.ui: Shelf Stream2D as StringU2D
 libv.ui: String2D API get position of character between space, by index: 0 = before first char, 1 = before second char, size() and size()+k = after last character
 libv.ui: ui.settings and its FAST availability from context() | settings might end up being really stored in the context
+libv.ui.property: remove style code from base_component.hpp (ContextStyle) (optional / best effort)
+libv.ui.property: free property name binding
+libv.ui.property: need support for structure and different names, libv.reflection might gets a hit because of this
+libv.ui.property: remove fallback from properties and place it into context_ui as a fallback style
+libv.ui.property: detect to property changes
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: on property change event / virtual function (?) called before layout1 if there was any change
-libv.ui.property: detect and/or react to property changes
-libv.ui.style: move style code out of component_base (inside doStyle instead of change to an external thing)
-libv.ui.property: move around property system a bit > instead of reflection inside doStyle, use two function (?) Am I really .. (?) | the aim is to remove the necessity of actually storing the property
-libv.ui.property: more freedom for property "binding", need support for structure and different names, libv.reflection might gets a hit because of this
-libv.ui.style: complex composite component would result in "nested" property sets
 
-libv.ui: layout padding
+libv.ui.property: react to property changes
+libv.ui.property: property set / get via functions to eliminate mandated property storage in component
+
+
 
 properties / style
+	libv.ui.property: Add a default / init value per instance (above fallback)
 	libv.ui.property: property system interaction with static_component system
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes) | Have to account for cyclic owning references!
+	libv.ui.property: complex composite component would result in "nested" property sets
+	libv.ui.property: solve name/type collusion
+	libv.ui.property: scope / sheet / component type based style rules
+	libv.ui.property: dynamic access
+	libv.ui.property: if fallback value is requested log a warning
+	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
+	libv.ui.property: account for cyclic owning references with style property
 	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
-	libv.ui.style: verify that style change in child causes restyle in parent
+	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
+	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
+	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
 cleanup
+	libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
+	libv.ui: rename cursor to caret
+	libv.ui.font: line 179 not just log but return default on error
 	libv.ui: doLayout1 should use the return channel instead of member cache
+	libv.ui: remove layout1 pass member variables in component_base
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
-	libv.ui.font: line 179 not just log but return default on error
-	libv.ui: remove layout1 pass member variables in component_base
+	libv.ui: mark every component type one paramed ctors as explicit (and maybe check on every ui class too)
+	libv.ui: setX() / getX() -> void X(T) / T X()
 
 mouse
 	libv.ui: flatten - flatten EventMouse to combat variant complexity
@@ -275,13 +290,15 @@ component
 	libv.ui: support atlas based images
 
 	libv.ui: clipping vertex shader (with on/off)
-	libv.ui: scroll pane | dont forget clip plane (scissors), and that would effect every ui shader!
+	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar
 
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
 	libv.ui: not owning container views (list and/or table)
 
 ui
+	libv.ui: layout padding
+	libv.ui: fragments
 	libv.ui: static_component system
 	libv.ui: progress bar
 	libv.ui: add a glr::remote& to UI to simplify app::frame
@@ -290,10 +307,22 @@ ui
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
+libv.math: create vec_fwd and mat_fwd headers
+
+debug
+	libv.gl: framebuffer
+	libv.glr: framebuffer
+	libv.gl: renderbuffer
+	libv.glr: renderbuffer
+	libv.gl: blit
+	libv.glr: blit
+	libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), its not strictly an ui debug feature
+
 interactive
 	libv.ui: String2D API to find nearest character position
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui: callback system for button (and other interactive component) aka: signal-slot
+	libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signal
 	libv.ui.input_field: paste support
 	libv.ui.input_field: selection support
 	libv.ui.input_field: copy support
@@ -367,8 +396,6 @@ app.vm4_viewer: implement a small light gui app to provide guidance to GUI devel
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
 --- [[[ deadline: 2019.10.31 ]]] ---
-
-libv.math: create vec_fwd and mat_fwd headers
 
 libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs

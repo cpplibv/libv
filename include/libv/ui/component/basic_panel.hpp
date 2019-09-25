@@ -12,6 +12,7 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_focus_travers.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/style.hpp>
 
@@ -41,8 +42,8 @@ public:
 
 protected:
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
-	virtual void doStyle() override;
-	virtual void doStyle(ChildID childID) override;
+	virtual void doStyle(ContextStyle& context) override;
+	virtual void doStyle(ContextStyle& context, ChildID childID) override;
 	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current) override;
 	virtual void doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
@@ -114,13 +115,13 @@ void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(BaseComponent&
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::doStyle() {
-	set(property);
+void BasicPanel<Layout>::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::doStyle(ChildID childID) {
-	children[childID].ptr->set(children[childID].property);
+void BasicPanel<Layout>::doStyle(ContextStyle& ctx, ChildID childID) {
+	children[childID].property.access(ctx);
 }
 
 template <typename Layout>

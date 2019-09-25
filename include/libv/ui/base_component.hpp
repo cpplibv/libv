@@ -5,6 +5,7 @@
 // libv
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/meta/identity.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/utility/function_ref.hpp>
 #include <libv/utility/intrusive_ptr.hpp>
@@ -30,6 +31,7 @@ class ContextFocusTravers;
 class ContextLayout1;
 class ContextLayout2;
 class ContextRender;
+class ContextStyle;
 class ContextUI;
 class EventFocus;
 class EventMouse;
@@ -48,6 +50,7 @@ struct BaseComponent {
 	friend class AccessLayout;
 	friend class AccessParent;
 	friend class AccessRoot;
+	friend class ContextStyle; // For flagging invalidate flags
 
 private:
 	Flag_t flags = Flag::mask_init;
@@ -127,16 +130,15 @@ public:
 
 public:
 	template <typename Property>
+		WISH_REQUIRES(C_Property<Property>)
 	inline void set(Property& property, typename Property::value_type value);
 
-	template <typename PS, auto delay = [](Style& v) { return v; }>
-	inline void set(PropertySet<PS>& properties);
-
-	template <typename Property, auto delay = [](Style& v) { return v; }>
+	template <typename Property, typename CTX = ContextStyle>
+		WISH_REQUIRES(C_Property<Property>)
 	inline void reset(Property& property);
 
-	template <typename Property>
-	[[nodiscard]] inline const typename Property::value_type& value(Property& property) const;
+private:
+	ContextStyle makeStyleContext() noexcept;
 
 private:
 	bool isFocusableComponent() const noexcept;
@@ -166,8 +168,8 @@ private:
 	virtual void doAttach();
 	virtual void doDetach();
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback);
-	virtual void doStyle();
-	virtual void doStyle(ChildID childID);
+	virtual void doStyle(ContextStyle& context);
+	virtual void doStyle(ContextStyle& context, ChildID childID);
 	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current);
 	virtual void doCreate(ContextRender& context);
 	virtual void doDestroy(ContextRender& context);
@@ -274,6 +276,7 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Property>
+		WISH_REQUIRES(C_Property<Property>)
 inline void BaseComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::manual(property, true);
 	const bool change = AccessProperty::value(property) != value;
@@ -283,98 +286,13 @@ inline void BaseComponent::set(Property& property, typename Property::value_type
 	}
 }
 
-template <typename PS, auto delay>
-inline void BaseComponent::set(PropertySet<PS>& properties) {
-	// TODO P5: I think it is possible to "type erase" these style set functions with a minimal code on the user site (? template instantiated function pointers)
-	if (style_ == nullptr) {
-		libv::meta::foreach_member_reference(properties, [this](auto& property) {
-			using value_type = typename std::remove_reference_t<decltype(property)>::value_type;
-			constexpr bool is_fallback_function = std::is_invocable_v<decltype(property.fallback), ContextUI&>;
-
-			if (AccessProperty::manual(property))
-				return;
-
-			value_type value;
-
-			if constexpr (is_fallback_function)
-				value = property.fallback(context());
-			else
-				value = property.fallback;
-
-			const bool change = value != AccessProperty::value(property);
-
-			if (change) {
-				AccessProperty::value(property, std::move(value));
-				flagAuto(property.invalidate);
-			}
-		});
-	} else {
-		libv::meta::foreach_member_reference(properties, [this](auto& property) {
-			using value_type = typename std::remove_reference_t<decltype(property)>::value_type;
-			constexpr bool is_fallback_function = std::is_invocable_v<decltype(property.fallback), ContextUI&>;
-
-			if (AccessProperty::manual(property))
-				return;
-
-			value_type value;
-
-			const auto& value_by_style = delay(*style_).template get_optional<value_type>(property.name);
-			if (value_by_style)
-				value = *value_by_style;
-			else
-				if constexpr (is_fallback_function)
-					value = property.fallback(context());
-				else
-					value = property.fallback;
-
-			const bool change = value != AccessProperty::value(property);
-
-			if (change) {
-				AccessProperty::value(property, std::move(value));
-				flagAuto(property.invalidate);
-			}
-		});
-	}
-}
-
-template <typename Property, auto delay>
+template <typename Property, typename CTX>
+		WISH_REQUIRES(C_Property<Property>)
 inline void BaseComponent::reset(Property& property) {
-	using value_type = typename Property::value_type;
-	constexpr bool is_fallback_function = std::is_invocable_v<decltype(property.fallback), ContextUI&>;
-
-	if (AccessProperty::manual(property))
-		return;
-
+	static_assert(sizeof(CTX) != 0, "Missing include: ContextStyle");
 	AccessProperty::manual(property, false);
-	value_type value;
-
-	if (style_ == nullptr) {
-		if constexpr (is_fallback_function)
-			value = property.fallback(context());
-		else
-			value = property.fallback;
-	} else {
-		const auto& value_by_style = delay(*style_).template get_optional<value_type>(property.name);
-		if (value_by_style)
-			value = *value_by_style;
-		else
-			if constexpr (is_fallback_function)
-				value = property.fallback(context());
-			else
-				value = property.fallback;
-	}
-
-	const bool change = value != AccessProperty::value(property);
-
-	if (change) {
-		AccessProperty::value(property, std::move(value));
-		flagAuto(property.invalidate);
-	}
-}
-
-template <typename Property>
-inline const typename Property::value_type& BaseComponent::value(Property& property) const {
-	return AccessProperty::value(property);
+	makeStyleContext()(property, "");
+	// NOTE: This works as names are stored inside the type, sub fragment mapping might break it
 }
 
 // -------------------------------------------------------------------------------------------------

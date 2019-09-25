@@ -164,6 +164,19 @@ int main(int, char**) {
 		std::cout << libv::member_offset(member_pointer) << ", ";
 	});
 
+	std::cout << std::endl;
+
+	constexpr int num_uint16_t_members = [] {
+		int i = 0;
+		libv::meta::foreach_static_member<State<ServerFieldSet>>([&i](auto member) {
+			if (std::is_same_v<typename decltype(member)::value_type, uint16_t>)
+				++i;
+		});
+		return i;
+	}();
+
+	std::cout << "num_uint16_t_members: " << num_uint16_t_members << std::endl;
+
 	return 0;
 }
 

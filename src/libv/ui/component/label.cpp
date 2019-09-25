@@ -7,6 +7,7 @@
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
@@ -43,14 +44,14 @@ const std::string& Label::getText() const {
 
 // -------------------------------------------------------------------------------------------------
 
-void Label::doStyle() {
-	set(property);
+void Label::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 void Label::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 	string.setFont(property.font(), property.font_size());
-	string.setAlign(property.align());
+	string.setAlign(property.align_horizontal());
 	const auto content = string.getContent(-1, -1);
 	AccessLayout::lastDynamic(*this) = {content, 0.f};
 }
@@ -67,7 +68,7 @@ void Label::doRender(ContextRender& context) {
 	context.gl.state.blendDst_One_Minus_Source1Color();
 
 	string.setFont(property.font(), property.font_size());
-	string.setAlign(property.align());
+	string.setAlign(property.align_horizontal());
 
 	context.gl.program(*property.font_shader());
 	context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);

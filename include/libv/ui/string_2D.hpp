@@ -59,6 +59,7 @@ public:
 
 public:
 	void setAlign(const AlignHorizontal align);
+	void setFont(std::shared_ptr<Font2D> font);
 	void setFont(std::shared_ptr<Font2D> font, const FontSize fontSize);
 	void setSize(const FontSize fontSize);
 	void setString(std::string string);

@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/meta/reflection_access.hpp>
 // std
 #include <functional>
 #include <string>
@@ -25,25 +24,32 @@ namespace ui {
 class Button : public BaseComponent {
 private:
 	struct PS {
-		PropertyColor color;
-		PropertyImage image;
-		PropertyShaderImage image_shader;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
+		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
 
-		PropertyAlignHorizontal align;
-		PropertyFont font;
-		PropertyFontColor font_color;
-		PropertyFontSize font_size;
-		PropertyShaderFont font_shader;
+		Property<Color,             R, pnm::bg_color> bg_color;
+		Property<Texture2D_view,   LR, pnm::bg_image> bg_image;
+		Property<ShaderImage_view,  R, pnm::bg_shader> bg_shader;
 
-		LIBV_REFLECTION_ACCESS(color);
-		LIBV_REFLECTION_ACCESS(image);
-		LIBV_REFLECTION_ACCESS(image_shader);
+		Property<AlignHorizontal,  L , pnm::align_horizontal> align_horizontal;
+		Property<Font2D_view,      LR, pnm::font> font;
+		Property<Color,             R, pnm::font_color> font_color;
+		Property<FontSize,         LR, pnm::font_size> font_size;
+		Property<ShaderFont_view,   R, pnm::font_shader> font_shader;
 
-		LIBV_REFLECTION_ACCESS(align);
-		LIBV_REFLECTION_ACCESS(font);
-		LIBV_REFLECTION_ACCESS(font_color);
-		LIBV_REFLECTION_ACCESS(font_size);
-		LIBV_REFLECTION_ACCESS(font_shader);
+		template <typename T>
+		void access(T& ctx) {
+			ctx(bg_color, "Background color");
+			ctx(bg_image, "Background image");
+			ctx(bg_shader, "Background shader");
+
+			ctx(align_horizontal, "Horizontal alignment of the text");
+			ctx(font, "Font file");
+			ctx(font_color, "Font color");
+			ctx(font_shader, "Font shader");
+			ctx(font_size, "Font size in pixel");
+		}
 	};
 
 private:
@@ -73,7 +79,7 @@ private:
 private:
 	virtual void doAttach() override;
 	virtual void doDetach() override;
-	virtual void doStyle() override;
+	virtual void doStyle(ContextStyle& ctx) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;

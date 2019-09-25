@@ -32,7 +32,6 @@ public:
 				std::is_invocable_r<R, F &&, Args...>::value
 			>
 	>
-
 	constexpr inline function_ref(F &&f) noexcept :
 		obj_(const_cast<void*> (reinterpret_cast<const void*> (std::addressof(f)))) {
 		callback_ = [](void* obj, Args... args) -> R {

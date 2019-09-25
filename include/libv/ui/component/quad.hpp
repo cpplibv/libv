@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/meta/reflection_access.hpp>
 // std
 #include <string>
 #include <string_view>
@@ -22,11 +21,16 @@ namespace ui {
 struct Quad : BaseComponent {
 private:
 	struct PS {
-		PropertyColor color;
-		PropertyShaderQuad quad_shader;
+		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
 
-		LIBV_REFLECTION_ACCESS(color);
-		LIBV_REFLECTION_ACCESS(quad_shader);
+		Property<Color,           R, pnm::color> color;
+		Property<ShaderQuad_view, R, pnm::quad_shader> quad_shader;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(color, "Color");
+			ctx(quad_shader, "Quad shader");
+		}
 	};
 
 private:
@@ -41,7 +45,7 @@ public:
 	~Quad();
 
 private:
-	virtual void doStyle() override;
+	virtual void doStyle(ContextStyle& ctx) override;
 	virtual void doRender(ContextRender& context) override;
 };
 

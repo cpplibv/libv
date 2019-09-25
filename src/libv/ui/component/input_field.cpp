@@ -5,13 +5,16 @@
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/input/event.hpp>
+#include <libv/meta/identity.hpp>
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
+#include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
@@ -38,20 +41,20 @@ InputField::~InputField() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void InputField::setText(std::string string_) {
-	text.setString(std::move(string_));
+void InputField::text(std::string string_) {
+	text_.setString(std::move(string_));
 
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
-const std::string& InputField::getText() const {
-	return text.getString();
+const std::string& InputField::text() const {
+	return text_.getString();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 bool InputField::onChar(const libv::input::EventChar& event) {
-	text.push_back(event.utf8.data());
+	text_.push_back(event.utf8.data());
 
 	cursorStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -60,7 +63,7 @@ bool InputField::onChar(const libv::input::EventChar& event) {
 
 bool InputField::onKey(const libv::input::EventKey& event) {
 	if (event.key == libv::input::Key::Backspace && event.action != libv::input::Action::release) {
-		text.pop_back();
+		text_.pop_back();
 
 		cursorStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -86,10 +89,12 @@ bool InputField::onMouse(const EventMouse& event) {
 		focus();
 
 	if (event.isMovement() && event.movement().enter)
-		{} // Set style to hover if not disabled
+		// Set style to hover if not disabled
+		set(property.bg_color, property.bg_color() + 0.2f);
 
 	if (event.isMovement() && event.movement().leave)
-		{} // Set style to normal or disabled
+		// Set style to hover if not disabled
+		reset(property.bg_color);
 
 	return true;
 }
@@ -100,64 +105,36 @@ void InputField::doAttach() {
 	watchChar(true);
 	watchKey(true);
 	watchFocus(true);
-	watchMouse(Flag::watchMouseButton);
+	watchMouse(Flag::watchMouseButton | Flag::watchMouseEnter);
 }
 
-void InputField::doStyle() {
-	set(property);
-
-	// =================================================================================================
-
-//	set<std::shared_ptr<Font2D>>("font",
-//			[](auto& c, auto v) {
-//				c.text.setFont(std::move(v), 12);
-//				c.cursorPosition = c.text.getCharacterPosition();
-//			}, [](auto& c) {
-//				return c.text.getFont();
-//			}
-//	);
-//	set(property.font,
-//			[](auto& c, auto v) {
-//				c.text.setFont(std::move(v), 12);
-//				c.cursorPosition = c.text.getCharacterPosition();
-//			}, [](auto& c) {
-//				return c.text.getFont();
-//			}
-//	);
-
-//	libv::meta::foreach_member(property, [](auto p) {
-//		set(property);
-//	});
-//
-////	set<Font2D_view>("font", &InputField::setFont, &InputField::getFont);
-//	set<PropertyFont>("font", &InputField::setFont, &InputField::getFont);
-//	set<PropertyFontSize>("font-size", &InputField::setFontSize, &InputField::getFontSize);
-//	set<PropertyFontColor>("font-color", &InputField::font_color);
-
-	// =================================================================================================
+void InputField::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 void InputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	text.setFont(property.font(), property.font_size());
-	text.setAlign(property.align());
-	const auto contentString = text.getContent(-1, -1);
-	const auto contentImage = libv::vec::cast<float>(property.image()->size());
+
+	text_.setFont(property.font(), property.font_size());
+	text_.setAlign(property.align_horizontal());
+
+	const auto contentString = text_.getContent(-1, -1);
+	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
 void InputField::doLayout2(const ContextLayout2& environment) {
-	text.setLimit(libv::vec::xy(environment.size));
-	cursorPosition = text.getCharacterPosition();
+	text_.setLimit(libv::vec::xy(environment.size));
+	cursorPosition = text_.getCharacterPosition();
 }
 
 void InputField::doRender(ContextRender& ctx) {
 	if (ctx.changedSize) {
-		quad_mesh.clear();
-		auto pos = quad_mesh.attribute(attribute_position);
-		auto tex = quad_mesh.attribute(attribute_texture0);
-		auto index = quad_mesh.index();
+		bg_mesh.clear();
+		auto pos = bg_mesh.attribute(attribute_position);
+		auto tex = bg_mesh.attribute(attribute_texture0);
+		auto index = bg_mesh.index();
 
 		pos(0, 0, 0);
 		pos(size().x, 0, 0);
@@ -172,11 +149,8 @@ void InputField::doRender(ContextRender& ctx) {
 		index.quad(0, 1, 2, 3);
 	}
 
-	// <<< P3: on Font or on FontSize change would be the correct condition
-//	const auto changedFont = property.font.consumeChange();
-//	const auto changedFontSize = property.font.consumeChange();
-	const auto changedFont = ctx.changedSize;
-	const auto changedFontSize = ctx.changedSize;
+	const auto changedFont = property.font.consumeChange();
+	const auto changedFontSize = property.font_size.consumeChange();
 
 	if (changedFont || changedFontSize) {
 		cursor_mesh.clear();
@@ -201,28 +175,30 @@ void InputField::doRender(ContextRender& ctx) {
 		index.quad(0, 1, 2, 3);
 	}
 
+	if (changedFont || changedFontSize) {
+		text_.setFont(property.font(), property.font_size());
+		text_.setAlign(property.align_horizontal());
+	}
+
 	const auto guard_m = ctx.gl.model.push_guard();
  	ctx.gl.model.translate(position());
 
 	{
-		ctx.gl.program(*property.image_shader());
-		ctx.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
-		ctx.gl.uniform(property.image_shader()->uniform_color, property.color());
-		ctx.gl.uniform(property.image_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(quad_mesh);
+		ctx.gl.program(*property.bg_shader());
+		ctx.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
+		ctx.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
+		ctx.gl.uniform(property.bg_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(bg_mesh);
 	} {
 		const auto guard_s = ctx.gl.state.push_guard();
 		ctx.gl.state.blendSrc_Source1Color();
 		ctx.gl.state.blendDst_One_Minus_Source1Color();
 
-		text.setFont(property.font(), property.font_size());
-		text.setAlign(property.align());
-
 		ctx.gl.program(*property.font_shader());
 		ctx.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
 		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
 		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(text.mesh());
+		ctx.gl.render(text_.mesh());
 	}
 
 	const auto cursor_flash_iteration = time_mod(ctx.now - cursorStartTime, context().settings.cursor_flash_period);
@@ -231,8 +207,7 @@ void InputField::doRender(ContextRender& ctx) {
 		ctx.gl.model.translate({cursorPosition, 0});
 
 		ctx.gl.program(*property.cursor_shader());
-		ctx.gl.uniform(property.cursor_shader()->uniform_color, property.font_color());
-//		context.gl.uniform(property.cursor_shader()->uniform_color, property.cursor_color()); // <<< P2: property name collusion
+		ctx.gl.uniform(property.cursor_shader()->uniform_color, property.cursor_color());
 		ctx.gl.uniform(property.cursor_shader()->uniform_MVPmat, ctx.gl.mvp());
 		ctx.gl.render(cursor_mesh);
 	}

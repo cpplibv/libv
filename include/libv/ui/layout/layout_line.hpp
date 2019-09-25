@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
 #include <libv/utility/span.hpp>
 // std
 #include <memory>
@@ -24,19 +23,27 @@ class BaseComponent;
 
 struct LayoutLine {
 	struct PS {
-		PropertyAlignHorizontal alignHorizontal;
-		PropertyAlignVertical alignVertical;
-		PropertyOrientation orientation;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
 
-		LIBV_REFLECTION_ACCESS(alignHorizontal);
-		LIBV_REFLECTION_ACCESS(alignVertical);
-		LIBV_REFLECTION_ACCESS(orientation);
+		Property<AlignHorizontal, L, pnm::align_horizontal> align_horizontal;
+		Property<AlignVertical,   L, pnm::align_vertical> align_vertical;
+		Property<Orientation,     L, pnm::orientation> orientation;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(align_horizontal, "Horizontal align of the inner content of the component");
+			ctx(align_vertical, "Vertical align of the inner content of the component");
+			ctx(orientation, "Orientation of subsequent components");
+		}
 	};
 
 	struct ChildPS {
-		PropertySize size;
+		Property<Size, (Flag::pendingLayout).value(), pnm::size> size;
 
-		LIBV_REFLECTION_ACCESS(size);
+		template <typename T>
+		void access(T& ctx) {
+			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
+		}
 	};
 
 	struct Child {

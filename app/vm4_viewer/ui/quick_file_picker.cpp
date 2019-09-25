@@ -64,8 +64,8 @@ void QuickFilePicker::key(libv::input::Key key) {
 }
 
 void QuickFilePicker::doAttach() {
-	set(property.alignHorizontal, libv::ui::AlignHorizontal::Left);
-	set(property.alignVertical, libv::ui::AlignVertical::Top);
+	set(property.align_horizontal, libv::ui::AlignHorizontal::Left);
+	set(property.align_vertical, libv::ui::AlignVertical::Top);
 	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
 
 	{
@@ -106,22 +106,27 @@ void QuickFilePicker::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.slim_border");
-		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-		style->set("image_shader", context().shaderImage());
-		style->set("image", context().texture2D("slate_line_edge.png"));
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_shader", context().shaderImage());
+		style->set("bg_image", context().texture2D("slate_line_edge.png"));
 		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 	}
 
 	{
 		auto style = context().style("vm4pv.info.input");
+
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
+		style->set("bg_shader", context().shaderImage());
+
+		style->set("cursor_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
+		style->set("cursor_shader", context().shaderQuad());
+
 		style->set("align", libv::ui::AlignHorizontal::Left);
 		style->set("align_vertical", libv::ui::AlignVertical::Center);
-		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("font_size", libv::ui::FontSize{12});
-		style->set("image", context().texture2D("separator_bar_256x16.png"));
-		style->set("image_shader", context().shaderImage());
 		style->set("size", libv::ui::parse_size_or_throw("1rD, d"));
 	}
 
@@ -182,14 +187,14 @@ void QuickFilePicker::update_filelist() {
 	{
 		const auto input = std::make_shared<libv::ui::InputField>("input0");
 		input->style(context().style("vm4pv.info.input"));
-		input->setText("Input 0");
+		input->text("Input 0");
 		add(input);
 	}
 
 	{
 		const auto input = std::make_shared<libv::ui::InputField>("input1");
 		input->style(context().style("vm4pv.info.input"));
-		input->setText("Input 1");
+		input->text("Input 1");
 		add(input);
 	}
 

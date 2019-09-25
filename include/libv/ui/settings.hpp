@@ -38,6 +38,8 @@ struct Settings {
 	float cursor_width_offset = 12;
 	float cursor_width_scale = 24;
 
+	// bool enable_lcd_font = true;
+
 	ResourceSettings res_font = {"res/font"};
 	ResourceSettings res_shader = {"res/shader"};
 	ResourceSettings res_texture = {"res/texture"};
@@ -48,6 +50,7 @@ struct Settings {
 	LIBV_REFLECTION_ACCESS(cursor_width_min);
 	LIBV_REFLECTION_ACCESS(cursor_width_offset);
 	LIBV_REFLECTION_ACCESS(cursor_width_scale);
+	// LIBV_REFLECTION_ACCESS(enable_lcd_font);
 	LIBV_REFLECTION_ACCESS(res_font);
 	LIBV_REFLECTION_ACCESS(res_shader);
 	LIBV_REFLECTION_ACCESS(res_texture);

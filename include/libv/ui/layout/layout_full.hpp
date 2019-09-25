@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
 #include <libv/utility/span.hpp>
 // std
 #include <memory>
@@ -24,13 +23,21 @@ class BaseComponent;
 
 struct LayoutFull {
 	struct PS {
-		LIBV_REFLECTION_EMPTY();
+		template <typename T>
+		void access(T& ctx) {
+			(void) ctx;
+		}
 	};
 
 	struct ChildPS {
-		PropertySize size;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
 
-		LIBV_REFLECTION_ACCESS(size);
+		Property<Size, L, pnm::size> size;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
+		}
 	};
 
 	struct Child {

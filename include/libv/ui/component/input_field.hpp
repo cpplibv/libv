@@ -22,41 +22,51 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+
 class InputField : public BaseComponent {
 private:
 	struct PS {
-		PropertyColor color;
-		PropertyImage image;
-		PropertyShaderImage image_shader;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
+		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
 
-		PropertyAlignHorizontal align;
-		PropertyFont font;
-		PropertyFontColor font_color;
-		PropertyFontSize font_size;
-		PropertyShaderFont font_shader;
+		Property<Color,             R, pnm::bg_color> bg_color;
+		Property<Texture2D_view,   LR, pnm::bg_image> bg_image;
+		Property<ShaderImage_view,  R, pnm::bg_shader> bg_shader;
 
-//		PropertyColor cursor_color;
-		PropertyShaderQuad cursor_shader;
+		Property<Color,             R, pnm::cursor_color> cursor_color;
+		Property<ShaderQuad_view,   R, pnm::cursor_shader> cursor_shader;
 
-		LIBV_REFLECTION_ACCESS(color);
-		LIBV_REFLECTION_ACCESS(image);
-		LIBV_REFLECTION_ACCESS(image_shader);
+		Property<AlignHorizontal,  L , pnm::align_horizontal> align_horizontal;
+		// Property<AlignVertical,   L , pnm::align_vertical> align_vertical;
+		// Property7DD<Font2D_view,     LR, pnm::font, setFont, getFont> font;
+		Property<Font2D_view,      LR, pnm::font> font;
+		Property<Color,             R, pnm::font_color> font_color;
+		Property<FontSize,         LR, pnm::font_size> font_size;
+		Property<ShaderFont_view,   R, pnm::font_shader> font_shader;
 
-		LIBV_REFLECTION_ACCESS(align);
-		LIBV_REFLECTION_ACCESS(font);
-		LIBV_REFLECTION_ACCESS(font_color);
-		LIBV_REFLECTION_ACCESS(font_size);
-		LIBV_REFLECTION_ACCESS(font_shader);
+		template <typename T>
+		void access(T& ctx) {
+			ctx(bg_color, "Background color");
+			ctx(bg_image, "Background image");
+			ctx(bg_shader, "Background shader");
 
-//		LIBV_REFLECTION_ACCESS(cursor_color);
-		LIBV_REFLECTION_ACCESS(cursor_shader);
+			ctx(cursor_color, "Cursor color");
+			ctx(cursor_shader, "Cursor shader");
+
+			ctx(align_horizontal, "Horizontal alignment of the text");
+		//	ctx(align_vertical, "Vertical alignment of the text");
+			ctx(font, "Font file");
+			ctx(font_color, "Font color");
+			ctx(font_shader, "Font shader");
+			ctx(font_size, "Font size in pixel");
+		}
 	};
 
-public:
 	libv::ui::PropertySet<PS> property;
 
 private:
-	libv::glr::Mesh quad_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh cursor_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 private:
@@ -64,7 +74,7 @@ private:
 	libv::vec2f cursorPosition;
 
 private:
-	String2D text;
+	String2D text_;
 
 public:
 	InputField();
@@ -73,8 +83,8 @@ public:
 	~InputField();
 
 public:
-	void setText(std::string string_);
-	const std::string& getText() const;
+	void text(std::string string_);
+	const std::string& text() const;
 
 private:
 	virtual bool onChar(const libv::input::EventChar& event) override;
@@ -84,7 +94,7 @@ private:
 
 private:
 	virtual void doAttach() override;
-	virtual void doStyle() override;
+	virtual void doStyle(ContextStyle& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;

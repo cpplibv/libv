@@ -88,7 +88,7 @@ libv::observer_ptr<const PropertyDynamic> Style::get_optional(const std::string_
 const PropertyDynamic& Style::get_or_throw(const std::string_view property) const {
 	const auto result = get_optional(property);
 	if (!result)
-		throw std::invalid_argument(libv::concat("Requested property \"", property, "\" is not found"));
+		throw std::invalid_argument(libv::concat("Requested property \"", property, "\" is not found in \"", style_name ,"\" style"));
 
 	return *result;
 }

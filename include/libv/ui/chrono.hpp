@@ -4,6 +4,7 @@
 
 // std
 #include <chrono>
+#include <type_traits>
 
 
 namespace libv {
@@ -19,7 +20,7 @@ struct clock {
 
 	static constexpr bool is_steady = true;
 
-	static inline time_point now() noexcept {
+	[[nodiscard]] static inline time_point now() noexcept {
 		return {std::chrono::steady_clock::now()};
 	}
 };
@@ -27,14 +28,19 @@ struct clock {
 using time_duration = clock::duration;
 using time_point = clock::time_point;
 
+// -------------------------------------------------------------------------------------------------
+
 template <typename RepX, typename PeriodX, typename RepY, typename PeriodY>
-constexpr inline auto time_mod(std::chrono::duration<RepX, PeriodX> x, std::chrono::duration<RepY, PeriodY> y) noexcept {
+[[nodiscard]] constexpr inline auto time_mod(std::chrono::duration<RepX, PeriodX> x, std::chrono::duration<RepY, PeriodY> y) noexcept {
 	using common_type = std::common_type_t<decltype(x), decltype(y)>;
 
 	common_type commonX{x};
 	common_type commonY{y};
 
-	return common_type{std::fmod(commonX.count(), commonY.count())};
+	if constexpr (std::is_floating_point_v<typename time_duration::rep>)
+		return common_type{std::fmod(commonX.count(), commonY.count())};
+	else
+		return common_type{commonX.count() % commonY.count()};
 }
 
 // -------------------------------------------------------------------------------------------------

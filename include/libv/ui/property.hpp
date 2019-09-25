@@ -2,6 +2,9 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/intrusive_ptr.hpp>
+#include <libv/utility/fixed_string.hpp>
 // std
 #include <memory>
 #include <string>
@@ -18,6 +21,7 @@
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
+#include <libv/ui/style_fwd.hpp>
 
 
 namespace libv {
@@ -42,181 +46,91 @@ using ShaderImage_view = std::shared_ptr<ShaderImage>;
 class ShaderQuad;
 using ShaderQuad_view = std::shared_ptr<ShaderQuad>;
 
-// -------------------------------------------------------------------------------------------------
+using Style_view = libv::intrusive_ptr<Style>;
+
+namespace pnm { // ---------------------------------------------------------------------------------
+
+// NOTE: It is not necessary to store the fixed_strings here, it is merely a forethought and typo protection
+
+static constexpr libv::fixed_string align_horizontal = "align";
+static constexpr libv::fixed_string align_vertical = "align_vertical";
+static constexpr libv::fixed_string anchor = "anchor";
+static constexpr libv::fixed_string anchor_content = "anchor_content";
+static constexpr libv::fixed_string anchor_parent = "anchor_parent";
+static constexpr libv::fixed_string anchor_target = "anchor_target";
+static constexpr libv::fixed_string bg_color = "bg_color";
+static constexpr libv::fixed_string bg_image = "bg_image";
+static constexpr libv::fixed_string bg_shader = "bg_shader";
+static constexpr libv::fixed_string color = "color";
+static constexpr libv::fixed_string column_count = "column_count";
+static constexpr libv::fixed_string cursor_color = "cursor_color";
+static constexpr libv::fixed_string cursor_shader = "cursor_shader";
+static constexpr libv::fixed_string font = "font";
+static constexpr libv::fixed_string font_color = "font_color";
+static constexpr libv::fixed_string font_shader = "font_shader";
+static constexpr libv::fixed_string font_size = "font_size";
+static constexpr libv::fixed_string orientation = "orientation";
+static constexpr libv::fixed_string orientation2 = "orientation2";
+static constexpr libv::fixed_string quad_shader = "quad_shader";
+static constexpr libv::fixed_string size = "size";
+static constexpr libv::fixed_string snapToEdge = "snapToEdge";
+static constexpr libv::fixed_string squish = "squish";
+
+} // namespace pnm ---------------------------------------------------------------------------------
 
 template <typename T>
-class BaseProperty {
+concept bool C_Property = requires(T var) {
+		{ T::name } -> std::string_view;
+		{ T::invalidate } -> Flag_t;
+
+		typename T::tagProperty;
+		typename T::value_type;
+};
+
+template <typename T, Flag_t::value_type I, libv::fixed_string Name>
+class Property {
 	friend class AccessProperty;
 
 	T value;
 	bool manual = false;
+	bool changed = false;
 
 public:
+	using tagProperty = void;
 	using value_type = T;
 
-public:
-	inline const T& operator()() const noexcept {
+	static constexpr std::string_view name = Name;
+	static constexpr Flag_t invalidate{I};
+
+	constexpr inline const T& operator()() const noexcept {
 		return value;
+	}
+
+	bool consumeChange() {
+		bool result = changed;
+		changed = false;
+		return result;
 	}
 };
 
-// -------------------------------------------------------------------------------------------------
-
-struct PropertyAlignHorizontal : BaseProperty<AlignHorizontal> {
-	static constexpr std::string_view name = "align";
-	static constexpr std::string_view description = "Horizontal align of the inner content of the component";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = value_type::Left;
-};
-
-struct PropertyAlignVertical : BaseProperty<AlignVertical> {
-	static constexpr std::string_view name = "align_vertical";
-	static constexpr std::string_view description = "Vertical align of the inner content of the component";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = value_type::Top;
-};
-
-struct PropertyAnchor : BaseProperty<Anchor> {
-	static constexpr std::string_view name = "anchor";
-	static constexpr std::string_view description = "Component's anchor point";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = {0.5f, 0.5f, 0.5f};
-};
-
-struct PropertyAnchorContent : BaseProperty<Anchor> {
-	static constexpr std::string_view name = "anchor_content";
-	static constexpr std::string_view description = "Content's anchor point";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = {0.5f, 0.5f, 0.5f};
-};
-
-struct PropertyAnchorParent : BaseProperty<Anchor> {
-	static constexpr std::string_view name = "anchor_parent";
-	static constexpr std::string_view description = "Parent's floating anchor point";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = {0.5f, 0.5f, 0.5f};
-};
-
-struct PropertyAnchorTarget : BaseProperty<Anchor> {
-	static constexpr std::string_view name = "anchor_target";
-	static constexpr std::string_view description = "Child's floating anchor point";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = {0.5f, 0.5f, 0.5f};
-};
-
-struct PropertyColumnCount : BaseProperty<ColumnCount> {
-	static constexpr std::string_view name = "column_count";
-	static constexpr std::string_view description = "Column count of the secondary dimension";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static constexpr value_type fallback = 2;
-};
-
-struct PropertyColor : BaseProperty<Color> {
-	static constexpr std::string_view name = "color";
-	static constexpr std::string_view description = "Primary color of the displayed component";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static constexpr value_type fallback = {1.f, 1.f, 1.f, 1.f};
-};
-
-struct PropertyFont : BaseProperty<Font2D_view> {
-	static constexpr std::string_view name = "font";
-	static constexpr std::string_view description = "Font file path";
-	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
-	static value_type fallback(ContextUI& context);
-};
-
-struct PropertyFontColor : BaseProperty<Color> {
-	static constexpr std::string_view name = "font_color";
-	static constexpr std::string_view description = "Font color";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static constexpr value_type fallback = {1.f, 1.f, 1.f, 1.f};
-};
-
-struct PropertyFontSize : BaseProperty<FontSize> {
-	static constexpr std::string_view name = "font_size";
-	static constexpr std::string_view description = "Font size in pixel";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = value_type{12};
-};
-
-struct PropertyImage : BaseProperty<Texture2D_view> {
-	static constexpr std::string_view name = "image";
-	static constexpr std::string_view description = "Image file path";
-	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
-	static value_type fallback(ContextUI& context);
-};
-
-struct PropertyOrientation : BaseProperty<Orientation> {
-	static constexpr std::string_view name = "orientation";
-	static constexpr std::string_view description = "Orientation of subsequent components";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = Orientation::LEFT_TO_RIGHT;
-};
-
-struct PropertyOrientation2 : BaseProperty<Orientation2> {
-	static constexpr std::string_view name = "orientation2";
-	static constexpr std::string_view description = "Two dimensional orientation of subsequent components";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = Orientation2::RIGHT_DOWN;
-};
-
-struct PropertyShaderFont : BaseProperty<ShaderFont_view> {
-	static constexpr std::string_view name = "font_shader";
-	static constexpr std::string_view description = "Font shader";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static value_type fallback(ContextUI& context);
-};
-
-struct PropertyShaderImage : BaseProperty<ShaderImage_view> {
-	static constexpr std::string_view name = "image_shader";
-	static constexpr std::string_view description = "Image shader";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static value_type fallback(ContextUI& context);
-};
-
-struct PropertyShaderQuad : BaseProperty<ShaderQuad_view> {
-	static constexpr std::string_view name = "quad_shader";
-	static constexpr std::string_view description = "Quad shader";
-	static constexpr Flag_t invalidate = Flag::pendingRender;
-	static value_type fallback(ContextUI& context);
-};
-
-struct PropertySize : BaseProperty<Size> {
-	static constexpr std::string_view name = "size";
-	static constexpr std::string_view description = "Component size in pixel, percent, ratio and dynamic units";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-//	static Flag_t invalidate(const value_type& value);
-	static constexpr value_type fallback = value_type{};
-};
-
-struct PropertySnapToEdge : BaseProperty<SnapToEdge> {
-	static constexpr std::string_view name = "snap_to_edge";
-	static constexpr std::string_view description = "Snap to edge any child that otherwise would hang out";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = false;
-};
-
-struct PropertySquish : BaseProperty<Squish> {
-	static constexpr std::string_view name = "squish";
-	static constexpr std::string_view description = "Squish any child that otherwise would hang out";
-	static constexpr Flag_t invalidate = Flag::pendingLayout;
-	static constexpr value_type fallback = false;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-using Debug = std::string;
-struct PropertyDebug : BaseProperty<Debug> {
-	static constexpr std::string_view name = "debug";
-	static constexpr std::string_view description = "Debug value";
-	static constexpr Flag_t invalidate = Flag::none;
-	// static constexpr value_type fallback = ""; // C++20
-	static inline const value_type fallback = "";
-};
+//template <typename T, Flag_t::value_type I, auto Set, auto Get>
+//class Property7DD {
+//	friend class AccessProperty;
+//
+//	bool manual = false;
+//	bool changed = false;
+//
+//public:
+//	static constexpr Flag_t invalidate{I};
+//	using value_type = T;
+//};
 
 // -------------------------------------------------------------------------------------------------
 
 using PropertyDynamic = std::variant<
+		float,
+		Style_view,
+
 		AlignHorizontal,
 		AlignVertical,
 		Anchor,
@@ -235,74 +149,28 @@ using PropertyDynamic = std::variant<
 		SnapToEdge,
 		// Squish,
 
-		Debug
-
-		// ---
-
-//		PropertyAlignHorizontal,
-//		PropertyAlignVertical,
-//		PropertyAnchor,
-//		PropertyAnchorContent,
-//		PropertyAnchorParent,
-//		PropertyAnchorTarget,
-//		PropertyColumnCount,
-//		PropertyColor,
-//		PropertyFont,
-//		PropertyFontColor,
-//		PropertyFontSize,
-//		PropertyImage,
-//		PropertyOrientation,
-//		PropertyOrientation2,
-//		PropertyShaderFont,
-//		PropertyShaderImage,
-//		PropertyShaderQuad,
-//		PropertySize,
-//		PropertySnapToEdge,
-//		PropertySquish,
-//
-//		PropertyDebug
+		std::string // For debug only
 >;
 
 // -------------------------------------------------------------------------------------------------
 
-//template <typename T>
-//class Property {
-//	friend class AccessProperty;
-//
-//	T value;
-//	bool manual = false;
-//
-//public:
-//	using value_type = T;
-//
-//public:
-//	inline operator const T&() const noexcept {
-//		return value;
-//	}
-////	inline const T* operator->() const noexcept {
-////		return &value;
-////	}
-//	inline const T& operator*() const noexcept {
-//		return value;
-//	}
-//};
-
 struct AccessProperty {
 public:
-	template <typename T>
-	static constexpr inline void manual(BaseProperty<T>& property, bool manual) noexcept {
+	template <typename Property>
+	static constexpr inline void manual(Property& property, bool manual) noexcept {
 		property.manual = manual;
 	}
-	template <typename T>
-	static constexpr inline bool manual(const BaseProperty<T>& property) noexcept {
+	template <typename Property>
+	static constexpr inline bool manual(const Property& property) noexcept {
 		return property.manual;
 	}
-	template <typename T>
-	static constexpr inline void value(BaseProperty<T>& property, T value) noexcept {
+	template <typename Property>
+	static constexpr inline void value(Property& property, typename Property::value_type value) noexcept {
 		property.value = std::move(value);
+		property.changed = true;
 	}
-	template <typename T>
-	static constexpr inline const T& value(const BaseProperty<T>& property) noexcept {
+	template <typename Property>
+	static constexpr inline const auto& value(const Property& property) noexcept {
 		return property.value;
 	}
 };

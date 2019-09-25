@@ -7,6 +7,7 @@
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
@@ -30,13 +31,13 @@ Image::~Image() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void Image::doStyle() {
-	this->set(property);
+void Image::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 void Image::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(property.image()->size()), 0.f};
+	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(property.bg_image()->size()), 0.f};
 }
 
 void Image::doRender(ContextRender& context) {
@@ -62,10 +63,10 @@ void Image::doRender(ContextRender& context) {
 	const auto guard_m = context.gl.model.push_guard();
 	context.gl.model.translate(position());
 
-	context.gl.program(*property.image_shader());
-	context.gl.uniform(property.image_shader()->uniform_color, property.color());
-	context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
+	context.gl.program(*property.bg_shader());
+	context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
+	context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
+	context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
 	context.gl.render(mesh);
 }
 

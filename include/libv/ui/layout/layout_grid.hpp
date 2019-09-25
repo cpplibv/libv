@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
 #include <libv/utility/span.hpp>
 // std
 #include <memory>
@@ -24,21 +23,31 @@ class BaseComponent;
 
 struct LayoutGrid {
 	struct PS {
-		PropertyAnchorContent anchor_content;
-		PropertyColumnCount column_count;
-		PropertyOrientation2 orientation2;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
 
-		LIBV_REFLECTION_ACCESS(anchor_content);
-		LIBV_REFLECTION_ACCESS(column_count);
-		LIBV_REFLECTION_ACCESS(orientation2);
+		Property<Anchor,       L, pnm::anchor_content> anchor_content;
+		Property<ColumnCount,  L, pnm::column_count> column_count;
+		Property<Orientation2, L, pnm::orientation2> orientation2;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(anchor_content, "Content's anchor point");
+			ctx(column_count, "Column count of the secondary dimension");
+			ctx(orientation2, "Two dimensional orientation of subsequent components");
+		}
 	};
 
 	struct ChildPS {
-		PropertyAnchor anchor;
-		PropertySize size;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
 
-		LIBV_REFLECTION_ACCESS(anchor);
-		LIBV_REFLECTION_ACCESS(size);
+		Property<Anchor, L, pnm::anchor> anchor;
+		Property<Size,   L, pnm::size> size;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(anchor, "Component's anchor point");
+			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
+		}
 	};
 
 	struct Child {

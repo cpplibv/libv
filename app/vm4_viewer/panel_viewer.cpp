@@ -68,12 +68,12 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv");
-		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_shader", context().shaderImage());
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_shader", context().shaderFont());
 		style->set("font_size", libv::ui::FontSize{11});
-		style->set("image_shader", context().shaderImage());
 		style->set("quad_shader", context().shaderQuad());
 	}
 
@@ -92,10 +92,10 @@ void PanelViewer::doAttach() {
 		auto style = context().style("vm4pv.button");
 		style->set("align", libv::ui::AlignHorizontal::Center);
 		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("font_size", libv::ui::FontSize{12});
-		style->set("image", context().texture2D("separator_bar_256x16.png"));
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	}
 
@@ -158,18 +158,18 @@ void PanelViewer::doAttach() {
 
 //	{
 //		auto style = context().style("vm4pv.info.separator");
-//		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-//		style->set("image", context().texture2D("separator_bar_256x16.png"));
+//		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+//		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 //		style->set("size", libv::ui::parse_size_or_throw("1r, 8px"));
 //	}
 
 	{
 		auto style = context().style("vm4pv.info.bar");
 		style->set("align", libv::ui::AlignHorizontal::Center);
-		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("font_size", libv::ui::FontSize{11});
-		style->set("image", context().texture2D("separator_bar_256x16.png"));
 		style->set("size", libv::ui::parse_size_or_throw("1r D, D"));
 	}
 
@@ -190,9 +190,9 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.slim_border");
-		style->set("color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
-		style->set("image_shader", context().shaderImage());
-		style->set("image", context().texture2D("slate_line_edge.png"));
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_image", context().texture2D("slate_line_edge.png"));
+		style->set("bg_shader", context().shaderImage());
 		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
 	}
 

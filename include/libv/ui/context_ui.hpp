@@ -50,7 +50,7 @@ class ContextUI {
 
 	UI& ui;
 public:
-	MouseTable& mouse; // <<< P5: remove
+	MouseTable& mouse;
 	Settings settings;
 
 public:
@@ -71,18 +71,22 @@ public:
 	std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
 	libv::intrusive_ptr<Style> style(const std::string_view style_name);
 
-public:
-	std::shared_ptr<ShaderFont> shaderFont();
-	std::shared_ptr<ShaderImage> shaderImage();
-	std::shared_ptr<ShaderQuad> shaderQuad();
-
 	std::shared_ptr<Shader> shader(const std::string& name);
 	std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
 	std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
 	std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
 
 public:
+	std::shared_ptr<ShaderFont> shaderFont();
+	std::shared_ptr<ShaderImage> shaderImage();
+	std::shared_ptr<ShaderQuad> shaderQuad();
+
+private:
+	std::shared_ptr<Font2D> getFallbackFont() const;
 	std::shared_ptr<Texture2D> getFallbackTexture2D() const;
+
+public:
+	const Style& getFallbackStyle() const;
 };
 
 // -------------------------------------------------------------------------------------------------

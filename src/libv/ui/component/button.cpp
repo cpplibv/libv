@@ -7,6 +7,7 @@
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
@@ -67,16 +68,16 @@ void Button::doDetach() {
 	context().mouse.unsubscribe(mouseWatcher);
 }
 
-void Button::doStyle() {
-	set(property);
+void Button::doStyle(ContextStyle& ctx) {
+	property.access(ctx);
 }
 
 void Button::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 	string.setFont(property.font(), property.font_size());
-	string.setAlign(property.align());
+	string.setAlign(property.align_horizontal());
 	const auto contentString = string.getContent(-1, -1);
-	const auto contentImage = libv::vec::cast<float>(property.image()->size());
+	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
@@ -114,10 +115,10 @@ void Button::doRender(ContextRender& context) {
  	context.gl.model.translate(position());
 
 	{
-		context.gl.program(*property.image_shader());
-		context.gl.uniform(property.image_shader()->uniform_color, property.color());
-		context.gl.uniform(property.image_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.texture(property.image()->texture(), property.image_shader()->textureChannel);
+		context.gl.program(*property.bg_shader());
+		context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
+		context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
+		context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
 		context.gl.render(mesh);
 	} {
 		const auto guard_s = context.gl.state.push_guard();
@@ -125,7 +126,7 @@ void Button::doRender(ContextRender& context) {
 		context.gl.state.blendDst_One_Minus_Source1Color();
 
 		string.setFont(property.font(), property.font_size());
-		string.setAlign(property.align());
+		string.setAlign(property.align_horizontal());
 
 		context.gl.program(*property.font_shader());
 		context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);

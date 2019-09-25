@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/meta/reflection_access.hpp>
 // std
 #include <string>
 #include <string_view>
@@ -22,13 +21,20 @@ namespace ui {
 struct Image : BaseComponent {
 private:
 	struct PS {
-		PropertyColor color;
-		PropertyImage image;
-		PropertyShaderImage image_shader;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
+		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
 
-		LIBV_REFLECTION_ACCESS(color);
-		LIBV_REFLECTION_ACCESS(image);
-		LIBV_REFLECTION_ACCESS(image_shader);
+		Property<Color,             R, pnm::bg_color> bg_color;
+		Property<Texture2D_view,   LR, pnm::bg_image> bg_image;
+		Property<ShaderImage_view,  R, pnm::bg_shader> bg_shader;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(bg_color, "Background color");
+			ctx(bg_image, "Background image");
+			ctx(bg_shader, "Background shader");
+		}
 	};
 
 private:
@@ -43,7 +49,7 @@ public:
 	~Image();
 
 private:
-	virtual void doStyle() override;
+	virtual void doStyle(ContextStyle& ctx) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doRender(ContextRender& context) override;
 };

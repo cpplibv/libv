@@ -47,6 +47,14 @@ void String2D::setAlign(const AlignHorizontal align_) {
 	dirty = true;
 }
 
+void String2D::setFont(std::shared_ptr<Font2D> font_) {
+	if (font == font_)
+		return;
+
+	font = std::move(font_);
+	dirty = true;
+}
+
 void String2D::setFont(std::shared_ptr<Font2D> font_, const FontSize fontSize_) {
 	if (font == font_ && fontSize == fontSize_)
 		return;

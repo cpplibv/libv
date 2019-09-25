@@ -2,8 +2,6 @@
 
 #pragma once
 
-// libv
-#include <libv/meta/reflection_access.hpp>
 // std
 #include <string>
 #include <string_view>
@@ -22,17 +20,24 @@ namespace ui {
 struct Label : BaseComponent {
 private:
 	struct PS {
-		PropertyAlignHorizontal align;
-		PropertyFont font;
-		PropertyFontColor font_color;
-		PropertyFontSize font_size;
-		PropertyShaderFont font_shader;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
+		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
 
-		LIBV_REFLECTION_ACCESS(align);
-		LIBV_REFLECTION_ACCESS(font);
-		LIBV_REFLECTION_ACCESS(font_color);
-		LIBV_REFLECTION_ACCESS(font_shader);
-		LIBV_REFLECTION_ACCESS(font_size);
+		Property<AlignHorizontal,  L , pnm::align_horizontal> align_horizontal;
+		Property<Font2D_view,      LR, pnm::font> font;
+		Property<Color,             R, pnm::font_color> font_color;
+		Property<FontSize,         LR, pnm::font_size> font_size;
+		Property<ShaderFont_view,   R, pnm::font_shader> font_shader;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(align_horizontal, "Horizontal alignment of the text");
+			ctx(font, "Font file");
+			ctx(font_color, "Font color");
+			ctx(font_shader, "Font shader");
+			ctx(font_size, "Font size in pixel");
+		}
 	};
 
 private:
@@ -51,7 +56,7 @@ public:
 	const std::string& getText() const;
 
 private:
-	virtual void doStyle() override;
+	virtual void doStyle(ContextStyle& ctx) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;

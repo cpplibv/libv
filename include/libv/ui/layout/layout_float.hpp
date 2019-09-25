@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/meta/reflection_access.hpp>
 #include <libv/utility/span.hpp>
 // std
 #include <memory>
@@ -24,23 +23,33 @@ class BaseComponent;
 
 struct LayoutFloat {
 	struct PS {
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+
 		// TODO P5: libv.ui: Implement Snap in float layout
 		// TODO P5: libv.ui: Implement Squish in float layout
-		PropertySnapToEdge snapToEdge;
-		PropertySquish squish;
+		Property<SnapToEdge, L, pnm::snapToEdge> snapToEdge;
+		Property<Squish,     L, pnm::squish> squish;
 
-		LIBV_REFLECTION_ACCESS(snapToEdge);
-		LIBV_REFLECTION_ACCESS(squish);
+		template <typename T>
+		void access(T& ctx) {
+			ctx(snapToEdge, "Snap to edge any child that otherwise would hang out");
+			ctx(squish, "Squish any child that otherwise would hang out");
+		}
 	};
 
 	struct ChildPS {
-		PropertySize size;
-		PropertyAnchorParent anchor_parent;
-		PropertyAnchorTarget anchor_target;
+		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
 
-		LIBV_REFLECTION_ACCESS(size);
-		LIBV_REFLECTION_ACCESS(anchor_parent);
-		LIBV_REFLECTION_ACCESS(anchor_target);
+		Property<Anchor, L, pnm::anchor_parent> anchor_parent;
+		Property<Anchor, L, pnm::anchor_target> anchor_target;
+		Property<Size,   L, pnm::size> size;
+
+		template <typename T>
+		void access(T& ctx) {
+			ctx(anchor_parent, "Parent's floating anchor point");
+			ctx(anchor_target, "Child's floating anchor point");
+			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
+		}
 	};
 
 	struct Child {

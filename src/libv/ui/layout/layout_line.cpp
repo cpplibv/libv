@@ -126,8 +126,8 @@ void LayoutLine::layout2(
 
 	(void) parent;
 
-	const auto& alignHData = AlignmentTableH[libv::to_value(property.alignHorizontal())];
-	const auto& alignVData = AlignmentTableV[libv::to_value(property.alignVertical())];
+	const auto& alignHData = AlignmentTableH[libv::to_value(property.align_horizontal())];
+	const auto& alignVData = AlignmentTableV[libv::to_value(property.align_vertical())];
 	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
 
 	const auto _X_ = orientData._X_;
