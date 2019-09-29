@@ -169,102 +169,159 @@
 //}
 //
 // =================================================================================================
-
-// ext
-#include <fmt/printf.h>
-// std
-#include <filesystem>
-#include <iostream>
-#include <optional>
-
-
-//std::optional<std::filesystem::path> resolve(
-//		const std::filesystem::path& path,
-//		const std::filesystem::path& base) {
+//
+//// ext
+//#include <fmt/printf.h>
+//// std
+//#include <filesystem>
+//#include <iostream>
+//#include <optional>
 //
 //
+////std::optional<std::filesystem::path> resolve(
+////		const std::filesystem::path& path,
+////		const std::filesystem::path& base) {
+////
+////
+////}
+//
+//std::optional<std::filesystem::path> resolve(const std::filesystem::path& path) {
+//	const auto res_folder = std::filesystem::path("res/font");
+//
+//	std::error_code ec;
+////	const auto normalized = path.lexically_normal();
+//
+//	fmt::print("is_relative: {}, is_absolute: {}\n", path.is_relative(), path.is_absolute());
+//	const auto normalized = std::filesystem::canonical(res_folder / path, ec);
+//
+//	if (ec) {
+//		fmt::print("cannonical: {} {}\n", ec, ec.message());
+//		return std::nullopt;
+//	}
+//
+//	fmt::print("is_relative: {}, is_absolute: {}\n", normalized.is_relative(), normalized.is_absolute());
+//
+////	if (normalized.empty())
+////		return std::nullopt;
+////
+////	if (normalized.is_absolute())
+////		return std::nullopt;
+////
+////	if (*normalized.begin() == "..")
+////		return std::nullopt;
+////
+////	if (*normalized.begin() == "/")
+////		return std::nullopt;
+////
+////	if (normalized.has_root_path())
+////		return std::nullopt;
+//
+//	fmt::print("normalized: {}\n", normalized.generic_string());
+////	return res_folder / normalized;
+//
+//	const auto relative = std::filesystem::relative(normalized, ec);
+//
+//	if (ec) {
+//		fmt::print("relative:   {} {}\n", ec, ec.message());
+//		return std::nullopt;
+//	}
+//	fmt::print("relative:   {}\n", relative.generic_string());
+//
+//	return relative;
+//}
+//
+//void print(const std::filesystem::path& path) {
+//	fmt::print("path:       {}\n", path.generic_string());
+////	auto x = resolve(path, "res");
+//	auto x = resolve(path);
+//	if (x)
+//		fmt::print("resolved:   {}\n\n", x->generic_string());
+//	else
+//		fmt::print("false\n\n");
+//}
+//
+//int main() {
+//	fmt::print("current_path: {}\n\n", std::filesystem::current_path().generic_string());
+//	print("consola.ttf");
+//	print("base/consola.ttf");
+//	print("base/../consola.ttf");
+//	print("../consola.ttf");
+//	print("./consola.ttf");
+//	print("../../res/font/consola.ttf");
+//	print("E:\\res/font/consola.ttf");
+//	print("E:\\res/../font/consola.ttf");
+//	print("E:/res/font/consola.ttf");
+//	print("E://res/../font/consola.ttf");
+//	print("C:res/../font/consola.ttf");
+//	print("//font/consola.ttf");
+//	print("/c/font/consola.ttf");
+//	print("c/font/consola.ttf");
+//
+//
+//	std::error_code ec;
+//	std::filesystem::path base = "base";
+//	std::filesystem::path target = "target";
+//	std::filesystem::path result = base / target;
+//
+//	result = std::filesystem::canonical(result, ec);
+//	fmt::print("[{}]\n\n", result.generic_string());
+//
+//	return 0;
 //}
 
-std::optional<std::filesystem::path> resolve(const std::filesystem::path& path) {
-	const auto res_folder = std::filesystem::path("res/font");
+// =================================================================================================
 
-	std::error_code ec;
-//	const auto normalized = path.lexically_normal();
+// libv
+#include <libv/utility/fixed_string.hpp>
+// std
+#include <iostream>
 
-	fmt::print("is_relative: {}, is_absolute: {}\n", path.is_relative(), path.is_absolute());
-	const auto normalized = std::filesystem::canonical(res_folder / path, ec);
 
-	if (ec) {
-		fmt::print("cannonical: {} {}\n", ec, ec.message());
-		return std::nullopt;
-	}
+template <libv::fixed_string Name>
+struct S {
+	static constexpr std::string_view name = Name;
+};
 
-	fmt::print("is_relative: {}, is_absolute: {}\n", normalized.is_relative(), normalized.is_absolute());
-
-//	if (normalized.empty())
-//		return std::nullopt;
-//
-//	if (normalized.is_absolute())
-//		return std::nullopt;
-//
-//	if (*normalized.begin() == "..")
-//		return std::nullopt;
-//
-//	if (*normalized.begin() == "/")
-//		return std::nullopt;
-//
-//	if (normalized.has_root_path())
-//		return std::nullopt;
-
-	fmt::print("normalized: {}\n", normalized.generic_string());
-//	return res_folder / normalized;
-
-	const auto relative = std::filesystem::relative(normalized, ec);
-
-	if (ec) {
-		fmt::print("relative:   {} {}\n", ec, ec.message());
-		return std::nullopt;
-	}
-	fmt::print("relative:   {}\n", relative.generic_string());
-
-	return relative;
+template <typename T>
+void foo0(T s) {
+	std::cout << s.name << " " << s.name.size() << std::endl;
 }
 
-void print(const std::filesystem::path& path) {
-	fmt::print("path:       {}\n", path.generic_string());
-//	auto x = resolve(path, "res");
-	auto x = resolve(path);
-	if (x)
-		fmt::print("resolved:   {}\n\n", x->generic_string());
-	else
-		fmt::print("false\n\n");
-}
+//template <size_t N, const char Name[N]>
+//void foo1(S<libv::fixed_string<N>{Name}> s) {
+//	std::cout << s.name << " " << s.name.size() << std::endl;
+//}
+
+//template <libv::fixed_string Name>
+//void foo1(S<Name> s) {
+//	std::cout << s.name << " " << s.name.size() << std::endl;
+//}
+
+//template <auto Name>
+//void foo1(S<Name> s) {
+//	std::cout << s.name << " " << s.name.size() << std::endl;
+//}
 
 int main() {
-	fmt::print("current_path: {}\n\n", std::filesystem::current_path().generic_string());
-	print("consola.ttf");
-	print("base/consola.ttf");
-	print("base/../consola.ttf");
-	print("../consola.ttf");
-	print("./consola.ttf");
-	print("../../res/font/consola.ttf");
-	print("E:\\res/font/consola.ttf");
-	print("E:\\res/../font/consola.ttf");
-	print("E:/res/font/consola.ttf");
-	print("E://res/../font/consola.ttf");
-	print("C:res/../font/consola.ttf");
-	print("//font/consola.ttf");
-	print("/c/font/consola.ttf");
-	print("c/font/consola.ttf");
+	{
+		S<"test"> s;
+		std::cout << s.name << " " << s.name.size() << std::endl;
+		static_assert(std::is_same_v<decltype(s), S<libv::fixed_string<4>{"test"}>>);
+	}
 
+	{
+		libv::fixed_string s{"test"};
+		std::cout << s << " " << s.size() << std::endl;
+		static_assert(std::is_same_v<decltype(s), libv::fixed_string<4>>);
+	}
 
-	std::error_code ec;
-	std::filesystem::path base = "base";
-	std::filesystem::path target = "target";
-	std::filesystem::path result = base / target;
+	{
+		foo0(S<"test">{});
+	}
 
-	result = std::filesystem::canonical(result, ec);
-	fmt::print("[{}]\n\n", result.generic_string());
+//	{
+//		foo1(S<"test">{});
+//	}
 
 	return 0;
 }
