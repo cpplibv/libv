@@ -72,12 +72,20 @@ public:
 	void pop_back();
 
 public:
-	inline const std::string& getString() const {
+	inline AlignHorizontal getAlign() const noexcept {
+		return align;
+	}
+
+	inline const std::string& getString() const noexcept {
 		return string;
 	}
 
-	inline const std::shared_ptr<Font2D>& getFont() const {
+	inline const std::shared_ptr<Font2D>& getFont() const noexcept {
 		return font;
+	}
+
+	inline FontSize getSize() const noexcept {
+		return fontSize;
 	}
 
 	/// @param limit - The maximum available space that can be used to layout

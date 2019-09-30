@@ -47,7 +47,7 @@ private:
 
 public:
 	template <typename Property>
-			WISH_REQUIRES(C_Property<Property>)
+			WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
 	inline void operator()(Property& property, const std::string_view description) {
 		(void) description;
 		using value_type = typename Property::value_type;
@@ -65,13 +65,22 @@ public:
 			return fallback.get_or_throw<value_type>(Property::name); // This throw could even be a log and terminate
 		}();
 
-		const bool change = value != AccessProperty::value(property);
+		if constexpr (C_Property<Property>) {
+			const bool change = value != AccessProperty::value(property);
 
-		if (!change)
-			return;
+			if (!change)
+				return;
 
-		AccessProperty::value(property, std::move(value));
-		component.flagAuto(Property::invalidate);
+			AccessProperty::value(property, std::move(value));
+			component.flagAuto(Property::invalidate);
+		} else {
+			const bool change = value != AccessProperty::value(component, property);
+
+			if (!change)
+				return;
+
+			AccessProperty::value(component, property, std::move(value));
+		}
 	}
 };
 

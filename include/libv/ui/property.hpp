@@ -8,6 +8,7 @@
 // std
 #include <memory>
 #include <string>
+#include <type_traits>
 #include <variant>
 // pro
 #include <libv/ui/flag.hpp>
@@ -66,6 +67,7 @@ static constexpr libv::fixed_string column_count = "column_count";
 static constexpr libv::fixed_string cursor_color = "cursor_color";
 static constexpr libv::fixed_string cursor_shader = "cursor_shader";
 static constexpr libv::fixed_string font = "font";
+static constexpr libv::fixed_string text = "text";
 static constexpr libv::fixed_string font_color = "font_color";
 static constexpr libv::fixed_string font_shader = "font_shader";
 static constexpr libv::fixed_string font_size = "font_size";
@@ -80,11 +82,22 @@ static constexpr libv::fixed_string squish = "squish";
 
 template <typename T>
 concept bool C_Property = requires(T var) {
+		typename T::value_type;
+
 		{ T::name } -> std::string_view;
 		{ T::invalidate } -> Flag_t;
+};
 
-		typename T::tagProperty;
+template <typename T>
+concept bool C_PropertySG = requires(T var) {
+		typename T::component_type;
 		typename T::value_type;
+		typename T::set_type;
+		typename T::get_type;
+
+		{ T::name } -> std::string_view;
+		{ T::set } -> void (T::component_type::*)(typename T::set_type);
+		{ T::get } -> typename T::get_type (T::component_type::*)() const;
 };
 
 template <typename T, Flag_t::value_type I, libv::fixed_string Name>
@@ -96,7 +109,6 @@ class Property {
 	bool changed = false;
 
 public:
-	using tagProperty = void;
 	using value_type = T;
 
 	static constexpr std::string_view name = Name;
@@ -113,17 +125,30 @@ public:
 	}
 };
 
-//template <typename T, Flag_t::value_type I, auto Set, auto Get>
-//class Property7DD {
-//	friend class AccessProperty;
-//
-//	bool manual = false;
-//	bool changed = false;
-//
-//public:
-//	static constexpr Flag_t invalidate{I};
-//	using value_type = T;
-//};
+// TODO P1: Would be nice to accept all four: T, T&, const T&, T&& version of set and get parameters / return values
+template <typename C, typename SetT, void (C::*Set)(SetT), typename GetT, GetT (C::*Get)() const, libv::fixed_string Name>
+class PropertySG {
+	friend class AccessProperty;
+
+	bool manual = false;
+	bool changed = false;
+
+public:
+	using component_type = C;
+	using value_type = std::decay_t<GetT>;
+	using set_type = SetT;
+	using get_type = GetT;
+
+	static constexpr void (C::*set)(SetT) = Set;
+	static constexpr GetT (C::*get)() const = Get;
+	static constexpr std::string_view name = Name;
+
+	bool consumeChange() {
+		bool result = changed;
+		changed = false;
+		return result;
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -172,6 +197,16 @@ public:
 	template <typename Property>
 	static constexpr inline const auto& value(const Property& property) noexcept {
 		return property.value;
+	}
+	template <typename Component, typename Property>
+	static constexpr inline void value(Component& component, Property& property, typename Property::value_type value) noexcept {
+		(static_cast<typename Property::component_type&>(component).*Property::set)(std::move(value));
+		property.changed = true;
+	}
+	template <typename Component, typename Property>
+	static constexpr inline decltype(auto) value(const Component& component, const Property& property) noexcept {
+		(void) property;
+		return (static_cast<const typename Property::component_type&>(component).*Property::get)();
 	}
 };
 

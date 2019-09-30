@@ -41,13 +41,39 @@ InputField::~InputField() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void InputField::text(std::string string_) {
-	text_.setString(std::move(string_));
+void InputField::align_horizontal(AlignHorizontal value) {
+	text_.setAlign(value);
+	flagAuto(Flag::pendingRender);
+}
 
+AlignHorizontal InputField::align_horizontal() const noexcept {
+	return text_.getAlign();
+}
+
+void InputField::font(Font2D_view value) {
+	text_.setFont(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
-const std::string& InputField::text() const {
+const Font2D_view& InputField::font() const noexcept {
+	return text_.getFont();
+}
+
+void InputField::font_size(FontSize value) {
+	text_.setSize(value);
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+
+FontSize InputField::font_size() const noexcept {
+	return text_.getSize();
+}
+
+void InputField::text(std::string value) {
+	text_.setString(std::move(value));
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+
+const std::string& InputField::text() const noexcept {
 	return text_.getString();
 }
 
@@ -115,9 +141,6 @@ void InputField::doStyle(ContextStyle& ctx) {
 void InputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	text_.setFont(property.font(), property.font_size());
-	text_.setAlign(property.align_horizontal());
-
 	const auto contentString = text_.getContent(-1, -1);
 	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
@@ -157,7 +180,7 @@ void InputField::doRender(ContextRender& ctx) {
 		auto pos = cursor_mesh.attribute(attribute_position);
 		auto index = cursor_mesh.index();
 
-		const auto cursorHeight = property.font()->getLineAdvance(property.font_size());
+		const auto cursorHeight = font()->getLineAdvance(font_size());
 		const auto max = context().settings.cursor_width_max;
 		const auto min = context().settings.cursor_width_min;
 		const auto offset = context().settings.cursor_width_offset;
@@ -175,11 +198,6 @@ void InputField::doRender(ContextRender& ctx) {
 		index.quad(0, 1, 2, 3);
 	}
 
-	if (changedFont || changedFontSize) {
-		text_.setFont(property.font(), property.font_size());
-		text_.setAlign(property.align_horizontal());
-	}
-
 	const auto guard_m = ctx.gl.model.push_guard();
  	ctx.gl.model.translate(position());
 
@@ -195,7 +213,7 @@ void InputField::doRender(ContextRender& ctx) {
 		ctx.gl.state.blendDst_One_Minus_Source1Color();
 
 		ctx.gl.program(*property.font_shader());
-		ctx.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
+		ctx.gl.texture(font()->texture(), property.font_shader()->textureChannel);
 		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
 		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
 		ctx.gl.render(text_.mesh());

@@ -130,11 +130,11 @@ public:
 
 public:
 	template <typename Property>
-		WISH_REQUIRES(C_Property<Property>)
+		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
 	inline void set(Property& property, typename Property::value_type value);
 
 	template <typename Property, typename CTX = ContextStyle>
-		WISH_REQUIRES(C_Property<Property>)
+		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
 	inline void reset(Property& property);
 
 private:
@@ -276,7 +276,7 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Property>
-		WISH_REQUIRES(C_Property<Property>)
+		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
 inline void BaseComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::manual(property, true);
 	const bool change = AccessProperty::value(property) != value;
@@ -287,7 +287,7 @@ inline void BaseComponent::set(Property& property, typename Property::value_type
 }
 
 template <typename Property, typename CTX>
-		WISH_REQUIRES(C_Property<Property>)
+		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
 inline void BaseComponent::reset(Property& property) {
 	static_assert(sizeof(CTX) != 0, "Missing include: ContextStyle");
 	AccessProperty::manual(property, false);

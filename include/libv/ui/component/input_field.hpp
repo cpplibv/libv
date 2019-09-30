@@ -24,6 +24,19 @@ namespace ui {
 
 
 class InputField : public BaseComponent {
+public:
+	void align_horizontal(AlignHorizontal value);
+	AlignHorizontal align_horizontal() const noexcept;
+
+	void font(Font2D_view value);
+	const Font2D_view& font() const noexcept;
+
+	void font_size(FontSize value);
+	FontSize font_size() const noexcept;
+
+	void text(std::string value);
+	const std::string& text() const noexcept;
+
 private:
 	struct PS {
 		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
@@ -37,13 +50,13 @@ private:
 		Property<Color,             R, pnm::cursor_color> cursor_color;
 		Property<ShaderQuad_view,   R, pnm::cursor_shader> cursor_shader;
 
-		Property<AlignHorizontal,  L , pnm::align_horizontal> align_horizontal;
-		// Property<AlignVertical,   L , pnm::align_vertical> align_vertical;
-		// Property7DD<Font2D_view,     LR, pnm::font, setFont, getFont> font;
-		Property<Font2D_view,      LR, pnm::font> font;
 		Property<Color,             R, pnm::font_color> font_color;
-		Property<FontSize,         LR, pnm::font_size> font_size;
 		Property<ShaderFont_view,   R, pnm::font_shader> font_shader;
+
+		PropertySG<InputField, AlignHorizontal, &InputField::align_horizontal, AlignHorizontal, &InputField::align_horizontal, pnm::align_horizontal> align_horizontal;
+		PropertySG<InputField, Font2D_view, &InputField::font, const Font2D_view&, &InputField::font, pnm::font> font;
+		PropertySG<InputField, FontSize, &InputField::font_size, FontSize, &InputField::font_size, pnm::font_size> font_size;
+		PropertySG<InputField, std::string, &InputField::text, const std::string&, &InputField::text, pnm::text> text;
 
 		template <typename T>
 		void access(T& ctx) {
@@ -81,10 +94,6 @@ public:
 	InputField(std::string name);
 	InputField(UnnamedTag_t, const std::string_view type);
 	~InputField();
-
-public:
-	void text(std::string string_);
-	const std::string& text() const;
 
 private:
 	virtual bool onChar(const libv::input::EventChar& event) override;

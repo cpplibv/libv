@@ -118,7 +118,7 @@ struct ImplMouseTable {
 				},
 				[&event](const libv::observer_ref<BaseComponent>& component) {
 					AccessEvent::onMouse(*component, event);
-					// <<< P5: return value for shielding is discarded
+					// <<< P5: Mouse shield: return value for shielding is discarded
 				}
 			);
 
@@ -431,7 +431,7 @@ void MouseTable::event_update() {
 	boost::container::small_vector<Hit, 8> hits;
 
 	for (ImplMouseTable::Entry& entry : self->entries) {
-		// <<< P5: In future when shielding happens this if will have to change
+		// <<< P5: Mouse shield: In future when shielding happens this if will have to change
 		if (!entry.pendingUpdate)
 			continue;
 

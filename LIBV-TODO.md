@@ -231,15 +231,17 @@ libv.ui.property: free property name binding
 libv.ui.property: need support for structure and different names, libv.reflection might gets a hit because of this
 libv.ui.property: remove fallback from properties and place it into context_ui as a fallback style
 libv.ui.property: detect to property changes
+libv.ui.property: react to property changes
+libv.ui.property: property set / get via functions to eliminate mandated property storage in component
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui.property: property set / get issue: void font(value) function does not set manual flag when used as manual override
 
-libv.ui.property: react to property changes
-libv.ui.property: property set / get via functions to eliminate mandated property storage in component
-
+libv.ui.property: the idea of typed properties meant to be polymorphic property types with static storage in component
+libv.ui.property: typed property registry
 
 
 properties / style
