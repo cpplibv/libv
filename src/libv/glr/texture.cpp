@@ -171,7 +171,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		case libv::gl::TextureTarget::_1D:
 			gl(texture).storage(static_cast<int32_t>(levels.size()), format, levels[0].size.x);
 			break;
-		default:
+		default: // TODO P5: libv.gl: instead of default log and assert invalid input
 		case libv::gl::TextureTarget::_1DArray:
 		case libv::gl::TextureTarget::_2D:
 		case libv::gl::TextureTarget::Rectangle:
@@ -195,7 +195,7 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 			case libv::gl::TextureTarget::_1D:
 				gl(texture).subImage(i, 0, levels[i].size.x, format.base, dataType, data.data() + levels[i].offset);
 				break;
-			default:
+			default: // TODO P5: libv.gl: instead of default log and assert invalid input
 			case libv::gl::TextureTarget::_1DArray:
 			case libv::gl::TextureTarget::_2D:
 			case libv::gl::TextureTarget::Rectangle:

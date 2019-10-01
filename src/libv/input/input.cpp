@@ -11,16 +11,15 @@ namespace input {
 
 std::string_view to_string(const Action value) {
 	switch (value) {
-	default: return "unknown";
 	case Action::release: return "release";
 	case Action::press: return "press";
 	case Action::repeat: return "repeat";
 	}
+	return "unknown";
 }
 
 std::string_view to_string(const Key value) {
 	switch (value) {
-	default: return "Invalid";
 	case Key::Unknown: return "Unknown";
 	case Key::Space: return "Space";
 	case Key::Apostrophe: return "Apostrophe";
@@ -143,27 +142,27 @@ std::string_view to_string(const Key value) {
 	case Key::SuperRight: return "SuperRight";
 	case Key::Menu: return "Menu";
 	}
+	return "invalid";
 }
 
 std::string_view to_string(const KeyState value) {
 	switch (value) {
-	default: return "unknown";
 	case KeyState::pressed: return "pressed";
 	case KeyState::released: return "released";
 	}
+	return "unknown";
 }
 
 std::string_view to_string(const MonitorEvent value) {
 	switch (value) {
-	default: return "Unknown";
 	case MonitorEvent::connected: return "connected";
 	case MonitorEvent::disconnected: return "disconnected";
 	}
+	return "unknown";
 }
 
 std::string_view to_string(const Mouse value) {
 	switch (value) {
-	default: return "unknown";
 	case Mouse::Left: return "left";
 	case Mouse::Right: return "right";
 	case Mouse::Middle: return "middle";
@@ -174,6 +173,7 @@ std::string_view to_string(const Mouse value) {
 	case Mouse::Button6: return "mouse6";
 	case Mouse::Button7: return "mouse7";
 	}
+	return "unknown";
 }
 
 // -------------------------------------------------------------------------------------------------

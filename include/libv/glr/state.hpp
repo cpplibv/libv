@@ -371,7 +371,8 @@ public:
 		case 4: state_stack.top().clipPlanes = 4; break;
 		case 5: state_stack.top().clipPlanes = 5; break;
 		case 6: state_stack.top().clipPlanes = 6; break;
-		default: state_stack.top().clipPlanes = 6;
+		default: // TODO P5: libv.gl: instead of default log and assert invalid input
+			state_stack.top().clipPlanes = 6;
 		}
 	}
 };

@@ -18,8 +18,8 @@ std::ostream& operator<<(std::ostream& os, const AlignVertical value) {
 	case AlignVertical::Bottom: return os << "bottom";
 	case AlignVertical::Justify: return os << "justify";
 	case AlignVertical::JustifyAll: return os << "justify-all";
-	default: return os << "<<invalid>>";
 	}
+	return os << "<<invalid>>";
 }
 
 std::ostream& operator<<(std::ostream& os, const AlignHorizontal value) {
@@ -29,8 +29,8 @@ std::ostream& operator<<(std::ostream& os, const AlignHorizontal value) {
 	case AlignHorizontal::Right: return os << "right";
 	case AlignHorizontal::Justify: return os << "justify";
 	case AlignHorizontal::JustifyAll: return os << "justify-all";
-	default: return os << "<<invalid>>";
 	}
+	return os << "<<invalid>>";
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -744,7 +744,7 @@ inline void GL::bind(TextureTarget target, uint32_t id) {
 	size_t targetIndex;
 
 	switch (target) {
-	default:
+	default: // TODO P5: libv.gl: instead of default log and assert invalid input
 	case TextureTarget::_2D: targetIndex = 0; break;
 	case TextureTarget::CubeMap: targetIndex = 1; break;
 	case TextureTarget::_1D: targetIndex = 2; break;

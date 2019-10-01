@@ -73,8 +73,8 @@ private:
 		case Severity::Warn: return "Warn ";
 		case Severity::Error: return "Error";
 		case Severity::Fatal: return "Fatal";
-		default: return "Undefined";
 		}
+		return "Undefined";
 	}
 
 	inline std::string_view toColorString(Severity value) {
@@ -85,8 +85,8 @@ private:
 		case Severity::Warn: return  "\u001B[33mWarn \u001B[0m";
 		case Severity::Error: return "\u001B[31mError\u001B[0m";
 		case Severity::Fatal: return "\u001B[35mFatal\u001B[0m";
-		default: return "Undefined";
 		}
+		return "Undefined";
 	}
 
 	inline std::string_view toColorShortString(Severity value) {
@@ -97,8 +97,8 @@ private:
 		case Severity::Warn: return  "\u001B[33mW\u001B[0m";
 		case Severity::Error: return "\u001B[31mE\u001B[0m";
 		case Severity::Fatal: return "\u001B[35mF\u001B[0m";
-		default: return "?";
 		}
+		return "?";
 	}
 
 	struct MatchResult {

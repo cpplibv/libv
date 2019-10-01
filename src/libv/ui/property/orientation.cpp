@@ -17,8 +17,8 @@ std::ostream& operator<<(std::ostream& os, const Orientation value) {
 	case Orientation::LEFT_TO_RIGHT: return os << "left-to-right";
 	case Orientation::RIGHT_TO_LEFT: return os << "right-to-left";
 	case Orientation::TOP_TO_BOTTOM: return os << "top-to-bottom";
-	default: return os << "<<invalid>>";
 	}
+	return os << "<<invalid>>";
 }
 
 // -------------------------------------------------------------------------------------------------

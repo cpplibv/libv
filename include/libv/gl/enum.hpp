@@ -233,7 +233,6 @@ constexpr inline auto sizeInfo(DataType type) noexcept {
 	};
 
 	switch (type) {
-	default:
 	case DataType::U8:                 return Result{1, 1};
 	case DataType::I8:                 return Result{1, 1};
 	case DataType::U16:                return Result{2, 1};
@@ -254,6 +253,7 @@ constexpr inline auto sizeInfo(DataType type) noexcept {
 	case DataType::U32_R10_G10_B10_A2: return Result{4, 4};
 	case DataType::U32_A2_B10_G10_R10: return Result{4, 4};
 	}
+	return Result{1, 1}; // [[unreachable]]
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -380,7 +380,6 @@ enum class FormatSized : GLenum {
 
 constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	switch (format) {
-	default:
 	case FormatBase::R: return 1;
 	case FormatBase::RG: return 2;
 	case FormatBase::RGB: return 3;
@@ -389,39 +388,39 @@ constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	case FormatBase::DEPTH_STENCIL: return 2;
 	case FormatBase::STENCIL: return 1;
 	}
+	return 1; // [[unreachable]]
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatDepth format) noexcept {
 	switch (format) {
-	default:
 	case FormatDepth::DEPTH_COMPONENT16:  return FormatBase::DEPTH;
 	case FormatDepth::DEPTH_COMPONENT24:  return FormatBase::DEPTH;
 	case FormatDepth::DEPTH_COMPONENT32:  return FormatBase::DEPTH;
 	case FormatDepth::DEPTH_COMPONENT32F: return FormatBase::DEPTH;
 	}
+	return FormatBase::DEPTH; // [[unreachable]]
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatDepthStencil format) noexcept {
 	switch (format) {
-	default:
 	case FormatDepthStencil::DEPTH24_STENCIL8:  return FormatBase::DEPTH_STENCIL;
 	case FormatDepthStencil::DEPTH32F_STENCIL8: return FormatBase::DEPTH_STENCIL;
 	}
+	return FormatBase::DEPTH_STENCIL; // [[unreachable]]
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatStencil format) noexcept {
 	switch (format) {
-	default:
 	case FormatStencil::STENCIL_INDEX1:  return FormatBase::STENCIL;
 	case FormatStencil::STENCIL_INDEX4:  return FormatBase::STENCIL;
 	case FormatStencil::STENCIL_INDEX8:  return FormatBase::STENCIL;
 	case FormatStencil::STENCIL_INDEX16: return FormatBase::STENCIL;
 	}
+	return FormatBase::STENCIL; // [[unreachable]]
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatCompressed format) noexcept {
 	switch (format) {
-	default:
 	case FormatCompressed::R:                       return FormatBase::R;
 	case FormatCompressed::RG:                      return FormatBase::RG;
 	case FormatCompressed::RGB:                     return FormatBase::RGB;
@@ -446,11 +445,11 @@ constexpr inline FormatBase compatibleFormatBase(FormatCompressed format) noexce
 	case FormatCompressed::SRGBA_S3TC_DXT3_EXT:     return FormatBase::RGBA;
 	case FormatCompressed::SRGBA_S3TC_DXT5_EXT:     return FormatBase::RGBA;
 	}
+	return FormatBase::R; // [[unreachable]]
 }
 
 constexpr inline FormatBase compatibleFormatBase(FormatSized format) noexcept {
 	switch (format) {
-	default:
 	case FormatSized::R8:             return FormatBase::R;
 	case FormatSized::R8_SNORM:       return FormatBase::R;
 	case FormatSized::R16:            return FormatBase::R;
@@ -513,6 +512,7 @@ constexpr inline FormatBase compatibleFormatBase(FormatSized format) noexcept {
 	case FormatSized::RGBA32I:        return FormatBase::RGBA;
 	case FormatSized::RGBA32UI:       return FormatBase::RGBA;
 	}
+	return FormatBase::R; // [[unreachable]]
 }
 
 struct Format {
@@ -559,8 +559,8 @@ inline const char* to_string(ShaderType type) {
 	case ShaderType::Compute: return "compute";
 	case ShaderType::TessControl: return "tess-control";
 	case ShaderType::TessEvaluation: return "tess-evaluation";
-	default: return "unknown";
 	}
+	return "unknown";
 }
 
 // TextureType -------------------------------------------------------------------------------------

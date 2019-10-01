@@ -214,7 +214,7 @@ public:
 					reinterpret_cast<const void*>(offset));
 			break;
 
-		default:
+		default: // TODO P5: libv.gl: instead of default log and assert invalid input
 		case AttributeType::FIXED:
 		case AttributeType::INT_2_10_10_10_REV:
 		case AttributeType::UNSIGNED_INT_10F_11F_11F_REV:

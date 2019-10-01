@@ -42,9 +42,9 @@ const char* to_libv_technique(int tech) {
 	case aiShadingMode_Minnaert: return "minnaert";
 	case aiShadingMode_CookTorrance: return "cooktorrance";
 	case aiShadingMode_Fresnel: return "fresnel";
-	default:
 	case aiShadingMode_NoShading: return "noshading";
 	}
+	return "noshading";
 }
 
 void importMaterials(Model& model, const aiScene* scene) {
