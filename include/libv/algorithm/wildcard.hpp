@@ -2,33 +2,25 @@
 
 #pragma once
 
+// ext
+#include <boost/container/small_vector.hpp>
 // std
 #include <string_view>
-#include <memory>
-#include <iostream>
+
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-inline bool match_wildcard(const std::string_view str, const std::string_view pattern) noexcept {
+template <typename = void>
+bool match_wildcard(const std::string_view str, const std::string_view pattern) noexcept {
 	static constexpr auto WILDCARD_SINGLE = '?';
 	static constexpr auto WILDCARD_ANY = '*';
 //	static constexpr auto WILDCARD_ESCAPE = '\\';
 //	static constexpr auto WILDCARD_ESCAPE_ESCAPE = "\\\\";
 
-	// micro optimaliztion for the empty cases
-	if (pattern.empty())
-		return str.empty();
-
-	if (str.empty()) {
-		for (const auto& c : pattern)
-			if (c != WILDCARD_ANY)
-				return false;
-		return true;
-	}
-
-	const auto array = std::make_unique<bool[]>((str.size() + 1) * (pattern.size() + 1)); // Yep, vla...
+	boost::container::small_vector<bool, 1024> array;
+	array.resize((str.size() + 1) * (pattern.size() + 1), false);
 	const auto index = [&](size_t i, size_t j) -> bool& {
 		return array[(pattern.size() + 1) * i + j];
 	};
@@ -59,58 +51,95 @@ inline bool match_wildcard(const std::string_view str, const std::string_view pa
 	return index(str.size(), pattern.size());
 }
 
-inline bool match_wildcard_layer(const std::string_view str, const std::string_view pattern) noexcept {
-	static constexpr auto WILDCARD_SINGLE = '?';
-	static constexpr auto WILDCARD_LAYER = '*';
-	static constexpr auto WILDCARD_ANY = '$';
-	static constexpr auto WILDCARD_SEPARATOR = '/';
-//	static constexpr auto WILDCARD_RANGE = "[abc]";
-//	static constexpr auto WILDCARD_RANGE = "[a-z]";
-//	static constexpr auto WILDCARD_NEGATED_RANGE = "[!abc]";
-//	static constexpr auto WILDCARD_NEGATED_RANGE = "[!a-z]";
-//	static constexpr auto WILDCARD_ALTERNATE = "a|b";
-//	static constexpr auto WILDCARD_GROUP = "(a.txt|b.jpg)";
-//	static constexpr auto WILDCARD_ESCAPE = '\\';
-//	static constexpr auto WILDCARD_ESCAPE_ESCAPE = "\\\\";
+template <typename = void>
+bool match_wildcard_glob(const std::string_view str, const std::string_view pattern_str) noexcept {
+	static constexpr std::string_view WILDCARD_ESCAPE = "\\";
 
-	if (pattern.empty())
-		return str.empty();
+	static constexpr std::string_view WILDCARD_LAYER_ANY = "**";
+	static constexpr std::string_view WILDCARD_LAYER = "*";
+	static constexpr std::string_view WILDCARD_SINGLE = "?";
+//	static constexpr std::string_view WILDCARD_RANGE = "[abc]";
+//	static constexpr std::string_view WILDCARD_RANGE = "[a-z]";
+//	static constexpr std::string_view WILDCARD_NEGATED_RANGE = "[!abc]";
+//	static constexpr std::string_view WILDCARD_NEGATED_RANGE = "[!a-z]";
+//	static constexpr std::string_view WILDCARD_ALTERNATE = "(a.txt|b.jpg)";
 
-	if (str.empty()) {
-		bool layer_accept = false;
-		for (const auto& c : pattern) {
-			if (c == WILDCARD_ANY) {
-				continue;
-			} else if (c == WILDCARD_LAYER && !layer_accept) {
-				layer_accept = true;
-				continue;
-			} else {
-				return false;
-			}
+	/// Separator is not allowed in WILDCARD_SINGLE or WILDCARD_LAYER (but it is allowed in WILDCARD_LAYER_ANY)
+	static constexpr std::string_view WILDCARD_SEPARATOR = "/";
+
+	// parse pattern
+	enum class TokenType {
+		literal,   // abc
+		single,    // ?
+		layer,     // *
+		layer_any, // **
+	};
+
+	struct Token {
+		TokenType type;
+		size_t begin = 0;
+		size_t size = 0;
+	};
+
+	boost::container::small_vector<Token, 10> pattern;
+	boost::container::small_vector<std::string_view::value_type, 256> pattern_literals;
+
+	for (size_t i = 0; i < pattern_str.size();) {
+		if (pattern_str.substr(i).starts_with(WILDCARD_ESCAPE) && pattern_str.size() - i != WILDCARD_ESCAPE.size()) {
+			i += WILDCARD_ESCAPE.size();
+
+			if (!pattern.empty() && pattern.back().type == TokenType::literal)
+				pattern.back().size++;
+			else
+				pattern.push_back(Token{TokenType::literal, pattern_literals.size(), 1});
+
+			pattern_literals.push_back(pattern_str[i]);
+			i++;
+
+		} else if (pattern_str.substr(i).starts_with(WILDCARD_LAYER_ANY)) {
+			i += WILDCARD_LAYER_ANY.size();
+			if (pattern.empty() || pattern.back().type != TokenType::layer_any)
+				pattern.push_back(Token{TokenType::layer_any});
+
+		} else if (pattern_str.substr(i).starts_with(WILDCARD_LAYER)) {
+			i += WILDCARD_LAYER.size();
+			if (pattern.empty() || pattern.back().type != TokenType::layer)
+				pattern.push_back(Token{TokenType::layer});
+
+		} else if (pattern_str.substr(i).starts_with(WILDCARD_SINGLE)) {
+			i += WILDCARD_SINGLE.size();
+			if (!pattern.empty() && pattern.back().type == TokenType::single)
+				pattern.back().size++;
+			else
+				pattern.push_back(Token{TokenType::single, 0, 1});
+
+		} else {
+			if (!pattern.empty() && pattern.back().type == TokenType::literal)
+				pattern.back().size++;
+			else
+				pattern.push_back(Token{TokenType::literal, pattern_literals.size(), 1});
+
+			pattern_literals.push_back(pattern_str[i]);
+			i++;
 		}
-		return true;
 	}
 
-	const auto array = std::make_unique<bool[]>((str.size() + 1) * (pattern.size() + 1)); // Yep, vla...
+	boost::container::small_vector<bool, 1024> array;
+	array.resize((str.size() + 1) * (pattern.size() + 1), false);
 	const auto index = [&](size_t i, size_t j) -> bool& {
 		return array[(pattern.size() + 1) * i + j];
 	};
-
-	// clear
-	for (size_t i = 0; i <= str.size(); ++i)
-		for (size_t j = 0; j <= pattern.size(); ++j)
-			index(i, j) = false;
 
 	// accept any leading WILDCARD_ANY and at most one WILDCARD_LAYER as str start
 	{
 		bool layer_accept = false;
 		for (size_t j = 1; j <= pattern.size(); ++j) {
-			if (pattern[j - 1] == WILDCARD_LAYER && !layer_accept) {
+			if (pattern[j - 1].type == TokenType::layer && !layer_accept) {
 				layer_accept = true;
 				index(0, j) = true;
 				continue;
 			}
-			if (pattern[j - 1] == WILDCARD_ANY) {
+			if (pattern[j - 1].type == TokenType::layer_any) {
 				index(0, j) = true;
 				continue;
 			}
@@ -124,20 +153,36 @@ inline bool match_wildcard_layer(const std::string_view str, const std::string_v
 	// solve
 	for (size_t i = 1; i <= str.size(); i++) {
 		for (size_t j = 1; j <= pattern.size(); j++) {
-			const auto sc = str[i - 1];
-			const auto pc = pattern[j - 1];
-			const auto up = index(i - 1, j);
-			const auto left = index(i, j - 1);
-			const auto up_left = index(i - 1, j - 1);
+			if (index(i, j)) // Optimization: Already calculated
+				continue;
 
-			if (pc == sc || pc == WILDCARD_SINGLE && sc != WILDCARD_SEPARATOR)
-				index(i, j) = up_left;
+			const auto& token = pattern[j - 1];
+			const auto str_literal = str.substr(i - 1);
 
-			else if (pc == WILDCARD_LAYER)
-				index(i, j) = left || up && sc != WILDCARD_SEPARATOR;
+			const bool up = index(i - 1, j);
+			const bool left = index(i, j - 1);
+			const bool up_left = index(i - 1, j - 1);
 
-			else if (pc == WILDCARD_ANY)
-				index(i, j) = left || up;
+			if (token.type == TokenType::literal) {
+				const bool accept = str_literal.starts_with(std::string_view(pattern_literals.data() + token.begin, token.size));
+				if (accept && up_left)
+					 // Optimization: Prefill the every matched character
+					for (size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
+						index(i + s, j) = true;
+
+			} else if (token.type == TokenType::single) {
+				const bool accept = str_literal.size() >= token.size && str_literal.substr(0, token.size).find_first_of(WILDCARD_SEPARATOR) == str_literal.npos;
+				if (accept && up_left)
+					 // Optimization: Prefill the every matched character
+					for (size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
+						index(i + s, j) = true;
+
+			} else if (token.type == TokenType::layer_any) {
+				index(i, j) |= left || up;
+
+			} else if (token.type == TokenType::layer) {
+				index(i, j) |= left || up && !str_literal.starts_with(WILDCARD_SEPARATOR);
+			}
 		}
 	}
 
