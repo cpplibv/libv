@@ -49,6 +49,33 @@ using ShaderQuad_view = std::shared_ptr<ShaderQuad>;
 
 using Style_view = libv::intrusive_ptr<Style>;
 
+// -------------------------------------------------------------------------------------------------
+
+using PropertyDynamic = std::variant<
+		float,
+		Style_view,
+
+		AlignHorizontal,
+		AlignVertical,
+		Anchor,
+		Color,
+		ColumnCount,
+		Font2D_view,
+		FontSize,
+		// FontColor,
+		Texture2D_view,
+		Orientation,
+		Orientation2,
+		ShaderFont_view,
+		ShaderImage_view,
+		ShaderQuad_view,
+		Size,
+		SnapToEdge,
+		// Squish,
+
+		std::string // For debug only
+>;
+
 namespace pnm { // ---------------------------------------------------------------------------------
 
 // NOTE: It is not necessary to store the fixed_strings here, it is merely a forethought and typo protection
@@ -79,6 +106,17 @@ static constexpr libv::fixed_string snapToEdge = "snapToEdge";
 static constexpr libv::fixed_string squish = "squish";
 
 } // namespace pnm ---------------------------------------------------------------------------------
+namespace pgr { // ---------------------------------------------------------------------------------
+
+// NOTE: It is not necessary to store the fixed_strings here, it is merely a forethought and typo protection
+
+static constexpr libv::fixed_string appearance = "appearance";
+static constexpr libv::fixed_string behaviour = "behaviour";
+static constexpr libv::fixed_string common = "common";
+static constexpr libv::fixed_string font = "font";
+static constexpr libv::fixed_string layout = "layout";
+
+} // namespace pgr ---------------------------------------------------------------------------------
 
 template <typename T>
 concept bool C_Property = requires(T var) {
@@ -152,30 +190,63 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-using PropertyDynamic = std::variant<
-		float,
-		Style_view,
+enum class PropertyDriver : uint8_t {
+	style = 0,
+	manual,
+	// animation
+};
 
-		AlignHorizontal,
-		AlignVertical,
-		Anchor,
-		Color,
-		ColumnCount,
-		Font2D_view,
-		FontSize,
-		// FontColor,
-		Texture2D_view,
-		Orientation,
-		Orientation2,
-		ShaderFont_view,
-		ShaderImage_view,
-		ShaderQuad_view,
-		Size,
-		SnapToEdge,
-		// Squish,
+// -------------------------------------------------------------------------------------------------
 
-		std::string // For debug only
->;
+class BasePropertyFF {
+	friend class AccessProperty;
+//public:
+//	static constexpr Flag_t invalidate = Flag::none;
+
+private:
+	PropertyDriver driver = PropertyDriver::style;
+	bool changed = false;
+
+public:
+	constexpr inline bool consumeChange() noexcept {
+		bool result = changed;
+		changed = false;
+		return result;
+	}
+};
+
+template <typename T = void>
+class PropertyFF : public BasePropertyFF {
+	friend class AccessProperty;
+
+public:
+	using value_type = T;
+
+private:
+	T value;
+
+public:
+	constexpr inline const value_type& operator()() const noexcept {
+		return value;
+	}
+};
+
+template <>
+class PropertyFF<void> : public BasePropertyFF {
+	friend class AccessProperty;
+};
+
+template <typename T = void>
+class PropertyFFL : public PropertyFF<T> {
+public:
+	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
+};
+
+template <typename T = void>
+class PropertyFFR : public PropertyFF<T> {
+public:
+	static constexpr Flag_t invalidate = Flag::pendingRender;
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -194,10 +265,54 @@ public:
 		property.value = std::move(value);
 		property.changed = true;
 	}
+
+	// =================================================================================================
+
+	template <typename P>
+			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
+	static constexpr inline auto driver(const P& property) noexcept {
+		return property.driver;
+	}
+	template <typename P>
+			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
+	static constexpr inline void driver(P& property, PropertyDriver driver) noexcept {
+		property.driver = driver;
+	}
+
+	template <typename Component, typename P, typename T, typename TC>
+			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
+	static constexpr inline void valueFF(Component& component, P& property, TC&& value) noexcept {
+		property.value = std::move(value);
+		property.changed = true;
+		component.flagAuto(property.invalidate);
+	}
+
+	template <typename Component, typename P, typename TC>
+			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
+	static constexpr inline void valueFF(Component& component, P& property, TC&& value) noexcept {
+		property.value = std::move(value);
+		property.changed = true;
+		component.flagAuto(property.invalidate);
+	}
+
+	template <typename Component, typename P>
+			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
+	static constexpr inline bool setter(Component& component, P& property, PropertyDriver driver) noexcept {
+		if (property.changed && driver != PropertyDriver::manual)
+			return true;
+		property.driver = driver;
+		property.changed = true;
+		component.flagAuto(property.invalidate);
+		return false;
+	}
+
+	// =================================================================================================
+
 	template <typename Property>
 	static constexpr inline const auto& value(const Property& property) noexcept {
 		return property.value;
 	}
+
 	template <typename Component, typename Property>
 	static constexpr inline void value(Component& component, Property& property, typename Property::value_type value) noexcept {
 		(static_cast<typename Property::component_type&>(component).*Property::set)(std::move(value));

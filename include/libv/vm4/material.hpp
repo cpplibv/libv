@@ -25,15 +25,15 @@ using Property = std::variant<
 		float,
 		double,
 		std::string,
-		vec2i,
-		vec3i,
-		vec4i,
-		vec2f,
-		vec3f,
-		vec4f,
-		vec2d,
-		vec3d,
-		vec4d
+		libv::vec2i,
+		libv::vec3i,
+		libv::vec4i,
+		libv::vec2f,
+		libv::vec3f,
+		libv::vec4f,
+		libv::vec2d,
+		libv::vec3d,
+		libv::vec4d
 	>;
 
 // -------------------------------------------------------------------------------------------------

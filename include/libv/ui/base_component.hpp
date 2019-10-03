@@ -49,6 +49,7 @@ struct BaseComponent {
 	friend class AccessEvent;
 	friend class AccessLayout;
 	friend class AccessParent;
+	friend class AccessProperty;
 	friend class AccessRoot;
 	friend class ContextStyle; // For flagging invalidate flags
 
@@ -135,6 +136,14 @@ public:
 
 	template <typename Property, typename CTX = ContextStyle>
 		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
+	inline void reset(Property& property);
+
+	template <typename Property>
+		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
+	inline void set(Property& property, typename Property::value_type value);
+
+	template <typename Property>
+		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
 	inline void reset(Property& property);
 
 private:
@@ -293,6 +302,26 @@ inline void BaseComponent::reset(Property& property) {
 	AccessProperty::manual(property, false);
 	makeStyleContext()(property, "");
 	// NOTE: This works as names are stored inside the type, sub fragment mapping might break it
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Property>
+		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
+inline void BaseComponent::set(Property& property, typename Property::value_type value) {
+	AccessProperty::driver(property, PropertyDriver::manual);
+	const bool change = AccessProperty::value(property) != value;
+	if (change) {
+		AccessProperty::value(property, std::move(value));
+		flagAuto(property.invalidate);
+	}
+}
+
+template <typename Property>
+		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
+inline void BaseComponent::reset(Property& property) {
+	AccessProperty::driver(property, PropertyDriver::style);
+	flagAuto(Flag::pendingStyle);
 }
 
 // -------------------------------------------------------------------------------------------------

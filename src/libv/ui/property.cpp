@@ -1,7 +1,7 @@
 // File:   property.cpp Author: Vader Created on 24 July 2019, 16:57
 
 // hpp
-#include <libv/ui/property.hpp>
+//#include <libv/ui/property.hpp>
 // pro
 //#include <libv/ui/context_ui.hpp>
 //#include <libv/ui/shader/shader_font.hpp>

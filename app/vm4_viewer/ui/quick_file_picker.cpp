@@ -4,6 +4,7 @@
 #include <vm4_viewer/ui/quick_file_picker.hpp>
 // ext
 //#include <fmt/format.h>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/container/flat_set.hpp>
 //#include <range/v3/view/enumerate.hpp>
 // libv
@@ -195,7 +196,9 @@ void QuickFilePicker::update_filelist() {
 
 //		const auto filter_pattern = search_field->text(); // full filter
 //		const auto filter_pattern = search_field->text() + "**"; // prefix filter
-		const auto filter_pattern = "**" + search_field->text() + "**"; // any filter
+//		const auto filter_pattern = "**" + search_field->text() + "**"; // any filter
+		const auto filter_pattern = "**" + boost::algorithm::replace_all_copy(search_field->text(), " ", "**") + "**"; // relax filter
+//		const auto filter_pattern = not wildcard just match every split by space and / in search_field->text() // lose filter
 
 		int i = 0;
 		for(auto& p : std::filesystem::recursive_directory_iterator(path)) {

@@ -233,22 +233,26 @@ libv.ui.property: remove fallback from properties and place it into context_ui a
 libv.ui.property: detect to property changes
 libv.ui.property: react to property changes
 libv.ui.property: property set / get via functions to eliminate mandated property storage in component
+libv.ui.property: set/get/reset changed/manual in general not only in hybrid
+libv.ui.property: setter / getter issue: does not set manual/changed flag when called manually
+libv.ui.property: have a single line in set/get function that refers to the property?
+libv.ui.property: hybrid reflection - static
+libv.ui.property: hybrid implement doStyle work
+libv.ui.property: hybrid Add a default / init value per instance ("above" fallback)
+libv.ui.property: hybrid reset (address could be used to lookup) | simple full style invalidation at first
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.property: property set / get issue: void font(value) function does not set manual flag when used as manual override
 
-libv.ui.property: the idea of typed properties meant to be polymorphic property types with static storage in component
-libv.ui.property: typed property registry
+libv.ui.property: hybrid reflection - dynamic
+
 
 
 properties / style
-	libv.ui.property: Add a default / init value per instance (above fallback)
 	libv.ui.property: property system interaction with static_component system
 	libv.ui.property: complex composite component would result in "nested" property sets
-	libv.ui.property: solve name/type collusion
 	libv.ui.property: scope / sheet / component type based style rules
 	libv.ui.property: dynamic access
 	libv.ui.property: if fallback value is requested log a warning
@@ -257,7 +261,13 @@ properties / style
 	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
 	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
 	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
+	libv.ui.style: do not track style changes, require ui to be prompted about change
+	libv.ui.property: solve name/type collusion
 	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
+	libv.ui.style: Style based on component state (bit-mask)
+	libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized?
+	libv.ui.property: typed property registry
+	libv.ui.property: optimize hybrid reset address could be used to lookup
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
@@ -309,7 +319,7 @@ ui
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
-libv.math: create vec_fwd and mat_fwd headers
+libv.ui: style sheets
 
 debug
 	libv.gl: framebuffer
@@ -330,7 +340,8 @@ interactive
 	libv.ui.input_field: copy support
 	libv.ui.input_field: undo/redo support
 	libv.ui.input_field: input mask (this will possibly a different input_field type)
-	libv.ui.input_field: if text does not fit, crop/layer it and only display around cursor
+	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
+	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
 
 hotkey
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
@@ -376,6 +387,8 @@ focus
 	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
 	libv.ui.focus: Focus traversal order: position based
 
+libv.math: create vec_fwd and mat_fwd headers
+
 libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
 
 libv.sig: merge back the sig codebase rework a lighter version of the lib
@@ -397,8 +410,11 @@ libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly w
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
+libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
+
 --- [[[ deadline: 2019.10.31 ]]] ---
 
+libv.ui.layout: size over 100% is not an error
 libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 libv.gl.glsl: Warning option for crlf line ending.
@@ -423,6 +439,8 @@ libv.ui: shader failure to load means fallback | verify
 libv.ui: shader dynamic loading from file
 
 libv.ui.font: render the not found character by 'hand' (simple square)
+libv.ui.font: https://www.freetype.org/freetype2/docs/tutorial/step2.html
+libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is because the function always sets the content of delta to (0,0) if an error occurs.
 
 libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible
 
@@ -505,6 +523,13 @@ libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 
 libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
 
+sol2: new fwd header, use it if/where appropriate: sol_forward.hpp
+cpp: enun class default underlying type is int, specify underlying type for every enum class
+cpp: check if every possible operator had been made to a hidden friend
+cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
+libv.gl: use mdspan for image updates instead of raw loops
+
+
 --- AWAITING ---------------------------------------------------------------------------------------
 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
@@ -552,28 +577,12 @@ cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
-frame.core: remove core
-frame: Move frames from disconnected monitor / off-screen
-frame: remove default own thread, give them an io_context like executor
-gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
-gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
+ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
 gl: docs http://docs.gl
-gl: framebuffer
 gl: glEnable(GL_DEBUG_OUTPUT);
-gl: remove irrelevant member function from templated textures
-gl: renderbuffer
-gl: templated buffer for binding
-gl: uniformbuffer?
+gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
+gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
-libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
-libv.log: log thread naming
-libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
-libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
-libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, that is too many template)
-libv.utility: Make a proper copy-pastable noisy type
-libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
-libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
-libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
 mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html
@@ -582,12 +591,25 @@ observe: https://github.com/hugoam/mud
 resource: dns like resource resolver for custom arguments: Args... -> ResourceDescriptor -> Resource
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
-ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
-ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
-ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
-ui: https://www.factorio.com/blog/post/fff-246
-ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
-ui: take a look at frame and component events
+
+libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
+libv.frame: Move frames from disconnected monitor / off-screen
+libv.frame: remove default own thread, give them an io_context like executor
+libv.gl: templated buffer for binding
+libv.gl: uniformbuffer?
+libv.log: log thread naming
+libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
+libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
+libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, it is too many template)
+libv.ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
+libv.ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets
+libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which can be identified with a simple string key), this could also be applied for the rest of the resources
+libv.ui: https://www.factorio.com/blog/post/fff-246
+libv.ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
+libv.utility: Make a proper copy-pastable noisy type
+libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
+libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
+libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
 
 ide.options:
 	- profile:
@@ -1263,29 +1285,72 @@ std::string Shader::PreprocessIncludes(const std::string& source, const boost::f
 
 // -------------------------------------------------------------------------------------------------
 
-A - ALPHA
-B - BRAVO
-C - CHARLIE
-D - DELTA
-E - ECHO
-F - FOXTROT
-G - GOLF
-H - HOTEL
-I - INDIA
-J - JULIET
-K - KILO
-L - LIMA
-M - MIKE
-N - NOVEMBER
-O - OSCAR
-P - PAPA
-Q - QUEBEC
-R - ROMEO
-S - SIERRA
-T - TANGO
-U - UNIFORM
-V - VICTOR
-W - WHISKY
-X - X-RAY
-Y - YANKEE
-Z - ZULU
+/// Calculates the fast inverse square root approximation. Error rate is around 0.175%
+/// For more information see: https://en.wikipedia.org/wiki/Fast_inverse_square_root
+constexpr inline float fast_rsqrt(float y) noexcept {
+	auto i = libv::bit_cast<int32_t>(y);
+	i = 0x5f3759df - (i >> 1); // evil floating point bit level hacking
+
+	y = libv::bit_cast<float>(i);
+	y *= 1.5f - (0.5f * y * y * y); // One iteration of Newton's method, repeated application would reduce error rate
+
+	return y;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+local nato_phonetic_alphabet = {
+	"Alfa",
+	"Bravo",
+	"Charlie",
+	"Delta",
+	"Echo",
+	"Foxtrot",
+	"Golf",
+	"Hotel",
+	"India",
+	"Juliet",
+	"Kilo",
+	"Lima",
+	"Mike",
+	"November",
+	"Oscar",
+	"Papa",
+	"Quebec",
+	"Romeo",
+	"Sierra",
+	"Tango",
+	"Uniform",
+	"Victor",
+	"Whisky",
+	"X-ray",
+	"Yankee",
+	"Zulu",
+}
+
+local greek_alphabet = {
+	"Alpha",
+	"Beta",
+	"Gamma",
+	"Delta",
+	"Epsilon",
+	"Zeta",
+	"Eta",
+	"Theta",
+	"Iota",
+	"Kappa",
+	"Lambda",
+	"Mu",
+	"Nu",
+	"Xi",
+	"Omicron",
+	"Pi",
+	"Rho",
+	"Sigma",
+	"Tau",
+	"Upsilon",
+	"Phi",
+	"Chi",
+	"Psi",
+	"Omega",
+}

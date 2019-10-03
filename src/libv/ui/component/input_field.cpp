@@ -22,9 +22,100 @@
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 
+#include <libv/ui/property_access.hpp>
+
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void InputField::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::bg_color,
+			"Background color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_image; },
+			[](auto& u) { return u.fallbackTexture2D(); },
+			pgr::appearance, pnm::bg_image,
+			"Background image"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_shader; },
+			[](auto& u) { return u.shaderImage(); },
+			pgr::appearance, pnm::bg_shader,
+			"Background shader"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.cursor_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::cursor_color,
+			"Cursor color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.cursor_shader; },
+			[](auto& u) { return u.shaderQuad(); },
+			pgr::appearance, pnm::cursor_shader,
+			"Cursor shader"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.align_horizontal; },
+			[](auto& c, auto v) { c.align_horizontal(v, PropertyDriver::style); },
+			[](const auto& c) { return c.align_horizontal(); },
+			AlignHorizontal::Left,
+			pgr::appearance, pnm::align_horizontal,
+			"Horizontal alignment of the text"
+	);
+//	ctx.indirect(
+//			[](auto& c) -> auto& { return c.property.align_vertical; },
+//			[](auto& c, auto v) { c.align_vertical(v, PropertyDriver::style); },
+//			[](const auto& c) { return c.align_vertical(); },
+//			AlignVertical::Top,
+//			pgr::appearance, pnm::align_vertical,
+//			"Vertical alignment of the text"
+//	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.font_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::font_color,
+			"Font color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.font_shader; },
+			[](auto& u) { return u.shaderFont(); },
+			pgr::appearance, pnm::font_shader,
+			"Font shader"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.font; },
+			[](auto& c, auto v) { c.font(std::move(v), PropertyDriver::style); },
+			[](const auto& c) { return c.font(); },
+			[](auto& u) { return u.fallbackFont(); },
+			pgr::font, pnm::font,
+			"Font file"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.font_size; },
+			[](auto& c, auto v) { c.font_size(v, PropertyDriver::style); },
+			[](const auto& c) { return c.font_size(); },
+			FontSize{12},
+			pgr::font, pnm::font_size,
+			"Font size in pixel"
+	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.text(std::move(v)); },
+			[](const auto& c) { return c.text(); },
+			pgr::behaviour, pnm::text,
+			"Displayed text"
+	);
+}
+
+//ComponentPropertyDescription InputField::description;
+//namespace { PropertyAutoRegistration<InputField> registration; } // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -41,32 +132,40 @@ InputField::~InputField() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void InputField::align_horizontal(AlignHorizontal value) {
+void InputField::align_horizontal(AlignHorizontal value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.align_horizontal, driver))
+		return;
+
 	text_.setAlign(value);
-	flagAuto(Flag::pendingRender);
 }
 
 AlignHorizontal InputField::align_horizontal() const noexcept {
 	return text_.getAlign();
 }
 
-void InputField::font(Font2D_view value) {
+void InputField::font(Font2D_view value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.font, driver))
+		return;
+
 	text_.setFont(std::move(value));
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 const Font2D_view& InputField::font() const noexcept {
 	return text_.getFont();
 }
 
-void InputField::font_size(FontSize value) {
+void InputField::font_size(FontSize value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.font_size, driver))
+		return;
+
 	text_.setSize(value);
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 FontSize InputField::font_size() const noexcept {
 	return text_.getSize();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void InputField::text(std::string value) {
 	text_.setString(std::move(value));
@@ -115,12 +214,12 @@ bool InputField::onMouse(const EventMouse& event) {
 		focus();
 
 	if (event.isMovement() && event.movement().enter)
-		// Set style to hover if not disabled
 		set(property.bg_color, property.bg_color() + 0.2f);
+		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	if (event.isMovement() && event.movement().leave)
-		// Set style to hover if not disabled
 		reset(property.bg_color);
+		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	return true;
 }
@@ -135,7 +234,8 @@ void InputField::doAttach() {
 }
 
 void InputField::doStyle(ContextStyle& ctx) {
-	property.access(ctx);
+	PropertySetterContext<InputField> setter{*this, ctx.style, context()};
+	access_properties(setter);
 }
 
 void InputField::doLayout1(const ContextLayout1& environment) {

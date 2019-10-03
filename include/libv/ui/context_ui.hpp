@@ -80,10 +80,8 @@ public:
 	std::shared_ptr<ShaderFont> shaderFont();
 	std::shared_ptr<ShaderImage> shaderImage();
 	std::shared_ptr<ShaderQuad> shaderQuad();
-
-private:
-	std::shared_ptr<Font2D> getFallbackFont() const;
-	std::shared_ptr<Texture2D> getFallbackTexture2D() const;
+	std::shared_ptr<Font2D> fallbackFont() const;
+	std::shared_ptr<Texture2D> fallbackTexture2D() const;
 
 public:
 	const Style& getFallbackStyle() const;

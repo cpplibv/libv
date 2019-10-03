@@ -138,13 +138,13 @@ ContextUI::ContextUI(UI& ui, Settings settings) :
 	self->fallback_style.set("anchor_parent", ANCHOR_CENTER_CENTER);
 	self->fallback_style.set("anchor_target", ANCHOR_CENTER_CENTER);
 	self->fallback_style.set("bg_color", Color{0, 0, 0, 1});
-	self->fallback_style.set("bg_image", getFallbackTexture2D());
+	self->fallback_style.set("bg_image", fallbackTexture2D());
 	self->fallback_style.set("bg_shader", shaderImage());
 	self->fallback_style.set("color", Color{1, 1, 1, 1});
 	self->fallback_style.set("column_count", ColumnCount{2});
 	self->fallback_style.set("cursor_color", Color{1, 1, 1, 1});
 	self->fallback_style.set("cursor_shader", shaderQuad());
-	self->fallback_style.set("font", getFallbackFont());
+	self->fallback_style.set("font", fallbackFont());
 	self->fallback_style.set("font_color", Color{1, 1, 1, 1});
 	self->fallback_style.set("font_shader", shaderFont());
 	self->fallback_style.set("font_size", FontSize(12));
@@ -361,11 +361,11 @@ std::shared_ptr<ShaderQuad> ContextUI::shaderQuad() {
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<Font2D> ContextUI::getFallbackFont() const {
+std::shared_ptr<Font2D> ContextUI::fallbackFont() const {
 	return self->fallback_font;
 }
 
-std::shared_ptr<Texture2D> ContextUI::getFallbackTexture2D() const {
+std::shared_ptr<Texture2D> ContextUI::fallbackTexture2D() const {
 	return self->fallback_texture2D;
 }
 

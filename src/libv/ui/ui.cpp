@@ -10,9 +10,11 @@
 #include <libv/utility/overload.hpp>
 #include <libv/utility/timer.hpp>
 // std
+#include <array>
 #include <mutex>
 #include <variant>
 #include <vector>
+//#include <iostream>
 // pro
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
@@ -45,6 +47,33 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+template <size_t N>
+struct Histogram {
+	std::array<size_t, N> data;
+
+	std::chrono::nanoseconds min;
+	std::chrono::nanoseconds max;
+
+	Histogram(std::chrono::nanoseconds min, std::chrono::nanoseconds max) : min(min), max(max) {
+		data.fill(0);
+	}
+
+	void sample(std::chrono::nanoseconds value) {
+		if (value > max)
+			data[N - 1]++;
+		else if (value < min)
+			data[0]++;
+		else
+			data[(value - min).count() / ((max - min).count() / N)]++;
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const Histogram& var) {
+		for (size_t i = 0; i < N; ++i)
+			os << var.data[i] << ' ';
+		return os;
+	}
+};
+
 class ImplUI {
 public:
 	using UIEvent = std::variant<
@@ -59,7 +88,40 @@ public:
 public:
 	ContextUI context;
 	Root root;
+
+	struct Stat {
+		Histogram<100> attach1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> event{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> attach2{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> styleScan{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> style{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> layout1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> layout2{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> render{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> detach{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+
+		Histogram<100> frame{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+
+		friend std::ostream& operator<<(std::ostream& os, const Stat& var) {
+			os << "attach1:   " << var.attach1;
+			os << "\nevent:     " << var.event;
+			os << "\nattach2:   " << var.attach2;
+			os << "\nstyleScan: " << var.styleScan;
+			os << "\nstyle:     " << var.style;
+			os << "\nlayout1:   " << var.layout1;
+			os << "\nlayout2:   " << var.layout2;
+			os << "\nrender:    " << var.render;
+			os << "\ndetach:    " << var.detach;
+			os << "\n-------------------------------------------------------------------------------------";
+			os << "\nframe:     " << var.frame;
+			os << '\n';
+			return os;
+		}
+	} stat;
+//	size_t i = 0;
+
 	libv::Timer timer;
+	libv::Timer timerFrame;
 	std::vector<UIEvent> event_queue;
 	std::mutex mutex;
 
@@ -175,12 +237,14 @@ ContextUI& UI::context() {
 // -------------------------------------------------------------------------------------------------
 
 void UI::update(libv::glr::Queue& gl) {
-	self->timer.reset();
 	AccessRoot::setContext(self->root, self->context);
 
+	self->timer.reset();
+	self->timerFrame.reset();
 	{
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
+		self->stat.attach1.sample(self->timer.time_ns());
 	} {
 		// --- Event ---
 		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (reactive events to layout and attach changes)
@@ -215,9 +279,11 @@ void UI::update(libv::glr::Queue& gl) {
 		}
 
 		self->event_queue.clear();
+		self->stat.event.sample(self->timer.time_ns());
 	} {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
+		self->stat.attach2.sample(self->timer.time_ns());
 	} {
 		// --- Focus ---
 //		self->focusTravers(Degrees<float>{135}); // backward
@@ -233,13 +299,17 @@ void UI::update(libv::glr::Queue& gl) {
 		if (self->context.isAnyStyleDirty()) {
 			AccessRoot::styleScan(self->root);
 			self->context.clearEveryStyleDirty();
+			self->stat.styleScan.sample(self->timer.time_ns());
 		} else {
 			AccessRoot::style(self->root);
+			self->stat.style.sample(self->timer.time_ns());
 		}
 	} {
 		// --- Layout ---
 		AccessRoot::layout1(self->root, ContextLayout1{});
+		self->stat.layout1.sample(self->timer.time_ns());
 		AccessRoot::layout2(self->root, ContextLayout2{AccessRoot::position(self->root), AccessRoot::size(self->root), MouseOrder{0}});
+		self->stat.layout2.sample(self->timer.time_ns());
 	} {
 		// --- Render ---
 		const auto guard_s = gl.state.push_guard();
@@ -270,10 +340,20 @@ void UI::update(libv::glr::Queue& gl) {
 //		AccessRoot::create(self->root, context);
 		AccessRoot::render(self->root, context);
 //		AccessRoot::destroy(self->root, context);
+
+		self->stat.render.sample(self->timer.time_ns());
 	} {
 		// --- Detach ---
 		AccessRoot::detach(self->root, self->root);
+		self->stat.detach.sample(self->timer.time_ns());
 	}
+
+	self->stat.frame.sample(self->timerFrame.time_ns());
+
+//	if (++self->i == 1200) {
+//		self->i = 0;
+//		std::cout << '\n' << self->stat << std::endl;
+//	}
 }
 
 void UI::destroy(libv::glr::Queue& gl) {
