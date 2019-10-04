@@ -14,6 +14,20 @@
 #include <vm4_viewer/scene.hpp>
 
 
+// -------------------------------------------------------------------------------------------------
+
+namespace libv {
+namespace ui {
+
+// TODO P3: fwd ui components
+class InputField;
+class PanelFull;
+
+} // namespace ui
+} // namespace libv
+
+// -------------------------------------------------------------------------------------------------
+
 namespace app {
 namespace ui {
 
@@ -23,11 +37,14 @@ class QuickFilePicker : public libv::ui::PanelLine {
 private:
 	std::filesystem::path path;
 
-	struct StyleRule {
-		std::filesystem::path pattern;
-		bool show = true;
-		libv::intrusive_ptr<libv::ui::Style> style;
-	};
+//	std::string filter_pattern;
+//
+//	struct StyleRule {
+//		std::filesystem::path pattern;
+////		std::string pattern;
+//		bool show = true;
+//		libv::intrusive_ptr<libv::ui::Style> style;
+//	};
 
 	bool displayRelativePath = true;
 	bool restrictRelativePath = true;
@@ -42,6 +59,9 @@ private:
 	bool followUpdates = false;
 
 	int select = -1;
+
+	std::shared_ptr<libv::ui::InputField> search_field;
+	std::shared_ptr<libv::ui::PanelFull> list_panel;
 
 public:
 	QuickFilePicker();

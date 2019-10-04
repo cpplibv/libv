@@ -7,6 +7,7 @@
 #include <boost/container/flat_set.hpp>
 //#include <range/v3/view/enumerate.hpp>
 // libv
+#include <libv/algorithm/wildcard.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/ui/component/image.hpp> // testing only, remove it
 #include <libv/ui/component/label.hpp>
@@ -61,6 +62,8 @@ void QuickFilePicker::key(libv::input::Key key) {
 		log_app.info("Select {}", select);
 		update_filelist();
 	}
+
+	update_filelist(); // TODO P1: need value change event to input field to update filelist
 }
 
 void QuickFilePicker::doAttach() {
@@ -132,63 +135,18 @@ void QuickFilePicker::doAttach() {
 
 	// -------------------------------------------------------------------------------------------------
 
-	update_filelist();
-}
-
-void QuickFilePicker::update_filelist() {
-	clear();
-
 	{
-		const auto panel_border = std::make_shared<libv::ui::PanelFull>("layer");
-		{
-			const auto temp = std::make_shared<libv::ui::Quad>("bg-quad");
-//			temp->style(context().style("vm4pv"));
-			temp->set(temp->property.color, libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
-			panel_border->add(temp);
-		} {
-			const auto temp = std::make_shared<libv::ui::Stretch>("border");
-			temp->style(context().style("vm4pv.info.slim_border"));
-			panel_border->add(temp);
-		} {
-			const auto panel_files = std::make_shared<libv::ui::PanelLine>("list");
-			panel_files->style(context().style("vm4pv.file_list"));
-
-			path = "res/model";
-			boost::container::flat_set<std::filesystem::path> exts_vm = {".vm3", ".vm4", ".vm5"};
-			boost::container::flat_set<std::filesystem::path> exts_importable = {".dae"};
-
-			int i = 0;
-			for(auto& p : std::filesystem::recursive_directory_iterator(path)) {
-				if (not p.is_regular_file())
-					continue;
-
-				auto ext = p.path().extension();
-				auto entry = std::make_shared<libv::ui::Label>("entry");
-
-				if (select == i++)
-					entry->style(context().style("vm4pv.file_list.entry.selected"));
-				else if (exts_vm.contains(ext))
-					entry->style(context().style("vm4pv.file_list.entry.vm"));
-				else if (exts_importable.contains(ext))
-					entry->style(context().style("vm4pv.file_list.entry.importable"));
-				else
-					entry->style(context().style("vm4pv.file_list.entry.other"));
-
-				entry->setText(libv::generic_path(p));
-				panel_files->add(entry);
-			}
-
-			panel_border->add(panel_files);
-		}
-		auto& child = add(panel_border);
-		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
+		search_field = std::make_shared<libv::ui::InputField>("input0");
+		search_field->style(context().style("vm4pv.info.input"));
+		search_field->text("model");
+		// hook up value change event
+		add(search_field);
 	}
 
 	{
-		const auto input = std::make_shared<libv::ui::InputField>("input0");
-		input->style(context().style("vm4pv.info.input"));
-		input->text("Input 0");
-		add(input);
+		list_panel = std::make_shared<libv::ui::PanelFull>("layer");
+		auto& child = add(list_panel);
+		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
 	}
 
 	{
@@ -209,6 +167,61 @@ void QuickFilePicker::update_filelist() {
 		);
 		auto& child = add(label_help);
 		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
+	}
+
+	update_filelist();
+}
+
+void QuickFilePicker::update_filelist() {
+	list_panel->clear();
+
+	{
+		const auto temp = std::make_shared<libv::ui::Quad>("bg-quad");
+//			temp->style(context().style("vm4pv"));
+		temp->set(temp->property.color, libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
+		list_panel->add(temp);
+	} {
+		const auto temp = std::make_shared<libv::ui::Stretch>("border");
+		temp->style(context().style("vm4pv.info.slim_border"));
+		list_panel->add(temp);
+	} {
+		const auto panel_files = std::make_shared<libv::ui::PanelLine>("list");
+		panel_files->style(context().style("vm4pv.file_list"));
+
+//			path = "res/model";
+		path = "res/";
+		boost::container::flat_set<std::filesystem::path> exts_vm = {".vm3", ".vm4", ".vm5"};
+		boost::container::flat_set<std::filesystem::path> exts_importable = {".dae"};
+
+//		const auto filter_pattern = search_field->text(); // full filter
+//		const auto filter_pattern = search_field->text() + "**"; // prefix filter
+		const auto filter_pattern = "**" + search_field->text() + "**"; // any filter
+
+		int i = 0;
+		for(auto& p : std::filesystem::recursive_directory_iterator(path)) {
+			if (not p.is_regular_file())
+				continue;
+
+			if (not libv::match_wildcard_glob(libv::generic_path(p), filter_pattern))
+				continue;
+
+			auto ext = p.path().extension();
+			auto entry = std::make_shared<libv::ui::Label>("entry");
+
+			if (select == i++)
+				entry->style(context().style("vm4pv.file_list.entry.selected"));
+			else if (exts_vm.contains(ext))
+				entry->style(context().style("vm4pv.file_list.entry.vm"));
+			else if (exts_importable.contains(ext))
+				entry->style(context().style("vm4pv.file_list.entry.importable"));
+			else
+				entry->style(context().style("vm4pv.file_list.entry.other"));
+
+			entry->setText(libv::generic_path(p));
+			panel_files->add(entry);
+		}
+
+		list_panel->add(panel_files);
 	}
 }
 
