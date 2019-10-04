@@ -98,12 +98,15 @@ bool match_wildcard_glob(const std::string_view str, const std::string_view patt
 
 		} else if (pattern_str.substr(i).starts_with(WILDCARD_LAYER_ANY)) {
 			i += WILDCARD_LAYER_ANY.size();
-			if (pattern.empty() || pattern.back().type != TokenType::layer_any)
+			if (!pattern.empty() && pattern.back().type == TokenType::layer)
+				pattern.back().type = TokenType::layer_any;
+
+			else if (pattern.empty() || pattern.back().type != TokenType::layer_any)
 				pattern.push_back(Token{TokenType::layer_any});
 
 		} else if (pattern_str.substr(i).starts_with(WILDCARD_LAYER)) {
 			i += WILDCARD_LAYER.size();
-			if (pattern.empty() || pattern.back().type != TokenType::layer)
+			if (pattern.empty() || (pattern.back().type != TokenType::layer && pattern.back().type != TokenType::layer_any))
 				pattern.push_back(Token{TokenType::layer});
 
 		} else if (pattern_str.substr(i).starts_with(WILDCARD_SINGLE)) {
@@ -181,7 +184,7 @@ bool match_wildcard_glob(const std::string_view str, const std::string_view patt
 				index(i, j) |= left || up;
 
 			} else if (token.type == TokenType::layer) {
-				index(i, j) |= left || up && !str_literal.starts_with(WILDCARD_SEPARATOR);
+				index(i, j) |= left || (up && !str_literal.starts_with(WILDCARD_SEPARATOR));
 			}
 		}
 	}
