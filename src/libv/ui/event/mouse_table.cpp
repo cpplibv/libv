@@ -9,6 +9,7 @@
 #include <libv/algorithm/linear_find.hpp>
 #include <libv/algorithm/sort.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
@@ -168,7 +169,7 @@ void MouseTable::update(BaseComponent& component, Flag_t interest) {
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
 	it->interest = interest;
 	it->pendingUpdate = true;
@@ -180,7 +181,7 @@ void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::ve
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
 	it->cornerBL = position;
 	it->cornerTR = position + size - 1.f;
@@ -194,7 +195,7 @@ void MouseTable::update(MouseWatcher& watcher, Flag_t interest) {
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", reinterpret_cast<size_t>(&watcher));
+		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
 
 	it->interest = interest;
 	it->pendingUpdate = true;
@@ -206,7 +207,7 @@ void MouseTable::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", reinterpret_cast<size_t>(&watcher));
+		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
 
 	it->cornerBL = position;
 	it->cornerTR = position + size - 1.f;
@@ -220,7 +221,7 @@ void MouseTable::unsubscribe(BaseComponent& component) {
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to unsubscribing a not subscribed component: 0x{:016x} {}", reinterpret_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to unsubscribing a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
 	libv::erase_unstable(self->entries, it);
 }
@@ -231,7 +232,7 @@ void MouseTable::unsubscribe(MouseWatcher& watcher) {
 	});
 
 	if (it == self->entries.end())
-		return log_ui.warn("Attempted to unsubscribing a not subscribed watcher: 0x{:016x}", reinterpret_cast<size_t>(&watcher));
+		return log_ui.warn("Attempted to unsubscribing a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
 
 	libv::erase_unstable(self->entries, it);
 }

@@ -18,6 +18,7 @@
 #include <libv/math/constants.hpp>
 #include <libv/math/quaternion.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/bit_cast.hpp>
 // std
 #include <iostream>
 
@@ -34,10 +35,10 @@ struct EventListener : rp3d::EventListener {
 	virtual void newContact(const rp3d::CollisionCallback::CollisionCallbackInfo& collisionInfo) override {
 		std::cout << '\n';
 		std::cout << "\tNew contact:"
-				<< " body1: " << reinterpret_cast<size_t>(collisionInfo.body1)
-				<< " body2: " << reinterpret_cast<size_t>(collisionInfo.body2)
-				<< " shape1: " << reinterpret_cast<size_t>(collisionInfo.proxyShape1)
-				<< " shape2: " << reinterpret_cast<size_t>(collisionInfo.proxyShape2)
+				<< " body1: " << libv::bit_cast<size_t>(collisionInfo.body1)
+				<< " body2: " << libv::bit_cast<size_t>(collisionInfo.body2)
+				<< " shape1: " << libv::bit_cast<size_t>(collisionInfo.proxyShape1)
+				<< " shape2: " << libv::bit_cast<size_t>(collisionInfo.proxyShape2)
 				<< '\n';
 
 		for (rp3d::ContactManifoldListElement* manifold = collisionInfo.contactManifoldElements; manifold; manifold = manifold->getNext()) {
