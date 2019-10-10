@@ -241,11 +241,14 @@ libv.ui.property: hybrid implement doStyle work
 libv.ui.property: hybrid Add a default / init value per instance ("above" fallback)
 libv.ui.property: hybrid reset (address could be used to lookup) | simple full style invalidation at first
 libv.ui: rename cursor to caret
+libv.ui.property: migrate to hybrid reflection
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+cleanup names for PropertyFF
+cleanup names for valueFF
 
 libv.ui.property: hybrid reflection - dynamic
 

@@ -8,12 +8,31 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/property_access.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void Quad::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::color,
+			"Background color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.quad_shader; },
+			[](auto& u) { return u.shaderQuad(); },
+			pgr::appearance, pnm::quad_shader,
+			"Background shader"
+	);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -31,7 +50,8 @@ Quad::~Quad() { }
 // -------------------------------------------------------------------------------------------------
 
 void Quad::doStyle(ContextStyle& ctx) {
-	property.access(ctx);
+	PropertySetterContext<Quad> setter{*this, ctx.style, context()};
+	access_properties(setter);
 }
 
 void Quad::doRender(ContextRender& context) {

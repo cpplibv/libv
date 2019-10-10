@@ -12,6 +12,7 @@
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
+#include <libv/ui/property_access.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
@@ -20,6 +21,80 @@
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void Button::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::bg_color,
+			"Background color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_image; },
+			[](auto& u) { return u.fallbackTexture2D(); },
+			pgr::appearance, pnm::bg_image,
+			"Background image"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_shader; },
+			[](auto& u) { return u.shaderImage(); },
+			pgr::appearance, pnm::bg_shader,
+			"Background shader"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.align_horizontal; },
+			[](auto& c, auto v) { c.align_horizontal(v, PropertyDriver::style); },
+			[](const auto& c) { return c.align_horizontal(); },
+			AlignHorizontal::Left,
+			pgr::appearance, pnm::align_horizontal,
+			"Horizontal alignment of the text"
+	);
+//	ctx.indirect(
+//			[](auto& c) -> auto& { return c.property.align_vertical; },
+//			[](auto& c, auto v) { c.align_vertical(v, PropertyDriver::style); },
+//			[](const auto& c) { return c.align_vertical(); },
+//			AlignVertical::Top,
+//			pgr::appearance, pnm::align_vertical,
+//			"Vertical alignment of the text"
+//	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.font_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::font_color,
+			"Font color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.font_shader; },
+			[](auto& u) { return u.shaderFont(); },
+			pgr::appearance, pnm::font_shader,
+			"Font shader"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.font; },
+			[](auto& c, auto v) { c.font(std::move(v), PropertyDriver::style); },
+			[](const auto& c) { return c.font(); },
+			[](auto& u) { return u.fallbackFont(); },
+			pgr::font, pnm::font,
+			"Font file"
+	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.font_size; },
+			[](auto& c, auto v) { c.font_size(v, PropertyDriver::style); },
+			[](const auto& c) { return c.font_size(); },
+			FontSize{12},
+			pgr::font, pnm::font_size,
+			"Font size in pixel"
+	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.text(std::move(v)); },
+			[](const auto& c) { return c.text(); },
+			pgr::behaviour, pnm::text,
+			"Displayed text"
+	);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -36,14 +111,51 @@ Button::~Button() { }
 
 // -------------------------------------------------------------------------------------------------
 
-void Button::setText(std::string string_) {
-	string.setString(std::move(string_));
+void Button::align_horizontal(AlignHorizontal value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.align_horizontal, driver))
+		return;
+
+	text_.setAlign(value);
+}
+
+AlignHorizontal Button::align_horizontal() const noexcept {
+	return text_.getAlign();
+}
+
+void Button::font(Font2D_view value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.font, driver))
+		return;
+
+	text_.setFont(std::move(value));
+}
+
+const Font2D_view& Button::font() const noexcept {
+	return text_.getFont();
+}
+
+void Button::font_size(FontSize value, PropertyDriver driver) {
+	if (AccessProperty::setter(*this, property.font_size, driver))
+		return;
+
+	text_.setSize(value);
+}
+
+FontSize Button::font_size() const noexcept {
+	return text_.getSize();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Button::text(std::string value) {
+	text_.setString(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
-const std::string& Button::getText() const {
-	return string.getString();
+const std::string& Button::text() const noexcept {
+	return text_.getString();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 void Button::setCallback(std::function<void(const EventMouse&)> callback) {
 	mouseWatcher.callback = std::move(callback);
@@ -69,14 +181,14 @@ void Button::doDetach() {
 }
 
 void Button::doStyle(ContextStyle& ctx) {
-	property.access(ctx);
+	PropertySetterContext<Button> setter{*this, ctx.style, context()};
+	access_properties(setter);
 }
 
 void Button::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	string.setFont(property.font(), property.font_size());
-	string.setAlign(property.align_horizontal());
-	const auto contentString = string.getContent(-1, -1);
+
+	const auto contentString = text_.getContent(-1, -1);
 	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
@@ -88,15 +200,15 @@ void Button::doLayout2(const ContextLayout2& environment) {
 			libv::vec::xy(environment.position),
 			libv::vec::xy(environment.size),
 			environment.mouseOrder);
-	string.setLimit(libv::vec::xy(environment.size));
+	text_.setLimit(libv::vec::xy(environment.size));
 }
 
-void Button::doRender(ContextRender& context) {
-	if (context.changedSize) {
-		mesh.clear();
-		auto pos = mesh.attribute(attribute_position);
-		auto tex = mesh.attribute(attribute_texture0);
-		auto index = mesh.index();
+void Button::doRender(ContextRender& ctx) {
+	if (ctx.changedSize) {
+		bg_mesh.clear();
+		auto pos = bg_mesh.attribute(attribute_position);
+		auto tex = bg_mesh.attribute(attribute_texture0);
+		auto index = bg_mesh.index();
 
 		pos(0, 0, 0);
 		pos(size().x, 0, 0);
@@ -111,28 +223,25 @@ void Button::doRender(ContextRender& context) {
 		index.quad(0, 1, 2, 3);
 	}
 
-	const auto guard_m = context.gl.model.push_guard();
- 	context.gl.model.translate(position());
+	const auto guard_m = ctx.gl.model.push_guard();
+ 	ctx.gl.model.translate(position());
 
 	{
-		context.gl.program(*property.bg_shader());
-		context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-		context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
-		context.gl.render(mesh);
+		ctx.gl.program(*property.bg_shader());
+		ctx.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
+		ctx.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
+		ctx.gl.uniform(property.bg_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(bg_mesh);
 	} {
-		const auto guard_s = context.gl.state.push_guard();
-		context.gl.state.blendSrc_Source1Color();
-		context.gl.state.blendDst_One_Minus_Source1Color();
+		const auto guard_s = ctx.gl.state.push_guard();
+		ctx.gl.state.blendSrc_Source1Color();
+		ctx.gl.state.blendDst_One_Minus_Source1Color();
 
-		string.setFont(property.font(), property.font_size());
-		string.setAlign(property.align_horizontal());
-
-		context.gl.program(*property.font_shader());
-		context.gl.texture(property.font()->texture(), property.font_shader()->textureChannel);
-		context.gl.uniform(property.font_shader()->uniform_color, property.font_color());
-		context.gl.uniform(property.font_shader()->uniform_MVPmat, context.gl.mvp());
-		context.gl.render(string.mesh());
+		ctx.gl.program(*property.font_shader());
+		ctx.gl.texture(font()->texture(), property.font_shader()->textureChannel);
+		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
+		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(text_.mesh());
 	}
 }
 

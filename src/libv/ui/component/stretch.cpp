@@ -8,6 +8,8 @@
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
+#include <libv/ui/context_ui.hpp>
+#include <libv/ui/property_access.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
@@ -15,6 +17,30 @@
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void Stretch::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_color; },
+			Color(1, 1, 1, 1),
+			pgr::appearance, pnm::bg_color,
+			"Background color"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_image; },
+			[](auto& u) { return u.fallbackTexture2D(); },
+			pgr::appearance, pnm::bg_image,
+			"Background image"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.bg_shader; },
+			[](auto& u) { return u.shaderImage(); },
+			pgr::appearance, pnm::bg_shader,
+			"Background shader"
+	);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -32,7 +58,8 @@ Stretch::~Stretch() { }
 // -------------------------------------------------------------------------------------------------
 
 void Stretch::doStyle(ContextStyle& ctx) {
-	property.access(ctx);
+	PropertySetterContext<Stretch> setter{*this, ctx.style, context()};
+	access_properties(setter);
 }
 
 void Stretch::doLayout1(const ContextLayout1& environment) {

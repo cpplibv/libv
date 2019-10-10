@@ -109,6 +109,11 @@ void QuickFilePicker::doAttach() {
 	}
 
 	{
+		auto style = context().style("vm4pv.info.bg");
+		style->set("color", libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
+	}
+
+	{
 		auto style = context().style("vm4pv.info.slim_border");
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 		style->set("bg_shader", context().shaderImage());
@@ -160,7 +165,7 @@ void QuickFilePicker::doAttach() {
 	{
 		const auto label_help = std::make_shared<libv::ui::Label>("help");
 		label_help->style(context().style("vm4pv.file_list"));
-		label_help->setText(
+		label_help->text(
 				"[Up/Down] Navigate  [Enter] Open  [A-Z] Search\n"
 				"? Wildcard matching a single character\n"
 				"* Wildcard matching single level any file or directory name\n"
@@ -178,8 +183,7 @@ void QuickFilePicker::update_filelist() {
 
 	{
 		const auto temp = std::make_shared<libv::ui::Quad>("bg-quad");
-//			temp->style(context().style("vm4pv"));
-		temp->set(temp->property.color, libv::parse::parse_color_or_throw("hsva(0, 0%, 20%, 35%)"));
+		temp->style(context().style("vm4pv.info.bg"));
 		list_panel->add(temp);
 	} {
 		const auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -220,7 +224,7 @@ void QuickFilePicker::update_filelist() {
 			else
 				entry->style(context().style("vm4pv.file_list.entry.other"));
 
-			entry->setText(libv::generic_path(p));
+			entry->text(libv::generic_path(p));
 			panel_files->add(entry);
 		}
 

@@ -16,13 +16,12 @@
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
+#include <libv/ui/property_access.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
-
-#include <libv/ui/property_access.hpp>
 
 
 namespace libv {

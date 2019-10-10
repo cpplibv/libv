@@ -19,31 +19,21 @@ namespace ui {
 
 struct Label : BaseComponent {
 private:
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
+
 	struct PS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
-		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
-		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
+		PropertyFFR<Color> font_color;
+		PropertyFFR<ShaderFont_view> font_shader;
 
-		Property<AlignHorizontal,  L , pnm::align_horizontal> align_horizontal;
-		Property<Font2D_view,      LR, pnm::font> font;
-		Property<Color,             R, pnm::font_color> font_color;
-		Property<FontSize,         LR, pnm::font_size> font_size;
-		Property<ShaderFont_view,   R, pnm::font_shader> font_shader;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(align_horizontal, "Horizontal alignment of the text");
-			ctx(font, "Font file");
-			ctx(font_color, "Font color");
-			ctx(font_shader, "Font shader");
-			ctx(font_size, "Font size in pixel");
-		}
-	};
+		PropertyFFL<> align_horizontal;
+		PropertyFFL<> font;
+		PropertyFFL<> font_size;
+	} property;
 
 private:
-	String2D string;
-public:
-	libv::ui::PropertySet<PS> property;
+	String2D text_;
 
 public:
 	Label();
@@ -52,8 +42,17 @@ public:
 	~Label();
 
 public:
-	void setText(std::string string_);
-	const std::string& getText() const;
+	void align_horizontal(AlignHorizontal value, PropertyDriver driver = PropertyDriver::manual);
+	AlignHorizontal align_horizontal() const noexcept;
+
+	void font(Font2D_view value, PropertyDriver driver = PropertyDriver::manual);
+	const Font2D_view& font() const noexcept;
+
+	void font_size(FontSize value, PropertyDriver driver = PropertyDriver::manual);
+	FontSize font_size() const noexcept;
+
+	void text(std::string value);
+	const std::string& text() const noexcept;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;

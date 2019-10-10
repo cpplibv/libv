@@ -20,23 +20,17 @@ namespace ui {
 
 struct Quad : BaseComponent {
 private:
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
+
 	struct PS {
-		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
-
-		Property<Color,           R, pnm::color> color;
-		Property<ShaderQuad_view, R, pnm::quad_shader> quad_shader;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(color, "Color");
-			ctx(quad_shader, "Quad shader");
-		}
-	};
+		PropertyFFR<Color> color;
+		PropertyFFR<ShaderQuad_view> quad_shader;
+	} property;
 
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-public:
-	libv::ui::PropertySet<PS> property;
 
 public:
 	Quad();

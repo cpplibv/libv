@@ -20,27 +20,18 @@ namespace ui {
 
 struct Stretch : BaseComponent {
 private:
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
+
 	struct PS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
-		static constexpr Flag_t::value_type LR = (Flag::pendingLayout | Flag::pendingRender).value();
-		static constexpr Flag_t::value_type  R = (Flag::pendingRender).value();
-
-		Property<Color,             R, pnm::bg_color> bg_color;
-		Property<Texture2D_view,   LR, pnm::bg_image> bg_image;
-		Property<ShaderImage_view,  R, pnm::bg_shader> bg_shader;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(bg_color, "Background color");
-			ctx(bg_image, "Background image");
-			ctx(bg_shader, "Background shader");
-		}
-	};
+		PropertyFFR<Color> bg_color;
+		PropertyFFL<Texture2D_view> bg_image;
+		PropertyFFR<ShaderImage_view> bg_shader;
+	} property;
 
 private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
-public:
-	libv::ui::PropertySet<PS> property;
 
 public:
 	Stretch();

@@ -89,12 +89,11 @@ static constexpr libv::fixed_string anchor_target = "anchor_target";
 static constexpr libv::fixed_string bg_color = "bg_color";
 static constexpr libv::fixed_string bg_image = "bg_image";
 static constexpr libv::fixed_string bg_shader = "bg_shader";
-static constexpr libv::fixed_string color = "color";
-static constexpr libv::fixed_string column_count = "column_count";
 static constexpr libv::fixed_string caret_color = "caret_color";
 static constexpr libv::fixed_string caret_shader = "caret_shader";
+static constexpr libv::fixed_string color = "color";
+static constexpr libv::fixed_string column_count = "column_count";
 static constexpr libv::fixed_string font = "font";
-static constexpr libv::fixed_string text = "text";
 static constexpr libv::fixed_string font_color = "font_color";
 static constexpr libv::fixed_string font_shader = "font_shader";
 static constexpr libv::fixed_string font_size = "font_size";
@@ -104,6 +103,7 @@ static constexpr libv::fixed_string quad_shader = "quad_shader";
 static constexpr libv::fixed_string size = "size";
 static constexpr libv::fixed_string snapToEdge = "snapToEdge";
 static constexpr libv::fixed_string squish = "squish";
+static constexpr libv::fixed_string text = "text";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------

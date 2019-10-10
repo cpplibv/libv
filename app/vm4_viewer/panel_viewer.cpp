@@ -201,7 +201,7 @@ void PanelViewer::doAttach() {
 	{
 		label_version = std::make_shared<libv::ui::Label>("version");
 		label_version->style(context().style("vm4pv.label_version"));
-		label_version->setText(app::full_version);
+		label_version->text(app::full_version);
 		add(label_version);
 	}
 
@@ -214,7 +214,7 @@ void PanelViewer::doAttach() {
 	{
 		label_version = std::make_shared<libv::ui::Label>("help");
 		label_version->style(context().style("vm4pv.label_help"));
-		label_version->setText(
+		label_version->text(
 				"Strafe camera - WASD\n"
 				"Lift camera - RF\n"
 				"Roll camera - QE\n"
@@ -231,7 +231,7 @@ void PanelViewer::doAttach() {
 		{
 			button_close = std::make_shared<libv::ui::Button>("close");
 			button_close->style(context().style("vm4pv.button"));
-			button_close->setText("Button0");
+			button_close->text("Button0");
 			button_close->setCallback([this](const libv::ui::EventMouse& event) {
 				if (event.isButton())
 					button_close->focus();
@@ -250,7 +250,7 @@ void PanelViewer::doAttach() {
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
 			temp->style(context().style("vm4pv.info.bar"));
-			temp->setText("Project");
+			temp->text("Project");
 			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -259,7 +259,7 @@ void PanelViewer::doAttach() {
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
 			temp->style(context().style("vm4pv.info.bar"));
-			temp->setText("File");
+			temp->text("File");
 			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -268,7 +268,7 @@ void PanelViewer::doAttach() {
 		} {
 			button_close = std::make_shared<libv::ui::Button>("button1");
 			button_close->style(context().style("vm4pv.button"));
-			button_close->setText("Button1");
+			button_close->text("Button1");
 			button_close->setCallback([this](const libv::ui::EventMouse& event) {
 				if (event.isButton())
 					button_close->focus();
@@ -287,7 +287,7 @@ void PanelViewer::doAttach() {
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
 			temp->style(context().style("vm4pv.info.bar"));
-			temp->setText("Model");
+			temp->text("Model");
 			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -296,7 +296,7 @@ void PanelViewer::doAttach() {
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
 			temp->style(context().style("vm4pv.info.bar"));
-			temp->setText("Node");
+			temp->text("Node");
 			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -305,7 +305,7 @@ void PanelViewer::doAttach() {
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
 			temp->style(context().style("vm4pv.info.bar"));
-			temp->setText("Material");
+			temp->text("Material");
 			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::Stretch>("border");
@@ -320,7 +320,7 @@ void PanelViewer::doAttach() {
 //			temp->set(temp->property.font_color, libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 //			temp->set(temp->property.font_shader, context().shaderFont());
 //			temp->set(temp->property.font_size, libv::ui::FontSize{12});
-//			temp->setText("Model");
+//			temp->text("Model");
 //
 //			auto& child = panel_left->add(temp);
 //			child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("d, d"));
@@ -403,13 +403,13 @@ void PanelViewer::update_info() {
 //	//		panel_info.property.set(context().style("vm4_viewer.info"));
 //
 //	label_name.property.set(context().style("vm4_viewer.info.name"));
-//	label_name.setText(fmt::format(
+//	label_name.text(fmt::format(
 //			"Name: {}",
 //			scene.model.name
 //	));
 //
 //	label_file.property.set(context().style("vm4_viewer.info.file"));
-//	label_file.setText(fmt::format(
+//	label_file.text(fmt::format(
 //			"File:      {}"
 //			"Version:   {}"
 //			"Hash:      {}"
@@ -422,7 +422,7 @@ void PanelViewer::update_info() {
 //	));
 //
 //	label_info.property.set(context().style("vm4_viewer.info.info"));
-//	label_info.setText(fmt::format(
+//	label_info.text(fmt::format(
 //			"Vertex count:       {:9}\n"
 //			"Index count:        {:9}\n"
 //			"LOD count:          {:9}\n"
@@ -447,7 +447,7 @@ void PanelViewer::update_info() {
 //		auto& label = label_lod.emplace_back();
 //
 //		label.property.set(context().style("vm4_viewer.info.lod"));
-//		label.setText(fmt::format(
+//		label.text(fmt::format(
 //				"Level: {}\n"
 //				"Range far:   {:12.6f}\n"
 //				"Range near:  {:12.6f}\n"
@@ -485,7 +485,7 @@ void PanelViewer::update_info() {
 //			}, data);
 //		}
 //
-//		label.setText(std::move(ss).str());
+//		label.text(std::move(ss).str());
 //	}
 //
 
@@ -494,7 +494,7 @@ void PanelViewer::update_info() {
 
 	//		for (const auto& [level, lod] : scene.model.lods | ranges::view::enumerate) {
 	//			auto& label = label_lod.emplace_back();
-	//			label.setText(fmt::format(
+	//			label.text(fmt::format(
 	//					"Level: {}\n"
 	//					"Range far:   {:12.6f}\n"
 	//					"Range near:  {:12.6f}\n"
@@ -555,7 +555,7 @@ void PanelViewer::update_info() {
 //	add(panel_help);
 //
 //	panel_left->add(label_info);
-//	label_info->setText("Hello world!");
+//	label_info->text("Hello world!");
 //	label_info->property.font
 
 //	const auto style_label_01 = ui.context().style("style-label-01");
@@ -564,11 +564,11 @@ void PanelViewer::update_info() {
 //	style_label_01->set("align", libv::ui::Anchor::Left);
 //
 //	label0->property.set(style_label_01);
-//	label0->setText("Hello, Label0!");
+//	label0->text("Hello, Label0!");
 //	label1->property.set(style_label_01);
-//	label1->setText("Hello, Label1!");
+//	label1->text("Hello, Label1!");
 //	label2->property.set(style_label_01);
-//	label2->setText("Hello, Label2!");
+//	label2->text("Hello, Label2!");
 //	label2->propertySize = libv::ui::parse_size_or_throw("dynamic, dynamic");
 //
 //	quad0->color(libv::parse::parse_color_or_throw("rgba(134, 189, 111, 80%)"));

@@ -45,13 +45,11 @@ private:
 private:
 	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh caret_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	String2D text_;
 
 private:
 	time_point caretStartTime;
 	libv::vec2f caretPosition;
-
-private:
-	String2D text_;
 
 public:
 	InputField();
