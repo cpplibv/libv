@@ -22,7 +22,7 @@ public:
 	PanelGrid() :
 		BasicPanel<LayoutGrid>(UnnamedTag, "grid") { }
 
-	PanelGrid(std::string name) :
+	explicit PanelGrid(std::string name) :
 		BasicPanel<LayoutGrid>(std::move(name)) { }
 
 	PanelGrid(UnnamedTag_t, const std::string_view type) :

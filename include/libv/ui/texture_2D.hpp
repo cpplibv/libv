@@ -17,7 +17,7 @@ class Texture2D {
 	libv::vec2i size_;
 
 public:
-	Texture2D(libv::gl::Image image) : size_(image.size()) {
+	explicit Texture2D(libv::gl::Image image) : size_(image.size()) {
 		texture_.load(std::move(image));
 	}
 

@@ -34,7 +34,7 @@ private:
 
 public:
 	Stretch();
-	Stretch(std::string name);
+	explicit Stretch(std::string name);
 	Stretch(UnnamedTag_t, const std::string_view type);
 	~Stretch();
 

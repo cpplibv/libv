@@ -44,7 +44,7 @@ private:
 
 public:
 	UI();
-	UI(const Settings& setting);
+	explicit UI(const Settings& setting);
 	~UI();
 
 public:

@@ -22,7 +22,7 @@ public:
 	PanelFloat() :
 		BasicPanel<LayoutFloat>(UnnamedTag, "float") { }
 
-	PanelFloat(std::string name) :
+	explicit PanelFloat(std::string name) :
 		BasicPanel<LayoutFloat>(std::move(name)) { }
 
 	PanelFloat(UnnamedTag_t, const std::string_view type) :

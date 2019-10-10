@@ -36,7 +36,7 @@ private:
 
 public:
 	Label();
-	Label(std::string name);
+	explicit Label(std::string name);
 	Label(UnnamedTag_t, const std::string_view type);
 	~Label();
 

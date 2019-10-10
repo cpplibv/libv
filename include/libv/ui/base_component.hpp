@@ -75,7 +75,7 @@ public:
 	std::string name;
 
 public:
-	BaseComponent(std::string name);
+	explicit BaseComponent(std::string name);
 	BaseComponent(UnnamedTag_t, const std::string_view type);
 	virtual ~BaseComponent();
 

@@ -33,7 +33,7 @@ private:
 
 public:
 	Quad();
-	Quad(std::string name);
+	explicit Quad(std::string name);
 	Quad(UnnamedTag_t, const std::string_view type);
 	~Quad();
 

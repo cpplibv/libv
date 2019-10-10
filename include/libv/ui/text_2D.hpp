@@ -103,7 +103,7 @@ private:
 
 public:
 	String2D() = default;
-	String2D(const std::string& text, Anchor halign = Anchor::Center, Anchor valign = Anchor::Center);
+	explicit String2D(const std::string& text, Anchor halign = Anchor::Center, Anchor valign = Anchor::Center);
 
 public:
 	void setText(const std::string& text);

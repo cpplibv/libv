@@ -22,7 +22,7 @@ public:
 	PanelFull() :
 		BasicPanel<LayoutFull>(UnnamedTag, "full") { }
 
-	PanelFull(std::string name) :
+	explicit PanelFull(std::string name) :
 		BasicPanel<LayoutFull>(std::move(name)) { }
 
 	PanelFull(UnnamedTag_t, const std::string_view type) :

@@ -52,7 +52,7 @@ private:
 
 public:
 	InputField();
-	InputField(std::string name);
+	explicit InputField(std::string name);
 	InputField(UnnamedTag_t, const std::string_view type);
 	~InputField();
 

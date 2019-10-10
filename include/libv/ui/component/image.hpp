@@ -34,7 +34,7 @@ private:
 
 public:
 	Image();
-	Image(std::string name);
+	explicit Image(std::string name);
 	Image(UnnamedTag_t, const std::string_view type);
 	~Image();
 

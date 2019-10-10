@@ -54,7 +54,7 @@ public:
 	Settings settings;
 
 public:
-	ContextUI(UI& ui, Settings settings = Settings());
+	explicit ContextUI(UI& ui, Settings settings = Settings());
 	~ContextUI();
 
 public:

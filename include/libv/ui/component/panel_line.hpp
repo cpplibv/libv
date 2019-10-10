@@ -22,7 +22,7 @@ public:
 	PanelLine() :
 		BasicPanel<LayoutLine>(UnnamedTag, "line") { }
 
-	PanelLine(std::string name) :
+	explicit PanelLine(std::string name) :
 		BasicPanel<LayoutLine>(std::move(name)) { }
 
 	PanelLine(UnnamedTag_t, const std::string_view type) :

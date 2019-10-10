@@ -43,7 +43,7 @@ private:
 
 public:
 	LabelImage();
-	LabelImage(std::string name);
+	explicit LabelImage(std::string name);
 	LabelImage(UnnamedTag_t, const std::string_view type);
 	~LabelImage();
 

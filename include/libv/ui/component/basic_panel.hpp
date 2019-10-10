@@ -31,7 +31,7 @@ private:
 
 public:
 	BasicPanel();
-	BasicPanel(std::string name);
+	explicit BasicPanel(std::string name);
 	BasicPanel(UnnamedTag_t, const std::string_view type);
 	virtual ~BasicPanel();
 

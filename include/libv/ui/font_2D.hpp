@@ -86,7 +86,7 @@ private:
 
 public:
 	/// @param fontData the content of the font file
-	Font2D(std::string fontData);
+	explicit Font2D(std::string fontData);
 	~Font2D();
 
 public:

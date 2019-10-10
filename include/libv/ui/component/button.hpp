@@ -45,7 +45,7 @@ private:
 
 public:
 	Button();
-	Button(std::string name);
+	explicit Button(std::string name);
 	Button(UnnamedTag_t, const std::string_view type);
 	~Button();
 

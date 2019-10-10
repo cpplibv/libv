@@ -244,6 +244,8 @@ libv.ui: rename cursor to caret
 libv.ui.property: migrate to hybrid reflection
 libv.ui.property: cleanup old non hybrid property codes: PropertyFF, valueFF
 libv.ui.style: cleanup fallback style
+libv.ui: setX() / getX() -> void X(T) / T X()
+libv.ui: mark every component type one paramed ctors as explicit (and maybe check on every ui class too)
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -283,8 +285,6 @@ cleanup
 	libv.ui: remove layout1 pass member variables in component_base
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
-	libv.ui: mark every component type one paramed ctors as explicit (and maybe check on every ui class too)
-	libv.ui: setX() / getX() -> void X(T) / T X()
 
 mouse
 	libv.ui: flatten - flatten EventMouse to combat variant complexity
