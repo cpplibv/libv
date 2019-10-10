@@ -102,6 +102,8 @@ public:
 	const Character& getCharacter(uint32_t unicode, uint32_t size);
 
 private:
+	const Character& _getCharacter(uint32_t unicode, uint32_t size);
+	Character _renderFallbackCharacter();
 	Character _renderCharacter(uint32_t unicode, uint32_t size);
 	void _changeSizeOnDemand(uint32_t size);
 };

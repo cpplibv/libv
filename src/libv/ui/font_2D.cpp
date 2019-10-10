@@ -75,7 +75,7 @@ Font2D::Font2D(std::string fontData) :
 	texture_.set(gl::MagFilter::Nearest);
 	texture_.set(gl::MinFilter::Nearest);
 
-	getCharacter(0, 12); // pre-fetch default char
+	_renderFallbackCharacter(); // pre-fetch default char
 }
 
 Font2D::~Font2D() {
@@ -135,11 +135,21 @@ const Font2D::Character& Font2D::getCharacter(uint32_t unicode, uint32_t size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 
+	return _getCharacter(unicode, size);
+}
+
+const Font2D::Character& Font2D::_getCharacter(uint32_t unicode, uint32_t size) {
+	LIBV_UI_DEBUG_ASSERT(face != nullptr);
+
 	const auto infoIndex = CharacterIndex{unicode, size};
 	auto it = characterInfos.find(infoIndex);
 	if (it == characterInfos.end())
 		it = characterInfos.emplace(infoIndex, _renderCharacter(unicode, size)).first;
 	return it->second;
+}
+
+Font2D::Character Font2D::_renderFallbackCharacter() {
+	return _renderCharacter(0, 12);
 }
 
 Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
@@ -151,13 +161,18 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
-	// TODO P3: libv.ui.font: Not just log but act on error
-	if (const auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT))
+	if (const auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT)) {
 		log_ui_ft.error("FT_Load_Glyph failed: {} for: {} size: {}", err, unicode, size);
-	if (const auto err = FT_Get_Glyph(face->glyph, &glyph))
+		return _renderFallbackCharacter();
+	}
+	if (const auto err = FT_Get_Glyph(face->glyph, &glyph)) {
 		log_ui_ft.error("FT_Get_Glyph failed: {} for: {} size: {}", err, unicode, size);
-	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_LCD, nullptr, true))
+		return _renderFallbackCharacter();
+	}
+	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_LCD, nullptr, true)) {
 		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, size);
+		return _renderFallbackCharacter();
+	}
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
 	const auto& bitmap = bitmapGlyph->bitmap;
@@ -172,7 +187,7 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 				"unicode: {} size: {} bitmap size: {} {}, pen pos: {}",
 				unicode, currentSize, bitmapWidth, bitmapHeight, texturePen);
 		FT_Done_Glyph(glyph);
-		return getCharacter(0, 12); // Fallback to pre-fetched default char
+		return _renderFallbackCharacter();
 	}
 
 	if (texturePen.y + bitmapHeight > textureNextLine) // Expand current line
