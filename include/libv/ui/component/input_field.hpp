@@ -31,8 +31,8 @@ private:
 		PropertyFFL<Texture2D_view> bg_image;
 		PropertyFFR<ShaderImage_view> bg_shader;
 
-		PropertyFFR<Color> cursor_color;
-		PropertyFFR<ShaderQuad_view> cursor_shader;
+		PropertyFFR<Color> caret_color;
+		PropertyFFR<ShaderQuad_view> caret_shader;
 
 		PropertyFFR<Color> font_color;
 		PropertyFFR<ShaderFont_view> font_shader;
@@ -44,11 +44,11 @@ private:
 
 private:
 	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh cursor_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh caret_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 private:
-	time_point cursorStartTime;
-	libv::vec2f cursorPosition;
+	time_point caretStartTime;
+	libv::vec2f caretPosition;
 
 private:
 	String2D text_;

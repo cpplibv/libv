@@ -240,6 +240,7 @@ libv.ui.property: hybrid reflection - static
 libv.ui.property: hybrid implement doStyle work
 libv.ui.property: hybrid Add a default / init value per instance ("above" fallback)
 libv.ui.property: hybrid reset (address could be used to lookup) | simple full style invalidation at first
+libv.ui: rename cursor to caret
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -275,7 +276,6 @@ debug
 
 cleanup
 	libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
-	libv.ui: rename cursor to caret
 	libv.ui.font: line 179 not just log but return default on error
 	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: remove layout1 pass member variables in component_base

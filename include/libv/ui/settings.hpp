@@ -30,13 +30,13 @@ struct ResourceSettings {
 };
 
 struct Settings {
-	std::chrono::milliseconds cursor_flash_period{700};
-	std::chrono::milliseconds cursor_show_period{350};
+	std::chrono::milliseconds caret_flash_period{700};
+	std::chrono::milliseconds caret_show_period{350};
 
-	float cursor_width_max = 5;
-	float cursor_width_min = 2;
-	float cursor_width_offset = 12;
-	float cursor_width_scale = 24;
+	float caret_width_max = 5;
+	float caret_width_min = 2;
+	float caret_width_offset = 12;
+	float caret_width_scale = 24;
 
 	// bool enable_lcd_font = true;
 
@@ -44,12 +44,12 @@ struct Settings {
 	ResourceSettings res_shader = {"res/shader"};
 	ResourceSettings res_texture = {"res/texture"};
 
-	LIBV_REFLECTION_ACCESS(cursor_flash_period);
-	LIBV_REFLECTION_ACCESS(cursor_show_period);
-	LIBV_REFLECTION_ACCESS(cursor_width_max);
-	LIBV_REFLECTION_ACCESS(cursor_width_min);
-	LIBV_REFLECTION_ACCESS(cursor_width_offset);
-	LIBV_REFLECTION_ACCESS(cursor_width_scale);
+	LIBV_REFLECTION_ACCESS(caret_flash_period);
+	LIBV_REFLECTION_ACCESS(caret_show_period);
+	LIBV_REFLECTION_ACCESS(caret_width_max);
+	LIBV_REFLECTION_ACCESS(caret_width_min);
+	LIBV_REFLECTION_ACCESS(caret_width_offset);
+	LIBV_REFLECTION_ACCESS(caret_width_scale);
 	// LIBV_REFLECTION_ACCESS(enable_lcd_font);
 	LIBV_REFLECTION_ACCESS(res_font);
 	LIBV_REFLECTION_ACCESS(res_shader);

@@ -51,15 +51,15 @@ void InputField::access_properties(T& ctx) {
 			"Background shader"
 	);
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.cursor_color; },
+			[](auto& c) -> auto& { return c.property.caret_color; },
 			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::cursor_color,
+			pgr::appearance, pnm::caret_color,
 			"Cursor color"
 	);
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.cursor_shader; },
+			[](auto& c) -> auto& { return c.property.caret_shader; },
 			[](auto& u) { return u.shaderQuad(); },
-			pgr::appearance, pnm::cursor_shader,
+			pgr::appearance, pnm::caret_shader,
 			"Cursor shader"
 	);
 	ctx.indirect(
@@ -181,7 +181,7 @@ const std::string& InputField::text() const noexcept {
 bool InputField::onChar(const libv::input::EventChar& event) {
 	text_.push_back(event.utf8.data());
 
-	cursorStartTime = clock::now();
+	caretStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	return true;
 }
@@ -190,7 +190,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	if (event.key == libv::input::Key::Backspace && event.action != libv::input::Action::release) {
 		text_.pop_back();
 
-		cursorStartTime = clock::now();
+		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		return true;
 	}
@@ -203,7 +203,7 @@ void InputField::onFocus(const EventFocus& event) {
 
 	if (event.gain) {
 		{} // Set style to active if not disabled
-		cursorStartTime = clock::now();
+		caretStartTime = clock::now();
 	}
 
 	flagAuto(Flag::pendingRender);
@@ -249,7 +249,7 @@ void InputField::doLayout1(const ContextLayout1& environment) {
 
 void InputField::doLayout2(const ContextLayout2& environment) {
 	text_.setLimit(libv::vec::xy(environment.size));
-	cursorPosition = text_.getCharacterPosition();
+	caretPosition = text_.getCharacterPosition();
 }
 
 void InputField::doRender(ContextRender& ctx) {
@@ -276,24 +276,24 @@ void InputField::doRender(ContextRender& ctx) {
 	const auto changedFontSize = property.font_size.consumeChange();
 
 	if (changedFont || changedFontSize) {
-		cursor_mesh.clear();
-		auto pos = cursor_mesh.attribute(attribute_position);
-		auto index = cursor_mesh.index();
+		caret_mesh.clear();
+		auto pos = caret_mesh.attribute(attribute_position);
+		auto index = caret_mesh.index();
 
-		const auto cursorHeight = font()->getLineAdvance(font_size());
-		const auto max = context().settings.cursor_width_max;
-		const auto min = context().settings.cursor_width_min;
-		const auto offset = context().settings.cursor_width_offset;
-		const auto scale = context().settings.cursor_width_scale;
-		const auto cursorWidth = std::floor(std::min((cursorHeight - offset) / scale + min, max));
+		const auto caretHeight = font()->getLineAdvance(font_size());
+		const auto max = context().settings.caret_width_max;
+		const auto min = context().settings.caret_width_min;
+		const auto offset = context().settings.caret_width_offset;
+		const auto scale = context().settings.caret_width_scale;
+		const auto caretWidth = std::floor(std::min((caretHeight - offset) / scale + min, max));
 
 		// 3-2
 		// |/|
 		// 0-1
 		pos(0, 0, 0);
-		pos(cursorWidth, 0, 0);
-		pos(cursorWidth, cursorHeight, 0);
-		pos(0, cursorHeight, 0);
+		pos(caretWidth, 0, 0);
+		pos(caretWidth, caretHeight, 0);
+		pos(0, caretHeight, 0);
 
 		index.quad(0, 1, 2, 3);
 	}
@@ -319,15 +319,15 @@ void InputField::doRender(ContextRender& ctx) {
 		ctx.gl.render(text_.mesh());
 	}
 
-	const auto cursor_flash_iteration = time_mod(ctx.now - cursorStartTime, context().settings.cursor_flash_period);
+	const auto caret_flash_iteration = time_mod(ctx.now - caretStartTime, context().settings.caret_flash_period);
 
-	if (isFocused() && cursor_flash_iteration < context().settings.cursor_show_period) {
-		ctx.gl.model.translate({cursorPosition, 0});
+	if (isFocused() && caret_flash_iteration < context().settings.caret_show_period) {
+		ctx.gl.model.translate({caretPosition, 0});
 
-		ctx.gl.program(*property.cursor_shader());
-		ctx.gl.uniform(property.cursor_shader()->uniform_color, property.cursor_color());
-		ctx.gl.uniform(property.cursor_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(cursor_mesh);
+		ctx.gl.program(*property.caret_shader());
+		ctx.gl.uniform(property.caret_shader()->uniform_color, property.caret_color());
+		ctx.gl.uniform(property.caret_shader()->uniform_MVPmat, ctx.gl.mvp());
+		ctx.gl.render(caret_mesh);
 	}
 }
 
