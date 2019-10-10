@@ -23,7 +23,7 @@ private:
 	static void access_properties(T& ctx);
 //	static ComponentPropertyDescription description;
 
-	struct PS {
+	struct Properties {
 		PropertyFFR<Color> font_color;
 		PropertyFFR<ShaderFont_view> font_shader;
 

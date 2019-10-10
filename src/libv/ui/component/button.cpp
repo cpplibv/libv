@@ -181,7 +181,7 @@ void Button::doDetach() {
 }
 
 void Button::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Button> setter{*this, ctx.style, context()};
+	PropertySetterContext<Button> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

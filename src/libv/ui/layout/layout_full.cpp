@@ -9,12 +9,42 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/property_access.hpp>
 
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void LayoutFull::access_properties(T& ctx) {
+}
+
+template <typename T>
+void LayoutFull::access_child_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.size; },
+			Size{},
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void LayoutFull::style(Properties& properties, ContextStyle& ctx) {
+	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_properties(setter);
+}
+
+void LayoutFull::style(ChildProperties& properties, ContextStyle& ctx) {
+	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_child_properties(setter);
+}
 
 // -------------------------------------------------------------------------------------------------
 

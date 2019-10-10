@@ -19,45 +19,41 @@ namespace ui {
 
 class ContextLayout1;
 class ContextLayout2;
+class ContextStyle;
 class BaseComponent;
 
 struct LayoutGrid {
-	struct PS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
-
-		Property<Anchor,       L, pnm::anchor_content> anchor_content;
-		Property<ColumnCount,  L, pnm::column_count> column_count;
-		Property<Orientation2, L, pnm::orientation2> orientation2;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(anchor_content, "Content's anchor point");
-			ctx(column_count, "Column count of the secondary dimension");
-			ctx(orientation2, "Two dimensional orientation of subsequent components");
-		}
+public:
+	struct Properties {
+		PropertyFFL<Anchor> anchor_content;
+		PropertyFFL<ColumnCount> column_count;
+		PropertyFFL<Orientation2> orientation2;
 	};
 
-	struct ChildPS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
 
-		Property<Anchor, L, pnm::anchor> anchor;
-		Property<Size,   L, pnm::size> size;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(anchor, "Component's anchor point");
-			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
-		}
+	struct ChildProperties {
+		PropertyFFL<Anchor> anchor;
+		PropertyFFL<Size> size;
 	};
 
+	template <typename T>
+	static void access_child_properties(T& ctx);
+//	static ComponentPropertyDescription child_description;
+
+public:
 	struct Child {
-		libv::ui::PropertySet<ChildPS> property;
+		ChildProperties property;
 		std::shared_ptr<BaseComponent> ptr;
 
 		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
 	};
 
-	struct Properties : libv::ui::PropertySet<PS> {};
+public:
+	static void style(Properties& properties, ContextStyle& ctx);
+	static void style(ChildProperties& properties, ContextStyle& ctx);
 
 public:
 	static libv::vec3f layout1(

@@ -131,7 +131,7 @@ const std::string& Label::text() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void Label::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Label> setter{*this, ctx.style, context()};
+	PropertySetterContext<Label> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

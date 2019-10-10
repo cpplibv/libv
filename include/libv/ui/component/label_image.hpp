@@ -25,7 +25,7 @@ private:
 	static void access_properties(T& ctx);
 //	static ComponentPropertyDescription description;
 
-	struct PS {
+	struct Properties {
 		PropertyFFR<Color> bg_color;
 		PropertyFFL<Texture2D_view> bg_image;
 		PropertyFFR<ShaderImage_view> bg_shader;

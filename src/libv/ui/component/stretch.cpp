@@ -58,7 +58,7 @@ Stretch::~Stretch() { }
 // -------------------------------------------------------------------------------------------------
 
 void Stretch::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Stretch> setter{*this, ctx.style, context()};
+	PropertySetterContext<Stretch> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

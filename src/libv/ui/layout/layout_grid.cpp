@@ -17,7 +17,9 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
+#include <libv/ui/property_access.hpp>
 
 
 namespace libv {
@@ -57,6 +59,58 @@ inline auto buildLayoutedChildrenRandomAccessRange(libv::span<LayoutGrid::Child>
 }
 
 } // namespace
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void LayoutGrid::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.anchor_content; },
+			ANCHOR_CENTER_CENTER,
+			pgr::layout, pnm::anchor_content,
+			"Content's anchor point"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.column_count; },
+			ColumnCount{2},
+			pgr::layout, pnm::column_count,
+			"Column count of the secondary dimension"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.orientation2; },
+			Orientation2::RIGHT_DOWN,
+			pgr::layout, pnm::orientation2,
+			"Two dimensional orientation of subsequent components"
+	);
+}
+
+template <typename T>
+void LayoutGrid::access_child_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.anchor; },
+			ANCHOR_CENTER_CENTER,
+			pgr::layout, pnm::anchor,
+			"Component's anchor point"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.size; },
+			Size{},
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void LayoutGrid::style(Properties& properties, ContextStyle& ctx) {
+	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_properties(setter);
+}
+
+void LayoutGrid::style(ChildProperties& properties, ContextStyle& ctx) {
+	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_child_properties(setter);
+}
 
 // -------------------------------------------------------------------------------------------------
 

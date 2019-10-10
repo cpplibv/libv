@@ -3,18 +3,13 @@
 #pragma once
 
 // libv
-//#include <libv/utility/intrusive_ptr.hpp>
-//#include <libv/utility/fixed_string.hpp>
+#include <libv/utility/observer_ptr.hpp>
 // std
-#include <memory>
-//#include <string>
 #include <string_view>
 #include <type_traits>
-//#include <variant>
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/style.hpp>
-//#include <libv/ui/context_ui.hpp>
 
 
 namespace libv {
@@ -56,10 +51,12 @@ struct ComponentPropertyDescription {
 
 template <typename ComponentT>
 struct PropertySetterContext {
-	ComponentT& component;
+	ComponentT& owner;
+	BaseComponent& component;
 	libv::observer_ptr<Style> style;
 	ContextUI& context;
 
+private:
 	template <typename Access>
 	using access_value_type_t = typename std::remove_cvref_t<decltype(std::declval<const Access&>()(std::declval<ComponentT&>()))>::value_type;
 	template <typename Get>
@@ -84,7 +81,7 @@ public:
 		(void) description;
 
 		using value_type = access_value_type_t<Access>;
-		auto& property = access(component);
+		auto& property = access(owner);
 
 		if (AccessProperty::driver(property) != PropertyDriver::style)
 			return;
@@ -113,7 +110,7 @@ public:
 		(void) description;
 
 		using value_type = access_value_type_t<Access>;
-		auto& property = access(component);
+		auto& property = access(owner);
 
 		if (AccessProperty::driver(property) != PropertyDriver::style)
 			return;
@@ -143,7 +140,7 @@ public:
 		(void) description;
 
 		using value_type = get_value_type_t<Get>;
-		auto& property = access(component);
+		auto& property = access(owner);
 
 		if (AccessProperty::driver(property) != PropertyDriver::style)
 			return;
@@ -151,14 +148,14 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != get(component))
-					set(component, *value_opt);
+				if (*value_opt != get(owner))
+					set(owner, *value_opt);
 				return;
 			}
 		}
 
-		if (init != get(component))
-			set(component, std::move(init));
+		if (init != get(owner))
+			set(owner, std::move(init));
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>
@@ -173,7 +170,7 @@ public:
 		(void) description;
 
 		using value_type = get_value_type_t<Get>;
-		auto& property = access(component);
+		auto& property = access(owner);
 
 		if (AccessProperty::driver(property) != PropertyDriver::style)
 			return;
@@ -181,15 +178,15 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != get(component))
-					set(component, *value_opt);
+				if (*value_opt != get(owner))
+					set(owner, *value_opt);
 				return;
 			}
 		}
 
 		auto value = init(context);
-		if (value != get(component))
-			set(component, std::move(value));
+		if (value != get(owner))
+			set(owner, std::move(value));
 	}
 
 	template <typename Set, typename Get>

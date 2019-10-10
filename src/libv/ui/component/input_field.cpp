@@ -233,7 +233,7 @@ void InputField::doAttach() {
 }
 
 void InputField::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<InputField> setter{*this, ctx.style, context()};
+	PropertySetterContext<InputField> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

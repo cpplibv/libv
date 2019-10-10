@@ -50,7 +50,7 @@ Quad::~Quad() { }
 // -------------------------------------------------------------------------------------------------
 
 void Quad::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Quad> setter{*this, ctx.style, context()};
+	PropertySetterContext<Quad> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

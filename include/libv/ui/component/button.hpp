@@ -26,7 +26,7 @@ private:
 	template <typename T>
 	static void access_properties(T& ctx);
 
-	struct PS {
+	struct Properties {
 		PropertyFFR<Color> bg_color;
 		PropertyFFL<Texture2D_view> bg_image;
 		PropertyFFR<ShaderImage_view> bg_shader;

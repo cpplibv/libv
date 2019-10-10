@@ -116,12 +116,12 @@ void BasicPanel<Layout>::doDetachChildren(libv::function_ref<bool(BaseComponent&
 
 template <typename Layout>
 void BasicPanel<Layout>::doStyle(ContextStyle& ctx) {
-	property.access(ctx);
+	Layout::style(property, ctx);
 }
 
 template <typename Layout>
 void BasicPanel<Layout>::doStyle(ContextStyle& ctx, ChildID childID) {
-	children[childID].property.access(ctx);
+	Layout::style(children[childID].property, ctx);
 }
 
 template <typename Layout>

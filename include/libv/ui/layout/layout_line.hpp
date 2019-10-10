@@ -17,43 +17,42 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class BaseComponent;
 class ContextLayout1;
 class ContextLayout2;
-class BaseComponent;
+class ContextStyle;
 
 struct LayoutLine {
-	struct PS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
-
-		Property<AlignHorizontal, L, pnm::align_horizontal> align_horizontal;
-		Property<AlignVertical,   L, pnm::align_vertical> align_vertical;
-		Property<Orientation,     L, pnm::orientation> orientation;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(align_horizontal, "Horizontal align of the inner content of the component");
-			ctx(align_vertical, "Vertical align of the inner content of the component");
-			ctx(orientation, "Orientation of subsequent components");
-		}
+public:
+	struct Properties {
+		PropertyFFL<AlignHorizontal> align_horizontal;
+		PropertyFFL<AlignVertical> align_vertical;
+		PropertyFFL<Orientation> orientation;
 	};
 
-	struct ChildPS {
-		Property<Size, (Flag::pendingLayout).value(), pnm::size> size;
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
 
-		template <typename T>
-		void access(T& ctx) {
-			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
-		}
+	struct ChildProperties {
+		PropertyFFL<Size> size;
 	};
 
+	template <typename T>
+	static void access_child_properties(T& ctx);
+//	static ComponentPropertyDescription child_description;
+
+public:
 	struct Child {
-		libv::ui::PropertySet<ChildPS> property;
+		ChildProperties property;
 		std::shared_ptr<BaseComponent> ptr;
 
 		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
 	};
 
-	struct Properties : libv::ui::PropertySet<PS> {};
+public:
+	static void style(Properties& properties, ContextStyle& ctx);
+	static void style(ChildProperties& properties, ContextStyle& ctx);
 
 public:
 	static libv::vec3f layout1(

@@ -9,12 +9,66 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/property_access.hpp>
 
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void LayoutFloat::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.snapToEdge; },
+			SnapToEdge{false},
+			pgr::layout, pnm::snapToEdge,
+			"Snap to edge any child that otherwise would hang out"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.squish; },
+			Squish{false},
+			pgr::layout, pnm::squish,
+			"Squish any child that otherwise would hang out"
+	);
+}
+
+template <typename T>
+void LayoutFloat::access_child_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.anchor_parent; },
+			ANCHOR_CENTER_CENTER,
+			pgr::layout, pnm::anchor_parent,
+			"Parent's floating anchor point"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.anchor_target; },
+			ANCHOR_CENTER_CENTER,
+			pgr::layout, pnm::anchor_target,
+			"Child's floating anchor point"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.size; },
+			Size{},
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void LayoutFloat::style(Properties& properties, ContextStyle& ctx) {
+	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_properties(setter);
+}
+
+void LayoutFloat::style(ChildProperties& properties, ContextStyle& ctx) {
+	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_child_properties(setter);
+}
 
 // -------------------------------------------------------------------------------------------------
 

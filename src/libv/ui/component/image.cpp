@@ -58,7 +58,7 @@ Image::~Image() { }
 // -------------------------------------------------------------------------------------------------
 
 void Image::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Image> setter{*this, ctx.style, context()};
+	PropertySetterContext<Image> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

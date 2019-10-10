@@ -19,47 +19,43 @@ namespace ui {
 
 class ContextLayout1;
 class ContextLayout2;
+class ContextStyle;
 class BaseComponent;
 
 struct LayoutFloat {
-	struct PS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
-
+public:
+	struct Properties {
 		// TODO P5: libv.ui: Implement Snap in float layout
 		// TODO P5: libv.ui: Implement Squish in float layout
-		Property<SnapToEdge, L, pnm::snapToEdge> snapToEdge;
-		Property<Squish,     L, pnm::squish> squish;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(snapToEdge, "Snap to edge any child that otherwise would hang out");
-			ctx(squish, "Squish any child that otherwise would hang out");
-		}
+		PropertyFFL<SnapToEdge> snapToEdge;
+		PropertyFFL<Squish> squish;
 	};
 
-	struct ChildPS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
 
-		Property<Anchor, L, pnm::anchor_parent> anchor_parent;
-		Property<Anchor, L, pnm::anchor_target> anchor_target;
-		Property<Size,   L, pnm::size> size;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(anchor_parent, "Parent's floating anchor point");
-			ctx(anchor_target, "Child's floating anchor point");
-			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
-		}
+	struct ChildProperties {
+		PropertyFFL<Anchor> anchor_parent;
+		PropertyFFL<Anchor> anchor_target;
+		PropertyFFL<Size> size;
 	};
 
+	template <typename T>
+	static void access_child_properties(T& ctx);
+//	static ComponentPropertyDescription child_description;
+
+public:
 	struct Child {
-		libv::ui::PropertySet<ChildPS> property;
+		ChildProperties property;
 		std::shared_ptr<BaseComponent> ptr;
 
 		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
 	};
 
-	struct Properties : libv::ui::PropertySet<PS> {};
+public:
+	static void style(Properties& properties, ContextStyle& ctx);
+	static void style(ChildProperties& properties, ContextStyle& ctx);
 
 public:
 	static libv::vec3f layout1(

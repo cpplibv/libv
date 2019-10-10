@@ -247,8 +247,8 @@ libv.ui.property: migrate to hybrid reflection
 --- STACK ------------------------------------------------------------------------------------------
 
 
-cleanup names for PropertyFF
-cleanup names for valueFF
+libv.ui.style: kill fallback style
+libv.ui.property: kill old non hybrid property codes: PropertyFF, valueFF
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -408,6 +408,7 @@ libv.console: new console lib? A UI component will also be needed for it, but th
 libv.console: should depend on libv.arg
 
 libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
+libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
 
 libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development

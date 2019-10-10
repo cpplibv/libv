@@ -157,7 +157,7 @@ const std::string& LabelImage::text() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void LabelImage::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<LabelImage> setter{*this, ctx.style, context()};
+	PropertySetterContext<LabelImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 

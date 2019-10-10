@@ -17,37 +17,38 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class BaseComponent;
 class ContextLayout1;
 class ContextLayout2;
-class BaseComponent;
+class ContextStyle;
 
 struct LayoutFull {
-	struct PS {
-		template <typename T>
-		void access(T& ctx) {
-			(void) ctx;
-		}
+	struct Properties {
 	};
 
-	struct ChildPS {
-		static constexpr Flag_t::value_type L  = (Flag::pendingLayout).value();
+	template <typename T>
+	static void access_properties(T& ctx);
+//	static ComponentPropertyDescription description;
 
-		Property<Size, L, pnm::size> size;
-
-		template <typename T>
-		void access(T& ctx) {
-			ctx(size, "Component size in pixel, percent, ratio and dynamic units");
-		}
+	struct ChildProperties {
+		PropertyFFL<Size> size;
 	};
 
+	template <typename T>
+	static void access_child_properties(T& ctx);
+//	static ComponentPropertyDescription child_description;
+
+public:
 	struct Child {
-		libv::ui::PropertySet<ChildPS> property;
+		ChildProperties property;
 		std::shared_ptr<BaseComponent> ptr;
 
 		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
 	};
 
-	struct Properties : libv::ui::PropertySet<PS> {};
+public:
+	static void style(Properties& properties, ContextStyle& ctx);
+	static void style(ChildProperties& properties, ContextStyle& ctx);
 
 public:
 	static libv::vec3f layout1(

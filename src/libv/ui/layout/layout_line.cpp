@@ -12,8 +12,10 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/property_access.hpp>
 
 
 namespace libv {
@@ -63,6 +65,52 @@ static constexpr AlignmentData AlignmentTableV[] = {
 
 
 } // namespace
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void LayoutLine::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.align_horizontal; },
+			AlignHorizontal::Left,
+			pgr::layout, pnm::align_horizontal,
+			"Horizontal align of the inner content of the component"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.align_vertical; },
+			AlignVertical::Top,
+			pgr::layout, pnm::align_vertical,
+			"Vertical align of the inner content of the component"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.orientation; },
+			Orientation::LEFT_TO_RIGHT,
+			pgr::layout, pnm::orientation,
+			"Orientation of subsequent components"
+	);
+}
+
+template <typename T>
+void LayoutLine::access_child_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.size; },
+			Size{},
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void LayoutLine::style(Properties& properties, ContextStyle& ctx) {
+	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_properties(setter);
+}
+
+void LayoutLine::style(ChildProperties& properties, ContextStyle& ctx) {
+	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	access_child_properties(setter);
+}
 
 // -------------------------------------------------------------------------------------------------
 
