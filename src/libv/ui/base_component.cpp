@@ -197,7 +197,7 @@ void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 ContextStyle BaseComponent::makeStyleContext() noexcept {
-	return ContextStyle{libv::make_observer(style_.get()), context().getFallbackStyle(), *this};
+	return ContextStyle{libv::make_observer(style_.get()), *this};
 }
 
 // -------------------------------------------------------------------------------------------------

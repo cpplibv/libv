@@ -9,7 +9,6 @@
 #include <memory>
 // pro
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -25,9 +24,9 @@ class BaseComponent;
 struct LayoutGrid {
 public:
 	struct Properties {
-		PropertyFFL<Anchor> anchor_content;
-		PropertyFFL<ColumnCount> column_count;
-		PropertyFFL<Orientation2> orientation2;
+		PropertyL<Anchor> anchor_content;
+		PropertyL<ColumnCount> column_count;
+		PropertyL<Orientation2> orientation2;
 	};
 
 	template <typename T>
@@ -35,8 +34,8 @@ public:
 //	static ComponentPropertyDescription description;
 
 	struct ChildProperties {
-		PropertyFFL<Anchor> anchor;
-		PropertyFFL<Size> size;
+		PropertyL<Anchor> anchor;
+		PropertyL<Size> size;
 	};
 
 	template <typename T>

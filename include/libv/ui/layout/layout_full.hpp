@@ -9,7 +9,6 @@
 #include <memory>
 // pro
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -31,7 +30,7 @@ struct LayoutFull {
 //	static ComponentPropertyDescription description;
 
 	struct ChildProperties {
-		PropertyFFL<Size> size;
+		PropertyL<Size> size;
 	};
 
 	template <typename T>

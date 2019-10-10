@@ -82,9 +82,6 @@ public:
 	std::shared_ptr<ShaderQuad> shaderQuad();
 	std::shared_ptr<Font2D> fallbackFont() const;
 	std::shared_ptr<Texture2D> fallbackTexture2D() const;
-
-public:
-	const Style& getFallbackStyle() const;
 };
 
 // -------------------------------------------------------------------------------------------------

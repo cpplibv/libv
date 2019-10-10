@@ -42,7 +42,6 @@ struct ImplContextUI {
 	std::shared_ptr<Texture2D> fallback_texture2D;
 	std::unordered_map<std::string, std::weak_ptr<Texture2D>> cache_texture2D;
 
-	Style fallback_style{"--fallback--"};
 	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
 
 //	std::unordered_map<std::string, std::weak_ptr<Shader>> cache_shader;
@@ -130,30 +129,6 @@ ContextUI::ContextUI(UI& ui, Settings settings) :
 	self->fallback_texture2D = std::make_shared<Texture2D>(libv::gl::load_image_or_throw(
 			{reinterpret_cast<const char*>(fallback_texture2D_data.first), fallback_texture2D_data.second})
 	);
-
-	self->fallback_style.set("align", AlignHorizontal::Left);
-	self->fallback_style.set("align_vertical", AlignVertical::Top);
-	self->fallback_style.set("anchor", ANCHOR_CENTER_CENTER);
-	self->fallback_style.set("anchor_content", ANCHOR_CENTER_CENTER);
-	self->fallback_style.set("anchor_parent", ANCHOR_CENTER_CENTER);
-	self->fallback_style.set("anchor_target", ANCHOR_CENTER_CENTER);
-	self->fallback_style.set("bg_color", Color{0, 0, 0, 1});
-	self->fallback_style.set("bg_image", fallbackTexture2D());
-	self->fallback_style.set("bg_shader", shaderImage());
-	self->fallback_style.set("color", Color{1, 1, 1, 1});
-	self->fallback_style.set("column_count", ColumnCount{2});
-	self->fallback_style.set("cursor_color", Color{1, 1, 1, 1});
-	self->fallback_style.set("cursor_shader", shaderQuad());
-	self->fallback_style.set("font", fallbackFont());
-	self->fallback_style.set("font_color", Color{1, 1, 1, 1});
-	self->fallback_style.set("font_shader", shaderFont());
-	self->fallback_style.set("font_size", FontSize(12));
-	self->fallback_style.set("orientation", Orientation::LEFT_TO_RIGHT);
-	self->fallback_style.set("orientation2", Orientation2::RIGHT_DOWN);
-	self->fallback_style.set("quad_shader", shaderQuad());
-	self->fallback_style.set("size", Size{});
-	self->fallback_style.set("snapToEdge", SnapToEdge{false});
-	self->fallback_style.set("squish", Squish{false});
 }
 
 ContextUI::~ContextUI() {
@@ -367,12 +342,6 @@ std::shared_ptr<Font2D> ContextUI::fallbackFont() const {
 
 std::shared_ptr<Texture2D> ContextUI::fallbackTexture2D() const {
 	return self->fallback_texture2D;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-const Style& ContextUI::getFallbackStyle() const {
-	return self->fallback_style;
 }
 
 // -------------------------------------------------------------------------------------------------

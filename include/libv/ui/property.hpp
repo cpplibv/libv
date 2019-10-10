@@ -118,78 +118,6 @@ static constexpr libv::fixed_string layout = "layout";
 
 } // namespace pgr ---------------------------------------------------------------------------------
 
-template <typename T>
-concept bool C_Property = requires(T var) {
-		typename T::value_type;
-
-		{ T::name } -> std::string_view;
-		{ T::invalidate } -> Flag_t;
-};
-
-template <typename T>
-concept bool C_PropertySG = requires(T var) {
-		typename T::component_type;
-		typename T::value_type;
-		typename T::set_type;
-		typename T::get_type;
-
-		{ T::name } -> std::string_view;
-		{ T::set } -> void (T::component_type::*)(typename T::set_type);
-		{ T::get } -> typename T::get_type (T::component_type::*)() const;
-};
-
-template <typename T, Flag_t::value_type I, libv::fixed_string Name>
-class Property {
-	friend class AccessProperty;
-
-	T value;
-	bool manual = false;
-	bool changed = false;
-
-public:
-	using value_type = T;
-
-	static constexpr std::string_view name = Name;
-	static constexpr Flag_t invalidate{I};
-
-	constexpr inline const T& operator()() const noexcept {
-		return value;
-	}
-
-	bool consumeChange() {
-		bool result = changed;
-		changed = false;
-		return result;
-	}
-};
-
-// TODO P1: Would be nice to accept all four: T, T&, const T&, T&& version of set and get parameters / return values
-template <typename C, typename SetT, void (C::*Set)(SetT), typename GetT, GetT (C::*Get)() const, libv::fixed_string Name>
-class PropertySG {
-	friend class AccessProperty;
-
-	bool manual = false;
-	bool changed = false;
-
-public:
-	using component_type = C;
-	using value_type = std::decay_t<GetT>;
-	using set_type = SetT;
-	using get_type = GetT;
-
-	static constexpr void (C::*set)(SetT) = Set;
-	static constexpr GetT (C::*get)() const = Get;
-	static constexpr std::string_view name = Name;
-
-	bool consumeChange() {
-		bool result = changed;
-		changed = false;
-		return result;
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
 enum class PropertyDriver : uint8_t {
 	style = 0,
 	manual,
@@ -198,10 +126,8 @@ enum class PropertyDriver : uint8_t {
 
 // -------------------------------------------------------------------------------------------------
 
-class BasePropertyFF {
+class BaseProperty {
 	friend class AccessProperty;
-//public:
-//	static constexpr Flag_t invalidate = Flag::none;
 
 private:
 	PropertyDriver driver = PropertyDriver::style;
@@ -216,7 +142,7 @@ public:
 };
 
 template <typename T = void>
-class PropertyFF : public BasePropertyFF {
+class Property : public BaseProperty {
 	friend class AccessProperty;
 
 public:
@@ -232,18 +158,18 @@ public:
 };
 
 template <>
-class PropertyFF<void> : public BasePropertyFF {
+class Property<void> : public BaseProperty {
 	friend class AccessProperty;
 };
 
 template <typename T = void>
-class PropertyFFL : public PropertyFF<T> {
+class PropertyL : public Property<T> {
 public:
 	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
 };
 
 template <typename T = void>
-class PropertyFFR : public PropertyFF<T> {
+class PropertyR : public Property<T> {
 public:
 	static constexpr Flag_t invalidate = Flag::pendingRender;
 };
@@ -251,52 +177,24 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct AccessProperty {
-public:
-	template <typename Property>
-	static constexpr inline void manual(Property& property, bool manual) noexcept {
-		property.manual = manual;
-	}
-	template <typename Property>
-	static constexpr inline bool manual(const Property& property) noexcept {
-		return property.manual;
-	}
-	template <typename Property>
-	static constexpr inline void value(Property& property, typename Property::value_type value) noexcept {
-		property.value = std::move(value);
-		property.changed = true;
-	}
-
-	// =================================================================================================
-
 	template <typename P>
-			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
 	static constexpr inline auto driver(const P& property) noexcept {
 		return property.driver;
 	}
+
 	template <typename P>
-			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
 	static constexpr inline void driver(P& property, PropertyDriver driver) noexcept {
 		property.driver = driver;
 	}
 
-	template <typename Component, typename P, typename T, typename TC>
-			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
-	static constexpr inline void valueFF(Component& component, P& property, TC&& value) noexcept {
-		property.value = std::move(value);
-		property.changed = true;
-		component.flagAuto(property.invalidate);
-	}
-
 	template <typename Component, typename P, typename TC>
-			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
-	static constexpr inline void valueFF(Component& component, P& property, TC&& value) noexcept {
+	static constexpr inline void value(Component& component, P& property, TC&& value) noexcept {
 		property.value = std::move(value);
 		property.changed = true;
 		component.flagAuto(property.invalidate);
 	}
 
 	template <typename Component, typename P>
-			WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, P>)
 	static constexpr inline bool setter(Component& component, P& property, PropertyDriver driver) noexcept {
 		if (property.changed && driver != PropertyDriver::manual)
 			return true;
@@ -304,24 +202,6 @@ public:
 		property.changed = true;
 		component.flagAuto(property.invalidate);
 		return false;
-	}
-
-	// =================================================================================================
-
-	template <typename Property>
-	static constexpr inline const auto& value(const Property& property) noexcept {
-		return property.value;
-	}
-
-	template <typename Component, typename Property>
-	static constexpr inline void value(Component& component, Property& property, typename Property::value_type value) noexcept {
-		(static_cast<typename Property::component_type&>(component).*Property::set)(std::move(value));
-		property.changed = true;
-	}
-	template <typename Component, typename Property>
-	static constexpr inline decltype(auto) value(const Component& component, const Property& property) noexcept {
-		(void) property;
-		return (static_cast<const typename Property::component_type&>(component).*Property::get)();
 	}
 };
 

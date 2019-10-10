@@ -10,7 +10,6 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -25,9 +24,9 @@ private:
 //	static ComponentPropertyDescription description;
 
 	struct Properties {
-		PropertyFFR<Color> bg_color;
-		PropertyFFL<Texture2D_view> bg_image;
-		PropertyFFR<ShaderImage_view> bg_shader;
+		PropertyR<Color> bg_color;
+		PropertyL<Texture2D_view> bg_image;
+		PropertyR<ShaderImage_view> bg_shader;
 	} property;
 
 private:

@@ -9,7 +9,6 @@
 #include <memory>
 // pro
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -25,9 +24,9 @@ class ContextStyle;
 struct LayoutLine {
 public:
 	struct Properties {
-		PropertyFFL<AlignHorizontal> align_horizontal;
-		PropertyFFL<AlignVertical> align_vertical;
-		PropertyFFL<Orientation> orientation;
+		PropertyL<AlignHorizontal> align_horizontal;
+		PropertyL<AlignVertical> align_vertical;
+		PropertyL<Orientation> orientation;
 	};
 
 	template <typename T>
@@ -35,7 +34,7 @@ public:
 //	static ComponentPropertyDescription description;
 
 	struct ChildProperties {
-		PropertyFFL<Size> size;
+		PropertyL<Size> size;
 	};
 
 	template <typename T>

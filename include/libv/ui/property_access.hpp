@@ -89,14 +89,14 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != AccessProperty::value(property))
-					AccessProperty::valueFF(component, property, *value_opt);
+				if (*value_opt != property())
+					AccessProperty::value(component, property, *value_opt);
 				return;
 			}
 		}
 
-		if (init != AccessProperty::value(property))
-			AccessProperty::valueFF(component, property, std::move(init));
+		if (init != property())
+			AccessProperty::value(component, property, std::move(init));
 	}
 
 	template <typename Access, typename Init>
@@ -118,20 +118,20 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != AccessProperty::value(property))
-					AccessProperty::valueFF(component, property, *value_opt);
+				if (*value_opt != property())
+					AccessProperty::value(component, property, *value_opt);
 				return;
 			}
 		}
 
 		auto value = init(context);
-		if (value != AccessProperty::value(property))
-			AccessProperty::valueFF(component, property, std::move(value));
+		if (value != property())
+			AccessProperty::value(component, property, std::move(value));
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
-//		static_assert(Access yields PropertyFF<void>);
+//		static_assert(Access yields Property<void>);
 //		static_assert(Set is callable with invoke result of Get + driver);
 //		static_assert(Get yields a non void);
 //		static_assert(Init can be passed to Set);
@@ -161,7 +161,7 @@ public:
 	template <typename Access, typename Set, typename Get, typename Init>
 			WISH_REQUIRES(std::is_invocable_v<Init, ContextUI&>)
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
-//		static_assert(Access yields PropertyFF<void>);
+//		static_assert(Access yields Property<void>);
 //		static_assert(Set is callable with invoke result of Get + driver);
 //		static_assert(Get yields a non void);
 //		static_assert(Init invoke with ContextUI& result can be passed to Set);

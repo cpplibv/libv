@@ -11,7 +11,6 @@
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
 
 
@@ -27,19 +26,19 @@ private:
 //	static ComponentPropertyDescription description;
 
 	struct Properties {
-		PropertyFFR<Color> bg_color;
-		PropertyFFL<Texture2D_view> bg_image;
-		PropertyFFR<ShaderImage_view> bg_shader;
+		PropertyR<Color> bg_color;
+		PropertyL<Texture2D_view> bg_image;
+		PropertyR<ShaderImage_view> bg_shader;
 
-		PropertyFFR<Color> caret_color;
-		PropertyFFR<ShaderQuad_view> caret_shader;
+		PropertyR<Color> caret_color;
+		PropertyR<ShaderQuad_view> caret_shader;
 
-		PropertyFFR<Color> font_color;
-		PropertyFFR<ShaderFont_view> font_shader;
+		PropertyR<Color> font_color;
+		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyFFL<> align_horizontal;
-		PropertyFFL<> font;
-		PropertyFFL<> font_size;
+		PropertyL<> align_horizontal;
+		PropertyL<> font;
+		PropertyL<> font_size;
 	} property;
 
 private:

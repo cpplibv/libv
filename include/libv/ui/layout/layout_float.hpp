@@ -9,7 +9,6 @@
 #include <memory>
 // pro
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 
 
 namespace libv {
@@ -27,8 +26,8 @@ public:
 	struct Properties {
 		// TODO P5: libv.ui: Implement Snap in float layout
 		// TODO P5: libv.ui: Implement Squish in float layout
-		PropertyFFL<SnapToEdge> snapToEdge;
-		PropertyFFL<Squish> squish;
+		PropertyL<SnapToEdge> snapToEdge;
+		PropertyL<Squish> squish;
 	};
 
 	template <typename T>
@@ -36,9 +35,9 @@ public:
 //	static ComponentPropertyDescription description;
 
 	struct ChildProperties {
-		PropertyFFL<Anchor> anchor_parent;
-		PropertyFFL<Anchor> anchor_target;
-		PropertyFFL<Size> size;
+		PropertyL<Anchor> anchor_parent;
+		PropertyL<Anchor> anchor_target;
+		PropertyL<Size> size;
 	};
 
 	template <typename T>

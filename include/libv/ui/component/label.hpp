@@ -8,7 +8,6 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 #include <libv/ui/string_2D.hpp>
 
 
@@ -24,12 +23,12 @@ private:
 //	static ComponentPropertyDescription description;
 
 	struct Properties {
-		PropertyFFR<Color> font_color;
-		PropertyFFR<ShaderFont_view> font_shader;
+		PropertyR<Color> font_color;
+		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyFFL<> align_horizontal;
-		PropertyFFL<> font;
-		PropertyFFL<> font_size;
+		PropertyL<> align_horizontal;
+		PropertyL<> font;
+		PropertyL<> font_size;
 	} property;
 
 private:

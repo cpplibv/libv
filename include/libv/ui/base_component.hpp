@@ -18,7 +18,6 @@
 // pro
 #include <libv/ui/flag.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_set.hpp>
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -131,19 +130,9 @@ public:
 
 public:
 	template <typename Property>
-		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
-	inline void set(Property& property, typename Property::value_type value);
-
-	template <typename Property, typename CTX = ContextStyle>
-		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
-	inline void reset(Property& property);
-
-	template <typename Property>
-		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
 	inline void set(Property& property, typename Property::value_type value);
 
 	template <typename Property>
-		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
 	inline void reset(Property& property);
 
 private:
@@ -285,40 +274,13 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Property>
-		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
-inline void BaseComponent::set(Property& property, typename Property::value_type value) {
-	AccessProperty::manual(property, true);
-	const bool change = AccessProperty::value(property) != value;
-	if (change) {
-		AccessProperty::value(property, std::move(value));
-		flagAuto(property.invalidate);
-	}
-}
-
-template <typename Property, typename CTX>
-		WISH_REQUIRES(C_Property<Property> || C_PropertySG<Property>)
-inline void BaseComponent::reset(Property& property) {
-	static_assert(sizeof(CTX) != 0, "Missing include: ContextStyle");
-	AccessProperty::manual(property, false);
-	makeStyleContext()(property, "");
-	// NOTE: This works as names are stored inside the type, sub fragment mapping might break it
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename Property>
-		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
 inline void BaseComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::driver(property, PropertyDriver::manual);
-	const bool change = AccessProperty::value(property) != value;
-	if (change) {
-		AccessProperty::value(property, std::move(value));
-		flagAuto(property.invalidate);
-	}
+	if (value != property())
+		AccessProperty::value(*this, property, std::move(value));
 }
 
 template <typename Property>
-		WISH_REQUIRES(std::is_base_of_v<BasePropertyFF, Property>)
 inline void BaseComponent::reset(Property& property) {
 	AccessProperty::driver(property, PropertyDriver::style);
 	flagAuto(Flag::pendingStyle);

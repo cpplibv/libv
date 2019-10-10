@@ -22,6 +22,7 @@ namespace ui {
 
 template <typename T>
 void LayoutFull::access_properties(T& ctx) {
+	(void) ctx;
 }
 
 template <typename T>

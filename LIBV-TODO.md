@@ -242,13 +242,12 @@ libv.ui.property: hybrid Add a default / init value per instance ("above" fallba
 libv.ui.property: hybrid reset (address could be used to lookup) | simple full style invalidation at first
 libv.ui: rename cursor to caret
 libv.ui.property: migrate to hybrid reflection
+libv.ui.property: cleanup old non hybrid property codes: PropertyFF, valueFF
+libv.ui.style: cleanup fallback style
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui.style: kill fallback style
-libv.ui.property: kill old non hybrid property codes: PropertyFF, valueFF
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -258,8 +257,8 @@ properties / style
 	libv.ui.property: property system interaction with static_component system
 	libv.ui.property: complex composite component would result in "nested" property sets
 	libv.ui.property: scope / sheet / component type based style rules
-	libv.ui.property: dynamic access
 	libv.ui.property: if fallback value is requested log a warning
+	libv.ui.property: dynamic access
 	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
 	libv.ui.property: account for cyclic owning references with style property
 	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
@@ -271,7 +270,7 @@ properties / style
 	libv.ui.style: Style based on component state (bit-mask)
 	libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized?
 	libv.ui.property: typed property registry
-	libv.ui.property: optimize hybrid reset address could be used to lookup
+	libv.ui.property: optimize property reset: address could be used to lookup
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
