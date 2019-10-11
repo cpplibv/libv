@@ -254,7 +254,17 @@ void BaseComponent::onFocus(const EventFocus& event) {
 	(void) event;
 }
 
-bool BaseComponent::onMouse(const EventMouse& event) {
+bool BaseComponent::onMouseButton(const EventMouseButton& event) {
+	(void) event;
+	return false;
+}
+
+bool BaseComponent::onMouseMovement(const EventMouseMovement& event) {
+	(void) event;
+	return false;
+}
+
+bool BaseComponent::onMouseScroll(const EventMouseScroll& event) {
 	(void) event;
 	return false;
 }

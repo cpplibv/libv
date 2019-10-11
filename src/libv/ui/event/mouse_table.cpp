@@ -111,14 +111,44 @@ struct ImplMouseTable {
 		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<BaseComponent> component) :
 			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target(component) { }
 
-		inline void notify(const EventMouse& event) const {
+		inline void notify(const EventMouseButton& event) const {
 			const auto visitor = libv::overload(
 				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
-					if (watcher->callback)
-						watcher->callback(event);
+					if (watcher->cb_button)
+						watcher->cb_button(event);
 				},
 				[&event](const libv::observer_ref<BaseComponent>& component) {
-					AccessEvent::onMouse(*component, event);
+					AccessEvent::onMouseButton(*component, event);
+					// <<< P5: Mouse shield: return value for shielding is discarded
+				}
+			);
+
+			std::visit(visitor, target);
+		}
+
+		inline void notify(const EventMouseMovement& event) const {
+			const auto visitor = libv::overload(
+				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
+					if (watcher->cb_movement)
+						watcher->cb_movement(event);
+				},
+				[&event](const libv::observer_ref<BaseComponent>& component) {
+					AccessEvent::onMouseMovement(*component, event);
+					// <<< P5: Mouse shield: return value for shielding is discarded
+				}
+			);
+
+			std::visit(visitor, target);
+		}
+
+		inline void notify(const EventMouseScroll& event) const {
+			const auto visitor = libv::overload(
+				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
+					if (watcher->cb_scroll)
+						watcher->cb_scroll(event);
+				},
+				[&event](const libv::observer_ref<BaseComponent>& component) {
+					AccessEvent::onMouseScroll(*component, event);
 					// <<< P5: Mouse shield: return value for shielding is discarded
 				}
 			);
@@ -246,7 +276,7 @@ void MouseTable::event_enter() {
 void MouseTable::event_leave() {
 	using Entry = ImplMouseTable::Entry;
 
-	EventMouse::Movement event;
+	EventMouseMovement event;
 	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
 
@@ -280,7 +310,7 @@ void MouseTable::event_leave() {
 		event.enter = false;
 		event.leave = true;
 
-		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(event);
 	}
 }
 
@@ -288,7 +318,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 	using Entry = ImplMouseTable::Entry;
 
 	// Define event
-	EventMouse::Button event;
+	EventMouseButton event;
 	event.action = action;
 	event.button = mouse;
 
@@ -317,7 +347,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 
 	// Notify hits in order
 	for (const Hit& hit : hits)
-		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(event);
 }
 
 void MouseTable::event_position(libv::vec2f position_new) {
@@ -327,7 +357,7 @@ void MouseTable::event_position(libv::vec2f position_new) {
 	const auto movement = position_new - self->mouse_position;
 	self->mouse_position = position_new;
 
-	EventMouse::Movement event;
+	EventMouseMovement event;
 	event.mouse_movement = movement;
 	event.mouse_position = position_new;
 
@@ -371,7 +401,7 @@ void MouseTable::event_position(libv::vec2f position_new) {
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
-		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(event);
 	}
 }
 
@@ -382,7 +412,7 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 	self->scroll_position += movement;
 	const auto position = self->scroll_position;
 
-	EventMouse::Scroll event;
+	EventMouseScroll event;
 	event.scroll_movement = movement;
 	event.scroll_position = position;
 
@@ -410,13 +440,13 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 
 	// Notify hits in order
 	for (const Hit& hit : hits)
-		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(event);
 }
 
 void MouseTable::event_update() {
 	using Entry = ImplMouseTable::Entry;
 
-	EventMouse::Movement event;
+	EventMouseMovement event;
 	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
 
@@ -464,7 +494,7 @@ void MouseTable::event_update() {
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
-		hit.entry->notify(EventMouse{event}); // TODO P5: nicer construction of EventMouse
+		hit.entry->notify(event);
 	}
 }
 

@@ -211,5 +211,5 @@ std::string_view to_string(const Mouse value);
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace frame
+} // namespace input
 } // namespace libv

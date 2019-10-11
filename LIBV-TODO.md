@@ -248,14 +248,17 @@ libv.ui: setX() / getX() -> void X(T) / T X()
 libv.ui: mark every component type one paramed ctors as explicit (and maybe check on every ui class too)
 libv.ui.font: line 179 not just log but return default on error
 libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
+libv.ui: flatten - flatten EventMouse to combat variant complexity
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signals
+libv.ui: callback system for button (and other interactive component) aka: signal-slot
+
+
 libv.ui.property: hybrid reflection - dynamic
-
-
 
 properties / style
 	libv.ui.property: property system interaction with static_component system
@@ -287,8 +290,7 @@ cleanup
 	libv.ui: cleanup context_ui redundant codes
 
 mouse
-	libv.ui: flatten - flatten EventMouse to combat variant complexity
-	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically
+	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
 	libv.ui: absorb - mouse event absorb/shield/plates
 	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 	libv.ui: relative - mouse event should contain a watcher relative coordinates too
@@ -298,11 +300,12 @@ event
 	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
-component
-	libv.ui: atlas definition/parsing
+atlas
+	libv.ui: texture atlas definition/parsing
 	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
 	libv.ui: support atlas based images
 
+component
 	libv.ui: clipping vertex shader (with on/off)
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar
 
@@ -335,8 +338,6 @@ debug
 interactive
 	libv.ui: String2D API to find nearest character position
 	libv.ui: Make a sandbox for a input->button->label->list
-	libv.ui: callback system for button (and other interactive component) aka: signal-slot
-	libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signal
 	libv.ui.input_field: paste support
 	libv.ui.input_field: selection support
 	libv.ui.input_field: copy support

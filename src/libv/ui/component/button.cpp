@@ -157,8 +157,16 @@ const std::string& Button::text() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void Button::setCallback(std::function<void(const EventMouse&)> callback) {
-	mouseWatcher.callback = std::move(callback);
+void Button::callback(std::function<void(const EventMouseButton&)> callback) {
+	mouseWatcher.cb_button = std::move(callback);
+}
+
+void Button::callback(std::function<void(const EventMouseMovement&)> callback) {
+	mouseWatcher.cb_movement = std::move(callback);
+}
+
+void Button::callback(std::function<void(const EventMouseScroll&)> callback) {
+	mouseWatcher.cb_scroll = std::move(callback);
 }
 
 // -------------------------------------------------------------------------------------------------

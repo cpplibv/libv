@@ -33,7 +33,9 @@ class ContextRender;
 class ContextStyle;
 class ContextUI;
 class EventFocus;
-class EventMouse;
+class EventMouseButton;
+class EventMouseMovement;
+class EventMouseScroll;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -50,7 +52,6 @@ struct BaseComponent {
 	friend class AccessParent;
 	friend class AccessProperty;
 	friend class AccessRoot;
-	friend class ContextStyle; // For flagging invalidate flags
 
 private:
 	Flag_t flags = Flag::mask_init;
@@ -150,7 +151,9 @@ private:
 	virtual bool onChar(const libv::input::EventChar& event); /// returns true if event is absorbed
 	virtual bool onKey(const libv::input::EventKey& event); /// returns true if event is absorbed
 	virtual void onFocus(const EventFocus& event);
-	virtual bool onMouse(const EventMouse& event);
+	virtual bool onMouseButton(const EventMouseButton& event);
+	virtual bool onMouseMovement(const EventMouseMovement& event);
+	virtual bool onMouseScroll(const EventMouseScroll& event);
 
 private:
 	void attach(BaseComponent& parent);
@@ -185,8 +188,14 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 struct AccessEvent {
-	static inline decltype(auto) onMouse(BaseComponent& component, const EventMouse& event) {
-		return component.onMouse(event);
+	static inline decltype(auto) onMouseButton(BaseComponent& component, const EventMouseButton& event) {
+		return component.onMouseButton(event);
+	}
+	static inline decltype(auto) onMouseMovement(BaseComponent& component, const EventMouseMovement& event) {
+		return component.onMouseMovement(event);
+	}
+	static inline decltype(auto) onMouseScroll(BaseComponent& component, const EventMouseScroll& event) {
+		return component.onMouseScroll(event);
 	}
 };
 

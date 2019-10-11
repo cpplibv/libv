@@ -5,9 +5,6 @@
 // libv
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/optional_ref.hpp>
-// std
-#include <variant>
 
 
 namespace libv {
@@ -15,93 +12,34 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct EventMouse {
-	struct Button {
-		libv::input::Mouse button;
-		libv::input::Action action;
-	};
-	struct Movement {
-		libv::vec2f mouse_position;
-		libv::vec2f mouse_movement;
-
-		bool enter = false;
-		bool leave = false;
-	};
-	struct Scroll {
-		libv::vec2f scroll_position;
-		libv::vec2f scroll_movement;
-		//TYPE scroll_unit;
-	};
-
+struct BaseEventMouse {
 //	libv::vec2f mouse_position;
 //	libv::vec2f scroll_position;
 //	boost::container::flat_map<libv::input::Mouse, libv::input::Action> mouse_buttons;
+	// access to key states
+	// access to joystick states
+	// access to mouse states
+	// access to time states
+	// access to hotkey states (?)
+};
 
-	std::variant<Button, Movement, Scroll> value;
-	// key states
-	// joystick states
-	// mouse states
-	// time states
-	// hotkey states (?)
+struct EventMouseButton : BaseEventMouse {
+	libv::input::Mouse button;
+	libv::input::Action action;
+};
 
-public:
-	constexpr inline bool isButton() const noexcept {
-		return std::holds_alternative<Button>(value);
-	}
-	constexpr inline bool isMovement() const noexcept {
-		return std::holds_alternative<Movement>(value);
-	}
-	constexpr inline bool isScroll() const noexcept {
-		return std::holds_alternative<Scroll>(value);
-	}
+struct EventMouseMovement : BaseEventMouse {
+	libv::vec2f mouse_position;
+	libv::vec2f mouse_movement;
 
-public:
-	template <typename F>
-	constexpr inline void ifButton(F&& func) const {
-		if (isButton())
-			std::forward<F>(func)(std::get<Button>(value));
-	}
-	template <typename F>
-	constexpr inline void ifMovement(F&& func) const {
-		if (isMovement())
-			std::forward<F>(func)(std::get<Movement>(value));
-	}
-	template <typename F>
-	constexpr inline void ifScroll(F&& func) const {
-		if (isScroll())
-			std::forward<F>(func)(std::get<Scroll>(value));
-	}
+	bool enter = false;
+	bool leave = false;
+};
 
-public:
-	constexpr inline const Button& button() const {
-		return std::get<Button>(value);
-	}
-	constexpr inline const Movement& movement() const {
-		return std::get<Movement>(value);
-	}
-	constexpr inline const Scroll& scroll() const {
-		return std::get<Scroll>(value);
-	}
-
-public:
-	constexpr inline libv::optional_ref<const Button> buttonOptional() const {
-		if (isButton())
-			return libv::make_optional_ref(std::get<Button>(value));
-		else
-			return nullptr;
-	}
-	constexpr inline libv::optional_ref<const Movement> movementOptional() const {
-		if (isMovement())
-			return libv::make_optional_ref(std::get<Movement>(value));
-		else
-			return nullptr;
-	}
-	constexpr inline libv::optional_ref<const Scroll> scrollOptional() const {
-		if (isScroll())
-			return libv::make_optional_ref(std::get<Scroll>(value));
-		else
-			return nullptr;
-	}
+struct EventMouseScroll : BaseEventMouse {
+	libv::vec2f scroll_position;
+	libv::vec2f scroll_movement;
+	//TYPE scroll_unit;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -208,18 +208,27 @@ void InputField::onFocus(const EventFocus& event) {
 	flagAuto(Flag::pendingRender);
 }
 
-bool InputField::onMouse(const EventMouse& event) {
-	if (event.isButton() && event.button().action == libv::input::Action::press)
+bool InputField::onMouseButton(const EventMouseButton& event) {
+	if (event.action == libv::input::Action::press)
 		focus();
 
-	if (event.isMovement() && event.movement().enter)
+	return true;
+}
+
+bool InputField::onMouseMovement(const EventMouseMovement& event) {
+	if (event.enter)
 		set(property.bg_color, property.bg_color() + 0.2f);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
-	if (event.isMovement() && event.movement().leave)
+	if (event.leave)
 		reset(property.bg_color);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
+	return true;
+}
+
+bool InputField::onMouseScroll(const EventMouseScroll& event) {
+	(void) event;
 	return true;
 }
 

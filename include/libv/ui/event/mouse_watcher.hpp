@@ -11,10 +11,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class EventMouse;
+class EventMouseButton;
+class EventMouseMovement;
+class EventMouseScroll;
 
 struct MouseWatcher {
-	std::function<void(const EventMouse&)> callback;
+	std::function<void(const EventMouseButton&)> cb_button;
+	std::function<void(const EventMouseMovement&)> cb_movement;
+	std::function<void(const EventMouseScroll&)> cb_scroll;
 };
 
 // -------------------------------------------------------------------------------------------------

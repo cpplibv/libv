@@ -232,18 +232,15 @@ void PanelViewer::doAttach() {
 			button_close = std::make_shared<libv::ui::Button>("close");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->text("Button0");
-			button_close->setCallback([this](const libv::ui::EventMouse& event) {
-				if (event.isButton())
-					button_close->focus();
-
-				if (event.isButton())
-					log_app.trace("Button0 Click {} {}", libv::to_value(event.button().button),  libv::to_value(event.button().action));
-
-				if (event.isMovement())
-					log_app.trace("Button0 Movement {} {} {} {}", event.movement().mouse_position, event.movement().mouse_movement, event.movement().enter, event.movement().leave);
-
-				if (event.isScroll())
-					log_app.trace("Button0 Scroll {} {}", event.scroll().scroll_position, event.scroll().scroll_movement);
+			button_close->callback([this](const libv::ui::EventMouseButton& event) {
+				button_close->focus();
+				log_app.trace("Button0 Click {} {}", libv::input::to_string(event.button),  libv::input::to_string(event.action));
+			});
+			button_close->callback([this](const libv::ui::EventMouseMovement& event) {
+				log_app.trace("Button0 Movement {} {} {} {}", event.mouse_position, event.mouse_movement, event.enter, event.leave);
+			});
+			button_close->callback([this](const libv::ui::EventMouseScroll& event) {
+				log_app.trace("Button0 Scroll {} {}", event.scroll_position, event.scroll_movement);
 			});
 
 			panel_left->add(button_close);
@@ -269,18 +266,15 @@ void PanelViewer::doAttach() {
 			button_close = std::make_shared<libv::ui::Button>("button1");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->text("Button1");
-			button_close->setCallback([this](const libv::ui::EventMouse& event) {
-				if (event.isButton())
-					button_close->focus();
-
-				if (event.isButton())
-					log_app.trace("Button1 Click {} {}", libv::to_value(event.button().button),  libv::to_value(event.button().action));
-
-				if (event.isMovement())
-					log_app.trace("Button1 Movement {} {} {} {}", event.movement().mouse_position, event.movement().mouse_movement, event.movement().enter, event.movement().leave);
-
-				if (event.isScroll())
-					log_app.trace("Button1 Scroll {} {}", event.scroll().scroll_position, event.scroll().scroll_movement);
+			button_close->callback([this](const libv::ui::EventMouseButton& event) {
+				button_close->focus();
+				log_app.trace("Button1 Click {} {}", libv::input::to_string(event.button),  libv::input::to_string(event.action));
+			});
+			button_close->callback([this](const libv::ui::EventMouseMovement& event) {
+				log_app.trace("Button1 Movement {} {} {} {}", event.mouse_position, event.mouse_movement, event.enter, event.leave);
+			});
+			button_close->callback([this](const libv::ui::EventMouseScroll& event) {
+				log_app.trace("Button1 Scroll {} {}", event.scroll_position, event.scroll_movement);
 			});
 
 			panel_left->add(button_close);

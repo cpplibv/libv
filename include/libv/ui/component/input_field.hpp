@@ -73,7 +73,9 @@ private:
 	virtual bool onChar(const libv::input::EventChar& event) override;
 	virtual bool onKey(const libv::input::EventKey& event) override;
 	virtual void onFocus(const EventFocus& event) override;
-	virtual bool onMouse(const EventMouse& event) override;
+	virtual bool onMouseButton(const EventMouseButton& event) override;
+	virtual bool onMouseMovement(const EventMouseMovement& event) override;
+	virtual bool onMouseScroll(const EventMouseScroll& event) override;
 
 //private:
 //	virtual void doProperty(const EventFocus& event) override;

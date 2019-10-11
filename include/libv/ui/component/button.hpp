@@ -64,7 +64,9 @@ public:
 
 public:
 	// TODO P1: libv.ui Think about a signal-slot pattern very hard
-	void setCallback(std::function<void(const EventMouse&)> callback);
+	void callback(std::function<void(const EventMouseButton&)> callback);
+	void callback(std::function<void(const EventMouseMovement&)> callback);
+	void callback(std::function<void(const EventMouseScroll&)> callback);
 
 private:
 	virtual void onFocus(const EventFocus& event) override;
