@@ -106,7 +106,7 @@ void process_style_property(UI& ui, Style& style, const std::string_view key, co
 	if (property("font", libv::lua::string_accept([&ui](const auto path){ return ui.context().font(path); }))) return;
 	if (property("font_color", pattern_color())) return;
 	if (property("font_outline", pattern_color())) return;
-	if (property("font_size", libv::lua::as<FontSize>(libv::lua::number<float>()))) return;
+	if (property("font_size", libv::lua::as<FontSize>(libv::lua::number<int16_t>()))) return;
 	if (property("size", libv::lua::string_parse(&libv::ui::parse_size_optional))) return;
 //	if (property("font_shader", libv::lua::string())) return;
 //	if (property("layout", libv::lua::string_parse(&libv::ui::parse_layout_optional))) return;
@@ -189,7 +189,10 @@ std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::f
 	for (const auto& [name, style] : styles)
 		style->foreach([&name](const auto& key, const auto& value) {
 			std::visit([&](const auto& var) {
-				log_ui.trace("{}/{} = {}", name, key, var);
+				if constexpr (std::is_enum_v<std::decay_t<decltype(var)>>)
+					log_ui.trace("{}/{} = {}", name, key, libv::to_value(var));
+				else
+					log_ui.trace("{}/{} = {}", name, key, var);
 			}, value);
 		});
 

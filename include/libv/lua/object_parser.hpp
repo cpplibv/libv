@@ -166,7 +166,14 @@ struct MatcherAs : Matcher {
 		if constexpr (std::is_void_v<CppT>) {
 			return result;
 		} else {
-			return result ? std::optional<CppT>(result.value()) : std::optional<CppT>(std::nullopt);
+			std::optional<CppT> resultCpp(std::nullopt);
+			if (result) {
+				if constexpr (std::is_enum_v<CppT>)
+					resultCpp.emplace(CppT(result.value()));
+				else
+					resultCpp.emplace(result.value());
+			}
+			return resultCpp;
 		}
 	}
 };

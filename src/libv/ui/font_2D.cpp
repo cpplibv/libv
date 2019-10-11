@@ -12,6 +12,7 @@
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/enum.hpp>
 // std
 #include <atomic>
 #include <mutex>
@@ -75,7 +76,7 @@ Font2D::Font2D(std::string fontData) :
 	texture_.set(gl::MagFilter::Nearest);
 	texture_.set(gl::MinFilter::Nearest);
 
-	_renderFallbackCharacter(); // pre-fetch default char
+	_getFallbackCharacter(); // pre-fetch default char
 }
 
 Font2D::~Font2D() {
@@ -86,7 +87,7 @@ Font2D::~Font2D() {
 
 // -------------------------------------------------------------------------------------------------
 
-float Font2D::getLineAdvance(uint32_t size) {
+float Font2D::getLineAdvance(FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 	_changeSizeOnDemand(size);
@@ -94,7 +95,7 @@ float Font2D::getLineAdvance(uint32_t size) {
 	return static_cast<float>(face->size->metrics.height) / 64.0f; // 26.6 fixed point
 }
 
-float Font2D::getAscender(uint32_t size) {
+float Font2D::getAscender(FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 	_changeSizeOnDemand(size);
@@ -102,7 +103,7 @@ float Font2D::getAscender(uint32_t size) {
 	return static_cast<float>(face->size->metrics.ascender) / 64.0f; // 26.6 fixed point
 }
 
-float Font2D::getDescender(uint32_t size) {
+float Font2D::getDescender(FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 	_changeSizeOnDemand(size);
@@ -110,7 +111,7 @@ float Font2D::getDescender(uint32_t size) {
 	return static_cast<float>(face->size->metrics.descender) / 64.0f; // 26.6 fixed point
 }
 
-vec2f Font2D::getKerning(uint32_t left, uint32_t right, uint32_t size) {
+vec2f Font2D::getKerning(uint32_t left, uint32_t right, FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 	_changeSizeOnDemand(size);
@@ -131,14 +132,14 @@ vec2f Font2D::getKerning(uint32_t left, uint32_t right, uint32_t size) {
 	return {static_cast<float>(kerning.x) / 64.0f, static_cast<float>(kerning.y) / 64.0f};
 }
 
-const Font2D::Character& Font2D::getCharacter(uint32_t unicode, uint32_t size) {
+const Font2D::Character& Font2D::getCharacter(uint32_t unicode, FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);
 
 	return _getCharacter(unicode, size);
 }
 
-const Font2D::Character& Font2D::_getCharacter(uint32_t unicode, uint32_t size) {
+const Font2D::Character& Font2D::_getCharacter(uint32_t unicode, FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 
 	const auto infoIndex = CharacterIndex{unicode, size};
@@ -148,11 +149,11 @@ const Font2D::Character& Font2D::_getCharacter(uint32_t unicode, uint32_t size) 
 	return it->second;
 }
 
-Font2D::Character Font2D::_renderFallbackCharacter() {
-	return _renderCharacter(0, 12);
+Font2D::Character Font2D::_getFallbackCharacter() {
+	return _getCharacter(0, FontSize{12});
 }
 
-Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
+Font2D::Character Font2D::_renderCharacter(uint32_t unicode, FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 
 	_changeSizeOnDemand(size);
@@ -162,16 +163,16 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 	int charIndex = FT_Get_Char_Index(face, unicode);
 
 	if (const auto err = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT)) {
-		log_ui_ft.error("FT_Load_Glyph failed: {} for: {} size: {}", err, unicode, size);
-		return _renderFallbackCharacter();
+		log_ui_ft.error("FT_Load_Glyph failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		return _getFallbackCharacter();
 	}
 	if (const auto err = FT_Get_Glyph(face->glyph, &glyph)) {
-		log_ui_ft.error("FT_Get_Glyph failed: {} for: {} size: {}", err, unicode, size);
-		return _renderFallbackCharacter();
+		log_ui_ft.error("FT_Get_Glyph failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		return _getFallbackCharacter();
 	}
 	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_LCD, nullptr, true)) {
-		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, size);
-		return _renderFallbackCharacter();
+		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+		return _getFallbackCharacter();
 	}
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
@@ -185,9 +186,9 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 	if (texturePen.y + bitmapHeight > textureSize.y) { // Detect 'full' texture
 		log_ui_ft.error("Failed to render character: Not enough space in font texture: "
 				"unicode: {} size: {} bitmap size: {} {}, pen pos: {}",
-				unicode, currentSize, bitmapWidth, bitmapHeight, texturePen);
+				unicode, libv::to_value(currentSize), bitmapWidth, bitmapHeight, texturePen);
 		FT_Done_Glyph(glyph);
-		return _renderFallbackCharacter();
+		return _getFallbackCharacter();
 	}
 
 	if (texturePen.y + bitmapHeight > textureNextLine) // Expand current line
@@ -226,10 +227,10 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, uint32_t size) {
 	return result;
 }
 
-void Font2D::_changeSizeOnDemand(uint32_t size) {
+void Font2D::_changeSizeOnDemand(FontSize size) {
 	if (currentSize != size) {
 		// 26.6 fixed point
-		if (const auto err = FT_Set_Char_Size(face, size << 6, size << 6, 96, 96))
+		if (const auto err = FT_Set_Char_Size(face, libv::to_value(size) << 6, libv::to_value(size) << 6, 96, 96))
 			log_ui_ft.error("FT_Set_Char_Size failed: {}", err);
 		else
 			currentSize = size;

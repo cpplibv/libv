@@ -247,6 +247,7 @@ libv.ui.style: cleanup fallback style
 libv.ui: setX() / getX() -> void X(T) / T X()
 libv.ui: mark every component type one paramed ctors as explicit (and maybe check on every ui class too)
 libv.ui.font: line 179 not just log but return default on error
+libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -280,7 +281,6 @@ debug
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
 cleanup
-	libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
 	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: remove layout1 pass member variables in component_base
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target

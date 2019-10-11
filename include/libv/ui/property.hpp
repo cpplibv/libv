@@ -71,7 +71,7 @@ using PropertyDynamic = std::variant<
 		ShaderQuad_view,
 		Size,
 		SnapToEdge,
-		// Squish,
+		Squish,
 
 		std::string // For debug only
 >;

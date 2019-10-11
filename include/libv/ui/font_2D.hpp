@@ -13,6 +13,8 @@
 #include <array>
 #include <mutex>
 #include <string>
+// pro
+#include <libv/ui/property/font_size.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -60,7 +62,7 @@ public:
 private:
 	struct CharacterIndex {
 		uint32_t unicode;
-		uint32_t pxSize;
+		FontSize pxSize;
 		bool operator<(const CharacterIndex& rhs) const {
 			return std::tie(unicode, pxSize) < std::tie(rhs.unicode, rhs.pxSize);
 		}
@@ -72,7 +74,7 @@ private:
 private:
 	std::mutex face_m;
 	FT_Face face = nullptr;
-	uint32_t currentSize = 0;
+	FontSize currentSize = FontSize{0};
 	std::string fontData;
 	// TODO P2: unique_ptr for FT_Face
 
@@ -95,17 +97,17 @@ public:
 	}
 
 public:
-	float getLineAdvance(uint32_t size);
-	float getAscender(uint32_t size);
-	float getDescender(uint32_t size);
-	vec2f getKerning(uint32_t left, uint32_t right, uint32_t size);
-	const Character& getCharacter(uint32_t unicode, uint32_t size);
+	float getLineAdvance(FontSize size);
+	float getAscender(FontSize size);
+	float getDescender(FontSize size);
+	vec2f getKerning(uint32_t left, uint32_t right, FontSize size);
+	const Character& getCharacter(uint32_t unicode, FontSize size);
 
 private:
-	const Character& _getCharacter(uint32_t unicode, uint32_t size);
-	Character _renderFallbackCharacter();
-	Character _renderCharacter(uint32_t unicode, uint32_t size);
-	void _changeSizeOnDemand(uint32_t size);
+	const Character& _getCharacter(uint32_t unicode, FontSize size);
+	Character _getFallbackCharacter();
+	Character _renderCharacter(uint32_t unicode, FontSize size);
+	void _changeSizeOnDemand(FontSize size);
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -63,8 +63,8 @@ void PanelViewer::key(libv::input::Key key) {
 }
 
 void PanelViewer::doAttach() {
-	set(property.snapToEdge, false);
-	set(property.squish, false);
+	set(property.snapToEdge, libv::ui::SnapToEdge{false});
+	set(property.squish, libv::ui::Squish{false});
 
 	{
 		auto style = context().style("vm4pv");

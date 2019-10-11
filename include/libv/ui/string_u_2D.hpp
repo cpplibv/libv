@@ -27,7 +27,7 @@ private:
 
 	std::shared_ptr<Font2D> font;
 
-	FontSize fontSize = 12u;
+	FontSize fontSize = FontSize{12};
 	bool dirty = true;
 	AlignHorizontal align = AlignHorizontal::Center;
 	libv::vec2f limit;
