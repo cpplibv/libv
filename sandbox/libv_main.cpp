@@ -268,60 +268,93 @@
 //
 //	return 0;
 //}
+//
+//// =================================================================================================
+//
+//// libv
+//#include <libv/utility/fixed_string.hpp>
+//// std
+//#include <iostream>
+//
+//
+//template <libv::fixed_string Name>
+//struct S {
+//	static constexpr std::string_view name = Name;
+//};
+//
+//template <typename T>
+//void foo0(T s) {
+//	std::cout << s.name << " " << s.name.size() << std::endl;
+//}
+//
+////template <size_t N, const char Name[N]>
+////void foo1(S<libv::fixed_string<N>{Name}> s) {
+////	std::cout << s.name << " " << s.name.size() << std::endl;
+////}
+//
+////template <libv::fixed_string Name>
+////void foo1(S<Name> s) {
+////	std::cout << s.name << " " << s.name.size() << std::endl;
+////}
+//
+////template <auto Name>
+////void foo1(S<Name> s) {
+////	std::cout << s.name << " " << s.name.size() << std::endl;
+////}
+//
+//int main() {
+//	{
+//		S<"test"> s;
+//		std::cout << s.name << " " << s.name.size() << std::endl;
+//		static_assert(std::is_same_v<decltype(s), S<libv::fixed_string<4>{"test"}>>);
+//	}
+//
+//	{
+//		libv::fixed_string s{"test"};
+//		std::cout << s << " " << s.size() << std::endl;
+//		static_assert(std::is_same_v<decltype(s), libv::fixed_string<4>>);
+//	}
+//
+//	{
+//		foo0(S<"test">{});
+//	}
+//
+////	{
+////		foo1(S<"test">{});
+////	}
+//
+//	return 0;
+//}
 
 // =================================================================================================
 
 // libv
-#include <libv/utility/fixed_string.hpp>
+#include <libv/math/bezier_curve.hpp>
 // std
 #include <iostream>
 
 
-template <libv::fixed_string Name>
-struct S {
-	static constexpr std::string_view name = Name;
-};
-
-template <typename T>
-void foo0(T s) {
-	std::cout << s.name << " " << s.name.size() << std::endl;
-}
-
-//template <size_t N, const char Name[N]>
-//void foo1(S<libv::fixed_string<N>{Name}> s) {
-//	std::cout << s.name << " " << s.name.size() << std::endl;
-//}
-
-//template <libv::fixed_string Name>
-//void foo1(S<Name> s) {
-//	std::cout << s.name << " " << s.name.size() << std::endl;
-//}
-
-//template <auto Name>
-//void foo1(S<Name> s) {
-//	std::cout << s.name << " " << s.name.size() << std::endl;
-//}
-
 int main() {
-	{
-		S<"test"> s;
-		std::cout << s.name << " " << s.name.size() << std::endl;
-		static_assert(std::is_same_v<decltype(s), S<libv::fixed_string<4>{"test"}>>);
+	libv::math::BezierCurve curve;
+	curve.points.emplace_back(0, 0);
+		curve.points.emplace_back(0, 1);
+		curve.points.emplace_back(2, 1);
+	curve.points.emplace_back(2, 0);
+		curve.points.emplace_back(2, -1);
+		curve.points.emplace_back(1, -1);
+	curve.points.emplace_back(1, 0);
+		curve.points.emplace_back(0, 0.5f);
+		curve.points.emplace_back(1.5f, 0.5f);
+	curve.points.emplace_back(1.5f, 0);
+
+	for (int i = -15; i <= 45; ++i) {
+		const float t = static_cast<float>(i) * 0.1f;
+		std::cout << t << " = " << curve.eval(t) << std::endl;
 	}
 
-	{
-		libv::fixed_string s{"test"};
-		std::cout << s << " " << s.size() << std::endl;
-		static_assert(std::is_same_v<decltype(s), libv::fixed_string<4>>);
-	}
-
-	{
-		foo0(S<"test">{});
-	}
-
-//	{
-//		foo1(S<"test">{});
-//	}
+	std::cout << "min:  " << curve.min() << std::endl;
+	std::cout << "max:  " << curve.max() << std::endl;
+	std::cout << "size: " << curve.size() << std::endl;
 
 	return 0;
 }

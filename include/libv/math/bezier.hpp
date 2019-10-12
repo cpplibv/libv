@@ -8,14 +8,14 @@ namespace math {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-inline T bezierCurvePoint(const T p0, const T p1, const T p2, const T p3, const T t) {
-	const auto u = T{1.0} - t;
+template <typename T, typename S = T>
+[[nodiscard]] constexpr inline T bezierCurvePoint(const T p0, const T p1, const T p2, const T p3, const S t) noexcept {
+	const auto u = S{1.0} - t;
 
     return
         p0 * u * u * u +
-        p1 * u * u * t * T{3.0} +
-        p2 * u * t * t * T{3.0} +
+        p1 * u * u * t * S{3.0} +
+        p2 * u * t * t * S{3.0} +
         p3 * t * t * t;
 }
 
