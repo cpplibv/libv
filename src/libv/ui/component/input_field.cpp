@@ -118,14 +118,14 @@ void InputField::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-InputField::InputField() :
-	BaseComponent(UnnamedTag, "input-field") { }
+InputField::InputField(BaseComponent& parent) :
+	BaseComponent(parent, UnnamedTag, "input-field") { }
 
-InputField::InputField(std::string name) :
-	BaseComponent(std::move(name)) { }
+InputField::InputField(BaseComponent& parent, std::string name) :
+	BaseComponent(parent, std::move(name)) { }
 
-InputField::InputField(UnnamedTag_t, const std::string_view type) :
-	BaseComponent(UnnamedTag, type) { }
+InputField::InputField(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+	BaseComponent(parent, UnnamedTag, type) { }
 
 InputField::~InputField() { }
 
@@ -169,6 +169,7 @@ FontSize InputField::font_size() const noexcept {
 void InputField::text(std::string value) {
 	text_.setString(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventChange{*this});
 }
 
 const std::string& InputField::text() const noexcept {
@@ -182,6 +183,7 @@ bool InputField::onChar(const libv::input::EventChar& event) {
 
 	caretStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventChange{*this});
 	return true;
 }
 
@@ -191,8 +193,20 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventChange{*this});
 		return true;
 	}
+
+	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release) {
+		fire(EventSubmit{*this});
+		return true;
+	}
+
+	if (event.key == libv::input::Key::KPEnter && event.action != libv::input::Action::release) {
+		fire(EventSubmit{*this});
+		return true;
+	}
+
 	return false;
 }
 

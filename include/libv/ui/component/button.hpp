@@ -44,9 +44,9 @@ private:
 	MouseWatcher mouseWatcher;
 
 public:
-	Button();
-	explicit Button(std::string name);
-	Button(UnnamedTag_t, const std::string_view type);
+	explicit Button(BaseComponent& parent);
+	Button(BaseComponent& parent, std::string name);
+	Button(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~Button();
 
 public:

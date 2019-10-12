@@ -71,14 +71,14 @@ void Label::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-Label::Label() :
-	BaseComponent(UnnamedTag, "label") { }
+Label::Label(BaseComponent& parent) :
+	BaseComponent(parent, UnnamedTag, "label") { }
 
-Label::Label(std::string name) :
-	BaseComponent(std::move(name)) { }
+Label::Label(BaseComponent& parent, std::string name) :
+	BaseComponent(parent, std::move(name)) { }
 
-Label::Label(UnnamedTag_t, const std::string_view type) :
-	BaseComponent(UnnamedTag, type) { }
+Label::Label(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+	BaseComponent(parent, UnnamedTag, type) { }
 
 Label::~Label() { }
 

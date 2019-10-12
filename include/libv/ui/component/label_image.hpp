@@ -42,9 +42,9 @@ private:
 	String2D text_;
 
 public:
-	LabelImage();
-	explicit LabelImage(std::string name);
-	LabelImage(UnnamedTag_t, const std::string_view type);
+	explicit LabelImage(BaseComponent& parent);
+	LabelImage(BaseComponent& parent, std::string name);
+	LabelImage(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~LabelImage();
 
 public:

@@ -64,7 +64,7 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 			static_cast<float>(config.window_width),
 			static_cast<float>(config.window_height)); // TODO P4: auto detect size changes
 
-	panel = std::make_shared<app::PanelViewer>();
+	panel = std::make_shared<app::PanelViewer>(ui.root());
 	ui.add(panel);
 
 	onKey.output([&](const libv::input::EventKey& e) {

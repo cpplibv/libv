@@ -19,14 +19,14 @@ namespace ui {
 
 class PanelFloat : public BasicPanel<LayoutFloat> {
 public:
-	PanelFloat() :
-		BasicPanel<LayoutFloat>(UnnamedTag, "float") { }
+	explicit PanelFloat(BaseComponent& parent) :
+		BasicPanel<LayoutFloat>(parent, UnnamedTag, "float") { }
 
-	explicit PanelFloat(std::string name) :
-		BasicPanel<LayoutFloat>(std::move(name)) { }
+	PanelFloat(BaseComponent& parent, std::string name) :
+		BasicPanel<LayoutFloat>(parent, std::move(name)) { }
 
-	PanelFloat(UnnamedTag_t, const std::string_view type) :
-		BasicPanel<LayoutFloat>(UnnamedTag, type) { }
+	PanelFloat(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutFloat>(parent, UnnamedTag, type) { }
 
 	virtual ~PanelFloat() = default;
 };

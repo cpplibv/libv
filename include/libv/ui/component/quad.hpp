@@ -32,9 +32,9 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	Quad();
-	explicit Quad(std::string name);
-	Quad(UnnamedTag_t, const std::string_view type);
+	explicit Quad(BaseComponent& parent);
+	Quad(BaseComponent& parent, std::string name);
+	Quad(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~Quad();
 
 private:

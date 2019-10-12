@@ -7,6 +7,7 @@
 // std
 #include <cassert>
 // pro
+#include <libv/ui/context_event.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
@@ -22,10 +23,15 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-BaseComponent::BaseComponent(std::string name) :
+BaseComponent::BaseComponent(ContextUI& context) :
+	context_(context) { }
+
+BaseComponent::BaseComponent(BaseComponent& parent, std::string name) :
+	context_(parent.context_),
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(UnnamedTag_t, const std::string_view type) :
+BaseComponent::BaseComponent(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+	context_(parent.context_),
 	name(libv::concat(type, '-', nextID++)) { }
 
 BaseComponent::~BaseComponent() {
@@ -41,14 +47,6 @@ std::string BaseComponent::path() const {
 		result = it->parent->name + '/' + std::move(result);
 
 	return result;
-}
-
-ContextUI& BaseComponent::context() const noexcept {
-	if (context_ == nullptr) {
-		log_ui.fatal("Component has to be attached to acquire its context: {}", path());
-		assert(false && "Component has to be attached to acquire its context");
-	}
-	return *context_;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -273,7 +271,7 @@ bool BaseComponent::onMouseScroll(const EventMouseScroll& event) {
 
 void BaseComponent::attach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
-		context_ = libv::make_observer(parent_.context());
+		// NOTE: context_ is already set in the constructor
 		parent = libv::make_observer_ref(parent_);
 
 		log_ui.trace("Attaching {}", path());
@@ -331,12 +329,17 @@ void BaseComponent::detach(BaseComponent& parent_) {
 //		if (flags.match_any(Flag::focusLinked))
 //			context().detachFocusLinked(*this);
 
+		if (flags.match_any(Flag::signal))
+			context().event.disconnect_signal(this);
+
+		if (flags.match_any(Flag::slot))
+			context().event.disconnect_slot(this);
+
 		doDetach();
 
-		context_ = nullptr;
 		parent = libv::make_observer_ref(this);
 
-		flags.reset(Flag::pendingDetach);
+		flags.reset(Flag::pendingDetach | Flag::signal | Flag::slot);
 	}
 }
 

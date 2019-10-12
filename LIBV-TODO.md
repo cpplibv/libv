@@ -249,15 +249,17 @@ libv.ui: mark every component type one paramed ctors as explicit (and maybe chec
 libv.ui.font: line 179 not just log but return default on error
 libv.ui: using FontSize = int16_t; -> enum class FontSize : int16_t {};
 libv.ui: flatten - flatten EventMouse to combat variant complexity
+libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signals | Couple of changes, global ContextEvent dispatcher, no proxy
+libv.ui: contextlessness
+libv.ui: events for input field
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signals
-libv.ui: callback system for button (and other interactive component) aka: signal-slot
+libv.ui: events for button
 
-
+libv.ui: rename UnnamedTag_t to GenerateName_t
 libv.ui.property: hybrid reflection - dynamic
 
 properties / style
@@ -306,8 +308,9 @@ atlas
 	libv.ui: support atlas based images
 
 component
+	libv.ui: scroll bar (without the pane itself, aka slider) | NOTE: Check git stash
 	libv.ui: clipping vertex shader (with on/off)
-	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar
+	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
@@ -317,7 +320,8 @@ ui
 	libv.ui: layout padding
 	libv.ui: fragments
 	libv.ui: static_component system
-	libv.ui: progress bar
+	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
+	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 
@@ -415,6 +419,7 @@ app.vm4_viewer: implement a small light gui app to provide guidance to GUI devel
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
 libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
+libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 
 --- [[[ deadline: 2019.10.31 ]]] ---
 

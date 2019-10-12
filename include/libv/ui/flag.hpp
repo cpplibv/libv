@@ -21,9 +21,9 @@ static constexpr Flag_t none = Flag_t{};
 //static constexpr Flag_t enable              = libv::bit(0);
 static constexpr Flag_t render                = libv::bit(1);
 static constexpr Flag_t layout                = libv::bit(2);
-//static constexpr Flag_t ______              = libv::bit(3);
-static constexpr Flag_t focused               = libv::bit(4);
-//static constexpr Flag_t focusLinked         = libv::bit(5);
+static constexpr Flag_t signal                = libv::bit(3); /// Component has or had at least one slot connected. Once set this flag is never resets
+static constexpr Flag_t slot                  = libv::bit(4); /// Component has or had at least one signal connected. Once set this flag is never resets
+static constexpr Flag_t focused               = libv::bit(5);
 static constexpr Flag_t focusableChild        = libv::bit(6);
 static constexpr Flag_t focusableSelf         = libv::bit(7);
 
@@ -52,7 +52,7 @@ static constexpr Flag_t watchMouseButton      = libv::bit(27);
 static constexpr Flag_t watchMouseEnter       = libv::bit(28);
 static constexpr Flag_t watchMousePosition    = libv::bit(29);
 static constexpr Flag_t watchMouseScroll      = libv::bit(30);
-//static constexpr Flag_t ______              = libv::bit(31);
+//static constexpr Flag_t focusLinked           = libv::bit(31);
 
 // -------------------------------------------------------------------------------------------------
 

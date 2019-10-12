@@ -62,7 +62,7 @@ private:
 //	}
 
 public:
-	PanelViewer();
+	explicit PanelViewer(BaseComponent& parent);
 
 	void init();
 //	void update_filelist();

@@ -98,14 +98,14 @@ void Button::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-Button::Button() :
-	BaseComponent(UnnamedTag, "button") { }
+Button::Button(BaseComponent& parent) :
+	BaseComponent(parent, UnnamedTag, "button") { }
 
-Button::Button(std::string name) :
-	BaseComponent(std::move(name)) { }
+Button::Button(BaseComponent& parent, std::string name) :
+	BaseComponent(parent, std::move(name)) { }
 
-Button::Button(UnnamedTag_t, const std::string_view type) :
-	BaseComponent(UnnamedTag, type) { }
+Button::Button(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+	BaseComponent(parent, UnnamedTag, type) { }
 
 Button::~Button() { }
 

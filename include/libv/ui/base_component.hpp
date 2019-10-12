@@ -5,8 +5,6 @@
 // libv
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/meta/identity.hpp>
-#include <libv/meta/reflection.hpp>
 #include <libv/utility/function_ref.hpp>
 #include <libv/utility/intrusive_ptr.hpp>
 #include <libv/utility/observer_ptr.hpp>
@@ -16,6 +14,8 @@
 #include <string_view>
 #include <type_traits>
 // pro
+#include <libv/ui/context_event.hpp>
+#include <libv/ui/context_ui.hpp>
 #include <libv/ui/flag.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/style_fwd.hpp>
@@ -65,8 +65,8 @@ private:
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to direct parent
 	libv::observer_ref<BaseComponent> parent = libv::make_observer_ref(this);
-	/// Null before attach and after detach, never null inbetween
-	libv::observer_ptr<ContextUI> context_ = nullptr;
+	/// Never null, points to the associated context
+	libv::observer_ref<ContextUI> context_;
 	/// Null if no style is assigned to the component
 	libv::intrusive_ptr<Style> style_;
 
@@ -76,16 +76,25 @@ public:
 	std::string name;
 
 public:
-	explicit BaseComponent(std::string name);
-	BaseComponent(UnnamedTag_t, const std::string_view type);
+	explicit BaseComponent(ContextUI& context); // Root only constructor
+	BaseComponent(BaseComponent& parent, std::string name);
+	BaseComponent(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+
+	BaseComponent(const BaseComponent&) = delete;
+	BaseComponent(BaseComponent&&) = delete;
+	BaseComponent& operator=(const BaseComponent&) = delete;
+	BaseComponent& operator=(BaseComponent&&) = delete;
+
 	virtual ~BaseComponent();
 
 public:
 	[[nodiscard]] std::string path() const;
-	[[nodiscard]] ContextUI& context() const noexcept;
 
+	[[nodiscard]] inline ContextUI& context() const noexcept {
+		return *context_;
+	}
 	[[nodiscard]] inline bool isAttached() noexcept {
-		return context_ != nullptr;
+		return parent != this;
 	}
 	[[nodiscard]] inline bool isRendered() noexcept {
 		return flags.match_any(Flag::render);
@@ -132,9 +141,14 @@ public:
 public:
 	template <typename Property>
 	inline void set(Property& property, typename Property::value_type value);
-
 	template <typename Property>
 	inline void reset(Property& property);
+
+protected:
+	template <typename Event, typename F>
+	inline void connect(libv::observer_ptr<BaseComponent> slot, F&& func);
+	template <typename Event>
+	inline void fire(const Event& event);
 
 private:
 	ContextStyle makeStyleContext() noexcept;
@@ -274,10 +288,6 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) render(BaseComponent& component, ContextRender& context) {
 		return component.render(context);
 	}
-
-	static inline decltype(auto) setContext(BaseComponent& component, ContextUI& context) {
-		component.context_ = libv::make_observer(context);
-	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -293,6 +303,23 @@ template <typename Property>
 inline void BaseComponent::reset(Property& property) {
 	AccessProperty::driver(property, PropertyDriver::style);
 	flagAuto(Flag::pendingStyle);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Event, typename F>
+inline void BaseComponent::connect(libv::observer_ptr<BaseComponent> slot, F&& func) {
+	context().event.connect<Event>(this, slot, std::forward<F>(func));
+
+	this->flagDirect(Flag::signal);
+	slot->flagDirect(Flag::slot);
+}
+
+template <typename Event>
+inline void BaseComponent::fire(const Event& event) {
+	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (attach) codes
+	if (isAttached() && flags.match_any(Flag::signal))
+		context().event.fire(this, event);
 }
 
 // -------------------------------------------------------------------------------------------------

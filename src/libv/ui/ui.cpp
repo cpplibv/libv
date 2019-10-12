@@ -32,7 +32,7 @@ namespace ui {
 
 class Root : public PanelFull {
 public:
-	Root() : PanelFull("") {}
+	Root(ContextUI& context) : PanelFull(context) {}
 
 	void setSize(libv::vec3f size_) {
 		AccessRoot::size(*this) = size_;
@@ -87,7 +87,7 @@ public:
 
 public:
 	ContextUI context;
-	Root root;
+	Root root{context};
 
 	struct Stat {
 		Histogram<100> attach1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
@@ -139,7 +139,7 @@ public:
 		if (libv::make_observer_ref(component) == focused)
 			return;
 
-		log_ui.debug("Focus set from: {} to {}", focused->path(), component.path());
+		log_ui.trace("Focus set from: {} to {}", focused->path(), component.path());
 
 		AccessRoot::focusChange(*focused, component);
 		focused = libv::make_observer_ref(component);
@@ -196,6 +196,10 @@ void UI::setPosition(float x, float y, float z) noexcept {
 	self->root.setPosition({x, y, z});
 }
 
+BaseComponent& UI::root() const noexcept {
+	return self->root;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void UI::event(const libv::input::EventChar& event) {
@@ -237,8 +241,6 @@ ContextUI& UI::context() {
 // -------------------------------------------------------------------------------------------------
 
 void UI::update(libv::glr::Queue& gl) {
-	AccessRoot::setContext(self->root, self->context);
-
 	self->timer.reset();
 	self->timerFrame.reset();
 	{
@@ -247,7 +249,7 @@ void UI::update(libv::glr::Queue& gl) {
 		self->stat.attach1.sample(self->timer.time_ns());
 	} {
 		// --- Event ---
-		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (reactive events to layout and attach changes)
+		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
 
 		std::unique_lock lock{self->mutex};
 		for (const auto& mouseEvent : self->event_queue) {
@@ -378,7 +380,7 @@ void UI::focus(BaseComponent& component) {
 void UI::detachFocused(BaseComponent& component) {
 	(void) component;
 
-	assert(&component == self->focused);
+	assert(&component == self->focused && "Attempted to detachFocused the not focused element");
 	self->focusTravers(Degrees<float>{315});
 }
 

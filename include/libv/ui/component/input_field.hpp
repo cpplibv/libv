@@ -10,6 +10,8 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/context_event.hpp>
+#include <libv/ui/context_ui.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/string_2D.hpp>
 
@@ -20,6 +22,28 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class InputField : public BaseComponent {
+public:
+	struct EventChange {
+		InputField& component;
+
+//		enum class Change : bool {
+//			insert = true,
+//			remove = false,
+//		};
+//
+//		InputField& component;
+//		// Caret position
+//		int32_t caret;
+//		Change change;
+//		// Change type: insert/push_back/remove/pop_back | Important, could be used for optimization
+	};
+	struct EventSelect {
+		InputField& component;
+	};
+	struct EventSubmit {
+		InputField& component;
+	};
+
 private:
 	template <typename T>
 	static void access_properties(T& ctx);
@@ -51,9 +75,9 @@ private:
 	libv::vec2f caretPosition;
 
 public:
-	InputField();
-	explicit InputField(std::string name);
-	InputField(UnnamedTag_t, const std::string_view type);
+	explicit InputField(BaseComponent& parent);
+	InputField(BaseComponent& parent, std::string name);
+	InputField(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~InputField();
 
 public:
@@ -69,6 +93,22 @@ public:
 	void text(std::string value);
 	const std::string& text() const noexcept;
 
+public:
+	template <typename F>
+	inline void event_change(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EventChange>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_select(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EventSelect>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_submit(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EventSubmit>(slot, std::forward<F>(func));
+	}
+
 private:
 	virtual bool onChar(const libv::input::EventChar& event) override;
 	virtual bool onKey(const libv::input::EventKey& event) override;
@@ -76,9 +116,6 @@ private:
 	virtual bool onMouseButton(const EventMouseButton& event) override;
 	virtual bool onMouseMovement(const EventMouseMovement& event) override;
 	virtual bool onMouseScroll(const EventMouseScroll& event) override;
-
-//private:
-//	virtual void doProperty(const EventFocus& event) override;
 
 private:
 	virtual void doAttach() override;

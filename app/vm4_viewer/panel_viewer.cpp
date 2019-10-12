@@ -33,7 +33,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-PanelViewer::PanelViewer() : libv::ui::PanelFloat("VM4Viewer") { }
+PanelViewer::PanelViewer(BaseComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
 
 void PanelViewer::key(libv::input::Key key) {
 	if (!isAttached())
@@ -199,20 +199,20 @@ void PanelViewer::doAttach() {
 	// -------------------------------------------------------------------------------------------------
 
 	{
-		label_version = std::make_shared<libv::ui::Label>("version");
+		label_version = std::make_shared<libv::ui::Label>(*this, "version");
 		label_version->style(context().style("vm4pv.label_version"));
 		label_version->text(app::full_version);
 		add(label_version);
 	}
 
 	{
-		picker_files = std::make_shared<app::ui::QuickFilePicker>("picker");
+		picker_files = std::make_shared<app::ui::QuickFilePicker>(*this, "picker");
 		picker_files->style(context().style("vm4pv.file_list"));
 		add(picker_files);
 	}
 
 	{
-		label_version = std::make_shared<libv::ui::Label>("help");
+		label_version = std::make_shared<libv::ui::Label>(*this, "help");
 		label_version->style(context().style("vm4pv.label_help"));
 		label_version->text(
 				"Strafe camera - WASD\n"
@@ -224,12 +224,12 @@ void PanelViewer::doAttach() {
 	}
 
 	{
-		panel_left = std::make_shared<libv::ui::PanelLine>("info");
+		panel_left = std::make_shared<libv::ui::PanelLine>(*this, "info");
 		panel_left->style(context().style("vm4pv.info"));
 		add(panel_left);
 
 		{
-			button_close = std::make_shared<libv::ui::Button>("close");
+			button_close = std::make_shared<libv::ui::Button>(*panel_left, "close");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->text("Button0");
 			button_close->callback([this](const libv::ui::EventMouseButton& event) {
@@ -245,25 +245,25 @@ void PanelViewer::doAttach() {
 
 			panel_left->add(button_close);
 		} {
-			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
+			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));
 			temp->text("Project");
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::Stretch>("border");
+			auto temp = std::make_shared<libv::ui::Stretch>(*panel_left, "border");
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
+			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));
 			temp->text("File");
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::Stretch>("border");
+			auto temp = std::make_shared<libv::ui::Stretch>(*panel_left, "border");
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		} {
-			button_close = std::make_shared<libv::ui::Button>("button1");
+			button_close = std::make_shared<libv::ui::Button>(*panel_left, "button1");
 			button_close->style(context().style("vm4pv.button"));
 			button_close->text("Button1");
 			button_close->callback([this](const libv::ui::EventMouseButton& event) {
@@ -279,30 +279,30 @@ void PanelViewer::doAttach() {
 
 			panel_left->add(button_close);
 		} {
-			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
+			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));
 			temp->text("Model");
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::Stretch>("border");
+			auto temp = std::make_shared<libv::ui::Stretch>(*panel_left, "border");
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
+			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));
 			temp->text("Node");
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::Stretch>("border");
+			auto temp = std::make_shared<libv::ui::Stretch>(*panel_left, "border");
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::LabelImage>("bar");
+			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));
 			temp->text("Material");
 			panel_left->add(temp);
 		} {
-			auto temp = std::make_shared<libv::ui::Stretch>("border");
+			auto temp = std::make_shared<libv::ui::Stretch>(*panel_left, "border");
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		}

@@ -32,6 +32,7 @@
 // TODO P5: app.vm4_viewer: lighting
 // TODO P5: app.vm4_viewer: multiple light
 // TODO P5: app.vm4_viewer: shaders
+// TODO P5: app.vm4_viewer: Forward+
 // TODO P5: app.vm4_viewer: AA
 // TODO P5: app.vm4_viewer: full game render engine (what ?!)
 // TODO P5: app.vm4_viewer: texture LOD.scale change

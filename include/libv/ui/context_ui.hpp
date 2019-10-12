@@ -20,14 +20,15 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class BaseComponent;
+class ContextEvent;
 class Font2D;
+class MouseTable;
 class Shader;
 class ShaderFont;
 class ShaderImage;
 class ShaderQuad;
 class Style;
 class Texture2D;
-class MouseTable;
 class UI;
 
 class ImplContextUI;
@@ -50,6 +51,7 @@ class ContextUI {
 
 	UI& ui;
 public:
+	ContextEvent& event;
 	MouseTable& mouse;
 	Settings settings;
 

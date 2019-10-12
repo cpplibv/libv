@@ -19,14 +19,17 @@ namespace ui {
 
 class PanelFull : public BasicPanel<LayoutFull> {
 public:
-	PanelFull() :
-		BasicPanel<LayoutFull>(UnnamedTag, "full") { }
+	explicit PanelFull(ContextUI& context) : // Root only constructor
+		BasicPanel<LayoutFull>(context) { }
 
-	explicit PanelFull(std::string name) :
-		BasicPanel<LayoutFull>(std::move(name)) { }
+	explicit PanelFull(BaseComponent& parent) :
+		BasicPanel<LayoutFull>(parent, UnnamedTag, "full") { }
 
-	PanelFull(UnnamedTag_t, const std::string_view type) :
-		BasicPanel<LayoutFull>(UnnamedTag, type) { }
+	PanelFull(BaseComponent& parent, std::string name) :
+		BasicPanel<LayoutFull>(parent, std::move(name)) { }
+
+	PanelFull(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutFull>(parent, UnnamedTag, type) { }
 
 	virtual ~PanelFull() = default;
 };

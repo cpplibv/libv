@@ -38,14 +38,14 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-QuickFilePicker::QuickFilePicker() :
-	PanelLine(libv::ui::UnnamedTag, "QuickFilePicker") { }
+QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent) :
+	PanelLine(parent, libv::ui::UnnamedTag, "QFileP") { }
 
-QuickFilePicker::QuickFilePicker(std::string name) :
-	PanelLine(std::move(name)) { }
+QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, std::string name) :
+	PanelLine(parent, std::move(name)) { }
 
-QuickFilePicker::QuickFilePicker(libv::ui::UnnamedTag_t, const std::string_view type) :
-	PanelLine(libv::ui::UnnamedTag, type) { }
+QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::UnnamedTag_t, const std::string_view type) :
+	PanelLine(parent, libv::ui::UnnamedTag, type) { }
 
 QuickFilePicker::~QuickFilePicker() { }
 
@@ -63,8 +63,6 @@ void QuickFilePicker::key(libv::input::Key key) {
 		log_app.info("Select {}", select);
 		update_filelist();
 	}
-
-	update_filelist(); // TODO P1: need value change event to input field to update filelist
 }
 
 void QuickFilePicker::doAttach() {
@@ -142,28 +140,35 @@ void QuickFilePicker::doAttach() {
 	// -------------------------------------------------------------------------------------------------
 
 	{
-		search_field = std::make_shared<libv::ui::InputField>("input0");
+		search_field = std::make_shared<libv::ui::InputField>(*this, "input0");
 		search_field->style(context().style("vm4pv.info.input"));
 		search_field->text("model");
-		// hook up value change event
+		search_field->event_change(this, [this](const libv::ui::InputField::EventChange& event) {
+			(void) event;
+			this->update_filelist();
+		});
+		search_field->event_submit(this, [](const libv::ui::InputField::EventSubmit& event) {
+			// Open selected file
+			log_app.info("Submit: {}", event.component.text());
+		});
 		add(search_field);
 	}
 
 	{
-		list_panel = std::make_shared<libv::ui::PanelFull>("layer");
+		list_panel = std::make_shared<libv::ui::PanelFull>(*this, "layer");
 		auto& child = add(list_panel);
 		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
 	}
 
 	{
-		const auto input = std::make_shared<libv::ui::InputField>("input1");
+		const auto input = std::make_shared<libv::ui::InputField>(*this, "input1");
 		input->style(context().style("vm4pv.info.input"));
 		input->text("Input 1");
 		add(input);
 	}
 
 	{
-		const auto label_help = std::make_shared<libv::ui::Label>("help");
+		const auto label_help = std::make_shared<libv::ui::Label>(*this, "help");
 		label_help->style(context().style("vm4pv.file_list"));
 		label_help->text(
 				"[Up/Down] Navigate  [Enter] Open  [A-Z] Search\n"
@@ -182,15 +187,15 @@ void QuickFilePicker::update_filelist() {
 	list_panel->clear();
 
 	{
-		const auto temp = std::make_shared<libv::ui::Quad>("bg-quad");
+		const auto temp = std::make_shared<libv::ui::Quad>(*list_panel, "bg-quad");
 		temp->style(context().style("vm4pv.info.bg"));
 		list_panel->add(temp);
 	} {
-		const auto temp = std::make_shared<libv::ui::Stretch>("border");
+		const auto temp = std::make_shared<libv::ui::Stretch>(*list_panel, "border");
 		temp->style(context().style("vm4pv.info.slim_border"));
 		list_panel->add(temp);
 	} {
-		const auto panel_files = std::make_shared<libv::ui::PanelLine>("list");
+		const auto panel_files = std::make_shared<libv::ui::PanelLine>(*list_panel, "list");
 		panel_files->style(context().style("vm4pv.file_list"));
 
 //			path = "res/model";
@@ -213,7 +218,7 @@ void QuickFilePicker::update_filelist() {
 				continue;
 
 			auto ext = p.path().extension();
-			auto entry = std::make_shared<libv::ui::Label>("entry");
+			auto entry = std::make_shared<libv::ui::Label>(*list_panel, "entry");
 
 			if (select == i++)
 				entry->style(context().style("vm4pv.file_list.entry.selected"));

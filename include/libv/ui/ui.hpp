@@ -15,21 +15,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P2: libv.ui: UI Option to disable Font2D LCD sub pixel render
+// TODO P2: libv.ui: Implement Setting to disable Font2D LCD sub pixel rendering
 // TODO P2: libv.ui: Resource debugger, font and texture view at first
-// TODO P2: libv.ui: Component stack on Hover
+// TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<BaseComponent>> getComponentAt(int, int);)
 // TODO P2: libv.ui: Record create/layout/render/destroy statistics
 // TODO P3: Idea reminder: glr could be more light with signed objects, and this might be a completely different approve
 //			<0 means look at some global glr store, and its only a promise, in the future there will be an object
 //			=0 default ctor, noop
 //			>0 actual opengl object index
-// TODO P4: UI Event should not come from directly from frame but from open signals? (remove attach)
 // TODO P5: Render ui into a separate frame buffer, or option set its target
-// TODO P5: Create UIID and UIClass string "aliases" for components and use it to address string
-//		ambiguity on constructors. Names could vary, but suggested to stay short
 // TODO P5: (?) void setFocusPolicy(...);
-// TODO P5: (?) std::vector<adaptive_ptr<Component>> findComponentAt(int, int);
-// TODO P5: (?) std::vector<adaptive_ptr<Component>> getComponentAt(int, int);
 
 class BaseComponent;
 class ContextUI;
@@ -53,6 +48,7 @@ public:
 	void setSize(float x, float y, float z = 0.f) noexcept;
 	void setPosition(libv::vec3f position_) noexcept;
 	void setPosition(float x, float y, float z) noexcept;
+	BaseComponent& root() const noexcept; // TODO P5: I would really like to not give access to the root
 
 public:
 	void event(const libv::input::EventChar& event);

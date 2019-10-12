@@ -35,9 +35,9 @@ private:
 	String2D text_;
 
 public:
-	Label();
-	explicit Label(std::string name);
-	Label(UnnamedTag_t, const std::string_view type);
+	explicit Label(BaseComponent& parent);
+	Label(BaseComponent& parent, std::string name);
+	Label(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~Label();
 
 public:

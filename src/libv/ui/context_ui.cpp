@@ -15,6 +15,7 @@
 #include <string_view>
 #include <unordered_map>
 // pro
+#include <libv/ui/context_event.hpp>
 #include <libv/ui/event/mouse_table.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
@@ -34,6 +35,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct ImplContextUI {
+	ContextEvent event;
 	MouseTable mouse;
 
 	std::shared_ptr<Font2D> fallback_font;
@@ -113,6 +115,7 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 ContextUI::ContextUI(UI& ui, Settings settings) :
 	self(std::make_unique<ImplContextUI>()),
 	ui(ui),
+	event(self->event),
 	mouse(self->mouse),
 	settings(std::move(settings)) {
 

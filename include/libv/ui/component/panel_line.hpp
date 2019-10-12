@@ -19,14 +19,14 @@ namespace ui {
 
 class PanelLine : public BasicPanel<LayoutLine> {
 public:
-	PanelLine() :
-		BasicPanel<LayoutLine>(UnnamedTag, "line") { }
+	explicit PanelLine(BaseComponent& parent) :
+		BasicPanel<LayoutLine>(parent, UnnamedTag, "line") { }
 
-	explicit PanelLine(std::string name) :
-		BasicPanel<LayoutLine>(std::move(name)) { }
+	PanelLine(BaseComponent& parent, std::string name) :
+		BasicPanel<LayoutLine>(parent, std::move(name)) { }
 
-	PanelLine(UnnamedTag_t, const std::string_view type) :
-		BasicPanel<LayoutLine>(UnnamedTag, type) { }
+	PanelLine(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+		BasicPanel<LayoutLine>(parent, UnnamedTag, type) { }
 
 	virtual ~PanelLine() = default;
 };

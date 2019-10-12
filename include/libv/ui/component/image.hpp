@@ -33,9 +33,9 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	Image();
-	explicit Image(std::string name);
-	Image(UnnamedTag_t, const std::string_view type);
+	explicit Image(BaseComponent& parent);
+	Image(BaseComponent& parent, std::string name);
+	Image(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~Image();
 
 private:

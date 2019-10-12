@@ -30,9 +30,10 @@ private:
 	std::vector<typename Layout::Child> children;
 
 public:
-	BasicPanel();
-	explicit BasicPanel(std::string name);
-	BasicPanel(UnnamedTag_t, const std::string_view type);
+	explicit BasicPanel(ContextUI& context); // Root only constructor
+	explicit BasicPanel(BaseComponent& parent);
+	BasicPanel(BaseComponent& parent, std::string name);
+	BasicPanel(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	virtual ~BasicPanel();
 
 public:
@@ -54,16 +55,20 @@ protected:
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
-BasicPanel<Layout>::BasicPanel() :
-	BaseComponent(UnnamedTag, "basic-panel") { }
+BasicPanel<Layout>::BasicPanel(ContextUI& context) :
+	BaseComponent(context) { }
 
 template <typename Layout>
-BasicPanel<Layout>::BasicPanel(std::string name) :
-	BaseComponent(std::move(name)) { }
+BasicPanel<Layout>::BasicPanel(BaseComponent& parent) :
+	BaseComponent(parent, UnnamedTag, "basic-panel") { }
 
 template <typename Layout>
-BasicPanel<Layout>::BasicPanel(UnnamedTag_t, const std::string_view type) :
-	BaseComponent(UnnamedTag, type) { }
+BasicPanel<Layout>::BasicPanel(BaseComponent& parent, std::string name) :
+	BaseComponent(parent, std::move(name)) { }
+
+template <typename Layout>
+BasicPanel<Layout>::BasicPanel(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+	BaseComponent(parent, UnnamedTag, type) { }
 
 template <typename Layout>
 BasicPanel<Layout>::~BasicPanel() {

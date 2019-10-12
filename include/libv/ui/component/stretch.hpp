@@ -33,9 +33,9 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	Stretch();
-	explicit Stretch(std::string name);
-	Stretch(UnnamedTag_t, const std::string_view type);
+	explicit Stretch(BaseComponent& parent);
+	Stretch(BaseComponent& parent, std::string name);
+	Stretch(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
 	~Stretch();
 
 private:

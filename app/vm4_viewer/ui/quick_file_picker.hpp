@@ -64,9 +64,9 @@ private:
 	std::shared_ptr<libv::ui::PanelFull> list_panel;
 
 public:
-	QuickFilePicker();
-	QuickFilePicker(std::string name);
-	QuickFilePicker(libv::ui::UnnamedTag_t, const std::string_view type);
+	explicit QuickFilePicker(libv::ui::BaseComponent& parent);
+	QuickFilePicker(libv::ui::BaseComponent& parent, std::string name);
+	QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::UnnamedTag_t, const std::string_view type);
 	~QuickFilePicker();
 
 	void update_filelist();
