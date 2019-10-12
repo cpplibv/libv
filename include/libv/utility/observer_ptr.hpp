@@ -25,8 +25,10 @@ public:
 
 	constexpr inline observer_ptr() noexcept : ptr(nullptr) { }
 	constexpr inline observer_ptr(std::nullptr_t) noexcept : ptr(nullptr) { }
-	constexpr explicit inline observer_ptr(T* p) noexcept : ptr(p) { }
+	constexpr inline observer_ptr(T* p) noexcept : ptr(p) { }
+	constexpr inline observer_ptr(T& r) noexcept : ptr(std::addressof(r)) { }
 	constexpr explicit inline observer_ptr(const std::shared_ptr<T>& p) noexcept : ptr(p.get()) { }
+	constexpr explicit inline observer_ptr(const std::unique_ptr<T>& p) noexcept : ptr(p.get()) { }
 	template <typename K, typename = std::enable_if_t<std::is_base_of_v<T, K>>>
 	constexpr inline observer_ptr(const observer_ptr<K>& other) noexcept : ptr(other.get()) { }
 
