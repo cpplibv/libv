@@ -252,6 +252,7 @@ libv.ui: flatten - flatten EventMouse to combat variant complexity
 libv.ui: signal-slot and event proxies, do not store a signal inside the component, use a member function event() to yield a proxy that has many signals | Couple of changes, global ContextEvent dispatcher, no proxy
 libv.ui: contextlessness
 libv.ui: events for input field
+libv.ui: rename UnnamedTag_t to GenerateName_t
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -259,7 +260,6 @@ libv.ui: events for input field
 
 libv.ui: events for button
 
-libv.ui: rename UnnamedTag_t to GenerateName_t
 libv.ui.property: hybrid reflection - dynamic
 
 properties / style

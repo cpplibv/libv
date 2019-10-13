@@ -35,7 +35,7 @@ private:
 public:
 	explicit Image(BaseComponent& parent);
 	Image(BaseComponent& parent, std::string name);
-	Image(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	Image(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~Image();
 
 private:

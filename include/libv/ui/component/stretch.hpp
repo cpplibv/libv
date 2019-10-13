@@ -35,7 +35,7 @@ private:
 public:
 	explicit Stretch(BaseComponent& parent);
 	Stretch(BaseComponent& parent, std::string name);
-	Stretch(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	Stretch(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~Stretch();
 
 private:

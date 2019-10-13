@@ -46,7 +46,7 @@ private:
 public:
 	explicit Button(BaseComponent& parent);
 	Button(BaseComponent& parent, std::string name);
-	Button(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	Button(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~Button();
 
 public:

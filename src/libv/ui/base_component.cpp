@@ -30,7 +30,7 @@ BaseComponent::BaseComponent(BaseComponent& parent, std::string name) :
 	context_(parent.context_),
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
+BaseComponent::BaseComponent(BaseComponent& parent, GenerateName_t, const std::string_view type) :
 	context_(parent.context_),
 	name(libv::concat(type, '-', nextID++)) { }
 

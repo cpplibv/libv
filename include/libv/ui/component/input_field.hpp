@@ -77,7 +77,7 @@ private:
 public:
 	explicit InputField(BaseComponent& parent);
 	InputField(BaseComponent& parent, std::string name);
-	InputField(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	InputField(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~InputField();
 
 public:

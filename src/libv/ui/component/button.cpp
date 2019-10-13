@@ -99,13 +99,13 @@ void Button::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Button::Button(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "button") { }
+	BaseComponent(parent, GenerateName, "button") { }
 
 Button::Button(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-Button::Button(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+Button::Button(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 Button::~Button() { }
 

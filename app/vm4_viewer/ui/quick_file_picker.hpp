@@ -66,7 +66,7 @@ private:
 public:
 	explicit QuickFilePicker(libv::ui::BaseComponent& parent);
 	QuickFilePicker(libv::ui::BaseComponent& parent, std::string name);
-	QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::UnnamedTag_t, const std::string_view type);
+	QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 	~QuickFilePicker();
 
 	void update_filelist();

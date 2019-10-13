@@ -44,7 +44,7 @@ private:
 public:
 	explicit LabelImage(BaseComponent& parent);
 	LabelImage(BaseComponent& parent, std::string name);
-	LabelImage(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	LabelImage(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~LabelImage();
 
 public:

@@ -34,7 +34,7 @@ private:
 public:
 	explicit Quad(BaseComponent& parent);
 	Quad(BaseComponent& parent, std::string name);
-	Quad(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	Quad(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~Quad();
 
 private:

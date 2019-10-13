@@ -43,8 +43,8 @@ public:
 	ComponentStatic(std::string name) :
 		BaseComponent(std::move(name)) { }
 
-	ComponentStatic(UnnamedTag, const std::string_view type = "static") :
-		BaseComponent(UnnamedTag{}, type) { }
+	ComponentStatic(GenerateName, const std::string_view type = "static") :
+		BaseComponent(GenerateName{}, type) { }
 
 private:
 	constexpr inline auto& self() noexcept {

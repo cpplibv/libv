@@ -20,13 +20,13 @@ namespace ui {
 class PanelLine : public BasicPanel<LayoutLine> {
 public:
 	explicit PanelLine(BaseComponent& parent) :
-		BasicPanel<LayoutLine>(parent, UnnamedTag, "line") { }
+		BasicPanel<LayoutLine>(parent, GenerateName, "line") { }
 
 	PanelLine(BaseComponent& parent, std::string name) :
 		BasicPanel<LayoutLine>(parent, std::move(name)) { }
 
-	PanelLine(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-		BasicPanel<LayoutLine>(parent, UnnamedTag, type) { }
+	PanelLine(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+		BasicPanel<LayoutLine>(parent, GenerateName, type) { }
 
 	virtual ~PanelLine() = default;
 };

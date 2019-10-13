@@ -33,7 +33,7 @@ public:
 	explicit BasicPanel(ContextUI& context); // Root only constructor
 	explicit BasicPanel(BaseComponent& parent);
 	BasicPanel(BaseComponent& parent, std::string name);
-	BasicPanel(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	BasicPanel(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	virtual ~BasicPanel();
 
 public:
@@ -60,15 +60,15 @@ BasicPanel<Layout>::BasicPanel(ContextUI& context) :
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "basic-panel") { }
+	BaseComponent(parent, GenerateName, "basic-panel") { }
 
 template <typename Layout>
 BasicPanel<Layout>::BasicPanel(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
 template <typename Layout>
-BasicPanel<Layout>::BasicPanel(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+BasicPanel<Layout>::BasicPanel(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 template <typename Layout>
 BasicPanel<Layout>::~BasicPanel() {

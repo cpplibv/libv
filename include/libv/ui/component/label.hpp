@@ -37,7 +37,7 @@ private:
 public:
 	explicit Label(BaseComponent& parent);
 	Label(BaseComponent& parent, std::string name);
-	Label(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	Label(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~Label();
 
 public:

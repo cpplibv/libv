@@ -98,13 +98,13 @@ void LabelImage::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 LabelImage::LabelImage(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "label-image") { }
+	BaseComponent(parent, GenerateName, "label-image") { }
 
 LabelImage::LabelImage(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-LabelImage::LabelImage(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+LabelImage::LabelImage(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 LabelImage::~LabelImage() { }
 

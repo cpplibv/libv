@@ -23,13 +23,13 @@ public:
 		BasicPanel<LayoutFull>(context) { }
 
 	explicit PanelFull(BaseComponent& parent) :
-		BasicPanel<LayoutFull>(parent, UnnamedTag, "full") { }
+		BasicPanel<LayoutFull>(parent, GenerateName, "full") { }
 
 	PanelFull(BaseComponent& parent, std::string name) :
 		BasicPanel<LayoutFull>(parent, std::move(name)) { }
 
-	PanelFull(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-		BasicPanel<LayoutFull>(parent, UnnamedTag, type) { }
+	PanelFull(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+		BasicPanel<LayoutFull>(parent, GenerateName, type) { }
 
 	virtual ~PanelFull() = default;
 };

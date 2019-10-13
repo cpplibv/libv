@@ -45,13 +45,13 @@ void Stretch::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Stretch::Stretch(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "stretch") { }
+	BaseComponent(parent, GenerateName, "stretch") { }
 
 Stretch::Stretch(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-Stretch::Stretch(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+Stretch::Stretch(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 Stretch::~Stretch() { }
 

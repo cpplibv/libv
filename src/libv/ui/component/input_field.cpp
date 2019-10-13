@@ -119,13 +119,13 @@ void InputField::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 InputField::InputField(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "input-field") { }
+	BaseComponent(parent, GenerateName, "input-field") { }
 
 InputField::InputField(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-InputField::InputField(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+InputField::InputField(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 InputField::~InputField() { }
 

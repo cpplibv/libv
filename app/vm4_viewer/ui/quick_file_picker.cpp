@@ -39,13 +39,13 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent) :
-	PanelLine(parent, libv::ui::UnnamedTag, "QFileP") { }
+	PanelLine(parent, libv::ui::GenerateName, "QFileP") { }
 
 QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, std::string name) :
 	PanelLine(parent, std::move(name)) { }
 
-QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::UnnamedTag_t, const std::string_view type) :
-	PanelLine(parent, libv::ui::UnnamedTag, type) { }
+QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
+	PanelLine(parent, libv::ui::GenerateName, type) { }
 
 QuickFilePicker::~QuickFilePicker() { }
 

@@ -39,8 +39,8 @@ class EventMouseScroll;
 
 // -------------------------------------------------------------------------------------------------
 
-struct UnnamedTag_t {};
-static constexpr UnnamedTag_t UnnamedTag;
+struct GenerateName_t {};
+static constexpr GenerateName_t GenerateName;
 
 using ChildID = int32_t;
 static constexpr ChildID ChildIDSelf = -2;
@@ -78,7 +78,7 @@ public:
 public:
 	explicit BaseComponent(ContextUI& context); // Root only constructor
 	BaseComponent(BaseComponent& parent, std::string name);
-	BaseComponent(BaseComponent& parent, UnnamedTag_t, const std::string_view type);
+	BaseComponent(BaseComponent& parent, GenerateName_t, const std::string_view type);
 
 	BaseComponent(const BaseComponent&) = delete;
 	BaseComponent(BaseComponent&&) = delete;

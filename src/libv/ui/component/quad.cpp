@@ -37,13 +37,13 @@ void Quad::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Quad::Quad(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "quad") { }
+	BaseComponent(parent, GenerateName, "quad") { }
 
 Quad::Quad(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-Quad::Quad(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+Quad::Quad(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 Quad::~Quad() { }
 

@@ -45,13 +45,13 @@ void Image::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Image::Image(BaseComponent& parent) :
-	BaseComponent(parent, UnnamedTag, "image") { }
+	BaseComponent(parent, GenerateName, "image") { }
 
 Image::Image(BaseComponent& parent, std::string name) :
 	BaseComponent(parent, std::move(name)) { }
 
-Image::Image(BaseComponent& parent, UnnamedTag_t, const std::string_view type) :
-	BaseComponent(parent, UnnamedTag, type) { }
+Image::Image(BaseComponent& parent, GenerateName_t, const std::string_view type) :
+	BaseComponent(parent, GenerateName, type) { }
 
 Image::~Image() { }
 

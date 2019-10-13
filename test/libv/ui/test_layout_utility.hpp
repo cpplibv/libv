@@ -52,7 +52,7 @@ class TestComponent : public libv::ui::BaseComponent {
 public:
 	libv::vec3f dynamicSize = {};
 
-	TestComponent() : libv::ui::BaseComponent(libv::ui::UnnamedTag, "test") {};
+	TestComponent() : libv::ui::BaseComponent(libv::ui::GenerateName, "test") {};
 
 	virtual void doLayout1(const libv::ui::ContextLayout1&) override {
 		libv::ui::AccessLayout::lastDynamic(*this) = dynamicSize;
