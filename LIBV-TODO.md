@@ -254,6 +254,7 @@ libv.ui: contextlessness
 libv.ui: events for input field
 libv.ui: rename UnnamedTag_t to GenerateName_t
 libv.ui: events for button
+ext: adopt https://github.com/dacap/clip
 
 
 --- STACK ------------------------------------------------------------------------------------------

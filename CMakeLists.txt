@@ -311,6 +311,21 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME clip
+	GIT_REPOSITORY https://github.com/dacap/clip.git
+	GIT_TAG 3c8f05b5d71a4d5ea7125f074323307293332a92
+	CMAKE_ARGS
+		-DCLIP_EXAMPLES=OFF
+		-DCLIP_TESTS=OFF
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/clip/include/clip/
+		COMMAND mkdir -p ${PATH_EXT}/clip/lib/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/clip/src/get_clip/clip.h ${PATH_EXT}/clip/include/clip/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/clip/src/get_clip-build/libclip.a ${PATH_EXT}/clip/lib/
+	LINK clip
+)
+
+wish_create_external(
 	NAME ctre
 	GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
 	GIT_TAG 42aab3969a1ea48ed146b55fb1e97e720da11849
