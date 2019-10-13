@@ -9,6 +9,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
@@ -157,35 +158,54 @@ const std::string& Button::text() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void Button::callback(std::function<void(const EventMouseButton&)> callback) {
-	mouseWatcher.cb_button = std::move(callback);
-}
-
-void Button::callback(std::function<void(const EventMouseMovement&)> callback) {
-	mouseWatcher.cb_movement = std::move(callback);
-}
-
-void Button::callback(std::function<void(const EventMouseScroll&)> callback) {
-	mouseWatcher.cb_scroll = std::move(callback);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 void Button::onFocus(const EventFocus& event) {
 	(void) event;
 	// TODO P3: listen to hotkey event (ui.select)
+
+	if (event.loss)
+		{} // Set style to normal or disabled
+
+	if (event.gain)
+		{} // Set style to active if not disabled
+
+	flagAuto(Flag::pendingRender);
+}
+
+bool Button::onMouseButton(const EventMouseButton& event) {
+	if (event.action == libv::input::Action::press)
+		focus();
+
+	fire(EMouseButton{event, *this});
+
+	// TODO P3: use hotkey event (ui.select) (even for mouse)
+	if (event.action == libv::input::Action::press && event.button == libv::input::Mouse::Left)
+		fire(ESubmit{*this});
+	return true;
+}
+
+bool Button::onMouseMovement(const EventMouseMovement& event) {
+	if (event.enter)
+		set(property.bg_color, property.bg_color() + 0.2f);
+		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+
+	if (event.leave)
+		reset(property.bg_color);
+		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+
+	fire(EMouseMovement{event, *this});
+	return true;
+}
+
+bool Button::onMouseScroll(const EventMouseScroll& event) {
+	fire(EMouseScroll{event, *this});
+	return true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Button::doAttach() {
-	flagAuto(Flag::focusable);
-//	context().mouse.subscribe(mouseWatcher, MouseInterest::release);
-	context().mouse.subscribe(mouseWatcher, Flag::mask_watchMouse);
-}
-
-void Button::doDetach() {
-	context().mouse.unsubscribe(mouseWatcher);
+	watchFocus(true);
+	watchMouse(Flag::mask_watchMouse);
 }
 
 void Button::doStyle(ContextStyle& ctx) {
@@ -203,11 +223,6 @@ void Button::doLayout1(const ContextLayout1& environment) {
 }
 
 void Button::doLayout2(const ContextLayout2& environment) {
-	context().mouse.update(
-			mouseWatcher,
-			libv::vec::xy(environment.position),
-			libv::vec::xy(environment.size),
-			environment.mouseOrder);
 	text_.setLimit(libv::vec::xy(environment.size));
 }
 

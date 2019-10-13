@@ -231,16 +231,18 @@ void PanelViewer::doAttach() {
 		{
 			button_close = std::make_shared<libv::ui::Button>(*panel_left, "close");
 			button_close->style(context().style("vm4pv.button"));
-			button_close->text("Button0");
-			button_close->callback([this](const libv::ui::EventMouseButton& event) {
-				button_close->focus();
-				log_app.trace("Button0 Click {} {}", libv::input::to_string(event.button),  libv::input::to_string(event.action));
+			button_close->text("Close");
+			button_close->event_mouseButton(this, [this](const libv::ui::Button::EMouseButton& event) {
+				log_app.trace("Close Click {} {}", libv::input::to_string(event.button),  libv::input::to_string(event.action));
 			});
-			button_close->callback([this](const libv::ui::EventMouseMovement& event) {
-				log_app.trace("Button0 Movement {} {} {} {}", event.mouse_position, event.mouse_movement, event.enter, event.leave);
+			button_close->event_mouseMovement(this, [this](const libv::ui::Button::EMouseMovement& event) {
+				log_app.trace("Close Movement {} {} {} {}", event.mouse_position, event.mouse_movement, event.enter, event.leave);
 			});
-			button_close->callback([this](const libv::ui::EventMouseScroll& event) {
-				log_app.trace("Button0 Scroll {} {}", event.scroll_position, event.scroll_movement);
+			button_close->event_mouseScroll(this, [this](const libv::ui::Button::EMouseScroll& event) {
+				log_app.trace("Close Scroll {} {}", event.scroll_position, event.scroll_movement);
+			});
+			button_close->event_submit(this, [this](const libv::ui::Button::ESubmit&) {
+				log_app.trace("Close Submit");
 			});
 
 			panel_left->add(button_close);
@@ -263,21 +265,23 @@ void PanelViewer::doAttach() {
 			temp->style(context().style("vm4pv.info.slim_border"));
 			panel_left->add(temp);
 		} {
-			button_close = std::make_shared<libv::ui::Button>(*panel_left, "button1");
-			button_close->style(context().style("vm4pv.button"));
-			button_close->text("Button1");
-			button_close->callback([this](const libv::ui::EventMouseButton& event) {
-				button_close->focus();
+			auto temp = std::make_shared<libv::ui::Button>(*panel_left, "button1");
+			temp->style(context().style("vm4pv.button"));
+			temp->text("Button1");
+			temp->event_mouseButton(this, [this](const libv::ui::Button::EMouseButton& event) {
 				log_app.trace("Button1 Click {} {}", libv::input::to_string(event.button),  libv::input::to_string(event.action));
 			});
-			button_close->callback([this](const libv::ui::EventMouseMovement& event) {
+			temp->event_mouseMovement(this, [this](const libv::ui::Button::EMouseMovement& event) {
 				log_app.trace("Button1 Movement {} {} {} {}", event.mouse_position, event.mouse_movement, event.enter, event.leave);
 			});
-			button_close->callback([this](const libv::ui::EventMouseScroll& event) {
+			temp->event_mouseScroll(this, [this](const libv::ui::Button::EMouseScroll& event) {
 				log_app.trace("Button1 Scroll {} {}", event.scroll_position, event.scroll_movement);
 			});
+			temp->event_submit(this, [this](const libv::ui::Button::ESubmit&) {
+				log_app.trace("Button1 Submit");
+			});
 
-			panel_left->add(button_close);
+			panel_left->add(temp);
 		} {
 			auto temp = std::make_shared<libv::ui::LabelImage>(*panel_left, "bar");
 			temp->style(context().style("vm4pv.info.bar"));

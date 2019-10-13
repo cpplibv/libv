@@ -4,13 +4,14 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
+#include <libv/input/input.hpp>
 // std
 #include <functional>
 #include <string>
 #include <string_view>
 // pro
 #include <libv/ui/base_component.hpp>
-#include <libv/ui/event/mouse_watcher.hpp>
+#include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/string_2D.hpp>
 
@@ -21,6 +22,23 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class Button : public BaseComponent {
+public:
+	struct EMouseButton : libv::ui::EventMouseButton {
+		Button& component;
+	};
+
+	struct EMouseMovement : libv::ui::EventMouseMovement {
+		Button& component;
+	};
+
+	struct EMouseScroll : libv::ui::EventMouseScroll {
+		Button& component;
+	};
+
+	struct ESubmit {
+		Button& component;
+	};
+
 private:
 	template <typename T>
 	static void access_properties(T& ctx);
@@ -41,7 +59,6 @@ private:
 private:
 	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	String2D text_;
-	MouseWatcher mouseWatcher;
 
 public:
 	explicit Button(BaseComponent& parent);
@@ -63,17 +80,34 @@ public:
 	const std::string& text() const noexcept;
 
 public:
-	// TODO P1: libv.ui Think about a signal-slot pattern very hard
-	void callback(std::function<void(const EventMouseButton&)> callback);
-	void callback(std::function<void(const EventMouseMovement&)> callback);
-	void callback(std::function<void(const EventMouseScroll&)> callback);
+	template <typename F>
+	inline void event_mouseButton(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EMouseButton>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_mouseMovement(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EMouseMovement>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_mouseScroll(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EMouseScroll>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_submit(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<ESubmit>(slot, std::forward<F>(func));
+	}
 
 private:
 	virtual void onFocus(const EventFocus& event) override;
+	virtual bool onMouseButton(const EventMouseButton& event) override;
+	virtual bool onMouseMovement(const EventMouseMovement& event) override;
+	virtual bool onMouseScroll(const EventMouseScroll& event) override;
 
 private:
 	virtual void doAttach() override;
-	virtual void doDetach() override;
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;

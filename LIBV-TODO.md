@@ -253,12 +253,11 @@ libv.ui: signal-slot and event proxies, do not store a signal inside the compone
 libv.ui: contextlessness
 libv.ui: events for input field
 libv.ui: rename UnnamedTag_t to GenerateName_t
+libv.ui: events for button
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui: events for button
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -311,6 +310,7 @@ component
 	libv.ui: scroll bar (without the pane itself, aka slider) | NOTE: Check git stash
 	libv.ui: clipping vertex shader (with on/off)
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
+	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
@@ -321,7 +321,6 @@ ui
 	libv.ui: fragments
 	libv.ui: static_component system
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
-	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 
