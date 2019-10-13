@@ -55,7 +55,7 @@ public:
 
 public:
 	constexpr inline T* release() noexcept {
-		T * p(ptr);
+		T* p(ptr);
 		reset();
 		return p;
 	}
@@ -66,50 +66,63 @@ public:
 	constexpr inline void swap(observer_ptr<K>& other) noexcept {
 		std::swap(ptr, other.ptr);
 	}
-};
 
-template <typename T1, typename T2>
-constexpr inline bool operator==(observer_ptr<T1> p1, observer_ptr<T2> p2) noexcept {
-	return p1.get() == p2.get();
-}
-template <typename T1, typename T2>
-constexpr inline bool operator!=(observer_ptr<T1> p1, observer_ptr<T2> p2) noexcept {
-	return !(p1 == p2);
-}
-template <typename T>
-constexpr inline bool operator==(observer_ptr<T> p, std::nullptr_t) noexcept {
-	return p.get() == nullptr;
-}
-template <typename T>
-constexpr inline bool operator==(std::nullptr_t, observer_ptr<T> p) noexcept {
-	return nullptr == p.get();
-}
-template <typename T>
-constexpr inline bool operator!=(observer_ptr<T> p, std::nullptr_t) noexcept {
-	return p.get() != nullptr;
-}
-template <typename T>
-constexpr inline bool operator!=(std::nullptr_t, observer_ptr<T> p) noexcept {
-	return nullptr != p.get();
-}
-template <typename T1, typename T2>
-constexpr inline bool operator<(observer_ptr<T1> p1, observer_ptr<T2> p2) noexcept {
-	return std::less<T1*>()(p1.get(), p2.get());
-	// return std::less<T3>()( p1.get(), p2.get() );
-	// where T3 is the composite T* type (C++14 §5) of T1* and T2*.
-}
-template <typename T>
-constexpr inline bool operator>(observer_ptr<T> p1, observer_ptr<T> p2) noexcept {
-	return p2 < p1;
-}
-template <typename T>
-constexpr inline bool operator<=(observer_ptr<T> p1, observer_ptr<T> p2) noexcept {
-	return !(p2 < p1);
-}
-template <typename T>
-constexpr inline bool operator>=(observer_ptr<T> p1, observer_ptr<T> p2) noexcept {
-	return !(p1 < p2);
-}
+public:
+	template <typename T2>
+	friend constexpr inline bool operator==(T2* p1, observer_ptr p2) noexcept {
+		return p1 == p2.get();
+	}
+	template <typename T2>
+	friend constexpr inline bool operator==(observer_ptr p1, T2* p2) noexcept {
+		return p1.get() == p2;
+	}
+	template <typename T2>
+	friend constexpr inline bool operator!=(T2* p1, observer_ptr p2) noexcept {
+		return !(p1 == p2);
+	}
+	template <typename T2>
+	friend constexpr inline bool operator!=(observer_ptr p1, T2* p2) noexcept {
+		return !(p1 == p2);
+	}
+	template <typename T2>
+	friend constexpr inline bool operator==(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return p1.get() == p2.get();
+	}
+	template <typename T2>
+	friend constexpr inline bool operator!=(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return !(p1 == p2);
+	}
+	friend constexpr inline bool operator==(observer_ptr p, std::nullptr_t) noexcept {
+		return p.get() == nullptr;
+	}
+	friend constexpr inline bool operator==(std::nullptr_t, observer_ptr p) noexcept {
+		return nullptr == p.get();
+	}
+	friend constexpr inline bool operator!=(observer_ptr p, std::nullptr_t) noexcept {
+		return p.get() != nullptr;
+	}
+	friend constexpr inline bool operator!=(std::nullptr_t, observer_ptr p) noexcept {
+		return nullptr != p.get();
+	}
+	template <typename T2>
+	friend constexpr inline bool operator<(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return p1.get() < p2.get();
+		// return std::less<T3>()( p1.get(), p2.get() );
+		// where T3 is the composite T* type (C++14 §5) of T1* and T2*.
+	}
+	template <typename T2>
+	friend constexpr inline bool operator>(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return p2 < p1;
+	}
+	template <typename T2>
+	friend constexpr inline bool operator<=(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return !(p2 < p1);
+	}
+	template <typename T2>
+	friend constexpr inline bool operator>=(observer_ptr p1, observer_ptr<T2> p2) noexcept {
+		return !(p1 < p2);
+	}
+};
 
 // specialized algorithms --------------------------------------------------------------------------
 
