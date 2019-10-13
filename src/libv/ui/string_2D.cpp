@@ -10,6 +10,7 @@
 #include <libv/algorithm/slice.hpp>
 #include <libv/range/view_uft8_codepoints.hpp>
 #include <libv/utility/observer_ref.hpp>
+#include <libv/utility/utf8.hpp>
 // std
 #include <array>
 #include <cmath>
@@ -36,6 +37,12 @@ static constexpr uint32_t invalidCodepointReplacement = '_';
 // -------------------------------------------------------------------------------------------------
 
 String2D::String2D() { }
+
+// -------------------------------------------------------------------------------------------------
+
+size_t String2D::length() const noexcept {
+	return libv::distance_utf8_unchecked(string);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -96,6 +103,53 @@ void String2D::setLimit(const libv::vec2f limit_) {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void String2D::insert(size_t position, uint32_t unicode) {
+	if (!utf8::internal::is_code_point_valid(unicode)) {
+		log_ui.error("Attempted to insert an invalid codepoint: {} at {} substituting with {}", unicode, position, invalidCodepointReplacement);
+		unicode = invalidCodepointReplacement;
+	}
+
+	libv::insert_utf8_unchecked(string, position, unicode);
+
+	dirty = true;
+}
+
+size_t String2D::insert(size_t position, const std::string_view string_) {
+	size_t codepoints = 0;
+
+	if (utf8::is_valid(string_.begin(), string_.end())) {
+		libv::insert_utf8_unchecked(string, position, string_);
+		codepoints = libv::distance_utf8_unchecked(string_);
+
+	} else {
+		std::string fixedString;
+		utf8::replace_invalid(string_.begin(), string_.end(), std::back_inserter(fixedString), '_');
+		log_ui.error("Attempted to insert invalid utf8 string: \"{}\" at {} substituting with \"{}\"",
+				string_, position, fixedString);
+
+		libv::insert_utf8_unchecked(string, position, fixedString);
+		codepoints = libv::distance_utf8_unchecked(fixedString);
+	}
+
+	dirty = true;
+	return codepoints;
+}
+
+void String2D::erase(size_t position, size_t count) {
+	auto it = string.begin();
+
+	if (!libv::advance_utf8_unchecked(it, string.end(), position))
+		return log_ui.error("Invalid position {}. Failed to erase {} character in string {}: \"{}\"", position, count, string);
+
+	const auto from = it;
+
+	if (!libv::advance_utf8_unchecked(it, string.end(), count))
+		return log_ui.error("Invalid position {}. Failed to erase {} character in string {}: \"{}\"", position, count, string);
+
+	string.erase(from, it);
+	dirty = true;
+}
 
 void String2D::push_back(uint32_t unicode) {
 	if (!utf8::internal::is_code_point_valid(unicode)) {
@@ -199,8 +253,9 @@ libv::vec2f String2D::getCharacterPosition() {
 
 libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
 	auto it = string.begin();
-	for (size_t i = 0; i < characterIndex && it != string.end(); ++i)
-		utf8::unchecked::next(it);
+
+	if (!libv::advance_utf8_unchecked(it, string.end(), characterIndex))
+		log_ui.warn("Invalid character index {}. Failed to get character position. Returning last character position of {}", characterIndex, length());
 
 	if (it == string.end())
 		return getCharacterPosition();

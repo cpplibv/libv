@@ -31,6 +31,12 @@ namespace ui {
 
 template <typename T>
 void InputField::access_properties(T& ctx) {
+//	ctx.property(
+//			[](auto& c) -> auto& { return c.property.focus_select_policy; },
+//			FocusSelectPolicy::caretAtCursorOrEnd,
+//			pgr::behaviour, pnm::focus_select_policy,
+//			"Focus select policy"
+//	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.bg_color; },
 			Color(1, 1, 1, 1),
@@ -179,8 +185,11 @@ const std::string& InputField::text() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 bool InputField::onChar(const libv::input::EventChar& event) {
-	text_.push_back(event.utf8.data());
+	text_.insert(caret, event.unicode);
+//	text_.insert(caret, event.utf8.data());
+//	text_.push_back(event.utf8.data());
 
+	caret++;
 	caretStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	fire(EventChange{*this});
@@ -189,8 +198,21 @@ bool InputField::onChar(const libv::input::EventChar& event) {
 
 bool InputField::onKey(const libv::input::EventKey& event) {
 	if (event.key == libv::input::Key::Backspace && event.action != libv::input::Action::release) {
-		text_.pop_back();
+		if (caret > 0) {
+			text_.erase(caret - 1, 1);
+			caret--;
+		}
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventChange{*this});
+		return true;
+	}
 
+	if (event.key == libv::input::Key::Delete && event.action != libv::input::Action::release) {
+		if (caret < text_.length())
+			text_.erase(caret, 1);
+
+		// On delete caret does not moves
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventChange{*this});
@@ -217,7 +239,8 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	}
 
 	if (event.key == libv::input::Key::V && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
-		text_.push_back(context().clipboardText());
+		const auto clip = context().clipboardText();
+		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -225,24 +248,66 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		return true;
 	}
 
+	if (event.key == libv::input::Key::Left && event.action != libv::input::Action::release) {
+		if (caret > 0)
+			caret--;
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+
+	if (event.key == libv::input::Key::Right&& event.action != libv::input::Action::release) {
+		if (caret < text_.length())
+			caret++;
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+
+	if (event.key == libv::input::Key::Home&& event.action != libv::input::Action::release) {
+		caret = 0;
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+
+	if (event.key == libv::input::Key::End&& event.action != libv::input::Action::release) {
+		caret = static_cast<uint32_t>(text_.length());
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+
 	return false;
 }
 
 void InputField::onFocus(const EventFocus& event) {
-	if (event.loss)
-		{} // Set style to normal or disabled
-
-	if (event.gain) {
-		{} // Set style to active if not disabled
-		caretStartTime = clock::now();
+	if (event.loss) {
+		// TODO P5: Set style to normal or disabled
+//		flagAuto(Flag::pendingRender);
 	}
 
-	flagAuto(Flag::pendingRender);
+	if (event.gain) {
+		// TODO P5: Set style to active if not disabled
+
+		// TODO P5: Implement FocusSelectPolicy property, half is in onFocus, half is onMouseButton
+//		property.focus_select_policy = FocusSelectPolicy::caretAtCursorOrEnd;
+//		if (property.focus_select_policy == FocusSelectPolicy::caretAtCursorOrEnd)
+//		caret = 0; // Begin
+//		caret = caret; // History
+		caret = static_cast<uint32_t>(text_.length()); // End
+		// caret = do not change if focus was initiated by cursor to retain caret placement by the cursor | NOPE, focus event should happen from inside mouse button, so after focus() call simple caret set and we done
+
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingRender | Flag::pendingLayout);
+	}
 }
 
 bool InputField::onMouseButton(const EventMouseButton& event) {
 	if (event.action == libv::input::Action::press)
 		focus();
+
+//	caret = text_.getClosestCharacterIndex(position() - event.universe.mousePosition);
 
 	return true;
 }
@@ -289,7 +354,7 @@ void InputField::doLayout1(const ContextLayout1& environment) {
 
 void InputField::doLayout2(const ContextLayout2& environment) {
 	text_.setLimit(libv::vec::xy(environment.size));
-	caretPosition = text_.getCharacterPosition();
+	caretPosition = text_.getCharacterPosition(caret);
 }
 
 void InputField::doRender(ContextRender& ctx) {

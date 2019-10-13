@@ -23,6 +23,15 @@ namespace ui {
 
 class InputField : public BaseComponent {
 public:
+	enum class FocusSelectPolicy {
+		// TODO P5: Implement FocusSelectPolicy
+		caretAtEnd = 0,
+		caretAtBeginning,
+		caretAtHistory,
+		selectAll,
+	};
+
+public:
 	struct EventChange {
 		InputField& component;
 
@@ -50,6 +59,8 @@ private:
 //	static ComponentPropertyDescription description;
 
 	struct Properties {
+		PropertyB<FocusSelectPolicy> focus_select_policy;
+
 		PropertyR<Color> bg_color;
 		PropertyL<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
@@ -73,6 +84,7 @@ private:
 private:
 	time_point caretStartTime;
 	libv::vec2f caretPosition;
+	uint32_t caret = 0; /// 0 = Before the first character, n = Before the nth character, length() = After the last character
 
 public:
 	explicit InputField(BaseComponent& parent);

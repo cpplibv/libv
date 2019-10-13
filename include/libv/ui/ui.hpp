@@ -100,34 +100,6 @@ void UI::attach(Frame& frame) {
 	frame.onMouseScroll.output([this](const auto& e) {
 		this->event(e);
 	});
-
-//		frame.onContextCreate.output([this](const auto&) {
-//			this->create();
-//		});
-//		frame.onContextUpdate.output([this](const auto&) {
-//			this->update();
-//		});
-//		frame.onContextDestroy.output([this](const auto&) {
-//			this->destroy();
-//		});
-
-	//	frame->onSize.output([this](auto e) {
-	//		this->setSize(e.size);
-	//		this->content.set(Property::Size, px(e.size.x), px(e.size.y), 0);
-	//	});
-	//	frame->onClosed.output([this](auto /*frame*/) {
-	//		this->destroy();
-	//	});
-
-	//	frame.onContextCreate.output(create, this);
-	//	frame.onContextUpdate.output(update, this);
-	//	frame.onContextDestroy.output(destroy, this);
-
-	//	frame.onKey();
-	//	frame.onChar();
-	//	frame.onMouse();
-	//	frame.onMouseButton();
-	//	frame.onMouseLeave();
 }
 
 // -------------------------------------------------------------------------------------------------

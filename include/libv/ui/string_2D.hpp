@@ -58,6 +58,9 @@ public:
 	String2D();
 
 public:
+	[[nodiscard]] size_t length() const noexcept;
+
+public:
 	void setAlign(const AlignHorizontal align);
 	void setFont(std::shared_ptr<Font2D> font);
 	void setFont(std::shared_ptr<Font2D> font, const FontSize fontSize);
@@ -67,50 +70,55 @@ public:
 	inline void setLimit(const float x, const float y) { setLimit({x, y}); }
 
 public:
+	void insert(size_t position, uint32_t unicode);
+	/// @return the number of codepoints inserted
+	size_t insert(size_t position, const std::string_view string_);
+	void erase(size_t position, size_t count = 1);
+
 	void push_back(uint32_t unicode);
 	void push_back(const std::string_view string_);
 	void pop_back();
 
 public:
-	inline AlignHorizontal getAlign() const noexcept {
+	[[nodiscard]] inline AlignHorizontal getAlign() const noexcept {
 		return align;
 	}
 
-	inline const std::string& getString() const noexcept {
+	[[nodiscard]] inline const std::string& getString() const noexcept {
 		return string;
 	}
 
-	inline const std::shared_ptr<Font2D>& getFont() const noexcept {
+	[[nodiscard]] inline const std::shared_ptr<Font2D>& getFont() const noexcept {
 		return font;
 	}
 
-	inline FontSize getSize() const noexcept {
+	[[nodiscard]] inline FontSize getSize() const noexcept {
 		return fontSize;
 	}
 
 	/// @param limit - The maximum available space that can be used to layout
 	/// @note Negative \c limit values are representing unbounded limits
 	/// @return the necessary space to layout while obeying the \c limit
-	libv::vec2f getContent(libv::vec2f limit);
+	[[nodiscard]] libv::vec2f getContent(libv::vec2f limit);
 
 	/// @param x - The maximum available width that can be used to layout
 	/// @param y - The maximum available height that can be used to layout
 	/// @note Negative \c x and \c y values are representing unbounded limits
 	/// @return the necessary space to layout while obeying the \c limit
-	inline libv::vec2f getContent(const float x, const float y) {
+	[[nodiscard]] inline libv::vec2f getContent(const float x, const float y) {
 		return getContent({x, y});
 	}
 
 public:
-	const libv::glr::Mesh& mesh();
+	[[nodiscard]] const libv::glr::Mesh& mesh();
 
 public:
-	libv::vec2f getCharacterPosition();
-	libv::vec2f getCharacterPosition(size_t characterIndex);
+	[[nodiscard]] libv::vec2f getCharacterPosition();
+	[[nodiscard]] libv::vec2f getCharacterPosition(size_t characterIndex);
 //	libv::vec2f getLinePosition();
 //	libv::vec2f getLinePosition(size_t lineIndex);
-//
-//	size_t getClosestCharacterIndex(libv::vec2f position);
+
+	size_t getClosestCharacterIndex(libv::vec2f position);
 //	size_t getClosestLineIndex(libv::vec2f position);
 
 private:

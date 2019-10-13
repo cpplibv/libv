@@ -258,13 +258,18 @@ ext: adopt https://github.com/dacap/clip
 libv.ui: clipboard access from ContextUI
 libv.ui.input_field: paste support
 libv.ui.input_field: copy support
+libv.ui.input_field: caret support
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.input_field: caret support
+libv.ui.input_field: bugfix for new line (glpyhless) mean no entry in the mesh for it
+
 libv.ui.input_field: caret mouse support
+libv.ui.input_field: cut support
+
+libv.ui: String2D set/get modernization
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -296,6 +301,7 @@ cleanup
 	libv.ui: remove layout1 pass member variables in component_base
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
+	libv.ui: fatal log before every assert
 
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
@@ -353,6 +359,7 @@ interactive
 	libv.ui.input_field: input mask (this will possibly a different input_field type)
 	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
 	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
+	libv.ui.input_field: Implement FocusSelectPolicy
 
 hotkey
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
@@ -367,7 +374,10 @@ hotkey
 	libv.ui.hotkey: ui.focus-tab-forward = ctrl+tab
 	libv.ui.hotkey: ui.new-line = enter
 	libv.ui.hotkey: ui.select = space
-	libv.ui.hotkey: ui.send = ctrl+enter
+	libv.ui.hotkey: ui.send = enter
+	libv.ui.hotkey: ui.send = kp-enter
+	libv.ui.hotkey: ui.send-alt = shift+enter
+	libv.ui.hotkey: ui.send-alt = shift+kp-enter
 	libv.ui.hotkey: ui.text.cursor-down = down
 	libv.ui.hotkey: ui.text.cursor-left = left
 	libv.ui.hotkey: ui.text.cursor-right = right

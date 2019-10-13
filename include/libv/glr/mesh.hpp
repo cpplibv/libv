@@ -377,6 +377,10 @@ public:
 		return MeshIndices{remote->indices};
 	}
 
+	[[nodiscard]] size_t index_size() const noexcept {
+		return remote->indices.data.size();
+	}
+
 	void clear() {
 		// TODO P5: Think about if replacing is the best way to clear
 		remote = std::make_shared<RemoteMesh>(remote->primitive, remote->usage);

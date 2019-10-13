@@ -93,6 +93,7 @@ static constexpr libv::fixed_string caret_color = "caret_color";
 static constexpr libv::fixed_string caret_shader = "caret_shader";
 static constexpr libv::fixed_string color = "color";
 static constexpr libv::fixed_string column_count = "column_count";
+static constexpr libv::fixed_string focus_select_policy = "focus_select_policy";
 static constexpr libv::fixed_string font = "font";
 static constexpr libv::fixed_string font_color = "font_color";
 static constexpr libv::fixed_string font_shader = "font_shader";
@@ -163,15 +164,21 @@ class Property<void> : public BaseProperty {
 };
 
 template <typename T = void>
-class PropertyL : public Property<T> {
+class PropertyB : public Property<T> {
 public:
-	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
+	static constexpr Flag_t invalidate = Flag::none;
 };
 
 template <typename T = void>
 class PropertyR : public Property<T> {
 public:
 	static constexpr Flag_t invalidate = Flag::pendingRender;
+};
+
+template <typename T = void>
+class PropertyL : public Property<T> {
+public:
+	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
 };
 
 // -------------------------------------------------------------------------------------------------
