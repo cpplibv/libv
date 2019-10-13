@@ -207,6 +207,24 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		return true;
 	}
 
+	if (event.key == libv::input::Key::C && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
+		context().clipboardText(text_.getString());
+
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventChange{*this});
+		return true;
+	}
+
+	if (event.key == libv::input::Key::V && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
+		text_.push_back(context().clipboardText());
+
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventChange{*this});
+		return true;
+	}
+
 	return false;
 }
 

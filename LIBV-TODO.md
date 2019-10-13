@@ -255,10 +255,16 @@ libv.ui: events for input field
 libv.ui: rename UnnamedTag_t to GenerateName_t
 libv.ui: events for button
 ext: adopt https://github.com/dacap/clip
+libv.ui: clipboard access from ContextUI
+libv.ui.input_field: paste support
+libv.ui.input_field: copy support
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
+
+libv.ui.input_field: caret support
+libv.ui.input_field: caret mouse support
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -342,9 +348,7 @@ debug
 interactive
 	libv.ui: String2D API to find nearest character position
 	libv.ui: Make a sandbox for a input->button->label->list
-	libv.ui.input_field: paste support
 	libv.ui.input_field: selection support
-	libv.ui.input_field: copy support
 	libv.ui.input_field: undo/redo support
 	libv.ui.input_field: input mask (this will possibly a different input_field type)
 	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
@@ -352,9 +356,9 @@ interactive
 
 hotkey
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
+	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
 	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
 	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
 	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
 	libv.ui.hotkey: hotkey system are an extension to the keyboard system
 	libv.ui.hotkey: ui.focus-backward = shift+tab
@@ -527,6 +531,7 @@ libv.frame: cleanup states by adding a single state for show/hidden/maximized/mi
 libv.frame: cleanup monitor, provide a thread-safe access to monitors list
 libv.frame: cleanup global variables, at least place them next to each other and reason about thread access
 libv.frame.input: Question should I couple scancode with key for each key states | observe use-case
+libv.frame: remove clipboard support, ext clip will take care of it.
 
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 

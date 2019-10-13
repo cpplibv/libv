@@ -316,7 +316,7 @@ public:
 
 public:
 	std::string getClipboardString();
-	void setClipboardString(const std::string& string);
+	void setClipboardString(const std::string& string); // Argument is std::string as it is required to be 0 terminated
 };
 
 } // namespace frame -------------------------------------------------------------------------------

@@ -14,8 +14,8 @@ include(cmake/wish_warning.cmake)
 
 set(CMAKE_VERBOSE_MAKEFILE off)
 #set(CMAKE_BUILD_TYPE "DEBUG")
-set(CMAKE_BUILD_TYPE "RELEASE")
-#set(CMAKE_BUILD_TYPE "DEV")
+#set(CMAKE_BUILD_TYPE "RELEASE")
+set(CMAKE_BUILD_TYPE "DEV")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
@@ -622,7 +622,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
-	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp
+	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp ext_clip
 )
 
 wish_create_library(

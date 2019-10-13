@@ -60,6 +60,10 @@ public:
 	~ContextUI();
 
 public:
+	std::string clipboardText();
+	void clipboardText(const std::string& string);
+
+public:
 	bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
 

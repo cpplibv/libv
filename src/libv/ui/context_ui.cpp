@@ -2,6 +2,8 @@
 
 // hpp
 #include <libv/ui/context_ui.hpp>
+// ext
+#include <clip/clip.h>
 // libv
 #include <libv/gl/image.hpp>
 #include <libv/utility/generic_path.hpp>
@@ -136,6 +138,18 @@ ContextUI::ContextUI(UI& ui, Settings settings) :
 
 ContextUI::~ContextUI() {
 	// For forward declared unique_ptr
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::string ContextUI::clipboardText() {
+	std::string result;
+	clip::get_text(result);
+	return result;
+}
+
+void ContextUI::clipboardText(const std::string& string) {
+	clip::set_text(string);
 }
 
 // -------------------------------------------------------------------------------------------------

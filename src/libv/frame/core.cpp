@@ -182,7 +182,7 @@ void Frame::cmdCoreCreate() {
 
 void Frame::cmdCoreRecreate() {
 	log_core.trace("Recreate window for frame {}", self->title);
-	assert(window && "Requires a valid window");
+	assert(self->window && "Requires a valid window");
 
 	self->shareWindow = self->window;
 	self->window = nullptr;
