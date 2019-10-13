@@ -1299,20 +1299,6 @@ std::string Shader::PreprocessIncludes(const std::string& source, const boost::f
 
 // -------------------------------------------------------------------------------------------------
 
-/// Calculates the fast inverse square root approximation. Error rate is around 0.175%
-/// For more information see: https://en.wikipedia.org/wiki/Fast_inverse_square_root
-constexpr inline float fast_rsqrt(float y) noexcept {
-	auto i = libv::bit_cast<int32_t>(y);
-	i = 0x5f3759df - (i >> 1); // evil floating point bit level hacking
-
-	y = libv::bit_cast<float>(i);
-	y *= 1.5f - (0.5f * y * y * y); // One iteration of Newton's method, repeated application would reduce error rate
-
-	return y;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 local nato_phonetic_alphabet = {
 	"Alfa",
 	"Bravo",
