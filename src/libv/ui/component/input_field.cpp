@@ -141,45 +141,45 @@ void InputField::align_horizontal(AlignHorizontal value, PropertyDriver driver) 
 	if (AccessProperty::setter(*this, property.align_horizontal, driver))
 		return;
 
-	text_.setAlign(value);
+	text_.align(value);
 }
 
 AlignHorizontal InputField::align_horizontal() const noexcept {
-	return text_.getAlign();
+	return text_.align();
 }
 
 void InputField::font(Font2D_view value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font, driver))
 		return;
 
-	text_.setFont(std::move(value));
+	text_.font(std::move(value));
 }
 
 const Font2D_view& InputField::font() const noexcept {
-	return text_.getFont();
+	return text_.font();
 }
 
 void InputField::font_size(FontSize value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font_size, driver))
 		return;
 
-	text_.setSize(value);
+	text_.size(value);
 }
 
 FontSize InputField::font_size() const noexcept {
-	return text_.getSize();
+	return text_.size();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void InputField::text(std::string value) {
-	text_.setString(std::move(value));
+	text_.string(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	fire(EventChange{*this});
 }
 
 const std::string& InputField::text() const noexcept {
-	return text_.getString();
+	return text_.string();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -264,7 +264,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	}
 
 	if (event.key == libv::input::Key::C && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
-		context().clipboardText(text_.getString());
+		context().clipboardText(text_.string());
 
 		caretStartTime = clock::now();
 		return true;
@@ -281,7 +281,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	}
 
 	if (event.key == libv::input::Key::X && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
-		context().clipboardText(text_.getString());
+		context().clipboardText(text_.string());
 		text_.clear();
 
 		caret = 0;
@@ -389,14 +389,14 @@ void InputField::doStyle(ContextStyle& ctx) {
 void InputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	const auto contentString = text_.getContent(-1, -1);
+	const auto contentString = text_.content(-1, -1);
 	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
 void InputField::doLayout2(const ContextLayout2& environment) {
-	text_.setLimit(libv::vec::xy(environment.size));
+	text_.limit(libv::vec::xy(environment.size));
 	caretPosition = text_.getCharacterPosition(caret);
 }
 

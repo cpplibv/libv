@@ -45,29 +45,38 @@ class String2D {
 private:
 	libv::glr::Mesh mesh_{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
-	std::shared_ptr<Font2D> font;
+	std::shared_ptr<Font2D> font_;
 
-	FontSize fontSize = FontSize{12};
+	FontSize fontSize_ = FontSize{12};
 	bool dirty = true;
-	AlignHorizontal align = AlignHorizontal::Center;
-	libv::vec2f limit;
+	AlignHorizontal align_ = AlignHorizontal::Center;
+	libv::vec2f limit_;
 
-	std::string string;
+	std::string string_;
 
 public:
-	String2D();
+	void align(const AlignHorizontal align);
+	void font(std::shared_ptr<Font2D> font);
+	void font(std::shared_ptr<Font2D> font, const FontSize fontSize);
+	void size(const FontSize fontSize);
+	void string(std::string string);
+	void limit(const libv::vec2f limit);
+	inline void limit(const float x, const float y) { limit({x, y}); }
 
 public:
 	[[nodiscard]] size_t length() const noexcept;
-
-public:
-	void setAlign(const AlignHorizontal align);
-	void setFont(std::shared_ptr<Font2D> font);
-	void setFont(std::shared_ptr<Font2D> font, const FontSize fontSize);
-	void setSize(const FontSize fontSize);
-	void setString(std::string string);
-	void setLimit(const libv::vec2f limit);
-	inline void setLimit(const float x, const float y) { setLimit({x, y}); }
+	[[nodiscard]] inline AlignHorizontal align() const noexcept {
+		return align_;
+	}
+	[[nodiscard]] inline const std::string& string() const noexcept {
+		return string_;
+	}
+	[[nodiscard]] inline const std::shared_ptr<Font2D>& font() const noexcept {
+		return font_;
+	}
+	[[nodiscard]] inline FontSize size() const noexcept {
+		return fontSize_;
+	}
 
 public:
 	void insert(size_t position, uint32_t unicode);
@@ -82,36 +91,6 @@ public:
 	void clear();
 
 public:
-	[[nodiscard]] inline AlignHorizontal getAlign() const noexcept {
-		return align;
-	}
-
-	[[nodiscard]] inline const std::string& getString() const noexcept {
-		return string;
-	}
-
-	[[nodiscard]] inline const std::shared_ptr<Font2D>& getFont() const noexcept {
-		return font;
-	}
-
-	[[nodiscard]] inline FontSize getSize() const noexcept {
-		return fontSize;
-	}
-
-	/// @param limit - The maximum available space that can be used to layout
-	/// @note Negative \c limit values are representing unbounded limits
-	/// @return the necessary space to layout while obeying the \c limit
-	[[nodiscard]] libv::vec2f getContent(libv::vec2f limit);
-
-	/// @param x - The maximum available width that can be used to layout
-	/// @param y - The maximum available height that can be used to layout
-	/// @note Negative \c x and \c y values are representing unbounded limits
-	/// @return the necessary space to layout while obeying the \c limit
-	[[nodiscard]] inline libv::vec2f getContent(const float x, const float y) {
-		return getContent({x, y});
-	}
-
-public:
 	[[nodiscard]] const libv::glr::Mesh& mesh();
 
 public:
@@ -124,6 +103,19 @@ public:
 
 //	size_t getClosestCharacterIndex(libv::vec2f position);
 //	size_t getClosestLineIndex(libv::vec2f position);
+
+	/// @param limit - The maximum available space that can be used to layout
+	/// @note Negative \c limit values are representing unbounded limits
+	/// @return the necessary space to layout while obeying the \c limit
+	[[nodiscard]] libv::vec2f content(libv::vec2f limit);
+
+	/// @param x - The maximum available width that can be used to layout
+	/// @param y - The maximum available height that can be used to layout
+	/// @note Negative \c x and \c y values are representing unbounded limits
+	/// @return the necessary space to layout while obeying the \c limit
+	[[nodiscard]] inline libv::vec2f content(const float x, const float y) {
+		return content({x, y});
+	}
 
 private:
 	void layout();

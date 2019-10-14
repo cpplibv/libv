@@ -114,44 +114,44 @@ void LabelImage::align_horizontal(AlignHorizontal value, PropertyDriver driver) 
 	if (AccessProperty::setter(*this, property.align_horizontal, driver))
 		return;
 
-	text_.setAlign(value);
+	text_.align(value);
 }
 
 AlignHorizontal LabelImage::align_horizontal() const noexcept {
-	return text_.getAlign();
+	return text_.align();
 }
 
 void LabelImage::font(Font2D_view value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font, driver))
 		return;
 
-	text_.setFont(std::move(value));
+	text_.font(std::move(value));
 }
 
 const Font2D_view& LabelImage::font() const noexcept {
-	return text_.getFont();
+	return text_.font();
 }
 
 void LabelImage::font_size(FontSize value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font_size, driver))
 		return;
 
-	text_.setSize(value);
+	text_.size(value);
 }
 
 FontSize LabelImage::font_size() const noexcept {
-	return text_.getSize();
+	return text_.size();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void LabelImage::text(std::string value) {
-	text_.setString(std::move(value));
+	text_.string(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 const std::string& LabelImage::text() const noexcept {
-	return text_.getString();
+	return text_.string();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -164,14 +164,14 @@ void LabelImage::doStyle(ContextStyle& ctx) {
 void LabelImage::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	const auto contentString = text_.getContent(-1, -1);
+	const auto contentString = text_.content(-1, -1);
 	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
 
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
 void LabelImage::doLayout2(const ContextLayout2& environment) {
-	text_.setLimit(libv::vec::xy(environment.size));
+	text_.limit(libv::vec::xy(environment.size));
 }
 
 void LabelImage::doRender(ContextRender& ctx) {

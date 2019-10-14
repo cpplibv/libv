@@ -88,44 +88,44 @@ void Label::align_horizontal(AlignHorizontal value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.align_horizontal, driver))
 		return;
 
-	text_.setAlign(value);
+	text_.align(value);
 }
 
 AlignHorizontal Label::align_horizontal() const noexcept {
-	return text_.getAlign();
+	return text_.align();
 }
 
 void Label::font(Font2D_view value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font, driver))
 		return;
 
-	text_.setFont(std::move(value));
+	text_.font(std::move(value));
 }
 
 const Font2D_view& Label::font() const noexcept {
-	return text_.getFont();
+	return text_.font();
 }
 
 void Label::font_size(FontSize value, PropertyDriver driver) {
 	if (AccessProperty::setter(*this, property.font_size, driver))
 		return;
 
-	text_.setSize(value);
+	text_.size(value);
 }
 
 FontSize Label::font_size() const noexcept {
-	return text_.getSize();
+	return text_.size();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Label::text(std::string value) {
-	text_.setString(std::move(value));
+	text_.string(std::move(value));
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 const std::string& Label::text() const noexcept {
-	return text_.getString();
+	return text_.string();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -138,12 +138,12 @@ void Label::doStyle(ContextStyle& ctx) {
 void Label::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	const auto content = text_.getContent(-1, -1);
+	const auto content = text_.content(-1, -1);
 	AccessLayout::lastDynamic(*this) = {content, 0.f};
 }
 
 void Label::doLayout2(const ContextLayout2& environment) {
-	text_.setLimit(libv::vec::xy(environment.size));
+	text_.limit(libv::vec::xy(environment.size));
 }
 
 void Label::doRender(ContextRender& ctx) {

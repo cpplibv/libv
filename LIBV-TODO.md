@@ -272,6 +272,7 @@ libv.ui.input_field: cut support
 libv.ui: fix cut-paste breaks search field (? with newline involved)
 libv.ui: add exception catch beds to main ui operations
 libv: fix build for all / tests / run tests
+libv.ui: String2D set/get modernization
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -279,10 +280,6 @@ libv: fix build for all / tests / run tests
 
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	\ libv.ui.input_field: caret mouse support
-
-
-libv.ui: String2D set/get modernization
-libv.ui: String2D scream at the user if the API get a \r, and ignore it
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -520,6 +517,7 @@ libv.ui: ui <-> 3D layout linkage: planet names and additional informations are 
 
 libv.ui: text | easy text
 libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
+libv.ui: String2D scream at the user if the API get a \r (or any non printable character beside \n \t), and ignore it
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
@@ -566,6 +564,7 @@ cpp: check if i have any recursive variadic function that is not using if conste
 libv.gl: use mdspan for image updates instead of raw loops
 
 libv.ecs: Test fails with an assert in boost vector
+
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
