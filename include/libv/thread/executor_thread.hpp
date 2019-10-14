@@ -56,7 +56,7 @@ public:
 		try {
 			if (thread.joinable())
 				thread.join();
-		} catch (std::system_error& ex) {
+		} catch (const std::system_error& ex) {
 			log.error("Exception during joining ExecutorThread {}: {}", name, ex.what());
 		}
 	}
@@ -80,7 +80,7 @@ private:
 
 			try {
 				task();
-			} catch (std::exception& ex) {
+			} catch (const std::exception& ex) {
 				log.error("Exception occurred in {} ExecutorThread: {}", name, ex.what());
 			}
 		}

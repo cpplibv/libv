@@ -243,11 +243,15 @@ ContextUI& UI::context() {
 void UI::update(libv::glr::Queue& gl) {
 	self->timer.reset();
 	self->timerFrame.reset();
-	{
+	try {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 		self->stat.attach1.sample(self->timer.time_ns());
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Event ---
 		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
 
@@ -277,26 +281,50 @@ void UI::update(libv::glr::Queue& gl) {
 				}
 			);
 
-			std::visit(visitor, mouseEvent);
+			try {
+				std::visit(visitor, mouseEvent);
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during event in UI: {}. Discarding event", ex.what());
+			}
 		}
 
 		self->event_queue.clear();
 		self->stat.event.sample(self->timer.time_ns());
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during event in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 		self->stat.attach2.sample(self->timer.time_ns());
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Focus ---
-//		self->focusTravers(Degrees<float>{135}); // backward
-//		self->focusTravers(Degrees<float>{315}); // forward
-	} {
-//		// --- Update ---
-//		AccessRoot::update(self->root);
-//	} {
-//		// --- Attach ---
-//		AccessRoot::attach(self->root, self->root);
-	} {
+		//self->focusTravers(Degrees<float>{135}); // backward
+		//self->focusTravers(Degrees<float>{315}); // forward
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during focus in UI: {}", ex.what());
+	}
+
+	try {
+		// --- Update ---
+		//AccessRoot::update(self->root);
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during update in UI: {}", ex.what());
+	}
+
+	try {
+		// --- Attach ---
+		//AccessRoot::attach(self->root, self->root);
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Style ---
 		if (self->context.isAnyStyleDirty()) {
 			AccessRoot::styleScan(self->root);
@@ -306,13 +334,21 @@ void UI::update(libv::glr::Queue& gl) {
 			AccessRoot::style(self->root);
 			self->stat.style.sample(self->timer.time_ns());
 		}
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during style in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Layout ---
 		AccessRoot::layout1(self->root, ContextLayout1{});
 		self->stat.layout1.sample(self->timer.time_ns());
 		AccessRoot::layout2(self->root, ContextLayout2{AccessRoot::position(self->root), AccessRoot::size(self->root), MouseOrder{0}});
 		self->stat.layout2.sample(self->timer.time_ns());
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Render ---
 		const auto guard_s = gl.state.push_guard();
 		const auto guard_m = gl.model.push_guard();
@@ -344,10 +380,16 @@ void UI::update(libv::glr::Queue& gl) {
 //		AccessRoot::destroy(self->root, context);
 
 		self->stat.render.sample(self->timer.time_ns());
-	} {
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during render in UI: {}", ex.what());
+	}
+
+	try {
 		// --- Detach ---
 		AccessRoot::detach(self->root, self->root);
 		self->stat.detach.sample(self->timer.time_ns());
+	} catch (const std::exception& ex) {
+		log_ui.error("Exception occurred during detach in UI: {}", ex.what());
 	}
 
 	self->stat.frame.sample(self->timerFrame.time_ns());

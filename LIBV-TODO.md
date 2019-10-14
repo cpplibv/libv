@@ -270,12 +270,11 @@ libv.ui: String2D fix justify cursor placement | space glyph should be snapped t
 libv.ui.input_field: test cursor placement with a non mono font
 libv.ui.input_field: cut support
 libv.ui: fix cut-paste breaks search field (? with newline involved)
+libv.ui: add exception catch beds to main ui operations
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui: add exception catch beds to main ui operations
 
 libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 
