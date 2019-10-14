@@ -4,14 +4,16 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/ui/base_component.hpp>
-#include <libv/ui/context_layout.hpp>
-#include <libv/ui/parse/parse_size.hpp>
-#include <libv/ui/style.hpp>
 #include <libv/utility/approx.hpp>
 // std
 #include <memory>
 #include <ostream>
+// pro
+#include <libv/ui/base_component.hpp>
+#include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_style.hpp>
+#include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/style.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -52,7 +54,8 @@ class TestComponent : public libv::ui::BaseComponent {
 public:
 	libv::vec3f dynamicSize = {};
 
-	TestComponent() : libv::ui::BaseComponent(libv::ui::GenerateName, "test") {};
+	TestComponent(BaseComponent& parent) :
+			libv::ui::BaseComponent(parent, libv::ui::GenerateName, "test") {};
 
 	virtual void doLayout1(const libv::ui::ContextLayout1&) override {
 		libv::ui::AccessLayout::lastDynamic(*this) = dynamicSize;
@@ -90,19 +93,27 @@ public:
 template <typename T, typename TC>
 class BasicTestLayout {
 protected:
-	TestComponent ignore;
+	TestComponent ignore{static_cast<libv::ui::BaseComponent&>(ignore)};
+	// Fix UB: passing an uninitialized object address to itself to copy the context ptr that is not used
 	typename T::Properties property;
 	std::vector<typename T::Child> components;
 
 public:
 	BasicTestLayout() {
-		ignore.set(property); // Initialize property with fallback values
+		// Initialize property with fallback values
+		libv::ui::ContextStyle ctx{nullptr, ignore};
+		T::style(property, ctx);
 	}
 
 public:
 	TC add() {
-		auto& child = components.emplace_back(std::make_shared<TestComponent>());
-		child.ptr->set(child.property); // Initialize child property with fallback values
+		auto sp = std::make_shared<TestComponent>(static_cast<libv::ui::BaseComponent&>(ignore));
+		auto& child = components.emplace_back(sp);
+
+		// Initialize child property with fallback values
+		libv::ui::ContextStyle ctx{nullptr, ignore};
+		T::style(child.property, ctx);
+
 		return TC{components, components.size() - 1};
 	}
 

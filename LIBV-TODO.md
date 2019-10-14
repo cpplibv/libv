@@ -271,12 +271,11 @@ libv.ui.input_field: test cursor placement with a non mono font
 libv.ui.input_field: cut support
 libv.ui: fix cut-paste breaks search field (? with newline involved)
 libv.ui: add exception catch beds to main ui operations
+libv: fix build for all / tests / run tests
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	\ libv.ui.input_field: caret mouse support
@@ -566,6 +565,7 @@ cpp: check if every possible operator had been made to a hidden friend
 cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
 libv.gl: use mdspan for image updates instead of raw loops
 
+libv.ecs: Test fails with an assert in boost vector
 
 --- AWAITING ---------------------------------------------------------------------------------------
 

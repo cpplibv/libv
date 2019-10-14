@@ -56,14 +56,14 @@ private:
 
 private:
 //	std::shared_ptr<libv::ui::Button> button;
-	std::shared_ptr<libv::ui::PanelLine> panel0 = std::make_shared<libv::ui::PanelLine>();
-	std::shared_ptr<libv::ui::PanelLine> panel1 = std::make_shared<libv::ui::PanelLine>();
-	std::shared_ptr<libv::ui::Label> label0 = std::make_shared<libv::ui::Label>();
-	std::shared_ptr<libv::ui::Label> label1 = std::make_shared<libv::ui::Label>();
-	std::shared_ptr<libv::ui::Label> label2 = std::make_shared<libv::ui::Label>();
-	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>();
-	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>();
-	std::shared_ptr<libv::ui::Image> image0 = std::make_shared<libv::ui::Image>();
+	std::shared_ptr<libv::ui::PanelLine> panel0 = std::make_shared<libv::ui::PanelLine>(ui.root());
+	std::shared_ptr<libv::ui::PanelLine> panel1 = std::make_shared<libv::ui::PanelLine>(ui.root());
+	std::shared_ptr<libv::ui::Label> label0 = std::make_shared<libv::ui::Label>(ui.root());
+	std::shared_ptr<libv::ui::Label> label1 = std::make_shared<libv::ui::Label>(ui.root());
+	std::shared_ptr<libv::ui::Label> label2 = std::make_shared<libv::ui::Label>(ui.root());
+	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
+	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
+	std::shared_ptr<libv::ui::Image> image0 = std::make_shared<libv::ui::Image>(ui.root());
 
 public:
 	void create() {

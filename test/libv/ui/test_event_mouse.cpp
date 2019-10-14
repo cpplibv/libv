@@ -27,7 +27,10 @@ TEST_CASE("mouse subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]
 	libv::ui::MouseTable table;
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
@@ -51,13 +54,22 @@ TEST_CASE("mouse multiple sub, notify with correct order", "[libv.ui.event.mouse
 	std::vector<int> call_order;
 	libv::ui::MouseTable table;
 
-	libv::ui::MouseWatcher watcher0; watcher0.callback = [&](auto&) { call_order.emplace_back(0); };
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = [&](auto&) { call_order.emplace_back(0); };
+	watcher0.cb_movement = [&](auto&) { call_order.emplace_back(0); };
+	watcher0.cb_scroll = [&](auto&) { call_order.emplace_back(0); };
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
-	libv::ui::MouseWatcher watcher2; watcher2.callback = [&](auto&) { call_order.emplace_back(2); };
+	libv::ui::MouseWatcher watcher2;
+	watcher2.cb_button = [&](auto&) { call_order.emplace_back(2); };
+	watcher2.cb_movement = [&](auto&) { call_order.emplace_back(2); };
+	watcher2.cb_scroll = [&](auto&) { call_order.emplace_back(2); };
 	table.subscribe(watcher2, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{2});
 
-	libv::ui::MouseWatcher watcher1; watcher1.callback = [&](auto&) { call_order.emplace_back(1); };
+	libv::ui::MouseWatcher watcher1;
+	watcher1.cb_button = [&](auto&) { call_order.emplace_back(1); };
+	watcher1.cb_movement = [&](auto&) { call_order.emplace_back(1); };
+	watcher1.cb_scroll = [&](auto&) { call_order.emplace_back(1); };
 	table.subscribe(watcher1, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{1});
 
 	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
@@ -85,11 +97,17 @@ TEST_CASE("mouse multiple sub, only notify intersected ones", "[libv.ui.event.mo
 	libv::ui::MouseTable table;
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
 	CallCounter callback1;
-	libv::ui::MouseWatcher watcher1; watcher1.callback = std::ref(callback1);
+	libv::ui::MouseWatcher watcher1;
+	watcher1.cb_button = std::ref(callback1);
+	watcher1.cb_movement = std::ref(callback1);
+	watcher1.cb_scroll = std::ref(callback1);
 	table.subscribe(watcher1, libv::ui::Flag::mask_watchMouse, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_position(libv::vec2f{0, 0});
@@ -122,7 +140,10 @@ TEST_CASE("mouse never intersect region", "[libv.ui.event.mouse]") {
 	table.event_position(libv::vec2f{0, 0});
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 
 	SECTION("Should not intersect zero sized region") {
 		table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {5, 5}, {0, 0}, libv::ui::MouseOrder{0});
@@ -178,7 +199,10 @@ TEST_CASE("mouse new subscribe should receive event from enter if created on top
 	table.event_position(libv::vec2f{0, 0});
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {5, 5}, libv::ui::MouseOrder{0});
 	CHECK(callback0.call_count == 0);
@@ -190,9 +214,15 @@ TEST_CASE("mouse update", "[libv.ui.event.mouse]") {
 	libv::ui::MouseTable table;
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 	CallCounter callback1;
-	libv::ui::MouseWatcher watcher1; watcher1.callback = std::ref(callback1);
+	libv::ui::MouseWatcher watcher1;
+	watcher1.cb_button = std::ref(callback1);
+	watcher1.cb_movement = std::ref(callback1);
+	watcher1.cb_scroll = std::ref(callback1);
 	table.event_position(libv::vec2f{0, 0});
 
 	SECTION("simple moving watcher") {
@@ -266,7 +296,10 @@ TEST_CASE("mouse leave", "[libv.ui.event.mouse]") {
 	libv::ui::MouseTable table;
 
 	CallCounter callback0;
-	libv::ui::MouseWatcher watcher0; watcher0.callback = std::ref(callback0);
+	libv::ui::MouseWatcher watcher0;
+	watcher0.cb_button = std::ref(callback0);
+	watcher0.cb_movement = std::ref(callback0);
+	watcher0.cb_scroll = std::ref(callback0);
 	table.event_position(libv::vec2f{0, 0});
 
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});

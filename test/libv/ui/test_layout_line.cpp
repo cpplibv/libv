@@ -22,12 +22,12 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutLine> {
 struct TestLayout : public BasicTestLayout<libv::ui::LayoutLine, TestChild> {
 	template <typename V>
 	void alignHorizontal(V&& value) {
-		ignore.set(property.alignHorizontal, std::forward<V>(value));
+		ignore.set(property.align_horizontal, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void alignVertical(V&& value) {
-		ignore.set(property.alignVertical, std::forward<V>(value));
+		ignore.set(property.align_vertical, std::forward<V>(value));
 	}
 
 	template <typename V>
