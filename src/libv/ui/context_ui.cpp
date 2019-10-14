@@ -144,16 +144,17 @@ ContextUI::~ContextUI() {
 
 std::string ContextUI::clipboardText() {
 	std::string result;
-	clip::get_text(result);
-//	log_ui.error("Coudl base shader:  {}", );
-	// TODO P3: log error on clip::get_text fail
-	std::erase(result, '\r');
+	bool success = clip::get_text(result);
+	log_ui.error_if(!success, "Failed to get clipboard");
+
+	std::erase(result, '\r'); // NOTE: Cleanup any crlf line ending be remove every cr
+
 	return result;
 }
 
 void ContextUI::clipboardText(const std::string& string) {
-	clip::set_text(string);
-	// TODO P3: log error on clip::set_text fail
+	bool success = clip::set_text(string);
+	log_ui.error_if(!success, "Failed to set clipboard text of length {}: \"{}\"", string.size(), string);
 }
 
 // -------------------------------------------------------------------------------------------------

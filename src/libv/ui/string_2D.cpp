@@ -186,6 +186,11 @@ void String2D::pop_back() {
 	dirty = true;
 }
 
+void String2D::clear() {
+	string.clear();
+	dirty = true;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f String2D::getContent(libv::vec2f limit_) {

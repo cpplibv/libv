@@ -268,17 +268,20 @@ libv.ui: Verify if String2D is pen.x += kerning.x; to early | it is not, it help
 libv.ui: String2D fix new line alignment
 libv.ui: String2D fix justify cursor placement | space glyph should be snapped to the left and not to the right
 libv.ui.input_field: test cursor placement with a non mono font
+libv.ui.input_field: cut support
+libv.ui: fix cut-paste breaks search field (? with newline involved)
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
+
+libv.ui: add exception catch beds to main ui operations
 
 libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	\ libv.ui.input_field: caret mouse support
 
-libv.ui.input_field: cut support
 
 libv.ui: String2D set/get modernization
 libv.ui: String2D scream at the user if the API get a \r, and ignore it

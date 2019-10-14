@@ -220,6 +220,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	}
 
 	// === TEMP ========================================================================================
+
 	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none) {
 		text_.insert(caret, '\n');
 
@@ -246,9 +247,9 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		return font(context().font("consola.ttf")), true;
 
 	if (event.key == libv::input::Key::Num8 && event.action == libv::input::Action::press)
-		return font_size(libv::ui::FontSize{libv::to_value(font_size()) + 3}), true;
+		return font_size(libv::ui::FontSize(libv::to_value(font_size()) + 3)), true;
 	if (event.key == libv::input::Key::Num9 && event.action == libv::input::Action::press)
-		return font_size(libv::ui::FontSize{libv::to_value(font_size()) - 3}), true;
+		return font_size(libv::ui::FontSize(libv::to_value(font_size()) - 3)), true;
 
 	// =================================================================================================
 
@@ -266,8 +267,6 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		context().clipboardText(text_.getString());
 
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventChange{*this});
 		return true;
 	}
 
@@ -275,6 +274,17 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		const auto clip = context().clipboardText();
 		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventChange{*this});
+		return true;
+	}
+
+	if (event.key == libv::input::Key::X && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::control) != libv::input::KeyModifier::none) {
+		context().clipboardText(text_.getString());
+		text_.clear();
+
+		caret = 0;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventChange{*this});

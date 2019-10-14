@@ -79,6 +79,8 @@ public:
 	void push_back(const std::string_view string_);
 	void pop_back();
 
+	void clear();
+
 public:
 	[[nodiscard]] inline AlignHorizontal getAlign() const noexcept {
 		return align;
