@@ -145,11 +145,15 @@ ContextUI::~ContextUI() {
 std::string ContextUI::clipboardText() {
 	std::string result;
 	clip::get_text(result);
+//	log_ui.error("Coudl base shader:  {}", );
+	// TODO P3: log error on clip::get_text fail
+	std::erase(result, '\r');
 	return result;
 }
 
 void ContextUI::clipboardText(const std::string& string) {
 	clip::set_text(string);
+	// TODO P3: log error on clip::set_text fail
 }
 
 // -------------------------------------------------------------------------------------------------

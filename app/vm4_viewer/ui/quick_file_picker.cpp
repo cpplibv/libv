@@ -137,6 +137,14 @@ void QuickFilePicker::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("1rD, d"));
 	}
 
+	{
+		auto style = context().style("vm4pv.info.input-limit");
+
+		style->inherit(context().style("vm4pv.info.input"));
+//		style->set("size", libv::ui::parse_size_or_throw("100px, d")); // TODO P2: broken layout
+		style->set("size", libv::ui::parse_size_or_throw("100px, 100px"));
+	}
+
 	// -------------------------------------------------------------------------------------------------
 
 	{
@@ -163,7 +171,15 @@ void QuickFilePicker::doAttach() {
 	{
 		const auto input = std::make_shared<libv::ui::InputField>(*this, "input1");
 		input->style(context().style("vm4pv.info.input"));
-		input->text("Input 1");
+		// input->text("x\nxx\nx\n\nx\nxx\nx");
+		input->text("[\n[[\n[\n\n[\n[[\n[");
+		add(input);
+	}
+	{
+		const auto input = std::make_shared<libv::ui::InputField>(*this, "input-limit");
+		input->style(context().style("vm4pv.info.input-limit"));
+		// input->text("x\nxx\nx\n\nx\nxx\nx");
+		input->text("Hello world ZZzzZZ ZzzZZz ZZzZ");
 		add(input);
 	}
 

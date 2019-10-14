@@ -115,10 +115,12 @@ public:
 public:
 	[[nodiscard]] libv::vec2f getCharacterPosition();
 	[[nodiscard]] libv::vec2f getCharacterPosition(size_t characterIndex);
+//	size_t getLineOfCharacter();
+//	size_t getLineOfCharacter(size_t characterIndex);
 //	libv::vec2f getLinePosition();
 //	libv::vec2f getLinePosition(size_t lineIndex);
 
-	size_t getClosestCharacterIndex(libv::vec2f position);
+//	size_t getClosestCharacterIndex(libv::vec2f position);
 //	size_t getClosestLineIndex(libv::vec2f position);
 
 private:

@@ -74,30 +74,35 @@ void insert_utf8_unchecked(std::string& string, size_t position, uint32_t unicod
 
 // -------------------------------------------------------------------------------------------------
 
-/// Returns true on success, returns false if end was reached before count step were taken
 template <typename octet_iterator>
-constexpr inline bool advance_utf8_unchecked(octet_iterator& it, const octet_iterator end, size_t count) noexcept {
+constexpr inline void advance_utf8_unchecked(octet_iterator& it) noexcept {
+	it += utf8::internal::sequence_length(it);
+}
+
+/// Returns true on success, returns false if end was reached before count step were taken
+template <typename octet_iterator, typename octet_sentinel>
+constexpr inline bool advance_utf8_unchecked(octet_iterator& it, const octet_sentinel end, size_t count) noexcept {
 	for (size_t i = 0; i < count; ++i) {
 		if (it == end)
 			return false;
-		it += utf8::internal::sequence_length(it);
+		advance_utf8_unchecked(it);
 	}
 	return true;
 }
 
-template <typename octet_iterator>
-[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(octet_iterator it, const octet_iterator end) noexcept {
+template <typename octet_iterator, typename octet_sentinel>
+[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(octet_iterator it, const octet_sentinel end) noexcept {
 	size_t result = 0;
 
-	for (; it != end; it += utf8::internal::sequence_length(it))
+	for (; it != end; advance_utf8_unchecked(it))
 		result++;
 
 	return result;
 }
 
 template <typename octet_range>
-[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(const octet_range& string) noexcept {
-	return distance_utf8_unchecked(string.begin(), string.end());
+[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(const octet_range& range) noexcept {
+	return distance_utf8_unchecked(range.begin(), range.end());
 }
 
 // -------------------------------------------------------------------------------------------------

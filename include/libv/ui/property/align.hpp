@@ -27,7 +27,7 @@ enum class AlignHorizontal : uint16_t {
 	Left = 0,
 	Center = 1,
 	Right = 2,
-	// TODO P6: libv.ui: it would be nice to have a baseline horizontal alignment, even if it wont be ever used, and is basically a left align, still.
+	// TODO P5: libv.ui: it would be nice to have a baseline horizontal alignment, even if it wont be ever used, and is basically a left align, still.
 	Justify = 3, /// Apply left alignment on the last line and justify every other line
 	JustifyAll = 4, /// Apply justify to every line including the last line
 };

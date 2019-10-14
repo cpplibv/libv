@@ -232,23 +232,19 @@ const libv::glr::Mesh& String2D::mesh() {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f String2D::getCharacterPosition() {
-	if (string.empty())
-		return {};
-
 	if (dirty)
 		layout();
 
-	auto it = string.end();
-	const auto codepoint = utf8::unchecked::previous(it);
+	// Note: codepoint is \n as there is a hidden new-line glyph placed to the end to help these functions
+	const auto codepoint = '\n';
 
 	const auto& descender = font->getDescender(fontSize);
 	const auto& glyph = font->getCharacter(codepoint, fontSize);
-	const auto& kerning = font->getKerning(codepoint, 0, fontSize);
 
 	auto positions = mesh_.attribute(attribute_position);
 	const auto& position = positions[positions.size() - 4];
 
-	return libv::vec2f{position.x - glyph.pos[0].x + kerning.x + glyph.advance.x, position.y - glyph.pos[0].y + descender};
+	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
 libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
@@ -270,8 +266,9 @@ libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
 
 	auto positions = mesh_.attribute(attribute_position);
 	const auto& position = positions[characterIndex * 4];
+	// Note: characterIndex can over index into end as hidden new-line glyphs are placed to help these functions
 
-	return libv::vec2f{position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
+	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
 //libv::vec2f String2D::getLinePosition() {
@@ -324,10 +321,10 @@ void String2D::layout() {
 			contentWidth = std::max(line->width, contentWidth);
 	};
 
-	const auto newLine = [&] {
+	const auto newLine = [&](bool lf) {
 		finishLine();
 
-		const auto lastEnd = line->end;
+		const auto lastEnd = line->end + (lf ? 4 : 0);
 		line = make_observer_ref(lines.emplace_back());
 		line->begin = lastEnd;
 		line->end = lastEnd;
@@ -338,16 +335,11 @@ void String2D::layout() {
 	};
 
 	for (const uint32_t currentCodepoint : string | libv::view::uft8_codepoints) {
-		if (currentCodepoint == '\n') {
-			newLine();
-			continue;
-		}
-
 		const auto& glyph = font->getCharacter(currentCodepoint, fontSize);
 		const auto& kerning = font->getKerning(previousCodepoint, currentCodepoint, fontSize);
 
-		if (hasLimitX && pen.x + glyph.advance.x + kerning.x > limit.x)
-			newLine();
+		if (currentCodepoint != '\n' && hasLimitX && pen.x + glyph.advance.x + kerning.x > limit.x)
+			newLine(false);
 
 		if (currentCodepoint == ' ')
 			line->wordEndings.emplace_back(line->end);
@@ -355,6 +347,7 @@ void String2D::layout() {
 		pen.x += kerning.x;
 
 		const auto vertex_base = static_cast<libv::glr::VertexIndex>(position.size());
+
 		position(libv::vec3f{glyph.pos[0] + pen, 0});
 		position(libv::vec3f{glyph.pos[1] + pen, 0});
 		position(libv::vec3f{glyph.pos[2] + pen, 0});
@@ -365,12 +358,36 @@ void String2D::layout() {
 		texture0(glyph.tex[2]);
 		texture0(glyph.tex[3]);
 
+		if (currentCodepoint == '\n') {
+			newLine(true);
+			// NOTE: At every line-feed character there is an extra not rendered new-line glyph placed
+			continue;
+		}
+
 		index.quad(vertex_base + 0, vertex_base + 1, vertex_base + 2, vertex_base + 3);
 
 		line->end += 4;
 		pen.x += glyph.advance.x;
 
 		previousCodepoint = currentCodepoint;
+	}
+	{
+		// NOTE: At the very end there is an extra not rendered new-line glyph placed
+		const auto currentCodepoint = '\n';
+		const auto& glyph = font->getCharacter(currentCodepoint, fontSize);
+		const auto& kerning = font->getKerning(previousCodepoint, currentCodepoint, fontSize);
+
+		pen.x += kerning.x;
+
+		position(libv::vec3f{glyph.pos[0] + pen, 0});
+		position(libv::vec3f{glyph.pos[1] + pen, 0});
+		position(libv::vec3f{glyph.pos[2] + pen, 0});
+		position(libv::vec3f{glyph.pos[3] + pen, 0});
+
+		texture0(glyph.tex[0]);
+		texture0(glyph.tex[1]);
+		texture0(glyph.tex[2]);
+		texture0(glyph.tex[3]);
 	}
 	finishLine();
 

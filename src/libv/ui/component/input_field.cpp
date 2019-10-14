@@ -219,6 +219,17 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		return true;
 	}
 
+	// === TEMP ========================================================================================
+	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none) {
+		text_.insert(caret, '\n');
+
+		caret++;
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+	// =================================================================================================
+
 	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release) {
 		fire(EventSubmit{*this});
 		return true;

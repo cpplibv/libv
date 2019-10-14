@@ -46,7 +46,6 @@ bool match_wildcard(const std::string_view str, const std::string_view pattern) 
 			else if (pattern[j - 1] == WILDCARD_ANY)
 				index(i, j) = index(i, j - 1) || index(i - 1, j);
 		}
-		// TODO P5: If every entry was false in the row, early exit with false
 	}
 
 	return index(str.size(), pattern.size());
@@ -188,7 +187,6 @@ bool match_wildcard_glob(const std::string_view str, const std::string_view patt
 				index(i, j) |= left || (up && !str_literal.starts_with(WILDCARD_SEPARATOR));
 			}
 		}
-		// TODO P5: If every entry was false in the row, early exit with false
 	}
 
 	return index(str.size(), pattern.size());

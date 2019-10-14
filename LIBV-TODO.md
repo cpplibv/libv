@@ -259,59 +259,33 @@ libv.ui: clipboard access from ContextUI
 libv.ui.input_field: paste support
 libv.ui.input_field: copy support
 libv.ui.input_field: caret support
+libv.ui: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ? | Yep, implemented as synthetize property
+libv.ui.input_field: bugfix for new line (glyphless) mean no entry in the mesh for it | solved by hidden glyphs
+libv.ui.input_field: bugfix new line before after glyph is not possible if there is no glyph in the line | solved by hidden glyphs
+libv.ui.input_field: bugfix new line before after glyph bearing issue (test char '[') | solved by hidden glyphs
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.input_field: bugfix for new line (glpyhless) mean no entry in the mesh for it
+libv.ui.input_field: new line alignment tests
+libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 
-libv.ui.input_field: caret mouse support
+libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
+	\ libv.ui.input_field: caret mouse support
+
 libv.ui.input_field: cut support
 
 libv.ui: String2D set/get modernization
+libv.ui: String2D scream at the user if the API get a \r, and ignore it
 
 libv.ui.property: hybrid reflection - dynamic
-
-properties / style
-	libv.ui.property: property system interaction with static_component system
-	libv.ui.property: complex composite component would result in "nested" property sets
-	libv.ui.property: scope / sheet / component type based style rules
-	libv.ui.property: if fallback value is requested log a warning
-	libv.ui.property: dynamic access
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
-	libv.ui.property: account for cyclic owning references with style property
-	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
-	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
-	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
-	libv.ui.style: do not track style changes, require ui to be prompted about change
-	libv.ui.property: solve name/type collusion
-	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
-	libv.ui.style: Style based on component state (bit-mask)
-	libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized?
-	libv.ui.property: typed property registry
-	libv.ui.property: optimize property reset: address could be used to lookup
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
-cleanup
-	libv.ui: doLayout1 should use the return channel instead of member cache
-	libv.ui: remove layout1 pass member variables in component_base
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
-	libv.ui: cleanup context_ui redundant codes
-	libv.ui: fatal log before every assert
-
-mouse
-	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
-	libv.ui: absorb - mouse event absorb/shield/plates
-	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
-	libv.ui: relative - mouse event should contain a watcher relative coordinates too
-	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
-
 event
-	libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
 atlas
@@ -337,12 +311,48 @@ ui
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 
+layout
+	libv.ui: doLayout1 should use the return channel instead of member cache
+	libv.ui: remove layout1 pass member variables in component_base
+	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue
+
+cleanup
+	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
+	libv.ui: cleanup context_ui redundant codes
+	libv.ui: fatal log before every assert
+
+mouse
+	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
+	libv.ui: absorb - mouse event absorb/shield/plates
+	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
+	libv.ui: relative - mouse event should contain a watcher relative coordinates too
+	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
+
+properties / style
+	libv.ui.property: property system interaction with static_component system
+	libv.ui.property: complex composite component would result in "nested" property sets
+	libv.ui.property: scope / sheet / component type based style rules
+	libv.ui.property: if fallback value is requested log a warning
+	libv.ui.property: dynamic access
+	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
+	libv.ui.property: account for cyclic owning references with style property
+	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
+	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
+	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
+	libv.ui.style: do not track style changes, require ui to be prompted about change
+	libv.ui.property: solve name/type collusion
+	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
+	libv.ui.style: Style based on component state (bit-mask)
+	libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized?
+	libv.ui.property: typed property registry
+	libv.ui.property: optimize property reset: address could be used to lookup
+
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
 libv.ui: style sheets
 
-debug
+libv.ui: debug zoom in
 	libv.gl: framebuffer
 	libv.glr: framebuffer
 	libv.gl: renderbuffer
@@ -409,18 +419,14 @@ focus
 	libv.ui.focus: Focus traversal order: position based
 
 libv.math: create vec_fwd and mat_fwd headers
-
-libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
-
 libv.sig: merge back the sig codebase rework a lighter version of the lib
-
 libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
 libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
-
-libv.ui: Question: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ?
+libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
 
 libv.ui: include check everything / fwd everything
+libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
 
 libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
 libv.console: should depend on libv.arg
@@ -428,15 +434,16 @@ libv.console: should depend on libv.arg
 libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
 libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
 
-libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges
+libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance
+
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
-libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
-libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 
 --- [[[ deadline: 2019.10.31 ]]] ---
 
+
+libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 libv.ui.layout: size over 100% is not an error
 libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
