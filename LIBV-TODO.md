@@ -260,15 +260,21 @@ libv.ui.input_field: paste support
 libv.ui.input_field: copy support
 libv.ui.input_field: caret support
 libv.ui: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ? | Yep, implemented as synthetize property
-libv.ui.input_field: bugfix for new line (glyphless) mean no entry in the mesh for it | solved by hidden glyphs
-libv.ui.input_field: bugfix new line before after glyph is not possible if there is no glyph in the line | solved by hidden glyphs
-libv.ui.input_field: bugfix new line before after glyph bearing issue (test char '[') | solved by hidden glyphs
+libv.ui: String2D fix for new line (glyphless) mean no entry in the mesh for it | solved by hidden glyphs
+libv.ui: String2D fix new line before after glyph is not possible if there is no glyph in the line | solved by hidden glyphs
+libv.ui: String2D fix new line before after glyph bearing issue (test char '[') | solved by hidden glyphs
+libv.ui: String2D new line alignment tests
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.input_field: new line alignment tests
+libv.ui: String2D fix new line alignment
+libv.ui: String2D fix justify cursor placement
+libv.ui: String2D is pen.x += kerning.x; to early
+
+libv.ui.input_field: test cursor placement with a non mono font
+
 libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe

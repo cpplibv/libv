@@ -228,6 +228,28 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		return true;
 	}
+
+	if (event.key == libv::input::Key::Num1 && event.action == libv::input::Action::press)
+		return align_horizontal(AlignHorizontal::Left), true;
+	if (event.key == libv::input::Key::Num2 && event.action == libv::input::Action::press)
+		return align_horizontal(AlignHorizontal::Center), true;
+	if (event.key == libv::input::Key::Num3 && event.action == libv::input::Action::press)
+		return align_horizontal(AlignHorizontal::Right), true;
+	if (event.key == libv::input::Key::Num4 && event.action == libv::input::Action::press)
+		return align_horizontal(AlignHorizontal::Justify), true;
+	if (event.key == libv::input::Key::Num5 && event.action == libv::input::Action::press)
+		return align_horizontal(AlignHorizontal::JustifyAll), true;
+
+	if (event.key == libv::input::Key::Num6 && event.action == libv::input::Action::press)
+		return font(context().font("Achafexp.ttf")), true;
+	if (event.key == libv::input::Key::Num7 && event.action == libv::input::Action::press)
+		return font(context().font("consola.ttf")), true;
+
+	if (event.key == libv::input::Key::Num8 && event.action == libv::input::Action::press)
+		return font_size(libv::ui::FontSize{libv::to_value(font_size()) + 3}), true;
+	if (event.key == libv::input::Key::Num9 && event.action == libv::input::Action::press)
+		return font_size(libv::ui::FontSize{libv::to_value(font_size()) - 3}), true;
+
 	// =================================================================================================
 
 	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release) {

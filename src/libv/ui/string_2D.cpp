@@ -321,10 +321,10 @@ void String2D::layout() {
 			contentWidth = std::max(line->width, contentWidth);
 	};
 
-	const auto newLine = [&](bool lf) {
+	const auto newLine = [&]() {
 		finishLine();
 
-		const auto lastEnd = line->end + (lf ? 4 : 0);
+		const auto lastEnd = line->end;
 		line = make_observer_ref(lines.emplace_back());
 		line->begin = lastEnd;
 		line->end = lastEnd;
@@ -339,7 +339,7 @@ void String2D::layout() {
 		const auto& kerning = font->getKerning(previousCodepoint, currentCodepoint, fontSize);
 
 		if (currentCodepoint != '\n' && hasLimitX && pen.x + glyph.advance.x + kerning.x > limit.x)
-			newLine(false);
+			newLine();
 
 		if (currentCodepoint == ' ')
 			line->wordEndings.emplace_back(line->end);
@@ -358,17 +358,16 @@ void String2D::layout() {
 		texture0(glyph.tex[2]);
 		texture0(glyph.tex[3]);
 
+		line->end += 4;
+
 		if (currentCodepoint == '\n') {
-			newLine(true);
+			newLine();
 			// NOTE: At every line-feed character there is an extra not rendered new-line glyph placed
 			continue;
 		}
 
 		index.quad(vertex_base + 0, vertex_base + 1, vertex_base + 2, vertex_base + 3);
-
-		line->end += 4;
 		pen.x += glyph.advance.x;
-
 		previousCodepoint = currentCodepoint;
 	}
 	{
@@ -388,6 +387,8 @@ void String2D::layout() {
 		texture0(glyph.tex[1]);
 		texture0(glyph.tex[2]);
 		texture0(glyph.tex[3]);
+
+		line->end += 4;
 	}
 	finishLine();
 
