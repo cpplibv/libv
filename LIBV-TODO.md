@@ -264,16 +264,14 @@ libv.ui: String2D fix for new line (glyphless) mean no entry in the mesh for it 
 libv.ui: String2D fix new line before after glyph is not possible if there is no glyph in the line | solved by hidden glyphs
 libv.ui: String2D fix new line before after glyph bearing issue (test char '[') | solved by hidden glyphs
 libv.ui: String2D new line alignment tests
+libv.ui: Verify if String2D is pen.x += kerning.x; to early | it is not, it helps with correct line width
+libv.ui: String2D fix new line alignment
+libv.ui: String2D fix justify cursor placement | space glyph should be snapped to the left and not to the right
+libv.ui.input_field: test cursor placement with a non mono font
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui: String2D fix new line alignment
-libv.ui: String2D fix justify cursor placement
-libv.ui: String2D is pen.x += kerning.x; to early
-
-libv.ui.input_field: test cursor placement with a non mono font
 
 libv.utility.utf8: utf8 namespace, no need for a separate lib, but a namespace would be nice
 

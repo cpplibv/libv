@@ -341,10 +341,11 @@ void String2D::layout() {
 		if (currentCodepoint != '\n' && hasLimitX && pen.x + glyph.advance.x + kerning.x > limit.x)
 			newLine();
 
+		line->end += 4;
+		pen.x += kerning.x;
+
 		if (currentCodepoint == ' ')
 			line->wordEndings.emplace_back(line->end);
-
-		pen.x += kerning.x;
 
 		const auto vertex_base = static_cast<libv::glr::VertexIndex>(position.size());
 
@@ -357,8 +358,6 @@ void String2D::layout() {
 		texture0(glyph.tex[1]);
 		texture0(glyph.tex[2]);
 		texture0(glyph.tex[3]);
-
-		line->end += 4;
 
 		if (currentCodepoint == '\n') {
 			newLine();
@@ -377,6 +376,7 @@ void String2D::layout() {
 		const auto& kerning = font->getKerning(previousCodepoint, currentCodepoint, fontSize);
 
 		pen.x += kerning.x;
+		line->end += 4;
 
 		position(libv::vec3f{glyph.pos[0] + pen, 0});
 		position(libv::vec3f{glyph.pos[1] + pen, 0});
@@ -387,8 +387,6 @@ void String2D::layout() {
 		texture0(glyph.tex[1]);
 		texture0(glyph.tex[2]);
 		texture0(glyph.tex[3]);
-
-		line->end += 4;
 	}
 	finishLine();
 
