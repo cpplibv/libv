@@ -17,8 +17,7 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 Frame::Frame(std::string title, libv::vec2i size) :
-	self(std::make_unique<ImplFrame>(title, size)) {
-}
+	self(std::make_unique<ImplFrame>(title, size)) { }
 
 Frame::Frame(std::string title, int32_t width, int32_t height) :
 	Frame(std::move(title), libv::vec2i{width, height}) { }

@@ -21,6 +21,7 @@ namespace ui {
 
 class BaseComponent;
 class ContextEvent;
+class ContextState;
 class Font2D;
 class MouseTable;
 class Shader;
@@ -50,13 +51,15 @@ class ContextUI {
 	std::unique_ptr<ImplContextUI> self;
 
 	UI& ui;
+
 public:
 	ContextEvent& event;
+	ContextState& state;
 	MouseTable& mouse;
 	Settings settings;
 
 public:
-	explicit ContextUI(UI& ui, Settings settings = Settings());
+	explicit ContextUI(UI& ui, ContextState& state, Settings settings = Settings());
 	~ContextUI();
 
 public:

@@ -14,13 +14,13 @@
 #include <mutex>
 #include <variant>
 #include <vector>
-//#include <iostream>
 // pro
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
+#include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/log.hpp>
 
@@ -86,6 +86,7 @@ public:
 	>;
 
 public:
+	ContextState context_state;
 	ContextUI context;
 	Root root{context};
 
@@ -125,30 +126,32 @@ public:
 	std::vector<UIEvent> event_queue;
 	std::mutex mutex;
 
-	libv::observer_ref<BaseComponent> focused = libv::make_observer_ref(root);
-
 public:
 	ImplUI(UI& ui) :
-		context(ui) { }
+		context(ui, context_state) {
+		context_state.focus_ = root;
+	}
 
 	ImplUI(UI& ui, const Settings& settings) :
-		context(ui, settings) { }
+		context(ui, context_state, settings) {
+		context_state.focus_ = root;
+	}
 
 public:
 	void focus(BaseComponent& component) {
-		if (libv::make_observer_ref(component) == focused)
+		if (component == context_state.focus_)
 			return;
 
-		log_ui.trace("Focus set from: {} to {}", focused->path(), component.path());
+		log_ui.trace("Focus set from: {} to {}", context_state.focus_->path(), component.path());
 
-		AccessRoot::focusChange(*focused, component);
-		focused = libv::make_observer_ref(component);
+		AccessRoot::focusChange(*context_state.focus_, component);
+		context_state.focus_ = component;
 	}
 
 	void focusTravers(Degrees<float> direction) {
-		ContextFocusTravers context{libv::make_observer_ref(*focused), direction};
+		ContextFocusTravers context{*context_state.focus_, direction};
 
-		auto newFocus = AccessRoot::focusTravers(*focused, context, *focused);
+		auto newFocus = AccessRoot::focusTravers(*context_state.focus_, context, *context_state.focus_);
 
 		if (newFocus == nullptr) // Loop around
 			newFocus = AccessRoot::focusTravers(root, context, root);
@@ -156,10 +159,10 @@ public:
 		if (newFocus == nullptr) // Not found anything, back to root
 			newFocus = libv::make_observer(root);
 
-		log_ui.debug("Focus travel from: {} to {}", focused->path(), newFocus->path());
+		log_ui.debug("Focus travel from: {} to {}", context_state.focus_->path(), newFocus->path());
 
-		AccessRoot::focusChange(*focused, *newFocus);
-		focused = libv::make_observer_ref(*newFocus);
+		AccessRoot::focusChange(*context_state.focus_, *newFocus);
+		context_state.focus_ = newFocus;
 	}
 };
 
@@ -238,11 +241,19 @@ ContextUI& UI::context() {
 	return self->context;
 }
 
+ContextState& UI::state() {
+	return self->context_state;
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void UI::update(libv::glr::Queue& gl) {
 	self->timer.reset();
 	self->timerFrame.reset();
+
+	self->context_state.time_frame_ = clock::now();
+	self->context_state.time_ = self->context_state.time_frame_ - self->context_state.time_ui_;
+
 	try {
 		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
@@ -259,25 +270,46 @@ void UI::update(libv::glr::Queue& gl) {
 		for (const auto& mouseEvent : self->event_queue) {
 			const auto visitor = libv::overload(
 				[this](const libv::input::EventChar& event) {
-					AccessRoot::eventChar(*self->focused, event);
+					if (self->context_state.focus_ != nullptr)
+						AccessRoot::eventChar(*self->context_state.focus_, event);
 				},
 				[this](const libv::input::EventKey& event) {
-					AccessRoot::eventKey(*self->focused, event);
+					if (self->context_state.focus_ != nullptr)
+						AccessRoot::eventKey(*self->context_state.focus_, event);
+
+					if (event.action != libv::input::Action::release) {
+						self->context_state.pressed_keys.insert(event.key);
+						self->context_state.pressed_scancodes.insert(event.scancode);
+					} else {
+						self->context_state.pressed_keys.erase(event.key);
+						self->context_state.pressed_scancodes.erase(event.scancode);
+					}
 				},
 				[this](const libv::input::EventMouseEnter& event) {
-					if (event.entered)
+					if (event.entered) {
 						self->context.mouse.event_enter();
-					else
+						self->context_state.mouse_over_ = true;
+					} else {
 						self->context.mouse.event_leave();
+						self->context_state.mouse_over_ = false;
+					}
 				},
 				[this](const libv::input::EventMouseButton& event) {
 					self->context.mouse.event_button(event.button, event.action);
+					if (event.action != libv::input::Action::release)
+						self->context_state.pressed_mouses.insert(event.button);
+					else
+						self->context_state.pressed_mouses.erase(event.button);
 				},
 				[this](const libv::input::EventMousePosition& event) {
-					self->context.mouse.event_position(libv::vec::cast<float>(event.position));
+					const auto position = libv::vec::cast<float>(event.position);
+					self->context.mouse.event_position(position);
+					self->context_state.mouse_position_ = position;
 				},
 				[this](const libv::input::EventMouseScroll& event) {
-					self->context.mouse.event_scroll(libv::vec::cast<float>(event.offset));
+					const auto offset = libv::vec::cast<float>(event.offset);
+					self->context.mouse.event_scroll(offset);
+					self->context_state.scroll_position_ = offset;
 				}
 			);
 
@@ -422,7 +454,7 @@ void UI::focus(BaseComponent& component) {
 void UI::detachFocused(BaseComponent& component) {
 	(void) component;
 
-	assert(&component == self->focused && "Attempted to detachFocused the not focused element");
+	assert(component == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
 	self->focusTravers(Degrees<float>{315});
 }
 

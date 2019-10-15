@@ -21,12 +21,6 @@ struct EventFocus {
 
 	libv::observer_ref<BaseComponent> previous;
 	libv::observer_ref<BaseComponent> current;
-
-	// key states
-	// joystick states
-	// mouse states
-	// time states
-	// hotkey states (?)
 };
 
 // -------------------------------------------------------------------------------------------------

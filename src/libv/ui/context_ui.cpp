@@ -114,10 +114,11 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 
 // -------------------------------------------------------------------------------------------------
 
-ContextUI::ContextUI(UI& ui, Settings settings) :
+ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 	self(std::make_unique<ImplContextUI>()),
 	ui(ui),
 	event(self->event),
+	state(state),
 	mouse(self->mouse),
 	settings(std::move(settings)) {
 

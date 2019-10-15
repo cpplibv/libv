@@ -273,13 +273,15 @@ libv.ui: fix cut-paste breaks search field (? with newline involved)
 libv.ui: add exception catch beds to main ui operations
 libv: fix build for all / tests / run tests
 libv.ui: String2D set/get modernization
+libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe | Access to state universe from everywhere
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe
-	\ libv.ui.input_field: caret mouse support
+libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
+
+libv.ui.input_field: caret mouse support
 
 libv.ui.property: hybrid reflection - dynamic
 
@@ -677,7 +679,7 @@ app: for apps you can cd next to the binary to solve any relative path issue (co
 --- ABANDONED --------------------------------------------------------------------------------------
 
 logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
-logger: binlog
+logger: binlog - https://www.youtube.com/watch?v=FyJI4Z6jD4w
 cpp.compile: things I want to know about my compile time:
 		- Instantiation time, count, location and arguments for every template and their size in binary (inline = 0)
 		- List of headers included for every translation unit

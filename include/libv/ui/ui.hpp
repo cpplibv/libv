@@ -27,6 +27,7 @@ namespace ui {
 // TODO P5: (?) void setFocusPolicy(...);
 
 class BaseComponent;
+class ContextState;
 class ContextUI;
 class ImplUI;
 class Settings;
@@ -59,6 +60,7 @@ public:
 	void event(const libv::input::EventMouseScroll& event);
 
 public:
+	ContextState& state();
 	ContextUI& context();
 	template <typename Frame> void attach(Frame& frame);
 

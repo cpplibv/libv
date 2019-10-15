@@ -52,6 +52,21 @@ public:
 		ptr = nullptr;
 		return *this;
 	}
+	template <typename T2>
+	constexpr inline observer_ptr& operator=(T2* other) & noexcept {
+		ptr = other;
+		return *this;
+	}
+	template <typename T2>
+	constexpr inline observer_ptr& operator=(T2& other) & noexcept {
+		ptr = std::addressof(other);
+		return *this;
+	}
+	template <typename T2>
+	constexpr inline observer_ptr& operator=(observer_ptr<T2>& other) & noexcept {
+		ptr = other.get();
+		return *this;
+	}
 
 public:
 	constexpr inline T* release() noexcept {

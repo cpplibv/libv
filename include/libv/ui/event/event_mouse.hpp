@@ -13,14 +13,6 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct BaseEventMouse {
-//	libv::vec2f mouse_position;
-//	libv::vec2f scroll_position;
-//	boost::container::flat_map<libv::input::Mouse, libv::input::Action> mouse_buttons;
-	// access to key states
-	// access to joystick states
-	// access to mouse states
-	// access to time states
-	// access to hotkey states (?)
 };
 
 struct EventMouseButton : BaseEventMouse {
