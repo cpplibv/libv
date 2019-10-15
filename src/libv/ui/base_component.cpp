@@ -220,20 +220,16 @@ void BaseComponent::eventKey(BaseComponent& component, const libv::input::EventK
 			return;
 }
 
-void BaseComponent::focusChange(BaseComponent& previous, BaseComponent& current) {
-	{
-		EventFocus event{false, true, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		if (previous.flags.match_any(Flag::watchFocus))
-			previous.onFocus(event);
-		previous.flags.reset(Flag::focused);
-	}
+void BaseComponent::focusGain(BaseComponent& component) {
+	if (component.flags.match_any(Flag::watchFocus))
+		component.onFocus(EventFocus{true});
+	component.flags.set(Flag::focused);
+}
 
-	{
-		current.flags.set(Flag::focused);
-		EventFocus event{true, false, libv::make_observer_ref(previous), libv::make_observer_ref(current)};
-		if (current.flags.match_any(Flag::watchFocus))
-			current.onFocus(event);
-	}
+void BaseComponent::focusLoss(BaseComponent& component) {
+	if (component.flags.match_any(Flag::watchFocus))
+		component.onFocus(EventFocus{false});
+	component.flags.reset(Flag::focused);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -371,10 +367,12 @@ void BaseComponent::styleScan() {
 	flags.reset(Flag::pendingStyle);
 }
 
-libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocusTravers& context, BaseComponent& current) {
-	libv::observer_ptr<BaseComponent> result = current.doFocusTravers(context, ChildIDSelf);
+libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocusTravers& context) {
+	// Algorithm driver method, does not directly recurse, up walking
 
-	auto ancestor = libv::make_observer_ref(current);
+	libv::observer_ptr<BaseComponent> result = doFocusTravers(context, ChildIDSelf);
+	libv::observer_ref<BaseComponent> ancestor = *this;
+
 	while (result == nullptr && ancestor != ancestor->parent) {
 		result = ancestor->parent->doFocusTravers(context, ancestor->childID);
 		ancestor = ancestor->parent;

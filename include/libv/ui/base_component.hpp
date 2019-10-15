@@ -159,7 +159,8 @@ private:
 private:
 	static void eventChar(BaseComponent& component, const libv::input::EventChar& event);
 	static void eventKey(BaseComponent& component, const libv::input::EventKey& event);
-	static void focusChange(BaseComponent& previous, BaseComponent& current);
+	static void focusGain(BaseComponent& component);
+	static void focusLoss(BaseComponent& component);
 
 private:
 	virtual bool onChar(const libv::input::EventChar& event); /// returns true if event is absorbed
@@ -174,7 +175,7 @@ private:
 	void detach(BaseComponent& parent);
 	void style();
 	void styleScan();
-	libv::observer_ptr<BaseComponent> focusTravers(const ContextFocusTravers& context, BaseComponent& current);
+	libv::observer_ptr<BaseComponent> focusTravers(const ContextFocusTravers& context);
 	void render(ContextRender& context);
 	void layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
@@ -279,11 +280,14 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) styleScan(BaseComponent& component) {
 		return component.styleScan();
 	}
-	static inline decltype(auto) focusChange(BaseComponent& previous, BaseComponent& current) {
-		return BaseComponent::focusChange(previous, current);
+	static inline decltype(auto) focusGain(BaseComponent& component) {
+		return BaseComponent::focusGain(component);
 	}
-	static inline decltype(auto) focusTravers(BaseComponent& component, const ContextFocusTravers& context, BaseComponent& current) {
-		return component.focusTravers(context, current);
+	static inline decltype(auto) focusLoss(BaseComponent& component) {
+		return BaseComponent::focusLoss(component);
+	}
+	static inline decltype(auto) focusTravers(BaseComponent& component, const ContextFocusTravers& context) {
+		return component.focusTravers(context);
 	}
 	static inline decltype(auto) render(BaseComponent& component, ContextRender& context) {
 		return component.render(context);

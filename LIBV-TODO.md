@@ -274,12 +274,12 @@ libv.ui: add exception catch beds to main ui operations
 libv: fix build for all / tests / run tests
 libv.ui: String2D set/get modernization
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe | Access to state universe from everywhere
+libv.ui: Make focus nullable
+libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
 
 libv.ui.input_field: caret mouse support
 

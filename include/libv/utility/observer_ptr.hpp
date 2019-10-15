@@ -63,7 +63,7 @@ public:
 		return *this;
 	}
 	template <typename T2>
-	constexpr inline observer_ptr& operator=(observer_ptr<T2>& other) & noexcept {
+	constexpr inline observer_ptr& operator=(const observer_ptr<T2>& other) & noexcept {
 		ptr = other.get();
 		return *this;
 	}

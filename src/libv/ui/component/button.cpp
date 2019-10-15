@@ -162,10 +162,10 @@ void Button::onFocus(const EventFocus& event) {
 	(void) event;
 	// TODO P3: listen to hotkey event (ui.select)
 
-	if (event.loss)
+	if (event.loss())
 		{} // Set style to normal or disabled
 
-	if (event.gain)
+	if (event.gain())
 		{} // Set style to active if not disabled
 
 	flagAuto(Flag::pendingRender);

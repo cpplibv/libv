@@ -54,6 +54,21 @@ public:
 	constexpr explicit inline operator T*() const noexcept {
 		return ptr;
 	}
+//	constexpr inline observer_ref& operator=(const observer_ref& other) & noexcept {
+//		ptr = other.get();
+//		return *this;
+//	}
+//	template <typename T2,
+//			typename = std::enable_if_t<!std::is_same_v<observer_ref, T2>>>
+//	constexpr inline observer_ref& operator=(T2& other) & noexcept {
+//		ptr = std::addressof(other);
+//		return *this;
+//	}
+//	template <typename T2>
+//	constexpr inline observer_ref& operator=(const observer_ref<T2>& other) & noexcept {
+//		ptr = other.get();
+//		return *this;
+//	}
 
 public:
 	template <typename K>

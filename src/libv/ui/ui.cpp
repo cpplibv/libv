@@ -128,41 +128,44 @@ public:
 
 public:
 	ImplUI(UI& ui) :
-		context(ui, context_state) {
-		context_state.focus_ = root;
-	}
+		context(ui, context_state) { }
 
 	ImplUI(UI& ui, const Settings& settings) :
-		context(ui, context_state, settings) {
-		context_state.focus_ = root;
-	}
+		context(ui, context_state, settings) { }
 
 public:
-	void focus(BaseComponent& component) {
-		if (component == context_state.focus_)
+	void focus(libv::observer_ptr<BaseComponent> old_focus, libv::observer_ptr<BaseComponent> new_focus) {
+		if (new_focus == old_focus)
 			return;
 
-		log_ui.trace("Focus set from: {} to {}", context_state.focus_->path(), component.path());
+		if (old_focus == nullptr) {
+			log_ui.trace("Focus set to: {}", new_focus->path());
+			AccessRoot::focusGain(*new_focus);
 
-		AccessRoot::focusChange(*context_state.focus_, component);
-		context_state.focus_ = component;
+		} else if (new_focus == nullptr) {
+			log_ui.trace("Focus clear from: {}", old_focus->path());
+			AccessRoot::focusLoss(*old_focus);
+
+		} else {
+			log_ui.trace("Focus set from: {} to: {}", old_focus->path(), new_focus->path());
+			AccessRoot::focusLoss(*old_focus);
+			AccessRoot::focusGain(*new_focus);
+		}
 	}
 
-	void focusTravers(Degrees<float> direction) {
-		ContextFocusTravers context{*context_state.focus_, direction};
+	libv::observer_ptr<BaseComponent> focusTravers(libv::observer_ptr<BaseComponent> old_focus, Degrees<float> direction) {
+		ContextFocusTravers ctx{direction};
 
-		auto newFocus = AccessRoot::focusTravers(*context_state.focus_, context, *context_state.focus_);
+		libv::observer_ptr<BaseComponent> new_focus = nullptr;
 
-		if (newFocus == nullptr) // Loop around
-			newFocus = AccessRoot::focusTravers(root, context, root);
+		if (old_focus != nullptr)
+			new_focus = AccessRoot::focusTravers(*old_focus, ctx);
 
-		if (newFocus == nullptr) // Not found anything, back to root
-			newFocus = libv::make_observer(root);
+		if (new_focus == nullptr)
+			new_focus = AccessRoot::focusTravers(root, ctx);
 
-		log_ui.debug("Focus travel from: {} to {}", context_state.focus_->path(), newFocus->path());
-
-		AccessRoot::focusChange(*context_state.focus_, *newFocus);
-		context_state.focus_ = newFocus;
+		focus(old_focus, new_focus);
+		return new_focus;
 	}
 };
 
@@ -335,14 +338,6 @@ void UI::update(libv::glr::Queue& gl) {
 	}
 
 	try {
-		// --- Focus ---
-		//self->focusTravers(Degrees<float>{135}); // backward
-		//self->focusTravers(Degrees<float>{315}); // forward
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during focus in UI: {}", ex.what());
-	}
-
-	try {
 		// --- Update ---
 		//AccessRoot::update(self->root);
 	} catch (const std::exception& ex) {
@@ -448,14 +443,15 @@ void UI::destroy(libv::glr::Queue& gl) {
 // -------------------------------------------------------------------------------------------------
 
 void UI::focus(BaseComponent& component) {
-	self->focus(component);
+	self->focus(self->context_state.focus_, component);
+	self->context_state.focus_ = component;
 }
 
 void UI::detachFocused(BaseComponent& component) {
 	(void) component;
 
 	assert(component == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
-	self->focusTravers(Degrees<float>{315});
+	self->context_state.focus_ = self->focusTravers(self->context_state.focus_, Degrees<float>{315});
 }
 
 void UI::detachFocusLinked(BaseComponent& component) {

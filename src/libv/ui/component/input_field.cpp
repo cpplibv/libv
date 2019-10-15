@@ -22,6 +22,7 @@
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
+#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -325,12 +326,12 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 }
 
 void InputField::onFocus(const EventFocus& event) {
-	if (event.loss) {
+	if (event.loss()) {
 		// TODO P5: Set style to normal or disabled
-//		flagAuto(Flag::pendingRender);
+		flagAuto(Flag::pendingRender);
 	}
 
-	if (event.gain) {
+	if (event.gain()) {
 		// TODO P5: Set style to active if not disabled
 
 		// TODO P5: Implement FocusSelectPolicy property, half is in onFocus, half is onMouseButton

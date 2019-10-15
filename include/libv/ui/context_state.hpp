@@ -21,11 +21,10 @@ class BaseComponent;
 
 class ContextState {
 	friend class UI;
-	friend class ImplUI; // <<< P1: move away from ImplUI
 
-	time_point time_frame_{}; /// Time point of frame start, does not change during a frame
+	time_point time_frame_{}; /// Time point of frame start, does not change during the same frame
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
-	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during a frame
+	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
 
 	libv::vec2f mouse_position_;
 	libv::vec2f scroll_position_;

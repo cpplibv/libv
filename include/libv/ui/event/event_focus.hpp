@@ -2,25 +2,22 @@
 
 #pragma once
 
-// libv
-#include <libv/math/angle.hpp>
-#include <libv/math/vec.hpp>
-#include <libv/utility/observer_ref.hpp>
-
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
-
 struct EventFocus {
-	bool gain = false;
-	bool loss = false;
+	bool focus = false;
 
-	libv::observer_ref<BaseComponent> previous;
-	libv::observer_ref<BaseComponent> current;
+	[[nodiscard]] constexpr inline bool gain() const noexcept {
+		return focus;
+	}
+
+	[[nodiscard]] constexpr inline bool loss() const noexcept {
+		return !focus;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
