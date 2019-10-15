@@ -62,6 +62,11 @@ public:
 	explicit ContextUI(UI& ui, ContextState& state, Settings settings = Settings());
 	~ContextUI();
 
+	ContextUI(const ContextUI&) = delete;
+	ContextUI(ContextUI&&) = delete;
+	ContextUI& operator=(const ContextUI&) = delete;
+	ContextUI& operator=(ContextUI&&) = delete;
+
 public:
 	std::string clipboardText();
 	void clipboardText(const std::string& string);

@@ -276,12 +276,14 @@ libv.ui: String2D set/get modernization
 libv.ui: Every event: focus, mouse, key, char shall provide access to the entire state universe | Access to state universe from everywhere
 libv.ui: Make focus nullable
 libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
+libv.ui.input_field: caret mouse support
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.input_field: caret mouse support
+libv.ui.input_field: mouse caret placement respect line
+libv.ui: String2D getClosestCharacterIndex should use pen position, glyph are all over the place
 
 libv.ui.property: hybrid reflection - dynamic
 

@@ -348,10 +348,15 @@ void InputField::onFocus(const EventFocus& event) {
 }
 
 bool InputField::onMouseButton(const EventMouseButton& event) {
-	if (event.action == libv::input::Action::press)
+	if (!isFocused() && event.action == libv::input::Action::press)
 		focus();
 
-//	caret = text_.getClosestCharacterIndex(position() - event.universe.mousePosition);
+	if (event.action == libv::input::Action::press) {
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
 
 	return true;
 }
@@ -364,6 +369,15 @@ bool InputField::onMouseMovement(const EventMouseMovement& event) {
 	if (event.leave)
 		reset(property.bg_color);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+
+	// === TEMP ========================================================================================
+	if (context().state.key_pressed(libv::input::Key::F1)) {
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+	// =================================================================================================
 
 	return true;
 }
@@ -379,7 +393,8 @@ void InputField::doAttach() {
 	watchChar(true);
 	watchKey(true);
 	watchFocus(true);
-	watchMouse(Flag::watchMouseButton | Flag::watchMouseEnter);
+//	watchMouse(Flag::watchMouseButton | Flag::watchMouseEnter);
+	watchMouse(Flag::mask_watchMouse);
 }
 
 void InputField::doStyle(ContextStyle& ctx) {

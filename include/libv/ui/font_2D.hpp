@@ -50,7 +50,7 @@ namespace ui {
 class Font2D {
 public:
 	struct Character {
-		libv::vec2f pos[4];
+		libv::vec2f pos[4]; /// Order: bottom-left, bottom-right, top-right, top-left
 		libv::vec2f tex[4]; /// Texture coordinates in TEXEL-SPACE (and not in normalized texture space)
 		libv::vec2f advance; /// The pen offset for the next character position
 		float bearing_left = 0;

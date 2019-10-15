@@ -35,6 +35,7 @@ class ContextState {
 	boost::container::flat_set<int> pressed_scancodes;
 	boost::container::flat_set<libv::input::Mouse> pressed_mouses;
 
+	// modifier lock keys: caps-lock, num-lock, scroll-lock
 	// pressed timestamps (?)
 
 	libv::observer_ptr<BaseComponent> focus_ = nullptr;

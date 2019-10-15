@@ -250,11 +250,31 @@ libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
 //libv::vec2f String2D::getLinePosition(size_t lineIndex) {
 //	return {}; // Not implemented yet.
 //}
-//
-//size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
-//	return {}; // Not implemented yet.
-//}
-//
+
+size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
+	if (dirty)
+		layout();
+
+	auto positions = mesh_.attribute(attribute_position);
+
+	float min_distance_sq = (libv::vec::xy(positions[0]) - position).lengthSQ();
+	size_t min_index = 0;
+
+	for (size_t i = 0; i < positions.size(); i += 4) {
+		// NOTE: Using +0 as bottom-left and +3 as top-left to round better as cursor is placed on the left side of the glyph
+
+		const auto center = (libv::vec::xy(positions[i + 0]) + libv::vec::xy(positions[i + 3])) * 0.5f;
+		const auto distance_sq = (position - center).lengthSQ();
+
+		if (distance_sq < min_distance_sq) {
+			min_index = i;
+			min_distance_sq = distance_sq;
+		}
+	}
+
+	return min_index / 4;
+}
+
 //size_t String2D::getClosestLineIndex(libv::vec2f position) {
 //	return {}; // Not implemented yet.
 //}
