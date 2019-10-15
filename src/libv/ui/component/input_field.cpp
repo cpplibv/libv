@@ -118,6 +118,12 @@ void InputField::access_properties(T& ctx) {
 			pgr::behaviour, pnm::text,
 			"Displayed text"
 	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.caret = v; },
+			[](const auto& c) { return c.caret; },
+			pgr::behaviour, "caret",
+			"Current zero indexed caret position"
+	);
 }
 
 //ComponentPropertyDescription InputField::description;

@@ -278,6 +278,7 @@ libv.ui: Make focus nullable
 libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
 libv.ui.input_field: caret mouse support
 libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs are all over the place
+libv.ui.input_field: synthetize caret property
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -285,14 +286,21 @@ libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs 
 
 libv.ui.input_field: mouse caret placement respect line
 
-libv.ui.property: hybrid reflection - dynamic
+
+libv.ui: debug zoom in
+	libv.gl: framebuffer
+	libv.glr: framebuffer
+	libv.gl: renderbuffer
+	libv.glr: renderbuffer
+	libv.gl: blit
+	libv.glr: blit
+	libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), its not strictly an ui debug feature
+
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
+	libv.ui.property: hybrid reflection - dynamic
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
-
-event
-	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
 atlas
 	libv.ui: texture atlas definition/parsing
@@ -320,7 +328,7 @@ ui
 layout
 	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: remove layout1 pass member variables in component_base
-	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue
+	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits
 
 cleanup
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
@@ -333,6 +341,9 @@ mouse
 	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 	libv.ui: relative - mouse event should contain a watcher relative coordinates too
 	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
+
+event
+	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
 properties / style
 	libv.ui.property: property system interaction with static_component system
@@ -356,28 +367,22 @@ properties / style
 
 --- [[[ deadline: 2019.09.30 ]]] ---
 
-libv.ui: style sheets
 
-libv.ui: debug zoom in
-	libv.gl: framebuffer
-	libv.glr: framebuffer
-	libv.gl: renderbuffer
-	libv.glr: renderbuffer
-	libv.gl: blit
-	libv.glr: blit
-	libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), its not strictly an ui debug feature
+libv.ui: style sheets
 
 interactive
 	libv.ui: String2D API to find nearest character position
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui.input_field: selection support
+	libv.ui.input_field: Implement FocusSelectPolicy
+	libv.ui.input_field: synthetize selection property
 	libv.ui.input_field: undo/redo support
 	libv.ui.input_field: input mask (this will possibly a different input_field type)
 	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
 	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
-	libv.ui.input_field: Implement FocusSelectPolicy
 
 hotkey
+	libv.hotkey: design API
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
 	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
 	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
@@ -417,7 +422,8 @@ hotkey
 
 focus
 	libv.ui.focus: easy way to trigger Focus traversal from events/components
-	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further, only downside is the members in the event class previous and current would be invalid
+	libv.ui.focus: by default unhandled tab should trigger Focus traversal
+	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further
 	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
 	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
 
