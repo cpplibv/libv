@@ -119,7 +119,7 @@ void InputField::access_properties(T& ctx) {
 			"Displayed text"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.caret = v; },
+			[](auto& c, auto v) { c.caret = v; c.fire(EventCaret{c}); },
 			[](const auto& c) { return c.caret; },
 			pgr::behaviour, "caret",
 			"Current zero indexed caret position"
@@ -200,6 +200,7 @@ bool InputField::onChar(const libv::input::EventChar& event) {
 	caretStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	fire(EventChange{*this});
+	fire(EventCaret{*this});
 	return true;
 }
 
@@ -234,6 +235,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caret++;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -263,6 +265,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 	if (event.key == libv::input::Key::F2 && event.action == libv::input::Action::press) {
@@ -270,6 +273,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -299,6 +303,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventChange{*this});
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -310,6 +315,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventChange{*this});
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -318,6 +324,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 			caret--;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -326,6 +333,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 			caret++;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -333,6 +341,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caret = 0;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -340,6 +349,7 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 		caret = static_cast<uint32_t>(text_.length());
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 		return true;
 	}
 
@@ -365,6 +375,7 @@ void InputField::onFocus(const EventFocus& event) {
 
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingRender | Flag::pendingLayout);
+		fire(EventCaret{*this});
 	}
 }
 
@@ -377,6 +388,7 @@ bool InputField::onMouseButton(const EventMouseButton& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 	}
 
 	return true;
@@ -397,12 +409,14 @@ bool InputField::onMouseMovement(const EventMouseMovement& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 	}
 	if (context().state.key_pressed(libv::input::Key::F2)) {
 		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		fire(EventCaret{*this});
 	}
 	// =================================================================================================
 

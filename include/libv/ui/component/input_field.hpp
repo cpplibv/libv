@@ -46,6 +46,9 @@ public:
 //		Change change;
 //		// Change type: insert/push_back/remove/pop_back | Important, could be used for optimization
 	};
+	struct EventCaret {
+		InputField& component;
+	};
 	struct EventSelect {
 		InputField& component;
 	};
@@ -109,6 +112,11 @@ public:
 	template <typename F>
 	inline void event_change(libv::observer_ptr<BaseComponent> slot, F&& func) {
 		connect<EventChange>(slot, std::forward<F>(func));
+	}
+
+	template <typename F>
+	inline void event_caret(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EventCaret>(slot, std::forward<F>(func));
 	}
 
 	template <typename F>
