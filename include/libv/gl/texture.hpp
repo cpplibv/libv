@@ -130,11 +130,21 @@ private:
 		checkGL();
 	}
 
-public:
-	// glTexStorage1D(to_value(object.target), levels, to_value(Format), width);
-	// glTexStorage2D(to_value(object.target), levels, to_value(Format), width, height);
-	// glTexStorage3D(to_value(object.target), levels, to_value(Format), width, height, depth);
+	inline void emulateStorage2D_ms(int32_t samples, bool fixedSamples, GLenum format, int32_t width, int32_t height) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisample>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTexImage2DMultisample(to_value(object.target), samples, format, width, height, fixedSamples);
+		checkGL();
+	}
 
+	inline void emulateStorage3D_ms(int32_t samples, bool fixedSamples, GLenum format, int32_t width, int32_t height, int32_t depth) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisampleArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTexImage3DMultisample(to_value(object.target), samples, format, width, height, depth, fixedSamples);
+		checkGL();
+	}
+
+public:
 	inline void storage(int32_t levels, Format format, int32_t width) noexcept {
 		emulateStorage1D(levels, format.format, format.base, width);
 	}
@@ -143,6 +153,13 @@ public:
 	}
 	inline void storage(int32_t levels, Format format, int32_t width, int32_t height, int32_t depth) noexcept {
 		emulateStorage3D(levels, format.format, format.base, width, height, depth);
+	}
+
+	inline void storage_ms(int32_t samples, bool fixedSamples, Format format, int32_t width, int32_t height) noexcept {
+		emulateStorage2D_ms(samples, fixedSamples, format.format, width, height);
+	}
+	inline void storage_ms(int32_t samples, bool fixedSamples, Format format, int32_t width, int32_t height, int32_t depth) noexcept {
+		emulateStorage3D_ms(samples, fixedSamples, format.format, width, height, depth);
 	}
 
 public:
@@ -271,7 +288,7 @@ public:
 		return result;
 	}
 
-public:
+private:
 	inline void set(GLenum parameter, GLfloat value) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glTexParameterf(to_value(object.target), parameter, value);
@@ -319,12 +336,14 @@ public:
 		set(GL_TEXTURE_LOD_BIAS, bias);
 	}
 	inline void setMagFilter(MagFilter filter) noexcept {
+		object.template assert_not_target<TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
 		set(GL_TEXTURE_MAG_FILTER, static_cast<int32_t>(to_value(filter)));
 	}
 	inline void setMaxLOD(float value) noexcept {
 		set(GL_TEXTURE_MAX_LOD, value);
 	}
 	inline void setMinFilter(MinFilter filter) noexcept {
+		object.template assert_not_target<TextureTarget::_2DMultisample, TextureTarget::_2DMultisampleArray>();
 		set(GL_TEXTURE_MIN_FILTER, static_cast<int32_t>(to_value(filter)));
 	}
 	inline void setMinLOD(float value) noexcept {
@@ -345,16 +364,17 @@ public:
 	inline void setSwizzleA(Swizzle swizzle) noexcept {
 		set(GL_TEXTURE_SWIZZLE_A, swizzle);
 	}
+
 	inline void setWrap(Wrap s) noexcept {
 		object.template assert_target<TextureTarget::_1D>();
 
-		set(GL_TEXTURE_WRAP_S, to_value(s));
+		set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(s)));
 	}
 	inline void setWrap(Wrap s, Wrap t) noexcept {
 		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::CubeMap>();
 
-		set(GL_TEXTURE_WRAP_S, to_value(s));
-		set(GL_TEXTURE_WRAP_T, to_value(t));
+		set(GL_TEXTURE_WRAP_S, static_cast<int32_t>(to_value(s)));
+		set(GL_TEXTURE_WRAP_T, static_cast<int32_t>(to_value(t)));
 	}
 	inline void setWrap(Wrap s, Wrap t, Wrap r) noexcept {
 		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray>();

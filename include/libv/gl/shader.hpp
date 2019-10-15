@@ -33,8 +33,6 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id == 0);
 		object.id = glCreateShader(to_value(type));
 		checkGL();
-		if (object.id == 0)
-			log_gl.error("Failed to create {} shader", to_string(type));
 	}
 
 	inline void destroy() {

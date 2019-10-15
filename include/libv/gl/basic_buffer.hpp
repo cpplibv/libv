@@ -4,6 +4,8 @@
 
 // ext
 #include <GL/glew.h>
+// libv
+#include <libv/utility/guard.hpp>
 // pro
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
@@ -50,6 +52,14 @@ public:
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glBindBuffer(Target, 0);
 		checkGL();
+	}
+
+	[[nodiscard]] inline auto bind_guard() noexcept {
+	    bind();
+
+		return Guard([this] {
+			unbind();
+		});
 	}
 
 public:

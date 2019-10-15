@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 // libv
 #include <libv/utility/bit_cast.hpp>
+#include <libv/utility/guard.hpp>
 // pro
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/assert.hpp>
@@ -44,22 +45,22 @@ public:
 
 public:
 	inline void bind() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 	    glBindVertexArray(object.id);
 		checkGL();
 	}
 
 	inline void unbind() noexcept {
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 	    glBindVertexArray(0);
 		checkGL();
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {
-	    glBindVertexArray(object.id);
-		checkGL();
+	    bind();
 
 		return Guard([this] {
-			glBindVertexArray(0);
-			checkGL();
+			unbind();
 		});
 	}
 

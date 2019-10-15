@@ -23,6 +23,10 @@ struct Texture_t {
 	constexpr inline void assert_target() noexcept {
 		LIBV_GL_DEBUG_ASSERT_STATIC(((Targets == Target) || ...), "Operation is not supported on Texture Target");
 	}
+	template <TextureTarget... Targets>
+	constexpr inline void assert_not_target() noexcept {
+		LIBV_GL_DEBUG_ASSERT_STATIC(((Targets != Target) && ...), "Operation is not supported on Texture Target");
+	}
 };
 
 struct Texture {
@@ -56,14 +60,14 @@ using Texture1D = Texture_t<TextureTarget::_1D>;
 using Texture1DArray = Texture_t<TextureTarget::_1DArray>;
 using Texture2D = Texture_t<TextureTarget::_2D>;
 using Texture2DArray = Texture_t<TextureTarget::_2DArray>;
+using Texture2DMultisample = Texture_t<TextureTarget::_2DMultisample>;
+using Texture2DMultisampleArray = Texture_t<TextureTarget::_2DMultisampleArray>;
 using Texture3D = Texture_t<TextureTarget::_3D>;
 using TextureCube = Texture_t<TextureTarget::CubeMap>;
 using TextureCubeArray = Texture_t<TextureTarget::CubeMapArray>;
 using TextureRectangle = Texture_t<TextureTarget::Rectangle>;
 
 //using TextureBuffer = Texture_t<TextureTarget::Buffer>;
-//using Texture2DMultisample = Texture_t<TextureTarget::_2DMultisample>;
-//using Texture2DMultisampleArray = Texture_t<TextureTarget::_2DMultisampleArray>;
 
 // -------------------------------------------------------------------------------------------------
 

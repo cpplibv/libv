@@ -72,6 +72,13 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
+	glfwWindowHint(GLFW_RED_BITS, 8);
+	glfwWindowHint(GLFW_GREEN_BITS, 8);
+	glfwWindowHint(GLFW_BLUE_BITS, 8);
+	glfwWindowHint(GLFW_ALPHA_BITS, 0);
+	glfwWindowHint(GLFW_DEPTH_BITS, 32);
+	glfwWindowHint(GLFW_STENCIL_BITS, 0);
+
 	// --- Windowed ------------------------------------------------------------------------------------
 
 	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);

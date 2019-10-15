@@ -24,6 +24,11 @@ enum class BufferBit : GLenum {
 	Color = 0x00004000, /// GL_COLOR_BUFFER_BIT
 	Depth = 0x00000100, /// GL_DEPTH_BUFFER_BIT
 	Stencil = 0x00000400, /// GL_STENCIL_BUFFER_BIT
+
+	ColorDepth = Color | Depth,
+	DepthStencil = Depth | Stencil,
+
+	ColorDepthStencil = Color | Depth | Stencil,
 };
 inline BufferBit operator|(BufferBit lhs, BufferBit rhs) {
 	return static_cast<BufferBit>(libv::to_value(lhs) | libv::to_value(rhs));
@@ -646,6 +651,43 @@ enum class PolygonMode : GLenum {
 enum class FrontFace : GLenum {
 	CCW = 0x0901, /// GL_CCW
 	CW = 0x0900, /// GL_CW
+};
+
+// -------------------------------------------------------------------------------------------------
+
+enum class Attachment : GLenum {
+	Color0 = 0x8CE0, /// GL_COLOR_ATTACHMENT0
+	Color1 = 0x8CE1, /// GL_COLOR_ATTACHMENT1
+	Color2 = 0x8CE2, /// GL_COLOR_ATTACHMENT2
+	Color3 = 0x8CE3, /// GL_COLOR_ATTACHMENT3
+	Color4 = 0x8CE4, /// GL_COLOR_ATTACHMENT4
+	Color5 = 0x8CE5, /// GL_COLOR_ATTACHMENT5
+	Color6 = 0x8CE6, /// GL_COLOR_ATTACHMENT6
+	Color7 = 0x8CE7, /// GL_COLOR_ATTACHMENT7
+	Color8 = 0x8CE8, /// GL_COLOR_ATTACHMENT8
+	Color9 = 0x8CE9, /// GL_COLOR_ATTACHMENT9
+	Color10 = 0x8CEA, /// GL_COLOR_ATTACHMENT10
+	Color11 = 0x8CEB, /// GL_COLOR_ATTACHMENT11
+	Color12 = 0x8CEC, /// GL_COLOR_ATTACHMENT12
+	Color13 = 0x8CED, /// GL_COLOR_ATTACHMENT13
+	Color14 = 0x8CEE, /// GL_COLOR_ATTACHMENT14
+	Color15 = 0x8CEF, /// GL_COLOR_ATTACHMENT15
+	Depth = 0x8D00, /// GL_DEPTH_ATTACHMENT
+	DepthStencil = 0x821A, /// GL_DEPTH_STENCIL_ATTACHMENT
+	Stencil = 0x8D20, /// GL_STENCIL_ATTACHMENT
+};
+
+enum class FramebufferStatus : GLenum {
+	Complete = 0x8CD5, /// GL_FRAMEBUFFER_COMPLETE
+
+	IncompleteAttachment = 0x8CD6, /// GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT
+	IncompleteDraw_buffer = 0x8CDB, /// GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER
+	IncompleteLayerTargets = 0x8DA8, /// GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS
+	IncompleteMissingAttachment = 0x8CD7, /// GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT
+	IncompleteMultisample = 0x8D56, /// GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE
+	IncompleteReadBuffer = 0x8CDC, /// GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
+	Undefined = 0x8219, /// GL_FRAMEBUFFER_UNDEFINED
+	Unsupported = 0x8CDD, /// GL_FRAMEBUFFER_UNSUPPORTED
 };
 
 // -------------------------------------------------------------------------------------------------

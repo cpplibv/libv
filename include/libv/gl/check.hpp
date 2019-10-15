@@ -15,7 +15,7 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-inline void checkGL(source_location loc = source_location::current()) {
+inline void checkGL(libv::source_location loc = libv::source_location::current()) noexcept {
 	GLenum err = glGetError();
 	while (err != GL_NO_ERROR) {
 		log_gl.error({"OpenGL: {}: {}", loc}, err, glewGetErrorString(err));

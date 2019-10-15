@@ -281,22 +281,37 @@ libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs 
 libv.ui.input_field: synthetize caret property
 libv.ui.input_field: mouse caret placement respect line
 libv.ui.input_field: fix that lines tend to snap down | Solved by determining that LineAdvance != LineHeight
+libv.gl: framebuffer
+libv.gl: Texture2DMultisample
+libv.gl: Texture2DMultisampleArray
+libv.gl: blit
+libv.gl: renderbuffer
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.gl: framebuffer
+libv.gl: glEnable GL_MULTISAMPLE
+libv.gl: glReadPixels
+
+libv.gl: framebuffer clarify the difference between read/write, especially on the attachments, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
+
 libv.glr: framebuffer
-libv.gl: renderbuffer
 libv.glr: renderbuffer
-libv.gl: blit
+libv.glr: rendertarget | (?) I think this is meant to be the framebuffer itself
 libv.glr: blit
+libv.glr: Texture2DMultisample
+libv.glr: Texture2DMultisampleArray
+libv.glr: glEnable GL_MULTISAMPLE
+libv.glr: glReadPixels
 
 libv.ui: debug zoom in
 libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), it could be used not just for UI
 libv.ui: debug zoom in mode remap mouse input, debug key to change camera zoom/position while not pressed remap input
-libv.ui: debug mode highlight mouse cursor pixel
+libv.ui: debug mode highlight mouse cursor pixel | magnifier can do it better, but this still could be useful
+
+libv.ui: debug magnifier mode, only zoom around the mouse, (optionally) slow mouse movement speed
+libv.ui: both debug magnifier mode and debug zoom mode are required
 
 
 debug
@@ -505,7 +520,7 @@ libv.ui: batch component meshes into a bigger ui mesh cluster and use subcompone
 
 libv.utility: add/verify structured binding support for vec_t
 
-libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras
+libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras | Cancel! 100%+ is valid (Example: button with a 120% shadow around it)
 
 --- [[[ deadline: 2019.11.30 ]]] ---
 
@@ -537,13 +552,12 @@ libv.glr: Implement sub-mesh API
 libv.glr: Fix uniform naming mess, Reduce the number of public members
 libv.glr: vm4 | non trivial
 libv.gl: https://learnopengl.com/PBR/Lighting
-libv.glr: frame buffer
-libv.glr: render target
 libv.glr: post-processing emission / bloom
 libv.glr: post-processing gamma
 libv.glr: post-processing haze
 
-libv.glr: shadow
+libv.glr: Shadow
+libv.glr: Cascaded shadow maps
 libv.glr: Use instanced render for world shadow pass and clip with gl_ClipDistance[i] / glEnable(GL_CLIP_DISTANCEi);
 libv.glr: Tiled Forward Shading (aka Forward+) https://www.3dgep.com/forward-plus/
 libv.glr: Volume Tiled Forward Shading https://www.3dgep.com/wp-content/uploads/2017/07/3910539_Jeremiah_van_Oosten_Volume_Tiled_Forward_Shading.pdf
@@ -575,6 +589,7 @@ cpp: enun class default underlying type is int, specify underlying type for ever
 cpp: check if every possible operator had been made to a hidden friend
 cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
 libv.gl: use mdspan for image updates instead of raw loops
+libv.gl: glReadBuffer and glDrawBuffer | not urgent as the defaults are correct
 
 libv.ecs: Test fails with an assert in boost vector
 
@@ -622,11 +637,12 @@ cpp: (adaptive) radix tree - O(1) lookup
 cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
 cpp: clarify template vs auto type deduction rules
 cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inline const void&& function() const&& noexcept override final;
-cpp: replace every raw ptr with a smart counter part (incl observer_ptr)
+cpp: learn std::launder and std::bless
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
+ext: adopt a better hash_map
 gl: docs http://docs.gl
 gl: glEnable(GL_DEBUG_OUTPUT);
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
@@ -689,8 +705,8 @@ app: for apps you can cd next to the binary to solve any relative path issue (co
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
-logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
 logger: binlog - https://www.youtube.com/watch?v=FyJI4Z6jD4w
+logger: client - network connected different app (real time log viewer) with retrospective and real-time filtering and stuff...
 cpp.compile: things I want to know about my compile time:
 		- Instantiation time, count, location and arguments for every template and their size in binary (inline = 0)
 		- List of headers included for every translation unit
@@ -752,20 +768,17 @@ http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
 
 Optimized compiling - cmake https://github.com/sakra/cotire
 
-// -------------------------------------------------------------------------------------------------
-
 CMake resource folder
 Cube / Sky Textures http://sourceforge.net/projects/spacescape/
 
 http://ogldev.atspace.co.uk/www/tutorial43/tutorial43.html
 OpenGL Reference page: https://www.khronos.org/registry/OpenGL-Refpages/gl4/
 
-----
-
-Fresnel shader - Atmosphere
-Cook-Torrance shader - Metal
-Minnaert - More depth?
-OrenNayar - More avg lambert
+Shader types
+	Fresnel shader - Atmosphere
+	Cook-Torrance shader - Metal
+	Minnaert - More depth?
+	OrenNayar - More avg lambert
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
@@ -1076,145 +1089,6 @@ struct Light {
 //  13  |     ^^^^^     |  texcoord5  |
 //  14  |     ^^^^^     |  texcoord6  |
 //  15  |     ^^^^^     |  texcoord7  |
-
-// -------------------------------------------------------------------------------------------------
-
-class Framebuffer {
-public:
-	Framebuffer(const Framebuffer& other);
-	Framebuffer(uint width, uint height, uchar color = 32, uchar depth = 24);
-	~Framebuffer();
-
-	operator GLuint() const;
-	const Framebuffer& operator=(const Framebuffer& other);
-
-	const Texture& GetTexture();
-	const Texture& GetDepthTexture();
-
-private:
-	static GC gc;
-	GLuint obj;
-	Texture texColor;
-	Texture texDepth;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-class Renderbuffer {
-public:
-	Renderbuffer();
-	Renderbuffer(const Renderbuffer& other);
-	Renderbuffer(uint width, uint height, InternalFormat::internal_format_t format);
-
-	~Renderbuffer();
-
-	operator GLuint() const;
-	const Renderbuffer& operator=(const Renderbuffer& other);
-
-	void Storage(uint width, uint height, InternalFormat::internal_format_t format);
-
-private:
-	static GC gc;
-	GLuint obj;
-};
-
-// =================================================================================================
-
-Framebuffer::Framebuffer(const Framebuffer& other) {
-	gc.Copy(other.obj, obj);
-	texColor = other.texColor;
-	texDepth = other.texDepth;
-}
-Framebuffer::Framebuffer(uint width, uint height, uchar color, uchar depth) {
-	GLint restoreId; glGetIntegerv( GL_DRAW_FRAMEBUFFER_BINDING, &restoreId );
-
-	// Determine appropriate formats
-	InternalFormat::internal_format_t colorFormat;
-	if (color == 24) colorFormat = InternalFormat::RGB;
-	else if (color == 32) colorFormat = InternalFormat::RGBA;
-	else throw FramebufferException();
-
-	InternalFormat::internal_format_t FormatDepth;
-	if (depth == 8) FormatDepth = InternalFormat::DepthComponent;
-	else if (depth == 16) FormatDepth = InternalFormat::DepthComponent16;
-	else if (depth == 24) FormatDepth = InternalFormat::DepthComponent24;
-	else if (depth == 32) FormatDepth = InternalFormat::DepthComponent32F;
-	else throw FramebufferException();
-
-	// Create FBO
-	gc.Create(obj, glGenFramebuffers, glDeleteFramebuffers);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, obj);
-
-	// Create texture to hold color buffer
-	texColor.Image2D(0, DataType::UByte, Format::RGBA, width, height, colorFormat);
-	texColor.SetWrapping(GL::Wrapping::ClampEdge, GL::Wrapping::ClampEdge);
-	texColor.SetFilters(GL::Filter::Linear, GL::Filter::Linear);
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texColor, 0);
-
-	// Create renderbuffer to hold depth buffer
-	if (depth > 0) {
-		glBindTexture(GL_TEXTURE_2D, texDepth);
-		glTexImage2D(GL_TEXTURE_2D, 0, FormatDepth, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, 0);
-		texDepth.SetWrapping(GL::Wrapping::ClampEdge, GL::Wrapping::ClampEdge);
-		texDepth.SetFilters(GL::Filter::Nearest, GL::Filter::Nearest);
-		glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texDepth, 0);
-	}
-
-	// Check
-	if (glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		throw FramebufferException();
-
-	glBindFramebuffer( GL_DRAW_FRAMEBUFFER, restoreId );
-}
-Framebuffer::~Framebuffer() {
-	gc.Destroy(obj);
-}
-Framebuffer::operator GLuint() const {
-	return obj;
-}
-const Framebuffer& Framebuffer::operator=(const Framebuffer& other) {
-	gc.Copy(other.obj, obj, true);
-	texColor = other.texColor;
-	texDepth = other.texDepth;
-
-	return *this;
-}
-const Texture& Framebuffer::GetTexture() {
-	return texColor;
-}
-const Texture& Framebuffer::GetDepthTexture() {
-	return texDepth;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-GC Framebuffer::gc;
-Renderbuffer::Renderbuffer() {
-	gc.Create(obj, glGenRenderbuffers, glDeleteRenderbuffers);
-}
-Renderbuffer::Renderbuffer(const Renderbuffer& other) {
-	gc.Copy(other.obj, obj);
-}
-Renderbuffer::Renderbuffer(uint width, uint height, InternalFormat::internal_format_t format) {
-	gc.Create(obj, glGenRenderbuffers, glDeleteRenderbuffers);
-	Storage(width, height, format);
-}
-Renderbuffer::~Renderbuffer() {
-	gc.Destroy(obj);
-}
-Renderbuffer::operator GLuint() const {
-	return obj;
-}
-const Renderbuffer& Renderbuffer::operator=(const Renderbuffer& other) {
-	gc.Copy(other.obj, obj, true);
-	return *this;
-}
-void Renderbuffer::Storage(uint width, uint height, InternalFormat::internal_format_t format) {
-	glBindRenderbuffer(GL_RENDERBUFFER, obj);
-	glRenderbufferStorage(GL_RENDERBUFFER, format, width, height);
-}
-
-GC Renderbuffer::gc;
 
 // -------------------------------------------------------------------------------------------------
 

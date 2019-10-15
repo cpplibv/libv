@@ -15,12 +15,15 @@
 #include <stack>
 #include <vector>
 // pro
+#include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
 #include <libv/gl/matrix_stack.hpp>
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/buffer_object.hpp>
+#include <libv/gl/framebuffer_object.hpp>
 #include <libv/gl/program_object.hpp>
+#include <libv/gl/renderbuffer_object.hpp>
 #include <libv/gl/shader_object.hpp>
 #include <libv/gl/texture_object.hpp>
 #include <libv/gl/uniform_buffer_object.hpp>
@@ -44,7 +47,9 @@ inline float deg(float radians) {
 
 struct AccessArrayBuffer;
 struct AccessBuffer;
+struct AccessFramebuffer;
 struct AccessProgram;
+struct AccessRenderbuffer;
 struct AccessShader;
 template <typename T> struct AccessTexture;
 struct AccessUniformBuffer;
@@ -507,6 +512,9 @@ private:
 	}
 
 public:
+	inline GLint getMaxColorAttachments() const {
+		return get<GLint>(GL_MAX_COLOR_ATTACHMENTS);
+	}
 	inline GLint getMaxUniformBlockSize() const {
 		return get<GLint>(GL_MAX_UNIFORM_BLOCK_SIZE);
 	}
@@ -518,6 +526,12 @@ public:
 	}
 	inline GLint getMaxVertexUniformComponents() const {
 		return get<GLint>(GL_MAX_VERTEX_UNIFORM_COMPONENTS);
+	}
+	inline GLint getMaxSamples() const {
+		return get<GLint>(GL_MAX_SAMPLES);
+	}
+	inline GLint getMaxSamplesInteger() const {
+		return get<GLint>(GL_MAX_INTEGER_SAMPLES);
 	}
 	inline GLint getMaxTextureImageUnits() const {
 		return get<GLint>(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
@@ -649,10 +663,12 @@ public:
 public:
 	inline void activeTexture(TextureChannel channel);
 	inline void viewport(vec2i pos, vec2i size);
+	inline void viewport(int32_t left, int32_t bottom, int32_t width, int32_t height);
+	inline void blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter);
 
 	inline void clearColor(const libv::vec4f& col);
 	inline void clearColor(float r, float g, float b, float a = 1.0f);
-	inline void clear(BufferBit buffers = BufferBit::Color | BufferBit::Depth);
+	inline void clear(BufferBit buffers = BufferBit::ColorDepthStencil);
 
 public:
 	//	void depthMask(bool writeEnabled);
@@ -675,9 +691,12 @@ public:
 	inline void unbind(const Texture& texture);
 
 	//	void bindTexture(const Texture& texture, uchar unit);
-	//
+
 	//	void bindFramebuffer(const Framebuffer& framebuffer);
 	//	void bindFramebuffer();
+	inline void bindFramebufferDefault();
+	inline void bindFramebufferDefaultDraw();
+	inline void bindFramebufferDefaultRead();
 
 public:
 	template <typename Access = AccessUniformBuffer>
@@ -690,6 +709,14 @@ public:
 	}
 	template <typename Access = AccessBuffer>
 	inline Access operator()(Buffer& object) noexcept {
+		return Access{object};
+	}
+	template <typename Access = AccessFramebuffer>
+	inline Access operator()(Framebuffer& object) noexcept {
+		return Access{object};
+	}
+	template <typename Access = AccessRenderbuffer>
+	inline Access operator()(Renderbuffer& object) noexcept {
 		return Access{object};
 	}
 	template <typename Access = AccessProgram>
@@ -727,6 +754,27 @@ inline void GL::viewport(vec2i pos, vec2i size) {
 	glViewport(pos.x, pos.y, size.x, size.y);
 	checkGL();
 }
+inline void GL::viewport(int32_t left, int32_t bottom, int32_t width, int32_t height) {
+	glViewport(left, bottom, width, height);
+	checkGL();
+}
+inline void GL::blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter) {
+	LIBV_GL_DEBUG_ASSERT(filter != MagFilter::Linear || mask == BufferBit::Color);
+
+	glBlitFramebuffer(
+			src_pos.x,
+			src_pos.y,
+			src_pos.x + src_size.x,
+			src_pos.y + src_size.y,
+			dst_pos.x,
+			dst_pos.y,
+			dst_pos.x + dst_size.x,
+			dst_pos.y + dst_size.y,
+			libv::to_value(mask),
+			libv::to_value(filter)
+	);
+	checkGL();
+}
 inline void GL::clearColor(const libv::vec4f& col) {
 	glClearColor(col.r, col.g, col.b, col.a);
 	checkGL();
@@ -739,6 +787,8 @@ inline void GL::clear(BufferBit buffers) {
 	glClear(to_value(buffers));
 	checkGL();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 inline void GL::bind(TextureTarget target, uint32_t id) {
 	size_t targetIndex;
@@ -777,6 +827,20 @@ inline void GL::unbind(const Texture_t<Target>& texture) {
 }
 inline void GL::unbind(const Texture& texture) {
 	bind(texture.target, 0);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void GL::bindFramebufferDefault() {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+inline void GL::bindFramebufferDefaultDraw() {
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+inline void GL::bindFramebufferDefaultRead() {
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 }
 
 // -------------------------------------------------------------------------------------------------
