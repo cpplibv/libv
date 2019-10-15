@@ -28,7 +28,7 @@ struct Settings {
 
 	float caret_width_max = 5;
 	float caret_width_min = 2;
-	float caret_width_offset = 12;
+	float caret_width_offset = 32;
 	float caret_width_scale = 24;
 
 	// bool enable_lcd_font = true;

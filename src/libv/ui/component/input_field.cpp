@@ -444,20 +444,20 @@ void InputField::doRender(ContextRender& ctx) {
 		auto pos = caret_mesh.attribute(attribute_position);
 		auto index = caret_mesh.index();
 
-		const auto caretHeight = font()->getLineAdvance(font_size());
+		const auto lineHeight = font()->getLineAdvance(font_size());
 		const auto max = context().settings.caret_width_max;
 		const auto min = context().settings.caret_width_min;
 		const auto offset = context().settings.caret_width_offset;
 		const auto scale = context().settings.caret_width_scale;
-		const auto caretWidth = std::floor(std::min((caretHeight - offset) / scale + min, max));
+		const auto caretWidth = std::floor(std::clamp((lineHeight + offset) / scale, min, max));
 
 		// 3-2
 		// |/|
 		// 0-1
 		pos(0, 0, 0);
 		pos(caretWidth, 0, 0);
-		pos(caretWidth, caretHeight, 0);
-		pos(0, caretHeight, 0);
+		pos(caretWidth, lineHeight, 0);
+		pos(0, lineHeight, 0);
 
 		index.quad(0, 1, 2, 3);
 	}
