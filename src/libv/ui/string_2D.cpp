@@ -207,7 +207,7 @@ libv::vec2f String2D::getCharacterPosition() {
 	if (dirty)
 		layout();
 
-	// Note: codepoint is \n as there is a hidden new-line glyph placed to the end to help these functions
+	// NOTE: codepoint is \n as there is a hidden new-line glyph placed to the end to help these functions
 	const auto codepoint = '\n';
 
 	const auto& descender = font_->getDescender(fontSize_);
@@ -238,11 +238,19 @@ libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
 
 	auto positions = mesh_.attribute(attribute_position);
 	const auto& position = positions[characterIndex * 4];
-	// Note: characterIndex can over index into end as hidden new-line glyphs are placed to help these functions
+	// NOTE: characterIndex can over index into end as hidden new-line glyphs are placed to help these functions
 
 	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
+//size_t String2D::getLineOfCharacter() {
+//	return {}; // Not implemented yet.
+//}
+//
+//size_t String2D::getLineOfCharacter(size_t characterIndex) {
+//	return {}; // Not implemented yet.
+//}
+//
 //libv::vec2f String2D::getLinePosition() {
 //	return {}; // Not implemented yet.
 //}
@@ -255,24 +263,36 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 	if (dirty)
 		layout();
 
+	const auto lineHeight = font_->getLineAdvance(fontSize_);
 	auto positions = mesh_.attribute(attribute_position);
 
-	float min_distance_sq = (libv::vec::xy(positions[0]) - position).lengthSQ();
-	size_t min_index = 0;
+	float min_distance_sq = std::numeric_limits<float>::infinity();
+	size_t min_index = 0; // In case of empty string, index 0 is valid
+	size_t index = 0;
 
-	for (size_t i = 0; i < positions.size(); i += 4) {
-		// NOTE: Using +0 as bottom-left and +3 as top-left to round better as cursor is placed on the left side of the glyph
+	const auto check = [&](uint32_t codepoint, size_t i) {
+		const auto& descender = font_->getDescender(fontSize_);
+		const auto& glyph = font_->getCharacter(codepoint, fontSize_);
 
-		const auto center = (libv::vec::xy(positions[i + 0]) + libv::vec::xy(positions[i + 3])) * 0.5f;
-		const auto distance_sq = (position - center).lengthSQ();
+		const auto& glyph_position = positions[i * 4];
+
+		const auto pen = libv::vec2f{glyph_position.x - glyph.pos[0].x, glyph_position.y - glyph.pos[0].y + descender};
+		const auto left_center = libv::vec2f{pen.x, pen.y + lineHeight * 0.5f};
+		// As the caret is displayed on the left side of the glyph calculations are based on the left center
+
+		const auto distance_sq = (position - left_center).lengthSQ();
 
 		if (distance_sq < min_distance_sq) {
 			min_index = i;
 			min_distance_sq = distance_sq;
 		}
-	}
+	};
 
-	return min_index / 4;
+	for (auto it = string_.begin(); it != string_.end();)
+		check(utf8::unchecked::next(it), index++);
+	check('\n', index); // NOTE: index can over index into end as hidden new-line glyphs are placed to help these functions
+
+	return min_index;
 }
 
 //size_t String2D::getClosestLineIndex(libv::vec2f position) {
@@ -282,7 +302,7 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f String2D::content(libv::vec2f new_limit) {
-	const auto lineHeight = static_cast<float>(font_->getLineAdvance(fontSize_));
+	const auto lineHeight = font_->getLineAdvance(fontSize_);
 	if (new_limit.x <= 0.0f)
 		new_limit.x = std::numeric_limits<float>::max();
 
