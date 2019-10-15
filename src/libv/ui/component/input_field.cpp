@@ -15,6 +15,7 @@
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
+#include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_access.hpp>
 #include <libv/ui/shader/shader_font.hpp>
@@ -22,7 +23,6 @@
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
-#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -258,6 +258,21 @@ bool InputField::onKey(const libv::input::EventKey& event) {
 	if (event.key == libv::input::Key::Num9 && event.action == libv::input::Action::press)
 		return font_size(libv::ui::FontSize(libv::to_value(font_size()) - 3)), true;
 
+	if (event.key == libv::input::Key::F1 && event.action == libv::input::Action::press) {
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+	if (event.key == libv::input::Key::F2 && event.action == libv::input::Action::press) {
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		return true;
+	}
+
 	// =================================================================================================
 
 	if (event.key == libv::input::Key::Enter && event.action != libv::input::Action::release) {
@@ -359,7 +374,7 @@ bool InputField::onMouseButton(const EventMouseButton& event) {
 
 	if (event.action == libv::input::Action::press) {
 		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
@@ -380,6 +395,12 @@ bool InputField::onMouseMovement(const EventMouseMovement& event) {
 	if (context().state.key_pressed(libv::input::Key::F1)) {
 		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caretStartTime = clock::now();
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+	if (context().state.key_pressed(libv::input::Key::F2)) {
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}

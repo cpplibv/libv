@@ -97,7 +97,8 @@ public:
 	}
 
 public:
-	float getLineAdvance(FontSize size);
+	float getLineAdvance(FontSize size); /// Offset between lines, Yields the offset to the next lines first pixel
+	float getLineHeight(FontSize size); /// Height of a single line, Yields the offset to the current lines last pixel
 	float getAscender(FontSize size);
 	float getDescender(FontSize size);
 	vec2f getKerning(uint32_t left, uint32_t right, FontSize size);

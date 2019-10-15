@@ -279,22 +279,24 @@ libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from Co
 libv.ui.input_field: caret mouse support
 libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs are all over the place
 libv.ui.input_field: synthetize caret property
+libv.ui.input_field: mouse caret placement respect line
+libv.ui.input_field: fix that lines tend to snap down | Solved by determining that LineAdvance != LineHeight
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui.input_field: mouse caret placement respect line
-
+libv.gl: framebuffer
+libv.glr: framebuffer
+libv.gl: renderbuffer
+libv.glr: renderbuffer
+libv.gl: blit
+libv.glr: blit
 
 libv.ui: debug zoom in
-	libv.gl: framebuffer
-	libv.glr: framebuffer
-	libv.gl: renderbuffer
-	libv.glr: renderbuffer
-	libv.gl: blit
-	libv.glr: blit
-	libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), its not strictly an ui debug feature
+libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), it could be used not just for UI
+libv.ui: debug zoom in mode remap mouse input, debug key to change camera zoom/position while not pressed remap input
+libv.ui: debug mode highlight mouse cursor pixel
 
 
 debug
@@ -387,7 +389,6 @@ hotkey
 	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
 	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
 	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
-	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
 	libv.ui.hotkey: hotkey system are an extension to the keyboard system
 	libv.ui.hotkey: ui.focus-backward = shift+tab
 	libv.ui.hotkey: ui.focus-forward = tab
@@ -421,8 +422,10 @@ hotkey
 	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
 
 focus
+	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
 	libv.ui.focus: easy way to trigger Focus traversal from events/components
-	libv.ui.focus: by default unhandled tab should trigger Focus traversal
+	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traversal
+	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
 	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further
 	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
 	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it

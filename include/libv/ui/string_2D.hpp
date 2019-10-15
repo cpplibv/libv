@@ -102,6 +102,7 @@ public:
 //	libv::vec2f getLinePosition(size_t lineIndex);
 
 	[[nodiscard]] size_t getClosestCharacterIndex(libv::vec2f position);
+	[[nodiscard]] size_t getClosestCharacterIndexInline(libv::vec2f position);
 //	size_t getClosestLineIndex(libv::vec2f position);
 
 	/// @param limit - The maximum available space that can be used to layout

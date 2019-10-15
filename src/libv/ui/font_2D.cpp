@@ -95,6 +95,10 @@ float Font2D::getLineAdvance(FontSize size) {
 	return static_cast<float>(face->size->metrics.height) / 64.0f; // 26.6 fixed point
 }
 
+float Font2D::getLineHeight(FontSize size) {
+	return getLineAdvance(size) - 1.0f;
+}
+
 float Font2D::getAscender(FontSize size) {
 	LIBV_UI_DEBUG_ASSERT(face != nullptr);
 	std::lock_guard lock(face_m);

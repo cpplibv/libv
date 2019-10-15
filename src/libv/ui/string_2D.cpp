@@ -263,7 +263,7 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 	if (dirty)
 		layout();
 
-	const auto lineHeight = font_->getLineAdvance(fontSize_);
+	const auto lineHeight = font_->getLineHeight(fontSize_);
 	auto positions = mesh_.attribute(attribute_position);
 
 	float min_distance_sq = std::numeric_limits<float>::infinity();
@@ -278,7 +278,7 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 
 		const auto pen = libv::vec2f{glyph_position.x - glyph.pos[0].x, glyph_position.y - glyph.pos[0].y + descender};
 		const auto left_center = libv::vec2f{pen.x, pen.y + lineHeight * 0.5f};
-		// As the caret is displayed on the left side of the glyph calculations are based on the left center
+		// As the caret is displayed on the left side of the glyph, calculations are based on the left center
 
 		const auto distance_sq = (position - left_center).lengthSQ();
 
@@ -290,7 +290,51 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 
 	for (auto it = string_.begin(); it != string_.end();)
 		check(utf8::unchecked::next(it), index++);
-	check('\n', index); // NOTE: index can over index into end as hidden new-line glyphs are placed to help these functions
+	check('\n', index); // NOTE: allowed to over index into end as hidden new-line glyphs are placed to help these functions
+
+	return min_index;
+}
+
+size_t String2D::getClosestCharacterIndexInline(libv::vec2f position) {
+	if (dirty)
+		layout();
+
+	const auto lineHeight = font_->getLineHeight(fontSize_);
+	auto positions = mesh_.attribute(attribute_position);
+
+	float min_distance_x = std::numeric_limits<float>::infinity();
+	float min_distance_y = std::numeric_limits<float>::infinity();
+	size_t min_index = 0; // In case of empty string, index 0 is valid
+	size_t index = 0;
+
+	const auto check = [&](uint32_t codepoint, size_t i) {
+		const auto& descender = font_->getDescender(fontSize_);
+		const auto& glyph = font_->getCharacter(codepoint, fontSize_);
+
+		const auto& glyph_position = positions[i * 4];
+
+		const auto pen = libv::vec2f{glyph_position.x - glyph.pos[0].x, glyph_position.y - glyph.pos[0].y + descender};
+		const auto left_center = libv::vec2f{pen.x, pen.y + lineHeight * 0.5f};
+		// As the caret is displayed on the left side of the glyph, calculations are based on the left center
+
+		const auto distance = libv::vec::abs(position - left_center);
+
+		if (distance.y < min_distance_y) {
+			min_distance_y = distance.y;
+			min_distance_x = std::numeric_limits<float>::infinity();
+		}
+
+		const auto is_minline = std::abs(distance.y - min_distance_y) < 0.001f;
+
+		if (is_minline && distance.x < min_distance_x) {
+			min_distance_x = distance.x;
+			min_index = i;
+		}
+	};
+
+	for (auto it = string_.begin(); it != string_.end();)
+		check(utf8::unchecked::next(it), index++);
+	check('\n', index); // NOTE: allowed to over index into end as hidden new-line glyphs are placed to help these functions
 
 	return min_index;
 }
@@ -302,14 +346,14 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f String2D::content(libv::vec2f new_limit) {
-	const auto lineHeight = font_->getLineAdvance(fontSize_);
+	const auto lineAdvance = font_->getLineAdvance(fontSize_);
 	if (new_limit.x <= 0.0f)
 		new_limit.x = std::numeric_limits<float>::max();
 
 	auto codepointPrevious = uint32_t{0};
 	auto lineWidth = 0.0f;
 	auto contentWidth = 0.0f;
-	auto contentHeight = lineHeight;
+	auto contentHeight = lineAdvance;
 
 	for (const uint32_t codepointCurrent : string_ | libv::view::uft8_codepoints) {
 		const auto& glyph = font_->getCharacter(codepointCurrent, fontSize_);
@@ -319,7 +363,7 @@ libv::vec2f String2D::content(libv::vec2f new_limit) {
 
 		if (requestedLineWidth > new_limit.x || codepointCurrent == '\n') {
 			contentWidth = std::max(contentWidth, lineWidth);
-			contentHeight += lineHeight;
+			contentHeight += lineAdvance;
 			lineWidth = 0.0f;
 		} else {
 			lineWidth = requestedLineWidth;
@@ -354,14 +398,14 @@ void String2D::layout() {
 		boost::container::small_vector<size_t, 32> wordEndings{};
 	};
 
-	const auto lineHeight = font_->getLineAdvance(fontSize_);
+	const auto lineAdvance = font_->getLineAdvance(fontSize_);
 	const auto descender = font_->getDescender(fontSize_);
 	const auto hasLimitX = limit_.x > 0;
 	const auto hasLimitY = limit_.y > 0;
-	const auto heightAdjusment = hasLimitY ? std::round(limit_.y - lineHeight - descender) : 0.0f;
+	const auto heightAdjusment = hasLimitY ? std::round(limit_.y - lineAdvance - descender) : 0.0f;
 	auto pen = libv::vec2f{0, heightAdjusment};
 	auto previousCodepoint = uint32_t{'\n'};
-	auto lines = boost::container::small_vector<Line, 1>{1};
+	auto lines = boost::container::small_vector<Line, 8>{1}; // 2240 Byte on the stack
 	auto line = libv::observer_ref<Line>{lines.data()};
 	auto contentWidth = limit_.x;
 
@@ -382,7 +426,7 @@ void String2D::layout() {
 
 		previousCodepoint = 0;
 		pen.x = 0.0f;
-		pen.y -= lineHeight;
+		pen.y -= lineAdvance;
 	};
 
 	for (const uint32_t currentCodepoint : string_ | libv::view::uft8_codepoints) {
