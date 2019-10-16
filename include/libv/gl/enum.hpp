@@ -67,6 +67,7 @@ enum class Capability : GLenum {
 	Blend = 0x0BE2, /// GL_BLEND
 	CullFace = 0x0B44, /// GL_CULL_FACE
 	DepthTest = 0x0B71, /// GL_DEPTH_TEST
+	Multisample = 0x809D, /// GL_MULTISAMPLE
 	RasterizerDiscard = 0x8C89, /// GL_RASTERIZER_DISCARD
 	ScissorTest = 0x0C11, /// GL_SCISSOR_TEST
 	StencilTest = 0x0B90, /// GL_STENCIL_TEST

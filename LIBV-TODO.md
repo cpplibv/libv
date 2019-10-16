@@ -286,15 +286,16 @@ libv.gl: Texture2DMultisample
 libv.gl: Texture2DMultisampleArray
 libv.gl: blit
 libv.gl: renderbuffer
+libv.gl: multisample capability
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.gl: glEnable GL_MULTISAMPLE
 libv.gl: glReadPixels
 
-libv.gl: framebuffer clarify the difference between read/write, especially on the attachments, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
+libv.gl: learn the meaning of multisample fixedlocation (in case of texture2Dmultisample)
+libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
 
 libv.glr: framebuffer
 libv.glr: renderbuffer
@@ -302,7 +303,7 @@ libv.glr: rendertarget | (?) I think this is meant to be the framebuffer itself
 libv.glr: blit
 libv.glr: Texture2DMultisample
 libv.glr: Texture2DMultisampleArray
-libv.glr: glEnable GL_MULTISAMPLE
+libv.glr: multisample capability
 libv.glr: glReadPixels
 
 libv.ui: debug zoom in

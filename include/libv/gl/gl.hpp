@@ -105,9 +105,11 @@ struct BlendFunctionSetter {
 struct CapabilitySetter {
 	template <size_t CAPABILITY>
 	struct Selector {
-		// TODO P5: This is the only setter that uses gl call on init, would be nice to get rid of it
-		bool current = glIsEnabled(CAPABILITY);
+		bool current = false;
 
+		inline void init() {
+			current = glIsEnabled(CAPABILITY);
+		}
 		inline void set(bool enable_) noexcept {
 			if (enable_)
 				enable();
@@ -151,6 +153,7 @@ struct CapabilitySetter {
 	Selector<to_value(Capability::Blend)> blend;
 	Selector<to_value(Capability::CullFace)> cullFace;
 	Selector<to_value(Capability::DepthTest)> depthTest;
+	Selector<to_value(Capability::Multisample)> multisample;
 	Selector<to_value(Capability::RasterizerDiscard)> rasterizerDiscard;
 	Selector<to_value(Capability::ScissorTest)> scissorTest;
 	Selector<to_value(Capability::StencilTest)> stencilTest;
@@ -161,6 +164,7 @@ struct CapabilitySetter {
 			case Capability::Blend: return blend(enable);
 			case Capability::CullFace: return cullFace(enable);
 			case Capability::DepthTest: return depthTest(enable);
+			case Capability::Multisample: return multisample(enable);
 			case Capability::RasterizerDiscard: return rasterizerDiscard(enable);
 			case Capability::ScissorTest: return scissorTest(enable);
 			case Capability::StencilTest: return stencilTest(enable);
@@ -464,10 +468,25 @@ private:
 	TextureChannel currentActiveTexture{0};
 	std::array<std::array<uint32_t, 16>, 11> textureBindings; /// Target -> Channel -> ID
 
+private:
+	void init() {
+		// Fetch OpenGL context current state
+		capability.blend.init();
+		capability.cullFace.init();
+		capability.depthTest.init();
+		capability.multisample.init();
+		capability.rasterizerDiscard.init();
+		capability.scissorTest.init();
+		capability.stencilTest.init();
+		capability.textureCubeMapSeamless.init();
+	}
+
 public:
 	GL() {
 		for (auto& channels : textureBindings)
 			libv::fill(channels, 0);
+
+		init(); // This init function calls into the OpenGL context
 	}
 
 public:

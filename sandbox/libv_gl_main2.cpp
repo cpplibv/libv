@@ -98,9 +98,9 @@ struct Sandbox {
 	libv::gl::AttributeFixLocation<libv::vec2f> attributeUV;
 
 	int32_t sample_count = 4;
-//	libv::vec2i sizeFBOMS = libv::vec2i{WINDOW_WIDTH, WINDOW_HEIGHT} / 8;
+	libv::vec2i sizeFBOMS = libv::vec2i{WINDOW_WIDTH, WINDOW_HEIGHT} / 8;
 //	libv::vec2i sizeFBOMS = libv::vec2i{WINDOW_WIDTH, WINDOW_HEIGHT} / 4;
-	libv::vec2i sizeFBOMS = {WINDOW_WIDTH, WINDOW_HEIGHT};
+//	libv::vec2i sizeFBOMS = {WINDOW_WIDTH, WINDOW_HEIGHT};
 //	libv::vec2i sizeFBOMS = {256, 256};
 
 	libv::gl::Framebuffer framebuffer;
@@ -387,6 +387,7 @@ struct Sandbox {
 
 	void render() {
 		gl.clearColor(0.098f, 0.2f, 0.298f, 1.0f);
+		gl.capability.multisample(std::fmod(angle, 100) < 50);
 
 		{
 			gl(framebufferMS).bind();
@@ -419,23 +420,23 @@ struct Sandbox {
 			libv::gl::checkGL();
 		}
 
-//		{
-//			gl.bindFramebufferDefault();
-//			gl.viewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-//			gl.clear();
-//
-//			render_pass2();
-//
-//			libv::gl::checkGL();
-//		}
-
 		{
-			gl.bindFramebufferDefaultDraw();
-			gl(framebufferMS).bind_read();
-			gl.blit({}, sizeFBOMS, {}, {WINDOW_WIDTH, WINDOW_HEIGHT}, libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+			gl.bindFramebufferDefault();
+			gl.viewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+			gl.clear();
+
+			render_pass2();
 
 			libv::gl::checkGL();
 		}
+
+//		{
+//			gl.bindFramebufferDefaultDraw();
+//			gl(framebufferMS).bind_read();
+//			gl.blit({}, sizeFBOMS, {}, {WINDOW_WIDTH, WINDOW_HEIGHT}, libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+//
+//			libv::gl::checkGL();
+//		}
 	}
 
 	void render_pass1() {
