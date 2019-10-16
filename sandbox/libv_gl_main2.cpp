@@ -91,6 +91,7 @@ void main() {
 
 struct Sandbox {
 	float angle = 0.f;
+	size_t frame_counter = 0;
 
 	libv::gl::GL gl;
 
@@ -382,12 +383,13 @@ struct Sandbox {
 	}
 
 	void update(const std::chrono::duration<float> deltaTime) {
+		frame_counter++;
 		angle += 22.5f * deltaTime.count();
 	}
 
 	void render() {
 		gl.clearColor(0.098f, 0.2f, 0.298f, 1.0f);
-		gl.capability.multisample(std::fmod(angle, 100) < 50);
+		gl.capability.multisample(frame_counter % 240 < 120);
 
 		{
 			gl(framebufferMS).bind();
@@ -437,6 +439,12 @@ struct Sandbox {
 //
 //			libv::gl::checkGL();
 //		}
+
+		if (frame_counter % 120 == 0) {
+			libv::vec4uc pixel;
+			gl.readPixels(libv::vec2i{WINDOW_WIDTH, WINDOW_HEIGHT} / 2, {1, 1}, libv::gl::ReadFormat::RGBA, libv::gl::DataType::U32_A8_B8_G8_R8, &pixel);
+			log_sandbox.trace("Center pixel color: {}", libv::vec4i{pixel});
+		}
 	}
 
 	void render_pass1() {

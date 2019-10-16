@@ -689,6 +689,15 @@ public:
 	inline void clearColor(float r, float g, float b, float a = 1.0f);
 	inline void clear(BufferBit buffers = BufferBit::ColorDepthStencil);
 
+	inline void readPixels(vec2i pos, vec2i size, ReadFormat format, DataType type, void* data) {
+		// Not supported read data types:
+		//		GL_FLOAT_32_UNSIGNED_INT_24_8_REV.
+		//		GL_UNSIGNED_INT_10F_11F_11F_REV,
+		//		GL_UNSIGNED_INT_24_8
+		//		GL_UNSIGNED_INT_5_9_9_9_REV
+		glReadPixels(pos.x, pos.y, size.x, size.y, libv::to_value(format), libv::to_value(type), data);
+	}
+
 public:
 	//	void depthMask(bool writeEnabled);
 	//	void stencilMask(bool writeEnabled);

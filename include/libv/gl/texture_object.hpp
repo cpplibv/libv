@@ -54,6 +54,10 @@ struct Texture {
 	constexpr inline void assert_target() noexcept {
 		LIBV_GL_DEBUG_ASSERT((Targets == target) || ...);
 	}
+	template <TextureTarget... Targets>
+	constexpr inline void assert_not_target() noexcept {
+		LIBV_GL_DEBUG_ASSERT((Targets != target) && ...);
+	}
 };
 
 using Texture1D = Texture_t<TextureTarget::_1D>;

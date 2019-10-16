@@ -30,6 +30,7 @@ enum class BufferBit : GLenum {
 
 	ColorDepthStencil = Color | Depth | Stencil,
 };
+
 inline BufferBit operator|(BufferBit lhs, BufferBit rhs) {
 	return static_cast<BufferBit>(libv::to_value(lhs) | libv::to_value(rhs));
 }
@@ -215,6 +216,7 @@ enum class DataType : GLenum {
 	I8 = 0x1400, /// GL_BYTE
 	U16 = 0x1403, /// GL_UNSIGNED_SHORT
 	I16 = 0x1402, /// GL_SHORT
+	F16 = 0x140B, /// GL_HALF_FLOAT
 	U32 = 0x1405, /// GL_UNSIGNED_INT
 	I32 = 0x1404, /// GL_INT
 	F32 = 0x1406, /// GL_FLOAT
@@ -243,6 +245,7 @@ constexpr inline auto sizeInfo(DataType type) noexcept {
 	case DataType::I8:                 return Result{1, 1};
 	case DataType::U16:                return Result{2, 1};
 	case DataType::I16:                return Result{2, 1};
+	case DataType::F16:                return Result{2, 1};
 	case DataType::U32:                return Result{4, 1};
 	case DataType::I32:                return Result{4, 1};
 	case DataType::F32:                return Result{4, 1};
@@ -261,6 +264,21 @@ constexpr inline auto sizeInfo(DataType type) noexcept {
 	}
 	return Result{1, 1}; // [[unreachable]]
 }
+
+// -------------------------------------------------------------------------------------------------
+
+enum class ReadFormat : GLenum {
+	R = 0x1903, /// GL_RED
+	G = 0x1904, /// GL_GREEN
+	B = 0x1905, /// GL_BLUE
+	RGB = 0x1907, /// GL_RGB
+	RGBA = 0x1908, /// GL_RGBA
+	BGR = 0x80E0, /// GL_BGR
+	BGRA = 0x80E1, /// GL_BGRA
+	DEPTH = 0x1902, /// GL_DEPTH_COMPONENT
+	DEPTH_STENCIL = 0x84F9, /// GL_DEPTH_STENCIL
+	STENCIL = 0x1901, /// GL_STENCIL_INDEX
+};
 
 // -------------------------------------------------------------------------------------------------
 

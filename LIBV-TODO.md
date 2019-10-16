@@ -287,12 +287,11 @@ libv.gl: Texture2DMultisampleArray
 libv.gl: blit
 libv.gl: renderbuffer
 libv.gl: multisample capability
+libv.gl: glReadPixels
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
-
-libv.gl: glReadPixels
 
 libv.gl: learn the meaning of multisample fixedlocation (in case of texture2Dmultisample)
 libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
@@ -591,6 +590,7 @@ cpp: check if every possible operator had been made to a hidden friend
 cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
 libv.gl: use mdspan for image updates instead of raw loops
 libv.gl: glReadBuffer and glDrawBuffer | not urgent as the defaults are correct
+libv.gl: learn glPixelStore / implement
 
 libv.ecs: Test fails with an assert in boost vector
 
