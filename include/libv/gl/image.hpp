@@ -52,19 +52,21 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-/// @supported KTX, KMG, DDS: GLI backend
-/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+// TODO P2: Move load functions to a separate header (therefore remove string_view and optional includes)
+
+/// @supported GLI backend: KTX, KMG, DDS
+/// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR
 /// @context ANY
 [[nodiscard]] std::optional<Image> load_image(const std::string_view data) noexcept;
 
-/// @supported KTX, KMG, DDS: GLI backend
-/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+/// @supported GLI backend: KTX, KMG, DDS
+/// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR
 /// @context ANY
 // TODO P5: implement fallback image
 //[[nodiscard]] Image load_image_or(const std::string_view data, Fallback&& fallback = "");
 
-/// @supported KTX, KMG, DDS: GLI backend
-/// @supported BMP, PNG, JPG, TGA, DDS, PSD, HDR: SOIL backend
+/// @supported GLI backend: KTX, KMG, DDS
+/// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR
 /// @context ANY
 [[nodiscard]] Image load_image_or_throw(const std::string_view data);
 

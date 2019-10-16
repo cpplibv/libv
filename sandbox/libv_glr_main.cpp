@@ -14,11 +14,13 @@
 #include <libv/gl/enum.hpp>
 #include <libv/gl/image.hpp>
 #include <libv/glr/attribute.hpp>
+#include <libv/glr/framebuffer.hpp>
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/procedural/cube.hpp>
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/program.hpp>
 #include <libv/glr/remote.hpp>
+#include <libv/glr/renderbuffer.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
@@ -121,6 +123,31 @@ void main() {
 }
 )";
 
+constexpr auto shader_quad_vs = R"(
+#version 330 core
+
+layout(location = 0) in vec3 vertexPos;
+
+out vec2 fragmentUV;
+
+void main() {
+	gl_Position = vec4(vertexPos, 1);
+	fragmentUV = vertexPos.xy * 0.5 + 0.5;
+})";
+
+constexpr auto shader_quad_fs = R"(
+#version 330 core
+
+uniform sampler2D texture0Sampler;
+
+in vec2 fragmentUV;
+
+out vec4 color;
+
+void main() {
+	color = texture2D(texture0Sampler, fragmentUV, 0).rgba;
+})";
+
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal    = libv::glr::Attribute<1, libv::vec3f>{};
 constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
@@ -182,10 +209,14 @@ struct Sandbox {
 	float angle = 0.0f;
 	float time = 0.0f;
 
+	libv::vec2i windowSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
+	libv::vec2i framebufferSize = windowSize / 8;
+	int32_t samples = 16;
+
 	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
 
-	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program sphere_program;
+	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::UniformBuffer sphere_uniforms{libv::gl::BufferUsage::StreamDraw};
 	libv::glr::Uniform_vec3f sphere_uniform_shift;
 	libv::glr::Uniform_float sphere_uniform_time;
@@ -195,14 +226,25 @@ struct Sandbox {
 	libv::glr::Texture sphere_texture0;
 	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture1;
 
+	libv::glr::Program quad_program;
+	libv::glr::Mesh quad_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Uniform_texture quad_uniform_texture0;
+
 	libv::glr::Program sky_program;
 	libv::glr::Mesh sky_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Uniform_mat4f sky_uniform_MVPmat;
 	libv::glr::Uniform_texture sky_uniform_texture;
 	libv::glr::Texture sky_texture0;
 
+	libv::glr::Framebuffer framebuffer;
+	libv::glr::Texture2DMultisample::R8_G8_B8_A8 framebufferColor;
+	libv::glr::Renderbuffer::D32 framebufferDepth;
+
+	libv::glr::Framebuffer framebuffer2;
+	libv::glr::Texture2D::R8_G8_B8_A8 framebuffer2Color;
+
 	Sandbox() {
-		// Sphere
+		// --- Sphere ---
 		sphere_program.vertex(shader_sphere_vs);
 		sphere_program.fragment(shader_sphere_fs);
 		sphere_program.block_binding(uniformBlock_sphere);
@@ -234,7 +276,32 @@ struct Sandbox {
 			libv::glr::generateSpherifiedCube(32, position, normal, texture0, index);
 		}
 
-		// Sky
+		// --- Quad ---
+
+		quad_program.vertex(shader_quad_vs);
+		quad_program.fragment(shader_quad_fs);
+		quad_program.assign(quad_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
+
+		{
+			auto position = quad_mesh.attribute(attribute_position);
+			auto index = quad_mesh.index();
+
+			// Full screen
+//			position(-1, -1, 0);
+//			position(+1, -1, 0);
+//			position(+1, +1, 0);
+//			position(-1, +1, 0);
+
+			// Little quad in lower left of center
+			position(-0.5f, -0.5f, 0);
+			position(0, -0.5f, 0);
+			position(0, 0, 0);
+			position(-0.5f, 0, 0);
+
+			index.quad(0, 1, 2, 3);
+		}
+
+		// --- Sky ---
 		sky_program.vertex(shader_sky_vs);
 		sky_program.fragment(shader_sky_fs);
 		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureChannel_diffuse);
@@ -256,6 +323,19 @@ struct Sandbox {
 
 			libv::glr::generateInnerCube(position, index);
 		}
+
+		// --- Framebuffer ---
+
+		framebufferColor.storage_ms(framebufferSize, samples, true);
+		framebufferDepth.storage_ms(framebufferSize, samples);
+		framebuffer.attach2D(libv::gl::Attachment::Color0, framebufferColor);
+		framebuffer.attach(libv::gl::Attachment::Depth, framebufferDepth);
+
+		framebuffer2Color.storage(1, framebufferSize);
+		framebuffer2Color.set(libv::gl::MagFilter::Nearest);
+		framebuffer2.attach2D(libv::gl::Attachment::Color0, framebuffer2Color);
+
+		// --- Start ---
 
 		remote.create();
 		remote.enableDebug();
@@ -281,14 +361,38 @@ struct Sandbox {
 	}
 
 	void update(const std::chrono::duration<float> deltaTime) {
-		angle = std::fmod(angle + 22.5f * deltaTime.count(), 360.0f);
+		angle = std::fmod(angle + 5.0f * deltaTime.count(), 360.0f);
 		time += deltaTime.count();
 	}
 
 	void render() {
 		auto queue = remote.queue();
 
+		if (std::fmod(time, 4.f) < 2.f)
+			queue.state.enableMultisample();
+		else
+			queue.state.disableMultisample();
+
+		// Draw world normal
+		queue.framebuffer_draw_deafult();
+		queue.viewport({0, 0}, windowSize);
 		render_remote(queue);
+
+		// Draw world lower resolution onto background framebuffer
+		queue.framebuffer_draw(framebuffer);
+		queue.viewport({0, 0}, framebufferSize);
+		render_remote(queue);
+
+		// Downsample background multisampled framebuffer to framebuffer2
+		queue.blit(framebuffer, framebuffer2,
+				{}, framebufferSize,
+				{}, framebufferSize,
+				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+
+		// Render a quad with framebuffer2 ower the normal output
+		queue.framebuffer_draw_deafult();
+		queue.viewport({0, 0}, windowSize);
+		render_remote_quad(queue);
 
 		remote.queue(std::move(queue));
 		remote.execute();
@@ -352,6 +456,16 @@ struct Sandbox {
 			gl.texture(sky_texture0, textureChannel_diffuse);
 			gl.render(sky_mesh);
 		}
+	}
+
+	void render_remote_quad(libv::glr::Queue& gl) {
+		const auto guard_s = gl.state.push_guard();
+
+		gl.state.disableDepthTest();
+
+		gl.program(quad_program);
+		gl.texture(framebuffer2Color, textureChannel_diffuse);
+		gl.render(quad_mesh);
 	}
 };
 

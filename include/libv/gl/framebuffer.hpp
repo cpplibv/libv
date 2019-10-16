@@ -8,6 +8,7 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/gl.hpp>
 #include <libv/gl/framebuffer_object.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/gl/texture_object.hpp>
@@ -21,10 +22,11 @@ namespace gl {
 class AccessFramebuffer {
 private:
 	Framebuffer& object;
+	GL& gl;
 
 public:
-	AccessFramebuffer(Framebuffer& object) :
-		object(object) { }
+	AccessFramebuffer(Framebuffer& object, GL& gl) :
+		object(object), gl(gl) { }
 
 public:
 	inline void create() {
@@ -40,38 +42,37 @@ public:
 		checkGL();
 	}
 
-private:
-	inline void _bind(GLenum target) noexcept {
-		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-	    glBindFramebuffer(target, object.id);
-		checkGL();
-	}
-
-	inline void _unbind(GLenum target) noexcept {
-		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-	    glBindFramebuffer(target, 0);
-		checkGL();
-	}
-
 public:
 	inline void bind() noexcept {
-		_bind(GL_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer(object);
+		checkGL();
 	}
 	inline void bind_draw() noexcept {
-		_bind(GL_DRAW_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer_draw(object);
+		checkGL();
 	}
 	inline void bind_read() noexcept {
-		_bind(GL_READ_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer_read(object);
+		checkGL();
 	}
 
 	inline void unbind() noexcept {
-		_unbind(GL_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer_default();
+		checkGL();
 	}
 	inline void unbind_draw() noexcept {
-		_unbind(GL_DRAW_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer_default_draw();
+		checkGL();
 	}
 	inline void unbind_read() noexcept {
-		_unbind(GL_READ_FRAMEBUFFER);
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		gl.framebuffer_default_read();
+		checkGL();
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {
@@ -172,6 +173,16 @@ public:
 		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
 	}
 
+	inline void attach_draw2D(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::CubeMap);
+		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
+	}
+
+	inline void attach_read2D(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::CubeMap);
+		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
+	}
+
 	inline void attach_draw2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
 		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
 	}
@@ -202,6 +213,10 @@ public:
 
 	inline void attach2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
 		attach_draw2D(attachment, texture, level);
+	}
+
+	inline void attach2D(Attachment attachment, Texture texture, CubeSide side, int32_t level = 0) noexcept {
+		attach_draw2D(attachment, texture, side, level);
 	}
 
 	inline void attach2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {

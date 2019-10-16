@@ -2,14 +2,17 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/bit_cast.hpp>
+
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T, typename M>
-constexpr inline size_t member_offset(M T::* member) {
-	return reinterpret_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
+[[nodiscard]] constexpr inline size_t member_offset(M T::* member) noexcept {
+	return libv::bit_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
 }
 
 // -------------------------------------------------------------------------------------------------

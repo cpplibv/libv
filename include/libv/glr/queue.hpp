@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/gl/framebuffer.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/matrix_stack.hpp>
 #include <libv/math/mat.hpp>
@@ -12,14 +13,16 @@
 // std
 #include <cstdint>
 #include <functional>
+#include <optional>
 #include <variant>
 // pro
+#include <libv/glr/framebuffer.hpp>
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/program.hpp>
 #include <libv/glr/state.hpp>
+#include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
 #include <libv/glr/uniform_buffer.hpp>
-#include <libv/glr/texture.hpp>
 
 
 namespace libv {
@@ -145,6 +148,65 @@ struct QueueTaskViewport {
 		sequenceNumber(sequenceNumber), position(position), size(size) { }
 };
 
+struct QueueTaskFramebuffer {
+	SequenceNumber sequenceNumber;
+	std::optional<Framebuffer> framebuffer;
+	enum class Mode {
+		both,
+		draw,
+		read,
+
+		default_both,
+		default_draw,
+		default_read,
+	} mode;
+
+	// C++20: aggregate ctors
+	QueueTaskFramebuffer(SequenceNumber sequenceNumber, Framebuffer&& framebuffer, Mode mode) :
+		sequenceNumber(sequenceNumber), framebuffer(std::move(framebuffer)), mode(mode) { }
+
+	QueueTaskFramebuffer(SequenceNumber sequenceNumber, Mode mode) :
+		sequenceNumber(sequenceNumber), mode(mode) { }
+};
+
+struct QueueTaskBlit {
+	SequenceNumber sequenceNumber;
+	std::optional<Framebuffer> framebuffer_src;
+	std::optional<Framebuffer> framebuffer_dst;
+	libv::vec2i src_pos;
+	libv::vec2i src_size;
+	libv::vec2i dst_pos;
+	libv::vec2i dst_size;
+	libv::gl::BufferBit mask;
+	libv::gl::MagFilter filter;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		auto previous_read = gl.framebuffer_read();
+		auto previous_draw = gl.framebuffer_draw();
+
+		if (!framebuffer_dst && !framebuffer_src) {
+			gl.framebuffer_default();
+
+		} else if (!framebuffer_dst) {
+			AttorneyRemoteFramebuffer::bind_read(*framebuffer_src, gl, remote);
+			gl.framebuffer_default_draw();
+
+		} else if (!framebuffer_src) {
+			gl.framebuffer_default_read();
+			AttorneyRemoteFramebuffer::bind_draw(*framebuffer_dst, gl, remote);
+
+		} else {
+			AttorneyRemoteFramebuffer::bind_read(*framebuffer_src, gl, remote);
+			AttorneyRemoteFramebuffer::bind_draw(*framebuffer_dst, gl, remote);
+		}
+
+		gl.blit(src_pos, src_size, dst_pos, dst_size, mask, filter);
+
+		gl.framebuffer_read(previous_read);
+		gl.framebuffer_draw(previous_draw);
+	}
+};
+
 struct Queue {
 public:
 	StateStack state;
@@ -156,7 +218,7 @@ private:
 	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
 
 private:
-	std::vector<std::variant<QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture, QueueTaskClear, QueueTaskClearColor, QueueTaskViewport>> tasks;
+	std::vector<std::variant<QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture, QueueTaskClear, QueueTaskClearColor, QueueTaskViewport, QueueTaskFramebuffer, QueueTaskBlit>> tasks;
 	SequenceNumber sequenceNumber = 0;
 	State currentState;
 
@@ -176,6 +238,12 @@ private:
 //		// Preferred sorting order would be:
 //		// pass >> target >> capabilities >> programs >> texture >> uniform >> z_hint >> buffer
 //	}
+
+private:
+	template <typename T, typename... Args>
+	inline void add(Args&&... args) {
+		tasks.emplace_back(std::in_place_type<T>, T{std::forward<Args>(args)...});
+	}
 
 public:
 	inline const libv::mat4f mvp() const {
@@ -226,13 +294,73 @@ public:
 	}
 
 public:
-	void viewport(libv::vec2f position, libv::vec2f size) {
-		tasks.emplace_back(std::in_place_type<QueueTaskViewport>,
-				sequenceNumber,
-				libv::vec::cast<int>(position),
-				libv::vec::cast<int>(size));
+	void viewport(libv::vec2i position, libv::vec2i size) {
+		tasks.emplace_back(std::in_place_type<QueueTaskViewport>, sequenceNumber, position, size);
 	}
 
+public:
+	void framebuffer(Framebuffer framebuffer) {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, std::move(framebuffer), QueueTaskFramebuffer::Mode::both);
+		sequencePoint();
+	}
+
+	void framebuffer_draw(Framebuffer framebuffer) {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, std::move(framebuffer), QueueTaskFramebuffer::Mode::draw);
+		sequencePoint();
+	}
+
+	void framebuffer_read(Framebuffer framebuffer) {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, std::move(framebuffer), QueueTaskFramebuffer::Mode::read);
+		sequencePoint();
+	}
+
+	void framebuffer_deafult() {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, QueueTaskFramebuffer::Mode::default_both);
+		sequencePoint();
+	}
+
+	void framebuffer_draw_deafult() {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, QueueTaskFramebuffer::Mode::default_draw);
+		sequencePoint();
+	}
+
+	void framebuffer_read_deafult() {
+		sequencePoint();
+		tasks.emplace_back(std::in_place_type<QueueTaskFramebuffer>, sequenceNumber, QueueTaskFramebuffer::Mode::default_read);
+		sequencePoint();
+	}
+
+public:
+	void blit(Framebuffer src, Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+		sequencePoint();
+		add<QueueTaskBlit>(sequenceNumber, std::move(src), std::move(dst), src_pos, src_size, dst_pos, dst_size, mask, filter);
+		sequencePoint();
+	}
+
+	void blit_to_default(Framebuffer src, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+		sequencePoint();
+		add<QueueTaskBlit>(sequenceNumber, std::move(src), std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+		sequencePoint();
+	}
+
+	void blit_from_default(Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+		sequencePoint();
+		add<QueueTaskBlit>(sequenceNumber, std::nullopt, std::move(dst), src_pos, src_size, dst_pos, dst_size, mask, filter);
+		sequencePoint();
+	}
+
+	void blit_default(libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter) {
+		sequencePoint();
+		add<QueueTaskBlit>(sequenceNumber, std::nullopt, std::nullopt, src_pos, src_size, dst_pos, dst_size, mask, filter);
+		sequencePoint();
+	}
+
+public:
 	template <typename T>
 	void uniform(const Uniform_t<T> uniform, const T& value) {
 		programStack.top()->uniformStream.set(uniform.location, value);
@@ -267,6 +395,7 @@ private:
 		gl.capability.blend.set(target.capabilityBlend != 0);
 		gl.capability.cullFace.set(target.capabilityCullFace != 0);
 		gl.capability.depthTest.set(target.capabilityDepthTest != 0);
+		gl.capability.multisample.set(target.capabilityMultisample != 0);
 		gl.capability.rasterizerDiscard.set(target.capabilityRasterizerDiscard != 0);
 		gl.capability.scissorTest.set(target.capabilityScissorTest != 0);
 		gl.capability.stencilTest.set(target.capabilityStencilTest != 0);
@@ -342,8 +471,8 @@ public:
 				[&gl, &remote](const QueueTaskTexture& task) {
 					gl.activeTexture(task.channel);
 
-					auto& remoteTexture = AttorneyTextureRemote::remote(task.texture);
-					remoteTexture.bind(gl, remote);
+					auto object = AttorneyRemoteTexture::sync_might_bind(task.texture, gl, remote);
+					gl.bind(object);
 				},
 				[&gl](const QueueTaskClearColor& task) {
 					gl.clearColor(task.color);
@@ -353,6 +482,30 @@ public:
 				},
 				[&gl](const QueueTaskViewport& task) {
 					gl.viewport(task.position, task.size);
+				},
+				[&gl, &remote](const QueueTaskFramebuffer& task) {
+					switch (task.mode) {
+					case QueueTaskFramebuffer::Mode::both:
+						return AttorneyRemoteFramebuffer::bind(*task.framebuffer, gl, remote);
+
+					case QueueTaskFramebuffer::Mode::draw:
+						return AttorneyRemoteFramebuffer::bind_draw(*task.framebuffer, gl, remote);
+
+					case QueueTaskFramebuffer::Mode::read:
+						return AttorneyRemoteFramebuffer::bind_read(*task.framebuffer, gl, remote);
+
+					case QueueTaskFramebuffer::Mode::default_both:
+						return gl.framebuffer_default();
+
+					case QueueTaskFramebuffer::Mode::default_draw:
+						return gl.framebuffer_default_draw();
+
+					case QueueTaskFramebuffer::Mode::default_read:
+						return gl.framebuffer_default_read();
+					}
+				},
+				[&gl, &remote](const QueueTaskBlit& task) {
+					task.execute(gl, remote);
 				});
 
 			std::visit(execution, task_variant);

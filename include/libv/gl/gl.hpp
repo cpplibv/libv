@@ -469,6 +469,10 @@ private:
 	std::array<std::array<uint32_t, 16>, 11> textureBindings; /// Target -> Channel -> ID
 
 private:
+	Framebuffer framebuffer_read_{0};
+	Framebuffer framebuffer_draw_{0};
+
+private:
 	void init() {
 		// Fetch OpenGL context current state
 		capability.blend.init();
@@ -602,18 +606,6 @@ private:
 
 		(void) length;
 
-		//const auto type_str = libv::switch_(type)
-		//	(GL_DEBUG_TYPE_ERROR, "Error")
-		//	(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "Deprecated Behavior")
-		//	(GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR, "Undefined Behavior")
-		//	(GL_DEBUG_TYPE_PORTABILITY, "Portability")
-		//	(GL_DEBUG_TYPE_PERFORMANCE, "Performance")
-		//	(GL_DEBUG_TYPE_OTHER, "Other")
-		//	(GL_DEBUG_TYPE_MARKER, "Marker")
-		//	(GL_DEBUG_TYPE_PUSH_GROUP, "Push Group")
-		//	(GL_DEBUG_TYPE_POP_GROUP, "Pop Group")
-		//;
-
 //		const auto source_str = [&] {
 //			switch (source) {
 //			case GL_DEBUG_SOURCE_API:             return "API"; break;
@@ -718,13 +710,18 @@ public:
 	inline void unbind(const Texture_t<Target>& texture);
 	inline void unbind(const Texture& texture);
 
-	//	void bindTexture(const Texture& texture, uchar unit);
+	inline Texture bound_texture(TextureTarget target);
 
-	//	void bindFramebuffer(const Framebuffer& framebuffer);
-	//	void bindFramebuffer();
-	inline void bindFramebufferDefault();
-	inline void bindFramebufferDefaultDraw();
-	inline void bindFramebufferDefaultRead();
+public:
+	inline void framebuffer(Framebuffer object) noexcept;
+	inline void framebuffer_draw(Framebuffer object) noexcept;
+	inline void framebuffer_read(Framebuffer object) noexcept;
+	inline void framebuffer_default() noexcept;
+	inline void framebuffer_default_draw() noexcept;
+	inline void framebuffer_default_read() noexcept;
+
+	inline Framebuffer framebuffer_draw() const noexcept;
+	inline Framebuffer framebuffer_read() const noexcept;
 
 public:
 	template <typename Access = AccessUniformBuffer>
@@ -741,7 +738,7 @@ public:
 	}
 	template <typename Access = AccessFramebuffer>
 	inline Access operator()(Framebuffer& object) noexcept {
-		return Access{object};
+		return Access{object, *this};
 	}
 	template <typename Access = AccessRenderbuffer>
 	inline Access operator()(Renderbuffer& object) noexcept {
@@ -857,18 +854,79 @@ inline void GL::unbind(const Texture& texture) {
 	bind(texture.target, 0);
 }
 
+inline Texture GL::bound_texture(TextureTarget target) {
+	size_t targetIndex;
+
+	switch (target) {
+	default: // TODO P5: libv.gl: instead of default log and assert invalid input
+	case TextureTarget::_2D: targetIndex = 0; break;
+	case TextureTarget::CubeMap: targetIndex = 1; break;
+	case TextureTarget::_1D: targetIndex = 2; break;
+	case TextureTarget::_3D: targetIndex = 3; break;
+	case TextureTarget::_1DArray: targetIndex = 4; break;
+	case TextureTarget::_2DArray: targetIndex = 5; break;
+	case TextureTarget::Rectangle: targetIndex = 6; break;
+	case TextureTarget::CubeMapArray: targetIndex = 7; break;
+	case TextureTarget::Buffer: targetIndex = 8; break;
+	case TextureTarget::_2DMultisample: targetIndex = 9; break;
+	case TextureTarget::_2DMultisampleArray: targetIndex = 10; break;
+	}
+
+	return Texture{textureBindings[targetIndex][libv::to_value(currentActiveTexture)], target};
+}
+
 // -------------------------------------------------------------------------------------------------
 
-inline void GL::bindFramebufferDefault() {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+inline void GL::framebuffer(Framebuffer object) noexcept {
+	if (framebuffer_draw_.id != object.id || framebuffer_read_.id != object.id) {
+		glBindFramebuffer(GL_FRAMEBUFFER, object.id);
+		framebuffer_draw_.id = object.id;
+		framebuffer_draw_.id = object.id;
+	}
 }
 
-inline void GL::bindFramebufferDefaultDraw() {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+inline void GL::framebuffer_draw(Framebuffer object) noexcept {
+	if (framebuffer_draw_.id != object.id) {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, object.id);
+		framebuffer_draw_.id = object.id;
+	}
 }
 
-inline void GL::bindFramebufferDefaultRead() {
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+inline void GL::framebuffer_read(Framebuffer object) noexcept {
+	if (framebuffer_read_.id != object.id) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, object.id);
+		framebuffer_read_.id = object.id;
+	}
+}
+
+inline void GL::framebuffer_default() noexcept {
+	if (framebuffer_draw_.id != 0 || framebuffer_read_.id != 0) {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		framebuffer_draw_.id = 0;
+		framebuffer_draw_.id = 0;
+	}
+}
+
+inline void GL::framebuffer_default_draw() noexcept {
+	if (framebuffer_draw_.id != 0) {
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		framebuffer_draw_.id = 0;
+	}
+}
+
+inline void GL::framebuffer_default_read() noexcept {
+	if (framebuffer_read_.id != 0) {
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+		framebuffer_read_.id = 0;
+	}
+}
+
+inline Framebuffer GL::framebuffer_draw() const noexcept {
+	return framebuffer_draw_;
+}
+
+inline Framebuffer GL::framebuffer_read() const noexcept {
+	return framebuffer_read_;
 }
 
 // -------------------------------------------------------------------------------------------------

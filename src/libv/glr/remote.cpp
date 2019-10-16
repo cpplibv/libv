@@ -6,8 +6,10 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/buffer.hpp>
 #include <libv/gl/check.hpp>
+#include <libv/gl/framebuffer.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/program.hpp>
+#include <libv/gl/renderbuffer.hpp>
 #include <libv/gl/texture.hpp>
 #include <libv/gl/vertex_array.hpp>
 
@@ -42,9 +44,17 @@ void Remote::clear() {
 		gl(object).destroy();
 	gc_program.clear();
 
+	for (auto& object : gc_framebuffer)
+		gl(object).destroy();
+	gc_framebuffer.clear();
+
 	for (auto& object : gc_textures)
 		gl(object).destroy();
 	gc_textures.clear();
+
+	for (auto& object : gc_renderbuffer)
+		gl(object).destroy();
+	gc_renderbuffer.clear();
 
 	for (auto& object : gc_buffers)
 		gl(object).destroy();
@@ -62,6 +72,12 @@ void Remote::enableTrace() {
 void Remote::enableDebug() {
 	gl.enableDebug();
 }
+
+void Remote::readPixels(vec2i pos, vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) {
+	gl.readPixels(pos, size, format, type, data);
+}
+
+// -------------------------------------------------------------------------------------------------
 
 void Remote::create() {
 	// load glew

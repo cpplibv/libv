@@ -130,20 +130,6 @@ private:
 		checkGL();
 	}
 
-	inline void emulateStorage2D_ms(int32_t samples, bool fixedSamples, GLenum format, int32_t width, int32_t height) noexcept {
-		object.template assert_target<TextureTarget::_2DMultisample>();
-		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glTexImage2DMultisample(to_value(object.target), samples, format, width, height, fixedSamples);
-		checkGL();
-	}
-
-	inline void emulateStorage3D_ms(int32_t samples, bool fixedSamples, GLenum format, int32_t width, int32_t height, int32_t depth) noexcept {
-		object.template assert_target<TextureTarget::_2DMultisampleArray>();
-		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glTexImage3DMultisample(to_value(object.target), samples, format, width, height, depth, fixedSamples);
-		checkGL();
-	}
-
 public:
 	inline void storage(int32_t levels, Format format, int32_t width) noexcept {
 		emulateStorage1D(levels, format.format, format.base, width);
@@ -155,11 +141,17 @@ public:
 		emulateStorage3D(levels, format.format, format.base, width, height, depth);
 	}
 
-	inline void storage_ms(int32_t samples, bool fixedSamples, Format format, int32_t width, int32_t height) noexcept {
-		emulateStorage2D_ms(samples, fixedSamples, format.format, width, height);
+	inline void storage_ms(Format format, libv::vec2i size, int32_t samples, bool fixedSamples) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisample>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTexImage2DMultisample(to_value(object.target), samples, format.format, size.x, size.y, fixedSamples);
+		checkGL();
 	}
-	inline void storage_ms(int32_t samples, bool fixedSamples, Format format, int32_t width, int32_t height, int32_t depth) noexcept {
-		emulateStorage3D_ms(samples, fixedSamples, format.format, width, height, depth);
+	inline void storage_ms(Format format, libv::vec3i size, int32_t samples, bool fixedSamples) noexcept {
+		object.template assert_target<TextureTarget::_2DMultisampleArray>();
+		LIBV_GL_DEBUG_ASSERT(object.id != 0);
+		glTexImage3DMultisample(to_value(object.target), samples, format.format, size.x, size.y, size.z, fixedSamples);
+		checkGL();
 	}
 
 public:

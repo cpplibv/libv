@@ -236,41 +236,27 @@ struct Sandbox {
 
 			gl(renderFBODepth).create();
 			gl(renderFBODepth).bind();
-			gl(renderFBODepth).storage(libv::gl::FormatDepth::DEPTH_COMPONENT32, sizeFBOMS.x, sizeFBOMS.y);
+			gl(renderFBODepth).storage(libv::gl::FormatDepth::DEPTH_COMPONENT32, sizeFBOMS);
 
 			gl(framebuffer).create();
 			gl(framebuffer).bind();
 			gl(framebuffer).attach2D(libv::gl::Attachment::Color0, textureFBOColor);
 			gl(framebuffer).attach(libv::gl::Attachment::Depth, renderFBODepth);
-
-			auto status = gl(framebuffer).status_draw();
-			if (status != libv::gl::FramebufferStatus::Complete)
-				log_sandbox.error("Framebuffer status draw {}", libv::to_value(status));
-			auto statu2 = gl(framebuffer).status_read();
-			if (statu2 != libv::gl::FramebufferStatus::Complete)
-				log_sandbox.error("Framebuffer status read {}", libv::to_value(statu2));
 		}
 
 		{
 			gl(textureFBOMSColor).create();
 			gl(textureFBOMSColor).bind();
-			gl(textureFBOMSColor).storage_ms(sample_count, true, libv::gl::FormatSized::RGB8, sizeFBOMS.x, sizeFBOMS.y);
+			gl(textureFBOMSColor).storage_ms(libv::gl::FormatSized::RGB8, sizeFBOMS, sample_count, true);
 
 			gl(renderFBOMSDepth).create();
 			gl(renderFBOMSDepth).bind();
-			gl(renderFBOMSDepth).storage_ms(sample_count, libv::gl::FormatDepth::DEPTH_COMPONENT32, sizeFBOMS.x, sizeFBOMS.y);
+			gl(renderFBOMSDepth).storage_ms(libv::gl::FormatDepth::DEPTH_COMPONENT32, sizeFBOMS, sample_count);
 
 			gl(framebufferMS).create();
 			gl(framebufferMS).bind();
 			gl(framebufferMS).attach2D(libv::gl::Attachment::Color0, textureFBOMSColor);
 			gl(framebufferMS).attach(libv::gl::Attachment::Depth, renderFBOMSDepth);
-
-			auto status = gl(framebufferMS).status_draw();
-			if (status != libv::gl::FramebufferStatus::Complete)
-				log_sandbox.error("Framebuffer ms status draw {}", libv::to_value(status));
-			auto statu2 = gl(framebufferMS).status_read();
-			if (statu2 != libv::gl::FramebufferStatus::Complete)
-				log_sandbox.error("Framebuffer ms status read {}", libv::to_value(statu2));
 		}
 
 		gl(shaderQuadVert).create(libv::gl::ShaderType::Vertex);
@@ -419,7 +405,7 @@ struct Sandbox {
 		}
 
 		{
-			gl.bindFramebufferDefault();
+			gl.framebuffer_default();
 			gl.viewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 			gl.clear();
 

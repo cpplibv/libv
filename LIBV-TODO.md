@@ -281,6 +281,7 @@ libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs 
 libv.ui.input_field: synthetize caret property
 libv.ui.input_field: mouse caret placement respect line
 libv.ui.input_field: fix that lines tend to snap down | Solved by determining that LineAdvance != LineHeight
+libv.ui: String2D API to find nearest character position
 libv.gl: framebuffer
 libv.gl: Texture2DMultisample
 libv.gl: Texture2DMultisampleArray
@@ -288,22 +289,65 @@ libv.gl: blit
 libv.gl: renderbuffer
 libv.gl: multisample capability
 libv.gl: glReadPixels
+libv.gl: rename framebuffer read|draw*D function family to attach_read|draw*D and add plain attach
+libv.glr: framebuffer
+libv.glr: framebuffer binding
+libv.gl: ability to current bound texture
+libv.glr: solution for internal hiding but exposing correct offset for inline "direct" access to mandatory info (id and dirty) | aliasing head
+libv.glr: framebuffer auto init textures | solved with sync_no_bind()
+libv.glr: optimize textures with head access
+libv.glr: texture_fwd.hpp
+libv.glr: RemoteTexture should have its own header file
+libv.glr: renderbuffer
+libv.glr: blit
+libv.gl: track framebuffer bindings and eliminate duplicate bind
+libv.glr: Texture2DMultisample | RemoteTexture will be the most work, might worth to think about a different type?
+libv.glr: Texture2DMultisampleArray
+libv.glr: multisample capability
+libv.glr: glReadPixels | only makes sense in remote, and not for queue
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.glr: rename gc to DestroyQueue
+libv.glr: libv/glr/remote.hpp only included in glr files for the gc call, make that a function, make a fwd header for it, impleted it in remote.cpp, remove this include
+
+libv.glr: rendertarget (?) | a higher level abstraction
+
+libv.glr: optimize framebuffer with head access
+
+libv.glr: MAJOR overhaul on includes and code structure | hide remotes, provide head access
+		glr/assert.hpp
+		glr/attribute.hpp
+		glr/framebuffer.hpp
+		glr/layout_std140.hpp
+		glr/layout_to_string.hpp
+		glr/mesh.hpp
+		glr/procedural/cube.hpp
+		glr/procedural/plane.hpp
+		glr/procedural/sphere.hpp
+		glr/program.hpp
+		glr/queue.hpp
+		glr/queue_fwd.hpp
+		glr/remote.hpp
+		glr/renderbuffer.hpp
+		glr/state.hpp
+		glr/texture.hpp
+		glr/uniform.hpp
+		glr/uniform_block_binding.hpp
+		glr/uniform_block_layout.hpp
+		glr/uniform_buffer.hpp
+		glr/uniform_stream.hpp
+		glr/vertex.hpp
+
+libv.glr: create bool -> remote == nullptr
+
+libv.glr: too many variant, function / arg streams?
+
+
 libv.gl: learn the meaning of multisample fixedlocation (in case of texture2Dmultisample)
 libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
-
-libv.glr: framebuffer
-libv.glr: renderbuffer
-libv.glr: rendertarget | (?) I think this is meant to be the framebuffer itself
-libv.glr: blit
-libv.glr: Texture2DMultisample
-libv.glr: Texture2DMultisampleArray
-libv.glr: multisample capability
-libv.glr: glReadPixels
 
 libv.ui: debug zoom in
 libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), it could be used not just for UI
@@ -385,10 +429,7 @@ properties / style
 --- [[[ deadline: 2019.09.30 ]]] ---
 
 
-libv.ui: style sheets
-
 interactive
-	libv.ui: String2D API to find nearest character position
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui.input_field: selection support
 	libv.ui.input_field: Implement FocusSelectPolicy
@@ -448,30 +489,30 @@ focus
 	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
 	libv.ui.focus: Focus traversal order: position based
 
-libv.math: create vec_fwd and mat_fwd headers
-libv.sig: merge back the sig codebase rework a lighter version of the lib
-libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
-
-libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
-
 libv.ui: include check everything / fwd everything
 libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
 
 libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
 libv.console: should depend on libv.arg
 
+libv.ui: style sheets
+libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
 libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
-
-libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance
-
-app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
-app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
 
 --- [[[ deadline: 2019.10.31 ]]] ---
 
+
+libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance | design API allow async (give next N passed entry or M failed entry)
+
+app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
+app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
+
+libv.math: create vec_fwd and mat_fwd headers
+libv.sig: merge back the sig codebase rework a lighter version of the lib
+libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
 libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 libv.ui.layout: size over 100% is not an error
@@ -526,9 +567,6 @@ libv.ui.warning: warning if percent used inside a content is invalid | not just 
 
 libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
 libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
-
-libv.glr: texture_fwd.hpp
-libv.glr: RemoteTexture should have its own header file
 
 libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
 libv.glr: Mesh attributes should use a single VBO
@@ -592,7 +630,21 @@ libv.gl: use mdspan for image updates instead of raw loops
 libv.gl: glReadBuffer and glDrawBuffer | not urgent as the defaults are correct
 libv.gl: learn glPixelStore / implement
 
+libv.glr: texture, do not store the whole image, only have pending chunks, this will get rid of a lot of memcopy nightmare
+libv.glr: optimize every remote resource with head access
+libv.ui: switch of direct glr usage to a UI wrapper bulk renderer
+libv.ui: question: for bulk rendering would stencil buffer help for fonts | yes-kind of but alpha makes it tricky
+libv.glr: IDEA: An Entry object the group every call/state to a single render operation, both in queue and on the user API
+libv.glr: IDEA: Versioned resources, beside what tell which version are we want to use
+libv.glr: Make the reordering explicit and opt-in
+libv.glr: Refactor the variants
+
 libv.ecs: Test fails with an assert in boost vector
+
+libv.va4/ia4: (Iris/Vader Asset 4) New "library" to handle vm4 models and bundle them.
+libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate, play animation, etc...
+
+libv.lua: function to immediately destroy a variable (useful for game object or gui object cleanup that would hold a resource otherwise)
 
 
 --- AWAITING ---------------------------------------------------------------------------------------
@@ -639,11 +691,13 @@ cpp: can there be multiple definition error during linkage if two lib contains t
 cpp: clarify template vs auto type deduction rules
 cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inline const void&& function() const&& noexcept override final;
 cpp: learn std::launder and std::bless
+cpp: aligned_storage is UB, use this instead: alignas(T) std::byte storage[sizeof(T)];
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 ecs: existence / super-position based predication
+ext: adopt colony https://github.com/mattreecebentley/plf_colony
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
-ext: adopt a better hash_map
+ext: adopt a better hash_map and remove every std::unordered container
 gl: docs http://docs.gl
 gl: glEnable(GL_DEBUG_OUTPUT);
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.

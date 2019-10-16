@@ -22,6 +22,7 @@ struct State {
 	type capabilityBlend:1 = 0;
 	type capabilityCullFace:1 = 0;
 	type capabilityDepthTest:1 = 0;
+	type capabilityMultisample:1 = 1;
 	type capabilityRasterizerDiscard:1 = 0;
 	type capabilityScissorTest:1 = 0;
 	type capabilityStencilTest:1 = 0;
@@ -105,7 +106,7 @@ struct State {
 	type clipPlanes:3 = 0;
 
 	///	unused zero initialized padding bits
-	type _reserved:36 = 0;
+	type _reserved:35 = 0;
 
 	bool operator==(const State& rhs) const {
 		return libv::bit_cast<type>(*this) == libv::bit_cast<type>(rhs);
@@ -115,7 +116,7 @@ struct State {
 		return !(*this == rhs);
 	}
 };
-static_assert(sizeof(State) == sizeof(State::type), "layout error");
+static_assert(sizeof(State) == sizeof(State::type), "libv::glr::State layout error");
 
 // -------------------------------------------------------------------------------------------------
 
@@ -156,6 +157,9 @@ public:
 	inline void enableDepthTest() noexcept {
 		state_stack.top().capabilityDepthTest = 1;
 	}
+	inline void enableMultisample() noexcept {
+		state_stack.top().capabilityMultisample = 1;
+	}
 	inline void enableRasterizerDiscard() noexcept {
 		state_stack.top().capabilityRasterizerDiscard = 1;
 	}
@@ -177,6 +181,9 @@ public:
 	}
 	inline void disableDepthTest() noexcept {
 		state_stack.top().capabilityDepthTest = 0;
+	}
+	inline void disableMultisample() noexcept {
+		state_stack.top().capabilityMultisample = 0;
 	}
 	inline void disableRasterizerDiscard() noexcept {
 		state_stack.top().capabilityRasterizerDiscard = 0;

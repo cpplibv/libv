@@ -137,7 +137,6 @@ void Program::assign(Uniform& uniform_, std::string identifier) noexcept {
 	remote->dirty_location = true;
 }
 
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace glr

@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
 // ext
 #include <GL/glew.h>
 // pro
@@ -57,15 +59,15 @@ public:
 	}
 
 public:
-	inline void storage(Format format, int32_t width, int32_t height) noexcept {
+	inline void storage(Format format, libv::vec2i size) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glRenderbufferStorage(GL_RENDERBUFFER, format.format, width, height);
+		glRenderbufferStorage(GL_RENDERBUFFER, format.format, size.x, size.y);
 		checkGL();
 	}
 
-	inline void storage_ms(int32_t samples, Format format, int32_t width, int32_t height) noexcept {
+	inline void storage_ms(Format format, libv::vec2i size, int32_t samples) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, format.format, width, height);
+		glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, format.format, size.x, size.y);
 		checkGL();
 	}
 };
