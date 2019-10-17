@@ -116,7 +116,7 @@ private:
 
 public:
 	// NOTE: glFramebufferTexture is not implemented as specs are very unclear on level / layer
-	//	inline void draw(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+	//	inline void attach_draw(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
 	//		oneOf(texture.target,
 	//				TextureTarget::_3D,
 	//				TextureTarget::CubeMapArray,
@@ -132,64 +132,84 @@ public:
 	//		_texture(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
 	//	}
 
-	inline void draw1D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
-		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_1D);
-
-		_texture1D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
-	}
-
-	inline void read1D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
-		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_1D);
-
-		_texture1D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
-	}
-
-	inline void draw2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
-		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::_2DMultisample));
-		LIBV_GL_DEBUG_ASSERT(!oneOf(texture.target, TextureTarget::Rectangle, TextureTarget::_2DMultisample) || level == 0);
-
-		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
-	}
-
-	inline void read2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
-		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::_2DMultisample));
-		LIBV_GL_DEBUG_ASSERT(!oneOf(texture.target, TextureTarget::Rectangle, TextureTarget::_2DMultisample) || level == 0);
-
-		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
-	}
-
-	inline void draw2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
-		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
-	}
-
-	inline void read2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
-		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
-	}
-
-	inline void draw3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
-		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_3D);
-
-		_texture3D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level, layer);
-	}
-
-	inline void read3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
-		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_3D);
-
-		_texture3D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level, layer);
-	}
-
-	inline void draw(Attachment attachment, Renderbuffer renderbuffer) noexcept {
+	inline void attach_draw(Attachment attachment, Renderbuffer renderbuffer) noexcept {
 		LIBV_GL_DEBUG_ASSERT(renderbuffer.id != 0);
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, libv::to_value(attachment), GL_RENDERBUFFER, renderbuffer.id);
 	}
 
-	inline void read(Attachment attachment, Renderbuffer renderbuffer) noexcept {
+	inline void attach_read(Attachment attachment, Renderbuffer renderbuffer) noexcept {
 		LIBV_GL_DEBUG_ASSERT(renderbuffer.id != 0);
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
 		glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, libv::to_value(attachment), GL_RENDERBUFFER, renderbuffer.id);
+	}
+
+	inline void attach_draw1D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_1D);
+
+		_texture1D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
+	}
+
+	inline void attach_read1D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_1D);
+
+		_texture1D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
+	}
+
+	inline void attach_draw2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::_2DMultisample));
+		LIBV_GL_DEBUG_ASSERT(!oneOf(texture.target, TextureTarget::Rectangle, TextureTarget::_2DMultisample) || level == 0);
+
+		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
+	}
+
+	inline void attach_read2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		LIBV_GL_DEBUG_ASSERT(oneOf(texture.target, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::_2DMultisample));
+		LIBV_GL_DEBUG_ASSERT(!oneOf(texture.target, TextureTarget::Rectangle, TextureTarget::_2DMultisample) || level == 0);
+
+		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level);
+	}
+
+	inline void attach_draw2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
+		_texture2D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
+	}
+
+	inline void attach_read2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
+		_texture2D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(side), texture.id, level);
+	}
+
+	inline void attach_draw3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_3D);
+
+		_texture3D(GL_DRAW_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level, layer);
+	}
+
+	inline void attach_read3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+		LIBV_GL_DEBUG_ASSERT(texture.target == TextureTarget::_3D);
+
+		_texture3D(GL_READ_FRAMEBUFFER, attachment, libv::to_value(texture.target), texture.id, level, layer);
+	}
+
+	inline void attach(Attachment attachment, Renderbuffer renderbuffer) noexcept {
+		attach_draw(attachment, renderbuffer);
+	}
+
+	inline void attach1D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		attach_draw1D(attachment, texture, level);
+	}
+
+	inline void attach2D(Attachment attachment, Texture texture, int32_t level = 0) noexcept {
+		attach_draw2D(attachment, texture, level);
+	}
+
+	inline void attach2D(Attachment attachment, TextureCube texture, CubeSide side, int32_t level = 0) noexcept {
+		attach_draw2D(attachment, texture, side, level);
+	}
+
+	inline void attach3D(Attachment attachment, Texture texture, int32_t level, int32_t layer) noexcept {
+		attach_draw3D(attachment, texture, level, layer);
 	}
 
 public:

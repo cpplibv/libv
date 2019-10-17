@@ -240,10 +240,8 @@ struct Sandbox {
 
 			gl(framebuffer).create();
 			gl(framebuffer).bind();
-			gl(framebuffer).draw2D(libv::gl::Attachment::Color0, textureFBOColor);
-			gl(framebuffer).read2D(libv::gl::Attachment::Color0, textureFBOColor);
-			gl(framebuffer).draw(libv::gl::Attachment::Depth, renderFBODepth);
-			gl(framebuffer).read(libv::gl::Attachment::Depth, renderFBODepth);
+			gl(framebuffer).attach2D(libv::gl::Attachment::Color0, textureFBOColor);
+			gl(framebuffer).attach(libv::gl::Attachment::Depth, renderFBODepth);
 
 			auto status = gl(framebuffer).status_draw();
 			if (status != libv::gl::FramebufferStatus::Complete)
@@ -264,10 +262,8 @@ struct Sandbox {
 
 			gl(framebufferMS).create();
 			gl(framebufferMS).bind();
-			gl(framebufferMS).draw2D(libv::gl::Attachment::Color0, textureFBOMSColor);
-			gl(framebufferMS).read2D(libv::gl::Attachment::Color0, textureFBOMSColor);
-			gl(framebufferMS).draw(libv::gl::Attachment::Depth, renderFBOMSDepth);
-			gl(framebufferMS).read(libv::gl::Attachment::Depth, renderFBOMSDepth);
+			gl(framebufferMS).attach2D(libv::gl::Attachment::Color0, textureFBOMSColor);
+			gl(framebufferMS).attach(libv::gl::Attachment::Depth, renderFBOMSDepth);
 
 			auto status = gl(framebufferMS).status_draw();
 			if (status != libv::gl::FramebufferStatus::Complete)
@@ -404,7 +400,7 @@ struct Sandbox {
 
 		{
 			gl(framebufferMS).bind();
-			gl.blit({100, 0}, {100, 100}, {200, 0}, {100, 100}, libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+			gl.blit({100, 100}, {100, 100}, {200, 100}, {100, 100}, libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
 			gl(framebufferMS).unbind();
 
 			libv::gl::checkGL();
