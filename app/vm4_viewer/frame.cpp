@@ -4,6 +4,8 @@
 #include <vm4_viewer/frame.hpp>
 // ext
 #include <GL/glew.h>
+// libv
+#include <libv/glr/queue.hpp>
 // pro
 #include <vm4_viewer/log.hpp>
 #include <vm4_viewer/panel_viewer.hpp>

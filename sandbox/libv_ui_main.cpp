@@ -4,6 +4,7 @@
 #include <GL/glew.h>
 // libv
 #include <libv/frame/frame.hpp>
+#include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/input/event.hpp>
 #include <libv/input/input.hpp>

@@ -5,7 +5,6 @@
 // libv
 #include <libv/gl/enum.hpp>
 #include <libv/gl/gl_fwd.hpp>
-#include <libv/gl/image_fwd.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/math/vec.hpp>
 // std

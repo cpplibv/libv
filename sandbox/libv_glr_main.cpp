@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 // libv
 #include <libv/gl/enum.hpp>
+#include <libv/gl/gl.hpp>
 #include <libv/gl/image.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/utility/read_file.hpp>

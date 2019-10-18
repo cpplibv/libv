@@ -2,8 +2,6 @@
 
 #pragma once
 
-// ext
-#include <boost/align/aligned_allocator.hpp>
 // libv
 #include <libv/gl/uniform.hpp>
 #include <libv/math/mat.hpp>
@@ -28,6 +26,8 @@ struct BatchEndMarker {};
 template <typename... Types>
 class ImplUniformStream {
 	static constexpr uint8_t end_type = libv::meta::type_to_index_v<BatchEndMarker, Types...>;
+	static_assert((std::is_trivially_destructible_v<Types> && ...), "Invalid type");
+//	static_assert((std::is_trivially_copyable_v<Types> && ...), "Invalid type"); // Fails because of vec union
 
 	struct Header {
 		uint32_t location_index;
@@ -36,7 +36,7 @@ class ImplUniformStream {
 	};
 
 	std::vector<Header> header;
-	std::vector<std::byte, boost::alignment::aligned_allocator<std::byte, 32>> data;
+	std::vector<std::byte> data;
 	size_t current_header = 0;
 	size_t current_data = 0;
 
@@ -53,8 +53,9 @@ public:
 				libv::meta::type_to_index_v<T, Types...>,
 				static_cast<uint8_t>(sizeof(T) + aligned_last - orig_last)});
 		data.resize(aligned_last + sizeof(T));
-		std::memcpy(data.data() + aligned_last, &value, sizeof(T));
+		new (data.data() + aligned_last) T(value);
 	}
+
 	void set(const uint32_t location_index, bool value) {
 		set(location_index, static_cast<int32_t>(value));
 	}
@@ -68,7 +69,7 @@ public:
 			[](const GLint location, const std::byte* ptr) {
 				if constexpr (!std::is_same_v<Types, BatchEndMarker>) {
 					const auto aligned_ptr = static_cast<const void*>(ptr); // ptr is aligned, suppress warnings
-					libv::gl::uniform(location, *reinterpret_cast<const Types*>(aligned_ptr));
+					libv::gl::uniform(location, *static_cast<const Types*>(aligned_ptr));
 				} else {
 					// To suppress warnings in the BatchEndMarker case
 					(void) location;
@@ -108,9 +109,9 @@ using UniformStream = detail::ImplUniformStream<
 		libv::vec2i, libv::vec3i, libv::vec4i, libv::vec2ui, libv::vec3ui, libv::vec4ui,
 		libv::vec2l, libv::vec3l, libv::vec4l, libv::vec2ul, libv::vec3ul, libv::vec4ul,
 		libv::vec2f, libv::vec3f, libv::vec4f, libv::vec2d, libv::vec3d, libv::vec4d,
-		libv::mat2x2f, libv::mat3x2f, libv::mat4x2f, libv::mat2x2f, libv::mat3x2f, libv::mat4x2f,
-		libv::mat2x3f, libv::mat3x3f, libv::mat4x3f, libv::mat2x3f, libv::mat3x3f, libv::mat4x3f,
-		libv::mat2x4f, libv::mat3x4f, libv::mat4x4f, libv::mat2x4f, libv::mat3x4f, libv::mat4x4f
+		libv::mat2x2f, libv::mat3x2f, libv::mat4x2f, libv::mat2x2d, libv::mat3x2d, libv::mat4x2d,
+		libv::mat2x3f, libv::mat3x3f, libv::mat4x3f, libv::mat2x3d, libv::mat3x3d, libv::mat4x3d,
+		libv::mat2x4f, libv::mat3x4f, libv::mat4x4f, libv::mat2x4d, libv::mat3x4d, libv::mat4x4d
 >;
 
 // -------------------------------------------------------------------------------------------------

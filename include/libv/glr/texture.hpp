@@ -80,10 +80,7 @@ private:
 	void sync_might_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;
 };
 
-class AttorneyRemoteTexture {
-	friend class Queue;
-	friend class RemoteFramebuffer;
-
+struct AttorneyRemoteTexture {
 	[[nodiscard]] static inline libv::gl::Texture sync_no_bind(const Texture& texture, libv::gl::GL& gl, Remote& remote_) noexcept {
 		// NOTE: Valid aliasing, verified by the standard, head is the first member
 		auto& head = *static_cast<RemoteTextureHead*>(static_cast<void*>(texture.remote.get()));

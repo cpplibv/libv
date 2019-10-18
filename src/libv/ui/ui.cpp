@@ -399,7 +399,10 @@ void UI::update(libv::glr::Queue& gl) {
 		gl.view = libv::mat4f::identity();
 		gl.model = libv::mat4f::identity();
 
-		gl.viewport(xy(AccessRoot::position(self->root)), xy(AccessRoot::size(self->root)));
+		gl.viewport(
+				libv::vec::cast<int32_t>(libv::vec::xy(AccessRoot::position(self->root))),
+				libv::vec::cast<int32_t>(libv::vec::xy(AccessRoot::size(self->root)))
+		);
 
 		ContextRender context{gl, clock::now()};
 //		AccessRoot::create(self->root, context);

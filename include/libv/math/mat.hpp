@@ -14,6 +14,7 @@
 #include <glm/mat4x3.hpp>
 #include <glm/mat4x4.hpp>
 // libv
+#include <libv/meta/always.hpp>
 #include <libv/meta/resolve.hpp>
 // pro
 #include <libv/math/angle.hpp>
@@ -127,30 +128,39 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 
-	static constexpr mat_t perspective(const T fovy, const T aspect, const T near, const T far) {
+	[[nodiscard]] static constexpr inline mat_t perspective(const T fovy, const T aspect, const T near, const T far) noexcept {
 		mat_t result;
 		result = glm::perspective<T>(fovy, aspect, near, far);
 		return result;
 	}
 
-	static constexpr mat_t lookAt(const libv::vec3_t<T> eye, const libv::vec3_t<T> target, const libv::vec3_t<T> up) {
+	[[nodiscard]] static constexpr inline mat_t lookAt(const libv::vec3_t<T> eye, const libv::vec3_t<T> target, const libv::vec3_t<T> up) noexcept {
 		mat_t result;
 		result = glm::lookAt<T>(to_glm(eye), to_glm(target), to_glm(up));
 		return result;
 	}
 
-	static constexpr mat_t ortho(const T left, const T right, const T bottom, const T top) {
+	[[nodiscard]] static constexpr inline mat_t ortho(const T left, const T right, const T bottom, const T top) noexcept {
 		mat_t result;
 		result = glm::ortho<T>(left, right, bottom, top);
 		return result;
 	}
-	
-	static constexpr inline mat_t ortho(const libv::vec2_t<T> position, const libv::vec2_t<T> size) {
+
+	[[nodiscard]] static constexpr inline mat_t ortho(const libv::vec2_t<T> position, const libv::vec2_t<T> size) noexcept {
 		return ortho(position.x, position.x + size.x, position.y, position.y + size.y);
 	}
 
-	static constexpr mat_t identity() {
+	[[nodiscard]] static constexpr inline mat_t identity() noexcept {
 		return mat_t{1};
+	}
+
+	[[nodiscard]] static constexpr inline mat_t texture() noexcept
+			WISH_REQUIRES(C == 4 && R == 4) {
+		return mat_t{
+				0.5, 0.0, 0.0, 0.0,
+				0.0, 0.5, 0.0, 0.0,
+				0.0, 0.0, 0.5, 0.0,
+				0.5, 0.5, 0.5, 1.0};
 	}
 };
 

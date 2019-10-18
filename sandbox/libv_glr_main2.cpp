@@ -5,6 +5,7 @@
 // ext
 #include <GL/glew.h>
 // libv
+#include <libv/gl/gl.hpp>
 #include <libv/math/angle.hpp>
 #include <libv/utility/read_file.hpp>
 // std
@@ -16,14 +17,15 @@
 #include <libv/glr/remote.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/program.hpp>
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
 //#include <libv/glr/attribute.hpp>
 //#include <libv/glr/font.hpp>
-//#include <libv/glr/mesh.hpp>
 //#include <libv/glr/procedural/cube.hpp>
 //#include <libv/glr/procedural/sphere.hpp>
-//#include <libv/glr/program.hpp>
 //#include <libv/glr/text.hpp>
 //#include <libv/glr/texture.hpp>
 //#include <libv/glr/uniform.hpp>
@@ -194,20 +196,20 @@ struct Sandbox {
 		remote.create();
 		remote.enableDebug();
 
-		log_sandbox.debug("{:46} [{:>10} ]", "CurrentAvailableVideoMemory",        remote.gl.getCurrentAvailableVideoMemory());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnits",               remote.gl.getMaxTextureImageUnits());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsFragment",       remote.gl.getMaxTextureImageUnitsFragment());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsGeometry",       remote.gl.getMaxTextureImageUnitsGeometry());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsVertex",         remote.gl.getMaxTextureImageUnitsVertex());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsCompute",        remote.gl.getMaxTextureImageUnitsCompute());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsTessControl",    remote.gl.getMaxTextureImageUnitsTessControl());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsTessEvaluation", remote.gl.getMaxTextureImageUnitsTessEvaluation());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureSize",                     remote.gl.getMaxTextureSize());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxUniformBlockSize",                remote.gl.getMaxUniformBlockSize());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxUniformBufferBindings",           remote.gl.getMaxUniformBufferBindings());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxVertexAttribs",                   remote.gl.getMaxVertexAttribs());
-		log_sandbox.debug("{:46} [{:>10} ]", "MaxVertexUniformComponents",         remote.gl.getMaxVertexUniformComponents());
-		log_sandbox.debug("{:46} [{:>10} ]", "UniformBufferOffsetAlignment",       remote.gl.getUniformBufferOffsetAlignment());
+		log_sandbox.debug("{:46} [{:>10} ]", "CurrentAvailableVideoMemory",        remote.gl().getCurrentAvailableVideoMemory());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnits",               remote.gl().getMaxTextureImageUnits());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsFragment",       remote.gl().getMaxTextureImageUnitsFragment());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsGeometry",       remote.gl().getMaxTextureImageUnitsGeometry());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsVertex",         remote.gl().getMaxTextureImageUnitsVertex());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsCompute",        remote.gl().getMaxTextureImageUnitsCompute());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsTessControl",    remote.gl().getMaxTextureImageUnitsTessControl());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureImageUnitsTessEvaluation", remote.gl().getMaxTextureImageUnitsTessEvaluation());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxTextureSize",                     remote.gl().getMaxTextureSize());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxUniformBlockSize",                remote.gl().getMaxUniformBlockSize());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxUniformBufferBindings",           remote.gl().getMaxUniformBufferBindings());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxVertexAttribs",                   remote.gl().getMaxVertexAttribs());
+		log_sandbox.debug("{:46} [{:>10} ]", "MaxVertexUniformComponents",         remote.gl().getMaxVertexUniformComponents());
+		log_sandbox.debug("{:46} [{:>10} ]", "UniformBufferOffsetAlignment",       remote.gl().getUniformBufferOffsetAlignment());
 	}
 
 	~Sandbox() {

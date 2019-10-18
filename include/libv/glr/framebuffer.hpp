@@ -19,6 +19,13 @@ class RemoteFramebuffer;
 class Renderbuffer;
 class Texture;
 
+// -------------------------------------------------------------------------------------------------
+
+//struct RemoteFramebufferHead {
+//	libv::gl::Framebuffer framebuffer;
+//	bool dirty = true;
+//};
+
 struct Framebuffer {
 	friend class AttorneyRemoteFramebuffer;
 

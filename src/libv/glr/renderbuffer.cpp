@@ -2,17 +2,11 @@
 
 // hpp
 #include <libv/glr/renderbuffer.hpp>
-// ext
-#include <boost/container/small_vector.hpp>
 // libv
 #include <libv/gl/gl.hpp>
-#include <libv/gl/image.hpp>
 #include <libv/gl/renderbuffer.hpp>
 #include <libv/utility/observer_ptr.hpp>
-// std
-#include <optional>
 // pro
-#include <libv/glr/assert.hpp>
 #include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 

@@ -305,45 +305,12 @@ libv.glr: Texture2DMultisample | RemoteTexture will be the most work, might wort
 libv.glr: Texture2DMultisampleArray
 libv.glr: multisample capability
 libv.glr: glReadPixels | only makes sense in remote, and not for queue
+libv.glr: rename gc to DestroyQueue
+libv.glr: first half of a major overhaul on includes and code structure | hide remotes, provide head access
+libv.glr: cleanup queue
 
 
 --- STACK ------------------------------------------------------------------------------------------
-
-
-libv.glr: rename gc to DestroyQueue
-libv.glr: libv/glr/remote.hpp only included in glr files for the gc call, make that a function, make a fwd header for it, impleted it in remote.cpp, remove this include
-
-libv.glr: rendertarget (?) | a higher level abstraction
-
-libv.glr: optimize framebuffer with head access
-
-libv.glr: MAJOR overhaul on includes and code structure | hide remotes, provide head access
-		glr/assert.hpp
-		glr/attribute.hpp
-		glr/framebuffer.hpp
-		glr/layout_std140.hpp
-		glr/layout_to_string.hpp
-		glr/mesh.hpp
-		glr/procedural/cube.hpp
-		glr/procedural/plane.hpp
-		glr/procedural/sphere.hpp
-		glr/program.hpp
-		glr/queue.hpp
-		glr/queue_fwd.hpp
-		glr/remote.hpp
-				glr/renderbuffer.hpp
-		glr/state.hpp
-		glr/texture.hpp
-		glr/uniform.hpp
-		glr/uniform_block_binding.hpp
-		glr/uniform_block_layout.hpp
-		glr/uniform_buffer.hpp
-		glr/uniform_stream.hpp
-		glr/vertex.hpp
-
-libv.glr: create bool -> remote == nullptr
-
-libv.glr: too many variant, function / arg streams?
 
 
 libv.gl: learn the meaning of multisample fixedlocation (in case of texture2Dmultisample)
@@ -431,6 +398,7 @@ properties / style
 
 interactive
 	libv.ui: Make a sandbox for a input->button->label->list
+	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
 	libv.ui.input_field: selection support
 	libv.ui.input_field: Implement FocusSelectPolicy
 	libv.ui.input_field: synthetize selection property
@@ -564,6 +532,33 @@ libv.utility: add/verify structured binding support for vec_t
 libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras | Cancel! 100%+ is valid (Example: button with a 120% shadow around it)
 
 --- [[[ deadline: 2019.11.30 ]]] ---
+
+libv.glr: Cleanup includes and implement head pattern for:
+			libv/glr/mesh.cpp
+			libv/glr/mesh.hpp
+			libv/glr/program.cpp
+			libv/glr/program.hpp
+			libv/glr/uniform_buffer.cpp
+			libv/glr/uniform_buffer.hpp
+			libv/glr/uniform_stream.hpp
+libv.glr: Implement head pattern for:
+			libv/glr/mesh.cpp
+			libv/glr/mesh.hpp
+			libv/glr/program.cpp
+			libv/glr/program.hpp
+			libv/glr/uniform_buffer.cpp
+			libv/glr/uniform_buffer.hpp
+			libv/glr/uniform_stream.hpp
+			libv/glr/framebuffer.cpp
+			libv/glr/framebuffer.hpp
+			libv/glr/texture.cpp
+			libv/glr/texture.hpp
+libv.glr: GLR User facing API shall not expose to the OpenGL header
+libv.glr: better name for DestroyQueue
+libv.glr: libv/glr/remote.hpp only included in glr files to fetch DestroyQueue, pass that around instead (with a better name), could be boundeled with the gl reference.
+libv.glr: create bool -> remote == nullptr
+
+libv.glr: too many variant, function / arg streams?, uniform_stream has a similar pattern that could be generalized
 
 libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
 libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
