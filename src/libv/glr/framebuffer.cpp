@@ -11,9 +11,10 @@
 // std
 #include <variant>
 // pro
-#include <libv/glr/remote.hpp> // <<< P4: only included for the gc call, make that a function, make a fwd header for it, impleted it in remote.cpp, remove this include
-#include <libv/glr/texture.hpp>
+#include <libv/glr/destroy_queue.hpp>
+#include <libv/glr/remote.hpp>
 #include <libv/glr/renderbuffer.hpp>
+#include <libv/glr/texture.hpp>
 
 
 namespace libv {
@@ -78,7 +79,7 @@ public:
 	boost::container::small_vector<Attachment, 2> attachments; /// Pending attachments
 
 private:
-	libv::observer_ptr<Remote> remote = nullptr;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
 	template <bool Both, bool Read, bool Draw>
@@ -99,7 +100,7 @@ template <bool Both, bool Draw, bool Read>
 void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
 		gl(object).create();
-		remote = remote_;
+		remote = remote_.destroyQueues();
 	}
 
 	if constexpr (Both)

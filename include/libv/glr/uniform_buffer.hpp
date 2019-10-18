@@ -5,6 +5,7 @@
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
+#include <libv/gl/gl_fwd.hpp>
 #include <libv/utility/observer_ptr.hpp>
 // std
 #include <memory>
@@ -18,17 +19,13 @@
 
 
 namespace libv {
-namespace gl {
-
-class GL;
-
-} // namespace gl
 namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Remote;
+class DestroyQueues;
 class RemoteUniformBuffer;
+struct Remote;
 
 struct UniformDataBlock {
 	size_t offset;
@@ -58,8 +55,7 @@ public:
 	static constexpr size_t BLOCK_ALIGNMENT = 256;
 	// TODO P5: load BLOCK_ALIGNMENT run-time
 
-	/// Can be nullptr if the object is not yet associated with a remote OpenGL context
-	libv::observer_ptr<Remote> remote;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
 	void create(libv::gl::GL& gl, Remote& remote_) noexcept;

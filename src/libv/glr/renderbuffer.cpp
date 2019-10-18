@@ -13,6 +13,7 @@
 #include <optional>
 // pro
 #include <libv/glr/assert.hpp>
+#include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -28,7 +29,7 @@ struct RemoteRenderbuffer {
 	libv::vec2i size;
 	int32_t samples = 0;
 
-	libv::observer_ptr<Remote> remote = nullptr;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 public:
 	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
@@ -41,7 +42,7 @@ public:
 
 void RemoteRenderbuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
-		remote = remote_;
+		remote = remote_.destroyQueues();
 
 		gl(head.renderbuffer).create();
 	}

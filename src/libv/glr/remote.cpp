@@ -4,14 +4,11 @@
 #include <libv/glr/remote.hpp>
 // libv
 #include <libv/gl/assert.hpp>
-#include <libv/gl/buffer.hpp>
 #include <libv/gl/check.hpp>
-#include <libv/gl/framebuffer.hpp>
 #include <libv/gl/gl.hpp>
-#include <libv/gl/program.hpp>
-#include <libv/gl/renderbuffer.hpp>
-#include <libv/gl/texture.hpp>
-#include <libv/gl/vertex_array.hpp>
+// pro
+#include <libv/glr/destroy_queue.hpp>
+#include <libv/glr/queue.hpp>
 
 
 namespace libv {
@@ -19,12 +16,21 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-Remote::Remote() {
-}
+struct ImplRemote {
+	libv::gl::GL gl;
+	std::vector<Queue> queues;
+	DestroyQueues destroyQueues;
+	std::thread::id contextThreadID;
+	bool initalized = false;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+Remote::Remote() : self(std::make_unique<ImplRemote>()) {}
 
 Remote::~Remote() {
-	if (initalized) {
-		LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == contextThreadID);
+	if (self->initalized) {
+		LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
 		destroy();
 	}
 }
@@ -34,69 +40,55 @@ Queue Remote::queue() {
 }
 
 void Remote::queue(Queue&& queue) {
-	queues.emplace_back(std::move(queue));
+	self->queues.emplace_back(std::move(queue));
 }
 
-void Remote::clear() {
-	queues.clear();
-
-	for (auto& object : gc_program)
-		gl(object).destroy();
-	gc_program.clear();
-
-	for (auto& object : gc_framebuffer)
-		gl(object).destroy();
-	gc_framebuffer.clear();
-
-	for (auto& object : gc_textures)
-		gl(object).destroy();
-	gc_textures.clear();
-
-	for (auto& object : gc_renderbuffer)
-		gl(object).destroy();
-	gc_renderbuffer.clear();
-
-	for (auto& object : gc_buffers)
-		gl(object).destroy();
-	gc_buffers.clear();
-
-	for (auto& object : gc_vertexArrays)
-		gl(object).destroy();
-	gc_vertexArrays.clear();
+DestroyQueues& Remote::destroyQueues() noexcept {
+	return self->destroyQueues;
 }
 
-void Remote::enableTrace() {
-	gl.enableTrace();
+void Remote::clear() noexcept {
+	self->queues.clear();
+	self->destroyQueues.clear(self->gl);
 }
 
-void Remote::enableDebug() {
-	gl.enableDebug();
+void Remote::enableTrace() noexcept {
+	self->gl.enableTrace();
 }
 
-void Remote::readPixels(vec2i pos, vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) {
-	gl.readPixels(pos, size, format, type, data);
+void Remote::enableDebug() noexcept {
+	self->gl.enableDebug();
+}
+
+void Remote::readPixels(libv::vec2i pos, libv::vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) noexcept {
+	self->gl.readPixels(pos, size, format, type, data);
+}
+
+libv::gl::GL& Remote::gl() noexcept {
+	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
+	LIBV_GL_DEBUG_ASSERT(self->initalized);
+	return self->gl;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Remote::create() {
 	// load glew
-	contextThreadID = std::this_thread::get_id();
-	LIBV_GL_DEBUG_ASSERT(!initalized);
-	initalized = true;
+	LIBV_GL_DEBUG_ASSERT(!self->initalized);
+	self->contextThreadID = std::this_thread::get_id();
+	self->initalized = true;
 }
 
 void Remote::destroy() {
-	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == contextThreadID);
-	LIBV_GL_DEBUG_ASSERT(initalized);
+	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
+	LIBV_GL_DEBUG_ASSERT(self->initalized);
 	clear();
-	initalized = false;
+	self->initalized = false;
 }
 
 void Remote::execute() {
-	for (auto& queue : queues) {
-		queue.execute(gl, *this);
-	}
+	for (auto& queue : self->queues)
+		queue.execute(self->gl, *this);
 	clear();
 }
 

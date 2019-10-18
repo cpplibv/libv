@@ -13,6 +13,7 @@
 #include <optional>
 // pro
 #include <libv/glr/assert.hpp>
+#include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -61,7 +62,7 @@ struct RemoteTexture {
 //	libv::gl::Wrap warpT = libv::gl::Wrap::Repeat;
 //	libv::gl::Wrap warpR = libv::gl::Wrap::Repeat;
 
-	libv::observer_ptr<Remote> remote = nullptr;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 public:
 	void update(libv::gl::GL& gl, Remote& remote_) noexcept;
@@ -74,7 +75,7 @@ public:
 
 void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
-		remote = remote_;
+		remote = remote_.destroyQueues();
 
 		if (!dirty_load) {
 			// TODO P5: Sort out this create mess, ideal solution would be to improve Image to accept a texture

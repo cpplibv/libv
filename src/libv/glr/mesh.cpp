@@ -7,6 +7,7 @@
 #include <libv/gl/gl.hpp>
 #include <libv/gl/vertex_array.hpp>
 // pro
+#include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -21,7 +22,7 @@ void RemoteMesh::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	for (RemoteMeshAttribute& attribute : attributes)
 		gl(attribute.buffer).create();
 
-	remote = libv::make_observer(remote_);
+	remote = remote_.destroyQueues();
 	created = true;
 }
 

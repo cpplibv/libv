@@ -9,6 +9,7 @@
 #include <libv/gl/program.hpp>
 #include <libv/gl/shader.hpp>
 // pro
+#include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -20,7 +21,7 @@ namespace glr {
 void RemoteProgram::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(program).create();
 
-	remote = libv::make_observer(remote_);
+	remote = remote_.destroyQueues();
 	created = true;
 }
 

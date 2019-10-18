@@ -6,10 +6,11 @@
 #include <boost/align/aligned_allocator.hpp>
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/algorithm/linear_find.hpp>
 #include <libv/algorithm/container.hpp>
+#include <libv/algorithm/linear_find.hpp>
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/vertex_array_object.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/observer_ptr.hpp>
@@ -20,17 +21,13 @@
 
 
 namespace libv {
-namespace gl {
-
-class GL;
-
-} // namespace gl
 namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
 using VertexIndex = uint32_t;
 using AttributeChannel = int32_t;
+struct DestroyQueues;
 struct Remote;
 struct RemoteMesh;
 
@@ -133,8 +130,7 @@ struct RemoteMesh {
 	libv::gl::Primitive primitive = libv::gl::Primitive::Triangles;
 	libv::gl::BufferUsage usage = libv::gl::BufferUsage::StaticDraw;
 
-	/// Can be nullptr if the object is not yet associated with a remote OpenGL context
-	libv::observer_ptr<Remote> remote;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
 	void create(libv::gl::GL& gl, Remote& remote_) noexcept;

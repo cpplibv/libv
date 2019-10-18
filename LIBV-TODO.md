@@ -331,7 +331,7 @@ libv.glr: MAJOR overhaul on includes and code structure | hide remotes, provide 
 		glr/queue.hpp
 		glr/queue_fwd.hpp
 		glr/remote.hpp
-		glr/renderbuffer.hpp
+				glr/renderbuffer.hpp
 		glr/state.hpp
 		glr/texture.hpp
 		glr/uniform.hpp

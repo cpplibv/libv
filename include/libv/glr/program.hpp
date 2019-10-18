@@ -3,12 +3,12 @@
 #pragma once
 
 // libv
-#include <libv/utility/observer_ptr.hpp>
+#include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/program_object.hpp>
+#include <libv/utility/observer_ptr.hpp>
 // std
 #include <memory>
 #include <string>
-#include <variant>
 #include <vector>
 // pro
 #include <libv/glr/uniform.hpp>
@@ -17,17 +17,13 @@
 
 
 namespace libv {
-namespace gl {
-
-class GL;
-
-} // namespace gl
 namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-class Remote;
 class AttorneyMeshRemote;
+class DestroyQueues;
+class Remote;
 
 struct RemoteProgram {
 	libv::gl::Program program;
@@ -55,8 +51,7 @@ public:
 	std::vector<std::string> uniform_identifiers;
 
 private:
-	/// Can be nullptr if the object is not yet associated with a remote OpenGL context
-	libv::observer_ptr<Remote> remote = nullptr;
+	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
 private:
 	void create(libv::gl::GL& gl, Remote& remote_) noexcept;

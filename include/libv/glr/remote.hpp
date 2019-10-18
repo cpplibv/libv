@@ -3,19 +3,11 @@
 #pragma once
 
 // libv
-#include <libv/gl/assert.hpp>
-#include <libv/gl/check.hpp>
-#include <libv/gl/gl.hpp>
-#include <libv/gl/buffer_object.hpp>
-#include <libv/gl/framebuffer_object.hpp>
-#include <libv/gl/program_object.hpp>
-#include <libv/gl/texture_object.hpp>
-#include <libv/gl/vertex_array_object.hpp>
+#include <libv/gl/enum.hpp>
+#include <libv/gl/gl_fwd.hpp>
+#include <libv/math/vec.hpp>
 // std
-#include <thread>
-#include <vector>
-// pro
-#include <libv/glr/queue.hpp>
+#include <memory>
 
 
 namespace libv {
@@ -53,61 +45,31 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
+class ImplRemote;
+class Queue;
+class DestroyQueues;
+
 struct Remote {
 private:
-public:
-	libv::gl::GL gl;
-
-private:
-	std::vector<Queue> queues;
-
-private:
-	std::vector<libv::gl::Buffer> gc_buffers;
-	std::vector<libv::gl::Framebuffer> gc_framebuffer;
-	std::vector<libv::gl::Program> gc_program;
-	std::vector<libv::gl::Renderbuffer> gc_renderbuffer;
-	std::vector<libv::gl::Texture> gc_textures;
-	std::vector<libv::gl::VertexArray> gc_vertexArrays;
-
-private:
-	std::thread::id contextThreadID;
-	bool initalized = false;
+	std::unique_ptr<ImplRemote> self;
 
 public:
 	Remote();
 	~Remote();
 
 public:
-	inline void gc(libv::gl::Buffer object) {
-		gc_buffers.emplace_back(object);
-	}
-	inline void gc(libv::gl::Framebuffer object) {
-		gc_framebuffer.emplace_back(object);
-	}
-	inline void gc(libv::gl::Program object) {
-		gc_program.emplace_back(object);
-	}
-	inline void gc(libv::gl::Renderbuffer object) {
-		gc_renderbuffer.emplace_back(object);
-	}
-	inline void gc(libv::gl::Texture object) {
-		gc_textures.emplace_back(object);
-	}
-	inline void gc(libv::gl::VertexArray object) {
-		gc_vertexArrays.emplace_back(object);
-	}
-
-public:
 	Queue queue();
 	void queue(Queue&& queue);
-	void clear();
+	DestroyQueues& destroyQueues() noexcept;
+	void clear() noexcept;
 
 public:
-	void enableTrace();
-	void enableDebug();
+	void enableTrace() noexcept;
+	void enableDebug() noexcept;
 
 public:
-	void readPixels(vec2i pos, vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data);
+	void readPixels(libv::vec2i pos, libv::vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) noexcept;
+	libv::gl::GL& gl() noexcept;
 
 public:
 	void create();

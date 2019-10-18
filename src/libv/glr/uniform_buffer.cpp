@@ -7,6 +7,7 @@
 #include <libv/gl/uniform_buffer.hpp>
 #include <libv/utility/align.hpp>
 // pro
+#include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/remote.hpp>
 
 
@@ -18,7 +19,7 @@ namespace glr {
 void RemoteUniformBuffer::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(buffer).create();
 
-	remote = libv::make_observer(remote_);
+	remote = remote_.destroyQueues();
 	created = true;
 }
 
