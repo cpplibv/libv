@@ -23,6 +23,7 @@
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/overlay_zoom.lpp>
 
 
 namespace libv {
@@ -36,11 +37,6 @@ public:
 
 	void setSize(libv::vec3f size_) {
 		AccessRoot::size(*this) = size_;
-		flagAuto(Flag::pendingLayout);
-	}
-
-	void setPosition(libv::vec3f position_) {
-		AccessRoot::position(*this) = position_;
 		flagAuto(Flag::pendingLayout);
 	}
 };
@@ -75,21 +71,6 @@ struct Histogram {
 };
 
 class ImplUI {
-public:
-	using UIEvent = std::variant<
-			libv::input::EventChar,
-			libv::input::EventKey,
-			libv::input::EventMouseButton,
-			libv::input::EventMouseEnter,
-			libv::input::EventMousePosition,
-			libv::input::EventMouseScroll
-	>;
-
-public:
-	ContextState context_state;
-	ContextUI context;
-	Root root{context};
-
 	struct Stat {
 		Histogram<100> attach1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
 		Histogram<100> event{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
@@ -118,13 +99,38 @@ public:
 			os << '\n';
 			return os;
 		}
-	} stat;
-//	size_t i = 0;
+	};
 
+public:
+	using UIEvent = std::variant<
+			libv::input::EventChar,
+			libv::input::EventKey,
+			libv::input::EventMouseButton,
+			libv::input::EventMouseEnter,
+			libv::input::EventMousePosition,
+			libv::input::EventMouseScroll
+	>;
+
+public:
+	ContextState context_state;
+	ContextUI context;
+	Root root{context};
+
+	Stat stat;
 	libv::Timer timer;
 	libv::Timer timerFrame;
+
 	std::vector<UIEvent> event_queue;
 	std::mutex mutex;
+
+	bool overlayZoomEnable = false;
+	std::shared_ptr<OverlayZoom> overlayZoom = std::make_shared<OverlayZoom>(root);
+
+//	bool overlayCursorEnable = false;
+//	std::shared_ptr<OverlayCursor> overlayCursor = std::make_shared<OverlayCursor>(root);
+
+//	std::shared_ptr<OverlayPref> overlayPref = std::make_shared<OverlayPref>(root);
+//	std::shared_ptr<OverlayStack> overlayStack = std::make_shared<OverlayStack>(root);
 
 public:
 	ImplUI(UI& ui) :
@@ -167,6 +173,78 @@ public:
 		focus(old_focus, new_focus);
 		return new_focus;
 	}
+
+public:
+	void event(const libv::input::EventChar& event) {
+		if (context_state.focus_ != nullptr)
+			AccessRoot::eventChar(*context_state.focus_, event);
+	}
+
+	void event(const libv::input::EventKey& event) {
+//		if (event.key == libv::input::Key::F12 && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none) {
+		if (event.key == libv::input::Key::F12 && event.action == libv::input::Action::press) {
+			overlayZoomEnable = !overlayZoomEnable;
+
+			if (overlayZoomEnable)
+				root.add(overlayZoom);
+			else
+				root.remove(overlayZoom);
+
+			log_ui.info("Switch overlay mode: {} to {}", "zoom", overlayZoomEnable ? "on" : "off");
+		}
+
+//		if (event.key == libv::input::Key::F11 && event.action == libv::input::Action::press) {
+//			overlayCursorEnable = !overlayCursorEnable;
+//
+//			if (overlayCursorEnable)
+////				root.add(overlayZoom);
+//			else
+////				root.remove(overlayZoom);
+//
+//			log_ui.info("Switch overlay mode: {} to {}", "cursor", overlayCursorEnable ? "on" : "off");
+//		}
+
+		if (context_state.focus_ != nullptr)
+			AccessRoot::eventKey(*context_state.focus_, event);
+
+		if (event.action != libv::input::Action::release) {
+			context_state.pressed_keys.insert(event.key);
+			context_state.pressed_scancodes.insert(event.scancode);
+		} else {
+			context_state.pressed_keys.erase(event.key);
+			context_state.pressed_scancodes.erase(event.scancode);
+		}
+	}
+
+	void event(const libv::input::EventMouseButton& event) {
+		context.mouse.event_button(event.button, event.action);
+		if (event.action != libv::input::Action::release)
+			context_state.pressed_mouses.insert(event.button);
+		else
+			context_state.pressed_mouses.erase(event.button);
+	}
+
+	void event(const libv::input::EventMouseEnter& event) {
+		if (event.entered) {
+			context.mouse.event_enter();
+			context_state.mouse_over_ = true;
+		} else {
+			context.mouse.event_leave();
+			context_state.mouse_over_ = false;
+		}
+	}
+
+	void event(const libv::input::EventMousePosition& event) {
+		const auto position = libv::vec::cast<float>(event.position);
+		context.mouse.event_position(position);
+		context_state.mouse_position_ = position;
+	}
+
+	void event(const libv::input::EventMouseScroll& event) {
+		const auto offset = libv::vec::cast<float>(event.offset);
+		context.mouse.event_scroll(offset);
+		context_state.scroll_position_ = offset;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -186,20 +264,8 @@ void UI::add(std::shared_ptr<BaseComponent> component) {
 	self->root.add(std::move(component));
 }
 
-void UI::setSize(libv::vec3f size_) noexcept {
-	self->root.setSize(size_);
-}
-
-void UI::setSize(float x, float y, float z) noexcept {
-	self->root.setSize({x, y, z});
-}
-
-void UI::setPosition(libv::vec3f position_) noexcept {
-	self->root.setPosition(position_);
-}
-
-void UI::setPosition(float x, float y, float z) noexcept {
-	self->root.setPosition({x, y, z});
+void UI::setSize(libv::vec2i size_) noexcept {
+	self->root.setSize({libv::vec::cast<float>(size_), 0});
 }
 
 BaseComponent& UI::root() const noexcept {
@@ -254,70 +320,28 @@ void UI::update(libv::glr::Queue& gl) {
 	self->timer.reset();
 	self->timerFrame.reset();
 
+	self->context_state.frame_count_++;
 	self->context_state.time_frame_ = clock::now();
 	self->context_state.time_ = self->context_state.time_frame_ - self->context_state.time_ui_;
 
+	// --- Attach ---
 	try {
-		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 		self->stat.attach1.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
 	}
 
+	// --- Event ---
 	try {
-		// --- Event ---
-		self->context.mouse.event_update(); // Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
+		self->context.mouse.event_update();
+		// NOTE: Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
 
 		std::unique_lock lock{self->mutex};
-		for (const auto& mouseEvent : self->event_queue) {
-			const auto visitor = libv::overload(
-				[this](const libv::input::EventChar& event) {
-					if (self->context_state.focus_ != nullptr)
-						AccessRoot::eventChar(*self->context_state.focus_, event);
-				},
-				[this](const libv::input::EventKey& event) {
-					if (self->context_state.focus_ != nullptr)
-						AccessRoot::eventKey(*self->context_state.focus_, event);
 
-					if (event.action != libv::input::Action::release) {
-						self->context_state.pressed_keys.insert(event.key);
-						self->context_state.pressed_scancodes.insert(event.scancode);
-					} else {
-						self->context_state.pressed_keys.erase(event.key);
-						self->context_state.pressed_scancodes.erase(event.scancode);
-					}
-				},
-				[this](const libv::input::EventMouseEnter& event) {
-					if (event.entered) {
-						self->context.mouse.event_enter();
-						self->context_state.mouse_over_ = true;
-					} else {
-						self->context.mouse.event_leave();
-						self->context_state.mouse_over_ = false;
-					}
-				},
-				[this](const libv::input::EventMouseButton& event) {
-					self->context.mouse.event_button(event.button, event.action);
-					if (event.action != libv::input::Action::release)
-						self->context_state.pressed_mouses.insert(event.button);
-					else
-						self->context_state.pressed_mouses.erase(event.button);
-				},
-				[this](const libv::input::EventMousePosition& event) {
-					const auto position = libv::vec::cast<float>(event.position);
-					self->context.mouse.event_position(position);
-					self->context_state.mouse_position_ = position;
-				},
-				[this](const libv::input::EventMouseScroll& event) {
-					const auto offset = libv::vec::cast<float>(event.offset);
-					self->context.mouse.event_scroll(offset);
-					self->context_state.scroll_position_ = offset;
-				}
-			);
-
+		for (const auto& inputEvent : self->event_queue) {
 			try {
-				std::visit(visitor, mouseEvent);
+				std::visit([this](const auto& event) { self->event(event); }, inputEvent);
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during event in UI: {}. Discarding event", ex.what());
 			}
@@ -329,30 +353,30 @@ void UI::update(libv::glr::Queue& gl) {
 		log_ui.error("Exception occurred during event in UI: {}", ex.what());
 	}
 
+	// --- Attach ---
 	try {
-		// --- Attach ---
 		AccessRoot::attach(self->root, self->root);
 		self->stat.attach2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
 	}
 
+	// --- Update ---
 	try {
-		// --- Update ---
 		//AccessRoot::update(self->root);
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during update in UI: {}", ex.what());
 	}
 
+	// --- Attach ---
 	try {
-		// --- Attach ---
 		//AccessRoot::attach(self->root, self->root);
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
 	}
 
+	// --- Style ---
 	try {
-		// --- Style ---
 		if (self->context.isAnyStyleDirty()) {
 			AccessRoot::styleScan(self->root);
 			self->context.clearEveryStyleDirty();
@@ -365,8 +389,8 @@ void UI::update(libv::glr::Queue& gl) {
 		log_ui.error("Exception occurred during style in UI: {}", ex.what());
 	}
 
+	// --- Layout ---
 	try {
-		// --- Layout ---
 		AccessRoot::layout1(self->root, ContextLayout1{});
 		self->stat.layout1.sample(self->timer.time_ns());
 		AccessRoot::layout2(self->root, ContextLayout2{AccessRoot::position(self->root), AccessRoot::size(self->root), MouseOrder{0}});
@@ -375,8 +399,8 @@ void UI::update(libv::glr::Queue& gl) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
 	}
 
+	// --- Render ---
 	try {
-		// --- Render ---
 		const auto guard_s = gl.state.push_guard();
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_v = gl.view.push_guard();
@@ -409,13 +433,16 @@ void UI::update(libv::glr::Queue& gl) {
 		AccessRoot::render(self->root, context);
 //		AccessRoot::destroy(self->root, context);
 
+//		if (overlayZoomEnable)
+//			self->overlayZoom->render(context);
+
 		self->stat.render.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during render in UI: {}", ex.what());
 	}
 
+	// --- Detach ---
 	try {
-		// --- Detach ---
 		AccessRoot::detach(self->root, self->root);
 		self->stat.detach.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
@@ -433,12 +460,14 @@ void UI::update(libv::glr::Queue& gl) {
 void UI::destroy(libv::glr::Queue& gl) {
 	self->root.markRemove();
 
+	// --- Render ---
 	{
-		// --- Render ---
 		ContextRender context{gl, clock::now()};
 		AccessRoot::render(self->root, context);
-	} {
-		// --- Detach ---
+	}
+
+	// --- Detach ---
+	{
 		AccessRoot::detach(self->root, self->root);
 	}
 }

@@ -26,11 +26,6 @@ void VM4ViewerFrame::create() {
 
 	remote.create();
 	remote.enableDebug();
-
-//	auto gl = remote.queue();
-//	ui.create(gl);
-//	remote.queue(std::move(gl));
-//	remote.execute();
 }
 
 void VM4ViewerFrame::render() {
@@ -62,36 +57,16 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	setOpenGLVersion(3, 3);
 	setOpenGLSamples(OpenGLSamples{4});
 	ui.attach(*this);
-	ui.setSize(
-			static_cast<float>(config.window_width),
-			static_cast<float>(config.window_height)); // TODO P4: auto detect size changes
+	ui.setSize(config.window_width, config.window_height); // TODO P2: auto load size
 
 	panel = std::make_shared<app::PanelViewer>(ui.root());
 	ui.add(panel);
 
 	onKey.output([&](const libv::input::EventKey& e) {
-		if (e.action == libv::input::Action::release)
-			return;
-
-		if (e.key == libv::input::Key::Escape)
+		if (e.key == libv::input::Key::Escape && e.action == libv::input::Action::press)
 			closeDefault();
-
-		switch (e.key) {
-		case libv::input::Key::Q: break;
-		case libv::input::Key::W: break;
-		case libv::input::Key::E: break;
-		case libv::input::Key::A: break;
-		case libv::input::Key::S: break;
-		case libv::input::Key::D: break;
-		default: break;
-		}
-	});
-	onChar.output([&](const libv::input::EventChar& e) {
-		(void) e;
 	});
 	onKey.output([&](const libv::input::EventKey& e) {
-		(void) e;
-
 		if (e.action == libv::input::Action::release)
 			panel->key(e.key);
 	});

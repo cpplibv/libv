@@ -308,35 +308,45 @@ libv.glr: glReadPixels | only makes sense in remote, and not for queue
 libv.glr: rename gc to DestroyQueue
 libv.glr: first half of a major overhaul on includes and code structure | hide remotes, provide head access
 libv.glr: cleanup queue
+libv.ui: debug zoom in overlay
+libv.ui: component level overlay system
+libv.ui: component fix attach-detach
+libv.ui: debug zoom proper frame buffer size setup | based on component level layout
+libv.ui: debug zoom toward center
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.gl: learn the meaning of multisample fixedlocation (in case of texture2Dmultisample)
-libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
+libv.ui: mouse grab system, a way to soft lock mouse event positions to an initiator mouse watcher
+libv.ui: scroll bar (without the pane itself, aka slider) | NOTE: Check git stash
+libv.ui: remap mouse input in debug zoom mode
 
-libv.ui: debug zoom in
-libv.ui: debug zoom in mode (might be able to getaway with a glBlitFramebuffer, note that an extra frame buffer is required), it could be used not just for UI
-libv.ui: debug zoom in mode remap mouse input, debug key to change camera zoom/position while not pressed remap input
+libv.ui: orthogonal component level overlay system
+libv.ui: overlay event freeze
+libv.ui: overlay property inspector
+libv.ui: overlay stack display
+libv.ui: overlay zoom
+libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
+
+libv.ui: overlay: event grab / multi-root / fake-root / focus shaky
+libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
+
+libv.ui: debug zoom toward mouse (not sure)
+
 libv.ui: debug mode highlight mouse cursor pixel | magnifier can do it better, but this still could be useful
-
 libv.ui: debug magnifier mode, only zoom around the mouse, (optionally) slow mouse movement speed
 libv.ui: both debug magnifier mode and debug zoom mode are required
 
+libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample)
+libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
 
 debug
 	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
 	libv.ui.property: hybrid reflection - dynamic
 	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
 
-atlas
-	libv.ui: texture atlas definition/parsing
-	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
-	libv.ui: support atlas based images
-
 component
-	libv.ui: scroll bar (without the pane itself, aka slider) | NOTE: Check git stash
 	libv.ui: clipping vertex shader (with on/off)
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
@@ -344,6 +354,8 @@ component
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
 	libv.ui: not owning container views (list and/or table)
+
+--- [[[ deadline: 2019.09.30 ]]] ---
 
 ui
 	libv.ui: layout padding
@@ -362,6 +374,11 @@ cleanup
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
 	libv.ui: fatal log before every assert
+
+atlas
+	libv.ui: texture atlas definition/parsing
+	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
+	libv.ui: support atlas based images
 
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
@@ -392,10 +409,6 @@ properties / style
 	libv.ui.property: typed property registry
 	libv.ui.property: optimize property reset: address could be used to lookup
 
-
---- [[[ deadline: 2019.09.30 ]]] ---
-
-
 interactive
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
@@ -406,6 +419,7 @@ interactive
 	libv.ui.input_field: input mask (this will possibly a different input_field type)
 	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
 	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
+	libv.ui: mouse drag and drop system
 
 hotkey
 	libv.hotkey: design API
@@ -682,22 +696,25 @@ cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
 cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
 cpp: (adaptive) radix tree - O(1) lookup
+cpp: aligned_storage is UB, use this instead: alignas(T) std::byte storage[sizeof(T)];
 cpp: can there be multiple definition error during linkage if two lib contains the same (symbol) definition
 cpp: clarify template vs auto type deduction rules
 cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inline const void&& function() const&& noexcept override final;
 cpp: learn std::launder and std::bless
-cpp: aligned_storage is UB, use this instead: alignas(T) std::byte storage[sizeof(T)];
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
+doc: code snippet generation mdsnippets.com https://github.com/simonCropp/MarkdownSnippets
 ecs: existence / super-position based predication
-ext: adopt colony https://github.com/mattreecebentley/plf_colony
-ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
-ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
 ext: adopt a better hash_map and remove every std::unordered container
+ext: adopt colony https://github.com/mattreecebentley/plf_colony
+ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
+ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
 gl: docs http://docs.gl
 gl: glEnable(GL_DEBUG_OUTPUT);
+gl: renderdoc https://renderdoc.org/
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
+math: blue noise, a stable uniform noise
 mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html

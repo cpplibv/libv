@@ -561,6 +561,11 @@ void Frame::clearIcon() {
 
 // Getters -----------------------------------------------------------------------------------------
 
+libv::vec2f Frame::getContentScale() const {
+	std::lock_guard lock(self->frameState_m);
+	return self->contentScale;
+}
+
 Frame::CloseOperation Frame::getCloseOperation() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->defaultCloseOperation;
@@ -569,6 +574,11 @@ Frame::CloseOperation Frame::getCloseOperation() const {
 Frame::DisplayMode Frame::getDisplayMode() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->displayMode;
+}
+
+libv::vec2i Frame::getFramebufferSize() const {
+	std::lock_guard lock(self->frameState_m);
+	return self->framebufferSize;
 }
 
 libv::vec2i Frame::getPosition() const {
@@ -584,11 +594,6 @@ libv::vec2i Frame::getSize() const {
 libv::vec4i Frame::getFrameSize() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->frameSize;
-}
-
-libv::vec2f Frame::getContentScale() const {
-	std::lock_guard lock(self->frameState_m);
-	return self->contentScale;
 }
 
 std::string Frame::getTitle() const {

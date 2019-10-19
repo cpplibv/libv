@@ -268,7 +268,7 @@ bool BaseComponent::onMouseScroll(const EventMouseScroll& event) {
 void BaseComponent::attach(BaseComponent& parent_) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		// NOTE: context_ is already set in the constructor
-		parent = libv::make_observer_ref(parent_);
+		parent = parent_;
 
 		log_ui.trace("Attaching {}", path());
 
@@ -333,9 +333,14 @@ void BaseComponent::detach(BaseComponent& parent_) {
 
 		doDetach();
 
-		parent = libv::make_observer_ref(this);
-
 		flags.reset(Flag::pendingDetach | Flag::signal | Flag::slot);
+
+		childID = 0;
+		flags = Flag::mask_init;
+		lastDynamic = {};
+		parent = *this;
+		position_ = {};
+		size_ = {};
 	}
 }
 

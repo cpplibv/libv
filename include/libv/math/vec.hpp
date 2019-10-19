@@ -312,6 +312,12 @@ struct vec_t : vec_base_t<N, T> {
 		return build_vec<N>([&](const auto index) { return this->data[index] / l; });
 	}
 
+	/// \return The static_cast-ed vector to the requested K type
+	template <typename K>
+	constexpr inline auto cast() const {
+		return build_vec<N>([&](const auto index) { return static_cast<K>(this->data[index]); });
+	}
+
 	// observers -----------------------------------------------------------------------------------
 
 	constexpr inline decltype(auto) ptr() {

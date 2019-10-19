@@ -193,8 +193,6 @@ const std::string& InputField::text() const noexcept {
 
 bool InputField::onChar(const libv::input::EventChar& event) {
 	text_.insert(caret, event.unicode);
-//	text_.insert(caret, event.utf8.data());
-//	text_.push_back(event.utf8.data());
 
 	caret++;
 	caretStartTime = clock::now();

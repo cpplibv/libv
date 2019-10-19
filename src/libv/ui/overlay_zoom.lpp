@@ -1,0 +1,68 @@
+// File:   ui_renderer.hpp Author: Vader Created on 20 October 2019, 06:50
+
+#pragma once
+
+// libv
+#include <libv/glr/framebuffer.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/program.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/glr/renderbuffer.hpp>
+#include <libv/glr/texture.hpp>
+#include <libv/glr/uniform.hpp>
+#include <libv/math/vec.hpp>
+// std
+#include <string>
+#include <string_view>
+// pro
+#include <libv/ui/base_component.hpp>
+
+
+namespace libv {
+namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+class OverlayZoom : public BaseComponent {
+private:
+	libv::vec2i framebufferSize_;
+
+	libv::vec2f displayPosition = {};
+	float zoom_ = 1.f;
+
+	libv::glr::Framebuffer framebuffer;
+	libv::glr::Texture2D::R8_G8_B8_A8 framebufferColor0;
+
+	libv::glr::Mesh quad{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
+	libv::glr::Program program;
+	libv::glr::Uniform_texture uniformSampler0;
+
+	libv::glr::Mesh lines{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
+	libv::glr::Program lineProgram;
+
+public:
+	explicit OverlayZoom(BaseComponent& parent);
+	OverlayZoom(BaseComponent& parent, std::string name);
+	OverlayZoom(BaseComponent& parent, GenerateName_t, const std::string_view type);
+	~OverlayZoom();
+
+private:
+	void init();
+	void update();
+
+private:
+	virtual bool onKey(const libv::input::EventKey& event) override;
+	virtual void onFocus(const EventFocus& event) override;
+	virtual bool onMouseMovement(const EventMouseMovement& event) override;
+	virtual bool onMouseScroll(const EventMouseScroll& event) override;
+
+private:
+	virtual void doAttach() override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ui
+} // namespace libv

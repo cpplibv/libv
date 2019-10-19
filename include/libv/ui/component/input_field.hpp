@@ -40,11 +40,10 @@ public:
 //			remove = false,
 //		};
 //
-//		InputField& component;
 //		// Caret position
 //		int32_t caret;
 //		Change change;
-//		// Change type: insert/push_back/remove/pop_back | Important, could be used for optimization
+//		// Change type: insert/push_back/remove/pop_back | Kind of important, could be used for optimization
 	};
 	struct EventCaret {
 		InputField& component;

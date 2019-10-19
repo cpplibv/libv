@@ -20,8 +20,10 @@ namespace ui {
 class BaseComponent;
 
 class ContextState {
+	friend class ImplUI;
 	friend class UI;
 
+	size_t frame_count_ = 0; /// Number of UI frame operations since the UI initialization
 	time_point time_frame_{}; /// Time point of frame start, does not change during the same frame
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
 	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
@@ -35,15 +37,21 @@ class ContextState {
 	boost::container::flat_set<int> pressed_scancodes;
 	boost::container::flat_set<libv::input::Mouse> pressed_mouses;
 
-	// modifier lock keys: caps-lock, num-lock, scroll-lock
-	// pressed timestamps (?)
-
 	libv::observer_ptr<BaseComponent> focus_ = nullptr;
 
-	// joystick vector
-	// joystick button states
-	// joystick analog states
-	// hotkey states (?)
+	// TODO P4: libv.ui: modifier lock keys: caps-lock, num-lock, scroll-lock
+	// TODO P4: libv.ui: pressed timestamps (?)
+
+	// TODO P4: libv.ui: hotkey states (?)
+
+	// TODO P5: libv.ui: joystick vector
+	// TODO P5: libv.ui: joystick button states
+	// TODO P5: libv.ui: joystick analog states
+
+public:
+	[[nodiscard]] constexpr inline size_t frame_count() const noexcept {
+		return frame_count_;
+	}
 
 public:
 	[[nodiscard]] constexpr inline time_point time_frame() const noexcept {

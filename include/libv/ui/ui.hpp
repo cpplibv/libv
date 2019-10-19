@@ -45,10 +45,12 @@ public:
 
 public:
 	void add(std::shared_ptr<BaseComponent> component);
-	void setSize(libv::vec3f size_) noexcept;
-	void setSize(float x, float y, float z = 0.f) noexcept;
-	void setPosition(libv::vec3f position_) noexcept;
-	void setPosition(float x, float y, float z) noexcept;
+
+	void setSize(libv::vec2i size_) noexcept;
+	inline void setSize(int32_t x, int32_t y) noexcept {
+		setSize({x, y});
+	}
+
 	BaseComponent& root() const noexcept; // TODO P5: I would really like to not give access to the root
 
 public:
@@ -80,8 +82,11 @@ private:
 template <typename Frame>
 void UI::attach(Frame& frame) {
 	frame.onSize.output([this](const auto& e) {
-		this->setSize(static_cast<float>(e.size.x), static_cast<float>(e.size.y));
+		this->setSize(e.size);
 	});
+//	frame.onFramebufferSize.output([this](const auto& e) {
+//		this->setFramebufferSize(e.size);
+//	});
 
 	frame.onChar.output([this](const auto& e) {
 		this->event(e);

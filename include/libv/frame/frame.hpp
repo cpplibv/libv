@@ -286,12 +286,13 @@ public:
 	void clearIcon();
 
 public:
+	libv::vec2f getContentScale() const;
 	CloseOperation getCloseOperation() const;
 	DisplayMode getDisplayMode() const;
+	libv::vec2i getFramebufferSize() const;
 	libv::vec2i getPosition() const;
 	libv::vec2i getSize() const;
 	libv::vec4i getFrameSize() const; /// x - left, y - top, z - right, w - bottom
-	libv::vec2f getContentScale() const;
 	std::string getTitle() const;
 	// ... Additional getters on demand
 

@@ -212,6 +212,11 @@ void Frame::distributeEvents() {
 				onFocus.fire(e);
 
 			}, [this](const EventFramebufferSize& e) {
+				{
+					std::lock_guard lock(self->frameState_m);
+					self->framebufferSize = e.size;
+				}
+
 				onFramebufferSize.fire(e);
 
 			}, [this](const libv::input::EventKey& e) {

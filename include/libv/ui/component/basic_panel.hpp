@@ -87,7 +87,7 @@ typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<BaseComponent> c
 
 template <typename Layout>
 void BasicPanel<Layout>::remove(const std::shared_ptr<BaseComponent>& component) {
-	if (*(children.begin() + AccessParent::childID(*component)) != component) {
+	if (children[AccessParent::childID(*component)].ptr != component) {
 		log_ui.error("Attempted to remove a non child element: {} from: {}", component->path(), path());
 		return;
 	}

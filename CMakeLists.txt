@@ -289,6 +289,13 @@ wish_create_external(
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/catch/include/catch/
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/catch/src/get_catch/single_include/ ${PATH_EXT}/catch/include/catch/
+#	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+#	GIT_TAG 7d0b205564567359ced799af93bbf7b1f051110
+#	CMAKE_ARGS
+#			-DCATCH_BUILD_TESTING=OFF
+#			-DCATCH_ENABLE_WERROR=OFF
+#			-DCATCH_INSTALL_DOCS=OFF
+#			-DCATCH_INSTALL_HELPERS=OFF
 )
 
 wish_create_external(

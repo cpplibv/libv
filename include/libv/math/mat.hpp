@@ -112,7 +112,7 @@ public:
 		return *this;
 	}
 	inline vec_t<R, T> operator*(const vec_t<R, T>& vec) const {
-		return {mx() * to_glm(vec)};
+		return vec_t<R, T>{mx() * to_glm(vec)};
 	}
 	inline mat_t operator*(const mat_t& mat) const {
 		mat_t result;

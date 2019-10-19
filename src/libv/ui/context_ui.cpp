@@ -122,9 +122,9 @@ ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 	mouse(self->mouse),
 	settings(std::move(settings)) {
 
-	log_ui.info("Resource base font:    {}", libv::generic_path(settings.res_font.base_path));
-	log_ui.info("Resource base shader:  {}", libv::generic_path(settings.res_shader.base_path));
-	log_ui.info("Resource base texture: {}", libv::generic_path(settings.res_texture.base_path));
+	log_ui.info("Resource base font:    {}", libv::generic_path(this->settings.res_font.base_path));
+	log_ui.info("Resource base shader:  {}", libv::generic_path(this->settings.res_shader.base_path));
+	log_ui.info("Resource base texture: {}", libv::generic_path(this->settings.res_texture.base_path));
 
 	const auto fallback_font_data = raw_font_consolas_min();
 	self->fallback_font = std::make_shared<Font2D>(
@@ -148,7 +148,7 @@ std::string ContextUI::clipboardText() {
 	bool success = clip::get_text(result);
 	log_ui.error_if(!success, "Failed to get clipboard");
 
-	std::erase(result, '\r'); // NOTE: Cleanup any crlf line ending be remove every cr
+	std::erase(result, '\r'); // NOTE: Cleanup any crlf line ending by removing every cr
 
 	return result;
 }
