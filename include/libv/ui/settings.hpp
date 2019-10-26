@@ -6,6 +6,8 @@
 #include <filesystem>
 //#include <string>
 #include <chrono>
+// pro
+#include <libv/ui/chrono.hpp>
 
 
 namespace libv {
@@ -36,6 +38,13 @@ struct Settings {
 	ResourceSettings res_font = {"res/font"};
 	ResourceSettings res_shader = {"res/shader"};
 	ResourceSettings res_texture = {"res/texture"};
+
+	double scroll_step_button = 3.0;
+	double scroll_step_scroll = 3.0;
+	double scroll_step_track = std::numeric_limits<double>::infinity();
+	double scroll_hold_button = scroll_step_button * 10.0;
+	double scroll_hold_scroll = scroll_step_scroll * 10.0;
+	double scroll_hold_track = scroll_step_track * 10.0;
 };
 
 // -------------------------------------------------------------------------------------------------

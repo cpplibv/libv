@@ -22,6 +22,7 @@ State create_state(lualib libmask) {
 
 	if ((libv::to_value(libmask) & libv::to_value(lualib::base)) != 0) {
 		lua.open_libraries(sol::lib::base);
+		lua.open_libraries(sol::lib::coroutine);
 		lua.open_libraries(sol::lib::debug);
 		lua.open_libraries(sol::lib::math);
 		lua.open_libraries(sol::lib::package);

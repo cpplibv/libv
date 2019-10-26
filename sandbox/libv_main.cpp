@@ -327,6 +327,39 @@
 //}
 
 // =================================================================================================
+//
+//// libv
+//#include <libv/math/bezier_curve.hpp>
+//// std
+//#include <iostream>
+//
+//
+//int main() {
+//	libv::math::BezierCurve curve;
+//	curve.points.emplace_back(0, 0);
+//		curve.points.emplace_back(0, 1);
+//		curve.points.emplace_back(2, 1);
+//	curve.points.emplace_back(2, 0);
+//		curve.points.emplace_back(2, -1);
+//		curve.points.emplace_back(1, -1);
+//	curve.points.emplace_back(1, 0);
+//		curve.points.emplace_back(0, 0.5f);
+//		curve.points.emplace_back(1.5f, 0.5f);
+//	curve.points.emplace_back(1.5f, 0);
+//
+//	for (int i = -15; i <= 45; ++i) {
+//		const float t = static_cast<float>(i) * 0.1f;
+//		std::cout << t << " = " << curve.eval(t) << std::endl;
+//	}
+//
+//	std::cout << "min:  " << curve.min() << std::endl;
+//	std::cout << "max:  " << curve.max() << std::endl;
+//	std::cout << "size: " << curve.size() << std::endl;
+//
+//	return 0;
+//}
+
+// =================================================================================================
 
 //// libv
 //#include <libv/math/bezier_curve.hpp>
@@ -399,31 +432,6 @@
 //}
 //
 // =================================================================================================
-//
-//int main() {
-//	libv::math::BezierCurve curve;
-//	curve.points.emplace_back(0, 0);
-//		curve.points.emplace_back(0, 1);
-//		curve.points.emplace_back(2, 1);
-//	curve.points.emplace_back(2, 0);
-//		curve.points.emplace_back(2, -1);
-//		curve.points.emplace_back(1, -1);
-//	curve.points.emplace_back(1, 0);
-//		curve.points.emplace_back(0, 0.5f);
-//		curve.points.emplace_back(1.5f, 0.5f);
-//	curve.points.emplace_back(1.5f, 0);
-//
-//	for (int i = -15; i <= 45; ++i) {
-//		const float t = static_cast<float>(i) * 0.1f;
-//		std::cout << t << " = " << curve.eval(t) << std::endl;
-//	}
-//
-//	std::cout << "min:  " << curve.min() << std::endl;
-//	std::cout << "max:  " << curve.max() << std::endl;
-//	std::cout << "size: " << curve.size() << std::endl;
-//
-//	return 0;
-//}
 
 //// libv
 //#include <libv/math/constants.hpp>

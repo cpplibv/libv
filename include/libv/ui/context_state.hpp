@@ -28,6 +28,8 @@ class ContextState {
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
 	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
 
+	// time_duration delta_time; /// Duration since last update
+
 	libv::vec2f mouse_position_;
 	libv::vec2f scroll_position_;
 

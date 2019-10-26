@@ -346,11 +346,15 @@ wish_create_external(
 wish_create_external(
 	NAME date
 	GIT_REPOSITORY https://github.com/HowardHinnant/date.git
-	GIT_TAG f782ae98f05572b80fe72f9c9e26ed25ff816132
-	CMAKE_ARGS
-		-DENABLE_DATE_TESTING=OFF
+	GIT_TAG 3e376be2e9b4d32c946bd83c22601e4b7a1ce421
+#	CMAKE_ARGS
+#		-DENABLE_DATE_TESTING=OFF
 #		-DUSE_SYSTEM_TZ_DB=ON
-		-DUSE_TZ_DB_IN_DOT=ON
+#		-DUSE_TZ_DB_IN_DOT=ON
+	SKIP_CONFIGURE_AND_BUILD
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/date/include/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/date/src/get_date/include/ ${PATH_EXT}/date/include/
 )
 
 wish_create_external(
@@ -371,7 +375,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 5.0.0
+	GIT_TAG 6.0.0
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
@@ -658,7 +662,8 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/vm4_viewer/res
 	SOURCE app/vm4_viewer/*.cpp
-	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
+	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility 
+#	LINK   ext_date
 )
 
 wish_create_executable(

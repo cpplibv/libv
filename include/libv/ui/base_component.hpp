@@ -113,6 +113,13 @@ public:
 		return size_;
 	}
 
+	[[nodiscard]] inline libv::vec2f position2() const noexcept {
+		return libv::vec::xy(position_);
+	}
+	[[nodiscard]] inline libv::vec2f size2() const noexcept {
+		return libv::vec::xy(size_);
+	}
+
 protected:
 	void flagDirect(Flag_t flags_) noexcept;
 	void flagAncestors(Flag_t flags_) noexcept;

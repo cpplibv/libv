@@ -3,6 +3,7 @@
 // libv
 #include <libv/utility/generic_path.hpp>
 // std
+#include <filesystem>
 #include <iostream>
 // pro
 #include <vm4_viewer/config.hpp>
@@ -60,7 +61,9 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("Current path  {}", libv::generic_path(std::filesystem::current_path()));
 	app::log_app.info("Executable    {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
-//	app::log_app.info("Last modified {}", std::filesystem::last_write_time(path));
+	// C++20: last_write_time file_time_clock should be fixed and should be convertible to system_clock
+//	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", std::filesystem::last_write_time(path));
+//	app::log_app.info("Last modified {}", std::chrono::system_clock::now());
 
 	app::ConfigViewer config(config_path);
 

@@ -17,6 +17,161 @@
 namespace libv {
 namespace ui {
 
+// =================================================================================================
+
+// Hive {
+//     0..* Render
+//     0..* Hive
+//     0..1 Focus
+//     0..1 Layout
+//     0..1 Event_Mouse
+//     0..1 Event_Keyboard
+// }
+
+//struct ModuleFocus : Module {};
+//struct ModuleProperties : Module {};
+//struct Render_StretchPlane : ModuleRender {};
+//struct Render_ImagePlane : ModuleRender {};
+//struct Event_Keyboard : Module {};
+//struct Event_Mouse : Module {};
+//struct Event_MousePosition : Module {};
+//struct Focus : ModuleFocus {};
+//struct Layout_Fix : ModuleLayout {};
+//struct Layout_Float : ModuleLayout {};
+//struct Layout_Flow : ModuleLayout {};
+//struct Layout_Layer : ModuleLayout {};
+//struct Layout_ToolTip : ModuleLayout {};
+
+// -------------------------------------------------------------------------------------------------
+
+//struct Label : public Hive<Label> {
+//    // String2D, Something that requires complex binding of size and layouting
+//};
+//
+//struct ToolTip : public Hive<ToolTip> {
+//	Render_StretchPlane background;
+//	Label text;
+//	Layout_Flow layout;
+//};
+//
+//struct ToolTip_Host : public Hive<ToolTip_Host> {
+//	// This tooltip should follow the mouse, there should be ones that does not
+//	ToolTip toolTip;
+//	Layout_ToolTip layout;
+//	Event_Mouse eventMouse;
+//};
+//
+//struct CivIcon : public Hive<CivIcon> {
+//	Render_ImagePlane plane;
+//	Layout_Layer layout;
+//
+//	ToolTip_Host toolTip;
+//	Event_Mouse eventMouse;
+//};
+//
+//struct LoadingBar : public Hive<LoadingBar> {
+//
+//};
+//
+//struct DeclarationOfWarIcon : public Hive<DeclarationOfWarIcon> {
+//	CivIcon left;
+//	CivIcon right;
+//	Render_ImagePlane roundBackground;
+//
+//	Layout_Layer layout;
+//
+//	ToolTip toolTip;
+//	Event_Mouse eventMouse;
+//};
+//
+//struct RightSidePanel : public Hive<RightSidePanel> {
+//	std::vector<DeclarationOfWarIcon> notifications;
+//
+//    struct Layout_DroppingNewEntriesFromSky {};
+//	Layout_DroppingNewEntriesFromSky layout;
+//
+//	template <typename T>
+//    void ui_access(T& access) {
+//        access(layout);
+//
+//		for (auto& notification : notifications)
+//			access(notification);
+//    }
+//};
+//
+//struct PlanetHud : public Hive<PlanetHud> {
+//	Label name;
+//};
+//
+//struct Button : public Hive<Button> {
+//	Label text;
+//	Render_StretchPlane plane;
+//
+//	Layout_Layer layout;
+//
+//	Focus focus;
+//	Event_Keyboard eventKeyboard;
+//	Event_Mouse eventMouse;
+//
+//    template <typename T>
+//    void ui_access(T& access) {
+//        access(text);
+//        access(plane);
+//        access(layout);
+//        access(focus);
+//        access(eventKeyboard);
+//        access(eventMouse);
+//    }
+//};
+//
+//struct InputField : public Hive<InputField> {
+//    Label text;
+//    Render_StretchPlane plane;
+//
+//    Layout_Layer layout;
+//
+//    Focus focus;
+//    Event_Keyboard eventKeyboard;
+//    Event_Mouse eventMouse;
+//
+//    template <typename T>
+//    void ui_access(T& access) {
+//        access(text);
+//        access(plane);
+//        access(layout);
+//        access(focus);
+//        access(eventKeyboard);
+//        access(eventMouse);
+//    }
+//};
+//
+//struct LuaComponent : public Hive<LuaComponent> {
+//	std::vector<Hive<LuaComponent>> children;
+//	std::vector<std::unique_ptr<Render>> renders;
+//
+//	std::unique_ptr<Layout> layout;
+//	std::unique_ptr<Focus> focus;
+//	std::unique_ptr<Event_Keyboard> eventKeyboard;
+//	std::unique_ptr<Event_Mouse> eventMouse;
+//
+//    template <typename T>
+//    void ui_access(T& access) {
+//        access(layout);
+//
+//		for (auto& child : children)
+//			access(child);
+//		for (auto& render : renders)
+//			access(render);
+//
+//		if(layout) access(*layout);
+//		if(focus) access(*focus);
+//		if(eventKeyboard) access(*eventKeyboard);
+//		if(eventMouse) access(*eventMouse);
+//    }
+//};
+
+// =================================================================================================
+
 // -------------------------------------------------------------------------------------------------
 
 class ContextUI;

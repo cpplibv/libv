@@ -78,7 +78,7 @@ using PropertyDynamic = std::variant<
 
 namespace pnm { // ---------------------------------------------------------------------------------
 
-// NOTE: It is not necessary to store the fixed_strings here, it is merely a forethought and typo protection
+// NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
 
 static constexpr libv::fixed_string align_horizontal = "align";
 static constexpr libv::fixed_string align_vertical = "align_vertical";
@@ -86,6 +86,9 @@ static constexpr libv::fixed_string anchor = "anchor";
 static constexpr libv::fixed_string anchor_content = "anchor_content";
 static constexpr libv::fixed_string anchor_parent = "anchor_parent";
 static constexpr libv::fixed_string anchor_target = "anchor_target";
+static constexpr libv::fixed_string bar_color = "bar_color";
+static constexpr libv::fixed_string bar_image = "bar_image";
+static constexpr libv::fixed_string bar_shader = "bar_shader";
 static constexpr libv::fixed_string bg_color = "bg_color";
 static constexpr libv::fixed_string bg_image = "bg_image";
 static constexpr libv::fixed_string bg_shader = "bg_shader";
@@ -105,11 +108,16 @@ static constexpr libv::fixed_string size = "size";
 static constexpr libv::fixed_string snapToEdge = "snapToEdge";
 static constexpr libv::fixed_string squish = "squish";
 static constexpr libv::fixed_string text = "text";
+static constexpr libv::fixed_string value = "value";
+static constexpr libv::fixed_string value_max = "value_max";
+static constexpr libv::fixed_string value_min = "value_min";
+static constexpr libv::fixed_string value_range = "value_range";
+static constexpr libv::fixed_string value_step = "value_step";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------
 
-// NOTE: It is not necessary to store the fixed_strings here, it is merely a forethought and typo protection
+// NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
 
 static constexpr libv::fixed_string appearance = "appearance";
 static constexpr libv::fixed_string behaviour = "behaviour";

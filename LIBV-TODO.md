@@ -313,53 +313,64 @@ libv.ui: component level overlay system
 libv.ui: component fix attach-detach
 libv.ui: debug zoom proper frame buffer size setup | based on component level layout
 libv.ui: debug zoom toward center
+libv.ui: mouse grab system, a way to soft lock mouse event positions to an initiator mouse watcher
+libv.ui: bug: mouse acquire might generate extra events? | null update was broadcasted on accident
+libv.ui: scroll bar (aka slider) without the scroll pane
+libv.ui: remap mouse input in debug zoom mode (remap function) | inline remap causes hazard on movement | fixed by control/view split but rounding might broke things
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: mouse grab system, a way to soft lock mouse event positions to an initiator mouse watcher
-libv.ui: scroll bar (without the pane itself, aka slider) | NOTE: Check git stash
-libv.ui: remap mouse input in debug zoom mode
+libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar
 
-libv.ui: orthogonal component level overlay system
-libv.ui: overlay event freeze
-libv.ui: overlay property inspector
-libv.ui: overlay stack display
-libv.ui: overlay zoom
-libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
+libv.ui: generic orthogonal component level overlay system
+	libv.ui: overlay event freeze
+		libv.ui: overlay event grab / multi-root / fake-root / overlay focus shaky
+		libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
 
-libv.ui: overlay: event grab / multi-root / fake-root / focus shaky
-libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
+	libv.ui: overlay zoom
+		libv.ui: debug zoom toward mouse (not sure)
+		libv.ui: pixel distance measure / pixel region measure
 
-libv.ui: debug zoom toward mouse (not sure)
+	libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
+	libv.ui: overlay magnifier (local zoom) (optionally slow mouse movement speed (freeze cursor with frame))
+	libv.ui: overlay (mouse) stack display
+	libv.ui: overlay component tree display
+	libv.ui: overlay debug data stream, a context based output that can be written and displayed as a HUD
 
-libv.ui: debug mode highlight mouse cursor pixel | magnifier can do it better, but this still could be useful
-libv.ui: debug magnifier mode, only zoom around the mouse, (optionally) slow mouse movement speed
-libv.ui: both debug magnifier mode and debug zoom mode are required
+	libv.ui.property: hybrid reflection - dynamic
+		libv.ui: detach should also be an event (mouse_table could utilize it to cleanup, debug observers could also use it)
+			libv.ui: overlay property inspector (name it inspector)
 
-libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample)
+	libv.ui: overlay resource viewer (textures, fonts, shaders (?))
+
+libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample (and why there is none for RBO))
 libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
 
-debug
-	libv.ui: a way to debug / test / display every textures (font and other ui) | every resource
-	libv.ui.property: hybrid reflection - dynamic
-	libv.ui: ui debug view, tree display, property viewer (including property and style 'editor')
-
 component
-	libv.ui: clipping vertex shader (with on/off)
+	libv.ui: clipping vertex shader (with on/off) | stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 
+
+--- [[[ deadline: 2019.11.01 ]]] ---
+
+
+component
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
 	libv.ui: not owning container views (list and/or table)
 
---- [[[ deadline: 2019.09.30 ]]] ---
-
 ui
+	libv.ui: if size is 0, do not execute anything from ui loop (frame buffer protection)
 	libv.ui: layout padding
 	libv.ui: fragments
+	libv.ui: ContextResource
+	libv.ui: ContextConfig
+	libv.ui: ContextExecutor
+		libv.ui: async_task<T> work_async(const function<progress_report(multi_entry_call, stop_token)>& task);
+	libv.ui: ContextStat
 	libv.ui: static_component system
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
@@ -384,11 +395,17 @@ mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
 	libv.ui: absorb - mouse event absorb/shield/plates
 	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
-	libv.ui: relative - mouse event should contain a watcher relative coordinates too
+	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
 
 event
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
+	libv.ui: common base class for event "stubs" to handle general events
+	libv.ui: provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
+	libv.ui: read http://nanapro.org/en-us/documentation/core/events.htm
+	libv.ui: instead of return value use (with different name:) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
+	libv.ui: unignorable event handles
+	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 
 properties / style
 	libv.ui.property: property system interaction with static_component system
@@ -410,7 +427,9 @@ properties / style
 	libv.ui.property: optimize property reset: address could be used to lookup
 
 interactive
+	libv.ui.input_field: text function call should produce event
 	libv.ui: Make a sandbox for a input->button->label->list
+	libv.ui: Cursor image change
 	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
 	libv.ui.input_field: selection support
 	libv.ui.input_field: Implement FocusSelectPolicy
@@ -471,7 +490,7 @@ focus
 	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
 	libv.ui.focus: Focus traversal order: position based
 
-libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by string2D edit
+libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by String2D edit
 libv.ui: include check everything / fwd everything
 libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
 
@@ -484,7 +503,7 @@ libv.ui.style: (style exclusive / multiple) multiple style usage in a component 
 libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
 
 
---- [[[ deadline: 2019.10.31 ]]] ---
+--- [[[ deadline: 2019.12.01 ]]] ---
 
 
 libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance | design API allow async (give next N passed entry or M failed entry)
@@ -538,6 +557,7 @@ libv.ui: Docker layout with movable components (frames), who handles which respo
 libv.ui: group: RadioButton
 libv.ui: Splitter
 libv.ui: composite: TextField (Label, TableImage, Label, +Events)
+libv.ui: possible component list https://en.wikipedia.org/wiki/Widget_(GUI)
 
 libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations
 
@@ -545,9 +565,7 @@ libv.utility: add/verify structured binding support for vec_t
 
 libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras | Cancel! 100%+ is valid (Example: button with a 120% shadow around it)
 
---- [[[ deadline: 2019.11.30 ]]] ---
-
-libv.glr: Cleanup includes and implement head pattern for:
+libv.glr: Cleanup includes for:
 			libv/glr/mesh.cpp
 			libv/glr/mesh.hpp
 			libv/glr/program.cpp
@@ -584,6 +602,10 @@ libv.ui: Label link support (?)
 libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
 
+
+--- [[[ deadline: 2020.01.01 ]]] ---
+
+
 libv.ui: constraints: a way of syncing data between the world and the ui
 libv.ui.layout: Flow
 libv.ui.layout: 2D <-> 3D based on game state
@@ -597,7 +619,15 @@ libv.ui: String2D scream at the user if the API get a \r (or any non printable c
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Implement sub-mesh API
 libv.glr: Fix uniform naming mess, Reduce the number of public members
+
 libv.glr: vm4 | non trivial
+libv.vm4: in header include version
+libv.vm4: in header include date
+libv.vm4: in header include hash
+libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
+libv.va4/ia4: (Iris/Vader Asset 4) New "library" to handle vm4 models and bundle them.
+libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate, play animation, etc...
+
 libv.gl: https://learnopengl.com/PBR/Lighting
 libv.glr: post-processing emission / bloom
 libv.glr: post-processing gamma
@@ -617,9 +647,11 @@ libv.glr: SRAA
 libv.glr: Tiled-Deferred-Shading
 libv.glr: Order Independent Transparency (OIT)
 
---- [[[ deadline: 2019.12.31 ]]] ---
 
-libv.ecui: state based ui, separate control and data!
+--- [[[ deadline: 2020.02.01 ]]] ---
+
+
+libv.ecui: state based ui, separate control and data
 
 libv.frame: cleanup states by adding a single state for show/hidden/maximized/minimized/fullscreen/borderless_maximized
 libv.frame: cleanup monitor, provide a thread-safe access to monitors list
@@ -631,7 +663,7 @@ libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
 
 libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
 
-sol2: new fwd header, use it if/where appropriate: sol_forward.hpp
+ext.sol2: update and there is a new fwd header, use it if/where appropriate: sol_forward.hpp
 cpp: enun class default underlying type is int, specify underlying type for every enum class
 cpp: check if every possible operator had been made to a hidden friend
 cpp: check if i have any recursive variadic function that is not using if constexpr but uses a tail overload
@@ -650,10 +682,12 @@ libv.glr: Refactor the variants
 
 libv.ecs: Test fails with an assert in boost vector
 
-libv.va4/ia4: (Iris/Vader Asset 4) New "library" to handle vm4 models and bundle them.
-libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate, play animation, etc...
-
 libv.lua: function to immediately destroy a variable (useful for game object or gui object cleanup that would hold a resource otherwise)
+
+ext.clara: remove dependency
+ext.lua: update to 8eb1482b493a3a44f004c86baeeb0683ec094542 at https://github.com/xpol/lua for 5.3.5
+
+libv.math: Catmull-Rom spline https://www.youtube.com/watch?v=9_aJGUTePYo and code https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Splines2.cpp
 
 
 --- AWAITING ---------------------------------------------------------------------------------------
@@ -693,7 +727,10 @@ cpp.proposal: P3 generalized type pack "using... ", type pack in non template pa
 cpp.proposal: P3 structured binding pack
 		auto& [...members] = object;
 cpp.proposal: P3 vec_t<N, T>, matrix_t<N, M, T>
+cpp.proposal: P3 template specialization without opening a namespace
+		issue: inline namespace, namespace/class scope disambiguation
 cpp.proposal: P4 allow trailing comma for function arguments and lambda captures and init lists, its already there for arrays and enums
+cpp.proposal: P4 file watcher
 cpp.stacktrace: Seams like a solid alternative for boost.stacktrace https://github.com/bombela/backward-cpp
 cpp: (adaptive) radix tree - O(1) lookup
 cpp: aligned_storage is UB, use this instead: alignas(T) std::byte storage[sizeof(T)];
@@ -703,7 +740,7 @@ cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inlin
 cpp: learn std::launder and std::bless
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 doc: code snippet generation mdsnippets.com https://github.com/simonCropp/MarkdownSnippets
-ecs: existence / super-position based predication
+ext.mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 ext: adopt a better hash_map and remove every std::unordered container
 ext: adopt colony https://github.com/mattreecebentley/plf_colony
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
@@ -713,9 +750,9 @@ gl: glEnable(GL_DEBUG_OUTPUT);
 gl: renderdoc https://renderdoc.org/
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
+gold: existence / super-position based predication
 learn: https://gafferongames.com/post/state_synchronization/ or just https://gafferongames.com/
 math: blue noise, a stable uniform noise
-mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 net: distributed servers (RAFT joint consensus algorithm) https://raft.github.io/
 observe: https://bkaradzic.github.io/bgfx/examples.html
 observe: https://github.com/bkaradzic/bgfx
@@ -739,7 +776,6 @@ libv.ui: (shader) Program Descriptor: program is defined by a descriptor (which 
 libv.ui: https://www.factorio.com/blog/post/fff-246
 libv.ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
 libv.utility: Make a proper copy-pastable noisy type
-libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
 libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
 

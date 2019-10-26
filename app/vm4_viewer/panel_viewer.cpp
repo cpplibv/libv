@@ -12,6 +12,7 @@
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/label_image.hpp>
 #include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp> // testing only, remove it
 #include <libv/ui/component/stretch.hpp> // testing only, remove it
@@ -120,6 +121,79 @@ void PanelViewer::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("d, 100%"));
 	}
 
+	{
+		auto style = context().style("vm4pv.scroll-show");
+		style->set("align", libv::ui::AlignHorizontal::Left);
+		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("orientation", libv::ui::Orientation::LEFT_TO_RIGHT);
+		style->set("anchor_target", libv::ui::ANCHOR_CENTER_RIGHT);
+		style->set("anchor_parent", libv::ui::ANCHOR_CENTER_RIGHT);
+		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+	}
+
+	{
+		auto style = context().style("vm4pv.scroll-bar");
+		style->set("orientation", libv::ui::Orientation::BOTTOM_TO_TOP);
+		style->set("size", libv::ui::parse_size_or_throw("8px, 200px"));
+
+		style->set("bg_color", libv::parse::parse_color_or_throw("hsva(120, 30%, 90%, 100%)"));
+		style->set("bar_color", libv::parse::parse_color_or_throw("hsva(240, 30%, 90%, 100%)"));
+
+//		style->set("style_arrow", context().style("vm4pv.scroll-bar-fit:arrow"));
+//		style->set("style_track", context().style("vm4pv.scroll-bar-fit:track"));
+//		style->set("style_bar", context().style("vm4pv.scroll-bar-fit:bar"));
+
+//		style->set("scroll_arrows", true);
+//		style->set("scale_bar_relative", true);
+//		style->set("min_scroll_size", 22.f);
+//		style->set("min_scroll_ratio", 0.f);
+	}
+
+	{
+		auto style = context().style("vm4pv.scroll-show2");
+		style->set("align", libv::ui::AlignHorizontal::Left);
+		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("anchor_target", libv::ui::ANCHOR_BOTTOM_CENTER);
+		style->set("anchor_parent", libv::ui::ANCHOR_BOTTOM_CENTER);
+		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+	}
+
+	{
+		auto style = context().style("vm4pv.scroll-bar2");
+		style->set("orientation", libv::ui::Orientation::LEFT_TO_RIGHT);
+		style->set("size", libv::ui::parse_size_or_throw("200px, 8px"));
+
+		style->set("bg_color", libv::parse::parse_color_or_throw("hsva(120, 30%, 90%, 100%)"));
+		style->set("bar_color", libv::parse::parse_color_or_throw("hsva(240, 30%, 90%, 100%)"));
+
+//		style->set("style_arrow", context().style("vm4pv.scroll-bar-fit:arrow"));
+//		style->set("style_track", context().style("vm4pv.scroll-bar-fit:track"));
+//		style->set("style_bar", context().style("vm4pv.scroll-bar-fit:bar"));
+
+//		style->set("scroll_arrows", true);
+//		style->set("scale_bar_relative", true);
+//		style->set("min_scroll_size", 22.f);
+//		style->set("min_scroll_ratio", 0.f);
+	}
+
+//	{
+//		auto style = context().style("vm4pv.scroll-bar:arrow");
+//		style->set("size", libv::ui::parse_size_or_throw("22px, 22px"));
+//		style->set("image", context().texture2D("separator_bar_256x16.png"));
+//	}
+//
+//	{
+//		auto style = context().style("vm4pv.scroll-bar:track");
+//		style->set("size", libv::ui::parse_size_or_throw("1r, 1r"));
+//		style->set("image", context().texture2D("separator_bar_256x16.png"));
+//	}
+//
+//	{
+//		auto style = context().style("vm4pv.scroll-bar:bar");
+//		style->set("image", context().texture2D("separator_bar_256x16.png"));
+//	}
+
 //	{
 //		auto style = context().style("vm4pv.file_list");
 //		style->set("align", libv::ui::AlignHorizontal::Left);
@@ -209,6 +283,248 @@ void PanelViewer::doAttach() {
 		picker_files = std::make_shared<app::ui::QuickFilePicker>(*this, "picker");
 		picker_files->style(context().style("vm4pv.file_list"));
 		add(picker_files);
+	}
+
+	{
+		auto tmp_panel = std::make_shared<libv::ui::PanelLine>(*this, "scroll-show");
+		tmp_panel->style(context().style("vm4pv.scroll-show"));
+		add(tmp_panel);
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(+110); tmp->value_min(+10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(+110); tmp->value_min(-10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(-110); tmp->value_min(+10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(-110); tmp->value_min(-10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(+10); tmp->value_min(+110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(+10); tmp->value_min(-110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(-10); tmp->value_min(+110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(-10); tmp->value_min(-110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(100); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(0); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(0); tmp->value_range(0);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(0); tmp->value_range(200);
+			tmp_panel->add(tmp);
+		}
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(100); tmp->value_range(0);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(100); tmp->value_range(200);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(10); tmp->value_max(210); tmp->value_min(10); tmp->value_range(20); tmp->value_step(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar"));
+			tmp->value(10); tmp->value_max(200); tmp->value_min(0); tmp->value_range(20); tmp->value_step(20);
+			tmp_panel->add(tmp);
+		}
+	}
+
+	{
+		auto tmp_panel = std::make_shared<libv::ui::PanelLine>(*this, "scroll-show2");
+		tmp_panel->style(context().style("vm4pv.scroll-show2"));
+		add(tmp_panel);
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(5); tmp->value_max(10); tmp->value_min(0); tmp->value_range(0);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(+110); tmp->value_min(+10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(+110); tmp->value_min(-10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(-110); tmp->value_min(+10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(-110); tmp->value_min(-10); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(+10); tmp->value_min(+110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(+10); tmp->value_min(-110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(-10); tmp->value_min(+110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(-10); tmp->value_min(-110); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(100); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(0); tmp->value_range(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(0); tmp->value_range(0);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(100); tmp->value_min(0); tmp->value_range(200);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(100); tmp->value_range(0);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(0); tmp->value_max(0); tmp->value_min(100); tmp->value_range(200);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(10); tmp->value_max(210); tmp->value_min(10); tmp->value_range(20); tmp->value_step(20);
+			tmp_panel->add(tmp);
+		}
+
+		{
+			auto tmp = std::make_shared<libv::ui::ScrollBar>(*this, "scroll-bar");
+			tmp->style(context().style("vm4pv.scroll-bar2"));
+			tmp->value(10); tmp->value_max(200); tmp->value_min(0); tmp->value_range(20); tmp->value_step(20);
+			tmp_panel->add(tmp);
+		}
 	}
 
 	{

@@ -35,6 +35,9 @@
 // IDEA: Format string per route; most likely will be integrated into the serialization and output-formatter system
 //		libv::log.route_below(libv::Info, std::cout, "{severity} {thread_id} {module}: {message} <{file}:{line}>\n");
 //		libv::log.route(std::cout, "{severity} {module}: {message}\n");
+//
+// TODO P5: Design a unified log line structure
+//		 Warn: This happened. It was unexpected because. This was done to recover. [Recommended user action.]
 
 // -------------------------------------------------------------------------------------------------
 // Trace - Only when tracing the code and execution steps
@@ -302,6 +305,17 @@ private:
 	}
 
 private:
+//	template <typename OS, typename Args>
+//	inline void ostream_if_possible(OS& os, const Args& arg) {
+//		(void) arg;
+//		os << " ?,";
+//	}
+//
+//	template <typename OS, typename Args>
+//	inline void ostream_if_possible(OS& os, const Args& arg) WISH_REQUIRES(requires { os << arg; }) {
+//		os << " \"" << arg << "\",";
+//	}
+
 	template <typename... Args>
 	/*NEVER_INLINE*/ std::string formatMessage(
 			const std::string_view fmt,
@@ -312,6 +326,7 @@ private:
 		} catch (const fmt::format_error& ex) {
 			message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", fmt, ex.what());
 			std::ostringstream argument_ss;
+//			(ostream_if_possible(argument_ss, args), ...);
 			((argument_ss << " \"" << args << "\","), ...);
 			message += argument_ss.str();
 		}

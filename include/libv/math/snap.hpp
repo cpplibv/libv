@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/float_equal.hpp>
 // std
 #include <cmath>
 #include <utility>
@@ -27,22 +29,16 @@ template <typename T>
 
 template <typename T>
 [[nodiscard]] constexpr inline T snap(T value, T snap_) noexcept {
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wfloat-equal"
-	if (snap_ == 0.0)
+	if (libv::float_equal(snap_, 0.0))
 		return value;
-	#pragma GCC diagnostic pop
 
 	return std::round(value / snap_) * snap_;
 }
 
 template <typename T>
 [[nodiscard]] constexpr inline T snap_interval(T value, T snap_, T lo, T hi) noexcept {
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wfloat-equal"
-	if (snap_ == 0.0)
+	if (libv::float_equal(snap_, 0.0))
 		return clamp_interval(value, lo, hi);
-	#pragma GCC diagnostic pop
 
 	if (hi < lo)
 		std::swap(hi, lo);

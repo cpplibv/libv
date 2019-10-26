@@ -563,7 +563,14 @@ constexpr inline auto dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	return result;
 }
 
-/// \return The cross product of the two vector
+/// \return The cross product of the two 2D vector
+template <typename V0, typename V1>
+		WISH_REQUIRES(Vec2<V0> && Vec2<V1>)
+constexpr inline auto cross(const V0& lhs, const V1& rhs) {
+	return lhs.x * rhs.y - lhs.y * rhs.x;
+}
+
+/// \return The cross product of the two 3D vector
 template <typename V0, typename V1>
 		WISH_REQUIRES(Vec3<V0> && Vec3<V1>)
 constexpr inline auto cross(const V0& lhs, const V1& rhs) {

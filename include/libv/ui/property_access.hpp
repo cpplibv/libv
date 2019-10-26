@@ -45,9 +45,9 @@ class ContextUI;
 //	virtual std::string toString() override { }
 //};
 
-struct ComponentPropertyDescription {
+//struct ComponentPropertyDescription {
 //	std::vector<std::unique_ptr<BasePropertyInfo>> properties;
-};
+//};
 
 template <typename ComponentT>
 struct PropertySetterContext {

@@ -47,6 +47,13 @@ public:
 	void unsubscribe(BaseComponent& watcher);
 	void unsubscribe(MouseWatcher& watcher);
 
+public:
+	void acquire(BaseComponent& watcher);
+	void acquire(MouseWatcher& watcher);
+	void release(BaseComponent& watcher);
+	void release(MouseWatcher& watcher);
+
+public:
 	void event_enter();
 	void event_leave();
 	void event_button(libv::input::Mouse mouse, libv::input::Action action);
