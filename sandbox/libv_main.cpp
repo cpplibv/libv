@@ -328,9 +328,43 @@
 
 // =================================================================================================
 
+//// libv
+//#include <libv/math/bezier_curve.hpp>
+//// std
+//#include <iostream>
+//
+//
+//[[nodiscard]] constexpr inline bool interval_check(double value, double lo, double hi) noexcept {
+//	return !((value > lo && value > hi) || (value < lo && value < hi));
+//}
+//
+//[[nodiscard]] constexpr inline double interval_clamp(double value, double lo, double hi) noexcept {
+//	if (hi < lo)
+//		return std::clamp(value, hi, lo);
+//	else
+//		return std::clamp(value, lo, hi);
+//}
+//
+//int main() {
+//	for (int i = 0; i < 7; ++i) {
+//		std::cout << interval_clamp(i, 2, 4) << " " << interval_clamp(i, 4, 2) << std::endl;
+//	}
+//	std::cout << std::endl;
+//	for (int i = 0; i < 7; ++i) {
+//		std::cout << interval_check(i, 2, 4) << " " << interval_check(i, 4, 2) << std::endl;
+//	}
+//
+//	return 0;
+//}
+
+// =================================================================================================
+
 // libv
+#include <libv/math/constants.hpp>
 #include <libv/math/bezier_curve.hpp>
+#include <libv/math/vec.hpp>
 // std
+#include <cmath>
 #include <iostream>
 
 
