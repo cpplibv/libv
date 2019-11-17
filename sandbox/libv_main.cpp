@@ -359,36 +359,170 @@
 
 // =================================================================================================
 
+//// libv
+//#include <libv/math/constants.hpp>
+//#include <libv/math/bezier_curve.hpp>
+//#include <libv/math/vec.hpp>
+//// std
+//#include <cmath>
+//#include <iostream>
+//
+//
+////auto dclamp(int v, int hi, int lo) {
+////    return std::min((v - lo), hi) + lo;
+////    //return std::min((v - lo), hi - lo) + lo;
+////	//return std::clamp(v, lo, hi);
+////}
+//
+//
+//[[nodiscard]] constexpr inline bool interval_check(double value, double lo, double hi) noexcept {
+//	return !((value > lo && value > hi) || (value < lo && value < hi));
+//}
+//
+//[[nodiscard]] constexpr inline double interval_clamp(double value, double lo, double hi) noexcept {
+//	if (hi < lo)
+//		return std::clamp(value, hi, lo);
+//	else
+//		return std::clamp(value, lo, hi);
+//}
+//
+//int main() {
+//	for (int i = 0; i < 7; ++i) {
+//		std::cout << interval_clamp(i, 2, 4) << " " << interval_clamp(i, 4, 2) << std::endl;
+//	}
+//	std::cout << std::endl;
+//	for (int i = 0; i < 7; ++i) {
+//		std::cout << interval_check(i, 2, 4) << " " << interval_check(i, 4, 2) << std::endl;
+//	}
+//
+//	return 0;
+//}
+//
+// =================================================================================================
+//
+//int main() {
+//	libv::math::BezierCurve curve;
+//	curve.points.emplace_back(0, 0);
+//		curve.points.emplace_back(0, 1);
+//		curve.points.emplace_back(2, 1);
+//	curve.points.emplace_back(2, 0);
+//		curve.points.emplace_back(2, -1);
+//		curve.points.emplace_back(1, -1);
+//	curve.points.emplace_back(1, 0);
+//		curve.points.emplace_back(0, 0.5f);
+//		curve.points.emplace_back(1.5f, 0.5f);
+//	curve.points.emplace_back(1.5f, 0);
+//
+//	for (int i = -15; i <= 45; ++i) {
+//		const float t = static_cast<float>(i) * 0.1f;
+//		std::cout << t << " = " << curve.eval(t) << std::endl;
+//	}
+//
+//	std::cout << "min:  " << curve.min() << std::endl;
+//	std::cout << "max:  " << curve.max() << std::endl;
+//	std::cout << "size: " << curve.size() << std::endl;
+//
+//	return 0;
+//}
+
+//// libv
+//#include <libv/math/constants.hpp>
+//#include <libv/math/vec.hpp>
+//// std
+//#include <cmath>
+//#include <iostream>
+//#include <cassert>
+//#include <cstdlib>
+//
+//
+//inline double get_dx(const double x[]) {
+//	return x[1] - x[0];
+//}
+//
+//int find_xb(double x, const double a[], int n, int b) {
+//	assert(b < n);
+//	double dx = get_dx(a);
+//	int ix = (x - a[0]) / dx;
+//	ix = std::max(ix, b);
+//	ix = std::min(ix, n - b - 1);
+//	return ix;
+//}
+//
+//double lagrange_basis(int j, double x,
+//		const double x_values[],
+//		int num_x) {
+//	double l_j = 1;
+//	double r;
+//	assert(0 <= j && j < num_x && "j is in bounds");
+//	if (num_x == 0 || num_x == 1) return 1.;
+//	for (int m = 0; m < num_x; m++) {
+//		if (m != j) {
+//			r = (x - x_values[m]) / (x_values[j] - x_values[m]);
+//			l_j *= r;
+//		}
+//	}
+//	return l_j;
+//}
+//
+//double lagrange_interp_1D(double x,
+//		const double x_values[],
+//		int num_x,
+//		const double y_values[]) {
+//	double out = 0;
+//	for (int j = 0; j < num_x; j++) {
+//		out += y_values[j] * lagrange_basis(j, x, x_values, num_x);
+//	}
+//	return out;
+//}
+//
+//double lagrange_interp_1Dfo(double x, int order,
+//		const double x_values[], int num_x,
+//		const double y_values[]) {
+//	assert(order % 2 == 0);
+//	assert(num_x > order);
+//	double mx[order + 1];
+//	double my[order + 1];
+//	int i;
+//	int ix = find_xb(x, x_values, num_x, order / 2);
+//	for (i = 0; i < order + 1; i++) {
+//		mx[i] = x_values[ix + i - order / 2];
+//		my[i] = y_values[ix + i - order / 2];
+//	}
+//	return lagrange_interp_1D(x, mx, order + 1, my);
+//}
+//
+//int main() {
+//	double xs[] = {0, 1, 2};
+//	double ys[] = {0, 0, 1};
+//
+//	for (double t = 0; t < 2; t += 0.2) {
+//		std::cout << lagrange_interp_1Dfo(t, 2, xs, 3, ys) << std::endl;
+//	}
+//
+//	return 0;
+//}
+
+// =================================================================================================
+
+// ext
+#include <fmt/format.h>
 // libv
-#include <libv/math/constants.hpp>
-#include <libv/math/bezier_curve.hpp>
-#include <libv/math/vec.hpp>
-// std
-#include <cmath>
-#include <iostream>
+#include <libv/math/pid.hpp>
 
 
 int main() {
-	libv::math::BezierCurve curve;
-	curve.points.emplace_back(0, 0);
-		curve.points.emplace_back(0, 1);
-		curve.points.emplace_back(2, 1);
-	curve.points.emplace_back(2, 0);
-		curve.points.emplace_back(2, -1);
-		curve.points.emplace_back(1, -1);
-	curve.points.emplace_back(1, 0);
-		curve.points.emplace_back(0, 0.5f);
-		curve.points.emplace_back(1.5f, 0.5f);
-	curve.points.emplace_back(1.5f, 0);
+	libv::PID<double> pid(0.25, 0.01, 0.5);
 
-	for (int i = -15; i <= 45; ++i) {
-		const float t = static_cast<float>(i) * 0.1f;
-		std::cout << t << " = " << curve.eval(t) << std::endl;
+	double dt = 0.1;
+	double current = 200;
+
+	for (int i = 0; i <= 100; i++) {
+		double target = static_cast<double>(i);
+		double feedback = pid.calculate(dt, current, target);
+
+		fmt::print("current: {:8.4f}, target: {:8.4f}, feedback: {:8.4f}\n", current, target, feedback);
+		current += feedback;
 	}
-
-	std::cout << "min:  " << curve.min() << std::endl;
-	std::cout << "max:  " << curve.max() << std::endl;
-	std::cout << "size: " << curve.size() << std::endl;
 
 	return 0;
 }
