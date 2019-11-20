@@ -5,6 +5,7 @@
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/input/event.hpp>
+#include <libv/math/remap.hpp>
 #include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
@@ -123,7 +124,13 @@ public:
 	std::vector<UIEvent> event_queue;
 	std::mutex mutex;
 
-	bool overlayZoomEnable = false;
+public:
+	enum class OverlayZoomMode {
+		disabled,
+		control,
+		view,
+	};
+	OverlayZoomMode overlayZoomMode = OverlayZoomMode::disabled;
 	std::shared_ptr<OverlayZoom> overlayZoom = std::make_shared<OverlayZoom>(root);
 
 //	bool overlayCursorEnable = false;
@@ -182,15 +189,27 @@ public:
 
 	void event(const libv::input::EventKey& event) {
 //		if (event.key == libv::input::Key::F12 && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none) {
+//		parse_hotkey_or_throw("F12")
+//		parse_hotkey_or_throw("Shift + F12")
+
 		if (event.key == libv::input::Key::F12 && event.action == libv::input::Action::press) {
-			overlayZoomEnable = !overlayZoomEnable;
-
-			if (overlayZoomEnable)
+			if (overlayZoomMode == OverlayZoomMode::disabled) {
+				log_ui.info("Switch overlay mode: {} to {}", "zoom", "control");
+				overlayZoomMode = OverlayZoomMode::control;
 				root.add(overlayZoom);
-			else
-				root.remove(overlayZoom);
+				overlayZoom->control();
 
-			log_ui.info("Switch overlay mode: {} to {}", "zoom", overlayZoomEnable ? "on" : "off");
+			} else if (overlayZoomMode == OverlayZoomMode::control) {
+				log_ui.info("Switch overlay mode: {} to {}", "zoom", "view");
+				overlayZoomMode = OverlayZoomMode::view;
+				overlayZoom->view();
+
+			} else if (overlayZoomMode == OverlayZoomMode::view) {
+				log_ui.info("Switch overlay mode: {} to {}", "zoom", "disabled");
+				overlayZoomMode = OverlayZoomMode::disabled;
+				overlayZoom->disable();
+				root.remove(overlayZoom);
+			}
 		}
 
 //		if (event.key == libv::input::Key::F11 && event.action == libv::input::Action::press) {
@@ -235,7 +254,12 @@ public:
 	}
 
 	void event(const libv::input::EventMousePosition& event) {
-		const auto position = libv::vec::cast<float>(event.position);
+		auto position = libv::vec::cast<float>(event.position);
+
+		if (overlayZoomMode == OverlayZoomMode::view)
+			// Floor is used as mouse position are in pixel center coordinates
+			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.size2(), overlayZoom->screen_BL(), overlayZoom->screen_TR() + 1.0f));
+
 		context.mouse.event_position(position);
 		context_state.mouse_position_ = position;
 	}
@@ -432,9 +456,6 @@ void UI::update(libv::glr::Queue& gl) {
 //		AccessRoot::create(self->root, context);
 		AccessRoot::render(self->root, context);
 //		AccessRoot::destroy(self->root, context);
-
-//		if (overlayZoomEnable)
-//			self->overlayZoom->render(context);
 
 		self->stat.render.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {

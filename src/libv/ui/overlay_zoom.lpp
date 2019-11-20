@@ -29,7 +29,9 @@ private:
 
 	libv::vec2f displayPosition = {};
 	float zoom_ = 1.f;
+	bool control_ = false;
 
+private:
 	libv::glr::Framebuffer framebuffer;
 	libv::glr::Texture2D::R8_G8_B8_A8 framebufferColor0;
 
@@ -37,8 +39,10 @@ private:
 	libv::glr::Program program;
 	libv::glr::Uniform_texture uniformSampler0;
 
-	libv::glr::Mesh lines{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
+	libv::glr::Mesh lines_border{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
 	libv::glr::Program lineProgram;
+
+	libv::glr::Mesh lines_cursor{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
 
 public:
 	explicit OverlayZoom(BaseComponent& parent);
@@ -46,9 +50,18 @@ public:
 	OverlayZoom(BaseComponent& parent, GenerateName_t, const std::string_view type);
 	~OverlayZoom();
 
+public:
+	void control();
+	void view();
+	void disable();
+
+	libv::vec2f screen_BL() const;
+	libv::vec2f screen_TR() const;
+
 private:
 	void init();
 	void update();
+	void update_cursor();
 
 private:
 	virtual bool onKey(const libv::input::EventKey& event) override;

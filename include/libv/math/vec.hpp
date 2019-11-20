@@ -624,6 +624,16 @@ constexpr inline auto cast(const vec_t<N, T>& vec) {
 }
 
 template <size_t N, typename T>
+constexpr inline auto floor(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](const auto index) { return std::floor(vec.data[index]); });
+}
+
+template <size_t N, typename T>
+constexpr inline auto ceil(const vec_t<N, T>& vec) {
+	return build_vec<N>([&](const auto index) { return std::ceil(vec.data[index]); });
+}
+
+template <size_t N, typename T>
 constexpr inline auto round(const vec_t<N, T>& vec) {
 	return build_vec<N>([&](const auto index) { return std::round(vec.data[index]); });
 }

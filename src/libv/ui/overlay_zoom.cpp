@@ -86,6 +86,31 @@ OverlayZoom::~OverlayZoom() { }
 
 // -------------------------------------------------------------------------------------------------
 
+void OverlayZoom::control() {
+	control_ = true;
+	context().mouse.acquire(*this);
+}
+
+void OverlayZoom::view() {
+	control_ = false;
+	context().mouse.release(*this);
+}
+
+void OverlayZoom::disable() {
+	control_ = false;
+	context().mouse.release(*this);
+}
+
+libv::vec2f OverlayZoom::screen_BL() const {
+	return displayPosition;
+}
+
+libv::vec2f OverlayZoom::screen_TR() const {
+	return displayPosition + framebufferSize_.cast<float>() / zoom_ - 1.0f;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void OverlayZoom::init() {
 	program.vertex(quad_vs);
 	program.fragment(quad_fs);
@@ -97,7 +122,7 @@ void OverlayZoom::init() {
 
 void OverlayZoom::update() {
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
-	const auto matrix = libv::mat4f::ortho(libv::vec::cast<float>(displayPosition), fboSize / zoom_);
+	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
 
 	{
 		quad.clear();
@@ -122,10 +147,10 @@ void OverlayZoom::update() {
 		index.quad(0, 1, 2, 3);
 	}
 	{
-		lines.clear();
+		lines_border.clear();
 
-		auto pos = lines.attribute(libv::glr::Attribute<0, libv::vec2f>{});
-		auto index = lines.index();
+		auto pos = lines_border.attribute(libv::glr::Attribute<0, libv::vec2f>{});
+		auto index = lines_border.index();
 
 		const auto p0 = libv::vec::xy(matrix * libv::vec4f(fboSize * -1.f - 0.0f, 0, 1));
 		const auto p1 = libv::vec::xy(matrix * libv::vec4f(fboSize * -0.f - 0.5f, 0, 1));
@@ -145,6 +170,33 @@ void OverlayZoom::update() {
 	}
 }
 
+void OverlayZoom::update_cursor() {
+	const auto mouse_position = context().state.mouse_position();
+	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
+	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
+
+	{
+		lines_cursor.clear();
+
+		auto pos = lines_cursor.attribute(libv::glr::Attribute<0, libv::vec2f>{});
+		auto index = lines_cursor.index();
+
+		// NOTE: Only works because zoom is always power of 2, otherwise zoom would have to be accounted in next nearest pixel center calculation
+		const auto p0 = libv::vec::xy(matrix * libv::vec4f(mouse_position - 0.0f, 0, 1)) - 1.f / fboSize;
+		const auto p1 = libv::vec::xy(matrix * libv::vec4f(mouse_position + 1.0f, 0, 1)) + 1.f / fboSize;
+
+		pos(p0.x, p0.y);
+		pos(p0.x, p1.y);
+		pos(p1.x, p1.y);
+		pos(p1.x, p0.y);
+
+		index.line(0, 1);
+		index.line(1, 2);
+		index.line(2, 3);
+		index.line(3, 0);
+	}
+}
+
 // -------------------------------------------------------------------------------------------------
 
 bool OverlayZoom::onKey(const libv::input::EventKey& event) {
@@ -158,8 +210,13 @@ void OverlayZoom::onFocus(const EventFocus& event) {
 }
 
 bool OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
+	if (!control_)
+		return false;
+
 	if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
-		displayPosition -= event.mouse_movement;
+		// Would be nice to have a slowed movement if zoomed, but rounding absorbs little diffs
+		//		displayPosition = libv::vec::round(displayPosition - event.mouse_movement / zoom_);
+		displayPosition = libv::vec::round(displayPosition - event.mouse_movement);
 		update();
 	}
 
@@ -167,13 +224,16 @@ bool OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 }
 
 bool OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
+	if (!control_)
+		return false;
+
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 
 	const auto old_zoom = zoom_;
-	const auto new_zoom = std::max(1.0f, zoom_ * (1.0f + event.scroll_movement.y * 0.25f));
+	const auto new_zoom = std::max(1.0f, old_zoom * std::pow(2.f, event.scroll_movement.y));
 	zoom_ = new_zoom;
 
-	displayPosition = displayPosition + fboSize / old_zoom / 2.0f - fboSize / new_zoom / 2.0f;
+	displayPosition = libv::vec::round(displayPosition + fboSize / old_zoom / 2.0f - fboSize / new_zoom / 2.0f);
 	update();
 
 	return true;
@@ -227,7 +287,12 @@ void OverlayZoom::doRender(ContextRender& context) {
 	}
 	{
 		gl.program(lineProgram);
-		gl.render(lines);
+		gl.render(lines_border);
+	}
+	{
+		update_cursor();
+		gl.program(lineProgram);
+		gl.render(lines_cursor);
 	}
 }
 
