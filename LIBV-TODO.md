@@ -318,60 +318,50 @@ libv.ui: bug: mouse acquire might generate extra events? | null update was broad
 libv.ui: scroll bar (aka slider) without the scroll pane
 libv.ui: remap mouse input in debug zoom mode (remap function) | inline remap causes hazard on movement | fixed by control/view split but rounding might broke things
 libv.ui: overlay zoom, zoom toward mouse
+app.vm4_viewer: list models
+app.vm4_viewer: load model
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: not shared_ptr based panels, aka static_container (?)
+app.vm4_viewer: display statistics
+
+app.vm4_viewer: show model grey
+app.vm4_viewer: import model
+
+libv.ui: static_component system
+libv.ui: list
+libv.ui: table layout - only the columns and/or rows have size
+libv.ui: not owning container views (list and/or table)
+
 libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar
-
-libv.ui: generic orthogonal component level overlay system
-	libv.ui: overlay event freeze
-		libv.ui: overlay event grab / multi-root / fake-root / overlay focus shaky
-		libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
-
-	libv.ui: overlay zoom
-		libv.ui: pixel distance measure / pixel region measure
-
-	libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
-	libv.ui: overlay magnifier (local zoom) (optionally slow mouse movement speed (freeze cursor with frame))
-	libv.ui: overlay (mouse) stack display
-	libv.ui: overlay component tree display
-	libv.ui: overlay debug data stream, a context based output that can be written and displayed as a HUD
-
-	libv.ui.property: hybrid reflection - dynamic
-		libv.ui: detach should also be an event (mouse_table could utilize it to cleanup, debug observers could also use it)
-			libv.ui: overlay property inspector (name it inspector)
-
-	libv.ui: overlay resource viewer (textures, fonts, shaders (?))
 
 libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample (and why there is none for RBO))
 libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
+
 
 component
 	libv.ui: clipping vertex shader (with on/off) | stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 
-
---- [[[ deadline: 2019.11.01 ]]] ---
-
-
-component
-	libv.ui: list
-	libv.ui: table layout - only the columns and/or rows have size
-	libv.ui: not owning container views (list and/or table)
+atlas
+	libv.ui: texture atlas definition/parsing
+	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
+	libv.ui: support atlas based images
 
 ui
 	libv.ui: if size is 0, do not execute anything from ui loop (frame buffer protection)
 	libv.ui: layout padding
-	libv.ui: fragments
+	libv.ui: fragments, sub component reusable codes
+	libv.ui: background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
 	libv.ui: ContextResource
 	libv.ui: ContextConfig
 	libv.ui: ContextExecutor
 		libv.ui: async_task<T> work_async(const function<progress_report(multi_entry_call, stop_token)>& task);
-	libv.ui: ContextStat
-	libv.ui: static_component system
+	libv.ui: ContextStat (not ContextState, stat is for ui statistics)
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
@@ -385,11 +375,6 @@ cleanup
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
 	libv.ui: cleanup context_ui redundant codes
 	libv.ui: fatal log before every assert
-
-atlas
-	libv.ui: texture atlas definition/parsing
-	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
-	libv.ui: support atlas based images
 
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
@@ -497,10 +482,32 @@ libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, m
 libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
 libv.console: should depend on libv.arg
 
-libv.ui: style sheets
-libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
-libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
-libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
+style
+	libv.ui: style sheets
+	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
+	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
+	libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
+
+overlay
+	libv.ui: generic orthogonal component level overlay system
+		libv.ui: overlay event freeze
+			libv.ui: overlay event grab / multi-root / fake-root / overlay focus shaky
+			libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
+
+		libv.ui: overlay zoom
+			libv.ui: pixel distance measure / pixel region measure
+
+		libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
+		libv.ui: overlay magnifier (local zoom) (optionally slow mouse movement speed (freeze cursor with frame))
+		libv.ui: overlay (mouse) stack display
+		libv.ui: overlay component tree display
+		libv.ui: overlay debug data stream, a context based output that can be written and displayed as a HUD
+
+		libv.ui.property: hybrid reflection - dynamic
+			libv.ui: detach should also be an event (mouse_table could utilize it to cleanup, debug observers could also use it)
+				libv.ui: overlay property inspector (name it inspector)
+
+		libv.ui: overlay resource viewer (textures, fonts, shaders (?))
 
 
 --- [[[ deadline: 2019.12.01 ]]] ---

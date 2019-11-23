@@ -34,8 +34,14 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class QuickFilePicker : public libv::ui::PanelLine {
+public:
+	struct EventPick {
+		QuickFilePicker& component;
+	};
+
 private:
 	std::filesystem::path path;
+	std::string value_;
 
 //	std::string filter_pattern;
 //
@@ -50,6 +56,12 @@ private:
 	bool restrictRelativePath = true;
 	bool listDirectories = true;
 	bool expandDirectories = false;
+
+//	enum class SelectionMode {
+//		single,
+//		multiple,
+//		interval,
+//	};
 
 	enum class PathDisplayMode {
 		flat,
@@ -70,10 +82,20 @@ public:
 	~QuickFilePicker();
 
 	void update_filelist();
-	void key(libv::input::Key key);
+
+public:
+	template <typename F>
+	inline void event_pick(libv::observer_ptr<BaseComponent> slot, F&& func) {
+		connect<EventPick>(slot, std::forward<F>(func));
+	}
+
+	[[nodiscard]] inline const std::string& value() const noexcept {
+		return value_;
+	}
 
 private:
-	void doAttach() override;
+	virtual void doAttach() override;
+	virtual bool onKey(const libv::input::EventKey& event) override;
 //	void doLayout1(const ContextLayout1& environment) override;
 //	void doRender(ContextRender& context) override;
 };

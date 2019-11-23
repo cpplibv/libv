@@ -23,6 +23,9 @@ class BaseComponent;
 
 struct LayoutGrid {
 public:
+	using ptr_type = std::shared_ptr<BaseComponent>;
+
+public:
 	struct Properties {
 		PropertyL<Anchor> anchor_content;
 		PropertyL<ColumnCount> column_count;
@@ -45,9 +48,9 @@ public:
 public:
 	struct Child {
 		ChildProperties property;
-		std::shared_ptr<BaseComponent> ptr;
+		ptr_type ptr;
 
-		Child(std::shared_ptr<BaseComponent> ptr) : ptr(std::move(ptr)) {}
+		Child(ptr_type ptr) : ptr(std::move(ptr)) {}
 	};
 
 public:

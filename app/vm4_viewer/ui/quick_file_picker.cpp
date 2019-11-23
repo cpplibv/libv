@@ -25,6 +25,7 @@
 #include <libv/ui/shader/shader_image.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 //#include <libv/ui/shader/shader_quad.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 #include <libv/utility/generic_path.hpp>
+#include <libv/input/event.hpp>
 // std
 //#include <sstream>
 // pro
@@ -48,22 +49,6 @@ QuickFilePicker::QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::Gene
 	PanelLine(parent, libv::ui::GenerateName, type) { }
 
 QuickFilePicker::~QuickFilePicker() { }
-
-void QuickFilePicker::key(libv::input::Key key) {
-	if (!isAttached())
-		return;
-
-	if (key == libv::input::Key::Up) {
-		select--;
-		log_app.info("Select {}", select);
-		update_filelist();
-	}
-	if (key == libv::input::Key::Down) {
-		select++;
-		log_app.info("Select {}", select);
-		update_filelist();
-	}
-}
 
 void QuickFilePicker::doAttach() {
 	set(property.align_horizontal, libv::ui::AlignHorizontal::Left);
@@ -155,9 +140,10 @@ void QuickFilePicker::doAttach() {
 			(void) event;
 			this->update_filelist();
 		});
-		search_field->event_submit(this, [](const libv::ui::InputField::EventSubmit& event) {
+		search_field->event_submit(this, [this](const libv::ui::InputField::EventSubmit& event) {
 			// Open selected file
 			log_app.info("Submit: {}", event.component.text());
+			this->fire(EventPick{*this});
 		});
 		add(search_field);
 	}
@@ -166,21 +152,6 @@ void QuickFilePicker::doAttach() {
 		list_panel = std::make_shared<libv::ui::PanelFull>(*this, "layer");
 		auto& child = add(list_panel);
 		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
-	}
-
-	{
-		const auto input = std::make_shared<libv::ui::InputField>(*this, "input1");
-		input->style(context().style("vm4pv.info.input"));
-		// input->text("x\nxx\nx\n\nx\nxx\nx");
-		input->text("[\n[[\n[\n\n[\n[[\n[");
-		add(input);
-	}
-	{
-		const auto input = std::make_shared<libv::ui::InputField>(*this, "input-limit");
-		input->style(context().style("vm4pv.info.input-limit"));
-		// input->text("x\nxx\nx\n\nx\nxx\nx");
-		input->text("Hello world ZZzzZZ ZzzZZz ZZzZ");
-		add(input);
 	}
 
 	{
@@ -196,7 +167,26 @@ void QuickFilePicker::doAttach() {
 		child.ptr->set(child.property.size, libv::ui::parse_size_or_throw("1rD, D"));
 	}
 
+	watchKey(true);
 	update_filelist();
+}
+
+bool QuickFilePicker::onKey(const libv::input::EventKey& event) {
+	if (event.key == libv::input::Key::Up && event.action != libv::input::Action::release) {
+		select--;
+		log_app.info("Select {}", select);
+		update_filelist();
+		return true;
+	}
+
+	if (event.key == libv::input::Key::Down && event.action != libv::input::Action::release) {
+		select++;
+		log_app.info("Select {}", select);
+		update_filelist();
+		return true;
+	}
+
+	return false;
 }
 
 void QuickFilePicker::update_filelist() {
@@ -236,8 +226,10 @@ void QuickFilePicker::update_filelist() {
 			auto ext = p.path().extension();
 			auto entry = std::make_shared<libv::ui::Label>(*list_panel, "entry");
 
-			if (select == i++)
+			if (select == i++) {
+				value_ = libv::generic_path(p);
 				entry->style(context().style("vm4pv.file_list.entry.selected"));
+			}
 			else if (exts_vm.contains(ext))
 				entry->style(context().style("vm4pv.file_list.entry.vm"));
 			else if (exts_importable.contains(ext))

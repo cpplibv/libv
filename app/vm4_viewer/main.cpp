@@ -13,11 +13,6 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P5: app.vm4_viewer: list models
-// TODO P5: app.vm4_viewer: load model
-// TODO P5: app.vm4_viewer: import model
-// TODO P5: app.vm4_viewer: display statistics
-// TODO P5: app.vm4_viewer: show model grey
 // TODO P5: app.vm4_viewer: show model wireframe (GS based wireframe)
 // TODO P5: app.vm4_viewer: vm4 LOD support
 // TODO P5: app.vm4_viewer: pointless loading bar

@@ -44,8 +44,8 @@ void PanelViewer::key(libv::input::Key key) {
 	if (key == libv::input::Key::Q) i++;
 	if (key == libv::input::Key::A) i--;
 
-	if (picker_files != nullptr)
-		picker_files->key(key);
+//	if (picker_files != nullptr)
+//		picker_files->key(key);
 
 	{
 		auto style = context().style("vm4pv.info.bar");

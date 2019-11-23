@@ -37,8 +37,8 @@ public:
 	virtual ~BasicPanel();
 
 public:
-	typename Layout::Child& add(std::shared_ptr<BaseComponent> component);
-	void remove(const std::shared_ptr<BaseComponent>& component);
+	typename Layout::Child& add(typename Layout::ptr_type component);
+	void remove(const typename Layout::ptr_type& component);
 	void clear();
 
 protected:
@@ -77,7 +77,7 @@ BasicPanel<Layout>::~BasicPanel() {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Layout>
-typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<BaseComponent> component) {
+typename Layout::Child& BasicPanel<Layout>::add(typename Layout::ptr_type component) {
 	const auto childID = static_cast<ChildID>(children.size());
 	auto& child = children.emplace_back(std::move(component));
 	flagForce(Flag::pendingAttachChild);
@@ -86,7 +86,7 @@ typename Layout::Child& BasicPanel<Layout>::add(std::shared_ptr<BaseComponent> c
 }
 
 template <typename Layout>
-void BasicPanel<Layout>::remove(const std::shared_ptr<BaseComponent>& component) {
+void BasicPanel<Layout>::remove(const typename Layout::ptr_type& component) {
 	if (children[AccessParent::childID(*component)].ptr != component) {
 		log_ui.error("Attempted to remove a non child element: {} from: {}", component->path(), path());
 		return;

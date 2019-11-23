@@ -8,7 +8,7 @@
 #include <libv/glr/queue.hpp>
 // pro
 #include <vm4_viewer/log.hpp>
-#include <vm4_viewer/panel_viewer.hpp>
+#include <vm4_viewer/viewer_ui.hpp>
 
 
 namespace app {
@@ -59,16 +59,12 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	ui.attach(*this);
 	ui.setSize(config.window_width, config.window_height); // TODO P2: auto load size
 
-	panel = std::make_shared<app::PanelViewer>(ui.root());
+	panel = std::make_shared<app::ViewerUI>(ui.root());
 	ui.add(panel);
 
 	onKey.output([&](const libv::input::EventKey& e) {
 		if (e.key == libv::input::Key::Escape && e.action == libv::input::Action::press)
 			closeDefault();
-	});
-	onKey.output([&](const libv::input::EventKey& e) {
-		if (e.action == libv::input::Action::release)
-			panel->key(e.key);
 	});
 	onSize.output([&](const libv::frame::EventSize& e) {
 		if (config.save_window_size) {

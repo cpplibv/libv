@@ -4,6 +4,8 @@
 
 // libv
 #include <libv/vm4/model.hpp>
+// std
+#include <optional>
 // pro
 #include <vm4_viewer/camera.hpp>
 
@@ -13,8 +15,9 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Scene {
-	libv::vm4::Model model;
+	std::optional<libv::vm4::Model> model;
 	app::Camera camera;
+
 	//	libv::vm4::Model environment;
 	//	libv::glr::Program shader;
 
@@ -27,6 +30,10 @@ struct Scene {
 //		model.materials[0].properties[0];
 //		model.materials[0].shader;
 //		model.vertices[0].
+
+	void render() {
+
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
