@@ -317,6 +317,7 @@ libv.ui: mouse grab system, a way to soft lock mouse event positions to an initi
 libv.ui: bug: mouse acquire might generate extra events? | null update was broadcasted on accident
 libv.ui: scroll bar (aka slider) without the scroll pane
 libv.ui: remap mouse input in debug zoom mode (remap function) | inline remap causes hazard on movement | fixed by control/view split but rounding might broke things
+libv.ui: overlay zoom, zoom toward mouse
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -330,7 +331,6 @@ libv.ui: generic orthogonal component level overlay system
 		libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
 
 	libv.ui: overlay zoom
-		libv.ui: debug zoom toward mouse (not sure)
 		libv.ui: pixel distance measure / pixel region measure
 
 	libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display

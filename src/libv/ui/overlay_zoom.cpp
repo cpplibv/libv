@@ -214,9 +214,7 @@ bool OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 		return false;
 
 	if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
-		// Would be nice to have a slowed movement if zoomed, but rounding absorbs little diffs
-		//		displayPosition = libv::vec::round(displayPosition - event.mouse_movement / zoom_);
-		displayPosition = libv::vec::round(displayPosition - event.mouse_movement);
+		displayPosition -= event.mouse_movement / zoom_;
 		update();
 	}
 
@@ -227,13 +225,17 @@ bool OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 	if (!control_)
 		return false;
 
-	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
-
 	const auto old_zoom = zoom_;
-	const auto new_zoom = std::max(1.0f, old_zoom * std::pow(2.f, event.scroll_movement.y));
+	auto new_zoom = std::clamp(old_zoom * std::pow(1.25f, event.scroll_movement.y), 0.512f, 330.872245f);
+	if (new_zoom > 0.85f && new_zoom < 1.2f) // stabilization around 1.0f
+		new_zoom = 1.0f;
 	zoom_ = new_zoom;
 
-	displayPosition = libv::vec::round(displayPosition + fboSize / old_zoom / 2.0f - fboSize / new_zoom / 2.0f);
+	// Zoom to center:
+	//	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
+	//	displayPosition += fboSize / old_zoom / 2.0f - fboSize / new_zoom / 2.0f;
+	// Zoom to cursor:
+	displayPosition += context().state.mouse_position() / old_zoom - context().state.mouse_position() / new_zoom;
 	update();
 
 	return true;
