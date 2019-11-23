@@ -640,7 +640,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_vm4 INTERFACE
+	TARGET libv_vm4 STATIC
+	SOURCE src/libv/vm4/*.cpp
 	LINK   libv_math libv_serialization ext_boost
 )
 
