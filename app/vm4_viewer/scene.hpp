@@ -3,11 +3,12 @@
 #pragma once
 
 // libv
-#include <libv/vm4/model.hpp>
+#include <libv/glr/queue_fwd.hpp>
 // std
 #include <optional>
 // pro
 #include <vm4_viewer/camera.hpp>
+#include <vm4_viewer/model.hpp>
 
 
 namespace app {
@@ -15,25 +16,11 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Scene {
-	std::optional<libv::vm4::Model> model;
+//	std::optional<app::Model> environment;
+	std::optional<app::Model> model;
 	app::Camera camera;
 
-	//	libv::vm4::Model environment;
-	//	libv::glr::Program shader;
-
-//	void changeModel() {
-		//	libv::erase(config.recent_models, model);
-		//	config.recent_models.emplace_back(model);
-//
-//	}
-//		model.materials[0].name;
-//		model.materials[0].properties[0];
-//		model.materials[0].shader;
-//		model.vertices[0].
-
-	void render() {
-
-	}
+	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
 };
 
 // -------------------------------------------------------------------------------------------------

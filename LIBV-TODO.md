@@ -320,15 +320,32 @@ libv.ui: remap mouse input in debug zoom mode (remap function) | inline remap ca
 libv.ui: overlay zoom, zoom toward mouse
 app.vm4_viewer: list models
 app.vm4_viewer: load model
+libv.vm4: Generate flipped winding order version of index sequences for mesh inside inverted nodes
+app.vm4_viewer: show model wireframe (gl fill mode based)
+libv.vm4: fix vm4 root node issue
+app.vm4_viewer: show model fragment input values
+app.vm4_viewer: Implement camera
+app.vm4_viewer: Implement camera controls
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: not shared_ptr based panels, aka static_container (?)
-app.vm4_viewer: display statistics
+libv.vm4: Import calculate AABB
+libv.vm4: Import calculate BS
 
-app.vm4_viewer: show model grey
+app.vm4_viewer: Visualize node AABB
+app.vm4_viewer: Visualize node BS
+app.vm4_viewer: Camera center and focus model
+
+app.vm4_viewer: Fit camera on loading to properly include model (config setting)
+app.vm4_viewer: Reset camera
+
+libv.ui: read nana 3rd party property tree lib API
+libv.ui: non-shared_ptr based panels, aka static_container (?)
+app.vm4_viewer: display statistics
+app.vm4_viewer: show model grey lighted (phong)
+
 app.vm4_viewer: import model
 
 libv.ui: static_component system
@@ -336,14 +353,16 @@ libv.ui: list
 libv.ui: table layout - only the columns and/or rows have size
 libv.ui: not owning container views (list and/or table)
 
-libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar
+libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
 
 libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample (and why there is none for RBO))
 libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
 
 
 component
-	libv.ui: clipping vertex shader (with on/off) | stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
+	libv.ui: clipping vertex shader (with on/off)
+			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
+			| or just use a viewport call and correct the projection matrix
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
 
@@ -372,12 +391,12 @@ layout
 	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits
 
 cleanup
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target
+	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target (2D)
 	libv.ui: cleanup context_ui redundant codes
 	libv.ui: fatal log before every assert
 
 mouse
-	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | UI setting
+	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | need this as component level dynamically (camera controls need global, for other ui actions local is enough)
 	libv.ui: absorb - mouse event absorb/shield/plates
 	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
@@ -415,6 +434,10 @@ interactive
 	libv.ui.input_field: text function call should produce event
 	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui: Cursor image change
+	libv.ui.input_field: tip_string("Generic password related tip")
+	libv.ui.input_field: background_shadow_tip_string("Password")
+	libv.ui.input_field: multi_line(true)
+	libv.ui.input_field: mask('*') for passwords
 	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
 	libv.ui.input_field: selection support
 	libv.ui.input_field: Implement FocusSelectPolicy
@@ -938,149 +961,6 @@ shininess(32.0f) { }
 //	else //if (type == pointLight)
 //		return ortho<float>(-30, 30, -30, 30, -10, 150);
 //}
-
-class Model {
-private:
-	uint32_t vao;
-	uint32_t vbo_vertex;
-	uint32_t vbo_index;
-
-private:
-	libv::vm3::Model model;
-	std::string name;
-
-private:
-//	libv::gl::Uniform<glm::mat4> uniformMVPmat;
-//	libv::gl::Uniform<glm::mat4> uniformMmat;
-
-public:
-	Model(const char* data, const size_t size, const std::string& name = DEFAULT_MODEL_NAME);
-
-	virtual ~Model();
-
-private:
-	void init(const char* data, const size_t size);
-	void loadGL();
-	void unloadGL();
-
-public:
-	inline const std::string& getName() const {
-		return name;
-	}
-	void render(libv::gl::GL&);
-	void renderNode(uint32_t id, libv::gl::GL&);
-	bool loaded();
-};
-
-Model::Model(const char* data, size_t size, const std::string& name) :
-	name(name) {
-	init(data, size);
-}
-
-void Model::init(const char* data, size_t size) {
-	if (!model.load(data, size)) {
-		log_gl.error("Failed to load model: {}", name);
-		return;
-	}
-	loadGL();
-}
-
-Model::~Model() {
-	unloadGL();
-}
-
-
-// -------------------------------------------------------------------------------------------------
-
-void Model::loadGL() {
-	log_gl.trace("GL Loading model: {}", name);
-
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo_vertex);
-	glGenBuffers(1, &vbo_index);
-
-	glBindVertexArray(vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo_vertex);
-	glBufferData(GL_ARRAY_BUFFER, sizeof (vm3::Vertex) * model.vertices.size(), model.vertices.data(), GL_STATIC_DRAW);
-	checkGL();
-
-	enableVertexAttribArray(Attribute::position);
-	vertexAttribPointer(Attribute::position, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, position));
-	enableVertexAttribArray(Attribute::normal);
-	vertexAttribPointer(Attribute::normal, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, normal));
-	enableVertexAttribArray(Attribute::tangent);
-	vertexAttribPointer(Attribute::tangent, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, tangent));
-	enableVertexAttribArray(Attribute::bitangent);
-	vertexAttribPointer(Attribute::bitangent, 3, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, bitangent));
-	enableVertexAttribArray(Attribute::texcoord0);
-	vertexAttribPointer(Attribute::texcoord0, 2, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, texCoord0));
-	enableVertexAttribArray(Attribute::boneindices);
-	vertexAttribIPointer(Attribute::boneindices, 4, VertexAttribType::INT, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneID));
-	enableVertexAttribArray(Attribute::boneweight);
-	vertexAttribPointer(Attribute::boneweight, 4, VertexAttribType::FLOAT, GL_FALSE, sizeof (vm3::Vertex), MEMBER_OFFSET(vm3::Vertex, boneWieght));
-	checkGL();
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_index);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof (model.indices[0]) * model.indices.size(), model.indices.data(), GL_STATIC_DRAW);
-	checkGL();
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	checkGL();
-}
-
-void Model::unloadGL() {
-	log_gl.trace("GL Unloading model: {}", name);
-
-	glDeleteBuffers(1, &vbo_index);
-	glDeleteBuffers(1, &vbo_vertex);
-	glDeleteVertexArrays(1, &vao);
-}
-
-void Model::render(libv::gl::GL& gl) {
-	glBindVertexArray(vao);
-	checkGL();
-
-	renderNode(model.lods[0].rootNodeID, gl);
-
-	glBindVertexArray(0);
-	checkGL();
-}
-
-void Model::renderNode(uint32_t id, libv::gl::GL& gl) {
-	gl.pushMatrixModel();
-	gl.matrixModel() *= model.nodes[id].transformation;
-//	uniformMmat = gl.matrixModel();
-//	uniformMVPmat = gl.matrixMVP(); //<<<Assign uniforms
-	//node->material->get<std::string>("diffuseTexture") //<<<Bind Textures here
-	//libv::glsl::material = materials[entries[i].MaterialIndex]; //<<<Material here
-
-	if (gl.matrixModel()[0][0] * gl.matrixModel()[1][1] * gl.matrixModel()[2][2] < 0) {
-		glFrontFace(GL_CCW);
-	} else {
-		glFrontFace(GL_CW);
-	}
-
-	for (auto meshID : model.nodes[id].meshIDs) {
-		glDrawElementsBaseVertex(GL_TRIANGLES,
-				model.meshes[meshID].numIndices,
-				GL_UNSIGNED_INT,
-				(void*) (sizeof (GLuint) * model.meshes[meshID].baseIndex),
-				model.meshes[meshID].baseVertex);
-		checkGL();
-	}
-
-	for (auto childID : model.nodes[id].childrenIDs) {
-		renderNode(childID, gl);
-	}
-
-	gl.popMatrixModel();
-	checkGL();
-}
-
 
 // Light -------------------------------------------------------------------------------------------
 

@@ -26,6 +26,22 @@ namespace libv {
 	return x * libv::DEG<double>;
 }
 
+[[nodiscard]] constexpr inline float to_rad(float x) {
+	return deg_to_rad(x);
+}
+
+[[nodiscard]] constexpr inline double to_rad(double x) {
+	return deg_to_rad(x);
+}
+
+[[nodiscard]] constexpr inline float to_deg(float x) {
+	return rad_to_deg(x);
+}
+
+[[nodiscard]] constexpr inline double to_deg(double x) {
+	return rad_to_deg(x);
+}
+
 template <typename T> struct Degrees;
 template <typename T> struct Radian;
 

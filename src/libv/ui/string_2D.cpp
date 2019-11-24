@@ -346,6 +346,9 @@ size_t String2D::getClosestCharacterIndexInline(libv::vec2f position) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f String2D::content(libv::vec2f new_limit) {
+	if (string_.empty())
+		return {0.f, 0.f};
+
 	const auto lineAdvance = font_->getLineAdvance(fontSize_);
 	if (new_limit.x <= 0.0f)
 		new_limit.x = std::numeric_limits<float>::max();

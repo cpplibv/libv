@@ -27,6 +27,7 @@ class ContextState {
 	time_point time_frame_{}; /// Time point of frame start, does not change during the same frame
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
 	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
+	time_duration time_delta_{}; /// Duration between time_frame and previous time_frame, does not change during the same frame
 
 	// time_duration delta_time; /// Duration since last update
 
@@ -66,6 +67,14 @@ public:
 
 	[[nodiscard]] constexpr inline time_duration time() const noexcept {
 		return time_;
+	}
+
+	[[nodiscard]] constexpr inline time_duration time_delta() const noexcept {
+		return time_delta_;
+	}
+
+	[[nodiscard]] constexpr inline time_duration_f time_delta_f() const noexcept {
+		return std::chrono::duration_cast<time_duration_f>(time_delta_);
 	}
 
 public:

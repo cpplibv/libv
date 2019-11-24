@@ -24,12 +24,52 @@ namespace app {
 //	std::shared_ptr<BaseComponent>& operator()(size_t x, size_t y);
 //};
 
+class PropertyPanelGroupProxy {
+public:
+	template <typename K, typename V>
+	void add(K key, V value);
+};
+
+class PropertyPanelGroup {
+private:
+	using key_type = std::shared_ptr<libv::ui::BaseComponent>;
+	using value_type = std::shared_ptr<libv::ui::BaseComponent>;
+
+	struct key_value_type {
+		key_type key;
+		value_type value;
+	};
+
+public:
+	std::vector<key_value_type> properties;
+
+	void add(key_type, value_type);
+};
+
+class PropertyPanel : public libv::ui::PanelLine {
+	std::vector<PropertyPanelGroup> groups;
+
+public:
+	explicit PropertyPanel(BaseComponent& parent);
+	PropertyPanel(BaseComponent& parent, std::string name);
+	PropertyPanel(BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+
+public:
+	PropertyPanelGroupProxy group(const std::string& name, libv::intrusive_ptr<libv::ui::Style>& style);
+};
+
+// =================================================================================================
+
 class ViewerInfoPanel : public libv::ui::PanelLine {
 private:
 //	KeyValuePanel panel_general{*this, "general"};
 
+	std::shared_ptr<libv::ui::Label> label_name;
+	std::shared_ptr<libv::ui::Label> label_info;
+	std::vector<std::shared_ptr<libv::ui::Label>> label_material;
+
 //	libv::ui::PanelObserver panel_info;
-//	libv::ui::Label label_name{*this};
+//	libv::ui::Label label_name;
 //	libv::ui::Label label_file;
 //	libv::ui::Label label_info;
 //	std::vector<libv::ui::Label> label_lod;

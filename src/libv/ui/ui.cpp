@@ -345,7 +345,9 @@ void UI::update(libv::glr::Queue& gl) {
 	self->timerFrame.reset();
 
 	self->context_state.frame_count_++;
-	self->context_state.time_frame_ = clock::now();
+	const auto now = clock::now();
+	self->context_state.time_delta_ = now - self->context_state.time_frame_;
+	self->context_state.time_frame_ = now;
 	self->context_state.time_ = self->context_state.time_frame_ - self->context_state.time_ui_;
 
 	// --- Attach ---

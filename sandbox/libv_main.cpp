@@ -512,25 +512,39 @@
 
 // =================================================================================================
 
-// ext
-#include <fmt/format.h>
-// libv
-#include <libv/math/pid.hpp>
+//// ext
+//#include <fmt/format.h>
+//// libv
+//#include <libv/math/pid.hpp>
+//
+//
+//int main() {
+//	libv::PID<double> pid(0.25, 0.01, 0.5);
+//
+//	double dt = 0.1;
+//	double current = 200;
+//
+//	for (int i = 0; i <= 100; i++) {
+//		double target = static_cast<double>(i);
+//		double feedback = pid.calculate(dt, current, target);
+//
+//		fmt::print("current: {:8.4f}, target: {:8.4f}, feedback: {:8.4f}\n", current, target, feedback);
+//		current += feedback;
+//	}
+//
+//	return 0;
+//}
+
+
+//// ext
+//#include <fmt/format.h>
+//// libv
+//#include <libv/math/pid.hpp>
+#include <iostream>
+#include <cmath>
 
 
 int main() {
-	libv::PID<double> pid(0.25, 0.01, 0.5);
-
-	double dt = 0.1;
-	double current = 200;
-
-	for (int i = 0; i <= 100; i++) {
-		double target = static_cast<double>(i);
-		double feedback = pid.calculate(dt, current, target);
-
-		fmt::print("current: {:8.4f}, target: {:8.4f}, feedback: {:8.4f}\n", current, target, feedback);
-		current += feedback;
-	}
-
+	std::cout << std::fmod(-0.5, 1.) << std::endl;
 	return 0;
 }

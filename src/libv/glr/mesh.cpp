@@ -57,6 +57,16 @@ void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(vao).drawElements(primitive, count, start);
 }
 
+void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept {
+	if (dirty)
+		update(gl, remote_);
+	else
+		gl(vao).bind();
+
+//	gl(vao).drawElementsBaseVertex(primitive, baseVertex, baseIndex, numIndices);
+	gl(vao).drawElementsBaseVertex(primitive, numIndices, baseIndex, baseVertex);
+}
+
 RemoteMesh::~RemoteMesh() noexcept {
 	if (remote) {
 		remote->gc(indices.buffer);

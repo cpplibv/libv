@@ -73,13 +73,15 @@ namespace arg {
 //		args.mergable // example: 'ls -la' where -l and -a are grouped
 //			args.mergable_1         (args...)                 // usage: args.mergable(arg_list, arg_all);                // uses aliases that are 1 letter or 2 with common first letter
 //			args.mergable_2         (start)(alias, args)...   // usage: args.mergable('-')('l', arg_list)('a', arg_all); // explicit
-//			args.mergable_3         (start, args...)          // usage: args.mergable('-', arg_list, arg_all);           // uses aliases that are 
+//			args.mergable_3         (start, args...)          // usage: args.mergable('-', arg_list, arg_all);           // uses aliases that are
 //	S	args.rest               ()
 //	S	args.unused             ()
 //		args.require            (arg0 && arg1 || arg2)     // Marks certain combination of arguments as required
 //		args.depricated         (arg0 && arg1 || arg2)     // Marks certain combination of arguments as depricated
 //		args.reserve            (arg0)                     // Marks a certain argument as reserved for compatibility, reserved arguments are "silently" "ignored"
-//		args.warning            ()
+//		args.require            (bool, "reason")
+//		args.warning            (bool, "reason")
+//		args.depricated         (bool, "reason")
 //	SF	args.require_no_unused  ()                         // Needs better naming
 //		args.require_no_depricated()                       // Needs better naming
 //		args.warning_no_unused  ()                         // Needs better naming

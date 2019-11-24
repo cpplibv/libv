@@ -33,20 +33,32 @@ private:
 	std::shared_ptr<app::ui::QuickFilePicker> picker_files;
 	std::shared_ptr<ViewerInfoPanel> info_panel;
 
+private:
+//	float keyboard_spin_speed = libv::to_rad(60.f); // 60°/s
+//	float mouse_spin_speed = libv::to_rad(60.f) * 0.0025f; // 60°/400px
+//	float keyboard_move_speed = zoom * 0.5f + 1.0f;
+//	float keyboard_zoom_scale = zoom * 0.2f + 0.1f;
+//	float mouse_move_speed = zoom * 0.0006f + 0.05f;
+//	float mouse_scroll_scale = zoom * 0.08f + 0.1f;
+
 	app::Scene scene;
 
 public:
 	explicit ViewerUI(BaseComponent& parent);
 
-	void init();
-	void update_model();
-	void update_camera();
-	void update_ui();
+	void update(libv::ui::time_duration elapsed_time);
 	void load(const std::string& path);
-	void update_info();
 
 private:
-	void doAttach() override;
+	virtual bool onKey(const libv::input::EventKey& event) override;
+	virtual void onFocus(const libv::ui::EventFocus& event) override;
+	virtual bool onMouseButton(const libv::ui::EventMouseButton& event) override;
+	virtual bool onMouseMovement(const libv::ui::EventMouseMovement& event) override;
+	virtual bool onMouseScroll(const libv::ui::EventMouseScroll& event) override;
+
+private:
+	virtual void doAttach() override;
+	virtual void doRender(libv::ui::ContextRender& ctx) override;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -55,16 +55,16 @@ void QuickFilePicker::doAttach() {
 	set(property.align_vertical, libv::ui::AlignVertical::Top);
 	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
 
-	{
-		auto style = context().style("vm4pv.file_list");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
-		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
-		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
-		style->set("font_size", libv::ui::FontSize{11});
-		style->set("size", libv::ui::parse_size_or_throw("d, d"));
-	}
+//	{
+//		auto style = context().style("vm4pv.file_list");
+//		style->set("align", libv::ui::AlignHorizontal::Left);
+//		style->set("align_vertical", libv::ui::AlignVertical::Top);
+//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+//		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
+//		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
+//		style->set("font_size", libv::ui::FontSize{11});
+//		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+//	}
 
 	{
 		auto style = context().style("vm4pv.file_list.entry");
@@ -135,7 +135,7 @@ void QuickFilePicker::doAttach() {
 	{
 		search_field = std::make_shared<libv::ui::InputField>(*this, "input0");
 		search_field->style(context().style("vm4pv.info.input"));
-		search_field->text("model");
+		search_field->text(".game.vm4");
 		search_field->event_change(this, [this](const libv::ui::InputField::EventChange& event) {
 			(void) event;
 			this->update_filelist();
@@ -160,7 +160,7 @@ void QuickFilePicker::doAttach() {
 		label_help->text(
 				"[Up/Down] Navigate  [Enter] Open  [A-Z] Search\n"
 				"? Wildcard matching a single character\n"
-				"* Wildcard matching single level any file or directory name\n"
+				"* Wildcard matching any single level file or directory name\n"
 				"** Wildcard matching any recursive file or directory name"
 		);
 		auto& child = add(label_help);

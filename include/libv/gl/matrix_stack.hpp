@@ -3,7 +3,6 @@
 #pragma once
 
 // std
-#include <stack>
 #include <vector>
 // libv
 #include <libv/math/angle.hpp>
@@ -21,7 +20,7 @@ namespace gl {
 template <typename Mat>
 class MatrixStack {
 private:
-	std::stack<Mat, std::vector<Mat>> stack;
+	std::vector<Mat> stack;
 
 public:
 	using value_type = Mat;
@@ -29,15 +28,16 @@ public:
 
 public:
 	inline MatrixStack() {
-		stack.emplace(static_cast<T>(1.0));
+		stack.emplace_back();
+		identity();
 	}
 	inline MatrixStack<Mat>& push() {
-		stack.push(top());
+		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
+		stack.push_back(top());
 		return *this;
 	}
 	inline MatrixStack<Mat>& push(const Mat& mx) {
-		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
-		stack.push(mx);
+		stack.push_back(mx);
 		return *this;
 	}
 	[[nodiscard]] inline auto push_guard() noexcept {
@@ -49,17 +49,18 @@ public:
 		return Guard([this] { pop(); });
 	}
 	inline MatrixStack<Mat>& pop() {
+		// Asserting for 1 because because empty stack is not allowed
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 1);
-		stack.pop();
+		stack.pop_back();
 		return *this;
 	}
 	inline decltype(auto) top() const {
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
-		return stack.top();
+		return stack.back();
 	}
 	inline decltype(auto) top() {
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
-		return stack.top();
+		return stack.back();
 	}
 	inline MatrixStack& operator=(const Mat& mat) & {
 		top() = mat;
@@ -74,6 +75,12 @@ public:
 	inline decltype(auto) operator*(const MatrixStack<Mat>& ms) const {
 		return top() * ms.top();
 	}
+//	inline decltype(auto) operator*=(const Mat& mat) {
+//		return top() *= mat;
+//	}
+//	inline decltype(auto) operator*=(const MatrixStack<Mat>& ms) {
+//		return top() *= ms.top();
+//	}
 	inline operator Mat() const {
 		return top();
 	}

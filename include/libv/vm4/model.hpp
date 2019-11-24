@@ -21,6 +21,9 @@ namespace vm4 {
 
 // -------------------------------------------------------------------------------------------------
 
+using MeshID = uint32_t;
+using NodeID = uint32_t;
+
 struct Animation {
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
@@ -69,11 +72,11 @@ struct Mesh {
 struct Node {
 	//bounding box ?
 	std::string name;
-	uint32_t parentID;
+	NodeID parentID;
 	//bool visibility;
 	libv::mat4f transformation;
-	std::vector<uint32_t> meshIDs;
-	std::vector<uint32_t> childrenIDs;
+	std::vector<MeshID> meshIDs;
+	std::vector<NodeID> childrenIDs;
 
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(parentID);
@@ -86,7 +89,7 @@ struct Node {
 struct LOD {
 	double rangeNear; //threshold for increasing LOD
 	double rangeFar; //threshold for decreasing LOD
-	uint32_t rootNodeID;
+	NodeID rootNodeID;
 
 	LIBV_REFLECTION_ACCESS(rangeNear);
 	LIBV_REFLECTION_ACCESS(rangeFar);
@@ -139,13 +142,6 @@ struct Model {
 	LIBV_REFLECTION_ACCESS(indices);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
 };
-
-// -------------------------------------------------------------------------------------------------
-
-//struct ImportResult {
-//	bool error_code;
-//	Model model;
-//};
 
 // -------------------------------------------------------------------------------------------------
 

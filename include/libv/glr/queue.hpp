@@ -139,6 +139,7 @@ public:
 //	void push_program_guard(Program program) {}
 	void program(Program program_);
 	void render(Mesh mesh);
+	void render(Mesh mesh, uint32_t baseVertex, uint32_t baseIndex, uint32_t numIndices);
 
 private:
 	static inline void changeState(libv::gl::GL& gl, State target);

@@ -4,10 +4,11 @@
 #include <vm4_viewer/viewer_info_panel.hpp>
 // libv
 #include <libv/parse/color.hpp>
-//#include <libv/ui/component/label.hpp>
-//#include <libv/ui/context_ui.hpp>
+#include <libv/ui/component/label_image.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/vm4/model.hpp>
+//#include <libv/ui/component/label.hpp>
+//#include <libv/ui/context_ui.hpp>
 
 
 namespace app {
@@ -52,13 +53,21 @@ void ViewerInfoPanel::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.value");
-		style->set("align", libv::ui::AlignHorizontal::Right);
-		style->set("font", context().font("consola.ttf"));
+		style->set("align", libv::ui::AlignHorizontal::Left);
+//		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
-		style->set("anchor_target", libv::ui::Anchor{1.0f, 1.0f, 0.0f});
-		style->set("anchor_parent", libv::ui::Anchor{1.0f, 1.0f, 0.0f});
-		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+		style->set("size", libv::ui::parse_size_or_throw("100%, d"));
+	}
+
+	{
+		auto style = context().style("vm4pv.info.bar");
+		style->set("align", libv::ui::AlignHorizontal::Center);
+		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
+		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
+		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
+		style->set("font_size", libv::ui::FontSize{11});
+		style->set("size", libv::ui::parse_size_or_throw("1r D, D"));
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -70,19 +79,67 @@ void ViewerInfoPanel::doAttach() {
 //		add(label_version);
 //	}
 	{
-//		label_name.style(context().style("vm4_viewer.info.value"));
-		//	label_file.style(context().style("vm4_viewer.info.file"));
-		//	label_info.style(context().style("vm4_viewer.info.info"));
+		auto tmp = std::make_shared<libv::ui::LabelImage>(*this);
+		tmp->style(context().style("vm4pv.info.bar"));
+		tmp->text("General");
+		add(std::move(tmp));
 	}
+	{
+		label_name = std::make_shared<libv::ui::Label>(*this, "name");
+		label_name->style(context().style("vm4pv.info.value"));
+		add(label_name);
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+	{
+		auto tmp = std::make_shared<libv::ui::LabelImage>(*this);
+		tmp->style(context().style("vm4pv.info.bar"));
+		tmp->text("Count");
+		add(std::move(tmp));
+	}
+	{
+		label_info = std::make_shared<libv::ui::Label>(*this, "info");
+		label_info->style(context().style("vm4pv.info.value"));
+		add(label_info);
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+	{
+		auto tmp = std::make_shared<libv::ui::LabelImage>(*this);
+		tmp->style(context().style("vm4pv.info.bar"));
+		tmp->text("Material");
+		add(std::move(tmp));
+	}
+	//	label_file.style(context().style("vm4_viewer.info.file"));
+	//	label_info.style(context().style("vm4_viewer.info.info"));
 }
 
+//void ViewerInfoPanel::update(const std::string& path, const libv::vm4::Model& model) {
 void ViewerInfoPanel::update(const libv::vm4::Model& model) {
 //			panel_info.style(context().style("vm4_viewer.info"));
 
-//	label_name.text(fmt::format(
-//			"Name: {}",
-//			model.name
-//	));
+//	panel_general.title("General");
+//	panel_general.set(panel_general.property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
+//
+//	{
+//		auto tmp = std::make_shared<libv::ui::Label>(*this);
+//		tmp->style(context().style("vm4_viewer.info.key"));
+//		tmp->text("Name");
+//		panel_general(0, 0) = std::move(tmp);
+//	}
+//	{
+//		auto tmp = std::make_shared<libv::ui::Label>(*this);
+//		tmp->style(context().style("vm4_viewer.info.value"));
+//		tmp->text(model.name);
+//		panel_general(1, 0) = std::move(tmp);
+//	}
+
+	label_name->text(fmt::format(
+			"Name: {}",
+			model.name
+	));
 
 //	label_file.text(fmt::format(
 //			"File:      {}"
@@ -96,26 +153,28 @@ void ViewerInfoPanel::update(const libv::vm4::Model& model) {
 //			"Not Implemented Yet"
 //	));
 
-//	label_info.text(fmt::format(
-//			"Vertex count:       {:9}\n"
-//			"Index count:        {:9}\n"
-//			"LOD count:          {:9}\n"
-//			"Material count:     {:9}\n"
-//			"Node count:         {:9}\n"
-//			"Mesh count:         {:9}\n"
-//			"Animation count:    {:9}\n"
-//			"Anim.Channel count: {:9}",
-//			scene.model.vertices.size(),
-//			scene.model.indices.size(),
-//			scene.model.lods.size(),
-//			scene.model.materials.size(),
-//			scene.model.nodes.size(),
-//			scene.model.meshes.size(),
-//			scene.model.animations.size(),
-//			scene.model.animationChannels.size()
-//	));
-//
-//	int i = 0;
+	label_info->text(fmt::format(
+			"Vertex count:    {:9}\n"
+			"Index count:     {:9}\n"
+			"Triangle count:  {:9}\n"
+			"LOD count:       {:9}\n"
+			"Material count:  {:9}\n"
+			"Node count:      {:9}\n"
+			"Mesh count:      {:9}\n"
+			"Animation count: {:9}\n"
+			"Channel count:   {:9}",
+			model.vertices.size(),
+			model.indices.size(),
+			model.indices.size() / 3,
+			model.lods.size(),
+			model.materials.size(),
+			model.nodes.size(),
+			model.meshes.size(),
+			model.animations.size(),
+			model.animationChannels.size()
+	));
+
+	int i = 0;
 //	label_lod.clear();
 //	for (const auto& lod : scene.model.lods) {
 //		auto& label = label_lod.emplace_back();
@@ -136,32 +195,35 @@ void ViewerInfoPanel::update(const libv::vm4::Model& model) {
 //				scene.model.nodes[lod.rootNodeID].name
 //		));
 //	}
-//
-//	i = 0;
-//	label_material.clear();
-//	for (const auto& material : scene.model.materials) {
-//		auto& label = label_material.emplace_back();
-//
-//		label.style(context().style("vm4_viewer.info.material"));
-//
-//		std::ostringstream ss;
-//		ss << fmt::format(
-//				"ID: {}\n"
-//				"Name: {}\n"
-//				"Shader: {}\n",
-//				i++,
-//				material.name,
-//				material.shader
-//		);
-//		for (const auto& [key, data] : material.property) {
-//			std::visit([&key, &ss](const auto& value) {
-//				ss << fmt::format("\t{:20}: {}\n", key, value);
-//			}, data);
-//		}
-//
-//		label.text(std::move(ss).str());
-//	}
-//
+
+	i = 0;
+	for (const auto& lbl : label_material)
+		remove(lbl);
+	label_material.clear();
+
+	for (const auto& material : model.materials) {
+		const auto& tmp = label_material.emplace_back(std::make_shared<libv::ui::Label>(*this, "material"));
+
+		tmp->style(context().style("vm4pv.info.value"));
+
+		std::ostringstream ss;
+		ss << fmt::format(
+				"ID: {}\n"
+				"Name: {}\n"
+				"Shader: {}\n",
+				i++,
+				material.name,
+				material.shader
+		);
+		for (const auto& [key, data] : material.properties) {
+			std::visit([&key, &ss](const auto& value) {
+				ss << fmt::format("    {:16}: {}\n", key, value);
+			}, data);
+		}
+
+		tmp->text(std::move(ss).str());
+		add(tmp);
+	}
 
 	// =================================================================================================
 

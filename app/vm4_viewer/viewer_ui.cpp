@@ -2,14 +2,15 @@
 
 // hpp
 #include <vm4_viewer/viewer_ui.hpp>
-// ext
-//#include <fmt/format.h>
-//#include <boost/container/flat_set.hpp>
-//#include <range/v3/view/enumerate.hpp>
 // libv
+#include <libv/input/event.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/context_render.hpp>
+#include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_focus.hpp>
+#include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
@@ -25,7 +26,153 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-ViewerUI::ViewerUI(BaseComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
+ViewerUI::ViewerUI(BaseComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") {
+	scene.camera.translateZoom(-15.f);
+	scene.camera.rotateX(libv::to_rad(45.f));
+	scene.camera.rotateZ(libv::to_rad(45.f));
+}
+
+void ViewerUI::update(libv::ui::time_duration elapsed_time_t) {
+	if (not isFocused())
+		return;
+
+	const auto elapsed_time = static_cast<float>(elapsed_time_t.count());
+	const auto zoom = -scene.camera.zoom();
+
+	const auto keyboard_spin_speed = libv::to_rad(60.f); // 60°/s
+	const auto keyboard_move_speed = zoom * 0.5f + 1.0f;
+	const auto keyboard_zoom_scale = zoom * 0.2f + 0.1f;
+
+	if (context().state.key_pressed(libv::input::Key::W))
+		scene.camera.rotateX(keyboard_spin_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::S))
+		scene.camera.rotateX(-keyboard_spin_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::A))
+		scene.camera.rotateZ(keyboard_spin_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::D))
+		scene.camera.rotateZ(-keyboard_spin_speed * elapsed_time);
+
+	if (context().state.key_pressed(libv::input::Key::Q))
+		scene.camera.rotateY(keyboard_spin_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::E))
+		scene.camera.rotateY(-keyboard_spin_speed * elapsed_time);
+
+	if (context().state.key_pressed(libv::input::Key::Up))
+		scene.camera.translateY(-keyboard_move_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::Down))
+		scene.camera.translateY(keyboard_move_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::Right))
+		scene.camera.translateX(keyboard_move_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::Left))
+		scene.camera.translateX(-keyboard_move_speed * elapsed_time);
+
+	if (context().state.key_pressed(libv::input::Key::R))
+		scene.camera.translateZ(keyboard_move_speed * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::F))
+		scene.camera.translateZ(-keyboard_move_speed * elapsed_time);
+
+	if (context().state.key_pressed(libv::input::Key::T))
+		scene.camera.translateZoom(-keyboard_zoom_scale * elapsed_time);
+	if (context().state.key_pressed(libv::input::Key::G))
+		scene.camera.translateZoom(+keyboard_zoom_scale * elapsed_time);
+}
+
+void ViewerUI::load(const std::string& path) {
+	// libv::erase_stable(config.recent_projects, project);
+	// config.recent_projects.emplace_back(project);
+
+	// libv::erase_stable(config.recent_models, model);
+	// config.recent_models.emplace_back(model);
+
+	libv::Timer timer;
+
+	log_app.info("Loading  {}...", path);
+	auto file = libv::read_file_or_throw(path);
+	const auto time_load = timer.timef_us().count();
+
+	log_app.info("Parsing  {}...", path);
+	auto model_vm4 = libv::vm4::load_or_throw(file);
+	const auto time_parse = timer.timef_us().count();
+
+	log_app.info("Updating {}...", path);
+	info_panel->update(model_vm4);
+	const auto time_update = timer.timef_us().count();
+
+	log_app.info("Applying {}...", path);
+	scene.model.emplace(std::move(model_vm4));
+	const auto time_apply = timer.timef_us().count();
+
+	log_app.info("Processed {} in: Load {}us, Parse {}us, Update {}us, Apply {}us. Total: {}us.",
+			path, time_load, time_parse, time_update, time_apply,
+			time_load + time_parse + time_update, time_apply);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+bool ViewerUI::onKey(const libv::input::EventKey& event) {
+	// TODO P0: Proper mouse shield and focus travers (remove two line below)
+	if (event.key == libv::input::Key::Tab)
+		focus();
+
+	if (not isFocused())
+		return false;
+
+	log_app.info("ViewerUI Key {} {} {} {}", libv::input::to_string(event.action), libv::input::to_string(event.key), libv::to_value(event.mods), event.scancode);
+	return true;
+}
+
+void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
+	log_app.info("ViewerUI Focus {}", event.focus);
+}
+
+bool ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
+	// TODO P0: proper mouse shielding, and gain focus here too
+	//	focus();
+
+	log_app.info("ViewerUI Button {} {}", libv::input::to_string(event.action), libv::input::to_string(event.button));
+	return true;
+}
+
+bool ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
+	if (not isFocused())
+		return false;
+
+	log_app.info("ViewerUI Movement {} {} {} {}", event.enter, event.leave, event.mouse_movement, event.mouse_position);
+
+	const auto zoom = -scene.camera.zoom();
+	const auto mouse_spin_speed = libv::to_rad(60.f) * 0.0025f; // 60°/400px
+	const auto mouse_move_speed = zoom * 0.0006f + 0.05f;
+
+	if (context().state.mouse_pressed(libv::input::Mouse::Left) && context().state.mouse_pressed(libv::input::Mouse::Right)) {
+		scene.camera.translateZoom(-event.mouse_movement.y * mouse_move_speed);
+
+	} else if (context().state.mouse_pressed(libv::input::Mouse::Right)) {
+		scene.camera.translateX(-event.mouse_movement.x * mouse_move_speed);
+		scene.camera.translateY(event.mouse_movement.y * mouse_move_speed);
+
+	} else if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
+		scene.camera.rotateZ(event.mouse_movement.x * mouse_spin_speed);
+		scene.camera.rotateX(-event.mouse_movement.y * mouse_spin_speed);
+	}
+
+	return true;
+}
+
+bool ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
+	if (not isFocused())
+		return false;
+
+	log_app.info("ViewerUI Scroll {} {}", event.scroll_movement, event.scroll_position);
+
+	const auto zoom = -scene.camera.zoom();
+	const auto mouse_scroll_scale = zoom * 0.08f + 0.1f;
+
+	scene.camera.translateZoom(event.scroll_movement.y * mouse_scroll_scale);
+
+	return true;
+}
+
+// -------------------------------------------------------------------------------------------------
 
 void ViewerUI::doAttach() {
 	set(property.snapToEdge, libv::ui::SnapToEdge{false});
@@ -57,7 +204,19 @@ void ViewerUI::doAttach() {
 		auto style = context().style("vm4pv.info_panel");
 		style->set("anchor_target", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
 		style->set("anchor_parent", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
+//		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+		style->set("size", libv::ui::parse_size_or_throw("350px, d"));
+	}
+
+	{
+		auto style = context().style("vm4pv.file_list");
+		style->set("align", libv::ui::AlignHorizontal::Left);
+		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
+		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
+		style->set("font_size", libv::ui::FontSize{11});
 	}
 
 	{
@@ -106,231 +265,15 @@ void ViewerUI::doAttach() {
 		);
 		add(label_version);
 	}
+
+	watchFocus(true);
+	watchKey(true);
+	watchMouse(libv::ui::Flag::mask_watchMouse);
 }
 
-void ViewerUI::init() { }
-
-// TODO P5: libv.vm4: include BSO and BSR for each node(?) / LOD(?) / mesh(?) / model
-// TODO P5: libv.vm4: include AABB for each node(?) / LOD(?) / mesh(?) / model
-//
-//void ViewerUI::find_bounding_sphere() {
-//	// Find (BSO) Bounding sphere origin and (BSR) Bounding sphere radius
-//	const auto& node = scene.model.nodes[0];
-//
-//	auto referencePointW = libv::vec3f{};
-//	auto referenceDistanceWSQ = 0.f;
-//
-//	for (const auto& meshID : node.meshIDs) {
-//		const auto& mesh = scene.model.meshes[meshID];
-//		const auto indexBegin = mesh.baseIndex;
-//		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
-//
-//		for (size_t index = indexBegin; index < indexEnd; ++index) {
-//			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
-//			const auto vertexPositionM = scene.model.vertices[vertexID].position;
-//			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
-//
-//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).lengthSQ();
-//			if (vertexDistanceWSQ > referenceDistanceWSQ) {
-//				referencePointW
-//
-//			}
-//		}
-//	}
-//
-//	for (const auto& childID : node.childrenIDs)
-//		referencePoint = findFarestVertex(scene.model.nodes[childID], referencePoint);
-//
-////	for (const auto& node : scene.model.nodes)
-////	for (const auto& node : scene.model.nodes)
-//}
-
-void ViewerUI::update_model() {
-	//	libv::erase(config.recent_projects, project);
-	//	config.recent_projects.emplace_back(project);
-//	scene.model;
-}
-
-void ViewerUI::update_camera() {
-//	scene.camera;
-}
-
-void ViewerUI::update_ui() {
-//	this->in
-}
-
-void ViewerUI::load(const std::string& path) {
-	//	libv::erase(config.recent_projects, project);
-	//	config.recent_projects.emplace_back(project);
-
-	libv::Timer timer;
-
-	log_app.info("Loading  {}...", path);
-	auto file = libv::read_file_or_throw(path);
-	const auto time_load = timer.timef_us().count();
-
-	log_app.info("Parsing  {}...", path);
-	scene.model = libv::vm4::load_or_throw(file);
-	const auto time_parse = timer.timef_us().count();
-
-	log_app.info("Updating {}...", path);
-
-	info_panel->update(*scene.model);
-
-	log_app.info("Name  : {}", scene.model->name);
-	log_app.info("Vertex: {}", scene.model->vertices.size());
-	const auto time_update = timer.timef_us().count();
-
-	log_app.info("Processed {} in: Load {}us, Parse {}us, Update {}us", path, time_load, time_parse, time_update);
-}
-
-void ViewerUI::update_info() {
-//	//		panel_info.property.set(context().style("vm4_viewer.info"));
-//
-//	label_name.property.set(context().style("vm4_viewer.info.name"));
-//	label_name.text(fmt::format(
-//			"Name: {}",
-//			scene.model.name
-//	));
-//
-//	label_file.property.set(context().style("vm4_viewer.info.file"));
-//	label_file.text(fmt::format(
-//			"File:      {}"
-//			"Version:   {}"
-//			"Hash:      {}"
-//			"Last edit: {}",
-//			// TODO P5: Implement vm4 viewer addition file information display
-//			"Not Implemented Yet",
-//			"Not Implemented Yet",
-//			"Not Implemented Yet",
-//			"Not Implemented Yet"
-//	));
-//
-//	label_info.property.set(context().style("vm4_viewer.info.info"));
-//	label_info.text(fmt::format(
-//			"Vertex count:       {:9}\n"
-//			"Index count:        {:9}\n"
-//			"LOD count:          {:9}\n"
-//			"Material count:     {:9}\n"
-//			"Node count:         {:9}\n"
-//			"Mesh count:         {:9}\n"
-//			"Animation count:    {:9}\n"
-//			"Anim.Channel count: {:9}",
-//			scene.model.vertices.size(),
-//			scene.model.indices.size(),
-//			scene.model.lods.size(),
-//			scene.model.materials.size(),
-//			scene.model.nodes.size(),
-//			scene.model.meshes.size(),
-//			scene.model.animations.size(),
-//			scene.model.animationChannels.size()
-//	));
-//
-//	int i = 0;
-//	label_lod.clear();
-//	for (const auto& lod : scene.model.lods) {
-//		auto& label = label_lod.emplace_back();
-//
-//		label.property.set(context().style("vm4_viewer.info.lod"));
-//		label.text(fmt::format(
-//				"Level: {}\n"
-//				"Range far:   {:12.6f}\n"
-//				"Range near:  {:12.6f}\n"
-//				"Root nodeID: {}\n"
-//				"Root node:   {}",
-//				// TODO P5: Implement grid layout (? or grid text component; ? or expanding space text element)
-//				// TODO P5: Implement component link, clicking root node should jump to node info
-//				i++,
-//				lod.rangeFar,
-//				lod.rangeNear,
-//				lod.rootNodeID,
-//				scene.model.nodes[lod.rootNodeID].name
-//		));
-//	}
-//
-//	i = 0;
-//	label_material.clear();
-//	for (const auto& material : scene.model.materials) {
-//		auto& label = label_material.emplace_back();
-//
-//		label.property.set(context().style("vm4_viewer.info.material"));
-//
-//		std::ostringstream ss;
-//		ss << fmt::format(
-//				"ID: {}\n"
-//				"Name: {}\n"
-//				"Shader: {}\n",
-//				i++,
-//				material.name,
-//				material.shader
-//		);
-//		for (const auto& [key, data] : material.property) {
-//			std::visit([&key, &ss](const auto& value) {
-//				ss << fmt::format("\t{:20}: {}\n", key, value);
-//			}, data);
-//		}
-//
-//		label.text(std::move(ss).str());
-//	}
-//
-
-	// =================================================================================================
-
-	//		for (const auto& [level, lod] : scene.model.lods | ranges::view::enumerate) {
-	//			auto& label = label_lod.emplace_back();
-	//			label.text(fmt::format(
-	//					"Level: {}\n"
-	//					"Range far:   {:12.6f}\n"
-	//					"Range near:  {:12.6f}\n"
-	//					"Root nodeID: {}\n",
-	//					"Root node:   {}",
-	//					// TODO P5: Implement grid layout (? or grid text component)
-	//					// TODO P5: Implement component link, clicking root node should jump to node info
-	//					level,
-	//					lod.rangeFar,
-	//					lod.rangeNear,
-	//					lod.rootNodeID,
-	//					scene.model.nodes[lod.rootNodeID].name
-	//			));
-	//		}
-
-	//		for (const auto& material : scene.model.materials) {
-	//			material.name;
-	//			material.property.size();
-	//			material.shader;
-	//		}
-	//
-	//		for (const auto& node : scene.model.nodes) {
-	//			node.name;
-	//			node.parentID;
-	//			node.childrenIDs.size();
-	//			scene.model.nodes[node.parentID];
-	//			for (const auto& childID : node.childrenIDs) {
-	//				scene.model.nodes[childID];
-	//			}
-	//			node.meshIDs.size();
-	//			for (const auto& meshID : node.meshIDs) {
-	//				scene.model.meshes[meshID];
-	//			}
-	//			node.transformation;
-	//		}
-	//
-	//		for (const auto& mesh : scene.model.meshes) {
-	//			mesh.name;
-	//			mesh.baseIndex;
-	//			mesh.baseVertex;
-	//			mesh.materialID;
-	//			scene.model.materials[mesh.materialID];
-	//			mesh.numIndices;
-	//		}
-	//
-	//		for (const auto& animation : scene.model.animations) {
-	//			(void) animation;
-	//		}
-	//
-	//		for (const auto& animationChannel : scene.model.animationChannels) {
-	//			(void) animationChannel;
-	//		}
+void ViewerUI::doRender(libv::ui::ContextRender& ctx) {
+	update(context().state.time_delta());
+	scene.render(ctx.gl, size2());
 }
 
 // -------------------------------------------------------------------------------------------------

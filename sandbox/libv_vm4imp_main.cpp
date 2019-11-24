@@ -3,45 +3,51 @@
 // ext
 #include <fmt/printf.h>
 // libv
-#include <libv/log/log.hpp>
+#include <libv/algorithm/wildcard.hpp>
 #include <libv/serialization/archive/binary.hpp>
-#include <libv/serialization/archive/json.hpp>
 #include <libv/serialization/types/std_optional.hpp>
+#include <libv/utility/generic_path.hpp>
 // std
-#include <iostream>
-#include <sstream>
+#include <filesystem>
 #include <fstream>
 // pro
 #include <libv/vm4/model.hpp>
 #include <libv/vm4/serialization/model.hpp>
 #include <libv/vm4imp/importer.hpp>
+#include <libv/vm4imp/log.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
 
-int main(int, char **) {
+int main(int, char**) {
 	std::cout << libv::logger_stream;
 
-	const auto model = libv::vm4::import("res/model/fighter_01_eltanin.dae");
+	const auto path = "res/model";
+//	const auto filter_pattern = "**.dae";
+	const auto filter_pattern = "**.game.fbx";
 
-	{
-		std::ofstream ofs("model_test_file.json.vm4", std::ios::out | std::ios::binary);
-		libv::archive::JSONOutput oar(ofs);
-		oar << LIBV_NVP_NAMED("model", model);
-	}
-	{
-		std::ofstream ofs("model_test_file.vm4", std::ios::out | std::ios::binary);
-		libv::archive::BinaryOutput oar(ofs);
-		oar << LIBV_NVP_NAMED("model", *model);
-	}
+	for(const auto& p : std::filesystem::recursive_directory_iterator(path)) {
+		if (not p.is_regular_file())
+			continue;
 
-	for (const auto& material : model->materials) {
-		fmt::print("name: {}\n", material.name);
-		fmt::print("\t{:20}: {}\n", "shader", material.shader);
-		for (const auto& [property, value] : material.properties) {
-			std::visit([&](const auto& element) {
-				fmt::print("\t{:20}: {}\n", property, element);
-			}, value);
+		const auto gp = libv::generic_path(p);
+
+		if (not libv::match_wildcard_glob(gp, filter_pattern))
+			continue;
+
+		libv::vm4::log_vm4.info("Importing {}...", gp);
+
+		const auto model = libv::vm4::import(gp);
+		const auto output_path = std::filesystem::path(gp).replace_extension("vm4");
+
+		if (model) {
+			libv::vm4::log_vm4.info("Saving    {}...", libv::generic_path(output_path));
+
+			std::ofstream ofs(output_path, std::ios::out | std::ios::binary);
+			libv::archive::BinaryOutput oar(ofs);
+			oar << LIBV_NVP_NAMED("model", *model);
+		} else {
+			libv::vm4::log_vm4.error("Failed to import {}", gp);
 		}
 	}
 

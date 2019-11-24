@@ -62,6 +62,10 @@ public:
 	}
 
 public:
+	inline value_type determinant() const {
+		return glm::determinant(mx());
+	}
+
 	inline mat_t& inverse() {
 		glm::inverse(mx());
 		return *this;
@@ -83,13 +87,25 @@ public:
 		result = glm::rotate(mx(), angle.value, to_glm(axis));
 		return result;
 	}
+
+	inline mat_t& rotate(const T angle, const libv::vec3_t<T>& axis)
+			WISH_REQUIRES(C == 4 && R == 4) {
+		mx() = glm::rotate(mx(), angle, to_glm(axis));
+		return *this;
+	}
+	inline mat_t rotate_copy(const T angle, const libv::vec3_t<T>& axis) const
+			WISH_REQUIRES(C == 4 && R == 4) {
+		mat_t result;
+		result = glm::rotate(mx(), angle, to_glm(axis));
+		return result;
+	}
 	//rotate(const glm::quat& quat);
 
 	inline mat_t& scale(const libv::vec3_t<T>& v) {
 		mx() = glm::scale(mx(), to_glm(v));
 		return *this;
 	}
-	inline mat_t scale_copy(T angle, const libv::vec3_t<T>& v) const {
+	inline mat_t scale_copy(const libv::vec3_t<T>& v) const {
 		mat_t result;
 		result = glm::scale(mx(), to_glm(v));
 		return result;

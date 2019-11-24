@@ -138,6 +138,7 @@ private:
 
 public:
 	void render(libv::gl::GL& gl, Remote& remote_) noexcept;
+	void render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept;
 
 	inline RemoteMesh(libv::gl::Primitive primitive, libv::gl::BufferUsage usage) noexcept :
 		primitive(primitive),

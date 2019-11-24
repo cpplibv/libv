@@ -4,9 +4,9 @@
 #include <libv/glr/queue.hpp>
 // libv
 #include <libv/gl/gl.hpp>
-#include <libv/meta/similar.hpp>
 // std
 #include <optional>
+#include <type_traits>
 #include <variant>
 //// pro
 #include <libv/glr/framebuffer.hpp>
@@ -100,6 +100,22 @@ struct QueueTaskMesh {
 
 		program->use(gl, remote);
 		mesh->render(gl, remote);
+	}
+};
+
+struct QueueTaskMeshVII : QueueTaskMesh {
+	VertexIndex baseVertex;
+	VertexIndex baseIndex;
+	VertexIndex numIndices;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
+		program->use(gl, remote);
+		mesh->render(gl, remote, baseVertex, baseIndex, numIndices);
 	}
 };
 
@@ -241,7 +257,7 @@ struct ImplQueue {
 	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
 
 	std::vector<std::variant<
-			QueueTaskMesh, QueueTaskUniformBlock, QueueTaskTexture,
+			QueueTaskMesh, QueueTaskMeshVII, QueueTaskUniformBlock, QueueTaskTexture,
 			QueueTaskClear, QueueTaskClearColor, QueueTaskViewport,
 			QueueTaskFramebuffer, QueueTaskBlit
 	>> tasks;
@@ -540,12 +556,17 @@ void Queue::render(Mesh mesh) {
 	self->add<QueueTaskMesh>(self->sequenceNumber, state.state(), self->programStack.top(), AttorneyMeshRemote::remote(mesh));
 }
 
+void Queue::render(Mesh mesh, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) {
+	self->programStack.top()->uniformStream.endBatch();
+	self->add<QueueTaskMeshVII>(self->sequenceNumber, state.state(), self->programStack.top(), AttorneyMeshRemote::remote(mesh), baseVertex, baseIndex, numIndices);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Queue::execute(libv::gl::GL& gl, Remote& remote) {
 	for (const auto& task_variant : self->tasks) {
 		auto execution = [&](const auto& task) {
-			if constexpr (libv::similar_v<QueueTaskMesh, decltype(task)>)
+			if constexpr (std::is_base_of_v<QueueTaskMesh, std::remove_cvref_t<decltype(task)>>)
 				task.execute(gl, remote, self->currentState);
 			else
 				task.execute(gl, remote);

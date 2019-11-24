@@ -26,6 +26,7 @@ struct clock {
 	}
 };
 
+using time_duration_f = std::chrono::duration<float, clock::period>;
 using time_duration = clock::duration;
 using time_point = clock::time_point;
 
