@@ -36,7 +36,7 @@ struct Vertex {
 	libv::vec3f normal;
 	libv::vec3f tangent;
 	libv::vec3f bitangent;
-	libv::vec2f texCoord0;
+	libv::vec2f texture0;
 	libv::vec4i boneID;
 	libv::vec4f boneWieght;
 
@@ -44,7 +44,7 @@ struct Vertex {
 	LIBV_REFLECTION_ACCESS(normal);
 	LIBV_REFLECTION_ACCESS(tangent);
 	LIBV_REFLECTION_ACCESS(bitangent);
-	LIBV_REFLECTION_ACCESS(texCoord0);
+	LIBV_REFLECTION_ACCESS(texture0);
 	LIBV_REFLECTION_ACCESS(boneID);
 	LIBV_REFLECTION_ACCESS(boneWieght);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
