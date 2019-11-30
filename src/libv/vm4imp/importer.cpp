@@ -233,89 +233,19 @@ public:
 			for (uint32_t j = 0; j < mesh->mNumFaces; j++) {
 				const aiFace& face = mesh->mFaces[j];
 				if (face.mNumIndices != 3) {
-					log_vm4.warn("Illegal number of vertex {} in face {} of a mesh: {}. Skipping face", face.mNumIndices, j, mesh->mName.C_Str());
+					log_vm4.warn("Illegal number of vertex {} in face {} of a mesh: {}. Filling indices with 0", face.mNumIndices, j, mesh->mName.C_Str());
+					// Filling in indices to not leave a hole in the indices container
+					for (size_t k = 0; k < face.mNumIndices; ++k) {
+						model.indices.push_back(0);
+					}
 					continue;
+				} else {
+					model.indices.push_back(face.mIndices[0]);
+					model.indices.push_back(face.mIndices[1]);
+					model.indices.push_back(face.mIndices[2]);
 				}
-				model.indices.push_back(face.mIndices[0]);
-				model.indices.push_back(face.mIndices[1]);
-				model.indices.push_back(face.mIndices[2]);
 			}
 		}
-	}
-
-	// -------------------------------------------------------------------------------------------------
-
-	void calculateAABB() {
-		// TODO P5: libv.vm4: include AABB for each node(?) / LOD(?) / mesh(?) / model
-
-		//void get_aabb_for_node(const struct aiNode* nd,
-		//		aiVector3D* min,
-		//		aiVector3D* max,
-		//		aiMatrix4x4* trafo) {
-		//	aiMatrix4x4 prev;
-		//	uint32_t n = 0, t;
-		//	prev = *trafo;
-		//	aiMultiplyMatrix4(trafo, &nd->mTransformation);
-		//	for (; n < nd->mNumMeshes; ++n) {
-		//		const aiMesh* mesh = scene->mMeshes[nd->mMeshes[n]];
-		//		for (t = 0; t < mesh->mNumVertices; ++t) {
-		//			aiVector3D tmp = mesh->mVertices[t];
-		//			aiTransformVecByMatrix4(&tmp, trafo);
-		//			min->x = aisgl_min(min->x, tmp.x);
-		//			min->y = aisgl_min(min->y, tmp.y);
-		//			min->z = aisgl_min(min->z, tmp.z);
-		//			max->x = aisgl_max(max->x, tmp.x);
-		//			max->y = aisgl_max(max->y, tmp.y);
-		//			max->z = aisgl_max(max->z, tmp.z);
-		//		}
-		//	}
-		//	for (n = 0; n < nd->mNumChildren; ++n) {
-		//		get_aabb_for_node(nd->mChildren[n], min, max, trafo);
-		//	}
-		//	*trafo = prev;
-		//}
-		//
-		//void get_aabb(aiVector3D* min, aiVector3D* max) {
-		//	aiMatrix4x4 trafo;
-		//	aiIdentityMatrix4(&trafo);
-		//	min->x = min->y = min->z = std::numeric_limits<float4>::max();
-		//	max->x = max->y = max->z = std::numeric_limits<float4>::min();
-		//	get_aabb_for_node(scene->mRootNode, min, max, &trafo);
-		//}
-	}
-
-	void calculateBoundingSphere() {
-		// TODO P5: libv.vm4: include BSO and BSR for each node(?) / LOD(?) / mesh(?) / model
-
-		//	// Find (BSO) Bounding sphere origin and (BSR) Bounding sphere radius
-		//	const auto& node = scene.model.nodes[0];
-		//
-		//	auto referencePointW = libv::vec3f{};
-		//	auto referenceDistanceWSQ = 0.f;
-		//
-		//	for (const auto& meshID : node.meshIDs) {
-		//		const auto& mesh = scene.model.meshes[meshID];
-		//		const auto indexBegin = mesh.baseIndex;
-		//		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
-		//
-		//		for (size_t index = indexBegin; index < indexEnd; ++index) {
-		//			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
-		//			const auto vertexPositionM = scene.model.vertices[vertexID].position;
-		//			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
-		//
-		//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).lengthSQ();
-		//			if (vertexDistanceWSQ > referenceDistanceWSQ) {
-		//				referencePointW
-		//
-		//			}
-		//		}
-		//	}
-		//
-		//	for (const auto& childID : node.childrenIDs)
-		//		referencePoint = findFarestVertex(scene.model.nodes[childID], referencePoint);
-		//
-		////	for (const auto& node : scene.model.nodes)
-		////	for (const auto& node : scene.model.nodes)
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -351,6 +281,78 @@ public:
 
 			log_vm4.warn("Fixing winding order for Node {} {}", nodeID, model.nodes[nodeID].name);
 		}
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+	void calculateAABBnode(NodeID nodeID, libv::mat4f parentMat) {
+		const auto globalMat = parentMat * model.nodes[nodeID].transformation;
+
+		for (const auto& meshID : model.nodes[nodeID].meshIDs) {
+			for (size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
+				const auto vertexID = model.meshes[meshID].baseVertex + model.indices[model.meshes[meshID].baseIndex + i];
+				const auto vertexPositionW = libv::xyz(globalMat * libv::vec4f(model.vertices[vertexID].position, 1));
+
+				model.AABB_min = libv::min(model.AABB_min, vertexPositionW);
+				model.AABB_max = libv::max(model.AABB_max, vertexPositionW);
+			}
+		}
+
+		for (const auto& childID : model.nodes[nodeID].childrenIDs)
+			calculateAABBnode(childID, globalMat);
+	}
+
+	void calculateAABB() {
+		// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
+
+		if (model.vertices.empty())
+			return;
+
+		const auto fmax = std::numeric_limits<float>::max();
+		const auto fmin = std::numeric_limits<float>::lowest();
+
+		model.AABB_max = libv::vec3f(fmin, fmin, fmin);
+		model.AABB_min = libv::vec3f(fmax, fmax, fmax);
+
+		calculateAABBnode(0, libv::mat4f::identity());
+	}
+
+	void calculateBoundingSphere() {
+		// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
+		// TODO P5: libv.vm4: BSO and BSR for model
+
+		if (model.vertices.empty())
+			return;
+
+		//	// Find (BSO) Bounding sphere origin and (BSR) Bounding sphere radius
+		//	const auto& node = scene.model.nodes[0];
+		//
+		//	auto referencePointW = libv::vec3f{};
+		//	auto referenceDistanceWSQ = 0.f;
+		//
+		//	for (const auto& meshID : node.meshIDs) {
+		//		const auto& mesh = scene.model.meshes[meshID];
+		//		const auto indexBegin = mesh.baseIndex;
+		//		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
+		//
+		//		for (size_t index = indexBegin; index < indexEnd; ++index) {
+		//			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
+		//			const auto vertexPositionM = scene.model.vertices[vertexID].position;
+		//			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
+		//
+		//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).lengthSQ();
+		//			if (vertexDistanceWSQ > referenceDistanceWSQ) {
+		//				referencePointW
+		//
+		//			}
+		//		}
+		//	}
+		//
+		//	for (const auto& childID : node.childrenIDs)
+		//		referencePoint = findFarestVertex(scene.model.nodes[childID], referencePoint);
+		//
+		////	for (const auto& node : scene.model.nodes)
+		////	for (const auto& node : scene.model.nodes)
 	}
 };
 
@@ -452,9 +454,6 @@ std::optional<Model> import(const std::string& filePath) {
 	ctx.importLod();
 	ctx.importGeometry();
 
-	ctx.calculateAABB();
-	ctx.calculateBoundingSphere();
-
 	// --- Post-process ---
 	// TODO P4: libv.vm4: Prompt / importer setting for unit scale factor
 	// TODO P4: libv.vm4: Handle multiple LOD case for unit scale factor
@@ -462,6 +461,9 @@ std::optional<Model> import(const std::string& filePath) {
 	// TODO P4: libv.vm4: Prompt / importer setting for winding order fix
 	ctx.fixupFlippedWindingOrder();
 	// TODO P4: libv.vm4: Prompt / importer setting for aiProcess_OptimizeGraph
+
+	ctx.calculateAABB();
+	ctx.calculateBoundingSphere();
 
 //	fmt::print("=== Scan assimp =====================================================================\n");
 //	scanNode(0, scene->mRootNode);
