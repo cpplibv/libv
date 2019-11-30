@@ -233,7 +233,7 @@ public:
 			for (uint32_t j = 0; j < mesh->mNumFaces; j++) {
 				const aiFace& face = mesh->mFaces[j];
 				if (face.mNumIndices != 3) {
-					log_vm4.warn("Illegal number of vertex {} in face {} of a mesh: {}. Filling indices with 0", face.mNumIndices, j, mesh->mName.C_Str());
+					log_vm4.warn("Illegal number of vertex {} in face {} of a mesh: {}. Filling face indices with 0", face.mNumIndices, j, mesh->mName.C_Str());
 					// Filling in indices to not leave a hole in the indices container
 					for (size_t k = 0; k < face.mNumIndices; ++k) {
 						model.indices.push_back(0);
@@ -285,7 +285,8 @@ public:
 
 	// -------------------------------------------------------------------------------------------------
 
-	void calculateAABBnode(NodeID nodeID, libv::mat4f parentMat) {
+	template <typename F>
+	void foreachVertex(NodeID nodeID, libv::mat4f parentMat, const F& func) {
 		const auto globalMat = parentMat * model.nodes[nodeID].transformation;
 
 		for (const auto& meshID : model.nodes[nodeID].meshIDs) {
@@ -293,18 +294,16 @@ public:
 				const auto vertexID = model.meshes[meshID].baseVertex + model.indices[model.meshes[meshID].baseIndex + i];
 				const auto vertexPositionW = libv::xyz(globalMat * libv::vec4f(model.vertices[vertexID].position, 1));
 
-				model.AABB_min = libv::min(model.AABB_min, vertexPositionW);
-				model.AABB_max = libv::max(model.AABB_max, vertexPositionW);
+				func(vertexPositionW);
 			}
 		}
 
 		for (const auto& childID : model.nodes[nodeID].childrenIDs)
-			calculateAABBnode(childID, globalMat);
+			foreachVertex(childID, globalMat, func);
 	}
 
 	void calculateAABB() {
 		// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
-
 		if (model.vertices.empty())
 			return;
 
@@ -314,45 +313,31 @@ public:
 		model.AABB_max = libv::vec3f(fmin, fmin, fmin);
 		model.AABB_min = libv::vec3f(fmax, fmax, fmax);
 
-		calculateAABBnode(0, libv::mat4f::identity());
+		foreachVertex(0, libv::mat4f::identity(), [this](libv::vec3f positionW) {
+			model.AABB_min = libv::min(model.AABB_min, positionW);
+			model.AABB_max = libv::max(model.AABB_max, positionW);
+		});
 	}
 
 	void calculateBoundingSphere() {
 		// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
-		// TODO P5: libv.vm4: BSO and BSR for model
 
 		if (model.vertices.empty())
 			return;
 
-		//	// Find (BSO) Bounding sphere origin and (BSR) Bounding sphere radius
-		//	const auto& node = scene.model.nodes[0];
-		//
-		//	auto referencePointW = libv::vec3f{};
-		//	auto referenceDistanceWSQ = 0.f;
-		//
-		//	for (const auto& meshID : node.meshIDs) {
-		//		const auto& mesh = scene.model.meshes[meshID];
-		//		const auto indexBegin = mesh.baseIndex;
-		//		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
-		//
-		//		for (size_t index = indexBegin; index < indexEnd; ++index) {
-		//			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
-		//			const auto vertexPositionM = scene.model.vertices[vertexID].position;
-		//			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
-		//
-		//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).lengthSQ();
-		//			if (vertexDistanceWSQ > referenceDistanceWSQ) {
-		//				referencePointW
-		//
-		//			}
-		//		}
-		//	}
-		//
-		//	for (const auto& childID : node.childrenIDs)
-		//		referencePoint = findFarestVertex(scene.model.nodes[childID], referencePoint);
-		//
-		////	for (const auto& node : scene.model.nodes)
-		////	for (const auto& node : scene.model.nodes)
+		// NOTE: This implementation is a very rough approximation, improve it on-demand
+
+		float num_real_vertex = 0.f;
+		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f) {
+			num_real_vertex += 1.0f;
+		});
+		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
+			model.BS_origin += positionW / num_real_vertex;
+		});
+		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
+			const auto dist = (model.BS_origin - positionW).length();
+			model.BS_radius = std::max(model.BS_radius, dist);
+		});
 	}
 };
 
@@ -384,7 +369,6 @@ public:
 //	DefaultLogger::get()->info("this is my info-call");
 //	// Kill it after the work is done
 //	DefaultLogger::kill();
-
 
 
 void scanNode(uint32_t depth, const aiNode* aiNode) {

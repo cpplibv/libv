@@ -105,6 +105,8 @@ struct Model {
 
 	libv::vec3f AABB_min;
 	libv::vec3f AABB_max;
+	libv::vec3f BS_origin; // Bounding Sphere Origin
+	float BS_radius; // Bounding Sphere Radius
 
 	std::vector<Animation> animations;
 	std::vector<AnimationChannel> animationChannels;
@@ -128,8 +130,11 @@ struct Model {
 	LIBV_REFLECTION_ACCESS(format);
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(version);
+
 	LIBV_REFLECTION_ACCESS(AABB_min);
 	LIBV_REFLECTION_ACCESS(AABB_max);
+	LIBV_REFLECTION_ACCESS(BS_origin);
+	LIBV_REFLECTION_ACCESS(BS_radius);
 
 	LIBV_REFLECTION_ACCESS(animations);
 	LIBV_REFLECTION_ACCESS(animationChannels);
