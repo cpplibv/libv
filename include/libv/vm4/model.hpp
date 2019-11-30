@@ -95,7 +95,10 @@ struct LOD {
 };
 
 struct Model {
+	int32_t format_version = 20191130;
+
 	std::string name;
+	int32_t version = 0;
 
 	std::vector<Animation> animations;
 	std::vector<AnimationChannel> animationChannels;
@@ -116,7 +119,9 @@ struct Model {
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
+	LIBV_REFLECTION_ACCESS(format_version);
 	LIBV_REFLECTION_ACCESS(name);
+	LIBV_REFLECTION_ACCESS(version);
 	LIBV_REFLECTION_ACCESS(animations);
 	LIBV_REFLECTION_ACCESS(animationChannels);
 	LIBV_REFLECTION_ACCESS(materials);
