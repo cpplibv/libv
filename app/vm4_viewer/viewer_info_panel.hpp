@@ -66,6 +66,7 @@ private:
 
 	std::shared_ptr<libv::ui::Label> label_name;
 	std::shared_ptr<libv::ui::Label> label_info;
+	std::shared_ptr<libv::ui::Label> label_bounds;
 	std::vector<std::shared_ptr<libv::ui::Label>> label_material;
 
 //	libv::ui::PanelObserver panel_info;

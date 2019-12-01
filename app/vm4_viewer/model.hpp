@@ -25,8 +25,8 @@ private:
 	libv::glr::Mesh mesh;
 	ShaderModel shader;
 
-private:
-	libv::vm4::Model model;
+public:
+	libv::vm4::Model vm4;
 
 //	uint32_t rootNodeID;
 

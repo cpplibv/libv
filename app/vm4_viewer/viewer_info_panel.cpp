@@ -95,6 +95,20 @@ void ViewerInfoPanel::doAttach() {
 	{
 		auto tmp = std::make_shared<libv::ui::LabelImage>(*this);
 		tmp->style(context().style("vm4pv.info.bar"));
+		tmp->text("Bounds");
+		add(std::move(tmp));
+	}
+	{
+		label_bounds = std::make_shared<libv::ui::Label>(*this, "bounds");
+		label_bounds->style(context().style("vm4pv.info.value"));
+		add(label_bounds);
+	}
+
+	// -------------------------------------------------------------------------------------------------
+
+	{
+		auto tmp = std::make_shared<libv::ui::LabelImage>(*this);
+		tmp->style(context().style("vm4pv.info.bar"));
 		tmp->text("Count");
 		add(std::move(tmp));
 	}
@@ -152,6 +166,17 @@ void ViewerInfoPanel::update(const libv::vm4::Model& model) {
 //			"Not Implemented Yet",
 //			"Not Implemented Yet"
 //	));
+
+	label_bounds->text(fmt::format(
+			"AABB_max:  {}\n"
+			"AABB_min:  {}\n"
+			"BS_origin: {}\n"
+			"BS_radius: {}",
+			model.AABB_max,
+			model.AABB_min,
+			model.BS_origin,
+			model.BS_radius
+	));
 
 	label_info->text(fmt::format(
 			"Vertex count:    {:9}\n"
