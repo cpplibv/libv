@@ -4,6 +4,7 @@
 #include <vm4_viewer/scene.hpp>
 // libv
 #include <libv/glr/procedural/cube.hpp>
+#include <libv/glr/procedural/grid.hpp>
 #include <libv/glr/procedural/ignore.hpp>
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
@@ -20,7 +21,7 @@ namespace app {
 Scene::Scene() :
 	debug_cube(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
 	debug_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	debug_grid(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	debug_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw),
 	debug_sphere(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw) {
 
 	debug_shader.vertex(R"(
@@ -58,6 +59,12 @@ Scene::Scene() :
 		auto pos = debug_gizmo.attribute(attribute_position);
 		auto index = debug_gizmo.index();
 		libv::glr::generateCube(pos, libv::glr::ignore, libv::glr::ignore, index);
+	}
+
+	{
+		auto pos = debug_grid.attribute(attribute_position);
+		auto index = debug_grid.index();
+		libv::glr::generateGrid(25, 25, pos, libv::glr::ignore, index);
 	}
 
 	{
@@ -130,20 +137,15 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		gl.render(debug_cube);
 	}
 
-//	if (model && display_grid) {
-//		const auto guard_m = gl.model.push_guard();
-//		const auto guard_s = gl.state.push_guard();
-//
-//		gl.state.disableCullFace();
-//		gl.state.polygonModeLine();
-//		gl.model.translate(model->vm4.BS_origin);
-//		gl.model.scale(model->vm4.BS_radius);
-//
-//		gl.program(debug_shader);
-//		gl.uniform(debug_uniform_MVPmat, gl.mvp());
-//		gl.uniform(debug_uniform_color, libv::vec4f(0.8f, 0.8f, 0.8f, 0.8f));
-////		gl.render(debug_grid);
-//	}
+	if (model && display_grid) {
+		const auto guard_m = gl.model.push_guard();
+		const auto guard_s = gl.state.push_guard();
+
+		gl.program(debug_shader);
+		gl.uniform(debug_uniform_MVPmat, gl.mvp());
+		gl.uniform(debug_uniform_color, libv::vec4f(0.8f, 0.8f, 0.8f, 0.8f));
+		gl.render(debug_grid);
+	}
 
 	if (model && display_BS) {
 		const auto guard_m = gl.model.push_guard();

@@ -333,12 +333,12 @@ app.vm4_viewer: Visualize BS
 app.vm4_viewer: Reset camera on model loading
 app.vm4_viewer: Camera center and focus model (without altering the rotation)
 app.vm4_viewer: Reset camera / Focus camera
+app.vm4_viewer: Visualize grid-XY
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-app.vm4_viewer: Add config option to disable reset camera on model loading
 
 libv.ui: read nana 3rd party property tree lib API
 libv.ui: non-shared_ptr based panels, aka static_container (?)
@@ -346,6 +346,11 @@ app.vm4_viewer: display statistics
 app.vm4_viewer: show model grey lighted (phong)
 
 app.vm4_viewer: import model
+app.vm4_viewer: Add config option to disable reset camera on model loading
+app.vm4_viewer: Add config options for grid-XY
+app.vm4_viewer: Add project level size comparison functionality
+app.vm4_viewer: Thumbnails
+app.vm4_viewer: Better focus camera based on the actual view angles and model ineast of the BSO
 
 libv.ui: static_component system
 libv.ui: list
