@@ -326,20 +326,19 @@ libv.vm4: fix vm4 root node issue
 app.vm4_viewer: show model fragment input values
 app.vm4_viewer: Implement camera
 app.vm4_viewer: Implement camera controls
+libv.vm4: Import calculate AABB
+libv.vm4: Import calculate BS
+app.vm4_viewer: Visualize AABB
+app.vm4_viewer: Visualize BS
+app.vm4_viewer: Reset camera on model loading
+app.vm4_viewer: Camera center and focus model (without altering the rotation)
+app.vm4_viewer: Reset camera / Focus camera
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.vm4: Import calculate AABB
-libv.vm4: Import calculate BS
-
-app.vm4_viewer: Visualize node AABB
-app.vm4_viewer: Visualize node BS
-app.vm4_viewer: Camera center and focus model
-
-app.vm4_viewer: Fit camera on loading to properly include model (config setting)
-app.vm4_viewer: Reset camera
+app.vm4_viewer: Add config option to disable reset camera on model loading
 
 libv.ui: read nana 3rd party property tree lib API
 libv.ui: non-shared_ptr based panels, aka static_container (?)

@@ -14,14 +14,15 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Camera {
+private:
 	static constexpr libv::vec3f up = {0, 0, 1};
 
 	float fov = libv::deg_to_rad(90.0f);
 	float near = 0.1f;
 	float far = 1000.f;
 
-	libv::vec3f position{0, 0, 0};
-	libv::vec3f rotation{0, 0, 0}; // RAD
+	libv::vec3f position_{0, 0, 0};
+	libv::vec3f rotation_{0, 0, 0}; // RAD
 	float zoom_ = 0;
 
 public:
@@ -34,11 +35,11 @@ public:
 
 		mat.translate(libv::vec3f(0, 0, zoom_));
 		mat.rotate(-libv::deg_to_rad(90.f), libv::vec3f(1, 0, 0));
-		mat.rotate(rotation.y, libv::vec3f(0, 1, 0));
-		mat.rotate(rotation.x, libv::vec3f(1, 0, 0));
-		mat.rotate(rotation.z, libv::vec3f(0, 0, 1));
+		mat.rotate(rotation_.y, libv::vec3f(0, 1, 0));
+		mat.rotate(rotation_.x, libv::vec3f(1, 0, 0));
+		mat.rotate(rotation_.z, libv::vec3f(0, 0, 1));
 
-		mat.translate(-position);
+		mat.translate(-position_);
 		return mat;
 	}
 
@@ -48,8 +49,29 @@ public:
 	}
 
 public:
+	libv::vec3f position() {
+		return position_;
+	}
+	void position(libv::vec3f value) {
+		position_ = value;
+	}
+
+public:
+	libv::vec3f rotation() {
+		return rotation_;
+	}
+	void rotation(libv::vec3f value) {
+		rotation_ = value;
+	}
+
+public:
 	/// zoom
-	void zoom(float amount);
+	void zoom(float amount) {
+		zoom_ += amount;
+	}
+	void set_zoom(float value) {
+		zoom_ = value;
+	}
 
 	float zoom() const {
 		return zoom_;
@@ -65,27 +87,27 @@ public:
 public:
 	void translateX(float x) {
 		// Strafing
-		position.y += x * std::cos(rotation.z + libv::deg_to_rad(90.f));
-		position.x += x * std::sin(rotation.z + libv::deg_to_rad(90.f));
+		position_.y += x * std::cos(rotation_.z + libv::deg_to_rad(90.f));
+		position_.x += x * std::sin(rotation_.z + libv::deg_to_rad(90.f));
 	}
 	void translateY(float x) {
-		position.y -= x * std::cos(rotation.z);
-		position.x -= x * std::sin(rotation.z);
+		position_.y -= x * std::cos(rotation_.z);
+		position_.x -= x * std::sin(rotation_.z);
 	}
 	void translateZ(float x) {
-		position.z += x;
+		position_.z += x;
 	}
 	void translateZoom(float x) {
 		zoom_ += x;
 	}
 	void rotateX(float x) {
-		rotation.x += x;
+		rotation_.x += x;
 	}
 	void rotateY(float x) {
-		rotation.y += x;
+		rotation_.y += x;
 	}
 	void rotateZ(float x) {
-		rotation.z += x;
+		rotation_.z += x;
 	}
 
 //public:
@@ -103,8 +125,8 @@ public:
 //		const auto diff = libv::xy(position) - libv::xy(pivot);
 //		const float angle = std::atan2(diff.y, diff.x) + amount;
 //		const float dist = diff.length();
-//		position.x = pivot.x + std::cos(angle) * dist;
-//		position.y = pivot.y + std::sin(angle) * dist;
+//		position_.x = pivot.x + std::cos(angle) * dist;
+//		position_.y = pivot.y + std::sin(angle) * dist;
 //	}
 //	/// rotate left-right around the pivot
 //	/// \param amount - tilt angle in radian
@@ -112,8 +134,8 @@ public:
 //		const auto diff = libv::xy(position) - libv::xy(pivot);
 //		const float angle = std::atan2(diff.y, diff.x) + amount;
 //		const float dist = diff.length();
-//		position.x = pivot.x + std::cos(angle) * dist;
-//		position.y = pivot.y + std::sin(angle) * dist;
+//		position_.x = pivot.x + std::cos(angle) * dist;
+//		position_.y = pivot.y + std::sin(angle) * dist;
 //	}
 //
 //public:
@@ -131,7 +153,7 @@ public:
 //	/// \param amount - pedestal movement in units
 //	void pedestal(float amount) {
 //		pivot.z += amount;
-//		position.z += amount;
+//		position_.z += amount;
 //	}
 };
 

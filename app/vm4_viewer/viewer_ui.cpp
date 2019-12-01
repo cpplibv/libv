@@ -66,9 +66,9 @@ void ViewerUI::update(libv::ui::time_duration elapsed_time_t) {
 	if (context().state.key_pressed(libv::input::Key::Left))
 		scene.camera.translateX(-keyboard_move_speed * elapsed_time);
 
-	if (context().state.key_pressed(libv::input::Key::R))
+	if (context().state.key_pressed(libv::input::Key::Y))
 		scene.camera.translateZ(keyboard_move_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::F))
+	if (context().state.key_pressed(libv::input::Key::H))
 		scene.camera.translateZ(-keyboard_move_speed * elapsed_time);
 
 	if (context().state.key_pressed(libv::input::Key::T))
@@ -100,6 +100,7 @@ void ViewerUI::load(const std::string& path) {
 
 	log_app.info("Applying {}...", path);
 	scene.model.emplace(std::move(model_vm4));
+	scene.reset_camera();
 	const auto time_apply = timer.timef_us().count();
 
 	log_app.info("Processed {} in: Load {}us, Parse {}us, Update {}us, Apply {}us. Total: {}us.",
@@ -116,6 +117,11 @@ bool ViewerUI::onKey(const libv::input::EventKey& event) {
 
 	if (not isFocused())
 		return false;
+
+	if (event.key == libv::input::Key::F && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none)
+		scene.reset_camera();
+	else if (event.key == libv::input::Key::F)
+		scene.focus_camera();
 
 	log_app.info("ViewerUI Key {} {} {} {}", libv::input::to_string(event.action), libv::input::to_string(event.key), libv::to_value(event.mods), event.scancode);
 	return true;
@@ -259,9 +265,11 @@ void ViewerUI::doAttach() {
 		label_version->style(context().style("vm4pv.label_help"));
 		label_version->text(
 				"Strafe camera - WASD\n"
-				"Lift camera - RF\n"
+				"Lift camera - YH\n"
 				"Roll camera - QE\n"
-				"Zoom camera - TG"
+				"Zoom camera - TG\n"
+				"Focus camera - F\n"
+				"Reset camera - Shift+F"
 		);
 		add(label_version);
 	}
