@@ -339,11 +339,13 @@ app.vm4_viewer: Visualize grid-XY
 --- STACK ------------------------------------------------------------------------------------------
 
 
+app.vm4_viewer: single directional light
+app.vm4_viewer: show model grey lighted (phong)
+
 
 libv.ui: read nana 3rd party property tree lib API
 libv.ui: non-shared_ptr based panels, aka static_container (?)
 app.vm4_viewer: display statistics
-app.vm4_viewer: show model grey lighted (phong)
 
 app.vm4_viewer: import model
 app.vm4_viewer: Add config option to disable reset camera on model loading

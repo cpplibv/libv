@@ -303,9 +303,10 @@ public:
 	}
 
 	void calculateAABB() {
-		// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
 		if (model.vertices.empty())
 			return;
+
+		// TODO P5: libv.vm4: AABB for each node(?) / mesh(?) | (LOD make no sense)
 
 		const auto fmax = std::numeric_limits<float>::max();
 		const auto fmin = std::numeric_limits<float>::lowest();
@@ -321,19 +322,10 @@ public:
 
 	void calculateBoundingSphere() {
 		// TODO P5: libv.vm4: BSO and BSR for each node(?) / mesh(?) | (LOD make no sense)
+		// NOTE: This implementation is a very rough approximation based on AABB, improve it on-demand
 
-		if (model.vertices.empty())
-			return;
+		model.BS_origin = (model.AABB_min + model.AABB_max) * 0.5f;
 
-		// NOTE: This implementation is a very rough approximation, improve it on-demand
-
-		float num_real_vertex = 0.f;
-		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f) {
-			num_real_vertex += 1.0f;
-		});
-		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
-			model.BS_origin += positionW / num_real_vertex;
-		});
 		foreachVertex(0, libv::mat4f::identity(), [&](libv::vec3f positionW) {
 			const auto dist = (model.BS_origin - positionW).length();
 			model.BS_radius = std::max(model.BS_radius, dist);
