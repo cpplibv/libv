@@ -265,7 +265,7 @@ public:
 				model.indices[fixedStart + i + 2] = model.indices[mesh.baseIndex + i + 0];
 			}
 
-			mesh.name += "@CWFix";
+			mesh.name += "@CW";
 			mesh.baseIndex = fixedStart;
 
 			log_vm4.warn("Fixing winding order for Mesh {} {} start {} count {} to {} {} start {} count {}",

@@ -75,12 +75,14 @@ public:
 	inline decltype(auto) operator*(const MatrixStack<Mat>& ms) const {
 		return top() * ms.top();
 	}
-//	inline decltype(auto) operator*=(const Mat& mat) {
-//		return top() *= mat;
-//	}
-//	inline decltype(auto) operator*=(const MatrixStack<Mat>& ms) {
-//		return top() *= ms.top();
-//	}
+	inline decltype(auto) operator*=(const Mat& mat) {
+		top() = top() * mat;
+		return *this;
+	}
+	inline decltype(auto) operator*=(const MatrixStack<Mat>& ms) {
+		top() = top() * ms.top();
+		return *this;
+	}
 	inline operator Mat() const {
 		return top();
 	}

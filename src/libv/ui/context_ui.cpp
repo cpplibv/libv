@@ -73,7 +73,7 @@ public:
 
 bool secure_path(const std::filesystem::path& base, const std::filesystem::path& target, const std::filesystem::path& path) {
 	std::error_code ec;
-	const auto canonical = std::filesystem::canonical(target, ec);
+	const auto canonical = std::filesystem::relative(std::filesystem::canonical(target, ec), ec);
 	if (ec) {
 		log_ui.error("Failed to determine canonical target path: {} {}"
 				"\n\tPath:      {}"
@@ -82,7 +82,7 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 		return false;
 	}
 
-	const auto is_parent = libv::is_parent_folder_of(path, canonical);
+	const auto is_parent = libv::is_parent_folder_of(base, canonical);
 	if (!is_parent) {
 		log_ui.error("Canonical path is expected to be under the base folder:"
 				"\n\tPath:      {}"

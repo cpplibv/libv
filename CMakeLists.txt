@@ -357,6 +357,8 @@ wish_create_external(
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
 	LINK glfw3
+#	LINK $<IF:$<PLATFORM_ID:Windows,MinGW>, gdi32,>
+#	LINK $<IF:$<PLATFORM_ID:Linux>, dl X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt,>
 	LINK $<IF:$<BOOL:${WIN32}>,
 			gdi32, # Win 32
 			dl X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt # Ubuntu 18.04
@@ -618,7 +620,7 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/vm4_viewer/res
 	SOURCE app/vm4_viewer/*.cpp
-	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility
+	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw
 #	LINK   ext_date
 )
 

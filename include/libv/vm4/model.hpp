@@ -8,6 +8,7 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serialization/enable.hpp>
 // std
+#include <chrono>
 #include <vector>
 // pro
 #include <libv/vm4/material.hpp>
@@ -98,15 +99,19 @@ struct LOD {
 };
 
 struct Model {
-	int32_t format = 20191201;
+	int32_t format = 20191204; /// VM4 format version identifier
 
+//	int64_t hash; /// Pre-calculated hash value of the Model, useful to detect changes
+//	binary<32> hash; /// Pre-calculated hash value of the Model, useful to detect changes
+//	libv::Hash256 hash; /// Pre-calculated hash value of the Model, useful to detect changes
+	int32_t version = 0; /// Incremental informal version number, identical version does not mean identical model
+//	std::chrono::system_clock::time_point import_time;
 	std::string name;
-	int32_t version = 0;
 
 	libv::vec3f AABB_min;
 	libv::vec3f AABB_max;
-	libv::vec3f BS_origin; // Bounding Sphere Origin
-	float BS_radius; // Bounding Sphere Radius
+	libv::vec3f BS_origin; /// Bounding Sphere Origin
+	float BS_radius; /// Bounding Sphere Radius
 
 	std::vector<Animation> animations;
 	std::vector<AnimationChannel> animationChannels;
@@ -128,8 +133,10 @@ struct Model {
 	std::vector<uint32_t> indices;
 
 	LIBV_REFLECTION_ACCESS(format);
-	LIBV_REFLECTION_ACCESS(name);
+//	LIBV_REFLECTION_ACCESS(hash);
 	LIBV_REFLECTION_ACCESS(version);
+//	LIBV_REFLECTION_ACCESS(import_time);
+	LIBV_REFLECTION_ACCESS(name);
 
 	LIBV_REFLECTION_ACCESS(AABB_min);
 	LIBV_REFLECTION_ACCESS(AABB_max);
@@ -142,6 +149,7 @@ struct Model {
 	LIBV_REFLECTION_ACCESS(meshes);
 	LIBV_REFLECTION_ACCESS(nodes);
 	LIBV_REFLECTION_ACCESS(lods);
+
 //	LIBV_REFLECTION_ACCESS(vertex_positions);
 //	LIBV_REFLECTION_ACCESS(vertex_normals);
 //	LIBV_REFLECTION_ACCESS(vertex_tangents);

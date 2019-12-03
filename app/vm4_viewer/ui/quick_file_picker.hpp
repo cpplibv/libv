@@ -10,8 +10,8 @@
 #include <libv/input/input.hpp>
 // std
 #include <filesystem>
-// pro
-#include <vm4_viewer/scene.hpp>
+//// pro
+//#include <vm4_viewer/scene/scene.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

@@ -29,8 +29,9 @@ std::ostream& operator<<(std::ostream& os, const Action& event);
 
 struct WatchToken {
 	// TODO P5: hide or use a better token
-	void* id;
+	void* id = nullptr;
 
+	constexpr inline WatchToken() noexcept = default;
 	constexpr inline WatchToken(void* id) noexcept : id(id) { }
 };
 

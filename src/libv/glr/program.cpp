@@ -26,10 +26,19 @@ void RemoteProgram::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 }
 
 void RemoteProgram::update(libv::gl::GL& gl, Remote& remote_) noexcept {
+	bool first_update = !created;
+
 	if (!created)
 		create(gl, remote_);
 
 	if (dirty_source) {
+		// TODO P5: cleanup glr shader a bit better, consider shader detach
+		if (!first_update) {
+			remote->gc(program);
+			program.id = 0;
+			gl(program).create();
+		}
+
 		const auto attach = [&](libv::gl::ShaderType type, const std::string& source) {
 			if (!source.empty()) {
 				libv::gl::Shader shader;

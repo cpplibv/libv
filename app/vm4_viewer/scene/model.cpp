@@ -1,7 +1,7 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // hpp
-#include <vm4_viewer/model.hpp>
+#include <vm4_viewer/scene/model.hpp>
 // libv
 #include <libv/glr/queue.hpp>
 // pro
@@ -72,19 +72,16 @@ void Model::load() {
 	index(vm4.indices);
 }
 
-void Model::render(libv::glr::Queue& gl) {
+void Model::render(libv::glr::Queue& gl, ShaderModel& shader) {
 	gl.program(shader);
 
-	const auto guard = gl.model.push_guard();
-
-	gl.model.identity();
-	node(gl, vm4.lods[0].rootNodeID);
+	node(gl, vm4.lods[0].rootNodeID, shader);
 }
 
-void Model::node(libv::glr::Queue& gl, uint32_t nodeID) {
+void Model::node(libv::glr::Queue& gl, uint32_t nodeID, ShaderModel& shader) {
 	const auto guard = gl.model.push_guard();
 
-	gl.model = gl.model * vm4.nodes[nodeID].transformation;
+	gl.model *= vm4.nodes[nodeID].transformation;
 
 	gl.uniform(shader.uniform_Mmat, gl.model);
 	gl.uniform(shader.uniform_MVPmat, gl.mvp());
@@ -100,7 +97,7 @@ void Model::node(libv::glr::Queue& gl, uint32_t nodeID) {
 	}
 
 	for (auto childID : vm4.nodes[nodeID].childrenIDs) {
-		node(gl, childID);
+		node(gl, childID, shader);
 	}
 }
 

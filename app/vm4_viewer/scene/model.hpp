@@ -9,21 +9,21 @@
 #include <libv/vm4/model.hpp>
 //#include <libv/math/quaternion.hpp>
 // pro
-#include <vm4_viewer/shader.hpp>
+#include <vm4_viewer/scene/shader_model.hpp>
+#include <vm4_viewer/scene/object.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-class Model {
+class Model : Object {
 private:
-	libv::vec3f position;
+//	libv::vec3f position;
 //	libv::quatf direction;
 
 private:
 	libv::glr::Mesh mesh;
-	ShaderModel shader;
 
 public:
 	libv::vm4::Model vm4;
@@ -37,10 +37,10 @@ private:
 	void load();
 
 public:
-	void render(libv::glr::Queue& gl);
+	void render(libv::glr::Queue& gl, ShaderModel& shader);
 
 private:
-	void node(libv::glr::Queue& gl, uint32_t id);
+	void node(libv::glr::Queue& gl, uint32_t id, ShaderModel& shader);
 };
 
 // -------------------------------------------------------------------------------------------------

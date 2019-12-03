@@ -347,63 +347,87 @@ libv.fsw: Remove WA0001 workaround
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: Could boost::sync_queue be used?
-libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
-
-// Render Data Dependency Graph
-
-Node
-	string name
-	Node*[] children
-
-Object : Node
-	transformation
-
-Scene
-	Camera
-	Model
-	Light[]
-	Shader[]
-
-Camera : Object
-	camera properties
-
-Model : Object
-	gl::mesh
-	Material[]
-	vm4::model
-
-Shader
-	texture channels
-	gl::uniform location miscellaneous
-	gl::uniform location transformation
-	gl::uniform location light[]
-	gl::uniform location material[]
-
-Light : Object
-	light properties
-
-Material
-	Shader*
-	material properties
-
-Texture
-	map type (channel)
-	gl::texture
-
-
-
+app.vm4_viewer: proper camera grab
+app.vm4_viewer: camera movement should acquire mouse
+libv.ui: absorb - mouse event absorb/shield/plates
+libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
+libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+libv.ui: instead of return value use (with different name:) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
+libv.ui: unignorable event handles
+libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 
 app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
 
+libv.gl: Implement a GLSL engine
+libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
+libv.gl.glsl: Warning option for crlf line ending.
+libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
 
+> Render Data Dependency Graph aka Scene structure reorganization
+	Node
+		string name
+		Node*[] children
+
+	Object : Node
+		transformation
+
+	Scene
+		Camera
+		Model
+		Light[]
+		Shader[]
+
+	Camera : Object
+		camera properties
+
+	Model : Object
+		gl::mesh
+		Material[]
+		vm4::model
+
+	Shader
+		texture channels
+		gl::uniform location miscellaneous
+		gl::uniform location transformation
+		gl::uniform location light[]
+		gl::uniform location material[]
+
+	Light : Object
+		light properties
+
+	Material
+		Shader*
+		material properties
+
+	Texture
+		map type (channel)
+		gl::texture
+
+libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
+app.vm4_viewer: UI shader should unsub from file watcher, ATM there is an issue during program termination
+
+vm4 hash and timestamp
+	ext: cryptopp https://github.com/weidai11/cryptopp
+	ext: openssl https://github.com/janbar/openssl-cmake
+	libv: MD5
+	libv: SHA3-256
+	libv: SHA3-512
+	libv.vm4: model hash (calculated at import)
+	libv.serialization: std::chrono::system_clock::time_point (convert to UTC) (serialize a normalized value around a fixed epoch)
+	libv.vm4: model import timestamp
+
+libv.vm4lua: lua binding for vm4 and vm4 importer
+
+glsl: quaternion https://github.com/mattatz/ShibuyaCrowd/blob/master/source/shaders/common/quaternion.glsl and http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
 libv.ui: read nana 3rd party property tree lib API
 libv.ui: non-shared_ptr based panels, aka static_container (?)
 app.vm4_viewer: display statistics
 
 app.vm4_viewer: import model
 app.vm4_viewer: Add config option to disable reset camera on model loading
+app.vm4_viewer: Add config options for AABB
+app.vm4_viewer: Add config options for BS
 app.vm4_viewer: Add config options for grid-XY
 app.vm4_viewer: Add project level size comparison functionality
 app.vm4_viewer: Thumbnails
@@ -425,7 +449,7 @@ component
 			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
 			| or just use a viewport call and correct the projection matrix
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
-	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it
+	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
 
 atlas
 	libv.ui: texture atlas definition/parsing
@@ -439,6 +463,8 @@ ui
 	libv.ui: background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
 	libv.ui: ContextResource
 	libv.ui: ContextConfig
+	libv.ui: ContextFileWatcher
+	libv.ui: ContextLoopExecutor: any_thread_callable_cb = context.loop.callback_as_event(my_event_callback)
 	libv.ui: ContextExecutor
 		libv.ui: async_task<T> work_async(const function<progress_report(multi_entry_call, stop_token)>& task);
 	libv.ui: ContextStat (not ContextState, stat is for ui statistics)
@@ -458,19 +484,13 @@ cleanup
 
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | need this as component level dynamically (camera controls need global, for other ui actions local is enough)
-	libv.ui: absorb - mouse event absorb/shield/plates
-	libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
-	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
 
 event
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
-	libv.ui: common base class for event "stubs" to handle general events
+	libv.ui: common base class for event "host stubs" to handle general events
 	libv.ui: provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
 	libv.ui: read http://nanapro.org/en-us/documentation/core/events.htm
-	libv.ui: instead of return value use (with different name:) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
-	libv.ui: unignorable event handles
-	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 
 properties / style
 	libv.ui.property: property system interaction with static_component system
@@ -492,22 +512,25 @@ properties / style
 	libv.ui.property: optimize property reset: address could be used to lookup
 
 interactive
-	libv.ui.input_field: text function call should produce event
-	libv.ui: Make a sandbox for a input->button->label->list
 	libv.ui: Cursor image change
-	libv.ui.input_field: tip_string("Generic password related tip")
-	libv.ui.input_field: background_shadow_tip_string("Password")
-	libv.ui.input_field: multi_line(true)
-	libv.ui.input_field: mask('*') for passwords
-	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
-	libv.ui.input_field: selection support
+	libv.ui: Make a sandbox for a input->button->label->list
+	libv.ui: mouse drag and drop system
 	libv.ui.input_field: Implement FocusSelectPolicy
-	libv.ui.input_field: synthetize selection property
-	libv.ui.input_field: undo/redo support
-	libv.ui.input_field: input mask (this will possibly a different input_field type)
+	libv.ui.input_field: Implement NewLine/MultiLinePolicy
 	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
 	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
-	libv.ui: mouse drag and drop system
+	libv.ui.input_field: input mask (this will possibly a different input_field type)
+	libv.ui.input_field: mask('*') for passwords
+	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
+	libv.ui.input_field: multi_line(true)
+	libv.ui.input_field: selection support
+	libv.ui.input_field: multi-selection support
+	libv.ui.input_field: synthetize selection property
+	libv.ui.input_field: synthetize multi-selection property
+	libv.ui.input_field: text function call should produce event
+	libv.ui.input_field: background_shadow_tip_string("Password")
+	libv.ui.input_field: tip_string("Generic password related tip")
+	libv.ui.input_field: undo/redo support
 
 hotkey
 	libv.hotkey: design API
@@ -608,10 +631,6 @@ libv.gl: move glew init into GL (with the ability to optionally disable it with 
 
 libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 libv.ui.layout: size over 100% is not an error
-libv.gl: Implement a GLSL engine
-libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
-libv.gl.glsl: Warning option for crlf line ending.
-libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
 
 libv.ui: lua binding | or rather a lua component or prototype parsing
@@ -632,7 +651,9 @@ libv.ui: font failure to load means fallback | verify
 libv.ui: shader failure to load means fallback | verify
 libv.ui: shader dynamic loading from file
 
-libv.ui.font: render the not found character by 'hand' (simple square)
+libv.ui.font: fallback to Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) | add it back to fallback consolas_min font | https://www.fileformat.info/info/unicode/char/fffd/index.htm
+libv.ui.font: fallback to ascii '?'
+libv.ui.font: fallback to simple square (render the not found character by 'hand')
 libv.ui.font: https://www.freetype.org/freetype2/docs/tutorial/step2.html
 libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is because the function always sets the content of delta to (0,0) if an error occurs.
 
@@ -762,6 +783,7 @@ cpp: check if i have any recursive variadic function that is not using if conste
 libv.gl: use mdspan for image updates instead of raw loops
 libv.gl: glReadBuffer and glDrawBuffer | not urgent as the defaults are correct
 libv.gl: learn glPixelStore / implement
+libv.gl: glsl preprocessor support for "#pragma vertex" and "#pragma fragment" to auto split files, useful for small test and debug shaders
 
 libv.glr: texture, do not store the whole image, only have pending chunks, this will get rid of a lot of memcopy nightmare
 libv.glr: optimize every remote resource with head access
@@ -780,6 +802,9 @@ ext.clara: remove dependency
 ext.lua: update to 8eb1482b493a3a44f004c86baeeb0683ec094542 at https://github.com/xpol/lua for 5.3.5
 
 libv.math: Catmull-Rom spline https://www.youtube.com/watch?v=9_aJGUTePYo and code https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Splines2.cpp
+
+libv.ui: Could boost::sync_queue be used?
+libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 
 
 --- AWAITING ---------------------------------------------------------------------------------------
@@ -894,6 +919,36 @@ colorpicker:
 	- visualize color distances, distance "bubbles"
 	- visualize picked colors in sliders too
 
+libv: generic general binary data storage
+		 Name               | Implementation                   | Capacity | Size    | SBO | Heap
+		--------------------+----------------------------------+----------+---------+-----+---------
+		byte_array<N>       | std::array<byte>                 | N        | N       |  N  | never
+		byte_static<N>      | std::array<byte>, size_t         | N        | dynamic |  N  | never
+		byte_small<N>       | boost::small_vector<byte, N>     | dynamic  | dynamic |  N  | above N
+		byte_dynamic        | std::vector<byte>                | dynamic  | dynamic |  -  | above 0
+		byte_cold           | byte*                            | fixed    | fixed   |  -  | above 0
+		byte_very_cold      | int32_t (index to global byte**) | fixed    | fixed   |  -  | above 0
+
+		binary<-1>          | binary_dynamic
+		binary<0+>          | binary_array
+
+libv: generic general container storage
+		 Name                    | Implementation            | Capacity | Size    | SBO | Heap
+		-------------------------+---------------------------+----------+---------+-----+---------
+		vector_static<T..., N>   | std::array<T, N>          | N        | N       |  N  | never
+		vector_local<T..., N>    | std::array<T, N>, size_t  | N        | dynamic |  N  | never
+		vector_small<T..., N>    | boost::small_vector<T, N> | dynamic  | dynamic |  N  | above N
+		vector_dynamic<T...>     | std::vector<T>            | dynamic  | dynamic |  -  | above 0
+		vector_cold<T...>        | T*                        | fixed    | fixed   |  -  | above 0
+		vector_very_cold<T...>   | int32_t (+ global T**)    | fixed    | fixed   |  -  | above 0
+
+		vector<static<N>, T...>  | std::array<T, N>          | N        | N       |  N  | never
+		vector<local<N>, T...>   | std::array<T, N>, size_t  | N        | dynamic |  N  | never
+		vector<small<N>, T...>   | boost::small_vector<T, N> | dynamic  | dynamic |  N  | above N
+		vector<dynamic<N>, T...> | std::vector<T>            | dynamic  | dynamic |  -  | above 0
+		vector<cold, T...>       | T*                        | fixed    | fixed   |  -  | above 0
+		vector<very_cold, T...>  | int32_t (+ global T**)    | fixed    | fixed   |  -  | above 0
+
 --- NOTE -------------------------------------------------------------------------------------------
 
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
@@ -977,87 +1032,12 @@ Shader types
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
 
-//struct UniformLight {
-//	Uniform<int> type;
-//	Uniform<bool> enabled;
-//
-//	Uniform<glm::vec3> position;
-//	Uniform<glm::vec3> direction;
-//	Uniform<glm::vec4> diffuse;
-//	Uniform<glm::vec4> specular;
-//
-//	Uniform<double> range;
-//	Uniform<double> intensity;
-//	Uniform<double> innerCosAngle;
-//	Uniform<double> outerCosAngle;
-//
-//	Uniform<bool> shadowCast;
-//	Uniform<int> shadowMapSampler;
-//	Uniform<glm::mat4> shadowMVPTmat;
-//
-//	UniformLight(const std::string& name);
-//	void operator=(const Light &v);
-//};
-
 diffuse(1.0f, 1.0f, 1.0f, 1.0f),
 specular(0.8f, 0.8f, 0.8f, 1.0f),
 emission(0.0f, 0.0f, 0.0f, 1.0f),
 ambient(0.1f, 0.1f, 0.1f, 1.0f),
 reflective(1.0f, 1.0f, 1.0f, 1.0f),
 shininess(32.0f) { }
-
-//glm::mat4 Light::getPmat() {
-//	if (type == spotLight)
-//		return perspective<float>(acos(outerCosAngle) * 180.0f / PI * 2, 1.0f, range / 15.0f, range); //2szeres outer sz�g, mivel nek�nk nem a 'fele' kell hanem a teljes 'sug�r'
-//	else if (type == dirLight)
-//		return ortho<float>(-90, 90, -90, 90, -90, 90);
-//	else //if (type == pointLight)
-//		return ortho<float>(-30, 30, -30, 30, -10, 150);
-//}
-//
-//glm::mat4 Light::getVmat() {
-//	if (type == spotLight)
-//		return lookAt(position, position + direction, glm::glm::vec3(0, 1, 0));
-//	else if (type == dirLight)
-//		return lookAt(glm::vec3(0, 0, 0), direction, glm::glm::vec3(0, 1, 0));
-//	else //if (type == pointLight)
-//		return ortho<float>(-30, 30, -30, 30, -10, 150);
-//}
-
-// Light -------------------------------------------------------------------------------------------
-
-struct LightType {
-	static const int point = 0;
-	static const int dir = 1;
-	static const int spot = 2;
-};
-
-struct Light {
-	int type = LightType::point;
-	bool enabled = true;
-
-	glm::vec3 position = {0, 0, 0};
-	glm::vec3 direction = {1, 0, 0};
-	glm::vec4 diffuse = {1, 1, 1, 1};
-	glm::vec4 specular = {1, 1, 1, 1};
-
-	double range = 75.0;
-	double intensity = 1.0;
-	double innerCosAngle = 0.8; // Angles closer to 1 produce tighter cones
-	double outerCosAngle = 0.6; // Angles of -1 will emulate point lights.
-
-	bool shadowCast = false;
-	//			GLuint frameBuffer;
-	//			GLuint shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
-	//			GLuint shadowMapSampler;
-	unsigned int frameBuffer;
-	unsigned int shadowDepthTexture; //Texture sampler for shadow map. The textureSamplers layout is 10+i where 'i' is the index of the light!
-	unsigned int shadowMapSampler;
-	glm::mat4 shadowMVPTmat; //MVPT mat
-
-	glm::mat4 getVmat();
-	glm::mat4 getPmat();
-};
 
 // -------------------------------------------------------------------------------------------------
 

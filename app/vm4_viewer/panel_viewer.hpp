@@ -11,7 +11,7 @@
 // std
 #include <filesystem>
 // pro
-#include <vm4_viewer/scene.hpp>
+#include <vm4_viewer/scene/scene.hpp>
 
 
 namespace app {

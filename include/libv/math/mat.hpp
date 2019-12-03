@@ -42,80 +42,87 @@ public:
 	inline constexpr mat_t(mat_t&&) = default;
 	inline ~mat_t() = default;
 
+	inline mat_t& operator=(const mat_t& mat) & {
+		mx() = mat.mx();
+		return *this;
+	}
+
 	// ---------------------------------------------------------------------------------------------
 
 private:
 	using mt = glm::mat<Ri, Ci, T, glm::precision::highp>;
-	inline mt& mx() {
+	[[nodiscard]] constexpr inline mt& mx() noexcept {
 		return static_cast<mt&>(*this);
 	}
-	inline const mt& mx() const {
+	[[nodiscard]] constexpr inline const mt& mx() const noexcept {
 		return static_cast<const mt&>(*this);
 	}
 
 public:
-	T* data() {
+	[[nodiscard]] constexpr T* data() noexcept {
 		return &mx()[0][0];
 	}
-	const T* data() const {
+	[[nodiscard]] constexpr const T* data() const noexcept {
 		return &mx()[0][0];
 	}
 
 public:
-	inline value_type determinant() const {
+	[[nodiscard]] constexpr inline value_type determinant() const noexcept {
 		return glm::determinant(mx());
 	}
 
-	inline mat_t& inverse() {
+	constexpr inline mat_t& inverse() noexcept {
 		glm::inverse(mx());
 		return *this;
 	}
-	inline mat_t inverse_copy() const {
+	[[nodiscard]] constexpr inline mat_t inverse_copy() const noexcept {
 		mat_t result;
 		result = glm::inverse(mx());
 		return result;
 	}
 
-	inline mat_t& rotate(const Radian<T> angle, const libv::vec3_t<T>& axis)
-			WISH_REQUIRES(C == 4 && R == 4) {
+	constexpr inline mat_t& rotate(const Radian<T> angle, const libv::vec3_t<T>& axis) noexcept
+			WISH_REQUIRES(Column == 4 && Row == 4) {
 		mx() = glm::rotate(mx(), angle.value, to_glm(axis));
 		return *this;
 	}
-	inline mat_t rotate_copy(const Radian<T> angle, const libv::vec3_t<T>& axis) const
-			WISH_REQUIRES(C == 4 && R == 4) {
+	[[nodiscard]] constexpr inline mat_t rotate_copy(const Radian<T> angle, const libv::vec3_t<T>& axis) const noexcept
+			WISH_REQUIRES(Column == 4 && Row == 4) {
 		mat_t result;
 		result = glm::rotate(mx(), angle.value, to_glm(axis));
 		return result;
 	}
 
-	inline mat_t& rotate(const T angle, const libv::vec3_t<T>& axis)
-			WISH_REQUIRES(C == 4 && R == 4) {
+	constexpr inline mat_t& rotate(const T angle, const libv::vec3_t<T>& axis) noexcept
+			WISH_REQUIRES(Column == 4 && Row == 4) {
 		mx() = glm::rotate(mx(), angle, to_glm(axis));
 		return *this;
 	}
-	inline mat_t rotate_copy(const T angle, const libv::vec3_t<T>& axis) const
-			WISH_REQUIRES(C == 4 && R == 4) {
+	[[nodiscard]] constexpr inline mat_t rotate_copy(const T angle, const libv::vec3_t<T>& axis) const noexcept
+			WISH_REQUIRES(Column == 4 && Row == 4) {
 		mat_t result;
 		result = glm::rotate(mx(), angle, to_glm(axis));
 		return result;
 	}
-	//rotate(const glm::quat& quat);
 
-	inline mat_t& scale(const libv::vec3_t<T>& v) {
+//	constexpr inline mat_t& rotate(const glm::quat& quat) noexcept {
+//	[[nodiscard]] constexpr inline mat_t rotate_copy(const glm::quat& quat) const noexcept {
+
+	constexpr inline mat_t& scale(const libv::vec3_t<T>& v) noexcept {
 		mx() = glm::scale(mx(), to_glm(v));
 		return *this;
 	}
-	inline mat_t scale_copy(const libv::vec3_t<T>& v) const {
+	[[nodiscard]] constexpr inline mat_t scale_copy(const libv::vec3_t<T>& v) const noexcept {
 		mat_t result;
 		result = glm::scale(mx(), to_glm(v));
 		return result;
 	}
 
-	inline mat_t& translate(const libv::vec3_t<T>& v) {
+	constexpr inline mat_t& translate(const libv::vec3_t<T>& v) noexcept {
 		mx() = glm::translate(mx(), to_glm(v));
 		return *this;
 	}
-	inline mat_t translate_copy(const libv::vec3_t<T>& v) const {
+	[[nodiscard]] constexpr inline mat_t translate_copy(const libv::vec3_t<T>& v) const noexcept {
 		mat_t result;
 		result = glm::translate(mx(), to_glm(v));
 		return result;
@@ -123,22 +130,18 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 
-	inline mat_t& operator=(const mat_t& mat) & {
-		mx() = mat.mx();
-		return *this;
-	}
-	inline vec_t<R, T> operator*(const vec_t<R, T>& vec) const {
+	[[nodiscard]] constexpr inline vec_t<R, T> operator*(const vec_t<R, T>& vec) const noexcept {
 		return vec_t<R, T>{mx() * to_glm(vec)};
 	}
-	inline mat_t operator*(const mat_t& mat) const {
+	[[nodiscard]] constexpr inline mat_t operator*(const mat_t& mat) const noexcept {
 		mat_t result;
 		result = mx() * mat.mx();
 		return result;
 	}
-	inline decltype(auto) operator[](int col) {
+	[[nodiscard]] constexpr inline decltype(auto) operator[](int col) noexcept {
 		return mx()[col];
 	}
-	inline decltype(auto) operator[](int col) const {
+	[[nodiscard]] constexpr inline decltype(auto) operator[](int col) const noexcept {
 		return mx()[col];
 	}
 
@@ -166,17 +169,27 @@ public:
 		return ortho(position.x, position.x + size.x, position.y, position.y + size.y);
 	}
 
+	[[nodiscard]] static constexpr inline mat_t ortho(const T left, const T right, const T bottom, const T top, const T near, const T far) noexcept {
+		mat_t result;
+		result = glm::ortho<T>(left, right, bottom, top, near, far);
+		return result;
+	}
+
+	[[nodiscard]] static constexpr inline mat_t ortho(const libv::vec3_t<T> position, const libv::vec3_t<T> size) noexcept {
+		return ortho(position.x, position.x + size.x, position.y, position.y + size.y, position.z, position.z + size.z);
+	}
+
 	[[nodiscard]] static constexpr inline mat_t identity() noexcept {
-		return mat_t{1};
+		return mat_t(1);
 	}
 
 	[[nodiscard]] static constexpr inline mat_t texture() noexcept
-			WISH_REQUIRES(C == 4 && R == 4) {
-		return mat_t{
+			WISH_REQUIRES(Column == 4 && Row == 4) {
+		return mat_t(
 				0.5, 0.0, 0.0, 0.0,
 				0.0, 0.5, 0.0, 0.0,
 				0.0, 0.0, 0.5, 0.0,
-				0.5, 0.5, 0.5, 1.0};
+				0.5, 0.5, 0.5, 1.0);
 	}
 };
 

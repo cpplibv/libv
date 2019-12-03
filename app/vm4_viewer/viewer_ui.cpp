@@ -111,7 +111,7 @@ void ViewerUI::load(const std::string& path) {
 // -------------------------------------------------------------------------------------------------
 
 bool ViewerUI::onKey(const libv::input::EventKey& event) {
-	// TODO P0: Proper mouse shield and focus travers (remove two line below)
+	// TODO P0: libv.ui: Proper mouse shield and focus travers (remove two line below)
 	if (event.key == libv::input::Key::Tab)
 		focus();
 
@@ -132,7 +132,7 @@ void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 }
 
 bool ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
-	// TODO P0: proper mouse shielding, and gain focus here too
+	// TODO P0: libv.ui: proper mouse shielding, and gain focus here too
 	//	focus();
 
 	log_app.info("ViewerUI Button {} {}", libv::input::to_string(event.action), libv::input::to_string(event.button));

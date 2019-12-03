@@ -1,7 +1,7 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // hpp
-#include <vm4_viewer/scene.hpp>
+#include <vm4_viewer/scene/scene.hpp>
 // libv
 #include <libv/glr/procedural/cube.hpp>
 #include <libv/glr/procedural/grid.hpp>
@@ -19,59 +19,42 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 Scene::Scene() :
-	debug_cube(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	debug_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	debug_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw),
-	debug_sphere(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw) {
+	mesh_AABB(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	mesh_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	mesh_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw),
+	mesh_BS(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
 
-	debug_shader.vertex(R"(
-		#version 330 core
-
-		layout(location = 0) in vec3 vertexPosition;
-
-		uniform mat4 MVPmat;
-
-		void main() {
-			gl_Position = MVPmat * vec4(vertexPosition, 1);
-		}
-	)");
-	debug_shader.fragment(R"(
-		#version 330 core
-
-		out vec4 output;
-
-		uniform vec4 color;
-
-		void main() {
-			output = color;
-		}
-	)");
-	debug_shader.assign(debug_uniform_color, "color");
-	debug_shader.assign(debug_uniform_MVPmat, "MVPmat");
+	line_shader("app/vm4_viewer/res/line_shader.vs", "app/vm4_viewer/res/line_shader.fs"),
+	model_shader("app/vm4_viewer/res/model_shader.vs", "app/vm4_viewer/res/model_shader.fs") {
 
 	{
-		auto pos = debug_cube.attribute(attribute_position);
-		auto index = debug_cube.index();
+		auto pos = mesh_AABB.attribute(attribute_position);
+		auto index = mesh_AABB.index();
 		libv::glr::generateCube(pos, libv::glr::ignore, libv::glr::ignore, index);
 	}
 
 	{
-		auto pos = debug_gizmo.attribute(attribute_position);
-		auto index = debug_gizmo.index();
+		auto pos = mesh_gizmo.attribute(attribute_position);
+		auto index = mesh_gizmo.index();
 		libv::glr::generateCube(pos, libv::glr::ignore, libv::glr::ignore, index);
 	}
 
 	{
-		auto pos = debug_grid.attribute(attribute_position);
-		auto index = debug_grid.index();
+		auto pos = mesh_grid.attribute(attribute_position);
+		auto index = mesh_grid.index();
 		libv::glr::generateGrid(25, 25, pos, libv::glr::ignore, index);
 	}
 
 	{
-		auto pos = debug_sphere.attribute(attribute_position);
-		auto index = debug_sphere.index();
+		auto pos = mesh_BS.attribute(attribute_position);
+		auto index = mesh_BS.index();
 		libv::glr::generateSpherifiedCube(6, pos, libv::glr::ignore, libv::glr::ignore, index);
 	}
+
+	sun.type = LightType::dir;
+	sun.direction = libv::vec3f(2, 1, 4).normalize();
+	sun.diffuse = libv::vec3f(1, 1, 1);
+	sun.specular = libv::vec3f(1, 1, 1);
 }
 
 void Scene::focus_camera() {
@@ -90,7 +73,7 @@ void Scene::reset_camera() {
 	camera.position(model->vm4.BS_origin);
 	camera.set_zoom(-model->vm4.BS_radius);
 	camera.rotateX(libv::to_rad(45.f));
-	camera.rotateZ(libv::to_rad(45.f));
+	camera.rotateZ(libv::to_rad(-135.f));
 }
 
 void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
@@ -119,7 +102,7 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 	gl.state.depthFunctionLess();
 
 	if (model) {
-		model->render(gl);
+		model->render(gl, model_shader);
 	}
 
 	if (model && display_AABB) {
@@ -131,20 +114,20 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		gl.model.translate((model->vm4.AABB_max + model->vm4.AABB_min) * 0.5f);
 		gl.model.scale(libv::vec::abs(model->vm4.AABB_max - model->vm4.AABB_min) * 0.5f);
 
-		gl.program(debug_shader);
-		gl.uniform(debug_uniform_MVPmat, gl.mvp());
-		gl.uniform(debug_uniform_color, libv::vec4f(0.3f, 1.0f, 0.3f, 0.4f));
-		gl.render(debug_cube);
+		gl.program(line_shader);
+		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
+		gl.uniform(line_shader.uniform_color, color_AABB);
+		gl.render(mesh_AABB);
 	}
 
 	if (model && display_grid) {
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_s = gl.state.push_guard();
 
-		gl.program(debug_shader);
-		gl.uniform(debug_uniform_MVPmat, gl.mvp());
-		gl.uniform(debug_uniform_color, libv::vec4f(0.8f, 0.8f, 0.8f, 0.8f));
-		gl.render(debug_grid);
+		gl.program(line_shader);
+		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
+		gl.uniform(line_shader.uniform_color, color_grid);
+		gl.render(mesh_grid);
 	}
 
 	if (model && display_BS) {
@@ -156,10 +139,10 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		gl.model.translate(model->vm4.BS_origin);
 		gl.model.scale(model->vm4.BS_radius);
 
-		gl.program(debug_shader);
-		gl.uniform(debug_uniform_MVPmat, gl.mvp());
-		gl.uniform(debug_uniform_color, libv::vec4f(0.3f, 0.3f, 1.0f, 0.4f));
-		gl.render(debug_sphere);
+		gl.program(line_shader);
+		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
+		gl.uniform(line_shader.uniform_color, color_BS);
+		gl.render(mesh_BS);
 	}
 }
 

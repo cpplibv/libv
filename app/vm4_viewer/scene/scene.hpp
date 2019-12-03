@@ -10,8 +10,11 @@
 // std
 #include <optional>
 // pro
-#include <vm4_viewer/camera.hpp>
-#include <vm4_viewer/model.hpp>
+#include <vm4_viewer/scene/camera.hpp>
+#include <vm4_viewer/scene/light.hpp>
+#include <vm4_viewer/scene/model.hpp>
+#include <vm4_viewer/scene/shader_line.hpp>
+#include <vm4_viewer/scene/shader_model.hpp>
 
 
 namespace app {
@@ -19,22 +22,30 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Scene {
+//	std::unique_ptr<Node> root;
+
 //	std::optional<app::Model> environment;
 	std::optional<app::Model> model;
 	app::Camera camera;
+
+	Light sun;
 
 	bool display_BS = true;
 	bool display_AABB = true;
 	bool display_grid = true;
 
-	libv::glr::Mesh debug_cube;
-	libv::glr::Mesh debug_gizmo;
-	libv::glr::Mesh debug_grid;
-	libv::glr::Mesh debug_sphere;
+	libv::glr::Mesh mesh_AABB;
+	libv::glr::Mesh mesh_gizmo;
+	libv::glr::Mesh mesh_grid;
+	libv::glr::Mesh mesh_BS;
 
-	libv::glr::Program debug_shader;
-	libv::glr::Uniform_vec4f debug_uniform_color;
-	libv::glr::Uniform_mat4f debug_uniform_MVPmat;
+	app::ShaderLine line_shader;
+	app::ShaderModel model_shader;
+
+	static constexpr libv::vec4f color_AABB = {0.3f, 1.0f, 0.3f, 0.4f};
+	static constexpr libv::vec4f color_gizmo = {1.0f, 1.0f, 1.0f, 1.0f};
+	static constexpr libv::vec4f color_grid = {0.8f, 0.8f, 0.8f, 0.8f};
+	static constexpr libv::vec4f color_BS = {0.3f, 0.3f, 1.0f, 0.4f};
 
 public:
 	Scene();

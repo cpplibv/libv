@@ -7,6 +7,8 @@
 #include <libv/math/mat.hpp>
 // std
 #include <cmath>
+// pro
+#include <vm4_viewer/scene/object.hpp>
 
 
 namespace app {
@@ -14,6 +16,7 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Camera {
+//struct Camera : Object {
 private:
 	static constexpr libv::vec3f up = {0, 0, 1};
 
