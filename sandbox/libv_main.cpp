@@ -542,9 +542,29 @@
 //#include <libv/math/pid.hpp>
 #include <iostream>
 #include <cmath>
+#include <filesystem>
 
+
+void _append_slash(std::filesystem::path& dir) {
+	static constexpr decltype(std::filesystem::path::preferred_separator) sep[] = {std::filesystem::path::preferred_separator, 0};
+
+	if (dir.native().back() != std::filesystem::path::preferred_separator)
+		dir.concat(sep);
+}
+
+std::filesystem::path _parent_directory(const std::filesystem::path& dir) {
+	auto result = dir;
+
+//	if (result.native().back() == std::filesystem::path::preferred_separator)
+//		result = result.parent_path();
+//
+//	result = result.parent_path();
+	_append_slash(result);
+	return result;
+}
 
 int main() {
-	std::cout << std::fmod(-0.5, 1.) << std::endl;
+	std::cout << _parent_directory("E:\\dev\\cpp\\libv\\tmp") << std::endl;
+	std::cout << _parent_directory("E:\\dev\\cpp\\libv\\tmp\\") << std::endl;
 	return 0;
 }

@@ -78,19 +78,35 @@ inline std::string slice_suffix_copy(const std::string_view str, const std::stri
 	return std::string{slice_suffix_view(str, suffix)};
 }
 
-// TODO P5: implement inplace slices
-
 template <typename String>
 inline void slice_inplace(String& str, const int64_t lo, const int64_t hi);
+	// TODO P5: implement slice_inplace
 
 template <typename String>
 inline void slice_inplace(String& str, const int64_t cut);
+	// TODO P5: implement slice_inplace
 
 template <typename String>
-inline void slice_prefix_inplace(String& str, const std::string_view prefix);
+inline void slice_prefix_inplace(String& str, const std::string_view prefix) {
+	if (str.size() < prefix.size())
+		return;
+
+	if (std::string_view{str.data(), prefix.size()} != prefix)
+		return;
+
+	str.erase(str.begin(), str.begin() + prefix.size());
+}
 
 template <typename String>
-inline void slice_suffix_inplace(String& str, const std::string_view suffix);
+inline void slice_suffix_inplace(String& str, const std::string_view suffix) {
+	if (str.size() < suffix.size())
+		return;
+
+	if (std::string_view{str.data() + (str.size() - suffix.size()), suffix.size()} != suffix)
+		return;
+
+	str.erase(str.begin() + (str.size() - suffix.size()), str.end());
+}
 
 // -------------------------------------------------------------------------------------------------
 

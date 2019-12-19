@@ -132,6 +132,8 @@ inline void parser_function(std::string& value, std::string_view str, OutcomeArg
 
 } // namespace detail ------------------------------------------------------------------------------
 
+// TODO P5: libv.arg: implicit value for typed flags, both default_value(T) and implicit_value(T)
+
 class Flag : public BaseArgument {
 	using value_type = bool;
 	value_type value_ = false;

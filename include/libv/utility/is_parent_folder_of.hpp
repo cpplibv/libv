@@ -21,7 +21,7 @@ inline bool is_parent_folder_of(const std::filesystem::path& parent, const std::
 		return false;
 
 	const auto [parent_it, path_it] = std::mismatch(parent.begin(), parent.end(), path.begin(), path.end());
-	return parent_it != parent.end();
+	return parent_it == parent.end();
 }
 
 // -------------------------------------------------------------------------------------------------

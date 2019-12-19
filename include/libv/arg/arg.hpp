@@ -17,7 +17,7 @@ namespace arg {
 //	- Missing: commands / sub commands / sub-sub commands
 //	- Missing: allow / disable override of arguments
 //
-//	auto args = libv::arg::Parser();
+//	auto args = libv::arg::Parser("Program Name", "Program Description");
 //
 //	const auto input_file = args.required<std::string>
 //			("input_file", "File path of the binary input file")
@@ -42,7 +42,8 @@ namespace arg {
 //			("flag", "Flag for something")
 //			= false;
 //
-//	const auto rest = args.rest; // arguments after the first plain --
+//	const auto rest = args.rest
+//			("--");
 //
 //	args.positional(input_file, output_file, function_name, indexes);
 //
@@ -74,7 +75,7 @@ namespace arg {
 //			args.mergable_1         (args...)                 // usage: args.mergable(arg_list, arg_all);                // uses aliases that are 1 letter or 2 with common first letter
 //			args.mergable_2         (start)(alias, args)...   // usage: args.mergable('-')('l', arg_list)('a', arg_all); // explicit
 //			args.mergable_3         (start, args...)          // usage: args.mergable('-', arg_list, arg_all);           // uses aliases that are
-//	S	args.rest               ()
+//	?	args.rest               (aliases...)
 //	S	args.unused             ()
 //		args.require            (arg0 && arg1 || arg2)     // Marks certain combination of arguments as required
 //		args.depricated         (arg0 && arg1 || arg2)     // Marks certain combination of arguments as depricated

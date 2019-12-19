@@ -334,9 +334,63 @@ app.vm4_viewer: Reset camera on model loading
 app.vm4_viewer: Camera center and focus model (without altering the rotation)
 app.vm4_viewer: Reset camera / Focus camera
 app.vm4_viewer: Visualize grid-XY
+libv.fsw: Lib to wrap a file system watcher
+libv.fsw: improve file watcher to handle single file and multi callbacks
+libv.fsw: use absolute path internally, pass rel or abs path to the callback based on the sub
+libv.fsw: guard redundant watchers and ownerships
+libv.fsw: subscribe_directory
+libv.fsw: WA0001 workaround
+libv.fsw: unsubscribe (with cleanup)
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+libv.ui: Could boost::sync_queue be used?
+libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
+
+// Render Data Dependency Graph
+
+Node
+	string name
+	Node*[] children
+
+Object : Node
+	transformation
+
+Scene
+	Camera
+	Model
+	Light[]
+	Shader[]
+
+Camera : Object
+	camera properties
+
+Model : Object
+	gl::mesh
+	Material[]
+	vm4::model
+
+Shader
+	texture channels
+	gl::uniform location miscellaneous
+	gl::uniform location transformation
+	gl::uniform location light[]
+	gl::uniform location material[]
+
+Light : Object
+	light properties
+
+Material
+	Shader*
+	material properties
+
+Texture
+	map type (channel)
+	gl::texture
+
+
 
 
 app.vm4_viewer: single directional light
@@ -557,6 +611,7 @@ libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 libv.gl.glsl: Warning option for crlf line ending.
 libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
+libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
 
 libv.ui: lua binding | or rather a lua component or prototype parsing
 libv.ui: make sandbox_ui.lua work

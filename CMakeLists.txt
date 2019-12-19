@@ -61,7 +61,7 @@ wish_warning(
 	GNU -Wdouble-promotion
 	GNU -Wduplicated-cond
 	GNU -Wlogical-op
-	GNU -Wnon-virtual-dtor
+	GNU -Wnon-virtual-dtor # Causes some false positives with efsw (suppressed)
 	GNU -Wnull-dereference # Causes some false positives with libv.ecs System.create (suppressed)
 	GNU -Wold-style-cast
 	GNU -Wsuggest-override
@@ -226,12 +226,15 @@ wish_create_external(
 		--prefix=${PATH_EXT}/boost
 		--layout=tagged
 		--with-system
+#		--with-thread
 		-j${WISH_PROCESSOR_COUNT}
 	INSTALL_COMMAND "echo" "Skipping install..."
 
 	DEFINE BOOST_DLL_USE_STD_FS=1
 	DEFINE BOOST_STACKTRACE_USE_BACKTRACE
 	DEFINE BOOST_STACKTRACE_BACKTRACE_INCLUDE_FILE=<libbacktrace/backtrace.h>
+
+#	LINK boost_thread-mt-s-x64
 )
 
 wish_create_library(
@@ -307,16 +310,10 @@ wish_create_external(
 
 wish_create_external(
 	NAME efsw
-	GIT_REPOSITORY https://github.com/mnafees/efsw.git
-	GIT_TAG 9bc94939f154bc756def4e9788d83e1f164300f3
+	GIT_REPOSITORY https://github.com/SpartanJ/efsw.git
+	GIT_TAG 33d6ce34a53d2b2c5dfb856570c8c259fce2682a
 	CMAKE_ARGS
 		-DSTATIC_LIB=ON
-	# TODO P3: this ext_efsw install command looks off
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/efsw/include/
-		COMMAND mkdir -p ${PATH_EXT}/efsw/lib/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/efsw/src/get_efsw/include/ ${PATH_EXT}/efsw/include/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/efsw/src/get_efsw-build/libefsw.a ${PATH_EXT}/efsw/lib/
 	LINK efsw
 )
 
@@ -514,6 +511,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_fsw STATIC
+	SOURCE src/libv/fsw/*.cpp
+	LINK   libv_utility ext_efsw
+)
+
+wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
 	LINK   libv_log libv_math ext_glew ext_boost ext_gli ext_soil ${OPENGL_LIBRARIES}
@@ -590,7 +593,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_utility INTERFACE
-	LINK   ext_efsw Threads::Threads
+	LINK   Threads::Threads
 )
 
 wish_create_library(
@@ -645,6 +648,12 @@ wish_create_executable(
 	TARGET sandbox_libv_frame
 	SOURCE sandbox/libv_frame_main.cpp
 	LINK   libv_log libv_frame
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_fsw
+	SOURCE sandbox/libv_fsw_main.cpp
+	LINK   libv_fsw Threads::Threads
 )
 
 wish_create_executable(
@@ -809,6 +818,12 @@ wish_create_executable(
 	TARGET test_libv_frame
 	SOURCE test/libv/frame/*.cpp
 	LINK   obj_test_runner libv_frame
+)
+
+wish_create_executable(
+	TARGET test_libv_fsw
+	SOURCE test/libv/fsw/*.cpp
+	LINK   obj_test_runner libv_fsw ext_boost
 )
 
 wish_create_executable(

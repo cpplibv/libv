@@ -68,3 +68,35 @@ TEST_CASE("slice_view over-indexing cut sub-string", "[libv.utility.slice]") {
 	CHECK(libv::slice_view("0123456789", -20) == "0123456789");
 	CHECK(libv::slice_view("0123456789", 20) == "0123456789");
 }
+
+TEST_CASE("slice_prefix_inplace", "[libv.utility.slice]") {
+	std::string str = "0123456789";
+
+	libv::slice_prefix_inplace(str, "");           CHECK(str == "0123456789");
+	libv::slice_prefix_inplace(str, "0");          CHECK(str == "123456789");
+	libv::slice_prefix_inplace(str, "9");          CHECK(str == "123456789");
+	libv::slice_prefix_inplace(str, "123");        CHECK(str == "456789");
+	libv::slice_prefix_inplace(str, "123");        CHECK(str == "456789");
+	libv::slice_prefix_inplace(str, "0123456879"); CHECK(str == "456789");
+	libv::slice_prefix_inplace(str, "456789-");    CHECK(str == "456789");
+	libv::slice_prefix_inplace(str, "-456789");    CHECK(str == "456789");
+	libv::slice_prefix_inplace(str, "456789");     CHECK(str == "");
+	libv::slice_prefix_inplace(str, "0");          CHECK(str == "");
+	libv::slice_prefix_inplace(str, "");           CHECK(str == "");
+}
+
+TEST_CASE("slice_suffix_inplace", "[libv.utility.slice]") {
+	std::string str = "0123456789";
+
+	libv::slice_suffix_inplace(str, "");           CHECK(str == "0123456789");
+	libv::slice_suffix_inplace(str, "9");          CHECK(str == "012345678");
+	libv::slice_suffix_inplace(str, "0");          CHECK(str == "012345678");
+	libv::slice_suffix_inplace(str, "678");        CHECK(str == "012345");
+	libv::slice_suffix_inplace(str, "678");        CHECK(str == "012345");
+	libv::slice_suffix_inplace(str, "0123456879"); CHECK(str == "012345");
+	libv::slice_suffix_inplace(str, "-012345");    CHECK(str == "012345");
+	libv::slice_suffix_inplace(str, "012345-");    CHECK(str == "012345");
+	libv::slice_suffix_inplace(str, "012345");     CHECK(str == "");
+	libv::slice_suffix_inplace(str, "0");          CHECK(str == "");
+	libv::slice_suffix_inplace(str, "");           CHECK(str == "");
+}

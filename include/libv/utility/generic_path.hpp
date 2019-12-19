@@ -11,7 +11,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 /// I just cannot be bothered anymore, give me a generic path string
-inline std::string generic_path(const std::filesystem::path& path) {
+[[nodiscard]] inline std::string generic_path(const std::filesystem::path& path) {
 	auto result = path.generic_string();
 	std::replace(result.begin(), result.end(), '\\', '/'); // For windows drive letters
 	return result;
