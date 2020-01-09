@@ -18,7 +18,6 @@ class ImplFileWatcher;
 
 // -------------------------------------------------------------------------------------------------
 
-//enum class Action : uint32_t {
 enum class Action {
 	create = 1,
 	remove = 2,
@@ -28,26 +27,17 @@ enum class Action {
 
 std::ostream& operator<<(std::ostream& os, const Action& event);
 
-//class WatchToken {
 struct WatchToken {
-//	friend class ImplFileWatcher;
-//	friend class FileWatcher;
-
-	// <<< P4: hide / improve
+	// TODO P5: hide or use a better token
 	void* id;
 
 	constexpr inline WatchToken(void* id) noexcept : id(id) { }
 };
 
 struct Event {
-//	WatchToken token;
 	Action action;
 	std::filesystem::path path;
 	std::filesystem::path old_path;
-
-//	std::string dir; /// The directory
-//	std::string filename; /// The filename that was accessed (not full path)
-//	std::string old_path; /// The name of the file or directory moved
 
 	friend std::ostream& operator<<(std::ostream& os, const Event& event);
 };

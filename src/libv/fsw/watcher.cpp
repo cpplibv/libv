@@ -6,17 +6,10 @@
 // ext
 #include <efsw/efsw.hpp>
 // libv
-#include <libv/algorithm/erase_if_stable.hpp>
 #include <libv/algorithm/erase_if_unstable.hpp>
 #include <libv/algorithm/linear_find.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
-
-
-
-// <<< P5: debug stuff include
-#include <iostream>
-
 
 
 namespace libv {
@@ -53,23 +46,23 @@ std::ostream& operator<<(std::ostream& os, const Event& event) {
 
 // -------------------------------------------------------------------------------------------------
 
-void _debug_state(ImplFileWatcher& self) {
-	std::cout << "  -- --" << std::endl;
-	for (const auto& item : self.efsw_watcher->directories()) {
-		std::cout << "  -- EFSW Watch: " << item << std::endl;
-	}
-
-	for (const auto& item : self.watcher_entries) {
-		std::cout << "  -- Watch entry: " << item.path.string() << " ID:" << item.watchID << " RC:" << item.ref_count << std::endl;
-	}
-
-	for (const auto& item : self.directories) {
-		std::cout << "  -- DIR: " << item.first << " ID:" << item.second.watcher_used << std::endl;
-		for (const auto& item2 : item.second.file_callbacks) {
-			std::cout << "  --    FILE: " << item2.first << std::endl;
-		}
-	}
-}
+//void _debug_state(ImplFileWatcher& self) {
+//	std::cout << "  -- --" << std::endl;
+//	for (const auto& item : self.efsw_watcher->directories()) {
+//		std::cout << "  -- EFSW Watch: " << item << std::endl;
+//	}
+//
+//	for (const auto& item : self.watcher_entries) {
+//		std::cout << "  -- Watch entry: " << item.path.string() << " ID:" << item.watchID << " RC:" << item.ref_count << std::endl;
+//	}
+//
+//	for (const auto& item : self.directories) {
+//		std::cout << "  -- DIR: " << item.first << " ID:" << item.second.watcher_used << std::endl;
+//		for (const auto& item2 : item.second.file_callbacks) {
+//			std::cout << "  --    FILE: " << item2.first << std::endl;
+//		}
+//	}
+//}
 
 void _append_slash(std::filesystem::path& dir) {
 	static constexpr decltype(std::filesystem::path::preferred_separator) sep[] = {std::filesystem::path::preferred_separator, 0};
@@ -159,11 +152,6 @@ DirectoryCluster& _unsafe_watch_dir(ImplFileWatcher& self, std::filesystem::path
 		}
 	}
 
-//	if constexpr (WA0001) {
-//		const auto file_count = std::filesystem::...;
-//		entry.WA0001_file_count = file_count;
-//	}
-
 	if (dir_entry.watcher_used == 0)
 		dir_entry.watcher_used = id;
 
@@ -209,28 +197,6 @@ void _handle_file_action(
 
 	std::unique_lock lock(self.mutex);
 
-	// WA0001
-	if constexpr (WA0001) if (is_dir && action == Action::modify) {
-		const auto key = path.string();
-		auto entry_it = self.directories.find(key);
-
-		if (entry_it != self.directories.end()) {
-			for(auto& p : std::filesystem::directory_iterator(path)) {
-				if (p.is_directory())
-					continue;
-
-				const auto child_path = p.path();
-				const auto filename = child_path.filename().string();
-				const auto it = entry_it->second.file_callbacks.find(filename);
-
-				if (it != entry_it->second.file_callbacks.end()) {
-					std::cout << " Back to we goooo" << child_path << std::endl;
-//					_handle_file_action(self, Action::create, child_path, "");
-				}
-			}
-		}
-	}
-
 	// Broadcast to file callbacks
 	if (!is_dir) {
 		const auto dir = _parent_directory(path);
@@ -244,16 +210,6 @@ void _handle_file_action(
 			const auto it = entry_it->second.file_callbacks.find(file);
 			if (it != entry_it->second.file_callbacks.end()) {
 				for (auto& cb : it->second) {
-					if constexpr (WA0001) if (action == Action::create) {
-						if (cb.WA0001_create_already_sent)
-							continue;
-						cb.WA0001_exists = true;
-						cb.WA0001_create_already_sent = true;
-					}
-					if constexpr (WA0001) if (action == Action::remove) {
-						cb.WA0001_exists = false;
-						cb.WA0001_create_already_sent = false;
-					}
 					if (*cb.callback)
 						(*cb.callback)(cb.uses_relative_path ? event_rel : event_abs);
 				}
@@ -295,14 +251,9 @@ FileWatcher::token_type _subscribe_file(
 
 	std::unique_lock lock(self.mutex);
 
-	if constexpr (WA0001) {
-		const auto exists = std::filesystem::exists(path, ignore_ec);
-		_unsafe_watch_dir(self, dir).file_callbacks[str_file].emplace_back(exists, is_relative, std::move(cb_up));
-	} else {
-		_unsafe_watch_dir(self, dir).file_callbacks[str_file].emplace_back(is_relative, std::move(cb_up));
-	}
+	_unsafe_watch_dir(self, dir).file_callbacks[str_file].emplace_back(is_relative, std::move(cb_up));
 
-	_debug_state(self);
+//	_debug_state(self);
 
 	return token;
 }
@@ -323,10 +274,6 @@ FileWatcher::token_type _subscribe_directory(
 
 	auto& entry = _unsafe_watch_dir(self, path);
 	entry.callbacks.emplace_back(is_relative, std::move(cb_up));
-//	if constexpr (WA0001) {
-//		const auto file_count = std::filesystem::...;
-//		entry.WA0001_file_count = file_count;
-//	}
 
 //	_debug_state(self);
 

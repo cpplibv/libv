@@ -7,11 +7,10 @@
 // ext
 #include <efsw/efsw.hpp>
 // std
-#include <filesystem>
+//#include <filesystem>
 #include <functional>
 #include <mutex>
 #include <optional>
-#include <type_traits>
 #include <unordered_map>
 
 
@@ -20,40 +19,9 @@ namespace fsw {
 
 // -------------------------------------------------------------------------------------------------
 
-/// WA0001:
-/// Workaround for EFSW modify dir event instead of file create event on first new file in a directory
-///
-/// Extra operations during EFSW handleFileAction with the "WA0001_State":
-///		on_create:
-///			cb.exists = true;
-///			if !cb.create_already_sent
-///				cb.broadcast(event);
-///				cb.create_already_sent = true;
-///
-///		on_delete:
-///			cb.exists = false;
-///			cb.create_already_sent = false;
-///			cb.broadcast(event);
-///
-///		on_modify:
-///			if folder
-///				foreach fs::child
-///					if !cb.exists
-///						cb.exists = true;
-///						cb.create_already_sent = true;
-///						cb.broadcast(event)
-///
-///		on_rename:
-///			?
-///
-static constexpr bool WA0001 = true;
-
-// -------------------------------------------------------------------------------------------------
-
 struct CallbackDir {
 	bool uses_relative_path;
-	// NOTE: Pointer stability is used by watch tokens
-	// <<< P2: Better unsub method, remove double indirection
+	// NOTE: Pointer stability is used by watch tokens, better solutions are possible
 	std::unique_ptr<FileWatcher::callback_type> callback;
 
 	CallbackDir(bool uses_relative_path, std::unique_ptr<FileWatcher::callback_type>&& callback) :
@@ -61,34 +29,14 @@ struct CallbackDir {
 		callback(std::move(callback)) { }
 };
 
-struct WA0001_CallbackFile : CallbackDir {
-	bool WA0001_exists;
-	bool WA0001_create_already_sent = false;
+using CallbackFile = CallbackDir;
 
-	WA0001_CallbackFile(bool WA0001_exists, bool uses_relative_path, std::unique_ptr<FileWatcher::callback_type>&& callback) :
-		CallbackDir(uses_relative_path, std::move(callback)),
-		WA0001_exists(WA0001_exists) { }
-};
-
-using CallbackFile = std::conditional_t<WA0001, WA0001_CallbackFile, CallbackDir>;
-
-// -------------------------------------------------------------------------------------------------
-
-struct _DirectoryCluster {
+struct DirectoryCluster {
 	efsw::WatchID watcher_used = 0;
 
 	std::vector<CallbackDir> callbacks;
 	std::unordered_map<std::string, std::vector<CallbackFile>> file_callbacks;
 };
-
-struct WA0001_DirectoryCluster : _DirectoryCluster {
-	bool WA0001_scanned = false;
-	size_t WA0001_file_count = 0;
-};
-
-using DirectoryCluster = std::conditional_t<WA0001, WA0001_DirectoryCluster, _DirectoryCluster>;
-
-// -------------------------------------------------------------------------------------------------
 
 struct WatcherEntry {
 	efsw::WatchID watchID;

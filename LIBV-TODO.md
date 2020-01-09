@@ -341,6 +341,7 @@ libv.fsw: guard redundant watchers and ownerships
 libv.fsw: subscribe_directory
 libv.fsw: WA0001 workaround
 libv.fsw: unsubscribe (with cleanup)
+libv.fsw: Remove WA0001 workaround
 
 
 --- STACK ------------------------------------------------------------------------------------------

@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <thread>
+#include <iostream>
 // pro
 #include <libv/fsw/watcher.hpp>
 
@@ -158,6 +159,7 @@ public:
 		auto token = watcher->subscribe_file(path, [subID, this](const auto& event) {
 			std::ostringstream os;
 			os << event;
+			std::cout << subID << " " << event << std::endl;
 
 			events.push(Event{subID, std::move(os).str()});
 		});
@@ -171,6 +173,7 @@ public:
 		auto token = watcher->subscribe_directory(path, [subID, this](const auto& event) {
 			std::ostringstream os;
 			os << event;
+			std::cout << subID << " " << event << std::endl;
 
 			events.push(Event{subID, std::move(os).str()});
 		});
@@ -268,222 +271,222 @@ public:
 
 // =================================================================================================
 
-//TEST_CASE("single file watching", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	SECTION("subscribe first") {
-//		auto w0 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.create_file("a.txt");
-//		test.create_check(w0, "a.txt");
-//
-//		test.modify_file("a.txt");
-//		test.modify_check(w0, "a.txt");
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//	}
-//
-//	SECTION("create first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.modify_check(w0, "a.txt");
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//	}
-//
-//	SECTION("create mod first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//	}
-//
-//	SECTION("create mod rem first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.empty_check();
-//
-//		test.remove_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		(void) w0;
-//	}
-//}
-//
-//TEST_CASE("double file watching", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	SECTION("subscribe first") {
-//		auto w0 = test.subscribe_file("a.txt");
-//		auto w1 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.create_file("a.txt");
-//		test.create_check(w0, "a.txt");
-//		test.create_check(w1, "a.txt");
-//
-//		test.modify_file("a.txt");
-//		test.modify_check(w0, "a.txt");
-//		test.modify_check(w1, "a.txt");
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//		test.remove_check(w1, "a.txt");
-//	}
-//
-//	SECTION("create first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		auto w1 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.modify_check(w0, "a.txt");
-//		test.modify_check(w1, "a.txt");
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//		test.remove_check(w1, "a.txt");
-//	}
-//
-//	SECTION("create mod first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		auto w1 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		test.remove_file("a.txt");
-//		test.remove_check(w0, "a.txt");
-//		test.remove_check(w1, "a.txt");
-//	}
-//
-//	SECTION("create mod rem first") {
-//		test.create_file("a.txt");
-//		test.empty_check();
-//
-//		test.modify_file("a.txt");
-//		test.empty_check();
-//
-//		test.remove_file("a.txt");
-//		test.empty_check();
-//
-//		auto w0 = test.subscribe_file("a.txt");
-//		auto w1 = test.subscribe_file("a.txt");
-//		test.empty_check();
-//
-//		(void) w0;
-//		(void) w1;
-//	}
-//}
-//
-//TEST_CASE("multi file no interference watching", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	auto w0 = test.subscribe_file("a.txt");
-//	auto w1 = test.subscribe_file("b.txt");
-//
-//	test.create_file("a.txt");
-//	test.create_check(w0, "a.txt");
-//
-//	test.modify_file("a.txt");
-//	test.modify_check(w0, "a.txt");
-//
-//	test.remove_file("a.txt");
-//	test.remove_check(w0, "a.txt");
-//
-//	(void) w1;
-//}
-//
-//TEST_CASE("two file watching with and without present folders", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//	std::string path;
-//
-//	bool efsw_first_create_in_empty_dir_workaround = false;
-//
-//	SECTION("tmp/") {
-//		path = "tmp/";
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//	SECTION("tmp/a/") {
-//		path = "tmp/a/";
-//	}
-//	SECTION("tmp/a/a/") {
-//		path = "tmp/a/a/";
-//	}
-//
-//	SECTION("tmp/ with full dir") {
-//		path = "tmp/";
-//		test.create_directory("tmp/");
-//	}
-//	SECTION("tmp/a/ with full dir") {
-//		path = "tmp/a/";
-//		test.create_directory("tmp/a/");
-//	}
-//	SECTION("tmp/a/a/ with full dir") {
-//		path = "tmp/a/a/";
-//		test.create_directory("tmp/a/a/");
-//	}
-//
-//	SECTION("tmp/a/ with tmp/") {
-//		path = "tmp/a/";
-//		test.create_directory("tmp/");
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//	SECTION("tmp/a/a/ with tmp/") {
-//		path = "tmp/a/a/";
-//		test.create_directory("tmp/");
-//	}
-//	SECTION("tmp/a/a/ with tmp/a/") {
-//		path = "tmp/a/a/";
-//		test.create_directory("tmp/a/");
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//
-//	auto w0 = test.subscribe_file(path + "a.txt");
-//	auto w1 = test.subscribe_file(path + "b.txt");
-//
-//	test.create_file(path + "a.txt");
-//	if (!efsw_first_create_in_empty_dir_workaround)
-//		test.create_check(w0, path + "a.txt");
-//	test.modify_file(path + "a.txt");
-//	test.modify_check(w0, path + "a.txt");
-//	test.remove_file(path + "a.txt");
-//	test.remove_check(w0, path + "a.txt");
-//
-//	test.create_file(path + "b.txt");
-//	test.create_check(w1, path + "b.txt");
-//	test.modify_file(path + "b.txt");
-//	test.modify_check(w1, path + "b.txt");
-//	test.remove_file(path + "b.txt");
-//	test.remove_check(w1, path + "b.txt");
-//}
+TEST_CASE("single file watching", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	SECTION("subscribe first") {
+		auto w0 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.create_file("a.txt");
+		test.create_check(w0, "a.txt");
+
+		test.modify_file("a.txt");
+		test.modify_check(w0, "a.txt");
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+	}
+
+	SECTION("create first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.modify_check(w0, "a.txt");
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+	}
+
+	SECTION("create mod first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+	}
+
+	SECTION("create mod rem first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.empty_check();
+
+		test.remove_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		(void) w0;
+	}
+}
+
+TEST_CASE("double file watching", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	SECTION("subscribe first") {
+		auto w0 = test.subscribe_file("a.txt");
+		auto w1 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.create_file("a.txt");
+		test.create_check(w0, "a.txt");
+		test.create_check(w1, "a.txt");
+
+		test.modify_file("a.txt");
+		test.modify_check(w0, "a.txt");
+		test.modify_check(w1, "a.txt");
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+		test.remove_check(w1, "a.txt");
+	}
+
+	SECTION("create first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		auto w1 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.modify_check(w0, "a.txt");
+		test.modify_check(w1, "a.txt");
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+		test.remove_check(w1, "a.txt");
+	}
+
+	SECTION("create mod first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		auto w1 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		test.remove_file("a.txt");
+		test.remove_check(w0, "a.txt");
+		test.remove_check(w1, "a.txt");
+	}
+
+	SECTION("create mod rem first") {
+		test.create_file("a.txt");
+		test.empty_check();
+
+		test.modify_file("a.txt");
+		test.empty_check();
+
+		test.remove_file("a.txt");
+		test.empty_check();
+
+		auto w0 = test.subscribe_file("a.txt");
+		auto w1 = test.subscribe_file("a.txt");
+		test.empty_check();
+
+		(void) w0;
+		(void) w1;
+	}
+}
+
+TEST_CASE("multi file no interference watching", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	auto w0 = test.subscribe_file("a.txt");
+	auto w1 = test.subscribe_file("b.txt");
+
+	test.create_file("a.txt");
+	test.create_check(w0, "a.txt");
+
+	test.modify_file("a.txt");
+	test.modify_check(w0, "a.txt");
+
+	test.remove_file("a.txt");
+	test.remove_check(w0, "a.txt");
+
+	(void) w1;
+}
+
+TEST_CASE("two file watching with and without present folders", "[libv.fsw.watcher]") {
+	FSWTester test;
+	std::string path;
+
+	bool efsw_first_create_in_empty_dir_workaround = false;
+
+	SECTION("tmp/") {
+		path = "tmp/";
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+	SECTION("tmp/a/") {
+		path = "tmp/a/";
+	}
+	SECTION("tmp/a/a/") {
+		path = "tmp/a/a/";
+	}
+
+	SECTION("tmp/ with full dir") {
+		path = "tmp/";
+		test.create_directory("tmp/");
+	}
+	SECTION("tmp/a/ with full dir") {
+		path = "tmp/a/";
+		test.create_directory("tmp/a/");
+	}
+	SECTION("tmp/a/a/ with full dir") {
+		path = "tmp/a/a/";
+		test.create_directory("tmp/a/a/");
+	}
+
+	SECTION("tmp/a/ with tmp/") {
+		path = "tmp/a/";
+		test.create_directory("tmp/");
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+	SECTION("tmp/a/a/ with tmp/") {
+		path = "tmp/a/a/";
+		test.create_directory("tmp/");
+	}
+	SECTION("tmp/a/a/ with tmp/a/") {
+		path = "tmp/a/a/";
+		test.create_directory("tmp/a/");
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+
+	auto w0 = test.subscribe_file(path + "a.txt");
+	auto w1 = test.subscribe_file(path + "b.txt");
+
+	test.create_file(path + "a.txt");
+	if (!efsw_first_create_in_empty_dir_workaround)
+		test.create_check(w0, path + "a.txt");
+	test.modify_file(path + "a.txt");
+	test.modify_check(w0, path + "a.txt");
+	test.remove_file(path + "a.txt");
+	test.remove_check(w0, path + "a.txt");
+
+	test.create_file(path + "b.txt");
+	test.create_check(w1, path + "b.txt");
+	test.modify_file(path + "b.txt");
+	test.modify_check(w1, path + "b.txt");
+	test.remove_file(path + "b.txt");
+	test.remove_check(w1, path + "b.txt");
+}
 
 TEST_CASE("subscribe_directory", "[libv.fsw.watcher]") {
 	FSWTester test;
@@ -510,125 +513,125 @@ TEST_CASE("subscribe_directory", "[libv.fsw.watcher]") {
 	test.create_check(wd, path + "b.txt");
 }
 
-//TEST_CASE("no dup event on in stacked folders", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	bool efsw_first_create_in_empty_dir_workaround = false;
-//
-//	SECTION("0 dir") {
-//	}
-//	SECTION("1 dir") {
-//		test.create_directory("tmp/");
-//	}
-//	SECTION("2 dir") {
-//		test.create_directory("tmp/tmp/");
-//	}
-//	SECTION("3 dir") {
-//		test.create_directory("tmp/tmp/tmp/");
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//
-//	auto w0 = test.subscribe_file("tmp/tmp/tmp/a.txt");
-//	auto w1 = test.subscribe_file("tmp/tmp/a.txt");
-//	auto w2 = test.subscribe_file("tmp/a.txt");
-//	auto w3 = test.subscribe_file("a.txt");
-//
-//	test.create_file("tmp/tmp/tmp/a.txt");
-//	if (!efsw_first_create_in_empty_dir_workaround)
-//		test.create_check(w0, "tmp/tmp/tmp/a.txt");
-//
-//	test.create_file("tmp/tmp/a.txt");
-//	test.create_check(w1, "tmp/tmp/a.txt");
-//
-//	test.create_file("tmp/a.txt");
-//	test.create_check(w2, "tmp/a.txt");
-//
-//	test.create_file("a.txt");
-//	test.create_check(w3, "a.txt");
-//}
-//
-//TEST_CASE("no dup event on out stacked folders", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	bool efsw_first_create_in_empty_dir_workaround = false;
-//
-//	SECTION("0 dir") {
-//	}
-//	SECTION("1 dir") {
-//		test.create_directory("tmp/");
-//	}
-//	SECTION("2 dir") {
-//		test.create_directory("tmp/tmp/");
-//	}
-//	SECTION("3 dir") {
-//		test.create_directory("tmp/tmp/tmp/");
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//
-//	auto w3 = test.subscribe_file("a.txt");
-//	auto w2 = test.subscribe_file("tmp/a.txt");
-//	auto w1 = test.subscribe_file("tmp/tmp/a.txt");
-//	auto w0 = test.subscribe_file("tmp/tmp/tmp/a.txt");
-//
-//	test.create_file("tmp/tmp/tmp/a.txt");
-//	if (!efsw_first_create_in_empty_dir_workaround)
-//		test.create_check(w0, "tmp/tmp/tmp/a.txt");
-//
-//	test.create_file("tmp/tmp/a.txt");
-//	test.create_check(w1, "tmp/tmp/a.txt");
-//
-//	test.create_file("tmp/a.txt");
-//	test.create_check(w2, "tmp/a.txt");
-//
-//	test.create_file("a.txt");
-//	test.create_check(w3, "a.txt");
-//}
-//
-//TEST_CASE("scenario 0", "[libv.fsw.watcher]") {
-//	FSWTester test;
-//
-//	bool efsw_first_create_in_empty_dir_workaround = false;
-//
-//	SECTION("no dir") {
-//	}
-//	SECTION("half dir") {
-//		test.create_directory("tmp/a/p");
-//		test.create_directory("tmp/b/p");
-//	}
-//	SECTION("full dir") {
-//		test.create_directory("tmp/p/p");
-//		test.create_directory("tmp/p/b");
-//		test.create_directory("tmp/a/p");
-//		test.create_directory("tmp/b/p");
-//
-//		efsw_first_create_in_empty_dir_workaround = true;
-//	}
-//
-//	auto w0 = test.subscribe_file("tmp/p/p/a.txt");
-//	auto w1 = test.subscribe_file("tmp/p/p/b.txt");
-//	auto w2 = test.subscribe_file("tmp/p/a.txt");
-//	auto w3 = test.subscribe_file("tmp/p/b.txt");
-//	auto w4 = test.subscribe_file("tmp/a.txt");
-//	auto w5 = test.subscribe_file("a.txt");
-//
-//	test.create_file("tmp/p/p/a.txt");
-//	if (!efsw_first_create_in_empty_dir_workaround)
-//		test.create_check(w0, "tmp/p/p/a.txt");
-//
-//	test.create_file("tmp/p/p/b.txt");
-//	test.create_check(w1, "tmp/p/p/b.txt");
-//
-//	test.create_file("tmp/a.txt");
-//	test.create_check(w4, "tmp/a.txt");
-//
-//	test.create_file("tmp/p/b.txt");
-//	test.create_check(w3, "tmp/p/b.txt");
-//
-//	test.create_file("tmp/p/a.txt");
-//	test.create_check(w2, "tmp/p/a.txt");
-//
-//	test.create_file("a.txt");
-//	test.create_check(w5, "a.txt");
-//}
+TEST_CASE("no dup event on in stacked folders", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	bool efsw_first_create_in_empty_dir_workaround = false;
+
+	SECTION("0 dir") {
+	}
+	SECTION("1 dir") {
+		test.create_directory("tmp/");
+	}
+	SECTION("2 dir") {
+		test.create_directory("tmp/tmp/");
+	}
+	SECTION("3 dir") {
+		test.create_directory("tmp/tmp/tmp/");
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+
+	auto w0 = test.subscribe_file("tmp/tmp/tmp/a.txt");
+	auto w1 = test.subscribe_file("tmp/tmp/a.txt");
+	auto w2 = test.subscribe_file("tmp/a.txt");
+	auto w3 = test.subscribe_file("a.txt");
+
+	test.create_file("tmp/tmp/tmp/a.txt");
+	if (!efsw_first_create_in_empty_dir_workaround)
+		test.create_check(w0, "tmp/tmp/tmp/a.txt");
+
+	test.create_file("tmp/tmp/a.txt");
+	test.create_check(w1, "tmp/tmp/a.txt");
+
+	test.create_file("tmp/a.txt");
+	test.create_check(w2, "tmp/a.txt");
+
+	test.create_file("a.txt");
+	test.create_check(w3, "a.txt");
+}
+
+TEST_CASE("no dup event on out stacked folders", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	bool efsw_first_create_in_empty_dir_workaround = false;
+
+	SECTION("0 dir") {
+	}
+	SECTION("1 dir") {
+		test.create_directory("tmp/");
+	}
+	SECTION("2 dir") {
+		test.create_directory("tmp/tmp/");
+	}
+	SECTION("3 dir") {
+		test.create_directory("tmp/tmp/tmp/");
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+
+	auto w3 = test.subscribe_file("a.txt");
+	auto w2 = test.subscribe_file("tmp/a.txt");
+	auto w1 = test.subscribe_file("tmp/tmp/a.txt");
+	auto w0 = test.subscribe_file("tmp/tmp/tmp/a.txt");
+
+	test.create_file("tmp/tmp/tmp/a.txt");
+	if (!efsw_first_create_in_empty_dir_workaround)
+		test.create_check(w0, "tmp/tmp/tmp/a.txt");
+
+	test.create_file("tmp/tmp/a.txt");
+	test.create_check(w1, "tmp/tmp/a.txt");
+
+	test.create_file("tmp/a.txt");
+	test.create_check(w2, "tmp/a.txt");
+
+	test.create_file("a.txt");
+	test.create_check(w3, "a.txt");
+}
+
+TEST_CASE("scenario 0", "[libv.fsw.watcher]") {
+	FSWTester test;
+
+	bool efsw_first_create_in_empty_dir_workaround = false;
+
+	SECTION("no dir") {
+	}
+	SECTION("half dir") {
+		test.create_directory("tmp/a/p");
+		test.create_directory("tmp/b/p");
+	}
+	SECTION("full dir") {
+		test.create_directory("tmp/p/p");
+		test.create_directory("tmp/p/b");
+		test.create_directory("tmp/a/p");
+		test.create_directory("tmp/b/p");
+
+		efsw_first_create_in_empty_dir_workaround = true;
+	}
+
+	auto w0 = test.subscribe_file("tmp/p/p/a.txt");
+	auto w1 = test.subscribe_file("tmp/p/p/b.txt");
+	auto w2 = test.subscribe_file("tmp/p/a.txt");
+	auto w3 = test.subscribe_file("tmp/p/b.txt");
+	auto w4 = test.subscribe_file("tmp/a.txt");
+	auto w5 = test.subscribe_file("a.txt");
+
+	test.create_file("tmp/p/p/a.txt");
+	if (!efsw_first_create_in_empty_dir_workaround)
+		test.create_check(w0, "tmp/p/p/a.txt");
+
+	test.create_file("tmp/p/p/b.txt");
+	test.create_check(w1, "tmp/p/p/b.txt");
+
+	test.create_file("tmp/a.txt");
+	test.create_check(w4, "tmp/a.txt");
+
+	test.create_file("tmp/p/b.txt");
+	test.create_check(w3, "tmp/p/b.txt");
+
+	test.create_file("tmp/p/a.txt");
+	test.create_check(w2, "tmp/p/a.txt");
+
+	test.create_file("a.txt");
+	test.create_check(w5, "a.txt");
+}
 
 // -------------------------------------------------------------------------------------------------
