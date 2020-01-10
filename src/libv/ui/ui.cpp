@@ -23,6 +23,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/overlay_zoom.lpp>
 
@@ -183,8 +184,10 @@ public:
 
 public:
 	void event(const libv::input::EventChar& event) {
-		if (context_state.focus_ != nullptr)
-			AccessRoot::eventChar(*context_state.focus_, event);
+		if (context_state.focus_ == nullptr)
+			return;
+
+		AccessRoot::eventChar(*context_state.focus_, EventChar(event));
 	}
 
 	void event(const libv::input::EventKey& event) {
@@ -224,7 +227,7 @@ public:
 //		}
 
 		if (context_state.focus_ != nullptr)
-			AccessRoot::eventKey(*context_state.focus_, event);
+			AccessRoot::eventKey(*context_state.focus_, EventKey(event));
 
 		if (event.action != libv::input::Action::release) {
 			context_state.pressed_keys.insert(event.key);

@@ -14,6 +14,7 @@
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
+#include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/style.hpp>
 
@@ -208,16 +209,22 @@ bool BaseComponent::isFocusableComponent() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::eventChar(BaseComponent& component, const libv::input::EventChar& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
-		if (i->flags.match_any(Flag::watchChar) && i->onChar(event))
+void BaseComponent::eventChar(BaseComponent& component, const EventChar& event) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
+		if (i->flags.match_any(Flag::watchChar))
+			i->onChar(event);
+		if (event.propagation_stopped())
 			return;
+	}
 }
 
-void BaseComponent::eventKey(BaseComponent& component, const libv::input::EventKey& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent)
-		if (i->flags.match_any(Flag::watchKey) && i->onKey(event))
+void BaseComponent::eventKey(BaseComponent& component, const EventKey& event) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
+		if (i->flags.match_any(Flag::watchKey))
+			i->onKey(event);
+		if (event.propagation_stopped())
 			return;
+	}
 }
 
 void BaseComponent::focusGain(BaseComponent& component) {
@@ -234,33 +241,28 @@ void BaseComponent::focusLoss(BaseComponent& component) {
 
 // -------------------------------------------------------------------------------------------------
 
-bool BaseComponent::onChar(const libv::input::EventChar& event) {
+void BaseComponent::onChar(const EventChar& event) {
 	(void) event;
-	return false;
 }
 
-bool BaseComponent::onKey(const libv::input::EventKey& event) {
+void BaseComponent::onKey(const EventKey& event) {
 	(void) event;
-	return false;
 }
 
 void BaseComponent::onFocus(const EventFocus& event) {
 	(void) event;
 }
 
-bool BaseComponent::onMouseButton(const EventMouseButton& event) {
+void BaseComponent::onMouseButton(const EventMouseButton& event) {
 	(void) event;
-	return false;
 }
 
-bool BaseComponent::onMouseMovement(const EventMouseMovement& event) {
+void BaseComponent::onMouseMovement(const EventMouseMovement& event) {
 	(void) event;
-	return false;
 }
 
-bool BaseComponent::onMouseScroll(const EventMouseScroll& event) {
+void BaseComponent::onMouseScroll(const EventMouseScroll& event) {
 	(void) event;
-	return false;
 }
 
 // -------------------------------------------------------------------------------------------------

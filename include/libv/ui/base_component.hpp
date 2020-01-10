@@ -32,6 +32,8 @@ class ContextLayout2;
 class ContextRender;
 class ContextStyle;
 class ContextUI;
+class EventChar;
+class EventKey;
 class EventFocus;
 class EventMouseButton;
 class EventMouseMovement;
@@ -164,18 +166,18 @@ private:
 	bool isFocusableComponent() const noexcept;
 
 private:
-	static void eventChar(BaseComponent& component, const libv::input::EventChar& event);
-	static void eventKey(BaseComponent& component, const libv::input::EventKey& event);
+	static void eventChar(BaseComponent& component, const EventChar& event);
+	static void eventKey(BaseComponent& component, const EventKey& event);
 	static void focusGain(BaseComponent& component);
 	static void focusLoss(BaseComponent& component);
 
 private:
-	virtual bool onChar(const libv::input::EventChar& event); /// returns true if event is absorbed
-	virtual bool onKey(const libv::input::EventKey& event); /// returns true if event is absorbed
+	virtual void onChar(const EventChar& event);
+	virtual void onKey(const EventKey& event);
 	virtual void onFocus(const EventFocus& event);
-	virtual bool onMouseButton(const EventMouseButton& event);
-	virtual bool onMouseMovement(const EventMouseMovement& event);
-	virtual bool onMouseScroll(const EventMouseScroll& event);
+	virtual void onMouseButton(const EventMouseButton& event);
+	virtual void onMouseMovement(const EventMouseMovement& event);
+	virtual void onMouseScroll(const EventMouseScroll& event);
 
 private:
 	void attach(BaseComponent& parent);
@@ -268,10 +270,10 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 		return component.size_;
 	}
 
-	static inline decltype(auto) eventChar(BaseComponent& component, const libv::input::EventChar& event) {
+	static inline decltype(auto) eventChar(BaseComponent& component, const EventChar& event) {
 		return BaseComponent::eventChar(component, event);
 	}
-	static inline decltype(auto) eventKey(BaseComponent& component, const libv::input::EventKey& event) {
+	static inline decltype(auto) eventKey(BaseComponent& component, const EventKey& event) {
 		return BaseComponent::eventKey(component, event);
 	}
 

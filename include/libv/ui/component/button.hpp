@@ -102,9 +102,9 @@ public:
 
 private:
 	virtual void onFocus(const EventFocus& event) override;
-	virtual bool onMouseButton(const EventMouseButton& event) override;
-	virtual bool onMouseMovement(const EventMouseMovement& event) override;
-	virtual bool onMouseScroll(const EventMouseScroll& event) override;
+	virtual void onMouseButton(const EventMouseButton& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
 
 private:
 	virtual void doAttach() override;

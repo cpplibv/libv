@@ -10,6 +10,7 @@
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
+#include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/read_file.hpp>
@@ -110,13 +111,13 @@ void ViewerUI::load(const std::string& path) {
 
 // -------------------------------------------------------------------------------------------------
 
-bool ViewerUI::onKey(const libv::input::EventKey& event) {
+void ViewerUI::onKey(const libv::ui::EventKey& event) {
 	// TODO P0: libv.ui: Proper mouse shield and focus travers (remove two line below)
 	if (event.key == libv::input::Key::Tab)
 		focus();
 
 	if (not isFocused())
-		return false;
+		return;
 
 	if (event.key == libv::input::Key::F && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none)
 		scene.reset_camera();
@@ -124,24 +125,26 @@ bool ViewerUI::onKey(const libv::input::EventKey& event) {
 		scene.focus_camera();
 
 	log_app.info("ViewerUI Key {} {} {} {}", libv::input::to_string(event.action), libv::input::to_string(event.key), libv::to_value(event.mods), event.scancode);
-	return true;
+
+	event.stop_propagation();
 }
 
 void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 	log_app.info("ViewerUI Focus {}", event.focus);
 }
 
-bool ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
+void ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
 	// TODO P0: libv.ui: proper mouse shielding, and gain focus here too
 	//	focus();
 
 	log_app.info("ViewerUI Button {} {}", libv::input::to_string(event.action), libv::input::to_string(event.button));
-	return true;
+
+	event.stop_propagation();
 }
 
-bool ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
+void ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 	if (not isFocused())
-		return false;
+		return;
 
 	log_app.info("ViewerUI Movement {} {} {} {}", event.enter, event.leave, event.mouse_movement, event.mouse_position);
 
@@ -161,12 +164,12 @@ bool ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 		scene.camera.rotateX(-event.mouse_movement.y * mouse_spin_speed);
 	}
 
-	return true;
+	event.stop_propagation();
 }
 
-bool ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
+void ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
 	if (not isFocused())
-		return false;
+		return;
 
 	log_app.info("ViewerUI Scroll {} {}", event.scroll_movement, event.scroll_position);
 
@@ -175,7 +178,7 @@ bool ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
 
 	scene.camera.translateZoom(event.scroll_movement.y * mouse_scroll_scale);
 
-	return true;
+	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -64,10 +64,10 @@ private:
 	void update_cursor();
 
 private:
-	virtual bool onKey(const libv::input::EventKey& event) override;
+	virtual void onKey(const EventKey& event) override;
 	virtual void onFocus(const EventFocus& event) override;
-	virtual bool onMouseMovement(const EventMouseMovement& event) override;
-	virtual bool onMouseScroll(const EventMouseScroll& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
 
 private:
 	virtual void doAttach() override;

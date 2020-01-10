@@ -50,11 +50,11 @@ public:
 	void load(const std::string& path);
 
 private:
-	virtual bool onKey(const libv::input::EventKey& event) override;
+	virtual void onKey(const libv::ui::EventKey& event) override;
 	virtual void onFocus(const libv::ui::EventFocus& event) override;
-	virtual bool onMouseButton(const libv::ui::EventMouseButton& event) override;
-	virtual bool onMouseMovement(const libv::ui::EventMouseMovement& event) override;
-	virtual bool onMouseScroll(const libv::ui::EventMouseScroll& event) override;
+	virtual void onMouseButton(const libv::ui::EventMouseButton& event) override;
+	virtual void onMouseMovement(const libv::ui::EventMouseMovement& event) override;
+	virtual void onMouseScroll(const libv::ui::EventMouseScroll& event) override;
 
 private:
 	virtual void doAttach() override;

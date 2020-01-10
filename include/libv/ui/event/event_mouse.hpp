@@ -5,6 +5,8 @@
 // libv
 #include <libv/input/input.hpp>
 #include <libv/math/vec.hpp>
+// pro
+#include <libv/ui/event/base_event.hpp>
 
 
 namespace libv {
@@ -12,7 +14,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct BaseEventMouse {
+struct BaseEventMouse : BaseEvent {
 };
 
 struct EventMouseButton : BaseEventMouse {

@@ -20,12 +20,12 @@
 #include <libv/ui/component/stretch.hpp> // testing only, remove it
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 //#include <libv/ui/shader/shader_font.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 #include <libv/ui/shader/shader_image.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 //#include <libv/ui/shader/shader_quad.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.
 #include <libv/utility/generic_path.hpp>
-#include <libv/input/event.hpp>
 // std
 //#include <sstream>
 // pro
@@ -171,22 +171,20 @@ void QuickFilePicker::doAttach() {
 	update_filelist();
 }
 
-bool QuickFilePicker::onKey(const libv::input::EventKey& event) {
+void QuickFilePicker::onKey(const libv::ui::EventKey& event) {
 	if (event.key == libv::input::Key::Up && event.action != libv::input::Action::release) {
 		select--;
 		log_app.info("Select {}", select);
 		update_filelist();
-		return true;
+		return event.stop_propagation();
 	}
 
 	if (event.key == libv::input::Key::Down && event.action != libv::input::Action::release) {
 		select++;
 		log_app.info("Select {}", select);
 		update_filelist();
-		return true;
+		return event.stop_propagation();
 	}
-
-	return false;
 }
 
 void QuickFilePicker::update_filelist() {

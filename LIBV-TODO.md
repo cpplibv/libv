@@ -342,19 +342,27 @@ libv.fsw: subscribe_directory
 libv.fsw: WA0001 workaround
 libv.fsw: unsubscribe (with cleanup)
 libv.fsw: Remove WA0001 workaround
+libv.ui: instead of return value use (with different name) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: mouse respect stop_propagation
+libv.ui: absorb - mouse event absorb/shield/plates
+
+libv.ui: common base class for event "host stubs" to handle general events
+libv.ui: provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
+libv.ui: read http://nanapro.org/en-us/documentation/core/events.htm
+libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
+libv.ui: unignorable event handlers
+
+libv.ui: alias any libv.input event in libv.ui for consistent access
+
 app.vm4_viewer: proper camera grab
 app.vm4_viewer: camera movement should acquire mouse
-libv.ui: absorb - mouse event absorb/shield/plates
 libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
-libv.ui: instead of return value use (with different name:) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
-libv.ui: unignorable event handles
-libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 
 app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
@@ -457,7 +465,7 @@ atlas
 	libv.ui: support atlas based images
 
 ui
-	libv.ui: if size is 0, do not execute anything from ui loop (frame buffer protection)
+	libv.ui: if ui size is 0, do not execute anything from ui loop (frame buffer protection)
 	libv.ui: layout padding
 	libv.ui: fragments, sub component reusable codes
 	libv.ui: background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
@@ -488,9 +496,6 @@ mouse
 
 event
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
-	libv.ui: common base class for event "host stubs" to handle general events
-	libv.ui: provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
-	libv.ui: read http://nanapro.org/en-us/documentation/core/events.htm
 
 properties / style
 	libv.ui.property: property system interaction with static_component system

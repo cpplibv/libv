@@ -10,6 +10,7 @@
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_focus.hpp>
+#include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
@@ -171,7 +172,7 @@ void Button::onFocus(const EventFocus& event) {
 	flagAuto(Flag::pendingRender);
 }
 
-bool Button::onMouseButton(const EventMouseButton& event) {
+void Button::onMouseButton(const EventMouseButton& event) {
 	if (event.action == libv::input::Action::press)
 		focus();
 
@@ -180,10 +181,11 @@ bool Button::onMouseButton(const EventMouseButton& event) {
 	// TODO P3: use hotkey event (ui.select) (even for mouse)
 	if (event.action == libv::input::Action::press && event.button == libv::input::Mouse::Left)
 		fire(ESubmit{*this});
-	return true;
+
+	event.stop_propagation();
 }
 
-bool Button::onMouseMovement(const EventMouseMovement& event) {
+void Button::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter)
 		set(property.bg_color, property.bg_color() + 0.2f);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
@@ -193,12 +195,14 @@ bool Button::onMouseMovement(const EventMouseMovement& event) {
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	fire(EMouseMovement{event, *this});
-	return true;
+
+	event.stop_propagation();
 }
 
-bool Button::onMouseScroll(const EventMouseScroll& event) {
+void Button::onMouseScroll(const EventMouseScroll& event) {
 	fire(EMouseScroll{event, *this});
-	return true;
+
+	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------

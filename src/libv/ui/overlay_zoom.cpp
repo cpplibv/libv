@@ -199,31 +199,29 @@ void OverlayZoom::update_cursor() {
 
 // -------------------------------------------------------------------------------------------------
 
-bool OverlayZoom::onKey(const libv::input::EventKey& event) {
+void OverlayZoom::onKey(const EventKey& event) {
 	(void) event;
-
-	return true;
 }
 
 void OverlayZoom::onFocus(const EventFocus& event) {
 	(void) event;
 }
 
-bool OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
+void OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 	if (!control_)
-		return false;
+		return;
 
 	if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
 		displayPosition -= event.mouse_movement / zoom_;
 		update();
 	}
 
-	return true;
+	event.stop_propagation();
 }
 
-bool OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
+void OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 	if (!control_)
-		return false;
+		return;
 
 	const auto old_zoom = zoom_;
 	auto new_zoom = std::clamp(old_zoom * std::pow(1.25f, event.scroll_movement.y), 0.512f, 330.872245f);
@@ -238,7 +236,7 @@ bool OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 	displayPosition += context().state.mouse_position() / old_zoom - context().state.mouse_position() / new_zoom;
 	update();
 
-	return true;
+	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------

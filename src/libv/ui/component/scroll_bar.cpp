@@ -312,7 +312,7 @@ inline auto ScrollBar::bar_bounds() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-bool ScrollBar::onMouseButton(const EventMouseButton& event) {
+void ScrollBar::onMouseButton(const EventMouseButton& event) {
 	if (event.button == libv::input::Mouse::Left && event.action == libv::input::Action::press) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
 		const auto bar = bar_bounds();
@@ -338,26 +338,24 @@ bool ScrollBar::onMouseButton(const EventMouseButton& event) {
 		}
 
 		context().mouse.acquire(*this);
-		return true;
+		return event.stop_propagation();
 	}
 
 	if (event.button == libv::input::Mouse::Left && event.action == libv::input::Action::release) {
 		context().mouse.release(*this);
 		drag_mode = DragMode::idle;
-		return true;
+		return event.stop_propagation();
 	}
 
 	// === TEMP ========================================================================================
 	if (event.button == libv::input::Mouse::Right && event.action == libv::input::Action::press) {
 		set(property.orientation, Orientation{(libv::to_value(property.orientation()) + 1) % 4});
-		return true;
+		return event.stop_propagation();
 	}
 	// === TEMP ========================================================================================
-
-	return false;
 }
 
-bool ScrollBar::onMouseMovement(const EventMouseMovement& event) {
+void ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter) {
 		set(property.bg_color, property.bg_color() + 0.2f);
 		set(property.bar_color, property.bar_color() + 0.2f);
@@ -371,7 +369,7 @@ bool ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	}
 
 	if (drag_mode == DragMode::idle)
-		return false;
+		return;
 
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
 	const auto bar = bar_bounds();
@@ -385,7 +383,7 @@ bool ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 		const auto toward_min = side_a == orient.control_inverted;
 		const auto local_value = toward_min ? value_min_ : value_max_;
 		value(local_value);
-		return true;
+		return event.stop_propagation();
 	}
 
 	const auto local_drag = drag_mode == DragMode::track ?
@@ -400,16 +398,16 @@ bool ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 			orient.control_inverted ? value_min_ : value_max_);
 
 	value(local_value);
-	return true;
+	event.stop_propagation();
 }
 
-bool ScrollBar::onMouseScroll(const EventMouseScroll& event) {
+void ScrollBar::onMouseScroll(const EventMouseScroll& event) {
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
 	const auto movement = static_cast<double>(event.scroll_movement.y * orient.control_direction);
 	const auto inverse_interval = value_min_ < value_max_ ? 1.0 : -1.0;
 	make_scroll(movement * inverse_interval);
 
-	return true;
+	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------
