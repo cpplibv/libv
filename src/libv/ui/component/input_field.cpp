@@ -4,7 +4,6 @@
 #include <libv/ui/component/input_field.hpp>
 // libv
 #include <libv/glr/queue.hpp>
-#include <libv/input/event.hpp>
 #include <libv/meta/identity.hpp>
 // pro
 #include <libv/ui/context_layout.hpp>

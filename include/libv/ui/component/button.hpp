@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/glr/mesh.hpp>
-#include <libv/input/input.hpp>
 // std
 #include <functional>
 #include <string>

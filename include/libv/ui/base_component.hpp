@@ -3,7 +3,6 @@
 #pragma once
 
 // libv
-#include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
 #include <libv/utility/intrusive_ptr.hpp>

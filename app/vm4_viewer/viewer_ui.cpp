@@ -3,7 +3,6 @@
 // hpp
 #include <vm4_viewer/viewer_ui.hpp>
 // libv
-#include <libv/input/event.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/context_render.hpp>
@@ -112,10 +111,6 @@ void ViewerUI::load(const std::string& path) {
 // -------------------------------------------------------------------------------------------------
 
 void ViewerUI::onKey(const libv::ui::EventKey& event) {
-	// TODO P0: libv.ui: Proper mouse shield and focus travers (remove two line below)
-	if (event.key == libv::input::Key::Tab)
-		focus();
-
 	if (not isFocused())
 		return;
 
@@ -134,8 +129,7 @@ void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 }
 
 void ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
-	// TODO P0: libv.ui: proper mouse shielding, and gain focus here too
-	//	focus();
+	focus();
 
 	log_app.info("ViewerUI Button {} {}", libv::input::to_string(event.action), libv::input::to_string(event.button));
 
@@ -149,7 +143,7 @@ void ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 	log_app.info("ViewerUI Movement {} {} {} {}", event.enter, event.leave, event.mouse_movement, event.mouse_position);
 
 	const auto zoom = -scene.camera.zoom();
-	const auto mouse_spin_speed = libv::to_rad(60.f) * 0.0025f; // 60°/400px
+	const auto mouse_spin_speed = libv::to_rad(60.f) * 0.0032f; // 60°/312.5px
 	const auto mouse_move_speed = zoom * 0.0006f + 0.05f;
 
 	if (context().state.mouse_pressed(libv::input::Mouse::Left) && context().state.mouse_pressed(libv::input::Mouse::Right)) {

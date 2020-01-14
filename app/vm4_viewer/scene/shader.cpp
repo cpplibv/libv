@@ -35,7 +35,7 @@ BaseShader::BaseShader(const std::filesystem::path& vs_path, const std::filesyst
 	update(fs_path, false);
 	update_ptr(*this);
 
-	// <<< P1: UI based file watcher that swaps threads and broadcasts the event in the appropriate loop stage
+	// <<< P5: UI based file watcher that swaps threads and broadcasts the event in the appropriate loop stage
 	watcher_vs = watcher.subscribe_file(vs_path, [this, vs_path](const libv::fsw::Event& e) {
 		log_app.trace("Updating {} shader: {}", "vertex", e);
 		this->update(vs_path, true);

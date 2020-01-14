@@ -343,26 +343,20 @@ libv.fsw: WA0001 workaround
 libv.fsw: unsubscribe (with cleanup)
 libv.fsw: Remove WA0001 workaround
 libv.ui: instead of return value use (with different name) void stop_propagation() const; / bool propagation_stopped() const; / mutable bool stop_propagation_{ false };
+libv.ui: Mouse events should respect stop_propagation
+libv.ui: Mouse event absorb/shield/plates
+libv.ui: alias any libv.input event in libv.ui for consistent access
+app.vm4_viewer: proper camera grab
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: mouse respect stop_propagation
-libv.ui: absorb - mouse event absorb/shield/plates
+libv.ui: Rename mouse_table to context_mouse
 
-libv.ui: common base class for event "host stubs" to handle general events
-libv.ui: provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
-libv.ui: read http://nanapro.org/en-us/documentation/core/events.htm
-libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
-libv.ui: unignorable event handlers
-
-libv.ui: alias any libv.input event in libv.ui for consistent access
-
-app.vm4_viewer: proper camera grab
-app.vm4_viewer: camera movement should acquire mouse
-libv.ui: absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+
+app.vm4_viewer: camera movement should acquire and lock mouse position
 
 app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
@@ -414,6 +408,9 @@ libv.gl.glsl: Warning option for space indentation or if indentation character i
 
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 app.vm4_viewer: UI shader should unsub from file watcher, ATM there is an issue during program termination
+
+app: about page with executable path, build and compiler information, git hash and software version
+libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
 
 vm4 hash and timestamp
 	ext: cryptopp https://github.com/weidai11/cryptopp
@@ -493,8 +490,16 @@ cleanup
 mouse
 	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | need this as component level dynamically (camera controls need global, for other ui actions local is enough)
 	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
+	libv.ui: Mouse acquire should leave any over component (?)
+	libv.ui: Mouse release should enter any over component (?) (respect non-pass_through)
+	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 
 event
+	libv.ui: Common base class for event "host stubs" to handle general events (mouse / keyboard / component lifetime)
+	libv.ui: Provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
+	libv.ui: Read http://nanapro.org/en-us/documentation/core/events.htm
+	libv.ui: Unignorable event handlers
+	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
 
 properties / style
@@ -891,6 +896,7 @@ libv.gl: uniformbuffer?
 libv.log: log thread naming
 libv.net: Possible C++20 feature std::ispanstream would allow direct deserialization out from a received packet
 libv.net: compression lib (fast, but not the best compression for me) https://github.com/google/snappy
+libv.range: view::input_pass resumable range pass: auto pass = range | view::input_pass; for (auto i : pass) fooA(i) if (i % 2) break; for (auto i : pass) fooB(i);
 libv.sig: merge back and place meta (too many tamplate argument) into libv.meta, (or dont, please, it is too many template)
 libv.ui.layout: think layout as a graph instead of a stack..., just think and see whats going on with that approach
 libv.ui.lua: https://www.wowace.com/projects/ace3/pages/ace-gui-3-0-widgets

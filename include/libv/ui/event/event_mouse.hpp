@@ -15,6 +15,17 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct BaseEventMouse : BaseEvent {
+//private:
+//	mutable bool shield_mouse_ = false;
+//
+//public:
+//	constexpr inline void shield_mouse() const noexcept {
+//		shield_mouse_ = true;
+//	}
+//
+//	[[nodiscard]] constexpr inline bool mouse_shielded() const noexcept {
+//		return !shield_mouse_;
+//	}
 };
 
 struct EventMouseButton : BaseEventMouse {
@@ -28,6 +39,18 @@ struct EventMouseMovement : BaseEventMouse {
 
 	bool enter = false;
 	bool leave = false;
+
+private:
+	mutable bool pass_through_ = false;
+
+public:
+	constexpr inline void pass_through() const noexcept {
+		pass_through_ = true;
+	}
+
+	[[nodiscard]] constexpr inline bool is_pass_through() const noexcept {
+		return pass_through_;
+	}
 };
 
 struct EventMouseScroll : BaseEventMouse {

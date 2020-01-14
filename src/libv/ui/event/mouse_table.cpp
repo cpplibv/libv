@@ -105,7 +105,6 @@ struct ImplMouseTable {
 				},
 				[&event](const libv::observer_ref<BaseComponent>& component) {
 					AccessEvent::onMouseButton(*component, event);
-					// TODO P0: libv.ui: Mouse shield: return value for shielding is discarded
 				}
 			);
 
@@ -120,7 +119,6 @@ struct ImplMouseTable {
 				},
 				[&event](const libv::observer_ref<BaseComponent>& component) {
 					AccessEvent::onMouseMovement(*component, event);
-					// TODO P0: libv.ui: Mouse shield: return value for shielding is discarded
 				}
 			);
 
@@ -135,7 +133,6 @@ struct ImplMouseTable {
 				},
 				[&event](const libv::observer_ref<BaseComponent>& component) {
 					AccessEvent::onMouseScroll(*component, event);
-					// TODO P0: libv.ui: Mouse shield: return value for shielding is discarded
 				}
 			);
 
@@ -312,7 +309,7 @@ struct Hit {
 };
 
 struct HitEL {
-	libv::observer_ref<const ImplMouseTable::Entry> entry;
+	libv::observer_ref<ImplMouseTable::Entry> entry;
 	bool enter;
 	bool leave;
 };
@@ -322,24 +319,47 @@ using HitELs = boost::container::small_vector<HitEL, 8>;
 
 template <typename Hits>
 inline void sort_hits(Hits& hits) noexcept {
-	libv::sort(hits, [](const auto& lhs, const auto& rhs) {
+	libv::sort_unstable(hits, [](const auto& lhs, const auto& rhs) {
 		return libv::to_value(lhs.entry->order) > libv::to_value(rhs.entry->order);
 	});
 }
 
 template <typename Event>
 inline void notify_hits(Hits& hits, Event& event) noexcept {
-	for (const auto& hit : hits)
+	for (const auto& hit : hits) {
 		hit.entry->target.notify(event);
+	}
 }
 
 template <typename Event>
 inline void notify_hits(HitELs& hits, Event& event) noexcept {
-	for (const auto& hit : hits) {
+	size_t i = 0;
+
+	for (; i < hits.size(); i++) {
+		const auto& hit = hits[i];
+
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
 		hit.entry->target.notify(event);
+
+		if (!event.is_pass_through())
+			break;
+	}
+
+	i++;
+
+	for (; i < hits.size(); i++) {
+		const auto& hit = hits[i];
+
+		hit.entry->over = false;
+
+		if (!hit.enter) { // If it's not a new enter for the watcher, leave that watcher
+			event.enter = false;
+			event.leave = true;
+
+			hit.entry->target.notify(event);
+		}
 	}
 }
 
@@ -348,7 +368,7 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void MouseTable::event_enter() {
-	// No-op, the mouse position event that follows will take care of it
+	// No-op, the mouse position event that follows the mouse enter event will take care of it
 }
 
 void MouseTable::event_leave() {
@@ -503,23 +523,22 @@ void MouseTable::event_update() {
 	HitELs hits;
 
 	for (ImplMouseTable::Entry& entry : self->entries) {
-		// TODO P0: libv.ui: Mouse shield: In future when shielding happens this if will have to change
-		if (!entry.pendingUpdate)
+		if (!entry.pendingUpdate && !entry.over)
 			continue;
 
-		const auto over_new = libv::vec::within(self->mouse_position, entry.cornerBL, entry.cornerTR);
+		const bool over_new = libv::vec::within(self->mouse_position, entry.cornerBL, entry.cornerTR);
 		const bool over_old = entry.over;
 
 		entry.pendingUpdate = false;
 		entry.over = over_new;
 
-		if (!over_old && !over_new)
+		if (over_old == over_new)
 			continue;
 
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		const bool interested = over_old != over_new && entry.interest.match_any(Flag::watchMouseEnter);
+		const bool interested = entry.interest.match_any(Flag::watchMouseEnter);
 		if (interested)
 			hits.push_back({entry, enter, leave});
 	}
