@@ -18,7 +18,7 @@
 #include <unordered_map>
 // pro
 #include <libv/ui/context_event.hpp>
-#include <libv/ui/event/mouse_table.hpp>
+#include <libv/ui/context_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/raw/font_consolas_min.hpp>
@@ -38,7 +38,7 @@ namespace ui {
 
 struct ImplContextUI {
 	ContextEvent event;
-	MouseTable mouse;
+	ContextMouse mouse;
 
 	std::shared_ptr<Font2D> fallback_font;
 	std::unordered_map<std::string, std::weak_ptr<Font2D>> cache_font;

@@ -18,15 +18,15 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class BaseComponent;
-class ImplMouseTable;
+class ImplContextMouse;
 class MouseWatcher;
 
-class MouseTable {
-	std::unique_ptr<ImplMouseTable> self;
+class ContextMouse {
+	std::unique_ptr<ImplContextMouse> self;
 
 public:
-	MouseTable();
-	~MouseTable();
+	ContextMouse();
+	~ContextMouse();
 
 public:
 	void subscribe(BaseComponent& watcher, Flag_t interest);

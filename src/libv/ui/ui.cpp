@@ -20,6 +20,7 @@
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>

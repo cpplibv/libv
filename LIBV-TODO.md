@@ -93,7 +93,7 @@ libv.ui: fix content size bug in float layout
 libv.ui: basic panel base class to handle current panels
 libv.ui: remove / removaAll functions for every container
 libv.input: New lib to story input enums for frame, ui and hotkey
-libv.ui: MouseTable
+libv.ui: ContextMouse
 libv.ui: MouseWatcher
 libv.ui: MouseInterest
 libv.ui: MouseEvent
@@ -347,22 +347,21 @@ libv.ui: Mouse events should respect stop_propagation
 libv.ui: Mouse event absorb/shield/plates
 libv.ui: alias any libv.input event in libv.ui for consistent access
 app.vm4_viewer: proper camera grab
+libv.ui: Rename mouse_table to context_mouse
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: Rename mouse_table to context_mouse
-
-libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
-
-app.vm4_viewer: camera movement should acquire and lock mouse position
+libv.gl: Implement a GLSL engine
+libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 
 app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
 
-libv.gl: Implement a GLSL engine
-libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
+libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+app.vm4_viewer: camera movement should acquire and lock mouse position
+
 libv.gl.glsl: Warning option for crlf line ending.
 libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
 

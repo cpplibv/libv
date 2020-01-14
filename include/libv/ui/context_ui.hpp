@@ -23,7 +23,7 @@ class BaseComponent;
 class ContextEvent;
 class ContextState;
 class Font2D;
-class MouseTable;
+class ContextMouse;
 class Shader;
 class ShaderFont;
 class ShaderImage;
@@ -55,7 +55,7 @@ class ContextUI {
 public:
 	ContextEvent& event;
 	ContextState& state;
-	MouseTable& mouse;
+	ContextMouse& mouse;
 	Settings settings;
 
 public:

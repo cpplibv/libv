@@ -7,7 +7,7 @@
 // std
 #include <utility>
 // pro
-#include <libv/ui/event/mouse_table.hpp>
+#include <libv/ui/context_mouse.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/flag.hpp>
 
@@ -24,7 +24,7 @@ struct CallCounter {
 };
 
 TEST_CASE("mouse subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 
 	CallCounter callback0;
 	libv::ui::MouseWatcher watcher0;
@@ -52,7 +52,7 @@ TEST_CASE("mouse subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]
 
 TEST_CASE("mouse multiple sub, notify with correct order", "[libv.ui.event.mouse]") {
 	std::vector<int> call_order;
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 
 	libv::ui::MouseWatcher watcher0;
 	watcher0.cb_button = [&](auto&) { call_order.emplace_back(0); };
@@ -94,7 +94,7 @@ TEST_CASE("mouse multiple sub, notify with correct order", "[libv.ui.event.mouse
 }
 
 TEST_CASE("mouse multiple sub, only notify intersected ones", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 
 	CallCounter callback0;
 	libv::ui::MouseWatcher watcher0;
@@ -136,7 +136,7 @@ TEST_CASE("mouse multiple sub, only notify intersected ones", "[libv.ui.event.mo
 }
 
 TEST_CASE("mouse never intersect region", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 	table.event_position(libv::vec2f{0, 0});
 
 	CallCounter callback0;
@@ -195,7 +195,7 @@ TEST_CASE("mouse never intersect region", "[libv.ui.event.mouse]") {
 }
 
 TEST_CASE("mouse new subscribe should receive event from enter if created on top of mouse", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 	table.event_position(libv::vec2f{0, 0});
 
 	CallCounter callback0;
@@ -211,7 +211,7 @@ TEST_CASE("mouse new subscribe should receive event from enter if created on top
 }
 
 TEST_CASE("mouse update", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 
 	CallCounter callback0;
 	libv::ui::MouseWatcher watcher0;
@@ -293,7 +293,7 @@ TEST_CASE("mouse update", "[libv.ui.event.mouse]") {
 }
 
 TEST_CASE("mouse leave", "[libv.ui.event.mouse]") {
-	libv::ui::MouseTable table;
+	libv::ui::ContextMouse table;
 
 	CallCounter callback0;
 	libv::ui::MouseWatcher watcher0;

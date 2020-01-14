@@ -12,6 +12,7 @@
 #include <cmath>
 // pro
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_style.hpp>

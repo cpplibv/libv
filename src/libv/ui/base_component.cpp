@@ -10,6 +10,7 @@
 #include <libv/ui/context_event.hpp>
 #include <libv/ui/context_focus_travers.hpp>
 #include <libv/ui/context_layout.hpp>
+#include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>

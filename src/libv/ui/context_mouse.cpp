@@ -1,7 +1,7 @@
 // File:   mouse.cpp Author: Vader Created on 14 August 2019, 14:01
 
 // hpp
-#include <libv/ui/event/mouse_table.hpp>
+#include <libv/ui/context_mouse.hpp>
 // ext
 #include <boost/container/small_vector.hpp>
 // libv
@@ -44,7 +44,7 @@ namespace ui {
 ////	MouseRegionDimension dimension;
 //};
 //
-////struct ImplMouseTable {
+////struct ImplContextMouse {
 //struct ImplMouseDimension {
 //	using point = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
 //	using region = boost::geometry::model::box<point>;
@@ -92,7 +92,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplMouseTable {
+struct ImplContextMouse {
 	struct EntryTarget {
 		std::variant<libv::observer_ref<MouseWatcher>, libv::observer_ref<BaseComponent>> target;
 
@@ -176,26 +176,26 @@ struct ImplMouseTable {
 
 // -------------------------------------------------------------------------------------------------
 
-MouseTable::MouseTable() :
-	self(std::make_unique<ImplMouseTable>()) {
+ContextMouse::ContextMouse() :
+	self(std::make_unique<ImplContextMouse>()) {
 }
 
-MouseTable::~MouseTable() { }
+ContextMouse::~ContextMouse() { }
 
-void MouseTable::subscribe(BaseComponent& component, Flag_t interest) {
+void ContextMouse::subscribe(BaseComponent& component, Flag_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
 }
 
-void MouseTable::subscribe(MouseWatcher& watcher, Flag_t interest) {
+void ContextMouse::subscribe(MouseWatcher& watcher, Flag_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
 }
 
-void MouseTable::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+void ContextMouse::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order) {
 	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
-void MouseTable::update(BaseComponent& component, Flag_t interest) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::update(BaseComponent& component, Flag_t interest) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
 
@@ -206,8 +206,8 @@ void MouseTable::update(BaseComponent& component, Flag_t interest) {
 	it->pendingUpdate = true;
 }
 
-void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::update(BaseComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
 
@@ -220,8 +220,8 @@ void MouseTable::update(BaseComponent& component, libv::vec2f position, libv::ve
 	it->pendingUpdate = true;
 }
 
-void MouseTable::update(MouseWatcher& watcher, Flag_t interest) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::update(MouseWatcher& watcher, Flag_t interest) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(watcher);
 	});
 
@@ -232,8 +232,8 @@ void MouseTable::update(MouseWatcher& watcher, Flag_t interest) {
 	it->pendingUpdate = true;
 }
 
-void MouseTable::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(watcher);
 	});
 
@@ -246,8 +246,8 @@ void MouseTable::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f
 	it->pendingUpdate = true;
 }
 
-void MouseTable::unsubscribe(BaseComponent& component) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::unsubscribe(BaseComponent& component) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
 
@@ -258,8 +258,8 @@ void MouseTable::unsubscribe(BaseComponent& component) {
 	release(component);
 }
 
-void MouseTable::unsubscribe(MouseWatcher& watcher) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplMouseTable::Entry& entry) {
+void ContextMouse::unsubscribe(MouseWatcher& watcher) {
+	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(watcher);
 	});
 
@@ -272,15 +272,15 @@ void MouseTable::unsubscribe(MouseWatcher& watcher) {
 
 // -------------------------------------------------------------------------------------------------
 
-void MouseTable::acquire(BaseComponent& watcher) {
-	self->acquired.emplace_back(ImplMouseTable::EntryTarget{watcher});
+void ContextMouse::acquire(BaseComponent& watcher) {
+	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
 }
 
-void MouseTable::acquire(MouseWatcher& watcher) {
-	self->acquired.emplace_back(ImplMouseTable::EntryTarget{watcher});
+void ContextMouse::acquire(MouseWatcher& watcher) {
+	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
 }
 
-void MouseTable::release(BaseComponent& watcher) {
+void ContextMouse::release(BaseComponent& watcher) {
 	if (self->acquired.empty())
 		return;
 
@@ -290,7 +290,7 @@ void MouseTable::release(BaseComponent& watcher) {
 		event_position(self->mouse_position);
 }
 
-void MouseTable::release(MouseWatcher& watcher) {
+void ContextMouse::release(MouseWatcher& watcher) {
 	if (self->acquired.empty())
 		return;
 
@@ -305,11 +305,11 @@ void MouseTable::release(MouseWatcher& watcher) {
 namespace {
 
 struct Hit {
-	libv::observer_ref<const ImplMouseTable::Entry> entry;
+	libv::observer_ref<const ImplContextMouse::Entry> entry;
 };
 
 struct HitEL {
-	libv::observer_ref<ImplMouseTable::Entry> entry;
+	libv::observer_ref<ImplContextMouse::Entry> entry;
 	bool enter;
 	bool leave;
 };
@@ -367,11 +367,11 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void MouseTable::event_enter() {
+void ContextMouse::event_enter() {
 	// No-op, the mouse position event that follows the mouse enter event will take care of it
 }
 
-void MouseTable::event_leave() {
+void ContextMouse::event_leave() {
 	EventMouseMovement event;
 	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
@@ -390,7 +390,7 @@ void MouseTable::event_leave() {
 	// Gather hits
 	Hits hits;
 
-	for (ImplMouseTable::Entry& entry : self->entries) {
+	for (ImplContextMouse::Entry& entry : self->entries) {
 		if (!entry.over)
 			continue;
 
@@ -405,7 +405,7 @@ void MouseTable::event_leave() {
 	notify_hits(hits, event);
 }
 
-void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action action) {
+void ContextMouse::event_button(libv::input::Mouse mouse, libv::input::Action action) {
 	// Define event
 	EventMouseButton event;
 	event.action = action;
@@ -421,7 +421,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 	// Gather hits
 	Hits hits;
 
-	for (const ImplMouseTable::Entry& entry : self->entries) {
+	for (const ImplContextMouse::Entry& entry : self->entries) {
 		if (!entry.over)
 			continue;
 
@@ -434,7 +434,7 @@ void MouseTable::event_button(libv::input::Mouse mouse, libv::input::Action acti
 	notify_hits(hits, event);
 }
 
-void MouseTable::event_position(libv::vec2f position_new) {
+void ContextMouse::event_position(libv::vec2f position_new) {
 	// Define event
 	const auto movement = position_new - self->mouse_position;
 	self->mouse_position = position_new;
@@ -455,7 +455,7 @@ void MouseTable::event_position(libv::vec2f position_new) {
 	// Gather hits
 	HitELs hits;
 
-	for (ImplMouseTable::Entry& entry : self->entries) {
+	for (ImplContextMouse::Entry& entry : self->entries) {
 		const bool over_new = libv::vec::within(position_new, entry.cornerBL, entry.cornerTR);
 		const bool over_old = entry.over;
 
@@ -478,7 +478,7 @@ void MouseTable::event_position(libv::vec2f position_new) {
 	notify_hits(hits, event);
 }
 
-void MouseTable::event_scroll(libv::vec2f movement) {
+void ContextMouse::event_scroll(libv::vec2f movement) {
 	// Define event
 	self->scroll_position += movement;
 	const auto position = self->scroll_position;
@@ -497,7 +497,7 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 	// Gather hits
 	Hits hits;
 
-	for (const ImplMouseTable::Entry& entry : self->entries) {
+	for (const ImplContextMouse::Entry& entry : self->entries) {
 		if (!entry.over)
 			continue;
 
@@ -510,7 +510,7 @@ void MouseTable::event_scroll(libv::vec2f movement) {
 	notify_hits(hits, event);
 }
 
-void MouseTable::event_update() {
+void ContextMouse::event_update() {
 	EventMouseMovement event;
 	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
@@ -522,7 +522,7 @@ void MouseTable::event_update() {
 	// Gather hits
 	HitELs hits;
 
-	for (ImplMouseTable::Entry& entry : self->entries) {
+	for (ImplContextMouse::Entry& entry : self->entries) {
 		if (!entry.pendingUpdate && !entry.over)
 			continue;
 
