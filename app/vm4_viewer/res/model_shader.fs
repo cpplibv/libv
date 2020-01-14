@@ -1,5 +1,7 @@
 #version 330 core
 
+#include <app/vm4_viewer/res/common.glsl>
+
 in vec3 fragmentPositionW;
 in vec3 fragmentNormalW;
 in vec3 fragmentTangentW;
@@ -13,10 +15,6 @@ uniform vec4 color;
 uniform float near; // camera z near
 uniform float far; // camera z far
 //uniform sampler2D textureSampler;
-
-float linearize_depth(float zoverw) {
-	return (2.0 * near) / (far + near - zoverw * (far - near)) * (far - near);
-}
 
 void main() {
 //vec4 sample = texture(textureSampler, fragmentTexture0).xyzw;
@@ -37,7 +35,7 @@ void main() {
 		output = vec4(fragmentTexture0, 0, 1);
 
 	else if (mode == 6) {
-		float depth = mod(linearize_depth(gl_FragCoord.z), 20) / 20;
+		float depth = mod(linearize_depth(gl_FragCoord.z, near, far), 20) / 20;
 		output = vec4(depth, depth, depth, 1);
 	}
 

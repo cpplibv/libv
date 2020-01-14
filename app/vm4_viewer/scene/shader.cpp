@@ -5,6 +5,7 @@
 // libv
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/read_file.hpp>
+#include <libv/gl/glsl_compiler.hpp>
 // pro
 #include <vm4_viewer/log.hpp>
 
@@ -23,10 +24,25 @@ void BaseShader::update(const std::filesystem::path& file_path, bool is_vertex) 
 		return;
 	}
 
+	// TODO P2: fsw subscribe_file every included file
+	const auto include_loader = [](const auto& path){
+		auto include_result = libv::read_file_ec(path);
+
+		if (include_result.ec) {
+			log_app.error("Failed to include file: {} - {}: {}", path, include_result.ec, include_result.ec.message());
+			return libv::gl::IncludeResult{false, ""};
+		} else {
+			return libv::gl::IncludeResult{true, std::move(include_result.data)};
+		}
+	};
+
+	libv::gl::GLSLCompiler compiler(include_loader);
+	const auto source = compiler.compile(file_result.data, libv::generic_path(file_path));
+
 	if (is_vertex)
-		this->vertex(file_result.data);
+		this->vertex(source);
 	else
-		this->fragment(file_result.data);
+		this->fragment(source);
 }
 
 BaseShader::BaseShader(const std::filesystem::path& vs_path, const std::filesystem::path& fs_path, update_signature func) {
