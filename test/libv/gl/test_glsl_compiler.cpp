@@ -54,6 +54,12 @@ TEST_CASE("GLSL Include pre-processing", "[libv.gl.glsl_compiler]") {
 		if (str == "Q.glsl")
 			return {true, "#include <P.glsl>\nQ1"};
 
+		if (str == "W.glsl")
+			return {true, "\r\n01234\r\n56789"};
+
+		if (str == "Z.glsl")
+			return {true, "    \tZ1\n\t Z2"};
+
 		return {false, "ERROR Could not find source \"" + std::string(str) + '"'};
 	});
 
@@ -88,4 +94,7 @@ TEST_CASE("GLSL Include pre-processing", "[libv.gl.glsl_compiler]") {
 
 	CHECK(test("#include <P.glsl>\n#include <Q.glsl>") == "#line 1 \"P.glsl\"\nP1\n#line 2 \"main\"\n#line 1 \"Q.glsl\"\nQ1\n#line 3 \"main\"\n");
 	CHECK(test("#include <Q.glsl>\n#include <Q.glsl>") == "#line 1 \"Q.glsl\"\n#line 1 \"P.glsl\"\nP1\n#line 2 \"Q.glsl\"\nQ1\n#line 2 \"main\"\n#line 1 \"Q.glsl\"\nQ1\n#line 3 \"main\"\n");
+
+	CHECK(test("#include <W.glsl>") == "#line 1 \"W.glsl\"\n\n01234\n56789\n#line 2 \"main\"\n");
+	CHECK(test("#include <Z.glsl>") == "#line 1 \"Z.glsl\"\n    \tZ1\n\t Z2\n#line 2 \"main\"\n");
 }

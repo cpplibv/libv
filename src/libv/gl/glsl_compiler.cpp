@@ -34,6 +34,7 @@ public:
 public:
 	std::optional<std::string_view> extract_include(std::string_view line) const noexcept;
 	bool is_pragma_once(std::string_view line) const noexcept;
+	bool is_mixed_indentation(const std::string_view line) const noexcept;
 
 	void preprocess_includes(const std::string_view source, const std::string_view filename, int include_line);
 };
@@ -52,23 +53,49 @@ bool ImplGLSLCompiler::is_pragma_once(const std::string_view line) const noexcep
 	return ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]+once[ \t]*.*)qq">(line);
 }
 
+bool ImplGLSLCompiler::is_mixed_indentation(const std::string_view line) const noexcept {
+	return ctre::match<R"qq(^(\t+ +| +\t+).*)qq">(line);
+}
+
 void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const std::string_view filename, const int include_line) {
 	int line_number = 1;
 
 	includeStack.emplace_back(filename, include_line);
 	libv::Guard stack_guard{[this] { includeStack.pop_back(); }};
 
-	for (const std::string_view line : source | libv::view::lines_string_view()) {
+	for (std::string_view line : source | libv::view::lines_string_view()) {
 		const auto include = extract_include(line);
 
 		if (!include) {
 			if (is_pragma_once(line)) {
 				includePragmaOnce.emplace_back(filename);
 			} else {
-				output << line;
-				if (line.back() != '\n')
-					// Append newline on last line if its missing
-					output << '\n';
+				const auto crlf = line.ends_with("\r\n");
+				const auto cr = line.ends_with("\r");
+				const auto lf = !crlf && line.ends_with("\n");
+
+				const auto mixed = is_mixed_indentation(line);
+
+				if (crlf || cr) {
+					log_gl.warn("Non generic line ending {} detected at {}:{}:{}. Converting to generic linefeed.", crlf ? "crlf" : "cr", filename, line_number, line.size() - (crlf ? 2 : 1) + 1);
+				}
+
+				if (!cr && !lf && !crlf) {
+					log_gl.warn("Missing line ending detected at {}:{}:{}. Appending generic linefeed.", filename, line_number, line.size());
+				}
+
+				if (mixed) {
+					log_gl.warn("Mixed indentation detected at {}:{}.", filename, line_number, 0);
+				}
+
+				if (cr || lf)
+					line.remove_suffix(1);
+
+				if (crlf)
+					line.remove_suffix(2);
+
+				// NOTE: This step also auto-appends newline on last line if its missing
+				output << line << '\n';
 			}
 		} else {
 			if (libv::linear_contains(includeStack | ranges::view::keys, *include)) {
@@ -104,7 +131,7 @@ void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const 
 GLSLCompiler::GLSLCompiler(IncludeLoader file_loader) : loader(std::move(file_loader)) {}
 
 std::string GLSLCompiler::compile(const std::string_view source, const std::string_view filename) {
-	ImplGLSLCompiler session{loader};
+	ImplGLSLCompiler session{loader, {}, {}, {}};
 
 	session.preprocess_includes(source, filename, 1);
 

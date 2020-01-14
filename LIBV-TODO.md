@@ -350,6 +350,8 @@ app.vm4_viewer: proper camera grab
 libv.ui: Rename mouse_table to context_mouse
 libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
+libv.gl.glsl: Warning option for crlf line ending.
+libv.gl.glsl: Warning option for space indentation or if indentation characters are mixed
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -361,8 +363,6 @@ app.vm4_viewer: show model grey lighted (phong)
 libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 app.vm4_viewer: camera movement should acquire and lock mouse position
 
-libv.gl.glsl: Warning option for crlf line ending.
-libv.gl.glsl: Warning option for space indentation or if indentation character is mixed
 
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node
