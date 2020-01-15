@@ -21,7 +21,7 @@ struct view_lines_string_view : ranges::view_facade<view_lines_string_view, rang
 	friend ranges::range_access;
 
 private:
-	char newline;
+	std::string_view::value_type newline;
 	std::string_view range;
 	std::string_view::iterator it_begin;
 	std::string_view::iterator it_end;
@@ -39,22 +39,16 @@ private:
 	constexpr inline void next() noexcept {
 		it_begin = it_end;
 
-		while (true) {
-			if (*it_end == newline) { // safe to dereference it_end as sentinel was already checked
-				++it_end; // place end after the newline char
-				return;
-			}
-
+		while (it_end != range.end() && *it_end != newline)
 			++it_end;
 
-			if (it_end == range.end())
-				return;
-		}
+		if (it_end != range.end())
+			++it_end;
 	}
 
 public:
 	inline view_lines_string_view() noexcept {}
-	constexpr inline view_lines_string_view(const std::string_view range, const char newline = '\n') noexcept :
+	constexpr inline view_lines_string_view(const std::string_view range, const std::string_view::value_type newline = '\n') noexcept :
 		newline(newline),
 		range(range),
 		it_begin(range.begin()),
@@ -73,14 +67,14 @@ struct lines_string_view_fn {
 
 private:
 	template <typename = void>
-	static constexpr auto bind(lines_string_view_fn fn, const char newline = '\n') {
+	static constexpr auto bind(lines_string_view_fn fn, const std::string_view::value_type newline = '\n') {
 		return ranges::make_pipeable([fn, newline](const std::string_view rng) {
 			return fn(rng, newline);
 		});
 	}
 
 public:
-	constexpr inline auto operator()(const std::string_view rng, const char newline = '\n') const {
+	constexpr inline auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') const {
 		return detail::view_lines_string_view(rng, newline);
 	}
 };
