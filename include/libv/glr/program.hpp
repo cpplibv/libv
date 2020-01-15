@@ -39,7 +39,11 @@ struct RemoteProgram {
 	bool dirty_location = false;
 
 	UniformStream uniformStream;
+
+	std::vector<std::string> uniform_identifiers;
 	std::vector<int32_t> uniform_locations;
+
+	std::vector<UniformBlockBinding> pending_bindings;
 
 public:
 	std::string vertex;
@@ -48,8 +52,6 @@ public:
 	std::string compute;
 	std::string tess_control;
 	std::string tess_evaluation;
-	std::vector<UniformBlockBinding> pending_bindings;
-	std::vector<std::string> uniform_identifiers;
 
 private:
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
@@ -99,6 +101,9 @@ public:
 		assign(uniform_, identifier);
 		uniform(uniform_, value);
 	}
+
+public:
+	void _native_swap(libv::gl::Program& program) noexcept;
 };
 
 struct AttorneyProgramRemote {
@@ -112,76 +117,3 @@ struct AttorneyProgramRemote {
 
 } // namespace glr
 } // namespace libv
-
-
-//struct ProgramRemote {
-//	libv::gl::Program program;
-//
-////	libv::gl::Uniform_vec3f uniformCameraPositionW;
-////	libv::gl::Uniform_mat4f uniformMatrixMVP;
-////	libv::gl::Uniform_mat4f uniformMatrixModel;
-////	libv::gl::Uniform_mat4f uniformMatrixModelView;
-////	libv::gl::Uniform_mat4f uniformMatrixProjection;
-////	libv::gl::Uniform_mat4f uniformMatrixView;
-////	libv::gl::Uniform_vec2f uniformMousePositionH; // Not sure about this one
-////	libv::gl::Uniform_vec2f uniformMousePositionS; // Not sure about this one
-////	libv::gl::Uniform_vec2f uniformResolution;
-////	libv::gl::Uniform_float uniformTimeReal;
-////	libv::gl::Uniform_float uniformTimeSimulation;
-//
-//	ProgramRemote(const Shader& vs, const Shader& fs) {
-//		program.createLink(vs, fs);
-////		assignBaseUniforms();
-//	}
-//	ProgramRemote(const Shader& vs, const Shader& gs, const Shader& fs) {
-//		program.createLink(vs, gs, fs);
-////		assignBaseUniforms();
-//	}
-//	~ProgramRemote() {
-//		program.destroy();
-//	}
-//
-////	void assignBaseUniforms() {
-////		program.assign(uniformCameraPositionW, "cameraPositionW");
-////		program.assign(uniformMatrixMVP, "matrixMVP");
-////		program.assign(uniformMatrixModel, "matrixModel");
-////		program.assign(uniformMatrixModelView, "matrixModelView");
-////		program.assign(uniformMatrixProjection, "matrixProjection");
-////		program.assign(uniformMatrixView, "matrixView");
-////		program.assign(uniformMousePositionH, "mousePositionH");
-////		program.assign(uniformMousePositionS, "mousePositionS");
-////		program.assign(uniformResolution, "resolution");
-////		program.assign(uniformTimeReal, "timeReal");
-////		program.assign(uniformTimeSimulation, "timeSimulation");
-////	}
-//
-//	void use(Queue& queue) {
-//		queue.program(program);
-//
-////		if (uniformMatrixMVP.isActive())
-////			queue.uniform(uniformMatrixMVP, mvp());
-////		if (uniformMatrixModel.isActive())
-////			queue.uniform(uniformMatrixModel, model);
-////		if (uniformMatrixModelView.isActive())
-////			queue.uniform(uniformMatrixModelView, view * model);
-////		if (uniformMatrixProjection.isActive())
-////			queue.uniform(uniformMatrixProjection, projection);
-////		if (uniformMatrixView.isActive())
-////			queue.uniform(uniformMatrixView, view);
-////
-////		if (uniformCameraPositionW.isActive())
-////			queue.uniform(uniformCameraPositionW, eye());
-////
-////		if (uniformTimeReal.isActive())
-////			queue.uniform(uniformTimeReal, timeFrame);
-////		if (uniformTimeSimulation.isActive())
-////			queue.uniform(uniformTimeSimulation, timeSimulation);
-////
-////		if (uniformMousePositionH.isActive())
-////			queue.uniform(uniformMousePositionH, mousePosition / resolution);
-////		if (uniformMousePositionS.isActive())
-////			queue.uniform(uniformMousePositionS, mousePosition);
-////		if (uniformResolution.isActive())
-////			queue.uniform(uniformResolution, resolution);
-//	}
-//};

@@ -2,48 +2,95 @@
 
 #pragma once
 
+// ext
+#include <boost/container/flat_set.hpp>
+#include <boost/container/small_vector.hpp>
 // libv
 #include <libv/glr/program.hpp>
 #include <libv/glr/uniform.hpp>
-#include <libv/fsw/watcher.hpp>
 // std
-#include <filesystem>
+#include <string>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseShader : public libv::glr::Program {
-	libv::fsw::FileWatcher::token_type watcher_vs;
-	libv::fsw::FileWatcher::token_type watcher_fs;
+class ShaderLoader;
 
-	using update_signature = void (*)(BaseShader&);
-	update_signature update_ptr;
+struct ShaderStage {
+	libv::gl::ShaderType type;
+	std::string path;
 
-public:
-	void update(const std::filesystem::path& file_path, bool is_vertex);
-
-public:
-	BaseShader(const std::filesystem::path& vs_path, const std::filesystem::path& fs_path, update_signature func);
-	~BaseShader();
+	inline ShaderStage(libv::gl::ShaderType type, std::string path) :
+		type(type),
+		path(std::move(path)) { }
 };
 
-// -------------------------------------------------------------------------------------------------
+// ---
+
+class BaseShader {
+	template <typename Uniforms>
+	friend class Shader;
+
+	using update_signature = void (*)(BaseShader&);
+
+protected:
+public: // <<< P5: public
+	libv::glr::Program program;
+
+private:
+	ShaderLoader& loader;
+public: // <<< P5: public
+	update_signature update_ptr;
+
+public: // <<< P5: public
+	boost::container::small_vector<ShaderStage, 3> stages;
+	boost::container::flat_set<std::string> source_files;
+
+public:
+	BaseShader(const BaseShader&) = delete;
+	BaseShader& operator=(const BaseShader&) & = delete;
+	BaseShader(BaseShader&&) = delete;
+	BaseShader& operator=(BaseShader&&) & = delete;
+
+	BaseShader(ShaderLoader& loader, update_signature update_ptr);
+	~BaseShader();
+
+public:
+	void addStage(libv::gl::ShaderType type, std::string path);
+	std::string name() const;
+};
+
+// ---
 
 template <typename Uniforms>
-struct Shader : public Uniforms, public BaseShader {
-	Shader(const std::filesystem::path& vs_path, const std::filesystem::path& fs_path) :
-		BaseShader(vs_path, fs_path, [](auto& self) {
-//			auto access = [&self](auto& uniform, const auto& name) mutable {
-//				self.assign(uniform, name);
-//			};
-			auto access = [&self](auto&&... args) mutable {
-				self.assign(args...);
-			};
-			static_cast<Uniforms&>(static_cast<Shader&>(self)).update_uniforms(access);
-		})
-	{}
+struct Shader : BaseShader {
+	Uniforms uniform;
+
+private:
+	template <typename... Args>
+	inline void unpackStages(libv::gl::ShaderType type, std::string path, Args&&... args) {
+		addStage(type, std::move(path));
+
+		if constexpr (sizeof...(Args) != 0)
+			unpackStages(std::forward<Args>(args)...);
+	}
+
+private:
+	static void updater(BaseShader& self) {
+		auto access = [&self](auto&&... args) mutable {
+			self.program.assign(args...);
+		};
+		static_cast<Shader<Uniforms>&>(self).uniform.update_uniforms(access);
+	}
+
+public:
+	template <typename... Args>
+	inline Shader(ShaderLoader& loader, Args&&... args) :
+		BaseShader(loader, updater) {
+		unpackStages(std::forward<Args>(args)...);
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

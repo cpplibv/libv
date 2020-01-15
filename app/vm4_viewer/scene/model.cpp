@@ -9,15 +9,6 @@
 #include <vm4_viewer/log.hpp>
 
 
-//#include <libv/utility/generic_path.hpp>
-//// std
-//#include <filesystem>
-//#include <iostream>
-//// pro
-//#include <vm4_viewer/config.hpp>
-//#include <vm4_viewer/frame.hpp>
-
-
 // -------------------------------------------------------------------------------------------------
 
 namespace app {
@@ -73,8 +64,6 @@ void Model::load() {
 }
 
 void Model::render(libv::glr::Queue& gl, ShaderModel& shader) {
-	gl.program(shader);
-
 	node(gl, vm4.lods[0].rootNodeID, shader);
 }
 
@@ -83,8 +72,8 @@ void Model::node(libv::glr::Queue& gl, uint32_t nodeID, ShaderModel& shader) {
 
 	gl.model *= vm4.nodes[nodeID].transformation;
 
-	gl.uniform(shader.uniform_Mmat, gl.model);
-	gl.uniform(shader.uniform_MVPmat, gl.mvp());
+	gl.uniform(shader.uniform.Mmat, gl.model);
+	gl.uniform(shader.uniform.MVPmat, gl.mvp());
 
 	// TODO P2: Bind textures here
 	// node->material->get<std::string>("diffuseTexture")

@@ -3,9 +3,10 @@
 #pragma once
 
 // std
-#include <functional>
 #include <string>
 #include <string_view>
+// libv
+#include <libv/utility/unique_function.hpp>
 
 
 namespace libv {
@@ -21,7 +22,7 @@ struct IncludeResult {
 class GLSLCompiler {
 public:
 	using IncludeResult = libv::gl::IncludeResult;
-	using IncludeLoader = std::function<IncludeResult(const std::string_view)>;
+	using IncludeLoader = libv::unique_function<IncludeResult(const std::string_view)>;
 
 private:
 	IncludeLoader loader;

@@ -56,34 +56,36 @@ namespace app {
 //
 //	define("MODE_LAMBERT", RenderMode::lambert);
 
-struct UniformsShaderModel {
-	libv::glr::Uniform_vec4f uniform_color;
-	libv::glr::Uniform_mat4f uniform_Mmat;
-	libv::glr::Uniform_mat4f uniform_MVPmat;
-	libv::glr::Uniform_texture uniform_texture;
-	libv::glr::Uniform_int32 uniform_mode;
-	libv::glr::Uniform_float uniform_near;
-	libv::glr::Uniform_float uniform_far;
-	libv::glr::Uniform_vec3f uniform_eyeW;
 
-	UniformLight uniform_sun;
+struct UniformsShaderModel {
+	libv::glr::Uniform_vec4f color;
+	libv::glr::Uniform_mat4f Mmat;
+	libv::glr::Uniform_mat4f MVPmat;
+	libv::glr::Uniform_texture texture;
+	libv::glr::Uniform_int32 mode;
+	libv::glr::Uniform_float near;
+	libv::glr::Uniform_float far;
+	libv::glr::Uniform_vec3f eyeW;
+
+	UniformLight sun;
 
 	constexpr static libv::gl::TextureChannel textureChannel{0};
 
 	template <typename Access>
 	void update_uniforms(Access& access) {
-		access(uniform_color, "color", libv::vec4f(1, 1, 1, 1));
-		access(uniform_Mmat, "Mmat", libv::mat4f::identity());
-		access(uniform_MVPmat, "MVPmat", libv::mat4f::identity());
-		access(uniform_texture, "textureSampler", textureChannel);
-		access(uniform_mode, "mode");
-//		access(uniform_mode, "mode", 2);
-//		access(uniform_mode, "mode", RenderMode::normalW);
-		access(uniform_near, "near", 0.1f);
-		access(uniform_far, "far", 1000.0f);
-		access(uniform_eyeW, "eyeW");
+		access(color, "color", libv::vec4f(1, 1, 1, 1));
+		access(Mmat, "Mmat", libv::mat4f::identity());
+		access(MVPmat, "MVPmat", libv::mat4f::identity());
+		access(texture, "textureSampler", textureChannel);
+		access(mode, "mode");
+//		access(mode, "mode", 2);
+//		access(mode, "mode", RenderMode::normalW);
+		access(near, "near", 0.1f);
+		access(far, "far", 1000.0f);
+		access(eyeW, "eyeW");
 
-		uniform_sun.update_uniforms(access);
+		// TODO P2: sun auto iteration and name auto appending chaining
+		sun.update_uniforms(access);
 //		access(sun, "sun");
 	}
 

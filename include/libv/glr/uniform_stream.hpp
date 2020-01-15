@@ -40,6 +40,13 @@ class ImplUniformStream {
 	size_t current_header = 0;
 	size_t current_data = 0;
 
+	inline void clear() {
+		header.clear();
+		data.clear();
+		current_data = 0;
+		current_header = 0;
+	}
+
 public:
 	template <typename T>
 	void set(const uint32_t location_index, const T& value) {
@@ -90,12 +97,8 @@ public:
 			current_data += head.size;
 		}
 
-		if (current_header == header.size()) {
-			data.clear();
-			header.clear();
-			current_data = 0;
-			current_header = 0;
-		}
+		if (current_header == header.size())
+			clear();
 	}
 };
 

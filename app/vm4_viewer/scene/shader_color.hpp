@@ -10,18 +10,16 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct UniformsShaderLine {
-	libv::glr::Uniform_vec4f color;
+struct UniformsShaderColor {
 	libv::glr::Uniform_mat4f matMVP;
 
 	template <typename Access>
 	void update_uniforms(Access& access) {
-		access(color, "color");
 		access(matMVP, "matMVP");
 	}
 };
 
-using ShaderLine = app::Shader<UniformsShaderLine>;
+using ShaderColor = app::Shader<UniformsShaderColor>;
 
 // -------------------------------------------------------------------------------------------------
 

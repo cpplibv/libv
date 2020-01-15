@@ -1,7 +1,7 @@
 #pragma once
 
-#include <app/vm4_viewer/res/common/light.glsl>
-#include <app/vm4_viewer/res/common/material.glsl>
+#include <common/light.glsl>
+#include <common/material.glsl>
 
 
 
@@ -20,8 +20,12 @@ vec4 phong(vec3 eyeW, vec3 fragmentPositionW, vec3 normal, Material material, Li
 	// TODO P2: Use attenuation
 	float attenuation;
 
+	// Disabled light
+	if (light.type == 0) {
+		return result;
+
 	// Point light
-	if (light.type == 1) {
+	} else if (light.type == 1) {
 		L = normalize(light.position - fragmentPositionW);
 		float dist = dot(L, L);
 		attenuation = 1 / (dist * dist);

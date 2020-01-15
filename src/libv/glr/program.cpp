@@ -100,42 +100,49 @@ Program::Program() noexcept :
 
 void Program::vertex(std::string source) noexcept {
 	remote->vertex = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::geometry(std::string source) noexcept {
 	remote->geometry = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::fragment(std::string source) noexcept {
 	remote->fragment = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::compute(std::string source) noexcept {
 	remote->compute = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::tess_control(std::string source) noexcept {
 	remote->tess_control = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::tess_evaluation(std::string source) noexcept {
 	remote->tess_evaluation = std::move(source);
+
 	remote->dirty = true;
 	remote->dirty_source = true;
 }
 
 void Program::block_binding(UniformBlockBinding binding) noexcept {
 	remote->pending_bindings.emplace_back(std::move(binding));
+
 	remote->dirty = true;
 	remote->dirty_binding = true;
 }
@@ -143,7 +150,28 @@ void Program::block_binding(UniformBlockBinding binding) noexcept {
 void Program::assign(Uniform& uniform_, std::string identifier) noexcept {
 	uniform_.location = static_cast<uint32_t>(remote->uniform_identifiers.size());
 	remote->uniform_identifiers.emplace_back(std::move(identifier));
+
 	remote->dirty = true;
+	remote->dirty_location = true;
+}
+
+void Program::_native_swap(libv::gl::Program& program) noexcept {
+	std::swap(remote->program, program);
+
+	remote->vertex.clear();
+	remote->geometry.clear();
+	remote->fragment.clear();
+	remote->compute.clear();
+	remote->tess_control.clear();
+	remote->tess_evaluation.clear();
+
+	remote->uniform_identifiers.clear();
+	remote->uniform_locations.clear();
+
+	remote->created = true;
+	remote->dirty = true;
+	remote->dirty_source = false;
+	remote->dirty_binding = true;
 	remote->dirty_location = true;
 }
 

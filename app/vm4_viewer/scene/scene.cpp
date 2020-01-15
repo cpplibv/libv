@@ -18,14 +18,24 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-Scene::Scene() :
-	mesh_AABB(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	mesh_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	mesh_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw),
-	mesh_BS(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+Scene::Scene(ShaderLoader& shader_loader) :
+	shader_color(shader_loader,
+			libv::gl::ShaderType::Vertex, "color.vs",
+			libv::gl::ShaderType::Fragment, "color.fs"
+	),
+	shader_line(shader_loader,
+			libv::gl::ShaderType::Vertex, "line.vs",
+			libv::gl::ShaderType::Fragment, "line.fs"
+	),
+	shader_model(shader_loader,
+			libv::gl::ShaderType::Vertex, "model.vs",
+			libv::gl::ShaderType::Fragment, "model.fs"
+	),
 
-	line_shader("app/vm4_viewer/res/line_shader.vs", "app/vm4_viewer/res/line_shader.fs"),
-	model_shader("app/vm4_viewer/res/model_shader.vs", "app/vm4_viewer/res/model_shader.fs") {
+	mesh_AABB(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	mesh_BS(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	mesh_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
+	mesh_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw) {
 
 	{
 		auto pos = mesh_AABB.attribute(attribute_position);
@@ -61,7 +71,7 @@ Scene::Scene() :
 	sun.type = LightType::directional;
 	sun.direction = libv::vec3f(-2, -1, -4).normalize();
 
-	sun.ambient = libv::vec3f(0.1f, 0.1f, 0.1f);
+	sun.ambient = libv::vec3f(0.05f, 0.05f, 0.05f);
 	sun.diffuse = libv::vec3f(1, 1, 1);
 	sun.specular = libv::vec3f(1, 1, 1);
 }
@@ -110,14 +120,17 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 	gl.state.enableDepthTest();
 	gl.state.depthFunctionLess();
 
-	if (model) {
-		gl.program(model_shader);
-		model_shader.uniform_sun.set(gl, sun);
-		gl.uniform(model_shader.uniform_eyeW, gl.eye());
-		model->render(gl, model_shader);
+	if (!model)
+		return;
+
+	{
+		gl.program(shader_model.program);
+		shader_model.uniform.sun.set(gl, sun);
+		gl.uniform(shader_model.uniform.eyeW, gl.eye());
+		model->render(gl, shader_model);
 	}
 
-	if (model && display_AABB) {
+	if (display_AABB) {
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_s = gl.state.push_guard();
 
@@ -126,23 +139,14 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		gl.model.translate((model->vm4.AABB_max + model->vm4.AABB_min) * 0.5f);
 		gl.model.scale(libv::vec::abs(model->vm4.AABB_max - model->vm4.AABB_min) * 0.5f);
 
-		gl.program(line_shader);
-		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
-		gl.uniform(line_shader.uniform_color, color_AABB);
+		gl.program(shader_line.program);
+		gl.uniform(shader_line.uniform.matMVP, gl.mvp());
+		gl.uniform(shader_line.uniform.color, color_AABB);
+
 		gl.render(mesh_AABB);
 	}
 
-	if (model && display_grid) {
-		const auto guard_m = gl.model.push_guard();
-		const auto guard_s = gl.state.push_guard();
-
-		gl.program(line_shader);
-		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
-		gl.uniform(line_shader.uniform_color, color_grid);
-		gl.render(mesh_grid);
-	}
-
-	if (model && display_BS) {
+	if (display_BS) {
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_s = gl.state.push_guard();
 
@@ -151,10 +155,20 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		gl.model.translate(model->vm4.BS_origin);
 		gl.model.scale(model->vm4.BS_radius);
 
-		gl.program(line_shader);
-		gl.uniform(line_shader.uniform_matMVP, gl.mvp());
-		gl.uniform(line_shader.uniform_color, color_BS);
+		gl.program(shader_line.program);
+		gl.uniform(shader_line.uniform.matMVP, gl.mvp());
+		gl.uniform(shader_line.uniform.color, color_BS);
 		gl.render(mesh_BS);
+	}
+
+	if (display_grid) {
+		const auto guard_m = gl.model.push_guard();
+		const auto guard_s = gl.state.push_guard();
+
+		gl.program(shader_line.program);
+		gl.uniform(shader_line.uniform.matMVP, gl.mvp());
+		gl.uniform(shader_line.uniform.color, color_grid);
+		gl.render(mesh_grid);
 	}
 }
 

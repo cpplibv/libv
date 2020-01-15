@@ -42,7 +42,35 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+//auto ImplGLSLCompiler::extract_inspect(const std::string_view line) const noexcept {
+//	struct Result {
+//		std::string_view name;
+//		std::string_view type;
+//		std::string_view min;
+//		std::string_view max;
+//		std::string_view step;
+//		std::string_view init;
+//	};
+//
+//	std::optional<Result> result;
+//
+//	// Accepted: #pragma inspect                 uniform vec4 color;
+//	// Accepted: #pragma inspect                 uniform vec4 color = vec4(0, 0, 0, 0);
+//	// Accepted: #pragma inspect(min, max)       uniform vec4 color = vec4(0, 0, 0, 0);
+//	// Accepted: #pragma inspect(min, max, step) uniform vec4 color = vec4(0, 0, 0, 0);
+//	if (auto m = ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]*inspect[ \t]+(.*);)qq">(line)) {
+//	if (auto m = ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]*inspect[ \t]+(.*);)qq">(line)) {
+//		m.get<1>().to_view();
+//	}
+//	} else {
+//		return std::nullopt;
+//	}
+//}
+
 std::optional<std::string_view> ImplGLSLCompiler::extract_include(const std::string_view line) const noexcept {
+	// Accepted: #include <path> // comment
+	// Accepted: #include "path" // comment
+
 	if (auto m = ctre::match<R"qq(^[ \t]*#[ \t]*include[ \t]+(?:"(.*)"|<(.*)>).*)qq">(line)) {
 		return m.get<1>().to_view().empty() ? m.get<2>().to_view() : m.get<1>().to_view();
 	} else {

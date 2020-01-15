@@ -1,10 +1,11 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // libv
-//#include <libv/ui/component/panel_full.hpp>
-//#include <libv/ui/component/label.hpp>
+#include <libv/ui/component/fwd.hpp>
 #include <libv/ui/component/panel_line.hpp>
+//#include <libv/ui/component/label.hpp>
 //#include <libv/ui/component/panel_float.hpp>
+//#include <libv/ui/component/panel_full.hpp>
 //#include <libv/ui/component_static.hpp>
 //#include <libv/ui/layout_line.hpp>
 // std
@@ -12,18 +13,6 @@
 //// pro
 //#include <vm4_viewer/scene/scene.hpp>
 
-
-// -------------------------------------------------------------------------------------------------
-
-namespace libv {
-namespace ui {
-
-// TODO P3: fwd ui components
-class InputField;
-class PanelFull;
-
-} // namespace ui
-} // namespace libv
 
 // -------------------------------------------------------------------------------------------------
 

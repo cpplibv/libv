@@ -587,6 +587,18 @@ inline const char* to_string(ShaderType type) {
 	return "unknown";
 }
 
+inline const char* to_string_short(ShaderType type) {
+	switch (type) {
+	case ShaderType::Vertex: return "v";
+	case ShaderType::Geometry: return "g";
+	case ShaderType::Fragment: return "f";
+	case ShaderType::Compute: return "c";
+	case ShaderType::TessControl: return "tc";
+	case ShaderType::TessEvaluation: return "te";
+	}
+	return "?";
+}
+
 // TextureType -------------------------------------------------------------------------------------
 
 enum class TextureChannel : GLint {

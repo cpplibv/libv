@@ -203,15 +203,15 @@ void _handle_file_action(
 		const auto key = dir.string();
 		const auto file = path.filename().string();
 
-//		std::cout << " [[ key: " << key << std::endl;
 		auto entry_it = self.directories.find(key);
 
 		if (entry_it != self.directories.end()) {
 			const auto it = entry_it->second.file_callbacks.find(file);
 			if (it != entry_it->second.file_callbacks.end()) {
 				for (auto& cb : it->second) {
-					if (*cb.callback)
+					if (*cb.callback) {
 						(*cb.callback)(cb.uses_relative_path ? event_rel : event_abs);
+					}
 				}
 			}
 		}
@@ -221,12 +221,14 @@ void _handle_file_action(
 	for (auto up_dir = path; true; up_dir = _parent_directory(up_dir)) {
 		const auto up_key = up_dir.string();
 
-//		std::cout << " ]] up_key: " << up_key << std::endl;
 		const auto up_it = self.directories.find(up_key);
-		if (up_it != self.directories.end())
-			for (auto& cb : up_it->second.callbacks)
-				if (*cb.callback)
+		if (up_it != self.directories.end()) {
+			for (auto& cb : up_it->second.callbacks) {
+				if (*cb.callback) {
 					(*cb.callback)(cb.uses_relative_path ? event_rel : event_abs);
+				}
+			}
+		}
 
 		if (!up_dir.has_relative_path())
 			break;
@@ -297,6 +299,7 @@ void _unsubscribe(ImplFileWatcher& self, FileWatcher::token_type token) {
 			break;
 		}
 
+		bool found = false;
 		for (auto fit = dir.file_callbacks.begin(); fit != dir.file_callbacks.end(); ++fit) {
 			auto& file = *fit;
 
@@ -309,9 +312,13 @@ void _unsubscribe(ImplFileWatcher& self, FileWatcher::token_type token) {
 
 				if (file.second.empty())
 					dir.file_callbacks.erase(fit);
+				found = true;
 				break;
 			}
 		}
+
+		if (found)
+			break;
 	}
 
 	if (dit->second.callbacks.empty() && dit->second.file_callbacks.empty()) {
@@ -346,12 +353,6 @@ void ImplFileWatcher::handleFileAction(efsw::WatchID id, const std::string& dir,
 	normal_old_path = std::filesystem::weakly_canonical(normal_old_path, ignore_ec);
 	normal_old_path = std::filesystem::absolute(normal_old_path, ignore_ec);
 	normal_old_path.make_preferred();
-
-//	std::cout << "EFSW: "
-//			<<id << " " << normal_action << ", "
-//			<< "dir: " << dir << "|" << filename << " [" << normal_path.string() << "], "
-//			<< "old_path: " << old_path << " [" << normal_old_path.string() << "]"
-//			<< std::endl;
 
 	_handle_file_action(*this, normal_action, normal_path, normal_old_path);
 }

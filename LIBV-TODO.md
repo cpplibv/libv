@@ -356,20 +356,56 @@ app.vm4_viewer: single directional light
 app.vm4_viewer: show model grey lighted (phong)
 app.vm4_viewer: single point light
 app.vm4_viewer: single spot light
+libv.glr: general function callback and remote bypass / callback with gl state
+app.vm4_viewer: shader manager bypass libv.glr to access libv.gl
+libv.glr: program adopt and swap with libv.gl
+app.vm4_viewer: shader include base directory
+app.vm4_viewer: shader loader
+app.vm4_viewer: do not change shader if shader load/compile/link failed
+app.vm4_viewer: throw out old shader code, rename shader2 to shader
+app.vm4_viewer: shader should sub for every included file
+app.vm4_viewer: shader should unsub from file watcher, ATM there is an issue during program termination
+app.vm4_viewer: solve 3 line of error while program reloading happens
+app.vm4_viewer: cleanup cpp shader codes
+app.vm4_viewer: ui feedback for glsl shader error, big red text
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-app.vm4_viewer: ui feedback for glsl shader error, and do not change shader if shader failed, but big red text
+libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
-app.vm4_viewer: shader include base director
-app.vm4_viewer: shader "manager"
 
+app.vm4_viewer: Camera controller class
+app.vm4_viewer: Camera controller class with lua binding
+
+app.vm4_viewer: light source indicator
+app.vm4_viewer: camera pivot indicator
+app.vm4_viewer: camera orientation indicator
+
+app.vm4_viewer: light source mover
+
+app.vm4_viewer: Run time (and config time) options for debug tool toggles, or overlays: ui toggle buttons
+app.vm4_viewer: Add config option to auto open shader on errors: /netbeans/bin/netbeans64.exe --open {file}:{line}
+app.vm4_viewer: Add config option to disable reset camera on model loading
+app.vm4_viewer: Add config option for AABB
+app.vm4_viewer: Add config option for BS
+app.vm4_viewer: Add config option for grid-XY
+app.vm4_viewer: Add config option to not reset camera on model change
+
+app.vm4_viewer: Command line argument --open "file" to auto open file
+app.vm4_viewer: Command line argument --active open file in already running instance (overrides config option)
+
+
+libv.ui: UI level message/event bus/system might be required:
+		context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
+		context().events().fire("shader_reload", ...);
+libv.ui: UI level message/event bus/system could use support for up-walking context iteration
+libv.ui: UI level storage system
+		context().storage<UIUserConfig>() : UIUserConfig&
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
-app.vm4_viewer: shader should unsub from file watcher, ATM there is an issue during program termination
-app.vm4_viewer: shader should sub for every included file
 
+libv.ui.raw: use constexpr std::span<const std::byte>
 
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node
@@ -412,10 +448,13 @@ app.vm4_viewer: shader should sub for every included file
 		gl::texture
 
 
-libv.gl.glsl: Warning option for mixed indentation in different lines
-libv.gl.glsl: Warning option for mixed indentation in different files
-libv.gl.glsl: Warning for trailing white space
+gl: learn https://www.khronos.org/opengl/wiki/Image_Load_Store
 
+libv.gl.glsl: Warning for abs          include path (path normal form start with root)
+libv.gl.glsl: Warning for non base-abs include path (path normal form start with ..)
+libv.gl.glsl: Warning for non generic directory separator in include path (backlash)
+libv.gl.glsl: Warning option for mixed indentation in different lines and/or files
+libv.gl.glsl: Warning for line trailing white space
 
 libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 app.vm4_viewer: camera movement should acquire and lock mouse position
@@ -442,13 +481,15 @@ libv.ui: non-shared_ptr based panels, aka static_container (?)
 app.vm4_viewer: display statistics
 
 app.vm4_viewer: import model
-app.vm4_viewer: Add config option to disable reset camera on model loading
-app.vm4_viewer: Add config options for AABB
-app.vm4_viewer: Add config options for BS
-app.vm4_viewer: Add config options for grid-XY
 app.vm4_viewer: Add project level size comparison functionality
-app.vm4_viewer: Thumbnails
+app.vm4_viewer: Thumbnails and thumbnail generation
 app.vm4_viewer: Better focus camera based on the actual view angles and model ineast of the BSO
+
+app.vm4_viewer.shader: uniform (sun) auto iteration and name auto chaining
+app.vm4_viewer.shader: ui feedback for glsl shader reload success
+app.vm4_viewer.shader: ui feedback for glsl shader failed include
+app.vm4_viewer.shader: use a fallback shader on init failure
+app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
 
 libv.ui: static_component system
 libv.ui: list
@@ -555,6 +596,8 @@ interactive
 	libv.ui.input_field: undo/redo support
 
 hotkey
+	libv.hotkey: Rename to libv.control
+	libv.hotkey: Press type aka additional information regarding control usage: N/A, Continuous (Hold), Press, Release, Double click, (Toggle), etc...
 	libv.hotkey: design API
 	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
 	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
@@ -828,6 +871,8 @@ libv.math: Catmull-Rom spline https://www.youtube.com/watch?v=9_aJGUTePYo and co
 libv.ui: Could boost::sync_queue be used?
 libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 
+libv.fsw: Improve callback and tokens to not hold the mutex during event broadcast (callback), currently it is a deadlock
+
 
 --- AWAITING ---------------------------------------------------------------------------------------
 
@@ -1054,6 +1099,78 @@ Shader types
 	OrenNayar - More avg lambert
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
+
+IDEA: NamedUniform_t + reflection
+
+template <libv::static_string Name, typename Type>
+struct NamedUniform_t : Uniform_t<Type> {
+	static constexpr inline libv::static_string name = Name;
+};
+
+struct UniformsShaderLine {
+	app::Uniform_vec4f<"color"> uniform_color;
+	app::Uniform_mat4f<"matMVP"> uniform_matMVP;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+libv::gl::Uniform_vec3f cameraPositionW;
+libv::gl::Uniform_mat4f matrixMVP;
+libv::gl::Uniform_mat4f matrixModel;
+libv::gl::Uniform_mat4f matrixModelView;
+libv::gl::Uniform_mat4f matrixProjection;
+libv::gl::Uniform_mat4f matrixView;
+libv::gl::Uniform_vec2f mousePositionH; // Not sure about this one
+libv::gl::Uniform_vec2f mousePositionS; // Not sure about this one
+libv::gl::Uniform_vec2f resolution;
+libv::gl::Uniform_float timeReal;
+libv::gl::Uniform_float timeSimulation;
+
+void assignBaseUniforms() {
+	program.assign(cameraPositionW, "cameraPositionW");
+	program.assign(matrixMVP, "matrixMVP");
+	program.assign(matrixModel, "matrixModel");
+	program.assign(matrixModelView, "matrixModelView");
+	program.assign(matrixProjection, "matrixProjection");
+	program.assign(matrixView, "matrixView");
+	program.assign(mousePositionH, "mousePositionH");
+	program.assign(mousePositionS, "mousePositionS");
+	program.assign(resolution, "resolution");
+	program.assign(timeReal, "timeReal");
+	program.assign(timeSimulation, "timeSimulation");
+}
+
+void use(Queue& queue) {
+	queue.program(program);
+
+	if (matrixMVP.isActive())
+		queue.uniform(uniformMatrixMVP, mvp());
+	if (matrixModel.isActive())
+		queue.uniform(uniformMatrixModel, model);
+	if (matrixModelView.isActive())
+		queue.uniform(uniformMatrixModelView, view * model);
+	if (matrixProjection.isActive())
+		queue.uniform(uniformMatrixProjection, projection);
+	if (matrixView.isActive())
+		queue.uniform(uniformMatrixView, view);
+
+	if (cameraPositionW.isActive())
+		queue.uniform(uniformCameraPositionW, eye());
+
+	if (timeReal.isActive())
+		queue.uniform(uniformTimeReal, timeFrame);
+	if (timeSimulation.isActive())
+		queue.uniform(uniformTimeSimulation, timeSimulation);
+
+	if (mousePositionH.isActive())
+		queue.uniform(uniformMousePositionH, mousePosition / resolution);
+	if (mousePositionS.isActive())
+		queue.uniform(uniformMousePositionS, mousePosition);
+	if (resolution.isActive())
+		queue.uniform(uniformResolution, resolution);
+}
+
+// -------------------------------------------------------------------------------------------------
 
 diffuse(1.0f, 1.0f, 1.0f, 1.0f),
 specular(0.8f, 0.8f, 0.8f, 1.0f),
