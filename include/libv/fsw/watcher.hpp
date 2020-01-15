@@ -5,8 +5,11 @@
 // std
 #include <filesystem>
 #include <functional>
-#include <iosfwd>
 #include <memory>
+// pro
+#include <libv/fsw/action.hpp>
+#include <libv/fsw/event.hpp>
+#include <libv/fsw/token.hpp>
 
 
 namespace libv {
@@ -14,45 +17,13 @@ namespace fsw {
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplFileWatcher;
-
-// -------------------------------------------------------------------------------------------------
-
-// TODO P5: to separate files you go
-enum class Action {
-	create = 1,
-	remove = 2,
-	modify = 3,
-	rename = 4,
-};
-
-std::ostream& operator<<(std::ostream& os, const Action& event);
-
-// TODO P5: to separate files you go
-struct WatchToken {
-	// TODO P5: hide or use a better token
-	void* id = nullptr;
-
-	constexpr inline WatchToken() noexcept = default;
-	constexpr inline WatchToken(void* id) noexcept : id(id) { }
-};
-
-// TODO P5: to separate files you go
-struct Event {
-	Action action;
-	std::filesystem::path path;
-	std::filesystem::path old_path;
-
-	friend std::ostream& operator<<(std::ostream& os, const Event& event);
-};
-
 class FileWatcher {
 public:
 	using callback_type = std::function<void(const Event&)>;
 	using token_type = WatchToken;
 
 private:
-	std::unique_ptr<ImplFileWatcher> self;
+	std::unique_ptr<class ImplFileWatcher> self;
 
 public:
 	FileWatcher();
