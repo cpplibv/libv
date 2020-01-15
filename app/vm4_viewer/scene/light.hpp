@@ -6,13 +6,15 @@
 //#include <libv/glr/mesh.hpp>
 //#include <libv/glr/program.hpp>
 //#include <libv/glr/queue_fwd.hpp>
+#include <libv/glr/queue.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/math/vec.hpp>
 // std
 //#include <optional>
 // pro
+#include <vm4_viewer/scene/node.hpp>
 //#include <vm4_viewer/camera.hpp>
-#include <vm4_viewer/scene/object.hpp>
+//#include <vm4_viewer/scene/object.hpp>
 
 
 namespace app {
@@ -20,24 +22,26 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 enum class LightType : int32_t {
-	point = 0,
-	dir = 1,
-	spot = 2,
+	disable = 0,
+
+	point = 1,
+	directional = 2,
+	spot = 3,
 };
 
 struct Light : Node {
 	LightType type = LightType::point;
-//	bool enabled = true;
 
-//	libv::vec3f position = {0, 0, 0};
+	libv::vec3f position = {0, 0, 0};
 	libv::vec3f direction = {1, 0, 0};
+
+	libv::vec3f ambient = {0.1f, 0.1f, 0.1f};
 	libv::vec3f diffuse = {1, 1, 1};
 	libv::vec3f specular = {1, 1, 1};
 
-//	double range = 75.0;
-//	double intensity = 1.0;
-//	double innerCosAngle = 0.8; // Angles closer to 1 produce tighter cones
-//	double outerCosAngle = 0.6; // Angles of -1 will emulate point lights.
+//	float range = 75.0;
+	float innerCosAngle = 0.8f; // Angles closer to 1 produce tighter cones
+	float outerCosAngle = 0.6f; // Angles of -1 will emulate point lights.
 
 //	bool shadowCast = false;
 //	uint32_t frameBuffer;
@@ -73,25 +77,57 @@ struct Light : Node {
 
 struct UniformLight {
 	libv::glr::Uniform_int32 type;
-//	libv::glr::Uniform_bool enabled;
 
-//	libv::glr::Uniform_vec3f position;
+	libv::glr::Uniform_vec3f position;
 	libv::glr::Uniform_vec3f direction;
+
+	libv::glr::Uniform_vec3f ambient;
 	libv::glr::Uniform_vec3f diffuse;
 	libv::glr::Uniform_vec3f specular;
 
-//	libv::glr::Uniform_double range;
-//	libv::glr::Uniform_double intensity;
-//	libv::glr::Uniform_double innerCosAngle;
-//	libv::glr::Uniform_double outerCosAngle;
+//	libv::glr::Uniform_float range;
+	libv::glr::Uniform_float innerCosAngle;
+	libv::glr::Uniform_float outerCosAngle;
 
 //	libv::glr::Uniform_bool shadowCast;
 //	libv::glr::Uniform_int32 shadowMapSampler;
 //	libv::glr::Uniform_mat4f shadowMVPTmat;
 
 //	UniformLight(const std::string& name);
-	void set(const Light& v) {
 
+	template <typename Access>
+	void update_uniforms(Access& access) {
+		access(type, "sun.type", libv::to_value(LightType::point));
+
+		access(position, "sun.position", libv::vec3f(0, 0, 0));
+		access(direction, "sun.direction", libv::vec3f(0, 0, -1));
+
+		access(ambient, "sun.ambient", libv::vec3f(0.1f, 0.1f, 0.1f));
+		access(diffuse, "sun.diffuse", libv::vec3f(1, 1, 1));
+		access(specular, "sun.specular", libv::vec3f(1, 1, 1));
+
+//		access(range, "sun.range", 100);
+		access(innerCosAngle, "sun.innerCosAngle", 0.8f);
+		access(outerCosAngle, "sun.outerCosAngle", 0.6f);
+
+//		access(shadowCast, "sun.shadowCast", false);
+//		access(shadowMapSampler, "sun.shadowMapSampler");
+//		access(shadowMVPTmat, "sun.shadowMVPTmat");
+	}
+
+	void set(libv::glr::Queue& gl, const Light& v) {
+		// TODO P3: gl::uniform and glr::uniform template overloads to accept any enum type and call to_value by itself
+		gl.uniform(type, libv::to_value(v.type));
+
+		gl.uniform(position, v.position);
+		gl.uniform(direction, v.direction);
+
+		gl.uniform(ambient, v.ambient);
+		gl.uniform(diffuse, v.diffuse);
+		gl.uniform(specular, v.specular);
+
+		gl.uniform(innerCosAngle, v.innerCosAngle);
+		gl.uniform(outerCosAngle, v.outerCosAngle);
 	}
 };
 

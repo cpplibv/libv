@@ -21,9 +21,9 @@ void main() {
 	gl_Position = MVPmat * vec4(vertexPosition, 1);
 
 	fragmentPositionW = vec3(Mmat * vec4(vertexPosition, 1 ));
-	fragmentNormalW = vertexNormal * mat3(Mmat);
-	fragmentTangentW = vertexTangent * mat3(Mmat);
-	fragmentBitangentW = vertexBitangent * mat3(Mmat);
+	fragmentNormalW = mat3(Mmat) * vertexNormal;
+	fragmentTangentW = mat3(Mmat) * vertexTangent;
+	fragmentBitangentW = mat3(Mmat) * vertexBitangent;
 	// fragmentBinormalW = cross(fragmentNormalW, fragmentTangentW);
 
 	fragmentTexture0 = vertexTexture0;

@@ -5,6 +5,7 @@
 // libv
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/program_object.hpp>
+#include <libv/meta/identity.hpp>
 #include <libv/utility/observer_ptr.hpp>
 // std
 #include <memory>
@@ -86,7 +87,7 @@ public:
 
 public:
 	template <typename T>
-	inline void uniform(const Uniform_t<T> uniform, const T& value) noexcept {
+	inline void uniform(const Uniform_t<T> uniform, const libv::meta::identity_t<T>& value) noexcept {
 		remote->uniformStream.set(uniform.location, value);
 	}
 
@@ -94,7 +95,7 @@ public:
 	void assign(Uniform& uniform_, std::string identifier) noexcept;
 
 	template <typename T>
-	inline void assign(Uniform_t<T>& uniform_, std::string identifier, const T& value) noexcept {
+	inline void assign(Uniform_t<T>& uniform_, std::string identifier, const libv::meta::identity_t<T>& value) noexcept {
 		assign(uniform_, identifier);
 		uniform(uniform_, value);
 	}

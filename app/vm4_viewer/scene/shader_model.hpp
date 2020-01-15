@@ -4,6 +4,7 @@
 
 // pro
 #include <vm4_viewer/scene/shader.hpp>
+#include <vm4_viewer/scene/light.hpp>
 
 
 namespace app {
@@ -29,6 +30,8 @@ namespace app {
 //	sample5 = 15,
 //	sample6 = 16,
 //	sample7 = 17,
+//
+//	lambert = 20,
 //};
 //
 //ShaderModel()
@@ -50,6 +53,8 @@ namespace app {
 //	define("MODE_SAMPLE5", RenderMode::sample5);
 //	define("MODE_SAMPLE6", RenderMode::sample6);
 //	define("MODE_SAMPLE7", RenderMode::sample7);
+//
+//	define("MODE_LAMBERT", RenderMode::lambert);
 
 struct UniformsShaderModel {
 	libv::glr::Uniform_vec4f uniform_color;
@@ -59,6 +64,9 @@ struct UniformsShaderModel {
 	libv::glr::Uniform_int32 uniform_mode;
 	libv::glr::Uniform_float uniform_near;
 	libv::glr::Uniform_float uniform_far;
+	libv::glr::Uniform_vec3f uniform_eyeW;
+
+	UniformLight uniform_sun;
 
 	constexpr static libv::gl::TextureChannel textureChannel{0};
 
@@ -73,7 +81,15 @@ struct UniformsShaderModel {
 //		access(uniform_mode, "mode", RenderMode::normalW);
 		access(uniform_near, "near", 0.1f);
 		access(uniform_far, "far", 1000.0f);
+		access(uniform_eyeW, "eyeW");
+
+		uniform_sun.update_uniforms(access);
+//		access(sun, "sun");
 	}
+
+//	void update(libv::span<const Light> lights);
+//	void update(const Material& material);
+//	void update(const Camera& camera);
 };
 
 using ShaderModel = app::Shader<UniformsShaderModel>;

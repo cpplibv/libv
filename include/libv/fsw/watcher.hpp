@@ -18,6 +18,7 @@ class ImplFileWatcher;
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: to separate files you go
 enum class Action {
 	create = 1,
 	remove = 2,
@@ -27,6 +28,7 @@ enum class Action {
 
 std::ostream& operator<<(std::ostream& os, const Action& event);
 
+// TODO P5: to separate files you go
 struct WatchToken {
 	// TODO P5: hide or use a better token
 	void* id = nullptr;
@@ -35,6 +37,7 @@ struct WatchToken {
 	constexpr inline WatchToken(void* id) noexcept : id(id) { }
 };
 
+// TODO P5: to separate files you go
 struct Event {
 	Action action;
 	std::filesystem::path path;

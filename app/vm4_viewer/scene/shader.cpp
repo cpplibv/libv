@@ -24,8 +24,14 @@ void BaseShader::update(const std::filesystem::path& file_path, bool is_vertex) 
 		return;
 	}
 
-	// TODO P2: fsw subscribe_file every included file
-	const auto include_loader = [](const auto& path){
+	const auto include_loader = [&](const auto& path) {
+		// TODO P2: store token for fsw subscribe_file every included file
+//		const auto token = watcher.subscribe_file(path, [this, file_path, is_vertex](const libv::fsw::Event& e) {
+//			log_app.trace("Updating {} shader: {}", "vertex", e);
+//			this->update(file_path, is_vertex);
+//			update_ptr(*this);
+//		});
+
 		auto include_result = libv::read_file_ec(path);
 
 		if (include_result.ec) {
@@ -52,13 +58,19 @@ BaseShader::BaseShader(const std::filesystem::path& vs_path, const std::filesyst
 	update_ptr(*this);
 
 	// <<< P5: UI based file watcher that swaps threads and broadcasts the event in the appropriate loop stage
-	watcher_vs = watcher.subscribe_file(vs_path, [this, vs_path](const libv::fsw::Event& e) {
-		log_app.trace("Updating {} shader: {}", "vertex", e);
+//	watcher_vs = watcher.subscribe_file(vs_path, [this, vs_path](const libv::fsw::Event& e) {
+//		log_app.trace("Updating {} shader: {}", "vertex", e);
+//		this->update(vs_path, true);
+//		update_ptr(*this);
+//	});
+//	watcher_fs = watcher.subscribe_file(fs_path, [this, fs_path](const libv::fsw::Event& e) {
+//		log_app.trace("Updating {} shader: {}", "fragment", e);
+//		this->update(fs_path, false);
+//		update_ptr(*this);
+//	});
+	watcher_fs = watcher.subscribe_directory(vs_path.parent_path(), [this, vs_path, fs_path](const libv::fsw::Event& e) {
+		log_app.trace("Updating shader {}/{} action: {}", libv::generic_path(vs_path), libv::generic_path(fs_path), e);
 		this->update(vs_path, true);
-		update_ptr(*this);
-	});
-	watcher_fs = watcher.subscribe_file(fs_path, [this, fs_path](const libv::fsw::Event& e) {
-		log_app.trace("Updating {} shader: {}", "fragment", e);
 		this->update(fs_path, false);
 		update_ptr(*this);
 	});

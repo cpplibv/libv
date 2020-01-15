@@ -51,8 +51,17 @@ Scene::Scene() :
 		libv::glr::generateSpherifiedCube(6, pos, libv::glr::ignore, libv::glr::ignore, index);
 	}
 
-	sun.type = LightType::dir;
-	sun.direction = libv::vec3f(2, 1, 4).normalize();
+//	sun.type = LightType::point;
+//	sun.position = libv::vec3f(4, 5, 8);
+
+//	sun.type = LightType::spot;
+//	sun.position = libv::vec3f(4, 5, 8);
+//	sun.direction = libv::vec3f(-2, -1, -4).normalize();
+
+	sun.type = LightType::directional;
+	sun.direction = libv::vec3f(-2, -1, -4).normalize();
+
+	sun.ambient = libv::vec3f(0.1f, 0.1f, 0.1f);
 	sun.diffuse = libv::vec3f(1, 1, 1);
 	sun.specular = libv::vec3f(1, 1, 1);
 }
@@ -102,6 +111,9 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 	gl.state.depthFunctionLess();
 
 	if (model) {
+		gl.program(model_shader);
+		model_shader.uniform_sun.set(gl, sun);
+		gl.uniform(model_shader.uniform_eyeW, gl.eye());
 		model->render(gl, model_shader);
 	}
 

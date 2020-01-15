@@ -64,10 +64,10 @@ struct Object : Node {
 	}
 };
 
-struct OModel : Object {
-	void* model;
-	void* shader;
-};
+//struct OModel : Object {
+//	void* model;
+//	void* shader;
+//};
 
 // -------------------------------------------------------------------------------------------------
 

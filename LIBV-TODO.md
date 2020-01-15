@@ -352,16 +352,23 @@ libv.gl: Implement a GLSL engine
 libv.gl.glsl: Implement primitive preprocessor with #include and include dirs
 libv.gl.glsl: Warning option for crlf line ending.
 libv.gl.glsl: Warning option for space indentation or if indentation characters are mixed
+app.vm4_viewer: single directional light
+app.vm4_viewer: show model grey lighted (phong)
+app.vm4_viewer: single point light
+app.vm4_viewer: single spot light
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-app.vm4_viewer: single directional light
-app.vm4_viewer: show model grey lighted (phong)
+app.vm4_viewer: ui feedback for glsl shader error, and do not change shader if shader failed, but big red text
 
-libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
-app.vm4_viewer: camera movement should acquire and lock mouse position
+app.vm4_viewer: shader include base director
+app.vm4_viewer: shader "manager"
+
+libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
+app.vm4_viewer: shader should unsub from file watcher, ATM there is an issue during program termination
+app.vm4_viewer: shader should sub for every included file
 
 
 > Render Data Dependency Graph aka Scene structure reorganization
@@ -404,8 +411,16 @@ app.vm4_viewer: camera movement should acquire and lock mouse position
 		map type (channel)
 		gl::texture
 
-libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
-app.vm4_viewer: UI shader should unsub from file watcher, ATM there is an issue during program termination
+
+libv.gl.glsl: Warning option for mixed indentation in different lines
+libv.gl.glsl: Warning option for mixed indentation in different files
+libv.gl.glsl: Warning for trailing white space
+
+
+libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+app.vm4_viewer: camera movement should acquire and lock mouse position
+
+libv.ui: read nana 3rd party property tree lib API
 
 app: about page with executable path, build and compiler information, git hash and software version
 libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
@@ -423,7 +438,6 @@ vm4 hash and timestamp
 libv.vm4lua: lua binding for vm4 and vm4 importer
 
 glsl: quaternion https://github.com/mattatz/ShibuyaCrowd/blob/master/source/shaders/common/quaternion.glsl and http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-libv.ui: read nana 3rd party property tree lib API
 libv.ui: non-shared_ptr based panels, aka static_container (?)
 app.vm4_viewer: display statistics
 
