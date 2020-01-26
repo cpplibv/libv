@@ -9,6 +9,7 @@
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 // std
+#include <functional>
 #include <memory>
 // pro
 #include <libv/glr/state.hpp>
@@ -54,6 +55,9 @@ public:
 
 public:
 	void sequencePoint() noexcept; /// Registers a sequence point as a sorting fence
+
+public:
+	void callback(std::function<void(libv::gl::GL&)>);
 
 public:
 	inline void setClearColor(const float r, const float g, const float b, const float a) {

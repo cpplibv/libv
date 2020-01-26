@@ -9,6 +9,7 @@
 // pro
 #include <libv/gl/check.hpp>
 #include <libv/gl/enum.hpp>
+#include <libv/gl/gl.hpp>
 #include <libv/gl/program_object.hpp>
 #include <libv/gl/shader.hpp>
 #include <libv/gl/uniform.hpp>
@@ -22,10 +23,11 @@ namespace gl {
 class AccessProgram {
 private:
 	Program& object;
+	GL& gl;
 
 public:
-	AccessProgram(Program& object) :
-		object(object) { }
+	AccessProgram(Program& object, GL& gl) :
+		object(object), gl(gl) { }
 
 public:
 	inline void create() {
@@ -102,8 +104,8 @@ public:
 
 public:
 	inline void use() const {
-		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glUseProgram(object.id);
+		// object.id is allowed to be 0
+		gl.use_program(object);
 		checkGL();
 	}
 
