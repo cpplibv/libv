@@ -34,6 +34,7 @@ public:
 public:
 	std::optional<std::string_view> extract_include(std::string_view line) const noexcept;
 	bool is_pragma_once(std::string_view line) const noexcept;
+	bool is_version(std::string_view line) const noexcept;
 	bool is_mixed_indentation(const std::string_view line) const noexcept;
 
 	void preprocess_includes(const std::string_view source, const std::string_view filename, int include_line);
@@ -51,6 +52,10 @@ std::optional<std::string_view> ImplGLSLCompiler::extract_include(const std::str
 
 bool ImplGLSLCompiler::is_pragma_once(const std::string_view line) const noexcept {
 	return ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]+once[ \t]*.*)qq">(line);
+}
+
+bool ImplGLSLCompiler::is_version(const std::string_view line) const noexcept {
+	return ctre::match<R"qq(^[ \t]*#[ \t]*version[ \t]+.*)qq">(line);
 }
 
 bool ImplGLSLCompiler::is_mixed_indentation(const std::string_view line) const noexcept {
@@ -94,8 +99,12 @@ void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const 
 				if (crlf)
 					line.remove_suffix(2);
 
-				// NOTE: This step also auto-appends newline on last line if its missing
+				// NOTE: This step also auto-appends newline on last line if it is missing
 				output << line << '\n';
+
+				if (is_version(line))
+					// NOTE: Inserting top level source information after version
+					output << "#line " << line_number + 1 << " \"" << filename << "\"\n";
 			}
 		} else {
 			if (libv::linear_contains(includeStack | ranges::view::keys, *include)) {
@@ -116,9 +125,9 @@ void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const 
 			if (!included_source.success) {
 				log_gl.error("Failed to include source: {} reason: {}", *include, included_source.result);
 			} else {
-				output << "#line "<< 1 << " \"" << *include << "\"\n";
+				output << "#line " << 1 << " \"" << *include << "\"\n";
 				preprocess_includes(included_source.result, *include, line_number);
-				output << "#line "<< line_number + 1 << " \"" << filename << "\"\n";
+				output << "#line " << line_number + 1 << " \"" << filename << "\"\n";
 			}
 		}
 
@@ -136,6 +145,17 @@ std::string GLSLCompiler::compile(const std::string_view source, const std::stri
 	session.preprocess_includes(source, filename, 1);
 
 	return std::move(session.output).str();
+}
+
+std::string GLSLCompiler::load(const std::string_view filepath) {
+	auto main_source = loader(filepath);
+
+	if (!main_source.success) {
+		log_gl.error("Failed to load source: {} reason: {}", filepath, main_source.result);
+		return "";
+	}
+
+	return compile(main_source.result, filepath);
 }
 
 // -------------------------------------------------------------------------------------------------
