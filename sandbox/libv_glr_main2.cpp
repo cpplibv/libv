@@ -7,19 +7,20 @@
 // libv
 #include <libv/gl/gl.hpp>
 #include <libv/math/angle.hpp>
-#include <libv/utility/read_file.hpp>
+//#include <libv/utility/read_file.hpp>
 // std
 #include <chrono>
 #include <iostream>
 // pro
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/layout_std140.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/procedural/progress_segmented_ring.hpp>
+#include <libv/glr/program.hpp>
+#include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_block_binding.hpp>
-#include <libv/glr/queue.hpp>
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/program.hpp>
 //#include <libv/gl/enum.hpp>
 //#include <libv/gl/image.hpp>
 //#include <libv/glr/attribute.hpp>
@@ -57,69 +58,36 @@ void main() {
 const auto shader_plane_fs = R"(
 #version 330 core
 
+#define FILL_MODE_CCW 0
+#define FILL_MODE_CW 1
+#define FILL_MODE_IN 2
+#define FILL_MODE_OUT 3
+#define FILL_MODE_FLOOR 4
+#define FILL_MODE_CEIL 5
+
 in vec2 fragmentTexture0;
 
 out vec4 output;
 
-uniform sampler2D texture1Sampler;
+uniform int fill_mode = FILL_MODE_CCW;
+uniform float progress = 1.0;
+uniform vec4 color_fg = vec4(1, 1, 1, 1);
+uniform vec4 color_bg = vec4(0, 0, 0, 1);
 
 void main() {
-	output = texture(texture1Sampler, fragmentTexture0);
-}
-)";
+//	const float t = fragmentTexture0.x;
+//	const float s = fragmentTexture0.y;
 
-const auto shader_font_vs = R"(
-#version 330 core
+//	if (fill_mode == FILL_MODE_CCW && t < progress)
+//		discard();
 
-layout(location = 0) in vec3 vertexPosition;
-layout(location = 2) in vec4 vertexColor0;
-layout(location = 8) in vec2 vertexTexture0;
-layout(location = 10) in vec4 vertexFontXYWH;
-
-out vec4 fragmentColor0;
-out vec2 fragmentTexture0;
-out vec4 fragmentFontXYWH;
-
-uniform mat4 MVPmat;
-
-void main() {
-	fragmentTexture0 = vertexTexture0;
-	fragmentFontXYWH = vertexFontXYWH;
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
-}
-)";
-
-const auto shader_font_gs = R"(
-#version 330 core
-
-in vec4 fragmentColor0;
-in vec2 fragmentTexture0;
-in vec4 fragmentFontXYWH;
-
-void main() {
-}
-)";
-
-const auto shader_font_fs = R"(
-#version 330 core
-
-in vec4 fragmentColor0;
-in vec2 fragmentTexture0;
-in vec4 fragmentFontXYWH;
-
-out vec4 output;
-
-uniform sampler2D textureSampler;
-
-void main() {
-	output = texture(texture1Sampler, fragmentTexture0);
+	output = vec4(1, fragmentTexture0, 1);
 }
 )";
 
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
-constexpr auto attribute_font_xywh = libv::glr::Attribute<10, libv::vec4f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
@@ -144,16 +112,10 @@ struct Sandbox {
 	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
 
 	libv::glr::Mesh plane_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+
 	libv::glr::Program plane_program;
 	libv::glr::Uniform_mat4f plane_uniform_MVPmat;
 	libv::glr::Uniform_texture plane_uniform_texture;
-
-	libv::glr::Program font_program;
-	libv::glr::Uniform_mat4f font_uniform_MVPmat;
-	libv::glr::Uniform_texture font_uniform_texture;
-
-//	libv::glr::Font font;
-//	libv::glr::Text text;
 
 	Sandbox() {
 		// Plane
@@ -163,35 +125,24 @@ struct Sandbox {
 		plane_program.assign(plane_uniform_texture, "textureSampler", textureChannel_diffuse);
 
 		{
+			plane_mesh.clear();
+
 			auto position = plane_mesh.attribute(attribute_position);
 			auto texture0 = plane_mesh.attribute(attribute_texture0);
 			auto index = plane_mesh.index();
 
-			position(0, 0, 0);
-			position(WINDOW_WIDTH, 0, 0);
-			position(WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-			position(0, WINDOW_HEIGHT, 0);
+			libv::glr::ProgressSegmentedRingStyle style;
 
-			texture0(0, 0);
-			texture0(1, 0);
-			texture0(1, 1);
-			texture0(0, 1);
+			style.segment_num = 8;
+			style.resolution = 4;
+			style.radius_inner = 100;
+			style.radius_outer = 300;
+			style.up = libv::to_rad(30.f);
+//			style.CW = false;
+//			style.fill_mode = libv::glr::ProgressSegmentedRingStyle::FillMode::floor;
 
-			index.quad(0, 1, 2, 3);
+			libv::glr::generateProgressSegmentedRing(style, position, texture0, index);
 		}
-
-		// Text
-		font_program.vertex(shader_font_vs);
-//		font_program.geometry(shader_font_gs);
-		font_program.fragment(shader_font_fs);
-		font_program.assign(plane_uniform_MVPmat, "MVPmat");
-		font_program.assign(plane_uniform_texture, "textureSampler", textureChannel_diffuse);
-
-		const auto dataFont = libv::read_file_or_throw("res/texture/cube_debug_transparent.dds");
-//		font = libv::gl::load_font_or_throw(dataFont);
-//
-//		text.setFont(font);
-//		text.setText("");
 
 		remote.create();
 		remote.enableDebug();
@@ -237,7 +188,6 @@ struct Sandbox {
 		gl.state.enableBlend();
 		gl.state.blendSrc_SourceAlpha();
 		gl.state.blendDst_One_Minus_SourceAlpha();
-//		gl.state.blendEquation_Add();
 
 		gl.state.enableCullFace();
 		gl.state.frontFaceCCW();
@@ -253,24 +203,19 @@ struct Sandbox {
 		gl.clearColor();
 		gl.clearDepth();
 
+		gl.viewport({0, 0}, {WINDOW_WIDTH, WINDOW_HEIGHT});
+
 		gl.projection = libv::mat4f::ortho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
 		gl.view = libv::mat4f::identity();
 		gl.model = libv::mat4f::identity();
 
 		{
-//			const auto guard_m2 = gl.model.push_guard();
-//			gl.model.scale();
+			const auto guard_m = gl.model.push_guard();
+			gl.model.translate(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0);
+
 			gl.program(plane_program);
 			gl.uniform(plane_uniform_MVPmat, gl.mvp());
-//			gl.texture(font.texture, textureChannel_diffuse);
 			gl.render(plane_mesh);
-		}
-
-		{
-			gl.program(font_program);
-			gl.uniform(font_uniform_MVPmat, gl.mvp());
-//			gl.texture(font.texture, textureChannel_diffuse);
-//			gl.render(text.mesh);
 		}
 	}
 };
@@ -279,5 +224,5 @@ struct Sandbox {
 
 int main() {
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Sandbox libv.GL3", WINDOW_HEIGHT, WINDOW_WIDTH);
+	return run_sandbox<Sandbox>("Sandbox libv.GLR2", WINDOW_HEIGHT, WINDOW_WIDTH);
 }
