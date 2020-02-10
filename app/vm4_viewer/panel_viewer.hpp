@@ -71,7 +71,7 @@ public:
 	void update_ui();
 	void update_info();
 
-	void key(libv::input::Key key);
+	void key(libv::input::Keycode key);
 
 private:
 	void doAttach() override;

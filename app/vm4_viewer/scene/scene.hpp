@@ -11,11 +11,13 @@
 #include <optional>
 // pro
 #include <vm4_viewer/scene/camera.hpp>
+#include <vm4_viewer/scene/camera_2.hpp>
 #include <vm4_viewer/scene/light.hpp>
 #include <vm4_viewer/scene/model.hpp>
 #include <vm4_viewer/scene/shader_color.hpp>
 #include <vm4_viewer/scene/shader_line.hpp>
 #include <vm4_viewer/scene/shader_model.hpp>
+#include <vm4_viewer/scene/shader_grid.hpp>
 #include <vm4_viewer/shader_loader.hpp>
 
 
@@ -28,13 +30,16 @@ struct Scene {
 
 //	std::optional<app::Model> environment;
 	std::optional<app::Model> model;
-	app::Camera camera;
+//	app::Camera camera;
+	app::Camera2 camera;
+//	app::Camera2 camera2;
 
 	app::Light sun;
 
 	app::ShaderColor shader_color;
 	app::ShaderLine shader_line;
 	app::ShaderModel shader_model;
+	app::ShaderGrid shader_grid;
 
 	static constexpr libv::vec4f color_AABB = {0.3f, 1.0f, 0.3f, 0.4f};
 	static constexpr libv::vec4f color_BS = {0.3f, 0.3f, 1.0f, 0.4f};
@@ -50,6 +55,7 @@ struct Scene {
 	libv::glr::Mesh mesh_BS;
 	libv::glr::Mesh mesh_gizmo;
 	libv::glr::Mesh mesh_grid;
+	libv::glr::Mesh mesh_temp;
 
 public:
 	Scene(ShaderLoader& shader_loader);

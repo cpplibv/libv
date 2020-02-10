@@ -15,9 +15,11 @@
 #include <libv/utility/concat.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
+#include <libv/ctrl/feature_register.hpp>
 #include <libv/vm4/load.hpp>
 // pro
 #include <vm4_viewer/log.hpp>
+#include <vm4_viewer/scene/camera_behaviour.hpp>
 #include <vm4_viewer/ui/quick_file_picker.hpp>
 #include <vm4_viewer/version.hpp>
 #include <vm4_viewer/viewer_info_panel.hpp>
@@ -30,54 +32,23 @@ namespace app {
 ViewerUI::ViewerUI(BaseComponent& parent) :
 	libv::ui::PanelFloat(parent, "VM4Viewer"),
 	scene(shader_loader) {
-	scene.camera.translateZoom(-15.f);
-	scene.camera.rotateX(libv::to_rad(45.f));
-	scene.camera.rotateZ(libv::to_rad(45.f));
+	scene.camera.orbit_to(15.f);
+	scene.camera.rotate_x(libv::to_rad(45.f));
+	scene.camera.rotate_z(libv::to_rad(45.f));
+
+	// <<< P5: control integration
+	auto fr = libv::ctrl::FeatureRegister{controls};
+	CameraBehaviour::register_controls(fr);
+	CameraBehaviour::bind_controls(controls);
+	controls.context_enter(&scene.camera);
+//	controls.context_enter(&scene.camera2);
 }
 
 void ViewerUI::update(libv::ui::time_duration elapsed_time_t) {
 	if (not isFocused())
 		return;
 
-	const auto elapsed_time = static_cast<float>(elapsed_time_t.count());
-	const auto zoom = -scene.camera.zoom();
-
-	const auto keyboard_spin_speed = libv::to_rad(60.f); // 60°/s
-	const auto keyboard_move_speed = zoom * 0.5f + 1.0f;
-	const auto keyboard_zoom_scale = zoom * 0.2f + 0.1f;
-
-	if (context().state.key_pressed(libv::input::Key::W))
-		scene.camera.rotateX(keyboard_spin_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::S))
-		scene.camera.rotateX(-keyboard_spin_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::A))
-		scene.camera.rotateZ(keyboard_spin_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::D))
-		scene.camera.rotateZ(-keyboard_spin_speed * elapsed_time);
-
-	if (context().state.key_pressed(libv::input::Key::Q))
-		scene.camera.rotateY(keyboard_spin_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::E))
-		scene.camera.rotateY(-keyboard_spin_speed * elapsed_time);
-
-	if (context().state.key_pressed(libv::input::Key::Up))
-		scene.camera.translateY(-keyboard_move_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::Down))
-		scene.camera.translateY(keyboard_move_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::Right))
-		scene.camera.translateX(keyboard_move_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::Left))
-		scene.camera.translateX(-keyboard_move_speed * elapsed_time);
-
-	if (context().state.key_pressed(libv::input::Key::Y))
-		scene.camera.translateZ(keyboard_move_speed * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::H))
-		scene.camera.translateZ(-keyboard_move_speed * elapsed_time);
-
-	if (context().state.key_pressed(libv::input::Key::T))
-		scene.camera.translateZoom(-keyboard_zoom_scale * elapsed_time);
-	if (context().state.key_pressed(libv::input::Key::G))
-		scene.camera.translateZoom(+keyboard_zoom_scale * elapsed_time);
+	controls.update(elapsed_time_t);
 }
 
 void ViewerUI::load(const std::string& path) {
@@ -113,17 +84,25 @@ void ViewerUI::load(const std::string& path) {
 
 // -------------------------------------------------------------------------------------------------
 
+//void ViewerUI::register_controls(libv::ctrl::FeatureRegister& controls) {
+//	CameraBehaviour::register_controls(controls);
+//}
+
+// -------------------------------------------------------------------------------------------------
+
 void ViewerUI::onKey(const libv::ui::EventKey& event) {
 	if (not isFocused())
 		return;
 
-	if (event.key == libv::input::Key::F && (event.mods & libv::input::KeyModifier::shift) != libv::input::KeyModifier::none)
+	// TODO P2: libv.ui: Better access to modifiers
+	const auto shift = context().state.key_pressed(libv::input::Keycode::ShiftLeft) || context().state.key_pressed(libv::input::Keycode::ShiftRight);
+
+	if (event.key == libv::input::Keycode::F && shift)
 		scene.reset_camera();
-	else if (event.key == libv::input::Key::F)
+	else if (event.key == libv::input::Keycode::F)
 		scene.focus_camera();
 
-	log_app.info("ViewerUI Key {} {} {} {}", libv::input::to_string(event.action), libv::input::to_string(event.key), libv::to_value(event.mods), event.scancode);
-
+	controls.input(event);
 	event.stop_propagation();
 }
 
@@ -134,8 +113,8 @@ void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 void ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
 	focus();
 
-	log_app.info("ViewerUI Button {} {}", libv::input::to_string(event.action), libv::input::to_string(event.button));
-
+	// <<< P5: control integration
+	controls.input(libv::input::EventMouseButton{event.button, event.action});
 	event.stop_propagation();
 }
 
@@ -143,24 +122,8 @@ void ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 	if (not isFocused())
 		return;
 
-	log_app.info("ViewerUI Movement {} {} {} {}", event.enter, event.leave, event.mouse_movement, event.mouse_position);
-
-	const auto zoom = -scene.camera.zoom();
-	const auto mouse_spin_speed = libv::to_rad(60.f) * 0.0032f; // 60°/312.5px
-	const auto mouse_move_speed = zoom * 0.0006f + 0.05f;
-
-	if (context().state.mouse_pressed(libv::input::Mouse::Left) && context().state.mouse_pressed(libv::input::Mouse::Right)) {
-		scene.camera.translateZoom(-event.mouse_movement.y * mouse_move_speed);
-
-	} else if (context().state.mouse_pressed(libv::input::Mouse::Right)) {
-		scene.camera.translateX(-event.mouse_movement.x * mouse_move_speed);
-		scene.camera.translateY(event.mouse_movement.y * mouse_move_speed);
-
-	} else if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
-		scene.camera.rotateZ(event.mouse_movement.x * mouse_spin_speed);
-		scene.camera.rotateX(-event.mouse_movement.y * mouse_spin_speed);
-	}
-
+	// <<< P5: control integration
+	controls.input(libv::input::EventMousePosition{libv::vec2d{event.mouse_position}});
 	event.stop_propagation();
 }
 
@@ -168,13 +131,8 @@ void ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
 	if (not isFocused())
 		return;
 
-	log_app.info("ViewerUI Scroll {} {}", event.scroll_movement, event.scroll_position);
-
-	const auto zoom = -scene.camera.zoom();
-	const auto mouse_scroll_scale = zoom * 0.08f + 0.1f;
-
-	scene.camera.translateZoom(event.scroll_movement.y * mouse_scroll_scale);
-
+	// <<< P5: control integration
+	controls.input(libv::input::EventMouseScroll{libv::vec2d{event.scroll_movement}});
 	event.stop_propagation();
 }
 

@@ -1,6 +1,8 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // libv
+#include <libv/ctrl/fwd.hpp>
+#include <libv/ctrl/controls.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_float.hpp>
@@ -51,11 +53,17 @@ private:
 	app::ShaderLoader shader_loader;
 	app::Scene scene;
 
+private:
+	libv::ctrl::Controls controls;
+
 public:
 	explicit ViewerUI(BaseComponent& parent);
 
 	void update(libv::ui::time_duration elapsed_time);
 	void load(const std::string& path);
+
+//public:
+//	static void register_controls(libv::ctrl::FeatureRegister& controls);
 
 private:
 	virtual void onKey(const libv::ui::EventKey& event) override;

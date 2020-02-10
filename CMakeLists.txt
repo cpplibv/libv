@@ -641,7 +641,7 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/vm4_viewer/res
 	SOURCE app/vm4_viewer/*.cpp
-	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw
+	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw libv_ctrl
 #	LINK   ext_date
 )
 

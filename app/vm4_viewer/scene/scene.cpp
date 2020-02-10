@@ -12,6 +12,7 @@
 // pro
 #include <vm4_viewer/attribute.hpp>
 #include <vm4_viewer/log.hpp>
+#include <vm4_viewer/ui/keyboard.hpp>
 
 
 namespace app {
@@ -31,11 +32,16 @@ Scene::Scene(ShaderLoader& shader_loader) :
 			libv::gl::ShaderType::Vertex, "model.vs",
 			libv::gl::ShaderType::Fragment, "model.fs"
 	),
+	shader_grid(shader_loader,
+			libv::gl::ShaderType::Vertex, "grid.vs",
+			libv::gl::ShaderType::Fragment, "grid.fs"
+	),
 
 	mesh_AABB(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
 	mesh_BS(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
 	mesh_gizmo(libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw),
-	mesh_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw) {
+	mesh_grid(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw),
+	mesh_temp(libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw) {
 
 	{
 		auto pos = mesh_AABB.attribute(attribute_position);
@@ -61,6 +67,12 @@ Scene::Scene(ShaderLoader& shader_loader) :
 		libv::glr::generateSpherifiedCube(6, pos, libv::glr::ignore, libv::glr::ignore, index);
 	}
 
+	{
+		// <<< P7: Remove
+		ui::Keyboard keyboard{mesh_temp};
+		keyboard.foo();
+	}
+
 //	sun.type = LightType::point;
 //	sun.position = libv::vec3f(4, 5, 8);
 
@@ -81,7 +93,7 @@ void Scene::focus_camera() {
 		return;
 
 	camera.position(model->vm4.BS_origin);
-	camera.set_zoom(-model->vm4.BS_radius);
+	camera.orbit_to(model->vm4.BS_radius);
 }
 
 void Scene::reset_camera() {
@@ -90,9 +102,9 @@ void Scene::reset_camera() {
 
 	camera.rotation({0, 0, 0});
 	camera.position(model->vm4.BS_origin);
-	camera.set_zoom(-model->vm4.BS_radius);
-	camera.rotateX(libv::to_rad(45.f));
-	camera.rotateZ(libv::to_rad(-135.f));
+	camera.orbit_to(model->vm4.BS_radius);
+	camera.rotate_x(libv::to_rad(45.f));
+	camera.rotate_z(libv::to_rad(-135.f));
 }
 
 void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
@@ -119,6 +131,16 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 
 	gl.state.enableDepthTest();
 	gl.state.depthFunctionLess();
+
+	if (!model) {
+		const auto guard_m = gl.model.push_guard();
+		const auto guard_s = gl.state.push_guard();
+
+		gl.program(shader_line.program);
+		gl.uniform(shader_line.uniform.matMVP, gl.mvp());
+		gl.uniform(shader_line.uniform.color, color_grid);
+		gl.render(mesh_temp);
+	}
 
 	if (!model)
 		return;
@@ -165,9 +187,9 @@ void Scene::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_s = gl.state.push_guard();
 
-		gl.program(shader_line.program);
-		gl.uniform(shader_line.uniform.matMVP, gl.mvp());
-		gl.uniform(shader_line.uniform.color, color_grid);
+		gl.program(shader_grid.program);
+		gl.uniform(shader_grid.uniform.matMVP, gl.mvp());
+		gl.uniform(shader_grid.uniform.color, color_grid);
 		gl.render(mesh_grid);
 	}
 }

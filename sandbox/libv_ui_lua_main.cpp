@@ -105,7 +105,8 @@ public:
 				log_sandbox.trace("Appending new line");
 			}
 
-			if (e.mods != libv::input::KeyModifier::control)
+			// TODO P2: libv.frame: Better access to modifiers
+			if (!isKeyPressed(libv::input::Keycode::ControlLeft) && !isKeyPressed(libv::input::Keycode::ControlRight))
 				return;
 
 			switch (e.key) {

@@ -172,14 +172,14 @@ void QuickFilePicker::doAttach() {
 }
 
 void QuickFilePicker::onKey(const libv::ui::EventKey& event) {
-	if (event.key == libv::input::Key::Up && event.action != libv::input::Action::release) {
+	if (event.key == libv::input::Keycode::Up && event.action != libv::input::Action::release) {
 		select--;
 		log_app.info("Select {}", select);
 		update_filelist();
 		return event.stop_propagation();
 	}
 
-	if (event.key == libv::input::Key::Down && event.action != libv::input::Action::release) {
+	if (event.key == libv::input::Keycode::Down && event.action != libv::input::Action::release) {
 		select++;
 		log_app.info("Select {}", select);
 		update_filelist();

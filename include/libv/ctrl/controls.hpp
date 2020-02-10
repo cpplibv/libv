@@ -88,10 +88,16 @@ public:
 	inline void feature_action(std::string name, F&& function);
 
 	template <typename T, typename F>
-	inline void feature_binary(std::string name, F&& function);
+	inline void feature_analog(std::string name, F&& function, scale_type scale_impulse = 1, scale_type scale_time = 1, scale_type scale_analog = 1);
 
 	template <typename T, typename F>
-	inline void feature_analog(std::string name, F&& function, scale_type scale_impulse = 1, scale_type scale_time = 1, scale_type scale_analog = 1);
+	inline void feature_analog(std::string name, F&& function, scale_group scales);
+
+	template <typename T, typename F>
+	inline void feature_analog(std::string name, scale_group scales, F&& function);
+
+	template <typename T, typename F>
+	inline void feature_binary(std::string name, F&& function);
 
 	template <typename T>
 	inline void remove_feature(std::string_view name);
@@ -260,6 +266,16 @@ inline void Controls::feature_analog(std::string name, F&& function, scale_type 
 		else
 			function(params, *static_cast<T*>(context));
 	}, scale_impulse, scale_time, scale_analog);
+}
+
+template <typename T, typename F>
+inline void Controls::feature_analog(std::string name, F&& function, scale_group scales) {
+	feature_analog<T>(std::move(name), std::forward<F>(function), scales.impulse, scales.time, scales.scale);
+}
+
+template <typename T, typename F>
+inline void Controls::feature_analog(std::string name, scale_group scales, F&& function) {
+	feature_analog<T>(std::move(name), std::forward<F>(function), scales.impulse, scales.time, scales.scale);
 }
 
 template <typename T, typename F>

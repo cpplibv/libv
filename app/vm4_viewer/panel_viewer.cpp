@@ -36,13 +36,13 @@ namespace app {
 
 PanelViewer::PanelViewer(BaseComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
 
-void PanelViewer::key(libv::input::Key key) {
+void PanelViewer::key(libv::input::Keycode key) {
 	if (!isAttached())
 		return;
 
 	static int16_t i = 11;
-	if (key == libv::input::Key::Q) i++;
-	if (key == libv::input::Key::A) i--;
+	if (key == libv::input::Keycode::Q) i++;
+	if (key == libv::input::Keycode::A) i--;
 
 //	if (picker_files != nullptr)
 //		picker_files->key(key);

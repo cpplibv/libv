@@ -27,21 +27,21 @@ using MockFeatureAction = MockFeature<lc::arg_action_t>;
 using MockFeatureAnalog = MockFeature<lc::arg_analog_t>;
 using MockFeatureBinary = MockFeature<lc::arg_binary_t>;
 
-const auto event_key_a_press   = li::EventKey{li::Key::A, li::Scancode{30}, li::Action::press, li::KeyModifier::none};
-const auto event_key_a_release = li::EventKey{li::Key::A, li::Scancode{30}, li::Action::release, li::KeyModifier::none};
-//const auto event_key_a_repeat  = li::EventKey{li::Key::A, li::Scancode{30}, li::Action::repeat, li::KeyModifier::none};
-//const auto event_key_s_press   = li::EventKey{li::Key::S, li::Scancode{31}, li::Action::press, li::KeyModifier::none};
-//const auto event_key_s_release = li::EventKey{li::Key::S, li::Scancode{31}, li::Action::release, li::KeyModifier::none};
-//const auto event_key_s_repeat  = li::EventKey{li::Key::S, li::Scancode{31}, li::Action::repeat, li::KeyModifier::none};
-//const auto event_key_d_press   = li::EventKey{li::Key::D, li::Scancode{32}, li::Action::press, li::KeyModifier::none};
-//const auto event_key_d_release = li::EventKey{li::Key::D, li::Scancode{32}, li::Action::release, li::KeyModifier::none};
-//const auto event_key_d_repeat  = li::EventKey{li::Key::D, li::Scancode{32}, li::Action::repeat, li::KeyModifier::none};
-//const auto event_key_f_press   = li::EventKey{li::Key::F, li::Scancode{33}, li::Action::press, li::KeyModifier::none};
-//const auto event_key_f_release = li::EventKey{li::Key::F, li::Scancode{33}, li::Action::release, li::KeyModifier::none};
-//const auto event_key_f_repeat  = li::EventKey{li::Key::F, li::Scancode{33}, li::Action::repeat, li::KeyModifier::none};
-//const auto event_key_ctrl_press   = li::EventKey{li::Key::ControlLeft, li::Scancode{29}, li::Action::press, li::KeyModifier::none};
-//const auto event_key_ctrl_release = li::EventKey{li::Key::ControlLeft, li::Scancode{29}, li::Action::release, li::KeyModifier::none};
-//const auto event_key_ctrl_repeat  = li::EventKey{li::Key::ControlLeft, li::Scancode{29}, li::Action::repeat, li::KeyModifier::none};
+const auto event_key_a_press   = li::EventKey{li::Keycode::A, li::Scancode{30}, li::Action::press};
+const auto event_key_a_release = li::EventKey{li::Keycode::A, li::Scancode{30}, li::Action::release};
+//const auto event_key_a_repeat  = li::EventKey{li::Keycode::A, li::Scancode{30}, li::Action::repeat};
+//const auto event_key_s_press   = li::EventKey{li::Keycode::S, li::Scancode{31}, li::Action::press};
+//const auto event_key_s_release = li::EventKey{li::Keycode::S, li::Scancode{31}, li::Action::release};
+//const auto event_key_s_repeat  = li::EventKey{li::Keycode::S, li::Scancode{31}, li::Action::repeat};
+//const auto event_key_d_press   = li::EventKey{li::Keycode::D, li::Scancode{32}, li::Action::press};
+//const auto event_key_d_release = li::EventKey{li::Keycode::D, li::Scancode{32}, li::Action::release};
+//const auto event_key_d_repeat  = li::EventKey{li::Keycode::D, li::Scancode{32}, li::Action::repeat};
+//const auto event_key_f_press   = li::EventKey{li::Keycode::F, li::Scancode{33}, li::Action::press};
+//const auto event_key_f_release = li::EventKey{li::Keycode::F, li::Scancode{33}, li::Action::release};
+//const auto event_key_f_repeat  = li::EventKey{li::Keycode::F, li::Scancode{33}, li::Action::repeat};
+//const auto event_key_ctrl_press   = li::EventKey{li::Keycode::ControlLeft, li::Scancode{29}, li::Action::press};
+//const auto event_key_ctrl_release = li::EventKey{li::Keycode::ControlLeft, li::Scancode{29}, li::Action::release};
+//const auto event_key_ctrl_repeat  = li::EventKey{li::Keycode::ControlLeft, li::Scancode{29}, li::Action::repeat};
 
 } // namespace
 

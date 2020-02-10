@@ -891,6 +891,10 @@ libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement
 libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 
+app.vm4_viewer: Camera controller class with lua binding
+
+libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
+
 app.vm4_viewer: light source mover
 
 app.vm4_viewer: Rulers: Display size rulers along the 3 dimension (3/6/9 value) of the max ranges
@@ -1112,13 +1116,6 @@ interactive
 	libv.ui.input_field: undo/redo support
 
 hotkey
-	libv.hotkey: Rename to libv.control
-	libv.hotkey: Press type aka additional information regarding control usage: N/A, Continuous (Hold), Press, Release, Double click, (Toggle), etc...
-	libv.hotkey: design API
-	libv.hotkey: review glfwGetKeyName and glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
-	libv.hotkey: There will be a need for logical and physical key definition (99% physical, ctrl+z logical)
-	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
-	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
 	libv.ui.hotkey: hotkey system are an extension to the keyboard system
 	libv.ui.hotkey: ui.focus-backward = shift+tab
 	libv.ui.hotkey: ui.focus-forward = tab
