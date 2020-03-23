@@ -206,6 +206,8 @@ enum class Key : int32_t {
 	Menu = 348,
 };
 
+enum class Scancode	: int32_t {};
+
 std::string_view to_string(const Action value);
 std::string_view to_string(const Key value);
 std::string_view to_string(const KeyState value);

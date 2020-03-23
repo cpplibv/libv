@@ -37,7 +37,7 @@ class ContextState {
 	bool mouse_over_ = false; /// Mouse is over the frame content area
 
 	boost::container::flat_set<libv::input::Key> pressed_keys;
-	boost::container::flat_set<int> pressed_scancodes;
+	boost::container::flat_set<libv::input::Scancode> pressed_scancodes;
 	boost::container::flat_set<libv::input::Mouse> pressed_mouses;
 
 	libv::observer_ptr<BaseComponent> focus_ = nullptr;

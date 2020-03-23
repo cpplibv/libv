@@ -46,7 +46,7 @@ struct DispatchGLFWEvent {
 			std::lock_guard lock_handler(windowHandlers_m);
 			Frame& frame = *windowHandlers.at(window);
 			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E{libv::input::Key{key}, scancode, libv::input::Action{action}, libv::input::KeyModifier{mods}});
+			frame.self->eventQueue.emplace_back(E{libv::input::Key{key}, libv::input::Scancode{scancode}, libv::input::Action{action}, libv::input::KeyModifier{mods}});
 
 		} catch (const std::out_of_range& e) {
 			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
