@@ -81,6 +81,22 @@ struct EventMouseScroll {
 	std::string toPrettyString() const;
 };
 
+struct EventJoystickButton {
+	libv::input::JoystickID joystickID;
+	libv::input::JoystickButton button;
+	libv::input::Action action;
+
+	std::string toPrettyString() const;
+};
+
+struct EventJoystickAnalog {
+	libv::input::JoystickID joystickID;
+	libv::input::JoystickAnalogID analogID;
+	libv::vec2d position;
+
+	std::string toPrettyString() const;
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace frame

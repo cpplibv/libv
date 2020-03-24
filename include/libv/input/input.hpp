@@ -63,7 +63,7 @@ enum class Mouse : int32_t {
 	Middle = Button2,
 };
 
-enum class Joystick : int32_t {
+enum class JoystickButton : int32_t {
 	Button0 = 0,
 	Button1 = 1,
 	Button2 = 2,
@@ -80,6 +80,25 @@ enum class Joystick : int32_t {
 	Button13 = 13,
 	Button14 = 14,
 	Button15 = 15,
+};
+
+//enum class GamepadButton : int32_t {
+//	A = 0,
+//	B = 1,
+//	X = 2,
+//	Y = 3,
+//	DPUp = 4,
+//	DPDown = 5,
+//	DPLeft = 6,
+//	DPRight = 7,
+//	LeftTrigger = 8,
+//	Left = 9,
+//};
+
+enum class JoystickID : uint8_t {
+};
+
+enum class JoystickAnalogID : uint8_t {
 };
 
 enum class Key : int32_t {
