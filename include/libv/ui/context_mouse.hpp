@@ -56,7 +56,7 @@ public:
 public:
 	void event_enter();
 	void event_leave();
-	void event_button(libv::input::Mouse mouse, libv::input::Action action);
+	void event_button(libv::input::MouseButton mouse, libv::input::Action action);
 	void event_position(libv::vec2f position);
 	void event_scroll(libv::vec2f movement);
 

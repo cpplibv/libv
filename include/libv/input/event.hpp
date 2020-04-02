@@ -43,7 +43,7 @@ struct EventKey {
 };
 
 struct EventMouseButton {
-	libv::input::Mouse button;
+	libv::input::MouseButton button;
 	libv::input::Action action;
 	libv::input::KeyModifier mods;
 

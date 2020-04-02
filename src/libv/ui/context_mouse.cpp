@@ -405,7 +405,7 @@ void ContextMouse::event_leave() {
 	notify_hits(hits, event);
 }
 
-void ContextMouse::event_button(libv::input::Mouse mouse, libv::input::Action action) {
+void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Action action) {
 	// Define event
 	EventMouseButton event;
 	event.action = action;

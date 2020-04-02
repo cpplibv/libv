@@ -48,7 +48,7 @@ enum class KeyModifier : int32_t {
 	return KeyModifier{libv::to_value(lhs) & libv::to_value(rhs)};
 }
 
-enum class Mouse : int32_t {
+enum class MouseButton : int32_t {
 	Button0 = 0,
 	Button1 = 1,
 	Button2 = 2,
@@ -57,6 +57,62 @@ enum class Mouse : int32_t {
 	Button5 = 5,
 	Button6 = 6,
 	Button7 = 7,
+	Button8 = 8,
+	Button9 = 9,
+	Button10 = 10,
+	Button11 = 11,
+	Button12 = 12,
+	Button13 = 13,
+	Button14 = 14,
+	Button15 = 15,
+	Button16 = 16,
+	Button17 = 17,
+	Button18 = 18,
+	Button19 = 19,
+	Button20 = 20,
+	Button21 = 21,
+	Button22 = 22,
+	Button23 = 23,
+	Button24 = 24,
+	Button25 = 25,
+	Button26 = 26,
+	Button27 = 27,
+	Button28 = 28,
+	Button29 = 29,
+	Button30 = 30,
+	Button31 = 31,
+	Button32 = 32,
+	Button33 = 33,
+	Button34 = 34,
+	Button35 = 35,
+	Button36 = 36,
+	Button37 = 37,
+	Button38 = 38,
+	Button39 = 39,
+	Button40 = 40,
+	Button41 = 41,
+	Button42 = 42,
+	Button43 = 43,
+	Button44 = 44,
+	Button45 = 45,
+	Button46 = 46,
+	Button47 = 47,
+	Button48 = 48,
+	Button49 = 49,
+	Button50 = 50,
+	Button51 = 51,
+	Button52 = 52,
+	Button53 = 53,
+	Button54 = 54,
+	Button55 = 55,
+	Button56 = 56,
+	Button57 = 57,
+	Button58 = 58,
+	Button59 = 59,
+	Button60 = 60,
+	Button61 = 61,
+	Button62 = 62,
+	Button63 = 63,
 
 	Left = Button0,
 	Right = Button1,
@@ -231,7 +287,7 @@ std::string_view to_string(const Action value);
 std::string_view to_string(const Key value);
 std::string_view to_string(const KeyState value);
 std::string_view to_string(const MonitorEvent value);
-std::string_view to_string(const Mouse value);
+std::string_view to_string(const MouseButton value);
 
 // -------------------------------------------------------------------------------------------------
 

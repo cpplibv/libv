@@ -638,17 +638,17 @@ bool Frame::isKeyReleased(libv::input::Key key) {
 	return not self->pressedKeys.contains(key);
 }
 
-libv::input::KeyState Frame::mouse(libv::input::Mouse key) {
+libv::input::KeyState Frame::mouse(libv::input::MouseButton key) {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
-bool Frame::isMousePressed(libv::input::Mouse key) {
+bool Frame::isMousePressed(libv::input::MouseButton key) {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key);
 }
 
-bool Frame::isMouseReleased(libv::input::Mouse key) {
+bool Frame::isMouseReleased(libv::input::MouseButton key) {
 	std::lock_guard lock(self->frameState_m);
 	return not self->pressedMouseButtons.contains(key);
 }

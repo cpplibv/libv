@@ -15,7 +15,8 @@ std::string_view to_string(const Action value) {
 	case Action::press: return "press";
 	case Action::repeat: return "repeat";
 	}
-	return "unknown";
+
+	return "--invalid--";
 }
 
 std::string_view to_string(const Key value) {
@@ -142,7 +143,8 @@ std::string_view to_string(const Key value) {
 	case Key::SuperRight: return "SuperRight";
 	case Key::Menu: return "Menu";
 	}
-	return "invalid";
+
+	return "--invalid--";
 }
 
 std::string_view to_string(const KeyState value) {
@@ -150,7 +152,8 @@ std::string_view to_string(const KeyState value) {
 	case KeyState::pressed: return "pressed";
 	case KeyState::released: return "released";
 	}
-	return "unknown";
+
+	return "--invalid--";
 }
 
 std::string_view to_string(const MonitorEvent value) {
@@ -158,22 +161,79 @@ std::string_view to_string(const MonitorEvent value) {
 	case MonitorEvent::connected: return "connected";
 	case MonitorEvent::disconnected: return "disconnected";
 	}
-	return "unknown";
+
+	return "--invalid--";
 }
 
-std::string_view to_string(const Mouse value) {
+std::string_view to_string(const MouseButton value) {
 	switch (value) {
-	case Mouse::Left: return "left";
-	case Mouse::Right: return "right";
-	case Mouse::Middle: return "middle";
-
-	case Mouse::Button3: return "mouse3";
-	case Mouse::Button4: return "mouse4";
-	case Mouse::Button5: return "mouse5";
-	case Mouse::Button6: return "mouse6";
-	case Mouse::Button7: return "mouse7";
+	case MouseButton::Button0: static_assert(MouseButton::Button0 == MouseButton::Left, ""); return "left";
+	case MouseButton::Button1: static_assert(MouseButton::Button1 == MouseButton::Right, ""); return "right";
+	case MouseButton::Button2: static_assert(MouseButton::Button2 == MouseButton::Middle, ""); return "middle";
+	case MouseButton::Button3: return "mouse3";
+	case MouseButton::Button4: return "mouse4";
+	case MouseButton::Button5: return "mouse5";
+	case MouseButton::Button6: return "mouse6";
+	case MouseButton::Button7: return "mouse7";
+	case MouseButton::Button8: return "mouse8";
+	case MouseButton::Button9: return "mouse9";
+	case MouseButton::Button10: return "mouse10";
+	case MouseButton::Button11: return "mouse11";
+	case MouseButton::Button12: return "mouse12";
+	case MouseButton::Button13: return "mouse13";
+	case MouseButton::Button14: return "mouse14";
+	case MouseButton::Button15: return "mouse15";
+	case MouseButton::Button16: return "mouse16";
+	case MouseButton::Button17: return "mouse17";
+	case MouseButton::Button18: return "mouse18";
+	case MouseButton::Button19: return "mouse19";
+	case MouseButton::Button20: return "mouse20";
+	case MouseButton::Button21: return "mouse21";
+	case MouseButton::Button22: return "mouse22";
+	case MouseButton::Button23: return "mouse23";
+	case MouseButton::Button24: return "mouse24";
+	case MouseButton::Button25: return "mouse25";
+	case MouseButton::Button26: return "mouse26";
+	case MouseButton::Button27: return "mouse27";
+	case MouseButton::Button28: return "mouse28";
+	case MouseButton::Button29: return "mouse29";
+	case MouseButton::Button30: return "mouse30";
+	case MouseButton::Button31: return "mouse31";
+	case MouseButton::Button32: return "mouse32";
+	case MouseButton::Button33: return "mouse33";
+	case MouseButton::Button34: return "mouse34";
+	case MouseButton::Button35: return "mouse35";
+	case MouseButton::Button36: return "mouse36";
+	case MouseButton::Button37: return "mouse37";
+	case MouseButton::Button38: return "mouse38";
+	case MouseButton::Button39: return "mouse39";
+	case MouseButton::Button40: return "mouse40";
+	case MouseButton::Button41: return "mouse41";
+	case MouseButton::Button42: return "mouse42";
+	case MouseButton::Button43: return "mouse43";
+	case MouseButton::Button44: return "mouse44";
+	case MouseButton::Button45: return "mouse45";
+	case MouseButton::Button46: return "mouse46";
+	case MouseButton::Button47: return "mouse47";
+	case MouseButton::Button48: return "mouse48";
+	case MouseButton::Button49: return "mouse49";
+	case MouseButton::Button50: return "mouse50";
+	case MouseButton::Button51: return "mouse51";
+	case MouseButton::Button52: return "mouse52";
+	case MouseButton::Button53: return "mouse53";
+	case MouseButton::Button54: return "mouse54";
+	case MouseButton::Button55: return "mouse55";
+	case MouseButton::Button56: return "mouse56";
+	case MouseButton::Button57: return "mouse57";
+	case MouseButton::Button58: return "mouse58";
+	case MouseButton::Button59: return "mouse59";
+	case MouseButton::Button60: return "mouse60";
+	case MouseButton::Button61: return "mouse61";
+	case MouseButton::Button62: return "mouse62";
+	case MouseButton::Button63: return "mouse63";
 	}
-	return "unknown";
+
+	return "--invalid--";
 }
 
 // -------------------------------------------------------------------------------------------------

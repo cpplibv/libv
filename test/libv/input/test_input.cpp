@@ -38,23 +38,23 @@ TEST_CASE("Check KeyModifier consistency with GLFW") {
 }
 
 TEST_CASE("Check Mouse consistency with GLFW") {
-	CHECK(libv::to_value(libv::input::Mouse::Button0) == GLFW_MOUSE_BUTTON_1);
-	CHECK(libv::to_value(libv::input::Mouse::Button1) == GLFW_MOUSE_BUTTON_2);
-	CHECK(libv::to_value(libv::input::Mouse::Button2) == GLFW_MOUSE_BUTTON_3);
-	CHECK(libv::to_value(libv::input::Mouse::Button3) == GLFW_MOUSE_BUTTON_4);
-	CHECK(libv::to_value(libv::input::Mouse::Button4) == GLFW_MOUSE_BUTTON_5);
-	CHECK(libv::to_value(libv::input::Mouse::Button5) == GLFW_MOUSE_BUTTON_6);
-	CHECK(libv::to_value(libv::input::Mouse::Button6) == GLFW_MOUSE_BUTTON_7);
-	CHECK(libv::to_value(libv::input::Mouse::Button7) == GLFW_MOUSE_BUTTON_8);
+	CHECK(libv::to_value(libv::input::MouseButton::Button0) == GLFW_MOUSE_BUTTON_1);
+	CHECK(libv::to_value(libv::input::MouseButton::Button1) == GLFW_MOUSE_BUTTON_2);
+	CHECK(libv::to_value(libv::input::MouseButton::Button2) == GLFW_MOUSE_BUTTON_3);
+	CHECK(libv::to_value(libv::input::MouseButton::Button3) == GLFW_MOUSE_BUTTON_4);
+	CHECK(libv::to_value(libv::input::MouseButton::Button4) == GLFW_MOUSE_BUTTON_5);
+	CHECK(libv::to_value(libv::input::MouseButton::Button5) == GLFW_MOUSE_BUTTON_6);
+	CHECK(libv::to_value(libv::input::MouseButton::Button6) == GLFW_MOUSE_BUTTON_7);
+	CHECK(libv::to_value(libv::input::MouseButton::Button7) == GLFW_MOUSE_BUTTON_8);
 
-	CHECK(libv::input::Mouse::Left == libv::input::Mouse::Button0);
-	CHECK(libv::input::Mouse::Right == libv::input::Mouse::Button1);
-	CHECK(libv::input::Mouse::Middle == libv::input::Mouse::Button2);
-	CHECK(libv::to_value(libv::input::Mouse::Left) == GLFW_MOUSE_BUTTON_LEFT);
-	CHECK(libv::to_value(libv::input::Mouse::Right) == GLFW_MOUSE_BUTTON_RIGHT);
-	CHECK(libv::to_value(libv::input::Mouse::Middle) == GLFW_MOUSE_BUTTON_MIDDLE);
+	CHECK(libv::input::MouseButton::Left == libv::input::MouseButton::Button0);
+	CHECK(libv::input::MouseButton::Right == libv::input::MouseButton::Button1);
+	CHECK(libv::input::MouseButton::Middle == libv::input::MouseButton::Button2);
+	CHECK(libv::to_value(libv::input::MouseButton::Left) == GLFW_MOUSE_BUTTON_LEFT);
+	CHECK(libv::to_value(libv::input::MouseButton::Right) == GLFW_MOUSE_BUTTON_RIGHT);
+	CHECK(libv::to_value(libv::input::MouseButton::Middle) == GLFW_MOUSE_BUTTON_MIDDLE);
 
-	CHECK(libv::to_value(libv::input::Mouse::Button7) == GLFW_MOUSE_BUTTON_LAST);
+	CHECK(libv::to_value(libv::input::MouseButton::Button7) == GLFW_MOUSE_BUTTON_LAST);
 }
 
 TEST_CASE("Check Joystick consistency with GLFW") {

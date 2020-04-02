@@ -179,7 +179,7 @@ void Button::onMouseButton(const EventMouseButton& event) {
 	fire(EMouseButton{event, *this});
 
 	// TODO P3: use hotkey event (ui.select) (even for mouse)
-	if (event.action == libv::input::Action::press && event.button == libv::input::Mouse::Left)
+	if (event.action == libv::input::Action::press && event.button == libv::input::MouseButton::Left)
 		fire(ESubmit{*this});
 
 	event.stop_propagation();

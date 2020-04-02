@@ -29,7 +29,7 @@ struct BaseEventMouse : BaseEvent {
 };
 
 struct EventMouseButton : BaseEventMouse {
-	libv::input::Mouse button;
+	libv::input::MouseButton button;
 	libv::input::Action action;
 };
 

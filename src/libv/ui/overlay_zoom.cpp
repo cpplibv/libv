@@ -212,7 +212,7 @@ void OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 	if (!control_)
 		return;
 
-	if (context().state.mouse_pressed(libv::input::Mouse::Left)) {
+	if (context().state.mouse_pressed(libv::input::MouseButton::Left)) {
 		displayPosition -= event.mouse_movement / zoom_;
 		update();
 	}

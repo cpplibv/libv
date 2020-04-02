@@ -33,7 +33,7 @@ TEST_CASE("mouse subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]
 	watcher0.cb_scroll = std::ref(callback0);
 	table.subscribe(watcher0, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{0});
 
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	CHECK(callback0.call_count == 1);
 
 	table.event_position(libv::vec2f{0, 0});
@@ -44,7 +44,7 @@ TEST_CASE("mouse subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]
 
 	table.unsubscribe(watcher0);
 
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	table.event_position(libv::vec2f{0, 0});
 	table.event_scroll(libv::vec2f{15, 0});
 	CHECK(callback0.call_count == 3);
@@ -72,7 +72,7 @@ TEST_CASE("mouse multiple sub, notify with correct order", "[libv.ui.event.mouse
 	watcher1.cb_scroll = [&](auto&) { call_order.emplace_back(1); };
 	table.subscribe(watcher1, libv::ui::Flag::mask_watchMouse, {0, 0}, {10, 10}, libv::ui::MouseOrder{1});
 
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	CHECK(ranges::equal(call_order, std::array{2, 1, 0}));
 
 	table.event_position(libv::vec2f{0, 0});
@@ -83,7 +83,7 @@ TEST_CASE("mouse multiple sub, notify with correct order", "[libv.ui.event.mouse
 
 	table.unsubscribe(watcher1);
 
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	table.event_position(libv::vec2f{0, 0});
 	table.event_scroll(libv::vec2f{15, 0});
 
@@ -111,21 +111,21 @@ TEST_CASE("mouse multiple sub, only notify intersected ones", "[libv.ui.event.mo
 	table.subscribe(watcher1, libv::ui::Flag::mask_watchMouse, {5, 5}, {10, 10}, libv::ui::MouseOrder{0});
 
 	table.event_position(libv::vec2f{0, 0});
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	table.event_scroll(libv::vec2f{15, 0});
 
 	CHECK(callback0.call_count == 3);
 	CHECK(callback1.call_count == 0);
 
 	table.event_position(libv::vec2f{5, 5});
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	table.event_scroll(libv::vec2f{15, 0});
 
 	CHECK(callback0.call_count == 6);
 	CHECK(callback1.call_count == 3);
 
 	table.event_position(libv::vec2f{10, 10});
-	table.event_button(libv::input::Mouse::Left, libv::input::Action::press);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
 	table.event_scroll(libv::vec2f{15, 0});
 
 	CHECK(callback0.call_count == 7);

@@ -38,7 +38,7 @@ class ContextState {
 
 	boost::container::flat_set<libv::input::Key> pressed_keys;
 	boost::container::flat_set<libv::input::Scancode> pressed_scancodes;
-	boost::container::flat_set<libv::input::Mouse> pressed_mouses;
+	boost::container::flat_set<libv::input::MouseButton> pressed_mouses;
 
 	libv::observer_ptr<BaseComponent> focus_ = nullptr;
 
@@ -103,15 +103,15 @@ public:
 		return not pressed_keys.contains(key);
 	}
 
-	[[nodiscard]] inline libv::input::KeyState mouse(libv::input::Mouse key) const noexcept {
+	[[nodiscard]] inline libv::input::KeyState mouse(libv::input::MouseButton key) const noexcept {
 		return pressed_mouses.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 	}
 
-	[[nodiscard]] inline bool mouse_pressed(libv::input::Mouse key) const noexcept {
+	[[nodiscard]] inline bool mouse_pressed(libv::input::MouseButton key) const noexcept {
 		return pressed_mouses.contains(key);
 	}
 
-	[[nodiscard]] inline bool mouse_released(libv::input::Mouse key) const noexcept {
+	[[nodiscard]] inline bool mouse_released(libv::input::MouseButton key) const noexcept {
 		return not pressed_mouses.contains(key);
 	}
 

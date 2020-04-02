@@ -314,7 +314,7 @@ inline auto ScrollBar::bar_bounds() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void ScrollBar::onMouseButton(const EventMouseButton& event) {
-	if (event.button == libv::input::Mouse::Left && event.action == libv::input::Action::press) {
+	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
 		const auto bar = bar_bounds();
 		// TODO P0: libv.ui: correct local mouse position;
@@ -342,14 +342,14 @@ void ScrollBar::onMouseButton(const EventMouseButton& event) {
 		return event.stop_propagation();
 	}
 
-	if (event.button == libv::input::Mouse::Left && event.action == libv::input::Action::release) {
+	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::release) {
 		context().mouse.release(*this);
 		drag_mode = DragMode::idle;
 		return event.stop_propagation();
 	}
 
 	// === TEMP ========================================================================================
-	if (event.button == libv::input::Mouse::Right && event.action == libv::input::Action::press) {
+	if (event.button == libv::input::MouseButton::Right && event.action == libv::input::Action::press) {
 		set(property.orientation, Orientation{(libv::to_value(property.orientation()) + 1) % 4});
 		return event.stop_propagation();
 	}

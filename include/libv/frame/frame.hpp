@@ -308,9 +308,9 @@ public:
 	bool isKeyPressed(libv::input::Key key);
 	bool isKeyReleased(libv::input::Key key);
 
-	libv::input::KeyState mouse(libv::input::Mouse key);
-	bool isMousePressed(libv::input::Mouse key);
-	bool isMouseReleased(libv::input::Mouse key);
+	libv::input::KeyState mouse(libv::input::MouseButton key);
+	bool isMousePressed(libv::input::MouseButton key);
+	bool isMouseReleased(libv::input::MouseButton key);
 
 	libv::vec2d getMousePosition();
 	libv::vec2d getScrollPosition();
