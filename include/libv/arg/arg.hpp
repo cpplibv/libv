@@ -78,15 +78,15 @@ namespace arg {
 //	?	args.rest               (aliases...)
 //	S	args.unused             ()
 //		args.require            (arg0 && arg1 || arg2)     // Marks certain combination of arguments as required
-//		args.depricated         (arg0 && arg1 || arg2)     // Marks certain combination of arguments as depricated
+//		args.deprecated         (arg0 && arg1 || arg2)     // Marks certain combination of arguments as deprecated
 //		args.reserve            (arg0)                     // Marks a certain argument as reserved for compatibility, reserved arguments are "silently" "ignored"
 //		args.require            (bool, "reason")
 //		args.warning            (bool, "reason")
-//		args.depricated         (bool, "reason")
+//		args.deprecated         (bool, "reason")
 //	SF	args.require_no_unused  ()                         // Needs better naming
-//		args.require_no_depricated()                       // Needs better naming
+//		args.require_no_deprecated()                       // Needs better naming
 //		args.warning_no_unused  ()                         // Needs better naming
-//		args.warning_no_depricated()                       // Needs better naming
+//		args.warning_no_deprecated()                       // Needs better naming
 //	S	args.parse              (argc, argv)
 //		args.parse              (line)
 //		args.exe                ()
