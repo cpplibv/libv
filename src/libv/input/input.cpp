@@ -16,7 +16,29 @@ std::string_view to_string(const Action value) {
 	case Action::repeat: return "repeat";
 	}
 
-	return "--invalid--";
+	return "<<invalid>>";
+}
+
+std::string_view to_string(const GamepadButton value) {
+	switch (value) {
+	case GamepadButton::A: return "A";
+	case GamepadButton::B: return "B";
+	case GamepadButton::X: return "X";
+	case GamepadButton::Y: return "Y";
+	case GamepadButton::LeftBumper: return "LeftBumper";
+	case GamepadButton::RightBumper: return "RightBumper";
+	case GamepadButton::Back: return "Back";
+	case GamepadButton::Start: return "Start";
+	case GamepadButton::Guide: return "Guide";
+	case GamepadButton::LeftThumb: return "LeftThumb";
+	case GamepadButton::RightThumb: return "RightThumb";
+	case GamepadButton::DPadUp: return "DPadUp";
+	case GamepadButton::DPadRight: return "DPadRight";
+	case GamepadButton::DPadDown: return "DPadDown";
+	case GamepadButton::DPadLeft: return "DPadLeft";
+	}
+
+	return "<<invalid>>";
 }
 
 std::string_view to_string(const Key value) {
@@ -144,7 +166,7 @@ std::string_view to_string(const Key value) {
 	case Key::Menu: return "Menu";
 	}
 
-	return "--invalid--";
+	return "<<invalid>>";
 }
 
 std::string_view to_string(const KeyState value) {
@@ -153,7 +175,7 @@ std::string_view to_string(const KeyState value) {
 	case KeyState::released: return "released";
 	}
 
-	return "--invalid--";
+	return "<<invalid>>";
 }
 
 std::string_view to_string(const MonitorEvent value) {
@@ -162,7 +184,7 @@ std::string_view to_string(const MonitorEvent value) {
 	case MonitorEvent::disconnected: return "disconnected";
 	}
 
-	return "--invalid--";
+	return "<<invalid>>";
 }
 
 std::string_view to_string(const MouseButton value) {
@@ -233,7 +255,7 @@ std::string_view to_string(const MouseButton value) {
 	case MouseButton::Button63: return "mouse63";
 	}
 
-	return "--invalid--";
+	return "<<invalid>>";
 }
 
 // -------------------------------------------------------------------------------------------------

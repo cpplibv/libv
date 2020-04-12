@@ -15,6 +15,8 @@ struct EventMouseButton;
 struct EventMouseEnter;
 struct EventMousePosition;
 struct EventMouseScroll;
+struct EventGamepadAnalog;
+struct EventGamepadButton;
 struct EventJoystickAnalog;
 struct EventJoystickButton;
 

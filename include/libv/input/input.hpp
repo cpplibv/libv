@@ -119,23 +119,11 @@ enum class MouseButton : int32_t {
 	Middle = Button2,
 };
 
-enum class JoystickButton : int32_t {
-	Button0 = 0,
-	Button1 = 1,
-	Button2 = 2,
-	Button3 = 3,
-	Button4 = 4,
-	Button5 = 5,
-	Button6 = 6,
-	Button7 = 7,
-	Button8 = 8,
-	Button9 = 9,
-	Button10 = 10,
-	Button11 = 11,
-	Button12 = 12,
-	Button13 = 13,
-	Button14 = 14,
-	Button15 = 15,
+enum class GamepadID : uint8_t {
+	any = 255,
+};
+
+enum class GamepadAnalogID : uint8_t {
 };
 
 enum class GamepadButton : int32_t {
@@ -165,6 +153,25 @@ enum class JoystickID : uint8_t {
 };
 
 enum class JoystickAnalogID : uint8_t {
+};
+
+enum class JoystickButton : int32_t {
+	Button0 = 0,
+	Button1 = 1,
+	Button2 = 2,
+	Button3 = 3,
+	Button4 = 4,
+	Button5 = 5,
+	Button6 = 6,
+	Button7 = 7,
+	Button8 = 8,
+	Button9 = 9,
+	Button10 = 10,
+	Button11 = 11,
+	Button12 = 12,
+	Button13 = 13,
+	Button14 = 14,
+	Button15 = 15,
 };
 
 enum class Key : int32_t {
@@ -294,6 +301,7 @@ enum class Key : int32_t {
 enum class Scancode	: int32_t {};
 
 std::string_view to_string(const Action value);
+std::string_view to_string(const GamepadButton value);
 std::string_view to_string(const Key value);
 std::string_view to_string(const KeyState value);
 std::string_view to_string(const MonitorEvent value);
