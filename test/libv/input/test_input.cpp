@@ -58,24 +58,49 @@ TEST_CASE("Check Mouse consistency with GLFW") {
 }
 
 TEST_CASE("Check Joystick consistency with GLFW") {
-	CHECK(libv::to_value(libv::input::Joystick::Button0) == GLFW_JOYSTICK_1);
-	CHECK(libv::to_value(libv::input::Joystick::Button1) == GLFW_JOYSTICK_2);
-	CHECK(libv::to_value(libv::input::Joystick::Button2) == GLFW_JOYSTICK_3);
-	CHECK(libv::to_value(libv::input::Joystick::Button3) == GLFW_JOYSTICK_4);
-	CHECK(libv::to_value(libv::input::Joystick::Button4) == GLFW_JOYSTICK_5);
-	CHECK(libv::to_value(libv::input::Joystick::Button5) == GLFW_JOYSTICK_6);
-	CHECK(libv::to_value(libv::input::Joystick::Button6) == GLFW_JOYSTICK_7);
-	CHECK(libv::to_value(libv::input::Joystick::Button7) == GLFW_JOYSTICK_8);
-	CHECK(libv::to_value(libv::input::Joystick::Button8) == GLFW_JOYSTICK_9);
-	CHECK(libv::to_value(libv::input::Joystick::Button9) == GLFW_JOYSTICK_10);
-	CHECK(libv::to_value(libv::input::Joystick::Button10) == GLFW_JOYSTICK_11);
-	CHECK(libv::to_value(libv::input::Joystick::Button11) == GLFW_JOYSTICK_12);
-	CHECK(libv::to_value(libv::input::Joystick::Button12) == GLFW_JOYSTICK_13);
-	CHECK(libv::to_value(libv::input::Joystick::Button13) == GLFW_JOYSTICK_14);
-	CHECK(libv::to_value(libv::input::Joystick::Button14) == GLFW_JOYSTICK_15);
-	CHECK(libv::to_value(libv::input::Joystick::Button15) == GLFW_JOYSTICK_16);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button0) == GLFW_JOYSTICK_1);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button1) == GLFW_JOYSTICK_2);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button2) == GLFW_JOYSTICK_3);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button3) == GLFW_JOYSTICK_4);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button4) == GLFW_JOYSTICK_5);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button5) == GLFW_JOYSTICK_6);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button6) == GLFW_JOYSTICK_7);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button7) == GLFW_JOYSTICK_8);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button8) == GLFW_JOYSTICK_9);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button9) == GLFW_JOYSTICK_10);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button10) == GLFW_JOYSTICK_11);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button11) == GLFW_JOYSTICK_12);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button12) == GLFW_JOYSTICK_13);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button13) == GLFW_JOYSTICK_14);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button14) == GLFW_JOYSTICK_15);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button15) == GLFW_JOYSTICK_16);
 
-	CHECK(libv::to_value(libv::input::Joystick::Button15) == GLFW_JOYSTICK_LAST);
+	CHECK(libv::to_value(libv::input::JoystickButton::Button15) == GLFW_JOYSTICK_LAST);
+}
+
+TEST_CASE("Check Gamepad consistency with GLFW") {
+	CHECK(libv::to_value(libv::input::GamepadButton::A) == GLFW_GAMEPAD_BUTTON_A);
+	CHECK(libv::to_value(libv::input::GamepadButton::B) == GLFW_GAMEPAD_BUTTON_B);
+	CHECK(libv::to_value(libv::input::GamepadButton::X) == GLFW_GAMEPAD_BUTTON_X);
+	CHECK(libv::to_value(libv::input::GamepadButton::Y) == GLFW_GAMEPAD_BUTTON_Y);
+	CHECK(libv::to_value(libv::input::GamepadButton::LeftBumper) == GLFW_GAMEPAD_BUTTON_LEFT_BUMPER);
+	CHECK(libv::to_value(libv::input::GamepadButton::RightBumper) == GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER);
+	CHECK(libv::to_value(libv::input::GamepadButton::Back) == GLFW_GAMEPAD_BUTTON_BACK);
+	CHECK(libv::to_value(libv::input::GamepadButton::Start) == GLFW_GAMEPAD_BUTTON_START);
+	CHECK(libv::to_value(libv::input::GamepadButton::Guide) == GLFW_GAMEPAD_BUTTON_GUIDE);
+	CHECK(libv::to_value(libv::input::GamepadButton::LeftThumb) == GLFW_GAMEPAD_BUTTON_LEFT_THUMB);
+	CHECK(libv::to_value(libv::input::GamepadButton::RightThumb) == GLFW_GAMEPAD_BUTTON_RIGHT_THUMB);
+	CHECK(libv::to_value(libv::input::GamepadButton::DPadUp) == GLFW_GAMEPAD_BUTTON_DPAD_UP);
+	CHECK(libv::to_value(libv::input::GamepadButton::DPadRight) == GLFW_GAMEPAD_BUTTON_DPAD_RIGHT);
+	CHECK(libv::to_value(libv::input::GamepadButton::DPadDown) == GLFW_GAMEPAD_BUTTON_DPAD_DOWN);
+	CHECK(libv::to_value(libv::input::GamepadButton::DPadLeft) == GLFW_GAMEPAD_BUTTON_DPAD_LEFT);
+
+	CHECK(libv::to_value(libv::input::GamepadButton::Cross) == GLFW_GAMEPAD_BUTTON_CROSS);
+	CHECK(libv::to_value(libv::input::GamepadButton::Circle) == GLFW_GAMEPAD_BUTTON_CIRCLE);
+	CHECK(libv::to_value(libv::input::GamepadButton::Square) == GLFW_GAMEPAD_BUTTON_SQUARE);
+	CHECK(libv::to_value(libv::input::GamepadButton::Triangle) == GLFW_GAMEPAD_BUTTON_TRIANGLE);
+
+	CHECK(libv::to_value(libv::input::GamepadButton::DPadLeft) == GLFW_GAMEPAD_BUTTON_LAST);
 }
 
 TEST_CASE("Check Key consistency with GLFW") {

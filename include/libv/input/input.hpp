@@ -138,18 +138,28 @@ enum class JoystickButton : int32_t {
 	Button15 = 15,
 };
 
-//enum class GamepadButton : int32_t {
-//	A = 0,
-//	B = 1,
-//	X = 2,
-//	Y = 3,
-//	DPUp = 4,
-//	DPDown = 5,
-//	DPLeft = 6,
-//	DPRight = 7,
-//	LeftTrigger = 8,
-//	Left = 9,
-//};
+enum class GamepadButton : int32_t {
+	A = 0,
+	B = 1,
+	X = 2,
+	Y = 3,
+	LeftBumper = 4,
+	RightBumper = 5,
+	Back = 6,
+	Start = 7,
+	Guide = 8,
+	LeftThumb = 9,
+	RightThumb = 10,
+	DPadUp = 11,
+	DPadRight = 12,
+	DPadDown = 13,
+	DPadLeft = 14,
+
+	Cross = A,
+	Circle = B,
+	Square = X,
+	Triangle = Y,
+};
 
 enum class JoystickID : uint8_t {
 };
