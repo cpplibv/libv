@@ -477,6 +477,16 @@ wish_create_external(
 		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/get_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 )
 
+wish_create_external(
+	NAME jc_voronoi
+	GIT_REPOSITORY https://github.com/JCash/voronoi
+	GIT_TAG fc9ed1ce6661ccc73783ee9193fa77e8a673b839
+	SKIP_CONFIGURE_AND_BUILD
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/jc_voronoi/include/jc_voronoi/
+		COMMAND cp -f -T ${PATH_EXT_SRC}/jc_voronoi/src/get_jc_voronoi/src/jc_voronoi.h ${PATH_EXT}/jc_voronoi/include/jc_voronoi/jc_voronoi.h
+)
+
 wish_end_group()
 
 # === Targets ======================================================================================
