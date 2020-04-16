@@ -672,6 +672,7 @@ wish_create_library(
 	SOURCE src/libv/math/*.cpp
 	LINK   ext_glm # Remove (This will only happen with a vec concept)
 	LINK   ext_range # For concepts | # TODO P5: Do we still need this? Are we not using native concepts?
+	LINK   ext_jc_voronoi
 )
 
 wish_create_library(
