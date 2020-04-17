@@ -506,6 +506,10 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_color INTERFACE
+)
+
+wish_create_library(
 	TARGET libv_ecs INTERFACE
 	LINK   ext_boost ext_range
 )
@@ -818,6 +822,12 @@ wish_create_executable(
 	TARGET test_libv_arg
 	SOURCE test/libv/arg/*.cpp
 	LINK   obj_test_runner libv_arg
+)
+
+wish_create_executable(
+	TARGET test_libv_color
+	SOURCE test/libv/color/*.cpp
+	LINK   obj_test_runner libv_color libv_utility libv_math
 )
 
 wish_create_executable(
