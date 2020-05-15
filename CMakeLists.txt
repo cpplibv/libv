@@ -522,6 +522,19 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME SDL_mixer
+	GIT_REPOSITORY https://github.com/SDL-mirror/SDL_mixer.git
+	GIT_TAG e012c219253eaba6040abef04ece88cb4daa41fa
+	#	CMAKE_ARGS
+	#		-DSUPPORT_OGG=ON
+	CONFIGURE_COMMAND ./configure
+	#--enable-music-ogg
+	BUILD_COMMAND echo ""
+	INSTALL_COMMAND echo ""
+	#	LINK soil
+)
+
+wish_create_external(
 	NAME soil2
 	GIT_REPOSITORY https://github.com/VaderY/SOIL2.git
 	GIT_TAG master
