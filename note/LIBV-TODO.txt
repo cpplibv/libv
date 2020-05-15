@@ -438,51 +438,6 @@ libv.fsw: Improve callback and tokens to not hold the mutex during event broadca
 
 
 
-libv.audio: Great overview on the requirements of a basic sound engine: https://www.youtube.com/watch?v=MEizUamJTyk
-libv.audio: Idea: Choose one of N random sounds when selecting play
-libv.audio: Paper
-	For audio HARD API BARRIER IS REQUIRED (Every lib / backend is a shitshow)
-
-	Backend possibilities
-		Best solution would be audeo at first, but that will pull in the SDL chain, even if it is only used for audio
-
-		OpenAL - License issue: https://github.com/kcat/openal-soft
-		PortAudio - Too low level: http://www.portaudio.com/docs.html
-			sndfile lib in order to load/save all kinds of audio files.
-		audeo - Based on top of SDL_Mixer: https://github.com/NotAPenguin0/audeo
-									https://github.com/libsdl-org/SDL_mixer
-									https://github.com/libsdl-org/SDL
-		soloud - Another good candidate: https://sol.gfxile.net/soloud/quickstart.html
-			has many-many backend (even OS native ones), API looks ok, license ok (zlib)
-
-	Sound
-		Sound - What to play
-		+/- Variations
-		+/- Effects /  Filters
-		? Other
-
- 	Play
-		Sound - What to play
-		Channel - What mixing channel should it be played on
-		Operation - Start, Repeat, Stop
-		Edge - Fade in, Fade out, Normal
-		Position or Centered - For positioning [and sound delay]
-		[Speed - For Doppler effect]
-		+/- Effects / Filters
-		? Other
-
-	Option
-		Center position - So play can use abs position and not rel
-		Center speed - So play can use abs speed and not rel
-		Channel volumes
-		? Other
-
-	Other
-		ducking by over powering volume of sound
-		ducking by over powering volume of channel
-		ducking by importance of sound
-		ducking by importance of channel
-
 
 
 --- AWAITING ---------------------------------------------------------------------------------------

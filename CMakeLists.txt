@@ -487,6 +487,49 @@ wish_create_external(
 	LINK rp3d
 )
 
+#wish_create_external(
+#	NAME SDL_mixer
+#	GIT_REPOSITORY https://github.com/SDL-mirror/SDL_mixer.git
+#	GIT_TAG e012c219253eaba6040abef04ece88cb4daa41fa
+#	#	CMAKE_ARGS
+#	#		-DSUPPORT_OGG=ON
+#	CONFIGURE_COMMAND ./configure
+#	#--enable-music-ogg
+#	BUILD_COMMAND echo ""
+#	INSTALL_COMMAND echo ""
+#	#	LINK sdl2?
+#)
+
+wish_create_external(
+	NAME soloud
+	GIT_REPOSITORY https://github.com/jarikomppa/soloud.git
+	GIT_TAG 1157475881da0d7f76102578255b937c7d4e8f57
+	CMAKE_ARGS
+		-DSOLOUD_C_API=OFF
+		-DSOLOUD_DYNAMIC=OFF
+		-DSOLOUD_STATIC=ON
+		-DSOLOUD_BUILD_DEMOS=OFF
+
+		-DSOLOUD_BACKEND_WINMM=ON
+		-DSOLOUD_BACKEND_NULL=ON
+
+		-DSOLOUD_BACKEND_SDL2=OFF
+		-DSOLOUD_BACKEND_ALSA=OFF
+		-DSOLOUD_BACKEND_COREAUDIO=OFF
+		-DSOLOUD_BACKEND_OPENSLES=OFF
+		-DSOLOUD_BACKEND_XAUDIO2=OFF
+		-DSOLOUD_BACKEND_WASAPI=OFF
+
+		-DSOLOUD_GENERATE_GLUE=OFF
+
+	SOURCE_SUBDIR contrib
+#	DEFINE WITH_NULL
+	DEFINE WITH_WINMM
+#	DEFINE WITH_SDL2_STATIC
+	LINK soloud
+	LINK winmm
+)
+
 wish_create_external(
 	NAME tsl_robin_map
 	GIT_REPOSITORY https://github.com/Tessil/robin-map
@@ -614,6 +657,13 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv::audio STATIC
+	SOURCE src/libv/audio/*.cpp
+	LINK   ext_soloud
+#	LINK   ext_boost libv::utility
+)
+
+wish_create_library(
 	TARGET libv::arg INTERFACE
 )
 
@@ -719,8 +769,8 @@ wish_create_library(
 wish_create_library(
 	TARGET libv::mt STATIC
 	SOURCE src/libv/mt/*.cpp
-	LINK   libv_log Threads::Threads
-	LINK   libv_utility # For unique_function and concat
+	LINK   libv::log Threads::Threads
+	LINK   libv::utility # For unique_function and concat
 	LINK   ext_cppcoro
 )
 
@@ -1013,6 +1063,8 @@ wish_create_executable(
 )
 
 wish_group(group_sandbox sandbox) # --- Sandbox ---------------------------------------------------
+
+add_subdirectory(sandbox/audio)
 
 wish_create_executable(
 	TARGET sandbox_libv_benchmark
