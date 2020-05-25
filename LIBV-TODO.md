@@ -491,6 +491,7 @@ libv.control: List (into the paper) what is: global/per source/per binding/per f
 libv.control: Configuration and settings
 libv.control: Remove debug trace messages, CONTROL_DEBUG, iostream, etc...
 libv.control: 2 (+ 1) Example sandbox to presented in the paper
+libv.control: Rename libv.control to libv.ctrl
 
 
 
@@ -498,11 +499,22 @@ libv.control: 2 (+ 1) Example sandbox to presented in the paper
 
 
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
+idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
-libv.control: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
-libv.control: introspection API should not see stated types | info type proxies
-libv.control: Binding binary operation setting and serialization
+ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
 
+libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
+libv.ctrl: introspection API should not see stated types | info type proxies
+libv.ctrl: Binding binary operation setting and serialization
+
+libv.ctrl: InputID, Input, AIA and DIA should be merged this way: both Input and InputID should be 64bit types, but one should contain the action related information, they should be converted to one another with extra info or info loss, inheritance or CRTP might save some work
+
+libv.ctrl: feature auto invoke member function pointer on context
+		controls.feature_action("sandbox.move", &Camera::move_x)
+
+libv.ctrl: More specialized binding can hide normal feature if there is not context under it -> the order of context existence check and binding specialization test should be flipped
+
+libv.math: constant 2_pi rename to TAU
 
 Sequence: dead-key like behaviour
 		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
@@ -537,7 +549,7 @@ Sequence: dead-key like behaviour
 
 
 
-libv.control: The control paper:
+libv.ctrl:
 	TODO notes:
 		Issue: Binding input sub sequence collusion
 			Given 'Shift + E' and 'E' binding, inputting 'Shift + E' will incorrectly satisfy both
@@ -779,20 +791,20 @@ libv.control: The control paper:
 		... in the xls
 
 
-libv.control: If I have enough time - IIHET
-	libv.control: IIHET: Binding profiles, and inheritance
-	libv.control: IIHET: Gamepad/joystick analog should be time related, but mouse and scroll are event based
-	libv.control: IIHET: Click and double click support would be nice
-	libv.control: IIHET: User should not be exposed to stated sequence (binding does that)
-	libv.control: IIHET: Idea: Stated and normal sequence common templated base class (?)
-	libv.control.parse: IIHET: identifier parsing (_ skipper or adjusting infos to match current parser)
-	libv.control: IIHET: Routing: Select sequence progression (beside bindings) based on more specialized
+libv.ctrl: If I have enough time - IIHET
+	libv.ctrl: IIHET: Binding profiles, and inheritance
+	libv.ctrl: IIHET: Gamepad/joystick analog should be time related, but mouse and scroll are event based
+	libv.ctrl: IIHET: Click and double click support would be nice
+	libv.ctrl: IIHET: User should not be exposed to stated sequence (binding does that)
+	libv.ctrl: IIHET: Idea: Stated and normal sequence common templated base class (?)
+	libv.ctrl.parse: IIHET: identifier parsing (_ skipper or adjusting infos to match current parser)
+	libv.ctrl: IIHET: Routing: Select sequence progression (beside bindings) based on more specialized
 
-libv.control: Integration queue:
+libv.ctrl: Integration queue:
 	libv.frame.input: Add support for joysticks and game-pads
 
-	libv.control: review glfwGetKeyName http://www.glfw.org/docs/latest/group__keys.html
-	libv.control: review glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
+	libv.ctrl: review glfwGetKeyName http://www.glfw.org/docs/latest/group__keys.html
+	libv.ctrl: review glfwSetInputMode http://www.glfw.org/docs/latest/group__keys.html
 	libv.frame.input: Added glfwGetKeyName for querying the layout-specific name of printable keys
 	libv.frame.input: Added glfwGetKeyScancode function that allows retrieving platform dependent scancodes for keys (#830)
 
@@ -805,57 +817,57 @@ libv.control: Integration queue:
 	glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
 	glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
 
-libv.control: Outside of paper scope - OOPS, but must implement
-	libv.control.routing: OOPS: Unrelated analog event cancels button sequence
-	libv.control: OOPS: Feature collection is collecting empty functions too
-	libv.control: OOPS: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
+libv.ctrl: Outside of paper scope - OOPS, but must implement
+	libv.ctrl.routing: OOPS: Unrelated analog event cancels button sequence
+	libv.ctrl: OOPS: Feature collection is collecting empty functions too
+	libv.ctrl: OOPS: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
 
-libv.control: Outside of paper scope - OOPS
-	libv.control: OOPS: Split analog dimension to dimension and aia
-	libv.control: OOPS: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
-	libv.control: OOPS: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
+libv.ctrl: Outside of paper scope - OOPS
+	libv.ctrl: OOPS: Split analog dimension to dimension and aia
+	libv.ctrl: OOPS: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
+	libv.ctrl: OOPS: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
 					In other word: an additional type between the current binding and feature, this would clean up string operations
-	libv.control: OOPS: Contexts information, state collusion information among contexts, use that for queries
-	libv.control: OOPS: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
-	libv.control.parse: OOPS: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
-	libv.control.parse: OOPS: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
-	libv.control.parse: OOPS: x3::eoi could improve matching, relax orders, optimize for most probably input
-	libv.control.parse: OOPS: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
-	libv.control: OOPS: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
-	libv.control: OOPS: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
-	libv.control: OOPS: event/feature chain interruptibility on colliding bindings:
+	libv.ctrl: OOPS: Contexts information, state collusion information among contexts, use that for queries
+	libv.ctrl: OOPS: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
+	libv.ctrl.parse: OOPS: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
+	libv.ctrl.parse: OOPS: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
+	libv.ctrl.parse: OOPS: x3::eoi could improve matching, relax orders, optimize for most probably input
+	libv.ctrl.parse: OOPS: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
+	libv.ctrl: OOPS: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
+	libv.ctrl: OOPS: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
+	libv.ctrl: OOPS: event/feature chain interruptibility on colliding bindings:
 						add member to event: is_ambiguous
 						add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
-	libv.control: OOPS: Invalid sequence automated fixup | only if there is consent
-	libv.control: OOPS: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
-	libv.control: OOPS: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
-	libv.control: OOPS: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
-	libv.control: OOPS: feature registration show provide way for custom properties
-	libv.control: OOPS: hash based binding index for event where manually map everything to the most similar form
-	libv.control: OOPS: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
-	libv.control: OOPS: More introspection is possible: search feature by context with or without name
-	libv.control: OOPS: More introspection is possible: search binding with feature and sequence
-	libv.control: OOPS: More search possible: search_mode::wildcard (with . as the level separator)
-	libv.control: OOPS: More search possible: search_mode::any_word (with space as the word separator)
-	libv.control: OOPS: More search possible: search_mode::all_word (with space as the word separator)
-	libv.control: OOPS: Super flatten sequence and stated sequence
-	libv.control: OOPS: check_binding and check_feature are algorithm that should be generalized
-	libv.control: OOPS: Change in codepoint mapping can cause events with codepoint based inputs
+	libv.ctrl: OOPS: Invalid sequence automated fixup | only if there is consent
+	libv.ctrl: OOPS: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
+	libv.ctrl: OOPS: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
+	libv.ctrl: OOPS: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
+	libv.ctrl: OOPS: feature registration show provide way for custom properties
+	libv.ctrl: OOPS: hash based binding index for event where manually map everything to the most similar form
+	libv.ctrl: OOPS: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
+	libv.ctrl: OOPS: More introspection is possible: search feature by context with or without name
+	libv.ctrl: OOPS: More introspection is possible: search binding with feature and sequence
+	libv.ctrl: OOPS: More search possible: search_mode::wildcard (with . as the level separator)
+	libv.ctrl: OOPS: More search possible: search_mode::any_word (with space as the word separator)
+	libv.ctrl: OOPS: More search possible: search_mode::all_word (with space as the word separator)
+	libv.ctrl: OOPS: Super flatten sequence and stated sequence
+	libv.ctrl: OOPS: check_binding and check_feature are algorithm that should be generalized
+	libv.ctrl: OOPS: Change in codepoint mapping can cause events with codepoint based inputs
 
-	libv.control.profile: OOPS: each binding entry would select: inherit (noop) / override / extend its parent binding entry
+	libv.ctrl.profile: OOPS: each binding entry would select: inherit (noop) / override / extend its parent binding entry
 
-	libv.control: OOPS: Idea: why not require codepoints to be inside the inputs events
-	libv.control: OOPS: Idea: dia as bitmask
-	libv.control: OOPS: Rep source type could be signed and analogs on negative, buttons on positive values
-	libv.control: OOPS: Ability to list every (active) context
-	libv.control: OOPS: Bind and profile api and serialization: override, empty override, append
-	libv.control: OOPS: A serialization... A serious one
-	libv.control: OOPS: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
+	libv.ctrl: OOPS: Idea: why not require codepoints to be inside the inputs events
+	libv.ctrl: OOPS: Idea: dia as bitmask
+	libv.ctrl: OOPS: Rep source type could be signed and analogs on negative, buttons on positive values
+	libv.ctrl: OOPS: Ability to list every (active) context
+	libv.ctrl: OOPS: Bind and profile api and serialization: override, empty override, append
+	libv.ctrl: OOPS: A serialization... A serious one
+	libv.ctrl: OOPS: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
 
-	libv.control: OOPS: libv::control -> libv::ctrl
-	libv.control: OOPS: Context level feature containers, or index so lookup faster (?)
-	libv.control: OOPS: Store more information about Context. Name, orthogonal and concurrent contexts
-	libv.control: OOPS: Idea of context groups, and under a group there are multiple types
+	libv.ctrl: OOPS: libv::ctrl -> libv::ctrl
+	libv.ctrl: OOPS: Context level feature containers, or index so lookup faster (?)
+	libv.ctrl: OOPS: Store more information about Context. Name, orthogonal and concurrent contexts
+	libv.ctrl: OOPS: Idea of context groups, and under a group there are multiple types
 
 visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
 visual.grid: For grids expand and fade out line endings

@@ -580,10 +580,10 @@
 //#include <iostream>
 //#include <optional>
 //// pro
-//#include <libv/control/sequence.hpp>
+//#include <libv/ctrl/sequence.hpp>
 //
 //
-//using namespace libv::control;
+//using namespace libv::ctrl;
 //
 //template <typename T>
 //struct Scream;

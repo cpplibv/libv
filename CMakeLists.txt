@@ -511,11 +511,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_control STATIC
-	SOURCE src/libv/control/*.cpp
+	TARGET libv_ctrl STATIC
+	SOURCE src/libv/ctrl/*.cpp
 	LINK   libv_math libv_input libv_utility ext_fmt ext_boost ext_utf8cpp
-#	LINK   libv_input
-#	LINK   libv_math ext_fmt ext_boost ext_utf8cpp
 )
 
 wish_create_library(
@@ -657,24 +655,24 @@ wish_end_group()
 wish_create_group(GROUP_EXAMPLE) # EXAMPLE ---------------------------------------------------------
 
 wish_create_executable(
-	TARGET example_libv_control_camera
-	SOURCE example/control/camera/*.cpp
-	LINK   libv_control
+	TARGET example_libv_ctrl_camera
+	SOURCE example/ctrl/camera/*.cpp
+	LINK   libv_ctrl
 )
 
 wish_create_executable(
-	TARGET example_libv_control_hello
-	SOURCE example/control/hello/*.cpp
-	LINK   libv_control
+	TARGET example_libv_ctrl_hello
+	SOURCE example/ctrl/hello/*.cpp
+	LINK   libv_ctrl
 )
 
 wish_end_group()
 wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
 
 wish_create_executable(
-	TARGET sandbox_libv_control
-	SOURCE sandbox/libv_control_main.cpp
-	LINK   libv_log libv_control libv_frame libv_ui libv_utility
+	TARGET sandbox_libv_ctrl
+	SOURCE sandbox/libv_ctrl_main.cpp
+	LINK   libv_log libv_ctrl libv_frame libv_ui libv_utility
 )
 
 wish_create_executable(
@@ -734,7 +732,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log libv_control ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_log libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(
@@ -836,7 +834,7 @@ wish_end_group()
 wish_create_library(
 	TARGET obj_test_runner STATIC
 	SOURCE test/runner.cpp
-	LINK   libv_log ext_catch ext_fmt ext_boost
+	LINK   ext_catch ext_fmt ext_boost
 )
 
 wish_create_group(GROUP_UNIT_TEST)
@@ -860,9 +858,9 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET test_libv_control
-	SOURCE test/libv/control/*.cpp
-	LINK   obj_test_runner libv_control
+	TARGET test_libv_ctrl
+	SOURCE test/libv/ctrl/*.cpp
+	LINK   obj_test_runner libv_ctrl
 )
 
 wish_create_executable(
