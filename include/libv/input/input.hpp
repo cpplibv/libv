@@ -176,7 +176,7 @@ enum class JoystickButton : int32_t {
 	Button15 = 15,
 };
 
-enum class Key : int32_t {
+enum class Keycode : int32_t {
 	Unknown = -1,
 	Space = 32,
 	Apostrophe = 39, /// '
@@ -304,7 +304,7 @@ enum class Scancode	: int32_t {};
 
 std::string_view to_string(const Action value);
 std::string_view to_string(const GamepadButton value);
-std::string_view to_string(const Key value);
+std::string_view to_string(const Keycode value);
 std::string_view to_string(const KeyState value);
 std::string_view to_string(const MonitorEvent value);
 std::string_view to_string(const MouseButton value);

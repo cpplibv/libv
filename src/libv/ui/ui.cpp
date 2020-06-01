@@ -196,7 +196,7 @@ public:
 //		parse_hotkey_or_throw("F12")
 //		parse_hotkey_or_throw("Shift + F12")
 
-		if (event.key == libv::input::Key::F12 && event.action == libv::input::Action::press) {
+		if (event.key == libv::input::Keycode::F12 && event.action == libv::input::Action::press) {
 			if (overlayZoomMode == OverlayZoomMode::disabled) {
 				log_ui.info("Switch overlay mode: {} to {}", "zoom", "control");
 				overlayZoomMode = OverlayZoomMode::control;

@@ -18,7 +18,7 @@ namespace ctrl {
 enum class Codepoint : uint32_t {
 };
 
-using Keycode = libv::input::Key;
+using Keycode = libv::input::Keycode;
 
 using Scancode = libv::input::Scancode;
 

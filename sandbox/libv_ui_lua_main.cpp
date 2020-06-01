@@ -90,16 +90,16 @@ public:
 			if (e.action == libv::input::Action::release)
 				return;
 
-			if (e.key == libv::input::Key::Escape)
+			if (e.key == libv::input::Keycode::Escape)
 				closeDefault();
 
-			if (e.key == libv::input::Key::Backspace) {
+			if (e.key == libv::input::Keycode::Backspace) {
 //				label0->string.pop_back();
 //				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Pop back");
 			}
 
-			if (e.key == libv::input::Key::Enter || e.key == libv::input::Key::KPEnter) {
+			if (e.key == libv::input::Keycode::Enter || e.key == libv::input::Keycode::KPEnter) {
 //				label0->string.push_back("\n");
 //				label0->flag(libv::ui::Flag::invalidLayout);
 				log_sandbox.trace("Appending new line");
@@ -109,22 +109,22 @@ public:
 				return;
 
 			switch (e.key) {
-			case libv::input::Key::Num0:
+			case libv::input::Keycode::Num0:
 //				label0->properties.align = libv::ui::Anchor::Left;
 				log_sandbox.trace("Set anchor to {}", "Left");
 				break;
 
-			case libv::input::Key::Num1:
+			case libv::input::Keycode::Num1:
 //				label0->properties.align = libv::ui::Anchor::Center;
 				log_sandbox.trace("Set anchor to {}", "Center");
 				break;
 
-			case libv::input::Key::Num2:
+			case libv::input::Keycode::Num2:
 //				label0->properties.align = libv::ui::Anchor::Right;
 				log_sandbox.trace("Set anchor to {}", "Right");
 				break;
 
-			case libv::input::Key::Num3:
+			case libv::input::Keycode::Num3:
 //				label0->properties.align = libv::ui::Anchor::Justify;
 				log_sandbox.trace("Set anchor to {}", "Justify");
 				break;

@@ -623,17 +623,17 @@ const Monitor& Frame::getCurrentMonitor() const {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::input::KeyState Frame::key(libv::input::Key key) {
+libv::input::KeyState Frame::key(libv::input::Keycode key) {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
-bool Frame::isKeyPressed(libv::input::Key key) {
+bool Frame::isKeyPressed(libv::input::Keycode key) {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key);
 }
 
-bool Frame::isKeyReleased(libv::input::Key key) {
+bool Frame::isKeyReleased(libv::input::Keycode key) {
 	std::lock_guard lock(self->frameState_m);
 	return not self->pressedKeys.contains(key);
 }

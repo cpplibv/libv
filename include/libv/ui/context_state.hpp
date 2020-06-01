@@ -36,7 +36,7 @@ class ContextState {
 
 	bool mouse_over_ = false; /// Mouse is over the frame content area
 
-	boost::container::flat_set<libv::input::Key> pressed_keys;
+	boost::container::flat_set<libv::input::Keycode> pressed_keys;
 	boost::container::flat_set<libv::input::Scancode> pressed_scancodes;
 	boost::container::flat_set<libv::input::MouseButton> pressed_mouses;
 
@@ -91,15 +91,15 @@ public:
 	}
 
 public:
-	[[nodiscard]] inline libv::input::KeyState key(libv::input::Key key) const noexcept {
+	[[nodiscard]] inline libv::input::KeyState key(libv::input::Keycode key) const noexcept {
 		return pressed_keys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 	}
 
-	[[nodiscard]] inline bool key_pressed(libv::input::Key key) const noexcept {
+	[[nodiscard]] inline bool key_pressed(libv::input::Keycode key) const noexcept {
 		return pressed_keys.contains(key);
 	}
 
-	[[nodiscard]] inline bool key_released(libv::input::Key key) const noexcept {
+	[[nodiscard]] inline bool key_released(libv::input::Keycode key) const noexcept {
 		return not pressed_keys.contains(key);
 	}
 

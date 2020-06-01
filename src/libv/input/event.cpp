@@ -30,13 +30,13 @@ std::string EventDrop::toPrettyString() const {
 }
 
 std::string EventKey::toPrettyString() const {
-	return fmt::format("Key: key = {} ({}), scancode = {}, action = {} ({}), mode = {}",
-			libv::input::to_string(key), libv::to_value(key), scancode, libv::input::to_string(action), libv::to_value(action), libv::to_value(mods));
+	return fmt::format("Key: key = {} ({}), scancode = {}, action = {} ({})",
+			libv::input::to_string(key), libv::to_value(key), scancode, libv::input::to_string(action), libv::to_value(action));
 }
 
 std::string EventMouseButton::toPrettyString() const {
-	return fmt::format("Mouse Button: button = {} ({}), action = {} ({}), mods = {}",
-			libv::input::to_string(button), libv::to_value(button), libv::input::to_string(action), libv::to_value(action), libv::to_value(mods));
+	return fmt::format("Mouse Button: button = {} ({}), action = {} ({})",
+			libv::input::to_string(button), libv::to_value(button), libv::input::to_string(action), libv::to_value(action));
 }
 
 std::string EventMouseEnter::toPrettyString() const {

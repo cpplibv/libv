@@ -80,7 +80,7 @@ public:
 
 public:
 	std::mutex frameState_m; /// Guards every state that is observable by getters
-	boost::container::flat_set<libv::input::Key> pressedKeys;
+	boost::container::flat_set<libv::input::Keycode> pressedKeys;
 	boost::container::flat_set<libv::input::Scancode> pressedScancodes;
 	boost::container::flat_set<libv::input::MouseButton> pressedMouseButtons;
 

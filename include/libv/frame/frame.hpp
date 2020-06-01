@@ -304,9 +304,9 @@ public:
 	const Monitor& getCurrentMonitor() const;
 
 public:
-	libv::input::KeyState key(libv::input::Key key);
-	bool isKeyPressed(libv::input::Key key);
-	bool isKeyReleased(libv::input::Key key);
+	libv::input::KeyState key(libv::input::Keycode key);
+	bool isKeyPressed(libv::input::Keycode key);
+	bool isKeyReleased(libv::input::Keycode key);
 
 	libv::input::KeyState mouse(libv::input::MouseButton key);
 	bool isMousePressed(libv::input::MouseButton key);

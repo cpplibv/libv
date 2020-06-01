@@ -18,7 +18,7 @@
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
-using libv::input::Key;
+using libv::input::Keycode;
 
 libv::frame::Icon generateIcon(size_t size, libv::vec4uc color) {
 	libv::frame::Icon result;
@@ -90,48 +90,48 @@ public:
 			if (e.action != libv::input::Action::release)
 				return;
 
-			if (e.key == Key::Escape)
+			if (e.key == Keycode::Escape)
 				closeDefault();
 
 			// --- 0 row
 
-			if (e.key == Key::Backtick)
+			if (e.key == Keycode::Backtick)
 				clearIcon();
-			if (e.key == Key::Num1)
+			if (e.key == Keycode::Num1)
 				setIcon(std::vector<libv::frame::Icon>{generateIcon(16, {255, 0, 0, 255}), generateIcon(32, {255, 63, 127, 255}), generateIcon(48, {255, 127, 255, 255})});
-			if (e.key == Key::Num2)
+			if (e.key == Keycode::Num2)
 				setIcon(std::vector<libv::frame::Icon>{generateIcon(16, {0, 255, 0, 255}), generateIcon(32, {127, 255, 63, 255}), generateIcon(48, {255, 255, 127, 255})});
 
 			// --- Q row
 
-			if (e.key == Key::Q)
+			if (e.key == Keycode::Q)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->show(); });
-			if (e.key == Key::W)
+			if (e.key == Keycode::W)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->hide(); });
-			if (e.key == Key::E)
+			if (e.key == Keycode::E)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->maximize(); });
-			if (e.key == Key::R)
+			if (e.key == Keycode::R)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->minimize(); });
-			if (e.key == Key::T)
+			if (e.key == Keycode::T)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->restore(); });
-			if (e.key == Key::Y)
+			if (e.key == Keycode::Y)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->focus(); });
-			if (e.key == Key::U)
+			if (e.key == Keycode::U)
 				executeAfter(std::chrono::seconds{5}, [this]{ this->requestAttention(); });
 
-			if (e.key == Key::I)
+			if (e.key == Keycode::I)
 				setCursorMode(CursorMode::normal);
-			if (e.key == Key::O)
+			if (e.key == Keycode::O)
 				setCursorMode(CursorMode::hidden);
-			if (e.key == Key::P)
+			if (e.key == Keycode::P)
 				setCursorMode(CursorMode::disabled);
 
-			if (e.key == Key::BracketOpen)
+			if (e.key == Keycode::BracketOpen)
 				setClipboardString("Your clipboard now belongs to us.");
-			if (e.key == Key::BracketClose)
+			if (e.key == Keycode::BracketClose)
 				log_sandbox.trace("getClipboardString: {}", getClipboardString());
 
-			if (e.key == Key::Backslash)
+			if (e.key == Keycode::Backslash)
 				for (const auto& [_, monitor] : libv::frame::Monitor::monitors) {
 					log_sandbox.trace("{} pos {}, work pos {}, work size {}, content scale {}, physical mm {}", monitor.name, monitor.position, monitor.workAreaPosition, monitor.workAreaSize, monitor.contentScale, monitor.physicalSizeMM);
 					log_sandbox.trace("     >> size {}, rate {}, bits {}", monitor.currentVideoMode.size, monitor.currentVideoMode.refreshRate, monitor.currentVideoMode.colorBits);
@@ -141,55 +141,55 @@ public:
 
 			// --- A row
 
-			if (e.key == Key::A)
+			if (e.key == Keycode::A)
 				setDisplayMode(libv::Frame::DisplayMode::windowed);
-			if (e.key == Key::S)
+			if (e.key == Keycode::S)
 				setDisplayMode(libv::Frame::DisplayMode::borderless_maximized);
-			if (e.key == Key::D)
+			if (e.key == Keycode::D)
 				setDisplayMode(libv::Frame::DisplayMode::fullscreen);
-			if (e.key == Key::F)
+			if (e.key == Keycode::F)
 				setDisplayMode(libv::Frame::DisplayMode::fullscreen_windowed);
 
-			if (e.key == Key::G)
+			if (e.key == Keycode::G)
 				log_sandbox.trace("getFrameSize: {}", getFrameSize());
-			if (e.key == Key::H)
+			if (e.key == Keycode::H)
 				log_sandbox.trace("getSize: {}", getSize());
-			if (e.key == Key::J)
+			if (e.key == Keycode::J)
 				log_sandbox.trace("getPosition: {}", getPosition());
 
-			if (e.key == Key::K)
+			if (e.key == Keycode::K)
 				setAlwaysOnTop(true);
-			if (e.key == Key::L)
+			if (e.key == Keycode::L)
 				setAlwaysOnTop(false);
 
-			if (e.key == Key::Semicolon)
+			if (e.key == Keycode::Semicolon)
 				setFocusOnShow(true);
-			if (e.key == Key::Apostrophe)
+			if (e.key == Keycode::Apostrophe)
 				setFocusOnShow(false);
 
 			// --- Z row
 
-			if (e.key == Key::Z)
+			if (e.key == Keycode::Z)
 				setResizable(!isResizable());
 
-			if (e.key == Key::X)
+			if (e.key == Keycode::X)
 				setDecoration(!isDecorated());
 
-			if (e.key == Key::C)
+			if (e.key == Keycode::C)
 				setPosition(FramePosition::center_current_monitor);
-			if (e.key == Key::V)
+			if (e.key == Keycode::V)
 				setPosition(FramePosition::center_primary_monitor);
 
-			if (e.key == Key::B)
+			if (e.key == Keycode::B)
 				setSizeLimit(200, 150, 400, 300);
-			if (e.key == Key::N)
+			if (e.key == Keycode::N)
 				setSizeLimit(-1, -1, 400, 300);
-			if (e.key == Key::M)
+			if (e.key == Keycode::M)
 				setSizeLimit(-1, -1, -1, -1);
 
-			if (e.key == Key::Comma)
+			if (e.key == Keycode::Comma)
 				setAspectRatio(16, 9);
-			if (e.key == Key::Period)
+			if (e.key == Keycode::Period)
 				setAspectRatio(-1, -1);
 		});
 	}

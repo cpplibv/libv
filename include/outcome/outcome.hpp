@@ -1808,7 +1808,7 @@ namespace
   typedef struct _IMAGEHLP_LINE64
   {
     unsigned long SizeOfStruct;
-    void *Key;
+    void *Keycode;
     unsigned long LineNumber;
     wchar_t *FileName;
     unsigned long long int Address;

@@ -504,17 +504,14 @@ idea: For UI 2D picker use the mouse wheel with indication beside the cursor to 
 ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
-libv.ctrl: introspection API should not see stated types | info type proxies
+libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
 libv.ctrl: Binding binary operation setting and serialization
 
 libv.ctrl: InputID, Input, AIA and DIA should be merged this way: both Input and InputID should be 64bit types, but one should contain the action related information, they should be converted to one another with extra info or info loss, inheritance or CRTP might save some work
 
-libv.ctrl: feature auto invoke member function pointer on context
-		controls.feature_action("sandbox.move", &Camera::move_x)
-
 libv.ctrl: More specialized binding can hide normal feature if there is not context under it -> the order of context existence check and binding specialization test should be flipped
 
-libv.math: constant 2_pi rename to TAU
+libv.math: Add TAU constant as PI * 2
 
 Sequence: dead-key like behaviour
 		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
