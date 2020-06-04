@@ -15,7 +15,7 @@
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 
 
 namespace libv {
@@ -103,12 +103,12 @@ void LayoutLine::access_child_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void LayoutLine::style(Properties& properties, ContextStyle& ctx) {
-	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
 }
 
 void LayoutLine::style(ChildProperties& properties, ContextStyle& ctx) {
-	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_child_properties(setter);
 }
 
@@ -143,22 +143,22 @@ libv::vec3f LayoutLine::layout1(
 		}
 	};
 
-	for (const auto& child : children | view_layouted()) {
-		AccessLayout::layout1(*child.ptr, ContextLayout1{});
+	for (auto& child : children | view_layouted()) {
+		AccessLayout::layout1(child.ptr.base(), ContextLayout1{});
 
 		pixelX += child.property.size()[_X_].pixel;
 		percentX += child.property.size()[_X_].percent;
-		contentX += (child.property.size()[_X_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_X_] : 0.0f);
+		contentX += (child.property.size()[_X_].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[_X_] : 0.0f);
 
 		result[_Y_] = libv::max(result[_Y_],
 				resolvePercent(
-						child.property.size()[_Y_].pixel + (child.property.size()[_Y_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Y_] : 0.0f),
-						child.property.size()[_Y_].percent, *child.ptr));
+						child.property.size()[_Y_].pixel + (child.property.size()[_Y_].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[_Y_] : 0.0f),
+						child.property.size()[_Y_].percent, child.ptr));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
-						child.property.size()[_Z_].pixel + (child.property.size()[_Z_].dynamic ? AccessLayout::lastDynamic(*child.ptr)[_Z_] : 0.0f),
-						child.property.size()[_Z_].percent, *child.ptr));
+						child.property.size()[_Z_].pixel + (child.property.size()[_Z_].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[_Z_] : 0.0f),
+						child.property.size()[_Z_].percent, child.ptr));
 	}
 
 	result[_X_] = resolvePercent(pixelX + contentX, percentX, parent);
@@ -187,16 +187,15 @@ void LayoutLine::layout2(
 	auto contentX = 0.f;
 	auto sumRatioX = 0.f;
 
-	// Note: This will allocate more size as children includes non-layouted components too, but that is rare and saves a pass
+	// Note: This reserve will allocate more memory as children includes non-layouted components too, but that is rare and saves a pass
 	boost::container::small_vector<libv::vec3f, 16> childSizes(children.size(), libv::vec3f{});
 
-	for (const auto& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
-
+	for (auto&& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
 		libv::meta::n_times_index<3>([&](auto&& index) {
 			childSize[index] =
 					child.property.size()[index].pixel +
 					child.property.size()[index].percent * 0.01f * environment.size[index] +
-					(child.property.size()[index].dynamic ? AccessLayout::lastDynamic(*child.ptr)[index] : 0.f);
+					(child.property.size()[index].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[index] : 0.f);
 		});
 
 		sumRatioX += child.property.size()[_X_].ratio;
@@ -207,8 +206,7 @@ void LayoutLine::layout2(
 	auto ratioScaledX = sumRatioX > 0.f ? leftoverX / sumRatioX : 0.f;
 	auto sizeContent = vec3f{};
 
-	for (const auto& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
-
+	for (auto&& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
 		childSize[_X_] += ratioScaledX * child.property.size()[_X_].ratio;
 		if (child.property.size()[_Y_].ratio > 0.f) childSize[_Y_] = environment.size[_Y_];
 		if (child.property.size()[_Z_].ratio > 0.f) childSize[_Z_] = environment.size[_Z_];
@@ -233,8 +231,7 @@ void LayoutLine::layout2(
 
 	auto startToPen = vec3f{};
 
-	for (const auto& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
-
+	for (auto&& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
 		const auto penToBase = childSize * orientData.penCorner;
 		auto baseToPosition = vec3f{};
 		baseToPosition[_Y_] = (sizeContent[_Y_] - childSize[_Y_]) * aligmentScale[_Y_];
@@ -246,7 +243,7 @@ void LayoutLine::layout2(
 		const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 		AccessLayout::layout2(
-				*child.ptr,
+				child.ptr.base(),
 				ContextLayout2{
 					roundedPosition,
 					roundedSize,

@@ -3,9 +3,11 @@
 // hpp
 #include <libv/ui/component/input_field.hpp>
 // libv
+#include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/meta/identity.hpp>
 // pro
+#include <libv/ui/chrono.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
@@ -17,10 +19,11 @@
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
+#include <libv/ui/string_2D.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
 
@@ -30,8 +33,65 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class CoreInputField : public BaseComponent {
+	friend class InputField;
+	[[nodiscard]] inline auto handler() { return InputField{this}; }
+
+private:
+	template <typename T> static void access_properties(T& ctx);
+
+	struct Properties {
+		PropertyB<FocusSelectPolicy> focus_select_policy;
+
+		PropertyR<Color> bg_color;
+		PropertyL<Texture2D_view> bg_image;
+		PropertyR<ShaderImage_view> bg_shader;
+
+		PropertyR<Color> caret_color;
+		PropertyR<ShaderQuad_view> caret_shader;
+
+		PropertyR<Color> font_color;
+		PropertyR<ShaderFont_view> font_shader;
+
+		PropertyL<> align_horizontal;
+		PropertyL<> align_vertical;
+		PropertyL<> font;
+		PropertyL<> font_size;
+	} property;
+
+private:
+	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh caret_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	String2D text_;
+
+private:
+	time_point caretStartTime;
+	libv::vec2f caretPosition;
+	uint32_t caret = 0; /// 0 = Before the first character, n = Before the nth character, length() = After the last character
+
+public:
+	using BaseComponent::BaseComponent;
+
+private:
+	virtual void onChar(const EventChar& event) override;
+	virtual void onKey(const EventKey& event) override;
+	virtual void onFocus(const EventFocus& event) override;
+	virtual void onMouseButton(const EventMouseButton& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+private:
+	virtual void doAttach() override;
+	virtual void doStyle(ContextStyle& context) override;
+	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
 template <typename T>
-void InputField::access_properties(T& ctx) {
+void CoreInputField::access_properties(T& ctx) {
 //	ctx.property(
 //			[](auto& c) -> auto& { return c.property.focus_select_policy; },
 //			FocusSelectPolicy::caretAtCursorOrEnd,
@@ -58,7 +118,7 @@ void InputField::access_properties(T& ctx) {
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.caret_color; },
-			Color(1, 1, 1, 1),
+			Color(0, 0, 0, 1),
 			pgr::appearance, pnm::caret_color,
 			"Cursor color"
 	);
@@ -70,23 +130,24 @@ void InputField::access_properties(T& ctx) {
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
-			[](auto& c, auto v) { c.align_horizontal(v, PropertyDriver::style); },
-			[](const auto& c) { return c.align_horizontal(); },
+			[](auto& c, auto v) { c.text_.align(v); },
+			[](const auto& c) { return c.text_.align(); },
 			AlignHorizontal::Left,
 			pgr::appearance, pnm::align_horizontal,
 			"Horizontal alignment of the text"
 	);
+// TODO P1: Implement align_vertical
 //	ctx.indirect(
 //			[](auto& c) -> auto& { return c.property.align_vertical; },
-//			[](auto& c, auto v) { c.align_vertical(v, PropertyDriver::style); },
-//			[](const auto& c) { return c.align_vertical(); },
+//			[](auto& c, auto v) { c.text_.align_vertical(v); },
+//			[](const auto& c) { return c.text_.align_vertical(); },
 //			AlignVertical::Top,
 //			pgr::appearance, pnm::align_vertical,
 //			"Vertical alignment of the text"
 //	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_color; },
-			Color(1, 1, 1, 1),
+			Color(0, 0, 0, 1),
 			pgr::appearance, pnm::font_color,
 			"Font color"
 	);
@@ -98,111 +159,48 @@ void InputField::access_properties(T& ctx) {
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font; },
-			[](auto& c, auto v) { c.font(std::move(v), PropertyDriver::style); },
-			[](const auto& c) { return c.font(); },
+			[](auto& c, auto v) { c.text_.font(std::move(v)); },
+			[](const auto& c) { return c.text_.font(); },
 			[](auto& u) { return u.fallbackFont(); },
 			pgr::font, pnm::font,
 			"Font file"
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font_size; },
-			[](auto& c, auto v) { c.font_size(v, PropertyDriver::style); },
-			[](const auto& c) { return c.font_size(); },
+			[](auto& c, auto v) { c.text_.size(v); },
+			[](const auto& c) { return c.text_.size(); },
 			FontSize{12},
 			pgr::font, pnm::font_size,
 			"Font size in pixel"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.text(std::move(v)); },
-			[](const auto& c) { return c.text(); },
+			[](auto& c, auto v) { c.handler().text(std::move(v)); },
+			[](const auto& c) { return c.handler().text(); },
 			pgr::behaviour, pnm::text,
 			"Displayed text"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.caret = v; c.fire(EventCaret{c}); },
-			[](const auto& c) { return c.caret; },
-			pgr::behaviour, "caret",
+			[](auto& c, auto v) { c.handler().caret(v); },
+			[](const auto& c) { return c.handler().caret(); },
+			pgr::behaviour, pnm::caret,
 			"Current zero indexed caret position"
 	);
 }
 
-//ComponentPropertyDescription InputField::description;
-//namespace { PropertyAutoRegistration<InputField> registration; } // namespace
-
 // -------------------------------------------------------------------------------------------------
 
-InputField::InputField(BaseComponent& parent) :
-	BaseComponent(parent, GenerateName, "input-field") { }
-
-InputField::InputField(BaseComponent& parent, std::string name) :
-	BaseComponent(parent, std::move(name)) { }
-
-InputField::InputField(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-	BaseComponent(parent, GenerateName, type) { }
-
-InputField::~InputField() { }
-
-// -------------------------------------------------------------------------------------------------
-
-void InputField::align_horizontal(AlignHorizontal value, PropertyDriver driver) {
-	if (AccessProperty::setter(*this, property.align_horizontal, driver))
-		return;
-
-	text_.align(value);
-}
-
-AlignHorizontal InputField::align_horizontal() const noexcept {
-	return text_.align();
-}
-
-void InputField::font(Font2D_view value, PropertyDriver driver) {
-	if (AccessProperty::setter(*this, property.font, driver))
-		return;
-
-	text_.font(std::move(value));
-}
-
-const Font2D_view& InputField::font() const noexcept {
-	return text_.font();
-}
-
-void InputField::font_size(FontSize value, PropertyDriver driver) {
-	if (AccessProperty::setter(*this, property.font_size, driver))
-		return;
-
-	text_.size(value);
-}
-
-FontSize InputField::font_size() const noexcept {
-	return text_.size();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void InputField::text(std::string value) {
-	text_.string(std::move(value));
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	fire(EventChange{*this});
-}
-
-const std::string& InputField::text() const noexcept {
-	return text_.string();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void InputField::onChar(const EventChar& event) {
+void CoreInputField::onChar(const EventChar& event) {
 	text_.insert(caret, event.unicode);
 
 	caret++;
 	caretStartTime = clock::now();
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	fire(EventChange{*this});
-	fire(EventCaret{*this});
+	fire(EventChange{});
+	fire(EventCaret{});
 	event.stop_propagation();
 }
 
-void InputField::onKey(const EventKey& event) {
+void CoreInputField::onKey(const EventKey& event) {
 	if (event.keycode == libv::input::Keycode::Backspace && event.action != libv::input::Action::release) {
 		if (caret > 0) {
 			text_.erase(caret - 1, 1);
@@ -210,7 +208,7 @@ void InputField::onKey(const EventKey& event) {
 		}
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventChange{*this});
+		fire(EventChange{});
 		return event.stop_propagation();
 	}
 
@@ -221,7 +219,7 @@ void InputField::onKey(const EventKey& event) {
 		// On delete caret does not moves
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventChange{*this});
+		fire(EventChange{});
 		return event.stop_propagation();
 	}
 
@@ -237,37 +235,37 @@ void InputField::onKey(const EventKey& event) {
 		caret++;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
 	if (event.keycode == libv::input::Keycode::Num1 && event.action == libv::input::Action::press)
-		return align_horizontal(AlignHorizontal::Left), event.stop_propagation();
+		return handler().align_horizontal(AlignHorizontal::Left), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num2 && event.action == libv::input::Action::press)
-		return align_horizontal(AlignHorizontal::Center), event.stop_propagation();
+		return handler().align_horizontal(AlignHorizontal::Center), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num3 && event.action == libv::input::Action::press)
-		return align_horizontal(AlignHorizontal::Right), event.stop_propagation();
+		return handler().align_horizontal(AlignHorizontal::Right), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num4 && event.action == libv::input::Action::press)
-		return align_horizontal(AlignHorizontal::Justify), event.stop_propagation();
+		return handler().align_horizontal(AlignHorizontal::Justify), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num5 && event.action == libv::input::Action::press)
-		return align_horizontal(AlignHorizontal::JustifyAll), event.stop_propagation();
+		return handler().align_horizontal(AlignHorizontal::JustifyAll), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::Num6 && event.action == libv::input::Action::press)
-		return font(context().font("Achafexp.ttf")), event.stop_propagation();
+		return handler().font(context().font("Achafexp.ttf")), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num7 && event.action == libv::input::Action::press)
-		return font(context().font("consola.ttf")), event.stop_propagation();
+		return handler().font(context().font("consola.ttf")), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::Num8 && event.action == libv::input::Action::press)
-		return font_size(libv::ui::FontSize(libv::to_value(font_size()) + 3)), event.stop_propagation();
+		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) + 3)), event.stop_propagation();
 	if (event.keycode == libv::input::Keycode::Num9 && event.action == libv::input::Action::press)
-		return font_size(libv::ui::FontSize(libv::to_value(font_size()) - 3)), event.stop_propagation();
+		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
 		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 	if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
@@ -275,19 +273,19 @@ void InputField::onKey(const EventKey& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
 	// =================================================================================================
 
 	if (event.keycode == libv::input::Keycode::Enter && event.action != libv::input::Action::release) {
-		fire(EventSubmit{*this});
+		fire(EventSubmit{});
 		return event.stop_propagation();
 	}
 
 	if (event.keycode == libv::input::Keycode::KPEnter && event.action != libv::input::Action::release) {
-		fire(EventSubmit{*this});
+		fire(EventSubmit{});
 		return event.stop_propagation();
 	}
 
@@ -304,8 +302,8 @@ void InputField::onKey(const EventKey& event) {
 
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventChange{*this});
-		fire(EventCaret{*this});
+		fire(EventChange{});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
@@ -316,8 +314,8 @@ void InputField::onKey(const EventKey& event) {
 		caret = 0;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventChange{*this});
-		fire(EventCaret{*this});
+		fire(EventChange{});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
@@ -326,7 +324,7 @@ void InputField::onKey(const EventKey& event) {
 			caret--;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
@@ -335,7 +333,7 @@ void InputField::onKey(const EventKey& event) {
 			caret++;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
@@ -343,7 +341,7 @@ void InputField::onKey(const EventKey& event) {
 		caret = 0;
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 
@@ -351,12 +349,12 @@ void InputField::onKey(const EventKey& event) {
 		caret = static_cast<uint32_t>(text_.length());
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 }
 
-void InputField::onFocus(const EventFocus& event) {
+void CoreInputField::onFocus(const EventFocus& event) {
 	if (event.loss()) {
 		// TODO P5: Set style to normal or disabled
 		flagAuto(Flag::pendingRender);
@@ -375,11 +373,11 @@ void InputField::onFocus(const EventFocus& event) {
 
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingRender | Flag::pendingLayout);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 	}
 }
 
-void InputField::onMouseButton(const EventMouseButton& event) {
+void CoreInputField::onMouseButton(const EventMouseButton& event) {
 	if (!isFocused() && event.action == libv::input::Action::press)
 		focus();
 
@@ -388,13 +386,13 @@ void InputField::onMouseButton(const EventMouseButton& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 	}
 
 	event.stop_propagation();
 }
 
-void InputField::onMouseMovement(const EventMouseMovement& event) {
+void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter)
 		set(property.bg_color, property.bg_color() + 0.2f);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
@@ -409,27 +407,27 @@ void InputField::onMouseMovement(const EventMouseMovement& event) {
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 	}
 	if (context().state.key_pressed(libv::input::Keycode::F2)) {
 		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-		fire(EventCaret{*this});
+		fire(EventCaret{});
 	}
 	// =================================================================================================
 
 	event.stop_propagation();
 }
 
-void InputField::onMouseScroll(const EventMouseScroll& event) {
+void CoreInputField::onMouseScroll(const EventMouseScroll& event) {
 	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void InputField::doAttach() {
+void CoreInputField::doAttach() {
 	watchChar(true);
 	watchKey(true);
 	watchFocus(true);
@@ -437,12 +435,12 @@ void InputField::doAttach() {
 	watchMouse(Flag::mask_watchMouse);
 }
 
-void InputField::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<InputField> setter{*this, ctx.component, ctx.style, context()};
+void CoreInputField::doStyle(ContextStyle& ctx) {
+	PropertyAccessContext<CoreInputField> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 
-void InputField::doLayout1(const ContextLayout1& environment) {
+void CoreInputField::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	const auto contentString = text_.content(-1, -1);
@@ -451,12 +449,12 @@ void InputField::doLayout1(const ContextLayout1& environment) {
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
 }
 
-void InputField::doLayout2(const ContextLayout2& environment) {
+void CoreInputField::doLayout2(const ContextLayout2& environment) {
 	text_.limit(libv::vec::xy(environment.size));
 	caretPosition = text_.getCharacterPosition(caret);
 }
 
-void InputField::doRender(ContextRender& ctx) {
+void CoreInputField::doRender(ContextRender& ctx) {
 	if (ctx.changedSize) {
 		bg_mesh.clear();
 		auto pos = bg_mesh.attribute(attribute_position);
@@ -484,7 +482,7 @@ void InputField::doRender(ContextRender& ctx) {
 		auto pos = caret_mesh.attribute(attribute_position);
 		auto index = caret_mesh.index();
 
-		const auto lineHeight = font()->getLineAdvance(font_size());
+		const auto lineHeight = text_.font()->getLineAdvance(text_.size());
 		const auto max = context().settings.caret_width_max;
 		const auto min = context().settings.caret_width_min;
 		const auto offset = context().settings.caret_width_offset;
@@ -517,7 +515,7 @@ void InputField::doRender(ContextRender& ctx) {
 		ctx.gl.state.blendDst_One_Minus_Source1Color();
 
 		ctx.gl.program(*property.font_shader());
-		ctx.gl.texture(font()->texture(), property.font_shader()->textureChannel);
+		ctx.gl.texture(text_.font()->texture(), property.font_shader()->textureChannel);
 		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
 		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
 		ctx.gl.render(text_.mesh());
@@ -533,6 +531,118 @@ void InputField::doRender(ContextRender& ctx) {
 		ctx.gl.uniform(property.caret_shader()->uniform_MVPmat, ctx.gl.mvp());
 		ctx.gl.render(caret_mesh);
 	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+InputField::InputField(std::string name) :
+	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(std::move(name)) { }
+
+InputField::InputField(GenerateName_t gen, const std::string_view type) :
+	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(gen, type) { }
+
+InputField::InputField(base_ptr core) noexcept :
+	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(core) { }
+
+// -------------------------------------------------------------------------------------------------
+
+void InputField::color(Color value) {
+	AccessProperty::manual(self(), self().property.bg_color, value);
+}
+
+const Color& InputField::color() const noexcept {
+	return self().property.bg_color();
+}
+
+void InputField::image(Texture2D_view value) {
+	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
+}
+
+const Texture2D_view& InputField::image() const noexcept {
+	return self().property.bg_image();
+}
+
+void InputField::shader(ShaderImage_view value) {
+	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
+}
+
+const ShaderImage_view& InputField::shader() const noexcept {
+	return self().property.bg_shader();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void InputField::align_horizontal(AlignHorizontal value) {
+	AccessProperty::setter(self(), self().property.align_horizontal, PropertyDriver::manual, [&]() {
+		self().text_.align(value);
+	});
+}
+
+AlignHorizontal InputField::align_horizontal() const noexcept {
+	return self().text_.align();
+}
+
+void InputField::align_vertical(AlignVertical value) {
+	assert(false && "Not implemented yet");
+	AccessProperty::setter(self(), self().property.align_vertical, PropertyDriver::manual, [&]() {
+		// self().text_.align_vertical(value);
+	});
+}
+
+AlignVertical InputField::align_vertical() const noexcept {
+	assert(false && "Not implemented yet");
+	// return self().property.align_vertical();
+	return AlignVertical::Top;
+}
+
+void InputField::font(Font2D_view value) {
+	AccessProperty::setter(self(), self().property.font, PropertyDriver::manual, [&]() {
+		self().text_.font(std::move(value));
+	});
+}
+
+const Font2D_view& InputField::font() const noexcept {
+	return self().text_.font();
+}
+
+void InputField::font_size(FontSize value) {
+	AccessProperty::setter(self(), self().property.font, PropertyDriver::manual, [&]() {
+		self().text_.size(value);
+	});
+}
+
+FontSize InputField::font_size() const noexcept {
+	return self().text_.size();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void InputField::text(std::string value) {
+	self().text_.string(std::move(value));
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().fire(EventChange{});
+}
+
+const std::string& InputField::text() const noexcept {
+	return self().text_.string();
+}
+
+void InputField::caret(uint32_t value) {
+	self().caret = value;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().fire(EventCaret{});
+}
+
+uint32_t InputField::caret() const noexcept {
+	return self().caret;
+}
+
+void InputField::focus_select_policy(FocusSelectPolicy value) {
+	AccessProperty::manual(self(), self().property.focus_select_policy, std::move(value));
+}
+
+FocusSelectPolicy InputField::focus_select_policy() const noexcept {
+	return self().property.focus_select_policy();
 }
 
 // -------------------------------------------------------------------------------------------------

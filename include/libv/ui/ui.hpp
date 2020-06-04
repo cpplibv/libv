@@ -19,14 +19,15 @@ namespace ui {
 // TODO P2: libv.ui: Resource debugger, font and texture view at first
 // TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<BaseComponent>> getComponentAt(int, int);)
 // TODO P2: libv.ui: Record create/layout/render/destroy statistics
-// TODO P3: Idea reminder: glr could be more light with signed objects, and this might be a completely different approve
+// TODO P3: libv.ui: Idea reminder: glr could be more light with signed objects, and this might be a completely different approve
 //			<0 means look at some global glr store, and its only a promise, in the future there will be an object
 //			=0 default ctor, noop
 //			>0 actual opengl object index
-// TODO P5: Render ui into a separate frame buffer, or option set its target
-// TODO P5: (?) void setFocusPolicy(...);
+// TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
+// TODO P5: libv.ui: (?) void setFocusPolicy(...);
 
 class BaseComponent;
+class Component;
 class ContextState;
 class ContextUI;
 class ImplUI;
@@ -44,14 +45,12 @@ public:
 	~UI();
 
 public:
-	void add(std::shared_ptr<BaseComponent> component);
+	void add(Component component);
 
 	void setSize(libv::vec2i size_) noexcept;
 	inline void setSize(int32_t x, int32_t y) noexcept {
 		setSize({x, y});
 	}
-
-	BaseComponent& root() const noexcept; // TODO P5: I would really like to not give access to the root
 
 public:
 	void event(const libv::input::EventChar& event);

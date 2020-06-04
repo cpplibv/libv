@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 // pro
+#include <libv/ui/component.hpp>
+#include <libv/ui/component/label.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/parse/parse_align.hpp>
@@ -119,7 +121,7 @@ void process_style_property(UI& ui, Style& style, const std::string_view key, co
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
+Component script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
 
 	auto ui_table = lua.create_table();
 	ui_table["bottom"] = "bottom";
@@ -196,8 +198,11 @@ std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::f
 			}, value);
 		});
 
-//	std::shared_ptr<BaseComponent>
-	return nullptr;
+//	return Component{nullptr};
+	assert(false && "Not implemented yet.");
+	Label tmp{"lua"};
+	tmp.text("Lua script component");
+	return tmp;
 }
 
 // -------------------------------------------------------------------------------------------------

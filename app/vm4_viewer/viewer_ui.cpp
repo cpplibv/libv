@@ -36,7 +36,7 @@ ViewerUI::ViewerUI(BaseComponent& parent) :
 	scene.camera.rotate_x(libv::to_rad(45.f));
 	scene.camera.rotate_z(libv::to_rad(45.f));
 
-	// <<< P5: control integration
+	// <<< P5: app_vm4v: control integration
 	auto fr = libv::ctrl::FeatureRegister{controls};
 	CameraBehaviour::register_controls(fr);
 	CameraBehaviour::bind_controls(controls);
@@ -113,7 +113,7 @@ void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 void ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
 	focus();
 
-	// <<< P5: control integration
+	// <<< P5: app_vm4v: control integration
 	controls.input(libv::input::EventMouseButton{event.button, event.action});
 	event.stop_propagation();
 }
@@ -122,7 +122,7 @@ void ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 	if (not isFocused())
 		return;
 
-	// <<< P5: control integration
+	// <<< P5: app_vm4v: control integration
 	controls.input(libv::input::EventMousePosition{libv::vec2d{event.mouse_position}});
 	event.stop_propagation();
 }
@@ -131,7 +131,7 @@ void ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
 	if (not isFocused())
 		return;
 
-	// <<< P5: control integration
+	// <<< P5: app_vm4v: control integration
 	controls.input(libv::input::EventMouseScroll{libv::vec2d{event.scroll_movement}});
 	event.stop_propagation();
 }

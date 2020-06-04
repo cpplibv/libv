@@ -10,7 +10,7 @@
 #include <libv/glr/queue.hpp>
 #include <libv/math/angle.hpp>
 // pro
-//#include <vm4_viewer/attribute.hpp>
+#include <vm4_viewer/attribute.hpp>
 //#include <vm4_viewer/log.hpp>
 //#include <vm4_viewer/ui/keyboard.hpp>
 

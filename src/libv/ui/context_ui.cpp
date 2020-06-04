@@ -73,7 +73,9 @@ public:
 
 bool secure_path(const std::filesystem::path& base, const std::filesystem::path& target, const std::filesystem::path& path) {
 	std::error_code ec;
-	const auto canonical = std::filesystem::relative(std::filesystem::canonical(target, ec), ec);
+
+	// TODO P1: Nicer file not found error (it will be detected with the canonical call)
+	const auto canonical = std::filesystem::canonical(target, ec);
 	if (ec) {
 		log_ui.error("Failed to determine canonical target path: {} {}"
 				"\n\tPath:      {}"
@@ -82,30 +84,39 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 		return false;
 	}
 
-	const auto is_parent = libv::is_parent_folder_of(base, canonical);
+	const auto relative_to_current = std::filesystem::relative(canonical, ec);
+	if (ec) {
+		log_ui.error("Failed to determine relative target path: {} {}"
+				"\n\tPath:      {}"
+				"\n\tTarget:    {}"
+				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(target), libv::generic_path(base));
+		return false;
+	}
+
+	const auto is_parent = libv::is_parent_folder_of(base, relative_to_current);
 	if (!is_parent) {
 		log_ui.error("Canonical path is expected to be under the base folder:"
 				"\n\tPath:      {}"
 				"\n\tCanonical: {}"
-				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(canonical), libv::generic_path(base));
+				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
 		return false;
 	}
 
-	const auto relative = std::filesystem::relative(canonical, base, ec);
+	const auto relative_to_base = std::filesystem::relative(relative_to_current, base, ec);
 	if (ec) {
 		log_ui.error("Failed to determine relative path: {} {}"
 				"\n\tPath:      {}"
 				"\n\tCanonical: {}"
-				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(canonical), libv::generic_path(base));
+				"\n\tBase:      {}", ec, ec.message(), libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(base));
 		return false;
 	}
 
-	if (relative != path) {
+	if (relative_to_base != path) {
 		log_ui.error("Canonical relative path does not matches path"
 				"\n\tPath:      {}"
 				"\n\tCanonical: {}"
 				"\n\tRelative:  {}"
-				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(canonical), libv::generic_path(relative), libv::generic_path(base));
+				"\n\tBase:      {}", libv::generic_path(path), libv::generic_path(relative_to_current), libv::generic_path(relative_to_base), libv::generic_path(base));
 		return false;
 	}
 

@@ -494,19 +494,65 @@ libv.control: 2 (+ 1) Example sandbox to presented in the paper
 libv.control: Rename libv.control to libv.ctrl
 libv.ctrl: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
 libv.input: rename EventKey::key to EventKey::keycode
-
+libv.ui: event two param, one for the component one for the event
+libv.ui: Use an intrusive ptr like pattern for component internal storage
+libv.ui: Common base class for event "host stubs" to handle general events (mouse / keyboard / component lifetime)
+libv.ui: Provide general events for every component
+libv.ui: Hide component parent management | thread local variable to hide UI* context in it
+libv.ui: Idea move "real" component creation to attach time, removes the ctor ctx overhead | Cancelled
+libv.ui: sandbox has some off colors that should not happen | the res white image was dirty
+libv.ui: Hide component memory management: sp<Label> -> Label = magic<ImplLabel>
+libv.ui: component base fire should reject non this pointer or types
+libv.ui: Clean up base_component/component includes with the new memory model
+libv.ui: Remove every usage of std::shared_ptr<BaseComponent>
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: Hide BaseComponent usage from every API: focus,
+libv.ui: Kill .base() usages
+libv.ui: fix typo: Travers -> Traverse
 
-libv.ui: MUST! Hide component memory management: sp<Label> -> Label = magic<ImplLabel> | AND move component creation to attach time -> that removes the ctor overhead, but add the issue that there can be no ctor arg passed
-libv.ui: MUST! Hide component parent management: thread local variable to hide UI* context in it?
+libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
+libv.ui: align_vertical for string2D
+
+libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
+
+libv.ui: container child anchor_parent, anchor_target and size are general concept and every component should have them -> eliminates child storage issues (for now)
+		grid anchor_content is also here
+libv.ui: Kill the half manual half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
+
+libv.ui: Rename BaseComponent to CoreComponent (?) or CoreBaseComponent
+libv.ui: Autonaming should use per type indexing
+libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
+libv.ui: OverlayZoom use linearized zoom
+
+libv.math: kill vec dependency to glm
+
+
+
+libv.ui: The UI Paper
+	Core - Core Component object containing every state of a given component, derived from BaseComponent
+	Component / Handler - Lightweight stateless handler object of a core component object, derived from Component
+	Host - Stateless event host
+
+	read again once done with events http://nanapro.org/en-us/documentation/core/events.htm
+
+
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
-idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
+
+libv.ui: UI level message/event bus/system might be required:
+		context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
+		context().events().fire("shader_reload", ...);
+libv.ui: UI level message/event bus/system could use support for hierarchical up-walking 'context' iteration
+libv.ui: UI level storage system
+		context().storage<UIUserConfig>() : UIUserConfig&
+libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 
 ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
+ext.x3: make sure that every rule is static
+ext.x3: make sure that no header dependency exposed by libv parsers
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
 libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
@@ -515,8 +561,9 @@ libv.ctrl: Binding binary operation setting and serialization
 libv.ctrl: InputID, Input, AIA and DIA should be merged this way: both Input and InputID should be 64bit types, but one should contain the action related information, they should be converted to one another with extra info or info loss, inheritance or CRTP might save some work
 
 libv.ctrl: More specialized binding can hide normal feature if there is not context under it -> the order of context existence check and binding specialization test should be flipped
+libv.ctrl.routing: Unrelated analog event cancels button sequence
+libv.ctrl: Feature collection is collecting empty functions too
 
-libv.math: Add TAU constant as PI * 2
 
 Sequence: dead-key like behaviour
 		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
@@ -583,14 +630,10 @@ libv.ctrl:
 			Additional note:
 				Callbacks passed events could/should have an absorb flag. Binding and features could demand certain absorbs properties like only one absorb or allow subset sequences to be fired or allow parallel and so on...
 
-		Issue: Given 'E' and 'Shift + E' binding, inputting 'E' then pressing 'Shift' will do what? And why?
-
 		Issue: Need 2D input support (?), for example pie menu needs it too | that is UI absolute position
 
 		Click - Press > at most X time > Release
 		Double Click - Press > at most X time > Release > at most T time > Press > at most X time > Release
-
-		sequence (definition) + binding (info) + feature (name) [+ operation] = a single record
 
 	Outside of scope notes:
 		Issue: need a way to prevent scale above 1 on certain D->A time based bindings
@@ -602,15 +645,6 @@ libv.ctrl:
 		Press type aka additional information on binding (AKA A/D converter):
 			N/A, Continuous (Hold), Press, Release, Double click, (Toggle), etc...
 			Threshold, Scale, Repeat rules, Offset, Ramp-up
-
-	sub-systems:
-		input normalization (definition): input id and parsing
-		routing                         : decision matrix
-		binding and conversion          :
-		context                         : injected objects
-		feature                         : callbacks
-		presentation                    : introspection
-		persistence                     : parsers and output streams, save and load of bindings
 
 	input sources:
 		keyboard
@@ -637,48 +671,6 @@ libv.ctrl:
 		analog (as joystick or gamepad) - linearization, deadzone
 		movement - normalization px to 0..1
 
-	input event aliasing (event identification can produce alias events):
-		L/R Ctrl
-		L/R Shift
-		L/R Super
-		L/R Alt
-		Mouse X/X+/X-
-		Mouse Y/Y+/Y-
-		Scroll X/X+/X-
-		Scroll Y/Y+/Y-
-		Joystick Analog X/X+/X-
-		Joystick Analog Y/Y+/Y-
-		Any joystick (joystick without index)
-		Any gamepad (gamepad without index)
-
-	configuration and settings (wrong place here)
-		per source type
-			Analog: scale
-			Button: impulse/scale
-
-		per source (for gamepad and joystick)
-			Analog: scale
-			Button: impulse/scale
-
-		per binding
-			scale
-
-		per feature
-			Action: -
-			Binary: binary_operation
-			Analog: scale_analog/scale_binary <<< wrong
-
-	scales:
-		from event to binding
-			global time/button/analog/impulse
-			input type button/analog/impulse
-			optionally for multi devise input types per device button/analog/impulse
-			+1 hidden hard coded mouse / 600px
-
-		determine the correct scales
-		time scale/degrees/px/normalized_px/? scale
-		old scales are still somewhere in this paper, cleanup them
-
 	digital input action:
 		press   - input::press
 		release - input::release
@@ -692,62 +684,22 @@ libv.ctrl:
 		double tap - for <N sec within <M sec (outside of scope of initial release) (digital)
 		hold - for N sec                      (outside of scope of initial release) (analog or digital)
 
-	feature:
-		types:
-			action: single action - void() // single shot event
-			binary: discrete binary state - void(bool state) // (accepts binary input, allows toggle)
-			analog: continuous control - void(float value) //
+	additional binding operation on analog features:
+		scale (includes invert with negative scale)
+		(?) position
+		(?) difference
+		(?) dimension select
+		(?) dimension direction select
+		(?) dimension convert
+		(?) threshold
+		(?) multiple analog
+		(?) gamepad axis dead-zone
+		(?) gamepad axis linearization
 
-	binding:
-		connect =      what      +  where  + (     how     +    do    )
-		binding = input sequence + feature + (conversation + operation)
+	binding exclusivity:
+		???
 
-		binding operation on action features:
-			(no extra operation)
-
-		binding operation on binary features:
-			enable
-			disable
-			toggle
-			button state
-			inverted button state
-
-		binding operation on analog features:
-			scale (includes invert with negative scale)
-			(?) position
-			(?) difference
-			(?) dimension select
-			(?) dimension direction select
-			(?) dimension convert
-			(?) threshold
-			(?) multiple analog
-			(?) gamepad axis dead-zone
-			(?) gamepad axis linearization
-
-		exclusivity:
-			???
-
-		binding level:
-			Primary, binding information can be used to display on HUD
-			Secondary, binding information can be used to display in tutorial texts
-			Hidden
-
-	rule for input/combination/sequence:
-		sequence: only the last combination can be a non action dia or aia
-		combination: only one dia or aia can be an action (every aia can be considered an action, so only dia matters)
-		input: dia can have these values based on what inputID is
-		input: cannot have dia if inputID is analog
-		input: cannot have aia if inputID is button (solved by including aia in inputID)
-
-	context:
-		string + function_ptr + type_index + void* = context
-		if void* is nullptr then the context is inactive
-		context iteration order shall be deterministic
-
-		overloading: (ui.edit context can have different action sets based on focus)
-				context = function_ptr + type_index + void* (without string)
-
-	presentation:
+	additional presentation:
 		ability to list every feature
 		ability to list every binding
 		ability to list every warnings / errors
@@ -756,14 +708,8 @@ libv.ctrl:
 		ability to search in features / bindings based on input sequence
 
 	interesting usages examples, things to investigate:
-		prefix collusion, especially for multi-stroke controls
-		example mouse movement while holding a button
-
-		app.editor.camera_orbit_X = Left Mouse + Mouse X
-		app.editor.camera_orbit_X = W
-		app.editor.camera_orbit_Z = Left Mouse + Right Mouse + Mouse Y
-		app.editor.grab_manipulator_under_cursor = Left Mouse
-		app.editor.move_selection_X = X + Mouse X * 2
+		app.editor.manipulator.grab = Left Mouse
+		app.editor.selection.move_x = X + Mouse X * 2
 		app.editor.selection.to_upper = Ctrl + U, U
 
 		half control - how would walk forward and walk forward toggle look like
@@ -780,27 +726,14 @@ libv.ctrl:
 
 		right click to move command, long right click to move command with final direction/shape
 
-		granade wind and granade throw jó lenne kettő G [press] + G [release] helyett G [auto]
-			aka ez egy feature type lesz amivel az auto jól müködik együtt
 
-	NOTE:
-		32 context add / tick
-		32 context remove / tick
-		64 active context
-		64000 mouse position / tick (max if mouse position is rasterized, should be less with segment intersection)
-
-	Observations and research:
-		... in the xls
-
-
-libv.ctrl: If I have enough time - IIHET
-	libv.ctrl: IIHET: Binding profiles, and inheritance
-	libv.ctrl: IIHET: Gamepad/joystick analog should be time related, but mouse and scroll are event based
-	libv.ctrl: IIHET: Click and double click support would be nice
-	libv.ctrl: IIHET: User should not be exposed to stated sequence (binding does that)
-	libv.ctrl: IIHET: Idea: Stated and normal sequence common templated base class (?)
-	libv.ctrl.parse: IIHET: identifier parsing (_ skipper or adjusting infos to match current parser)
-	libv.ctrl: IIHET: Routing: Select sequence progression (beside bindings) based on more specialized
+libv.ctrl: Binding profiles, and inheritance
+libv.ctrl: Gamepad/joystick analog should be time related, but mouse and scroll are event based
+libv.ctrl: Click and double click support would be nice
+libv.ctrl: User should not be exposed to stated sequence (binding does that)
+libv.ctrl: Idea: Stated and normal sequence common templated base class (?)
+libv.ctrl.parse: identifier parsing (_ skipper or adjusting infos to match current parser)
+libv.ctrl: Routing: Select sequence progression (beside bindings) based on more specialized
 
 libv.ctrl: Integration queue:
 	libv.frame.input: Add support for joysticks and game-pads
@@ -819,57 +752,51 @@ libv.ctrl: Integration queue:
 	glfw.joystick: Added glfwSetJoystickUserPointer and glfwGetJoystickUserPointer for per-joystick user pointers
 	glfw.joystick: Added glfwUpdateGamepadMappings function for importing gamepad mappings in SDL_GameControllerDB format
 
-libv.ctrl: Outside of paper scope - OOPS, but must implement
-	libv.ctrl.routing: OOPS: Unrelated analog event cancels button sequence
-	libv.ctrl: OOPS: Feature collection is collecting empty functions too
-	libv.ctrl: OOPS: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
-
-libv.ctrl: Outside of paper scope - OOPS
-	libv.ctrl: OOPS: Split analog dimension to dimension and aia
-	libv.ctrl: OOPS: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
-	libv.ctrl: OOPS: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
+libv.ctrl: Implementation queue:
+	libv.ctrl: Split analog dimension to dimension and aia
+	libv.ctrl: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
+	libv.ctrl: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
 					In other word: an additional type between the current binding and feature, this would clean up string operations
-	libv.ctrl: OOPS: Contexts information, state collusion information among contexts, use that for queries
-	libv.ctrl: OOPS: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
-	libv.ctrl.parse: OOPS: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
-	libv.ctrl.parse: OOPS: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
-	libv.ctrl.parse: OOPS: x3::eoi could improve matching, relax orders, optimize for most probably input
-	libv.ctrl.parse: OOPS: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
-	libv.ctrl: OOPS: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
-	libv.ctrl: OOPS: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
-	libv.ctrl: OOPS: event/feature chain interruptibility on colliding bindings:
+	libv.ctrl: Contexts information, state collusion information among contexts, use that for queries
+	libv.ctrl: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
+	libv.ctrl.parse: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
+	libv.ctrl.parse: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
+	libv.ctrl.parse: x3::eoi could improve matching, relax orders, optimize for most probably input
+	libv.ctrl.parse: Quirk: word_plus and word_minus could have p/m due to the forbidden reverse order in mouse movement, test cases are required
+	libv.ctrl: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
+	libv.ctrl: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
+	libv.ctrl: event/feature chain interruptibility on colliding bindings:
 						add member to event: is_ambiguous
 						add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
-	libv.ctrl: OOPS: Invalid sequence automated fixup | only if there is consent
-	libv.ctrl: OOPS: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
-	libv.ctrl: OOPS: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
-	libv.ctrl: OOPS: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
-	libv.ctrl: OOPS: feature registration show provide way for custom properties
-	libv.ctrl: OOPS: hash based binding index for event where manually map everything to the most similar form
-	libv.ctrl: OOPS: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
-	libv.ctrl: OOPS: More introspection is possible: search feature by context with or without name
-	libv.ctrl: OOPS: More introspection is possible: search binding with feature and sequence
-	libv.ctrl: OOPS: More search possible: search_mode::wildcard (with . as the level separator)
-	libv.ctrl: OOPS: More search possible: search_mode::any_word (with space as the word separator)
-	libv.ctrl: OOPS: More search possible: search_mode::all_word (with space as the word separator)
-	libv.ctrl: OOPS: Super flatten sequence and stated sequence
-	libv.ctrl: OOPS: check_binding and check_feature are algorithm that should be generalized
-	libv.ctrl: OOPS: Change in codepoint mapping can cause events with codepoint based inputs
+	libv.ctrl: Invalid sequence automated fixup | only if there is consent
+	libv.ctrl: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
+	libv.ctrl: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
+	libv.ctrl: binding levels should be grouped primaries for keyboard or gamepad, also it need a way to switch them, maybe assign group or groups to bindings
+	libv.ctrl: feature registration show provide way for custom properties
+	libv.ctrl: hash based binding index for event where manually map everything to the most similar form
+	libv.ctrl: why can I not x3::attr InputID directly (it just default constructs it and drop the value on the floor)
+	libv.ctrl: More introspection is possible: search feature by context with or without name
+	libv.ctrl: More introspection is possible: search binding with feature and sequence
+	libv.ctrl: More search possible: search_mode::wildcard (with . as the level separator)
+	libv.ctrl: More search possible: search_mode::any_word (with space as the word separator)
+	libv.ctrl: More search possible: search_mode::all_word (with space as the word separator)
+	libv.ctrl: Super flatten sequence and stated sequence
+	libv.ctrl: check_binding and check_feature are algorithm that should be generalized
+	libv.ctrl: Change in codepoint mapping can cause events with codepoint based inputs
 
-	libv.ctrl.profile: OOPS: each binding entry would select: inherit (noop) / override / extend its parent binding entry
+	libv.ctrl.profile: each binding entry would select: inherit (noop) / override / extend its parent binding entry
 
-	libv.ctrl: OOPS: Idea: why not require codepoints to be inside the inputs events
-	libv.ctrl: OOPS: Idea: dia as bitmask
-	libv.ctrl: OOPS: Rep source type could be signed and analogs on negative, buttons on positive values
-	libv.ctrl: OOPS: Ability to list every (active) context
-	libv.ctrl: OOPS: Bind and profile api and serialization: override, empty override, append
-	libv.ctrl: OOPS: A serialization... A serious one
-	libv.ctrl: OOPS: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
+	libv.ctrl: Idea: why not require codepoints to be inside the inputs events
+	libv.ctrl: Idea: dia as bitmask
+	libv.ctrl: Rep source type could be signed and analogs on negative, buttons on positive values
+	libv.ctrl: Ability to list every (active) context
+	libv.ctrl: Bind and profile api and serialization: override, empty override, append
+	libv.ctrl: A serialization... A serious one
+	libv.ctrl: Solve FeatureRegister code duplication with inheritance (FeatureRegister even could be a base of Controls)
 
-	libv.ctrl: OOPS: libv::ctrl -> libv::ctrl
-	libv.ctrl: OOPS: Context level feature containers, or index so lookup faster (?)
-	libv.ctrl: OOPS: Store more information about Context. Name, orthogonal and concurrent contexts
-	libv.ctrl: OOPS: Idea of context groups, and under a group there are multiple types
+	libv.ctrl: Context level feature containers, or index so lookup faster (?)
+	libv.ctrl: Store more information about Context. Name, orthogonal and concurrent contexts
+	libv.ctrl: Idea of context groups, and under a group there are multiple types
 
 visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
 visual.grid: For grids expand and fade out line endings
@@ -887,11 +814,6 @@ app.vm4_viewer: camera orientation indicator
 app.vm4_viewer: ortho camera, and swapping
 
 app.vm4_viewer: Camera controller class with lua binding
-
-libv.input: rename EventKey::key to EventKey::keycode (?)
-libv.ui: MUST! Hide component memory management: sp<Label> -> Label = magic<ImplLabel> | AND move component creation to attach time -> that removes the ctor overhead, but add the issue that there can be no ctor arg passed
-libv.ui: MUST! Hide component parent management: thread local variable to hide UI* context in it?
-libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
 libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
@@ -915,15 +837,6 @@ app.vm4_viewer: Add config option to not reset camera on model change
 libv.args: support or extension for the lib to support command line "late" commands, from a different process instance with a network hook
 app.vm4_viewer: Command line argument --open "file" to auto open file
 app.vm4_viewer: Command line argument --active open file in already running instance (overrides config option)
-
-
-libv.ui: UI level message/event bus/system might be required:
-		context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
-		context().events().fire("shader_reload", ...);
-libv.ui: UI level message/event bus/system could use support for up-walking context iteration
-libv.ui: UI level storage system
-		context().storage<UIUserConfig>() : UIUserConfig&
-libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 
 app.bin_to_src: libv.arg-ify
 app.bin_to_src: command line argument for line length
@@ -1016,16 +929,7 @@ app.vm4_viewer.shader: ui feedback for glsl shader failed include
 app.vm4_viewer.shader: use a fallback shader on init failure
 app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
 
-libv.ui: static_component system
-libv.ui: list
-libv.ui: table layout - only the columns and/or rows have size
-libv.ui: not owning container views (list and/or table)
-
 libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
-
-libv.gl: learn the meaning of multisample fixedlocation (in case of Texture2DMultisample (and why there is none for RBO))
-libv.gl: learn the difference between read/write framebuffer on attachment, can even a FBO have different read/draw attachments and how does that work? Func in question: glFramebufferTexture*D
-
 
 component
 	libv.ui: clipping vertex shader (with on/off)
@@ -1033,6 +937,33 @@ component
 			| or just use a viewport call and correct the projection matrix
 	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
+	libv.ui: list
+	libv.ui: table layout - only the columns and/or rows have size
+	libv.ui: not owning container views (list and/or table)
+	libv.ui: static_component system
+
+	libv.ui: Component ideas from other systems
+		button	 			Clickable elements.
+		sprite-button	 	A button that displays an image rather than text.
+		checkbox	 			Clickable elements with a cross in the middle that can be turned off or on.
+		flow					Invisible containers that lay out children either horizontally or vertically.
+		frame	 			Grey semi-transparent boxes that contain other elements. They have a caption, and, just like flows, they lay out children either horizontally or vertically.
+		label	 			A piece of text.
+		progressbar	 		Indicate progress by displaying a partially filled bar.
+		table	 			An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
+		textfield	 		Boxes of text the user can type in.
+		radiobutton	 		Identical to checkbox except circular.
+		sprite	 			An element that shows an image.
+		scroll-pane	 		Similar to a flow but includes the ability to show and use scroll bars.
+		drop-down	 		A drop down list of other elements.
+		list-box	 			A list of other elements.
+		camera	 			A camera that shows the game at the given position on the given surface.
+		choose-elem-button	A button that lets the player pick one of an: item, entity, tile, or signal similar to the filter-select window.
+		text-box				A multi-line text box that supports selection and copy-paste.
+		slider				A number picker.
+		entity-preview		A preview of an entity.
+		split-pane
+		tab-pane
 
 atlas
 	libv.ui: texture atlas definition/parsing
@@ -1054,6 +985,7 @@ ui
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
+	libv.ui: idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
 layout
 	libv.ui: doLayout1 should use the return channel instead of member cache
@@ -1073,9 +1005,6 @@ mouse
 	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 
 event
-	libv.ui: Common base class for event "host stubs" to handle general events (mouse / keyboard / component lifetime)
-	libv.ui: Provide general events for every component: read more about http://nanapro.org/en-us/documentation/core/events.htm
-	libv.ui: Read http://nanapro.org/en-us/documentation/core/events.htm
 	libv.ui: Unignorable event handlers
 	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
@@ -1119,6 +1048,7 @@ interactive
 	libv.ui.input_field: background_shadow_tip_string("Password")
 	libv.ui.input_field: tip_string("Generic password related tip")
 	libv.ui.input_field: undo/redo support
+	libv.ui.qol: On selecting a file name input field the caret should be placed before the extension (even if the click is after the dot), but for a second click it should jump where it is requested
 
 hotkey
 	libv.ui.hotkey: hotkey system are an extension to the keyboard system

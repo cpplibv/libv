@@ -2,25 +2,22 @@
 
 #pragma once
 
+// libv
+#include <libv/lua/fwd.hpp>
 // std
 #include <filesystem>
 #include <memory>
 
 
 namespace libv {
-namespace lua {
-
-class State;
-
-} // namespace lua
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class Component;
 class UI;
-class BaseComponent;
 
-std::shared_ptr<BaseComponent> script_file(UI& ui, lua::State& lua, const std::filesystem::path& file);
+Component script_file(UI& ui, lua::State& lua, const std::filesystem::path& file);
 
 // -------------------------------------------------------------------------------------------------
 

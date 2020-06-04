@@ -14,6 +14,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/context_ui_link.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
@@ -25,15 +26,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-BaseComponent::BaseComponent(ContextUI& context) :
-	context_(context) { }
-
-BaseComponent::BaseComponent(BaseComponent& parent, std::string name) :
-	context_(parent.context_),
+BaseComponent::BaseComponent(std::string name) :
+	context_(current_thread_context()),
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-	context_(parent.context_),
+BaseComponent::BaseComponent(GenerateName_t, const std::string_view type) :
+	context_(current_thread_context()),
 	name(libv::concat(type, '-', nextID++)) { }
 
 BaseComponent::~BaseComponent() {
@@ -196,8 +194,25 @@ void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+void BaseComponent::_fire(std::type_index type, const void* event_ptr) {
+	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (attach) codes
+	if (isAttached() && flags.match_any(Flag::signal))
+		context().event.fire(this, type, event_ptr);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 ContextStyle BaseComponent::makeStyleContext() noexcept {
 	return ContextStyle{libv::make_observer(style_.get()), *this};
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BaseComponent::connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
+	signal.context().event.connect(&signal, &slot, type, std::move(callback));
+
+	signal.flagDirect(Flag::signal);
+	slot.flagDirect(Flag::slot);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -351,7 +366,8 @@ void BaseComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
-		parent->doStyle(ctx, childID);
+		if (parent != this) // NOTE: Condition is required to Avoid root component edge case
+			parent->doStyle(ctx, childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {

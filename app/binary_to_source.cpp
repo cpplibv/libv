@@ -9,6 +9,7 @@
 #include <libv/utility/generic_path.hpp>
 // std
 #include <sstream>
+#include <iostream>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -49,7 +50,7 @@ std::pair<void*, size_t> {function_name}() {{
 )";
 
 int main(int argc, const char** argv) {
-	if (argc != 2 && argc != 3) {
+	if (argc != 3 && argc != 4) {
 		fmt::print("Expected 2 or 3 argument but received {}\n", argc);
 		fmt::print("Usage: {} <input_file> <output_file> [function_name]\n", libv::generic_path(argv[0]));
 		return EXIT_FAILURE;

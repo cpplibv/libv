@@ -2,20 +2,34 @@
 
 #pragma once
 
-// libv
-#include <libv/glr/mesh.hpp>
-// std
-#include <functional>
-#include <string>
-#include <string_view>
 // pro
-#include <libv/ui/base_component.hpp>
-//#include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/property.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/align.hpp>
+#include <libv/ui/property/color.hpp>
+#include <libv/ui/property/orientation.hpp>
+#include <libv/ui/property/shader_image.hpp>
+#include <libv/ui/property/texture_2D.hpp>
 
 
 namespace libv {
 namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+struct EventScrollChange : BaseEvent {
+	double change;
+
+	constexpr inline EventScrollChange(double change) noexcept : change(change) { }
+};
+
+template <typename ComponentT>
+struct EventHostScroll : EventHostGeneral<ComponentT> {
+	BasicEventProxy<ComponentT, EventScrollChange> change;
+
+	EventHostScroll(ComponentT& core) : EventHostGeneral<ComponentT>(core),
+		change(core) {}
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -44,70 +58,19 @@ namespace ui {
 //		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
 //		double step_page; // [pageup/pagedown] num_lines_displayed
 
-class ScrollBar : public BaseComponent {
-private:
-	enum class DragMode : uint8_t {
-		idle,
-		track,
-		bar,
-	};
-
+class ScrollBar : public ComponenetHandler<class CoreScrollBar, EventHostScroll<ScrollBar>> {
+public:
 //	enum class BarMode : uint8_t {
+//		bar_range = 0,
 //		bar_fix,
-//		bar_range,
 //		fill_high,
 //		fill_low,
 //	};
 
 public:
-	struct EChange {
-		ScrollBar& component;
-		double change;
-	};
-
-private:
-	template <typename T>
-	static void access_properties(T& ctx);
-
-	struct Properties {
-		PropertyR<Color> bar_color;
-		PropertyL<Texture2D_view> bar_image;
-		PropertyR<ShaderImage_view> bar_shader;
-
-		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
-
-		PropertyL<Orientation> orientation;
-	} property;
-
-private:
-	libv::glr::Mesh bar_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
-private:
-	double value_ = 0.0;
-	double value_max_ = 100.0;
-	double value_min_ = 0.0;
-	double value_range_ = 10.0;
-	double value_step_ = 0.0;
-
-private:
-	libv::vec2f drag_point;
-	DragMode drag_mode = DragMode::idle;
-
-//	double scroll_step_button;
-//	double scroll_step_scroll;
-//	double scroll_step_track;
-//	double scroll_hold_button;
-//	double scroll_hold_scroll;
-//	double scroll_hold_track;
-
-public:
-	explicit ScrollBar(BaseComponent& parent);
-	ScrollBar(BaseComponent& parent, std::string name);
-	ScrollBar(BaseComponent& parent, GenerateName_t, const std::string_view type);
-	~ScrollBar();
+	explicit ScrollBar(std::string name);
+	explicit ScrollBar(GenerateName_t = {}, const std::string_view type = "scroll-bar");
+	explicit ScrollBar(base_ptr core) noexcept;
 
 public:
 	void value(double value);
@@ -128,33 +91,35 @@ public:
 	void value_step(double value);
 	[[nodiscard]] double value_step() const noexcept;
 
+public:
 	void make_step(double amount) noexcept;
 	void make_scroll(double amount) noexcept;
 
 //	[[nodiscard]] bool is_at_max() const noexcept;
 //	[[nodiscard]] bool is_at_min() const noexcept;
 
-private:
-//	inline auto bar_size() const noexcept;
-	inline auto bar_bounds() const noexcept;
+public:
+	void bar_color(Color value);
+	[[nodiscard]] const Color& bar_color() const noexcept;
+
+	void bar_image(Texture2D_view value);
+	[[nodiscard]] const Texture2D_view& bar_image() const noexcept;
+
+	void bar_shader(ShaderImage_view value);
+	[[nodiscard]] const ShaderImage_view& bar_shader() const noexcept;
+
+	void color(Color value);
+	[[nodiscard]] const Color& color() const noexcept;
+
+	void image(Texture2D_view value);
+	[[nodiscard]] const Texture2D_view& image() const noexcept;
+
+	void shader(ShaderImage_view value);
+	[[nodiscard]] const ShaderImage_view& shader() const noexcept;
 
 public:
-	template <typename F>
-	inline void event_change(libv::observer_ptr<BaseComponent> slot, F&& func) {
-		connect<EChange>(slot, std::forward<F>(func));
-	}
-
-private:
-	virtual void onMouseButton(const EventMouseButton& event) override;
-	virtual void onMouseMovement(const EventMouseMovement& event) override;
-	virtual void onMouseScroll(const EventMouseScroll& event) override;
-
-private:
-	virtual void doAttach() override;
-	virtual void doStyle(ContextStyle& ctx) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
-	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	void orientation(Orientation value);
+	[[nodiscard]] Orientation orientation() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

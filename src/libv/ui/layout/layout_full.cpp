@@ -12,7 +12,7 @@
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 
 
 namespace libv {
@@ -38,12 +38,12 @@ void LayoutFull::access_child_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void LayoutFull::style(Properties& properties, ContextStyle& ctx) {
-	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
 }
 
 void LayoutFull::style(ChildProperties& properties, ContextStyle& ctx) {
-	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_child_properties(setter);
 }
 
@@ -72,14 +72,14 @@ libv::vec3f LayoutFull::layout1(
 
 	auto result = libv::vec3f{};
 
-	for (const auto& child : children | view_layouted()) {
-		AccessLayout::layout1(*child.ptr, ContextLayout1{});
+	for (auto& child : children | view_layouted()) {
+		AccessLayout::layout1(child.ptr.base(), ContextLayout1{});
 		libv::meta::for_constexpr<0, 3>([&](auto dim) {
 			result[dim] = libv::max(
 					result[dim],
 					resolvePercent(
-							child.property.size()[dim].pixel + (child.property.size()[dim].dynamic ? AccessLayout::lastDynamic(*child.ptr)[dim] : 0.f),
-							child.property.size()[dim].percent, *child.ptr)
+							child.property.size()[dim].pixel + (child.property.size()[dim].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[dim] : 0.f),
+							child.property.size()[dim].percent, child.ptr.base())
 			);
 		});
 	}
@@ -96,9 +96,9 @@ void LayoutFull::layout2(
 	(void) parent;
 	(void) property;
 
-	for (const auto& child : children | view_layouted()) {
+	for (auto& child : children | view_layouted()) {
 		AccessLayout::layout2(
-				*child.ptr,
+				child.ptr.base(),
 				ContextLayout2{
 					environment.position,
 					environment.size,

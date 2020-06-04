@@ -2,14 +2,9 @@
 
 #pragma once
 
-// std
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
 // pro
-#include <libv/ui/component/basic_panel.hpp>
-#include <libv/ui/layout/layout_full.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
 
 
 namespace libv {
@@ -17,21 +12,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFull : public BasicPanel<LayoutFull> {
+class PanelFull : public ComponenetHandler<class CorePanelFull, EventHostGeneral<PanelFull>> {
 public:
-	explicit PanelFull(ContextUI& context) : // Root only constructor
-		BasicPanel<LayoutFull>(context) { }
+	explicit PanelFull(std::string name);
+	explicit PanelFull(GenerateName_t = {}, const std::string_view type = "full");
+	explicit PanelFull(base_ptr core) noexcept;
 
-	explicit PanelFull(BaseComponent& parent) :
-		BasicPanel<LayoutFull>(parent, GenerateName, "full") { }
-
-	PanelFull(BaseComponent& parent, std::string name) :
-		BasicPanel<LayoutFull>(parent, std::move(name)) { }
-
-	PanelFull(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-		BasicPanel<LayoutFull>(parent, GenerateName, type) { }
-
-	virtual ~PanelFull() = default;
+public:
+	void add(Component component);
+	void remove(Component& component);
+	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

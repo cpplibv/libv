@@ -21,9 +21,9 @@ namespace ui {
 
 class BaseComponent;
 class ContextEvent;
+class ContextMouse;
 class ContextState;
 class Font2D;
-class ContextMouse;
 class Shader;
 class ShaderFont;
 class ShaderImage;

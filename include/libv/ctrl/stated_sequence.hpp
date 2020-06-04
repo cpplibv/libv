@@ -10,7 +10,7 @@
 #include <libv/ctrl/time_point.hpp>
 
 
-// <<< P9: cleanup state_sequence file
+// TODO P1: cleanup state_sequence file
 namespace libv {
 namespace ctrl {
 

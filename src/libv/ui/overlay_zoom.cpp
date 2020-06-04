@@ -4,11 +4,20 @@
 #include <libv/ui/overlay_zoom.lpp>
 // libv
 #include <libv/glr/attribute.hpp>
+#include <libv/glr/framebuffer.hpp>
+#include <libv/glr/mesh.hpp>
+#include <libv/glr/program.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/glr/renderbuffer.hpp>
+#include <libv/glr/texture.hpp>
+#include <libv/glr/uniform.hpp>
 // pro
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
+#include <libv/ui/context_ui.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 
@@ -68,51 +77,61 @@ void main() {
 
 // -------------------------------------------------------------------------------------------------
 
-OverlayZoom::OverlayZoom(BaseComponent& parent) :
-	BaseComponent(parent, GenerateName, "overlay-zoom") {
-	init();
-}
+class CoreOverlayZoom : public BaseComponent {
+	friend class OverlayZoom;
+	[[nodiscard]] inline auto handler() { return OverlayZoom{this}; }
 
-OverlayZoom::OverlayZoom(BaseComponent& parent, std::string name) :
-	BaseComponent(parent, std::move(name)) {
-	init();
-}
+private:
+	libv::vec2i framebufferSize_;
 
-OverlayZoom::OverlayZoom(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-	BaseComponent(parent, GenerateName, type) {
-	init();
-}
+	libv::vec2f displayPosition = {};
+	float zoom_ = 1.f;
+	bool control_ = false;
 
-OverlayZoom::~OverlayZoom() { }
+private:
+	libv::glr::Framebuffer framebuffer;
+	libv::glr::Texture2D::R8_G8_B8_A8 framebufferColor0;
+
+	libv::glr::Mesh quad{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
+	libv::glr::Program program;
+	libv::glr::Uniform_texture uniformSampler0;
+
+	libv::glr::Mesh lines_border{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
+	libv::glr::Program lineProgram;
+
+	libv::glr::Mesh lines_cursor{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
+
+public:
+	using BaseComponent::BaseComponent;
+
+public:
+	void control();
+	void view();
+	void disable();
+
+	libv::vec2f screen_BL() const;
+	libv::vec2f screen_TR() const;
+
+private:
+	void init();
+	void update();
+	void update_cursor();
+
+private:
+	virtual void onKey(const EventKey& event) override;
+	virtual void onFocus(const EventFocus& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+private:
+	virtual void doAttach() override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
+};
 
 // -------------------------------------------------------------------------------------------------
 
-void OverlayZoom::control() {
-	control_ = true;
-	context().mouse.acquire(*this);
-}
-
-void OverlayZoom::view() {
-	control_ = false;
-	context().mouse.release(*this);
-}
-
-void OverlayZoom::disable() {
-	control_ = false;
-	context().mouse.release(*this);
-}
-
-libv::vec2f OverlayZoom::screen_BL() const {
-	return displayPosition;
-}
-
-libv::vec2f OverlayZoom::screen_TR() const {
-	return displayPosition + framebufferSize_.cast<float>() / zoom_ - 1.0f;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void OverlayZoom::init() {
+void CoreOverlayZoom::init() {
 	program.vertex(quad_vs);
 	program.fragment(quad_fs);
 	program.assign(uniformSampler0, "sampler0", libv::gl::TextureChannel{0});
@@ -121,7 +140,7 @@ void OverlayZoom::init() {
 	lineProgram.fragment(line_fs);
 }
 
-void OverlayZoom::update() {
+void CoreOverlayZoom::update() {
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
 
@@ -171,7 +190,7 @@ void OverlayZoom::update() {
 	}
 }
 
-void OverlayZoom::update_cursor() {
+void CoreOverlayZoom::update_cursor() {
 	const auto mouse_position = context().state.mouse_position();
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
@@ -200,15 +219,15 @@ void OverlayZoom::update_cursor() {
 
 // -------------------------------------------------------------------------------------------------
 
-void OverlayZoom::onKey(const EventKey& event) {
+void CoreOverlayZoom::onKey(const EventKey& event) {
 	(void) event;
 }
 
-void OverlayZoom::onFocus(const EventFocus& event) {
+void CoreOverlayZoom::onFocus(const EventFocus& event) {
 	(void) event;
 }
 
-void OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
+void CoreOverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 	if (!control_)
 		return;
 
@@ -220,7 +239,7 @@ void OverlayZoom::onMouseMovement(const EventMouseMovement& event) {
 	event.stop_propagation();
 }
 
-void OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
+void CoreOverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 	if (!control_)
 		return;
 
@@ -242,13 +261,13 @@ void OverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 
 // -------------------------------------------------------------------------------------------------
 
-void OverlayZoom::doAttach() {
+void CoreOverlayZoom::doAttach() {
 	watchFocus(true);
 	watchKey(true);
 	watchMouse(Flag::watchMousePosition | Flag::watchMouseScroll);
 }
 
-void OverlayZoom::doLayout2(const ContextLayout2& environment) {
+void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {
 	framebufferSize_ = libv::vec::xy(environment.size.cast<int32_t>());
 
 	framebufferColor0 = libv::glr::Texture2D::R8_G8_B8_A8{};
@@ -259,7 +278,7 @@ void OverlayZoom::doLayout2(const ContextLayout2& environment) {
 	update();
 }
 
-void OverlayZoom::doRender(ContextRender& context) {
+void CoreOverlayZoom::doRender(ContextRender& context) {
 	auto& gl = context.gl;
 
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
@@ -295,6 +314,48 @@ void OverlayZoom::doRender(ContextRender& context) {
 		gl.program(lineProgram);
 		gl.render(lines_cursor);
 	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+OverlayZoom::OverlayZoom(std::string name) :
+	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(std::move(name)) {
+	self().init();
+}
+
+OverlayZoom::OverlayZoom(GenerateName_t gen, const std::string_view type) :
+	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(gen, type) {
+	self().init();
+}
+
+OverlayZoom::OverlayZoom(base_ptr core) noexcept :
+	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(core) {
+	self().init();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void OverlayZoom::control() {
+	self().control_ = true;
+	self().context().mouse.acquire(self());
+}
+
+void OverlayZoom::view() {
+	self().control_ = false;
+	self().context().mouse.release(self());
+}
+
+void OverlayZoom::disable() {
+	self().control_ = false;
+	self().context().mouse.release(self());
+}
+
+libv::vec2f OverlayZoom::screen_BL() const {
+	return self().displayPosition;
+}
+
+libv::vec2f OverlayZoom::screen_TR() const {
+	return self().displayPosition + self().framebufferSize_.cast<float>() / self().zoom_ - 1.0f;
 }
 
 // -------------------------------------------------------------------------------------------------

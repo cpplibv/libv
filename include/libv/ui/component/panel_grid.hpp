@@ -2,14 +2,12 @@
 
 #pragma once
 
-// std
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
 // pro
-#include <libv/ui/component/basic_panel.hpp>
-#include <libv/ui/layout/layout_grid.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/column_count.hpp>
+#include <libv/ui/property/orientation2.hpp>
 
 
 namespace libv {
@@ -17,18 +15,26 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelGrid : public BasicPanel<LayoutGrid> {
+class PanelGrid : public ComponenetHandler<class CorePanelGrid, EventHostGeneral<PanelGrid>> {
 public:
-	explicit PanelGrid(BaseComponent& parent) :
-		BasicPanel<LayoutGrid>(parent, GenerateName, "grid") { }
+	explicit PanelGrid(std::string name);
+	explicit PanelGrid(GenerateName_t = {}, const std::string_view type = "grid");
+	explicit PanelGrid(base_ptr core) noexcept;
 
-	PanelGrid(BaseComponent& parent, std::string name) :
-		BasicPanel<LayoutGrid>(parent, std::move(name)) { }
+public:
+	void anchor_content(Anchor value);
+	[[nodiscard]] Anchor anchor_content() const noexcept;
 
-	PanelGrid(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-		BasicPanel<LayoutGrid>(parent, GenerateName, type) { }
+	void column_count(ColumnCount value);
+	[[nodiscard]] ColumnCount column_count() const noexcept;
 
-	virtual ~PanelGrid() = default;
+	void orientation2(Orientation2 value);
+	[[nodiscard]] Orientation2 orientation2() const noexcept;
+
+public:
+	void add(Component component);
+	void remove(Component& component);
+	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

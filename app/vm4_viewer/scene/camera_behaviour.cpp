@@ -3,13 +3,12 @@
 // hpp
 #include <vm4_viewer/scene/camera_behaviour.hpp>
 // libv
-#include <libv/ctrl/controls.hpp> // <<< tmp binds
+#include <libv/ctrl/controls.hpp> // <<< P9: tmp for binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
 // pro
 #include <vm4_viewer/scene/camera_2.hpp>
-
-#include "vm4_viewer/log.hpp"
+//#include <vm4_viewer/log.hpp>
 
 
 namespace app {
@@ -88,7 +87,7 @@ void CameraBehaviour::bind_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.pivot_orbit", "Scroll", -0.1);
 	controls.bind("camera.pivot_orbit", "LMB + RMB + Mouse Y", -1);
 	controls.bind("camera.pivot_orbit", "LMB + RMB + Mouse X", 0);
-	// <<< P1: libv.ctrl: ^^^ Bug, if the selected dim is 0, the change in other dims are not subject to binding specialziation selection
+	// TODO P5: libv.ctrl: ^^^ Bug, if the selected dim is 0, the change in other dims are not subject to binding specialziation selection | solution will be to dont discard 0 in selection just only after gather complete
 
 	controls.bind("camera.rotate_x", "W");
 	controls.bind("camera.rotate_x", "S", -1);

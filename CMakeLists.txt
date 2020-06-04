@@ -54,20 +54,25 @@ wish_warning(
 	Clang -Wconversion
 
 	GNU -Wall
-	GNU -Wextra
-	GNU -Wpedantic
+	GNU -Warray-bounds
+	GNU -Wcast-align=strict
 	GNU -Wcast-qual
+	GNU -Wconversion
 	GNU -Wdelete-non-virtual-dtor
 	GNU -Wdouble-promotion
+	GNU -Wduplicated-branches
 	GNU -Wduplicated-cond
+	GNU -Wextra
 	GNU -Wlogical-op
+	GNU -Wmultistatement-macros
 	GNU -Wnon-virtual-dtor # Causes some false positives with efsw (suppressed)
 	GNU -Wnull-dereference # Causes some false positives with libv.ecs System.create (suppressed)
 	GNU -Wold-style-cast
+	GNU -Wpedantic
+	GNU -Wrestrict
+	GNU -Wshadow-compatible-local
 	GNU -Wsuggest-override
 	GNU -Wundef
-	GNU -Warray-bounds
-	GNU -Wconversion
 
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
@@ -78,11 +83,7 @@ wish_warning(
 	# GNU -Wsuggest-final-methods # in signal 50+ function
 	# GNU -Wsuggest-final-types # in signal 1 type
 
-	GNU VERSION_GREATER 7.0 -Wduplicated-branches
-	GNU VERSION_GREATER 7.0 -Wrestrict
-	GNU VERSION_GREATER 7.0 -Wshadow-compatible-local
-	GNU VERSION_GREATER 8.0 -Wcast-align=strict
-	GNU VERSION_GREATER 8.0 -Wmultistatement-macros
+	# GNU VERSION_GREATER 10.0 -Wxyz
 
 	# Warnings that I don't care about
 	Clang -Wno-comment
@@ -96,8 +97,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		# add_compile_options(-fsanitize=leak)
 		# add_compile_options(-fsanitize=thread)
 		# add_compile_options(-fsanitize=undefined)
-		# link_libraries(ubsan)
 		# link_libraries(asan)
+		# link_libraries(ubsan)
 	endif()
 endif()
 
@@ -106,6 +107,7 @@ endif()
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-Og)
 	add_compile_options(-ggdb3)
+#	add_compile_options(-fno-omit-frame-pointer)
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 	add_compile_options(-O3)
@@ -117,6 +119,7 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
 	add_compile_options(-O3)
+	add_definitions(-DNDEBUG)
 
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")

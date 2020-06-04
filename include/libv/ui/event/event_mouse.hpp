@@ -36,6 +36,7 @@ struct EventMouseButton : BaseEventMouse {
 struct EventMouseMovement : BaseEventMouse {
 	libv::vec2f mouse_position;
 	libv::vec2f mouse_movement;
+	//	libv::vec2f local_position;
 
 	bool enter = false;
 	bool leave = false;

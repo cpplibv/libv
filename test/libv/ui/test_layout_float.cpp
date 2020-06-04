@@ -15,24 +15,24 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutFloat> {
 	using BasicTestChild<libv::ui::LayoutFloat>::BasicTestChild;
 
 	void size(std::string_view value) {
-		components[index].ptr->set(components[index].property.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr.base().set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 
 	template <typename V>
 	void anchor_parent(V&& value) {
-		components[index].ptr->set(components[index].property.anchor_parent, std::forward<V>(value));
+		components[index].ptr.base().set(components[index].property.anchor_parent, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void anchor_target(V&& value) {
-		components[index].ptr->set(components[index].property.anchor_target, std::forward<V>(value));
+		components[index].ptr.base().set(components[index].property.anchor_target, std::forward<V>(value));
 	}
 };
 
 struct TestLayout : public BasicTestLayout<libv::ui::LayoutFloat, TestChild> {
 	template <typename V>
-	void snapToEdge(V&& value) {
-		ignore.set(property.snapToEdge, std::forward<V>(value));
+	void snap_to_edge(V&& value) {
+		ignore.set(property.snap_to_edge, std::forward<V>(value));
 	}
 
 	template <typename V>
@@ -54,15 +54,15 @@ TEST_CASE("layout float: empty", "[libv.ui.layout.float]") {
 	layout.layout2(env2);
 }
 
-TEST_CASE("layout float: snapToEdge", "[libv.ui.layout.float]") {
+TEST_CASE("layout float: snap_to_edge", "[libv.ui.layout.float]") {
 	// Not implemented yet
 
 	//	TestLayout layout;
 	//	libv::ui::ContextLayout1 env1;
 	//	libv::ui::ContextLayout2 env2(libv::vec3f(0, 0, 0), libv::vec3f(400, 300, 0));
 	//
-	//	layout.snapToEdge(false);
-	//	layout.snapToEdge(true);
+	//	layout.snap_to_edge(false);
+	//	layout.snap_to_edge(true);
 	//
 	//	CHECK(layout.layout1(env1) == Size(0, 0, 0));
 	//	layout.layout2(env2);

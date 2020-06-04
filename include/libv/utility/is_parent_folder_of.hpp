@@ -16,7 +16,7 @@ namespace libv {
 /// @param path - The path that is expected to be within the \c parent folder. Expected to be in canonical form
 /// @return
 ///
-inline bool is_parent_folder_of(const std::filesystem::path& parent, const std::filesystem::path& path) {
+[[nodiscard]] inline bool is_parent_folder_of(const std::filesystem::path& parent, const std::filesystem::path& path) {
 	if (std::distance(parent.begin(), parent.end()) > std::distance(path.begin(), path.end()))
 		return false;
 

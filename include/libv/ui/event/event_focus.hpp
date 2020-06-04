@@ -2,15 +2,22 @@
 
 #pragma once
 
+// pro
+#include <libv/ui/event/base_event.hpp>
+
 
 namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct EventFocus {
+struct EventFocus : BaseEvent {
 	bool focus = false;
 
+public:
+	constexpr inline EventFocus(bool focus) noexcept : focus(focus) { }
+
+public:
 	[[nodiscard]] constexpr inline bool gain() const noexcept {
 		return focus;
 	}

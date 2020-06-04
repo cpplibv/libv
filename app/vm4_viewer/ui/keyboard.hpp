@@ -17,6 +17,8 @@
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/angle.hpp>
+#include <libv/math/bezier.hpp>
+#include <libv/math/bezier_curve.hpp>
 // pro
 #include <vm4_viewer/attribute.hpp>
 #include <vm4_viewer/log.hpp>
@@ -27,6 +29,80 @@ namespace app {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
+
+//float sign(fPoint p1, fPoint p2, fPoint p3) {
+//	return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+//}
+//
+//bool PointInTriangle(fPoint pt, fPoint v1, fPoint v2, fPoint v3) {
+//	float d1, d2, d3;
+//	bool has_neg, has_pos;
+//
+//	d1 = sign(pt, v1, v2);
+//	d2 = sign(pt, v2, v3);
+//	d3 = sign(pt, v3, v1);
+//
+//	has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+//	has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+//
+//	return !(has_neg && has_pos);
+//}
+
+//std::vector<libv::vec2f> buildPolygon(libv::math::BezierCurve outline) {
+
+//std::vector<libv::vec2f> triangulate_outline(std::vector<libv::vec2f> outline) {
+//	using vec = libv::vec2f;
+//
+//	std::vector<vec> vertices;
+//
+//	size_t last = 0;
+//	for (size_t i = 0; i < outline.size(); ++i) {
+//		if (is_curviture_negative)
+//			continue;
+//
+//		if (other_vertex_inside_the_triangle)
+//			continue;
+//
+//		remove_middle();
+//		last++;
+//		pack_based_on_removed();
+//
+////		outline
+//
+//		vertices.emplace_back(outline[i + 0]);
+//		vertices.emplace_back(outline[i + 1]);
+//		vertices.emplace_back(outline[i + 2]);
+//	}
+//
+//	return vertices;
+//}
+//
+//void buildPolygon() {
+//	using vec = libv::vec2f;
+//	std::vector<vec> vertices;
+//
+//	const auto linear = [&](vec p0, vec p1) {
+//		vertices.emplace_back(p0);
+//		vertices.emplace_back(p1);
+//	};
+//
+//	const auto bezier = [&](vec p0, vec p1, vec p2, vec p3, size_t n) {
+//		const auto nf = 1.0f / static_cast<float>(n);
+//
+//		vertices.emplace_back(p0);
+//		for (size_t i = 1; i < n - 1; ++i) {
+//			const auto if_ = static_cast<float>(i);
+//			const auto t = nf * if_;
+//			vertices.emplace_back(libv::math::bezierCurvePoint(p0, p1, p2, p3, t));
+//		}
+//		vertices.emplace_back(p3);
+//	};
+//
+//
+//	linear({0, 0}, {1, 0});
+//	linear({1, 1}, {0, 1});
+//	bezier({0, 0}, {0, 1}, {1, 1}, {1, 0});
+//}
 
 struct Button {
 	libv::ctrl::InputID input;

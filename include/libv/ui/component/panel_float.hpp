@@ -2,14 +2,11 @@
 
 #pragma once
 
-// std
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
 // pro
-#include <libv/ui/component/basic_panel.hpp>
-#include <libv/ui/layout/layout_float.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/snap_to_edge.hpp>
+#include <libv/ui/property/squish.hpp>
 
 
 namespace libv {
@@ -17,18 +14,23 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFloat : public BasicPanel<LayoutFloat> {
+class PanelFloat : public ComponenetHandler<class CorePanelFloat, EventHostGeneral<PanelFloat>> {
 public:
-	explicit PanelFloat(BaseComponent& parent) :
-		BasicPanel<LayoutFloat>(parent, GenerateName, "float") { }
+	explicit PanelFloat(std::string name);
+	explicit PanelFloat(GenerateName_t = {}, const std::string_view type = "float");
+	explicit PanelFloat(base_ptr core) noexcept;
 
-	PanelFloat(BaseComponent& parent, std::string name) :
-		BasicPanel<LayoutFloat>(parent, std::move(name)) { }
+public:
+	void snap_to_edge(SnapToEdge value);
+	[[nodiscard]] SnapToEdge snap_to_edge() const noexcept;
 
-	PanelFloat(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-		BasicPanel<LayoutFloat>(parent, GenerateName, type) { }
+	void squish(Squish value);
+	[[nodiscard]] Squish squish() const noexcept;
 
-	virtual ~PanelFloat() = default;
+public:
+	void add(Component component);
+	void remove(Component& component);
+	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

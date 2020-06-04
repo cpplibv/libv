@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/component/scroll_bar.hpp>
 // libv
+#include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/math/snap.hpp>
@@ -20,7 +21,7 @@
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
@@ -31,8 +32,78 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+class CoreScrollBar : public BaseComponent {
+	friend class ScrollBar;
+	[[nodiscard]] inline auto handler() { return ScrollBar{this}; }
+
+private:
+	template <typename T> static void access_properties(T& ctx);
+
+private:
+	enum class DragMode : uint8_t {
+		idle,
+		track,
+		bar,
+	};
+
+	struct Properties {
+		PropertyR<Color> bar_color;
+		PropertyL<Texture2D_view> bar_image;
+		PropertyR<ShaderImage_view> bar_shader;
+
+		PropertyR<Color> bg_color;
+		PropertyL<Texture2D_view> bg_image;
+		PropertyR<ShaderImage_view> bg_shader;
+
+		PropertyL<Orientation> orientation;
+	} property;
+
+private:
+	libv::glr::Mesh bar_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+
+private:
+	double value_ = 0.0;
+	double value_max_ = 100.0;
+	double value_min_ = 0.0;
+	double value_range_ = 10.0;
+	double value_step_ = 0.0;
+
+private:
+	libv::vec2f drag_point;
+	DragMode drag_mode = DragMode::idle;
+
+//	double scroll_step_button;
+//	double scroll_step_scroll;
+//	double scroll_step_track;
+//	double scroll_hold_button;
+//	double scroll_hold_scroll;
+//	double scroll_hold_track;
+
+public:
+	using BaseComponent::BaseComponent;
+
+private:
+//	inline auto bar_size() const noexcept;
+	inline auto bar_bounds() const noexcept;
+
+private:
+	virtual void onMouseButton(const EventMouseButton& event) override;
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+private:
+	virtual void doAttach() override;
+	virtual void doStyle(ContextStyle& ctx) override;
+	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
+	virtual void doRender(ContextRender& context) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
 template <typename T>
-void ScrollBar::access_properties(T& ctx) {
+void CoreScrollBar::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.bar_color; },
 			Color(1, 1, 1, 1),
@@ -79,32 +150,32 @@ void ScrollBar::access_properties(T& ctx) {
 	);
 
 	ctx.synthetize(
-			[](auto& c, auto v) { c.value(std::move(v)); },
-			[](const auto& c) { return c.value(); },
+			[](auto& c, auto v) { c.handler().value(std::move(v)); },
+			[](const auto& c) { return c.handler().value(); },
 			pgr::behaviour, pnm::value,
 			"Current value"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.value_min(std::move(v)); },
-			[](const auto& c) { return c.value_min(); },
+			[](auto& c, auto v) { c.handler().value_min(std::move(v)); },
+			[](const auto& c) { return c.handler().value_min(); },
 			pgr::behaviour, pnm::value_min,
 			"Minimum value"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.value_max(std::move(v)); },
-			[](const auto& c) { return c.value_max(); },
+			[](auto& c, auto v) { c.handler().value_max(std::move(v)); },
+			[](const auto& c) { return c.handler().value_max(); },
 			pgr::behaviour, pnm::value_max,
 			"Maximum value"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.value_range(std::move(v)); },
-			[](const auto& c) { return c.value_range(); },
+			[](auto& c, auto v) { c.handler().value_range(std::move(v)); },
+			[](const auto& c) { return c.handler().value_range(); },
 			pgr::behaviour, pnm::value_range,
 			"Value range covered by the scroll bar"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.value_step(std::move(v)); },
-			[](const auto& c) { return c.value_step(); },
+			[](auto& c, auto v) { c.handler().value_step(std::move(v)); },
+			[](const auto& c) { return c.handler().value_step(); },
 			pgr::behaviour, pnm::value_step,
 			"Value step"
 	);
@@ -132,125 +203,7 @@ static constexpr OrientationData OrientationTable[] = {
 
 // -------------------------------------------------------------------------------------------------
 
-ScrollBar::ScrollBar(BaseComponent& parent) :
-	BaseComponent(parent, GenerateName, "scroll-bar") { }
-
-ScrollBar::ScrollBar(BaseComponent& parent, std::string name) :
-	BaseComponent(parent, std::move(name)) { }
-
-ScrollBar::ScrollBar(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-	BaseComponent(parent, GenerateName, type) { }
-
-ScrollBar::~ScrollBar() { }
-
-//void ScrollBar::init() noexcept {
-//	scroll_step_button = context().settings.scroll_step_button;
-//	scroll_step_scroll = context().settings.scroll_step_scroll;
-//	scroll_step_track = context().settings.scroll_step_track;
-//	scroll_hold_button = context().settings.scroll_hold_button;
-//	scroll_hold_scroll = context().settings.scroll_hold_scroll;
-//	scroll_hold_track = context().settings.scroll_hold_track;
-//}
-
-// -------------------------------------------------------------------------------------------------
-
-void ScrollBar::value(double var) {
-	if (!libv::math::check_interval(var, value_min_, value_max_))
-		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", var, value_min_, value_max_, path());
-
-	var = libv::math::snap_interval(var, value_step_, value_min_, value_max_);
-
-	const auto change = var - value_;
-	value_ = var;
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	fire(EChange{*this, change});
-}
-double ScrollBar::value() const noexcept {
-	return value_;
-}
-
-void ScrollBar::value_int(int64_t value_) {
-	value(static_cast<double>(value_));
-}
-[[nodiscard]] int64_t ScrollBar::value_int() const noexcept {
-	return std::llround(value());
-}
-
-void ScrollBar::value_max(double var) {
-	value_max_ = var;
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-
-	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
-		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
-		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
-		const auto change = new_value - value_;
-		value_ = new_value;
-		fire(EChange{*this, change});
-	}
-}
-double ScrollBar::value_max() const noexcept {
-	return value_max_;
-}
-
-void ScrollBar::value_min(double var) {
-	value_min_ = var;
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-
-	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
-		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
-		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
-		const auto change = new_value - value_;
-		value_ = new_value;
-		fire(EChange{*this, change});
-	}
-}
-double ScrollBar::value_min() const noexcept {
-	return value_min_;
-}
-
-void ScrollBar::value_range(double var) {
-	if (var < 0) {
-		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", value_, path());
-		var = std::abs(var);
-	}
-
-	value_range_ = var;
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-}
-double ScrollBar::value_range() const noexcept {
-	return value_range_;
-}
-
-void ScrollBar::value_step(double var) {
-	value_step_ = var;
-	value(value_);
-}
-double ScrollBar::value_step() const noexcept {
-	return value_step_;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void ScrollBar::make_step(double amount) noexcept {
-	// WONT FIX: make_step can overstep the nearest value if the amount is big enough
-	//		most noticeable on min/max values that are not aligned to step and current value is min/max.
-	//		Fixing this rounding behaviour would result in more oddities that it would solve
-	const auto step = libv::float_equal(value_step_, 0.0) ? 1.0 : value_step_;
-
-	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_min_, value_max_);
-	const auto change = new_value - value_;
-	value_ = new_value;
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	fire(EChange{*this, change});
-}
-
-void ScrollBar::make_scroll(double amount) noexcept {
-	make_step(amount);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-inline auto ScrollBar::bar_bounds() const noexcept {
+inline auto CoreScrollBar::bar_bounds() const noexcept {
 	//
 	//                    Orientation::BOTTOM_TO_TOP
 	//          value == value_min             value == value_max
@@ -313,7 +266,7 @@ inline auto ScrollBar::bar_bounds() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollBar::onMouseButton(const EventMouseButton& event) {
+void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
 		const auto bar = bar_bounds();
@@ -335,7 +288,7 @@ void ScrollBar::onMouseButton(const EventMouseButton& event) {
 						size2()[orient.dim_control] - bar.size[orient.dim_control],
 						orient.control_inverted ? value_max_ : value_min_,
 						orient.control_inverted ? value_min_ : value_max_);
-			value(local_value);
+			handler().value(local_value);
 		}
 
 		context().mouse.acquire(*this);
@@ -356,7 +309,7 @@ void ScrollBar::onMouseButton(const EventMouseButton& event) {
 	// === TEMP ========================================================================================
 }
 
-void ScrollBar::onMouseMovement(const EventMouseMovement& event) {
+void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter) {
 		set(property.bg_color, property.bg_color() + 0.2f);
 		set(property.bar_color, property.bar_color() + 0.2f);
@@ -383,7 +336,7 @@ void ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 		const auto side_a = local_mouse[orient.dim_control] < size2()[orient.dim_control] * 0.5f;
 		const auto toward_min = side_a == orient.control_inverted;
 		const auto local_value = toward_min ? value_min_ : value_max_;
-		value(local_value);
+		handler().value(local_value);
 		return event.stop_propagation();
 	}
 
@@ -398,33 +351,33 @@ void ScrollBar::onMouseMovement(const EventMouseMovement& event) {
 			orient.control_inverted ? value_max_ : value_min_,
 			orient.control_inverted ? value_min_ : value_max_);
 
-	value(local_value);
+	handler().value(local_value);
 	event.stop_propagation();
 }
 
-void ScrollBar::onMouseScroll(const EventMouseScroll& event) {
+void CoreScrollBar::onMouseScroll(const EventMouseScroll& event) {
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
 	const auto movement = static_cast<double>(event.scroll_movement.y * orient.control_direction);
 	const auto inverse_interval = value_min_ < value_max_ ? 1.0 : -1.0;
-	make_scroll(movement * inverse_interval);
+	handler().make_scroll(movement * inverse_interval);
 
 	event.stop_propagation();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollBar::doAttach() {
+void CoreScrollBar::doAttach() {
 	drag_mode = DragMode::idle;
 
 	watchMouse(Flag::mask_watchMouse);
 }
 
-void ScrollBar::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<ScrollBar> setter{*this, ctx.component, ctx.style, context()};
+void CoreScrollBar::doStyle(ContextStyle& ctx) {
+	PropertyAccessContext<CoreScrollBar> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 
-void ScrollBar::doLayout1(const ContextLayout1& environment) {
+void CoreScrollBar::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	const auto bar = property.bar_image()->size().cast<float>();
@@ -433,7 +386,7 @@ void ScrollBar::doLayout1(const ContextLayout1& environment) {
 	AccessLayout::lastDynamic(*this) = {libv::vec::max(bar, bg), 0.f};
 }
 
-void ScrollBar::doLayout2(const ContextLayout2& environment) {
+void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
 
 	{
@@ -478,7 +431,7 @@ void ScrollBar::doLayout2(const ContextLayout2& environment) {
 	}
 }
 
-void ScrollBar::doRender(ContextRender& ctx) {
+void CoreScrollBar::doRender(ContextRender& ctx) {
 	const auto guard_m = ctx.gl.model.push_guard();
  	ctx.gl.model.translate(position());
 
@@ -495,6 +448,173 @@ void ScrollBar::doRender(ContextRender& ctx) {
 		ctx.gl.uniform(property.bar_shader()->uniform_MVPmat, ctx.gl.mvp());
 		ctx.gl.render(bar_mesh);
 	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+ScrollBar::ScrollBar(std::string name) :
+	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
+
+ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
+	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
+
+ScrollBar::ScrollBar(base_ptr core) noexcept :
+	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollBar::value(double var) {
+	if (!libv::math::check_interval(var, self().value_min_, self().value_max_))
+		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", var, self().value_min_, self().value_max_, path());
+
+	var = libv::math::snap_interval(var, self().value_step_, self().value_min_, self().value_max_);
+
+	const auto change = var - self().value_;
+	self().value_ = var;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().fire(EventScrollChange{change});
+}
+double ScrollBar::value() const noexcept {
+	return self().value_;
+}
+
+void ScrollBar::value_int(int64_t value_) {
+	value(static_cast<double>(value_));
+}
+int64_t ScrollBar::value_int() const noexcept {
+	return std::llround(value());
+}
+
+void ScrollBar::value_max(double var) {
+	self().value_max_ = var;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+
+	if (!libv::math::check_interval(self().value_, self().value_min_, self().value_max_)) {
+		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, self().value_, self().value_min_, self().value_max_, path());
+		const auto new_value = libv::math::clamp_interval(self().value_, self().value_min_, self().value_max_);
+		const auto change = new_value - self().value_;
+		self().value_ = new_value;
+		self().fire(EventScrollChange{change});
+	}
+}
+double ScrollBar::value_max() const noexcept {
+	return self().value_max_;
+}
+
+void ScrollBar::value_min(double var) {
+	self().value_min_ = var;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+
+	if (!libv::math::check_interval(self().value_, self().value_min_, self().value_max_)) {
+		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, self().value_, self().value_min_, self().value_max_, path());
+		const auto new_value = libv::math::clamp_interval(self().value_, self().value_min_, self().value_max_);
+		const auto change = new_value - self().value_;
+		self().value_ = new_value;
+		self().fire(EventScrollChange{change});
+	}
+}
+double ScrollBar::value_min() const noexcept {
+	return self().value_min_;
+}
+
+void ScrollBar::value_range(double var) {
+	if (var < 0) {
+		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", self().value_, path());
+		var = std::abs(var);
+	}
+
+	self().value_range_ = var;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+double ScrollBar::value_range() const noexcept {
+	return self().value_range_;
+}
+
+void ScrollBar::value_step(double var) {
+	self().value_step_ = var;
+	value(self().value_);
+}
+double ScrollBar::value_step() const noexcept {
+	return self().value_step_;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollBar::make_step(double amount) noexcept {
+	// WONT FIX: make_step can overstep the nearest value if the amount is big enough
+	//		most noticeable on min/max values that are not aligned to step and current value is min/max.
+	//		Fixing this rounding behaviour would result in more oddities than what it would solve
+	const auto step = libv::float_equal(self().value_step_, 0.0) ? 1.0 : self().value_step_;
+
+	const auto new_value = libv::math::snap_interval(self().value_ + amount * step, self().value_step_, self().value_min_, self().value_max_);
+	const auto change = new_value - self().value_;
+	self().value_ = new_value;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().fire(EventScrollChange{change});
+}
+
+void ScrollBar::make_scroll(double amount) noexcept {
+	make_step(amount);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollBar::bar_color(Color value) {
+	AccessProperty::manual(self(), self().property.bar_color, value);
+}
+
+const Color& ScrollBar::bar_color() const noexcept {
+	return self().property.bar_color();
+}
+
+void ScrollBar::bar_image(Texture2D_view value) {
+	AccessProperty::manual(self(), self().property.bar_image, std::move(value));
+}
+
+const Texture2D_view& ScrollBar::bar_image() const noexcept {
+	return self().property.bar_image();
+}
+
+void ScrollBar::bar_shader(ShaderImage_view value) {
+	AccessProperty::manual(self(), self().property.bar_shader, std::move(value));
+}
+
+const ShaderImage_view& ScrollBar::bar_shader() const noexcept {
+	return self().property.bar_shader();
+}
+
+void ScrollBar::color(Color value) {
+	AccessProperty::manual(self(), self().property.bg_color, value);
+}
+
+const Color& ScrollBar::color() const noexcept {
+	return self().property.bg_color();
+}
+
+void ScrollBar::image(Texture2D_view value) {
+	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
+}
+
+const Texture2D_view& ScrollBar::image() const noexcept {
+	return self().property.bg_image();
+}
+
+void ScrollBar::shader(ShaderImage_view value) {
+	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
+}
+
+const ShaderImage_view& ScrollBar::shader() const noexcept {
+	return self().property.bg_shader();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollBar::orientation(Orientation value) {
+	AccessProperty::manual(self(), self().property.orientation, value);
+}
+
+Orientation ScrollBar::orientation() const noexcept {
+	return self().property.orientation();
 }
 
 // -------------------------------------------------------------------------------------------------

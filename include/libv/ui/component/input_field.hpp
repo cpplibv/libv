@@ -2,18 +2,15 @@
 
 #pragma once
 
-// libv
-#include <libv/glr/mesh.hpp>
-// std
-#include <string>
-#include <string_view>
 // pro
-#include <libv/ui/base_component.hpp>
-#include <libv/ui/chrono.hpp>
-#include <libv/ui/context_event.hpp>
-#include <libv/ui/context_ui.hpp>
-#include <libv/ui/property.hpp>
-#include <libv/ui/string_2D.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/align.hpp>
+#include <libv/ui/property/color.hpp>
+#include <libv/ui/property/font_2D.hpp>
+#include <libv/ui/property/font_size.hpp>
+#include <libv/ui/property/shader_image.hpp>
+#include <libv/ui/property/texture_2D.hpp>
 
 
 namespace libv {
@@ -21,20 +18,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class InputField : public BaseComponent {
-public:
-	enum class FocusSelectPolicy {
-		// TODO P5: Implement FocusSelectPolicy
-		caretAtEnd = 0,
-		caretAtBeginning,
-		caretAtHistory,
-		selectAll,
-	};
+enum class FocusSelectPolicy {
+	// TODO P5: Implement FocusSelectPolicy
+	caretAtEnd = 0,
+//		caretBeforeLastDot,
+	caretAtBeginning,
+	caretAtHistory,
+	selectAll,
+};
 
-public:
-	struct EventChange {
-		InputField& component;
-
+struct EventChange : BaseEvent {
 //		enum class Change : bool {
 //			insert = true,
 //			remove = false,
@@ -44,104 +37,68 @@ public:
 //		int32_t caret;
 //		Change change;
 //		// Change type: insert/push_back/remove/pop_back | Kind of important, could be used for optimization
-	};
-	struct EventCaret {
-		InputField& component;
-	};
-	struct EventSelect {
-		InputField& component;
-	};
-	struct EventSubmit {
-		InputField& component;
-	};
+};
 
-private:
-	template <typename T>
-	static void access_properties(T& ctx);
-//	static ComponentPropertyDescription description;
+struct EventCaret : BaseEvent {
+};
 
-	struct Properties {
-		PropertyB<FocusSelectPolicy> focus_select_policy;
+struct EventSelect : BaseEvent {
+};
 
-		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
+template <typename ComponentT>
+struct EventHostEditable : EventHostSubmitable<ComponentT> {
+	BasicEventProxy<ComponentT, EventCaret> caret;
+	BasicEventProxy<ComponentT, EventChange> change;
+	BasicEventProxy<ComponentT, EventSelect> select;
 
-		PropertyR<Color> caret_color;
-		PropertyR<ShaderQuad_view> caret_shader;
+	EventHostEditable(ComponentT& core) : EventHostSubmitable<ComponentT>(core),
+		caret(core),
+		change(core),
+		select(core) {}
+};
 
-		PropertyR<Color> font_color;
-		PropertyR<ShaderFont_view> font_shader;
+// -------------------------------------------------------------------------------------------------
 
-		PropertyL<> align_horizontal;
-		PropertyL<> font;
-		PropertyL<> font_size;
-	} property;
-
-private:
-	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh caret_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	String2D text_;
-
-private:
-	time_point caretStartTime;
-	libv::vec2f caretPosition;
-	uint32_t caret = 0; /// 0 = Before the first character, n = Before the nth character, length() = After the last character
+class InputField : public ComponenetHandler<class CoreInputField, EventHostEditable<InputField>> {
+public:
+	explicit InputField(std::string name);
+	explicit InputField(GenerateName_t = {}, const std::string_view type = "input-field");
+	explicit InputField(base_ptr core) noexcept;
 
 public:
-	explicit InputField(BaseComponent& parent);
-	InputField(BaseComponent& parent, std::string name);
-	InputField(BaseComponent& parent, GenerateName_t, const std::string_view type);
-	~InputField();
+	void color(Color value);
+	[[nodiscard]] const Color& color() const noexcept;
+
+	void image(Texture2D_view value);
+	[[nodiscard]] const Texture2D_view& image() const noexcept;
+
+	void shader(ShaderImage_view value);
+	[[nodiscard]] const ShaderImage_view& shader() const noexcept;
 
 public:
-	void align_horizontal(AlignHorizontal value, PropertyDriver driver = PropertyDriver::manual);
-	AlignHorizontal align_horizontal() const noexcept;
+	void align_horizontal(AlignHorizontal value);
+	[[nodiscard]] AlignHorizontal align_horizontal() const noexcept;
 
-	void font(Font2D_view value, PropertyDriver driver = PropertyDriver::manual);
-	const Font2D_view& font() const noexcept;
+	void align_vertical(AlignVertical value);
+	[[nodiscard]] AlignVertical align_vertical() const noexcept;
 
-	void font_size(FontSize value, PropertyDriver driver = PropertyDriver::manual);
-	FontSize font_size() const noexcept;
+	void font(Font2D_view value);
+	[[nodiscard]] const Font2D_view& font() const noexcept;
 
+	void font_size(FontSize value);
+	[[nodiscard]] FontSize font_size() const noexcept;
+
+public:
 	void text(std::string value);
-	const std::string& text() const noexcept;
+	[[nodiscard]] const std::string& text() const noexcept;
 
-public:
-	template <typename F>
-	inline void event_change(libv::observer_ptr<BaseComponent> slot, F&& func) {
-		connect<EventChange>(slot, std::forward<F>(func));
-	}
+	/// 0 = Before the first character, n = Before the nth character, length() = After the last character
+	void caret(uint32_t value);
+	/// 0 = Before the first character, n = Before the nth character, length() = After the last character
+	[[nodiscard]] uint32_t caret() const noexcept;
 
-	template <typename F>
-	inline void event_caret(libv::observer_ptr<BaseComponent> slot, F&& func) {
-		connect<EventCaret>(slot, std::forward<F>(func));
-	}
-
-	template <typename F>
-	inline void event_select(libv::observer_ptr<BaseComponent> slot, F&& func) {
-		connect<EventSelect>(slot, std::forward<F>(func));
-	}
-
-	template <typename F>
-	inline void event_submit(libv::observer_ptr<BaseComponent> slot, F&& func) {
-		connect<EventSubmit>(slot, std::forward<F>(func));
-	}
-
-private:
-	virtual void onChar(const EventChar& event) override;
-	virtual void onKey(const EventKey& event) override;
-	virtual void onFocus(const EventFocus& event) override;
-	virtual void onMouseButton(const EventMouseButton& event) override;
-	virtual void onMouseMovement(const EventMouseMovement& event) override;
-	virtual void onMouseScroll(const EventMouseScroll& event) override;
-
-private:
-	virtual void doAttach() override;
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
-	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	void focus_select_policy(FocusSelectPolicy value);
+	[[nodiscard]] FocusSelectPolicy focus_select_policy() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

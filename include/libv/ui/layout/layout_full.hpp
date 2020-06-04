@@ -5,9 +5,9 @@
 // libv
 #include <libv/math/vec.hpp>
 // std
-#include <memory>
 #include <span>
 // pro
+#include <libv/ui/component.hpp>
 #include <libv/ui/property.hpp>
 
 
@@ -16,15 +16,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
 class ContextLayout1;
 class ContextLayout2;
 class ContextStyle;
 
 struct LayoutFull {
-public:
-	using ptr_type = std::shared_ptr<BaseComponent>;
-
 public:
 	struct Properties {
 	};
@@ -44,9 +40,9 @@ public:
 public:
 	struct Child {
 		ChildProperties property;
-		ptr_type ptr;
+		Component ptr;
 
-		Child(ptr_type ptr) : ptr(std::move(ptr)) {}
+		Child(Component ptr) : ptr(std::move(ptr)) {}
 	};
 
 public:

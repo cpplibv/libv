@@ -16,6 +16,7 @@
 #include <variant>
 #include <vector>
 // pro
+#include <libv/ui/base_component.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context_focus_travers.hpp>
@@ -24,6 +25,7 @@
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_state.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/overlay_zoom.lpp>
@@ -31,18 +33,6 @@
 
 namespace libv {
 namespace ui {
-
-// -------------------------------------------------------------------------------------------------
-
-class Root : public PanelFull {
-public:
-	Root(ContextUI& context) : PanelFull(context) {}
-
-	void setSize(libv::vec3f size_) {
-		AccessRoot::size(*this) = size_;
-		flagAuto(Flag::pendingLayout);
-	}
-};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -73,19 +63,39 @@ struct Histogram {
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
+using Root = PanelFull;
+
+//class Root : public PanelFull {
+//public:
+//	using PanelFull::PanelFull;
+//
+//public:
+//	void setSize(libv::vec3f size_) {
+//		AccessRoot::size(base()) = size_;
+//		AccessRoot::flagAuto(base(), Flag::pendingLayout);
+//	}
+//};
+
+// -------------------------------------------------------------------------------------------------
+
 class ImplUI {
 	struct Stat {
-		Histogram<100> attach1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> event{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> attach2{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> styleScan{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> style{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> layout1{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> layout2{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> render{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
-		Histogram<100> detach{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		static constexpr std::chrono::microseconds t_min{0};
+		static constexpr std::chrono::milliseconds t_max{1};
 
-		Histogram<100> frame{std::chrono::microseconds{0}, std::chrono::milliseconds{1}};
+		Histogram<100> attach1{t_min, t_max};
+		Histogram<100> event{t_min, t_max};
+		Histogram<100> attach2{t_min, t_max};
+		Histogram<100> styleScan{t_min, t_max};
+		Histogram<100> style{t_min, t_max};
+		Histogram<100> layout1{t_min, t_max};
+		Histogram<100> layout2{t_min, t_max};
+		Histogram<100> render{t_min, t_max};
+		Histogram<100> detach{t_min, t_max};
+
+		Histogram<100> frame{t_min, t_max};
 
 		friend std::ostream& operator<<(std::ostream& os, const Stat& var) {
 			os << "attach1:   " << var.attach1;
@@ -105,7 +115,7 @@ class ImplUI {
 	};
 
 public:
-	using UIEvent = std::variant<
+	using EventVariant = std::variant<
 			libv::input::EventChar,
 			libv::input::EventKey,
 			libv::input::EventMouseButton,
@@ -117,23 +127,19 @@ public:
 public:
 	ContextState context_state;
 	ContextUI context;
-	Root root{context};
+	Root root;
 
 	Stat stat;
 	libv::Timer timer;
 	libv::Timer timerFrame;
 
-	std::vector<UIEvent> event_queue;
+	std::vector<EventVariant> event_queue;
 	std::mutex mutex;
 
 public:
-	enum class OverlayZoomMode {
-		disabled,
-		control,
-		view,
-	};
 	OverlayZoomMode overlayZoomMode = OverlayZoomMode::disabled;
-	std::shared_ptr<OverlayZoom> overlayZoom = std::make_shared<OverlayZoom>(root);
+	OverlayZoom overlayZoom;
+	// TODO P1: make sure zoom is px aligned and the lines are pixel perfect
 
 //	bool overlayCursorEnable = false;
 //	std::shared_ptr<OverlayCursor> overlayCursor = std::make_shared<OverlayCursor>(root);
@@ -143,10 +149,12 @@ public:
 
 public:
 	ImplUI(UI& ui) :
-		context(ui, context_state) { }
+		context(ui, context_state),
+		root((current_thread_context(context), "")) { }
 
 	ImplUI(UI& ui, const Settings& settings) :
-		context(ui, context_state, settings) { }
+		context(ui, context_state, settings),
+		root((current_thread_context(context), "")) { }
 
 public:
 	void focus(libv::observer_ptr<BaseComponent> old_focus, libv::observer_ptr<BaseComponent> new_focus) {
@@ -173,11 +181,11 @@ public:
 
 		libv::observer_ptr<BaseComponent> new_focus = nullptr;
 
-		if (old_focus != nullptr)
+		if (old_focus != nullptr) // Traverse to next
 			new_focus = AccessRoot::focusTravers(*old_focus, ctx);
 
-		if (new_focus == nullptr)
-			new_focus = AccessRoot::focusTravers(root, ctx);
+		if (new_focus == nullptr) // End reached, Loop around
+			new_focus = AccessRoot::focusTravers(root.base(), ctx);
 
 		focus(old_focus, new_focus);
 		return new_focus;
@@ -201,17 +209,17 @@ public:
 				log_ui.info("Switch overlay mode: {} to {}", "zoom", "control");
 				overlayZoomMode = OverlayZoomMode::control;
 				root.add(overlayZoom);
-				overlayZoom->control();
+				overlayZoom.control();
 
 			} else if (overlayZoomMode == OverlayZoomMode::control) {
 				log_ui.info("Switch overlay mode: {} to {}", "zoom", "view");
 				overlayZoomMode = OverlayZoomMode::view;
-				overlayZoom->view();
+				overlayZoom.view();
 
 			} else if (overlayZoomMode == OverlayZoomMode::view) {
 				log_ui.info("Switch overlay mode: {} to {}", "zoom", "disabled");
 				overlayZoomMode = OverlayZoomMode::disabled;
-				overlayZoom->disable();
+				overlayZoom.disable();
 				root.remove(overlayZoom);
 			}
 		}
@@ -262,7 +270,7 @@ public:
 
 		if (overlayZoomMode == OverlayZoomMode::view)
 			// Floor is used as mouse position are in pixel center coordinates
-			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.size2(), overlayZoom->screen_BL(), overlayZoom->screen_TR() + 1.0f));
+			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.size2(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
 
 		context.mouse.event_position(position);
 		context_state.mouse_position_ = position;
@@ -279,25 +287,26 @@ public:
 
 UI::UI() {
 	self = std::make_unique<ImplUI>(*this);
+	current_thread_context(context());
 }
 
 UI::UI(const Settings& settings) {
 	self = std::make_unique<ImplUI>(*this, settings);
+	current_thread_context(context());
 }
 
 UI::~UI() {
+	clear_current_thread_context();
 }
 
-void UI::add(std::shared_ptr<BaseComponent> component) {
+void UI::add(Component component) {
 	self->root.add(std::move(component));
 }
 
 void UI::setSize(libv::vec2i size_) noexcept {
-	self->root.setSize({libv::vec::cast<float>(size_), 0});
-}
-
-BaseComponent& UI::root() const noexcept {
-	return self->root;
+	std::unique_lock lock{self->mutex};
+	AccessRoot::size(self->root.base()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
+	AccessRoot::flagAuto(self->root.base(), Flag::pendingLayout);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -345,6 +354,8 @@ ContextState& UI::state() {
 // -------------------------------------------------------------------------------------------------
 
 void UI::update(libv::glr::Queue& gl) {
+	current_thread_context(context());
+
 	self->timer.reset();
 	self->timerFrame.reset();
 
@@ -356,7 +367,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Attach ---
 	try {
-		AccessRoot::attach(self->root, self->root);
+		AccessRoot::attach(self->root.base(), self->root.base());
 		self->stat.attach1.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
@@ -385,34 +396,34 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Attach ---
 	try {
-		AccessRoot::attach(self->root, self->root);
+		AccessRoot::attach(self->root.base(), self->root.base());
 		self->stat.attach2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
 	}
 
-	// --- Update ---
-	try {
-		//AccessRoot::update(self->root);
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during update in UI: {}", ex.what());
-	}
-
-	// --- Attach ---
-	try {
-		//AccessRoot::attach(self->root, self->root);
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
-	}
+//	// --- Update ---
+//	try {
+//		//AccessRoot::update(self->root);
+//	} catch (const std::exception& ex) {
+//		log_ui.error("Exception occurred during update in UI: {}", ex.what());
+//	}
+//
+//	// --- Attach ---
+//	try {
+//		//AccessRoot::attach(self->root, self->root);
+//	} catch (const std::exception& ex) {
+//		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
+//	}
 
 	// --- Style ---
 	try {
 		if (self->context.isAnyStyleDirty()) {
-			AccessRoot::styleScan(self->root);
+			AccessRoot::styleScan(self->root.base());
 			self->context.clearEveryStyleDirty();
 			self->stat.styleScan.sample(self->timer.time_ns());
 		} else {
-			AccessRoot::style(self->root);
+			AccessRoot::style(self->root.base());
 			self->stat.style.sample(self->timer.time_ns());
 		}
 	} catch (const std::exception& ex) {
@@ -421,9 +432,9 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Layout ---
 	try {
-		AccessRoot::layout1(self->root, ContextLayout1{});
+		AccessRoot::layout1(self->root.base(), ContextLayout1{});
 		self->stat.layout1.sample(self->timer.time_ns());
-		AccessRoot::layout2(self->root, ContextLayout2{AccessRoot::position(self->root), AccessRoot::size(self->root), MouseOrder{0}});
+		AccessRoot::layout2(self->root.base(), ContextLayout2{self->root.position(), self->root.size(), MouseOrder{0}});
 		self->stat.layout2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
@@ -449,18 +460,18 @@ void UI::update(libv::glr::Queue& gl) {
 
 		gl.state.polygonModeFill();
 
-		gl.projection = libv::mat4f::ortho(xy(AccessRoot::position(self->root)), xy(AccessRoot::size(self->root)));
+		gl.projection = libv::mat4f::ortho(self->root.position2(), self->root.size2());
 		gl.view = libv::mat4f::identity();
 		gl.model = libv::mat4f::identity();
 
 		gl.viewport(
-				libv::vec::cast<int32_t>(libv::vec::xy(AccessRoot::position(self->root))),
-				libv::vec::cast<int32_t>(libv::vec::xy(AccessRoot::size(self->root)))
+				libv::vec::cast<int32_t>(self->root.position2()),
+				libv::vec::cast<int32_t>(self->root.size2())
 		);
 
 		ContextRender context{gl, clock::now()};
 //		AccessRoot::create(self->root, context);
-		AccessRoot::render(self->root, context);
+		AccessRoot::render(self->root.base(), context);
 //		AccessRoot::destroy(self->root, context);
 
 		self->stat.render.sample(self->timer.time_ns());
@@ -470,7 +481,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Detach ---
 	try {
-		AccessRoot::detach(self->root, self->root);
+		AccessRoot::detach(self->root.base(), self->root.base());
 		self->stat.detach.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during detach in UI: {}", ex.what());
@@ -485,28 +496,34 @@ void UI::update(libv::glr::Queue& gl) {
 }
 
 void UI::destroy(libv::glr::Queue& gl) {
+	current_thread_context(context());
+
 	self->root.markRemove();
 
 	// --- Render ---
 	{
 		ContextRender context{gl, clock::now()};
-		AccessRoot::render(self->root, context);
+		AccessRoot::render(self->root.base(), context);
 	}
 
 	// --- Detach ---
 	{
-		AccessRoot::detach(self->root, self->root);
+		AccessRoot::detach(self->root.base(), self->root.base());
 	}
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void UI::focus(BaseComponent& component) {
+	current_thread_context(context());
+
 	self->focus(self->context_state.focus_, component);
 	self->context_state.focus_ = component;
 }
 
 void UI::detachFocused(BaseComponent& component) {
+	current_thread_context(context());
+
 	(void) component;
 
 	assert(component == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
@@ -514,8 +531,10 @@ void UI::detachFocused(BaseComponent& component) {
 }
 
 void UI::detachFocusLinked(BaseComponent& component) {
+	current_thread_context(context());
+
 	(void) component;
-	// TODO P5: implement focus link
+	assert(false && "Not yet implemented"); // TODO P5: implement focus link
 }
 
 // -------------------------------------------------------------------------------------------------

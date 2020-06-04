@@ -2,14 +2,12 @@
 
 #pragma once
 
-// libv
-#include <libv/glr/mesh.hpp>
-// std
-#include <string>
-#include <string_view>
 // pro
-#include <libv/ui/base_component.hpp>
-#include <libv/ui/property.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/color.hpp>
+#include <libv/ui/property/shader_image.hpp>
+#include <libv/ui/property/texture_2D.hpp>
 
 
 namespace libv {
@@ -17,32 +15,23 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Stretch : BaseComponent {
-private:
-	template <typename T>
-	static void access_properties(T& ctx);
-//	static ComponentPropertyDescription description;
-
-	struct Properties {
-		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
-	} property;
-
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+class Stretch : public ComponenetHandler<class CoreStretch, EventHostGeneral<Stretch>> {
+public:
+	explicit Stretch(std::string name);
+	explicit Stretch(GenerateName_t = {}, const std::string_view type = "image");
+	explicit Stretch(base_ptr core) noexcept;
 
 public:
-	explicit Stretch(BaseComponent& parent);
-	Stretch(BaseComponent& parent, std::string name);
-	Stretch(BaseComponent& parent, GenerateName_t, const std::string_view type);
-	~Stretch();
+	void color(Color value);
+	[[nodiscard]] const Color& color() const noexcept;
 
-private:
-	virtual void doStyle(ContextStyle& ctx) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	void image(Texture2D_view value);
+	[[nodiscard]] const Texture2D_view& image() const noexcept;
+
+	void shader(ShaderImage_view value);
+	[[nodiscard]] const ShaderImage_view& shader() const noexcept;
 };
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

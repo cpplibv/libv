@@ -13,40 +13,26 @@
 // std
 #include <iostream>
 // pro
+#include <libv/ui/component/button.hpp>
 #include <libv/ui/component/image.hpp>
+#include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/component/label_image.hpp>
+#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_full.hpp>
+#include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp>
+#include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
-#include <libv/ui/parse/parse_size.hpp>
-#include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
+//#include <libv/ui/parse/parse_size.hpp>
+//#include <libv/ui/style.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
 
-// button	 			Clickable elements.
-// sprite-button	 	A button that displays an image rather than text.
-// checkbox	 			Clickable elements with a cross in the middle that can be turned off or on.
-// flow					Invisible containers that lay out children either horizontally or vertically.
-// frame	 			Grey semi-transparent boxes that contain other elements. They have a caption, and, just like flows, they lay out children either horizontally or vertically.
-// label	 			A piece of text.
-// progressbar	 		Indicate progress by displaying a partially filled bar.
-// table	 			An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
-// textfield	 		Boxes of text the user can type in.
-// radiobutton	 		Identical to checkbox except circular.
-// sprite	 			An element that shows an image.
-// scroll-pane	 		Similar to a flow but includes the ability to show and use scroll bars.
-// drop-down	 		A drop down list of other elements.
-// list-box	 			A list of other elements.
-// camera	 			A camera that shows the game at the given position on the given surface.
-// choose-elem-button	A button that lets the player pick one of an: item, entity, tile, or signal similar to the filter-select window.
-// text-box				A multi-line text box that supports selection and copy-paste.
-// slider				A number picker.
-// entity-preview		A preview of an entity.
-// split-pane
-// tab-pane
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
@@ -56,15 +42,25 @@ private:
 	libv::ui::UI ui;
 
 private:
-//	std::shared_ptr<libv::ui::Button> button;
-	std::shared_ptr<libv::ui::PanelLine> panel0 = std::make_shared<libv::ui::PanelLine>(ui.root());
-	std::shared_ptr<libv::ui::PanelLine> panel1 = std::make_shared<libv::ui::PanelLine>(ui.root());
-	std::shared_ptr<libv::ui::Label> label0 = std::make_shared<libv::ui::Label>(ui.root());
-	std::shared_ptr<libv::ui::Label> label1 = std::make_shared<libv::ui::Label>(ui.root());
-	std::shared_ptr<libv::ui::Label> label2 = std::make_shared<libv::ui::Label>(ui.root());
-	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
-	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
-	std::shared_ptr<libv::ui::Image> image0 = std::make_shared<libv::ui::Image>(ui.root());
+	libv::ui::Button button0;
+	libv::ui::Button button1;
+	libv::ui::Button button2;
+	libv::ui::Button button3;
+	libv::ui::Button button;
+	libv::ui::Image image;
+	libv::ui::InputField input_field;
+	libv::ui::Label label;
+	libv::ui::LabelImage label_image;
+	libv::ui::PanelFloat panel_float;
+	libv::ui::PanelFull panel_full;
+	libv::ui::PanelGrid panel_grid;
+	libv::ui::PanelLine panel_line;
+	libv::ui::Stretch stretch;
+	libv::ui::Quad quad;
+	libv::ui::ScrollBar scroll_bar;
+
+//	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
+//	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
 
 public:
 	void create() {
@@ -100,9 +96,9 @@ public:
 
 	void destroy() {
 		auto gl = remote.queue();
-//		ui.destroy(gl);
-//		remote.queue(std::move(gl));
-//		remote.render();
+		ui.destroy(gl);
+		remote.queue(std::move(gl));
+		remote.execute();
 
 		remote.destroy();
 	}
@@ -115,7 +111,83 @@ public:
 		setOpenGLVersion(3, 3);
 		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
-		ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
+
+		//
+
+		button.text("Hello World!");
+		button.event().submit([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("Button submitted");
+		});
+		button.event().submit([](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
+			(void) event;
+			log_sandbox.info("Button pressed {}", component.path());
+			component.text(component.text() + ".");
+		});
+
+		button0.text("Button 0!");
+		button1.text("Button 1!");
+		button1.image(ui.context().texture2D("separator_bar_256x16.png"));
+
+		button2.text("Button 2!");
+//		button2.anchor(libv::ui::ANCHOR_TOP_LEFT);
+//		button2.size("25%, 25%");
+		button3.text("Button 3!");
+//		button3.anchor(libv::ui::ANCHOR_BOTTOM_RIGHT);
+//		button3.size("25%, 25%");
+
+		label.text("Label");
+		label.align_horizontal(libv::ui::AlignHorizontal::Center);
+//		label.align_vertical(libv::ui::AlignVertical::Center); // TODO P1: align_vertical on label / button / etc
+
+		label_image.text("Label image");
+		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
+
+		image.image(ui.context().texture2D("separator_bar_256x16.png"));
+
+		input_field.text("Input Field");
+		input_field.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field {} changed to {}", component.path(), component.text());
+		});
+		input_field.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field {} submitted", component.path());
+		});
+
+		stretch.image(ui.context().texture2D("stretch_border.png"));
+
+		quad.color({.8f, .5f, .5f, 1.f});
+
+		scroll_bar.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		scroll_bar.event().change([](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar {} changed to {} with change {}", component.path(), component.value(), event.change);
+		});
+
+		panel_full.add(button1);
+
+		panel_float.add(button2);
+		panel_float.add(button3);
+
+		panel_grid.column_count(3);
+		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+		panel_grid.add(button0);
+		panel_grid.add(panel_full);
+		panel_grid.add(panel_float);
+		panel_grid.add(label_image);
+		panel_grid.add(input_field);
+		panel_grid.add(quad);
+		panel_grid.add(stretch);
+		panel_grid.add(scroll_bar);
+
+		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		panel_line.add(panel_grid);
+		panel_line.add(button);
+		panel_line.add(label);
+		panel_line.add(image);
+
+		ui.add(panel_line);
 
 //		const auto style_label_01 = ui.context().style("style-label-01");
 //		style_label_01->set("color", libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
@@ -153,14 +225,14 @@ public:
 //
 //		ui.add(panel0);
 //
-//		onKey.output([&](const libv::frame::EventKey& e) {
-//			if (e.action == libv::input::Action::release)
-//				return;
-//
-//			if (e.key == libv::input::Key::Escape)
-//				closeDefault();
-//
-//			if (e.key == libv::input::Key::Backspace) {
+		onKey.output([&](const libv::input::EventKey& e) {
+			if (e.action == libv::input::Action::release)
+				return;
+
+			if (e.keycode == libv::input::Keycode::Escape)
+				closeDefault();
+
+//			if (e.keycode == libv::input::Keycode::Backspace) {
 //				label0->string.pop_back();
 //				label2->string.pop_back();
 //				label0->flag(libv::ui::Flag::invalidLayout);
@@ -168,37 +240,37 @@ public:
 //				log_sandbox.trace("Pop back");
 //			}
 //
-//			if (e.key == libv::input::Key::Enter || e.key == libv::input::Key::KPEnter) {
+//			if (e.keycode == libv::input::Keycode::Enter || e.keycode == libv::input::Keycode::KPEnter) {
 //				label0->string.push_back("\n");
 //				label2->string.push_back("\n");
 //				label0->flag(libv::ui::Flag::invalidLayout);
 //				label2->flag(libv::ui::Flag::invalidLayout);
-//				log_sandbox.trace("Appending new line");
+//				log_sandbox.trace("Appending new panel_line");
 //			}
 //
 //			if (e.mods != libv::input::KeyModifier::control)
 //				return;
 //
-//			switch (e.key) {
-//			case libv::input::Key::Num0:
+//			switch (e.keycode) {
+//			case libv::input::Keycode::Num0:
 //				label0->properties.align = libv::ui::AlignHorizontal::Left;
 //				label2->properties.align = libv::ui::AlignHorizontal::Left;
 //				log_sandbox.trace("Set anchor to {}", "Left");
 //				break;
 //
-//			case libv::input::Key::Num1:
+//			case libv::input::Keycode::Num1:
 //				label0->properties.align = libv::ui::AlignHorizontal::Center;
 //				label2->properties.align = libv::ui::AlignHorizontal::Center;
 //				log_sandbox.trace("Set anchor to {}", "Center");
 //				break;
 //
-//			case libv::input::Key::Num2:
+//			case libv::input::Keycode::Num2:
 //				label0->properties.align = libv::ui::AlignHorizontal::Right;
 //				label2->properties.align = libv::ui::AlignHorizontal::Right;
 //				log_sandbox.trace("Set anchor to {}", "Right");
 //				break;
 //
-//			case libv::input::Key::Num3:
+//			case libv::input::Keycode::Num3:
 //				label0->properties.align = libv::ui::AlignHorizontal::Justify;
 //				label2->properties.align = libv::ui::AlignHorizontal::Justify;
 //				log_sandbox.trace("Set anchor to {}", "Justify");
@@ -207,13 +279,14 @@ public:
 //			default:
 //				break;
 //			}
-//		});
+		});
 		onChar.output([&](const libv::input::EventChar& e) {
 //			label0->string.push_back(e.utf8);
 //			label2->string.push_back(e.utf8);
 //			label0->flag(libv::ui::Flag::invalidLayout);
 //			label2->flag(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8.data());
+			label.text(label.text() + e.utf8.data());
 		});
 		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
 			create();

@@ -3,13 +3,14 @@
 // hpp
 #include <libv/ui/component/image.hpp>
 // libv
+#include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/context_ui.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/texture_2D.hpp>
@@ -20,8 +21,35 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+struct CoreImage : BaseComponent {
+	friend class Image;
+	[[nodiscard]] inline auto handler() { return Image{this}; }
+
+private:
+	template <typename T> static void access_properties(T& ctx);
+
+	struct Properties {
+		PropertyR<Color> bg_color;
+		PropertyL<Texture2D_view> bg_image;
+		PropertyR<ShaderImage_view> bg_shader;
+	} property;
+
+private:
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+
+public:
+	using BaseComponent::BaseComponent;
+
+private:
+	virtual void doStyle(ContextStyle& ctx) override;
+	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual void doRender(ContextRender& context) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
 template <typename T>
-void Image::access_properties(T& ctx) {
+void CoreImage::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.bg_color; },
 			Color(1, 1, 1, 1),
@@ -44,30 +72,17 @@ void Image::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-Image::Image(BaseComponent& parent) :
-	BaseComponent(parent, GenerateName, "image") { }
-
-Image::Image(BaseComponent& parent, std::string name) :
-	BaseComponent(parent, std::move(name)) { }
-
-Image::Image(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-	BaseComponent(parent, GenerateName, type) { }
-
-Image::~Image() { }
-
-// -------------------------------------------------------------------------------------------------
-
-void Image::doStyle(ContextStyle& ctx) {
-	PropertySetterContext<Image> setter{*this, ctx.component, ctx.style, context()};
+void CoreImage::doStyle(ContextStyle& ctx) {
+	PropertyAccessContext<CoreImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 }
 
-void Image::doLayout1(const ContextLayout1& environment) {
+void CoreImage::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 	AccessLayout::lastDynamic(*this) = {libv::vec::cast<float>(property.bg_image()->size()), 0.f};
 }
 
-void Image::doRender(ContextRender& context) {
+void CoreImage::doRender(ContextRender& context) {
 	if (context.changedSize) {
 		mesh.clear();
 		auto pos = mesh.attribute(attribute_position);
@@ -95,6 +110,43 @@ void Image::doRender(ContextRender& context) {
 	context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
 	context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
 	context.gl.render(mesh);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+Image::Image(std::string name) :
+	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(std::move(name)) { }
+
+Image::Image(GenerateName_t gen, const std::string_view type) :
+	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(gen, type) { }
+
+Image::Image(base_ptr core) noexcept :
+	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(core) { }
+
+// -------------------------------------------------------------------------------------------------
+
+void Image::color(Color value) {
+	AccessProperty::manual(self(), self().property.bg_color, value);
+}
+
+const Color& Image::color() const noexcept {
+	return self().property.bg_color();
+}
+
+void Image::image(Texture2D_view value) {
+	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
+}
+
+const Texture2D_view& Image::image() const noexcept {
+	return self().property.bg_image();
+}
+
+void Image::shader(ShaderImage_view value) {
+	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
+}
+
+const ShaderImage_view& Image::shader() const noexcept {
+	return self().property.bg_shader();
 }
 
 // -------------------------------------------------------------------------------------------------

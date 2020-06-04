@@ -26,8 +26,14 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct Grid {
-	app::ShaderGrid shader_grid;
 	static constexpr libv::vec4f color_grid = {0.8f, 0.8f, 0.8f, 0.15f};
+//	static constexpr libv::vec4f color_low = {0.8f, 0.8f, 0.8f, 0.5f};
+
+	static constexpr libv::vec4f color_x = {0.8f, 0.0f, 0.0f, 0.5f};
+	static constexpr libv::vec4f color_y = {0.0f, 0.8f, 0.0f, 0.5f};
+	static constexpr libv::vec4f color_z = {0.0f, 0.0f, 0.8f, 0.5f};
+
+	app::ShaderGrid shader_grid;
 
 	libv::glr::Mesh mesh;
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/lua/fwd.hpp>
 // ext
 #include <sol/state.hpp>
 #include <sol/types.hpp>

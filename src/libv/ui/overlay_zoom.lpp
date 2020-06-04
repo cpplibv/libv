@@ -3,19 +3,10 @@
 #pragma once
 
 // libv
-#include <libv/glr/framebuffer.hpp>
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/program.hpp>
-#include <libv/glr/queue.hpp>
-#include <libv/glr/renderbuffer.hpp>
-#include <libv/glr/texture.hpp>
-#include <libv/glr/uniform.hpp>
 #include <libv/math/vec.hpp>
-// std
-#include <string>
-#include <string_view>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
 
 
 namespace libv {
@@ -23,56 +14,26 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class OverlayZoom : public BaseComponent {
-private:
-	libv::vec2i framebufferSize_;
+enum class OverlayZoomMode {
+	disabled,
+	control,
+	view,
+};
 
-	libv::vec2f displayPosition = {};
-	float zoom_ = 1.f;
-	bool control_ = false;
-
-private:
-	libv::glr::Framebuffer framebuffer;
-	libv::glr::Texture2D::R8_G8_B8_A8 framebufferColor0;
-
-	libv::glr::Mesh quad{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
-	libv::glr::Program program;
-	libv::glr::Uniform_texture uniformSampler0;
-
-	libv::glr::Mesh lines_border{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
-	libv::glr::Program lineProgram;
-
-	libv::glr::Mesh lines_cursor{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
-
+class OverlayZoom : public ComponenetHandler<class CoreOverlayZoom, EventHostGeneral<OverlayZoom>> {
 public:
-	explicit OverlayZoom(BaseComponent& parent);
-	OverlayZoom(BaseComponent& parent, std::string name);
-	OverlayZoom(BaseComponent& parent, GenerateName_t, const std::string_view type);
-	~OverlayZoom();
+	explicit OverlayZoom(std::string name);
+	explicit OverlayZoom(GenerateName_t = {}, const std::string_view type = "overlay-zoom");
+	explicit OverlayZoom(base_ptr core) noexcept;
 
 public:
 	void control();
 	void view();
 	void disable();
 
-	libv::vec2f screen_BL() const;
-	libv::vec2f screen_TR() const;
-
-private:
-	void init();
-	void update();
-	void update_cursor();
-
-private:
-	virtual void onKey(const EventKey& event) override;
-	virtual void onFocus(const EventFocus& event) override;
-	virtual void onMouseMovement(const EventMouseMovement& event) override;
-	virtual void onMouseScroll(const EventMouseScroll& event) override;
-
-private:
-	virtual void doAttach() override;
-	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+public:
+	[[nodiscard]] libv::vec2f screen_BL() const;
+	[[nodiscard]] libv::vec2f screen_TR() const;
 };
 
 // -------------------------------------------------------------------------------------------------

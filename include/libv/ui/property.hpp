@@ -4,10 +4,11 @@
 
 // libv
 #include <libv/utility/intrusive_ptr.hpp>
-#include <libv/utility/fixed_string.hpp>
+//#include <libv/utility/fixed_string.hpp>
 // std
 #include <memory>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <variant>
 // pro
@@ -16,12 +17,15 @@
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/column_count.hpp>
+#include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/orientation.hpp>
 #include <libv/ui/property/orientation2.hpp>
+#include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
+#include <libv/ui/property/texture_2D.hpp>
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -32,17 +36,8 @@ namespace ui {
 
 class ContextUI;
 
-class Font2D;
-using Font2D_view = std::shared_ptr<Font2D>;
-
-class Texture2D;
-using Texture2D_view = std::shared_ptr<Texture2D>;
-
 class ShaderFont;
 using ShaderFont_view = std::shared_ptr<ShaderFont>;
-
-class ShaderImage;
-using ShaderImage_view = std::shared_ptr<ShaderImage>;
 
 class ShaderQuad;
 using ShaderQuad_view = std::shared_ptr<ShaderQuad>;
@@ -80,50 +75,51 @@ namespace pnm { // -------------------------------------------------------------
 
 // NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
 
-static constexpr libv::fixed_string align_horizontal = "align";
-static constexpr libv::fixed_string align_vertical = "align_vertical";
-static constexpr libv::fixed_string anchor = "anchor";
-static constexpr libv::fixed_string anchor_content = "anchor_content";
-static constexpr libv::fixed_string anchor_parent = "anchor_parent";
-static constexpr libv::fixed_string anchor_target = "anchor_target";
-static constexpr libv::fixed_string bar_color = "bar_color";
-static constexpr libv::fixed_string bar_image = "bar_image";
-static constexpr libv::fixed_string bar_shader = "bar_shader";
-static constexpr libv::fixed_string bg_color = "bg_color";
-static constexpr libv::fixed_string bg_image = "bg_image";
-static constexpr libv::fixed_string bg_shader = "bg_shader";
-static constexpr libv::fixed_string caret_color = "caret_color";
-static constexpr libv::fixed_string caret_shader = "caret_shader";
-static constexpr libv::fixed_string color = "color";
-static constexpr libv::fixed_string column_count = "column_count";
-static constexpr libv::fixed_string focus_select_policy = "focus_select_policy";
-static constexpr libv::fixed_string font = "font";
-static constexpr libv::fixed_string font_color = "font_color";
-static constexpr libv::fixed_string font_shader = "font_shader";
-static constexpr libv::fixed_string font_size = "font_size";
-static constexpr libv::fixed_string orientation = "orientation";
-static constexpr libv::fixed_string orientation2 = "orientation2";
-static constexpr libv::fixed_string quad_shader = "quad_shader";
-static constexpr libv::fixed_string size = "size";
-static constexpr libv::fixed_string snapToEdge = "snapToEdge";
-static constexpr libv::fixed_string squish = "squish";
-static constexpr libv::fixed_string text = "text";
-static constexpr libv::fixed_string value = "value";
-static constexpr libv::fixed_string value_max = "value_max";
-static constexpr libv::fixed_string value_min = "value_min";
-static constexpr libv::fixed_string value_range = "value_range";
-static constexpr libv::fixed_string value_step = "value_step";
+static constexpr std::string_view align_horizontal = "align";
+static constexpr std::string_view align_vertical = "align_vertical";
+static constexpr std::string_view anchor = "anchor";
+static constexpr std::string_view anchor_content = "anchor_content";
+static constexpr std::string_view anchor_parent = "anchor_parent";
+static constexpr std::string_view anchor_target = "anchor_target";
+static constexpr std::string_view bar_color = "bar_color";
+static constexpr std::string_view bar_image = "bar_image";
+static constexpr std::string_view bar_shader = "bar_shader";
+static constexpr std::string_view bg_color = "bg_color";
+static constexpr std::string_view bg_image = "bg_image";
+static constexpr std::string_view bg_shader = "bg_shader";
+static constexpr std::string_view caret = "caret";
+static constexpr std::string_view caret_color = "caret_color";
+static constexpr std::string_view caret_shader = "caret_shader";
+static constexpr std::string_view color = "color";
+static constexpr std::string_view column_count = "column_count";
+static constexpr std::string_view focus_select_policy = "focus_select_policy";
+static constexpr std::string_view font = "font";
+static constexpr std::string_view font_color = "font_color";
+static constexpr std::string_view font_shader = "font_shader";
+static constexpr std::string_view font_size = "font_size";
+static constexpr std::string_view orientation = "orientation";
+static constexpr std::string_view orientation2 = "orientation2";
+static constexpr std::string_view quad_shader = "quad_shader";
+static constexpr std::string_view size = "size";
+static constexpr std::string_view snap_to_edge = "snap_to_edge";
+static constexpr std::string_view squish = "squish";
+static constexpr std::string_view text = "text";
+static constexpr std::string_view value = "value";
+static constexpr std::string_view value_max = "value_max";
+static constexpr std::string_view value_min = "value_min";
+static constexpr std::string_view value_range = "value_range";
+static constexpr std::string_view value_step = "value_step";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------
 
 // NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
 
-static constexpr libv::fixed_string appearance = "appearance";
-static constexpr libv::fixed_string behaviour = "behaviour";
-static constexpr libv::fixed_string common = "common";
-static constexpr libv::fixed_string font = "font";
-static constexpr libv::fixed_string layout = "layout";
+static constexpr std::string_view appearance = "appearance";
+static constexpr std::string_view behaviour = "behaviour";
+static constexpr std::string_view common = "common";
+static constexpr std::string_view font = "font";
+static constexpr std::string_view layout = "layout";
 
 } // namespace pgr ---------------------------------------------------------------------------------
 
@@ -140,7 +136,7 @@ class BaseProperty {
 
 private:
 	PropertyDriver driver = PropertyDriver::style;
-	bool changed = false;
+	bool changed = true;
 
 public:
 	constexpr inline bool consumeChange() noexcept {
@@ -209,14 +205,30 @@ struct AccessProperty {
 		component.flagAuto(property.invalidate);
 	}
 
-	template <typename Component, typename P>
-	static constexpr inline bool setter(Component& component, P& property, PropertyDriver driver) noexcept {
+	template <typename Component, typename P, typename F>
+	static constexpr inline void setter(Component& component, P& property, PropertyDriver driver, F&& func) noexcept {
 		if (property.changed && driver != PropertyDriver::manual)
-			return true;
+			return;
+
 		property.driver = driver;
 		property.changed = true;
 		component.flagAuto(property.invalidate);
-		return false;
+
+		func();
+	}
+
+	// ---
+
+	template <typename Component, typename P, typename TC>
+	static constexpr inline void manual(Component& component, P& property, TC&& value) noexcept {
+		property.driver = PropertyDriver::manual;
+
+		if (property.value == value)
+			return;
+
+		property.value = std::forward<TC>(value);
+		property.changed = true;
+		component.flagAuto(property.invalidate);
 	}
 };
 

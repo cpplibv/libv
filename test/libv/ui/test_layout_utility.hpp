@@ -74,7 +74,7 @@ public:
 
 public:
 	void dynamic(libv::vec3f value) {
-		std::static_pointer_cast<TestComponent>(components[index].ptr)->dynamicSize = value;
+		static_cast<TestComponent&>(components[index].ptr.base()).dynamicSize = value;
 	}
 
 	void dynamic(float x, float y, float z) {
@@ -86,7 +86,7 @@ public:
 	}
 
 	Bounds bounds() {
-		return {components[index].ptr->position(), components[index].ptr->size()};
+		return {components[index].ptr.base().position(), components[index].ptr.base().size()};
 	}
 };
 

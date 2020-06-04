@@ -12,7 +12,7 @@
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/property_access.hpp>
+#include <libv/ui/property_access_context.hpp>
 
 
 namespace libv {
@@ -23,9 +23,9 @@ namespace ui {
 template <typename T>
 void LayoutFloat::access_properties(T& ctx) {
 	ctx.property(
-			[](auto& c) -> auto& { return c.snapToEdge; },
+			[](auto& c) -> auto& { return c.snap_to_edge; },
 			SnapToEdge{false},
-			pgr::layout, pnm::snapToEdge,
+			pgr::layout, pnm::snap_to_edge,
 			"Snap to edge any child that otherwise would hang out"
 	);
 	ctx.property(
@@ -61,12 +61,12 @@ void LayoutFloat::access_child_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void LayoutFloat::style(Properties& properties, ContextStyle& ctx) {
-	PropertySetterContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<Properties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
 }
 
 void LayoutFloat::style(ChildProperties& properties, ContextStyle& ctx) {
-	PropertySetterContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<ChildProperties> setter{properties, ctx.component, ctx.style, ctx.component.context()};
 	access_child_properties(setter);
 }
 
@@ -95,15 +95,15 @@ libv::vec3f LayoutFloat::layout1(
 
 	auto result = libv::vec3f{};
 
-	for (const auto& child : children | view_layouted()) {
-		AccessLayout::layout1(*child.ptr, ContextLayout1{});
+	for (auto& child : children | view_layouted()) {
+		AccessLayout::layout1(child.ptr.base(), ContextLayout1{});
 
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
 			result[i] = libv::max(
 					result[i],
 					resolvePercent(
-							child.property.size()[i].pixel + (child.property.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f),
-							child.property.size()[i].percent, *child.ptr)
+							child.property.size()[i].pixel + (child.property.size()[i].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[i] : 0.f),
+							child.property.size()[i].percent, child.ptr.base())
 			);
 		});
 	}
@@ -120,7 +120,7 @@ void LayoutFloat::layout2(
 	(void) parent;
 	(void) property;
 
-	for (const auto& child : children | view_layouted()) {
+	for (auto& child : children | view_layouted()) {
 
 		// Size ---
 
@@ -134,7 +134,7 @@ void LayoutFloat::layout2(
 				size[i] =
 						child.property.size()[i].pixel +
 						child.property.size()[i].percent * 0.01f * environment.size[i] +
-						(child.property.size()[i].dynamic ? AccessLayout::lastDynamic(*child.ptr)[i] : 0.f);
+						(child.property.size()[i].dynamic ? AccessLayout::lastDynamic(child.ptr.base())[i] : 0.f);
 		});
 
 		// Position ---
@@ -148,7 +148,7 @@ void LayoutFloat::layout2(
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
 
 		AccessLayout::layout2(
-				*child.ptr,
+				child.ptr.base(),
 				ContextLayout2{
 					roundedPosition,
 					roundedSize,

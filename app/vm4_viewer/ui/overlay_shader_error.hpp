@@ -1,8 +1,9 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // libv
+#include <libv/ui/component.hpp>
+//#include <libv/ui/component/fwd.hpp>
 #include <libv/ui/component/panel_line.hpp>
-#include <libv/ui/component/fwd.hpp>
 // std
 #include <map>
 #include <string>
@@ -32,7 +33,8 @@ class OverlayShaderError : public libv::ui::PanelLine {
 //		details->add(label_error_message);
 //	}
 
-	std::map<std::string, std::shared_ptr<BaseComponent>> errors;
+//	std::map<std::string, std::shared_ptr<BaseComponent>> errors;
+	std::map<std::string, Component> errors;
 
 public:
 	explicit OverlayShaderError(libv::ui::BaseComponent& parent);

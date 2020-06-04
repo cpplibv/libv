@@ -11,12 +11,11 @@
 // std
 #include <string>
 #include <string_view>
-#include <type_traits>
+#include <typeindex>
 // pro
-#include <libv/ui/context_event.hpp>
-#include <libv/ui/context_ui.hpp>
 #include <libv/ui/flag.hpp>
-#include <libv/ui/property.hpp>
+#include <libv/ui/generate_name.hpp>
+#include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the variant is killing me)
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -32,39 +31,40 @@ class ContextRender;
 class ContextStyle;
 class ContextUI;
 class EventChar;
-class EventKey;
 class EventFocus;
+class EventKey;
 class EventMouseButton;
 class EventMouseMovement;
 class EventMouseScroll;
 
 // -------------------------------------------------------------------------------------------------
 
-struct GenerateName_t {};
-static constexpr GenerateName_t GenerateName;
-
 using ChildID = int32_t;
 static constexpr ChildID ChildIDSelf = -2;
 static constexpr ChildID ChildIDNone = -1;
 
 struct BaseComponent {
+	friend class AccessConnect;
 	friend class AccessEvent;
 	friend class AccessLayout;
 	friend class AccessParent;
 	friend class AccessProperty;
 	friend class AccessRoot;
 
+	friend class Component;
+
 private:
 	Flag_t flags = Flag::mask_init;
 	ChildID childID = 0;
+	uint32_t ref_count = 0;
 
 	libv::vec3f position_; /// Component position relative to parent in pixels
 	libv::vec3f size_; /// Component size in pixels
-	// TODO P2: Measure the impact of removing lastDynamic field and remove if acceptable
+	// TODO P2: Measure the impact of removing lastDynamic field and remove it if acceptable
 	libv::vec3f lastDynamic; /// Result of last layout pass1
 
 private:
-	/// Never null, points to self if its a (temporal) root element otherwise points to direct parent
+	/// Never null, points to self if its a (temporal) root element otherwise points to parent
 	libv::observer_ref<BaseComponent> parent = libv::make_observer_ref(this);
 	/// Never null, points to the associated context
 	libv::observer_ref<ContextUI> context_;
@@ -77,9 +77,8 @@ public:
 	std::string name;
 
 public:
-	explicit BaseComponent(ContextUI& context); // Root only constructor
-	BaseComponent(BaseComponent& parent, std::string name);
-	BaseComponent(BaseComponent& parent, GenerateName_t, const std::string_view type);
+	explicit BaseComponent(std::string name);
+	BaseComponent(GenerateName_t, const std::string_view type);
 
 	BaseComponent(const BaseComponent&) = delete;
 	BaseComponent(BaseComponent&&) = delete;
@@ -94,23 +93,23 @@ public:
 	[[nodiscard]] inline ContextUI& context() const noexcept {
 		return *context_;
 	}
-	[[nodiscard]] inline bool isAttached() noexcept {
+	[[nodiscard]] inline bool isAttached() const noexcept {
 		return parent != this;
 	}
-	[[nodiscard]] inline bool isRendered() noexcept {
+	[[nodiscard]] inline bool isRendered() const noexcept {
 		return flags.match_any(Flag::render);
 	}
-	[[nodiscard]] inline bool isLayouted() noexcept {
+	[[nodiscard]] inline bool isLayouted() const noexcept {
 		return flags.match_any(Flag::layout);
 	}
-	[[nodiscard]] inline bool isFocused() noexcept {
+	[[nodiscard]] inline bool isFocused() const noexcept {
 		return flags.match_any(Flag::focused);
 	}
 
-	[[nodiscard]] inline const libv::vec3f& position() const noexcept {
+	[[nodiscard]] inline libv::vec3f position() const noexcept {
 		return position_;
 	}
-	[[nodiscard]] inline const libv::vec3f& size() const noexcept {
+	[[nodiscard]] inline libv::vec3f size() const noexcept {
 		return size_;
 	}
 
@@ -152,11 +151,15 @@ public:
 	template <typename Property>
 	inline void reset(Property& property);
 
+private:
+	void _fire(std::type_index type, const void* event_ptr);
+
 protected:
-	template <typename Event, typename F>
-	inline void connect(libv::observer_ptr<BaseComponent> slot, F&& func);
 	template <typename Event>
 	inline void fire(const Event& event);
+
+private:
+	static void connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback);
 
 private:
 	ContextStyle makeStyleContext() noexcept;
@@ -203,7 +206,7 @@ private:
 	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback);
 	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback);
 
-	// TWO PASS layout:
+	// TWO PASS layout: (Planning on changing to on demand pass 1 as of 2020 06 30)
 	// - Pass 1: calculate everything as content bottom-top and store the result
 	// - Pass 2: calculate everything top-down
 };
@@ -240,6 +243,12 @@ struct AccessParent {
 	}
 };
 
+struct AccessConnect {
+	static inline void connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
+		BaseComponent::connect(signal, slot, type, std::move(callback));
+	}
+};
+
 struct AccessLayout {
 	static inline decltype(auto) layout1(BaseComponent& component, const ContextLayout1& environment) {
 		return component.layout1(environment);
@@ -267,6 +276,10 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	}
 	[[nodiscard]] static inline const auto& size(const BaseComponent& component) noexcept {
 		return component.size_;
+	}
+
+	static inline decltype(auto) flagAuto(BaseComponent& component, Flag_t flags_) noexcept {
+		return component.flagAuto(flags_);
 	}
 
 	static inline decltype(auto) eventChar(BaseComponent& component, const EventChar& event) {
@@ -319,19 +332,9 @@ inline void BaseComponent::reset(Property& property) {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Event, typename F>
-inline void BaseComponent::connect(libv::observer_ptr<BaseComponent> slot, F&& func) {
-	context().event.connect<Event>(this, slot, std::forward<F>(func));
-
-	this->flagDirect(Flag::signal);
-	slot->flagDirect(Flag::slot);
-}
-
-template <typename Event>
-inline void BaseComponent::fire(const Event& event) {
-	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (attach) codes
-	if (isAttached() && flags.match_any(Flag::signal))
-		context().event.fire(this, event);
+template <typename EventT>
+inline void BaseComponent::fire(const EventT& event) {
+	_fire(std::type_index(typeid(EventT)), &event);
 }
 
 // -------------------------------------------------------------------------------------------------

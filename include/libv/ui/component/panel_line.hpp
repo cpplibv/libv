@@ -2,14 +2,11 @@
 
 #pragma once
 
-// std
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
 // pro
-#include <libv/ui/component/basic_panel.hpp>
-#include <libv/ui/layout/layout_line.hpp>
+#include <libv/ui/component.hpp>
+#include <libv/ui/event_host.hpp>
+#include <libv/ui/property/align.hpp>
+#include <libv/ui/property/orientation.hpp>
 
 
 namespace libv {
@@ -17,18 +14,26 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelLine : public BasicPanel<LayoutLine> {
+class PanelLine : public ComponenetHandler<class CorePanelLine, EventHostGeneral<PanelLine>> {
 public:
-	explicit PanelLine(BaseComponent& parent) :
-		BasicPanel<LayoutLine>(parent, GenerateName, "line") { }
+	explicit PanelLine(std::string name);
+	explicit PanelLine(GenerateName_t = {}, const std::string_view type = "line");
+	explicit PanelLine(base_ptr core) noexcept;
 
-	PanelLine(BaseComponent& parent, std::string name) :
-		BasicPanel<LayoutLine>(parent, std::move(name)) { }
+public:
+	void align_horizontal(AlignHorizontal value);
+	[[nodiscard]] AlignHorizontal align_horizontal() const noexcept;
 
-	PanelLine(BaseComponent& parent, GenerateName_t, const std::string_view type) :
-		BasicPanel<LayoutLine>(parent, GenerateName, type) { }
+	void align_vertical(AlignVertical value);
+	[[nodiscard]] AlignVertical align_vertical() const noexcept;
 
-	virtual ~PanelLine() = default;
+	void orientation(Orientation value);
+	[[nodiscard]] Orientation orientation() const noexcept;
+
+public:
+	void add(Component component);
+	void remove(Component& component);
+	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------
