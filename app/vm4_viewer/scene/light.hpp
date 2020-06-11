@@ -55,7 +55,7 @@ struct Light : Node {
 
 //libv::mat4f Light::getPmat() {
 //	if (type == LightType::spot)
-//		return libv::mat4f::perspective(std::acos(outerCosAngle) * 180.0f / libv::PI<float> * 2.0f, 1.0f, range / 15.0f, range);
+//		return libv::mat4f::perspective(std::acos(outerCosAngle) * 180.0f / libv::pi_v<float> * 2.0f, 1.0f, range / 15.0f, range);
 //	else if (type == LightType::dir)
 //		return libv::mat4f::ortho(-90, 90, -90, 90, -90, 90);
 //	else if (type == LightType::point)

@@ -73,7 +73,7 @@ TEST_CASE("view deinterleave with partial last row", "[libv.range.view_deinterle
 }
 
 TEST_CASE("view deinterleave empty", "[libv.range.view_deinterleave]") {
-	auto view = ranges::view::empty<int>() | libv::view::deinterleave(2);
+	auto view = ranges::view::empty<int> | libv::view::deinterleave(2);
 	REQUIRE(view.size() == 0);
 
 	auto row_it = view.begin();

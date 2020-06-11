@@ -17,7 +17,7 @@ namespace vm4 {
 
 // -------------------------------------------------------------------------------------------------
 
-//Model load_or_throw(libv::span<std::byte> data) {
+//Model load_or_throw(std::span<std::byte> data) {
 Model load_or_throw(const std::string& data) {
 	// C++20: std::ispanstream ss(data, std::ios::in | std::ios::binary);
 	std::istringstream ss(data, std::ios::in | std::ios::binary);
@@ -28,7 +28,7 @@ Model load_or_throw(const std::string& data) {
 	return model;
 }
 
-//std::optional<Model> load_optional(libv::span<std::byte> data) {
+//std::optional<Model> load_optional(std::span<std::byte> data) {
 //	(void) data;
 //	// Not implemented yet.
 //	return std::nullopt;

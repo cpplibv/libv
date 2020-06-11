@@ -123,8 +123,8 @@ public:
 		position_.x -= x * std::sin(rotation_.z);
 	}
 	void translate_y(float x) {
-		position_.y += x * std::cos(rotation_.z + libv::PI_2_f);
-		position_.x += x * std::sin(rotation_.z + libv::PI_2_f);
+		position_.y += x * std::cos(rotation_.z + libv::pi / 2.0f);
+		position_.x += x * std::sin(rotation_.z + libv::pi / 2.0f);
 	}
 	void translate_z(float x) {
 		position_.z += x;

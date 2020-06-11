@@ -64,7 +64,7 @@ int main() {
 
 	rp3d::WorldSettings settings;
 	settings.defaultPositionSolverNbIterations = 10;
-	settings.defaultSleepAngularVelocity = 3.0f * libv::PI<float> / 180.0f;
+	settings.defaultSleepAngularVelocity = 3.0f * libv::pi / 180.0f;
 	settings.defaultSleepLinearVelocity = 0.02f;
 	settings.defaultVelocitySolverNbIterations = 15;
 	settings.isSleepingEnabled = true;

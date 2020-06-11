@@ -3,10 +3,9 @@
 #pragma once
 
 // ext
-//#include <range/v3/detail/satisfy_boost_range.hpp>
 #include <range/v3/view/all.hpp>
+#include <range/v3/view/facade.hpp>
 #include <range/v3/view/view.hpp>
-#include <range/v3/view_facade.hpp>
 #include <utf8cpp/utf8.h>
 // std
 #include <string>
@@ -30,7 +29,7 @@ class aux_uft8_codepoints_view : public ranges::view_facade<aux_uft8_codepoints_
 	uint32_t read() const {
 		return utf8::peek_next(iter_, end_);
 	}
-	bool equal(ranges::default_sentinel) const {
+	bool equal(ranges::default_sentinel_t) const {
 		return iter_ == end_;
 	}
 	void next() {
@@ -71,11 +70,12 @@ struct uft8_codepoints_fn {
 	}
 };
 
-static constexpr ranges::view::view<uft8_codepoints_fn> uft8_codepoints{};
+static constexpr ranges::view::view_closure<uft8_codepoints_fn> uft8_codepoints{};
 
 // -------------------------------------------------------------------------------------------------
 
 } // namespace view
 } // namespace libv
 
+//#include <range/v3/detail/satisfy_boost_range.hpp>
 //RANGES_SATISFY_BOOST_RANGE(::libv::view::detail::uft8_codepoints_view)

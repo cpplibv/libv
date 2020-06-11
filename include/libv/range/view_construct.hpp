@@ -20,6 +20,7 @@ struct construct_fn {
 	constexpr inline auto operator()(Rng&& rng) const {
 		return ranges::view::transform(libv::construct<T, uint32_t>);;
 	}
+
 	constexpr inline auto operator()() const {
 		return [](auto&& rng) {
 			using Rng = decltype(rng);
@@ -29,7 +30,7 @@ struct construct_fn {
 };
 
 template <typename T>
-static constexpr ranges::view::view<construct_fn<T>> construct{};
+static constexpr ranges::view::view_closure<construct_fn<T>> construct{};
 
 // -------------------------------------------------------------------------------------------------
 

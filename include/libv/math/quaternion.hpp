@@ -25,7 +25,7 @@ template <typename Quaternion>
 	// pitch (y-axis rotation)
 	value_type sinp = value_type{2} * (q.w * q.y - q.z * q.x);
 	if (std::fabs(sinp) >= value_type{1})
-		angles.y = std::copysign(libv::PI_2<value_type>, sinp); // use 90 degrees if out of range
+		angles.y = std::copysign(libv::pi_v<value_type> / value_type{2}, sinp); // use 90 degrees if out of range
 	else
 		angles.y = std::asin(sinp);
 

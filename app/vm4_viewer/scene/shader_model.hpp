@@ -89,7 +89,7 @@ struct UniformsShaderModel {
 //		access(sun, "sun");
 	}
 
-//	void update(libv::span<const Light> lights);
+//	void update(std::span<const Light> lights);
 //	void update(const Material& material);
 //	void update(const Camera& camera);
 };

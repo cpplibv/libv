@@ -46,7 +46,7 @@ void generateProgressSegmentedRing(const ProgressSegmentedRingStyle& style, Posi
 	texture0.reserve(num_vertex);
 	index.reserve(num_index);
 
-	const auto two_pi_per_segment = F{2} * libv::PI<F> / static_cast<F>(style.segment_num);
+	const auto two_pi_per_segment = F{2} * libv::pi_v<F> / static_cast<F>(style.segment_num);
 
 	for (int32_t i = 0; i < style.segment_num; ++i) {
 		const auto s0 = two_pi_per_segment * static_cast<F>(i + 0);
@@ -57,7 +57,7 @@ void generateProgressSegmentedRing(const ProgressSegmentedRingStyle& style, Posi
 			const auto t1 = (s1 - s0) * static_cast<F>(j + 1) / static_cast<F>(style.resolution) + s0;
 
 //			if (style.fill_mode == ProgressSegmentedRingStyle::FillMode::floor)
-//			if (F{2} * libv::PI<F> * progress < t1)
+//			if (F{2} * libv::pi_v<F> * progress < t1)
 //				return;
 
 			const auto sin_t0 = std::sin(style.up + t0);
@@ -70,10 +70,10 @@ void generateProgressSegmentedRing(const ProgressSegmentedRingStyle& style, Posi
 			position(style.radius_inner * sin_t1, style.radius_inner * cos_t1, 0);
 			position(style.radius_outer * sin_t1, style.radius_outer * cos_t1, 0);
 
-			texture0(t0 / libv::PI<F> / F{2}, F{1});
-			texture0(t0 / libv::PI<F> / F{2}, F{0});
-			texture0(t1 / libv::PI<F> / F{2}, F{0});
-			texture0(t1 / libv::PI<F> / F{2}, F{1});
+			texture0(t0 / libv::pi_v<F> / F{2}, F{1});
+			texture0(t0 / libv::pi_v<F> / F{2}, F{0});
+			texture0(t1 / libv::pi_v<F> / F{2}, F{0});
+			texture0(t1 / libv::pi_v<F> / F{2}, F{1});
 
 			index(ioffset + i * style.resolution * 4 + j * 4 + 0);
 			index(ioffset + i * style.resolution * 4 + j * 4 + 1);

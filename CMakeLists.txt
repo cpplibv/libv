@@ -127,10 +127,8 @@ add_compile_options(-std=c++2a)
 
 # Tooling ------------------------------------------------------------------------------------------
 
-add_compile_options(-fconcepts)
-
 # Sparing tooling from supporting requires, for now.
-add_definitions(-D "WISH_REQUIRES\\(...\\)=\"requires __VA_ARGS__\"")
+add_definitions(-D "WISH_REQUIRES\\(...\\)=\"requires \(__VA_ARGS__\)\"")
 #wish_add_ide_definition("WISH_REQUIRES(...)" " ")
 add_definitions(-D "IDE_IGNORE\\(...\\)=__VA_ARGS__")
 
@@ -287,7 +285,7 @@ wish_create_external(
 wish_create_external(
 	NAME ctre
 	GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
-	GIT_TAG 42aab3969a1ea48ed146b55fb1e97e720da11849
+	GIT_TAG 72ea41938bca052fa33d61469213beb76245c788
 	CMAKE_ARGS
 		-DCTRE_BUILD_TESTS=OFF
 		-DCTRE_BUILD_PACKAGE=OFF
@@ -421,7 +419,7 @@ wish_create_external(
 wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG 9fc24044f442afbee3d3a751d11cbb5fbf08d745
+	GIT_TAG 08ef81acf5617366f8daa9d8b3b9bc8f7064ecf5
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/

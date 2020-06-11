@@ -11,19 +11,19 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] constexpr inline float deg_to_rad(float x) {
-	return x / libv::DEG<float>;
+	return x / libv::deg_v<float>;
 }
 
 [[nodiscard]] constexpr inline double deg_to_rad(double x) {
-	return x / libv::DEG<double>;
+	return x / libv::deg_v<double>;
 }
 
 [[nodiscard]] constexpr inline float rad_to_deg(float x) {
-	return x * libv::DEG<float>;
+	return x * libv::deg_v<float>;
 }
 
 [[nodiscard]] constexpr inline double rad_to_deg(double x) {
-	return x * libv::DEG<double>;
+	return x * libv::deg_v<double>;
 }
 
 [[nodiscard]] constexpr inline float to_rad(float x) {

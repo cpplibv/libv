@@ -26,27 +26,18 @@ struct RemoteFramebuffer {
 	struct AttachmentR {
 		libv::gl::Attachment attachment;
 		Renderbuffer renderbuffer;
-
-		AttachmentR(libv::gl::Attachment attachment, Renderbuffer&& renderbuffer) :
-			attachment(attachment), renderbuffer(std::move(renderbuffer)) { }
 	};
 
 	struct Attachment1D {
 		libv::gl::Attachment attachment;
 		Texture texture;
 		int32_t level;
-
-		Attachment1D(libv::gl::Attachment attachment, Texture&& texture, int32_t level) :
-			attachment(attachment), texture(std::move(texture)), level(level) { }
 	};
 
 	struct Attachment2D {
 		libv::gl::Attachment attachment;
 		Texture texture;
 		int32_t level;
-
-		Attachment2D(libv::gl::Attachment attachment, Texture&& texture, int32_t level) :
-			attachment(attachment), texture(std::move(texture)), level(level) { }
 	};
 
 	struct Attachment2DCube {
@@ -54,9 +45,6 @@ struct RemoteFramebuffer {
 		Texture texture;
 		libv::gl::CubeSide side;
 		int32_t level;
-
-		Attachment2DCube(libv::gl::Attachment attachment, Texture&& texture, libv::gl::CubeSide side, int32_t level) :
-			attachment(attachment), texture(std::move(texture)), side(side), level(level) { }
 	};
 
 	struct Attachment3D {
@@ -64,10 +52,6 @@ struct RemoteFramebuffer {
 		Texture texture;
 		int32_t level;
 		int32_t layer;
-
-		// C++20: clean up these aggregate ctors
-		Attachment3D(libv::gl::Attachment attachment, Texture&& texture, int32_t level, int32_t layer) :
-			attachment(attachment), texture(std::move(texture)), level(level), layer(layer) { }
 	};
 
 	using Attachment = std::variant<AttachmentR, Attachment1D, Attachment2D, Attachment2DCube, Attachment3D>;

@@ -3,9 +3,10 @@
 #pragma once
 
 // ext
-//#include <range/v3/detail/satisfy_boost_range.hpp>
-#include <range/v3/view/view.hpp>
-#include <range/v3/view_facade.hpp>
+#include <range/v3/functional/bind_back.hpp>
+#include <range/v3/range/concepts.hpp>
+#include <range/v3/view/all.hpp>
+#include <range/v3/view/facade.hpp>
 // std
 #include <string_view>
 
@@ -30,7 +31,7 @@ private:
 	constexpr inline std::string_view read() const noexcept {
 		return std::string_view{it_begin, static_cast<size_t>(std::distance(it_begin, it_end))};
 	}
-	constexpr inline bool equal(ranges::default_sentinel) const noexcept {
+	constexpr inline bool equal(ranges::default_sentinel_t) const noexcept {
 		return it_begin == range.end();
 	}
 	constexpr inline bool equal(const view_lines_string_view& other) const noexcept {
@@ -62,30 +63,28 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct lines_string_view_fn {
-	friend ranges::view::view_access;
-
-private:
-	template <typename = void>
-	static constexpr auto bind(lines_string_view_fn fn, const std::string_view::value_type newline = '\n') {
-		return ranges::make_pipeable([fn, newline](const std::string_view rng) {
-			return fn(rng, newline);
-		});
-	}
-
-public:
-	constexpr inline auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') const {
+struct lines_string_view_base_fn {
+	constexpr auto operator()(const std::string_view rng, const std::string_view::value_type newline = '\n') const {
 		return detail::view_lines_string_view(rng, newline);
+	}
+};
+
+struct lines_string_view_fn : lines_string_view_base_fn {
+	using lines_string_view_base_fn::operator();
+
+	constexpr auto operator()(const std::string_view::value_type newline = '\n') const {
+		return ranges::make_view_closure(ranges::bind_back(lines_string_view_base_fn{}, newline));
 	}
 };
 
 /// Includes the new line characters
 /// Every line will contain at least the newline character (no empty line will be yielded)
-static constexpr ranges::view::view<lines_string_view_fn> lines_string_view{};
+static constexpr ranges::view::view_closure<lines_string_view_fn> lines_string_view{};
 
 // -------------------------------------------------------------------------------------------------
 
 } // namespace view
 } // namespace libv
 
+//#include <range/v3/detail/satisfy_boost_range.hpp>
 //RANGES_SATISFY_BOOST_RANGE(::libv::view::detail::view_lines_string_view)

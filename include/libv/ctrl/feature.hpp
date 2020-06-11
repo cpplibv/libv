@@ -5,6 +5,7 @@
 // fwd
 #include <libv/ctrl/fwd.hpp>
 // std
+#include <string>
 #include <typeindex>
 // pro
 #include <libv/ctrl/enum.hpp>

@@ -14,9 +14,9 @@
 #include <libv/gl/vertex_array_object.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/observer_ptr.hpp>
-#include <libv/utility/span.hpp>
 // std
 #include <memory>
+#include <span>
 #include <vector>
 
 
@@ -94,7 +94,7 @@ public:
 	}
 
 	template <typename T>
-	inline void push_back_all(const libv::span<const T> values) {
+	inline void push_back_all(const std::span<const T> values) {
 		const auto size = data_.size();
 		const auto count = values.size();
 
@@ -168,7 +168,7 @@ public:
 		ptr[ptr_index].push_back<T>(value);
 		return static_cast<CRTP&>(*this);
 	}
-	inline CRTP& operator()(const libv::span<const T> values) {
+	inline CRTP& operator()(const std::span<const T> values) {
 		ptr[ptr_index].push_back_all<T>(values);
 		return static_cast<CRTP&>(*this);
 	}
@@ -181,10 +181,10 @@ public:
 	}
 
 public:
-	inline libv::span<T> view_last(const size_t count) {
+	inline std::span<T> view_last(const size_t count) {
 		return {
 				ptr[ptr_index].data<T>() + ptr[ptr_index].size<T>() - count,
-				static_cast<typename libv::span<T>::index_type>(count)
+				static_cast<typename std::span<T>::index_type>(count)
 		};
 	}
 
@@ -266,7 +266,7 @@ public:
 		libv::insert_all(ref.data, indices);
 		return *this;
 	}
-	inline MeshIndices& operator()(const libv::span<const VertexIndex> indices) {
+	inline MeshIndices& operator()(const std::span<const VertexIndex> indices) {
 		libv::insert_all(ref.data, indices);
 		return *this;
 	}
@@ -297,10 +297,10 @@ public:
 	}
 
 public:
-	inline libv::span<VertexIndex> view_last(const size_t count) {
+	inline std::span<VertexIndex> view_last(const size_t count) {
 		return {
 				ref.data.data() + ref.data.size() - count,
-				static_cast<libv::span<VertexIndex>::index_type>(count)
+				static_cast<std::span<VertexIndex>::size_type>(count)
 		};
 	}
 

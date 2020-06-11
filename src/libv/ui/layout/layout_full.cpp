@@ -51,7 +51,7 @@ void LayoutFull::style(ChildProperties& properties, ContextStyle& ctx) {
 
 libv::vec3f LayoutFull::layout1(
 		const ContextLayout1& environment,
-		libv::span<Child> children,
+		std::span<Child> children,
 		const Properties& property,
 		const BaseComponent& parent) {
 
@@ -89,7 +89,7 @@ libv::vec3f LayoutFull::layout1(
 
 void LayoutFull::layout2(
 		const ContextLayout2& environment,
-		libv::span<Child> children,
+		std::span<Child> children,
 		const Properties& property,
 		const BaseComponent& parent) {
 

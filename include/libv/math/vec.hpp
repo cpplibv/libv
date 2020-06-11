@@ -96,8 +96,22 @@ struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+		// potentially inactive union member usage, "UB" but it is the price of the pattern
+		data = orig.data;
+#pragma GCC diagnostic pop
+		return *this;
+	}
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+		// potentially inactive union member usage, "UB" but it is the price of the pattern
+		data = std::move(orig.data);
+#pragma GCC diagnostic pop
+		return *this;
+	}
 
 	constexpr inline vec_base_t(T x, T y) : x(x), y(y) { }
 	template <typename V0>
@@ -119,8 +133,22 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	constexpr inline vec_base_t() : data{} { }
 	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
 	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+		// potentially inactive union member usage, "UB" but it is the price of the pattern
+		data = orig.data;
+#pragma GCC diagnostic pop
+		return *this;
+	}
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+		// potentially inactive union member usage, "UB" but it is the price of the pattern
+		data = std::move(orig.data);
+#pragma GCC diagnostic pop
+		return *this;
+	}
 
 	constexpr inline vec_base_t(T x, T y, T z) : x(x), y(y), z(z) { }
 	template <typename V0>

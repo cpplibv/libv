@@ -116,7 +116,7 @@ void LayoutLine::style(ChildProperties& properties, ContextStyle& ctx) {
 
 libv::vec3f LayoutLine::layout1(
 		const ContextLayout1& environment,
-		libv::span<Child> children,
+		std::span<Child> children,
 		const Properties& property,
 		const BaseComponent& parent) {
 
@@ -168,7 +168,7 @@ libv::vec3f LayoutLine::layout1(
 
 void LayoutLine::layout2(
 		const ContextLayout2& environment,
-		libv::span<Child> children,
+		std::span<Child> children,
 		const Properties& property,
 		const BaseComponent& parent) {
 

@@ -4,7 +4,7 @@
 
 // ext
 #include <boost/container/flat_set.hpp>
-#include <range/v3/iterator_range.hpp>
+#include <range/v3/view/subrange.hpp>
 // std
 #include <algorithm>
 #include <utility>
@@ -120,12 +120,13 @@ public: // foreach -------------------------------------------------------------
 	void foreach_children(EntityID parentID, F&& f) {
 		const auto requiredBits = make_required_bitset<Cs...>();
 
-		auto children = std::equal_range(entities.begin(), entities.end(), parentID & 0xFFFFFFFF, ChildOfCmp());
-		auto childrenitrange = ranges::make_iterator_range(children.first, children.second);
-		// Note: Remove childrenitrange after range concept and boost flat_set are in sync
+		auto children_itpair = std::equal_range(entities.begin(), entities.end(), parentID & 0xFFFFFFFF, ChildOfCmp());
+		auto children = ranges::make_subrange(children_itpair.first, children_itpair.second);
+		// Note: Remove children_itpair after range concept and boost flat_set can play nicely, in favour of:
+		// auto children = ranges::equal_range(entities, parentID & 0xFFFFFFFF, ChildOfCmp());
 
 		[&](auto&&... creepers) {
-			for (const auto& entity : childrenitrange)
+			for (const auto& entity : children)
 				if ((entity.components & requiredBits) == requiredBits)
 					f(entity, creepers(entity.id)...);
 		}(storage<typename Cs::type>(Cs::ID).template creeper<Cs>()...);

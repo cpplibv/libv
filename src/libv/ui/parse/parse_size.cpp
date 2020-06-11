@@ -58,7 +58,7 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 			_val(ctx).dynamic = true;
 	};
 
-	const auto dimension = x3::rule<class dimension, SizeDim>{} =
+	const auto dimension = x3::rule<class dimension_, SizeDim>{} =
 			+(
 				(x3::float_ >> x3::no_case[x3::lit("px")])[map_pixel] |
 				(x3::float_ >> x3::no_case[x3::lit("%")])[map_percent] |
@@ -68,7 +68,7 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 				x3::lit("0")
 			);
 
-	const auto size_rule = x3::rule<class size_rule, SizeDim3>{} =
+	const auto size_rule = x3::rule<class size_rule_, SizeDim3>{} =
 			dimension >> x3::lit(',') >
 			dimension >
 			(x3::lit(',') >> dimension | x3::attr(ratio(1)));

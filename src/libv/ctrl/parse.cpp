@@ -141,63 +141,63 @@ const auto fa_input = [](auto& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-const auto word_button = x3::rule<class word_button, x3::unused_type>{} =
+const auto word_button = x3::rule<class word_button_, x3::unused_type>{} =
 		x3::lit("button") | x3::lit("btn") | x3::lit("bt") | x3::lit("b");
 
-const auto word_mouse = x3::rule<class word_mouse, x3::unused_type>{} =
+const auto word_mouse = x3::rule<class word_mouse_, x3::unused_type>{} =
 		x3::lit("mouse") | x3::lit("m");
 
-const auto word_mouse_wheel = x3::rule<class word_mouse_wheel, x3::unused_type>{} =
+const auto word_mouse_wheel = x3::rule<class word_mouse_wheel_, x3::unused_type>{} =
 		x3::lit("scroll") | x3::lit("wheel") | x3::lit("s") | x3::lit("w");
 
-const auto word_mouse_wheel_long = x3::rule<class word_mouse_wheel_long, x3::unused_type>{} =
+const auto word_mouse_wheel_long = x3::rule<class word_mouse_wheel_long_, x3::unused_type>{} =
 		x3::lit("scroll") | x3::lit("wheel");
 
-const auto word_gamepad = x3::rule<class word_joystick, x3::unused_type>{} =
+const auto word_gamepad = x3::rule<class word_joystick_, x3::unused_type>{} =
 		x3::lit("gamepad") | x3::lit("gp") | x3::lit("g");
 
-const auto word_joystick = x3::rule<class word_joystick, x3::unused_type>{} =
+const auto word_joystick = x3::rule<class word_joystick_, x3::unused_type>{} =
 		x3::lit("joystick") | x3::lit("js") | x3::lit("j");
 
-const auto word_analog = x3::rule<class word_analog, x3::unused_type>{} =
+const auto word_analog = x3::rule<class word_analog_, x3::unused_type>{} =
 		x3::lit("analog") | x3::lit("an") | x3::lit("a");
 
-const auto word_lock = x3::rule<class word_lock, x3::unused_type>{} =
+const auto word_lock = x3::rule<class word_lock_, x3::unused_type>{} =
 		x3::lit("lock") | x3::lit("lck") | x3::lit("lk");
 
-const auto word_x = x3::rule<class word_x, x3::unused_type>{} =
+const auto word_x = x3::rule<class word_x_, x3::unused_type>{} =
 		x3::lit("horizontal") | x3::lit("hori") | x3::lit("h") | x3::lit("x");
 
-const auto word_y = x3::rule<class word_y, x3::unused_type>{} =
+const auto word_y = x3::rule<class word_y_, x3::unused_type>{} =
 		x3::lit("vertical") | x3::lit("vert") | x3::lit("v") | x3::lit("y");
 
-const auto word_plus = x3::rule<class word_plus, x3::unused_type>{} =
+const auto word_plus = x3::rule<class word_plus_, x3::unused_type>{} =
 //		x3::lit("positive") | x3::lit("plus") | x3::lit("p") | x3::lit("+"); // p would miss m as counter part
 		x3::lit("positive") | x3::lit("plus") | x3::lit("+");
 
-const auto word_minus = x3::rule<class word_minus, x3::unused_type>{} =
+const auto word_minus = x3::rule<class word_minus_, x3::unused_type>{} =
 //		x3::lit("negative") | x3::lit("minus") | x3::lit("m") | x3::lit("-"); // m would collide with mouse
 		x3::lit("negative") | x3::lit("minus") | x3::lit("-");
 
-const auto word_left = x3::rule<class word_left, x3::unused_type>{} =
+const auto word_left = x3::rule<class word_left_, x3::unused_type>{} =
 		x3::lit("left") | x3::lit("l");
 
-const auto word_right = x3::rule<class word_right, x3::unused_type>{} =
+const auto word_right = x3::rule<class word_right_, x3::unused_type>{} =
 		x3::lit("right") | x3::lit("r");
 
-const auto word_middle = x3::rule<class word_middle, x3::unused_type>{} =
+const auto word_middle = x3::rule<class word_middle_, x3::unused_type>{} =
 		x3::lit("middle") | x3::lit("m");
 
-const auto word_kp = x3::rule<class word_kp, x3::unused_type>{} =
+const auto word_kp = x3::rule<class word_kp_, x3::unused_type>{} =
 		x3::lit("numpad") | x3::lit("keypad") | x3::lit("kp");
 
-const auto word_thumb = x3::rule<class word_middle, x3::unused_type>{} =
+const auto word_thumb = x3::rule<class word_middle_, x3::unused_type>{} =
 		x3::lit("thumb") | x3::lit("t");
 
-const auto word_bumper = x3::rule<class word_middle, x3::unused_type>{} =
+const auto word_bumper = x3::rule<class word_middle_, x3::unused_type>{} =
 		x3::lit("bumper") | x3::lit("b");
 
-const auto word_dpad = x3::rule<class word_middle, x3::unused_type>{} =
+const auto word_dpad = x3::rule<class word_middle_, x3::unused_type>{} =
 		x3::lit("dpad") | x3::lit("dp") | x3::lit("d");
 
 // -------------------------------------------------------------------------------------------------
@@ -303,7 +303,7 @@ struct key_named_ : x3::symbols<Keycode> { key_named_() { add
 	("hyphen",       Keycode::Minus)
 ; }	} key_named;
 
-const auto key_kp_base = x3::rule<class key_kp_base, Keycode>{} =
+const auto key_kp_base = x3::rule<class key_kp_base_, Keycode>{} =
 		-x3::lit("num") >> x3::lit("0") >> x3::attr(Keycode::KPNum0) |
 		-x3::lit("num") >> x3::lit("1") >> x3::attr(Keycode::KPNum1) |
 		-x3::lit("num") >> x3::lit("2") >> x3::attr(Keycode::KPNum2) |
@@ -322,7 +322,7 @@ const auto key_kp_base = x3::rule<class key_kp_base, Keycode>{} =
 		(x3::lit("enter") >> x3::attr(Keycode::KPEnter)) |
 		(x3::lit("=") | x3::lit("equal")) >> x3::attr(Keycode::KPEqual);
 
-const auto key_num = x3::rule<class key_num, Keycode>{} =
+const auto key_num = x3::rule<class key_num_, Keycode>{} =
 		-x3::lit("num") >> x3::lit("0") >> x3::attr(Keycode::Num0) |
 		-x3::lit("num") >> x3::lit("1") >> x3::attr(Keycode::Num1) |
 		-x3::lit("num") >> x3::lit("2") >> x3::attr(Keycode::Num2) |
@@ -334,10 +334,10 @@ const auto key_num = x3::rule<class key_num, Keycode>{} =
 		-x3::lit("num") >> x3::lit("8") >> x3::attr(Keycode::Num8) |
 		-x3::lit("num") >> x3::lit("9") >> x3::attr(Keycode::Num9);
 
-const auto key_kp = x3::rule<class key_kp, Keycode>{} =
+const auto key_kp = x3::rule<class key_kp_, Keycode>{} =
 		word_kp >> key_kp_base;
 
-const auto key_pg = x3::rule<class key_pg, Keycode>{} =
+const auto key_pg = x3::rule<class key_pg_, Keycode>{} =
 		(
 			x3::lit("pg") | x3::lit("page")
 		) >> (
@@ -345,7 +345,7 @@ const auto key_pg = x3::rule<class key_pg, Keycode>{} =
 			(x3::lit("down") >> x3::attr(Keycode::PageDown))
 		);
 
-const auto key_sided_left = x3::rule<class key_sided_left, Keycode>{} =
+const auto key_sided_left = x3::rule<class key_sided_left_, Keycode>{} =
 		(x3::lit("alt") >> x3::attr(Keycode::AltLeft)) |
 		(x3::lit("control") >> x3::attr(Keycode::ControlLeft)) |
 		(x3::lit("ctrl") >> x3::attr(Keycode::ControlLeft)) |
@@ -353,7 +353,7 @@ const auto key_sided_left = x3::rule<class key_sided_left, Keycode>{} =
 		(x3::lit("shift") >> x3::attr(Keycode::ShiftLeft)) |
 		(x3::lit("super") >> x3::attr(Keycode::SuperLeft));
 
-const auto key_sided_right = x3::rule<class key_sided_right, Keycode>{} =
+const auto key_sided_right = x3::rule<class key_sided_right_, Keycode>{} =
 		(x3::lit("alt") >> x3::attr(Keycode::AltRight)) |
 		(x3::lit("control") >> x3::attr(Keycode::ControlRight)) |
 		(x3::lit("ctrl") >> x3::attr(Keycode::ControlRight)) |
@@ -361,13 +361,13 @@ const auto key_sided_right = x3::rule<class key_sided_right, Keycode>{} =
 		(x3::lit("shift") >> x3::attr(Keycode::ShiftRight)) |
 		(x3::lit("super") >> x3::attr(Keycode::SuperRight));
 
-const auto key_sided = x3::rule<class key_sided, Keycode>{} =
+const auto key_sided = x3::rule<class key_sided_, Keycode>{} =
 		word_left >> key_sided_left |
 		word_right >> key_sided_right |
 		key_sided_left >> word_left |
 		key_sided_right >> word_right;
 
-const auto key_multi_word = x3::rule<class key_multi_word, Keycode>{} =
+const auto key_multi_word = x3::rule<class key_multi_word_, Keycode>{} =
 		x3::lit("bracket") >> x3::lit("open") >> x3::attr(Keycode::BracketOpen) |
 		x3::lit("bracket") >> x3::lit("close") >> x3::attr(Keycode::BracketClose) |
 		x3::lit("open") >> x3::lit("bracket") >> x3::attr(Keycode::BracketOpen) |
@@ -392,7 +392,7 @@ struct modifier_named_ : x3::symbols<Modifier> { modifier_named_() { add
 
 // -------------------------------------------------------------------------------------------------
 
-const auto analog_dimension_rule = x3::rule<class analog_dimension_rule, AnalogDimension>{} =
+const auto analog_dimension_rule = x3::rule<class analog_dimension_rule_, AnalogDimension>{} =
 		word_x >> (
 				word_plus >> x3::attr(AnalogDimension::x_plus) |
 				word_minus >> x3::attr(AnalogDimension::x_minus) |
@@ -418,10 +418,10 @@ struct gamepad_button_named_ : x3::symbols<GamepadButton> { gamepad_button_named
 	("guide",    GamepadButton::Guide)
 ; }	} gamepad_button_named;
 
-const auto gamepad_button_number = x3::rule<class gamepad_button_number, GamepadButton>{} =
+const auto gamepad_button_number = x3::rule<class gamepad_button_number_, GamepadButton>{} =
 		x3::int32[fa_gamepad_button_number];
 
-const auto aux_gamepad_button = x3::rule<class aux_gamepad_button, GamepadButton>{} =
+const auto aux_gamepad_button = x3::rule<class aux_gamepad_button_, GamepadButton>{} =
 		word_left >> word_bumper >> x3::attr(GamepadButton::LeftBumper) |
 		word_bumper >> word_left >> x3::attr(GamepadButton::LeftBumper) |
 		word_right >> word_bumper >> x3::attr(GamepadButton::RightBumper) |
@@ -442,26 +442,26 @@ const auto aux_gamepad_button = x3::rule<class aux_gamepad_button, GamepadButton
 
 // -------------------------------------------------------------------------------------------------
 
-const auto gamepad_button_rule = x3::rule<class gamepad_button_rule, InputID>{} =
+const auto gamepad_button_rule = x3::rule<class gamepad_button_rule_, InputID>{} =
 		(
 			word_gamepad >> x3::uint8 >>
 			word_button >> aux_gamepad_button
 		)[fa_gamepad_button];
 
-const auto gamepad_any_button_rule = x3::rule<class gamepad_any_button_rule, InputID>{} =
+const auto gamepad_any_button_rule = x3::rule<class gamepad_any_button_rule_, InputID>{} =
 		(
 			word_gamepad >>
 			word_button >> aux_gamepad_button
 		)[fa_gamepad_any_button];
 
-const auto gamepad_analog_rule = x3::rule<class gamepad_analog_rule, InputID>{} =
+const auto gamepad_analog_rule = x3::rule<class gamepad_analog_rule_, InputID>{} =
 		(
 			word_gamepad >> x3::uint8 >>
 			word_analog >> x3::uint8 >>
 			x3::lit(":") >> analog_dimension_rule
 		)[fa_gamepad_analog];
 
-const auto gamepad_any_analog_rule = x3::rule<class gamepad_any_analog_rule, InputID>{} =
+const auto gamepad_any_analog_rule = x3::rule<class gamepad_any_analog_rule_, InputID>{} =
 		(
 			word_gamepad >>
 			word_analog >> x3::uint8 >>
@@ -470,26 +470,26 @@ const auto gamepad_any_analog_rule = x3::rule<class gamepad_any_analog_rule, Inp
 
 // -------------------------------------------------------------------------------------------------
 
-const auto joystick_button_rule = x3::rule<class joystick_button_rule, InputID>{} =
+const auto joystick_button_rule = x3::rule<class joystick_button_rule_, InputID>{} =
 		(
 			word_joystick >> x3::uint8 >>
 			word_button >> x3::int32
 		)[fa_joystick_button];
 
-const auto joystick_any_button_rule = x3::rule<class joystick_any_button_rule, InputID>{} =
+const auto joystick_any_button_rule = x3::rule<class joystick_any_button_rule_, InputID>{} =
 		(
 			word_joystick >>
 			word_button >> x3::int32
 		)[fa_joystick_any_button];
 
-const auto joystick_analog_rule = x3::rule<class joystick_analog_rule, InputID>{} =
+const auto joystick_analog_rule = x3::rule<class joystick_analog_rule_, InputID>{} =
 		(
 			word_joystick >> x3::uint8 >>
 			word_analog >> x3::uint8 >>
 			x3::lit(":") >> analog_dimension_rule
 		)[fa_joystick_analog];
 
-const auto joystick_any_analog_rule = x3::rule<class joystick_any_analog_rule, InputID>{} =
+const auto joystick_any_analog_rule = x3::rule<class joystick_any_analog_rule_, InputID>{} =
 		(
 			word_joystick >>
 			word_analog >> x3::uint8 >>
@@ -498,7 +498,7 @@ const auto joystick_any_analog_rule = x3::rule<class joystick_any_analog_rule, I
 
 // -------------------------------------------------------------------------------------------------
 
-const auto mouse_move_rule = x3::rule<class mouse_move_rule, InputID>{} =
+const auto mouse_move_rule = x3::rule<class mouse_move_rule_, InputID>{} =
 		word_mouse >> word_x >> (
 				word_plus >> x3::attr(MouseMovement::x_plus)[fa_mouse_movement] |
 				word_minus >> x3::attr(MouseMovement::x_minus)[fa_mouse_movement] |
@@ -510,7 +510,7 @@ const auto mouse_move_rule = x3::rule<class mouse_move_rule, InputID>{} =
 				x3::attr(MouseMovement::y)[fa_mouse_movement]
 		);
 
-const auto mouse_scroll_rule = x3::rule<class mouse_scroll_rule, InputID>{} =
+const auto mouse_scroll_rule = x3::rule<class mouse_scroll_rule_, InputID>{} =
 		(word_mouse >> word_mouse_wheel | word_mouse_wheel_long) >> word_x >> (
 				word_plus >> x3::attr(MouseScroll::x_plus)[fa_mouse_scroll] |
 				word_minus >> x3::attr(MouseScroll::x_minus)[fa_mouse_scroll] |
@@ -522,7 +522,7 @@ const auto mouse_scroll_rule = x3::rule<class mouse_scroll_rule, InputID>{} =
 				x3::attr(MouseScroll::y)[fa_mouse_scroll]
 		) >> x3::eoi;
 
-const auto mouse_button_rule = x3::rule<class mouse_button_rule, InputID>{} =
+const auto mouse_button_rule = x3::rule<class mouse_button_rule_, InputID>{} =
 		word_left   >> word_mouse >> -word_button >> x3::attr(MouseButton::Left  )[fa_mouse_button] |
 		word_right  >> word_mouse >> -word_button >> x3::attr(MouseButton::Right )[fa_mouse_button] |
 		word_middle >> word_mouse >> -word_button >> x3::attr(MouseButton::Middle)[fa_mouse_button] |
@@ -532,7 +532,7 @@ const auto mouse_button_rule = x3::rule<class mouse_button_rule, InputID>{} =
 		x3::int32[fa_mouse_button] >> word_mouse >> -word_button |
 		word_mouse >> -word_button >> x3::int32[fa_mouse_button];
 
-const auto codepoint_rule = x3::rule<class codepoint_rule, InputID>{} =
+const auto codepoint_rule = x3::rule<class codepoint_rule_, InputID>{} =
 		x3::lit("\"\\\"\"") >> x3::attr(Codepoint{'"'})[fa_codepoint_esc] |
 		x3::lit("\"\\\'\"") >> x3::attr(Codepoint{'\''})[fa_codepoint_esc] |
 		x3::lit("\'\\\"\'") >> x3::attr(Codepoint{'"'})[fa_codepoint_esc] |
@@ -540,10 +540,10 @@ const auto codepoint_rule = x3::rule<class codepoint_rule, InputID>{} =
 		x3::lexeme[x3::lit("\"") >> (*~x3::char_('\"'))[fa_codepoint] >> x3::lit("\"")] |
 		x3::lexeme[x3::lit("'") >> (*~x3::char_('\''))[fa_codepoint] >> x3::lit("'")];
 
-const auto scancode_rule = x3::rule<class scancode_rule, InputID>{} =
+const auto scancode_rule = x3::rule<class scancode_rule_, InputID>{} =
 		(x3::lit("scancode") | x3::lit("scan") | x3::lit("sc")) >> x3::int32[fa_scancode];
 
-const auto keycode_or_modifier_rule = x3::rule<class keycode_or_modifier_rule, InputID>{} =
+const auto keycode_or_modifier_rule = x3::rule<class keycode_or_modifier_rule_, InputID>{} =
 		key_num[fa_keycode] |
 		key_kp[fa_keycode] |
 		key_pg[fa_keycode] |
@@ -554,7 +554,7 @@ const auto keycode_or_modifier_rule = x3::rule<class keycode_or_modifier_rule, I
 
 // -------------------------------------------------------------------------------------------------
 
-const auto input_id_rule = x3::rule<class input_id_rule, InputID>{} =
+const auto input_id_rule = x3::rule<class input_id_rule_, InputID>{} =
 		gamepad_any_analog_rule |
 		gamepad_analog_rule |
 		gamepad_any_button_rule |
@@ -572,7 +572,7 @@ const auto input_id_rule = x3::rule<class input_id_rule, InputID>{} =
 
 // -------------------------------------------------------------------------------------------------
 
-const auto dia_rule = x3::rule<class dia_rule, DigitalInputAction>{} =
+const auto dia_rule = x3::rule<class dia_rule_, DigitalInputAction>{} =
 		x3::lit("[") >> (
 			x3::lit("auto") >> x3::attr(DigitalInputAction::auto_) |
 			x3::lit("press") >> x3::attr(DigitalInputAction::press) |
@@ -583,7 +583,7 @@ const auto dia_rule = x3::rule<class dia_rule, DigitalInputAction>{} =
 			x3::lit("free") >> x3::attr(DigitalInputAction::free)
 		) >> x3::lit("]");
 
-const auto input_rule = x3::rule<class input_rule, Input>{} =
+const auto input_rule = x3::rule<class input_rule_, Input>{} =
 		(input_id_rule >> -dia_rule)[fa_input];
 
 //		input_rule % x3::lit("+");

@@ -294,77 +294,77 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 
 	// ---------------------------------------------------------------------------------------------
 
-	const auto hex1_channel = x3::rule<class hex1_channel, float>{} =
+	const auto hex1_channel = x3::rule<class hex1_channel_, float>{} =
 			x3::uint_parser<uint8_t, 16, 1, 1>{}[scale(15)];
 
-	const auto hex2_channel = x3::rule<class hex2_channel, float>{} =
+	const auto hex2_channel = x3::rule<class hex2_channel_, float>{} =
 			x3::uint_parser<uint8_t, 16, 2, 2>{}[scale(255)];
 
-	const auto rgb_channel = x3::rule<class rgb_channel, float>{} =
+	const auto rgb_channel = x3::rule<class rgb_channel_, float>{} =
 			(x3::real_parser<float, x3::ureal_policies<float>>{} >> x3::lit('%'))[scale(100)] |
 			(x3::real_parser<float, x3::strict_ureal_policies<float>>{})[scale(1)] |
 			(x3::uint_parser<uint8_t, 10, 1, 3>{})[scale(255)];
 
-	const auto hue_channel = x3::rule<class hue_channel, float>{} =
+	const auto hue_channel = x3::rule<class hue_channel_, float>{} =
 			x3::float_ >> -x3::lit("°");
 
 	// ---------------------------------------------------------------------------------------------
 
-	const auto hex1_color = x3::rule<class hex1_color, float4>{} = x3::lit('#') >>
+	const auto hex1_color = x3::rule<class hex1_color_, float4>{} = x3::lit('#') >>
 			hex1_channel >>
 			hex1_channel >>
 			hex1_channel >>
 			(hex1_channel | x3::attr(1.0f));
 
-	const auto hex2_color = x3::rule<class hex2_color, float4>{} = x3::lit('#') >>
+	const auto hex2_color = x3::rule<class hex2_color_, float4>{} = x3::lit('#') >>
 			hex2_channel >>
 			hex2_channel >>
 			hex2_channel >>
 			(hex2_channel | x3::attr(1.0f));
 
-	const auto rgb_color = x3::rule<class rgb_color, float4>{} =
+	const auto rgb_color = x3::rule<class rgb_color_, float4>{} =
 			x3::no_case[x3::lit("rgb")] >>
 			x3::lit('(') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			(x3::lit(',') >> rgb_channel | x3::attr(1.0f)) >> x3::lit(')');
 
-	const auto rgba_color = x3::rule<class rgba_color, float4>{} =
+	const auto rgba_color = x3::rule<class rgba_color_, float4>{} =
 			x3::no_case[x3::lit("rgba")] >>
 			x3::lit('(') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >> x3::lit(')');
 
-	const auto hsl_color = x3::rule<class hsl_color, float4>{} =
+	const auto hsl_color = x3::rule<class hsl_color_, float4>{} =
 			x3::no_case[x3::lit("hsl")] >>
 			x3::lit('(') >> hue_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			(x3::lit(',') >> rgb_channel | x3::attr(1.0f)) >> x3::lit(')');
 
-	const auto hsla_color = x3::rule<class hsla_color, float4>{} =
+	const auto hsla_color = x3::rule<class hsla_color_, float4>{} =
 			x3::no_case[x3::lit("hsla")] >>
 			x3::lit('(') >> hue_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >> x3::lit(')');
 
-	const auto hsv_color = x3::rule<class hsv_color, float4>{} =
+	const auto hsv_color = x3::rule<class hsv_color_, float4>{} =
 			x3::no_case[x3::lit("hsv")] >>
 			x3::lit('(') >> hue_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			(x3::lit(',') >> rgb_channel | x3::attr(1.0f)) >> x3::lit(')');
 
-	const auto hsva_color = x3::rule<class hsva_color, float4>{} =
+	const auto hsva_color = x3::rule<class hsva_color_, float4>{} =
 			x3::no_case[x3::lit("hsva")] >>
 			x3::lit('(') >> hue_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >>
 			x3::lit(',') >> rgb_channel >> x3::lit(')');
 
-	const auto color_rule = x3::rule<class color_rule, color>{} =
+	const auto color_rule = x3::rule<class color_rule_, color>{} =
 			x3::no_case[named_colors][identity] |
 			hex2_color[translate_rgb] |
 			hex1_color[translate_rgb] |

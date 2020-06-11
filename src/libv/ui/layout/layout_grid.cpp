@@ -49,7 +49,7 @@ static constexpr Orientation2Data Orientation2Table[] = {
 	{1u, 0u, 2u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // UP_RIGHT
 };
 
-inline auto buildLayoutedChildrenRandomAccessRange(libv::span<LayoutGrid::Child> children) {
+inline auto buildLayoutedChildrenRandomAccessRange(std::span<LayoutGrid::Child> children) {
 	boost::container::small_vector<libv::observer_ref<const LayoutGrid::Child>, 32> result;
 
 	for (const auto& child : children | view_layouted())
@@ -116,7 +116,7 @@ void LayoutGrid::style(ChildProperties& properties, ContextStyle& ctx) {
 
 libv::vec3f LayoutGrid::layout1(
 		const ContextLayout1& environment,
-		libv::span<Child> everyChildren,
+		std::span<Child> everyChildren,
 		const Properties& property,
 		const BaseComponent& parent) {
 
@@ -190,7 +190,7 @@ libv::vec3f LayoutGrid::layout1(
 
 void LayoutGrid::layout2(
 		const ContextLayout2& environment,
-		libv::span<Child> everyChildren,
+		std::span<Child> everyChildren,
 		const Properties& property,
 		const BaseComponent& parent) {
 

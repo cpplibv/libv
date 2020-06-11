@@ -498,6 +498,12 @@ libv.control: Rename libv.control to libv.ctrl
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+
+
+libv.input: rename EventKey::key to EventKey::keycode (?)
+libv.ui: MUST! Hide component memory management: sp<Label> -> Label = magic<ImplLabel> | AND move component creation to attach time -> that removes the ctor overhead, but add the issue that there can be no ctor arg passed
+libv.ui: MUST! Hide component parent management: thread local variable to hide UI* context in it?
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
@@ -922,7 +928,7 @@ libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadca
 
 app.bin_to_src: libv.arg-ify
 app.bin_to_src: command line argument for line length
-app.bin_to_src: use libv::span<const std::byte>
+app.bin_to_src: use std::span<const std::byte>
 app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
 
 libv: Update every file first lines with: // Project: LIBV, Author: Császár Mátyás [Vader], Email: vaderhun@gmail.com
@@ -1441,6 +1447,7 @@ cpp: can there be multiple definition error during linkage if two lib contains t
 cpp: clarify template vs auto type deduction rules
 cpp: keyword order: [[nodiscard]] virtual explicit friend static constexpr inline const void&& function() const&& noexcept override final;
 cpp: learn std::launder and std::bless
+cpp: Apply <stop_token> and std::jthread onto the codebase
 doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 doc: code snippet generation mdsnippets.com https://github.com/simonCropp/MarkdownSnippets
 ext.mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz

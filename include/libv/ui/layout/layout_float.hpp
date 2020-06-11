@@ -4,9 +4,9 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/utility/span.hpp>
 // std
 #include <memory>
+#include <span>
 // pro
 #include <libv/ui/property.hpp>
 
@@ -62,12 +62,12 @@ public:
 public:
 	static libv::vec3f layout1(
 			const ContextLayout1& environment,
-			libv::span<Child> children,
+			std::span<Child> children,
 			const Properties& property,
 			const BaseComponent& parent);
 	static void layout2(
 			const ContextLayout2& environment,
-			libv::span<Child> children,
+			std::span<Child> children,
 			const Properties& property,
 			const BaseComponent& parent);
 };

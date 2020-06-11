@@ -20,7 +20,7 @@ namespace libv {
 /// @example Concept usage with Element type specified:\code
 /// template <typename V> WISH_REQUIRES(Vec2<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
-concept bool Vec2 = requires(Vector vector) {
+concept Vec2 = requires(Vector vector) {
 		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires sizeof(vector) == 2 * sizeof(libv::meta::lnv_t<Element, decltype(vector.x)>);
@@ -35,7 +35,7 @@ concept bool Vec2 = requires(Vector vector) {
 /// @example Concept usage with Element type specified:\code
 /// template <typename V> WISH_REQUIRES(Vec3<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
-concept bool Vec3 = requires(Vector vector) {
+concept Vec3 = requires(Vector vector) {
 		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires std::is_same_v<decltype(vector.z), libv::meta::lnv_t<Element, decltype(vector.x)>>;
@@ -52,7 +52,7 @@ concept bool Vec3 = requires(Vector vector) {
 /// @example Concept usage with Element type specified:\code
 /// template <typename V> WISH_REQUIRES(Vec4<V, float>) void function(V& vec) {}\endcode
 template <typename Vector, typename Element = void>
-concept bool Vec4 = requires(Vector vector) {
+concept Vec4 = requires(Vector vector) {
 		requires std::is_same_v<decltype(vector.x), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires std::is_same_v<decltype(vector.y), libv::meta::lnv_t<Element, decltype(vector.x)>>;
 		requires std::is_same_v<decltype(vector.z), libv::meta::lnv_t<Element, decltype(vector.x)>>;
@@ -74,7 +74,7 @@ concept bool Vec4 = requires(Vector vector) {
 ///// @example Concept usage with Element type specified:\code
 ///// template <typename V, CONCEPT_REQUIRES_(Vec<V, 3, float>())> void function(V& vec) {}\endcode
 //template <typename Vector, size_t N, typename Element = void>
-//concept bool Vec = requires(Vector vector) {
+//concept Vec = requires(Vector vector) {
 //		requires std::is_void_v<Element> || std::is_same_v<decltype(vector[0]), Element>;
 //		requires sizeof(vector) == N * sizeof(libv::meta::lnv_t<Element, decltype(vector[0])>);
 //};

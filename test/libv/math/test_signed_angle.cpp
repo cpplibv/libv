@@ -9,10 +9,11 @@
 #include <libv/math/signed_angle.hpp>
 #include <libv/math/vec.hpp>
 
+
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("signed_angle", "[libv.math.signed_angle]") {
-	const auto pi = libv::PI<float>;
+	const auto pi = libv::pi;
 
 	CHECK(libv::math::signed_angle<float>({1, 0, 0}, {1, 0, 0}) == libv::Approx(0 * pi));
 	CHECK(libv::math::signed_angle<float>({2, 0, 0}, {2, 0, 0}) == libv::Approx(0 * pi));
@@ -24,7 +25,7 @@ TEST_CASE("signed_angle", "[libv.math.signed_angle]") {
 }
 
 TEST_CASE("signed_angle 2D", "[libv.math.signed_angle]") {
-	const auto pi = libv::PI<float>;
+	const auto pi = libv::pi;
 
 	CHECK(libv::math::signed_angle<float>({1, 0}, {1, 0}) == libv::Approx(0 * pi));
 	CHECK(libv::math::signed_angle<float>({2, 0}, {2, 0}) == libv::Approx(0 * pi));

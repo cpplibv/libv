@@ -2,55 +2,84 @@
 
 #pragma once
 
+// std
+#include <numbers>
+
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T> static constexpr T PI        = static_cast<T>( 3.14159265358979323846 );
-template <typename T> static constexpr T PI_2      = static_cast<T>( 1.57079632679489661923 );
-template <typename T> static constexpr T PI_4      = static_cast<T>( 0.785398163397448309616);
-template <typename T> static constexpr T _1_PI     = static_cast<T>( 0.318309886183790671538);
-template <typename T> static constexpr T _2_PI     = static_cast<T>( 0.636619772367581343076);
-template <typename T> static constexpr T _2_SQRTPI = static_cast<T>( 1.12837916709551257390 );
-template <typename T> static constexpr T SQRT2     = static_cast<T>( 1.41421356237309504880 );
-template <typename T> static constexpr T SQRT1_2   = static_cast<T>( 0.707106781186547524401);
-template <typename T> static constexpr T E         = static_cast<T>( 2.71828182845904523536 );
-template <typename T> static constexpr T LOG2E     = static_cast<T>( 1.44269504088896340736 );
-template <typename T> static constexpr T LOG10E    = static_cast<T>( 0.434294481903251827651);
-template <typename T> static constexpr T LN2       = static_cast<T>( 0.693147180559945309417);
-template <typename T> static constexpr T LN10      = static_cast<T>( 2.30258509299404568402 );
-template <typename T> static constexpr T DEG       = static_cast<T>(57.29577951308232087680 );
+template <typename T> static constexpr T deg_v       = static_cast<T>(57.295779513082320876800);
+template <typename T> static constexpr T inv_sqrt2_v = static_cast<T>( 0.707106781186547524401);
+template <typename T> static constexpr T tau_v       = static_cast<T>( 6.283185307179586476926);
 
-static constexpr float PI_f       = PI        <float>;
-static constexpr float PI_2_f     = PI_2      <float>;
-static constexpr float PI_4_f     = PI_4      <float>;
-static constexpr float _1_PI_f    = _1_PI     <float>;
-static constexpr float _2_PI_f    = _2_PI     <float>;
-static constexpr float _2_SQRTPI_f= _2_SQRTPI <float>;
-static constexpr float SQRT2_f    = SQRT2     <float>;
-static constexpr float SQRT1_2_f  = SQRT1_2   <float>;
-static constexpr float E_f        = E         <float>;
-static constexpr float LOG2E_f    = LOG2E     <float>;
-static constexpr float LOG10E_f   = LOG10E    <float>;
-static constexpr float LN2_f      = LN2       <float>;
-static constexpr float LN10_f     = LN10      <float>;
-static constexpr float DEG_f      = DEG       <float>;
+template <typename T> static constexpr T e_v          = std::numbers::e_v<T>;
+template <typename T> static constexpr T egamma_v     = std::numbers::egamma_v<T>;
+template <typename T> static constexpr T inv_pi_v     = std::numbers::inv_pi_v<T>;
+template <typename T> static constexpr T inv_sqrt3_v  = std::numbers::inv_sqrt3_v<T>;
+template <typename T> static constexpr T inv_sqrtpi_v = std::numbers::inv_sqrtpi_v<T>;
+template <typename T> static constexpr T ln10_v       = std::numbers::ln10_v<T>;
+template <typename T> static constexpr T ln2_v        = std::numbers::ln2_v<T>;
+template <typename T> static constexpr T log10e_v     = std::numbers::log10e_v<T>;
+template <typename T> static constexpr T log2e_v      = std::numbers::log2e_v<T>;
+template <typename T> static constexpr T phi_v        = std::numbers::phi_v<T>;
+template <typename T> static constexpr T pi_v         = std::numbers::pi_v<T>;
+template <typename T> static constexpr T sqrt2_v      = std::numbers::sqrt2_v<T>;
+template <typename T> static constexpr T sqrt3_v      = std::numbers::sqrt3_v<T>;
 
-static constexpr double PI_d       = PI        <double>;
-static constexpr double PI_2_d     = PI_2      <double>;
-static constexpr double PI_4_d     = PI_4      <double>;
-static constexpr double _1_PI_d    = _1_PI     <double>;
-static constexpr double _2_PI_d    = _2_PI     <double>;
-static constexpr double _2_SQRTPI_d= _2_SQRTPI <double>;
-static constexpr double SQRT2_d    = SQRT2     <double>;
-static constexpr double SQRT1_2_d  = SQRT1_2   <double>;
-static constexpr double E_d        = E         <double>;
-static constexpr double LOG2E_d    = LOG2E     <double>;
-static constexpr double LOG10E_d   = LOG10E    <double>;
-static constexpr double LN2_d      = LN2       <double>;
-static constexpr double LN10_d     = LN10      <double>;
-static constexpr double DEG_d      = DEG       <double>;
+static constexpr float deg_f        = deg_v<float>;
+static constexpr float e_f          = e_v<float>;
+static constexpr float egamma_f     = egamma_v<float>;
+static constexpr float inv_pi_f     = inv_pi_v<float>;
+static constexpr float inv_sqrt2_f  = inv_sqrt2_v<float>;
+static constexpr float inv_sqrt3_f  = inv_sqrt3_v<float>;
+static constexpr float inv_sqrtpi_f = inv_sqrtpi_v<float>;
+static constexpr float ln10_f       = ln10_v<float>;
+static constexpr float ln2_f        = ln2_v<float>;
+static constexpr float log10e_f     = log10e_v<float>;
+static constexpr float log2e_f      = log2e_v<float>;
+static constexpr float phi_f        = phi_v<float>;
+static constexpr float pi_f         = pi_v<float>;
+static constexpr float sqrt2_f      = sqrt2_v<float>;
+static constexpr float sqrt3_f      = sqrt3_v<float>;
+static constexpr float tau_f        = tau_v<float>;
+
+static constexpr double deg_d        = deg_v<double>;
+static constexpr double e_d          = e_v<double>;
+static constexpr double egamma_d     = egamma_v<double>;
+static constexpr double inv_pi_d     = inv_pi_v<double>;
+static constexpr double inv_sqrt2_d  = inv_sqrt2_v<double>;
+static constexpr double inv_sqrt3_d  = inv_sqrt3_v<double>;
+static constexpr double inv_sqrtpi_d = inv_sqrtpi_v<double>;
+static constexpr double ln10_d       = ln10_v<double>;
+static constexpr double ln2_d        = ln2_v<double>;
+static constexpr double log10e_d     = log10e_v<double>;
+static constexpr double log2e_d      = log2e_v<double>;
+static constexpr double phi_d        = phi_v<double>;
+static constexpr double pi_d         = pi_v<double>;
+static constexpr double sqrt2_d      = sqrt2_v<double>;
+static constexpr double sqrt3_d      = sqrt3_v<double>;
+static constexpr double tau_d        = tau_v<double>;
+
+using default_constants_type = float;
+
+static constexpr default_constants_type deg        = deg_v<default_constants_type>;
+static constexpr default_constants_type e          = e_v<default_constants_type>;
+static constexpr default_constants_type egamma     = egamma_v<default_constants_type>;
+static constexpr default_constants_type inv_pi     = inv_pi_v<default_constants_type>;
+static constexpr default_constants_type inv_sqrt2  = inv_sqrt2_v<default_constants_type>;
+static constexpr default_constants_type inv_sqrt3  = inv_sqrt3_v<default_constants_type>;
+static constexpr default_constants_type inv_sqrtpi = inv_sqrtpi_v<default_constants_type>;
+static constexpr default_constants_type ln10       = ln10_v<default_constants_type>;
+static constexpr default_constants_type ln2        = ln2_v<default_constants_type>;
+static constexpr default_constants_type log10e     = log10e_v<default_constants_type>;
+static constexpr default_constants_type log2e      = log2e_v<default_constants_type>;
+static constexpr default_constants_type phi        = phi_v<default_constants_type>;
+static constexpr default_constants_type pi         = pi_v<default_constants_type>;
+static constexpr default_constants_type sqrt2      = sqrt2_v<default_constants_type>;
+static constexpr default_constants_type sqrt3      = sqrt3_v<default_constants_type>;
+static constexpr default_constants_type tau        = tau_v<default_constants_type>;
 
 // -------------------------------------------------------------------------------------------------
 

@@ -3,8 +3,10 @@
 #pragma once
 
 // ext
-#include <range/v3/detail/satisfy_boost_range.hpp>
-#include <range/v3/view_facade.hpp>
+#include <range/v3/view/facade.hpp>
+// std
+#include <bit>
+#include <type_traits>
 
 
 namespace libv {
@@ -17,40 +19,39 @@ namespace detail {
 template <typename Integral>
 struct setbits_view : ranges::view_facade<setbits_view<Integral>, ranges::finite> {
 	friend ranges::range_access;
-	using Index = Integral;
+	using Index = int;
+	using Rep = std::make_unsigned_t<Integral>;
 
 private:
-	Integral integral = 0;
+	Rep integral = 0;
 	Index it = 0; // Points to the current (non zero) bit if valid or to a zero bit if its the end of range
-	static constexpr Index it_max = sizeof(Integral) * 8 - 1;
+	static constexpr Index it_end = sizeof(Rep) * 8;
 
 private:
 	constexpr inline Index read() const noexcept {
 		return it;
 	}
-	constexpr inline bool equal(ranges::default_sentinel) const noexcept {
-		return it > it_max || integral < (1 << it);
+	constexpr inline bool equal(ranges::default_sentinel_t) const noexcept {
+		return (integral >> it) == 0;
 	}
 	constexpr inline bool equal(const setbits_view& other) const noexcept {
 		return other.it == it;
 	}
 	constexpr inline void next() noexcept {
-		// C++20 bit operations, shift with count right zeros, etc...
-		//	size = popcount, next = countr_zero + 1
-		it++;
-		while ((integral & (1 << it)) == 0 && it <= it_max)
-			it++;
+		it += std::countr_zero(static_cast<Rep>(integral >> (it + 1))) + 1;
 	}
-//	void prev() {
-//		--value_;
+//	constexpr inline void prev() noexcept {
+//		it -= std::countl_zero(static_cast<Rep>(integral >> it)) + 1;
 //	}
 
 public:
 	constexpr inline setbits_view() noexcept {}
-	constexpr inline setbits_view(const Integral integral) noexcept : integral(integral) {
-		if (integral != 0)
-			while ((integral & (1 << it)) == 0)
-				it++;
+	constexpr inline setbits_view(const Integral integral) noexcept : integral(static_cast<Rep>(integral)) {
+		it = std::countr_zero(this->integral);
+	}
+
+	constexpr inline auto size() noexcept {
+		return std::popcount(integral);
 	}
 };
 
@@ -72,4 +73,5 @@ static constexpr setbits_fn setbits{};
 } // namespace view
 } // namespace libv
 
+#include <range/v3/detail/satisfy_boost_range.hpp>
 RANGES_SATISFY_BOOST_RANGE(::libv::view::detail::setbits_view)
