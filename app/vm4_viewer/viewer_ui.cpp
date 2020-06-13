@@ -97,9 +97,9 @@ void ViewerUI::onKey(const libv::ui::EventKey& event) {
 	// TODO P2: libv.ui: Better access to modifiers
 	const auto shift = context().state.key_pressed(libv::input::Keycode::ShiftLeft) || context().state.key_pressed(libv::input::Keycode::ShiftRight);
 
-	if (event.key == libv::input::Keycode::F && shift)
+	if (event.keycode == libv::input::Keycode::F && shift)
 		scene.reset_camera();
-	else if (event.key == libv::input::Keycode::F)
+	else if (event.keycode == libv::input::Keycode::F)
 		scene.focus_camera();
 
 	controls.input(event);

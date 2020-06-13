@@ -492,6 +492,8 @@ libv.control: Configuration and settings
 libv.control: Remove debug trace messages, CONTROL_DEBUG, iostream, etc...
 libv.control: 2 (+ 1) Example sandbox to presented in the paper
 libv.control: Rename libv.control to libv.ctrl
+libv.ctrl: Would be nice to merge keycode-codepoint-scancode events to a single pass | Its must due to sequence cancellation
+libv.input: rename EventKey::key to EventKey::keycode
 
 
 
@@ -499,9 +501,6 @@ libv.control: Rename libv.control to libv.ctrl
 
 
 
-
-
-libv.input: rename EventKey::key to EventKey::keycode (?)
 libv.ui: MUST! Hide component memory management: sp<Label> -> Label = magic<ImplLabel> | AND move component creation to attach time -> that removes the ctor overhead, but add the issue that there can be no ctor arg passed
 libv.ui: MUST! Hide component parent management: thread local variable to hide UI* context in it?
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets

@@ -227,10 +227,10 @@ void Frame::distributeEvents() {
 				{
 					std::lock_guard lock(self->frameState_m);
 					if (e.action != libv::input::Action::release) {
-						self->pressedKeys.insert(e.key);
+						self->pressedKeys.insert(e.keycode);
 						self->pressedScancodes.insert(e.scancode);
 					} else {
-						self->pressedKeys.erase(e.key);
+						self->pressedKeys.erase(e.keycode);
 						self->pressedScancodes.erase(e.scancode);
 					}
 				}

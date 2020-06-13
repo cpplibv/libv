@@ -63,7 +63,7 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	ui.add(panel);
 
 	onKey.output([&](const libv::input::EventKey& e) {
-		if (e.key == libv::input::Keycode::Escape && e.action == libv::input::Action::press)
+		if (e.keycode == libv::input::Keycode::Escape && e.action == libv::input::Action::press)
 			closeDefault();
 	});
 	onSize.output([&](const libv::frame::EventSize& e) {

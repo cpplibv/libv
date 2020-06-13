@@ -809,21 +809,21 @@ unbinding_outcome Controls::unbind_all(std::string_view feature_name) {
 void Controls::input(const libv::input::EventKey& event) {
 	// Update SOW
 	if (event.action == ButtonAction::release) {
-		self->pressed_keycodes.erase(event.key);
+		self->pressed_keycodes.erase(event.keycode);
 		self->pressed_scancodes.erase(event.scancode);
 	} else {
-		self->pressed_keycodes.emplace(event.key);
+		self->pressed_keycodes.emplace(event.keycode);
 		self->pressed_scancodes.emplace(event.scancode);
 	}
 
-	const auto it = self->codepoint_mappings.find(Keycode{event.key});
+	const auto it = self->codepoint_mappings.find(Keycode{event.keycode});
 	const auto impulse = self->impulse_button * self->impulse_keyboard;
 
 	if (it == self->codepoint_mappings.end()) {
 		// Process event
 		self->process_button([&](const auto inputID) {
 			return
-					alias_match(InputID{Keycode{event.key}}, inputID) ||
+					alias_match(InputID{Keycode{event.keycode}}, inputID) ||
 					alias_match(InputID{Scancode{event.scancode}}, inputID);
 		}, event.action, impulse);
 
@@ -837,7 +837,7 @@ void Controls::input(const libv::input::EventKey& event) {
 		// Process event
 		self->process_button([&](const auto inputID) {
 			return
-					alias_match(InputID{Keycode{event.key}}, inputID) ||
+					alias_match(InputID{Keycode{event.keycode}}, inputID) ||
 					alias_match(InputID{Scancode{event.scancode}}, inputID) ||
 					alias_match(InputID{Codepoint{it->second}}, inputID);
 		}, event.action, impulse);

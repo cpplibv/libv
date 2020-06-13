@@ -34,7 +34,7 @@ struct EventDrop {
 };
 
 struct EventKey {
-	libv::input::Keycode key;
+	libv::input::Keycode keycode;
 	libv::input::Scancode scancode;
 	libv::input::Action action;
 

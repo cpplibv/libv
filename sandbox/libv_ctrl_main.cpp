@@ -123,7 +123,7 @@ void init(libv::Frame& frame) {
 	frame.onMousePosition.output(pretty_print_to_log);
 
 	frame.onKey.output([&frame](const libv::input::EventKey& e) {
-		if (e.key == libv::input::Keycode::Escape)
+		if (e.keycode == libv::input::Keycode::Escape)
 			frame.closeDefault();
 	});
 
@@ -133,8 +133,8 @@ void init(libv::Frame& frame) {
 //	});
 
 	frame.onKey.output([](const libv::input::EventKey& e) {
-		const int scancode = e.key != libv::input::Keycode::Unknown ? glfwGetKeyScancode(libv::to_value(e.key)) : -1;
-		const char* name = glfwGetKeyName(libv::to_value(e.key), libv::to_value(e.scancode));
+		const int scancode = e.keycode != libv::input::Keycode::Unknown ? glfwGetKeyScancode(libv::to_value(e.keycode)) : -1;
+		const char* name = glfwGetKeyName(libv::to_value(e.keycode), libv::to_value(e.scancode));
 		log_sandbox.trace("{}, rescan = {}, name = {}, rescan-match = {}",
 				e.toPrettyString(), scancode, name ? name : "unkown", scancode == libv::to_value(e.scancode));
 	});
