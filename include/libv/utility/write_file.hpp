@@ -33,9 +33,13 @@ void write_file_or_throw(const std::filesystem::path& filePath, std::string_view
 
 template <typename = void>
 void write_file(const std::filesystem::path& filePath, std::string_view data, std::error_code& ec) {
-	std::filesystem::create_directories(filePath.parent_path(), ec);
-	if (ec)
-		return;
+	const auto dir = filePath.parent_path();
+
+	if (!dir.empty()) {
+		std::filesystem::create_directories(dir, ec);
+		if (ec)
+			return;
+	}
 
 	std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
 
