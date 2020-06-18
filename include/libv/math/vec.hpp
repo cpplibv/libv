@@ -9,7 +9,6 @@
 #include <glm/vec4.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
-#include <libv/meta/type_traits.hpp>
 // std
 #include <array>
 #include <cassert>
@@ -30,17 +29,17 @@
 // TODO P4: vec noexcept example with the only problem that a lambda cannot be part of an unevaluated context:
 //		template <size_t N, typename T, typename K, CONCEPT_REQUIRES_(not Vec<K, N>)>
 //		constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) LIBV_RETURNS(
-//			build_vec<N>([&](const auto index) { return lhs.data[index] / rhs; }
+//			build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs; }
 //		)
 //		template <size_t N, typename T, typename K,
 //			CONCEPT_REQUIRES_(Vec<K, N>)>
 //		constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) LIBV_RETURNS(
-//			build_vec<N>([&](const auto index) { return lhs.data[index] / rhs.data[index]; }
+//			build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs.data()[index]; }
 //		)
 // TODO P5: use warning disable macros with: _Pragma("argument")
 // TODO P5: implement operator%
 
-// NOTE: Use concepts to enable every operation based on underlying types
+// NOTE: Use concepts to enable every operation based on underlying types | compile time hit not worth it
 // NOTE: Perfect forwarding is possible, but it seams like does not worth +600 line template
 // NOTE: MSVC: Disable warnings for nameless struct on MSVC maybe, but then again, I don't care about MSVC:
 //		#pragma warning(push)
@@ -65,90 +64,62 @@ constexpr inline decltype(auto) build_vec(F&& func) {
 
 // vec_base_t --------------------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpedantic"
-// nonstandard extension used : nameless struct / union
-
-template <size_t N, typename T, typename = void>
+template <size_t N, typename T>
 struct vec_base_t {
-	std::array<T, N> data;
+	std::array<T, N> data_{};
 
-	constexpr inline vec_base_t() : data{} { }
-	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
-	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t() = default;
+	constexpr inline vec_base_t(const vec_base_t& orig) = default;
+	constexpr inline vec_base_t(vec_base_t&& orig) = default;
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & = default;
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & = default;
 
 	template <typename... Args, typename = std::enable_if_t<sizeof...(Args) == N>>
-	constexpr inline explicit vec_base_t(Args&&... values) : data{std::forward<Args>(values)...} { }
+	constexpr inline explicit vec_base_t(Args&&... values) : data_{std::forward<Args>(values)...} { }
+
+	constexpr inline T* data() {
+		return data_.data();
+	}
+	constexpr inline const T* data() const {
+		return data_.data();
+	}
 };
 
 template <typename T>
-struct vec_base_t<2, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
-	union {
-		struct {
-			union { T x, r, s, u; };
-			union { T y, g, t, v; };
-		};
-		std::array<T, 2> data;
-	};
+struct vec_base_t<2, T> {
+	T x{};
+	T y{};
 
-	constexpr inline vec_base_t() : data{} { }
-	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
-	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-		// potentially inactive union member usage, "UB" but it is the price of the pattern
-		data = orig.data;
-#pragma GCC diagnostic pop
-		return *this;
-	}
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-		// potentially inactive union member usage, "UB" but it is the price of the pattern
-		data = std::move(orig.data);
-#pragma GCC diagnostic pop
-		return *this;
-	}
+	constexpr inline vec_base_t() = default;
+	constexpr inline vec_base_t(const vec_base_t& orig) = default;
+	constexpr inline vec_base_t(vec_base_t&& orig) = default;
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & = default;
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & = default;
 
 	constexpr inline vec_base_t(T x, T y) : x(x), y(y) { }
 	template <typename V0>
 			WISH_REQUIRES(Vec2<V0>)
 	constexpr inline explicit vec_base_t(const V0& xy) : x(xy.x), y(xy.y) { }
+
+	constexpr inline T* data() {
+		return &x;
+	}
+	constexpr inline const T* data() const {
+		return &x;
+	}
 };
 
 template <typename T>
-struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
-	union {
-		struct {
-			union { T x, r, s; };
-			union { T y, g, t; };
-			union { T z, b, p; };
-		};
-		std::array<T, 3> data;
-	};
+struct vec_base_t<3, T> {
+	T x{};
+	T y{};
+	T z{};
 
-	constexpr inline vec_base_t() : data{} { }
-	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
-	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-		// potentially inactive union member usage, "UB" but it is the price of the pattern
-		data = orig.data;
-#pragma GCC diagnostic pop
-		return *this;
-	}
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference"
-		// potentially inactive union member usage, "UB" but it is the price of the pattern
-		data = std::move(orig.data);
-#pragma GCC diagnostic pop
-		return *this;
-	}
+	constexpr inline vec_base_t() = default;
+	constexpr inline vec_base_t(const vec_base_t& orig) = default;
+	constexpr inline vec_base_t(vec_base_t&& orig) = default;
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & = default;
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & = default;
 
 	constexpr inline vec_base_t(T x, T y, T z) : x(x), y(y), z(z) { }
 	template <typename V0>
@@ -160,25 +131,27 @@ struct vec_base_t<3, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	template <typename V0>
 			WISH_REQUIRES(Vec3<V0>)
 	constexpr inline explicit vec_base_t(const V0& xyz) : x(xyz.x), y(xyz.y), z(xyz.z) { }
+
+	constexpr inline T* data() {
+		return &x;
+	}
+	constexpr inline const T* data() const {
+		return &x;
+	}
 };
 
 template <typename T>
-struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
-	union {
-		struct {
-			union { T x, r, s; };
-			union { T y, g, t; };
-			union { T z, b, p; };
-			union { T w, a, q; };
-		};
-		std::array<T, 4> data;
-	};
+struct vec_base_t<4, T> {
+	T x{};
+	T y{};
+	T z{};
+	T w{};
 
-	constexpr inline vec_base_t() : data{} { }
-	constexpr inline vec_base_t(const vec_base_t& orig) : data{orig.data} { }
-	constexpr inline vec_base_t(vec_base_t&& orig) : data{std::move(orig.data)} { }
-	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & { data = orig.data; return *this; }
-	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & { data = std::move(orig.data); return *this; }
+	constexpr inline vec_base_t() = default;
+	constexpr inline vec_base_t(const vec_base_t& orig) = default;
+	constexpr inline vec_base_t(vec_base_t&& orig) = default;
+	constexpr inline vec_base_t& operator=(const vec_base_t& orig) & = default;
+	constexpr inline vec_base_t& operator=(vec_base_t&& orig) & = default;
 
 	constexpr inline vec_base_t(T x, T y, T z, T w) : x(x), y(y), z(z), w(w) { }
 	template <typename V0>
@@ -202,9 +175,14 @@ struct vec_base_t<4, T, std::enable_if_t<std::is_trivially_destructible_v<T>>> {
 	template <typename V0>
 			WISH_REQUIRES(Vec4<V0>)
 	constexpr inline explicit vec_base_t(const V0& xyzw) : x(xyzw.x), y(xyzw.y), z(xyzw.z), w(xyzw.w) { }
-};
 
-#pragma GCC diagnostic pop
+	constexpr inline T* data() {
+		return &x;
+	}
+	constexpr inline const T* data() const {
+		return &x;
+	}
+};
 
 // vec_t -------------------------------------------------------------------------------------------
 
@@ -235,73 +213,73 @@ struct vec_t : vec_base_t<N, T> {
 
 	// operator[] ----------------------------------------------------------------------------------
 	constexpr inline T& operator[](size_t i) & {
-		return this->data[i];
+		return this->data()[i];
 	}
 	constexpr inline const T& operator[](size_t i) const & {
-		return this->data[i];
+		return this->data()[i];
 	}
 	constexpr inline T&& operator[](size_t i) && {
-		return std::move(this->data[i]);
+		return std::move(this->data()[i]);
 	}
 
 	// operator= -----------------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator=(const vec_t<N, K>& rhs) & {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] = rhs.data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] = rhs.data()[index]; });
 		return *this;
 	}
 
 	// operator*=(scalar) --------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator+=(const K& v) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] += v; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] += v; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator-=(const K& v) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] -= v; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] -= v; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator*=(const K& v) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] *= v; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] *= v; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator/=(const K& v) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] /= v; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] /= v; });
 		return *this;
 	}
 
 	// operator*=(vec) -----------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator+=(const vec_t<N, K>& rhs) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] += rhs.data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] += rhs.data()[index]; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator-=(const vec_t<N, K>& rhs) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] -= rhs.data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] -= rhs.data()[index]; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator*=(const vec_t<N, K>& rhs) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] *= rhs.data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] *= rhs.data()[index]; });
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t<N, T>& operator/=(const vec_t<N, K>& rhs) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data[index] /= rhs.data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] /= rhs.data()[index]; });
 		return *this;
 	}
 
 	// operator+ -----------------------------------------------------------------------------------
 	constexpr inline vec_t<N, T> operator+() const {
-		return build_vec<N>([&](const auto index) { return +this->data[index]; });
+		return build_vec<N>([&](const auto index) { return +this->data()[index]; });
 	}
 
 	constexpr inline vec_t<N, T> operator-() const {
-		return build_vec<N>([&](const auto index) { return -this->data[index]; });
+		return build_vec<N>([&](const auto index) { return -this->data()[index]; });
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -311,7 +289,7 @@ struct vec_t : vec_base_t<N, T> {
 	 * @return The vector */
 	constexpr inline decltype(auto) lengthSQ() const {
 		T result{};
-		libv::meta::for_constexpr<0, N>([&](const auto index) { result += this->data[index] * this->data[index]; });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { result += this->data()[index] * this->data()[index]; });
 		return result;
 	}
 
@@ -337,28 +315,28 @@ struct vec_t : vec_base_t<N, T> {
 	constexpr inline auto normalize_copy() const {
 		assert(lengthSQ() != 0);
 		auto l = length();
-		return build_vec<N>([&](const auto index) { return this->data[index] / l; });
+		return build_vec<N>([&](const auto index) { return this->data()[index] / l; });
 	}
 
 	/// \return The static_cast-ed vector to the requested K type
 	template <typename K>
 	constexpr inline auto cast() const {
-		return build_vec<N>([&](const auto index) { return static_cast<K>(this->data[index]); });
+		return build_vec<N>([&](const auto index) { return static_cast<K>(this->data()[index]); });
 	}
 
 	// observers -----------------------------------------------------------------------------------
 
 	constexpr inline decltype(auto) ptr() {
-		return &this->data[0];
+		return &this->data()[0];
 	}
 
 	constexpr inline decltype(auto) ptr() const {
-		return &this->data[0];
+		return &this->data()[0];
 	}
 
 	template <typename F>
 	constexpr inline void sequential_foreach(F&& func) {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { func(this->data[index]); });
+		libv::meta::for_constexpr<0, N>([&](const auto index) { func(this->data()[index]); });
 	}
 };
 
@@ -366,82 +344,82 @@ struct vec_t : vec_base_t<N, T> {
 
 template <size_t N, typename T, typename K>
 constexpr inline auto operator+(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] + rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] + rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator-(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] - rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] - rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator*(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] * rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] * rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] / rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs.data()[index]; });
 }
 //template <size_t N, typename T, typename K>
 //constexpr inline auto operator%(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-//	return build_vec<N>([&](const auto index) { return lhs.data[index] % rhs.data[index]; });
+//	return build_vec<N>([&](const auto index) { return lhs.data()[index] % rhs.data()[index]; });
 //}
 
 // operator*(vec, scalar) --------------------------------------------------------------------------
 
 template <size_t N, typename T, typename K>
 constexpr inline auto operator+(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] + rhs; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] + rhs; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator-(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] - rhs; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] - rhs; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator*(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] * rhs; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] * rhs; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs.data[index] / rhs; });
+	return build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs; });
 }
 //template <size_t N, typename T, typename K>
 //constexpr inline auto operator%(const vec_t<N, T>& lhs, const K& rhs) {
-//	return build_vec<N>([&](const auto index) { return lhs.data[index] % rhs; });
+//	return build_vec<N>([&](const auto index) { return lhs.data()[index] % rhs; });
 //}
 
 // operator*(scalar, vec) --------------------------------------------------------------------------
 
 template <size_t N, typename T, typename K>
 constexpr inline auto operator+(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs + rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs + rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator-(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs - rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs - rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator*(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs * rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs * rhs.data()[index]; });
 }
 template <size_t N, typename T, typename K>
 constexpr inline auto operator/(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return lhs / rhs.data[index]; });
+	return build_vec<N>([&](const auto index) { return lhs / rhs.data()[index]; });
 }
 //template <size_t N, typename T, typename K>
 //constexpr inline auto operator%(const T& lhs, const vec_t<N, K>& rhs) {
-//	return build_vec<N>([&](const auto index) { return lhs % rhs.data[index]; });
+//	return build_vec<N>([&](const auto index) { return lhs % rhs.data()[index]; });
 //}
 
 // operator==(vec, vec) ----------------------------------------------------------------------------
 template <size_t N, typename T, typename K>
 constexpr inline bool operator==(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	bool result = true;
-	libv::meta::for_constexpr<0, N>([&](const auto index) { result = result && lhs.data[index] == rhs.data[index]; });
+	libv::meta::for_constexpr<0, N>([&](const auto index) { result = result && lhs.data()[index] == rhs.data()[index]; });
 	return result;
 }
 template <size_t N, typename T, typename K>
 constexpr inline bool operator!=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	bool result = false;
-	libv::meta::for_constexpr<0, N>([&](const auto index) { result = result || lhs.data[index] != rhs.data[index]; });
+	libv::meta::for_constexpr<0, N>([&](const auto index) { result = result || lhs.data()[index] != rhs.data()[index]; });
 	return result;
 }
 
@@ -500,13 +478,12 @@ constexpr inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) {
 }
 
 // operator<<(ostream, vec) ------------------------------------------------------------------------
-template <size_t N, typename T,
-		typename = std::enable_if_t<libv::meta::is_ostreamable<std::ostream, T>::value>>
+template <size_t N, typename T>
 constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& vec) {
 	libv::meta::for_constexpr<0, N>([&](const auto index) {
 		if constexpr (index != 0)
 			os << ' ';
-		os << vec.data[index];
+		os << vec.data()[index];
 	});
 	return os;
 }
@@ -552,42 +529,42 @@ LIBV_IMPLEMENT_TO_VEC4_GETS()
 
 template <size_t N, typename T> constexpr inline T& x(vec_t<N, T>& vec) {
 	static_assert(N > 0, "vec_t with less then 1 dimension does not have 'x' coordinate");
-	return vec.data[0];
+	return vec.data()[0];
 }
 template <size_t N, typename T> constexpr inline T& y(vec_t<N, T>& vec) {
 	static_assert(N > 1, "vec_t with less then 2 dimension does not have 'y' coordinate");
-	return vec.data[1];
+	return vec.data()[1];
 }
 template <size_t N, typename T> constexpr inline T& z(vec_t<N, T>& vec) {
 	static_assert(N > 2, "vec_t with less then 3 dimension does not have 'z' coordinate");
-	return vec.data[2];
+	return vec.data()[2];
 }
 template <size_t N, typename T> constexpr inline T& w(vec_t<N, T>& vec) {
 	static_assert(N > 3, "vec_t with less then 4 dimension does not have 'w' coordinate");
-	return vec.data[3];
+	return vec.data()[3];
 }
 template <size_t N, typename T> constexpr inline const T& x(const vec_t<N, T>& vec) {
 	static_assert(N > 0, "vec_t with less then 1 dimension does not have 'x' coordinate");
-	return vec.data[0];
+	return vec.data()[0];
 }
 template <size_t N, typename T> constexpr inline const T& y(const vec_t<N, T>& vec) {
 	static_assert(N > 1, "vec_t with less then 2 dimension does not have 'y' coordinate");
-	return vec.data[1];
+	return vec.data()[1];
 }
 template <size_t N, typename T> constexpr inline const T& z(const vec_t<N, T>& vec) {
 	static_assert(N > 2, "vec_t with less then 3 dimension does not have 'z' coordinate");
-	return vec.data[2];
+	return vec.data()[2];
 }
 template <size_t N, typename T> constexpr inline const T& w(const vec_t<N, T>& vec) {
 	static_assert(N > 3, "vec_t with less then 4 dimension does not have 'w' coordinate");
-	return vec.data[3];
+	return vec.data()[3];
 }
 
 /// \return The dot product of the two vector
 template <size_t N, typename T, typename K>
 constexpr inline auto dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
 	std::common_type_t<T, K> result{};
-	libv::meta::for_constexpr<0, N>([&](const auto index) { result += lhs.data[index] * rhs.data[index]; });
+	libv::meta::for_constexpr<0, N>([&](const auto index) { result += lhs.data()[index] * rhs.data()[index]; });
 	return result;
 }
 
@@ -611,81 +588,81 @@ constexpr inline auto cross(const V0& lhs, const V1& rhs) {
 /// \return The maximum vector with the greater value on each dimension from the two vector
 template <size_t N, typename T, typename K>
 constexpr inline auto max(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return std::max(lhs.data[index], rhs.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::max(lhs.data()[index], rhs.data()[index]); });
 }
 /// \return The maximum vector with the greater value on each dimension
 template <size_t N, typename T, typename K>
 constexpr inline auto max(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return std::max(lhs.data[index], rhs); });
+	return build_vec<N>([&](const auto index) { return std::max(lhs.data()[index], rhs); });
 }
 /// \return The maximum vector with the greater value on each dimension
 template <size_t N, typename T, typename K>
 constexpr inline auto max(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return std::max(lhs, rhs.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::max(lhs, rhs.data()[index]); });
 }
 
 /// \return The minimum vector with the smaller value on each dimension from the two vector
 template <size_t N, typename T, typename K>
 constexpr inline auto min(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return std::min(lhs.data[index], rhs.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::min(lhs.data()[index], rhs.data()[index]); });
 }
 /// \return The minimum vector with the smaller value on each dimension
 template <size_t N, typename T, typename K>
 constexpr inline auto min(const vec_t<N, T>& lhs, const K& rhs) {
-	return build_vec<N>([&](const auto index) { return std::min(lhs.data[index], rhs); });
+	return build_vec<N>([&](const auto index) { return std::min(lhs.data()[index], rhs); });
 }
 /// \return The minimum vector with the smaller value on each dimension
 template <size_t N, typename T, typename K>
 constexpr inline auto min(const T& lhs, const vec_t<N, K>& rhs) {
-	return build_vec<N>([&](const auto index) { return std::min(lhs, rhs.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::min(lhs, rhs.data()[index]); });
 }
 
 /// \return Clamps the vector's each dimension within the range of [\c high, \c low]
 template <size_t N, typename T>
 constexpr inline auto clamp(const vec_t<N, T>& vec, const T& low, const T& high) {
-	return build_vec<N>([&](const auto index) { return std::clamp(vec.data[index], low, high); });
+	return build_vec<N>([&](const auto index) { return std::clamp(vec.data()[index], low, high); });
 }
 
 /// \return Abs the vector's each dimension
 template <size_t N, typename T>
 constexpr inline auto abs(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::abs(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::abs(vec.data()[index]); });
 }
 
 /// \return The static_cast-ed vector to the requested K type
 template <typename K, size_t N, typename T>
 constexpr inline auto cast(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return static_cast<K>(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return static_cast<K>(vec.data()[index]); });
 }
 
 template <size_t N, typename T>
 constexpr inline auto floor(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::floor(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::floor(vec.data()[index]); });
 }
 
 template <size_t N, typename T>
 constexpr inline auto ceil(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::ceil(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::ceil(vec.data()[index]); });
 }
 
 template <size_t N, typename T>
 constexpr inline auto round(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::round(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::round(vec.data()[index]); });
 }
 template <size_t N, typename T>
 constexpr inline auto lround(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::lround(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::lround(vec.data()[index]); });
 }
 template <size_t N, typename T>
 constexpr inline auto llround(const vec_t<N, T>& vec) {
-	return build_vec<N>([&](const auto index) { return std::llround(vec.data[index]); });
+	return build_vec<N>([&](const auto index) { return std::llround(vec.data()[index]); });
 }
 
 template <size_t N, typename T, typename K, typename L = std::common_type_t<T, K>>
 constexpr inline bool approx(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs, L&& epsilon = 0.00001) {
 	bool result = true;
 	libv::meta::for_constexpr<0, N>([&](const auto index) {
-		result = result && std::abs(lhs.data[index] - rhs.data[index]) < epsilon;
+		result = result && std::abs(lhs.data()[index] - rhs.data()[index]) < epsilon;
 	});
 	return result;
 }
@@ -695,8 +672,8 @@ constexpr inline bool within(const vec_t<N, T>& value, const vec_t<N, K>& min, c
 	bool result = true;
 	libv::meta::for_constexpr<0, N>([&](const auto index) {
 		result = result &&
-				value.data[index] >= min.data[index] &&
-				value.data[index] <= max.data[index];
+				value.data()[index] >= min.data()[index] &&
+				value.data()[index] <= max.data()[index];
 	});
 	return result;
 }

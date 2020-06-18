@@ -47,21 +47,21 @@ TEST_CASE("unionValue") {
 	vec.x = 42;
 
 	CHECK(42.f == vec.x);
-	CHECK(42.f == vec.r);
-	CHECK(42.f == vec.s);
-	CHECK(42.f == vec.data[0]);
+//	CHECK(42.f == vec.r);
+//	CHECK(42.f == vec.s);
+	CHECK(42.f == vec.data()[0]);
 	CHECK(1.f == vec.y);
-	CHECK(1.f == vec.g);
-	CHECK(1.f == vec.t);
-	CHECK(1.f == vec.data[1]);
+//	CHECK(1.f == vec.g);
+//	CHECK(1.f == vec.t);
+	CHECK(1.f == vec.data()[1]);
 	CHECK(2.f == vec.z);
-	CHECK(2.f == vec.b);
-	CHECK(2.f == vec.p);
-	CHECK(2.f == vec.data[2]);
+//	CHECK(2.f == vec.b);
+//	CHECK(2.f == vec.p);
+	CHECK(2.f == vec.data()[2]);
 	CHECK(3.f == vec.w);
-	CHECK(3.f == vec.a);
-	CHECK(3.f == vec.q);
-	CHECK(3.f == vec.data[3]);
+//	CHECK(3.f == vec.a);
+//	CHECK(3.f == vec.q);
+	CHECK(3.f == vec.data()[3]);
 
 	CHECK((4 * sizeof (float)) == sizeof (vec));
 }
@@ -69,26 +69,26 @@ TEST_CASE("unionValue") {
 TEST_CASE("unionAddress") {
 	libv::vec4_t<double> vec(0, 1, 2, 3);
 
-	CHECK(&vec.x == &vec.data[0]);
-	CHECK(&vec.y == &vec.data[0] + 1);
-	CHECK(&vec.z == &vec.data[0] + 2);
-	CHECK(&vec.w == &vec.data[0] + 3);
+	CHECK(&vec.x == &vec.data()[0]);
+	CHECK(&vec.y == &vec.data()[0] + 1);
+	CHECK(&vec.z == &vec.data()[0] + 2);
+	CHECK(&vec.w == &vec.data()[0] + 3);
 
-	CHECK(&vec.x == &vec.data[0]);
-	CHECK(&vec.x == &vec.r);
-	CHECK(&vec.x == &vec.s);
+	CHECK(&vec.x == &vec.data()[0]);
+//	CHECK(&vec.x == &vec.r);
+//	CHECK(&vec.x == &vec.s);
 
-	CHECK(&vec.y == &vec.data[1]);
-	CHECK(&vec.y == &vec.g);
-	CHECK(&vec.y == &vec.t);
+	CHECK(&vec.y == &vec.data()[1]);
+//	CHECK(&vec.y == &vec.g);
+//	CHECK(&vec.y == &vec.t);
 
-	CHECK(&vec.z == &vec.data[2]);
-	CHECK(&vec.z == &vec.b);
-	CHECK(&vec.z == &vec.p);
+	CHECK(&vec.z == &vec.data()[2]);
+//	CHECK(&vec.z == &vec.b);
+//	CHECK(&vec.z == &vec.p);
 
-	CHECK(&vec.w == &vec.data[3]);
-	CHECK(&vec.w == &vec.a);
-	CHECK(&vec.w == &vec.q);
+	CHECK(&vec.w == &vec.data()[3]);
+//	CHECK(&vec.w == &vec.a);
+//	CHECK(&vec.w == &vec.q);
 
 	CHECK((4 * sizeof (double)) == sizeof (vec));
 }

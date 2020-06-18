@@ -827,7 +827,7 @@ inline void GL::blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_siz
 	checkGL();
 }
 inline void GL::clearColor(const libv::vec4f& col) {
-	glClearColor(col.r, col.g, col.b, col.a);
+	glClearColor(col.x, col.y, col.z, col.w);
 	checkGL();
 }
 inline void GL::clearColor(float r, float g, float b, float a) {

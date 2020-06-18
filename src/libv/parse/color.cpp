@@ -193,10 +193,10 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 	// ---------------------------------------------------------------------------------------------
 
 	const auto translate_rgb = [](auto& ctx) {
-		_val(ctx).r = std::get<0>(_attr(ctx));
-		_val(ctx).g = std::get<1>(_attr(ctx));
-		_val(ctx).b = std::get<2>(_attr(ctx));
-		_val(ctx).a = std::get<3>(_attr(ctx));
+		_val(ctx).x = std::get<0>(_attr(ctx));
+		_val(ctx).y = std::get<1>(_attr(ctx));
+		_val(ctx).z = std::get<2>(_attr(ctx));
+		_val(ctx).w = std::get<3>(_attr(ctx));
 	};
 
 	const auto translate_hsl = [](auto& ctx) {
@@ -211,31 +211,31 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 		auto m = l - c * .5f;
 
 		if (h < 60.f) {
-			_val(ctx).r = m + c;
-			_val(ctx).g = m + x;
-			_val(ctx).b = m;
+			_val(ctx).x = m + c;
+			_val(ctx).y = m + x;
+			_val(ctx).z = m;
 		} else if (h < 120.f) {
-			_val(ctx).r = m + x;
-			_val(ctx).g = m + c;
-			_val(ctx).b = m;
+			_val(ctx).x = m + x;
+			_val(ctx).y = m + c;
+			_val(ctx).z = m;
 		} else if (h < 180.f) {
-			_val(ctx).r = m;
-			_val(ctx).g = m + c;
-			_val(ctx).b = m + x;
+			_val(ctx).x = m;
+			_val(ctx).y = m + c;
+			_val(ctx).z = m + x;
 		} else if (h < 240.f) {
-			_val(ctx).r = m;
-			_val(ctx).g = m + x;
-			_val(ctx).b = m + c;
+			_val(ctx).x = m;
+			_val(ctx).y = m + x;
+			_val(ctx).z = m + c;
 		} else if (h < 300.f) {
-			_val(ctx).r = m + x;
-			_val(ctx).g = m;
-			_val(ctx).b = m + c;
+			_val(ctx).x = m + x;
+			_val(ctx).y = m;
+			_val(ctx).z = m + c;
 		} else {
-			_val(ctx).r = m + c;
-			_val(ctx).g = m;
-			_val(ctx).b = m + x;
+			_val(ctx).x = m + c;
+			_val(ctx).y = m;
+			_val(ctx).z = m + x;
 		}
-		_val(ctx).a = std::get<3>(_attr(ctx));
+		_val(ctx).w = std::get<3>(_attr(ctx));
 	};
 
 	const auto translate_hsv = [](auto& ctx) {
@@ -250,31 +250,31 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 		auto m = v - c;
 
 		if (h < 60.f) {
-			_val(ctx).r = m + c;
-			_val(ctx).g = m + x;
-			_val(ctx).b = m;
+			_val(ctx).x = m + c;
+			_val(ctx).y = m + x;
+			_val(ctx).z = m;
 		} else if (h < 120.f) {
-			_val(ctx).r = m + x;
-			_val(ctx).g = m + c;
-			_val(ctx).b = m;
+			_val(ctx).x = m + x;
+			_val(ctx).y = m + c;
+			_val(ctx).z = m;
 		} else if (h < 180.f) {
-			_val(ctx).r = m;
-			_val(ctx).g = m + c;
-			_val(ctx).b = m + x;
+			_val(ctx).x = m;
+			_val(ctx).y = m + c;
+			_val(ctx).z = m + x;
 		} else if (h < 240.f) {
-			_val(ctx).r = m;
-			_val(ctx).g = m + x;
-			_val(ctx).b = m + c;
+			_val(ctx).x = m;
+			_val(ctx).y = m + x;
+			_val(ctx).z = m + c;
 		} else if (h < 300.f) {
-			_val(ctx).r = m + x;
-			_val(ctx).g = m;
-			_val(ctx).b = m + c;
+			_val(ctx).x = m + x;
+			_val(ctx).y = m;
+			_val(ctx).z = m + c;
 		} else {
-			_val(ctx).r = m + c;
-			_val(ctx).g = m;
-			_val(ctx).b = m + x;
+			_val(ctx).x = m + c;
+			_val(ctx).y = m;
+			_val(ctx).z = m + x;
 		}
-		_val(ctx).a = std::get<3>(_attr(ctx));
+		_val(ctx).w = std::get<3>(_attr(ctx));
 	};
 
 	// ---------------------------------------------------------------------------------------------
