@@ -505,17 +505,22 @@ libv.ui: Hide component memory management: sp<Label> -> Label = magic<ImplLabel>
 libv.ui: component base fire should reject non this pointer or types
 libv.ui: Clean up base_component/component includes with the new memory model
 libv.ui: Remove every usage of std::shared_ptr<BaseComponent>
-libv.ui: fix typo: Travers -> Traverse
+libv.ui: Fix typo: Travers -> Traverse
+libv.ui: Autonaming should use per type indexing
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: Hide BaseComponent usage from every API: focus,
-libv.ui: Kill .base() usages
+libv.ui: align_vertical for string2D
+
+
+
+
 
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
-libv.ui: align_vertical for string2D
+libv.ui: Hide or kill BaseComponent usage from every API like focus
+libv.ui: Kill .base() usages wherever possible
 
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 
@@ -523,12 +528,12 @@ libv.ui: container child anchor_parent, anchor_target and size are general conce
 		grid anchor_content is also here
 libv.ui: Kill the half manual half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
-libv.ui: Rename BaseComponent to CoreComponent (?) or CoreBaseComponent
-libv.ui: Autonaming should use per type indexing
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 libv.ui: OverlayZoom use linearized zoom
 
-libv.math: kill vec dependency to glm
+libv.ui: Rename BaseComponent to CoreComponent (?) or CoreBaseComponent
+
+libv.math: kill vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 
 
 

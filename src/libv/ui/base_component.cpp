@@ -30,9 +30,9 @@ BaseComponent::BaseComponent(std::string name) :
 	context_(current_thread_context()),
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(GenerateName_t, const std::string_view type) :
+BaseComponent::BaseComponent(GenerateName_t, const std::string_view type, size_t index) :
 	context_(current_thread_context()),
-	name(libv::concat(type, '-', nextID++)) { }
+	name(libv::concat(type, '-', index)) { }
 
 BaseComponent::~BaseComponent() {
 	log_ui.error_if(isAttached(), "Component is destructed in an attached state: {}", path());

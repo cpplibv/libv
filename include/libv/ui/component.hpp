@@ -84,6 +84,9 @@ public:
 
 template <typename ComponentT, typename EventHostT>
 struct ComponenetHandler : public Component {
+private:
+	static inline size_t nextID = 0;
+
 protected:
 	template <typename DelayedT = ComponentT>
 	explicit inline ComponenetHandler(std::string name) :
@@ -91,12 +94,12 @@ protected:
 
 	template <typename DelayedT = ComponentT>
 	explicit inline ComponenetHandler(GenerateName_t = {}, const std::string_view type = "component") :
-		Component(create_base_ptr<DelayedT>(GenerateName, type)) { }
+		Component(create_base_ptr<DelayedT>(GenerateName, type, nextID++)) { }
 
 	explicit inline ComponenetHandler(base_ptr ptr) noexcept :
 		Component(std::move(ptr)) {
 
-		assert(dynamic_cast<ComponentT*>(this->ptr) != nullptr && "");
+		assert(dynamic_cast<ComponentT*>(this->ptr) != nullptr && "Invalid component pointer initialization");
 	}
 
 protected:

@@ -71,14 +71,12 @@ private:
 	/// Null if no style is assigned to the component
 	libv::intrusive_ptr<Style> style_;
 
-private:
-	static inline size_t nextID = 0;
 public:
 	std::string name;
 
 public:
 	explicit BaseComponent(std::string name);
-	BaseComponent(GenerateName_t, const std::string_view type);
+	explicit BaseComponent(GenerateName_t, const std::string_view type, size_t index);
 
 	BaseComponent(const BaseComponent&) = delete;
 	BaseComponent(BaseComponent&&) = delete;

@@ -3,7 +3,7 @@
 // hpp
 #include <vm4_viewer/scene/camera_behaviour.hpp>
 // libv
-#include <libv/ctrl/controls.hpp> // <<< P9: tmp for binds
+#include <libv/ctrl/controls.hpp> // <<< P9: temporary for binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
 // pro
