@@ -505,6 +505,7 @@ libv.ui: Hide component memory management: sp<Label> -> Label = magic<ImplLabel>
 libv.ui: component base fire should reject non this pointer or types
 libv.ui: Clean up base_component/component includes with the new memory model
 libv.ui: Remove every usage of std::shared_ptr<BaseComponent>
+libv.ui: fix typo: Travers -> Traverse
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -512,7 +513,6 @@ libv.ui: Remove every usage of std::shared_ptr<BaseComponent>
 
 libv.ui: Hide BaseComponent usage from every API: focus,
 libv.ui: Kill .base() usages
-libv.ui: fix typo: Travers -> Traverse
 
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
 libv.ui: align_vertical for string2D
@@ -1084,16 +1084,16 @@ hotkey
 	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
 
 focus
-	libv.ui.focus: Key/Hotkey events can trigger focus-traversal
-	libv.ui.focus: easy way to trigger Focus traversal from events/components
-	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traversal
+	libv.ui.focus: Key/Hotkey events can trigger focus-traverseal
+	libv.ui.focus: easy way to trigger Focus traverseal from events/components
+	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traverseal
 	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
 	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further
-	libv.ui.focus: Focus traversal order: direct link (ptr, ptr)
-	libv.ui.focus: Focus-traversal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
+	libv.ui.focus: Focus traverseal order: direct link (ptr, ptr)
+	libv.ui.focus: Focus-traverseal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
 
-	libv.ui.focus: Focus traversal order: layout driven (layout knows the orientation)
-	libv.ui.focus: Focus traversal order: position based
+	libv.ui.focus: Focus traverseal order: layout driven (layout knows the orientation)
+	libv.ui.focus: Focus traverseal order: position based
 
 libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by String2D edit
 libv.ui: include check everything / fwd everything

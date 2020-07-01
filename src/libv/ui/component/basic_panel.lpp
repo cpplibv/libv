@@ -12,7 +12,7 @@
 // pro
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/component.hpp>
-#include <libv/ui/context_focus_travers.hpp>
+#include <libv/ui/context_focus_traverse.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/style.hpp>
@@ -42,7 +42,7 @@ private:
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current) override;
+	virtual libv::observer_ptr<BaseComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
 	virtual void doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
@@ -105,7 +105,7 @@ void CoreBasicPanel<Layout>::doStyle(ContextStyle& ctx, ChildID childID) {
 }
 
 template <typename Layout>
-libv::observer_ptr<BaseComponent> CoreBasicPanel<Layout>::doFocusTravers(const ContextFocusTravers& context, ChildID current) {
+libv::observer_ptr<BaseComponent> CoreBasicPanel<Layout>::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
 	const ChildID dir = context.isForward() ? +1 : -1;
 	const ChildID end = context.isForward() ? static_cast<ChildID>(children.size()) : -1;
 	ChildID begin = context.isForward() ? 0 : static_cast<ChildID>(children.size() - 1);
@@ -127,7 +127,7 @@ libv::observer_ptr<BaseComponent> CoreBasicPanel<Layout>::doFocusTravers(const C
 		return nullptr;
 
 	for (ChildID i = begin; i != end; i += dir)
-		if (auto hit = AccessParent::doFocusTravers(children[i].ptr.base(), context, ChildIDNone))
+		if (auto hit = AccessParent::doFocusTraverse(children[i].ptr.base(), context, ChildIDNone))
 			return hit;
 
 	return nullptr;

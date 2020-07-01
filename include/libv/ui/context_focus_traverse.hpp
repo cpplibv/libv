@@ -15,7 +15,7 @@ namespace ui {
 
 class BaseComponent;
 
-struct ContextFocusTravers {
+struct ContextFocusTraverse {
 	Degrees<float> direction;
 	// libv::vec3f direction;
 

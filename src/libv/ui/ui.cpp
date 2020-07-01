@@ -19,7 +19,7 @@
 #include <libv/ui/base_component.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
-#include <libv/ui/context_focus_travers.hpp>
+#include <libv/ui/context_focus_traverse.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
@@ -176,16 +176,16 @@ public:
 		}
 	}
 
-	libv::observer_ptr<BaseComponent> focusTravers(libv::observer_ptr<BaseComponent> old_focus, Degrees<float> direction) {
-		ContextFocusTravers ctx{direction};
+	libv::observer_ptr<BaseComponent> focusTraverse(libv::observer_ptr<BaseComponent> old_focus, Degrees<float> direction) {
+		ContextFocusTraverse ctx{direction};
 
 		libv::observer_ptr<BaseComponent> new_focus = nullptr;
 
-		if (old_focus != nullptr) // Traverse to next
-			new_focus = AccessRoot::focusTravers(*old_focus, ctx);
+		if (old_focus != nullptr) // Traversee to next
+			new_focus = AccessRoot::focusTraverse(*old_focus, ctx);
 
 		if (new_focus == nullptr) // End reached, Loop around
-			new_focus = AccessRoot::focusTravers(root.base(), ctx);
+			new_focus = AccessRoot::focusTraverse(root.base(), ctx);
 
 		focus(old_focus, new_focus);
 		return new_focus;
@@ -527,7 +527,7 @@ void UI::detachFocused(BaseComponent& component) {
 	(void) component;
 
 	assert(component == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
-	self->context_state.focus_ = self->focusTravers(self->context_state.focus_, Degrees<float>{315});
+	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, Degrees<float>{315});
 }
 
 void UI::detachFocusLinked(BaseComponent& component) {

@@ -24,7 +24,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ContextFocusTravers;
+class ContextFocusTraverse;
 class ContextLayout1;
 class ContextLayout2;
 class ContextRender;
@@ -186,7 +186,7 @@ private:
 	void detach(BaseComponent& parent);
 	void style();
 	void styleScan();
-	libv::observer_ptr<BaseComponent> focusTravers(const ContextFocusTravers& context);
+	libv::observer_ptr<BaseComponent> focusTraverse(const ContextFocusTraverse& context);
 	void render(ContextRender& context);
 	void layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
@@ -197,7 +197,7 @@ private:
 	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback);
 	virtual void doStyle(ContextStyle& context);
 	virtual void doStyle(ContextStyle& context, ChildID childID);
-	virtual libv::observer_ptr<BaseComponent> doFocusTravers(const ContextFocusTravers& context, ChildID current);
+	virtual libv::observer_ptr<BaseComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
 	virtual void doCreate(ContextRender& context);
 	virtual void doDestroy(ContextRender& context);
 	virtual void doRender(ContextRender& context);
@@ -238,8 +238,8 @@ struct AccessParent {
 	static inline decltype(auto) isFocusableChild(const BaseComponent& component) {
 		return component.flags.match_any(Flag::focusableChild);
 	}
-	static inline decltype(auto) doFocusTravers(BaseComponent& component, const ContextFocusTravers& context, ChildID current) {
-		return component.doFocusTravers(context, current);
+	static inline decltype(auto) doFocusTraverse(BaseComponent& component, const ContextFocusTraverse& context, ChildID current) {
+		return component.doFocusTraverse(context, current);
 	}
 };
 
@@ -307,8 +307,8 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) focusLoss(BaseComponent& component) {
 		return BaseComponent::focusLoss(component);
 	}
-	static inline decltype(auto) focusTravers(BaseComponent& component, const ContextFocusTravers& context) {
-		return component.focusTravers(context);
+	static inline decltype(auto) focusTraverse(BaseComponent& component, const ContextFocusTraverse& context) {
+		return component.focusTraverse(context);
 	}
 	static inline decltype(auto) render(BaseComponent& component, ContextRender& context) {
 		return component.render(context);

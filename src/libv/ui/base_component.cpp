@@ -8,7 +8,7 @@
 #include <cassert>
 // pro
 #include <libv/ui/context_event.hpp>
-#include <libv/ui/context_focus_travers.hpp>
+#include <libv/ui/context_focus_traverse.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
@@ -391,14 +391,14 @@ void BaseComponent::styleScan() {
 	flags.reset(Flag::pendingStyle);
 }
 
-libv::observer_ptr<BaseComponent> BaseComponent::focusTravers(const ContextFocusTravers& context) {
+libv::observer_ptr<BaseComponent> BaseComponent::focusTraverse(const ContextFocusTraverse& context) {
 	// Algorithm driver method, does not directly recurse, up walking
 
-	libv::observer_ptr<BaseComponent> result = doFocusTravers(context, ChildIDSelf);
+	libv::observer_ptr<BaseComponent> result = doFocusTraverse(context, ChildIDSelf);
 	libv::observer_ref<BaseComponent> ancestor = *this;
 
 	while (result == nullptr && ancestor != ancestor->parent) {
-		result = ancestor->parent->doFocusTravers(context, ancestor->childID);
+		result = ancestor->parent->doFocusTraverse(context, ancestor->childID);
 		ancestor = ancestor->parent;
 	}
 
@@ -495,7 +495,7 @@ void BaseComponent::doStyle(ContextStyle& context, ChildID childID) {
 	(void) childID;
 }
 
-libv::observer_ptr<BaseComponent> BaseComponent::doFocusTravers(const ContextFocusTravers& context, ChildID current) {
+libv::observer_ptr<BaseComponent> BaseComponent::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
 	(void) context;
 
 	if (current == ChildIDSelf || !isFocusableComponent())
