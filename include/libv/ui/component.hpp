@@ -47,7 +47,7 @@ protected:
 	explicit Component(base_ptr ptr_) noexcept;
 
 public:
-	inline EventHostGeneral<Component> event() noexcept {
+	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
 		return {*this};
 	}
 
@@ -111,7 +111,7 @@ protected:
 	}
 
 public:
-	inline EventHostT event() noexcept {
+	[[nodiscard]] inline EventHostT event() noexcept {
 		return EventHostT{static_cast<typename EventHostT::component_type&>(*this)};
 	}
 };

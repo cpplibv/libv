@@ -35,17 +35,33 @@ static constexpr std::array AlignHorizontalTable = {
 	0.0f, // JustifyAll
 };
 
+static constexpr std::array AlignVerticalTable = {
+	0.0f, // Top
+	0.5f, // Center
+	1.0f, // Bottom
+	0.0f, // Justify
+	0.0f, // JustifyAll
+};
+
 static constexpr uint32_t invalidCodepointReplacement = '_';
 
 } // namespace
 
 // -------------------------------------------------------------------------------------------------
 
-void String2D::align(const AlignHorizontal new_align) {
-	if (align_ == new_align)
+void String2D::align_horizontal(const AlignHorizontal new_align) {
+	if (align_horizontal_ == new_align)
 		return;
 
-	align_ = new_align;
+	align_horizontal_ = new_align;
+	dirty = true;
+}
+
+void String2D::align_vertical(const AlignVertical new_align) {
+	if (align_vertical_ == new_align)
+		return;
+
+	align_vertical_ = new_align;
 	dirty = true;
 }
 
@@ -384,8 +400,9 @@ libv::vec2f String2D::content(libv::vec2f new_limit) {
 
 void String2D::layout() {
 	if (font_ == nullptr) {
-		log_ui.fatal("Attempted to layout a String2D without a valid font");
+		log_ui.error("Attempted to layout a String2D without a valid font");
 		assert(false && "Attempted to layout a String2D without a valid font");
+		return;
 	}
 
 	mesh_.clear();
@@ -405,10 +422,11 @@ void String2D::layout() {
 	const auto descender = font_->getDescender(fontSize_);
 	const auto hasLimitX = limit_.x > 0;
 	const auto hasLimitY = limit_.y > 0;
-	const auto heightAdjusment = hasLimitY ? std::round(limit_.y - lineAdvance - descender) : 0.0f;
+	const auto heightAdjusment = std::round((hasLimitY ? limit_.y : 0.0f) - lineAdvance - descender);
+
 	auto pen = libv::vec2f{0, heightAdjusment};
 	auto previousCodepoint = uint32_t{'\n'};
-	auto lines = boost::container::small_vector<Line, 8>{1}; // 2240 Byte on the stack
+	auto lines = boost::container::small_vector<Line, 8>{1}; // ~2240 Byte on the stack
 	auto line = libv::observer_ref<Line>{lines.data()};
 	auto contentWidth = limit_.x;
 
@@ -419,7 +437,7 @@ void String2D::layout() {
 			contentWidth = std::max(line->width, contentWidth);
 	};
 
-	const auto newLine = [&]() {
+	const auto newLine = [&] {
 		finishLine();
 
 		const auto lastEnd = line->end;
@@ -488,22 +506,40 @@ void String2D::layout() {
 	}
 	finishLine();
 
-	for (const auto& [index, line] : lines | ranges::view::enumerate) {
-		const auto leftover = contentWidth - line.width;
+	// --- Alignments ---
 
-		const auto offset = std::round(leftover * AlignHorizontalTable[libv::to_value(align_)]);
-		const auto isLastLine = static_cast<size_t>(index) == lines.size() - 1;
-		const auto isJustifiedLine = align_ == AlignHorizontal::JustifyAll || (align_ == AlignHorizontal::Justify && !isLastLine);
-		const auto justifyGap = isJustifiedLine ?
-				leftover / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) : 0.0f;
+	const auto num_lines_f = static_cast<float>(lines.size());
+	const auto lines_height_sum = num_lines_f * lineAdvance;
+
+	const auto leftoverY = hasLimitY ? (limit_.y - lines_height_sum) : 0.f;
+	const auto offsetY = -1.f * leftoverY * AlignVerticalTable[libv::to_value(align_vertical_)];
+	const auto isJustifiedY = align_vertical_ == AlignVertical::JustifyAll || align_vertical_ == AlignVertical::Justify;
+	const auto justifyGapY = isJustifiedY ?
+			-1.f * leftoverY / std::max(1.f, num_lines_f - 1.0f) : 0.0f;
+
+	for (const auto& [line_index, line] : lines | ranges::view::enumerate) {
+		const auto line_index_f = static_cast<float>(line_index);
+
+		const auto leftoverX = contentWidth - line.width;
+		const auto offsetX = leftoverX * AlignHorizontalTable[libv::to_value(align_horizontal_)];
+		const auto isLastLine = static_cast<size_t>(line_index) == lines.size() - 1;
+		const auto isJustifiedLine = align_horizontal_ == AlignHorizontal::JustifyAll || (align_horizontal_ == AlignHorizontal::Justify && !isLastLine);
+		const auto justifyGapX = isJustifiedLine ?
+				leftoverX / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) : 0.0f;
+
+		const auto adjusmentY = std::round(offsetY + line_index_f * justifyGapY);
 
 		size_t i = line.begin;
-		auto justifyOffset = 0.0f;
-		for (const auto& wordEnd : line.wordEndings) {
+		for (const auto& [word_index, wordEnd] : line.wordEndings | ranges::view::enumerate) {
+			const auto word_index_f = static_cast<float>(word_index);
+
+			const auto adjusmentX = std::round(offsetX + word_index_f * justifyGapX);
+
 			while (i < wordEnd) {
-				position[i++].x += offset + justifyOffset;
+				position[i].x += adjusmentX;
+				position[i].y += adjusmentY;
+				i++;
 			}
-			justifyOffset += justifyGap;
 		}
 	}
 

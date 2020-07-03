@@ -130,21 +130,20 @@ void CoreInputField::access_properties(T& ctx) {
 	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
-			[](auto& c, auto v) { c.text_.align(v); },
-			[](const auto& c) { return c.text_.align(); },
+			[](auto& c, auto v) { c.text_.align_horizontal(v); },
+			[](const auto& c) { return c.text_.align_horizontal(); },
 			AlignHorizontal::Left,
 			pgr::appearance, pnm::align_horizontal,
 			"Horizontal alignment of the text"
 	);
-// TODO P1: Implement align_vertical
-//	ctx.indirect(
-//			[](auto& c) -> auto& { return c.property.align_vertical; },
-//			[](auto& c, auto v) { c.text_.align_vertical(v); },
-//			[](const auto& c) { return c.text_.align_vertical(); },
-//			AlignVertical::Top,
-//			pgr::appearance, pnm::align_vertical,
-//			"Vertical alignment of the text"
-//	);
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.align_vertical; },
+			[](auto& c, auto v) { c.text_.align_vertical(v); },
+			[](const auto& c) { return c.text_.align_vertical(); },
+			AlignVertical::Top,
+			pgr::appearance, pnm::align_vertical,
+			"Vertical alignment of the text"
+	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_color; },
 			Color(0, 0, 0, 1),
@@ -574,25 +573,22 @@ const ShaderImage_view& InputField::shader() const noexcept {
 
 void InputField::align_horizontal(AlignHorizontal value) {
 	AccessProperty::setter(self(), self().property.align_horizontal, PropertyDriver::manual, [&]() {
-		self().text_.align(value);
+		self().text_.align_horizontal(value);
 	});
 }
 
 AlignHorizontal InputField::align_horizontal() const noexcept {
-	return self().text_.align();
+	return self().text_.align_horizontal();
 }
 
 void InputField::align_vertical(AlignVertical value) {
-	assert(false && "Not implemented yet");
 	AccessProperty::setter(self(), self().property.align_vertical, PropertyDriver::manual, [&]() {
-		// self().text_.align_vertical(value);
+		 self().text_.align_vertical(value);
 	});
 }
 
 AlignVertical InputField::align_vertical() const noexcept {
-	assert(false && "Not implemented yet");
-	// return self().property.align_vertical();
-	return AlignVertical::Top;
+	return self().text_.align_vertical();
 }
 
 void InputField::font(Font2D_view value) {

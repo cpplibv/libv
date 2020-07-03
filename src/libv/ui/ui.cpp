@@ -150,10 +150,12 @@ public:
 public:
 	ImplUI(UI& ui) :
 		context(ui, context_state),
+		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
 		root((current_thread_context(context), "")) { }
 
 	ImplUI(UI& ui, const Settings& settings) :
 		context(ui, context_state, settings),
+		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
 		root((current_thread_context(context), "")) { }
 
 public:

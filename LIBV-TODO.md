@@ -507,33 +507,34 @@ libv.ui: Clean up base_component/component includes with the new memory model
 libv.ui: Remove every usage of std::shared_ptr<BaseComponent>
 libv.ui: Fix typo: Travers -> Traverse
 libv.ui: Autonaming should use per type indexing
+libv.ui: align_vertical for string2D
+libv.ui: align_vertical for string2D in pickers | Well, the algo was fool proof and it just works
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: align_vertical for string2D
 
 
-
-
-
-libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
-libv.ui: Hide or kill BaseComponent usage from every API like focus
-libv.ui: Kill .base() usages wherever possible
-
-libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
-
+libv.ui: property size
 libv.ui: container child anchor_parent, anchor_target and size are general concept and every component should have them -> eliminates child storage issues (for now)
 		grid anchor_content is also here
-libv.ui: Kill the half manual half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
+
+
+libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
+
+libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
+libv.ui: Hide or remove BaseComponent usage from every API (like focus)
+libv.ui: Remove .base() usages wherever possible
+
+libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 libv.ui: OverlayZoom use linearized zoom
 
 libv.ui: Rename BaseComponent to CoreComponent (?) or CoreBaseComponent
 
-libv.math: kill vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
+libv.math: remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 
 
 
@@ -554,6 +555,8 @@ libv.ui: UI level message/event bus/system could use support for hierarchical up
 libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
+
+libv.ui: Idea for over restricted string_2D: in content would exceed limit, just push the lines or characters closer to each other (could be policy driven)
 
 ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
 ext.x3: make sure that every rule is static

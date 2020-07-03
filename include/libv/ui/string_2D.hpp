@@ -49,13 +49,15 @@ private:
 
 	FontSize fontSize_ = FontSize{12};
 	bool dirty = true;
-	AlignHorizontal align_ = AlignHorizontal::Center;
+	AlignHorizontal align_horizontal_ = AlignHorizontal::Center;
+	AlignVertical align_vertical_ = AlignVertical::Center;
 	libv::vec2f limit_;
 
 	std::string string_;
 
 public:
-	void align(const AlignHorizontal align);
+	void align_horizontal(const AlignHorizontal align);
+	void align_vertical(const AlignVertical align);
 	void font(std::shared_ptr<Font2D> font);
 	void font(std::shared_ptr<Font2D> font, const FontSize fontSize);
 	void size(const FontSize fontSize);
@@ -64,9 +66,11 @@ public:
 	inline void limit(const float x, const float y) { limit({x, y}); }
 
 public:
-	[[nodiscard]] size_t length() const noexcept;
-	[[nodiscard]] inline AlignHorizontal align() const noexcept {
-		return align_;
+	[[nodiscard]] inline AlignHorizontal align_horizontal() const noexcept {
+		return align_horizontal_;
+	}
+	[[nodiscard]] inline AlignVertical align_vertical() const noexcept {
+		return align_vertical_;
 	}
 	[[nodiscard]] inline const std::string& string() const noexcept {
 		return string_;
@@ -77,6 +81,9 @@ public:
 	[[nodiscard]] inline FontSize size() const noexcept {
 		return fontSize_;
 	}
+
+public:
+	[[nodiscard]] size_t length() const noexcept;
 
 public:
 	void insert(size_t position, uint32_t unicode);

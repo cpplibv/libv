@@ -137,7 +137,7 @@ public:
 
 		label.text("Label");
 		label.align_horizontal(libv::ui::AlignHorizontal::Center);
-//		label.align_vertical(libv::ui::AlignVertical::Center); // TODO P1: align_vertical on label / button / etc
+		label.align_vertical(libv::ui::AlignVertical::Center);
 
 		label_image.text("Label image");
 		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
@@ -224,7 +224,7 @@ public:
 //		panel1->add(stretch0);
 //
 //		ui.add(panel0);
-//
+
 		onKey.output([&](const libv::input::EventKey& e) {
 			if (e.action == libv::input::Action::release)
 				return;
@@ -239,46 +239,41 @@ public:
 //				label2->flag(libv::ui::Flag::invalidLayout);
 //				log_sandbox.trace("Pop back");
 //			}
-//
-//			if (e.keycode == libv::input::Keycode::Enter || e.keycode == libv::input::Keycode::KPEnter) {
-//				label0->string.push_back("\n");
-//				label2->string.push_back("\n");
-//				label0->flag(libv::ui::Flag::invalidLayout);
-//				label2->flag(libv::ui::Flag::invalidLayout);
-//				log_sandbox.trace("Appending new panel_line");
-//			}
-//
-//			if (e.mods != libv::input::KeyModifier::control)
-//				return;
-//
-//			switch (e.keycode) {
-//			case libv::input::Keycode::Num0:
-//				label0->properties.align = libv::ui::AlignHorizontal::Left;
-//				label2->properties.align = libv::ui::AlignHorizontal::Left;
-//				log_sandbox.trace("Set anchor to {}", "Left");
-//				break;
-//
-//			case libv::input::Keycode::Num1:
-//				label0->properties.align = libv::ui::AlignHorizontal::Center;
-//				label2->properties.align = libv::ui::AlignHorizontal::Center;
-//				log_sandbox.trace("Set anchor to {}", "Center");
-//				break;
-//
-//			case libv::input::Keycode::Num2:
-//				label0->properties.align = libv::ui::AlignHorizontal::Right;
-//				label2->properties.align = libv::ui::AlignHorizontal::Right;
-//				log_sandbox.trace("Set anchor to {}", "Right");
-//				break;
-//
-//			case libv::input::Keycode::Num3:
-//				label0->properties.align = libv::ui::AlignHorizontal::Justify;
-//				label2->properties.align = libv::ui::AlignHorizontal::Justify;
-//				log_sandbox.trace("Set anchor to {}", "Justify");
-//				break;
-//
-//			default:
-//				break;
-//			}
+
+			if (e.keycode == libv::input::Keycode::Enter || e.keycode == libv::input::Keycode::KPEnter) {
+				log_sandbox.trace("Appending new line");
+				label.text(label.text() + "\n");
+			}
+
+			if (e.keycode == libv::input::Keycode::F7) {
+				log_sandbox.trace("AlignVertical::Top");
+				label.align_vertical(libv::ui::AlignVertical::Top);
+				input_field.align_vertical(libv::ui::AlignVertical::Top);
+			}
+
+			if (e.keycode == libv::input::Keycode::F8) {
+				log_sandbox.trace("AlignVertical::Center");
+				label.align_vertical(libv::ui::AlignVertical::Center);
+				input_field.align_vertical(libv::ui::AlignVertical::Center);
+			}
+
+			if (e.keycode == libv::input::Keycode::F9) {
+				log_sandbox.trace("AlignVertical::Bottom");
+				label.align_vertical(libv::ui::AlignVertical::Bottom);
+				input_field.align_vertical(libv::ui::AlignVertical::Bottom);
+			}
+
+			if (e.keycode == libv::input::Keycode::F10) {
+				log_sandbox.trace("AlignVertical::Justify");
+				label.align_vertical(libv::ui::AlignVertical::Justify);
+				input_field.align_vertical(libv::ui::AlignVertical::Justify);
+			}
+
+			if (e.keycode == libv::input::Keycode::F11) {
+				log_sandbox.trace("AlignVertical::JustifyAll");
+				label.align_vertical(libv::ui::AlignVertical::JustifyAll);
+				input_field.align_vertical(libv::ui::AlignVertical::JustifyAll);
+			}
 		});
 		onChar.output([&](const libv::input::EventChar& e) {
 //			label0->string.push_back(e.utf8);
