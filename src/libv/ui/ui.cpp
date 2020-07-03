@@ -272,7 +272,7 @@ public:
 
 		if (overlayZoomMode == OverlayZoomMode::view)
 			// Floor is used as mouse position are in pixel center coordinates
-			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.size2(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
+			position = libv::vec::floor(libv::remap(position, libv::vec2f(), root.layout_size2(), overlayZoom.screen_BL(), overlayZoom.screen_TR() + 1.0f));
 
 		context.mouse.event_position(position);
 		context_state.mouse_position_ = position;
@@ -307,7 +307,7 @@ void UI::add(Component component) {
 
 void UI::setSize(libv::vec2i size_) noexcept {
 	std::unique_lock lock{self->mutex};
-	AccessRoot::size(self->root.base()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
+	AccessRoot::layout_size(self->root.base()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
 	AccessRoot::flagAuto(self->root.base(), Flag::pendingLayout);
 }
 
@@ -436,7 +436,7 @@ void UI::update(libv::glr::Queue& gl) {
 	try {
 		AccessRoot::layout1(self->root.base(), ContextLayout1{});
 		self->stat.layout1.sample(self->timer.time_ns());
-		AccessRoot::layout2(self->root.base(), ContextLayout2{self->root.position(), self->root.size(), MouseOrder{0}});
+		AccessRoot::layout2(self->root.base(), ContextLayout2{self->root.layout_position(), self->root.layout_size(), MouseOrder{0}});
 		self->stat.layout2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
@@ -462,13 +462,13 @@ void UI::update(libv::glr::Queue& gl) {
 
 		gl.state.polygonModeFill();
 
-		gl.projection = libv::mat4f::ortho(self->root.position2(), self->root.size2());
+		gl.projection = libv::mat4f::ortho(self->root.layout_position2(), self->root.layout_size2());
 		gl.view = libv::mat4f::identity();
 		gl.model = libv::mat4f::identity();
 
 		gl.viewport(
-				libv::vec::cast<int32_t>(self->root.position2()),
-				libv::vec::cast<int32_t>(self->root.size2())
+				libv::vec::cast<int32_t>(self->root.layout_position2()),
+				libv::vec::cast<int32_t>(self->root.layout_size2())
 		);
 
 		ContextRender context{gl, clock::now()};

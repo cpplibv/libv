@@ -18,7 +18,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-// <<< P6: make sure that the camera points toward its X+ and the rotations are also based on that
+// TODO P1: make sure that the camera points toward its X+ and the rotations are also based on that
 struct Camera2 {
 private:
 	//private:

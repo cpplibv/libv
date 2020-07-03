@@ -26,8 +26,8 @@
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
+#include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/ui.hpp>
-//#include <libv/ui/parse/parse_size.hpp>
 //#include <libv/ui/style.hpp>
 
 
@@ -129,11 +129,11 @@ public:
 		button1.image(ui.context().texture2D("separator_bar_256x16.png"));
 
 		button2.text("Button 2!");
-//		button2.anchor(libv::ui::ANCHOR_TOP_LEFT);
-//		button2.size("25%, 25%");
+		button2.anchor(libv::ui::Anchor::top_left);
+		button2.size(libv::ui::parse_size_or_throw("33%, 33%"));
 		button3.text("Button 3!");
-//		button3.anchor(libv::ui::ANCHOR_BOTTOM_RIGHT);
-//		button3.size("25%, 25%");
+		button3.anchor(libv::ui::Anchor::bottom_right);
+		button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
 
 		label.text("Label");
 		label.align_horizontal(libv::ui::AlignHorizontal::Center);
@@ -143,6 +143,7 @@ public:
 		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
 
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
+		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
 		input_field.text("Input Field");
 		input_field.event().change([](auto& component, const auto&) {
@@ -158,6 +159,8 @@ public:
 		stretch.image(ui.context().texture2D("stretch_border.png"));
 
 		quad.color({.8f, .5f, .5f, 1.f});
+		quad.anchor(libv::ui::Anchor::center_center);
+		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
 
 		scroll_bar.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);

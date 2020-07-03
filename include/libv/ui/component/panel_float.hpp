@@ -4,7 +4,6 @@
 
 // pro
 #include <libv/ui/component.hpp>
-#include <libv/ui/event_host.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
 

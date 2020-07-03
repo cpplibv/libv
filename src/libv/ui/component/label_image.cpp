@@ -138,6 +138,7 @@ void CoreLabelImage::access_properties(T& ctx) {
 void CoreLabelImage::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabelImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreLabelImage::doLayout1(const ContextLayout1& environment) {
@@ -161,9 +162,9 @@ void CoreLabelImage::doRender(ContextRender& ctx) {
 		auto index = bg_mesh.index();
 
 		pos(0, 0, 0);
-		pos(size().x, 0, 0);
-		pos(size().x, size().y, 0);
-		pos(0, size().y, 0);
+		pos(layout_size().x, 0, 0);
+		pos(layout_size().x, layout_size().y, 0);
+		pos(0, layout_size().y, 0);
 
 		tex(0, 0);
 		tex(1, 0);
@@ -174,7 +175,7 @@ void CoreLabelImage::doRender(ContextRender& ctx) {
 	}
 
 	const auto guard_m = ctx.gl.model.push_guard();
- 	ctx.gl.model.translate(position());
+ 	ctx.gl.model.translate(layout_position());
 
 	{
 		ctx.gl.program(*property.bg_shader());

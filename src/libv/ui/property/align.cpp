@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/property/align.hpp>
 // std
+#include <cassert>
 #include <ostream>
 
 
@@ -19,6 +20,8 @@ std::ostream& operator<<(std::ostream& os, const AlignVertical value) {
 	case AlignVertical::Justify: return os << "justify";
 	case AlignVertical::JustifyAll: return os << "justify-all";
 	}
+
+	assert(false && "Invalid AlignVertical enum value");
 	return os << "<<invalid>>";
 }
 
@@ -30,6 +33,8 @@ std::ostream& operator<<(std::ostream& os, const AlignHorizontal value) {
 	case AlignHorizontal::Justify: return os << "justify";
 	case AlignHorizontal::JustifyAll: return os << "justify-all";
 	}
+
+	assert(false && "Invalid AlignHorizontal enum value");
 	return os << "<<invalid>>";
 }
 

@@ -233,8 +233,8 @@ inline auto CoreScrollBar::bar_bounds() const noexcept {
 
 	const auto value_extent = std::abs(value_max_ - value_min_);
 
-	const auto size_x = static_cast<double>(size2()[orient.dim_control]);
-	const auto size_y = static_cast<double>(size2()[orient.dim_secondary]);
+	const auto size_x = static_cast<double>(layout_size2()[orient.dim_control]);
+	const auto size_y = static_cast<double>(layout_size2()[orient.dim_secondary]);
 
 	// NOTE: std::clamp is not usable as min should have priority (0 size should yield 0 sized bar)
 	const auto size_bar_x = value_extent < value_range_ ?
@@ -271,7 +271,7 @@ void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
 		const auto bar = bar_bounds();
 		// TODO P0: libv.ui: correct local mouse position;
-		const auto local_mouse = context().state.mouse_position() - position2();
+		const auto local_mouse = context().state.mouse_position() - layout_position2();
 
 		if (libv::vec::within(local_mouse, bar.position, bar.position + bar.size - 1.0f)) {
 			drag_mode = DragMode::bar;
@@ -285,7 +285,7 @@ void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 					libv::remap_clamp<double>(
 						local_mouse[orient.dim_control] - local_drag,
 						0,
-						size2()[orient.dim_control] - bar.size[orient.dim_control],
+						layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
 						orient.control_inverted ? value_max_ : value_min_,
 						orient.control_inverted ? value_min_ : value_max_);
 			handler().value(local_value);
@@ -328,12 +328,12 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
 	const auto bar = bar_bounds();
 	// TODO P0: libv.ui: correct local mouse position;
-	const auto local_mouse = event.mouse_position - position2();
+	const auto local_mouse = event.mouse_position - layout_position2();
 	const auto value_extent = std::abs(value_max_ - value_min_);
 
 	if (value_extent < value_range_) {
 		// Handle special case with oversized (range) bar
-		const auto side_a = local_mouse[orient.dim_control] < size2()[orient.dim_control] * 0.5f;
+		const auto side_a = local_mouse[orient.dim_control] < layout_size2()[orient.dim_control] * 0.5f;
 		const auto toward_min = side_a == orient.control_inverted;
 		const auto local_value = toward_min ? value_min_ : value_max_;
 		handler().value(local_value);
@@ -347,7 +347,7 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	const auto local_value = libv::remap_clamp<double>(
 			local_mouse[orient.dim_control] - local_drag,
 			0,
-			size2()[orient.dim_control] - bar.size[orient.dim_control],
+			layout_size2()[orient.dim_control] - bar.size[orient.dim_control],
 			orient.control_inverted ? value_max_ : value_min_,
 			orient.control_inverted ? value_min_ : value_max_);
 
@@ -375,6 +375,7 @@ void CoreScrollBar::doAttach() {
 void CoreScrollBar::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreScrollBar> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreScrollBar::doLayout1(const ContextLayout1& environment) {
@@ -397,9 +398,9 @@ void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
 		auto index = bg_mesh.index();
 
 		pos(0, 0, 0);
-		pos(size().x, 0, 0);
-		pos(size().x, size().y, 0);
-		pos(0, size().y, 0);
+		pos(layout_size().x, 0, 0);
+		pos(layout_size().x, layout_size().y, 0);
+		pos(0, layout_size().y, 0);
 
 		tex(0, 0);
 		tex(1, 0);
@@ -433,7 +434,7 @@ void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
 
 void CoreScrollBar::doRender(ContextRender& ctx) {
 	const auto guard_m = ctx.gl.model.push_guard();
- 	ctx.gl.model.translate(position());
+ 	ctx.gl.model.translate(layout_position());
 
 	{
 		ctx.gl.program(*property.bg_shader());

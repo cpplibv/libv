@@ -64,30 +64,49 @@ Component::Component(base_ptr ptr_) noexcept :
 	++ptr->ref_count;
 }
 
+const std::string& Component::name() const noexcept {
+	return ptr->name;
+}
 
 std::string Component::path() const noexcept {
 	return ptr->path();
 }
 
-std::string Component::name() const noexcept {
-	return ptr->name;
+libv::vec3f Component::layout_position() const noexcept {
+	return ptr->layout_position();
 }
 
-libv::vec3f Component::position() const noexcept {
-	return ptr->position();
+libv::vec2f Component::layout_position2() const noexcept {
+	return ptr->layout_position2();
 }
 
-libv::vec2f Component::position2() const noexcept {
-	return ptr->position2();
+libv::vec3f Component::layout_size() const noexcept {
+	return ptr->layout_size();
 }
 
-libv::vec3f Component::size() const noexcept {
+libv::vec2f Component::layout_size2() const noexcept {
+	return ptr->layout_size2();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+const Size& Component::size() const noexcept {
 	return ptr->size();
 }
 
-libv::vec2f Component::size2() const noexcept {
-	return ptr->size2();
+void Component::size(const Size& value) noexcept {
+	ptr->size(value);
 }
+
+Anchor Component::anchor() const noexcept {
+	return ptr->anchor();
+}
+
+void Component::anchor(Anchor value) noexcept {
+	ptr->anchor(value);
+}
+
+// -------------------------------------------------------------------------------------------------
 
 void Component::markRemove() {
 	ptr->markRemove();

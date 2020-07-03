@@ -78,9 +78,6 @@ namespace pnm { // -------------------------------------------------------------
 static constexpr std::string_view align_horizontal = "align";
 static constexpr std::string_view align_vertical = "align_vertical";
 static constexpr std::string_view anchor = "anchor";
-static constexpr std::string_view anchor_content = "anchor_content";
-static constexpr std::string_view anchor_parent = "anchor_parent";
-static constexpr std::string_view anchor_target = "anchor_target";
 static constexpr std::string_view bar_color = "bar_color";
 static constexpr std::string_view bar_image = "bar_image";
 static constexpr std::string_view bar_shader = "bar_shader";

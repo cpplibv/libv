@@ -65,6 +65,7 @@ void CoreQuad::access_properties(T& ctx) {
 void CoreQuad::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreQuad> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreQuad::doRender(ContextRender& context) {
@@ -73,19 +74,16 @@ void CoreQuad::doRender(ContextRender& context) {
 		auto pos = mesh.attribute(attribute_position);
 		auto index = mesh.index();
 
-		// 3-2
-		// |/|
-		// 0-1
 		pos(0, 0, 0);
-		pos(size().x, 0, 0);
-		pos(size().x, size().y, 0);
-		pos(0, size().y, 0);
+		pos(layout_size().x, 0, 0);
+		pos(layout_size().x, layout_size().y, 0);
+		pos(0, layout_size().y, 0);
 
 		index.quad(0, 1, 2, 3);
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position());
+	context.gl.model.translate(layout_position());
 
 	context.gl.program(*property.quad_shader());
 	context.gl.uniform(property.quad_shader()->uniform_color, property.color());

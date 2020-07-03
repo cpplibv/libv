@@ -75,6 +75,7 @@ void CoreStretch::access_properties(T& ctx) {
 void CoreStretch::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreStretch> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreStretch::doLayout1(const ContextLayout1& environment) {
@@ -99,13 +100,13 @@ void CoreStretch::doRender(ContextRender& context) {
 		//
 		//      x0  x1  x2  x3
 
-		const auto borderPos = min(cast<float>(property.bg_image()->size()), xy(size())) * 0.5f;
-		const auto borderTex = min(xy(size()) / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
+		const auto borderPos = min(cast<float>(property.bg_image()->size()), layout_size2()) * 0.5f;
+		const auto borderTex = min(layout_size2() / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
 
 		const auto p0 = libv::vec2f{0.0f, 0.0f};
 		const auto p1 = borderPos;
-		const auto p2 = xy(size()) - borderPos;
-		const auto p3 = xy(size());
+		const auto p2 = layout_size2() - borderPos;
+		const auto p3 = layout_size2();
 
 		const auto t0 = libv::vec2f{0.0f, 0.0f};
 		const auto t1 = borderTex;
@@ -138,7 +139,7 @@ void CoreStretch::doRender(ContextRender& context) {
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position());
+	context.gl.model.translate(layout_position());
 
 	context.gl.program(*property.bg_shader());
 	context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());

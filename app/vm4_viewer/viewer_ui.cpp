@@ -347,7 +347,7 @@ void ViewerUI::doRender(libv::ui::ContextRender& ctx) {
 
 	update(context().state.time_delta());
 
-	scene.render(ctx.gl, size2());
+	scene.render(ctx.gl, layout_size2());
 }
 
 // -------------------------------------------------------------------------------------------------

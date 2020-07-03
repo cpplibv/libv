@@ -4,6 +4,10 @@
 
 // libv
 #include <libv/math/vec.hpp>
+// std
+#include <cstdint>
+#include <iosfwd>
+#include <string_view>
 
 
 namespace libv {
@@ -11,18 +15,21 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-using Anchor = libv::vec3f;
+enum class Anchor : uint16_t {
+	top_left      = 0,
+	top_center    = 1,
+	top_right     = 2,
+	center_left   = 3,
+	center_center = 4,
+	center_right  = 5,
+	bottom_left   = 6,
+	bottom_center = 7,
+	bottom_right  = 8,
+};
 
-// TODO P4: Anchor enum, at least for anchor content (for grid layout), flow layout should remain float anchor
-static constexpr auto ANCHOR_TOP_LEFT      = libv::ui::Anchor{0.0f, 1.0f, 0};
-static constexpr auto ANCHOR_TOP_CENTER    = libv::ui::Anchor{0.5f, 1.0f, 0};
-static constexpr auto ANCHOR_TOP_RIGHT     = libv::ui::Anchor{1.0f, 1.0f, 0};
-static constexpr auto ANCHOR_CENTER_LEFT   = libv::ui::Anchor{0.0f, 0.5f, 0};
-static constexpr auto ANCHOR_CENTER_CENTER = libv::ui::Anchor{0.5f, 0.5f, 0};
-static constexpr auto ANCHOR_CENTER_RIGHT  = libv::ui::Anchor{1.0f, 0.5f, 0};
-static constexpr auto ANCHOR_BOTTOM_LEFT   = libv::ui::Anchor{0.0f, 0.0f, 0};
-static constexpr auto ANCHOR_BOTTOM_CENTER = libv::ui::Anchor{0.5f, 0.0f, 0};
-static constexpr auto ANCHOR_BOTTOM_RIGHT  = libv::ui::Anchor{1.0f, 0.0f, 0};
+[[nodiscard]] libv::vec3f to_info(const Anchor value) noexcept;
+[[nodiscard]] std::string_view to_string(const Anchor value) noexcept;
+std::ostream& operator<<(std::ostream& os, const Anchor value);
 
 // -------------------------------------------------------------------------------------------------
 

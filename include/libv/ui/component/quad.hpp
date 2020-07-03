@@ -4,7 +4,6 @@
 
 // pro
 #include <libv/ui/component.hpp>
-#include <libv/ui/event_host.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/shader_quad.hpp>
 

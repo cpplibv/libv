@@ -58,10 +58,14 @@ private:
 	ChildID childID = 0;
 	uint32_t ref_count = 0;
 
-	libv::vec3f position_; /// Component position relative to parent in pixels
-	libv::vec3f size_; /// Component size in pixels
+	libv::vec3f layout_position_; /// Component position relative to parent in pixels
+	libv::vec3f layout_size_; /// Component size in pixels
 	// TODO P2: Measure the impact of removing lastDynamic field and remove it if acceptable
 	libv::vec3f lastDynamic; /// Result of last layout pass1
+
+private:
+	Size size_;
+	Anchor anchor_;
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
@@ -104,19 +108,38 @@ public:
 		return flags.match_any(Flag::focused);
 	}
 
-	[[nodiscard]] inline libv::vec3f position() const noexcept {
-		return position_;
+	[[nodiscard]] inline libv::vec3f layout_position() const noexcept {
+		return layout_position_;
 	}
-	[[nodiscard]] inline libv::vec3f size() const noexcept {
-		return size_;
+	[[nodiscard]] inline libv::vec2f layout_position2() const noexcept {
+		return libv::vec::xy(layout_position_);
+	}
+	[[nodiscard]] inline libv::vec3f layout_size() const noexcept {
+		return layout_size_;
+	}
+	[[nodiscard]] inline libv::vec2f layout_size2() const noexcept {
+		return libv::vec::xy(layout_size_);
 	}
 
-	[[nodiscard]] inline libv::vec2f position2() const noexcept {
-		return libv::vec::xy(position_);
+public:
+	[[nodiscard]] inline const Size& size() const noexcept {
+		return size_;
 	}
-	[[nodiscard]] inline libv::vec2f size2() const noexcept {
-		return libv::vec::xy(size_);
+	inline void size(Size value) noexcept {
+		size_ = value;
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
+	[[nodiscard]] inline Anchor anchor() const noexcept {
+		return anchor_;
+	}
+	inline void anchor(Anchor value) noexcept {
+		anchor_ = value;
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+
+public:
+	template <typename T>
+	void access_properties(T& ctx);
 
 protected:
 	void flagDirect(Flag_t flags_) noexcept;
@@ -211,6 +234,46 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename Property>
+inline void BaseComponent::set(Property& property, typename Property::value_type value) {
+	AccessProperty::driver(property, PropertyDriver::manual);
+	if (value != property())
+		AccessProperty::value(*this, property, std::move(value));
+}
+
+template <typename Property>
+inline void BaseComponent::reset(Property& property) {
+	AccessProperty::driver(property, PropertyDriver::style);
+	flagAuto(Flag::pendingStyle);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename EventT>
+inline void BaseComponent::fire(const EventT& event) {
+	_fire(std::type_index(typeid(EventT)), &event);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void BaseComponent::access_properties(T& ctx) {
+	ctx.synthetize(
+			[](auto& c, auto v) { c.anchor(v); },
+			[](const auto& c) { return c.anchor(); },
+			pgr::layout, pnm::anchor,
+			"Component's anchor point"
+	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.size(v); },
+			[](const auto& c) { return c.size(); },
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 struct AccessEvent {
 	static inline decltype(auto) onMouseButton(BaseComponent& component, const EventMouseButton& event) {
 		return component.onMouseButton(event);
@@ -263,17 +326,17 @@ struct AccessLayout {
 };
 
 struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
-	[[nodiscard]] static inline auto& position(BaseComponent& component) noexcept {
-		return component.position_;
+	[[nodiscard]] static inline auto& layout_position(BaseComponent& component) noexcept {
+		return component.layout_position_;
 	}
-	[[nodiscard]] static inline const auto& position(const BaseComponent& component) noexcept {
-		return component.position_;
+	[[nodiscard]] static inline const auto& layout_position(const BaseComponent& component) noexcept {
+		return component.layout_position_;
 	}
-	[[nodiscard]] static inline auto& size(BaseComponent& component) noexcept {
-		return component.size_;
+	[[nodiscard]] static inline auto& layout_size(BaseComponent& component) noexcept {
+		return component.layout_size_;
 	}
-	[[nodiscard]] static inline const auto& size(const BaseComponent& component) noexcept {
-		return component.size_;
+	[[nodiscard]] static inline const auto& layout_size(const BaseComponent& component) noexcept {
+		return component.layout_size_;
 	}
 
 	static inline decltype(auto) flagAuto(BaseComponent& component, Flag_t flags_) noexcept {
@@ -312,28 +375,6 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 		return component.render(context);
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename Property>
-inline void BaseComponent::set(Property& property, typename Property::value_type value) {
-	AccessProperty::driver(property, PropertyDriver::manual);
-	if (value != property())
-		AccessProperty::value(*this, property, std::move(value));
-}
-
-template <typename Property>
-inline void BaseComponent::reset(Property& property) {
-	AccessProperty::driver(property, PropertyDriver::style);
-	flagAuto(Flag::pendingStyle);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename EventT>
-inline void BaseComponent::fire(const EventT& event) {
-	_fire(std::type_index(typeid(EventT)), &event);
-}
 
 // -------------------------------------------------------------------------------------------------
 

@@ -357,8 +357,8 @@ void BaseComponent::detach(BaseComponent& parent_) {
 		flags = Flag::mask_init;
 		lastDynamic = {};
 		parent = *this;
-		position_ = {};
-		size_ = {};
+		layout_position_ = {};
+		layout_size_ = {};
 	}
 }
 
@@ -448,16 +448,16 @@ void BaseComponent::layout2(const ContextLayout2& environment) {
 //	log_ui.trace("Layout Pass2 {}", path());
 	bool boundsChanged = false;
 
-	if (environment.position != position_) {
+	if (environment.position != layout_position_) {
 		boundsChanged = true;
 		flags.set(Flag::updatedPosition);
-		position_ = environment.position;
+		layout_position_ = environment.position;
 	}
 
-	if (environment.size != size_) {
+	if (environment.size != layout_size_) {
 		boundsChanged = true;
 		flags.set(Flag::updatedSize);
-		size_ = environment.size;
+		layout_size_ = environment.size;
 	}
 
 	if (boundsChanged && flags.match_any(Flag::mask_watchMouse)) {
@@ -472,7 +472,7 @@ void BaseComponent::layout2(const ContextLayout2& environment) {
 		this->doLayout2(environment);
 
 		flags.reset(Flag::pendingLayout);
-		log_ui.trace("Layout {:>11}, {:>11}, {}", position_, size_, path());
+		log_ui.trace("Layout {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
 	}
 }
 

@@ -509,22 +509,21 @@ libv.ui: Fix typo: Travers -> Traverse
 libv.ui: Autonaming should use per type indexing
 libv.ui: align_vertical for string2D
 libv.ui: align_vertical for string2D in pickers | Well, the algo was fool proof and it just works
+libv.ui: container child anchor_parent, anchor_target and size are general concept and every component should have them -> eliminates child storage issues (for now) AND grid anchor_content is also here
+libv.ui: property size / anchor
+libv.ui: layout_line should support anchor | invalidated as the two alignment basically already solves the use-cases
+libv.ui: property size / anchor access, and inherited property access | manual, it will do but for now
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-
-
-libv.ui: property size
-libv.ui: container child anchor_parent, anchor_target and size are general concept and every component should have them -> eliminates child storage issues (for now)
-		grid anchor_content is also here
-
+libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
 
 libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
-libv.ui: Hide or remove BaseComponent usage from every API (like focus)
+libv.ui: Hide or remove BaseComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .base() usages wherever possible
 
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent

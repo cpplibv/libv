@@ -75,6 +75,7 @@ void CoreImage::access_properties(T& ctx) {
 void CoreImage::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreImage::doLayout1(const ContextLayout1& environment) {
@@ -90,9 +91,9 @@ void CoreImage::doRender(ContextRender& context) {
 		auto index = mesh.index();
 
 		pos(0, 0, 0);
-		pos(size().x, 0, 0);
-		pos(size().x, size().y, 0);
-		pos(0, size().y, 0);
+		pos(layout_size().x, 0, 0);
+		pos(layout_size().x, layout_size().y, 0);
+		pos(0, layout_size().y, 0);
 
 		tex(0, 0);
 		tex(1, 0);
@@ -103,7 +104,7 @@ void CoreImage::doRender(ContextRender& context) {
 	}
 
 	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(position());
+	context.gl.model.translate(layout_position());
 
 	context.gl.program(*property.bg_shader());
 	context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());

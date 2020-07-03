@@ -4,7 +4,6 @@
 
 // pro
 #include <libv/ui/component.hpp>
-#include <libv/ui/event_host.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>

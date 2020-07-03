@@ -4,8 +4,6 @@
 
 // pro
 #include <libv/ui/component.hpp>
-#include <libv/ui/event_host.hpp>
-#include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/orientation2.hpp>
 
@@ -22,9 +20,6 @@ public:
 	explicit PanelGrid(base_ptr core) noexcept;
 
 public:
-	void anchor_content(Anchor value);
-	[[nodiscard]] Anchor anchor_content() const noexcept;
-
 	void column_count(ColumnCount value);
 	[[nodiscard]] ColumnCount column_count() const noexcept;
 

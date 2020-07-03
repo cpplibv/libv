@@ -260,7 +260,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -268,7 +268,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 	if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -381,7 +381,7 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 		focus();
 
 	if (event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -402,14 +402,14 @@ void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 
 	// === TEMP ========================================================================================
 	if (context().state.key_pressed(libv::input::Keycode::F1)) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
 	}
 	if (context().state.key_pressed(libv::input::Keycode::F2)) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(position());
+		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -437,6 +437,7 @@ void CoreInputField::doAttach() {
 void CoreInputField::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreInputField> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
+	BaseComponent::access_properties(setter);
 }
 
 void CoreInputField::doLayout1(const ContextLayout1& environment) {
@@ -461,9 +462,9 @@ void CoreInputField::doRender(ContextRender& ctx) {
 		auto index = bg_mesh.index();
 
 		pos(0, 0, 0);
-		pos(size().x, 0, 0);
-		pos(size().x, size().y, 0);
-		pos(0, size().y, 0);
+		pos(layout_size().x, 0, 0);
+		pos(layout_size().x, layout_size().y, 0);
+		pos(0, layout_size().y, 0);
 
 		tex(0, 0);
 		tex(1, 0);
@@ -500,7 +501,7 @@ void CoreInputField::doRender(ContextRender& ctx) {
 	}
 
 	const auto guard_m = ctx.gl.model.push_guard();
- 	ctx.gl.model.translate(position());
+ 	ctx.gl.model.translate(layout_position());
 
 	{
 		ctx.gl.program(*property.bg_shader());

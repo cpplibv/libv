@@ -4,7 +4,6 @@
 
 // pro
 #include <libv/ui/component.hpp>
-#include <libv/ui/event_host.hpp>
 
 
 namespace libv {

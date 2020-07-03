@@ -2,14 +2,16 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
 // std
-//#include <memory>
 #include <string>
 #include <string_view>
-#include <type_traits>
 // pro
 #include <libv/ui/event_host.hpp>
 #include <libv/ui/generate_name.hpp>
+#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/size.hpp>
 
 
 namespace libv {
@@ -21,13 +23,10 @@ using base_ptr = class BaseComponent*;
 
 template <typename T, typename... Args>
 [[nodiscard]] inline base_ptr create_base_ptr(Args&&... args) noexcept {
-	static_assert(std::is_base_of_v<BaseComponent, T>, "");
 	return new T(std::forward<Args>(args)...);
 }
 
 // -------------------------------------------------------------------------------------------------
-
-class BaseComponent;
 
 /// Handler class for components
 /// Warning: Derived classes must not contain any data member
@@ -60,12 +59,20 @@ public:
 	}
 
 public:
-	[[nodiscard]] std::string name() const noexcept;
+	[[nodiscard]] const std::string& name() const noexcept;
 	[[nodiscard]] std::string path() const noexcept;
-	[[nodiscard]] libv::vec3f position() const noexcept;
-	[[nodiscard]] libv::vec2f position2() const noexcept;
-	[[nodiscard]] libv::vec3f size() const noexcept;
-	[[nodiscard]] libv::vec2f size2() const noexcept;
+
+	[[nodiscard]] libv::vec3f layout_position() const noexcept;
+	[[nodiscard]] libv::vec2f layout_position2() const noexcept;
+	[[nodiscard]] libv::vec3f layout_size() const noexcept;
+	[[nodiscard]] libv::vec2f layout_size2() const noexcept;
+
+public:
+	[[nodiscard]] const Size& size() const noexcept;
+	void size(const Size& value) noexcept;
+
+	[[nodiscard]] Anchor anchor() const noexcept;
+	void anchor(Anchor value) noexcept;
 
 public:
 	void markRemove();

@@ -10,8 +10,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename E, typename = std::enable_if_t<std::is_enum_v<E>>>
+template <typename E>
 [[nodiscard]] constexpr inline auto to_value(E e) noexcept {
+	static_assert(std::is_enum_v<E>, "E has to be an enum type");
 	return static_cast<std::underlying_type_t<E>>(e);
 }
 
