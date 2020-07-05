@@ -16,7 +16,7 @@
 #include <variant>
 #include <vector>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context_focus_traverse.hpp>
@@ -159,7 +159,7 @@ public:
 		root((current_thread_context(context), "")) { }
 
 public:
-	void focus(libv::observer_ptr<BaseComponent> old_focus, libv::observer_ptr<BaseComponent> new_focus) {
+	void focus(libv::observer_ptr<CoreComponent> old_focus, libv::observer_ptr<CoreComponent> new_focus) {
 		if (new_focus == old_focus)
 			return;
 
@@ -178,16 +178,16 @@ public:
 		}
 	}
 
-	libv::observer_ptr<BaseComponent> focusTraverse(libv::observer_ptr<BaseComponent> old_focus, Degrees<float> direction) {
+	libv::observer_ptr<CoreComponent> focusTraverse(libv::observer_ptr<CoreComponent> old_focus, Degrees<float> direction) {
 		ContextFocusTraverse ctx{direction};
 
-		libv::observer_ptr<BaseComponent> new_focus = nullptr;
+		libv::observer_ptr<CoreComponent> new_focus = nullptr;
 
 		if (old_focus != nullptr) // Traversee to next
 			new_focus = AccessRoot::focusTraverse(*old_focus, ctx);
 
 		if (new_focus == nullptr) // End reached, Loop around
-			new_focus = AccessRoot::focusTraverse(root.base(), ctx);
+			new_focus = AccessRoot::focusTraverse(root.core(), ctx);
 
 		focus(old_focus, new_focus);
 		return new_focus;
@@ -307,8 +307,8 @@ void UI::add(Component component) {
 
 void UI::setSize(libv::vec2i size_) noexcept {
 	std::unique_lock lock{self->mutex};
-	AccessRoot::layout_size(self->root.base()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
-	AccessRoot::flagAuto(self->root.base(), Flag::pendingLayout);
+	AccessRoot::layout_size(self->root.core()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
+	AccessRoot::flagAuto(self->root.core(), Flag::pendingLayout);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -369,7 +369,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Attach ---
 	try {
-		AccessRoot::attach(self->root.base(), self->root.base());
+		AccessRoot::attach(self->root.core(), self->root.core());
 		self->stat.attach1.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
@@ -398,7 +398,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Attach ---
 	try {
-		AccessRoot::attach(self->root.base(), self->root.base());
+		AccessRoot::attach(self->root.core(), self->root.core());
 		self->stat.attach2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
@@ -421,11 +421,11 @@ void UI::update(libv::glr::Queue& gl) {
 	// --- Style ---
 	try {
 		if (self->context.isAnyStyleDirty()) {
-			AccessRoot::styleScan(self->root.base());
+			AccessRoot::styleScan(self->root.core());
 			self->context.clearEveryStyleDirty();
 			self->stat.styleScan.sample(self->timer.time_ns());
 		} else {
-			AccessRoot::style(self->root.base());
+			AccessRoot::style(self->root.core());
 			self->stat.style.sample(self->timer.time_ns());
 		}
 	} catch (const std::exception& ex) {
@@ -434,9 +434,9 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Layout ---
 	try {
-		AccessRoot::layout1(self->root.base(), ContextLayout1{});
+		AccessRoot::layout1(self->root.core(), ContextLayout1{});
 		self->stat.layout1.sample(self->timer.time_ns());
-		AccessRoot::layout2(self->root.base(), ContextLayout2{self->root.layout_position(), self->root.layout_size(), MouseOrder{0}});
+		AccessRoot::layout2(self->root.core(), ContextLayout2{self->root.layout_position(), self->root.layout_size(), MouseOrder{0}});
 		self->stat.layout2.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
@@ -473,7 +473,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 		ContextRender context{gl, clock::now()};
 //		AccessRoot::create(self->root, context);
-		AccessRoot::render(self->root.base(), context);
+		AccessRoot::render(self->root.core(), context);
 //		AccessRoot::destroy(self->root, context);
 
 		self->stat.render.sample(self->timer.time_ns());
@@ -483,7 +483,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Detach ---
 	try {
-		AccessRoot::detach(self->root.base(), self->root.base());
+		AccessRoot::detach(self->root.core(), self->root.core());
 		self->stat.detach.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during detach in UI: {}", ex.what());
@@ -505,25 +505,25 @@ void UI::destroy(libv::glr::Queue& gl) {
 	// --- Render ---
 	{
 		ContextRender context{gl, clock::now()};
-		AccessRoot::render(self->root.base(), context);
+		AccessRoot::render(self->root.core(), context);
 	}
 
 	// --- Detach ---
 	{
-		AccessRoot::detach(self->root.base(), self->root.base());
+		AccessRoot::detach(self->root.core(), self->root.core());
 	}
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void UI::focus(BaseComponent& component) {
+void UI::focus(CoreComponent& component) {
 	current_thread_context(context());
 
 	self->focus(self->context_state.focus_, component);
 	self->context_state.focus_ = component;
 }
 
-void UI::detachFocused(BaseComponent& component) {
+void UI::detachFocused(CoreComponent& component) {
 	current_thread_context(context());
 
 	(void) component;
@@ -532,7 +532,7 @@ void UI::detachFocused(BaseComponent& component) {
 	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, Degrees<float>{315});
 }
 
-void UI::detachFocusLinked(BaseComponent& component) {
+void UI::detachFocusLinked(CoreComponent& component) {
 	current_thread_context(context());
 
 	(void) component;

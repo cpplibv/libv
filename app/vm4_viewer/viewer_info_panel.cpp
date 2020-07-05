@@ -15,13 +15,13 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-ViewerInfoPanel::ViewerInfoPanel(BaseComponent& parent) :
+ViewerInfoPanel::ViewerInfoPanel(CoreComponent& parent) :
 	libv::ui::PanelLine(parent, libv::ui::GenerateName, "ViewerInfoPanel") { }
 
-ViewerInfoPanel::ViewerInfoPanel(BaseComponent& parent, std::string name) :
+ViewerInfoPanel::ViewerInfoPanel(CoreComponent& parent, std::string name) :
 	libv::ui::PanelLine(parent, std::move(name)) { }
 
-ViewerInfoPanel::ViewerInfoPanel(BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
+ViewerInfoPanel::ViewerInfoPanel(CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
 	libv::ui::PanelLine(parent, libv::ui::GenerateName, type) { }
 
 void ViewerInfoPanel::doAttach() {

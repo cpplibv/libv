@@ -28,7 +28,7 @@ private:
 	libv::lua::State lua;
 
 private:
-	std::shared_ptr<libv::ui::BaseComponent> lua_component;
+	std::shared_ptr<libv::ui::CoreComponent> lua_component;
 
 public:
 	void create() {

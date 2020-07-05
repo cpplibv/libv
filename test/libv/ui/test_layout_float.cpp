@@ -15,17 +15,17 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutFloat> {
 	using BasicTestChild<libv::ui::LayoutFloat>::BasicTestChild;
 
 	void size(std::string_view value) {
-		components[index].ptr.base().set(components[index].property.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr.core().set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 
 	template <typename V>
 	void anchor_parent(V&& value) {
-		components[index].ptr.base().set(components[index].property.anchor_parent, std::forward<V>(value));
+		components[index].ptr.core().set(components[index].property.anchor_parent, std::forward<V>(value));
 	}
 
 	template <typename V>
 	void anchor_target(V&& value) {
-		components[index].ptr.base().set(components[index].property.anchor_target, std::forward<V>(value));
+		components[index].ptr.core().set(components[index].property.anchor_target, std::forward<V>(value));
 	}
 };
 

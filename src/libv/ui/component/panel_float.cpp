@@ -13,7 +13,7 @@
 #include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
@@ -88,7 +88,7 @@ void CorePanelFloat::access_child_properties(T& ctx) {
 void CorePanelFloat::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CorePanelFloat::doStyle(ContextStyle& ctx, ChildID childID) {
@@ -115,14 +115,14 @@ void CorePanelFloat::doLayout1(const ContextLayout1& environment) {
 	auto result = libv::vec3f{};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.base(), ContextLayout1{});
+		AccessLayout::layout1(child.core(), ContextLayout1{});
 
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
 			result[i] = libv::max(
 					result[i],
 					resolvePercent(
-							child.size()[i].pixel + (child.size()[i].dynamic ? AccessLayout::lastDynamic(child.base())[i] : 0.f),
-							child.size()[i].percent, child.base())
+							child.size()[i].pixel + (child.size()[i].dynamic ? AccessLayout::lastDynamic(child.core())[i] : 0.f),
+							child.size()[i].percent, child.core())
 			);
 		});
 	}
@@ -145,7 +145,7 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 				size[i] =
 						child.size()[i].pixel +
 						child.size()[i].percent * 0.01f * environment.size[i] +
-						(child.size()[i].dynamic ? AccessLayout::lastDynamic(child.base())[i] : 0.f);
+						(child.size()[i].dynamic ? AccessLayout::lastDynamic(child.core())[i] : 0.f);
 		});
 
 		// Position ---
@@ -159,7 +159,7 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
 
 		AccessLayout::layout2(
-				child.base(),
+				child.core(),
 				ContextLayout2{
 					roundedPosition,
 					roundedSize,
@@ -177,7 +177,7 @@ PanelFloat::PanelFloat(std::string name) :
 PanelFloat::PanelFloat(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(gen, type) { }
 
-PanelFloat::PanelFloat(base_ptr core) noexcept :
+PanelFloat::PanelFloat(core_ptr core) noexcept :
 	ComponenetHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

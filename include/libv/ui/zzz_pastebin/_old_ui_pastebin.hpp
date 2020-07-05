@@ -64,9 +64,9 @@
 //		ComponentName
 
 //
-//		struct BaseComponent {
+//		struct CoreComponent {
 //			Flag_t flags;
-//			libv::observer_ref<BaseComponent> parent = libv::make_observer(this);
+//			libv::observer_ref<CoreComponent> parent = libv::make_observer(this);
 //
 //			libv::vec3f position; /// Component position absolute to origin
 //			libv::vec3f size;
@@ -77,7 +77,7 @@
 //		};
 //
 //		struct ComponentLayout {
-//			void (*layouter)(libv::ecs::System&, libv::ecs::EntityID, const BaseComponent&);
+//			void (*layouter)(libv::ecs::System&, libv::ecs::EntityID, const CoreComponent&);
 //		};
 //
 //		struct ComponentProperty {

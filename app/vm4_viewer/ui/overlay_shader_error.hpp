@@ -33,13 +33,13 @@ class OverlayShaderError : public libv::ui::PanelLine {
 //		details->add(label_error_message);
 //	}
 
-//	std::map<std::string, std::shared_ptr<BaseComponent>> errors;
+//	std::map<std::string, std::shared_ptr<CoreComponent>> errors;
 	std::map<std::string, Component> errors;
 
 public:
-	explicit OverlayShaderError(libv::ui::BaseComponent& parent);
-	OverlayShaderError(libv::ui::BaseComponent& parent, std::string name);
-	OverlayShaderError(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit OverlayShaderError(libv::ui::CoreComponent& parent);
+	OverlayShaderError(libv::ui::CoreComponent& parent, std::string name);
+	OverlayShaderError(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 	~OverlayShaderError();
 
 public:

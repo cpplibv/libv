@@ -13,13 +13,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-OverlayShaderError::OverlayShaderError(libv::ui::BaseComponent& parent) :
+OverlayShaderError::OverlayShaderError(libv::ui::CoreComponent& parent) :
 	PanelLine(parent, libv::ui::GenerateName, "OverlayShaderError") { }
 
-OverlayShaderError::OverlayShaderError(libv::ui::BaseComponent& parent, std::string name) :
+OverlayShaderError::OverlayShaderError(libv::ui::CoreComponent& parent, std::string name) :
 	PanelLine(parent, std::move(name)) { }
 
-OverlayShaderError::OverlayShaderError(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
+OverlayShaderError::OverlayShaderError(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
 	PanelLine(parent, libv::ui::GenerateName, type) { }
 
 OverlayShaderError::~OverlayShaderError() { }

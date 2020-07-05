@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/component.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 
 
 namespace libv {
@@ -12,21 +12,21 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 //template <typename T, typename... Args>
-//base_ptr create_base_ptr(Args&&... args) noexcept {
-//	static_assert(std::is_base_of_v<BaseComponent, T>, "");
+//core_ptr create_core_ptr(Args&&... args) noexcept {
+//	static_assert(std::is_base_of_v<CoreComponent, T>, "");
 //
 //	return new T(std::forward<Args>(args)...);
 //}
 //
-//void add_ref_base_ptr(base_ptr ptr) noexcept {
+//void add_ref_core_ptr(core_ptr ptr) noexcept {
 //	++ptr->ref_count;
 //}
 //
-//bool remove_ref_base_ptr(base_ptr ptr) noexcept {
+//bool remove_ref_core_ptr(core_ptr ptr) noexcept {
 //	return --ptr->ref_count == 0;
 //}
 //
-//void destroy_base_ptr(base_ptr ptr) noexcept {
+//void destroy_core_ptr(core_ptr ptr) noexcept {
 //	delete ptr;
 //}
 
@@ -59,7 +59,7 @@ Component::~Component() noexcept {
 		delete ptr;
 }
 
-Component::Component(base_ptr ptr_) noexcept :
+Component::Component(core_ptr ptr_) noexcept :
 	ptr(std::move(ptr_)) {
 	++ptr->ref_count;
 }

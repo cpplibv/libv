@@ -9,13 +9,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-OverlayShaderInspector::OverlayShaderInspector(libv::ui::BaseComponent& parent) :
+OverlayShaderInspector::OverlayShaderInspector(libv::ui::CoreComponent& parent) :
 	PanelLine(parent, libv::ui::GenerateName, "OverlayShaderInspector") { }
 
-OverlayShaderInspector::OverlayShaderInspector(libv::ui::BaseComponent& parent, std::string name) :
+OverlayShaderInspector::OverlayShaderInspector(libv::ui::CoreComponent& parent, std::string name) :
 	PanelLine(parent, std::move(name)) { }
 
-OverlayShaderInspector::OverlayShaderInspector(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
+OverlayShaderInspector::OverlayShaderInspector(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
 	PanelLine(parent, libv::ui::GenerateName, type) { }
 
 OverlayShaderInspector::~OverlayShaderInspector() { }

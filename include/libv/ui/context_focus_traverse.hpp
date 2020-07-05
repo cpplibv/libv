@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 
 struct ContextFocusTraverse {
 	Degrees<float> direction;

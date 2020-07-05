@@ -6,7 +6,7 @@
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_render.hpp>
 #include <libv/ui/context_style.hpp>
@@ -28,7 +28,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreButton : public BaseComponent {
+class CoreButton : public CoreComponent {
 	friend class Button;
 	[[nodiscard]] inline auto handler() { return Button{this}; }
 
@@ -54,7 +54,7 @@ private:
 	String2D text_;
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void onFocus(const EventFocus& event) override;
@@ -202,7 +202,7 @@ void CoreButton::doAttach() {
 void CoreButton::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreButton> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreButton::doLayout1(const ContextLayout1& environment) {
@@ -268,7 +268,7 @@ Button::Button(std::string name) :
 Button::Button(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreButton, EventHostSubmitable<Button>>(gen, type) { }
 
-Button::Button(base_ptr core) noexcept :
+Button::Button(core_ptr core) noexcept :
 	ComponenetHandler<CoreButton, EventHostSubmitable<Button>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

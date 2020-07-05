@@ -65,7 +65,7 @@ void CorePanelFull::doStyle(ContextStyle& ctx) {
 	// TODO P2: Having property mentioned here is incorrect, but the class based access context will solve he problem
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {
@@ -92,13 +92,13 @@ void CorePanelFull::doLayout1(const ContextLayout1& environment) {
 	auto result = libv::vec3f{};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.base(), ContextLayout1{});
+		AccessLayout::layout1(child.core(), ContextLayout1{});
 		libv::meta::for_constexpr<0, 3>([&](auto dim) {
 			result[dim] = libv::max(
 					result[dim],
 					resolvePercent(
-							child.size()[dim].pixel + (child.size()[dim].dynamic ? AccessLayout::lastDynamic(child.base())[dim] : 0.f),
-							child.size()[dim].percent, child.base())
+							child.size()[dim].pixel + (child.size()[dim].dynamic ? AccessLayout::lastDynamic(child.core())[dim] : 0.f),
+							child.size()[dim].percent, child.core())
 			);
 		});
 	}
@@ -109,7 +109,7 @@ void CorePanelFull::doLayout1(const ContextLayout1& environment) {
 void CorePanelFull::doLayout2(const ContextLayout2& environment) {
 	for (auto& child : children | view_layouted()) {
 		AccessLayout::layout2(
-				child.base(),
+				child.core(),
 				ContextLayout2{
 					environment.position,
 					environment.size,
@@ -127,7 +127,7 @@ PanelFull::PanelFull(std::string name) :
 PanelFull::PanelFull(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CorePanelFull, EventHostGeneral<PanelFull>>(gen, type) { }
 
-PanelFull::PanelFull(base_ptr core) noexcept :
+PanelFull::PanelFull(core_ptr core) noexcept :
 	ComponenetHandler<CorePanelFull, EventHostGeneral<PanelFull>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

@@ -21,9 +21,9 @@ class OverlayShaderInspector : public libv::ui::PanelLine {
 	// https://www.khronos.org/opengl/wiki/Program_Introspection
 
 public:
-	explicit OverlayShaderInspector(libv::ui::BaseComponent& parent);
-	OverlayShaderInspector(libv::ui::BaseComponent& parent, std::string name);
-	OverlayShaderInspector(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit OverlayShaderInspector(libv::ui::CoreComponent& parent);
+	OverlayShaderInspector(libv::ui::CoreComponent& parent, std::string name);
+	OverlayShaderInspector(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 	~OverlayShaderInspector();
 
 public:

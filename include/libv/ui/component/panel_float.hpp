@@ -17,7 +17,7 @@ class PanelFloat : public ComponenetHandler<class CorePanelFloat, EventHostGener
 public:
 	explicit PanelFloat(std::string name);
 	explicit PanelFloat(GenerateName_t = {}, const std::string_view type = "float");
-	explicit PanelFloat(base_ptr core) noexcept;
+	explicit PanelFloat(core_ptr core) noexcept;
 
 public:
 	void snap_to_edge(SnapToEdge value);

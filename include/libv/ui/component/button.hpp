@@ -21,7 +21,7 @@ class Button : public ComponenetHandler<class CoreButton, EventHostSubmitable<Bu
 public:
 	explicit Button(std::string name);
 	explicit Button(GenerateName_t = {}, const std::string_view type = "button");
-	explicit Button(base_ptr core) noexcept;
+	explicit Button(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

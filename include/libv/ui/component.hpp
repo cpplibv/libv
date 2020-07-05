@@ -19,10 +19,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-using base_ptr = class BaseComponent*;
+using core_ptr = class CoreComponent*;
 
 template <typename T, typename... Args>
-[[nodiscard]] inline base_ptr create_base_ptr(Args&&... args) noexcept {
+[[nodiscard]] inline core_ptr create_core_ptr(Args&&... args) noexcept {
 	return new T(std::forward<Args>(args)...);
 }
 
@@ -32,7 +32,7 @@ template <typename T, typename... Args>
 /// Warning: Derived classes must not contain any data member
 class Component {
 private:
-	base_ptr ptr;
+	core_ptr ptr;
 
 public:
 	Component() = delete;
@@ -43,7 +43,7 @@ public:
 	~Component() noexcept;
 
 protected:
-	explicit Component(base_ptr ptr_) noexcept;
+	explicit Component(core_ptr ptr_) noexcept;
 
 public:
 	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
@@ -51,10 +51,10 @@ public:
 	}
 
 public:
-	[[nodiscard]] inline BaseComponent& base() noexcept {
+	[[nodiscard]] inline CoreComponent& core() noexcept {
 		return *ptr;
 	}
-	[[nodiscard]] inline const BaseComponent& base() const noexcept {
+	[[nodiscard]] inline const CoreComponent& core() const noexcept {
 		return *ptr;
 	}
 
@@ -97,13 +97,13 @@ private:
 protected:
 	template <typename DelayedT = ComponentT>
 	explicit inline ComponenetHandler(std::string name) :
-		Component(create_base_ptr<DelayedT>(std::move(name))) { }
+		Component(create_core_ptr<DelayedT>(std::move(name))) { }
 
 	template <typename DelayedT = ComponentT>
 	explicit inline ComponenetHandler(GenerateName_t = {}, const std::string_view type = "component") :
-		Component(create_base_ptr<DelayedT>(GenerateName, type, nextID++)) { }
+		Component(create_core_ptr<DelayedT>(GenerateName, type, nextID++)) { }
 
-	explicit inline ComponenetHandler(base_ptr ptr) noexcept :
+	explicit inline ComponenetHandler(core_ptr ptr) noexcept :
 		Component(std::move(ptr)) {
 
 		assert(dynamic_cast<ComponentT*>(this->ptr) != nullptr && "Invalid component pointer initialization");
@@ -111,10 +111,10 @@ protected:
 
 protected:
 	[[nodiscard]] constexpr inline ComponentT& self() noexcept {
-		return static_cast<ComponentT&>(base());
+		return static_cast<ComponentT&>(core());
 	}
 	[[nodiscard]] constexpr inline const ComponentT& self() const noexcept {
-		return static_cast<const ComponentT&>(base());
+		return static_cast<const ComponentT&>(core());
 	}
 
 public:

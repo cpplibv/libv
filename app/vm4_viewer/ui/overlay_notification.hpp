@@ -16,9 +16,9 @@ namespace ui {
 
 class OverlayNotification : public libv::ui::PanelLine {
 public:
-	explicit OverlayNotification(libv::ui::BaseComponent& parent);
-	OverlayNotification(libv::ui::BaseComponent& parent, std::string name);
-	OverlayNotification(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit OverlayNotification(libv::ui::CoreComponent& parent);
+	OverlayNotification(libv::ui::CoreComponent& parent, std::string name);
+	OverlayNotification(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 	~OverlayNotification();
 
 public:

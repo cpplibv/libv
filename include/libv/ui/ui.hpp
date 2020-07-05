@@ -17,7 +17,7 @@ namespace ui {
 
 // TODO P2: libv.ui: Implement Setting to disable Font2D LCD sub pixel rendering
 // TODO P2: libv.ui: Resource debugger, font and texture view at first
-// TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<BaseComponent>> getComponentAt(int, int);)
+// TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<CoreComponent>> getComponentAt(int, int);)
 // TODO P2: libv.ui: Record create/layout/render/destroy statistics
 // TODO P3: libv.ui: Idea reminder: glr could be more light with signed objects, and this might be a completely different approve
 //			<0 means look at some global glr store, and its only a promise, in the future there will be an object
@@ -26,7 +26,7 @@ namespace ui {
 // TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
 // TODO P5: libv.ui: (?) void setFocusPolicy(...);
 
-class BaseComponent;
+class CoreComponent;
 class Component;
 class ContextState;
 class ContextUI;
@@ -71,9 +71,9 @@ public:
 	void destroy(libv::glr::Queue& gl);
 
 private:
-	void focus(BaseComponent& component);
-	void detachFocused(BaseComponent& component);
-	void detachFocusLinked(BaseComponent& component);
+	void focus(CoreComponent& component);
+	void detachFocused(CoreComponent& component);
+	void detachFocusLinked(CoreComponent& component);
 };
 
 // -------------------------------------------------------------------------------------------------

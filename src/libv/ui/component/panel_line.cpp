@@ -10,7 +10,7 @@
 #include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_style.hpp>
@@ -133,7 +133,7 @@ void CorePanelLine::access_child_properties(T& ctx) {
 void CorePanelLine::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {
@@ -168,20 +168,20 @@ void CorePanelLine::doLayout1(const ContextLayout1& environment) {
 	};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.base(), ContextLayout1{});
+		AccessLayout::layout1(child.core(), ContextLayout1{});
 
 		pixelX += child.size()[_X_].pixel;
 		percentX += child.size()[_X_].percent;
-		contentX += (child.size()[_X_].dynamic ? AccessLayout::lastDynamic(child.base())[_X_] : 0.0f);
+		contentX += (child.size()[_X_].dynamic ? AccessLayout::lastDynamic(child.core())[_X_] : 0.0f);
 
 		result[_Y_] = libv::max(result[_Y_],
 				resolvePercent(
-						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? AccessLayout::lastDynamic(child.base())[_Y_] : 0.0f),
+						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? AccessLayout::lastDynamic(child.core())[_Y_] : 0.0f),
 						child.size()[_Y_].percent, child));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
-						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? AccessLayout::lastDynamic(child.base())[_Z_] : 0.0f),
+						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? AccessLayout::lastDynamic(child.core())[_Z_] : 0.0f),
 						child.size()[_Z_].percent, child));
 	}
 
@@ -212,7 +212,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& environment) {
 			childSize[index] =
 					child.size()[index].pixel +
 					child.size()[index].percent * 0.01f * environment.size[index] +
-					(child.size()[index].dynamic ? AccessLayout::lastDynamic(child.base())[index] : 0.f);
+					(child.size()[index].dynamic ? AccessLayout::lastDynamic(child.core())[index] : 0.f);
 		});
 
 		sumRatioX += child.size()[_X_].ratio;
@@ -260,7 +260,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& environment) {
 		const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 		AccessLayout::layout2(
-				child.base(),
+				child.core(),
 				ContextLayout2{
 					roundedPosition,
 					roundedSize,
@@ -278,7 +278,7 @@ PanelLine::PanelLine(std::string name) :
 PanelLine::PanelLine(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CorePanelLine, EventHostGeneral<PanelLine>>(gen, type) { }
 
-PanelLine::PanelLine(base_ptr core) noexcept :
+PanelLine::PanelLine(core_ptr core) noexcept :
 	ComponenetHandler<CorePanelLine, EventHostGeneral<PanelLine>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

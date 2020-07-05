@@ -13,12 +13,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class ContextUI;
 
 struct ContextStyle {
 	libv::observer_ptr<Style> style;
-	BaseComponent& component;
+	CoreComponent& component;
 };
 
 // -------------------------------------------------------------------------------------------------

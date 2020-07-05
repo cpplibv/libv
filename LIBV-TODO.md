@@ -513,40 +513,36 @@ libv.ui: container child anchor_parent, anchor_target and size are general conce
 libv.ui: property size / anchor
 libv.ui: layout_line should support anchor | invalidated as the two alignment basically already solves the use-cases
 libv.ui: property size / anchor access, and inherited property access | manual, it will do but for now
+libv.ui: Rename BaseComponent to CoreComponent
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
+libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
+
+libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
 libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
-libv.ui: Hide or remove BaseComponent usage from every API (like focus, AccessLayout)
-libv.ui: Remove .base() usages wherever possible
-
-libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
+libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
+libv.ui: Remove .core() usages wherever possible
 
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 libv.ui: OverlayZoom use linearized zoom
 
-libv.ui: Rename BaseComponent to CoreComponent (?) or CoreBaseComponent
-
-libv.math: remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
-
-
 
 libv.ui: The UI Paper
-	Core - Core Component object containing every state of a given component, derived from BaseComponent
+	Core - Core Component object containing every state of a given component, derived from CoreComponent
 	Component / Handler - Lightweight stateless handler object of a core component object, derived from Component
 	Host - Stateless event host
 
 	read again once done with events http://nanapro.org/en-us/documentation/core/events.htm
 
 
-libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
+libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 libv.ui: UI level message/event bus/system might be required:
 		context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
 		context().events().fire("shader_reload", ...);
@@ -555,11 +551,15 @@ libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 
-libv.ui: Idea for over restricted string_2D: in content would exceed limit, just push the lines or characters closer to each other (could be policy driven)
+libv.ui: Idea for over restricted string_2D: if content would exceed limit, just push the lines or characters closer to each other (could be policy driven)
 
 ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
 ext.x3: make sure that every rule is static
+	libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
+	libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 ext.x3: make sure that no header dependency exposed by libv parsers
+
+libv.math: remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
 libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
@@ -813,23 +813,14 @@ visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 cpp: move from to holds_alternative to get_if https://en.cppreference.com/w/cpp/utility/variant/get_if
 
 app.vm4_viewer: Camera controller class
-app.vm4_viewer: Camera controller class jump controls with multiple interpolation type (linear camera motion is sickening, jumping camera movement/rotation should always ease out and in, in case of very long jumps skip in the middle segment)
+app.vm4_viewer: Camera controller class jump controls with multiple interpolation type (linear camera motion is sickening, jumping camera movement/rotation should always ease out and in, in case of very long jumps with a skip in the middle segment)
+app.vm4_viewer: Camera controller class with lua binding
 
 app.vm4_viewer: light source indicator
+app.vm4_viewer: light source mover
 app.vm4_viewer: camera pivot indicator
 app.vm4_viewer: camera orientation indicator
 app.vm4_viewer: ortho camera, and swapping
-
-app.vm4_viewer: Camera controller class with lua binding
-
-libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
-libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
-
-app.vm4_viewer: Camera controller class with lua binding
-
-libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
-
-app.vm4_viewer: light source mover
 
 app.vm4_viewer: Rulers: Display size rulers along the 3 dimension (3/6/9 value) of the max ranges
 

@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/basic_event_proxy.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/component.hpp>
 
 
@@ -14,7 +14,7 @@ namespace detail {
 // -------------------------------------------------------------------------------------------------
 
 void internal_connect(Component& signal, Component& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
-	AccessConnect::connect(signal.base(), slot.base(), type, std::move(callback));
+	AccessConnect::connect(signal.core(), slot.core(), type, std::move(callback));
 }
 
 // -------------------------------------------------------------------------------------------------

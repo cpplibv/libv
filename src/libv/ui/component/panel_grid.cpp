@@ -14,7 +14,7 @@
 #include <libv/utility/enum.hpp>
 #include <libv/utility/observer_ref.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_style.hpp>
@@ -121,7 +121,7 @@ void CorePanelGrid::access_child_properties(T& ctx) {
 void CorePanelGrid::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CorePanelGrid::doStyle(ContextStyle& ctx, ChildID childID) {
@@ -144,11 +144,11 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 	auto result = libv::vec3f{};
 
 	for (auto& child : l_children) {
-		AccessLayout::layout1(child->base(), ContextLayout1{});
+		AccessLayout::layout1(child->core(), ContextLayout1{});
 
 		result[_Z_] = std::max(result[_Z_],
 				child->size()[_Z_].pixel +
-				(child->size()[_Z_].dynamic ? AccessLayout::lastDynamic(child->base())[_Z_] : 0.f));
+				(child->size()[_Z_].dynamic ? AccessLayout::lastDynamic(child->core())[_Z_] : 0.f));
 	}
 
 	const auto attemptX = [&](int32_t parentSize) {
@@ -163,7 +163,7 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 				usedColumnSizeX = std::max(usedColumnSizeX,
 						child->size()[_X_].pixel +
 						child->size()[_X_].percent * parentSizeX * 0.01f +
-						(child->size()[_X_].dynamic ? AccessLayout::lastDynamic(child->base())[_X_] : 0.f));
+						(child->size()[_X_].dynamic ? AccessLayout::lastDynamic(child->core())[_X_] : 0.f));
 			}
 			usedGridSizeX += usedColumnSizeX;
 		}
@@ -183,7 +183,7 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 				usedRowSizeY = std::max(usedRowSizeY,
 						child->size()[_Y_].pixel +
 						child->size()[_Y_].percent * parentSizeY * 0.01f +
-						(child->size()[_Y_].dynamic ? AccessLayout::lastDynamic(child->base())[_Y_] : 0.f));
+						(child->size()[_Y_].dynamic ? AccessLayout::lastDynamic(child->core())[_Y_] : 0.f));
 			}
 			usedGridSizeY += usedRowSizeY;
 		}
@@ -243,7 +243,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 							child->size()[_D_].pixel +
 							child->size()[_D_].percent * environment.size[_D_] * 0.01f +
 							child->size()[_D_].ratio * ratioScale +
-							(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->base())[_D_] : 0.f);
+							(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->core())[_D_] : 0.f);
 
 					if (childSize > firstSubDimSize) {
 						firstSubDimSize = childSize;
@@ -294,7 +294,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 			const auto used =
 					child->size()[_D_].pixel +
 					child->size()[_D_].percent * environment.size[_D_] * 0.01f +
-					(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->base())[_D_] : 0.f);
+					(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->core())[_D_] : 0.f);
 			const auto leftover = environment.size[_D_] - used;
 			const auto contribution = leftover / child->size()[_D_].ratio;
 
@@ -323,7 +323,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 				return child->size()[i].pixel +
 						child->size()[i].percent * environment.size[i] * 0.01f +
 						child->size()[i].ratio * ratioContribution[i] +
-						(child->size()[i].dynamic ? AccessLayout::lastDynamic(child->base())[i] : 0.f);
+						(child->size()[i].dynamic ? AccessLayout::lastDynamic(child->core())[i] : 0.f);
 			});
 
 			advanceX[x] = std::max(advanceX[x], childSize[_X_]);
@@ -359,7 +359,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 			const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 			AccessLayout::layout2(
-					child->base(),
+					child->core(),
 					ContextLayout2{
 						roundedPosition,
 						roundedSize,
@@ -382,7 +382,7 @@ PanelGrid::PanelGrid(std::string name) :
 PanelGrid::PanelGrid(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(gen, type) { }
 
-PanelGrid::PanelGrid(base_ptr core) noexcept :
+PanelGrid::PanelGrid(core_ptr core) noexcept :
 	ComponenetHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

@@ -16,12 +16,12 @@ namespace app {
 //	libv::ui::PanelTable table{*this, "table"};
 //
 //public:
-//	explicit KeyValuePanel(BaseComponent& parent);
-//	KeyValuePanel(BaseComponent& parent, std::string name);
-//	KeyValuePanel(BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+//	explicit KeyValuePanel(CoreComponent& parent);
+//	KeyValuePanel(CoreComponent& parent, std::string name);
+//	KeyValuePanel(CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 //
 //public:
-//	std::shared_ptr<BaseComponent>& operator()(size_t x, size_t y);
+//	std::shared_ptr<CoreComponent>& operator()(size_t x, size_t y);
 //};
 
 class PropertyPanelGroupProxy {
@@ -32,8 +32,8 @@ public:
 
 class PropertyPanelGroup {
 private:
-	using key_type = std::shared_ptr<libv::ui::BaseComponent>;
-	using value_type = std::shared_ptr<libv::ui::BaseComponent>;
+	using key_type = std::shared_ptr<libv::ui::CoreComponent>;
+	using value_type = std::shared_ptr<libv::ui::CoreComponent>;
 
 	struct key_value_type {
 		key_type key;
@@ -50,9 +50,9 @@ class PropertyPanel : public libv::ui::PanelLine {
 	std::vector<PropertyPanelGroup> groups;
 
 public:
-	explicit PropertyPanel(BaseComponent& parent);
-	PropertyPanel(BaseComponent& parent, std::string name);
-	PropertyPanel(BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit PropertyPanel(CoreComponent& parent);
+	PropertyPanel(CoreComponent& parent, std::string name);
+	PropertyPanel(CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 
 public:
 	PropertyPanelGroupProxy group(const std::string& name, libv::intrusive_ptr<libv::ui::Style>& style);
@@ -81,9 +81,9 @@ private:
 //	std::vector<libv::ui::Label> label_animationChannel;
 
 public:
-	explicit ViewerInfoPanel(BaseComponent& parent);
-	ViewerInfoPanel(BaseComponent& parent, std::string name);
-	ViewerInfoPanel(BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit ViewerInfoPanel(CoreComponent& parent);
+	ViewerInfoPanel(CoreComponent& parent, std::string name);
+	ViewerInfoPanel(CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 
 	void update(const libv::vm4::Model& model);
 

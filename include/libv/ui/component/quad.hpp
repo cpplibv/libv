@@ -17,7 +17,7 @@ class Quad : public ComponenetHandler<class CoreQuad, EventHostGeneral<Quad>> {
 public:
 	explicit Quad(std::string name);
 	explicit Quad(GenerateName_t = {}, const std::string_view type = "quad");
-	explicit Quad(base_ptr core) noexcept;
+	explicit Quad(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

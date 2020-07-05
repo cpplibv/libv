@@ -17,7 +17,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 
 class ContextState {
 	friend class ImplUI;
@@ -40,7 +40,7 @@ class ContextState {
 	boost::container::flat_set<libv::input::Scancode> pressed_scancodes;
 	boost::container::flat_set<libv::input::MouseButton> pressed_mouses;
 
-	libv::observer_ptr<BaseComponent> focus_ = nullptr;
+	libv::observer_ptr<CoreComponent> focus_ = nullptr;
 
 	// TODO P4: libv.ui: modifier lock keys: caps-lock, num-lock, scroll-lock
 	// TODO P4: libv.ui: pressed timestamps (?)
@@ -116,7 +116,7 @@ public:
 	}
 
 public:
-	[[nodiscard]] constexpr inline libv::observer_ptr<BaseComponent> focus() const noexcept {
+	[[nodiscard]] constexpr inline libv::observer_ptr<CoreComponent> focus() const noexcept {
 		return focus_;
 	}
 };

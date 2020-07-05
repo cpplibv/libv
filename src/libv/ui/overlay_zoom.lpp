@@ -24,7 +24,7 @@ class OverlayZoom : public ComponenetHandler<class CoreOverlayZoom, EventHostGen
 public:
 	explicit OverlayZoom(std::string name);
 	explicit OverlayZoom(GenerateName_t = {}, const std::string_view type = "overlay-zoom");
-	explicit OverlayZoom(base_ptr core) noexcept;
+	explicit OverlayZoom(core_ptr core) noexcept;
 
 public:
 	void control();

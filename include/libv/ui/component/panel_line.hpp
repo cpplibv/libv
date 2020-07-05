@@ -17,7 +17,7 @@ class PanelLine : public ComponenetHandler<class CorePanelLine, EventHostGeneral
 public:
 	explicit PanelLine(std::string name);
 	explicit PanelLine(GenerateName_t = {}, const std::string_view type = "line");
-	explicit PanelLine(base_ptr core) noexcept;
+	explicit PanelLine(core_ptr core) noexcept;
 
 public:
 	void align_horizontal(AlignHorizontal value);

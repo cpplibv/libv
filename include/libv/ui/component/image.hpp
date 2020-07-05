@@ -18,7 +18,7 @@ class Image : public ComponenetHandler<class CoreImage, EventHostGeneral<Image>>
 public:
 	explicit Image(std::string name);
 	explicit Image(GenerateName_t = {}, const std::string_view type = "image");
-	explicit Image(base_ptr core) noexcept;
+	explicit Image(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

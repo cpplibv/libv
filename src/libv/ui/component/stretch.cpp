@@ -21,7 +21,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreStretch : BaseComponent {
+struct CoreStretch : CoreComponent {
 	friend class Stretch;
 	[[nodiscard]] inline auto handler() { return Stretch{this}; }
 
@@ -38,7 +38,7 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -75,7 +75,7 @@ void CoreStretch::access_properties(T& ctx) {
 void CoreStretch::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreStretch> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreStretch::doLayout1(const ContextLayout1& environment) {
@@ -156,7 +156,7 @@ Stretch::Stretch(std::string name) :
 Stretch::Stretch(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreStretch, EventHostGeneral<Stretch>>(gen, type) { }
 
-Stretch::Stretch(base_ptr core) noexcept :
+Stretch::Stretch(core_ptr core) noexcept :
 	ComponenetHandler<CoreStretch, EventHostGeneral<Stretch>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

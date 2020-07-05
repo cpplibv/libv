@@ -57,7 +57,7 @@ private:
 	libv::ctrl::Controls controls;
 
 public:
-	explicit ViewerUI(BaseComponent& parent);
+	explicit ViewerUI(CoreComponent& parent);
 
 	void update(libv::ui::time_duration elapsed_time);
 	void load(const std::string& path);

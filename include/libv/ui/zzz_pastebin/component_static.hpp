@@ -8,7 +8,7 @@
 #include <functional>
 #include <string_view>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/layout_default.hpp>
 #include <libv/ui/module_layout.hpp>
 //#include <libv/ui/module_render.hpp>
@@ -193,13 +193,13 @@ class ComponentStaticAccess {
 // TODO P4: use ModuleAttach, ModuleRender, ModuleLayout concepts during static_access
 
 template <typename CRTP>
-class ComponentStatic : public BaseComponent {
+class ComponentStatic : public CoreComponent {
 public:
 	ComponentStatic(std::string name) :
-		BaseComponent(std::move(name)) { }
+		CoreComponent(std::move(name)) { }
 
 	ComponentStatic(GenerateName, const std::string_view type = "static") :
-		BaseComponent(GenerateName{}, type) { }
+		CoreComponent(GenerateName{}, type) { }
 
 private:
 	constexpr inline auto& self() noexcept {
@@ -212,28 +212,28 @@ private:
 private:
 	virtual void doAttach(context) override final {
 		ComponentStaticAccess::access(self(), [&context](auto& member) {
-			if constexpr (std::is_base_of_v<BaseComponent, std::remove_cvref_t<decltype(member)>>)
+			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 				member.attach(context);
 		});
 	};
 
 //	virtual void doCreate(ContextRender& context) override final {
 //		ComponentStaticAccess::access(self(), [&context](auto& member) {
-//			if constexpr (std::is_base_of_v<BaseComponent, std::remove_cvref_t<decltype(member)>>)
+//			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 //				member.create(context);
 //		});
 //	};
 //
 //	virtual void doDestroy(ContextRender& context) override final {
 //		ComponentStaticAccess::access(self(), [&context](auto& member) {
-//			if constexpr (std::is_base_of_v<BaseComponent, std::remove_cvref_t<decltype(member)>>)
+//			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 //				member.destroy(context);
 //		});
 //	};
 
 	virtual void doRender(ContextRender& context) override final {
 		ComponentStaticAccess::access(self(), [&context](auto& member) {
-			if constexpr (std::is_base_of_v<BaseComponent, std::remove_cvref_t<decltype(member)>>)
+			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 				member.render(context);
 		});
 	};
@@ -270,9 +270,9 @@ private:
 		}
 	}
 
-	virtual void doForeachChildren(const std::function<void(BaseComponent&)>& callback) override final {
+	virtual void doForeachChildren(const std::function<void(CoreComponent&)>& callback) override final {
 		ComponentStaticAccess::access(self(), [&callback](auto& member) {
-			if constexpr (std::is_base_of_v<BaseComponent, std::remove_cvref_t<decltype(member)>>)
+			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 				callback(member);
 		});
 	}

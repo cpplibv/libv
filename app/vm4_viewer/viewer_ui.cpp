@@ -29,7 +29,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-ViewerUI::ViewerUI(BaseComponent& parent) :
+ViewerUI::ViewerUI(CoreComponent& parent) :
 	libv::ui::PanelFloat(parent, "VM4Viewer"),
 	scene(shader_loader) {
 	scene.camera.orbit_to(15.f);

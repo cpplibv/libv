@@ -29,7 +29,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class UI;
 
 namespace {

@@ -19,7 +19,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreQuad : BaseComponent {
+struct CoreQuad : CoreComponent {
 	friend class Quad;
 	[[nodiscard]] inline auto handler() { return Quad{this}; }
 
@@ -35,7 +35,7 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -65,7 +65,7 @@ void CoreQuad::access_properties(T& ctx) {
 void CoreQuad::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreQuad> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreQuad::doRender(ContextRender& context) {
@@ -99,7 +99,7 @@ Quad::Quad(std::string name) :
 Quad::Quad(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreQuad, EventHostGeneral<Quad>>(gen, type) { }
 
-Quad::Quad(base_ptr core) noexcept :
+Quad::Quad(core_ptr core) noexcept :
 	ComponenetHandler<CoreQuad, EventHostGeneral<Quad>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

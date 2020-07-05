@@ -15,7 +15,7 @@ class PanelFull : public ComponenetHandler<class CorePanelFull, EventHostGeneral
 public:
 	explicit PanelFull(std::string name);
 	explicit PanelFull(GenerateName_t = {}, const std::string_view type = "full");
-	explicit PanelFull(base_ptr core) noexcept;
+	explicit PanelFull(core_ptr core) noexcept;
 
 public:
 	void add(Component component);

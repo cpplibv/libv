@@ -33,7 +33,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreInputField : public BaseComponent {
+class CoreInputField : public CoreComponent {
 	friend class InputField;
 	[[nodiscard]] inline auto handler() { return InputField{this}; }
 
@@ -70,7 +70,7 @@ private:
 	uint32_t caret = 0; /// 0 = Before the first character, n = Before the nth character, length() = After the last character
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void onChar(const EventChar& event) override;
@@ -437,7 +437,7 @@ void CoreInputField::doAttach() {
 void CoreInputField::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreInputField> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreInputField::doLayout1(const ContextLayout1& environment) {
@@ -541,7 +541,7 @@ InputField::InputField(std::string name) :
 InputField::InputField(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(gen, type) { }
 
-InputField::InputField(base_ptr core) noexcept :
+InputField::InputField(core_ptr core) noexcept :
 	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

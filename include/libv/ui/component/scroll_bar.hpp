@@ -69,7 +69,7 @@ public:
 public:
 	explicit ScrollBar(std::string name);
 	explicit ScrollBar(GenerateName_t = {}, const std::string_view type = "scroll-bar");
-	explicit ScrollBar(base_ptr core) noexcept;
+	explicit ScrollBar(core_ptr core) noexcept;
 
 public:
 	void value(double value);

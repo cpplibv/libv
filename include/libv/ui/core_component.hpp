@@ -43,7 +43,7 @@ using ChildID = int32_t;
 static constexpr ChildID ChildIDSelf = -2;
 static constexpr ChildID ChildIDNone = -1;
 
-struct BaseComponent {
+struct CoreComponent {
 	friend class AccessConnect;
 	friend class AccessEvent;
 	friend class AccessLayout;
@@ -69,7 +69,7 @@ private:
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
-	libv::observer_ref<BaseComponent> parent = libv::make_observer_ref(this);
+	libv::observer_ref<CoreComponent> parent = libv::make_observer_ref(this);
 	/// Never null, points to the associated context
 	libv::observer_ref<ContextUI> context_;
 	/// Null if no style is assigned to the component
@@ -79,15 +79,15 @@ public:
 	std::string name;
 
 public:
-	explicit BaseComponent(std::string name);
-	explicit BaseComponent(GenerateName_t, const std::string_view type, size_t index);
+	explicit CoreComponent(std::string name);
+	explicit CoreComponent(GenerateName_t, const std::string_view type, size_t index);
 
-	BaseComponent(const BaseComponent&) = delete;
-	BaseComponent(BaseComponent&&) = delete;
-	BaseComponent& operator=(const BaseComponent&) = delete;
-	BaseComponent& operator=(BaseComponent&&) = delete;
+	CoreComponent(const CoreComponent&) = delete;
+	CoreComponent(CoreComponent&&) = delete;
+	CoreComponent& operator=(const CoreComponent&) = delete;
+	CoreComponent& operator=(CoreComponent&&) = delete;
 
-	virtual ~BaseComponent();
+	virtual ~CoreComponent();
 
 public:
 	[[nodiscard]] std::string path() const;
@@ -180,7 +180,7 @@ protected:
 	inline void fire(const Event& event);
 
 private:
-	static void connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback);
+	static void connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback);
 
 private:
 	ContextStyle makeStyleContext() noexcept;
@@ -189,10 +189,10 @@ private:
 	bool isFocusableComponent() const noexcept;
 
 private:
-	static void eventChar(BaseComponent& component, const EventChar& event);
-	static void eventKey(BaseComponent& component, const EventKey& event);
-	static void focusGain(BaseComponent& component);
-	static void focusLoss(BaseComponent& component);
+	static void eventChar(CoreComponent& component, const EventChar& event);
+	static void eventKey(CoreComponent& component, const EventKey& event);
+	static void focusGain(CoreComponent& component);
+	static void focusLoss(CoreComponent& component);
 
 private:
 	virtual void onChar(const EventChar& event);
@@ -203,11 +203,11 @@ private:
 	virtual void onMouseScroll(const EventMouseScroll& event);
 
 private:
-	void attach(BaseComponent& parent);
-	void detach(BaseComponent& parent);
+	void attach(CoreComponent& parent);
+	void detach(CoreComponent& parent);
 	void style();
 	void styleScan();
-	libv::observer_ptr<BaseComponent> focusTraverse(const ContextFocusTraverse& context);
+	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
 	void render(ContextRender& context);
 	void layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
@@ -215,17 +215,17 @@ private:
 private:
 	virtual void doAttach();
 	virtual void doDetach();
-	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback);
+	virtual void doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback);
 	virtual void doStyle(ContextStyle& context);
 	virtual void doStyle(ContextStyle& context, ChildID childID);
-	virtual libv::observer_ptr<BaseComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
+	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
 	virtual void doCreate(ContextRender& context);
 	virtual void doDestroy(ContextRender& context);
 	virtual void doRender(ContextRender& context);
 	virtual void doLayout1(const ContextLayout1& environment);
 	virtual void doLayout2(const ContextLayout2& environment);
-	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback);
-	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback);
+	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback);
+	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback);
 
 	// TWO PASS layout: (Planning on changing to on demand pass 1 as of 2020 06 30)
 	// - Pass 1: calculate everything as content bottom-top and store the result
@@ -235,14 +235,14 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 template <typename Property>
-inline void BaseComponent::set(Property& property, typename Property::value_type value) {
+inline void CoreComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::driver(property, PropertyDriver::manual);
 	if (value != property())
 		AccessProperty::value(*this, property, std::move(value));
 }
 
 template <typename Property>
-inline void BaseComponent::reset(Property& property) {
+inline void CoreComponent::reset(Property& property) {
 	AccessProperty::driver(property, PropertyDriver::style);
 	flagAuto(Flag::pendingStyle);
 }
@@ -250,14 +250,14 @@ inline void BaseComponent::reset(Property& property) {
 // -------------------------------------------------------------------------------------------------
 
 template <typename EventT>
-inline void BaseComponent::fire(const EventT& event) {
+inline void CoreComponent::fire(const EventT& event) {
 	_fire(std::type_index(typeid(EventT)), &event);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-void BaseComponent::access_properties(T& ctx) {
+void CoreComponent::access_properties(T& ctx) {
 	ctx.synthetize(
 			[](auto& c, auto v) { c.anchor(v); },
 			[](const auto& c) { return c.anchor(); },
@@ -275,103 +275,103 @@ void BaseComponent::access_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 struct AccessEvent {
-	static inline decltype(auto) onMouseButton(BaseComponent& component, const EventMouseButton& event) {
+	static inline decltype(auto) onMouseButton(CoreComponent& component, const EventMouseButton& event) {
 		return component.onMouseButton(event);
 	}
-	static inline decltype(auto) onMouseMovement(BaseComponent& component, const EventMouseMovement& event) {
+	static inline decltype(auto) onMouseMovement(CoreComponent& component, const EventMouseMovement& event) {
 		return component.onMouseMovement(event);
 	}
-	static inline decltype(auto) onMouseScroll(BaseComponent& component, const EventMouseScroll& event) {
+	static inline decltype(auto) onMouseScroll(CoreComponent& component, const EventMouseScroll& event) {
 		return component.onMouseScroll(event);
 	}
 };
 
 struct AccessParent {
-	[[nodiscard]] static inline auto& childID(BaseComponent& component) noexcept {
+	[[nodiscard]] static inline auto& childID(CoreComponent& component) noexcept {
 		return component.childID;
 	}
-	[[nodiscard]] static inline const auto& childID(const BaseComponent& component) noexcept {
+	[[nodiscard]] static inline const auto& childID(const CoreComponent& component) noexcept {
 		return component.childID;
 	}
-	static inline decltype(auto) isFocusableComponent(const BaseComponent& component) {
+	static inline decltype(auto) isFocusableComponent(const CoreComponent& component) {
 		return component.isFocusableComponent();
 	}
-	static inline decltype(auto) isFocusableChild(const BaseComponent& component) {
+	static inline decltype(auto) isFocusableChild(const CoreComponent& component) {
 		return component.flags.match_any(Flag::focusableChild);
 	}
-	static inline decltype(auto) doFocusTraverse(BaseComponent& component, const ContextFocusTraverse& context, ChildID current) {
+	static inline decltype(auto) doFocusTraverse(CoreComponent& component, const ContextFocusTraverse& context, ChildID current) {
 		return component.doFocusTraverse(context, current);
 	}
 };
 
 struct AccessConnect {
-	static inline void connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
-		BaseComponent::connect(signal, slot, type, std::move(callback));
+	static inline void connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
+		CoreComponent::connect(signal, slot, type, std::move(callback));
 	}
 };
 
 struct AccessLayout {
-	static inline decltype(auto) layout1(BaseComponent& component, const ContextLayout1& environment) {
+	static inline decltype(auto) layout1(CoreComponent& component, const ContextLayout1& environment) {
 		return component.layout1(environment);
 	}
-	static inline decltype(auto) layout2(BaseComponent& component, const ContextLayout2& environment) {
+	static inline decltype(auto) layout2(CoreComponent& component, const ContextLayout2& environment) {
 		return component.layout2(environment);
 	}
-	[[nodiscard]] static inline auto& lastDynamic(BaseComponent& component) {
+	[[nodiscard]] static inline auto& lastDynamic(CoreComponent& component) {
 		return component.lastDynamic;
 	}
-	[[nodiscard]] static inline const auto& lastDynamic(const BaseComponent& component) {
+	[[nodiscard]] static inline const auto& lastDynamic(const CoreComponent& component) {
 		return component.lastDynamic;
 	}
 };
 
 struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
-	[[nodiscard]] static inline auto& layout_position(BaseComponent& component) noexcept {
+	[[nodiscard]] static inline auto& layout_position(CoreComponent& component) noexcept {
 		return component.layout_position_;
 	}
-	[[nodiscard]] static inline const auto& layout_position(const BaseComponent& component) noexcept {
+	[[nodiscard]] static inline const auto& layout_position(const CoreComponent& component) noexcept {
 		return component.layout_position_;
 	}
-	[[nodiscard]] static inline auto& layout_size(BaseComponent& component) noexcept {
+	[[nodiscard]] static inline auto& layout_size(CoreComponent& component) noexcept {
 		return component.layout_size_;
 	}
-	[[nodiscard]] static inline const auto& layout_size(const BaseComponent& component) noexcept {
+	[[nodiscard]] static inline const auto& layout_size(const CoreComponent& component) noexcept {
 		return component.layout_size_;
 	}
 
-	static inline decltype(auto) flagAuto(BaseComponent& component, Flag_t flags_) noexcept {
+	static inline decltype(auto) flagAuto(CoreComponent& component, Flag_t flags_) noexcept {
 		return component.flagAuto(flags_);
 	}
 
-	static inline decltype(auto) eventChar(BaseComponent& component, const EventChar& event) {
-		return BaseComponent::eventChar(component, event);
+	static inline decltype(auto) eventChar(CoreComponent& component, const EventChar& event) {
+		return CoreComponent::eventChar(component, event);
 	}
-	static inline decltype(auto) eventKey(BaseComponent& component, const EventKey& event) {
-		return BaseComponent::eventKey(component, event);
+	static inline decltype(auto) eventKey(CoreComponent& component, const EventKey& event) {
+		return CoreComponent::eventKey(component, event);
 	}
 
-	static inline decltype(auto) attach(BaseComponent& component, BaseComponent& parent) {
+	static inline decltype(auto) attach(CoreComponent& component, CoreComponent& parent) {
 		return component.attach(parent);
 	}
-	static inline decltype(auto) detach(BaseComponent& component, BaseComponent& parent) {
+	static inline decltype(auto) detach(CoreComponent& component, CoreComponent& parent) {
 		return component.detach(parent);
 	}
-	static inline decltype(auto) style(BaseComponent& component) {
+	static inline decltype(auto) style(CoreComponent& component) {
 		return component.style();
 	}
-	static inline decltype(auto) styleScan(BaseComponent& component) {
+	static inline decltype(auto) styleScan(CoreComponent& component) {
 		return component.styleScan();
 	}
-	static inline decltype(auto) focusGain(BaseComponent& component) {
-		return BaseComponent::focusGain(component);
+	static inline decltype(auto) focusGain(CoreComponent& component) {
+		return CoreComponent::focusGain(component);
 	}
-	static inline decltype(auto) focusLoss(BaseComponent& component) {
-		return BaseComponent::focusLoss(component);
+	static inline decltype(auto) focusLoss(CoreComponent& component) {
+		return CoreComponent::focusLoss(component);
 	}
-	static inline decltype(auto) focusTraverse(BaseComponent& component, const ContextFocusTraverse& context) {
+	static inline decltype(auto) focusTraverse(CoreComponent& component, const ContextFocusTraverse& context) {
 		return component.focusTraverse(context);
 	}
-	static inline decltype(auto) render(BaseComponent& component, ContextRender& context) {
+	static inline decltype(auto) render(CoreComponent& component, ContextRender& context) {
 		return component.render(context);
 	}
 };

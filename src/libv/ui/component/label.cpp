@@ -21,7 +21,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreLabel : BaseComponent {
+struct CoreLabel : CoreComponent {
 	friend class Label;
 	[[nodiscard]] inline auto handler() { return Label{this}; }
 
@@ -42,7 +42,7 @@ private:
 	String2D text_;
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -112,7 +112,7 @@ void CoreLabel::access_properties(T& ctx) {
 void CoreLabel::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabel> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreLabel::doLayout1(const ContextLayout1& environment) {
@@ -148,7 +148,7 @@ Label::Label(std::string name) :
 Label::Label(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreLabel, EventHostGeneral<Label>>(gen, type) { }
 
-Label::Label(base_ptr core) noexcept :
+Label::Label(core_ptr core) noexcept :
 	ComponenetHandler<CoreLabel, EventHostGeneral<Label>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

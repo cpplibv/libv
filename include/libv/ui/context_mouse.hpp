@@ -17,7 +17,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class ImplContextMouse;
 class MouseWatcher;
 
@@ -29,12 +29,12 @@ public:
 	~ContextMouse();
 
 public:
-	void subscribe(BaseComponent& watcher, Flag_t interest);
+	void subscribe(CoreComponent& watcher, Flag_t interest);
 	void subscribe(MouseWatcher& watcher, Flag_t interest);
 	void subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
-	void update(BaseComponent& watcher, Flag_t interest);
-	void update(BaseComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
+	void update(CoreComponent& watcher, Flag_t interest);
+	void update(CoreComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
 //	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
 //	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size);
@@ -44,13 +44,13 @@ public:
 //	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseOrder order);
 
-	void unsubscribe(BaseComponent& watcher);
+	void unsubscribe(CoreComponent& watcher);
 	void unsubscribe(MouseWatcher& watcher);
 
 public:
-	void acquire(BaseComponent& watcher);
+	void acquire(CoreComponent& watcher);
 	void acquire(MouseWatcher& watcher);
-	void release(BaseComponent& watcher);
+	void release(CoreComponent& watcher);
 	void release(MouseWatcher& watcher);
 
 public:

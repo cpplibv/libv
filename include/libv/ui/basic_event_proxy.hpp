@@ -15,7 +15,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class Component;
 
 namespace detail {
@@ -42,7 +42,7 @@ private:
 	std::function<void(void*, const void*)> internal_callback(Func&& func) {
 		if constexpr (std::is_invocable_r_v<void, Func, ComponentT&, const EventT&>) {
 			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
-					auto handler = ComponentT{static_cast<BaseComponent*>(component_ptr)};
+					auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
 					f(handler, *static_cast<const EventT*>(event_ptr));
 			};
 
@@ -55,7 +55,7 @@ private:
 		} else if constexpr (std::is_invocable_r_v<void, Func, ComponentT&>) {
 			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
 					(void) event_ptr; // Callback is not interested in the event
-					auto handler = ComponentT{static_cast<BaseComponent*>(component_ptr)};
+					auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
 					f(handler);
 			};
 

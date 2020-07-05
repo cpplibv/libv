@@ -17,7 +17,7 @@ class PanelGrid : public ComponenetHandler<class CorePanelGrid, EventHostGeneral
 public:
 	explicit PanelGrid(std::string name);
 	explicit PanelGrid(GenerateName_t = {}, const std::string_view type = "grid");
-	explicit PanelGrid(base_ptr core) noexcept;
+	explicit PanelGrid(core_ptr core) noexcept;
 
 public:
 	void column_count(ColumnCount value);

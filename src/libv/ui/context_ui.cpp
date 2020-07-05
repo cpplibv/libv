@@ -186,15 +186,15 @@ void ContextUI::clearEveryStyleDirty() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ContextUI::focus(BaseComponent& component) {
+void ContextUI::focus(CoreComponent& component) {
 	ui.focus(component);
 }
 
-void ContextUI::detachFocused(BaseComponent& component) {
+void ContextUI::detachFocused(CoreComponent& component) {
 	ui.detachFocused(component);
 }
 
-void ContextUI::detachFocusLinked(BaseComponent& component) {
+void ContextUI::detachFocusLinked(CoreComponent& component) {
 	ui.detachFocusLinked(component);
 }
 

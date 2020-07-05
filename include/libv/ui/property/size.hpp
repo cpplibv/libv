@@ -131,7 +131,7 @@ struct Size {
 //			percent = std::max(percent, size[dim].percent);
 //		}
 //
-//		float resolve(const BaseComponent& component) const {
+//		float resolve(const CoreComponent& component) const {
 //			if (fix < 0.01f) {
 //				return fix;
 //			} else if (percent > 99.99f) {

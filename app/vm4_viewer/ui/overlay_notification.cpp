@@ -11,13 +11,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-OverlayNotification::OverlayNotification(libv::ui::BaseComponent& parent) :
+OverlayNotification::OverlayNotification(libv::ui::CoreComponent& parent) :
 	PanelLine(parent, libv::ui::GenerateName, "OverlayNotification") { }
 
-OverlayNotification::OverlayNotification(libv::ui::BaseComponent& parent, std::string name) :
+OverlayNotification::OverlayNotification(libv::ui::CoreComponent& parent, std::string name) :
 	PanelLine(parent, std::move(name)) { }
 
-OverlayNotification::OverlayNotification(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
+OverlayNotification::OverlayNotification(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type) :
 	PanelLine(parent, libv::ui::GenerateName, type) { }
 
 OverlayNotification::~OverlayNotification() { }

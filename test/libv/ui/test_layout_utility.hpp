@@ -50,12 +50,12 @@ struct Bounds {
 	}
 };
 
-class TestComponent : public libv::ui::BaseComponent {
+class TestComponent : public libv::ui::CoreComponent {
 public:
 	libv::vec3f dynamicSize = {};
 
-	TestComponent(BaseComponent& parent) :
-			libv::ui::BaseComponent(parent, libv::ui::GenerateName, "test") {};
+	TestComponent(CoreComponent& parent) :
+			libv::ui::CoreComponent(parent, libv::ui::GenerateName, "test") {};
 
 	virtual void doLayout1(const libv::ui::ContextLayout1&) override {
 		libv::ui::AccessLayout::lastDynamic(*this) = dynamicSize;
@@ -74,7 +74,7 @@ public:
 
 public:
 	void dynamic(libv::vec3f value) {
-		static_cast<TestComponent&>(components[index].ptr.base()).dynamicSize = value;
+		static_cast<TestComponent&>(components[index].ptr.core()).dynamicSize = value;
 	}
 
 	void dynamic(float x, float y, float z) {
@@ -86,14 +86,14 @@ public:
 	}
 
 	Bounds bounds() {
-		return {components[index].ptr.base().position(), components[index].ptr.base().size()};
+		return {components[index].ptr.core().position(), components[index].ptr.core().size()};
 	}
 };
 
 template <typename T, typename TC>
 class BasicTestLayout {
 protected:
-	TestComponent ignore{static_cast<libv::ui::BaseComponent&>(ignore)};
+	TestComponent ignore{static_cast<libv::ui::CoreComponent&>(ignore)};
 	// Fix UB: passing an uninitialized object address to itself to copy the context ptr that is not used
 	typename T::Properties property;
 	std::vector<typename T::Child> components;
@@ -107,7 +107,7 @@ public:
 
 public:
 	TC add() {
-		auto sp = std::make_shared<TestComponent>(static_cast<libv::ui::BaseComponent&>(ignore));
+		auto sp = std::make_shared<TestComponent>(static_cast<libv::ui::CoreComponent&>(ignore));
 		auto& child = components.emplace_back(sp);
 
 		// Initialize child property with fallback values

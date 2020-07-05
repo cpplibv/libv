@@ -34,7 +34,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-PanelViewer::PanelViewer(BaseComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
+PanelViewer::PanelViewer(CoreComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
 
 void PanelViewer::key(libv::input::Keycode key) {
 	if (!isAttached())

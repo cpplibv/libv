@@ -18,7 +18,7 @@
 #include <variant>
 #include <vector>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/log.hpp>
@@ -94,7 +94,7 @@ namespace ui {
 
 struct ImplContextMouse {
 	struct EntryTarget {
-		std::variant<libv::observer_ref<MouseWatcher>, libv::observer_ref<BaseComponent>> target;
+		std::variant<libv::observer_ref<MouseWatcher>, libv::observer_ref<CoreComponent>> target;
 
 	public:
 		inline void notify(const EventMouseButton& event) const {
@@ -103,7 +103,7 @@ struct ImplContextMouse {
 					if (watcher->cb_button)
 						watcher->cb_button(event);
 				},
-				[&event](const libv::observer_ref<BaseComponent>& component) {
+				[&event](const libv::observer_ref<CoreComponent>& component) {
 					AccessEvent::onMouseButton(*component, event);
 				}
 			);
@@ -117,7 +117,7 @@ struct ImplContextMouse {
 					if (watcher->cb_movement)
 						watcher->cb_movement(event);
 				},
-				[&event](const libv::observer_ref<BaseComponent>& component) {
+				[&event](const libv::observer_ref<CoreComponent>& component) {
 					AccessEvent::onMouseMovement(*component, event);
 				}
 			);
@@ -131,7 +131,7 @@ struct ImplContextMouse {
 					if (watcher->cb_scroll)
 						watcher->cb_scroll(event);
 				},
-				[&event](const libv::observer_ref<BaseComponent>& component) {
+				[&event](const libv::observer_ref<CoreComponent>& component) {
 					AccessEvent::onMouseScroll(*component, event);
 				}
 			);
@@ -144,9 +144,9 @@ struct ImplContextMouse {
 					&& std::get<libv::observer_ref<MouseWatcher>>(target) == &watcher;
 		}
 
-		inline bool match(BaseComponent& component) const {
-			return std::holds_alternative<libv::observer_ref<BaseComponent>>(target)
-					&& std::get<libv::observer_ref<BaseComponent>>(target) == &component;
+		inline bool match(CoreComponent& component) const {
+			return std::holds_alternative<libv::observer_ref<CoreComponent>>(target)
+					&& std::get<libv::observer_ref<CoreComponent>>(target) == &component;
 		}
 	};
 
@@ -163,7 +163,7 @@ struct ImplContextMouse {
 		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
 			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{watcher} { }
 
-		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<BaseComponent> component) :
+		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<CoreComponent> component) :
 			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{component} { }
 	};
 
@@ -182,7 +182,7 @@ ContextMouse::ContextMouse() :
 
 ContextMouse::~ContextMouse() { }
 
-void ContextMouse::subscribe(BaseComponent& component, Flag_t interest) {
+void ContextMouse::subscribe(CoreComponent& component, Flag_t interest) {
 	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
 }
 
@@ -194,7 +194,7 @@ void ContextMouse::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f
 	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
-void ContextMouse::update(BaseComponent& component, Flag_t interest) {
+void ContextMouse::update(CoreComponent& component, Flag_t interest) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
@@ -206,7 +206,7 @@ void ContextMouse::update(BaseComponent& component, Flag_t interest) {
 	it->pendingUpdate = true;
 }
 
-void ContextMouse::update(BaseComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+void ContextMouse::update(CoreComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
@@ -246,7 +246,7 @@ void ContextMouse::update(MouseWatcher& watcher, libv::vec2f position, libv::vec
 	it->pendingUpdate = true;
 }
 
-void ContextMouse::unsubscribe(BaseComponent& component) {
+void ContextMouse::unsubscribe(CoreComponent& component) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
 		return entry.target.match(component);
 	});
@@ -272,7 +272,7 @@ void ContextMouse::unsubscribe(MouseWatcher& watcher) {
 
 // -------------------------------------------------------------------------------------------------
 
-void ContextMouse::acquire(BaseComponent& watcher) {
+void ContextMouse::acquire(CoreComponent& watcher) {
 	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
 }
 
@@ -280,7 +280,7 @@ void ContextMouse::acquire(MouseWatcher& watcher) {
 	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
 }
 
-void ContextMouse::release(BaseComponent& watcher) {
+void ContextMouse::release(CoreComponent& watcher) {
 	if (self->acquired.empty())
 		return;
 

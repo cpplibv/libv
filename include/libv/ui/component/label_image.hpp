@@ -21,7 +21,7 @@ class LabelImage : public ComponenetHandler<class CoreLabelImage, EventHostGener
 public:
 	explicit LabelImage(std::string name);
 	explicit LabelImage(GenerateName_t = {}, const std::string_view type = "label-image");
-	explicit LabelImage(base_ptr core) noexcept;
+	explicit LabelImage(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

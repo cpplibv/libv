@@ -32,7 +32,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreScrollBar : public BaseComponent {
+class CoreScrollBar : public CoreComponent {
 	friend class ScrollBar;
 	[[nodiscard]] inline auto handler() { return ScrollBar{this}; }
 
@@ -81,7 +81,7 @@ private:
 //	double scroll_hold_track;
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 //	inline auto bar_size() const noexcept;
@@ -375,7 +375,7 @@ void CoreScrollBar::doAttach() {
 void CoreScrollBar::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreScrollBar> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreScrollBar::doLayout1(const ContextLayout1& environment) {
@@ -459,7 +459,7 @@ ScrollBar::ScrollBar(std::string name) :
 ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
 
-ScrollBar::ScrollBar(base_ptr core) noexcept :
+ScrollBar::ScrollBar(core_ptr core) noexcept :
 	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
 
 // -------------------------------------------------------------------------------------------------

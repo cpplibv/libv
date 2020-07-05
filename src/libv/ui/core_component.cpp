@@ -1,7 +1,7 @@
 // File: Component.cpp, Created on 2014. január 7. 7:58, Author: Vader
 
 // hpp
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 // std
@@ -26,21 +26,21 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-BaseComponent::BaseComponent(std::string name) :
+CoreComponent::CoreComponent(std::string name) :
 	context_(current_thread_context()),
 	name(std::move(name)) { }
 
-BaseComponent::BaseComponent(GenerateName_t, const std::string_view type, size_t index) :
+CoreComponent::CoreComponent(GenerateName_t, const std::string_view type, size_t index) :
 	context_(current_thread_context()),
 	name(libv::concat(type, '-', index)) { }
 
-BaseComponent::~BaseComponent() {
+CoreComponent::~CoreComponent() {
 	log_ui.error_if(isAttached(), "Component is destructed in an attached state: {}", path());
 }
 
 // -------------------------------------------------------------------------------------------------
 
-std::string BaseComponent::path() const {
+std::string CoreComponent::path() const {
 	std::string result = name;
 
 	for (auto it = make_observer_ref(this); it != it->parent; it = it->parent)
@@ -51,32 +51,32 @@ std::string BaseComponent::path() const {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::flagDirect(Flag_t flags_) noexcept {
+void CoreComponent::flagDirect(Flag_t flags_) noexcept {
 	flags.set(flags_);
 }
 
-void BaseComponent::flagAncestors(Flag_t flags_) noexcept {
+void CoreComponent::flagAncestors(Flag_t flags_) noexcept {
 	for (auto it = parent; !it->flags.match_mask(flags_); it = it->parent)
 		it->flags.set(flags_);
 }
 
-void BaseComponent::flagAuto(Flag_t flags_) noexcept {
+void CoreComponent::flagAuto(Flag_t flags_) noexcept {
 	flagDirect(flags_ & Flag::mask_self);
 	flagAncestors(flags_ & Flag::mask_propagate);
 }
 
-void BaseComponent::flagForce(Flag_t flags_) noexcept {
+void CoreComponent::flagForce(Flag_t flags_) noexcept {
 	flagDirect(flags_);
 	flagAncestors(flags_);
 }
 
-void BaseComponent::flagPurge(Flag_t flags_) noexcept {
+void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 	flags.reset(flags_ & Flag::mask_self);
 
 	for (auto it = parent; true; it = it->parent) {
 		Flag_t childFlags = Flag::none;
 
-		it->doForeachChildren([&childFlags](BaseComponent& child) {
+		it->doForeachChildren([&childFlags](CoreComponent& child) {
 			childFlags |= child.flags;
 		});
 
@@ -93,21 +93,21 @@ void BaseComponent::flagPurge(Flag_t flags_) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::watchChar(bool value) noexcept {
+void CoreComponent::watchChar(bool value) noexcept {
 	if (value)
 		flags.set(Flag::watchChar);
 	else
 		flags.reset(Flag::watchChar);
 }
 
-void BaseComponent::watchKey(bool value) noexcept {
+void CoreComponent::watchKey(bool value) noexcept {
 	if (value)
 		flags.set(Flag::watchKey);
 	else
 		flags.reset(Flag::watchKey);
 }
 
-void BaseComponent::watchFocus(bool value) noexcept {
+void CoreComponent::watchFocus(bool value) noexcept {
 	if (value) {
 		flagAuto(Flag::focusable | Flag::watchFocus);
 		return;
@@ -126,7 +126,7 @@ void BaseComponent::watchFocus(bool value) noexcept {
 	}
 }
 
-void BaseComponent::watchMouse(Flag_t interest) noexcept {
+void CoreComponent::watchMouse(Flag_t interest) noexcept {
 	if (interest & ~Flag::mask_watchMouse) {
 		log_ui.error("Invalid argument passed to mouse watch: {}. Ignoring non mouse watch bits {}", interest, path());
 		interest &= Flag::mask_watchMouse;
@@ -148,25 +148,25 @@ void BaseComponent::watchMouse(Flag_t interest) noexcept {
 	flags.set(interest);
 }
 
-bool BaseComponent::isWatchChar() const noexcept {
+bool CoreComponent::isWatchChar() const noexcept {
 	return flags.match_any(Flag::watchChar);
 }
 
-bool BaseComponent::isWatchKey() const noexcept {
+bool CoreComponent::isWatchKey() const noexcept {
 	return flags.match_any(Flag::watchKey);
 }
 
-bool BaseComponent::isWatchFocus() const noexcept {
+bool CoreComponent::isWatchFocus() const noexcept {
 	return flags.match_any(Flag::watchFocus);
 }
 
-Flag_t BaseComponent::isWatchMouse() const noexcept {
+Flag_t CoreComponent::isWatchMouse() const noexcept {
 	return flags & Flag::mask_watchMouse;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::focus() noexcept {
+void CoreComponent::focus() noexcept {
 	// Note: focus has to be sync to allow correct event processing
 	if (!isAttached())
 		log_ui.error("Attempted to focus a non-attached component. Attempt ignored. {}", path());
@@ -178,23 +178,23 @@ void BaseComponent::focus() noexcept {
 		context().focus(*this);
 }
 
-void BaseComponent::markRemove() noexcept {
+void CoreComponent::markRemove() noexcept {
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
 
-	doForeachChildren([](BaseComponent& child) {
+	doForeachChildren([](CoreComponent& child) {
 		child.markRemove();
 	});
 }
 
-void BaseComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
+void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 	style_ = std::move(newStyle);
 	flagAuto(Flag::pendingStyle);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::_fire(std::type_index type, const void* event_ptr) {
+void CoreComponent::_fire(std::type_index type, const void* event_ptr) {
 	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (attach) codes
 	if (isAttached() && flags.match_any(Flag::signal))
 		context().event.fire(this, type, event_ptr);
@@ -202,13 +202,13 @@ void BaseComponent::_fire(std::type_index type, const void* event_ptr) {
 
 // -------------------------------------------------------------------------------------------------
 
-ContextStyle BaseComponent::makeStyleContext() noexcept {
+ContextStyle CoreComponent::makeStyleContext() noexcept {
 	return ContextStyle{libv::make_observer(style_.get()), *this};
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::connect(BaseComponent& signal, BaseComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
+void CoreComponent::connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
 	signal.context().event.connect(&signal, &slot, type, std::move(callback));
 
 	signal.flagDirect(Flag::signal);
@@ -217,7 +217,7 @@ void BaseComponent::connect(BaseComponent& signal, BaseComponent& slot, std::typ
 
 // -------------------------------------------------------------------------------------------------
 
-bool BaseComponent::isFocusableComponent() const noexcept {
+bool CoreComponent::isFocusableComponent() const noexcept {
 	return !flags.match_any(Flag::pendingDetachSelf) &&
 			flags.match_any(Flag::render) &&
 			flags.match_any(Flag::focusableSelf);
@@ -225,7 +225,7 @@ bool BaseComponent::isFocusableComponent() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::eventChar(BaseComponent& component, const EventChar& event) {
+void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) {
 	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
 		if (i->flags.match_any(Flag::watchChar))
 			i->onChar(event);
@@ -234,7 +234,7 @@ void BaseComponent::eventChar(BaseComponent& component, const EventChar& event) 
 	}
 }
 
-void BaseComponent::eventKey(BaseComponent& component, const EventKey& event) {
+void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
 	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
 		if (i->flags.match_any(Flag::watchKey))
 			i->onKey(event);
@@ -243,13 +243,13 @@ void BaseComponent::eventKey(BaseComponent& component, const EventKey& event) {
 	}
 }
 
-void BaseComponent::focusGain(BaseComponent& component) {
+void CoreComponent::focusGain(CoreComponent& component) {
 	if (component.flags.match_any(Flag::watchFocus))
 		component.onFocus(EventFocus{true});
 	component.flags.set(Flag::focused);
 }
 
-void BaseComponent::focusLoss(BaseComponent& component) {
+void CoreComponent::focusLoss(CoreComponent& component) {
 	if (component.flags.match_any(Flag::watchFocus))
 		component.onFocus(EventFocus{false});
 	component.flags.reset(Flag::focused);
@@ -257,33 +257,33 @@ void BaseComponent::focusLoss(BaseComponent& component) {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::onChar(const EventChar& event) {
+void CoreComponent::onChar(const EventChar& event) {
 	(void) event;
 }
 
-void BaseComponent::onKey(const EventKey& event) {
+void CoreComponent::onKey(const EventKey& event) {
 	(void) event;
 }
 
-void BaseComponent::onFocus(const EventFocus& event) {
+void CoreComponent::onFocus(const EventFocus& event) {
 	(void) event;
 }
 
-void BaseComponent::onMouseButton(const EventMouseButton& event) {
+void CoreComponent::onMouseButton(const EventMouseButton& event) {
 	(void) event;
 }
 
-void BaseComponent::onMouseMovement(const EventMouseMovement& event) {
+void CoreComponent::onMouseMovement(const EventMouseMovement& event) {
 	(void) event;
 }
 
-void BaseComponent::onMouseScroll(const EventMouseScroll& event) {
+void CoreComponent::onMouseScroll(const EventMouseScroll& event) {
 	(void) event;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::attach(BaseComponent& parent_) {
+void CoreComponent::attach(CoreComponent& parent_) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		// NOTE: context_ is already set in the constructor
 		parent = parent_;
@@ -301,7 +301,7 @@ void BaseComponent::attach(BaseComponent& parent_) {
 	}
 
 	if (flags.match_any(Flag::pendingAttachChild)) {
-		doForeachChildren([this](BaseComponent& child) {
+		doForeachChildren([this](CoreComponent& child) {
 			if (child.flags.match_any(Flag::pendingAttach))
 				child.attach(*this);
 		});
@@ -309,11 +309,11 @@ void BaseComponent::attach(BaseComponent& parent_) {
 	}
 }
 
-void BaseComponent::detach(BaseComponent& parent_) {
+void CoreComponent::detach(CoreComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
-		doDetachChildren([this, &parent_, &childFlags](BaseComponent& child) {
+		doDetachChildren([this, &parent_, &childFlags](CoreComponent& child) {
 			bool remove = child.flags.match_any(Flag::pendingDetachSelf);
 
 			if (child.flags.match_any(Flag::pendingDetach))
@@ -362,7 +362,7 @@ void BaseComponent::detach(BaseComponent& parent_) {
 	}
 }
 
-void BaseComponent::style() {
+void CoreComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
@@ -371,7 +371,7 @@ void BaseComponent::style() {
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
-		doForeachChildren([](BaseComponent& child) {
+		doForeachChildren([](CoreComponent& child) {
 			if (child.flags.match_any(Flag::pendingStyle))
 				child.style();
 		});
@@ -379,23 +379,23 @@ void BaseComponent::style() {
 	}
 }
 
-void BaseComponent::styleScan() {
+void CoreComponent::styleScan() {
 	if (flags.match_any(Flag::pendingStyleSelf) || (style_ && style_->isDirty())) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
 		parent->doStyle(ctx, childID);
 	}
-	doForeachChildren([](BaseComponent& child) {
+	doForeachChildren([](CoreComponent& child) {
 		child.styleScan();
 	});
 	flags.reset(Flag::pendingStyle);
 }
 
-libv::observer_ptr<BaseComponent> BaseComponent::focusTraverse(const ContextFocusTraverse& context) {
+libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocusTraverse& context) {
 	// Algorithm driver method, does not directly recurse, up walking
 
-	libv::observer_ptr<BaseComponent> result = doFocusTraverse(context, ChildIDSelf);
-	libv::observer_ref<BaseComponent> ancestor = *this;
+	libv::observer_ptr<CoreComponent> result = doFocusTraverse(context, ChildIDSelf);
+	libv::observer_ref<CoreComponent> ancestor = *this;
 
 	while (result == nullptr && ancestor != ancestor->parent) {
 		result = ancestor->parent->doFocusTraverse(context, ancestor->childID);
@@ -405,7 +405,7 @@ libv::observer_ptr<BaseComponent> BaseComponent::focusTraverse(const ContextFocu
 	return result;
 }
 
-void BaseComponent::render(ContextRender& context) {
+void CoreComponent::render(ContextRender& context) {
 	if (isRendered()) {
 		context.changedLayout = flags.match_any(Flag::updatedPosition | Flag::updatedSize);
 		context.changedPosition = flags.match_any(Flag::updatedPosition);
@@ -420,7 +420,7 @@ void BaseComponent::render(ContextRender& context) {
 	//	if (flags.match_any(Flag::pendingRender)) {
 			doRender(context);
 
-			doForeachChildren([&context](BaseComponent& child) {
+			doForeachChildren([&context](CoreComponent& child) {
 				child.render(context);
 			});
 	//		flags.reset(Flag::pendingRender);
@@ -435,7 +435,7 @@ void BaseComponent::render(ContextRender& context) {
 	}
 }
 
-void BaseComponent::layout1(const ContextLayout1& environment) {
+void CoreComponent::layout1(const ContextLayout1& environment) {
 	bool dirty = flags.match_any(Flag::pendingLayout);
 
 	if (dirty) {
@@ -444,7 +444,7 @@ void BaseComponent::layout1(const ContextLayout1& environment) {
 	}
 }
 
-void BaseComponent::layout2(const ContextLayout2& environment) {
+void CoreComponent::layout2(const ContextLayout2& environment) {
 //	log_ui.trace("Layout Pass2 {}", path());
 	bool boundsChanged = false;
 
@@ -478,24 +478,24 @@ void BaseComponent::layout2(const ContextLayout2& environment) {
 
 // -------------------------------------------------------------------------------------------------
 
-void BaseComponent::doAttach() { }
+void CoreComponent::doAttach() { }
 
-void BaseComponent::doDetach() { }
+void CoreComponent::doDetach() { }
 
-void BaseComponent::doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+void CoreComponent::doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
 	(void) callback;
 }
 
-void BaseComponent::doStyle(ContextStyle& context) {
+void CoreComponent::doStyle(ContextStyle& context) {
 	(void) context;
 }
 
-void BaseComponent::doStyle(ContextStyle& context, ChildID childID) {
+void CoreComponent::doStyle(ContextStyle& context, ChildID childID) {
 	(void) context;
 	(void) childID;
 }
 
-libv::observer_ptr<BaseComponent> BaseComponent::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
+libv::observer_ptr<CoreComponent> CoreComponent::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
 	(void) context;
 
 	if (current == ChildIDSelf || !isFocusableComponent())
@@ -504,31 +504,31 @@ libv::observer_ptr<BaseComponent> BaseComponent::doFocusTraverse(const ContextFo
 	return libv::make_observer(this);
 }
 
-void BaseComponent::doCreate(ContextRender& context) {
+void CoreComponent::doCreate(ContextRender& context) {
 	(void) context;
 }
 
-void BaseComponent::doDestroy(ContextRender& context) {
+void CoreComponent::doDestroy(ContextRender& context) {
 	(void) context;
 }
 
-void BaseComponent::doRender(ContextRender& context) {
+void CoreComponent::doRender(ContextRender& context) {
 	(void) context;
 }
 
-void BaseComponent::doLayout1(const ContextLayout1& environment) {
+void CoreComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 }
 
-void BaseComponent::doLayout2(const ContextLayout2& environment) {
+void CoreComponent::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
 }
 
-void BaseComponent::doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+void CoreComponent::doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
 	(void) callback;
 }
 
-void BaseComponent::doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) {
+void CoreComponent::doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) {
 	(void) callback;
 }
 

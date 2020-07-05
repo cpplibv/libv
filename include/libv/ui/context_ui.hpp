@@ -19,7 +19,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class ContextEvent;
 class ContextMouse;
 class ContextState;
@@ -76,9 +76,9 @@ public:
 	void clearEveryStyleDirty() noexcept;
 
 public:
-	void focus(BaseComponent& component);
-	void detachFocused(BaseComponent& component);
-	void detachFocusLinked(BaseComponent& component);
+	void focus(CoreComponent& component);
+	void detachFocused(CoreComponent& component);
+	void detachFocusLinked(CoreComponent& component);
 
 public:
 	std::shared_ptr<Font2D> font(const std::filesystem::path& path);

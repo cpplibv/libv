@@ -12,7 +12,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform.hpp>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/context_layout.hpp>
 #include <libv/ui/context_mouse.hpp>
 #include <libv/ui/context_render.hpp>
@@ -77,7 +77,7 @@ void main() {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreOverlayZoom : public BaseComponent {
+class CoreOverlayZoom : public CoreComponent {
 	friend class OverlayZoom;
 	[[nodiscard]] inline auto handler() { return OverlayZoom{this}; }
 
@@ -102,7 +102,7 @@ private:
 	libv::glr::Mesh lines_cursor{libv::gl::Primitive::Lines, libv::gl::BufferUsage::DynamicDraw};
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 public:
 	void control();
@@ -328,7 +328,7 @@ OverlayZoom::OverlayZoom(GenerateName_t gen, const std::string_view type) :
 	self().init();
 }
 
-OverlayZoom::OverlayZoom(base_ptr core) noexcept :
+OverlayZoom::OverlayZoom(core_ptr core) noexcept :
 	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(core) {
 	self().init();
 }

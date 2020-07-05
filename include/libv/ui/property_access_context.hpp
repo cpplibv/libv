@@ -8,7 +8,7 @@
 #include <string_view>
 #include <type_traits>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/style.hpp>
 
 
@@ -19,14 +19,14 @@ namespace ui {
 
 class ContextUI;
 
-//class BaseComponent;
+//class CoreComponent;
 //
 //struct BasePropertyInfo {
 //	std::string group;
 //	std::string name;
 //	std::string description;
 //
-//	virtual std::shared_ptr<BaseComponent> makeEditor() = 0;
+//	virtual std::shared_ptr<CoreComponent> makeEditor() = 0;
 //	virtual std::string toString() = 0;
 //	virtual ~BasePropertyInfo() = default;
 //};
@@ -41,7 +41,7 @@ class ContextUI;
 ////	fallback
 ////	init
 //
-//	virtual std::shared_ptr<BaseComponent> makeEditor() override { }
+//	virtual std::shared_ptr<CoreComponent> makeEditor() override { }
 //	virtual std::string toString() override { }
 //};
 
@@ -55,7 +55,7 @@ class ContextUI;
 template <typename Owner>
 struct PropertyAccessContext {
 	Owner& owner;
-	BaseComponent& component;
+	CoreComponent& component;
 	libv::observer_ptr<Style> style;
 	ContextUI& context;
 

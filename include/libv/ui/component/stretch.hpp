@@ -18,7 +18,7 @@ class Stretch : public ComponenetHandler<class CoreStretch, EventHostGeneral<Str
 public:
 	explicit Stretch(std::string name);
 	explicit Stretch(GenerateName_t = {}, const std::string_view type = "image");
-	explicit Stretch(base_ptr core) noexcept;
+	explicit Stretch(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

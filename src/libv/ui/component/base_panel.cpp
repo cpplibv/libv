@@ -18,14 +18,14 @@ namespace ui {
 
 void CoreBasePanel::add(Component component) {
 	const auto childID = static_cast<ChildID>(children.size());
-	AccessParent::childID(component.base()) = childID;
+	AccessParent::childID(component.core()) = childID;
 
 	children.emplace_back(std::move(component));
 	flagForce(Flag::pendingAttachChild);
 }
 
 void CoreBasePanel::remove(Component& component) {
-	if (children[AccessParent::childID(component.base())] != component) {
+	if (children[AccessParent::childID(component.core())] != component) {
 		log_ui.error("Attempted to remove a non child element: {} from: {}", component.path(), path());
 		return;
 	}
@@ -40,22 +40,22 @@ void CoreBasePanel::clear() {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreBasePanel::doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+void CoreBasePanel::doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
 	ChildID numRemoved = 0;
 
 	libv::erase_if_stable(children, [&numRemoved, &callback](auto& child) {
-		const bool remove = callback(child.base());
+		const bool remove = callback(child.core());
 
 		if (remove)
 			++numRemoved;
 		else
-			AccessParent::childID(child.base()) -= numRemoved;
+			AccessParent::childID(child.core()) -= numRemoved;
 
 		return remove;
 	});
 }
 
-libv::observer_ptr<BaseComponent> CoreBasePanel::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
+libv::observer_ptr<CoreComponent> CoreBasePanel::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
 	const ChildID dir = context.isForward() ? +1 : -1;
 	const ChildID end = context.isForward() ? static_cast<ChildID>(children.size()) : -1;
 	ChildID begin = context.isForward() ? 0 : static_cast<ChildID>(children.size() - 1);
@@ -77,21 +77,21 @@ libv::observer_ptr<BaseComponent> CoreBasePanel::doFocusTraverse(const ContextFo
 		return nullptr;
 
 	for (ChildID i = begin; i != end; i += dir)
-		if (auto hit = AccessParent::doFocusTraverse(children[i].base(), context, ChildIDNone))
+		if (auto hit = AccessParent::doFocusTraverse(children[i].core(), context, ChildIDNone))
 			return hit;
 
 	return nullptr;
 }
 
-void CoreBasePanel::doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) {
+void CoreBasePanel::doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
 	for (auto& child : children)
-		if (not callback(child.base()))
+		if (not callback(child.core()))
 			return;
 }
 
-void CoreBasePanel::doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) {
+void CoreBasePanel::doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) {
 	for (auto& child : children)
-		callback(child.base());
+		callback(child.core());
 }
 
 // -------------------------------------------------------------------------------------------------

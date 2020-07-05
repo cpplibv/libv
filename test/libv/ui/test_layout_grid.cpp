@@ -16,11 +16,11 @@ struct TestChild : public BasicTestChild<libv::ui::LayoutGrid> {
 
 	template <typename V>
 	void anchor(V&& value) {
-		components[index].ptr.base().set(components[index].property.anchor, std::forward<V>(value));
+		components[index].ptr.core().set(components[index].property.anchor, std::forward<V>(value));
 	}
 
 	void size(std::string_view value) {
-		components[index].ptr.base().set(components[index].property.size, libv::ui::parse_size_or_throw(value));
+		components[index].ptr.core().set(components[index].property.size, libv::ui::parse_size_or_throw(value));
 	}
 };
 

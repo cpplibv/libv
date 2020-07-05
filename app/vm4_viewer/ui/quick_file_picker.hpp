@@ -64,16 +64,16 @@ private:
 	std::shared_ptr<libv::ui::PanelFull> list_panel;
 
 public:
-	explicit QuickFilePicker(libv::ui::BaseComponent& parent);
-	QuickFilePicker(libv::ui::BaseComponent& parent, std::string name);
-	QuickFilePicker(libv::ui::BaseComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	explicit QuickFilePicker(libv::ui::CoreComponent& parent);
+	QuickFilePicker(libv::ui::CoreComponent& parent, std::string name);
+	QuickFilePicker(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 	~QuickFilePicker();
 
 	void update_filelist();
 
 public:
 	template <typename F>
-	inline void event_pick(libv::observer_ptr<BaseComponent> slot, F&& func) {
+	inline void event_pick(libv::observer_ptr<CoreComponent> slot, F&& func) {
 		connect<EventPick>(slot, std::forward<F>(func));
 	}
 

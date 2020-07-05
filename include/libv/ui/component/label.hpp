@@ -18,7 +18,7 @@ class Label : public ComponenetHandler<class CoreLabel, EventHostGeneral<Label>>
 public:
 	explicit Label(std::string name);
 	explicit Label(GenerateName_t = {}, const std::string_view type = "label");
-	explicit Label(base_ptr core) noexcept;
+	explicit Label(core_ptr core) noexcept;
 
 public:
 	void align_horizontal(AlignHorizontal value);

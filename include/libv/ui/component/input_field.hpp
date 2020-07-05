@@ -62,7 +62,7 @@ class InputField : public ComponenetHandler<class CoreInputField, EventHostEdita
 public:
 	explicit InputField(std::string name);
 	explicit InputField(GenerateName_t = {}, const std::string_view type = "input-field");
-	explicit InputField(base_ptr core) noexcept;
+	explicit InputField(core_ptr core) noexcept;
 
 public:
 	void color(Color value);

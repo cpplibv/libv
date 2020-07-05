@@ -5,7 +5,7 @@
 // std
 #include <vector>
 // pro
-#include <libv/ui/base_component.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/component.hpp>
 
 
@@ -14,12 +14,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CoreBasePanel : public BaseComponent {
+class CoreBasePanel : public CoreComponent {
 protected:
 	std::vector<Component> children;
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 public:
 	void add(Component component);
@@ -27,10 +27,10 @@ public:
 	void clear();
 
 private:
-	virtual void doDetachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
-	virtual libv::observer_ptr<BaseComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
-	virtual void doForeachChildren(libv::function_ref<bool(BaseComponent&)> callback) override;
-	virtual void doForeachChildren(libv::function_ref<void(BaseComponent&)> callback) override;
+	virtual void doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
+	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
+	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) override;
 };
 
 // -------------------------------------------------------------------------------------------------

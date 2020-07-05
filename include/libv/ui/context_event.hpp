@@ -15,12 +15,12 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class BaseComponent;
+class CoreComponent;
 class ImplContextEvent;
 
 class ContextEvent {
 public:
-	using ptr = libv::observer_ptr<BaseComponent>;
+	using ptr = libv::observer_ptr<CoreComponent>;
 
 private:
 	std::unique_ptr<ImplContextEvent> self;

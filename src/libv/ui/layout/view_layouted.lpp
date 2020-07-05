@@ -13,7 +13,7 @@ namespace ui {
 
 inline auto view_layouted() {
 	return ranges::view::filter([](const auto& child) {
-		return child.base().isLayouted();
+		return child.core().isLayouted();
 	});
 }
 

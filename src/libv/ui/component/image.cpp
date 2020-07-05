@@ -21,7 +21,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreImage : BaseComponent {
+struct CoreImage : CoreComponent {
 	friend class Image;
 	[[nodiscard]] inline auto handler() { return Image{this}; }
 
@@ -38,7 +38,7 @@ private:
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 public:
-	using BaseComponent::BaseComponent;
+	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -75,7 +75,7 @@ void CoreImage::access_properties(T& ctx) {
 void CoreImage::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	BaseComponent::access_properties(setter);
+	CoreComponent::access_properties(setter);
 }
 
 void CoreImage::doLayout1(const ContextLayout1& environment) {
@@ -121,7 +121,7 @@ Image::Image(std::string name) :
 Image::Image(GenerateName_t gen, const std::string_view type) :
 	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(gen, type) { }
 
-Image::Image(base_ptr core) noexcept :
+Image::Image(core_ptr core) noexcept :
 	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
