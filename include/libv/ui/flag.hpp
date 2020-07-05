@@ -48,10 +48,10 @@ static constexpr Flag_t updatedPosition       = libv::bit(23); /// Component's p
 static constexpr Flag_t watchChar             = libv::bit(24);
 static constexpr Flag_t watchKey              = libv::bit(25);
 static constexpr Flag_t watchFocus            = libv::bit(26); // Not really a self contained flag, mostly present for consistency
-static constexpr Flag_t watchMouseButton      = libv::bit(27);
-static constexpr Flag_t watchMouseEnter       = libv::bit(28);
-static constexpr Flag_t watchMousePosition    = libv::bit(29);
-static constexpr Flag_t watchMouseScroll      = libv::bit(30);
+static constexpr Flag_t watchMouse            = libv::bit(27);
+//static constexpr Flag_t ____                = libv::bit(28);
+//static constexpr Flag_t ____                = libv::bit(29);
+//static constexpr Flag_t ____                = libv::bit(30);
 //static constexpr Flag_t focusLinked           = libv::bit(31);
 
 // -------------------------------------------------------------------------------------------------
@@ -95,10 +95,7 @@ static constexpr Flag_t mask_self =
 		watchChar |
 		watchKey |
 		watchFocus |
-		watchMouseButton |
-		watchMouseEnter |
-		watchMousePosition |
-		watchMouseScroll
+		watchMouse
 ;
 
 static constexpr Flag_t mask_init =
@@ -115,12 +112,6 @@ static constexpr Flag_t mask_init =
 
 		updatedSize |
 		updatedPosition;
-
-static constexpr Flag_t mask_watchMouse =
-		watchMouseButton |
-		watchMouseEnter |
-		watchMousePosition |
-		watchMouseScroll;
 
 } // namespace flag
 

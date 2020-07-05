@@ -196,7 +196,7 @@ void CoreButton::onMouseScroll(const EventMouseScroll& event) {
 
 void CoreButton::doAttach() {
 	watchFocus(true);
-	watchMouse(Flag::mask_watchMouse);
+	watchMouse(true);
 }
 
 void CoreButton::doStyle(ContextStyle& ctx) {

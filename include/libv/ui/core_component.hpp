@@ -155,11 +155,11 @@ protected:
 	void watchChar(bool value) noexcept;
 	void watchKey(bool value) noexcept;
 	void watchFocus(bool value) noexcept;
-	void watchMouse(Flag_t interest) noexcept;
+	void watchMouse(bool value) noexcept;
 	[[nodiscard]] bool isWatchChar() const noexcept;
 	[[nodiscard]] bool isWatchKey() const noexcept;
 	[[nodiscard]] bool isWatchFocus() const noexcept;
-	[[nodiscard]] Flag_t isWatchMouse() const noexcept;
+	[[nodiscard]] bool isWatchMouse() const noexcept;
 
 public:
 	void focus() noexcept;

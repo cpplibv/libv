@@ -430,8 +430,7 @@ void CoreInputField::doAttach() {
 	watchChar(true);
 	watchKey(true);
 	watchFocus(true);
-//	watchMouse(Flag::watchMouseButton | Flag::watchMouseEnter);
-	watchMouse(Flag::mask_watchMouse);
+	watchMouse(true);
 }
 
 void CoreInputField::doStyle(ContextStyle& ctx) {

@@ -29,20 +29,17 @@ public:
 	~ContextMouse();
 
 public:
-	void subscribe(CoreComponent& watcher, Flag_t interest);
-	void subscribe(MouseWatcher& watcher, Flag_t interest);
-	void subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
+	void subscribe(CoreComponent& watcher);
+	void subscribe(MouseWatcher& watcher);
+	void subscribe(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
-	void update(CoreComponent& watcher, Flag_t interest);
+//	void update(CoreComponent& watcher, MouseOrder order);
+//	void update(CoreComponent& watcher, libv::vec2f position, libv::vec2f size);
 	void update(CoreComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
-//	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order);
-//	void update(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size);
-//	void update(MouseWatcher& watcher, Flag_t interest, MouseOrder order);
-	void update(MouseWatcher& watcher, Flag_t interest);
-	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
-//	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
 //	void update(MouseWatcher& watcher, MouseOrder order);
+//	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
+	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
 
 	void unsubscribe(CoreComponent& watcher);
 	void unsubscribe(MouseWatcher& watcher);

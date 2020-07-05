@@ -151,7 +151,6 @@ struct ImplContextMouse {
 	};
 
 	struct Entry {
-		Flag_t interest;
 		libv::vec2f cornerBL;
 		libv::vec2f cornerTR;
 		MouseOrder order;
@@ -160,11 +159,11 @@ struct ImplContextMouse {
 		bool over = false;
 		bool pendingUpdate = true;
 
-		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
-			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{watcher} { }
+		Entry(libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
+			cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{watcher} { }
 
-		Entry(Flag_t interest, libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<CoreComponent> component) :
-			interest(interest), cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{component} { }
+		Entry(libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<CoreComponent> component) :
+			cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{component} { }
 	};
 
 	std::vector<Entry> entries;
@@ -182,28 +181,16 @@ ContextMouse::ContextMouse() :
 
 ContextMouse::~ContextMouse() { }
 
-void ContextMouse::subscribe(CoreComponent& component, Flag_t interest) {
-	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
+void ContextMouse::subscribe(CoreComponent& component) {
+	self->entries.emplace_back(libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
 }
 
-void ContextMouse::subscribe(MouseWatcher& watcher, Flag_t interest) {
-	self->entries.emplace_back(interest, libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
+void ContextMouse::subscribe(MouseWatcher& watcher) {
+	self->entries.emplace_back(libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
 }
 
-void ContextMouse::subscribe(MouseWatcher& watcher, Flag_t interest, libv::vec2f position, libv::vec2f size, MouseOrder order) {
-	self->entries.emplace_back(interest, position, position + size - 1.f, order, libv::make_observer_ref(watcher));
-}
-
-void ContextMouse::update(CoreComponent& component, Flag_t interest) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(component);
-	});
-
-	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
-
-	it->interest = interest;
-	it->pendingUpdate = true;
+void ContextMouse::subscribe(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+	self->entries.emplace_back(position, position + size - 1.f, order, libv::make_observer_ref(watcher));
 }
 
 void ContextMouse::update(CoreComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
@@ -217,18 +204,6 @@ void ContextMouse::update(CoreComponent& component, libv::vec2f position, libv::
 	it->cornerBL = position;
 	it->cornerTR = position + size - 1.f;
 	it->order = order;
-	it->pendingUpdate = true;
-}
-
-void ContextMouse::update(MouseWatcher& watcher, Flag_t interest) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(watcher);
-	});
-
-	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
-
-	it->interest = interest;
 	it->pendingUpdate = true;
 }
 
@@ -396,9 +371,7 @@ void ContextMouse::event_leave() {
 
 		entry.over = false;
 
-		const bool interested = entry.interest.match_any(Flag::watchMouseEnter);
-		if (interested)
-			hits.push_back({entry});
+		hits.push_back({entry});
 	}
 
 	sort_hits(hits);
@@ -425,9 +398,7 @@ void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Act
 		if (!entry.over)
 			continue;
 
-		const bool interested = entry.interest.match_any(Flag::watchMouseButton);
-		if (interested)
-			hits.push_back({entry});
+		hits.push_back({entry});
 	}
 
 	sort_hits(hits);
@@ -467,11 +438,7 @@ void ContextMouse::event_position(libv::vec2f position_new) {
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		const bool interested =
-				entry.interest.match_any(Flag::watchMousePosition) ||
-				(over_old != over_new && entry.interest.match_any(Flag::watchMouseEnter));
-		if (interested)
-			hits.push_back({entry, enter, leave});
+		hits.push_back({entry, enter, leave});
 	}
 
 	sort_hits(hits);
@@ -501,9 +468,7 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 		if (!entry.over)
 			continue;
 
-		const bool interested = entry.interest.match_any(Flag::watchMouseScroll);
-		if (interested)
-			hits.push_back({entry});
+		hits.push_back({entry});
 	}
 
 	sort_hits(hits);
@@ -538,9 +503,7 @@ void ContextMouse::event_update() {
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		const bool interested = entry.interest.match_any(Flag::watchMouseEnter);
-		if (interested)
-			hits.push_back({entry, enter, leave});
+		hits.push_back({entry, enter, leave});
 	}
 
 	sort_hits(hits);

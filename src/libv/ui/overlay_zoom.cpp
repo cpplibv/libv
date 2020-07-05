@@ -264,7 +264,7 @@ void CoreOverlayZoom::onMouseScroll(const EventMouseScroll& event) {
 void CoreOverlayZoom::doAttach() {
 	watchFocus(true);
 	watchKey(true);
-	watchMouse(Flag::watchMousePosition | Flag::watchMouseScroll);
+	watchMouse(true);
 }
 
 void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {

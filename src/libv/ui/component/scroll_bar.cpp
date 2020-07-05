@@ -369,7 +369,7 @@ void CoreScrollBar::onMouseScroll(const EventMouseScroll& event) {
 void CoreScrollBar::doAttach() {
 	drag_mode = DragMode::idle;
 
-	watchMouse(Flag::mask_watchMouse);
+	watchMouse(true);
 }
 
 void CoreScrollBar::doStyle(ContextStyle& ctx) {

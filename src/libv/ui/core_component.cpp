@@ -126,26 +126,22 @@ void CoreComponent::watchFocus(bool value) noexcept {
 	}
 }
 
-void CoreComponent::watchMouse(Flag_t interest) noexcept {
-	if (interest & ~Flag::mask_watchMouse) {
-		log_ui.error("Invalid argument passed to mouse watch: {}. Ignoring non mouse watch bits {}", interest, path());
-		interest &= Flag::mask_watchMouse;
-	}
+void CoreComponent::watchMouse(bool value) noexcept {
+	if (flags.match_full(Flag::watchMouse) == value)
+		return;
 
 	// NOTE: pendingAttachSelf flag is used instead of isAttached to allow usage of this function in doAttach
-	if (!flags.match_any(Flag::pendingAttachSelf) && flags.match_mask(Flag::mask_watchMouse, interest)) { // Attached and there is a change
-		if (!interest) // no watched mouse event left, unsubscribe
+	if (!flags.match_any(Flag::pendingAttachSelf)) { // Already attached
+		if (value)
+			context().mouse.subscribe(*this);
+		else
 			context().mouse.unsubscribe(*this);
-
-		else if (!(flags & Flag::mask_watchMouse)) // start watching mouse events, subscribe
-			context().mouse.subscribe(*this, interest);
-
-		else // not subscribe and not unsubscribe but there is a change, update
-			context().mouse.update(*this, flags & interest & Flag::mask_watchMouse);
 	}
 
-	flags.reset(Flag::mask_watchMouse);
-	flags.set(interest);
+	if (value)
+		flags.set(Flag::watchMouse);
+	else
+		flags.reset(Flag::watchMouse);
 }
 
 bool CoreComponent::isWatchChar() const noexcept {
@@ -160,8 +156,8 @@ bool CoreComponent::isWatchFocus() const noexcept {
 	return flags.match_any(Flag::watchFocus);
 }
 
-Flag_t CoreComponent::isWatchMouse() const noexcept {
-	return flags & Flag::mask_watchMouse;
+bool CoreComponent::isWatchMouse() const noexcept {
+	return flags.match_any(Flag::watchMouse);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -294,8 +290,8 @@ void CoreComponent::attach(CoreComponent& parent_) {
 
 		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
 
-		if (flags.match_any(Flag::mask_watchMouse))
-			context().mouse.subscribe(*this, flags & Flag::mask_watchMouse);
+		if (flags.match_any(Flag::watchMouse))
+			context().mouse.subscribe(*this);
 
 		flags.reset(Flag::pendingAttachSelf);
 	}
@@ -332,7 +328,7 @@ void CoreComponent::detach(CoreComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachSelf)) {
 		log_ui.trace("Detaching {}", path());
 
-		if (flags.match_any(Flag::mask_watchMouse))
+		if (flags.match_any(Flag::watchMouse))
 			context().mouse.unsubscribe(*this);
 
 		if (flags.match_any(Flag::focused)) {
@@ -460,7 +456,7 @@ void CoreComponent::layout2(const ContextLayout2& environment) {
 		layout_size_ = environment.size;
 	}
 
-	if (boundsChanged && flags.match_any(Flag::mask_watchMouse)) {
+	if (boundsChanged && flags.match_any(Flag::watchMouse)) {
 		context().mouse.update(
 			*this,
 			libv::vec::xy(environment.position),

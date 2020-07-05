@@ -514,12 +514,12 @@ libv.ui: property size / anchor
 libv.ui: layout_line should support anchor | invalidated as the two alignment basically already solves the use-cases
 libv.ui: property size / anchor access, and inherited property access | manual, it will do but for now
 libv.ui: Rename BaseComponent to CoreComponent
+libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 
 
 libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
