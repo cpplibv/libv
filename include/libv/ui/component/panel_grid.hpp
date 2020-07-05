@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelGrid : public ComponenetHandler<class CorePanelGrid, EventHostGeneral<PanelGrid>> {
+class PanelGrid : public ComponentHandler<class CorePanelGrid, EventHostGeneral<PanelGrid>> {
 public:
 	explicit PanelGrid(std::string name);
 	explicit PanelGrid(GenerateName_t = {}, const std::string_view type = "grid");

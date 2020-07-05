@@ -14,7 +14,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Stretch : public ComponenetHandler<class CoreStretch, EventHostGeneral<Stretch>> {
+class Stretch : public ComponentHandler<class CoreStretch, EventHostGeneral<Stretch>> {
 public:
 	explicit Stretch(std::string name);
 	explicit Stretch(GenerateName_t = {}, const std::string_view type = "image");

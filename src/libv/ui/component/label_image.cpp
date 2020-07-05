@@ -199,13 +199,13 @@ void CoreLabelImage::doRender(ContextRender& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 LabelImage::LabelImage(std::string name) :
-	ComponenetHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(std::move(name)) { }
+	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(std::move(name)) { }
 
 LabelImage::LabelImage(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(gen, type) { }
+	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(gen, type) { }
 
 LabelImage::LabelImage(core_ptr core) noexcept :
-	ComponenetHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(core) { }
+	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

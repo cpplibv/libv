@@ -14,7 +14,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Image : public ComponenetHandler<class CoreImage, EventHostGeneral<Image>> {
+class Image : public ComponentHandler<class CoreImage, EventHostGeneral<Image>> {
 public:
 	explicit Image(std::string name);
 	explicit Image(GenerateName_t = {}, const std::string_view type = "image");

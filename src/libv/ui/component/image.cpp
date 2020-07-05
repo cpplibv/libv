@@ -116,13 +116,13 @@ void CoreImage::doRender(ContextRender& context) {
 // -------------------------------------------------------------------------------------------------
 
 Image::Image(std::string name) :
-	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(std::move(name)) { }
+	ComponentHandler<CoreImage, EventHostGeneral<Image>>(std::move(name)) { }
 
 Image::Image(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(gen, type) { }
+	ComponentHandler<CoreImage, EventHostGeneral<Image>>(gen, type) { }
 
 Image::Image(core_ptr core) noexcept :
-	ComponenetHandler<CoreImage, EventHostGeneral<Image>>(core) { }
+	ComponentHandler<CoreImage, EventHostGeneral<Image>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

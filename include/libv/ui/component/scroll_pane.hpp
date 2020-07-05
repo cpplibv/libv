@@ -1,0 +1,147 @@
+// File: panel.hpp - Created on 2017.10.22. 06:50 - Author: Vader
+
+#pragma once
+
+// pro
+#include <libv/ui/component.hpp>
+#include <libv/ui/property/scroll_area_mode.hpp>
+
+
+namespace libv {
+namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+class ScrollArea : public ComponentHandler<class CoreScrollArea, EventHostGeneral<ScrollArea>> {
+//class ScrollPane : public ComponentHandler<class CoreScrollArea>, public EventHost<EventHostGeneral<ScrollPane>>> {
+public:
+	explicit ScrollArea(std::string name);
+	explicit ScrollArea(GenerateName_t = {}, const std::string_view type = "scroll-area");
+	explicit ScrollArea(core_ptr core) noexcept;
+
+public:
+	void mode(ScrollAreaMode value);
+	[[nodiscard]] ScrollAreaMode mode() const noexcept;
+
+	void content(Component&& value) noexcept;
+	void content(const Component& value) noexcept;
+	[[nodiscard]] Component& content() noexcept;
+	[[nodiscard]] const Component& content() const noexcept;
+
+public:
+	void view_position(libv::vec2f value);
+	[[nodiscard]] libv::vec2f view_position() const noexcept;
+};
+
+// -------------------------------------------------------------------------------------------------
+// =================================================================================================
+// =================================================================================================
+
+//enum class BarVisibility {
+//	/// The default. The scroll bar is displayed when the client area does not fit in the viewport.
+//	on_demand = 0,
+//
+//	/// The scroll bar appears when the viewport is smaller than the client and disappears when the viewport is larger than the client.
+//	on_demand_lazy,
+//
+//	/// Always display the scroll bar. The knob disappears if the viewport is large enough to show the whole client.
+//	always,
+//
+//	/// Never display the scroll bar. Use this option if you don't want the user to directly control what part of the client is shown, or if you want them to use only non-scroll-bar techniques (such as dragging).
+//	never,
+//};
+//
+//enum class ScrollPaneMode {
+//	horizontal,
+//	vertical,
+//
+//	both_with_corner,
+//	both_with_horizontal_main,
+//	both_with_vertical_main,
+//};
+//
+//enum class BarPlacementHorizontal {
+//	left,
+//	right,
+//
+//	both,
+//};
+//
+//enum class BarPlacementVertical {
+//	top,
+//	bottom,
+//
+//	both,
+//};
+//
+//// -------------------------------------------------------------------------------------------------
+//// =================================================================================================
+//// =================================================================================================
+//
+//// Property public API
+//#define LIBV_UI_PROPERTY_PAPI(RType, WType, Name) \
+//	void Name(WType value); \
+//	[[nodiscard]] RType Name() const noexcept;
+//
+//// Property member manual
+//#define LIBV_UI_PROPERTY_MMAN(Owner, RType, WType, Name) \
+//	void Owner::Name(WType value) { \
+//		AccessProperty::manual(self(), self().property.Name, std::move(value)); \
+//	} \
+//	RType Owner::Name() const noexcept { \
+//		return self().property.Name(); \
+//	}
+//
+//// Property public API | value based
+//#define LIBV_UI_PROPERTY_PAPI_V(Type, Name) LIBV_UI_PROPERTY_PAPI(Type, Type, Name)
+//// Property public API | reference based
+//#define LIBV_UI_PROPERTY_PAPI_R(Type, Name) LIBV_UI_PROPERTY_PAPI(const Type&, Type, Name)
+//
+//// Property member manual | value based
+//#define LIBV_UI_PROPERTY_MMAN_V(Owner, Type, Name) LIBV_UI_PROPERTY_MMAN(Owner, Type, Type, Name)
+//// Property member manual | reference based
+//#define LIBV_UI_PROPERTY_MMAN_R(Owner, Type, Name) LIBV_UI_PROPERTY_MMAN(Owner, const Type&, Type, Name)
+//
+//
+//// =================================================================================================
+//// =================================================================================================
+//
+//class ScrollPane : public ComponentHandler<class CoreScrollPane, EventHostGeneral<ScrollPane>> {
+////class ScrollPane : public ScrollArea, public EventHost<EventHostGeneral<ScrollPane>>> {
+//public:
+//	explicit ScrollPane(std::string name);
+//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "scroll-pane");
+//	explicit ScrollPane(core_ptr core) noexcept;
+//
+//public:
+//	[[nodiscard]] ScrollBar& bar_vertical();
+//	[[nodiscard]] const ScrollBar& bar_vertical() const;
+//
+//	[[nodiscard]] ScrollBar& bar_horizontal();
+//	[[nodiscard]] const ScrollBar& bar_horizontal() const;
+//
+//	void corner(Component value);
+//	void clear_corner();
+//	[[nodiscard]] const Component& corner() const;
+//
+////	[[nodiscard]] ScrollArea& scroll_area();
+////	[[nodiscard]] const ScrollArea& scroll_area() const;
+//
+//public:
+//	LIBV_UI_PROPERTY_PAPI_V(BarPlacementHorizontal, bar_placement_horizontal)
+//	LIBV_UI_PROPERTY_PAPI_V(BarPlacementVertical, bar_placement_vertical)
+//	LIBV_UI_PROPERTY_PAPI_V(BarVisibility, bar_visibility_horizontal)
+//	LIBV_UI_PROPERTY_PAPI_V(BarVisibility, bar_visibility_vertical)
+//	LIBV_UI_PROPERTY_PAPI_V(ScrollPaneMode, mode)
+//};
+//
+//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarPlacementHorizontal, bar_placement_horizontal)
+//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarPlacementVertical, bar_placement_vertical)
+//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarVisibility, bar_visibility_horizontal)
+//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, BarVisibility, bar_visibility_vertical)
+//LIBV_UI_PROPERTY_MMAN_V(ScrollPane, ScrollPaneMode, mode)
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ui
+} // namespace libv

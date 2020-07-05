@@ -32,10 +32,14 @@ template <typename T, typename... Args>
 /// Warning: Derived classes must not contain any data member
 class Component {
 private:
-	core_ptr ptr;
+	core_ptr ptr = nullptr;
+
+//protected:
+//	Component() noexcept = default;
+public:
+	Component() noexcept = delete;
 
 public:
-	Component() = delete;
 	Component(const Component& other) noexcept;
 	Component(Component&& other) noexcept;
 	Component& operator=(const Component& other) & noexcept;
@@ -90,20 +94,20 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <typename ComponentT, typename EventHostT>
-struct ComponenetHandler : public Component {
+struct ComponentHandler : public Component {
 private:
 	static inline size_t nextID = 0;
 
 protected:
 	template <typename DelayedT = ComponentT>
-	explicit inline ComponenetHandler(std::string name) :
+	explicit inline ComponentHandler(std::string name) :
 		Component(create_core_ptr<DelayedT>(std::move(name))) { }
 
 	template <typename DelayedT = ComponentT>
-	explicit inline ComponenetHandler(GenerateName_t = {}, const std::string_view type = "component") :
+	explicit inline ComponentHandler(GenerateName_t = {}, const std::string_view type = "component") :
 		Component(create_core_ptr<DelayedT>(GenerateName, type, nextID++)) { }
 
-	explicit inline ComponenetHandler(core_ptr ptr) noexcept :
+	explicit inline ComponentHandler(core_ptr ptr) noexcept :
 		Component(std::move(ptr)) {
 
 		assert(dynamic_cast<ComponentT*>(this->ptr) != nullptr && "Invalid component pointer initialization");

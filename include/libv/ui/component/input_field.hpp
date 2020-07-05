@@ -58,7 +58,7 @@ struct EventHostEditable : EventHostSubmitable<ComponentT> {
 
 // -------------------------------------------------------------------------------------------------
 
-class InputField : public ComponenetHandler<class CoreInputField, EventHostEditable<InputField>> {
+class InputField : public ComponentHandler<class CoreInputField, EventHostEditable<InputField>> {
 public:
 	explicit InputField(std::string name);
 	explicit InputField(GenerateName_t = {}, const std::string_view type = "input-field");

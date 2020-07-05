@@ -143,13 +143,13 @@ void CoreLabel::doRender(ContextRender& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Label::Label(std::string name) :
-	ComponenetHandler<CoreLabel, EventHostGeneral<Label>>(std::move(name)) { }
+	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(std::move(name)) { }
 
 Label::Label(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreLabel, EventHostGeneral<Label>>(gen, type) { }
+	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(gen, type) { }
 
 Label::Label(core_ptr core) noexcept :
-	ComponenetHandler<CoreLabel, EventHostGeneral<Label>>(core) { }
+	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

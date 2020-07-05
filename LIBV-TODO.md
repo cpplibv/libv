@@ -522,6 +522,86 @@ libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement
 
 
 
+libv.ui: Fix layout pass 1 information channel
+
+
+
+
+
+
+
+ui - glsl - component info - client area : 1 uniform block and a single index into it as vertex attribute
+		component bounds
+		clip bounds
+
+problem: composition of components to create complex components
+	issue: create/attach/foreach/traverse/etc function implementations
+	issue: pollutes component hierarchy
+	issue: nested properties
+
+issue: scroll area size of child propagation up
+
+ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
+
+ideas and notes
+	new component memory models allows unlimited templates
+	component decorator
+	component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
+
+
+
+
+
+libv.ui: scroll_area only the "scroll pane" area without scroll bar
+libv.ui: scroll_pane = client area + scroll bar
+	libv.ui: clipping vertex shader (with on/off)
+	libv.ui: shader clip plane (scissors), (effects every ui shader)
+			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
+			| or just use a viewport call and correct the projection matrix | would not allow 3D transforms
+			| clip planes should be the most generic solution
+	libv.ui: style sub component
+	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
+	libv.ui: mouse remapping regions and/or dimension and/or hubs to handle scroll panes and windows
+
+libv.ui: rename scroll bar to slider
+libv.ui: rename scroll bar (slider) value_min and value_max to value_low and value_high
+libv.ui: create a real scroll_bar = slider + buttons
+
+libv.ui: check box
+		Clickable elements with a cross in the middle that can be turned off or on.
+
+libv.ui: radio_button and/or group
+libv.ui: toggle_button
+
+libv.ui: padding support in every layout
+libv.ui: component color go from uniform to vertex attribute
+libv.ui: default style and theme set
+
+libv.ui: card layout
+
+--- libv.ui MVP checkpoint ------------
+
+libv.ui: tab layout = card layout + header buttons
+libv.ui: window
+		contain other elements. They have a caption (and, just like flows, they lay out children either horizontally or vertically)
+libv.ui: popup / tooltip
+libv.ui: menu bar / menu / popup menu
+libv.ui: separator / group (bordered and captioned)
+libv.ui: progressbar
+		Indicate progress by displaying a partially filled bar.
+
+libv.ui: table layout (more strict grid)
+		An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
+
+--- libv.ui MVP+ checkpoint -----------
+
+
+libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
+libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+
+libv.ui: OverlayZoom use linearized zoom (like the Camera2 in vm4viewer)
+libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
+
 libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
 libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
@@ -529,23 +609,49 @@ libv.ui: content property.hpp can be more hidden toward components (Especially t
 libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .core() usages wherever possible
 
-libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
-libv.ui: OverlayZoom use linearized zoom
-
+libv.ui: InputMask for input field
+		struct InputMask {
+			virtual void insert(std::string& text, std::string_view insert, size_t insert_pos);
+			virtual void remove(std::string& text, size_t remove_pos, size_t remove_size);
+			// virtual std::string_view empty();
+			// ...
+		};
 
 libv.ui: The UI Paper
-	Core - Core Component object containing every state of a given component, derived from CoreComponent
-	Component / Handler - Lightweight stateless handler object of a core component object, derived from Component
-	Host - Stateless event host
+	Core
+			Core Component object containing every state of a given component, derived from CoreComponent
+	Component / Handler
+			Lightweight stateless handler object of a core component object, derived from Component
+	Host
+			Stateless event host
+
+	Notes for the real scroll bar:
+		double value; // current_line
+		double value_min; // 0
+		double value_max; // num_line
+		double value_range; // num_lines_displayed
+
+		double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit
+		double step_button; // [button >] 1 or 3 or settings.scroll_unit
+		double step_track; // [mouse button on track] 1 or 3 or settings.scroll_unit or inf
+		double step_track_interval; // 0.3 or 1 or settings.step_button_hold_interval
+		double step_button_hold; // [button > hold per interval] 1 or 3 or settings.scroll_unit
+		double step_button_hold_interval; // 0.3 or 1 or settings.step_button_hold_interval
+		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
+		double step_page; // [pageup/pagedown] num_lines_displayed
+
+	NOTES: fragments
+		caption
+		bg
+		? fg
 
 	read again once done with events http://nanapro.org/en-us/documentation/core/events.htm
-
-
 
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 libv.ui: UI level message/event bus/system might be required:
 		context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
 		context().events().fire("shader_reload", ...);
+
 libv.ui: UI level message/event bus/system could use support for hierarchical up-walking 'context' iteration
 libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
@@ -766,6 +872,7 @@ libv.ctrl: Implementation queue:
 					In other word: an additional type between the current binding and feature, this would clean up string operations
 	libv.ctrl: Contexts information, state collusion information among contexts, use that for queries
 	libv.ctrl: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
+	libv.ctrl: Identifier level to_string should be parsable
 	libv.ctrl.parse: Quirk: Combination parsing bug on '+'+' would mean reverse order | Forward parsing would solve it
 	libv.ctrl.parse: Quirk: Symbol ' has to contain an extra space because parsing error around + and ,
 	libv.ctrl.parse: x3::eoi could improve matching, relax orders, optimize for most probably input
@@ -892,10 +999,7 @@ libv.gl.glsl: Warning for non generic directory separator in include path (backl
 libv.gl.glsl: Warning option for mixed indentation in different lines and/or files
 libv.gl.glsl: Warning for line trailing white space
 
-libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 app.vm4_viewer: camera movement should acquire and lock mouse position
-
-libv.ui: read nana 3rd party property tree lib API
 
 app: about page with executable path, build and compiler information, git hash and software version
 libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
@@ -913,7 +1017,7 @@ vm4 hash and timestamp
 libv.vm4lua: lua binding for vm4 and vm4 importer
 
 glsl: quaternion https://github.com/mattatz/ShibuyaCrowd/blob/master/source/shaders/common/quaternion.glsl and http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-libv.ui: non-shared_ptr based panels, aka static_container (?)
+libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 app.vm4_viewer: display statistics
 
 app.vm4_viewer: import model
@@ -927,13 +1031,9 @@ app.vm4_viewer.shader: ui feedback for glsl shader failed include
 app.vm4_viewer.shader: use a fallback shader on init failure
 app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
 
-libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
+libv.ui: read nana 3rd party property tree lib API
 
 component
-	libv.ui: clipping vertex shader (with on/off)
-			| stencil could also be a solution, and it would be even better, more generic, non intrusive for the other shaders
-			| or just use a viewport call and correct the projection matrix
-	libv.ui: scroll pane | shader clip plane (scissors), (effects every ui shader) | only pane without scroll bar | NOTE: Check git stash
 	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
 	libv.ui: list
 	libv.ui: table layout - only the columns and/or rows have size
@@ -982,13 +1082,12 @@ ui
 	libv.ui: ContextStat (not ContextState, stat is for ui statistics)
 	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
 	libv.ui: add a glr::remote& to UI to simplify app::frame
-	libv.ui: component position is currently relative to origin, once 'frame' and 'scroll' component comes in this will change
 	libv.ui: idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
 layout
 	libv.ui: doLayout1 should use the return channel instead of member cache
 	libv.ui: remove layout1 pass member variables in component_base
-	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits
+	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits (in string_2D)
 
 cleanup
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target (2D)

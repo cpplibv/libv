@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Quad : public ComponenetHandler<class CoreQuad, EventHostGeneral<Quad>> {
+class Quad : public ComponentHandler<class CoreQuad, EventHostGeneral<Quad>> {
 public:
 	explicit Quad(std::string name);
 	explicit Quad(GenerateName_t = {}, const std::string_view type = "quad");

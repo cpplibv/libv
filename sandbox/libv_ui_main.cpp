@@ -24,6 +24,7 @@
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
+#include <libv/ui/component/scroll_pane.hpp>
 #include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
@@ -55,9 +56,12 @@ private:
 	libv::ui::PanelFull panel_full;
 	libv::ui::PanelGrid panel_grid;
 	libv::ui::PanelLine panel_line;
+	libv::ui::PanelLine panel_line_scrolled;
 	libv::ui::Stretch stretch;
 	libv::ui::Quad quad;
-	libv::ui::ScrollBar scroll_bar;
+	libv::ui::ScrollBar scroll_bar_x;
+	libv::ui::ScrollBar scroll_bar_y;
+	libv::ui::ScrollArea scroll_area;
 
 //	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
 //	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
@@ -143,7 +147,8 @@ public:
 		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
 
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
-		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
+//		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
+		image.size(libv::ui::parse_size_or_throw("25px, 50px"));
 
 		input_field.text("Input Field");
 		input_field.event().change([](auto& component, const auto&) {
@@ -162,11 +167,41 @@ public:
 		quad.anchor(libv::ui::Anchor::center_center);
 		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
 
-		scroll_bar.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
-		scroll_bar.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-		scroll_bar.event().change([](auto& component, const auto& event) {
-			log_sandbox.info("Scroll bar {} changed to {} with change {}", component.path(), component.value(), event.change);
+		panel_line_scrolled.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+
+		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
+		scroll_bar_x.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		scroll_bar_x.value_min(-500);
+		scroll_bar_x.value_max(500);
+		scroll_bar_x.value(0);
+		scroll_bar_x.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area.view_position({static_cast<float>(component.value()), scroll_area.view_position().y});
 		});
+
+		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
+		scroll_bar_y.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		scroll_bar_y.value_min(-500);
+		scroll_bar_y.value_max(500);
+		scroll_bar_y.value(0);
+		scroll_bar_y.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area.view_position({scroll_area.view_position().x, static_cast<float>(component.value())});
+		});
+
+		scroll_area.content(panel_line_scrolled);
+		scroll_area.mode(libv::ui::ScrollAreaMode::both);
+		libv::ui::Label tmp_scrolled_text;
+		tmp_scrolled_text.text(
+			"And I will strike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+			"And I will strike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+			"And I will strike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+			"And I will strike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+		);
+		panel_line_scrolled.add(tmp_scrolled_text);
+		panel_line_scrolled.add(image);
 
 		panel_full.add(button1);
 
@@ -182,13 +217,14 @@ public:
 		panel_grid.add(input_field);
 		panel_grid.add(quad);
 		panel_grid.add(stretch);
-		panel_grid.add(scroll_bar);
+		panel_grid.add(scroll_bar_x);
+		panel_grid.add(scroll_bar_y);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
 		panel_line.add(panel_grid);
 		panel_line.add(button);
+		panel_line.add(scroll_area);
 		panel_line.add(label);
-		panel_line.add(image);
 
 		ui.add(panel_line);
 

@@ -94,7 +94,7 @@ private:
 
 private:
 	virtual void doAttach() override;
-	virtual void doStyle(ContextStyle& ctx) override;
+	virtual void doStyle(ContextStyle& context) override;
 	virtual void doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;
@@ -454,13 +454,13 @@ void CoreScrollBar::doRender(ContextRender& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 ScrollBar::ScrollBar(std::string name) :
-	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
+	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
 
 ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
+	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
 
 ScrollBar::ScrollBar(core_ptr core) noexcept :
-	ComponenetHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
+	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

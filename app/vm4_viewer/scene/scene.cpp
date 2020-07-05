@@ -68,7 +68,7 @@ Scene::Scene(ShaderLoader& shader_loader) :
 	}
 
 	{
-		// <<< P7: Remove
+		// TODO P0: Remove
 		ui::Keyboard keyboard{mesh_temp};
 		keyboard.foo();
 	}

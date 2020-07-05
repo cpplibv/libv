@@ -14,7 +14,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Label : public ComponenetHandler<class CoreLabel, EventHostGeneral<Label>> {
+class Label : public ComponentHandler<class CoreLabel, EventHostGeneral<Label>> {
 public:
 	explicit Label(std::string name);
 	explicit Label(GenerateName_t = {}, const std::string_view type = "label");

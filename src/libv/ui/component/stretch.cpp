@@ -151,13 +151,13 @@ void CoreStretch::doRender(ContextRender& context) {
 // -------------------------------------------------------------------------------------------------
 
 Stretch::Stretch(std::string name) :
-	ComponenetHandler<CoreStretch, EventHostGeneral<Stretch>>(std::move(name)) { }
+	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(std::move(name)) { }
 
 Stretch::Stretch(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreStretch, EventHostGeneral<Stretch>>(gen, type) { }
+	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(gen, type) { }
 
 Stretch::Stretch(core_ptr core) noexcept :
-	ComponenetHandler<CoreStretch, EventHostGeneral<Stretch>>(core) { }
+	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

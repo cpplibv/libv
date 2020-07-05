@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFloat : public ComponenetHandler<class CorePanelFloat, EventHostGeneral<PanelFloat>> {
+class PanelFloat : public ComponentHandler<class CorePanelFloat, EventHostGeneral<PanelFloat>> {
 public:
 	explicit PanelFloat(std::string name);
 	explicit PanelFloat(GenerateName_t = {}, const std::string_view type = "float");

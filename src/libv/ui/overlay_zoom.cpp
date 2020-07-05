@@ -319,17 +319,17 @@ void CoreOverlayZoom::doRender(ContextRender& context) {
 // -------------------------------------------------------------------------------------------------
 
 OverlayZoom::OverlayZoom(std::string name) :
-	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(std::move(name)) {
+	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(std::move(name)) {
 	self().init();
 }
 
 OverlayZoom::OverlayZoom(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(gen, type) {
+	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(gen, type) {
 	self().init();
 }
 
 OverlayZoom::OverlayZoom(core_ptr core) noexcept :
-	ComponenetHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(core) {
+	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(core) {
 	self().init();
 }
 

@@ -16,12 +16,26 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-class Button : public ComponentHandler<class CoreButton, EventHostSubmitable<Button>> {
+enum class CheckBoxMode {
+	on_off,
+	on_off_mixed,
+};
+
+enum class CheckBoxValue {
+	on,
+	off,
+	mixed,
+};
+
+// =================================================================================================
+
+class CheckBox : public ComponentHandler<class CoreCheckBox, EventHostSubmitable<CheckBox>> {
 public:
-	explicit Button(std::string name);
-	explicit Button(GenerateName_t = {}, const std::string_view type = "button");
-	explicit Button(core_ptr core) noexcept;
+	explicit CheckBox(std::string name);
+	explicit CheckBox(GenerateName_t = {}, const std::string_view type = "check-box");
+	explicit CheckBox(core_ptr core) noexcept;
 
 public:
 	void color(Color value);
@@ -34,21 +48,23 @@ public:
 	[[nodiscard]] const ShaderImage_view& shader() const noexcept;
 
 public:
-	void align_horizontal(AlignHorizontal value);
-	[[nodiscard]] AlignHorizontal align_horizontal() const noexcept;
+	void mode(CheckBoxMode value);
+	[[nodiscard]] CheckBoxMode mode() const noexcept;
 
-	void align_vertical(AlignVertical value);
-	[[nodiscard]] AlignVertical align_vertical() const noexcept;
+	void value(CheckBoxValue value);
+	[[nodiscard]] CheckBoxValue value() const noexcept;
 
-	void font(Font2D_view value);
-	[[nodiscard]] const Font2D_view& font() const noexcept;
+	inline void set_to_on() {
+		value(CheckBoxValue::on);
+	}
 
-	void font_size(FontSize value);
-	[[nodiscard]] FontSize font_size() const noexcept;
+	inline void set_to_off() {
+		value(CheckBoxValue::off);
+	}
 
-public:
-	void text(std::string value);
-	[[nodiscard]] const std::string& text() const noexcept;
+	inline void set_to_mixed() {
+		value(CheckBoxValue::mixed);
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

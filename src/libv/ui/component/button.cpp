@@ -263,13 +263,13 @@ void CoreButton::doRender(ContextRender& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 Button::Button(std::string name) :
-	ComponenetHandler<CoreButton, EventHostSubmitable<Button>>(std::move(name)) { }
+	ComponentHandler<CoreButton, EventHostSubmitable<Button>>(std::move(name)) { }
 
 Button::Button(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreButton, EventHostSubmitable<Button>>(gen, type) { }
+	ComponentHandler<CoreButton, EventHostSubmitable<Button>>(gen, type) { }
 
 Button::Button(core_ptr core) noexcept :
-	ComponenetHandler<CoreButton, EventHostSubmitable<Button>>(core) { }
+	ComponentHandler<CoreButton, EventHostSubmitable<Button>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

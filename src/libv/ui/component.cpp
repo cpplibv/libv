@@ -61,6 +61,7 @@ Component::~Component() noexcept {
 
 Component::Component(core_ptr ptr_) noexcept :
 	ptr(std::move(ptr_)) {
+	assert(ptr != nullptr && "Internal error: Component cannot be null");
 	++ptr->ref_count;
 }
 

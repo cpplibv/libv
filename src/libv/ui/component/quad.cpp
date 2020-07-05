@@ -94,13 +94,13 @@ void CoreQuad::doRender(ContextRender& context) {
 // -------------------------------------------------------------------------------------------------
 
 Quad::Quad(std::string name) :
-	ComponenetHandler<CoreQuad, EventHostGeneral<Quad>>(std::move(name)) { }
+	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(std::move(name)) { }
 
 Quad::Quad(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreQuad, EventHostGeneral<Quad>>(gen, type) { }
+	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(gen, type) { }
 
 Quad::Quad(core_ptr core) noexcept :
-	ComponenetHandler<CoreQuad, EventHostGeneral<Quad>>(core) { }
+	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

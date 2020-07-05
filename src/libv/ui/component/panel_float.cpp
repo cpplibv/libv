@@ -172,13 +172,13 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 // =================================================================================================
 
 PanelFloat::PanelFloat(std::string name) :
-	ComponenetHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(std::move(name)) { }
+	ComponentHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(std::move(name)) { }
 
 PanelFloat::PanelFloat(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(gen, type) { }
+	ComponentHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(gen, type) { }
 
 PanelFloat::PanelFloat(core_ptr core) noexcept :
-	ComponenetHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(core) { }
+	ComponentHandler<CorePanelFloat, EventHostGeneral<PanelFloat>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

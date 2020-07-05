@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelLine : public ComponenetHandler<class CorePanelLine, EventHostGeneral<PanelLine>> {
+class PanelLine : public ComponentHandler<class CorePanelLine, EventHostGeneral<PanelLine>> {
 public:
 	explicit PanelLine(std::string name);
 	explicit PanelLine(GenerateName_t = {}, const std::string_view type = "line");

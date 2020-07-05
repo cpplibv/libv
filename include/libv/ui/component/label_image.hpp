@@ -17,7 +17,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class LabelImage : public ComponenetHandler<class CoreLabelImage, EventHostGeneral<LabelImage>> {
+class LabelImage : public ComponentHandler<class CoreLabelImage, EventHostGeneral<LabelImage>> {
 public:
 	explicit LabelImage(std::string name);
 	explicit LabelImage(GenerateName_t = {}, const std::string_view type = "label-image");

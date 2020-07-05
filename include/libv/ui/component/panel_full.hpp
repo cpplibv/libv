@@ -11,7 +11,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFull : public ComponenetHandler<class CorePanelFull, EventHostGeneral<PanelFull>> {
+class PanelFull : public ComponentHandler<class CorePanelFull, EventHostGeneral<PanelFull>> {
 public:
 	explicit PanelFull(std::string name);
 	explicit PanelFull(GenerateName_t = {}, const std::string_view type = "full");

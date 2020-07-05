@@ -32,32 +32,7 @@ struct EventHostScroll : EventHostGeneral<ComponentT> {
 
 // -------------------------------------------------------------------------------------------------
 
-// Notes for scroll pane:
-//
-// HORIZONTAL_SCROLLBAR_ALWAYS Always display the scroll bar. The knob disappears if the viewport is large enough to show the whole client.
-// HORIZONTAL_SCROLLBAR_AS_NEEDED The default. The scroll bar appears when the viewport is smaller than the client and disappears when the viewport is larger than the client.
-// HORIZONTAL_SCROLLBAR_NEVER Never display the scroll bar. Use this option if you don't want the user to directly control what part of the client is shown, or if you want them to use only non-scroll-bar techniques (such as dragging).
-// HORIZONTAL_SCROLLBAR_aggressive_hide
-// VERTICAL_SCROLLBAR_ALWAYS
-// VERTICAL_SCROLLBAR_AS_NEEDED
-// VERTICAL_SCROLLBAR_NEVER
-// VERTICAL_SCROLLBAR_aggressive_hide
-//
-//		double value; // current_line
-//		double value_min; // 0
-//		double value_max; // num_line
-//		double value_range; // num_lines_displayed
-//
-//		double step_scroll; // [mouse wheel] 1 or 3 or settings.scroll_unit
-//		double step_button; // [button >] 1 or 3 or settings.scroll_unit
-//		double step_track; // [mouse button on track] 1 or 3 or settings.scroll_unit or inf
-//		double step_track_interval; // 0.3 or 1 or settings.step_button_hold_interval
-//		double step_button_hold; // [button > hold per interval] 1 or 3 or settings.scroll_unit
-//		double step_button_hold_interval; // 0.3 or 1 or settings.step_button_hold_interval
-//		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
-//		double step_page; // [pageup/pagedown] num_lines_displayed
-
-class ScrollBar : public ComponenetHandler<class CoreScrollBar, EventHostScroll<ScrollBar>> {
+class ScrollBar : public ComponentHandler<class CoreScrollBar, EventHostScroll<ScrollBar>> {
 public:
 //	enum class BarMode : uint8_t {
 //		bar_range = 0,

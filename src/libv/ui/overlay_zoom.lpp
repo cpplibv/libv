@@ -20,7 +20,7 @@ enum class OverlayZoomMode {
 	view,
 };
 
-class OverlayZoom : public ComponenetHandler<class CoreOverlayZoom, EventHostGeneral<OverlayZoom>> {
+class OverlayZoom : public ComponentHandler<class CoreOverlayZoom, EventHostGeneral<OverlayZoom>> {
 public:
 	explicit OverlayZoom(std::string name);
 	explicit OverlayZoom(GenerateName_t = {}, const std::string_view type = "overlay-zoom");

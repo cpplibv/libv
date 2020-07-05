@@ -41,7 +41,7 @@ static constexpr Flag_t pendingDetachSelf     = libv::bit(17);
 static constexpr Flag_t pendingCreate         = libv::bit(18);
 //static constexpr Flag_t awakeSelf             = libv::bit(19);
 //static constexpr Flag_t awakeChild            = libv::bit(20);
-//static constexpr Flag_t parentsDependOnLayout = libv::bit(21); /// Component dynamic content size change will affect parent's layout (if not set, parent layout does not have to be invalidated on dynamic content size change)
+//static constexpr Flag_t parentsDependOnLayout = libv::bit(21); /// Component dynamic content size change will affect parent's layout (if not set, parent layout does not have to be invalidated on content's size change)
 static constexpr Flag_t updatedSize           = libv::bit(22); /// Component's size was changed since it last render
 static constexpr Flag_t updatedPosition       = libv::bit(23); /// Component's position was changed since it last render
 

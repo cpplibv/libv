@@ -27,6 +27,11 @@ enum class Anchor : uint16_t {
 	bottom_right  = 8,
 };
 
+// extern Anchor anchor_list[];
+//[[nodiscard]] std::optional<Anchor> parse_anchor_optional(std::string_view text) noexcept;
+//[[nodiscard]] Anchor parse_anchor_or(std::string_view text, const Anchor fallback) noexcept;
+//[[nodiscard]] Anchor parse_anchor_or_throw(std::string_view text);
+
 [[nodiscard]] libv::vec3f to_info(const Anchor value) noexcept;
 [[nodiscard]] std::string_view to_string(const Anchor value) noexcept;
 std::ostream& operator<<(std::ostream& os, const Anchor value);

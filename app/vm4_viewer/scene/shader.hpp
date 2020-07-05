@@ -36,15 +36,15 @@ class BaseShader {
 	using update_signature = void (*)(BaseShader&);
 
 protected:
-public: // <<< P5: public
+public: // TODO P0: public
 	libv::glr::Program program;
 
 private:
 	ShaderLoader& loader;
-public: // <<< P5: public
+public: // TODO P0: public
 	update_signature update_ptr;
 
-public: // <<< P5: public
+public: // TODO P0: public
 	boost::container::small_vector<ShaderStage, 3> stages;
 	boost::container::flat_set<std::string> source_files;
 

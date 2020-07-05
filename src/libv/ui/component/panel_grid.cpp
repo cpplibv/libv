@@ -377,13 +377,13 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 // =================================================================================================
 
 PanelGrid::PanelGrid(std::string name) :
-	ComponenetHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(std::move(name)) { }
+	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(std::move(name)) { }
 
 PanelGrid::PanelGrid(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(gen, type) { }
+	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(gen, type) { }
 
 PanelGrid::PanelGrid(core_ptr core) noexcept :
-	ComponenetHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(core) { }
+	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

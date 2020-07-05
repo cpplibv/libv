@@ -21,6 +21,7 @@
 #include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/orientation.hpp>
 #include <libv/ui/property/orientation2.hpp>
+#include <libv/ui/property/scroll_area_mode.hpp>
 #include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
@@ -61,6 +62,7 @@ using PropertyDynamic = std::variant<
 		Texture2D_view,
 		Orientation,
 		Orientation2,
+		ScrollAreaMode,
 		ShaderFont_view,
 		ShaderImage_view,
 		ShaderQuad_view,
@@ -97,6 +99,7 @@ static constexpr std::string_view font_size = "font_size";
 static constexpr std::string_view orientation = "orientation";
 static constexpr std::string_view orientation2 = "orientation2";
 static constexpr std::string_view quad_shader = "quad_shader";
+static constexpr std::string_view scroll_area_mode = "scroll_area_mode";
 static constexpr std::string_view size = "size";
 static constexpr std::string_view snap_to_edge = "snap_to_edge";
 static constexpr std::string_view squish = "squish";
@@ -106,6 +109,7 @@ static constexpr std::string_view value_max = "value_max";
 static constexpr std::string_view value_min = "value_min";
 static constexpr std::string_view value_range = "value_range";
 static constexpr std::string_view value_step = "value_step";
+static constexpr std::string_view view_position = "view_position";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------

@@ -535,13 +535,13 @@ void CoreInputField::doRender(ContextRender& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 InputField::InputField(std::string name) :
-	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(std::move(name)) { }
+	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(std::move(name)) { }
 
 InputField::InputField(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(gen, type) { }
+	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(gen, type) { }
 
 InputField::InputField(core_ptr core) noexcept :
-	ComponenetHandler<CoreInputField, EventHostEditable<InputField>>(core) { }
+	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

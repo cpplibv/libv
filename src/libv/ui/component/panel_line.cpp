@@ -273,13 +273,13 @@ void CorePanelLine::doLayout2(const ContextLayout2& environment) {
 // =================================================================================================
 
 PanelLine::PanelLine(std::string name) :
-	ComponenetHandler<CorePanelLine, EventHostGeneral<PanelLine>>(std::move(name)) { }
+	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(std::move(name)) { }
 
 PanelLine::PanelLine(GenerateName_t gen, const std::string_view type) :
-	ComponenetHandler<CorePanelLine, EventHostGeneral<PanelLine>>(gen, type) { }
+	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(gen, type) { }
 
 PanelLine::PanelLine(core_ptr core) noexcept :
-	ComponenetHandler<CorePanelLine, EventHostGeneral<PanelLine>>(core) { }
+	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 

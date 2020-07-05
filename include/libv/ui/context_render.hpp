@@ -6,7 +6,7 @@
 #include <libv/gl/enum.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/queue_fwd.hpp>
-#include <libv/glr/uniform_block_binding.hpp>
+//#include <libv/glr/uniform_block_binding.hpp>
 #include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/chrono.hpp>
@@ -39,6 +39,19 @@ struct ContextRender {
 	bool changedLayout = false;   /// Components size or position has changed since last render call
 	bool changedPosition = false; /// Components position has changed since last render call
 	bool changedSize = false;     /// Components size has changed since last render call
+
+
+
+	// =================================================================================================
+
+//private:
+//	libv::vec2f clip_;
+
+public:
+	void quad(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color) {}
+	void clip(libv::vec2f pos, libv::vec2f size) {}
+
+	// =================================================================================================
 };
 
 // -------------------------------------------------------------------------------------------------

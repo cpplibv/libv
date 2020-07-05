@@ -17,11 +17,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Button : public ComponentHandler<class CoreButton, EventHostSubmitable<Button>> {
+class RadioGroup;
+
+class RadioButton : public ComponentHandler<class CoreRadioButton, EventHostSubmitable<RadioButton>> {
 public:
-	explicit Button(std::string name);
-	explicit Button(GenerateName_t = {}, const std::string_view type = "button");
-	explicit Button(core_ptr core) noexcept;
+	explicit RadioButton(std::string name);
+	explicit RadioButton(GenerateName_t = {}, const std::string_view type = "radio-button");
+	explicit RadioButton(core_ptr core) noexcept;
+
+public:
+	void group(RadioGroup group);
+	[[nodiscard]] const RadioGroup& group() const noexcept;
 
 public:
 	void color(Color value);
@@ -49,6 +55,21 @@ public:
 public:
 	void text(std::string value);
 	[[nodiscard]] const std::string& text() const noexcept;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class RadioGroup {
+	Component owner;
+	RadioButton selection;
+
+	//BasicEventProxy<RadioGroup, EventSubmit> change;
+	std::vector<RadioButton> group;
+
+public:
+	void add(RadioButton radioButton);
+	void remove(const RadioButton& radioButton);
+	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------
