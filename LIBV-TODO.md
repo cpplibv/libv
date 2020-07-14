@@ -519,19 +519,19 @@ libv.ui: Rename BaseComponent to CoreComponent
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
 libv.ui: Improve layout pass 1 information channel: doLayout1 should use the return channel instead of member cache
 libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits (in string_2D)
+libv.ui: implement parentDependOnLayout, reduce the number of layout invalidation caused by String2D edit
+libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback | size is now a property and it maintains the parentDependOnLayout flag
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: scroll_area only the "scroll pane" area without scroll bar
+	libv.ui: scroll area layout
+	libv.ui: scroll area render
+	libv.ui: scroll area (mouse) control
 
-
-libv.ui: implement parentDependOnLayout, reduce the number of layout invalidation caused by String2D edit
-libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
-
-
-
-
+	libv.ui: (?) scroll area size should equal or inherit(upward) it's content size
 
 
 
@@ -555,9 +555,6 @@ ideas and notes
 
 
 
-
-
-libv.ui: scroll_area only the "scroll pane" area without scroll bar
 libv.ui: scroll_pane = client area + scroll bar
 	libv.ui: clipping vertex shader (with on/off)
 	libv.ui: shader clip plane (scissors), (effects every ui shader)

@@ -125,14 +125,7 @@ public:
 	[[nodiscard]] inline const Size& size() const noexcept {
 		return size_;
 	}
-	inline void size(Size value) noexcept {
-//		const auto has_dynamic = value.has_dynamic();
-//		flags.set_to(Flag::parentDependOnLayout, has_dynamic);
-//		if has_dynamic
-//			invalidate parent layout too
-		size_ = value;
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	}
+	void size(Size value) noexcept;
 	[[nodiscard]] inline Anchor anchor() const noexcept {
 		return anchor_;
 	}

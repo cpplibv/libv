@@ -22,7 +22,9 @@
 #include <libv/ui/property/orientation.hpp>
 #include <libv/ui/property/orientation2.hpp>
 #include <libv/ui/property/scroll_area_mode.hpp>
+#include <libv/ui/property/shader_font.hpp>
 #include <libv/ui/property/shader_image.hpp>
+#include <libv/ui/property/shader_quad.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
@@ -34,14 +36,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-class ContextUI;
-
-class ShaderFont;
-using ShaderFont_view = std::shared_ptr<ShaderFont>;
-
-class ShaderQuad;
-using ShaderQuad_view = std::shared_ptr<ShaderQuad>;
 
 using Style_view = libv::intrusive_ptr<Style>;
 
@@ -80,6 +74,8 @@ namespace pnm { // -------------------------------------------------------------
 static constexpr std::string_view align_horizontal = "align";
 static constexpr std::string_view align_vertical = "align_vertical";
 static constexpr std::string_view anchor = "anchor";
+static constexpr std::string_view area_position = "area_position";
+static constexpr std::string_view area_size = "area_size";
 static constexpr std::string_view bar_color = "bar_color";
 static constexpr std::string_view bar_image = "bar_image";
 static constexpr std::string_view bar_shader = "bar_shader";
@@ -109,7 +105,6 @@ static constexpr std::string_view value_max = "value_max";
 static constexpr std::string_view value_min = "value_min";
 static constexpr std::string_view value_range = "value_range";
 static constexpr std::string_view value_step = "value_step";
-static constexpr std::string_view view_position = "view_position";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------

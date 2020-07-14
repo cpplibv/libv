@@ -176,7 +176,7 @@ public:
 		scroll_bar_x.value(0);
 		scroll_bar_x.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
-			scroll_area.view_position({static_cast<float>(component.value()), scroll_area.view_position().y});
+			scroll_area.area_position({static_cast<float>(component.value()), scroll_area.area_position().y});
 		});
 
 		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
@@ -187,7 +187,7 @@ public:
 		scroll_bar_y.value(0);
 		scroll_bar_y.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
-			scroll_area.view_position({scroll_area.view_position().x, static_cast<float>(component.value())});
+			scroll_area.area_position({scroll_area.area_position().x, static_cast<float>(component.value())});
 		});
 
 		scroll_area.content(panel_line_scrolled);

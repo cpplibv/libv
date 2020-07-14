@@ -51,6 +51,18 @@ std::string CoreComponent::path() const {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreComponent::size(Size value) noexcept {
+	size_ = value;
+	flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
+
+	for (auto it = make_observer_ref(this); it != it->parent && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent)
+		it->flagDirect(Flag::pendingLayoutSelf);
+
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void CoreComponent::flagDirect(Flag_t flags_) noexcept {
 	flags.set(flags_);
 }
@@ -422,7 +434,7 @@ void CoreComponent::render(ContextRender& context) {
 }
 
 libv::vec3f CoreComponent::layout1(const ContextLayout1& environment) {
-	const auto result = this->doLayout1(environment);
+	const auto result = doLayout1(environment);
 	log_ui.trace("Layout dynamic {:>11}, {}", result, path());
 	return result;
 }
@@ -452,10 +464,21 @@ void CoreComponent::layout2(const ContextLayout2& environment) {
 	}
 
 	if (boundsChanged || flags.match_any(Flag::pendingLayout)) {
-		this->doLayout2(environment);
+
+		if (boundsChanged || flags.match_any(Flag::pendingLayoutSelf)) {
+			// Layout self
+			doLayout2(environment);
+			log_ui.trace("Layout {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
+
+		} else {
+			// Layout the children only
+			doForeachChildren([&environment](CoreComponent& child) {
+				child.layout2(ContextLayout2{child.layout_position_, child.layout_size_, MouseOrder{libv::to_value(environment.mouseOrder) + 1}});
+			});
+			log_ui.trace("   |   {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
+		}
 
 		flags.reset(Flag::pendingLayout);
-		log_ui.trace("Layout {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
 	}
 }
 

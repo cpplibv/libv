@@ -46,7 +46,8 @@ private:
 private:
 //	Component client;
 	std::optional<Component> client;
-	libv::vec2f view_position;
+	libv::vec2f area_position;
+	libv::vec2f area_size;
 
 public:
 	using CoreComponent::CoreComponent;
@@ -90,10 +91,16 @@ void CoreScrollArea::access_properties(T& ctx) {
 //			"Scroll area mode"
 //	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.handler().view_position(std::move(v)); },
-			[](const auto& c) { return c.handler().view_position(); },
-			pgr::behaviour, pnm::view_position,
+			[](auto& c, auto v) { c.handler().area_position(std::move(v)); },
+			[](const auto& c) { return c.handler().area_position(); },
+			pgr::behaviour, pnm::area_position,
 			"Scroll area view position"
+	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.handler().area_size(std::move(v)); },
+			[](const auto& c) { return c.handler().area_size(); },
+			pgr::behaviour, pnm::area_size,
+			"Scroll area view size"
 	);
 }
 
@@ -154,7 +161,7 @@ void CoreScrollArea::doRender(ContextRender& environment) {
 		environment.clip({}, libv::vec2f(layout_size2().x, -1)); break;
 	}
 
-	const auto pos = libv::vec::round(-view_position);
+	const auto pos = libv::vec::round(-area_position);
 	environment.gl.model.translate(pos.x, pos.y, 0);
 }
 
@@ -217,7 +224,7 @@ ScrollArea::ScrollArea(core_ptr core) noexcept :
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollArea::mode(ScrollAreaMode value) {
+void ScrollArea::mode(ScrollAreaMode value) noexcept {
 	AccessProperty::manual(self(), self().property.mode, value);
 }
 
@@ -245,13 +252,22 @@ const Component& ScrollArea::content() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ScrollArea::view_position(libv::vec2f value) {
-	self().view_position = value;
+void ScrollArea::area_position(libv::vec2f value) noexcept {
+	self().area_position = value;
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
-[[nodiscard]] libv::vec2f ScrollArea::view_position() const noexcept {
-	return self().view_position;
+[[nodiscard]] libv::vec2f ScrollArea::area_position() const noexcept {
+	return self().area_position;
+}
+
+void ScrollArea::area_size(libv::vec2f value) noexcept {
+	self().area_size = value;
+	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+}
+
+[[nodiscard]] libv::vec2f ScrollArea::area_size() const noexcept {
+	return self().area_size;
 }
 
 // -------------------------------------------------------------------------------------------------

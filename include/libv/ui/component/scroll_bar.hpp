@@ -43,7 +43,7 @@ public:
 
 public:
 	explicit ScrollBar(std::string name);
-	explicit ScrollBar(GenerateName_t = {}, const std::string_view type = "scroll-bar");
+	explicit ScrollBar(GenerateName_t = {}, const std::string_view type = "s-bar");
 	explicit ScrollBar(core_ptr core) noexcept;
 
 public:

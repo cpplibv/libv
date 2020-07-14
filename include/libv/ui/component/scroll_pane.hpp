@@ -13,14 +13,16 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class ScrollArea : public ComponentHandler<class CoreScrollArea, EventHostGeneral<ScrollArea>> {
-//class ScrollPane : public ComponentHandler<class CoreScrollArea>, public EventHost<EventHostGeneral<ScrollPane>>> {
+//class ScrollPane :
+//		public ComponentHandler<class CoreScrollArea>,
+//		public EventHost<EventHostGeneral<ScrollPane>>> {
 public:
 	explicit ScrollArea(std::string name);
-	explicit ScrollArea(GenerateName_t = {}, const std::string_view type = "scroll-area");
+	explicit ScrollArea(GenerateName_t = {}, const std::string_view type = "s-area");
 	explicit ScrollArea(core_ptr core) noexcept;
 
 public:
-	void mode(ScrollAreaMode value);
+	void mode(ScrollAreaMode value) noexcept;
 	[[nodiscard]] ScrollAreaMode mode() const noexcept;
 
 	void content(Component&& value) noexcept;
@@ -29,8 +31,11 @@ public:
 	[[nodiscard]] const Component& content() const noexcept;
 
 public:
-	void view_position(libv::vec2f value);
-	[[nodiscard]] libv::vec2f view_position() const noexcept;
+	void area_position(libv::vec2f value) noexcept;
+	[[nodiscard]] libv::vec2f area_position() const noexcept;
+
+	void area_size(libv::vec2f value) noexcept;
+	[[nodiscard]] libv::vec2f area_size() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -110,7 +115,7 @@ public:
 ////class ScrollPane : public ScrollArea, public EventHost<EventHostGeneral<ScrollPane>>> {
 //public:
 //	explicit ScrollPane(std::string name);
-//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "scroll-pane");
+//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "s-pane");
 //	explicit ScrollPane(core_ptr core) noexcept;
 //
 //public:
