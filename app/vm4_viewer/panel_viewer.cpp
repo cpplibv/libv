@@ -16,7 +16,7 @@
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp> // testing only, remove it
 #include <libv/ui/component/stretch.hpp> // testing only, remove it
-#include <libv/ui/context_ui.hpp>
+#include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/shader/shader_font.hpp> // There is a way to work around this include when using context().shader<T>, find it and implement it.

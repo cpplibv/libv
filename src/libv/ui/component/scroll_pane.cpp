@@ -10,10 +10,10 @@
 #include <optional>
 // pro
 #include <libv/glr/queue.hpp>
-#include <libv/ui/context_layout.hpp>
-#include <libv/ui/context_mouse.hpp>
-#include <libv/ui/context_render.hpp>
-#include <libv/ui/context_style.hpp>
+#include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_mouse.hpp>
+#include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 //#include <libv/ui/layout/view_layouted.lpp>

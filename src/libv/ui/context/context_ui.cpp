@@ -1,7 +1,7 @@
 // File:   context_ui.cpp Author: Vader Created on 2019. február 9., 13:01
 
 // hpp
-#include <libv/ui/context_ui.hpp>
+#include <libv/ui/context/context_ui.hpp>
 // ext
 #include <clip/clip.h>
 // libv
@@ -17,8 +17,8 @@
 #include <string_view>
 #include <unordered_map>
 // pro
-#include <libv/ui/context_event.hpp>
-#include <libv/ui/context_mouse.hpp>
+#include <libv/ui/context/context_event.hpp>
+#include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/raw/font_consolas_min.hpp>

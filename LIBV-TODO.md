@@ -527,8 +527,6 @@ libv.ui.style: parent depends on layout invalidation could be introduced into th
 
 
 libv.ui: rework render
-
-
 libv.ui: move render iteration into the containers (to allow render state manipulation)
 libv.ui: overlay component layout stack highlight
 

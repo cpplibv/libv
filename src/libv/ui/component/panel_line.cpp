@@ -12,8 +12,8 @@
 // pro
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
-#include <libv/ui/context_layout.hpp>
-#include <libv/ui/context_style.hpp>
+#include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
