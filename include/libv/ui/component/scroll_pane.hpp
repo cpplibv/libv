@@ -112,7 +112,10 @@ public:
 //// =================================================================================================
 //
 //class ScrollPane : public ComponentHandler<class CoreScrollPane, EventHostGeneral<ScrollPane>> {
-////class ScrollPane : public ScrollArea, public EventHost<EventHostGeneral<ScrollPane>>> {
+////class ScrollPane :
+////	public ScrollArea,
+////	public ComponentDerived<ScrollPane>,
+////	public EventHost<EventHostGeneral<ScrollPane>>> {
 //public:
 //	explicit ScrollPane(std::string name);
 //	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "s-pane");

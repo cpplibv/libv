@@ -19,8 +19,10 @@
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
+#include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/orientation.hpp>
 #include <libv/ui/property/orientation2.hpp>
+#include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/scroll_area_mode.hpp>
 #include <libv/ui/property/shader_font.hpp>
 #include <libv/ui/property/shader_image.hpp>
@@ -51,11 +53,12 @@ using PropertyDynamic = std::variant<
 		Color,
 		ColumnCount,
 		Font2D_view,
-		FontSize,
 		// FontColor,
-		Texture2D_view,
+		FontSize,
+		// Margin,
 		Orientation,
 		Orientation2,
+		// Padding,
 		ScrollAreaMode,
 		ShaderFont_view,
 		ShaderImage_view,
@@ -63,6 +66,7 @@ using PropertyDynamic = std::variant<
 		Size,
 		SnapToEdge,
 		Squish,
+		Texture2D_view,
 
 		std::string // For debug only
 >;
@@ -92,8 +96,10 @@ static constexpr std::string_view font = "font";
 static constexpr std::string_view font_color = "font_color";
 static constexpr std::string_view font_shader = "font_shader";
 static constexpr std::string_view font_size = "font_size";
+static constexpr std::string_view margin = "margin";
 static constexpr std::string_view orientation = "orientation";
 static constexpr std::string_view orientation2 = "orientation2";
+static constexpr std::string_view padding = "padding";
 static constexpr std::string_view quad_shader = "quad_shader";
 static constexpr std::string_view scroll_area_mode = "scroll_area_mode";
 static constexpr std::string_view size = "size";

@@ -17,6 +17,8 @@
 #include <libv/ui/generate_name.hpp>
 #include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the variant is killing me)
 #include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/margin.hpp>
+#include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/style_fwd.hpp>
 
@@ -66,6 +68,8 @@ private:
 private:
 	Size size_;
 	Anchor anchor_;
+	libv::vec4f margin_;
+	libv::vec4f padding_;
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
@@ -126,12 +130,35 @@ public:
 		return size_;
 	}
 	void size(Size value) noexcept;
+
 	[[nodiscard]] inline Anchor anchor() const noexcept {
 		return anchor_;
 	}
 	inline void anchor(Anchor value) noexcept {
 		anchor_ = value;
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+
+//	inline void margin(float top_down_left_right) noexcept;
+//	inline void margin(float top_down, float left_right) noexcept;
+//	inline void margin(float top, float down, float left, float right) noexcept;
+	inline void margin(Margin value) noexcept {
+		margin_ = value;
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+	[[nodiscard]] inline Margin margin() const noexcept {
+		return margin_;
+	}
+
+//	inline void padding(float top_down_left_right) noexcept;
+//	inline void padding(float top_down, float left_right) noexcept;
+//	inline void padding(float top, float down, float left, float right) noexcept;
+	inline void padding(Padding value) noexcept {
+		padding_ = value;
+		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	}
+	[[nodiscard]] inline Padding padding() const noexcept {
+		return padding_;
 	}
 
 public:
@@ -257,16 +284,28 @@ inline void CoreComponent::fire(const EventT& event) {
 template <typename T>
 void CoreComponent::access_properties(T& ctx) {
 	ctx.synthetize(
+			[](auto& c, auto v) { c.size(v); },
+			[](const auto& c) { return c.size(); },
+			pgr::layout, pnm::size,
+			"Component size in pixel, percent, ratio and dynamic units"
+	);
+	ctx.synthetize(
 			[](auto& c, auto v) { c.anchor(v); },
 			[](const auto& c) { return c.anchor(); },
 			pgr::layout, pnm::anchor,
 			"Component's anchor point"
 	);
 	ctx.synthetize(
-			[](auto& c, auto v) { c.size(v); },
-			[](const auto& c) { return c.size(); },
-			pgr::layout, pnm::size,
-			"Component size in pixel, percent, ratio and dynamic units"
+			[](auto& c, auto v) { c.margin(v); },
+			[](const auto& c) { return c.margin(); },
+			pgr::layout, pnm::margin,
+			"Component's margin"
+	);
+	ctx.synthetize(
+			[](auto& c, auto v) { c.padding(v); },
+			[](const auto& c) { return c.padding(); },
+			pgr::layout, pnm::padding,
+			"Component's padding"
 	);
 }
 

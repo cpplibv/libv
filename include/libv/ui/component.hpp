@@ -11,6 +11,8 @@
 #include <libv/ui/event_host.hpp>
 #include <libv/ui/generate_name.hpp>
 #include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/margin.hpp>
+#include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
 
 
@@ -72,11 +74,17 @@ public:
 	[[nodiscard]] libv::vec2f layout_size2() const noexcept;
 
 public:
-	[[nodiscard]] const Size& size() const noexcept;
 	void size(const Size& value) noexcept;
+	[[nodiscard]] const Size& size() const noexcept;
 
-	[[nodiscard]] Anchor anchor() const noexcept;
 	void anchor(Anchor value) noexcept;
+	[[nodiscard]] Anchor anchor() const noexcept;
+
+	void margin(Margin value) noexcept;
+	[[nodiscard]] Margin margin() const noexcept;
+
+	void padding(Padding value) noexcept;
+	[[nodiscard]] Padding padding() const noexcept;
 
 public:
 	void markRemove();

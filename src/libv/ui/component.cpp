@@ -91,20 +91,36 @@ libv::vec2f Component::layout_size2() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+void Component::size(const Size& value) noexcept {
+	ptr->size(value);
+}
+
 const Size& Component::size() const noexcept {
 	return ptr->size();
 }
 
-void Component::size(const Size& value) noexcept {
-	ptr->size(value);
+void Component::anchor(Anchor value) noexcept {
+	ptr->anchor(value);
 }
 
 Anchor Component::anchor() const noexcept {
 	return ptr->anchor();
 }
 
-void Component::anchor(Anchor value) noexcept {
-	ptr->anchor(value);
+void Component::margin(Margin value) noexcept {
+	ptr->margin(value);
+}
+
+Margin Component::margin() const noexcept {
+	return ptr->margin();
+}
+
+void Component::padding(Padding value) noexcept {
+	ptr->padding(value);
+}
+
+Padding Component::padding() const noexcept {
+	return ptr->padding();
 }
 
 // -------------------------------------------------------------------------------------------------

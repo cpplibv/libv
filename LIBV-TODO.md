@@ -526,32 +526,41 @@ libv.ui.style: parent depends on layout invalidation could be introduced into th
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.ui: rework render
+
+
+libv.ui: move render iteration into the containers (to allow render state manipulation)
+libv.ui: overlay component layout stack highlight
+
+
+
 libv.ui: scroll_area only the "scroll pane" area without scroll bar
 	libv.ui: scroll area layout
 	libv.ui: scroll area render
 	libv.ui: scroll area (mouse) control
-
 	libv.ui: (?) scroll area size should equal or inherit(upward) it's content size
+			issue: If I want a scroll plane size to be content, I have to set the plane, the area and the line
+			idea: scroll area is not a component, but a component adaptor
+				what is a component adaptor? How does it fit a component hierarchy, how does it alters the behaviours?
 
 
+	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
+			component bounds
+			clip bounds
 
-ui - glsl - component info - client area : 1 uniform block and a single index into it as vertex attribute
-		component bounds
-		clip bounds
+	problem: composition of components to create complex components
+		issue: create/attach/foreach/traverse/etc function implementations
+		issue: pollutes component hierarchy
+		issue: nested properties
 
-problem: composition of components to create complex components
-	issue: create/attach/foreach/traverse/etc function implementations
-	issue: pollutes component hierarchy
-	issue: nested properties
+	issue: scroll area size of child propagation up
 
-issue: scroll area size of child propagation up
+	ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
 
-ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
-
-ideas and notes
-	new component memory models allows unlimited templates
-	component decorator
-	component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
+	ideas and notes
+		new component memory models allows unlimited templates
+		component decorator
+		component that can be "hidden" in the component hierarchy but still function (aka a quick and dirty implementation of decorator)
 
 
 
@@ -575,7 +584,8 @@ libv.ui: check box
 libv.ui: radio_button and/or group
 libv.ui: toggle_button
 
-libv.ui: padding support in every layout
+libv.ui: padding support in every component (layout)
+libv.ui: margin support in every layout
 libv.ui: component color go from uniform to vertex attribute
 libv.ui: default style and theme set
 

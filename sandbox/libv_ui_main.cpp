@@ -149,7 +149,7 @@ public:
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
-		input_field.text("Input Field");
+		input_field.text("Input field");
 		input_field.event().change([](auto& component, const auto&) {
 			log_sandbox.info("Input field {} changed to {}", component.path(), component.text());
 		});

@@ -377,7 +377,10 @@ void CoreInputField::onFocus(const EventFocus& event) {
 }
 
 void CoreInputField::onMouseButton(const EventMouseButton& event) {
+	event.stop_propagation();
+
 	if (!isFocused() && event.action == libv::input::Action::press)
+		// NOTE: This focus causes a second EventCaret, could be fixed, but not really important
 		focus();
 
 	if (event.action == libv::input::Action::press) {
@@ -387,8 +390,6 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
 	}
-
-	event.stop_propagation();
 }
 
 void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
