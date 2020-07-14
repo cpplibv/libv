@@ -37,6 +37,14 @@ private:
 
 public:
 	Texture() noexcept;
+	
+private:
+	Texture(std::shared_ptr<RemoteTexture> remote) noexcept;
+
+public:
+	[[nodiscard]] inline Texture base_ref() const noexcept {
+		return Texture(remote);
+	}
 
 private:
 	void implStorage(libv::gl::TextureTarget target, int32_t levels, libv::vec3i size, libv::gl::Format format, libv::gl::DataType type) noexcept;

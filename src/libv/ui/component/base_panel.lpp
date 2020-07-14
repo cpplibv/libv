@@ -27,10 +27,11 @@ public:
 	void clear();
 
 private:
-	virtual void doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
+	virtual void doRender(Renderer& r) override;
+	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
-	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
-	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback) override;
 };
 
 // -------------------------------------------------------------------------------------------------

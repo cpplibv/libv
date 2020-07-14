@@ -1,7 +1,7 @@
 // File: Font2D.cpp, Created on 2014. november 30. 14:32, Author: Vader
 
 // hpp
-#include <libv/ui/string_2D.hpp>
+#include <libv/ui/text_layout.hpp>
 // ext
 #include <boost/container/small_vector.hpp>
 #include <range/v3/view/enumerate.hpp>
@@ -18,7 +18,6 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/shader/shader.hpp> // For attribute_position only
 
 
 namespace libv {
@@ -50,7 +49,7 @@ static constexpr uint32_t invalidCodepointReplacement = '_';
 
 // -------------------------------------------------------------------------------------------------
 
-void String2D::align_horizontal(const AlignHorizontal new_align) {
+void TextLayout::align_horizontal(const AlignHorizontal new_align) {
 	if (align_horizontal_ == new_align)
 		return;
 
@@ -58,7 +57,7 @@ void String2D::align_horizontal(const AlignHorizontal new_align) {
 	dirty = true;
 }
 
-void String2D::align_vertical(const AlignVertical new_align) {
+void TextLayout::align_vertical(const AlignVertical new_align) {
 	if (align_vertical_ == new_align)
 		return;
 
@@ -66,7 +65,7 @@ void String2D::align_vertical(const AlignVertical new_align) {
 	dirty = true;
 }
 
-void String2D::font(std::shared_ptr<Font2D> new_font) {
+void TextLayout::font(std::shared_ptr<Font2D> new_font) {
 	if (font_ == new_font)
 		return;
 
@@ -74,7 +73,7 @@ void String2D::font(std::shared_ptr<Font2D> new_font) {
 	dirty = true;
 }
 
-void String2D::font(std::shared_ptr<Font2D> new_font, const FontSize new_size) {
+void TextLayout::font(std::shared_ptr<Font2D> new_font, const FontSize new_size) {
 	if (font_ == new_font && fontSize_ == new_size)
 		return;
 
@@ -83,7 +82,7 @@ void String2D::font(std::shared_ptr<Font2D> new_font, const FontSize new_size) {
 	dirty = true;
 }
 
-void String2D::size(const FontSize new_size) {
+void TextLayout::size(const FontSize new_size) {
 	if (fontSize_ == new_size)
 		return;
 
@@ -91,7 +90,7 @@ void String2D::size(const FontSize new_size) {
 	dirty = true;
 }
 
-void String2D::string(std::string value) {
+void TextLayout::string(std::string value) {
 	if (string_ == value)
 		return;
 
@@ -106,7 +105,7 @@ void String2D::string(std::string value) {
 	dirty = true;
 }
 
-void String2D::limit(const libv::vec2f new_limit) {
+void TextLayout::limit(const libv::vec2f new_limit) {
 	if (limit_ == new_limit)
 		return;
 
@@ -116,13 +115,13 @@ void String2D::limit(const libv::vec2f new_limit) {
 
 // -------------------------------------------------------------------------------------------------
 
-size_t String2D::length() const noexcept {
+size_t TextLayout::length() const noexcept {
 	return libv::distance_utf8_unchecked(string_);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void String2D::insert(size_t position, uint32_t unicode) {
+void TextLayout::insert(size_t position, uint32_t unicode) {
 	if (!utf8::internal::is_code_point_valid(unicode)) {
 		log_ui.error("Attempted to insert an invalid codepoint: {} at {} substituting with {}", unicode, position, invalidCodepointReplacement);
 		unicode = invalidCodepointReplacement;
@@ -133,7 +132,7 @@ void String2D::insert(size_t position, uint32_t unicode) {
 	dirty = true;
 }
 
-size_t String2D::insert(size_t position, const std::string_view value) {
+size_t TextLayout::insert(size_t position, const std::string_view value) {
 	size_t codepoints = 0;
 
 	if (utf8::is_valid(value.begin(), value.end())) {
@@ -154,7 +153,7 @@ size_t String2D::insert(size_t position, const std::string_view value) {
 	return codepoints;
 }
 
-void String2D::erase(size_t position, size_t count) {
+void TextLayout::erase(size_t position, size_t count) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), position))
@@ -169,7 +168,7 @@ void String2D::erase(size_t position, size_t count) {
 	dirty = true;
 }
 
-void String2D::push_back(uint32_t unicode) {
+void TextLayout::push_back(uint32_t unicode) {
 	if (!utf8::internal::is_code_point_valid(unicode)) {
 		log_ui.error("Attempted to push_back an invalid codepoint: {} substituting with {}", unicode, invalidCodepointReplacement);
 		unicode = invalidCodepointReplacement;
@@ -180,7 +179,7 @@ void String2D::push_back(uint32_t unicode) {
 	dirty = true;
 }
 
-void String2D::push_back(const std::string_view value) {
+void TextLayout::push_back(const std::string_view value) {
 	if (utf8::is_valid(value.begin(), value.end())) {
 		string_.append(value);
 
@@ -193,7 +192,7 @@ void String2D::push_back(const std::string_view value) {
 	dirty = true;
 }
 
-void String2D::pop_back() {
+void TextLayout::pop_back() {
 	if (string_.empty())
 		return log_ui.warn("Attempted to pop_back an empty string");
 
@@ -204,23 +203,23 @@ void String2D::pop_back() {
 	dirty = true;
 }
 
-void String2D::clear() {
+void TextLayout::clear() {
 	string_.clear();
 	dirty = true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-const libv::glr::Mesh& String2D::mesh() {
+const TextLayoutData& TextLayout::vertices_data() {
 	if (dirty)
 		layout();
 
-	return mesh_;
+	return static_cast<const TextLayoutData&>(*this);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec2f String2D::getCharacterPosition() {
+libv::vec2f TextLayout::getCharacterPosition() {
 	if (dirty)
 		layout();
 
@@ -229,14 +228,12 @@ libv::vec2f String2D::getCharacterPosition() {
 
 	const auto& descender = font_->getDescender(fontSize_);
 	const auto& glyph = font_->getCharacter(codepoint, fontSize_);
-
-	auto positions = mesh_.attribute(attribute_position);
 	const auto& position = positions[positions.size() - 4];
 
 	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
-libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
+libv::vec2f TextLayout::getCharacterPosition(size_t characterIndex) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), characterIndex))
@@ -252,36 +249,33 @@ libv::vec2f String2D::getCharacterPosition(size_t characterIndex) {
 
 	const auto& descender = font_->getDescender(fontSize_);
 	const auto& glyph = font_->getCharacter(codepoint, fontSize_);
-
-	auto positions = mesh_.attribute(attribute_position);
 	const auto& position = positions[characterIndex * 4];
 	// NOTE: characterIndex can over index into end as hidden new-line glyphs are placed to help these functions
 
 	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
-//size_t String2D::getLineOfCharacter() {
+//size_t TextLayout::getLineOfCharacter() {
 //	return {}; // Not implemented yet.
 //}
 //
-//size_t String2D::getLineOfCharacter(size_t characterIndex) {
+//size_t TextLayout::getLineOfCharacter(size_t characterIndex) {
 //	return {}; // Not implemented yet.
 //}
 //
-//libv::vec2f String2D::getLinePosition() {
+//libv::vec2f TextLayout::getLinePosition() {
 //	return {}; // Not implemented yet.
 //}
 //
-//libv::vec2f String2D::getLinePosition(size_t lineIndex) {
+//libv::vec2f TextLayout::getLinePosition(size_t lineIndex) {
 //	return {}; // Not implemented yet.
 //}
 
-size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
+size_t TextLayout::getClosestCharacterIndex(libv::vec2f position) {
 	if (dirty)
 		layout();
 
 	const auto lineHeight = font_->getLineHeight(fontSize_);
-	auto positions = mesh_.attribute(attribute_position);
 
 	float min_distance_sq = std::numeric_limits<float>::infinity();
 	size_t min_index = 0; // In case of empty string, index 0 is valid
@@ -312,12 +306,11 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 	return min_index;
 }
 
-size_t String2D::getClosestCharacterIndexInline(libv::vec2f position) {
+size_t TextLayout::getClosestCharacterIndexInline(libv::vec2f position) {
 	if (dirty)
 		layout();
 
 	const auto lineHeight = font_->getLineHeight(fontSize_);
-	auto positions = mesh_.attribute(attribute_position);
 
 	float min_distance_x = std::numeric_limits<float>::infinity();
 	float min_distance_y = std::numeric_limits<float>::infinity();
@@ -356,13 +349,13 @@ size_t String2D::getClosestCharacterIndexInline(libv::vec2f position) {
 	return min_index;
 }
 
-//size_t String2D::getClosestLineIndex(libv::vec2f position) {
+//size_t TextLayout::getClosestLineIndex(libv::vec2f position) {
 //	return {}; // Not implemented yet.
 //}
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec2f String2D::content(libv::vec2f new_limit) {
+libv::vec2f TextLayout::content(libv::vec2f new_limit) {
 	if (string_.empty())
 		return {0.f, 0.f};
 
@@ -399,18 +392,42 @@ libv::vec2f String2D::content(libv::vec2f new_limit) {
 
 // -------------------------------------------------------------------------------------------------
 
-void String2D::layout() {
+void TextLayout::layout() {
 	if (font_ == nullptr) {
-		log_ui.error("Attempted to layout a String2D without a valid font");
-		assert(false && "Attempted to layout a String2D without a valid font");
+		log_ui.error("Attempted to layout a TextLayout without a valid font");
+		assert(false && "Attempted to layout a TextLayout without a valid font");
 		return;
 	}
 
-	mesh_.clear();
-	auto position = mesh_.attribute(attribute_position);
-	auto texture0 = mesh_.attribute(attribute_texture0);
-	auto index = mesh_.index();
-	mesh_.reserve(string_.size() * 4, string_.size() * 6);
+	// ---
+
+	positions.clear();
+	texture0s.clear();
+	indices.clear();
+	// NOTE: It would be nice to use resize and direct index into the data, but "virtual" new line glyphs might be inserted that cannot be calculated without the layout, also utf8 codepoint would require a shrinking resize at the end
+	positions.reserve(string_.size() * 4);
+	texture0s.reserve(string_.size() * 4);
+	indices.reserve(string_.size() * 6);
+	auto vi = 0;
+	auto ii = 0;
+
+	const auto vertex = [&](auto pos, auto uv0) {
+		positions.emplace_back(pos, 0);
+		texture0s.emplace_back(uv0);
+		vi++;
+	};
+
+	const auto index_quad = [&]() {
+		indices.emplace_back(vi - 4 + 0);
+		indices.emplace_back(vi - 4 + 1);
+		indices.emplace_back(vi - 4 + 2);
+		indices.emplace_back(vi - 4 + 2);
+		indices.emplace_back(vi - 4 + 3);
+		indices.emplace_back(vi - 4 + 0);
+		ii += 6;
+	};
+
+	// ---
 
 	struct Line {
 		size_t begin = 0;
@@ -464,25 +481,19 @@ void String2D::layout() {
 		if (currentCodepoint == ' ')
 			line->wordEndings.emplace_back(line->end);
 
-		const auto vertex_base = static_cast<libv::glr::VertexIndex>(position.size());
-
-		position(libv::vec3f{glyph.pos[0] + pen, 0});
-		position(libv::vec3f{glyph.pos[1] + pen, 0});
-		position(libv::vec3f{glyph.pos[2] + pen, 0});
-		position(libv::vec3f{glyph.pos[3] + pen, 0});
-
-		texture0(glyph.tex[0]);
-		texture0(glyph.tex[1]);
-		texture0(glyph.tex[2]);
-		texture0(glyph.tex[3]);
+		vertex(glyph.pos[0] + pen, glyph.tex[0]);
+		vertex(glyph.pos[1] + pen, glyph.tex[1]);
+		vertex(glyph.pos[2] + pen, glyph.tex[2]);
+		vertex(glyph.pos[3] + pen, glyph.tex[3]);
 
 		if (currentCodepoint == '\n') {
 			newLine();
-			// NOTE: At every line-feed character there is an extra not rendered new-line glyph placed
 			continue;
 		}
 
-		index.quad(vertex_base + 0, vertex_base + 1, vertex_base + 2, vertex_base + 3);
+		// NOTE: At every line-feed character there is an extra not rendered new-line glyph placed, so the indices are skipped for those
+		index_quad();
+
 		pen.x += glyph.advance.x;
 		previousCodepoint = currentCodepoint;
 	}
@@ -495,16 +506,12 @@ void String2D::layout() {
 		pen.x += kerning.x;
 		line->end += 4;
 
-		position(libv::vec3f{glyph.pos[0] + pen, 0});
-		position(libv::vec3f{glyph.pos[1] + pen, 0});
-		position(libv::vec3f{glyph.pos[2] + pen, 0});
-		position(libv::vec3f{glyph.pos[3] + pen, 0});
-
-		texture0(glyph.tex[0]);
-		texture0(glyph.tex[1]);
-		texture0(glyph.tex[2]);
-		texture0(glyph.tex[3]);
+		vertex(glyph.pos[0] + pen, glyph.tex[0]);
+		vertex(glyph.pos[1] + pen, glyph.tex[1]);
+		vertex(glyph.pos[2] + pen, glyph.tex[2]);
+		vertex(glyph.pos[3] + pen, glyph.tex[3]);
 	}
+
 	finishLine();
 
 	// --- Alignments ---
@@ -513,7 +520,7 @@ void String2D::layout() {
 	const auto lines_height_sum = num_lines_f * lineAdvance;
 
 	const auto leftoverY = hasLimitY ? (limit_.y - lines_height_sum) : 0.f;
-	const auto offsetY = -1.f * leftoverY * AlignVerticalTable[align_vertical_.to_value()];
+	const auto offsetY = -1.f * leftoverY * AlignVerticalTable[align_vertical_];
 	const auto isJustifiedY = align_vertical_ == AlignVertical::justify_all || align_vertical_ == AlignVertical::justify;
 	const auto justifyGapY = isJustifiedY ?
 			-1.f * leftoverY / std::max(1.f, num_lines_f - 1.0f) : 0.0f;
@@ -522,7 +529,7 @@ void String2D::layout() {
 		const auto line_index_f = static_cast<float>(line_index);
 
 		const auto leftoverX = contentWidth - line.width;
-		const auto offsetX = leftoverX * AlignHorizontalTable[align_horizontal_.to_value()];
+		const auto offsetX = leftoverX * AlignHorizontalTable[align_horizontal_];
 		const auto isLastLine = static_cast<size_t>(line_index) == lines.size() - 1;
 		const auto isJustifiedLine = align_horizontal_ == AlignHorizontal::justify_all || (align_horizontal_ == AlignHorizontal::justify && !isLastLine);
 		const auto justifyGapX = isJustifiedLine ?
@@ -537,8 +544,8 @@ void String2D::layout() {
 			const auto adjusmentX = std::round(offsetX + word_index_f * justifyGapX);
 
 			while (i < wordEnd) {
-				position[i].x += adjusmentX;
-				position[i].y += adjusmentY;
+				positions[i].x += adjusmentX;
+				positions[i].y += adjusmentY;
 				i++;
 			}
 		}

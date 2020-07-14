@@ -162,9 +162,91 @@ public:
 	}
 };
 
+// =================================================================================================
+
+class UniformBlockStreamView_std140 {
+private:
+	template <typename T>
+	struct Proxy {
+		libv::observer_ref<std::byte> ptr;
+
+		inline void operator=(const T& value) && {
+			write_std140(ptr, value);
+		}
+	};
+
+public:
+	UniformBlockBindingLocation binding;
+	UniformDataBlock block;
+	std::shared_ptr<RemoteUniformBuffer> remote;
+
+public:
+	UniformBlockStreamView_std140(
+			UniformBlockBindingLocation binding,
+			UniformDataBlock block,
+			const std::shared_ptr<RemoteUniformBuffer>& remote) :
+		binding(binding),
+		block(block),
+		remote(remote) { }
+
+	UniformBlockStreamView_std140(const UniformBlockStreamView_std140& other) = default;
+	UniformBlockStreamView_std140(UniformBlockStreamView_std140&& other) = default;
+	UniformBlockStreamView_std140& operator=(const UniformBlockStreamView_std140& other) & = default;
+	UniformBlockStreamView_std140& operator=(UniformBlockStreamView_std140&& other) & = default;
+
+public:
+	template <typename T>
+	Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) {
+		remote->dirty = true;
+		const auto ptr = libv::make_observer_ref(remote->data.data() + block.offset + location.location);
+		return Proxy<T>{ptr};
+	}
+
+	~UniformBlockStreamView_std140() {
+		// The uniform memory is deallocated by a stream clear function
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class UniformBufferStream {
+	friend class AttorneyUniformBufferRemote;
+
+private:
+	std::shared_ptr<RemoteUniformBuffer> remote;
+
+public:
+	UniformBufferStream(libv::gl::BufferUsage usage = libv::gl::BufferUsage::StreamDraw) :
+		remote(std::make_shared<RemoteUniformBuffer>(usage)) { }
+
+	UniformBufferStream(const UniformBufferStream& orig) = default;
+	UniformBufferStream(UniformBufferStream&& orig) = default;
+
+public:
+	template <typename T>
+	[[nodiscard]] UniformBlockStreamView_std140 block_stream(const UniformBlockLayout<T>& layout) {
+		remote->dirty = true;
+		return UniformBlockStreamView_std140{layout.binding, remote->allocate(layout.size), remote};
+	}
+
+	const auto& tmp() {
+		return remote->data;
+	}
+
+	void clear() {
+		remote->data.clear();
+		remote->frees.clear();
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 struct AttorneyUniformBufferRemote {
 	friend class Queue;
 	static inline RemoteUniformBuffer& remote(const UniformBuffer& object) {
+		return *object.remote;
+	}
+	static inline RemoteUniformBuffer& remote(const UniformBufferStream& object) {
 		return *object.remote;
 	}
 };

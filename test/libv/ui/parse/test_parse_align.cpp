@@ -19,35 +19,35 @@ using libv::ui::parse_align_vertical_or_throw;
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("Parse valid align_horizontal", "[libv.ui]") {
-	CHECK(parse_align_horizontal_or_throw("left") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw("center") == AlignHorizontal::Center);
-	CHECK(parse_align_horizontal_or_throw("right") == AlignHorizontal::Right);
-	CHECK(parse_align_horizontal_or_throw("justify") == AlignHorizontal::Justify);
-	CHECK(parse_align_horizontal_or_throw("justifyall") == AlignHorizontal::JustifyAll);
-	CHECK(parse_align_horizontal_or_throw("justify-all") == AlignHorizontal::JustifyAll);
-	CHECK(parse_align_horizontal_or_throw("justify_all") == AlignHorizontal::JustifyAll);
+	CHECK(parse_align_horizontal_or_throw("left") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw("center") == AlignHorizontal::center);
+	CHECK(parse_align_horizontal_or_throw("right") == AlignHorizontal::right);
+	CHECK(parse_align_horizontal_or_throw("justify") == AlignHorizontal::justify);
+	CHECK(parse_align_horizontal_or_throw("justifyall") == AlignHorizontal::justify_all);
+	CHECK(parse_align_horizontal_or_throw("justify-all") == AlignHorizontal::justify_all);
+	CHECK(parse_align_horizontal_or_throw("justify_all") == AlignHorizontal::justify_all);
 
-	CHECK(parse_align_horizontal_or_throw("west") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw("east") == AlignHorizontal::Right);
+	CHECK(parse_align_horizontal_or_throw("west") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw("east") == AlignHorizontal::right);
 
-	CHECK(parse_align_horizontal_or_throw("W") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw("C") == AlignHorizontal::Center);
-	CHECK(parse_align_horizontal_or_throw("E") == AlignHorizontal::Right);
-	CHECK(parse_align_horizontal_or_throw("J") == AlignHorizontal::Justify);
-	CHECK(parse_align_horizontal_or_throw("JA") == AlignHorizontal::JustifyAll);
-	CHECK(parse_align_horizontal_or_throw("w") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw("c") == AlignHorizontal::Center);
-	CHECK(parse_align_horizontal_or_throw("e") == AlignHorizontal::Right);
-	CHECK(parse_align_horizontal_or_throw("j") == AlignHorizontal::Justify);
-	CHECK(parse_align_horizontal_or_throw("ja") == AlignHorizontal::JustifyAll);
+	CHECK(parse_align_horizontal_or_throw("W") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw("C") == AlignHorizontal::center);
+	CHECK(parse_align_horizontal_or_throw("E") == AlignHorizontal::right);
+	CHECK(parse_align_horizontal_or_throw("J") == AlignHorizontal::justify);
+	CHECK(parse_align_horizontal_or_throw("JA") == AlignHorizontal::justify_all);
+	CHECK(parse_align_horizontal_or_throw("w") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw("c") == AlignHorizontal::center);
+	CHECK(parse_align_horizontal_or_throw("e") == AlignHorizontal::right);
+	CHECK(parse_align_horizontal_or_throw("j") == AlignHorizontal::justify);
+	CHECK(parse_align_horizontal_or_throw("ja") == AlignHorizontal::justify_all);
 
-	CHECK(parse_align_horizontal_or_throw(" left") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw(" \t\nleft") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw(" \t\nleft  ") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw("leFT") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw(" leFT") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw(" \t\nlEft") == AlignHorizontal::Left);
-	CHECK(parse_align_horizontal_or_throw(" \t\nlEft  ") == AlignHorizontal::Left);
+	CHECK(parse_align_horizontal_or_throw(" left") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw(" \t\nleft") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw(" \t\nleft  ") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw("leFT") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw(" leFT") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw(" \t\nlEft") == AlignHorizontal::left);
+	CHECK(parse_align_horizontal_or_throw(" \t\nlEft  ") == AlignHorizontal::left);
 }
 
 TEST_CASE("Parse invalid align_horizontal", "[libv.ui]") {
@@ -64,35 +64,35 @@ TEST_CASE("Parse invalid align_horizontal", "[libv.ui]") {
 }
 
 TEST_CASE("Parse valid align_vertical", "[libv.ui]") {
-	CHECK(parse_align_vertical_or_throw("top") == AlignVertical::Top);
-	CHECK(parse_align_vertical_or_throw("center") == AlignVertical::Center);
-	CHECK(parse_align_vertical_or_throw("bottom") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw("justify") == AlignVertical::Justify);
-	CHECK(parse_align_vertical_or_throw("justifyall") == AlignVertical::JustifyAll);
-	CHECK(parse_align_vertical_or_throw("justify-all") == AlignVertical::JustifyAll);
-	CHECK(parse_align_vertical_or_throw("justify_all") == AlignVertical::JustifyAll);
+	CHECK(parse_align_vertical_or_throw("top") == AlignVertical::top);
+	CHECK(parse_align_vertical_or_throw("center") == AlignVertical::center);
+	CHECK(parse_align_vertical_or_throw("bottom") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw("justify") == AlignVertical::justify);
+	CHECK(parse_align_vertical_or_throw("justifyall") == AlignVertical::justify_all);
+	CHECK(parse_align_vertical_or_throw("justify-all") == AlignVertical::justify_all);
+	CHECK(parse_align_vertical_or_throw("justify_all") == AlignVertical::justify_all);
 
-	CHECK(parse_align_vertical_or_throw("north") == AlignVertical::Top);
-	CHECK(parse_align_vertical_or_throw("south") == AlignVertical::Bottom);
+	CHECK(parse_align_vertical_or_throw("north") == AlignVertical::top);
+	CHECK(parse_align_vertical_or_throw("south") == AlignVertical::bottom);
 
-	CHECK(parse_align_vertical_or_throw("N") == AlignVertical::Top);
-	CHECK(parse_align_vertical_or_throw("C") == AlignVertical::Center);
-	CHECK(parse_align_vertical_or_throw("S") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw("J") == AlignVertical::Justify);
-	CHECK(parse_align_vertical_or_throw("JA") == AlignVertical::JustifyAll);
-	CHECK(parse_align_vertical_or_throw("n") == AlignVertical::Top);
-	CHECK(parse_align_vertical_or_throw("c") == AlignVertical::Center);
-	CHECK(parse_align_vertical_or_throw("s") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw("j") == AlignVertical::Justify);
-	CHECK(parse_align_vertical_or_throw("ja") == AlignVertical::JustifyAll);
+	CHECK(parse_align_vertical_or_throw("N") == AlignVertical::top);
+	CHECK(parse_align_vertical_or_throw("C") == AlignVertical::center);
+	CHECK(parse_align_vertical_or_throw("S") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw("J") == AlignVertical::justify);
+	CHECK(parse_align_vertical_or_throw("JA") == AlignVertical::justify_all);
+	CHECK(parse_align_vertical_or_throw("n") == AlignVertical::top);
+	CHECK(parse_align_vertical_or_throw("c") == AlignVertical::center);
+	CHECK(parse_align_vertical_or_throw("s") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw("j") == AlignVertical::justify);
+	CHECK(parse_align_vertical_or_throw("ja") == AlignVertical::justify_all);
 
-	CHECK(parse_align_vertical_or_throw(" bottom") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw(" \t\nbottom") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw(" \t\nbottom  ") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw("boTTom") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw(" boTTom") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw(" \t\nboTTOm") == AlignVertical::Bottom);
-	CHECK(parse_align_vertical_or_throw(" \t\nboTTOm  ") == AlignVertical::Bottom);
+	CHECK(parse_align_vertical_or_throw(" bottom") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw(" \t\nbottom") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw(" \t\nbottom  ") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw("boTTom") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw(" boTTom") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw(" \t\nboTTOm") == AlignVertical::bottom);
+	CHECK(parse_align_vertical_or_throw(" \t\nboTTOm  ") == AlignVertical::bottom);
 }
 
 TEST_CASE("Parse invalid align_vertical", "[libv.ui]") {

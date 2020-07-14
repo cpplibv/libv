@@ -13,52 +13,18 @@
 #include <libv/utility/bit_cast.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/observer_ref.hpp>
-#include <libv/utility/overload.hpp>
+//#include <libv/utility/overload.hpp>
 // std
 #include <variant>
 #include <vector>
 // pro
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
-#include <libv/ui/event/mouse_watcher.hpp>
 #include <libv/ui/log.hpp>
 
 
 namespace libv {
 namespace ui {
-
-// -------------------------------------------------------------------------------------------------
-
-//#include <boost/geometry.hpp>
-//#include <boost/geometry/geometries/point.hpp>
-//#include <boost/geometry/geometries/box.hpp>
-//#include <boost/geometry/index/rtree.hpp>
-////#include <boost/geometry/index/predicates.hpp>
-////#include <boost/geometry/core/cs.hpp>
-//
-// https://www.boost.org/doc/libs/1_70_0/libs/geometry/doc/html/geometry/spatial_indexes/introduction.html
-//
-//struct ImplMouseRegionHandler {
-//	Interest_t interest;
-//	libv::observer_ref<MouseRegion> region;
-////	MouseRegionDimension dimension;
-//};
-//
-////struct ImplContextMouse {
-//struct ImplMouseDimension {
-//	using point = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
-//	using region = boost::geometry::model::box<point>;
-//
-////	using value_type = ImplMouseRegionHandler;
-//	using value_type = MouseDimension;
-//    using key_type = region;
-//
-//    using key_value = std::pair<key_type, value_type>;
-//    using rtree = boost::geometry::index::rtree<key_value, boost::geometry::index::quadratic<16>>;
-//
-//public:
-//	rtree container;
-//};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -81,12 +47,14 @@ namespace ui {
 //	- When layout changes but it stays above the same object(s) a mouse movement event with (0,0) should be sent
 //
 //	- Mouse events should move around focus | (not entirely true, but mouse event and focus/selection modules will interact)
+//
 //	- Question: How does scroll panel and other moving panels are remapping dynamically the MouseRegions?
 //		~ event hitting on such dynamic planes should remap and resend the event to either a different region manager or to different dimension
 //			Meaning that we remap the event and not the components
 //			Meaning we need to find the closest remapping point if we attach a MouseRegion | by walking up the component hierarchy
 //	- When the scroll pane moves under the mouse, does it count as mouse movement? | No, but it can count as a leave.
-//	- What about hotkey with condition that mouse is over ui or canvas object | not sure, but it feels like a "not my problem" for the event system, sounds like hotkey context switches
+//
+//	- What about hotkey with condition that mouse is over ui or canvas object | not sure, but it feels like a "not my problem" for the event system, sounds like hotkey context switches | libv.control contexts are solving this problem
 //	- What about drag and drop / drag payload / drag hover payload | it would be nice to have a generic ui drag payload
 
 
@@ -94,59 +62,26 @@ namespace ui {
 
 struct ImplContextMouse {
 	struct EntryTarget {
-		std::variant<libv::observer_ref<MouseWatcher>, libv::observer_ref<CoreComponent>> target;
+		libv::observer_ref<CoreComponent> target;
 
 	public:
 		inline void notify(const EventMouseButton& event) const {
-			const auto visitor = libv::overload(
-				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
-					if (watcher->cb_button)
-						watcher->cb_button(event);
-				},
-				[&event](const libv::observer_ref<CoreComponent>& component) {
-					AccessEvent::onMouseButton(*component, event);
-				}
-			);
-
-			std::visit(visitor, target);
+			AccessEvent::onMouseButton(*target, event);
 		}
 
 		inline void notify(const EventMouseMovement& event) const {
-			const auto visitor = libv::overload(
-				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
-					if (watcher->cb_movement)
-						watcher->cb_movement(event);
-				},
-				[&event](const libv::observer_ref<CoreComponent>& component) {
-					AccessEvent::onMouseMovement(*component, event);
-				}
-			);
-
-			std::visit(visitor, target);
+			AccessEvent::onMouseMovement(*target, event);
 		}
 
 		inline void notify(const EventMouseScroll& event) const {
-			const auto visitor = libv::overload(
-				[&event](const libv::observer_ref<MouseWatcher>& watcher) {
-					if (watcher->cb_scroll)
-						watcher->cb_scroll(event);
-				},
-				[&event](const libv::observer_ref<CoreComponent>& component) {
-					AccessEvent::onMouseScroll(*component, event);
-				}
-			);
-
-			std::visit(visitor, target);
+			AccessEvent::onMouseScroll(*target, event);
 		}
 
-		inline bool match(MouseWatcher& watcher) const {
-			return std::holds_alternative<libv::observer_ref<MouseWatcher>>(target)
-					&& std::get<libv::observer_ref<MouseWatcher>>(target) == &watcher;
+		[[nodiscard]] friend constexpr inline bool operator==(const EntryTarget& lhs, const CoreComponent& rhs) noexcept {
+			return lhs.target == &rhs;
 		}
-
-		inline bool match(CoreComponent& component) const {
-			return std::holds_alternative<libv::observer_ref<CoreComponent>>(target)
-					&& std::get<libv::observer_ref<CoreComponent>>(target) == &component;
+		[[nodiscard]] friend constexpr inline bool operator==(const CoreComponent& lhs, const EntryTarget& rhs) noexcept {
+			return rhs == lhs;
 		}
 	};
 
@@ -159,8 +94,7 @@ struct ImplContextMouse {
 		bool over = false;
 		bool pendingUpdate = true;
 
-		Entry(libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<MouseWatcher> watcher) :
-			cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{watcher} { }
+//		bool remap_region = false;
 
 		Entry(libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<CoreComponent> component) :
 			cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{component} { }
@@ -179,51 +113,33 @@ ContextMouse::ContextMouse() :
 	self(std::make_unique<ImplContextMouse>()) {
 }
 
-ContextMouse::~ContextMouse() { }
+ContextMouse::~ContextMouse() = default; // For the sake of forward declared unique_ptr
 
 void ContextMouse::subscribe(CoreComponent& component) {
 	self->entries.emplace_back(libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
 }
 
-void ContextMouse::subscribe(MouseWatcher& watcher) {
-	self->entries.emplace_back(libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(watcher));
+void ContextMouse::subscribe_region(CoreComponent& component) {
+
 }
 
-void ContextMouse::subscribe(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
-	self->entries.emplace_back(position, position + size - 1.f, order, libv::make_observer_ref(watcher));
-}
-
-void ContextMouse::update(CoreComponent& component, libv::vec2f position, libv::vec2f size, MouseOrder order) {
+void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(component);
+		return entry.target == component;
 	});
 
 	if (it == self->entries.end())
 		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
-	it->cornerBL = position;
-	it->cornerTR = position + size - 1.f;
-	it->order = order;
-	it->pendingUpdate = true;
-}
-
-void ContextMouse::update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(watcher);
-	});
-
-	if (it == self->entries.end())
-		return log_ui.warn("Attempted to update a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
-
-	it->cornerBL = position;
-	it->cornerTR = position + size - 1.f;
+	it->cornerBL = xy(abs_position);
+	it->cornerTR = xy(abs_position) + xy(size) - 1.f;
 	it->order = order;
 	it->pendingUpdate = true;
 }
 
 void ContextMouse::unsubscribe(CoreComponent& component) {
 	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(component);
+		return entry.target == component;
 	});
 
 	if (it == self->entries.end())
@@ -233,43 +149,21 @@ void ContextMouse::unsubscribe(CoreComponent& component) {
 	release(component);
 }
 
-void ContextMouse::unsubscribe(MouseWatcher& watcher) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target.match(watcher);
-	});
+void ContextMouse::unsubscribe_region(CoreComponent& component) {
 
-	if (it == self->entries.end())
-		return log_ui.warn("Attempted to unsubscribing a not subscribed watcher: 0x{:016x}", libv::bit_cast<size_t>(&watcher));
-
-	libv::erase_unstable(self->entries, it);
-	release(watcher);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ContextMouse::acquire(CoreComponent& watcher) {
-	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
+void ContextMouse::acquire(CoreComponent& component) {
+	self->acquired.emplace_back(component);
 }
 
-void ContextMouse::acquire(MouseWatcher& watcher) {
-	self->acquired.emplace_back(ImplContextMouse::EntryTarget{watcher});
-}
-
-void ContextMouse::release(CoreComponent& watcher) {
+void ContextMouse::release(CoreComponent& component) {
 	if (self->acquired.empty())
 		return;
 
-	libv::erase_if_stable(self->acquired, [&](const auto& i) { return i.match(watcher); });
-
-	if (self->acquired.empty())
-		event_position(self->mouse_position);
-}
-
-void ContextMouse::release(MouseWatcher& watcher) {
-	if (self->acquired.empty())
-		return;
-
-	libv::erase_if_stable(self->acquired, [&](const auto& i) { return i.match(watcher); });
+	libv::erase_if_stable(self->acquired, [&](const auto& i) { return i == component; });
 
 	if (self->acquired.empty())
 		event_position(self->mouse_position);
@@ -329,7 +223,7 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 
 		hit.entry->over = false;
 
-		if (!hit.enter) { // If it's not a new enter for the watcher, leave that watcher
+		if (!hit.enter) { // If it's not a new enter for the component, leave that component
 			event.enter = false;
 			event.leave = true;
 
@@ -514,3 +408,36 @@ void ContextMouse::event_update() {
 
 } // namespace ui
 } // namespace libv
+
+// =================================================================================================
+
+//#include <boost/geometry.hpp>
+//#include <boost/geometry/geometries/point.hpp>
+//#include <boost/geometry/geometries/box.hpp>
+//#include <boost/geometry/index/rtree.hpp>
+////#include <boost/geometry/index/predicates.hpp>
+////#include <boost/geometry/core/cs.hpp>
+//
+// https://www.boost.org/doc/libs/1_70_0/libs/geometry/doc/html/geometry/spatial_indexes/introduction.html
+//
+//struct ImplMouseRegionHandler {
+//	Interest_t interest;
+//	libv::observer_ref<MouseRegion> region;
+////	MouseRegionDimension dimension;
+//};
+//
+////struct ImplContextMouse {
+//struct ImplMouseDimension {
+//	using point = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
+//	using region = boost::geometry::model::box<point>;
+//
+////	using value_type = ImplMouseRegionHandler;
+//	using value_type = MouseDimension;
+//    using key_type = region;
+//
+//    using key_value = std::pair<key_type, value_type>;
+//    using rtree = boost::geometry::index::rtree<key_value, boost::geometry::index::quadratic<16>>;
+//
+//public:
+//	rtree container;
+//};

@@ -2,8 +2,6 @@
 
 // hpp
 #include <libv/ui/property/anchor.hpp>
-// libv
-#include <libv/utility/enum.hpp>
 // std
 #include <cassert>
 #include <ostream>
@@ -14,45 +12,52 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f TableAnchor[] = {
-	libv::vec3f{0.0f, 1.0f, 0}, // top_left
-	libv::vec3f{0.5f, 1.0f, 0}, // top_center
-	libv::vec3f{1.0f, 1.0f, 0}, // top_right
-	libv::vec3f{0.0f, 0.5f, 0}, // center_left
-	libv::vec3f{0.5f, 0.5f, 0}, // center_center
-	libv::vec3f{1.0f, 0.5f, 0}, // center_right
-	libv::vec3f{0.0f, 0.0f, 0}, // bottom_left
-	libv::vec3f{0.5f, 0.0f, 0}, // bottom_center
-	libv::vec3f{1.0f, 0.0f, 0}, // bottom_right
+static constexpr std::string_view storage_Anchor_to_string[] = {
+	"top-left"     , // top_left
+	"top-center"   , // top_center
+	"top-right"    , // top_right
+	"center-left"  , // center_left
+	"center-center", // center_center
+	"center-right" , // center_right
+	"bottom-left"  , // bottom_left
+	"bottom-center", // bottom_center
+	"bottom-right" , // bottom_right
 };
 
-[[nodiscard]] libv::vec3f to_info(const Anchor value) noexcept {
-	if (libv::to_value(value) >= std::size(TableAnchor)) {
+std::string_view Anchor::to_string() const noexcept {
+	if (value >= std::size(storage_Anchor_to_string)) {
 		assert(false && "Invalid Anchor enum value");
-		return TableAnchor[0];
+		return "<<invalid>>";
 	}
-	return TableAnchor[libv::to_value(value)];
+	return storage_Anchor_to_string[value];
 }
 
-std::string_view to_string(const Anchor value) noexcept {
-	switch (value) {
-	case Anchor::top_left:      return "top-left";
-	case Anchor::top_center:    return "top-center";
-	case Anchor::top_right:     return "top-right";
-	case Anchor::center_left:   return "center-left";
-	case Anchor::center_center: return "center-center";
-	case Anchor::center_right:  return "center-right";
-	case Anchor::bottom_left:   return "bottom-left";
-	case Anchor::bottom_center: return "bottom-center";
-	case Anchor::bottom_right:  return "bottom-right";
-	}
-
-	assert(false && "Invalid Anchor enum value");
-	return "<<invalid>>";
+std::ostream& operator<<(std::ostream& os, const Anchor& var) {
+	return os << var.to_string();
 }
 
-std::ostream& operator<<(std::ostream& os, const Anchor value) {
-	return os << to_string(value);
+std::span<const Anchor> Anchor::list() noexcept {
+	return detail::storage_Anchor;
+}
+
+static constexpr libv::vec3f storage_Anchor_to_info[] = {
+	libv::vec3f{0.0f, 1.0f, 0.0f}, // top_left
+	libv::vec3f{0.5f, 1.0f, 0.0f}, // top_center
+	libv::vec3f{1.0f, 1.0f, 0.0f}, // top_right
+	libv::vec3f{0.0f, 0.5f, 0.0f}, // center_left
+	libv::vec3f{0.5f, 0.5f, 0.0f}, // center_center
+	libv::vec3f{1.0f, 0.5f, 0.0f}, // center_right
+	libv::vec3f{0.0f, 0.0f, 0.0f}, // bottom_left
+	libv::vec3f{0.5f, 0.0f, 0.0f}, // bottom_center
+	libv::vec3f{1.0f, 0.0f, 0.0f}, // bottom_right
+};
+
+libv::vec3f Anchor::to_info() const noexcept {
+	if (value >= std::size(storage_Anchor_to_info)) {
+		assert(false && "Invalid Anchor enum value");
+		return storage_Anchor_to_info[0];
+	}
+	return storage_Anchor_to_info[value];
 }
 
 // -------------------------------------------------------------------------------------------------

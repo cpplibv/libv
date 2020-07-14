@@ -3,13 +3,15 @@
 #pragma once
 
 // libv
-#include <libv/glr/mesh.hpp>
 #include <libv/math/vec.hpp>
 // std
+//#include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 // pro
 #include <libv/ui/property/align.hpp>
+#include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
 
 
@@ -20,10 +22,20 @@ namespace ui {
 
 class Font2D;
 
-class String2D {
-private:
-	libv::glr::Mesh mesh_{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+//struct TextLayoutData_____ {
+//	std::span<libv::vec3f> positions;
+//	std::span<libv::vec2f> texture0s;
+//	std::span<uint32_t> indices;
+//};
 
+struct TextLayoutData {
+	std::vector<libv::vec3f> positions;
+	std::vector<libv::vec2f> texture0s;
+	std::vector<uint32_t> indices;
+};
+
+class TextLayout : TextLayoutData {
+private:
 	std::shared_ptr<Font2D> font_;
 
 	FontSize fontSize_ = FontSize{12};
@@ -77,7 +89,7 @@ public:
 	void clear();
 
 public:
-	[[nodiscard]] const libv::glr::Mesh& mesh();
+	[[nodiscard]] const TextLayoutData& vertices_data();
 
 public:
 	[[nodiscard]] libv::vec2f getCharacterPosition();

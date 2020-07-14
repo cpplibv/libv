@@ -80,10 +80,14 @@ public:
 	void anchor(Anchor value) noexcept;
 	[[nodiscard]] Anchor anchor() const noexcept;
 
+	/// x: left, y: down, z: right, w: top
 	void margin(Margin value) noexcept;
+	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] Margin margin() const noexcept;
 
+	/// x: left, y: down, z: right, w: top
 	void padding(Padding value) noexcept;
+	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] Padding padding() const noexcept;
 
 public:
@@ -116,9 +120,9 @@ protected:
 		Component(create_core_ptr<DelayedT>(GenerateName, type, nextID++)) { }
 
 	explicit inline ComponentHandler(core_ptr ptr) noexcept :
-		Component(std::move(ptr)) {
+		Component(ptr) {
 
-		assert(dynamic_cast<ComponentT*>(this->ptr) != nullptr && "Invalid component pointer initialization");
+		assert(dynamic_cast<ComponentT*>(ptr) != nullptr && "Invalid component pointer initialization");
 	}
 
 protected:

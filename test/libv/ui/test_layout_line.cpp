@@ -65,8 +65,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	layout.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
 
 	SECTION("alignment: TOP_LEFT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-		layout.alignVertical(libv::ui::AlignVertical::Top);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+		layout.alignVertical(libv::ui::AlignVertical::top);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -77,8 +77,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: TOP_CENTER") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Center);
-		layout.alignVertical(libv::ui::AlignVertical::Top);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::center);
+		layout.alignVertical(libv::ui::AlignVertical::top);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -89,8 +89,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: TOP_RIGHT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Right);
-		layout.alignVertical(libv::ui::AlignVertical::Top);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::right);
+		layout.alignVertical(libv::ui::AlignVertical::top);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -102,12 +102,12 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 
 	SECTION("alignment: TOP_JUSTIFY") {
 		SECTION("Justify") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::Justify);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify);
 		}
 		SECTION("JustifyAll") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::JustifyAll);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify_all);
 		}
-		layout.alignVertical(libv::ui::AlignVertical::Top);
+		layout.alignVertical(libv::ui::AlignVertical::top);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -118,8 +118,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: CENTER_LEFT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-		layout.alignVertical(libv::ui::AlignVertical::Center);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+		layout.alignVertical(libv::ui::AlignVertical::center);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -130,8 +130,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: CENTER_CENTER") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Center);
-		layout.alignVertical(libv::ui::AlignVertical::Center);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::center);
+		layout.alignVertical(libv::ui::AlignVertical::center);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -142,8 +142,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: CENTER_RIGHT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Right);
-		layout.alignVertical(libv::ui::AlignVertical::Center);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::right);
+		layout.alignVertical(libv::ui::AlignVertical::center);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -155,12 +155,12 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 
 	SECTION("alignment: CENTER_JUSTIFY") {
 		SECTION("Justify") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::Justify);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify);
 		}
 		SECTION("JustifyAll") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::JustifyAll);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify_all);
 		}
-		layout.alignVertical(libv::ui::AlignVertical::Center);
+		layout.alignVertical(libv::ui::AlignVertical::center);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -171,8 +171,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: BOTTOM_LEFT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-		layout.alignVertical(libv::ui::AlignVertical::Bottom);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+		layout.alignVertical(libv::ui::AlignVertical::bottom);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -183,8 +183,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: BOTTOM_CENTER") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Center);
-		layout.alignVertical(libv::ui::AlignVertical::Bottom);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::center);
+		layout.alignVertical(libv::ui::AlignVertical::bottom);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -195,8 +195,8 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 	}
 
 	SECTION("alignment: BOTTOM_RIGHT") {
-		layout.alignHorizontal(libv::ui::AlignHorizontal::Right);
-		layout.alignVertical(libv::ui::AlignVertical::Bottom);
+		layout.alignHorizontal(libv::ui::AlignHorizontal::right);
+		layout.alignVertical(libv::ui::AlignVertical::bottom);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -208,12 +208,12 @@ TEST_CASE("layout line: positioning with alignment", "[libv.ui.layout.line]") {
 
 	SECTION("alignment: BOTTOM_JUSTIFY") {
 		SECTION("Justify") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::Justify);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify);
 		}
 		SECTION("JustifyAll") {
-			layout.alignHorizontal(libv::ui::AlignHorizontal::JustifyAll);
+			layout.alignHorizontal(libv::ui::AlignHorizontal::justify_all);
 		}
-		layout.alignVertical(libv::ui::AlignVertical::Bottom);
+		layout.alignVertical(libv::ui::AlignVertical::bottom);
 
 		CHECK(layout.layout1(env1) == Size(150, 60, 0));
 		layout.layout2(env2);
@@ -241,8 +241,8 @@ TEST_CASE("layout line: positioning with orientation", "[libv.ui.layout.line]") 
 	comp1.size("50px, 50px"); comp1.dynamic( 60,  40);
 	comp2.size("60px, 40px"); comp2.dynamic(100,  10);
 
-	layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-	layout.alignVertical(libv::ui::AlignVertical::Top);
+	layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+	layout.alignVertical(libv::ui::AlignVertical::top);
 
 	SECTION("orient: BOTTOM_TO_TOP") {
 		layout.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
@@ -300,8 +300,8 @@ TEST_CASE("layout line: sizing one quad", "[libv.ui.layout.line]") {
 	libv::ui::ContextLayout1 env1;
 	libv::ui::ContextLayout2 env2(libv::vec3f(0, 0, 0), libv::vec3f(400, 300, 0), libv::ui::MouseOrder{0});
 
-	layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-	layout.alignVertical(libv::ui::AlignVertical::Bottom);
+	layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+	layout.alignVertical(libv::ui::AlignVertical::bottom);
 	layout.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
 
 	SECTION("ratio") {
@@ -359,8 +359,8 @@ TEST_CASE("layout line: complex test 0", "[libv.ui.layout.line]") {
 	comp3.size("250px  0% 4r D,   0px 10% 4r  ,   0px  0%     "); comp3.dynamic(13, 23, 33);
 
 	layout.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-	layout.alignHorizontal(libv::ui::AlignHorizontal::Left);
-	layout.alignVertical(libv::ui::AlignVertical::Top);
+	layout.alignHorizontal(libv::ui::AlignHorizontal::left);
+	layout.alignVertical(libv::ui::AlignVertical::top);
 
 	CHECK(layout.layout1(env1) == Size(1270.f, 106.66667f, 257.77778f));
 	layout.layout2(env2);

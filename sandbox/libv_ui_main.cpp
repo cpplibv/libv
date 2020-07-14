@@ -6,10 +6,10 @@
 #include <libv/frame/frame.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
-#include <libv/input/event.hpp>
-#include <libv/input/input.hpp>
+//#include <libv/input/event.hpp>
+//#include <libv/input/input.hpp>
 #include <libv/log/log.hpp>
-#include <libv/parse/color.hpp>
+//#include <libv/parse/color.hpp>
 // std
 #include <iostream>
 // pro
@@ -50,8 +50,10 @@ private:
 	libv::ui::Button button;
 	libv::ui::Image image;
 	libv::ui::InputField input_field;
+	libv::ui::InputField input_field2;
 	libv::ui::Label label;
-	libv::ui::LabelImage label_image;
+	libv::ui::LabelImage label_image1;
+	libv::ui::LabelImage label_image2;
 	libv::ui::PanelFloat panel_float;
 	libv::ui::PanelFull panel_full;
 	libv::ui::PanelGrid panel_grid;
@@ -140,11 +142,15 @@ public:
 		button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
 
 		label.text("Label");
-		label.align_horizontal(libv::ui::AlignHorizontal::Center);
-		label.align_vertical(libv::ui::AlignVertical::Center);
+		label.align_horizontal(libv::ui::AlignHorizontal::center);
+		label.align_vertical(libv::ui::AlignVertical::center);
 
-		label_image.text("Label image");
-		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
+		label_image1.text("Label image");
+		label_image1.image(ui.context().texture2D("separator_bar_256x16.png"));
+
+		label_image2.text("Label image2");
+		label_image2.image(ui.context().texture2D("separator_bar_256x16.png"));
+		label_image2.color({1.f, 1.f, 1.f, 0.5f});
 
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
@@ -158,6 +164,17 @@ public:
 		});
 		input_field.event().submit([](auto& component, const auto&) {
 			log_sandbox.info("Input field {} submitted", component.path());
+		});
+
+		input_field2.text("Input field 2");
+		input_field2.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} changed to {}", component.path(), component.text());
+		});
+		input_field2.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field2.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 2 {} submitted", component.path());
 		});
 
 		stretch.image(ui.context().texture2D("stretch_border.png"));
@@ -192,6 +209,8 @@ public:
 
 		scroll_area.content(panel_line_scrolled);
 		scroll_area.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area.size(libv::ui::parse_size_or_throw("50%, 1r"));
+		scroll_area.anchor(libv::ui::Anchor::center_center);
 		{
 			libv::ui::Label tmp;
 			tmp.text(
@@ -202,7 +221,10 @@ public:
 			);
 			tmp.size(libv::ui::parse_size_or_throw("D, D"));
 			panel_line_scrolled.add(tmp);
-		} {
+		}
+		panel_line_scrolled.add(input_field2);
+		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
+		{
 			libv::ui::Label tmp;
 			tmp.text(
 				"222222222222trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
@@ -231,22 +253,25 @@ public:
 		panel_float.add(button3);
 
 		panel_grid.column_count(3);
+		panel_grid.padding({5, 5, 5, 10});
 		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
 		panel_grid.add(button0);
 		panel_grid.add(panel_full);
 		panel_grid.add(panel_float);
-		panel_grid.add(label_image);
 		panel_grid.add(input_field);
+		panel_grid.add(label_image1);
 		panel_grid.add(quad);
 		panel_grid.add(stretch);
 		panel_grid.add(scroll_bar_x);
 		panel_grid.add(scroll_bar_y);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		panel_line.padding({20, 10, 20, 10});
 		panel_line.add(panel_grid);
 		panel_line.add(button);
 		panel_line.add(scroll_area);
 		panel_line.add(label);
+		panel_line.add(label_image2);
 
 		ui.add(panel_line);
 
@@ -307,33 +332,33 @@ public:
 			}
 
 			if (e.keycode == libv::input::Keycode::F7) {
-				log_sandbox.trace("AlignVertical::Top");
-				label.align_vertical(libv::ui::AlignVertical::Top);
-				input_field.align_vertical(libv::ui::AlignVertical::Top);
+				log_sandbox.trace("AlignVertical::top");
+				label.align_vertical(libv::ui::AlignVertical::top);
+				input_field.align_vertical(libv::ui::AlignVertical::top);
 			}
 
 			if (e.keycode == libv::input::Keycode::F8) {
-				log_sandbox.trace("AlignVertical::Center");
-				label.align_vertical(libv::ui::AlignVertical::Center);
-				input_field.align_vertical(libv::ui::AlignVertical::Center);
+				log_sandbox.trace("AlignVertical::center");
+				label.align_vertical(libv::ui::AlignVertical::center);
+				input_field.align_vertical(libv::ui::AlignVertical::center);
 			}
 
 			if (e.keycode == libv::input::Keycode::F9) {
-				log_sandbox.trace("AlignVertical::Bottom");
-				label.align_vertical(libv::ui::AlignVertical::Bottom);
-				input_field.align_vertical(libv::ui::AlignVertical::Bottom);
+				log_sandbox.trace("AlignVertical::bottom");
+				label.align_vertical(libv::ui::AlignVertical::bottom);
+				input_field.align_vertical(libv::ui::AlignVertical::bottom);
 			}
 
 			if (e.keycode == libv::input::Keycode::F10) {
-				log_sandbox.trace("AlignVertical::Justify");
-				label.align_vertical(libv::ui::AlignVertical::Justify);
-				input_field.align_vertical(libv::ui::AlignVertical::Justify);
+				log_sandbox.trace("AlignVertical::justify");
+				label.align_vertical(libv::ui::AlignVertical::justify);
+				input_field.align_vertical(libv::ui::AlignVertical::justify);
 			}
 
 			if (e.keycode == libv::input::Keycode::F11) {
-				log_sandbox.trace("AlignVertical::JustifyAll");
-				label.align_vertical(libv::ui::AlignVertical::JustifyAll);
-				input_field.align_vertical(libv::ui::AlignVertical::JustifyAll);
+				log_sandbox.trace("AlignVertical::justify_all");
+				label.align_vertical(libv::ui::AlignVertical::justify_all);
+				input_field.align_vertical(libv::ui::AlignVertical::justify_all);
 			}
 		});
 		onChar.output([&](const libv::input::EventChar& e) {
@@ -362,6 +387,10 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char**) {
+	system("chcp 65001"); // !!! For Clion terminal
+	std::filesystem::current_path(std::filesystem::current_path().parent_path()); // !!! For Clion editor
+	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n"); // !!! For Clion console
+
 	std::cout << libv::logger_stream;
 //	libv::logger_stream.allow("libv.ui");
 //	libv::logger_stream.deny();

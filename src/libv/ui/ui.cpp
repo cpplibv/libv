@@ -6,6 +6,7 @@
 #include <libv/glr/queue.hpp>
 #include <libv/input/event.hpp>
 #include <libv/math/remap.hpp>
+#include <libv/utility/histogram.hpp>
 #include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
@@ -13,6 +14,7 @@
 // std
 #include <array>
 #include <mutex>
+#include <ostream>
 #include <variant>
 #include <vector>
 // pro
@@ -36,35 +38,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N>
-struct Histogram {
-	std::array<size_t, N> data;
-
-	std::chrono::nanoseconds min;
-	std::chrono::nanoseconds max;
-
-	Histogram(std::chrono::nanoseconds min, std::chrono::nanoseconds max) : min(min), max(max) {
-		data.fill(0);
-	}
-
-	void sample(std::chrono::nanoseconds value) {
-		if (value > max)
-			data[N - 1]++;
-		else if (value < min)
-			data[0]++;
-		else
-			data[(value - min).count() / ((max - min).count() / N)]++;
-	}
-
-	friend std::ostream& operator<<(std::ostream& os, const Histogram& var) {
-		for (size_t i = 0; i < N; ++i)
-			os << var.data[i] << ' ';
-		return os;
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
 using Root = PanelFull;
 
 //class Root : public PanelFull {
@@ -85,16 +58,16 @@ class ImplUI {
 		static constexpr std::chrono::microseconds t_min{0};
 		static constexpr std::chrono::milliseconds t_max{1};
 
-		Histogram<100> attach1{t_min, t_max};
-		Histogram<100> event{t_min, t_max};
-		Histogram<100> attach2{t_min, t_max};
-		Histogram<100> styleScan{t_min, t_max};
-		Histogram<100> style{t_min, t_max};
-		Histogram<100> layout{t_min, t_max};
-		Histogram<100> render{t_min, t_max};
-		Histogram<100> detach{t_min, t_max};
+		libv::Histogram<100> attach1{t_min, t_max};
+		libv::Histogram<100> event{t_min, t_max};
+		libv::Histogram<100> attach2{t_min, t_max};
+		libv::Histogram<100> styleScan{t_min, t_max};
+		libv::Histogram<100> style{t_min, t_max};
+		libv::Histogram<100> layout{t_min, t_max};
+		libv::Histogram<100> render{t_min, t_max};
+		libv::Histogram<100> detach{t_min, t_max};
 
-		Histogram<100> frame{t_min, t_max};
+		libv::Histogram<100> frame{t_min, t_max};
 
 		friend std::ostream& operator<<(std::ostream& os, const Stat& var) {
 			os << "attach1:   " << var.attach1;
@@ -125,6 +98,8 @@ public:
 public:
 	ContextState context_state;
 	ContextUI context;
+	ContextRender context_render;
+	bool context_render_created = false;
 	Root root;
 
 	Stat stat;
@@ -353,7 +328,7 @@ ContextState& UI::state() {
 
 // -------------------------------------------------------------------------------------------------
 
-void UI::update(libv::glr::Queue& gl) {
+void UI::update(libv::glr::Queue& glr) {
 	current_thread_context(context());
 
 	self->timer.reset();
@@ -432,7 +407,7 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Layout ---
 	try {
-		AccessRoot::layout2(self->root.core(), ContextLayout2{self->root.layout_position(), self->root.layout_size(), MouseOrder{0}});
+		AccessRoot::layout2(self->root.core(), ContextLayout2{self->root.layout_position(), self->root.layout_size()});
 		self->stat.layout.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
@@ -440,37 +415,16 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Render ---
 	try {
-		const auto guard_s = gl.state.push_guard();
-		const auto guard_m = gl.model.push_guard();
-		const auto guard_v = gl.view.push_guard();
-		const auto guard_p = gl.projection.push_guard();
+		const auto guard_s = glr.state.push_guard();
+		const auto guard_m = glr.model.push_guard();
+		const auto guard_v = glr.view.push_guard();
+		const auto guard_p = glr.projection.push_guard();
 
-		gl.state.enableBlend();
-		gl.state.blendSrc_SourceAlpha();
-		gl.state.blendDst_One_Minus_SourceAlpha();
-
-		gl.state.enableCullFace();
-		gl.state.cullBackFace();
-		gl.state.frontFaceCCW();
-
-		gl.state.disableDepthTest();
-		gl.state.depthFunctionLess();
-
-		gl.state.polygonModeFill();
-
-		gl.projection = libv::mat4f::ortho(self->root.layout_position2(), self->root.layout_size2());
-		gl.view = libv::mat4f::identity();
-		gl.model = libv::mat4f::identity();
-
-		gl.viewport(
-				libv::vec::cast<int32_t>(self->root.layout_position2()),
-				libv::vec::cast<int32_t>(self->root.layout_size2())
-		);
-
-		ContextRender context{gl, clock::now()};
-//		AccessRoot::create(self->root, context);
-		AccessRoot::render(self->root.core(), context);
-//		AccessRoot::destroy(self->root, context);
+//		AccessRoot::create(self->root.core(), context);
+		auto r = self->context_render.root_renderer(self->root, glr, self->context_state.time_frame(), self->context_state.time());
+		AccessRoot::render(self->root.core(), r);
+		self->context_render.execute_render(glr);
+//		AccessRoot::destroy(self->root.core(), context);
 
 		self->stat.render.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
@@ -500,8 +454,9 @@ void UI::destroy(libv::glr::Queue& gl) {
 
 	// --- Render ---
 	{
-		ContextRender context{gl, clock::now()};
-		AccessRoot::render(self->root.core(), context);
+		auto r = self->context_render.root_renderer(self->root, gl, self->context_state.time_frame(), self->context_state.time());
+		AccessRoot::render(self->root.core(), r);
+		self->context_render.execute_render(gl);
 	}
 
 	// --- Detach ---

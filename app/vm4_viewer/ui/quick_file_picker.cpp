@@ -51,14 +51,14 @@ QuickFilePicker::QuickFilePicker(libv::ui::CoreComponent& parent, libv::ui::Gene
 QuickFilePicker::~QuickFilePicker() { }
 
 void QuickFilePicker::doAttach() {
-	set(property.align_horizontal, libv::ui::AlignHorizontal::Left);
-	set(property.align_vertical, libv::ui::AlignVertical::Top);
+	set(property.align_horizontal, libv::ui::AlignHorizontal::left);
+	set(property.align_vertical, libv::ui::AlignVertical::top);
 	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
 
 //	{
 //		auto style = context().style("vm4pv.file_list");
-//		style->set("align", libv::ui::AlignHorizontal::Left);
-//		style->set("align_vertical", libv::ui::AlignVertical::Top);
+//		style->set("align", libv::ui::AlignHorizontal::left);
+//		style->set("align_vertical", libv::ui::AlignVertical::top);
 //		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
 //		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
@@ -114,8 +114,8 @@ void QuickFilePicker::doAttach() {
 		style->set("cursor_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("cursor_shader", context().shaderQuad());
 
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
 		style->set("font_size", libv::ui::FontSize{12});

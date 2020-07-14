@@ -148,6 +148,16 @@ public:
 	}
 
 public:
+	inline void set(State state) noexcept {
+		state_stack.top() = state;
+	}
+
+	inline StateStack& operator=(State state) noexcept {
+		set(state);
+		return *this;
+	}
+
+public:
 	inline void enableBlend() noexcept {
 		state_stack.top().capabilityBlend = 1;
 	}

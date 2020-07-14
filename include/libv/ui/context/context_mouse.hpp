@@ -18,37 +18,26 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreComponent;
-class ImplContextMouse;
-class MouseWatcher;
 
 class ContextMouse {
-	std::unique_ptr<ImplContextMouse> self;
+	std::unique_ptr<class ImplContextMouse> self;
 
 public:
 	ContextMouse();
 	~ContextMouse();
 
 public:
-	void subscribe(CoreComponent& watcher);
-	void subscribe(MouseWatcher& watcher);
-	void subscribe(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
+	void subscribe(CoreComponent& component);
+	void subscribe_region(CoreComponent& component);
 
-//	void update(CoreComponent& watcher, MouseOrder order);
-//	void update(CoreComponent& watcher, libv::vec2f position, libv::vec2f size);
-	void update(CoreComponent& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
+	void update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order);
 
-//	void update(MouseWatcher& watcher, MouseOrder order);
-//	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size);
-	void update(MouseWatcher& watcher, libv::vec2f position, libv::vec2f size, MouseOrder order);
-
-	void unsubscribe(CoreComponent& watcher);
-	void unsubscribe(MouseWatcher& watcher);
+	void unsubscribe(CoreComponent& component);
+	void unsubscribe_region(CoreComponent& component);
 
 public:
-	void acquire(CoreComponent& watcher);
-	void acquire(MouseWatcher& watcher);
-	void release(CoreComponent& watcher);
-	void release(MouseWatcher& watcher);
+	void acquire(CoreComponent& component);
+	void release(CoreComponent& component);
 
 public:
 	void event_enter();

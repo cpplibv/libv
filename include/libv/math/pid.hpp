@@ -7,6 +7,17 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+///
+///	libv::PID<double> pid(0.25, 0.01, 0.5);
+///
+///	while(true) {
+///		double target_value = ...;
+///		double current_value = ...;
+///		double delta_time = ...;
+///		double feedback = pid.calculate(delta_time, current_value, target_value);
+///		apply_feedback(feedback);
+/// }
+///
 template <typename T = double, typename S = double>
 class PID {
 private:

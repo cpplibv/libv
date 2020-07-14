@@ -2,13 +2,11 @@
 
 // hpp
 #include <libv/ui/component/quad.hpp>
-// libv
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
@@ -31,15 +29,13 @@ private:
 		PropertyR<ShaderQuad_view> quad_shader;
 	} property;
 
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
 public:
 	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -68,27 +64,16 @@ void CoreQuad::doStyle(ContextStyle& ctx) {
 	CoreComponent::access_properties(setter);
 }
 
-void CoreQuad::doRender(ContextRender& context) {
-	if (context.changedSize) {
-		mesh.clear();
-		auto pos = mesh.attribute(attribute_position);
-		auto index = mesh.index();
+libv::vec3f CoreQuad::doLayout1(const ContextLayout1& environment) {
+	(void) environment;
 
-		pos(0, 0, 0);
-		pos(layout_size().x, 0, 0);
-		pos(layout_size().x, layout_size().y, 0);
-		pos(0, layout_size().y, 0);
+	return {padding_size(), 0.f};
+}
 
-		index.quad(0, 1, 2, 3);
-	}
-
-	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(layout_position());
-
-	context.gl.program(*property.quad_shader());
-	context.gl.uniform(property.quad_shader()->uniform_color, property.color());
-	context.gl.uniform(property.quad_shader()->uniform_MVPmat, context.gl.mvp());
-	context.gl.render(mesh);
+void CoreQuad::doRender(Renderer& r) {
+	r.quad(padding_LB(), layout_size2() - padding_size(),
+			property.color(),
+			property.quad_shader());
 }
 
 // -------------------------------------------------------------------------------------------------

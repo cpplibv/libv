@@ -29,11 +29,11 @@ private:
 	float zoom_ = 0;
 
 public:
-	libv::mat4f projection(libv::vec2f canvas_size) const noexcept {
+	[[nodiscard]] [[nodiscard]] libv::mat4f projection(libv::vec2f canvas_size) const noexcept {
 		return libv::mat4f::perspective(fov, canvas_size.x / canvas_size.y, near, far);
 	}
 
-	libv::mat4f view() const noexcept {
+	[[nodiscard]] libv::mat4f view() const noexcept {
 		libv::mat4f mat(1.f);
 
 		mat.translate(libv::vec3f(0, 0, zoom_));
@@ -47,7 +47,7 @@ public:
 	}
 
 public:
-	libv::vec3f eye() const noexcept {
+	[[nodiscard]] libv::vec3f eye() const noexcept {
 		return libv::vec::xyz(view().inverse()[3]);
 	}
 
@@ -76,7 +76,7 @@ public:
 		zoom_ = value;
 	}
 
-	float zoom() const {
+	[[nodiscard]] float zoom() const {
 		return zoom_;
 	}
 

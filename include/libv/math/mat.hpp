@@ -144,6 +144,9 @@ public:
 	[[nodiscard]] constexpr inline decltype(auto) operator[](int col) const noexcept {
 		return mx()[col];
 	}
+	[[nodiscard]] constexpr inline const vec_t<R, T> at_v(int col) const noexcept {
+		return vec_t<R, T>{mx()[col]};
+	}
 
 	// ---------------------------------------------------------------------------------------------
 

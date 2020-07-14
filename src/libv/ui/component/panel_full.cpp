@@ -75,7 +75,9 @@ void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
+
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
 		if (fix == libv::Approx(0.f)) {
 			return fix;
@@ -91,31 +93,33 @@ libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& environment) {
 
 	for (auto& child : children | view_layouted()) {
 		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
 				libv::vec3f{};
 
-		libv::meta::for_constexpr<0, 3>([&](auto dim) {
-			result[dim] = libv::max(
-					result[dim],
+		libv::meta::for_constexpr<0, 3>([&](auto i) {
+			result[i] = libv::max(
+					result[i],
 					resolvePercent(
-							child.size()[dim].pixel + (child.size()[dim].dynamic ? child_dynamic[dim] : 0.f),
-							child.size()[dim].percent, child.core())
+							child.size()[i].pixel + (child.size()[i].dynamic ? child_dynamic[i] : 0.f),
+							child.size()[i].percent, child.core())
 			);
 		});
 	}
 
-	return result;
+	return result + padding_size3();
 }
 
-void CorePanelFull::doLayout2(const ContextLayout2& environment) {
+void CorePanelFull::doLayout2(const ContextLayout2& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
+
+	const auto position = padding_LB3();
+	const auto roundedPosition = libv::vec::round(position);
+	const auto roundedSize = libv::vec::round(position + env_size) - roundedPosition;
+
 	for (auto& child : children | view_layouted()) {
 		AccessLayout::layout2(
 				child.core(),
-				ContextLayout2{
-					environment.position,
-					environment.size,
-					MouseOrder{libv::to_value(environment.mouseOrder) + 1}
-				}
+				layout_env.enter(roundedPosition, roundedSize)
 		);
 	}
 }

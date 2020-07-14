@@ -11,7 +11,13 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
+class AccessUniformBuffer;
+
 struct UniformBuffer : Buffer {
+	template <typename Access = AccessUniformBuffer>
+	inline Access operator()(GL&) noexcept {
+		return Access{*this};
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

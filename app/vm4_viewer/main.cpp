@@ -2,9 +2,12 @@
 
 // libv
 #include <libv/utility/generic_path.hpp>
+// ext
+#include <fmt/chrono.h>
 // std
 #include <filesystem>
 #include <iostream>
+#include <chrono>
 // pro
 #include <vm4_viewer/config.hpp>
 #include <vm4_viewer/frame.hpp>
@@ -35,9 +38,9 @@
 
 // -------------------------------------------------------------------------------------------------
 
-const std::string DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
-const std::string DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
-const std::string DEFAULT_PROJECT_FOLDER = "project";
+static constexpr auto DEFAULT_CONFIG_FILENAME = "app_vm4_viewer_config.json";
+static constexpr auto DEFAULT_PROJECT_FILENAME = "vm4_viewer_default.json";
+static constexpr auto DEFAULT_PROJECT_FOLDER = "project";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -56,9 +59,14 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("Current path  {}", libv::generic_path(std::filesystem::current_path()));
 	app::log_app.info("Executable    {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
-	// C++20: last_write_time file_time_clock should be fixed and should be convertible to system_clock
-//	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", std::filesystem::last_write_time(path));
-//	app::log_app.info("Last modified {}", std::chrono::system_clock::now());
+
+	// TODO P5: write a utility wrapper for last_write_time
+	// C++20: There might be a better way in the future for this
+	//  std::chrono::clock_cast<std::chrono::system_clock>(lwt)
+	const auto lwt = std::filesystem::last_write_time(path);
+	const auto lwt_sys = decltype(lwt)::clock::to_sys(lwt);
+	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}",
+			fmt::localtime(std::chrono::system_clock::to_time_t(lwt_sys)));
 
 	app::ConfigViewer config(config_path);
 

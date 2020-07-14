@@ -133,6 +133,7 @@ ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 	mouse(self->mouse),
 	settings(std::move(settings)) {
 
+	log_ui.info("Working directory:     {}", libv::generic_path(std::filesystem::current_path()));
 	log_ui.info("Resource base font:    {}", libv::generic_path(this->settings.res_font.base_path));
 	log_ui.info("Resource base shader:  {}", libv::generic_path(this->settings.res_shader.base_path));
 	log_ui.info("Resource base texture: {}", libv::generic_path(this->settings.res_texture.base_path));

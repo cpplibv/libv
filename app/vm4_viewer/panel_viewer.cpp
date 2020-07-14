@@ -80,7 +80,7 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.label_version");
-		style->set("align", libv::ui::AlignHorizontal::Right);
+		style->set("align", libv::ui::AlignHorizontal::right);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -91,8 +91,8 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.button");
-		style->set("align", libv::ui::AlignHorizontal::Center);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align", libv::ui::AlignHorizontal::center);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
@@ -102,7 +102,7 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.label_help");
-		style->set("align", libv::ui::AlignHorizontal::Right);
+		style->set("align", libv::ui::AlignHorizontal::right);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -113,8 +113,8 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::top);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 		style->set("anchor_target", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
 		style->set("anchor_parent", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
@@ -123,8 +123,8 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.scroll-show");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::top);
 		style->set("orientation", libv::ui::Orientation::LEFT_TO_RIGHT);
 		style->set("anchor_target", libv::ui::ANCHOR_CENTER_RIGHT);
 		style->set("anchor_parent", libv::ui::ANCHOR_CENTER_RIGHT);
@@ -151,8 +151,8 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.scroll-show2");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::top);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 		style->set("anchor_target", libv::ui::ANCHOR_BOTTOM_CENTER);
 		style->set("anchor_parent", libv::ui::ANCHOR_BOTTOM_CENTER);
@@ -196,8 +196,8 @@ void PanelViewer::doAttach() {
 
 //	{
 //		auto style = context().style("vm4pv.file_list");
-//		style->set("align", libv::ui::AlignHorizontal::Left);
-//		style->set("align_vertical", libv::ui::AlignVertical::Top);
+//		style->set("align", libv::ui::AlignHorizontal::left);
+//		style->set("align_vertical", libv::ui::AlignVertical::top);
 //		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
 //		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
@@ -239,7 +239,7 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.bar");
-		style->set("align", libv::ui::AlignHorizontal::Center);
+		style->set("align", libv::ui::AlignHorizontal::center);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));
@@ -629,7 +629,7 @@ void PanelViewer::doAttach() {
 
 //		{
 //			auto temp = std::make_shared<libv::ui::Label>("text");
-//			temp->set(temp->property.align, libv::ui::AlignHorizontal::Right);
+//			temp->set(temp->property.align, libv::ui::AlignHorizontal::right);
 //			temp->set(temp->property.font, context().font("consola.ttf"));
 //			temp->set(temp->property.font_color, libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 //			temp->set(temp->property.font_shader, context().shaderFont());

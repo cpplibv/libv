@@ -78,8 +78,12 @@ public:
 
 template <typename ComponentT>
 struct EventHostSubmitable : EventHostGeneral<ComponentT> {
+	using component_type = ComponentT;
+
+public:
 	BasicEventProxy<ComponentT, EventSubmit> submit;
 
+public:
 	EventHostSubmitable(ComponentT& core) : EventHostGeneral<ComponentT>(core),
 		submit(core) {}
 };

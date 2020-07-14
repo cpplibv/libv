@@ -173,6 +173,16 @@ public:
 		return static_cast<CRTP&>(*this);
 	}
 
+	template <typename Range>
+	inline CRTP& set_from_range(const Range& range) {
+		static_assert(std::is_same_v<typename Range::value_type, value_type>);
+		ptr[ptr_index].resize<T>(range.size());
+		void* dst = ptr[ptr_index].data<T>();
+		const void* src = range.data();
+		std::memcpy(dst, src, range.size() * sizeof(value_type));
+		return static_cast<CRTP&>(*this);
+	}
+
 	inline T& operator[](const size_t index) {
 		return ptr[ptr_index].at<T>(index);
 	}
@@ -293,6 +303,14 @@ public:
 		ref.data.emplace_back(i2);
 		ref.data.emplace_back(i3);
 		ref.data.emplace_back(i0);
+		return *this;
+	}
+
+	template <typename Range>
+	inline MeshIndices& set_from_range(const Range& range) {
+		static_assert(std::is_same_v<typename Range::value_type, value_type>);
+		ref.data.resize(range.size());
+		std::memcpy(ref.data.data(), range.data(), (range.size() * sizeof(value_type)));
 		return *this;
 	}
 

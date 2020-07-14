@@ -2,15 +2,12 @@
 
 // hpp
 #include <libv/ui/component/button.hpp>
-// libv
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/queue.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -18,8 +15,8 @@
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/string_2D.hpp>
 #include <libv/ui/style.hpp>
+#include <libv/ui/text_layout.hpp>
 #include <libv/ui/texture_2D.hpp>
 
 
@@ -50,8 +47,7 @@ private:
 	} property;
 
 private:
-	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	String2D text_;
+	TextLayout text_;
 
 public:
 	using CoreComponent::CoreComponent;
@@ -67,7 +63,7 @@ private:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -96,7 +92,7 @@ void CoreButton::access_properties(T& ctx) {
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
 			[](auto& c, auto v) { c.text_.align_horizontal(v); },
 			[](const auto& c) { return c.text_.align_horizontal(); },
-			AlignHorizontal::Left,
+			AlignHorizontal::left,
 			pgr::appearance, pnm::align_horizontal,
 			"Horizontal alignment of the text"
 	);
@@ -104,7 +100,7 @@ void CoreButton::access_properties(T& ctx) {
 			[](auto& c) -> auto& { return c.property.align_vertical; },
 			[](auto& c, auto v) { c.text_.align_vertical(v); },
 			[](const auto& c) { return c.text_.align_vertical(); },
-			AlignVertical::Top,
+			AlignVertical::top,
 			pgr::appearance, pnm::align_vertical,
 			"Vertical alignment of the text"
 	);
@@ -206,56 +202,26 @@ void CoreButton::doStyle(ContextStyle& ctx) {
 }
 
 libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {
-	const auto dynamic_size_text = text_.content(xy(environment.size));
+	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
 	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
 	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
 }
 
 void CoreButton::doLayout2(const ContextLayout2& environment) {
-	text_.limit(libv::vec::xy(environment.size));
+	text_.limit(xy(environment.size) - padding_size());
 }
 
-void CoreButton::doRender(ContextRender& ctx) {
-	if (ctx.changedSize) {
-		bg_mesh.clear();
-		auto pos = bg_mesh.attribute(attribute_position);
-		auto tex = bg_mesh.attribute(attribute_texture0);
-		auto index = bg_mesh.index();
+void CoreButton::doRender(Renderer& r) {
+	r.texture_2D({0, 0}, layout_size2(), {0, 0}, {1, 1},
+			property.bg_color(),
+			property.bg_image(),
+			property.bg_shader());
 
-		pos(0, 0, 0);
-		pos(layout_size().x, 0, 0);
-		pos(layout_size().x, layout_size().y, 0);
-		pos(0, layout_size().y, 0);
-
-		tex(0, 0);
-		tex(1, 0);
-		tex(1, 1);
-		tex(0, 1);
-
-		index.quad(0, 1, 2, 3);
-	}
-
-	const auto guard_m = ctx.gl.model.push_guard();
- 	ctx.gl.model.translate(layout_position());
-
-	{
-		ctx.gl.program(*property.bg_shader());
-		ctx.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
-		ctx.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-		ctx.gl.uniform(property.bg_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(bg_mesh);
-	} {
-		const auto guard_s = ctx.gl.state.push_guard();
-		ctx.gl.state.blendSrc_Source1Color();
-		ctx.gl.state.blendDst_One_Minus_Source1Color();
-
-		ctx.gl.program(*property.font_shader());
-		ctx.gl.texture(text_.font()->texture(), property.font_shader()->textureChannel);
-		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
-		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(text_.mesh());
-	}
+	r.text(padding_LB(), text_,
+			property.font_color(),
+			text_.font(),
+			property.font_shader());
 }
 
 // -------------------------------------------------------------------------------------------------

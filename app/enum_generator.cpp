@@ -12,7 +12,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v3";
+static constexpr std::string_view enum_gen_version = "v5";
 
 void clipboard(const std::string& string) {
 	bool success = clip::set_text(string);
@@ -53,11 +53,15 @@ public:
     constexpr inline {enum_name}({enum_name}&& other) noexcept = default;
     constexpr inline {enum_name}& operator=(const {enum_name}& other) & noexcept = default;
     constexpr inline {enum_name}& operator=({enum_name}&& other) & noexcept = default;
-    constexpr inline ~{enum_name}() noexcept = default;
+    inline ~{enum_name}() noexcept = default;
 
     explicit constexpr inline {enum_name}(value_type value) : value{{value}} {{ }}
 
 	constexpr inline operator value_type() const noexcept {{
+        return value;
+    }}
+
+	[[nodiscard]] constexpr inline value_type to_value() const noexcept {{
         return value;
     }}
 {member_functions}}};
@@ -65,7 +69,7 @@ public:
 // <editor-fold defaultstate="collapsed" desc="{enum_name} constant declarations ...">
 
 namespace detail {{
-static constexpr Anchor storage_{enum_name}[] = {{
+static constexpr {enum_name} storage_{enum_name}[] = {{
 {value_objects}}};
 }} // namespace detail
 
@@ -130,7 +134,7 @@ public:
 	bool to_span = true;
 
 public:
-	MyEnumBuilder(std::string enum_name = "MyEnum", std::string enum_type = "int") :
+	explicit MyEnumBuilder(std::string enum_name = "MyEnum", std::string enum_type = "int") :
 		enum_name(std::move(enum_name)),
 		enum_type(std::move(enum_type)) { }
 
@@ -216,18 +220,20 @@ public:
 		for (size_t i = 0; const auto& kv : values)
 			make_value(kv.name, kv.value, i++);
 
-		if (operator_eq) {
+		if (operator_eq || operator_rel) {
 			member_functions += "\npublic:\n";
-			make_op_function(fmt_operator, "==");
-			make_op_function(fmt_operator, "!=");
-		}
 
-		if (operator_rel) {
-			member_functions += "\npublic:\n";
-			make_op_function(fmt_operator, "<");
-			make_op_function(fmt_operator, "<=");
-			make_op_function(fmt_operator, ">");
-			make_op_function(fmt_operator, ">=");
+			if (operator_eq) {
+				make_op_function(fmt_operator, "==");
+				make_op_function(fmt_operator, "!=");
+			}
+
+			if (operator_rel) {
+				make_op_function(fmt_operator, "<");
+				make_op_function(fmt_operator, "<=");
+				make_op_function(fmt_operator, ">");
+				make_op_function(fmt_operator, ">=");
+			}
 		}
 
 		if (to_string || to_stream) {
@@ -392,7 +398,7 @@ public:
 	}
 };
 
-int main() {
+auto gen_anchor() {
 	MyEnumBuilder builder{"Anchor", "uint16_t"};
 
 	builder.operator_eq = true;
@@ -425,7 +431,41 @@ int main() {
 //
 //	builder.info_stub(0, "to_info", "libv::vec3f");
 
-	auto result = builder.make();
+	return builder.make();
+}
+
+auto gen_align_vertical() {
+	MyEnumBuilder builder{"AlignVertical", "uint16_t"};
+
+	builder.value("top"        , "top"        , true);
+	builder.value("center"     , "center"     );
+	builder.value("bottom"     , "bottom"     );
+	builder.value("justify"    , "justify"    );
+	builder.value("justify_all", "justify-all");
+
+	builder.info_stub("to_info", "float", "0.0f");
+
+	return builder.make();
+}
+
+auto gen_align_horizontal() {
+	MyEnumBuilder builder{"AlignHorizontal", "uint16_t"};
+
+	builder.value("left"       , "left"       , true);
+	builder.value("center"     , "center"     );
+	builder.value("right"      , "right"      );
+	builder.value("justify"    , "justify"    );
+	builder.value("justify_all", "justify-all");
+
+	builder.info_stub("to_info", "float", "0.0f");
+
+	return builder.make();
+}
+
+int main() {
+//	auto result = gen_anchor();
+//	auto result = gen_align_vertical();
+	auto result = gen_align_horizontal();
 	clipboard(result);
 	std::cout << result << std::endl;
 

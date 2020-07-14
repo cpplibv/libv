@@ -125,6 +125,58 @@ void main() {
 }
 )";
 
+const auto shader_stream_vs = R"(
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec3 vertexNormal;
+layout(location = 8) in vec2 vertexTexture0;
+
+out vec3 fragmentNormal;
+out vec2 fragmentTexture0;
+
+const float PI = 3.1415926535897932384626433832795;
+
+layout(std140) uniform Sphere {
+	mat4 MVPmat;
+	mat4 Mmat;
+	vec3 color;
+};
+
+void main() {
+	gl_Position = MVPmat * vec4(vertexPosition, 1);
+	fragmentNormal = normalize(vertexNormal);
+	fragmentTexture0 = vertexTexture0;
+}
+)";
+
+const auto shader_stream_fs = R"(
+#version 330 core
+
+in vec3 fragmentNormal;
+in vec2 fragmentTexture0;
+
+out vec4 output;
+
+//uniform sampler2D texture0Sampler;
+//uniform sampler2D texture1Sampler;
+
+//uniform vec3 shift;
+
+layout(std140) uniform Sphere {
+	mat4 MVPmat;
+	mat4 Mmat;
+	vec3 color;
+};
+
+void main() {
+//	output = texture(texture0Sampler, fragmentTexture0) * 6;
+//	output = output + texture(texture1Sampler, fragmentTexture0);
+//	output = output + vec4(vec3(fragmentTexture0 * 0.3 + 0.4, 0.5) * color, 1.0) * 3;
+	output = vec4(color, 1.0);
+}
+)";
+
 constexpr auto shader_quad_vs = R"(
 #version 330 core
 
@@ -228,6 +280,10 @@ struct Sandbox {
 	libv::glr::Texture sphere_texture0;
 	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture1;
 
+	libv::glr::Program stream_program;
+	libv::glr::Mesh stream_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::UniformBufferStream stream_uniforms;
+
 	libv::glr::Program quad_program;
 	libv::glr::Mesh quad_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Uniform_texture quad_uniform_texture0;
@@ -247,6 +303,7 @@ struct Sandbox {
 
 	Sandbox() {
 		// --- Sphere ---
+
 		sphere_program.vertex(shader_sphere_vs);
 		sphere_program.fragment(shader_sphere_fs);
 		sphere_program.block_binding(uniformBlock_sphere);
@@ -278,6 +335,39 @@ struct Sandbox {
 			libv::glr::generateSpherifiedCube(32, position, normal, texture0, index);
 		}
 
+		// --- Stream ---
+
+		{
+			stream_program.vertex(shader_stream_vs);
+			stream_program.fragment(shader_stream_fs);
+			stream_program.block_binding(uniformBlock_sphere);
+	//		stream_program.assign(sphere_uniform_shift, "shift");
+	//		stream_program.assign(sphere_uniform_time, "time");
+	//		stream_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
+	//		stream_program.assign(sphere_uniform_texture1, "texture1Sampler", textureChannel_normal);
+
+//			const auto dataTexture0 = libv::read_file_or_throw("res/texture/hexagon_metal_0001_diffuse.dds");
+//			auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
+//			sphere_texture0.load(std::move(imageTexture0));
+
+//			const libv::vec4uc tex_data[] = {
+//				{0, 0, 0, 255},
+//				{255, 0, 0, 255},
+//				{0, 255, 0, 255},
+//				{255, 255, 0, 255},
+//			};
+//
+//			sphere_texture1.storage(1, {2, 2});
+//			sphere_texture1.image(0, {0, 0}, {2, 2}, tex_data);
+
+			auto position = stream_mesh.attribute(attribute_position);
+			auto normal = stream_mesh.attribute(attribute_normal);
+			auto texture0 = stream_mesh.attribute(attribute_texture0);
+			auto index = stream_mesh.index();
+
+			libv::glr::generateSpherifiedCube(32, position, normal, texture0, index);
+		}
+
 		// --- Quad ---
 
 		quad_program.vertex(shader_quad_vs);
@@ -295,15 +385,16 @@ struct Sandbox {
 //			position(-1, +1, 0);
 
 			// Little quad in lower left of center
-			position(-0.5f, -0.5f, 0);
-			position(0, -0.5f, 0);
+			position(-0.75f, -0.75f, 0);
+			position(0, -0.75f, 0);
 			position(0, 0, 0);
-			position(-0.5f, 0, 0);
+			position(-0.75f, 0, 0);
 
 			index.quad(0, 1, 2, 3);
 		}
 
 		// --- Sky ---
+
 		sky_program.vertex(shader_sky_vs);
 		sky_program.fragment(shader_sky_fs);
 		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureChannel_diffuse);
@@ -449,6 +540,45 @@ struct Sandbox {
 				gl.texture(sphere_texture1, textureChannel_normal);
 				gl.render(sphere_mesh);
 			}
+		}
+
+		{
+			stream_uniforms.clear();
+
+			gl.model.push();
+			gl.model.translate(-2, 0, 2 * 0.0f - 2);
+			auto block0 = stream_uniforms.block_stream(sphere_layout);
+			block0[sphere_layout.MVPmat] = gl.mvp();
+			block0[sphere_layout.Mmat] = gl.model;
+			block0[sphere_layout.color] = libv::vec3f(1.0f, 0.0f, 0.0f);
+			gl.model.pop();
+
+			gl.model.push();
+			gl.model.translate(-2, 0, 2 * 1.0f - 2);
+			auto block1 = stream_uniforms.block_stream(sphere_layout);
+			block1[sphere_layout.MVPmat] = gl.mvp();
+			block1[sphere_layout.Mmat] = gl.model;
+			block1[sphere_layout.color] = libv::vec3f(0.0f, 1.0f, 0.0f);
+			gl.model.pop();
+
+			gl.model.push();
+			gl.model.translate(-2, 0, 2 * 2.0f - 2);
+			auto block2 = stream_uniforms.block_stream(sphere_layout);
+			block2[sphere_layout.MVPmat] = gl.mvp();
+			block2[sphere_layout.Mmat] = gl.model;
+			block2[sphere_layout.color] = libv::vec3f(0.0f, 0.0f, 1.0f);
+			gl.model.pop();
+
+			gl.program(stream_program);
+
+			gl.uniform(block0);
+			gl.render(stream_mesh);
+
+			gl.uniform(block1);
+			gl.render(stream_mesh);
+
+			gl.uniform(block2);
+			gl.render(stream_mesh);
 		}
 
 		{

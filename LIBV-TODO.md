@@ -521,16 +521,112 @@ libv.ui: Improve layout pass 1 information channel: doLayout1 should use the ret
 libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits (in string_2D)
 libv.ui: implement parentDependOnLayout, reduce the number of layout invalidation caused by String2D edit
 libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback | size is now a property and it maintains the parentDependOnLayout flag
+libv.ui: text layout: rework string2D to not use GLR, it should be just a plain layouter, prep data into local buffer and provide span getters? | an alternative text layout was introduced
+libv.glr: Implement sub-mesh API | it was kind of already usable as base_vertex, base_index and num_indices
+libv.glr: Texture and Program base_ref
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+IDE	Colors:
+    BBBFC3
+    B5B6E3
+    5F8C8A
+
+    enum decl - C76863
+    enum usage - 9FB4C7
+    enumerator decl - 579058
+    enumerator usage - 579058
+
+CLion:
+	wrong working directory to run in
+		(generally the relationship between bin and res should be solved too)
+			? arg for res folder
+	console log line link require a comma at the end of the log message
+	console colored log workaround with:
+		system(("chcp "s + std::to_string(CP_UTF8)).c_str());
+		system("chcp 65001");
+
+fix mouse position
+	as position was abs not rel, and now I fixed that, mouse is now broken
+	local mouse pos in event
+	global mouse pos in event
+	global component pos in event
+
+mouse remap region
+	for scroll panel
+
+
+
+
+
+
+fix clipping position
+	clip position is currently rel but shader need it to be abs
+
+libv.ui: update every component to the new renderer
+		|< TODO
+		|	|< GLR dep removed
+		|	|	|< New renderer used
+			scroll_pane
+			stretch
+		overlay_zoom
+		radio_button
+
+libv.ui: padding support in every component (layout)
+		check_box
+		radio_button
+		scroll_bar | what is used in padding? The bar? | Most likely yes, the bar
+		scroll_pane
+		stretch
+
+libv.ui: margin support in every component | margin only effects layouts
+        panel_float
+        panel_full
+        panel_grid
+        panel_line
+        scroll_pane
+            label_image
+            button
+            check_box
+            image
+            input_field
+            label
+            quad
+            radio_button
+            scroll_bar
+            stretch
+
+libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
+libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
+libv.math: Create vec_fwd and mat_fwd headers
+libv.math: Add/verify structured binding support for vec_t
+libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
+libv.math: Move vec's from_rgba family into static method
+libv.math: Move vec's size_t template parameter to int
+libv.meta: Move any size_t template parameter to int if it makes sense
+
+libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
+libv.ui: Fragments:
+		also, render fragments in on "bundle"
+			r.quad({0, 0}, layout_size2(), {0, 0}, {1, 1}, property.background());
+			r.text(padding_LB(), text_, property.font());
+
+libv.ui: Make sure that (only) position change does not invalidates layout
+
+libv.ui: Idea: new raw texture, white with size of 1x1 px BUT on the getters it lies to 0x0 px so it would not effect layouts
+
+libv.ui: The ui should not know about glr, except in shader, context_render code and maybe the overlays
 libv.ui: rework render
-libv.ui: move render iteration into the containers (to allow render state manipulation)
+libv.ui: component color go from uniform to vertex attribute
+
+libv.ui: (?) move render iteration into the containers (to allow render state manipulation and clipping (?))
+
 libv.ui: overlay component layout stack highlight
 
-
+libv.ctrl: "alterator_feature" (with better name, maybe mode_feature) -> only stateful, like hold shift to show more information | its kind of an analog with ignored value, but not really, and it would be nice to have state getter for this, and that would make it a binary, but with properly guarded
+libv.ctrl: save xls from thesis archive
 
 libv.ui: scroll_area only the "scroll pane" area without scroll bar
 	libv.ui: scroll area layout
@@ -540,7 +636,8 @@ libv.ui: scroll_area only the "scroll pane" area without scroll bar
 			issue: If I want a scroll plane size to be content, I have to set the plane, the area and the line
 			idea: scroll area is not a component, but a component adaptor
 				what is a component adaptor? How does it fit a component hierarchy, how does it alters the behaviours?
-
+	libv.ui: container in scroll area, nested rendering alters clipping and control
+	libv.ui: scroll area in scroll area, nested rendering alters clipping and control
 
 	idea: ui glsl component info: 1 uniform block and a single index into it as vertex attribute
 			component bounds
@@ -550,8 +647,8 @@ libv.ui: scroll_area only the "scroll pane" area without scroll bar
 		issue: create/attach/foreach/traverse/etc function implementations
 		issue: pollutes component hierarchy
 		issue: nested properties
+		issue: scroll area size propagation: if content is 50% area has to be set to 50% and content to 100%, so the size rules are messed up | would be nice to not deal with this issue, but transparent wrapping
 
-	issue: scroll area size of child propagation up
 
 	ComponentHandler and EventHost should be "separated" to allow inheritance chains with different EventHosts
 
@@ -580,16 +677,21 @@ libv.ui: check box
 		Clickable elements with a cross in the middle that can be turned off or on.
 
 libv.ui: radio_button and/or group
-libv.ui: toggle_button
+libv.ui: toggle (toggle button)
 
-libv.ui: padding support in every component (layout)
-libv.ui: margin support in every layout
-libv.ui: component color go from uniform to vertex attribute
 libv.ui: default style and theme set
 
 libv.ui: card layout
+libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
+libv.ui: list layout / component
+libv.ui: table layout - only the columns and/or rows have size aka (more strict grid)
+		An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
+libv.ui: not owning container views (list and/or table)
+libv.ui: progressbar
+		Indicate progress by displaying a partially filled bar.
 
 --- libv.ui MVP checkpoint ------------
+
 
 libv.ui: tab layout = card layout + header buttons
 libv.ui: window
@@ -597,11 +699,6 @@ libv.ui: window
 libv.ui: popup / tooltip
 libv.ui: menu bar / menu / popup menu
 libv.ui: separator / group (bordered and captioned)
-libv.ui: progressbar
-		Indicate progress by displaying a partially filled bar.
-
-libv.ui: table layout (more strict grid)
-		An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
 
 --- libv.ui MVP+ checkpoint -----------
 
@@ -618,6 +715,8 @@ libv.ui: Remove the half manual - half automated public property access (this mi
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
 libv.ui: Hide or remove CoreComponent usage from every API (like focus, AccessLayout)
 libv.ui: Remove .core() usages wherever possible
+
+libv.ui: icon button = background + image + text
 
 libv.ui: InputMask for input field
 		struct InputMask {
@@ -650,6 +749,14 @@ libv.ui: The UI Paper
 		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
 		double step_page; // [pageup/pagedown] num_lines_displayed
 
+	Margin
+		space between elements
+		always collapses neighbouring margins
+			(?) except respects negative
+
+	Padding
+		space between border and content
+
 	NOTES: fragments
 		caption
 		bg
@@ -674,8 +781,6 @@ ext.x3: make sure that every rule is static
 	libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 	libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 ext.x3: make sure that no header dependency exposed by libv parsers
-
-libv.math: remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
 libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
@@ -1041,13 +1146,9 @@ app.vm4_viewer.shader: ui feedback for glsl shader failed include
 app.vm4_viewer.shader: use a fallback shader on init failure
 app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
 
-libv.ui: read nana 3rd party property tree lib API
+libv.ui: read nana 3rd party property tree lib API (again)
 
 component
-	libv.ui: progress bar | progress bar can have unknown max value, have a mode for it | 3 part: bg, bar, spark
-	libv.ui: list
-	libv.ui: table layout - only the columns and/or rows have size
-	libv.ui: not owning container views (list and/or table)
 	libv.ui: static_component system
 
 	libv.ui: Component ideas from other systems
@@ -1236,12 +1337,12 @@ libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly w
 app.vm4_viewer: implement a small light gui app to provide guidance to GUI development
 app.vm4_viewer: display statistics of texture density and estimated texture pixel world space size
 
-libv.math: create vec_fwd and mat_fwd headers
 libv.sig: merge back the sig codebase rework a lighter version of the lib
 libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
-libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers not 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
+libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers nor 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
 libv.ui.layout: size over 100% is not an error
+libv.glr: (?) (if passible) std140 implementation should be moved to libv.gl
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
 
 libv.ui: lua binding | or rather a lua component or prototype parsing
@@ -1286,9 +1387,9 @@ libv.ui: possible component list https://en.wikipedia.org/wiki/Widget_(GUI)
 
 libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations
 
-libv.utility: add/verify structured binding support for vec_t
-
 libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras | Cancel! 100%+ is valid (Example: button with a 120% shadow around it)
+
+libv.glr: MAYOR OVERHAUL: remove the queue, use thread local GLR context variable access, remove the idea of sorting, switch to immediate mode
 
 libv.glr: Cleanup includes for:
 			libv/glr/mesh.cpp
@@ -1311,14 +1412,13 @@ libv.glr: Implement head pattern for:
 			libv/glr/texture.cpp
 			libv/glr/texture.hpp
 libv.glr: GLR User facing API shall not expose to the OpenGL header
-libv.glr: better name for DestroyQueue
+libv.glr: better name for DestroyQueue (? and use thread local acces for it)
 libv.glr: libv/glr/remote.hpp only included in glr files to fetch DestroyQueue, pass that around instead (with a better name), could be boundeled with the gl reference.
-libv.glr: create bool -> remote == nullptr
+libv.glr: create bool -> remote == nullptr | or negative index
 
 libv.glr: too many variant, function / arg streams?, uniform_stream has a similar pattern that could be generalized
 
 libv.gl: Check on TextureRect if it is working properly (attempted to use it in font2D but failed, image was correct indexing/sampler issues (?))
-libv.math: make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
 
 libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
 libv.glr: Mesh attributes should use a single VBO
@@ -1334,21 +1434,20 @@ libv.glr: UniformBlockSharedView_std140
 libv.ui: constraints: a way of syncing data between the world and the ui
 libv.ui.layout: Flow
 libv.ui.layout: 2D <-> 3D based on game state
-libv.ui: ui <-> 3D layout linkage: planet names and additional informations are part of the ui and not the scene
+libv.ui: ui <-> 3D layout linkage: planet names and additional information is part of the ui and not the scene
 		ui therefore has to access the game state (trivial, but this code has to happen now)
 
 libv.ui: text | easy text
-libv.ui: Idea that a component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
+libv.ui: idea: A component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
 libv.ui: String2D scream at the user if the API get a \r (or any non printable character beside \n \t), and ignore it
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
-libv.glr: Implement sub-mesh API
 libv.glr: Fix uniform naming mess, Reduce the number of public members
 
 libv.glr: vm4 | non trivial
-libv.vm4: in header include version
-libv.vm4: in header include date
-libv.vm4: in header include hash
+libv.vm4: in model header include version
+libv.vm4: in model header include date
+libv.vm4: in model header include hash
 libv.vm4: geomax / geoorig: find the biggest distance between any two vertex, avg(a, b) = geoorig, dist(a, b) / 2 = geomax
 libv.va4/ia4: (Iris/Vader Asset 4) New "library" to handle vm4 models and bundle them.
 libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate, play animation, etc...

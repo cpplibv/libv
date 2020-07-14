@@ -150,8 +150,10 @@ void CorePanelGrid::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& environment) {
-	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, environment.size);
+libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
+
+	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, env_size);
 
 	const auto column_count = property.column_count();
 	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
@@ -213,11 +215,13 @@ libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 	result[_X_] = static_cast<float>(libv::bisect_rampup_3way(attemptX, 0, 0));
 	result[_Y_] = static_cast<float>(libv::bisect_rampup_3way(attemptY, 0, 0));
 
-	return result;
+	return result + padding_size3();
 }
 
-void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
-	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, environment.size);
+void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
+
+	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, env_size);
 
 	// TODO P4: generalize a way for table lookup for various table lookup and handle invalid enum values
 	const auto column_count = property.column_count();
@@ -237,7 +241,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 		for (const auto& child : l_children) {
 			const auto ratio = child->size()[_D_].ratio;
 			if (ratio != libv::Approx(0.f)) {
-				ratioScale = environment.size[_D_] / ratio;
+				ratioScale = env_size[_D_] / ratio;
 				hasRatio = true;
 				break;
 			}
@@ -259,7 +263,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 				for (const auto& child : firstDimension) {
 					const auto childSize =
 							child->size()[_D_].pixel +
-							child->size()[_D_].percent * environment.size[_D_] * 0.01f +
+							child->size()[_D_].percent * env_size[_D_] * 0.01f +
 							child->size()[_D_].ratio * ratioScale +
 							(child->size()[_D_].dynamic ? child.dynamic[_D_] : 0.f);
 
@@ -273,7 +277,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 				ratioCount += firstSubDimRatioCount;
 			}
 
-			float overshoot = size - environment.size[_D_];
+			float overshoot = size - env_size[_D_];
 			ratioScale -= overshoot / ratioCount;
 
 			if (ratioCount == libv::Approx(0.f))
@@ -294,7 +298,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 		for (const auto& child : l_children) {
 			const auto ratio = child->size()[_D_].ratio;
 			if (ratio != libv::Approx(0.f)) {
-				ratioScale = environment.size[_D_] / ratio;
+				ratioScale = env_size[_D_] / ratio;
 				hasRatio = true;
 				break;
 			}
@@ -311,9 +315,9 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 
 			const auto used =
 					child->size()[_D_].pixel +
-					child->size()[_D_].percent * environment.size[_D_] * 0.01f +
+					child->size()[_D_].percent * env_size[_D_] * 0.01f +
 					(child->size()[_D_].dynamic ? child.dynamic[_D_] : 0.f);
-			const auto leftover = environment.size[_D_] - used;
+			const auto leftover = env_size[_D_] - used;
 			const auto contribution = leftover / child->size()[_D_].ratio;
 
 			ratioScale = std::min(ratioScale, contribution);
@@ -339,7 +343,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 
 			childSize = libv::build_vec<3>([&](const auto i) {
 				return child->size()[i].pixel +
-						child->size()[i].percent * environment.size[i] * 0.01f +
+						child->size()[i].percent * env_size[i] * 0.01f +
 						child->size()[i].ratio * ratioContribution[i] +
 						(child->size()[i].dynamic ? child.dynamic[i] : 0.f);
 			});
@@ -351,12 +355,11 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 
 	// --- Position ------------------------------------------------------------------------------------
 
-	const auto origin = environment.position;
 	auto sizeContent = libv::vec3f{};
 	sizeContent[_X_] = libv::sum(advanceX, 0);
 	sizeContent[_Y_] = libv::sum(advanceY, 0);
 
-	const auto originToContent = (environment.size - sizeContent) * to_info(anchor());
+	const auto originToContent = (env_size - sizeContent) * anchor().to_info();
 	const auto contentToStart = sizeContent * orient.start;
 	auto startToPen = vec3f{};
 
@@ -367,22 +370,18 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 			auto cellSize = libv::vec3f{};
 			cellSize[_X_] = advanceX[x];
 			cellSize[_Y_] = advanceY[y];
-			cellSize[_Z_] = environment.size[_Z_];
+			cellSize[_Z_] = env_size[_Z_];
 
 			const auto penToCell = orient.penCorner * cellSize;
-			const auto cellToPosition = (cellSize - childSize) * to_info(child->anchor());
+			const auto cellToPosition = (cellSize - childSize) * child->anchor().to_info();
 
-			const auto position = origin + originToContent + contentToStart + startToPen + penToCell + cellToPosition;
+			const auto position = padding_LB3() + originToContent + contentToStart + startToPen + penToCell + cellToPosition;
 			const auto roundedPosition = libv::vec::round(position);
 			const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 			AccessLayout::layout2(
 					child.component->core(),
-					ContextLayout2{
-						roundedPosition,
-						roundedSize,
-						MouseOrder{libv::to_value(environment.mouseOrder) + 1}
-					}
+					layout_env.enter(roundedPosition, roundedSize)
 			);
 
 			startToPen[_X_] += orient.direction[_X_] * advanceX[x];

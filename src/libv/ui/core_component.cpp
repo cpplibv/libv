@@ -20,6 +20,8 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/style.hpp>
 
+#include <libv/ui/component.hpp>
+
 
 namespace libv {
 namespace ui {
@@ -88,8 +90,8 @@ void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 	for (auto it = parent; true; it = it->parent) {
 		Flag_t childFlags = Flag::none;
 
-		it->doForeachChildren([&childFlags](CoreComponent& child) {
-			childFlags |= child.flags;
+		it->doForeachChildren([&childFlags](Component& child) {
+			childFlags |= child.core().flags;
 		});
 
 		if (it->flags.match_mask(Flag::mask_propagate, childFlags))
@@ -181,7 +183,7 @@ void CoreComponent::markRemove() noexcept {
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
 
-	doForeachChildren([](CoreComponent& child) {
+	doForeachChildren([](Component& child) {
 		child.markRemove();
 	});
 }
@@ -300,9 +302,9 @@ void CoreComponent::attach(CoreComponent& parent_) {
 	}
 
 	if (flags.match_any(Flag::pendingAttachChild)) {
-		doForeachChildren([this](CoreComponent& child) {
-			if (child.flags.match_any(Flag::pendingAttach))
-				child.attach(*this);
+		doForeachChildren([this](Component& child) {
+			if (child.core().flags.match_any(Flag::pendingAttach))
+				child.core().attach(*this);
 		});
 		flags.reset(Flag::pendingAttachChild);
 	}
@@ -312,14 +314,14 @@ void CoreComponent::detach(CoreComponent& parent_) {
 	if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
-		doDetachChildren([this, &parent_, &childFlags](CoreComponent& child) {
-			bool remove = child.flags.match_any(Flag::pendingDetachSelf);
+		doDetachChildren([this, &parent_, &childFlags](Component& child) {
+			bool remove = child.core().flags.match_any(Flag::pendingDetachSelf);
 
-			if (child.flags.match_any(Flag::pendingDetach))
-				child.detach(*this);
+			if (child.core().flags.match_any(Flag::pendingDetach))
+				child.core().detach(*this);
 
 			if (!remove)
-				childFlags |= child.flags;
+				childFlags |= child.core().flags;
 
 			return remove;
 		});
@@ -369,9 +371,9 @@ void CoreComponent::style() {
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
-		doForeachChildren([](CoreComponent& child) {
-			if (child.flags.match_any(Flag::pendingStyle))
-				child.style();
+		doForeachChildren([](Component& child) {
+			if (child.core().flags.match_any(Flag::pendingStyle))
+				child.core().style();
 		});
 		flags.reset(Flag::pendingStyleChild);
 	}
@@ -383,14 +385,14 @@ void CoreComponent::styleScan() {
 		doStyle(ctx);
 		parent->doStyle(ctx, childID);
 	}
-	doForeachChildren([](CoreComponent& child) {
-		child.styleScan();
+	doForeachChildren([](Component& child) {
+		child.core().styleScan();
 	});
 	flags.reset(Flag::pendingStyle);
 }
 
 libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocusTraverse& context) {
-	// Algorithm driver method, does not directly recurse, up walking
+	// Algorithm driver method, does not directly recurse, only does the up walking
 
 	libv::observer_ptr<CoreComponent> result = doFocusTraverse(context, ChildIDSelf);
 	libv::observer_ref<CoreComponent> ancestor = *this;
@@ -403,82 +405,87 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 	return result;
 }
 
-void CoreComponent::render(ContextRender& context) {
-	if (isRendered()) {
-		context.changedLayout = flags.match_any(Flag::updatedPosition | Flag::updatedSize);
-		context.changedPosition = flags.match_any(Flag::updatedPosition);
-		context.changedSize = flags.match_any(Flag::updatedSize);
-
-		if (flags.match_any(Flag::pendingCreate)) {
-			doCreate(context);
-			flags.reset(Flag::pendingCreate);
-		}
-
-		{
-	//	if (flags.match_any(Flag::pendingRender)) {
-			doRender(context);
-
-			doForeachChildren([&context](CoreComponent& child) {
-				child.render(context);
-			});
-	//		flags.reset(Flag::pendingRender);
-		}
-
-		flags.reset(Flag::updatedPosition | Flag::updatedSize);
-	}
-
-	if (flags.match_any(Flag::pendingDetachSelf)) {
-		doDestroy(context);
-		return;
-	}
-}
-
-libv::vec3f CoreComponent::layout1(const ContextLayout1& environment) {
-	const auto result = doLayout1(environment);
+libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
+	const auto result = doLayout1(layout_env);
 	log_ui.trace("Layout dynamic {:>11}, {}", result, path());
 	return result;
 }
 
-void CoreComponent::layout2(const ContextLayout2& environment) {
+void CoreComponent::layout2(const ContextLayout2& layout_env) {
 //	log_ui.trace("Layout Pass2 {}", path());
 	bool boundsChanged = false;
 
-	if (environment.position != layout_position_) {
+	if (layout_env.position != layout_position_) {
 		boundsChanged = true;
 		flags.set(Flag::updatedPosition);
-		layout_position_ = environment.position;
+		layout_position_ = layout_env.position;
 	}
 
-	if (environment.size != layout_size_) {
+	if (layout_env.size != layout_size_) {
 		boundsChanged = true;
 		flags.set(Flag::updatedSize);
-		layout_size_ = environment.size;
+		layout_size_ = layout_env.size;
 	}
 
+	// <<< P1: abs_position is a bad name, it will be region_position or something like that
+	// <<< P1: Has to update mouse context based on abs_position/region_position change too, not just position change
+	//      Context Layout extra member bool to indicate global position changes
+	//      If it is set iterate every child except if its a mouse region
+
 	if (boundsChanged && flags.match_any(Flag::watchMouse)) {
-		context().mouse.update(
-			*this,
-			libv::vec::xy(environment.position),
-			libv::vec::xy(environment.size),
-			environment.mouseOrder);
+		context().mouse.update(*this, layout_env.abs_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});
 	}
 
 	if (boundsChanged || flags.match_any(Flag::pendingLayout)) {
 
 		if (boundsChanged || flags.match_any(Flag::pendingLayoutSelf)) {
 			// Layout self
-			doLayout2(environment);
+			doLayout2(layout_env);
 			log_ui.trace("Layout {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
 
 		} else {
 			// Layout the children only
-			doForeachChildren([&environment](CoreComponent& child) {
-				child.layout2(ContextLayout2{child.layout_position_, child.layout_size_, MouseOrder{libv::to_value(environment.mouseOrder) + 1}});
+			doForeachChildren([&layout_env](Component& child) {
+				child.core().layout2(layout_env.enter(child.layout_position(), child.layout_size()));
 			});
 			log_ui.trace("   |   {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
 		}
 
 		flags.reset(Flag::pendingLayout);
+	}
+}
+
+void CoreComponent::render(Renderer& r) {
+	if (isRendered()) {
+		r.changed_layout = flags.match_any(Flag::updatedPosition | Flag::updatedSize);
+		r.changed_position = flags.match_any(Flag::updatedPosition);
+		r.changed_size = flags.match_any(Flag::updatedSize);
+
+		if (flags.match_any(Flag::pendingCreate)) {
+			doCreate(r);
+			flags.reset(Flag::pendingCreate);
+		}
+
+		{ // if (flags.match_any(Flag::pendingRender)) {
+			r.translate(layout_position());
+			doRender(r);
+
+//			doForeachChildren([&r](Component& child) {
+////				const auto guard_m = glr.model.push_guard();
+////				glr.model.translate(child.layout_position());
+//
+//				Renderer rc = r.enter(child);
+//				child.core().render(rc);
+//			});
+
+			r.translate(-layout_position()); // <<< P7: Need proper guarding
+		}
+
+		flags.reset(Flag::updatedPosition | Flag::updatedSize | Flag::pendingRender);
+	}
+
+	if (flags.match_any(Flag::pendingDetachSelf)) {
+		doDestroy(r);
 	}
 }
 
@@ -488,7 +495,7 @@ void CoreComponent::doAttach() { }
 
 void CoreComponent::doDetach() { }
 
-void CoreComponent::doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
+void CoreComponent::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
 	(void) callback;
 }
 
@@ -510,18 +517,6 @@ libv::observer_ptr<CoreComponent> CoreComponent::doFocusTraverse(const ContextFo
 	return libv::make_observer(this);
 }
 
-void CoreComponent::doCreate(ContextRender& context) {
-	(void) context;
-}
-
-void CoreComponent::doDestroy(ContextRender& context) {
-	(void) context;
-}
-
-void CoreComponent::doRender(ContextRender& context) {
-	(void) context;
-}
-
 libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
@@ -532,11 +527,23 @@ void CoreComponent::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
 }
 
-void CoreComponent::doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
+void CoreComponent::doCreate(Renderer& context) {
+	(void) context;
+}
+
+void CoreComponent::doRender(Renderer& context) {
+	(void) context;
+}
+
+void CoreComponent::doDestroy(Renderer& context) {
+	(void) context;
+}
+
+void CoreComponent::doForeachChildren(libv::function_ref<bool(Component&)> callback) {
 	(void) callback;
 }
 
-void CoreComponent::doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) {
+void CoreComponent::doForeachChildren(libv::function_ref<void(Component&)> callback) {
 	(void) callback;
 }
 

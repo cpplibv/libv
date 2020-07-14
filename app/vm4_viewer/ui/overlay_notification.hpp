@@ -18,13 +18,13 @@ class OverlayNotification : public libv::ui::PanelLine {
 public:
 	explicit OverlayNotification(libv::ui::CoreComponent& parent);
 	OverlayNotification(libv::ui::CoreComponent& parent, std::string name);
-	OverlayNotification(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
+	OverlayNotification(libv::ui::CoreComponent& parent, libv::ui::GenerateName_t, std::string_view type);
 	~OverlayNotification();
 
 public:
-	void info(std::string text, const libv::ui::time_duration duration);
-	void warn(std::string text, const libv::ui::time_duration duration);
-	void error(std::string text, const libv::ui::time_duration duration);
+	void info(std::string text, libv::ui::time_duration duration);
+	void warn(std::string text, libv::ui::time_duration duration);
+	void error(std::string text, libv::ui::time_duration duration);
 };
 
 // -------------------------------------------------------------------------------------------------

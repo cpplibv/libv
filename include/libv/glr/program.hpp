@@ -75,6 +75,11 @@ private:
 
 public:
 	Program() noexcept;
+	Program(std::shared_ptr<RemoteProgram> remote) noexcept;
+
+	Program base_ref() {
+		return Program(remote);
+	}
 
 public:
 	void vertex(std::string source) noexcept;

@@ -3,8 +3,6 @@
 // hpp
 #include <libv/ui/component/scroll_bar.hpp>
 // libv
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/queue.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/math/snap.hpp>
 #include <libv/utility/approx.hpp>
@@ -18,6 +16,7 @@
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
@@ -40,6 +39,11 @@ private:
 	template <typename T> static void access_properties(T& ctx);
 
 private:
+	struct BarBounds {
+		libv::vec2f position;
+		libv::vec2f size;
+	};
+
 	enum class DragMode : uint8_t {
 		idle,
 		track,
@@ -59,10 +63,6 @@ private:
 	} property;
 
 private:
-	libv::glr::Mesh bar_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Mesh bg_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
-private:
 	double value_ = 0.0;
 	double value_max_ = 100.0;
 	double value_min_ = 0.0;
@@ -72,6 +72,8 @@ private:
 private:
 	libv::vec2f drag_point;
 	DragMode drag_mode = DragMode::idle;
+
+	BarBounds bar_bounds_;
 
 //	double scroll_step_button;
 //	double scroll_step_scroll;
@@ -85,7 +87,7 @@ public:
 
 private:
 //	inline auto bar_size() const noexcept;
-	inline auto bar_bounds() const noexcept;
+	inline BarBounds bar_bounds() const noexcept;
 
 private:
 	virtual void onMouseButton(const EventMouseButton& event) override;
@@ -97,7 +99,7 @@ private:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -203,7 +205,7 @@ static constexpr OrientationData OrientationTable[] = {
 
 // -------------------------------------------------------------------------------------------------
 
-inline auto CoreScrollBar::bar_bounds() const noexcept {
+inline CoreScrollBar::BarBounds CoreScrollBar::bar_bounds() const noexcept {
 	//
 	//                    Orientation::BOTTOM_TO_TOP
 	//          value == value_min             value == value_max
@@ -250,18 +252,15 @@ inline auto CoreScrollBar::bar_bounds() const noexcept {
 	);
 	const auto position_bar_y = 0.0f;
 
-	struct Bounds {
-		libv::vec2f position;
-		libv::vec2f size;
-	} bar;
+	BarBounds result;
 
-	bar.size[orient.dim_control] = static_cast<float>(size_bar_x);
-	bar.size[orient.dim_secondary] = static_cast<float>(size_bar_y);
+	result.size[orient.dim_control] = static_cast<float>(size_bar_x);
+	result.size[orient.dim_secondary] = static_cast<float>(size_bar_y);
 
-	bar.position[orient.dim_control] = static_cast<float>(position_bar_x);
-	bar.position[orient.dim_secondary] = static_cast<float>(position_bar_y);
+	result.position[orient.dim_control] = static_cast<float>(position_bar_x);
+	result.position[orient.dim_secondary] = static_cast<float>(position_bar_y);
 
-	return bar;
+	return result;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -269,7 +268,7 @@ inline auto CoreScrollBar::bar_bounds() const noexcept {
 void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
-		const auto bar = bar_bounds();
+		const auto bar = bar_bounds_;
 		// TODO P0: libv.ui: correct local mouse position;
 		const auto local_mouse = context().state.mouse_position() - layout_position2();
 
@@ -326,7 +325,7 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 		return;
 
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
-	const auto bar = bar_bounds();
+	const auto bar = bar_bounds_; // Cache bar_bounds
 	// TODO P0: libv.ui: correct local mouse position;
 	const auto local_mouse = event.mouse_position - layout_position2();
 	const auto value_extent = std::abs(value_max_ - value_min_);
@@ -390,65 +389,19 @@ libv::vec3f CoreScrollBar::doLayout1(const ContextLayout1& environment) {
 void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
 
-	{
-		bg_mesh.clear();
-
-		auto pos = bg_mesh.attribute(attribute_position);
-		auto tex = bg_mesh.attribute(attribute_texture0);
-		auto index = bg_mesh.index();
-
-		pos(0, 0, 0);
-		pos(layout_size().x, 0, 0);
-		pos(layout_size().x, layout_size().y, 0);
-		pos(0, layout_size().y, 0);
-
-		tex(0, 0);
-		tex(1, 0);
-		tex(1, 1);
-		tex(0, 1);
-
-		index.quad(0, 1, 2, 3);
-	}
-	{
-		bar_mesh.clear();
-
-		auto pos = bar_mesh.attribute(attribute_position);
-		auto tex = bar_mesh.attribute(attribute_texture0);
-		auto index = bar_mesh.index();
-
-		const auto bar = bar_bounds();
-
-		pos(bar.position.x, bar.position.y, 0);
-		pos(bar.position.x + bar.size.x, bar.position.y, 0);
-		pos(bar.position.x + bar.size.x, bar.position.y + bar.size.y, 0);
-		pos(bar.position.x, bar.position.y + bar.size.y, 0);
-
-		tex(0, 0);
-		tex(1, 0);
-		tex(1, 1);
-		tex(0, 1);
-
-		index.quad(0, 1, 2, 3);
-	}
+	bar_bounds_ = bar_bounds(); // Cache bar_bounds
 }
 
-void CoreScrollBar::doRender(ContextRender& ctx) {
-	const auto guard_m = ctx.gl.model.push_guard();
- 	ctx.gl.model.translate(layout_position());
+void CoreScrollBar::doRender(Renderer& r) {
+	r.texture_2D({0, 0}, layout_size2(), {0, 0}, {1, 1},
+			property.bg_color(),
+			property.bg_image(),
+			property.bg_shader());
 
-	{
-		ctx.gl.program(*property.bg_shader());
-		ctx.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
-		ctx.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-		ctx.gl.uniform(property.bg_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(bg_mesh);
-	} {
-		ctx.gl.program(*property.bar_shader());
-		ctx.gl.texture(property.bar_image()->texture(), property.bar_shader()->textureChannel);
-		ctx.gl.uniform(property.bar_shader()->uniform_color, property.bar_color());
-		ctx.gl.uniform(property.bar_shader()->uniform_MVPmat, ctx.gl.mvp());
-		ctx.gl.render(bar_mesh);
-	}
+	r.texture_2D(bar_bounds_.position, bar_bounds_.size, {0, 0}, {1, 1},
+			property.bar_color(),
+			property.bar_image(),
+			property.bar_shader());
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -472,6 +425,7 @@ void ScrollBar::value(double var) {
 
 	const auto change = var - self().value_;
 	self().value_ = var;
+	self().bar_bounds_ = self().bar_bounds(); // Cache bar_bounds
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	self().fire(EventScrollChange{change});
 }

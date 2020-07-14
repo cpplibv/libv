@@ -25,13 +25,13 @@ ViewerInfoPanel::ViewerInfoPanel(CoreComponent& parent, libv::ui::GenerateName_t
 	libv::ui::PanelLine(parent, libv::ui::GenerateName, type) { }
 
 void ViewerInfoPanel::doAttach() {
-	set(property.align_horizontal, libv::ui::AlignHorizontal::Left);
-	set(property.align_vertical, libv::ui::AlignVertical::Top);
+	set(property.align_horizontal, libv::ui::AlignHorizontal::left);
+	set(property.align_vertical, libv::ui::AlignVertical::top);
 	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
 
 //	{
 //		auto style = context().style("vm4pv.label_info");
-//		style->set("align", libv::ui::AlignHorizontal::Right);
+//		style->set("align", libv::ui::AlignHorizontal::right);
 //		style->set("font", context().font("consola.ttf"));
 //		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 //		style->set("font_size", libv::ui::FontSize{10});
@@ -42,7 +42,7 @@ void ViewerInfoPanel::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.h1");
-		style->set("align", libv::ui::AlignHorizontal::Right);
+		style->set("align", libv::ui::AlignHorizontal::right);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -53,7 +53,7 @@ void ViewerInfoPanel::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.value");
-		style->set("align", libv::ui::AlignHorizontal::Left);
+		style->set("align", libv::ui::AlignHorizontal::left);
 //		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -62,7 +62,7 @@ void ViewerInfoPanel::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.info.bar");
-		style->set("align", libv::ui::AlignHorizontal::Center);
+		style->set("align", libv::ui::AlignHorizontal::center);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 100%)"));
 		style->set("bg_image", context().texture2D("separator_bar_256x16.png"));
 		style->set("font_color", libv::parse::parse_color_or_throw("hsva(170, 2%, 90%, 100%)"));

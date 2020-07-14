@@ -6,6 +6,7 @@
 #include <libv/algorithm/erase_if_stable.hpp>
 // pro
 #include <libv/ui/context/context_focus_traverse.hpp>
+#include <libv/ui/context/context_render.hpp>
 #include <libv/ui/log.hpp>
 //#include <libv/ui/context/context_style.hpp>
 //#include <libv/ui/style.hpp>
@@ -40,11 +41,18 @@ void CoreBasePanel::clear() {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreBasePanel::doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
+void CoreBasePanel::doRender(Renderer& r) {
+	for (auto& child : children) {
+		Renderer rc = r.enter(child);
+		AccessParent::render(child.core(), rc);
+	}
+}
+
+void CoreBasePanel::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
 	ChildID numRemoved = 0;
 
 	libv::erase_if_stable(children, [&numRemoved, &callback](auto& child) {
-		const bool remove = callback(child.core());
+		const bool remove = callback(child);
 
 		if (remove)
 			++numRemoved;
@@ -83,15 +91,15 @@ libv::observer_ptr<CoreComponent> CoreBasePanel::doFocusTraverse(const ContextFo
 	return nullptr;
 }
 
-void CoreBasePanel::doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
+void CoreBasePanel::doForeachChildren(libv::function_ref<bool(Component&)> callback) {
 	for (auto& child : children)
-		if (not callback(child.core()))
+		if (not callback(child))
 			return;
 }
 
-void CoreBasePanel::doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) {
+void CoreBasePanel::doForeachChildren(libv::function_ref<void(Component&)> callback) {
 	for (auto& child : children)
-		callback(child.core());
+		callback(child);
 }
 
 // -------------------------------------------------------------------------------------------------

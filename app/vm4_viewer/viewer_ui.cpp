@@ -36,7 +36,7 @@ ViewerUI::ViewerUI(CoreComponent& parent) :
 	scene.camera.rotate_x(libv::to_rad(45.f));
 	scene.camera.rotate_z(libv::to_rad(45.f));
 
-	// <<< P5: app_vm4v: control integration
+	// <<< P95: app_vm4v: control integration
 	auto fr = libv::ctrl::FeatureRegister{controls};
 	CameraBehaviour::register_controls(fr);
 	CameraBehaviour::bind_controls(controls);
@@ -113,7 +113,7 @@ void ViewerUI::onFocus(const libv::ui::EventFocus& event) {
 void ViewerUI::onMouseButton(const libv::ui::EventMouseButton& event) {
 	focus();
 
-	// <<< P5: app_vm4v: control integration
+	// <<< P95: app_vm4v: control integration
 	controls.input(libv::input::EventMouseButton{event.button, event.action});
 	event.stop_propagation();
 }
@@ -122,7 +122,7 @@ void ViewerUI::onMouseMovement(const libv::ui::EventMouseMovement& event) {
 	if (not isFocused())
 		return;
 
-	// <<< P5: app_vm4v: control integration
+	// <<< P95: app_vm4v: control integration
 	controls.input(libv::input::EventMousePosition{libv::vec2d{event.mouse_position}});
 	event.stop_propagation();
 }
@@ -131,7 +131,7 @@ void ViewerUI::onMouseScroll(const libv::ui::EventMouseScroll& event) {
 	if (not isFocused())
 		return;
 
-	// <<< P5: app_vm4v: control integration
+	// <<< P95: app_vm4v: control integration
 	controls.input(libv::input::EventMouseScroll{libv::vec2d{event.scroll_movement}});
 	event.stop_propagation();
 }
@@ -155,7 +155,7 @@ void ViewerUI::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.label_version");
-		style->set("align", libv::ui::AlignHorizontal::Right);
+		style->set("align", libv::ui::AlignHorizontal::right);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -174,8 +174,8 @@ void ViewerUI::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.file_list");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::top);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
 		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
@@ -185,7 +185,7 @@ void ViewerUI::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.label_help");
-		style->set("align", libv::ui::AlignHorizontal::Right);
+		style->set("align", libv::ui::AlignHorizontal::right);
 		style->set("font", context().font("consola.ttf"));
 		style->set("font_color", libv::parse::parse_color_or_throw("rgba(187, 191, 195, 75%)"));
 		style->set("font_size", libv::ui::FontSize{10});
@@ -196,8 +196,8 @@ void ViewerUI::doAttach() {
 
 	{
 		auto style = context().style("overlay.notification");
-		style->set("align", libv::ui::AlignHorizontal::Center);
-		style->set("align_vertical", libv::ui::AlignVertical::Top);
+		style->set("align", libv::ui::AlignHorizontal::center);
+		style->set("align_vertical", libv::ui::AlignVertical::top);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 //		style->set("bg_shader", context().shaderQuad());
@@ -209,8 +209,8 @@ void ViewerUI::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	} {
 		auto style = context().style("overlay.notification.bubble");
-		style->set("align", libv::ui::AlignHorizontal::Center);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align", libv::ui::AlignHorizontal::center);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 //		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 		style->set("bg_shader", context().shaderQuad());
@@ -222,8 +222,8 @@ void ViewerUI::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	} {
 		auto style = context().style("overlay.notification.text");
-//		style->set("align", libv::ui::AlignHorizontal::Center);
-//		style->set("align_vertical", libv::ui::AlignVertical::Top);
+//		style->set("align", libv::ui::AlignHorizontal::center);
+//		style->set("align_vertical", libv::ui::AlignVertical::top);
 //		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 //		style->set("bg_shader", context().shaderQuad());
@@ -235,8 +235,8 @@ void ViewerUI::doAttach() {
 //		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	} {
 		auto style = context().style("overlay.shader_error");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 0, 0, 20%)"));
 //		style->set("bg_shader", context().shaderQuad());
@@ -248,8 +248,8 @@ void ViewerUI::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	} {
 		auto style = context().style("overlay.shader_error.text");
-		style->set("align_horizontal", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align_horizontal", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 //		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 0, 0, 20%)"));
 //		style->set("bg_shader", context().shaderQuad());
@@ -262,8 +262,8 @@ void ViewerUI::doAttach() {
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
 	} {
 		auto style = context().style("overlay.shader_inspector");
-		style->set("align", libv::ui::AlignHorizontal::Left);
-		style->set("align_vertical", libv::ui::AlignVertical::Center);
+		style->set("align", libv::ui::AlignHorizontal::left);
+		style->set("align_vertical", libv::ui::AlignVertical::center);
 		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(0, 0, 0, 40%)"));
 		style->set("bg_shader", context().shaderQuad());

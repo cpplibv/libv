@@ -2,22 +2,17 @@
 
 // hpp
 #include <libv/ui/component/scroll_pane.hpp>
-// libv
-//#include <libv/utility/approx.hpp>
-//#include <libv/utility/enum.hpp>
-//#include <libv/utility/min_max.hpp>
 // std
 #include <optional>
 // pro
-#include <libv/glr/queue.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
-//#include <libv/ui/layout/view_layouted.lpp>
-//#include <libv/ui/log.hpp>
+
+#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -32,6 +27,8 @@ class CoreScrollArea : public CoreComponent {
 private:
 	struct Properties {
 		PropertyL<ScrollAreaMode> mode;
+//		PropertyL<libv::vec2f> area_position;
+//		PropertyL<libv::vec2f> area_size;
 	} property;
 
 	struct ChildProperties {
@@ -63,15 +60,17 @@ public:
 	}
 
 private:
-	virtual void doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
+	virtual void doAttach() override;
+	virtual void doDetach() override;
+	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
-	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback) override;
+	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -125,48 +124,80 @@ void CoreScrollArea::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreScrollArea::doAttach() {
+	// <<< P6: scroll area subscribe_region
+//	context().mouse.subscribe_region(this);
+}
+
+void CoreScrollArea::doDetach() {
+	// <<< P6: scroll area unsubscribe_region
+//	context().mouse.unsubscribe_region(this);
+}
+
 libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& environment) {
 	if (!client)
 		return {};
 
-	return AccessLayout::layout1(client->core(), ContextLayout1{environment.size});
+	return AccessLayout::layout1(client->core(), ContextLayout1{environment.size - padding_size3()}) + padding_size3();
 }
 
 void CoreScrollArea::doLayout2(const ContextLayout2& environment) {
 	if (!client)
 		return;
 
-	ContextLayout2 client_env = environment;
+	// <<< P5: Use client's anchor for (initial) positioning inside the scroll area
+	const auto client_position = padding_LB3() + vec3f(0, environment.size.y - padding_size3().y, 0);
+	auto client_size = environment.size;
 
 	switch (property.mode()) {
 	case ScrollAreaMode::both:
-		client_env.size.x = -1;
-		client_env.size.y = -1; break;
+		client_size.x = -1;
+		client_size.y = -1; break;
 	case ScrollAreaMode::horizontal:
-		client_env.size.x = -1; break;
+		client_size.x = -1; break;
 	case ScrollAreaMode::vertical:
-		client_env.size.y = -1; break;
+		client_size.y = -1; break;
 	}
 
-	AccessLayout::layout2(client->core(), client_env);
+	AccessLayout::layout2(client->core(), environment.enter(client_position, client_size));
 }
 
-void CoreScrollArea::doRender(ContextRender& environment) {
-	switch (property.mode()) {
-	case ScrollAreaMode::both:
-		environment.clip({}, layout_size2()); break;
-	case ScrollAreaMode::horizontal:
-		environment.clip({}, libv::vec2f(-1, layout_size2().y)); break;
-	case ScrollAreaMode::vertical:
-		environment.clip({}, libv::vec2f(layout_size2().x, -1)); break;
+void CoreScrollArea::doRender(Renderer& r) {
+	if (!client)
+		return;
+
+	// <<< P4: scroll area clip and translate
+
+//	switch (property.mode()) {
+//	case ScrollAreaMode::both:
+//		environment.clip({}, layout_size2()); break;
+//	case ScrollAreaMode::horizontal:
+//		environment.clip({}, libv::vec2f(-1, layout_size2().y)); break;
+//	case ScrollAreaMode::vertical:
+//		environment.clip({}, libv::vec2f(layout_size2().x, -1)); break;
+//	}
+
+	r.clip(layout_position2(), layout_size2());
+	//log_ui.info("Clip to: {}, {}", layout_position2(), layout_size2());
+//	r.clip({}, layout_size2());
+
+	r.translate({libv::vec::round(area_position), 0});
+//	const auto pos = libv::vec::round(-area_position);
+//	r.translate(pos.x, pos.y, 0);
+
+	Renderer rc = r.enter(*client);
+	AccessParent::render(client->core(), rc);
+
+	r.translate({libv::vec::round(-area_position), 0}); // <<< P7: Need proper guarding
+}
+
+void CoreScrollArea::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
+	if (!client) {
+		assert(false && "Internal error: Requesting detach for a not set client component");
+		return;
 	}
 
-	const auto pos = libv::vec::round(-area_position);
-	environment.gl.model.translate(pos.x, pos.y, 0);
-}
-
-void CoreScrollArea::doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
-	callback(client->core());
+	callback(*client);
 }
 
 libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
@@ -194,21 +225,23 @@ libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextF
 //		if (auto hit = AccessParent::doFocusTraverse(children[i].core(), context, ChildIDNone))
 //			return hit;
 
+	// <<< P8: focus traverse inside scroll area
+
 	return nullptr;
 }
 
-void CoreScrollArea::doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) {
+void CoreScrollArea::doForeachChildren(libv::function_ref<bool(Component&)> callback) {
 	if (!client)
 		return;
 
-	callback(client->core());
+	callback(*client);
 }
 
-void CoreScrollArea::doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) {
+void CoreScrollArea::doForeachChildren(libv::function_ref<void(Component&)> callback) {
 	if (!client)
 		return;
 
-	callback(client->core());
+	callback(*client);
 }
 
 // =================================================================================================
@@ -324,7 +357,7 @@ void ScrollArea::area_size(libv::vec2f value) noexcept {
 //	virtual void doAttach() override;
 //	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;
-//	virtual void doRender(ContextRender& context) override;
+//	virtual void doRender(Renderer& r) override;
 //	virtual void doStyle(ContextStyle& context) override;
 //	virtual void doStyle(ContextStyle& context, ChildID childID) override;
 //};

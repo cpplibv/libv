@@ -67,7 +67,7 @@ namespace ui {
 //	virtual void doStyle(ContextStyle& ctx) override;
 //	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;
-//	virtual void doRender(ContextRender& context) override;
+//	virtual void doRender(Renderer& r) override;
 //};
 //
 //// -------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ namespace ui {
 //			[](auto& c) -> auto& { return c.property.align_horizontal; },
 //			[](auto& c, auto v) { c.text_.align_horizontal(v); },
 //			[](const auto& c) { return c.text_.align_horizontal(); },
-//			AlignHorizontal::Left,
+//			AlignHorizontal::left,
 //			pgr::appearance, pnm::align_horizontal,
 //			"Horizontal alignment of the text"
 //	);
@@ -104,7 +104,7 @@ namespace ui {
 //			[](auto& c) -> auto& { return c.property.align_vertical; },
 //			[](auto& c, auto v) { c.text_.align_vertical(v); },
 //			[](const auto& c) { return c.text_.align_vertical(); },
-//			AlignVertical::Top,
+//			AlignVertical::top,
 //			pgr::appearance, pnm::align_vertical,
 //			"Vertical alignment of the text"
 //	);
@@ -216,8 +216,8 @@ namespace ui {
 //	text_.limit(libv::vec::xy(environment.size));
 //}
 //
-//void CoreRadioButton::doRender(ContextRender& ctx) {
-//	if (ctx.changedSize) {
+//void CoreRadioButton::doRender(Renderer& r) {
+//	if (ctx.changed_size) {
 //		bg_mesh.clear();
 //		auto pos = bg_mesh.attribute(attribute_position);
 //		auto tex = bg_mesh.attribute(attribute_texture0);

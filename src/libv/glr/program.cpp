@@ -98,6 +98,9 @@ RemoteProgram::~RemoteProgram() noexcept {
 Program::Program() noexcept :
 	remote(std::make_shared<RemoteProgram>()) { }
 
+Program::Program(std::shared_ptr<RemoteProgram> remote) noexcept :
+	remote(std::move(remote)) { }
+
 void Program::vertex(std::string source) noexcept {
 	remote->vertex = std::move(source);
 

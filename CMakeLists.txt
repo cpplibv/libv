@@ -1,6 +1,6 @@
 #
 
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.17)
 project(libv)
 
 include(ExternalProject)
@@ -15,7 +15,7 @@ include(cmake/wish_warning.cmake)
 set(CMAKE_VERBOSE_MAKEFILE off)
 #set(CMAKE_BUILD_TYPE "DEBUG")
 #set(CMAKE_BUILD_TYPE "RELEASE")
-set(CMAKE_BUILD_TYPE "DEV")
+#set(CMAKE_BUILD_TYPE "DEV")
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")
@@ -115,11 +115,11 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 #	SET(CMAKE_AR "gcc-ar")
 #	SET(CMAKE_NM "gcc-nm")
 #	SET(CMAKE_RANLIB "gcc-ranlib")
+#	add_definitions(-DNDEBUG)
 	wish_static_link_std()
 
 elseif(CMAKE_BUILD_TYPE STREQUAL "DEV")
 	add_compile_options(-O3)
-	add_definitions(-DNDEBUG)
 
 else()
 	message(WARNING "Failed to identify [${CMAKE_BUILD_TYPE}] as a build type")
@@ -131,9 +131,9 @@ add_compile_options(-std=c++2a)
 # Tooling ------------------------------------------------------------------------------------------
 
 # Sparing tooling from supporting requires, for now.
-add_definitions(-D "WISH_REQUIRES\\(...\\)=\"requires \(__VA_ARGS__\)\"")
+add_definitions("-D\"WISH_REQUIRES(...)=requires (__VA_ARGS__)\"")
 #wish_add_ide_definition("WISH_REQUIRES(...)" " ")
-add_definitions(-D "IDE_IGNORE\\(...\\)=__VA_ARGS__")
+add_definitions("-D\"IDE_IGNORE(...)=__VA_ARGS__\"")
 
 add_definitions(-DWISH_DATE_LONG="${WISH_DATE_LONG}")
 add_definitions(-DWISH_DATE_SHORT="${WISH_DATE_SHORT}")

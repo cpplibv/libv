@@ -449,6 +449,7 @@ TEST_CASE("Layout UniformsBasic", "[libv.glr.std140]") {
 
 TEST_CASE("Layout UniformsNested", "[libv.glr.std140]") {
 	const auto layout = libv::glr::layout_std140<UniformsNested>(uniformblock_test);
+
 	CHECK(layout._00_float_.location == 0);
 	CHECK(layout._01_vec3f_.location == 16);
 	CHECK(layout._02_nested._00_mat4f.location == 32);
@@ -460,6 +461,7 @@ TEST_CASE("Layout UniformsNested", "[libv.glr.std140]") {
 
 TEST_CASE("Layout UniformsNestedNested", "[libv.glr.std140]") {
 	const auto layout = libv::glr::layout_std140<UniformsNestedNested>(uniformblock_test);
+
 	CHECK(layout._00_float_.location == 0);
 	CHECK(layout._01_vec3f_.location == 16);
 	CHECK(layout._02_nested._00_float_.location == 32);

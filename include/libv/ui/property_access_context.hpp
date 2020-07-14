@@ -8,7 +8,7 @@
 #include <string_view>
 #include <type_traits>
 // pro
-#include <libv/ui/core_component.hpp>
+//#include <libv/ui/core_component.hpp>
 #include <libv/ui/style.hpp>
 
 
@@ -19,8 +19,8 @@ namespace ui {
 
 class ContextUI;
 
-//class CoreComponent;
-//
+class CoreComponent;
+
 //struct BasePropertyInfo {
 //	std::string group;
 //	std::string name;

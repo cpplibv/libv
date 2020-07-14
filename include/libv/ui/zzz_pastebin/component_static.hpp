@@ -231,7 +231,7 @@ private:
 //		});
 //	};
 
-	virtual void doRender(ContextRender& context) override final {
+	virtual void doRender(Renderer& r) override final {
 		ComponentStaticAccess::access(self(), [&context](auto& member) {
 			if constexpr (std::is_base_of_v<CoreComponent, std::remove_cvref_t<decltype(member)>>)
 				member.render(context);

@@ -584,7 +584,7 @@ inline const char* to_string(ShaderType type) {
 	case ShaderType::TessControl: return "tess-control";
 	case ShaderType::TessEvaluation: return "tess-evaluation";
 	}
-	return "unknown";
+	return "<<invalid>>";
 }
 
 inline const char* to_string_short(ShaderType type) {
@@ -599,7 +599,7 @@ inline const char* to_string_short(ShaderType type) {
 	return "?";
 }
 
-// TextureType -------------------------------------------------------------------------------------
+// TextureChannel ----------------------------------------------------------------------------------
 
 enum class TextureChannel : GLint {
 	diffuse = 0,

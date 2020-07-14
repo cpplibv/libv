@@ -2,14 +2,12 @@
 
 // hpp
 #include <libv/ui/component/image.hpp>
-// libv
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
@@ -34,16 +32,13 @@ private:
 		PropertyR<ShaderImage_view> bg_shader;
 	} property;
 
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
 public:
 	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -80,39 +75,16 @@ void CoreImage::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreImage::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
+	const auto dynamic_size_image = property.bg_image()->size().cast<float>() + padding_size();
 
 	return {dynamic_size_image, 0.f};
 }
 
-void CoreImage::doRender(ContextRender& context) {
-	if (context.changedSize) {
-		mesh.clear();
-		auto pos = mesh.attribute(attribute_position);
-		auto tex = mesh.attribute(attribute_texture0);
-		auto index = mesh.index();
-
-		pos(0, 0, 0);
-		pos(layout_size().x, 0, 0);
-		pos(layout_size().x, layout_size().y, 0);
-		pos(0, layout_size().y, 0);
-
-		tex(0, 0);
-		tex(1, 0);
-		tex(1, 1);
-		tex(0, 1);
-
-		index.quad(0, 1, 2, 3);
-	}
-
-	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(layout_position());
-
-	context.gl.program(*property.bg_shader());
-	context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-	context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
-	context.gl.render(mesh);
+void CoreImage::doRender(Renderer& r) {
+	r.texture_2D(padding_LB(), layout_size2() - padding_size(), {0, 0}, {1, 1},
+			property.bg_color(),
+			property.bg_image(),
+			property.bg_shader());
 }
 
 // -------------------------------------------------------------------------------------------------

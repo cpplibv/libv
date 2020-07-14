@@ -2,18 +2,12 @@
 
 // hpp
 #include <libv/ui/component/panel_float.hpp>
-// pro
-#include <libv/ui/component/base_panel.lpp>
-
-
-
-
 // libv
 #include <libv/utility/approx.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/layout/view_layouted.lpp>
@@ -98,8 +92,8 @@ void CorePanelFloat::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
+libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
 		if (fix == libv::Approx(0.f)) {
@@ -116,7 +110,7 @@ libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& environment) {
 
 	for (auto& child : children | view_layouted()) {
 		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
 				libv::vec3f{};
 
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
@@ -129,10 +123,12 @@ libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& environment) {
 		});
 	}
 
-	return result;
+	return result + padding_size3();
 }
 
-void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
+void CorePanelFloat::doLayout2(const ContextLayout2& layout_env) {
+	const auto env_size = layout_env.size - padding_size3();
+
 	for (auto& child : children | view_layouted()) {
 
 		// Size ---
@@ -140,38 +136,34 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 		auto size = libv::vec3f{};
 
 		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
 				libv::vec3f{};
 
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
 			const auto has_ratio = child.size()[i].ratio != 0.f;
 
 			if (has_ratio)
-				size[i] = environment.size[i];
+				size[i] = env_size[i];
 			else
 				size[i] =
 						child.size()[i].pixel +
-						child.size()[i].percent * 0.01f * environment.size[i] +
+						child.size()[i].percent * 0.01f * env_size[i] +
 						(child.size()[i].dynamic ? child_dynamic[i] : 0.f);
 		});
 
 		// Position ---
 
 		const auto position =
-				+ environment.position
-				+ to_info(child.anchor()) * environment.size
-				- to_info(child.anchor()) * size;
+				+ padding_LB3()
+				+ child.anchor().to_info() * env_size
+				- child.anchor().to_info() * size;
 
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
 
 		AccessLayout::layout2(
 				child.core(),
-				ContextLayout2{
-					roundedPosition,
-					roundedSize,
-					MouseOrder{libv::to_value(environment.mouseOrder) + 1}
-				}
+				layout_env.enter(roundedPosition, roundedSize)
 		);
 	}
 }

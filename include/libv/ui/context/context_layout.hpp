@@ -4,8 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-// pro
-#include <libv/ui/event/mouse_order.hpp>
 
 
 namespace libv {
@@ -14,19 +12,38 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct ContextLayout1 {
-	libv::vec3f size; // <<< P2: use
+	libv::vec3f size;
 };
 
 struct ContextLayout2 {
-	libv::vec3f position; // <<< P1: Invesitage to remove
-	libv::vec3f size;
-	libv::ui::MouseOrder mouseOrder;
+public:
+	libv::vec3f abs_position;
 
-	constexpr inline ContextLayout2(libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder mouseOrder) :
+	libv::vec3f position;
+	libv::vec3f size;
+
+	int depth = 0;
+
+public:
+	constexpr inline ContextLayout2(libv::vec3f position, libv::vec3f size)  noexcept :
 		position(position),
-//	constexpr inline ContextLayout2(libv::vec3f size, libv::ui::MouseOrder mouseOrder) :
+		size(size) { }
+
+	constexpr inline ContextLayout2(libv::vec3f abs_position, libv::vec3f position, libv::vec3f size, int depth) noexcept :
+		abs_position(abs_position),
+		position(position),
 		size(size),
-		mouseOrder(mouseOrder) { }
+		depth(depth) { }
+
+public:
+	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec3f position, libv::vec3f size) const noexcept {
+		return ContextLayout2{
+				abs_position + position,
+				position,
+				size,
+				depth + 1
+		};
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

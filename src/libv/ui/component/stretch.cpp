@@ -2,14 +2,12 @@
 
 // hpp
 #include <libv/ui/component/stretch.hpp>
-// libv
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
@@ -34,16 +32,13 @@ private:
 		PropertyR<ShaderImage_view> bg_shader;
 	} property;
 
-private:
-	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
-
 public:
 	using CoreComponent::CoreComponent;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -80,74 +75,66 @@ void CoreStretch::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreStretch::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
+	const auto dynamic_size_image = property.bg_image()->size().cast<float>() + padding_size();
 
 	return {dynamic_size_image, 0.f};
 }
 
-void CoreStretch::doRender(ContextRender& context) {
-	if (context.changedSize) {
-		mesh.clear();
-		auto pos = mesh.attribute(attribute_position);
-		auto tex = mesh.attribute(attribute_texture0);
-		auto index = mesh.index();
+void CoreStretch::doRender(Renderer& r) {
+	// y3   12--13--14--15
+	//      | / | / | / |
+	// y2   8---9---10--11
+	//      | / | / | / |
+	// y1   4---5---6---7
+	//      | / | / | / |
+	// y0   0---1---2---3
+	//
+	//      x0  x1  x2  x3
 
-		// y3   12--13--14--15
-		//      | / | / | / |
-		// y2   8---9---10--11
-		//      | / | / | / |
-		// y1   4---5---6---7
-		//      | / | / | / |
-		// y0   0---1---2---3
-		//
-		//      x0  x1  x2  x3
-
-		const auto borderPos = min(cast<float>(property.bg_image()->size()), layout_size2()) * 0.5f;
-		const auto borderTex = min(layout_size2() / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
-
-		const auto p0 = libv::vec2f{0.0f, 0.0f};
-		const auto p1 = borderPos;
-		const auto p2 = layout_size2() - borderPos;
-		const auto p3 = layout_size2();
-
-		const auto t0 = libv::vec2f{0.0f, 0.0f};
-		const auto t1 = borderTex;
-		const auto t2 = 1.0f - borderTex;
-		const auto t3 = libv::vec2f{1.0f, 1.0f};
-
-		pos(p0.x, p0.y, 0); tex(t0.x, t0.y);
-		pos(p1.x, p0.y, 0); tex(t1.x, t0.y);
-		pos(p2.x, p0.y, 0); tex(t2.x, t0.y);
-		pos(p3.x, p0.y, 0); tex(t3.x, t0.y);
-
-		pos(p0.x, p1.y, 0); tex(t0.x, t1.y);
-		pos(p1.x, p1.y, 0); tex(t1.x, t1.y);
-		pos(p2.x, p1.y, 0); tex(t2.x, t1.y);
-		pos(p3.x, p1.y, 0); tex(t3.x, t1.y);
-
-		pos(p0.x, p2.y, 0); tex(t0.x, t2.y);
-		pos(p1.x, p2.y, 0); tex(t1.x, t2.y);
-		pos(p2.x, p2.y, 0); tex(t2.x, t2.y);
-		pos(p3.x, p2.y, 0); tex(t3.x, t2.y);
-
-		pos(p0.x, p3.y, 0); tex(t0.x, t3.y);
-		pos(p1.x, p3.y, 0); tex(t1.x, t3.y);
-		pos(p2.x, p3.y, 0); tex(t2.x, t3.y);
-		pos(p3.x, p3.y, 0); tex(t3.x, t3.y);
-
-		index({4, 0, 5, 1, 6, 2, 7, 3}); index({3, 8}); // jump
-		index({8, 4, 9, 5, 10, 6, 11, 7}); index({7, 12}); // jump
-		index({12, 8, 13, 9, 14, 10, 15, 11});
-	}
-
-	const auto guard_m = context.gl.model.push_guard();
-	context.gl.model.translate(layout_position());
-
-	context.gl.program(*property.bg_shader());
-	context.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-	context.gl.uniform(property.bg_shader()->uniform_MVPmat, context.gl.mvp());
-	context.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
-	context.gl.render(mesh);
+//	const auto borderPos = min(cast<float>(property.bg_image()->size()), layout_size2()) * 0.5f;
+//	const auto borderTex = min(layout_size2() / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
+//
+//	const auto p0 = libv::vec2f{0.0f, 0.0f};
+//	const auto p1 = borderPos;
+//	const auto p2 = layout_size2() - borderPos;
+//	const auto p3 = layout_size2();
+//
+//	const auto t0 = libv::vec2f{0.0f, 0.0f};
+//	const auto t1 = borderTex;
+//	const auto t2 = 1.0f - borderTex;
+//	const auto t3 = libv::vec2f{1.0f, 1.0f};
+//
+//	const auto color = property.bg_color();
+//
+//	r.begin_triangles(property.bg_image(), property.bg_shader());
+//
+//	r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
+//	r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
+//	r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
+//	r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
+//
+//	r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
+//	r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
+//	r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
+//	r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
+//
+//	r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
+//	r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
+//	r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
+//	r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
+//
+//	r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
+//	r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
+//	r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
+//	r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
+//
+//	r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
+//	r.index_strip({3, 8}); // jump
+//	r.index_strip({8, 4, 9, 5, 10, 6, 11, 7});
+//	r.index_strip({7, 12}); // jump
+//	r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
+//
+//	r.end();
 }
 
 // -------------------------------------------------------------------------------------------------

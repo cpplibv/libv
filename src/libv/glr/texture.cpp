@@ -186,6 +186,10 @@ Texture::Texture() noexcept :
 	remote(std::make_shared<RemoteTexture>()) {
 }
 
+Texture::Texture(std::shared_ptr<RemoteTexture> remote) noexcept :
+	remote(std::move(remote)) {
+}
+
 void Texture::implStorage(libv::gl::TextureTarget target, int32_t levels, libv::vec3i size, libv::gl::Format format, libv::gl::DataType type) noexcept {
 	remote->head.dirty = true;
 	remote->dirty_storage = true;

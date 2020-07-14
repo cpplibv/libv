@@ -37,26 +37,26 @@ std::optional<AlignVertical> parse_align_vertical_optional(const std::string_vie
 	struct named_aligns_ : x3::symbols<AlignVertical> {
 		named_aligns_() {
 			add
-				("top", AlignVertical::Top)
-				("center", AlignVertical::Center)
-				("bottom", AlignVertical::Bottom)
-				("justifyall", AlignVertical::JustifyAll)
-				("justify_all", AlignVertical::JustifyAll)
-				("justify-all", AlignVertical::JustifyAll)
-				("justify", AlignVertical::Justify)
+				("top", AlignVertical::top)
+				("center", AlignVertical::center)
+				("bottom", AlignVertical::bottom)
+				("justifyall", AlignVertical::justify_all)
+				("justify_all", AlignVertical::justify_all)
+				("justify-all", AlignVertical::justify_all)
+				("justify", AlignVertical::justify)
 
-				("north", AlignVertical::Top)
-				("south", AlignVertical::Bottom)
-				("n", AlignVertical::Top)
-				("c", AlignVertical::Center)
-				("s", AlignVertical::Bottom)
-				("ja", AlignVertical::JustifyAll)
-				("j", AlignVertical::Justify)
+				("north", AlignVertical::top)
+				("south", AlignVertical::bottom)
+				("n", AlignVertical::top)
+				("c", AlignVertical::center)
+				("s", AlignVertical::bottom)
+				("ja", AlignVertical::justify_all)
+				("j", AlignVertical::justify)
 			;
 		}
 	} named_aligns;
 
-	AlignVertical result = AlignVertical::Center;
+	AlignVertical result = AlignVertical::center;
 
 	auto it = str.begin();
 	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::space, result);
@@ -86,26 +86,26 @@ std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string
 	struct named_aligns_ : x3::symbols<AlignHorizontal> {
 		named_aligns_() {
 			add
-				("left", AlignHorizontal::Left)
-				("center", AlignHorizontal::Center)
-				("right", AlignHorizontal::Right)
-				("justifyall", AlignHorizontal::JustifyAll)
-				("justify-all", AlignHorizontal::JustifyAll)
-				("justify_all", AlignHorizontal::JustifyAll)
-				("justify", AlignHorizontal::Justify)
+				("left", AlignHorizontal::left)
+				("center", AlignHorizontal::center)
+				("right", AlignHorizontal::right)
+				("justifyall", AlignHorizontal::justify_all)
+				("justify-all", AlignHorizontal::justify_all)
+				("justify_all", AlignHorizontal::justify_all)
+				("justify", AlignHorizontal::justify)
 
-				("west", AlignHorizontal::Left)
-				("east", AlignHorizontal::Right)
-				("w", AlignHorizontal::Left)
-				("c", AlignHorizontal::Center)
-				("e", AlignHorizontal::Right)
-				("ja", AlignHorizontal::JustifyAll)
-				("j", AlignHorizontal::Justify)
+				("west", AlignHorizontal::left)
+				("east", AlignHorizontal::right)
+				("w", AlignHorizontal::left)
+				("c", AlignHorizontal::center)
+				("e", AlignHorizontal::right)
+				("ja", AlignHorizontal::justify_all)
+				("j", AlignHorizontal::justify)
 			;
 		}
 	} named_aligns;
 
-	AlignHorizontal result = AlignHorizontal::Center;
+	AlignHorizontal result = AlignHorizontal::center;
 
 	auto it = str.begin();
 	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::space, result);

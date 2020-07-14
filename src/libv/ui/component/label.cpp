@@ -2,18 +2,17 @@
 
 // hpp
 #include <libv/ui/component/label.hpp>
-// libv
-#include <libv/glr/queue.hpp>
 // pro
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/core_component.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/string_2D.hpp>
 #include <libv/ui/style.hpp>
+#include <libv/ui/text_layout.hpp>
 
 
 namespace libv {
@@ -39,7 +38,7 @@ private:
 	} property;
 
 private:
-	String2D text_;
+	TextLayout text_;
 
 public:
 	using CoreComponent::CoreComponent;
@@ -48,7 +47,7 @@ private:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
-	virtual void doRender(ContextRender& context) override;
+	virtual void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -59,7 +58,7 @@ void CoreLabel::access_properties(T& ctx) {
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
 			[](auto& c, auto v) { c.text_.align_horizontal(v); },
 			[](const auto& c) { return c.text_.align_horizontal(); },
-			AlignHorizontal::Left,
+			AlignHorizontal::left,
 			pgr::appearance, pnm::align_horizontal,
 			"Horizontal alignment of the text"
 	);
@@ -67,7 +66,7 @@ void CoreLabel::access_properties(T& ctx) {
 			[](auto& c) -> auto& { return c.property.align_vertical; },
 			[](auto& c, auto v) { c.text_.align_vertical(v); },
 			[](const auto& c) { return c.text_.align_vertical(); },
-			AlignVertical::Top,
+			AlignVertical::top,
 			pgr::appearance, pnm::align_vertical,
 			"Vertical alignment of the text"
 	);
@@ -116,27 +115,20 @@ void CoreLabel::doStyle(ContextStyle& ctx) {
 }
 
 libv::vec3f CoreLabel::doLayout1(const ContextLayout1& environment) {
-	const auto dynamic_size_text = text_.content(xy(environment.size));
+	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
 
 	return {dynamic_size_text, 0.f};
 }
 
 void CoreLabel::doLayout2(const ContextLayout2& environment) {
-	text_.limit(libv::vec::xy(environment.size));
+	text_.limit(xy(environment.size) - padding_size());
 }
 
-void CoreLabel::doRender(ContextRender& ctx) {
-	const auto guard_s = ctx.gl.state.push_guard();
-	const auto guard_m = ctx.gl.model.push_guard();
-	ctx.gl.model.translate(layout_position());
-	ctx.gl.state.blendSrc_Source1Color();
-	ctx.gl.state.blendDst_One_Minus_Source1Color();
-
-	ctx.gl.program(*property.font_shader());
-	ctx.gl.texture(text_.font()->texture(), property.font_shader()->textureChannel);
-	ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
-	ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
-	ctx.gl.render(text_.mesh());
+void CoreLabel::doRender(Renderer& r) {
+	r.text(padding_LB(), text_,
+			property.font_color(),
+			text_.font(),
+			property.font_shader());
 }
 
 // -------------------------------------------------------------------------------------------------

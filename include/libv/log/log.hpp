@@ -119,7 +119,7 @@ private:
 		MatcherFunction matcher;
 
 	private:
-		bool isSubModul(const std::string_view submodule) const {
+		[[nodiscard]] bool isSubModule(const std::string_view submodule) const {
 			const auto isPrefix = submodule.compare(0, module.size(), module) == 0;
 			const auto isEqualLenght = submodule.size() == module.size();
 
@@ -128,33 +128,33 @@ private:
 		}
 
 	public:
-		bool matcher_any(Severity, const std::string_view) const {
+		[[nodiscard]] bool matcher_any(Severity, const std::string_view) const {
 			return true;
 		}
-		bool matcher_module(Severity, const std::string_view module) const {
-			return isSubModul(module);
+		[[nodiscard]] bool matcher_module(Severity, const std::string_view module) const {
+			return isSubModule(module);
 		}
-		bool matcher_severity_equal(Severity severity, const std::string_view) const {
-			return severity == this->severity;
+		[[nodiscard]] bool matcher_severity_equal(Severity severity_, const std::string_view) const {
+			return severity_ == severity;
 		}
-		bool matcher_module_severity_equal(Severity severity, const std::string_view module) const {
-			return isSubModul(module) && severity == this->severity;
+		[[nodiscard]] bool matcher_module_severity_equal(Severity severity_, const std::string_view module) const {
+			return isSubModule(module) && severity_ == severity;
 		}
-		bool matcher_severity_above(Severity severity, const std::string_view) const {
-			return severity > this->severity;
+		[[nodiscard]] bool matcher_severity_above(Severity severity_, const std::string_view) const {
+			return severity_ > severity;
 		}
-		bool matcher_module_severity_above(Severity severity, const std::string_view module) const {
-			return isSubModul(module) && severity > this->severity;
+		[[nodiscard]] bool matcher_module_severity_above(Severity severity_, const std::string_view module) const {
+			return isSubModule(module) && severity_ > severity;
 		}
-		bool matcher_severity_below(Severity severity, const std::string_view) const {
-			return severity < this->severity;
+		[[nodiscard]] bool matcher_severity_below(Severity severity_, const std::string_view) const {
+			return severity_ < severity;
 		}
-		bool matcher_module_severity_below(Severity severity, const std::string_view module) const {
-			return isSubModul(module) && severity < this->severity;
+		[[nodiscard]] bool matcher_module_severity_below(Severity severity_, const std::string_view module) const {
+			return isSubModule(module) && severity_ < severity;
 		}
 
 	public:
-		MatchResult match(Severity severity, const std::string_view module) const {
+		[[nodiscard]] MatchResult match(Severity severity, const std::string_view module) const {
 			return {(this->*matcher)(severity, module), allow};
 		}
 
@@ -336,6 +336,14 @@ private:
 	/*NEVER_INLINE*/ void recordMessage(const std::string_view module, const Severity severity,
 			const source_location loc, const std::string& message) {
 
+		// constexpr bool force_generic_path_in_log = false;
+		//
+		// [[maybe_unused]] static thread_local std::string generic_file_path_tmp;
+		// if constexpr (force_generic_path_in_log) {
+		// 	generic_file_path_tmp = loc.file_name() + WISH_SHORT_PATH_CUTOFF;
+		// 	std::replace(generic_file_path_tmp.begin(), generic_file_path_tmp.end(), '\\', '/');
+		// }
+
 		const auto entry = fmt::format(this->format,
 				fmt::arg("message", message),
 				fmt::arg("module", module),
@@ -343,7 +351,10 @@ private:
 						!colored ? toString(severity) :
 						levelShort_ ? toColorShortString(severity) : toColorString(severity)),
 				fmt::arg("line", loc.line()),
-				fmt::arg("file", loc.file_name() + WISH_SHORT_PATH_CUTOFF),
+				fmt::arg("file",
+						// force_generic_path_in_log ?
+						// generic_file_path_tmp.c_str() :
+						loc.file_name() + WISH_SHORT_PATH_CUTOFF),
 				fmt::arg("function", loc.function_name()),
 				fmt::arg("column", loc.column()),
 				// fmt::arg("time", std::chrono::steady_clock::now()),

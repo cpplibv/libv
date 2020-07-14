@@ -85,7 +85,7 @@ private:
 	virtual void doAttach() override;
 	virtual void onKey(const libv::ui::EventKey& event) override;
 //	libv::vec3f doLayout1(const ContextLayout1& environment) override;
-//	void doRender(ContextRender& context) override;
+//	void doRender(Renderer& r) override;
 };
 
 // -------------------------------------------------------------------------------------------------

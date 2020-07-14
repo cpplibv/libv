@@ -28,10 +28,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+//class ContextRender;
+class Component;
 class ContextFocusTraverse;
 class ContextLayout1;
 class ContextLayout2;
-class ContextRender;
 class ContextStyle;
 class ContextUI;
 class EventChar;
@@ -40,6 +41,7 @@ class EventKey;
 class EventMouseButton;
 class EventMouseMovement;
 class EventMouseScroll;
+class Renderer;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -68,8 +70,11 @@ private:
 private:
 	Size size_;
 	Anchor anchor_;
-	libv::vec4f margin_;
-	libv::vec4f padding_;
+	libv::vec4f margin_; /// x: left, y: down, z: right, w: top
+	libv::vec4f padding_; /// x: left, y: down, z: right, w: top
+
+//	libv::vec4f margin_{10, 10, 10, 10}; // Theme::default_margin
+//	libv::vec4f padding_{5, 5, 5, 5}; // Theme::default_padding
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
@@ -116,13 +121,13 @@ public:
 		return layout_position_;
 	}
 	[[nodiscard]] inline libv::vec2f layout_position2() const noexcept {
-		return libv::vec::xy(layout_position_);
+		return libv::vec2f{layout_position_.x, layout_position_.y};
 	}
 	[[nodiscard]] inline libv::vec3f layout_size() const noexcept {
 		return layout_size_;
 	}
 	[[nodiscard]] inline libv::vec2f layout_size2() const noexcept {
-		return libv::vec::xy(layout_size_);
+		return libv::vec2f{layout_size_.x, layout_size_.y};
 	}
 
 public:
@@ -139,26 +144,88 @@ public:
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
 
-//	inline void margin(float top_down_left_right) noexcept;
-//	inline void margin(float top_down, float left_right) noexcept;
-//	inline void margin(float top, float down, float left, float right) noexcept;
 	inline void margin(Margin value) noexcept {
 		margin_ = value;
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
+	inline void margin(float left_down_right_top) noexcept {
+		margin({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
+	}
+	inline void margin(float left_right, float down_top) noexcept {
+		margin({left_right, down_top, left_right, down_top});
+	}
+	inline void margin(float left, float down, float right, float top) noexcept {
+		margin({left, down, right, top});
+	}
+	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Margin margin() const noexcept {
 		return margin_;
 	}
+	/// x: left, y: down
+	[[nodiscard]] inline libv::vec2f margin_LB() const noexcept {
+		return xy(margin_);
+	}
+	/// x: left, y: down, z: 0
+	[[nodiscard]] inline libv::vec3f margin_LB3() const noexcept {
+		return {margin_LB(), 0.0f};
+	}
+	/// x: right, y: top
+	[[nodiscard]] inline libv::vec2f margin_RT() const noexcept {
+		return zw(margin_);
+	}
+	/// x: right, y: top, z: 0
+	[[nodiscard]] inline libv::vec3f margin_RT3() const noexcept {
+		return {margin_RT(), 0.0f};
+	}
+	/// x: left + right, y: down + top
+	[[nodiscard]] inline libv::vec2f margin_size() const noexcept {
+		return margin_LB() + margin_RT();
+	}
+	/// x: left + right, y: down + top, z: 0
+	[[nodiscard]] inline libv::vec3f margin_size3() const noexcept {
+		return {margin_size(), 0.0f};
+	}
 
-//	inline void padding(float top_down_left_right) noexcept;
-//	inline void padding(float top_down, float left_right) noexcept;
-//	inline void padding(float top, float down, float left, float right) noexcept;
 	inline void padding(Padding value) noexcept {
 		padding_ = value;
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
+	inline void padding(float left_down_right_top) noexcept {
+		padding({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
+	}
+	inline void padding(float left_right, float down_top) noexcept {
+		padding({left_right, down_top, left_right, down_top});
+	}
+	inline void padding(float left, float down, float right, float top) noexcept {
+		padding({left, down, right, top});
+	}
+	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Padding padding() const noexcept {
 		return padding_;
+	}
+	/// x: left, y: down
+	[[nodiscard]] inline libv::vec2f padding_LB() const noexcept {
+		return xy(padding_);
+	}
+	/// x: left, y: down, z: 0
+	[[nodiscard]] inline libv::vec3f padding_LB3() const noexcept {
+		return {padding_LB(), 0.0f};
+	}
+	/// x: right, y: top
+	[[nodiscard]] inline libv::vec2f padding_RT() const noexcept {
+		return zw(padding_);
+	}
+	/// x: right, y: top, z: 0
+	[[nodiscard]] inline libv::vec3f padding_RT3() const noexcept {
+		return {padding_RT(), 0.0f};
+	}
+	/// x: left + right, y: down + top
+	[[nodiscard]] inline libv::vec2f padding_size() const noexcept {
+		return padding_LB() + padding_RT();
+	}
+	/// x: left + right, y: down + top, z: 0
+	[[nodiscard]] inline libv::vec3f padding_size3() const noexcept {
+		return {padding_size(), 0.0f};
 	}
 
 public:
@@ -232,24 +299,24 @@ private:
 	void style();
 	void styleScan();
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
-	void render(ContextRender& context);
 	libv::vec3f layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
+	void render(Renderer& r);
 
 private:
 	virtual void doAttach();
 	virtual void doDetach();
-	virtual void doDetachChildren(libv::function_ref<bool(CoreComponent&)> callback);
+	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback);
 	virtual void doStyle(ContextStyle& context);
 	virtual void doStyle(ContextStyle& context, ChildID childID);
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
-	virtual void doCreate(ContextRender& context);
-	virtual void doDestroy(ContextRender& context);
-	virtual void doRender(ContextRender& context);
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment);
 	virtual void doLayout2(const ContextLayout2& environment);
-	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback);
-	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback);
+	virtual void doCreate(Renderer& r);
+	virtual void doRender(Renderer& r);
+	virtual void doDestroy(Renderer& r);
+	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback);
+	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback);
 
 	// TWO PASS layout: (Planning on changing to on demand pass 1 as of 2020 06 30)
 	// - Pass 1: calculate everything as content bottom-top and store the result
@@ -258,7 +325,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-// <<< P4: Remove set/reset from here (?)
+// <<< P5: Remove set/reset from here (?)
 template <typename Property>
 inline void CoreComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::driver(property, PropertyDriver::manual);
@@ -339,6 +406,9 @@ struct AccessParent {
 	static inline decltype(auto) doFocusTraverse(CoreComponent& component, const ContextFocusTraverse& context, ChildID current) {
 		return component.doFocusTraverse(context, current);
 	}
+	static inline decltype(auto) render(CoreComponent& component, Renderer& r) {
+		return component.render(r);
+	}
 };
 
 struct AccessConnect {
@@ -401,9 +471,6 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	}
 	static inline decltype(auto) focusTraverse(CoreComponent& component, const ContextFocusTraverse& context) {
 		return component.focusTraverse(context);
-	}
-	static inline decltype(auto) render(CoreComponent& component, ContextRender& context) {
-		return component.render(context);
 	}
 };
 

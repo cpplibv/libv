@@ -5,7 +5,7 @@
 // ext
 #include <boost/container/flat_map.hpp>
 // libv
-#include <libv/glr/queue_fwd.hpp>
+//#include <libv/glr/queue_fwd.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/guard.hpp>
@@ -40,6 +40,28 @@ namespace ui {
 // TODO P5: Slant slant = Slant::Normal;
 // TODO P5: Improved texture usage algorithm (texture size reallocation is now possible) (Question: could it be stored as a one dimensional data? yes could mean no wasted space)
 // TODO P5: Gamma 1.8 + stem darkening in freetype: https://www.freetype.org/freetype2/docs/text-rendering-general.html
+
+// -------------------------------------------------------------------------------------------------
+
+//	struct Font {
+//		FontEffect effect;   /// normal / outline / underline / strike-through ...
+//		FontFamily family;   /// font-family: Consolas
+//		FontSize size = 12;  /// font-size/line-height
+//		FontStretch stretch; /// font-stretch - normal / ultra-condensed / extra-condensed / condensed / semi-condensed / semi-expanded / expanded / extra-expanded / ultra-expanded
+//		FontStyle style;     /// font-style - normal / italic / oblique
+//		FontVariant variant; /// font-variant - normal / small-caps
+//		FontWeight weight;   /// font-weight - normal / bold / bolder / lighter / %number%
+//
+//		FontFamily family;   /// font-family: Consolas
+//		uint64_t underline:1;
+//		uint64_t strike_through:1;
+//		uint64_t small_caps:1;
+//		uint64_t italic:1;
+//		uint64_t stretch:8; // 4.4 fixed point
+//		uint64_t outline:12; // 8.4 fixed point
+//		uint64_t weight:16; // 8.8 fixed point
+//		uint64_t size:8;
+//	};
 
 // -------------------------------------------------------------------------------------------------
 
