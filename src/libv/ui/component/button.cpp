@@ -65,7 +65,7 @@ private:
 private:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& ctx) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;
 };
@@ -205,13 +205,11 @@ void CoreButton::doStyle(ContextStyle& ctx) {
 	CoreComponent::access_properties(setter);
 }
 
-void CoreButton::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
+libv::vec3f CoreButton::doLayout1(const ContextLayout1& environment) {
+	const auto dynamic_size_text = text_.content(xy(environment.size));
+	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
-	const auto contentString = text_.content(-1, -1);
-	const auto contentImage = libv::vec::cast<float>(property.bg_image()->size());
-
-	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentImage), 0.f};
+	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
 }
 
 void CoreButton::doLayout2(const ContextLayout2& environment) {

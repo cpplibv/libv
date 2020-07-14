@@ -147,8 +147,7 @@ public:
 		label_image.image(ui.context().texture2D("separator_bar_256x16.png"));
 
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
-//		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
-		image.size(libv::ui::parse_size_or_throw("25px, 50px"));
+		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
 		input_field.text("Input Field");
 		input_field.event().change([](auto& component, const auto&) {
@@ -192,15 +191,38 @@ public:
 		});
 
 		scroll_area.content(panel_line_scrolled);
-		scroll_area.mode(libv::ui::ScrollAreaMode::both);
-		libv::ui::Label tmp_scrolled_text;
-		tmp_scrolled_text.text(
-			"And I will strike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
-			"And I will strike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
-			"And I will strike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
-			"And I will strike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
-		);
-		panel_line_scrolled.add(tmp_scrolled_text);
+		scroll_area.mode(libv::ui::ScrollAreaMode::vertical);
+		{
+			libv::ui::Label tmp;
+			tmp.text(
+				"And I will strike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+				"And I will strike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+				"And I will strike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+				"And I will strike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
+		} {
+			libv::ui::Label tmp;
+			tmp.text(
+				"222222222222trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+				"222222222222trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+				"222222222222trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+				"222222222222trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
+		} {
+			libv::ui::Label tmp;
+			tmp.text(
+				"333333333333trike 0 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 0.\n"
+				"333333333333trike 1 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 1.\n"
+				"333333333333trike 2 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 2.\n"
+				"333333333333trike 3 down upon thee with great vengeance and furious anger (those who would attempt to poison and destroy my brothers 3."
+			);
+			tmp.size(libv::ui::parse_size_or_throw("D, D"));
+			panel_line_scrolled.add(tmp);
+		}
 		panel_line_scrolled.add(image);
 
 		panel_full.add(button1);

@@ -54,7 +54,7 @@ public:
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;
 };
@@ -141,13 +141,11 @@ void CoreLabelImage::doStyle(ContextStyle& ctx) {
 	CoreComponent::access_properties(setter);
 }
 
-void CoreLabelImage::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
+libv::vec3f CoreLabelImage::doLayout1(const ContextLayout1& environment) {
+	const auto dynamic_size_text = text_.content(xy(environment.size));
+	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
-	const auto contentString = text_.content(-1, -1);
-	const auto contentLabelImage = libv::vec::cast<float>(property.bg_image()->size());
-
-	AccessLayout::lastDynamic(*this) = {libv::vec::max(contentString, contentLabelImage), 0.f};
+	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
 }
 
 void CoreLabelImage::doLayout2(const ContextLayout2& environment) {

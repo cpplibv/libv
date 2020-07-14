@@ -95,7 +95,7 @@ private:
 private:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& context) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(ContextRender& context) override;
 };
@@ -378,13 +378,13 @@ void CoreScrollBar::doStyle(ContextStyle& ctx) {
 	CoreComponent::access_properties(setter);
 }
 
-void CoreScrollBar::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CoreScrollBar::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	const auto bar = property.bar_image()->size().cast<float>();
-	const auto bg = property.bg_image()->size().cast<float>();
+	const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
+	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
 
-	AccessLayout::lastDynamic(*this) = {libv::vec::max(bar, bg), 0.f};
+	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
 }
 
 void CoreScrollBar::doLayout2(const ContextLayout2& environment) {

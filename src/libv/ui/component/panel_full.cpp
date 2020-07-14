@@ -43,7 +43,7 @@ public:
 private:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual void doLayout1(const ContextLayout1& le) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
 
@@ -75,9 +75,7 @@ void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelFull::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-
+libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& environment) {
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
 		if (fix == libv::Approx(0.f)) {
 			return fix;
@@ -92,18 +90,21 @@ void CorePanelFull::doLayout1(const ContextLayout1& environment) {
 	auto result = libv::vec3f{};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.core(), ContextLayout1{});
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				libv::vec3f{};
+
 		libv::meta::for_constexpr<0, 3>([&](auto dim) {
 			result[dim] = libv::max(
 					result[dim],
 					resolvePercent(
-							child.size()[dim].pixel + (child.size()[dim].dynamic ? AccessLayout::lastDynamic(child.core())[dim] : 0.f),
+							child.size()[dim].pixel + (child.size()[dim].dynamic ? child_dynamic[dim] : 0.f),
 							child.size()[dim].percent, child.core())
 			);
 		});
 	}
 
-	AccessLayout::lastDynamic(*this) = result;
+	return result;
 }
 
 void CorePanelFull::doLayout2(const ContextLayout2& environment) {

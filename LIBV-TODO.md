@@ -511,10 +511,14 @@ libv.ui: align_vertical for string2D
 libv.ui: align_vertical for string2D in pickers | Well, the algo was fool proof and it just works
 libv.ui: container child anchor_parent, anchor_target and size are general concept and every component should have them -> eliminates child storage issues (for now) AND grid anchor_content is also here
 libv.ui: property size / anchor
+libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
+libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized? | yes and padding too
 libv.ui: layout_line should support anchor | invalidated as the two alignment basically already solves the use-cases
 libv.ui: property size / anchor access, and inherited property access | manual, it will do but for now
 libv.ui: Rename BaseComponent to CoreComponent
 libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement determines the other event targets
+libv.ui: Improve layout pass 1 information channel: doLayout1 should use the return channel instead of member cache
+libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits (in string_2D)
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -522,7 +526,8 @@ libv.ui: Remove mask_watchMouse in favor of a single bool flag as mouse movement
 
 
 
-libv.ui: Fix layout pass 1 information channel
+libv.ui: implement parentDependOnLayout, reduce the number of layout invalidation caused by String2D edit
+libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
 
 
 
@@ -1084,11 +1089,6 @@ ui
 	libv.ui: add a glr::remote& to UI to simplify app::frame
 	libv.ui: idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
 
-layout
-	libv.ui: doLayout1 should use the return channel instead of member cache
-	libv.ui: remove layout1 pass member variables in component_base
-	libv.ui: broken layout with String2D with size = "100px, d" if text is longer than 100px, layout1 issue | main reason is that layout1 pass uses no limits (in string_2D)
-
 cleanup
 	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target (2D)
 	libv.ui: cleanup context_ui redundant codes
@@ -1114,14 +1114,12 @@ properties / style
 	libv.ui.property: dynamic access
 	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
 	libv.ui.property: account for cyclic owning references with style property
-	libv.ui.style: parent depends on layout invalidation could be introduced into the property as function test just like fallback
 	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
 	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
 	libv.ui.style: do not track style changes, require ui to be prompted about change
 	libv.ui.property: solve name/type collusion
 	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
 	libv.ui.style: Style based on component state (bit-mask)
-	libv.ui.property: layout properties: size / anchors (+padding) (+?merge cells) | can size + anchor be generalized?
 	libv.ui.property: typed property registry
 	libv.ui.property: optimize property reset: address could be used to lookup
 
@@ -1192,7 +1190,6 @@ focus
 	libv.ui.focus: Focus traverseal order: layout driven (layout knows the orientation)
 	libv.ui.focus: Focus traverseal order: position based
 
-libv.ui: implement parentsDependOnLayout, reduce the number of layout invalidation caused by String2D edit
 libv.ui: include check everything / fwd everything
 libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
 
@@ -1203,7 +1200,6 @@ style
 	libv.ui: style sheets
 	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
-	libv.ui.layout: anchor should be a general property, when a component placed somewhere beside unused space single enum which of the 9 corner should it use
 
 overlay
 	libv.ui: generic orthogonal component level overlay system

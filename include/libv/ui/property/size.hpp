@@ -53,17 +53,17 @@ struct SizeDim {
 		return os;
 	}
 
-	friend constexpr inline bool operator==(const SizeDim& lhs, const SizeDim& rhs) noexcept {
+	[[nodiscard]] friend constexpr inline bool operator==(const SizeDim& lhs, const SizeDim& rhs) noexcept {
 		return
 				lhs.pixel == rhs.pixel &&
 				lhs.percent == rhs.percent &&
 				lhs.ratio == rhs.ratio &&
 				lhs.dynamic == rhs.dynamic;
 	}
-	friend constexpr inline bool operator!=(const SizeDim& lhs, const SizeDim& rhs) noexcept {
+
+	[[nodiscard]] friend constexpr inline bool operator!=(const SizeDim& lhs, const SizeDim& rhs) noexcept {
 		return !(lhs == rhs);
 	}
-
 };
 
 inline auto pixel(float value) {
@@ -88,11 +88,15 @@ struct Size {
 	constexpr inline explicit Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) :
 		value{std::move(x), std::move(y), std::move(z)} {}
 
-	SizeDim& operator[](size_t dim) {
+	[[nodiscard]] SizeDim& operator[](size_t dim) {
 		return value[dim];
 	}
-	const SizeDim& operator[](size_t dim) const {
+	[[nodiscard]] const SizeDim& operator[](size_t dim) const {
 		return value[dim];
+	}
+
+	[[nodiscard]] constexpr inline bool has_dynamic() const noexcept {
+		return value.x.dynamic || value.y.dynamic || value.z.dynamic;
 	}
 
 	template <typename OStream>
@@ -101,11 +105,11 @@ struct Size {
 		return os;
 	}
 
-	friend constexpr inline bool operator==(const Size& lhs, const Size& rhs) noexcept {
+	[[nodiscard]] friend constexpr inline bool operator==(const Size& lhs, const Size& rhs) noexcept {
 		return lhs.value == rhs.value;
 	}
 
-	friend constexpr inline bool operator!=(const Size& lhs, const Size& rhs) noexcept {
+	[[nodiscard]] friend constexpr inline bool operator!=(const Size& lhs, const Size& rhs) noexcept {
 		return lhs.value != rhs.value;
 	}
 };

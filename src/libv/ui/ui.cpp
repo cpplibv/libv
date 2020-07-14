@@ -90,8 +90,7 @@ class ImplUI {
 		Histogram<100> attach2{t_min, t_max};
 		Histogram<100> styleScan{t_min, t_max};
 		Histogram<100> style{t_min, t_max};
-		Histogram<100> layout1{t_min, t_max};
-		Histogram<100> layout2{t_min, t_max};
+		Histogram<100> layout{t_min, t_max};
 		Histogram<100> render{t_min, t_max};
 		Histogram<100> detach{t_min, t_max};
 
@@ -103,8 +102,7 @@ class ImplUI {
 			os << "\nattach2:   " << var.attach2;
 			os << "\nstyleScan: " << var.styleScan;
 			os << "\nstyle:     " << var.style;
-			os << "\nlayout1:   " << var.layout1;
-			os << "\nlayout2:   " << var.layout2;
+			os << "\nlayout:    " << var.layout;
 			os << "\nrender:    " << var.render;
 			os << "\ndetach:    " << var.detach;
 			os << "\n-------------------------------------------------------------------------------------";
@@ -434,10 +432,8 @@ void UI::update(libv::glr::Queue& gl) {
 
 	// --- Layout ---
 	try {
-		AccessRoot::layout1(self->root.core(), ContextLayout1{});
-		self->stat.layout1.sample(self->timer.time_ns());
 		AccessRoot::layout2(self->root.core(), ContextLayout2{self->root.layout_position(), self->root.layout_size(), MouseOrder{0}});
-		self->stat.layout2.sample(self->timer.time_ns());
+		self->stat.layout.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
 		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
 	}

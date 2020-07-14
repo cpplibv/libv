@@ -16,6 +16,8 @@
 #include <libv/ui/flag.hpp>
 #include <libv/ui/generate_name.hpp>
 #include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the variant is killing me)
+#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/size.hpp>
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -59,9 +61,7 @@ private:
 	uint32_t ref_count = 0;
 
 	libv::vec3f layout_position_; /// Component position relative to parent in pixels
-	libv::vec3f layout_size_; /// Component size in pixels
-	// TODO P2: Measure the impact of removing lastDynamic field and remove it if acceptable
-	libv::vec3f lastDynamic; /// Result of last layout pass1
+	libv::vec3f layout_size_;     /// Component size in pixels
 
 private:
 	Size size_;
@@ -126,6 +126,10 @@ public:
 		return size_;
 	}
 	inline void size(Size value) noexcept {
+//		const auto has_dynamic = value.has_dynamic();
+//		flags.set_to(Flag::parentDependOnLayout, has_dynamic);
+//		if has_dynamic
+//			invalidate parent layout too
 		size_ = value;
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 	}
@@ -209,7 +213,7 @@ private:
 	void styleScan();
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
 	void render(ContextRender& context);
-	void layout1(const ContextLayout1& environment);
+	libv::vec3f layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
 
 private:
@@ -222,7 +226,7 @@ private:
 	virtual void doCreate(ContextRender& context);
 	virtual void doDestroy(ContextRender& context);
 	virtual void doRender(ContextRender& context);
-	virtual void doLayout1(const ContextLayout1& environment);
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment);
 	virtual void doLayout2(const ContextLayout2& environment);
 	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback);
 	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback);
@@ -234,6 +238,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
+// <<< P4: Remove set/reset from here (?)
 template <typename Property>
 inline void CoreComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::driver(property, PropertyDriver::manual);
@@ -316,12 +321,6 @@ struct AccessLayout {
 	}
 	static inline decltype(auto) layout2(CoreComponent& component, const ContextLayout2& environment) {
 		return component.layout2(environment);
-	}
-	[[nodiscard]] static inline auto& lastDynamic(CoreComponent& component) {
-		return component.lastDynamic;
-	}
-	[[nodiscard]] static inline const auto& lastDynamic(const CoreComponent& component) {
-		return component.lastDynamic;
 	}
 };
 

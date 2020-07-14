@@ -51,7 +51,7 @@ public:
 private:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual void doLayout1(const ContextLayout1& le) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
 
@@ -143,7 +143,7 @@ void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelLine::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
@@ -168,26 +168,28 @@ void CorePanelLine::doLayout1(const ContextLayout1& environment) {
 	};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.core(), ContextLayout1{});
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				libv::vec3f{};
 
 		pixelX += child.size()[_X_].pixel;
 		percentX += child.size()[_X_].percent;
-		contentX += (child.size()[_X_].dynamic ? AccessLayout::lastDynamic(child.core())[_X_] : 0.0f);
+		contentX += (child.size()[_X_].dynamic ? child_dynamic[_X_] : 0.0f);
 
 		result[_Y_] = libv::max(result[_Y_],
 				resolvePercent(
-						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? AccessLayout::lastDynamic(child.core())[_Y_] : 0.0f),
+						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? child_dynamic[_Y_] : 0.0f),
 						child.size()[_Y_].percent, child));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
-						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? AccessLayout::lastDynamic(child.core())[_Z_] : 0.0f),
+						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? child_dynamic[_Z_] : 0.0f),
 						child.size()[_Z_].percent, child));
 	}
 
 	result[_X_] = resolvePercent(pixelX + contentX, percentX, *this);
 
-	AccessLayout::lastDynamic(*this) = result;
+	return result;
 }
 
 void CorePanelLine::doLayout2(const ContextLayout2& environment) {
@@ -205,14 +207,18 @@ void CorePanelLine::doLayout2(const ContextLayout2& environment) {
 	auto sumRatioX = 0.f;
 
 	// Note: This reserve may allocate more memory as children may include non-layouted components too, but that is rare and saves a pass
-	boost::container::small_vector<libv::vec3f, 16> childSizes(children.size(), libv::vec3f{});
+	boost::container::small_vector<libv::vec3f, 32> childSizes(children.size(), libv::vec3f{});
 
 	for (auto&& [child, childSize] : ranges::view::zip(children | view_layouted(), childSizes)) {
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				libv::vec3f{};
+
 		libv::meta::n_times_index<3>([&](auto&& index) {
 			childSize[index] =
 					child.size()[index].pixel +
 					child.size()[index].percent * 0.01f * environment.size[index] +
-					(child.size()[index].dynamic ? AccessLayout::lastDynamic(child.core())[index] : 0.f);
+					(child.size()[index].dynamic ? child_dynamic[index] : 0.f);
 		});
 
 		sumRatioX += child.size()[_X_].ratio;

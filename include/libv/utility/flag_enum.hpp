@@ -129,6 +129,14 @@ public:
 		return *this;
 	}
 
+	constexpr inline flag_enum& set_to(const flag_enum f, bool value) noexcept {
+		if (value)
+			set(f);
+		else
+			reset(f);
+		return *this;
+	}
+
 	constexpr inline flag_enum operator~() const noexcept {
 		return flag_enum(static_cast<Underlying>(~value_));
 	}

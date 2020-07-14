@@ -48,8 +48,17 @@ struct ContextRender {
 //	libv::vec2f clip_;
 
 public:
-	void quad(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color) {}
-	void clip(libv::vec2f pos, libv::vec2f size) {}
+	void quad(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color) {
+		(void) pos;
+		(void) size;
+		(void) uv00;
+		(void) uv11;
+		(void) color;
+	}
+	void clip(libv::vec2f pos, libv::vec2f size) {
+		(void) pos;
+		(void) size;
+	}
 
 	// =================================================================================================
 };

@@ -94,17 +94,11 @@ void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void CoreComponent::watchChar(bool value) noexcept {
-	if (value)
-		flags.set(Flag::watchChar);
-	else
-		flags.reset(Flag::watchChar);
+	flags.set_to(Flag::watchChar, value);
 }
 
 void CoreComponent::watchKey(bool value) noexcept {
-	if (value)
-		flags.set(Flag::watchKey);
-	else
-		flags.reset(Flag::watchKey);
+	flags.set_to(Flag::watchKey, value);
 }
 
 void CoreComponent::watchFocus(bool value) noexcept {
@@ -138,10 +132,7 @@ void CoreComponent::watchMouse(bool value) noexcept {
 			context().mouse.unsubscribe(*this);
 	}
 
-	if (value)
-		flags.set(Flag::watchMouse);
-	else
-		flags.reset(Flag::watchMouse);
+	flags.set_to(Flag::watchMouse, value);
 }
 
 bool CoreComponent::isWatchChar() const noexcept {
@@ -351,7 +342,6 @@ void CoreComponent::detach(CoreComponent& parent_) {
 
 		childID = 0;
 		flags = Flag::mask_init;
-		lastDynamic = {};
 		parent = *this;
 		layout_position_ = {};
 		layout_size_ = {};
@@ -431,13 +421,10 @@ void CoreComponent::render(ContextRender& context) {
 	}
 }
 
-void CoreComponent::layout1(const ContextLayout1& environment) {
-	bool dirty = flags.match_any(Flag::pendingLayout);
-
-	if (dirty) {
-		this->doLayout1(environment);
-		log_ui.trace("Layout dynamic {:>11}, {}", lastDynamic, path());
-	}
+libv::vec3f CoreComponent::layout1(const ContextLayout1& environment) {
+	const auto result = this->doLayout1(environment);
+	log_ui.trace("Layout dynamic {:>11}, {}", result, path());
+	return result;
 }
 
 void CoreComponent::layout2(const ContextLayout2& environment) {
@@ -512,8 +499,10 @@ void CoreComponent::doRender(ContextRender& context) {
 	(void) context;
 }
 
-void CoreComponent::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
+
+	return {};
 }
 
 void CoreComponent::doLayout2(const ContextLayout2& environment) {

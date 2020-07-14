@@ -14,15 +14,17 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct ContextLayout1 {
+	libv::vec3f size; // <<< P2: use
 };
 
 struct ContextLayout2 {
-	libv::vec3f position;
+	libv::vec3f position; // <<< P1: Invesitage to remove
 	libv::vec3f size;
 	libv::ui::MouseOrder mouseOrder;
 
 	constexpr inline ContextLayout2(libv::vec3f position, libv::vec3f size, libv::ui::MouseOrder mouseOrder) :
 		position(position),
+//	constexpr inline ContextLayout2(libv::vec3f size, libv::ui::MouseOrder mouseOrder) :
 		size(size),
 		mouseOrder(mouseOrder) { }
 };

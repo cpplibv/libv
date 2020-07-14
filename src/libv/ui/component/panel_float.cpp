@@ -56,7 +56,7 @@ public:
 private:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual void doLayout1(const ContextLayout1& le) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
 
@@ -98,7 +98,7 @@ void CorePanelFloat::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelFloat::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
@@ -115,19 +115,21 @@ void CorePanelFloat::doLayout1(const ContextLayout1& environment) {
 	auto result = libv::vec3f{};
 
 	for (auto& child : children | view_layouted()) {
-		AccessLayout::layout1(child.core(), ContextLayout1{});
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				libv::vec3f{};
 
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
 			result[i] = libv::max(
 					result[i],
 					resolvePercent(
-							child.size()[i].pixel + (child.size()[i].dynamic ? AccessLayout::lastDynamic(child.core())[i] : 0.f),
+							child.size()[i].pixel + (child.size()[i].dynamic ? child_dynamic[i] : 0.f),
 							child.size()[i].percent, child.core())
 			);
 		});
 	}
 
-	AccessLayout::lastDynamic(*this) = result;
+	return result;
 }
 
 void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
@@ -136,6 +138,11 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 		// Size ---
 
 		auto size = libv::vec3f{};
+
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{environment.size}) :
+				libv::vec3f{};
+
 		libv::meta::for_constexpr<0, 3>([&](auto i) {
 			const auto has_ratio = child.size()[i].ratio != 0.f;
 
@@ -145,7 +152,7 @@ void CorePanelFloat::doLayout2(const ContextLayout2& environment) {
 				size[i] =
 						child.size()[i].pixel +
 						child.size()[i].percent * 0.01f * environment.size[i] +
-						(child.size()[i].dynamic ? AccessLayout::lastDynamic(child.core())[i] : 0.f);
+						(child.size()[i].dynamic ? child_dynamic[i] : 0.f);
 		});
 
 		// Position ---

@@ -57,8 +57,8 @@ public:
 	TestComponent(CoreComponent& parent) :
 			libv::ui::CoreComponent(parent, libv::ui::GenerateName, "test") {};
 
-	virtual void doLayout1(const libv::ui::ContextLayout1&) override {
-		libv::ui::AccessLayout::lastDynamic(*this) = dynamicSize;
+	virtual libv::vec3f doLayout1(const libv::ui::ContextLayout1&) override {
+		return dynamicSize;
 	}
 };
 

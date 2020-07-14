@@ -6,6 +6,7 @@
 #include <boost/container/small_vector.hpp>
 #include <range/v3/view/chunk.hpp>
 #include <range/v3/view/enumerate.hpp>
+//#include <range/v3/view/zip.hpp>
 // libv
 #include <libv/algorithm/bisect.hpp>
 #include <libv/algorithm/sum.hpp>
@@ -52,7 +53,7 @@ public:
 private:
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual void doLayout1(const ContextLayout1& le) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
 	virtual void doLayout2(const ContextLayout2& le) override;
 };
 
@@ -81,12 +82,30 @@ static constexpr Orientation2Data Orientation2Table[] = {
 };
 
 template <typename Range>
-inline auto buildLayoutedChildrenRandomAccessRange(Range& children) {
+inline auto buildLayoutedChildrenRandomAccessRange(Range& children, libv::vec3f env_bounds) {
 	// Build a random access range from the layouted children
-	boost::container::small_vector<libv::observer_ref<Component>, 32> result;
 
-	for (auto& child : children | view_layouted())
-		result.emplace_back(libv::make_observer_ref(child));
+	struct Element {
+		libv::observer_ref<Component> component;
+		libv::vec3f dynamic;
+
+		inline Component* operator->() noexcept {
+			return &*component;
+		}
+		inline const Component* operator->() const noexcept {
+			return &*component;
+		}
+	};
+
+	boost::container::small_vector<Element, 32> result;
+
+	for (auto& child : children | view_layouted()) {
+		const auto child_dynamic = child.size().has_dynamic() ?
+				AccessLayout::layout1(child.core(), ContextLayout1{env_bounds}) :
+				libv::vec3f{};
+
+		result.emplace_back(libv::make_observer_ref(child), child_dynamic);
+	}
 
 	return result;
 }
@@ -131,9 +150,8 @@ void CorePanelGrid::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-	const auto l_children = buildLayoutedChildrenRandomAccessRange(children);
+libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& environment) {
+	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, environment.size);
 
 	const auto column_count = property.column_count();
 	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
@@ -143,12 +161,12 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 
 	auto result = libv::vec3f{};
 
-	for (auto& child : l_children) {
-		AccessLayout::layout1(child->core(), ContextLayout1{});
+	boost::container::small_vector<libv::vec3f, 32> child_dynamics(children.size(), libv::vec3f{});
 
+	for (auto& child : l_children) {
 		result[_Z_] = std::max(result[_Z_],
 				child->size()[_Z_].pixel +
-				(child->size()[_Z_].dynamic ? AccessLayout::lastDynamic(child->core())[_Z_] : 0.f));
+				(child->size()[_Z_].dynamic ? child.dynamic[_Z_] : 0.f));
 	}
 
 	const auto attemptX = [&](int32_t parentSize) {
@@ -163,7 +181,7 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 				usedColumnSizeX = std::max(usedColumnSizeX,
 						child->size()[_X_].pixel +
 						child->size()[_X_].percent * parentSizeX * 0.01f +
-						(child->size()[_X_].dynamic ? AccessLayout::lastDynamic(child->core())[_X_] : 0.f));
+						(child->size()[_X_].dynamic ? child.dynamic[_X_] : 0.f));
 			}
 			usedGridSizeX += usedColumnSizeX;
 		}
@@ -183,7 +201,7 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 				usedRowSizeY = std::max(usedRowSizeY,
 						child->size()[_Y_].pixel +
 						child->size()[_Y_].percent * parentSizeY * 0.01f +
-						(child->size()[_Y_].dynamic ? AccessLayout::lastDynamic(child->core())[_Y_] : 0.f));
+						(child->size()[_Y_].dynamic ? child.dynamic[_Y_] : 0.f));
 			}
 			usedGridSizeY += usedRowSizeY;
 		}
@@ -195,11 +213,11 @@ void CorePanelGrid::doLayout1(const ContextLayout1& environment) {
 	result[_X_] = static_cast<float>(libv::bisect_rampup_3way(attemptX, 0, 0));
 	result[_Y_] = static_cast<float>(libv::bisect_rampup_3way(attemptY, 0, 0));
 
-	AccessLayout::lastDynamic(*this) = result;
+	return result;
 }
 
 void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
-	const auto l_children = buildLayoutedChildrenRandomAccessRange(children);
+	const auto l_children = buildLayoutedChildrenRandomAccessRange(children, environment.size);
 
 	// TODO P4: generalize a way for table lookup for various table lookup and handle invalid enum values
 	const auto column_count = property.column_count();
@@ -243,7 +261,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 							child->size()[_D_].pixel +
 							child->size()[_D_].percent * environment.size[_D_] * 0.01f +
 							child->size()[_D_].ratio * ratioScale +
-							(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->core())[_D_] : 0.f);
+							(child->size()[_D_].dynamic ? child.dynamic[_D_] : 0.f);
 
 					if (childSize > firstSubDimSize) {
 						firstSubDimSize = childSize;
@@ -294,7 +312,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 			const auto used =
 					child->size()[_D_].pixel +
 					child->size()[_D_].percent * environment.size[_D_] * 0.01f +
-					(child->size()[_D_].dynamic ? AccessLayout::lastDynamic(child->core())[_D_] : 0.f);
+					(child->size()[_D_].dynamic ? child.dynamic[_D_] : 0.f);
 			const auto leftover = environment.size[_D_] - used;
 			const auto contribution = leftover / child->size()[_D_].ratio;
 
@@ -311,9 +329,9 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 
 	// Assign size
 
-	boost::container::small_vector<libv::vec3f, 16> childSizes(l_children.size(), libv::vec3f{});
-	boost::container::small_vector<float, 16> advanceX(column_count, 0.f);
-	boost::container::small_vector<float, 16> advanceY(l_children.size() / column_count + 1, 0.f);
+	boost::container::small_vector<libv::vec3f, 32> childSizes(l_children.size(), libv::vec3f{});
+	boost::container::small_vector<float, 32> advanceX(column_count, 0.f);
+	boost::container::small_vector<float, 32> advanceY(l_children.size() / column_count + 1, 0.f);
 
 	for (const auto& [y, row] : l_children | ranges::view::chunk(column_count) | ranges::view::enumerate) {
 		for (const auto& [x, child] : row | ranges::view::enumerate) {
@@ -323,7 +341,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 				return child->size()[i].pixel +
 						child->size()[i].percent * environment.size[i] * 0.01f +
 						child->size()[i].ratio * ratioContribution[i] +
-						(child->size()[i].dynamic ? AccessLayout::lastDynamic(child->core())[i] : 0.f);
+						(child->size()[i].dynamic ? child.dynamic[i] : 0.f);
 			});
 
 			advanceX[x] = std::max(advanceX[x], childSize[_X_]);
@@ -359,7 +377,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& environment) {
 			const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
 			AccessLayout::layout2(
-					child->core(),
+					child.component->core(),
 					ContextLayout2{
 						roundedPosition,
 						roundedSize,

@@ -67,7 +67,7 @@ private:
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current) override;
 	virtual void doRender(ContextRender& context) override;
-	virtual void doLayout1(const ContextLayout1& environment) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doForeachChildren(libv::function_ref<bool(CoreComponent&)> callback) override;
 	virtual void doForeachChildren(libv::function_ref<void(CoreComponent&)> callback) override;
@@ -118,16 +118,19 @@ void CoreScrollArea::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreScrollArea::doLayout1(const ContextLayout1& environment) {
+libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& environment) {
 	if (!client)
-		return;
+		return {};
 
-	AccessLayout::layout1(client->core(), environment);
-	AccessLayout::lastDynamic(*this) = AccessLayout::lastDynamic(client->core());
+	return AccessLayout::layout1(client->core(), ContextLayout1{environment.size});
 }
 
 void CoreScrollArea::doLayout2(const ContextLayout2& environment) {
+	if (!client)
+		return;
+
 	ContextLayout2 client_env = environment;
+
 	switch (property.mode()) {
 	case ScrollAreaMode::both:
 		client_env.size.x = -1;
@@ -251,6 +254,7 @@ void ScrollArea::view_position(libv::vec2f value) {
 	return self().view_position;
 }
 
+// -------------------------------------------------------------------------------------------------
 // =================================================================================================
 // =================================================================================================
 // =================================================================================================
@@ -302,7 +306,7 @@ void ScrollArea::view_position(libv::vec2f value) {
 //
 //private:
 //	virtual void doAttach() override;
-//	virtual void doLayout1(const ContextLayout1& environment) override;
+//	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	virtual void doLayout2(const ContextLayout2& environment) override;
 //	virtual void doRender(ContextRender& context) override;
 //	virtual void doStyle(ContextStyle& context) override;
@@ -337,7 +341,7 @@ void ScrollArea::view_position(libv::vec2f value) {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//void CoreScrollPane::doLayout1(const ContextLayout1& environment) {
+//libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& environment) {
 //	(void) environment;
 //
 //	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
@@ -365,7 +369,7 @@ void ScrollArea::view_position(libv::vec2f value) {
 //		});
 //	}
 //
-//	AccessLayout::lastDynamic(*this) = result;
+//	return result;
 //}
 //
 //void CoreScrollPane::doLayout2(const ContextLayout2& environment) {

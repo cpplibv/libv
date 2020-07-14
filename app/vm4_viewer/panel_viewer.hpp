@@ -75,7 +75,7 @@ public:
 
 private:
 	void doAttach() override;
-//	void doLayout1(const ContextLayout1& environment) override;
+//	libv::vec3f doLayout1(const ContextLayout1& environment) override;
 //	void doRender(ContextRender& context) override;
 };
 
