@@ -652,6 +652,12 @@ wish_create_executable(
 	LINK   ext_fmt libv_utility
 )
 
+wish_create_executable(
+	TARGET app_enum_generator
+	SOURCE app/enum_generator.cpp
+	LINK   ext_fmt ext_clip
+)
+
 wish_end_group()
 wish_create_group(GROUP_EXAMPLE) # EXAMPLE ---------------------------------------------------------
 
