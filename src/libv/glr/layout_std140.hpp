@@ -10,6 +10,7 @@
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/always.hpp>
+#include <libv/meta/identity.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/type_traits.hpp>
 #include <libv/utility/align.hpp>
@@ -153,151 +154,235 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-static constexpr bool is_glsl_scalar_v = libv::meta::is_same_as_any_v<T,
-		bool, int32_t, uint32_t, int64_t, uint64_t, float, double>;
+//template <typename T>
+//static constexpr bool is_glsl_scalar_v = libv::meta::is_same_as_any_v<T,
+//		bool, int32_t, uint32_t, int64_t, uint64_t, float, double>;
+//
+//template <typename T>
+//static constexpr bool is_glsl_mat_scalar_v = libv::meta::is_same_as_any_v<T,
+//		float, double>;
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//template <typename T>
+//struct AlignSTD140;
+//
+//// 1) scalar
+//template <> struct AlignSTD140<bool> {
+//	static constexpr uint32_t align = 4;
+//	static constexpr uint32_t size = 4;
+//};
+//template <> struct AlignSTD140<int32_t> {
+//	static constexpr uint32_t align = sizeof (int32_t);
+//	static constexpr uint32_t size = sizeof (int32_t);
+//};
+//template <> struct AlignSTD140<uint32_t> {
+//	static constexpr uint32_t align = sizeof (uint32_t);
+//	static constexpr uint32_t size = sizeof (uint32_t);
+//};
+//template <> struct AlignSTD140<int64_t> {
+//	static constexpr uint32_t align = sizeof (int64_t);
+//	static constexpr uint32_t size = sizeof (int64_t);
+//};
+//template <> struct AlignSTD140<uint64_t> {
+//	static constexpr uint32_t align = sizeof (uint64_t);
+//	static constexpr uint32_t size = sizeof (uint64_t);
+//};
+//template <> struct AlignSTD140<float> {
+//	static constexpr uint32_t align = sizeof (float);
+//	static constexpr uint32_t size = sizeof (float);
+//};
+//template <> struct AlignSTD140<double> {
+//	static constexpr uint32_t align = sizeof (double);
+//	static constexpr uint32_t size = sizeof (double);
+//};
+//
+//// 2) two- or four-component vector
+//template <typename T> struct AlignSTD140<libv::vec2_t<T>> {
+//	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
+//	static constexpr uint32_t align = 2 * AlignSTD140<T>::align;
+//	static constexpr uint32_t size = 2 * AlignSTD140<T>::size;
+//};
+//template <typename T> struct AlignSTD140<libv::vec4_t<T>> {
+//	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
+//	static constexpr uint32_t align = 4 * AlignSTD140<T>::align;
+//	static constexpr uint32_t size = 4 * AlignSTD140<T>::size;
+//};
+//
+//// 3) three-component vector
+//template <typename T> struct AlignSTD140<libv::vec3_t<T>> {
+//	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
+//	static constexpr uint32_t align = 4 * AlignSTD140<T>::align;
+//	static constexpr uint32_t size = 3 * AlignSTD140<T>::align;
+//};
+//
+//// 4) array of scalars or vectors
+//template <typename T, size_t S> WISH_REQUIRES(is_glsl_scalar_v<T>) struct AlignSTD140<std::array<T, S>> {
+//	static constexpr uint32_t align = libv::align(AlignSTD140<T>::align, AlignSTD140<libv::vec4f>::align);
+//	static constexpr uint32_t size = S * libv::align(AlignSTD140<T>::size, AlignSTD140<libv::vec4f>::size);
+//};
+//template <typename T, size_t N, size_t S> struct AlignSTD140<std::array<libv::vec_t<N, T>, S>> {
+//	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in array<vec<T>>");
+//	static constexpr uint32_t align = libv::align(AlignSTD140<libv::vec_t<N, T>>::align, AlignSTD140<libv::vec4f>::align);
+//	static constexpr uint32_t size = S * libv::align(AlignSTD140<libv::vec_t<N, T>>::size, AlignSTD140<libv::vec4f>::size);
+//};
+//template <typename T, size_t S> struct AlignSTD140<std::array<T, S>> {
+//	static_assert(libv::meta::always_false_v<T>, "T has to be a scalar or vec type in array<T>");
+//};
+//
+//// 5) 7) matrix
+//template <typename T, size_t R, size_t C> struct AlignSTD140<libv::mat_t<R, C, T>> :
+//	AlignSTD140<std::array<libv::vec_t<C, T>, R>> {
+//	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
+//	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
+//	static_assert(is_glsl_mat_scalar_v<T>, "T has to be a mat scalar type");
+//};
+//
+//// 6) 8) array of matrices
+//template <typename T, size_t R, size_t C, size_t S> struct AlignSTD140<std::array<libv::mat_t<R, C, T>, S>> :
+//	AlignSTD140<std::array<libv::vec_t<C, T>, R * S>> {
+//	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
+//	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
+//	static_assert(is_glsl_mat_scalar_v<T>, "T has to be a mat scalar type");
+//};
 
-template <typename T>
-static constexpr bool is_glsl_mat_scalar_v = libv::meta::is_same_as_any_v<T,
-		float, double>;
+//// -------------------------------------------------------------------------------------------------
+//
+// Consider this alternative approach:
+//
+struct UnfirormLayoutRule {
+	uint32_t align = 0;
+	uint32_t size = 0;
+};
+
+template <typename T> using identity = libv::meta::identity_t<T>;
+
+//[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(...) noexcept;
+
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<bool>)          noexcept { return { 4,  4}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<int32_t>)       noexcept { return { 4,  4}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<uint32_t>)      noexcept { return { 4,  4}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<int64_t>)       noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<uint64_t>)      noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<float>)         noexcept { return { 4,  4}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<double>)        noexcept { return { 8,  8}; }
+
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2b>)   noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3b>)   noexcept { return {16, 12}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4b>)   noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2i>)   noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3i>)   noexcept { return {16, 12}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4i>)   noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2ui>)  noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3ui>)  noexcept { return {16, 12}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4ui>)  noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2l>)   noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3l>)   noexcept { return {32, 24}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4l>)   noexcept { return {32, 32}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2ul>)  noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3ul>)  noexcept { return {32, 24}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4ul>)  noexcept { return {32, 32}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2f>)   noexcept { return { 8,  8}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3f>)   noexcept { return {16, 12}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4f>)   noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec2d>)   noexcept { return {16, 16}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec3d>)   noexcept { return {32, 24}; }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::vec4d>)   noexcept { return {32, 32}; }
+
+template <typename T, size_t N>
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<std::array<T, N>>) noexcept {
+	const auto member_rule = rule_std140(identity<T>{});
+	const auto vec4_rule = rule_std140(identity<libv::vec4f>{});
+
+	return {
+		libv::align(member_rule.align, vec4_rule.align),
+		libv::align(member_rule.size, vec4_rule.size) * N
+	};
+}
+
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2f>)   noexcept { return rule_std140<libv::vec2f, 2>(identity<std::array<libv::vec2f, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3f>)   noexcept { return rule_std140<libv::vec3f, 3>(identity<std::array<libv::vec3f, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4f>)   noexcept { return rule_std140<libv::vec4f, 4>(identity<std::array<libv::vec4f, 4>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2d>)   noexcept { return rule_std140<libv::vec2f, 2>(identity<std::array<libv::vec2f, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3d>)   noexcept { return rule_std140<libv::vec3f, 3>(identity<std::array<libv::vec3f, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4d>)   noexcept { return rule_std140<libv::vec4f, 4>(identity<std::array<libv::vec4f, 4>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3f>) noexcept { return rule_std140<libv::vec3f, 2>(identity<std::array<libv::vec3f, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4f>) noexcept { return rule_std140<libv::vec4f, 2>(identity<std::array<libv::vec4f, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2f>) noexcept { return rule_std140<libv::vec2f, 3>(identity<std::array<libv::vec2f, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4f>) noexcept { return rule_std140<libv::vec4f, 3>(identity<std::array<libv::vec4f, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2f>) noexcept { return rule_std140<libv::vec2f, 4>(identity<std::array<libv::vec2f, 4>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3f>) noexcept { return rule_std140<libv::vec3f, 4>(identity<std::array<libv::vec3f, 4>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3d>) noexcept { return rule_std140<libv::vec3d, 2>(identity<std::array<libv::vec3d, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4d>) noexcept { return rule_std140<libv::vec4d, 2>(identity<std::array<libv::vec4d, 2>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2d>) noexcept { return rule_std140<libv::vec2d, 3>(identity<std::array<libv::vec2d, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4d>) noexcept { return rule_std140<libv::vec4d, 3>(identity<std::array<libv::vec4d, 3>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2d>) noexcept { return rule_std140<libv::vec2d, 4>(identity<std::array<libv::vec2d, 4>>{}); }
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3d>) noexcept { return rule_std140<libv::vec3d, 4>(identity<std::array<libv::vec3d, 4>>{}); }
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-struct AlignSTD140;
+[[nodiscard]] static constexpr inline uint32_t std140_align() noexcept {
+	return rule_std140(identity<T>{}).align;
+}
 
-// 1) scalar
-template <> struct AlignSTD140<bool> {
-	static constexpr uint32_t align = 4;
-	static constexpr uint32_t size = 4;
-};
-template <> struct AlignSTD140<int32_t> {
-	static constexpr uint32_t align = sizeof (int32_t);
-	static constexpr uint32_t size = sizeof (int32_t);
-};
-template <> struct AlignSTD140<uint32_t> {
-	static constexpr uint32_t align = sizeof (uint32_t);
-	static constexpr uint32_t size = sizeof (uint32_t);
-};
-template <> struct AlignSTD140<int64_t> {
-	static constexpr uint32_t align = sizeof (int64_t);
-	static constexpr uint32_t size = sizeof (int64_t);
-};
-template <> struct AlignSTD140<uint64_t> {
-	static constexpr uint32_t align = sizeof (uint64_t);
-	static constexpr uint32_t size = sizeof (uint64_t);
-};
-template <> struct AlignSTD140<float> {
-	static constexpr uint32_t align = sizeof (float);
-	static constexpr uint32_t size = sizeof (float);
-};
-template <> struct AlignSTD140<double> {
-	static constexpr uint32_t align = sizeof (double);
-	static constexpr uint32_t size = sizeof (double);
-};
+template <typename T>
+[[nodiscard]] static constexpr inline uint32_t std140_size() noexcept {
+	return rule_std140(identity<T>{}).size;
+}
 
-// 2) two- or four-component vector
-template <typename T> struct AlignSTD140<libv::vec2_t<T>> {
-	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
-	static constexpr uint32_t align = 2 * AlignSTD140<T>::align;
-	static constexpr uint32_t size = 2 * AlignSTD140<T>::size;
-};
-template <typename T> struct AlignSTD140<libv::vec4_t<T>> {
-	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
-	static constexpr uint32_t align = 4 * AlignSTD140<T>::align;
-	static constexpr uint32_t size = 4 * AlignSTD140<T>::size;
-};
+// -------------------------------------------------------------------------------------------------
 
-// 3) three-component vector
-template <typename T> struct AlignSTD140<libv::vec3_t<T>> {
-	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in vec<T>");
-	static constexpr uint32_t align = 4 * AlignSTD140<T>::align;
-	static constexpr uint32_t size = 3 * AlignSTD140<T>::align;
-};
+template <typename T>
+[[nodiscard]] static constexpr inline UnfirormLayoutRule rule_std140(identity<T>) noexcept {
+	uint32_t result_align = 0;
+	libv::meta::foreach_static_member<T>([&](auto member) {
+		using M = typename std::decay_t<decltype(member)>::value_type;
 
-// 4) array of scalars or vectors
-template <typename T, size_t S> WISH_REQUIRES(is_glsl_scalar_v<T>) struct AlignSTD140<std::array<T, S>> {
-	static constexpr uint32_t align = libv::align(AlignSTD140<T>::align, AlignSTD140<libv::vec4f>::align);
-	static constexpr uint32_t size = S * libv::align(AlignSTD140<T>::size, AlignSTD140<libv::vec4f>::size);
-};
-template <typename T, size_t N, size_t S> struct AlignSTD140<std::array<libv::vec_t<N, T>, S>> {
-	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in array<vec<T>>");
-	static constexpr uint32_t align = libv::align(AlignSTD140<libv::vec_t<N, T>>::align, AlignSTD140<libv::vec4f>::align);
-	static constexpr uint32_t size = S * libv::align(AlignSTD140<libv::vec_t<N, T>>::size, AlignSTD140<libv::vec4f>::size);
-};
-template <typename T, size_t S> struct AlignSTD140<std::array<T, S>> {
-	static_assert(libv::meta::always_false_v<T>, "T has to be a scalar or vec type in array<T>");
-};
+		if constexpr (isUniform_v<M>)
+			result_align = std::max(result_align, std140_align<typename M::value_type>());
+		else if constexpr (libv::meta::is_array_v<M>)
+			result_align = std::max(result_align, std140_align<typename M::value_type>());
+		else
+			result_align = std::max(result_align, std140_align<M>());
+	});
+	result_align = libv::align(result_align, std140_align<libv::vec4f>());
 
-// 5) 7) matrix
-template <typename T, size_t R, size_t C> struct AlignSTD140<libv::mat_t<R, C, T>> :
-	AlignSTD140<std::array<libv::vec_t<C, T>, R>> {
-	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
-	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
-	static_assert(is_glsl_mat_scalar_v<T>, "T has to be a mat scalar type");
-};
+	uint32_t result_size = 0;
+	libv::meta::foreach_static_member<T>([&](auto member) {
+		using M = typename std::decay_t<decltype(member)>::value_type;
 
-// 6) 8) array of matrices
-template <typename T, size_t R, size_t C, size_t S> struct AlignSTD140<std::array<libv::mat_t<R, C, T>, S>> :
-	AlignSTD140<std::array<libv::vec_t<C, T>, R * S>> {
-	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
-	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
-	static_assert(is_glsl_mat_scalar_v<T>, "T has to be a mat scalar type");
-};
+		if constexpr (isUniform_v<M>) {
+			result_size = libv::align(result_size, std140_align<typename M::value_type>());
+			result_size += std140_size<typename M::value_type>();
+		} else if constexpr (libv::meta::is_array_v<M>) {
+			libv::meta::for_constexpr<0, libv::meta::array_size_v<M>>([&](auto) {
+				// TODO P5: for_constexpr's loop variable should be optional
+				result_size = libv::align(result_size, std140_align<typename M::value_type>());
+				result_size += std140_size<typename M::value_type>();
+			});
+		} else {
+			result_size = libv::align(result_size, std140_align<M>());
+			result_size += std140_size<M>();
+		}
+	});
+	result_size = libv::align(result_size, result_align);
 
-// 9) 10) structure or array of structures
-template <typename T> struct AlignSTD140 {
-	static constexpr uint32_t calculate_align() {
-		uint32_t result = 0;
-		libv::meta::foreach_static_member<T>([&](auto member) {
-			using M = typename std::decay_t<decltype(member)>::value_type;
-
-			if constexpr (isUniform_v<M>)
-				result = std::max(result, AlignSTD140<typename M::value_type>::align);
-			else if constexpr (libv::meta::is_array_v<M>)
-				result = std::max(result, AlignSTD140<typename M::value_type>::align);
-			else
-				result = std::max(result, AlignSTD140<M>::align);
-		});
-		return libv::align(result, AlignSTD140<libv::vec4f>::align);
-	}
-
-	static constexpr uint32_t calculate_size() {
-		uint32_t result = 0;
-		libv::meta::foreach_static_member<T>([&](auto member) {
-			using M = typename std::decay_t<decltype(member)>::value_type;
-
-			if constexpr (isUniform_v<M>) {
-				result = libv::align(result, AlignSTD140<typename M::value_type>::align);
-				result += AlignSTD140<typename M::value_type>::size;
-			} else if constexpr (libv::meta::is_array_v<M>) {
-				libv::meta::for_constexpr<0, libv::meta::array_size_v<M>>([&](auto) {
-					// TODO P5: for_constexpr's loop variable should be optional
-					result = libv::align(result, AlignSTD140<typename M::value_type>::align);
-					result += AlignSTD140<typename M::value_type>::size;
-				});
-			} else {
-				result = libv::align(result, AlignSTD140<M>::align);
-				result += AlignSTD140<M>::size;
-			}
-		});
-		return libv::align(result, align);
-	}
-
-	static constexpr uint32_t align = calculate_align();
-	static constexpr uint32_t size = calculate_size();
-};
+	return {result_align, result_size};
+}
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
 constexpr inline uint32_t layout_std140_align() {
-	return AlignSTD140<T>::align;
+//	return AlignSTD140<T>::align;
+	return std140_align<T>();
 }
 
 template <typename T>
 constexpr inline uint32_t layout_std140_size() {
-	return AlignSTD140<T>::size;
+//	return AlignSTD140<T>::size;
+	return std140_size<T>();
 }
 
 template <typename T>
@@ -385,78 +470,3 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 
 } // namespace glr
 } // namespace libv
-
-//// -------------------------------------------------------------------------------------------------
-//
-// Consider this alternative approach:
-//
-//struct UnfirormLayoutRule {
-//	uint32_t align = 0;
-//	uint32_t size = 0;
-//};
-//
-//template <typename T> using identity = libv::meta::identity_t<T>;
-//
-//inline UnfirormLayoutRule rule_std140(...) { static_assert }
-//
-//inline UnfirormLayoutRule rule_std140(identity<bool>)          { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<int32_t>)       { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<uint32_t>)      { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<int64_t>)       { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<uint64_t>)      { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<float>)         { return { 4,  4}; }
-//inline UnfirormLayoutRule rule_std140(identity<double>)        { return { 8,  8}; }
-//
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2b>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3b>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4b>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2i>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3i>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4i>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2ui>)  { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3ui>)  { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4ui>)  { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2l>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3l>)   { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4l>)   { return {32, 32}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2ul>)  { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3ul>)  { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4ul>)  { return {32, 32}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2f>)   { return { 8,  8}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3f>)   { return {16, 12}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4f>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec2d>)   { return {16, 16}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec3d>)   { return {32, 24}; }
-//inline UnfirormLayoutRule rule_std140(identity<libv::vec4d>)   { return {32, 32}; }
-//
-//template <typename T, size_t N>
-//inline UnfirormLayoutRule rule_std140(identity<std::array<T, N>) {
-//	const auto member_rule = rule_std140(identity<T>{});
-//	const auto vec4_rule = rule_std140(identity<libv::vec4f>{});
-//
-//	return {
-//		libv::align(member_rule.align, vec4_rule.align),
-//		libv::align(member_rule.size, vec4_rule.size) * N
-//	};
-//}
-//
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2f>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3f>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4f>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2d>)   { return rule_std140(identity<std::array<libv::vec2f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3d>)   { return rule_std140(identity<std::array<libv::vec3f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4d>)   { return rule_std140(identity<std::array<libv::vec4f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3f>) { return rule_std140(identity<std::array<libv::vec3f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4f>) { return rule_std140(identity<std::array<libv::vec4f, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2f>) { return rule_std140(identity<std::array<libv::vec2f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4f>) { return rule_std140(identity<std::array<libv::vec4f, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2f>) { return rule_std140(identity<std::array<libv::vec2f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3f>) { return rule_std140(identity<std::array<libv::vec3f, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x3d>) { return rule_std140(identity<std::array<libv::vec3d, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat2x4d>) { return rule_std140(identity<std::array<libv::vec4d, 2>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x2d>) { return rule_std140(identity<std::array<libv::vec2d, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat3x4d>) { return rule_std140(identity<std::array<libv::vec4d, 3>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x2d>) { return rule_std140(identity<std::array<libv::vec2d, 4>>{}); }
-//inline UnfirormLayoutRule rule_std140(identity<libv::mat4x3d>) { return rule_std140(identity<std::array<libv::vec3d, 4>>{}); }
-//
-//// -------------------------------------------------------------------------------------------------
