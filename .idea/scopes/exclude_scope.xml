@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="exclude_scope" pattern="!file[libv]:ext//*&amp;&amp;!file[libv]:.idea//*" />
+</component>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/assimp/src/get_assimp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/catch/src/get_catch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/cereal/src/get_cereal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/clip/src/get_clip" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/ctre/src/get_ctre" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/date/src/get_date" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/efsw/src/get_efsw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/fmt/src/get_fmt" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/freetype/src/get_freetype" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/glew/src/get_glew" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/glfw/src/get_glfw" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/gli/src/get_gli" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/glm/src/get_glm" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/immer/src/get_immer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/immer/src/get_immer/extra/python/lib/pybind11" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/immer/src/get_immer/extra/python/lib/pybind11/tools/clang" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/immer/src/get_immer/tools/sinusoidal-sphinx-theme" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/jc_voronoi/src/get_jc_voronoi" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/libbacktrace/src/get_libbacktrace" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/lua/src/get_lua" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/net_ts/src/get_net_ts" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/range/src/get_range" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/range/src/get_range/doc/gh-pages" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/reactphysics3d/src/get_reactphysics3d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/sml/src/get_sml" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/soil/src/get_soil" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/sol/src/get_sol" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/ext_src/utf8cpp/src/get_utf8cpp" vcs="Git" />
+  </component>
+</project>

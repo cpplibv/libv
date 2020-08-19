@@ -1,0 +1,979 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AnalysisUIOptions">
+    <option name="SHOW_STRUCTURE" value="true" />
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:backup" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:ci" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:feature" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:personal" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="libv" targetName="sandbox_libv_log" />
+      <config projectName="libv" targetName="sandbox" />
+      <config projectName="libv" targetName="libv_net" />
+      <config projectName="libv" targetName="sandbox_libv_gl" />
+      <config projectName="libv" targetName="test_libv_frame" />
+      <config projectName="libv" targetName="test_libv_arg" />
+      <config projectName="libv" targetName="sandbox_libv_net_server" />
+      <config projectName="libv" targetName="sandbox_libv_ctrl" />
+      <config projectName="libv" targetName="get_sol" />
+      <config projectName="libv" targetName="get_fmt" />
+      <config projectName="libv" targetName="get_freetype" />
+      <config projectName="libv" targetName="sandbox_libv_glr" />
+      <config projectName="libv" targetName="app_enum_generator" />
+      <config projectName="libv" targetName="lib" />
+      <config projectName="libv" targetName="app_binary_to_source" />
+      <config projectName="libv" targetName="test_libv_math" />
+      <config projectName="libv" targetName="app_vm4_viewer" />
+      <config projectName="libv" targetName="sandbox_libv_sml" />
+      <config projectName="libv" targetName="test_libv_input" />
+      <config projectName="libv" targetName="test_libv_algorithm" />
+      <config projectName="libv" targetName="sandbox_libv_fsw" />
+      <config projectName="libv" targetName="sandbox_libv_vm4imp" />
+      <config projectName="libv" targetName="get_cereal" />
+      <config projectName="libv" targetName="libv_vm4" />
+      <config projectName="libv" targetName="test_libv_glr" />
+      <config projectName="libv" targetName="test_libv_range" />
+      <config projectName="libv" targetName="get_net_ts" />
+      <config projectName="libv" targetName="get_reactphysics3d" />
+      <config projectName="libv" targetName="libv_fsw" />
+      <config projectName="libv" targetName="sandbox_libv_ui_lua" />
+      <config projectName="libv" targetName="test_libv_ctrl" />
+      <config projectName="libv" targetName="example_libv_ctrl_camera" />
+      <config projectName="libv" targetName="test_libv_gl" />
+      <config projectName="libv" targetName="test_libv_log" />
+      <config projectName="libv" targetName="group_unit_test" />
+      <config projectName="libv" targetName="get_date" />
+      <config projectName="libv" targetName="test_libv_fsw" />
+      <config projectName="libv" targetName="group_example" />
+      <config projectName="libv" targetName="sandbox_libv_net" />
+      <config projectName="libv" targetName="get_immer" />
+      <config projectName="libv" targetName="get_efsw" />
+      <config projectName="libv" targetName="sandbox_libv_ecs" />
+      <config projectName="libv" targetName="libv_glr" />
+      <config projectName="libv" targetName="test" />
+      <config projectName="libv" targetName="sandbox_libv_ui" />
+      <config projectName="libv" targetName="get_assimp" />
+      <config projectName="libv" targetName="get_boost" />
+      <config projectName="libv" targetName="sandbox_libv_reflection2" />
+      <config projectName="libv" targetName="get_jc_voronoi" />
+      <config projectName="libv" targetName="group_library" />
+      <config projectName="libv" targetName="ext" />
+      <config projectName="libv" targetName="app" />
+      <config projectName="libv" targetName="obj_test_runner" />
+      <config projectName="libv" targetName="libv_ui" />
+      <config projectName="libv" targetName="get_glfw" />
+      <config projectName="libv" targetName="get_soil" />
+      <config projectName="libv" targetName="sandbox_libv_physics" />
+      <config projectName="libv" targetName="get_libbacktrace" />
+      <config projectName="libv" targetName="libv_ctrl" />
+      <config projectName="libv" targetName="get_utf8cpp" />
+      <config projectName="libv" targetName="test_libv_utility" />
+      <config projectName="libv" targetName="libv_lua" />
+      <config projectName="libv" targetName="libv_input" />
+      <config projectName="libv" targetName="example" />
+      <config projectName="libv" targetName="test_libv_lua" />
+      <config projectName="libv" targetName="test_libv_ui" />
+      <config projectName="libv" targetName="sandbox_libv_immer" />
+      <config projectName="libv" targetName="get_lua" />
+      <config projectName="libv" targetName="get_catch" />
+      <config projectName="libv" targetName="sandbox_libv_sig" />
+      <config projectName="libv" targetName="libv_frame" />
+      <config projectName="libv" targetName="get_glew" />
+      <config projectName="libv" targetName="wish_ide" />
+      <config projectName="libv" targetName="sandbox_libv_glr2" />
+      <config projectName="libv" targetName="get_clip" />
+      <config projectName="libv" targetName="libv_sig" />
+      <config projectName="libv" targetName="get_range" />
+      <config projectName="libv" targetName="sandbox_libv_serialize_cereal" />
+      <config projectName="libv" targetName="sandbox_libv_lua" />
+      <config projectName="libv" targetName="group_application" />
+      <config projectName="libv" targetName="get_ctre" />
+      <config projectName="libv" targetName="sandbox_libv_frame" />
+      <config projectName="libv" targetName="get_sml" />
+      <config projectName="libv" targetName="test_libv_ecs" />
+      <config projectName="libv" targetName="sandbox_libv_gl2" />
+      <config projectName="libv" targetName="test_libv_net" />
+      <config projectName="libv" targetName="example_libv_ctrl_hello" />
+      <config projectName="libv" targetName="libv_parse" />
+      <config projectName="libv" targetName="get_glm" />
+      <config projectName="libv" targetName="sandbox_libv_serialize" />
+      <config projectName="libv" targetName="group_externals" />
+      <config projectName="libv" targetName="get_gli" />
+      <config projectName="libv" targetName="test_libv_sig" />
+      <config projectName="libv" targetName="libv_vm4imp" />
+      <config projectName="libv" targetName="libv_gl" />
+      <config projectName="libv" targetName="sandbox_libv_reflection" />
+      <config projectName="libv" targetName="group_sandbox" />
+      <config projectName="libv" targetName="test_libv_parse" />
+      <config projectName="libv" targetName="sandbox_libv_libv" />
+      <config projectName="libv" targetName="test_libv_color" />
+      <config projectName="libv" targetName="sandbox_libv_net_client" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=DEBUG" GENERATION_DIR="build/debug" BUILD_OPTIONS="-- -j13" />
+      <configuration PROFILE_NAME="Release" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=RELEASE" GENERATION_DIR="build/release" BUILD_OPTIONS="-- -j13" />
+      <configuration PROFILE_NAME="Dev" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=DEV" GENERATION_DIR="build/dev" BUILD_OPTIONS="-- -j13" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="7b24159b-f77d-4823-ada0-1b19c3b4641b" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LIBV-TODO.md" beforeDir="false" afterPath="$PROJECT_DIR$/LIBV-TODO.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/enum_generator.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/enum_generator.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vm4_viewer/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/vm4_viewer/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vm4_viewer/scene/camera.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/vm4_viewer/scene/camera.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/vm4_viewer/ui/overlay_notification.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/app/vm4_viewer/ui/overlay_notification.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/libv/ui/context/context_mouse.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/libv/ui/context/context_mouse.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/libv/utility/generic_path.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/include/libv/utility/generic_path.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox/libv_main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/libv_main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sandbox/libv_ui_main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/sandbox/libv_ui_main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/libv/ui/context/context_mouse.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/libv/ui/context/context_mouse.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/libv/ui/core_component.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/libv/ui/core_component.cpp" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="DarkyenusTimeTracker">
+    <option name="totalTimeSeconds" value="2020" />
+    <option name="naggedAbout" value="1" />
+    <option name="ideTimePattern" value="{{lh}} {{lm}} {{ts}}" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Dev" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="NamedScopeManager">
+    <order>
+      <scope name="exclude_scope" />
+    </order>
+  </component>
+  <component name="ProjectId" id="1fxTC8t76e6ikbxKizBaA6f4xJT" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="TODO_SCOPE" value="exclude_scope" />
+    <property name="ToolWindowInspection Results.ShowToolbar" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settings.ide.settings.notifications" />
+  </component>
+  <component name="RunManager" selected="CMake Application.sandbox_libv_libv">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_algorithm" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_algorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_algorithm" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_arg" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_arg" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_arg" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_color" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_color" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_color" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_ctrl" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_ctrl" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_ctrl" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_ecs" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_ecs" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_ecs" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_gl" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_gl" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_gl" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_glr" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_glr" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_glr" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_input" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_input" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_input" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_log" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_log" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_log" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_lua" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_lua" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_lua" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_math" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_math" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_math" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_net" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_net" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_net" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_parse" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_parse" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_parse" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_range" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_range" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_range" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_sig" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_sig" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_sig" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_ui" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_ui" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_ui" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_utility" type="CMakeCatchTestRunConfigurationType" factoryName="Catch Test" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_utility" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_utility" TEST_MODE="SUITE_TEST">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="BeforeTestRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="app" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app_binary_to_source" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="app_binary_to_source" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="app_binary_to_source">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app_enum_generator" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="app_enum_generator" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="app_enum_generator">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="app_vm4_viewer" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="app_vm4_viewer" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="app_vm4_viewer">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="example" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="example" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="example_libv_ctrl_camera" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="example_libv_ctrl_camera" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="example_libv_ctrl_camera">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="example_libv_ctrl_hello" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="example_libv_ctrl_hello" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="example_libv_ctrl_hello">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ext" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="ext" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_assimp" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_assimp" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_boost" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_boost" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_catch" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_catch" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_cereal" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_cereal" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_clip" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_clip" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_ctre" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_ctre" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_date" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_date" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_efsw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_efsw" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_fmt" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_fmt" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_freetype" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_freetype" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_glew" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_glew" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_glfw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_glfw" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_gli" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_gli" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_glm" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_glm" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_immer" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_immer" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_jc_voronoi" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_jc_voronoi" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_libbacktrace" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_libbacktrace" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_lua" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_lua" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_net_ts" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_net_ts" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_range" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_range" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_reactphysics3d" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_reactphysics3d" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_sml" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_sml" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_soil" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_soil" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_sol" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_sol" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="get_utf8cpp" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="get_utf8cpp" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_application" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_application" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_example" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_example" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_externals" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_externals" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_library" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_library" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_sandbox" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_sandbox" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="group_unit_test" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="group_unit_test" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="lib" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="lib" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_ctrl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_ctrl" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_frame" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_frame" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_fsw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_fsw" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_gl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_gl" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_glr" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_glr" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_input" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_input" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_lua" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_lua" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_net" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_net" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_parse" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_parse" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_sig" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_sig" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_ui" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_ui" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_vm4" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_vm4" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="libv_vm4imp" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="libv_vm4imp" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="obj_test_runner" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="obj_test_runner" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_ctrl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_ctrl" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_ctrl">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_ecs" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_ecs" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_ecs">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_frame" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_frame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_frame">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_fsw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_fsw" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_fsw">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_gl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_gl" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_gl">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_gl2" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_gl2" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_gl2">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_glr" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_glr" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_glr">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_glr2" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_glr2" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_glr2">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_immer" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_immer" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_immer">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_libv" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_libv" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_libv">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_log" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_log" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_log">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_lua" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_lua" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_lua">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_net" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_net" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_net">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_net_client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_net_client" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_net_client">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_net_server" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_net_server" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_net_server">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_physics" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_physics" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_physics">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_reflection" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_reflection" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_reflection">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_reflection2" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_reflection2" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_reflection2">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_serialize" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_serialize" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_serialize">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_serialize_cereal" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_serialize_cereal" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_serialize_cereal">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_sig" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_sig" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_sig">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_sml" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_sml" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_sml">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_ui" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_ui" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_ui">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_ui_lua" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_ui_lua" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_ui_lua">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="sandbox_libv_vm4imp" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_vm4imp" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_vm4imp">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_frame" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_frame" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_frame">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="test_libv_fsw" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="test_libv_fsw" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="test_libv_fsw">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="wish_ide" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="wish_ide" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Catch.test_libv_algorithm" />
+      <item itemvalue="Catch.test_libv_arg" />
+      <item itemvalue="Catch.test_libv_color" />
+      <item itemvalue="Catch.test_libv_ctrl" />
+      <item itemvalue="Catch.test_libv_ecs" />
+      <item itemvalue="Catch.test_libv_gl" />
+      <item itemvalue="Catch.test_libv_glr" />
+      <item itemvalue="Catch.test_libv_input" />
+      <item itemvalue="Catch.test_libv_log" />
+      <item itemvalue="Catch.test_libv_lua" />
+      <item itemvalue="Catch.test_libv_math" />
+      <item itemvalue="Catch.test_libv_net" />
+      <item itemvalue="Catch.test_libv_parse" />
+      <item itemvalue="Catch.test_libv_range" />
+      <item itemvalue="Catch.test_libv_sig" />
+      <item itemvalue="Catch.test_libv_ui" />
+      <item itemvalue="Catch.test_libv_utility" />
+      <item itemvalue="CMake Application.app" />
+      <item itemvalue="CMake Application.app_binary_to_source" />
+      <item itemvalue="CMake Application.app_enum_generator" />
+      <item itemvalue="CMake Application.app_vm4_viewer" />
+      <item itemvalue="CMake Application.example" />
+      <item itemvalue="CMake Application.example_libv_ctrl_camera" />
+      <item itemvalue="CMake Application.example_libv_ctrl_hello" />
+      <item itemvalue="CMake Application.ext" />
+      <item itemvalue="CMake Application.get_assimp" />
+      <item itemvalue="CMake Application.get_boost" />
+      <item itemvalue="CMake Application.get_catch" />
+      <item itemvalue="CMake Application.get_cereal" />
+      <item itemvalue="CMake Application.get_clip" />
+      <item itemvalue="CMake Application.get_ctre" />
+      <item itemvalue="CMake Application.get_date" />
+      <item itemvalue="CMake Application.get_efsw" />
+      <item itemvalue="CMake Application.get_fmt" />
+      <item itemvalue="CMake Application.get_freetype" />
+      <item itemvalue="CMake Application.get_glew" />
+      <item itemvalue="CMake Application.get_glfw" />
+      <item itemvalue="CMake Application.get_gli" />
+      <item itemvalue="CMake Application.get_glm" />
+      <item itemvalue="CMake Application.get_immer" />
+      <item itemvalue="CMake Application.get_jc_voronoi" />
+      <item itemvalue="CMake Application.get_libbacktrace" />
+      <item itemvalue="CMake Application.get_lua" />
+      <item itemvalue="CMake Application.get_net_ts" />
+      <item itemvalue="CMake Application.get_range" />
+      <item itemvalue="CMake Application.get_reactphysics3d" />
+      <item itemvalue="CMake Application.get_sml" />
+      <item itemvalue="CMake Application.get_soil" />
+      <item itemvalue="CMake Application.get_sol" />
+      <item itemvalue="CMake Application.get_utf8cpp" />
+      <item itemvalue="CMake Application.group_application" />
+      <item itemvalue="CMake Application.group_example" />
+      <item itemvalue="CMake Application.group_externals" />
+      <item itemvalue="CMake Application.group_library" />
+      <item itemvalue="CMake Application.group_sandbox" />
+      <item itemvalue="CMake Application.group_unit_test" />
+      <item itemvalue="CMake Application.lib" />
+      <item itemvalue="CMake Application.libv_ctrl" />
+      <item itemvalue="CMake Application.libv_frame" />
+      <item itemvalue="CMake Application.libv_fsw" />
+      <item itemvalue="CMake Application.libv_gl" />
+      <item itemvalue="CMake Application.libv_glr" />
+      <item itemvalue="CMake Application.libv_input" />
+      <item itemvalue="CMake Application.libv_lua" />
+      <item itemvalue="CMake Application.libv_net" />
+      <item itemvalue="CMake Application.libv_parse" />
+      <item itemvalue="CMake Application.libv_sig" />
+      <item itemvalue="CMake Application.libv_ui" />
+      <item itemvalue="CMake Application.libv_vm4" />
+      <item itemvalue="CMake Application.libv_vm4imp" />
+      <item itemvalue="CMake Application.obj_test_runner" />
+      <item itemvalue="CMake Application.sandbox" />
+      <item itemvalue="CMake Application.sandbox_libv_ctrl" />
+      <item itemvalue="CMake Application.sandbox_libv_ecs" />
+      <item itemvalue="CMake Application.sandbox_libv_frame" />
+      <item itemvalue="CMake Application.sandbox_libv_fsw" />
+      <item itemvalue="CMake Application.sandbox_libv_gl2" />
+      <item itemvalue="CMake Application.sandbox_libv_gl" />
+      <item itemvalue="CMake Application.sandbox_libv_glr2" />
+      <item itemvalue="CMake Application.sandbox_libv_glr" />
+      <item itemvalue="CMake Application.sandbox_libv_immer" />
+      <item itemvalue="CMake Application.sandbox_libv_libv" />
+      <item itemvalue="CMake Application.sandbox_libv_log" />
+      <item itemvalue="CMake Application.sandbox_libv_lua" />
+      <item itemvalue="CMake Application.sandbox_libv_net" />
+      <item itemvalue="CMake Application.sandbox_libv_net_client" />
+      <item itemvalue="CMake Application.sandbox_libv_net_server" />
+      <item itemvalue="CMake Application.sandbox_libv_physics" />
+      <item itemvalue="CMake Application.sandbox_libv_reflection2" />
+      <item itemvalue="CMake Application.sandbox_libv_reflection" />
+      <item itemvalue="CMake Application.sandbox_libv_serialize" />
+      <item itemvalue="CMake Application.sandbox_libv_serialize_cereal" />
+      <item itemvalue="CMake Application.sandbox_libv_sig" />
+      <item itemvalue="CMake Application.sandbox_libv_sml" />
+      <item itemvalue="CMake Application.sandbox_libv_ui" />
+      <item itemvalue="CMake Application.sandbox_libv_ui_lua" />
+      <item itemvalue="CMake Application.sandbox_libv_vm4imp" />
+      <item itemvalue="CMake Application.test" />
+      <item itemvalue="CMake Application.test_libv_frame" />
+      <item itemvalue="CMake Application.test_libv_fsw" />
+      <item itemvalue="CMake Application.wish_ide" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SshConsoleOptionsProvider">
+    <option name="myEncoding" value="UTF-8" />
+    <option name="myConnectionType" value="NONE" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7b24159b-f77d-4823-ada0-1b19c3b4641b" name="Default Changelist" comment="" />
+      <created>1597158622148</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1597158622148</updated>
+      <workItem from="1597158630083" duration="836000" />
+      <workItem from="1597159488193" duration="9597000" />
+      <workItem from="1597171852714" duration="1598000" />
+      <workItem from="1597173483036" duration="389000" />
+      <workItem from="1597173887013" duration="854000" />
+      <workItem from="1597174760419" duration="616000" />
+      <workItem from="1597193760939" duration="1764000" />
+      <workItem from="1597427645143" duration="690000" />
+      <workItem from="1597714044251" duration="10476000" />
+      <workItem from="1597728775144" duration="106000" />
+      <workItem from="1597728896527" duration="72000" />
+      <workItem from="1597728983610" duration="333000" />
+      <workItem from="1597729331781" duration="6195000" />
+      <workItem from="1597738959899" duration="197000" />
+      <workItem from="1597739173700" duration="17694000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="1598" y="917" key="#Code_Folding" timestamp="1597161676437">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1598" y="917" key="#Code_Folding/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597161676437" />
+    <state x="1074" y="1076" width="1504" height="734" key="#Inspections" timestamp="1597728101656">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1074" y="1076" width="1504" height="734" key="#Inspections/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597728101656" />
+    <state x="1151" y="691" key="#Live_Templates" timestamp="1597730596373">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1151" y="691" key="#Live_Templates/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597730596373" />
+    <state x="1675" y="889" key="#Notifications" timestamp="1597728817967">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1675" y="889" key="#Notifications/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597728817967" />
+    <state x="1707" y="858" key="#TODO" timestamp="1597737905459">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1707" y="858" key="#TODO/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597737905459" />
+    <state x="902" y="1053" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1597735515047">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="902" y="1053" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597735515047" />
+    <state x="1669" y="901" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog" timestamp="1597819305181">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1669" y="901" key="#com.intellij.ide.actions.ChooseComponentsToExportDialog/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597819305181" />
+    <state x="1697" y="1190" key="FileChooserDialogImpl" timestamp="1597717171620">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1697" y="1190" key="FileChooserDialogImpl/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597717171620" />
+    <state width="3606" height="283" key="GridCell.Tab.0.bottom" timestamp="1597821361605">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state width="3606" height="283" key="GridCell.Tab.0.bottom/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597821361605" />
+    <state width="3606" height="283" key="GridCell.Tab.0.center" timestamp="1597821361605">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state width="3606" height="283" key="GridCell.Tab.0.center/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597821361605" />
+    <state width="3606" height="283" key="GridCell.Tab.0.left" timestamp="1597821361605">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state width="3606" height="283" key="GridCell.Tab.0.left/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597821361605" />
+    <state width="3606" height="283" key="GridCell.Tab.0.right" timestamp="1597821361605">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state width="3606" height="283" key="GridCell.Tab.0.right/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597821361605" />
+    <state x="1500" y="808" width="1988" height="818" key="IDE.errors.dialog" timestamp="1597728839199">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1500" y="808" width="1988" height="818" key="IDE.errors.dialog/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597728839199" />
+    <state x="2029" y="948" width="1482" height="990" key="SettingsEditor" timestamp="1597823123278">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="2029" y="948" width="1482" height="990" key="SettingsEditor/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597823123278" />
+    <state x="1600" y="670" key="StringManipulation.SortTypeDialog" timestamp="1597747652921">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1600" y="670" key="StringManipulation.SortTypeDialog/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597747652921" />
+    <state x="710" y="549" width="1116" height="1684" key="dock-window-1" timestamp="1597163197638">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="710" y="549" width="1116" height="1684" key="dock-window-1/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597163197638" />
+    <state x="1368" y="1153" width="688" height="562" key="org.intellij.images.editor.actions.BackgroundImageDialog" timestamp="1597715380109">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1368" y="1153" width="688" height="562" key="org.intellij.images.editor.actions.BackgroundImageDialog/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597715380109" />
+    <state x="1576" y="513" key="run.anything.popup" timestamp="1597743409208">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1576" y="513" key="run.anything.popup/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597743409208" />
+    <state x="1760" y="1038" width="892" height="553" key="scopes" timestamp="1597738003478">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1760" y="1038" width="892" height="553" key="scopes/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597738003478" />
+    <state x="1111" y="996" width="672" height="678" key="search.everywhere.popup" timestamp="1597742672197">
+      <screen x="0" y="0" width="3840" height="2130" />
+    </state>
+    <state x="1111" y="996" width="672" height="678" key="search.everywhere.popup/0.0.3840.2130/3840.121.1200.1890/-1920.698.1920.1170@0.0.3840.2130" timestamp="1597742672197" />
+  </component>
+</project>
