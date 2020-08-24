@@ -47,7 +47,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplShaderLoader {
+class ImplShaderLoader {
 	FileIncluder includer;
 	libv::gl::GLSLCompiler compiler;
 	libv::fsw::FileWatcher watcher;

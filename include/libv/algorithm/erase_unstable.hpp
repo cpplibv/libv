@@ -23,6 +23,16 @@ constexpr inline void erase_unstable(Container& container, typename Container::i
 	container.erase(last);
 }
 
+template <typename Container>
+constexpr inline void erase_unstable(Container& container, typename Container::value_type value) noexcept {
+	const auto it = std::find(container.begin(), container.end(), value);
+
+	if (it == container.end())
+		return;
+
+	erase_unstable(container, it);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv

@@ -3,13 +3,13 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
 #include <libv/input/input.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/utility/function_ref.hpp>
 // std
 #include <memory>
 // pro
 #include <libv/ui/event/mouse_order.hpp>
-#include <libv/ui/flag.hpp>
 
 
 namespace libv {
@@ -30,7 +30,8 @@ public:
 	void subscribe(CoreComponent& component);
 	void subscribe_region(CoreComponent& component);
 
-	void update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order);
+	void update(CoreComponent& component, libv::vec3f position, libv::vec3f size, MouseOrder order);
+	void update_region(CoreComponent& component, libv::vec2f remap_offset);
 
 	void unsubscribe(CoreComponent& component);
 	void unsubscribe_region(CoreComponent& component);
@@ -38,6 +39,16 @@ public:
 public:
 	void acquire(CoreComponent& component);
 	void release(CoreComponent& component);
+
+public:
+//	struct ComponentMouseInfo {
+//		Component component;
+//		libv::vec2f cornerBL;
+//		libv::vec2f cornerTR;
+//		MouseOrder order;
+//	};
+//
+//	void foreach_mouse_over(libv::function_ref<void(const ComponentMouseInfo&)> func);
 
 public:
 	void event_enter();

@@ -61,6 +61,7 @@ TEST_CASE("Parse invalid align_horizontal", "[libv.ui]") {
 	CHECK(not parse_align_horizontal_optional("N"));
 	CHECK(not parse_align_horizontal_optional("s"));
 	CHECK(not parse_align_horizontal_optional("S"));
+	CHECK(not parse_align_horizontal_optional("á"));
 }
 
 TEST_CASE("Parse valid align_vertical", "[libv.ui]") {
@@ -106,4 +107,5 @@ TEST_CASE("Parse invalid align_vertical", "[libv.ui]") {
 	CHECK(not parse_align_vertical_optional("W"));
 	CHECK(not parse_align_vertical_optional("e"));
 	CHECK(not parse_align_vertical_optional("E"));
+	CHECK(not parse_align_vertical_optional("á"));
 }

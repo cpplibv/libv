@@ -12,10 +12,15 @@ include(cmake/wish_warning.cmake)
 
 # --------------------------------------------------------------------------------------------------
 
-set(CMAKE_VERBOSE_MAKEFILE off)
+#set(CMAKE_VERBOSE_MAKEFILE off)
 #set(CMAKE_BUILD_TYPE "DEBUG")
 #set(CMAKE_BUILD_TYPE "RELEASE")
-#set(CMAKE_BUILD_TYPE "DEV")
+
+if (NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "DEV")
+endif()
+
+set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;DEV" CACHE STRING "" FORCE)
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "Processor count: ${WISH_PROCESSOR_COUNT}")

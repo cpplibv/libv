@@ -372,8 +372,10 @@ TEST_CASE("Parse inputID general", "[libv.control.parse]") {
 	CHECK(not lc::parse_input_id_optional(R"("sc120")"));
 	CHECK(not lc::parse_input_id_optional(R"("shift")"));
 	CHECK(not lc::parse_input_id_optional(R"("xyz")"));
+	CHECK(not lc::parse_input_id_optional(R"(" á")"));
 	CHECK(not lc::parse_input_id_optional(R"("á ")"));
 	CHECK(not lc::parse_input_id_optional(R"("áá")"));
+	CHECK(not lc::parse_input_id_optional(R"("ɫ"));
 	CHECK(not lc::parse_input_id_optional(R"("ɫɫ")"));
 
 	// Invalid Mouse Button
@@ -584,8 +586,10 @@ TEST_CASE("Parse Input general", "[libv.control.parse]") {
 	test("X [press]       ", lc::Keycode::X, lc::DigitalInputAction::press);
 	test("[               ", lc::Keycode::BracketOpen);
 	test("[ [press]       ", lc::Keycode::BracketOpen, lc::DigitalInputAction::press);
+	test("[[press]        ", lc::Keycode::BracketOpen, lc::DigitalInputAction::press);
 	test("]               ", lc::Keycode::BracketClose);
 	test("] [press]       ", lc::Keycode::BracketClose, lc::DigitalInputAction::press);
+	test("][press]        ", lc::Keycode::BracketClose, lc::DigitalInputAction::press);
 	test(",               ", lc::Keycode::Comma);
 	test(", [press]       ", lc::Keycode::Comma, lc::DigitalInputAction::press);
 	test(R"("á"          )", utf8_codepoint("á"));
@@ -606,8 +610,16 @@ TEST_CASE("Parse Input general", "[libv.control.parse]") {
 	CHECK(not lc::parse_input_optional(""));
 	CHECK(not lc::parse_input_optional(" "));
 
+	CHECK(not lc::parse_input_optional("[press]"));
+
 	CHECK(not lc::parse_input_optional("shift [press"));
 	CHECK(not lc::parse_input_optional("shift press]"));
+
+	CHECK(not lc::parse_input_optional("á [press]"));
+	CHECK(not lc::parse_input_optional(" á [press]"));
+	CHECK(not lc::parse_input_optional("á  [press]"));
+	CHECK(not lc::parse_input_optional("ɫ [press]"));
+	CHECK(not lc::parse_input_optional("ɫɫ [press]"));
 
 	CHECK(not lc::parse_input_optional("MX+ [press]"));
 	CHECK(not lc::parse_input_optional("GP A1:X+ [press]"));

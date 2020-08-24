@@ -2,17 +2,20 @@
 
 // hpp
 #include <libv/ui/component/scroll_pane.hpp>
+#include <libv/utility/approx.hpp>
+#include <libv/meta/for_constexpr.hpp>
 // std
 #include <optional>
 // pro
+#include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
+#include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/core_component.hpp>
-#include <libv/ui/property_access_context.hpp>
-
 #include <libv/ui/log.hpp>
+#include <libv/ui/property_access_context.hpp>
 
 
 namespace libv {
@@ -60,8 +63,11 @@ public:
 	}
 
 private:
+	virtual void onMouseMovement(const EventMouseMovement& event) override;
+//	virtual void onMouseScroll(const EventMouseScroll& event) override;
+
+private:
 	virtual void doAttach() override;
-	virtual void doDetach() override;
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override;
 	virtual void doStyle(ContextStyle& context) override;
 	virtual void doStyle(ContextStyle& context, ChildID childID) override;
@@ -124,71 +130,139 @@ void CoreScrollArea::doStyle(ContextStyle& ctx, ChildID childID) {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreScrollArea::onMouseMovement(const EventMouseMovement& event) {
+	event.pass_through();
+}
+
+//void CoreScrollArea::onMouseScroll(const EventMouseScroll& event) {
+//
+//}
+
+// -------------------------------------------------------------------------------------------------
+
 void CoreScrollArea::doAttach() {
-	// <<< P6: scroll area subscribe_region
-//	context().mouse.subscribe_region(this);
+	floatRegion(true);
 }
 
-void CoreScrollArea::doDetach() {
-	// <<< P6: scroll area unsubscribe_region
-//	context().mouse.unsubscribe_region(this);
+libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& layout_env) {
+	if (!client || !client->core().isLayouted())
+		return padding_size3();
+
+	const auto is_vertical = property.mode() != ScrollAreaMode::horizontal;
+	const auto is_horizontal = property.mode() != ScrollAreaMode::vertical;
+
+	const auto env_size = layout_env.size - padding_size3();
+	const auto client_env_size = libv::vec3f{
+			is_horizontal ? -1.0f : env_size.x,
+			is_vertical ? -1.0f : env_size.y,
+			env_size.z};
+
+	const auto resolvePercent = [](const float fix, const float percent, const auto& component) {
+		if (fix == libv::Approx(0.f)) {
+			return fix;
+		} else if (percent == libv::Approx(100.f)) {
+			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
+			return fix * 2.f;
+		} else {
+			return fix / (1.f - percent * 0.01f);
+		}
+	};
+
+	auto result = libv::vec3f{};
+
+	const auto client_dynamic = client->size().has_dynamic() ?
+			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
+			libv::vec3f{};
+
+	libv::meta::for_constexpr<0, 3>([&](auto i) {
+		result[i] = std::max(
+				result[i],
+				resolvePercent(
+						client->size()[i].pixel + (client->size()[i].dynamic ? client_dynamic[i] : 0.f),
+						client->size()[i].percent, client->core())
+		);
+	});
+
+	return result + padding_size3();
 }
 
-libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& environment) {
-	if (!client)
-		return {};
-
-	return AccessLayout::layout1(client->core(), ContextLayout1{environment.size - padding_size3()}) + padding_size3();
-}
-
-void CoreScrollArea::doLayout2(const ContextLayout2& environment) {
-	if (!client)
+void CoreScrollArea::doLayout2(const ContextLayout2& layout_env) {
+	if (!client || !client->core().isLayouted())
 		return;
 
-	// <<< P5: Use client's anchor for (initial) positioning inside the scroll area
-	const auto client_position = padding_LB3() + vec3f(0, environment.size.y - padding_size3().y, 0);
-	auto client_size = environment.size;
+	const auto is_vertical = property.mode() != ScrollAreaMode::horizontal;
+	const auto is_horizontal = property.mode() != ScrollAreaMode::vertical;
 
-	switch (property.mode()) {
-	case ScrollAreaMode::both:
-		client_size.x = -1;
-		client_size.y = -1; break;
-	case ScrollAreaMode::horizontal:
-		client_size.x = -1; break;
-	case ScrollAreaMode::vertical:
-		client_size.y = -1; break;
+	const auto env_size = layout_env.size - padding_size3();
+	const auto client_env_size = libv::vec3f{
+			is_horizontal ? -1.0f : env_size.x,
+			is_vertical ? -1.0f : env_size.y,
+			env_size.z};
+
+	// Size ---
+
+	auto size = libv::vec3f{};
+
+	const auto client_dynamic = client->size().has_dynamic() ?
+			AccessLayout::layout1(client->core(), ContextLayout1{client_env_size}) :
+			libv::vec3f{};
+
+	const auto client_area_size = libv::vec3f{
+			is_horizontal ? client_dynamic.x : env_size.x,
+			is_vertical ? client_dynamic.y : env_size.y,
+			env_size.z};
+
+	if (xy(client_area_size) != area_size) { // Update area size
+		const auto old_area_size = area_size;
+		area_size = xy(client_area_size);
+		fire(EventScrollArea{area_position, old_area_size});
 	}
 
-	AccessLayout::layout2(client->core(), environment.enter(client_position, client_size));
+	libv::meta::for_constexpr<0, 3>([&](auto i) {
+		const auto has_ratio = client->size()[i].ratio != 0.f;
+
+		if (has_ratio)
+			size[i] = client_area_size[i]; // NOTE: Ratio uses the client area size
+		else
+			size[i] =
+					client->size()[i].pixel +
+					client->size()[i].percent * 0.01f * env_size[i] + // NOTE: Percent uses the scroll-area size
+					(client->size()[i].dynamic ? client_dynamic[i] : 0.f);
+	});
+
+	// Position ---
+
+	const auto client_area_anchor = client->anchor().to_info();
+	const auto client_anchor = client->anchor().to_info();
+	// NOTE: For now client_area_anchor is the same as client_anchor, if needed this could be a property of the scroll area
+
+	const auto position =
+			+ padding_LB3()
+			+ client_area_anchor * layout_env.size
+			- client_area_anchor * client_area_size
+			+ client_anchor * client_area_size
+			- client_anchor * size; // NOTE: Anchor uses layout env size and client size
+
+	const auto roundedPosition = libv::vec::round(position);
+	const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
+
+	AccessLayout::layout2(client->core(), layout_env.enter(roundedPosition, roundedSize));
 }
 
 void CoreScrollArea::doRender(Renderer& r) {
 	if (!client)
 		return;
 
-	// <<< P4: scroll area clip and translate
+	r.clip({}, layout_size2());
 
-//	switch (property.mode()) {
-//	case ScrollAreaMode::both:
-//		environment.clip({}, layout_size2()); break;
-//	case ScrollAreaMode::horizontal:
-//		environment.clip({}, libv::vec2f(-1, layout_size2().y)); break;
-//	case ScrollAreaMode::vertical:
-//		environment.clip({}, libv::vec2f(layout_size2().x, -1)); break;
-//	}
-
-	r.clip(layout_position2(), layout_size2());
-	//log_ui.info("Clip to: {}, {}", layout_position2(), layout_size2());
-//	r.clip({}, layout_size2());
-
-	r.translate({libv::vec::round(area_position), 0});
-//	const auto pos = libv::vec::round(-area_position);
-//	r.translate(pos.x, pos.y, 0);
+	const auto rounded_area_position = libv::vec3f(libv::vec::round(area_position), 0.f);
+	r.translate(rounded_area_position);
 
 	Renderer rc = r.enter(*client);
 	AccessParent::render(client->core(), rc);
 
-	r.translate({libv::vec::round(-area_position), 0}); // <<< P7: Need proper guarding
+	// TODO P4: Renderer proper translate and clip guarding (same in component_core.render)
+	r.translate(-rounded_area_position);
 }
 
 void CoreScrollArea::doDetachChildren(libv::function_ref<bool(Component&)> callback) {
@@ -201,31 +275,28 @@ void CoreScrollArea::doDetachChildren(libv::function_ref<bool(Component&)> callb
 }
 
 libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextFocusTraverse& context, ChildID current) {
-//	const ChildID dir = context.isForward() ? +1 : -1;
-//	const ChildID end = context.isForward() ? static_cast<ChildID>(children.size()) : -1;
-//	ChildID begin = context.isForward() ? 0 : static_cast<ChildID>(children.size() - 1);
-//
-//	if (current == ChildIDNone) {
-//		// unrelated component is focused, focus self or iterate every children
-//		if (AccessParent::isFocusableComponent(*this))
-//			return libv::make_observer(this);
-//
-//	} else if (current == ChildIDSelf) {
-//		// this component itself is currently focused, iterate every children
-//
-//	} else {
-//		// one of the children is currently focused, iterate remaining children
-//		begin = current + dir;
-//	}
-//
-//	if (!AccessParent::isFocusableChild(*this))
-//		return nullptr;
-//
-//	for (ChildID i = begin; i != end; i += dir)
-//		if (auto hit = AccessParent::doFocusTraverse(children[i].core(), context, ChildIDNone))
-//			return hit;
+	if (current == ChildIDNone) {
+		// unrelated component is focused, focus self or iterate every children
+		if (AccessParent::isFocusableComponent(*this))
+			return libv::make_observer(this);
 
-	// <<< P8: focus traverse inside scroll area
+	} else if (current == ChildIDSelf) {
+		// this component itself is currently focused, iterate every children
+
+	} else {
+		// one of the children is currently focused, iterate remaining children
+		if (!context.isForward())
+			if (AccessParent::isFocusableComponent(*this))
+				return libv::make_observer(this);
+
+		return nullptr;
+	}
+
+	if (!client || !AccessParent::isFocusableChild(*this))
+		return nullptr;
+
+	if (auto hit = AccessParent::doFocusTraverse(client->core(), context, ChildIDNone))
+		return hit;
 
 	return nullptr;
 }
@@ -247,13 +318,13 @@ void CoreScrollArea::doForeachChildren(libv::function_ref<void(Component&)> call
 // =================================================================================================
 
 ScrollArea::ScrollArea(std::string name) :
-	ComponentHandler<CoreScrollArea, EventHostGeneral<ScrollArea>>(std::move(name)) { }
+	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(std::move(name)) { }
 
 ScrollArea::ScrollArea(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreScrollArea, EventHostGeneral<ScrollArea>>(gen, type) { }
+	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(gen, type) { }
 
 ScrollArea::ScrollArea(core_ptr core) noexcept :
-	ComponentHandler<CoreScrollArea, EventHostGeneral<ScrollArea>>(core) { }
+	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(core) { }
 
 // -------------------------------------------------------------------------------------------------
 
@@ -288,16 +359,17 @@ const Component& ScrollArea::content() const noexcept {
 void ScrollArea::area_position(libv::vec2f value) noexcept {
 	self().area_position = value;
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().context().mouse.update_region(self(), libv::vec::round(value));
 }
 
 [[nodiscard]] libv::vec2f ScrollArea::area_position() const noexcept {
 	return self().area_position;
 }
 
-void ScrollArea::area_size(libv::vec2f value) noexcept {
-	self().area_size = value;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
-}
+//void ScrollArea::area_size(libv::vec2f value) noexcept {
+//	self().area_size = value;
+//	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+//}
 
 [[nodiscard]] libv::vec2f ScrollArea::area_size() const noexcept {
 	return self().area_size;

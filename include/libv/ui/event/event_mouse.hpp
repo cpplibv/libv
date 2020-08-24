@@ -29,15 +29,20 @@ struct BaseEventMouse : BaseEvent {
 };
 
 struct EventMouseButton : BaseEventMouse {
+	libv::vec2f mouse_position;
+	libv::vec2f local_position;
+
 	libv::input::MouseButton button;
 	libv::input::Action action;
 };
 
 struct EventMouseMovement : BaseEventMouse {
-	libv::vec2f mouse_position;
-	libv::vec2f mouse_movement;
-	//	libv::vec2f local_position;
+	friend struct AccessEventMouseMovement;
 
+	libv::vec2f mouse_position;
+	libv::vec2f local_position;
+
+	libv::vec2f mouse_movement;
 	bool enter = false;
 	bool leave = false;
 
@@ -55,9 +60,20 @@ public:
 };
 
 struct EventMouseScroll : BaseEventMouse {
+	libv::vec2f mouse_position;
+	libv::vec2f local_position;
+
 	libv::vec2f scroll_position;
 	libv::vec2f scroll_movement;
 	//TYPE scroll_unit;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct AccessEventMouseMovement {
+	constexpr static inline void reset_pass_through(EventMouseMovement& event) noexcept {
+		event.pass_through_ = false;
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -29,7 +29,9 @@ private:
 
 public:
 	GLSLCompiler(IncludeLoader file_loader);
+	/// Processes the provided source
 	std::string compile(const std::string_view source, const std::string_view filename = "main");
+	/// Uses the file loader to load the given file and process it
 	std::string load(const std::string_view filepath);
 };
 

@@ -5,6 +5,7 @@
 // libv
 #include <libv/glr/queue_fwd.hpp>
 #include <libv/math/vec.hpp>
+#include <libv/utility/function_ref.hpp>
 // std
 #include <memory>
 // pro
@@ -37,7 +38,7 @@ public:
 	~ContextRender();
 
 public:
-	[[nodiscard]] Renderer root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time);
+	[[nodiscard]] Renderer root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time, libv::vec2f mouse_position, libv::vec2f ui_size);
 	void execute_render(libv::glr::Queue& glr);
 };
 
@@ -98,6 +99,9 @@ public: // --- High level ---
 
 public: // --- Component level ---
 	[[nodiscard]] Renderer enter(const Component& child);
+
+public: // --- Native level ---
+	void native(libv::function_ref<void(libv::glr::Queue& glr)> func);
 };
 
 // -------------------------------------------------------------------------------------------------

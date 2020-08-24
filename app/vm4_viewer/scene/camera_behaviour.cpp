@@ -18,11 +18,11 @@ namespace app {
 void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister& controls) {
 
 	// °/impulse °/600px °/s
-	libv::ctrl::scale_group sg_rotate{libv::to_rad(5.f), libv::to_rad(140.f), libv::to_rad(80.f)};
+	libv::ctrl::scale_group sg_rotate{libv::to_rad(5.0), libv::to_rad(140.0), libv::to_rad(80.0)};
 	// unit/impulse, unit/600px, unit/s
-	libv::ctrl::scale_group sg_translate{0.1f, 1.0f, 1.0f};
+	libv::ctrl::scale_group sg_translate{0.1, 1.0, 1.0};
 	// unit/impulse, unit/600px, unit/s
-	libv::ctrl::scale_group sg_orbit{0.5f, 9.0f, 8.0f};
+	libv::ctrl::scale_group sg_orbit{0.5, 9.0, 8.0};
 
 	static constexpr auto c0_orbit = 1.15f;
 	static constexpr auto c0_translate = 1.1f; (void) c0_translate; // (Suppressing a false warning)

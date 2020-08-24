@@ -49,7 +49,7 @@ struct WatcherEntry {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
-struct ImplFileWatcher : public efsw::FileWatchListener {
+class ImplFileWatcher : public efsw::FileWatchListener {
 #pragma GCC diagnostic pop
 
 	std::mutex mutex;

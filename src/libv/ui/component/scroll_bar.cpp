@@ -269,8 +269,7 @@ void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
 		const auto orient = OrientationTable[libv::to_value(property.orientation())];
 		const auto bar = bar_bounds_;
-		// TODO P0: libv.ui: correct local mouse position;
-		const auto local_mouse = context().state.mouse_position() - layout_position2();
+		const auto local_mouse = event.local_position;
 
 		if (libv::vec::within(local_mouse, bar.position, bar.position + bar.size - 1.0f)) {
 			drag_mode = DragMode::bar;
@@ -326,8 +325,7 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 
 	const auto orient = OrientationTable[libv::to_value(property.orientation())];
 	const auto bar = bar_bounds_; // Cache bar_bounds
-	// TODO P0: libv.ui: correct local mouse position;
-	const auto local_mouse = event.mouse_position - layout_position2();
+	const auto local_mouse = event.local_position;
 	const auto value_extent = std::abs(value_max_ - value_min_);
 
 	if (value_extent < value_range_) {

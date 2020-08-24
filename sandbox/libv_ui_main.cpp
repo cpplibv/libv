@@ -47,9 +47,11 @@ private:
 	libv::ui::Button button1;
 	libv::ui::Button button2;
 	libv::ui::Button button3;
+	libv::ui::Button button4;
 	libv::ui::Button button;
 	libv::ui::Image image;
-	libv::ui::InputField input_field;
+	libv::ui::InputField input_field0;
+	libv::ui::InputField input_field1;
 	libv::ui::InputField input_field2;
 	libv::ui::Label label;
 	libv::ui::LabelImage label_image1;
@@ -63,7 +65,10 @@ private:
 	libv::ui::Quad quad;
 	libv::ui::ScrollBar scroll_bar_x;
 	libv::ui::ScrollBar scroll_bar_y;
-	libv::ui::ScrollArea scroll_area;
+	libv::ui::ScrollBar scroll_bar_ix;
+	libv::ui::ScrollBar scroll_bar_iy;
+	libv::ui::ScrollArea scroll_area_outer;
+	libv::ui::ScrollArea scroll_area_inner;
 
 //	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
 //	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
@@ -111,7 +116,7 @@ public:
 
 public:
 	SandboxFrame() :
-		Frame("UI sandbox", 1280, 800) {
+		Frame("UI Sandbox", 1280, 800) {
 		setPosition(FramePosition::center_current_monitor);
 		setOpenGLProfile(OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
@@ -141,6 +146,10 @@ public:
 		button3.anchor(libv::ui::Anchor::bottom_right);
 		button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
 
+		button4.text("Button 4!");
+		button4.size(libv::ui::parse_size_or_throw("D, D"));
+		button4.image(ui.context().texture2D("separator_bar_256x16.png"));
+
 		label.text("Label");
 		label.align_horizontal(libv::ui::AlignHorizontal::center);
 		label.align_vertical(libv::ui::AlignVertical::center);
@@ -155,16 +164,34 @@ public:
 		image.image(ui.context().texture2D("separator_bar_256x16.png"));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
-		input_field.text("Input field");
-		input_field.event().change([](auto& component, const auto&) {
-			log_sandbox.info("Input field {} changed to {}", component.path(), component.text());
+		input_field0.image(ui.context().texture2D("gray256.png"));
+		input_field1.image(ui.context().texture2D("gray256.png"));
+		input_field2.image(ui.context().texture2D("gray256.png"));
+
+		input_field0.text("Input field 0");
+		input_field0.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} changed to {}", component.path(), component.text());
 		});
-		input_field.event().caret([](auto& component, const auto&) {
-			log_sandbox.info("Input field {} caret moved to {}", component.path(), component.caret());
+		input_field0.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} caret moved to {}", component.path(), component.caret());
 		});
-		input_field.event().submit([](auto& component, const auto&) {
-			log_sandbox.info("Input field {} submitted", component.path());
+		input_field0.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 0 {} submitted", component.path());
 		});
+		input_field0.size(libv::ui::parse_size_or_throw("D, 50px"));
+//		input_field0.size(libv::ui::parse_size_or_throw("D, D")); // <<< P8: cascades nan
+
+		input_field1.text("Input field 1 line 1\nInput field 1 line 2\nInput field 1 line 3\nInput field 1 line 4\nInput field 1 line 5");
+		input_field1.event().change([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} changed to {}", component.path(), component.text());
+		});
+		input_field1.event().caret([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} caret moved to {}", component.path(), component.caret());
+		});
+		input_field1.event().submit([](auto& component, const auto&) {
+			log_sandbox.info("Input field 1 {} submitted", component.path());
+		});
+		input_field1.size(libv::ui::parse_size_or_throw("D, D"));
 
 		input_field2.text("Input field 2");
 		input_field2.event().change([](auto& component, const auto&) {
@@ -176,6 +203,7 @@ public:
 		input_field2.event().submit([](auto& component, const auto&) {
 			log_sandbox.info("Input field 2 {} submitted", component.path());
 		});
+		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
 
 		stretch.image(ui.context().texture2D("stretch_border.png"));
 
@@ -184,6 +212,7 @@ public:
 		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
 
 		panel_line_scrolled.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
 
 		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
@@ -193,24 +222,55 @@ public:
 		scroll_bar_x.value(0);
 		scroll_bar_x.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
-			scroll_area.area_position({static_cast<float>(component.value()), scroll_area.area_position().y});
+			scroll_area_outer.area_position({static_cast<float>(component.value()), scroll_area_outer.area_position().y});
 		});
 
 		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
 		scroll_bar_y.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
-		scroll_bar_y.value_min(-500);
-		scroll_bar_y.value_max(500);
+		scroll_bar_y.value_min(-1000);
+		scroll_bar_y.value_max(1000);
 		scroll_bar_y.value(0);
 		scroll_bar_y.event().change([this](auto& component, const auto& event) {
 			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
-			scroll_area.area_position({scroll_area.area_position().x, static_cast<float>(component.value())});
+			scroll_area_outer.area_position({scroll_area_outer.area_position().x, static_cast<float>(component.value())});
 		});
 
-		scroll_area.content(panel_line_scrolled);
-		scroll_area.mode(libv::ui::ScrollAreaMode::vertical);
-		scroll_area.size(libv::ui::parse_size_or_throw("50%, 1r"));
-		scroll_area.anchor(libv::ui::Anchor::center_center);
+		scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
+		scroll_bar_ix.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		scroll_bar_ix.value_min(-500);
+		scroll_bar_ix.value_max(500);
+		scroll_bar_ix.value(0);
+		scroll_bar_ix.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar X {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_inner.area_position({static_cast<float>(component.value()), scroll_area_inner.area_position().y});
+		});
+
+		scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
+		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
+		scroll_bar_iy.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		scroll_bar_iy.value_min(-1000);
+		scroll_bar_iy.value_max(1000);
+		scroll_bar_iy.value(0);
+		scroll_bar_iy.event().change([this](auto& component, const auto& event) {
+			log_sandbox.info("Scroll bar Y {} changed to {} with change {}", component.path(), component.value(), event.change);
+			scroll_area_inner.area_position({scroll_area_inner.area_position().x, static_cast<float>(component.value())});
+		});
+
+		scroll_area_outer.content(panel_line_scrolled);
+		scroll_area_outer.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_outer.size(libv::ui::parse_size_or_throw("50%, 3r"));
+		scroll_area_outer.anchor(libv::ui::Anchor::center_center);
+		scroll_area_outer.event().area([](auto& component, const auto& event) {
+			log_sandbox.info("Scroll area outer size {} changed to {}", event.old_size, component.area_size());
+		});
+
+		scroll_area_inner.content(input_field1);
+		scroll_area_inner.mode(libv::ui::ScrollAreaMode::vertical);
+		scroll_area_inner.size(libv::ui::parse_size_or_throw("50%, 50px"));
+		scroll_area_inner.anchor(libv::ui::Anchor::center_center);
+
 		{
 			libv::ui::Label tmp;
 			tmp.text(
@@ -222,8 +282,11 @@ public:
 			tmp.size(libv::ui::parse_size_or_throw("D, D"));
 			panel_line_scrolled.add(tmp);
 		}
+		panel_line_scrolled.add(scroll_area_inner);
+//		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
+//		panel_line_scrolled.anchor(libv::ui::Anchor::bottom_right);
 		panel_line_scrolled.add(input_field2);
-		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
+		panel_line_scrolled.add(button4);
 		{
 			libv::ui::Label tmp;
 			tmp.text(
@@ -252,28 +315,50 @@ public:
 		panel_float.add(button2);
 		panel_float.add(button3);
 
-		panel_grid.column_count(3);
+		panel_grid.column_count(5);
 		panel_grid.padding({5, 5, 5, 10});
 		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+		panel_grid.size(libv::ui::parse_size_or_throw("1r, 3r"));
+
 		panel_grid.add(button0);
 		panel_grid.add(panel_full);
 		panel_grid.add(panel_float);
-		panel_grid.add(input_field);
+		panel_grid.add(input_field0);
 		panel_grid.add(label_image1);
 		panel_grid.add(quad);
 		panel_grid.add(stretch);
 		panel_grid.add(scroll_bar_x);
 		panel_grid.add(scroll_bar_y);
+		panel_grid.add(scroll_bar_ix);
+		panel_grid.add(scroll_bar_iy);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
 		panel_line.padding({20, 10, 20, 10});
 		panel_line.add(panel_grid);
 		panel_line.add(button);
-		panel_line.add(scroll_area);
+		panel_line.add(scroll_area_outer);
 		panel_line.add(label);
 		panel_line.add(label_image2);
 
 		ui.add(panel_line);
+
+
+//		libv::ui::PanelLine mouse_stack;
+//		foreach_mouse_over([](const auto& arg) {
+//			libv::ui::Label lbl;
+//			lbl.text(fmt::format("{}: {:<60} [{:>9}-{:>9}]", arg.order, arg.component.path(), arg.cornerBL, arg.cornerTR));
+//			mouse_stack.add(lbl);
+//		});
+//
+//		libv::ui::Table table;
+//		foreach_mouse_over([](const auto& arg) {
+//			table[-1][0] = arg.component.path();
+//			table[-1][1] = arg.order;
+//			table[-1][2] = arg.cornerBL;
+//			table[-1][3] = arg.cornerTR;
+//		});
+
+
 
 //		const auto style_label_01 = ui.context().style("style-label-01");
 //		style_label_01->set("color", libv::parse::parse_color_or_throw("rgba(167, 152, 120, 100%)"));
@@ -334,31 +419,31 @@ public:
 			if (e.keycode == libv::input::Keycode::F7) {
 				log_sandbox.trace("AlignVertical::top");
 				label.align_vertical(libv::ui::AlignVertical::top);
-				input_field.align_vertical(libv::ui::AlignVertical::top);
+				input_field0.align_vertical(libv::ui::AlignVertical::top);
 			}
 
 			if (e.keycode == libv::input::Keycode::F8) {
 				log_sandbox.trace("AlignVertical::center");
 				label.align_vertical(libv::ui::AlignVertical::center);
-				input_field.align_vertical(libv::ui::AlignVertical::center);
+				input_field0.align_vertical(libv::ui::AlignVertical::center);
 			}
 
 			if (e.keycode == libv::input::Keycode::F9) {
 				log_sandbox.trace("AlignVertical::bottom");
 				label.align_vertical(libv::ui::AlignVertical::bottom);
-				input_field.align_vertical(libv::ui::AlignVertical::bottom);
+				input_field0.align_vertical(libv::ui::AlignVertical::bottom);
 			}
 
 			if (e.keycode == libv::input::Keycode::F10) {
 				log_sandbox.trace("AlignVertical::justify");
 				label.align_vertical(libv::ui::AlignVertical::justify);
-				input_field.align_vertical(libv::ui::AlignVertical::justify);
+				input_field0.align_vertical(libv::ui::AlignVertical::justify);
 			}
 
 			if (e.keycode == libv::input::Keycode::F11) {
 				log_sandbox.trace("AlignVertical::justify_all");
 				label.align_vertical(libv::ui::AlignVertical::justify_all);
-				input_field.align_vertical(libv::ui::AlignVertical::justify_all);
+				input_field0.align_vertical(libv::ui::AlignVertical::justify_all);
 			}
 		});
 		onChar.output([&](const libv::input::EventChar& e) {
@@ -387,9 +472,8 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 int main(int, char**) {
-	system("chcp 65001"); // !!! For Clion terminal
-	std::filesystem::current_path(std::filesystem::current_path().parent_path()); // !!! For Clion editor
-	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n"); // !!! For Clion console
+	// For CLion console
+	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 
 	std::cout << libv::logger_stream;
 //	libv::logger_stream.allow("libv.ui");

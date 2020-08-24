@@ -49,13 +49,13 @@ using ChildID = int32_t;
 static constexpr ChildID ChildIDSelf = -2;
 static constexpr ChildID ChildIDNone = -1;
 
-struct CoreComponent {
-	friend class AccessConnect;
-	friend class AccessEvent;
-	friend class AccessLayout;
-	friend class AccessParent;
-	friend class AccessProperty;
-	friend class AccessRoot;
+class CoreComponent {
+	friend struct AccessConnect;
+	friend struct AccessEvent;
+	friend struct AccessLayout;
+	friend struct AccessParent;
+	friend struct AccessProperty;
+	friend struct AccessRoot;
 
 	friend class Component;
 
@@ -78,7 +78,7 @@ private:
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
-	libv::observer_ref<CoreComponent> parent = libv::make_observer_ref(this);
+	libv::observer_ref<CoreComponent> parent_ = libv::make_observer_ref(this);
 	/// Never null, points to the associated context
 	libv::observer_ref<ContextUI> context_;
 	/// Null if no style is assigned to the component
@@ -99,13 +99,17 @@ public:
 	virtual ~CoreComponent();
 
 public:
+	[[nodiscard]] inline libv::observer_ref<CoreComponent> parent() const noexcept {
+		return parent_;
+	}
+
 	[[nodiscard]] std::string path() const;
 
 	[[nodiscard]] inline ContextUI& context() const noexcept {
 		return *context_;
 	}
 	[[nodiscard]] inline bool isAttached() const noexcept {
-		return parent != this;
+		return parent_ != this;
 	}
 	[[nodiscard]] inline bool isRendered() const noexcept {
 		return flags.match_any(Flag::render);
@@ -247,10 +251,14 @@ protected:
 	void watchKey(bool value) noexcept;
 	void watchFocus(bool value) noexcept;
 	void watchMouse(bool value) noexcept;
+	void floatRegion(bool value) noexcept;
 	[[nodiscard]] bool isWatchChar() const noexcept;
 	[[nodiscard]] bool isWatchKey() const noexcept;
 	[[nodiscard]] bool isWatchFocus() const noexcept;
 	[[nodiscard]] bool isWatchMouse() const noexcept;
+
+public:
+	[[nodiscard]] bool isFloatRegion() const noexcept;
 
 public:
 	void focus() noexcept;
@@ -317,15 +325,11 @@ private:
 	virtual void doDestroy(Renderer& r);
 	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback);
 	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback);
-
-	// TWO PASS layout: (Planning on changing to on demand pass 1 as of 2020 06 30)
-	// - Pass 1: calculate everything as content bottom-top and store the result
-	// - Pass 2: calculate everything top-down
 };
 
 // -------------------------------------------------------------------------------------------------
 
-// <<< P5: Remove set/reset from here (?)
+// TODO P2: libv.ui: Remove set/reset from here (?)
 template <typename Property>
 inline void CoreComponent::set(Property& property, typename Property::value_type value) {
 	AccessProperty::driver(property, PropertyDriver::manual);

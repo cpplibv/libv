@@ -24,7 +24,7 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplGLSLCompiler {
+class ImplGLSLCompiler {
 public:
 	GLSLCompiler::IncludeLoader& loader;
 	std::stringstream output;
@@ -48,24 +48,43 @@ public:
 //		std::string_view type;
 //		std::string_view min;
 //		std::string_view max;
-//		std::string_view step;
 //		std::string_view init;
 //	};
 //
 //	std::optional<Result> result;
 //
-//	// Accepted: #pragma inspect                 uniform vec4 color;
-//	// Accepted: #pragma inspect                 uniform vec4 color = vec4(0, 0, 0, 0);
-//	// Accepted: #pragma inspect(min, max)       uniform vec4 color = vec4(0, 0, 0, 0);
-//	// Accepted: #pragma inspect(min, max, step) uniform vec4 color = vec4(0, 0, 0, 0);
-//	if (auto m = ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]*inspect[ \t]+(.*);)qq">(line)) {
-//	if (auto m = ctre::match<R"qq(^[ \t]*#[ \t]*pragma[ \t]*inspect[ \t]+(.*);)qq">(line)) {
+//	// Accepted: #pragma inspect           uniform vec4 color;
+//	// Accepted: #pragma inspect           uniform vec4 color = vec4(0, 0, 0, 0);
+//	// Accepted: #pragma inspect(min, max) uniform vec4 color = vec4(0, 0, 0, 0);
+//	if (auto m = ctre::match<R"qq(...................)qq">(line)) {
 //		m.get<1>().to_view();
 //	}
 //	} else {
 //		return std::nullopt;
 //	}
 //}
+//
+// IDEA GEN 2:
+//		Things that inspection should/could store:
+//			- Variable name
+//			- Variable type
+//			- Name - to display on the UI
+//			- Description - to display on the UI
+//			- Logical Type - to use by value setter in UI
+//				- Color
+//				- Texture
+//				- Range[1234] with min and max value
+//				- Float
+//				- Vector[1234]
+//			- Default value
+//
+//		#inspect("Foreground color", Color)
+//		uniform vec4 color = vec4(0, 0, 0, 0);
+//
+//		#inspect("name", Range(0, 0.5))
+//		uniform vec4 color = vec4(0, 0, 0, 0);
+//		#inspect("name", Vector)
+//		uniform vec4 color = vec4(0, 0, 0, 0);
 
 std::optional<std::string_view> ImplGLSLCompiler::extract_include(const std::string_view line) const noexcept {
 	// Accepted: #include <path> // comment

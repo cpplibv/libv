@@ -20,6 +20,7 @@
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/text_layout.hpp>
 #include <libv/ui/texture_2D.hpp>
+#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -46,7 +47,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplContextRender {
+class ImplContextRender {
 public:
 	float current_time;
 	time_point current_time_frame;
@@ -64,9 +65,11 @@ public:
 		libv::glr::Uniform_vec2f clip_size;
 		libv::glr::Uniform_vec2f component_pos;
 		libv::glr::Uniform_vec2f component_size;
-		libv::glr::Uniform_vec2f mouse_pos;
+		libv::glr::Uniform_vec2f mouse_position;
 		libv::glr::Uniform_vec2f ui_size;
 		libv::glr::Uniform_float time_frame; // Time in seconds, Resets each hour
+		// Uniform_float time_frame;
+		// Uniform_float time_simulation;
 
 		LIBV_REFLECTION_ACCESS(matMVP);
 		LIBV_REFLECTION_ACCESS(matM);
@@ -74,7 +77,7 @@ public:
 		LIBV_REFLECTION_ACCESS(clip_size);
 		LIBV_REFLECTION_ACCESS(component_pos);
 		LIBV_REFLECTION_ACCESS(component_size);
-		LIBV_REFLECTION_ACCESS(mouse_pos);
+		LIBV_REFLECTION_ACCESS(mouse_position);
 		LIBV_REFLECTION_ACCESS(ui_size);
 		LIBV_REFLECTION_ACCESS(time_frame);
 	};
@@ -86,6 +89,10 @@ public:
 
 	bool initalized = false;
 	libv::glr::Texture white_zero_texture;
+
+public:
+	libv::vec2f mouse_position;
+	libv::vec2f ui_size;
 
 public:
 	struct Task {
@@ -119,7 +126,7 @@ public:
 		}
 
 		// NOTE: No state guards as we are manipulating the glr state for the whole render process
-		// <<< P8: save the 2-3 fix states that are used into constants
+		//			Fixed saved states (UI only uses a handful of them, could improve this)
 
 		glr.state.enableBlend();
 		glr.state.blendSrc_SourceAlpha();
@@ -203,11 +210,12 @@ ContextRender::~ContextRender() {
 	// For the sake of forward declared unique_ptr
 }
 
-Renderer ContextRender::root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time) {
+Renderer ContextRender::root_renderer(const Component& root, libv::glr::Queue& glr, time_point time_frame, time_duration time, libv::vec2f mouse_position, libv::vec2f ui_size) {
 	auto r = Renderer{*self, glr, root};
-	r.clip(root.layout_position2(), root.layout_size2());
 	self->current_time = static_cast<float>(std::fmod(time.count(), 3600.0f));
 	self->current_time_frame = time_frame;
+	self->mouse_position = mouse_position;
+	self->ui_size = ui_size;
 	self->begin_render(root, glr);
 	return r;
 }
@@ -221,7 +229,9 @@ void ContextRender::execute_render(libv::glr::Queue& glr) {
 Renderer::Renderer(ImplContextRender& context, libv::glr::Queue& glr, const Component& root) noexcept :
 	context(context),
 	glr(glr),
-	current_component(root) {
+	current_component(root),
+	clip_pos(current_component.layout_position2()),
+	clip_size(current_component.layout_size2()) {
 }
 
 Renderer::Renderer(const Renderer& parent_renderer, const Component& child) noexcept :
@@ -231,8 +241,7 @@ Renderer::Renderer(const Renderer& parent_renderer, const Component& child) noex
 	clip_pos(parent_renderer.clip_pos),
 	clip_size(parent_renderer.clip_size) {
 
-	// IDEA: If create -> allocate data storage for the component and reuse it if not invalidated
-	// IDEA: If destroy -> deallocate data storage for the component and reuse it if not invalidated
+	// IDEA: If create/destroy -> allocate/deallocate data storage for the component and reuse it if not invalidated
 }
 
 // --- Context -------------------------------------------------------------------------------------
@@ -245,11 +254,15 @@ time_point Renderer::time_frame() const noexcept {
 
 void Renderer::translate(libv::vec3f value) noexcept {
 	glr.model.translate(value);
+	clip_pos -= xy(value);
 }
 
 void Renderer::clip(libv::vec2f pos, libv::vec2f size) noexcept {
-	clip_pos = pos;
-	clip_size = size;
+	const auto bl = libv::vec::max(clip_pos, pos);
+	const auto tr = libv::vec::min(clip_pos + clip_size, pos + size);
+
+	clip_pos = bl;
+	clip_size = tr - bl;
 }
 
 // --- Low level -----------------------------------------------------------------------------------
@@ -305,8 +318,7 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 //	const auto vtx = batch.vertex();
 //	const auto idx = batch.index();
 //
-//
-// <<< P6: Can be optimized with batch request of vtx data and just index into it
+// TODO P5: Can be optimized with batch request of vtx data and just index into it
 //	const auto vtx = request_vertex(4);
 //	const auto idx = request_index(6);
 //
@@ -367,9 +379,8 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
 	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
 	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
-	// <<< P5: set the rest of the uniforms
-//	task.uniform_block[layout_UIInfo.mouse_pos] = mouse_pos;
-//	task.uniform_block[layout_UIInfo.ui_size] = ui_size;
+	task.uniform_block[layout_UIInfo.mouse_position] = mouse_position;
+	task.uniform_block[layout_UIInfo.ui_size] = ui_size;
 	task.uniform_block[layout_UIInfo.time_frame] = current_time;
 
 	assert(vtx_positions.size() == vtx_texture0s.size());
@@ -419,9 +430,8 @@ void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const
 	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
 	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
 	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
-	// <<< P5: set the rest of the uniforms
-//	task.uniform_block[layout_UIInfo.mouse_pos] = mouse_pos;
-//	task.uniform_block[layout_UIInfo.ui_size] = ui_size;
+	task.uniform_block[layout_UIInfo.mouse_position] = context.mouse_position;
+	task.uniform_block[layout_UIInfo.ui_size] = context.ui_size;
 	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
 
 	assert(context.vtx_positions.size() == context.vtx_texture0s.size());
@@ -438,13 +448,22 @@ void Renderer::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, l
 // --- Component level -----------------------------------------------------------------------------
 
 Renderer Renderer::enter(const Component& child) {
-	// <<< P2: Do I want to do anything here, or leave it to component?
 	// <<< P2: adjust clip position, clip stack
+
+//	if (child.core().isFloatRegion())
+
+
 //	auto cr = Renderer{*this, child};
 //	cr.clip(clip_pos + child.layout_position(), clip_size);
 //	return cr;
 
 	return Renderer{*this, child};
+}
+
+// --- Native level --------------------------------------------------------------------------------
+
+void Renderer::native(libv::function_ref<void(libv::glr::Queue& glr)> func) {
+	func(glr);
 }
 
 // -------------------------------------------------------------------------------------------------

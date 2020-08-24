@@ -379,8 +379,7 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 		focus();
 
 	if (event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
@@ -398,15 +397,13 @@ void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 
 	// === TEMP ========================================================================================
 	if (context().state.key_pressed(libv::input::Keycode::F1)) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
 	}
 	if (context().state.key_pressed(libv::input::Keycode::F2)) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});

@@ -5,6 +5,7 @@
 // ext
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/char/unicode.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 #include <libv/utility/utf8.hpp>
@@ -28,10 +29,6 @@ namespace {
 namespace x3 = boost::spirit::x3;
 
 // -------------------------------------------------------------------------------------------------
-
-const auto fa_identity = [](auto& ctx) {
-	_val(ctx) = _attr(ctx);
-};
 
 const auto fa_codepoint = [](auto& ctx) {
 	auto it = _attr(ctx).begin();
@@ -586,8 +583,6 @@ const auto dia_rule = x3::rule<class dia_rule_, DigitalInputAction>{} =
 const auto input_rule = x3::rule<class input_rule_, Input>{} =
 		(input_id_rule >> -dia_rule)[fa_input];
 
-//		input_rule % x3::lit("+");
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace
@@ -611,7 +606,8 @@ std::optional<InputID> parse_input_id_optional(const std::string_view str) {
 	InputID result;
 
 	auto it = str.begin();
-	const auto passed = x3::phrase_parse(it, str.end(), x3::no_case[input_id_rule], x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	const auto passed = x3::phrase_parse(it, str.end(), x3::no_case[input_id_rule], x3::unicode::space, result);
 	const auto success = passed && it == str.end();
 
 	if (success)
@@ -639,7 +635,8 @@ std::optional<Input> parse_input_optional(const std::string_view str) {
 	Input result;
 
 	auto it = str.begin();
-	const auto passed = x3::phrase_parse(it, str.end(), x3::no_case[input_rule], x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	const auto passed = x3::phrase_parse(it, str.end(), x3::no_case[input_rule], x3::unicode::space, result);
 	const auto success = passed && it == str.end();
 
 	if (success)

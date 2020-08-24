@@ -18,7 +18,8 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplContextEvent {
+class ImplContextEvent {
+public:
 	using ptr = ContextEvent::ptr;
 
 	struct Target {

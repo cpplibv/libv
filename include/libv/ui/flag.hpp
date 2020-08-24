@@ -49,7 +49,7 @@ static constexpr Flag_t watchChar             = libv::bit(24);
 static constexpr Flag_t watchKey              = libv::bit(25);
 static constexpr Flag_t watchFocus            = libv::bit(26); // Not really a self contained flag, mostly present for consistency
 static constexpr Flag_t watchMouse            = libv::bit(27);
-//static constexpr Flag_t ____                = libv::bit(28);
+static constexpr Flag_t floatRegion           = libv::bit(28); /// Mark is a component is floating region, used for mouse context
 //static constexpr Flag_t ____                = libv::bit(29);
 //static constexpr Flag_t ____                = libv::bit(30);
 //static constexpr Flag_t focusLinked           = libv::bit(31);
@@ -95,7 +95,8 @@ static constexpr Flag_t mask_self =
 		watchChar |
 		watchKey |
 		watchFocus |
-		watchMouse
+		watchMouse |
+		floatRegion
 ;
 
 static constexpr Flag_t mask_init =

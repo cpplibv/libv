@@ -65,6 +65,10 @@ Component::Component(core_ptr ptr_) noexcept :
 	++ptr->ref_count;
 }
 
+bool Component::isFloatRegion() const noexcept {
+	return ptr->isFloatRegion();
+}
+
 const std::string& Component::name() const noexcept {
 	return ptr->name;
 }

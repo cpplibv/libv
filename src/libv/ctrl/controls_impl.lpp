@@ -60,7 +60,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplControls {
+class ImplControls {
 public:	// --- Feature ---
 	// TODO P2: C++20 Use unordered_multiset or use a better feature container to not duplicate feature_name as key, and has a better iteration speed (later is optional)
 	//				Waiting implementation of p0919r3 / p1690r1

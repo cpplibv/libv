@@ -118,4 +118,5 @@ TEST_CASE("parse color: test everything", "[libv.parse]") {
 	CHECK(not parse_color_optional("rgb(14)"));
 	CHECK(not parse_color_optional("rgb(14,15)"));
 	CHECK(not parse_color_optional("rgb(14,15,433)"));
+	CHECK(not parse_color_optional("á"));
 }

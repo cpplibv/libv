@@ -12,10 +12,29 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class ScrollArea : public ComponentHandler<class CoreScrollArea, EventHostGeneral<ScrollArea>> {
+struct EventScrollArea : BaseEvent {
+	libv::vec2f old_position;
+	libv::vec2f old_size;
+
+	constexpr inline EventScrollArea(libv::vec2f old_position, libv::vec2f old_size) noexcept :
+		old_position(old_position),
+		old_size(old_size) {}
+};
+
+template <typename ComponentT>
+struct EventHostScrollArea : EventHostGeneral<ComponentT> {
+	BasicEventProxy<ComponentT, EventScrollArea> area;
+
+	explicit inline EventHostScrollArea(ComponentT& core) : EventHostGeneral<ComponentT>(core),
+			area(core) {}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 //class ScrollPane :
 //		public ComponentHandler<class CoreScrollArea>,
 //		public EventHost<EventHostGeneral<ScrollPane>>> {
+class ScrollArea : public ComponentHandler<class CoreScrollArea, EventHostScrollArea<ScrollArea>> {
 public:
 	explicit ScrollArea(std::string name);
 	explicit ScrollArea(GenerateName_t = {}, const std::string_view type = "s-area");
@@ -34,12 +53,9 @@ public:
 	void area_position(libv::vec2f value) noexcept;
 	[[nodiscard]] libv::vec2f area_position() const noexcept;
 
-	void area_size(libv::vec2f value) noexcept;
 	[[nodiscard]] libv::vec2f area_size() const noexcept;
 };
 
-// -------------------------------------------------------------------------------------------------
-// =================================================================================================
 // =================================================================================================
 
 //enum class BarVisibility {
@@ -80,8 +96,39 @@ public:
 //};
 //
 //// -------------------------------------------------------------------------------------------------
-//// =================================================================================================
-//// =================================================================================================
+//
+//class ScrollPane : public ComponentHandler<class CoreScrollPane, EventHostGeneral<ScrollPane>> {
+//public:
+//	explicit ScrollPane(std::string name);
+//	explicit ScrollPane(GenerateName_t = {}, const std::string_view type = "s-pane");
+//	explicit ScrollPane(core_ptr core) noexcept;
+//
+//public:
+//	void content(Component&& value) noexcept;
+//	void content(const Component& value) noexcept;
+//	[[nodiscard]] Component& content() noexcept;
+//	[[nodiscard]] const Component& content() const noexcept;
+//
+//public:
+//	[[nodiscard]] ScrollArea& scroll_area();
+//	[[nodiscard]] const ScrollArea& scroll_area() const;
+//
+//	[[nodiscard]] ScrollBar& bar_vertical();
+//	[[nodiscard]] const ScrollBar& bar_vertical() const;
+//
+//	[[nodiscard]] ScrollBar& bar_horizontal();
+//	[[nodiscard]] const ScrollBar& bar_horizontal() const;
+//
+//	void corner(Component value);
+//	void clear_corner() noexcept;
+//	[[nodiscard]] bool has_corner() const noexcept;
+//	[[nodiscard]] const Component& corner() const;
+//};
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
 //
 //// Property public API
 //#define LIBV_UI_PROPERTY_PAPI(RType, WType, Name) \

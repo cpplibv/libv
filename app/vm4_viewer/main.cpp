@@ -1,7 +1,7 @@
 // File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
 
 // libv
-#include <libv/utility/generic_path.hpp>
+#include <libv/utility/last_write_time.hpp>
 // ext
 #include <fmt/chrono.h>
 // std
@@ -34,7 +34,7 @@
 // TODO P5: app.vm4_viewer: Forward+
 // TODO P5: app.vm4_viewer: AA
 // TODO P5: app.vm4_viewer: full game render engine (what ?!)
-// TODO P5: app.vm4_viewer: texture LOD.scale change
+// TODO P5: app.vm4_viewer: billboard LOD texture
 
 // -------------------------------------------------------------------------------------------------
 
@@ -48,25 +48,16 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 //	libv::logger_stream.deny_below(libv::Logger::Severity::Info);
 
-	(void) argc;
-	(void) argv;
-
 	const auto path = std::filesystem::path(argv[0]);
 	const auto path_bin = path.filename();
 	const auto path_dir = path.parent_path();
 	const auto config_filename = std::filesystem::path(DEFAULT_CONFIG_FILENAME);
 	const auto config_path = path_dir / config_filename;
+	const auto lwt = libv::last_write_time(path);
 
-	app::log_app.info("Current path  {}", libv::generic_path(std::filesystem::current_path()));
-	app::log_app.info("Executable    {}/{}", libv::generic_path(path_dir), libv::generic_path(path_bin));
-
-	// TODO P5: write a utility wrapper for last_write_time
-	// C++20: There might be a better way in the future for this
-	//  std::chrono::clock_cast<std::chrono::system_clock>(lwt)
-	const auto lwt = std::filesystem::last_write_time(path);
-	const auto lwt_sys = decltype(lwt)::clock::to_sys(lwt);
-	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}",
-			fmt::localtime(std::chrono::system_clock::to_time_t(lwt_sys)));
+	app::log_app.info("Current path  {}", std::filesystem::current_path().generic_string());
+	app::log_app.info("Executable    {}/{}", path_dir.generic_string(), path_bin.generic_string());
+	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", fmt::localtime(std::chrono::system_clock::to_time_t(lwt)));
 
 	app::ConfigViewer config(config_path);
 

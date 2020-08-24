@@ -45,8 +45,8 @@ CoreComponent::~CoreComponent() {
 std::string CoreComponent::path() const {
 	std::string result = name;
 
-	for (auto it = make_observer_ref(this); it != it->parent; it = it->parent)
-		result = it->parent->name + '/' + std::move(result);
+	for (auto it = make_observer_ref(this); it != it->parent_; it = it->parent_)
+		result = it->parent_->name + '/' + std::move(result);
 
 	return result;
 }
@@ -57,7 +57,7 @@ void CoreComponent::size(Size value) noexcept {
 	size_ = value;
 	flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
 
-	for (auto it = make_observer_ref(this); it != it->parent && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent)
+	for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
 		it->flagDirect(Flag::pendingLayoutSelf);
 
 	flagAuto(Flag::pendingLayout | Flag::pendingRender);
@@ -70,7 +70,7 @@ void CoreComponent::flagDirect(Flag_t flags_) noexcept {
 }
 
 void CoreComponent::flagAncestors(Flag_t flags_) noexcept {
-	for (auto it = parent; !it->flags.match_mask(flags_); it = it->parent)
+	for (auto it = parent_; !it->flags.match_mask(flags_); it = it->parent_)
 		it->flags.set(flags_);
 }
 
@@ -87,7 +87,7 @@ void CoreComponent::flagForce(Flag_t flags_) noexcept {
 void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 	flags.reset(flags_ & Flag::mask_self);
 
-	for (auto it = parent; true; it = it->parent) {
+	for (auto it = parent_; true; it = it->parent_) {
 		Flag_t childFlags = Flag::none;
 
 		it->doForeachChildren([&childFlags](Component& child) {
@@ -100,7 +100,7 @@ void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 		it->flags.reset(Flag::mask_propagate);
 		it->flags.set(calculatePropagateFlags(childFlags));
 
-		if (it == it->parent)
+		if (it == it->parent_)
 			return;
 	}
 }
@@ -149,6 +149,21 @@ void CoreComponent::watchMouse(bool value) noexcept {
 	flags.set_to(Flag::watchMouse, value);
 }
 
+void CoreComponent::floatRegion(bool value) noexcept {
+	if (flags.match_full(Flag::floatRegion) == value)
+		return;
+
+	// NOTE: pendingAttachSelf flag is used instead of isAttached to allow usage of this function in doAttach
+	if (!flags.match_any(Flag::pendingAttachSelf)) { // Already attached
+		if (value)
+			context().mouse.subscribe_region(*this);
+		else
+			context().mouse.unsubscribe_region(*this);
+	}
+
+	flags.set_to(Flag::floatRegion, value);
+}
+
 bool CoreComponent::isWatchChar() const noexcept {
 	return flags.match_any(Flag::watchChar);
 }
@@ -163,6 +178,10 @@ bool CoreComponent::isWatchFocus() const noexcept {
 
 bool CoreComponent::isWatchMouse() const noexcept {
 	return flags.match_any(Flag::watchMouse);
+}
+
+bool CoreComponent::isFloatRegion() const noexcept {
+	return flags.match_any(Flag::floatRegion);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -227,7 +246,7 @@ bool CoreComponent::isFocusableComponent() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent_; i = i->parent_) {
 		if (i->flags.match_any(Flag::watchChar))
 			i->onChar(event);
 		if (event.propagation_stopped())
@@ -236,7 +255,7 @@ void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) 
 }
 
 void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent; i = i->parent) {
+	for (auto i = libv::make_observer_ref(component); i != i->parent_; i = i->parent_) {
 		if (i->flags.match_any(Flag::watchKey))
 			i->onKey(event);
 		if (event.propagation_stopped())
@@ -284,10 +303,10 @@ void CoreComponent::onMouseScroll(const EventMouseScroll& event) {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreComponent::attach(CoreComponent& parent_) {
+void CoreComponent::attach(CoreComponent& new_parent) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		// NOTE: context_ is already set in the constructor
-		parent = parent_;
+		parent_ = new_parent;
 
 		log_ui.trace("Attaching {}", path());
 
@@ -297,6 +316,9 @@ void CoreComponent::attach(CoreComponent& parent_) {
 
 		if (flags.match_any(Flag::watchMouse))
 			context().mouse.subscribe(*this);
+
+		if (flags.match_any(Flag::floatRegion))
+			context().mouse.subscribe_region(*this);
 
 		flags.reset(Flag::pendingAttachSelf);
 	}
@@ -310,11 +332,13 @@ void CoreComponent::attach(CoreComponent& parent_) {
 	}
 }
 
-void CoreComponent::detach(CoreComponent& parent_) {
+void CoreComponent::detach(CoreComponent& old_parent) {
+	(void) old_parent;
+
 	if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
-		doDetachChildren([this, &parent_, &childFlags](Component& child) {
+		doDetachChildren([this, &childFlags](Component& child) {
 			bool remove = child.core().flags.match_any(Flag::pendingDetachSelf);
 
 			if (child.core().flags.match_any(Flag::pendingDetach))
@@ -336,6 +360,9 @@ void CoreComponent::detach(CoreComponent& parent_) {
 		if (flags.match_any(Flag::watchMouse))
 			context().mouse.unsubscribe(*this);
 
+		if (flags.match_any(Flag::floatRegion))
+			context().mouse.unsubscribe_region(*this);
+
 		if (flags.match_any(Flag::focused)) {
 			flags.reset(Flag::focusable);
 			context().detachFocused(*this);
@@ -356,7 +383,7 @@ void CoreComponent::detach(CoreComponent& parent_) {
 
 		childID = 0;
 		flags = Flag::mask_init;
-		parent = *this;
+		parent_ = *this;
 		layout_position_ = {};
 		layout_size_ = {};
 	}
@@ -366,8 +393,8 @@ void CoreComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
-		if (parent != this) // NOTE: Condition is required to Avoid root component edge case
-			parent->doStyle(ctx, childID);
+		if (parent_ != this) // NOTE: Condition is required to Avoid root component edge case
+			parent_->doStyle(ctx, childID);
 		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
@@ -383,7 +410,7 @@ void CoreComponent::styleScan() {
 	if (flags.match_any(Flag::pendingStyleSelf) || (style_ && style_->isDirty())) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
-		parent->doStyle(ctx, childID);
+		parent_->doStyle(ctx, childID);
 	}
 	doForeachChildren([](Component& child) {
 		child.core().styleScan();
@@ -397,9 +424,9 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 	libv::observer_ptr<CoreComponent> result = doFocusTraverse(context, ChildIDSelf);
 	libv::observer_ref<CoreComponent> ancestor = *this;
 
-	while (result == nullptr && ancestor != ancestor->parent) {
-		result = ancestor->parent->doFocusTraverse(context, ancestor->childID);
-		ancestor = ancestor->parent;
+	while (result == nullptr && ancestor != ancestor->parent_) {
+		result = ancestor->parent_->doFocusTraverse(context, ancestor->childID);
+		ancestor = ancestor->parent_;
 	}
 
 	return result;
@@ -412,7 +439,6 @@ libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
 }
 
 void CoreComponent::layout2(const ContextLayout2& layout_env) {
-//	log_ui.trace("Layout Pass2 {}", path());
 	bool boundsChanged = false;
 
 	if (layout_env.position != layout_position_) {
@@ -427,28 +453,22 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 		layout_size_ = layout_env.size;
 	}
 
-	// <<< P1: abs_position is a bad name, it will be region_position or something like that
-	// <<< P1: Has to update mouse context based on abs_position/region_position change too, not just position change
-	//      Context Layout extra member bool to indicate global position changes
-	//      If it is set iterate every child except if its a mouse region
-
-	if (boundsChanged && flags.match_any(Flag::watchMouse)) {
-		context().mouse.update(*this, layout_env.abs_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});
+	if (boundsChanged && flags.match_any(Flag::watchMouse | Flag::floatRegion)) {
+		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});
 	}
 
 	if (boundsChanged || flags.match_any(Flag::pendingLayout)) {
-
 		if (boundsChanged || flags.match_any(Flag::pendingLayoutSelf)) {
 			// Layout self
 			doLayout2(layout_env);
-			log_ui.trace("Layout {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
+			log_ui.trace("Layout {:>11}, {:>11}, {}", xy(layout_position_), xy(layout_size_), path());
 
 		} else {
 			// Layout the children only
 			doForeachChildren([&layout_env](Component& child) {
 				child.core().layout2(layout_env.enter(child.layout_position(), child.layout_size()));
 			});
-			log_ui.trace("   |   {:>11}, {:>11}, {}", layout_position_, layout_size_, path());
+			log_ui.trace("   |   {:>11}, {:>11}, {}", xy(layout_position_), xy(layout_size_), path());
 		}
 
 		flags.reset(Flag::pendingLayout);
@@ -467,18 +487,13 @@ void CoreComponent::render(Renderer& r) {
 		}
 
 		{ // if (flags.match_any(Flag::pendingRender)) {
-			r.translate(layout_position());
+			const auto offset = layout_position();
+			r.translate(offset);
+
 			doRender(r);
 
-//			doForeachChildren([&r](Component& child) {
-////				const auto guard_m = glr.model.push_guard();
-////				glr.model.translate(child.layout_position());
-//
-//				Renderer rc = r.enter(child);
-//				child.core().render(rc);
-//			});
-
-			r.translate(-layout_position()); // <<< P7: Need proper guarding
+			// TODO P4: Renderer proper translate guarding (same in scroll area)
+			r.translate(-offset);
 		}
 
 		flags.reset(Flag::updatedPosition | Flag::updatedSize | Flag::pendingRender);

@@ -50,7 +50,7 @@ struct EventHostEditable : EventHostSubmitable<ComponentT> {
 	BasicEventProxy<ComponentT, EventChange> change;
 	BasicEventProxy<ComponentT, EventSelect> select;
 
-	EventHostEditable(ComponentT& core) : EventHostSubmitable<ComponentT>(core),
+	explicit inline EventHostEditable(ComponentT& core) : EventHostSubmitable<ComponentT>(core),
 		caret(core),
 		change(core),
 		select(core) {}

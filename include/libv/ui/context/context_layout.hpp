@@ -17,7 +17,7 @@ struct ContextLayout1 {
 
 struct ContextLayout2 {
 public:
-	libv::vec3f abs_position;
+	libv::vec3f float_position;
 
 	libv::vec3f position;
 	libv::vec3f size;
@@ -29,18 +29,19 @@ public:
 		position(position),
 		size(size) { }
 
+private:
 	constexpr inline ContextLayout2(libv::vec3f abs_position, libv::vec3f position, libv::vec3f size, int depth) noexcept :
-		abs_position(abs_position),
+		float_position(abs_position),
 		position(position),
 		size(size),
 		depth(depth) { }
 
 public:
-	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec3f position, libv::vec3f size) const noexcept {
+	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec3f position_, libv::vec3f size_) const noexcept {
 		return ContextLayout2{
-				abs_position + position,
-				position,
-				size,
+				float_position + position_,
+				position_,
+				size_,
 				depth + 1
 		};
 	}

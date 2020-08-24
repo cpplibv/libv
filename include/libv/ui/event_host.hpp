@@ -65,7 +65,7 @@ public:
 	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll;
 
 public:
-	inline EventHostGeneral(ComponentT& core) noexcept :
+	explicit inline EventHostGeneral(ComponentT& core) noexcept :
 		char_(core),
 		key(core),
 		focus(core),
@@ -84,7 +84,7 @@ public:
 	BasicEventProxy<ComponentT, EventSubmit> submit;
 
 public:
-	EventHostSubmitable(ComponentT& core) : EventHostGeneral<ComponentT>(core),
+	explicit inline EventHostSubmitable(ComponentT& core) : EventHostGeneral<ComponentT>(core),
 		submit(core) {}
 };
 

@@ -16,7 +16,8 @@ namespace glr {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplRemote {
+class ImplRemote {
+public:
 	libv::gl::GL gl;
 	std::vector<Queue> queues;
 	DestroyQueues destroyQueues;

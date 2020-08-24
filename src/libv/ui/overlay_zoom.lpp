@@ -34,6 +34,9 @@ public:
 public:
 	[[nodiscard]] libv::vec2f screen_BL() const;
 	[[nodiscard]] libv::vec2f screen_TR() const;
+
+public:
+	void postRender(class Renderer& r);
 };
 
 // -------------------------------------------------------------------------------------------------

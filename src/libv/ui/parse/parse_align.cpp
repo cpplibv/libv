@@ -4,6 +4,7 @@
 #include <libv/ui/parse/parse_align.hpp>
 // ext
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/char/unicode.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 // std
@@ -59,7 +60,8 @@ std::optional<AlignVertical> parse_align_vertical_optional(const std::string_vie
 	AlignVertical result = AlignVertical::center;
 
 	auto it = str.begin();
-	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<AlignVertical>{result} : std::nullopt;
@@ -108,7 +110,8 @@ std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string
 	AlignHorizontal result = AlignHorizontal::center;
 
 	auto it = str.begin();
-	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<AlignHorizontal>{result} : std::nullopt;

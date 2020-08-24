@@ -4,6 +4,7 @@
 #include <libv/parse/bool.hpp>
 // ext
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/char/unicode.hpp>
 // libv
 #include <libv/utility/concat.hpp>
 // std
@@ -60,7 +61,8 @@ std::optional<bool> parse_bool_optional(const std::string_view str) {
 	bool result = false;
 
 	auto it = str.begin();
-	auto success = x3::phrase_parse(it, str.end(), bool_rule, x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), bool_rule, x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<bool>{result} : std::nullopt;

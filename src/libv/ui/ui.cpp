@@ -112,7 +112,6 @@ public:
 public:
 	OverlayZoomMode overlayZoomMode = OverlayZoomMode::disabled;
 	OverlayZoom overlayZoom;
-	// TODO P1: make sure zoom is px aligned and the lines are pixel perfect
 
 //	bool overlayCursorEnable = false;
 //	std::shared_ptr<OverlayCursor> overlayCursor = std::make_shared<OverlayCursor>(root);
@@ -421,10 +420,21 @@ void UI::update(libv::glr::Queue& glr) {
 		const auto guard_p = glr.projection.push_guard();
 
 //		AccessRoot::create(self->root.core(), context);
-		auto r = self->context_render.root_renderer(self->root, glr, self->context_state.time_frame(), self->context_state.time());
+		auto r = self->context_render.root_renderer(
+				self->root,
+				glr,
+				self->context_state.time_frame(),
+				self->context_state.time(),
+				self->context_state.mouse_position(),
+				self->root.layout_size2()
+		);
+
 		AccessRoot::render(self->root.core(), r);
 		self->context_render.execute_render(glr);
 //		AccessRoot::destroy(self->root.core(), context);
+
+		if (self->overlayZoomMode != OverlayZoomMode::disabled)
+			self->overlayZoom.postRender(r);
 
 		self->stat.render.sample(self->timer.time_ns());
 	} catch (const std::exception& ex) {
@@ -447,16 +457,23 @@ void UI::update(libv::glr::Queue& glr) {
 //	}
 }
 
-void UI::destroy(libv::glr::Queue& gl) {
+void UI::destroy(libv::glr::Queue& glr) {
 	current_thread_context(context());
 
 	self->root.markRemove();
 
 	// --- Render ---
 	{
-		auto r = self->context_render.root_renderer(self->root, gl, self->context_state.time_frame(), self->context_state.time());
+		auto r = self->context_render.root_renderer(
+				self->root,
+				glr,
+				self->context_state.time_frame(),
+				self->context_state.time(),
+				self->context_state.mouse_position(),
+				self->root.layout_size2()
+		);
 		AccessRoot::render(self->root.core(), r);
-		self->context_render.execute_render(gl);
+		self->context_render.execute_render(glr);
 	}
 
 	// --- Detach ---

@@ -35,6 +35,7 @@ TEST_CASE("parse size: 0, 1 and >3 dimension single quantity definitions are inv
 	CHECK(parse_to_string("100%               ") == "invalid");
 	CHECK(parse_to_string("100r               ") == "invalid");
 	CHECK(parse_to_string("d                  ") == "invalid");
+	CHECK(parse_to_string("á") == "invalid");
 	CHECK(parse_to_string("100px, 200px, 300px, 400px") == "invalid");
 	CHECK(parse_to_string("100% , 200% , 300% , 400% ") == "invalid");
 	CHECK(parse_to_string("100r , 200r , 300r , 400r ") == "invalid");

@@ -7,15 +7,12 @@
 // libv
 #include <libv/algorithm/erase_if_stable.hpp>
 #include <libv/algorithm/erase_unstable.hpp>
-#include <libv/algorithm/linear_find.hpp>
 #include <libv/algorithm/sort.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/bit_cast.hpp>
 #include <libv/utility/enum.hpp>
-#include <libv/utility/observer_ref.hpp>
-//#include <libv/utility/overload.hpp>
 // std
-#include <variant>
+#include <unordered_map>
 #include <vector>
 // pro
 #include <libv/ui/core_component.hpp>
@@ -60,49 +57,175 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplContextMouse {
-	struct EntryTarget {
-		libv::observer_ref<CoreComponent> target;
+namespace {
 
-	public:
-		inline void notify(const EventMouseButton& event) const {
-			AccessEvent::onMouseButton(*target, event);
-		}
+inline void component_notify(CoreComponent* target, const EventMouseButton& event) {
+	AccessEvent::onMouseButton(*target, event);
+}
 
-		inline void notify(const EventMouseMovement& event) const {
-			AccessEvent::onMouseMovement(*target, event);
-		}
+inline void component_notify(CoreComponent* target, const EventMouseMovement& event) {
+	AccessEvent::onMouseMovement(*target, event);
+}
 
-		inline void notify(const EventMouseScroll& event) const {
-			AccessEvent::onMouseScroll(*target, event);
-		}
+inline void component_notify(CoreComponent* target, const EventMouseScroll& event) {
+	AccessEvent::onMouseScroll(*target, event);
+}
 
-		[[nodiscard]] friend constexpr inline bool operator==(const EntryTarget& lhs, const CoreComponent& rhs) noexcept {
-			return lhs.target == &rhs;
-		}
-		[[nodiscard]] friend constexpr inline bool operator==(const CoreComponent& lhs, const EntryTarget& rhs) noexcept {
-			return rhs == lhs;
-		}
-	};
+[[nodiscard]] inline CoreComponent* component_region(CoreComponent& target) noexcept {
+	for (auto it = target.parent(); it != it->parent(); it = it->parent())
+		if (it->isFloatRegion())
+			return &*it;
 
-	struct Entry {
-		libv::vec2f cornerBL;
-		libv::vec2f cornerTR;
-		MouseOrder order;
-		EntryTarget target;
+	return nullptr;
+}
 
-		bool over = false;
+// ---
+
+using MouseKey = CoreComponent*;
+
+class MouseRegionContainer {
+public:
+	struct Node {
+		const MouseKey target;
+
+		libv::vec2f cornerBL = {0, 0};
+		libv::vec2f cornerTR = {-1, -1};
+		MouseOrder order = MouseOrder{0};
+
+		bool over = false; /// Mouse pointer is over (but might be clipped by region)
+		bool inside = false; /// Mouse pointer is over and it is interacting with the node (relates to pass_through)
 		bool pendingUpdate = true;
 
-//		bool remap_region = false;
+		Node* region_parent = nullptr;
+		libv::vec2f region_offset = {0, 0};
+		std::vector<Node*> region_nodes;
 
-		Entry(libv::vec2f cornerBL, libv::vec2f cornerTR, MouseOrder order, libv::observer_ref<CoreComponent> component) :
-			cornerBL(cornerBL), cornerTR(cornerTR), order(order), target{component} { }
+		explicit inline Node(MouseKey target) noexcept :
+			target(target) {}
+
+		[[nodiscard]] constexpr inline libv::vec2f global_offset() const noexcept {
+			libv::vec2f result;
+
+			for (auto it = this; it != nullptr; it = it->region_parent)
+				result += it->region_offset;
+
+			return result;
+		}
 	};
 
-	std::vector<Entry> entries;
-	std::vector<EntryTarget> acquired;
+private:
+	// NOTE: unordered_map's memory address stability is utilized in the nodes
+	std::unordered_map<MouseKey, Node> index_and_storage;
+	Node* root;
 
+public:
+	MouseRegionContainer() :
+		root(&index_and_storage.emplace(nullptr, nullptr).first->second) {
+	}
+
+public:
+	void add_node(MouseKey parent_key, MouseKey new_key) {
+		auto* parent_node = find(parent_key);
+
+		if (parent_node == nullptr) {
+			log_ui.error("Internal error: {} parent of mouse region {} is missing", parent_key == nullptr ? "<<mouse-root>>" : parent_key->path(), new_key->path());
+			assert(false && "Internal error: expected parent of mouse region is missing");
+			return;
+		}
+
+		const auto emplace_result = index_and_storage.emplace(new_key, new_key);
+
+		if (!emplace_result.second) {
+			log_ui.warn("Mouse region {} is already present", parent_key == nullptr ? "<<mouse-root>>" : parent_key->path(), new_key->path());
+			return;
+		}
+
+		auto& new_node = emplace_result.first->second;
+
+		new_node.region_parent = parent_node;
+		parent_node->region_nodes.emplace_back(&new_node);
+	}
+
+	void add_region(MouseKey parent_key, MouseKey new_key) {
+		add_node(parent_key, new_key);
+	}
+
+	Node* find(MouseKey key) noexcept {
+		const auto it = index_and_storage.find(key);
+
+		if (it != index_and_storage.end())
+			return &it->second;
+
+		return nullptr;
+	}
+
+	bool remove(MouseKey key) noexcept {
+		const auto it = index_and_storage.find(key);
+
+		if (it == index_and_storage.end())
+			return false;
+
+		auto& node = it->second;
+
+		if (!node.region_nodes.empty()) {
+			log_ui.error("Internal error: Removing {} parent with {} children", key == nullptr ? "<<mouse-root>>" : key->path(), node.region_nodes.size());
+			assert(false && "Internal error: Removing parent with children");
+			return true; // The remove still can be considered successful for the caller
+		}
+
+		libv::erase_unstable(node.region_parent->region_nodes, &node);
+		index_and_storage.erase(it);
+		return true;
+	}
+
+public:
+//	void aux_debug(Node& node, int depth = 0) noexcept {
+//		if (depth != 0) {
+//			if (node.region_nodes.empty())
+//				log_ui.info("{:<60} [{:>9}-{:>9}]({})", std::string((depth - 1) * 4, ' ') +
+//						node.target->path(), node.global_offset() + node.cornerBL, node.global_offset() + node.cornerTR, node.over ? "X" : " ");
+//			else
+//				log_ui.info("{:<60} [{:>9}-{:>9}]({}) -> {}", std::string((depth - 1) * 4, ' ') +
+//						node.target->path(), node.global_offset() + node.cornerBL, node.global_offset() + node.cornerTR, node.over ? "X" : " ", node.region_offset);
+//		}
+//
+//		for (auto& child_node : node.region_nodes)
+//			aux_debug(*child_node, depth + 1);
+//	}
+//
+//	void debug() noexcept {
+//		aux_debug(*root);
+//	}
+
+	template <typename F>
+	void aux_foreach_tree(Node& node, const F& f, libv::vec2f offset) noexcept {
+		const auto visit_childs = f(node, offset);
+
+		if (visit_childs) {
+			const auto child_offset = offset + node.region_offset;
+			for (auto* child_node : node.region_nodes)
+				aux_foreach_tree(*child_node, f, child_offset);
+		}
+	}
+
+public:
+	template <typename F>
+	void foreach_tree(const F& f) noexcept {
+		for (auto* node : root->region_nodes)
+			aux_foreach_tree(*node, f, {});
+	}
+};
+
+} // namespace
+
+// -------------------------------------------------------------------------------------------------
+
+class ImplContextMouse {
+public:
+	MouseRegionContainer container;
+	std::vector<MouseRegionContainer::Node*> acquired;
+
+public:
 	libv::vec2f mouse_position;
 	libv::vec2f scroll_position;
 };
@@ -116,19 +239,17 @@ ContextMouse::ContextMouse() :
 ContextMouse::~ContextMouse() = default; // For the sake of forward declared unique_ptr
 
 void ContextMouse::subscribe(CoreComponent& component) {
-	self->entries.emplace_back(libv::vec2f{0, 0}, libv::vec2f{-1, -1}, MouseOrder{0}, libv::make_observer_ref(component));
+	self->container.add_node(component_region(component), &component);
 }
 
 void ContextMouse::subscribe_region(CoreComponent& component) {
-
+	self->container.add_region(component_region(component), &component);
 }
 
 void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target == component;
-	});
+	auto it = self->container.find(&component);
 
-	if (it == self->entries.end())
+	if (it == nullptr)
 		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
 	it->cornerBL = xy(abs_position);
@@ -137,33 +258,49 @@ void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, li
 	it->pendingUpdate = true;
 }
 
-void ContextMouse::unsubscribe(CoreComponent& component) {
-	const auto it = libv::linear_find_if_iterator(self->entries, [&](const ImplContextMouse::Entry& entry) {
-		return entry.target == component;
-	});
+void ContextMouse::update_region(CoreComponent& component, libv::vec2f remap_offset) {
+	auto it = self->container.find(&component);
 
-	if (it == self->entries.end())
+	if (it == nullptr)
+		return log_ui.warn("Attempted to update a not subscribed region: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+
+	it->region_offset = remap_offset;
+}
+
+void ContextMouse::unsubscribe(CoreComponent& component) {
+	auto success = self->container.remove(&component);
+
+	if (!success)
 		return log_ui.warn("Attempted to unsubscribing a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
 
-	libv::erase_unstable(self->entries, it);
 	release(component);
 }
 
 void ContextMouse::unsubscribe_region(CoreComponent& component) {
+	auto success = self->container.remove(&component);
 
+	if (!success)
+		return log_ui.warn("Attempted to unsubscribing a not subscribed region: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+
+	release(component);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void ContextMouse::acquire(CoreComponent& component) {
-	self->acquired.emplace_back(component);
+	auto* node = self->container.find(&component);
+
+	if (node == nullptr)
+		return log_ui.warn("Attempted to acquire a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+
+	self->acquired.emplace_back(node);
 }
 
 void ContextMouse::release(CoreComponent& component) {
 	if (self->acquired.empty())
 		return;
 
-	libv::erase_if_stable(self->acquired, [&](const auto& i) { return i == component; });
+	libv::erase_if_stable(self->acquired, [&](const auto& i) { return i->target == &component; });
 
 	if (self->acquired.empty())
 		event_position(self->mouse_position);
@@ -174,29 +311,35 @@ void ContextMouse::release(CoreComponent& component) {
 namespace {
 
 struct Hit {
-	libv::observer_ref<const ImplContextMouse::Entry> entry;
+	MouseRegionContainer::Node* node;
+	libv::vec2f local_position;
 };
 
 struct HitEL {
-	libv::observer_ref<ImplContextMouse::Entry> entry;
+	MouseRegionContainer::Node* node;
+	libv::vec2f local_position;
 	bool enter;
 	bool leave;
 };
 
-using Hits = boost::container::small_vector<Hit, 8>;
-using HitELs = boost::container::small_vector<HitEL, 8>;
+using Hits = boost::container::small_vector<Hit, 16>;
+using HitELs = boost::container::small_vector<HitEL, 16>;
 
 template <typename Hits>
 inline void sort_hits(Hits& hits) noexcept {
 	libv::sort_unstable(hits, [](const auto& lhs, const auto& rhs) {
-		return libv::to_value(lhs.entry->order) > libv::to_value(rhs.entry->order);
+		return libv::to_value(lhs.node->order) > libv::to_value(rhs.node->order);
 	});
 }
 
 template <typename Event>
 inline void notify_hits(Hits& hits, Event& event) noexcept {
 	for (const auto& hit : hits) {
-		hit.entry->target.notify(event);
+		if (!hit.node->inside)
+			continue;
+
+		event.local_position = hit.local_position;
+		component_notify(hit.node->target, event);
 	}
 }
 
@@ -207,27 +350,39 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
 
+		if (!hit.node->inside && !hit.enter)
+			continue;
+
+		hit.node->inside = !hit.leave;
+
+		event.local_position = hit.local_position;
 		event.enter = hit.enter;
 		event.leave = hit.leave;
 
-		hit.entry->target.notify(event);
+		component_notify(hit.node->target, event);
 
-		if (!event.is_pass_through())
-			break;
+		if (!event.is_pass_through()) {
+			if (hit.leave) { // Left component has no authority to absorb the event
+				AccessEventMouseMovement::reset_pass_through(event);
+			} else {
+				break;
+			}
+		}
 	}
 
 	i++;
 
+	// Leave every other hit that was previously entered in the hit list
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
-
-		hit.entry->over = false;
+		hit.node->inside = false;
 
 		if (!hit.enter) { // If it's not a new enter for the component, leave that component
+			event.local_position = hit.local_position;
 			event.enter = false;
 			event.leave = true;
 
-			hit.entry->target.notify(event);
+			component_notify(hit.node->target, event);
 		}
 	}
 }
@@ -242,8 +397,8 @@ void ContextMouse::event_enter() {
 
 void ContextMouse::event_leave() {
 	EventMouseMovement event;
-	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
+	event.mouse_movement = {0, 0};
 	event.enter = false;
 	event.leave = true;
 
@@ -251,22 +406,29 @@ void ContextMouse::event_leave() {
 	if (!self->acquired.empty()) {
 		event.enter = false;
 		event.leave = false;
-		for (const auto& entry : self->acquired)
-			entry.notify(event);
-		return;
+		for (const auto& entry : self->acquired) {
+			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
+			component_notify(entry->target, event);
+		}
+
+		// No short-circuit: Continue to leave everything else too
 	}
 
 	// Gather hits
-	Hits hits;
+	HitELs hits;
 
-	for (ImplContextMouse::Entry& entry : self->entries) {
-		if (!entry.over)
-			continue;
+	self->container.foreach_tree([this, &hits](MouseRegionContainer::Node& node, libv::vec2f offset) {
+		const auto test_position = self->mouse_position - offset;
+		const auto local_position = test_position - node.cornerBL;
 
-		entry.over = false;
+		if (!node.over)
+			return false;
 
-		hits.push_back({entry});
-	}
+		node.over = false;
+
+		hits.emplace_back(&node, local_position, false, true);
+		return true;
+	});
 
 	sort_hits(hits);
 	notify_hits(hits, event);
@@ -275,29 +437,56 @@ void ContextMouse::event_leave() {
 void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Action action) {
 	// Define event
 	EventMouseButton event;
+	event.mouse_position = self->mouse_position;
 	event.action = action;
 	event.button = mouse;
 
 	// Handle acquired mouse
 	if (!self->acquired.empty()) {
-		for (const auto& entry : self->acquired)
-			entry.notify(event);
+		for (const auto& entry : self->acquired) {
+			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
+			component_notify(entry->target, event);
+		}
 		return;
 	}
 
 	// Gather hits
 	Hits hits;
 
-	for (const ImplContextMouse::Entry& entry : self->entries) {
-		if (!entry.over)
-			continue;
+	self->container.foreach_tree([this, &hits](MouseRegionContainer::Node& node, libv::vec2f offset) {
+		const auto test_position = self->mouse_position - offset;
+		const auto local_position = test_position - node.cornerBL;
 
-		hits.push_back({entry});
-	}
+		if (!node.over)
+			return false;
+
+		hits.emplace_back(&node, local_position);
+		return true;
+	});
 
 	sort_hits(hits);
 	notify_hits(hits, event);
 }
+
+namespace {
+
+void gather_over_for_leave(HitELs& hits, MouseRegionContainer::Node& node, libv::vec2f mouse_position, libv::vec2f offset) {
+	const auto node_offset = node.region_offset + offset;
+
+	for (auto* child : node.region_nodes) {
+		const auto local_position = mouse_position - node_offset - child->cornerBL;
+
+		if (!child->over)
+			continue;
+
+		child->over = false;
+		hits.emplace_back(child, local_position, false, true);
+
+		gather_over_for_leave(hits, *child, mouse_position, node_offset);
+	}
+}
+
+} // namespace
 
 void ContextMouse::event_position(libv::vec2f position_new) {
 	// Define event
@@ -305,35 +494,47 @@ void ContextMouse::event_position(libv::vec2f position_new) {
 	self->mouse_position = position_new;
 
 	EventMouseMovement event;
-	event.mouse_movement = movement;
 	event.mouse_position = position_new;
+	event.mouse_movement = movement;
 
 	// Handle acquired mouse
 	if (!self->acquired.empty()) {
 		event.enter = false;
 		event.leave = false;
-		for (const auto& entry : self->acquired)
-			entry.notify(event);
+		for (const auto& entry : self->acquired) {
+			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
+			component_notify(entry->target, event);
+		}
 		return;
 	}
 
 	// Gather hits
 	HitELs hits;
 
-	for (ImplContextMouse::Entry& entry : self->entries) {
-		const bool over_new = libv::vec::within(position_new, entry.cornerBL, entry.cornerTR);
-		const bool over_old = entry.over;
+	self->container.foreach_tree([this, &hits](MouseRegionContainer::Node& node, libv::vec2f offset) {
+		const auto test_position = self->mouse_position - offset;
+		const auto local_position = test_position - node.cornerBL;
+		const bool over_new = libv::vec::within(test_position, node.cornerBL, node.cornerTR);
+		const bool over_old = node.over;
 
-		entry.over = over_new;
+		node.over = over_new;
 
 		if (!over_old && !over_new)
-			continue;
+			return false;
 
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		hits.push_back({entry, enter, leave});
-	}
+		hits.emplace_back(&node, local_position, enter, leave);
+
+		if (leave) {
+			// Shortcut tree iteration as this region is left, gather every child that was 'over' to leave
+			gather_over_for_leave(hits, node, self->mouse_position, offset);
+			return false;
+		} else {
+			return true;
+		}
+	});
 
 	sort_hits(hits);
 	notify_hits(hits, event);
@@ -345,25 +546,32 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 	const auto position = self->scroll_position;
 
 	EventMouseScroll event;
-	event.scroll_movement = movement;
+	event.mouse_position = self->mouse_position;
 	event.scroll_position = position;
+	event.scroll_movement = movement;
 
 	// Handle acquired mouse
 	if (!self->acquired.empty()) {
-		for (const auto& entry : self->acquired)
-			entry.notify(event);
+		for (const auto& entry : self->acquired) {
+			event.local_position = self->mouse_position - entry->global_offset() - entry->cornerBL;
+			component_notify(entry->target, event);
+		}
 		return;
 	}
 
 	// Gather hits
 	Hits hits;
 
-	for (const ImplContextMouse::Entry& entry : self->entries) {
-		if (!entry.over)
-			continue;
+	self->container.foreach_tree([this, &hits](MouseRegionContainer::Node& node, libv::vec2f offset) {
+		const auto test_position = self->mouse_position - offset;
+		const auto local_position = test_position - node.cornerBL;
 
-		hits.push_back({entry});
-	}
+		if (!node.over)
+			return false;
+
+		hits.emplace_back(&node, local_position);
+		return true;
+	});
 
 	sort_hits(hits);
 	notify_hits(hits, event);
@@ -371,8 +579,8 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 
 void ContextMouse::event_update() {
 	EventMouseMovement event;
-	event.mouse_movement = {0, 0};
 	event.mouse_position = self->mouse_position;
+	event.mouse_movement = {0, 0};
 
 	// Handle acquired mouse
 	if (!self->acquired.empty())
@@ -381,24 +589,27 @@ void ContextMouse::event_update() {
 	// Gather hits
 	HitELs hits;
 
-	for (ImplContextMouse::Entry& entry : self->entries) {
-		if (!entry.pendingUpdate && !entry.over)
-			continue;
+	self->container.foreach_tree([this, &hits](MouseRegionContainer::Node& node, libv::vec2f offset) {
+		if (!node.pendingUpdate && !node.over)
+			return true;
 
-		const bool over_new = libv::vec::within(self->mouse_position, entry.cornerBL, entry.cornerTR);
-		const bool over_old = entry.over;
+		const auto test_position = self->mouse_position - offset;
+		const auto local_position = test_position - node.cornerBL;
+		const bool over_new = libv::vec::within(test_position, node.cornerBL, node.cornerTR);
+		const bool over_old = node.over;
 
-		entry.pendingUpdate = false;
-		entry.over = over_new;
+		node.pendingUpdate = false;
+		node.over = over_new;
 
 		if (over_old == over_new)
-			continue;
+			return true;
 
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
-		hits.push_back({entry, enter, leave});
-	}
+		hits.emplace_back(&node, local_position, enter, leave);
+		return true;
+	});
 
 	sort_hits(hits);
 	notify_hits(hits, event);
@@ -420,14 +631,14 @@ void ContextMouse::event_update() {
 //
 // https://www.boost.org/doc/libs/1_70_0/libs/geometry/doc/html/geometry/spatial_indexes/introduction.html
 //
-//struct ImplMouseRegionHandler {
+//class ImplMouseRegionHandler {
 //	Interest_t interest;
 //	libv::observer_ref<MouseRegion> region;
 ////	MouseRegionDimension dimension;
 //};
 //
 ////struct ImplContextMouse {
-//struct ImplMouseDimension {
+//class ImplMouseDimension {
 //	using point = boost::geometry::model::point<float, 2, boost::geometry::cs::cartesian>;
 //	using region = boost::geometry::model::box<point>;
 //

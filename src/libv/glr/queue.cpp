@@ -272,7 +272,8 @@ struct QueueTaskBlit {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplQueue {
+class ImplQueue {
+public:
 	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
 
 	std::vector<std::variant<

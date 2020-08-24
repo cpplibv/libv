@@ -53,7 +53,7 @@ protected:
 
 public:
 	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
-		return {*this};
+		return EventHostGeneral<Component>{*this};
 	}
 
 public:
@@ -65,6 +65,8 @@ public:
 	}
 
 public:
+	[[nodiscard]] bool isFloatRegion() const noexcept;
+
 	[[nodiscard]] const std::string& name() const noexcept;
 	[[nodiscard]] std::string path() const noexcept;
 

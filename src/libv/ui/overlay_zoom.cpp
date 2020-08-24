@@ -104,14 +104,6 @@ private:
 public:
 	using CoreComponent::CoreComponent;
 
-public:
-	void control();
-	void view();
-	void disable();
-
-	libv::vec2f screen_BL() const;
-	libv::vec2f screen_TR() const;
-
 private:
 	void init();
 	void update();
@@ -127,6 +119,9 @@ private:
 	virtual void doAttach() override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doRender(Renderer& r) override;
+
+public:
+	void postRender(Renderer& r);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -141,6 +136,8 @@ void CoreOverlayZoom::init() {
 }
 
 void CoreOverlayZoom::update() {
+	// TODO P5: make sure zoom is px aligned and the lines are pixel perfect
+
 	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
 	const auto matrix = libv::mat4f::ortho(displayPosition, fboSize / zoom_);
 
@@ -268,7 +265,7 @@ void CoreOverlayZoom::doAttach() {
 }
 
 void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {
-	framebufferSize_ = libv::vec::xy(environment.size.cast<int32_t>());
+	framebufferSize_ = libv::vec::xy(libv::lround(environment.size).cast<int32_t>());
 
 	framebufferColor0 = libv::glr::Texture2D::R8_G8_B8_A8{};
 	framebufferColor0.storage(1, framebufferSize_);
@@ -279,41 +276,45 @@ void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreOverlayZoom::doRender(Renderer& r) {
-//	auto& gl = context.gl;
-//
-//	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
-//	const auto blitPosition = libv::vec::max(displayPosition, libv::vec2f{0, 0}).cast<int32_t>();
-//	const auto blitSize = libv::vec::min(displayPosition + fboSize / zoom_, fboSize).cast<int32_t>();
-//
-//	gl.blit_from_default(framebuffer,
-//			blitPosition, blitSize,
-//			blitPosition, blitSize,
-//			libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
-//
-//	gl.setClearColor(0, 0, 0, 1);
-//	gl.clearColor();
-//	gl.clearDepth();
-//
-//	const auto guard_s = gl.state.push_guard();
-//
-//	gl.state.blendSrc_One();
-//	gl.state.blendDst_Zero();
-//	gl.state.disableDepthTest();
-//
-//	{
-//		gl.program(program);
-//		gl.texture(framebufferColor0, libv::gl::TextureChannel{0});
-//		gl.render(quad);
-//	}
-//	{
-//		gl.program(lineProgram);
-//		gl.render(lines_border);
-//	}
-//	{
-//		update_cursor();
-//		gl.program(lineProgram);
-//		gl.render(lines_cursor);
-//	}
+	(void) r;
+}
+
+void CoreOverlayZoom::postRender(Renderer& r) {
+	r.native([this](libv::glr::Queue& gl) {
+		const auto fboSize = libv::vec::cast<float>(framebufferSize_);
+		const auto blitPosition = libv::vec::max(displayPosition, libv::vec2f{0, 0}).cast<int32_t>();
+		const auto blitSize = libv::vec::min(displayPosition + fboSize / zoom_, fboSize).cast<int32_t>();
+
+		gl.blit_from_default(framebuffer,
+				blitPosition, blitSize,
+				blitPosition, blitSize,
+				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+
+		gl.setClearColor(0, 0, 0, 1);
+		gl.clearColor();
+		gl.clearDepth();
+
+		const auto guard_s = gl.state.push_guard();
+
+		gl.state.blendSrc_One();
+		gl.state.blendDst_Zero();
+		gl.state.disableDepthTest();
+
+		{
+			gl.program(program);
+			gl.texture(framebufferColor0, libv::gl::TextureChannel{0});
+			gl.render(quad);
+		}
+		{
+			gl.program(lineProgram);
+			gl.render(lines_border);
+		}
+		{
+			update_cursor();
+			gl.program(lineProgram);
+			gl.render(lines_cursor);
+		}
+	});
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -356,6 +357,10 @@ libv::vec2f OverlayZoom::screen_BL() const {
 
 libv::vec2f OverlayZoom::screen_TR() const {
 	return self().displayPosition + self().framebufferSize_.cast<float>() / self().zoom_ - 1.0f;
+}
+
+void OverlayZoom::postRender(class Renderer& r) {
+	self().postRender(r);
 }
 
 // -------------------------------------------------------------------------------------------------

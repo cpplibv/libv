@@ -36,7 +36,8 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ImplContextUI {
+class ImplContextUI {
+public:
 	ContextEvent event;
 	ContextMouse mouse;
 
@@ -60,7 +61,7 @@ public:
 	std::shared_ptr<T> getShader(std::weak_ptr<T>& wp, const std::string_view name) {
 		auto sp = wp.lock();
 		if (sp) {
-			log_ui.trace("Shader cache hit for: {}", name);
+//			log_ui.trace("Shader cache hit for: {}", name);
 		} else {
 			log_ui.trace("Shader cache miss for: {}", name);
 			wp = sp = std::make_shared<T>();
@@ -212,7 +213,7 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 		sp = it->second.lock();
 		if (sp) {
 			// Cache hit
-			log_ui.trace("Font cache hit for: {} as {}", libv::generic_path(path), key);
+//			log_ui.trace("Font cache hit for: {} as {}", libv::generic_path(path), key);
 			return sp;
 
 		} else {
@@ -268,7 +269,7 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 		sp = it->second.lock();
 		if (sp) {
 			// Cache hit
-			log_ui.trace("Texture2D cache hit for: {} as {}", libv::generic_path(path), key);
+//			log_ui.trace("Texture2D cache hit for: {} as {}", libv::generic_path(path), key);
 			return sp;
 
 		} else {

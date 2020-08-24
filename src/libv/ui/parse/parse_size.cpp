@@ -4,6 +4,7 @@
 #include <libv/ui/parse/parse_size.hpp>
 // ext
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/char/unicode.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
 // std
 #include <stdexcept>
@@ -79,7 +80,8 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 	std::get<2>(result).ratio = 0.0f;
 
 	auto it = str.begin();
-	auto success = x3::phrase_parse(it, str.end(), size_rule, x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), size_rule, x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<Size>{

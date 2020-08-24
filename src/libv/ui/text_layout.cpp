@@ -360,7 +360,7 @@ libv::vec2f TextLayout::content(libv::vec2f new_limit) {
 		return {0.f, 0.f};
 
 	const auto lineAdvance = font_->getLineAdvance(fontSize_);
-	if (new_limit.x <= 0.0f)
+	if (new_limit.x < 0.0f)
 		new_limit.x = std::numeric_limits<float>::max();
 
 	auto codepointPrevious = uint32_t{0};

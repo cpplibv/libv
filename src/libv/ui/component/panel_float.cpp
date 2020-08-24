@@ -6,6 +6,7 @@
 #include <libv/utility/approx.hpp>
 #include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
+#include <libv/meta/for_constexpr.hpp>
 // pro
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context/context_layout.hpp>
@@ -13,9 +14,6 @@
 #include <libv/ui/layout/view_layouted.lpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
-
-
-
 
 
 namespace libv {

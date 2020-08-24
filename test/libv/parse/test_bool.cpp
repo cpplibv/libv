@@ -71,4 +71,6 @@ TEST_CASE("parse bool: test everything", "[libv.parse]") {
 	CHECK(not parse_bool_optional("fa lse"));
 	CHECK(not parse_bool_optional("ffalse"));
 	CHECK(not parse_bool_optional("tr ue"));
+
+	CHECK(not parse_bool_optional("á"));
 }

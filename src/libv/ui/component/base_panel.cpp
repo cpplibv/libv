@@ -22,7 +22,8 @@ void CoreBasePanel::add(Component component) {
 	AccessParent::childID(component.core()) = childID;
 
 	children.emplace_back(std::move(component));
-	flagForce(Flag::pendingAttachChild);
+	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
+	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
 }
 
 void CoreBasePanel::remove(Component& component) {

@@ -524,61 +524,59 @@ libv.ui.style: parent depends on layout invalidation could be introduced into th
 libv.ui: text layout: rework string2D to not use GLR, it should be just a plain layouter, prep data into local buffer and provide span getters? | an alternative text layout was introduced
 libv.glr: Implement sub-mesh API | it was kind of already usable as base_vertex, base_index and num_indices
 libv.glr: Texture and Program base_ref
+ext.x3: debug build x3 parser in libv.ctrl fails with an assert | the cause were the ascii skipper failing, switched to unicode skipper
+libv.ui: Add local_mouse to the ui info uniform block | how to preserv the data | use mvp transforms instead
+libv.ui: Rework mouse context internals
+libv.ui: Rework render context internals
+libv.ui: Rework layout context internals
+libv.ui: Implement basic scroll area
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-IDE	Colors:
-    BBBFC3
-    B5B6E3
-    5F8C8A
 
-    enum decl - C76863
-    enum usage - 9FB4C7
-    enumerator decl - 579058
-    enumerator usage - 579058
 
-CLion:
-	wrong working directory to run in
-		(generally the relationship between bin and res should be solved too)
-			? arg for res folder
-	console log line link require a comma at the end of the log message
-	console colored log workaround with:
-		system(("chcp "s + std::to_string(CP_UTF8)).c_str());
-		system("chcp 65001");
 
-fix mouse position
-	as position was abs not rel, and now I fixed that, mouse is now broken
-	local mouse pos in event
-	global mouse pos in event
-	global component pos in event
 
-mouse remap region
-	for scroll panel
+libv: Merge include and src folders
+libv.ui.render:	bg.render(pos, size, ?padding, ?...)
+
+
+
+
+
+libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
+libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
 
 
 
 
 
 
-fix clipping position
-	clip position is currently rel but shader need it to be abs
+
+
+libv.ui: observation: clip and scroll are two orthogonal features
+		general concept: "floating" component that effects render, mouse, (layout)
+		general concept: clip component that effects render, mouse, layout
+
+libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
+libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
 
 libv.ui: update every component to the new renderer
 		|< TODO
 		|	|< GLR dep removed
 		|	|	|< New renderer used
-			scroll_pane
+				overlay_zoom (uses glr, but that is not too big of an issue)
 			stretch
-		overlay_zoom
 		radio_button
+
 
 libv.ui: padding support in every component (layout)
 		check_box
 		radio_button
 		scroll_bar | what is used in padding? The bar? | Most likely yes, the bar
-		scroll_pane
+			scroll_pane
 		stretch
 
 libv.ui: margin support in every component | margin only effects layouts
@@ -587,6 +585,7 @@ libv.ui: margin support in every component | margin only effects layouts
         panel_grid
         panel_line
         scroll_pane
+        scroll_area
             label_image
             button
             check_box
@@ -598,6 +597,45 @@ libv.ui: margin support in every component | margin only effects layouts
             scroll_bar
             stretch
 
+libv.ui: make access_property a class member function (or use a single composite param)
+libv.ui: remove layouted flag, servers no real purpose.
+libv.utility: opt_ref<T> and opt_ref_none
+libv.ctrl: rename every "scale" to "multiplier"
+
+
+IDE:
+	ide: Use MSYS2_HOME env var for toolchain settings
+
+	IDE	Colors:
+		BBBFC3
+		B5B6E3
+		5F8C8A
+
+		enum decl - C76863
+		enum usage - 9FB4C7
+		enumerator decl - 579058
+		enumerator usage - 579058
+
+	CLion:
+		Fixable: wrong working directory to run in
+			(generally the relationship between bin and res should be solved too)
+				? arg for res folder
+				? auto discover 1 folder up
+			| Solved with setting each IDE target
+		Fixable: Switch between cpp-hpp is unreliable, but a simple plugin could solve it
+			| Can be solved by merging the include and src dirs, it was already planned, only cmake support has to be implemented to create include directory for the clients of libv
+
+		Workaroundable: console log line link require a comma at the end of the log message
+			Note would be nice to have a hidden path with a short link
+			| but its not a big deal
+		Workaroundable: console colored log workaround with:
+			system(("chcp "s + std::to_string(CP_UTF8)).c_str());
+			system("chcp 65001");
+			| solution was to disable run.processes.with.pty in CLion
+
+		Issue: TODO list is shit
+			| a separate app that I make could solve it that calls back to CLion
+
 libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
 libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 libv.math: Create vec_fwd and mat_fwd headers
@@ -606,7 +644,9 @@ libv.math: Make every vec / mat operator a hidden friend | Is it possible or is 
 libv.math: Move vec's from_rgba family into static method
 libv.math: Move vec's size_t template parameter to int
 libv.meta: Move any size_t template parameter to int if it makes sense
+libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
 
+libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
 libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
 libv.ui: Fragments:
 		also, render fragments in on "bundle"
@@ -697,6 +737,9 @@ libv.ui: tab layout = card layout + header buttons
 libv.ui: window
 		contain other elements. They have a caption (and, just like flows, they lay out children either horizontally or vertically)
 libv.ui: popup / tooltip
+		? tooltip is a layout
+		Its possilbe to implement tooltip container with hierarchy, context.storage.treeget/treeset could use that
+		context().tooltip(Component, tooltip_for_pos, tooltip_for_size, preferred_corner)
 libv.ui: menu bar / menu / popup menu
 libv.ui: separator / group (bordered and captioned)
 
@@ -776,7 +819,6 @@ libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadca
 
 libv.ui: Idea for over restricted string_2D: if content would exceed limit, just push the lines or characters closer to each other (could be policy driven)
 
-ext.x3: currently on debug build x3 parser in libv.ctrl fails with an assert, it will be the utf8 string parsing with char...
 ext.x3: make sure that every rule is static
 	libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 	libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
@@ -1519,13 +1561,9 @@ libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 
 libv.fsw: Improve callback and tokens to not hold the mutex during event broadcast (callback), currently it is a deadlock
 
-libv.arg: recruit
-		(1) Tegye fel a kezét aki unja már, hogy nincsen értelmes argument parsing lib C++-hoz
-		(2) Tegye fel a kezét aki n
-		 ha van egy jó lib ötletem ami alkalmas lenne CPP FTW teamworkre
-		(Who would have guessed... Vader has a lib idea...)
 
 --- AWAITING ---------------------------------------------------------------------------------------
+
 
 asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
 cli: Clara, most important questions are: multi, optional, required, positional and default arguments
@@ -1673,6 +1711,7 @@ libv: generic general container storage
 
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
+clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
 
 --- ABANDONED --------------------------------------------------------------------------------------
 

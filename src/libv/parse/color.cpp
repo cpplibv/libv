@@ -4,6 +4,7 @@
 #include <libv/parse/color.hpp>
 // ext
 #include <boost/spirit/home/x3.hpp>
+#include <boost/spirit/home/x3/char/unicode.hpp>
 #include <boost/fusion/adapted/std_tuple.hpp>
 // libv
 #include <libv/utility/concat.hpp>
@@ -378,7 +379,8 @@ std::optional<libv::vec4f> parse_color_optional(const std::string_view str) {
 	color result(1.f, 1.f, 1.f, 1.f);
 
 	auto it = str.begin();
-	auto success = x3::phrase_parse(it, str.end(), color_rule, x3::space, result);
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), color_rule, x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<color>{result} : std::nullopt;
