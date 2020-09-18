@@ -3,10 +3,9 @@
 #pragma once
 
 // std
-#include <cstddef> // consider changing size_t usage to tempalte T in this file
+#include <cstddef> // consider changing size_t usage to int or T in this file
 #include <utility>
 
-// TODO P4: Rename this file to static_for.hpp and for_constexpr to static_for
 // TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
 // TODO P5: n_times and n_times_index can be merged based on F accepting a "size_t" or not
 
@@ -47,28 +46,10 @@ constexpr inline void for_constexpr(F&& func) {
 		aux_for_constexpr<F, Start>(std::forward<F>(func), std::make_index_sequence<End - Start>{});
 }
 
-// -------------------------------------------------------------------------------------------------
-
-/// Calls the given function N times
-/// @usage n_times\<10>( [] { do_work(i); } );
-template <size_t N, typename F>
-constexpr inline void n_times(F&& func) {
-	for_constexpr<0, N>([&](auto) { func(); });
-}
-
-/// Calls the given function N times with indexes starting from 0 and ending with N-1
-/// @usage n_times_index\<10>( [] (auto i) { do_work(i); } );
-template <size_t N, typename F>
-constexpr inline void n_times_index(F&& func) {
-	for_constexpr<0, N>(std::forward<F>(func));
-}
-
 } // namespace detail ------------------------------------------------------------------------------
 
 using detail::call_with_n_index;
 using detail::for_constexpr;
-using detail::n_times;
-using detail::n_times_index;
 
 // -------------------------------------------------------------------------------------------------
 

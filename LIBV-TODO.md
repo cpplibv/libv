@@ -533,23 +533,34 @@ libv.ui: Implement basic scroll area
 libv: Merge include and src folders
 libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible | UI renderer took care of it
 libv: Update every file first lines
+libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
+libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
+libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
+libv.math: Add/verify structured binding support for vec_t | works for 2, 3, 4, not for the rest
+libv.math.vec: Implement operator% | for floating point types it calls fmod
+libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)? | Moved everything that was worth it
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
 
-
-libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
-libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
 libv.math: Create vec_fwd and mat_fwd headers
-libv.math: Add/verify structured binding support for vec_t
-libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
-libv.math: Move vec's from_rgba family into static method
-libv.math: Move vec's size_t template parameter to int
-libv.meta: Move any size_t template parameter to int if it makes sense
-libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
+
 libv.utility: opt_ref<T> and opt_ref_none
+
+
+
+
+
+app.bin_to_src: libv.arg-ify
+app.bin_to_src: command line argument for line length
+app.bin_to_src: use std::span<const std::byte>
+app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
+
+
+
+
 
 
 
@@ -1091,11 +1102,6 @@ app.vm4_viewer: Add config option to not reset camera on model change
 libv.args: support or extension for the lib to support command line "late" commands, from a different process instance with a network hook
 app.vm4_viewer: Command line argument --open "file" to auto open file
 app.vm4_viewer: Command line argument --active open file in already running instance (overrides config option)
-
-app.bin_to_src: libv.arg-ify
-app.bin_to_src: command line argument for line length
-app.bin_to_src: use std::span<const std::byte>
-app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
 
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node

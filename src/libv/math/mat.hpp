@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/math/mat_fwd.hpp>
 // ext
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/mat2x2.hpp>
@@ -13,6 +15,9 @@
 #include <glm/mat4x2.hpp>
 #include <glm/mat4x3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 // libv
 #include <libv/meta/always.hpp>
 #include <libv/meta/resolve.hpp>
@@ -22,6 +27,22 @@
 
 
 namespace libv {
+
+// -------------------------------------------------------------------------------------------------
+// TODO P4: Replace to_glm function with conversion operators, with that glm includes will become obsolete
+
+template <typename T>
+[[nodiscard]] constexpr inline auto to_glm(const vec_t<2, T>& v) noexcept {
+	return glm::tvec2<T>(v.x, v.y);
+}
+template <typename T>
+[[nodiscard]] constexpr inline auto to_glm(const vec_t<3, T>& v) noexcept {
+	return glm::tvec3<T>(v.x, v.y, v.z);
+}
+template <typename T>
+[[nodiscard]] constexpr inline auto to_glm(const vec_t<4, T>& v) noexcept {
+	return glm::tvec4<T>(v.x, v.y, v.z, v.w);
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -195,48 +216,6 @@ public:
 				0.5, 0.5, 0.5, 1.0);
 	}
 };
-
-// aliases -----------------------------------------------------------------------------------------
-
-template <typename T> using mat2x2_t = mat_t<2, 2, T>;
-template <typename T> using mat2x3_t = mat_t<2, 3, T>;
-template <typename T> using mat2x4_t = mat_t<2, 4, T>;
-template <typename T> using mat3x2_t = mat_t<3, 2, T>;
-template <typename T> using mat3x3_t = mat_t<3, 3, T>;
-template <typename T> using mat3x4_t = mat_t<3, 4, T>;
-template <typename T> using mat4x2_t = mat_t<4, 2, T>;
-template <typename T> using mat4x3_t = mat_t<4, 3, T>;
-template <typename T> using mat4x4_t = mat_t<4, 4, T>;
-
-template <typename T> using mat2_t = mat2x2_t<T>;
-template <typename T> using mat3_t = mat3x3_t<T>;
-template <typename T> using mat4_t = mat4x4_t<T>;
-
-using mat2x2f = mat2x2_t<float>;
-using mat2x3f = mat2x3_t<float>;
-using mat2x4f = mat2x4_t<float>;
-using mat2x2d = mat2x2_t<double>;
-using mat2x3d = mat2x3_t<double>;
-using mat2x4d = mat2x4_t<double>;
-using mat3x2f = mat3x2_t<float>;
-using mat3x3f = mat3x3_t<float>;
-using mat3x4f = mat3x4_t<float>;
-using mat3x2d = mat3x2_t<double>;
-using mat3x3d = mat3x3_t<double>;
-using mat3x4d = mat3x4_t<double>;
-using mat4x2f = mat4x2_t<float>;
-using mat4x3f = mat4x3_t<float>;
-using mat4x4f = mat4x4_t<float>;
-using mat4x2d = mat4x2_t<double>;
-using mat4x3d = mat4x3_t<double>;
-using mat4x4d = mat4x4_t<double>;
-
-using mat2f = mat2x2_t<float>;
-using mat3f = mat3x3_t<float>;
-using mat4f = mat4x4_t<float>;
-using mat2d = mat2x2_t<double>;
-using mat3d = mat3x3_t<double>;
-using mat4d = mat4x4_t<double>;
 
 // -------------------------------------------------------------------------------------------------
 

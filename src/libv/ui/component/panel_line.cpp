@@ -216,7 +216,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 				AccessLayout::layout1(child.core(), ContextLayout1{env_size}) :
 				libv::vec3f{};
 
-		libv::meta::n_times_index<3>([&](auto&& i) {
+		libv::meta::for_constexpr<0, 3>([&](auto&& i) {
 			childSize[i] =
 					child.size()[i].pixel +
 					child.size()[i].percent * 0.01f * env_size[i] +

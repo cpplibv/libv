@@ -71,7 +71,7 @@ auto printHeader = [] () {
 		std::cout << "| " << std::setw(11) << std::string_view(name).substr(0, 11) << ' ';
 	}); std::cout << '\n';
 	std::cout << "-------";
-	libv::meta::n_times<libv::meta::member_count_v<T>>([] {
+	libv::meta::for_constexpr<0, libv::meta::member_count_v<T>>([] {
 		std::cout << "+-------------";
 	}); std::cout << '\n';
 };
