@@ -158,7 +158,6 @@ add_definitions(-DWISH_SHORT_PATH_PREFIX="${CMAKE_SOURCE_DIR}/")
 # Includes Directories -----------------------------------------------------------------------------
 
 include_directories(app)
-include_directories(include)
 include_directories(src)
 
 # === Package ======================================================================================
