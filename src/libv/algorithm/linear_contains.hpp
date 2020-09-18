@@ -1,4 +1,4 @@
-// File: associative.hpp Author: Vader Created on December 26, 2018, 5:26 AM
+// Project: libv.algorithm, File: src/libv/algorithm/linear_contains.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Model.hpp, Created on 2015. március 6. 16:29, Author: Vader
+// Project: libv.serialization, File: src/libv/vm4/serialization/model.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

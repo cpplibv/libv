@@ -1,4 +1,4 @@
-// File: string_2D.hpp Author: Vader Created on 2016. február 4., 6:25
+// Project: libv.ui, File: src/libv/ui/text_layout.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

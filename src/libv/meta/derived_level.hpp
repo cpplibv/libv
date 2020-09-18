@@ -1,4 +1,4 @@
-// File: derived_level.hpp Author: Vader Created on 2017. június 20., 1:41
+// Project: libv.meta, File: src/libv/meta/derived_level.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

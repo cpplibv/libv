@@ -1,4 +1,4 @@
-// File:   source_location.hpp Author: Vader Created on 2018.05.24., 19:43
+// Project: libv.utility, File: src/libv/utility/source_location.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

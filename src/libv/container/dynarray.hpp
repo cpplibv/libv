@@ -1,4 +1,4 @@
-// File: array.hpp, Created on 2015. március 19. 6:34, Author: Vader
+// Project: libv.container, File: src/libv/container/dynarray.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

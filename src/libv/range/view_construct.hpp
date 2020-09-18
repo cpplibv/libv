@@ -1,4 +1,4 @@
-//// File: utf8.hpp Author: Vader Created on 2017. január 19., 1:07
+// Project: libv.range, File: src/libv/range/view_construct.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

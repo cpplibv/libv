@@ -1,4 +1,4 @@
-// File:   object_grabber.hpp Author: Vader Created on 27 April 2019, 02:20
+// Project: libv.lua, File: src/libv/lua/object_parser.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

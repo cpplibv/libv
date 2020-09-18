@@ -1,4 +1,4 @@
-// File: size.hpp Author: Vader Created on 2017. augusztus 17., 0:04
+// Project: libv.ui, File: src/libv/ui/property/anchor.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

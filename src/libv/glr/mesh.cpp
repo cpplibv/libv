@@ -1,4 +1,4 @@
-// File:   mesh.cpp Author: Vader Created on 2019. január 25., 6:27
+// Project: libv.glr, File: src/libv/glr/mesh.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/glr/mesh.hpp>

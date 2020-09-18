@@ -1,4 +1,4 @@
-// File:   partial_sum.hpp Author: Vader Created on 08 August 2019, 07:06
+// Project: libv.algorithm, File: src/libv/algorithm/sum.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Component.cpp, Created on 2014. január 7. 7:58, Author: Vader
+// Project: libv.ui, File: src/libv/ui/basic_event_proxy.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/basic_event_proxy.hpp>

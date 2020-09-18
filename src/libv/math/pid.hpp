@@ -1,4 +1,4 @@
-// File:   pid.hpp Author: Vader Created on 17 November 2019, 03:47
+// Project: libv.math, File: src/libv/math/pid.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

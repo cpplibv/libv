@@ -1,4 +1,4 @@
-// File: Vec.hpp, Created on 2015. február 14. 23:11, Author: Vader
+// Project: libv.math, File: src/libv/math/vec_serialization.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: test_slice.cpp - Created on 2018.09.04. 09:37 - Author: Vader
+// Project: libv.math, File: test/libv/math/test_signed_angle.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

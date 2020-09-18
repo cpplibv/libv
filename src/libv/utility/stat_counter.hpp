@@ -1,4 +1,4 @@
-// File: stat_counter.hpp - Created on 2018.05.03. 01:49 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/stat_counter.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

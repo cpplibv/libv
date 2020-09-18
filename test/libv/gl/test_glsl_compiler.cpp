@@ -1,4 +1,4 @@
-// File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
+// Project: libv.gl, File: test/libv/gl/test_glsl_compiler.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

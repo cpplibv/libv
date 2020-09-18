@@ -1,4 +1,4 @@
-// File: byte_swap.hpp - Created on 2018.05.05. 02:54 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/byte_swap.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

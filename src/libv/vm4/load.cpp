@@ -1,4 +1,4 @@
-// File:   ui.cpp Author: Vader Created on 2019. február 14., 4:55
+// Project: libv.vm4, File: src/libv/vm4/load.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/vm4/load.hpp>

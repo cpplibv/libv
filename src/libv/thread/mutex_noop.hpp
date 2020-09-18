@@ -1,4 +1,4 @@
-// File:   noop_mutex.hpp Author: Vader Created on 07 September 2019, 17:19
+// Project: libv.thread, File: src/libv/thread/mutex_noop.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

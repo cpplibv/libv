@@ -1,4 +1,4 @@
-// File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
+// Project: libv, File: app/vm4_viewer/viewer_ui.hpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/ctrl/fwd.hpp>

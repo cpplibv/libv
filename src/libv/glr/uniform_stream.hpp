@@ -1,4 +1,4 @@
-// File:   unfirom_state.hpp Author: Vader Created on 2019. január 19., 21:33
+// Project: libv.glr, File: src/libv/glr/uniform_stream.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

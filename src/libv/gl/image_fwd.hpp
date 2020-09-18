@@ -1,4 +1,4 @@
-// File: image.hpp - Created on 2017.11.05. 08:59 - Author: Vader
+// Project: libv.gl, File: src/libv/gl/image_fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   spread.hpp Author: Vader Created on 02 July 2019, 18:15
+// Project: libv.color, File: src/libv/color/spread.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

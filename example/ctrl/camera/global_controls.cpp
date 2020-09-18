@@ -1,4 +1,4 @@
-// Project: libv.control, Created on 2020.03.16. 16:41, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/camera/global_controls.cpp, Author: Császár Mátyás [Vader]
 // --- Client side singleton source file - global_controls.cpp
 
 #include "global_controls.hpp"

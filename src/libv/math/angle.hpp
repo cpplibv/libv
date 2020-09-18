@@ -1,4 +1,4 @@
-// File: angle.hpp Author: Vader Created on 2017. január 23., 0:07
+// Project: libv.math, File: src/libv/math/angle.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

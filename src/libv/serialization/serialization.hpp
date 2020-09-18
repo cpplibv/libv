@@ -1,4 +1,4 @@
-// File: serialization.hpp Author: Vader Created on 2017. június 11., 16:28
+// Project: libv.serialization, File: src/libv/serialization/serialization.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

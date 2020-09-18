@@ -1,4 +1,4 @@
-// File: component.hpp Author: Vader Created on 2017. szeptember 10., 18:27
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/component_static.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

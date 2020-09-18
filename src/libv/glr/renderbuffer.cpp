@@ -1,4 +1,4 @@
-// File:   renderbuffer.cpp Author: Vader Created on 2019. január 25., 4:40
+// Project: libv.glr, File: src/libv/glr/renderbuffer.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/glr/renderbuffer.hpp>

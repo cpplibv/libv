@@ -1,4 +1,4 @@
-// File: consolas_min.cpp - Generated on YYYY.MM.DD. HH:mm from consolas_min.ttf
+// Project: libv.ui, File: src/libv/ui/raw/font_consolas_min.cpp, Author: Császár Mátyás [Vader]
 
 // pro
 #include <libv/ui/raw/font_consolas_min.hpp>

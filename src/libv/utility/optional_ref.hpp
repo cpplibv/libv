@@ -1,4 +1,4 @@
-// File:   optional_ref.hpp Author: Vader Created on 29 August 2019, 05:43
+// Project: libv.utility, File: src/libv/utility/optional_ref.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: texture2D_white256.hpp - Generated on YYYY.MM.DD. HH:mm from res/texture/white256.png
+// Project: libv.ui, File: src/libv/ui/raw/texture2D_white256.cpp, Author: Császár Mátyás [Vader]
 
 // pro
 #include <libv/ui/raw/texture2D_white256.hpp>

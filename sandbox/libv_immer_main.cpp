@@ -1,4 +1,4 @@
-// File: libv_gl_main3.cpp, Created on 2017.11.17. at 22:38, Author: Vader
+// Project: libv, File: sandbox/libv_immer_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <immer/vector.hpp>

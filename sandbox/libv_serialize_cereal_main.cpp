@@ -1,4 +1,4 @@
-// File: vserialize_main.cpp, Created on 2017. 04. 14. 15:09, Author: Vader
+// Project: libv, File: sandbox/libv_serialize_cereal_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <cereal/archives/binary.hpp>

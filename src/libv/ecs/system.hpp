@@ -1,4 +1,4 @@
-// File: ecs.hpp Author: Vader Created on 2017. március 15., 3:05
+// Project: libv.ecs, File: src/libv/ecs/system.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

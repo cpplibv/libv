@@ -1,4 +1,4 @@
-// File:   resolve.hpp Author: Vader Created on 2019. január 21., 3:59
+// Project: libv.meta, File: src/libv/meta/resolve.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Frame.cpp, Created on 2013. szeptember 27. 16:00, Author: Vader
+// Project: libv.frame, File: src/libv/frame/frame.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/frame/frame.hpp>

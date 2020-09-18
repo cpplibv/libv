@@ -1,4 +1,4 @@
-// File: bit_cast.hpp - Created on 2018.05.05. 04:31 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/bit_cast.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

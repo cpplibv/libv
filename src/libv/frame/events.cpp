@@ -1,4 +1,4 @@
-// File: events.hpp, Created on 2019. 02. 04. 23:42, Author: Vader
+// Project: libv.frame, File: src/libv/frame/events.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/frame/events.hpp>

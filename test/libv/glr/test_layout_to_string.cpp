@@ -1,4 +1,4 @@
-// File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
+// Project: libv.glr, File: test/libv/glr/test_layout_to_string.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

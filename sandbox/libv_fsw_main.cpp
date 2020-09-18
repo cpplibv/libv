@@ -1,4 +1,4 @@
-// File: main.cpp, Created on 2013. augusztus 16. 11:59, Author: Vader
+// Project: libv.fsw, File: sandbox/libv_fsw_main.cpp, Author: Császár Mátyás [Vader]
 
 // std
 #include <chrono>

@@ -1,4 +1,4 @@
-// File: mesh.hpp - Created on 2017.11.25. 05:06 - Author: Vader
+// Project: libv.glr, File: src/libv/glr/uniform.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

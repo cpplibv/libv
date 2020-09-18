@@ -1,4 +1,4 @@
-// File:   error.hpp Author: Vader Created on 2018. december 4., 5:52
+// Project: libv.net, File: src/libv/net/error.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

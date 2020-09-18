@@ -1,4 +1,4 @@
-// File: SignalTestUtil.hpp, Created on 2015. január 26. 17:15, Author: Vader
+// Project: libv.sig, File: test/libv/sig/signal_test_util.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

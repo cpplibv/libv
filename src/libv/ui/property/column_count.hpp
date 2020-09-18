@@ -1,4 +1,4 @@
-// File:   orient.hpp Author: Vader Created on 22 March 2019, 08:02
+// Project: libv.ui, File: src/libv/ui/property/column_count.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

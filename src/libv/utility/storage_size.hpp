@@ -1,4 +1,4 @@
-// File:   storage_size.hpp Author: Vader Created on 2018. július 19., 4:31
+// Project: libv.utility, File: src/libv/utility/storage_size.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

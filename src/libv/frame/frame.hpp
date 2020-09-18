@@ -1,4 +1,4 @@
-// File: Frame.hpp, Created on 2013. szeptember 27. 16:03, Author: Vader
+// Project: libv.frame, File: src/libv/frame/frame.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

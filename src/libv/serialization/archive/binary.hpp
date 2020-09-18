@@ -1,4 +1,4 @@
-// File: portable_binary.hpp Author: Vader Created on 2017. 05. 21., 16:07
+// Project: libv.serialization, File: src/libv/serialization/archive/binary.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

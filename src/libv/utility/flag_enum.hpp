@@ -1,4 +1,4 @@
-// File: flag_enum.hpp - Created on 2018.04.10. 03:06 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/flag_enum.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

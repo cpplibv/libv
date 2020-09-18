@@ -1,4 +1,4 @@
-// File: panel.hpp - Created on 2017.10.22. 06:50 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/panel_grid.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   std140.hpp Author: Vader Created on 2018. december 19., 17:20
+// Project: libv.glr, File: src/libv/glr/uniform_block_layout.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

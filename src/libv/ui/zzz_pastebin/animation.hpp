@@ -1,4 +1,4 @@
-// File:   animation.hpp Author: Vader Created on 15 March 2019, 00:59
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/animation.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

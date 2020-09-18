@@ -1,4 +1,4 @@
-// File: mat.hpp Author: Vader Created on 2017. február 26., 15:57
+// Project: libv.math, File: src/libv/math/mat_serialization.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

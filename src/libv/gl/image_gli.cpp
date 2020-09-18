@@ -1,4 +1,4 @@
-// File: Texture.cpp, Created on 2014. december 6. 22:44, Author: Vader
+// Project: libv.gl, File: src/libv/gl/image_gli.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/gl/image.hpp>

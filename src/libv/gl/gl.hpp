@@ -1,4 +1,4 @@
-// File: vgl.hpp, Created on 2014. november 25. 12:14, Author: Vader
+// Project: libv.gl, File: src/libv/gl/gl.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

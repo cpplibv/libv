@@ -1,4 +1,4 @@
-// File: to_tuple.hpp Author: Vader Created on 2017. június 11., 19:12
+// Project: libv.meta, File: src/libv/meta/to_tuple.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

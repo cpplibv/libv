@@ -1,4 +1,4 @@
-// File: framebuffer.hpp - Created on 2017.12.20. 11:27 - Author: Vader
+// Project: libv.glr, File: src/libv/glr/framebuffer.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

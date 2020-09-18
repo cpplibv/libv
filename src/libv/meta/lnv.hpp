@@ -1,4 +1,4 @@
-// File:   lnv.hpp Author: Vader Created on 31 May 2019, 22:38
+// Project: libv.meta, File: src/libv/meta/lnv.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

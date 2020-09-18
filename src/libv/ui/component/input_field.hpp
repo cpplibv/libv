@@ -1,4 +1,4 @@
-// File: label.hpp - Created on 2017.10.22. 07:12 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/input_field.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

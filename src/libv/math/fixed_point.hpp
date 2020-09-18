@@ -1,4 +1,4 @@
-// File: fixed.hpp Author: Vader Created on 2017. január 26., 0:20
+// Project: libv.math, File: src/libv/math/fixed_point.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: stretch.hpp - Created on 2017.10.22. 10:33 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/stretch.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

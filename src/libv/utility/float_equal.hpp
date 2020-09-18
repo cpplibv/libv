@@ -1,4 +1,4 @@
-// File:   slice.hpp Author: Vader Created on 2018. május 28., 19:03
+// Project: libv.utility, File: src/libv/utility/float_equal.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: bind_lite.hpp Author: Vader Created on 2017. május 7., 14:01
+// Project: libv.utility, File: src/libv/utility/bind_member.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

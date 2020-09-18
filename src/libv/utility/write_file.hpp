@@ -1,4 +1,4 @@
-// File: write_file.hpp, Created on 2018.07.14. 02:23, Author: Vader
+// Project: libv.utility, File: src/libv/utility/write_file.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   ui.cpp Author: Vader Created on 2019. február 14., 4:55
+// Project: libv.ui, File: src/libv/ui/ui.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/ui.hpp>

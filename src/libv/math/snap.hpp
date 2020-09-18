@@ -1,4 +1,4 @@
-// File:   snap.hpp Author: Vader Created on 22 November 2019, 07:01
+// Project: libv.math, File: src/libv/math/snap.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Semaphore.hpp, Created on 2015. január 11. 6:05, Author: Vader
+// Project: libv.thread, File: src/libv/thread/binary_latch.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

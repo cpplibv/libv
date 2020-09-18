@@ -1,4 +1,4 @@
-// File: hash.hpp - Created on 2017.10.21. 03:06 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/hash.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

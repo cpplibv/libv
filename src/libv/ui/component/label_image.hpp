@@ -1,4 +1,4 @@
-// File: labelimage.hpp - Created on 2017.10.22. 07:12 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/label_image.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

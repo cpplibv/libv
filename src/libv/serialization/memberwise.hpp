@@ -1,4 +1,4 @@
-// File: enable_memberwise.hpp Author: Vader Created on 2017. június 11., 19:00
+// Project: libv.serialization, File: src/libv/serialization/memberwise.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

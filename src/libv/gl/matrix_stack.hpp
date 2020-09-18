@@ -1,4 +1,4 @@
-// File: matrix_stack.hpp - Created on 2017.11.26. 02:58 - Author: Vader
+// Project: libv.gl, File: src/libv/gl/matrix_stack.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

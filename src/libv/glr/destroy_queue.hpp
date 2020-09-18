@@ -1,4 +1,4 @@
-// File:   mesh.cpp Author: Vader Created on 2019. január 25., 6:27
+// Project: libv.glr, File: src/libv/glr/destroy_queue.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

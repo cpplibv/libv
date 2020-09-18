@@ -1,4 +1,4 @@
-// File: raw.hpp - Created on 2017.10.22. 08:52 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/raw/texture2D_white256.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

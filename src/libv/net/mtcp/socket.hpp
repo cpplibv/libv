@@ -1,4 +1,4 @@
-// File: socket.hpp Author: Vader Created on 2018.11.01. 23:31
+// Project: libv.net, File: src/libv/net/mtcp/socket.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

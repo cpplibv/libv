@@ -1,4 +1,4 @@
-// File: type_traits.hpp
+// Project: libv.meta, File: src/libv/meta/identity.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

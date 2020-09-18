@@ -1,4 +1,4 @@
-// File: std_variant.hpp Author: Vader Created on 2017. június 11., 5:15
+// Project: libv.serialization, File: src/libv/serialization/types/std_variant.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: hex_dump.hpp Author: Vader Created on 2017. május 14., 20:15
+// Project: libv.utility, File: src/libv/utility/hex_dump.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

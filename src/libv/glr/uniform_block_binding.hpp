@@ -1,4 +1,4 @@
-// File: program.hpp - Created on 2017.12.20. 11:27 - Author: Vader
+// Project: libv.glr, File: src/libv/glr/uniform_block_binding.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

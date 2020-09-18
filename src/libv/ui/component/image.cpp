@@ -1,4 +1,4 @@
-// File: image.cpp - Created on 2017.10.22. 11:40 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/image.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/component/image.hpp>

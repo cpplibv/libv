@@ -1,4 +1,4 @@
-// File: bitflag.cpp - Created on 2018.04.12. 09:37 - Author: Vader
+// Project: libv.utility, File: test/libv/utility/flag_enum.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

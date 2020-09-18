@@ -1,4 +1,4 @@
-// File:   basic_event_proxy.hpp Author: Vader Created on 16 June 2020, 04:44
+// Project: libv.ui, File: src/libv/ui/basic_event_proxy.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   bisect.hpp Author: Vader Created on 02 August 2019, 05:44
+// Project: libv.algorithm, File: src/libv/algorithm/wildcard.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: libv_gl_main3.cpp, Created on 2017.11.17. at 22:38, Author: Vader
+// Project: libv.glr, File: sandbox/libv_glr_main.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include "libv_gl_runner.hpp"

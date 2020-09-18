@@ -1,4 +1,4 @@
-// File: attribute.hpp Author: Vader Created on 2018. december 28., 5:56
+// Project: libv.glr, File: src/libv/glr/attribute.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

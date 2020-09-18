@@ -1,4 +1,4 @@
-// File: Model.hpp, Created on 2015. január 17. 7:21, Author: Vader
+// Project: libv.vm4, File: src/libv/vm4/load.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

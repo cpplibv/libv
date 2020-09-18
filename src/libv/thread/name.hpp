@@ -1,4 +1,4 @@
-// File: name.hpp - Created on 2017.10.21. 02:47 - Author: Vader
+// Project: libv.thread, File: src/libv/thread/name.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

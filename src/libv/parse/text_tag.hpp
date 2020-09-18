@@ -1,4 +1,4 @@
-// File: text_tag.hpp Author: Vader Created on 2017. január 18., 0:26
+// Project: libv.parse, File: src/libv/parse/text_tag.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

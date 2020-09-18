@@ -1,4 +1,4 @@
-// File: image.hpp - Created on 2017.10.22. 10:33 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/image.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

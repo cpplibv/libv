@@ -1,4 +1,4 @@
-// File: overload.hpp - Created on 2018.01.02. 12:10 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/histogram.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

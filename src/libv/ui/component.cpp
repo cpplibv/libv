@@ -1,4 +1,4 @@
-// File: component.hpp Author: Vader Created on 2017. szeptember 10., 18:27
+// Project: libv.ui, File: src/libv/ui/component.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/component.hpp>

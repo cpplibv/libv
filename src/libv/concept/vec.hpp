@@ -1,4 +1,4 @@
-// File: vec_concept.hpp - Created on 2018.04.15. 07:50 - Author: Vader
+// Project: libv.concept, File: src/libv/concept/vec.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

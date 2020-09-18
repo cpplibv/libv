@@ -1,4 +1,4 @@
-// File:   quaternion.hpp Author: Vader Created on 09 September 2019, 10:40
+// Project: libv.math, File: src/libv/math/quaternion.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

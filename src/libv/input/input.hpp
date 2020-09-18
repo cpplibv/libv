@@ -1,4 +1,4 @@
-// File: inputs.hpp Author: Vader Created on 2017. január 24., 3:11
+// Project: libv.input, File: src/libv/input/input.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

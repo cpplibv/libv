@@ -1,4 +1,4 @@
-// File:   bezier.hpp Author: Vader Created on 2019. január 20., 3:20
+// Project: libv.math, File: src/libv/math/bezier_curve.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

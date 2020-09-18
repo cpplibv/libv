@@ -1,4 +1,4 @@
-// File:   concat.hpp Author: Vader Created on 2019. 02. 22., 19:03
+// Project: libv.utility, File: src/libv/utility/concat.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

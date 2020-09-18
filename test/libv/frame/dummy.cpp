@@ -1,1 +1,1 @@
-// File:   dummy.cpp Author: Vader Created on 19 August 2019, 11:20
+// Project: libv.frame, File: test/libv/frame/dummy.cpp, Author: Császár Mátyás [Vader]

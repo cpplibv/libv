@@ -1,4 +1,4 @@
-// File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
+// Project: libv.fsw, File: test/libv/fsw/test_fsw.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

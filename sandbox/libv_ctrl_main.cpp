@@ -1,4 +1,4 @@
-// Project: libv.control, Created on 2020.03.16. 16:41, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: sandbox/libv_ctrl_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <GLFW/glfw3.h>

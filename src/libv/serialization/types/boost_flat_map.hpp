@@ -1,4 +1,4 @@
-// File: boost_flat_map.hpp Author: Vader Created on 2017. június 11., 5:15
+// Project: libv.serialization, File: src/libv/serialization/types/boost_flat_map.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

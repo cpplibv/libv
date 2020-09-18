@@ -1,4 +1,4 @@
-// File:   erase_if_unstable.hpp Author: Vader Created on 22 August 2019, 17:23
+// Project: libv.algorithm, File: src/libv/algorithm/erase_if_unstable.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

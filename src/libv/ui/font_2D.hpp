@@ -1,4 +1,4 @@
-// File:   font.hpp Author: Vader Created on 2019. január 27., 4:25
+// Project: libv.ui, File: src/libv/ui/font_2D.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

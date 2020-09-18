@@ -1,4 +1,4 @@
-// File: program.hpp Author: Vader Created on 2016. július 8., 12:02
+// Project: libv.gl, File: src/libv/gl/program.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

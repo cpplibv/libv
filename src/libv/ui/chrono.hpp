@@ -1,4 +1,4 @@
-// File:   chrono.hpp Author: Vader Created on 01 March 2019, 10:48
+// Project: libv.ui, File: src/libv/ui/chrono.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: json.hpp - Created on 2017.10.04. 04:41 - Author: Vader
+// Project: libv.serialization, File: src/libv/serialization/archive/json.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

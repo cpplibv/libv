@@ -1,4 +1,4 @@
-// File: Log.hpp, Created on 2014. december 1. 12:50, Author: Vader
+// Project: libv.log, File: src/libv/log/log.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

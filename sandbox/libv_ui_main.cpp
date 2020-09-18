@@ -1,4 +1,4 @@
-// File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
+// Project: libv.ui, File: sandbox/libv_ui_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <GL/glew.h>

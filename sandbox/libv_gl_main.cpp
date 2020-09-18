@@ -1,4 +1,4 @@
-// File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
+// Project: libv.gl, File: sandbox/libv_gl_main.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include "libv_gl_runner.hpp"

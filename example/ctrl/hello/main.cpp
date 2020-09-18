@@ -1,4 +1,4 @@
-// Project: libv.control, Created on 2020.03.16. 16:41, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/hello/main.cpp, Author: Császár Mátyás [Vader]
 
 #include <libv/input/event.hpp>
 #include <libv/input/input.hpp>

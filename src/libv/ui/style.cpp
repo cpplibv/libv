@@ -1,4 +1,4 @@
-// File:   style.cpp Author: Vader Created on 25 July 2019, 00:27
+// Project: libv.ui, File: src/libv/ui/style.cpp, Author: Császár Mátyás [Vader]
 
 
 // hpp

@@ -1,4 +1,4 @@
-// File:   error.cpp Author: Vader Created on 2018. december 4., 5:53
+// Project: libv.net, File: src/libv/net/error.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/net/error.hpp>

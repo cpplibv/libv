@@ -1,4 +1,4 @@
-// File: remote.hpp - Created on 2017.10.28. 07:14 - Author: Vader
+// Project: libv.glr, File: src/libv/glr/remote.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

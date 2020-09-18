@@ -1,4 +1,4 @@
-// File: with_ec.hpp - Created on 2018.03.29. 08:38 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/with_ec.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

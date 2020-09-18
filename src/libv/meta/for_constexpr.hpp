@@ -1,4 +1,4 @@
-// File: n_times.hpp Author: Vader Created on 2017. június 10., 19:21
+// Project: libv.meta, File: src/libv/meta/for_constexpr.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

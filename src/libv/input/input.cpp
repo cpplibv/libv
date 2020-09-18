@@ -1,4 +1,4 @@
-// File: events.hpp, Created on 2019. 02. 04. 23:42, Author: Vader
+// Project: libv.input, File: src/libv/input/input.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/input/input.hpp>

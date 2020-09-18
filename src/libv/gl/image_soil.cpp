@@ -1,4 +1,4 @@
-// File: soil_loader.cpp - Created on 2017.11.05. 11:24 - Author: Vader
+// Project: libv.gl, File: src/libv/gl/image_soil.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/gl/image.hpp>

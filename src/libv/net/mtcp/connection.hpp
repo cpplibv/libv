@@ -1,4 +1,4 @@
-// File:   connection.hpp Author: Vader Created on 2018. július 14., 3:35
+// Project: libv.net, File: src/libv/net/mtcp/connection.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

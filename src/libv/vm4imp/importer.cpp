@@ -1,4 +1,4 @@
-// File: importer.cpp - Created on 2017.10.01. 03:09 - Author: Vader
+// Project: libv.vm4imp, File: src/libv/vm4imp/importer.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/vm4imp/importer.hpp>

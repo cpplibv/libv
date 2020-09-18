@@ -1,4 +1,4 @@
-// File: Events.hpp, Created on 2013. december 31. 21:52, Author: Vader
+// Project: libv.frame, File: src/libv/frame/icon.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

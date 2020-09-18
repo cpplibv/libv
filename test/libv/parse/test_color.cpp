@@ -1,4 +1,4 @@
-// File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
+// Project: libv.parse, File: test/libv/parse/test_color.cpp, Author: Császár Mátyás [Vader]
 
 #include <catch/catch.hpp>
 

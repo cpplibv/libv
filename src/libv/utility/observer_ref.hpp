@@ -1,4 +1,4 @@
-// File: observer_ref.hpp - Created on 2018.05.15. 02:02 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/observer_ref.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

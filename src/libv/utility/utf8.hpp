@@ -1,4 +1,4 @@
-// File: String.hpp, Created on 2013. szeptember 1. 0:29, Author: Vader
+// Project: libv.utility, File: src/libv/utility/utf8.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

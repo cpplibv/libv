@@ -1,4 +1,4 @@
-// File: Vec.hpp, Created on 2014. január 7. 7:08, Author: Vader
+// Project: libv.math, File: src/libv/math/vec.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   single_instance.hpp Author: Vader Created on 07 September 2019, 14:04
+// Project: libv.thread, File: src/libv/thread/single_instance.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

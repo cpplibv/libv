@@ -1,4 +1,4 @@
-// File: approxing.hpp Author: Vader Created on 2017. augusztus 16., 23:59
+// Project: libv.utility, File: src/libv/utility/last_write_time.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

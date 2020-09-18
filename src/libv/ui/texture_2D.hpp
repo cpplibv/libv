@@ -1,4 +1,4 @@
-// File: module.hpp - Created on 2017.10.08. 03:00 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/texture_2D.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

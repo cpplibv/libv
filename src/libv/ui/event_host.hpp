@@ -1,4 +1,4 @@
-// File:   event_host_general.hpp Author: Vader Created on 16 June 2020, 04:46
+// Project: libv.ui, File: src/libv/ui/event_host.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: texture.hpp, Created on 2014. november 28. 17:44, Author: Vader
+// Project: libv.gl, File: src/libv/gl/texture_object.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

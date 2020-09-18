@@ -1,4 +1,4 @@
-// File: io_context.hpp Author: Vader Created on 2017. június 21., 2:37
+// Project: libv.net, File: src/libv/net/io_context.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

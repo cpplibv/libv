@@ -1,4 +1,4 @@
-// File:   align.cpp Author: Vader Created on 18 April 2019, 09:38
+// Project: libv.ui, File: src/libv/ui/property/anchor.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/property/anchor.hpp>

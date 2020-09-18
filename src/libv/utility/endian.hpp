@@ -1,4 +1,4 @@
-// File: endian.hpp - Created on 2017.10.21. 06:47 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/endian.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

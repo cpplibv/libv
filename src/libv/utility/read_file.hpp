@@ -1,4 +1,4 @@
-// File: read_file.hpp, Created on 2017.04.14. 02:10, Author: Vader
+// Project: libv.utility, File: src/libv/utility/read_file.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   property.cpp Author: Vader Created on 24 July 2019, 16:57
+// Project: libv.ui, File: src/libv/ui/property.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 //#include <libv/ui/property.hpp>

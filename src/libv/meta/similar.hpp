@@ -1,4 +1,4 @@
-// File:   similar.hpp Author: Vader Created on 2018. május 31., 0:31
+// Project: libv.meta, File: src/libv/meta/similar.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

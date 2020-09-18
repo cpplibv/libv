@@ -1,4 +1,4 @@
-// File:   uniform.hpp Author: Vader Created on 2019. január 19., 21:30
+// Project: libv.gl, File: src/libv/gl/uniform.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

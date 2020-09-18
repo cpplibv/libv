@@ -1,4 +1,4 @@
-// File: address.hpp Author: Vader Created on 2017. május 8., 2:31
+// Project: libv.net, File: src/libv/net/mtcp/endpoint.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

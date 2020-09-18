@@ -1,4 +1,4 @@
-// File:   state.hpp Author: Vader Created on 2018. december 29., 20:10
+// Project: libv.glr, File: src/libv/glr/state.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

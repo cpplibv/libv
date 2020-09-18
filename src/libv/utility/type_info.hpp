@@ -1,4 +1,4 @@
-// File:   type_info.hpp Author: Vader Created on 16 September 2019, 19:41
+// Project: libv.utility, File: src/libv/utility/type_info.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: sphere.hpp Author: Vader Created on January 28, 2017, 3:22 PM
+// Project: libv.glr, File: src/libv/glr/procedural/cube.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

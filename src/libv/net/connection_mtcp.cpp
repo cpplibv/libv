@@ -1,4 +1,4 @@
-// File:   connection_mtcp.cpp Author: Vader Created on 2018.06.05., 21:05
+// Project: libv.net, File: src/libv/net/connection_mtcp.cpp, Author: Császár Mátyás [Vader]
 
 //// ext
 //#include <netts/buffer.hpp>

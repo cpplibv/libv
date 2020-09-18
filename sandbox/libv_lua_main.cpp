@@ -1,4 +1,4 @@
-// File: lua.hpp Author: Vader Created on 2016. november 14., 23:44
+// Project: libv.lua, File: sandbox/libv_lua_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/log/log.hpp>

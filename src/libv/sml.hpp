@@ -1,4 +1,4 @@
-// File:   sml_plantuml.hpp Author: Vader Created on 2018. július 9., 0:58
+// Project: libv, File: src/libv/sml.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

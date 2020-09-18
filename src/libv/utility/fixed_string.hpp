@@ -1,4 +1,4 @@
-// File: observer_ptr.hpp - Created on 2018.04.15. 03:37 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/fixed_string.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

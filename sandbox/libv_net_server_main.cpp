@@ -1,4 +1,4 @@
-// File: libv_net_server_main.hpp - Created on 2018.05.03. 10:51 - Author: Vader
+// Project: libv.net, File: sandbox/libv_net_server_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/log/log.hpp>

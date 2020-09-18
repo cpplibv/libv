@@ -1,4 +1,4 @@
-// File: enum.hpp - Created on 2017.10.21. 03:23 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/enum.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

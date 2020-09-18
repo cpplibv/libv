@@ -1,4 +1,4 @@
-// File: parser_size.cpp - Created on 2017.10.22. 06:09 - Author: Vader
+// Project: libv.parse, File: src/libv/ui/parse/parse_size.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/parse/parse_size.hpp>

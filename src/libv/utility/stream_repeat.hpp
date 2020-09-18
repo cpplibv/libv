@@ -1,4 +1,4 @@
-// File: stream_repeat.hpp Author: Vader Created on 2017. augusztus 4., 14:22
+// Project: libv.utility, File: src/libv/utility/stream_repeat.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

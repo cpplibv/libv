@@ -1,4 +1,4 @@
-// File:   interest.hpp Author: Vader Created on 15 April 2019, 06:10
+// Project: libv.ui, File: src/libv/ui/context/context_mouse.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

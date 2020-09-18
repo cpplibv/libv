@@ -1,4 +1,4 @@
-// File: Context.hpp, Created on 2015. január 6. 20:08, Author: Vader
+// Project: libv.thread, File: src/libv/thread/executor_thread.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

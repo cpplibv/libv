@@ -1,4 +1,4 @@
-// File: always.hpp Author: Vader Created on 2017. június 10., 21:09
+// Project: libv.meta, File: src/libv/meta/always.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

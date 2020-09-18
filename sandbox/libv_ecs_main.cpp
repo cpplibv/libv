@@ -1,4 +1,4 @@
-// File: ecs.cpp Author: Vader Created on 2017. július 8., 23:48
+// Project: libv.ecs, File: sandbox/libv_ecs_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <fmt/format.h>

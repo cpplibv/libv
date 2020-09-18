@@ -1,4 +1,4 @@
-// File:   snap.hpp Author: Vader Created on 22 November 2019, 07:01
+// Project: libv.math, File: test/libv/math/test_snap.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

@@ -1,4 +1,4 @@
-// File: adaptor.hpp Author: Vader Created on 2016. június 1., 5:04
+// Project: libv.range, File: src/libv/range/reversed_if.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

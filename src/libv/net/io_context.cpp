@@ -1,4 +1,4 @@
-// File: io_context.cpp Author: Vader Created on 2018.06.01. 23:10
+// Project: libv.net, File: src/libv/net/io_context.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/net/io_context.hpp>

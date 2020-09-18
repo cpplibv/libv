@@ -1,4 +1,4 @@
-// File:   args.hpp Author: Vader Created on 28 August 2019, 01:33
+// Project: libv.arg, File: src/libv/arg/arg.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

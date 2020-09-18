@@ -1,4 +1,4 @@
-// File:   color.hpp Author: Vader Created on 19 March 2019, 00:59
+// Project: libv.ui, File: src/libv/ui/property/color.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

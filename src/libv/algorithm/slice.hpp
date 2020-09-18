@@ -1,4 +1,4 @@
-// File:   slice.hpp Author: Vader Created on 2018. május 28., 19:03
+// Project: libv.algorithm, File: src/libv/algorithm/slice.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

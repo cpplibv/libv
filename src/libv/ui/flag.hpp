@@ -1,4 +1,4 @@
-// File:   flag.hpp Author: Vader Created on 15 April 2019, 06:10
+// Project: libv.ui, File: src/libv/ui/flag.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

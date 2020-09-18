@@ -1,4 +1,4 @@
-// File: vec.hpp Author: Vader Created on 2017. február 27., 21:36
+// Project: libv.lua, File: src/libv/lua/vm4.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
+// Project: libv, File: app/binary_to_source.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <fmt/format.h>

@@ -1,4 +1,4 @@
-// File:   function_ref.hpp Author: Vader Created on 30 August 2019, 00:10
+// Project: libv.utility, File: src/libv/utility/unique_function.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: log.hpp, Created on 2015. március 20. 2:37, Author: Vader
+// Project: libv.vm4imp, File: src/libv/vm4imp/log.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

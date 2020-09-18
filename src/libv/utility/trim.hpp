@@ -1,4 +1,4 @@
-// File:   trim.hpp Author: Vader Created on 01 March 2020, 07:24
+// Project: libv.utility, File: src/libv/utility/trim.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

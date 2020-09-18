@@ -1,4 +1,4 @@
-// File:   context_ui.cpp Author: Vader Created on 2019. február 9., 13:01
+// Project: libv.ui, File: src/libv/ui/context/context_event.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/context/context_event.hpp>

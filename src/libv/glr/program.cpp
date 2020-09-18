@@ -1,4 +1,4 @@
-// File:   program.cpp Author: Vader Created on 2019. január 25., 4:17
+// Project: libv.glr, File: src/libv/glr/program.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/glr/program.hpp>

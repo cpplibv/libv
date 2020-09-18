@@ -1,4 +1,4 @@
-// File: parser_align.hpp - Created on 2017.10.22. 06:09 - Author: Vader
+// Project: libv.parse, File: src/libv/ui/parse/parse_align.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

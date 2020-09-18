@@ -1,4 +1,4 @@
-// File: file_watcher.hpp Author: Vader Created on 2017. július 8., 23:19
+// Project: libv.fsw, File: src/libv/fsw/watcher.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/fsw/watcher.hpp>

@@ -1,4 +1,4 @@
-// File: matrix.hpp Author: Vader Created on 2017. február 19., 19:55
+// Project: libv.math, File: src/libv/math/mat.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

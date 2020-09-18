@@ -1,4 +1,4 @@
-// File: returns.hpp Author: Vader Created on 2017. szeptember 8., 22:04
+// Project: libv.utility, File: src/libv/utility/returns.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

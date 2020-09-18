@@ -1,4 +1,4 @@
-// File: _old_ui_pastebin.hpp - Created on 2017.10.18. 04:17 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_old_ui_pastebin.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

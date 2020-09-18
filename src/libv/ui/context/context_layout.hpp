@@ -1,4 +1,4 @@
-// File: layout_environment.hpp - Created on 2017.10.08. 02:55 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/context/context_layout.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   test_spread.cpp Author: Vader Created on 18 April 2020, 14:47
+// Project: libv.color, File: test/libv/color/test_spread.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

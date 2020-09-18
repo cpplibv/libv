@@ -1,4 +1,4 @@
-// File: monitor.hpp, Created on 2015. április 9. 20:44, Author: Vader
+// Project: libv.frame, File: src/libv/frame/monitor.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

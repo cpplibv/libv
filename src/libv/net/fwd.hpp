@@ -1,4 +1,4 @@
-// File:   fwd.hpp Author: Vader Created on 2018. december 14., 0:14
+// Project: libv.net, File: src/libv/net/fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

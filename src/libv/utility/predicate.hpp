@@ -1,4 +1,4 @@
-// File:   predicate.hpp Author: Vader Created on 2018. december 28., 15:39
+// Project: libv.utility, File: src/libv/utility/predicate.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

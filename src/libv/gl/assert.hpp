@@ -1,4 +1,4 @@
-// File: Log.hpp, Created on 2015.02.02. 5:11, Author: Vader
+// Project: libv.gl, File: src/libv/gl/assert.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

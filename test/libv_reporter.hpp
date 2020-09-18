@@ -1,4 +1,4 @@
-// File: TestReporter.hpp Author: Vader Created on 2017. január 13., 20:29
+// Project: libv, File: test/libv_reporter.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

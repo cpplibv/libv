@@ -1,4 +1,4 @@
-// File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
+// Project: libv.ui, File: app/vm4_viewer/ui/keyboard.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

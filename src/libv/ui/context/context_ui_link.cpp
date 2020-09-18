@@ -1,4 +1,4 @@
-// File:   context_ui_link.cpp Author: Vader Created on 13 June 2020, 09:37
+// Project: libv.ui, File: src/libv/ui/context/context_ui_link.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/context/context_ui_link.hpp>

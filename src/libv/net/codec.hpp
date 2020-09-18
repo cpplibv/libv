@@ -1,4 +1,4 @@
-// File: packetizer.hpp Author: Vader Created on 2017. május 13., 20:26
+// Project: libv.net, File: src/libv/net/codec.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

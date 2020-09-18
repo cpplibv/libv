@@ -1,4 +1,4 @@
-// File:   camera_behaviour.cpp Author: Vader Created on 31 May 2020, 22:51
+// Project: libv, File: app/vm4_viewer/scene/camera_behaviour.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <vm4_viewer/scene/camera_behaviour.hpp>

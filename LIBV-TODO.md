@@ -531,6 +531,8 @@ libv.ui: Rework render context internals
 libv.ui: Rework layout context internals
 libv.ui: Implement basic scroll area
 libv: Merge include and src folders
+libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible | UI renderer took care of it
+libv: Update every file first lines
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -538,23 +540,24 @@ libv: Merge include and src folders
 
 
 
+libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
+libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
+libv.math: Create vec_fwd and mat_fwd headers
+libv.math: Add/verify structured binding support for vec_t
+libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
+libv.math: Move vec's from_rgba family into static method
+libv.math: Move vec's size_t template parameter to int
+libv.meta: Move any size_t template parameter to int if it makes sense
+libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
+libv.utility: opt_ref<T> and opt_ref_none
+
+
 
 
 libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
-
-
-
-
 libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
 libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
-
-
-
-
-
-
-
 
 libv.ui: observation: clip and scroll are two orthogonal features
 		general concept: "floating" component that effects render, mouse, (layout)
@@ -599,7 +602,6 @@ libv.ui: margin support in every component | margin only effects layouts
 
 libv.ui: make access_property a class member function (or use a single composite param)
 libv.ui: remove layouted flag, servers no real purpose.
-libv.utility: opt_ref<T> and opt_ref_none
 libv.ctrl: rename every "scale" to "multiplier"
 
 
@@ -635,16 +637,6 @@ IDE:
 
 		Issue: TODO list is shit
 			| a separate app that I make could solve it that calls back to CLion
-
-libv.math: Assume T to be trivial and well behaving in vec and cleanup or update: decltype(auto) -> auto or T*, length[SQ] : T, , nodiscard, noexcept, etc...
-libv.math: Remove vec dependency to glm, concepts should be able to handle it, if it must, or create bridge
-libv.math: Create vec_fwd and mat_fwd headers
-libv.math: Add/verify structured binding support for vec_t
-libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)?
-libv.math: Move vec's from_rgba family into static method
-libv.math: Move vec's size_t template parameter to int
-libv.meta: Move any size_t template parameter to int if it makes sense
-libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
 
 libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
 libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
@@ -1105,8 +1097,6 @@ app.bin_to_src: command line argument for line length
 app.bin_to_src: use std::span<const std::byte>
 app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
 
-libv: Update every file first lines with: // Project: LIBV, Author: Császár Mátyás [Vader], Email: vaderhun@gmail.com
-
 > Render Data Dependency Graph aka Scene structure reorganization
 	Node
 		string name
@@ -1411,8 +1401,6 @@ libv.ui.font: fallback to ascii '?'
 libv.ui.font: fallback to simple square (render the not found character by 'hand')
 libv.ui.font: https://www.freetype.org/freetype2/docs/tutorial/step2.html
 libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is because the function always sets the content of delta to (0,0) if an error occurs.
-
-libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible
 
 libv.ppc: new Pre-Processor Compiler library, a cpp "like" pre-processor implementation for shader loading
 

@@ -1,4 +1,4 @@
-// File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
+// Project: libv, File: test/runner.cpp, Author: Császár Mátyás [Vader]
 
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_CONSOLE_WIDTH 100

@@ -1,4 +1,4 @@
-// File:   color.cpp Author: Vader Created on 2019. február 18., 4:42
+// Project: libv.parse, File: src/libv/parse/color.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/parse/color.hpp>

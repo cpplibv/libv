@@ -1,4 +1,4 @@
-// File: libv_gl_main3.cpp, Created on 2017.11.17. at 22:38, Author: Vader
+// Project: libv.gl, File: sandbox/libv_gl_runner.hpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <GL/glew.h>

@@ -1,4 +1,4 @@
-// File: tag.hpp Author: Vader Created on 2017. augusztus 3., 21:48
+// Project: libv.meta, File: src/libv/meta/tag.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

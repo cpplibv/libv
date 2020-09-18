@@ -1,4 +1,4 @@
-// File:   uninitialized.hpp Author: Vader Created on 05 August 2019, 05:02
+// Project: libv.utility, File: src/libv/utility/uninitialized.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

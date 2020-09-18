@@ -1,4 +1,4 @@
-// File: vgl2_main.cpp, Created on 2016.07.30. at 09:27, Author: Vader
+// Project: libv.gl, File: sandbox/libv_gl_main2.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include "libv_gl_runner.hpp"

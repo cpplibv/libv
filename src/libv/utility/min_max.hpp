@@ -1,4 +1,4 @@
-// File: min_max.hpp - Created on 2017.10.16. 03:45 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/min_max.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

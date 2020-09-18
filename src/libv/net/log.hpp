@@ -1,4 +1,4 @@
-// File: log.hpp Author: Vader Created on 2017. április 13., 21:28
+// Project: libv.net, File: src/libv/net/log.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

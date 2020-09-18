@@ -1,4 +1,4 @@
-// File: test.cpp, Created on 2014. október 25. 23:38, Author: Vader
+// Project: libv.ui, File: app/vm4_viewer/ui/quick_file_picker.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <vm4_viewer/ui/quick_file_picker.hpp>

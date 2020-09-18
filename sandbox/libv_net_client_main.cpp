@@ -1,4 +1,4 @@
-// File: libv_net_client_main.cpp, Created on 2013. augusztus 16. 11:59, Author: Vader
+// Project: libv.net, File: sandbox/libv_net_client_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/log/log.hpp>

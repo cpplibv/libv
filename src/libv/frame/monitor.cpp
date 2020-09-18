@@ -1,4 +1,4 @@
-// File: monitor.cpp, Created on 2015. április 9. 20:44, Author: Vader
+// Project: libv.frame, File: src/libv/frame/monitor.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/frame/monitor.hpp>

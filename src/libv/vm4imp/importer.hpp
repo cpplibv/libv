@@ -1,4 +1,4 @@
-// File: Importer.hpp, Created on 2015. január 17. 7:33, Author: Vader
+// Project: libv.vm4imp, File: src/libv/vm4imp/importer.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

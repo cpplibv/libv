@@ -1,4 +1,4 @@
-// File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
+// Project: libv.range, File: test/libv/range/adaptor_test.cpp, Author: Császár Mátyás [Vader]
 
 #include <catch/catch.hpp>
 

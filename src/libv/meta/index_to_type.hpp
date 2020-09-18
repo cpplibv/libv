@@ -1,4 +1,4 @@
-// File:   nth_element.hpp Author: Vader Created on 2018. augusztus 28., 20:09
+// Project: libv.meta, File: src/libv/meta/index_to_type.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

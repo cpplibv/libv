@@ -1,4 +1,4 @@
-// File: timer.hpp, Created on 2015. május 4. 12:34, Author: Vader
+// Project: libv.utility, File: src/libv/utility/timer.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

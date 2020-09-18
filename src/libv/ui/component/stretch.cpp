@@ -1,4 +1,4 @@
-// File: stretch.cpp - Created on 2017.10.22. 11:40 - Author: Vader
+// Project: libv.ui, File: src/libv/ui/component/stretch.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/component/stretch.hpp>

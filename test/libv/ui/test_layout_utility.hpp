@@ -1,4 +1,4 @@
-// File: layout_test_utils.hpp - Created on 2017.10.18. 04:56 - Author: Vader
+// Project: libv.ui, File: test/libv/ui/test_layout_utility.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: is_parent_folder_of.hpp Author: Vader Created on 2019. február 14., 1:53
+// Project: libv.utility, File: src/libv/utility/is_parent_folder_of.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Signal.hpp, Created on 2014. május 14. 20:05, Author: Vader
+// Project: libv.sig, File: src/libv/sig/signal.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

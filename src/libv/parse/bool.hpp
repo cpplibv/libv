@@ -1,4 +1,4 @@
-// File: bool.hpp, Created on 2015. január 26. 17:15, Author: Vader
+// Project: libv.parse, File: src/libv/parse/bool.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

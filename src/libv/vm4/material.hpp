@@ -1,4 +1,4 @@
-// File: Material.hpp, Created on 2015. január 17. 7:50, Author: Vader
+// Project: libv.vm4, File: src/libv/vm4/material.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

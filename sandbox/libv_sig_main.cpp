@@ -1,4 +1,4 @@
-// File: main.cpp, Created on 2014. április 25. 21:23, Author: Vader
+// Project: libv.sig, File: sandbox/libv_sig_main.cpp, Author: Császár Mátyás [Vader]
 
 int main(int, char**) {
 	return 0;

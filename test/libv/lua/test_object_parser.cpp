@@ -1,4 +1,4 @@
-// File: test_slice.cpp - Created on 2018.09.04. 09:37 - Author: Vader
+// Project: libv.lua, File: test/libv/lua/test_object_parser.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

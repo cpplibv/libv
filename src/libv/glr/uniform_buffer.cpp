@@ -1,4 +1,4 @@
-// File:   uniform_buffer.cpp Author: Vader Created on 2019. január 25., 5:34
+// Project: libv.glr, File: src/libv/glr/uniform_buffer.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/glr/uniform_buffer.hpp>

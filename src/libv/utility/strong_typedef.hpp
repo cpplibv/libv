@@ -1,4 +1,4 @@
-// File: strong_typedef.hpp - Created on 2017.10.21. 03:20 - Author: Vader
+// Project: libv.utility, File: src/libv/utility/strong_typedef.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

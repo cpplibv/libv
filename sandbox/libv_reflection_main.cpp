@@ -1,4 +1,4 @@
-// File: meta_main.cpp - Created on 2017.06.16. 06:42 - Author: Vader
+// Project: libv, File: sandbox/libv_reflection_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/meta/for_constexpr.hpp>

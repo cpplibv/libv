@@ -1,4 +1,4 @@
-// File: lua.hpp Author: Vader Created on 2016. november 14., 23:44
+// Project: libv.lua, File: src/libv/lua/fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

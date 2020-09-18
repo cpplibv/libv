@@ -1,4 +1,4 @@
-// File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
+// Project: libv, File: sandbox/libv_physics_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <rp3d/body/RigidBody.h>

@@ -1,4 +1,4 @@
-// File:   container.hpp Author: Vader Created on 2018. december 29., 3:30
+// Project: libv.algorithm, File: src/libv/algorithm/erase_if_stable.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: std_string.hpp - Created on 2017.10.04. 04:58 - Author: Vader
+// Project: libv.serialization, File: src/libv/serialization/types/std_string.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

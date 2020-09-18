@@ -1,4 +1,4 @@
-// File: VecTest.cpp, Created on 2014. december 8. 2:19, Author: Vader
+// Project: libv.net, File: test/libv/net/mtcp_test.cpp, Author: Császár Mátyás [Vader]
 
 // test
 #include <catch/catch.hpp>

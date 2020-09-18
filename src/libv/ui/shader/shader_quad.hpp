@@ -1,4 +1,4 @@
-// File:   shader_font.hpp Author: Vader Created on 2019. február 4., 20:32
+// Project: libv.ui, File: src/libv/ui/shader/shader_quad.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: member.hpp Author: Vader Created on 2017. június 18., 6:53
+// Project: libv.meta, File: src/libv/meta/reflection_access.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

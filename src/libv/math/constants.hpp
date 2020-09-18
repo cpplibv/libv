@@ -1,4 +1,4 @@
-// File: constants.hpp Author: Vader Created on 2017. február 27., 1:03
+// Project: libv.math, File: src/libv/math/constants.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

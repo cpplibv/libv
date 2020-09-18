@@ -1,4 +1,4 @@
-// File: core.cpp, Created on 2015. április 12. 2:28, Author: Vader
+// Project: libv.frame, File: src/libv/frame/core.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/frame/core.lpp>

@@ -1,4 +1,4 @@
-// File: Accumulator.hpp, Created on 2014. augusztus 9. 16:07, Author: Vader
+// Project: libv.sig, File: src/libv/sig/accumulator.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

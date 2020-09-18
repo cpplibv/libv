@@ -1,4 +1,4 @@
-// File: Material.hpp, Created on 2015. március 10. 1:50, Author: Vader
+// Project: libv.serialization, File: src/libv/vm4/serialization/material.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

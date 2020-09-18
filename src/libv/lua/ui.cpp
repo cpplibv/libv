@@ -1,4 +1,4 @@
-// File: %<%NAME%>%.%<%EXTENSION%>%, Created on %<%DATE%>% %<%TIME%>%, Author: %<%USER%>%
+// Project: libv.lua, File: src/libv/lua/ui.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/lua/ui.hpp>

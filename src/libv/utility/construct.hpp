@@ -1,4 +1,4 @@
-// File:   construct.hpp Author: Vader Created on 16 August 2019, 23:07
+// Project: libv.utility, File: src/libv/utility/construct.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

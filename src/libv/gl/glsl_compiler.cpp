@@ -1,4 +1,4 @@
-// File: image.cpp - Created on 2017.11.06. 12:06 - Author: Vader
+// Project: libv.gl, File: src/libv/gl/glsl_compiler.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/gl/glsl_compiler.hpp>

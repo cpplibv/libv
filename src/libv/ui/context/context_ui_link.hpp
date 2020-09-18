@@ -1,4 +1,4 @@
-// File: pcui.hpp Author: Vader Created on 2017. augusztus 24., 22:32
+// Project: libv.ui, File: src/libv/ui/context/context_ui_link.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   ui_classification.hpp Author: Vader Created on August 10, 2020, 6:30 PM
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/ui_classification.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Main.cpp, Created on 2014.04.25. at 21:23, Author: Vader
+// Project: libv.log, File: sandbox/libv_log_main.cpp, Author: Császár Mátyás [Vader]
 
 // std
 #include <iostream>

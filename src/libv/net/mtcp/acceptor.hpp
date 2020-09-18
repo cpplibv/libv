@@ -1,4 +1,4 @@
-// File: acceptor.hpp - Created on 2018.05.06. 02:35 - Author: Vader
+// Project: libv.net, File: src/libv/net/mtcp/acceptor.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File: Trackable.hpp, Created on 2014. május 28. 18:45, Author: Vader
+// Project: libv.sig, File: src/libv/sig/trackable.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// File:   fast_rsqrt.hpp Author: Vader Created on 09 September 2019, 10:40
+// Project: libv.math, File: src/libv/math/signed_angle.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

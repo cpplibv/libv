@@ -1,4 +1,4 @@
-// File: vertex_buffer.hpp Author: Vader Created on 2016. július 17., 0:51
+// Project: libv.gl, File: src/libv/gl/framebuffer_object.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

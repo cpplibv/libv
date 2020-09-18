@@ -1,4 +1,4 @@
-//// File: Font2D.cpp, Created on 2014. november 30. 14:32, Author: Vader
+// Project: libv.ui, File: src/libv/ui/text_2D.cpp, Author: Császár Mátyás [Vader]
 //
 //// hpp
 //#include <libv/ui/component/string_2D.hpp>

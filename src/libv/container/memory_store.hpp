@@ -1,4 +1,4 @@
-// File:   memory_store.hpp Author: Vader Created on 2018. december 29., 19:52
+// Project: libv.container, File: src/libv/container/memory_store.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

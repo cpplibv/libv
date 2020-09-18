@@ -1,4 +1,4 @@
-// File:   property.hpp Author: Vader Created on 2019. február 15., 1:32
+// Project: libv.ui, File: src/libv/ui/style_fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
