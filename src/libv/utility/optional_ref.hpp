@@ -2,8 +2,8 @@
 
 #pragma once
 
-// libv
-#include <libv/utility/observer_ptr.hpp>
+// std
+#include <cstddef>
 
 
 namespace libv {
@@ -12,16 +12,18 @@ namespace libv {
 
 // Close enough for now
 template <typename T>
-using optional_ref = libv::observer_ptr<T>;
+using optional_ref = T*;
+
+static constexpr inline std::nullptr_t opt_ref_none = nullptr;
 
 template <typename T>
-constexpr inline auto make_optional_ref(T* var) {
-	return libv::make_observer(var);
+constexpr inline optional_ref<T> make_optional_ref(T* var) {
+	return var;
 }
 
 template <typename T>
-constexpr inline auto make_optional_ref(T& var) {
-	return libv::make_observer(var);
+constexpr inline optional_ref<T> make_optional_ref(T& var) {
+	return &var;
 }
 
 // -------------------------------------------------------------------------------------------------

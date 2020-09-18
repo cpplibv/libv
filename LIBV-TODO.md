@@ -539,15 +539,13 @@ libv.math.vec: inf, -inf, nan, -nan, zero: vector creator functions
 libv.math: Add/verify structured binding support for vec_t | works for 2, 3, 4, not for the rest
 libv.math.vec: Implement operator% | for floating point types it calls fmod
 libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)? | Moved everything that was worth it
+libv.math: Create vec_fwd and mat_fwd headers
+libv.utility: opt_ref<T> and opt_ref_none to alias T* | reworked optional_ref<T> to the same idea
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-
-libv.math: Create vec_fwd and mat_fwd headers
-
-libv.utility: opt_ref<T> and opt_ref_none
 
 
 

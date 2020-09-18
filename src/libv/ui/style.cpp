@@ -68,12 +68,12 @@ void Style::set(std::string property, PropertyDynamic value) {
 	dirty();
 }
 
-libv::observer_ptr<const PropertyDynamic> Style::get_optional(const std::string_view property) const {
-	libv::observer_ptr<const PropertyDynamic> result;
+libv::optional_ref<const PropertyDynamic> Style::get_optional(const std::string_view property) const {
+	libv::optional_ref<const PropertyDynamic> result;
 
 	const auto it = properties.find(property);
 	if (it != properties.end()) {
-		result = libv::make_observer(it->second);
+		result = libv::make_optional_ref(it->second);
 	} else {
 		for (const auto& parent : parents) {
 			result = parent->get_optional(property);
