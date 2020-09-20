@@ -87,12 +87,18 @@ public:
 	libv::glr::Mesh mesh_stream{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StreamDraw};
 	libv::glr::UniformBufferStream uniform_stream;
 
-	bool initalized = false;
+	bool initialized = false;
 	libv::glr::Texture white_zero_texture;
 
 public:
 	libv::vec2f mouse_position;
 	libv::vec2f ui_size;
+
+public:
+	size_t ll_base_index;
+	size_t ll_base_vertex;
+	size_t ll_num_vertex;
+	size_t ll_num_index;
 
 public:
 	struct Task {
@@ -120,9 +126,9 @@ private:
 
 public:
 	void begin_render(const Component& root, libv::glr::Queue& glr) {
-		if (!initalized) {
+		if (!initialized) {
 			init();
-			initalized = true;
+			initialized = true;
 		}
 
 		// NOTE: No state guards as we are manipulating the glr state for the whole render process
@@ -266,6 +272,81 @@ void Renderer::clip(libv::vec2f pos, libv::vec2f size) noexcept {
 }
 
 // --- Low level -----------------------------------------------------------------------------------
+
+void Renderer::begin_triangles() {
+	context.ll_base_vertex = context.vtx_positions.size();
+	context.ll_base_index = context.vtx_indices.size();
+	context.ll_num_vertex = 0;
+	context.ll_num_index = 0;
+}
+
+void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader) {
+	const auto& layout_UIInfo = context.layout_UIInfo;
+
+	auto& task = context.tasks.emplace_back(
+			glr.state.state(),
+			shader->base_ref(),
+			texture->texture().base_ref(),
+			context.uniform_stream.block_stream(layout_UIInfo),
+			static_cast<uint32_t>(context.ll_base_vertex),
+			static_cast<uint32_t>(context.ll_base_index),
+			static_cast<uint32_t>(context.ll_num_index)
+	);
+
+	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp();
+	task.uniform_block[layout_UIInfo.matM] = glr.model.top();
+	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos;
+	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
+	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
+	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
+	task.uniform_block[layout_UIInfo.mouse_position] = context.mouse_position;
+	task.uniform_block[layout_UIInfo.ui_size] = context.ui_size;
+	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
+
+	assert(context.vtx_positions.size() == context.vtx_texture0s.size());
+	assert(context.vtx_positions.size() == context.vtx_color0s.size());
+	assert(context.vtx_positions.size() == context.ll_base_vertex + context.ll_num_vertex);
+	assert(context.vtx_indices.size() == context.ll_base_index + context.ll_num_index);
+}
+
+void Renderer::index_strip(std::span<const uint32_t> indices) {
+	size_t i = 0;
+
+	for (; i < indices.size() && context.ll_num_index + i < 3; ++i) {
+		context.vtx_indices.emplace_back(indices[i]);
+	}
+
+	for (; i < indices.size(); ++i) {
+		const auto n = context.vtx_indices.size();
+		const auto is_even = ((n - context.ll_base_index) % 2) == 0;
+
+		if (is_even) {
+			// Even index: New triangle (n-1, n-2, n)
+			context.vtx_indices.emplace_back(context.vtx_indices[n - 1]);
+			context.vtx_indices.emplace_back(context.vtx_indices[n - 2]);
+			context.vtx_indices.emplace_back(indices[i]);
+
+		} else {
+			// Odd index: New triangle (n-2, n, n-1)
+			context.vtx_indices.emplace_back(context.vtx_indices[n - 2]);
+			context.vtx_indices.emplace_back(indices[i]);
+			context.vtx_indices.emplace_back(context.vtx_indices[n - 1]);
+		}
+	}
+
+	context.ll_num_index = context.vtx_indices.size() - context.ll_base_index;
+}
+
+void Renderer::index_strip(std::initializer_list<const uint32_t> indices) {
+	index_strip(std::span<const uint32_t>(indices.begin(), indices.size()));
+}
+
+void Renderer::vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f color) {
+	context.vtx_positions.emplace_back(pos);
+	context.vtx_texture0s.emplace_back(uv);
+	context.vtx_color0s.emplace_back(color);
+	context.ll_num_vertex++;
+}
 
 //void Renderer::vertex_2(libv::vec2f pos, libv::vec2f uv, libv::vec4f color) {
 //	(void) pos;

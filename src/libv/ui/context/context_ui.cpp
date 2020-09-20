@@ -5,7 +5,7 @@
 // ext
 #include <clip/clip.h>
 // libv
-#include <libv/gl/image.hpp>
+#include <libv/gl/load_image.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 #include <libv/utility/read_file.hpp>

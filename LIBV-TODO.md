@@ -541,9 +541,36 @@ libv.math.vec: Implement operator% | for floating point types it calls fmod
 libv.math: Make every vec / mat operator a hidden friend | Is it possible or is it worth it (it might make 5 overload from the current 3 per operator)? | Moved everything that was worth it
 libv.math: Create vec_fwd and mat_fwd headers
 libv.utility: opt_ref<T> and opt_ref_none to alias T* | reworked optional_ref<T> to the same idea
+libv.ui: update every component to the new renderer | (overlay_zoom uses glr, but its fine)
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+libv.ui.render:	bg.render(pos, size, ?padding, ?...)
+
+
+
+
+
+place.it:
+	model: Generate texture for LOD meshes
+	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
+
+
+
 
 
 
@@ -563,7 +590,6 @@ app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data .
 
 
 
-libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
 libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
 libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
@@ -575,21 +601,9 @@ libv.ui: observation: clip and scroll are two orthogonal features
 libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
 libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
 
-libv.ui: update every component to the new renderer
-		|< TODO
-		|	|< GLR dep removed
-		|	|	|< New renderer used
-				overlay_zoom (uses glr, but that is not too big of an issue)
-			stretch
-		radio_button
-
-
 libv.ui: padding support in every component (layout)
-		check_box
-		radio_button
 		scroll_bar | what is used in padding? The bar? | Most likely yes, the bar
-			scroll_pane
-		stretch
+		stretch | not really uses paddig, but it will be moved to background anyways
 
 libv.ui: margin support in every component | margin only effects layouts
         panel_float
@@ -665,6 +679,7 @@ libv.ui: component color go from uniform to vertex attribute
 libv.ui: (?) move render iteration into the containers (to allow render state manipulation and clipping (?))
 
 libv.ui: overlay component layout stack highlight
+libv.ui: overlay zoom linearize movement and zoom
 
 libv.ctrl: "alterator_feature" (with better name, maybe mode_feature) -> only stateful, like hold shift to show more information | its kind of an analog with ignored value, but not really, and it would be nice to have state getter for this, and that would make it a binary, but with properly guarded
 libv.ctrl: save xls from thesis archive
@@ -1367,6 +1382,25 @@ overlay
 
 --- [[[ deadline: 2019.12.01 ]]] ---
 
+
+
+libv.[lua|eval]: A small [lua] engine that can be used in the ui for number inputs with support to math expressions
+		CHECK(eval(context, "3           ") == 100);
+		CHECK(eval(context, "3.14        ") == 100);
+		CHECK(eval(context, "pi          ") == 100);
+		CHECK(eval(context, "sin(pi)     ") == 100);
+		CHECK(eval(context, "360 / 21    ") == 100);
+		CHECK(eval(context, "pi * 2      ") == 100);
+		CHECK(eval(context, "a           ") == error);
+		CHECK(eval(context, "a = 42      ") == 42);
+		CHECK(eval(context, "a           ") == 42);
+		CHECK(eval(context, "a + 2       ") == 44);
+		CHECK(eval(context, "b           ") == error);
+		CHECK(eval(context, "foo(42)     ") == error);
+		//CHECK(eval(context, "function foo(x) return x end foo(42)") == error);
+		context.add("function foo(x) return x end");
+		CHECK(eval(context, "foo(42)     ") == 42)
+		CHECK(eval(context, "function g(x) return x end") == error)
 
 libv.utility: Implement a proper match file iterator "dir/part*.cpp", possibly with filesystem + ranges | use wildcard functions, but split pattern / match for performance | design API allow async/iterative (give next N passed entry or M failed (not matched) entry)
 

@@ -70,9 +70,6 @@ private:
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
 
-//	std::shared_ptr<libv::ui::Quad> quad0 = std::make_shared<libv::ui::Quad>(ui.root());
-//	std::shared_ptr<libv::ui::Stretch> stretch0 = std::make_shared<libv::ui::Stretch>(ui.root());
-
 public:
 	void create() {
 		glewExperimental = true;

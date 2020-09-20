@@ -18,6 +18,8 @@ namespace app {
 struct Camera {
 //struct Camera : Object {
 private:
+//	static constexpr libv::vec3f forward = {1, 0, 0};
+//	static constexpr libv::vec3f right = {0, 1, 0};
 	static constexpr libv::vec3f up = {0, 0, 1};
 
 	float fov = libv::deg_to_rad(90.0f);

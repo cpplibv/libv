@@ -1,8 +1,9 @@
-// Project: libv.gl, File: src/libv/gl/image.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/load_image.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/gl/image.hpp>
+#include <libv/gl/load_image.hpp>
 // pro
+#include <libv/gl/image.hpp>
 #include <libv/gl/log.hpp>
 
 
@@ -27,6 +28,15 @@ std::optional<Image> load_image(const std::string_view data) noexcept {
 		log_gl.error("Corrupted image or not supported format");
 
 	return result;
+}
+
+Image load_image_or(const std::string_view data, const Image& fallback) {
+	auto result = load_image(data);
+
+	if (result.has_value())
+		return std::move(result.value());
+	else
+		return fallback;
 }
 
 Image load_image_or_throw(const std::string_view data) {

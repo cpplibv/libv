@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/image_soil.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/load_image_soil.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/gl/image.hpp>

@@ -8,6 +8,7 @@
 #include <libv/utility/function_ref.hpp>
 // std
 #include <memory>
+#include <span>
 // pro
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -76,14 +77,20 @@ public: // --- Low level ---
 	//			buffer
 	//			framebuffer
 
-	// Line vertex
-	void vertex_2(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
-	// Line strip vertex
-	void vertex_2s(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
-	// Triangle vertex
-	void vertex_3(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
-	// Triangle strip vertex
-	void vertex_3s(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+	void begin_triangles();
+	void end(const Texture2D_view& texture, const ShaderImage_view& shader);
+	void vertex(libv::vec3f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+	void index_strip(std::span<const uint32_t> indices);
+	void index_strip(std::initializer_list<const uint32_t> indices);
+
+//	// Line vertex
+//	void vertex_2(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+//	// Line strip vertex
+//	void vertex_2s(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+//	// Triangle vertex
+//	void vertex_3(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+//	// Triangle strip vertex
+//	void vertex_3s(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
 //	// Quad vertex
 //	void vertex_4(libv::vec2f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
 //	// Quad strip vertex

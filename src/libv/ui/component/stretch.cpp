@@ -91,50 +91,50 @@ void CoreStretch::doRender(Renderer& r) {
 	//
 	//      x0  x1  x2  x3
 
-//	const auto borderPos = min(cast<float>(property.bg_image()->size()), layout_size2()) * 0.5f;
-//	const auto borderTex = min(layout_size2() / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
-//
-//	const auto p0 = libv::vec2f{0.0f, 0.0f};
-//	const auto p1 = borderPos;
-//	const auto p2 = layout_size2() - borderPos;
-//	const auto p3 = layout_size2();
-//
-//	const auto t0 = libv::vec2f{0.0f, 0.0f};
-//	const auto t1 = borderTex;
-//	const auto t2 = 1.0f - borderTex;
-//	const auto t3 = libv::vec2f{1.0f, 1.0f};
-//
-//	const auto color = property.bg_color();
-//
-//	r.begin_triangles(property.bg_image(), property.bg_shader());
-//
-//	r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
-//	r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
-//	r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
-//	r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
-//
-//	r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
-//	r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
-//	r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
-//	r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
-//
-//	r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
-//	r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
-//	r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
-//	r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
-//
-//	r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
-//	r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
-//	r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
-//	r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
-//
-//	r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
-//	r.index_strip({3, 8}); // jump
-//	r.index_strip({8, 4, 9, 5, 10, 6, 11, 7});
-//	r.index_strip({7, 12}); // jump
-//	r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
-//
-//	r.end();
+	const auto border_pos = min(cast<float>(property.bg_image()->size()), layout_size2()) * 0.5f;
+	const auto border_tex = min(layout_size2() / max(cast<float>(property.bg_image()->size()), 1.0f) * 0.5f, 0.5f);
+
+	const auto p0 = libv::vec2f{0.0f, 0.0f};
+	const auto p1 = border_pos;
+	const auto p2 = layout_size2() - border_pos;
+	const auto p3 = layout_size2();
+
+	const auto t0 = libv::vec2f{0.0f, 0.0f};
+	const auto t1 = border_tex;
+	const auto t2 = 1.0f - border_tex;
+	const auto t3 = libv::vec2f{1.0f, 1.0f};
+
+	const auto color = property.bg_color();
+
+	r.begin_triangles();
+
+	r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
+	r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
+	r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
+	r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
+
+	r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
+	r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
+	r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
+	r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
+
+	r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
+	r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
+	r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
+	r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
+
+	r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
+	r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
+	r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
+	r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
+
+	r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
+	r.index_strip({3, 8}); // jump
+	r.index_strip({8, 4, 9, 5, 10, 6, 11, 7});
+	r.index_strip({7, 12}); // jump
+	r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
+
+	r.end(property.bg_image(), property.bg_shader());
 }
 
 // -------------------------------------------------------------------------------------------------
