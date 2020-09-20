@@ -578,10 +578,22 @@ libv.ui.theme:
 		Disabled
 		Error
 
+	#HLFG - saturated blue
+	#HLBG - unsaturated blue
 
-		#HLFG - saturated blue
-		#HLBG - unsaturated blue
+				 | Upward              | Downward
+	-------------+---------------------+-----------------------------
+	inactive     |                     |
+	normal       |                     |
+	hover/select |                     |
+	active/press |                     |
 
+	Upward   = shadow outside, lighter edge  inside
+	Downward = shadow  inside, lighter edge outside
+
+	Highlight = Lighter background with #hlcolorbg, replace outer shadow #hlcolorfg shadow
+
+	Inactive  = No lighter edge, outer shadow is halved, bg grayed
 
 
 
@@ -599,9 +611,12 @@ libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
 
 
+
 place.it:
 	model: Generate texture for LOD meshes
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
+	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
+	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
 
 	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
