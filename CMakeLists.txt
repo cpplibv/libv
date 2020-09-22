@@ -659,6 +659,12 @@ wish_end_group()
 wish_create_group(GROUP_APPLICATION) # APPLICATION -------------------------------------------------
 
 wish_create_executable(
+	TARGET app_binary_to_source
+	SOURCE app/binary_to_source.cpp
+	LINK   ext_fmt libv_utility
+)
+
+wish_create_executable(
 	TARGET app_vm4_viewer
 	#OUTPUT_FOLDER vm4_viewer
 	#OUTPUT_NAME vm4_viewer
@@ -670,9 +676,16 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET app_binary_to_source
-	SOURCE app/binary_to_source.cpp
-	LINK   ext_fmt libv_utility
+		TARGET app_gen_ui_theme
+		#OUTPUT_FOLDER gen_ui_theme
+		#OUTPUT_NAME gen_ui_theme
+		#OUTPUT_RESOURCE res
+		#RESOURCE app/gen_ui_theme/res
+		SOURCE app/gen_ui_theme/*.cpp
+		LINK   libv_log libv_frame libv_utility libv_fsw libv_lua libv_glr
+		LINK   ext_glfw ext_glew
+#		LINK   libv_ui libv_ctrl
+		#	LINK   ext_date
 )
 
 wish_create_executable(

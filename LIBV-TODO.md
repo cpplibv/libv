@@ -549,8 +549,38 @@ libv.ui: update every component to the new renderer | (overlay_zoom uses glr, bu
 
 
 
+app.gen_ui_theme:
+
+	modernize to libv.frame
+	modernize to libv.ui
+	move effect implementations to C++
+	move blend implementations to C++
+	lua should only give the effect list and their colors
+	add lua <-> C++ linked ui elements for colors/float selection
+	create theme exporter: json and texture
+
+	connect the theme gen with a running app to live update
 
 
+
+
+libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
+
+
+
+libv.ui.theme:
+	Button states:
+		Normal
+		Focus
+		Hover
+		Active/Press
+		Progress/Loading
+		Disabled
+		Error
+
+
+		#HLFG - saturated blue
+		#HLBG - unsaturated blue
 
 
 
@@ -561,6 +591,10 @@ libv.ui: update every component to the new renderer | (overlay_zoom uses glr, bu
 
 libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
+		render background plane
+		render borders (outer shadow/edge)
+		render component
+		render borders (inner shadow/edge)
 
 
 
@@ -569,6 +603,9 @@ place.it:
 	model: Generate texture for LOD meshes
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
 
+	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
+	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
+	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
 
 

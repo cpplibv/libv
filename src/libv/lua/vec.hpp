@@ -37,6 +37,8 @@ void registerLuaVecCommon(R& type) {
 			sol::resolve<T(const V&, const T&)>(::libv::operator/),
 			sol::resolve<T(const T&, const V&)>(::libv::operator/)
 	));
+
+//	type.set(sol::meta_function::unary_minus, sol::resolve<T(const T&)>(::libv::operator-));
 	type.set("length", &T::length);
 }
 
