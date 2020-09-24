@@ -1,11 +1,7 @@
 // Project: libv.ui, File: sandbox/libv_ui_main.cpp, Author: Császár Mátyás [Vader]
 
-// ext
-#include <GL/glew.h>
 // libv
 #include <libv/frame/frame.hpp>
-#include <libv/glr/queue.hpp>
-#include <libv/glr/remote.hpp>
 //#include <libv/input/event.hpp>
 //#include <libv/input/input.hpp>
 #include <libv/log/log.hpp>
@@ -34,12 +30,10 @@
 
 // -------------------------------------------------------------------------------------------------
 
-
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 class SandboxFrame : public libv::Frame {
 private:
-	libv::glr::Remote remote;
 	libv::ui::UI ui;
 
 private:
@@ -69,47 +63,6 @@ private:
 	libv::ui::ScrollBar scroll_bar_iy;
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
-
-public:
-	void create() {
-		glewExperimental = true;
-		if (GLenum err = glewInit() != GLEW_OK)
-			log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
-		log_sandbox.debug("GL Vendor     {}", glGetString(GL_VENDOR));
-		log_sandbox.debug("GL Renderer   {}", glGetString(GL_RENDERER));
-		log_sandbox.debug("GL Version    {}", glGetString(GL_VERSION));
-
-		remote.create();
-		remote.enableDebug();
-
-//		auto gl = remote.queue();
-//		ui.create(gl);
-//		remote.queue(std::move(gl));
-//		remote.execute();
-	}
-
-	void render() {
-		auto gl = remote.queue();
-
-		gl.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
-		gl.clearColor();
-		gl.clearDepth();
-
-		ui.update(gl);
-
-		remote.queue(std::move(gl));
-		remote.execute();
-	}
-
-	void destroy() {
-		auto gl = remote.queue();
-		ui.destroy(gl);
-		remote.queue(std::move(gl));
-		remote.execute();
-
-		remote.destroy();
-	}
 
 public:
 	SandboxFrame() :
@@ -450,15 +403,6 @@ public:
 //			label2->flag(libv::ui::Flag::invalidLayout);
 			log_sandbox.trace("Append string {}", e.utf8.data());
 			label.text(label.text() + e.utf8.data());
-		});
-		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
-			create();
-		});
-		onContextUpdate.output([&](const libv::frame::EventContextUpdate&) {
-			render();
-		});
-		onContextDestroy.output([&](const libv::frame::EventContextDestroy&) {
-			destroy();
 		});
 	}
 	~SandboxFrame() {

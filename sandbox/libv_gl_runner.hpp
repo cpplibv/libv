@@ -21,32 +21,24 @@ inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 // Runner ------------------------------------------------------------------------------------------
 
-void checkGLSupport(const char* ext) {
-	log_sandbox.debug("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
-}
-
-void initGLEW() {
-	glewExperimental = true;
-	if (GLenum err = glewInit() != GLEW_OK)
-		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	log_sandbox.debug("GL Vendor   {}", glGetString(GL_VENDOR));
-	log_sandbox.debug("GL Renderer {}", glGetString(GL_RENDERER));
-	log_sandbox.debug("GL Version  {}", glGetString(GL_VERSION));
-
-	checkGLSupport("GL_VERSION_3_3");
-	checkGLSupport("GL_VERSION_4_5");
-	checkGLSupport("GL_ARB_direct_state_access");
-	checkGLSupport("GL_ARB_draw_elements_base_vertex");
-	checkGLSupport("GL_ARB_gpu_shader_fp64");
-	checkGLSupport("GL_ARB_gpu_shader_int64");
-	checkGLSupport("GL_ARB_sampler_objects");
-	checkGLSupport("GL_ARB_vertex_attrib_64bit");
-	checkGLSupport("GL_ARB_vertex_attrib_binding");
-	checkGLSupport("GL_EXT_texture_compression_s3tc");
-
-	libv::gl::checkGL();
-}
+//	log_sandbox.debug("GL Vendor   {}", glGetString(GL_VENDOR));
+//	log_sandbox.debug("GL Renderer {}", glGetString(GL_RENDERER));
+//	log_sandbox.debug("GL Version  {}", glGetString(GL_VERSION));
+//
+//  const auto checkGLSupport = [](const char* ext) {
+//      log_sandbox.debug("{:46} [{}]", ext, glewIsSupported(ext) ? " SUPPORTED " : "UNSUPPORTED");
+//  };
+//
+//	checkGLSupport("GL_VERSION_3_3");
+//	checkGLSupport("GL_VERSION_4_5");
+//	checkGLSupport("GL_ARB_direct_state_access");
+//	checkGLSupport("GL_ARB_draw_elements_base_vertex");
+//	checkGLSupport("GL_ARB_gpu_shader_fp64");
+//	checkGLSupport("GL_ARB_gpu_shader_int64");
+//	checkGLSupport("GL_ARB_sampler_objects");
+//	checkGLSupport("GL_ARB_vertex_attrib_64bit");
+//	checkGLSupport("GL_ARB_vertex_attrib_binding");
+//	checkGLSupport("GL_EXT_texture_compression_s3tc");
 
 auto running = std::atomic_bool{true};
 
@@ -160,11 +152,6 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 			running = false;
 	});
 	glfwSwapInterval(1);
-
-	// TODO P1: Make glew init part of libv.gl
-	initGLEW();
-
-	libv::gl::checkGL();
 
 	try {
 		Sandbox sandbox;

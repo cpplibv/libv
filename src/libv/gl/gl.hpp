@@ -475,6 +475,15 @@ private:
 
 private:
 	void init() {
+		glewExperimental = true;
+
+		if (GLenum err = glewInit() != GLEW_OK)
+			log_gl.error("Failed to initialize glew: {}", glewGetErrorString(err));
+
+		log_gl.debug("GL Vendor     {}", glGetString(GL_VENDOR));
+		log_gl.debug("GL Renderer   {}", glGetString(GL_RENDERER));
+		log_gl.debug("GL Version    {}", glGetString(GL_VERSION));
+
 		// Fetch OpenGL context current state
 		capability.blend.init();
 		capability.cullFace.init();

@@ -683,8 +683,9 @@ wish_create_executable(
 		#RESOURCE app/gen_ui_theme/res
 		SOURCE app/gen_ui_theme/*.cpp
 		LINK   libv_log libv_frame libv_utility libv_fsw libv_lua libv_glr
-		LINK   ext_glfw ext_glew
-#		LINK   libv_ui libv_ctrl
+		LINK   ext_glfw
+		LINK   libv_ui
+#		LINK   libv_ctrl
 		#	LINK   ext_date
 )
 

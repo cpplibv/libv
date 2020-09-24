@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/ui.hpp>
 // libv
+#include <libv/glr/remote.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/input/event.hpp>
 #include <libv/math/remap.hpp>
@@ -39,17 +40,6 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 using Root = PanelFull;
-
-//class Root : public PanelFull {
-//public:
-//	using PanelFull::PanelFull;
-//
-//public:
-//	void setSize(libv::vec3f size_) {
-//		AccessRoot::size(base()) = size_;
-//		AccessRoot::flagAuto(base(), Flag::pendingLayout);
-//	}
-//};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -94,6 +84,9 @@ public:
 			libv::input::EventMousePosition,
 			libv::input::EventMouseScroll
 	>;
+
+public:
+	libv::glr::Remote remote;
 
 public:
 	ContextState context_state;
@@ -255,6 +248,186 @@ public:
 		context.mouse.event_scroll(offset);
 		context_state.scroll_position_ = offset;
 	}
+
+	void create() {
+		remote.create();
+		remote.enableDebug();
+	}
+
+	void update() {
+		current_thread_context(context);
+
+		auto glr = remote.queue();
+
+		{
+			timer.reset();
+			timerFrame.reset();
+
+			context_state.frame_count_++;
+			const auto now = clock::now();
+			context_state.time_delta_ = now - context_state.time_frame_;
+			context_state.time_frame_ = now;
+			context_state.time_ = context_state.time_frame_ - context_state.time_ui_;
+
+			// --- Attach ---
+			try {
+				AccessRoot::attach(root.core(), root.core());
+				stat.attach1.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
+			}
+
+			// --- Event ---
+			try {
+				context.mouse.event_update();
+				// NOTE: Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
+
+				std::unique_lock lock{mutex};
+
+				for (const auto& inputEvent : event_queue) {
+					try {
+						std::visit([this](const auto& event) { this->event(event); }, inputEvent);
+					} catch (const std::exception& ex) {
+						log_ui.error("Exception occurred during event in UI: {}. Discarding event", ex.what());
+					}
+				}
+
+				event_queue.clear();
+				stat.event.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during event in UI: {}", ex.what());
+			}
+
+			// --- Attach ---
+			try {
+				AccessRoot::attach(root.core(), root.core());
+				stat.attach2.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
+			}
+
+	//	// --- Update ---
+	//	try {
+	//		//AccessRoot::update(root);
+	//	} catch (const std::exception& ex) {
+	//		log_ui.error("Exception occurred during update in UI: {}", ex.what());
+	//	}
+	//
+	//	// --- Attach ---
+	//	try {
+	//		//AccessRoot::attach(root, root);
+	//	} catch (const std::exception& ex) {
+	//		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
+	//	}
+
+			// --- Style ---
+			try {
+				if (context.isAnyStyleDirty()) {
+					AccessRoot::styleScan(root.core());
+					context.clearEveryStyleDirty();
+					stat.styleScan.sample(timer.time_ns());
+				} else {
+					AccessRoot::style(root.core());
+					stat.style.sample(timer.time_ns());
+				}
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during style in UI: {}", ex.what());
+			}
+
+			// --- Layout ---
+			try {
+				AccessRoot::layout2(root.core(), ContextLayout2{root.layout_position(), root.layout_size()});
+				stat.layout.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during layout in UI: {}", ex.what());
+			}
+
+			// --- Render ---
+			try {
+				glr.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
+				glr.clearColor();
+				glr.clearDepth();
+
+				const auto guard_s = glr.state.push_guard();
+				const auto guard_m = glr.model.push_guard();
+				const auto guard_v = glr.view.push_guard();
+				const auto guard_p = glr.projection.push_guard();
+
+	//		AccessRoot::create(root.core(), context);
+				auto r = context_render.root_renderer(
+						root,
+						glr,
+						context_state.time_frame(),
+						context_state.time(),
+						context_state.mouse_position(),
+						root.layout_size2()
+				);
+
+				AccessRoot::render(root.core(), r);
+				context_render.execute_render(glr);
+	//		AccessRoot::destroy(root.core(), context);
+
+				if (overlayZoomMode != OverlayZoomMode::disabled)
+					overlayZoom.postRender(r);
+
+				stat.render.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during render in UI: {}", ex.what());
+			}
+
+			// --- Detach ---
+			try {
+				AccessRoot::detach(root.core(), root.core());
+				stat.detach.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during detach in UI: {}", ex.what());
+			}
+
+			stat.frame.sample(timerFrame.time_ns());
+		}
+
+		//	if (++self->i == 1200) {
+		//		self->i = 0;
+		//		std::cout << '\n' << self->stat << std::endl;
+		//	}
+
+		remote.queue(std::move(glr));
+		remote.execute();
+	}
+
+	void destroy() {
+		auto glr = remote.queue();
+
+		{
+			current_thread_context(context);
+
+			root.markRemove();
+
+			// --- Render ---
+			{
+				auto r = context_render.root_renderer(
+						root,
+						glr,
+						context_state.time_frame(),
+						context_state.time(),
+						context_state.mouse_position(),
+						root.layout_size2()
+				);
+				AccessRoot::render(root.core(), r);
+				context_render.execute_render(glr);
+			}
+
+			// --- Detach ---
+			{
+				AccessRoot::detach(root.core(), root.core());
+			}
+		}
+
+		remote.queue(std::move(glr));
+		remote.execute();
+
+		remote.destroy();
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -327,159 +500,16 @@ ContextState& UI::state() {
 
 // -------------------------------------------------------------------------------------------------
 
-void UI::update(libv::glr::Queue& glr) {
-	current_thread_context(context());
-
-	self->timer.reset();
-	self->timerFrame.reset();
-
-	self->context_state.frame_count_++;
-	const auto now = clock::now();
-	self->context_state.time_delta_ = now - self->context_state.time_frame_;
-	self->context_state.time_frame_ = now;
-	self->context_state.time_ = self->context_state.time_frame_ - self->context_state.time_ui_;
-
-	// --- Attach ---
-	try {
-		AccessRoot::attach(self->root.core(), self->root.core());
-		self->stat.attach1.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
-	}
-
-	// --- Event ---
-	try {
-		self->context.mouse.event_update();
-		// NOTE: Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
-
-		std::unique_lock lock{self->mutex};
-
-		for (const auto& inputEvent : self->event_queue) {
-			try {
-				std::visit([this](const auto& event) { self->event(event); }, inputEvent);
-			} catch (const std::exception& ex) {
-				log_ui.error("Exception occurred during event in UI: {}. Discarding event", ex.what());
-			}
-		}
-
-		self->event_queue.clear();
-		self->stat.event.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during event in UI: {}", ex.what());
-	}
-
-	// --- Attach ---
-	try {
-		AccessRoot::attach(self->root.core(), self->root.core());
-		self->stat.attach2.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
-	}
-
-//	// --- Update ---
-//	try {
-//		//AccessRoot::update(self->root);
-//	} catch (const std::exception& ex) {
-//		log_ui.error("Exception occurred during update in UI: {}", ex.what());
-//	}
-//
-//	// --- Attach ---
-//	try {
-//		//AccessRoot::attach(self->root, self->root);
-//	} catch (const std::exception& ex) {
-//		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
-//	}
-
-	// --- Style ---
-	try {
-		if (self->context.isAnyStyleDirty()) {
-			AccessRoot::styleScan(self->root.core());
-			self->context.clearEveryStyleDirty();
-			self->stat.styleScan.sample(self->timer.time_ns());
-		} else {
-			AccessRoot::style(self->root.core());
-			self->stat.style.sample(self->timer.time_ns());
-		}
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during style in UI: {}", ex.what());
-	}
-
-	// --- Layout ---
-	try {
-		AccessRoot::layout2(self->root.core(), ContextLayout2{self->root.layout_position(), self->root.layout_size()});
-		self->stat.layout.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during layout in UI: {}", ex.what());
-	}
-
-	// --- Render ---
-	try {
-		const auto guard_s = glr.state.push_guard();
-		const auto guard_m = glr.model.push_guard();
-		const auto guard_v = glr.view.push_guard();
-		const auto guard_p = glr.projection.push_guard();
-
-//		AccessRoot::create(self->root.core(), context);
-		auto r = self->context_render.root_renderer(
-				self->root,
-				glr,
-				self->context_state.time_frame(),
-				self->context_state.time(),
-				self->context_state.mouse_position(),
-				self->root.layout_size2()
-		);
-
-		AccessRoot::render(self->root.core(), r);
-		self->context_render.execute_render(glr);
-//		AccessRoot::destroy(self->root.core(), context);
-
-		if (self->overlayZoomMode != OverlayZoomMode::disabled)
-			self->overlayZoom.postRender(r);
-
-		self->stat.render.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during render in UI: {}", ex.what());
-	}
-
-	// --- Detach ---
-	try {
-		AccessRoot::detach(self->root.core(), self->root.core());
-		self->stat.detach.sample(self->timer.time_ns());
-	} catch (const std::exception& ex) {
-		log_ui.error("Exception occurred during detach in UI: {}", ex.what());
-	}
-
-	self->stat.frame.sample(self->timerFrame.time_ns());
-
-//	if (++self->i == 1200) {
-//		self->i = 0;
-//		std::cout << '\n' << self->stat << std::endl;
-//	}
+void UI::create() {
+	self->create();
 }
 
-void UI::destroy(libv::glr::Queue& glr) {
-	current_thread_context(context());
+void UI::update() {
+	self->update();
+}
 
-	self->root.markRemove();
-
-	// --- Render ---
-	{
-		auto r = self->context_render.root_renderer(
-				self->root,
-				glr,
-				self->context_state.time_frame(),
-				self->context_state.time(),
-				self->context_state.mouse_position(),
-				self->root.layout_size2()
-		);
-		AccessRoot::render(self->root.core(), r);
-		self->context_render.execute_render(glr);
-	}
-
-	// --- Detach ---
-	{
-		AccessRoot::detach(self->root.core(), self->root.core());
-	}
+void UI::destroy() {
+	self->destroy();
 }
 
 // -------------------------------------------------------------------------------------------------

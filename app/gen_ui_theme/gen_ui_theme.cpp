@@ -1,8 +1,7 @@
-// Project: libv, File: app/gen_ui_theme/gen_ui_theme.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: app/gen_ui_theme/gen_ui_theme.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <GL/glew.h>
-#include <GLFW/glfw3.h>
 // libv
 #include <libv/fsw/watcher.hpp>
 #include <libv/gl/check.hpp>
@@ -28,6 +27,29 @@
 #include <string>
 
 
+
+#include <libv/frame/frame.hpp>
+#include <libv/glr/queue.hpp>
+#include <libv/glr/remote.hpp>
+
+
+#include <libv/ui/component/button.hpp>
+//#include <libv/ui/component/image.hpp>
+#include <libv/ui/component/input_field.hpp>
+//#include <libv/ui/component/label.hpp>
+//#include <libv/ui/component/label_image.hpp>
+//#include <libv/ui/component/panel_float.hpp>
+//#include <libv/ui/component/panel_full.hpp>
+//#include <libv/ui/component/panel_grid.hpp>
+#include <libv/ui/component/panel_line.hpp>
+//#include <libv/ui/component/quad.hpp>
+//#include <libv/ui/component/scroll_bar.hpp>
+//#include <libv/ui/component/scroll_pane.hpp>
+//#include <libv/ui/component/stretch.hpp>
+#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/ui.hpp>
+
 // -------------------------------------------------------------------------------------------------
 
 constexpr uint32_t WINDOW_WIDTH = 1152 + 30;
@@ -36,103 +58,10 @@ constexpr uint32_t WINDOW_HEIGHT = 1024 + 20;
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "gen_ui_theme"};
-
-// Runner ------------------------------------------------------------------------------------------
-
-auto running = std::atomic_bool{true};
-auto pulse = std::atomic_bool{true};
-
-void initGLEW() {
-	glewExperimental = true;
-	if (GLenum err = glewInit() != GLEW_OK)
-		log_sandbox.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	libv::gl::checkGL();
-}
-
-template <typename Sandbox>
-int run_sandbox(const std::string& title, const uint32_t window_height, const uint32_t window_width) {
-	glfwSetErrorCallback([](int code, const char* description) {
-		log_sandbox.error("GLFW {}: {}", code, description);
-	});
-
-	if (!glfwInit()) {
-		log_sandbox.fatal("Failed to initialize GLFW.");
-		return EXIT_FAILURE;
-	}
-
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
-	glfwWindowHint(GLFW_RED_BITS, 8);
-	glfwWindowHint(GLFW_GREEN_BITS, 8);
-	glfwWindowHint(GLFW_BLUE_BITS, 8);
-	glfwWindowHint(GLFW_ALPHA_BITS, 0);
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
-	glfwWindowHint(GLFW_STENCIL_BITS, 0);
-
-	// --- Windowed ------------------------------------------------------------------------------------
-
-	GLFWwindow* window = glfwCreateWindow(window_width, window_height, title.c_str(), nullptr, nullptr);
-	if (!window) {
-		glfwTerminate();
-		log_sandbox.fatal("Failed to create GLFW window.");
-		return EXIT_FAILURE;
-	}
-	glfwSetWindowPos(window, 200, 200);
-
-	// --- Windowed-Fullscreen -------------------------------------------------------------------------
-
-	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, [](GLFWwindow*, int key, int, int action, int) {
-		if (action != GLFW_RELEASE)
-			return;
-
-		if (key == GLFW_KEY_ESCAPE)
-			running = false;
-		if (key == GLFW_KEY_SPACE)
-			pulse = !pulse;
-	});
-	glfwSwapInterval(1);
-
-	initGLEW();
-
-	libv::gl::checkGL();
-
-	try {
-		Sandbox sandbox;
-
-		libv::Timer timer_update;
-
-		while (running && !glfwWindowShouldClose(window)) {
-			libv::gl::checkGL();
-			sandbox.update(timer_update.time());
-			sandbox.render();
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-
-	} catch (const std::system_error& e) {
-		log_sandbox.fatal("Exception caught: {} - {}: {}", e.what(), e.code(), e.code().message());
-		return EXIT_FAILURE;
-
-	} catch (const std::exception& e) {
-		log_sandbox.fatal("Exception caught: {}", e.what());
-		return EXIT_FAILURE;
-	}
-
-	libv::gl::checkGL();
-
-	glfwMakeContextCurrent(nullptr);
-	glfwDestroyWindow(window);
-	glfwTerminate();
-
-	return EXIT_SUCCESS;
-}
+inline std::atomic_bool pulse{true};
 
 // =================================================================================================
+
 
 const auto shader_texture_vs = R"(
 #version 330 core
@@ -198,10 +127,11 @@ const auto sphere_layout = libv::glr::layout_std140<SphereUniformLayout>(uniform
 // -------------------------------------------------------------------------------------------------
 
 struct Sandbox {
+//class Sandbox : public libv::ui::Canvas<Sandbox> {
 	libv::vec2i windowSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
 	libv::vec2i textureSize = {128, 128};
 
-	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
+//	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
 
 	libv::glr::Program sphere_program;
 	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
@@ -262,11 +192,6 @@ struct Sandbox {
 
 		// --- Start ---
 
-		remote.create();
-		remote.enableDebug();
-
-		// --- Start ---
-
 		load_texture();
 		file_watcher.subscribe_file(script_file, [this](const auto&) {
 			load_texture();
@@ -311,6 +236,7 @@ struct Sandbox {
 			}
 
 			libv::vec4f c = v.second.as<libv::vec4f>();
+//			texture_data[i] = (libv::vec::clamp(c, 0.0f, 1.0f) * 255.f).cast<uint8_t>();
 			texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
 			texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
 			texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
@@ -332,60 +258,152 @@ struct Sandbox {
 		sphere_texture0.image(0, {0, 0}, textureSize, texture_data.data());
 	}
 
-	void render() {
-		auto queue = remote.queue();
+	void render(libv::glr::Queue& gl) {
+		const auto guard_s = gl.state.push_guard();
+		const auto guard_m = gl.model.push_guard();
+		const auto guard_v = gl.view.push_guard();
+		const auto guard_p = gl.projection.push_guard();
+
+		gl.state.enableBlend();
+		gl.state.blendSrc_SourceAlpha();
+		gl.state.blendDst_One_Minus_SourceAlpha();
+
+		gl.state.enableCullFace();
+		gl.state.frontFaceCCW();
+		gl.state.cullBackFace();
+
+		gl.state.polygonModeFill();
+
+		gl.state.enableDepthTest();
+		gl.state.depthFunctionLess();
+
+		const auto clear_v = !pulse ? 0.5f : std::sin(time.count()) * 0.5f + 0.5f;
+		gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
+		gl.clearColor();
+		gl.clearDepth();
+
+		gl.projection = libv::mat4f::ortho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+		gl.view = libv::mat4f::identity();
+		gl.model = libv::mat4f::identity();
 
 		{
-			auto& gl = queue;
+			auto uniforms = sphere_uniforms.block_unique(sphere_layout);
+			uniforms[sphere_layout.matMVP] = gl.mvp();
+			uniforms[sphere_layout.matM] = gl.model;
+			uniforms[sphere_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
-			const auto guard_s = gl.state.push_guard();
-			const auto guard_m = gl.model.push_guard();
-			const auto guard_v = gl.view.push_guard();
-			const auto guard_p = gl.projection.push_guard();
-
-			gl.state.enableBlend();
-			gl.state.blendSrc_SourceAlpha();
-			gl.state.blendDst_One_Minus_SourceAlpha();
-
-			gl.state.enableCullFace();
-			gl.state.frontFaceCCW();
-			gl.state.cullBackFace();
-
-			gl.state.polygonModeFill();
-
-			gl.state.enableDepthTest();
-			gl.state.depthFunctionLess();
-
-			const auto clear_v = !pulse ? 0.5f : std::sin(time.count()) * 0.5f + 0.5f;
-			gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
-			gl.clearColor();
-			gl.clearDepth();
-
-			gl.projection = libv::mat4f::ortho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-			gl.view = libv::mat4f::identity();
-			gl.model = libv::mat4f::identity();
-
-			{
-				auto uniforms = sphere_uniforms.block_unique(sphere_layout);
-				uniforms[sphere_layout.matMVP] = gl.mvp();
-				uniforms[sphere_layout.matM] = gl.model;
-				uniforms[sphere_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
-
-				gl.program(sphere_program);
-				gl.uniform(std::move(uniforms));
-				gl.texture(sphere_texture0, textureChannel_diffuse);
-				gl.render(sphere_mesh);
-			}
+			gl.program(sphere_program);
+			gl.uniform(std::move(uniforms));
+			gl.texture(sphere_texture0, textureChannel_diffuse);
+			gl.render(sphere_mesh);
 		}
+	}
+};
 
-		remote.queue(std::move(queue));
-		remote.execute();
+// =================================================================================================
+
+class GenUIThemeFrame : public libv::Frame {
+private:
+	Sandbox sandbox;
+	libv::Timer update_timer;
+//	libv::glr::Remote remote;
+	libv::ui::UI ui;
+
+private:
+	libv::ui::Button button0;
+	libv::ui::PanelLine panel_line;
+
+public:
+//	void create() {
+//		remote.create();
+//		remote.enableDebug();
+//	}
+
+	void render() {
+//		auto gl = remote.queue();
+
+//		gl.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
+//		gl.clearColor();
+//		gl.clearDepth();
+
+		sandbox.update(update_timer.timef_s());
+		sandbox.render(gl);
+		// <<<
+
+//		ui.update();
+
+//		remote.queue(std::move(gl));
+//		remote.execute();
+	}
+
+//	void destroy() {
+//		remote.destroy();
+//	}
+
+public:
+	GenUIThemeFrame() :
+		Frame("Gen UI Theme", WINDOW_WIDTH, WINDOW_HEIGHT) {
+		setPosition(FramePosition::center_current_monitor);
+		setOpenGLProfile(OpenGLProfile::core);
+		setOpenGLVersion(3, 3);
+		setOpenGLSamples(OpenGLSamples{4});
+		ui.attach(*this);
+
+		//
+
+		button0.text("Hello World!");
+		button0.event().submit([](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
+			(void) event;
+			log_sandbox.info("Button pressed {}", component.path());
+			component.text(component.text() + ".");
+		});
+
+		//
+
+		button0.size(libv::ui::parse_size_or_throw("D, D"));
+
+		panel_line.add(button0);
+
+		ui.add(panel_line);
+
+		//
+
+		onKey.output([&](const libv::input::EventKey& e) {
+			if (e.action == libv::input::Action::release)
+				return;
+
+			if (e.keycode == libv::input::Keycode::Escape)
+				closeDefault();
+
+			if (e.keycode == libv::input::Keycode::Space)
+				pulse = !pulse;
+		});
+//		onContextCreate.output([&](const libv::frame::EventContextCreate&) {
+//			create();
+//		});
+//		onContextUpdate.output([&](const libv::frame::EventContextUpdate&) {
+//			render();
+//		});
+//		onContextDestroy.output([&](const libv::frame::EventContextDestroy&) {
+//			destroy();
+//		});
+	}
+
+	~GenUIThemeFrame() {
+		disconnectAll();
 	}
 };
 
 // Runner ------------------------------------------------------------------------------------------
 
-int main() {
+int main(int, char**) {
+	// For CLion console
+	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;
-	return run_sandbox<Sandbox>("Gen UI Theme", WINDOW_HEIGHT, WINDOW_WIDTH);
+
+	GenUIThemeFrame frame;
+	frame.show();
+	frame.join();
+
+	return EXIT_SUCCESS;
 }

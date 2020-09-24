@@ -66,9 +66,9 @@ public:
 	template <typename Frame> void attach(Frame& frame);
 
 public:
-	// TODO P1: libv.ui I disagree with this public, to resolve this I think UI has to store its glr::Remote?, which is reasonable, might need some alteration
-	void update(libv::glr::Queue& gl);
-	void destroy(libv::glr::Queue& gl);
+	void create();
+	void update();
+	void destroy();
 
 private:
 	void focus(CoreComponent& component);
@@ -105,6 +105,16 @@ void UI::attach(Frame& frame) {
 	});
 	frame.onMouseScroll.output([this](const auto& e) {
 		this->event(e);
+	});
+
+	frame.onContextCreate.output([&](const auto&) {
+		this->create();
+	});
+	frame.onContextUpdate.output([&](const auto&) {
+		this->update();
+	});
+	frame.onContextDestroy.output([&](const auto&) {
+		this->destroy();
 	});
 }
 

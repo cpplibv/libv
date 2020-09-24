@@ -2,8 +2,6 @@
 
 // hpp
 #include "libv_gl_runner.hpp"
-// ext
-#include <GL/glew.h>
 // libv
 #include <libv/math/angle.hpp>
 #include <libv/utility/read_file.hpp>
@@ -17,6 +15,7 @@
 #include <libv/gl/framebuffer.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/image.hpp>
+#include <libv/gl/load_image.hpp>
 #include <libv/gl/program.hpp>
 #include <libv/gl/renderbuffer.hpp>
 #include <libv/gl/shader.hpp>

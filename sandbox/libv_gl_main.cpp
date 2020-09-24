@@ -2,8 +2,6 @@
 
 // hpp
 #include "libv_gl_runner.hpp"
-// ext
-#include <GL/glew.h>
 // libv
 #include <libv/math/angle.hpp>
 #include <libv/utility/read_file.hpp>

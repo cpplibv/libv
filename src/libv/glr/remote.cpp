@@ -6,6 +6,8 @@
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
 #include <libv/gl/gl.hpp>
+// std
+#include <optional>
 // pro
 #include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/queue.hpp>
@@ -18,7 +20,7 @@ namespace glr {
 
 class ImplRemote {
 public:
-	libv::gl::GL gl;
+	std::optional<libv::gl::GL> gl;
 	std::vector<Queue> queues;
 	DestroyQueues destroyQueues;
 	std::thread::id contextThreadID;
@@ -50,32 +52,32 @@ DestroyQueues& Remote::destroyQueues() noexcept {
 
 void Remote::clear() noexcept {
 	self->queues.clear();
-	self->destroyQueues.clear(self->gl);
+	self->destroyQueues.clear(*self->gl);
 }
 
 void Remote::enableTrace() noexcept {
-	self->gl.enableTrace();
+	self->gl->enableTrace();
 }
 
 void Remote::enableDebug() noexcept {
-	self->gl.enableDebug();
+	self->gl->enableDebug();
 }
 
 void Remote::readPixels(libv::vec2i pos, libv::vec2i size, libv::gl::ReadFormat format, libv::gl::DataType type, void* data) noexcept {
-	self->gl.readPixels(pos, size, format, type, data);
+	self->gl->readPixels(pos, size, format, type, data);
 }
 
 libv::gl::GL& Remote::gl() noexcept {
 	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
 	LIBV_GL_DEBUG_ASSERT(self->initalized);
-	return self->gl;
+	return *self->gl;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Remote::create() {
-	// load glew
 	LIBV_GL_DEBUG_ASSERT(!self->initalized);
+	self->gl.emplace();
 	self->contextThreadID = std::this_thread::get_id();
 	self->initalized = true;
 }
@@ -84,12 +86,13 @@ void Remote::destroy() {
 	LIBV_GL_DEBUG_ASSERT(std::this_thread::get_id() == self->contextThreadID);
 	LIBV_GL_DEBUG_ASSERT(self->initalized);
 	clear();
+	self->gl->clear();
 	self->initalized = false;
 }
 
 void Remote::execute() {
 	for (auto& queue : self->queues)
-		queue.execute(self->gl, *this);
+		queue.execute(*self->gl, *this);
 	clear();
 }
 

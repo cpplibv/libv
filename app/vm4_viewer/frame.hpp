@@ -20,14 +20,8 @@ class ViewerUI;
 
 class VM4ViewerFrame : public libv::Frame {
 private:
-	libv::glr::Remote remote;
 	libv::ui::UI ui;
 	std::shared_ptr<app::ViewerUI> panel;
-
-private:
-	void create();
-	void render();
-	void destroy();
 
 public:
 	VM4ViewerFrame(app::ConfigViewer& config);

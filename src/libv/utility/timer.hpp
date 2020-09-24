@@ -12,11 +12,11 @@ namespace libv {
 class Timer {
 public:
 	using clock = std::chrono::steady_clock;
-private:
-	clock::time_point time_;
-public:
-	inline Timer() : time_(std::chrono::steady_clock::now()) { }
 
+private:
+	clock::time_point time_ = std::chrono::steady_clock::now();
+
+public:
 	inline clock::duration elapsed() {
 		return std::chrono::steady_clock::now() - time_;
 	}

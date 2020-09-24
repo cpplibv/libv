@@ -2,8 +2,6 @@
 
 // hpp
 #include <vm4_viewer/frame.hpp>
-// ext
-#include <GL/glew.h>
 // libv
 #include <libv/glr/queue.hpp>
 // pro
@@ -14,41 +12,6 @@
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
-
-void VM4ViewerFrame::create() {
-	glewExperimental = true;
-	if (GLenum err = glewInit() != GLEW_OK)
-		log_app.error("Failed to initialize glew: {}", glewGetErrorString(err));
-
-	log_app.debug("GL Vendor     {}", glGetString(GL_VENDOR));
-	log_app.debug("GL Renderer   {}", glGetString(GL_RENDERER));
-	log_app.debug("GL Version    {}", glGetString(GL_VERSION));
-
-	remote.create();
-	remote.enableDebug();
-}
-
-void VM4ViewerFrame::render() {
-	auto gl = remote.queue();
-
-	gl.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
-	gl.clearColor();
-	gl.clearDepth();
-
-	ui.update(gl);
-
-	remote.queue(std::move(gl));
-	remote.execute();
-}
-
-void VM4ViewerFrame::destroy() {
-	auto gl = remote.queue();
-	ui.destroy(gl);
-	remote.queue(std::move(gl));
-	remote.execute();
-
-	remote.destroy();
-}
 
 VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 	Frame("VM4 Viewer", config.window_width, config.window_height) {
@@ -71,15 +34,6 @@ VM4ViewerFrame::VM4ViewerFrame(app::ConfigViewer& config) :
 			config.window_width = e.size.x;
 			config.window_height = e.size.y;
 		}
-	});
-	onContextCreate.output([&](const libv::frame::EventContextCreate&) {
-		create();
-	});
-	onContextUpdate.output([&](const libv::frame::EventContextUpdate&) {
-		render();
-	});
-	onContextDestroy.output([&](const libv::frame::EventContextDestroy&) {
-		destroy();
 	});
 }
 
