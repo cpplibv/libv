@@ -129,7 +129,7 @@ public:
 			log_sandbox.info("Input field 0 {} submitted", component.path());
 		});
 		input_field0.size(libv::ui::parse_size_or_throw("D, 50px"));
-//		input_field0.size(libv::ui::parse_size_or_throw("D, D")); // <<< P8: cascades nan
+//		input_field0.size(libv::ui::parse_size_or_throw("D, D")); // <<< P92: cascades nan
 
 		input_field1.text("Input field 1 line 1\nInput field 1 line 2\nInput field 1 line 3\nInput field 1 line 4\nInput field 1 line 5");
 		input_field1.event().change([](auto& component, const auto&) {

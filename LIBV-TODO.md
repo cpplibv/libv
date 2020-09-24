@@ -546,18 +546,12 @@ app.gen_ui_theme: App to generate and modify UI themes
 app.gen_ui_theme: modernize to use libv.frame
 libv.gl: more glewInit into GL
 libv.ui: store glr remote inside UI, which is reasonable, might need some alteration
-libv: Fix build errors and warnings
+libv: Fix build errors and warnings (except vm4_viewer)
+app.gen_ui_theme: modernize to use libv.ui
+libv.ui: Implement CanvasAdaptor component
 
 
 --- STACK ------------------------------------------------------------------------------------------
-
-
-
-app.gen_ui_theme: modernize to use libv.ui
-	make "main display" into a component
-	libv.ui: update function
-	libv.ui: New component: Canvas
-
 
 
 
@@ -1482,6 +1476,15 @@ libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/typ
 libv.ui: lua binding | or rather a lua component or prototype parsing
 libv.ui: make sandbox_ui.lua work
 
+wish: Force colored output, useful for IDEs like clion and netbeans
+		option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+		if (${FORCE_COLORED_OUTPUT})
+			if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+				add_compile_options (-fdiagnostics-color=always)
+			elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+				add_compile_options (-fcolor-diagnostics)
+			endif ()
+		endif ()
 wish: update cmake version and use add_compile_definitions() instead of add_definitions()
 wish: target_link_directories()
 wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file

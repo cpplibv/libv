@@ -529,15 +529,6 @@ void Renderer::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, l
 // --- Component level -----------------------------------------------------------------------------
 
 Renderer Renderer::enter(const Component& child) {
-	// <<< P2: adjust clip position, clip stack
-
-//	if (child.core().isFloatRegion())
-
-
-//	auto cr = Renderer{*this, child};
-//	cr.clip(clip_pos + child.layout_position(), clip_size);
-//	return cr;
-
 	return Renderer{*this, child};
 }
 
