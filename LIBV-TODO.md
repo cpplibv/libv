@@ -1476,7 +1476,7 @@ libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/typ
 libv.ui: lua binding | or rather a lua component or prototype parsing
 libv.ui: make sandbox_ui.lua work
 
-wish: Force colored output, useful for IDEs like clion and netbeans
+wish: Force colored output, useful for IDEs like clion and netbeans, also for ninja too
 		option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
 		if (${FORCE_COLORED_OUTPUT})
 			if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -1805,6 +1805,7 @@ libv: generic general container storage
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
+ninja: CLICOLOR_FORCE=1 env var to have colored output
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
