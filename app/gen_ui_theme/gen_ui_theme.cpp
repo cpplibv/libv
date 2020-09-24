@@ -127,177 +127,177 @@ const auto sphere_layout = libv::glr::layout_std140<SphereUniformLayout>(uniform
 // -------------------------------------------------------------------------------------------------
 
 struct Sandbox {
-//class Sandbox : public libv::ui::Canvas<Sandbox> {
-	libv::vec2i windowSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
-	libv::vec2i textureSize = {128, 128};
-
-//	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
-
-	libv::glr::Program sphere_program;
-	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::UniformBuffer sphere_uniforms{libv::gl::BufferUsage::StreamDraw};
-	libv::glr::Uniform_vec3f sphere_uniform_shift;
-	libv::glr::Uniform_float sphere_uniform_time;
-	libv::glr::Uniform_texture sphere_uniform_texture0;
-	libv::glr::Uniform_texture sphere_uniform_texture1;
-	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture0;
-
-	libv::fsw::FileWatcher file_watcher;
-	std::string script_file = "app/gen_ui_theme/theme_slate.lua";
-	std::vector<libv::vec4uc> texture_data;
-	std::mutex texture_m;
-	bool dirty = false;
-
-	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
-
-	std::chrono::duration<float> time;
-
-	// -------------------------------------------------------------------------------------------------
-
-	Sandbox() {
-		// --- Sphere ---
-		sphere_program.vertex(shader_texture_vs);
-		sphere_program.fragment(shader_texture_fs);
-		sphere_program.block_binding(uniformBlock_sphere);
-		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
-
-		sphere_texture0.storage(1, textureSize);
-		sphere_texture0.set(libv::gl::MagFilter::Nearest);
-
-		{
-			auto position = sphere_mesh.attribute(attribute_position);
-			auto texture0 = sphere_mesh.attribute(attribute_texture0);
-			auto index = sphere_mesh.index();
-
-			const auto add_lod = [&](int i, auto pos, auto size) {
-				position(pos.x +      0, pos.y +      0, 0);
-				position(pos.x + size.x, pos.y +      0, 0);
-				position(pos.x + size.x, pos.y + size.y, 0);
-				position(pos.x +      0, pos.y + size.y, 0);
-
-				texture0(0, 0);
-				texture0(1, 0);
-				texture0(1, 1);
-				texture0(0, 1);
-
-				index.quad(i * 4 + 0, i * 4 + 1, i * 4 + 2, i * 4 + 3);
-			};
-
-			const auto ws = windowSize.cast<float>();
-			const auto ts = textureSize.cast<float>();
-
-			add_lod(0, libv::vec2f(0 + 10, (ws.y - ts.y) * 0.5f), ts);
-			add_lod(1, libv::vec2f(ts.x + 20, 10), ts * 8.0f);
-		}
-
-		// --- Start ---
-
-		load_texture();
-		file_watcher.subscribe_file(script_file, [this](const auto&) {
-			load_texture();
-		});
-	}
-
-	~Sandbox() {
-	}
-
-	void load_texture() {
-		log_sandbox.info("Updating texture...");
-
-		const auto guard = std::scoped_lock(texture_m);
-
-		libv::Timer script_timer;
-
-		lua["tex_size_x"] = textureSize.x;
-		lua["tex_size_y"] = textureSize.y;
-		auto result = lua.safe_script(libv::read_file_or_throw(script_file), sol::script_pass_on_error);
-
-		if (!result.valid()) {
-			sol::error err = result;
-			return log_sandbox.error("Script execution failed: {}", err.what());
-		}
-
-		if (result.get_type() != sol::type::table) {
-			return log_sandbox.error("Script did not return a table: {} - {}", libv::to_value(result.get_type()), std::string(result));
-		}
-
-		log_sandbox.info("Script execution successful: {:7.3f}ms", script_timer.timef_ms().count());
-
-		sol::table result_table = result;
-
-		texture_data.clear();
-		texture_data.resize(textureSize.x * textureSize.y);
-		int i = 0;
-		for (const auto v : result_table) {
-			if (!v.second.is<libv::vec4f>()) {
-				log_sandbox.error("Element {} is not a vec4f", i);
-				i++;
-				continue;
-			}
-
-			libv::vec4f c = v.second.as<libv::vec4f>();
-//			texture_data[i] = (libv::vec::clamp(c, 0.0f, 1.0f) * 255.f).cast<uint8_t>();
-			texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
-			texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
-			texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
-			texture_data[i].w = static_cast<uint8_t>(std::clamp(c.w, 0.0f, 1.0f) * 255.f);
-			i++;
-		}
-
-		dirty = true;
-	}
-
-	void update(const std::chrono::duration<float> deltaTime) {
-		time += deltaTime;
-
-		const auto guard = std::scoped_lock(this->texture_m);
-
-		if (!dirty)
-			return;
-
-		sphere_texture0.image(0, {0, 0}, textureSize, texture_data.data());
-	}
-
-	void render(libv::glr::Queue& gl) {
-		const auto guard_s = gl.state.push_guard();
-		const auto guard_m = gl.model.push_guard();
-		const auto guard_v = gl.view.push_guard();
-		const auto guard_p = gl.projection.push_guard();
-
-		gl.state.enableBlend();
-		gl.state.blendSrc_SourceAlpha();
-		gl.state.blendDst_One_Minus_SourceAlpha();
-
-		gl.state.enableCullFace();
-		gl.state.frontFaceCCW();
-		gl.state.cullBackFace();
-
-		gl.state.polygonModeFill();
-
-		gl.state.enableDepthTest();
-		gl.state.depthFunctionLess();
-
-		const auto clear_v = !pulse ? 0.5f : std::sin(time.count()) * 0.5f + 0.5f;
-		gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
-		gl.clearColor();
-		gl.clearDepth();
-
-		gl.projection = libv::mat4f::ortho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-		gl.view = libv::mat4f::identity();
-		gl.model = libv::mat4f::identity();
-
-		{
-			auto uniforms = sphere_uniforms.block_unique(sphere_layout);
-			uniforms[sphere_layout.matMVP] = gl.mvp();
-			uniforms[sphere_layout.matM] = gl.model;
-			uniforms[sphere_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
-
-			gl.program(sphere_program);
-			gl.uniform(std::move(uniforms));
-			gl.texture(sphere_texture0, textureChannel_diffuse);
-			gl.render(sphere_mesh);
-		}
-	}
+////class Sandbox : public libv::ui::Canvas<Sandbox> {
+//	libv::vec2i windowSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
+//	libv::vec2i textureSize = {128, 128};
+//
+////	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
+//
+//	libv::glr::Program sphere_program;
+//	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+//	libv::glr::UniformBuffer sphere_uniforms{libv::gl::BufferUsage::StreamDraw};
+//	libv::glr::Uniform_vec3f sphere_uniform_shift;
+//	libv::glr::Uniform_float sphere_uniform_time;
+//	libv::glr::Uniform_texture sphere_uniform_texture0;
+//	libv::glr::Uniform_texture sphere_uniform_texture1;
+//	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture0;
+//
+//	libv::fsw::FileWatcher file_watcher;
+//	std::string script_file = "app/gen_ui_theme/theme_slate.lua";
+//	std::vector<libv::vec4uc> texture_data;
+//	std::mutex texture_m;
+//	bool dirty = false;
+//
+//	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+//
+//	std::chrono::duration<float> time;
+//
+//	// -------------------------------------------------------------------------------------------------
+//
+//	Sandbox() {
+//		// --- Sphere ---
+//		sphere_program.vertex(shader_texture_vs);
+//		sphere_program.fragment(shader_texture_fs);
+//		sphere_program.block_binding(uniformBlock_sphere);
+//		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
+//
+//		sphere_texture0.storage(1, textureSize);
+//		sphere_texture0.set(libv::gl::MagFilter::Nearest);
+//
+//		{
+//			auto position = sphere_mesh.attribute(attribute_position);
+//			auto texture0 = sphere_mesh.attribute(attribute_texture0);
+//			auto index = sphere_mesh.index();
+//
+//			const auto add_lod = [&](int i, auto pos, auto size) {
+//				position(pos.x +      0, pos.y +      0, 0);
+//				position(pos.x + size.x, pos.y +      0, 0);
+//				position(pos.x + size.x, pos.y + size.y, 0);
+//				position(pos.x +      0, pos.y + size.y, 0);
+//
+//				texture0(0, 0);
+//				texture0(1, 0);
+//				texture0(1, 1);
+//				texture0(0, 1);
+//
+//				index.quad(i * 4 + 0, i * 4 + 1, i * 4 + 2, i * 4 + 3);
+//			};
+//
+//			const auto ws = windowSize.cast<float>();
+//			const auto ts = textureSize.cast<float>();
+//
+//			add_lod(0, libv::vec2f(0 + 10, (ws.y - ts.y) * 0.5f), ts);
+//			add_lod(1, libv::vec2f(ts.x + 20, 10), ts * 8.0f);
+//		}
+//
+//		// --- Start ---
+//
+//		load_texture();
+//		file_watcher.subscribe_file(script_file, [this](const auto&) {
+//			load_texture();
+//		});
+//	}
+//
+//	~Sandbox() {
+//	}
+//
+//	void load_texture() {
+//		log_sandbox.info("Updating texture...");
+//
+//		const auto guard = std::scoped_lock(texture_m);
+//
+//		libv::Timer script_timer;
+//
+//		lua["tex_size_x"] = textureSize.x;
+//		lua["tex_size_y"] = textureSize.y;
+//		auto result = lua.safe_script(libv::read_file_or_throw(script_file), sol::script_pass_on_error);
+//
+//		if (!result.valid()) {
+//			sol::error err = result;
+//			return log_sandbox.error("Script execution failed: {}", err.what());
+//		}
+//
+//		if (result.get_type() != sol::type::table) {
+//			return log_sandbox.error("Script did not return a table: {} - {}", libv::to_value(result.get_type()), std::string(result));
+//		}
+//
+//		log_sandbox.info("Script execution successful: {:7.3f}ms", script_timer.timef_ms().count());
+//
+//		sol::table result_table = result;
+//
+//		texture_data.clear();
+//		texture_data.resize(textureSize.x * textureSize.y);
+//		int i = 0;
+//		for (const auto v : result_table) {
+//			if (!v.second.is<libv::vec4f>()) {
+//				log_sandbox.error("Element {} is not a vec4f", i);
+//				i++;
+//				continue;
+//			}
+//
+//			libv::vec4f c = v.second.as<libv::vec4f>();
+////			texture_data[i] = (libv::vec::clamp(c, 0.0f, 1.0f) * 255.f).cast<uint8_t>();
+//			texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
+//			texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
+//			texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
+//			texture_data[i].w = static_cast<uint8_t>(std::clamp(c.w, 0.0f, 1.0f) * 255.f);
+//			i++;
+//		}
+//
+//		dirty = true;
+//	}
+//
+//	void update(const std::chrono::duration<float> deltaTime) {
+//		time += deltaTime;
+//
+//		const auto guard = std::scoped_lock(this->texture_m);
+//
+//		if (!dirty)
+//			return;
+//
+//		sphere_texture0.image(0, {0, 0}, textureSize, texture_data.data());
+//	}
+//
+//	void render(libv::glr::Queue& gl) {
+//		const auto guard_s = gl.state.push_guard();
+//		const auto guard_m = gl.model.push_guard();
+//		const auto guard_v = gl.view.push_guard();
+//		const auto guard_p = gl.projection.push_guard();
+//
+//		gl.state.enableBlend();
+//		gl.state.blendSrc_SourceAlpha();
+//		gl.state.blendDst_One_Minus_SourceAlpha();
+//
+//		gl.state.enableCullFace();
+//		gl.state.frontFaceCCW();
+//		gl.state.cullBackFace();
+//
+//		gl.state.polygonModeFill();
+//
+//		gl.state.enableDepthTest();
+//		gl.state.depthFunctionLess();
+//
+//		const auto clear_v = !pulse ? 0.5f : std::sin(time.count()) * 0.5f + 0.5f;
+//		gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
+//		gl.clearColor();
+//		gl.clearDepth();
+//
+//		gl.projection = libv::mat4f::ortho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
+//		gl.view = libv::mat4f::identity();
+//		gl.model = libv::mat4f::identity();
+//
+//		{
+//			auto uniforms = sphere_uniforms.block_unique(sphere_layout);
+//			uniforms[sphere_layout.matMVP] = gl.mvp();
+//			uniforms[sphere_layout.matM] = gl.model;
+//			uniforms[sphere_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
+//
+//			gl.program(sphere_program);
+//			gl.uniform(std::move(uniforms));
+//			gl.texture(sphere_texture0, textureChannel_diffuse);
+//			gl.render(sphere_mesh);
+//		}
+//	}
 };
 
 // =================================================================================================
@@ -326,9 +326,9 @@ public:
 //		gl.clearColor();
 //		gl.clearDepth();
 
-		sandbox.update(update_timer.timef_s());
-		sandbox.render(gl);
-		// <<<
+//		sandbox.update(update_timer.timef_s());
+//		sandbox.render();
+		// <<< render is no longer called
 
 //		ui.update();
 

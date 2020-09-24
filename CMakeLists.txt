@@ -71,7 +71,7 @@ wish_warning(
 	GNU -Wlogical-op
 	GNU -Wmultistatement-macros
 	GNU -Wnon-virtual-dtor # Causes some false positives with efsw (suppressed)
-	GNU -Wnull-dereference # Causes some false positives with libv.ecs System.create (suppressed)
+	GNU -Wnull-dereference # Causes some false positives with libv.ecs.system.create and libv.ctrl.controls.input (suppressed)
 	GNU -Wold-style-cast
 	GNU -Wpedantic
 	GNU -Wrestrict
@@ -682,11 +682,8 @@ wish_create_executable(
 		#OUTPUT_RESOURCE res
 		#RESOURCE app/gen_ui_theme/res
 		SOURCE app/gen_ui_theme/*.cpp
-		LINK   libv_log libv_frame libv_utility libv_fsw libv_lua libv_glr
-		LINK   ext_glfw
-		LINK   libv_ui
+		LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua
 #		LINK   libv_ctrl
-		#	LINK   ext_date
 )
 
 wish_create_executable(

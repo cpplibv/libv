@@ -6,6 +6,7 @@
 #include <libv/math/vec_fwd.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
+#include <libv/meta/type_traits.hpp>
 // std
 #include <array>
 #include <cassert>
@@ -377,7 +378,9 @@ struct vec_t : vec_base_t<N, T> {
 	}
 
 	// operator<<(ostream, vec) --------------------------------------------------------------------
-	friend constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& vec) {
+	friend constexpr inline std::ostream& operator<<(std::ostream& os, const vec_t<N, T>& vec)
+			WISH_REQUIRES(libv::meta::is_ostreamable_v<std::ostream, T>) {
+
 		libv::meta::for_constexpr<0, N>([&](const auto index) {
 			if constexpr (index != 0)
 				os << ' ';

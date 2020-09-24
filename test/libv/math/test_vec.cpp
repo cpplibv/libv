@@ -70,9 +70,9 @@ TEST_CASE("unionAddress") {
 	libv::vec4_t<double> vec(0, 1, 2, 3);
 
 	CHECK(&vec.x == &vec.data()[0]);
-	CHECK(&vec.y == &vec.data()[0] + 1);
-	CHECK(&vec.z == &vec.data()[0] + 2);
-	CHECK(&vec.w == &vec.data()[0] + 3);
+	CHECK(&vec.y == &vec.data()[1]);
+	CHECK(&vec.z == &vec.data()[2]);
+	CHECK(&vec.w == &vec.data()[3]);
 
 	CHECK(&vec.x == &vec.data()[0]);
 //	CHECK(&vec.x == &vec.r);

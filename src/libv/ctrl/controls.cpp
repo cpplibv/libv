@@ -889,7 +889,10 @@ void Controls::input(const libv::input::EventMouseScroll& event) {
 void Controls::input(const libv::input::EventGamepadAnalog& event) {
 	// Update SOW
 	auto& sow = self->gamepads[event.gamepadID];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 	sow.analogs[event.analogID] = event.position;
+#pragma GCC diagnostic pop
 
 	// Process event
 	const auto scale = self->scale_analog * self->scale_gamepad_analog * sow.scale_analog;
@@ -920,7 +923,10 @@ void Controls::input(const libv::input::EventGamepadButton& event) {
 void Controls::input(const libv::input::EventJoystickAnalog& event) {
 	// Update SOW
 	auto& sow = self->joysticks[event.joystickID];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 	sow.analogs[event.analogID] = event.position;
+#pragma GCC diagnostic pop
 
 	// Process event
 	const auto scale = self->scale_analog * self->scale_joystick_analog * sow.scale_analog;

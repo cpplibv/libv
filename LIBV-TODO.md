@@ -542,30 +542,42 @@ libv.math: Make every vec / mat operator a hidden friend | Is it possible or is 
 libv.math: Create vec_fwd and mat_fwd headers
 libv.utility: opt_ref<T> and opt_ref_none to alias T* | reworked optional_ref<T> to the same idea
 libv.ui: update every component to the new renderer | (overlay_zoom uses glr, but its fine)
+app.gen_ui_theme: App to generate and modify UI themes
+app.gen_ui_theme: modernize to use libv.frame
+libv.gl: more glewInit into GL
+libv.ui: store glr remote inside UI, which is reasonable, might need some alteration
+libv: Fix build errors and warnings
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
 
-
-app.gen_ui_theme:
-
-	modernize to libv.frame
-	modernize to libv.ui
-	move effect implementations to C++
-	move blend implementations to C++
-	lua should only give the effect list and their colors
-	add lua <-> C++ linked ui elements for colors/float selection
-	create theme exporter: json and texture
-
-	connect the theme gen with a running app to live update
+app.gen_ui_theme: modernize to use libv.ui
+	make "main display" into a component
+	libv.ui: update function
+	libv.ui: New component: Canvas
 
 
 
 
+
+
+app.gen_ui_theme: move effect implementations to C++
+app.gen_ui_theme: move blend implementations to C++
+app.gen_ui_theme: lua should only give the effect list and their colors
+app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
+app.gen_ui_theme: create theme exporter: json and texture
+
+app.gen_ui_theme: connect the theme gen with a running app to live update
+
+
+
+
+libv.ui: set_clear_color (?)
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
+glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 
 
 libv.ui.theme:

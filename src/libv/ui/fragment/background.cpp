@@ -198,6 +198,11 @@ private:
 		return {0, 0};
 	}
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
+
+		(void) r;
+		(void) pos;
+		(void) size;
+
 //		const auto p0 = pos;
 //		const auto p1 = pos + border_pos;
 //		const auto p2 = pos + size - border_pos;

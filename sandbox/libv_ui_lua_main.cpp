@@ -23,7 +23,7 @@ private:
 	libv::lua::State lua;
 
 private:
-	std::shared_ptr<libv::ui::CoreComponent> lua_component;
+//	std::shared_ptr<libv::ui::CoreComponent> lua_component;
 
 public:
 	SandboxFrame() :
@@ -35,9 +35,8 @@ public:
 		setOpenGLVersion(3, 3);
 		setOpenGLSamples(OpenGLSamples{4});
 		ui.attach(*this);
-		ui.setSize(1280.f, 800.f); // TODO P4: auto detect size changes
 
-		lua_component = libv::ui::script_file(ui, lua, "res/script/sandbox_ui.lua");
+//		lua_component = libv::ui::script_file(ui, lua, "res/script/sandbox_ui.lua");
 //		ui.add(lua_component);
 
 		onKey.output([&](const libv::input::EventKey& e) {
