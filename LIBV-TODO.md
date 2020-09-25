@@ -549,17 +549,17 @@ libv.ui: store glr remote inside UI, which is reasonable, might need some altera
 libv: Fix build errors and warnings (except vm4_viewer)
 app.gen_ui_theme: modernize to use libv.ui
 libv.ui: Implement CanvasAdaptor component
+app.gen_ui_theme: move blend/effect implementations to C++
+app.gen_ui_theme: enable multithreading
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
 
+app.gen_ui_theme: clean up C++ blend/effect implementations
+app.gen_ui_theme: move effect definition list to lua
 
-
-app.gen_ui_theme: move effect implementations to C++
-app.gen_ui_theme: move blend implementations to C++
-app.gen_ui_theme: lua should only give the effect list and their colors
 app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 app.gen_ui_theme: create theme exporter: json and texture
 
@@ -572,6 +572,7 @@ libv.ui: set_clear_color (?)
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
+libv.thread: rename to libv.mt
 
 
 libv.ui.theme:

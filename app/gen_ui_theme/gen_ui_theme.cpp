@@ -43,6 +43,9 @@
 //#include <libv/ui/component/scroll_pane.hpp>
 //#include <libv/ui/component/stretch.hpp>
 
+// pro
+#include <gen_ui_theme/effect.hpp>
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -51,7 +54,6 @@ constexpr uint32_t WINDOW_HEIGHT = 1024 + 20;
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_app{libv::logger_stream, "gen_ui_theme"};
 inline std::atomic_bool pulse{true};
 
 // =================================================================================================
@@ -123,6 +125,7 @@ const auto sphere_layout = libv::glr::layout_std140<SphereUniformLayout>(uniform
 class Canvas : public libv::ui::Canvas {
 	libv::vec2i windowSize = {WINDOW_WIDTH, WINDOW_HEIGHT};
 	libv::vec2i textureSize = {128, 128};
+//	libv::vec2i textureSize = {1024, 1024};
 
 //	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
 
@@ -202,42 +205,71 @@ private:
 
 			const auto guard = std::scoped_lock(texture_m);
 
-			libv::Timer script_timer;
-
-			lua["tex_size_x"] = textureSize.x;
-			lua["tex_size_y"] = textureSize.y;
-			auto result = lua.safe_script(libv::read_file_or_throw(script_file), sol::script_pass_on_error);
-
-			if (!result.valid()) {
-				sol::error err = result;
-				return log_app.error("Script execution failed: {}", err.what());
-			}
-
-			if (result.get_type() != sol::type::table) {
-				return log_app.error("Script did not return a table: {} - {}", libv::to_value(result.get_type()), std::string(result));
-			}
-
-			log_app.info("Script execution successful: {:7.3f}ms", script_timer.timef_ms().count());
-
-			sol::table result_table = result;
+//			libv::Timer script_timer;
+//
+//			lua["tex_size_x"] = textureSize.x;
+//			lua["tex_size_y"] = textureSize.y;
+//
+//			const auto script_str = libv::read_file_or_throw(script_file);
+//			const auto result = lua.safe_script(script_str, sol::script_pass_on_error);
+//
+//			if (!result.valid()) {
+//				sol::error err = result;
+//				return log_app.error("Script execution failed: {}", err.what());
+//			}
+//
+//			if (result.get_type() != sol::type::table) {
+//				return log_app.error("Script did not return a table: {} - {}", libv::to_value(result.get_type()), std::string(result));
+//			}
+//
+//			log_app.info("Script execution successful: {:7.3f}ms", script_timer.timef_ms().count());
+//
+//			sol::table result_table = result;
 
 			texture_data.clear();
 			texture_data.resize(textureSize.x * textureSize.y);
-			int i = 0;
-			for (const auto v : result_table) {
-				if (!v.second.is<libv::vec4f>()) {
-					log_app.error("Element {} is not a vec4f", i);
-					i++;
-					continue;
-				}
+//			int i = 0;
+//			for (const auto v : result_table) {
+//				if (!v.second.is<libv::vec4f>()) {
+//					log_app.error("Element {} is not a vec4f", i);
+//					i++;
+//					continue;
+//				}
+//
+//				libv::vec4f c = v.second.as<libv::vec4f>();
+//	//			texture_data[i] = (libv::vec::clamp(c, 0.0f, 1.0f) * 255.f).cast<uint8_t>();
+//				texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
+//				texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
+//				texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
+//				texture_data[i].w = static_cast<uint8_t>(std::clamp(c.w, 0.0f, 1.0f) * 255.f);
+//				i++;
+//			}
 
-				libv::vec4f c = v.second.as<libv::vec4f>();
-	//			texture_data[i] = (libv::vec::clamp(c, 0.0f, 1.0f) * 255.f).cast<uint8_t>();
-				texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
-				texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
-				texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
-				texture_data[i].w = static_cast<uint8_t>(std::clamp(c.w, 0.0f, 1.0f) * 255.f);
-				i++;
+			libv::Timer work_timer;
+
+			app::Image image(textureSize.cast<size_t>());
+			std::vector<std::unique_ptr<app::Effect>> effects;
+			effects.emplace_back(std::make_unique<app::EffectRoundedBox>(libv::vec2f(16.f, 16.f), libv::vec2f(96.f, 96.f), 5.5f, 16.f));
+			effects.emplace_back(std::make_unique<app::EffectGlow>(6.5f, 3, libv::vec4f(0.2f, 0.2f, 0.5f, 0.5f)));
+			effects.emplace_back(std::make_unique<app::EffectGlow>(-1.5f, 1, libv::vec4f(0.8f, 0.8f, 1, 0.8f)));
+
+			app::EffectApplyEngine engine(12);
+			engine.process(image, effects);
+
+			log_app.info("Work execution successful: {:7.3f}ms", work_timer.timef_ms().count());
+
+			int i = 0;
+			for (int x = 0; x < textureSize.x; ++x) {
+				for (int y = 0; y < textureSize.y; ++y) {
+					const auto c = image.color(x, y);
+//					auto c = image.sdistance(x, y) * libv::vec4f{1, 1, 1, 1};
+//					c.w = 1;
+					texture_data[i].x = static_cast<uint8_t>(std::clamp(c.x, 0.0f, 1.0f) * 255.f);
+					texture_data[i].y = static_cast<uint8_t>(std::clamp(c.y, 0.0f, 1.0f) * 255.f);
+					texture_data[i].z = static_cast<uint8_t>(std::clamp(c.z, 0.0f, 1.0f) * 255.f);
+					texture_data[i].w = static_cast<uint8_t>(std::clamp(c.w, 0.0f, 1.0f) * 255.f);
+					i++;
+				}
 			}
 
 			dirty = true;
@@ -326,11 +358,11 @@ public:
 		//
 
 		button0.text("Hello World!");
-		button0.size(libv::ui::parse_size_or_throw("D, D"));
+		button0.size(libv::ui::parse_size_or_throw("D, 22px"));
 		button0.event().submit([](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
 			(void) event;
 			log_app.info("Button pressed {}", component.path());
-			component.text(component.text() + ".");
+			pulse = !pulse;
 		});
 
 		//

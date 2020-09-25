@@ -29,9 +29,7 @@ public:
 	template <typename F,
 			typename = std::enable_if_t<
 				!std::is_same<std::decay_t<F>, function_ref>::value &&
-				std::is_invocable_r<R, F &&, Args...>::value
-			>
-	>
+				std::is_invocable_r<R, F &&, Args...>::value>>
 	constexpr inline function_ref(F &&f) noexcept :
 		obj_(const_cast<void*>(reinterpret_cast<const void*>(std::addressof(f)))) {
 		callback_ = [](void* obj, Args... args) -> R {
@@ -61,7 +59,7 @@ public:
 		std::swap(callback_, rhs.callback_);
 	}
 
-	inline R operator()(Args... args) const {
+	constexpr inline R operator()(Args... args) const {
 		return callback_(obj_, std::forward<Args>(args)...);
 	}
 };
