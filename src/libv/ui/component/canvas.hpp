@@ -15,6 +15,9 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct Canvas {
+	libv::vec2f canvas_size;
+
+public:
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
 	virtual void update(time_duration delta_time) = 0;
 	virtual void render(libv::glr::Queue& glr) = 0;

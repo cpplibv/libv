@@ -238,21 +238,62 @@
 //
 // =================================================================================================
 
+//#include <iostream>
+//#include <filesystem>
+//#include <chrono>
+//#include <fmt/printf.h>
+//#include <fmt/chrono.h>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//int main(int, const char** argv) {
+//	const auto path = std::filesystem::path(argv[0]);
+//
+//	const auto lwt = std::filesystem::last_write_time(path);
+//	const auto sys_lwt = decltype(lwt)::clock::to_sys(lwt);
+//	fmt::print("{}\n", path.generic_string());
+//	fmt::print("Last modified {:%Y.%m.%d %H:%M:%S}\n", fmt::localtime(std::chrono::system_clock::to_time_t(sys_lwt)));
+//
+//	return EXIT_SUCCESS;
+//}
+
+// =================================================================================================
+
 #include <iostream>
-#include <filesystem>
-#include <chrono>
 #include <fmt/printf.h>
-#include <fmt/chrono.h>
+#include <libv/thread/work_cooldown.hpp>
+#include <libv/thread/worker_thread.hpp>
 
 // -------------------------------------------------------------------------------------------------
 
-int main(int, const char** argv) {
-	const auto path = std::filesystem::path(argv[0]);
+int main(int, const char**) {
 
-	const auto lwt = std::filesystem::last_write_time(path);
-	const auto sys_lwt = decltype(lwt)::clock::to_sys(lwt);
-	fmt::print("{}\n", path.generic_string());
-	fmt::print("Last modified {:%Y.%m.%d %H:%M:%S}\n", fmt::localtime(std::chrono::system_clock::to_time_t(sys_lwt)));
+	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
+	libv::mt::work_cooldown load_cd{std::chrono::milliseconds{100}};
+
+	const auto start = std::chrono::steady_clock::now();
+
+	for (int i = 0; i < 100; ++i) {
+		std::this_thread::sleep_until(start + std::chrono::milliseconds{10 * i});
+
+		{
+			const auto now = std::chrono::steady_clock::now();
+			fmt::print("   i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
+		}
+
+		worker_thread.execute_async([i, start] {
+			const auto now = std::chrono::steady_clock::now();
+			fmt::print("AS i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
+		});
+
+		load_cd.execute_async([i, start] {
+			const auto now = std::chrono::steady_clock::now();
+			fmt::print("CD i: {:>3}, t: {:>3} ms\n", i, std::chrono::duration_cast<std::chrono::milliseconds>(now - start).count());
+		}, worker_thread);
+	}
 
 	return EXIT_SUCCESS;
 }
+
+// =================================================================================================
+

@@ -138,8 +138,6 @@ private:
 
 		shape = std::pow(shape, falloff);
 		output = add_layer(output, color, shape);
-
-//		log_app.info("EffectGlow {} {}: shape: {} output: {}", x, y, shape, output);
 	}
 };
 
@@ -158,22 +156,17 @@ public:
 		corner_sharpness(cornerSharpness) {}
 
 private:
-	// Source https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	virtual void apply(Image& image, size_t x, size_t y) const noexcept override {
 		const auto l_pos = ((libv::vec2f{x, y} - pos) - size * 0.5f);
 		const auto l_size = size * 0.5f - corner_size;
 
-		const auto q = libv::vec::abs(l_pos) - l_size;
-		const auto sd = libv::vec::max(q, 0.0f).length() + std::min(std::max(q.x, q.y), 0.0f) - corner_size;
+		// Source https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
+		const auto p = l_pos;
+		const auto b = l_size;
+		const auto r = corner_size;
 
-//		const auto p = l_pos;
-//		const auto b = l_size;
-//		const auto r = corner_size;
-//
-//		const auto q = abs(p) - b;
-//		const auto sd = libv::vec::max(q, 0.0f).length() + std::min(std::max(q.x, q.y), 0.0f) - r;
-
-//		log_app.info("EffectRoundedBox {} {} {}", x, y, sd);
+		const auto q = abs(p) - b;
+		const auto sd = libv::vec::max(q, 0.0f).length() + std::min(std::max(q.x, q.y), 0.0f) - r;
 
 		image.sdistance(x, y) = sd;
 	}

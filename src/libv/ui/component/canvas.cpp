@@ -3,6 +3,7 @@
 // hpp
 #include <libv/ui/component/canvas.hpp>
 // pro
+#include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
@@ -33,6 +34,7 @@ public:
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
+	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doCreate(Renderer& r) override;
 	virtual void doRender(Renderer& r) override;
 	virtual void doDestroy(Renderer& r) override;
@@ -57,6 +59,13 @@ libv::vec3f CoreCanvasAdaptor::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	return {padding_size(), 0.f};
+}
+
+void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
+	if (canvas == nullptr)
+		return;
+
+	canvas->canvas_size = xy(environment.size);
 }
 
 void CoreCanvasAdaptor::doCreate(Renderer& r) {

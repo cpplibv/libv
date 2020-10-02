@@ -551,14 +551,17 @@ app.gen_ui_theme: modernize to use libv.ui
 libv.ui: Implement CanvasAdaptor component
 app.gen_ui_theme: move blend/effect implementations to C++
 app.gen_ui_theme: enable multithreading
+app.gen_ui_theme: split canvas/engine/effect related codes
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
 
-app.gen_ui_theme: clean up C++ blend/effect implementations
+
 app.gen_ui_theme: move effect definition list to lua
+
+app.gen_ui_theme: clean up C++ blend/effect implementations
 
 app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 app.gen_ui_theme: create theme exporter: json and texture
@@ -572,7 +575,8 @@ libv.ui: set_clear_color (?)
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
-libv.thread: rename to libv.mt
+libv.thread: rename the lib to libv.mt
+libv.fsw: Rename watcher file to file_watcher, or the class the other way around
 
 
 libv.ui.theme:
@@ -620,14 +624,11 @@ libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
 
 place.it:
+	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	model: Generate texture for LOD meshes
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
 	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
-
-	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
-	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
-	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
 
 

@@ -233,51 +233,51 @@ TEST_CASE("SignalFireStringArgs") {
 }
 
 TEST_CASE("SignalFireArgsLValueRef") {
-	bool recieved = false;
+	bool received = false;
 	int x = 2;
 	std::string y = "Test string";
 	Signal<int&, std::string&> source;
-	source.output([&x, &y, &recieved](int& a, std::string & b) {
-		recieved = true;
+	source.output([&x, &y, &received](int& a, std::string & b) {
+		received = true;
 		CHECK(a == 2);
 				CHECK(b == std::string("Test string"));
 				CHECK(&a == &x);
 				CHECK(&b == &y);
 	});
 	source.fire(x, y);
-	CHECK(recieved);
+	CHECK(received);
 }
 
 TEST_CASE("SignalFireArgsConstLValueRef") {
-	bool recieved = false;
+	bool received = false;
 	const int x = 2;
 	const std::string y = "Test string";
 	Signal<const int&, const std::string&> source;
-	source.output([&x, &y, &recieved](const int& a, const std::string & b) {
-		recieved = true;
+	source.output([&x, &y, &received](const int& a, const std::string & b) {
+		received = true;
 		CHECK(a == 2);
 				CHECK(b == std::string("Test string"));
 				CHECK(&a == &x);
 				CHECK(&b == &y);
 	});
 	source.fire(x, y);
-	CHECK(recieved);
+	CHECK(received);
 }
 
 TEST_CASE("SignalFireArgsRValueRef") {
-	bool recieved = false;
+	bool received = false;
 	int x = 2;
 	std::string y = "Test string";
 	Signal<int&&, std::string&&> source;
-	source.output([&x, &y, &recieved](int&& a, std::string && b) {
-		recieved = true;
+	source.output([&x, &y, &received](int&& a, std::string && b) {
+		received = true;
 		CHECK(a == 2);
 				CHECK(b == std::string("Test string"));
 				CHECK(&a == &x);
 				CHECK(b.data() == y.data());
 	});
 	source.fire(std::move(x), std::move(y));
-	CHECK(recieved);
+	CHECK(received);
 }
 
 // --- Return --------------------------------------------------------------------------------------
