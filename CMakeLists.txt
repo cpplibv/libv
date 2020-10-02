@@ -637,8 +637,10 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_thread INTERFACE
-	LINK   Threads::Threads
+	TARGET libv_thread STATIC
+	SOURCE src/libv/thread/*.cpp
+	LINK   libv_log Threads::Threads
+	LINK   libv_utility # For unique_function
 )
 
 wish_create_library(
@@ -691,7 +693,7 @@ wish_create_executable(
 		#OUTPUT_RESOURCE res
 		#RESOURCE app/gen_ui_theme/res
 		SOURCE app/gen_ui_theme/*.cpp
-		LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua
+		LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_thread
 #		LINK   libv_ctrl
 )
 
@@ -782,7 +784,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_log libv_ctrl libv_thread ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(

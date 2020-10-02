@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/executor_thread.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.thread, File: src/libv/thread/concurrent_queue.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

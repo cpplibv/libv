@@ -22,7 +22,7 @@ namespace libv {
 class ExecutorThread {
 	std::queue<std::function<void()>> queue;
 	std::mutex queue_m;
-	std::condition_variable recieved_cv;
+	std::condition_variable received_cv;
 
 	std::atomic_bool terminate = false;
 	std::thread thread;
@@ -32,8 +32,10 @@ public:
 	template <typename F, typename = decltype(std::declval<F>()())>
 	void executeAsync(F&& func) {
 		std::unique_lock lock(queue_m);
+		assert(!terminate && "Queueing task after worker thread was stopped");
+
 		queue.emplace(std::forward<F>(func));
-		recieved_cv.notify_all();
+		received_cv.notify_all();
 	}
 
 	template <typename F, typename = decltype(std::declval<F>()())>
@@ -49,7 +51,7 @@ public:
 	void stop() {
 		std::unique_lock lock(queue_m);
 		terminate = true;
-		recieved_cv.notify_all();
+		received_cv.notify_all();
 	}
 
 	void join() {
@@ -91,7 +93,7 @@ private:
 			{
 				std::unique_lock lock(queue_m);
 				while (queue.empty() && !terminate)
-					recieved_cv.wait(lock);
+					received_cv.wait(lock);
 			}
 			process();
 		}
