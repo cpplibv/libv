@@ -701,7 +701,7 @@ template <size_t N, typename T>
 }
 
 template <size_t N, typename T, typename K, typename L = std::common_type_t<T, K>>
-[[nodiscard]] constexpr inline bool approx(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs, L&& epsilon = L{0.00001}) noexcept {
+[[nodiscard]] constexpr inline bool approx_eq(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs, L&& epsilon = L{0.00001}) noexcept {
 	bool result = true;
 	libv::meta::for_constexpr<0, N>([&](const auto index) {
 		result = result && std::abs(lhs.data()[index] - rhs.data()[index]) < epsilon;
