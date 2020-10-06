@@ -10,54 +10,11 @@
 #include <thread>
 #include <vector>
 #include <atomic>
+// pro
+#include <gen_ui_theme/image.hpp>
 
-
-// -------------------------------------------------------------------------------------------------
-
-inline libv::LoggerModule log_app{libv::logger_stream, "gen_ui_theme"};
 
 namespace app {
-
-// -------------------------------------------------------------------------------------------------
-
-struct Image {
-private:
-	libv::vec2z size_;
-	std::vector<libv::vec4f> pixels;
-	std::vector<float> sdistance_field;
-
-public:
-	explicit Image(libv::vec2z size) :
-		size_(size) {
-		pixels.resize(size.x * size.y, libv::vec4f{0, 0, 0, 0});
-		sdistance_field.resize(size.x * size.y, 0.0f);
-	}
-
-public:
-	[[nodiscard]] inline libv::vec4f& color(size_t x, size_t y) noexcept {
-		return pixels[size_.x * y + x];
-	}
-
-	[[nodiscard]] inline const libv::vec4f& color(size_t x, size_t y) const noexcept {
-		return pixels[size_.x * y + x];
-	}
-
-	[[nodiscard]] inline float& sdistance(size_t x, size_t y) noexcept {
-		return sdistance_field[size_.x * y + x];
-	}
-
-	[[nodiscard]] inline const float& sdistance(size_t x, size_t y) const noexcept {
-		return sdistance_field[size_.x * y + x];
-	}
-
-	[[nodiscard]] inline const libv::vec2z& size() const noexcept {
-		return size_;
-	}
-
-//	std::vector<libv::vec4uc> finalize() {
-//
-//	}
-};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -157,7 +114,10 @@ public:
 
 private:
 	virtual void apply(Image& image, size_t x, size_t y) const noexcept override {
-		const auto l_pos = ((libv::vec2f{x, y} - pos) - size * 0.5f);
+		const auto fx = static_cast<float>(x);
+		const auto fy = static_cast<float>(y);
+
+		const auto l_pos = ((libv::vec2f{fx, fy} - pos) - size * 0.5f);
 		const auto l_size = size * 0.5f - corner_size;
 
 		// Source https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
@@ -184,7 +144,6 @@ public:
 private:
 	bool work(Image& image, Effect& effect) {
 		size_t y = next_row++;
-//		log_app.info("work {}", y);
 		if (y >= image.size().y)
 			return false;
 

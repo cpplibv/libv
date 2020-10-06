@@ -28,20 +28,20 @@ end
 -- -------------------------------------------------------------------------------------------------
 
 
-shape(EffectRoundedBox, vec2f(16, 16), vec2f(96, 96), 5.5, 16);
+--shape(EffectRoundedBox, vec2f(16, 16), vec2f(96, 96), 5.5, 16);
+--
+--define_flex_point(vec2f(16, 16), vec2f(96, 96))
 
-define_flex_point(vec2f(16, 16), vec2f(96, 96))
-
-
--- outer_shadow
-add_effect(effects, 3.5, 3, vec4f(0, 0, 0, 0.5))
--- inner edge
-add_effect(effects, -1.5, 3, vec4f(0.8, 0.8, 0.8, 0.8))
 
 -- outer_shadow
-add_effect(effects, 6.5, 3, vec4f(0.2, 0.2, 0.5, 0.5))
+add_glow(3.5, 3, vec4f(0, 0, 0, 0.5))
 -- inner edge
-add_effect(effects, -1.5, 1, vec4f(0.8, 0.8, 1, 0.8))
+add_glow(-1.5, 3, vec4f(0.8, 0.8, 0.8, 0.8))
+
+---- outer_shadow
+--add_effect(6.5, 3, vec4f(0.2, 0.2, 0.5, 0.5))
+---- inner edge
+--add_effect(-1.5, 1, vec4f(0.8, 0.8, 1, 0.8))
 
 -- -------------------------------------------------------------------------------------------------
 

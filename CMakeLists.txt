@@ -528,7 +528,9 @@ wish_end_group()
 wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
 
 wish_create_library(
-	TARGET libv_algorithm INTERFACE
+	TARGET libv_algorithm STATIC
+	SOURCE src/libv/algorithm/*.cpp
+	LINK   libv_math
 )
 
 wish_create_library(

@@ -1,0 +1,123 @@
+// Project: libv.ui, File: app/gen_ui_theme/theme.hpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+// libv
+#include <libv/algorithm/pack_rect_bin.hpp>
+#include <libv/algorithm/pack_linear_lines.hpp>
+#include <libv/container/vector_2d.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/meta/reflection_access.hpp>
+#include <libv/utility/concat.hpp>
+// std
+#include <vector>
+#include <string>
+#include <span>
+
+
+
+namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+struct AtlasEntry {
+	std::string name;
+	libv::vec2f texture_00;
+	libv::vec2f texture_11;
+
+	LIBV_REFLECTION_ACCESS(name);
+	LIBV_REFLECTION_ACCESS(texture_00);
+	LIBV_REFLECTION_ACCESS(texture_11);
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct Atlas {
+	std::vector<AtlasEntry> entries;
+	libv::vector_2D<libv::vec4uc> image;
+
+	LIBV_REFLECTION_ACCESS(entries);
+
+public:
+	explicit inline Atlas(libv::vec2z size) : image(size) {}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct Theme {
+	Atlas atlas;
+
+
+
+	LIBV_REFLECTION_ACCESS(Atlas);
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class AtlasBuilder {
+	struct Entry {
+		std::string name;
+		libv::vector_2D<libv::vec4uc> image;
+	};
+
+	std::vector<Entry> entries;
+
+private:
+	template <typename SRC, typename DST>
+	static inline void copy_2D(const SRC& src, libv::vec2z src_pos, DST& dst, libv::vec2z dst_pos, libv::vec2z size) noexcept {
+		for (size_t y = 0; y < size.y; ++y)
+			for (size_t x = 0; x < size.x; ++x)
+				dst(dst_pos.x + x, dst_pos.y + y) = src(src_pos.x + x, src_pos.y + y);
+	}
+
+	template <typename SRC, typename DST>
+	static inline void copy_2D_to(const SRC& src, DST& dst, libv::vec2z dst_pos) noexcept {
+		const auto size = src.size();
+		for (size_t y = 0; y < size.y; ++y)
+			for (size_t x = 0; x < size.x; ++x)
+				dst(dst_pos.x + x, dst_pos.y + y) = src(x, y);
+	}
+
+public:
+	void add(std::string name, libv::vector_2D<libv::vec4uc> image) {
+		entries.emplace_back(name, image);
+	}
+
+	Atlas build_atlas(libv::vec2i size) {
+		std::vector<libv::vec2i> sizes(entries.size());
+
+		for (size_t i = 0; i < entries.size(); ++i)
+			sizes[i] = entries[i].image.size().cast<int32_t>();
+
+//		libv::pack_rect_bin pack(size);
+//      TODO P1: switch to rect_bin atlas packer
+
+		const auto pack_result = app::pack_linear_lines(size, sizes);
+
+		if (pack_result.size() != entries.size())
+			throw std::out_of_range(libv::concat("Theme does not fit into the atlas image of size (", size.x, ", ", size.y, ")"));
+
+		const auto sizef = size.cast<float>();
+		auto atlas = Atlas(size.cast<size_t>());
+
+		for (const auto& pack_item : pack_result) {
+			const auto& name = entries[pack_item.id].name;
+			const auto& image = entries[pack_item.id].image;
+
+			const auto pack_position = pack_item.position;
+			const auto pack_size = pack_item.size;
+
+			const auto texture_00 = pack_position.cast<float>() / sizef;
+			const auto texture_11 = (pack_position + pack_size).cast<float>() / sizef;
+
+			copy_2D_to(image, atlas.image, pack_position.cast<size_t>());
+			atlas.entries.emplace_back(name, texture_00, texture_11);
+		}
+
+		return atlas;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace app

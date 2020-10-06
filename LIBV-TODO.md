@@ -552,6 +552,8 @@ libv.ui: Implement CanvasAdaptor component
 app.gen_ui_theme: move blend/effect implementations to C++
 app.gen_ui_theme: enable multithreading
 app.gen_ui_theme: split canvas/engine/effect related codes
+libv.thread: work_cooldown add delay too not just cooldown
+app.gen_ui_theme: move effect definition list to lua
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -559,19 +561,16 @@ app.gen_ui_theme: split canvas/engine/effect related codes
 
 
 
-app.gen_ui_theme: move effect definition list to lua
-
-app.gen_ui_theme: clean up C++ blend/effect implementations
-
-app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 app.gen_ui_theme: create theme exporter: json and texture
-
 app.gen_ui_theme: connect the theme gen with a running app to live update
 
+app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
+app.gen_ui_theme: clean up C++ blend/effect implementations
 
 
 
-libv.ui: set_clear_color (?)
+
+libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
@@ -629,7 +628,7 @@ place.it:
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
 	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
-
+	project: Free project related tools (LDjam) https://docs.google.com/spreadsheets/d/1tfkBo2IWLHXkZDbIEFUyCWvLkumHYDWCxGHzb-Rmc-0/edit#gid=0
 
 
 

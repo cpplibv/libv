@@ -18,8 +18,6 @@
 #include <libv/ui/property/texture_2D.hpp>
 
 
-// -------------------------------------------------------------------------------------------------
-
 namespace libv {
 namespace ui {
 

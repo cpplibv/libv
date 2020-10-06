@@ -9,7 +9,6 @@
 #include <libv/algorithm/erase_unstable.hpp>
 #include <libv/algorithm/sort.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/enum.hpp>
 // std
 #include <unordered_map>
@@ -250,7 +249,7 @@ void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, li
 	auto it = self->container.find(&component);
 
 	if (it == nullptr)
-		return log_ui.warn("Attempted to update a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to update a not subscribed component: {} {}", static_cast<void*>(&component), component.path());
 
 	it->cornerBL = xy(abs_position);
 	it->cornerTR = xy(abs_position) + xy(size) - 1.f;
@@ -262,7 +261,7 @@ void ContextMouse::update_region(CoreComponent& component, libv::vec2f remap_off
 	auto it = self->container.find(&component);
 
 	if (it == nullptr)
-		return log_ui.warn("Attempted to update a not subscribed region: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to update a not subscribed region: {} {}", static_cast<void*>(&component), component.path());
 
 	it->region_offset = remap_offset;
 }
@@ -271,7 +270,7 @@ void ContextMouse::unsubscribe(CoreComponent& component) {
 	auto success = self->container.remove(&component);
 
 	if (!success)
-		return log_ui.warn("Attempted to unsubscribing a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to unsubscribing a not subscribed component: {} {}", static_cast<void*>(&component), component.path());
 
 	release(component);
 }
@@ -280,7 +279,7 @@ void ContextMouse::unsubscribe_region(CoreComponent& component) {
 	auto success = self->container.remove(&component);
 
 	if (!success)
-		return log_ui.warn("Attempted to unsubscribing a not subscribed region: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to unsubscribing a not subscribed region: {} {}", static_cast<void*>(&component), component.path());
 
 	release(component);
 }
@@ -291,7 +290,7 @@ void ContextMouse::acquire(CoreComponent& component) {
 	auto* node = self->container.find(&component);
 
 	if (node == nullptr)
-		return log_ui.warn("Attempted to acquire a not subscribed component: 0x{:016x} {}", libv::bit_cast<size_t>(&component), component.path());
+		return log_ui.warn("Attempted to acquire a not subscribed component: {} {}", static_cast<void*>(&component), component.path());
 
 	self->acquired.emplace_back(node);
 }
