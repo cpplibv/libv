@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/worker_thread.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.thread, File: src/libv/thread/work_cooldown.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

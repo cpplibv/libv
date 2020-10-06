@@ -95,6 +95,42 @@ public:
 	}
 };
 
+template <typename I, typename F>
+void parallel_for(thread_bulk& worker, I start, const I end, F&& func) {
+	std::atomic<I> it = start;
+
+	worker.execute_and_wait([&] {
+		if (++it < end) {
+			func(*it);
+			return true;
+		}
+		return false;
+	});
+}
+
+template <typename I, typename S, typename F>
+void parallel_for(thread_bulk& worker, I iterator, const S& sentinel, F&& func) {
+	std::mutex mutex;
+
+	worker.execute_and_wait([&] {
+		std::unique_lock lock(mutex);
+		I it = ++iterator;
+		lock.unlock();
+
+		if (it != sentinel) {
+			func(*it);
+			return true;
+		}
+
+		return false;
+	});
+}
+
+template <typename Range, typename F>
+void parallel_for(thread_bulk& worker, Range& range, F&& func) {
+	parallel_for(worker, std::begin(range), std::end(range), func);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace mt
