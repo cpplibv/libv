@@ -20,6 +20,155 @@
 // TODO P5: Tables should handle members without a keys for constants and generators
 // TODO P5: Ability to name pattern and better name concatenation, maybe stream
 
+
+// IDEA: Alternative imperative design idea #1: ---
+//
+//static inline libv::vec4f verify_color(sol::object object) {
+//	bool success = false;
+//	libv::vec4f result;
+//
+//	const auto type = object.get_type();
+//
+//	if (type == sol::type::string) {
+//		auto r = libv::parse::parse_color_optional(object.as<std::string_view>());
+//		if (!r)
+//			error();
+//		result = *r;
+//
+//		success = success || r;
+//	}
+//
+//	if (type == sol::type::table) {
+//		const auto table = sol::table(object);
+//
+//		success = success ||
+//				try_number(result.x, table["x"]) &&
+//						try_number(result.y, table["y"]) &&
+//						try_number(result.z, table["z"]) &&
+//						try_number(result.w, table["w"]);
+//
+//		success = success ||
+//				try_number(result.x, table["r"]) &&
+//						try_number(result.y, table["g"]) &&
+//						try_number(result.z, table["b"]) &&
+//						try_number(result.w, table["a"]);
+//
+//		success = success ||
+//				try_number(result.x, table[0]) &&
+//						try_number(result.y, table[1]) &&
+//						try_number(result.z, table[2]) &&
+//						try_number(result.w, table[3]);
+//	}
+//}
+//
+//
+//
+// IDEA: Alternative imperative design idea #2: ---
+//
+//template <typename Magic>
+//static inline auto verify_color(sol::object object, Magic& magic) {
+//	auto result = magic.result<libv::vec4f>();
+//
+//	magic.candidate_string_parse("Color string", &libv::parse::parse_color_optional);
+//
+//	magic.candidate_usertype<libv::vec4f>("vec4f");
+//
+//	magic.candidate_usertype<libv::vec3f>("vec3f", [](const auto& c, auto& r) {
+//		r.x = c.x;
+//		r.y = c.y;
+//		r.z = c.z;
+//		r.w = 1.0f;
+//      magic.reject("reason");
+//	});
+//
+//	magic.candidate_table("XYZ Table", [](auto c, auto& r) {
+//		c["x"].number(r.x);
+//		c["y"].number(r.y);
+//		c["z"].number(r.z);
+//		c["w"].number_or(r.w, 1.0f);
+//		c.no_unused();
+//	});
+//
+//	magic.candidate_table("RGB Table", [](auto c, auto& r) {
+//		c["r"].number(r.x);
+//		c["g"].number(r.y);
+//		c["b"].number(r.z);
+//		c["a"].number_or(r.w, 1.0f);
+//		c.no_unused();
+//	});
+//
+//	magic.candidate_table("Array Table", [](auto c, auto& r) {
+//		c[0].number(r.x);
+//		c[1].number(r.y);
+//		c[2].number(r.z);
+//		c[3].number_or(r.w, 1.0f);
+//		c.no_unused();
+//	});
+//
+//  magic.ensure([](auto c, const auto& r) {
+//      if (isnan(r.x) || isnan(r.y) || isnan(r.z) || isnan(r.w))
+//          c.reject("Color values cannot be NaN");
+//  });
+//
+//	return magic.end(verify_color, result);
+//}
+
+
+// IDEA: Reporter output idea #1: ---
+//
+// Lua object does not match [TYPE]
+// Candidate [string] rejected: [reason]
+// Candidate [userdata] rejected: [reason]
+// Candidate table [table name] rejected: [reason]
+//		[member0 name]:[member0 type]
+//		[member1 name]:[member1 type]
+//		[member2 name]:[member2 type]
+//		[member3 name]:[member3 type]
+//		[no unused]
+// Candidate table [table name] rejected: [reason]
+//		[member0 name]:[member0 type]
+//		[member1 name]:[optional][member1 type]
+// Candidate table [table name] rejected: [reason]
+//		[member0 name]:[member0 type]
+//		[member1 name]:[member1 type]
+//		[member2 name]:[member2 type]
+//		[member3 name]:[optional][member3 type]
+//		[unused][member4 name]:[member4 type]
+//
+//
+//
+// IDEA: Reporter output idea #2: ---
+//
+//Lua object is not a valid "Color"
+//	Candidate [Parsed String]
+//		Rejected: String is not a valid color format
+//	Candidate [Filtered String]
+//		Rejected: Maximum string length is 15
+//	Candidate [Userdata]
+//		Rejected: Type mismatch, Lua object is a [String]
+//	Candidate [RGB Table]
+//		Rejected:
+//		!   r:[Number] - Missing member
+//		!   g:[Number] - Missing member
+//		!   b:[Number] - Missing member
+//			a:[Optional Number] - Fallback to 1.0
+//	Candidate [XYZ Table]
+//		Rejected:
+//		!   x:[Number] - Type mismatch, Lua object is a [String]
+//		!   y:[Number] - Type mismatch, Lua object is a [String]
+//		!   z:[Number] - Missing member
+//			w:[Optional Number]=0.2
+//	Candidate [Array Table]
+//		Rejected:
+//			1:[Number]=1
+//			2:[Number]=1
+//			3:[Number]=1
+//			4:[Optional Number]=1
+//		!   5:[Unused]=1 - Unused member
+
+
+
+
 namespace libv {
 namespace lua {
 namespace detail {
@@ -40,10 +189,12 @@ inline auto primitive_eval(const sol::object& var, Reporter&& reporter) {
 				return std::optional<CppT>(std::in_place);
 			else
 				if constexpr (CheckIsType)
-					if (var.is<LuaT>())
-						return std::optional<CppT>(std::in_place, var.as<LuaT>());
-					else
+					if (var.is<CppT>()) {
+						return std::optional<CppT>(std::in_place, var.as<CppT>());
+					} else {
+//						reporter.user_type_mismatch(LuaTypeName, LuaTypeEnum, var.get_type());
 						return std::optional<CppT>(std::nullopt);
+					}
 				else
 					return std::optional<CppT>(std::in_place, var.as<LuaT>());
 		}
@@ -78,7 +229,7 @@ constexpr inline char LuaTypeNameFunction     [] = "Function";
 constexpr inline char LuaTypeNameTable        [] = "Table";
 constexpr inline char LuaTypeNameThread       [] = "Thread";
 constexpr inline char LuaTypeNameUserdata     [] = "Userdata";
-constexpr inline char LuaTypeNameLightuserdata[] = "Lightuserdata";
+constexpr inline char LuaTypeNameLightUserdata[] = "LightUserdata";
 
 template <typename CppT = sol::nil_t>
 struct Nil : PrimitiveType<CppT, sol::nil_t, LuaTypeNameNil, sol::type::nil, false> {};
@@ -102,7 +253,7 @@ template <typename CppT>
 struct Userdata : PrimitiveType<CppT, CppT, LuaTypeNameUserdata, sol::type::userdata, true> {};
 
 template <typename CppT>
-struct Lightuserdata : PrimitiveType<CppT, CppT, LuaTypeNameLightuserdata, sol::type::lightuserdata, true> {};
+struct LightUserdata : PrimitiveType<CppT, CppT, LuaTypeNameLightUserdata, sol::type::lightuserdata, true> {};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -144,10 +295,14 @@ struct Table {
 						return EvalType(CppType{member_results.value()...});
 					} else {
 						// TODO P5: report missing / failed members
+//						reporter.missing_member(...);
+//						reporter.member_matcher_failed?(...);
+//						reporter.rejected(...);
 						return EvalType(std::nullopt);
 					}
 				}(m.matcher.eval(table->template get<sol::object>(m.key), reporter)...);
 			}, members);
+//			reporter.unused_member(...);
 		}
 	}
 };
@@ -388,8 +543,19 @@ constexpr inline auto userdata() noexcept {
 
 template <typename CppT>
 constexpr inline auto lightuserdata() noexcept {
-	return detail::Lightuserdata<CppT>();
+	return detail::LightUserdata<CppT>();
 }
+
+// --- Aliases -------------------------------------------------------------------------------------
+
+constexpr inline auto float_ = detail::Number<float>();
+constexpr inline auto double_ = detail::Number<float>();
+constexpr inline auto int32_ = detail::Number<int32_t>();
+constexpr inline auto uint32_ = detail::Number<uint32_t>();
+constexpr inline auto int64_ = detail::Number<int64_t>();
+constexpr inline auto uint64_ = detail::Number<uint64_t>();
+
+constexpr inline auto string_view = detail::String<std::string_view>();
 
 // --- Table ---------------------------------------------------------------------------------------
 
@@ -503,6 +669,26 @@ struct ReportNoop {
 	}
 	inline auto reason() const {
 		return "";
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct ReportString {
+	std::ostringstream ss;
+
+	inline void lua_type_mismatch(const std::string_view name, const sol::type found, const sol::type expected) noexcept {
+//		ss << name << found << expected;
+		(void) found;
+		(void) expected;
+
+		ss << name;
+	}
+	inline void string_parse_failed(const std::string_view name, const std::string_view value) noexcept {
+		ss << name << value;
+	}
+	inline auto reason() const {
+		return ss.str();
 	}
 };
 

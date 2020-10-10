@@ -57,7 +57,7 @@ namespace ui {
 //
 //	size_t last = 0;
 //	for (size_t i = 0; i < outline.size(); ++i) {
-//		if (is_curviture_negative)
+//		if (is_curvature_negative)
 //			continue;
 //
 //		if (other_vertex_inside_the_triangle)
@@ -120,7 +120,13 @@ struct Keyboard {
 //	std::vector<Button> buttons;
 	libv::glr::Mesh& mesh;
 
-
+	// TODO P5: implement the 4 physical layout of the keyboard
+	enum class physical_layout {
+		layout_a, /// Long backspace, Single lined enter
+		layout_b, /// Long backspace, Top bitten two lined enter
+		layout_c, /// Short backspace, Bottom bitten two lined enter
+		merged, /// TODO P5: Whatever is currently implemented
+	};
 
 	void foo() {
 		auto pos = mesh.attribute(attribute_position);

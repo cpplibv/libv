@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DialyzerSettings">
+    <option name="currentPltPath" value="D:/utility/erl-23.1/bin" />
+  </component>
+  <component name="EmacsSettings">
+    <option name="emacsPath" value="D:/utility/erl-23.1/bin" />
+  </component>
+</project>

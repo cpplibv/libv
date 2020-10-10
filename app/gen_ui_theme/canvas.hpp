@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/container/vector_2d.hpp>
 #include <libv/gl/enum.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/mesh.hpp>
@@ -99,11 +100,11 @@ class Canvas : public libv::ui::Canvas {
 	libv::glr::Uniform_texture sphere_uniform_texture0;
 	libv::glr::Uniform_texture sphere_uniform_texture1;
 	libv::glr::Texture2D::R8_G8_B8_A8 sphere_texture0;
+	bool initialized = false;
 
 private:
 	std::mutex mutex;
-	libv::vec2i texture_size = {128, 128};
-	std::vector<libv::vec4uc> texture_data;
+	std::optional<libv::vector_2D<libv::vec4uc>> texture_data;
 	bool dirty = false;
 
 private:
@@ -119,16 +120,14 @@ public:
 		sphere_program.fragment(shader_texture_fs);
 		sphere_program.block_binding(uniformBlock_sphere);
 		sphere_program.assign(sphere_uniform_texture0, "texture0Sampler", textureChannel_diffuse);
-
-		sphere_texture0.storage(1, texture_size);
-		sphere_texture0.set(libv::gl::MagFilter::Nearest);
 	}
 
 public:
-	void update_texture(std::vector<libv::vec4uc> texture_data_, libv::vec2i texture_size_) {
+	void update_texture(libv::vector_2D<libv::vec4uc> texture_data_, libv::vec2i texture_size_) {
 		const auto guard = std::scoped_lock(mutex);
 		texture_data = std::move(texture_data_);
-		texture_size = texture_size_;
+//		texture_size = texture_size_;
+		(void) texture_size_;
 		dirty = true;
 	}
 
@@ -140,7 +139,15 @@ private:
 		if (!dirty)
 			return;
 
-		sphere_texture0.image(0, {0, 0}, texture_size, texture_data.data());
+		initialized = true;
+
+		// Hard reset texture;
+		const auto texture_size = texture_data->size().cast<int32_t>();
+
+		sphere_texture0 = libv::glr::Texture2D::R8_G8_B8_A8{};
+		sphere_texture0.storage(1, texture_size);
+		sphere_texture0.set(libv::gl::MagFilter::Nearest);
+		sphere_texture0.image(0, {0, 0}, texture_size, texture_data->data());
 
 		{
 			sphere_mesh.clear();
@@ -171,6 +178,9 @@ private:
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
+		if (!initialized)
+			return;
+
 		const auto guard_s = gl.state.push_guard();
 		const auto guard_m = gl.model.push_guard();
 		const auto guard_v = gl.view.push_guard();

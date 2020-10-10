@@ -52,53 +52,43 @@ template <typename T>
 	return blend(color * libv::vec4f(1, 1, 1, shape), output);
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-struct Effect {
-//	const bool allow_multithread = false;
-	const bool allow_multithread = true;
-
-	virtual void apply(Image& image, size_t x, size_t y) const noexcept = 0;
-	virtual ~Effect() = default;
+struct EffectEngineContext {
+	libv::mt::thread_bulk& threads;
+	Image& image;
 };
 
-struct EffectGlow : Effect {
-	float size;    /// px
-	float falloff; /// distance exponent
-	bool inward;
-	libv::vec4f color;
+// -------------------------------------------------------------------------------------------------
 
+struct BasePixelEffect {
+	virtual void execute(EffectEngineContext& context) = 0;
+	virtual ~BasePixelEffect() = default;
+};
+
+template <typename CRTP>
+struct PixelEffect : BasePixelEffect {
 public:
-	explicit inline EffectGlow(float size, float falloff, libv::vec4f color) noexcept :
-		size(std::abs(size)),
-		falloff(falloff),
-		inward(size < 0.0f),
-		color(color) {}
+	virtual void execute(EffectEngineContext& context) override {
+		std::atomic_size_t next_row = 0;
+		const auto num_row = context.image.size().y;
 
-private:
-	virtual void apply(Image& image, size_t x, size_t y) const noexcept override {
-		const auto signed_dist = image.sdistance(x, y);
-		auto& output = image.color(x, y);
+		context.threads.execute_and_wait([&] {
+			size_t y = next_row++;
+			if (y >= num_row)
+				return false;
 
-		const auto box = mix(0.f, 1.f, -signed_dist);
-		const auto mask = saturate(box);
+			for (size_t x = 0; x < context.image.size().x; ++x)
+				static_cast<CRTP&>(*this).apply(context.image, x, y);
 
-		float shape;
-		
-		if (inward) {
-			shape = (signed_dist + 1 + size) / size;
-			shape = saturate(saturate(shape) - (1 - mask));
-		} else {
-			shape = (-signed_dist + size) / size;
-			shape = saturate(saturate(shape) - mask);
-		}
-
-		shape = std::pow(shape, falloff);
-		output = add_layer(output, color, shape);
+			return true;
+		});
 	}
 };
 
-struct EffectRoundedBox : Effect {
+// -------------------------------------------------------------------------------------------------
+
+struct EffectRoundedBox : PixelEffect<EffectRoundedBox> {
 	libv::vec2f pos;
 	libv::vec2f size;
 
@@ -106,14 +96,14 @@ struct EffectRoundedBox : Effect {
 	float corner_sharpness;
 
 public:
-	EffectRoundedBox(libv::vec2f pos, libv::vec2f size, float cornerSize, float cornerSharpness) :
-		pos(pos),
-		size(size),
-		corner_size(cornerSize),
-		corner_sharpness(cornerSharpness) {}
+	EffectRoundedBox(libv::vec2f pos, libv::vec2f size, float corner_size, float corner_sharpness) :
+			pos(pos),
+			size(size),
+			corner_size(corner_size),
+			corner_sharpness(corner_sharpness) {}
 
-private:
-	virtual void apply(Image& image, size_t x, size_t y) const noexcept override {
+public:
+	inline void apply(Image& image, size_t x, size_t y) const noexcept {
 		const auto fx = static_cast<float>(x);
 		const auto fy = static_cast<float>(y);
 
@@ -132,37 +122,55 @@ private:
 	}
 };
 
+struct EffectGlow : PixelEffect<EffectGlow> {
+	float size;    /// px
+	float falloff; /// distance exponent
+	bool inward;
+	libv::vec4f color;
+
+public:
+	explicit inline EffectGlow(float size, float falloff, libv::vec4f color) noexcept :
+			size(std::abs(size)),
+			falloff(falloff),
+			inward(size < 0.0f),
+			color(color) {}
+
+public:
+	inline void apply(Image& image, size_t x, size_t y) const noexcept {
+		const auto signed_dist = image.sdistance(x, y);
+		auto& output = image.color(x, y);
+
+		const auto box = mix(0.f, 1.f, -signed_dist);
+		const auto mask = saturate(box);
+
+		float shape;
+
+		if (inward) {
+			shape = (signed_dist + 1 + size) / size;
+			shape = saturate(saturate(shape) - (1 - mask));
+		} else {
+			shape = (-signed_dist + size) / size;
+			shape = saturate(saturate(shape) - mask);
+		}
+
+		shape = std::pow(shape, falloff);
+		output = add_layer(output, color, shape);
+	}
+};
+
 // -------------------------------------------------------------------------------------------------
 
 class EffectApplyEngine {
 	libv::mt::thread_bulk threads;
-	std::atomic_size_t next_row = 0;
 
 public:
 	explicit EffectApplyEngine(size_t n) : threads(n) {}
 
-private:
-	bool work(Image& image, Effect& effect) {
-		size_t y = next_row++;
-		if (y >= image.size().y)
-			return false;
-
-		for (size_t x = 0; x < image.size().x; ++x) {
-			effect.apply(image, x, y);
-		}
-
-		return true;
-	}
-
 public:
-	void process(Image& image, const std::vector<std::unique_ptr<Effect>>& effects) {
-		for (const auto& effect : effects) {
-			next_row = 0;
-			if (effect->allow_multithread)
-				threads.execute_and_wait([this, &image, &effect] { return work(image, *effect); });
-			else
-				while (work(image, *effect));
-		}
+	void process(Image& image, const std::vector<std::unique_ptr<BasePixelEffect>>& effects) {
+		EffectEngineContext context(threads, image);
+		for (const auto& effect : effects)
+			effect->execute(context);
 	}
 };
 

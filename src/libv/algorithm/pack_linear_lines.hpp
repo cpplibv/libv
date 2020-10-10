@@ -12,6 +12,7 @@
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
+// TODO P4: Refactor API to match rect_bin's pattern
 
 struct PackElementOutput {
 	int32_t id;
@@ -19,7 +20,7 @@ struct PackElementOutput {
 	libv::vec2i size;
 };
 
-std::vector<PackElementOutput> pack_linear_lines(libv::vec2i texture_size, std::span<libv::vec2i> elements) {
+inline std::vector<PackElementOutput> pack_linear_lines(libv::vec2i texture_size, std::span<libv::vec2i> elements) {
 	std::vector<PackElementOutput> result;
 
 	libv::vec2i pen = {0, 0};

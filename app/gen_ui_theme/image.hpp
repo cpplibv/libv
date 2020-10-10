@@ -51,12 +51,12 @@ public:
 	}
 
 public:
-	std::vector<libv::vec4uc> generate_8bit_channels() {
-		std::vector<libv::vec4uc> result{size().x * size().y, libv::vec4uc{}};
+	[[nodiscard]] libv::vector_2D<libv::vec4uc> generate_8bit_channels() const {
+		libv::vector_2D<libv::vec4uc> result{size(), libv::vec4uc{}};
 
 		for (size_t y = 0; y < size().y; ++y) {
 			for (size_t x = 0; x < size().x; ++x) {
-				result[size().x * y + x] = (libv::vec::clamp(color(x, y), 0.0f, 1.0f) * 255.f).cast<uint8_t>();
+				result(x, y) = (libv::vec::clamp(color(x, y), 0.0f, 1.0f) * 255.f).cast<uint8_t>();
 			}
 		}
 

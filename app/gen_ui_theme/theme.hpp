@@ -13,7 +13,10 @@
 #include <vector>
 #include <string>
 #include <span>
+#include <map>
 
+#include <libv/ui/property.hpp>
+#include <libv/ui/style.hpp>
 
 
 namespace app {
@@ -36,7 +39,7 @@ struct Atlas {
 	std::vector<AtlasEntry> entries;
 	libv::vector_2D<libv::vec4uc> image;
 
-	LIBV_REFLECTION_ACCESS(entries);
+//	LIBV_REFLECTION_ACCESS(entries);
 
 public:
 	explicit inline Atlas(libv::vec2z size) : image(size) {}
@@ -45,12 +48,40 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct Theme {
+	struct Property {
+		std::string name;
+		libv::ui::PropertyDynamic value;
+	};
+
 	Atlas atlas;
+	std::map<std::string, std::vector<Property>> properties;
 
-
-
-	LIBV_REFLECTION_ACCESS(Atlas);
+//	LIBV_REFLECTION_ACCESS(atlas);
 };
+
+// -------------------------------------------------------------------------------------------------
+
+//struct StyleCenter {
+//	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+//
+//	libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
+//		// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
+//		const auto it = self->styles.find(std::string(style_name));
+//		if (it != self->styles.end())
+//			return it->second;
+//
+//		const auto result = self->styles.emplace(style_name, libv::make_intrusive<Style>(std::string(style_name))).first->second;
+//		const auto lastDot = style_name.rfind('.');
+//
+//		if (lastDot != style_name.npos)
+//			// Auto inherit based on dot naming hierarchy
+//			result->inherit(style(style_name.substr(0, lastDot)));
+//
+//		log_ui.trace("Created style {}", style_name);
+//
+//		return result;
+//	}
+//};
 
 // -------------------------------------------------------------------------------------------------
 

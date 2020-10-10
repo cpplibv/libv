@@ -554,11 +554,24 @@ app.gen_ui_theme: enable multithreading
 app.gen_ui_theme: split canvas/engine/effect related codes
 libv.thread: work_cooldown add delay too not just cooldown
 app.gen_ui_theme: move effect definition list to lua
+app.gen_ui_theme: implement multiple generation tasks support
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+
+So the way theme generation will work:
+	- lua script containing the styles incl properties and the recepies for the atlases
+	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
+	- from c++ ui run the generated lua script to acquire the theme
+	- | NOPE
+
+
+https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
+https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
+https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#typeeffect
 
 
 app.gen_ui_theme: create theme exporter: json and texture
@@ -568,6 +581,9 @@ app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 app.gen_ui_theme: clean up C++ blend/effect implementations
 
 
+
+libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
+libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
 
 
 libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear

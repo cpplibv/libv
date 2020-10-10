@@ -26,7 +26,6 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-
 class Style {
 private:
 	int32_t ref_count = 0;
@@ -61,6 +60,7 @@ private:
 public:
 	// TODO P5: detect cyclic dependency attempts and swap to use an error handling version of inherit (remove old)
 	//	void inherit_or_throw(const libv::intrusive_ref<Style>& parent);
+	//	bool try_inherit(const libv::intrusive_ref<Style>& parent);
 	//	bool inherit_optional(const libv::intrusive_ref<Style>& parent);
 	void inherit(const libv::intrusive_ref<Style>& parent);
 

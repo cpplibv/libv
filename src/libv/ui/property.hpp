@@ -73,8 +73,6 @@ using PropertyDynamic = std::variant<
 
 namespace pnm { // ---------------------------------------------------------------------------------
 
-// NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
-
 static constexpr std::string_view align_horizontal = "align";
 static constexpr std::string_view align_vertical = "align_vertical";
 static constexpr std::string_view anchor = "anchor";
@@ -114,8 +112,6 @@ static constexpr std::string_view value_step = "value_step";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------
-
-// NOTE: It is not necessary to store the fixed_strings in type and in here, it is merely a forethought and typo protection
 
 static constexpr std::string_view appearance = "appearance";
 static constexpr std::string_view behaviour = "behaviour";

@@ -63,7 +63,7 @@ private:
 public:
 	GenUIThemeFrame() :
 		Frame("Gen UI Theme", 128+1024+30, 1024+20),
-		lua_engine("app/gen_ui_theme/theme_slate.lua", [this](auto... v) { canvas.update_texture(v...); }) {
+		lua_engine("app/gen_ui_theme/theme_slate.lua", [this](auto&&... v) { canvas.update_texture(std::forward<decltype(v)>(v)...); }) {
 
 		setPosition(FramePosition::center_current_monitor);
 		setOpenGLProfile(OpenGLProfile::core);
