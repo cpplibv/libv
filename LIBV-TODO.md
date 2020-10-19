@@ -555,11 +555,48 @@ app.gen_ui_theme: split canvas/engine/effect related codes
 libv.thread: work_cooldown add delay too not just cooldown
 app.gen_ui_theme: move effect definition list to lua
 app.gen_ui_theme: implement multiple generation tasks support
+libv.ui: Implement thread switch support for UI modifying tasks
+app.fsw: New file system watcher app (lifted from iris)
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+
+
+
+
+
+app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
+	- too many thread spawns, fsw -> worker.load -> worker.run (-> work) -> worker.broadcast -> ui
+	- proper SOW update, and not just current state broadcast, currently this can lead to a data race on init
+
+libv.ui: multithreading cooldown for a single frame iteration. Aka: once_per_n_frame instead of 100ms
+
+new enum gen
+	- simple enum class, with a SINGLE function that explodes it into a struct
+	- find a nice operator | Yeah... it will be an ADL function
+	- its also a weak possibility to use a CTAD Enum class
+
+To fix property init
+		| scroll bar should not calculate any fucking layout in non layout
+		| it does it so it can process mouse event
+	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
+	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
+
+
+
+
+glow falloff is incorrect on corners, find a better solution
+	idea: it is 0-1 1-0: in the first range falloff should be a noop bc those values can be considered 1 AA
+	libv.ui: Overlay zoom mouse hovered pixel color display
+	| size = 0, falloff = 1 highlight perfectly the affected pixels
+
+in hover reset fucks up the manual vars like bg / bar color
+	libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
+
+scroll bar change prompts layout, why? should it?
 
 
 So the way theme generation will work:

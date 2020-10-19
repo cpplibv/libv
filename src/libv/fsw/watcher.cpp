@@ -30,16 +30,16 @@ std::ostream& operator<<(std::ostream& os, const Action& action) {
 
 std::ostream& operator<<(std::ostream& os, const Event& event) {
 	if (event.action == Action::create)
-		return os << "Create " << libv::generic_path(event.path);
+		return os << "Created " << libv::generic_path(event.path);
 
 	if (event.action == Action::remove)
-		return os << "Remove " << libv::generic_path(event.path);
+		return os << "Removed " << libv::generic_path(event.path);
 
 	if (event.action == Action::modify)
-		return os << "Modify " << libv::generic_path(event.path);
+		return os << "Modified " << libv::generic_path(event.path);
 
 	if (event.action == Action::rename)
-		return os << "Rename " << libv::generic_path(event.path) << " was " << libv::generic_path(event.old_path);
+		return os << "Moved " << libv::generic_path(event.path) << " from " << libv::generic_path(event.old_path);
 
 	return os << "Unknown event";
 }

@@ -335,7 +335,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG 6.0.0
+	GIT_TAG f468b203add3b04fb8fac473ec7a04ed64c429c1
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
@@ -675,6 +675,13 @@ wish_create_executable(
 	TARGET app_binary_to_source
 	SOURCE app/binary_to_source.cpp
 	LINK   ext_fmt libv_utility
+)
+
+wish_create_executable(
+	TARGET fsw
+	SOURCE app/fsw.cpp
+	LINK   ext_fmt libv_utility libv_fsw libv_thread
+#	LINK   libv_arg
 )
 
 wish_create_executable(

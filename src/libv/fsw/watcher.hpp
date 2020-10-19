@@ -30,8 +30,12 @@ public:
 	~FileWatcher();
 
 public:
-	token_type subscribe_file(std::filesystem::path path, callback_type callback);
+	// TODO P5: libv.fsw: If the watched directory removed (then recreated) the watching stops
 	token_type subscribe_directory(std::filesystem::path path, callback_type callback);
+	token_type subscribe_file(std::filesystem::path path, callback_type callback);
+
+	// TODO P5: libv.fsw: Add a type (file or directory) independent way of subscribe to a (potentially not existing) file system entity
+//	void subscribe(std::filesystem::path path, callback_type callback);
 
 //	void unsubscribe(std::filesystem::path path);
 	void unsubscribe(token_type token);
