@@ -50,6 +50,7 @@ class ImplUI {
 
 		libv::Histogram<100> attach1{t_min, t_max};
 		libv::Histogram<100> event{t_min, t_max};
+		libv::Histogram<100> loopTask{t_min, t_max};
 		libv::Histogram<100> attach2{t_min, t_max};
 		libv::Histogram<100> styleScan{t_min, t_max};
 		libv::Histogram<100> style{t_min, t_max};
@@ -62,6 +63,7 @@ class ImplUI {
 		friend std::ostream& operator<<(std::ostream& os, const Stat& var) {
 			os << "attach1:   " << var.attach1;
 			os << "\nevent:     " << var.event;
+			os << "\nloopTask:  " << var.loopTask;
 			os << "\nattach2:   " << var.attach2;
 			os << "\nstyleScan: " << var.styleScan;
 			os << "\nstyle:     " << var.style;
@@ -93,14 +95,19 @@ public:
 	ContextUI context;
 	ContextRender context_render;
 	bool context_render_created = false;
+
 	Root root;
 
+	std::vector<std::function<void()>> loop_tasks;
+	std::mutex loop_tasks_m;
+
+	std::vector<EventVariant> event_queue;
+	std::mutex event_queue_m;
+
+public:
 	Stat stat;
 	libv::Timer timer;
 	libv::Timer timerFrame;
-
-	std::vector<EventVariant> event_queue;
-	std::mutex mutex;
 
 public:
 	OverlayZoomMode overlayZoomMode = OverlayZoomMode::disabled;
@@ -278,24 +285,65 @@ public:
 			}
 
 			// --- Event ---
-			try {
-				context.mouse.event_update();
-				// NOTE: Internal "mouse" events don't require event queue lock (these are reactive events to layout and attach changes)
+			{
+				try {
+					context.mouse.event_update();
+				} catch (const std::exception& ex) {
+					log_ui.error("Exception occurred during virtual events in UI: {}. Discarding rest of the virtual events", ex.what());
+				}
 
-				std::unique_lock lock{mutex};
+				// Usual pattern to lift the entry out of locking scope, candidate for generalization
+				size_t i = 0;
+				std::optional<EventVariant> current_event;
+				while (true) {
+					{
+						std::unique_lock lock{event_queue_m};
+						if (i != event_queue.size()) {
+							current_event = std::move(event_queue[i]);
+							i++;
+						} else {
+							event_queue.clear();
+							break;
+						}
+					}
 
-				for (const auto& inputEvent : event_queue) {
+					std::visit([this](const auto& event) {
+						try {
+							this->event(event);
+						} catch (const std::exception& ex) {
+							log_ui.error("Exception occurred during event in UI: {}. Discarding event {}", ex.what(), event.toPrettyString());
+						}
+					}, *current_event);
+				}
+
+				stat.event.sample(timer.time_ns());
+			}
+
+			// --- UI loop tasks ---
+			{
+				// Usual pattern to lift the entry out of locking scope, candidate for generalization
+				size_t i = 0;
+				std::function<void()> current_task;
+				while (true) {
+					{
+						std::unique_lock lock{loop_tasks_m};
+						if (i != loop_tasks.size()) {
+							current_task = std::move(loop_tasks[i]);
+							i++;
+						} else {
+							loop_tasks.clear();
+							break;
+						}
+					}
+
 					try {
-						std::visit([this](const auto& event) { this->event(event); }, inputEvent);
+						current_task();
 					} catch (const std::exception& ex) {
-						log_ui.error("Exception occurred during event in UI: {}. Discarding event", ex.what());
+						log_ui.error("Exception occurred during UI loop task execution in UI: {}", ex.what());
 					}
 				}
 
-				event_queue.clear();
-				stat.event.sample(timer.time_ns());
-			} catch (const std::exception& ex) {
-				log_ui.error("Exception occurred during event in UI: {}", ex.what());
+				stat.loopTask.sample(timer.time_ns());
 			}
 
 			// --- Attach ---
@@ -451,40 +499,46 @@ void UI::add(Component component) {
 }
 
 void UI::setSize(libv::vec2i size_) noexcept {
-	std::unique_lock lock{self->mutex};
 	AccessRoot::layout_size(self->root.core()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
 	AccessRoot::flagAuto(self->root.core(), Flag::pendingLayout);
 }
 
 // -------------------------------------------------------------------------------------------------
 
+void UI::execute_in_ui_loop(std::function<void()> func) {
+	std::unique_lock lock{self->loop_tasks_m};
+	self->loop_tasks.emplace_back(std::move(func));
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void UI::event(const libv::input::EventChar& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 
 void UI::event(const libv::input::EventKey& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 
 void UI::event(const libv::input::EventMouseButton& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 
 void UI::event(const libv::input::EventMouseEnter& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 
 void UI::event(const libv::input::EventMousePosition& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 
 void UI::event(const libv::input::EventMouseScroll& event) {
-	std::unique_lock lock{self->mutex};
+	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
 }
 

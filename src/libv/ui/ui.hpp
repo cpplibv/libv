@@ -8,6 +8,7 @@
 #include <libv/math/vec.hpp>
 // std
 #include <memory>
+#include <functional>
 
 
 namespace libv {
@@ -51,6 +52,9 @@ public:
 	inline void setSize(int32_t x, int32_t y) noexcept {
 		setSize({x, y});
 	}
+
+public:
+	void execute_in_ui_loop(std::function<void()> func);
 
 public:
 	void event(const libv::input::EventChar& event);
