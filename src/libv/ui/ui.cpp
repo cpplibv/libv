@@ -45,7 +45,7 @@ using Root = PanelFull;
 
 class ImplUI {
 	struct Stat {
-		static constexpr std::chrono::microseconds t_min{0};
+		static constexpr std::chrono::milliseconds t_min{0};
 		static constexpr std::chrono::milliseconds t_max{1};
 
 		libv::Histogram<100> attach1{t_min, t_max};

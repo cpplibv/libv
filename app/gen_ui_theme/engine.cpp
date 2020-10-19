@@ -2,27 +2,41 @@
 
 // hpp
 #include <gen_ui_theme/engine.hpp>
+// ext
+//#include <boost/container/flat_set.hpp>
 // libv
-#include <libv/lua/object_parser.hpp>
-#include <libv/parse/color.hpp>
+#include <libv/algorithm/linear_find.hpp>
+#include <libv/container/vector_2d.hpp>
+#include <libv/fsw/watcher.hpp>
+#include <libv/lua/lua.hpp>
+//#include <libv/lua/object_parser.hpp>
+//#include <libv/parse/color.hpp>
+#include <libv/thread/work_cooldown.hpp>
+#include <libv/thread/worker_thread.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/timer.hpp>
+// std
+#include <filesystem>
+#include <chrono>
+#include <mutex>
 // pro
-//#include <gen_ui_theme/effect.hpp>
-//#include <gen_ui_theme/theme.hpp>
+#include <gen_ui_theme/effect.hpp>
+#include <gen_ui_theme/theme.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct FlexPoint {
-	bool horizontal = false;
-	float point;
-};
+//struct FlexPoint {
+//	bool horizontal = false;
+//	float point;
+//};
 
 struct Task {
 	std::string name;
 	libv::vec2i texture_size;
-	std::vector<FlexPoint> flex_points;
+//	std::vector<FlexPoint> flex_points;
 	std::vector<std::unique_ptr<app::BasePixelEffect>> effects;
 };
 
@@ -79,18 +93,57 @@ static inline T verify_userdata(const sol::object& object) {
 	return lvs::aux_verify<T, lvs::CppTypeNameDontCare, lvs::LuaTypeNameUserdata, sol::type::userdata>(object);
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Engine::Engine(std::filesystem::path script_file, std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback) :
-		script_file(std::move(script_file)),
-		callback(std::move(callback)) {
+struct ImplEngine {
+public:
+	std::filesystem::path script_file;
 
-	init();
+public:
+	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
+	std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback;
+	sol::safe_function lua_main_func;
 
-	load_cd.execute_async([this] { load(); }, worker_thread);
-	file_watcher.subscribe_file(this->script_file, [this](const auto&) {
-		load_cd.execute_async([this] { load(); }, worker_thread);
+public:
+//	boost::container::flat_set<DynamicVar, std::less<>> dynamic_vars;
+	std::vector<DynamicVar> dynamic_vars;
+	std::function<void(std::vector<DynamicVar>)> on_dynamic_var;
+
+public:
+	std::mutex mutex;
+
+public:
+	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
+	libv::mt::work_cooldown load_cd{std::chrono::milliseconds{100}};
+	libv::mt::work_cooldown execute_cd{std::chrono::milliseconds{5}};
+	libv::fsw::Watcher file_watcher;
+
+public:
+	void init();
+	void load_script();
+	void run_script();
+
+public:
+	void broadcast_dynamic_vars();
+};
+
+// =================================================================================================
+
+Engine::Engine(std::filesystem::path script_file, std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback) {
+	self = std::make_unique<ImplEngine>();
+	self->script_file = std::move(script_file);
+	self->callback = std::move(callback);
+
+	self->init();
+
+	self->load_cd.execute_async([this] { self->load_script(); }, self->worker_thread);
+	self->file_watcher.subscribe_file(self->script_file, [this](const auto&) {
+		self->load_cd.execute_async([this] { self->load_script(); }, self->worker_thread);
 	});
+}
+
+Engine::~Engine() {
+	// For the sake of forward declared unique_ptr
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -104,20 +157,22 @@ static inline Task load_task(const sol::object& object) {
 		verify_number(item.first);
 		const auto effect = verify_table(item.second);
 
-		const auto effect_type = verify_string(effect["type"]);
+		const auto effect_type = verify_string(effect.get<sol::object>("type"));
 
 		if (effect_type == "rounded_box") {
 			result.effects.emplace_back(std::make_unique<app::EffectRoundedBox>(
-					verify_userdata<libv::vec2f>(effect["pos"]),
-					verify_userdata<libv::vec2f>(effect["size"]),
-					verify_number<float>(effect["corner"]),
-					verify_number<float>(effect["sharpness"])
+//					effect["pos"].get_or_throw<libv::vec2f>(),
+//					effect.get_or_throw<libv::vec2f>("pos"),
+					verify_userdata<libv::vec2f>(effect.get<sol::object>("pos")),
+					verify_userdata<libv::vec2f>(effect.get<sol::object>("size")),
+					verify_number<float>(effect.get<sol::object>("corner")),
+					verify_number<float>(effect.get<sol::object>("sharpness"))
 			));
 		} else if (effect_type == "glow") {
 			result.effects.emplace_back(std::make_unique<app::EffectGlow>(
-					verify_number<float>(effect["size"]),
-					verify_number<float>(effect["falloff"]),
-					verify_userdata<libv::vec4f>(effect["color"])
+					verify_number<float>(effect.get<sol::object>("size")),
+					verify_number<float>(effect.get<sol::object>("falloff")),
+					verify_userdata<libv::vec4f>(effect.get<sol::object>("color"))
 			));
 		}
 	}
@@ -125,26 +180,15 @@ static inline Task load_task(const sol::object& object) {
 	return result;
 }
 
-void Engine::init() {
-	lua["dpi"] = libv::vec2f{92, 92};
-
-	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step) {
-
-	});
-
-//		lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
-//
-//		});
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void Engine::load() {
+void ImplEngine::load_script() {
 	std::unique_lock lock(mutex);
-	log_app.info("Loading...");
 
-	std::vector<Task> tasks;
+	log_app.info("Loading script...");
+
 	libv::Timer timer;
+
+	for (auto& var : dynamic_vars)
+		var.removed = true;
 
 	try {
 		const auto script_str = libv::read_file_or_throw(script_file);
@@ -166,9 +210,30 @@ void Engine::load() {
 		if (func_main.get_type() != sol::type::function)
 			return log_app.error("Main is not a function: {} - {}", libv::to_value(func_main.get_type()), std::string(func_main));
 
+		lua_main_func = func_main;
 		log_app.info("Script loading successful: {:7.3f}ms", timer.timef_ms().count());
 
+		// ...
+	} catch (const std::exception& e) {
+		log_app.error("Failed to load texture due to exception: {}", e.what());
+	}
+
+	execute_cd.execute_async([this] { run_script(); }, worker_thread);
+}
+
+void ImplEngine::run_script() {
+	std::vector<Task> tasks;
+	libv::Timer timer;
+
+	std::unique_lock lock(mutex);
+
+	try {
 		libv::vec2i texture_size;
+
+		for (const auto& var : dynamic_vars)
+			if (!var.removed)
+				lua[var.name] = var.value;
+
 		const auto lua_theme_table = lua.create_table(0, 2,
 				"atlas", [&](std::string_view name, sol::table effects) {
 					tasks.push_back(load_task(effects));
@@ -180,7 +245,7 @@ void Engine::load() {
 				}
 		);
 
-		const auto result_main = sol::function(func_main)(lua_theme_table);
+		const auto result_main = lua_main_func(lua_theme_table);
 
 		if (!result_main.valid()) {
 			sol::error err = result_main;
@@ -225,7 +290,79 @@ void Engine::load() {
 			}
 		}
 	}
+
+	broadcast_dynamic_vars();
 }
+
+void ImplEngine::init() {
+	lua["dpi"] = libv::vec2f{92, 92};
+
+	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step, double init) {
+		const auto it = libv::linear_find_optional(dynamic_vars, name);
+		if (it) {
+			it->low = low;
+			it->high = high;
+			it->step = step;
+			// We do not reset the value to init, only clamp it
+			it->value = std::clamp(it->value, low, high);
+			it->removed = false;
+		} else {
+			dynamic_vars.emplace_back(std::string(name), low, high, step, init, true, false);
+		}
+	});
+
+	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
+
+	});
+}
+
+void Engine::set_dynamic_var(const std::string_view name, double value) {
+	{
+		std::unique_lock lock(self->mutex);
+		log_app.info("{} = {}", name, value);
+
+		const auto it = libv::linear_find_optional(self->dynamic_vars, name);
+		if (!it)
+			return;
+
+		it->value = value;
+	}
+
+	self->execute_cd.execute_async([this] { self->run_script(); }, self->worker_thread);
+}
+
+void Engine::on_dynamic_var(std::function<void(std::vector<DynamicVar>)> callback) {
+	std::unique_lock lock(self->mutex);
+
+	self->on_dynamic_var = std::move(callback);
+	self->broadcast_dynamic_vars();
+}
+
+void ImplEngine::broadcast_dynamic_vars() {
+	worker_thread.execute_async([this]() {
+		std::unique_lock lock(mutex);
+
+		if (!on_dynamic_var)
+			return;
+
+		on_dynamic_var(dynamic_vars);
+
+		std::erase_if(dynamic_vars, [](auto& var) {
+			var.added = false;
+			return var.removed;
+		});
+	});
+}
+
+// -------------------------------------------------------------------------------------------------
+
+//void load() {
+//	for (const auto& pending_value : pending_dynamic_values)
+//		lua[pending_value.name] = pending_value.value;
+//}
+
+//void ImplEngine::load() {
+//}
 
 //Atlas Engine::export_atlas() {
 //	AtlasBuilder builder;

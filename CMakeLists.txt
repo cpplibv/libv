@@ -17,7 +17,7 @@ include(cmake/wish_warning.cmake)
 #set(CMAKE_BUILD_TYPE "RELEASE")
 
 if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "DEV")
+	set(CMAKE_BUILD_TYPE "RELEASE")
 endif()
 
 set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;DEV" CACHE STRING "" FORCE)
@@ -696,14 +696,14 @@ wish_create_executable(
 )
 
 wish_create_executable(
-		TARGET app_gen_ui_theme
-		#OUTPUT_FOLDER gen_ui_theme
-		#OUTPUT_NAME gen_ui_theme
-		#OUTPUT_RESOURCE res
-		#RESOURCE app/gen_ui_theme/res
-		SOURCE app/gen_ui_theme/*.cpp
-		LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_thread
-#		LINK   libv_ctrl
+	TARGET app_gen_ui_theme
+	#OUTPUT_FOLDER gen_ui_theme
+	#OUTPUT_NAME gen_ui_theme
+	#OUTPUT_RESOURCE res
+	#RESOURCE app/gen_ui_theme/res
+	SOURCE app/gen_ui_theme/*.cpp
+	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_thread
+#	LINK   libv_ctrl
 )
 
 wish_create_executable(

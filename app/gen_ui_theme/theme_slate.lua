@@ -41,7 +41,13 @@ end
 
 -- -------------------------------------------------------------------------------------------------
 
-register_var("debug0", 0, 100, 0);
+register_var("test_size", 0, 8, 0.1, 1);
+register_var("test_falloff", 0.1, 16, 0.1, 1);
+
+register_var("normal_os_size", 0, 8, 0.1, 3.5);
+register_var("normal_is_size", 0, 8, 0.1, -3.5);
+register_var("normal_oe_size", 0, 8, 0.1, 1.5);
+register_var("normal_ie_size", 0, 8, 0.1, -1.5);
 
 -- -------------------------------------------------------------------------------------------------
 
@@ -53,22 +59,30 @@ main = function (theme)
 	theme.texture_size(64, 64);
 
 	theme.atlas("button.normal", merge(base_button, {
-		glow(3.5, 3, rgba(0, 0, 0, 0.5)),
-		glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
+		--glow(3.5, 3, rgba(0, 0, 0, 0.5)),
+		--glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
+		glow(test_size, test_falloff, rgba(1, 0, 0, 1)),
+		glow(-test_size, test_falloff, rgba(0, 0, 1, 1)),
 	}))
+	--theme.atlas("button.normal", merge(base_button, {
+	--	--glow(3.5, 3, rgba(0, 0, 0, 0.5)),
+	--	--glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
+	--	glow( 2.5, 3, rgba(1, 0, 0, 1)),
+	--	glow(-2.5, 3, rgba(0, 0, 1, 1)),
+	--}))
 
 	theme.atlas("button.pressed", merge(base_button, {
-		glow(3.5, 3, rgba(1, 0, 0, 0.5)),
-		glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
+		glow( 2.5, 1, rgba(1, 0, 0, 1)),
+		glow(-2.5, 1, rgba(0, 0, 1, 1)),
 	}))
 
 	theme.atlas("button.hover", merge(base_button, {
-		glow(3.5, 3, rgba(0, 1, 0, 0.5)),
+		glow( 3.5, 3, rgba(0, 1, 0, 0.5)),
 		glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
 	}))
 
 	theme.atlas("button.inactive", merge(base_button, {
-		glow(3.5, 3, rgba(0, 0, 1, 0.5)),
+		glow( 3.5, 3, rgba(0, 0, 1, 0.5)),
 		glow(-1.5, 3, rgba(0.8, 0.8, 0.8, 0.8)),
 	}))
 end

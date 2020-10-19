@@ -529,6 +529,9 @@ libv.ui: Add local_mouse to the ui info uniform block | how to preserv the data 
 libv.ui: Rework mouse context internals
 libv.ui: Rework render context internals
 libv.ui: Rework layout context internals
+libv.ui: rework render
+libv.ui: component color go from uniform to vertex attribute
+libv.ui: move render iteration into the containers (to allow render state manipulation and clipping (?))
 libv.ui: Implement basic scroll area
 libv: Merge include and src folders
 libv.ui: Auto set mvp matricies for the UI shaders | (?) | might not be possible | UI renderer took care of it
@@ -565,13 +568,12 @@ libv.fsw: Rename watcher file to file_watcher, or the class the other way around
 
 
 
-
-
-
-
 app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 	- too many thread spawns, fsw -> worker.load -> worker.run (-> work) -> worker.broadcast -> ui
 	- proper SOW update, and not just current state broadcast, currently this can lead to a data race on init
+
+
+
 
 libv.ui: multithreading cooldown for a single frame iteration. Aka: once_per_n_frame instead of 100ms
 
@@ -605,23 +607,21 @@ So the way theme generation will work:
 	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
 	- from c++ ui run the generated lua script to acquire the theme
 	- | NOPE
+	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
 
 
-https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
-https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
-https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#typeeffect
 
 
 app.gen_ui_theme: create theme exporter: json and texture
 app.gen_ui_theme: connect the theme gen with a running app to live update
-
-app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
 app.gen_ui_theme: clean up C++ blend/effect implementations
 
 
-
 libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
-libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
+		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#typeeffect
+
 
 
 libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
@@ -640,27 +640,6 @@ libv.ui.theme:
 		Progress/Loading
 		Disabled
 		Error
-
-	#HLFG - saturated blue
-	#HLBG - unsaturated blue
-
-				 | Upward              | Downward
-	-------------+---------------------+-----------------------------
-	inactive     |                     |
-	normal       |                     |
-	hover/select |                     |
-	active/press |                     |
-
-	Upward   = shadow outside, lighter edge  inside
-	Downward = shadow  inside, lighter edge outside
-
-	Highlight = Lighter background with #hlcolorbg, replace outer shadow #hlcolorfg shadow
-
-	Inactive  = No lighter edge, outer shadow is halved, bg grayed
-
-
-
-
 
 
 
@@ -708,7 +687,7 @@ libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, clien
 
 libv.ui: observation: clip and scroll are two orthogonal features
 		general concept: "floating" component that effects render, mouse, (layout)
-		general concept: clip component that effects render, mouse, layout
+		general concept: clip component that effects render, mouse, (layout)
 
 libv.ui: current float region setting does not allows clean iteration and position determination of components, this is an issue. For example mouse and render behaviour are separated
 libv.ui.layout:	verify what is going on with position change based layout invalidation in float region
@@ -785,10 +764,6 @@ libv.ui: Make sure that (only) position change does not invalidates layout
 libv.ui: Idea: new raw texture, white with size of 1x1 px BUT on the getters it lies to 0x0 px so it would not effect layouts
 
 libv.ui: The ui should not know about glr, except in shader, context_render code and maybe the overlays
-libv.ui: rework render
-libv.ui: component color go from uniform to vertex attribute
-
-libv.ui: (?) move render iteration into the containers (to allow render state manipulation and clipping (?))
 
 libv.ui: overlay component layout stack highlight
 libv.ui: overlay zoom linearize movement and zoom

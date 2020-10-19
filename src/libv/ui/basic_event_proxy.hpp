@@ -35,7 +35,7 @@ private:
 	component_type& component;
 
 public:
-	inline BasicEventProxy(component_type& component) noexcept : component(component) { }
+	inline explicit BasicEventProxy(component_type& component) noexcept : component(component) { }
 
 private:
 	template <typename Func>
@@ -57,6 +57,13 @@ private:
 					(void) event_ptr; // Callback is not interested in the event
 					auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
 					f(handler);
+			};
+
+		} else if constexpr (std::is_invocable_r_v<void, Func>) {
+			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
+					(void) component_ptr; // Callback is not interested in the component
+					(void) event_ptr; // Callback is not interested in the event
+					f();
 			};
 
 		} else {

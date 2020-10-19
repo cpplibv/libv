@@ -203,6 +203,7 @@ void CoreComponent::markRemove() noexcept {
 	flags.reset(Flag::layout | Flag::render);
 
 	doForeachChildren([](Component& child) {
+		// <<< P3: check if mark remove should be recursive
 		child.markRemove();
 	});
 }

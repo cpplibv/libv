@@ -85,7 +85,7 @@ struct Size {
 	libv::vec3_t<SizeDim> value;
 
 	constexpr inline Size() = default;
-	constexpr inline explicit Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) :
+	constexpr inline Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) :
 		value{std::move(x), std::move(y), std::move(z)} {}
 
 	[[nodiscard]] SizeDim& operator[](size_t dim) {

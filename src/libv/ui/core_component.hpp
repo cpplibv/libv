@@ -240,6 +240,7 @@ protected:
 	void flagDirect(Flag_t flags_) noexcept;
 	void flagAncestors(Flag_t flags_) noexcept;
 
+public:
 	void flagAuto(Flag_t flags_) noexcept;
 	void flagForce(Flag_t flags_) noexcept;
 
@@ -274,7 +275,7 @@ public:
 private:
 	void _fire(std::type_index type, const void* event_ptr);
 
-protected:
+public:
 	template <typename Event>
 	inline void fire(const Event& event);
 

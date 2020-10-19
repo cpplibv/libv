@@ -57,7 +57,8 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("Current path  {}", std::filesystem::current_path().generic_string());
 	app::log_app.info("Executable    {}/{}", path_dir.generic_string(), path_bin.generic_string());
-	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", fmt::localtime(std::chrono::system_clock::to_time_t(lwt)));
+	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", lwt);
+//	app::log_app.info("Last modified {:%Y.%m.%d %H:%M:%S}", fmt::localtime(std::chrono::system_clock::to_time_t(lwt)));
 
 	app::ConfigViewer config(config_path);
 

@@ -69,7 +69,7 @@ void Style::set(std::string property, PropertyDynamic value) {
 }
 
 libv::optional_ref<const PropertyDynamic> Style::get_optional(const std::string_view property) const {
-	libv::optional_ref<const PropertyDynamic> result;
+	libv::optional_ref<const PropertyDynamic> result = libv::opt_ref_none;
 
 	const auto it = properties.find(property);
 	if (it != properties.end()) {

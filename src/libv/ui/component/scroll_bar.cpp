@@ -315,8 +315,10 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	}
 
 	if (event.leave) {
-		reset(property.bg_color);
-		reset(property.bar_color);
+		set(property.bg_color, property.bg_color() - 0.2f);
+		set(property.bar_color, property.bar_color() - 0.2f);
+//		reset(property.bg_color);
+//		reset(property.bar_color);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 	}
 
@@ -416,6 +418,9 @@ ScrollBar::ScrollBar(core_ptr core) noexcept :
 // -------------------------------------------------------------------------------------------------
 
 void ScrollBar::value(double var) {
+	if (libv::float_equal(var, self().value_))
+		return;
+
 	if (!libv::math::check_interval(var, self().value_min_, self().value_max_))
 		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", var, self().value_min_, self().value_max_, path());
 
@@ -439,6 +444,9 @@ int64_t ScrollBar::value_int() const noexcept {
 }
 
 void ScrollBar::value_max(double var) {
+	if (libv::float_equal(var, self().value_max_))
+		return;
+
 	self().value_max_ = var;
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
@@ -455,6 +463,9 @@ double ScrollBar::value_max() const noexcept {
 }
 
 void ScrollBar::value_min(double var) {
+	if (libv::float_equal(var, self().value_min_))
+		return;
+
 	self().value_min_ = var;
 	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
@@ -471,6 +482,9 @@ double ScrollBar::value_min() const noexcept {
 }
 
 void ScrollBar::value_range(double var) {
+	if (libv::float_equal(var, self().value_range_))
+		return;
+
 	if (var < 0) {
 		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", self().value_, path());
 		var = std::abs(var);
@@ -484,6 +498,9 @@ double ScrollBar::value_range() const noexcept {
 }
 
 void ScrollBar::value_step(double var) {
+	if (libv::float_equal(var, self().value_step_))
+		return;
+
 	self().value_step_ = var;
 	value(self().value_);
 }

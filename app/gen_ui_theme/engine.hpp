@@ -4,53 +4,51 @@
 
 // libv
 #include <libv/container/vector_2d.hpp>
-#include <libv/fsw/watcher.hpp>
-#include <libv/lua/lua.hpp>
-#include <libv/thread/work_cooldown.hpp>
-#include <libv/thread/worker_thread.hpp>
-#include <libv/utility/read_file.hpp>
-#include <libv/utility/timer.hpp>
+#include <libv/math/vec.hpp>
 // std
 #include <filesystem>
-#include <chrono>
-#include <mutex>
+#include <functional>
+#include <memory>
+//#include <span>
+#include <string>
+#include <string_view>
+//#include <vector>
 // pro
-#include <gen_ui_theme/effect.hpp>
-#include <gen_ui_theme/theme.hpp>
+//#include <gen_ui_theme/effect.hpp>
+//#include <gen_ui_theme/theme.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
+struct DynamicVar {
+	std::string name;
+	double low;
+	double high;
+	double step;
+	double value;
+
+	bool added;
+	bool removed;
+
+	[[nodiscard]] friend inline bool operator==(const DynamicVar& lhs, const std::string_view& rhs) noexcept {
+		return lhs.name == rhs;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 class Engine {
-private:
-	std::filesystem::path script_file;
-
-private:
-	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base | libv::lua::lualib::vec);
-	std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback;
-
-private:
-	std::mutex mutex;
-
-private:
-	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
-	libv::mt::work_cooldown load_cd{std::chrono::milliseconds{100}};
-	libv::fsw::FileWatcher file_watcher;
-
-	// -------------------------------------------------------------------------------------------------
+	std::unique_ptr<struct ImplEngine> self;
 
 public:
 	explicit Engine(std::filesystem::path script_file, std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback);
+	~Engine();
 
-private:
-//	void load_recipe(const sol::object& object);
-	void init();
-
-private:
-	void load();
-//	Atlas export_atlas();
+public:
+	void on_dynamic_var(std::function<void(std::vector<DynamicVar>)> callback);
+	void set_dynamic_var(const std::string_view name, double value);
 };
 
 // -------------------------------------------------------------------------------------------------
