@@ -60,7 +60,7 @@ int main(int argc, const char** argv) {
 	libv::mt::worker_thread worker_thread;
 	libv::mt::work_heatup_cooldown work_ht_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
 
-	libv::fsw::FileWatcher watcher;
+	libv::fsw::Watcher watcher;
 
 	const auto path = std::filesystem::path{argv[1]};
 

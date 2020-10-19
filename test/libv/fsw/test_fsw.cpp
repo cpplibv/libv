@@ -93,19 +93,19 @@ public:
 
 struct SubEntry {
 	size_t id = 7777;
-	libv::fsw::FileWatcher::token_type token;
+	libv::fsw::Watcher::token_type token;
 };
 
 struct FSWTester {
 private:
-	std::optional<libv::fsw::FileWatcher> watcher;
+	std::optional<libv::fsw::Watcher> watcher;
 
 	Queue<Event> events;
 
 	std::set<std::string> files;
 	std::set<std::string> dirs;
 
-//	std::map<size_t, libv::fsw::FileWatcher::token_type> tokens;
+//	std::map<size_t, libv::fsw::Watcher::token_type> tokens;
 	size_t nextSubID = 0;
 
 	std::chrono::milliseconds time_init    {1500};

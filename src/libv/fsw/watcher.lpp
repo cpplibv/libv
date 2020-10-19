@@ -22,9 +22,9 @@ namespace fsw {
 struct CallbackDir {
 	bool uses_relative_path;
 	// NOTE: Pointer stability is used by watch tokens, better solutions are possible
-	std::unique_ptr<FileWatcher::callback_type> callback;
+	std::unique_ptr<Watcher::callback_type> callback;
 
-	CallbackDir(bool uses_relative_path, std::unique_ptr<FileWatcher::callback_type>&& callback) :
+	CallbackDir(bool uses_relative_path, std::unique_ptr<Watcher::callback_type>&& callback) :
 		uses_relative_path(uses_relative_path),
 		callback(std::move(callback)) { }
 };
@@ -49,14 +49,15 @@ struct WatcherEntry {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnon-virtual-dtor"
-class ImplFileWatcher : public efsw::FileWatchListener {
+class ImplWatcher : public efsw::FileWatchListener {
 #pragma GCC diagnostic pop
 public:
 	std::mutex mutex;
-	std::optional<efsw::FileWatcher> efsw_watcher;
 
 	std::vector<WatcherEntry> watcher_entries;
 	std::unordered_map<std::string, DirectoryCluster> directories;
+
+	std::optional<efsw::FileWatcher> efsw_watcher;
 
 private:
 	/// @param watchid The watch id for the directory

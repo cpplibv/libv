@@ -50,7 +50,7 @@ public:
 class ImplShaderLoader {
 	FileIncluder includer;
 	libv::gl::GLSLCompiler compiler;
-	libv::fsw::FileWatcher watcher;
+	libv::fsw::Watcher watcher;
 
 	std::mutex update_queue_m;
 	boost::container::flat_set<libv::observer_ref<BaseShader>> update_queue;
@@ -131,7 +131,7 @@ void ShaderLoader::update(libv::gl::GL& gl, callback_success_type success_cb, ca
 			gl(program).destroy();
 
 		{
-			// Cleanup FileWatchers
+			// Cleanup Watchers
 			auto& tokens = self->tokens[update];
 			for (const auto& token : tokens)
 				self->watcher.unsubscribe(token);

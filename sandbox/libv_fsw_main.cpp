@@ -20,7 +20,7 @@ int main() {
 	std::filesystem::create_directories("tmp/b/p");
 
 	{
-		libv::fsw::FileWatcher watcher;
+		libv::fsw::Watcher watcher;
 
 		watcher.subscribe_file("tmp/p/p/a.txt", [](const libv::fsw::Event& event) { std::cout << "\tWatch of tmp/p/p/a.txt got: " << event << std::endl; });
 		watcher.subscribe_file("tmp/p/p/b.txt", [](const libv::fsw::Event& event) { std::cout << "\tWatch of tmp/p/p/b.txt got: " << event << std::endl; });
@@ -55,7 +55,7 @@ int main() {
 //	std::filesystem::create_directories("tmp/a");
 //
 //	{
-//		libv::fsw::FileWatcher watcher;
+//		libv::fsw::Watcher watcher;
 //
 //		std::cout << "> Subscribe A" << std::endl;
 //		auto token_a = watcher.subscribe_file(path_a, [](const libv::fsw::Event& event) {

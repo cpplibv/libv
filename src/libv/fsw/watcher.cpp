@@ -46,7 +46,7 @@ std::ostream& operator<<(std::ostream& os, const Event& event) {
 
 // -------------------------------------------------------------------------------------------------
 
-//void _debug_state(ImplFileWatcher& self) {
+//void _debug_state(ImplWatcher& self) {
 //	std::cout << "  -- --" << std::endl;
 //	for (const auto& item : self.efsw_watcher->directories()) {
 //		std::cout << "  -- EFSW Watch: " << item << std::endl;
@@ -83,7 +83,7 @@ std::filesystem::path _parent_directory(const std::filesystem::path& dir) {
 }
 
 /// Unsafe means that self's mutex has to be held by the caller
-DirectoryCluster& _unsafe_watch_dir(ImplFileWatcher& self, std::filesystem::path dir) {
+DirectoryCluster& _unsafe_watch_dir(ImplWatcher& self, std::filesystem::path dir) {
 	const auto entry = libv::linear_find_if_optional(self.watcher_entries, [&dir](const auto& entry) {
 		return libv::is_parent_folder_of(entry.path, dir);
 	});
@@ -159,7 +159,7 @@ DirectoryCluster& _unsafe_watch_dir(ImplFileWatcher& self, std::filesystem::path
 }
 
 /// Unsafe means that self's mutex has to be held by the caller
-void _unsafe_unwatch(ImplFileWatcher& self, efsw::WatchID id) {
+void _unsafe_unwatch(ImplWatcher& self, efsw::WatchID id) {
 	const auto it = libv::linear_find_if_iterator(self.watcher_entries, [&](auto& watcher_entry) {
 		return watcher_entry.watchID == id;
 	});
@@ -175,7 +175,7 @@ void _unsafe_unwatch(ImplFileWatcher& self, efsw::WatchID id) {
 }
 
 void _handle_file_action(
-		ImplFileWatcher& self,
+		ImplWatcher& self,
 		Action action,
 		std::filesystem::path path,
 		std::filesystem::path old_path) {
@@ -235,11 +235,11 @@ void _handle_file_action(
 	}
 }
 
-FileWatcher::token_type _subscribe_file(
-		ImplFileWatcher& self,
+Watcher::token_type _subscribe_file(
+		ImplWatcher& self,
 		std::filesystem::path&& path,
 		bool is_relative,
-		FileWatcher::callback_type&& callback) {
+		Watcher::callback_type&& callback) {
 
 	std::error_code ignore_ec;
 
@@ -247,9 +247,9 @@ FileWatcher::token_type _subscribe_file(
 	const auto dir = _parent_directory(path);
 	const auto str_dir = dir.string();
 
-	auto cb_up = std::make_unique<FileWatcher::callback_type>(std::move(callback));
+	auto cb_up = std::make_unique<Watcher::callback_type>(std::move(callback));
 	const auto ptr = cb_up.get();
-	const auto token = FileWatcher::token_type(ptr);
+	const auto token = Watcher::token_type(ptr);
 
 	std::unique_lock lock(self.mutex);
 
@@ -260,17 +260,17 @@ FileWatcher::token_type _subscribe_file(
 	return token;
 }
 
-FileWatcher::token_type _subscribe_directory(
-		ImplFileWatcher& self,
+Watcher::token_type _subscribe_directory(
+		ImplWatcher& self,
 		std::filesystem::path&& path,
 		bool is_relative,
-		FileWatcher::callback_type&& callback) {
+		Watcher::callback_type&& callback) {
 
 	std::error_code ignore_ec;
 
-	auto cb_up = std::make_unique<FileWatcher::callback_type>(std::move(callback));
+	auto cb_up = std::make_unique<Watcher::callback_type>(std::move(callback));
 	const auto ptr = cb_up.get();
-	const auto token = FileWatcher::token_type(ptr);
+	const auto token = Watcher::token_type(ptr);
 
 	std::unique_lock lock(self.mutex);
 
@@ -282,7 +282,7 @@ FileWatcher::token_type _subscribe_directory(
 	return token;
 }
 
-void _unsubscribe(ImplFileWatcher& self, FileWatcher::token_type token) {
+void _unsubscribe(ImplWatcher& self, Watcher::token_type token) {
 	std::unique_lock lock(self.mutex);
 
 	auto dit = self.directories.begin();
@@ -329,7 +329,7 @@ void _unsubscribe(ImplFileWatcher& self, FileWatcher::token_type token) {
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplFileWatcher::handleFileAction(efsw::WatchID id, const std::string& dir, const std::string& filename, efsw::Action action, std::string old_path) {
+void ImplWatcher::handleFileAction(efsw::WatchID id, const std::string& dir, const std::string& filename, efsw::Action action, std::string old_path) {
 	(void) id;
 
 	Action normal_action = [](efsw::Action a){
@@ -357,13 +357,13 @@ void ImplFileWatcher::handleFileAction(efsw::WatchID id, const std::string& dir,
 	_handle_file_action(*this, normal_action, normal_path, normal_old_path);
 }
 
-FileWatcher::FileWatcher() :
-	self(std::make_unique<ImplFileWatcher>()) {
+Watcher::Watcher() :
+	self(std::make_unique<ImplWatcher>()) {
 	self->efsw_watcher.emplace();
 	self->efsw_watcher->watch();
 }
 
-FileWatcher::~FileWatcher() {
+Watcher::~Watcher() {
 	// Unsure about EFSW cleanup so callbacks are cleaned up with the mutex held
 	// If a late call would happen client callbacks would not suffer it.
 	{
@@ -380,7 +380,7 @@ FileWatcher::~FileWatcher() {
 	self->efsw_watcher.reset();
 }
 
-FileWatcher::token_type FileWatcher::subscribe_file(std::filesystem::path path, callback_type callback) {
+Watcher::token_type Watcher::subscribe_file(std::filesystem::path path, callback_type callback) {
 
 	std::error_code ignore_ec;
 	const auto is_relative = path.is_relative();
@@ -392,7 +392,7 @@ FileWatcher::token_type FileWatcher::subscribe_file(std::filesystem::path path, 
 	return _subscribe_file(*self, std::move(path), is_relative, std::move(callback));
 }
 
-FileWatcher::token_type FileWatcher::subscribe_directory(std::filesystem::path path, callback_type callback) {
+Watcher::token_type Watcher::subscribe_directory(std::filesystem::path path, callback_type callback) {
 
 	std::error_code ignore_ec;
 	const auto is_relative = path.is_relative();
@@ -405,7 +405,7 @@ FileWatcher::token_type FileWatcher::subscribe_directory(std::filesystem::path p
 	return _subscribe_directory(*self, std::move(path), is_relative, std::move(callback));
 }
 
-void FileWatcher::unsubscribe(token_type token) {
+void Watcher::unsubscribe(token_type token) {
 	_unsubscribe(*self, token);
 }
 

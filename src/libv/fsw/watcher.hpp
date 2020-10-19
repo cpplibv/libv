@@ -17,17 +17,17 @@ namespace fsw {
 
 // -------------------------------------------------------------------------------------------------
 
-class FileWatcher {
+class Watcher {
 public:
 	using callback_type = std::function<void(const Event&)>;
 	using token_type = WatchToken;
 
 private:
-	std::unique_ptr<class ImplFileWatcher> self;
+	std::unique_ptr<class ImplWatcher> self;
 
 public:
-	FileWatcher();
-	~FileWatcher();
+	Watcher();
+	~Watcher();
 
 public:
 	// TODO P5: libv.fsw: If the watched directory removed (then recreated) the watching stops

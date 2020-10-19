@@ -557,6 +557,7 @@ app.gen_ui_theme: move effect definition list to lua
 app.gen_ui_theme: implement multiple generation tasks support
 libv.ui: Implement thread switch support for UI modifying tasks
 app.fsw: New file system watcher app (lifted from iris)
+libv.fsw: Rename watcher file to file_watcher, or the class the other way around | class rename preferred
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -628,7 +629,6 @@ libv.ui: Button icon support (with left, top, down, right placement), if icon or
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 libv.thread: rename the lib to libv.mt
-libv.fsw: Rename watcher file to file_watcher, or the class the other way around
 
 
 libv.ui.theme:
