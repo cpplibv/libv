@@ -31,10 +31,11 @@ private:
 	virtual libv::vec2f size() override {
 		return {0, 0};
 	}
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
 		(void) r;
 		(void) pos;
 		(void) size;
+		(void) padding;
 	}
 };
 
@@ -54,7 +55,9 @@ private:
 	virtual libv::vec2f size() override {
 		return {0, 0};
 	}
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+		(void) padding;
+
 		r.quad(pos, size, color, shader);
 	}
 };
@@ -77,7 +80,9 @@ private:
 	virtual libv::vec2f size() override {
 		return {0, 0};
 	}
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+		(void) padding;
+
 		r.texture_2D(pos, size, {0, 0}, {1, 1}, color, texture, shader);
 	}
 };
@@ -100,7 +105,9 @@ private:
 	virtual libv::vec2f size() override {
 		return {0, 0};
 	}
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+		(void) padding;
+
 		// y3   12--13--14--15
 		//      | / | / | / |
 		// y2   8---9---10--11
@@ -158,7 +165,7 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class BackgroundGradient : Background {
+class BackgroundGradientLinear : Background {
 private:
 	enum class PointMode {
 		fixed,
@@ -186,10 +193,18 @@ private:
 
 private:
 	std::vector<Point> points;
+
+//private:
+//	libv::vec2f start;
+//	PointMode start_mode;
+//	libv::vec2f end;
+//	PointMode end_mode;
+//	std::vector<Color> colors;
+
 	ShaderQuad_view shader;
 
 public:
-	BackgroundGradient(std::vector<Point> points, ShaderQuad_view shader) :
+	BackgroundGradientLinear(std::vector<Point> points, ShaderQuad_view shader) :
 		points(std::move(points)),
 		shader(std::move(shader)) {}
 
@@ -197,11 +212,11 @@ private:
 	virtual libv::vec2f size() override {
 		return {0, 0};
 	}
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size) override {
-
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
 		(void) r;
 		(void) pos;
 		(void) size;
+		(void) padding;
 
 //		const auto p0 = pos;
 //		const auto p1 = pos + border_pos;
@@ -246,6 +261,67 @@ private:
 //		r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
 
 //		r.end(shader);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class BackgroundPattern : Background {
+private:
+	Color color;
+	Texture2D_view texture;
+	ShaderImage_view shader;
+
+public:
+	BackgroundPattern(Color color, Texture2D_view texture, ShaderImage_view shader) :
+		color(color),
+		texture(std::move(texture)),
+		shader(std::move(shader)) {}
+
+private:
+	virtual libv::vec2f size() override {
+		return {0, 0};
+	}
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+
+		(void) r;
+		(void) pos;
+		(void) size;
+		(void) padding;
+
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class BackgroundPaddingPattern : Background {
+private:
+	Color color;
+	Texture2D_view texture;
+	ShaderImage_view shader;
+
+public:
+	BackgroundPaddingPattern(Color color, Texture2D_view texture, ShaderImage_view shader) :
+		color(color),
+		texture(std::move(texture)),
+		shader(std::move(shader)) {}
+
+private:
+	virtual libv::vec2f size() override {
+		return {0, 0};
+	}
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+
+		(void) r;
+		(void) pos;
+		(void) size;
+		(void) padding;
+
+//		9 border table except the middle
+//		in the middle use texture as pattern but leave out non padding area
+
+//		Required by reference picture ref_ui_bg_padding_pattern
+
 	}
 };
 

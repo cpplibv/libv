@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/gen_ui_theme/effect.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/effect.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

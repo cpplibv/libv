@@ -199,11 +199,13 @@ void CoreComponent::focus() noexcept {
 }
 
 void CoreComponent::markRemove() noexcept {
+	if (flags.match_full(Flag::pendingDetachSelf))
+		return; // Early return optimization if we are already marked for remove
+
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
 
 	doForeachChildren([](Component& child) {
-		// <<< P3: check if mark remove should be recursive
 		child.markRemove();
 	});
 }
@@ -379,8 +381,6 @@ void CoreComponent::detach(CoreComponent& old_parent) {
 			context().event.disconnect_slot(this);
 
 		doDetach();
-
-		flags.reset(Flag::pendingDetach | Flag::signal | Flag::slot);
 
 		childID = 0;
 		flags = Flag::mask_init;

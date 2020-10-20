@@ -75,7 +75,7 @@ libv.ui: unify style and property function that are currently at 3 place (compon
 libv.ui: setStyle should notify the parent, or signal a flag that its needs to restyled
 libv.ui: propagate property set change to actual invalidation of flags
 libv.ui: sort out property change auto invalidate flag
-libv.ui: releaseing a property override should trigger style lookup (reset function) if there is no style, give back the fallback value
+libv.ui: releasing a property override should trigger style lookup (reset function) if there is no style, give back the fallback value
 libv.ui: sort out flags, invalidation rules and validation traverses
 libv.ui: layout strong and week: flags/invalidations
 libv.ui: sort out component_base
@@ -91,7 +91,7 @@ libv.ui: fix content size bug in full layout
 libv.ui: port float layout and tests
 libv.ui: fix content size bug in float layout
 libv.ui: basic panel base class to handle current panels
-libv.ui: remove / removaAll functions for every container
+libv.ui: remove / removeAll functions for every container
 libv.input: New lib to story input enums for frame, ui and hotkey
 libv.ui: ContextMouse
 libv.ui: MouseWatcher
@@ -565,6 +565,11 @@ app.gen_ui_theme: Reduce the number of thread swapping during reloading
 app.gen_ui_theme: Keep worker threads alive between runs
 app.gen_ui_theme: Rename to app.theme
 libv.thread: Rename to libv.mt
+app.theme: add lua <-> C++ linked ui elements for float selection
+libv.img: New library to handle image saving
+libv.ui: verify: check if mark remove should be recursive | it is, markRemove does it perfectly
+libv.ui: remove layout flag | invalidated: used to exclude components that are marked for removal from the current loop
+app.theme: Improve SOW management
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -574,37 +579,29 @@ libv.thread: Rename to libv.mt
 
 
 
-app.theme: add lua <-> C++ linked ui elements for colors/float selection
-	- proper SOW update, and not just current state broadcast, currently this can lead to a data race on init
+
+background
+	anchor point
+	repeat, stretch, flexpoint
 
 
 
 
 
+libv.ui: multithreading cooldown for ui frame iteration. Aka: once_per_n_frame instead of X ms
 
-
-
-
-
-
-
-check if mark remove should be recursive (<<< P3)
-
-
-libv.ui: multithreading cooldown for a single frame iteration. Aka: once_per_n_frame instead of 100ms
-
-new enum gen
+app.enum: new enum gen | rename and refactor
 	- simple enum class, with a SINGLE function that explodes it into a struct
 	- find a nice operator | Yeah... it will be an ADL function
 	- its also a weak possibility to use a CTAD Enum class
+	| ADL function is the winner
 
-To fix property init
+libv.ui: To fix property init
 		| scroll bar should not calculate any fucking layout in non layout
 		| it does it so it can process mouse event
 	libv.ui: Initialize every property in the constructor, or at least by the end of the ctor
 	libv.ui: Do not cache bar bounds in value_* functions | or only cache if attached
-
-
+	libv.ui: Do not use properties outside of callbacks, the values WILL BE incorrect
 
 
 glow falloff is incorrect on corners, find a better solution
@@ -612,13 +609,12 @@ glow falloff is incorrect on corners, find a better solution
 	libv.ui: Overlay zoom mouse hovered pixel color display
 	| size = 0, falloff = 1 highlight perfectly the affected pixels
 
-in hover reset fucks up the manual vars like bg / bar color
-	libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
 
-scroll bar change prompts layout, why? should it?
+scroll bar change prompts layout, why? should it? | it does to recache the bar position, we will see
 
 
-So the way theme generation will work:
+app.there: --- PAPER ---
+	So the way theme generation works (plan):
 	- lua script containing the styles incl properties and the recepies for the atlases
 	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
 	- from c++ ui run the generated lua script to acquire the theme
@@ -627,12 +623,11 @@ So the way theme generation will work:
 
 
 
-
-app.theme: create theme exporter: json and texture
+app.theme: create theme exporter: json and atlas texture
 app.theme: connect the theme gen with a running app to live update
 app.theme: clean up C++ blend/effect implementations
 
-
+libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
 libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
 		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
 		https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#textfield
@@ -643,7 +638,6 @@ libv.ui.theme: Property substructure system example: https://docs.oracle.com/jav
 libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
-glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 
 
 libv.ui.theme:
@@ -670,12 +664,17 @@ libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
 
 place.it:
+	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	model: Generate texture for LOD meshes
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
 	monitor: DB monitoring https://blog.serverdensity.com/how-to-monitor-mysql/
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
 	project: Free project related tools (LDjam) https://docs.google.com/spreadsheets/d/1tfkBo2IWLHXkZDbIEFUyCWvLkumHYDWCxGHzb-Rmc-0/edit#gid=0
+	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
+
+
+glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 
 
 
@@ -683,20 +682,7 @@ place.it:
 
 
 
-
-app.bin_to_src: libv.arg-ify
-app.bin_to_src: command line argument for line length
-app.bin_to_src: use std::span<const std::byte>
-app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
-
-
-
-
-
-
-
-
-
+libv.ui: implement base_line alignment: most likely will need a vec2 get_base_line() function
 libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
 libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
 
@@ -730,8 +716,14 @@ libv.ui: margin support in every component | margin only effects layouts
             stretch
 
 libv.ui: make access_property a class member function (or use a single composite param)
-libv.ui: remove layouted flag, servers no real purpose.
 libv.ctrl: rename every "scale" to "multiplier"
+
+app.fsw: libv.arg-ify
+app.bin_to_src: libv.arg-ify
+app.bin_to_src: command line argument for line length
+app.bin_to_src: use std::span<const std::byte>
+app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
+
 
 
 IDE:

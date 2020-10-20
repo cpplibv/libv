@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/gen_ui_theme/engine.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/engine.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -9,13 +9,9 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
-//#include <span>
 #include <string>
 #include <string_view>
-//#include <vector>
-// pro
-//#include <theme/effect.hpp>
-//#include <theme/theme.hpp>
+#include <vector>
 
 
 namespace app {
@@ -23,14 +19,22 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct DynamicVar {
-	std::string name;
-	double low;
-	double high;
-	double step;
-	double value;
+	enum class State {
+		create,
+		remove,
+		update,
+	};
 
-	bool added;
-	bool removed;
+public:
+	std::string name;
+	double low = 0;
+	double high = 0;
+	double step = 0;
+	double value = 0;
+	State state = State::create;
+
+	explicit DynamicVar(std::string_view name) :
+		name(name) {}
 
 	[[nodiscard]] friend inline bool operator==(const DynamicVar& lhs, const std::string_view& rhs) noexcept {
 		return lhs.name == rhs;

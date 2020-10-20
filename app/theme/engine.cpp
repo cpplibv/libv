@@ -1,9 +1,7 @@
-// Project: libv.ui, File: app/gen_ui_theme/engine.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/engine.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <theme/engine.hpp>
-// ext
-//#include <boost/container/flat_set.hpp>
 // libv
 #include <libv/algorithm/linear_find.hpp>
 #include <libv/container/vector_2d.hpp>
@@ -29,54 +27,63 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T>
+class sow_scan_set {
+	/// T expected to have:
+	///
+	///	enum class State {
+	///		create,
+	///		remove,
+	///		update,
+	///	};
+	///
+	///	template Key ctor
+	///	template Key operator==
 
-// =================================================================================================
-// =================================================================================================
+private:
+	std::vector<T> vars;
 
-//template <typename T>
-//struct SOWScreenSet {
-//	enum class State {
-//		addition,
-//		removal,
-//		update,
-//	};
-//
-//	struct Item {
-//		T var;
-//		State state;
-//	};
-//	std::vector<T> vars;
-//};
-//
-//struct DynamicVar {
-//	std::string name;
-//	double low;
-//	double high;
-//	double step;
-//	double value;
-//
-//	[[nodiscard]] friend inline bool operator==(const DynamicVar& lhs, const std::string_view& rhs) noexcept {
-//		return lhs.name == rhs;
-//	}
-//};
+public:
+	void start_new_scan() {
+		std::erase_if(vars, [](auto& var) {
+			if (var.state == T::State::remove)
+				return true;
 
-// =================================================================================================
-// =================================================================================================
+			var.state = T::State::remove;
+			return false;
+		});
+	}
 
+	struct add_result {
+		T& value;
+		bool insertion; /// True - A new entry was inserted, False - An existing entry was returned
+	};
 
-//struct FlexPoint {
-//	bool horizontal = false;
-//	float point;
-//};
+	template <typename Key>
+	add_result add(Key&& key) {
+		auto it = libv::linear_find_optional(vars, key);
+		if (it) {
+			it->state = T::State::update;
+			return add_result{*it, false};
+		}
 
-struct Task {
-	std::string name;
-	libv::vec2i texture_size;
-//	std::vector<FlexPoint> flex_points;
-	std::vector<std::unique_ptr<app::BasePixelEffect>> effects;
+		auto& item = vars.emplace_back(std::forward<Key>(key));
+		item.state = T::State::create;
+		return add_result{item, true};
+	}
+
+	template <typename Key>
+	auto find(Key&& key) {
+		return libv::linear_find_optional(vars, key);
+	}
+
+	[[nodiscard]] std::vector<T> list() const {
+		return vars;
+	}
 };
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
+// =================================================================================================
 
 namespace lvs {
 
@@ -130,6 +137,21 @@ static inline T verify_userdata(const sol::object& object) {
 }
 
 // =================================================================================================
+// =================================================================================================
+
+//struct FlexPoint {
+//	bool horizontal = false;
+//	float point;
+//};
+
+struct Task {
+	std::string name;
+	libv::vec2i texture_size;
+//	std::vector<FlexPoint> flex_points;
+	std::vector<std::unique_ptr<app::BasePixelEffect>> effects;
+};
+
+// -------------------------------------------------------------------------------------------------
 
 struct ImplEngine {
 public:
@@ -141,8 +163,7 @@ public:
 	sol::safe_function lua_main_func;
 
 public:
-//	boost::container::flat_set<DynamicVar, std::less<>> dynamic_vars;
-	std::vector<DynamicVar> dynamic_vars;
+	sow_scan_set<DynamicVar> dynamic_var_sow;
 	std::function<void(std::vector<DynamicVar>)> on_dynamic_var;
 
 public:
@@ -236,17 +257,12 @@ void ImplEngine::init() {
 	lua["dpi"] = libv::vec2f{92, 92};
 
 	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step, double init) {
-		const auto it = libv::linear_find_optional(dynamic_vars, name);
-		if (it) {
-			it->low = low;
-			it->high = high;
-			it->step = step;
-			// We do not reset the value to init, only clamp it
-			it->value = std::clamp(it->value, low, high);
-			it->removed = false;
-		} else {
-			dynamic_vars.emplace_back(std::string(name), low, high, step, init, true, false);
-		}
+		auto&& [it, insertion] = dynamic_var_sow.add(name);
+
+		it.low = low;
+		it.high = high;
+		it.step = step;
+		it.value = insertion ? init : std::clamp(it.value, low, high); // On update we do not reset the value to init, only clamp it
 	});
 
 	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
@@ -288,8 +304,7 @@ void ImplEngine::_load_script() {
 
 	libv::Timer timer;
 
-	for (auto& var : dynamic_vars)
-		var.removed = true;
+	dynamic_var_sow.start_new_scan();
 
 	try {
 		const auto script_str = libv::read_file_or_throw(script_file);
@@ -327,8 +342,8 @@ void ImplEngine::_run_script() {
 	try {
 		libv::vec2i texture_size;
 
-		for (const auto& var : dynamic_vars)
-			if (!var.removed)
+		for (const auto& var : dynamic_var_sow.list())
+			if (var.state != DynamicVar::State::remove)
 				lua[var.name] = var.value;
 
 		const auto lua_theme_table = lua.create_table(0, 2,
@@ -370,7 +385,7 @@ void ImplEngine::_run_script() {
 	log_app.info("Work execution successful  : {:7.3f}ms", timer.timef_ms().count());
 
 	static constexpr int32_t atlas_size_max = 2048;
-	for (int32_t i = 64; i <= atlas_size_max; i *= 2) {
+	for (int32_t i = 128; i <= atlas_size_max; i *= 2) {
 		try {
 			const auto atlas_size = libv::vec2i{i, i};
 			Atlas result = builder.build_atlas(atlas_size);
@@ -393,18 +408,13 @@ void ImplEngine::_broadcast_dynamic_vars() {
 	if (!on_dynamic_var)
 		return;
 
-	on_dynamic_var(dynamic_vars);
-
-	std::erase_if(dynamic_vars, [](auto& var) {
-		var.added = false;
-		return var.removed;
-	});
+	on_dynamic_var(dynamic_var_sow.list());
 }
 
 void Engine::set_dynamic_var(const std::string_view name, double value) {
 	std::unique_lock lock(self->mutex);
 
-	const auto it = libv::linear_find_optional(self->dynamic_vars, name);
+	const auto it = self->dynamic_var_sow.find(name);
 	if (!it)
 		return;
 

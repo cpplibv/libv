@@ -13,7 +13,7 @@ namespace ui {
 
 class Background {
 public:
-	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size) = 0;
+	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) = 0;
 	virtual libv::vec2f size() = 0;
 	virtual ~Background() = default;
 };

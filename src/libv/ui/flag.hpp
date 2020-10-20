@@ -20,7 +20,7 @@ static constexpr Flag_t none = Flag_t{};
 
 //static constexpr Flag_t enable                = libv::bit(0);
 static constexpr Flag_t render                = libv::bit(1);
-static constexpr Flag_t layout                = libv::bit(2);
+static constexpr Flag_t layout                = libv::bit(2); /// Primarily used to exclude components that are marked for removal from the current loop's layout (This flag could be folded under pendingDetachSelf)
 static constexpr Flag_t signal                = libv::bit(3); /// Component has or had at least one slot connected. Once set this flag is never resets
 static constexpr Flag_t slot                  = libv::bit(4); /// Component has or had at least one signal connected. Once set this flag is never resets
 static constexpr Flag_t focused               = libv::bit(5);

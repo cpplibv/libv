@@ -174,7 +174,8 @@ void CoreButton::onMouseMovement(const EventMouseMovement& event) {
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	if (event.leave)
-		reset(property.bg_color);
+//		reset(property.bg_color);
+		set(property.bg_color, property.bg_color() - 0.2f);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	fire(EventMouseMovement{event});

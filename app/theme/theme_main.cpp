@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/gen_ui_theme/gen_ui_theme.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/theme_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <GL/glew.h>
@@ -47,7 +47,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-class GenUIThemeFrame : public libv::Frame {
+class UIThemeGenFrame : public libv::Frame {
 private:
 	libv::ui::UI ui;
 
@@ -61,7 +61,7 @@ private:
 	libv::ui::CanvasAdaptor canvas_adaptor;
 
 public:
-	GenUIThemeFrame() :
+	UIThemeGenFrame() :
 		Frame("Gen UI Theme", 128+1024+30, 1024+20),
 		lua_engine("app/theme/theme_slate.lua", [this](auto&&... v) { canvas.update_texture(std::forward<decltype(v)>(v)...); }) {
 
@@ -73,12 +73,12 @@ public:
 
 		//
 
-		button0.text("Hello World!");
+		button0.text("Mode: Pulse");
+		button0.padding({5, 2, 5, 2});
 		button0.size(libv::ui::parse_size_or_throw("D, 22px"));
-		button0.event().submit([this](libv::ui::Button& component, const libv::ui::EventSubmit& event) {
-			(void) event;
-			log_app.info("Button pressed {}", component.path());
+		button0.event().submit([this](libv::ui::Button& component) {
 			canvas.pulse = !canvas.pulse;
+			component.text(canvas.pulse ? "Mode: Pulse" : "Mode: Steady");
 		});
 
 		//
@@ -110,6 +110,7 @@ public:
 public:
 	struct VarControl {
 		libv::ui::PanelLine line;
+
 		libv::ui::Label lbl_name;
 		libv::ui::ScrollBar slider;
 		libv::ui::Label lbl_value;
@@ -124,28 +125,29 @@ public:
 
 		lua_engine.on_dynamic_var([this](auto list) {
 			ui.execute_in_ui_loop([this, list = std::move(list)]() {
-				update_dynamic_var_controls(list);
+				this->update_dynamic_var_controls(list);
 			});
 		});
 	}
 
 	void update_dynamic_var_controls(const std::vector<app::DynamicVar>& vars) {
+		const auto full_init = var_controls.empty();
+
 		for (const auto& var : vars) {
 			auto& control = var_controls[var.name];
 
-			if (var.removed) {
+			if (var.state == app::DynamicVar::State::remove) {
 				control.line.markRemove();
 				var_controls.erase(var.name);
 				continue;
 
-			} else if (var.added) {
+			} else if (var.state == app::DynamicVar::State::create || full_init) {
 				control.line.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
 				control.line.size({libv::ui::ratio(), libv::ui::pixel(20)});
 				var_panel.add(control.line);
 
 				control.slider.bar_color({1, 0, 0, 1});
 				control.slider.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-				// <<< P1: UI properties are not initialized, value_step without orientation will fail
 				control.slider.value_max(var.high);
 				control.slider.value_min(var.low);
 				control.slider.value_step(var.step);
@@ -162,11 +164,8 @@ public:
 				control.lbl_name.size({libv::ui::dynamic(), libv::ui::ratio()});
 				control.line.add(control.lbl_name);
 
-				// <<< P3: capture of &control
-				// <<< P3: capture of name = var.name
-
-				control.slider.event().change([this, &control, name = var.name](const libv::ui::ScrollBar& slider) {
-					control.lbl_value.text(fmt::format("{:6.2f}", slider.value()));
+				control.slider.event().change([this, lbl = control.lbl_value, name = var.name](const libv::ui::ScrollBar& slider) mutable {
+					lbl.text(fmt::format("{:6.2f}", slider.value()));
 					lua_engine.set_dynamic_var(name, slider.value());
 				});
 
@@ -179,7 +178,7 @@ public:
 		}
 	}
 
-	~GenUIThemeFrame() {
+	~UIThemeGenFrame() {
 		disconnectAll();
 	}
 };
@@ -192,7 +191,7 @@ int main(int, char**) {
 //	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
 	std::cout << libv::logger_stream;
 
-	GenUIThemeFrame frame;
+	UIThemeGenFrame frame;
 	frame.show();
 	frame.join();
 

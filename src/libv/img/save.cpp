@@ -1,4 +1,4 @@
-// Project: libv.img, File: src/libv/img/save_dds.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.img, File: src/libv/img/save.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/img/save.hpp>

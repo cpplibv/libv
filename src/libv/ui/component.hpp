@@ -31,7 +31,7 @@ template <typename T, typename... Args>
 // -------------------------------------------------------------------------------------------------
 
 /// Handler class for components
-/// Warning: Derived classes must not contain any data member
+/// @Warning: Derived classes must not contain any data member
 class Component {
 private:
 	core_ptr ptr = nullptr;

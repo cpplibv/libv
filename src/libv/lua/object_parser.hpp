@@ -64,6 +64,7 @@
 //
 //
 // IDEA: Alternative imperative design idea #2: ---
+//      Not sure if this would be good, as side effects could repeat
 //
 //template <typename Magic>
 //static inline auto verify_color(sol::object object, Magic& magic) {

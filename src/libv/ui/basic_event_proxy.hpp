@@ -41,26 +41,26 @@ private:
 	template <typename Func>
 	std::function<void(void*, const void*)> internal_callback(Func&& func) {
 		if constexpr (std::is_invocable_r_v<void, Func, ComponentT&, const EventT&>) {
-			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
+			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
 					auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
 					f(handler, *static_cast<const EventT*>(event_ptr));
 			};
 
 		} else if constexpr (std::is_invocable_r_v<void, Func, const EventT&>) {
-			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
+			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
 					(void) component_ptr; // Callback is not interested in the component
 					f(*static_cast<const EventT*>(event_ptr));
 			};
 
 		} else if constexpr (std::is_invocable_r_v<void, Func, ComponentT&>) {
-			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
+			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
 					(void) event_ptr; // Callback is not interested in the event
 					auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
 					f(handler);
 			};
 
 		} else if constexpr (std::is_invocable_r_v<void, Func>) {
-			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) {
+			return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
 					(void) component_ptr; // Callback is not interested in the component
 					(void) event_ptr; // Callback is not interested in the event
 					f();
