@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/binary_latch.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/binary_latch.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

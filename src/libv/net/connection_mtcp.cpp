@@ -6,7 +6,7 @@
 //#include <netts/internet.hpp>
 //#include <netts/socket.hpp>
 //// libv
-//#include <libv/thread/binary_latch.hpp>
+//#include <libv/mt/binary_latch.hpp>
 //#include <libv/utility/byte_swap.hpp>
 //// std
 //#include <memory>

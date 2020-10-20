@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/executor_thread.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/executor_thread.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -12,7 +12,7 @@
 #include <thread>
 // pro
 #include <libv/log/log.hpp>
-#include <libv/thread/binary_latch.hpp>
+#include <libv/mt/binary_latch.hpp>
 
 
 namespace libv {

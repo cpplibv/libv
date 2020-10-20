@@ -1,7 +1,7 @@
-// Project: libv.thread, File: src/libv/thread/worker_thread.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/worker_thread.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/thread/worker_thread.hpp>
+#include <libv/mt/worker_thread.hpp>
 // pro
 #include <libv/log/log.hpp>
 

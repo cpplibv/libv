@@ -1,10 +1,10 @@
-// Project: libv.thread, File: src/libv/thread/mutex_noop.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/mutex_noop.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 
 namespace libv {
-namespace thread {
+namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -24,5 +24,5 @@ struct mutex_noop {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace thread
+} // namespace mt
 } // namespace libv

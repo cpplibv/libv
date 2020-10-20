@@ -3,7 +3,7 @@
 // libv
 #include <libv/log/log.hpp>
 //#include <libv/sml.hpp>
-//#include <libv/thread/binary_latch.hpp>
+//#include <libv/mt/binary_latch.hpp>
 #include <libv/utility/hex_dump.hpp>
 //#include <libv/utility/timer.hpp>
 // std

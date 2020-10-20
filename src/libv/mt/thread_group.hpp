@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/thread_group.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/thread_group.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -613,7 +613,7 @@ wish_create_library(
 	SOURCE src/libv/net/*.cpp
 	LINK   libv_log libv_utility libv_meta ext_boost ext_net_ts
 #	LINK   libv_serialization
-#	LINK   libv_utility libv_thread ext_boost
+#	LINK   libv_utility libv_mt ext_boost
 )
 
 wish_create_library(
@@ -639,8 +639,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_thread STATIC
-	SOURCE src/libv/thread/*.cpp
+	TARGET libv_mt STATIC
+	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
 	LINK   libv_utility # For unique_function
 )
@@ -680,7 +680,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET fsw
 	SOURCE app/fsw.cpp
-	LINK   ext_fmt libv_utility libv_fsw libv_thread
+	LINK   ext_fmt libv_utility libv_fsw libv_mt
 #	LINK   libv_arg
 )
 
@@ -702,7 +702,7 @@ wish_create_executable(
 	#OUTPUT_RESOURCE res
 	#RESOURCE app/theme/res
 	SOURCE app/theme/*.cpp
-	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_thread
+	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_mt
 #	LINK   libv_ctrl
 )
 
@@ -793,7 +793,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log libv_ctrl libv_thread ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_log libv_ctrl libv_mt ext_boost ext_boost_stacktrace ext_glm ext_range
 )
 
 wish_create_executable(

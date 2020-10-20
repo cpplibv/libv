@@ -10,10 +10,10 @@
 #include <libv/fsw/watcher.hpp>
 #include <libv/lua/lua.hpp>
 //#include <libv/lua/object_parser.hpp>
+#include <libv/mt/hardware_concurrency.hpp>
+#include <libv/mt/work_cooldown.hpp>
+#include <libv/mt/worker_thread.hpp>
 //#include <libv/parse/color.hpp>
-#include <libv/thread/work_cooldown.hpp>
-#include <libv/thread/worker_thread.hpp>
-#include <libv/thread/hardware_concurrency.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std

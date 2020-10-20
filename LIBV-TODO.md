@@ -564,6 +564,7 @@ libv.fsw: Rename watcher file to file_watcher, or the class the other way around
 app.gen_ui_theme: Reduce the number of thread swapping during reloading
 app.gen_ui_theme: Keep worker threads alive between runs
 app.gen_ui_theme: Rename to app.theme
+libv.thread: Rename to libv.mt
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -578,9 +579,6 @@ app.theme: add lua <-> C++ linked ui elements for colors/float selection
 
 
 
-
-
-libv.thread: rename the lib to libv.mt
 
 
 

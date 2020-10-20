@@ -6,7 +6,7 @@
 #include <fmt/ostream.h>
 #include <fmt/format.h>
 // libv
-#include <libv/thread/number.hpp>
+#include <libv/mt/number.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/source_location.hpp>
 // std

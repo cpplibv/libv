@@ -5,7 +5,7 @@
 // ext
 #include <GLFW/glfw3.h>
 // libv
-#include <libv/thread/single_instance.hpp>
+#include <libv/mt/single_instance.hpp>
 #include <libv/utility/enum.hpp>
 // std
 #include <atomic>
@@ -23,7 +23,7 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::thread::SingleInstance<Core> core;
+libv::mt::SingleInstance<Core> core;
 
 std::shared_ptr<Core> getCoreInstance() {
 	return core.get();

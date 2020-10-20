@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/thread_bulk.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/thread_bulk.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -11,7 +11,7 @@
 #include <thread>
 #include <vector>
 // pro
-#include <libv/thread/thread_group.hpp>
+#include <libv/mt/thread_group.hpp>
 
 
 namespace libv {

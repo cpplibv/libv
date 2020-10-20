@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/work_cooldown.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/work_cooldown.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -7,7 +7,7 @@
 #include <chrono>
 #include <mutex>
 // pro
-#include <libv/thread/worker_thread.hpp>
+#include <libv/mt/worker_thread.hpp>
 
 
 namespace libv {

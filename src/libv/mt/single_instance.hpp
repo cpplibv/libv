@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/single_instance.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/single_instance.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -10,7 +10,7 @@
 // -------------------------------------------------------------------------------------------------
 
 namespace libv {
-namespace thread {
+namespace mt {
 namespace detail {
 
 template <typename Guard>
@@ -58,5 +58,5 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace thread
+} // namespace mt
 } // namespace libv

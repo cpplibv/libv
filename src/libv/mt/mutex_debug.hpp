@@ -1,4 +1,4 @@
-// Project: libv.thread, File: src/libv/thread/mutex_debug.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/mutex_debug.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -9,11 +9,11 @@
 #include <shared_mutex>
 #include <string>
 // pro
-#include <libv/thread/number.hpp>
+#include <libv/mt/number.hpp>
 
 
 namespace libv {
-namespace thread {
+namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -57,5 +57,5 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace thread
+} // namespace mt
 } // namespace libv

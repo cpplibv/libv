@@ -1,11 +1,11 @@
-// Project: libv.thread, File: src/libv/thread/name.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/name.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 // std
 #include <string>
 // libv
-#include <libv/thread/number.hpp>
+#include <libv/mt/number.hpp>
 
 
 namespace libv {

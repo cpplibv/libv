@@ -4,7 +4,7 @@
 #include <catch/catch.hpp>
 // libv
 #include <libv/log/log.hpp>
-#include <libv/thread/binary_latch.hpp>
+#include <libv/mt/binary_latch.hpp>
 #include <libv/utility/enum.hpp>
 // std
 #include <iostream>
