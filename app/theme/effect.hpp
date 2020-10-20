@@ -11,7 +11,7 @@
 #include <vector>
 #include <atomic>
 // pro
-#include <gen_ui_theme/image.hpp>
+#include <theme/image.hpp>
 
 
 namespace app {

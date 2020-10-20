@@ -1,7 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="app_gen_ui_theme" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="app_gen_ui_theme" CONFIG_NAME="Dev" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="app_gen_ui_theme">
-    <method v="2">
-      <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
-    </method>
-  </configuration>
-</component>

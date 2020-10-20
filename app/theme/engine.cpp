@@ -1,7 +1,7 @@
 // Project: libv.ui, File: app/gen_ui_theme/engine.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <gen_ui_theme/engine.hpp>
+#include <theme/engine.hpp>
 // ext
 //#include <boost/container/flat_set.hpp>
 // libv
@@ -21,8 +21,8 @@
 #include <chrono>
 #include <mutex>
 // pro
-#include <gen_ui_theme/effect.hpp>
-#include <gen_ui_theme/theme.hpp>
+#include <theme/effect.hpp>
+#include <theme/theme.hpp>
 
 
 namespace app {

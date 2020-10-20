@@ -562,6 +562,8 @@ libv.ui: Implement thread switch support for UI modifying tasks
 app.fsw: New file system watcher app (lifted from iris)
 libv.fsw: Rename watcher file to file_watcher, or the class the other way around | class rename preferred
 app.gen_ui_theme: Reduce the number of thread swapping during reloading
+app.gen_ui_theme: Keep worker threads alive between runs
+app.gen_ui_theme: Rename to app.theme
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -570,14 +572,16 @@ app.gen_ui_theme: Reduce the number of thread swapping during reloading
 
 
 
-	too many thread spawns, fsw -> worker.load -> worker.run (-> work) -> worker.broadcast -> ui
-	goal:	fsw -> worker (-> work) -> ui
 
-
-
-
-app.gen_ui_theme: add lua <-> C++ linked ui elements for colors/float selection
+app.theme: add lua <-> C++ linked ui elements for colors/float selection
 	- proper SOW update, and not just current state broadcast, currently this can lead to a data race on init
+
+
+
+
+
+libv.thread: rename the lib to libv.mt
+
 
 
 
@@ -626,9 +630,9 @@ So the way theme generation will work:
 
 
 
-app.gen_ui_theme: create theme exporter: json and texture
-app.gen_ui_theme: connect the theme gen with a running app to live update
-app.gen_ui_theme: clean up C++ blend/effect implementations
+app.theme: create theme exporter: json and texture
+app.theme: connect the theme gen with a running app to live update
+app.theme: clean up C++ blend/effect implementations
 
 
 libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane
@@ -642,8 +646,6 @@ libv.ui: set_clear_color (?) | no need, client could use a full background any t
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
-libv.thread: rename the lib to libv.mt
-app.gen_ui_theme: rename the app to ui_theme_gen or utg or ui_theme or theme | theme
 
 
 libv.ui.theme:

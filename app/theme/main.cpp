@@ -40,9 +40,9 @@
 //#include <libv/ui/component/stretch.hpp>
 
 // pro
-#include <gen_ui_theme/canvas.hpp>
-#include <gen_ui_theme/effect.hpp>
-#include <gen_ui_theme/engine.hpp>
+#include <theme/canvas.hpp>
+#include <theme/effect.hpp>
+#include <theme/engine.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ private:
 public:
 	GenUIThemeFrame() :
 		Frame("Gen UI Theme", 128+1024+30, 1024+20),
-		lua_engine("app/gen_ui_theme/theme_slate.lua", [this](auto&&... v) { canvas.update_texture(std::forward<decltype(v)>(v)...); }) {
+		lua_engine("app/theme/theme_slate.lua", [this](auto&&... v) { canvas.update_texture(std::forward<decltype(v)>(v)...); }) {
 
 		setPosition(FramePosition::center_current_monitor);
 		setOpenGLProfile(OpenGLProfile::core);

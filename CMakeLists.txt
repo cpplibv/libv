@@ -696,12 +696,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET app_gen_ui_theme
-	#OUTPUT_FOLDER gen_ui_theme
-	#OUTPUT_NAME gen_ui_theme
+	TARGET theme
+	#OUTPUT_FOLDER theme
+	#OUTPUT_NAME theme
 	#OUTPUT_RESOURCE res
-	#RESOURCE app/gen_ui_theme/res
-	SOURCE app/gen_ui_theme/*.cpp
+	#RESOURCE app/theme/res
+	SOURCE app/theme/*.cpp
 	LINK   libv_log libv_ui libv_frame libv_glr libv_utility libv_fsw libv_lua libv_thread
 #	LINK   libv_ctrl
 )
