@@ -54,6 +54,7 @@ public:
 	}
 
 public:
+	/// This is the only thread-safe operation on UI, every other member function can only be called from the main UI thread
 	void execute_in_ui_loop(std::function<void()> func);
 
 public:

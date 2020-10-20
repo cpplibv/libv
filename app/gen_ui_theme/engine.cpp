@@ -114,17 +114,26 @@ public:
 
 public:
 	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
-	libv::mt::work_cooldown load_cd{std::chrono::milliseconds{100}};
-	libv::mt::work_cooldown execute_cd{std::chrono::milliseconds{5}};
+	libv::mt::work_heatup_cooldown load_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
+	libv::mt::work_cooldown run_cd{std::chrono::milliseconds{5}};
 	libv::fsw::Watcher file_watcher;
 
 public:
 	void init();
-	void load_script();
-	void run_script();
 
 public:
+	void schedule_load_script();
+	void schedule_run_script();
+	void schedule_broadcast_dynamic_vars();
+
+	void load_script();
+	void run_script();
 	void broadcast_dynamic_vars();
+
+	void _load_script();
+	void _run_script();
+	void _broadcast_dynamic_vars();
+
 };
 
 // =================================================================================================
@@ -136,9 +145,9 @@ Engine::Engine(std::filesystem::path script_file, std::function<void(libv::vecto
 
 	self->init();
 
-	self->load_cd.execute_async([this] { self->load_script(); }, self->worker_thread);
+	self->schedule_load_script();
 	self->file_watcher.subscribe_file(self->script_file, [this](const auto&) {
-		self->load_cd.execute_async([this] { self->load_script(); }, self->worker_thread);
+		self->schedule_load_script();
 	});
 }
 
@@ -180,9 +189,61 @@ static inline Task load_task(const sol::object& object) {
 	return result;
 }
 
+// -------------------------------------------------------------------------------------------------
+
+void ImplEngine::init() {
+	lua["dpi"] = libv::vec2f{92, 92};
+
+	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step, double init) {
+		const auto it = libv::linear_find_optional(dynamic_vars, name);
+		if (it) {
+			it->low = low;
+			it->high = high;
+			it->step = step;
+			// We do not reset the value to init, only clamp it
+			it->value = std::clamp(it->value, low, high);
+			it->removed = false;
+		} else {
+			dynamic_vars.emplace_back(std::string(name), low, high, step, init, true, false);
+		}
+	});
+
+	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
+
+	});
+}
+
+void ImplEngine::schedule_load_script() {
+	load_cd.execute_async([this] { load_script(); }, worker_thread);
+}
+
+void ImplEngine::schedule_run_script() {
+	run_cd.execute_async([this] { run_script(); }, worker_thread);
+}
+
+void ImplEngine::schedule_broadcast_dynamic_vars() {
+	worker_thread.execute_async([this] { broadcast_dynamic_vars(); });
+}
+
 void ImplEngine::load_script() {
 	std::unique_lock lock(mutex);
+	_load_script();
+	_run_script();
+	_broadcast_dynamic_vars();
+}
 
+void ImplEngine::run_script() {
+	std::unique_lock lock(mutex);
+	_run_script();
+	_broadcast_dynamic_vars();
+}
+
+void ImplEngine::broadcast_dynamic_vars() {
+	std::unique_lock lock(mutex);
+	_broadcast_dynamic_vars();
+}
+
+void ImplEngine::_load_script() {
 	log_app.info("Loading script...");
 
 	libv::Timer timer;
@@ -217,15 +278,11 @@ void ImplEngine::load_script() {
 	} catch (const std::exception& e) {
 		log_app.error("Failed to load texture due to exception: {}", e.what());
 	}
-
-	execute_cd.execute_async([this] { run_script(); }, worker_thread);
 }
 
-void ImplEngine::run_script() {
+void ImplEngine::_run_script() {
 	std::vector<Task> tasks;
 	libv::Timer timer;
-
-	std::unique_lock lock(mutex);
 
 	try {
 		libv::vec2i texture_size;
@@ -290,100 +347,39 @@ void ImplEngine::run_script() {
 			}
 		}
 	}
-
-	broadcast_dynamic_vars();
 }
 
-void ImplEngine::init() {
-	lua["dpi"] = libv::vec2f{92, 92};
+void ImplEngine::_broadcast_dynamic_vars() {
+	if (!on_dynamic_var)
+		return;
 
-	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step, double init) {
-		const auto it = libv::linear_find_optional(dynamic_vars, name);
-		if (it) {
-			it->low = low;
-			it->high = high;
-			it->step = step;
-			// We do not reset the value to init, only clamp it
-			it->value = std::clamp(it->value, low, high);
-			it->removed = false;
-		} else {
-			dynamic_vars.emplace_back(std::string(name), low, high, step, init, true, false);
-		}
-	});
+	on_dynamic_var(dynamic_vars);
 
-	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
-
+	std::erase_if(dynamic_vars, [](auto& var) {
+		var.added = false;
+		return var.removed;
 	});
 }
 
 void Engine::set_dynamic_var(const std::string_view name, double value) {
-	{
-		std::unique_lock lock(self->mutex);
-		log_app.info("{} = {}", name, value);
+	std::unique_lock lock(self->mutex);
+	log_app.info("{} = {}", name, value);
 
-		const auto it = libv::linear_find_optional(self->dynamic_vars, name);
-		if (!it)
-			return;
+	const auto it = libv::linear_find_optional(self->dynamic_vars, name);
+	if (!it)
+		return;
 
-		it->value = value;
-	}
+	it->value = value;
 
-	self->execute_cd.execute_async([this] { self->run_script(); }, self->worker_thread);
+	self->schedule_run_script();
 }
 
 void Engine::on_dynamic_var(std::function<void(std::vector<DynamicVar>)> callback) {
 	std::unique_lock lock(self->mutex);
 
 	self->on_dynamic_var = std::move(callback);
-	self->broadcast_dynamic_vars();
+	self->schedule_broadcast_dynamic_vars();
 }
-
-void ImplEngine::broadcast_dynamic_vars() {
-	worker_thread.execute_async([this]() {
-		std::unique_lock lock(mutex);
-
-		if (!on_dynamic_var)
-			return;
-
-		on_dynamic_var(dynamic_vars);
-
-		std::erase_if(dynamic_vars, [](auto& var) {
-			var.added = false;
-			return var.removed;
-		});
-	});
-}
-
-// -------------------------------------------------------------------------------------------------
-
-//void load() {
-//	for (const auto& pending_value : pending_dynamic_values)
-//		lua[pending_value.name] = pending_value.value;
-//}
-
-//void ImplEngine::load() {
-//}
-
-//Atlas Engine::export_atlas() {
-//	AtlasBuilder builder;
-//
-////		build.add(...);
-//
-//	static constexpr int32_t atlas_size_max = 1024;
-//	for (int32_t i = 64; i <= atlas_size_max; i *= 2) {
-//		try {
-//			Atlas result = builder.build_atlas(libv::vec2i{i, i});
-//			return result;
-//		} catch (const std::exception& e) {
-//			if (i != atlas_size_max) {
-//				log_app.warn("{}", e.what());
-//			} else {
-//				log_app.error("{}", e.what());
-//				throw;
-//			}
-//		}
-//	}
-//}
 
 // -------------------------------------------------------------------------------------------------
 
