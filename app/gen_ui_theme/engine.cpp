@@ -13,6 +13,7 @@
 //#include <libv/parse/color.hpp>
 #include <libv/thread/work_cooldown.hpp>
 #include <libv/thread/worker_thread.hpp>
+#include <libv/thread/hardware_concurrency.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
@@ -27,6 +28,41 @@
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
+
+
+// =================================================================================================
+// =================================================================================================
+
+//template <typename T>
+//struct SOWScreenSet {
+//	enum class State {
+//		addition,
+//		removal,
+//		update,
+//	};
+//
+//	struct Item {
+//		T var;
+//		State state;
+//	};
+//	std::vector<T> vars;
+//};
+//
+//struct DynamicVar {
+//	std::string name;
+//	double low;
+//	double high;
+//	double step;
+//	double value;
+//
+//	[[nodiscard]] friend inline bool operator==(const DynamicVar& lhs, const std::string_view& rhs) noexcept {
+//		return lhs.name == rhs;
+//	}
+//};
+
+// =================================================================================================
+// =================================================================================================
+
 
 //struct FlexPoint {
 //	bool horizontal = false;
@@ -113,10 +149,16 @@ public:
 	std::mutex mutex;
 
 public:
+	app::EffectApplyEngine engine;
+
+public:
 	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
 	libv::mt::work_heatup_cooldown load_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
 	libv::mt::work_cooldown run_cd{std::chrono::milliseconds{5}};
 	libv::fsw::Watcher file_watcher;
+
+public:
+	ImplEngine(size_t n) : engine(n) {}
 
 public:
 	void init();
@@ -125,10 +167,6 @@ public:
 	void schedule_load_script();
 	void schedule_run_script();
 	void schedule_broadcast_dynamic_vars();
-
-	void load_script();
-	void run_script();
-	void broadcast_dynamic_vars();
 
 	void _load_script();
 	void _run_script();
@@ -139,7 +177,10 @@ public:
 // =================================================================================================
 
 Engine::Engine(std::filesystem::path script_file, std::function<void(libv::vector_2D<libv::vec4uc>, libv::vec2i)> callback) {
-	self = std::make_unique<ImplEngine>();
+	auto processor_count = libv::mt::hardware_concurrency_or(8);
+	log_app.info("Starting engine with {} worker thread", processor_count);
+
+	self = std::make_unique<ImplEngine>(processor_count);
 	self->script_file = std::move(script_file);
 	self->callback = std::move(callback);
 
@@ -214,33 +255,32 @@ void ImplEngine::init() {
 }
 
 void ImplEngine::schedule_load_script() {
-	load_cd.execute_async([this] { load_script(); }, worker_thread);
+	load_cd.execute_async([this] {
+
+		std::unique_lock lock(mutex);
+		_load_script();
+		_run_script();
+		_broadcast_dynamic_vars();
+
+	}, worker_thread);
 }
 
 void ImplEngine::schedule_run_script() {
-	run_cd.execute_async([this] { run_script(); }, worker_thread);
+	run_cd.execute_async([this] {
+
+		std::unique_lock lock(mutex);
+		_run_script();
+
+	}, worker_thread);
 }
 
 void ImplEngine::schedule_broadcast_dynamic_vars() {
-	worker_thread.execute_async([this] { broadcast_dynamic_vars(); });
-}
+	worker_thread.execute_async([this] {
 
-void ImplEngine::load_script() {
-	std::unique_lock lock(mutex);
-	_load_script();
-	_run_script();
-	_broadcast_dynamic_vars();
-}
+		std::unique_lock lock(mutex);
+		_broadcast_dynamic_vars();
 
-void ImplEngine::run_script() {
-	std::unique_lock lock(mutex);
-	_run_script();
-	_broadcast_dynamic_vars();
-}
-
-void ImplEngine::broadcast_dynamic_vars() {
-	std::unique_lock lock(mutex);
-	_broadcast_dynamic_vars();
+	});
 }
 
 void ImplEngine::_load_script() {
@@ -272,7 +312,7 @@ void ImplEngine::_load_script() {
 			return log_app.error("Main is not a function: {} - {}", libv::to_value(func_main.get_type()), std::string(func_main));
 
 		lua_main_func = func_main;
-		log_app.info("Script loading successful: {:7.3f}ms", timer.timef_ms().count());
+		log_app.info("Script loading successful  : {:7.3f}ms", timer.timef_ms().count());
 
 		// ...
 	} catch (const std::exception& e) {
@@ -322,25 +362,25 @@ void ImplEngine::_run_script() {
 
 	for (const Task& task : tasks) {
 		app::Image task_image(task.texture_size.cast<size_t>());
-		app::EffectApplyEngine engine(12);
 		engine.process(task_image, task.effects);
 
 		builder.add(task.name, task_image.generate_8bit_channels());
 	}
 
-	log_app.info("Work execution successful: {:7.3f}ms", timer.timef_ms().count());
+	log_app.info("Work execution successful  : {:7.3f}ms", timer.timef_ms().count());
 
-	static constexpr int32_t atlas_size_max = 1024;
+	static constexpr int32_t atlas_size_max = 2048;
 	for (int32_t i = 64; i <= atlas_size_max; i *= 2) {
 		try {
 			const auto atlas_size = libv::vec2i{i, i};
 			Atlas result = builder.build_atlas(atlas_size);
 
+			log_app.info("Atlas building successful  : {:7.3f}ms with size {}x{}", timer.timef_ms().count(), i, i);
 			callback(result.image, atlas_size);
 			break;
 		} catch (const std::exception& e) {
 			if (i != atlas_size_max) {
-				log_app.warn("{}", e.what());
+//				log_app.warn("{}", e.what());
 			} else {
 				log_app.error("{}", e.what());
 				throw;
@@ -363,7 +403,6 @@ void ImplEngine::_broadcast_dynamic_vars() {
 
 void Engine::set_dynamic_var(const std::string_view name, double value) {
 	std::unique_lock lock(self->mutex);
-	log_app.info("{} = {}", name, value);
 
 	const auto it = libv::linear_find_optional(self->dynamic_vars, name);
 	if (!it)

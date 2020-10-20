@@ -127,13 +127,6 @@ public:
 				update_dynamic_var_controls(list);
 			});
 		});
-
-//		std::vector<app::DynamicVar> vars;
-//		vars.emplace_back("test0",    0, 100,  0, 0, true, false);
-//		vars.emplace_back("test1",    0, 200,  0, 0, true, false);
-//		vars.emplace_back("test2", -100, 100,  0, 0, true, false);
-//		vars.emplace_back("test3",    0, 100, 10, 0, true, false);
-//		update_dynamic_var_controls(vars);
 	}
 
 	void update_dynamic_var_controls(const std::vector<app::DynamicVar>& vars) {
@@ -194,9 +187,9 @@ public:
 // Runner ------------------------------------------------------------------------------------------
 
 int main(int, char**) {
-	// For CLion console
+	// For CLion console links
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
-	libv::logger_stream.deny("libv.ui");
+//	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
 	std::cout << libv::logger_stream;
 
 	GenUIThemeFrame frame;
