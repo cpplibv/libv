@@ -471,10 +471,10 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME soil
-	GIT_REPOSITORY https://github.com/xosdy/soil.git
+	NAME soil2
+	GIT_REPOSITORY https://github.com/VaderY/SOIL2.git
 	GIT_TAG master
-	LINK soil
+	LINK soil2
 )
 
 wish_create_external(
@@ -577,7 +577,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math ext_ctre ext_glew ext_boost ext_gli ext_soil ${OPENGL_LIBRARIES}
+	LINK   libv_log libv_math ext_ctre ext_glew ext_boost ext_gli ext_soil2 ${OPENGL_LIBRARIES}
 )
 
 wish_create_library(

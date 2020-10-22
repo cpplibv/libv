@@ -3,7 +3,7 @@
 // hpp
 #include <libv/gl/image.hpp>
 // ext
-#include <SOIL/SOIL.h>
+#include <SOIL2/SOIL2.h>
 // libv
 #include <libv/container/dynarray.hpp>
 // std
