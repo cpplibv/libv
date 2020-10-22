@@ -474,7 +474,7 @@ wish_create_external(
 	NAME soil2
 	GIT_REPOSITORY https://github.com/VaderY/SOIL2.git
 	GIT_TAG master
-	LINK soil2
+	LINK soil2 ${OPENGL_LIBRARIES}
 )
 
 wish_create_external(
@@ -554,6 +554,12 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_ecs INTERFACE
 	LINK   ext_boost ext_range
+)
+
+wish_create_library(
+	TARGET libv_img STATIC
+	SOURCE src/libv/img/*.cpp
+	LINK   libv_math ext_soil2
 )
 
 wish_create_library(
@@ -782,6 +788,12 @@ wish_create_executable(
 	TARGET sandbox_libv_glr2
 	SOURCE sandbox/libv_glr_main2.cpp
 	LINK   libv_log libv_glr libv_utility libv_math ext_glfw
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_img
+	SOURCE sandbox/libv_img_main.cpp
+	LINK   libv_img libv_utility
 )
 
 wish_create_executable(
