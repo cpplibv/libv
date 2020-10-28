@@ -34,7 +34,7 @@ class OutcomeArgumentParse {
 	std::optional<std::string> warning_;
 
 public:
-	inline operator bool() const {
+	/*implicit*/ inline operator bool() const {
 		return !error_ && !warning_;
 	}
 	inline void error(std::string message) {
@@ -55,7 +55,7 @@ private:
 	std::string description_;
 
 public:
-	inline BaseArgument(std::vector<std::string> aliases) :
+	explicit inline BaseArgument(std::vector<std::string> aliases) :
 		aliases_(std::move(aliases)) { }
 
 	inline const std::vector<std::string>& aliases() const noexcept {
@@ -139,7 +139,7 @@ class Flag : public BaseArgument {
 	value_type value_ = false;
 
 public:
-	inline Flag(std::vector<std::string> aliases) :
+	explicit inline Flag(std::vector<std::string> aliases) :
 		BaseArgument(std::move(aliases)) { }
 
 	virtual bool consume() override {
@@ -160,7 +160,7 @@ public:
 		os << ": " << (value_ ? "true" : "false");
 	}
 
-	constexpr inline const value_type& value() const noexcept {
+	[[nodiscard]] constexpr inline const value_type& value() const noexcept {
 		return value_;
 	}
 
@@ -175,7 +175,7 @@ class Rest : public BaseArgument {
 	value_type value_;
 
 public:
-	inline Rest(std::vector<std::string> aliases) :
+	explicit inline Rest(std::vector<std::string> aliases) :
 		BaseArgument(std::move(aliases)) { }
 
 	virtual bool consume() override {
@@ -201,7 +201,7 @@ public:
 		os << ']';
 	}
 
-	constexpr inline const value_type& value() const noexcept {
+	[[nodiscard]] constexpr inline const value_type& value() const noexcept {
 		return value_;
 	}
 
@@ -218,7 +218,7 @@ class Optional : public BaseArgument {
 	bool consume_ = true;
 
 public:
-	inline Optional(std::vector<std::string> aliases) :
+	explicit inline Optional(std::vector<std::string> aliases) :
 		BaseArgument(std::move(aliases)) { }
 
 	virtual bool consume() override {
@@ -244,7 +244,7 @@ public:
 			os << " is not set";
 	}
 
-	constexpr inline const value_type& value() const noexcept {
+	[[nodiscard]] constexpr inline const value_type& value() const noexcept {
 		return value_;
 	}
 
@@ -262,7 +262,7 @@ class Require : public BaseArgument {
 	bool fulfilled_ = false;
 
 public:
-	inline Require(std::vector<std::string> aliases) :
+	explicit inline Require(std::vector<std::string> aliases) :
 		BaseArgument(std::move(aliases)) { }
 
 	virtual bool consume() override {
@@ -286,7 +286,7 @@ public:
 			os << " is not set";
 	}
 
-	constexpr inline const value_type& value() const noexcept {
+	[[nodiscard]] constexpr inline const value_type& value() const noexcept {
 		return value_;
 	}
 
@@ -307,9 +307,9 @@ class Argument {
 	std::shared_ptr<ArgumentT> argument;
 
 public:
-	Argument(std::shared_ptr<ArgumentT>&& argument) : argument(std::move(argument)) { }
+	explicit Argument(std::shared_ptr<ArgumentT>&& argument) : argument(std::move(argument)) { }
 
-	constexpr inline const auto& value() const noexcept {
+	[[nodiscard]] constexpr inline const auto& value() const noexcept {
 		return argument->value();
 	}
 
@@ -327,18 +327,21 @@ class Builder {
 	std::shared_ptr<ArgumentT> argument;
 
 public:
-	Builder(std::shared_ptr<ArgumentT>&& argument) : argument(std::move(argument)) { }
+	explicit Builder(std::shared_ptr<ArgumentT>&& argument) : argument(std::move(argument)) { }
 
-	Argument<ArgumentT> operator()(std::string name, std::string description = "") {
+	auto operator()(std::string name, std::string description = "") {
 		argument->name_ = std::move(name);
 		argument->description_ = std::move(description);
-		return {std::move(argument)};
+		return Argument<ArgumentT>{std::move(argument)};
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
 class Parser {
+	std::string program_name;
+	std::string program_description;
+
 	std::unordered_map<std::string, std::shared_ptr<BaseArgument>> identifiers;
 	std::vector<std::shared_ptr<BaseArgument>> arguments;
 	std::vector<std::shared_ptr<BaseArgument>> requires_;
@@ -352,6 +355,12 @@ private:
 	constexpr void verifyArgumentType() {
 		static_assert(!std::is_same_v<T, std::string_view>, "Argument type cannot be std::string_view to avoid a dangling view, use std::string instead");
 		static_assert((std::is_convertible_v<Aliases, std::string> && ...), "Name types has to be convertible to string");
+	}
+
+public:
+	explicit Parser(std::string program_name = "", std::string program_description = "") :
+		program_name(std::move(program_name)),
+		program_description(std::move(program_description)) {
 	}
 
 public:
@@ -448,14 +457,36 @@ public:
 			}
 		}
 
-		if (require_no_unused_ && !unused.empty())
-			return false;
-
 		for (const auto& require : requires_)
 			if (!require->fulfilled())
 				return false;
 
+		if (require_no_unused_ && !unused.empty())
+			return false;
+
 		return true;
+	}
+
+	std::ostream& error_message(std::ostream& os, int width = 120) const {
+		(void) width; // TODO P5: libv.arg: use width
+
+		os << "Failed to parse parameters:\n";
+
+		if (require_no_unused_)
+			for (const auto& [i, v] : unused)
+				os << "  Argument \"" << v << "\" at index " << i << " was not used\n";
+
+		for (const auto& require : requires_)
+			if (!require->fulfilled())
+				os << "  Required parameter \"" << require->name() << "\" was not set\n";
+
+		return os;
+	}
+
+	std::string error_message(int width = 120) const {
+		std::ostringstream os;
+		error_message(os, width);
+		return std::move(os.str());
 	}
 
 	std::ostream& report(std::ostream& os, int width = 120) const {
@@ -484,6 +515,8 @@ public:
 
 	std::ostream& usage(std::ostream& os, int width = 120) const {
 		(void) width; // TODO P5: libv.arg: use width
+
+		os << "Usage:\n";
 
 		for (const auto& argument : arguments) {
 			os << "  " << argument->name();
