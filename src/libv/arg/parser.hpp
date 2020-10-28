@@ -344,6 +344,7 @@ class Parser {
 
 	std::unordered_map<std::string, std::shared_ptr<BaseArgument>> identifiers;
 	std::vector<std::shared_ptr<BaseArgument>> arguments;
+
 	std::vector<std::shared_ptr<BaseArgument>> requires_;
 	std::vector<std::shared_ptr<BaseArgument>> positionals;
 //	std::shared_ptr<BaseArgument> arg_exe;
@@ -519,14 +520,17 @@ public:
 		os << "Usage:\n";
 
 		for (const auto& argument : arguments) {
-			os << "  " << argument->name();
+			os << "  ";
 
 			const auto& aliases = argument->aliases();
 			if (!aliases.empty())
 				os << "  " << aliases[0];
 			for (size_t i = 1; i < aliases.size(); ++i)
 				os << ", " << aliases[i];
-			os << "  " << argument->description() << '\n';
+
+			os << "  " << argument->name();
+
+			os << ": " << argument->description() << '\n';
 		}
 		return os;
 	}

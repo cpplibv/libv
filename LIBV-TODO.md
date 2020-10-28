@@ -572,6 +572,8 @@ libv.ui: remove layout flag | invalidated: used to exclude components that are m
 app.theme: Improve SOW management
 app.theme: Solve the event loop problem | in place, not really generalized
 app.theme: box shape | solved with rounded box with corner = 0
+libv.net.mtcp: Cleanup source file and pimpl patterns
+app.update: Start update server implementation
 
 
 
@@ -579,7 +581,19 @@ app.theme: box shape | solved with rounded box with corner = 0
 
 
 
+libv.net: Make connections moveable
+libv.net: Make connections rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
 
+app.update: Connection dtor calls in vector resize
+app.update: Proper disconnect, Cleanup lost connections (sessions)
+app.update: Reconnect
+
+app.update: Security: Scope restriction on file access
+app.update: Login
+app.update: Cache files in memory, watch if they change
+
+app.update: Manifest, versions, etc...
+app.update: List current clients on Server
 
 
 app.theme: create theme exporter: json and atlas texture
@@ -601,8 +615,6 @@ libv.ui: Every component bg should not contribute to layout1 size (?)
 background
 	anchor point
 	repeat, stretch, flexpoint
-
-
 
 
 
@@ -686,6 +698,7 @@ place.it:
 	project: Free project related tools (LDjam) https://docs.google.com/spreadsheets/d/1tfkBo2IWLHXkZDbIEFUyCWvLkumHYDWCxGHzb-Rmc-0/edit#gid=0
 	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
 
+build.ninja: ext target fails, otherwise it should be clear
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 

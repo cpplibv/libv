@@ -173,6 +173,8 @@ void ImplConnectionAsnycCB::init_socket() noexcept {
 
 	std::error_code ec;
 
+
+
 	socket.set_option(netts::ip::tcp::no_delay{true}, ec);
 	log_net.error_if(ec, "MTCP-{} Could not set no_delay TCP option. {}", id, libv::net::to_string(ec));
 

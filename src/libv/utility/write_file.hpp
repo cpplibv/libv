@@ -7,6 +7,7 @@
 // std
 #include <filesystem>
 #include <fstream>
+#include <span>
 #include <string_view>
 #include <system_error>
 

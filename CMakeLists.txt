@@ -691,6 +691,16 @@ wish_create_executable(
 )
 
 wish_create_executable(
+		TARGET update_server
+		#OUTPUT_FOLDER update_server
+		#OUTPUT_NAME update_server
+		#OUTPUT_RESOURCE res
+		#RESOURCE app/update_server/res
+		SOURCE app/update/*.cpp
+		LINK   libv_arg libv_net
+)
+
+wish_create_executable(
 	TARGET app_vm4_viewer
 	#OUTPUT_FOLDER vm4_viewer
 	#OUTPUT_NAME vm4_viewer
