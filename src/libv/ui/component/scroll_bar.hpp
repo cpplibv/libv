@@ -17,9 +17,11 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 struct EventScrollChange : BaseEvent {
+	double request;
 	double change;
 
-	constexpr inline EventScrollChange(double change) noexcept : change(change) { }
+	constexpr inline EventScrollChange(double request, double change) noexcept :
+			request(request), change(change) { }
 };
 
 template <typename ComponentT>

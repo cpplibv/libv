@@ -85,6 +85,29 @@ private:
 public:
 	using CoreComponent::CoreComponent;
 
+public:
+	void value(double value);
+	[[nodiscard]] double value() const noexcept;
+
+	void value_int(int64_t value);
+	[[nodiscard]] int64_t value_int() const noexcept;
+
+	void value_max(double value);
+	[[nodiscard]] double value_max() const noexcept;
+
+	void value_min(double value);
+	[[nodiscard]] double value_min() const noexcept;
+
+	void value_range(double value);
+	[[nodiscard]] double value_range() const noexcept;
+
+	void value_step(double value);
+	[[nodiscard]] double value_step() const noexcept;
+
+public:
+	void make_step(double amount) noexcept;
+	void make_scroll(double amount) noexcept;
+
 private:
 //	inline auto bar_size() const noexcept;
 	inline BarBounds bar_bounds() const noexcept;
@@ -406,125 +429,176 @@ void CoreScrollBar::doRender(Renderer& r) {
 
 // -------------------------------------------------------------------------------------------------
 
-ScrollBar::ScrollBar(std::string name) :
-	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
-
-ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
-
-ScrollBar::ScrollBar(core_ptr core) noexcept :
-	ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
-
-// -------------------------------------------------------------------------------------------------
-
-void ScrollBar::value(double var) {
-	if (libv::float_equal(var, self().value_))
+void CoreScrollBar::value(double request) {
+	if (libv::float_equal(request, value_))
 		return;
 
-	if (!libv::math::check_interval(var, self().value_min_, self().value_max_))
-		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", var, self().value_min_, self().value_max_, path());
+	if (!libv::math::check_interval(request, value_min_, value_max_))
+		log_ui.warn("Attempted to assign value {} outside of accepted interval {} - {}. Clamping value to interval for {}", request, value_min_, value_max_, path());
 
-	var = libv::math::snap_interval(var, self().value_step_, self().value_min_, self().value_max_);
+	const auto var = libv::math::snap_interval(request, value_step_, value_min_, value_max_);
 
-	const auto change = var - self().value_;
-	self().value_ = var;
-	self().bar_bounds_ = self().bar_bounds(); // Cache bar_bounds
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	self().fire(EventScrollChange{change});
+	const auto change = var - value_;
+	value_ = var;
+	bar_bounds_ = bar_bounds(); // Cache bar_bounds
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventScrollChange{request, change});
 }
-double ScrollBar::value() const noexcept {
-	return self().value_;
+double CoreScrollBar::value() const noexcept {
+	return value_;
 }
 
-void ScrollBar::value_int(int64_t value_) {
+void CoreScrollBar::value_int(int64_t value_) {
 	value(static_cast<double>(value_));
 }
-int64_t ScrollBar::value_int() const noexcept {
+int64_t CoreScrollBar::value_int() const noexcept {
 	return std::llround(value());
 }
 
-void ScrollBar::value_max(double var) {
-	if (libv::float_equal(var, self().value_max_))
+void CoreScrollBar::value_max(double var) {
+	if (libv::float_equal(var, value_max_))
 		return;
 
-	self().value_max_ = var;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	const auto request = value_;
+	value_max_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
-	if (!libv::math::check_interval(self().value_, self().value_min_, self().value_max_)) {
-		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, self().value_, self().value_min_, self().value_max_, path());
-		const auto new_value = libv::math::clamp_interval(self().value_, self().value_min_, self().value_max_);
-		const auto change = new_value - self().value_;
-		self().value_ = new_value;
-		self().fire(EventScrollChange{change});
+	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
+		log_ui.warn("Assigning value_max {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+		const auto change = new_value - value_;
+		value_ = new_value;
+		fire(EventScrollChange{request, change});
 	}
 }
-double ScrollBar::value_max() const noexcept {
-	return self().value_max_;
+double CoreScrollBar::value_max() const noexcept {
+	return value_max_;
 }
 
-void ScrollBar::value_min(double var) {
-	if (libv::float_equal(var, self().value_min_))
+void CoreScrollBar::value_min(double var) {
+	if (libv::float_equal(var, value_min_))
 		return;
 
-	self().value_min_ = var;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	const auto request = value_;
+	value_min_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 
-	if (!libv::math::check_interval(self().value_, self().value_min_, self().value_max_)) {
-		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, self().value_, self().value_min_, self().value_max_, path());
-		const auto new_value = libv::math::clamp_interval(self().value_, self().value_min_, self().value_max_);
-		const auto change = new_value - self().value_;
-		self().value_ = new_value;
-		self().fire(EventScrollChange{change});
+	if (!libv::math::check_interval(value_, value_min_, value_max_)) {
+		log_ui.warn("Assigning value_min {} with current value {} outside of interval {} - {}. Clamping value to the new interval for {}", var, value_, value_min_, value_max_, path());
+		const auto new_value = libv::math::clamp_interval(value_, value_min_, value_max_);
+		const auto change = new_value - value_;
+		value_ = new_value;
+		fire(EventScrollChange{request, change});
 	}
 }
-double ScrollBar::value_min() const noexcept {
-	return self().value_min_;
+double CoreScrollBar::value_min() const noexcept {
+	return value_min_;
 }
 
-void ScrollBar::value_range(double var) {
-	if (libv::float_equal(var, self().value_range_))
+void CoreScrollBar::value_range(double var) {
+	if (libv::float_equal(var, value_range_))
 		return;
 
 	if (var < 0) {
-		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", self().value_, path());
+		log_ui.warn("Attempted to assign negative value: {} as interval. Using the absolute value instead for {}", value_, path());
 		var = std::abs(var);
 	}
 
-	self().value_range_ = var;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	value_range_ = var;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
-double ScrollBar::value_range() const noexcept {
-	return self().value_range_;
+double CoreScrollBar::value_range() const noexcept {
+	return value_range_;
 }
 
-void ScrollBar::value_step(double var) {
-	if (libv::float_equal(var, self().value_step_))
+void CoreScrollBar::value_step(double var) {
+	if (libv::float_equal(var, value_step_))
 		return;
 
-	self().value_step_ = var;
-	value(self().value_);
+	value_step_ = var;
+	value(value_);
+}
+double CoreScrollBar::value_step() const noexcept {
+	return value_step_;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CoreScrollBar::make_step(double amount) noexcept {
+	// WONT FIX: make_step can overstep the nearest value if the amount is big enough
+	//		most noticeable on min/max values that are not aligned to step and current value is min/max.
+	//		Fixing this rounding behaviour would result in more oddities than what it would solve
+	const auto step = libv::float_equal(value_step_, 0.0) ? 1.0 : value_step_;
+
+	const auto request = value_;
+	const auto new_value = libv::math::snap_interval(value_ + amount * step, value_step_, value_min_, value_max_);
+	const auto change = new_value - value_;
+	value_ = new_value;
+	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	fire(EventScrollChange{request, change});
+}
+
+void CoreScrollBar::make_scroll(double amount) noexcept {
+	make_step(amount);
+}
+
+// =================================================================================================
+
+ScrollBar::ScrollBar(std::string name) :
+		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
+
+ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
+		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
+
+ScrollBar::ScrollBar(core_ptr core) noexcept :
+		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
+
+// -------------------------------------------------------------------------------------------------
+
+void ScrollBar::value(double request) {
+	self().value(request);
+}
+double ScrollBar::value() const noexcept {
+	return self().value();
+}
+void ScrollBar::value_int(int64_t request) {
+	self().value_int(request);
+}
+int64_t ScrollBar::value_int() const noexcept {
+	return self().value_int();
+}
+void ScrollBar::value_max(double var) {
+	self().value_max(var);
+}
+double ScrollBar::value_max() const noexcept {
+	return self().value_max();
+}
+void ScrollBar::value_min(double var) {
+	self().value_min(var);
+}
+double ScrollBar::value_min() const noexcept {
+	return self().value_min();
+}
+void ScrollBar::value_range(double var) {
+	self().value_range(var);
+}
+double ScrollBar::value_range() const noexcept {
+	return self().value_range();
+}
+void ScrollBar::value_step(double var) {
+	self().value_step(var);
 }
 double ScrollBar::value_step() const noexcept {
-	return self().value_step_;
+	return self().value_step();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void ScrollBar::make_step(double amount) noexcept {
-	// WONT FIX: make_step can overstep the nearest value if the amount is big enough
-	//		most noticeable on min/max values that are not aligned to step and current value is min/max.
-	//		Fixing this rounding behaviour would result in more oddities than what it would solve
-	const auto step = libv::float_equal(self().value_step_, 0.0) ? 1.0 : self().value_step_;
-
-	const auto new_value = libv::math::snap_interval(self().value_ + amount * step, self().value_step_, self().value_min_, self().value_max_);
-	const auto change = new_value - self().value_;
-	self().value_ = new_value;
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
-	self().fire(EventScrollChange{change});
+	self().make_step(amount);
 }
-
 void ScrollBar::make_scroll(double amount) noexcept {
-	make_step(amount);
+	self().make_scroll(amount);
 }
 
 // -------------------------------------------------------------------------------------------------

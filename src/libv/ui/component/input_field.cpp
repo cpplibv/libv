@@ -435,9 +435,10 @@ void CoreInputField::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreInputField::doLayout1(const ContextLayout1& environment) {
 	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
+//	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
 
-	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
+//	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
+	return {dynamic_size_text, 0.f};
 }
 
 void CoreInputField::doLayout2(const ContextLayout2& environment) {
