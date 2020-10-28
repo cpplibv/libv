@@ -2,18 +2,12 @@
 
 #pragma once
 
+#include <libv/net/fwd.hpp>
 // ext
-#include <netts/internet.hpp>
-#include <netts/io_context.hpp>
-// libv
-#include <libv/mt/number.hpp>
+#include <netts/netfwd.hpp>
 // std
-#include <optional>
-#include <thread>
-#include <vector>
-// pro
-#include <libv/net/address.hpp>
-#include <libv/net/log.hpp>
+#include <functional>
+#include <memory>
 
 
 namespace libv {
@@ -23,66 +17,21 @@ namespace net {
 
 class IOContext {
 private:
-	netts::io_context io_context;
-	netts::ip::tcp::resolver resolver;
-	netts::executor_work_guard<netts::io_context::executor_type> work_guard;
-
-	std::vector<std::thread> threads;
-
-private:
-	using ID = int64_t;
-	static inline std::atomic<ID> nextID = 0;
-	const ID id = nextID++; /// Informative ID for logging and monitoring
-
-private:
-	void start_thread() {
-		const auto parentID = libv::thread_number();
-		threads.emplace_back([this, parentID] {
-			log_net.trace("IOContext-{} worker {} started by thread {}", id, libv::thread_number(), parentID);
-			io_context.run();
-		});
-	}
+	std::unique_ptr<class ImplIOContext> impl;
 
 public:
-	explicit IOContext(size_t thread_count = 1) :
-		resolver(io_context),
-		work_guard(io_context.get_executor()) {
-		for (size_t i = 0; i < thread_count; ++i)
-			start_thread();
-	}
+	explicit IOContext(size_t thread_count = 1);
+	~IOContext();
 
-	netts::io_context& context() {
-		return io_context;
-	}
+public:
+	[[nodiscard]] netts::io_context& context() noexcept;
 
-	template <typename F>
-	void post(F&& func) {
-		io_context.get_executor().post(std::forward<F>(func), std::allocator<void>{});
-	}
+public:
+	void post(std::function<void()> func);
+	void resolve_async(const Address& addr, std::function<void(const std::error_code, mtcp::ResolveResults)> handler);
 
-	void join() {
-		work_guard.reset();
-		for (auto& thread : threads) {
-			if (thread.joinable())
-				thread.join();
-		}
-	}
-
-	~IOContext() {
-		work_guard.reset();
-		io_context.stop();
-		join();
-	}
-
-	template <typename ResolveHandlerT>
-	void resolve_async(const Address& addr, ResolveHandlerT&& handler) {
-		log_net.debug("Resolving {}:{}...", addr.address, addr.service);
-
-		resolver.async_resolve(addr.address, addr.service,
-				[handler = std::forward<ResolveHandlerT>(handler)] (const auto& ec, auto endpoints) mutable {
-					handler(ec, std::move(endpoints));
-				});
-	}
+public:
+	void join();
 };
 
 // -------------------------------------------------------------------------------------------------

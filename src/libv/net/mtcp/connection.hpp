@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <libv/utility/storage_size.hpp>
+// fwd
+#include <libv/net/fwd.hpp>
 // std
 #include <functional>
 #include <memory>
-#include <string>
 #include <system_error>
 // pro
 #include <libv/net/address.hpp>
-#include <libv/net/fwd.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
+#include <libv/net/mtcp/message.hpp>
 
 
 namespace libv {
@@ -20,27 +20,28 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-//using Message = std::vector<std::byte>; // TODO P2: Switch to std::vector<std::byte>
-using Message = std::string;
-using PacketHeader = uint32_t;
-
-constexpr auto MTCP_MESSAGE_MAX_RESERVE = libv::MB(1);
-constexpr auto MTCP_MESSAGE_MAX_SIZE = std::numeric_limits<PacketHeader>::max();
+// TODO P2: Document public api precondition (handlers must be set, list the possible logic error states)
 
 // -------------------------------------------------------------------------------------------------
 
 class ConnectionAsnycCB {
-	using Impl = detail::ImplConnectionAsnycCB;
-	using CBConnect = std::function<void(const Endpoint)>;
+	friend class ImplAcceptorAsyncCB;
+
+public:
+	using CBConnect = std::function<void(const Endpoint, const Endpoint)>;
 	using CBDisconnect = std::function<void()>;
 	using CBError = std::function<void(const std::error_code)>;
 	using CBRecive = std::function<void(Message&&)>;
 	using CBSend = std::function<void(Message&&)>;
 
-	std::shared_ptr<Impl> impl;
+private:
+	std::shared_ptr<class ImplConnectionAsnycCB> impl;
 
 public:
-	ConnectionAsnycCB(IOContext& io_context) noexcept;
+	explicit ConnectionAsnycCB(IOContext& io_context) noexcept;
+
+private:
+	/// Constructor to be used with an acceptor
 	ConnectionAsnycCB(IOContext& io_context, Socket&& socket) noexcept;
 
 public:
@@ -53,7 +54,8 @@ public:
 
 public:
 	/// Queues an asynchronous start task.
-	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
+	/// Required to be called if the connection object was created by an acceptor.
+	///	Requires every handler to be set.
 	/// @thread safe
 	void start() noexcept;
 
@@ -86,6 +88,11 @@ public:
 	/// Queues an asynchronous send task.
 	/// @thread safe
 	void send(Message message) noexcept;
+
+	/// Cancels every asynchronous send task.
+	/// This operation will cancel any already started send operation and may yield operation_aborted error
+	/// @thread safe
+	void send_cancel() noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -14,6 +14,7 @@ namespace net {
 
 std::string to_string(const std::error_code ec) {
 	if (false);
+
 	else if (ec == netts::error::make_error_code(netts::error::service_not_found))
 		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), "The service is not supported for the given socket type");
 	else if (ec == netts::error::make_error_code(netts::error::socket_type_not_supported))

@@ -2,19 +2,18 @@
 
 // hpp
 #include <libv/net/io_context.hpp>
-//// ext
-//#include <netts/internet.hpp>
-//#include <netts/io_context.hpp>
-//// libv
-//#include <libv/mt/number.hpp>
-//// std
-//#include <optional>
-//#include <thread>
-//#include <vector>
-//// pro
-//#include <libv/net/address.hpp>
-//#include <libv/net/connection.hpp>
-//#include <libv/net/log.hpp>
+// ext
+#include <netts/internet.hpp>
+#include <netts/io_context.hpp>
+// libv
+#include <libv/mt/number.hpp>
+// std
+#include <thread>
+#include <vector>
+// pro
+#include <libv/net/address.hpp>
+#include <libv/net/log.hpp>
+#include <libv/net/mtcp/resolve_results.hpp>
 
 
 namespace libv {
@@ -22,7 +21,96 @@ namespace net {
 
 // -------------------------------------------------------------------------------------------------
 
+class ImplIOContext {
+private:
+	netts::io_context io_context;
+	netts::ip::tcp::resolver resolver;
+	netts::executor_work_guard<netts::io_context::executor_type> work_guard;
 
+	std::vector<std::thread> threads;
+
+private:
+	using ID = int64_t;
+	static inline std::atomic<ID> nextID = 0;
+	const ID id = nextID++; /// Informative ID for logging and monitoring
+
+private:
+	void start_thread() {
+		const auto parentID = libv::thread_number();
+		threads.emplace_back([this, parentID] {
+			log_net.trace("IOContext-{} worker {} started by thread {}", id, libv::thread_number(), parentID);
+			io_context.run();
+		});
+	}
+
+public:
+	explicit ImplIOContext(size_t thread_count = 1) :
+		resolver(io_context),
+		work_guard(io_context.get_executor()) {
+		for (size_t i = 0; i < thread_count; ++i)
+			start_thread();
+	}
+
+	~ImplIOContext() {
+		work_guard.reset();
+		io_context.stop();
+		join();
+	}
+
+public:
+	[[nodiscard]] netts::io_context& context() noexcept {
+		return io_context;
+	}
+
+public:
+	template <typename F>
+	void post(F&& func) {
+		io_context.get_executor().post(std::forward<F>(func), std::allocator<void>{});
+	}
+
+	template <typename ResolveHandlerT>
+	void resolve_async(const Address& addr, ResolveHandlerT&& handler) {
+		log_net.trace("Resolving {}:{}...", addr.address, addr.service);
+
+		resolver.async_resolve(addr.address, addr.service,
+				[handler = std::forward<ResolveHandlerT>(handler)] (const auto& ec, auto endpoints) mutable {
+					handler(ec, mtcp::ResolveResults{std::move(endpoints)});
+				});
+	}
+
+public:
+	void join() {
+		work_guard.reset();
+		for (auto& thread : threads) {
+			if (thread.joinable())
+				thread.join();
+		}
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+IOContext::IOContext(size_t thread_count) :
+	impl(std::make_unique<ImplIOContext>(thread_count)) {
+}
+
+IOContext::~IOContext() = default; // For the sake of forward declared unique_ptr
+
+netts::io_context& IOContext::context() noexcept {
+	return impl->context();
+}
+
+void IOContext::post(std::function<void()> func) {
+	impl->post(std::move(func));
+}
+
+void IOContext::resolve_async(const Address& addr, std::function<void(const std::error_code, mtcp::ResolveResults)> handler) {
+	impl->resolve_async(addr, std::move(handler));
+}
+
+void IOContext::join() {
+	impl->join();
+}
 
 // -------------------------------------------------------------------------------------------------
 

@@ -2,6 +2,8 @@
 
 // test
 #include <catch/catch.hpp>
+// ext
+#include <netts/internet.hpp>
 // libv
 #include <libv/log/log.hpp>
 #include <libv/mt/binary_latch.hpp>
@@ -46,9 +48,11 @@ struct TestClient {
 		init();
 	}
 	void init() {
-		conn.handle_connect([&](const libv::net::mtcp::Endpoint endpoint) {
+		conn.handle_connect([&](const libv::net::mtcp::Endpoint local_endpoint, const libv::net::mtcp::Endpoint remote_endpoint) {
+			(void) local_endpoint;
+
 			libv::log.info("Connected");
-			connects.emplace_back(endpoint);
+			connects.emplace_back(remote_endpoint);
 		});
 		conn.handle_disconnect([&]() {
 			libv::log.info("Disconnected");
@@ -98,9 +102,9 @@ struct TestServer {
 
 // -------------------------------------------------------------------------------------------------
 
-TEST_CASE("_ reg logger") {
+TEST_CASE("AAA reg logger") {
 	std::cout << libv::logger_stream;
-	libv::logger_stream.setFormat("{severity} {thread_id:2} {module}: {message}\n");
+//	libv::logger_stream.setFormat("{severity} {thread_id:2} {module}: {message}\n");
 }
 
 TEST_CASE("MTCP Connection without any connect should handle errors") {
@@ -207,7 +211,7 @@ TEST_CASE("MTCP Connection without any connect should handle errors") {
 	CHECK(test.sends.size() == 0);
 }
 
-// TODO P1: remove hide from this test long-term (Disabled it because of TCP timeouts)
+// NOTE: remove hide from this test long-term (Disabled it because of TCP timeouts)
 TEST_CASE("MTCP Connection should stay inactive with a failed connection attempts", "[!hide]") {
 //TEST_CASE("MTCP Connection should stay inactive with a failed connection attempts") {
 	libv::log.info("------------------------------------------------");

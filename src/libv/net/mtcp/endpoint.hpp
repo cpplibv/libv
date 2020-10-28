@@ -7,7 +7,7 @@
 #include <libv/serialization/enable.hpp>
 // std
 #include <array>
-#include <cstddef>
+#include <cstdint>
 
 
 namespace libv {
@@ -24,19 +24,21 @@ struct Endpoint {
 	LIBV_REFLECTION_ACCESS(port);
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
 
-	void clear() {
+public:
+	constexpr inline void clear() noexcept {
 		address.fill(0);
 		port = 0;
 	}
 
 	template <typename OStream>
-	friend OStream& operator<<(OStream& os, const Endpoint& addr) {
-		return os
+	inline friend OStream& operator<<(OStream& os, const Endpoint& addr) {
+		os
 				<< uint16_t{addr.address[0]} << '.'
 				<< uint16_t{addr.address[1]} << '.'
 				<< uint16_t{addr.address[2]} << '.'
 				<< uint16_t{addr.address[3]} << ':'
 				<< addr.port;
+		return os;
 	}
 };
 

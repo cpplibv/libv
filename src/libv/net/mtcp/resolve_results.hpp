@@ -12,8 +12,8 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Socket {
-	netts::ip::tcp::socket socket;
+struct ResolveResults {
+	netts::ip::tcp::resolver::results_type results;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -4,23 +4,19 @@
 
 
 namespace libv {
-namespace net {
-
-// -------------------------------------------------------------------------------------------------
+namespace net { // --------------------------------------------------------------------------------/
 
 class IOContext;
+struct Address;
 
-namespace mtcp {
+namespace mtcp { // --------------------------------------------------------------------------------
 
+class AcceptorAsnycCB;
+class ConnectionAsnycCB;
+
+class ResolveResults;
 class Socket;
 
-namespace detail {
-
-class ImplConnectionAsnycCB;
-
-// -------------------------------------------------------------------------------------------------
-
-} // namespace detail
-} // namespace mtcp
+} // namespace mtcp --------------------------------------------------------------------------------
 } // namespace net
 } // namespace libv

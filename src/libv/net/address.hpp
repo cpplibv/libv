@@ -48,8 +48,9 @@ public:
 	}
 
 	template <typename OStream>
-	friend OStream& operator<<(OStream& os, const Address& addr) {
-		return os << addr.address << ':' << addr.service;
+	inline friend OStream& operator<<(OStream& os, const Address& addr) {
+		os << addr.address << ':' << addr.service;
+		return os;
 	}
 };
 
