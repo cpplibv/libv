@@ -24,13 +24,23 @@ struct DynamicVar {
 		remove,
 		update,
 	};
+//	enum class Type {
+//		scalar,
+//		vec2,
+//		vec3,
+//		vec4,
+//		rgb,
+//		rgba,
+//	};
 
 public:
 	std::string name;
-	double low = 0;
-	double high = 0;
-	double step = 0;
-	double value = 0;
+	libv::vec4d low;
+	libv::vec4d high;
+	libv::vec4d step;
+	libv::vec4d value;
+	uint8_t dim = 0;
+//	Type type;
 	State state = State::create;
 
 	explicit DynamicVar(std::string_view name) :
@@ -52,12 +62,9 @@ public:
 
 public:
 	void on_dynamic_var(std::function<void(std::vector<DynamicVar>)> callback);
-	void set_dynamic_var(const std::string_view name, double value);
+	void set_dynamic_var(const std::string_view name, const libv::vec4d& value);
 };
 
 // -------------------------------------------------------------------------------------------------
 
 } // namespace app
-
-
-

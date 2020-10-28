@@ -1,48 +1,40 @@
 // Project: libv, File: app/theme/theme_main.cpp, Author: Császár Mátyás [Vader]
 
-// ext
-#include <GL/glew.h>
 // libv
 #include <libv/frame/frame.hpp>
-#include <libv/gl/enum.hpp>
-#include <libv/glr/attribute.hpp>
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/program.hpp>
-#include <libv/glr/queue.hpp>
-#include <libv/glr/remote.hpp>
-#include <libv/glr/texture.hpp>
-#include <libv/glr/uniform.hpp>
-#include <libv/glr/uniform_block_binding.hpp>
-#include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/canvas.hpp>
-//#include <libv/ui/component/input_field.hpp>
+#include <libv/ui/component/input_field.hpp>
+#include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/ui.hpp>
+#include <libv/utility/float_equal.hpp>
 // std
-#include <iostream>
 #include <atomic>
+#include <iostream>
 #include <mutex>
+#include <optional>
 #include <string>
+// pro
+#include <theme/log.hpp>
+#include <theme/canvas.hpp>
+#include <theme/engine.hpp>
+
+
 
 //#include <libv/ui/component/image.hpp>
-#include <libv/ui/component/label.hpp>
 //#include <libv/ui/component/label_image.hpp>
 //#include <libv/ui/component/panel_float.hpp>
 //#include <libv/ui/component/panel_full.hpp>
 //#include <libv/ui/component/panel_grid.hpp>
 //#include <libv/ui/component/quad.hpp>
-#include <libv/ui/component/scroll_bar.hpp>
 //#include <libv/ui/component/scroll_pane.hpp>
 //#include <libv/ui/component/stretch.hpp>
 
-// pro
-#include <theme/canvas.hpp>
-#include <theme/effect.hpp>
-#include <theme/engine.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -113,7 +105,10 @@ public:
 
 		libv::ui::Label lbl_name;
 		libv::ui::ScrollBar slider;
-		libv::ui::Label lbl_value;
+		libv::ui::InputField in_value;
+
+		std::optional<double> requested_number;
+		std::optional<std::string> requested_text;
 	};
 	libv::ui::PanelLine var_panel;
 	std::unordered_map<std::string, VarControl> var_controls;
@@ -134,6 +129,11 @@ public:
 		const auto full_init = var_controls.empty();
 
 		for (const auto& var : vars) {
+//			for (size_t d = 0; d < var.dim; ++d) {
+//
+//			}
+
+			const auto d = 0;
 			auto& control = var_controls[var.name];
 
 			if (var.state == app::DynamicVar::State::remove) {
@@ -148,32 +148,59 @@ public:
 
 				control.slider.bar_color({1, 0, 0, 1});
 				control.slider.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-				control.slider.value_max(var.high);
-				control.slider.value_min(var.low);
-				control.slider.value_step(var.step);
-				control.slider.value_range(var.step != 0.0 ? var.step : 1.0);
-				control.slider.value(var.value);
+				control.slider.value_max(var.high[d]);
+				control.slider.value_min(var.low[d]);
+				control.slider.value_step(var.step[d]);
+				control.slider.value_range(var.step[d] != 0.0 ? var.step[d] : 1.0);
+				control.slider.value(var.value[d]);
 				control.slider.size({libv::ui::ratio(), libv::ui::ratio()});
 				control.line.add(control.slider);
 
-				control.lbl_value.text(fmt::format("{:6.2f}", var.value));
-				control.lbl_value.size({libv::ui::dynamic(), libv::ui::ratio()});
-				control.line.add(control.lbl_value);
+				control.in_value.text(fmt::format("{:6.2f}", var.value[d]));
+				control.in_value.size({libv::ui::dynamic(), libv::ui::ratio()});
+				control.line.add(control.in_value);
 
 				control.lbl_name.text(fmt::format(" {:<16}", var.name));
 				control.lbl_name.size({libv::ui::dynamic(), libv::ui::ratio()});
 				control.line.add(control.lbl_name);
 
-				control.slider.event().change([this, lbl = control.lbl_value, name = var.name](const libv::ui::ScrollBar& slider) mutable {
-					lbl.text(fmt::format("{:6.2f}", slider.value()));
-					lua_engine.set_dynamic_var(name, slider.value());
+				// <<< P1: &control
+				control.slider.event().change([this, &control, in = control.in_value, name = var.name](const libv::ui::ScrollBar& slider, const libv::ui::EventScrollChange& event) mutable {
+					if (control.requested_number && libv::float_equal(*control.requested_number, event.request))
+						return;
+
+					app::log_app.info("Value change to {}", slider.value());
+
+					control.requested_text = fmt::format("{:6.2f}", slider.value());
+					in.text(*control.requested_text);
+					control.requested_text.reset();
+
+					lua_engine.set_dynamic_var(name, libv::vec4d{slider.value(), 0, 0, 0});
+				});
+
+				// <<< P1: &control
+				control.in_value.event().change([this, &control, slider = control.slider](const libv::ui::InputField& input) mutable {
+					if (control.requested_text == input.text())
+						return;
+
+					auto value = std::stod(input.text());
+
+//					if (value < slider.value_max())
+//						slider.value(value);
+//
+//					if (value < slider.value_min())
+//						slider.value(value);
+
+					control.requested_number = value;
+					slider.value(value);
+					control.requested_number.reset();
 				});
 
 			} else {
-				control.slider.value_max(var.high);
-				control.slider.value_min(var.low);
-				control.slider.value_step(var.step);
-				control.slider.value_range(var.step != 0.0 ? var.step : 1.0);
+				control.slider.value_max(var.high[d]);
+				control.slider.value_min(var.low[d]);
+				control.slider.value_step(var.step[d]);
+				control.slider.value_range(var.step[d] != 0.0 ? var.step[d] : 1.0);
 			}
 		}
 	}

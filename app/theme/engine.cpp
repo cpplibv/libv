@@ -20,6 +20,7 @@
 #include <mutex>
 // pro
 #include <theme/effect.hpp>
+#include <theme/log.hpp>
 #include <theme/theme.hpp>
 
 
@@ -256,14 +257,39 @@ static inline Task load_task(const sol::object& object) {
 void ImplEngine::init() {
 	lua["dpi"] = libv::vec2f{92, 92};
 
-	lua.set_function("register_var", [this](std::string_view name, double low, double high, double step, double init) {
+	const auto aux_register_var = [this](std::string_view name, libv::vec4d low, libv::vec4d high, libv::vec4d step, libv::vec4d init, uint8_t dim) {
 		auto&& [it, insertion] = dynamic_var_sow.add(name);
 
 		it.low = low;
 		it.high = high;
 		it.step = step;
-		it.value = insertion ? init : std::clamp(it.value, low, high); // On update we do not reset the value to init, only clamp it
-	});
+		it.value = insertion ? init : libv::vec::clamp(it.value, low, high); // On update we do not reset the value to init, only clamp it
+		it.dim = dim;
+	};
+
+	lua.set_function("register_var", sol::overload(
+			[aux_register_var](std::string_view name, double low, double high, double step, double init) {
+				aux_register_var(name, {low, 0, 0, 0}, {high, 0, 0, 0}, {step, 0, 0, 0}, {init, 0, 0, 0}, 1);
+			},
+			[aux_register_var](std::string_view name, double low, double high, double step, libv::vec2d init) {
+				aux_register_var(name, {low, low, 0, 0}, {high, high, 0, 0}, {step, step, 0, 0}, {init, 0, 0}, 2);
+			},
+			[aux_register_var](std::string_view name, double low, double high, double step, libv::vec3d init) {
+				aux_register_var(name, {low, low, low, 0}, {high, high, high, 0}, {step, step, step, 0}, {init, 0}, 3);
+			},
+			[aux_register_var](std::string_view name, double low, double high, double step, libv::vec4d init) {
+				aux_register_var(name, {low, low, low, low}, {high, high, high, high}, {step, step, step, step}, init, 4);
+			}
+//			[aux_register_var](std::string_view name, libv::vec2d low, libv::vec2d high, libv::vec2d step, libv::vec2d init) {
+//				aux_register_var(name, {low, 0, 0}, {high, 0, 0}, {step, 0, 0}, {init, 0, 0}, 2);
+//			},
+//			[aux_register_var](std::string_view name, libv::vec3d low, libv::vec3d high, libv::vec3d step, libv::vec3d init) {
+//				aux_register_var(name, {low, 0}, {high, 0}, {step, 0}, {init, 0}, 3);
+//			},
+//			[aux_register_var](std::string_view name, libv::vec4d low, libv::vec4d high, libv::vec4d step, libv::vec4d init) {
+//				aux_register_var(name, low, high, step, init, 4);
+//			},
+	));
 
 	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
 
@@ -411,7 +437,7 @@ void ImplEngine::_broadcast_dynamic_vars() {
 	on_dynamic_var(dynamic_var_sow.list());
 }
 
-void Engine::set_dynamic_var(const std::string_view name, double value) {
+void Engine::set_dynamic_var(const std::string_view name, const libv::vec4d& value) {
 	std::unique_lock lock(self->mutex);
 
 	const auto it = self->dynamic_var_sow.find(name);

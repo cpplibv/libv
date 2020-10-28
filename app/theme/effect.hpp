@@ -3,6 +3,8 @@
 #pragma once
 
 // libv
+#include <libv/math/mix.hpp>
+#include <libv/math/saturate.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/mt/thread_bulk.hpp>
 // std
@@ -18,21 +20,6 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-[[nodiscard]] constexpr inline T saturate(T value) noexcept {
-	if (value < 0)
-		return 0;
-	else if (value > 1)
-		return 1;
-	else
-		return value;
-}
-
-template <typename T>
-[[nodiscard]] constexpr inline T mix(T v0, T v1, T t) noexcept {
-	return (T{1} - t) * v0 + t * v1;
-}
-
 [[nodiscard]] constexpr inline libv::vec4f blend(libv::vec4f src, libv::vec4f dst) noexcept {
 	const auto src_rgb = xyz(src);
 	const auto src_a = src.w;
@@ -46,10 +33,6 @@ template <typename T>
 		return src;
 	else
 		return libv::vec4f{out_rgb, out_a};
-}
-
-[[nodiscard]] constexpr inline libv::vec4f add_layer(libv::vec4f output, libv::vec4f color, float shape) noexcept {
-	return blend(color * libv::vec4f(1, 1, 1, shape), output);
 }
 
 // =================================================================================================
@@ -140,21 +123,21 @@ public:
 		const auto signed_dist = image.sdistance(x, y);
 		auto& output = image.color(x, y);
 
-		const auto box = mix(0.f, 1.f, -signed_dist);
-		const auto mask = saturate(box);
+		const auto box = libv::mix(0.f, 1.f, -signed_dist);
+		const auto mask = libv::saturate(box);
 
 		float shape;
 
 		if (inward) {
 			shape = (signed_dist + 1 + size) / size;
-			shape = saturate(saturate(shape) - (1 - mask));
+			shape = libv::saturate(libv::saturate(shape) - (1 - mask));
 		} else {
 			shape = (-signed_dist + size) / size;
-			shape = saturate(saturate(shape) - mask);
+			shape = libv::saturate(libv::saturate(shape) - mask);
 		}
 
 		shape = std::pow(shape, falloff);
-		output = add_layer(output, color, shape);
+		output = blend(color * libv::vec4f(1, 1, 1, shape), output);
 	}
 };
 

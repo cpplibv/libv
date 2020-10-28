@@ -570,6 +570,9 @@ libv.img: New library to handle image saving
 libv.ui: verify: check if mark remove should be recursive | it is, markRemove does it perfectly
 libv.ui: remove layout flag | invalidated: used to exclude components that are marked for removal from the current loop
 app.theme: Improve SOW management
+app.theme: Solve the event loop problem | in place, not really generalized
+app.theme: box shape | solved with rounded box with corner = 0
+
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -578,6 +581,21 @@ app.theme: Improve SOW management
 
 
 
+
+app.theme: create theme exporter: json and atlas texture
+
+
+
+
+libv.ui: Spacing, not just margin, not just padding, but container level spacing support
+
+
+
+
+app.theme: connect the theme gen with a running app to live update
+app.theme: clean up C++ blend/effect implementations
+
+libv.ui: Every component bg should not contribute to layout1 size (?)
 
 
 background
@@ -610,10 +628,10 @@ glow falloff is incorrect on corners, find a better solution
 	| size = 0, falloff = 1 highlight perfectly the affected pixels
 
 
-scroll bar change prompts layout, why? should it? | it does to recache the bar position, we will see
+scroll bar change prompts layout, why? should it? | it does to recache the bar position
 
 
-app.there: --- PAPER ---
+app.theme: --- PAPER ---
 	So the way theme generation works (plan):
 	- lua script containing the styles incl properties and the recepies for the atlases
 	- running the lua script from C++ will generate the atlases and export it into an image and another lua script
@@ -621,11 +639,6 @@ app.there: --- PAPER ---
 	- | NOPE
 	- 	-> I will not generate lua from lua, that would not make sense, but what would make sense, is to generate a hash from the lua and if the hash matches the atlas...
 
-
-
-app.theme: create theme exporter: json and atlas texture
-app.theme: connect the theme gen with a running app to live update
-app.theme: clean up C++ blend/effect implementations
 
 libv.ui.theme: UI system need a system to communicate states to the style system, like hover, pressed, etc...
 libv.ui.theme: Property substructure system example: https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html#titledpane

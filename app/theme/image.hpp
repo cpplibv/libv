@@ -5,14 +5,7 @@
 // libv
 #include <libv/container/vector_2d.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/log/log.hpp>
-// std
-#include <vector>
 
-
-// -------------------------------------------------------------------------------------------------
-
-inline libv::LoggerModule log_app{libv::logger_stream, "gen_ui_theme"};
 
 namespace app {
 

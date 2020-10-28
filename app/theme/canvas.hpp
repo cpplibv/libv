@@ -199,8 +199,13 @@ private:
 		gl.state.enableDepthTest();
 		gl.state.depthFunctionLess();
 
-		const auto clear_v = !pulse ? 0.5f : std::sin(time.count()) * 0.5f + 0.5f;
-		gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
+		if (pulse) {
+			const auto clear_v = std::sin(time.count()) * 0.5f + 0.5f;
+			gl.setClearColor(clear_v, clear_v, clear_v, 1.0f);
+		} else {
+			gl.setClearColor(61.f / 255.f, 74.f / 255.f, 82.f / 255.f, 1.0f);
+		}
+
 		gl.clearColor();
 		gl.clearDepth();
 
