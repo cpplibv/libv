@@ -665,6 +665,12 @@ template <size_t N, typename T>
 	return build_vec<N>([&](const auto index) { return std::clamp(vec.data()[index], low, high); });
 }
 
+/// \return Clamps the vector's each dimension within the range of [\c high, \c low] matching component
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto clamp(const vec_t<N, T>& vec, const vec_t<N, T>&  low, const vec_t<N, T>& high) noexcept {
+	return build_vec<N>([&](const auto index) { return std::clamp(vec.data()[index], low.data()[index], high.data()[index]); });
+}
+
 /// \return Abs the vector's each dimension
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto abs(const vec_t<N, T>& vec) noexcept {
