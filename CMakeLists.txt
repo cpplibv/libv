@@ -215,7 +215,7 @@ wish_create_external(
 	LINK backtrace
 )
 
-set(Boost_Version 1.72.0)
+set(Boost_Version 1.74.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 message(STATUS "Boost version: " ${Boost_Version})
