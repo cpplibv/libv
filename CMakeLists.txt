@@ -418,7 +418,7 @@ wish_create_external(
 wish_create_external(
 	NAME net_ts
 	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
-	GIT_TAG 3524b4408d26a67af683bfd2aad6b0b6b5684b36
+	GIT_TAG c97570e7ceef436581be3c138868a19ad96e025b
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/net_ts/
