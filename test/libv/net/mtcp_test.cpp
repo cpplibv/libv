@@ -58,7 +58,8 @@ struct TestClient {
 			libv::log.info("Disconnected");
 			disconnects.emplace_back(0);
 		});
-		conn.handle_error([&](const std::error_code ec) {
+		conn.handle_error([&](auto operation, const std::error_code ec) {
+			(void) operation;
 			libv::log.error("Client " + libv::net::to_string(ec));
 			errors.emplace_back(ec);
 		});

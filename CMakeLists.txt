@@ -245,6 +245,7 @@ wish_create_external(
 		-j${WISH_PROCESSOR_COUNT}
 	INSTALL_COMMAND "echo" "Skipping install..."
 
+	DEFINE BOOST_ASIO_USE_TS_EXECUTOR_AS_DEFAULT
 	DEFINE BOOST_DLL_USE_STD_FS=1
 	DEFINE BOOST_STACKTRACE_USE_BACKTRACE
 	DEFINE BOOST_STACKTRACE_BACKTRACE_INCLUDE_FILE=<libbacktrace/backtrace.h>
@@ -691,13 +692,13 @@ wish_create_executable(
 )
 
 wish_create_executable(
-		TARGET update_server
-		#OUTPUT_FOLDER update_server
-		#OUTPUT_NAME update_server
-		#OUTPUT_RESOURCE res
-		#RESOURCE app/update_server/res
-		SOURCE app/update/*.cpp
-		LINK   libv_arg libv_net
+	TARGET update_server
+	#OUTPUT_FOLDER update_server
+	#OUTPUT_NAME update_server
+	#OUTPUT_RESOURCE res
+	#RESOURCE app/update_server/res
+	SOURCE app/update/*.cpp
+	LINK   libv_arg libv_net
 )
 
 wish_create_executable(

@@ -28,9 +28,18 @@ class ConnectionAsnycCB {
 	friend class ImplAcceptorAsyncCB;
 
 public:
-	using CBConnect = std::function<void(const Endpoint, const Endpoint)>;
+	enum class ErrorSource {
+		logic,
+
+		connect,
+		receive,
+		send,
+	};
+
+public:
+	using CBConnect = std::function<void(Endpoint, Endpoint)>;
 	using CBDisconnect = std::function<void()>;
-	using CBError = std::function<void(const std::error_code)>;
+	using CBError = std::function<void(ErrorSource, std::error_code)>;
 	using CBRecive = std::function<void(Message&&)>;
 	using CBSend = std::function<void(Message&&)>;
 
@@ -51,6 +60,16 @@ public:
 	void handle_error(CBError callback) noexcept;
 	void handle_receive(CBRecive callback) noexcept;
 	void handle_send(CBSend callback) noexcept;
+
+public:
+	void read_limit(size_t bytes_per_second) noexcept;
+	void write_limit(size_t bytes_per_second) noexcept;
+
+	[[nodiscard]] size_t total_write_bytes() const noexcept;
+	[[nodiscard]] size_t total_read_bytes() const noexcept;
+
+	[[nodiscard]] size_t total_write_messages() const noexcept;
+	[[nodiscard]] size_t total_read_messages() const noexcept;
 
 public:
 	/// Queues an asynchronous start task.

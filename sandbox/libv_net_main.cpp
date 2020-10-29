@@ -39,13 +39,13 @@ struct Session {
 
 	Session(libv::net::mtcp::ConnectionAsnycCB&& conn_) :
 		conn(std::move(conn_)) {
-		conn.handle_connect([this](const libv::net::mtcp::Endpoint endpoint) {
+		conn.handle_connect([this](libv::net::mtcp::Endpoint endpoint) {
 			log_sandbox.info("{} connected to: {}", id, endpoint);
 		});
 		conn.handle_disconnect([this]() {
 			log_sandbox.info("{} disconnected", id);
 		});
-		conn.handle_error([this](const std::error_code ec) {
+		conn.handle_error([this](auto operation, std::error_code ec) {
 			log_sandbox.error("{} error: {}", id, libv::net::to_string(ec));
 			if (ec == netts::error::make_error_code(netts::error::eof))
 				return;
@@ -87,7 +87,7 @@ struct Server {
 				acceptor.cancel();
 		});
 
-		acceptor.handle_error([this](const std::error_code ec) {
+		acceptor.handle_error([this](auto operation, std::error_code ec) {
 			log_sandbox.error("{} error: {}", id, libv::net::to_string(ec));
 		});
 	}
@@ -107,13 +107,13 @@ struct Client {
 	libv::net::mtcp::ConnectionAsnycCB conn;
 
 	Client(libv::net::IOContext& io_context) : conn(io_context) {
-		conn.handle_connect([this](const libv::net::mtcp::Endpoint endpoint) {
+		conn.handle_connect([this](libv::net::mtcp::Endpoint endpoint) {
 			log_sandbox.info("{} connected to: {}", id, endpoint);
 		});
 		conn.handle_disconnect([this]() {
 			log_sandbox.info("{} disconnected", id);
 		});
-		conn.handle_error([this](const std::error_code ec) {
+		conn.handle_error([this](auto operation, std::error_code ec) {
 			if (ec == netts::error::make_error_code(netts::error::eof))
 				return;
 			if (ec == netts::error::make_error_code(netts::error::operation_aborted))

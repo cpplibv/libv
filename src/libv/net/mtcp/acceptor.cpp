@@ -22,6 +22,8 @@ namespace mtcp {
 // -------------------------------------------------------------------------------------------------
 
 class ImplAcceptorAsyncCB : public std::enable_shared_from_this<ImplAcceptorAsyncCB> {
+	using ErrorSource = AcceptorAsyncCB::ErrorSource;
+
 private:
 	bool accepting = false;
 	netts::ip::tcp::acceptor acceptor;
@@ -90,7 +92,7 @@ public:
 			std::unique_lock lock{self_sp->mutex};
 
 			if (ec)
-				self_sp->cb_error(ec);
+				self_sp->cb_error(ErrorSource::accept, ec);
 			else
 				self_sp->cb_accept(ConnectionAsnycCB(self_sp->io_context, Socket{std::move(peer)}));
 

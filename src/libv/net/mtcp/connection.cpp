@@ -31,6 +31,7 @@ namespace mtcp {
 
 class ImplConnectionAsnycCB : public std::enable_shared_from_this<ImplConnectionAsnycCB> {
 	using SelfPtr = std::shared_ptr<ImplConnectionAsnycCB>;
+	using ErrorSource = ConnectionAsnycCB::ErrorSource;
 
 private:
 	enum class State {
@@ -78,11 +79,21 @@ private:
 
 public:
 	/// Handlers must be set before any other function call
-	void handle_connect(ConnectionAsnycCB::CBConnect callback) noexcept;
-	void handle_disconnect(ConnectionAsnycCB::CBDisconnect callback) noexcept;
-	void handle_error(ConnectionAsnycCB::CBError callback) noexcept;
-	void handle_receive(ConnectionAsnycCB::CBRecive callback) noexcept;
-	void handle_send(ConnectionAsnycCB::CBSend callback) noexcept;
+	inline void handle_connect(ConnectionAsnycCB::CBConnect callback) noexcept;
+	inline void handle_disconnect(ConnectionAsnycCB::CBDisconnect callback) noexcept;
+	inline void handle_error(ConnectionAsnycCB::CBError callback) noexcept;
+	inline void handle_receive(ConnectionAsnycCB::CBRecive callback) noexcept;
+	inline void handle_send(ConnectionAsnycCB::CBSend callback) noexcept;
+
+public:
+	inline void read_limit(size_t bytes_per_second) noexcept;
+	inline void write_limit(size_t bytes_per_second) noexcept;
+
+	[[nodiscard]] inline size_t total_write_bytes() const noexcept;
+	[[nodiscard]] inline size_t total_read_bytes() const noexcept;
+
+	[[nodiscard]] inline size_t total_write_messages() const noexcept;
+	[[nodiscard]] inline size_t total_read_messages() const noexcept;
 
 public:
 	/// Queues an asynchronous start task.
@@ -118,16 +129,16 @@ public:
 	void send_cancel() noexcept;
 
 private:
-	[[nodiscard]] bool _is_connecting() const noexcept;
-	[[nodiscard]] bool _is_disconnecting() const noexcept;
-	[[nodiscard]] bool _is_handlers_set() const noexcept;
-	[[nodiscard]] bool _is_reading() const noexcept;
-	[[nodiscard]] bool _is_writing() const noexcept;
-	void _reset() noexcept;
+	[[nodiscard]] inline bool _is_connecting() const noexcept;
+	[[nodiscard]] inline bool _is_disconnecting() const noexcept;
+	[[nodiscard]] inline bool _is_handlers_set() const noexcept;
+	[[nodiscard]] inline bool _is_reading() const noexcept;
+	[[nodiscard]] inline bool _is_writing() const noexcept;
+	inline void _reset() noexcept;
 
 private:
-	void failure(SelfPtr&& self_sp, const std::error_code ec) noexcept;
-	void failure_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
+	void failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept;
+	void failure_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 
 	void failure_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	void failure_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept;
@@ -139,7 +150,7 @@ private:
 	void success_send(SelfPtr&& self_sp) noexcept;
 
 private:
-	static void do_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
+	static void do_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 
 	static void do_start(SelfPtr&& self_sp) noexcept;
 	static void do_resolve(SelfPtr&& self_sp, Address&& address) noexcept;
@@ -170,10 +181,7 @@ ImplConnectionAsnycCB::ImplConnectionAsnycCB(IOContext& io_context, Socket&& soc
 
 void ImplConnectionAsnycCB::init_socket() noexcept {
 	// TODO P1: Call init_socket to setup no_delay and keep_alive, might require research
-
 	std::error_code ec;
-
-
 
 	socket.set_option(netts::ip::tcp::no_delay{true}, ec);
 	log_net.error_if(ec, "MTCP-{} Could not set no_delay TCP option. {}", id, libv::net::to_string(ec));
@@ -182,29 +190,59 @@ void ImplConnectionAsnycCB::init_socket() noexcept {
 	log_net.error_if(ec, "MTCP-{} Could not set keep_alive TCP option. {}", id, libv::net::to_string(ec));
 }
 
-void ImplConnectionAsnycCB::handle_connect(ConnectionAsnycCB::CBConnect callback) noexcept {
+// -------------------------------------------------------------------------------------------------
+
+inline void ImplConnectionAsnycCB::handle_connect(ConnectionAsnycCB::CBConnect callback) noexcept {
 	std::unique_lock lock{mutex};
 	cb_connect = std::move(callback);
 }
 
-void ImplConnectionAsnycCB::handle_disconnect(ConnectionAsnycCB::CBDisconnect callback) noexcept {
+inline void ImplConnectionAsnycCB::handle_disconnect(ConnectionAsnycCB::CBDisconnect callback) noexcept {
 	std::unique_lock lock{mutex};
 	cb_disconnect = std::move(callback);
 }
 
-void ImplConnectionAsnycCB::handle_error(ConnectionAsnycCB::CBError callback) noexcept {
+inline void ImplConnectionAsnycCB::handle_error(ConnectionAsnycCB::CBError callback) noexcept {
 	std::unique_lock lock{mutex};
 	cb_error = std::move(callback);
 }
 
-void ImplConnectionAsnycCB::handle_receive(ConnectionAsnycCB::CBRecive callback) noexcept {
+inline void ImplConnectionAsnycCB::handle_receive(ConnectionAsnycCB::CBRecive callback) noexcept {
 	std::unique_lock lock{mutex};
 	cb_receive = std::move(callback);
 }
 
-void ImplConnectionAsnycCB::handle_send(ConnectionAsnycCB::CBSend callback) noexcept {
+inline void ImplConnectionAsnycCB::handle_send(ConnectionAsnycCB::CBSend callback) noexcept {
 	std::unique_lock lock{mutex};
 	cb_send = std::move(callback);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+inline void ImplConnectionAsnycCB::read_limit(size_t bytes_per_second) noexcept {
+	(void) bytes_per_second;
+	// TODO P1: Implement read_limit
+}
+
+inline void ImplConnectionAsnycCB::write_limit(size_t bytes_per_second) noexcept {
+	(void) bytes_per_second;
+	// TODO P1: Implement write_limit
+}
+
+inline size_t ImplConnectionAsnycCB::total_write_bytes() const noexcept {
+	return 0; // TODO P1: Implement statistics
+}
+
+inline size_t ImplConnectionAsnycCB::total_read_bytes() const noexcept {
+	return 0; // TODO P1: Implement statistics
+}
+
+inline size_t ImplConnectionAsnycCB::total_write_messages() const noexcept {
+	return 0; // TODO P1: Implement statistics
+}
+
+inline size_t ImplConnectionAsnycCB::total_read_messages() const noexcept {
+	return 0; // TODO P1: Implement statistics
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -215,12 +253,12 @@ void ImplConnectionAsnycCB::start() noexcept {
 
 	if (!_is_handlers_set()) {
 		log_net.error("MTCP-{} Logic error: Called start on connection with not every handler set", id);
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 	if (state != State::ConstructedSocket) {
 		log_net.error("MTCP-{} Logic error: Called start on connection in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::ConstructedSocket));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 	state = State::Connecting;
@@ -234,12 +272,12 @@ void ImplConnectionAsnycCB::connect(Address address) noexcept {
 
 	if (!_is_handlers_set()) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection with not every handler set", id);
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 	if (state != State::ConstructedIO) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::ConstructedIO));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 	state = State::Connecting;
@@ -253,12 +291,12 @@ void ImplConnectionAsnycCB::disconnect() noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 	if (queue_disconnect) {
 		log_net.error("MTCP-{} Logic error: Called disconnect on connection multiple times", id);
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 
@@ -277,7 +315,7 @@ void ImplConnectionAsnycCB::receive(int count) noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called receive on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 
@@ -294,7 +332,7 @@ void ImplConnectionAsnycCB::receive_repeat() noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called receive on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 
@@ -325,7 +363,7 @@ void ImplConnectionAsnycCB::send(Message message) noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called send on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
 		return;
 	}
 
@@ -348,27 +386,27 @@ void ImplConnectionAsnycCB::send_cancel() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-bool ImplConnectionAsnycCB::_is_connecting() const noexcept {
+inline bool ImplConnectionAsnycCB::_is_connecting() const noexcept {
 	return state == State::Connecting;
 }
 
-bool ImplConnectionAsnycCB::_is_disconnecting() const noexcept {
+inline bool ImplConnectionAsnycCB::_is_disconnecting() const noexcept {
 	return queue_disconnect;
 }
 
-bool ImplConnectionAsnycCB::_is_reading() const noexcept {
+inline bool ImplConnectionAsnycCB::_is_reading() const noexcept {
 	return queue_read != 0;
 }
 
-bool ImplConnectionAsnycCB::_is_writing() const noexcept {
-	return write_packets.size() > 0;
+inline bool ImplConnectionAsnycCB::_is_writing() const noexcept {
+	return !write_packets.empty();
 }
 
-bool ImplConnectionAsnycCB::_is_handlers_set() const noexcept {
+inline bool ImplConnectionAsnycCB::_is_handlers_set() const noexcept {
 	return cb_connect && cb_disconnect && cb_error && cb_receive && cb_send;
 }
 
-void ImplConnectionAsnycCB::_reset() noexcept {
+inline void ImplConnectionAsnycCB::_reset() noexcept {
 	state = State::ConstructedIO;
 	queue_disconnect = false;
 	queue_read = 0;
@@ -380,14 +418,14 @@ void ImplConnectionAsnycCB::_reset() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const std::error_code ec) noexcept {
+void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept {
 	(void) self_sp;
 	std::unique_lock lock{mutex};
 
 	const auto oldState = state;
 	if (state != State::Failure) {
 		state = State::Failure;
-		cb_error(ec);
+		cb_error(source, ec);
 
 		std::error_code ec_c;
 		socket.cancel(ec_c);
@@ -411,24 +449,24 @@ void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const std::error_code ec)
 	}
 }
 
-void ImplConnectionAsnycCB::failure_error(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	failure(std::move(self_sp), ec);
+void ImplConnectionAsnycCB::failure_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept {
+	failure(std::move(self_sp), ErrorSource::logic, ec);
 }
 
 void ImplConnectionAsnycCB::failure_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	failure(std::move(self_sp), ec);
+	failure(std::move(self_sp), ErrorSource::connect, ec);
 }
 
 void ImplConnectionAsnycCB::failure_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept {
 	// Abort further receives
 	queue_read = 0;
-	failure(std::move(self_sp), ec);
+	failure(std::move(self_sp), ErrorSource::receive, ec);
 }
 
 void ImplConnectionAsnycCB::failure_send(SelfPtr&& self_sp, const std::error_code ec) noexcept {
 	// Abort further sends
 	write_packets.clear();
-	failure(std::move(self_sp), ec);
+	failure(std::move(self_sp), ErrorSource::send, ec);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -512,12 +550,12 @@ void ImplConnectionAsnycCB::success_send(SelfPtr&& self_sp) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplConnectionAsnycCB::do_error(SelfPtr&& self_sp, const std::error_code ec) noexcept {
+void ImplConnectionAsnycCB::do_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept {
 	const auto self = self_sp.get();
 
 	self->io_context.post([self_sp = std::move(self_sp), ec]() mutable {
 		const auto self = self_sp.get();
-		self->failure_error(std::move(self_sp), ec);
+		self->failure_logic_error(std::move(self_sp), ec);
 	});
 }
 
@@ -792,6 +830,30 @@ void ConnectionAsnycCB::handle_receive(CBRecive callback) noexcept {
 
 void ConnectionAsnycCB::handle_send(CBSend callback) noexcept {
 	impl->handle_send(std::move(callback));
+}
+
+void ConnectionAsnycCB::read_limit(size_t bytes_per_second) noexcept {
+	impl->read_limit(bytes_per_second);
+}
+
+void ConnectionAsnycCB::write_limit(size_t bytes_per_second) noexcept {
+	impl->write_limit(bytes_per_second);
+}
+
+size_t ConnectionAsnycCB::total_write_bytes() const noexcept {
+	return impl->total_write_bytes();
+}
+
+size_t ConnectionAsnycCB::total_read_bytes() const noexcept {
+	return impl->total_read_bytes();
+}
+
+size_t ConnectionAsnycCB::total_write_messages() const noexcept {
+	return impl->total_write_messages();
+}
+
+size_t ConnectionAsnycCB::total_read_messages() const noexcept {
+	return impl->total_read_messages();
 }
 
 void ConnectionAsnycCB::start() noexcept {

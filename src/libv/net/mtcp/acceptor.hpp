@@ -17,11 +17,16 @@ namespace mtcp {
 
 class AcceptorAsyncCB {
 public:
+	enum class ErrorSource {
+		accept,
+	};
+
+public:
 	using Connection = ConnectionAsnycCB;
 
 public:
 	using CBAccept = std::function<void(Connection)>;
-	using CBError = std::function<void(const std::error_code)>;
+	using CBError = std::function<void(ErrorSource, std::error_code)>;
 
 private:
 	std::shared_ptr<class ImplAcceptorAsyncCB> impl;

@@ -43,13 +43,13 @@ public:
 	explicit UpdateSession(libv::net::mtcp::ConnectionAsnycCB connection_) :
 		connection(std::move(connection_)) {
 
-		const auto connect_cb = [](const auto local_endpoint, const auto remote_endpoint) {
+		const auto connect_cb = [](auto local_endpoint, auto remote_endpoint) {
 		};
 
 		const auto disconnect_cb = []() {
 		};
 
-		const auto error_cb = [](const std::error_code ec) noexcept {
+		const auto error_cb = [](auto operation, std::error_code ec) noexcept {
 //			libv::
 		};
 
@@ -84,6 +84,7 @@ struct UpdateServer {
 	libv::net::mtcp::AcceptorAsyncCB acceptor;
 
 	std::vector<UpdateSession> clients;
+//	std::vector<libv::net::mtcp::ConnectionAsnycCB> client_queue;
 	std::mutex clients_m;
 
 	UpdateServer(uint16_t port, uint16_t num_net_thread) :
@@ -97,7 +98,7 @@ struct UpdateServer {
 			clients.emplace_back(std::move(connection));
 		};
 
-		const auto error_cb = [this](const std::error_code ec) noexcept {
+		const auto error_cb = [this](auto operation, std::error_code ec) noexcept {
 			// log
 		};
 
@@ -119,13 +120,13 @@ struct UpdateClient {
 
 public:
 	explicit UpdateClient() {
-		const auto connect_cb = [](const auto local_endpoint, const auto remote_endpoint) {
+		const auto connect_cb = [](auto local_endpoint, auto remote_endpoint) {
 		};
 
 		const auto disconnect_cb = []() {
 		};
 
-		const auto error_cb = [](const std::error_code ec) noexcept {
+		const auto error_cb = [](auto operation, std::error_code ec) noexcept {
 		};
 
 		const auto receive_cb = [](libv::net::mtcp::Message&& message) noexcept {

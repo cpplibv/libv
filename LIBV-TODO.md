@@ -581,8 +581,13 @@ app.update: Start update server implementation
 
 
 
+libv.net: (?) Switch back to boost asio
+libv.net: FwdWrap IOContext accessor and remove fwd include
+
 libv.net: Make connections moveable
 libv.net: Make connections rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
+libv.net: Statistics: Byte sent, byte received total, Messages sent, messages received, ?connection time
+libv.net.mtcp: On error extra parameter enum to
 
 app.update: Connection dtor calls in vector resize
 app.update: Proper disconnect, Cleanup lost connections (sessions)
