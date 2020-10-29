@@ -581,6 +581,49 @@ app.update: Start update server implementation
 
 
 
+
+
+#include <iostream>
+#include <map>
+#include <boost/system/system_error.hpp>
+
+namespace std {
+
+error_code make_error_code(boost::system::error_code error) {
+    struct CategoryAdapter : public error_category {
+        CategoryAdapter(const boost::system::error_category& category)
+            : m_category(category) { }
+
+        const char* name() const noexcept {
+            return m_category.name();
+        }
+
+        std::string message(int ev) const {
+            return m_category.message(ev);
+        }
+
+    private:
+        const boost::system::error_category& m_category;
+    };
+
+    static thread_local map<std::string, CategoryAdapter> nameToCategory;
+    auto result = nameToCategory.emplace(error.category().name(), error.category());
+    auto& category = result.first->second;
+    return error_code(error.value(), category);
+}
+
+};
+
+int main() {
+    auto a = boost::system::errc::make_error_code(boost::system::errc::address_family_not_supported);
+    auto b = std::make_error_code(a);
+    std::cout << b.message() << std::endl;
+}
+
+
+
+
+
 libv.net: (?) Switch back to boost asio
 libv.net: FwdWrap IOContext accessor and remove fwd include
 

@@ -3,8 +3,8 @@
 // hpp
 #include <libv/net/io_context.hpp>
 // ext
-#include <netts/internet.hpp>
-#include <netts/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/io_context.hpp>
 // libv
 #include <libv/mt/number.hpp>
 // std
@@ -23,9 +23,9 @@ namespace net {
 
 class ImplIOContext {
 private:
-	netts::io_context io_context;
-	netts::ip::tcp::resolver resolver;
-	netts::executor_work_guard<netts::io_context::executor_type> work_guard;
+	boost::asio::io_context io_context;
+	boost::asio::ip::tcp::resolver resolver;
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 
 	std::vector<std::thread> threads;
 
@@ -58,7 +58,7 @@ public:
 	}
 
 public:
-	[[nodiscard]] netts::io_context& context() noexcept {
+	[[nodiscard]] boost::asio::io_context& context() noexcept {
 		return io_context;
 	}
 
@@ -96,7 +96,7 @@ IOContext::IOContext(size_t thread_count) :
 
 IOContext::~IOContext() = default; // For the sake of forward declared unique_ptr
 
-netts::io_context& IOContext::context() noexcept {
+boost::asio::io_context& IOContext::context() noexcept {
 	return impl->context();
 }
 

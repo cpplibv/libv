@@ -4,7 +4,7 @@
 
 #include <libv/net/fwd.hpp>
 // ext
-#include <netts/netfwd.hpp>
+#include <boost/asio/io_context.hpp> // <<< P1: Remove this include
 // std
 #include <functional>
 #include <memory>
@@ -24,7 +24,7 @@ public:
 	~IOContext();
 
 public:
-	[[nodiscard]] netts::io_context& context() noexcept;
+	[[nodiscard]] boost::asio::io_context& context() noexcept;
 
 public:
 	void post(std::function<void()> func);

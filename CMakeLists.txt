@@ -251,6 +251,11 @@ wish_create_external(
 	DEFINE BOOST_STACKTRACE_BACKTRACE_INCLUDE_FILE=<libbacktrace/backtrace.h>
 
 #	LINK boost_thread-mt-s-x64
+
+	# For boost asio usage
+	DEFINE _WIN32_WINNT=0x0501
+	LINK boost_system-mt-s-x64
+	LINK wsock32 ws2_32
 )
 
 wish_create_library(
@@ -618,9 +623,8 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_net STATIC
 	SOURCE src/libv/net/*.cpp
-	LINK   libv_log libv_utility libv_meta ext_boost ext_net_ts
+	LINK   libv_log libv_utility libv_meta ext_boost
 #	LINK   libv_serialization
-#	LINK   libv_utility libv_mt ext_boost
 )
 
 wish_create_library(

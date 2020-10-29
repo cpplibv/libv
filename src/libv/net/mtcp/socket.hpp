@@ -3,7 +3,7 @@
 #pragma once
 
 // ext
-#include <netts/internet.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 
 namespace libv {
@@ -13,7 +13,7 @@ namespace mtcp {
 // -------------------------------------------------------------------------------------------------
 
 struct Socket {
-	netts::ip::tcp::socket socket;
+	boost::asio::ip::tcp::socket socket;
 };
 
 // -------------------------------------------------------------------------------------------------

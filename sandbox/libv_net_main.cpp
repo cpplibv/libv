@@ -47,9 +47,9 @@ struct Session {
 		});
 		conn.handle_error([this](auto operation, std::error_code ec) {
 			log_sandbox.error("{} error: {}", id, libv::net::to_string(ec));
-			if (ec == netts::error::make_error_code(netts::error::eof))
+			if (ec == boost::asio::error::make_error_code(boost::asio::error::eof))
 				return;
-			if (ec == netts::error::make_error_code(netts::error::operation_aborted))
+			if (ec == boost::asio::error::make_error_code(boost::asio::error::operation_aborted))
 				return;
 		});
 		conn.handle_send([this](libv::net::mtcp::Message&& response) {
@@ -114,9 +114,9 @@ struct Client {
 			log_sandbox.info("{} disconnected", id);
 		});
 		conn.handle_error([this](auto operation, std::error_code ec) {
-			if (ec == netts::error::make_error_code(netts::error::eof))
+			if (ec == boost::asio::error::make_error_code(boost::asio::error::eof))
 				return;
-			if (ec == netts::error::make_error_code(netts::error::operation_aborted))
+			if (ec == boost::asio::error::make_error_code(boost::asio::error::operation_aborted))
 				return;
 			log_sandbox.error("{} error: {}", id, libv::net::to_string(ec));
 		});

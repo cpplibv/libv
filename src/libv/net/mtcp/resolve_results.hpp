@@ -3,7 +3,7 @@
 #pragma once
 
 // ext
-#include <netts/internet.hpp>
+#include <boost/asio/ip/tcp.hpp>
 
 
 namespace libv {
@@ -13,7 +13,7 @@ namespace mtcp {
 // -------------------------------------------------------------------------------------------------
 
 struct ResolveResults {
-	netts::ip::tcp::resolver::results_type results;
+	boost::asio::ip::tcp::resolver::results_type results;
 };
 
 // -------------------------------------------------------------------------------------------------

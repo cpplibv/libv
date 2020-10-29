@@ -127,6 +127,7 @@ public:
 		};
 
 		const auto error_cb = [](auto operation, std::error_code ec) noexcept {
+			(void) operation;
 		};
 
 		const auto receive_cb = [](libv::net::mtcp::Message&& message) noexcept {

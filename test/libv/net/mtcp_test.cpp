@@ -2,8 +2,6 @@
 
 // test
 #include <catch/catch.hpp>
-// ext
-#include <netts/internet.hpp>
 // libv
 #include <libv/log/log.hpp>
 #include <libv/mt/binary_latch.hpp>
@@ -41,14 +39,14 @@ struct TestClient {
 	std::vector<libv::net::mtcp::Message> receives{};
 	std::vector<libv::net::mtcp::Message> sends{};
 
-	TestClient(Connection&& conn) : conn(std::move(conn)) {
+	explicit TestClient(Connection&& conn) : conn(std::move(conn)) {
 		init();
 	}
-	TestClient(libv::net::IOContext& context) : conn(context) {
+	explicit TestClient(libv::net::IOContext& context) : conn(context) {
 		init();
 	}
 	void init() {
-		conn.handle_connect([&](const libv::net::mtcp::Endpoint local_endpoint, const libv::net::mtcp::Endpoint remote_endpoint) {
+		conn.handle_connect([&](libv::net::mtcp::Endpoint local_endpoint, libv::net::mtcp::Endpoint remote_endpoint) {
 			(void) local_endpoint;
 
 			libv::log.info("Connected");
@@ -58,8 +56,9 @@ struct TestClient {
 			libv::log.info("Disconnected");
 			disconnects.emplace_back(0);
 		});
-		conn.handle_error([&](auto operation, const std::error_code ec) {
+		conn.handle_error([&](auto operation, std::error_code ec) {
 			(void) operation;
+
 			libv::log.error("Client " + libv::net::to_string(ec));
 			errors.emplace_back(ec);
 		});
@@ -92,7 +91,9 @@ struct TestServer {
 
 			on_accept.raise();
 		});
-		acc.handle_error([this](const std::error_code ec) {
+		acc.handle_error([this](auto operation, std::error_code ec) {
+			(void) operation;
+
 			libv::log.error("Server " + libv::net::to_string(ec));
 			errors.emplace_back(ec);
 		});
@@ -132,7 +133,7 @@ TEST_CASE("MTCP Connection without any connect should handle errors") {
 
 		context.join();
 		REQUIRE(test.errors.size() == 1);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::not_connected));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
 	}
 
 	SECTION("when two operation of:") {
@@ -163,8 +164,8 @@ TEST_CASE("MTCP Connection without any connect should handle errors") {
 
 		context.join();
 		REQUIRE(test.errors.size() == 2);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::not_connected));
-		CHECK(test.errors[1] == netts::error::make_error_code(netts::error::not_connected));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
+		CHECK(test.errors[1] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
 	}
 
 	SECTION("when three operation of:") {
@@ -201,9 +202,9 @@ TEST_CASE("MTCP Connection without any connect should handle errors") {
 
 		context.join();
 		REQUIRE(test.errors.size() == 3);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::not_connected));
-		CHECK(test.errors[1] == netts::error::make_error_code(netts::error::not_connected));
-		CHECK(test.errors[2] == netts::error::make_error_code(netts::error::not_connected));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
+		CHECK(test.errors[1] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
+		CHECK(test.errors[2] == boost::asio::error::make_error_code(boost::asio::error::not_connected));
 	}
 
 	CHECK(test.connects.size() == 0);
@@ -225,28 +226,28 @@ TEST_CASE("MTCP Connection should stay inactive with a failed connection attempt
 
 		context.join();
 		REQUIRE(test.errors.size() == 1);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::host_not_found));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::host_not_found));
 	}
 	SECTION("When: Connection refused") {
 		test.conn.connect(libv::net::Address("127.0.0.1", test_port));
 
 		context.join();
 		REQUIRE(test.errors.size() == 1);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::connection_refused));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::connection_refused));
 	}
 	SECTION("When: Connection timed out") {
 		test.conn.connect(libv::net::Address("192.50.50.50", test_port));
 
 		context.join();
 		REQUIRE(test.errors.size() == 1);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::timed_out));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::timed_out));
 	}
 	SECTION("When: The service is not supported for the given socket type") {
 		test.conn.connect(libv::net::Address("198.51.100.1", "no such service"));
 
 		context.join();
 		REQUIRE(test.errors.size() == 1);
-		CHECK(test.errors[0] == netts::error::make_error_code(netts::error::service_not_found));
+		CHECK(test.errors[0] == boost::asio::error::make_error_code(boost::asio::error::service_not_found));
 	}
 
 	CHECK(test.connects.size() == 0);
@@ -281,7 +282,7 @@ TEST_CASE("MTCP Connection should handle successful connect-send-disconnect") {
 	context_server.join();
 
 	REQUIRE(server.accepts[0].errors.size() == 1);
-	CHECK(server.accepts[0].errors[0] == netts::error::make_error_code(netts::error::eof));
+	CHECK(server.accepts[0].errors[0] == boost::asio::error::make_error_code(boost::asio::error::eof));
 	CHECK(server.accepts[0].connects.size() == 1);
 	CHECK(server.accepts[0].disconnects.size() == 1);
 	REQUIRE(server.accepts[0].receives.size() == 1);

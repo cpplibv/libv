@@ -3,7 +3,7 @@
 // hpp
 #include <libv/net/mtcp/acceptor.hpp>
 // ext
-#include <netts/internet.hpp>
+#include <boost/asio/ip/tcp.hpp>
 // std
 #include <memory>
 #include <mutex>
@@ -26,7 +26,7 @@ class ImplAcceptorAsyncCB : public std::enable_shared_from_this<ImplAcceptorAsyn
 
 private:
 	bool accepting = false;
-	netts::ip::tcp::acceptor acceptor;
+	boost::asio::ip::tcp::acceptor acceptor;
 	std::recursive_mutex mutex;
 	IOContext& io_context;
 	AcceptorAsyncCB::CBAccept cb_accept;
@@ -40,14 +40,14 @@ public:
 public:
 	inline void listen(uint16_t port, int backlog) {
 		std::unique_lock lock{mutex};
-		std::error_code ec;
+		boost::system::error_code ec;
 
-		const auto endpoint = netts::ip::tcp::endpoint(netts::ip::tcp::v4(), port);
+		const auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port);
 
 		acceptor.open(endpoint.protocol(), ec);
 		log_net.error_if(ec, "open {}", libv::net::to_string(ec));
 
-		acceptor.set_option(netts::ip::tcp::acceptor::reuse_address(true), ec);
+		acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true), ec);
 		log_net.error_if(ec, "reuse_address {}", libv::net::to_string(ec));
 
 		acceptor.bind(endpoint, ec);
@@ -66,7 +66,7 @@ public:
 	inline void cancel() noexcept {
 		std::unique_lock lock{mutex};
 
-		std::error_code ignore_ec;
+		boost::system::error_code ignore_ec;
 		acceptor.close(ignore_ec);
 		(void) ignore_ec; // Ignore close error
 
@@ -87,7 +87,8 @@ public:
 		std::unique_lock lock{mutex};
 		acceptor.async_accept(
 				[self_sp = std::move(self_sp)]
-				(const std::error_code ec, netts::ip::tcp::socket peer) mutable {
+//				(const std::error_code ec, boost::asio::ip::tcp::socket peer) mutable {
+				(boost::system::error_code ec, boost::asio::ip::tcp::socket peer) mutable {
 
 			std::unique_lock lock{self_sp->mutex};
 

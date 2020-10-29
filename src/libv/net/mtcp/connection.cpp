@@ -3,8 +3,13 @@
 // hpp
 #include <libv/net/mtcp/connection.hpp>
 // ext
-#include <netts/buffer.hpp>
-#include <netts/socket.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/connect.hpp>
+#include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/read.hpp>
+#include <boost/asio/write.hpp>
+//#include <netts/buffer.hpp>
+//#include <netts/socket.hpp>
 // libv
 #include <libv/utility/byte_swap.hpp>
 #include <libv/utility/enum.hpp>
@@ -22,6 +27,134 @@
 #include <libv/net/mtcp/resolve_results.hpp>
 #include <libv/net/mtcp/socket.hpp>
 
+
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================
+//
+//
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================
+//
+//#include <boost/beast/core/basic_stream.hpp>
+//#include <boost/beast/core/rate_policy.hpp>
+////#include <boost/asio/read.hpp>
+//#include <boost/asio/ip/tcp.hpp>
+//#include <netts/net.hpp>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+///// A rate policy with simple, configurable limits on reads and writes.
+/////
+///// This rate policy allows for simple individual limits on the amount
+///// of bytes per second allowed for reads and writes.
+/////
+///// @par Concepts
+/////
+///// @li <em>RatePolicy</em>
+/////
+///// @see beast::basic_stream
+/////
+//class libv_rate_policy {
+//	friend class boost::beast::rate_policy_access;
+//
+//	static std::size_t constexpr all = std::numeric_limits<std::size_t>::max();
+//
+//private:
+//	std::size_t rd_remain_ = all;
+//	std::size_t wr_remain_ = all;
+//	std::size_t rd_limit_ = all;
+//	std::size_t wr_limit_ = all;
+//
+//private:
+//	[[nodiscard]] std::size_t available_read_bytes() const noexcept {
+//		return rd_remain_;
+//	}
+//
+//	[[nodiscard]] std::size_t available_write_bytes() const noexcept {
+//		return wr_remain_;
+//	}
+//
+//	void transfer_read_bytes(std::size_t n) noexcept {
+//		if (rd_remain_ != all)
+//			rd_remain_ = (n < rd_remain_) ? rd_remain_ - n : 0;
+//	}
+//
+//	void transfer_write_bytes(std::size_t n) noexcept {
+//		if (wr_remain_ != all)
+//			wr_remain_ = (n < wr_remain_) ? wr_remain_ - n : 0;
+//	}
+//
+//	void on_timer() noexcept {
+//		rd_remain_ = rd_limit_;
+//		wr_remain_ = wr_limit_;
+//	}
+//
+//public:
+//	/// Set the limit of bytes per second to read, 0 means unlimited
+//	void read_limit(std::size_t bytes_per_second) noexcept {
+//		if (bytes_per_second == 0)
+//			bytes_per_second = all;
+//
+//		rd_limit_ = bytes_per_second;
+//		if (rd_remain_ > bytes_per_second)
+//			rd_remain_ = bytes_per_second;
+//	}
+//
+//	/// Set the limit of bytes per second to write, 0 means unlimited
+//	void write_limit(std::size_t bytes_per_second) noexcept {
+//		if (bytes_per_second == 0)
+//			bytes_per_second = all;
+//
+//		wr_limit_ = bytes_per_second;
+//		if (wr_remain_ > bytes_per_second)
+//			wr_remain_ = bytes_per_second;
+//	}
+//};
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy>;
+////using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy>;
+//
+//
+//
+//
+////using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy>;
+////using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy>;
+////using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy>;
+//
+////struct RatedSocket2 {
+//////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, boost::beast::simple_rate_policy> socket;
+//////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::io_context, boost::beast::simple_rate_policy> socket;
+//////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, rate_gauge> socket;
+////
+//////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, boost::beast::simple_rate_policy> socket;
+//////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy> socket;
+////	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy> socket;
+////
+////	void foo() {
+////		socket.rate_policy().read_limit(100);
+////		socket.rate_policy().write_limit(100);
+////	}
+////};
+//
+////
+////// The policy object, which is default constructed, or
+////// decay-copied upon construction, is attached to the stream
+////// and may be accessed through the function `rate_policy`.
+//////
+////// Here we set individual rate limits for reading and writing
+////
+////stream.rate_policy().read_limit(10000); // bytes per second
+////
+////stream.rate_policy().write_limit(850000); // bytes per second
+//
+//
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================
 
 namespace libv {
 namespace net {
@@ -49,7 +182,8 @@ private:
 	ConnectionAsnycCB::CBRecive cb_receive;
 	ConnectionAsnycCB::CBSend cb_send;
 
-	netts::ip::tcp::socket socket;
+	boost::asio::ip::tcp::socket socket;
+//	mtcp_stream stream;
 
 private:
 	using ID = int64_t;
@@ -154,7 +288,7 @@ private:
 
 	static void do_start(SelfPtr&& self_sp) noexcept;
 	static void do_resolve(SelfPtr&& self_sp, Address&& address) noexcept;
-	static void do_connect(SelfPtr&& self_sp, netts::ip::tcp::resolver::results_type&& endpoints) noexcept;
+	static void do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept;
 
 	static void do_read(SelfPtr&& self_sp) noexcept;
 	static void do_read_header(SelfPtr&& self_sp) noexcept;
@@ -171,22 +305,31 @@ private:
 
 ImplConnectionAsnycCB::ImplConnectionAsnycCB(IOContext& io_context) noexcept :
 	socket(io_context.context()),
+//	stream(io_context.context()),
 	state(State::ConstructedIO),
 	io_context(io_context) { }
 
 ImplConnectionAsnycCB::ImplConnectionAsnycCB(IOContext& io_context, Socket&& socket) noexcept :
 	socket(std::move(socket.socket)),
+//	stream(std::move(socket.socket)),
 	state(State::ConstructedSocket),
 	io_context(io_context) { }
 
+
 void ImplConnectionAsnycCB::init_socket() noexcept {
 	// TODO P1: Call init_socket to setup no_delay and keep_alive, might require research
-	std::error_code ec;
+	boost::system::error_code ec;
 
-	socket.set_option(netts::ip::tcp::no_delay{true}, ec);
+//	boost::system::error_code bec;
+//	s<decltype(stream.socket())> x;
+//	stream.socket().set_option(boost::asio::ip::tcp::no_delay{true}, ec);
+//	stream.socket().set_option(boost::asio::ip::tcp::no_delay{true}, bec);
+//	stream.socket().set_option(boost::asio::ip::tcp::socket::keep_alive{true}, bec);
+
+	socket.set_option(boost::asio::ip::tcp::no_delay{true}, ec);
 	log_net.error_if(ec, "MTCP-{} Could not set no_delay TCP option. {}", id, libv::net::to_string(ec));
 
-	socket.set_option(netts::ip::tcp::socket::keep_alive{true}, ec);
+	socket.set_option(boost::asio::ip::tcp::socket::keep_alive{true}, ec);
 	log_net.error_if(ec, "MTCP-{} Could not set keep_alive TCP option. {}", id, libv::net::to_string(ec));
 }
 
@@ -253,12 +396,12 @@ void ImplConnectionAsnycCB::start() noexcept {
 
 	if (!_is_handlers_set()) {
 		log_net.error("MTCP-{} Logic error: Called start on connection with not every handler set", id);
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 	if (state != State::ConstructedSocket) {
 		log_net.error("MTCP-{} Logic error: Called start on connection in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::ConstructedSocket));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 	state = State::Connecting;
@@ -272,12 +415,12 @@ void ImplConnectionAsnycCB::connect(Address address) noexcept {
 
 	if (!_is_handlers_set()) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection with not every handler set", id);
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 	if (state != State::ConstructedIO) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::ConstructedIO));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 	state = State::Connecting;
@@ -291,12 +434,12 @@ void ImplConnectionAsnycCB::disconnect() noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called connect on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 	if (queue_disconnect) {
 		log_net.error("MTCP-{} Logic error: Called disconnect on connection multiple times", id);
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 
@@ -315,7 +458,7 @@ void ImplConnectionAsnycCB::receive(int count) noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called receive on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 
@@ -332,7 +475,7 @@ void ImplConnectionAsnycCB::receive_repeat() noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called receive on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 
@@ -363,7 +506,7 @@ void ImplConnectionAsnycCB::send(Message message) noexcept {
 
 	if (state != State::Connecting && state != State::Connected) {
 		log_net.error("MTCP-{} Logic error: Called send on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
-		do_logic_error(shared_from_this(), netts::error::make_error_code(netts::error::not_connected));
+		do_logic_error(shared_from_this(), boost::asio::error::make_error_code(boost::asio::error::not_connected));
 		return;
 	}
 
@@ -427,7 +570,7 @@ void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const ErrorSource source,
 		state = State::Failure;
 		cb_error(source, ec);
 
-		std::error_code ec_c;
+		boost::system::error_code ec_c;
 		socket.cancel(ec_c);
 		log_net.error_if(ec_c, "MTCP-{} Failed to cancel operations. {}", id, libv::net::to_string(ec_c));
 		log_net.trace_if(!ec_c, "MTCP-{} Successfully cancelled operations", id);
@@ -565,7 +708,7 @@ void ImplConnectionAsnycCB::do_start(SelfPtr&& self_sp) noexcept {
 	self->io_context.post([self_sp = std::move(self_sp)]() mutable {
 		const auto self = self_sp.get();
 
-		std::error_code ignore_ec;
+		boost::system::error_code ignore_ec;
 		const auto local_endpoint = self->socket.local_endpoint(ignore_ec);
 		(void) ignore_ec; // Ignore error case where we are actually no longer connected
 		const auto remote_endpoint = self->socket.remote_endpoint(ignore_ec);
@@ -594,10 +737,22 @@ void ImplConnectionAsnycCB::do_resolve(SelfPtr&& self_sp, Address&& address) noe
 	});
 }
 
-void ImplConnectionAsnycCB::do_connect(SelfPtr&& self_sp, netts::ip::tcp::resolver::results_type&& endpoints) noexcept {
+void ImplConnectionAsnycCB::do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept {
 	const auto self = self_sp.get();
 
-	netts::async_connect(self->socket, endpoints, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy> socket2(self->io_context.context());
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy> socket2(ioc);
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy> socket2(self->io_context.context());
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy> socket2(self->io_context.context().get_executor());
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::any_io_executor, libv_rate_policy> socket2(ioc);
+
+//	boost::asio::io_context ioc;
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy> socket2(ioc);
+//	socket2.async_read_some();
+//	socket2.async_write_some();
+//	socket2.async_connect(endpoints, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
+
+	boost::asio::async_connect(self->socket, endpoints, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
 		const auto self = self_sp.get();
 
 		if (ec) {
@@ -607,7 +762,7 @@ void ImplConnectionAsnycCB::do_connect(SelfPtr&& self_sp, netts::ip::tcp::resolv
 		} else {
 			log_net.trace("MTCP-{} Successfully connected", self->id);
 
-			std::error_code ignore_ec;
+			boost::system::error_code ignore_ec;
 			const auto local_endpoint = self->socket.local_endpoint(ignore_ec);
 			(void) ignore_ec; // Ignore error case where we are actually no longer connected
 
@@ -628,7 +783,7 @@ void ImplConnectionAsnycCB::do_disconnect(SelfPtr&& self_sp) noexcept {
 	self->io_context.post([self_sp = std::move(self_sp)]() mutable {
 		const auto self = self_sp.get();
 
-		std::error_code ec;
+		boost::system::error_code ec;
 
 		self->socket.shutdown(self->socket.shutdown_both, ec);
 		log_net.error_if(ec, "MTCP-{} Error while shutting down socket. {}", self->id, libv::net::to_string(ec));
@@ -652,9 +807,17 @@ void ImplConnectionAsnycCB::do_read(SelfPtr&& self_sp) noexcept {
 void ImplConnectionAsnycCB::do_read_header(SelfPtr&& self_sp) noexcept {
 	const auto self = self_sp.get();
 
-	netts::async_read(
+//	boost::asio::io_context ioc;
+//	boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio::executor, libv_rate_policy> socket2(ioc);
+//
+//	boost::asio::async_read(
+//			socket2,
+//	socket2.async_read_some(
+//			boost::asio::buffer(&self->read_header, sizeof(PacketHeader)),
+
+	boost::asio::async_read(
 			self->socket,
-			netts::buffer(&self->read_header, sizeof(PacketHeader)),
+			boost::asio::buffer(&self->read_header, sizeof(PacketHeader)),
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
 				const auto self = self_sp.get();
 
@@ -668,7 +831,7 @@ void ImplConnectionAsnycCB::do_read_header(SelfPtr&& self_sp) noexcept {
 
 					if (read_body_size > MTCP_MESSAGE_MAX_SIZE) {
 						log_net.error("MTCP-{} Payload size {} exceeds maximum size of {}", self->id, read_body_size, MTCP_MESSAGE_MAX_SIZE);
-						self->failure_receive(std::move(self_sp), netts::error::make_error_code(netts::error::message_size));
+						self->failure_receive(std::move(self_sp), boost::asio::error::make_error_code(boost::asio::error::message_size));
 					}
 
 					do_read_body(std::move(self_sp), read_body_size);
@@ -689,9 +852,9 @@ void ImplConnectionAsnycCB::do_read_body(SelfPtr&& self_sp, size_t read_body_siz
 	}
 
 	// TODO P5: Use a non dynamic buffer is read_body_size < MTCP_MESSAGE_MAX_RESERVE, with resize instead of reserve
-	netts::async_read(
+	boost::asio::async_read(
 			self->socket,
-			netts::dynamic_buffer(self->read_body, read_body_size),
+			boost::asio::dynamic_buffer(self->read_body, read_body_size),
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
 				const auto self = self_sp.get();
 
@@ -719,9 +882,9 @@ void ImplConnectionAsnycCB::do_write(SelfPtr&& self_sp) noexcept {
 //	const auto write_body_size = self->write_packets.begin()->size();
 //	assert(write_body_size <= MTCP_MESSAGE_MAX_SIZE);
 ////	self->write_header = libv::host_to_network(static_cast<PacketHeader> (write_body_size));
-////	const auto header_buffer = netts::buffer(&self->write_header, sizeof(PacketHeader));
+////	const auto header_buffer = boost::asio::buffer(&self->write_header, sizeof(PacketHeader));
 //
-////	netts::async_write(
+////	boost::asio::async_write(
 ////			self->socket,
 ////			header_buffer,
 ////			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
@@ -736,11 +899,11 @@ void ImplConnectionAsnycCB::do_write(SelfPtr&& self_sp) noexcept {
 ////				}
 ////			});
 //
-//	const auto header_buffer = netts::buffer(&self->write_header, sizeof(PacketHeader));
-//	const auto body_buffer = netts::buffer(*self->write_packets.begin());
-//	const auto buffers = std::array<netts::const_buffer, 2>{header_buffer, body_buffer};
+//	const auto header_buffer = boost::asio::buffer(&self->write_header, sizeof(PacketHeader));
+//	const auto body_buffer = boost::asio::buffer(*self->write_packets.begin());
+//	const auto buffers = std::array<boost::asio::const_buffer, 2>{header_buffer, body_buffer};
 //
-//	netts::async_write(
+//	boost::asio::async_write(
 //			self->socket,
 //			buffers,
 //			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
@@ -764,9 +927,9 @@ void ImplConnectionAsnycCB::do_write_header(SelfPtr&& self_sp) noexcept {
 	// TODO P3: replace assert with recoverable error
 
 	self->write_header = libv::host_to_network(static_cast<PacketHeader> (write_body_size));
-	const auto header_buffer = netts::buffer(&self->write_header, sizeof(PacketHeader));
+	const auto header_buffer = boost::asio::buffer(&self->write_header, sizeof(PacketHeader));
 
-	netts::async_write(
+	boost::asio::async_write(
 			self->socket,
 			header_buffer,
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
@@ -785,9 +948,9 @@ void ImplConnectionAsnycCB::do_write_header(SelfPtr&& self_sp) noexcept {
 
 void ImplConnectionAsnycCB::do_write_body(SelfPtr&& self_sp) noexcept {
 	const auto self = self_sp.get();
-	const auto body_buffer = netts::buffer(*self->write_packets.begin());
+	const auto body_buffer = boost::asio::buffer(*self->write_packets.begin());
 
-	netts::async_write(
+	boost::asio::async_write(
 			self->socket,
 			body_buffer,
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {

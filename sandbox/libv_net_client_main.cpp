@@ -24,7 +24,7 @@ int main(int, char**) {
 //	libv::net::IOContext io_context{2};
 //	libv::Timer timer;
 //
-//	libv::net::Connection conn(netts::ip::tcp::socket{io_context.context()}); // TODO P2: I don't like this socket{}
+//	libv::net::Connection conn(boost::asio::ip::tcp::socket{io_context.context()}); // TODO P2: I don't like this socket{}
 //
 //	io_context.resolve_async(address, [&](auto ec, const auto& endpoints) {
 //		if (ec)
@@ -34,7 +34,7 @@ int main(int, char**) {
 //		for (auto endpoint : endpoints)
 //			LIBV_LOG_LIBV_INFO("{}:{} - {}", endpoint.host_name(), endpoint.service_name(), endpoint.endpoint());
 //
-//		netts::async_connect(conn.socket(), endpoints, [&](auto ec, const auto& next) {
+//		boost::asio::async_connect(conn.socket(), endpoints, [&](auto ec, const auto& next) {
 //			if (ec)
 //				LIBV_LOG_LIBV_TRACE("Failed connect condition: {}", ec.message());
 //
