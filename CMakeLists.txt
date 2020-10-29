@@ -422,23 +422,6 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME net_ts
-	GIT_REPOSITORY https://github.com/chriskohlhoff/networking-ts-impl.git
-	GIT_TAG c97570e7ceef436581be3c138868a19ad96e025b
-	SKIP_CONFIGURE_AND_BUILD
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/net_ts/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/net_ts/src/get_net_ts/include/ ${PATH_EXT}/net_ts/include/
-	# TODO P3: Add support for linux link / define for net_ts
-	#	LINK $<IF:$<BOOL:${WIN32}>,
-	#			wsock32 ws2_32, # Win 32
-	#			 # Ubuntu 18.04
-	#		>
-	LINK wsock32 ws2_32
-	DEFINE _WIN32_WINNT=0x0501
-)
-
-wish_create_external(
 	NAME prometheus
 	GIT_REPOSITORY https://github.com/jupp0r/prometheus-cpp.git
 	GIT_TAG de66b57c42cc23b5b412ef4ae01697dbda259da4
