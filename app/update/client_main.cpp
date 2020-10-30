@@ -1,13 +1,14 @@
-// Project: libv, File: app/update/server_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/update/client_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
+#include <libv/net/address.hpp>
 // std
 #include <iostream>
 // pro
+#include <update/common/client.hpp>
 #include <update/common/config.hpp>
 #include <update/common/log.hpp>
-#include <update/common/server.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -25,12 +26,12 @@ int main(int argc, const char** argv) {
 
 	const auto address = args.require<std::string>
 			("-a", "--address")
-			("address", "Listening IP address")
-			= "0.0.0.0";
+			("address", "Server IP address to connect to")
+			= app::default_address;
 
 	const auto port = args.require<uint16_t>
 			("-p", "--port")
-			("port", "Listening TCP port")
+			("port", "Server TCP port to connect to")
 			= app::default_port;
 
 	const auto num_net_thread = args.require<uint16_t>
@@ -50,9 +51,12 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("{}", args.report(100));
 
-	app::UpdateServer server = {port.value(), num_net_thread.value()};
-	while (true)
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+	app::UpdateClient client;
+	client.update_from(libv::net::Address(address.value(), port.value()));
+
+	for (std::string line; std::getline(std::cin, line);) {
+		client.send(line);
+	}
 
 	return EXIT_SUCCESS;
 }

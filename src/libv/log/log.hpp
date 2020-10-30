@@ -413,7 +413,7 @@ private:
 	const std::string_view module;
 
 public:
-	LoggerModule(Logger& log, const std::string_view module) : log(log), module(module) { }
+	LoggerModule(Logger& log, const std::string_view module) noexcept : log(log), module(module) { }
 
 public:
 	/// Level 1/6 log.

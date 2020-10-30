@@ -666,26 +666,47 @@ wish_end_group()
 wish_create_group(GROUP_APPLICATION) # APPLICATION -------------------------------------------------
 
 wish_create_executable(
-	TARGET app_binary_to_source
-	SOURCE app/binary_to_source.cpp
-	LINK   ext_fmt libv_utility
-)
-
-wish_create_executable(
 	TARGET fsw
 	SOURCE app/fsw.cpp
 	LINK   ext_fmt libv_utility libv_fsw libv_mt
 #	LINK   libv_arg
 )
 
+# --- Update ---
+
+wish_create_library(
+	# TODO P5: Make this an object library
+	TARGET update_common STATIC
+	SOURCE app/update/common/*.cpp
+	LINK   libv_net
+)
+
 wish_create_executable(
 	TARGET update_server
-	#OUTPUT_FOLDER update_server
-	#OUTPUT_NAME update_server
-	#OUTPUT_RESOURCE res
-	#RESOURCE app/update_server/res
-	SOURCE app/update/*.cpp
-	LINK   libv_arg libv_net
+	SOURCE app/update/server_main.cpp
+	LINK   libv_arg update_common
+#	SOURCE app/update/common/*.cpp
+#	SOURCE app/update/server_main.cpp
+#	LINK   libv_arg libv_net
+)
+
+wish_create_executable(
+	TARGET update_client
+	SOURCE app/update/client_main.cpp
+	LINK   libv_arg update_common
+#	SOURCE app/update/common/*.cpp
+#	SOURCE app/update/client_main.cpp
+#	LINK   libv_arg libv_net
+)
+
+add_custom_target(update DEPENDS update_client update_server)
+
+# ---
+
+wish_create_executable(
+		TARGET app_binary_to_source
+		SOURCE app/binary_to_source.cpp
+		LINK   ext_fmt libv_utility
 )
 
 wish_create_executable(

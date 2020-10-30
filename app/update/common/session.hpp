@@ -1,0 +1,31 @@
+// Project: libv, File: app/update/common/session.hpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+// libv
+#include <libv/net/mtcp/connection.hpp>
+
+
+namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+struct UpdateSession {
+	libv::net::mtcp::ConnectionAsnycCB connection;
+	class UpdateServer& server;
+
+public:
+	// Session memory address is leaked to callbacks, so address stability is required
+	UpdateSession(const UpdateSession& orig) noexcept = delete;
+	UpdateSession(UpdateSession&& orig) noexcept = delete;
+	UpdateSession& operator=(const UpdateSession& orig) & noexcept = delete;
+	UpdateSession& operator=(UpdateSession&& orig) & noexcept = delete;
+
+public:
+	explicit UpdateSession(UpdateServer& server, libv::net::mtcp::ConnectionAsnycCB connection_);
+	~UpdateSession();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace app

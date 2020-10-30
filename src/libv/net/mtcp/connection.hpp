@@ -48,10 +48,24 @@ private:
 
 public:
 	explicit ConnectionAsnycCB(IOContext& io_context) noexcept;
-
 private:
 	/// Constructor to be used with an acceptor
 	ConnectionAsnycCB(IOContext& io_context, Socket&& socket) noexcept;
+
+public:
+	ConnectionAsnycCB(const ConnectionAsnycCB& orig) noexcept = default;
+	ConnectionAsnycCB(ConnectionAsnycCB&& orig) noexcept = default;
+	ConnectionAsnycCB& operator=(const ConnectionAsnycCB& orig) & noexcept = default;
+	ConnectionAsnycCB& operator=(ConnectionAsnycCB&& orig) & noexcept = default;
+
+public:
+	~ConnectionAsnycCB() noexcept = default;
+
+public:
+	/// Can only return false if the connection was moved out
+	[[nodiscard]] explicit inline operator bool() const noexcept {
+		return impl != nullptr;
+	}
 
 public:
 	/// Handlers must be set before any other function call

@@ -581,6 +581,10 @@ libv.net: Statistics: Byte sent, byte received total, Messages sent, messages re
 libv.net.mtcp: On error extra parameter enum to indicate the source operation of the error
 libv.net: Wrap IOContext accessor in fwd
 libv.net: Move rate_policy into its own header
+libv.net: Make connections moveable | it was already movable, but now its explicit
+app.update: Connection dtor calls in vector resize | Session memory address is leaked to callback, so address stability is required, solved with unique pointers
+app.update: Proper disconnect, Cleanup lost connections (sessions)
+
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -589,18 +593,35 @@ libv.net: Move rate_policy into its own header
 clion live templates:
 	cout
 	ci
+netbeans and clion live templates:
 	getm - auto&
 	getr - const auto& x() const
 	getv - auto x() const
 
 
 
-
-libv.net: Make connections moveable
-
-app.update: Connection dtor calls in vector resize
-app.update: Proper disconnect, Cleanup lost connections (sessions)
-
+Canceling other from the other side not the cleanest teardown of connection state:
+	Start requested, src/libv/net/mtcp/connection.cpp:265
+	Receive requested: repeat, src/libv/net/mtcp/connection.cpp:344
+	Successfully read 4 header byte, src/libv/net/mtcp/connection.cpp:687
+	Successfully read 9 payload byte, src/libv/net/mtcp/connection.cpp:723
+receive_cb: README.md
+	Send requested, src/libv/net/mtcp/connection.cpp:375
+	Successfully wrote 4 header byte, src/libv/net/mtcp/connection.cpp:784
+	Failed to read 0 header byte, src/libv/net/mtcp/connection.cpp:683
+	Failed to write 296 payload byte, src/libv/net/mtcp/connection.cpp:801
+	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
+	Successfully shutdown socket, src/libv/net/mtcp/connection.cpp:453
+	Successfully closed socket, src/libv/net/mtcp/connection.cpp:458
+	Receive requested: stop, src/libv/net/mtcp/connection.cpp:360
+	Disconnect requested, src/libv/net/mtcp/connection.cpp:303
+	Logic error: Called connect on connection in state 4. Expected states are 2 or 3, src/libv/net/mtcp/connection.cpp:306
+	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
+	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
+	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
+	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
+	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
+	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
 
 
 
@@ -1888,6 +1909,20 @@ app: for apps you can cd next to the binary to solve any relative path issue (co
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
 ninja: CLICOLOR_FORCE=1 env var to have colored output
+
+--- INFO -------------------------------------------------------------------------------------------
+
+Used default port ranges in LIBV
+	25090 - Update server listening
+	25091 - RESERVED
+	25092 - RESERVED
+	25093 - RESERVED
+	25094 - RESERVED
+	25095 - RESERVED
+	25096 - RESERVED
+	25097 - RESERVED
+	25098 - RESERVED
+	25099 - RESERVED
 
 --- ABANDONED --------------------------------------------------------------------------------------
 
