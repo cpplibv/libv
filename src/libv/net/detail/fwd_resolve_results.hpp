@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/socket.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/detail/fwd_resolve_results.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

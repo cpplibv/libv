@@ -579,7 +579,8 @@ ext: Remove unused netts
 libv.net: Make connections transfer rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
 libv.net: Statistics: Byte sent, byte received total, Messages sent, messages received, ?connection time
 libv.net.mtcp: On error extra parameter enum to indicate the source operation of the error
-libv.net: fwd wrap IOContext accessor
+libv.net: Wrap IOContext accessor in fwd
+libv.net: Move rate_policy into its own header
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -592,9 +593,6 @@ clion live templates:
 	getr - const auto& x() const
 	getv - auto x() const
 
-
-
-rate_policy into its own header
 
 
 
