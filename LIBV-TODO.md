@@ -574,7 +574,11 @@ app.theme: Solve the event loop problem | in place, not really generalized
 app.theme: box shape | solved with rounded box with corner = 0
 libv.net.mtcp: Cleanup source file and pimpl patterns
 app.update: Start update server implementation
-
+libv.net: Switch back to boost asio
+ext: Remove unused netts
+libv.net: Make connections transfer rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
+libv.net: Statistics: Byte sent, byte received total, Messages sent, messages received, ?connection time
+libv.net.mtcp: On error extra parameter enum to indicate the source operation of the error
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -582,66 +586,31 @@ app.update: Start update server implementation
 
 
 
-
-#include <iostream>
-#include <map>
-#include <boost/system/system_error.hpp>
-
-namespace std {
-
-error_code make_error_code(boost::system::error_code error) {
-    struct CategoryAdapter : public error_category {
-        CategoryAdapter(const boost::system::error_category& category)
-            : m_category(category) { }
-
-        const char* name() const noexcept {
-            return m_category.name();
-        }
-
-        std::string message(int ev) const {
-            return m_category.message(ev);
-        }
-
-    private:
-        const boost::system::error_category& m_category;
-    };
-
-    static thread_local map<std::string, CategoryAdapter> nameToCategory;
-    auto result = nameToCategory.emplace(error.category().name(), error.category());
-    auto& category = result.first->second;
-    return error_code(error.value(), category);
-}
-
-};
-
-int main() {
-    auto a = boost::system::errc::make_error_code(boost::system::errc::address_family_not_supported);
-    auto b = std::make_error_code(a);
-    std::cout << b.message() << std::endl;
-}
-
-
-
-
-
-libv.net: (?) Switch back to boost asio
 libv.net: FwdWrap IOContext accessor and remove fwd include
+#include <boost/asio/io_context.hpp> // <<< P1: Remove this include
+maybe even detail header folder and namespace for these fwd proxies?
+
+
+
 
 libv.net: Make connections moveable
-libv.net: Make connections rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
-libv.net: Statistics: Byte sent, byte received total, Messages sent, messages received, ?connection time
-libv.net.mtcp: On error extra parameter enum to
 
 app.update: Connection dtor calls in vector resize
 app.update: Proper disconnect, Cleanup lost connections (sessions)
-app.update: Reconnect
 
-app.update: Security: Scope restriction on file access
-app.update: Login
-app.update: Cache files in memory, watch if they change
 
-app.update: Manifest, versions, etc...
-app.update: List current clients on Server
+
+
+
+app.update: Implement an update server - client
+	app.update: Reconnect: attempts, timers
+
+	app.update: Security: Scope restriction on file access
+	app.update: Login
+	app.update: Cache files in memory, watch if they change
+
+	app.update: Manifest, versions, etc...
+	app.update: List current clients on Server
 
 
 app.theme: create theme exporter: json and atlas texture

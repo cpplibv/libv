@@ -8,11 +8,8 @@
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/acceptor.hpp>
 #include <libv/net/mtcp/connection.hpp>
-//#include <libv/net/mtcp/endpoint.hpp>
-
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
-
 // std
 //#include <chrono>
 #include <cstdint>
@@ -50,7 +47,6 @@ public:
 		};
 
 		const auto error_cb = [](auto operation, std::error_code ec) noexcept {
-//			libv::
 		};
 
 		const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
@@ -68,6 +64,9 @@ public:
 		connection.handle_error(error_cb);
 		connection.handle_receive(receive_cb);
 		connection.handle_send(send_cb);
+
+		connection.read_limit(100); // bytes per second
+		connection.write_limit(100); // bytes per second
 
 		connection.start();
 		connection.receive_repeat();
@@ -130,8 +129,12 @@ public:
 			(void) operation;
 		};
 
-		const auto receive_cb = [](libv::net::mtcp::Message&& message) noexcept {
+		const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
 			std::cout << "receive_cb: " << message << std::endl;
+			std::cout << "total_read_bytes    : " << connection.total_read_bytes() << std::endl;
+			std::cout << "total_write_bytes   : " << connection.total_write_bytes() << std::endl;
+			std::cout << "total_read_messages : " << connection.total_read_messages() << std::endl;
+			std::cout << "total_write_messages: " << connection.total_write_messages() << std::endl;
 		};
 
 		const auto send_cb = [](libv::net::mtcp::Message&& message) noexcept {
@@ -143,6 +146,9 @@ public:
 		connection.handle_error(error_cb);
 		connection.handle_receive(receive_cb);
 		connection.handle_send(send_cb);
+
+		connection.read_limit(100); // bytes per second
+		connection.write_limit(100); // bytes per second
 
 		connection.connect(*libv::net::Address::parse("localhost:25090"));
 //		connection.receive(1);

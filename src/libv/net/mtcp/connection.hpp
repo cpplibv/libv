@@ -65,11 +65,11 @@ public:
 	void read_limit(size_t bytes_per_second) noexcept;
 	void write_limit(size_t bytes_per_second) noexcept;
 
-	[[nodiscard]] size_t total_write_bytes() const noexcept;
 	[[nodiscard]] size_t total_read_bytes() const noexcept;
+	[[nodiscard]] size_t total_write_bytes() const noexcept;
 
-	[[nodiscard]] size_t total_write_messages() const noexcept;
 	[[nodiscard]] size_t total_read_messages() const noexcept;
+	[[nodiscard]] size_t total_write_messages() const noexcept;
 
 public:
 	/// Queues an asynchronous start task.
