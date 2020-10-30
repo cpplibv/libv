@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/net/detail/fwd_resolve_results.hpp>
 // ext
 #include <boost/asio/ip/tcp.hpp>
 

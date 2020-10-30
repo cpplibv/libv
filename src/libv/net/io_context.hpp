@@ -2,12 +2,14 @@
 
 #pragma once
 
-#include <libv/net/fwd.hpp>
-// ext
-#include <boost/asio/io_context.hpp> // <<< P1: Remove this include
+// fwd
+#include <libv/net/detail/fwd_io_context.hpp>
+#include <libv/net/detail/fwd_resolve_results.hpp>
 // std
 #include <functional>
 #include <memory>
+// pro
+#include <libv/net/address.hpp>
 
 
 namespace libv {

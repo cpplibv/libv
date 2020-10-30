@@ -21,11 +21,11 @@
 #include <system_error>
 // pro
 #include <libv/net/address.hpp>
+#include <libv/net/detail/resolve_results.hpp>
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/log.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
-#include <libv/net/mtcp/resolve_results.hpp>
 #include <libv/net/mtcp/socket.hpp>
 
 

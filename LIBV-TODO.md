@@ -579,17 +579,22 @@ ext: Remove unused netts
 libv.net: Make connections transfer rate limitable: https://www.boost.org/doc/libs/1_74_0/libs/beast/doc/html/beast/using_io/rate_limiting.html
 libv.net: Statistics: Byte sent, byte received total, Messages sent, messages received, ?connection time
 libv.net.mtcp: On error extra parameter enum to indicate the source operation of the error
+libv.net: fwd wrap IOContext accessor
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+clion live templates:
+	cout
+	ci
+	getm - auto&
+	getr - const auto& x() const
+	getv - auto x() const
 
 
-libv.net: FwdWrap IOContext accessor and remove fwd include
-#include <boost/asio/io_context.hpp> // <<< P1: Remove this include
-maybe even detail header folder and namespace for these fwd proxies?
 
+rate_policy into its own header
 
 
 

@@ -12,8 +12,8 @@
 #include <vector>
 // pro
 #include <libv/net/address.hpp>
+#include <libv/net/detail/resolve_results.hpp>
 #include <libv/net/log.hpp>
-#include <libv/net/mtcp/resolve_results.hpp>
 
 
 namespace libv {
