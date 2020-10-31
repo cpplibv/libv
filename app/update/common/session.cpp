@@ -5,7 +5,7 @@
 // libv
 #include <libv/utility/read_file.hpp>
 //#include <libv/utility/write_file.hpp>
-//#include <libv/net/error.hpp>
+#include <libv/net/error.hpp>
 // std
 #include <iostream>
 // pro
@@ -21,14 +21,18 @@ UpdateSession::UpdateSession(UpdateServer& server_, libv::net::mtcp::ConnectionA
 		connection(std::move(connection_)),
 		server(server_) {
 
-	const auto connect_cb = [](auto local_endpoint, auto remote_endpoint) {
+	const auto connect_cb = [this](auto local_endpoint, auto remote_endpoint) {
+		std::cout << "connect_cb: " << local_endpoint << " - " << remote_endpoint << std::endl;
 	};
 
 	const auto disconnect_cb = [this]() {
+		std::cout << "disconnect_cb" << std::endl;
+
 		server.remove_session(this);
 	};
 
-	const auto error_cb = [](auto operation, std::error_code ec) noexcept {
+	const auto error_cb = [this](auto operation, std::error_code ec) noexcept {
+		std::cout << "error_cb: " << libv::net::to_string(ec) << std::endl;
 	};
 
 	const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
@@ -55,8 +59,19 @@ UpdateSession::UpdateSession(UpdateServer& server_, libv::net::mtcp::ConnectionA
 }
 
 UpdateSession::~UpdateSession() {
-	connection.receive_stop();
-	connection.disconnect();
+	connection.disconnect_teardown();
+}
+
+void UpdateSession::send(const std::string& message) {
+//	std::cout << "send: " << message << std::endl;
+
+	connection.send(message);
+}
+
+void UpdateSession::kick() {
+//	std::cout << "kick" << std::endl;
+
+	connection.disconnect_teardown();
 }
 
 // -------------------------------------------------------------------------------------------------

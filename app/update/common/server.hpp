@@ -17,12 +17,12 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 class UpdateServer {
-	libv::net::IOContext io_context;
-	libv::net::mtcp::AcceptorAsyncCB acceptor;
-
 	std::vector<std::unique_ptr<class UpdateSession>> clients;
 //	std::vector<libv::net::mtcp::ConnectionAsnycCB> client_queue;
 	std::mutex clients_m;
+
+	libv::net::IOContext io_context;
+	libv::net::mtcp::AcceptorAsyncCB acceptor;
 
 public:
 	UpdateServer(libv::net::mtcp::Endpoint endpoint, uint16_t num_net_thread);
@@ -31,6 +31,7 @@ public:
 
 public:
 	void remove_session(class UpdateSession*);
+	void broadcast(const std::string& message);
 };
 
 // -------------------------------------------------------------------------------------------------

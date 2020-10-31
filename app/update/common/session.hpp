@@ -24,6 +24,10 @@ public:
 public:
 	explicit UpdateSession(UpdateServer& server, libv::net::mtcp::ConnectionAsnycCB connection_);
 	~UpdateSession();
+
+public:
+	void send(const std::string& message);
+	void kick();
 };
 
 // -------------------------------------------------------------------------------------------------

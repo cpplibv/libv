@@ -586,14 +586,28 @@ app.update: Connection dtor calls in vector resize | Session memory address is l
 app.update: Proper disconnect, Cleanup lost connections (sessions)
 libv.utility: Add parse number utility functions
 libv.net.mtcp: Add endpoint selection support for acceptor
+libv.net: Implement perfect connection teardown
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+Split main track development to 3: Updater, UI, Game
+
+
+
+
 
 libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
 libv.net.mtcp: Protocol message, handshake with protocol ID and version
+
+
+
+disconnect_immediate()
+
+
+
+udp::resolver::query query(udp::v4(), response[0], response[1]);
 
 
 
@@ -606,6 +620,60 @@ app.update: Implement an update server / client
 
 	app.update: Manifest, versions, etc...
 	app.update: List current clients on Server
+
+	app.update: Sign the patch (server auth is not needed for now, signing is enough)
+			https://eclipsesource.com/blogs/2016/09/07/tutorial-code-signing-and-verification-with-openssl/
+			https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
+
+
+app.update: The update process:
+	download diff
+    copy update.exe to update.ex_
+	apply diff to update.ex_
+    rename update.exe to update.bak
+    // Only bricking point is here, and even then .bak could be renamed by hand
+    rename update.ex_ to update.exe
+    restart update.exe
+	remove update.bak
+
+app.update.security:
+	! must authenticate the server
+	! must sign and verify any downloaded content
+
+	https://stackoverflow.com/questions/11580944/client-to-server-authentication-in-c-using-sockets
+		The client connects to the server, sending in the user-name (but not password)
+		The server responds by sending out unique random number
+		The client encrypts that random number using the hash of their password as the key
+		The client sends the encrypted random number to the server
+		The server encrypts the random number with the correct hash of the user's password
+		The server compares the two encrypted random numbers
+
+	boost.asio.ssl
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/overview/ssl.html
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/example/cpp11/ssl/server.cpp
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/example/cpp11/ssl/client.cpp
+
+
+
+
+iris.lore: Yellow line, red line, black line -ing. Overclocking the engine: Maintenance in 2 week of any yellow line, Maintenance at the end of the mission on red line, Engine melts by the end of the mission
+
+non repeating random numbers: lottery problem, on collusion shuffle to back
+https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html
+table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
+        scroll.getViewportBounds().getWidth(), scroll.viewportBoundsProperty()));
+    grid.getChildren().add(imageHolder);
+
+place.it:
+    E = confirm (the same as pressing the green button)
+    Esc = cancel (the same as pressing the [X] button)
+
+
+
+
+
 
 
 app.theme: create theme exporter: json and atlas texture
@@ -700,6 +768,9 @@ libv.ui.render:	bg.render(pos, size, ?padding, ?...)
 
 
 
+
+
+
 place.it:
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
@@ -709,6 +780,14 @@ place.it:
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
 	project: Free project related tools (LDjam) https://docs.google.com/spreadsheets/d/1tfkBo2IWLHXkZDbIEFUyCWvLkumHYDWCxGHzb-Rmc-0/edit#gid=0
 	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
+
+clion live templates:
+	cout
+	ci
+netbeans and clion live templates:
+	getm - auto&
+	getr - const auto& x() const
+	getv - auto x() const
 
 build.ninja: ext target fails, otherwise it should be clear
 

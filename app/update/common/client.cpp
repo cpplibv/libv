@@ -3,7 +3,7 @@
 // hpp
 #include <update/common/client.hpp>
 // libv
-//#include <libv/net/error.hpp>
+#include <libv/net/error.hpp>
 // std
 #include <iostream>
 // pro
@@ -15,14 +15,16 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 UpdateClient::UpdateClient() {
-	const auto connect_cb = [](auto local_endpoint, auto remote_endpoint) {
+	const auto connect_cb = [this](auto local_endpoint, auto remote_endpoint) {
+		std::cout << "connect_cb: " << local_endpoint << " - " << remote_endpoint << std::endl;
 	};
 
-	const auto disconnect_cb = []() {
+	const auto disconnect_cb = [this]() {
+		std::cout << "disconnect_cb" << std::endl;
 	};
 
-	const auto error_cb = [](auto operation, std::error_code ec) noexcept {
-		(void) operation;
+	const auto error_cb = [this](auto operation, std::error_code ec) noexcept {
+		std::cout << "error_cb: " << libv::net::to_string(ec) << std::endl;
 	};
 
 	const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
@@ -48,7 +50,7 @@ UpdateClient::UpdateClient() {
 }
 
 UpdateClient::~UpdateClient() {
-	connection.disconnect();
+	connection.disconnect_teardown();
 	io_context.join();
 }
 

@@ -41,6 +41,16 @@ UpdateServer::UpdateServer(uint16_t port, uint16_t num_net_thread) :
 	UpdateServer(libv::net::mtcp::Endpoint(port), num_net_thread) { }
 
 UpdateServer::~UpdateServer() {
+	{
+		const auto lock = std::unique_lock(clients_m);
+
+		acceptor.cancel();
+
+		for (const auto& client : clients)
+			client->kick();
+	}
+
+	io_context.join();
 }
 
 void UpdateServer::remove_session(class UpdateSession* session) {
@@ -54,6 +64,13 @@ void UpdateServer::remove_session(class UpdateSession* session) {
 	}
 
 	libv::erase_unstable(clients, it);
+}
+
+void UpdateServer::broadcast(const std::string& message) {
+	const auto lock = std::unique_lock(clients_m);
+
+	for (const auto& client : clients)
+		client->send(message);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -16,15 +16,15 @@
 libv::net::mtcp::Endpoint parse_endpoint(std::string_view address, uint16_t port) {
 	size_t p0 = address.find('.', 0);
 	if (p0 == std::string_view::npos)
-		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address");
 
 	size_t p1 = address.find('.', p0 + 1);
 	if (p1 == std::string_view::npos)
-		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address");
 
 	size_t p2 = address.find('.', p1 + 1);
 	if (p2 == std::string_view::npos)
-		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address");
 
 	try {
 		const auto a0 = libv::parse_number_or_throw<uint8_t>(address.substr(0, p0));
@@ -33,7 +33,7 @@ libv::net::mtcp::Endpoint parse_endpoint(std::string_view address, uint16_t port
 		const auto a3 = libv::parse_number_or_throw<uint8_t>(address.substr(p2 + 1, address.size() - p2));
 		return libv::net::mtcp::Endpoint(a0, a1, a2, a3, port);
 	} catch (const std::exception& e) {
-		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address: " + e.what());
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address: " + e.what());
 	}
 }
 
@@ -85,6 +85,8 @@ int main(int argc, const char** argv) {
 	for (std::string line; std::getline(std::cin, line);) {
 		if (line == "quit")
 			break;
+
+		server.broadcast(line);
 	}
 
 	return EXIT_SUCCESS;
