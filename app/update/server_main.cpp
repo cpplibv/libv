@@ -2,6 +2,7 @@
 
 // libv
 #include <libv/arg/arg.hpp>
+#include <libv/utility/parse_number.hpp>
 // std
 #include <iostream>
 // pro
@@ -9,6 +10,32 @@
 #include <update/common/log.hpp>
 #include <update/common/server.hpp>
 
+
+// -------------------------------------------------------------------------------------------------
+
+libv::net::mtcp::Endpoint parse_endpoint(std::string_view address, uint16_t port) {
+	size_t p0 = address.find('.', 0);
+	if (p0 == std::string_view::npos)
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+
+	size_t p1 = address.find('.', p0 + 1);
+	if (p1 == std::string_view::npos)
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+
+	size_t p2 = address.find('.', p1 + 1);
+	if (p2 == std::string_view::npos)
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address");
+
+	try {
+		const auto a0 = libv::parse_number_or_throw<uint8_t>(address.substr(0, p0));
+		const auto a1 = libv::parse_number_or_throw<uint8_t>(address.substr(p0 + 1, p1 - p0 - 1));
+		const auto a2 = libv::parse_number_or_throw<uint8_t>(address.substr(p1 + 1, p2 - p1 - 1));
+		const auto a3 = libv::parse_number_or_throw<uint8_t>(address.substr(p2 + 1, address.size() - p2));
+		return libv::net::mtcp::Endpoint(a0, a1, a2, a3, port);
+	} catch (const std::exception& e) {
+		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid endpoint address: " + e.what());
+	}
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -50,9 +77,15 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("{}", args.report(100));
 
-	app::UpdateServer server = {port.value(), num_net_thread.value()};
-	while (true)
-		std::this_thread::sleep_for(std::chrono::seconds(1));
+	const auto endpoint = parse_endpoint(address.value(), port.value());
+	app::log_app.info("Listening on: {}...", endpoint);
+
+	app::UpdateServer server = {endpoint, num_net_thread.value()};
+
+	for (std::string line; std::getline(std::cin, line);) {
+		if (line == "quit")
+			break;
+	}
 
 	return EXIT_SUCCESS;
 }

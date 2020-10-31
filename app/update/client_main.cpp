@@ -55,6 +55,9 @@ int main(int argc, const char** argv) {
 	client.update_from(libv::net::Address(address.value(), port.value()));
 
 	for (std::string line; std::getline(std::cin, line);) {
+		if (line == "quit")
+			break;
+
 		client.send(line);
 	}
 

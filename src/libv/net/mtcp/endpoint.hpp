@@ -25,6 +25,21 @@ struct Endpoint {
 	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
 
 public:
+	constexpr inline Endpoint() = default;
+
+	explicit constexpr inline Endpoint(uint16_t port) noexcept :
+		address{0, 0, 0, 0},
+		port(port) { }
+
+	constexpr inline Endpoint(std::array<uint8_t, 4> address, uint16_t port) noexcept :
+		address(address),
+		port(port) { }
+
+	constexpr inline Endpoint(uint8_t a0, uint8_t a1, uint8_t a2, uint8_t a3, uint16_t port) noexcept :
+		address{a0, a1, a2, a3},
+		port(port) { }
+
+public:
 	constexpr inline void clear() noexcept {
 		address.fill(0);
 		port = 0;

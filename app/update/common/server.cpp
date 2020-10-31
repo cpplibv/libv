@@ -16,7 +16,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-UpdateServer::UpdateServer(uint16_t port, uint16_t num_net_thread) :
+UpdateServer::UpdateServer(libv::net::mtcp::Endpoint endpoint, uint16_t num_net_thread) :
 		io_context(num_net_thread),
 		acceptor(io_context) {
 
@@ -33,9 +33,12 @@ UpdateServer::UpdateServer(uint16_t port, uint16_t num_net_thread) :
 
 	acceptor.handle_accept(accept_cb);
 	acceptor.handle_error(error_cb);
-	acceptor.listen(port, accept_backlog_size);
+	acceptor.listen(endpoint, accept_backlog_size);
 	acceptor.accept();
 }
+
+UpdateServer::UpdateServer(uint16_t port, uint16_t num_net_thread) :
+	UpdateServer(libv::net::mtcp::Endpoint(port), num_net_thread) { }
 
 UpdateServer::~UpdateServer() {
 }

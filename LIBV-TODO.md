@@ -584,10 +584,15 @@ libv.net: Move rate_policy into its own header
 libv.net: Make connections moveable | it was already movable, but now its explicit
 app.update: Connection dtor calls in vector resize | Session memory address is leaked to callback, so address stability is required, solved with unique pointers
 app.update: Proper disconnect, Cleanup lost connections (sessions)
-
+libv.utility: Add parse number utility functions
+libv.net.mtcp: Add endpoint selection support for acceptor
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+
+
 
 
 clion live templates:
@@ -623,6 +628,22 @@ receive_cb: README.md
 	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
 	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
 
+Got better by removing stuffy from dtor:
+	Start requested, src/libv/net/mtcp/connection.cpp:265
+	Receive requested: repeat, src/libv/net/mtcp/connection.cpp:344
+	Successfully read 4 header byte, src/libv/net/mtcp/connection.cpp:687
+	Successfully read 7 payload byte, src/libv/net/mtcp/connection.cpp:723
+receive_cb: LICENSE
+	Send requested, src/libv/net/mtcp/connection.cpp:375
+	Successfully wrote 4 header byte, src/libv/net/mtcp/connection.cpp:784
+	Failed to read 0 header byte, src/libv/net/mtcp/connection.cpp:683
+	Failed to write 196 payload byte, src/libv/net/mtcp/connection.cpp:801
+	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
+	Successfully shutdown socket, src/libv/net/mtcp/connection.cpp:453
+	Successfully closed socket, src/libv/net/mtcp/connection.cpp:458
+	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
+	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
+	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
 
 
 
@@ -1766,6 +1787,7 @@ cli: Clara, most important questions are: multi, optional, required, positional 
 			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency() | could I use separate cmake file for each ext and make a dependency on it ?
+color: color picker http://www.colorhexa.com/3affce
 color.math: colorspace of humans https://en.wikipedia.org/wiki/Lab_color_space
 color.math: http://graficaobscura.com/matrix/index.html
 color.picker: http://tristen.ca/hcl-picker/#/hlc/10/1/F68385/D1E468

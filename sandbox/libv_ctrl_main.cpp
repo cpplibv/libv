@@ -136,7 +136,7 @@ void init(libv::Frame& frame) {
 		const int scancode = e.keycode != libv::input::Keycode::Unknown ? glfwGetKeyScancode(libv::to_value(e.keycode)) : -1;
 		const char* name = glfwGetKeyName(libv::to_value(e.keycode), libv::to_value(e.scancode));
 		log_sandbox.trace("{}, rescan = {}, name = {}, rescan-match = {}",
-				e.toPrettyString(), scancode, name ? name : "unkown", scancode == libv::to_value(e.scancode));
+				e.toPrettyString(), scancode, name ? name : "unknown", scancode == libv::to_value(e.scancode));
 	});
 
 	log_sandbox.trace("---------------- ---------------- ---------------- ----------------");
@@ -153,7 +153,7 @@ void init(libv::Frame& frame) {
 		if (name == nullptr)
 			continue;
 
-		log_sandbox.trace("{}, key: {} scan: {}, name: {}", i, libv::input::to_string(libv::input::Keycode{i}), scancode, name ? name : "unkown");
+		log_sandbox.trace("{}, key: {} scan: {}, name: {}", i, libv::input::to_string(libv::input::Keycode{i}), scancode, name ? name : "unknown");
 	}
 
 	log_sandbox.trace("---------------- ---------------- ---------------- ----------------");

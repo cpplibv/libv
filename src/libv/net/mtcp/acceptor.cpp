@@ -38,11 +38,11 @@ public:
 		io_context(io_context) { }
 
 public:
-	inline void listen(uint16_t port, int backlog) {
+	inline void listen(Endpoint endpoint_, int backlog) {
 		std::unique_lock lock{mutex};
 		boost::system::error_code ec;
 
-		const auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), port);
+		const auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address_v4(endpoint_.address), endpoint_.port);
 
 		acceptor.open(endpoint.protocol(), ec);
 		log_net.error_if(ec, "open {}", libv::net::to_string(ec));
@@ -113,8 +113,12 @@ void AcceptorAsyncCB::accept() noexcept {
 	impl->accept();
 }
 
+void AcceptorAsyncCB::listen(Endpoint endpoint, int backlog) noexcept {
+	impl->listen(endpoint, backlog);
+}
+
 void AcceptorAsyncCB::listen(uint16_t port, int backlog) noexcept {
-	impl->listen(port, backlog);
+	impl->listen(Endpoint(0, 0, 0, 0, port), backlog);
 }
 
 void AcceptorAsyncCB::cancel() noexcept {

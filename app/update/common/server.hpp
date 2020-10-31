@@ -5,6 +5,7 @@
 // libv
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/acceptor.hpp>
+#include <libv/net/mtcp/endpoint.hpp>
 // std
 #include <memory>
 #include <mutex>
@@ -24,6 +25,7 @@ class UpdateServer {
 	std::mutex clients_m;
 
 public:
+	UpdateServer(libv::net::mtcp::Endpoint endpoint, uint16_t num_net_thread);
 	UpdateServer(uint16_t port, uint16_t num_net_thread);
 	~UpdateServer();
 

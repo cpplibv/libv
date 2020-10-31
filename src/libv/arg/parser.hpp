@@ -86,12 +86,13 @@ constexpr inline void parser_function(T& value, std::string_view str, OutcomeArg
 	std::from_chars_result result = std::from_chars<T>(str.begin(), str.end(), value);
 	std::error_code ec = std::make_error_code(result.ec);
 
-	// TODO P5: discard leading / trailing whitespace
-	// TODO P5: verify if the whole str was consumed by from_chars
-	// TODO P5: Only two errc possible: its out of range or its not a number
+	// TODO P4: Use libv.utility parse_number
+	//       -: discard leading / trailing whitespace
+	//       -: verify if the whole str was consumed by from_chars
+	//       -: Only two errc possible: its out of range or its not a number
 	//	if (result.ec == std::errc::result_out_of_range)
 	//	else if (result.ec == std::errc::invalid_argument)
-	//	else // unkown error code
+	//	else // unknown error code
 
 	if (ec)
 		outcome.error("Invalid argument: " + ec.message() + " starting from \"" + result.ptr + "\"");

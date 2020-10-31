@@ -4,6 +4,7 @@
 
 // fwd
 #include <libv/net/fwd.hpp>
+#include <libv/net/mtcp/endpoint.hpp>
 // std
 #include <functional>
 #include <memory>
@@ -40,10 +41,15 @@ public:
 	void handle_error(CBError callback) noexcept;
 
 public:
-	/// Sets up the port and
+	/// Sets up the port to the default 0.0.0.0 address and the backlog connection count
 	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
 	/// @thread safe
 	void listen(uint16_t port, int backlog = 4) noexcept;
+	/// Sets up the endpoint port and the  backlog connection count
+	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
+	/// @thread safe
+	void listen(Endpoint endpoint, int backlog = 4) noexcept;
+
 	void accept() noexcept;
 	void cancel() noexcept;
 };

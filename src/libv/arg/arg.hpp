@@ -11,6 +11,11 @@ namespace arg {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P4: A way to parse and verify a type, in an extension point and a runtime hook too
+// TODO P5: A way to parse and verify multiple arguments together, in a runtime hook only
+
+// -------------------------------------------------------------------------------------------------
+
 //	// Argument parsing
 //
 //	- Missing: validator func(const T&):<bool, string>
