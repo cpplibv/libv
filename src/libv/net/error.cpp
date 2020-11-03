@@ -12,6 +12,8 @@
 namespace libv {
 namespace net {
 
+// -------------------------------------------------------------------------------------------------
+
 std::string to_string(const std::error_code ec) {
 	if (false);
 
@@ -30,7 +32,11 @@ std::string to_string(const std::error_code ec) {
 		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), "Transport endpoint is not connected");
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::timed_out))
 		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), "Connection timed out");
+	else if (ec == boost::asio::error::make_error_code(boost::asio::error::operation_aborted))
+		// Win text: The I/O operation has been aborted because of either a thread exit or an application request
+		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), "Operation aborted");
 		// ...
+		// ^ Additional system mapped errors should go here on-demand
 
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::already_open))
 		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), "Already open");
@@ -53,6 +59,8 @@ std::string to_string(const std::error_code ec) {
 	else
 		return fmt::format("{}:{} - {}", ec.category().name(), ec.value(), ec.message());
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace net
 } // namespace libv

@@ -51,6 +51,7 @@ private:
 		Connecting,
 		Connected,
 		Failure,
+		FailureConnected,
 	};
 
 private:
@@ -109,36 +110,15 @@ public:
 	[[nodiscard]] inline size_t total_write_messages() const noexcept;
 
 public:
-	/// Queues an asynchronous start task.
-	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
-	/// @thread safe
 	void start() noexcept;
-	/// Queues an asynchronous connect task.
-	/// @thread safe
 	void connect(Address address) noexcept;
-	/// Queues an asynchronous disconnect task.
-	/// @thread safe
 	void disconnect() noexcept;
-	/// Queues \c count asynchronous receive task.
-	/// @thread safe
+	void disconnect_teardown() noexcept;
 	void receive(int count = 1) noexcept;
-	/// Queues a repeating asynchronous receive task.
-	/// @thread safe
 	void receive_repeat() noexcept;
-	/// Stops the repeating asynchronous receive task.
-	/// This operation does not cancels any already started receive operation
-	/// @thread safe
 	void receive_stop() noexcept;
-	/// Cancels every asynchronous receive task.
-	/// This operation will cancel any already started receive operation and may yield operation_aborted error
-	/// @thread safe
 	void receive_cancel() noexcept;
-	/// Queues an asynchronous send task.
-	/// @thread safe
 	void send(Message message) noexcept;
-	/// Cancels every asynchronous send task.
-	/// This operation will cancel any already started send operation and may yield operation_aborted error
-	/// @thread safe
 	void send_cancel() noexcept;
 
 private:
@@ -150,9 +130,9 @@ private:
 	inline void _reset() noexcept;
 
 private:
-	void failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept;
-	void failure_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
+	void _failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept;
 
+	void failure_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	void failure_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	void failure_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	void failure_send(SelfPtr&& self_sp, const std::error_code ec) noexcept;
@@ -322,6 +302,29 @@ void ImplConnectionAsnycCB::disconnect() noexcept {
 	do_disconnect(shared_from_this());
 }
 
+void ImplConnectionAsnycCB::disconnect_teardown() noexcept {
+	std::unique_lock lock{mutex};
+	log_net.trace("MTCP-{} Disconnect teardown requested", id);
+
+	{
+		// Receive requested: stop
+		queue_read = 0;
+	}
+
+	if (state != State::Connecting && state != State::Connected)
+		return;
+
+	if (queue_disconnect)
+		return;
+
+	queue_disconnect = true;
+
+	if (_is_connecting() || _is_writing() || _is_reading())
+		return;
+
+	do_disconnect(shared_from_this());
+}
+
 void ImplConnectionAsnycCB::receive(int count) noexcept {
 	std::unique_lock lock{mutex};
 	log_net.trace("MTCP-{} Receive requested: {}", id, count);
@@ -431,35 +434,42 @@ inline void ImplConnectionAsnycCB::_reset() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept {
+void ImplConnectionAsnycCB::_failure(SelfPtr&& self_sp, const ErrorSource source, const std::error_code ec) noexcept {
 	(void) self_sp;
-	std::unique_lock lock{mutex};
 
 	const auto oldState = state;
-	if (state != State::Failure) {
-		state = State::Failure;
-		cb_error(source, ec);
 
-		boost::system::error_code ec_c;
+	cb_error(source, ec);
 
-//		stream.cancel(ec_c);
+	if (state != State::Failure && state != State::FailureConnected) {
+		state = oldState == State::Connected ? State::FailureConnected : State::Failure;
+
 		stream.cancel();
-		log_net.error_if(ec_c, "MTCP-{} Failed to cancel operations. {}", id, libv::net::to_string(ec_c));
-		log_net.trace_if(!ec_c, "MTCP-{} Successfully cancelled operations", id);
 
-//		stream.shutdown(socket.shutdown_both, ec_c);
-		stream.socket().shutdown(stream.socket().shutdown_both, ec_c);
-		log_net.error_if(ec_c, "MTCP-{} Error while shutting down socket. {}", id, libv::net::to_string(ec_c));
-		log_net.trace_if(!ec_c, "MTCP-{} Successfully shutdown socket", id);
+		if (oldState == State::Connected) {
+			boost::system::error_code ec_c;
 
-//		stream.close(ec_c);
+//			socket.cancel(ec_c);
+//			log_net.error_if(ec_c, "MTCP-{} Failed to cancel operations. {}", id, libv::net::to_string(ec_c));
+//			log_net.trace_if(!ec_c, "MTCP-{} Successfully cancelled operations", id);
+
+//			stream.shutdown(socket.shutdown_both, ec_c);
+			stream.socket().shutdown(stream.socket().shutdown_both, ec_c);
+			log_net.error_if(ec_c, "MTCP-{} Error while shutting down socket: {}", id, libv::net::to_string(ec_c));
+			log_net.trace_if(!ec_c, "MTCP-{} Successfully shutdown socket", id);
+
+//			socket.close(ec_c);
+//			log_net.error_if(ec_c, "MTCP-{} Error while closing socket. {}", id, libv::net::to_string(ec_c));
+//			log_net.trace_if(!ec_c, "MTCP-{} Successfully closed socket", id);
+		}
+
 		stream.close();
-		log_net.error_if(ec_c, "MTCP-{} Error while closing socket. {}", id, libv::net::to_string(ec_c));
-		log_net.trace_if(!ec_c, "MTCP-{} Successfully closed socket", id);
+
+		log_net.trace("MTCP-{} Closed connection", id);
 	}
 
 	if (!_is_disconnecting() && !_is_reading() && !_is_writing()) {
-		if (oldState == State::Connected) {
+		if (oldState == State::Connected || oldState == State::FailureConnected) {
 			cb_disconnect();
 		}
 		_reset();
@@ -467,23 +477,27 @@ void ImplConnectionAsnycCB::failure(SelfPtr&& self_sp, const ErrorSource source,
 }
 
 void ImplConnectionAsnycCB::failure_logic_error(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	failure(std::move(self_sp), ErrorSource::logic, ec);
+	std::unique_lock lock{mutex};
+	_failure(std::move(self_sp), ErrorSource::logic, ec);
 }
 
 void ImplConnectionAsnycCB::failure_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	failure(std::move(self_sp), ErrorSource::connect, ec);
+	std::unique_lock lock{mutex};
+	_failure(std::move(self_sp), ErrorSource::connect, ec);
 }
 
 void ImplConnectionAsnycCB::failure_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept {
+	std::unique_lock lock{mutex};
 	// Abort further receives
 	queue_read = 0;
-	failure(std::move(self_sp), ErrorSource::receive, ec);
+	_failure(std::move(self_sp), ErrorSource::receive, ec);
 }
 
 void ImplConnectionAsnycCB::failure_send(SelfPtr&& self_sp, const std::error_code ec) noexcept {
+	std::unique_lock lock{mutex};
 	// Abort further sends
 	write_packets.clear();
-	failure(std::move(self_sp), ErrorSource::send, ec);
+	_failure(std::move(self_sp), ErrorSource::send, ec);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -514,6 +528,22 @@ void ImplConnectionAsnycCB::success_disconnect(SelfPtr&& self_sp) noexcept {
 	(void) self_sp;
 	std::unique_lock lock{mutex};
 
+	boost::system::error_code ec;
+
+//		std::unique_lock lock{self->mutex};
+//		if (self->state == State::Failure || self->state == State::FailureConnected)
+//			return;
+
+//		self->socket.shutdown(self->socket.shutdown_both, ec);
+	stream.socket().shutdown(stream.socket().shutdown_both, ec);
+	log_net.error_if(ec, "MTCP-{} Error while shutting down socket. {}", id, libv::net::to_string(ec));
+	log_net.trace_if(!ec, "MTCP-{} Successfully shutdown socket", id);
+
+//		socket.close(ec);
+	stream.close();
+	log_net.error_if(ec, "MTCP-{} Error while closing socket. {}", id, libv::net::to_string(ec));
+	log_net.trace_if(!ec, "MTCP-{} Successfully closed socket", id);
+
 	cb_disconnect();
 	_reset();
 }
@@ -527,9 +557,10 @@ void ImplConnectionAsnycCB::success_receive(SelfPtr&& self_sp) noexcept {
 	num_total_message_read++;
 	cb_receive(std::move(self_sp->read_body));
 
-	if (state == State::Failure) {
+	if (state == State::Failure || state == State::FailureConnected) {
 		if (!_is_disconnecting() && !_is_reading() && !_is_writing()) {
-			cb_disconnect();
+			if (state == State::FailureConnected)
+				cb_disconnect();
 			_reset();
 		}
 		return;
@@ -551,9 +582,10 @@ void ImplConnectionAsnycCB::success_send(SelfPtr&& self_sp) noexcept {
 
 	write_packets.pop_front();
 
-	if (state == State::Failure) {
+	if (state == State::Failure || state == State::FailureConnected) {
 		if (!_is_disconnecting() && !_is_reading() && !_is_writing()) {
-			cb_disconnect();
+			if (state == State::FailureConnected)
+				cb_disconnect();
 			_reset();
 		}
 		return;
@@ -605,9 +637,10 @@ void ImplConnectionAsnycCB::do_resolve(SelfPtr&& self_sp, Address&& address) noe
 		const auto self = self_sp.get();
 
 		if (ec) {
-			log_net.error("MTCP-{} Failed to resolve", self->id);
+			log_net.error("MTCP-{} Failed to resolve {}", self->id, libv::net::to_string(ec));
 			self->failure_connect(std::move(self_sp), ec);
 		} else {
+			log_net.trace("MTCP-{} Successfully resolved address", self->id);
 			do_connect(std::move(self_sp), std::move(endpoints.results));
 		}
 	});
@@ -616,11 +649,22 @@ void ImplConnectionAsnycCB::do_resolve(SelfPtr&& self_sp, Address&& address) noe
 void ImplConnectionAsnycCB::do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept {
 	const auto self = self_sp.get();
 
-	self->stream.async_connect(std::move(endpoints), [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
+	using EPEntry = boost::asio::ip::tcp::resolver::results_type::value_type;
+	const auto connect_condition = [id = self->id](const auto& ec, const EPEntry& entry) {
+		log_net.warn_if(ec, "MTCP-{} Failed to connect: {}", id, libv::net::to_string(ec));
+
+		const auto& endpoint = entry.endpoint();
+		const auto is_v4 = endpoint.address().is_v4();
+
+		log_net.trace_if(is_v4, "MTCP-{} Connecting to {}:{}...", id, endpoint.address().to_string(), endpoint.port());
+		return is_v4;
+	};
+
+	self->stream.async_connect(std::move(endpoints), connect_condition, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
 		const auto self = self_sp.get();
 
 		if (ec) {
-			log_net.error("MTCP-{} Failed to connect", self->id);
+			log_net.error("MTCP-{} Failed to connect: {}", self->id, libv::net::to_string(ec));
 			self->failure_connect(std::move(self_sp), ec);
 
 		} else {
@@ -647,18 +691,6 @@ void ImplConnectionAsnycCB::do_disconnect(SelfPtr&& self_sp) noexcept {
 	self->io_context.post([self_sp = std::move(self_sp)]() mutable {
 		const auto self = self_sp.get();
 
-		boost::system::error_code ec;
-
-//		self->socket.shutdown(self->socket.shutdown_both, ec);
-		self->stream.socket().shutdown(self->stream.socket().shutdown_both, ec);
-		log_net.error_if(ec, "MTCP-{} Error while shutting down socket. {}", self->id, libv::net::to_string(ec));
-		log_net.trace_if(!ec, "MTCP-{} Successfully shutdown socket", self->id);
-
-//		self->socket.close(ec);
-		self->stream.close();
-		log_net.error_if(ec, "MTCP-{} Error while closing socket. {}", self->id, libv::net::to_string(ec));
-		log_net.trace_if(!ec, "MTCP-{} Successfully closed socket", self->id);
-
 		// Disconnecting will always succeed (in one way or an another)
 		self->success_disconnect(std::move(self_sp));
 	});
@@ -680,7 +712,7 @@ void ImplConnectionAsnycCB::do_read_header(SelfPtr&& self_sp) noexcept {
 				const auto self = self_sp.get();
 
 				if (ec) {
-					log_net.error("MTCP-{} Failed to read {} header byte", self->id, size);
+					log_net.error("MTCP-{} Failed to read {} header byte: {}", self->id, size, libv::net::to_string(ec));
 					self->failure_receive(std::move(self_sp), ec);
 
 				} else {
@@ -690,9 +722,10 @@ void ImplConnectionAsnycCB::do_read_header(SelfPtr&& self_sp) noexcept {
 					if (read_body_size > MTCP_MESSAGE_MAX_SIZE) {
 						log_net.error("MTCP-{} Payload size {} exceeds maximum size of {}", self->id, read_body_size, MTCP_MESSAGE_MAX_SIZE);
 						self->failure_receive(std::move(self_sp), boost::asio::error::make_error_code(boost::asio::error::message_size));
-					}
 
-					do_read_body(std::move(self_sp), read_body_size);
+					} else {
+						do_read_body(std::move(self_sp), read_body_size);
+					}
 				}
 			});
 }
@@ -709,7 +742,7 @@ void ImplConnectionAsnycCB::do_read_body(SelfPtr&& self_sp, size_t read_body_siz
 		self->read_body.reserve(read_body_size);
 	}
 
-	// TODO P5: Use a non dynamic buffer is read_body_size < MTCP_MESSAGE_MAX_RESERVE, with resize instead of reserve
+	// TODO P5: Use a non dynamic buffer if read_body_size < MTCP_MESSAGE_MAX_RESERVE, with resize instead of reserve
 	boost::asio::async_read(
 			self->stream,
 			boost::asio::dynamic_buffer(self->read_body, read_body_size),
@@ -717,7 +750,7 @@ void ImplConnectionAsnycCB::do_read_body(SelfPtr&& self_sp, size_t read_body_siz
 				const auto self = self_sp.get();
 
 				if (ec) {
-					log_net.error("MTCP-{} Failed to read {} payload byte", self->id, size);
+					log_net.error("MTCP-{} Failed to read {} payload byte: {}", self->id, size, libv::net::to_string(ec));
 					self->failure_receive(std::move(self_sp), ec);
 				} else {
 					log_net.trace("MTCP-{} Successfully read {} payload byte", self->id, size);
@@ -777,7 +810,7 @@ void ImplConnectionAsnycCB::do_write_header(SelfPtr&& self_sp) noexcept {
 				const auto self = self_sp.get();
 
 				if (ec) {
-					log_net.error("MTCP-{} Failed to write {} header byte", self->id, size);
+					log_net.error("MTCP-{} Failed to write {} header byte: {}", self->id, size, libv::net::to_string(ec));
 					self->failure_send(std::move(self_sp), ec);
 
 				} else {
@@ -798,7 +831,7 @@ void ImplConnectionAsnycCB::do_write_body(SelfPtr&& self_sp) noexcept {
 				const auto self = self_sp.get();
 
 				if (ec) {
-					log_net.error("MTCP-{} Failed to write {} payload byte", self->id, size);
+					log_net.error("MTCP-{} Failed to write {} payload byte: {}", self->id, size, libv::net::to_string(ec));
 					self->failure_send(std::move(self_sp), ec);
 
 				} else {
@@ -870,6 +903,10 @@ void ConnectionAsnycCB::connect(Address address) noexcept {
 
 void ConnectionAsnycCB::disconnect() noexcept {
 	impl->disconnect();
+}
+
+void ConnectionAsnycCB::disconnect_teardown() noexcept {
+	impl->disconnect_teardown();
 }
 
 void ConnectionAsnycCB::receive(int count) noexcept {

@@ -126,6 +126,11 @@ public:
 	/// This operation will cancel any already started send operation and may yield operation_aborted error
 	/// @thread safe
 	void send_cancel() noexcept;
+
+public:
+	/// If its possible queues an asynchronous disconnect task and request a receive stop.
+	/// @thread safe
+	void disconnect_teardown() noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

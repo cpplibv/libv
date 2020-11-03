@@ -73,8 +73,15 @@ public:
 		log_net.trace("Resolving {}:{}...", addr.address, addr.service);
 
 		resolver.async_resolve(addr.address, addr.service,
-				[handler = std::forward<ResolveHandlerT>(handler)] (const auto& ec, auto endpoints) mutable {
-					handler(ec, mtcp::ResolveResults{std::move(endpoints)});
+				[handler = std::forward<ResolveHandlerT>(handler)] (const auto& ec, auto results) mutable {
+					if (!ec) {
+						log_net.trace("Resolved to {} entry", results.size());
+						for (const auto& entry : results) {
+							log_net.trace("    ...{}:{}", entry.endpoint().address().to_string(), entry.endpoint().port());
+						}
+					}
+
+					handler(ec, mtcp::ResolveResults{std::move(results)});
 				});
 	}
 

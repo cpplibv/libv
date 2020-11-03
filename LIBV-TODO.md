@@ -581,7 +581,7 @@ libv.net: Statistics: Byte sent, byte received total, Messages sent, messages re
 libv.net.mtcp: On error extra parameter enum to indicate the source operation of the error
 libv.net: Wrap IOContext accessor in fwd
 libv.net: Move rate_policy into its own header
-libv.net: Make connections moveable | it was already movable, but now its explicit
+libv.net: Make connections movable | it was already movable, but now its explicit
 app.update: Connection dtor calls in vector resize | Session memory address is leaked to callback, so address stability is required, solved with unique pointers
 app.update: Proper disconnect, Cleanup lost connections (sessions)
 libv.utility: Add parse number utility functions
@@ -592,62 +592,12 @@ libv.net.mtcp: Add endpoint selection support for acceptor
 
 
 
+libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
+libv.net.mtcp: Protocol message, handshake with protocol ID and version
 
 
 
-clion live templates:
-	cout
-	ci
-netbeans and clion live templates:
-	getm - auto&
-	getr - const auto& x() const
-	getv - auto x() const
-
-
-
-Canceling other from the other side not the cleanest teardown of connection state:
-	Start requested, src/libv/net/mtcp/connection.cpp:265
-	Receive requested: repeat, src/libv/net/mtcp/connection.cpp:344
-	Successfully read 4 header byte, src/libv/net/mtcp/connection.cpp:687
-	Successfully read 9 payload byte, src/libv/net/mtcp/connection.cpp:723
-receive_cb: README.md
-	Send requested, src/libv/net/mtcp/connection.cpp:375
-	Successfully wrote 4 header byte, src/libv/net/mtcp/connection.cpp:784
-	Failed to read 0 header byte, src/libv/net/mtcp/connection.cpp:683
-	Failed to write 296 payload byte, src/libv/net/mtcp/connection.cpp:801
-	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
-	Successfully shutdown socket, src/libv/net/mtcp/connection.cpp:453
-	Successfully closed socket, src/libv/net/mtcp/connection.cpp:458
-	Receive requested: stop, src/libv/net/mtcp/connection.cpp:360
-	Disconnect requested, src/libv/net/mtcp/connection.cpp:303
-	Logic error: Called connect on connection in state 4. Expected states are 2 or 3, src/libv/net/mtcp/connection.cpp:306
-	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
-	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
-	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
-	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
-	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
-	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
-
-Got better by removing stuffy from dtor:
-	Start requested, src/libv/net/mtcp/connection.cpp:265
-	Receive requested: repeat, src/libv/net/mtcp/connection.cpp:344
-	Successfully read 4 header byte, src/libv/net/mtcp/connection.cpp:687
-	Successfully read 7 payload byte, src/libv/net/mtcp/connection.cpp:723
-receive_cb: LICENSE
-	Send requested, src/libv/net/mtcp/connection.cpp:375
-	Successfully wrote 4 header byte, src/libv/net/mtcp/connection.cpp:784
-	Failed to read 0 header byte, src/libv/net/mtcp/connection.cpp:683
-	Failed to write 196 payload byte, src/libv/net/mtcp/connection.cpp:801
-	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
-	Successfully shutdown socket, src/libv/net/mtcp/connection.cpp:453
-	Successfully closed socket, src/libv/net/mtcp/connection.cpp:458
-	Successfully cancelled operations, src/libv/net/mtcp/connection.cpp:448
-	Error while shutting down socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:452
-	Error while closing socket. system:10009 - Bad file descriptor, src/libv/net/mtcp/connection.cpp:457
-
-
-
-app.update: Implement an update server - client
+app.update: Implement an update server / client
 	app.update: Reconnect: attempts, timers
 
 	app.update: Security: Scope restriction on file access
@@ -1066,7 +1016,7 @@ Sequence: dead-key like behaviour
 
 
 
-libv.ctrl:
+libv.ctrl: Paper
 	TODO notes:
 		Issue: Binding input sub sequence collusion
 			Given 'Shift + E' and 'E' binding, inputting 'Shift + E' will incorrectly satisfy both
@@ -1536,7 +1486,7 @@ libv.console: new console lib? A UI component will also be needed for it, but th
 libv.console: should depend on libv.arg
 
 style
-	libv.ui: style sheets
+	libv.ui: style sheets | aka themes
 	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
 	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
 
@@ -1777,6 +1727,28 @@ libv.ui: Could boost::sync_queue be used?
 libv.utility: Add lexically_normal to generic_path and cleanup relevant usages
 
 libv.fsw: Improve callback and tokens to not hold the mutex during event broadcast (callback), currently it is a deadlock
+
+
+libv.audio: Paper
+	Sound
+		Sound - What to play
+		+/- Variations
+		+/- Effects
+
+ 	Play
+		Sound - What to play
+		Channel - What mixing channel should it be played on
+		Operation - Start, Repeat, Stop
+		Edge - Fade in, Fade out, Normal
+		Position or Centered - For positioning and sound delay
+		Speed - For Doppler effect
+		+/- Effect
+
+	Option
+		Center position - So play can use abs position and not rel
+		Center speed - So play can use abs speed and not rel
+		Channel volume
+
 
 
 --- AWAITING ---------------------------------------------------------------------------------------
