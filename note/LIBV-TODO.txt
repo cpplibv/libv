@@ -587,12 +587,12 @@ app.update: Proper disconnect, Cleanup lost connections (sessions)
 libv.utility: Add parse number utility functions
 libv.net.mtcp: Add endpoint selection support for acceptor
 libv.net: Implement perfect connection teardown
+libv: Split main track development to 3: Updater, UI, Game
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
-Split main track development to 3: Updater, UI, Game
 
 
 
