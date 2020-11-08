@@ -1,0 +1,65 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+iris.lore: Yellow line, red line, black line -ing. Overclocking the engine: Maintenance in 2 week of any yellow line, Maintenance at the end of the mission on red line, Engine melts by the end of the mission
+
+place.it:
+    E = confirm (the same as pressing the green button)
+    Esc = cancel (the same as pressing the [X] button)
+
+
+
+
+iris: Make a main menu
+
+

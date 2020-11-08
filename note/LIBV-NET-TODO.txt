@@ -1,0 +1,107 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
+libv.net.mtcp: Protocol message, handshake with protocol ID and version
+
+
+
+disconnect_immediate()
+
+
+
+udp::resolver::query query(udp::v4(), response[0], response[1]);
+
+
+
+app.update: Implement an update server / client
+	app.update: Reconnect: attempts, timers
+
+	app.update: Security: Scope restriction on file access
+	app.update: Login
+	app.update: Cache files in memory, watch if they change
+
+	app.update: Manifest, versions, etc...
+	app.update: List current clients on Server
+
+	app.update: Sign the patch (server auth is not needed for now, signing is enough)
+			https://eclipsesource.com/blogs/2016/09/07/tutorial-code-signing-and-verification-with-openssl/
+			https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
+
+
+app.update: The update process:
+	download diff
+    copy update.exe to update.ex_
+	apply diff to update.ex_
+    rename update.exe to update.bak
+    // Only bricking point is here, and even then .bak could be renamed by hand
+    rename update.ex_ to update.exe
+    restart update.exe
+	remove update.bak
+
+app.update.security:
+	! must authenticate the server
+	! must sign and verify any downloaded content
+
+	https://stackoverflow.com/questions/11580944/client-to-server-authentication-in-c-using-sockets
+		The client connects to the server, sending in the user-name (but not password)
+		The server responds by sending out unique random number
+		The client encrypts that random number using the hash of their password as the key
+		The client sends the encrypted random number to the server
+		The server encrypts the random number with the correct hash of the user's password
+		The server compares the two encrypted random numbers
+
+	boost.asio.ssl
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/overview/ssl.html
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/example/cpp11/ssl/server.cpp
+		https://www.boost.org/doc/libs/1_74_0/doc/html/boost_asio/example/cpp11/ssl/client.cpp
+
