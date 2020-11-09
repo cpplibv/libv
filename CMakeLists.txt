@@ -330,6 +330,16 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME hdiffpatch
+	GIT_REPOSITORY https://github.com/VaderY/HDiffPatch.git
+	GIT_TAG f931d8d6cc992e6744fea317327368e4b0103fbc
+	CMAKE_ARGS
+		-DHDIFF_VERSION_TAG="v0"
+	LINK hdiffpatch
+#	LINK z bz2 # compressors are not used
+)
+
+wish_create_external(
 	NAME efsw
 	GIT_REPOSITORY https://github.com/SpartanJ/efsw.git
 	GIT_TAG 33d6ce34a53d2b2c5dfb856570c8c259fce2682a
