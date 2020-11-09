@@ -551,6 +551,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_diff STATIC
+	SOURCE src/libv/diff/*.cpp
+	LINK   ext_hdiffpatch
+)
+
+wish_create_library(
 	TARGET libv_ecs INTERFACE
 	LINK   ext_boost ext_range
 )
@@ -834,7 +840,9 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
-	LINK   libv_log libv_ctrl libv_mt ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_log libv_utility
+#	LINK   libv_ctrl libv_mt ext_boost ext_boost_stacktrace ext_glm ext_range
+	LINK   libv_diff
 )
 
 wish_create_executable(
