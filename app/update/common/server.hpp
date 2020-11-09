@@ -18,7 +18,7 @@ namespace app {
 
 class UpdateServer {
 	std::vector<std::unique_ptr<class UpdateSession>> clients;
-//	std::vector<libv::net::mtcp::ConnectionAsnycCB> client_queue;
+//	std::vector<libv::net::mtcp::ConnectionAsyncCB> client_queue;
 	std::mutex clients_m;
 
 	libv::net::IOContext io_context;

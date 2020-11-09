@@ -20,7 +20,7 @@
 //: Change from trackable to shared or weak ptr
 //	signal target variable ami egy shared_ptr és a signal kap róla
 //	egy weak_ptr-t így amikor külden rá infot csak kidobja magából, ígykönnyen
-//	lehet "lokális változót" asnyc módosítani
+//	lehet "lokális változót" Async módosítani
 //: Add "Signal Hub" approach where signals are light weight and a main hub stores
 //	everything and member signal "markers" (or what should i call them...) are just an
 //	accessors to the hub wrapping the necessary minimal information.
@@ -41,7 +41,7 @@
 //	Also a template size_t N for limit max call memory number
 //: TransformSignal - Manipulating the arguments flowing through it using a
 //	manipulator function. Similar to std::transform.
-//: AsnycSignal - Put the fire method and the arguments into a worker
+//: AsyncSignal - Put the fire method and the arguments into a worker
 //	thread que to call this signal in async mode. (template executor?)
 //: SnycSignal - Put the fire method and the arguments into a worker
 //	thread que to call this signal in sync mode. (template executor?)

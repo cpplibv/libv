@@ -24,7 +24,7 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-class ConnectionAsnycCB {
+class ConnectionAsyncCB {
 	friend class ImplAcceptorAsyncCB;
 
 public:
@@ -44,25 +44,26 @@ public:
 	using CBSend = std::function<void(Message&&)>;
 
 private:
-	std::shared_ptr<class ImplConnectionAsnycCB> impl;
+	std::shared_ptr<class ImplConnectionAsyncCB> impl;
 
 public:
-	explicit ConnectionAsnycCB(IOContext& io_context) noexcept;
+	explicit ConnectionAsyncCB(IOContext& io_context) noexcept;
+
 private:
-	/// Constructor to be used with an acceptor
-	ConnectionAsnycCB(IOContext& io_context, Socket&& socket) noexcept;
+	/// Constructor to be used by an acceptor
+	ConnectionAsyncCB(IOContext& io_context, Socket&& socket) noexcept;
 
 public:
-	ConnectionAsnycCB(const ConnectionAsnycCB& orig) noexcept = default;
-	ConnectionAsnycCB(ConnectionAsnycCB&& orig) noexcept = default;
-	ConnectionAsnycCB& operator=(const ConnectionAsnycCB& orig) & noexcept = default;
-	ConnectionAsnycCB& operator=(ConnectionAsnycCB&& orig) & noexcept = default;
+	ConnectionAsyncCB(const ConnectionAsyncCB& orig) noexcept = default;
+	ConnectionAsyncCB(ConnectionAsyncCB&& orig) noexcept = default;
+	ConnectionAsyncCB& operator=(const ConnectionAsyncCB& orig) & noexcept = default;
+	ConnectionAsyncCB& operator=(ConnectionAsyncCB&& orig) & noexcept = default;
 
 public:
-	~ConnectionAsnycCB() noexcept = default;
+	~ConnectionAsyncCB() noexcept = default;
 
 public:
-	/// Can only return false if the connection was moved out
+	/// Can only return false if the connection was moved out from the current object
 	[[nodiscard]] explicit inline operator bool() const noexcept {
 		return impl != nullptr;
 	}
@@ -79,11 +80,11 @@ public:
 	void read_limit(size_t bytes_per_second) noexcept;
 	void write_limit(size_t bytes_per_second) noexcept;
 
-	[[nodiscard]] size_t total_read_bytes() const noexcept;
-	[[nodiscard]] size_t total_write_bytes() const noexcept;
+	[[nodiscard]] size_t num_byte_read() const noexcept;
+	[[nodiscard]] size_t num_byte_wrote() const noexcept;
 
-	[[nodiscard]] size_t total_read_messages() const noexcept;
-	[[nodiscard]] size_t total_write_messages() const noexcept;
+	[[nodiscard]] size_t num_message_received() const noexcept;
+	[[nodiscard]] size_t num_message_sent() const noexcept;
 
 public:
 	/// Queues an asynchronous start task.

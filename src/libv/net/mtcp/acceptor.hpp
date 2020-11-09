@@ -23,7 +23,7 @@ public:
 	};
 
 public:
-	using Connection = ConnectionAsnycCB;
+	using Connection = ConnectionAsyncCB;
 
 public:
 	using CBAccept = std::function<void(Connection)>;

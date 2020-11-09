@@ -18,42 +18,42 @@ namespace net {
 class rate_policy {
 	friend class boost::beast::rate_policy_access;
 
-	static size_t constexpr all = std::numeric_limits<size_t>::max();
+	static constexpr size_t all = std::numeric_limits<size_t>::max();
 
 private:
-	size_t rd_remain = all;
-	size_t wr_remain = all;
-	size_t rd_limit = all;
-	size_t wr_limit = all;
+	size_t read_remain = all;
+	size_t write_remain = all;
+	size_t read_limit_ = all;
+	size_t write_limit_ = all;
 
 private:
-	std::atomic_size_t rd_total = 0;
-	std::atomic_size_t wr_total = 0;
+	std::atomic_size_t read_total = 0;
+	std::atomic_size_t write_total = 0;
 
 private:
-	[[nodiscard]] size_t available_read_bytes() const noexcept {
-		return rd_remain;
+	[[nodiscard]] inline size_t available_read_bytes() const noexcept {
+		return read_remain;
 	}
 
-	[[nodiscard]] size_t available_write_bytes() const noexcept {
-		return wr_remain;
+	[[nodiscard]] inline size_t available_write_bytes() const noexcept {
+		return write_remain;
 	}
 
-	void transfer_read_bytes(size_t n) noexcept {
-		rd_total += n;
-		if (rd_remain != all)
-			rd_remain = (n < rd_remain) ? rd_remain - n : 0;
+	inline void transfer_read_bytes(size_t n) noexcept {
+		read_total += n;
+		if (read_remain != all)
+			read_remain = (n < read_remain) ? read_remain - n : 0;
 	}
 
-	void transfer_write_bytes(size_t n) noexcept {
-		wr_total += n;
-		if (wr_remain != all)
-			wr_remain = (n < wr_remain) ? wr_remain - n : 0;
+	inline void transfer_write_bytes(size_t n) noexcept {
+		write_total += n;
+		if (write_remain != all)
+			write_remain = (n < write_remain) ? write_remain - n : 0;
 	}
 
-	void on_timer() noexcept {
-		rd_remain = rd_limit;
-		wr_remain = wr_limit;
+	inline void on_timer() noexcept {
+		read_remain = read_limit_;
+		write_remain = write_limit_;
 	}
 
 public:
@@ -62,9 +62,9 @@ public:
 		if (bytes_per_second == 0)
 			bytes_per_second = all;
 
-		rd_limit = bytes_per_second;
-		if (rd_remain > bytes_per_second)
-			rd_remain = bytes_per_second;
+		read_limit_ = bytes_per_second;
+		if (read_remain > bytes_per_second)
+			read_remain = bytes_per_second;
 	}
 
 	/// Set the limit of bytes per second to write, 0 means unlimited
@@ -72,18 +72,18 @@ public:
 		if (bytes_per_second == 0)
 			bytes_per_second = all;
 
-		wr_limit = bytes_per_second;
-		if (wr_remain > bytes_per_second)
-			wr_remain = bytes_per_second;
+		write_limit_ = bytes_per_second;
+		if (write_remain > bytes_per_second)
+			write_remain = bytes_per_second;
 	}
 
 public:
-	[[nodiscard]] inline size_t total_read_bytes() const noexcept {
-		return rd_total;
+	[[nodiscard]] inline size_t num_byte_read() const noexcept {
+		return read_total;
 	}
 
-	[[nodiscard]] inline size_t total_write_bytes() const noexcept {
-		return wr_total;
+	[[nodiscard]] inline size_t num_byte_wrote() const noexcept {
+		return write_total;
 	}
 };
 

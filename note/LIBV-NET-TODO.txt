@@ -50,8 +50,9 @@
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
-libv.net.mtcp: Protocol message, handshake with protocol ID and version
+
+
+
 
 
 
@@ -60,6 +61,11 @@ disconnect_immediate()
 
 
 udp::resolver::query query(udp::v4(), response[0], response[1]);
+
+
+
+libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
+libv.net.mtcp: Protocol messages, handshake with protocol ID and version
 
 
 

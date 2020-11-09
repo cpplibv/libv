@@ -11,8 +11,8 @@ struct Address;
 
 namespace mtcp { // --------------------------------------------------------------------------------
 
-class AcceptorAsnycCB;
-class ConnectionAsnycCB;
+class AcceptorAsyncCB;
+class ConnectionAsyncCB;
 
 class ResolveResults;
 class Socket;

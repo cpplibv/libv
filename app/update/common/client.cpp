@@ -29,10 +29,10 @@ UpdateClient::UpdateClient() {
 
 	const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
 		std::cout << "receive_cb: " << message << std::endl;
-		std::cout << "total_read_bytes    : " << connection.total_read_bytes() << std::endl;
-		std::cout << "total_write_bytes   : " << connection.total_write_bytes() << std::endl;
-		std::cout << "total_read_messages : " << connection.total_read_messages() << std::endl;
-		std::cout << "total_write_messages: " << connection.total_write_messages() << std::endl;
+		std::cout << "num_byte_read       : " << connection.num_byte_read() << std::endl;
+		std::cout << "num_byte_wrote      : " << connection.num_byte_wrote() << std::endl;
+		std::cout << "num_message_received: " << connection.num_message_received() << std::endl;
+		std::cout << "num_message_sent    : " << connection.num_message_sent() << std::endl;
 	};
 
 	const auto send_cb = [](libv::net::mtcp::Message&& message) noexcept {

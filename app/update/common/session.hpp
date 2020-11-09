@@ -11,7 +11,7 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct UpdateSession {
-	libv::net::mtcp::ConnectionAsnycCB connection;
+	libv::net::mtcp::ConnectionAsyncCB connection;
 	class UpdateServer& server;
 
 public:
@@ -22,7 +22,7 @@ public:
 	UpdateSession& operator=(UpdateSession&& orig) & noexcept = delete;
 
 public:
-	explicit UpdateSession(UpdateServer& server, libv::net::mtcp::ConnectionAsnycCB connection_);
+	explicit UpdateSession(UpdateServer& server, libv::net::mtcp::ConnectionAsyncCB connection_);
 	~UpdateSession();
 
 public:

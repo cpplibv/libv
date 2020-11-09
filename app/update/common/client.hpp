@@ -16,7 +16,7 @@ namespace app {
 
 struct UpdateClient {
 	libv::net::IOContext io_context{1};
-	libv::net::mtcp::ConnectionAsnycCB connection{io_context};
+	libv::net::mtcp::ConnectionAsyncCB connection{io_context};
 
 public:
 	explicit UpdateClient();

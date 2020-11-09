@@ -95,7 +95,7 @@ public:
 			if (ec)
 				self_sp->cb_error(ErrorSource::accept, ec);
 			else
-				self_sp->cb_accept(ConnectionAsnycCB(self_sp->io_context, Socket{std::move(peer)}));
+				self_sp->cb_accept(ConnectionAsyncCB(self_sp->io_context, Socket{std::move(peer)}));
 
 			if (self_sp->accepting)
 				self_sp->accept(std::move(self_sp));

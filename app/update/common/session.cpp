@@ -17,7 +17,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-UpdateSession::UpdateSession(UpdateServer& server_, libv::net::mtcp::ConnectionAsnycCB connection_) :
+UpdateSession::UpdateSession(UpdateServer& server_, libv::net::mtcp::ConnectionAsyncCB connection_) :
 		connection(std::move(connection_)),
 		server(server_) {
 

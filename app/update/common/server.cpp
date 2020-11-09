@@ -22,7 +22,7 @@ UpdateServer::UpdateServer(libv::net::mtcp::Endpoint endpoint, uint16_t num_net_
 
 	const auto accept_backlog_size = 4;
 
-	const auto accept_cb = [this](libv::net::mtcp::ConnectionAsnycCB connection) noexcept {
+	const auto accept_cb = [this](libv::net::mtcp::ConnectionAsyncCB connection) noexcept {
 		const auto lock = std::unique_lock(clients_m);
 		clients.push_back(std::make_unique<UpdateSession>(*this, std::move(connection)));
 	};

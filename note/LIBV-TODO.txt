@@ -1471,7 +1471,7 @@ libv.audio: Paper
 --- AWAITING ---------------------------------------------------------------------------------------
 
 
-asnyc: https://www.youtube.com/watch?v=t4etEwG2_LY
+Async: https://www.youtube.com/watch?v=t4etEwG2_LY
 cli: Clara, most important questions are: multi, optional, required, positional and default arguments
 			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)

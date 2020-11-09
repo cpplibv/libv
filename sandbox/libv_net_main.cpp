@@ -35,9 +35,9 @@ struct Config {
 struct Session {
 	static inline int nextID = 0;
 	std::string id = fmt::format("Session-{}", nextID++);
-	libv::net::mtcp::ConnectionAsnycCB conn;
+	libv::net::mtcp::ConnectionAsyncCB conn;
 
-	Session(libv::net::mtcp::ConnectionAsnycCB&& conn_) :
+	Session(libv::net::mtcp::ConnectionAsyncCB&& conn_) :
 		conn(std::move(conn_)) {
 		conn.handle_connect([this](libv::net::mtcp::Endpoint endpoint) {
 			log_sandbox.info("{} connected to: {}", id, endpoint);
@@ -78,7 +78,7 @@ struct Server {
 	Server(libv::net::IOContext& io_context) :
 		acceptor(io_context) {
 
-		acceptor.handle_accept([this](libv::net::mtcp::ConnectionAsnycCB conn) {
+		acceptor.handle_accept([this](libv::net::mtcp::ConnectionAsyncCB conn) {
 
 			log_sandbox.info("{} accepted", id);
 			sessions.emplace_back(std::make_shared<Session>(std::move(conn)))->run();
@@ -104,7 +104,7 @@ struct Server {
 struct Client {
 	static inline int nextID = 0;
 	std::string id = fmt::format("Client-{}", nextID++);
-	libv::net::mtcp::ConnectionAsnycCB conn;
+	libv::net::mtcp::ConnectionAsyncCB conn;
 
 	Client(libv::net::IOContext& io_context) : conn(io_context) {
 		conn.handle_connect([this](libv::net::mtcp::Endpoint endpoint) {

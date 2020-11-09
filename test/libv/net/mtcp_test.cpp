@@ -113,7 +113,7 @@ TEST_CASE("MTCP Connection without any connect should handle errors") {
 	libv::log.info("------------------------------------------------");
 
 	libv::net::IOContext context{num_client_thread};
-	TestClient<libv::net::mtcp::ConnectionAsnycCB> test{context};
+	TestClient<libv::net::mtcp::ConnectionAsyncCB> test{context};
 
 	SECTION("If no operation is called") {
 		context.join();
@@ -219,7 +219,7 @@ TEST_CASE("MTCP Connection should stay inactive with a failed connection attempt
 	libv::log.info("------------------------------------------------");
 
 	libv::net::IOContext context{num_client_thread};
-	TestClient<libv::net::mtcp::ConnectionAsnycCB> test{context};
+	TestClient<libv::net::mtcp::ConnectionAsyncCB> test{context};
 
 	SECTION("When: Host not found") {
 		test.conn.connect(libv::net::Address("unknown host", test_port));
@@ -260,7 +260,7 @@ TEST_CASE("MTCP Connection should handle successful connect-send-disconnect") {
 	libv::log.info("------------------------------------------------");
 
 	auto context_client = libv::net::IOContext(num_client_thread);
-	auto client = TestClient<libv::net::mtcp::ConnectionAsnycCB>(context_client);
+	auto client = TestClient<libv::net::mtcp::ConnectionAsyncCB>(context_client);
 
 	auto context_server = libv::net::IOContext(num_server_thread);
 	auto server = TestServer<libv::net::mtcp::AcceptorAsyncCB>(context_server);
