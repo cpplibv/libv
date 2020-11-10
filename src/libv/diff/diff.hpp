@@ -21,18 +21,18 @@ using bv = std::span<const std::byte>;
 using sv = std::string_view;
 
 struct diff_info {
-	size_t new_size;
-	size_t old_size;
+private:
+	static constexpr size_t invalid = std::numeric_limits<size_t>::max();
 
 public:
-	constexpr inline void reset() noexcept {
-		new_size = std::numeric_limits<size_t>::max();
-		old_size = std::numeric_limits<size_t>::max();
-	}
+	size_t old_size = invalid;
+	size_t new_size = invalid;
+
+public:
 	[[nodiscard]] constexpr inline bool valid() const noexcept {
 		return
-				new_size != std::numeric_limits<size_t>::max() &&
-				old_size != std::numeric_limits<size_t>::max();
+				old_size != invalid &&
+				new_size != invalid;
 	}
 	[[nodiscard]] explicit constexpr inline operator bool() const noexcept {
 		return valid();
@@ -54,7 +54,8 @@ public:
 [[nodiscard]] std::vector<std::byte> create_diff(bv old, bv new_, size_t match_block_size = default_match_block_size);
 void create_diff(sv old, sv new_, std::string& out_diff, size_t match_block_size = default_match_block_size);
 void create_diff(bv old, bv new_, std::vector<std::byte>& out_diff, size_t match_block_size = default_match_block_size);
-void create_diff(std::istream& old, std::istream& new_, std::ostream& diff, size_t match_block_size = default_match_block_size);
+/// All streams has to be binary and seekable
+void create_diff(std::istream& old, std::istream& new_, std::ostream& out_diff, size_t match_block_size = default_match_block_size);
 
 /// Check if the \c diff applied to \c old will result in \c new.
 ///
@@ -64,6 +65,7 @@ void create_diff(std::istream& old, std::istream& new_, std::ostream& diff, size
 /// \return Returns true if \c diff can be applied to \c old and it results in \c new
 [[nodiscard]] bool check_diff(sv old, sv new_, sv diff);
 [[nodiscard]] bool check_diff(bv old, bv new_, bv diff);
+/// All streams has to be binary and seekable
 [[nodiscard]] bool check_diff(std::istream& old, std::istream& new_, std::istream& diff);
 
 /// Applies \c diff to \c old.
@@ -73,13 +75,16 @@ void create_diff(std::istream& old, std::istream& new_, std::ostream& diff, size
 /// \return Returns the new version of the data after applying the \c diff or an empty optional if the \c diff cannot be applied to \olc
 [[nodiscard]] std::optional<std::string> apply_patch(sv old, sv diff);
 [[nodiscard]] std::optional<std::vector<std::byte>> apply_patch(bv old, bv diff);
-[[nodiscard]] bool apply_patch(sv old, sv diff, std::string& out_new_);
-[[nodiscard]] bool apply_patch(bv old, bv diff, std::vector<std::byte>& out_new_);
-[[nodiscard]] bool apply_patch(std::istream& old, std::istream& diff, std::ostream& new_);
+[[nodiscard]] bool apply_patch(sv old, sv diff, std::string& out_new);
+[[nodiscard]] bool apply_patch(bv old, bv diff, std::vector<std::byte>& out_new);
+/// All streams has to be binary and seekable
+[[nodiscard]] bool apply_patch(std::istream& old, std::istream& diff, std::ostream& out_new);
 
 /// \return Returns a non valid diff_info object upon failure, otherwise returns the diff info
 [[nodiscard]] diff_info get_diff_info(sv diff);
 [[nodiscard]] diff_info get_diff_info(bv diff);
+/// All streams has to be binary and seekable
+[[nodiscard]] diff_info get_diff_info(std::istream& diff);
 
 // -------------------------------------------------------------------------------------------------
 

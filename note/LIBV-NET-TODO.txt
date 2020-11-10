@@ -84,6 +84,9 @@ app.update: Implement an update server / client
 			https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
 
 
+app.update: Version manifest: list of files with MD5 hash in a folder
+app.update: Patch manifest: list of changes add/delete/(replace)/modify/rename
+
 app.update: The update process:
 	prep
 		create release
