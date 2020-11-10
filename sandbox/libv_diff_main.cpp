@@ -198,41 +198,26 @@ bool test_file(const std::string_view file_old_, const std::string_view file_new
 //}
 
 #include <filesystem>
-#include <libv/diff/dir.hpp>
+#include <libv/diff/manifest.hpp>
 #include <libv/hash/md5.hpp>
+#include <libv/utility/enum.hpp>
 
 
-using namespace libv::diff;
-
-[[nodiscard]] Manifest create_manifest(const std::string_view root_path) {
-	Manifest manifest;
-
-	for(const auto& entry : std::filesystem::recursive_directory_iterator(root_path)) {
-		if (not entry.is_regular_file())
-			continue;
-
-		const auto& path = entry.path();
-
-		std::ifstream file(path);
-		auto md5 = libv::hash::hash_md5(file);
-
-		auto path_str = path.generic_string();
-
-		std::cout << path_str << md5 << std::endl;
-
-		manifest.entries.emplace_back(std::move(path_str), std::move(md5));
-	}
-
-	std::cout << manifest.entries.size() << std::endl;
-
-//	libv::sort(manifest.entries, std::less<>{}, &Manifest::Entry::path);
-	return manifest;
-}
 
 int main() {
 	std::filesystem::current_path(std::filesystem::current_path().parent_path());
 
-	create_manifest("src");
+	const auto manifest = libv::diff::create_manifest("src");
+
+	for (const auto& entry : manifest.entries)
+		std::cout << entry.md5 << " " << entry.path << std::endl;
+
+//	const auto manifest_a = libv::diff::create_manifest("D:/temp/__20201110_143012_CIWoAWXK/HDiffPatch/");
+//	const auto manifest_b = libv::diff::create_manifest("D:/temp/__20201109_074307_8IqBFnlO/HDiffPatch/");
+//	const auto manifest_diff = libv::diff::create_manifest_diff(manifest_a, manifest_b);
+//
+//	for (const auto& entry : manifest_diff.entries)
+//		std::cout << libv::to_value(entry.change) << " " << entry.path << std::endl;
 
 	return EXIT_SUCCESS;
 }

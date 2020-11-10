@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <iosfwd>
 #include <optional>
 #include <span>
 #include <string>

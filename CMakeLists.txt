@@ -553,7 +553,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_diff STATIC
 	SOURCE src/libv/diff/*.cpp
-	LINK   ext_hdiffpatch libv_hash
+	LINK   ext_hdiffpatch libv_hash libv_algorithm
 )
 
 wish_create_library(

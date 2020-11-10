@@ -59,8 +59,8 @@ md5 hash_md5(const std::span<const std::byte> data) {
 }
 
 md5 hash_md5(std::istream& stream) {
-	static constexpr size_t batch_size = 1024 * 4;
-	char buff[batch_size];
+	static constexpr size_t batch_size = 16 * 1024;
+	char buffer[batch_size];
 
 	stream.seekg(0, std::ios::end);
 	const auto size = static_cast<size_t>(stream.tellg());
@@ -71,12 +71,12 @@ md5 hash_md5(std::istream& stream) {
 	boost::uuids::detail::md5 hasher;
 
 	for (size_t i = 0; i < batch_count; i++) {
-		stream.read(buff, batch_size);
-		hasher.process_bytes(buff, batch_size);
+		stream.read(buffer, batch_size);
+		hasher.process_bytes(buffer, batch_size);
 	}
 
-	stream.read(buff, size - batch_count * batch_size);
-	hasher.process_bytes(buff, size - batch_count * batch_size);
+	stream.read(buffer, size - batch_count * batch_size);
+	hasher.process_bytes(buffer, size - batch_count * batch_size);
 
 	boost::uuids::detail::md5::digest_type digest;
 	hasher.get_digest(digest);

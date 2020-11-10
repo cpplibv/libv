@@ -600,7 +600,7 @@ libv.diff: Implement in memory diff and patch support
 
 
 ext: Acquire a crypto lib
-ext: Acquire a hashing lib
+ext: Acquire a hashing lib (the MD5 will not be enough forever)
 
 
 app.enum: new enum gen | rename and refactor
