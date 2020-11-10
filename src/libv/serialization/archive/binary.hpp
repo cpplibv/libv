@@ -35,7 +35,7 @@ private:
 public:
 	/// Construct, outputting to the provided stream
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
-	BinaryOutput(std::ostream& stream) :
+	explicit BinaryOutput(std::ostream& stream) :
 		OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision>(this),
 		os(stream) {
 	}
@@ -68,7 +68,7 @@ private:
 public:
 	/// Construct, loading from the provided stream
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
-	BinaryInput(std::istream& stream) :
+	explicit BinaryInput(std::istream& stream) :
 		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
 		is(stream) {
 	}

@@ -29,8 +29,8 @@ public:
 	lock_file(const lock_file&) = delete;
 	lock_file& operator=(const lock_file&) & = delete;
 
-	lock_file(lock_file&&) noexcept = default;
-	lock_file& operator=(lock_file&&) & noexcept = default;
+	lock_file(lock_file&&) noexcept;
+	lock_file& operator=(lock_file&&) & noexcept;
 
 	///	Closes (and attempts to delete) the lock file. Does not throw.
 	/// Does not releases the lock.

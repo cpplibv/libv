@@ -1,4 +1,4 @@
-// Project: libv.diff, File: src/libv/diff/dir.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.diff, File: src/libv/diff/manifest.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/diff/manifest.hpp>
@@ -55,12 +55,13 @@ ManifestDiff create_manifest_diff(const Manifest& old, const Manifest& new_) {
 
 		const auto change =
 				!n ? ManifestDiff::Change::remove :
-				!o ? ManifestDiff::Change::add :
+				!o ? ManifestDiff::Change::create :
 				ManifestDiff::Change::modify;
 
 		const auto& path = n ? n->path : o->path;
 
-		manifest_diff.entries.emplace_back(path, change);
+		static constexpr auto nullopt_md5 = std::optional<libv::hash::md5>(std::nullopt);
+		manifest_diff.entries.emplace_back(path, change, o ? o->md5 : nullopt_md5, n ? n->md5 : nullopt_md5);
 
 	}, std::ranges::less{}, &Manifest::Entry::path);
 

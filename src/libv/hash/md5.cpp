@@ -19,7 +19,7 @@ namespace hash {
 // -------------------------------------------------------------------------------------------------
 
 std::ostream& operator<<(std::ostream& os, const md5& md5) {
-	std::ios_base::fmtflags f(os.flags());
+	std::ios::fmtflags f(os.flags());
 	os << std::hex << std::setfill('0') << std::uppercase;
 
 	for (auto i : md5.value)

@@ -1,4 +1,4 @@
-// Project: libv.diff, File: src/libv/diff/dir.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.diff, File: src/libv/diff/manifest.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -29,7 +29,7 @@ public:
 struct ManifestDiff {
 public:
 	enum class Change {
-		add,
+		create,
 		remove,
 		modify,
 		// rename, ?
@@ -37,8 +37,10 @@ public:
 	};
 
 	struct Entry {
-		std::string path;
+		std::string filepath;
 		Change change;
+		std::optional<libv::hash::md5> old_md5;
+		std::optional<libv::hash::md5> new_md5;
 	};
 
 public:

@@ -683,14 +683,14 @@ static constexpr auto sv = [](const auto begin, const auto end) {
 // -------------------------------------------------------------------------------------------------
 
 Combination parse_combination_or(const std::string_view str, const Combination& fallback) {
-	const auto result = parse_combination_optional(str);
-	return result ? *result : fallback;
+	auto result = parse_combination_optional(str);
+	return result ? std::move(*result) : fallback;
 }
 
 Combination parse_combination_or_throw(const std::string_view str) {
-	const auto result = parse_combination_optional(str);
+	auto result = parse_combination_optional(str);
 	if (result)
-		return *result;
+		return std::move(*result);
 	else
 		throw std::invalid_argument(libv::concat("\"", str, "\" is not a valid Combination"));
 }
@@ -747,14 +747,14 @@ std::optional<Combination> parse_combination_optional(const std::string_view str
 // -------------------------------------------------------------------------------------------------
 
 Sequence parse_sequence_or(const std::string_view str, const Sequence& fallback) {
-	const auto result = parse_sequence_optional(str);
-	return result ? *result : fallback;
+	auto result = parse_sequence_optional(str);
+	return result ? std::move(*result) : fallback;
 }
 
 Sequence parse_sequence_or_throw(const std::string_view str) {
-	const auto result = parse_sequence_optional(str);
+	auto result = parse_sequence_optional(str);
 	if (result)
-		return *result;
+		return std::move(*result);
 	else
 		throw std::invalid_argument(libv::concat("\"", str, "\" is not a valid Sequence"));
 }

@@ -7,6 +7,8 @@
 #include <libv/utility/bytes/output_bytes.hpp>
 // std
 #include <optional>
+#include <string>
+#include <vector>
 
 
 namespace libv {
@@ -74,6 +76,16 @@ template <typename T, typename In0, typename In1>
 	return diff;
 }
 
+template <typename In0, typename In1>
+[[nodiscard]] inline std::string create_diff_str(In0&& old, In1&& new_, size_t match_block_size = default_match_block_size) {
+	return create_diff<std::string>(old, new_, match_block_size);
+}
+
+template <typename In0, typename In1>
+[[nodiscard]] inline std::vector<std::byte> create_diff_bin(In0&& old, In1&& new_, size_t match_block_size = default_match_block_size) {
+	return create_diff<std::vector<std::byte>>(old, new_, match_block_size);
+}
+
 /// \return Returns a non valid diff_info object upon failure, otherwise returns the diff info
 template <typename In0>
 [[nodiscard]] diff_info get_diff_info(In0&& diff) {
@@ -115,6 +127,16 @@ template <typename T, typename In0, typename In1>
 		new_.reset();
 
 	return new_;
+}
+
+template <typename In0, typename In1>
+[[nodiscard]] inline std::optional<std::string> apply_patch_str(In0&& old, In1&& diff) {
+	return apply_patch<std::string>(old, diff);
+}
+
+template <typename In0, typename In1>
+[[nodiscard]] inline std::optional<std::vector<std::byte>> apply_patch_bin(In0&& old, In1&& diff) {
+	return apply_patch<std::vector<std::byte>>(old, diff);
 }
 
 // -------------------------------------------------------------------------------------------------

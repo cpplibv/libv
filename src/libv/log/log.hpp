@@ -35,6 +35,18 @@
 // IDEA: Format string per route; most likely will be integrated into the serialization and output-formatter system
 //		libv::log.route_below(libv::Info, std::cout, "{severity} {thread_id} {module}: {message} <{file}:{line}>\n");
 //		libv::log.route(std::cout, "{severity} {module}: {message}\n");
+// TODO P5: Improve var template instantiations by fmt::make_args_checked:
+//		void vlog(const char* file, int line, fmt::string_view format,
+//				fmt::format_args args) {
+//			fmt::print("{}: {}: ", file, line);
+//			fmt::vprint(format, args);
+//		}
+//
+//		template <typename S, typename... Args>
+//		void log(const char* file, int line, const S& format, Args&&... args) {
+//			vlog(file, line, format,
+//					fmt::make_args_checked<Args...>(format, args...));
+//		}
 //
 // TODO P5: Design a unified log line structure
 //		 Warn: This happened. It was unexpected because. This was done to recover. [Recommended user action.]
@@ -172,7 +184,7 @@ private:
 	std::vector<Rule> rules;
 	std::vector<libv::observer_ref<std::ostream>> outputs;
 	std::vector<libv::observer_ref<Logger>> outputChains;
-	std::string format = "{severity} {thread_id} {module}: {message}  {file}:{line}\n";
+	std::string format = "{severity} {thread_id} {module}: {message}, {file}:{line}\n";
 
 private:
 	bool notable(Severity severity, const std::string_view module) {

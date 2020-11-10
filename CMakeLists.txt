@@ -79,6 +79,16 @@ wish_warning(
 	GNU -Wsuggest-override
 	GNU -Wundef
 
+	#	more warning:
+	#GNU -Wmissing-include-dirs
+	#GNU -Wdisabled-optimization,
+	#GNU -Wpadded,
+	#GNU -Wzero-as-null-pointer-constant,
+	#	maybe even:
+	#GNU -Wswitch-enum, and take a look at:
+	#GNU -Wunsafe-loop-optimizations,
+	#GNU -Wdangling-else
+
 	# Enablement in progress:
 	# GNU -Wuseless-cast # in vec_base_t has some false positive issue with this one, but otherwise clear
 	# GNU -Wfloat-equal # some in tests, and some in ui might be true positive, ui got some true positive with ratio
@@ -707,7 +717,10 @@ wish_create_library(
 	# TODO P5: Make this an object library
 	TARGET update_common STATIC
 	SOURCE app/update/common/*.cpp
+	SOURCE app/update/patch/*.cpp # <<< P4: Just for testing
 	LINK   libv_net libv_process
+	LINK   libv_diff # <<< P4: Just for testing
+	LINK   libv_serialization # <<< P4: Just for testing
 )
 
 wish_create_executable(
@@ -726,6 +739,15 @@ wish_create_executable(
 #	SOURCE app/update/common/*.cpp
 #	SOURCE app/update/client_main.cpp
 #	LINK   libv_arg libv_net
+)
+
+wish_create_executable(
+	TARGET create_patch
+	SOURCE app/update/create_patch.cpp
+	LINK   libv_log libv_arg libv_diff
+	LINK   libv_serialization
+	LINK   libv_process # <<< P4: Just for testing
+	LINK   update_common # <<< P4: Just for testing
 )
 
 add_custom_target(update DEPENDS update_client update_server)

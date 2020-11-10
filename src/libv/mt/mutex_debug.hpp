@@ -24,8 +24,8 @@ private:
 public:
 	std::string name = "";
 
-	mutex_debug() {}
-	mutex_debug(std::string name) : name(name) {}
+	mutex_debug() = default;
+	explicit mutex_debug(std::string name) : name(name) {}
 
 public:
 	inline void lock() {

@@ -30,6 +30,10 @@ struct impl_lock_file {
 lock_file::lock_file(const std::filesystem::path& filepath) :
 	self(std::make_unique<impl_lock_file>(filepath)) {}
 
+lock_file::lock_file(lock_file&&) noexcept = default;
+
+lock_file& lock_file::operator=(lock_file&&) & noexcept = default;
+
 lock_file::~lock_file() {
 #ifdef _WIN32
 	// NOTE: On windows deleting a file will fail if it is already opened by another process

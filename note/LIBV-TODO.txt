@@ -313,7 +313,7 @@ libv.ui: component level overlay system
 libv.ui: component fix attach-detach
 libv.ui: debug zoom proper frame buffer size setup | based on component level layout
 libv.ui: debug zoom toward center
-libv.ui: mouse grab system, a way to soft lock mouse event positions to an initiator mouse watcher
+libv.ui: mouse grab system, a way to soft mutex mouse event positions to an initiator mouse watcher
 libv.ui: bug: mouse acquire might generate extra events? | null update was broadcasted on accident
 libv.ui: scroll bar (aka slider) without the scroll pane
 libv.ui: remap mouse input in debug zoom mode (remap function) | inline remap causes hazard on movement | fixed by control/view split but rounding might broke things
@@ -590,9 +590,11 @@ libv.net: Implement perfect connection teardown
 libv: Split main track development to 3: Updater, UI, Game
 libv.diff: New library for diff and patch management
 libv.diff: Implement in memory diff and patch support
+libv.diff: make sure every stream of lvalue ref output respects offset
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
 
 
 
@@ -609,8 +611,58 @@ app.enum: new enum gen | rename and refactor
 	- its also a weak possibility to use a CTAD Enum class
 	| ADL function is the winner
 
+	#include <array>
+	#include <string_view>
+	#include <stdexcept>
+	#include <algorithm>
+	#include <map>
+
+	template <typename Key, typename Value, std::size_t Size>
+	struct Map {
+	  std::array<std::pair<Key, Value>, Size> data;
+
+	  [[nodiscard]] constexpr Value at(const Key &key) const {
+		const auto itr =
+			std::find_if(begin(data), end(data),
+						 [&key](const auto &v) { return v.first == key; });
+		if (itr != end(data)) {
+		  return itr->second;
+		} else {
+		  throw std::range_error("Not Found");
+		}
+	  }
+
+	};
+
+	using namespace std::literals::string_view_literals;
+	static constexpr std::array<std::pair<std::string_view, int>, 8> color_values{
+		{{"black"sv, 7},
+		 {"blue"sv, 3},
+		 {"cyan"sv, 5},
+		 {"green"sv, 2},
+		 {"magenta"sv, 6},
+		 {"red"sv, 1},
+		 {"white"sv, 8},
+		 {"yellow"sv, 4}}};
+
+	int lookup_value(const std::string_view sv) {
+	  //static const auto map = std::map<std::string_view, int>{color_values.begin(), color_values.end()};
+	  static constexpr auto map =
+		  Map<std::string_view, int, color_values.size()>{{color_values}};
+
+	  return map.at(sv);
+	}
+
+
+
+
+
 
 place.it:
+	https://quick-bench.com
+	https://build-bench.com
+	https://godbolt.org
+
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	model: Generate texture for LOD meshes
@@ -622,11 +674,23 @@ place.it:
 
 clion live templates:
 	cout
-	ci
+	fora
 netbeans and clion live templates:
-	getm - auto&
-	getr - const auto& x() const
-	getv - auto x() const
+	ci - var(var)                  // Remove comma from netbeans version
+	cim - var(std::move(var))
+	getm - auto& { return x; }
+	getr - const auto& x() const { return x; }
+	getv - auto x() const { return x; }
+	nd - [[nodiscard]]
+	un - [[maybe_unused]]
+	ft - [[fallthrough]]
+	cc - copy ctor and assignment
+		my_type(const my_type&) = default;
+		my_type& operator=(const my_type&) & = default;
+	mc - move ctor and assignment
+		my_type(my_type&&) noexcept = default;
+		my_type& operator=(my_type&&) & noexcept = default;
+	ctor - copy and move - ctor and assignment
 
 build.ninja: some ext target fails, otherwise it should be clear
 
@@ -646,7 +710,7 @@ app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data .
 
 
 IDE:
-	ide: Use MSYS2_HOME env var for toolchain settings
+	ide: Use MSYS2_HOME env var for toolchain settings in IDEs
 
 	IDE	Colors:
 		BBBFC3
@@ -1017,7 +1081,7 @@ libv.gl.glsl: Warning for non generic directory separator in include path (backl
 libv.gl.glsl: Warning option for mixed indentation in different lines and/or files
 libv.gl.glsl: Warning for line trailing white space
 
-app.vm4_viewer: camera movement should acquire and lock mouse position
+app.vm4_viewer: camera movement should acquire and mutex mouse position
 
 app: about page with executable path, build and compiler information, git hash and software version
 libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
@@ -1483,7 +1547,7 @@ color: color picker http://www.colorhexa.com/3affce
 color.math: colorspace of humans https://en.wikipedia.org/wiki/Lab_color_space
 color.math: http://graficaobscura.com/matrix/index.html
 color.picker: http://tristen.ca/hcl-picker/#/hlc/10/1/F68385/D1E468
-color.picker: https://tools.lgm.cl/colorpicker.html
+color.picker: HCL picker https://tools.lgm.cl/colorpicker.html
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
@@ -1619,6 +1683,7 @@ libv: generic general container storage
 
 --- NOTE -------------------------------------------------------------------------------------------
 
+cpp: C++ has a nice nested exception facility: std::throw_with_nested(std::runtime_error("Outer operation")); and std::rethrow_if_nested(e);
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
@@ -1630,7 +1695,13 @@ Extensions: Used default file extensions in LIBV
 	.vm4 - vader model 4
 	.vup - vader update patch
 
+Files: Used default file names in LIBV
+	.mutex - active write opened mutex file
+	.manifest - manifest file in the root directory
+	.patch_progress - patch_progress log file
+
 Ports: Used default port ranges in LIBV
+	10220 - SSH
 	25090 - Update server listening
 	25091 - RESERVED
 	25092 - RESERVED

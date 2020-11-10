@@ -23,6 +23,12 @@ public:
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const md5& md5);
+
+public:
+	template <class Archive>
+	inline void serialize(Archive& ar) {
+		ar(value);
+	}
 };
 
 [[nodiscard]] md5 hash_md5(const std::string_view data);

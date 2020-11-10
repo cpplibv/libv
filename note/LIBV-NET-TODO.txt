@@ -1,4 +1,4 @@
-
+libv.diff: make sure every stream input respects offset (?) | for output it makes sense, but for input I need the end of it | Done with byte streams
 
 
 
@@ -50,6 +50,40 @@
 --- STACK ------------------------------------------------------------------------------------------
 
 
+ (cd app/update/res/; ./gen.sh)
+
+
+libv.hash: Generate md5 hash from file without needing to handle the istream
+libv.utility: Storage space size formatter: xxx'xxx.yy KB, MB
+		This will absorb the dotter that I have in fsw
+
+
+
+libv.update: patch create folder
+libv.update: patch remove folder
+
+libv.update: patch creation rename support
+libv.update: patch creation modify to support
+
+libv.update: patch apply LOG EVERY FAILURE, LOG EVERYTHING, that will be useful
+
+
+cpp: if tellg fails it can return -1, review EVERY usage of it
+
+
+
+
+
+
+libv.net, libv.utility, app.update: Looks like the performance of operator<< .rdbuf() might be bad, benchmark and fix it
+		| ok, its not that bad, but there is faster, seek + tell + resize + read is faster
+		| https://quick-bench.com/q/GLAWAXMThdMGHsagYhSOOR1DBx8
+		| ok, its pretty bad, seek and tell is faster for larger inputs
+			s.seekg(0, std::ios::end);
+			const auto stream_size = s.tellg();
+			s.seekg(0, std::ios::beg);
+		| but the fastest is a local stack buffer of ~16KB that is filled and processed in a loop
+			https://quick-bench.com/q/idbivSAx2upsgoXQQgIPhmsBIJU
 
 
 
@@ -57,35 +91,22 @@
 
 
 
-
-/d/temp/__20201111_120309_Gp1HYNSk> /e/dev/cpp/libv/bin/make_patch.exe -o /D/temp/__20201110_143012_CIWoAWXK/HDiffPatch/ -n /D/temp/__20201109_074307_8IqBFnlO/HDiffPatch/ -p test.lup -f
-
+Idea: patch on patch: for future patch download, download expected patch, patch the patch when it goes live
 
 
 
-
-
-
-libv.diff: make sure every stream of lvalue ref output respects offset
-libv.diff: make sure every stream input respects offset
-
-
-
-
-
-
-
+Network:
 
 disconnect_immediate()
 
 
-
+I could do this when resolving:
 udp::resolver::query query(udp::v4(), response[0], response[1]);
+						   ^^^^^^^^^
 
 
-
-libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
 libv.net.mtcp: Protocol messages, handshake with protocol ID and version
+	libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
 
 
 
@@ -94,7 +115,7 @@ app.update: Implement an update server / client
 
 	app.update: Security: Scope restriction on file access
 	app.update: Login
-	app.update: Cache files in memory, watch if they change
+	app.update: Server: Cache files in memory, watch if they change
 
 	app.update: Manifest, versions, etc...
 	app.update: List current clients on Server

@@ -52,7 +52,7 @@ struct Inner {
 	std::string x;
 
 	Inner() { }
-	Inner(std::string xv) : x(xv) { }
+	explicit Inner(std::string xv) : x(xv) { }
 
 	template <class Archive>
 	inline void serialize(Archive& ar) {
