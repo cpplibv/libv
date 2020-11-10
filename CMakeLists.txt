@@ -553,7 +553,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_diff STATIC
 	SOURCE src/libv/diff/*.cpp
-	LINK   ext_hdiffpatch
+	LINK   ext_hdiffpatch libv_hash
 )
 
 wish_create_library(
@@ -583,6 +583,12 @@ wish_create_library(
 	TARGET libv_fsw STATIC
 	SOURCE src/libv/fsw/*.cpp
 	LINK   libv_utility ext_efsw
+)
+
+wish_create_library(
+	TARGET libv_hash STATIC
+	SOURCE src/libv/hash/*.cpp
+	LINK   ext_boost libv_utility
 )
 
 wish_create_library(

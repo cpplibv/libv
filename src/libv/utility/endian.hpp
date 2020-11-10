@@ -3,6 +3,7 @@
 #pragma once
 
 // std
+#include <bit>
 #include <type_traits>
 
 
