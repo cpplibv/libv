@@ -85,14 +85,22 @@ app.update: Implement an update server / client
 
 
 app.update: The update process:
-	download diff
-    copy update.exe to update.ex_
-	apply diff to update.ex_
-    rename update.exe to update.bak
-    // Only bricking point is here, and even then .bak could be renamed by hand
-    rename update.ex_ to update.exe
-    restart update.exe
-	remove update.bak
+	prep
+		create release
+		server side create diff from
+			folder/release A
+			folder/release B
+		save diff into patch folder with relevant information
+		sign the diff
+	update
+		download diff
+		copy update.exe to update.ex_
+		apply diff to update.ex_
+		rename update.exe to update.bak
+		// Only bricking point is here, and even then .bak could be renamed by hand
+		rename update.ex_ to update.exe
+		restart update.exe
+		remove update.bak
 
 app.update.security:
 	! must authenticate the server

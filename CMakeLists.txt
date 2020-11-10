@@ -778,6 +778,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_diff
+	SOURCE sandbox/libv_diff_main.cpp
+	LINK   libv_diff
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_ecs
 	SOURCE sandbox/libv_ecs_main.cpp
 	LINK   libv_log libv_ecs

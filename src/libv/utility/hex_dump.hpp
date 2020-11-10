@@ -4,6 +4,7 @@
 
 // std
 #include <iomanip>
+#include <span>
 #include <sstream>
 #include <string_view>
 
@@ -46,8 +47,11 @@ inline std::string hex_dump_with_ascii(const std::string_view& s) {
 
 		if (i % 32 == 0) {
 			ss << " | ";
-			for (size_t j = i - 32; j < i; ++j) {
+			for (size_t j = i - 32; j < i;) {
 				ss << (std::isprint(s[j]) ? s[j] : '.');
+				++j;
+				if (j % 8 == 0 && j % 32 != 0)
+					ss << ' ';
 			}
 			ss << "\n";
 		} else if (i % 8 == 0) {
@@ -73,11 +77,18 @@ inline std::string hex_dump_with_ascii(const std::string_view& s) {
 	}
 
 	ss << " | ";
-	for (size_t j = (i - 1) / 32 * 32; j < i; ++j) {
+	for (size_t j = (i - 1) / 32 * 32; j < i;) {
 		ss << (std::isprint(s[j]) ? s[j] : '.');
+		++j;
+		if (j % 8 == 0 && j % 32 != 0)
+			ss << ' ';
 	}
 
 	return std::move(ss).str();
+}
+
+inline std::string hex_dump_with_ascii(const std::span<const std::byte> s) {
+	return hex_dump_with_ascii(std::string_view(reinterpret_cast<const char*>(s.data()), s.size()));
 }
 
 // -------------------------------------------------------------------------------------------------

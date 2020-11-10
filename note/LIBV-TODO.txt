@@ -588,6 +588,8 @@ libv.utility: Add parse number utility functions
 libv.net.mtcp: Add endpoint selection support for acceptor
 libv.net: Implement perfect connection teardown
 libv: Split main track development to 3: Updater, UI, Game
+libv.diff: New library for diff and patch management
+libv.diff: Implement in memory diff and patch support
 
 
 --- STACK ------------------------------------------------------------------------------------------
@@ -597,7 +599,8 @@ libv: Split main track development to 3: Updater, UI, Game
 
 
 
-
+ext: Acquire a crypto lib
+ext: Acquire a hashing lib
 
 
 app.enum: new enum gen | rename and refactor
