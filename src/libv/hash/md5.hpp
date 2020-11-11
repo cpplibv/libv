@@ -3,9 +3,9 @@
 #pragma once
 
 // std
+#include <cstring>
 #include <iosfwd>
 #include <span>
-#include <string>
 #include <string_view>
 
 
@@ -19,10 +19,7 @@ struct md5 {
 
 public:
 	[[nodiscard]] friend constexpr inline bool operator==(const md5& lhs, const md5& rhs) noexcept {
-		for (int i = 0; i < 16; i++)
-			if (lhs.value[i] != rhs.value[i])
-				return false;
-		return true;
+		return std::memcmp(lhs.value, rhs.value, 16) == 0;
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const md5& md5);

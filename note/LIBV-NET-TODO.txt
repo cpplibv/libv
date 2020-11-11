@@ -54,6 +54,28 @@
 
 
 
+
+
+
+
+/d/temp/__20201111_120309_Gp1HYNSk> /e/dev/cpp/libv/bin/make_patch.exe -o /D/temp/__20201110_143012_CIWoAWXK/HDiffPatch/ -n /D/temp/__20201109_074307_8IqBFnlO/HDiffPatch/ -p test.lup -f
+
+
+
+
+
+
+
+libv.diff: make sure every stream of lvalue ref output respects offset
+libv.diff: make sure every stream input respects offset
+
+
+
+
+
+
+
+
 disconnect_immediate()
 
 

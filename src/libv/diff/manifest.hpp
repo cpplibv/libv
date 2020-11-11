@@ -5,8 +5,8 @@
 // libv
 #include <libv/hash/md5.hpp>
 // std
+#include <filesystem>
 #include <string>
-#include <string_view>
 #include <vector>
 
 
@@ -47,7 +47,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] Manifest create_manifest(const std::string_view root_path);
+[[nodiscard]] Manifest create_manifest(const std::filesystem::path& root_path);
 [[nodiscard]] ManifestDiff create_manifest_diff(const Manifest& old, const Manifest& new_);
 
 // -------------------------------------------------------------------------------------------------

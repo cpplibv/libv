@@ -7,8 +7,12 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <filesystem>
 // pro
 #include <libv/diff/diff.hpp>
+#include <libv/diff/manifest.hpp>
+#include <libv/hash/md5.hpp>
+#include <libv/utility/enum.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -156,71 +160,65 @@ bool test_file(const std::string_view file_old_, const std::string_view file_new
 
 // -------------------------------------------------------------------------------------------------
 
-//int main(int, const char**) {
-//	const std::string_view old_sv0 = "<libv/utilessed it by yourself or use create_compressed_diff()/patch_decompress() create compressed diffData;\n"
-//	                              "//\tif your file size very __ grelkj 999`888 98 large or request faster and less memity/hex_dump.hpp>handle_disconnectb";
-//	const std::string_view new_sv0 = "<hdiffpatch/HDiessed it by yourself or use c555()/patch_decompress() create compressed diffData;\n"
-//							      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
-//                                  "//\tif your file size very __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request faster and less memff/diff.h>handle_disconnecta";
-//
-//	const std::string_view old_sv1 = "f your file sizef your file size very\0 large or rvery large or r";
-//	const std::string_view new_sv1 = "f your file sizef your file size avery\0 large or rvery large or r";
-//
-//	const std::string_view old_sv2 = "";
-//	const std::string_view new_sv2 = "a";
-//
-//	const std::vector<std::byte> old_bv0 = to_bytes(old_sv0);
-//	const std::vector<std::byte> new_bv0 = to_bytes(new_sv0);
-//
-//	const std::vector<std::byte> old_bv1 = to_bytes(old_sv1);
-//	const std::vector<std::byte> new_bv1 = to_bytes(new_sv1);
-//
-//	const std::vector<std::byte> old_bv2 = to_bytes(old_sv2);
-//	const std::vector<std::byte> new_bv2 = to_bytes(new_sv2);
-//
-//	bool success = true;
-//
-//	success &= test_memory(old_sv0, new_sv0, 16);
-//	success &= test_memory(old_sv1, new_sv1, 16);
-//	success &= test_memory(old_sv2, new_sv2, 16);
-//
-//	success &= test_memory(old_bv0, new_bv0, 16);
-//	success &= test_memory(old_bv1, new_bv1, 16);
-//	success &= test_memory(old_bv2, new_bv2, 16);
-//
-//	success &= test_stream(old_sv0, new_sv0, 16);
-//	success &= test_stream(old_sv1, new_sv1, 16);
-//	success &= test_stream(old_sv2, new_sv2, 16);
-//
-//	success &= test_file("example_libv_control_hello.exe", "example_libv_control_camera.exe", 16);
-//
-//	return success ? EXIT_SUCCESS : EXIT_FAILURE;
-//}
-
-#include <filesystem>
-#include <libv/diff/manifest.hpp>
-#include <libv/hash/md5.hpp>
-#include <libv/utility/enum.hpp>
-
-
-
-int main() {
+int main(int, const char**) {
 	std::filesystem::current_path(std::filesystem::current_path().parent_path());
+
+	const std::string_view old_sv0 = "<libv/utilessed it by yourself or use create_compressed_diff()/patch_decompress() create compressed diffData;\n"
+	                              "//\tif your file size very __ grelkj 999`888 98 large or request faster and less memity/hex_dump.hpp>handle_disconnectb";
+	const std::string_view new_sv0 = "<hdiffpatch/HDiessed it by yourself or use c555()/patch_decompress() create compressed diffData;\n"
+							      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+                                  "//\tif your file size very __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request __ grelkj 999`888 98 large or request faster and less memff/diff.h>handle_disconnecta";
+
+	const std::string_view old_sv1 = "f your file sizef your file size very\0 large or rvery large or r";
+	const std::string_view new_sv1 = "f your file sizef your file size avery\0 large or rvery large or r";
+
+	const std::string_view old_sv2 = "";
+	const std::string_view new_sv2 = "a";
+
+	const std::vector<std::byte> old_bv0 = to_bytes(old_sv0);
+	const std::vector<std::byte> new_bv0 = to_bytes(new_sv0);
+
+	const std::vector<std::byte> old_bv1 = to_bytes(old_sv1);
+	const std::vector<std::byte> new_bv1 = to_bytes(new_sv1);
+
+	const std::vector<std::byte> old_bv2 = to_bytes(old_sv2);
+	const std::vector<std::byte> new_bv2 = to_bytes(new_sv2);
+
+	bool success = true;
+
+	success &= test_memory(old_sv0, new_sv0, 16);
+	success &= test_memory(old_sv1, new_sv1, 16);
+	success &= test_memory(old_sv2, new_sv2, 16);
+
+	success &= test_memory(old_bv0, new_bv0, 16);
+	success &= test_memory(old_bv1, new_bv1, 16);
+	success &= test_memory(old_bv2, new_bv2, 16);
+
+	success &= test_stream(old_sv0, new_sv0, 16);
+	success &= test_stream(old_sv1, new_sv1, 16);
+	success &= test_stream(old_sv2, new_sv2, 16);
+
+	success &= test_file("bin/example_libv_control_hello.exe", "bin/example_libv_control_camera.exe", 16);
+
+	std::cout << "=================================================================================================" << std::endl;
 
 	const auto manifest = libv::diff::create_manifest("src");
 
 	for (const auto& entry : manifest.entries)
 		std::cout << entry.md5 << " " << entry.path << std::endl;
 
-//	const auto manifest_a = libv::diff::create_manifest("D:/temp/__20201110_143012_CIWoAWXK/HDiffPatch/");
-//	const auto manifest_b = libv::diff::create_manifest("D:/temp/__20201109_074307_8IqBFnlO/HDiffPatch/");
-//	const auto manifest_diff = libv::diff::create_manifest_diff(manifest_a, manifest_b);
-//
-//	for (const auto& entry : manifest_diff.entries)
-//		std::cout << libv::to_value(entry.change) << " " << entry.path << std::endl;
+	std::cout << "=================================================================================================" << std::endl;
 
-	return EXIT_SUCCESS;
+	const auto manifest_a = libv::diff::create_manifest("D:/temp/__20201110_143012_CIWoAWXK/HDiffPatch/");
+	const auto manifest_b = libv::diff::create_manifest("D:/temp/__20201109_074307_8IqBFnlO/HDiffPatch/");
+	const auto manifest_diff = libv::diff::create_manifest_diff(manifest_a, manifest_b);
+
+	for (const auto& entry : manifest_diff.entries)
+		std::cout << libv::to_value(entry.change) << " " << entry.path << std::endl;
+
+	std::cout << "=================================================================================================" << std::endl;
+
+	return success ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
 
 // -------------------------------------------------------------------------------------------------

@@ -20,16 +20,16 @@ template <typename = void>
 void write_file_or_throw(const std::filesystem::path& filePath, std::string_view data) {
 	std::filesystem::create_directories(filePath.parent_path());
 
-	std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+	std::ofstream file(filePath, std::ios_base::binary | std::ios_base::out);
 
 	if (!file)
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", filePath.string()));
+		throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", filePath.generic_string()));
 
 	file.write(data.data(), data.size());
 	file.close();
 
 	if (file.fail())
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to write file: ", filePath.string()));
+		throw std::system_error(errno, std::system_category(), libv::concat("Failed to write file: ", filePath.generic_string()));
 }
 
 inline void write_file_or_throw(const std::filesystem::path& filePath, std::span<const std::byte> data) {
@@ -50,7 +50,7 @@ void write_file(const std::filesystem::path& filePath, std::string_view data, st
 			return;
 	}
 
-	std::ofstream file(filePath, std::ios_base::out | std::ios_base::binary);
+	std::ofstream file(filePath, std::ios_base::binary | std::ios_base::out);
 
 	if (!file) {
 		ec.assign(errno, std::system_category());

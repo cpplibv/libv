@@ -62,21 +62,16 @@ md5 hash_md5(std::istream& stream) {
 	static constexpr size_t batch_size = 16 * 1024;
 	char buffer[batch_size];
 
-	stream.seekg(0, std::ios::end);
-	const auto size = static_cast<size_t>(stream.tellg());
-	stream.seekg(0, std::ios::beg);
-
-	const auto batch_count = size / batch_size;
-
 	boost::uuids::detail::md5 hasher;
 
-	for (size_t i = 0; i < batch_count; i++) {
+	while(!stream.eof()) {
 		stream.read(buffer, batch_size);
-		hasher.process_bytes(buffer, batch_size);
+		hasher.process_bytes(buffer, stream.gcount());
 	}
 
-	stream.read(buffer, size - batch_count * batch_size);
-	hasher.process_bytes(buffer, size - batch_count * batch_size);
+	// Clear fail bit as we intentionally tried to over-read
+	if (stream.rdstate() == (std::istream::eofbit | std::istream::failbit))
+		stream.clear(std::istream::eofbit);
 
 	boost::uuids::detail::md5::digest_type digest;
 	hasher.get_digest(digest);

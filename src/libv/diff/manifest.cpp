@@ -4,9 +4,9 @@
 #include <libv/diff/manifest.hpp>
 // libv
 #include <libv/algorithm/outer_join.hpp>
+#include <libv/utility/concat.hpp>
 // std
 #include <algorithm>
-#include <filesystem>
 #include <fstream>
 
 
@@ -15,10 +15,8 @@ namespace diff {
 
 // -------------------------------------------------------------------------------------------------
 
-Manifest create_manifest(const std::string_view root_path_str) {
+Manifest create_manifest(const std::filesystem::path& root_path) {
 	Manifest manifest;
-
-	std::filesystem::path root_path = root_path_str;
 
 	for (const auto& entry : std::filesystem::recursive_directory_iterator(root_path)) {
 		if (not entry.is_regular_file())
@@ -26,10 +24,19 @@ Manifest create_manifest(const std::string_view root_path_str) {
 
 		const auto& path = entry.path();
 		const auto rel_path = std::filesystem::relative(path, root_path);
+		auto path_str = rel_path.generic_string();
 
 		std::ifstream file(path, std::ios::binary | std::ios::in);
+
+		if (!file)
+			throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", path_str));
+
 		auto md5 = libv::hash::hash_md5(file);
-		auto path_str = rel_path.generic_string();
+
+		file.close();
+
+		if (file.fail())
+			throw std::system_error(errno, std::system_category(), libv::concat("Failed to read file: ", path_str));
 
 		manifest.entries.emplace_back(std::move(path_str), std::move(md5));
 	}
@@ -40,9 +47,9 @@ Manifest create_manifest(const std::string_view root_path_str) {
 }
 
 ManifestDiff create_manifest_diff(const Manifest& old, const Manifest& new_) {
-	ManifestDiff result;
+	ManifestDiff manifest_diff;
 
-	libv::outer_join(old.entries, new_.entries, [&result](auto o, auto n) {
+	libv::outer_join(old.entries, new_.entries, [&manifest_diff](auto o, auto n) {
 		if (o && n && o->md5 == n->md5)
 			return;
 
@@ -53,11 +60,11 @@ ManifestDiff create_manifest_diff(const Manifest& old, const Manifest& new_) {
 
 		const auto& path = n ? n->path : o->path;
 
-		result.entries.emplace_back(path, change);
+		manifest_diff.entries.emplace_back(path, change);
 
 	}, std::ranges::less{}, &Manifest::Entry::path);
 
-	return result;
+	return manifest_diff;
 }
 
 // -------------------------------------------------------------------------------------------------

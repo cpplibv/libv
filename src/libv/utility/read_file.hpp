@@ -2,10 +2,9 @@
 
 #pragma once
 
-// ext
-#include <fmt/format.h>
 // libv
 #include <libv/log/log.hpp>
+#include <libv/utility/concat.hpp>
 // std
 #include <filesystem>
 #include <fstream>
@@ -20,11 +19,11 @@ namespace libv {
 
 template <typename Fallback = std::string_view>
 [[nodiscard]] std::string read_file_or(const std::filesystem::path& filePath, Fallback&& fallback = "") {
-	std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+	std::ifstream file(filePath, std::ios_base::binary | std::ios_base::in);
 
 	if (!file) {
 		const auto err = errno;
-		log.error("Failed to open file: {} - {}: {}", filePath, err, std::system_category().message(err));
+		log.error("Failed to open file: {} - {}: {}", filePath.generic_string(), err, std::system_category().message(err));
 		return std::string{std::forward<Fallback>(fallback)};
 	}
 
@@ -34,7 +33,7 @@ template <typename Fallback = std::string_view>
 
 	if (file.fail()) {
 		const auto err = errno;
-		log.error("Failed to read file: {} - {}: {}", filePath, err, std::system_category().message(err));
+		log.error("Failed to read file: {} - {}: {}", filePath.generic_string(), err, std::system_category().message(err));
 		return std::string{std::forward<Fallback>(fallback)};
 	}
 
@@ -45,17 +44,17 @@ template <typename Fallback = std::string_view>
 
 template <typename = void>
 [[nodiscard]] std::string read_file_or_throw(const std::filesystem::path& filePath) {
-	std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+	std::ifstream file(filePath, std::ios_base::binary | std::ios_base::in);
 
 	if (!file)
-		throw std::system_error(errno, std::system_category(), fmt::format("Failed to open file: {}", filePath));
+		throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", filePath.generic_string()));
 
 	std::ostringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
 
 	if (file.fail())
-		throw std::system_error(errno, std::system_category(), fmt::format("Failed to read file: {}", filePath));
+		throw std::system_error(errno, std::system_category(), libv::concat("Failed to read file: ", filePath.generic_string()));
 
 	return std::move(buffer).str();
 }
@@ -64,7 +63,7 @@ template <typename = void>
 
 template <typename = void>
 [[nodiscard]] std::string read_file(const std::filesystem::path& filePath, std::error_code& ec) {
-	std::ifstream file(filePath, std::ios_base::in | std::ios_base::binary);
+	std::ifstream file(filePath, std::ios_base::binary | std::ios_base::in);
 
 	if (!file) {
 		ec.assign(errno, std::system_category());

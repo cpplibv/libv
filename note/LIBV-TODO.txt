@@ -1626,7 +1626,11 @@ ninja: CLICOLOR_FORCE=1 env var to have colored output
 
 --- INFO -------------------------------------------------------------------------------------------
 
-Used default port ranges in LIBV
+Extensions: Used default file extensions in LIBV
+	.vm4 - vader model 4
+	.vup - vader update patch
+
+Ports: Used default port ranges in LIBV
 	25090 - Update server listening
 	25091 - RESERVED
 	25092 - RESERVED

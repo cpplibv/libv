@@ -34,20 +34,6 @@ namespace diff {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-static auto write_dyn_fn(
-		const hpatch_TStreamOutput* stream,
-		hpatch_StreamPos_t writeToPos,
-		const unsigned char* out_data,
-		const unsigned char* out_data_end) {
-
-	auto vec = reinterpret_cast<T*>(stream->streamImport);
-	vec->resize(std::max(vec->size(), writeToPos + (out_data_end - out_data)));
-	std::memcpy(vec->data() + writeToPos, out_data, out_data_end - out_data);
-
-	return hpatch_TRUE;
-}
-
 static auto read_stream_fn(
 		const hpatch_TStreamInput* stream,
 		hpatch_StreamPos_t readFromPos,
@@ -63,25 +49,6 @@ static auto read_stream_fn(
 		s->seekg(readFromPos);
 
 	s->read(out_ptr, out_num);
-
-	return hpatch_TRUE;
-}
-
-static auto write_stream_fn(
-		const hpatch_TStreamOutput* stream,
-		hpatch_StreamPos_t writeToPos,
-		const unsigned char* data,
-		const unsigned char* data_end) {
-
-	const auto ptr = reinterpret_cast<const char*>(data);
-	const auto num = data_end - data;
-
-	auto s = reinterpret_cast<std::ostream*>(stream->streamImport);
-
-	if (writeToPos != static_cast<hpatch_uint64_t>(s->tellp()))
-		s->seekp(writeToPos);
-
-	s->write(ptr, num);
 
 	return hpatch_TRUE;
 }
@@ -103,14 +70,38 @@ static inline auto fix_output(T& out) noexcept {
 }
 
 template <typename OUT_DYN>
-static inline auto dyn_output(OUT_DYN& out) noexcept {
-	hpatch_TStreamOutput stream;
-	stream.streamImport = reinterpret_cast<void*>(&out);
-	stream.streamSize = std::numeric_limits<size_t>::max();
-	stream.read_writed = nullptr;
-	stream.write = write_dyn_fn<OUT_DYN>;
-	return stream;
-}
+struct dyn_output {
+	hpatch_TStreamOutput base;
+	OUT_DYN& out;
+	size_t offset;
+
+	static auto write_fn(
+			const hpatch_TStreamOutput* stream,
+			hpatch_StreamPos_t writeToPos,
+			const unsigned char* data,
+			const unsigned char* data_end) {
+
+		const auto ptr = reinterpret_cast<const char*>(data);
+		const auto num = data_end - data;
+		auto& self = *reinterpret_cast<dyn_output*>(stream->streamImport);
+
+		writeToPos += self.offset;
+
+		self.out.resize(std::max(self.out.size(), writeToPos + num));
+		std::memcpy(self.out.data() + writeToPos, ptr, num);
+
+		return hpatch_TRUE;
+	}
+
+	explicit inline dyn_output(OUT_DYN& out) noexcept :
+		out(out) {
+		base.streamImport = reinterpret_cast<void*>(this);
+		base.streamSize = std::numeric_limits<size_t>::max();
+		base.read_writed = nullptr;
+		base.write = write_fn;
+		offset = out.size();
+	}
+};
 
 static inline auto stream_input(std::istream& s) noexcept {
 	s.seekg(0, std::ios::end);
@@ -124,14 +115,40 @@ static inline auto stream_input(std::istream& s) noexcept {
 	return stream;
 }
 
-static inline auto stream_output(std::ostream& s) noexcept {
-	hpatch_TStreamOutput stream;
-	stream.streamImport = reinterpret_cast<void*>(&s);
-	stream.streamSize = std::numeric_limits<size_t>::max();
-	stream.read_writed = nullptr;
-	stream.write = write_stream_fn;
-	return stream;
-}
+struct stream_output {
+	hpatch_TStreamOutput base;
+	std::ostream& ostream;
+	size_t offset;
+
+	static auto write_fn(
+			const hpatch_TStreamOutput* stream,
+			hpatch_StreamPos_t writeToPos,
+			const unsigned char* data,
+			const unsigned char* data_end) {
+
+		const auto ptr = reinterpret_cast<const char*>(data);
+		const auto num = data_end - data;
+		auto& self = *reinterpret_cast<stream_output*>(stream->streamImport);
+
+		writeToPos += self.offset;
+
+		if (writeToPos != static_cast<hpatch_uint64_t>(self.ostream.tellp()))
+			self.ostream.seekp(writeToPos);
+
+		self.ostream.write(ptr, num);
+
+		return hpatch_TRUE;
+	}
+
+	inline stream_output(std::ostream& s, size_t streamSize) noexcept :
+		ostream(s) {
+		base.streamImport = reinterpret_cast<void*>(this);
+		base.streamSize = streamSize;
+		base.read_writed = nullptr;
+		base.write = write_fn;
+		offset = s.tellp();
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -139,17 +156,17 @@ template <typename OUT_DYN>
 static inline void aux_create_diff(bv old, bv new_, OUT_DYN& out_diff, size_t match_block_size) {
 	auto old_stream = fix_input(old);
 	auto new_stream = fix_input(new_);
-	auto diff_stream = dyn_output(out_diff);
+	auto diff_stream = dyn_output<OUT_DYN>(out_diff);
 
-	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr, match_block_size);
+	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream.base, nullptr, match_block_size);
 }
 
 static inline void aux_create_diff_stream(std::istream& old, std::istream& new_, std::ostream& diff, size_t match_block_size) {
 	auto old_stream = stream_input(old);
 	auto new_stream = stream_input(new_);
-	auto diff_stream = stream_output(diff);
+	auto diff_stream = stream_output(diff, std::numeric_limits<size_t>::max());
 
-	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr, match_block_size);
+	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream.base, nullptr, match_block_size);
 }
 
 [[nodiscard]] static inline bool aux_check_diff(bv old, bv new_, bv diff) {
@@ -194,11 +211,9 @@ template <typename OUT_DYN>
 
 	auto old_stream = stream_input(old);
 	auto diff_stream = stream_input(diff);
-	auto new_stream = stream_output(new_);
+	auto new_stream = stream_output(new_, diff_info.new_size); // HDiffPatch requires stream size to be set on patch apply
 
-	new_stream.streamSize = diff_info.new_size; // HDiffPatch requires stream size to be set on patch apply
-
-	const auto success = patch_decompress(&new_stream, &old_stream, &diff_stream, nullptr);
+	const auto success = patch_decompress(&new_stream.base, &old_stream, &diff_stream, nullptr);
 
 	return success;
 }
