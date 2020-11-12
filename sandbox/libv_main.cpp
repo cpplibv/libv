@@ -296,21 +296,85 @@
 //}
 //
 //// =================================================================================================
+//
+//#include <iostream>
+//#include <libv/utility/hex_dump.hpp>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//int main(int, const char**) {
+//	for (int i = 0; i <= 64; ++i) {
+//		std::string str;
+//		for (int j = 0; j < i; ++j) {
+//			str += (j <= 'z' - 'a') ? 'a' + j : 'A' + (j - ('z' - 'a'));
+//		}
+//
+//		std::cout << libv::hex_dump_with_ascii(str) << std::endl;
+//	}
+//
+//	return EXIT_SUCCESS;
+//}
+//
+//// =================================================================================================
 
 #include <iostream>
-#include <libv/utility/hex_dump.hpp>
+#include <libv/utility/uniform_distribution.hpp>
+#include <random>
+#include <chrono>
 
 // -------------------------------------------------------------------------------------------------
 
-int main(int, const char**) {
-	for (int i = 0; i <= 64; ++i) {
-		std::string str;
-		for (int j = 0; j < i; ++j) {
-			str += (j <= 'z' - 'a') ? 'a' + j : 'A' + (j - ('z' - 'a'));
-		}
+#define LIFT(FUNC) [](auto... a) { return FUNC(a...); }
 
-		std::cout << libv::hex_dump_with_ascii(str) << std::endl;
-	}
+int main(int, const char**) {
+	static constexpr auto seed = 0x5EED;
+	std::mt19937_64 rng;
+
+	const auto make = [&rng](auto f, auto... a) {
+		std::cout << " --- " << std::endl;
+		rng.seed(seed);
+
+		auto dist = f(a...);
+
+		for (int i = 0; i < 10; ++i)
+			if constexpr ((libv::is_std_chrono_duration_v<decltype(a)> && ...))
+				std::cout << dist(rng).count() << std::endl;
+			else
+				std::cout << dist(rng) << std::endl;
+	};
+
+	using isec = std::chrono::seconds;
+	using fsec = std::chrono::duration<float, std::chrono::seconds::period>;
+
+	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20);
+	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20.0);
+	make(LIFT(libv::make_uniform_distribution_inclusive), isec{10}, isec{20});
+	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{10}, fsec{20.0});
+
+	make(LIFT(libv::make_uniform_distribution_inclusive), 20);
+	make(LIFT(libv::make_uniform_distribution_inclusive), 20.0);
+	make(LIFT(libv::make_uniform_distribution_inclusive), isec{20});
+	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{20.0});
+
+	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20);
+	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20.0);
+	make(LIFT(libv::make_uniform_distribution_exclusive), isec{10}, isec{20});
+	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{10}, fsec{20.0});
+
+	make(LIFT(libv::make_uniform_distribution_exclusive), 20);
+	make(LIFT(libv::make_uniform_distribution_exclusive), 20.0);
+	make(LIFT(libv::make_uniform_distribution_exclusive), isec{20});
+	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{20.0});
+
+
+//	rng.seed(seed);
+//
+//	auto dist_in = libv::make_uniform_distribution_inclusive(10, 20);
+//	auto dist_ex = libv::make_uniform_distribution_exclusive(10, 20);
+//
+//	for (int i = 0; i < 100; ++i)
+//		std::cout << dist_in(rng) << " "  << dist_ex(rng) << std::endl;
+
 
 	return EXIT_SUCCESS;
 }
