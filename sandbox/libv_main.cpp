@@ -316,67 +316,105 @@
 //}
 //
 //// =================================================================================================
+//
+//#include <iostream>
+//#include <libv/utility/uniform_distribution.hpp>
+//#include <random>
+//#include <chrono>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//#define LIFT(FUNC) [](auto... a) { return FUNC(a...); }
+//
+//int main(int, const char**) {
+//	static constexpr auto seed = 0x5EED;
+//	std::mt19937_64 rng;
+//
+//	const auto make = [&rng](auto f, auto... a) {
+//		std::cout << " --- " << std::endl;
+//		rng.seed(seed);
+//
+//		auto dist = f(a...);
+//
+//		for (int i = 0; i < 10; ++i)
+//			if constexpr ((libv::is_std_chrono_duration_v<decltype(a)> && ...))
+//				std::cout << dist(rng).count() << std::endl;
+//			else
+//				std::cout << dist(rng) << std::endl;
+//	};
+//
+//	using isec = std::chrono::seconds;
+//	using fsec = std::chrono::duration<float, std::chrono::seconds::period>;
+//
+//	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20);
+//	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20.0);
+//	make(LIFT(libv::make_uniform_distribution_inclusive), isec{10}, isec{20});
+//	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{10}, fsec{20.0});
+//
+//	make(LIFT(libv::make_uniform_distribution_inclusive), 20);
+//	make(LIFT(libv::make_uniform_distribution_inclusive), 20.0);
+//	make(LIFT(libv::make_uniform_distribution_inclusive), isec{20});
+//	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{20.0});
+//
+//	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20);
+//	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20.0);
+//	make(LIFT(libv::make_uniform_distribution_exclusive), isec{10}, isec{20});
+//	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{10}, fsec{20.0});
+//
+//	make(LIFT(libv::make_uniform_distribution_exclusive), 20);
+//	make(LIFT(libv::make_uniform_distribution_exclusive), 20.0);
+//	make(LIFT(libv::make_uniform_distribution_exclusive), isec{20});
+//	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{20.0});
+//
+//
+////	rng.seed(seed);
+////
+////	auto dist_in = libv::make_uniform_distribution_inclusive(10, 20);
+////	auto dist_ex = libv::make_uniform_distribution_exclusive(10, 20);
+////
+////	for (int i = 0; i < 100; ++i)
+////		std::cout << dist_in(rng) << " "  << dist_ex(rng) << std::endl;
+//
+//
+//	return EXIT_SUCCESS;
+//}
+//
+//// =================================================================================================
 
-#include <iostream>
+#include <libv/mt/mutex_lock_file.hpp>
 #include <libv/utility/uniform_distribution.hpp>
-#include <random>
 #include <chrono>
+#include <iostream>
+#include <mutex>
+#include <thread>
+#include <random>
 
 // -------------------------------------------------------------------------------------------------
 
-#define LIFT(FUNC) [](auto... a) { return FUNC(a...); }
+int main(int argc, const char** argv) {
+	if (argc < 2)
+		return EXIT_FAILURE;
 
-int main(int, const char**) {
-	static constexpr auto seed = 0x5EED;
-	std::mt19937_64 rng;
+	std::random_device rng;
+	std::this_thread::sleep_for(libv::make_uniform_distribution_inclusive(std::chrono::milliseconds(1000))(rng));
 
-	const auto make = [&rng](auto f, auto... a) {
-		std::cout << " --- " << std::endl;
-		rng.seed(seed);
+	libv::mt::mutex_lock_file mutex(".lock");
+	std::unique_lock lock(mutex, std::defer_lock);
 
-		auto dist = f(a...);
+	for (int i = 0; i < 1000; i++) {
+		if (lock.try_lock()) {
+			break;
+		}
+		std::cout << argv[1] << " Waiting" << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	}
 
-		for (int i = 0; i < 10; ++i)
-			if constexpr ((libv::is_std_chrono_duration_v<decltype(a)> && ...))
-				std::cout << dist(rng).count() << std::endl;
-			else
-				std::cout << dist(rng) << std::endl;
-	};
-
-	using isec = std::chrono::seconds;
-	using fsec = std::chrono::duration<float, std::chrono::seconds::period>;
-
-	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20);
-	make(LIFT(libv::make_uniform_distribution_inclusive), 10, 20.0);
-	make(LIFT(libv::make_uniform_distribution_inclusive), isec{10}, isec{20});
-	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{10}, fsec{20.0});
-
-	make(LIFT(libv::make_uniform_distribution_inclusive), 20);
-	make(LIFT(libv::make_uniform_distribution_inclusive), 20.0);
-	make(LIFT(libv::make_uniform_distribution_inclusive), isec{20});
-	make(LIFT(libv::make_uniform_distribution_inclusive), fsec{20.0});
-
-	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20);
-	make(LIFT(libv::make_uniform_distribution_exclusive), 10, 20.0);
-	make(LIFT(libv::make_uniform_distribution_exclusive), isec{10}, isec{20});
-	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{10}, fsec{20.0});
-
-	make(LIFT(libv::make_uniform_distribution_exclusive), 20);
-	make(LIFT(libv::make_uniform_distribution_exclusive), 20.0);
-	make(LIFT(libv::make_uniform_distribution_exclusive), isec{20});
-	make(LIFT(libv::make_uniform_distribution_exclusive), fsec{20.0});
-
-
-//	rng.seed(seed);
-//
-//	auto dist_in = libv::make_uniform_distribution_inclusive(10, 20);
-//	auto dist_ex = libv::make_uniform_distribution_exclusive(10, 20);
-//
-//	for (int i = 0; i < 100; ++i)
-//		std::cout << dist_in(rng) << " "  << dist_ex(rng) << std::endl;
-
+	for (int i = 0; i < 10; i++) {
+		std::cout << argv[1] << " Working" << std::endl;
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	}
 
 	return EXIT_SUCCESS;
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------

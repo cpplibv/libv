@@ -658,7 +658,8 @@ wish_create_library(
 	TARGET libv_mt STATIC
 	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
-	LINK   libv_utility # For unique_function
+	LINK   libv_utility # For unique_function and concat
+	LINK   ext_boost # For interprocess file_lock
 )
 
 wish_create_library(
@@ -853,8 +854,9 @@ wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
 	LINK   libv_log libv_utility
-#	LINK   libv_ctrl libv_mt ext_boost ext_boost_stacktrace ext_glm ext_range
+#	LINK   libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
 	LINK   libv_diff
+	LINK   libv_mt
 )
 
 wish_create_executable(
