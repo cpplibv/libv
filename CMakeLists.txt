@@ -659,7 +659,6 @@ wish_create_library(
 	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
 	LINK   libv_utility # For unique_function and concat
-	LINK   ext_boost # For interprocess file_lock
 )
 
 wish_create_library(
@@ -671,6 +670,13 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_utility INTERFACE
 	LINK   Threads::Threads
+)
+
+wish_create_library(
+	TARGET libv_process STATIC
+	SOURCE src/libv/process/*.cpp
+	LINK   Threads::Threads
+	LINK   ext_boost # For interprocess file_lock
 )
 
 wish_create_library(

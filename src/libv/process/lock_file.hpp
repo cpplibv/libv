@@ -1,4 +1,4 @@
-// Project: libv, File: app/update/make_patch.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.process, File: src/libv/process/lock_file.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -8,33 +8,29 @@
 
 
 namespace libv {
-namespace mt {
-
-// -------------------------------------------------------------------------------------------------
-
-// TODO P5: This should file and mutex_lock_file should be in an inter process and not multi thread library. Create another lib
+namespace process {
 
 // -------------------------------------------------------------------------------------------------
 
 /// Note: For each file, use a single file_lock object per process.
 /// Note: Use the same thread to lock and unlock a file.
-class mutex_lock_file {
-	std::unique_ptr<class impl_mutex_lock_file> self;
+class lock_file {
+	std::unique_ptr<class impl_lock_file> self;
 
 public:
 	///	Opens a file lock. If the file does not exist creates it.
 	/// Throws: interprocess_exception if the file creation or the file access fails.
-	explicit mutex_lock_file(const std::filesystem::path& filepath);
+	explicit lock_file(const std::filesystem::path& filepath);
 
-	mutex_lock_file() = delete;
-	mutex_lock_file(const mutex_lock_file&) = delete;
-	mutex_lock_file& operator=(const mutex_lock_file&) & = delete;
+	lock_file() = delete;
+	lock_file(const lock_file&) = delete;
+	lock_file& operator=(const lock_file&) & = delete;
 
-	mutex_lock_file(mutex_lock_file&&) noexcept = default;
-	mutex_lock_file& operator=(mutex_lock_file&&) & noexcept = default;
+	lock_file(lock_file&&) noexcept = default;
+	lock_file& operator=(lock_file&&) & noexcept = default;
 
-	///	Closes and attempts to deletes the lock file. Does not throw.
-	~mutex_lock_file() noexcept;
+	///	Closes (and attempts to delete) the lock file. Does not throw.
+	~lock_file() noexcept;
 
 public:
 	///	Effects: The calling thread tries to obtain exclusive ownership of the mutex,
@@ -78,5 +74,5 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace mt
+} // namespace process
 } // namespace libv
