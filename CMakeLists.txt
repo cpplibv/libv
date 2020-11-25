@@ -675,7 +675,6 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_process STATIC
 	SOURCE src/libv/process/*.cpp
-	LINK   Threads::Threads
 	LINK   ext_boost # For interprocess file_lock
 )
 
@@ -707,7 +706,7 @@ wish_create_library(
 	# TODO P5: Make this an object library
 	TARGET update_common STATIC
 	SOURCE app/update/common/*.cpp
-	LINK   libv_net
+	LINK   libv_net libv_process
 )
 
 wish_create_executable(
@@ -733,9 +732,9 @@ add_custom_target(update DEPENDS update_client update_server)
 # ---
 
 wish_create_executable(
-		TARGET app_binary_to_source
-		SOURCE app/binary_to_source.cpp
-		LINK   ext_fmt libv_utility
+	TARGET app_binary_to_source
+	SOURCE app/binary_to_source.cpp
+	LINK   ext_fmt libv_utility
 )
 
 wish_create_executable(

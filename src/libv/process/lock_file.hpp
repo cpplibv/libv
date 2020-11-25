@@ -5,6 +5,7 @@
 // std
 #include <filesystem>
 #include <memory>
+#include <mutex>
 
 
 namespace libv {
@@ -18,7 +19,9 @@ class lock_file {
 	std::unique_ptr<class impl_lock_file> self;
 
 public:
-	///	Opens a file lock. If the file does not exist creates it.
+	///	Opens a file lock.
+	/// If the file does not exist creates it.
+	/// Does not acquires the lock.
 	/// Throws: interprocess_exception if the file creation or the file access fails.
 	explicit lock_file(const std::filesystem::path& filepath);
 
@@ -30,6 +33,7 @@ public:
 	lock_file& operator=(lock_file&&) & noexcept = default;
 
 	///	Closes (and attempts to delete) the lock file. Does not throw.
+	/// Does not releases the lock.
 	~lock_file() noexcept;
 
 public:
@@ -70,6 +74,151 @@ public:
 	///	Effects: The calling thread releases the sharable ownership of the mutex.
 	///	Throws: An exception derived from interprocess_exception on error.
 	void unlock_shared();
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class lock_file_guard {
+	lock_file mutex;
+	bool owns;
+
+public:
+	lock_file_guard() = delete;
+	lock_file_guard(const lock_file_guard&) = delete;
+	lock_file_guard& operator=(const lock_file_guard&) & = delete;
+
+	inline explicit lock_file_guard(const std::filesystem::path& filepath) :
+		mutex(filepath),
+		owns(true) {
+		lock();
+	}
+
+	inline lock_file_guard(const std::filesystem::path& filepath, std::defer_lock_t) :
+		mutex(filepath),
+		owns(false) {
+	}
+
+	inline lock_file_guard(lock_file_guard&& orig) noexcept :
+		mutex(std::move(orig.mutex)),
+		owns(orig.owns)	{
+		orig.owns = false;
+	}
+
+	inline lock_file_guard& operator=(lock_file_guard&& orig) & noexcept {
+		if (owns_lock())
+			unlock();
+
+		mutex = std::move(orig.mutex);
+		owns = orig.owns;
+		orig.owns = false;
+
+		return *this;
+	}
+
+	inline ~lock_file_guard() noexcept {
+		if (owns_lock())
+			unlock();
+	}
+
+public:
+	inline void lock() {
+		mutex.lock();
+	}
+
+	[[nodiscard]] inline bool try_lock() {
+		return mutex.try_lock();
+	}
+
+	inline void unlock() {
+		mutex.unlock();
+	}
+
+public:
+	[[nodiscard]] inline bool owns_lock() const noexcept {
+		return owns;
+	}
+
+	[[nodiscard]] explicit inline operator bool() const noexcept {
+		return owns_lock();
+	}
+
+	[[nodiscard]] inline bool operator!() const noexcept {
+		return !owns_lock();
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class lock_file_shared_guard {
+	lock_file mutex;
+	bool owns;
+
+public:
+	lock_file_shared_guard() = delete;
+	lock_file_shared_guard(const lock_file_shared_guard&) = delete;
+	lock_file_shared_guard& operator=(const lock_file_shared_guard&) & = delete;
+
+	inline explicit lock_file_shared_guard(const std::filesystem::path& filepath) :
+		mutex(filepath),
+		owns(true) {
+		lock();
+	}
+
+	inline lock_file_shared_guard(const std::filesystem::path& filepath, std::defer_lock_t) :
+		mutex(filepath),
+		owns(false) {
+	}
+
+	inline lock_file_shared_guard(lock_file_shared_guard&& orig) noexcept :
+		mutex(std::move(orig.mutex)),
+		owns(orig.owns)	{
+		orig.owns = false;
+	}
+
+	inline lock_file_shared_guard& operator=(lock_file_shared_guard&& orig) & noexcept {
+		if (owns_lock())
+			unlock();
+
+		mutex = std::move(orig.mutex);
+		owns = orig.owns;
+		orig.owns = false;
+
+		return *this;
+	}
+
+	inline ~lock_file_shared_guard() noexcept {
+		if (owns_lock())
+			unlock();
+	}
+
+public:
+	inline void lock() {
+		mutex.lock_shared();
+		owns = true;
+	}
+
+	[[nodiscard]] inline bool try_lock() {
+		owns = mutex.try_lock_shared();
+		return owns;
+	}
+
+	inline void unlock() {
+		mutex.unlock_shared();
+		owns = false;
+	}
+
+public:
+	[[nodiscard]] inline bool owns_lock() const noexcept {
+		return owns;
+	}
+
+	[[nodiscard]] explicit inline operator bool() const noexcept {
+		return owns_lock();
+	}
+
+	[[nodiscard]] inline bool operator!() const noexcept {
+		return !owns_lock();
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

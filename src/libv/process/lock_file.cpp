@@ -17,12 +17,12 @@ namespace process {
 
 struct impl_lock_file {
 	std::ofstream file;
-	boost::interprocess::file_lock lock;
+	boost::interprocess::file_lock mutex;
 	std::filesystem::path filepath;
 
 	explicit impl_lock_file(std::filesystem::path filepath) :
 		file(filepath, std::ios::binary | std::ios::out),
-		lock(filepath.string().c_str()),
+		mutex(filepath.string().c_str()),
 		filepath(std::move(filepath)) {
 	}
 };
@@ -48,27 +48,27 @@ lock_file::~lock_file() {
 }
 
 void lock_file::lock() {
-	self->lock.lock();
+	self->mutex.lock();
 }
 
 void lock_file::lock_shared() {
-	self->lock.lock_sharable();
+	self->mutex.lock_sharable();
 }
 
 bool lock_file::try_lock() {
-	return self->lock.try_lock();
+	return self->mutex.try_lock();
 }
 
 bool lock_file::try_lock_shared() {
-	return self->lock.try_lock_sharable();
+	return self->mutex.try_lock_sharable();
 }
 
 void lock_file::unlock() {
-	self->lock.unlock();
+	self->mutex.unlock();
 }
 
 void lock_file::unlock_shared() {
-	self->lock.unlock_sharable();
+	self->mutex.unlock_sharable();
 }
 
 // -------------------------------------------------------------------------------------------------
