@@ -29,14 +29,14 @@ Manifest create_manifest(const std::filesystem::path& root_path) {
 		std::ifstream file(path, std::ios::binary | std::ios::in);
 
 		if (!file)
-			throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", path_str));
+			throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to open file: ", path_str));
 
 		auto md5 = libv::hash::hash_md5(file);
 
 		file.close();
 
 		if (file.fail())
-			throw std::system_error(errno, std::system_category(), libv::concat("Failed to read file: ", path_str));
+			throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to read file: ", path_str));
 
 		manifest.entries.emplace_back(std::move(path_str), std::move(md5));
 	}

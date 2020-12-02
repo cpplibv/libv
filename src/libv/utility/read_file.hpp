@@ -47,14 +47,14 @@ template <typename = void>
 	std::ifstream file(filePath, std::ios_base::binary | std::ios_base::in);
 
 	if (!file)
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", filePath.generic_string()));
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to open file: ", filePath.generic_string()));
 
 	std::ostringstream buffer;
 	buffer << file.rdbuf();
 	file.close();
 
 	if (file.fail())
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to read file: ", filePath.generic_string()));
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to read file: ", filePath.generic_string()));
 
 	return std::move(buffer).str();
 }
@@ -66,7 +66,7 @@ template <typename = void>
 	std::ifstream file(filePath, std::ios_base::binary | std::ios_base::in);
 
 	if (!file) {
-		ec.assign(errno, std::system_category());
+		ec = std::make_error_code(static_cast<std::errc>(errno));
 		return "";
 	}
 
@@ -75,7 +75,7 @@ template <typename = void>
 	file.close();
 
 	if (file.fail()) {
-		ec.assign(errno, std::system_category());
+		ec = std::make_error_code(static_cast<std::errc>(errno));
 		return "";
 	}
 

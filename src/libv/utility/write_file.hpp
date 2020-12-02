@@ -23,13 +23,13 @@ void write_file_or_throw(const std::filesystem::path& filePath, std::string_view
 	std::ofstream file(filePath, std::ios_base::binary | std::ios_base::out);
 
 	if (!file)
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to open file: ", filePath.generic_string()));
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to open file: ", filePath.generic_string()));
 
 	file.write(data.data(), data.size());
 	file.close();
 
 	if (file.fail())
-		throw std::system_error(errno, std::system_category(), libv::concat("Failed to write file: ", filePath.generic_string()));
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to write file: ", filePath.generic_string()));
 }
 
 inline void write_file_or_throw(const std::filesystem::path& filePath, std::span<const std::byte> data) {
@@ -53,7 +53,7 @@ void write_file(const std::filesystem::path& filePath, std::string_view data, st
 	std::ofstream file(filePath, std::ios_base::binary | std::ios_base::out);
 
 	if (!file) {
-		ec.assign(errno, std::system_category());
+		ec = std::make_error_code(static_cast<std::errc>(errno));
 		return;
 	}
 
@@ -61,7 +61,7 @@ void write_file(const std::filesystem::path& filePath, std::string_view data, st
 	file.close();
 
 	if (file.fail()) {
-		ec.assign(errno, std::system_category());
+		ec = std::make_error_code(static_cast<std::errc>(errno));
 		return;
 	}
 

@@ -17,7 +17,7 @@ template <typename T> WISH_REQUIRES(std::is_arithmetic_v<T>)
 
 	T value;
 
-	// This branching could be removed once Clang/GCC implements from_chars to floating point types
+	// C++20 Support Workaround: This branching could be removed once Clang/GCC implements from_chars to floating point types
 	if constexpr (std::is_integral_v<T>) {
 		std::from_chars_result result = std::from_chars<T>(str.begin(), str.end(), value);
 		ec = std::make_error_code(result.ec);
