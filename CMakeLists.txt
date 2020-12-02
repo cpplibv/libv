@@ -668,7 +668,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_utility INTERFACE
+	TARGET libv_utility STATIC
+	SOURCE src/libv/utility/*.cpp
 	LINK   Threads::Threads
 )
 
