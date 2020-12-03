@@ -5,228 +5,71 @@
 // ext
 #include <hdiffpatch/HDiff/diff.h>
 #include <hdiffpatch/HPatch/patch.h>
-// std
-#include <cstring>
-#include <istream>
-#include <ostream>
 
 
 namespace libv {
 namespace diff {
+namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] static inline bv as_bv(sv s) noexcept {
-	return bv(reinterpret_cast<const std::byte*>(s.data()), s.size());
-}
-
-[[nodiscard]] static inline auto as_uc(const std::byte* p) noexcept {
-	return reinterpret_cast<const unsigned char*>(p);
-}
-
-[[nodiscard]] static inline auto as_uc(std::byte* p) noexcept {
-	return reinterpret_cast<unsigned char*>(p);
-}
-
-[[nodiscard]] static inline auto as_uc(std::string_view::pointer p) noexcept {
-	return reinterpret_cast<unsigned char*>(p);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-static auto read_stream_fn(
-		const hpatch_TStreamInput* stream,
-		hpatch_StreamPos_t readFromPos,
-		unsigned char* out_data,
-		unsigned char* out_data_end) {
-
-	const auto out_ptr = reinterpret_cast<char*>(out_data);
-	const auto out_num = out_data_end - out_data;
-
-	auto s = reinterpret_cast<std::istream*>(stream->streamImport);
-
-	if (readFromPos != static_cast<hpatch_uint64_t>(s->tellg()))
-		s->seekg(readFromPos);
-
-	s->read(out_ptr, out_num);
-
-	return hpatch_TRUE;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T>
-static inline auto fix_input(const T& view) noexcept {
+static inline auto input_bytes_adaptor(libv::input_bytes& s) noexcept {
 	hpatch_TStreamInput stream;
-	mem_as_hStreamInput(&stream, as_uc(view.data()), as_uc(view.data() + view.size()));
-	return stream;
-}
-
-template <typename T>
-static inline auto fix_output(T& out) noexcept {
-	hpatch_TStreamOutput stream;
-	mem_as_hStreamOutput(&stream, as_uc(out.data()), as_uc(out.data() + out.size()));
-	return stream;
-}
-
-template <typename OUT_DYN>
-struct dyn_output {
-	hpatch_TStreamOutput base;
-	OUT_DYN& out;
-	size_t offset;
-
-	static auto write_fn(
-			const hpatch_TStreamOutput* stream,
-			hpatch_StreamPos_t writeToPos,
-			const unsigned char* data,
-			const unsigned char* data_end) {
-
-		const auto ptr = reinterpret_cast<const char*>(data);
-		const auto num = data_end - data;
-		auto& self = *reinterpret_cast<dyn_output*>(stream->streamImport);
-
-		writeToPos += self.offset;
-
-		self.out.resize(std::max(self.out.size(), writeToPos + num));
-		std::memcpy(self.out.data() + writeToPos, ptr, num);
-
-		return hpatch_TRUE;
-	}
-
-	explicit inline dyn_output(OUT_DYN& out) noexcept :
-		out(out) {
-		base.streamImport = reinterpret_cast<void*>(this);
-		base.streamSize = std::numeric_limits<size_t>::max();
-		base.read_writed = nullptr;
-		base.write = write_fn;
-		offset = out.size();
-	}
-};
-
-static inline auto stream_input(std::istream& s) noexcept {
-	s.seekg(0, std::ios::end);
-	const auto stream_size = s.tellg();
-	s.seekg(0, std::ios::beg);
-
-	hpatch_TStreamInput stream;
-	stream.streamSize = stream_size;
+	stream.streamSize = s.size();
 	stream.streamImport = reinterpret_cast<void*>(&s);
-	stream.read = read_stream_fn;
+	stream.read = +[](
+			const hpatch_TStreamInput* stream,
+			hpatch_StreamPos_t readFromPos,
+			unsigned char* out_data,
+			unsigned char* out_data_end) {
+
+		const auto out_ptr = reinterpret_cast<std::byte*>(out_data);
+		const auto pos = readFromPos;
+		const auto size = out_data_end - out_data;
+
+		auto s = reinterpret_cast<libv::input_bytes*>(stream->streamImport);
+		s->read(out_ptr, pos, size);
+		return hpatch_TRUE;
+	};
+
 	return stream;
 }
 
-struct stream_output {
-	hpatch_TStreamOutput base;
-	std::ostream& ostream;
-	size_t offset;
-
-	static auto write_fn(
+static inline auto output_bytes_adaptor(libv::output_bytes& s) noexcept {
+	hpatch_TStreamOutput stream;
+	stream.streamSize = s.size();
+	stream.streamImport = reinterpret_cast<void*>(&s);
+	stream.read_writed = nullptr;
+	stream.write = +[](
 			const hpatch_TStreamOutput* stream,
 			hpatch_StreamPos_t writeToPos,
 			const unsigned char* data,
 			const unsigned char* data_end) {
 
-		const auto ptr = reinterpret_cast<const char*>(data);
-		const auto num = data_end - data;
-		auto& self = *reinterpret_cast<stream_output*>(stream->streamImport);
+		const auto ptr = reinterpret_cast<const std::byte*>(data);
+		const auto pos = writeToPos;
+		const auto size = data_end - data;
 
-		writeToPos += self.offset;
-
-		if (writeToPos != static_cast<hpatch_uint64_t>(self.ostream.tellp()))
-			self.ostream.seekp(writeToPos);
-
-		self.ostream.write(ptr, num);
-
+		auto s = reinterpret_cast<libv::output_bytes*>(stream->streamImport);
+		s->write(ptr, pos, size);
 		return hpatch_TRUE;
-	}
+	};
 
-	inline stream_output(std::ostream& s, size_t streamSize) noexcept :
-		ostream(s) {
-		base.streamImport = reinterpret_cast<void*>(this);
-		base.streamSize = streamSize;
-		base.read_writed = nullptr;
-		base.write = write_fn;
-		offset = s.tellp();
-	}
-};
+	return stream;
+}
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename OUT_DYN>
-static inline void aux_create_diff(bv old, bv new_, OUT_DYN& out_diff, size_t match_block_size) {
-	auto old_stream = fix_input(old);
-	auto new_stream = fix_input(new_);
-	auto diff_stream = dyn_output<OUT_DYN>(out_diff);
+void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output_bytes out_diff, size_t match_block_size) {
+	auto old_stream = input_bytes_adaptor(old);
+	auto new_stream = input_bytes_adaptor(new_);
+	auto diff_stream = output_bytes_adaptor(out_diff);
 
-	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream.base, nullptr, match_block_size);
+	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr, match_block_size);
 }
 
-static inline void aux_create_diff_stream(std::istream& old, std::istream& new_, std::ostream& diff, size_t match_block_size) {
-	auto old_stream = stream_input(old);
-	auto new_stream = stream_input(new_);
-	auto diff_stream = stream_output(diff, std::numeric_limits<size_t>::max());
-
-	create_compressed_diff_stream(&new_stream, &old_stream, &diff_stream.base, nullptr, match_block_size);
-}
-
-[[nodiscard]] static inline bool aux_check_diff(bv old, bv new_, bv diff) {
-	auto old_stream = fix_input(old);
-	auto new_stream = fix_input(new_);
-	auto diff_stream = fix_input(diff);
-
-	return check_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr);
-}
-
-[[nodiscard]] static inline bool aux_check_diff(std::istream& old, std::istream& new_, std::istream& diff) {
-	auto old_stream = stream_input(old);
-	auto new_stream = stream_input(new_);
-	auto diff_stream = stream_input(diff);
-
-	return check_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr);
-}
-
-template <typename OUT_DYN>
-[[nodiscard]] static inline bool aux_apply_patch(bv old, bv diff, OUT_DYN& out_new) {
-	const auto diff_info = get_diff_info(diff);
-
-	if (!diff_info)
-		return false;
-
-	out_new.resize(diff_info.new_size);
-
-	auto old_stream = fix_input(old);
-	auto diff_stream = fix_input(diff);
-	auto new_stream = fix_output(out_new);
-
-	const auto success = patch_decompress(&new_stream, &old_stream, &diff_stream, nullptr);
-
-	return success;
-}
-
-[[nodiscard]] static inline bool aux_apply_patch(std::istream& old, std::istream& diff, std::ostream& new_) {
-	const auto diff_info = get_diff_info(diff);
-
-	if (!diff_info)
-		return false;
-
-	auto old_stream = stream_input(old);
-	auto diff_stream = stream_input(diff);
-	auto new_stream = stream_output(new_, diff_info.new_size); // HDiffPatch requires stream size to be set on patch apply
-
-	const auto success = patch_decompress(&new_stream.base, &old_stream, &diff_stream, nullptr);
-
-	return success;
-}
-
-[[nodiscard]] static inline diff_info aux_get_diff_info(bv diff) {
-	hpatch_compressedDiffInfo info;
-	const auto success = getCompressedDiffInfo_mem(&info, as_uc(diff.data()), as_uc(diff.data() + diff.size()));
-
-	return success ? diff_info{info.oldDataSize, info.newDataSize} : diff_info{};
-}
-
-[[nodiscard]] static inline diff_info aux_get_diff_info(std::istream& diff) {
-	auto diff_stream = stream_input(diff);
+diff_info aux_get_diff_info(libv::input_bytes diff) {
+	auto diff_stream = input_bytes_adaptor(diff);
 
 	hpatch_compressedDiffInfo info;
 	const auto success = getCompressedDiffInfo(&info, &diff_stream);
@@ -234,95 +77,37 @@ template <typename OUT_DYN>
 	return success ? diff_info{info.oldDataSize, info.newDataSize} : diff_info{};
 }
 
-// =================================================================================================
+bool aux_check_diff(libv::input_bytes old, libv::input_bytes new_, libv::input_bytes diff) {
+	auto old_stream = input_bytes_adaptor(old);
+	auto new_stream = input_bytes_adaptor(new_);
+	auto diff_stream = input_bytes_adaptor(diff);
 
-std::string create_diff(sv old, sv new_, size_t match_block_size) {
-	std::string result;
-	create_diff(old, new_, result, match_block_size);
-	return result;
+	return check_compressed_diff_stream(&new_stream, &old_stream, &diff_stream, nullptr);
 }
 
-std::vector<std::byte> create_diff(bv old, bv new_, size_t match_block_size) {
-	std::vector<std::byte> result;
-	create_diff(old, new_, result, match_block_size);
-	return result;
-}
+bool apply_patch(libv::input_bytes old, libv::input_bytes diff, libv::output_bytes out_new) {
+	const auto diff_info = get_diff_info(diff);
 
-void create_diff(sv old, sv new_, std::string& out_diff, size_t match_block_size) {
-	aux_create_diff(as_bv(old), as_bv(new_), out_diff, match_block_size);
-}
+	if (!diff_info)
+		return false;
 
-void create_diff(bv old, bv new_, std::vector<std::byte>& out_diff, size_t match_block_size) {
-	aux_create_diff(old, new_, out_diff, match_block_size);
-}
+	if (diff_info.new_size != 0)
+		// Probe last byte to cause pre allocation
+		out_new.write(nullptr, diff_info.new_size, 0);
 
-void create_diff(std::istream& old, std::istream& new_, std::ostream& diff, size_t match_block_size) {
-	aux_create_diff_stream(old, new_, diff, match_block_size);
-}
+	auto old_stream = input_bytes_adaptor(old);
+	auto diff_stream = input_bytes_adaptor(diff);
+	auto new_stream = output_bytes_adaptor(out_new);
 
-// ---
+	// HDiffPatch API: patch_decompress requires the new stream's size to be exact
+	// (To why I have no idea because this is an output and not an input, but there, have it your way)
+	new_stream.streamSize = std::min(new_stream.streamSize, diff_info.new_size);
 
-bool check_diff(sv old, sv new_, sv diff) {
-	return check_diff(as_bv(old), as_bv(new_), as_bv(diff));
-}
-
-bool check_diff(bv old, bv new_, bv diff) {
-	return aux_check_diff(old, new_, diff);
-}
-
-bool check_diff(std::istream& old, std::istream& new_, std::istream& diff) {
-	return aux_check_diff(old, new_, diff);
-}
-
-// ---
-
-std::optional<std::string> apply_patch(sv old, sv diff) {
-	std::optional<std::string> result(std::in_place);
-
-	const auto success = apply_patch(old, diff, *result);
-	if (!success)
-		result.reset();
-
-	return result;
-}
-
-std::optional<std::vector<std::byte>> apply_patch(bv old, bv diff) {
-	std::optional<std::vector<std::byte>> result(std::in_place);
-
-	const auto success = apply_patch(old, diff, *result);
-	if (!success)
-		result.reset();
-
-	return result;
-}
-
-bool apply_patch(sv old, sv diff, std::string& out_new_) {
-	return aux_apply_patch(as_bv(old), as_bv(diff), out_new_);
-}
-
-bool apply_patch(bv old, bv diff, std::vector<std::byte>& out_new_) {
-	return aux_apply_patch(old, diff, out_new_);
-}
-
-bool apply_patch(std::istream& old, std::istream& diff, std::ostream& out_new_) {
-	return aux_apply_patch(old, diff, out_new_);
-}
-
-// ---
-
-diff_info get_diff_info(sv diff) {
-	return get_diff_info(as_bv(diff));
-}
-
-diff_info get_diff_info(bv diff) {
-	return aux_get_diff_info(diff);
-}
-
-diff_info get_diff_info(std::istream& diff) {
-	return aux_get_diff_info(diff);
+	return patch_decompress(&new_stream, &old_stream, &diff_stream, nullptr);
 }
 
 // -------------------------------------------------------------------------------------------------
 
+} // namespace detail
 } // namespace diff
 } // namespace libv

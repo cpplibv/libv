@@ -36,11 +36,11 @@ std::vector<std::byte> to_bytes(std::string_view str) {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-bool test_memory(const T& old_, const T& new_, size_t block_size) {
+template <typename OT, typename T1, typename T2>
+bool test_memory(const T1& old_, const T2& new_, size_t block_size) {
 	std::cout << "=================================================================================================" << std::endl;
 
-	const auto diff = libv::diff::create_diff(old_, new_, block_size);
+	const auto diff = libv::diff::create_diff<OT>(old_, new_, block_size);
 
 	std::cout << "Old_ size: " << old_.size() << std::endl;
 	std::cout << "New_ size: " << new_.size() << std::endl;
@@ -62,7 +62,7 @@ bool test_memory(const T& old_, const T& new_, size_t block_size) {
 
 	std::cout << "check_result: " << check_result << std::endl;
 
-	const auto patch_result = libv::diff::apply_patch(old_, diff);
+	const auto patch_result = libv::diff::apply_patch<OT>(old_, diff);
 
 	std::cout << "patch_result: " << patch_result.has_value() << std::endl;
 
@@ -100,9 +100,19 @@ bool test_stream(const std::string_view str_old_, const std::string_view str_new
 	std::cout << "diff_info.old_size: " << diff_info.old_size << std::endl;
 	std::cout << "diff_info.new_size: " << diff_info.new_size << std::endl;
 
+	// Rewind streams
+	old_.clear(std::ios::eofbit); old_.seekg(0);
+	new_.clear(std::ios::eofbit); new_.seekg(0);
+	diff.clear(std::ios::eofbit); diff.seekg(0);
+
 	const auto check_result = libv::diff::check_diff(old_, new_, diff);
 
 	std::cout << "check_result: " << check_result << std::endl;
+
+	// Rewind streams
+	old_.clear(std::ios::eofbit); old_.seekg(0);
+	new_.clear(std::ios::eofbit); new_.seekg(0);
+	diff.clear(std::ios::eofbit); diff.seekg(0);
 
 	std::stringstream patched;
 	const auto patch_result = libv::diff::apply_patch(old_, diff, patched);
@@ -143,9 +153,19 @@ bool test_file(const std::string_view file_old_, const std::string_view file_new
 	std::cout << "diff_info.old_size: " << diff_info.old_size << std::endl;
 	std::cout << "diff_info.new_size: " << diff_info.new_size << std::endl;
 
+	// Rewind streams
+	old_.clear(std::ios::eofbit); old_.seekg(0);
+	new_.clear(std::ios::eofbit); new_.seekg(0);
+	diff.clear(std::ios::eofbit); diff.seekg(0);
+
 	const auto check_result = libv::diff::check_diff(old_, new_, diff);
 
 	std::cout << "check_result: " << check_result << std::endl;
+
+	// Rewind streams
+	old_.clear(std::ios::eofbit); old_.seekg(0);
+	new_.clear(std::ios::eofbit); new_.seekg(0);
+	diff.clear(std::ios::eofbit); diff.seekg(0);
 
 	std::ofstream patched{patched_file_path, std::ios::out | std::ios::binary};
 	const auto patch_result = libv::diff::apply_patch(old_, diff, patched);
@@ -186,13 +206,16 @@ int main(int, const char**) {
 
 	bool success = true;
 
-	success &= test_memory(old_sv0, new_sv0, 16);
-	success &= test_memory(old_sv1, new_sv1, 16);
-	success &= test_memory(old_sv2, new_sv2, 16);
+	success &= test_memory<std::string>(old_sv0, new_sv0, 16);
+	success &= test_memory<std::string>(old_sv1, new_sv1, 16);
+	success &= test_memory<std::string>(old_sv2, new_sv2, 16);
 
-	success &= test_memory(old_bv0, new_bv0, 16);
-	success &= test_memory(old_bv1, new_bv1, 16);
-	success &= test_memory(old_bv2, new_bv2, 16);
+	success &= test_memory<std::vector<std::byte>>(old_bv0, new_bv0, 16);
+	success &= test_memory<std::vector<std::byte>>(old_bv1, new_bv1, 16);
+	success &= test_memory<std::vector<std::byte>>(old_bv2, new_bv2, 16);
+
+	success &= test_memory<std::vector<std::byte>>(old_sv0, new_bv0, 16);
+	success &= test_memory<std::string>(old_bv0, new_sv0, 16);
 
 	success &= test_stream(old_sv0, new_sv0, 16);
 	success &= test_stream(old_sv1, new_sv1, 16);
