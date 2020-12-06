@@ -750,7 +750,16 @@ wish_create_executable(
 	LINK   update_common # <<< P4: Just for testing
 )
 
-add_custom_target(update DEPENDS update_client update_server)
+wish_create_executable(
+	TARGET apply_patch
+	SOURCE app/update/apply_patch.cpp
+	LINK   libv_log libv_arg libv_diff
+	LINK   libv_serialization
+	LINK   libv_process # <<< P4: Just for testing
+	LINK   update_common # <<< P4: Just for testing
+)
+
+add_custom_target(update DEPENDS update_client update_server apply_patch create_patch)
 
 # ---
 

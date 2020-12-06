@@ -3,7 +3,8 @@
 #pragma once
 
 // libv
-#include <libv/diff/manifest.hpp>
+//#include <libv/diff/manifest.hpp>
+#include <libv/diff/manifest_diff.hpp>
 #include <libv/hash/md5.hpp>
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serialization/enable.hpp>
@@ -31,6 +32,20 @@ using file_diff_data = std::vector<std::byte>;
 using file_full_data = std::vector<std::byte>;
 
 // -------------------------------------------------------------------------------------------------
+
+struct StepCreateDir {
+	std::string path;
+
+	LIBV_REFLECTION_ACCESS(path);
+	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+};
+
+struct StepRemoveDir {
+	std::string path;
+
+	LIBV_REFLECTION_ACCESS(path);
+	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+};
 
 struct StepCreate {
 	std::string filepath;
@@ -103,9 +118,12 @@ struct Patch {
 	version_number to;
 
 public:
+	std::vector<StepCreateDir> creates_dir;
+	std::vector<StepRemoveDir> removes_dir;
+
 	std::vector<StepCreate> creates;
 	std::vector<StepModify> modifies;
-	std::vector<StepModifyTo> modifiesTo;
+	std::vector<StepModifyTo> modifies_to;
 	std::vector<StepRename> renames;
 	std::vector<StepRemove> removes;
 
@@ -115,9 +133,12 @@ public:
 	LIBV_REFLECTION_ACCESS(from);
 	LIBV_REFLECTION_ACCESS(to);
 
+	LIBV_REFLECTION_ACCESS(creates_dir);
+	LIBV_REFLECTION_ACCESS(removes_dir);
+
 	LIBV_REFLECTION_ACCESS(creates);
 	LIBV_REFLECTION_ACCESS(modifies);
-	LIBV_REFLECTION_ACCESS(modifiesTo);
+	LIBV_REFLECTION_ACCESS(modifies_to);
 	LIBV_REFLECTION_ACCESS(renames);
 	LIBV_REFLECTION_ACCESS(removes);
 

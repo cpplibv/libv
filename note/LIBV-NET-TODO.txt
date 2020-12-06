@@ -1,4 +1,7 @@
 libv.diff: make sure every stream input respects offset (?) | for output it makes sense, but for input I need the end of it | Done with byte streams
+libv.hash: Generate md5 hash from file without needing to handle the istream
+libv.update: patch create folder
+libv.update: patch remove folder
 
 
 
@@ -50,17 +53,22 @@ libv.diff: make sure every stream input respects offset (?) | for output it make
 --- STACK ------------------------------------------------------------------------------------------
 
 
- (cd app/update/res/; ./gen.sh)
+app/update/res/gen.sh
+app/update/res/apply.sh
+
+app/update/res/gen.sh && app/update/res/apply.sh
 
 
-libv.hash: Generate md5 hash from file without needing to handle the istream
+
+libv.utility: input bytes on static memory should return correct amount of read bytes (required by hash_md5)
+
 libv.utility: Storage space size formatter: xxx'xxx.yy KB, MB
 		This will absorb the dotter that I have in fsw
 
 
 
-libv.update: patch create folder
-libv.update: patch remove folder
+
+libv.update: Upon patch apply failure, create manifest and send to server
 
 libv.update: patch creation rename support
 libv.update: patch creation modify to support

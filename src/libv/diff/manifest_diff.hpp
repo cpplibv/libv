@@ -5,7 +5,6 @@
 // libv
 #include <libv/hash/md5.hpp>
 // std
-#include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
@@ -16,14 +15,34 @@ namespace diff {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Manifest {
+struct Manifest;
+
+struct ManifestDiff {
+public:
+	enum class ChangeFile : uint32_t {
+		create = 0,
+		modify = 1,
+		// modifyTo = 2,
+		// rename = 3,
+		remove = 4,
+	};
+
+	enum class ChangeDirectory : uint32_t {
+		create = 0,
+		remove = 4,
+	};
+
 public:
 	struct EntryDirectory {
-		std::string path;
+		std::string filepath;
+		ChangeDirectory change;
 	};
+
 	struct EntryFile {
-		std::string path;
-		libv::hash::md5 md5;
+		std::string filepath;
+		ChangeFile change;
+		std::optional<libv::hash::md5> old_md5;
+		std::optional<libv::hash::md5> new_md5;
 	};
 
 public:
@@ -31,7 +50,7 @@ public:
 	std::vector<EntryFile> files;
 };
 
-[[nodiscard]] Manifest create_manifest(const std::filesystem::path& root_path);
+[[nodiscard]] ManifestDiff create_manifest_diff(const Manifest& old, const Manifest& new_);
 
 // -------------------------------------------------------------------------------------------------
 

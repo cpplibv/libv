@@ -5,6 +5,7 @@
 // std
 #include <filesystem>
 #include <memory>
+#include <span>
 #include <string>
 
 
@@ -42,8 +43,8 @@ struct PatchApplyFailure {
 //		enum class operation : int {
 //			create,
 //			modify,
+//			modify_to,
 //			rename,
-//			change,
 //			remove,
 //		};
 
@@ -58,7 +59,7 @@ struct PatchApplier {
 	std::unique_ptr<class ImplPatchApplier> self;
 
 public:
-	PatchApplier(std::filesystem::path root_dir, std::shared_ptr<class Patch> patch);
+	PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const class Patch> patch);
 	virtual ~PatchApplier();
 
 public:
@@ -67,6 +68,9 @@ public:
 	// failures
 //	void progress(size_t min_amount);
 	void progress(bool fast_plan);
+
+public:
+	[[nodiscard]] std::span<const PatchApplyFailure> failures() const noexcept;
 
 public:
 	[[nodiscard]] size_t progress_current() const noexcept;

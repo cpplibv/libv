@@ -6,11 +6,13 @@
 #include <boost/uuid/detail/md5.hpp>
 // libv
 #include <libv/utility/byte_swap.hpp>
+#include <libv/utility/concat.hpp>
 // std
 #include <cstring>
+#include <fstream>
+#include <iomanip>
 #include <istream>
 #include <ostream>
-#include <iomanip>
 
 
 namespace libv {
@@ -79,6 +81,41 @@ md5 hash_md5(std::istream& stream) {
 	return digest_to_md5(digest);
 }
 
+// -------------------------------------------------------------------------------------------------
+
+[[nodiscard]] md5 hash_file_md5_or_throw(const std::filesystem::path& filepath) {
+	std::ifstream file(filepath, std::ios::binary | std::ios::in);
+
+	if (!file)
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to open file: ", filepath.generic_string()));
+
+	auto result = hash_md5(file);
+
+	if (file.fail())
+		throw std::system_error(std::make_error_code(static_cast<std::errc>(errno)), libv::concat("Failed to read file: ", filepath.generic_string()));
+
+	return result;
+}
+
+[[nodiscard]] md5 hash_file_md5(const std::filesystem::path& filepath, std::error_code& ec) {
+	md5 result;
+	std::ifstream file(filepath, std::ios::binary | std::ios::in);
+
+	if (!file) {
+		ec = std::make_error_code(static_cast<std::errc>(errno));
+		return result;
+	}
+
+	result = hash_md5(file);
+
+	if (file.fail()) {
+		ec = std::make_error_code(static_cast<std::errc>(errno));
+		return result;
+	}
+
+	ec.clear();
+	return result;
+}
 
 // -------------------------------------------------------------------------------------------------
 

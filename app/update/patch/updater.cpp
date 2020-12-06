@@ -1,7 +1,8 @@
 // Project: libv, File: app/update/patch/updater.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <update/patch/patch_applier.hpp>
+//#include <update/patch/patch_applier.hpp>
+#include <update/patch/updater.hpp>
 // std
 #include <filesystem>
 #include <memory>
@@ -16,19 +17,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Updater {
-
-public:
-	std::filesystem::path filepath_lock;
-	std::filesystem::path filepath_journey;
-
-public:
-	void update();
-};
-
-// -------------------------------------------------------------------------------------------------
-
-void Updater::update() {
+void Updater::update(std::filesystem::path root_dir, class Patch& patch) {
 
 //	const auto failure_cb = [this](std::string filepath, std::error_code ec) {
 //		failures.emplace_back(std::move(filepath), ec);

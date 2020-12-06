@@ -1694,11 +1694,12 @@ ninja: CLICOLOR_FORCE=1 env var to have colored output
 Extensions: Used default file extensions in LIBV
 	.vm4 - vader model 4
 	.vup - vader update patch
+	p01.00.patch - p{new}.{old}.patch - patch file naming convention
 
 Files: Used default file names in LIBV
-	.mutex - active write opened mutex file
+	.lock - active write opened lock file
 	.manifest - manifest file in the root directory
-	.patch_progress - patch_progress log file
+	.patch - patch_progress log file
 
 Ports: Used default port ranges in LIBV
 	10220 - SSH

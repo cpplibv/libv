@@ -4,6 +4,7 @@
 
 // std
 #include <cstring>
+#include <filesystem>
 #include <iosfwd>
 #include <span>
 #include <string_view>
@@ -31,9 +32,26 @@ public:
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
 [[nodiscard]] md5 hash_md5(const std::string_view data);
 [[nodiscard]] md5 hash_md5(const std::span<const std::byte> data);
 [[nodiscard]] md5 hash_md5(std::istream& stream);
+
+// -------------------------------------------------------------------------------------------------
+
+[[nodiscard]] md5 hash_file_md5_or_throw(const std::filesystem::path& filepath);
+[[nodiscard]] md5 hash_file_md5(const std::filesystem::path& filepath, std::error_code& ec);
+[[nodiscard]] inline auto hash_file_md5_ec(const std::filesystem::path& filepath) {
+	struct Result {
+		std::error_code ec;
+		md5 hash;
+	} result;
+
+	result.hash = hash_file_md5(filepath, result.ec);
+
+	return result;
+}
 
 // -------------------------------------------------------------------------------------------------
 

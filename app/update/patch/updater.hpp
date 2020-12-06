@@ -9,13 +9,17 @@
 //#include <vector>
 // pro
 //#include <update/patch/patch.hpp>
-#include <update/patch/constants.hpp>
+//#include <update/patch/constants.hpp>
 
 
 namespace libv {
 namespace update {
 
 // -------------------------------------------------------------------------------------------------
+
+static constexpr auto filename_manifest = ".manifest";
+static constexpr auto filename_lock = ".lock";
+static constexpr auto filename_progress = ".patch";
 
 struct UpdaterSettings {
 	std::string filename_manifest = libv::update::filename_manifest;
@@ -30,7 +34,7 @@ public:
 	std::filesystem::path filepath_journey;
 
 public:
-	void update();
+	void update(std::filesystem::path root_dir, class Patch& patch);
 };
 
 // -------------------------------------------------------------------------------------------------

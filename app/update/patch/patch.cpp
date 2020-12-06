@@ -15,7 +15,7 @@
 #include <iostream>
 #include <mutex>
 // pro
-#include <update/patch/constants.hpp>
+//#include <update/patch/constants.hpp>
 
 
 //#include <libv/mt/lock_file.hpp>
@@ -71,7 +71,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] std::error_code Patch::save_to_file(const std::filesystem::path& filepath) const {
+std::error_code Patch::save_to_file(const std::filesystem::path& filepath) const {
 	if (!filepath.parent_path().empty())
 		std::filesystem::create_directories(filepath.parent_path());
 	std::ofstream file(filepath, std::ios::binary | std::ios::out);
@@ -84,6 +84,21 @@ namespace update {
 	return {};
 }
 
+Patch::LoadResult Patch::load_from_file(const std::filesystem::path& filepath) {
+	auto patch = std::make_shared<Patch>();
+
+	std::ifstream file(filepath, std::ios::binary | std::ios::out);
+
+	{
+		libv::archive::BinaryInput ar{file};
+		ar(*patch);
+	}
+
+	LoadResult result;
+	result.patch = std::move(patch);
+	return result;
+}
+
 Patch Patch::create(const libv::diff::ManifestDiff& manifest_diff, const std::filesystem::path& root_old, const std::filesystem::path& root_new) {
 	Patch patch;
 
@@ -93,22 +108,34 @@ Patch Patch::create(const libv::diff::ManifestDiff& manifest_diff, const std::fi
 //	patch.from = ?;
 //	patch.to = ?;
 
-	for (const auto& entry : manifest_diff.entries) {
+	for (const auto& entry : manifest_diff.directories) {
 		switch (entry.change) {
-		case libv::diff::ManifestDiff::Change::create:
+		case libv::diff::ManifestDiff::ChangeDirectory::create:
+			patch.creates_dir.emplace_back(entry.filepath);
+			break;
+
+		case libv::diff::ManifestDiff::ChangeDirectory::remove:
+			patch.removes_dir.emplace_back(entry.filepath);
+			break;
+		}
+	}
+
+	for (const auto& entry : manifest_diff.files) {
+		switch (entry.change) {
+		case libv::diff::ManifestDiff::ChangeFile::create:
 			patch.creates.emplace_back(
 					entry.filepath,
 					libv::read_file_bin_or_throw(root_new / entry.filepath),
 					*entry.new_md5);
 			break;
 
-		case libv::diff::ManifestDiff::Change::remove:
+		case libv::diff::ManifestDiff::ChangeFile::remove:
 			patch.removes.emplace_back(
 					entry.filepath,
 					*entry.old_md5);
 			break;
 
-		case libv::diff::ManifestDiff::Change::modify:
+		case libv::diff::ManifestDiff::ChangeFile::modify:
 			std::ifstream old_file(root_old / entry.filepath, std::ios::binary | std::ios::in);
 			std::ifstream new_file(root_new / entry.filepath, std::ios::binary | std::ios::in);
 

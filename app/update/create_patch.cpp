@@ -14,11 +14,10 @@
 
 #include <fstream>
 #include <libv/hash/md5.hpp>
-#include <libv/utility/enum.hpp>
+//#include <libv/utility/enum.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 #include <update/patch/patch.hpp>
-
 //#include <update/patch/contants.hpp>
 
 
@@ -77,7 +76,7 @@ int main(int argc, const char** argv) {
 		return EXIT_FAILURE;
 	}
 	if (!std::filesystem::is_directory(path_old_dir)) {
-		std::cerr << "ERROR: The specified old version root directory path is not directory: " << path_old_dir << std::endl;
+		std::cerr << "ERROR: The specified old version root path is not directory: " << path_old_dir << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -86,7 +85,7 @@ int main(int argc, const char** argv) {
 		return EXIT_FAILURE;
 	}
 	if (!std::filesystem::is_directory(path_new_dir)) {
-		std::cerr << "ERROR: The specified new version root directory path is not directory: " << path_new_dir << std::endl;
+		std::cerr << "ERROR: The specified new version root path is not directory: " << path_new_dir << std::endl;
 		return EXIT_FAILURE;
 	}
 
@@ -142,15 +141,15 @@ int main(int argc, const char** argv) {
 
 	std::cout << "Creating manifest for: " << path_old_dir.generic_string() << "... " << std::flush;
 	const auto manifest_old = libv::diff::create_manifest(path_old_dir);
-	std::cout << manifest_old.entries.size() << " Entry" << std::endl;
+	std::cout << manifest_old.files.size() << " Entry" << std::endl;
 
 	std::cout << "Creating manifest for: " << path_new_dir.generic_string() << "... " << std::flush;
 	const auto manifest_new = libv::diff::create_manifest(path_new_dir);
-	std::cout << manifest_new.entries.size() << " Entry" << std::endl;
+	std::cout << manifest_new.files.size() << " Entry" << std::endl;
 
 	std::cout << "Creating manifest diff... " << std::flush;
 	const auto manifest_diff = libv::diff::create_manifest_diff(manifest_old, manifest_new);
-	std::cout << manifest_diff.entries.size() << " Entry" << std::endl;
+	std::cout << manifest_diff.files.size() << " Entry" << std::endl;
 
 	std::cout << "Creating patch... " << std::flush;
 	const auto patch = libv::update::Patch::create(manifest_diff, path_old_dir, path_new_dir);
