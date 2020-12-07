@@ -59,15 +59,18 @@ struct PatchApplier {
 	std::unique_ptr<class ImplPatchApplier> self;
 
 public:
-	PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const class Patch> patch);
+	PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const class Patch> patch, bool continue_);
 	virtual ~PatchApplier();
+
+private:
+	void init();
 
 public:
 	// start
 	// stop
-	// failures
+
 //	void progress(size_t min_amount);
-	void progress(bool fast_plan);
+	bool progress();
 
 public:
 	[[nodiscard]] std::span<const PatchApplyFailure> failures() const noexcept;

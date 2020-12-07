@@ -55,11 +55,8 @@ namespace { // -----------------------------------------------------------------
 		bool matches = false;
 	} result;
 
-	std::error_code ec;
-	result.exists = std::filesystem::exists(filepath, ec);
-	log_update.error_if(ec, "Failed to check file existence for: {} - {} {}", filepath, ec, ec.message());
-
-	if (ec || !result.exists)
+	result.exists = file_exists(filepath);
+	if (!result.exists)
 		return result;
 
 	result.matches = file_hash(filepath, hash);
@@ -118,12 +115,12 @@ struct OperationRemove {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Op>
-void execute(Op& op, const failure_cb_ref_t& failure_cb) {
+void execute(const Op& op, const failure_cb_ref_t& failure_cb) {
 	const auto success = do_execute(op, op.chain->aborted, failure_cb);
 	op.chain->aborted &= !success;
 }
 
-void do_execute(OperationCreateDir& op, const failure_cb_ref_t& failure_cb) {
+void execute(const OperationCreateDir& op, const failure_cb_ref_t& failure_cb) {
 	log_update.trace("Creating directory {}", op.path.generic_string());
 
 	if (op.path.empty())
@@ -139,7 +136,7 @@ void do_execute(OperationCreateDir& op, const failure_cb_ref_t& failure_cb) {
 	}
 }
 
-void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
+void execute(const OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 	log_update.trace("Removing directory {}", op.path.generic_string());
 
 	if (op.path.empty())
@@ -185,7 +182,7 @@ void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 	}
 }
 
-[[nodiscard]] bool do_execute(OperationCreate& op, bool aborted, const failure_cb_ref_t& failure_cb) {
+[[nodiscard]] bool do_execute(const OperationCreate& op, bool aborted, const failure_cb_ref_t& failure_cb) {
 	if (aborted)
 		return false;
 	log_update.trace("Creating {}", op.path.generic_string());
@@ -215,7 +212,7 @@ void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 	return true;
 }
 
-[[nodiscard]] bool do_execute(OperationModify& op, bool aborted, const failure_cb_ref_t& failure_cb) {
+[[nodiscard]] bool do_execute(const OperationModify& op, bool aborted, const failure_cb_ref_t& failure_cb) {
 	if (aborted)
 		return false;
 	log_update.trace("Modifying {} to {}", op.path_new.generic_string(), op.path_old.generic_string());
@@ -270,7 +267,7 @@ void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 	return success;
 }
 
-[[nodiscard]] bool do_execute(OperationRename& op, bool aborted, const failure_cb_ref_t& failure_cb) {
+[[nodiscard]] bool do_execute(const OperationRename& op, bool aborted, const failure_cb_ref_t& failure_cb) {
 	if (aborted)
 		return false;
 	log_update.trace("Renaming {} to {}", op.path_old.generic_string(), op.path_new.generic_string());
@@ -299,7 +296,7 @@ void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 	return !ec;
 }
 
-[[nodiscard]] bool do_execute(OperationRemove& op, bool aborted, const failure_cb_ref_t& failure_cb) {
+[[nodiscard]] bool do_execute(const OperationRemove& op, bool aborted, const failure_cb_ref_t& failure_cb) {
 	if (aborted)
 		return false;
 	log_update.trace("Removing {}", op.path.generic_string());
@@ -334,46 +331,45 @@ void do_execute(OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 // -------------------------------------------------------------------------------------------------
 
 struct ExecutionPlan {
-	using OperationCreateOrModify = std::variant<OperationCreate, OperationModify>;
-
 	std::vector<OperationCreateDir> create_dir_;
-	std::vector<OperationCreateOrModify> prepare;
-	std::vector<OperationRename> apply_1;
-	std::vector<OperationRename> apply_2;
-	std::vector<OperationRemove> cleanup;
+	std::vector<OperationCreate> creates;
+	std::vector<OperationModify> modifies;
+	std::vector<OperationRename> rename_pass1;
+	std::vector<OperationRename> rename_pass2;
+	std::vector<OperationRemove> removes;
 	std::vector<OperationRemoveDir> remove_dir_;
 
 public:
-	void create_dir(std::filesystem::path path) {
+	inline void create_dir(std::filesystem::path path) {
 		create_dir_.emplace_back(std::move(path));
 	}
 
-	void remove_dir(std::filesystem::path path) {
+	inline void remove_dir(std::filesystem::path path) {
 		remove_dir_.emplace_back(std::move(path));
 	}
 
-	void create(std::shared_ptr<OperationChain> chain, std::filesystem::path path, const file_full_data* data, libv::hash::md5 hash) {
-		prepare.emplace_back(std::in_place_type<OperationCreate>, std::move(chain), std::move(path), data, hash);
+	inline void create(std::shared_ptr<OperationChain> chain, std::filesystem::path path, const file_full_data* data, libv::hash::md5 hash) {
+		creates.emplace_back(std::move(chain), std::move(path), data, hash);
 	}
 
-	void modify(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, const file_diff_data* data, libv::hash::md5 hash_old, libv::hash::md5 hash_new) {
-		prepare.emplace_back(std::in_place_type<OperationModify>, std::move(chain), std::move(path_old), std::move(path_new), data, hash_old, hash_new);
+	inline void modify(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, const file_diff_data* data, libv::hash::md5 hash_old, libv::hash::md5 hash_new) {
+		modifies.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), data, hash_old, hash_new);
 	}
 
-	void rename_1(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
-		apply_1.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
+	inline void rename_1(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
+		rename_pass1.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
 	}
 
-	void rename_2(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
-		apply_2.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
+	inline void rename_2(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
+		rename_pass2.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
 	}
 
-	void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path, libv::hash::md5 hash) {
-		cleanup.emplace_back(std::move(chain), std::move(path), hash);
+	inline void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path, libv::hash::md5 hash) {
+		removes.emplace_back(std::move(chain), std::move(path), hash);
 	}
 
-	void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path) {
-		cleanup.emplace_back(std::move(chain), std::move(path), std::nullopt);
+	inline void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path) {
+		removes.emplace_back(std::move(chain), std::move(path), std::nullopt);
 	}
 };
 
@@ -541,6 +537,105 @@ void plan(const StepRemove& step, const std::filesystem::path& root_dir, Executi
 	plan.remove(chain, path_old_, step.hash_old);
 }
 
+// -------------------------------------------------------------------------------------------------
+
+static constexpr size_t progress_weight_io_write_byte = 1;
+static constexpr size_t progress_weight_io_read_byte  = 1;
+
+static constexpr size_t progress_weight_io_input      =  8 * 1024;
+static constexpr size_t progress_weight_io_output     =  8 * 1024;
+static constexpr size_t progress_weight_io_remove     =  8 * 1024;
+static constexpr size_t progress_weight_io_rename     =  8 * 1024;
+
+static constexpr size_t progress_weight_create_dir    = 32 * 1024;
+static constexpr size_t progress_weight_remove_dir    = 32 * 1024;
+
+static constexpr size_t progress_weight_step          = 16 * 1024;
+
+size_t progress_weight(const StepCreateDir&) {
+	return progress_weight_create_dir;
+}
+size_t progress_weight(const StepRemoveDir&) {
+	return progress_weight_remove_dir;
+}
+size_t progress_weight(const StepCreate& step) {
+	return
+			progress_weight_io_output +
+			progress_weight_io_write_byte * step.data.size() +
+			progress_weight_io_rename;
+}
+size_t progress_weight(const StepModify& step) {
+	const auto diff_info = libv::diff::get_diff_info(step.diff);
+	return
+			progress_weight_io_output +
+			progress_weight_io_input +
+			progress_weight_io_read_byte * diff_info.old_size +
+			progress_weight_io_write_byte * diff_info.new_size +
+			progress_weight_io_rename * 2 +
+			progress_weight_io_remove;
+}
+size_t progress_weight(const StepModifyTo& step) {
+	const auto diff_info = libv::diff::get_diff_info(step.diff);
+	return
+			progress_weight_io_output +
+			progress_weight_io_input +
+			progress_weight_io_read_byte * diff_info.old_size +
+			progress_weight_io_write_byte * diff_info.new_size +
+			progress_weight_io_rename;
+}
+size_t progress_weight(const StepRename&) {
+	return progress_weight_io_rename * 2;
+}
+size_t progress_weight(const StepRemove&) {
+	return
+			progress_weight_io_rename +
+			progress_weight_io_remove;
+}
+
+//// -------------------------------------------------------------------------------------------------
+//
+//size_t num_step(const Patch& patch) {
+//	return
+//			patch.creates_dir.size() +
+//			patch.removes_dir.size() +
+//
+//			patch.creates.size() +
+//			patch.modifies.size() +
+//			patch.modifies_to.size() +
+//			patch.renames.size() +
+//			patch.removes.size();
+//}
+//
+//template <typename F>
+//void call_step(const Patch& patch, size_t i, F&& func) {
+//	if (i < patch.creates_dir.size())
+//		return func(patch.creates_dir[i]);
+//	i -= patch.creates_dir.size();
+//
+//	if (i < patch.removes_dir.size())
+//		return func(patch.removes_dir[i]);
+//	i -= patch.removes_dir.size();
+//
+//	if (i < patch.creates.size())
+//		return func(patch.creates[i]);
+//	i -= patch.creates.size();
+//
+//	if (i < patch.modifies.size())
+//		return func(patch.modifies[i]);
+//	i -= patch.modifies.size();
+//
+//	if (i < patch.modifies_to.size())
+//		return func(patch.modifies_to[i]);
+//	i -= patch.modifies_to.size();
+//
+//	if (i < patch.renames.size())
+//		return func(patch.renames[i]);
+//	i -= patch.renames.size();
+//
+//	if (i < patch.removes.size())
+//		return func(patch.removes[i]);
+//}
+
 } // namespace -------------------------------------------------------------------------------------
 
 struct ImplPatchApplier {
@@ -548,63 +643,169 @@ struct ImplPatchApplier {
 	std::shared_ptr<const Patch> patch;
 
 public:
+	bool fast_plan;
 	ExecutionPlan plan;
 
 public:
-	size_t progress_current;
-	size_t progress_total;
+//	size_t num_steps = 0;
+//
+//	size_t work_current = 0;
+//	size_t work_total = 0;
+
+	size_t progress_current = 0;
+	size_t progress_total = 0;
 
 public:
-	std::vector<PatchApplyFailure> failures; // <<< P4: expose failures
+	enum class progress_stage {
+		plan_creates_dir,
+		plan_removes_dir,
+		plan_creates,
+		plan_modifies,
+		plan_modifies_to,
+		plan_renames,
+		plan_removes,
+		execute_creates_dir,
+		execute_creates,
+		execute_modifies,
+		execute_rename_pass1,
+		execute_rename_pass2,
+		execute_removes,
+		execute_removes_dirs,
+		done,
+	};
+
+	progress_stage current_stage = progress_stage::plan_creates_dir;
+	size_t current_stage_it = 0;
+
+public:
+	std::vector<PatchApplyFailure> failures;
 };
 
 // -------------------------------------------------------------------------------------------------
 
-PatchApplier::PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const Patch> patch) :
+PatchApplier::PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const Patch> patch, bool continue_) :
 	self(std::make_unique<ImplPatchApplier>()) {
 	self->root_dir = std::move(root_dir);
 	self->patch = std::move(patch);
+	self->fast_plan = !continue_;
+	init();
 }
 
 PatchApplier::~PatchApplier() = default; // For the sake of forward declared unique_ptr
 
-void PatchApplier::progress(bool fast_plan) {
-	const auto failure_cb = [this](std::string filepath, std::error_code ec) {
-		self->failures.emplace_back(std::move(filepath), ec);
+void PatchApplier::init() {
+//	self->num_steps = num_step(*self->patch);
+//
+//	self->progress_total = 0;
+//	self->progress_total += self->num_steps * progress_weight_step;
+//	for (size_t i = 0; i < self->num_steps; i++)
+//		call_step(*self->patch, i, [this](const auto& step) {
+//			self->progress_total += progress_weight(step);
+//		});
+}
+
+bool PatchApplier::progress() {
+	const auto plan_stage = [this](const auto& step_container, const auto next_stage) {
+		if (self->current_stage_it < step_container.size()) {
+			const auto& step = step_container[self->current_stage_it];
+			plan(step, self->root_dir, self->plan, self->fast_plan);
+//			self->progress_current += progress_weight(step);
+			self->current_stage_it++;
+			return true;
+		} else {
+			self->current_stage = next_stage;
+			self->current_stage_it = 0;
+			return false;
+		}
 	};
 
-	// Prepare
+	const auto execute_stage = [this](const auto& operation_container, const auto next_stage) {
+		const auto failure_cb = [this](std::string filepath, std::error_code ec) {
+			self->failures.emplace_back(std::move(filepath), ec);
+		};
 
-	for (const auto& step : self->patch->creates_dir)
-		plan(step, self->root_dir, self->plan, fast_plan);
-	for (const auto& step : self->patch->removes_dir)
-		plan(step, self->root_dir, self->plan, fast_plan);
+		if (self->current_stage_it < operation_container.size()) {
+			const auto& op = operation_container[self->current_stage_it];
+			execute(op, failure_cb);
+//			self->progress_current += progress_weight(op);
+			self->current_stage_it++;
+			return true;
+		} else {
+			self->current_stage = next_stage;
+			self->current_stage_it = 0;
+			return false;
+		}
+	};
 
-	for (const auto& step : self->patch->creates)
-		plan(step, self->root_dir, self->plan, fast_plan);
-	for (const auto& step : self->patch->modifies)
-		plan(step, self->root_dir, self->plan, fast_plan);
-	for (const auto& step : self->patch->modifies_to)
-		plan(step, self->root_dir, self->plan, fast_plan);
-	for (const auto& step : self->patch->renames)
-		plan(step, self->root_dir, self->plan, fast_plan);
-	for (const auto& step : self->patch->removes)
-		plan(step, self->root_dir, self->plan, fast_plan);
+	const auto& patch = *self->patch;
+	const auto& plan = self->plan;
+	using progress_stage = ImplPatchApplier::progress_stage;
 
-	// Apply
+	switch (self->current_stage) {
+		case progress_stage::plan_creates_dir:
+			if (plan_stage(patch.creates_dir, progress_stage::plan_removes_dir))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_removes_dir:
+			if (plan_stage(patch.removes_dir, progress_stage::plan_creates))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_creates:
+			if (plan_stage(patch.creates, progress_stage::plan_modifies))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_modifies:
+			if (plan_stage(patch.modifies, progress_stage::plan_modifies_to))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_modifies_to:
+			if (plan_stage(patch.modifies_to, progress_stage::plan_renames))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_renames:
+			if (plan_stage(patch.renames, progress_stage::plan_removes))
+				return true;
+			[[fallthrough]];
+		case progress_stage::plan_removes:
+			if (plan_stage(patch.removes, progress_stage::execute_creates_dir))
+				return true;
+			[[fallthrough]];
 
-	for (auto& op : self->plan.create_dir_)
-		do_execute(op, failure_cb);
-	for (auto& opv : self->plan.prepare)
-		std::visit([&](auto& op) { execute(op, failure_cb); }, opv);
-	for (auto& op : self->plan.apply_1)
-		execute(op, failure_cb);
-	for (auto& op : self->plan.apply_2)
-		execute(op, failure_cb);
-	for (auto& op : self->plan.cleanup)
-		execute(op, failure_cb);
-	for (auto& op : self->plan.remove_dir_)
-		do_execute(op, failure_cb);
+		case progress_stage::execute_creates_dir:
+			if (execute_stage(plan.create_dir_, progress_stage::execute_creates))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_creates:
+			if (execute_stage(plan.creates, progress_stage::execute_modifies))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_modifies:
+			if (execute_stage(plan.modifies, progress_stage::execute_rename_pass1))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_rename_pass1:
+			if (execute_stage(plan.rename_pass1, progress_stage::execute_rename_pass2))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_rename_pass2:
+			if (execute_stage(plan.rename_pass2, progress_stage::execute_removes))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_removes:
+			if (execute_stage(plan.removes, progress_stage::execute_removes_dirs))
+				return true;
+			[[fallthrough]];
+		case progress_stage::execute_removes_dirs:
+			if (execute_stage(plan.remove_dir_, progress_stage::done))
+				return true;
+			[[fallthrough]];
+
+		case progress_stage::done:
+			// Done
+			[[fallthrough]];
+	}
+
+	return false;
 }
 
 std::span<const PatchApplyFailure> PatchApplier::failures() const noexcept {

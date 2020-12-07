@@ -142,8 +142,8 @@ Patch Patch::create(const libv::diff::ManifestDiff& manifest_diff, const std::fi
 			patch.modifies.emplace_back(
 					entry.filepath,
 					libv::diff::create_diff_bin(old_file, new_file),
-					*entry.new_md5,
-					*entry.old_md5);
+					*entry.old_md5,
+					*entry.new_md5);
 			break;
 		}
 	}

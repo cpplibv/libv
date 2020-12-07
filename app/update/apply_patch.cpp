@@ -83,8 +83,9 @@ int main(int argc, const char** argv) {
 	auto patch_load_result = libv::update::Patch::load_from_file(path_patch_file);
 	std::cout << "Loaded patch" << std::endl;
 
-	libv::update::PatchApplier applier(path_root_dir, patch_load_result.patch);
-	applier.progress(true);
+	libv::update::PatchApplier applier(path_root_dir, patch_load_result.patch, true);
+	std::cout << "Applying patch..." << std::endl;
+	while (applier.progress());
 
 	if (applier.failures().empty()) {
 		std::cout << "Patch applied successfully" << std::endl;
