@@ -60,6 +60,13 @@ app/update/res/gen.sh && app/update/res/apply.sh
 
 
 
+
+libv.update: Patch apply progress report
+libv.update: Patch apply current step report (API to get the next step/operation)
+
+
+
+
 libv.utility: input bytes on static memory should return correct amount of read bytes (required by hash_md5)
 
 libv.utility: Storage space size formatter: xxx'xxx.yy KB, MB

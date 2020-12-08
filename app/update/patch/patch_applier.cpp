@@ -330,6 +330,45 @@ void execute(const OperationRemoveDir& op, const failure_cb_ref_t& failure_cb) {
 
 // -------------------------------------------------------------------------------------------------
 
+static constexpr int64_t progress_weight_io_operation  = 8 * 1024;
+static constexpr int64_t progress_weight_io_read_byte  = 1;
+static constexpr int64_t progress_weight_io_write_byte = 1;
+static constexpr int64_t progress_weight_step_plan     = 4 * 1024;
+
+[[nodiscard]] static constexpr int64_t pw_iorw(size_t num_io, size_t num_read_byte, size_t num_write_byte) noexcept {
+	return progress_weight_io_operation * static_cast<int64_t>(num_io) +
+			progress_weight_io_read_byte * static_cast<int64_t>(num_read_byte) +
+			progress_weight_io_write_byte * static_cast<int64_t>(num_write_byte);
+}
+
+int64_t progress_cost(const StepCreateDir&) { return pw_iorw(1, 0, 0) + progress_weight_step_plan; }
+int64_t progress_cost(const StepRemoveDir&) { return pw_iorw(1, 0, 0) + progress_weight_step_plan; }
+int64_t progress_cost(const StepCreate& step) { return pw_iorw(2, 0, step.data.size()) + progress_weight_step_plan; }
+int64_t progress_cost(const StepModify& step) {
+	const auto diff_info = libv::diff::get_diff_info(step.diff);
+	return pw_iorw(5, diff_info.old_size, diff_info.new_size) + progress_weight_step_plan;
+}
+int64_t progress_cost(const StepModifyTo& step) {
+	const auto diff_info = libv::diff::get_diff_info(step.diff);
+	return pw_iorw(3, diff_info.old_size, diff_info.new_size) + progress_weight_step_plan;
+}
+int64_t progress_cost(const StepRename&) { return pw_iorw(2, 0, 0) + progress_weight_step_plan; }
+int64_t progress_cost(const StepRemove&) { return pw_iorw(2, 0, 0) + progress_weight_step_plan; }
+
+// Costs of steps and operations has to kept in sync!
+
+int64_t progress_cost(const OperationCreateDir&) { return pw_iorw(1, 0, 0); }
+int64_t progress_cost(const OperationRemoveDir&) { return pw_iorw(1, 0, 0); }
+int64_t progress_cost(const OperationCreate& op) { return pw_iorw(1, 0, op.data->size()); }
+int64_t progress_cost(const OperationModify& op) {
+	const auto diff_info = libv::diff::get_diff_info(*op.diff);
+	return pw_iorw(2, diff_info.old_size, diff_info.new_size);
+}
+int64_t progress_cost(const OperationRename&) { return pw_iorw(1, 0, 0); }
+int64_t progress_cost(const OperationRemove&) { return pw_iorw(1, 0, 0); }
+
+// -------------------------------------------------------------------------------------------------
+
 struct ExecutionPlan {
 	std::vector<OperationCreateDir> create_dir_;
 	std::vector<OperationCreate> creates;
@@ -339,43 +378,60 @@ struct ExecutionPlan {
 	std::vector<OperationRemove> removes;
 	std::vector<OperationRemoveDir> remove_dir_;
 
+	int64_t last_steps_operation_cost = 0;
+
 public:
 	inline void create_dir(std::filesystem::path path) {
 		create_dir_.emplace_back(std::move(path));
+		last_steps_operation_cost += progress_cost(create_dir_.back());
 	}
 
 	inline void remove_dir(std::filesystem::path path) {
 		remove_dir_.emplace_back(std::move(path));
+		last_steps_operation_cost += progress_cost(remove_dir_.back());
 	}
 
 	inline void create(std::shared_ptr<OperationChain> chain, std::filesystem::path path, const file_full_data* data, libv::hash::md5 hash) {
 		creates.emplace_back(std::move(chain), std::move(path), data, hash);
+		last_steps_operation_cost += progress_cost(creates.back());
 	}
 
 	inline void modify(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, const file_diff_data* data, libv::hash::md5 hash_old, libv::hash::md5 hash_new) {
 		modifies.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), data, hash_old, hash_new);
+		last_steps_operation_cost += progress_cost(modifies.back());
 	}
 
 	inline void rename_1(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
 		rename_pass1.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
+		last_steps_operation_cost += progress_cost(rename_pass1.back());
 	}
 
 	inline void rename_2(std::shared_ptr<OperationChain> chain, std::filesystem::path path_old, std::filesystem::path path_new, libv::hash::md5 hash) {
 		rename_pass2.emplace_back(std::move(chain), std::move(path_old), std::move(path_new), hash);
+		last_steps_operation_cost += progress_cost(rename_pass2.back());
 	}
 
 	inline void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path, libv::hash::md5 hash) {
 		removes.emplace_back(std::move(chain), std::move(path), hash);
+		last_steps_operation_cost += progress_cost(removes.back());
 	}
 
 	inline void remove(std::shared_ptr<OperationChain> chain, std::filesystem::path path) {
 		removes.emplace_back(std::move(chain), std::move(path), std::nullopt);
+		last_steps_operation_cost += progress_cost(removes.back());
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-void plan(const StepCreateDir& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+template <typename Step>
+[[nodiscard]] inline int64_t plan_step(const Step& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+	plan.last_steps_operation_cost = 0;
+	do_plan_step(step, root_dir, plan, fast_plan);
+	return progress_cost(step) - plan.last_steps_operation_cost;
+}
+
+void do_plan_step(const StepCreateDir& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto path = root_dir / step.path;
 
 	if (!fast_plan && file_exists(path))
@@ -384,7 +440,7 @@ void plan(const StepCreateDir& step, const std::filesystem::path& root_dir, Exec
 	plan.create_dir(path);
 }
 
-void plan(const StepRemoveDir& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepRemoveDir& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto path = root_dir / step.path;
 
 	if (!fast_plan && !file_exists(path))
@@ -393,7 +449,7 @@ void plan(const StepRemoveDir& step, const std::filesystem::path& root_dir, Exec
 	plan.remove_dir(path);
 }
 
-void plan(const StepCreate& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepCreate& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_live = root_dir / step.filepath;
@@ -421,7 +477,7 @@ void plan(const StepCreate& step, const std::filesystem::path& root_dir, Executi
 	plan.rename_2(chain, path_new_, path_live, step.hash_new);
 }
 
-void plan(const StepModify& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepModify& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_live = root_dir / step.filepath;
@@ -459,7 +515,7 @@ void plan(const StepModify& step, const std::filesystem::path& root_dir, Executi
 	plan.remove(chain, path_old_, step.hash_old);
 }
 
-void plan(const StepModifyTo& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepModifyTo& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_origin = root_dir / step.filepath_old;
@@ -488,7 +544,7 @@ void plan(const StepModifyTo& step, const std::filesystem::path& root_dir, Execu
 	plan.rename_2(chain, path_new_, path_live, step.hash_new);
 }
 
-void plan(const StepRename& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepRename& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_origin = root_dir / step.filepath_old;
@@ -516,7 +572,7 @@ void plan(const StepRename& step, const std::filesystem::path& root_dir, Executi
 	plan.rename_2(chain, path_new_, path_live, step.hash_new);
 }
 
-void plan(const StepRemove& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepRemove& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_live = root_dir / step.filepath;
@@ -539,102 +595,16 @@ void plan(const StepRemove& step, const std::filesystem::path& root_dir, Executi
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr size_t progress_weight_io_write_byte = 1;
-static constexpr size_t progress_weight_io_read_byte  = 1;
-
-static constexpr size_t progress_weight_io_input      =  8 * 1024;
-static constexpr size_t progress_weight_io_output     =  8 * 1024;
-static constexpr size_t progress_weight_io_remove     =  8 * 1024;
-static constexpr size_t progress_weight_io_rename     =  8 * 1024;
-
-static constexpr size_t progress_weight_create_dir    = 32 * 1024;
-static constexpr size_t progress_weight_remove_dir    = 32 * 1024;
-
-static constexpr size_t progress_weight_step          = 16 * 1024;
-
-size_t progress_weight(const StepCreateDir&) {
-	return progress_weight_create_dir;
+template <typename F>
+void foreach_step(const Patch& patch, F&& func) {
+	for (const auto& step : patch.creates_dir) func(step);
+	for (const auto& step : patch.removes_dir) func(step);
+	for (const auto& step : patch.creates) func(step);
+	for (const auto& step : patch.modifies) func(step);
+	for (const auto& step : patch.modifies_to) func(step);
+	for (const auto& step : patch.renames) func(step);
+	for (const auto& step : patch.removes) func(step);
 }
-size_t progress_weight(const StepRemoveDir&) {
-	return progress_weight_remove_dir;
-}
-size_t progress_weight(const StepCreate& step) {
-	return
-			progress_weight_io_output +
-			progress_weight_io_write_byte * step.data.size() +
-			progress_weight_io_rename;
-}
-size_t progress_weight(const StepModify& step) {
-	const auto diff_info = libv::diff::get_diff_info(step.diff);
-	return
-			progress_weight_io_output +
-			progress_weight_io_input +
-			progress_weight_io_read_byte * diff_info.old_size +
-			progress_weight_io_write_byte * diff_info.new_size +
-			progress_weight_io_rename * 2 +
-			progress_weight_io_remove;
-}
-size_t progress_weight(const StepModifyTo& step) {
-	const auto diff_info = libv::diff::get_diff_info(step.diff);
-	return
-			progress_weight_io_output +
-			progress_weight_io_input +
-			progress_weight_io_read_byte * diff_info.old_size +
-			progress_weight_io_write_byte * diff_info.new_size +
-			progress_weight_io_rename;
-}
-size_t progress_weight(const StepRename&) {
-	return progress_weight_io_rename * 2;
-}
-size_t progress_weight(const StepRemove&) {
-	return
-			progress_weight_io_rename +
-			progress_weight_io_remove;
-}
-
-//// -------------------------------------------------------------------------------------------------
-//
-//size_t num_step(const Patch& patch) {
-//	return
-//			patch.creates_dir.size() +
-//			patch.removes_dir.size() +
-//
-//			patch.creates.size() +
-//			patch.modifies.size() +
-//			patch.modifies_to.size() +
-//			patch.renames.size() +
-//			patch.removes.size();
-//}
-//
-//template <typename F>
-//void call_step(const Patch& patch, size_t i, F&& func) {
-//	if (i < patch.creates_dir.size())
-//		return func(patch.creates_dir[i]);
-//	i -= patch.creates_dir.size();
-//
-//	if (i < patch.removes_dir.size())
-//		return func(patch.removes_dir[i]);
-//	i -= patch.removes_dir.size();
-//
-//	if (i < patch.creates.size())
-//		return func(patch.creates[i]);
-//	i -= patch.creates.size();
-//
-//	if (i < patch.modifies.size())
-//		return func(patch.modifies[i]);
-//	i -= patch.modifies.size();
-//
-//	if (i < patch.modifies_to.size())
-//		return func(patch.modifies_to[i]);
-//	i -= patch.modifies_to.size();
-//
-//	if (i < patch.renames.size())
-//		return func(patch.renames[i]);
-//	i -= patch.renames.size();
-//
-//	if (i < patch.removes.size())
-//		return func(patch.removes[i]);
-//}
 
 } // namespace -------------------------------------------------------------------------------------
 
@@ -652,11 +622,12 @@ public:
 //	size_t work_current = 0;
 //	size_t work_total = 0;
 
-	size_t progress_current = 0;
-	size_t progress_total = 0;
+	int64_t progress_current = 0;
+	int64_t progress_total = 0;
 
 public:
 	enum class progress_stage {
+		init,
 		plan_creates_dir,
 		plan_removes_dir,
 		plan_creates,
@@ -688,28 +659,24 @@ PatchApplier::PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const
 	self->root_dir = std::move(root_dir);
 	self->patch = std::move(patch);
 	self->fast_plan = !continue_;
-	init();
+
+	foreach_step(*self->patch, [this](const auto& step) {
+		self->progress_total += progress_cost(step);
+	});
 }
 
 PatchApplier::~PatchApplier() = default; // For the sake of forward declared unique_ptr
 
-void PatchApplier::init() {
-//	self->num_steps = num_step(*self->patch);
-//
-//	self->progress_total = 0;
-//	self->progress_total += self->num_steps * progress_weight_step;
-//	for (size_t i = 0; i < self->num_steps; i++)
-//		call_step(*self->patch, i, [this](const auto& step) {
-//			self->progress_total += progress_weight(step);
-//		});
-}
-
 bool PatchApplier::progress() {
+	const auto& patch = *self->patch;
+	const auto& plan = self->plan;
+	using progress_stage = ImplPatchApplier::progress_stage;
+
 	const auto plan_stage = [this](const auto& step_container, const auto next_stage) {
 		if (self->current_stage_it < step_container.size()) {
 			const auto& step = step_container[self->current_stage_it];
-			plan(step, self->root_dir, self->plan, self->fast_plan);
-//			self->progress_current += progress_weight(step);
+			const auto fast_forwarded_progress = plan_step(step, self->root_dir, self->plan, self->fast_plan);
+			self->progress_current += fast_forwarded_progress;
 			self->current_stage_it++;
 			return true;
 		} else {
@@ -727,7 +694,7 @@ bool PatchApplier::progress() {
 		if (self->current_stage_it < operation_container.size()) {
 			const auto& op = operation_container[self->current_stage_it];
 			execute(op, failure_cb);
-//			self->progress_current += progress_weight(op);
+			self->progress_current += progress_cost(op);
 			self->current_stage_it++;
 			return true;
 		} else {
@@ -737,11 +704,11 @@ bool PatchApplier::progress() {
 		}
 	};
 
-	const auto& patch = *self->patch;
-	const auto& plan = self->plan;
-	using progress_stage = ImplPatchApplier::progress_stage;
-
 	switch (self->current_stage) {
+		case progress_stage::init:
+			self->current_stage = progress_stage::plan_creates_dir;
+			[[fallthrough]];
+
 		case progress_stage::plan_creates_dir:
 			if (plan_stage(patch.creates_dir, progress_stage::plan_removes_dir))
 				return true;
@@ -801,8 +768,7 @@ bool PatchApplier::progress() {
 			[[fallthrough]];
 
 		case progress_stage::done:
-			// Done
-			[[fallthrough]];
+			{ } // Done
 	}
 
 	return false;
@@ -812,11 +778,11 @@ std::span<const PatchApplyFailure> PatchApplier::failures() const noexcept {
 	return self->failures;
 }
 
-size_t PatchApplier::progress_current() const noexcept {
+int64_t PatchApplier::progress_current() const noexcept {
 	return self->progress_current;
 }
 
-size_t PatchApplier::progress_total() const noexcept {
+int64_t PatchApplier::progress_total() const noexcept {
 	return self->progress_total;
 }
 

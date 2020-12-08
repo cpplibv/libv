@@ -40,16 +40,7 @@ namespace update {
 // -------------------------------------------------------------------------------------------------
 
 struct PatchApplyFailure {
-//		enum class operation : int {
-//			create,
-//			modify,
-//			modify_to,
-//			rename,
-//			remove,
-//		};
-
 	std::string filepath;
-//		operation operation;
 	std::error_code reason;
 };
 
@@ -62,22 +53,15 @@ public:
 	PatchApplier(std::filesystem::path root_dir, std::shared_ptr<const class Patch> patch, bool continue_);
 	virtual ~PatchApplier();
 
-private:
-	void init();
-
 public:
-	// start
-	// stop
-
-//	void progress(size_t min_amount);
 	bool progress();
 
 public:
-	[[nodiscard]] std::span<const PatchApplyFailure> failures() const noexcept;
+	[[nodiscard]] int64_t progress_current() const noexcept;
+	[[nodiscard]] int64_t progress_total() const noexcept;
 
 public:
-	[[nodiscard]] size_t progress_current() const noexcept;
-	[[nodiscard]] size_t progress_total() const noexcept;
+	[[nodiscard]] std::span<const PatchApplyFailure> failures() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

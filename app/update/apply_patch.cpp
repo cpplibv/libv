@@ -78,14 +78,17 @@ int main(int argc, const char** argv) {
 
 	std::cout << libv::logger_stream;
 
-
 	std::cout << "Loading patch... " << std::flush;
 	auto patch_load_result = libv::update::Patch::load_from_file(path_patch_file);
 	std::cout << "Loaded patch" << std::endl;
 
 	libv::update::PatchApplier applier(path_root_dir, patch_load_result.patch, true);
 	std::cout << "Applying patch..." << std::endl;
-	while (applier.progress());
+	while (applier.progress()) {
+		const auto pt = applier.progress_total();
+		const auto pc = applier.progress_current();
+		std::cout << std::setw(10) << pc << "/" << pt << "   " << std::setw(3) << (static_cast<double>(pc) / static_cast<double>(pt) * 100.0) << "%" << std::endl;
+	}
 
 	if (applier.failures().empty()) {
 		std::cout << "Patch applied successfully" << std::endl;
