@@ -540,6 +540,7 @@ wish_create_library(
 	TARGET libv_algorithm STATIC
 	SOURCE src/libv/algorithm/*.cpp
 	LINK   libv_math
+	LINK   ext_boost # For small_vector in wildcard.cpp, therefore could be private
 )
 
 wish_create_library(
