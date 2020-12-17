@@ -1,4 +1,4 @@
-// Project: libv, File: src/libv/sml.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.state, File: src/libv/state/sml.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -86,8 +86,9 @@ protected:
 
 	template <typename T> static constexpr auto exception = boost::sml::exception<T>;
 	template <typename T> static constexpr auto on_ = boost::sml::event<T>;
-	template <typename T> static constexpr auto on_entry = boost::sml::on_entry<T>;
-	template <typename T> static constexpr auto on_exit = boost::sml::on_exit<T>;
+	template <typename T> static constexpr auto on = on_<T>;
+	template <typename T = _> static constexpr auto on_entry = boost::sml::on_entry<T>;
+	template <typename T = _> static constexpr auto on_exit = boost::sml::on_exit<T>;
 	template <typename T> static constexpr auto state = boost::sml::state<T>;
 	template <typename T> static constexpr auto unexpected_event = boost::sml::unexpected_event<T>;
 

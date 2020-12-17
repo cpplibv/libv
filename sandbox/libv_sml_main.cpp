@@ -2,7 +2,7 @@
 
 // libv
 #include <libv/log/log.hpp>
-#include <libv/sml.hpp>
+#include <libv/state/sml.hpp>
 // std
 #include <cassert>
 #include <iostream>
@@ -49,13 +49,12 @@ struct EventTimeout {};
 
 // Guards
 constexpr auto is_valid = [](const auto& event) { return event.valid; };
+constexpr auto tt = []() { return true; };
+constexpr auto ff = []() { return false; };
 
 // Actions
 constexpr auto send_fin = [](Sender& s) { s.send(EventFin{0}); };
 constexpr auto send_ack = [](const auto& event, Sender& s) { s.send(event); };
-
-constexpr auto tt = []() { return true; };
-constexpr auto ff = []() { return false; };
 
 // State Machine
 struct tcp_release : libv::sml::state_machine {
@@ -79,6 +78,75 @@ struct tcp_release : libv::sml::state_machine {
 		);
 	}
 };
+
+//// State Machine improved front-end ideas
+//
+//struct tcp_release2 : libv::state::state_machine {
+//
+//	static constexpr auto established = state<class established>;
+//	static constexpr auto fin_wait_1 = state<class fin_wait_1>;
+//	static constexpr auto fin_wait_2 = state<class fin_wait_2>;
+//	static constexpr auto timed_wait = state<class timed_wait>;
+//
+//
+//	/// Transition DSL: src_state + event [ guard ] / action = dst_state
+////	auto operator()() const {
+////		return table(
+////				established
+////					| enter[tt]              / []{ fmt::print("established tt\n"); }
+////					| enter[ff]              / []{ fmt::print("established ff\n"); }
+////					| enter                  / []{ fmt::print("established entry\n"); }
+////					| leave                  / []{ fmt::print("established exit\n"); }
+////					| on<EventRelease>       / send_fin > fin_wait_1,
+////				fin_wait_1
+////					| on<EventAck>[is_valid]            > fin_wait_2,
+////				fin_wait_2
+////					| on<EventFin>[is_valid] / send_ack > timed_wait,
+////				timed_wait
+////					| on<EventTimeout>                  > terminate
+////		);
+////	}
+////
+////	/// Transition DSL: src_state + event [ guard ] / action = dst_state
+////	auto operator()() const {
+////		return table(
+////				established(
+////					enter[tt]              / []{ fmt::print("established tt\n"); },
+////					enter[ff]              / []{ fmt::print("established ff\n"); },
+////					enter                  / []{ fmt::print("established entry\n"); },
+////					leave                  / []{ fmt::print("established exit\n"); },
+////					on<EventRelease>       / send_fin = fin_wait_1),
+////				fin_wait_1(
+////					on<EventAck>[is_valid]            = fin_wait_2),
+////				fin_wait_2(
+////					on<EventFin>[is_valid] / send_ack = timed_wait),
+////				timed_wait(
+////					on<EventTimeout>                  = terminate)
+////		);
+////	}
+//
+////	/// Transition DSL: src_state + event [ guard ] / action = dst_state
+////	auto operator()() const {
+////		return table(
+////				pair_state(
+////					established,
+////						on_entry<_>[tt]          / []{ fmt::print("established tt\n"); },
+////						on_entry<_>[ff]          / []{ fmt::print("established ff\n"); },
+////						on_entry<_>              / []{ fmt::print("established entry\n"); },
+////						on_exit<_>               / []{ fmt::print("established exit\n"); },
+////					    on<EventRelease>         / send_fin = fin_wait_1),
+////				pair_state(
+////					fin_wait_1,
+////						on<EventAck> [is_valid]            = fin_wait_2),
+////				pair_state(
+////					fin_wait_2,
+////						on<EventFin> [is_valid] / send_ack = timed_wait),
+////				pair_state(
+////					timed_wait
+////						on<EventTimeout>                   = terminate)
+////		);
+////	}
+//};
 
 int main() {
 	std::cout << libv::logger_stream;

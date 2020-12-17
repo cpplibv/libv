@@ -665,6 +665,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_state INTERFACE
+	LINK   ext_sml # For SML based
+	LINK   ext_boost # For boost statechart based
+)
+
+wish_create_library(
 	TARGET libv_mt STATIC
 	SOURCE src/libv/mt/*.cpp
 	LINK   libv_log Threads::Threads
@@ -969,9 +975,15 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_sm
+	SOURCE sandbox/libv_sm_main.cpp
+	LINK   libv_log libv_state
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_sml
 	SOURCE sandbox/libv_sml_main.cpp
-	LINK   libv_log ext_sml
+	LINK   libv_log libv_state
 )
 
 wish_create_executable(
