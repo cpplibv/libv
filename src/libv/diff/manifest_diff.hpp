@@ -1,4 +1,4 @@
-// Project: libv.diff, File: src/libv/diff/manifest.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.diff, File: src/libv/diff/manifest_diff.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

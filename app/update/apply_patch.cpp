@@ -1,4 +1,4 @@
-// Project: libv, File: app/update/create_patch.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/update/apply_patch.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
