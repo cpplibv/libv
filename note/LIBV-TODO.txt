@@ -599,6 +599,18 @@ libv.diff: make sure every stream of lvalue ref output respects offset
 
 
 
+app.editor:
+	small app for first line and include order fix-ups
+	use the folder .editor in the project root are store
+		.editor/first_line.txt
+		.editor/include_order.txt | or .lua?
+			special_line_like_hpp
+			[if condition] line
+			// line
+			regex.*.hpp
+			line
+			[line if next section is not empty?] line
+			wildcard.**.hpp
 
 
 ext: Acquire a crypto lib

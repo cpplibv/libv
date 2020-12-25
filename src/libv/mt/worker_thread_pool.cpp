@@ -1,7 +1,7 @@
-// Project: libv.mt, File: src/libv/mt/worker_thread.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/worker_thread_pool.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/mt/worker_thread.hpp>
+#include <libv/mt/worker_thread_pool.hpp>
 // pro
 #include <libv/log/log.hpp>
 
@@ -11,27 +11,26 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
-worker_thread::worker_thread(std::string new_name) :
-	thread(&worker_thread::loop, this),
+worker_thread_pool::worker_thread_pool(size_t n, std::string new_name) :
+	threads(n, &worker_thread_pool::loop, this),
 	name_(std::move(new_name)) {}
 
-worker_thread::~worker_thread() {
+worker_thread_pool::~worker_thread_pool() {
 	// TODO P2: What should happen with tasks that are 'canceled', for now we just dont execute them, best would be an argument to the task like netts that tells it, that it is cancelled, with maybe a default way that it would just not get called
 	stop();
-	// thread.join called with jthread destructor
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void worker_thread::execute_async(libv::unique_function<void()> func) {
+void worker_thread_pool::execute_async(libv::unique_function<void()> func) {
 	execute_async(std::move(func), immediate);
 }
 
-void worker_thread::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
+void worker_thread_pool::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
 	execute_async(std::move(func), std::chrono::steady_clock::now() + after);
 }
 
-void worker_thread::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
+void worker_thread_pool::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
 	std::unique_lock lock(queue_m);
 	assert(!terminate && "Queueing task after worker thread has been stopped");
 
@@ -39,19 +38,19 @@ void worker_thread::execute_async(libv::unique_function<void()> func, std::chron
 	work_cv.notify_one();
 }
 
-void worker_thread::stop() {
+void worker_thread_pool::stop() {
 	std::unique_lock lock(queue_m);
 	terminate = true;
 	work_cv.notify_all();
 }
 
-void worker_thread::join() {
-	thread.join();
+void worker_thread_pool::join() {
+	threads.join();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-inline void worker_thread::loop() {
+inline void worker_thread_pool::loop() {
 	libv::unique_function<void()> task;
 
 	while (true) {
@@ -79,21 +78,21 @@ inline void worker_thread::loop() {
 			if (terminate)
 				break;
 
-			task = std::move(const_cast<worker_thread_task&>(queue.top()).func); // NOTE: const_cast is safe as the task is popped anyways but ugly
+			task = std::move(const_cast<worker_thread_pool_task&>(queue.top()).func); // NOTE: const_cast is safe as the task is popped anyways but ugly
 			queue.pop();
 		}
 
 		try {
 			task();
 		} catch (const std::exception& ex) {
-			log.error("Exception occurred in {} worker_thread: {}", name_, ex.what());
+			log.error("Exception occurred in {} worker_thread_pool: {}", name_, ex.what());
 		}
 	}
 
 	// Process tasks that can be executed
 	std::unique_lock queue_lock(queue_m);
 	while (!queue.empty() && queue.top().time <= std::chrono::steady_clock::now()) {
-		task = std::move(const_cast<worker_thread_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
+		task = std::move(const_cast<worker_thread_pool_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
 		queue.pop();
 
 		queue_lock.unlock();
@@ -101,7 +100,7 @@ inline void worker_thread::loop() {
 		try {
 			task();
 		} catch (const std::exception& ex) {
-			log.error("Exception occurred in {} worker_thread: {}", name_, ex.what());
+			log.error("Exception occurred in {} worker_thread_pool: {}", name_, ex.what());
 		}
 
 		queue_lock.lock();
@@ -111,18 +110,18 @@ inline void worker_thread::loop() {
 
 	//	// Process tasks that has to be cancelled
 	//	while (!queue.empty()) {
-	//		task = std::move(const_cast<worker_thread_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
+	//		task = std::move(const_cast<worker_thread_pool_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
 	//		queue.pop();
 	//
-	//		queue_lock.unlock();
+	//		lock.unlock();
 	//
 	//		try {
 	//			task(cancelled);
 	//		} catch (const std::exception& ex) {
-	//			log.error("Exception occurred in {} worker_thread: {}", name_, ex.what());
+	//			log.error("Exception occurred in {} worker_thread_pool: {}", name_, ex.what());
 	//		}
 	//
-	//		queue_lock.queue_lock();
+	//		lock.lock();
 	//	}
 }
 

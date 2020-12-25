@@ -52,18 +52,58 @@ libv.update: patch remove folder
 
 --- STACK ------------------------------------------------------------------------------------------
 
+pimpl worker_thread_pool and worker_thread
+common base queue for worker_thread_pool and worker_thread only difference is "run" calls (?)
+
+worker_thread_pool and worker_thread, solve the next index loop around problem
+
 
 app/update/res/gen.sh
 app/update/res/apply.sh
 
 app/update/res/gen.sh && app/update/res/apply.sh
 
+STACK
+	> worker_thread_pool
+	> async_value
+	> ResourceServer Peer
+	> ResourceServer Peer State machine
+	> Connection
+	> ConnectionSet
+	> Codec
+	> ResourceServer
+	> ResourceClient
+	> ResourceDownloading
+	> FileDownloading
+	> UpdateClient
+	> Updater
+	> Patch/Update Apply
+	> Codec
+	> Protocol
+	> Connection
+	> ConnectionAsnyc sync API: disconnect_immediate
 
 
 
 libv.update: Patch apply progress report
 libv.update: Patch apply current step report (API to get the next step/operation)
 
+
+update: Sometimes it might require a restart for the updater
+	updater is updated -> needs restart
+	or migration code is introduced -> need restart to run it, and only after that can the updater continue
+	and with that we might enter the dual process updater world
+
+		migration can effect saves, options, configs, profiles or even DB, or install settings or other OS integration stuff
+		most of these are resource based so migration happen on demand but some dont (like os)
+		so there fore the best option is if the updater code (leave a patch previous version info behind) returns the prev version
+
+
+
+
+
+app/update/res/gen.sh
+app/update/res/apply.sh
 
 
 

@@ -13,11 +13,11 @@ include(cmake/wish_warning.cmake)
 # --------------------------------------------------------------------------------------------------
 
 #set(CMAKE_VERBOSE_MAKEFILE off)
-#set(CMAKE_BUILD_TYPE "DEBUG")
-#set(CMAKE_BUILD_TYPE "RELEASE")
+#set(CMAKE_BUILD_TYPE DEBUG)
+#set(CMAKE_BUILD_TYPE RELEASE)
 
 if (NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE "RELEASE")
+	set(CMAKE_BUILD_TYPE RELEASE)
 endif()
 
 set(CMAKE_CONFIGURATION_TYPES "DEBUG;RELEASE;DEV" CACHE STRING "" FORCE)
@@ -473,9 +473,10 @@ wish_create_external(
 wish_create_external(
 	NAME reactphysics3d
 	GIT_REPOSITORY https://github.com/VaderY/reactphysics3d.git
-	GIT_TAG master
+#	GIT_TAG 9fb21277
+	GIT_TAG b213ca34
 	CMAKE_ARGS
-		-DCMAKE_BUILD_TYPE="Release"
+		-DCMAKE_BUILD_TYPE=RELEASE
 	LINK reactphysics3d
 )
 
@@ -1011,6 +1012,7 @@ wish_end_group()
 
 # TODO P5: This should be an object library, but ran into troubles with target_link_libraries against object library,
 #			maybe an addition layer of interface would solve the problem
+#			check on cmake, there might have been an update that improves this front
 wish_create_library(
 	TARGET obj_test_runner STATIC
 	SOURCE test/runner.cpp
@@ -1095,6 +1097,12 @@ wish_create_executable(
 	TARGET test_libv_math
 	SOURCE test/libv/math/*.cpp
 	LINK   obj_test_runner libv_math
+)
+
+wish_create_executable(
+	TARGET test_libv_mt
+	SOURCE test/libv/mt/*.cpp
+	LINK   obj_test_runner libv_mt
 )
 
 wish_create_executable(

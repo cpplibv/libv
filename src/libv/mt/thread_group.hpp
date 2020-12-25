@@ -28,6 +28,11 @@ public:
 	[[nodiscard]] inline size_t size() const noexcept {
 		return group.size();
 	}
+
+	inline void join() noexcept {
+		for (auto& thread : group)
+			thread.join();
+	}
 };
 
 // -------------------------------------------------------------------------------------------------
