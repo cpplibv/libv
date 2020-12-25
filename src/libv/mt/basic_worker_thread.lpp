@@ -19,7 +19,7 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Executor>
+template <typename ExecutionContext>
 class basic_worker_thread {
 	static constexpr std::chrono::steady_clock::time_point immediate = std::chrono::steady_clock::time_point::min();
 
@@ -41,7 +41,7 @@ private:
 	std::condition_variable work_cv;
 
 	bool terminate = false;
-	Executor executor;
+	ExecutionContext context;
 	const std::string name_;
 
 	size_t next_index = 0;
@@ -73,32 +73,32 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Executor>
+template <typename ExecutionContext>
 template <typename... Args>
-inline basic_worker_thread<Executor>::basic_worker_thread(std::string new_name, Args&&... args) :
-	executor(std::forward<Args>(args)..., &basic_worker_thread::run, this),
+inline basic_worker_thread<ExecutionContext>::basic_worker_thread(std::string new_name, Args&&... args) :
+	context(std::forward<Args>(args)..., &basic_worker_thread::run, this),
 	name_(std::move(new_name)) {}
 
-template <typename Executor>
-inline basic_worker_thread<Executor>::~basic_worker_thread() {
+template <typename ExecutionContext>
+inline basic_worker_thread<ExecutionContext>::~basic_worker_thread() {
 	// TODO P2: What should happen with tasks that are 'canceled', for now we just dont execute them, best would be an argument to the task like netts that tells it, that it is cancelled, with maybe a default way that it would just not get called
 	stop();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::execute_async(libv::unique_function<void()> func) {
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func) {
 	execute_async(std::move(func), immediate);
 }
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
 	execute_async(std::move(func), std::chrono::steady_clock::now() + after);
 }
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
 	std::unique_lock lock(queue_m);
 	assert(!terminate && "Queueing task after worker thread has been stopped");
 
@@ -106,22 +106,22 @@ inline void basic_worker_thread<Executor>::execute_async(libv::unique_function<v
 	work_cv.notify_one();
 }
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::stop() {
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::stop() {
 	std::unique_lock lock(queue_m);
 	terminate = true;
 	work_cv.notify_all();
 }
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::join() {
-	executor.join();
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::join() {
+	context.join();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Executor>
-inline void basic_worker_thread<Executor>::run() {
+template <typename ExecutionContext>
+inline void basic_worker_thread<ExecutionContext>::run() {
 	libv::unique_function<void()> task;
 
 	while (true) {

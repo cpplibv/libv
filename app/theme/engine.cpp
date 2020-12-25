@@ -297,23 +297,23 @@ void ImplEngine::init() {
 }
 
 void ImplEngine::schedule_load_script() {
-	load_cd.execute_async([this] {
+	load_cd.execute_async(worker_thread, [this] {
 
 		std::unique_lock lock(mutex);
 		_load_script();
 		_run_script();
 		_broadcast_dynamic_vars();
 
-	}, worker_thread);
+	});
 }
 
 void ImplEngine::schedule_run_script() {
-	run_cd.execute_async([this] {
+	run_cd.execute_async(worker_thread, [this] {
 
 		std::unique_lock lock(mutex);
 		_run_script();
 
-	}, worker_thread);
+	});
 }
 
 void ImplEngine::schedule_broadcast_dynamic_vars() {

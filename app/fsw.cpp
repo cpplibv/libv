@@ -70,12 +70,12 @@ int main(int argc, const char** argv) {
 	const auto schedule_run = [&work_ht_cd, &worker_thread](const libv::fsw::Event& event) {
 		const auto now = std::chrono::system_clock::now();
 
-		work_ht_cd.execute_async([event, now] {
+		work_ht_cd.execute_async(worker_thread, [event, now] {
 			::system("clear");
 			fmt::print("{:%Y.%m.%d %H:%M:%S}: ", now);
 			std::cout << event << std::endl;
 			run();
-		}, worker_thread);
+		});
 	};
 
 	if (is_dir)
@@ -87,11 +87,11 @@ int main(int argc, const char** argv) {
 		watcher.subscribe_file(path, schedule_run);
 	}
 
-	work_ht_cd.execute_async([argv] {
+	work_ht_cd.execute_async(worker_thread, [argv] {
 		::system("clear");
 		std::cout << "Watching: " << argv[1] << std::endl;
 		run();
-	}, worker_thread);
+	});
 
 	while (true) {
 		std::this_thread::sleep_for(std::chrono::seconds(10));

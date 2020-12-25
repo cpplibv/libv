@@ -52,8 +52,8 @@ public:
 public:
 	/// Supports std::stop_token as the first argument for the loader function
 	/// If the cancellation occurs before the loader function call, the call is skipped entirely
-	template <typename Thread, typename LoadFunc>
-	void load(Thread& threads, LoadFunc&& func) {
+	template <typename Executor, typename LoadFunc>
+	void load_async(Executor& executor, LoadFunc&& func) {
 		std::shared_ptr<payload> local_result;
 
 		{
@@ -64,7 +64,7 @@ public:
 			local_result = result;
 		}
 
-		threads.execute_async([
+		executor.execute_async([
 				result_sp = std::move(local_result),
 				f = std::forward<LoadFunc>(func)] () mutable {
 

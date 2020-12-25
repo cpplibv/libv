@@ -72,8 +72,6 @@ app/update/res/apply.sh
 app/update/res/gen.sh && app/update/res/apply.sh
 
 STACK
-	> worker_thread_pool
-	> async_value
 	> ResourceServer Peer
 	> ResourceServer Peer State machine
 	> Connection

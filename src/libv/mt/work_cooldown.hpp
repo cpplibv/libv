@@ -24,11 +24,11 @@ private:
 
 public:
 	explicit inline work_cooldown(std::chrono::steady_clock::duration cooldown) noexcept :
-			cooldown(cooldown) {}
+		cooldown(cooldown) {}
 
 public:
-	template <typename F>
-	void execute_async(F&& func, libv::mt::worker_thread& thread) {
+	template <typename Executor, typename F>
+	void execute_async(Executor& executor, F&& func) {
 		const auto need_to_queue = !in_flight.exchange(true);
 
 		if (need_to_queue) {
@@ -42,11 +42,11 @@ public:
 
 			if (now >= cooldown_at) {
 				// No cooldown
-				thread.execute_async(std::move(callback));
+				executor.execute_async(std::move(callback));
 				cooldown_at = now + cooldown;
 			} else {
 				// Has cooldown
-				thread.execute_async(std::move(callback), cooldown_at);
+				executor.execute_async(std::move(callback), cooldown_at);
 				cooldown_at = cooldown_at + cooldown;
 			}
 		}
@@ -69,8 +69,8 @@ public:
 		cooldown(cooldown) {}
 
 public:
-	template <typename F>
-	void execute_async(F&& func, libv::mt::worker_thread& thread) {
+	template <typename Executor, typename F>
+	void execute_async(Executor& executor, F&& func) {
 		const auto need_to_queue = !in_flight.exchange(true);
 
 		if (need_to_queue) {
@@ -84,12 +84,12 @@ public:
 
 			if (now >= cooldown_at) {
 				// No cooldown
-				thread.execute_async(std::move(callback), now + heatup);
+				executor.execute_async(std::move(callback), now + heatup);
 				cooldown_at = now + heatup + cooldown;
 			} else {
 				// Has cooldown
 				const auto execute_at = std::max(cooldown_at, now + heatup);
-				thread.execute_async(std::move(callback), execute_at);
+				executor.execute_async(std::move(callback), execute_at);
 				cooldown_at = execute_at + cooldown;
 			}
 		}

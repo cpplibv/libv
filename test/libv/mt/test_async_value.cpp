@@ -32,7 +32,7 @@ TEST_CASE("async_value ctor semantics", "[libv.mt.async_value]") {
 	libv::mt::worker_thread worker;
 
 	libv::mt::async_value<int> av0;
-	av0.load(worker, load_async_42);
+	av0.load_async(worker, load_async_42);
 
 	// 0 copy to 1
 	// 0 move to 2
@@ -59,8 +59,8 @@ TEST_CASE("async_value complete loading with worker_thread", "[libv.mt.async_val
 	libv::mt::async_value<int> av0;
 	libv::mt::async_value<int> av1;
 
-	av0.load(worker, load_async_42);
-	av1.load(worker, load_async_42_stoppable);
+	av0.load_async(worker, load_async_42);
+	av1.load_async(worker, load_async_42_stoppable);
 
 	while (av0.loading())
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -79,8 +79,8 @@ TEST_CASE("async_value complete loading with worker_thread_pool", "[libv.mt.asyn
 	libv::mt::async_value<int> av0;
 	libv::mt::async_value<int> av1;
 
-	av0.load(worker, load_async_42);
-	av1.load(worker, load_async_42_stoppable);
+	av0.load_async(worker, load_async_42);
+	av1.load_async(worker, load_async_42_stoppable);
 
 	while (av0.loading())
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -111,11 +111,11 @@ TEST_CASE("async_value load cancellation before entering load function", "[libv.
 
 	libv::mt::async_value<int> av0;
 	libv::mt::async_value<int> av1;
-	av0.load(worker, [&] {
+	av0.load_async(worker, [&] {
 		load_was_called_av0 = true;
 		return 42;
 	});
-	av1.load(worker, [&] {
+	av1.load_async(worker, [&] {
 		load_was_called_av1 = true;
 		return 42;
 	});
@@ -154,7 +154,7 @@ TEST_CASE("async_value load cancellation after entering load function", "[libv.m
 	bool load_was_called_av0 = false;
 	libv::binary_latch load_trap_in;
 	libv::binary_latch load_trap_out;
-	av0.load(worker, [&](std::stop_token st) {
+	av0.load_async(worker, [&](std::stop_token st) {
 		load_was_called_av0 = true;
 
 		load_trap_in.raise();
