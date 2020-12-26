@@ -2,17 +2,12 @@ libv.diff: make sure every stream input respects offset (?) | for output it make
 libv.hash: Generate md5 hash from file without needing to handle the istream
 libv.update: patch create folder
 libv.update: patch remove folder
-<<<<<<< HEAD
-=======
 libv.update: Patch apply progress report
 libv.update: Patch improved logging
 libv.state: Find a state machine solution | for now boost statechart will be good enough
 libv.mt: pimpl worker_thread_pool and worker_thread
 libv.mt: common base queue for worker_thread_pool and worker_thread only difference is "run" calls (?)
->>>>>>> 03b6533... libv.mt: Add common baseclass and pimpl for worker_thread and worker_thread_pool
-
-
-
+libv.mt: Add load function argument support for async_value
 
 
 
@@ -60,9 +55,6 @@ libv.mt: common base queue for worker_thread_pool and worker_thread only differe
 
 --- STACK ------------------------------------------------------------------------------------------
 
-pimpl worker_thread_pool and worker_thread
-common base queue for worker_thread_pool and worker_thread only difference is "run" calls (?)
-
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
 
 
@@ -72,8 +64,8 @@ app/update/res/apply.sh
 app/update/res/gen.sh && app/update/res/apply.sh
 
 STACK
-	> ResourceServer Peer
 	> ResourceServer Peer State machine
+	> ResourceServer Peer
 	> Connection
 	> ConnectionSet
 	> Codec

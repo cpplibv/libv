@@ -182,4 +182,25 @@ TEST_CASE("async_value load cancellation after entering load function", "[libv.m
 	CHECK(not av0.loading());
 }
 
+TEST_CASE("async_value load functions arguments", "[libv.mt.async_value]") {
+	libv::mt::worker_thread worker;
+	libv::mt::async_value<int> av0;
+	libv::mt::async_value<int> av1;
+
+	av0.load_async(worker, [&](std::stop_token, int i) {
+		return i;
+	}, 42);
+	av1.load_async(worker, [&](int i) {
+		return i;
+	}, 42);
+
+	worker.stop();
+	worker.join();
+
+	REQUIRE(av0.has_value());
+	REQUIRE(av1.has_value());
+	CHECK(av0.value() == 42);
+	CHECK(av1.value() == 42);
+}
+
 // -------------------------------------------------------------------------------------------------

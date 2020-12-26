@@ -52,8 +52,8 @@ public:
 public:
 	/// Supports std::stop_token as the first argument for the loader function
 	/// If the cancellation occurs before the loader function call, the call is skipped entirely
-	template <typename Executor, typename LoadFunc>
-	void load_async(Executor& executor, LoadFunc&& func) {
+	template <typename Executor, typename LoadFunc, typename... Args>
+	void load_async(Executor& executor, LoadFunc&& func, Args&&... args) {
 		std::shared_ptr<payload> local_result;
 
 		{
@@ -66,16 +66,20 @@ public:
 
 		executor.execute_async([
 				result_sp = std::move(local_result),
-				f = std::forward<LoadFunc>(func)] () mutable {
+				f = std::forward<LoadFunc>(func),
+				...a = std::forward<Args>(args)] () mutable {
+			// By value capture for the function object and for the arguments
 
 			if (result_sp->stop_source.stop_requested())
 				return;
 
-			if constexpr (std::is_invocable_v<decltype(std::move(f)), std::stop_token>)
+			if constexpr (std::is_invocable_v<decltype(std::move(f)), std::stop_token, decltype(std::move(a))...>)
 				// Moving 'f' to give the loader function call operator the freedom to be rvalue qualified
-				result_sp->value = std::move(f)(result_sp->stop_source.get_token());
+				// Moving 'a...' as the local by value copies are going out of scope anyways
+				// NOTE: This blocks lvalue references as parameters, but those uses are error prone and logically incorrect
+				result_sp->value = std::move(f)(result_sp->stop_source.get_token(), std::move(a)...);
 			else
-				result_sp->value = std::move(f)();
+				result_sp->value = std::move(f)(std::move(a)...);
 		});
 	}
 
