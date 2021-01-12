@@ -23,7 +23,7 @@ namespace libv {
 /// @example `slice_view("Hello world!",  0,  5) == "Hello"`
 /// @example `slice_view("Hello world!",  5, -1) == " world"`
 /// @example `slice_view("Hello world!", -7, -1) == " world"`
-constexpr inline std::string_view slice_view(const std::string_view str, const int64_t lo, const int64_t hi) noexcept {
+[[nodiscard]] constexpr inline std::string_view slice_view(const std::string_view str, const int64_t lo, const int64_t hi) noexcept {
 	const auto size = static_cast<int64_t>(str.size());
 
 	const auto index_lo = std::clamp(lo < 0 ? lo + size : lo, int64_t{0}, size);
@@ -41,40 +41,71 @@ constexpr inline std::string_view slice_view(const std::string_view str, const i
 /// @param cut - the number of characters requested
 /// @example `slice_view("Hello world!", 5) == "Hello"`
 /// @example `slice_view("Hello world!", -6) == "world!"`
-constexpr inline std::string_view slice_view(const std::string_view str, const int64_t cut) noexcept {
+[[nodiscard]] constexpr inline std::string_view slice_view(const std::string_view str, const int64_t cut) noexcept {
 	if (cut < 0)
 		return slice_view(str, str.size() + cut, str.size());
 	else
 		return slice_view(str, 0, cut);
 }
 
-constexpr inline std::string_view slice_prefix_view(const std::string_view str, const std::string_view prefix) {
+/// Returns a string_view to the sub-string of the
+/// - prefixing `abs(\c cut)` characters cut off if \c cut is positive or
+/// - suffixing `abs(\c cut)` characters cut off if \c cut is negative
+/// If `abs(\c cut)` is greater then the length of the string, an empty string will be returned
+/// @param str - the source string
+/// @param cut - the number of characters to cut off
+/// @example `slice_off_view("Hello world!", 6) == "world!"`
+/// @example `slice_off_view("Hello world!", -7) == "Hello"`
+[[nodiscard]] constexpr inline std::string_view slice_off_view(const std::string_view str, const int64_t cut) noexcept {
+	if (cut < 0) {
+		const auto cut_s = static_cast<size_t>(std::abs(cut));
+
+		if (cut_s > str.size())
+			return "";
+		else
+			return std::string_view(str.data(), str.size() - cut_s);
+
+	} else {
+		const auto cut_s = static_cast<size_t>(cut);
+
+		if (cut_s > str.size())
+			return "";
+		else
+			return std::string_view(str.data() + cut_s, str.size() - cut_s);
+	}
+}
+
+[[nodiscard]] constexpr inline std::string_view slice_prefix_view(const std::string_view str, const std::string_view prefix) noexcept {
 	auto result = str;
 	if (result.substr(0, prefix.size()) == prefix)
 		result.remove_prefix(prefix.size());
 	return result;
 }
 
-constexpr inline std::string_view slice_suffix_view(const std::string_view str, const std::string_view suffix) {
+[[nodiscard]] constexpr inline std::string_view slice_suffix_view(const std::string_view str, const std::string_view suffix) noexcept {
 	auto result = str;
 	if (result.substr(str.size() - suffix.size(), suffix.size()) == suffix)
 		result.remove_prefix(suffix.size());
 	return result;
 }
 
-inline std::string slice_copy(const std::string_view str, const int64_t lo, const int64_t hi) {
+[[nodiscard]] inline std::string slice_copy(const std::string_view str, const int64_t lo, const int64_t hi) {
 	return std::string{slice_view(str, lo, hi)};
 }
 
-inline std::string slice_copy(const std::string_view str, const int64_t cut) {
+[[nodiscard]] inline std::string slice_copy(const std::string_view str, const int64_t cut) {
 	return std::string{slice_view(str, cut)};
 }
 
-inline std::string slice_prefix_copy(const std::string_view str, const std::string_view prefix) {
+[[nodiscard]] inline std::string slice_off_copy(const std::string_view str, const int64_t cut) {
+	return std::string{slice_off_view(str, cut)};
+}
+
+[[nodiscard]] inline std::string slice_prefix_copy(const std::string_view str, const std::string_view prefix) {
 	return std::string{slice_prefix_view(str, prefix)};
 }
 
-inline std::string slice_suffix_copy(const std::string_view str, const std::string_view suffix) {
+[[nodiscard]] inline std::string slice_suffix_copy(const std::string_view str, const std::string_view suffix) {
 	return std::string{slice_suffix_view(str, suffix)};
 }
 
@@ -85,6 +116,10 @@ inline void slice_inplace(String& str, const int64_t lo, const int64_t hi);
 template <typename String>
 inline void slice_inplace(String& str, const int64_t cut);
 	// TODO P5: implement slice_inplace
+
+template <typename String>
+inline void slice_off_inplace(String& str, const int64_t cut);
+	// TODO P5: implement slice_off_inplace
 
 template <typename String>
 inline void slice_prefix_inplace(String& str, const std::string_view prefix) {

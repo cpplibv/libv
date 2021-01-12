@@ -69,6 +69,26 @@ TEST_CASE("slice_view over-indexing cut sub-string", "[libv.utility.slice]") {
 	CHECK(libv::slice_view("0123456789", 20) == "0123456789");
 }
 
+TEST_CASE("slice_off_view simple cut sub-string", "[libv.utility.slice]") {
+	CHECK(libv::slice_off_view("0123456789", 0) == "0123456789");
+	CHECK(libv::slice_off_view("0123456789", 1) == "123456789");
+	CHECK(libv::slice_off_view("0123456789", 2) == "23456789");
+	CHECK(libv::slice_off_view("0123456789", 8) == "89");
+	CHECK(libv::slice_off_view("0123456789", 9) == "9");
+	CHECK(libv::slice_off_view("0123456789", 10) == "");
+
+	CHECK(libv::slice_off_view("0123456789", -1) == "012345678");
+	CHECK(libv::slice_off_view("0123456789", -2) == "01234567");
+	CHECK(libv::slice_off_view("0123456789", -8) == "01");
+	CHECK(libv::slice_off_view("0123456789", -9) == "0");
+	CHECK(libv::slice_off_view("0123456789", -10) == "");
+}
+
+TEST_CASE("slice_off_view over-indexing results in empty string", "[libv.utility.slice]") {
+	CHECK(libv::slice_off_view("0123456789", -20) == "");
+	CHECK(libv::slice_off_view("0123456789", 20) == "");
+}
+
 TEST_CASE("slice_prefix_inplace", "[libv.utility.slice]") {
 	std::string str = "0123456789";
 
