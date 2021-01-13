@@ -315,6 +315,16 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME colony
+	GIT_REPOSITORY https://github.com/mattreecebentley/plf_colony.git
+	GIT_TAG 80cb82f542bb176ab7f7e3393ab530a79223bb13
+	SKIP_CONFIGURE_AND_BUILD
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/colony/include/colony/
+		COMMAND cp -f ${PATH_EXT_SRC}/colony/src/get_colony/plf_colony.h ${PATH_EXT}/colony/include/colony/plf_colony.h
+)
+
+wish_create_external(
 	NAME ctre
 	GIT_REPOSITORY https://github.com/hanickadot/compile-time-regular-expressions.git
 	GIT_TAG 72ea41938bca052fa33d61469213beb76245c788
@@ -822,6 +832,12 @@ wish_create_executable(
 
 wish_end_group()
 wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
+
+wish_create_executable(
+	TARGET sandbox_libv_colony
+	SOURCE sandbox/libv_colony_main.cpp
+	LINK   ext_colony
+)
 
 wish_create_executable(
 	TARGET sandbox_libv_ctrl
