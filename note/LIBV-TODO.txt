@@ -591,12 +591,15 @@ libv: Split main track development to 3: Updater, UI, Game
 libv.diff: New library for diff and patch management
 libv.diff: Implement in memory diff and patch support
 libv.diff: make sure every stream of lvalue ref output respects offset
+ext: adopt colony https://github.com/mattreecebentley/plf_colony
+
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
 
+libv.utility: Naming for bit extract: I originally thought about using set/get pair, but extract/deposit are used in asm and bit world
 
 
 app.editor:
@@ -623,47 +626,138 @@ app.enum: new enum gen | rename and refactor
 	- its also a weak possibility to use a CTAD Enum class
 	| ADL function is the winner
 
-	#include <array>
-	#include <string_view>
-	#include <stdexcept>
-	#include <algorithm>
-	#include <map>
+	INPUT
+		enum("color", "int32_t")
+		namespace("libv::ns")
+		include("libv/math/vec.hpp")
+		property("rgb", "libv::vec4f")
+		custom_function("int calc")
+		values{
+				red = { rgba("255, 0, 0, 255") },
+				green = { rgba("0, 255, 0, 255") },
+				blue = { rgba("0, 0, 255, 255") },
+		)
 
-	template <typename Key, typename Value, std::size_t Size>
-	struct Map {
-	  std::array<std::pair<Key, Value>, Size> data;
+	OUTPUT
+		// First line
 
-	  [[nodiscard]] constexpr Value at(const Key &key) const {
-		const auto itr =
-			std::find_if(begin(data), end(data),
-						 [&key](const auto &v) { return v.first == key; });
-		if (itr != end(data)) {
-		  return itr->second;
-		} else {
-		  throw std::range_error("Not Found");
+		#pragma once
+
+		// std
+        #include <span>
+        #include <cstdint>
+        #include <string_view>
+        // pro
+        #include <libv/math/vec.hpp>
+
+        namespace libv::ns {
+
+        enum color {
+            red = 0,
+            green = 1,
+            blue = 2,
+        };
+
+        class color_type {
+            color enum_value;
+
+		public:
+            /*implicit*/ constexpr inline color_type(color value) noexcept :
+            	enum_value(value) {
+            }
+
+            [[nodiscard]] constexpr inline libv::vec4f rgb() const noexcept {
+                static constexpr libv::vec4f table[] = {
+                    libv::vec4f(255, 0, 0),
+                    libv::vec4f(0, 255, 0),
+                    libv::vec4f(0, 0, 255),
+                };
+
+                assert(enum_value >= 0 && enum_value < 3);
+                return table[enum_value];
+            }
+
+            [[nodiscard]] constexpr inline std::string_view to_string() const noexcept {
+                static constexpr std::string_view[] = {
+                    "red",
+                    "green",
+                    "blue",
+                };
+
+                assert(enum_value >= 0 && enum_value < 3);
+                return table[enum_value];
+            }
+
+            // ostream
+            // value
+            // parse
+            // operator<=>
+            // hash
+        };
+
+		[[nodiscard]] constexpr inline color_type type(color) noexcept {
+			return color_type(color);
 		}
-	  }
 
-	};
+        class color_state {
+            static constexpr color table[] = {
+                color::red,
+                color::green,
+                color::blue,
+            };
 
-	using namespace std::literals::string_view_literals;
-	static constexpr std::array<std::pair<std::string_view, int>, 8> color_values{
-		{{"black"sv, 7},
-		 {"blue"sv, 3},
-		 {"cyan"sv, 5},
-		 {"green"sv, 2},
-		 {"magenta"sv, 6},
-		 {"red"sv, 1},
-		 {"white"sv, 8},
-		 {"yellow"sv, 4}}};
+		public:
+            static constexpr size_t size = 3;
 
-	int lookup_value(const std::string_view sv) {
-	  //static const auto map = std::map<std::string_view, int>{color_values.begin(), color_values.end()};
-	  static constexpr auto map =
-		  Map<std::string_view, int, color_values.size()>{{color_values}};
+            // Range interfaces over table
+        };
 
-	  return map.at(sv);
-	}
+        static constexpr color_state color_enum;
+
+        } // namespace libv::ns
+
+	CONSTEXPR MAP
+		#include <array>
+		#include <string_view>
+		#include <stdexcept>
+		#include <algorithm>
+		#include <map>
+
+		template <typename Key, typename Value, std::size_t Size>
+		struct ConstexprMap {
+		  std::array<std::pair<Key, Value>, Size> data;
+
+		  [[nodiscard]] constexpr Value at(const Key &key) const {
+			const auto itr =
+				std::find_if(begin(data), end(data),
+							 [&key](const auto &v) { return v.first == key; });
+			if (itr != end(data)) {
+			  return itr->second;
+			} else {
+			  throw std::range_error("Not Found");
+			}
+		  }
+
+		};
+
+		using namespace std::literals::string_view_literals;
+		static constexpr std::array<std::pair<std::string_view, int>, 8> color_values{
+			{{"black"sv, 7},
+			 {"blue"sv, 3},
+			 {"cyan"sv, 5},
+			 {"green"sv, 2},
+			 {"magenta"sv, 6},
+			 {"red"sv, 1},
+			 {"white"sv, 8},
+			 {"yellow"sv, 4}}};
+
+		int lookup_value(const std::string_view sv) {
+		  //static const auto map = std::map<std::string_view, int>{color_values.begin(), color_values.end()};
+		  static constexpr auto map =
+			  Map<std::string_view, int, color_values.size()>{{color_values}};
+
+		  return map.at(sv);
+		}
 
 
 
@@ -671,10 +765,11 @@ app.enum: new enum gen | rename and refactor
 
 
 place.it:
-	https://quick-bench.com
-	https://build-bench.com
-	https://godbolt.org
+	cpp.tool: quick-bench.com - Mirco benchmark runtime
+	cpp.tool: build-bench.com - Benchmark compile time
+	cpp.tool: godbolt.org - Test build and analyze compiler asm
 
+	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	model: Generate texture for LOD meshes
@@ -688,7 +783,9 @@ clion live templates:
 	cout
 	fora
 netbeans and clion live templates:
-	ci - var(var)                  // Remove comma from netbeans version
+	fw - std::forward<Args>(args)
+	fwa - std::forward<decltype(args)>(args)
+	ci - var(var)                  // Remove the comma from the netbeans version
 	cim - var(std::move(var))
 	getm - auto& { return x; }
 	getr - const auto& x() const { return x; }
@@ -1602,7 +1699,6 @@ doc / blog: Klipse plugin - http://blog.klipse.tech/cpp/2016/12/29/blog-cpp.html
 doc: code snippet generation mdsnippets.com https://github.com/simonCropp/MarkdownSnippets
 ext.mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.17-src.tar.gz
 ext: adopt a better hash_map and remove every std::unordered container
-ext: adopt colony https://github.com/mattreecebentley/plf_colony
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
 gl: docs http://docs.gl
@@ -1696,6 +1792,7 @@ libv: generic general container storage
 --- NOTE -------------------------------------------------------------------------------------------
 
 cpp: C++ has a nice nested exception facility: std::throw_with_nested(std::runtime_error("Outer operation")); and std::rethrow_if_nested(e);
+cpp: hash_maps: https://martin.ankerl.com/2019/04/01/hashmap-benchmarks-01-overview/
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
@@ -1705,10 +1802,23 @@ UX: For windows position history: Remember not just position and size but if it 
 
 --- INFO -------------------------------------------------------------------------------------------
 
+Servers:
+	{"rs0.corruptedai.com", 25090},
+	{"rs1.corruptedai.com", 25091},
+	{"rs2.corruptedai.com", 25092},
+	{"rs3.corruptedai.com", 25093},
+	{"rs4.corruptedai.com", 25094},
+	// {"rs5.corruptedai.com", 25095},
+	// {"rs6.corruptedai.com", 25096},
+	// {"rs7.corruptedai.com", 25097},
+	// {"rs8.corruptedai.com", 25098},
+	// {"rs9.corruptedai.com", 25099},
+
 Extensions: Used default file extensions in LIBV
 	.vm4 - vader model 4
 	.vup - vader update patch
 	p01.00.patch - p{new}.{old}.patch - patch file naming convention
+	iris.01.00.patch - {program}.{new}.{old}.patch - patch file naming convention
 
 Files: Used default file names in LIBV
 	.lock - active write opened lock file
@@ -1716,7 +1826,12 @@ Files: Used default file names in LIBV
 	.patch - patch_progress log file
 
 Ports: Used default port ranges in LIBV
-	10220 - SSH
+	10022 - SSH
+	10122 - SSH (tunnel for rs0)
+	18080 - Jenkins
+
+	[25080-25089] - Network Sandbox
+
 	25090 - Update server listening
 	25091 - RESERVED
 	25092 - RESERVED
@@ -1727,6 +1842,7 @@ Ports: Used default port ranges in LIBV
 	25097 - RESERVED
 	25098 - RESERVED
 	25099 - RESERVED
+
 
 --- ABANDONED --------------------------------------------------------------------------------------
 

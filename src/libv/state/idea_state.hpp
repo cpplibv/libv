@@ -24,6 +24,10 @@
 //      - List of every sub state class can be listed with: using substates = list<S0, S1, S2>;
 //      - Parent state can be set with: using parent = S0; or as a template parameter of state
 //
+//  Open questions:
+//      - How to pass parameters to a state constructor during a transition (Boost has no easy solution but a posting an internal event and reacting to that, because in FSM events should be the only data flow)
+//      - Many more...
+//
 // -------------------------------------------------------------------------------------------------
 //
 //	struct MainState : libv::sm::state {
@@ -70,6 +74,14 @@
 //		state_machine.process_event(EventUserUnsubscribe{});
 //		assert(state_machine.terminated());
 //	}
+//
+//  Another interesting idea would be declaration only state transition definitions
+//		auto react(const Event&) -> transit<struct Selected>;
+//		auto react(const Event&) -> terminate;
+//		auto react(const Event&) -> discard_event;
+//		auto react(const Event&) -> defer_event;
+//		auto react(const Event&) -> forward_event;
+//  If the result type is not "result" then the framework would not call the function, but only use its declaration.
 //
 // -------------------------------------------------------------------------------------------------
 

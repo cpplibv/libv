@@ -12,12 +12,13 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T> WISH_REQUIRES(std::is_arithmetic_v<T>)
-[[nodiscard]] constexpr inline T parse_number(std::string_view str, std::error_code& ec) {
+[[nodiscard]] constexpr T parse_number(std::string_view str, std::error_code& ec) {
 	str = libv::trim(str);
 
 	T value;
 
 	// C++20 Support Workaround: This branching could be removed once Clang/GCC implements from_chars to floating point types
+	// Implementation is expected to land with GCC 11.0
 	if constexpr (std::is_integral_v<T>) {
 		std::from_chars_result result = std::from_chars<T>(str.begin(), str.end(), value);
 		ec = std::make_error_code(result.ec);
@@ -69,7 +70,7 @@ template <typename T> WISH_REQUIRES(std::is_arithmetic_v<T>)
 }
 
 template <typename T> WISH_REQUIRES(std::is_arithmetic_v<T>)
-[[nodiscard]] constexpr inline T parse_number_or_throw(std::string_view str) {
+[[nodiscard]] constexpr T parse_number_or_throw(std::string_view str) {
 	std::error_code ec;
 	T value = parse_number<T>(str, ec);
 

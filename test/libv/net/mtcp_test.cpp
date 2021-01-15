@@ -14,7 +14,7 @@
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/acceptor.hpp>
-#include <libv/net/mtcp/connection.hpp>
+#include <libv/net/mtcp/connection_cb.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
 
 

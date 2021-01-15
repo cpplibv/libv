@@ -60,6 +60,11 @@ int main(int argc, const char** argv) {
 			("port", "Listening TCP port")
 			= app::default_port;
 
+//	const auto enable_resource_server = args.flag
+//			("-r", "--resource_server")
+//			("resource_server", "Enable built in resource server")
+//			= app::default_port;
+
 	const auto num_net_thread = args.require<uint16_t>
 			("-t", "--net_thread")
 			("net_thread", "Number of network IO threads")
@@ -79,6 +84,27 @@ int main(int argc, const char** argv) {
 
 	const auto endpoint = parse_endpoint(address.value(), port.value());
 	app::log_app.info("Listening on: {}...", endpoint);
+
+//	app::UpdateServer us(update_server_settings);
+//	if (enable_resource_server.value()) {
+//		app::ResourceServer rs(resource_server_settings);
+//		us.add_resource_server(rs);
+//
+//		for (const auto path : libv::wilcard_filepath("app/update/res/p*.*.patch"))
+//			rs.add_files(path.generic_path, path);
+//		rs.add_files("app.update::patch::{}", "app/update/res/", "p*.*.patch");
+//
+//      Resource ID:
+//          app.update::patch::{filename}
+//                             ^^^^^^^^^^ filename template
+//                    ^^     ^^ separators
+//                      ^^^^^ resource namespace
+//          ^^^^^^^^^^ program / program url
+//	}
+
+//	us.peer.on_resource_request([]{
+//		rs.adopt(peer);
+//	});
 
 	app::UpdateServer server = {endpoint, num_net_thread.value()};
 

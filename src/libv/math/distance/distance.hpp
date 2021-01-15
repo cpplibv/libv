@@ -7,13 +7,19 @@
 #include <libv/math/solve_quadratic.hpp>
 // std
 #include <cmath>
+#include <chrono>
 
 
-namespace iris {
+namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
 inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f spherePos, float sphereRadius) {
+	struct Result {
+		bool hit;
+		float t;
+	};
+
 	auto dir = lineDir;
 
 	float t0, t1;
@@ -24,7 +30,7 @@ inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, l
 	auto c = l.lengthSQ() - sphereRadius * sphereRadius;
 
 	if (!solve_quadratic(a, b, c, t0, t1))
-		return std::make_pair(false, 0.f);
+		return Result(false, 0.f);
 
 	if (t0 > t1)
 		std::swap(t0, t1);
@@ -32,13 +38,13 @@ inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, l
 	if (t0 < 0.f) {
 		t0 = t1;
 		if (t0 < 0.f)
-			return std::make_pair(false, 0.f);
+			return Result(false, 0.f);
 	}
 
-	return std::make_pair(true, t0);
+	return Result(true, t0);
 }
 
-// http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+/// http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f point) {
 	auto w = point - linePos;
 
@@ -52,4 +58,4 @@ inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace iris
+} // namespace libv

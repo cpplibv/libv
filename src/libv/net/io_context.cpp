@@ -38,7 +38,7 @@ private:
 	void start_thread() {
 		const auto parentID = libv::thread_number();
 		threads.emplace_back([this, parentID] {
-			log_net.trace("IOContext-{} worker {} started by thread {}", id, libv::thread_number(), parentID);
+			log_net.trace("IOContext-{} worker thread {} started by thread {}", id, libv::thread_number(), parentID);
 			io_context.run();
 		});
 	}

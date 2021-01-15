@@ -1,7 +1,7 @@
-// Project: libv, File: app/update/patch/update_client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/read_file_stop.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <update/patch/resource/read_file_stop.hpp>
+#include <libv/utility/read_file_stop.hpp>
 // std
 #include <fstream>
 

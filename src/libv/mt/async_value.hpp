@@ -1,4 +1,4 @@
-// Project: libv, ...
+// Project: libv.mt, File: src/libv/mt/async_value.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -17,14 +17,14 @@ namespace mt {
 template <typename T>
 class async_value {
 private:
-	struct payload {
+	struct payload_t {
 		std::optional<T> value;
 		std::stop_source stop_source;
 	};
 
 private:
 	mutable std::mutex mutex;
-	std::shared_ptr<payload> result;
+	std::shared_ptr<payload_t> result = std::make_shared<payload_t>();
 
 public:
 	inline async_value() noexcept = default;
@@ -54,13 +54,13 @@ public:
 	/// If the cancellation occurs before the loader function call, the call is skipped entirely
 	template <typename Executor, typename LoadFunc, typename... Args>
 	void load_async(Executor& executor, LoadFunc&& func, Args&&... args) {
-		std::shared_ptr<payload> local_result;
+		std::shared_ptr<payload_t> local_result;
 
 		{
 			std::scoped_lock lock(mutex);
 			if (result)
 				result->stop_source.request_stop();
-			result = std::make_shared<payload>();
+			result = std::make_shared<payload_t>();
 			local_result = result;
 		}
 
@@ -107,8 +107,10 @@ public:
 	}
 
 	~async_value() {
-		if (result)
-			result->stop_source.request_stop();
+//		if (result && result.use_count() <= 2)
+//  		// !!! Race condition here, observing use count is incorrect
+//      !!! lifetime semantic violations
+		result->stop_source.request_stop();
 	}
 };
 

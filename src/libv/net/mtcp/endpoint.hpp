@@ -46,7 +46,7 @@ public:
 	}
 
 	template <typename OStream>
-	inline friend OStream& operator<<(OStream& os, const Endpoint& addr) {
+	friend inline OStream& operator<<(OStream& os, const Endpoint& addr) {
 		os
 				<< uint16_t{addr.address[0]} << '.'
 				<< uint16_t{addr.address[1]} << '.'

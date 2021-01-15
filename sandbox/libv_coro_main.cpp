@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_immer_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: sandbox/libv_coro_main.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <cppcoro/async_generator.hpp>

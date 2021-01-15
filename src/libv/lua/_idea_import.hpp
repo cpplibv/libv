@@ -1,4 +1,4 @@
-// Project: libv.lua, File: src/libv/lua/vm4.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: src/libv/lua/_idea_import.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -5,7 +5,7 @@
 // libv
 #include <libv/algorithm/linear_find.hpp>
 #include <libv/algorithm/erase_unstable.hpp>
-#include <libv/net/mtcp/connection.hpp>
+#include <libv/net/mtcp/connection_cb.hpp>
 //#include <libv/net/error.hpp>
 // pro
 #include <update/common/session.hpp>

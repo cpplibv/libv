@@ -49,6 +49,12 @@ public:
 	}
 
 public:
+	auto picker(...) {};
+//	Picker<float> picker(libv::vec2f screenSize) {
+//		return Picker<float>(proj_ * view(), screenSize);
+//	}
+
+public:
 	libv::mat4f projection(libv::vec2f canvas_size) const noexcept {
 		return libv::mat4f::perspective(fov, canvas_size.x / canvas_size.y, near_, far_);
 	}

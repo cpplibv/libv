@@ -645,7 +645,7 @@ public:
 		done,
 	};
 
-	progress_stage current_stage = progress_stage::plan_creates_dir;
+	progress_stage current_stage = progress_stage::init;
 	size_t current_stage_it = 0;
 
 public:

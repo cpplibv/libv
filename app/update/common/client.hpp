@@ -5,7 +5,7 @@
 // libv
 #include <libv/net/address.hpp>
 #include <libv/net/io_context.hpp>
-#include <libv/net/mtcp/connection.hpp>
+#include <libv/net/mtcp/connection_cb.hpp>
 // std
 #include <string>
 

@@ -10,12 +10,15 @@
 
 
 namespace libv {
-namespace sm {
+namespace state {
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
 using event = boost::statechart::event<T>;
+
+template <typename E>
+struct ev : libv::state::event<ev<E>> { E value; };
 
 template <typename CRTP, typename InitialState>
 using machine = boost::statechart::state_machine<CRTP, InitialState>;
@@ -27,10 +30,10 @@ struct state : boost::statechart::simple_state<CRTP, Context, EntryState> {
 	template <typename... T>
 	using react_list = boost::mpl::list<boost::statechart::custom_reaction<T>...>;
 
-	using result = libv::sm::result;
+	using result = libv::state::result;
 };
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace sm
+} // namespace state
 } // namespace libv

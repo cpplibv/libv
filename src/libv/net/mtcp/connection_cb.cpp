@@ -1,7 +1,7 @@
 // Project: libv.net, File: src/libv/net/mtcp/connection.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/net/mtcp/connection.hpp>
+#include <libv/net/mtcp/connection_cb.hpp>
 // ext
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/connect.hpp>
@@ -64,7 +64,7 @@ private:
 	mtcp_stream stream;
 
 private:
-	using ID = int64_t;
+	using ID = uint64_t;
 	static inline std::atomic<ID> nextID = 0;
 	const ID id = nextID++; /// Informative ID for logging and monitoring
 

@@ -56,6 +56,3 @@ template <typename T>
 
 } // namespace math
 } // namespace libv
-
-//interval_snap(i, 2, 1, 5.5)
-//interval_snap(i, 2, 0, 6)

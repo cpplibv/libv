@@ -14,31 +14,6 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-// */**
-// */**.new
-// */**.old
-// patch/v0001_v0000.vup
-// patch/*.vup
-// .lock
-// .patch
-// program
-//
-//	update outcomes:
-//		failure - operation failure
-//			attempt to retry and continue
-//			rollback -> do nothing
-//			rollback -> fix corruption -> do nothing
-//			rollback -> fix corruption -> update again
-//			force apply -> fix corruption
-//		failure - corruption
-//			rollback -> do nothing
-//			rollback -> fix corruption -> do nothing
-//			rollback -> fix corruption -> update again
-//			force apply -> fix corruption
-//		success
-
-// -------------------------------------------------------------------------------------------------
-
 struct PatchApplyFailure {
 	std::string filepath;
 	std::error_code reason;
@@ -54,6 +29,7 @@ public:
 	virtual ~PatchApplier();
 
 public:
+	/// Repeat until its returns false, errors are reported with the failures() function
 	bool progress();
 
 public:

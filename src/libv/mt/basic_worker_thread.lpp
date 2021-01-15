@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/basic_worker_thread.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/basic_worker_thread.lpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -25,10 +25,12 @@ class basic_worker_thread {
 
 	struct queued_task {
 		std::chrono::steady_clock::time_point time;
-		size_t index;
+		uint64_t index;
 		libv::unique_function<void()> func;
+	};
 
-		[[nodiscard]] friend constexpr inline bool operator<(const queued_task& lhs, const queued_task& rhs) noexcept {
+	struct queue_comp {
+		[[nodiscard]] constexpr inline bool operator()(const queued_task& lhs, const queued_task& rhs) const noexcept {
 			if (lhs.time == rhs.time)
 				return lhs.index > rhs.index;
 			return lhs.time > rhs.time;
@@ -36,7 +38,7 @@ class basic_worker_thread {
 	};
 
 private:
-	std::priority_queue<queued_task> queue;
+	std::priority_queue<queued_task, std::vector<queued_task>, queue_comp> queue;
 	mutable std::mutex queue_m;
 	std::condition_variable work_cv;
 
@@ -44,7 +46,7 @@ private:
 	Threads context;
 	const std::string name_;
 
-	size_t next_index = 0;
+	uint64_t next_index = 0;
 
 public:
 	template <typename... Args>

@@ -1,7 +1,7 @@
 // Project: libv.net, File: src/libv/net/mtcp/acceptor.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/net/mtcp/acceptor.hpp>
+#include <libv/net/mtcp/acceptor_he.hpp>
 // ext
 #include <boost/asio/ip/tcp.hpp>
 // std
@@ -11,7 +11,7 @@
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/log.hpp>
-#include <libv/net/mtcp/connection_cb.hpp>
+#include <libv/net/mtcp/connection_he.hpp>
 #include <libv/net/mtcp/socket.hpp>
 
 
@@ -21,21 +21,32 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplAcceptorAsyncCB : public std::enable_shared_from_this<ImplAcceptorAsyncCB> {
-	using ErrorSource = AcceptorAsyncCB::ErrorSource;
-
+class ImplBaseAcceptorAsyncHE : public std::enable_shared_from_this<ImplBaseAcceptorAsyncHE> {
 private:
 	bool accepting = false;
 	boost::asio::ip::tcp::acceptor acceptor;
 	std::recursive_mutex mutex;
 	IOContext& io_context;
-	AcceptorAsyncCB::CBAccept cb_accept;
-	AcceptorAsyncCB::CBError cb_error;
+
+	bool abandoned_handler = false;
+	std::unique_ptr<BaseAcceptorHandler> handler;
 
 public:
-	explicit ImplAcceptorAsyncCB(IOContext& io_context) :
+	explicit inline ImplBaseAcceptorAsyncHE(IOContext& io_context) :
 		acceptor(io_context.context()),
 		io_context(io_context) { }
+
+	inline void inject_handler(std::unique_ptr<BaseAcceptorHandler>&& handler_) noexcept {
+		handler = std::move(handler_);
+	}
+
+	inline void abandon_handler() noexcept {
+		std::unique_lock lock{mutex};
+		abandoned_handler = true;
+
+		if (!accepting)
+			auto temp = std::move(handler); // Move handler to stack to commit suicide
+	}
 
 public:
 	[[nodiscard]] inline std::error_code listen(Endpoint endpoint_, int backlog) {
@@ -68,11 +79,14 @@ public:
 			return ec;
 		}
 
+		log_net.trace("Acceptor listens to {}...", endpoint);
 		return ec;
 	}
 
-	inline void accept() noexcept {
+	inline void accept_async() noexcept {
 		std::unique_lock lock{mutex};
+
+		log_net.trace("Acceptor accept_async");
 		accepting = true;
 		_do_accept(shared_from_this());
 	}
@@ -87,17 +101,7 @@ public:
 		accepting = false;
 	}
 
-	inline void handle_accept(AcceptorAsyncCB::CBAccept callback) noexcept {
-		std::unique_lock lock{mutex};
-		cb_accept = std::move(callback);
-	}
-
-	inline void handle_error(AcceptorAsyncCB::CBError callback) noexcept {
-		std::unique_lock lock{mutex};
-		cb_error = std::move(callback);
-	}
-
-	inline void _do_accept(std::shared_ptr<ImplAcceptorAsyncCB>&& self_sp) noexcept {
+	inline void _do_accept(std::shared_ptr<ImplBaseAcceptorAsyncHE>&& self_sp) noexcept {
 		acceptor.async_accept(
 				[self_sp = std::move(self_sp)]
 //				(const std::error_code ec, boost::asio::ip::tcp::socket peer) mutable {
@@ -105,45 +109,51 @@ public:
 
 			std::unique_lock lock{self_sp->mutex};
 
-			if (ec)
-				self_sp->cb_error(ErrorSource::accept, ec);
-			else
-				self_sp->cb_accept(ConnectionAsyncCB(self_sp->io_context, Socket{std::move(peer)}));
+			if (ec) {
+				self_sp->handler->on_accept(ec);
+
+			} else {
+//				self_sp->cb_accept(ConnectionAsyncCB(self_sp->io_context, Socket{std::move(peer)}));
+				auto connection = self_sp->handler->on_accept(self_sp->io_context);
+				connection.handler().connection.connect_sync(Socket{std::move(peer)});
+			}
 
 			if (self_sp->accepting)
 				self_sp->_do_accept(std::move(self_sp));
+			else if (self_sp->abandoned_handler)
+				auto temp = std::move(self_sp->handler); // Move handler to stack to commit suicide
 		});
 	}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-AcceptorAsyncCB::AcceptorAsyncCB(IOContext& io_context) :
-	impl(std::make_shared<ImplAcceptorAsyncCB>(io_context)) {
+BaseAcceptorAsyncHE::BaseAcceptorAsyncHE(IOContext& io_context) :
+	internals(std::make_shared<ImplBaseAcceptorAsyncHE>(io_context)) {
 }
 
-std::error_code AcceptorAsyncCB::listen(Endpoint endpoint, int backlog) noexcept {
-	return impl->listen(endpoint, backlog);
+void BaseAcceptorAsyncHE::inject_handler(std::unique_ptr<BaseAcceptorHandler>&& handler) noexcept {
+	internals->inject_handler(std::move(handler));
 }
 
-std::error_code AcceptorAsyncCB::listen(uint16_t port, int backlog) noexcept {
-	return impl->listen(Endpoint(0, 0, 0, 0, port), backlog);
+void BaseAcceptorAsyncHE::abandon_handler() noexcept {
+	internals->abandon_handler();
 }
 
-void AcceptorAsyncCB::accept() noexcept {
-	impl->accept();
+std::error_code BaseAcceptorAsyncHE::listen(Endpoint endpoint, int backlog) noexcept {
+	return internals->listen(endpoint, backlog);
 }
 
-void AcceptorAsyncCB::cancel() noexcept {
-	impl->cancel();
+std::error_code BaseAcceptorAsyncHE::listen(uint16_t port, int backlog) noexcept {
+	return internals->listen(Endpoint(0, 0, 0, 0, port), backlog);
 }
 
-void AcceptorAsyncCB::handle_accept(CBAccept callback) noexcept {
-	impl->handle_accept(std::move(callback));
+void BaseAcceptorAsyncHE::accept_async() noexcept {
+	internals->accept_async();
 }
 
-void AcceptorAsyncCB::handle_error(CBError callback) noexcept {
-	impl->handle_error(std::move(callback));
+void BaseAcceptorAsyncHE::cancel() noexcept {
+	internals->cancel();
 }
 
 // -------------------------------------------------------------------------------------------------

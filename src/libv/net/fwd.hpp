@@ -14,6 +14,7 @@ namespace mtcp { // ------------------------------------------------------------
 class AcceptorAsyncCB;
 class ConnectionAsyncCB;
 
+class Endpoint;
 class ResolveResults;
 class Socket;
 

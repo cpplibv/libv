@@ -8,8 +8,9 @@ libv.state: Find a state machine solution | for now boost statechart will be goo
 libv.mt: pimpl worker_thread_pool and worker_thread
 libv.mt: common base queue for worker_thread_pool and worker_thread only difference is "run" calls (?)
 libv.mt: Add load function argument support for async_value
-
-
+ext: pulled in cppcoro, but need to work around cmake issue of WIN32 branching in lib
+ext: fork cppcoro to fix build issues
+libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 
 
 
@@ -50,52 +51,52 @@ libv.mt: Add load function argument support for async_value
 
 
 
-https://www.youtube.com/watch?v=1Wy5sq3s2rg
-https://www.youtube.com/watch?v=FeUOKwLLQe0
+
+
+
+
+// TODO P2: Place Invariants into the proper header
+//		Async Connection Invariants:
+//		- every on_* function is called on a connection strand by the io context's executor
+//		- no call happens before start or connect was called
+//		- on_connect and on_disconnect are each called at most once
+//		- if on_connect is called then on_disconnect will be called to
+//		- on_error may called multiple times
+//		- on_error is called between on_connect and on_disconnect except on the error for connect failure
+//		- on_disconnect will always be the last function to be called
+
+
+
+
+review:
+	libv.net: naming: close // Does it on the spot canceling anything, disconnect_async // Queues an async for disconnect
 
 
 
 
 
-
-libv.net: naming:
-		disconnect // Does it on the spot canceling anything
-		queue_disconnect_sync // (??) Queues and wait for disconnect
-		queue_disconnect_async // Queues an async for disconnect
-
-
-
-
-
-
+naming or minor changes:
+	libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
+	libv.algorithm: Rename libv.algorithm to libv.algo
+	libv.serialization: Rename libv.serialization to libv.serial
+	libv: fix typo SERIALIAZTION -> SERIALIZATION
+	libv: (?) naming change: func_optional -> func_opt
+	libv: (?) naming change: func_or_throw -> func_throw
+	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
+	libv: (?) naming change: func_or       -> func_or    (unchanged)
 
 
-
-
-
---- STACK ------------------------------------------------------------------------------------------
-
+libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
-
-
-libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
-libv.algorithm: Rename libv.algorithm to libv.algo
-libv.serialization: Rename libv.serialization to libv.serial
-libv: (?) naming change: func_optional -> func_opt
-libv: (?) naming change: func_or_throw -> func_throw
-libv: (?) naming change: func_ec       -> func_ec    (unchanged)
-libv: (?) naming change: func_or       -> func_or    (unchanged)
-
-
 libv.net: Idea channel: open, close, receive, send, error, so a connection within a connection
 
 
 Make sure that the state machine event are mutex protected, otherwise a response to a request could arrive before we change state
 	Or this is taken care of by a "strand" in connection? Or it should it be?
 
-app/update/res/gen.sh && app/update/res/apply.sh
-
 STACK
+	> ConnectionAsyncIH
+	> SimpleServer, SimpleSession and SimpleClient
 	> ResourceServer Peer State machine
 	> ResourceServer Peer
 	> Connection
@@ -111,13 +112,13 @@ STACK
 	> Codec
 	> Protocol
 	> Connection
-	> ConnectionAsnyc sync API: disconnect_immediate
+	> ConnectionAsyncCB No reuse, simplify
+	> ConnectionAsync sync API: disconnect_immediate | The main issue might be the naming
+		| disconnect // Does it on the spot canceling anything
+		| queue_disconnect_sync // (??) Queues and wait for disconnect
+		| queue_disconnect_async // Queues an async for disconnect
 
-
-
-libv.update: Patch apply progress report
-libv.update: Patch apply current step report (API to get the next step/operation)
-
+libv.net: Rename acceptor.accept -> acceptor.start
 
 update: Sometimes it might require a restart for the updater
 	updater is updated -> needs restart
@@ -134,29 +135,40 @@ update: Sometimes it might require a restart for the updater
 
 app/update/res/gen.sh
 app/update/res/apply.sh
-
-
-
-libv.utility: input bytes on static memory should return correct amount of read bytes (required by hash_md5)
-
-libv.utility: Storage space size formatter: xxx'xxx.yy KB, MB
-		This will absorb the dotter that I have in fsw
+app/update/res/gen.sh && app/update/res/apply.sh
 
 
 
 
-libv.update: Upon patch apply failure, create manifest and send to server
+libv.update.master Separate master sources and dependencies to a separate lib
+libv.update.common Separate common sources and dependencies to a separate lib
+libv.update.client Separate client sources and dependencies to a separate lib
+libv.update.server Separate server sources and dependencies to a separate lib
 
-libv.update: patch creation rename support
-libv.update: patch creation modify to support
 
-libv.update: patch apply LOG EVERY FAILURE, LOG EVERYTHING, that will be useful
 
+patch apply progress ratio getter
+for updater progress made callback
+
+
+place.it:
+	libv.serialization: ideas for limited container size during serialization:
+			std::string resource;
+			libv::serial::limited<std::string, 256> resource;
+			template <typename Archive> inline void serialize(Archive& ar) {
+				ar & LIBV_NVP(resource);
+				LIBV_NVP(ar, resource);
+				ar.limited(resource, "resource", 256);
+				ar.limited(LIBV_NVP(resource), 256);
+			}
 
 cpp: if tellg fails it can return -1, review EVERY usage of it
+libv.utility: input bytes on static memory should return correct amount of read bytes (required by hash_md5)
 
 
-
+libv.update: Patch apply current step report (API to get the next step/operation)
+libv.update: Patch creation rename support
+libv.update: Patch creation modify to support
 
 
 
@@ -176,42 +188,40 @@ libv.net, libv.utility, app.update: Looks like the performance of operator<< .rd
 
 
 
-Idea: patch on patch: for future patch download, download expected patch, patch the patch when it goes live
-
-
 
 Network:
+	disconnect_immediate()
 
-disconnect_immediate()
+	I could do this when resolving:
+	udp::resolver::query query(udp::v4(), response[0], response[1]);
+							   ^^^^^^^^^
 
-
-I could do this when resolving:
-udp::resolver::query query(udp::v4(), response[0], response[1]);
-						   ^^^^^^^^^
-
-
-libv.net.mtcp: Protocol messages, handshake with protocol ID and version
-	libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
+	libv.net.mtcp: Protocol messages, handshake with protocol ID and version
+		libv.net.mtcp: Symmetric transfer rate limiting (requires storing local and remote limit, use min) (requires protocol message)
 
 
+Update:
+	app.update: Implement an update server / client
+		app.update: Reconnect: attempts, timers
 
-app.update: Implement an update server / client
-	app.update: Reconnect: attempts, timers
+		app.update: Security: Scope restriction on file access
+		app.update: Login
+		app.update: Server: Cache files in memory, watch if they change
 
-	app.update: Security: Scope restriction on file access
-	app.update: Login
-	app.update: Server: Cache files in memory, watch if they change
+		app.update: Manifest, versions, etc...
+		app.update: List current clients on Server
 
-	app.update: Manifest, versions, etc...
-	app.update: List current clients on Server
+		app.update: Sign the patch (server auth is not needed for now, signing is enough)
+				https://eclipsesource.com/blogs/2016/09/07/tutorial-code-signing-and-verification-with-openssl/
+				https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
 
-	app.update: Sign the patch (server auth is not needed for now, signing is enough)
-			https://eclipsesource.com/blogs/2016/09/07/tutorial-code-signing-and-verification-with-openssl/
-			https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
+	app.update: Upon patch apply failure, create manifest and send to server
 
 
-app.update: Version manifest: list of files with MD5 hash in a folder
-app.update: Patch manifest: list of changes add/delete/(replace)/modify/rename
+
+app.update:
+		Version manifest: list of files with MD5 hash in a folder
+		Patch manifest: list of changes add/delete/(replace)/modify/rename
 
 app.update: The update process:
 	prep
@@ -220,16 +230,17 @@ app.update: The update process:
 			folder/release A
 			folder/release B
 		save diff into patch folder with relevant information
-		sign the diff
+		sign the update
 	update
-		download diff
-		copy update.exe to update.ex_
-		apply diff to update.ex_
-		rename update.exe to update.bak
-		// Only bricking point is here, and even then .bak could be renamed by hand
-		rename update.ex_ to update.exe
+		download update
+		verify update signature
+		copy update.exe to update.exe.new
+		apply diff to update.exe.new
+		rename update.exe to update.exe.old
+		// <- This is the only bricking point is here, and even then .old could be renamed by hand
+		rename update.exe.new to update.exe
 		restart update.exe
-		remove update.bak
+		remove update.exe.old
 
 app.update.security:
 	! must authenticate the server

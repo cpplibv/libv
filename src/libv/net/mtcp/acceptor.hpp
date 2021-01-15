@@ -44,11 +44,11 @@ public:
 	/// Sets up the port to the default 0.0.0.0 address and the backlog connection count
 	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
 	/// @thread safe
-	void listen(uint16_t port, int backlog = 4) noexcept;
+	[[nodiscard]] std::error_code listen(uint16_t port, int backlog = 4) noexcept;
 	/// Sets up the endpoint port and the  backlog connection count
 	/// Its (only) required to call \c start if the connection object was constructed with a socket external object.
 	/// @thread safe
-	void listen(Endpoint endpoint, int backlog = 4) noexcept;
+	[[nodiscard]] std::error_code listen(Endpoint endpoint, int backlog = 4) noexcept;
 
 	void accept() noexcept;
 	void cancel() noexcept;
