@@ -389,6 +389,14 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME function2
+	GIT_REPOSITORY https://github.com/Naios/function2.git
+	GIT_TAG a92427bf25705287a47ffebd787dfec93033ccef
+	CMAKE_ARGS
+		-DBUILD_TESTING=OFF
+)
+
+wish_create_external(
 	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
 	GIT_TAG 679246fadb5780963151c676056772fedebab694
@@ -698,7 +706,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_utility STATIC
 	SOURCE src/libv/utility/*.cpp
-	LINK   Threads::Threads
+	LINK   Threads::Threads ext_function2
 )
 
 wish_create_library(
