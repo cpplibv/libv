@@ -115,6 +115,8 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 		# link_libraries(asan)
 		# link_libraries(ubsan)
 	endif()
+
+	add_compile_options(-fcoroutines)
 endif()
 
 # Flags --------------------------------------------------------------------------------------------
@@ -322,6 +324,20 @@ wish_create_external(
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/colony/include/colony/
 		COMMAND cp -f ${PATH_EXT_SRC}/colony/src/get_colony/plf_colony.h ${PATH_EXT}/colony/include/colony/plf_colony.h
+)
+
+wish_create_external(
+	NAME cppcoro
+#	GIT_REPOSITORY https://github.com/andreasbuhr/cppcoro.git
+#	GIT_TAG 7cc9433436fe8f2482138019cfaafce8e1d7a896
+	GIT_REPOSITORY https://github.com/VaderY/cppcoro.git
+	GIT_TAG bf48f908410b9977377e2c74a9c56d1b7686c2d8
+	CMAKE_ARGS
+		-DBUILD_TESTING=OFF
+	LINK cppcoro
+	LINK $<IF:$<BOOL:${WIN32}>,
+			Synchronization, # Win 32
+		>
 )
 
 wish_create_external(
@@ -840,6 +856,12 @@ wish_create_executable(
 
 wish_end_group()
 wish_create_group(GROUP_SANDBOX) # Sandboxes -------------------------------------------------------
+
+wish_create_executable(
+	TARGET sandbox_libv_coro
+	SOURCE sandbox/libv_coro_main.cpp
+	LINK   ext_cppcoro libv_mt libv_utility
+)
 
 wish_create_executable(
 	TARGET sandbox_libv_colony

@@ -45,6 +45,26 @@ libv.mt: Add load function argument support for async_value
 
 
 
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+https://www.youtube.com/watch?v=1Wy5sq3s2rg
+https://www.youtube.com/watch?v=FeUOKwLLQe0
+
+
+
+
+
+
+libv.net: naming:
+		disconnect // Does it on the spot canceling anything
+		queue_disconnect_sync // (??) Queues and wait for disconnect
+		queue_disconnect_async // Queues an async for disconnect
+
+
+
 
 
 
@@ -58,8 +78,20 @@ libv.mt: Add load function argument support for async_value
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
 
 
-app/update/res/gen.sh
-app/update/res/apply.sh
+libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
+libv.algorithm: Rename libv.algorithm to libv.algo
+libv.serialization: Rename libv.serialization to libv.serial
+libv: (?) naming change: func_optional -> func_opt
+libv: (?) naming change: func_or_throw -> func_throw
+libv: (?) naming change: func_ec       -> func_ec    (unchanged)
+libv: (?) naming change: func_or       -> func_or    (unchanged)
+
+
+libv.net: Idea channel: open, close, receive, send, error, so a connection within a connection
+
+
+Make sure that the state machine event are mutex protected, otherwise a response to a request could arrive before we change state
+	Or this is taken care of by a "strand" in connection? Or it should it be?
 
 app/update/res/gen.sh && app/update/res/apply.sh
 

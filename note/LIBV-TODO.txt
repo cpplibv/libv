@@ -1700,6 +1700,8 @@ app: for apps you can cd next to the binary to solve any relative path issue (co
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_CXX_FLAGS="-fdiagnostics-color=always"
 ninja: CLICOLOR_FORCE=1 env var to have colored output
+UX: Upon first run avoid full-screening a desktop app by default, this makes it less scary, less intrusive and leave the clint more in control
+UX: For windows position history: Remember not just position and size but if it was in maximized state or not (clion fucked it up, and it show a pixel line on a secondary monitor)
 
 --- INFO -------------------------------------------------------------------------------------------
 
