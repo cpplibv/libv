@@ -19,7 +19,7 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename ExecutionContext>
+template <typename Threads>
 class basic_worker_thread {
 	static constexpr std::chrono::steady_clock::time_point immediate = std::chrono::steady_clock::time_point::min();
 
@@ -41,7 +41,7 @@ private:
 	std::condition_variable work_cv;
 
 	bool terminate = false;
-	ExecutionContext context;
+	Threads context;
 	const std::string name_;
 
 	size_t next_index = 0;
@@ -73,32 +73,32 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename ExecutionContext>
+template <typename Threads>
 template <typename... Args>
-inline basic_worker_thread<ExecutionContext>::basic_worker_thread(std::string new_name, Args&&... args) :
+inline basic_worker_thread<Threads>::basic_worker_thread(std::string new_name, Args&&... args) :
 	context(std::forward<Args>(args)..., &basic_worker_thread::run, this),
 	name_(std::move(new_name)) {}
 
-template <typename ExecutionContext>
-inline basic_worker_thread<ExecutionContext>::~basic_worker_thread() {
+template <typename Threads>
+inline basic_worker_thread<Threads>::~basic_worker_thread() {
 	// TODO P2: What should happen with tasks that are 'canceled', for now we just dont execute them, best would be an argument to the task like netts that tells it, that it is cancelled, with maybe a default way that it would just not get called
 	stop();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func) {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::execute_async(libv::unique_function<void()> func) {
 	execute_async(std::move(func), immediate);
 }
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::duration after) {
 	execute_async(std::move(func), std::chrono::steady_clock::now() + after);
 }
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::execute_async(libv::unique_function<void()> func, std::chrono::steady_clock::time_point at) {
 	std::unique_lock lock(queue_m);
 	assert(!terminate && "Queueing task after worker thread has been stopped");
 
@@ -106,67 +106,73 @@ inline void basic_worker_thread<ExecutionContext>::execute_async(libv::unique_fu
 	work_cv.notify_one();
 }
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::stop() {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::stop() {
 	std::unique_lock lock(queue_m);
 	terminate = true;
 	work_cv.notify_all();
 }
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::join() {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::join() {
 	context.join();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename ExecutionContext>
-inline void basic_worker_thread<ExecutionContext>::run() {
+template <typename Threads>
+inline void basic_worker_thread<Threads>::run() {
 	libv::unique_function<void()> task;
+	std::unique_lock lock(queue_m);
 
 	while (true) {
-		{
-			std::unique_lock lock(queue_m);
+		// Wait for terminate, new task, or until the time of the top task is up
+		while (true) {
+			if (terminate) {
+				break;
 
-			// Wait for terminate, new task, or until the time of the top task is up
-			while (true) {
-				if (terminate) {
-					break;
+			} else if (queue.empty()) {
+				work_cv.wait(lock);
 
-				} else if (queue.empty()) {
-					work_cv.wait(lock);
+			} else if (queue.top().time <= std::chrono::steady_clock::now()) {
+				break;
 
-				} else if (queue.top().time <= std::chrono::steady_clock::now()) {
-					break;
-
-				} else {
-					const auto cvs = work_cv.wait_until(lock, queue.top().time);
-					if (cvs == std::cv_status::timeout)
+			} else {
+				// NOTE: This code will woke up every thread for the next task, could be improved, but it will be extra complexity
+				const auto cvs = work_cv.wait_until(lock, queue.top().time);
+				if (cvs == std::cv_status::timeout) {
+					if (queue.empty())
+						// Someone else already took care of the job, go back to sleep
+						continue;
+					else
 						break;
 				}
 			}
-
-			if (terminate)
-				break;
-
-			task = std::move(const_cast<queued_task&>(queue.top()).func); // NOTE: const_cast is safe as the task is popped anyways but ugly
-			queue.pop();
 		}
+
+		if (terminate)
+			break;
+
+		task = std::move(const_cast<queued_task&>(queue.top()).func); // NOTE: const_cast is safe as the task is popped anyways
+		queue.pop();
+
+		lock.unlock();
 
 		try {
 			task();
 		} catch (const std::exception& ex) {
 			log.error("Exception occurred in {} basic_worker_thread: {}", name_, ex.what());
 		}
+
+		lock.lock();
 	}
 
 	// Process tasks that can be executed
-	std::unique_lock queue_lock(queue_m);
 	while (!queue.empty() && queue.top().time <= std::chrono::steady_clock::now()) {
 		task = std::move(const_cast<queued_task&>(queue.top()).func); // NOTE: const_cast is safe but ugly as the task is popped anyways
 		queue.pop();
 
-		queue_lock.unlock();
+		lock.unlock();
 
 		try {
 			task();
@@ -174,7 +180,7 @@ inline void basic_worker_thread<ExecutionContext>::run() {
 			log.error("Exception occurred in {} basic_worker_thread: {}", name_, ex.what());
 		}
 
-		queue_lock.lock();
+		lock.lock();
 	}
 
 	// NOTE: Currently the rest of the outlining task are just dropped, but they could be cancelled
