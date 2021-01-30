@@ -661,7 +661,8 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_math INTERFACE
+	TARGET libv_math STATIC
+	SOURCE src/libv/math/*.cpp
 	LINK   ext_glm # Remove (This will only happen with a vec concept)
 	LINK   ext_range # For concepts | # TODO P5: Do we still need this? Are we not using native concepts?
 )
