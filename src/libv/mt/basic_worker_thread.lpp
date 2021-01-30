@@ -138,14 +138,14 @@ inline void basic_worker_thread<Threads>::run() {
 				break;
 
 			} else {
-				// NOTE: This code will woke up every thread for the next task, could be improved, but it will be extra complexity
+				// NOTE: This code will woke up every thread for the next task
+				//      could be improved, but it would be extra complexity, good enough for now
 				const auto cvs = work_cv.wait_until(lock, queue.top().time);
 				if (cvs == std::cv_status::timeout) {
-					if (queue.empty())
+					if (queue.empty() || queue.top().time > std::chrono::steady_clock::now())
 						// Someone else already took care of the job, go back to sleep
 						continue;
-					else
-						break;
+					break;
 				}
 			}
 		}
