@@ -5,7 +5,7 @@
 // std
 #include <cstdint>
 // pro
-#include <libv/algorithm/wildcard.hpp>
+#include <libv/algo/wildcard.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

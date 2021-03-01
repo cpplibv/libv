@@ -7,7 +7,7 @@
 #include <range/v3/view/map.hpp>
 #include <range/v3/view/reverse.hpp>
 // libv
-#include <libv/algorithm/linear_contains.hpp>
+#include <libv/algo/linear_contains.hpp>
 #include <libv/range/view_lines_string_view.hpp>
 #include <libv/utility/guard.hpp>
 // std

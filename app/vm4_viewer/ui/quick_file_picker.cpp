@@ -8,7 +8,7 @@
 #include <boost/container/flat_set.hpp>
 //#include <range/v3/view/enumerate.hpp>
 // libv
-#include <libv/algorithm/wildcard.hpp>
+#include <libv/algo/wildcard.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/ui/component/image.hpp> // testing only, remove it
 #include <libv/ui/component/label.hpp>

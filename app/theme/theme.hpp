@@ -3,8 +3,8 @@
 #pragma once
 
 // libv
-#include <libv/algorithm/pack_rect_bin.hpp>
-#include <libv/algorithm/pack_linear_lines.hpp>
+#include <libv/algo/pack_rect_bin.hpp>
+#include <libv/algo/pack_linear_lines.hpp>
 #include <libv/container/vector_2d.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/reflection_access.hpp>

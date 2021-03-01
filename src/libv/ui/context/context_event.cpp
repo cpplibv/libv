@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/context/context_event.hpp>
 // libv
-#include <libv/algorithm/erase_all_unstable.hpp>
+#include <libv/algo/erase_all_unstable.hpp>
 // std
 #include <cassert>
 #include <functional>

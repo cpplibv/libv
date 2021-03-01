@@ -5,7 +5,7 @@
 // ext
 #include <GL/glew.h>
 // libv
-#include <libv/algorithm/fill.hpp>
+#include <libv/algo/fill.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/always.hpp>

@@ -7,7 +7,7 @@
 #include <range/v3/view/enumerate.hpp>
 #include <utf8cpp/utf8.h>
 // libv
-#include <libv/algorithm/slice.hpp>
+#include <libv/algo/slice.hpp>
 #include <libv/range/view_uft8_codepoints.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/utf8.hpp>

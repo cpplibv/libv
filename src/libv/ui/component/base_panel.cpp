@@ -3,7 +3,7 @@
 // hpp
 #include <libv/ui/component/base_panel.lpp>
 // libv
-#include <libv/algorithm/erase_if_stable.hpp>
+#include <libv/algo/erase_if_stable.hpp>
 // pro
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_render.hpp>

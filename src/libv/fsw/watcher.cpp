@@ -6,8 +6,8 @@
 // ext
 #include <efsw/efsw.hpp>
 // libv
-#include <libv/algorithm/erase_if_unstable.hpp>
-#include <libv/algorithm/linear_find.hpp>
+#include <libv/algo/erase_if_unstable.hpp>
+#include <libv/algo/linear_find.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/is_parent_folder_of.hpp>
 

@@ -13,7 +13,9 @@ ext: fork cppcoro to fix build issues
 libv.net: Implement new network handler based connection and acceptor
 libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 libv: fix typo SERIALIAZTION -> SERIALIZATION
-
+libv.serialization: Rename libv.serialization to libv.serial
+libv.serialization: Rename SERIALIZATION to SERIAL
+libv.algorithm: Rename libv.algorithm to libv.algo
 
 
 
@@ -50,13 +52,10 @@ libv: fix typo SERIALIAZTION -> SERIALIZATION
 --- STACK ------------------------------------------------------------------------------------------
 
 
-libv.serialization: Rename libv.serialization to libv.serial
-libv.serialization: Rename SERIALIZATION to SERIAL
 
 
 naming or minor changes:
 	libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
-	libv.algorithm: Rename libv.algorithm to libv.algo
 	libv: (?) naming change: func_optional -> func_opt
 	libv: (?) naming change: func_or_throw -> func_throw
 	libv: (?) naming change: func_ec       -> func_ec    (unchanged)

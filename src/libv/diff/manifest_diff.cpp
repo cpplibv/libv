@@ -3,7 +3,7 @@
 // hpp
 #include <libv/diff/manifest_diff.hpp>
 // libv
-#include <libv/algorithm/outer_join.hpp>
+#include <libv/algo/outer_join.hpp>
 // pro
 #include <libv/diff/manifest.hpp>
 

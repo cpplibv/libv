@@ -82,7 +82,7 @@
 //#include <boost/stacktrace.hpp>
 //#include <fmt/printf.h>
 //// libv
-//#include <libv/algorithm/slice.hpp>
+//#include <libv/algo/slice.hpp>
 //// std
 //#include <iostream>
 //#include <libv/utility/endian.hpp>

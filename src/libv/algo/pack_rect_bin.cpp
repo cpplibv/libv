@@ -1,7 +1,7 @@
 // Project: libv.algorithm, File: src/libv/algorithm/pack_rect_bin.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/algorithm/pack_rect_bin.hpp>
+#include <libv/algo/pack_rect_bin.hpp>
 // std
 #include <memory>
 

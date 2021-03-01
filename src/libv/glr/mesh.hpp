@@ -6,8 +6,8 @@
 #include <boost/align/aligned_allocator.hpp>
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/algorithm/container.hpp>
-#include <libv/algorithm/linear_find.hpp>
+#include <libv/algo/container.hpp>
+#include <libv/algo/linear_find.hpp>
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/enum.hpp>
 #include <libv/gl/gl_fwd.hpp>

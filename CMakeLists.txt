@@ -572,8 +572,8 @@ wish_end_group()
 wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
 
 wish_create_library(
-	TARGET libv_algorithm STATIC
-	SOURCE src/libv/algorithm/*.cpp
+	TARGET libv_algo STATIC
+	SOURCE src/libv/algo/*.cpp
 	LINK   libv_math
 	LINK   ext_boost # For small_vector in wildcard.cpp, therefore could be private
 )
@@ -599,7 +599,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_diff STATIC
 	SOURCE src/libv/diff/*.cpp
-	LINK   ext_hdiffpatch libv_hash libv_algorithm
+	LINK   ext_hdiffpatch libv_hash libv_algo
 )
 
 wish_create_library(
@@ -1038,7 +1038,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE sandbox/libv_vm4imp_main.cpp
-	LINK   libv_log libv_vm4imp libv_utility libv_algorithm
+	LINK   libv_log libv_vm4imp libv_utility libv_algo
 )
 
 wish_end_group()
@@ -1057,9 +1057,9 @@ wish_create_library(
 wish_create_group(GROUP_UNIT_TEST)
 
 wish_create_executable(
-	TARGET test_libv_algorithm
+	TARGET test_libv_algo
 	SOURCE test/libv/algorithm/*.cpp
-	LINK   obj_test_runner libv_algorithm ext_range
+	LINK   obj_test_runner libv_algo ext_range
 )
 
 wish_create_executable(

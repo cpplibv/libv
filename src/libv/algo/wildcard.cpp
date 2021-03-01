@@ -1,7 +1,7 @@
 // Project: libv.algorithm, File: src/libv/algorithm/wildcard.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/algorithm/wildcard.hpp>
+#include <libv/algo/wildcard.hpp>
 // ext
 #include <boost/container/small_vector.hpp>
 

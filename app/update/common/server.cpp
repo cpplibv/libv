@@ -3,8 +3,8 @@
 // hpp
 #include <update/common/server.hpp>
 // libv
-#include <libv/algorithm/linear_find.hpp>
-#include <libv/algorithm/erase_unstable.hpp>
+#include <libv/algo/linear_find.hpp>
+#include <libv/algo/erase_unstable.hpp>
 #include <libv/net/mtcp/connection_cb.hpp>
 //#include <libv/net/error.hpp>
 // pro

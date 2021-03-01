@@ -8,8 +8,8 @@
 #include <range/v3/view/enumerate.hpp>
 //#include <range/v3/view/zip.hpp>
 // libv
-#include <libv/algorithm/bisect.hpp>
-#include <libv/algorithm/sum.hpp>
+#include <libv/algo/bisect.hpp>
+#include <libv/algo/sum.hpp>
 #include <libv/range/view_deinterleave.hpp>
 #include <libv/utility/approx.hpp>
 #include <libv/utility/enum.hpp>

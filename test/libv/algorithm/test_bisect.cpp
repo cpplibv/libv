@@ -5,7 +5,7 @@
 // std
 #include <cstdint>
 // pro
-#include <libv/algorithm/bisect.hpp>
+#include <libv/algo/bisect.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

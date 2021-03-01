@@ -2,7 +2,7 @@
 
 // hpp
 #include <catch/catch.hpp>
-#include <libv/algorithm/pack_rect_bin.hpp>
+#include <libv/algo/pack_rect_bin.hpp>
 // libv
 #include <libv/utility/approx.hpp>
 

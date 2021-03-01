@@ -3,7 +3,7 @@
 // hpp
 #include <theme/engine.hpp>
 // libv
-#include <libv/algorithm/linear_find.hpp>
+#include <libv/algo/linear_find.hpp>
 #include <libv/container/vector_2d.hpp>
 #include <libv/fsw/watcher.hpp>
 #include <libv/lua/lua.hpp>

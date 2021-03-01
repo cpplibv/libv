@@ -5,7 +5,7 @@
 // ext
 #include <fmt/format.h>
 // libv
-#include <libv/algorithm/slice.hpp>
+#include <libv/algo/slice.hpp>
 // std
 #include <string_view>
 #include <unordered_set>

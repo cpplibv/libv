@@ -8,7 +8,7 @@
 #include <array>
 #include <vector>
 // pro
-#include <libv/algorithm/erase_if_unstable.hpp>
+#include <libv/algo/erase_if_unstable.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

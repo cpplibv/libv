@@ -5,9 +5,9 @@
 // ext
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/algorithm/erase_if_stable.hpp>
-#include <libv/algorithm/erase_unstable.hpp>
-#include <libv/algorithm/sort.hpp>
+#include <libv/algo/erase_if_stable.hpp>
+#include <libv/algo/erase_unstable.hpp>
+#include <libv/algo/sort.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/enum.hpp>
 // std

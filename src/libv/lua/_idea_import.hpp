@@ -10,7 +10,7 @@
 #include <vector>
 // libv
 //#include <libv/math/vec.hpp>
-#include <libv/algorithm/slice.hpp>
+#include <libv/algo/slice.hpp>
 #include <libv/utility/read_file.hpp>
 
 

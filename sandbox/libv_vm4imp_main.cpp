@@ -3,7 +3,7 @@
 // ext
 #include <fmt/printf.h>
 // libv
-#include <libv/algorithm/wildcard.hpp>
+#include <libv/algo/wildcard.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/types/std_optional.hpp>
 #include <libv/utility/generic_path.hpp>

@@ -5,7 +5,7 @@
 // ext
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/algorithm/erase_if_unstable.hpp>
+#include <libv/algo/erase_if_unstable.hpp>
 #include <libv/input/event.hpp>
 #include <libv/utility/float_equal.hpp>
 // pro
