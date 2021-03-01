@@ -14,7 +14,7 @@ namespace gl {
 
 // -------------------------------------------------------------------------------------------------
 
-struct IncludeResult {
+struct [[nodiscard]] IncludeResult {
 	bool success;
 	std::string result; /// Error reason or include payload
 };

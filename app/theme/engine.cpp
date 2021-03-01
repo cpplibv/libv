@@ -55,7 +55,7 @@ public:
 		});
 	}
 
-	struct add_result {
+	struct [[nodiscard]] add_result {
 		T& value;
 		bool insertion; /// True - A new entry was inserted, False - An existing entry was returned
 	};

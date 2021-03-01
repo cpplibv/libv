@@ -11,7 +11,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-struct ReadFileResult {
+struct [[nodiscard]] ReadFileResult {
 	std::vector<std::byte> data;
 	std::error_code ec;
 };

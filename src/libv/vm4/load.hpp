@@ -14,7 +14,7 @@ namespace vm4 {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct LoadResult {
+//struct [[nodiscard]] LoadResult {
 //	int error_code;
 //	Model model;
 //};

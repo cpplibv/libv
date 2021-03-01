@@ -80,7 +80,7 @@ public:
 	};
 
 private:
-	inline std::string_view toString(Severity value) {
+	[[nodiscard]] constexpr inline std::string_view toString(Severity value) noexcept {
 		switch (value) {
 		case Severity::Trace: return "Trace";
 		case Severity::Debug: return "Debug";
@@ -92,7 +92,7 @@ private:
 		return "Undefined";
 	}
 
-	inline std::string_view toColorString(Severity value) {
+	[[nodiscard]] constexpr inline std::string_view toColorString(Severity value) noexcept {
 		switch (value) {
 		case Severity::Trace: return "\u001B[37mTrace\u001B[0m";
 		case Severity::Debug: return "\u001B[37mDebug\u001B[0m";
@@ -104,7 +104,7 @@ private:
 		return "Undefined";
 	}
 
-	inline std::string_view toColorShortString(Severity value) {
+	[[nodiscard]] constexpr inline std::string_view toColorShortString(Severity value) noexcept {
 		switch (value) {
 		case Severity::Trace: return "\u001B[37mT\u001B[0m";
 		case Severity::Debug: return "\u001B[37mD\u001B[0m";

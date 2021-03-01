@@ -17,7 +17,7 @@ struct formated_image_data_view {
 	size_t size;
 };
 
-class save_result {
+class [[nodiscard]] save_result {
 private:
 	std::shared_ptr<const formated_image_data_view> view;
 

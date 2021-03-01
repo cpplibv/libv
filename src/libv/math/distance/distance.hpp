@@ -14,7 +14,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f spherePos, float sphereRadius) {
+[[nodiscard]] constexpr inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f spherePos, float sphereRadius) noexcept {
 	struct Result {
 		bool hit;
 		float t;
@@ -45,7 +45,7 @@ inline auto distanceTestLineToSphere(libv::vec3f linePos, libv::vec3f lineDir, l
 }
 
 /// http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
-inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f point) {
+[[nodiscard]] inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f point) noexcept {
 	auto w = point - linePos;
 
 	auto c1 = libv::vec::dot(w, lineDir);

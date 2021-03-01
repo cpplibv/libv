@@ -793,6 +793,7 @@ netbeans and clion live templates:
 	nd - [[nodiscard]]
 	un - [[maybe_unused]]
 	ft - [[fallthrough]]
+	no - noexcept
 	cc - copy ctor and assignment
 		my_type(const my_type&) = default;
 		my_type& operator=(const my_type&) & = default;

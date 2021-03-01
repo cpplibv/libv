@@ -145,7 +145,7 @@ public:
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	struct LoadResult {
+	struct [[nodiscard]] LoadResult {
 		std::error_code ec;
 		std::shared_ptr<const Patch> patch;
 	};

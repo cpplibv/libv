@@ -31,7 +31,7 @@ enum class BufferBit : GLenum {
 	ColorDepthStencil = Color | Depth | Stencil,
 };
 
-inline BufferBit operator|(BufferBit lhs, BufferBit rhs) {
+[[nodiscard]] constexpr inline BufferBit operator|(BufferBit lhs, BufferBit rhs) noexcept {
 	return static_cast<BufferBit>(libv::to_value(lhs) | libv::to_value(rhs));
 }
 
@@ -234,7 +234,7 @@ enum class DataType : GLenum {
 	U32_A2_B10_G10_R10 = 0x8368, /// GL_UNSIGNED_INT_2_10_10_10_REV
 };
 
-constexpr inline auto sizeInfo(DataType type) noexcept {
+[[nodiscard]] constexpr inline auto sizeInfo(DataType type) noexcept {
 	struct Result {
 		int32_t size;
 		int32_t pack;
@@ -402,7 +402,7 @@ enum class FormatSized : GLenum {
 	RGBA32UI = 0x8D70, /// GL_RGBA32UI
 };
 
-constexpr inline int32_t dimInfo(FormatBase format) noexcept {
+[[nodiscard]] constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	switch (format) {
 	case FormatBase::R: return 1;
 	case FormatBase::RG: return 2;
@@ -415,7 +415,7 @@ constexpr inline int32_t dimInfo(FormatBase format) noexcept {
 	return 1; // [[unreachable]]
 }
 
-constexpr inline FormatBase compatibleFormatBase(FormatDepth format) noexcept {
+[[nodiscard]] constexpr inline FormatBase compatibleFormatBase(FormatDepth format) noexcept {
 	switch (format) {
 	case FormatDepth::DEPTH_COMPONENT16:  return FormatBase::DEPTH;
 	case FormatDepth::DEPTH_COMPONENT24:  return FormatBase::DEPTH;
@@ -425,7 +425,7 @@ constexpr inline FormatBase compatibleFormatBase(FormatDepth format) noexcept {
 	return FormatBase::DEPTH; // [[unreachable]]
 }
 
-constexpr inline FormatBase compatibleFormatBase(FormatDepthStencil format) noexcept {
+[[nodiscard]] constexpr inline FormatBase compatibleFormatBase(FormatDepthStencil format) noexcept {
 	switch (format) {
 	case FormatDepthStencil::DEPTH24_STENCIL8:  return FormatBase::DEPTH_STENCIL;
 	case FormatDepthStencil::DEPTH32F_STENCIL8: return FormatBase::DEPTH_STENCIL;
@@ -433,7 +433,7 @@ constexpr inline FormatBase compatibleFormatBase(FormatDepthStencil format) noex
 	return FormatBase::DEPTH_STENCIL; // [[unreachable]]
 }
 
-constexpr inline FormatBase compatibleFormatBase(FormatStencil format) noexcept {
+[[nodiscard]] constexpr inline FormatBase compatibleFormatBase(FormatStencil format) noexcept {
 	switch (format) {
 	case FormatStencil::STENCIL_INDEX1:  return FormatBase::STENCIL;
 	case FormatStencil::STENCIL_INDEX4:  return FormatBase::STENCIL;
@@ -443,7 +443,7 @@ constexpr inline FormatBase compatibleFormatBase(FormatStencil format) noexcept 
 	return FormatBase::STENCIL; // [[unreachable]]
 }
 
-constexpr inline FormatBase compatibleFormatBase(FormatCompressed format) noexcept {
+[[nodiscard]] constexpr inline FormatBase compatibleFormatBase(FormatCompressed format) noexcept {
 	switch (format) {
 	case FormatCompressed::R:                       return FormatBase::R;
 	case FormatCompressed::RG:                      return FormatBase::RG;
@@ -472,7 +472,7 @@ constexpr inline FormatBase compatibleFormatBase(FormatCompressed format) noexce
 	return FormatBase::R; // [[unreachable]]
 }
 
-constexpr inline FormatBase compatibleFormatBase(FormatSized format) noexcept {
+[[nodiscard]] constexpr inline FormatBase compatibleFormatBase(FormatSized format) noexcept {
 	switch (format) {
 	case FormatSized::R8:             return FormatBase::R;
 	case FormatSized::R8_SNORM:       return FormatBase::R;
@@ -575,7 +575,7 @@ enum class ShaderType : GLenum {
 	TessEvaluation = 0x8E87, /// GL_TESS_EVALUATION_SHADER
 };
 
-inline const char* to_string(ShaderType type) {
+[[nodiscard]] inline const char* to_string(ShaderType type) noexcept {
 	switch (type) {
 	case ShaderType::Vertex: return "vertex";
 	case ShaderType::Geometry: return "geometry";
@@ -587,7 +587,7 @@ inline const char* to_string(ShaderType type) {
 	return "<<invalid>>";
 }
 
-inline const char* to_string_short(ShaderType type) {
+[[nodiscard]] inline const char* to_string_short(ShaderType type) noexcept {
 	switch (type) {
 	case ShaderType::Vertex: return "v";
 	case ShaderType::Geometry: return "g";
@@ -651,7 +651,7 @@ enum class AttributeType : GLenum {
 };
 
 template <typename T>
-constexpr inline AttributeType toAttributeType() {
+[[nodiscard]] constexpr inline AttributeType toAttributeType() noexcept {
 //		if constexpr (std::is_same_v<T, bool>)
 //			return to_value(AttributeType::INT);
 	// Bool cannot be just mapped for int, what about the sizes?

@@ -18,7 +18,7 @@ namespace ctrl {
 // -------------------------------------------------------------------------------------------------
 
 // NOTE: rename back to binding_outcome
-//struct binding_result {
+//struct [[nodiscard]] binding_result {
 //	bool success;
 //
 //	//	failure_invalid_sequence,
