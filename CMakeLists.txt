@@ -640,7 +640,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math ext_ctre ext_glew ext_boost ext_gli ext_soil2 ${OPENGL_LIBRARIES}
+	LINK   libv_log libv_math libv_utility ext_ctre ext_glew ext_boost ext_gli ext_soil2 ${OPENGL_LIBRARIES}
 )
 
 wish_create_library(
@@ -948,7 +948,7 @@ wish_create_executable(
 	LINK   libv_log libv_utility
 #	LINK   libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
 	LINK   libv_diff
-	LINK   libv_mt
+	LINK   libv_mt libv_process
 )
 
 wish_create_executable(
@@ -1038,7 +1038,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_vm4imp
 	SOURCE sandbox/libv_vm4imp_main.cpp
-	LINK   libv_log libv_vm4imp
+	LINK   libv_log libv_vm4imp libv_utility libv_algorithm
 )
 
 wish_end_group()

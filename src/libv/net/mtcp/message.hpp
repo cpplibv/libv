@@ -33,6 +33,7 @@ enum class MessageType : uint8_t {
 //	mtcp_rate_limit_read = 1,
 //	mtcp_rate_limit_write = 2,
 //	mtcp_rate_limit_rw = 3,
+//	mtcp_reconnect_introduction = 4,
 };
 
 // -------------------------------------------------------------------------------------------------

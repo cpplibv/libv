@@ -381,7 +381,7 @@
 //
 //// =================================================================================================
 
-#include <libv/mt/lock_file.hpp>
+#include <libv/process/lock_file.hpp>
 #include <libv/utility/uniform_distribution.hpp>
 #include <chrono>
 #include <iostream>
@@ -398,7 +398,7 @@ int main(int argc, const char** argv) {
 	std::random_device rng;
 	std::this_thread::sleep_for(libv::make_uniform_distribution_inclusive(std::chrono::milliseconds(1000))(rng));
 
-	libv::mt::mutex_lock_file mutex(".lock");
+	libv::process::lock_file mutex(".lock");
 	std::unique_lock lock(mutex, std::defer_lock);
 
 	for (int i = 0; i < 1000; i++) {

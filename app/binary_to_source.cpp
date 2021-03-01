@@ -2,14 +2,15 @@
 
 // ext
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 // libv
 #include <libv/utility/concat.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 #include <libv/utility/generic_path.hpp>
 // std
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 
 // -------------------------------------------------------------------------------------------------

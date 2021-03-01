@@ -51,7 +51,12 @@ libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 
 
 
-
+include check connection_he
+include check accept_he
+include check message
+declare connection invariants and place it in header
+declare acceptor invariants and place it in header
+salvage simple_server | resource stuff in it should be useful
 
 
 

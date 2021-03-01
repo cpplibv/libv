@@ -11,6 +11,7 @@
 // pro
 #include <libv/diff/diff.hpp>
 #include <libv/diff/manifest.hpp>
+#include <libv/diff/manifest_diff.hpp>
 #include <libv/hash/md5.hpp>
 #include <libv/utility/enum.hpp>
 
@@ -227,7 +228,9 @@ int main(int, const char**) {
 
 	const auto manifest = libv::diff::create_manifest("src");
 
-	for (const auto& entry : manifest.entries)
+	for (const auto& entry : manifest.directories)
+		std::cout << entry.path << std::endl;
+	for (const auto& entry : manifest.files)
 		std::cout << entry.md5 << " " << entry.path << std::endl;
 
 	std::cout << "=================================================================================================" << std::endl;
@@ -236,8 +239,10 @@ int main(int, const char**) {
 	const auto manifest_b = libv::diff::create_manifest("D:/temp/__20201109_074307_8IqBFnlO/HDiffPatch/");
 	const auto manifest_diff = libv::diff::create_manifest_diff(manifest_a, manifest_b);
 
-	for (const auto& entry : manifest_diff.entries)
-		std::cout << libv::to_value(entry.change) << " " << entry.path << std::endl;
+	for (const auto& entry : manifest_diff.directories)
+		std::cout << libv::to_value(entry.change) << " " << entry.filepath << std::endl;
+	for (const auto& entry : manifest_diff.files)
+		std::cout << libv::to_value(entry.change) << " " << entry.filepath << std::endl;
 
 	std::cout << "=================================================================================================" << std::endl;
 
