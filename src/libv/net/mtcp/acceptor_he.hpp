@@ -23,6 +23,21 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Usage:
+///		UserHandler type shall derive from AcceptorHandler<CRTP>
+///		An acceptor can be created with an Acceptor<UserHandler> object
+///		To start the acceptor listen() then accept_async() should be called
+///
+/// Acceptor Invariants:
+/// - The handler type is kept alive until there is a Acceptor<> object or an async operation associated with it
+/// - When the last Connection<> reference destroyed an async cancellation and close is requested
+/// - Every on_* function is called on a connection strand by the io context's executor
+/// - No on_* function is called before accept_async
+///
+/// - The connection returned by on_accept is started with a connect_sync call by the acceptor
+
+// -------------------------------------------------------------------------------------------------
+
 class BaseAcceptorHandler;
 
 // -------------------------------------------------------------------------------------------------

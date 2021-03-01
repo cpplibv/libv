@@ -24,6 +24,23 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Usage:
+///		UserHandler type shall derive from ConnectionHandler<CRTP>
+///		A connection can be created with a Connection<UserHandler> object
+///
+/// Connection Invariants:
+/// - The handler type is kept alive until there is a Connection<> object or an async operation associated with it
+/// - When the last Connection<> reference destroyed an async cancellation and disconnect is requested
+/// - Every on_* function is called on a connection strand by the io context's executor
+/// - No on_* function is called before connect_*sync is called (acceptor internally calls connect_sync on the returned connection)
+///
+/// - on_connect will always be the first function to be called
+/// - on_disconnect will always be the last function to be called
+/// - both on_connect and on_disconnect called at most once
+/// - on_disconnect will be called if there was a on_connect call without any error
+
+// -------------------------------------------------------------------------------------------------
+
 class BaseConnectionHandler;
 
 // -------------------------------------------------------------------------------------------------

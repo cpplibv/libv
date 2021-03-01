@@ -67,7 +67,7 @@ app.theme: create theme exporter: json and atlas texture
 
 
 
-libv.ui: Spacing, not just margin, not just padding, but container level spacing support
+libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
 
 
 

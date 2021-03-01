@@ -599,8 +599,6 @@ ext: adopt colony https://github.com/mattreecebentley/plf_colony
 
 
 
-libv.utility: Naming for bit extract: I originally thought about using set/get pair, but extract/deposit are used in asm and bit world
-
 
 app.editor:
 	small app for first line and include order fix-ups
@@ -625,142 +623,7 @@ app.enum: new enum gen | rename and refactor
 	- find a nice operator | Yeah... it will be an ADL function
 	- its also a weak possibility to use a CTAD Enum class
 	| ADL function is the winner
-
-	INPUT
-		enum("color", "int32_t")
-		namespace("libv::ns")
-		include("libv/math/vec.hpp")
-		property("rgb", "libv::vec4f")
-		custom_function("int calc")
-		values{
-				red = { rgba("255, 0, 0, 255") },
-				green = { rgba("0, 255, 0, 255") },
-				blue = { rgba("0, 0, 255, 255") },
-		)
-
-	OUTPUT
-		// First line
-
-		#pragma once
-
-		// std
-        #include <span>
-        #include <cstdint>
-        #include <string_view>
-        // pro
-        #include <libv/math/vec.hpp>
-
-        namespace libv::ns {
-
-        enum color {
-            red = 0,
-            green = 1,
-            blue = 2,
-        };
-
-        class color_type {
-            color enum_value;
-
-		public:
-            /*implicit*/ constexpr inline color_type(color value) noexcept :
-            	enum_value(value) {
-            }
-
-            [[nodiscard]] constexpr inline libv::vec4f rgb() const noexcept {
-                static constexpr libv::vec4f table[] = {
-                    libv::vec4f(255, 0, 0),
-                    libv::vec4f(0, 255, 0),
-                    libv::vec4f(0, 0, 255),
-                };
-
-                assert(enum_value >= 0 && enum_value < 3);
-                return table[enum_value];
-            }
-
-            [[nodiscard]] constexpr inline std::string_view to_string() const noexcept {
-                static constexpr std::string_view[] = {
-                    "red",
-                    "green",
-                    "blue",
-                };
-
-                assert(enum_value >= 0 && enum_value < 3);
-                return table[enum_value];
-            }
-
-            // ostream
-            // value
-            // parse
-            // operator<=>
-            // hash
-        };
-
-		[[nodiscard]] constexpr inline color_type type(color) noexcept {
-			return color_type(color);
-		}
-
-        class color_state {
-            static constexpr color table[] = {
-                color::red,
-                color::green,
-                color::blue,
-            };
-
-		public:
-            static constexpr size_t size = 3;
-
-            // Range interfaces over table
-        };
-
-        static constexpr color_state color_enum;
-
-        } // namespace libv::ns
-
-	CONSTEXPR MAP
-		#include <array>
-		#include <string_view>
-		#include <stdexcept>
-		#include <algorithm>
-		#include <map>
-
-		template <typename Key, typename Value, std::size_t Size>
-		struct ConstexprMap {
-		  std::array<std::pair<Key, Value>, Size> data;
-
-		  [[nodiscard]] constexpr Value at(const Key &key) const {
-			const auto itr =
-				std::find_if(begin(data), end(data),
-							 [&key](const auto &v) { return v.first == key; });
-			if (itr != end(data)) {
-			  return itr->second;
-			} else {
-			  throw std::range_error("Not Found");
-			}
-		  }
-
-		};
-
-		using namespace std::literals::string_view_literals;
-		static constexpr std::array<std::pair<std::string_view, int>, 8> color_values{
-			{{"black"sv, 7},
-			 {"blue"sv, 3},
-			 {"cyan"sv, 5},
-			 {"green"sv, 2},
-			 {"magenta"sv, 6},
-			 {"red"sv, 1},
-			 {"white"sv, 8},
-			 {"yellow"sv, 4}}};
-
-		int lookup_value(const std::string_view sv) {
-		  //static const auto map = std::map<std::string_view, int>{color_values.begin(), color_values.end()};
-		  static constexpr auto map =
-			  Map<std::string_view, int, color_values.size()>{{color_values}};
-
-		  return map.at(sv);
-		}
-
-
-
+	| Detailed new idea is placed in enum_generator.cpp
 
 
 
@@ -778,6 +641,7 @@ place.it:
 	monitor: Prometheus DB monitoring https://dzone.com/articles/how-to-monitor-mysql-deployments-with-prometheus-a
 	project: Free project related tools (LDjam) https://docs.google.com/spreadsheets/d/1tfkBo2IWLHXkZDbIEFUyCWvLkumHYDWCxGHzb-Rmc-0/edit#gid=0
 	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
+	ide.clion: console colored log workaround with: disable run.processes.with.pty in CLion (or with system(("chcp "s + std::to_string(CP_UTF8)).c_str());)
 
 clion live templates:
 	cout
@@ -807,8 +671,6 @@ build.ninja: some ext target fails, otherwise it should be clear
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 
 
-
-
 libv.ctrl: rename every "scale" to "multiplier"
 
 app.fsw: libv.arg-ify
@@ -818,9 +680,16 @@ app.bin_to_src: use std::span<const std::byte>
 app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
 
 
+Naming changes:
+	libv.utility: Naming for bit extract: I originally thought about using set/get pair, but extract/deposit are used in asm and bit world
+	libv: (?) naming change: func_optional -> func_opt
+	libv: (?) naming change: func_or_throw -> func_throw
+	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
+	libv: (?) naming change: func_or       -> func_or    (unchanged)
+
 
 IDE:
-	ide: Use MSYS2_HOME env var for toolchain settings in IDEs
+	ide: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
 
 	IDE	Colors:
 		BBBFC3
@@ -838,16 +707,6 @@ IDE:
 				? arg for res folder
 				? auto discover 1 folder up
 			| Solved with setting each IDE target
-		Fixable: Switch between cpp-hpp is unreliable, but a simple plugin could solve it
-			| Can be solved by merging the include and src dirs, it was already planned, only cmake support has to be implemented to create include directory for the clients of libv
-
-		Workaroundable: console log line link require a comma at the end of the log message
-			Note would be nice to have a hidden path with a short link
-			| but its not a big deal
-		Workaroundable: console colored log workaround with:
-			system(("chcp "s + std::to_string(CP_UTF8)).c_str());
-			system("chcp 65001");
-			| solution was to disable run.processes.with.pty in CLion
 
 		Issue: TODO list is shit
 			| a separate app that I make could solve it that calls back to CLion
@@ -864,7 +723,7 @@ libv.ctrl: save xls from thesis archive
 ext.x3: make sure that every rule is static
 	libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
 	libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
-ext.x3: make sure that no header dependency exposed by libv parsers
+ext.x3: make sure that no header dependency exposed by libv parsers (headers)
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
 libv.ctrl: introspection API should not see stated types | info type proxies | maybe even pimpl
@@ -877,7 +736,7 @@ libv.ctrl.routing: Unrelated analog event cancels button sequence
 libv.ctrl: Feature collection is collecting empty functions too
 
 
-Sequence: dead-key like behaviour
+libv.ctrl: Sequence: dead-key like behaviour
 		process analog will need to differentiate between mouse and analog, but that is already needed for, or not, at least not yet, something got cancelled with this one
 
 		if there are dead-keys active
@@ -1068,7 +927,7 @@ libv.ctrl: Implementation queue:
 	libv.ctrl: Split analog dimension to dimension and aia
 	libv.ctrl: Clamped analog (feature or control type that can only be 0..1 in a 1 sec time frame)
 	libv.ctrl: Feature middle ground is missing: Input > Binding > Feature > Feature Instance > callback
-					In other word: an additional type between the current binding and feature, this would clean up string operations
+				In other word: an additional type between the current binding and feature, this would clean up string operations
 	libv.ctrl: Contexts information, state collusion information among contexts, use that for queries
 	libv.ctrl: Idea: Analog/Action fulfilment hold satisfied for small time | SOLVED BY MOVING ANALOGS TO TIME BASED (also multi analog combination is no longer a problem)
 	libv.ctrl: Identifier level to_string should be parsable
@@ -1079,8 +938,8 @@ libv.ctrl: Implementation queue:
 	libv.ctrl: DigitalInputAction/(?)AnalogInputAction could be folded into InputID's reserved 8 bit, aliasing and specialization would have to follow | this would also fold InputID into Input
 	libv.ctrl: Binding two separate additional information form | This is important, this is the core solution!: Input based, Feature based (and operation based)
 	libv.ctrl: event/feature chain interruptibility on colliding bindings:
-						add member to event: is_ambiguous
-						add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
+				add member to event: is_ambiguous
+				add member to event: is_consumed and consume (or whatever it is called in ui similar event pattern)
 	libv.ctrl: Invalid sequence automated fixup | only if there is consent
 	libv.ctrl: In parsing Gamepad Button-s make word_button optional, maybe make gamepad selection more distinct
 	libv.ctrl: In parsing Joystick Button-s make word_button optional if possible, maybe make joystick selection more distinct
