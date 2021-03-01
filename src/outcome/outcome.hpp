@@ -1,4 +1,4 @@
-/* Include the default amount of outcome
+// Project: libv, File: src/outcome/outcome.hpp, Author: Császár Mátyás [Vader]
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Mar 2018
 

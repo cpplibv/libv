@@ -5,6 +5,7 @@
 // libv
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serial/enable.hpp>
+#include <libv/serial/limit.hpp>
 // std
 #include <optional>
 #include <string>
@@ -18,8 +19,8 @@ namespace net {
 
 struct Address {
 public:
-	std::string address;
-	std::string service;
+	libv::serial::limit<std::string, 256> address;
+	libv::serial::limit<std::string, 256> service;
 
 	LIBV_REFLECTION_ACCESS(address);
 	LIBV_REFLECTION_ACCESS(service);

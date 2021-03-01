@@ -1,4 +1,4 @@
-// Project: libv.algorithm, File: src/libv/algorithm/wildcard.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/wildcard.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

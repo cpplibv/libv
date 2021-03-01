@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/connection2.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/mtcp/connection_he.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/net/mtcp/connection_he.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.algorithm, File: src/libv/algorithm/partial_sum.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/partial_sum.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.algorithm, File: src/libv/algorithm/outer_join.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/outer_join.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

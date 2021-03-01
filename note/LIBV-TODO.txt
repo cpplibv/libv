@@ -646,6 +646,7 @@ place.it:
 clion live templates:
 	cout
 	fora
+	t - typename; // remove the ;
 netbeans and clion live templates:
 	fw - std::forward<Args>(args)
 	fwa - std::forward<decltype(args)>(args)

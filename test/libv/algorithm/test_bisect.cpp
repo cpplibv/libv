@@ -1,4 +1,4 @@
-// Project: libv.algorithm, File: test/libv/algorithm/test_bisect.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: test/libv/algorithm/test_bisect.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <catch/catch.hpp>

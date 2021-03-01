@@ -1,4 +1,4 @@
-// Project: libv.serialization, File: src/libv/serialization/types/boost_flat_map.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/types/boost_flat_map.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

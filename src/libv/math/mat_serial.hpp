@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/mat_serialization.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/mat_serial.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

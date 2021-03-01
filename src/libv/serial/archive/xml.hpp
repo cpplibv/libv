@@ -1,4 +1,4 @@
-// Project: libv.serialization, File: src/libv/serialization/archive/xml.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/archive/xml.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

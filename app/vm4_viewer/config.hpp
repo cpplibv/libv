@@ -6,7 +6,9 @@
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serial/archive/json.hpp>
+#include <libv/serial/limit.hpp>
 #include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/read_file.hpp>
@@ -29,8 +31,8 @@ struct ConfigViewer {
 	int window_height = 800;
 	int window_width = 1280;
 	int save_window_size = false;
-	std::vector<std::string> recent_projects;
-	std::vector<std::string> recent_models;
+	libv::serial::limit<std::vector<libv::serial::limit<std::string>, 1024>, 1024> recent_projects;
+	libv::serial::limit<std::vector<libv::serial::limit<std::string>, 1024>, 1024> recent_models;
 
 	LIBV_REFLECTION_ACCESS(window_height);
 	LIBV_REFLECTION_ACCESS(window_width);
@@ -40,9 +42,9 @@ struct ConfigViewer {
 };
 
 struct ConfigProject {
-	std::string project_name = "default";
-	std::string project_location;
-	std::vector<std::string> recent_models;
+	libv::serial::limit<std::string, 1024> project_name = "default";
+	libv::serial::limit<std::string, 1024> project_location;
+	libv::serial::limit<std::vector<libv::serial::limit<std::string>, 1024>, 1024> recent_models;
 
 	LIBV_REFLECTION_ACCESS(project_name);
 	LIBV_REFLECTION_ACCESS(project_location);

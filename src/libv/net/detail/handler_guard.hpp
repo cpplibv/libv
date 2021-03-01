@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/connection2.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/detail/handler_guard.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

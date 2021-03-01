@@ -1,4 +1,4 @@
-// Project: libv.algorithm, File: src/libv/algorithm/pack_linear_lines.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/pack_linear_lines.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

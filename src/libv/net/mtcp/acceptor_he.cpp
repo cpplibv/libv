@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/acceptor.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/mtcp/acceptor_he.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/net/mtcp/acceptor_he.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/acceptor.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/mtcp/acceptor_he.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

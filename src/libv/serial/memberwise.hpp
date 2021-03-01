@@ -1,4 +1,4 @@
-// Project: libv.serialization, File: src/libv/serialization/memberwise.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/memberwise.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

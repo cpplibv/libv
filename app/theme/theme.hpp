@@ -3,11 +3,12 @@
 #pragma once
 
 // libv
-#include <libv/algo/pack_rect_bin.hpp>
 #include <libv/algo/pack_linear_lines.hpp>
+#include <libv/algo/pack_rect_bin.hpp>
 #include <libv/container/vector_2d.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/reflection_access.hpp>
+#include <libv/serial/limit.hpp>
 #include <libv/utility/concat.hpp>
 // std
 #include <vector>
@@ -24,7 +25,7 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct AtlasEntry {
-	std::string name;
+	libv::serial::limit<std::string, 1024> name;
 	libv::vec2f texture_00;
 	libv::vec2f texture_11;
 
@@ -36,8 +37,8 @@ struct AtlasEntry {
 // -------------------------------------------------------------------------------------------------
 
 struct Atlas {
-	std::vector<AtlasEntry> entries;
-	libv::vector_2D<libv::vec4uc> image;
+	libv::serial::limit<std::vector<AtlasEntry>, 2048> entries;
+	libv::serial::limit<libv::vector_2D<libv::vec4uc>, 8192 * 8192> image;
 
 //	LIBV_REFLECTION_ACCESS(entries);
 
