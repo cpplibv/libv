@@ -87,10 +87,10 @@ public:
 
 public:
 	/// Queues an asynchronous connect task by adopting an already open socket.
-	void connect_async(Socket&& socket) noexcept;
+	void connect_async(detail::Socket&& socket) noexcept;
 
 	/// Connects synchronously by adopting an already open socket.
-	void connect_sync(Socket&& socket) noexcept;
+	void connect_sync(detail::Socket&& socket) noexcept;
 
 	/// Queues an asynchronous connect task.
 	void connect_async(Address address) noexcept;

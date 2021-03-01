@@ -9,6 +9,7 @@
 namespace libv {
 namespace net {
 namespace mtcp {
+namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@ struct Socket {
 
 // -------------------------------------------------------------------------------------------------
 
+} // namespace detail
 } // namespace mtcp
 } // namespace net
 } // namespace libv

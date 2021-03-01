@@ -16,8 +16,12 @@ class ConnectionAsyncCB;
 
 class Endpoint;
 class ResolveResults;
+
+namespace detail { // ------------------------------------------------------------------------------
+
 class Socket;
 
-} // namespace mtcp --------------------------------------------------------------------------------
+} // namespace detail ------------------------------------------------------------------------------
+} // namespace mtcp
 } // namespace net
 } // namespace libv

@@ -8,11 +8,11 @@
 #include <memory>
 #include <mutex>
 // pro
+#include <libv/net/detail/socket.hpp>
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/log.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
-#include <libv/net/mtcp/socket.hpp>
 
 
 namespace libv {
@@ -115,7 +115,7 @@ public:
 			} else {
 //				self_sp->cb_accept(ConnectionAsyncCB(self_sp->io_context, Socket{std::move(peer)}));
 				auto connection = self_sp->handler->on_accept(self_sp->io_context);
-				connection.handler().connection.connect_sync(Socket{std::move(peer)});
+				connection.handler().connection.connect_sync(detail::Socket{std::move(peer)});
 			}
 
 			if (self_sp->accepting)

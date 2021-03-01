@@ -22,12 +22,12 @@
 #include <libv/net/address.hpp>
 #include <libv/net/detail/rate_policy.hpp>
 #include <libv/net/detail/resolve_results.hpp>
+#include <libv/net/detail/socket.hpp>
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/log.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
 #include <libv/net/mtcp/message.hpp>
-#include <libv/net/mtcp/socket.hpp>
 
 
 namespace libv {
@@ -109,8 +109,8 @@ public:
 	[[nodiscard]] inline size_t send_queue_size() const noexcept;
 
 public:
-	inline void connect_async(Socket&& socket) noexcept;
-	inline void connect_sync(Socket&& socket) noexcept;
+	inline void connect_async(detail::Socket&& socket) noexcept;
+	inline void connect_sync(detail::Socket&& socket) noexcept;
 	inline void connect_async(Address address) noexcept;
 	inline void disconnect_async() noexcept;
 	inline void disconnect_if_connected_async() noexcept;
@@ -203,7 +203,7 @@ inline size_t ImplBaseConnectionAsyncHE::send_queue_size() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-inline void ImplBaseConnectionAsyncHE::connect_async(Socket&& socket) noexcept {
+inline void ImplBaseConnectionAsyncHE::connect_async(detail::Socket&& socket) noexcept {
 	std::unique_lock lock{mutex};
 	log_net.trace("MTCP-{} connect_async(socket)", id);
 
@@ -215,7 +215,7 @@ inline void ImplBaseConnectionAsyncHE::connect_async(Socket&& socket) noexcept {
 	do_start(shared_from_this());
 }
 
-inline void ImplBaseConnectionAsyncHE::connect_sync(Socket&& socket) noexcept {
+inline void ImplBaseConnectionAsyncHE::connect_sync(detail::Socket&& socket) noexcept {
 	std::unique_lock lock{mutex};
 	log_net.trace("MTCP-{} connect_sync(socket)", id);
 
@@ -776,11 +776,11 @@ size_t BaseConnectionAsyncHE::send_queue_size() const noexcept {
 	return internals->send_queue_size();
 }
 
-void BaseConnectionAsyncHE::connect_async(Socket&& socket) noexcept {
+void BaseConnectionAsyncHE::connect_async(detail::Socket&& socket) noexcept {
 	internals->connect_async(std::move(socket));
 }
 
-void BaseConnectionAsyncHE::connect_sync(Socket&& socket) noexcept {
+void BaseConnectionAsyncHE::connect_sync(detail::Socket&& socket) noexcept {
 	internals->connect_sync(std::move(socket));
 }
 
