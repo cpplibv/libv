@@ -117,7 +117,7 @@ public:
 	inline void cancel_and_disconnect_async() noexcept;
 	inline void pause_receive_async() noexcept;
 	inline void resume_receive_async() noexcept;
-	inline void send_async(Message message) noexcept;
+	inline void send_async(MessageBody message) noexcept;
 
 private:
 	[[nodiscard]] inline bool _no_on_flight_operation() const noexcept;
@@ -330,7 +330,7 @@ inline void ImplBaseConnectionAsyncHE::resume_receive_async() noexcept {
 	do_read(shared_from_this());
 }
 
-inline void ImplBaseConnectionAsyncHE::send_async(Message message) noexcept {
+inline void ImplBaseConnectionAsyncHE::send_async(MessageBody message) noexcept {
 	std::unique_lock lock{mutex};
 	log_net.trace("MTCP-{} Send requested", id);
 
@@ -808,7 +808,7 @@ void BaseConnectionAsyncHE::resume_receive_async() noexcept {
 	internals->resume_receive_async();
 }
 
-void BaseConnectionAsyncHE::send_async(Message message) noexcept {
+void BaseConnectionAsyncHE::send_async(MessageBody message) noexcept {
 	internals->send_async(std::move(message));
 }
 

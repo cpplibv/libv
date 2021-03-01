@@ -10,6 +10,7 @@ libv.mt: common base queue for worker_thread_pool and worker_thread only differe
 libv.mt: Add load function argument support for async_value
 ext: pulled in cppcoro, but need to work around cmake issue of WIN32 branching in lib
 ext: fork cppcoro to fix build issues
+libv.net: Implement new network handler based connection and acceptor
 libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 
 
@@ -51,13 +52,11 @@ libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 
 
 
-include check connection_he
-include check accept_he
-include check message
 declare connection invariants and place it in header
 declare acceptor invariants and place it in header
 salvage simple_server | resource stuff in it should be useful
 
+libv.net: on_disconnect shall receive the first error that occurred which resulted in the disconnect if there was any
 
 
 // TODO P2: Place Invariants into the proper header

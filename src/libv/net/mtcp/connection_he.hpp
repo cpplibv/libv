@@ -32,10 +32,6 @@ class BaseConnectionHandler;
 class BaseConnectionAsyncHE {
 	friend class BaseConnectionHandler;
 
-public:
-	using error_code = std::error_code;
-	using message = Message;
-
 private:
 	std::shared_ptr<class ImplBaseConnectionAsyncHE> internals;
 
@@ -99,7 +95,7 @@ public:
 	void resume_receive_async() noexcept;
 
 	/// Queues an asynchronous send task.
-	void send_async(Message message) noexcept;
+	void send_async(MessageBody message) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -112,7 +108,7 @@ private:
 
 public:
 	using error_code = std::error_code;
-	using message = Message;
+	using message = MessageBody;
 	using io_context = IOContext;
 
 private:
@@ -135,11 +131,8 @@ private:
 		++ref_count;
 		// TODO P4: Figure out what should happen with revived handlers
 		//		if (handler->ref_count() == 1)
-		//			log_net.error("Reviving an abounded connection handler");
-		//			OR
-		//			handler->cancel_null_ref()
-		//			OR
-		//			increment_ref_count handle this case internally ! BEST
+		//			log_net.error("Attempting to revive an abounded connection handler");
+		//		| has to be hard error (unless if its after a new object and we are after the ctor)
 	}
 
 	inline void decrement_ref_count() noexcept {

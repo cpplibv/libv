@@ -8,7 +8,6 @@
 #include <atomic>
 #include <cassert>
 #include <concepts>
-//#include <functional>
 #include <memory>
 #include <system_error>
 // pro
@@ -86,11 +85,8 @@ private:
 		++ref_count;
 		// TODO P4: Figure out what should happen with revived handlers
 		//		if (handler->ref_count() == 1)
-		//			log_net.error("Reviving an abounded acceptor handler");
-		//			OR
-		//			handler->cancel_null_ref()
-		//			OR
-		//			increment_ref_count handle this case internally ! BEST
+		//			log_net.error("Attempting to revive an abounded connection handler");
+		//		| has to be hard error (unless if its after a new object and we are after the ctor)
 	}
 
 	inline void decrement_ref_count() noexcept {

@@ -7,6 +7,7 @@
 #include <libv/utility/enum.hpp>
 #include <libv/utility/storage_size.hpp>
 // std
+#include <cstdint>
 #include <string>
 //#include <vector>
 
@@ -17,14 +18,13 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-//using Message = std::vector<std::byte>; // TODO P2: Switch to std::vector<std::byte> | or maybe dont
-using Message = std::string;
-//using MessageBody = std::string;
-using PacketHeader = uint32_t;
-// !!! cleanup old stuff
+using MessageBody = std::string;
+//using MessageBody = std::vector<std::byte>; // TODO P2: Switch to std::vector<std::byte> | or maybe dont
+
+// -------------------------------------------------------------------------------------------------
 
 constexpr auto MTCP_MESSAGE_MAX_RESERVE = libv::MB(1);
-constexpr auto MTCP_MESSAGE_MAX_SIZE = std::min(static_cast<int64_t>(std::numeric_limits<PacketHeader>::max()), libv::MB(4));
+constexpr auto MTCP_MESSAGE_MAX_SIZE = std::min(static_cast<int64_t>(std::numeric_limits<uint32_t>::max()), libv::MB(4));
 
 // -------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,9 @@ enum class MessageType : uint8_t {
 //	mtcp_rate_limit_read = 1,
 //	mtcp_rate_limit_write = 2,
 //	mtcp_rate_limit_rw = 3,
-//	mtcp_reconnect_introduction = 4,
+//	mtcp_reconnect_request = 4,
+//	mtcp_reconnect_reject = 5,
+//	mtcp_reconnect_accept = 6,
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -98,7 +100,7 @@ public:
 
 struct MessageEntry {
 	MessageHeader header;
-	Message body;
+	MessageBody body;
 };
 
 // -------------------------------------------------------------------------------------------------
