@@ -5,10 +5,10 @@
 // hpp
 #include <libv/math/vec.hpp>
 // libv
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 
 
-namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
+namespace LIBV_SERIAL_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -20,4 +20,4 @@ inline void serialize(Archive& ar, ::libv::mat_t<R, C, T>& var, const unsigned i
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE
+} // namespace LIBV_SERIAL_EXTENSION_NAMESPACE

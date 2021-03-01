@@ -24,7 +24,7 @@
 #include <update/patch/updater.hpp> // For UpdaterSettings
 #include <libv/net/address.hpp>
 //#include <libv/net/mtcp/connection.hpp>
-//#include <libv/serialization/serialization.hpp>
+//#include <libv/serial/serialization.hpp>
 
 
 #include <algorithm>

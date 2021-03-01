@@ -18,9 +18,9 @@
 
 
 
-#include <libv/serialization/archive/binary.hpp>
+#include <libv/serial/archive/binary.hpp>
 
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 #include <libv/net/mtcp/acceptor.hpp>
 #include <libv/net/mtcp/connection_cb.hpp>
 #include <libv/net/mtcp/endpoint.hpp>

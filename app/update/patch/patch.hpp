@@ -7,7 +7,7 @@
 #include <libv/diff/manifest_diff.hpp>
 #include <libv/hash/md5.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 // std
 #include <filesystem>
 #include <iosfwd>
@@ -37,14 +37,14 @@ struct StepCreateDir {
 	std::string path;
 
 	LIBV_REFLECTION_ACCESS(path);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepRemoveDir {
 	std::string path;
 
 	LIBV_REFLECTION_ACCESS(path);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepCreate {
@@ -55,7 +55,7 @@ struct StepCreate {
 	LIBV_REFLECTION_ACCESS(filepath);
 	LIBV_REFLECTION_ACCESS(data);
 	LIBV_REFLECTION_ACCESS(hash_new);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepModify {
@@ -68,7 +68,7 @@ struct StepModify {
 	LIBV_REFLECTION_ACCESS(diff);
 	LIBV_REFLECTION_ACCESS(hash_old);
 	LIBV_REFLECTION_ACCESS(hash_new);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepModifyTo {
@@ -83,7 +83,7 @@ struct StepModifyTo {
 	LIBV_REFLECTION_ACCESS(diff);
 	LIBV_REFLECTION_ACCESS(hash_old);
 	LIBV_REFLECTION_ACCESS(hash_new);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepRename {
@@ -94,7 +94,7 @@ struct StepRename {
 	LIBV_REFLECTION_ACCESS(filepath_old);
 	LIBV_REFLECTION_ACCESS(filepath_new);
 	LIBV_REFLECTION_ACCESS(hash_new);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct StepRemove {
@@ -103,7 +103,7 @@ struct StepRemove {
 
 	LIBV_REFLECTION_ACCESS(filepath);
 	LIBV_REFLECTION_ACCESS(hash_old);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -142,7 +142,7 @@ public:
 	LIBV_REFLECTION_ACCESS(renames);
 	LIBV_REFLECTION_ACCESS(removes);
 
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
 	struct LoadResult {

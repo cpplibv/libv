@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 // std
 #include <optional>
 #include <string>
@@ -23,7 +23,7 @@ public:
 
 	LIBV_REFLECTION_ACCESS(address);
 	LIBV_REFLECTION_ACCESS(service);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
 	inline Address() = default;

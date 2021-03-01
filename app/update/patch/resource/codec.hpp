@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 // std
 #include <span>
 #include <typeindex>

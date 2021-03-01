@@ -3,9 +3,9 @@
 #pragma once
 
 // libv
-#include <libv/serialization/serialization.hpp>
-#include <libv/serialization/types/std_string.hpp>
-#include <libv/serialization/types/std_vector.hpp>
+#include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_string.hpp>
+#include <libv/serial/types/std_vector.hpp>
 #include <libv/state/state.hpp>
 // std
 #include <string>

@@ -6,16 +6,16 @@
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/xml.hpp>
 // libv
-#include <libv/serialization/archive/binary.hpp>
-#include <libv/serialization/memberwise.hpp>
-#include <libv/serialization/reflection.hpp>
-#include <libv/serialization/serialization.hpp>
-#include <libv/serialization/types/boost_flat_map.hpp>
-#include <libv/serialization/types/std_map.hpp>
-#include <libv/serialization/types/std_memory.hpp>
-#include <libv/serialization/types/std_string.hpp>
-#include <libv/serialization/types/std_variant.hpp>
-#include <libv/serialization/types/std_vector.hpp>
+#include <libv/serial/archive/binary.hpp>
+#include <libv/serial/memberwise.hpp>
+#include <libv/serial/reflection.hpp>
+#include <libv/serial/serial.hpp>
+#include <libv/serial/types/boost_flat_map.hpp>
+#include <libv/serial/types/std_map.hpp>
+#include <libv/serial/types/std_memory.hpp>
+#include <libv/serial/types/std_string.hpp>
+#include <libv/serial/types/std_variant.hpp>
+#include <libv/serial/types/std_vector.hpp>
 #include <libv/utility/hex_dump.hpp>
 // std
 #include <iomanip>
@@ -37,11 +37,11 @@ struct SimpleServerFieldSet {
 	LIBV_REFLECTION_ACCESS(has_mod);
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(players_current);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct Memberwise {
-	LIBV_SERIALIAZTION_ENABLE_MEMBERWISE();
+	LIBV_SERIALIZATION_ENABLE_MEMBERWISE();
 
 	std::string a;
 	double b;

@@ -7,7 +7,7 @@
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 // std
 #include <map>
 #include <memory>
@@ -46,7 +46,7 @@ struct Material {
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(shader);
 	LIBV_REFLECTION_ACCESS(properties);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------

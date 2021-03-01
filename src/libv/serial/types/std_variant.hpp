@@ -5,10 +5,10 @@
 // std
 #include <variant>
 // pro
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 
 
-namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
+namespace LIBV_SERIAL_EXTENSION_NAMESPACE {
 namespace detail {
 
 // -------------------------------------------------------------------------------------------------
@@ -50,4 +50,4 @@ inline void load(Archive& ar, std::variant<Types...>& variant) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE
+} // namespace LIBV_SERIAL_EXTENSION_NAMESPACE

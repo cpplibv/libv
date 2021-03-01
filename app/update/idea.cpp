@@ -18,7 +18,7 @@
 // =================================================================================================
 // -------------------------------------------------------------------------------------------------
 
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 
 struct msg_ReportVersion {
 	version_number version;
@@ -209,7 +209,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-#include <libv/serialization/archive/binary.hpp>
+#include <libv/serial/archive/binary.hpp>
 
 
 template <typename T>

@@ -7,20 +7,20 @@
 // libv
 #include <libv/meta/to_tuple.hpp>
 // pro
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 
 
-namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
+namespace LIBV_SERIAL_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_memberwise_save>
+template <typename Archive, typename T, typename = typename T::__libv_SERIALIZATION_enable_memberwise_save>
 inline void save(Archive& ar, const T& object, std::integral_constant<size_t, 2000> = {}) {
 	auto tuple = libv::meta::to_tuple(object);
 	cereal::serialize(ar, tuple);
 }
 
-template <typename Archive, typename T, typename = typename T::__libv_serialiaztion_enable_memberwise_load>
+template <typename Archive, typename T, typename = typename T::__libv_SERIALIZATION_enable_memberwise_load>
 inline void load(Archive& ar, T& object, std::integral_constant<size_t, 2000> = {}) {
 	libv::meta::to_tuple_type_t<T> tuple;
 	cereal::serialize(ar, tuple);
@@ -29,4 +29,4 @@ inline void load(Archive& ar, T& object, std::integral_constant<size_t, 2000> = 
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE
+} // namespace LIBV_SERIAL_EXTENSION_NAMESPACE

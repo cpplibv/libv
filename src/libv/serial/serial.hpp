@@ -5,7 +5,7 @@
 // ext
 #include <cereal/cereal.hpp>
 // pro
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -13,6 +13,6 @@
 #define LIBV_NVP(NAME) CEREAL_NVP(NAME)
 #define LIBV_NVP_NAMED(NAME, VAR) ::cereal::make_nvp(NAME, VAR)
 
-#define LIBV_SERIALIZATION_EXTENSION_NAMESPACE cereal
+#define LIBV_SERIAL_EXTENSION_NAMESPACE cereal
 
 // -------------------------------------------------------------------------------------------------

@@ -3,8 +3,8 @@
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/meta/reflection.hpp>
-#include <libv/serialization/reflection.hpp>
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/reflection.hpp>
+#include <libv/serial/serial.hpp>
 #include <libv/utility/member_offset.hpp>
 // std
 #include <iomanip>
@@ -60,7 +60,7 @@ struct ServerFieldSet {
 	LIBV_REFLECTION_ACCESS(players_limit);
 	LIBV_REFLECTION_ACCESS(map);
 	LIBV_REFLECTION_ACCESS(name);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------

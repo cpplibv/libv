@@ -5,9 +5,9 @@
 // libv
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/archive/json.hpp>
-#include <libv/serialization/serialization.hpp>
-#include <libv/serialization/types/std_vector.hpp>
+#include <libv/serial/archive/json.hpp>
+#include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_vector.hpp>
 #include <libv/utility/generic_path.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>

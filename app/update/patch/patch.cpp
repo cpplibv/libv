@@ -58,10 +58,10 @@
 
 
 
-#include <libv/serialization/reflection.hpp>
-#include <libv/serialization/types/std_vector.hpp>
-#include <libv/serialization/types/std_string.hpp>
-#include <libv/serialization/archive/binary.hpp>
+#include <libv/serial/reflection.hpp>
+#include <libv/serial/types/std_vector.hpp>
+#include <libv/serial/types/std_string.hpp>
+#include <libv/serial/archive/binary.hpp>
 #include <fstream>
 
 

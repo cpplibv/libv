@@ -12,7 +12,7 @@ ext: pulled in cppcoro, but need to work around cmake issue of WIN32 branching i
 ext: fork cppcoro to fix build issues
 libv.net: Implement new network handler based connection and acceptor
 libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
-
+libv: fix typo SERIALIAZTION -> SERIALIZATION
 
 
 
@@ -50,6 +50,23 @@ libv.net: Implement sandbox chat server / session / client in libv_net_main.cpp
 --- STACK ------------------------------------------------------------------------------------------
 
 
+libv.serialization: Rename libv.serialization to libv.serial
+libv.serialization: Rename SERIALIZATION to SERIAL
+
+
+naming or minor changes:
+	libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
+	libv.algorithm: Rename libv.algorithm to libv.algo
+	libv: (?) naming change: func_optional -> func_opt
+	libv: (?) naming change: func_or_throw -> func_throw
+	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
+	libv: (?) naming change: func_or       -> func_or    (unchanged)
+
+
+
+
+
+
 
 
 declare connection invariants and place it in header
@@ -78,16 +95,6 @@ review:
 
 
 
-
-naming or minor changes:
-	libv: Result only types should be marked nodiscard (like read file or parsers): class [[nodiscard]] result{};
-	libv.algorithm: Rename libv.algorithm to libv.algo
-	libv.serialization: Rename libv.serialization to libv.serial
-	libv: fix typo SERIALIAZTION -> SERIALIZATION
-	libv: (?) naming change: func_optional -> func_opt
-	libv: (?) naming change: func_or_throw -> func_throw
-	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
-	libv: (?) naming change: func_or       -> func_or    (unchanged)
 
 
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining

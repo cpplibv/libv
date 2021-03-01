@@ -5,10 +5,10 @@
 // std
 #include <optional>
 // pro
-#include <libv/serialization/serialization.hpp>
+#include <libv/serial/serial.hpp>
 
 
-namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE {
+namespace LIBV_SERIAL_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -35,4 +35,4 @@ inline void load(Archive& ar, std::optional<T>& optional) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace LIBV_SERIALIZATION_EXTENSION_NAMESPACE
+} // namespace LIBV_SERIAL_EXTENSION_NAMESPACE

@@ -676,7 +676,7 @@ wish_create_library(
 	TARGET libv_net STATIC
 	SOURCE src/libv/net/*.cpp
 	LINK   libv_log libv_utility libv_meta ext_boost
-#	LINK   libv_serialization
+#	LINK   libv_serial
 )
 
 wish_create_library(
@@ -691,7 +691,7 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_serialization INTERFACE
+	TARGET libv_serial INTERFACE
 	LINK   ext_cereal
 	LINK   ext_boost # Remove
 )
@@ -735,7 +735,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_vm4 STATIC
 	SOURCE src/libv/vm4/*.cpp
-	LINK   libv_math libv_serialization ext_boost
+	LINK   libv_math libv_serial ext_boost
 )
 
 wish_create_library(
@@ -763,7 +763,7 @@ wish_create_library(
 	SOURCE app/update/patch/*.cpp # <<< P4: Just for testing
 	LINK   libv_net libv_process
 	LINK   libv_diff # <<< P4: Just for testing
-	LINK   libv_serialization # <<< P4: Just for testing
+	LINK   libv_serial # <<< P4: Just for testing
 )
 
 wish_create_executable(
@@ -788,7 +788,7 @@ wish_create_executable(
 	TARGET create_patch
 	SOURCE app/update/create_patch.cpp
 	LINK   libv_log libv_arg libv_diff
-	LINK   libv_serialization
+	LINK   libv_serial
 	LINK   libv_process # <<< P4: Just for testing
 	LINK   update_common # <<< P4: Just for testing
 )
@@ -797,7 +797,7 @@ wish_create_executable(
 	TARGET apply_patch
 	SOURCE app/update/apply_patch.cpp
 	LINK   libv_log libv_arg libv_diff
-	LINK   libv_serialization
+	LINK   libv_serial
 	LINK   libv_process # <<< P4: Just for testing
 	LINK   update_common # <<< P4: Just for testing
 )
@@ -984,19 +984,19 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_reflection
 	SOURCE sandbox/libv_reflection_main.cpp
-	LINK   libv_serialization
+	LINK   libv_serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE sandbox/libv_reflection2_main.cpp
-	LINK   libv_serialization
+	LINK   libv_serial
 )
 
 wish_create_executable(
 	TARGET sandbox_libv_serialize
 	SOURCE sandbox/libv_serialize_main.cpp
-	LINK   libv_serialization
+	LINK   libv_serial
 )
 
 wish_create_executable(

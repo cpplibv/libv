@@ -6,7 +6,7 @@
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 // std
 #include <chrono>
 #include <vector>
@@ -27,12 +27,12 @@ using NodeID = uint32_t;
 
 struct Animation {
 	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct AnimationChannel {
 	LIBV_REFLECTION_EMPTY();
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct Vertex {
@@ -51,7 +51,7 @@ struct Vertex {
 	LIBV_REFLECTION_ACCESS(texture0);
 	LIBV_REFLECTION_ACCESS(boneID);
 	LIBV_REFLECTION_ACCESS(boneWieght);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct Mesh {
@@ -67,7 +67,7 @@ struct Mesh {
 	LIBV_REFLECTION_ACCESS(baseVertex);
 	LIBV_REFLECTION_ACCESS(numIndices);
 	LIBV_REFLECTION_ACCESS(materialID);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct Node {
@@ -84,7 +84,7 @@ struct Node {
 	LIBV_REFLECTION_ACCESS(transformation);
 	LIBV_REFLECTION_ACCESS(meshIDs);
 	LIBV_REFLECTION_ACCESS(childrenIDs);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct LOD {
@@ -95,7 +95,7 @@ struct LOD {
 	LIBV_REFLECTION_ACCESS(rangeNear);
 	LIBV_REFLECTION_ACCESS(rangeFar);
 	LIBV_REFLECTION_ACCESS(rootNodeID);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct Model {
@@ -159,7 +159,7 @@ struct Model {
 //	LIBV_REFLECTION_ACCESS(vertex_boneWieghts);
 	LIBV_REFLECTION_ACCESS(vertices);
 	LIBV_REFLECTION_ACCESS(indices);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------

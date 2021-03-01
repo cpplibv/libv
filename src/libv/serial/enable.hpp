@@ -1,0 +1,12 @@
+// Project: libv.serialization, File: src/libv/serialization/enable.hpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+
+#define LIBV_SERIALIZATION_ENABLE_REFLECTION_SAVE() using __libv_SERIALIZATION_enable_reflection_save = void
+#define LIBV_SERIALIZATION_ENABLE_REFLECTION_LOAD() using __libv_SERIALIZATION_enable_reflection_load = void
+#define LIBV_SERIALIZATION_ENABLE_REFLECTION() LIBV_SERIALIZATION_ENABLE_REFLECTION_SAVE(); LIBV_SERIALIZATION_ENABLE_REFLECTION_LOAD()
+
+#define LIBV_SERIALIZATION_ENABLE_MEMBERWISE_SAVE() using __libv_SERIALIZATION_enable_memberwise_save = void
+#define LIBV_SERIALIZATION_ENABLE_MEMBERWISE_LOAD() using __libv_SERIALIZATION_enable_memberwise_load = void
+#define LIBV_SERIALIZATION_ENABLE_MEMBERWISE() LIBV_SERIALIZATION_ENABLE_MEMBERWISE_SAVE(); LIBV_SERIALIZATION_ENABLE_MEMBERWISE_LOAD()

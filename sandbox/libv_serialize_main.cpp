@@ -1,11 +1,11 @@
 // Project: libv, File: sandbox/libv_serialize_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
-#include <libv/serialization/archive/binary.hpp>
-#include <libv/serialization/archive/xml.hpp>
-#include <libv/serialization/serialization.hpp>
-#include <libv/serialization/types/std_memory.hpp>
-#include <libv/serialization/types/std_vector.hpp>
+#include <libv/serial/archive/binary.hpp>
+#include <libv/serial/archive/xml.hpp>
+#include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_memory.hpp>
+#include <libv/serial/types/std_vector.hpp>
 // std
 #include <fstream>
 #include <iostream>

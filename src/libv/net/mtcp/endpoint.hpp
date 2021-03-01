@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/meta/reflection_access.hpp>
-#include <libv/serialization/enable.hpp>
+#include <libv/serial/enable.hpp>
 // std
 #include <array>
 #include <cstdint>
@@ -22,7 +22,7 @@ struct Endpoint {
 
 	LIBV_REFLECTION_ACCESS(address);
 	LIBV_REFLECTION_ACCESS(port);
-	LIBV_SERIALIAZTION_ENABLE_REFLECTION();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
 	constexpr inline Endpoint() = default;
