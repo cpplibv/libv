@@ -972,18 +972,6 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_net
 	SOURCE sandbox/libv_net_main.cpp
-	LINK   libv_net libv_log ext_sml
-)
-
-wish_create_executable(
-	TARGET sandbox_libv_net_client
-	SOURCE sandbox/libv_net_client_main.cpp
-	LINK   libv_net libv_log
-)
-
-wish_create_executable(
-	TARGET sandbox_libv_net_server
-	SOURCE sandbox/libv_net_server_main.cpp
 	LINK   libv_net libv_log
 )
 
