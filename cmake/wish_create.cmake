@@ -139,7 +139,7 @@ function(wish_create_executable)
 	endif()
 
 	# glob
-	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS ${arg_SOURCE})
 	foreach(obj ${arg_OBJECT})
 		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
@@ -181,7 +181,7 @@ function(wish_create_library)
 
 	# glob
 	if(arg_SOURCE)
-		file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+		file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS ${arg_SOURCE})
 	endif()
 	foreach(obj ${arg_OBJECT})
 		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
@@ -232,7 +232,7 @@ function(wish_create_object)
 	endif()
 
 	# glob
-	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${arg_SOURCE})
+	file(GLOB_RECURSE matching_sources RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS ${arg_SOURCE})
 	foreach(obj ${arg_OBJECT})
 		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
