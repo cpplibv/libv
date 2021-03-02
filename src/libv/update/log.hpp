@@ -1,4 +1,4 @@
-// Project: libv.update, File: app/update/common/log.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/log.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -6,12 +6,14 @@
 #include <libv/log/log.hpp>
 
 
-namespace app {
+namespace libv {
+namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-inline libv::LoggerModule log_app{libv::logger_stream, "updater"};
+inline libv::LoggerModule log_update{libv::logger_stream, "libv.update"};
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace update
+} // namespace libv

@@ -36,13 +36,13 @@ public:
 		address(std::move(address)),
 		service(std::move(service)) { }
 
-	inline Address(std::string_view address, uint16_t port) :
-		address(address),
-		service(std::to_string(port)) { }
-
-	inline Address(std::string_view address, std::string service) :
-		address(address),
-		service(std::move(service)) { }
+//	inline Address(std::string_view address, uint16_t port) :
+//		address(address),
+//		service(std::to_string(port)) { }
+//
+//	inline Address(std::string_view address, std::string service) :
+//		address(address),
+//		service(std::move(service)) { }
 
 	static std::optional<Address> parse(const std::string_view addressport) {
 		std::optional<Address> result;

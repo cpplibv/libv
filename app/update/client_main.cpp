@@ -1,19 +1,17 @@
-// Project: libv, File: app/update/client_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: app/update/client_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
 #include <libv/net/address.hpp>
+#include <libv/update/client/updater.hpp>
 // std
 #include <iostream>
 // pro
-#include <update/common/client.hpp>
 #include <update/common/config.hpp>
 #include <update/common/log.hpp>
-
-//
-
-//#include <update/patch/updater.hpp>
-#include <update/patch/update_client.hpp>
+//#include <update/common/client.hpp>
+//#include <libv/update/updater.hpp>
+//#include <libv/update/update_client.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -85,9 +83,9 @@ int main(int argc, const char** argv) {
 //			{"localhost", 25090},
 		};
 
-		libv::update::UpdateClient update_client;
-		update_client.init(path_root_dir, path_executable, update_servers, current_version);
-		update_client.check_for_update();
+//		libv::update::UpdateClient update_client;
+//		update_client.init(path_root_dir, path_executable, update_servers, current_version);
+//		update_client.check_for_update();
 
 	}
 

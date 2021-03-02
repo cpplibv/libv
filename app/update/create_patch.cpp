@@ -1,4 +1,4 @@
-// Project: libv, File: app/update/create_patch.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: app/update/create_patch.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
@@ -17,8 +17,8 @@
 //#include <libv/utility/enum.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
-#include <update/patch/patch.hpp>
-//#include <update/patch/contants.hpp>
+#include <libv/update/patch.hpp>
+//#include <libv/update/contants.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

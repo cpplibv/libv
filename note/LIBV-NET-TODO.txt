@@ -47,37 +47,44 @@ libv: Result only types should be marked nodiscard
 
 
 
-salvage simple_server | resource stuff in it should be useful
+libv.net: Fix that the read/write limit currently cannot be used before the connect_* calls
+
+
+libv.update: weed out the legacy codes related to file downloading
+	I think the best ones are in libv/update/resource/resource_server
+	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
+
+
+
 
 libv.net: on_disconnect shall receive the first error that occurred which resulted in the disconnect if there was any
 
+libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
 
+app.update: Create a sandbox that flips version A->B B->A upon each start
 
 STACK
-	> ConnectionAsyncIH
-	> SimpleServer, SimpleSession and SimpleClient
+	> Codec and Protocol
 	> ResourceServer Peer State machine
 	> ResourceServer Peer
-	> Connection
-	> ConnectionSet
-	> Codec
-
 	> ResourceServer
 	> ResourceClient
-	> ResourceDownloading
-	> FileDownloading
+	> ResourceDownloading (FileDownloading)
 	> UpdateClient
 	> Updater
 	> Patch/Update Apply
-	> Codec
-	> Protocol
-	> Connection
-	> ConnectionAsyncCB No reuse, simplify
-	> ConnectionAsync sync API: disconnect_immediate | The main issue might be the naming
-		| disconnect // Does it on the spot canceling anything
-		| queue_disconnect_sync // (??) Queues and wait for disconnect
-		| queue_disconnect_async // Queues an async for disconnect
 
+			> ConnectionAsyncIH
+			> Connection
+			> ConnectionSet
+			> Connection
+			> ConnectionAsyncCB No reuse, simplify
+			> ConnectionAsync sync API: disconnect_immediate | The main issue might be the naming
+				| disconnect // Does it on the spot canceling anything
+				| queue_disconnect_sync // (??) Queues and wait for disconnect
+				| queue_disconnect_async // Queues an async for disconnect
+
+			> (? delayed or canceled) SimpleServer, SimpleSession and SimpleClient
 
 
 

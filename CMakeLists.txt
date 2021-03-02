@@ -727,6 +727,12 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_update STATIC
+	SOURCE src/libv/update/*.cpp
+	LINK   libv_net libv_process libv_diff libv_serial
+)
+
+wish_create_library(
 	TARGET libv_process STATIC
 	SOURCE src/libv/process/*.cpp
 	LINK   ext_boost # For interprocess file_lock
@@ -760,7 +766,8 @@ wish_create_library(
 	# TODO P5: Make this an object library
 	TARGET update_common STATIC
 	SOURCE app/update/common/*.cpp
-	SOURCE app/update/patch/*.cpp # <<< P4: Just for testing
+	LINK   libv_update
+
 	LINK   libv_net libv_process
 	LINK   libv_diff # <<< P4: Just for testing
 	LINK   libv_serial # <<< P4: Just for testing
@@ -973,6 +980,12 @@ wish_create_executable(
 	TARGET sandbox_libv_net
 	SOURCE sandbox/libv_net_main.cpp
 	LINK   libv_net libv_log
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_update
+	SOURCE sandbox/libv_update_main.cpp
+	LINK   libv_update libv_net libv_log
 )
 
 wish_create_executable(

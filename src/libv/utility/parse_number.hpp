@@ -4,6 +4,7 @@
 #include <libv/utility/trim.hpp>
 // std
 #include <charconv>
+#include <system_error>
 #include <type_traits>
 
 

@@ -8,6 +8,7 @@
 // std
 #include <array>
 #include <cstdint>
+#include <string_view> // Only for parse functions
 
 
 namespace libv {
@@ -56,6 +57,11 @@ public:
 		return os;
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+Endpoint parse_endpoint_or_throw(std::string_view address, uint16_t port);
+Endpoint parse_endpoint_or_throw(std::string_view endpoint);
 
 // -------------------------------------------------------------------------------------------------
 
