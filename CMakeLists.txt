@@ -152,7 +152,7 @@ else()
 endif()
 
 add_compile_options(-m64)
-add_compile_options(-std=c++2a)
+set(CMAKE_CXX_STANDARD 20)
 
 # Tooling ------------------------------------------------------------------------------------------
 
