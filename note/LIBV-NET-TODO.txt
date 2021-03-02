@@ -53,6 +53,36 @@ libv.net: on_disconnect shall receive the first error that occurred which result
 
 
 
+STACK
+	> ConnectionAsyncIH
+	> SimpleServer, SimpleSession and SimpleClient
+	> ResourceServer Peer State machine
+	> ResourceServer Peer
+	> Connection
+	> ConnectionSet
+	> Codec
+
+	> ResourceServer
+	> ResourceClient
+	> ResourceDownloading
+	> FileDownloading
+	> UpdateClient
+	> Updater
+	> Patch/Update Apply
+	> Codec
+	> Protocol
+	> Connection
+	> ConnectionAsyncCB No reuse, simplify
+	> ConnectionAsync sync API: disconnect_immediate | The main issue might be the naming
+		| disconnect // Does it on the spot canceling anything
+		| queue_disconnect_sync // (??) Queues and wait for disconnect
+		| queue_disconnect_async // Queues an async for disconnect
+
+
+
+
+
+
 libv.update.master Separate master sources and dependencies to a separate lib
 libv.update.common Separate common sources and dependencies to a separate lib
 libv.update.client Separate client sources and dependencies to a separate lib
@@ -64,6 +94,11 @@ libv.update: (?) for updater progress made callback
 libv.update: Patch apply current step report (API to get the next step/operation)
 libv.update: Patch creation rename support
 libv.update: Patch creation modify to support
+
+place.it:
+	download.https: HTTPS download?: https://curl.se/libcurl/c/url2file.html
+	download.https: https://stackoverflow.com/questions/28264313/ssl-certificates-and-boost-asio
+	download.https: https://github.com/yhirose/cpp-httplib
 
 Update:
 	app.update: Implement an update server / client
@@ -108,30 +143,6 @@ app.update: Paper
 				restart update.exe
 				remove update.exe.old
 
-
-STACK
-	> ConnectionAsyncIH
-	> SimpleServer, SimpleSession and SimpleClient
-	> ResourceServer Peer State machine
-	> ResourceServer Peer
-	> Connection
-	> ConnectionSet
-	> Codec
-	> ResourceServer
-	> ResourceClient
-	> ResourceDownloading
-	> FileDownloading
-	> UpdateClient
-	> Updater
-	> Patch/Update Apply
-	> Codec
-	> Protocol
-	> Connection
-	> ConnectionAsyncCB No reuse, simplify
-	> ConnectionAsync sync API: disconnect_immediate | The main issue might be the naming
-		| disconnect // Does it on the spot canceling anything
-		| queue_disconnect_sync // (??) Queues and wait for disconnect
-		| queue_disconnect_async // Queues an async for disconnect
 
 update: Sometimes it might require a restart for the updater
 	- migration code is introduced -> need restart to run it, and only after that can the updater continue
