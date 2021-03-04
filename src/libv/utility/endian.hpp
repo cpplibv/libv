@@ -4,7 +4,6 @@
 
 // std
 #include <bit>
-#include <type_traits>
 
 
 namespace libv {

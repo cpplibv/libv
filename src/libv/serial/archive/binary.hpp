@@ -4,12 +4,12 @@
 
 // ext
 #include <cereal/cereal.hpp>
-// std
-#include <istream>
-#include <limits>
-#include <ostream>
 // libv
+#include <libv/utility/bytes/input_bytes.hpp>
+#include <libv/utility/bytes/output_bytes.hpp>
 #include <libv/utility/endian.hpp>
+// std
+#include <limits>
 
 
 namespace libv {
@@ -20,7 +20,7 @@ namespace archive {
 namespace detail {
 
 template <size_t DataSize>
-inline void swap_bytes(uint8_t* data) {
+inline void swap_bytes(std::byte* data) {
 	for (size_t i = 0, end = DataSize / 2; i < end; ++i)
 		std::swap(data[i], data[DataSize - i - 1]);
 }
@@ -28,33 +28,43 @@ inline void swap_bytes(uint8_t* data) {
 } // namespace detail ------------------------------------------------------------------------------
 
 class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
-
 private:
-	std::ostream& os; // <<< Implement network/serial std::byte support
+	libv::output_bytes output_stream;
+	size_t output_it = 0;
 
 public:
 	/// Construct, outputting to the provided stream
 	/// @param stream The stream to output to. Should be opened with std::ios::binary flag.
-	explicit BinaryOutput(std::ostream& stream) :
+	explicit BinaryOutput(libv::output_bytes output) :
 		OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision>(this),
-		os(stream) {
+		output_stream(output) {
 	}
 
 	~BinaryOutput() noexcept = default;
 
 	template <size_t DataSize>
 	inline void saveBinary(const void* const data, size_t size) {
-		size_t writtenSize = 0;
+//		size_t writtenSize = 0;
 
-		if constexpr (!is_network_endian())
-			for (size_t i = 0; i < size; i += DataSize)
-				for (size_t j = 0; j < DataSize; ++j)
-					writtenSize += static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data) + DataSize - j - 1 + i, 1));
-		else
-			writtenSize = static_cast<size_t>(os.rdbuf()->sputn(reinterpret_cast<const char*>(data), size));
+		if (output_stream.size() < output_it + size)
+			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Output stream only has " + std::to_string(output_stream.size() - output_it) + " byte storage left");
 
-		if (writtenSize != size)
-			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
+		if constexpr (!is_network_endian() && DataSize != 1) {
+			for (size_t i = 0; i < size; i += DataSize) {
+				std::byte swap_buffer[DataSize];
+				std::memcpy(swap_buffer, reinterpret_cast<const std::byte*>(data) + i, DataSize);
+				detail::swap_bytes<DataSize>(swap_buffer);
+
+				output_stream.write(swap_buffer, output_it, DataSize);
+				output_it += DataSize;
+			}
+		} else {
+			output_stream.write(reinterpret_cast<const std::byte*>(data), output_it, size);
+			output_it += size;
+		}
+
+//		if (writtenSize != size)
+//			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
 	}
 };
 
@@ -63,28 +73,30 @@ public:
 class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
 
 private:
-	std::istream& is; // <<< Implement network/serial std::byte support
+	libv::input_bytes input_stream;
+	size_t input_it = 0;
 
 public:
 	/// Construct, loading from the provided stream
 	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
-	explicit BinaryInput(std::istream& stream) :
+	explicit BinaryInput(libv::input_bytes input) :
 		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
-		is(stream) {
+			input_stream(input) {
 	}
 
 	~BinaryInput() noexcept = default;
 
 	template <size_t DataSize>
 	inline void loadBinary(void* const data, size_t size) {
-		auto const readSize = static_cast<size_t>(is.rdbuf()->sgetn(reinterpret_cast<char*>(data), size));
+		const auto readSize = input_stream.read(reinterpret_cast<std::byte*>(data), input_it, size);
+		input_it += size; // (readSize would yield same result)
 
 		if (readSize != size)
 			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
 
 		if constexpr (!is_network_endian())
 			for (size_t i = 0; i < size; i += DataSize)
-				detail::swap_bytes<DataSize>(reinterpret_cast<uint8_t*>(data) + i);
+				detail::swap_bytes<DataSize>(reinterpret_cast<std::byte*>(data) + i);
 	}
 };
 
@@ -96,7 +108,7 @@ struct Binary {
 };
 
 // -------------------------------------------------------------------------------------------------
-// Common BinaryArchive serialization functions
+// Common BinaryArchive serialization functions (Found by ADL)
 
 /// Saving for POD types to portable binary
 template<class T> inline
