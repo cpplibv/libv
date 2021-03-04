@@ -73,9 +73,7 @@ public:
 
 private:
 	Message aux_encode(std::type_index type, const void* object) const {
-		// TODO P4: Performance issue with ostringstream, cause is libv.serial archive API
-		std::ostringstream message; // <<< Implement network/serial std::byte support
-//		Message message;
+		Message message;
 
 		{
 			OArchive oar(message);
@@ -89,21 +87,10 @@ private:
 			}
 		}
 
-//		return message;
-		auto tmp = std::move(message).str();
-		return std::vector<std::byte>(
-				reinterpret_cast<std::byte*>(tmp.data()),
-				reinterpret_cast<std::byte*>(tmp.data() + tmp.size())
-		);
+		return message;
 	}
 
-//	void aux_decode(void* handler, Message_view message) const {
-	void aux_decode(void* handler, Message_view tmp) const {
-		// TODO P4: Performance issue with ostringstream, cause is libv.serial archive API
-		std::istringstream message(std::string( // <<< Implement network/serial std::byte support
-				reinterpret_cast<const char*>(tmp.data()),
-				reinterpret_cast<const char*>(tmp.data() + tmp.size())
-		));
+	void aux_decode(void* handler, Message_view message) const {
 		IArchive iar(message);
 
 		MessageID id;

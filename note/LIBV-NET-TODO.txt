@@ -17,7 +17,9 @@ libv.serialization: Rename libv.serialization to libv.serial
 libv.serialization: Rename SERIALIZATION to SERIAL
 libv.algorithm: Rename libv.algorithm to libv.algo
 libv: Result only types should be marked nodiscard
-
+libv.utility: input bytes on static memory should return correct amount of read bytes
+libv.serial: Add support for non stream based IO Binary archives
+libv.serial: Add support for non string based codec
 
 
 
@@ -44,10 +46,13 @@ libv: Result only types should be marked nodiscard
 --- STACK ------------------------------------------------------------------------------------------
 
 
-- send a valid version not supported response from the server
 
-libv.serial: Add support for non stream based IO archives
-libv.serial: Add support for non string based codec
+
+libv.update: Cleanup dirty progress
+
+
+
+
 libv.network: Add support for non string based connection send / receive
 
 libv.update: PAPER
@@ -243,7 +248,6 @@ app.update.security:
 
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
-libv.utility: input bytes on static memory should return correct amount of read bytes (required for hash_md5)
 libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connection within a connection
 
 
