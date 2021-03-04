@@ -3,7 +3,7 @@
 // libv
 #include <libv/arg/arg.hpp>
 //#include <libv/utility/parse_number.hpp>
-#include <libv/update/common/server.hpp>
+#include <libv/update/net/server.hpp>
 // std
 #include <iostream>
 // pro
@@ -14,7 +14,7 @@
 // -------------------------------------------------------------------------------------------------
 
 int main(int argc, const char** argv) {
-	auto args = libv::arg::Parser("Updater server", "LIBV Updater server daemon");
+	auto args = libv::arg::Parser("Update server", "LIBV Update server daemon");
 
 //	const auto config_file = args.require<std::string>
 //			("-c", "--config")
@@ -38,11 +38,11 @@ int main(int argc, const char** argv) {
 //			("-r", "--resource_server")
 //			("resource_server", "Enable built in resource server")
 //			= app::default_port;
-
-	const auto num_net_thread = args.require<uint16_t>
-			("-t", "--net_thread")
-			("net_thread", "Number of network IO threads")
-			= app::default_net_thread;
+//
+//	const auto num_net_thread = args.require<uint16_t>
+//			("-t", "--net_thread")
+//			("net_thread", "Number of network IO threads")
+//			= app::default_net_thread;
 
 	args.require_no_unused();
 
@@ -67,26 +67,22 @@ int main(int argc, const char** argv) {
 //		for (const auto path : libv::wilcard_filepath("app/update/res/p*.*.patch"))
 //			rs.add_files(path.generic_path, path);
 //		rs.add_files("app.update::patch::{}", "app/update/res/", "p*.*.patch");
-//
-//      Resource ID:
-//          app.update::patch::{filename}
-//                             ^^^^^^^^^^ filename template
-//                    ^^     ^^ separators
-//                      ^^^^^ resource namespace
-//          ^^^^^^^^^^ program / program url
 //	}
 
 //	us.peer.on_resource_request([]{
 //		rs.adopt(peer);
 //	});
 
-	app::UpdateServer server = {endpoint, num_net_thread.value()};
+//	app::UpdateServer server = {endpoint, num_net_thread.value()};
 
 	for (std::string line; std::getline(std::cin, line);) {
 		if (line == "quit")
 			break;
 
-		server.broadcast(line);
+//		if (line.starts_with("create"))
+//			break;
+
+//		server.broadcast(line);
 	}
 
 	return EXIT_SUCCESS;

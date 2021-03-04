@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <libv/update/patch_number.hpp>
+//#include <libv/update/patch_number.hpp>
 #include <libv/update/patch_version.hpp>
 #include <libv/update/version_number.hpp>
 
@@ -106,13 +106,12 @@ struct StepRemove {
 // -------------------------------------------------------------------------------------------------
 
 struct Patch {
-	static constexpr patch_version current_patch_version{uint64_t{0}};
+	static constexpr patch_version current_patch_version = patch_version{0};
 
 	patch_version version;
-	patch_number number;
 
-	version_number from;
-	version_number to;
+	version_number source;
+	version_number target;
 
 public:
 	std::vector<StepCreateDir> creates_dir;
@@ -126,10 +125,9 @@ public:
 
 public:
 	LIBV_REFLECTION_ACCESS(version);
-	LIBV_REFLECTION_ACCESS(number);
 
-	LIBV_REFLECTION_ACCESS(from);
-	LIBV_REFLECTION_ACCESS(to);
+	LIBV_REFLECTION_ACCESS(source);
+	LIBV_REFLECTION_ACCESS(target);
 
 	LIBV_REFLECTION_ACCESS(creates_dir);
 	LIBV_REFLECTION_ACCESS(removes_dir);

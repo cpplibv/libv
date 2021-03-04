@@ -3,6 +3,7 @@
 
 !/.idea/
 .idea/workspace.xml
+.idea/csv-plugin.xml
 
 !/app/
 !/cmake/

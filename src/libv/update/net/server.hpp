@@ -25,6 +25,8 @@ class UpdateServer {
 	libv::net::IOContext io_context;
 //	libv::net::mtcp::AcceptorAsyncCB acceptor;
 
+//	std::vector<Update> updates;
+
 public:
 	UpdateServer(libv::net::mtcp::Endpoint endpoint, uint16_t num_net_thread);
 	UpdateServer(uint16_t port, uint16_t num_net_thread);

@@ -494,7 +494,13 @@ public:
 	std::ostream& report(std::ostream& os, int width = 120) const {
 		(void) width; // TODO P5: libv.arg: use width
 
-		os << "Parsed arguments:\n";
+		if (!arguments.empty())
+			os << "Parsed arguments:\n";
+		else if (unused.empty())
+			os << "No argument were parsed";
+		else
+			os << "No argument were parsed\n";
+
 		for (const auto& argument : arguments) {
 			os << "  " << argument->name();
 			argument->ostream(os);

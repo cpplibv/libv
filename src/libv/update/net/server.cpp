@@ -1,14 +1,14 @@
 // Project: libv.update, File: src/libv/update/common/server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/common/server.hpp>
+#include <libv/update/net/server.hpp>
 // libv
 #include <libv/algo/linear_find.hpp>
 #include <libv/algo/erase_unstable.hpp>
 //#include <libv/net/mtcp/connection_cb.hpp>
 //#include <libv/net/error.hpp>
 // pro
-#include <libv/update/common/session.hpp>
+#include <libv/update/net/session.hpp>
 //#include <update/common/log.hpp>
 
 

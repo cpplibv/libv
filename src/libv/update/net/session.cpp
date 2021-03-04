@@ -1,12 +1,15 @@
-// Project: libv.update, File: src/libv/update/common/client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/common/session.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/common/client.hpp>
+#include <libv/update/net/session.hpp>
 // libv
+#include <libv/utility/read_file.hpp>
+//#include <libv/utility/write_file.hpp>
 #include <libv/net/error.hpp>
 // std
 #include <iostream>
 // pro
+#include <libv/update/net/server.hpp>
 //#include <update/common/log.hpp>
 
 
@@ -14,13 +17,18 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-//UpdateClient::UpdateClient() {
+//UpdateSession::UpdateSession(UpdateServer& server_, libv::net::mtcp::ConnectionAsyncCB connection_) :
+//		connection(std::move(connection_)),
+//		server(server_) {
+//
 //	const auto connect_cb = [this](auto local_endpoint, auto remote_endpoint) {
 //		std::cout << "connect_cb: " << local_endpoint << " - " << remote_endpoint << std::endl;
 //	};
 //
 //	const auto disconnect_cb = [this]() {
 //		std::cout << "disconnect_cb" << std::endl;
+//
+//		server.remove_session(this);
 //	};
 //
 //	const auto error_cb = [this](auto operation, std::error_code ec) noexcept {
@@ -29,10 +37,8 @@ namespace app {
 //
 //	const auto receive_cb = [this](libv::net::mtcp::Message&& message) noexcept {
 //		std::cout << "receive_cb: " << message << std::endl;
-//		std::cout << "num_byte_read       : " << connection.num_byte_read() << std::endl;
-//		std::cout << "num_byte_wrote      : " << connection.num_byte_wrote() << std::endl;
-//		std::cout << "num_message_received: " << connection.num_message_received() << std::endl;
-//		std::cout << "num_message_sent    : " << connection.num_message_sent() << std::endl;
+//
+//		connection.send(libv::read_file_or(message, ""));
 //	};
 //
 //	const auto send_cb = [](libv::net::mtcp::Message&& message) noexcept {
@@ -47,23 +53,27 @@ namespace app {
 //
 //	connection.read_limit(100); // bytes per second
 //	connection.write_limit(100); // bytes per second
-//}
 //
-//UpdateClient::~UpdateClient() {
-//	connection.disconnect_teardown();
-//	io_context.join();
-//}
-//
-//void UpdateClient::update_from(libv::net::Address server_address) {
-//	connection.connect(server_address);
-////	connection.receive(1);
+//	connection.start();
 //	connection.receive_repeat();
 //}
 //
-//void UpdateClient::send(std::string m) {
-//	connection.send(m);
+//UpdateSession::~UpdateSession() {
+//	connection.disconnect_teardown();
+//}
+//
+//void UpdateSession::send(const std::string& message) {
+////	std::cout << "send: " << message << std::endl;
+//
+//	connection.send(message);
+//}
+//
+//void UpdateSession::kick() {
+////	std::cout << "kick" << std::endl;
+//
+//	connection.disconnect_teardown();
 //}
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace
+} // namespace app

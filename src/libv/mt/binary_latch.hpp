@@ -56,4 +56,10 @@ using binary_latch = BinaryLatch;
 
 // -------------------------------------------------------------------------------------------------
 
+namespace mt {
+
+// TODO P5: Move everything to this alias
+using binary_latch = ::libv::BinaryLatch;
+
+} // namespace mt
 } // namespace libv

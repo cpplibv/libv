@@ -104,9 +104,17 @@ public:
 	}
 
 public:
-	inline T* operator->() const noexcept {
+	inline T* operator->() const noexcept
+			requires (!std::is_void_v<T>) {
 		assert(object != nullptr);
 		return object;
+	}
+
+	template <typename TT = T>
+			requires (!std::is_void_v<TT>)
+	inline TT& operator*() const noexcept {
+		assert(object != nullptr);
+		return *object;
 	}
 
 	[[nodiscard]] inline BaseHandler& handler() const noexcept {

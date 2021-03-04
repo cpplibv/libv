@@ -1,9 +1,6 @@
-// Project: libv.update, File: src/libv/update/patch_number.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/client/updater.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
-
-// std
-#include <cstdint>
 
 
 namespace libv {
@@ -11,7 +8,12 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class patch_number : uint64_t {};
+enum class update_check_result {
+	version_outdated,
+	version_up_to_date,
+	version_not_supported,
+	communication_error,
+};
 
 // -------------------------------------------------------------------------------------------------
 

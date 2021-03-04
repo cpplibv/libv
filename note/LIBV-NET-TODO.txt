@@ -44,8 +44,31 @@ libv: Result only types should be marked nodiscard
 --- STACK ------------------------------------------------------------------------------------------
 
 
+Goal for today: send a valid version not supported response from the server
 
 
+libv.update: PAPER
+	Update file name
+		program-variant-01-00.update - {program}-{variant}-{target}-{source}.update
+		parsing from the back should be possible
+
+	Updating:
+		-
+		-
+		-
+
+		Check for update:
+			-
+			-
+			-
+
+	Resource ID:
+        app.update::variant::patch::{filename}
+                  ^^       ^^     ^^ separators
+                                    ^^^^^^^^^^ filename template
+                             ^^^^^ resource namespace
+                    ^^^^^^^ program variant (dev, daily, experimental, stable)
+        ^^^^^^^^^^ program / program url
 
 libv.net: Fix that the read/write limit currently cannot be used before the connect_* calls
 
@@ -53,8 +76,12 @@ libv.net: Fix that the read/write limit currently cannot be used before the conn
 libv.update: weed out the legacy codes related to file downloading
 	I think the best ones are in libv/update/resource/resource_server
 	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
+	| The libv/update/resource/update_client is marked for death
 
 
+Codec and Protocol
+	if handler is not invocable with function, \
+		do error mechanizm with if constexpr
 
 
 libv.net: on_disconnect shall receive the first error that occurred which resulted in the disconnect if there was any
