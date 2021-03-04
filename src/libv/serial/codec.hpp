@@ -1,4 +1,4 @@
-// Project: libv.serial, File: src/libv/serial/resource/codec.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/codec.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -71,11 +71,10 @@ public:
 		decoders.emplace_back(MessageIndex, std::move(decode_fn));
 	}
 
-
 private:
 	Message aux_encode(std::type_index type, const void* object) const {
 		// TODO P4: Performance issue with ostringstream, cause is libv.serial archive API
-		std::ostringstream message;
+		std::ostringstream message; // <<< Implement network/serial std::byte support
 //		Message message;
 
 		{
@@ -101,7 +100,7 @@ private:
 //	void aux_decode(void* handler, Message_view message) const {
 	void aux_decode(void* handler, Message_view tmp) const {
 		// TODO P4: Performance issue with ostringstream, cause is libv.serial archive API
-		std::istringstream message(std::string(
+		std::istringstream message(std::string( // <<< Implement network/serial std::byte support
 				reinterpret_cast<const char*>(tmp.data()),
 				reinterpret_cast<const char*>(tmp.data() + tmp.size())
 		));

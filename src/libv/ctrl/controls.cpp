@@ -12,7 +12,6 @@
 #include <libv/ctrl/controls_impl.lpp>
 #include <libv/ctrl/parse.hpp>
 
-#include <iostream>
 
 namespace libv {
 namespace ctrl {

@@ -44,8 +44,11 @@ libv: Result only types should be marked nodiscard
 --- STACK ------------------------------------------------------------------------------------------
 
 
-Goal for today: send a valid version not supported response from the server
+- send a valid version not supported response from the server
 
+libv.serial: Add support for non stream based IO archives
+libv.serial: Add support for non string based codec
+libv.network: Add support for non string based connection send / receive
 
 libv.update: PAPER
 	Update file name

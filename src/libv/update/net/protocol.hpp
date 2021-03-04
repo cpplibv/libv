@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/common/protocol.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/update/net/protocol.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -64,8 +64,8 @@ struct msg {
 		};
 
 	public:
-		std::string program;
-		std::string variant;
+		std::string program; // Sending back the program and variant names are not necessary, but could be used to remap
+		std::string variant; // Sending back the program and variant names are not necessary, but could be used to remap
 		std::vector<UpdateInfoEntry> updates;
 		//	std::vector<Address> resource_servers;
 

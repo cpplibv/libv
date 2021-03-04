@@ -16,7 +16,7 @@
 #include <libv/update/client/patch_applier.hpp>
 #include <libv/update/log.hpp>
 #include <libv/update/patch.hpp>
-#include <libv/update/net/updater_network_client.hpp>
+#include <libv/update/net/update_network_client.hpp>
 
 
 
@@ -96,8 +96,10 @@ update_check_result Updater::check_for_update() {
 		for (const auto& server_address : settings.update_servers) {
 			log_update.trace("Connecting to update server server: {} (Attempt {})", server_address, i + 1);
 
-			UpdaterNetworkClient connection(io_context, server_address);
+			UpdateNetworkClient connection(io_context, server_address);
 			check_result = connection.check_version(settings.program_name, settings.program_variant, settings.current_version);
+
+			log_update.trace("check_result: {}", libv::to_value(check_result)); // <<<
 
 			if (check_result == update_check_result::version_outdated)
 				update_info = connection.update_info();
@@ -105,8 +107,11 @@ update_check_result Updater::check_for_update() {
 				break;
 		}
 
-		if (i >= 2) // Break after 3 attempt
-			break;
+		if (check_result != update_check_result::communication_error)
+			break; // Break if we got back a valid response
+
+		if (i >= 2)
+			break; // Break after 3 attempt (on every server)
 
 		const auto wait_min = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i)));     // 1, 3, 9 sec
 		const auto wait_max = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i + 1))); // 3, 9, 27 sec

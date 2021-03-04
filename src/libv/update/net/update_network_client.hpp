@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/common/client.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/update/net/updater_network_client.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -19,7 +19,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-class UpdaterNetworkClient {
+class UpdateNetworkClient {
 private:
 	libv::net::IOContext& io_context;
 	libv::net::Address server_address;
@@ -28,17 +28,13 @@ private:
 	msg::UpdateInfo update_info_;
 
 public:
-	UpdaterNetworkClient(libv::net::IOContext& ioContext, libv::net::Address serverAddress);
-//	~UpdaterNetworkClient();
+	UpdateNetworkClient(libv::net::IOContext& ioContext, libv::net::Address serverAddress);
 
 public:
 	[[nodiscard]] update_check_result check_version(std::string program_name, std::string program_variant, version_number current_version);
 	[[nodiscard]] inline const msg::UpdateInfo& update_info() const noexcept {
 		return update_info_;
 	}
-
-//	void update_from();
-//	void send(std::string m);
 };
 
 // -------------------------------------------------------------------------------------------------

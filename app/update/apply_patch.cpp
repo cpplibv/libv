@@ -18,7 +18,7 @@
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 #include <libv/update/patch.hpp>
-#include <libv/update/client/updater.hpp>
+//#include <libv/update/client/updater.hpp>
 #include <libv/update/client/patch_applier.hpp>
 //#include <libv/update/contants.hpp>
 

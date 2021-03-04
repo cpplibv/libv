@@ -49,8 +49,8 @@ int main(int argc, const char** argv) {
 				{"rs0.corruptedai.com", 25090},
 				{"rs1.corruptedai.com", 25091},
 				{"rs2.corruptedai.com", 25092},
-				{"rs3.corruptedai.com", 25093},
-				{"rs4.corruptedai.com", 25094},
+//				{"rs3.corruptedai.com", 25093},
+//				{"rs4.corruptedai.com", 25094},
 		};
 
 //		open_program_frame();

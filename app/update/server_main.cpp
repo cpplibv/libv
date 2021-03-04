@@ -3,7 +3,11 @@
 // libv
 #include <libv/arg/arg.hpp>
 //#include <libv/utility/parse_number.hpp>
-#include <libv/update/net/server.hpp>
+//#include <libv/update/net/server.hpp>
+//#include <libv/update/server/server.hpp>
+#include <libv/net/mtcp/endpoint.hpp>
+#include <libv/update/server/update_server.hpp>
+//#include <libv/update/net/updater_network_server.hpp>
 // std
 #include <iostream>
 // pro
@@ -32,7 +36,8 @@ int main(int argc, const char** argv) {
 	const auto port = args.require<uint16_t>
 			("-p", "--port")
 			("port", "Listening TCP port")
-			= app::default_port;
+			;
+//			= app::default_port;
 
 //	const auto enable_resource_server = args.flag
 //			("-r", "--resource_server")
@@ -59,6 +64,12 @@ int main(int argc, const char** argv) {
 	const auto endpoint = libv::net::mtcp::parse_endpoint_or_throw(address.value(), port.value());
 	app::log_app.info("Listening on: {}...", endpoint);
 
+	auto server = libv::update::UpdateServer{endpoint, 8};
+
+	using vn = libv::update::version_number;
+//	server.add_update("app.update", "dev", vn{1}, vn{2}, 99999, 12345);
+//	server.add_update("app.update", "dev", vn{2}, vn{1}, 99999, 12345);
+
 //	app::UpdateServer us(update_server_settings);
 //	if (enable_resource_server.value()) {
 //		app::ResourceServer rs(resource_server_settings);
@@ -72,8 +83,6 @@ int main(int argc, const char** argv) {
 //	us.peer.on_resource_request([]{
 //		rs.adopt(peer);
 //	});
-
-//	app::UpdateServer server = {endpoint, num_net_thread.value()};
 
 	for (std::string line; std::getline(std::cin, line);) {
 		if (line == "quit")

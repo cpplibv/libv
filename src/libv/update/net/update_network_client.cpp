@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/common/client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/update/net/updater_network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/net/updater_network_client.hpp>
+#include <libv/update/net/update_network_client.hpp>
 // libv
 #include <libv/mt/binary_latch.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
@@ -10,7 +10,6 @@
 #include <libv/utility/hex_dump.hpp> // <<<
 //#include <libv/net/error.hpp>
 // std
-#include <iostream>
 // pro
 #include <libv/update/log.hpp>
 #include <libv/update/net/protocol.hpp>
@@ -21,7 +20,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-class aux_UpdaterNetworkClient : public libv::net::mtcp::ConnectionHandler<aux_UpdaterNetworkClient> {
+class aux_UpdateNetworkClient : public libv::net::mtcp::ConnectionHandler<aux_UpdateNetworkClient> {
 public:
 	libv::mt::binary_latch latch;
 	error_code error;
@@ -33,7 +32,7 @@ public:
 	bool version_up_to_date = false;
 
 public:
-	inline explicit aux_UpdaterNetworkClient(libv::net::Address address, std::string message) {
+	inline explicit aux_UpdateNetworkClient(libv::net::Address address, std::string message) {
 		connection.connect_async(address);
 		connection.send_async(message);
 	}
@@ -76,18 +75,19 @@ private:
 
 namespace { // -------------------------------------------------------------------------------------
 
-static auto codec = libv::serial::CodecClient<aux_UpdaterNetworkClient, libv::archive::Binary>{msg{}};
+static auto codec = libv::serial::CodecClient<aux_UpdateNetworkClient, libv::archive::Binary>{msg{}};
 
 } // namespace -------------------------------------------------------------------------------------
 
-UpdaterNetworkClient::UpdaterNetworkClient(net::IOContext& ioContext, net::Address serverAddress) :
+UpdateNetworkClient::UpdateNetworkClient(net::IOContext& ioContext, net::Address serverAddress) :
 	io_context(ioContext),
 	server_address(std::move(serverAddress)) {}
 
-update_check_result UpdaterNetworkClient::check_version(std::string program_name, std::string program_variant, version_number current_version) {
+update_check_result UpdateNetworkClient::check_version(std::string program_name, std::string program_variant, version_number current_version) {
 	const auto report = msg::ReportVersion(program_name, program_variant, current_version);
 
-	const auto tmp = codec.encode(report);
+//	const auto message = codec.encode(report);
+	const auto tmp = codec.encode(report); // <<< Implement network/serial std::byte support
 	const auto message = std::string(
 			reinterpret_cast<const char*>(tmp.data()),
 			reinterpret_cast<const char*>(tmp.data() + tmp.size())
@@ -95,7 +95,8 @@ update_check_result UpdaterNetworkClient::check_version(std::string program_name
 
 	log_update.debug("Report: \n{}", libv::hex_dump_with_ascii(message)); // <<<
 
-	const auto connection = libv::net::mtcp::Connection<aux_UpdaterNetworkClient>(io_context, server_address, message);
+	const auto connection = libv::net::mtcp::Connection<aux_UpdateNetworkClient>(io_context, server_address, message);
+	// No need to limit for version checking
 	//	connection.read_limit(100); // bytes per second
 	//	connection.write_limit(100); // bytes per second
 
@@ -106,7 +107,8 @@ update_check_result UpdaterNetworkClient::check_version(std::string program_name
 
 	log_update.debug("Response: \n{}", libv::hex_dump_with_ascii(connection->response)); // <<<
 
-	codec.decode(*connection, std::span<const std::byte>(
+//	codec.decode(*connection, connection->response);
+	codec.decode(*connection, std::span<const std::byte>( // <<< Implement network/serial std::byte support
 			reinterpret_cast<const std::byte*>(connection->response.data()),
 			connection->response.size()
 	));
@@ -117,8 +119,13 @@ update_check_result UpdaterNetworkClient::check_version(std::string program_name
 	if (connection->version_not_supported)
 		return update_check_result::version_not_supported;
 
-	if (connection->version_not_supported)
+	if (connection->version_outdated) {
+		update_info_ = connection->info;
 		return update_check_result::version_outdated;
+	}
+
+	assert(false && "Internal error");
+	return update_check_result::communication_error;
 }
 
 // -------------------------------------------------------------------------------------------------

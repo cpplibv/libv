@@ -30,7 +30,7 @@ inline void swap_bytes(uint8_t* data) {
 class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
 
 private:
-	std::ostream& os;
+	std::ostream& os; // <<< Implement network/serial std::byte support
 
 public:
 	/// Construct, outputting to the provided stream
@@ -63,7 +63,7 @@ public:
 class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
 
 private:
-	std::istream& is;
+	std::istream& is; // <<< Implement network/serial std::byte support
 
 public:
 	/// Construct, loading from the provided stream
