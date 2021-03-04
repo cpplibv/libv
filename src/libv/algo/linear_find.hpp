@@ -22,6 +22,15 @@ constexpr inline observer_ptr<typename Range::value_type> linear_find_optional(R
 	return libv::make_observer(it != end ? std::addressof(*it) : nullptr);
 }
 
+template <typename Range, typename Proj, typename Key>
+constexpr inline auto* linear_find_optional(Range& range, const Key& key, const Proj& proj) {
+	const auto begin = std::begin(range);
+	const auto end = std::end(range);
+
+	const auto it = std::ranges::find(begin, end, key, proj);
+	return it != end ? std::addressof(*it) : nullptr;
+}
+
 template <typename Range, typename Pred>
 constexpr inline observer_ptr<typename Range::value_type> linear_find_if_optional(Range& range, const Pred& pred) {
 	const auto begin = std::begin(range);
