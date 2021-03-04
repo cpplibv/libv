@@ -12,7 +12,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-// Some very rough test to prove the idea performance
+// Some very rough tests to prove the performance of the idea
 // https://quick-bench.com/q/LyXMRavpfzjZl_qP7adP0SGk79A
 
 // -------------------------------------------------------------------------------------------------
@@ -22,8 +22,8 @@ class input_bytes {
 
 private:
 	void* object;
-	size_t offset;
-	size_t size_;
+	size_t input_offset;
+	size_t input_size;
 	read_fn_t read_fn;
 
 public:
@@ -33,12 +33,15 @@ public:
 	/*implicit*/ input_bytes(std::istream& s) noexcept;
 
 public:
+	/// Read \c size byte starting from \c pos into \c dst
 	inline size_t read(std::byte* dst, size_t pos, size_t size) noexcept {
-		return read_fn(object, dst, offset + pos, size);
+		// assert(input_size >= pos + size); // No need to assert here, as returned size marks and makes the error recoverable
+		pos = input_offset + pos;
+		return read_fn(object, dst, pos, std::min(size, input_size - pos));
 	}
 
 	[[nodiscard]] constexpr inline size_t size() const noexcept {
-		return size_;
+		return input_size;
 	}
 };
 

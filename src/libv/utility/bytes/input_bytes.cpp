@@ -15,8 +15,8 @@ namespace libv {
 
 input_bytes::input_bytes(const std::byte* data, size_t size) noexcept :
 	object(const_cast<std::byte*>(data)), // No modification will be made on the pointer by read_fn
-	offset(0),
-	size_(size),
+	input_offset(0),
+	input_size(size),
 	read_fn(+[](void* object_, std::byte* ptr, size_t pos, size_t size_) noexcept {
 		std::memcpy(ptr, reinterpret_cast<const std::byte*>(object_) + pos, size_);
 		return size_;
@@ -38,8 +38,8 @@ input_bytes::input_bytes(std::istream& s) noexcept {
 	const auto end_g = s.tellg();
 	s.seekg(0, std::ios::beg);
 
-	offset = cur_g < 0 ? 0 : static_cast<size_t>(cur_g);
-	size_ = end_g < 0 ? 0 : static_cast<size_t>(end_g);
+	input_offset = cur_g < 0 ? 0 : static_cast<size_t>(cur_g);
+	input_size = end_g < 0 ? 0 : static_cast<size_t>(end_g);
 
 	read_fn = +[](void* object, std::byte* ptr, size_t pos, size_t size) noexcept {
 		auto& ss = *reinterpret_cast<std::istream*>(object);
