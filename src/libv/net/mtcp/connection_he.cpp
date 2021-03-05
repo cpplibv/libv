@@ -490,6 +490,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 			do_read(std::move(self_sp));
 
 		} else if (_is_disconnecting() && !_is_writing()) {
+			state = State::Disconnecting;
 			do_disconnect(std::move(self_sp));
 		}
 	}
@@ -528,6 +529,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 			do_write(std::move(self_sp));
 
 		} else if (_is_disconnecting() && !_is_reading()) {
+			state = State::Disconnecting;
 			do_disconnect(std::move(self_sp));
 		}
 	}
