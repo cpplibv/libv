@@ -2,18 +2,23 @@
 
 // libv
 #include <libv/arg/arg.hpp>
-//#include <libv/utility/parse_number.hpp>
-//#include <libv/update/net/server.hpp>
-//#include <libv/update/server/server.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
 #include <libv/update/server/update_server.hpp>
+//#include <libv/update/net/server.hpp>
 //#include <libv/update/net/updater_network_server.hpp>
+//#include <libv/update/server/server.hpp>
+//#include <libv/utility/parse_number.hpp>
 // std
 #include <iostream>
 // pro
 #include <update/common/config.hpp>
 #include <update/common/log.hpp>
 
+
+// -------------------------------------------------------------------------------------------------
+
+using vn = libv::update::version_number;
+using us = libv::update::update_signature;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -36,8 +41,7 @@ int main(int argc, const char** argv) {
 	const auto port = args.require<uint16_t>
 			("-p", "--port")
 			("port", "Listening TCP port")
-			;
-//			= app::default_port;
+			= app::default_port;
 
 //	const auto enable_resource_server = args.flag
 //			("-r", "--resource_server")
@@ -61,14 +65,44 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("{}", args.report(100));
 
+	// -------------------------------------------------------------------------------------------------
+
 	const auto endpoint = libv::net::mtcp::parse_endpoint_or_throw(address.value(), port.value());
-	app::log_app.info("Listening on: {}...", endpoint);
 
-	auto server = libv::update::UpdateServer{endpoint, 8};
+	auto server_settings = libv::update::UpdateServerSettings{};
+	server_settings.endpoint = endpoint;
+	server_settings.num_thread_net = 8;
+	server_settings.num_accept_backlog = 4;
+	server_settings.resource_servers = std::vector<libv::net::Address>{
+			{"rs0.corruptedai.com", 25090},
+			{"rs1.corruptedai.com", 25091},
+			{"rs2.corruptedai.com", 25092},
+//			{"rs3.corruptedai.com", 25093},
+//			{"rs4.corruptedai.com", 25094},
+	};
 
-	using vn = libv::update::version_number;
-//	server.add_update("app.update", "dev", vn{1}, vn{2}, 99999, 12345);
-//	server.add_update("app.update", "dev", vn{2}, vn{1}, 99999, 12345);
+	{
+		auto server = libv::update::UpdateServer{server_settings};
+
+		server.register_update("app.update", "dev", vn{1}, vn{2}, 99999, us{12345});
+		server.register_update("app.update", "dev", vn{2}, vn{3}, 99999, us{12345});
+		server.register_update("app.update", "dev", vn{3}, vn{6}, 99999, us{12345});
+		server.register_update("app.update", "dev", vn{4}, vn{6}, 99999, us{12345});
+		server.register_update("app.update", "dev", vn{5}, vn{6}, 99999, us{12345});
+
+		server.register_update("app.update", "stable", vn{2}, vn{3}, 99999, us{12345});
+		server.register_update("app.update", "stable", vn{3}, vn{6}, 99999, us{12345});
+		server.register_update("app.update", "stable", vn{4}, vn{6}, 99999, us{12345});
+
+		server.start();
+
+		for (std::string line; std::getline(std::cin, line);) {
+			if (line == "quit")
+				break;
+	//		if (line.starts_with("create"))
+	//			break;
+		}
+	}
 
 //	app::UpdateServer us(update_server_settings);
 //	if (enable_resource_server.value()) {
@@ -84,15 +118,7 @@ int main(int argc, const char** argv) {
 //		rs.adopt(peer);
 //	});
 
-	for (std::string line; std::getline(std::cin, line);) {
-		if (line == "quit")
-			break;
 
-//		if (line.starts_with("create"))
-//			break;
-
-//		server.broadcast(line);
-	}
 
 	return EXIT_SUCCESS;
 }

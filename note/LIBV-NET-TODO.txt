@@ -48,12 +48,20 @@ libv.serial: Add support for non string based codec
 
 
 
+libv.update: Implement real check version server response calculation
+
+bug fix
+	E 8 libv.update: Update server accept failure: system:995 Operation aborted, src/libv/update/server/network_server.cpp:180
+	I 8 libv.update: ~aux_update_server, Terminating every connection..., src/libv/update/server/network_server.cpp:169
+	T 8 libv.net: MTCP-0 cancel_and_disconnect_async, src/libv/net/mtcp/connection_he.cpp:292
+	W 8 libv.net: MTCP-0 Logic error: Called disconnect on connection multiple times, src/libv/net/mtcp/connection_he.cpp:298
+
+
+
+libv.net: Add support for non string based connection send / receive
 libv.update: Cleanup dirty progress
 
 
-
-
-libv.network: Add support for non string based connection send / receive
 
 libv.update: PAPER
 	Update file name

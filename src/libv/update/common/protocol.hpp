@@ -5,18 +5,14 @@
 // libv
 #include <libv/arg/arg.hpp>
 #include <libv/net/address.hpp>
+#include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
 // std
 #include <iostream>
 // pro
-//#include <update/common/client.hpp>
-//#include <update/common/config.hpp>
-//#include <update/common/log.hpp>
 #include <libv/update/version_number.hpp>
-//
-#include <libv/state/state.hpp>
-#include <libv/serial/serial.hpp>
+#include <libv/update/update_signature.hpp>
 
 
 namespace libv {
@@ -48,12 +44,12 @@ struct msg {
 	};
 
 	/// If the client is reporting an outdated version
-	struct UpdateInfo {
+	struct UpdateRoute {
 		struct UpdateInfoEntry {
 			version_number version_source;
 			version_number version_target;
 			uint64_t size;
-			uint64_t signature;
+			update_signature signature;
 
 			template <class Archive> inline void serialize(Archive& ar) {
 				ar & LIBV_NVP(version_source);
@@ -88,17 +84,9 @@ struct msg {
 		// 2) Server -> Client
 		codec.template type_server<20, VersionNotSupported>();
 		codec.template type_server<21, VersionUpToDate>();
-		codec.template type_server<22, UpdateInfo>();
+		codec.template type_server<22, UpdateRoute>();
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-using ev_ReportVersion = libv::state::ev<msg::ReportVersion>;
-using ev_VersionNotSupported = libv::state::ev<msg::VersionNotSupported>;
-using ev_VersionUpToDate = libv::state::ev<msg::VersionUpToDate>;
-using ev_UpdateInfo = libv::state::ev<msg::UpdateInfo>;
-//using ev_NetIOError = libv::state::ev<net_io_error>;
 
 // -------------------------------------------------------------------------------------------------
 

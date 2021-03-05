@@ -10,7 +10,7 @@
 #include <string>
 // pro
 #include <libv/update/client/update_check_result.hpp>
-#include <libv/update/net/protocol.hpp>
+#include <libv/update/common/protocol.hpp>
 #include <libv/update/version_number.hpp>
 
 
@@ -25,14 +25,14 @@ private:
 	libv::net::Address server_address;
 //	libv::net::mtcp::ConnectionAsyncCB connection{io_context};
 
-	msg::UpdateInfo update_info_;
+	msg::UpdateRoute update_info_;
 
 public:
 	UpdateNetworkClient(libv::net::IOContext& ioContext, libv::net::Address serverAddress);
 
 public:
 	[[nodiscard]] update_check_result check_version(std::string program_name, std::string program_variant, version_number current_version);
-	[[nodiscard]] inline const msg::UpdateInfo& update_info() const noexcept {
+	[[nodiscard]] inline const msg::UpdateRoute& update_info() const noexcept {
 		return update_info_;
 	}
 };

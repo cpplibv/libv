@@ -11,7 +11,7 @@
 #include <libv/update/version_number.hpp>
 //#include <libv/update/net/client.hpp>
 #include <libv/update/client/update_check_result.hpp>
-#include <libv/update/net/protocol.hpp> // <<< Hide it from updater.hpp
+#include <libv/update/common/protocol.hpp> // <<< Hide it from updater.hpp
 
 
 // std
@@ -88,7 +88,7 @@ struct Updater {
 
 public:
 	UpdaterSettings settings;
-	msg::UpdateInfo update_info;
+	msg::UpdateRoute update_info;
 
 public:
 	libv::net::IOContext io_context;

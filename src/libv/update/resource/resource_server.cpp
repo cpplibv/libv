@@ -415,7 +415,7 @@
 //
 //	ImplResourceServer& server;
 //
-//	std::mutex mutex; // !!! use this mutex
+//	std::mutex mutex;
 //	libv::net::mtcp::ConnectionAsyncCB connection;
 //
 ////		std::chrono::steady_clock::time_point last_action;

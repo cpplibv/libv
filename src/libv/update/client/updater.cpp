@@ -13,10 +13,10 @@
 #include <memory>
 #include <string>
 // pro
+#include <libv/update/client/network_client.hpp>
 #include <libv/update/client/patch_applier.hpp>
 #include <libv/update/log.hpp>
 #include <libv/update/patch.hpp>
-#include <libv/update/net/update_network_client.hpp>
 
 
 
@@ -41,7 +41,7 @@
 #include <libv/utility/storage_size.hpp>
 
 #include <libv/state/state.hpp>
-#include <libv/update/net/protocol.hpp>
+#include <libv/update/common/protocol.hpp>
 
 
 
@@ -99,7 +99,7 @@ update_check_result Updater::check_for_update() {
 			UpdateNetworkClient connection(io_context, server_address);
 			check_result = connection.check_version(settings.program_name, settings.program_variant, settings.current_version);
 
-			log_update.trace("check_result: {}", libv::to_value(check_result)); // <<<
+			log_update.trace("check_result: {}", libv::to_value(check_result)); // <<< dumping return
 
 			if (check_result == update_check_result::version_outdated)
 				update_info = connection.update_info();

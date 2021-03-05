@@ -23,6 +23,10 @@ int main(int argc, const char** argv) {
 //			("-c", "--config")
 //			("config_file", "File path of the config file");
 
+	const auto tmp_version = args.require<int>
+			("-v", "--version")
+			("tmp", "tmp");
+
 	args.require_no_unused();
 
 	if (!args.parse(argc, argv)) {
@@ -35,20 +39,23 @@ int main(int argc, const char** argv) {
 
 	app::log_app.info("{}", args.report(100));
 
+	// -------------------------------------------------------------------------------------------------
+
 	{
 		libv::update::UpdaterSettings updater_settings;
 
 		updater_settings.program_name = app::program_name;
 		updater_settings.program_variant = app::program_variant;
-		updater_settings.current_version = app::current_version;
+//		updater_settings.current_version = app::current_version; // <<<
+		updater_settings.current_version = libv::update::version_number{tmp_version.value()};
 		updater_settings.path_executable = std::filesystem::path(argv[0]);
 		updater_settings.path_root = updater_settings.path_executable.parent_path();
 		updater_settings.path_lock_file = ".lock";
 		updater_settings.path_temp_folder = ".update";
 		updater_settings.update_servers = std::vector<libv::net::Address>{
 				{"rs0.corruptedai.com", 25090},
-				{"rs1.corruptedai.com", 25091},
-				{"rs2.corruptedai.com", 25092},
+//				{"rs1.corruptedai.com", 25091},
+//				{"rs2.corruptedai.com", 25092},
 //				{"rs3.corruptedai.com", 25093},
 //				{"rs4.corruptedai.com", 25094},
 		};
@@ -57,7 +64,6 @@ int main(int argc, const char** argv) {
 //		load_minimal_ui();
 
 		libv::update::Updater updater(updater_settings);
-//		libv::update::UpdateClient update_client;
 
 //		const auto update_info = updater.check_for_update();
 //		update_client.init(path_root_dir, path_executable, update_servers, current_version);

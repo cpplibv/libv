@@ -1,18 +1,18 @@
 // Project: libv.net, File: src/libv/update/net/updater_network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/net/update_network_client.hpp>
+#include <libv/update/client/network_client.hpp>
 // libv
 #include <libv/mt/binary_latch.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/codec.hpp>
-#include <libv/utility/hex_dump.hpp> // <<<
+#include <libv/utility/hex_dump.hpp> // <<< hex_dump_with_ascii
 //#include <libv/net/error.hpp>
 // std
 // pro
+#include <libv/update/common/protocol.hpp>
 #include <libv/update/log.hpp>
-#include <libv/update/net/protocol.hpp>
 
 
 namespace libv {
@@ -25,7 +25,7 @@ public:
 	libv::mt::binary_latch latch;
 	error_code error;
 	std::string response;
-	msg::UpdateInfo info;
+	msg::UpdateRoute info;
 
 	bool version_not_supported = false;
 	bool version_outdated = false;
@@ -41,7 +41,7 @@ public:
 	void receive(const msg::VersionNotSupported&) {
 		version_not_supported = true;
 	}
-	void receive(msg::UpdateInfo info_) {
+	void receive(msg::UpdateRoute info_) {
 		version_outdated = true;
 		info = std::move(info_);
 	}
@@ -93,7 +93,7 @@ update_check_result UpdateNetworkClient::check_version(std::string program_name,
 			reinterpret_cast<const char*>(tmp.data() + tmp.size())
 	);
 
-	log_update.debug("Report: \n{}", libv::hex_dump_with_ascii(message)); // <<<
+	log_update.debug("Report: \n{}", libv::hex_dump_with_ascii(message)); // <<< hex_dump_with_ascii
 
 	const auto connection = libv::net::mtcp::Connection<aux_UpdateNetworkClient>(io_context, server_address, message);
 	// No need to limit for version checking
@@ -105,13 +105,9 @@ update_check_result UpdateNetworkClient::check_version(std::string program_name,
 	if (connection->error)
 		return update_check_result::communication_error;
 
-	log_update.debug("Response: \n{}", libv::hex_dump_with_ascii(connection->response)); // <<<
+	log_update.debug("Response: \n{}", libv::hex_dump_with_ascii(connection->response)); // <<< hex_dump_with_ascii
 
-//	codec.decode(*connection, connection->response);
-	codec.decode(*connection, std::span<const std::byte>( // <<< Implement network/serial std::byte support
-			reinterpret_cast<const std::byte*>(connection->response.data()),
-			connection->response.size()
-	));
+	codec.decode(*connection, connection->response);
 
 	if (connection->version_up_to_date)
 		return update_check_result::version_up_to_date;

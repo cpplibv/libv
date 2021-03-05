@@ -114,9 +114,16 @@ public:
 		return aux_encode(type, object_ptr);
 	}
 
-	void decode(Handler& handler, Message_view message) const {
+	inline void decode(Handler& handler, Message_view message) const {
 		const auto handler_ptr = static_cast<void*>(&handler);
-
+		aux_decode(handler_ptr, message);
+	}
+	inline void decode(Handler& handler, std::string_view message_str) const {
+		const auto handler_ptr = static_cast<void*>(&handler);
+		const auto message = std::span<const std::byte>(
+				reinterpret_cast<const std::byte*>(message_str.data()),
+				reinterpret_cast<const std::byte*>(message_str.data() + message_str.size())
+		);
 		aux_decode(handler_ptr, message);
 	}
 };
