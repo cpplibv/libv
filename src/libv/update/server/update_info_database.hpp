@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/update_info_database.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -57,7 +57,7 @@ struct ProgramInfo {
 
 // -------------------------------------------------------------------------------------------------
 
-class UpdateInfoDictionary {
+class UpdateInfoDatabase {
 	std::mutex mutex;
 	std::unordered_map<std::string, ProgramInfo> programs;
 

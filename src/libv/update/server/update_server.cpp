@@ -1,12 +1,11 @@
-// Project: libv.update, File: src/libv/update/client/updateServer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/update_server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/update/server/update_server.hpp>
 // pro
 #include <libv/update/log.hpp>
-#include <libv/update/server/info.hpp>
+#include <libv/update/server/update_info_database.hpp>
 #include <libv/update/server/network_server.hpp>
-
 
 
 namespace libv {
@@ -17,8 +16,8 @@ namespace update {
 UpdateServer::UpdateServer(UpdateServerSettings settings_) :
 	settings(std::move(settings_)),
 	io_context(settings.num_thread_net),
-	dictionary(std::make_shared<UpdateInfoDictionary>()),
-	server(std::make_unique<UpdateNetworkServer>(io_context, dictionary)) {
+	database(std::make_shared<UpdateInfoDatabase>()),
+	server(std::make_unique<UpdateNetworkServer>(io_context, database)) {
 }
 
 UpdateServer::~UpdateServer() {
@@ -26,11 +25,11 @@ UpdateServer::~UpdateServer() {
 }
 
 void UpdateServer::register_update(std::string program, std::string variant, version_number source, version_number target, uint64_t size, update_signature signature) {
-	dictionary->register_update(program, variant, source, target, size, signature);
+	database->register_update(std::move(program), std::move(variant), source, target, size, signature);
 }
 
 void UpdateServer::debug_dump() {
-	dictionary->debug_dump();
+	database->debug_dump();
 }
 
 void UpdateServer::start() {

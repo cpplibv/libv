@@ -20,6 +20,7 @@ libv: Result only types should be marked nodiscard
 libv.utility: input bytes on static memory should return correct amount of read bytes
 libv.serial: Add support for non stream based IO Binary archives
 libv.serial: Add support for non string based codec
+libv.update: Implement real server side version check response calculation
 
 
 
@@ -48,17 +49,11 @@ libv.serial: Add support for non string based codec
 
 
 
-libv.update: Implement real check version server response calculation
-
-bug fix
-	E 8 libv.update: Update server accept failure: system:995 Operation aborted, src/libv/update/server/network_server.cpp:180
-	I 8 libv.update: ~aux_update_server, Terminating every connection..., src/libv/update/server/network_server.cpp:169
-	T 8 libv.net: MTCP-0 cancel_and_disconnect_async, src/libv/net/mtcp/connection_he.cpp:292
-	W 8 libv.net: MTCP-0 Logic error: Called disconnect on connection multiple times, src/libv/net/mtcp/connection_he.cpp:298
-
 
 
 libv.net: Add support for non string based connection send / receive
+libv.net: Add support for endpoint access in mtcp on_accept (passing other type than io_context might be the solution)
+			| This is important, IP bans could be implemented this way
 libv.update: Cleanup dirty progress
 
 
@@ -69,6 +64,29 @@ libv.update: PAPER
 		parsing from the back should be possible
 
 	Updating:
+		// Legacy stuff
+		//
+		// */**
+		// */**.new
+		// */**.old
+		// .update/program-variant-target-source.update
+		// .update/meta
+		// .lock
+		// program
+		//
+		//	update outcomes:
+		//		failure - operation failure
+		//			attempt to retry and continue
+		//			rollback -> do nothing
+		//			rollback -> fix corruption -> do nothing
+		//			rollback -> fix corruption -> update again
+		//			force apply -> fix corruption
+		//		failure - corruption
+		//			rollback -> do nothing
+		//			rollback -> fix corruption -> do nothing
+		//			rollback -> fix corruption -> update again
+		//			force apply -> fix corruption
+		//		success
 		-
 		-
 		-
@@ -97,7 +115,7 @@ libv.update: weed out the legacy codes related to file downloading
 
 Codec and Protocol
 	if handler is not invocable with function, \
-		do error mechanizm with if constexpr
+		do error mechanism with if constexpr
 
 
 libv.net: on_disconnect shall receive the first error that occurred which resulted in the disconnect if there was any
@@ -107,7 +125,7 @@ libv.net: Solve the problem for resource server in connection_he, I need to trac
 app.update: Create a sandbox that flips version A->B B->A upon each start
 
 STACK
-	> Codec and Protocol
+		> Codec and Protocol
 	> ResourceServer Peer State machine
 	> ResourceServer Peer
 	> ResourceServer
@@ -255,8 +273,9 @@ app.update.security:
 
 
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
-libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connection within a connection
+libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
+libv.utility: libv::storage<T> with: initialize, destroy, alignas(T) std::byte storage[sizeof(T)];
 
 
 

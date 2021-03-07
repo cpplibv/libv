@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/client/updater.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/client/update_client.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -11,7 +11,7 @@
 #include <libv/update/version_number.hpp>
 //#include <libv/update/net/client.hpp>
 #include <libv/update/client/update_check_result.hpp>
-#include <libv/update/common/protocol.hpp> // <<< Hide it from updater.hpp
+//#include <libv/update/common/protocol.hpp> // <<< Hide it from updater.hpp
 
 
 // std
@@ -21,7 +21,7 @@
 //#include <libv/update/patch_number.hpp>
 //#include <libv/update/net/client.hpp>
 //#include <libv/state/state.hpp>
-#include <libv/update/client/updater.hpp> // For UpdaterSettings
+#include <libv/update/client/update_client.hpp> // For UpdaterSettings
 #include <libv/net/address.hpp>
 //#include <libv/net/mtcp/connection.hpp>
 //#include <libv/serial/serialization.hpp>
@@ -37,33 +37,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-// */**
-// */**.new
-// */**.old
-// .patch/v0001.0000.patch
-// .patch/v{to}.{from}.patch
-// .patch/v*.*.patch
-// .patch/meta
-// .lock
-// program
-//
-//	update outcomes:
-//		failure - operation failure
-//			attempt to retry and continue
-//			rollback -> do nothing
-//			rollback -> fix corruption -> do nothing
-//			rollback -> fix corruption -> update again
-//			force apply -> fix corruption
-//		failure - corruption
-//			rollback -> do nothing
-//			rollback -> fix corruption -> do nothing
-//			rollback -> fix corruption -> update again
-//			force apply -> fix corruption
-//		success
-
-// -------------------------------------------------------------------------------------------------
-
-struct UpdaterSettings {
+struct UpdateClientSettings {
 	version_number current_version;
 
 	std::string program_name;
@@ -84,17 +58,16 @@ struct UpdaterSettings {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Updater {
+struct UpdateClient {
+	std::unique_ptr<class ImplUpdateClient> self;
 
 public:
-	UpdaterSettings settings;
-	msg::UpdateRoute update_info;
+	explicit UpdateClient(UpdateClientSettings settings);
+	~UpdateClient();
 
 public:
-	libv::net::IOContext io_context;
-
-public:
-	explicit Updater(UpdaterSettings settings);
+	[[nodiscard]] update_check_result check_for_update();
+	void update();
 
 public:
 //	void init(
@@ -166,10 +139,6 @@ public:
 //
 //		}
 	}
-
-public:
-	[[nodiscard]] update_check_result check_for_update();
-	void update();
 
 //	void update(
 //			std::filesystem::path root_dir,

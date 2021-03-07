@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_client.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/client/network_client.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -36,6 +36,16 @@ public:
 		return update_info_;
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
+
+//struct update_info {
+//  update_check_result outcome;
+//  msg::UpdateRoute info;
+//};
+//
+//[[nodiscard]] update_info download_update_info(libv::net::IOContext& io_context, libv::net::Address server,
+//		std::string_view program, std::string_view variant, version_number version);
 
 // -------------------------------------------------------------------------------------------------
 

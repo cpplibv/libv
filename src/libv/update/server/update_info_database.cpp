@@ -1,7 +1,7 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/update_info_database.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/server/info.hpp>
+#include <libv/update/server/update_info_database.hpp>
 // libv
 #include <libv/utility/enum.hpp>
 // pro
@@ -13,7 +13,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-void UpdateInfoDictionary::register_update(
+void UpdateInfoDatabase::register_update(
 		std::string program_name,
 		std::string variant_name,
 		version_number version_source,
@@ -43,10 +43,10 @@ void UpdateInfoDictionary::register_update(
 	);
 }
 
-void UpdateInfoDictionary::debug_dump() {
+void UpdateInfoDatabase::debug_dump() {
 	const auto lock = std::unique_lock(mutex);
 
-	log_update.info("Printing update dictionary of {} program...", programs.size());
+	log_update.info("Printing update database of {} program...", programs.size());
 	for (const auto& [key, value] : programs) {
 		log_update.info("\tProgram {} has {} variant:", key, value.variants.size());
 		for (const auto& [key, value] : value.variants) {
@@ -61,7 +61,7 @@ void UpdateInfoDictionary::debug_dump() {
 	}
 }
 
-update_route_variant UpdateInfoDictionary::get_update_route(std::string program_name, std::string variant_name, version_number version) {
+update_route_variant UpdateInfoDatabase::get_update_route(std::string program_name, std::string variant_name, version_number version) {
 	const auto lock = std::unique_lock(mutex);
 
 	const auto pit = programs.find(program_name);

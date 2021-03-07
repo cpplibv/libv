@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/network_server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/update/server/network_server.hpp>
@@ -18,11 +18,11 @@
 //#include <libv/net/mtcp/connection_he.hpp>
 // std
 //#include <mutex>
-#include <set> // <<<
+#include <unordered_set>
 // pro
 //#include <libv/update/common/protocol.hpp>
 #include <libv/update/log.hpp>
-#include <libv/update/server/info.hpp>
+#include <libv/update/server/update_info_database.hpp>
 
 
 namespace libv {
@@ -35,14 +35,6 @@ class ServerState;
 class aux_update_session : public libv::net::mtcp::ConnectionHandler<aux_update_session> {
 public:
 	std::shared_ptr<ServerState> server;
-//	libv::mt::binary_latch latch;
-//	error_code error;
-//	std::string response;
-//	msg::UpdateRoute info;
-//
-//	bool version_not_supported = false;
-//	bool version_outdated = false;
-//	bool version_up_to_date = false;
 
 public:
 	inline explicit aux_update_session(std::shared_ptr<ServerState> server);
@@ -66,38 +58,37 @@ static auto codec = libv::serial::CodecServer<aux_update_session, libv::archive:
 
 class ServerState {
 	std::mutex mutex;
-//	std::unordered_set<libv::net::mtcp::Connection<aux_update_session>> sessions; // <<< hash_set
-	std::set<libv::net::mtcp::Connection<aux_update_session>> sessions;
+	std::unordered_set<libv::net::mtcp::Connection<aux_update_session>> sessions;
 
 public:
-	std::shared_ptr<UpdateInfoDictionary> dictionary;
+	std::shared_ptr<UpdateInfoDatabase> database;
 
 public:
-	explicit ServerState(std::shared_ptr<UpdateInfoDictionary> dictionary) :
-		dictionary(std::move(dictionary)) {}
+	explicit ServerState(std::shared_ptr<UpdateInfoDatabase> database) :
+		database(std::move(database)) {}
 
 	~ServerState() {
-		log_update.info("~ServerState");
+		log_update.fatal("~ServerState");
 	}
 
 public:
 	auto make_response(const msg::ReportVersion& report) {
 		const auto lock = std::unique_lock(mutex);
 
-		return dictionary->get_update_route(report.program, report.variant, report.version);
+		return database->get_update_route(report.program, report.variant, report.version);
 	}
 
 	void join(libv::net::mtcp::Connection<aux_update_session> session) {
 		const auto lock = std::unique_lock(mutex);
 
-		log_update.info("join");
+		log_update.fatal("join");
 		sessions.insert(session);
 	}
 
 	void leave(libv::net::mtcp::Connection<aux_update_session> session) {
 		const auto lock = std::unique_lock(mutex);
 
-		log_update.info("leave");
+		log_update.fatal("leave");
 		sessions.erase(session);
 	}
 
@@ -116,24 +107,19 @@ inline aux_update_session::aux_update_session(std::shared_ptr<ServerState> serve
 }
 
 aux_update_session::~aux_update_session() {
-	log_update.info("~aux_update_session");
+	log_update.fatal("~aux_update_session");
 }
 
 void aux_update_session::receive(const msg::ReportVersion& report) {
 	const auto response = server->make_response(report);
-//	const auto message = std::visit([](auto& r) { return codec.encode(r); }, response);
 
+	// <<< Implement network/serial std::byte support
+//	const auto message = std::visit([](auto& r) { return codec.encode(r); }, response);
 	const auto tmp = std::visit([](auto& r) { return codec.encode(r); }, response);
 	const auto message = std::string(
 			reinterpret_cast<const char*>(tmp.data()),
 			reinterpret_cast<const char*>(tmp.data() + tmp.size())
 	);
-//	const auto message = codec.encode(response);
-//	const auto tmp = codec.encode(response); // <<< Implement network/serial std::byte support
-//	const auto message = std::string(
-//			reinterpret_cast<const char*>(tmp.data()),
-//			reinterpret_cast<const char*>(tmp.data() + tmp.size())
-//	);
 
 	log_update.debug("session response:\n{}", libv::hex_dump_with_ascii(message)); // <<< hex_dump_with_ascii
 
@@ -173,11 +159,11 @@ private:
 	std::shared_ptr<ServerState> server;
 
 public:
-	inline explicit aux_update_server(std::shared_ptr<UpdateInfoDictionary> dictionary) :
-		server(std::make_shared<ServerState>(std::move(dictionary))) {}
+	inline explicit aux_update_server(std::shared_ptr<UpdateInfoDatabase> database) :
+		server(std::make_shared<ServerState>(std::move(database))) {}
 
 	~aux_update_server() {
-		log_update.info("~aux_update_server, Terminating every connection...");
+		log_update.info("Destroying update server: Terminating every connection...");
 		server->disconnect_all();
 	}
 
@@ -197,14 +183,14 @@ private:
 struct ImplUpdateNetworkServer {
 	libv::net::mtcp::Acceptor<aux_update_server> acceptor;
 
-	inline explicit ImplUpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<UpdateInfoDictionary> dictionary) :
-		acceptor(io_context, std::move(dictionary)) {}
+	inline explicit ImplUpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<UpdateInfoDatabase> database) :
+		acceptor(io_context, std::move(database)) {}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-UpdateNetworkServer::UpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<UpdateInfoDictionary> dictionary) :
-	self(std::make_unique<ImplUpdateNetworkServer>(io_context, std::move(dictionary))) {
+UpdateNetworkServer::UpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<UpdateInfoDatabase> database) :
+	self(std::make_unique<ImplUpdateNetworkServer>(io_context, std::move(database))) {
 }
 
 UpdateNetworkServer::~UpdateNetworkServer() {

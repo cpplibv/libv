@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_server.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/network_server.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -18,7 +18,7 @@ private:
 	std::unique_ptr<class ImplUpdateNetworkServer> self;
 
 public:
-	explicit UpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<class UpdateInfoDictionary> dictionary);
+	explicit UpdateNetworkServer(libv::net::IOContext& io_context, std::shared_ptr<class UpdateInfoDatabase> database);
 	~UpdateNetworkServer();
 
 public:

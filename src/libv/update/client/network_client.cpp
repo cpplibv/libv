@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/update/net/updater_network_client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/client/network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/update/client/network_client.hpp>

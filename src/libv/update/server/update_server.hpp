@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/client/updater.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/server/update_server.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -36,7 +36,7 @@ private:
 
 private:
 	libv::net::IOContext io_context;
-	std::shared_ptr<class UpdateInfoDictionary> dictionary;
+	std::shared_ptr<class UpdateInfoDatabase> database;
 	std::unique_ptr<class UpdateNetworkServer> server;
 
 public:

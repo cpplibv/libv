@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/client/updater.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/client/update_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/client/updater.hpp>
+#include <libv/update/client/update_client.hpp>
 // libv
 #include <libv/process/lock_file.hpp>
 #include <libv/utility/enum.hpp>
@@ -50,85 +50,76 @@
 //#include <libv/update/patch.hpp>
 
 
-//bool exists_throw(const std::filesystem::path& path) {
-//	std::error_code ec;
-//
-//	const auto exists = std::filesystem::exists(path, ec);
-//	if (ec)
-//		throw io_exception(path, ec);
-//
-//	return exists;
-//}
-
 namespace libv {
 namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-//void Updater::update(
-//		std::filesystem::path root_dir,
-//		std::vector<std::filesystem::path> patches,
-//		version_number current,
-//		version_number target) {
-//
-//	version_current = current;
-//	version_target = target;
-//
-////	filepath_root_dir = root_dir;
-////	filepath_lock = root_dir / settings.filename_lock;
-////	filepath_journey = root_dir / settings.filename_lock;
-//}
+struct ImplUpdateClient {
+public:
+	UpdateClientSettings settings;
+	msg::UpdateRoute update_info;
 
-Updater::Updater(UpdaterSettings settings) :
-	settings(std::move(settings)),
-	io_context(this->settings.num_thread_net) {
-}
+public:
+	libv::net::IOContext io_context{settings.num_thread_net};
 
-update_check_result Updater::check_for_update() {
-	std::random_device rd; // Expensive random number engine (only a few uses, no need to spin up an mt)
+public:
+	update_check_result check_for_update() {
+		std::random_device rd; // Expensive random number engine (but only a few uses, no need to spin up an mt)
 
-	update_check_result check_result = update_check_result::communication_error;
-	log_update.trace("Checking update for program: [{}] variant: [{}] version: [{}]", settings.program_name, settings.program_variant, libv::to_value(settings.current_version));
+		update_check_result check_result = update_check_result::communication_error;
+		log_update.trace("Checking update for program: [{}] variant: [{}] version: [{}]", settings.program_name, settings.program_variant, libv::to_value(settings.current_version));
 
-	for (size_t i = 0;; i++) {
-		std::ranges::shuffle(settings.update_servers, rd);
+		for (size_t i = 0;; i++) {
+			std::ranges::shuffle(settings.update_servers, rd);
 
-		for (const auto& server_address : settings.update_servers) {
-			log_update.trace("Connecting to update server server: {} (Attempt {})", server_address, i + 1);
+			for (const auto& server_address : settings.update_servers) {
+				log_update.trace("Connecting to update server server: {} (Attempt {})", server_address, i + 1);
 
-			UpdateNetworkClient connection(io_context, server_address);
-			check_result = connection.check_version(settings.program_name, settings.program_variant, settings.current_version);
+				UpdateNetworkClient connection(io_context, server_address);
+				check_result = connection.check_version(settings.program_name, settings.program_variant, settings.current_version);
 
-			log_update.trace("check_result: {}", libv::to_value(check_result)); // <<< dumping return
+				log_update.trace("check_result: {}", libv::to_value(check_result)); // <<< dumping return
 
-			if (check_result == update_check_result::version_outdated)
-				update_info = connection.update_info();
+				if (check_result == update_check_result::version_outdated)
+					update_info = connection.update_info();
+				if (check_result != update_check_result::communication_error)
+					break;
+			}
+
 			if (check_result != update_check_result::communication_error)
-				break;
+				break; // Break if we got back a valid response
+
+			if (i >= 2)
+				break; // Break after 3 attempt (on every server)
+
+			const auto wait_min = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i)));     // 1, 3, 9 sec
+			const auto wait_max = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i + 1))); // 3, 9, 27 sec
+			const auto wait = libv::make_uniform_distribution_inclusive(wait_min, wait_max)(rd);
+			log_update.trace("Waiting {} ms before retrying ({})...", wait.count(), i + 1);
+			std::this_thread::sleep_for(wait);
 		}
 
-		if (check_result != update_check_result::communication_error)
-			break; // Break if we got back a valid response
-
-		if (i >= 2)
-			break; // Break after 3 attempt (on every server)
-
-		const auto wait_min = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i)));     // 1, 3, 9 sec
-		const auto wait_max = std::chrono::milliseconds(static_cast<uint64_t>(1000 * std::pow(3, i + 1))); // 3, 9, 27 sec
-		const auto wait = libv::make_uniform_distribution_inclusive(wait_min, wait_max)(rd);
-		log_update.trace("Waiting {} ms before retrying ({})...", wait.count(), i + 1);
-		std::this_thread::sleep_for(wait);
+		return check_result;
 	}
 
-	return check_result;
-}
+	void update() {
+		//void UpdateClient::update(
+		//		std::filesystem::path root_dir,
+		//		std::vector<std::filesystem::path> patches,
+		//		version_number current,
+		//		version_number target) {
+		//
+		//	version_current = current;
+		//	version_target = target;
+		//
+		////	filepath_root_dir = root_dir;
+		////	filepath_lock = root_dir / settings.filename_lock;
+		////	filepath_journey = root_dir / settings.filename_lock;
+		//}
 
-void Updater::update() {
-
-	try {
-		libv::process::lock_file_guard lock_file(settings.path_lock_file);
-
-
+		try {
+			libv::process::lock_file_guard lock_file(settings.path_lock_file);
 
 //		const auto journey_exists = std::filesystem::exists(filepath_journey);
 //		if (journey_exists) {
@@ -175,25 +166,41 @@ void Updater::update() {
 //
 //		}
 
+		} catch (const std::filesystem::filesystem_error& e) {
+			//e.code();
 
+			if (e.path2().empty())
+				log_update.error("{} {}", e.what(), e.path1());
+			else
+				log_update.error("{} {} {}", e.what(), e.path1(), e.path2());
 
-
-
-	} catch (const std::filesystem::filesystem_error& e) {
-		//e.code();
-
-		if (e.path2().empty())
-			log_update.error("{} {}", e.what(), e.path1());
-		else
-			log_update.error("{} {} {}", e.what(), e.path1(), e.path2());
-
-	} catch (const std::exception& e) {
-		log_update.error("{}", e.what());
+		} catch (const std::exception& e) {
+			log_update.error("{}", e.what());
+		}
 	}
-}
+};
 
 // -------------------------------------------------------------------------------------------------
 
+UpdateClient::UpdateClient(UpdateClientSettings settings) :
+	self(std::make_unique<ImplUpdateClient>(std::move(settings))) {
+}
+
+UpdateClient::~UpdateClient() {
+	// For the sake of forward declared unique_ptr
+}
+
+update_check_result UpdateClient::check_for_update() {
+	return self->check_for_update();
+}
+
+void UpdateClient::update() {
+	return self->update();
+}
+
+// -------------------------------------------------------------------------------------------------
+// State Machine
+//
 //  main_state(
 //		on_entry<_>                                         = wait_info,
 //		on<net_io_error>                                    = terminate
@@ -209,9 +216,6 @@ void Updater::update() {
 //		on<msg_PatchNotSupported>   / patch_not_supported   = terminate,
 //		on<msg_PatchChunk>          / save_and_request_next_chunk,
 //	)
-
-// -------------------------------------------------------------------------------------------------
-// State Machine
 
 //struct UpdateClientSM : libv::state::machine<UpdateClientSM, struct Connected> {
 //};

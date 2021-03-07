@@ -47,7 +47,7 @@ int main(int argc, const char** argv) {
 //			("-r", "--resource_server")
 //			("resource_server", "Enable built in resource server")
 //			= app::default_port;
-//
+
 //	const auto num_net_thread = args.require<uint16_t>
 //			("-t", "--net_thread")
 //			("net_thread", "Number of network IO threads")
