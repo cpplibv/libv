@@ -142,3 +142,15 @@ protected:
 } // namespace mtcp
 } // namespace net
 } // namespace libv
+
+namespace std { // ---------------------------------------------------------------------------------
+
+template <typename T>
+struct hash<libv::net::mtcp::Acceptor<T>> {
+	constexpr auto operator()(const libv::net::mtcp::Acceptor<T>& t) const noexcept {
+		const auto& he = static_cast<const libv::net::mtcp::detail::HandlerGuard<libv::net::mtcp::BaseAcceptorHandler, T>&>(t);
+		return std::hash<std::remove_cvref_t<decltype(he)>>{}(he);
+	}
+};
+
+} // -----------------------------------------------------------------------------------------------

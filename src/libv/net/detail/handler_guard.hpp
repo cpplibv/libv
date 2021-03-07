@@ -24,27 +24,28 @@ template <typename BaseHandler, typename T = void>
 class HandlerGuard {
 private:
 	template <typename K> using raw_ptr = K*;
-	template <typename B, typename K> friend class HandlerGuard;
+	template <typename K, typename L> friend class HandlerGuard;
+	template <typename K> friend class ::std::hash;
 
 private:
 	raw_ptr<BaseHandler> handler_;
-	raw_ptr<T> object;
+	raw_ptr<T> user_object;
 
 public:
 	template <typename... Args>
 	inline explicit HandlerGuard(IOContext& io_context, Args&&... args) {
 		libv::net::detail::current_io_context = &io_context;
 
-		auto object_up = std::make_unique<T>(std::forward<Args>(args)...);
-		handler_ = object_up.get();
-		object = object_up.get();
+		auto user_object_up = std::make_unique<T>(std::forward<Args>(args)...);
+		handler_ = user_object_up.get();
+		user_object = user_object_up.get();
 
-		handler_->inject_handler(std::move(object_up));
+		handler_->inject_handler(std::move(user_object_up));
 		handler_->increment_ref_count();
 	}
-	inline explicit HandlerGuard(raw_ptr<BaseHandler> handler_ptr, raw_ptr<T> object_) noexcept :
+	inline explicit HandlerGuard(raw_ptr<BaseHandler> handler_ptr, raw_ptr<T> user_object_) noexcept :
 		handler_(handler_ptr),
-		object(object_) {
+		user_object(user_object_) {
 		handler_->increment_ref_count();
 	}
 
@@ -53,41 +54,41 @@ public:
 	inline /*implicit*/ HandlerGuard(const HandlerGuard<BaseHandler, K>& orig) noexcept
 			requires std::derived_from<K, T> || std::same_as<const K*, T*> || std::same_as<T, void> :
 		handler_(orig.handler_),
-		object(orig.object) {
+		user_object(orig.user_object) {
 		handler_->increment_ref_count();
 	}
 	template <typename K>
 	inline /*implicit*/ HandlerGuard(HandlerGuard<BaseHandler, K>&& orig) noexcept
 			requires std::derived_from<K, T> || std::same_as<const K*, T*> || std::same_as<T, void> :
 		handler_(orig.handler_),
-		object(orig.object) {
+		user_object(orig.user_object) {
 		orig.handler_ = nullptr;
-		orig.object = nullptr;
+		orig.user_object = nullptr;
 	}
 
 public:
 	inline HandlerGuard(const HandlerGuard& orig) noexcept :
 		handler_(orig.handler_),
-		object(orig.object) {
+		user_object(orig.user_object) {
 		handler_->increment_ref_count();
 	}
 	inline HandlerGuard(HandlerGuard&& orig) noexcept :
 		handler_(orig.handler_),
-		object(orig.object) {
+		user_object(orig.user_object) {
 		orig.handler_ = nullptr;
-		orig.object = nullptr;
+		orig.user_object = nullptr;
 	}
 	inline HandlerGuard& operator=(const HandlerGuard& orig) & noexcept {
 		handler_ = orig.handler_;
-		object = orig.object;
+		user_object = orig.user_object;
 		handler_->increment_ref_count();
 		return *this;
 	}
 	inline HandlerGuard& operator=(HandlerGuard&& orig) & noexcept {
 		handler_ = std::move(orig.handler_);
-		object = std::move(orig.object);
+		user_object = std::move(orig.user_object);
 		orig.handler_ = nullptr;
-		orig.object = nullptr;
+		orig.user_object = nullptr;
 		return *this;
 	}
 	virtual ~HandlerGuard() {
@@ -100,21 +101,21 @@ public:
 		assert(handler_ != nullptr);
 		handler_->decrement_ref_count();
 		handler_ = nullptr;
-		object = nullptr;
+		user_object = nullptr;
 	}
 
 public:
 	inline T* operator->() const noexcept
 			requires (!std::is_void_v<T>) {
-		assert(object != nullptr);
-		return object;
+		assert(user_object != nullptr);
+		return user_object;
 	}
 
 	template <typename TT = T>
 			requires (!std::is_void_v<TT>)
 	inline TT& operator*() const noexcept {
-		assert(object != nullptr);
-		return *object;
+		assert(user_object != nullptr);
+		return *user_object;
 	}
 
 	[[nodiscard]] inline BaseHandler& handler() const noexcept {
@@ -123,8 +124,11 @@ public:
 	}
 
 public:
+	[[nodiscard]] friend constexpr inline bool operator==(const HandlerGuard& lhs, const HandlerGuard& rhs) noexcept {
+		return lhs.handler_ == rhs.handler_;
+	}
 	[[nodiscard]] friend constexpr inline bool operator<(const HandlerGuard& lhs, const HandlerGuard& rhs) noexcept {
-		return lhs.object < rhs.object;
+		return lhs.handler_ < rhs.handler_;
 	}
 };
 
@@ -134,3 +138,15 @@ public:
 } // namespace mtcp
 } // namespace net
 } // namespace libv
+
+namespace std { // ---------------------------------------------------------------------------------
+
+template <typename BaseHandler, typename T>
+struct hash<libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>> {
+	constexpr size_t operator()(const libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>& t) const noexcept {
+		return std::hash<BaseHandler*>{}(t.handler_);
+	}
+};
+
+} // -----------------------------------------------------------------------------------------------
+
