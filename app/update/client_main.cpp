@@ -27,12 +27,8 @@ int main(int argc, const char** argv) {
 			("-v", "--version")
 			("tmp", "tmp");
 
-	args.require_no_unused();
-
-	if (!args.parse(argc, argv)) {
-		std::cerr << args.error_message(100) << args.usage(100);
+	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;
-	}
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;

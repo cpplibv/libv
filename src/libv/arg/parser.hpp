@@ -350,7 +350,7 @@ class Parser {
 	std::vector<std::shared_ptr<BaseArgument>> positionals;
 //	std::shared_ptr<BaseArgument> arg_exe;
 	std::vector<std::pair<int, std::string>> unused;
-	bool require_no_unused_ = false;
+	bool require_no_unused_ = true;
 
 private:
 	template <typename T, typename... Aliases>
@@ -427,6 +427,20 @@ public:
 public:
 	inline void require_no_unused() noexcept {
 		require_no_unused_ = true;
+	}
+
+	inline void allow_unused() noexcept {
+		require_no_unused_ = false;
+	}
+
+public:
+	bool standard_validate(const int argc, const char* const* argv, std::ostream& os, int width = 120) {
+		auto success = parse(argc, argv);
+
+		if (!success)
+			os << error_message(width) << usage(width);
+
+		return success;
 	}
 
 public:

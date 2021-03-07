@@ -55,12 +55,9 @@ int main(int argc, const char** argv) {
 //			("invalidate", "Invalidate any cached manifest and regenerate them is caching is enabled");
 
 //	args.positional(arg_old_dir, arg_new_dir, arg_patch_file);
-	args.require_no_unused();
 
-	if (!args.parse(argc, argv)) {
-		std::cerr << args.error_message(100) << args.usage(100);
+	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;
-	}
 
 	if (arg_verbose.value())
 		std::cout << args.report(100);
