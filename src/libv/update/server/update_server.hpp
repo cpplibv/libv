@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/mt/hardware_concurrency.hpp>
 #include <libv/net/address.hpp>
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
@@ -19,20 +20,19 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-struct UpdateServerSettings {
-	libv::net::mtcp::Endpoint endpoint;
-
-	int num_thread_net = 8;
-	int num_accept_backlog = 4;
-
-	std::vector<libv::net::Address> resource_servers;
-};
-
-// -------------------------------------------------------------------------------------------------
-
 class UpdateServer {
+public:
+	struct Settings {
+		libv::net::mtcp::Endpoint endpoint;
+		size_t num_accept_backlog = 4;
+
+		size_t num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
+
+		std::vector<libv::net::Address> resource_servers;
+	};
+
 private:
-	UpdateServerSettings settings;
+	Settings settings;
 
 private:
 	libv::net::IOContext io_context;
@@ -40,7 +40,7 @@ private:
 	std::unique_ptr<class UpdateNetworkServer> server;
 
 public:
-	explicit UpdateServer(UpdateServerSettings settings);
+	explicit UpdateServer(Settings settings);
 	~UpdateServer();
 
 public:

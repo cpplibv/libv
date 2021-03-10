@@ -9,6 +9,7 @@
 #include <libv/utility/bytes/output_bytes.hpp>
 #include <libv/utility/endian.hpp>
 // std
+#include <cstring>
 #include <limits>
 
 

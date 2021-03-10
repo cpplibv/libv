@@ -1,4 +1,4 @@
-// Project: libv.update, File: app/update/server_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: app/update/update_server_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
@@ -28,10 +28,6 @@ int main(int argc, const char** argv) {
 //	const auto config_file = args.require<std::string>
 //			("-c", "--config")
 //			("config_file", "File path of the config file");
-//
-//	const auto manifest_file = args.require<std::string>
-//			("-m", "--manifest")
-//			("manifest_file", "File path of the manifest file");
 
 	const auto address = args.require<std::string>
 			("-a", "--address")
@@ -43,22 +39,13 @@ int main(int argc, const char** argv) {
 			("port", "Listening TCP port")
 			= app::default_port;
 
-//	const auto enable_resource_server = args.flag
-//			("-r", "--resource_server")
-//			("resource_server", "Enable built in resource server")
-//			= app::default_port;
-
 //	const auto num_net_thread = args.require<uint16_t>
 //			("-t", "--net_thread")
 //			("net_thread", "Number of network IO threads")
 //			= app::default_net_thread;
 
-	args.require_no_unused();
-
-	if (!args.parse(argc, argv)) {
-		std::cerr << args.error_message(100) << args.usage(100);
+	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;
-	}
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;
@@ -69,19 +56,19 @@ int main(int argc, const char** argv) {
 
 	const auto endpoint = libv::net::mtcp::parse_endpoint_or_throw(address.value(), port.value());
 
-	auto server_settings = libv::update::UpdateServerSettings{};
-	server_settings.endpoint = endpoint;
-	server_settings.num_thread_net = 8;
-	server_settings.num_accept_backlog = 4;
-	server_settings.resource_servers = std::vector<libv::net::Address>{
-			{"rs0.corruptedai.com", 25090},
-			{"rs1.corruptedai.com", 25091},
-			{"rs2.corruptedai.com", 25092},
-//			{"rs3.corruptedai.com", 25093},
-//			{"rs4.corruptedai.com", 25094},
-	};
-
 	{
+		auto server_settings = libv::update::UpdateServer::Settings{};
+		server_settings.endpoint = endpoint;
+		server_settings.num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
+		server_settings.num_accept_backlog = 4;
+		server_settings.resource_servers = std::vector<libv::net::Address>{
+				{"rs0.corruptedai.com", 25090},
+				{"rs1.corruptedai.com", 25091},
+				{"rs2.corruptedai.com", 25092},
+	//			{"rs3.corruptedai.com", 25093},
+	//			{"rs4.corruptedai.com", 25094},
+		};
+
 		auto server = libv::update::UpdateServer{server_settings};
 
 		server.register_update("app.update", "dev", vn{1}, vn{2}, 99999, us{12345});

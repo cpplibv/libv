@@ -13,7 +13,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-UpdateServer::UpdateServer(UpdateServerSettings settings_) :
+UpdateServer::UpdateServer(Settings settings_) :
 	settings(std::move(settings_)),
 	io_context(settings.num_thread_net),
 	database(std::make_shared<UpdateInfoDatabase>()),

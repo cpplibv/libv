@@ -57,7 +57,7 @@ namespace update {
 
 struct ImplUpdateClient {
 public:
-	UpdateClientSettings settings;
+	UpdateClient::Settings settings;
 	msg::UpdateRoute update_info;
 
 public:
@@ -182,7 +182,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-UpdateClient::UpdateClient(UpdateClientSettings settings) :
+UpdateClient::UpdateClient(Settings settings) :
 	self(std::make_unique<ImplUpdateClient>(std::move(settings))) {
 }
 

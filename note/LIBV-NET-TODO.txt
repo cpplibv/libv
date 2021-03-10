@@ -50,6 +50,13 @@ libv.update: Implement real server side version check response calculation
 
 
 
+libv.update: weed out the legacy codes related to file downloading
+	I think the best ones are in libv/update/resource/resource_server
+	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
+	| The libv/update/resource/update_client is marked for death
+
+
+
 
 libv.net: Add support for non string based connection send / receive
 libv.net: Add support for endpoint access in mtcp on_accept (passing other type than io_context might be the solution)
@@ -105,13 +112,17 @@ libv.update: PAPER
         ^^^^^^^^^^ program / program url
 
 libv.net: Fix that the read/write limit currently cannot be used before the connect_* calls
+libv.net: IDEA that in the connection instead of forcing the handle of an incoming message place it into the queue that can be accessed in the callbacks
+			| This behaviour could be configurable with ctor flags
+			| This would allow change of connection handle type
+			| But there are other option like special call in the handler
+				| connection.convert_to<different_handler>()
+					| .differ_to<>()
+					| .handle_as<>()
+					| both different_handler.on_connect and optionally the "same" on_receive will be called on the new type
+				| And this is the perfect solution
 
-
-libv.update: weed out the legacy codes related to file downloading
-	I think the best ones are in libv/update/resource/resource_server
-	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
-	| The libv/update/resource/update_client is marked for death
-
+libv.serial: Optimization: Go template archives for the streams instead of libv::bytes_io
 
 Codec and Protocol
 	if handler is not invocable with function, \

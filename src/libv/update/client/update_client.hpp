@@ -21,7 +21,7 @@
 //#include <libv/update/patch_number.hpp>
 //#include <libv/update/net/client.hpp>
 //#include <libv/state/state.hpp>
-#include <libv/update/client/update_client.hpp> // For UpdaterSettings
+//#include <libv/update/client/update_client.hpp> // For UpdaterSettings
 #include <libv/net/address.hpp>
 //#include <libv/net/mtcp/connection.hpp>
 //#include <libv/serial/serialization.hpp>
@@ -37,32 +37,33 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-struct UpdateClientSettings {
-	version_number current_version;
+class UpdateClient {
+public:
+	struct Settings {
+		version_number current_version;
 
-	std::string program_name;
-	std::string program_variant;
+		std::string program_name;
+		std::string program_variant;
 
-	std::filesystem::path path_lock_file = ".lock";
-	std::filesystem::path path_temp_folder = ".update";
-//	std::filesystem::path path_temp_folder = ".update/";
-	std::filesystem::path path_executable;
-	std::filesystem::path path_root;
+		std::filesystem::path path_lock_file = ".lock";
+		std::filesystem::path path_temp_folder = ".update";
+//		std::filesystem::path path_temp_folder = ".update/";
+		std::filesystem::path path_executable;
+		std::filesystem::path path_root;
 
-	std::vector<libv::net::Address> update_servers;
+		std::vector<libv::net::Address> update_servers;
 
-	int num_thread_net = 2;
-//	int num_thread_fs = 2;
-	bool remove_patch_files_after_success = true;
-};
+		size_t num_thread_fs = 2;
+		size_t num_thread_net = 4;
 
-// -------------------------------------------------------------------------------------------------
+		bool remove_patch_files_after_success = true;
+	};
 
-struct UpdateClient {
+private:
 	std::unique_ptr<class ImplUpdateClient> self;
 
 public:
-	explicit UpdateClient(UpdateClientSettings settings);
+	explicit UpdateClient(Settings settings);
 	~UpdateClient();
 
 public:
@@ -83,50 +84,6 @@ public:
 //
 //		std::random_device rng; // Using high quality random order
 //		std::ranges::shuffle(server_addresses, rng);
-//	}
-//
-//	void check_for_update() {
-//		for (size_t i = 0; i < 3; i++) {
-//			for (const auto& server_address : server_addresses) {
-//				libv::net::mtcp::ConnectionAsyncCB connection;
-//
-////				connection.handle_connect()
-////				connection.handle_disconnect()
-////				connection.handle_error()
-////				connection.handle_send()
-////				connection.handle_receive()
-//
-//				connection.connect(server_address);
-////				connection.connect(server_address, std::chrono::seconds{10});
-//
-//				connection.send(codec.encode(msg_ReportVersion{current_version}));
-//				connection.receive(1);
-//
-//				connection_ended.wait();
-//
-//				handler = libv::overload(
-//						[](const msg_VersionNotSupported&) {
-//
-//						},
-//						[](const msg_VersionUpToDate&) {
-//
-//						},
-//						[](const msg_UpdateInfo& info) {
-//
-//						}
-//				);
-//
-////				on_msg_VersionNotSupported() {
-////
-////				}
-////				on_msg_VersionUpToDate() {
-////
-////				}
-////				on_msg_UpdateInfo() {
-////
-////				}
-//			}
-//		}
 //	}
 
 	void update_to_latest() {
@@ -161,16 +118,6 @@ public:
 //
 //	});
 //}
-
-// -------------------------------------------------------------------------------------------------
-
-//struct UpdateChecker {
-//	std::vector<libv::net::Address> server_addresses;
-//
-//public:
-//	UpdateChecker(std::vector<libv::net::Address> servers);
-//	std::vector<std::string> check(version_number version_current);
-//};
 
 // -------------------------------------------------------------------------------------------------
 

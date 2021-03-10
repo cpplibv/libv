@@ -38,7 +38,7 @@ int main(int argc, const char** argv) {
 	// -------------------------------------------------------------------------------------------------
 
 	{
-		libv::update::UpdateClientSettings uc_settings;
+		libv::update::UpdateClient::Settings uc_settings;
 
 		uc_settings.program_name = app::program_name;
 		uc_settings.program_variant = app::program_variant;

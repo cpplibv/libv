@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/arg/arg.hpp>
+//#include <libv/arg/arg.hpp>
 #include <libv/net/address.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_string.hpp>
@@ -63,7 +63,7 @@ struct msg {
 		std::string program; // Sending back the program and variant names are not necessary, but could be used to remap
 		std::string variant; // Sending back the program and variant names are not necessary, but could be used to remap
 		std::vector<UpdateInfoEntry> updates;
-		//	std::vector<Address> resource_servers;
+//		std::vector<libv::net::Address> resource_servers;
 
 	public:
 		template <class Archive> inline void serialize(Archive& ar) {

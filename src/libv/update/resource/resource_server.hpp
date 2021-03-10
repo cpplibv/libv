@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/mt/hardware_concurrency.hpp>
 #include <libv/net/fwd.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
 #include <libv/utility/storage_size.hpp>
@@ -23,11 +24,14 @@ enum class FileCachePolicy {
 	always,
 };
 
-struct ResourceServer {
-
+class ResourceServer {
+public:
 	struct Settings {
-		size_t num_threads_fs = 2;
-		size_t num_threads_net = 4;
+		libv::net::mtcp::Endpoint endpoint;
+		size_t num_accept_backlog = 4;
+
+		size_t num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
+		size_t num_thread_fs = 2;
 
 //		size_t limit_bps_global_upload = libv::MB(120);
 //		size_t limit_bps_global_download = 0;
@@ -35,9 +39,6 @@ struct ResourceServer {
 //		size_t limit_bps_peer_download = 0;
 
 		size_t resource_network_chunk_size = libv::KB(512);
-
-		libv::net::mtcp::Endpoint acceptor_endpoint;
-		size_t acceptor_connection_backlog = 3;
 
 		size_t limit_peer_count_active = 32; // Zero means no limit
 		size_t limit_peer_count_queue = 32; // Zero means no limit
