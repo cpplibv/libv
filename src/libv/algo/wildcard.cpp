@@ -83,7 +83,7 @@ public:
 	boost::container::small_vector<std::string_view::value_type, 256> pattern_literals;
 
 public:
-	boost::container::small_vector<bool, 1024> table;
+	mutable boost::container::small_vector<bool, 1024> table;
 
 public:
 	void preprocess(const std::string_view pattern_str) {
@@ -135,11 +135,11 @@ public:
 		}
 	}
 
-	inline bool& index(size_t i, size_t j) noexcept {
+	inline bool& index(size_t i, size_t j) const noexcept {
 		return table[(pattern.size() + 1) * i + j];
 	}
 
-	bool match(const std::string_view str) {
+	bool match(const std::string_view str) const {
 		table.resize((str.size() + 1) * (pattern.size() + 1), false);
 
 		// accept any leading WILDCARD_ANY and at most one WILDCARD_LAYER as str start
@@ -213,7 +213,7 @@ void WildcardGlobMatcher::pattern(const std::string_view pattern_str) {
 	self->preprocess(pattern_str);
 }
 
-bool WildcardGlobMatcher::match(const std::string_view str) {
+bool WildcardGlobMatcher::match(const std::string_view str) const {
 	return self->match(str);
 }
 

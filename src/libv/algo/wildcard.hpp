@@ -33,11 +33,16 @@ private:
 public:
 	/// Pattern is stored internally, the lifetime of pattern string_view can expire after the constructor call
 	explicit WildcardGlobMatcher(const std::string_view pattern_str);
+	inline WildcardGlobMatcher() noexcept = default;
+	inline WildcardGlobMatcher(WildcardGlobMatcher&&) noexcept = default;
+	inline WildcardGlobMatcher& operator=(WildcardGlobMatcher&&) & noexcept = default;
 	~WildcardGlobMatcher();
+
 	/// Change pattern. Pattern is stored internally, the lifetime of pattern string_view can expire after the call
 	void pattern(const std::string_view pattern_str);
+
 	/// Returns if the given string is matched by the pattern
-	bool match(const std::string_view str);
+	bool match(const std::string_view str) const;
 };
 
 // -------------------------------------------------------------------------------------------------

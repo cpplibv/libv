@@ -48,7 +48,7 @@ private:
 	}
 
 public:
-	inline view_lines_string_view() noexcept {}
+	constexpr inline view_lines_string_view() noexcept {}
 	constexpr inline view_lines_string_view(const std::string_view range, const std::string_view::value_type newline = '\n') noexcept :
 		newline(newline),
 		range(range),

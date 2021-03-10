@@ -600,6 +600,11 @@ ext: adopt colony https://github.com/mattreecebentley/plf_colony
 
 
 
+This looks like a useful concepts:
+	concept non_cv = std::same_as<D, std::remove_cv_t<D>>
+	concept non_cvref = std::same_as<D, std::remove_cvref_t<D>>
+
+
 app.editor:
 	small app for first line and include order fix-ups
 	use the folder .editor in the project root are store
