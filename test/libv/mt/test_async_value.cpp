@@ -31,8 +31,7 @@ int load_async_42() {
 TEST_CASE("async_value ctor semantics", "[libv.mt.async_value]") {
 	libv::mt::worker_thread worker;
 
-	libv::mt::async_value<int> av0;
-	av0.load_async(worker, load_async_42);
+	auto av0 = libv::mt::load_async<int>(worker, load_async_42);
 
 	// 0 copy to 1
 	// 0 move to 2
@@ -50,17 +49,14 @@ TEST_CASE("async_value ctor semantics", "[libv.mt.async_value]") {
 	REQUIRE(av1.has_value());
 	CHECK(av0.value() == 42);
 	CHECK(av0.value() == av1.value());
-	CHECK(not av2.has_value());
+	// CHECK(not av2.has_value()); // Should fail with assert as we are reading from a moved out object
 }
 
 TEST_CASE("async_value complete loading with worker_thread", "[libv.mt.async_value]") {
 	libv::mt::worker_thread worker;
 
-	libv::mt::async_value<int> av0;
-	libv::mt::async_value<int> av1;
-
-	av0.load_async(worker, load_async_42);
-	av1.load_async(worker, load_async_42_stoppable);
+	auto av0 = libv::mt::load_async<int>(worker, load_async_42);
+	auto av1 = libv::mt::load_async<int>(worker, load_async_42_stoppable);
 
 	while (av0.loading())
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
@@ -76,11 +72,8 @@ TEST_CASE("async_value complete loading with worker_thread", "[libv.mt.async_val
 TEST_CASE("async_value complete loading with worker_thread_pool", "[libv.mt.async_value]") {
 	libv::mt::worker_thread_pool worker(4);
 
-	libv::mt::async_value<int> av0;
-	libv::mt::async_value<int> av1;
-
-	av0.load_async(worker, load_async_42);
-	av1.load_async(worker, load_async_42_stoppable);
+	auto av0 = libv::mt::load_async<int>(worker, load_async_42);
+	auto av1 = libv::mt::load_async<int>(worker, load_async_42_stoppable);
 
 	while (av0.loading())
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -109,13 +102,11 @@ TEST_CASE("async_value load cancellation before entering load function", "[libv.
 	bool load_was_called_av0 = false;
 	bool load_was_called_av1 = false;
 
-	libv::mt::async_value<int> av0;
-	libv::mt::async_value<int> av1;
-	av0.load_async(worker, [&] {
+	auto av0 = libv::mt::load_async<int>(worker, [&] {
 		load_was_called_av0 = true;
 		return 42;
 	});
-	av1.load_async(worker, [&] {
+	auto av1 = libv::mt::load_async<int>(worker, [&] {
 		load_was_called_av1 = true;
 		return 42;
 	});
@@ -154,7 +145,7 @@ TEST_CASE("async_value load cancellation after entering load function", "[libv.m
 	bool load_was_called_av0 = false;
 	libv::binary_latch load_trap_in;
 	libv::binary_latch load_trap_out;
-	av0.load_async(worker, [&](std::stop_token st) {
+	av0 = libv::mt::load_async<int>(worker, [&](std::stop_token st) {
 		load_was_called_av0 = true;
 
 		load_trap_in.raise();
@@ -178,21 +169,35 @@ TEST_CASE("async_value load cancellation after entering load function", "[libv.m
 	worker.join();
 
 	CHECK(load_was_called_av0);
-	CHECK(not av0.has_value());
+	REQUIRE(av0.has_value());
+	CHECK(av0.value() == 42);
 	CHECK(not av0.loading());
 }
 
 TEST_CASE("async_value load functions arguments", "[libv.mt.async_value]") {
 	libv::mt::worker_thread worker;
-	libv::mt::async_value<int> av0;
-	libv::mt::async_value<int> av1;
 
-	av0.load_async(worker, [&](std::stop_token, int i) {
+	auto av0 = libv::mt::load_async<int>(worker, [&](std::stop_token, int i) {
 		return i;
 	}, 42);
-	av1.load_async(worker, [&](int i) {
+	auto av1 = libv::mt::load_async<int>(worker, [&](int i) {
 		return i;
 	}, 42);
+
+	worker.stop();
+	worker.join();
+
+	REQUIRE(av0.has_value());
+	REQUIRE(av1.has_value());
+	CHECK(av0.value() == 42);
+	CHECK(av1.value() == 42);
+}
+
+TEST_CASE("type defuction from function", "[libv.mt.async_value]") {
+	libv::mt::worker_thread worker;
+
+	auto av0 = libv::mt::load_async(worker, load_async_42);
+	auto av1 = libv::mt::load_async(worker, load_async_42_stoppable);
 
 	worker.stop();
 	worker.join();
