@@ -4,5 +4,3 @@ cd "$(dirname "$0")"
 
 ./gen.sh
 ./apply.sh
-
-rm p*.*.patch

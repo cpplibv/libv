@@ -792,8 +792,8 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET create_patch
-	SOURCE app/update/create_patch.cpp
+	TARGET create_update
+	SOURCE app/update/create_update.cpp
 	LINK   libv_log libv_arg libv_diff
 	LINK   libv_serial
 	LINK   libv_process # <<< P4: Just for testing
@@ -801,15 +801,15 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET apply_patch
-	SOURCE app/update/apply_patch.cpp
+	TARGET apply_update
+	SOURCE app/update/apply_update.cpp
 	LINK   libv_log libv_arg libv_diff
 	LINK   libv_serial
 	LINK   libv_process # <<< P4: Just for testing
 	LINK   update_common # <<< P4: Just for testing
 )
 
-add_custom_target(update DEPENDS update_client update_server apply_patch create_patch)
+add_custom_target(update DEPENDS update_client update_server apply_update create_update)
 
 # ---
 
