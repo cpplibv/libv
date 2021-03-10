@@ -302,6 +302,10 @@ TEST_CASE("match_wildcard_glob", "[libv.algorithm.wildcard]") {
 	CHECK(not libv::match_wildcard_glob("test/test_erase_unstable.cpp", "**/test_*if*.cpp"));
 	CHECK(not libv::match_wildcard_glob("test/test_erase_unstable.cpp", "**test_*if*.cpp"));
 
+	CHECK(libv::match_wildcard_glob("testalgoif.cpp", "test**algo**if**.cpp"));
+	CHECK(libv::match_wildcard_glob("test/algo/if/x.cpp", "test**algo**if**.cpp"));
+	CHECK(libv::match_wildcard_glob("test_algo_if_x.cpp", "test**algo**if**.cpp"));
+
 	CHECK(not libv::match_wildcard_glob("a", "\\\\"));
 	CHECK(not libv::match_wildcard_glob("a", "\\"));
 	CHECK(libv::match_wildcard_glob("\\", "\\\\"));
