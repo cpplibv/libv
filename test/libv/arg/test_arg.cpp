@@ -12,7 +12,7 @@
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("parser: match argument short and long", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	SECTION("short") {
@@ -45,7 +45,7 @@ TEST_CASE("parser: match argument short and long", "[libv.arg.parser]") {
 }
 
 TEST_CASE("parser: argument flag", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 
 	SECTION("short and long") {
 		const auto argv = std::array{"path/exe", "-0", "--3"};
@@ -94,7 +94,7 @@ TEST_CASE("parser: argument flag", "[libv.arg.parser]") {
 }
 
 TEST_CASE("parser: argument require typed", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -114,11 +114,11 @@ TEST_CASE("parser: argument require typed", "[libv.arg.parser]") {
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument require typed with default", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -138,11 +138,11 @@ TEST_CASE("parser: argument require typed with default", "[libv.arg.parser]") {
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument require type not set with default", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -162,11 +162,11 @@ TEST_CASE("parser: argument require type not set with default", "[libv.arg.parse
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument optional typed", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -187,11 +187,11 @@ TEST_CASE("parser: argument optional typed", "[libv.arg.parser]") {
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument optional typed not set", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -211,11 +211,11 @@ TEST_CASE("parser: argument optional typed not set", "[libv.arg.parser]") {
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument optional typed with default", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -236,11 +236,11 @@ TEST_CASE("parser: argument optional typed with default", "[libv.arg.parser]") {
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: argument optional typed not set with default", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 	const auto argv = std::array{"path/exe", "-0", "0", "--a1", "1", "--a2", "2"};
 
 	auto test = [&args, &argv](auto expected){
@@ -261,11 +261,11 @@ TEST_CASE("parser: argument optional typed not set with default", "[libv.arg.par
 	SECTION("uint16_t") { test(uint16_t{1}); }
 	SECTION("uint32_t") { test(uint32_t{1}); }
 	SECTION("uint64_t") { test(uint64_t{1}); }
-	SECTION("std::string") { test(std::string{"1"}); }
+	SECTION("string") { test(std::string{"1"}); }
 }
 
 TEST_CASE("parser: file watcher test", "[libv.arg.parser]") {
-	libv::arg::Parser args;
+	libv::arg::Parser args; args.allow_unused();
 
 //	const auto exe = args.exe();
 
@@ -358,6 +358,65 @@ TEST_CASE("parser: file watcher test", "[libv.arg.parser]") {
 //	CHECK(help);
 //	CHECK(args.error_message(100));
 //	CHECK(args.usage(100));
+}
+
+TEST_CASE("parser: argument typed positional", "[libv.arg.parser]") {
+	libv::arg::Parser args; args.allow_unused();
+	const auto argv = std::array{"path/exe", "1"};
+
+	auto test = [&args, &argv](auto expected) {
+		const auto a1 = args.require<decltype(expected)>("-1", "--a1")("a1", "a1 desc");
+		args.positional(a1);
+
+		REQUIRE(args.parse(std::size(argv), argv.data()));
+		CHECK(a1.value() == expected);
+	};
+
+	SECTION("double") { test(double{1}); }
+	SECTION("float") { test(float{1}); }
+	SECTION("int8_t") { test(int8_t{1}); }
+	SECTION("int16_t") { test(int16_t{1}); }
+	SECTION("int32_t") { test(int32_t{1}); }
+	SECTION("int64_t") { test(int64_t{1}); }
+	SECTION("uint8_t") { test(uint8_t{1}); }
+	SECTION("uint16_t") { test(uint16_t{1}); }
+	SECTION("uint32_t") { test(uint32_t{1}); }
+	SECTION("uint64_t") { test(uint64_t{1}); }
+	SECTION("string") { test(std::string{"1"}); }
+}
+
+TEST_CASE("parser: argument typed multiple positional", "[libv.arg.parser]") {
+	libv::arg::Parser args;
+
+	auto test = [&args](auto expected_a1, auto expected_a2) {
+		std::vector<const char*> argv;
+
+		SECTION("none") { argv = std::vector<const char*>{"path/exe", "--a1", "1", "--a2", "2"}; }
+		SECTION("all") { argv = std::vector<const char*>{"path/exe", "1", "2"}; }
+		SECTION("prefilled") { argv = std::vector<const char*>{"path/exe", "--a1", "1", "2"}; }
+		SECTION("mixed") { argv = std::vector<const char*>{"path/exe", "--a2", "2", "1"}; }
+		SECTION("postfilled") { argv = std::vector<const char*>{"path/exe", "1", "--a2", "2"}; }
+
+		const auto a1 = args.require<decltype(expected_a1)>("-1", "--a1")("a1", "a1 desc");
+		const auto a2 = args.require<decltype(expected_a2)>("-2", "--a2")("a2", "a2 desc");
+		args.positional(a1, a2);
+
+		REQUIRE(args.parse(static_cast<int>(std::size(argv)), argv.data()));
+		CHECK(a1.value() == expected_a1);
+		CHECK(a2.value() == expected_a2);
+	};
+
+	SECTION("double") { test(double{1}, double{2}); }
+	SECTION("float") { test(float{1}, float{2}); }
+	SECTION("int8_t") { test(int8_t{1}, int8_t{2}); }
+	SECTION("int16_t") { test(int16_t{1}, int16_t{2}); }
+	SECTION("int32_t") { test(int32_t{1}, int32_t{2}); }
+	SECTION("int64_t") { test(int64_t{1}, int64_t{2}); }
+	SECTION("uint8_t") { test(uint8_t{1}, uint8_t{2}); }
+	SECTION("uint16_t") { test(uint16_t{1}, uint16_t{2}); }
+	SECTION("uint32_t") { test(uint32_t{1}, uint32_t{2}); }
+	SECTION("uint64_t") { test(uint64_t{1}, uint64_t{2}); }
+	SECTION("string") { test(std::string{"1"}, std::string{"2"}); }
 }
 
 // -------------------------------------------------------------------------------------------------

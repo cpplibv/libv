@@ -53,21 +53,30 @@ private:
 	std::vector<std::string> aliases_;
 	std::string name_;
 	std::string description_;
+	bool found_ = false;
 
 public:
 	explicit inline BaseArgument(std::vector<std::string> aliases) :
 		aliases_(std::move(aliases)) { }
 
-	inline const std::vector<std::string>& aliases() const noexcept {
+	[[nodiscard]] inline const std::vector<std::string>& aliases() const noexcept {
 		return aliases_;
 	}
 
-	inline const std::string& name() const noexcept {
+	[[nodiscard]] inline const std::string& name() const noexcept {
 		return name_;
 	}
 
-	inline const std::string& description() const noexcept {
+	[[nodiscard]] inline const std::string& description() const noexcept {
 		return description_;
+	}
+
+	[[nodiscard]] constexpr inline bool found() const noexcept {
+		return found_;
+	}
+
+	inline void mark_as_found() noexcept {
+		found_ = true;
 	}
 
 	virtual bool consume() = 0;
@@ -445,27 +454,45 @@ public:
 
 public:
 	bool parse(const int argc, const char* const* argv) {
+		size_t positional_index = 0;
+
 		for (int i = 1; i < argc; ++i) {
 			BaseArgument* selected;
 
+			// Phase: Search
 			const auto it = identifiers.find(argv[i]);
 			if (it != identifiers.end()) {
+				// Identifier found
 				selected = &*it->second;
-			} else if (!positionals.empty()) {
-				selected = &*positionals.front();
-				positionals.erase(positionals.begin());
-				i--; // Roll back i to consume argument
-				// NOTE: positional is not the sole owner of argument, shared pointer stability is used
-				// TODO P5: libv.arg: make the ownership rules nicer
 			} else {
-				unused.emplace_back(i, argv[i]);
-				continue;
+				// Identifier not found, check if there is positional arguments
+				bool positional_found = false;
+				while (positional_index != positionals.size()) {
+					selected = &*positionals[positional_index];
+					++positional_index;
+					if (selected->found()) {
+						// This positional argument was already processed by its identifier, skip
+						continue;
+					} else {
+						// Positional arguments found
+						positional_found = true;
+						--i; // Roll back i to consume argument as value in the next phase
+						break;
+					}
+				}
+				if (!positional_found) {
+					// Argument is not expected therefore marked as unused
+					unused.emplace_back(i, argv[i]);
+					continue;
+				}
 			}
 
+			// Phase: Consume
+			selected->mark_as_found();
 			while (selected->consume()) {
-				i++;
+				++i;
 				if (i >= argc) {
-					// report error, but not if rest is active or multiple with already fulfilled count
+					// TODO P5: libv.arg: report error, but not if rest is active or multiple with already fulfilled count
 					return false;
 				}
 				OutcomeArgumentParse outcome;
