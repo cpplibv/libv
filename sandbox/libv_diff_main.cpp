@@ -30,7 +30,7 @@ std::vector<std::byte> to_bytes(std::string_view str) {
 	std::vector<std::byte> result;
 
 	result.resize(str.size());
-	std::memcpy(result.data(), str.data(), result.size());
+	std::memcpy(result.data(), str.data(), str.size());
 
 	return result;
 }

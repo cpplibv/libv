@@ -8,8 +8,9 @@
 #include <libv/utility/storage_size.hpp>
 // std
 #include <cstdint>
+#include <span>
 #include <string>
-//#include <vector>
+#include <vector>
 
 
 namespace libv {
@@ -18,17 +19,22 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-using MessageBody = std::string;
-//using MessageBody = std::vector<std::byte>; // TODO P2: Switch to std::vector<std::byte> | or maybe dont
+using message_body_bin = std::vector<std::byte>;
+using message_body_bin_view = std::span<const std::byte>;
+using message_body_str = std::string;
+using message_body_str_view = std::string_view;
+
+using message_body = message_body_str_view;
+using message_body_view = message_body_bin_view;
 
 // -------------------------------------------------------------------------------------------------
 
 constexpr auto MTCP_MESSAGE_MAX_RESERVE = libv::MB(1);
-constexpr auto MTCP_MESSAGE_MAX_SIZE = std::min(static_cast<int64_t>(std::numeric_limits<uint32_t>::max()), libv::MB(4));
+constexpr auto MTCP_MESSAGE_MAX_SIZE = libv::MB(4);
 
 // -------------------------------------------------------------------------------------------------
 
-enum class MessageType : uint8_t {
+enum class mtcp_message_type : uint8_t {
 	message = 0,
 //	mtcp_rate_limit_read = 1,
 //	mtcp_rate_limit_write = 2,
@@ -41,7 +47,7 @@ enum class MessageType : uint8_t {
 
 // -------------------------------------------------------------------------------------------------
 
-struct MessageHeader {
+struct message_header {
 private:
 	uint64_t network_type : 8;
 	uint64_t _reserved : 8;
@@ -49,14 +55,14 @@ private:
 	uint64_t network_size : 32;
 
 public:
-	explicit constexpr inline MessageHeader(
-			MessageType type = MessageType::message,
+	explicit constexpr inline message_header(
+			mtcp_message_type type = mtcp_message_type::message,
 			uint16_t channel = 0,
 			uint32_t size = 0) noexcept :
-			network_type(libv::host_to_network(libv::to_value(type))),
-			_reserved(0),
-			network_channel(libv::host_to_network(channel)),
-			network_size(libv::host_to_network(size)) {}
+		network_type(libv::host_to_network(libv::to_value(type))),
+		_reserved(0),
+		network_channel(libv::host_to_network(channel)),
+		network_size(libv::host_to_network(size)) {}
 
 public:
 	[[nodiscard]] inline const std::byte* header_data() const noexcept {
@@ -66,16 +72,16 @@ public:
 		return reinterpret_cast<std::byte*>(this);
 	}
 	[[nodiscard]] constexpr inline size_t header_size() const noexcept {
-		static_assert(sizeof(MessageHeader) == sizeof(uint64_t));
-		return sizeof(MessageHeader);
+		static_assert(sizeof(message_header) == sizeof(uint64_t));
+		return sizeof(message_header);
 	}
 
 public:
-	constexpr inline void type(MessageType value) noexcept {
+	constexpr inline void type(mtcp_message_type value) noexcept {
 		network_type = libv::host_to_network(libv::to_value(value));
 	}
-	[[nodiscard]] constexpr inline MessageType type() const noexcept {
-		return MessageType{static_cast<uint8_t>(libv::network_to_host(network_type))};
+	[[nodiscard]] constexpr inline mtcp_message_type type() const noexcept {
+		return mtcp_message_type{static_cast<uint8_t>(libv::network_to_host(network_type))};
 	}
 //	constexpr inline void reserved(uint8_t value) noexcept {
 //		_reserved = libv::host_to_network(value);
@@ -97,12 +103,8 @@ public:
 	}
 };
 
-// -------------------------------------------------------------------------------------------------
-
-struct MessageEntry {
-	MessageHeader header;
-	MessageBody body;
-};
+static_assert(MTCP_MESSAGE_MAX_SIZE < std::numeric_limits<decltype(std::declval<message_header>().size())>::max());
+static_assert(sizeof(message_header) == 8); // Just a check, not a must
 
 // -------------------------------------------------------------------------------------------------
 

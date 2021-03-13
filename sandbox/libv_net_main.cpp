@@ -33,6 +33,10 @@ template <typename T> using AcceptorHandler = libv::net::mtcp::AcceptorHandler<T
 
 } // namespace net
 
+[[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
+	return std::string_view(reinterpret_cast<const char*>(s.data()), s.size());
+}
+
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
@@ -125,14 +129,14 @@ private:
 	}
 	virtual void on_receive(error_code ec, message m) override {
 		if (!ec)
-			room->deliver(m);
+			room->deliver(std::string(as_sv(m)));
 
-		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : as_sv(m)) << "'");
 	}
 	virtual void on_send(error_code ec, message m) override {
 		(void) ec;
 		(void) m;
-		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : as_sv(m)) << "'");
 	}
 	virtual void on_disconnect(error_code ec) override {
 		(void) ec;
@@ -200,15 +204,15 @@ private:
 
 	virtual void on_receive(error_code ec, message m) override {
 		if (!ec)
-			std::cout << m << std::endl;
+			std::cout << as_sv(m) << std::endl;
 
-		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : as_sv(m)) << "'");
 	}
 
 	virtual void on_send(error_code ec, message m) override {
 		(void) ec;
 		(void) m;
-		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : as_sv(m)) << "'");
 	}
 
 	virtual void on_disconnect(error_code ec) override {

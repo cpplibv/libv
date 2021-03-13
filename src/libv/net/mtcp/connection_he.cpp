@@ -40,6 +40,31 @@ using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio
 
 // -------------------------------------------------------------------------------------------------
 
+struct message_entry {
+	message_header header;
+	message_body_bin memory_bin; /// Move-in target to keep alive memory
+	message_body_str memory_str; /// Move-in target to keep alive memory
+	message_body_view body_view; // Generic view to the memory wherever it might be
+
+	inline message_entry() = default;
+	inline message_entry(message_header header_, message_body_bin&& body) :
+		header(header_),
+		memory_bin(std::move(body)),
+		body_view(memory_bin.data(), memory_bin.size()) {
+	}
+	inline message_entry(message_header header_, message_body_str&& body) :
+		header(header_),
+		memory_str(std::move(body)),
+		body_view(reinterpret_cast<const std::byte*>(memory_str.data()), memory_str.size()) {
+	}
+	inline message_entry(message_header header_, message_body_bin_view body) :
+		header(header_),
+		body_view(body) {
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 class ImplBaseConnectionAsyncHE : public std::enable_shared_from_this<ImplBaseConnectionAsyncHE> {
 	using SelfPtr = std::shared_ptr<ImplBaseConnectionAsyncHE>;
 
@@ -82,10 +107,14 @@ private:
 	bool queue_disconnect = false;
 
 	bool queue_read = true;
-	MessageEntry read_message; // Temporary buffer for subsequent reads
+	message_header read_message_header; // Temporary buffer for subsequent reads
+	message_body_bin read_message_body;  // Temporary buffer for subsequent reads
 
-	MessageHeader write_next_header; // Temporary buffer for subsequent writes
-	std::deque<MessageEntry> write_messages; // Write queue // NOTE: Assumed that observing the first element is thread-safe
+	message_header write_next_header; // Temporary buffer for subsequent writes
+	/// Write queue
+	/// NOTE: Assumed that observing the first element is thread-safe
+	/// NOTE: Assumed to be memory stable, memory address of elements might be self pointing (std::string memory view support)
+	std::deque<message_entry> write_messages;
 
 private:
 	size_t num_total_message_read = 0;
@@ -117,7 +146,8 @@ public:
 	inline void cancel_and_disconnect_async() noexcept;
 	inline void pause_receive_async() noexcept;
 	inline void resume_receive_async() noexcept;
-	inline void send_async(MessageBody message) noexcept;
+	template <typename M>
+	inline void send_async(M&& message) noexcept;
 
 private:
 	[[nodiscard]] inline bool _no_on_flight_operation() const noexcept;
@@ -330,7 +360,8 @@ inline void ImplBaseConnectionAsyncHE::resume_receive_async() noexcept {
 	do_read(shared_from_this());
 }
 
-inline void ImplBaseConnectionAsyncHE::send_async(MessageBody message) noexcept {
+template <typename M>
+inline void ImplBaseConnectionAsyncHE::send_async(M&& message) noexcept {
 	std::unique_lock lock{mutex};
 	log_net.trace("MTCP-{} Send requested", id);
 
@@ -339,7 +370,7 @@ inline void ImplBaseConnectionAsyncHE::send_async(MessageBody message) noexcept 
 
 	const auto was_writing = _is_writing();
 	write_messages.emplace_back(
-			MessageHeader{MessageType::message, 0, static_cast<uint32_t>(message.size())},
+			message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
 			std::move(message));
 
 	if (was_writing || state != State::Connected)
@@ -469,7 +500,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 			stream->cancel();
 		}
 
-		handler->on_receive(ec, std::move(read_message.body));
+		handler->on_receive(ec, read_message_body);
 
 		if (_no_on_flight_operation())
 			_terminate();
@@ -478,7 +509,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 
 	} else {
 		num_total_message_read++;
-		handler->on_receive(ec, std::move(read_message.body));
+		handler->on_receive(ec, read_message_body);
 
 		if (state != State::Connected) {
 			if (_no_on_flight_operation())
@@ -506,7 +537,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 			stream->cancel();
 		}
 
-		handler->on_send(ec, std::move(write_messages.front().body));
+		handler->on_send(ec, std::move(write_messages.front().body_view));
 
 		if (_no_on_flight_operation())
 			_terminate();
@@ -515,7 +546,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 
 	} else {
 		num_total_message_write++;
-		handler->on_send(ec, std::move(write_messages.front().body));
+		handler->on_send(ec, std::move(write_messages.front().body_view));
 
 		write_messages.pop_front();
 
@@ -621,7 +652,7 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 
 	boost::asio::async_read(
 			*self->stream,
-			boost::asio::buffer(self->read_message.header.header_data(), self->read_message.header.header_size()),
+			boost::asio::buffer(self->read_message_header.header_data(), self->read_message_header.header_size()),
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
 				const auto self = self_sp.get();
 
@@ -631,7 +662,7 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 
 				} else {
 					log_net.trace("MTCP-{} Successfully read {} header byte", self->id, size);
-					const auto read_body_size = self->read_message.header.size();
+					const auto read_body_size = self->read_message_header.size();
 
 					if (read_body_size > MTCP_MESSAGE_MAX_SIZE) {
 						log_net.error("MTCP-{} Payload size {} exceeds maximum size of {}", self->id, read_body_size, MTCP_MESSAGE_MAX_SIZE);
@@ -647,20 +678,20 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, size_t read_body_size) noexcept {
 	const auto self = self_sp.get();
 
-	self->read_message.body.clear();
+	self->read_message_body.clear();
 	if (read_body_size > MTCP_MESSAGE_MAX_RESERVE) {
 		log_net.warn("MTCP-{} Payload size {} exceeds maximum reserve size of {}", self->id, read_body_size, MTCP_MESSAGE_MAX_RESERVE);
-		self->read_message.body.reserve(MTCP_MESSAGE_MAX_RESERVE);
+		self->read_message_body.reserve(MTCP_MESSAGE_MAX_RESERVE);
 
 	} else {
-		self->read_message.body.reserve(read_body_size);
+		self->read_message_body.reserve(read_body_size);
 	}
 
 	// TODO P5: Use a non dynamic buffer if read_body_size < MTCP_MESSAGE_MAX_RESERVE, with resize instead of reserve
 	self->on_flight_read = true;
 	boost::asio::async_read(
 			*self->stream,
-			boost::asio::dynamic_buffer(self->read_message.body, read_body_size),
+			boost::asio::dynamic_buffer(self->read_message_body, read_body_size),
 			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
 				const auto self = self_sp.get();
 
@@ -720,7 +751,8 @@ void ImplBaseConnectionAsyncHE::do_write_header(SelfPtr&& self_sp) noexcept {
 
 void ImplBaseConnectionAsyncHE::do_write_body(SelfPtr&& self_sp) noexcept {
 	const auto self = self_sp.get();
-	const auto body_buffer = boost::asio::buffer(self->write_messages.front().body);
+	const auto& front_message = self->write_messages.front().body_view;
+	const auto body_buffer = boost::asio::buffer(front_message.data(), front_message.size());
 
 	self->on_flight_write = true;
 	boost::asio::async_write(
@@ -810,7 +842,37 @@ void BaseConnectionAsyncHE::resume_receive_async() noexcept {
 	internals->resume_receive_async();
 }
 
-void BaseConnectionAsyncHE::send_async(MessageBody message) noexcept {
+void BaseConnectionAsyncHE::send_async(message_body_bin message) noexcept {
+	internals->send_async(std::move(message));
+}
+void BaseConnectionAsyncHE::send_async(message_body_bin_view message_view) noexcept {
+	std::vector<std::byte> message;
+
+	message.resize(message_view.size());
+	std::memcpy(message.data(), message_view.data(), message_view.size());
+
+	internals->send_async(std::move(message));
+}
+void BaseConnectionAsyncHE::send_async(message_body_str message) noexcept {
+	internals->send_async(std::move(message));
+}
+void BaseConnectionAsyncHE::send_async(message_body_str_view message_str_view) noexcept {
+	std::vector<std::byte> message;
+
+	message.resize(message_str_view.size());
+	std::memcpy(message.data(), message_str_view.data(), message_str_view.size());
+
+	internals->send_async(std::move(message));
+}
+
+void BaseConnectionAsyncHE::send_view_async(message_body_bin_view message) noexcept {
+	internals->send_async(std::move(message));
+}
+void BaseConnectionAsyncHE::send_view_async(message_body_str_view message_str) noexcept {
+	const auto message = std::span<const std::byte>(
+			reinterpret_cast<const std::byte*>(message_str.data()),
+			reinterpret_cast<const std::byte*>(message_str.data() + message_str.size())
+	);
 	internals->send_async(std::move(message));
 }
 

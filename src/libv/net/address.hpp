@@ -28,21 +28,16 @@ public:
 
 public:
 	inline Address() = default;
-	inline Address(std::string address, uint16_t port) :
-		address(std::move(address)),
+
+	template <typename Str>
+	inline Address(Str&& address, uint16_t port) :
+		address(std::forward<Str>(address)),
 		service(std::to_string(port)) { }
 
-	inline Address(std::string address, std::string service) :
-		address(std::move(address)),
-		service(std::move(service)) { }
-
-//	inline Address(std::string_view address, uint16_t port) :
-//		address(address),
-//		service(std::to_string(port)) { }
-//
-//	inline Address(std::string_view address, std::string service) :
-//		address(address),
-//		service(std::move(service)) { }
+	template <typename Str0, typename Str1>
+	inline Address(Str0&& address, Str1&& port) :
+		address(std::forward<Str0>(address)),
+		service(std::forward<Str1>(port)) { }
 
 	static std::optional<Address> parse(const std::string_view addressport) {
 		std::optional<Address> result;

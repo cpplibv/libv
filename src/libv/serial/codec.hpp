@@ -33,12 +33,13 @@ struct Codec {
 
 private:
 	struct Encoder {
-		TypeID type; // Used for lookup during encoding
+		TypeID type; // Used for lookup during encoding and for 'is' checking
 		MessageID id; // Used to save this id for the decoder
 		EncodeFN encode_fn;
 	};
 
 	struct Decoder {
+		TypeID type; // Used for lookup during and for 'is' checking
 		MessageID id; // Used for lookup during decoding
 		DecodeFN decode_fn;
 	};
@@ -68,11 +69,31 @@ public:
 			handler.receive(std::move(object));
 		};
 
-		decoders.emplace_back(MessageIndex, std::move(decode_fn));
+		auto type = std::type_index(typeid(MessageType));
+		decoders.emplace_back(type, MessageIndex, std::move(decode_fn));
 	}
 
 private:
-	Message aux_encode(std::type_index type, const void* object) const {
+	[[nodiscard]] bool aux_is(std::type_index type, Message_view message) const {
+		IArchive iar(message);
+
+		MessageID id;
+		iar >> LIBV_NVP_NAMED("type", id);
+
+		auto it = libv::linear_find_optional(decoders, id, &Decoder::id);
+
+		if (!it)
+			it = libv::linear_find_optional(encoders, id, &Encoder::id);
+
+		if (!it) {
+			assert(false && "Encoder and Decoder are missing the provided type");
+			return false;
+		}
+
+		return it->type == type;
+	}
+
+	[[nodiscard]] Message aux_encode(std::type_index type, const void* object) const {
 		Message message;
 
 		{
@@ -103,6 +124,22 @@ private:
 		} else {
 			it->decode_fn(iar, handler);
 		}
+	}
+
+public:
+	template <typename T>
+	[[nodiscard]] inline bool is(Message_view message) const {
+		const auto type = std::type_index(typeid(T));
+		return aux_is(type, message);
+	}
+	template <typename T>
+	[[nodiscard]] inline bool is(std::string_view message_str) const {
+		const auto type = std::type_index(typeid(T));
+		const auto message = std::span<const std::byte>(
+				reinterpret_cast<const std::byte*>(message_str.data()),
+				reinterpret_cast<const std::byte*>(message_str.data() + message_str.size())
+		);
+		return aux_is(type, message);
 	}
 
 public:

@@ -111,8 +111,21 @@ public:
 	/// Resumes the repeating asynchronous receive task.
 	void resume_receive_async() noexcept;
 
-	/// Queues an asynchronous send task.
-	void send_async(MessageBody message) noexcept;
+	/// Queues an asynchronous send task. Moves the storage in
+	void send_async(message_body_bin message) noexcept;
+	/// Queues an asynchronous send task. Copies the data into an internal storage
+	void send_async(message_body_bin_view message) noexcept;
+	/// Queues an asynchronous send task. Moves the storage in
+	void send_async(message_body_str message) noexcept;
+	/// Queues an asynchronous send task. Copies the data into an internal storage
+	void send_async(message_body_str_view message) noexcept;
+
+	/// Queues an asynchronous send task with external reference to memory.
+	/// Management of the memory is the responsibility of the caller
+	void send_view_async(message_body_bin_view message) noexcept;
+	/// Queues an asynchronous send task with external reference to memory.
+	/// Management of the memory is the responsibility of the caller
+	void send_view_async(message_body_str_view message) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -125,7 +138,7 @@ private:
 
 public:
 	using error_code = std::error_code;
-	using message = MessageBody;
+	using message = message_body_bin_view;
 	using io_context = IOContext;
 
 private:
