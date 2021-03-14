@@ -1,4 +1,4 @@
-// First line
+// Project: libv, File: app/enum/example.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

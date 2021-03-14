@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/client/network_client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/client/network_client.hpp>
+#include <libv/update/update_client/network_client.hpp>
 // libv
 #include <libv/mt/binary_latch.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
@@ -11,7 +11,7 @@
 //#include <libv/net/error.hpp>
 // std
 // pro
-#include <libv/update/common/protocol.hpp>
+#include <libv/update/common/protocol_upd.hpp>
 #include <libv/update/log.hpp>
 
 
@@ -24,28 +24,28 @@ class aux_UpdateNetworkClient : public libv::net::mtcp::ConnectionHandler<aux_Up
 public:
 	libv::mt::binary_latch latch;
 	error_code error;
-	std::string response;
-	msg::UpdateRoute info;
+	std::vector<std::byte> response;
+	msg_upd::UpdateRoute info;
 
 	bool version_not_supported = false;
 	bool version_outdated = false;
 	bool version_up_to_date = false;
 
 public:
-	inline explicit aux_UpdateNetworkClient(libv::net::Address address, std::string message) {
-		connection.connect_async(address);
-		connection.send_async(message);
+	inline explicit aux_UpdateNetworkClient(libv::net::Address address, std::vector<std::byte> message) {
+		connection.connect_async(std::move(address));
+		connection.send_async(std::move(message));
 	}
 
 public:
-	void receive(const msg::VersionNotSupported&) {
+	void receive(const msg_upd::VersionNotSupported&) {
 		version_not_supported = true;
 	}
-	void receive(msg::UpdateRoute info_) {
+	void receive(msg_upd::UpdateRoute info_) {
 		version_outdated = true;
 		info = std::move(info_);
 	}
-	void receive(const msg::VersionUpToDate&) {
+	void receive(const msg_upd::VersionUpToDate&) {
 		version_up_to_date = true;
 	}
 
@@ -59,7 +59,7 @@ private:
 
 	virtual void on_receive(error_code ec, message m) override {
 		if (!ec) {
-			response = m;
+			response = std::vector<std::byte>(m.begin(), m.end());
 			connection.disconnect_async();
 		}
 	}
@@ -75,7 +75,7 @@ private:
 
 namespace { // -------------------------------------------------------------------------------------
 
-static auto codec = libv::serial::CodecClient<aux_UpdateNetworkClient, libv::archive::Binary>{msg{}};
+static auto codec = libv::serial::CodecClient<aux_UpdateNetworkClient, libv::archive::Binary>{msg_upd{}};
 
 } // namespace -------------------------------------------------------------------------------------
 
@@ -84,14 +84,8 @@ UpdateNetworkClient::UpdateNetworkClient(net::IOContext& ioContext, net::Address
 	server_address(std::move(serverAddress)) {}
 
 update_check_result UpdateNetworkClient::check_version(std::string program_name, std::string program_variant, version_number current_version) {
-	const auto report = msg::ReportVersion(program_name, program_variant, current_version);
-
-//	const auto message = codec.encode(report);
-	const auto tmp = codec.encode(report); // <<< Implement network/serial std::byte support
-	const auto message = std::string(
-			reinterpret_cast<const char*>(tmp.data()),
-			reinterpret_cast<const char*>(tmp.data() + tmp.size())
-	);
+	const auto report = msg_upd::ReportVersion(program_name, program_variant, current_version);
+	const auto message = codec.encode(report);
 
 	log_update.debug("Report: \n{}", libv::hex_dump_with_ascii(message)); // <<< hex_dump_with_ascii
 

@@ -31,6 +31,12 @@ void IntervalRegistry::mark(size_t offset, size_t size) noexcept {
 	}
 }
 
+void IntervalRegistry::mark(const IntervalRegistry& intervals) noexcept {
+	// TODO P5: Optimization: A more efficient merge could be implemented (based on merge-sort / join)
+	for (const auto& interval : intervals.marked)
+		mark(interval.offset, interval.size);
+}
+
 void IntervalRegistry::unmark(size_t offset, size_t size) noexcept {
 	// Dual key lookup is possible as container elements are strictly exclusive
 	const auto it_lo = std::ranges::lower_bound(marked, offset, std::less<>(), [](const auto& i) { return i.offset + i.size; });
@@ -67,6 +73,12 @@ void IntervalRegistry::unmark(size_t offset, size_t size) noexcept {
 			--i;
 		}
 	}
+}
+
+void IntervalRegistry::unmark(const IntervalRegistry& intervals) noexcept {
+	// TODO P5: Optimization: A more efficient merge could be implemented (based on merge-sort / join)
+	for (const auto& interval : intervals.marked)
+		unmark(interval.offset, interval.size);
 }
 
 // -------------------------------------------------------------------------------------------------

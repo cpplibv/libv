@@ -1,0 +1,113 @@
+// Project: libv.update, File: src/libv/update/resource_client/task_pool.lpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+// ext
+#include <boost/container/flat_set.hpp>
+// libv
+#include <libv/mt/binary_latch.hpp>
+#include <libv/net/mtcp/connection_he.hpp>
+// std
+#include <deque>
+#include <filesystem>
+#include <mutex>
+#include <optional>
+// pro
+//#include <libv/update/log.hpp>
+#include <libv/update/resource_client/resource_file.lpp>
+
+
+namespace libv {
+namespace update {
+
+// -------------------------------------------------------------------------------------------------
+
+//class DownloadTask {
+//	std::shared_ptr<ResourceFile> file;
+//
+////	libv::IntervalRegistry grabbed_regions;
+//};
+//
+//class GrabbedDownloadTask {
+//	std::shared_ptr<ResourceFile> file;
+//
+//	size_t offset;
+//	size_t size;
+//};
+//
+//class DownloadTaskPool {
+//	std::deque<Task> active_tasks;
+//	std::deque<Task> queue_tasks;
+//
+//	std::deque<Task> resource_queue;
+//};
+
+//class ResourceTaskOutput {
+//	ResourceFile file;
+//};
+
+// -------------------------------------------------------------------------------------------------
+
+class ResourceClientConnection;
+
+// ---
+
+struct ResourceTask {
+	std::string identifier;
+	std::filesystem::path filepath_save;
+	std::filesystem::path filepath_temp;
+	size_t size;
+};
+
+struct ActiveResourceTask {
+	std::shared_ptr<ResourceTask> resource_task;
+	ResourceFile file;
+	libv::IntervalRegistry remaining_work;
+};
+
+struct ActiveResourceSubTask {
+	std::shared_ptr<ActiveResourceTask> parent_task;
+	libv::IntervalRegistry work;
+};
+
+// ---
+
+class TaskPool {
+	using Connection = libv::net::mtcp::Connection<ResourceClientConnection>;
+
+private:
+	std::mutex mutex;
+	libv::mt::binary_latch done_bl;
+
+	boost::container::flat_set<Connection> connections;
+//	boost::container::flat_set<Connection> idles;
+	std::vector<Connection> idles;
+
+	std::deque<std::shared_ptr<ActiveResourceTask>> task_actives;
+	std::deque<std::shared_ptr<ResourceTask>> task_queue;
+//	std::deque<Task> resource_queue;
+
+//	size_t settings_limit_keep_do_not_split = libv::KB(512);
+//	size_t settings_limit_always_split = libv::KB(512);
+
+private:
+	void foo();
+
+public:
+	void hand_back_task(ActiveResourceTask task);
+	void queue_task(std::shared_ptr<ResourceTask> task);
+	void wait();
+
+public:
+//	std::optional<ResourceTask> grab_task(Connection connection);
+//	void hand_back_task(ResourceTask task);
+	void done(Connection connection, std::shared_ptr<ActiveResourceTask> task);
+
+	void connect(Connection connection);
+	void disconnect(Connection connection);
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace update
+} // namespace libv

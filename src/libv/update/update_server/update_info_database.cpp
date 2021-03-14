@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/server/update_info_database.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/update_info_database.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/server/update_info_database.hpp>
+#include <libv/update/update_server/update_info_database.hpp>
 // libv
 #include <libv/utility/enum.hpp>
 // pro
@@ -66,23 +66,23 @@ update_route_variant UpdateInfoDatabase::get_update_route(std::string program_na
 
 	const auto pit = programs.find(program_name);
 	if (pit == programs.end())
-		return msg::VersionNotSupported{};
+		return msg_upd::VersionNotSupported{};
 
 	const auto& variants = pit->second.variants;
 	const auto vit = variants.find(variant_name);
 	if (vit == variants.end())
-		return msg::VersionNotSupported{};
+		return msg_upd::VersionNotSupported{};
 
 	const auto& versions = vit->second.versions;
 	const auto eit = versions.find(version);
 	if (eit == versions.end())
-		return msg::VersionNotSupported{};
+		return msg_upd::VersionNotSupported{};
 
 	const auto& version_info = eit->second;
 	if (!version_info.update)
-		return msg::VersionUpToDate{};
+		return msg_upd::VersionUpToDate{};
 
-	msg::UpdateRoute response;
+	msg_upd::UpdateRoute response;
 	response.program = program_name;
 	response.variant = variant_name;
 

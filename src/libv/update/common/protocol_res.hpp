@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/common/res_protocol.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/common/protocol_res.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -24,16 +24,14 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-struct res_msg {
+struct msg_res {
 	struct RequestResource {
-		std::string resource_namespace;
-		std::string resource_id;
+		std::string name;
 		uint64_t offset;
-		uint64_t amount;
+		uint64_t amount; /// 0 amount means only requests the ResourceDescription, to blind full request use numeric_limit::max
 
 		template <typename Archive> inline void serialize(Archive& ar) {
-			ar & LIBV_NVP(resource_namespace);
-			ar & LIBV_NVP(resource_id);
+			ar & LIBV_NVP(name);
 			ar & LIBV_NVP(offset);
 			ar & LIBV_NVP(amount);
 		}
@@ -61,8 +59,11 @@ struct res_msg {
 	};
 
 	struct ResponseResourceDescription {
+		std::string name;
 		uint64_t size;
+
 		template <typename Archive> inline void serialize(Archive& ar) {
+			ar & LIBV_NVP(name);
 			ar & LIBV_NVP(size);
 		}
 	};

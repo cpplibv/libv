@@ -42,7 +42,7 @@ public:
 	void pattern(const std::string_view pattern_str);
 
 	/// Returns if the given string is matched by the pattern
-	bool match(const std::string_view str) const;
+	[[nodiscard]] bool match(const std::string_view str) const;
 };
 
 // -------------------------------------------------------------------------------------------------

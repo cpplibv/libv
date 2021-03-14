@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/server/update_info_database.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/update_info_database.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <variant>
 // pro
-#include <libv/update/common/protocol.hpp>
+#include <libv/update/common/protocol_upd.hpp>
 #include <libv/update/update_signature.hpp>
 #include <libv/update/version_number.hpp>
 
@@ -29,7 +29,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-using update_route_variant = std::variant<msg::UpdateRoute, msg::VersionUpToDate, msg::VersionNotSupported>;
+using update_route_variant = std::variant<msg_upd::UpdateRoute, msg_upd::VersionUpToDate, msg_upd::VersionNotSupported>;
 
 // -------------------------------------------------------------------------------------------------
 

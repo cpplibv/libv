@@ -1,4 +1,4 @@
-// Project: libv.range, File: src/libv/range/view_glob_generic_path.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: src/libv/range/glob_generic_path.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -24,6 +24,11 @@ namespace detail {
 
 struct glob_generic_path_t {
 	struct iterator {
+//		struct value_type : std::filesystem::recursive_directory_iterator::value_type {
+//			std::filesystem::path path();
+//			std::filesystem::path base_path();
+//		};
+
 		using iterator_category = std::input_iterator_tag;
 		using value_type = std::filesystem::path;
 		using difference_type = std::filesystem::recursive_directory_iterator::difference_type;

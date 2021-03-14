@@ -3,7 +3,7 @@
 // libv
 #include <libv/arg/arg.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
-#include <libv/update/server/update_server.hpp>
+#include <libv/update/update_server/update_server.hpp>
 //#include <libv/update/net/server.hpp>
 //#include <libv/update/net/updater_network_server.hpp>
 //#include <libv/update/server/server.hpp>
@@ -37,7 +37,7 @@ int main(int argc, const char** argv) {
 	const auto port = args.require<uint16_t>
 			("-p", "--port")
 			("port", "Listening TCP port")
-			= app::default_port;
+			= app::default_update_port;
 
 //	const auto num_net_thread = args.require<uint16_t>
 //			("-t", "--net_thread")
@@ -61,13 +61,7 @@ int main(int argc, const char** argv) {
 		server_settings.endpoint = endpoint;
 		server_settings.num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
 		server_settings.num_accept_backlog = 4;
-		server_settings.resource_servers = std::vector<libv::net::Address>{
-				{"rs0.corruptedai.com", 25090},
-				{"rs1.corruptedai.com", 25091},
-				{"rs2.corruptedai.com", 25092},
-	//			{"rs3.corruptedai.com", 25093},
-	//			{"rs4.corruptedai.com", 25094},
-		};
+		server_settings.resource_servers = app::resource_servers;
 
 		auto server = libv::update::UpdateServer{server_settings};
 

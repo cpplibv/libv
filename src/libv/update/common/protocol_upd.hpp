@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/common/protocol.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/common/protocol_upd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -20,7 +20,7 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-struct msg {
+struct msg_upd {
 	struct ReportVersion {
 		std::string program;
 		std::string variant;

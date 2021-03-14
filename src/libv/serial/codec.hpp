@@ -80,17 +80,16 @@ private:
 		MessageID id;
 		iar >> LIBV_NVP_NAMED("type", id);
 
-		auto it = libv::linear_find_optional(decoders, id, &Decoder::id);
+		const auto eit = libv::linear_find_optional(encoders, id, &Encoder::id);
+		if (eit)
+			return eit->type == type;
 
-		if (!it)
-			it = libv::linear_find_optional(encoders, id, &Encoder::id);
+		const auto dit = libv::linear_find_optional(decoders, id, &Decoder::id);
+		if (dit)
+			return dit->type == type;
 
-		if (!it) {
-			assert(false && "Encoder and Decoder are missing the provided type");
-			return false;
-		}
-
-		return it->type == type;
+		assert(false && "Encoder and Decoder are missing the provided type");
+		return false;
 	}
 
 	[[nodiscard]] Message aux_encode(std::type_index type, const void* object) const {

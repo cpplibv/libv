@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/server/network_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/network_server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/server/network_server.hpp>
+#include <libv/update/update_server/network_server.hpp>
 // libv
 #include <libv/net/error.hpp>
 #include <libv/net/mtcp/acceptor_he.hpp>
@@ -22,7 +22,7 @@
 // pro
 //#include <libv/update/common/protocol.hpp>
 #include <libv/update/log.hpp>
-#include <libv/update/server/update_info_database.hpp>
+#include <libv/update/update_server/update_info_database.hpp>
 
 
 namespace libv {
@@ -41,7 +41,7 @@ public:
 	~aux_update_session();
 
 public:
-	void receive(const msg::ReportVersion& report);
+	void receive(const msg_upd::ReportVersion& report);
 
 private:
 	virtual void on_connect(error_code ec) override;
@@ -52,7 +52,7 @@ private:
 
 namespace { // -------------------------------------------------------------------------------------
 
-static auto codec = libv::serial::CodecServer<aux_update_session, libv::archive::Binary>{msg{}};
+static auto codec = libv::serial::CodecServer<aux_update_session, libv::archive::Binary>{msg_upd{}};
 
 } // namespace -------------------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ public:
 	}
 
 public:
-	auto make_response(const msg::ReportVersion& report) {
+	auto make_response(const msg_upd::ReportVersion& report) {
 		const auto lock = std::unique_lock(mutex);
 
 		return database->get_update_route(report.program, report.variant, report.version);
@@ -110,16 +110,9 @@ aux_update_session::~aux_update_session() {
 	log_update.fatal("~aux_update_session");
 }
 
-void aux_update_session::receive(const msg::ReportVersion& report) {
+void aux_update_session::receive(const msg_upd::ReportVersion& report) {
 	const auto response = server->make_response(report);
-
-	// <<< Implement network/serial std::byte support
-//	const auto message = std::visit([](auto& r) { return codec.encode(r); }, response);
-	const auto tmp = std::visit([](auto& r) { return codec.encode(r); }, response);
-	const auto message = std::string(
-			reinterpret_cast<const char*>(tmp.data()),
-			reinterpret_cast<const char*>(tmp.data() + tmp.size())
-	);
+	const auto message = std::visit([](auto& r) { return codec.encode(r); }, response);
 
 	log_update.debug("session response:\n{}", libv::hex_dump_with_ascii(message)); // <<< hex_dump_with_ascii
 

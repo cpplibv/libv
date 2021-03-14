@@ -14,7 +14,9 @@ namespace mt {
 
 // -------------------------------------------------------------------------------------------------
 
+/// async_value is basically a future with cancellation support
 /// The object and lifetime semantics are matching with a shared_ptr
+/// Creation of a new object is done with load_async
 /// @thread shared state is thread safe, but the async_value object itself is unsafe
 template <typename T>
 class async_value {
@@ -44,7 +46,7 @@ private:
 	std::shared_ptr<payload_t> result;
 
 public:
-	inline async_value() noexcept = default;
+	constexpr inline async_value() noexcept = default;
 	inline async_value(const async_value& orig) noexcept :
 		result(orig.result) {
 		if (result)

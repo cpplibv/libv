@@ -213,10 +213,10 @@ private:
 		return {0, 0};
 	}
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-		(void) r;
-		(void) pos;
-		(void) size;
-		(void) padding;
+//		(void) r;
+//		(void) pos;
+//		(void) size;
+//		(void) padding;
 
 //		const auto p0 = pos;
 //		const auto p1 = pos + border_pos;
@@ -284,10 +284,10 @@ private:
 	}
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
 
-		(void) r;
-		(void) pos;
-		(void) size;
-		(void) padding;
+//		(void) r;
+//		(void) pos;
+//		(void) size;
+//		(void) padding;
 
 	}
 };
@@ -312,10 +312,10 @@ private:
 	}
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
 
-		(void) r;
-		(void) pos;
-		(void) size;
-		(void) padding;
+//		(void) r;
+//		(void) pos;
+//		(void) size;
+//		(void) padding;
 
 //		9 border table except the middle
 //		in the middle use texture as pattern but leave out non padding area

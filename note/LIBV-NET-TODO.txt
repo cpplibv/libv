@@ -21,8 +21,9 @@ libv.utility: input bytes on static memory should return correct amount of read 
 libv.serial: Add support for non stream based IO Binary archives
 libv.serial: Add support for non string based codec
 libv.update: Implement real server side version check response calculation
-
-
+libv.net: Add support for non string based connection send / receive
+libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
+libv.utility: Implement IntervalRegistry utility type
 
 
 
@@ -48,26 +49,57 @@ libv.update: Implement real server side version check response calculation
 
 
 
+libv.update: Resource Client
+	Single file download: Partial download recovery IDEA of an alternative approach would be to only write out the progress meta data every X seconds
+
+	Server connections and task coordination:
+		measure each connection
+		if
+
+	File download and saving process:
+		Check if 'file.temp' exits
+		if exits
+			Open 'file.temp'
+			Replay meta info onto the in-memory state
+			If a separator byte is missing or corrupt stop and dont include its record
+				Remove corrupted meta info from end of file
+		else
+			Open 'file.temp'
+
+		Write data chunk into place
+		Write chunk offset and size to meta data at the end of the file
+		Remove meta data
+		Close file
+		Calculate and verify checksum
+		if valid
+			Rename 'file.temp' to 'file'
+		else
+			Remove 'file.temp'
+			Start again
 
 
 libv.update: weed out the legacy codes related to file downloading
 	I think the best ones are in libv/update/resource/resource_server
 	and the correct pattern will be in sandbox_update_main (or sandbox_net_main)
 	| The libv/update/resource/update_client is marked for death
+	| Almost done
 
 
+libv.update: Cleanup dirty progress (mostly update server)
+libv.update: Net installer versions, aka "version 0" (which btw is a moving target)
 
-
-libv.net: Add support for non string based connection send / receive
+libv.net: Possible bug: In connection and acceptor io_context.post might not obey strand requirements
 libv.net: Add support for endpoint access in mtcp on_accept (passing other type than io_context might be the solution)
 			| This is important, IP bans could be implemented this way
-libv.update: Cleanup dirty progress
+			| ? But be careful, endpoints are only set with the connect call
 
 
+!!! libv.serial: For safety the only change I should do for now, is get rid of reserves / resizes in serializers
 
 libv.update: PAPER
 	Update file name
-		program-variant-01-00.update - {program}-{variant}-{target}-{source}.update
+		{program}-{variant}-{target}-{source}.update
+		program-variant-01-00.update
 		parsing from the back should be possible
 
 	Updating:
@@ -122,16 +154,10 @@ libv.net: IDEA that in the connection instead of forcing the handle of an incomi
 					| both different_handler.on_connect and optionally the "same" on_receive will be called on the new type
 				| And this is the perfect solution
 
-libv.serial: Optimization: Go template archives for the streams instead of libv::bytes_io
-
-Codec and Protocol
-	if handler is not invocable with function, \
-		do error mechanism with if constexpr
-
+libv.serial: Optimization: Go template archives for the streams instead of libv::bytes_io, performance matters in that code
+libv.serial: Codec and Protocol: if handler is not invocable with function, do error mechanism with if constexpr
 
 libv.net: on_disconnect shall receive the first error that occurred which resulted in the disconnect if there was any
-
-libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
 
 app.update: Create a sandbox that flips version A->B B->A upon each start
 
@@ -286,7 +312,7 @@ app.update.security:
 libv.mt: worker_thread_pool and worker_thread, solve the next index loop around problem
 libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connection within a connection
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
+		| investigate shared_ptr with custom deleter
 libv.utility: libv::storage<T> with: initialize, destroy, alignas(T) std::byte storage[sizeof(T)];
-
 
 

@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/client/patch_applier.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/patch_applier.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/client/patch_applier.hpp>
+#include <libv/update/update_client/patch_applier.hpp>
 // libv
 #include <libv/diff/diff.hpp>
 #include <libv/utility/function_ref.hpp>
@@ -348,7 +348,7 @@ int64_t progress_cost(const StepModify& step) {
 	const auto diff_info = libv::diff::get_diff_info(step.diff);
 	return pw_iorw(5, diff_info.old_size, diff_info.new_size) + progress_weight_step_plan;
 }
-int64_t progress_cost(const StepModifyTo& step) {
+int64_t progress_cost(const StepModifyAs& step) {
 	const auto diff_info = libv::diff::get_diff_info(step.diff);
 	return pw_iorw(3, diff_info.old_size, diff_info.new_size) + progress_weight_step_plan;
 }
@@ -515,7 +515,7 @@ void do_plan_step(const StepModify& step, const std::filesystem::path& root_dir,
 	plan.remove(chain, path_old_, step.hash_old);
 }
 
-void do_plan_step(const StepModifyTo& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
+void do_plan_step(const StepModifyAs& step, const std::filesystem::path& root_dir, ExecutionPlan& plan, bool fast_plan) {
 	const auto chain = std::make_shared<OperationChain>();
 
 	const auto path_origin = root_dir / step.filepath_old;
@@ -601,7 +601,7 @@ void foreach_step(const Patch& patch, F&& func) {
 	for (const auto& step : patch.removes_dir) func(step);
 	for (const auto& step : patch.creates) func(step);
 	for (const auto& step : patch.modifies) func(step);
-	for (const auto& step : patch.modifies_to) func(step);
+	for (const auto& step : patch.modifies_as) func(step);
 	for (const auto& step : patch.renames) func(step);
 	for (const auto& step : patch.removes) func(step);
 }
@@ -632,7 +632,7 @@ public:
 		plan_removes_dir,
 		plan_creates,
 		plan_modifies,
-		plan_modifies_to,
+		plan_modifies_as,
 		plan_renames,
 		plan_removes,
 		execute_creates_dir,
@@ -722,11 +722,11 @@ bool PatchApplier::progress() {
 				return true;
 			[[fallthrough]];
 		case progress_stage::plan_modifies:
-			if (plan_stage(patch.modifies, progress_stage::plan_modifies_to))
+			if (plan_stage(patch.modifies, progress_stage::plan_modifies_as))
 				return true;
 			[[fallthrough]];
-		case progress_stage::plan_modifies_to:
-			if (plan_stage(patch.modifies_to, progress_stage::plan_renames))
+		case progress_stage::plan_modifies_as:
+			if (plan_stage(patch.modifies_as, progress_stage::plan_renames))
 				return true;
 			[[fallthrough]];
 		case progress_stage::plan_renames:

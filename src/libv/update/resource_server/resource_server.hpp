@@ -1,10 +1,9 @@
-// Project: libv.update, File: src/libv/update/resource/resource_server.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_server/resource_server.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 // libv
 #include <libv/mt/hardware_concurrency.hpp>
-#include <libv/net/fwd.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
 #include <libv/utility/storage_size.hpp>
 // std
@@ -18,8 +17,8 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class FileCachePolicy {
-//	never,
+enum class resource_cache_policy {
+	never,
 //	on_demand,
 	always,
 };
@@ -38,7 +37,8 @@ public:
 //		size_t limit_bps_peer_upload = libv::MB(10);
 //		size_t limit_bps_peer_download = 0;
 
-		size_t resource_network_chunk_size = libv::KB(512);
+		size_t resource_network_chunk_size = libv::MB(1);
+//		size_t resource_network_chunk_queue = 2;
 
 		size_t limit_peer_count_active = 32; // Zero means no limit
 		size_t limit_peer_count_queue = 32; // Zero means no limit
@@ -70,12 +70,14 @@ public:
 	[[nodiscard]] const Settings& settings() const noexcept;
 
 public:
-	void add_file(std::string id, std::filesystem::path path, FileCachePolicy fcp = FileCachePolicy::always);
+	void add_file(std::string id, std::filesystem::path path, resource_cache_policy fcp = resource_cache_policy::always);
 //	void add_custom(std::string id, std::function<std::shared_ptr<std::span<std::byte>>(std::string_view)>);
 
 public:
-	void listen(libv::net::IOContext& io_context, const libv::net::mtcp::Endpoint& endpoint);
 //	void adopt_peer(libv::net::mtcp::ConnectionAsyncCB peer)
+
+public:
+	void start();
 };
 
 // -------------------------------------------------------------------------------------------------

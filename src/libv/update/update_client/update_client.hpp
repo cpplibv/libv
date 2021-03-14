@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/client/update_client.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/update_client.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -10,7 +10,7 @@
 // pro
 #include <libv/update/version_number.hpp>
 //#include <libv/update/net/client.hpp>
-#include <libv/update/client/update_check_result.hpp>
+#include <libv/update/update_client/update_check_result.hpp>
 //#include <libv/update/common/protocol.hpp> // <<< Hide it from updater.hpp
 
 
@@ -37,6 +37,23 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
+class UpdateStatus {
+//	std::mutex mutex;
+	class UpdateClient& client;
+
+public:
+	bool progress_for(std::chrono::steady_clock::duration duration) {
+//		std::this_thread::sleep_for(duration);
+
+		return false;
+	}
+
+	size_t progress_current();
+	size_t progress_total();
+	int operation();
+	std::string operation_file();
+};
+
 class UpdateClient {
 public:
 	struct Settings {
@@ -52,9 +69,12 @@ public:
 		std::filesystem::path path_root;
 
 		std::vector<libv::net::Address> update_servers;
+		std::vector<libv::net::Address> resource_servers;
 
 		size_t num_thread_fs = 2;
 		size_t num_thread_net = 4;
+
+//		size_t limit_bps_global_download = 0;
 
 		bool remove_patch_files_after_success = true;
 	};
@@ -69,6 +89,7 @@ public:
 public:
 	[[nodiscard]] update_check_result check_for_update();
 	void update();
+//	UpdateStatus update();
 
 public:
 //	void init(

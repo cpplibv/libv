@@ -1,4 +1,4 @@
-// Project: libv.update, File: app/update/apply_patch.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: app/update/apply_update.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
@@ -19,7 +19,7 @@
 #include <libv/utility/write_file.hpp>
 #include <libv/update/patch.hpp>
 //#include <libv/update/client/updater.hpp>
-#include <libv/update/client/patch_applier.hpp>
+#include <libv/update/update_client/patch_applier.hpp>
 //#include <libv/update/contants.hpp>
 
 
@@ -40,7 +40,7 @@ int main(int argc, const char** argv) {
 			("-v", "--verbose")
 			("verbose", "Enables verbose mode");
 
-//	args.positional(arg_path, arg_patch_file);
+	args.positional(arg_path, arg_patch_file);
 
 	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;

@@ -605,6 +605,11 @@ This looks like a useful concepts:
 	concept non_cvref = std::same_as<D, std::remove_cvref_t<D>>
 
 
+libv.sys: New library for OS related tools
+libv.sys: Open links/files with the OS defaults: https://stackoverflow.com/a/60225910
+			WIN: start https://corruptedai.com
+			UNIX: xdg-open https://corruptedai.com
+
 app.editor:
 	small app for first line and include order fix-ups
 	use the folder .editor in the project root are store
@@ -617,6 +622,8 @@ app.editor:
 			line
 			[line if next section is not empty?] line
 			wildcard.**.hpp
+		| validate that no lpp file (local header file) is included from a hpp file
+		| validate pragma once is used and only used in lpp or hpp files
 
 
 ext: Acquire a crypto lib
@@ -653,6 +660,9 @@ clion live templates:
 	fora
 	t - typename; // remove the ;
 netbeans and clion live templates:
+	for - // Unify, for int i = 0; i < 10; i++
+	fori - // Unify, Iterator version
+	fora - // Unify, const auto& v : range
 	fw - std::forward<Args>(args)
 	fwa - std::forward<decltype(args)>(args)
 	ci - var(var)                  // Remove the comma from the netbeans version
@@ -671,6 +681,7 @@ netbeans and clion live templates:
 		my_type(my_type&&) noexcept = default;
 		my_type& operator=(my_type&&) & noexcept = default;
 	ctor - copy and move - ctor and assignment
+	ul - auto lock = std::unique_lock(mutex);
 
 build.ninja: some ext target fails, otherwise it should be clear
 
@@ -1526,6 +1537,8 @@ color.picker: HCL picker https://tools.lgm.cl/colorpicker.html
 cpp.proposal: P1 member_offset alternative for offsetof macro
 		- similar approach is [p0908r0]
 		- template <typename T, typename M> size_t member_offset(M T::* ptr) { /* implementation-defined*/ }
+cpp.proposal: container.resize_for_overwrite()
+		- based on make_shared_for_overwrite just for containers
 cpp.proposal: P2 std::uninitialized
 		- ability to declare a primitive variable with explicitly uninitialized value
 		- int variable = std::uninitialized;

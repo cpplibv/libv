@@ -1,0 +1,146 @@
+// Project: libv.update, File: src/libv/update/resource_client/resource_file.lpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+// libv
+#include <libv/utility/interval_registry.hpp>
+// std
+#include <filesystem>
+#include <fstream>
+#include <mutex>
+#include <span>
+
+
+namespace libv {
+namespace update {
+
+// -------------------------------------------------------------------------------------------------
+
+struct MetaBlock {
+	static constexpr uint64_t marker_value = 0xFFFFFFFF'AAAAAAAA;
+
+	size_t offset;
+	size_t amount;
+	uint64_t checksum;
+	uint64_t marker;
+};
+
+static_assert(sizeof(MetaBlock) == 2 * sizeof(size_t) + 2 * sizeof(uint64_t));
+
+// -------------------------------------------------------------------------------------------------
+
+class ResourceFile {
+	std::mutex mutex;
+
+	bool created = false;
+
+	std::filesystem::path path;
+	std::fstream file;
+
+	size_t resource_size = 0;
+	size_t metadata_cursor = 0;
+	IntervalRegistry remaining_intervals;
+
+public:
+	ResourceFile(std::filesystem::path path) :
+		path(path) {
+	}
+
+	~ResourceFile() {
+		if (!created)
+			return;
+
+		file.close();
+
+		if (done())
+			std::filesystem::resize_file(path, resource_size);
+	}
+
+private:
+	void _recover_meta_blocks() {
+		file.seekg(resource_size);
+
+		while (true) {
+			MetaBlock meta;
+			file.read(reinterpret_cast<char*>(&meta), sizeof(meta));
+
+			if (!file || meta.marker != MetaBlock::marker_value) {
+				file.clear(); // Clear EOF or FAIL bits if any
+				break; // discard rest of the meta blocks
+			}
+
+			metadata_cursor += sizeof(meta);
+			remaining_intervals.unmark(meta.offset, meta.amount);
+		}
+
+		{
+			// Clear the corrupted metadata if any left
+			char zeros[sizeof(MetaBlock)] = {0};
+
+			file.seekg(0, std::ios::end);
+			auto end = file.tellg();
+
+			file.seekp(metadata_cursor);
+			auto start = file.tellp();
+
+			for (auto i = start; i < end; i += sizeof(MetaBlock))
+				file.write(zeros, sizeof(MetaBlock));
+		}
+	}
+
+public:
+	[[nodiscard]] inline bool done() const noexcept {
+		return remaining_intervals.empty();
+	}
+//
+//	[[nodiscard]] inline auto task() const noexcept {
+//		return remaining_intervals.next_marked();
+//	}
+
+public:
+	void create(size_t resource_size_) {
+		const auto lock = std::scoped_lock(mutex);
+		if (created)
+			return;
+
+		resource_size = resource_size_;
+		metadata_cursor = resource_size_;
+		remaining_intervals.mark(0, resource_size);
+
+		if (std::filesystem::exists(path)) {
+			file.open(path, std::ios::binary | std::ios::out | std::ios::in);
+			_recover_meta_blocks();
+		} else {
+			file.open(path, std::ios::binary | std::ios::out);
+		}
+
+		created = true;
+	}
+
+	void write(size_t offset, std::span<const std::byte> data) {
+		const auto lock = std::scoped_lock(mutex);
+		assert(created);
+		assert(offset + data.size() <= resource_size);
+
+		// Write out data chunk
+		file.seekp(offset);
+		file.write(reinterpret_cast<const char*>(data.data()), data.size());
+
+		// Write out meta data
+		MetaBlock meta;
+		meta.offset = offset;
+		meta.amount = data.size();
+		meta.marker = MetaBlock::marker_value;
+		file.seekp(metadata_cursor);
+		file.write(reinterpret_cast<const char*>(&meta), sizeof(meta));
+		metadata_cursor += sizeof(meta);
+
+		// Unmark interval
+		remaining_intervals.unmark(offset, data.size());
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace update
+} // namespace libv

@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/client/network_client.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/network_client.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -9,8 +9,8 @@
 // std
 #include <string>
 // pro
-#include <libv/update/client/update_check_result.hpp>
-#include <libv/update/common/protocol.hpp>
+#include <libv/update/update_client/update_check_result.hpp>
+#include <libv/update/common/protocol_upd.hpp>
 #include <libv/update/version_number.hpp>
 
 
@@ -25,14 +25,14 @@ private:
 	libv::net::Address server_address;
 //	libv::net::mtcp::ConnectionAsyncCB connection{io_context};
 
-	msg::UpdateRoute update_info_;
+	msg_upd::UpdateRoute update_info_;
 
 public:
 	UpdateNetworkClient(libv::net::IOContext& ioContext, libv::net::Address serverAddress);
 
 public:
 	[[nodiscard]] update_check_result check_version(std::string program_name, std::string program_variant, version_number current_version);
-	[[nodiscard]] inline const msg::UpdateRoute& update_info() const noexcept {
+	[[nodiscard]] inline const msg_upd::UpdateRoute& update_info() const noexcept {
 		return update_info_;
 	}
 };

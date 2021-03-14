@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/server/network_server.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/network_server.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

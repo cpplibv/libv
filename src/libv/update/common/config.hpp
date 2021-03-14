@@ -3,11 +3,12 @@
 #pragma once
 
 // std
-#include <cstdint>
-#include <string_view>
+//#include <cstdint>
+//#include <string_view>
 
 
-namespace app {
+namespace libv {
+namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -34,4 +35,5 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace update
+} // namespace libv

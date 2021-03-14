@@ -1,0 +1,118 @@
+// Project: libv.update, File: src/libv/update/resource_server/resource_peer.cpp, Author: Császár Mátyás [Vader]
+
+// hpp
+#include <libv/update/resource_server/resource_peer.lpp>
+// pro
+#include <libv/update/resource_server/resource_file.lpp>
+#include <libv/update/resource_server/resource_server_state.lpp>
+
+
+namespace libv {
+namespace update {
+
+// -------------------------------------------------------------------------------------------------
+
+void ResourcePeer::on_connect(error_code ec) {
+	if (ec)
+		return;
+
+	server->join(connection_from_this());
+}
+
+void ResourcePeer::on_receive(error_code ec, message m) {
+	if (ec)
+		return;
+
+	codec.decode(*this, m);
+}
+
+void ResourcePeer::on_send(error_code ec, message m) {
+	if (ec)
+		return;
+
+	if (codec.is<msg_res::ResponseResourceData>(m))
+		continue_current_task();
+}
+
+void ResourcePeer::on_disconnect(error_code ec) {
+	server->leave(connection_from_this());
+}
+
+// ---
+
+ResourcePeer::ResourcePeer(std::shared_ptr<ServerState> server) :
+	server(std::move(server)) {}
+
+//void ResourcePeer::on_send(message msg) {
+//	if (codec.is<msg_res::ResponseResourceData>(msg))
+//		continue_current_task();
+//}
+
+void ResourcePeer::cancel_current_task() {
+	if (current_task) {
+		current_task->requested_amount = 0;
+		current_task->requested_offset = current_task->next_offset;
+	}
+}
+
+void ResourcePeer::continue_current_task() {
+	auto& task = *current_task;
+	const auto amount_left = task.requested_offset + task.requested_amount - task.next_offset;
+	const auto amount_allowed = server->settings().resource_network_chunk_size;
+	const auto amount = std::min(amount_left, amount_allowed);
+	const auto offset = task.next_offset;
+	task.next_offset += amount;
+
+	if (amount != 0)
+		// There something to send
+		send(msg_res::ResponseResourceData{offset, task.resource->copy_chunk(offset, amount)});
+
+	if (amount_left == amount) {
+		// Task is finished
+		send(msg_res::ResponseResourceDone{});
+
+		if (next_task) {
+			current_task = std::move(next_task);
+			next_task.reset();
+		}
+	}
+}
+
+void ResourcePeer::receive(const msg_res::RequestResource& request) {
+	cancel_current_task();
+
+	const auto lookup_result = server->get_resource(request.name, request.offset, request.amount);
+
+	if (lookup_result.invalid_request) {
+		send(msg_res::ResponseResourceInvalid{});
+	} else if (lookup_result.not_found) {
+		send(msg_res::ResponseResourceNotFound{});
+	} else {
+		// Start new task
+		const auto resource_size = lookup_result.resource->size();
+		send(msg_res::ResponseResourceDescription{request.name, resource_size});
+		// The request only a header request
+		if (request.amount == 0)
+			send(msg_res::ResponseResourceDone{});
+		else {
+			auto& task = current_task ? current_task : next_task;
+			task.emplace(
+					request.offset,
+					request.amount,
+					request.offset,
+					std::move(lookup_result.resource)
+			);
+			continue_current_task();
+		}
+	}
+}
+
+void ResourcePeer::receive(const msg_res::RequestCancel& request) {
+	(void) request;
+	cancel_current_task();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace update
+} // namespace libv

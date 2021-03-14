@@ -22,7 +22,7 @@ public:
 	enum class ChangeFile : uint32_t {
 		create = 0,
 		modify = 1,
-		// modifyTo = 2,
+		// ModifyAs = 2,
 		// rename = 3,
 		remove = 4,
 	};

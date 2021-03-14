@@ -1,4 +1,4 @@
-// Project: libv.update, File: app/update/create_patch.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: app/update/create_update.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/arg/arg.hpp>
@@ -54,7 +54,7 @@ int main(int argc, const char** argv) {
 //			("-i", "--invalidate")
 //			("invalidate", "Invalidate any cached manifest and regenerate them is caching is enabled");
 
-//	args.positional(arg_old_dir, arg_new_dir, arg_patch_file);
+	args.positional(arg_old_dir, arg_new_dir, arg_patch_file);
 
 	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;

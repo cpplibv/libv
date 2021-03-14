@@ -1,11 +1,11 @@
-// Project: libv.update, File: src/libv/update/server/update_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/update_server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/server/update_server.hpp>
+#include <libv/update/update_server/update_server.hpp>
 // pro
 #include <libv/update/log.hpp>
-#include <libv/update/server/update_info_database.hpp>
-#include <libv/update/server/network_server.hpp>
+#include <libv/update/update_server/update_info_database.hpp>
+#include <libv/update/update_server/network_server.hpp>
 
 
 namespace libv {

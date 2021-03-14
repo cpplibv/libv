@@ -651,6 +651,7 @@ TEST_CASE("Parse Combination general", "[libv.control.parse]") {
 	test("A + \"'\"            ", lc::Input{lc::Keycode::A}, lc::Input{utf8_codepoint("'")});
 	test("'+'                  ", lc::Input{utf8_codepoint("+")});
 	test("'+ '                 ", lc::Input{lc::Keycode::Apostrophe}, lc::Input{lc::Keycode::Apostrophe});
+	// TODO P4: Fix the parser to handle the following case
 //	test("'+'+'                ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
 	test("'+'+'+'              ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});
 	test("'+' + '+'            ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});

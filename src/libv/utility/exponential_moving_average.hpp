@@ -1,4 +1,4 @@
-// Created by Vader on 2021.03.22..
+// Project: libv.utility, File: src/libv/utility/exponential_moving_average.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -15,8 +15,11 @@ template <typename T, int Window = 10>
 //template <typename T, T Window = T{10}, T Match = T{0.9}>
 struct exponential_moving_average {
 public:
-//	static constexpr T match = Match;
-	static constexpr T match = 0.9;
+//	static_assert(T{0} < Match && Match < T{1});
+	static_assert(T{0} < Window);
+
+//	static constexpr T match = Match; /// Convergence rate over the window
+	static constexpr T match = 0.8; /// Convergence rate over the window
 	static constexpr T window = Window;
 	static constexpr T alpha = -std::pow(T{1} - match, T{1} / window) + T{1};
 

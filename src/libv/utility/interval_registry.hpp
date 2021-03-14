@@ -57,7 +57,9 @@ public:
 
 public:
 	void mark(size_t offset, size_t size) noexcept;
+	void mark(const IntervalRegistry& intervals) noexcept;
 	void unmark(size_t offset, size_t size) noexcept;
+	void unmark(const IntervalRegistry& intervals) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

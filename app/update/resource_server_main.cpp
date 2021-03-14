@@ -3,7 +3,7 @@
 // libv
 #include <libv/arg/arg.hpp>
 #include <libv/net/mtcp/endpoint.hpp>
-#include <libv/update/resource/resource_server.hpp>
+#include <libv/update/resource_server/resource_server.hpp>
 #include <libv/range/glob_generic_path.hpp>
 //#include <libv/update/net/server.hpp>
 //#include <libv/update/net/updater_network_server.hpp>
@@ -37,7 +37,7 @@ int main(int argc, const char** argv) {
 	const auto port = args.require<uint16_t>
 			("-p", "--port")
 			("port", "Listening TCP port")
-			= app::default_port;
+			= app::default_resource_port;
 
 //	const auto num_net_thread = args.require<uint16_t>
 //			("-t", "--net_thread")
@@ -56,6 +56,8 @@ int main(int argc, const char** argv) {
 
 	const auto endpoint = libv::net::mtcp::parse_endpoint_or_throw(address.value(), port.value());
 
+	std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path().parent_path());
+
 	{
 		auto resource_settings = libv::update::ResourceServer::Settings{};
 		resource_settings.endpoint = endpoint;
@@ -65,15 +67,25 @@ int main(int argc, const char** argv) {
 
 		auto server = libv::update::ResourceServer{resource_settings};
 
-		for (const auto& path : libv::view::glob_generic_path("app/update/res", "update/test-dev-*-*.update"))
-			std::cout << path.generic_string() << std::endl;
+		for (const auto& path : libv::view::glob_generic_path("app/update/res/update", "test-dev-*-*.update")) {
+			const auto id = "app.update::dev::update::" + path.generic_string();
+			const auto file = "app/update/res/update/" + path.generic_string();
+			const auto cache = libv::update::resource_cache_policy::always;
 
-//		for (const auto path : libv::wilcard_filepath("app/update/res/version/**"))
-//		for (const auto& path : libv::view::glob_generic_path("app/update/res", "update/test-dev-*-*.update"))
-//			server.add_file(path.generic_path.filename(), path.generic_path(), path);
-//			rs.add_files("app.update::patch::{}", "app/update/res/", "p*.*.update");
+			server.add_file(id, file, cache);
+		}
 
-//		server.start();
+		for (const auto& path : libv::view::glob_generic_path("app/update/res/version", "v*/**")) {
+			const auto id = "app.update::dev::version::" + path.generic_string();
+			const auto file = "app/update/res/version/" + path.generic_string();
+			const auto is_file = std::filesystem::is_regular_file(file);
+			const auto cache = libv::update::resource_cache_policy::never;
+
+			if (is_file)
+				server.add_file(id, file, cache);
+		}
+
+		server.start();
 
 		for (std::string line; std::getline(std::cin, line);) {
 			if (line == "quit")

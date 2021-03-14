@@ -3,15 +3,16 @@
 // libv
 #include <libv/arg/arg.hpp>
 #include <libv/net/address.hpp>
-#include <libv/update/client/update_client.hpp>
+#include <libv/net/io_context.hpp>
+#include <libv/update/update_client/update_client.hpp>
 // std
 #include <iostream>
 // pro
 #include <update/common/config.hpp>
 #include <update/common/log.hpp>
-//#include <update/common/client.hpp>
-//#include <libv/update/update_client.hpp>
-//#include <libv/update/update_client.hpp>
+
+
+#include <libv/update/resource_client/resource_client.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -23,7 +24,7 @@ int main(int argc, const char** argv) {
 //			("-c", "--config")
 //			("config_file", "File path of the config file");
 
-	const auto tmp_version = args.require<int>
+	const auto tmp_version = args.require<uint64_t>
 			("-v", "--version")
 			("tmp", "tmp");
 
@@ -37,6 +38,24 @@ int main(int argc, const char** argv) {
 
 	// -------------------------------------------------------------------------------------------------
 
+	libv::update::ResourceClient::Settings settings;
+
+//	settings.limit_bps_global_download = 0;
+	settings.resource_servers = app::resource_servers;
+
+	libv::net::IOContext io_context(4);
+	libv::update::ResourceClient rc(io_context, settings);
+
+	const std::filesystem::path save_dir = "tmp/";
+	rc.download_file("app.update::dev::update::app.update-dev-02-00.update", save_dir / "app.update-dev-02-00.update");
+	rc.download_file("app.update::dev::update::app.update-dev-02-01.update", save_dir / "app.update-dev-02-01.update");
+	rc.download_file("app.update::dev::update::app.update-dev-02-02.update", save_dir / "app.update-dev-02-02.update");
+	rc.download_file("app.update::dev::update::app.update-dev-02-03.update", save_dir / "app.update-dev-02-03.update");
+	rc.download_file("app.update::dev::update::app.update-dev-02-04.update", save_dir / "app.update-dev-02-04.update");
+	rc.wait();
+
+	// -------------------------------------------------------------------------------------------------
+/*
 	{
 		libv::update::UpdateClient::Settings uc_settings;
 
@@ -47,14 +66,10 @@ int main(int argc, const char** argv) {
 		uc_settings.path_executable = std::filesystem::path(argv[0]);
 		uc_settings.path_root = uc_settings.path_executable.parent_path();
 		uc_settings.path_lock_file = ".lock";
-		uc_settings.path_temp_folder = ".update";
-		uc_settings.update_servers = std::vector<libv::net::Address>{
-				{"rs0.corruptedai.com", 25090},
-//				{"rs1.corruptedai.com", 25091},
-//				{"rs2.corruptedai.com", 25092},
-//				{"rs3.corruptedai.com", 25093},
-//				{"rs4.corruptedai.com", 25094},
-		};
+//		uc_settings.path_temp_folder = ".update";
+		uc_settings.path_temp_folder = ".update/";
+		uc_settings.resource_servers = app::resource_servers;
+		uc_settings.update_servers = app::update_servers;
 
 //		open_program_frame();
 //		load_minimal_ui();
@@ -81,16 +96,20 @@ int main(int argc, const char** argv) {
 		}
 		case libv::update::update_check_result::version_outdated: {
 			app::log_app.info("Update found for current version");
-//			update_client.update([](auto operation, uint64_t progress_current, uint64_t progress_total) {
-//				switch (operation) {
+
+			auto status = update_client.update();
+			while (status.progress_for(std::chrono::milliseconds(10))) {
+				app::log_app.info("Status: {}/{}", status.progress_current(), status.progress_total());
+
+//				app::log_app.info("Recovering {}...");
+//				app::log_app.info("Downloading {}...");
+//				app::log_app.info("Updating {}...");
+
 //				case libv::update::UpdateOperation::download:
-//					app::log_app.info("Downloading update {}/{}...", progress_current, progress_total);
-//					break;
 //				case libv::update::UpdateOperation::update:
+//					app::log_app.info("Downloading update {}/{}...", progress_current, progress_total);
 //					app::log_app.info("Updating update {}/{}...", progress_current, progress_total);
-//					break;
-//				}
-//			});
+			}
 			break;
 		}
 		}
@@ -98,7 +117,7 @@ int main(int argc, const char** argv) {
 //		discard_minimal_ui();
 //		load_full_ui();
 	}
-
+*/
 	return EXIT_SUCCESS;
 }
 

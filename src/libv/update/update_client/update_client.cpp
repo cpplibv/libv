@@ -1,7 +1,7 @@
-// Project: libv.update, File: src/libv/update/client/update_client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/update_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/client/update_client.hpp>
+#include <libv/update/update_client/update_client.hpp>
 // libv
 #include <libv/process/lock_file.hpp>
 #include <libv/utility/enum.hpp>
@@ -13,8 +13,8 @@
 #include <memory>
 #include <string>
 // pro
-#include <libv/update/client/network_client.hpp>
-#include <libv/update/client/patch_applier.hpp>
+#include <libv/update/update_client/network_client.hpp>
+#include <libv/update/update_client/patch_applier.hpp>
 #include <libv/update/log.hpp>
 #include <libv/update/patch.hpp>
 
@@ -41,7 +41,7 @@
 #include <libv/utility/storage_size.hpp>
 
 #include <libv/state/state.hpp>
-#include <libv/update/common/protocol.hpp>
+#include <libv/update/common/protocol_upd.hpp>
 
 
 
@@ -58,7 +58,7 @@ namespace update {
 struct ImplUpdateClient {
 public:
 	UpdateClient::Settings settings;
-	msg::UpdateRoute update_info;
+	msg_upd::UpdateRoute update_info;
 
 public:
 	libv::net::IOContext io_context{settings.num_thread_net};

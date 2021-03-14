@@ -35,10 +35,10 @@ private:
 	const ID id = nextID++; /// Informative ID for logging and monitoring
 
 private:
-	void start_thread() {
+	void start_thread(size_t i, size_t thread_count) {
 		const auto parentID = libv::thread_number();
-		threads.emplace_back([this, parentID] {
-			log_net.trace("IOContext-{} worker thread {} started by thread {}", id, libv::thread_number(), parentID);
+		threads.emplace_back([this, parentID, i, thread_count] {
+			log_net.trace("IOContext-{} worker thread {} ({}/{}) started by thread {}", id, libv::thread_number(), i + 1, thread_count, parentID);
 			io_context.run();
 		});
 	}
@@ -48,7 +48,7 @@ public:
 		resolver(io_context),
 		work_guard(io_context.get_executor()) {
 		for (size_t i = 0; i < thread_count; ++i)
-			start_thread();
+			start_thread(i, thread_count);
 	}
 
 	~ImplIOContext() {

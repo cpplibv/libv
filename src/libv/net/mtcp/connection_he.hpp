@@ -182,11 +182,10 @@ private:
 //	virtual void on_connect(error_code) {}
 //	virtual void on_receive(message m) = 0;
 //	virtual void on_receive(error_code) {}
-//	virtual void on_send() = 0;
 //	virtual void on_send(message m) = 0;
 //	virtual void on_send(error_code) {}
-//  /// Receives the first error that occurred which resulted in the disconnect if there was any
-//  /// !!! ^ Match this comment in implementation
+//	/// Receives the first error that occurred which resulted in the disconnect if there was any
+//	/// !!! ^ Match this comment in implementation
 //	virtual void on_disconnect(error_code ec) = 0;
 };
 

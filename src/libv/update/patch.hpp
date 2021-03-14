@@ -68,7 +68,7 @@ struct StepModify {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct StepModifyTo {
+struct StepModifyAs {
 	std::string filepath_old;
 	std::string filepath_new;
 	file_diff_data diff;
@@ -119,7 +119,7 @@ public:
 
 	std::vector<StepCreate> creates;
 	std::vector<StepModify> modifies;
-	std::vector<StepModifyTo> modifies_to;
+	std::vector<StepModifyAs> modifies_as;
 	std::vector<StepRename> renames;
 	std::vector<StepRemove> removes;
 
@@ -134,7 +134,7 @@ public:
 
 	LIBV_REFLECTION_ACCESS(creates);
 	LIBV_REFLECTION_ACCESS(modifies);
-	LIBV_REFLECTION_ACCESS(modifies_to);
+	LIBV_REFLECTION_ACCESS(modifies_as);
 	LIBV_REFLECTION_ACCESS(renames);
 	LIBV_REFLECTION_ACCESS(removes);
 
