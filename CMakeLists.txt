@@ -723,7 +723,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_utility STATIC
 	SOURCE src/libv/utility/*.cpp
-	LINK   Threads::Threads ext_function2
+	LINK   Threads::Threads ext_function2 ext_boost
 )
 
 wish_create_library(
