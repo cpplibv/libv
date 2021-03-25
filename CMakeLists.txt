@@ -851,6 +851,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET enum
+	SOURCE app/enum/*.cpp
+	LINK   ext_fmt ext_clip ext_range libv_lua
+)
+
+wish_create_executable(
 	TARGET app_enum_generator
 	SOURCE app/enum_generator.cpp
 	LINK   ext_fmt ext_clip
