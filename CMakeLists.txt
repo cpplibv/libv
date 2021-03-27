@@ -862,6 +862,12 @@ wish_create_executable(
 	LINK   ext_fmt ext_clip
 )
 
+wish_create_executable(
+	TARGET lua_runner
+	SOURCE app/lua_runner.cpp
+	LINK   libv_lua
+)
+
 wish_end_group()
 wish_create_group(GROUP_EXAMPLE) # EXAMPLE ---------------------------------------------------------
 
