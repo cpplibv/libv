@@ -59,6 +59,17 @@ struct ResourceTask {
 	size_t size;
 };
 
+//struct ResourceOutput {
+//	ResourceFile file;
+//	libv::IntervalRegistry remaining_work;
+//};
+//
+//struct ActiveResourceTask {
+//	std::shared_ptr<ResourceTask> task;
+//	std::shared_ptr<ResourceOutput> output;
+//	libv::IntervalRegistry assigned_work;
+//};
+
 struct ActiveResourceTask {
 	std::shared_ptr<ResourceTask> resource_task;
 	ResourceFile file;
@@ -83,7 +94,7 @@ private:
 //	boost::container::flat_set<Connection> idles;
 	std::vector<Connection> idles;
 
-	std::deque<std::shared_ptr<ActiveResourceTask>> task_actives;
+	std::vector<std::shared_ptr<ActiveResourceTask>> task_actives;
 	std::deque<std::shared_ptr<ResourceTask>> task_queue;
 //	std::deque<Task> resource_queue;
 
@@ -91,10 +102,9 @@ private:
 //	size_t settings_limit_always_split = libv::KB(512);
 
 private:
-	void foo();
+	std::shared_ptr<ActiveResourceSubTask> _assign_subtask_or_idle(Connection connection);
 
 public:
-	void hand_back_task(ActiveResourceTask task);
 	void queue_task(std::shared_ptr<ResourceTask> task);
 	void wait();
 

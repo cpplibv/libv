@@ -3,7 +3,7 @@
 // hpp
 #include <libv/frame/events.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // ext
 #include <fmt/format.h>
 // pro

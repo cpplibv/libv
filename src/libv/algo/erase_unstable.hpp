@@ -24,7 +24,7 @@ constexpr inline void erase_unstable(Container& container, typename Container::i
 }
 
 template <typename Container>
-constexpr inline void erase_unstable(Container& container, typename Container::value_type value) noexcept {
+constexpr inline void erase_unstable(Container& container, const typename Container::value_type& value) noexcept {
 	const auto it = std::find(container.begin(), container.end(), value);
 
 	if (it == container.end())

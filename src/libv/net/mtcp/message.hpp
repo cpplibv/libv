@@ -4,8 +4,8 @@
 
 // libv
 #include <libv/utility/byte_swap.hpp>
-#include <libv/utility/enum.hpp>
 #include <libv/utility/storage_size.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 #include <span>

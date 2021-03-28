@@ -3,7 +3,7 @@
 // hpp
 #include <libv/update/update_server/update_info_database.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/update/log.hpp>
 

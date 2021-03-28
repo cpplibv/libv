@@ -7,7 +7,7 @@
 // std
 #include <string_view>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>

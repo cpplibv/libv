@@ -12,7 +12,7 @@
 // libv
 #include <libv/glr/queue.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <atomic>
 #include <mutex>

@@ -12,8 +12,8 @@
 #include <libv/algo/sum.hpp>
 #include <libv/range/view_deinterleave.hpp>
 #include <libv/utility/approx.hpp>
-#include <libv/utility/enum.hpp>
 #include <libv/utility/observer_ref.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>

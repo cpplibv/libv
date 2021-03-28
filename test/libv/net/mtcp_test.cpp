@@ -5,7 +5,7 @@
 // libv
 #include <libv/log/log.hpp>
 #include <libv/mt/binary_latch.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <iostream>
 #include <sstream>

@@ -5,7 +5,7 @@
 // ext
 #include <sol/state.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/lua/vec.hpp>
 #include <libv/lua/vm4.hpp>

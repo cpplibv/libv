@@ -3,7 +3,7 @@
 // hpp
 #include <catch/catch.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ctrl/enum.hpp>
 

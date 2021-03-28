@@ -8,7 +8,7 @@
 #include <sol/state.hpp>
 #include <sol/types.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 
 
 namespace libv {

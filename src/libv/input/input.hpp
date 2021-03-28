@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 #include <string_view>

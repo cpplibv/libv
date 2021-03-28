@@ -7,7 +7,7 @@
 #include <libv/input/event.hpp>
 #include <libv/input/input.hpp>
 #include <libv/log/log.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <iostream>
 // pro

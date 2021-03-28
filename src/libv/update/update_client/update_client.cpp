@@ -4,8 +4,8 @@
 #include <libv/update/update_client/update_client.hpp>
 // libv
 #include <libv/process/lock_file.hpp>
-#include <libv/utility/enum.hpp>
 #include <libv/utility/read_file.hpp>
+#include <libv/utility/to_underlying.hpp>
 #include <libv/utility/uniform_distribution.hpp>
 #include <libv/utility/write_file.hpp>
 // std

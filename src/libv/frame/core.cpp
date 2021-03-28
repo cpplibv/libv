@@ -6,7 +6,7 @@
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/mt/single_instance.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <atomic>
 #include <memory>

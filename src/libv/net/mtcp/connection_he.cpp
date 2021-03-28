@@ -11,7 +11,7 @@
 #include <boost/beast/core/basic_stream.hpp>
 #include <boost/beast/core/rate_policy.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <deque>
 #include <memory>

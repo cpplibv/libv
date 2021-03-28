@@ -3,7 +3,7 @@
 // hpp
 #include <libv/input/event.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 #include <libv/utility/utf8.hpp>
 // ext
 #include <boost/algorithm/string/join.hpp>

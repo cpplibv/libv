@@ -7,8 +7,8 @@
 #include <range/v3/view/zip.hpp>
 // libv
 #include <libv/utility/approx.hpp>
-#include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>

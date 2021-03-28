@@ -5,7 +5,7 @@
 // hpp
 #include <libv/log/log.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <sstream>
 

@@ -9,7 +9,7 @@
 #include <libv/algo/erase_unstable.hpp>
 #include <libv/algo/sort.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <unordered_map>
 #include <vector>

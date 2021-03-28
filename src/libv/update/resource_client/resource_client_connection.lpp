@@ -3,10 +3,10 @@
 #pragma once
 
 // libv
+#include <libv/math/exponential_moving_average.hpp>
 #include <libv/net/mtcp/connection_he.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/codec.hpp>
-#include <libv/utility/exponential_moving_average.hpp>
 #include <libv/utility/storage_size.hpp>
 // std
 //#include <deque>
@@ -25,7 +25,8 @@ namespace update {
 // -------------------------------------------------------------------------------------------------
 
 class TaskPool;
-class ActiveResourceTask;
+//class ActiveResourceTask;
+class ActiveResourceSubTask;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -52,23 +53,24 @@ private:
 //	GrabbedDownloadTask download_task;
 	std::mutex mutex;
 
-	std::shared_ptr<TaskPool> tasks;
-	std::shared_ptr<ActiveResourceTask> active_task;
+	std::shared_ptr<TaskPool> task_pools;
+	std::shared_ptr<ActiveResourceTask> assigned_task_;
 
 	/// Last time the connection received a data message
 	std::chrono::system_clock::time_point last_data_transfer;
 	/// Transfer rate of data messages in the last 10 second
-	libv::exponential_moving_average<double, 10> transfer_rate_avg_bps{libv::MB(1)};
-//	libv::exponential_moving_average<double, 10, 0.8> transfer_rate_avg_bps{libv::MB(1)}; // TODO P4: GCC 11 NTTP adjust match to 0.8
+	libv::exponential_moving_average<double, 10> transfer_rate_avg_bps{libv::KB(256)};
+//	libv::exponential_moving_average<double, 10, 0.8> transfer_rate_avg_bps{libv::KB(256)}; // TODO P4: GCC 11 NTTP adjust match to 0.8
 
 public:
-	explicit ResourceClientConnection(std::shared_ptr<TaskPool> tasks, libv::net::Address address) :
-		tasks(std::move(tasks)) {
+	explicit ResourceClientConnection(std::shared_ptr<TaskPool> task_pools, libv::net::Address address) :
+		task_pools(std::move(task_pools)) {
 		connection.connect_async(std::move(address));
 	}
 
 public:
 	size_t download_rate_bps();
+	std::shared_ptr<ActiveResourceSubTask> assigned_task();
 	void assign_task(std::shared_ptr<ActiveResourceTask> task, size_t offset, size_t amount);
 
 //	size_t left_from_task();

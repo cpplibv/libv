@@ -13,7 +13,7 @@
 #include <libv/diff/manifest.hpp>
 #include <libv/diff/manifest_diff.hpp>
 #include <libv/hash/md5.hpp>
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

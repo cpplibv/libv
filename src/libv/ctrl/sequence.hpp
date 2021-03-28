@@ -7,7 +7,7 @@
 // ext
 #include <boost/container/small_vector.hpp>
 // libv
-#include <libv/utility/enum.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <initializer_list>
 #include <iosfwd>

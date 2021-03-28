@@ -4,8 +4,8 @@
 #include <libv/ui/component/panel_full.hpp>
 // libv
 #include <libv/utility/approx.hpp>
-#include <libv/utility/enum.hpp>
 #include <libv/utility/min_max.hpp>
+#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context/context_layout.hpp>
