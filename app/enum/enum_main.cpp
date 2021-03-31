@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <set>
+#include <sstream>
 #include <string>
 #include <string_view>
 
@@ -30,7 +31,7 @@ private:
 		std::string identifier;
 		std::string value;
 		std::string text;
-		bool init = false;
+		bool init;
 	};
 	std::vector<Value> enum_entries;
 
@@ -42,18 +43,6 @@ private:
 
 	std::vector<std::string> namespaces;
 	std::set<std::string> includes;
-
-//	std::set<std::string> includes_hpp;
-//	std::set<std::string> includes_cpp;
-
-//	std::vector<std::string> functions;
-//
-//	struct Info {
-//		std::string name;
-//		std::string type;
-//		std::string value;
-//	};
-//	std::vector<Info> infos;
 
 private:
 //	const Value& find_init() {
@@ -87,22 +76,13 @@ public:
 	}
 
 public:
-//	void function(std::string_view fmt_function) {
-//		functions.emplace_back(fmt_function);
-//	}
-
-//	void value(std::string_view name, std::string_view value, bool init_value_ = false) {
-//		values.emplace_back(std::string(name), std::string(value), init_value_);
-//		longest_value_name = std::max(longest_value_name, name.size());
-//	}
-
 	void add_namespace(std::string_view namespace_str) {
 		namespaces.emplace_back(namespace_str);
 	}
 	void include(std::string_view include_str) {
 		includes.emplace(include_str);
 	}
-	void value(std::string_view name, std::string_view text, bool init_value_ = false) {
+	void value(std::string_view name, std::string_view text, bool init_value_ = true) {
 		enum_entries.emplace_back(std::string(name), std::to_string(enum_entries.size()), std::string(text), init_value_);
 		longest_value_name = std::max(longest_value_name, name.size());
 		longest_value_text = std::max(longest_value_text, text.size());
@@ -114,43 +94,45 @@ public:
 		properties[std::string(property)].values.emplace(std::string(enum_), std::string(value));
 	}
 
-//	void info_stub(std::string_view info_name, std::string_view info_type, std::string_view value) {
-//		infos.emplace_back(std::string(info_name), std::string(info_type), std::string(value));
-//	}
-
 	// -------------------------------------------------------------------------------------------------
 
-private:
-	template <typename... Args>
-	void out(std::string_view fmt, Args&&... args) {
-		std::cout << fmt::format(fmt, std::forward<Args>(args)...);
-//		os << fmt::format(fmt, std::forward<Args>(args)...);
-	}
-
 public:
-	std::string make() {
+	[[nodiscard]] std::string generate_source_code() const {
+		std::stringstream os;
 
-//		if (to_string) {
-//			includes_cpp.emplace("cassert");
-//			includes_hpp.emplace("string_view");
-//		}
-//
-//		if (to_stream) {
-//			includes_hpp.emplace("iosfwd");
-//			includes_hpp.emplace("string_view");
-//			includes_cpp.emplace("ostream");
-//		}
-//
-//		if (to_span) {
-//			includes_hpp.emplace("span");
-//		}
+		const auto out = [&os](std::string_view fmt, auto&&... args) {
+			os << fmt::format(fmt, std::forward<decltype(args)>(args)...);
+		};
 
-		out("// First line\n");
-		out("// Enum generator version: {}\n", enum_gen_version);
+		out("// Generated source for enum: {}\n", enum_name);
+		out("// Generator: enum {}\n", enum_gen_version);
+		out("\n");
+		out("#pragma once\n");
+		out("\n");
 
-//		out("// std\n");
+		if (gen_to_string || gen_to_stream || gen_to_span) {
+			out("// std\n");
+
+			if (gen_to_string || gen_to_stream || !properties.empty())
+				out("#include <cassert>\n");
+
+			if (gen_to_stream) {
+				out("#include <iosfwd>\n");
+				out("#include <ostream>\n");
+			}
+
+			if (gen_to_span)
+				out("#include <span>\n");
+
+			if (gen_to_string || gen_to_stream)
+				out("#include <string_view>\n");
+		}
+
+		if (!includes.empty())
+			out("//\n");
 		for (const auto& in : includes)
 			out("#include <{}>\n", in);
+
 		out("\n");
 		out("\n");
 
@@ -310,8 +292,7 @@ public:
 		for (const auto& ns : namespaces | ranges::view::reverse)
 			out("}} // namespace {}\n", ns);
 
-		std::string result;
-		return result;
+		return std::move(os).str();
 	}
 };
 
@@ -338,14 +319,13 @@ int main() {
 	eb.add_namespace("color");
 	eb.include("libv/math/vec.hpp");
 
-	eb.property("rgb", "libv::vec4f");
-	eb.value("red", "red", false);     eb.property_value("rgb", "red",   "libv::vec4f{1, 0, 0, 1}");
-	eb.value("green", "green", false); eb.property_value("rgb", "green", "libv::vec4f{0, 1, 0, 1}");
-	eb.value("blue", "blue", false);   eb.property_value("rgb", "blue",  "libv::vec4f{0, 0, 1, 1}");
-	eb.make();
+	eb.property("rgba", "libv::vec4f");
+	eb.value("red", "red", false);     eb.property_value("rgba", "red",   "libv::vec4f{1, 0, 0, 1}");
+	eb.value("green", "green", false); eb.property_value("rgba", "green", "libv::vec4f{0, 1, 0, 1}");
+	eb.value("blue", "blue", false);   eb.property_value("rgba", "blue",  "libv::vec4f{0, 0, 1, 1}");
 
 //	clipboard(result);
-//	std::cout << result << std::endl;
+	std::cout << eb.generate_source_code() << std::endl;
 
 	return 0;
 }

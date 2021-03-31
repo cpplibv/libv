@@ -644,6 +644,7 @@ place.it:
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
 
+	ext: For utf ranges check out: https://github.com/tcbrindle/utf_ranges
 	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
