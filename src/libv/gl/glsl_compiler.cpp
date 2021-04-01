@@ -43,26 +43,6 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 //auto ImplGLSLCompiler::extract_inspect(const std::string_view line) const noexcept {
-//	struct Result {
-//		std::string_view name;
-//		std::string_view type;
-//		std::string_view min;
-//		std::string_view max;
-//		std::string_view init;
-//	};
-//
-//	std::optional<Result> result;
-//
-//	// Accepted: #pragma inspect           uniform vec4 color;
-//	// Accepted: #pragma inspect           uniform vec4 color = vec4(0, 0, 0, 0);
-//	// Accepted: #pragma inspect(min, max) uniform vec4 color = vec4(0, 0, 0, 0);
-//	if (auto m = ctre::match<R"qq(...................)qq">(line)) {
-//		m.get<1>().to_view();
-//	}
-//	} else {
-//		return std::nullopt;
-//	}
-//}
 //
 // IDEA GEN 2:
 //		Things that inspection should/could store:
@@ -85,6 +65,22 @@ public:
 //		uniform vec4 color = vec4(0, 0, 0, 0);
 //		#inspect("name", Vector)
 //		uniform vec4 color = vec4(0, 0, 0, 0);
+//
+//	struct Result {
+//		std::string_view name;
+//		std::string_view type;
+//		std::string_view min;
+//		std::string_view max;
+//		std::string_view init;
+//	};
+//
+//	if (auto m = ctre::match<R"qq(...................)qq">(line)) {
+//		m.get<1>().to_view();
+//	}
+//	} else {
+//		return std::nullopt;
+//	}
+//}
 
 std::optional<std::string_view> ImplGLSLCompiler::extract_include(const std::string_view line) const noexcept {
 	// Accepted: #include <path> // comment
@@ -186,7 +182,7 @@ void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const 
 
 GLSLCompiler::GLSLCompiler(IncludeLoader file_loader) : loader(std::move(file_loader)) {}
 
-std::string GLSLCompiler::compile(const std::string_view source, const std::string_view filename) {
+std::string GLSLCompiler::compile(const std::string_view source, const std::string_view filename) const {
 	ImplGLSLCompiler session{loader, {}, {}, {}};
 
 	session.preprocess_includes(source, filename, 1);
@@ -194,7 +190,7 @@ std::string GLSLCompiler::compile(const std::string_view source, const std::stri
 	return std::move(session.output).str();
 }
 
-std::string GLSLCompiler::load(const std::string_view filepath) {
+std::string GLSLCompiler::load(const std::string_view filepath) const {
 	auto main_source = loader(filepath);
 
 	if (!main_source.success) {

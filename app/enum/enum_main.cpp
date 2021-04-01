@@ -1,5 +1,7 @@
 // Project: libv, File: app/enum/enum_main.cpp, Author: Császár Mátyás [Vader]
 
+// libv
+#include <libv/lua/lua.hpp>
 // ext
 #include <clip/clip.h>
 #include <fmt/format.h>
@@ -37,9 +39,9 @@ private:
 
 	struct Property {
 		std::string type;
-		std::map<std::string, std::string> values;
+		std::map<std::string, std::string> values; // Enum entry name -> Property value
 	};
-	std::map<std::string, Property> properties;
+	std::map<std::string, Property> properties; // Property name -> Property
 
 	std::vector<std::string> namespaces;
 	std::set<std::string> includes;
@@ -76,22 +78,22 @@ public:
 	}
 
 public:
-	void add_namespace(std::string_view namespace_str) {
-		namespaces.emplace_back(namespace_str);
+	void add_namespace(std::string namespace_str) {
+		namespaces.emplace_back(std::move(namespace_str));
 	}
-	void include(std::string_view include_str) {
-		includes.emplace(include_str);
+	void include(std::string include_str) {
+		includes.emplace(std::move(include_str));
 	}
-	void value(std::string_view name, std::string_view text, bool init_value_ = true) {
-		enum_entries.emplace_back(std::string(name), std::to_string(enum_entries.size()), std::string(text), init_value_);
+	void value(std::string name, std::string text, bool init_value_ = true) {
+		enum_entries.emplace_back(std::move(name), std::to_string(enum_entries.size()), std::move(text), init_value_);
 		longest_value_name = std::max(longest_value_name, name.size());
 		longest_value_text = std::max(longest_value_text, text.size());
 	}
-	void property(std::string_view name, std::string_view type) {
-		properties.emplace(std::string(name), std::string(type));
+	void property(std::string property_name, std::string property_type) {
+		properties[std::move(property_name)].type = std::move(property_type);
 	}
-	void property_value(std::string_view property, std::string_view enum_, std::string_view value) {
-		properties[std::string(property)].values.emplace(std::string(enum_), std::string(value));
+	void property_value(std::string property_name, std::string enum_, std::string value) {
+		properties[std::move(property_name)].values.emplace(std::move(enum_), std::move(value));
 	}
 
 	// -------------------------------------------------------------------------------------------------
@@ -150,28 +152,33 @@ public:
 
 		out("\n");
 		out("struct {} {{\n", class_enum_type_name);
+		out("public:\n");
+		out("	using enum_type = {};\n", enum_name);
+		out("	using underlying_type = {};\n", enum_type);
+
+		out("\n");
 		out("private:\n");
-		out("	{} enum_value_;\n", enum_name);
+		out("	enum_type enum_value_;\n");
 
 		out("\n");
 		out("public:\n");
-		out("	/* implicit */ constexpr inline {}({} value) noexcept :\n", class_enum_type_name, enum_name);
+		out("	/* implicit */ constexpr inline {}(enum_type value) noexcept :\n", class_enum_type_name);
 		out("		enum_value_(value) {{\n");
 		out("	}}\n");
 		out("\n");
-		out("	[[nodiscard]] constexpr inline operator {}() const noexcept {{\n", enum_name);
+		out("	[[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
 		out("		return enum_value_;\n");
 		out("	}}\n");
 		out("\n");
-		out("	[[nodiscard]] constexpr inline {} enum_value() const noexcept {{\n", enum_name);
+		out("	[[nodiscard]] constexpr inline enum_type enum_value() const noexcept {{\n");
 		out("		return enum_value_;\n");
 		out("	}}\n");
 		out("\n");
-		out("	[[nodiscard]] constexpr inline {} underlying() const noexcept {{\n", enum_type);
-		out("		return static_cast<{}>(enum_value_);\n", enum_type);
+		out("	[[nodiscard]] constexpr inline underlying_type underlying() const noexcept {{\n");
+		out("		return static_cast<underlying_type>(enum_value_);\n");
 		out("	}}\n");
 		out("\n");
-		out("	[[nodiscard]] constexpr inline {} value() const noexcept {{\n", enum_name);
+		out("	[[nodiscard]] constexpr inline enum_type value() const noexcept {{\n");
 		out("		return enum_value();\n");
 		out("	}}\n");
 
@@ -243,10 +250,15 @@ public:
 
 		out("\n");
 		out("class {} {{\n", class_enum_state_name);
+		out("public:\n");
+		out("	using enum_type = {};\n", enum_name);
+		out("	using underlying_type = {};\n", enum_type);
+
+		out("\n");
 		out("private:\n");
-		out("	static constexpr {} table_enum_values[] = {{\n", enum_name);
+		out("	static constexpr enum_type table_enum_values[] = {{\n");
 		for (const auto& enum_entry : enum_entries)
-			out("			{}::{},\n", enum_name, enum_entry.identifier);
+			out("			enum_type::{},\n", enum_entry.identifier);
 		out("	}};\n");
 		out("\n");
 		out("public:\n");
@@ -254,7 +266,7 @@ public:
 
 		if (gen_to_span) {
 			out("\n");
-			out("	[[nodiscard]] static std::span<const {}> values() noexcept {{\n", enum_name);
+			out("	[[nodiscard]] static std::span<const enum_type> values() noexcept {{\n");
 			out("		return table_enum_values;\n");
 			out("	}}\n");
 		}
@@ -298,6 +310,82 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
+struct EnumBuilderLua {
+	libv::lua::State lua;
+	std::optional<EnumBuilder> eb;
+
+	EnumBuilderLua() {
+		lua.set_function("enum", [this](std::string name, std::string type) {
+			eb.emplace(std::move(name), std::move(type));
+		});
+
+		lua.set_function("namespace", [this](std::string name) {
+			eb->add_namespace(std::move(name));
+		});
+
+		lua.set_function("include", [this](std::string name) {
+			eb->include(std::move(name));
+		});
+
+		lua.set_function("property", [this](std::string name, std::string type) {
+			eb->property(name, type);
+
+			auto property_function = sol::make_object(lua, [this, name, type](std::string value) {
+				auto property_marked_value = lua.create_table();
+
+				property_marked_value["name"] = name;
+				property_marked_value["value"] = value;
+
+				return property_marked_value;
+			});
+
+			return property_function;
+		});
+
+		lua.set_function("values", [this](sol::table entries) {
+			for (const auto& [entry, properties] : entries) {
+				const auto entry_str = entry.as<std::string>();
+				const auto properties_table = properties.as<sol::table>();
+				std::string text = entry_str;
+
+				for (const auto& [_, property] : properties_table) {
+					if (property.is<sol::table>()) {
+						const auto marked_property_table = property.as<sol::table>();
+						auto property_name = marked_property_table["name"].get<std::string>();
+						auto property_value = marked_property_table["value"].get<std::string>();
+
+						eb->property_value(
+								std::move(property_name),
+								entry_str,
+								std::move(property_value)
+						);
+					} else if (property.get_type() == sol::type::string) {
+						text = property.as<std::string>();
+					} else {
+						// error managment
+						std::cerr << "property tables in values can only contain string or marked property table\n";
+					}
+				}
+
+				eb->value(entry_str, text, true);
+			}
+		});
+	}
+
+	std::string generate_source_code(std::string_view source_script) {
+		auto env = sol::environment(lua, sol::create, lua.globals());
+
+		lua.script(source_script, env);
+
+		auto result = eb->generate_source_code();
+		eb.reset();
+
+		return result;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 void clipboard(const std::string& string) {
 	bool success = clip::set_text(string);
 	if (!success)
@@ -307,25 +395,42 @@ void clipboard(const std::string& string) {
 // -------------------------------------------------------------------------------------------------
 
 int main() {
-	EnumBuilder eb("color", "int32_t");
+//	EnumBuilder eb("color", "int32_t");
+//
+////	eb.gen_operator_eq = true;
+////	eb.gen_operator_rel = true;
+//	eb.gen_to_string = true;
+//	eb.gen_to_stream = true;
+//	eb.gen_to_span = true;
+//
+//	eb.add_namespace("libv::ns");
+//	eb.add_namespace("color");
+//	eb.include("libv/math/vec.hpp");
+//
+//	eb.property("rgba", "libv::vec4f");
+//	eb.value("red", "red", false);     eb.property_value("rgba", "red",   "libv::vec4f{1, 0, 0, 1}");
+//	eb.value("green", "green", false); eb.property_value("rgba", "green", "libv::vec4f{0, 1, 0, 1}");
+//	eb.value("blue", "blue", false);   eb.property_value("rgba", "blue",  "libv::vec4f{0, 0, 1, 1}");
 
-//	eb.gen_operator_eq = true;
-//	eb.gen_operator_rel = true;
-	eb.gen_to_string = true;
-	eb.gen_to_stream = true;
-	eb.gen_to_span = true;
+	EnumBuilderLua eb;
 
-	eb.add_namespace("libv::ns");
-	eb.add_namespace("color");
-	eb.include("libv/math/vec.hpp");
+	const auto script = R"(
+		enum("color", "int32_t")
+		namespace("libv::ns")
+		include("libv/math/vec.hpp")
+		rgba = property("rgba", "libv::vec4f")
 
-	eb.property("rgba", "libv::vec4f");
-	eb.value("red", "red", false);     eb.property_value("rgba", "red",   "libv::vec4f{1, 0, 0, 1}");
-	eb.value("green", "green", false); eb.property_value("rgba", "green", "libv::vec4f{0, 1, 0, 1}");
-	eb.value("blue", "blue", false);   eb.property_value("rgba", "blue",  "libv::vec4f{0, 0, 1, 1}");
+--		custom_function("int calc() { return 42; }")
+		values{
+				red =   { rgba("libv::vec4f{1, 0, 0, 1}") },
+				green = { rgba("libv::vec4f{0, 1, 0, 1}") },
+				blue =  { rgba("libv::vec4f{0, 0, 1, 1}") },
+				text =  { "Te-xt", rgba("libv::vec4f{0, 0, 1, 1}") },
+		}
+)";
 
 //	clipboard(result);
-	std::cout << eb.generate_source_code() << std::endl;
+	std::cout << eb.generate_source_code(script) << std::endl;
 
 	return 0;
 }
