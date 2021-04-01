@@ -1,18 +1,19 @@
-// Project: libv, File: app/enum/example.hpp, Author: Császár Mátyás [Vader]
+// Generated source for enum: color
+// Generator: enum v14
 
 #pragma once
 
 // std
-#include <span>
-#include <cstdint>
-#include <string_view>
-// pro
-#include <libv/math/vec.hpp>
+#include <cassert>
+#include <iosfwd>
 #include <ostream>
+#include <span>
+#include <string_view>
+//
+#include <libv/math/vec.hpp>
 
 
 namespace libv::ns {
-namespace color {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -22,36 +23,42 @@ enum class color : int32_t {
 	blue = 2,
 };
 
+// --- color_type ---
+
 struct color_type {
+public:
+	using enum_type = color;
+	using underlying_type = int32_t;
+
 private:
-	color enum_value_;
+	enum_type enum_value_;
 
 public:
-	/* implicit */ constexpr inline color_type(color value) noexcept :
+	/* implicit */ constexpr inline color_type(enum_type value) noexcept :
 			enum_value_(value) {
 	}
 
-	[[nodiscard]] constexpr inline operator color() const noexcept {
+	/* implicit */ [[nodiscard]] constexpr inline operator enum_type() const noexcept {
 		return enum_value_;
 	}
 
-	[[nodiscard]] constexpr inline color enum_value() const noexcept {
+	[[nodiscard]] constexpr inline enum_type enum_value() const noexcept {
 		return enum_value_;
 	}
 
-	[[nodiscard]] constexpr inline int32_t underlying() const noexcept {
-		return static_cast<int32_t>(enum_value_);
+	[[nodiscard]] constexpr inline underlying_type underlying() const noexcept {
+		return static_cast<underlying_type>(enum_value_);
 	}
 
-	[[nodiscard]] constexpr inline color value() const noexcept {
+	[[nodiscard]] constexpr inline enum_type value() const noexcept {
 		return enum_value();
 	}
 
 private:
 	static constexpr std::string_view table_to_string[] = {
-			"red", // red
-			"green", // green
-			"blue", // blue
+			"Red",   // red
+			"Green", // green
+			"Blue",  // blue
 	};
 
 public:
@@ -65,30 +72,37 @@ public:
 	}
 
 private:
-	static constexpr libv::vec4f table_rgb[] = {
+	static constexpr libv::vec4f table_rgba[] = {
 			libv::vec4f{1, 0, 0, 1}, // red
 			libv::vec4f{0, 1, 0, 1}, // green
 			libv::vec4f{0, 0, 1, 1}, // blue
 	};
 
 public:
-	[[nodiscard]] constexpr inline libv::vec4f rgb() const noexcept {
+	[[nodiscard]] constexpr inline libv::vec4f rgba() const noexcept {
 		assert(underlying() >= 0 && underlying() < 3);
-		return table_rgb[underlying()];
+		return table_rgba[underlying()];
 	}
 };
 
+// --- color_state ---
+
 class color_state {
-	static constexpr color table_enum_values[] = {
-			color::red,
-			color::green,
-			color::blue,
+public:
+	using enum_type = color;
+	using underlying_type = int32_t;
+
+private:
+	static constexpr enum_type table_enum_values[] = {
+			enum_type::red,
+			enum_type::green,
+			enum_type::blue,
 	};
 
 public:
 	static constexpr size_t size = 3;
 
-	[[nodiscard]] static std::span<const color> values() noexcept {
+	[[nodiscard]] static std::span<const enum_type> values() noexcept {
 		return table_enum_values;
 	}
 };
@@ -97,13 +111,16 @@ public:
 	return color_type(enum_value).to_string();
 }
 
+// --- Global ADL functions ---
+
 [[nodiscard]] constexpr inline color_type type(color enum_value) noexcept {
 	return color_type(enum_value);
 }
+
+// --- Global state variables ---
 
 static constexpr color_state color_enum;
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace color
 } // namespace libv::ns

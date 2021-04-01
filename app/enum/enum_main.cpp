@@ -6,6 +6,7 @@
 #include <clip/clip.h>
 #include <fmt/format.h>
 #include <range/v3/view/reverse.hpp>
+#include <range/v3/view/transform.hpp>
 // std
 #include <iostream>
 #include <map>
@@ -151,6 +152,9 @@ public:
 		out("}};\n");
 
 		out("\n");
+		out("// --- {} ---\n", class_enum_type_name);
+
+		out("\n");
 		out("struct {} {{\n", class_enum_type_name);
 		out("public:\n");
 		out("	using enum_type = {};\n", enum_name);
@@ -166,7 +170,7 @@ public:
 		out("		enum_value_(value) {{\n");
 		out("	}}\n");
 		out("\n");
-		out("	[[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
+		out("	/* implicit */ [[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
 		out("		return enum_value_;\n");
 		out("	}}\n");
 		out("\n");
@@ -211,8 +215,11 @@ public:
 			out("\n");
 			out("private:\n");
 			out("	static constexpr std::string_view table_to_string[] = {{\n");
+
+			const auto longest_text = std::ranges::max(enum_entries | ranges::v3::view::transform([](const Value& v) { return v.text.size(); }));
+
 			for (const auto& enum_entry : enum_entries)
-				out("			\"{}\", // {}\n", enum_entry.text, enum_entry.identifier);
+				out("			{:{}} // {}\n", '"' + enum_entry.text + "\",", longest_text + 3, enum_entry.identifier);
 			out("	}};\n");
 			out("\n");
 			out("public:\n");
@@ -235,8 +242,11 @@ public:
 			out("\n");
 			out("private:\n");
 			out("	static constexpr {} table_{}[] = {{\n", property.type, property_name);
+
+			const auto longest_prop_value = std::ranges::max(enum_entries | ranges::v3::view::transform([&](const Value& v) { return property.values.at(v.identifier).size(); }));
+
 			for (const auto& enum_entry : enum_entries)
-				out("			{}, // {}\n", property.values.at(enum_entry.identifier), enum_entry.identifier);
+				out("			{:{}} // {}\n", property.values.at(enum_entry.identifier) + ',', longest_prop_value + 1, enum_entry.identifier);
 			out("	}};\n");
 			out("\n");
 			out("public:\n");
@@ -247,6 +257,9 @@ public:
 		}
 
 		out("}};\n"); // End of enum_type class
+
+		out("\n");
+		out("// --- {} ---\n", class_enum_state_name);
 
 		out("\n");
 		out("class {} {{\n", class_enum_state_name);
@@ -290,9 +303,15 @@ public:
 		}
 
 		out("\n");
+		out("// --- {} ---\n", "Global ADL functions");
+
+		out("\n");
 		out("[[nodiscard]] constexpr inline {} type({} enum_value) noexcept {{\n", class_enum_type_name, enum_name);
 		out("	return {}(enum_value);\n", class_enum_type_name);
 		out("}}\n");
+
+		out("\n");
+		out("// --- {} ---\n", "Global state variables");
 
 		out("\n");
 		out("static constexpr {} {};\n", class_enum_state_name, global_var_enum_state_name);
@@ -342,32 +361,25 @@ struct EnumBuilderLua {
 			return property_function;
 		});
 
-		lua.set_function("values", [this](sol::table entries) {
-			for (const auto& [entry, properties] : entries) {
-				const auto entry_str = entry.as<std::string>();
-				const auto properties_table = properties.as<sol::table>();
-				std::string text = entry_str;
+		lua.set_function("value", [this](std::string entry, std::string text, sol::table properties) {
+			eb->value(entry, text, true);
 
-				for (const auto& [_, property] : properties_table) {
-					if (property.is<sol::table>()) {
-						const auto marked_property_table = property.as<sol::table>();
-						auto property_name = marked_property_table["name"].get<std::string>();
-						auto property_value = marked_property_table["value"].get<std::string>();
-
-						eb->property_value(
-								std::move(property_name),
-								entry_str,
-								std::move(property_value)
-						);
-					} else if (property.get_type() == sol::type::string) {
-						text = property.as<std::string>();
-					} else {
-						// error managment
-						std::cerr << "property tables in values can only contain string or marked property table\n";
-					}
+			for (const auto& [_, property] : properties) {
+				if (!property.is<sol::table>()) {
+					// error management
+					std::cerr << "property tables in values can only contain string or marked property table\n";
+					continue;
 				}
 
-				eb->value(entry_str, text, true);
+				const auto marked_property_table = property.as<sol::table>();
+				auto property_name = marked_property_table["name"].get<std::string>();
+				auto property_value = marked_property_table["value"].get<std::string>();
+
+				eb->property_value(
+						std::move(property_name),
+						entry,
+						std::move(property_value)
+				);
 			}
 		});
 	}
@@ -421,12 +433,9 @@ int main() {
 		rgba = property("rgba", "libv::vec4f")
 
 --		custom_function("int calc() { return 42; }")
-		values{
-				red =   { rgba("libv::vec4f{1, 0, 0, 1}") },
-				green = { rgba("libv::vec4f{0, 1, 0, 1}") },
-				blue =  { rgba("libv::vec4f{0, 0, 1, 1}") },
-				text =  { "Te-xt", rgba("libv::vec4f{0, 0, 1, 1}") },
-		}
+		value("red"  , "Red"  , {rgba("libv::vec4f{1, 0, 0, 1}")})
+		value("green", "Green", {rgba("libv::vec4f{0, 1, 0, 1}")})
+		value("blue" , "Blue" , {rgba("libv::vec4f{0, 0, 1, 1}")})
 )";
 
 //	clipboard(result);
