@@ -67,10 +67,6 @@ public:
 		return table_to_string[underlying()];
 	}
 
-	friend std::ostream& operator<<(std::ostream& os, const color_type var) {
-		return os << var.to_string();
-	}
-
 private:
 	static constexpr libv::vec4f table_rgba[] = {
 			libv::vec4f{1, 0, 0, 1}, // red
@@ -107,11 +103,19 @@ public:
 	}
 };
 
+// --- Global ADL functions ---
+
 [[nodiscard]] constexpr inline std::string_view to_string(color enum_value) noexcept {
 	return color_type(enum_value).to_string();
 }
 
-// --- Global ADL functions ---
+std::ostream& operator<<(std::ostream& os, const color var) {
+	return os << color_type(var).to_string();
+}
+
+[[nodiscard]] constexpr inline int32_t underlying(color enum_value) noexcept {
+	return static_cast<int32_t>(enum_value);
+}
 
 [[nodiscard]] constexpr inline color_type type(color enum_value) noexcept {
 	return color_type(enum_value);

@@ -227,13 +227,6 @@ public:
 			out("		assert(underlying() >= 0 && underlying() < {});\n", enum_entries.size());
 			out("		return table_to_string[underlying()];\n");
 			out("	}}\n");
-
-			if (gen_to_stream) {
-				out("\n");
-				out("	friend std::ostream& operator<<(std::ostream& os, const {} var) {{\n", class_enum_type_name);
-				out("		return os << var.to_string();\n");
-				out("	}}\n");
-			}
 		}
 
 		// TODO P1: parse
@@ -295,15 +288,27 @@ public:
 
 		out("}};\n");
 
-		if (gen_to_string) {
+		out("\n");
+		out("// --- {} ---\n", "Global ADL functions");
+
+		if (gen_to_stream || gen_to_string) {
 			out("\n");
 			out("[[nodiscard]] constexpr inline std::string_view to_string({} enum_value) noexcept {{\n", enum_name);
 			out("	return {}(enum_value).to_string();\n", class_enum_type_name);
 			out("}}\n");
+
+			if (gen_to_stream) {
+				out("\n");
+				out("std::ostream& operator<<(std::ostream& os, const {} var) {{\n", enum_name);
+				out("	return os << {}(var).to_string();\n", class_enum_type_name);
+				out("}}\n");
+			}
 		}
 
 		out("\n");
-		out("// --- {} ---\n", "Global ADL functions");
+		out("[[nodiscard]] constexpr inline {} underlying({} enum_value) noexcept {{\n", enum_type, enum_name);
+		out("	return static_cast<{}>(enum_value);\n", enum_type);
+		out("}}\n");
 
 		out("\n");
 		out("[[nodiscard]] constexpr inline {} type({} enum_value) noexcept {{\n", class_enum_type_name, enum_name);
@@ -516,7 +521,13 @@ int main() {
 		auto foo6() {
 		    return color_enum.values();
 		}
-
+		auto foo7() {
+		    for (const auto c : color_enum.values());
+		}
+		void foo8(std::ostream& os, color c) {
+		    os << c;
+		    os << type(c);
+		}
  */
 
 //CONSTEXPR MAP - Might be useful for something
