@@ -628,7 +628,7 @@ app.editor:
 
 ext: Acquire a crypto lib
 ext: Acquire a hashing lib (the MD5 will not be enough forever)
-
+ext: Edit Distance https://github.com/erikerlandson/edit_distance
 
 app.enum: new enum gen | rename and refactor
 	- simple enum class, with a SINGLE function that explodes it into a struct
