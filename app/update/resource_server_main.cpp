@@ -68,7 +68,7 @@ int main(int argc, const char** argv) {
 		auto server = libv::update::ResourceServer{resource_settings};
 
 		for (const auto& path : libv::view::glob_generic_path("app/update/res/update", "test-dev-*-*.update")) {
-			const auto id = "app.update::dev::update::" + path.generic_string();
+			const auto id = "app.update::update::dev::" + path.generic_string();
 			const auto file = "app/update/res/update/" + path.generic_string();
 			const auto cache = libv::update::resource_cache_policy::always;
 
@@ -76,7 +76,7 @@ int main(int argc, const char** argv) {
 		}
 
 		for (const auto& path : libv::view::glob_generic_path("app/update/res/version", "v*/**")) {
-			const auto id = "app.update::dev::version::" + path.generic_string();
+			const auto id = "app.update::version::dev::" + path.generic_string();
 			const auto file = "app/update/res/version/" + path.generic_string();
 			const auto is_file = std::filesystem::is_regular_file(file);
 			const auto cache = libv::update::resource_cache_policy::never;

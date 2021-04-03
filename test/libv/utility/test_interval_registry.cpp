@@ -267,4 +267,39 @@ TEST_CASE("IntervalRegistry off-by-one tests", "[libv.utility.interval_registry]
 	CHECK(ir.empty());
 }
 
+TEST_CASE("IntervalRegistry empty interval is not stored", "[libv.utility.interval_registry]") {
+	libv::IntervalRegistry ir;
+
+	ir.mark(0, 0);
+	CHECK(ir.empty());
+
+	ir.mark(100, 0);
+	CHECK(ir.empty());
+
+	ir.mark(0, 100);
+	CHECK(ir.interval_count() == 1);
+	CHECK(ir.next_marked() == Interval{0, 100});
+
+	ir.mark(0, 0);
+	ir.mark(50, 0);
+	ir.mark(100, 0);
+	CHECK(ir.interval_count() == 1);
+	CHECK(ir.next_marked() == Interval{0, 100});
+}
+
+TEST_CASE("IntervalRegistry empty interval does not splits", "[libv.utility.interval_registry]") {
+	libv::IntervalRegistry ir;
+
+	ir.mark(0, 100);
+	CHECK(ir.interval_count() == 1);
+	CHECK(ir.next_marked() == Interval{0, 100});
+
+	ir.unmark(0, 0);
+	ir.unmark(50, 0);
+	ir.unmark(100, 0);
+
+	CHECK(ir.interval_count() == 1);
+	CHECK(ir.next_marked() == Interval{0, 100});
+}
+
 // -------------------------------------------------------------------------------------------------

@@ -345,7 +345,7 @@ libv.ui: The UI Paper
 		bg
 		? fg
 
-	read again once done with events http://nanapro.org/en-us/documentation/core/events.htm
+	read again once done with events http://nanapro.org/en-rs/documentation/core/events.htm
 
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 libv.ui: UI level message/event bus/system might be required:

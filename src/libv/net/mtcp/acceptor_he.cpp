@@ -79,7 +79,7 @@ public:
 			return ec;
 		}
 
-		log_net.trace("Acceptor listens to {}...", endpoint);
+		log_net.info("Acceptor listening on {}...", endpoint);
 		return ec;
 	}
 

@@ -18,7 +18,7 @@
 // -------------------------------------------------------------------------------------------------
 
 using vn = libv::update::version_number;
-using us = libv::update::update_signature;
+using rs = libv::update::resource_signature;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -65,15 +65,15 @@ int main(int argc, const char** argv) {
 
 		auto server = libv::update::UpdateServer{server_settings};
 
-		server.register_update("app.update", "dev", vn{1}, vn{2}, 99999, us{12345});
-		server.register_update("app.update", "dev", vn{2}, vn{3}, 99999, us{12345});
-		server.register_update("app.update", "dev", vn{3}, vn{6}, 99999, us{12345});
-		server.register_update("app.update", "dev", vn{4}, vn{6}, 99999, us{12345});
-		server.register_update("app.update", "dev", vn{5}, vn{6}, 99999, us{12345});
+		server.register_update("app.update", "dev", vn{1}, vn{2}, 99999, rs{12345});
+		server.register_update("app.update", "dev", vn{2}, vn{3}, 99999, rs{12345});
+		server.register_update("app.update", "dev", vn{3}, vn{6}, 99999, rs{12345});
+		server.register_update("app.update", "dev", vn{4}, vn{6}, 99999, rs{12345});
+		server.register_update("app.update", "dev", vn{5}, vn{6}, 99999, rs{12345});
 
-		server.register_update("app.update", "stable", vn{2}, vn{3}, 99999, us{12345});
-		server.register_update("app.update", "stable", vn{3}, vn{6}, 99999, us{12345});
-		server.register_update("app.update", "stable", vn{4}, vn{6}, 99999, us{12345});
+		server.register_update("app.update", "stable", vn{2}, vn{3}, 99999, rs{12345});
+		server.register_update("app.update", "stable", vn{3}, vn{6}, 99999, rs{12345});
+		server.register_update("app.update", "stable", vn{4}, vn{6}, 99999, rs{12345});
 
 		server.start();
 

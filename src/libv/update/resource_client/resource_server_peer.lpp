@@ -7,7 +7,9 @@
 #include <libv/net/mtcp/connection_he.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/codec.hpp>
+#include <libv/utility/interval_registry.hpp>
 #include <libv/utility/storage_size.hpp>
+#include <libv/utility/timer.hpp>
 // std
 //#include <deque>
 //#include <fstream>
@@ -25,13 +27,12 @@ namespace update {
 // -------------------------------------------------------------------------------------------------
 
 class TaskPool;
-//class ActiveResourceTask;
-class ActiveResourceSubTask;
+class ResourceTask;
 
 // -------------------------------------------------------------------------------------------------
 
-class ResourceClientConnection : public libv::net::mtcp::ConnectionHandler<ResourceClientConnection> {
-	static inline libv::serial::CodecClient<ResourceClientConnection, libv::archive::Binary> codec{msg_res{}};
+class ResourceServerPeer : public libv::net::mtcp::ConnectionHandler<ResourceServerPeer> {
+	static inline libv::serial::CodecClient<ResourceServerPeer, libv::archive::Binary> codec{msg_res{}};
 
 	template <typename T>
 	void send(const T& response) {
@@ -46,34 +47,30 @@ class ResourceClientConnection : public libv::net::mtcp::ConnectionHandler<Resou
 	// ---
 
 private:
-//	std::shared_ptr<ResourceFile> file;
-//	std::shared_ptr<DownloadTaskPool> tasks;
-//	std::shared_ptr<DownloadTaskPool> download_task_pool;
-//	DownloadTask download_task;
-//	GrabbedDownloadTask download_task;
 	std::mutex mutex;
 
-	std::shared_ptr<TaskPool> task_pools;
-	std::shared_ptr<ActiveResourceTask> assigned_task_;
-
 	/// Last time the connection received a data message
-	std::chrono::system_clock::time_point last_data_transfer;
-	/// Transfer rate of data messages in the last 10 second
+//	std::chrono::system_clock::time_point last_data_transfer;
+	libv::Timer last_data_transfer;
+	/// Transfer rate of data messages in the last 10 second in byte per second
 	libv::exponential_moving_average<double, 10> transfer_rate_avg_bps{libv::KB(256)};
 //	libv::exponential_moving_average<double, 10, 0.8> transfer_rate_avg_bps{libv::KB(256)}; // TODO P4: GCC 11 NTTP adjust match to 0.8
 
+	std::shared_ptr<TaskPool> task_pool;
+
+	std::shared_ptr<ResourceTask> assigned_task_;
+	bool assigned_prepare;
+	libv::IntervalRegistry assigned_work_;
+
 public:
-	explicit ResourceClientConnection(std::shared_ptr<TaskPool> task_pools, libv::net::Address address) :
-		task_pools(std::move(task_pools)) {
+	explicit ResourceServerPeer(std::shared_ptr<TaskPool> task_pool, libv::net::Address address) :
+		task_pool(std::move(task_pool)) {
 		connection.connect_async(std::move(address));
 	}
 
 public:
 	size_t download_rate_bps();
-	std::shared_ptr<ActiveResourceSubTask> assigned_task();
-	void assign_task(std::shared_ptr<ActiveResourceTask> task, size_t offset, size_t amount);
-
-//	size_t left_from_task();
+	void assign_task(std::shared_ptr<ResourceTask> task, uint64_t offset, uint64_t amount, bool prepare);
 //	void cancel_task();
 
 public:
@@ -82,7 +79,7 @@ public:
 	void receive(const msg_res::ResponseResourceNotFound& response);
 	void receive(const msg_res::ResponseResourceDescription& response);
 	void receive(const msg_res::ResponseResourceData& response);
-	void receive(const msg_res::ResponseResourceDone& response);
+	void receive(const msg_res::ResponseResourceEnd& response);
 };
 
 // -------------------------------------------------------------------------------------------------

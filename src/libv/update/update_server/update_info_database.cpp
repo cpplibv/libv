@@ -19,7 +19,7 @@ void UpdateInfoDatabase::register_update(
 		version_number version_source,
 		version_number version_target,
 		uint64_t size,
-		update_signature signature) {
+		resource_signature signature) {
 
 	const auto lock = std::unique_lock(mutex);
 

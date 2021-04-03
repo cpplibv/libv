@@ -105,6 +105,11 @@ public:
 	}
 
 public:
+	inline operator bool() const noexcept {
+		return user_object != nullptr;
+	}
+
+public:
 	inline T* operator->() const noexcept
 			requires (!std::is_void_v<T>) {
 		assert(user_object != nullptr);

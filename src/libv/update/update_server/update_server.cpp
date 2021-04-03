@@ -24,7 +24,7 @@ UpdateServer::~UpdateServer() {
 	// For the sake of forward declared unique_ptr
 }
 
-void UpdateServer::register_update(std::string program, std::string variant, version_number source, version_number target, uint64_t size, update_signature signature) {
+void UpdateServer::register_update(std::string program, std::string variant, version_number source, version_number target, uint64_t size, resource_signature signature) {
 	database->register_update(std::move(program), std::move(variant), source, target, size, signature);
 }
 

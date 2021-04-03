@@ -624,6 +624,7 @@ app.editor:
 			wildcard.**.hpp
 		| validate that no lpp file (local header file) is included from a hpp file
 		| validate pragma once is used and only used in lpp or hpp files
+		| warning on [cpp,c,cxx,...] aka source extension include
 
 
 ext: Acquire a crypto lib

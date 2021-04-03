@@ -15,7 +15,7 @@
 #include <vector>
 // pro
 #include <libv/update/version_number.hpp>
-#include <libv/update/update_signature.hpp>
+#include <libv/update/resource_signature.hpp>
 
 
 
@@ -61,10 +61,12 @@ struct msg_res {
 	struct ResponseResourceDescription {
 		std::string name;
 		uint64_t size;
+		resource_signature signature;
 
 		template <typename Archive> inline void serialize(Archive& ar) {
 			ar & LIBV_NVP(name);
 			ar & LIBV_NVP(size);
+			ar & LIBV_NVP(signature);
 		}
 	};
 
@@ -78,8 +80,12 @@ struct msg_res {
 		}
 	};
 
-	struct ResponseResourceDone {
-		template <typename Archive> inline void serialize(Archive& ar) { (void) ar; }
+	struct ResponseResourceEnd {
+		bool cancelled;
+
+		template <typename Archive> inline void serialize(Archive& ar) {
+			ar & LIBV_NVP(cancelled);
+		}
 	};
 
 	// ---------------------------------------------------------------------------------------------
@@ -96,7 +102,7 @@ struct msg_res {
 		codec.template type_server<22, ResponseResourceInvalid>();
 		codec.template type_server<23, ResponseResourceDescription>();
 		codec.template type_server<24, ResponseResourceData>();
-		codec.template type_server<25, ResponseResourceDone>();
+		codec.template type_server<25, ResponseResourceEnd>();
 	}
 };
 

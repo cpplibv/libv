@@ -1,0 +1,71 @@
+// Project: libv.update, File: src/libv/update/resource_client/task_pool.lpp, Author: Császár Mátyás [Vader]
+
+#pragma once
+
+// libv
+#include <libv/utility/interval_registry.hpp>
+// std
+#include <span>
+#include <string>
+// pro
+#include <libv/update/resource_signature.hpp>
+
+
+namespace libv {
+namespace update {
+
+// -------------------------------------------------------------------------------------------------
+
+class ResourceTask {
+public:
+	using interval_span = std::span<const IntervalRegistry::Interval>;
+
+private:
+	std::string identifier_;
+	uint64_t size_ = 0;
+	resource_signature signature_;
+
+public:
+	ResourceTask(std::string identifier) :
+		identifier_(std::move(identifier)) {}
+
+	virtual ~ResourceTask() {}
+
+public:
+	const std::string& identifier() const {
+		return identifier_;
+	}
+
+	interval_span start(uint64_t size, resource_signature signature) {
+		signature_ = signature;
+		size_ = size;
+		return do_start(size);
+	};
+
+	void write(uint64_t offset, std::span<const std::byte> data) {
+		do_write(offset, data);
+	}
+
+	bool is_complete();
+
+	void done() {};
+
+private:
+	virtual interval_span do_start(uint64_t size) = 0;
+	virtual void do_write(uint64_t offset, std::span<const std::byte> data) = 0;
+	virtual void do_done() {};
+};
+
+// -------------------------------------------------------------------------------------------------
+
+//class ResourceTaskMemory : ResourceTask {
+//  void* to;
+//
+//public:
+//	virtual void do_start() override;
+//};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace update
+} // namespace libv

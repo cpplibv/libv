@@ -5,9 +5,10 @@
 // libv
 #include <libv/algo/erase_unstable.hpp>
 // std
-//#include <algorithm>
+#include <algorithm>
+#include <random>
 // pro
-#include <libv/update/resource_client/resource_client_connection.lpp>
+#include <libv/update/resource_client/resource_server_peer.lpp>
 
 //// std
 //#include <deque>
@@ -31,110 +32,148 @@ namespace update {
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<ActiveResourceSubTask> TaskPool::_assign_subtask_or_idle(Connection connection) {
-	const auto download_rate_bps = connection->download_rate_bps();
-//	const auto subtask_max_size = download_speed_bps * 5;
-//
-//	std::shared_ptr<ResourceTask> base_task;
-//	std::shared_ptr<ActiveResourceTask> active_task(base_task);
-//	active_task->file.create(base_task->size);
-//
-//	const auto next_interval = active_task->work.next_marked();
-//	const auto next_work_offset = next_interval.offset;
-//	const auto next_work_size = std::min(next_interval.size, subtask_max_size);
-//
-//	std::shared_ptr<ActiveResourceSubTask> active_sub_task(active_task);
-//
-//	active_task->work.unmark(next_work_offset, next_work_size);
-//	active_sub_task->work.mark(next_work_offset, next_work_size);
+struct ActiveResourceTask {
+	std::shared_ptr<ResourceTask> base_task;
+	uint64_t offset;
+	uint64_t size;
+};
 
-	if (subtask)
-		connection->assign_task(std::move(subtask));
-	else
-		idles.emplace_back(std::move(connection));
+// -------------------------------------------------------------------------------------------------
+
+TaskPool::TaskPool(libv::net::IOContext& io_context, std::vector<libv::net::Address> servers_) :
+	io_context(io_context),
+	server_addresses(std::move(servers_)) {
+
+	std::random_device rd; // Expensive random number engine (but only a few uses, not worth to spin up an mt)
+	std::ranges::shuffle(server_addresses, rd);
+
+	const auto server_peer_count = std::min(static_cast<int>(server_addresses.size()), 2);
+//	const auto server_peer_count = std::min(static_cast<int>(server_addresses.size()), settings.limit_active_server_peer_count);
+	for (int i = 0; i < server_peer_count; ++i)
+		connections.emplace_back(io_context, shared_from_this(), server_addresses[i]);
+
+	// <<< In case of disconnect from a server_peer go for the next
+	// <<< In case there is no more server_peer left and there are no more server report failure
 }
 
-void TaskPool::queue_task(std::shared_ptr<ResourceTask> task) {
-	const auto lock = std::unique_lock(mutex);
+TaskPool::~TaskPool() {
 
-//	task_queue.emplace_back(std::move(task));
-//	done_bl.reset();
-//
-//	if (idles.empty())
-//		return;
-//
-//	const auto last_it = idles.begin() + (idles.size() - 1);
-//	const auto last = std::move(*last_it);
-//	idles.erase(last_it);
-//
-//	lock.unlock();
-//
-//	last->assign_task();
+}
 
-	while (true) {
-		if (!idles.empty())
-			queue_this_task();
+// -------------------------------------------------------------------------------------------------
+
+void TaskPool::_assign_next_task_or_enter_idle(Connection connection) {
+	const auto download_rate_bps = connection->download_rate_bps();
+	const auto download_max = download_rate_bps * settings_download_block_size_in_time;
+
+	if (active_task_queue.empty()) {
+		if (waiting_task_queue.empty()) {
+			idles.emplace_back(std::move(connection));
+
+			if (idles.size() == connections.size())
+				done_bl.raise();
 			return;
+		}
 
-		if (no_more_subtask_from_this_one_to_hand_out())
-			return;
-
-		hand_out_subtask_to_one_idle();
-		erase_that_idle_from_idles();
+		auto& task = waiting_task_queue.front();
+		connection->assign_task(std::move(task), 0, 0, true);
+		waiting_task_queue.pop_front();
+		return;
 	}
 
-	// pass a subtasks to every idle task
+	auto& task = active_task_queue.front();
+
+	if (task.size <= download_max) {
+		const auto offset = task.offset;
+		const auto size = task.size;
+		connection->assign_task(std::move(task.base_task), offset, size, false);
+		active_task_queue.pop_front();
+
+	} else {
+		const auto offset = task.offset;
+		const auto size = download_max;
+		task.offset += size;
+		task.size -= size;
+		connection->assign_task(task.base_task, offset, size, false);
+	}
+}
+
+std::optional<TaskPool::Connection> TaskPool::_grab_idle() {
+	std::optional<TaskPool::Connection> result;
+
+	if (!idles.empty()) {
+		const auto last_it = idles.begin() + (idles.size() - 1);
+		result.emplace(std::move(*last_it));
+		idles.erase(last_it);
+	}
+
+	return result;
+}
+
+void TaskPool::queue_task_file(std::string identifier, std::filesystem::path filepath) {
+	auto task = std::make_shared<ResourceTaskFile>(std::move(identifier), std::move(filepath));
+
+	auto lock = std::unique_lock(mutex);
+	if (auto idle = _grab_idle()) {
+		idle.value()->assign_task(std::move(task), 0, 0, true);
+
+	} else {
+		waiting_task_queue.emplace_back(std::move(task));
+	}
+}
+
+void TaskPool::add_active_task(std::shared_ptr<ResourceTask> task, size_t offset, size_t size) {
+	auto lock = std::unique_lock(mutex);
+	done_bl.reset();
+
+	while (auto idle = _grab_idle()) {
+		const auto& connection = idle.value();
+		const auto download_rate_bps = connection->download_rate_bps();
+		const auto download_max = download_rate_bps * settings_download_block_size_in_time;
+		const auto task_size = std::min(size, download_max);
+		connection->assign_task(task, offset, task_size, false);
+
+		offset += task_size;
+		size -= task_size;
+
+		if (size == 0)
+			return;
+	}
+
+	active_task_queue.emplace_back(std::move(task), offset, size);
 }
 
 void TaskPool::wait() {
 	done_bl.wait();
 }
 
-void TaskPool::done(Connection connection, std::shared_ptr<ActiveResourceTask> task) {
+void TaskPool::task_finished(Connection connection) {
 	const auto lock = std::unique_lock(mutex);
 
-	//	const auto lock = std::unique_lock(mutex);
-	//
-	//	std::optional<ResourceTask> result;
-	//
-	//	if (queue.empty()) {
-	//		idles.emplace(std::move(connection));
-	//		if (idles.size() == connections.size())
-	//			done.raise();
-	//
-	//	} else {
-	//		result.emplace(std::move(queue.front()));
-	//		queue.pop_front();
-	//	}
-	//
-	//	return result;
-
-	if (task->remaining_work.empty())
-		libv::erase_unstable(task_actives, task);
-
-	_assign_subtask_or_idle(std::move(connection));
-	if (task_actives.empty() && task_queue.empty());
-		done_bl.raise();
+	_assign_next_task_or_enter_idle(std::move(connection));
 }
 
 void TaskPool::connect(Connection connection) {
 	const auto lock = std::unique_lock(mutex);
 
 	connections.emplace(connection);
-	_assign_subtask_or_idle(std::move(connection));
+
+	_assign_next_task_or_enter_idle(std::move(connection));
+
+//  if no connection was establiesed in X time
+//      -> report failure
 }
 
 void TaskPool::disconnect(Connection connection) {
 	const auto lock = std::unique_lock(mutex);
 
-	maintain_task_actives_question_mark();
-
-	if (const auto assigned_task = connection->assigned_task())
-		// Hand back the remaining sub task's work to the main task
-		assigned_task->parent_task->remaining_work.mark(assigned_task->work);
-
 	connections.erase(connection);
 	libv::erase_unstable(idles, connection);
+
+//	if this was the last connection
+//  	and we did not finished
+//  	and it is not early stop case
+//  	-> report failure
 }
 
 // -------------------------------------------------------------------------------------------------

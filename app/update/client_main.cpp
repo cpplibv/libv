@@ -26,7 +26,7 @@ int main(int argc, const char** argv) {
 
 	const auto tmp_version = args.require<uint64_t>
 			("-v", "--version")
-			("tmp", "tmp");
+			("tmp", "tmp") = 2;
 
 	if (!args.standard_validate(argc, argv, std::cerr, 100))
 		return EXIT_FAILURE;
@@ -47,11 +47,11 @@ int main(int argc, const char** argv) {
 	libv::update::ResourceClient rc(io_context, settings);
 
 	const std::filesystem::path save_dir = "tmp/";
-	rc.download_file("app.update::dev::update::app.update-dev-02-00.update", save_dir / "app.update-dev-02-00.update");
-	rc.download_file("app.update::dev::update::app.update-dev-02-01.update", save_dir / "app.update-dev-02-01.update");
-	rc.download_file("app.update::dev::update::app.update-dev-02-02.update", save_dir / "app.update-dev-02-02.update");
-	rc.download_file("app.update::dev::update::app.update-dev-02-03.update", save_dir / "app.update-dev-02-03.update");
-	rc.download_file("app.update::dev::update::app.update-dev-02-04.update", save_dir / "app.update-dev-02-04.update");
+	rc.download_file("app.update::update::dev::app.update-dev-02-00.update", save_dir / "app.update-dev-02-00.update");
+	rc.download_file("app.update::update::dev::app.update-dev-02-01.update", save_dir / "app.update-dev-02-01.update");
+	rc.download_file("app.update::update::dev::app.update-dev-02-02.update", save_dir / "app.update-dev-02-02.update");
+	rc.download_file("app.update::update::dev::app.update-dev-02-03.update", save_dir / "app.update-dev-02-03.update");
+	rc.download_file("app.update::update::dev::app.update-dev-02-04.update", save_dir / "app.update-dev-02-04.update");
 	rc.wait();
 
 	// -------------------------------------------------------------------------------------------------

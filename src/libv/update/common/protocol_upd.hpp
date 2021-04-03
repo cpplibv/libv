@@ -12,7 +12,7 @@
 #include <iostream>
 // pro
 #include <libv/update/version_number.hpp>
-#include <libv/update/update_signature.hpp>
+#include <libv/update/resource_signature.hpp>
 
 
 namespace libv {
@@ -49,7 +49,7 @@ struct msg_upd {
 			version_number version_source;
 			version_number version_target;
 			uint64_t size;
-			update_signature signature;
+			resource_signature signature;
 
 			template <class Archive> inline void serialize(Archive& ar) {
 				ar & LIBV_NVP(version_source);

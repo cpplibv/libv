@@ -48,6 +48,7 @@ class ResourcePeer : public libv::net::mtcp::ConnectionHandler<ResourcePeer> {
 		uint64_t requested_amount = 0;
 		uint64_t next_offset = 0;
 		std::shared_ptr<ResourceFile> resource;
+		bool cancelled = false;
 	};
 
 	std::optional<Task> current_task;

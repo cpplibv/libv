@@ -3,8 +3,8 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
+#include <libv/math/exponential_moving_average.hpp>
 #include <libv/utility/approx.hpp>
-#include <libv/utility/exponential_moving_average.hpp>
 
 
 //#include <random>

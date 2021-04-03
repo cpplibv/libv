@@ -9,7 +9,7 @@
 #include <variant>
 // pro
 #include <libv/update/common/protocol_upd.hpp>
-#include <libv/update/update_signature.hpp>
+#include <libv/update/resource_signature.hpp>
 #include <libv/update/version_number.hpp>
 
 
@@ -36,7 +36,7 @@ using update_route_variant = std::variant<msg_upd::UpdateRoute, msg_upd::Version
 struct UpdateInfo {
 	class VersionInfo* target = nullptr;
 	uint64_t size;
-	update_signature signature;
+	resource_signature signature;
 };
 
 struct VersionInfo {
@@ -63,7 +63,7 @@ class UpdateInfoDatabase {
 
 public:
 	void register_update(std::string program, std::string variant,
-			version_number source, version_number target, uint64_t size, update_signature signature);
+			version_number source, version_number target, uint64_t size, resource_signature signature);
 	void debug_dump();
 	update_route_variant get_update_route(std::string program_name, std::string variant_name, version_number version);
 };

@@ -2,6 +2,8 @@
 
 #pragma once
 
+// std
+#include <span>
 // ext
 #include <boost/container/flat_set.hpp>
 
@@ -33,9 +35,13 @@ public:
 	inline ~IntervalRegistry() = default;
 
 public:
-	inline Interval next_marked() noexcept {
+	[[nodiscard]] inline Interval next_marked() const noexcept {
 		assert(!marked.empty());
 		return *marked.begin();
+	}
+
+	[[nodiscard]] inline std::span<const Interval> marked_intervals() const noexcept {
+		return std::span<const Interval>(&*marked.cbegin(), marked.size());
 	}
 
 public:

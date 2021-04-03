@@ -49,14 +49,24 @@ ResourcePeer::ResourcePeer(std::shared_ptr<ServerState> server) :
 //}
 
 void ResourcePeer::cancel_current_task() {
-	if (current_task) {
-		current_task->requested_amount = 0;
-		current_task->requested_offset = current_task->next_offset;
-	}
+	if (current_task)
+		current_task->cancelled = true;
 }
 
 void ResourcePeer::continue_current_task() {
 	auto& task = *current_task;
+
+	if (task.cancelled) {
+		send(msg_res::ResponseResourceEnd{true});
+		if (next_task) {
+			current_task = std::move(next_task);
+			next_task.reset();
+		} else {
+			current_task.reset();
+		}
+		return;
+	}
+
 	const auto amount_left = task.requested_offset + task.requested_amount - task.next_offset;
 	const auto amount_allowed = server->settings().resource_network_chunk_size;
 	const auto amount = std::min(amount_left, amount_allowed);
@@ -69,11 +79,13 @@ void ResourcePeer::continue_current_task() {
 
 	if (amount_left == amount) {
 		// Task is finished
-		send(msg_res::ResponseResourceDone{});
+		send(msg_res::ResponseResourceEnd{false});
 
 		if (next_task) {
 			current_task = std::move(next_task);
 			next_task.reset();
+		} else {
+			current_task.reset();
 		}
 	}
 }
@@ -91,11 +103,13 @@ void ResourcePeer::receive(const msg_res::RequestResource& request) {
 		// Start new task
 		const auto resource_size = lookup_result.resource->size();
 		send(msg_res::ResponseResourceDescription{request.name, resource_size});
-		// The request only a header request
+//		send(msg_res::ResponseResourceDescription{request.name, resource_size, resource_signature});
+
 		if (request.amount == 0)
-			send(msg_res::ResponseResourceDone{});
+			// The request only a header request
+			send(msg_res::ResponseResourceEnd{false});
 		else {
-			auto& task = current_task ? current_task : next_task;
+			auto& task = !current_task ? current_task : next_task;
 			task.emplace(
 					request.offset,
 					request.amount,

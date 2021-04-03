@@ -11,7 +11,10 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 void IntervalRegistry::mark(size_t offset, size_t size) noexcept {
-	// Dual key lookup is possible as container elements are strictly exclusive
+	if (size == 0)
+		return;
+
+	// Dual key lookup is possible as container elements are strictly exclusive intervals
 	const auto it_lo = std::ranges::lower_bound(marked, offset, std::less<>(), [](const auto& i) { return i.offset + i.size; });
 	const auto it_hi = std::ranges::upper_bound(marked, offset + size, std::less<>(), &Interval::offset);
 
@@ -38,7 +41,10 @@ void IntervalRegistry::mark(const IntervalRegistry& intervals) noexcept {
 }
 
 void IntervalRegistry::unmark(size_t offset, size_t size) noexcept {
-	// Dual key lookup is possible as container elements are strictly exclusive
+	if (size == 0)
+		return;
+
+	// Dual key lookup is possible as container elements are strictly exclusive intervals
 	const auto it_lo = std::ranges::lower_bound(marked, offset, std::less<>(), [](const auto& i) { return i.offset + i.size; });
 	const auto it_hi = std::ranges::upper_bound(marked, offset + size, std::less<>(), &Interval::offset);
 

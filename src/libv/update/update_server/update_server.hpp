@@ -11,7 +11,7 @@
 #include <memory>
 #include <string>
 // pro
-#include <libv/update/update_signature.hpp>
+#include <libv/update/resource_signature.hpp>
 #include <libv/update/version_number.hpp>
 
 
@@ -44,7 +44,7 @@ public:
 	~UpdateServer();
 
 public:
-	void register_update(std::string program, std::string variant, version_number source, version_number target, uint64_t size, update_signature signature);
+	void register_update(std::string program, std::string variant, version_number source, version_number target, uint64_t size, resource_signature signature);
 
 	void debug_dump();
 	void start();

@@ -227,7 +227,7 @@ wish_create_external(
 	LINK backtrace
 )
 
-set(Boost_Version 1.74.0)
+set(Boost_Version 1.75.0)
 set(TOOLSET)
 string(REPLACE "." "_" Boost_Version_Underscore ${Boost_Version})
 message(STATUS "Boost version: " ${Boost_Version})
@@ -694,6 +694,7 @@ wish_create_library(
 	TARGET libv_serial INTERFACE
 	LINK   ext_cereal
 	LINK   ext_boost # Remove
+	LINK   libv_utility # For byte streams that might be removed in the future
 )
 
 wish_create_library(
@@ -1036,7 +1037,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_serialize_cereal
 	SOURCE sandbox/libv_serialize_cereal_main.cpp
-	LINK   ext_boost ext_cereal
+	LINK   ext_boost ext_cereal libv_serial
 )
 
 wish_create_executable(

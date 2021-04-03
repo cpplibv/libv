@@ -51,6 +51,38 @@
 
 
 
+
+What do I need from libv to make a 'minimal' working iris program?
+
+	libv.update
+		Resource
+			1 Working resource download protocol
+			1 Update/Resource signature verification
+		Working update
+			1 Self update support
+			1 Marry Resource and Update
+		Deployment
+			2 Scripts to create a new build and deploy to libv.update servers
+
+	libv.security
+		1 public / private key signature checking
+
+	libv.serial
+		1 safe container resize/reserve
+
+	libv.ui
+		1 background generalization
+		2 style lua loader
+		2 list component
+		3 scroll pane = scroll area + scroll bar + connecting them
+		3 container spacing property
+		4 button states
+		5 font outline render
+
+
+
+
+
 iris.lore: Yellow line, red line, black line -ing. Overclocking the engine: Maintenance in 2 week of any yellow line, Maintenance at the end of the mission on red line, Engine melts by the end of the mission
 
 place.it:

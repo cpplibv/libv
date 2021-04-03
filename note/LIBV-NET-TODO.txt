@@ -266,13 +266,16 @@ app/update/res/gen.sh && app/update/res/apply.sh
 
 place.it:
 	libv.serial: ideas for limited container size during serialization:
-			std::string resource;
-			libv::serial::limited<std::string, 256> resource;
 			template <typename Archive> inline void serialize(Archive& ar) {
+				std::string resource;
+				libv::serial::limited<std::string, 256> resource;
 				ar & LIBV_NVP(resource);
 				LIBV_NVP(ar, resource);
 				ar.limited(resource, "resource", 256);
 				ar.limited(LIBV_NVP(resource), 256);
+				ar(LIBV_NVP(resource), libv::serial::limit<256>());
+				ar(LIBV_NVP(resource), libv::serial::limit(256));
+				ar(LIBV_NVP(resource), ar.limit(256));
 			}
 
 cpp: if tellg fails it can return -1, review EVERY usage of it
