@@ -304,6 +304,14 @@ FontSize Button::font_size() const noexcept {
 	return self().text_.size();
 }
 
+void Button::font_color(Color value) {
+	AccessProperty::manual(self(), self().property.font_color, value);
+}
+
+const Color& Button::font_color() const noexcept {
+	return self().property.font_color();
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Button::text(std::string value) {

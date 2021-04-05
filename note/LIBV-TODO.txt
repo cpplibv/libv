@@ -622,6 +622,7 @@ app.editor:
 			line
 			[line if next section is not empty?] line
 			wildcard.**.hpp
+			| Sorting order: folders first
 		| validate that no lpp file (local header file) is included from a hpp file
 		| validate pragma once is used and only used in lpp or hpp files
 		| warning on [cpp,c,cxx,...] aka source extension include

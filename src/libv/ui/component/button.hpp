@@ -46,6 +46,9 @@ public:
 	void font_size(FontSize value);
 	[[nodiscard]] FontSize font_size() const noexcept;
 
+	void font_color(Color value);
+	[[nodiscard]] const Color& font_color() const noexcept;
+
 public:
 	void text(std::string value);
 	[[nodiscard]] const std::string& text() const noexcept;

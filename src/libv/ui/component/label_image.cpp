@@ -241,6 +241,14 @@ FontSize LabelImage::font_size() const noexcept {
 	return self().text_.size();
 }
 
+void LabelImage::font_color(Color value) {
+	AccessProperty::manual(self(), self().property.font_color, value);
+}
+
+const Color& LabelImage::font_color() const noexcept {
+	return self().property.font_color();
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void LabelImage::text(std::string value) {
