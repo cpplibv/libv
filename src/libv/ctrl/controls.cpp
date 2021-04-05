@@ -805,7 +805,7 @@ unbinding_outcome Controls::unbind_all(std::string_view feature_name) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Controls::input(const libv::input::EventKey& event) {
+void Controls::event(const libv::input::EventKey& event) {
 	// Update SOW
 	if (event.action == ButtonAction::release) {
 		self->pressed_keycodes.erase(event.keycode);
@@ -843,7 +843,7 @@ void Controls::input(const libv::input::EventKey& event) {
 	}
 }
 
-void Controls::input(const libv::input::EventMouseButton& event) {
+void Controls::event(const libv::input::EventMouseButton& event) {
 	// Update SOW
 	if (event.action == ButtonAction::release) {
 		self->pressed_mouses.erase(event.button);
@@ -858,7 +858,7 @@ void Controls::input(const libv::input::EventMouseButton& event) {
 	self->process_button(event_matcher, event.action, impulse);
 }
 
-void Controls::input(const libv::input::EventMousePosition& event) {
+void Controls::event(const libv::input::EventMousePosition& event) {
 	// Update SOW
 	const auto mouse_diff = event.position - self->mouse_position;
 	self->mouse_position = event.position;
@@ -872,7 +872,7 @@ void Controls::input(const libv::input::EventMousePosition& event) {
 			scale);
 }
 
-void Controls::input(const libv::input::EventMouseScroll& event) {
+void Controls::event(const libv::input::EventMouseScroll& event) {
 	// Update SOW
 	self->scroll_position = event.offset;
 
@@ -885,7 +885,7 @@ void Controls::input(const libv::input::EventMouseScroll& event) {
 			scale);
 }
 
-void Controls::input(const libv::input::EventGamepadAnalog& event) {
+void Controls::event(const libv::input::EventGamepadAnalog& event) {
 	// Update SOW
 	auto& sow = self->gamepads[event.gamepadID];
 #pragma GCC diagnostic push
@@ -902,7 +902,7 @@ void Controls::input(const libv::input::EventGamepadAnalog& event) {
 			scale);
 }
 
-void Controls::input(const libv::input::EventGamepadButton& event) {
+void Controls::event(const libv::input::EventGamepadButton& event) {
 	// Update SOW
 	auto& sow = self->gamepads[event.gamepadID];
 
@@ -919,7 +919,7 @@ void Controls::input(const libv::input::EventGamepadButton& event) {
 	self->process_button(event_matcher, event.action, impulse);
 }
 
-void Controls::input(const libv::input::EventJoystickAnalog& event) {
+void Controls::event(const libv::input::EventJoystickAnalog& event) {
 	// Update SOW
 	auto& sow = self->joysticks[event.joystickID];
 #pragma GCC diagnostic push
@@ -936,7 +936,7 @@ void Controls::input(const libv::input::EventJoystickAnalog& event) {
 			scale);
 }
 
-void Controls::input(const libv::input::EventJoystickButton& event) {
+void Controls::event(const libv::input::EventJoystickButton& event) {
 	// Update SOW
 	auto& sow = self->joysticks[event.joystickID];
 

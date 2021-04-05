@@ -117,14 +117,17 @@ public:
 	unbinding_outcome unbind_all(std::string_view feature_name);
 
 public:
-	void input(const libv::input::EventKey& event);
-	void input(const libv::input::EventMouseButton& event);
-	void input(const libv::input::EventMousePosition& event);
-	void input(const libv::input::EventMouseScroll& event);
-	void input(const libv::input::EventGamepadAnalog& event);
-	void input(const libv::input::EventGamepadButton& event);
-	void input(const libv::input::EventJoystickButton& event);
-	void input(const libv::input::EventJoystickAnalog& event);
+	template <typename Frame>
+	void attach(Frame& frame);
+
+	void event(const libv::input::EventKey& event);
+	void event(const libv::input::EventMouseButton& event);
+	void event(const libv::input::EventMousePosition& event);
+	void event(const libv::input::EventMouseScroll& event);
+	void event(const libv::input::EventGamepadAnalog& event);
+	void event(const libv::input::EventGamepadButton& event);
+	void event(const libv::input::EventJoystickButton& event);
+	void event(const libv::input::EventJoystickAnalog& event);
 
 public:
 	void update(duration delta_time);
@@ -225,6 +228,41 @@ public:
 	void import_bindings(std::string_view data);
 	void import_settings(std::string_view data);
 };
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Frame>
+void Controls::attach(Frame& frame) {
+	frame.onKey.output([this](const auto& e) {
+		this->event(e);
+	});
+
+	frame.onMouseButton.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onMousePosition.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onMouseScroll.output([this](const auto& e) {
+		this->event(e);
+	});
+
+	frame.onGamepadAnalog.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onGamepadButton.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onJoystickAnalog.output([this](const auto& e) {
+		this->event(e);
+	});
+	frame.onJoystickButton.output([this](const auto& e) {
+		this->event(e);
+	});
+
+	// TODO P5: libv.ctrl: Joystick/Gamepad support: Might need to observe Connect-Disconnect events
+	//          | No need: Frame should release everything upon disconnect
+}
 
 // -------------------------------------------------------------------------------------------------
 
