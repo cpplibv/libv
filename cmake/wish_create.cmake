@@ -1,7 +1,19 @@
 # File: target.cmake, Created on 2017. 04. 14. 16:49, Author: Vader
 
 
-# --- Debug ----------------------------------------------------------------------------------------
+# --- Options --------------------------------------------------------------------------------------
+
+set(__wish_configure_externals 0)
+
+macro(wish_enable_configure_externals)
+	set(__wish_configure_externals 1)
+endmacro()
+
+macro(wish_disable_configure_externals)
+	set(__wish_configure_externals 0)
+endmacro()
+
+# --- Group ----------------------------------------------------------------------------------------
 
 set(__wish_global_debug 0)
 
@@ -66,18 +78,20 @@ function(wish_create_external)
 		set(command_str_build "BUILD_COMMAND;echo;\"Skipping build...\"")
 	endif()
 
-	# add
-	ExternalProject_Add(
-		get_${arg_NAME}
-		PREFIX ${PATH_EXT_SRC}/${arg_NAME}
-		CMAKE_ARGS
-			-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
-		#GIT_SHALLOW 1 # shallow fetch is not possible as long as SHA tags are used
-		EXCLUDE_FROM_ALL 1
-		${command_str_configure}
-		${command_str_build}
-		${arg_UNPARSED_ARGUMENTS}
-	)
+	if(__wish_configure_externals)
+		# add
+		ExternalProject_Add(
+			get_${arg_NAME}
+			PREFIX ${PATH_EXT_SRC}/${arg_NAME}
+			CMAKE_ARGS
+				-DCMAKE_INSTALL_PREFIX=${PATH_EXT}/${arg_NAME}
+			#GIT_SHALLOW 1 # shallow fetch is not possible as long as SHA tags are used
+			EXCLUDE_FROM_ALL 1
+			${command_str_configure}
+			${command_str_build}
+			${arg_UNPARSED_ARGUMENTS}
+		)
+	endif()
 	add_library(ext_${arg_NAME} INTERFACE)
 
 	# include

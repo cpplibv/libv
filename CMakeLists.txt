@@ -121,14 +121,20 @@ endif()
 
 # Flags --------------------------------------------------------------------------------------------
 
-option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
+option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
 if (${FORCE_COLORED_OUTPUT})
-	if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 		add_compile_options(-fdiagnostics-color=always)
-	elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 		add_compile_options(-fcolor-diagnostics)
-	endif ()
-endif ()
+	endif()
+endif()
+
+option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
+if(${SKIP_EXTERNAL_CONFIGURES})
+	wish_disable_configure_externals()
+	message(STATUS "Skipping external project configurations")
+endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
 	add_compile_options(-Og)
