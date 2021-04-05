@@ -2,6 +2,7 @@
 
 // libv
 #include <libv/ctrl/controls.hpp>
+#include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/mesh.hpp>
@@ -16,6 +17,9 @@
 // std
 #include <iostream>
 #include <libv/ui/component/panel_full.hpp>
+// pro
+#include <space/camera_3.hpp>
+#include <space/camera_behaviour.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -194,6 +198,8 @@ void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const Ar
 }
 
 struct SpaceCanvas : libv::ui::Canvas {
+	app::Camera3& camera;
+
 	float angle = 0.0f;
 	float time = 0.0f;
 
@@ -201,7 +207,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 	libv::glr::Program program;
 	libv::glr::UniformBuffer arrow_uniforms{libv::gl::BufferUsage::StreamDraw};
 
-	SpaceCanvas() {
+	SpaceCanvas(app::Camera3& camera) :
+		camera(camera) {
 		program.vertex(shader_arrow_vs);
 		program.fragment(shader_arrow_fs);
 		program.block_binding(uniformBlock_sphere);
@@ -253,6 +260,11 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P1: Camera, camera behaviour and controls
+// TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
+// TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
+// TODO P4: Nicer arrow strips, animation
+
 int main() {
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 
@@ -262,6 +274,11 @@ int main() {
 	libv::Frame frame("Space", 1280, 800);
 	libv::ui::UI ui;
 	libv::ctrl::Controls controls;
+	libv::ctrl::FeatureRegister cfr(controls); // <<< better or direct call
+	app::CameraBehaviour::register_controls(cfr);
+	app::CameraBehaviour::bind_controls(controls);
+	app::Camera3 camera;
+	controls.context_enter(&camera);
 
 	ui.attach(frame);
 	controls.attach(frame);
@@ -276,7 +293,7 @@ int main() {
 			frame.closeForce();
 	});
 
-	SpaceCanvas space;
+	SpaceCanvas space(camera);
 
 	{
 		libv::ui::PanelFull layers;
