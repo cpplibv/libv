@@ -864,6 +864,13 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET space
+	SOURCE app/space/*.cpp
+#	LINK   ext_fmt ext_clip ext_range
+	LINK   libv_lua libv_frame libv_ctrl libv_glr libv_ui
+)
+
+wish_create_executable(
 	TARGET app_enum_generator
 	SOURCE app/enum_generator.cpp
 	LINK   ext_fmt ext_clip

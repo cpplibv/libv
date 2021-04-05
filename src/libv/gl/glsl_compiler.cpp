@@ -44,7 +44,7 @@ public:
 
 //auto ImplGLSLCompiler::extract_inspect(const std::string_view line) const noexcept {
 //
-// IDEA GEN 2:
+// Inspection IDEA GEN 2:
 //		Things that inspection should/could store:
 //			- Variable name
 //			- Variable type
@@ -182,7 +182,7 @@ void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const 
 
 GLSLCompiler::GLSLCompiler(IncludeLoader file_loader) : loader(std::move(file_loader)) {}
 
-std::string GLSLCompiler::compile(const std::string_view source, const std::string_view filename) const {
+std::string GLSLCompiler::compile(const std::string_view source, const std::string_view filename) {
 	ImplGLSLCompiler session{loader, {}, {}, {}};
 
 	session.preprocess_includes(source, filename, 1);
@@ -190,7 +190,7 @@ std::string GLSLCompiler::compile(const std::string_view source, const std::stri
 	return std::move(session.output).str();
 }
 
-std::string GLSLCompiler::load(const std::string_view filepath) const {
+std::string GLSLCompiler::load(const std::string_view filepath) {
 	auto main_source = loader(filepath);
 
 	if (!main_source.success) {

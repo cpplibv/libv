@@ -1,3 +1,4 @@
+
 // Project: libv.gl, File: src/libv/gl/glsl_compiler.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
@@ -28,11 +29,11 @@ private:
 	IncludeLoader loader;
 
 public:
-	GLSLCompiler(IncludeLoader file_loader);
+	explicit GLSLCompiler(IncludeLoader file_loader);
 	/// Processes the provided source
-	[[nodiscard]] std::string compile(const std::string_view source, const std::string_view filename = "main") const;
+	[[nodiscard]] std::string compile(const std::string_view source, const std::string_view filename = "main");
 	/// Uses the file loader to load the given file and process it
-	[[nodiscard]] std::string load(const std::string_view filepath) const;
+	[[nodiscard]] std::string load(const std::string_view filepath);
 };
 
 // -------------------------------------------------------------------------------------------------
