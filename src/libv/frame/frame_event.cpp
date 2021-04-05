@@ -168,6 +168,9 @@ void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
 	glfwSetWindowPosCallback         (window, DispatchGLFWEvent<EventPosition                  >::pos);
 	glfwSetWindowRefreshCallback     (window, DispatchGLFWEvent<EventRefresh                   >::call);
 	glfwSetWindowSizeCallback        (window, DispatchGLFWEvent<EventSize                      >::sizeWS);
+	// TODO P2: libv.frame: Joystick/Gamepad support: Watch or pool events
+	// TODO P2: libv.frame: Joystick/Gamepad support: Connect-Disconnect events
+	// TODO P2: libv.frame: Joystick/Gamepad support: Upon disconnect release every button
 }
 
 void Frame::unregisterEventCallbacks(GLFWwindow* window) {
@@ -284,6 +287,22 @@ void Frame::distributeEvents() {
 				}
 
 				onMouseScroll.fire(e);
+
+			}, [this](const libv::input::EventGamepadAnalog& e) {
+				// TODO P2: libv.frame: Joystick/Gamepad support: Store states
+				onGamepadAnalog.fire(e);
+
+			}, [this](const libv::input::EventGamepadButton& e) {
+				// TODO P2: libv.frame: Joystick/Gamepad support: Store states
+				onGamepadButton.fire(e);
+
+			}, [this](const libv::input::EventJoystickAnalog& e) {
+				// TODO P2: libv.frame: Joystick/Gamepad support: Store states
+				onJoystickAnalog.fire(e);
+
+			}, [this](const libv::input::EventJoystickButton& e) {
+				// TODO P2: libv.frame: Joystick/Gamepad support: Store states
+				onJoystickButton.fire(e);
 
 			}, [this](const EventPosition& e) {
 				{

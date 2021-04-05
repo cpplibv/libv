@@ -157,6 +157,11 @@ public:
 	Event<libv::input::EventMouseEnter> onMouseEnter;
 	Event<libv::input::EventMousePosition> onMousePosition;
 	Event<libv::input::EventMouseScroll> onMouseScroll;
+	Event<libv::input::EventGamepadAnalog> onGamepadAnalog;
+	Event<libv::input::EventGamepadButton> onGamepadButton;
+	Event<libv::input::EventJoystickAnalog> onJoystickAnalog;
+	Event<libv::input::EventJoystickButton> onJoystickButton;
+	// TODO P2: libv.frame: Joystick/Gamepad support: Connect-Disconnect events
 	Event<EventPosition> onPosition;
 	Event<EventRefresh> onRefresh;
 	Event<EventSize> onSize;
@@ -314,6 +319,8 @@ public:
 
 	libv::vec2d getMousePosition();
 	libv::vec2d getScrollPosition();
+
+	// TODO P2: libv.frame: Joystick/Gamepad support: Getters to state
 
 public:
 	std::string getClipboardString();

@@ -87,6 +87,8 @@ public:
 	libv::vec2d mousePosition;
 	libv::vec2d scrollPosition;
 
+	// TODO P2: libv.frame: Joystick/Gamepad support: Store states
+
 public:
 	std::mutex eventQueue_m; /// glfw documentation states that not just pulling even can cause event callbacks to fire, meaning unknown threads could enter
 	std::vector<Event> eventQueue;

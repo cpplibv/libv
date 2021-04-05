@@ -24,13 +24,13 @@ struct EventChar {
 	std::array<char, 5> utf8; /// Null terminated utf8 representation of the unicode character (one to four octet + terminating zero)
 
 	EventChar(uint32_t unicode);
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventDrop {
 	std::vector<std::string> strings;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventKey {
@@ -38,14 +38,14 @@ struct EventKey {
 	libv::input::Scancode scancode;
 	libv::input::Action action;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMouseButton {
 	libv::input::MouseButton button;
 	libv::input::Action action;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMouseEnter {
@@ -54,7 +54,7 @@ struct EventMouseEnter {
 	inline EventMouseEnter(int entered) :
 		entered(entered != 0) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMousePosition {
@@ -65,7 +65,7 @@ struct EventMousePosition {
 	inline EventMousePosition(libv::vec2d position) :
 		position(position) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMouseScroll {
@@ -76,7 +76,7 @@ struct EventMouseScroll {
 	inline EventMouseScroll(libv::vec2d offset) :
 		offset(offset) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventGamepadAnalog {
@@ -84,7 +84,7 @@ struct EventGamepadAnalog {
 	libv::input::GamepadAnalogID analogID;
 	libv::vec2d position;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventGamepadButton {
@@ -92,7 +92,7 @@ struct EventGamepadButton {
 	libv::input::GamepadButton button;
 	libv::input::Action action;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventJoystickAnalog {
@@ -100,7 +100,7 @@ struct EventJoystickAnalog {
 	libv::input::JoystickAnalogID analogID;
 	libv::vec2d position;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventJoystickButton {
@@ -108,7 +108,7 @@ struct EventJoystickButton {
 	libv::input::JoystickButton button;
 	libv::input::Action action;
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 // -------------------------------------------------------------------------------------------------

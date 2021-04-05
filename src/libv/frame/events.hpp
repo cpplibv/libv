@@ -150,6 +150,10 @@ using Event = std::variant<
 		libv::input::EventMouseEnter,
 		libv::input::EventMousePosition,
 		libv::input::EventMouseScroll,
+		libv::input::EventGamepadAnalog,
+		libv::input::EventGamepadButton,
+		libv::input::EventJoystickAnalog,
+		libv::input::EventJoystickButton,
 		EventPosition,
 		EventRefresh,
 		EventSize
