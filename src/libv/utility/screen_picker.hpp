@@ -12,21 +12,28 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-class ScreenPicker {
-	libv::vec_t<2, T> screenSize;
-	libv::mat_t<4, T> matrixPV;
-	libv::mat_t<4, T> inversePV;
+class screen_picker {
+	using float_type = T;
+	using mat4 = libv::mat4_t<float_type>;
+	using vec2 = libv::vec2_t<float_type>;
+	using vec3 = libv::vec3_t<float_type>;
+	using vec4 = libv::vec4_t<float_type>;
+
+private:
+	vec2 canvas_size;
+	mat4 matrixPV;
+	mat4 inversePV;
 
 public:
-	ScreenPicker(const libv::mat_t<4, T>& matrixPV, const libv::vec_t<2, T>& screenSize) :
-		screenSize(screenSize),
+	screen_picker(mat4 matrixPV, vec2 canvas_size) :
+		canvas_size(canvas_size),
 		matrixPV(matrixPV),
 		inversePV(matrixPV.inverse_copy()) { }
 
-	libv::vec_t<3, T> to_world(const libv::vec_t<2, T>& screenCoord) const {
-		auto coord2Scaled = screenCoord / screenSize * static_cast<T>(2.0) - static_cast<T>(1.0);
-		auto coord4ScaledStart = libv::vec_t<4, T>(coord2Scaled, static_cast<T>(-1.0), static_cast<T>(1.0));
-		auto coord4ScaledEnd = libv::vec_t<4, T>(coord2Scaled, static_cast<T>(0.0), static_cast<T>(1.0));
+	vec3 to_world(const vec2 canvas_coord) const {
+		auto coord2Scaled = canvas_coord / canvas_size * float_type{2} - float_type{1};
+		auto coord4ScaledStart = vec4(coord2Scaled, float_type{-1}, float_type{1});
+		auto coord4ScaledEnd = vec4(coord2Scaled, float_type{0}, float_type{1});
 
 		auto coordLineWStart = inversePV * coord4ScaledStart;
 		coordLineWStart /= coordLineWStart.w;
@@ -37,11 +44,11 @@ public:
 		return libv::vec::xyz((coordLineWEnd - coordLineWStart).normalize());
 	}
 
-	libv::vec_t<2, T> to_screen(const libv::vec_t<3, T>& worldCoord) const {
-		auto objectSPosition = matrixPV * libv::vec_t<4, T>(worldCoord, static_cast<T>(1.0));
+	vec2 to_screen(const vec3 worldCoord) const {
+		auto objectSPosition = matrixPV * vec4(worldCoord, float_type{1});
 		objectSPosition /= objectSPosition.w;
 
-		return (libv::vec::xy(objectSPosition) + static_cast<T>(1.0)) * static_cast<T>(0.5) * screenSize;
+		return (libv::vec::xy(objectSPosition) + float_type{1}) * float_type{0.5} * canvas_size;
 	}
 };
 

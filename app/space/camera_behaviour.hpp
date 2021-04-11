@@ -11,8 +11,8 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct CameraBehaviour {
-	static void register_controls(libv::ctrl::FeatureRegister& controls);
-	static void bind_controls(libv::ctrl::Controls& controls);
+	static void register_controls(libv::ctrl::FeatureRegister controls);
+	static void bind_default_controls(libv::ctrl::Controls& controls);
 };
 
 // -------------------------------------------------------------------------------------------------

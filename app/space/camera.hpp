@@ -1,11 +1,18 @@
-// Project: libv, File: app/vm4_viewer/scene/camera.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/scene/camera_2.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp>
+#include <libv/math/angle.hpp>
+#include <libv/math/ease.hpp>
 #include <libv/math/mat.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/utility/screen_picker.hpp>
+// ext
+//#include <glm/ext/quaternion_transform.hpp>
+//#include <glm/gtx/easing.hpp>
 // std
+#include <chrono>
 #include <cmath>
 // pro
 //#include <vm4_viewer/scene/object.hpp>
@@ -15,151 +22,212 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Camera {
-//struct Camera : Object {
+//struct GenericCameraInterface {
+//	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
+//	[[nodiscard]] mat4 view() const noexcept;
+//	[[nodiscard]] vec3 eye() const noexcept;
+//	[[nodiscard]] vec3 direction() const noexcept;
+//  [[nodiscard]] screen_picker picker(vec2 canvas_size);
+//};
+
+// -------------------------------------------------------------------------------------------------
+
+/// At the 0,0,0 state the camera directions are:
+///      Forward  is  X+
+///       Right   is  Y-
+///        Up     is  Z+
+///
+/// In orbit mode the camera axes are slaved under each other:
+///     Z   -> Y     -> X
+///     Yaw -> Pitch -> Roll
+struct BaseCameraOrbit {
+protected:
+	using float_type = float;
+	using vec2 = libv::vec2_t<float_type>;
+	using vec3 = libv::vec3_t<float_type>;
+	using mat4 = libv::mat4_t<float_type>;
+	using screen_picker = libv::screen_picker<float_type>;
+
 private:
-//	static constexpr libv::vec3f forward = {1, 0, 0};
-//	static constexpr libv::vec3f right = {0, 1, 0};
-	static constexpr libv::vec3f up = {0, 0, 1};
+	static constexpr vec3 axis_up = {0, 0, 1};
 
-	float fov = libv::deg_to_rad(90.0f);
-	float near = 0.1f;
-	float far = 1000.f;
-
-	libv::vec3f position_{0, 0, 0};
-	libv::vec3f rotation_{0, 0, 0}; // RAD
-	float zoom_ = 0;
+private:
+	vec3 orbit_point_{0, 0, 0};
+	vec3 rotation_{0, 0, 0}; // roll, pitch, yaw in RAD on orbit
+	float_type orbit_distance_ = 0;
+	float_type near_ = 0.1f;
+	float_type far_ = 1000.f;
+	float_type fov_y_ = libv::deg_to_rad(75.0f);
 
 public:
-	[[nodiscard]] [[nodiscard]] libv::mat4f projection(libv::vec2f canvas_size) const noexcept {
-		return libv::mat4f::perspective(fov, canvas_size.x / canvas_size.y, near, far);
+	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept {
+		return mat4::perspective(fov_y_, canvas_size.x / canvas_size.y, near_, far_);
 	}
 
-	[[nodiscard]] libv::mat4f view() const noexcept {
-		libv::mat4f mat(1.f);
+	[[nodiscard]] mat4 view() const noexcept {
+		mat4 mat(1.f);
 
-		mat.translate(libv::vec3f(0, 0, zoom_));
-		mat.rotate(-libv::deg_to_rad(90.f), libv::vec3f(1, 0, 0));
-		mat.rotate(rotation_.y, libv::vec3f(0, 1, 0));
-		mat.rotate(rotation_.x, libv::vec3f(1, 0, 0));
-		mat.rotate(rotation_.z, libv::vec3f(0, 0, 1));
+		// OpenGL default axes: Forward is Z-, Right is X+, Up is Y+
+		mat.rotate(libv::deg_to_rad(90.f), vec3(0, 0, 1));
+		mat.rotate(libv::deg_to_rad(90.f), vec3(0, 1, 0));
+		// Custom default axes: Forward is X+, Right is Y-, Up is Z+
 
-		mat.translate(-position_);
+		mat.translate(vec3(orbit_distance_, 0, 0));
+		mat.rotate(rotation_.x, vec3(1, 0, 0));
+		mat.rotate(rotation_.y, vec3(0, 1, 0));
+		mat.rotate(rotation_.z, vec3(0, 0, 1));
+		mat.translate(-orbit_point_);
+
 		return mat;
 	}
 
-public:
-	[[nodiscard]] libv::vec3f eye() const noexcept {
-		return libv::vec::xyz(view().inverse()[3]);
+	[[nodiscard]] vec3 eye() const noexcept {
+		return orbit_point_ + direction() * -orbit_distance_;
+	}
+
+	[[nodiscard]] vec3 direction() const noexcept {
+		const auto pitch = rotation_.y;
+		const auto yaw = rotation_.z;
+		const auto xy_len = std::cos(pitch);
+		const auto x = xy_len * std::cos(yaw);
+		const auto y = xy_len * std::sin(-yaw);
+		const auto z = std::sin(pitch);
+		return vec3(x, y, z);
+	}
+
+	screen_picker picker(vec2 canvas_size) {
+		return screen_picker(projection(canvas_size) * view(), canvas_size);
 	}
 
 public:
-	libv::vec3f position() {
-		return position_;
-	}
-	void position(libv::vec3f value) {
-		position_ = value;
+	void look_at(vec3 eye, vec3 target) noexcept  {
+		orbit_point_ = target;
+		// TODO P5: libv.math: length_and_dir
+//		const auto [distance, dir] = length_and_dir(eye - target);
+		const auto diff = eye - target;
+		const auto dir = diff.normalize_copy();
+		rotation_.x = 0;
+		rotation_.y = -std::asin(dir.z);
+		rotation_.z = std::atan2(dir.y, dir.x);
+		orbit_distance_ = diff.length();
 	}
 
 public:
-	libv::vec3f rotation() {
+	[[nodiscard]] constexpr inline float_type near() const noexcept {
+		return near_;
+	}
+	constexpr inline void near(float_type value) noexcept {
+		near_ = value;
+	}
+	[[nodiscard]] constexpr inline float_type far() const noexcept {
+		return far_;
+	}
+	constexpr inline void far(float_type value) noexcept {
+		far_ = value;
+	}
+	[[nodiscard]] constexpr inline float_type fov_y() const noexcept {
+		return fov_y_;
+	}
+	constexpr inline void fov_y(float_type value) noexcept {
+		fov_y_ = value;
+	}
+	[[nodiscard]] constexpr inline float_type orbit_distance() const noexcept {
+		return orbit_distance_;
+	}
+	constexpr inline void orbit_distance(float_type value) noexcept {
+		orbit_distance_ = value;
+	}
+
+	[[nodiscard]] constexpr inline vec3 orbit_point() const noexcept {
+		return orbit_point_;
+	}
+	constexpr inline void orbit_point(vec3 value) noexcept {
+		orbit_point_ = value;
+	}
+	[[nodiscard]] constexpr inline vec3 rotations() const noexcept {
 		return rotation_;
 	}
-	void rotation(libv::vec3f value) {
+	constexpr inline void rotations(vec3 value) noexcept {
 		rotation_ = value;
 	}
 
 public:
-	/// zoom
-	void zoom(float amount) {
-		zoom_ += amount;
+	void move_forward(float_type value) {
+		orbit_point_.x += value * std::cos(rotation_.z);
+		orbit_point_.y -= value * std::sin(rotation_.z);
 	}
-	void set_zoom(float value) {
-		zoom_ = value;
+	void move_right(float_type value) {
+		orbit_point_.x += value * std::cos(rotation_.z + libv::pi / 2.0f);
+		orbit_point_.y -= value * std::sin(rotation_.z + libv::pi / 2.0f);
+	}
+	void move_up(float_type value) {
+		orbit_point_.z += value;
 	}
 
-	[[nodiscard]] float zoom() const {
-		return zoom_;
-	}
-
-public:
-//	void lookat(libv::vec3f eye, libv::vec3f center) const noexcept {
-//		position = center;
-//		zoom_ = (eye - center).lenght();
-//		rotation = ...;
-//	}
-
-public:
-	void translateX(float x) {
-		// Strafing
-		position_.y += x * std::cos(rotation_.z + libv::deg_to_rad(90.f));
-		position_.x += x * std::sin(rotation_.z + libv::deg_to_rad(90.f));
-	}
-	void translateY(float x) {
-		position_.y -= x * std::cos(rotation_.z);
-		position_.x -= x * std::sin(rotation_.z);
-	}
-	void translateZ(float x) {
-		position_.z += x;
-	}
-	void translateZoom(float x) {
-		zoom_ += x;
-	}
-	void rotateX(float x) {
+	void orbit_roll(float_type x) {
 		rotation_.x += x;
 	}
-	void rotateY(float x) {
+	void orbit_pitch(float_type x) {
 		rotation_.y += x;
 	}
-	void rotateZ(float x) {
+	void orbit_yaw(float_type x) {
 		rotation_.z += x;
 	}
+};
 
-//public:
-//	/// rotate left-right
-//	/// \param amount - pan angle in radian
-//	void pan(float amount);
-//	/// rotate up-down
-//	/// \param amount - tilt angle in radian
-//	void tilt(float amount);
-//
-//public:
-//	/// rotate up-down around the pivot
-//	/// \param amount - pan angle in radian
-//	void orbit_pan(float amount) {
-//		const auto diff = libv::xy(position) - libv::xy(pivot);
-//		const float angle = std::atan2(diff.y, diff.x) + amount;
-//		const float dist = diff.length();
-//		position_.x = pivot.x + std::cos(angle) * dist;
-//		position_.y = pivot.y + std::sin(angle) * dist;
-//	}
-//	/// rotate left-right around the pivot
-//	/// \param amount - tilt angle in radian
-//	void orbit_tilt(float amount) {
-//		const auto diff = libv::xy(position) - libv::xy(pivot);
-//		const float angle = std::atan2(diff.y, diff.x) + amount;
-//		const float dist = diff.length();
-//		position_.x = pivot.x + std::cos(angle) * dist;
-//		position_.y = pivot.y + std::sin(angle) * dist;
-//	}
-//
-//public:
-//	/// move forward - backward
-//	/// \param amount - dolly movement in units
-//	void dolly(float amount) {
-//		const auto dir = (libv::xy(position) - libv::xy(pivot)).normalize_copy();
-//		pivot += libv::vec3f(dir * amount, 0);
-//		position += libv::vec3f(dir * amount, 0);
-//	}
-//	/// move left-right
-//	/// \param amount - truck movement in units
-//	void truck(float amount);
-//	/// move up-down
-//	/// \param amount - pedestal movement in units
-//	void pedestal(float amount) {
-//		pivot.z += amount;
-//		position_.z += amount;
-//	}
+// =================================================================================================
+
+struct CameraPlayer : BaseCameraOrbit {
+private:
+	using duration = std::chrono::duration<float_type, std::chrono::seconds::period>;
+
+private:
+	float inclination_hard_min_ = libv::deg_to_rad(5.0f);
+	float inclination_soft_min_ = libv::deg_to_rad(15.0f);
+	float inclination_soft_max_ = libv::deg_to_rad(90.0f - 15.0f);
+	float inclination_hard_max_ = libv::deg_to_rad(90.0f - 5.0f);
+
+	vec3 warp_target;
+	float_type warp_edge_speed;
+	float_type warp_distance_threshold_to_orbit_distance_ratio = 0.5f;
+	duration warp_ease_out_duration = duration{0.2};
+	duration warp_ease_in_duration = duration{0.2};
+
+public:
+	void update(duration delta_time) {
+		// warp: out - move - in
+		// inclination correction
+	}
+
+	void warp_to(vec3 target) {
+//		const auto warp_distance_threshold = float_type{2.0};
+//		const auto warp_ease_out_duration = duration{0.2};
+//		const auto warp_ease_in_duration = duration{0.2};
+
+//		const auto v = libv::math::ease_in_cubic(x);
+//		const auto v = libv::math::ease_in_out_cubic(x);
+//		const auto v = libv::math::ease_out_cubic(x);
+	}
+
+//	void warp_to(vec3 eye, vec3 target);
+//	void shake(float_type magnitude, duration time) {}
+//	void shake(vec3 magnitude, duration time) {}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+struct CameraDeveloper : BaseCameraOrbit {
+private:
+	using duration = std::chrono::duration<float, std::chrono::seconds::period>;
+
+public:
+	void update(duration delta_time) {
+		// nothing
+	}
+
+	void warp_to(vec3 target) {
+		// instant
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

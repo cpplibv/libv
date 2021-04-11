@@ -10,18 +10,13 @@
       <file path="$PROJECT_DIR$/src" />
       <file path="$PROJECT_DIR$/test" />
     </sourceRoots>
-    <libraryRoots>
-      <file path="$PROJECT_DIR$/ext" />
-    </libraryRoots>
     <excludeRoots>
       <file path="$PROJECT_DIR$/bin" />
       <file path="$PROJECT_DIR$/build" />
+      <file path="$PROJECT_DIR$/ext" />
       <file path="$PROJECT_DIR$/ext_src" />
       <file path="$PROJECT_DIR$/lib" />
       <file path="$PROJECT_DIR$/nbproject" />
     </excludeRoots>
-  </component>
-  <component name="ProjectPlainTextFileTypeManager">
-    <file url="file://$PROJECT_DIR$/LIBV-TODO.md" />
   </component>
 </project>

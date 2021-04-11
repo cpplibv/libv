@@ -70,6 +70,10 @@ public:
 	void clearDepth();
 
 public:
+	// void line_width(float width); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glLineWidth.xhtml
+	// void point_size(float size); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glPointSize.xhtml
+
+public:
 	void viewport(libv::vec2i position, libv::vec2i size);
 
 public:

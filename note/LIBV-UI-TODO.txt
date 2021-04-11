@@ -60,6 +60,16 @@ imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
 
 
 
+libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
+		A simple const void* that can be passed to any function that can produce a event
+			(or in case of a stack a ui global stack of const void*)
+		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
+		if (label.ui().event_initiator_check_loop(&shared_state))
+		if (event.check_initiator_loop(&shared_state))
+			return;
+		Implement in: app.theme: control.slider.event().change
+
+
 
 
 app.theme: create theme exporter: json and atlas texture

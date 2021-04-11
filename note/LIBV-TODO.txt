@@ -1549,6 +1549,8 @@ cpp.proposal: P2 add auto ctor call to return MyType(arg0, arg1); => return (arg
 		- decltype(auto) foo();
 		- auto foo();
 		- return (result);
+cpp.proposal: std::concat
+		fmt format without format string
 cpp.proposal: P2 std::argument_with _name<T>: void foo(std::with_call_name<const T&> arg) { std::cout << arg.name << “: ” << args.value << std::endl; }
 		void foo(variable) -> void foo(MAGIC(variable)) -> void foo(std::with_call_name{“variable”, variable});
 		void foo(exp + ression) -> void foo(MAGIC(exp + ression)) -> void foo(std::with_call_name{“exp + ression”, exp + ression});

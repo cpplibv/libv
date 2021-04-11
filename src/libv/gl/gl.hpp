@@ -690,6 +690,9 @@ public:
 	inline void viewport(int32_t left, int32_t bottom, int32_t width, int32_t height);
 	inline void blit(vec2i src_pos, vec2i src_size, vec2i dst_pos, vec2i dst_size, BufferBit mask, MagFilter filter);
 
+	// void line_width(float width); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glLineWidth.xhtml
+	// void point_size(float size); // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glPointSize.xhtml
+
 	inline void clearColor(const libv::vec4f& col);
 	inline void clearColor(float r, float g, float b, float a = 1.0f);
 	inline void clear(BufferBit buffers = BufferBit::ColorDepthStencil);
