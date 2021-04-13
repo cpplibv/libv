@@ -4,7 +4,7 @@
 
 // libv
 #include <libv/math/angle.hpp>
-#include <libv/math/ease.hpp>
+//#include <libv/math/ease.hpp>
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/screen_picker.hpp>
@@ -22,12 +22,14 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P2: (?) Calculate camera 'GenericCameraInterface' properties once every frame
+
 //struct GenericCameraInterface {
 //	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
 //	[[nodiscard]] mat4 view() const noexcept;
 //	[[nodiscard]] vec3 eye() const noexcept;
 //	[[nodiscard]] vec3 direction() const noexcept;
-//  [[nodiscard]] screen_picker picker(vec2 canvas_size);
+//  [[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
 //};
 
 // -------------------------------------------------------------------------------------------------
@@ -40,6 +42,11 @@ namespace app {
 /// In orbit mode the camera axes are slaved under each other:
 ///     Z   -> Y     -> X
 ///     Yaw -> Pitch -> Roll
+///
+/// Roll - A positive rolling motion lifts the left wing and lowers the right wing.
+/// Pitch - A positive pitching motion raises the nose of the aircraft and lowers the tail.
+/// Yaw - A positive yawing motion moves the nose of the aircraft to the right.
+///
 struct BaseCameraOrbit {
 protected:
 	using float_type = float;
@@ -49,11 +56,15 @@ protected:
 	using screen_picker = libv::screen_picker<float_type>;
 
 private:
+	static constexpr vec3 axis_forward = {1, 0, 0};
+	static constexpr vec3 axis_right = {0, -1, 0};
 	static constexpr vec3 axis_up = {0, 0, 1};
 
 private:
 	vec3 orbit_point_{0, 0, 0};
-	vec3 rotation_{0, 0, 0}; // roll, pitch, yaw in RAD on orbit
+	float_type roll_ = 0;
+	float_type pitch_ = 0;
+	float_type yaw_ = 0;
 	float_type orbit_distance_ = 0;
 	float_type near_ = 0.1f;
 	float_type far_ = 1000.f;
@@ -65,17 +76,17 @@ public:
 	}
 
 	[[nodiscard]] mat4 view() const noexcept {
-		mat4 mat(1.f);
+		mat4 mat = mat4::identity();
 
 		// OpenGL default axes: Forward is Z-, Right is X+, Up is Y+
 		mat.rotate(libv::deg_to_rad(90.f), vec3(0, 0, 1));
 		mat.rotate(libv::deg_to_rad(90.f), vec3(0, 1, 0));
-		// Custom default axes: Forward is X+, Right is Y-, Up is Z+
+		// Corrected camera axes: Forward is X+, Right is Y-, Up is Z+
 
 		mat.translate(vec3(orbit_distance_, 0, 0));
-		mat.rotate(rotation_.x, vec3(1, 0, 0));
-		mat.rotate(rotation_.y, vec3(0, 1, 0));
-		mat.rotate(rotation_.z, vec3(0, 0, 1));
+		mat.rotate(-roll_, axis_forward);
+		mat.rotate(-pitch_, axis_right);
+		mat.rotate(yaw_, axis_up);
 		mat.translate(-orbit_point_);
 
 		return mat;
@@ -86,16 +97,14 @@ public:
 	}
 
 	[[nodiscard]] vec3 direction() const noexcept {
-		const auto pitch = rotation_.y;
-		const auto yaw = rotation_.z;
-		const auto xy_len = std::cos(pitch);
-		const auto x = xy_len * std::cos(yaw);
-		const auto y = xy_len * std::sin(-yaw);
-		const auto z = std::sin(pitch);
+		const auto xy_len = std::cos(pitch_);
+		const auto x = xy_len * std::cos(-yaw_); // Yaw is CW but math is CCW
+		const auto y = xy_len * std::sin(-yaw_); // Yaw is CW but math is CCW
+		const auto z = std::sin(pitch_);
 		return vec3(x, y, z);
 	}
 
-	screen_picker picker(vec2 canvas_size) {
+	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept {
 		return screen_picker(projection(canvas_size) * view(), canvas_size);
 	}
 
@@ -103,12 +112,13 @@ public:
 	void look_at(vec3 eye, vec3 target) noexcept  {
 		orbit_point_ = target;
 		// TODO P5: libv.math: length_and_dir
-//		const auto [distance, dir] = length_and_dir(eye - target);
-		const auto diff = eye - target;
+		// TODO P1: if eye == target or nan infection -> default cam in eye coord
+//		const auto [distance, dir] = length_and_dir(target - eye);
+		const auto diff = target - eye;
 		const auto dir = diff.normalize_copy();
-		rotation_.x = 0;
-		rotation_.y = -std::asin(dir.z);
-		rotation_.z = std::atan2(dir.y, dir.x);
+		roll_ = 0;
+		pitch_ = std::asin(dir.z);
+		yaw_ = -std::atan2(dir.y, dir.x); // Yaw is CW but atan2 is CCW
 		orbit_distance_ = diff.length();
 	}
 
@@ -131,6 +141,24 @@ public:
 	constexpr inline void fov_y(float_type value) noexcept {
 		fov_y_ = value;
 	}
+	[[nodiscard]] constexpr inline float_type roll() const noexcept {
+		return roll_;
+	}
+	constexpr inline void roll(float_type value) noexcept {
+		roll_ = value;
+	}
+	[[nodiscard]] constexpr inline float_type pitch() const noexcept {
+		return pitch_;
+	}
+	constexpr inline void pitch(float_type value) noexcept {
+		pitch_ = value;
+	}
+	[[nodiscard]] constexpr inline float_type yaw() const noexcept {
+		return yaw_;
+	}
+	constexpr inline void yaw(float_type value) noexcept {
+		yaw_ = value;
+	}
 	[[nodiscard]] constexpr inline float_type orbit_distance() const noexcept {
 		return orbit_distance_;
 	}
@@ -145,33 +173,45 @@ public:
 		orbit_point_ = value;
 	}
 	[[nodiscard]] constexpr inline vec3 rotations() const noexcept {
-		return rotation_;
+		return vec3(roll_, pitch_, yaw_);
 	}
 	constexpr inline void rotations(vec3 value) noexcept {
-		rotation_ = value;
+		roll_ = value.x;
+		pitch_ = value.y;
+		yaw_ = value.z;
 	}
 
 public:
+	/// Moves the camera on the XY plane based on cameras view direction to forward
 	void move_forward(float_type value) {
-		orbit_point_.x += value * std::cos(rotation_.z);
-		orbit_point_.y -= value * std::sin(rotation_.z);
+		// Yaw is CW but math is CCW
+		orbit_point_.x += value * std::cos(-yaw_);
+		orbit_point_.y += value * std::sin(-yaw_);
 	}
+	/// Moves the camera on the XY plane based on cameras view direction to right
 	void move_right(float_type value) {
-		orbit_point_.x += value * std::cos(rotation_.z + libv::pi / 2.0f);
-		orbit_point_.y -= value * std::sin(rotation_.z + libv::pi / 2.0f);
+		// Yaw is CW but math is CCW
+		orbit_point_.x += value * std::cos(-yaw_ - libv::pi / 2.0f);
+		orbit_point_.y += value * std::sin(-yaw_ - libv::pi / 2.0f);
 	}
+	/// Moves the camera on the Z axis
 	void move_up(float_type value) {
 		orbit_point_.z += value;
 	}
 
+	/// Roll - A positive rolling motion lifts the left 'wing' and lowers the right 'wing'.
 	void orbit_roll(float_type x) {
-		rotation_.x += x;
+		roll_ += x;
 	}
+	/// Pitch the camera around the orbit point
+	/// A positive pitching motion raises the nose of the 'aircraft' and lowers the 'tail'.
 	void orbit_pitch(float_type x) {
-		rotation_.y += x;
+		pitch_ += x;
 	}
+	/// Yaws the camera around the orbit point
+	/// A positive yawing motion moves the nose of the 'aircraft' to the right.
 	void orbit_yaw(float_type x) {
-		rotation_.z += x;
+		yaw_ += x;
 	}
 };
 

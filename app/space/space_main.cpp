@@ -376,21 +376,15 @@ int main() {
 	app::CameraBehaviour::register_controls(controls);
 	app::CameraBehaviour::bind_default_controls(controls);
 
-	// TODO P1: Solve the scroll impulse value on analog feature
-	//			| I want mouse scroll
-	//	            - to affect camera movement less
-	//			    - but still affect the sliders and number inputs the same (unaltered) way
-	//          | solution will be additional entries for features in scale grounds
-	controls.scale_scroll(0.1);
-
 	app::CameraPlayer camera;
-//	camera.look_at({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f});
+	camera.look_at({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f});
 	controls.context_enter<app::BaseCameraOrbit>(&camera); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
 
 	frame.setPosition(libv::Frame::FramePosition::center_current_monitor);
 	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 	frame.setOpenGLVersion(3, 3);
 	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
+	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 
 	// TODO P1: Timer management should be smoother with control and frame attachment
 	libv::Timer timer;
@@ -401,6 +395,27 @@ int main() {
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
 			frame.closeForce();
+
+		static float i = -2;
+		static float k = -2;
+		if (e.keycode == libv::input::Keycode::I && e.action == libv::input::Action::press)
+			i += 1.0f;
+		else if (e.keycode == libv::input::Keycode::O && e.action == libv::input::Action::press)
+			i -= 1.0f;
+		else if (e.keycode == libv::input::Keycode::K && e.action == libv::input::Action::press)
+			k += 1.0f;
+		else if (e.keycode == libv::input::Keycode::L && e.action == libv::input::Action::press)
+			k -= 1.0f;
+		else {
+			log_space.info("{} {} {} ==> rot:{:16} dir:{:16} eye:{:16}",
+					i, k, 1.2, camera.rotations(), camera.direction(), camera.eye());
+			return;
+		}
+		camera.look_at({i, k, 1.2f}, {0.f, 0.f, 0.f});
+		log_space.info("{} {} {} ==> rot:{:16} dir:{:16} eye:{:16}",
+				i, k, 1.2, camera.rotations(), camera.direction(), camera.eye());
+//		std::cout << i << " " << k << " 1.2 ==> " << camera.eye() << " > " << camera.rotations() << std::endl;
+//		camera.rotations({0, -libv::pi * 0.25, libv::pi * 0.25});
 	});
 
 	ui.attach(frame);

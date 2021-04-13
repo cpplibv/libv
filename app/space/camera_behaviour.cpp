@@ -21,7 +21,7 @@ void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 	// unit/impulse, unit/600px, unit/s
 	libv::ctrl::scale_group sg_translate{0.1, 1.0, 1.0};
 	// unit/impulse, unit/600px, unit/s
-	libv::ctrl::scale_group sg_orbit{0.5, 9.0, 8.0};
+	libv::ctrl::scale_group sg_orbit{0.5, 8.0, 4.0};
 
 	static constexpr auto c0_orbit = 1.15f;
 	static constexpr auto c0_translate = 1.1f; (void) c0_translate; // Suppressing a false warning
@@ -70,7 +70,12 @@ void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.orbit_distance", "T", -1);
 	controls.bind("camera.orbit_distance", "G");
-	controls.bind("camera.orbit_distance", "Scroll", -0.2);
+	// TODO P1: Solve the scroll impulse value on analog feature
+	//			| I want mouse scroll
+	//	            - to affect camera movement less
+	//			    - but still affect the sliders and number inputs the same (unaltered) way
+	//          | solution will be additional entries for features in scale grounds
+	controls.bind("camera.orbit_distance", "Scroll", -0.05);
 	// TODO P4: libv.ctrl: Scale groups would replace ^^^   and   vvvv constants with -1.0
 	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse Y", -0.6);
 	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse X", 0);
@@ -84,8 +89,8 @@ void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.orbit_roll", "Q", -1);
 	controls.bind("camera.orbit_roll", "E");
 
-	controls.bind("camera.orbit_yaw", "A", -1);
-	controls.bind("camera.orbit_yaw", "D");
+	controls.bind("camera.orbit_yaw", "A");
+	controls.bind("camera.orbit_yaw", "D", -1);
 	controls.bind("camera.orbit_yaw", "LMB + Mouse X");
 
 	controls.bind("camera.move_forward", "Up");

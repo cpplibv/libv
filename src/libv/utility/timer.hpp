@@ -2,6 +2,7 @@
 
 #pragma once
 
+// std
 #include <chrono>
 
 
@@ -14,64 +15,64 @@ public:
 	using clock = std::chrono::steady_clock;
 
 private:
-	clock::time_point time_ = std::chrono::steady_clock::now();
+	clock::time_point time_ = clock::now();
 
 public:
-	inline clock::duration elapsed() {
-		return std::chrono::steady_clock::now() - time_;
+	[[nodiscard]] inline clock::duration elapsed() const noexcept {
+		return clock::now() - time_;
 	}
 
-	inline void adjust(clock::duration diff) {
+	inline void adjust(clock::duration diff) noexcept {
 		time_ += diff;
 	}
 
-	inline void reset() {
-		time_ = std::chrono::steady_clock::now();
+	inline void reset() noexcept {
+		time_ = clock::now();
 	}
 
-	inline clock::duration time() {
-		auto ct = std::chrono::steady_clock::now();
+	[[nodiscard]] inline clock::duration time() noexcept {
+		auto ct = clock::now();
 		auto lastTurn = ct - time_;
 		time_ = ct;
 		return lastTurn;
 	}
 
-	inline auto time_s() {
+	[[nodiscard]] inline auto time_s() noexcept {
 		return std::chrono::duration_cast<std::chrono::seconds>(time());
 	}
-	inline auto time_ms() {
+	[[nodiscard]] inline auto time_ms() noexcept {
 		return std::chrono::duration_cast<std::chrono::milliseconds>(time());
 	}
-	inline auto time_us() {
+	[[nodiscard]] inline auto time_us() noexcept {
 		return std::chrono::duration_cast<std::chrono::microseconds>(time());
 	}
-	inline auto time_ns() {
+	[[nodiscard]] inline auto time_ns() noexcept {
 		return std::chrono::duration_cast<std::chrono::nanoseconds>(time());
 	}
 
-	inline auto timef_s() {
+	[[nodiscard]] inline auto timef_s() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<float>>(time());
 	}
-	inline auto timef_ms() {
+	[[nodiscard]] inline auto timef_ms() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(time());
 	}
-	inline auto timef_us() {
+	[[nodiscard]] inline auto timef_us() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<float, std::micro>>(time());
 	}
-	inline auto timef_ns() {
+	[[nodiscard]] inline auto timef_ns() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<float, std::nano>>(time());
 	}
 
-	inline auto timed_s() {
+	[[nodiscard]] inline auto timed_s() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<double>>(time());
 	}
-	inline auto timed_ms() {
+	[[nodiscard]] inline auto timed_ms() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<double, std::milli>>(time());
 	}
-	inline auto timed_us() {
+	[[nodiscard]] inline auto timed_us() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<double, std::micro>>(time());
 	}
-	inline auto timed_ns() {
+	[[nodiscard]] inline auto timed_ns() noexcept {
 		return std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(time());
 	}
 };
