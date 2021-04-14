@@ -75,7 +75,7 @@ void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	//	            - to affect camera movement less
 	//			    - but still affect the sliders and number inputs the same (unaltered) way
 	//          | solution will be additional entries for features in scale grounds
-	controls.bind("camera.orbit_distance", "Scroll", -0.05);
+	controls.bind("camera.orbit_distance", "Scroll", -0.025);
 	// TODO P4: libv.ctrl: Scale groups would replace ^^^   and   vvvv constants with -1.0
 	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse Y", -0.6);
 	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse X", 0);

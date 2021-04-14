@@ -55,12 +55,12 @@ struct mat_t : public glm::mat<static_cast<int>(R), static_cast<int>(C), T, glm:
 	static constexpr int Ri = static_cast<int>(R);
 
 public:
-	mat_t() : glm::mat<Ri, Ci, T, glm::precision::highp>() {}
+	constexpr inline mat_t() : glm::mat<Ri, Ci, T, glm::precision::highp>() {}
 	using glm::mat<Ri, Ci, T, glm::precision::highp>::mat;
 	using glm::mat<Ri, Ci, T, glm::precision::highp>::operator=;
 
-	inline constexpr mat_t(const mat_t&) = default;
-	inline constexpr mat_t(mat_t&&) = default;
+	constexpr inline mat_t(const mat_t&) = default;
+	constexpr inline mat_t(mat_t&&) = default;
 	inline ~mat_t() = default;
 
 	inline mat_t& operator=(const mat_t& mat) & {
