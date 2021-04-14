@@ -134,6 +134,9 @@ option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the
 if(${SKIP_EXTERNAL_CONFIGURES})
 	wish_disable_configure_externals()
 	message(STATUS "Skipping external project configurations")
+else()
+	wish_enable_configure_externals()
+	message(STATUS "Generating external project configurations")
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "DEBUG")
@@ -449,17 +452,15 @@ wish_create_external(
 wish_create_external(
 	NAME gli
 	GIT_REPOSITORY https://github.com/g-truc/gli.git
-	GIT_TAG 1893e5d2e9c6527e1aecf49ef7dd9c36889b33b3
-	SKIP_CONFIGURE_AND_BUILD
-	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/gli/include/gli/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/gli/src/get_gli/gli/ ${PATH_EXT}/gli/include/
+	GIT_TAG 0c171ee87fcfe35a7e0e0445adef06f92e0b6a91
+	CMAKE_ARGS
+		-DGLI_TEST_ENABLE=OFF
 )
 
 wish_create_external(
 	NAME glm
 	GIT_REPOSITORY https://github.com/g-truc/glm.git
-	GIT_TAG 49b508a1abdd592d9202676f7e95127587ff21c0
+	GIT_TAG 761a842a595f58acfc01cc5c7760ff351feaaece
 	CMAKE_ARGS
 		-DGLM_TEST_ENABLE=OFF
 	DEFINE GLM_ENABLE_EXPERIMENTAL
