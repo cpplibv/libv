@@ -15,14 +15,39 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
+	// TODO P2: libv.ctrl: These groups are kind of universal, make them libv.ctrl level constant with a multiplier support over them
+	//                  So one could just write: auto my_sg_rotate = ctrl::sg_rotate * 2.0;
+	//                  Include groups for:
+	//                      camera_rotate, camera_move, camera_zoom, number_slider, scroll_bar
 
-	// degree/impulse degree/600px degree/s
-	libv::ctrl::scale_group sg_rotate{libv::to_rad(5.0), libv::to_rad(140.0), libv::to_rad(80.0)};
-	// unit/impulse, unit/600px, unit/s
-	libv::ctrl::scale_group sg_translate{0.1, 1.0, 1.0};
-	// unit/impulse, unit/600px, unit/s
-	libv::ctrl::scale_group sg_orbit{0.5, 8.0, 4.0};
+	libv::ctrl::scale_group sg_rotate{
+			.impulse = libv::to_rad(5.0),
+			.time = libv::to_rad(80.0),
+			.mouse = libv::to_rad(140.0 / 600.0),
+			.scroll = libv::to_rad(5.0),
+			.gp_analog = libv::to_rad(80.0),
+			.js_analog = libv::to_rad(80.0)
+	};
 
+	libv::ctrl::scale_group sg_translate{
+			.impulse = 0.1,
+			.time = 1.0,
+			.mouse = 1.0 / 600.0,
+			.scroll = 0.1,
+			.gp_analog = 1.0,
+			.js_analog = 1.0
+	};
+
+	libv::ctrl::scale_group sg_orbit{
+			.impulse = 0.5,
+			.time = 4.0,
+			.mouse = 4.0 / 600.0,
+			.scroll = 0.20,
+			.gp_analog = 4.0,
+			.js_analog = 4.0
+	};
+
+	// TODO P3: Refine c0 constants in camera control
 	static constexpr auto c0_orbit = 1.15f;
 	static constexpr auto c0_translate = 1.1f; (void) c0_translate; // Suppressing a false warning
 
@@ -70,14 +95,8 @@ void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.orbit_distance", "T", -1);
 	controls.bind("camera.orbit_distance", "G");
-	// TODO P1: Solve the scroll impulse value on analog feature
-	//			| I want mouse scroll
-	//	            - to affect camera movement less
-	//			    - but still affect the sliders and number inputs the same (unaltered) way
-	//          | solution will be additional entries for features in scale grounds
-	controls.bind("camera.orbit_distance", "Scroll", -0.025);
-	// TODO P4: libv.ctrl: Scale groups would replace ^^^   and   vvvv constants with -1.0
-	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse Y", -0.6);
+	controls.bind("camera.orbit_distance", "Scroll", -1);
+	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse Y", -1);
 	controls.bind("camera.orbit_distance", "LMB + RMB + Mouse X", 0);
 	// TODO P5: libv.ctrl: ^^^ Bug, if the selected dim is 0, the change in other dims are not subject to binding specialziation selection | solution will be to dont discard 0 in selection just only after gather complete
 	// TODO P4: libv.ctrl: Implicit "noop" feature that is not visible in introspection but can be used as a dummy target

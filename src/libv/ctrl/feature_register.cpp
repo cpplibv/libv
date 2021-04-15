@@ -19,8 +19,8 @@ void FeatureRegister::_feature_binary(std::type_index context, std::string&& nam
 	target->_feature_binary(context, std::move(name), std::move(function));
 }
 
-void FeatureRegister::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog) {
-	target->_feature_analog(context, std::move(name), std::move(function), scale_impulse, scale_time, scale_analog);
+void FeatureRegister::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers) {
+	target->_feature_analog(context, std::move(name), std::move(function), multipliers);
 }
 
 // -------------------------------------------------------------------------------------------------

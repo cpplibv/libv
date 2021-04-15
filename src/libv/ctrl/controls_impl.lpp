@@ -12,6 +12,7 @@
 #include <libv/ctrl/binding.hpp>
 #include <libv/ctrl/duration.hpp>
 #include <libv/ctrl/feature.hpp>
+#include <libv/ctrl/origin.hpp>
 #include <libv/ctrl/scale.hpp>
 #include <libv/ctrl/scale_2d.hpp>
 #include <libv/ctrl/time_point.hpp>
@@ -145,7 +146,7 @@ private: // --- AUX ------------------------------------------------------------
 	inline auto notify_features(const T& target_features);
 
 public: // --- AUX -------------------------------------------------------------------------------------
-	void process_analog(const InputID event_X, const InputID event_Y, analog_type_2D value, scale_type_2D scale);
+	void process_analog(const InputID event_X, const InputID event_Y, analog_type_2D value, scale_type_2D scale, Origin origin);
 	template <typename EventMatcher>
 	void process_button(const EventMatcher& event_matcher, ButtonAction action, scale_type impulse);
 	void process_time(const duration delta_time, scale_type scale);

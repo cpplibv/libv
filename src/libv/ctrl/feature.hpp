@@ -10,6 +10,7 @@
 // pro
 #include <libv/ctrl/enum.hpp>
 #include <libv/ctrl/function_type.hpp>
+#include <libv/ctrl/origin.hpp>
 #include <libv/ctrl/scale.hpp>
 
 
@@ -17,12 +18,6 @@ namespace libv {
 namespace ctrl {
 
 // -------------------------------------------------------------------------------------------------
-
-enum class Origin {
-	analog,
-	impulse,
-	time,
-};
 
 struct Feature {
 	std::type_index context;
@@ -34,13 +29,11 @@ struct Feature {
 	bool binary_state = false;
 
 	ft_analog function_analog;
-	scale_type scale_impulse;
-	scale_type scale_time;
-	scale_type scale_analog;
+	scale_group feature_multiplier;
 
 public:
 	Feature(std::type_index context, std::string&& name, ft_action function);
-	Feature(std::type_index context, std::string&& name, ft_analog function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog);
+	Feature(std::type_index context, std::string&& name, ft_analog function, scale_group feature_multiplier);
 	Feature(std::type_index context, std::string&& name, ft_binary function);
 
 public:

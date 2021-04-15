@@ -16,13 +16,11 @@ Feature::Feature(std::type_index context, std::string&& name, ft_action function
 	name_(std::move(name)),
 	function_action(std::move(function)) { }
 
-Feature::Feature(std::type_index context, std::string&& name, ft_analog function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog) :
+Feature::Feature(std::type_index context, std::string&& name, ft_analog function, scale_group feature_multiplier) :
 	context(context),
 	name_(std::move(name)),
 	function_analog(std::move(function)),
-	scale_impulse(scale_impulse),
-	scale_time(scale_time),
-	scale_analog(scale_analog) { }
+	feature_multiplier(feature_multiplier) { }
 
 Feature::Feature(std::type_index context, std::string&& name, ft_binary function) :
 	context(context),
@@ -66,12 +64,18 @@ void Feature::fire_analog(void* ctx_ptr, scale_type scale, Origin origin) {
 		return;
 
 	switch (origin) {
-	case Origin::analog:
-		return function_analog(arg_analog_t{scale * scale_analog}, ctx_ptr);
 	case Origin::impulse:
-		return function_analog(arg_analog_t{scale * scale_impulse}, ctx_ptr);
+		return function_analog(arg_analog_t{scale * feature_multiplier.impulse}, ctx_ptr);
 	case Origin::time:
-		return function_analog(arg_analog_t{scale * scale_time}, ctx_ptr);
+		return function_analog(arg_analog_t{scale * feature_multiplier.time}, ctx_ptr);
+	case Origin::mouse:
+		return function_analog(arg_analog_t{scale * feature_multiplier.mouse}, ctx_ptr);
+	case Origin::scroll:
+		return function_analog(arg_analog_t{scale * feature_multiplier.scroll}, ctx_ptr);
+	case Origin::gp_analog:
+		return function_analog(arg_analog_t{scale * feature_multiplier.gp_analog}, ctx_ptr);
+	case Origin::js_analog:
+		return function_analog(arg_analog_t{scale * feature_multiplier.js_analog}, ctx_ptr);
 	}
 
 	assert(false && "Invalid Analog Origin");

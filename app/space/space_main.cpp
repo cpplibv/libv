@@ -357,7 +357,6 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: Camera, camera behaviour and controls
 // TODO P1: Controls camera should only be placed into context if the canvas is focused
 // TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
 // TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
@@ -384,7 +383,7 @@ int main() {
 	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 	frame.setOpenGLVersion(3, 3);
 	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
-	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
+//	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 
 	// TODO P1: Timer management should be smoother with control and frame attachment
 	libv::Timer timer;

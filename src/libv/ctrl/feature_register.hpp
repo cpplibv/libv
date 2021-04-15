@@ -37,7 +37,7 @@ public:
 
 private:
 	void _feature_action(std::type_index context, std::string&& name, ft_action function);
-	void _feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog);
+	void _feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers);
 	void _feature_binary(std::type_index context, std::string&& name, ft_binary function);
 
 public:
@@ -45,13 +45,13 @@ public:
 	inline void feature_action(std::string name, F&& function);
 
 	template <typename T, typename F>
+	inline void feature_analog(std::string name, F&& function, scale_group multipliers);
+
+	template <typename T, typename F>
+	inline void feature_analog(std::string name, scale_group multipliers, F&& function);
+
+	template <typename T, typename F>
 	inline void feature_analog(std::string name, F&& function, scale_type scale_impulse = 1, scale_type scale_time = 1, scale_type scale_analog = 1);
-
-	template <typename T, typename F>
-	inline void feature_analog(std::string name, F&& function, scale_group scales);
-
-	template <typename T, typename F>
-	inline void feature_analog(std::string name, scale_group scales, F&& function);
 
 	template <typename T, typename F>
 	inline void feature_binary(std::string name, F&& function);
@@ -62,7 +62,7 @@ public:
 template <auto GlobalFunc>
 struct AutomaticFeatureRegister {
 	template <typename T>
-	AutomaticFeatureRegister(const T& func) {
+	inline explicit AutomaticFeatureRegister(const T& func) {
 		auto feature_register = FeatureRegister{GlobalFunc()};
 		func(feature_register);
 	}
@@ -85,7 +85,7 @@ inline void FeatureRegister::feature_action(std::string name, F&& function) {
 }
 
 template <typename T, typename F>
-inline void FeatureRegister::feature_analog(std::string name, F&& function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog) {
+inline void FeatureRegister::feature_analog(std::string name, F&& function, scale_group multipliers) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
 	const auto context = std::type_index(typeid(T));
@@ -95,17 +95,26 @@ inline void FeatureRegister::feature_analog(std::string name, F&& function, scal
 			function(params), (void) context;
 		else
 			function(params, *static_cast<T*>(context));
-	}, scale_impulse, scale_time, scale_analog);
+	}, multipliers);
 }
 
 template <typename T, typename F>
-inline void FeatureRegister::feature_analog(std::string name, F&& function, scale_group scales) {
-	feature_analog<T>(std::move(name), std::forward<F>(function), scales.impulse, scales.time, scales.scale);
+inline void FeatureRegister::feature_analog(std::string name, scale_group multipliers, F&& function) {
+	feature_analog<T>(std::move(name), std::forward<F>(function), multipliers);
 }
 
 template <typename T, typename F>
-inline void FeatureRegister::feature_analog(std::string name, scale_group scales, F&& function) {
-	feature_analog<T>(std::move(name), std::forward<F>(function), scales.impulse, scales.time, scales.scale);
+inline void FeatureRegister::feature_analog(std::string name, F&& function, scale_type multi_impulse, scale_type multi_time, scale_type multi_analog) {
+	const auto multipliers = scale_group{
+			.impulse = multi_impulse,
+			.time = multi_time,
+			.mouse = multi_analog,
+			.scroll = multi_analog,
+			.gp_analog = multi_analog,
+			.js_analog = multi_analog
+	};
+
+	feature_analog<T>(std::move(name), std::forward<F>(function), multipliers);
 }
 
 template <typename T, typename F>

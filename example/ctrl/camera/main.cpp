@@ -35,18 +35,18 @@ int main() {
 	controls.context_enter(&camera); // Enter camera context
 
 	// Process events
-	controls.input(EventMousePosition{120, 60});
+	controls.event(EventMousePosition{120, 60});
 	// Output: Camera moved to X: 0.2
 	// Output: Camera moved to Y: 0.1
 
-	controls.input(EventKey{Keycode::ControlLeft, Scancode{29}, Action::press});
-	controls.input(EventMousePosition{300, 60});
+	controls.event(EventKey{Keycode::ControlLeft, Scancode{29}, Action::press});
+	controls.event(EventMousePosition{300, 60});
 	// Output: Camera moved to Z: 0.3
-	controls.input(EventKey{Keycode::ControlLeft, Scancode{29}, Action::release});
+	controls.event(EventKey{Keycode::ControlLeft, Scancode{29}, Action::release});
 
-	controls.input(EventKey{Keycode::A, Scancode{30}, Action::press});
+	controls.event(EventKey{Keycode::A, Scancode{30}, Action::press});
 	// Output: Camera moved to origin
-	controls.input(EventKey{Keycode::A, Scancode{30}, Action::release});
+	controls.event(EventKey{Keycode::A, Scancode{30}, Action::release});
 
 	controls.context_leave<Camera>(); // Leave camera context
 

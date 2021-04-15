@@ -546,7 +546,7 @@ inline auto ImplControls::notify_features(const T& target_features) {
 
 // =================================================================================================
 
-void ImplControls::process_analog(const InputID event_X, const InputID event_Y, analog_type_2D value, scale_type_2D scale) {
+void ImplControls::process_analog(const InputID event_X, const InputID event_Y, analog_type_2D value, scale_type_2D scale, Origin origin) {
 	assert(event_X.is_analog());
 	assert(event_Y.is_analog());
 
@@ -593,7 +593,7 @@ void ImplControls::process_analog(const InputID event_X, const InputID event_Y, 
 	auto candidate_bindings = update_and_gather_bindings(matcher, off_matcher);
 	select_bindings(candidate_bindings);
 	TargetFeatures target_features;
-	gather_features(candidate_bindings, target_features, Origin::analog);
+	gather_features(candidate_bindings, target_features, origin);
 	notify_features(target_features);
 }
 
@@ -682,10 +682,10 @@ void Controls::_feature_action(std::type_index context, std::string&& name, ft_a
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function)));
 }
 
-void Controls::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_type scale_impulse, scale_type scale_time, scale_type scale_analog) {
+void Controls::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers) {
 	// TODO P2: C++20 Better container would remove key copy
 	auto key = name;
-	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function), scale_impulse, scale_time, scale_analog));
+	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function), multipliers));
 }
 
 void Controls::_feature_binary(std::type_index context, std::string&& name, ft_binary function) {
@@ -864,12 +864,13 @@ void Controls::event(const libv::input::EventMousePosition& event) {
 	self->mouse_position = event.position;
 
 	// Process event
-	const auto scale = self->scale_analog * self->scale_mouse_move * MOUSE_NORMALIZATION_SCALE;
+	const auto scale = self->scale_analog * self->scale_mouse_move;
 	self->process_analog(
 			InputID{event.position.x >= 0 ? MouseMovement::x_plus : MouseMovement::x_minus},
 			InputID{event.position.y >= 0 ? MouseMovement::y_plus : MouseMovement::y_minus},
 			mouse_diff,
-			scale);
+			scale,
+			Origin::mouse);
 }
 
 void Controls::event(const libv::input::EventMouseScroll& event) {
@@ -882,7 +883,8 @@ void Controls::event(const libv::input::EventMouseScroll& event) {
 			InputID{event.offset.x >= 0 ? MouseScroll::x_plus : MouseScroll::x_minus},
 			InputID{event.offset.y >= 0 ? MouseScroll::y_plus : MouseScroll::y_minus},
 			event.offset,
-			scale);
+			scale,
+			Origin::scroll);
 }
 
 void Controls::event(const libv::input::EventGamepadAnalog& event) {
@@ -899,7 +901,8 @@ void Controls::event(const libv::input::EventGamepadAnalog& event) {
 			InputID{event.gamepadID, event.analogID, event.position.x >= 0 ? AnalogDimension::x_plus : AnalogDimension::x_minus},
 			InputID{event.gamepadID, event.analogID, event.position.y >= 0 ? AnalogDimension::y_plus : AnalogDimension::y_minus},
 			event.position,
-			scale);
+			scale,
+			Origin::gp_analog);
 }
 
 void Controls::event(const libv::input::EventGamepadButton& event) {
@@ -933,7 +936,8 @@ void Controls::event(const libv::input::EventJoystickAnalog& event) {
 			InputID{event.joystickID, event.analogID, event.position.x >= 0 ? AnalogDimension::x_plus : AnalogDimension::x_minus},
 			InputID{event.joystickID, event.analogID, event.position.y >= 0 ? AnalogDimension::y_plus : AnalogDimension::y_minus},
 			event.position,
-			scale);
+			scale,
+			Origin::js_analog);
 }
 
 void Controls::event(const libv::input::EventJoystickButton& event) {

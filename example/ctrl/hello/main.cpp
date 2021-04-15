@@ -26,12 +26,12 @@ int main() {
 	controls.bind("sandbox.hello", "A");
 	controls.bind("sandbox.bye", "S");
 
-	controls.input(EventKey{Keycode::A, Scancode{30}, Action::press});
+	controls.event(EventKey{Keycode::A, Scancode{30}, Action::press});
 	// Output: "Action: Hello!"
-	controls.input(EventKey{Keycode::A, Scancode{30}, Action::release});
-	controls.input(EventKey{Keycode::S, Scancode{31}, Action::press});
+	controls.event(EventKey{Keycode::A, Scancode{30}, Action::release});
+	controls.event(EventKey{Keycode::S, Scancode{31}, Action::press});
 	// Output: "Action: Bye!"
-	controls.input(EventKey{Keycode::S, Scancode{31}, Action::release});
+	controls.event(EventKey{Keycode::S, Scancode{31}, Action::release});
 
 	return EXIT_SUCCESS;
 }
