@@ -37,7 +37,7 @@ private:
 
 public:
 	Texture() noexcept;
-	
+
 private:
 	Texture(std::shared_ptr<RemoteTexture> remote) noexcept;
 

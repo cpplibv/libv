@@ -315,7 +315,7 @@ struct Sandbox {
 		auto imageTexture0 = libv::gl::load_image_or_throw(dataTexture0);
 		sphere_texture0.load(std::move(imageTexture0));
 
-		const libv::vec4uc tex_data[] = {
+		static constexpr libv::vec4uc tex_data[] = {
 			{0, 0, 0, 255},
 			{255, 0, 0, 255},
 			{0, 255, 0, 255},

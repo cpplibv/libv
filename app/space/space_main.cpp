@@ -9,6 +9,7 @@
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/program.hpp>
 #include <libv/glr/queue.hpp>
+#include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
 #include <libv/ui/component/canvas.hpp>
@@ -134,15 +135,46 @@ void main() {
 }
 )";
 
+const auto shader_background_vs = R"(
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition;
+
+out vec2 fragmentTexture0;
+
+void main() {
+	gl_Position = vec4(vertexPosition, 1);
+	fragmentTexture0 = vertexPosition.xy * 0.5 + 0.5;
+}
+)";
+
+const auto shader_background_fs = R"(
+#version 330 core
+
+in vec2 fragmentTexture0;
+
+out vec4 output;
+
+uniform sampler2D texture0Sampler;
+uniform vec4 color0;
+//uniform vec4 color1;
+//uniform vec4 colorCurve;
+
+void main() {
+	output = vec4(texture2D(texture0Sampler, fragmentTexture0, 0).rgb * color0.rgb, color0.a);
+}
+)";
+
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal    = libv::glr::Attribute<1, libv::vec3f>{};
 constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
 
+const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
+
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
-
-const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
+constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
 
 struct SphereUniformLayout {
 	libv::glr::Uniform_mat4f MVPmat;
@@ -253,6 +285,62 @@ void draw_gizmo_lines(libv::glr::Mesh& mesh) {
 	index.line(4, 5);
 }
 
+// -------------------------------------------------------------------------------------------------
+
+struct Background {
+	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Program program_background;
+	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
+	libv::glr::Uniform_vec4f background_uniform_color0;
+	libv::glr::Uniform_texture background_uniform_texture0;
+
+	Background() {
+		program_background.vertex(shader_background_vs);
+		program_background.fragment(shader_background_fs);
+		program_background.assign(background_uniform_color0, "color0");
+		program_background.assign(background_uniform_texture0, "texture0Sampler", textureChannel_pattern);
+		const libv::vec3uc tex_data[] = {
+				{0, 0, 255},
+				{255, 0, 0},
+				{0, 255, 0},
+				{255, 255, 0},
+		};
+
+//		background_texture_pattern Repeated UV stuffy
+		background_texture_pattern.storage(1, {2, 2});
+		background_texture_pattern.image(0, {0, 0}, {2, 2}, tex_data);
+		background_texture_pattern.set(libv::gl::MagFilter::Nearest);
+		background_texture_pattern.set(libv::gl::MinFilter::Nearest);
+
+		{
+			auto position = mesh_background.attribute(attribute_position);
+			auto index = mesh_background.index();
+
+			position(-1, -1, 0);
+			position( 1, -1, 0);
+			position( 1,  1, 0);
+			position(-1,  1, 0);
+
+			index.quad(0, 1, 2, 3);
+		}
+	}
+
+	void render(libv::glr::Queue& gl) {
+		const auto s_guard = gl.state.push_guard();
+
+		gl.state.disableDepthMask();
+		gl.state.disableDepthTest();
+		gl.state.polygonModeFill();
+
+		gl.program(program_background);
+		gl.uniform(background_uniform_color0, libv::vec4f(1, 1, 1, 1));
+		gl.texture(background_texture_pattern, textureChannel_pattern);
+		gl.render(mesh_background);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 struct SpaceCanvas : libv::ui::Canvas {
 	app::CameraPlayer& camera;
 
@@ -262,11 +350,13 @@ struct SpaceCanvas : libv::ui::Canvas {
 	libv::glr::Mesh mesh_gizmo{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program program_gizmo;
 
+	Background background;
+
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program program;
 	libv::glr::UniformBuffer arrow_uniforms{libv::gl::BufferUsage::StreamDraw};
 
-	SpaceCanvas(app::CameraPlayer& camera) :
+	explicit SpaceCanvas(app::CameraPlayer& camera) :
 		camera(camera) {
 
 		program.vertex(shader_arrow_vs);
@@ -302,9 +392,23 @@ struct SpaceCanvas : libv::ui::Canvas {
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 		time += dtf;
+
+		// TODO P2: Value tracking UI component for debugging
+//		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
+//		value_tracker(160);
+//		value_tracker.pause();
+//		value_tracker.resume();
+//		value_tracker("camera.orbit_point", camera.orbit_point());
+//		value_tracker("camera.orbit_distance", camera.orbit_distance());
+//		value_tracker("camera.rotations", camera.rotations());
+//		value_tracker.differential("camera.orbit_point", camera.orbit_point());
+//		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
+//		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
+		const auto s_guard = gl.state.push_guard();
+
 		gl.state.enableDepthTest();
 
 		gl.projection = camera.projection(canvas_size);
@@ -313,6 +417,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		gl.view = libv::mat4f::lookAt({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f});
 //		gl.view.rotate(libv::Degrees{angle}, 0.f, 0.f, 1.f);
 		gl.model = libv::mat4f::identity();
+
+		background.render(gl);
 
 		{
 			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
@@ -394,27 +500,6 @@ int main() {
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
 			frame.closeForce();
-
-		static float i = -2;
-		static float k = -2;
-		if (e.keycode == libv::input::Keycode::I && e.action == libv::input::Action::press)
-			i += 1.0f;
-		else if (e.keycode == libv::input::Keycode::O && e.action == libv::input::Action::press)
-			i -= 1.0f;
-		else if (e.keycode == libv::input::Keycode::K && e.action == libv::input::Action::press)
-			k += 1.0f;
-		else if (e.keycode == libv::input::Keycode::L && e.action == libv::input::Action::press)
-			k -= 1.0f;
-		else {
-			log_space.info("{} {} {} ==> rot:{:16} dir:{:16} eye:{:16}",
-					i, k, 1.2, camera.rotations(), camera.direction(), camera.eye());
-			return;
-		}
-		camera.look_at({i, k, 1.2f}, {0.f, 0.f, 0.f});
-		log_space.info("{} {} {} ==> rot:{:16} dir:{:16} eye:{:16}",
-				i, k, 1.2, camera.rotations(), camera.direction(), camera.eye());
-//		std::cout << i << " " << k << " 1.2 ==> " << camera.eye() << " > " << camera.rotations() << std::endl;
-//		camera.rotations({0, -libv::pi * 0.25, libv::pi * 0.25});
 	});
 
 	ui.attach(frame);
