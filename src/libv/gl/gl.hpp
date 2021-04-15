@@ -477,12 +477,24 @@ private:
 	void init() {
 		glewExperimental = true;
 
-		if (GLenum err = glewInit() != GLEW_OK)
+		if (GLenum err = glewInit() != GLEW_OK) {
 			log_gl.error("Failed to initialize glew: {}", glewGetErrorString(err));
+			return;
+		}
 
 		log_gl.debug("GL Vendor     {}", glGetString(GL_VENDOR));
 		log_gl.debug("GL Renderer   {}", glGetString(GL_RENDERER));
 		log_gl.debug("GL Version    {}", glGetString(GL_VERSION));
+
+		// Disable row alignment for texture and pixel operations
+		// Otherwise a default 4 byte alignment is required for pixels row starts (which is broken on R8G8B8 formats if the width is not multiple of 4)
+		// For more information:
+		//      https://www.khronos.org/opengl/wiki/Common_Mistakes#Texture_upload_and_pixel_reads
+		//      https://www.khronos.org/opengl/wiki/Pixel_Transfer#Pixel_layout
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		checkGL();
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		checkGL();
 
 		// Fetch OpenGL context current state
 		capability.blend.init();
