@@ -1,4 +1,4 @@
-// Generated source for enum: color
+// Project: libv, File: app/enum/example.hpp, Author: Császár Mátyás [Vader]
 // Generator: enum v14
 
 #pragma once

@@ -1,4 +1,4 @@
-// Project: libv, File: app/enum/enum_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/space_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/ctrl/controls.hpp>
@@ -12,6 +12,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
+#include <libv/math/noise/white.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/ui.hpp>
@@ -155,13 +156,17 @@ in vec2 fragmentTexture0;
 
 out vec4 output;
 
-uniform sampler2D texture0Sampler;
-uniform vec4 color0;
+uniform sampler2D textureNoise;
+uniform vec4 noiseScale;
+uniform vec4 noiseOffset;
+
+//uniform vec4 color0;
 //uniform vec4 color1;
 //uniform vec4 colorCurve;
 
 void main() {
-	output = vec4(texture2D(texture0Sampler, fragmentTexture0, 0).rgb * color0.rgb, color0.a);
+	vec4 noise = texture2D(textureNoise, fragmentTexture0, 0).rgba;
+	output = noise * noiseScale + noiseOffset;
 }
 )";
 
@@ -291,24 +296,24 @@ struct Background {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program program_background;
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-	libv::glr::Uniform_vec4f background_uniform_color0;
-	libv::glr::Uniform_texture background_uniform_texture0;
+	libv::glr::Uniform_vec4f background_uniform_noiseScale;
+	libv::glr::Uniform_vec4f background_uniform_noiseOffset;
+	libv::glr::Uniform_texture background_uniform_textureNoise;
 
 	Background() {
 		program_background.vertex(shader_background_vs);
 		program_background.fragment(shader_background_fs);
-		program_background.assign(background_uniform_color0, "color0");
-		program_background.assign(background_uniform_texture0, "texture0Sampler", textureChannel_pattern);
-		const libv::vec3uc tex_data[] = {
-				{0, 0, 255},
-				{255, 0, 0},
-				{0, 255, 0},
-				{255, 255, 0},
-		};
+		program_background.assign(background_uniform_noiseScale, "noiseScale");
+		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
+		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
+		// TODO P1: Repeated UV stuffy and smaller square noise texture
+//		const auto noise_size = libv::vec2i(128, 128);
+		const auto noise_size = libv::vec2i(1280, 800);
+		// TODO P1: Switch to blue noise once implemented
+		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
 
-//		background_texture_pattern Repeated UV stuffy
-		background_texture_pattern.storage(1, {2, 2});
-		background_texture_pattern.image(0, {0, 0}, {2, 2}, tex_data);
+		background_texture_pattern.storage(1, noise_size);
+		background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
 		background_texture_pattern.set(libv::gl::MagFilter::Nearest);
 		background_texture_pattern.set(libv::gl::MinFilter::Nearest);
 
@@ -333,7 +338,15 @@ struct Background {
 		gl.state.polygonModeFill();
 
 		gl.program(program_background);
-		gl.uniform(background_uniform_color0, libv::vec4f(1, 1, 1, 1));
+		// TODO P1: Update shader to operate on color-noise uniforms
+		const auto bg_noise = 5.f / 255.f;
+		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
+		gl.uniform(background_uniform_noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
+		gl.uniform(background_uniform_noiseOffset, bg_color);
+//		gl.uniform(background_uniform_noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
+//		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
+//		gl.uniform(background_uniform_noiseScale, libv::vec4f(0, 0, 0, 0));
+//		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0, 0, 0, 0));
 		gl.texture(background_texture_pattern, textureChannel_pattern);
 		gl.render(mesh_background);
 	}

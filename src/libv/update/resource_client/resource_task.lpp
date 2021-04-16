@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/resource_client/task_pool.lpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_client/resource_task.lpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

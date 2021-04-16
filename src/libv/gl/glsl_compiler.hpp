@@ -1,4 +1,4 @@
-
+// Project: libv.gl, File: src/libv/gl/glsl_compiler.hpp, Author: Császár Mátyás [Vader]
 // Project: libv.gl, File: src/libv/gl/glsl_compiler.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once

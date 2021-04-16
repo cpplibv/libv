@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/update_signature.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_signature.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

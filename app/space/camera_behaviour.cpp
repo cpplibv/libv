@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/camera_behaviour.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/camera_behaviour.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <space/camera_behaviour.hpp>
