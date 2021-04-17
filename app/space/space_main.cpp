@@ -62,10 +62,14 @@ const auto shader_arrow_vs = R"(
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 8) in vec2 vertexTexture0;
-//layout(location = 15) in vec2 vertexSegment_Total;
+layout(location = 15) in vec4 vertex_SP_SS_TP_TS; // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 
 out vec3 fragmentNormal;
 out vec2 fragmentTexture0;
+out float fragmentSegmentPosition;
+out float fragmentSegmentSize;
+out float fragmentTotalPosition;
+out float fragmentTotalSize;
 
 layout(std140) uniform Sphere {
 	mat4 MVPmat;
@@ -74,9 +78,19 @@ layout(std140) uniform Sphere {
 };
 
 void main() {
+	float vertexSegmentPosition = vertex_SP_SS_TP_TS.x;
+	float vertexSegmentSize = vertex_SP_SS_TP_TS.y;
+	float vertexTotalPosition = vertex_SP_SS_TP_TS.z;
+	float vertexTotalSize = vertex_SP_SS_TP_TS.w;
+
 	gl_Position = MVPmat * vec4(vertexPosition, 1);
 	fragmentNormal = normalize(vertexNormal);
 	fragmentTexture0 = vertexTexture0;
+
+	fragmentSegmentPosition = vertexSegmentPosition;
+	fragmentSegmentSize = vertexSegmentSize;
+	fragmentTotalPosition = vertexTotalPosition;
+	fragmentTotalSize = vertexTotalSize;
 }
 )";
 
@@ -85,6 +99,10 @@ const auto shader_arrow_fs = R"(
 
 in vec3 fragmentNormal;
 in vec2 fragmentTexture0;
+in float fragmentSegmentPosition;
+in float fragmentSegmentSize;
+in float fragmentTotalPosition;
+in float fragmentTotalSize;
 
 out vec4 output;
 
@@ -95,7 +113,7 @@ layout(std140) uniform Sphere {
 };
 
 /// Anti-aliased mask creation from SDF with zero as limit
-float mask_aa(float sdf) {
+float mask_aa(in float sdf) {
 	// Method A: smoothstep
 	// Idea from: https://www.ronja-tutorials.com/post/034-2d-sdf-basics/
 	float delta = fwidth(sdf) * 0.5;
@@ -109,11 +127,34 @@ float mask_aa(float sdf) {
 	return mask_aa;
 }
 
+float sdTriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2) {
+	vec2 e0 = p1 - p0;
+	vec2 e1 = p2 - p1;
+	vec2 e2 = p0 - p2;
+
+	vec2 v0 = p - p0;
+	vec2 v1 = p - p1;
+	vec2 v2 = p - p2;
+
+	vec2 pq0 = v0 - e0 * clamp(dot(v0, e0) / dot(e0, e0), 0.0, 1.0);
+	vec2 pq1 = v1 - e1 * clamp(dot(v1, e1) / dot(e1, e1), 0.0, 1.0);
+	vec2 pq2 = v2 - e2 * clamp(dot(v2, e2) / dot(e2, e2), 0.0, 1.0);
+
+    float s = e0.x * e2.y - e0.y * e2.x;
+    vec2 d = min(min(vec2(dot(pq0, pq0), s * (v0.x * e0.y - v0.y * e0.x)),
+                     vec2(dot(pq1, pq1), s * (v1.x * e1.y - v1.y * e1.x))),
+                     vec2(dot(pq2, pq2), s * (v2.x * e2.y - v2.y * e2.x)));
+
+	return -sqrt(d.x) * sign(d.y);
+}
+
 void main() {
-	vec4 color_body = vec4(0.60, 0.60, 0.60, 1);
-	vec4 color_edge = vec4(0.85, 0.85, 0.85, 1);
-	float body_size = 0.400;
-	float edge_size = 0.075;
+	const vec4 color_body = vec4(0.60, 0.60, 0.60, 1);
+	const vec4 color_edge = vec4(0.85, 0.85, 0.85, 1);
+	const vec4 color_head = vec4(0.85, 0.30, 0.30, 1);
+	const float body_size = 0.400;
+	const float edge_size = 0.075;
+	const float head_size = 0.125;
 
 	float distance_from_middle = abs(fragmentTexture0.x - 0.5);
 
@@ -124,8 +165,21 @@ void main() {
 
 	float edge_sdf = distance_from_middle - body_size * 0.5 + edge_size;
 	output = mix(output, color_edge, mask_aa(edge_sdf));
+
+	float head_x = fragmentTexture0.x;
+	float head_y = fragmentSegmentSize - fragmentSegmentPosition - head_size;
+	float head_sdf = sdTriangle(vec2(head_x, head_y), vec2(0.5, -head_size), vec2(0, 0), vec2(1, 0));
+	output = mix(output, color_head, mask_aa(head_sdf));
 }
 )";
+
+// TODO P1: In shader_arrow_fs body_size/edge_size is UV but head_size is world space. Unify them
+// TODO P1: Organize vertex_SP_SS_TP_TS to SS_SP_SE_TS s.start, s.position, s.end, t.size or with some more sane name
+// TODO P1: Move shaders to files
+// TODO P1: Move mask_aa into its own file
+// TODO P1: Shader hot loader
+// TODO P2: No sdTriangle (at all) solve the problem without triangle sdf
+// TODO P4: Shader Importer
 
 const auto shader_gizmo_vs = R"(
 #version 330 core
@@ -201,9 +255,10 @@ void main() {
 )";
 
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
-constexpr auto attribute_normal    = libv::glr::Attribute<1, libv::vec3f>{};
-constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
+constexpr auto attribute_normal	= libv::glr::Attribute<1, libv::vec3f>{};
+constexpr auto attribute_color0	= libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
+constexpr auto attribute_custom0	= libv::glr::Attribute<15, libv::vec4f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
@@ -250,6 +305,7 @@ struct ArrowOptions {
 
 void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const ArrowOptions& options) {
 	using vec3 = libv::vec3f;
+	using f = float;
 
 	static constexpr vec3 up{0, 0, 1};
 
@@ -259,7 +315,18 @@ void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const Ar
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto texture0 = mesh.attribute(attribute_texture0);
+	auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 	auto index = mesh.index();
+
+	f total_position = 0;
+	f total_size = 0;
+
+	for (int32_t i = 0; i < static_cast<int32_t>(points.size()) - 1; i++) {
+		const auto a = points[i];
+		const auto b = points[i + 1];
+
+		total_size += (b - a).length();
+	}
 
 	for (int32_t i = 0; i < static_cast<int32_t>(points.size()) - 1; i++) {
 		const auto a = points[i];
@@ -292,7 +359,14 @@ void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const Ar
 		texture0(1, 1);
 		texture0(0, 1);
 
+		sp_ss_tp_ts(0, length, total_position, total_size);
+		sp_ss_tp_ts(0, length, total_position, total_size);
+		sp_ss_tp_ts(length, length, total_position, total_size);
+		sp_ss_tp_ts(length, length, total_position, total_size);
+
 		index.quad(i * 4 + 0, i * 4 + 1, i * 4 + 2, i * 4 + 3);
+
+		total_position += length;
 	}
 }
 
