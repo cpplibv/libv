@@ -82,6 +82,9 @@ public:
 public:
 	void set(libv::gl::MagFilter filter) noexcept;
 	void set(libv::gl::MinFilter filter) noexcept;
+	void set(libv::gl::Wrap warpS) noexcept;
+	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT) noexcept;
+	void set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap warpR) noexcept;
 
 private:
 	void sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept;

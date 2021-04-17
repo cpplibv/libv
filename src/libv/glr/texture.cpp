@@ -30,6 +30,9 @@ struct RemoteTexture {
 	bool dirty_load = false;
 	bool dirty_data = false;
 	bool dirty_filter = false;
+	bool dirty_wrap1 = false;
+	bool dirty_wrap2 = false;
+	bool dirty_wrap3 = false;
 
 	//int32_t ref_count = 0;
 
@@ -58,9 +61,9 @@ struct RemoteTexture {
 	// Properties
 	libv::gl::MagFilter magFilter = libv::gl::MagFilter::Linear;
 	libv::gl::MinFilter minFilter = libv::gl::MinFilter::NearestMipmapLinear;
-//	libv::gl::Wrap warpS = libv::gl::Wrap::Repeat;
-//	libv::gl::Wrap warpT = libv::gl::Wrap::Repeat;
-//	libv::gl::Wrap warpR = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap warpS = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap warpT = libv::gl::Wrap::Repeat;
+	libv::gl::Wrap warpR = libv::gl::Wrap::Repeat;
 
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
 
@@ -170,6 +173,24 @@ void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 		gl(head.texture).setMagFilter(magFilter);
 		gl(head.texture).setMinFilter(minFilter);
 		dirty_filter = false;
+	}
+
+	if (dirty_wrap1) {
+		gl(head.texture).bind();
+		gl(head.texture).setWrap(warpS);
+		dirty_wrap1 = false;
+	}
+
+	if (dirty_wrap2) {
+		gl(head.texture).bind();
+		gl(head.texture).setWrap(warpS, warpT);
+		dirty_wrap2 = false;
+	}
+
+	if (dirty_wrap3) {
+		gl(head.texture).bind();
+		gl(head.texture).setWrap(warpS, warpT, warpR);
+		dirty_wrap3 = false;
 	}
 
 	head.dirty = false;
@@ -340,6 +361,27 @@ void Texture::set(libv::gl::MinFilter filter) noexcept {
 	remote->head.dirty = true;
 	remote->dirty_filter = true;
 	remote->minFilter = filter;
+}
+
+void Texture::set(libv::gl::Wrap warpS) noexcept {
+	remote->head.dirty = true;
+	remote->dirty_wrap1 = true;
+	remote->warpS = warpS;
+}
+
+void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT) noexcept {
+	remote->head.dirty = true;
+	remote->dirty_wrap2 = true;
+	remote->warpS = warpS;
+	remote->warpT = warpT;
+}
+
+void Texture::set(libv::gl::Wrap warpS, libv::gl::Wrap warpT, libv::gl::Wrap warpR) noexcept {
+	remote->head.dirty = true;
+	remote->dirty_wrap3 = true;
+	remote->warpS = warpS;
+	remote->warpT = warpT;
+	remote->warpR = warpR;
 }
 
 void Texture::sync_no_bind(libv::gl::GL& gl, Remote& remote_) const noexcept {
