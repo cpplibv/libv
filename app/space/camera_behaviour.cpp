@@ -122,6 +122,7 @@ void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 
 	controls.bind("camera.move_up", "Y");
 	controls.bind("camera.move_up", "H", -1);
+	controls.bind("camera.move_up", "MMB + Mouse Y");
 }
 
 // -------------------------------------------------------------------------------------------------

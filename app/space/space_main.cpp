@@ -62,6 +62,7 @@ const auto shader_arrow_vs = R"(
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 8) in vec2 vertexTexture0;
+//layout(location = 15) in vec2 vertexSegment_Total;
 
 out vec3 fragmentNormal;
 out vec2 fragmentTexture0;
@@ -93,8 +94,36 @@ layout(std140) uniform Sphere {
 	vec3 color;
 };
 
+/// Anti-aliased mask creation from SDF with zero as limit
+float mask_aa(float sdf) {
+	// Method A: smoothstep
+	// Idea from: https://www.ronja-tutorials.com/post/034-2d-sdf-basics/
+	float delta = fwidth(sdf) * 0.5;
+	float mask_aa = smoothstep(delta, -delta, sdf);
+
+	// Method B: division
+	// Idea from: Freya Holmér (Acegikmo) https://www.youtube.com/watch?v=mL8U8tIiRRg
+	// float delta = fwidth(sdf);
+	// float mask_aa = 1 - clamp(sdf / delta, 0, 1);
+
+	return mask_aa;
+}
+
 void main() {
-	output = vec4(fragmentTexture0, 1, 1);
+	vec4 color_body = vec4(0.60, 0.60, 0.60, 1);
+	vec4 color_edge = vec4(0.85, 0.85, 0.85, 1);
+	float body_size = 0.400;
+	float edge_size = 0.075;
+
+	float distance_from_middle = abs(fragmentTexture0.x - 0.5);
+
+	output = vec4(color_body.rgb, 0);
+
+	float body_sdf = distance_from_middle - body_size * 0.5;
+	output = mix(output, color_body, mask_aa(body_sdf));
+
+	float edge_sdf = distance_from_middle - body_size * 0.5 + edge_size;
+	output = mix(output, color_edge, mask_aa(edge_sdf));
 }
 )";
 
@@ -341,7 +370,7 @@ struct Background {
 		gl.state.polygonModeFill();
 
 		gl.program(program_background);
-		// TODO P1: Update shader to operate on color-noise uniforms
+		// TODO P1: Update shader to operate on color and noise uniforms
 //		const auto bg_noise = 1.f;
 		const auto bg_noise = 5.f / 255.f;
 		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
@@ -467,6 +496,14 @@ struct SpaceCanvas : libv::ui::Canvas {
 		}
 
 		{
+			gl.state.enableBlend();
+			gl.state.blendSrc_SourceAlpha();
+			gl.state.blendDst_One_Minus_SourceAlpha();
+
+			// TODO P1: With glsl generated shapes depth writing is not a good idea
+			//		  Also, the current mode would require glsl fwidth AA, possible but cumbersome
+			gl.state.disableDepthMask();
+
 			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
 			uniforms[arrow_layout.MVPmat] = gl.mvp();
 			uniforms[arrow_layout.Mmat] = gl.model;
