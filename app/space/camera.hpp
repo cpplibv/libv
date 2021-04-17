@@ -71,7 +71,7 @@ private:
 	float_type pitch_ = 0;
 	float_type yaw_ = 0;
 
-	float_type near_ = 0.1f;
+	float_type near_ = 0.01f;
 	float_type far_ = 1000.f;
 	float_type fov_y_ = libv::deg_to_rad(75.0f);
 

@@ -112,17 +112,33 @@ layout(std140) uniform Sphere {
 	vec3 color;
 };
 
+float saturate(in float v) {
+	return clamp(v, 0.0, 1.0);
+}
+
 /// Anti-aliased mask creation from SDF with zero as limit
 float mask_aa(in float sdf) {
-	// Method A: smoothstep
-	// Idea from: https://www.ronja-tutorials.com/post/034-2d-sdf-basics/
+	// Method A: fwidth and smoothstep
+	// Best result
+	// Origin: https://www.ronja-tutorials.com/post/034-2d-sdf-basics/
 	float delta = fwidth(sdf) * 0.5;
 	float mask_aa = smoothstep(delta, -delta, sdf);
 
-	// Method B: division
-	// Idea from: Freya Holmér (Acegikmo) https://www.youtube.com/watch?v=mL8U8tIiRRg
+	// Method B: division (Acegikmo)
+	// Issue: Enlarges the mask with half a pixel and therefore causes some artifacts.
+	// Origin: https://www.youtube.com/watch?v=mL8U8tIiRRg
 	// float delta = fwidth(sdf);
 	// float mask_aa = 1 - clamp(sdf / delta, 0, 1);
+
+	// Method C: division with half pixel correction
+	// Generates a bit blurrier/smoother edges, a good alternative to Method A
+	// Based on: https://www.youtube.com/watch?v=mL8U8tIiRRg
+	// float delta = fwidth(sdf);
+	// float mask_aa = 1 - clamp(sdf / delta + 0.5, 0, 1);
+
+	// Method D: step, the anti-method
+	// To just disable AA
+	// float mask_aa = step(sdf, 0);
 
 	return mask_aa;
 }
@@ -229,6 +245,44 @@ out vec2 fragmentTexture0;
 void main() {
 	gl_Position = vec4(vertexPosition, 1);
 	fragmentTexture0 = vertexPosition.xy * 0.5 + 0.5;
+}
+)";
+
+const auto shader_grid_vs = R"(
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 2) in vec4 vertexColor;
+
+out vec4 fragmentColor;
+
+layout(std140) uniform Sphere {
+	mat4 MVPmat;
+	mat4 Mmat;
+	vec3 color;
+};
+
+void main() {
+	gl_Position = MVPmat * vec4(vertexPosition, 1);
+	fragmentColor = vertexColor;
+}
+)";
+
+const auto shader_grid_fs = R"(
+#version 330 core
+
+in vec4 fragmentColor;
+
+out vec4 output;
+
+layout(std140) uniform Sphere {
+	mat4 MVPmat;
+	mat4 Mmat;
+	vec3 color;
+};
+
+void main() {
+	output = fragmentColor;
 }
 )";
 
@@ -460,6 +514,103 @@ struct Background {
 	}
 };
 
+//struct Grid {
+//	libv::glr::Mesh mesh_lines{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+//	libv::glr::Program program_lines;
+////	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
+////	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
+////	libv::glr::Uniform_texture background_uniform_textureNoise;
+//	libv::glr::Uniform_vec4f uniform_color_x;
+//	libv::glr::Uniform_vec4f uniform_color_y;
+//	libv::glr::Uniform_vec4f uniform_color_z;
+//	libv::glr::Uniform_vec4f uniform_color_line_low;
+//	libv::glr::Uniform_vec4f uniform_color_line_mid;
+//	libv::glr::Uniform_vec4f uniform_color_line_high;
+//
+////	float far;
+//
+//	static constexpr libv::vec2i noise_size = {128, 128};
+//
+//	Grid() {
+////		program_background.vertex(shader_background_vs);
+////		program_background.fragment(shader_background_fs);
+////		program_background.assign(background_uniform_noiseUVScale, "noiseUVScale");
+////		program_background.assign(background_uniform_noiseScale, "noiseScale");
+////		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
+////		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
+////		// TODO P1: Switch to blue noise once implemented
+////		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
+////
+////		background_texture_pattern.storage(1, noise_size);
+////		background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
+////		background_texture_pattern.set(libv::gl::MagFilter::Nearest);
+////		background_texture_pattern.set(libv::gl::MinFilter::Nearest);
+////		background_texture_pattern.set(libv::gl::Wrap::Repeat, libv::gl::Wrap::Repeat);
+//
+//		{
+//			auto position = mesh_background.attribute(attribute_position);
+//			auto index = mesh_background.index();
+//
+//			int count = 5000;
+//			float limit = 5000;
+//
+//			// Minor lines - 1 px dark
+//			// Major lines - 2 px light
+//			// Axis lines  - 2 px colored
+//			// Auto tessalate Minors -> Major with new Minors
+//			//      on smooth
+//			// Min size is 0.001
+//			// Fade based on inclination
+//
+//			for (int i = 0; i < count; ++i) {
+//				position(-limit, limit, 0);
+//				position(limit, limit, 0);
+//
+//				position(limit, -limit, 0);
+//				position(limit, limit, 0);
+//			}
+//
+//			for (int i = 0; i < count; ++i) {
+//				position(-limit, limit, 0);
+//				position(limit, limit, 0);
+//
+//				position(limit, -limit, 0);
+//				position(limit, limit, 0);
+//			}
+//
+////			position(-1, -1, 0);
+////			position( 1, -1, 0);
+////			position( 1,  1, 0);
+////			position(-1,  1, 0);
+//
+//			index.quad(0, 1, 2, 3);
+//		}
+//	}
+//
+//	void render(libv::glr::Queue& gl) {
+////		const auto s_guard = gl.state.push_guard();
+////
+////		gl.state.disableDepthMask();
+////		gl.state.disableDepthTest();
+////		gl.state.polygonModeFill();
+////
+////		gl.program(program_background);
+////		// TODO P1: Update shader to operate on color and noise uniforms
+//////		const auto bg_noise = 1.f;
+////		const auto bg_noise = 5.f / 255.f;
+////		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
+////		gl.uniform(background_uniform_noiseUVScale, canvas_size / noise_size.cast<float>());
+////		gl.uniform(background_uniform_noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
+////		gl.uniform(background_uniform_noiseOffset, bg_color);
+//////		gl.uniform(background_uniform_noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
+//////		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
+//////		gl.uniform(background_uniform_noiseScale, libv::vec4f(0, 0, 0, 0));
+//////		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0, 0, 0, 0));
+////		gl.texture(background_texture_pattern, textureChannel_pattern);
+////		gl.render(mesh_background);
+//	}
+//};
+
 // -------------------------------------------------------------------------------------------------
 
 struct SpaceCanvas : libv::ui::Canvas {
@@ -467,6 +618,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 	float angle = 0.0f;
 	float time = 0.0f;
+
+	int32_t test_mode = 0;
 
 	libv::glr::Mesh mesh_gizmo{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program program_gizmo;
@@ -476,12 +629,15 @@ struct SpaceCanvas : libv::ui::Canvas {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Program program;
 	libv::glr::UniformBuffer arrow_uniforms{libv::gl::BufferUsage::StreamDraw};
+	libv::glr::Uniform_int32 uniform_test_mode;
+
 
 	explicit SpaceCanvas(app::CameraPlayer& camera) :
 		camera(camera) {
 
 		program.vertex(shader_arrow_vs);
 		program.fragment(shader_arrow_fs);
+		program.assign(uniform_test_mode, "test_mode");
 		program.block_binding(uniformBlock_sphere);
 
 		program_gizmo.vertex(shader_gizmo_vs);
@@ -585,6 +741,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 			gl.program(program);
 			gl.uniform(std::move(uniforms));
+			gl.uniform(uniform_test_mode, test_mode);
 			gl.render(mesh);
 		}
 	}
@@ -611,7 +768,7 @@ int main() {
 	app::CameraBehaviour::bind_default_controls(controls);
 
 	app::CameraPlayer camera;
-	camera.look_at({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f});
+	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 	controls.context_enter<app::BaseCameraOrbit>(&camera); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
 
 	frame.setPosition(libv::Frame::FramePosition::center_current_monitor);
@@ -626,15 +783,37 @@ int main() {
 		controls.update(timer.time());
 	});
 
-	frame.onKey.output([&](const libv::input::EventKey& e) {
-		if (e.keycode == libv::input::Keycode::Escape)
-			frame.closeForce();
-	});
-
 	ui.attach(frame);
 	controls.attach(frame);
 
 	SpaceCanvas space(camera);
+
+	frame.onKey.output([&](const libv::input::EventKey& e) {
+		if (e.keycode == libv::input::Keycode::Escape)
+			frame.closeForce();
+
+		// TODO P1: Shortcut to save camera position and reload it upon restart
+		//          > Requires persistence
+		// TODO P1: Remember auto runtime hook options
+		//          > Requires persistence
+		// TODO P1: Auto runtime hook option for random uniform variables
+		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
+			const int32_t mode_count = 4;
+			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
+				space.test_mode = space.test_mode == 0 ? mode_count - 1 : space.test_mode - 1;
+			else
+				space.test_mode = (space.test_mode + 1) % mode_count;
+		}
+		if (e.keycode == libv::input::Keycode::Backtick)
+			space.test_mode = 0;
+		if (e.keycode == libv::input::Keycode::Num1)
+			space.test_mode = 1;
+		if (e.keycode == libv::input::Keycode::Num2)
+			space.test_mode = 2;
+		if (e.keycode == libv::input::Keycode::Num3)
+			space.test_mode = 3;
+		log_space.info("Test mode: {}", space.test_mode);
+	});
 
 	{
 		libv::ui::PanelFull layers;
