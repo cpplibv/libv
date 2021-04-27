@@ -72,8 +72,8 @@ void Model::node(libv::glr::Queue& gl, uint32_t nodeID, ShaderModel& shader) {
 
 	gl.model *= vm4.nodes[nodeID].transformation;
 
-	gl.uniform(shader.uniform.Mmat, gl.model);
-	gl.uniform(shader.uniform.MVPmat, gl.mvp());
+	gl.uniform(shader.uniform.matM, gl.model);
+	gl.uniform(shader.uniform.matMVP, gl.mvp());
 
 	// TODO P2: Bind textures here
 	// node->material->get<std::string>("diffuseTexture")

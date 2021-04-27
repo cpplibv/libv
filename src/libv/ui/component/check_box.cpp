@@ -243,7 +243,7 @@ namespace ui {
 //		ctx.gl.program(*property.bg_shader());
 //		ctx.gl.texture(property.bg_image()->texture(), property.bg_shader()->textureChannel);
 //		ctx.gl.uniform(property.bg_shader()->uniform_color, property.bg_color());
-//		ctx.gl.uniform(property.bg_shader()->uniform_MVPmat, ctx.gl.mvp());
+//		ctx.gl.uniform(property.bg_shader()->uniform_matMVP, ctx.gl.mvp());
 //		ctx.gl.render(bg_mesh);
 //	} {
 //		const auto guard_s = ctx.gl.state.push_guard();
@@ -253,7 +253,7 @@ namespace ui {
 //		ctx.gl.program(*property.font_shader());
 //		ctx.gl.texture(text_.font()->texture(), property.font_shader()->textureChannel);
 //		ctx.gl.uniform(property.font_shader()->uniform_color, property.font_color());
-//		ctx.gl.uniform(property.font_shader()->uniform_MVPmat, ctx.gl.mvp());
+//		ctx.gl.uniform(property.font_shader()->uniform_matMVP, ctx.gl.mvp());
 //		ctx.gl.render(text_.mesh());
 //	}
 //}

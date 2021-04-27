@@ -266,8 +266,6 @@ Watcher::token_type _subscribe_directory(
 		bool is_relative,
 		Watcher::callback_type&& callback) {
 
-	std::error_code ignore_ec;
-
 	auto cb_up = std::make_unique<Watcher::callback_type>(std::move(callback));
 	const auto ptr = cb_up.get();
 	const auto token = Watcher::token_type(ptr);

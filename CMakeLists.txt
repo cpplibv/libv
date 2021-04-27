@@ -698,6 +698,14 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_rev STATIC
+	SOURCE src/libv/rev/*.cpp
+	LINK   libv_glr libv_gl libv_utility libv_fsw
+#	LINK   ext_boost
+	LINK   libv_algo libv_range ext_range ext_ctre # Source include engine stuff
+)
+
+wish_create_library(
 	TARGET libv_serial INTERFACE
 	LINK   ext_cereal
 	LINK   ext_boost # Remove
@@ -868,7 +876,7 @@ wish_create_executable(
 	TARGET space
 	SOURCE app/space/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_lua libv_frame libv_ctrl libv_glr libv_ui
+	LINK   libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui
 )
 
 wish_create_executable(

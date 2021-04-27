@@ -59,8 +59,8 @@ namespace app {
 
 struct UniformsShaderModel {
 	libv::glr::Uniform_vec4f color;
-	libv::glr::Uniform_mat4f Mmat;
-	libv::glr::Uniform_mat4f MVPmat;
+	libv::glr::Uniform_mat4f matM;
+	libv::glr::Uniform_mat4f matMVP;
 	libv::glr::Uniform_texture texture;
 	libv::glr::Uniform_int32 mode;
 	libv::glr::Uniform_float near;
@@ -74,8 +74,8 @@ struct UniformsShaderModel {
 	template <typename Access>
 	void update_uniforms(Access& access) {
 		access(color, "color", libv::vec4f(1, 1, 1, 1));
-		access(Mmat, "Mmat", libv::mat4f::identity());
-		access(MVPmat, "MVPmat", libv::mat4f::identity());
+		access(matM, "matM", libv::mat4f::identity());
+		access(matMVP, "matMVP", libv::mat4f::identity());
 		access(texture, "textureSampler", textureChannel);
 		access(mode, "mode");
 //		access(mode, "mode", 2);

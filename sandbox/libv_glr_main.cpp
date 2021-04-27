@@ -40,11 +40,11 @@ layout(location = 0) in vec3 vertexPos;
 
 out vec3 fragmentDirectionW;
 
-uniform mat4 MVPmat;
+uniform mat4 matMVP;
 
 void main() {
     fragmentDirectionW = vertexPos;
-	vec4 pos = MVPmat * vec4(vertexPos, 1.0);
+	vec4 pos = matMVP * vec4(vertexPos, 1.0);
     gl_Position = pos.xyww; // Set depth to 1.0
 }
 )";
@@ -78,8 +78,8 @@ const float PI = 3.1415926535897932384626433832795;
 uniform float time;
 
 layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
+	mat4 matMVP;
+	mat4 matM;
 	vec3 color;
 };
 
@@ -89,7 +89,7 @@ void main() {
 
 	float effect = max(0, mod(time, full_period) - full_period + effect_period) / effect_period;
 
-	gl_Position = MVPmat * vec4(vertexPosition * (cos(effect * 2 * PI) * 0.5 + 0.5), 1);
+	gl_Position = matMVP * vec4(vertexPosition * (cos(effect * 2 * PI) * 0.5 + 0.5), 1);
 	fragmentNormal = normalize(vertexNormal);
 	fragmentTexture0 = vertexTexture0;
 }
@@ -109,8 +109,8 @@ uniform sampler2D texture1Sampler;
 uniform vec3 shift;
 
 layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
+	mat4 matMVP;
+	mat4 matM;
 	vec3 color;
 };
 
@@ -138,13 +138,13 @@ out vec2 fragmentTexture0;
 const float PI = 3.1415926535897932384626433832795;
 
 layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
+	mat4 matMVP;
+	mat4 matM;
 	vec3 color;
 };
 
 void main() {
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
+	gl_Position = matMVP * vec4(vertexPosition, 1);
 	fragmentNormal = normalize(vertexNormal);
 	fragmentTexture0 = vertexTexture0;
 }
@@ -164,8 +164,8 @@ out vec4 output;
 //uniform vec3 shift;
 
 layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
+	mat4 matMVP;
+	mat4 matM;
 	vec3 color;
 };
 
@@ -223,12 +223,12 @@ constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 // -------------------------------------------------------------------------------------------------
 
 struct SphereUniformLayout {
-	libv::glr::Uniform_mat4f MVPmat;
-	libv::glr::Uniform_mat4f Mmat;
+	libv::glr::Uniform_mat4f matMVP;
+	libv::glr::Uniform_mat4f matM;
 	libv::glr::Uniform_vec3f color;
 
-	LIBV_REFLECTION_ACCESS(MVPmat);
-	LIBV_REFLECTION_ACCESS(Mmat);
+	LIBV_REFLECTION_ACCESS(matMVP);
+	LIBV_REFLECTION_ACCESS(matM);
 	LIBV_REFLECTION_ACCESS(color);
 };
 const auto sphere_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
@@ -292,7 +292,7 @@ struct Sandbox {
 
 	libv::glr::Program sky_program;
 	libv::glr::Mesh sky_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Uniform_mat4f sky_uniform_MVPmat;
+	libv::glr::Uniform_mat4f sky_uniform_matMVP;
 	libv::glr::Uniform_texture sky_uniform_texture;
 	libv::glr::Texture sky_texture0;
 
@@ -403,7 +403,7 @@ struct Sandbox {
 		sky_program.vertex(shader_sky_vs);
 		sky_program.fragment(shader_sky_fs);
 		sky_program.assign(sky_uniform_texture, "textureSkySampler", textureChannel_diffuse);
-		sky_program.assign(sky_uniform_MVPmat, "MVPmat");
+		sky_program.assign(sky_uniform_matMVP, "matMVP");
 
 		const auto dataSky = libv::read_file_or_throw("res/texture/cube_debug_transparent.dds");
 		auto imageSky = libv::gl::load_image_or_throw(dataSky);
@@ -533,8 +533,8 @@ struct Sandbox {
 				gl.model.translate(0, 0, 2 * static_cast<float>(i) - 2);
 
 				auto uniforms = sphere_uniforms.block_unique(sphere_layout);
-				uniforms[sphere_layout.MVPmat] = gl.mvp();
-				uniforms[sphere_layout.Mmat] = gl.model;
+				uniforms[sphere_layout.matMVP] = gl.mvp();
+				uniforms[sphere_layout.matM] = gl.model;
 				uniforms[sphere_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f) * (static_cast<float>(i) * 0.2f + 0.8f);
 
 				gl.program(sphere_program);
@@ -553,24 +553,24 @@ struct Sandbox {
 			gl.model.push();
 			gl.model.translate(-2, 0, 2 * 0.0f - 2);
 			auto block0 = stream_uniforms.block_stream(sphere_layout);
-			block0[sphere_layout.MVPmat] = gl.mvp();
-			block0[sphere_layout.Mmat] = gl.model;
+			block0[sphere_layout.matMVP] = gl.mvp();
+			block0[sphere_layout.matM] = gl.model;
 			block0[sphere_layout.color] = libv::vec3f(1.0f, 0.0f, 0.0f);
 			gl.model.pop();
 
 			gl.model.push();
 			gl.model.translate(-2, 0, 2 * 1.0f - 2);
 			auto block1 = stream_uniforms.block_stream(sphere_layout);
-			block1[sphere_layout.MVPmat] = gl.mvp();
-			block1[sphere_layout.Mmat] = gl.model;
+			block1[sphere_layout.matMVP] = gl.mvp();
+			block1[sphere_layout.matM] = gl.model;
 			block1[sphere_layout.color] = libv::vec3f(0.0f, 1.0f, 0.0f);
 			gl.model.pop();
 
 			gl.model.push();
 			gl.model.translate(-2, 0, 2 * 2.0f - 2);
 			auto block2 = stream_uniforms.block_stream(sphere_layout);
-			block2[sphere_layout.MVPmat] = gl.mvp();
-			block2[sphere_layout.Mmat] = gl.model;
+			block2[sphere_layout.matMVP] = gl.mvp();
+			block2[sphere_layout.matM] = gl.model;
 			block2[sphere_layout.color] = libv::vec3f(0.0f, 0.0f, 1.0f);
 			gl.model.pop();
 
@@ -590,7 +590,7 @@ struct Sandbox {
 			const auto guard_s = gl.state.push_guard();
 			gl.state.depthFunctionLEqual();
 			gl.program(sky_program);
-			gl.uniform(sky_uniform_MVPmat, gl.projection * libv::mat4f(libv::mat3f(gl.view)));
+			gl.uniform(sky_uniform_matMVP, gl.projection * libv::mat4f(libv::mat3f(gl.view)));
 			gl.texture(sky_texture0, textureChannel_diffuse);
 			gl.render(sky_mesh);
 		}

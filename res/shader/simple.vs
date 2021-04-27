@@ -7,8 +7,8 @@ layout(location = 6) in vec3 vertexTangent;
 layout(location = 7) in vec3 vertexBitangent;
 layout(location = 8) in vec2 vertexUV;
 
-uniform mat4 MVPmat;
-uniform mat4 Mmat;
+uniform mat4 matMVP;
+uniform mat4 matM;
 
 out vec4 fragmentColor;
 out vec3 fragmentNormalW;
@@ -17,8 +17,8 @@ out vec3 fragmentBitangentW;
 out vec2 fragmentUV;
 
 void main() {
-	gl_Position = MVPmat * vec4(vertexPos, 1);
+	gl_Position = matMVP * vec4(vertexPos, 1);
 	fragmentColor = vertexColor;
-	fragmentNormalW = mat3(Mmat) * vertexNormal;
+	fragmentNormalW = mat3(matM) * vertexNormal;
 	fragmentUV = vertexUV;
 }

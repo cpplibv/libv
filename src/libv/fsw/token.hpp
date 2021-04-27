@@ -13,7 +13,7 @@ struct WatchToken {
 	void* id = nullptr;
 
 	constexpr inline WatchToken() noexcept = default;
-	constexpr inline WatchToken(void* id) noexcept : id(id) { }
+	explicit constexpr inline WatchToken(void* id) noexcept : id(id) { }
 };
 
 // -------------------------------------------------------------------------------------------------

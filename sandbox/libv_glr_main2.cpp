@@ -45,11 +45,11 @@ layout(location = 8) in vec2 vertexTexture0;
 
 out vec2 fragmentTexture0;
 
-uniform mat4 MVPmat;
+uniform mat4 matMVP;
 
 void main() {
 	fragmentTexture0 = vertexTexture0;
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
+	gl_Position = matMVP * vec4(vertexPosition, 1);
 }
 )";
 
@@ -94,12 +94,12 @@ constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 // -------------------------------------------------------------------------------------------------
 
 struct SphereUniformLayout {
-	libv::glr::Uniform_mat4f MVPmat;
-	libv::glr::Uniform_mat4f Mmat;
+	libv::glr::Uniform_mat4f matMVP;
+	libv::glr::Uniform_mat4f matM;
 	libv::glr::Uniform_vec3f color;
 
-	LIBV_REFLECTION_ACCESS(MVPmat);
-	LIBV_REFLECTION_ACCESS(Mmat);
+	LIBV_REFLECTION_ACCESS(matMVP);
+	LIBV_REFLECTION_ACCESS(matM);
 	LIBV_REFLECTION_ACCESS(color);
 };
 const auto plane_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
@@ -112,14 +112,14 @@ struct Sandbox {
 	libv::glr::Mesh plane_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::Program plane_program;
-	libv::glr::Uniform_mat4f plane_uniform_MVPmat;
+	libv::glr::Uniform_mat4f plane_uniform_matMVP;
 	libv::glr::Uniform_texture plane_uniform_texture;
 
 	Sandbox() {
 		// Plane
 		plane_program.vertex(shader_plane_vs);
 		plane_program.fragment(shader_plane_fs);
-		plane_program.assign(plane_uniform_MVPmat, "MVPmat");
+		plane_program.assign(plane_uniform_matMVP, "matMVP");
 		plane_program.assign(plane_uniform_texture, "textureSampler", textureChannel_diffuse);
 
 		{
@@ -212,7 +212,7 @@ struct Sandbox {
 			gl.model.translate(WINDOW_WIDTH * 0.5f, WINDOW_HEIGHT * 0.5f, 0);
 
 			gl.program(plane_program);
-			gl.uniform(plane_uniform_MVPmat, gl.mvp());
+			gl.uniform(plane_uniform_matMVP, gl.mvp());
 			gl.render(plane_mesh);
 		}
 	}

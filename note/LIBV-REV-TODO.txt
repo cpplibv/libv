@@ -1,0 +1,92 @@
+
+REV - Render Engine Vader
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--- STACK ------------------------------------------------------------------------------------------
+
+
+
+
+
+libv.gl: Add support for GL_TEXTURE_COMPARE_MODE
+libv.gl: Add support for GL_TEXTURE_COMPARE_FUNC
+libv.rev: Multiple shadow casters:
+		Use a texture3D (glFramebufferTextureLayer needed)
+
+
+libv.rev: Render Pass
+		Opaque (0..N)
+		[Sky]
+		OpaqueReflective (0..N)
+		Transparent (0..N)
+		Bloom
+		Post processing
+
+libv.rev: Paper
+		Mesh - What
+		Shader - How
+		Material - Parameters (uniforms) to How (shader) and render state properties
+
+libv.rev: Material
+		Material = Textures, Uniform values, Shader, Various material property
+
+		Material Instance = Material reference + instance based overrides
+
+		Material property = Determines every render property of the material
+			Render order / Pass information: Opaque or transparent (or other)
+			Sideness
+			Culling
+			BlendMode
+			DepthTest/Mask
+			AKA: The whole OpenGL capability and other state (libv.glr.state)
+
+
+libv.rev: 'Global' uniforms: read what unity has https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+

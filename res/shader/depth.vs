@@ -1,10 +1,10 @@
 #version 330
 #extension GL_ARB_separate_shader_objects : enable
 
-uniform mat4 MVPmat;
+uniform mat4 matMVP;
 
 layout(location = 0) in vec3 vertexPos;
 
 void main(){
-	gl_Position = MVPmat * vec4(vertexPos,1);
+	gl_Position = matMVP * vec4(vertexPos,1);
 }

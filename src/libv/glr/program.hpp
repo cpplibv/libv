@@ -75,7 +75,7 @@ private:
 
 public:
 	Program() noexcept;
-	Program(std::shared_ptr<RemoteProgram> remote) noexcept;
+	explicit Program(std::shared_ptr<RemoteProgram> remote) noexcept;
 
 	Program base_ref() {
 		return Program(remote);

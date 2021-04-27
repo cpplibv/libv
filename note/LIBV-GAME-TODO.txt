@@ -51,6 +51,12 @@
 
 
 
+nd
+ctor
+
+
+
+
 
 visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
 visual.grid: For grids expand and fade out line endings
@@ -59,8 +65,11 @@ visual.grid: For grids fade out small lines based on distance from the camera an
 visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 
 
+visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 
+libv.rev: 'Global' uniforms: read what unity has https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
+watch shader part 3 https://www.youtube.com/watch?v=E4PHFnvMzFc
 
 
 What do I need from libv to make a 'minimal' working iris program?
@@ -87,7 +96,7 @@ What do I need from libv to make a 'minimal' working iris program?
 		2 list component
 		3 scroll pane = scroll area + scroll bar + connecting them
 		3 container spacing property
-		4 button states
+		4 button states (state styles)
 		5 font outline render
 
 

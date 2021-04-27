@@ -37,12 +37,12 @@ constexpr auto shader_test1_vs = R"(
 layout(location = 0) in vec3 vertexPos;
 layout(location = 8) in vec2 vertexUV;
 
-uniform mat4 MVPmat;
+uniform mat4 matMVP;
 
 out vec2 fragmentUV;
 
 void main() {
-	gl_Position = MVPmat * vec4(vertexPos, 1);
+	gl_Position = matMVP * vec4(vertexPos, 1);
 	fragmentUV = vertexUV;
 })";
 
@@ -121,14 +121,14 @@ struct Sandbox {
 	libv::gl::Shader shaderTest1Frag;
 	libv::gl::Shader shaderTest1Vert;
 	libv::gl::Program programTest1;
-	libv::gl::Uniform_mat4f uniformTest1MVPmat;
+	libv::gl::Uniform_mat4f uniformTest1matMVP;
 	libv::gl::Uniform_texture uniformTest1TextureDiffuseSampler;
 
 	libv::gl::Shader shaderTest2Frag;
 	libv::gl::Shader shaderTest2Vert;
 	libv::gl::Program programTest2;
-	libv::gl::Uniform_mat4f uniformTest2MVPmat;
-	libv::gl::Uniform_mat4f uniformTest2Mmat;
+	libv::gl::Uniform_mat4f uniformTest2matMVP;
+	libv::gl::Uniform_mat4f uniformTest2matM;
 	libv::gl::Uniform_vec3f uniformTest2EyePosW;
 	libv::gl::Uniform_texture uniformTest2TextureSkySampler;
 
@@ -272,7 +272,7 @@ struct Sandbox {
 		gl(shaderTest1Frag).compile(shader_test1_fs);
 		gl(programTest1).create();
 		gl(programTest1).link(shaderTest1Vert, shaderTest1Frag);
-		gl(programTest1).assign(uniformTest1MVPmat, "MVPmat");
+		gl(programTest1).assign(uniformTest1matMVP, "matMVP");
 		gl(programTest1).assign(uniformTest1TextureDiffuseSampler, "textureDiffuseSampler");
 
 		gl(shaderTest2Frag).create(libv::gl::ShaderType::Fragment);
@@ -281,8 +281,8 @@ struct Sandbox {
 		gl(shaderTest2Vert).compile(libv::read_file_or_throw("res/shader/test2.vs"));
 		gl(programTest2).create();
 		gl(programTest2).link(shaderTest2Frag, shaderTest2Vert);
-		gl(programTest2).assign(uniformTest2MVPmat, "MVPmat");
-		gl(programTest2).assign(uniformTest2Mmat, "Mmat");
+		gl(programTest2).assign(uniformTest2matMVP, "matMVP");
+		gl(programTest2).assign(uniformTest2matM, "matM");
 		gl(programTest2).assign(uniformTest2EyePosW, "eyePosW");
 		gl(programTest2).assign(uniformTest2TextureSkySampler, "textureSkySampler");
 
@@ -451,8 +451,8 @@ struct Sandbox {
 			gl(programTest2).use();
 			gl.activeTexture(libv::gl::TextureChannel::sky);
 			gl(textureSky).bind();
-			uniformTest2MVPmat = gl.mvp();
-			uniformTest2Mmat = gl.model;
+			uniformTest2matMVP = gl.mvp();
+			uniformTest2matM = gl.model;
 			uniformTest2EyePosW = eye;
 
 			gl(vertexArray).bind();
@@ -464,7 +464,7 @@ struct Sandbox {
 			gl(programTest1).use();
 			gl.activeTexture(libv::gl::TextureChannel::diffuse);
 			gl(texturePlane).bind();
-			uniformTest1MVPmat = gl.mvp();
+			uniformTest1matMVP = gl.mvp();
 
 			gl(vertexArray).bind();
 			gl(vertexArray).drawElements(libv::gl::Primitive::Triangles, 36, 0);

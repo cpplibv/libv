@@ -14,16 +14,16 @@ out vec3 fragmentPositionW;
 //out vec3 fragmentBitangentW;
 //out vec2 fragmentTexture0;
 
-//uniform mat4 Mmat;
-uniform mat4 MVPmat;
+//uniform mat4 matM;
+uniform mat4 matMVP;
 
 void main() {
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
+	gl_Position = matMVP * vec4(vertexPosition, 1);
 
-//	fragmentPositionW = vec3(Mmat * vec4(vertexPosition, 1 ));
-//	fragmentNormalW = mat3(Mmat) * vertexNormal;
-//	fragmentTangentW = mat3(Mmat) * vertexTangent;
-//	fragmentBitangentW = mat3(Mmat) * vertexBitangent;
+//	fragmentPositionW = vec3(matM * vec4(vertexPosition, 1 ));
+//	fragmentNormalW = mat3(matM) * vertexNormal;
+//	fragmentTangentW = mat3(matM) * vertexTangent;
+//	fragmentBitangentW = mat3(matM) * vertexBitangent;
 //	// fragmentBinormalW = cross(fragmentNormalW, fragmentTangentW);
 //
 //	fragmentTexture0 = vertexTexture0;

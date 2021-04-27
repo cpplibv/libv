@@ -79,7 +79,7 @@
 //
 //		for (const auto& segment : segments) {
 //			segment.program->use();
-//			segment.program->uniformMVPmat = context.gl.mvp();
+//			segment.program->uniformmatMVP = context.gl.mvp();
 //			segment.program->uniformTextureSampler = gl::TextureChannel::diffuse;
 //			segment.program->uniformColor = segment.color;
 //

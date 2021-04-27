@@ -658,33 +658,51 @@ place.it:
 	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
 	ide.clion: console colored log workaround with: disable run.processes.with.pty in CLion (or with system(("chcp "s + std::to_string(CP_UTF8)).c_str());)
 
-clion live templates:
-	cout
-	fora
-	t - typename; // remove the ;
-netbeans and clion live templates:
-	for - // Unify, for int i = 0; i < 10; i++
-	fori - // Unify, Iterator version
-	fora - // Unify, const auto& v : range
-	fw - std::forward<Args>(args)
-	fwa - std::forward<decltype(args)>(args)
-	ci - var(var)                  // Remove the comma from the netbeans version
-	cim - var(std::move(var))
-	getm - auto& { return x; }
-	getr - const auto& x() const { return x; }
-	getv - auto x() const { return x; }
-	nd - [[nodiscard]]
-	un - [[maybe_unused]]
-	ft - [[fallthrough]]
-	no - noexcept
-	cc - copy ctor and assignment
-		my_type(const my_type&) = default;
-		my_type& operator=(const my_type&) & = default;
-	mc - move ctor and assignment
-		my_type(my_type&&) noexcept = default;
-		my_type& operator=(my_type&&) & noexcept = default;
-	ctor - copy and move - ctor and assignment
-	ul - auto lock = std::unique_lock(mutex);
+IDE live templates:
+	Netbeans and CLion:
+		for - // Unify, for int i = 0; i < 10; i++
+		fori - // Unify, Iterator version
+		fora - // Unify, const auto& v : range
+	Netbeans:
+		coutv
+			std::cout << "$COPY_OF_VAR$: " << $VAR$ << std::endl;$END$
+		fw - std::forward<Args>(args)
+		fwa - std::forward<decltype(args)>(args)
+		fwp - std::forward<Args>(args)...
+		ci - var(var)                  // Remove the comma from the netbeans version
+		cim - var(std::move(var))
+		get -
+			[[nodiscard]] constexpr inline $TYPE="const auto&"$ $VAR$() const noexcept {
+				return $VAR$_;
+			}
+		getr -
+			[[nodiscard]] constexpr inline auto& $VAR$() const noexcept {
+				return $VAR$_;
+			}
+		getc -
+			[[nodiscard]] constexpr inline const auto& $VAR$() const noexcept {
+				return $VAR$_;
+			}
+		getv -
+			[[nodiscard]] constexpr inline auto $VAR$() const noexcept {
+				return $VAR$_;
+			}
+		nd - [[nodiscard]]
+		un - [[maybe_unused]]
+		ft - [[fallthrough]]
+		no - noexcept
+		cc - copy ctor and assignment
+			constexpr inline $TYPE$(const $TYPE$&) $CC_IS_NOEXCEPT$= default;
+			constexpr inline $TYPE$& operator=(const $TYPE$&) & $CC_IS_NOEXCEPT$= default;
+		mc - move ctor and assignment
+			constexpr inline $TYPE$($TYPE$&&) noexcept = default;
+			constexpr inline $TYPE$& operator=($TYPE$&&) & noexcept = default;
+		ctor
+			constexpr inline $TYPE$(const $TYPE$&) $CC_IS_NOEXCEPT$= default;
+			constexpr inline $TYPE$& operator=(const $TYPE$&) & $CC_IS_NOEXCEPT$= default;
+			constexpr inline $TYPE$($TYPE$&&) noexcept = default;
+			constexpr inline $TYPE$& operator=($TYPE$&&) & noexcept = default;
+		lock - auto lock = std::unique_lock($VAR$);
 
 build.ninja: some ext target fails, otherwise it should be clear
 
