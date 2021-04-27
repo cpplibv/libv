@@ -4,7 +4,9 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
+#include <libv/gl/glsl_compiler.hpp>
 #include <libv/glr/attribute.hpp>
+#include <libv/glr/layout_to_string.hpp>
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/program.hpp>
@@ -13,6 +15,9 @@
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
 #include <libv/math/noise/white.hpp>
+#include <libv/rev/glsl_include_engine.hpp>
+#include <libv/rev/shader.hpp>
+#include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/ui.hpp>
@@ -56,263 +61,30 @@ inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // -------------------------------------------------------------------------------------------------
 
-const auto shader_arrow_vs = R"(
-#version 330 core
-
-layout(location = 0) in vec3 vertexPosition;
-layout(location = 1) in vec3 vertexNormal;
-layout(location = 8) in vec2 vertexTexture0;
-layout(location = 15) in vec4 vertex_SP_SS_TP_TS; // SegmentPosition, SegmentSize, TotalPosition, TotalSize
-
-out vec3 fragmentNormal;
-out vec2 fragmentTexture0;
-out float fragmentSegmentPosition;
-out float fragmentSegmentSize;
-out float fragmentTotalPosition;
-out float fragmentTotalSize;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-void main() {
-	float vertexSegmentPosition = vertex_SP_SS_TP_TS.x;
-	float vertexSegmentSize = vertex_SP_SS_TP_TS.y;
-	float vertexTotalPosition = vertex_SP_SS_TP_TS.z;
-	float vertexTotalSize = vertex_SP_SS_TP_TS.w;
-
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
-	fragmentNormal = normalize(vertexNormal);
-	fragmentTexture0 = vertexTexture0;
-
-	fragmentSegmentPosition = vertexSegmentPosition;
-	fragmentSegmentSize = vertexSegmentSize;
-	fragmentTotalPosition = vertexTotalPosition;
-	fragmentTotalSize = vertexTotalSize;
-}
-)";
-
-const auto shader_arrow_fs = R"(
-#version 330 core
-
-in vec3 fragmentNormal;
-in vec2 fragmentTexture0;
-in float fragmentSegmentPosition;
-in float fragmentSegmentSize;
-in float fragmentTotalPosition;
-in float fragmentTotalSize;
-
-out vec4 output;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-float saturate(in float v) {
-	return clamp(v, 0.0, 1.0);
-}
-
-/// Anti-aliased mask creation from SDF with zero as limit
-float mask_aa(in float sdf) {
-	// Method A: fwidth and smoothstep
-	// Best result
-	// Origin: https://www.ronja-tutorials.com/post/034-2d-sdf-basics/
-	float delta = fwidth(sdf) * 0.5;
-	float mask_aa = smoothstep(delta, -delta, sdf);
-
-	// Method B: division (Acegikmo)
-	// Issue: Enlarges the mask with half a pixel and therefore causes some artifacts.
-	// Origin: https://www.youtube.com/watch?v=mL8U8tIiRRg
-	// float delta = fwidth(sdf);
-	// float mask_aa = 1 - clamp(sdf / delta, 0, 1);
-
-	// Method C: division with half pixel correction
-	// Generates a bit blurrier/smoother edges, a good alternative to Method A
-	// Based on: https://www.youtube.com/watch?v=mL8U8tIiRRg
-	// float delta = fwidth(sdf);
-	// float mask_aa = 1 - clamp(sdf / delta + 0.5, 0, 1);
-
-	// Method D: step, the anti-method
-	// To just disable AA
-	// float mask_aa = step(sdf, 0);
-
-	return mask_aa;
-}
-
-float sdTriangle(in vec2 p, in vec2 p0, in vec2 p1, in vec2 p2) {
-	vec2 e0 = p1 - p0;
-	vec2 e1 = p2 - p1;
-	vec2 e2 = p0 - p2;
-
-	vec2 v0 = p - p0;
-	vec2 v1 = p - p1;
-	vec2 v2 = p - p2;
-
-	vec2 pq0 = v0 - e0 * clamp(dot(v0, e0) / dot(e0, e0), 0.0, 1.0);
-	vec2 pq1 = v1 - e1 * clamp(dot(v1, e1) / dot(e1, e1), 0.0, 1.0);
-	vec2 pq2 = v2 - e2 * clamp(dot(v2, e2) / dot(e2, e2), 0.0, 1.0);
-
-    float s = e0.x * e2.y - e0.y * e2.x;
-    vec2 d = min(min(vec2(dot(pq0, pq0), s * (v0.x * e0.y - v0.y * e0.x)),
-                     vec2(dot(pq1, pq1), s * (v1.x * e1.y - v1.y * e1.x))),
-                     vec2(dot(pq2, pq2), s * (v2.x * e2.y - v2.y * e2.x)));
-
-	return -sqrt(d.x) * sign(d.y);
-}
-
-void main() {
-	const vec4 color_body = vec4(0.60, 0.60, 0.60, 1);
-	const vec4 color_edge = vec4(0.85, 0.85, 0.85, 1);
-	const vec4 color_head = vec4(0.85, 0.30, 0.30, 1);
-	const float body_size = 0.400;
-	const float edge_size = 0.075;
-	const float head_size = 0.125;
-
-	float distance_from_middle = abs(fragmentTexture0.x - 0.5);
-
-	output = vec4(color_body.rgb, 0);
-
-	float body_sdf = distance_from_middle - body_size * 0.5;
-	output = mix(output, color_body, mask_aa(body_sdf));
-
-	float edge_sdf = distance_from_middle - body_size * 0.5 + edge_size;
-	output = mix(output, color_edge, mask_aa(edge_sdf));
-
-	float head_x = fragmentTexture0.x;
-	float head_y = fragmentSegmentSize - fragmentSegmentPosition - head_size;
-	float head_sdf = sdTriangle(vec2(head_x, head_y), vec2(0.5, -head_size), vec2(0, 0), vec2(1, 0));
-	output = mix(output, color_head, mask_aa(head_sdf));
-}
-)";
-
 // TODO P1: In shader_arrow_fs body_size/edge_size is UV but head_size is world space. Unify them
 // TODO P1: Organize vertex_SP_SS_TP_TS to SS_SP_SE_TS s.start, s.position, s.end, t.size or with some more sane name
 // TODO P1: Move shaders to files
 // TODO P1: Move mask_aa into its own file
-// TODO P1: Shader hot loader
+// TODO P1: Shader hot (re-)loader
 // TODO P2: No sdTriangle (at all) solve the problem without triangle sdf
 // TODO P4: Shader Importer
 
-const auto shader_gizmo_vs = R"(
-#version 330 core
+// TODO P2: libv.glr: Shader automated block binding by watching the includes
+//          So this should work:
+//          shader_loader.register_block<SphereUniformLayout>("block/sphere.glsl");
+//          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
+//          And this would be called on any program that includes block/sphere.glsl
+//          program.block_binding(uniformBlock_sphere)
+//          | issue: some struct might have already been defined, so block to string might have to skip them
+//                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
+//                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
 
-layout(location = 0) in vec3 vertexPosition;
-layout(location = 2) in vec4 vertexColor;
-
-out vec4 fragmentColor;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-void main() {
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
-	fragmentColor = vertexColor;
-}
-)";
-
-const auto shader_gizmo_fs = R"(
-#version 330 core
-
-in vec4 fragmentColor;
-
-out vec4 output;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-void main() {
-	output = fragmentColor;
-}
-)";
-
-const auto shader_background_vs = R"(
-#version 330 core
-
-layout(location = 0) in vec3 vertexPosition;
-
-out vec2 fragmentTexture0;
-
-void main() {
-	gl_Position = vec4(vertexPosition, 1);
-	fragmentTexture0 = vertexPosition.xy * 0.5 + 0.5;
-}
-)";
-
-const auto shader_grid_vs = R"(
-#version 330 core
-
-layout(location = 0) in vec3 vertexPosition;
-layout(location = 2) in vec4 vertexColor;
-
-out vec4 fragmentColor;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-void main() {
-	gl_Position = MVPmat * vec4(vertexPosition, 1);
-	fragmentColor = vertexColor;
-}
-)";
-
-const auto shader_grid_fs = R"(
-#version 330 core
-
-in vec4 fragmentColor;
-
-out vec4 output;
-
-layout(std140) uniform Sphere {
-	mat4 MVPmat;
-	mat4 Mmat;
-	vec3 color;
-};
-
-void main() {
-	output = fragmentColor;
-}
-)";
-
-const auto shader_background_fs = R"(
-#version 330 core
-
-in vec2 fragmentTexture0;
-
-out vec4 output;
-
-uniform sampler2D textureNoise;
-uniform vec2 noiseUVScale;
-uniform vec4 noiseScale;
-uniform vec4 noiseOffset;
-
-//uniform vec4 color0;
-//uniform vec4 color1;
-//uniform vec4 colorCurve;
-
-void main() {
-	vec4 noise = texture2D(textureNoise, fragmentTexture0 * noiseUVScale, 0).rgba;
-	output = noise * noiseScale + noiseOffset;
-}
-)";
 
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal	= libv::glr::Attribute<1, libv::vec3f>{};
 constexpr auto attribute_color0	= libv::glr::Attribute<2, libv::vec4f>{};
-constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
-constexpr auto attribute_custom0	= libv::glr::Attribute<15, libv::vec4f>{};
+constexpr auto attribute_texture0 = libv::glr::Attribute<8, libv::vec2f>{};
+constexpr auto attribute_custom0 = libv::glr::Attribute<15, libv::vec4f>{};
 
 const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
 
@@ -321,12 +93,12 @@ constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
 
 struct SphereUniformLayout {
-	libv::glr::Uniform_mat4f MVPmat;
-	libv::glr::Uniform_mat4f Mmat;
+	libv::glr::Uniform_mat4f matMVP;
+	libv::glr::Uniform_mat4f matM;
 	libv::glr::Uniform_vec3f color;
 
-	LIBV_REFLECTION_ACCESS(MVPmat);
-	LIBV_REFLECTION_ACCESS(Mmat);
+	LIBV_REFLECTION_ACCESS(matMVP);
+	LIBV_REFLECTION_ACCESS(matM);
 	LIBV_REFLECTION_ACCESS(color);
 };
 const auto arrow_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
@@ -347,6 +119,8 @@ template <typename V0>
 
 	return result;
 }
+
+// -------------------------------------------------------------------------------------------------
 
 struct ArrowOptions {
 	float width = 0.1f;
@@ -385,6 +159,9 @@ void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const Ar
 	for (int32_t i = 0; i < static_cast<int32_t>(points.size()) - 1; i++) {
 		const auto a = points[i];
 		const auto b = points[i + 1];
+
+		// TODO P3: Range adjacent pairs: for (const auto& [a, b] : points | view::adjacent);
+		// TODO P3: Range adjacent ring pairs: for (const auto& [a, b] : points | view::adjacent_ring);
 
 		if (a == b)
 			continue;
@@ -450,24 +227,50 @@ void draw_gizmo_lines(libv::glr::Mesh& mesh) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::rev::ShaderLoader shader_manager("app/space/shader/");
+
+// -------------------------------------------------------------------------------------------------
+
+struct BackgroundUniforms {
+	libv::glr::Uniform_vec2f noiseUVScale;
+	libv::glr::Uniform_vec4f noiseScale;
+	libv::glr::Uniform_vec4f noiseOffset;
+	libv::glr::Uniform_texture textureNoise;
+
+	template <typename Access>
+	void update_uniforms(Access& access) {
+		access(noiseUVScale, "noiseUVScale");
+		access(noiseScale, "noiseScale");
+		access(noiseOffset, "noiseOffset");
+		access(textureNoise, "textureNoise", textureChannel_pattern);
+	}
+};
+
+using ShaderBackground = libv::rev::Shader<BackgroundUniforms>;
 struct Background {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Program program_background;
+
+	libv::rev::Shader<BackgroundUniforms> shader(shader_manager, "editor_background.vs", "editor_background.fs");
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
-	libv::glr::Uniform_vec4f background_uniform_noiseScale;
-	libv::glr::Uniform_vec4f background_uniform_noiseOffset;
-	libv::glr::Uniform_texture background_uniform_textureNoise;
+//	libv::glr::Program program_background;
+//	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
+//	libv::glr::Uniform_vec4f background_uniform_noiseScale;
+//	libv::glr::Uniform_vec4f background_uniform_noiseOffset;
+//	libv::glr::Uniform_texture background_uniform_textureNoise;
 
 	static constexpr libv::vec2i noise_size = {128, 128};
 
 	Background() {
-		program_background.vertex(shader_background_vs);
-		program_background.fragment(shader_background_fs);
-		program_background.assign(background_uniform_noiseUVScale, "noiseUVScale");
-		program_background.assign(background_uniform_noiseScale, "noiseScale");
-		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
-		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
+//		std::string shader_script_dir = "../app/space/shader/";
+//		libv::glv::load_shader_source(loader, shader_script_dir + "editor_background.vs");
+//		libv::glv::load_shader_source(loader, shader_script_dir + "editor_background.fs");
+
+//		program_background.vertex(shader_background_vs);
+//		program_background.fragment(shader_background_fs);
+//		program_background.assign(background_uniform_noiseUVScale, "noiseUVScale");
+//		program_background.assign(background_uniform_noiseScale, "noiseScale");
+//		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
+//		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
 		// TODO P1: Switch to blue noise once implemented
 		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
 
@@ -490,6 +293,10 @@ struct Background {
 		}
 	}
 
+//	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
+//	void render_gizmos(libv::glr::Queue& gl, libv::vec2f canvas_size);
+//	void render_gizmos_selected(libv::glr::Queue& gl, libv::vec2f canvas_size);
+
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		const auto s_guard = gl.state.push_guard();
 
@@ -497,18 +304,18 @@ struct Background {
 		gl.state.disableDepthTest();
 		gl.state.polygonModeFill();
 
-		gl.program(program_background);
+		gl.program(shader.program());
 		// TODO P1: Update shader to operate on color and noise uniforms
 //		const auto bg_noise = 1.f;
 		const auto bg_noise = 5.f / 255.f;
 		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
-		gl.uniform(background_uniform_noiseUVScale, canvas_size / noise_size.cast<float>());
-		gl.uniform(background_uniform_noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
-		gl.uniform(background_uniform_noiseOffset, bg_color);
-//		gl.uniform(background_uniform_noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
-//		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
-//		gl.uniform(background_uniform_noiseScale, libv::vec4f(0, 0, 0, 0));
-//		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0, 0, 0, 0));
+		gl.uniform(shader.uniform().noiseUVScale, canvas_size / noise_size.cast<float>());
+		gl.uniform(shader.uniform().noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
+		gl.uniform(shader.uniform().noiseOffset, bg_color);
+//		gl.uniform(shader.uniform().noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
+//		gl.uniform(shader.uniform().noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
+//		gl.uniform(shader.uniform().noiseScale, libv::vec4f(0, 0, 0, 0));
+//		gl.uniform(shader.uniform().noiseOffset, libv::vec4f(0, 0, 0, 0));
 		gl.texture(background_texture_pattern, textureChannel_pattern);
 		gl.render(mesh_background);
 	}
@@ -699,8 +506,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 		{
 			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
-			uniforms[arrow_layout.MVPmat] = gl.mvp();
-			uniforms[arrow_layout.Mmat] = gl.model;
+			uniforms[arrow_layout.matMVP] = gl.mvp();
+			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
 			gl.program(program_gizmo);
@@ -716,8 +523,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 			gl.model.scale(0.2f);
 
 			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
-			uniforms[arrow_layout.MVPmat] = gl.mvp();
-			uniforms[arrow_layout.Mmat] = gl.model;
+			uniforms[arrow_layout.matMVP] = gl.mvp();
+			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
 			gl.program(program_gizmo);
@@ -732,11 +539,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 			// TODO P1: With glsl generated shapes depth writing is not a good idea
 			//		  Also, the current mode would require glsl fwidth AA, possible but cumbersome
+			//        | USE THE VERTEX SHADER TO ALTER THE SHAPE!! Just send an extra pair of vertex for each arrow
 			gl.state.disableDepthMask();
 
 			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
-			uniforms[arrow_layout.MVPmat] = gl.mvp();
-			uniforms[arrow_layout.Mmat] = gl.model;
+			uniforms[arrow_layout.matMVP] = gl.mvp();
+			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
 			gl.program(program);
@@ -794,26 +602,28 @@ int main() {
 
 		// TODO P1: Shortcut to save camera position and reload it upon restart
 		//          > Requires persistence
-		// TODO P1: Remember auto runtime hook options
+		// TODO P1: Persist auto runtime hook options
 		//          > Requires persistence
 		// TODO P1: Auto runtime hook option for random uniform variables
-		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
-			const int32_t mode_count = 4;
-			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
-				space.test_mode = space.test_mode == 0 ? mode_count - 1 : space.test_mode - 1;
-			else
-				space.test_mode = (space.test_mode + 1) % mode_count;
-		}
-		if (e.keycode == libv::input::Keycode::Backtick)
-			space.test_mode = 0;
-		if (e.keycode == libv::input::Keycode::Num1)
-			space.test_mode = 1;
-		if (e.keycode == libv::input::Keycode::Num2)
-			space.test_mode = 2;
-		if (e.keycode == libv::input::Keycode::Num3)
-			space.test_mode = 3;
-		log_space.info("Test mode: {}", space.test_mode);
+//		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
+//			const int32_t mode_count = 4;
+//			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
+//				space.test_mode = space.test_mode == 0 ? mode_count - 1 : space.test_mode - 1;
+//			else
+//				space.test_mode = (space.test_mode + 1) % mode_count;
+//		}
+//		if (e.keycode == libv::input::Keycode::Backtick)
+//			space.test_mode = 0;
+//		if (e.keycode == libv::input::Keycode::Num1)
+//			space.test_mode = 1;
+//		if (e.keycode == libv::input::Keycode::Num2)
+//			space.test_mode = 2;
+//		if (e.keycode == libv::input::Keycode::Num3)
+//			space.test_mode = 3;
+//		log_space.info("Test mode: {}", space.test_mode);
 	});
+
+//	std::cout << libv::glr::layout_to_string<SphereUniformLayout>("Sphere") << std::endl;
 
 	{
 		libv::ui::PanelFull layers;
