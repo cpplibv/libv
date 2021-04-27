@@ -590,11 +590,11 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_container INTERFACE
+	TARGET libv_color INTERFACE
 )
 
 wish_create_library(
-	TARGET libv_color INTERFACE
+	TARGET libv_container INTERFACE
 )
 
 wish_create_library(
@@ -680,6 +680,13 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_mt STATIC
+	SOURCE src/libv/mt/*.cpp
+	LINK   libv_log Threads::Threads
+	LINK   libv_utility # For unique_function and concat
+)
+
+wish_create_library(
 	TARGET libv_net STATIC
 	SOURCE src/libv/net/*.cpp
 	LINK   libv_log libv_utility libv_meta ext_boost
@@ -702,7 +709,7 @@ wish_create_library(
 	SOURCE src/libv/rev/*.cpp
 	LINK   libv_glr libv_gl libv_utility libv_fsw
 #	LINK   ext_boost
-	LINK   libv_algo libv_range ext_range ext_ctre # Source include engine stuff
+	LINK   libv_algo libv_range libv_log ext_range ext_ctre # Source include engine stuff
 )
 
 wish_create_library(
@@ -721,13 +728,6 @@ wish_create_library(
 	TARGET libv_state INTERFACE
 	LINK   ext_sml # For SML based
 	LINK   ext_boost # For boost statechart based
-)
-
-wish_create_library(
-	TARGET libv_mt STATIC
-	SOURCE src/libv/mt/*.cpp
-	LINK   libv_log Threads::Threads
-	LINK   libv_utility # For unique_function and concat
 )
 
 wish_create_library(

@@ -27,17 +27,17 @@ private:
 	GL& gl;
 
 public:
-	AccessFramebuffer(Framebuffer& object, GL& gl) :
+	inline AccessFramebuffer(Framebuffer& object, GL& gl) noexcept :
 		object(object), gl(gl) { }
 
 public:
-	inline void create() {
+	inline void create() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id == 0);
 		glGenFramebuffers(1, &object.id);
 		checkGL();
 	}
 
-	inline void destroy() {
+	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteFramebuffers(1, &object.id);
 		object.id = 0;
@@ -89,7 +89,7 @@ public:
 
 private:
 	template <typename T, typename... Args>
-	inline bool oneOf(T test, Args... options) noexcept {
+	[[nodiscard]] inline bool oneOf(T test, Args... options) noexcept {
 		return ((test == options) || ...);
 	}
 
@@ -230,12 +230,12 @@ public:
 	}
 
 public:
-	inline FramebufferStatus status_draw() noexcept {
+	[[nodiscard]] inline FramebufferStatus status_draw() const noexcept {
 		GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 		return FramebufferStatus{status};
 	}
 
-	inline FramebufferStatus status_read() noexcept {
+	[[nodiscard]] inline FramebufferStatus status_read() const noexcept {
 		GLenum status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
 		return FramebufferStatus{status};
 	}

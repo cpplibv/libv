@@ -4,12 +4,43 @@
 
 // std
 #include <exception>
-#include <vector>
+//#include <vector>
+// pro
+#include <libv/container/dyn_array.hpp>
 
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
+
+template <typename T>
+class ring {
+private:
+	size_t start = 0;
+	size_t end = 0;
+	libv::dyn_array<T> store;
+
+public:
+	explicit inline ring(size_t size) : store(size) {}
+
+	inline ring(size_t size, T&& init) : store(size, std::move(init)) {}
+	inline ring(size_t size, const T& init) : store(size, init) {}
+
+	inline ring(const ring&) = default;
+	inline ring& operator=(const ring&) & = default;
+	inline ring(ring&&) noexcept = default;
+	inline ring& operator=(ring&&) & noexcept = default;
+
+public:
+	// iterators
+	// range interface
+
+	[[nodiscard]] constexpr inline size_t size() const noexcept {
+		return store.size();
+	}
+};
+
+// =================================================================================================
 
 template <typename T>
 struct ring {

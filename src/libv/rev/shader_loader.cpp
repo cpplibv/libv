@@ -2,22 +2,16 @@
 
 // hpp
 #include <libv/rev/shader_loader.hpp>
-// ext
-#include <boost/container/flat_set.hpp>
 // libv
-#include <libv/fsw/watcher.hpp>
+#include <libv/algo/erase_if_stable.hpp>
 #include <libv/gl/gl.hpp>
-#include <libv/gl/glsl_compiler.hpp>
 #include <libv/gl/program.hpp>
-#include <libv/utility/concat.hpp>
-#include <libv/utility/generic_path.hpp>
-#include <libv/utility/read_file.hpp>
-// std
-#include <filesystem>
-#include <map>
-#include <mutex>
+#include <libv/utility/bit_cast.hpp>
 // pro
-#include <libv/rev/shader.hpp>
+#include <libv/rev/internal_shader.lpp>
+#include <libv/rev/internal_shader_loader.lpp>
+#include <libv/rev/log.hpp>
+#include "glsl_compose.hpp"
 
 
 namespace libv {
@@ -25,171 +19,322 @@ namespace rev {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct FileIncludeTrackingLoader {
-//};
+ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
+	self(std::make_shared<InternalShaderLoader>()) {
 
-//struct FileIncludeLoader {
-//};
+	auto file_tracker = [this](std::string_view include_path, std::string_view file_path) {
+		// Callback for glsl_source_loader whenever a new include loaded a file
+		// NOTE: Indirectly protected by mutex lock in internal_load
 
-struct FileIncluder {
-	std::filesystem::path base_directory = "app/vm4_viewer/res/shader/";
-	libv::observer_ptr<boost::container::flat_set<std::string>> current_sources;
+		auto queue_reload = [internal_wp = std::weak_ptr(*self->current_loading_internal)](const libv::fsw::Event& e) {
+			// Callback for fsw whenever a file changes
+			// NOTE: Not protected by mutex but queue_source_reload is thread safe
 
-public:
-	libv::gl::IncludeResult operator()(const std::string_view include_path) {
-		const auto file_path = base_directory / include_path;
+			auto internal_sp = internal_wp.lock();
+			if (!internal_sp)
+				return; // Shader was destroyed in the meantime
 
-		// TODO P5: normalized_generic_path
-		current_sources->emplace(libv::generic_path(file_path));
-		auto read_result = libv::read_file_ec(file_path);
+			auto loader_sp = internal_sp->loader.lock();
+			if (!loader_sp)
+				return; // Loader was destroyed in the meantime
 
-		if (read_result.ec)
-			// TODO P5: report failed include information
-			// TODO P5: report search path with failed include information
-			return {false, libv::concat(read_result.ec, ": ", read_result.ec.message())};
+			log_rev.info("Requesting shader reload for {} because: {}", internal_sp->name_, e);
+			loader_sp->queue_source_reload.push_back(std::move(internal_sp));
+		};
+
+		log_rev.info("Tracking file {} for {} because of include {}", file_path, (*self->current_loading_internal)->name_, include_path);
+		const auto token = self->watcher.subscribe_file(file_path, std::move(queue_reload));
+		self->current_loading_stage->included_sources.emplace_back(std::string(include_path), token);
+	};
+
+//	self->glsl_source_loader.add_include_directory("block/", lookup_block_source);
+	self->glsl_source_loader.add_include_directory("", base_include_directory.generic_string(), std::move(file_tracker));
+//	for (const auto mod : mods) {
+//		self->glsl_source_loader.add_include_directory(
+//				mod.shader_include_path,
+//				mod.shader_filesystem_path,
+//				std::move(file_loader));
+//	}
+}
+
+ShaderLoader::~ShaderLoader() {
+	// For the sake of forward declared shared_ptr
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void InternalShaderLoader::unsubscribe(InternalShader* internal_ptr) {
+	for (auto& stage : internal_ptr->stages)
+		for (auto& included_sources : stage.included_sources)
+			watcher.unsubscribe(included_sources.fsw_token);
+
+	const auto lock = std::unique_lock(mutex);
+
+	_broadcast(ShaderUnload{internal_ptr->id()});
+
+	libv::erase_stable(shaders, internal_ptr);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) {
+	const auto lock = std::unique_lock(mutex);
+
+	const auto comp = [&](const auto* s) { return s->compare(uniformTID, type0, path0, type1, path1); };
+	const auto it = std::ranges::lower_bound(shaders, 0, {}, comp);
+	if (it != shaders.end() && 0 == (*it)->compare(uniformTID, type0, path0, type1, path1))
+		return (*it)->shared_from_this();
+
+	auto internal_shader = std::make_shared<InternalShader>(weak_from_this(), ucc(), uniformTID);
+	internal_shader->stages.emplace_back(type0, path0);
+	internal_shader->stages.emplace_back(type1, path1);
+	internal_shader->finish();
+	log_rev.trace("Create new shader: {}", internal_shader->name_);
+
+	shaders.emplace(it, internal_shader.get());
+	queue_source_reload.push_back(internal_shader);
+	return internal_shader;
+}
+
+std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2) {
+	const auto lock = std::unique_lock(mutex);
+
+	const auto comp = [&](const auto* s) { return s->compare(uniformTID, type0, path0, type1, path1, type2, path2); };
+	const auto it = std::ranges::lower_bound(shaders, 0, {}, comp);
+	if (it != shaders.end() && 0 == (*it)->compare(uniformTID, type0, path0, type1, path1, type2, path2))
+		return (*it)->shared_from_this();
+
+	auto internal_shader = std::make_shared<InternalShader>(weak_from_this(), ucc(), uniformTID);
+	internal_shader->stages.emplace_back(type0, path0);
+	internal_shader->stages.emplace_back(type1, path1);
+	internal_shader->stages.emplace_back(type2, path2);
+	internal_shader->finish();
+	log_rev.trace("Create new shader: {}", internal_shader->name_);
+
+	shaders.emplace(it, internal_shader.get());
+	queue_source_reload.push_back(internal_shader);
+	return internal_shader;
+}
+
+void InternalShaderLoader::update_fs() {
+	auto old_tokens = std::vector<libv::fsw::WatchToken>{};
+
+	while (auto internal_opt = queue_source_reload.pop_optional()) {
+		auto& internal = *internal_opt;
+
+		log_rev.info("Reloading {}", internal->name_);
+
+		bool had_load_source_error = false;
+		for (auto& stage : internal->stages) {
+
+			// Move out old watch tokens
+			for (auto& [_, token] : stage.included_sources)
+				old_tokens.emplace_back(token);
+			stage.included_sources.clear();
+
+			// Load source
+			try {
+				current_loading_internal = &internal; // Setup temp var
+				current_loading_stage = &stage; // Setup temp var
+				stage.source_code = glsl_source_loader.load_source(stage.source_path, stage.defines);
+				current_loading_stage = nullptr; // Clear temp var
+				current_loading_internal = nullptr; // Clear temp var
+
+			} catch (const glsl_failed_include_exception& e) {
+				log_rev.error("--- Failed to load shader: {} ({}) ---", internal->name_, internal->id());
+				log_rev.error("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_path, e.file_path, e.ec, e.ec.message());
+				for (const auto& [file, line] : e.include_stack)
+					log_rev.error("    Included from: {}:{}", file, line);
+
+				_broadcast(ShaderLoadFailure{
+						internal->id(),
+						BaseShader(internal),
+						ShaderLoadFailure::IncludeFailure{
+							e.file_path,
+							e.ec,
+							e.include_path,
+							e.include_stack,
+						},
+						std::nullopt,
+						std::nullopt});
+
+				had_load_source_error = true;
+				current_loading_stage = nullptr; // Clear temp var
+				current_loading_internal = nullptr; // Clear temp var
+				break; // No need to look at the other stages
+			}
+		}
+
+		// Clean up old watch tokens
+		for (const auto& token : old_tokens)
+			watcher.unsubscribe(token);
+		old_tokens.clear();
+
+		if (had_load_source_error)
+			queue_shader_failed_load.push_back(std::move(internal));
 		else
-			return {true, std::move(read_result.data)};
+			queue_shader_update.push_back(std::move(internal));
 	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-class ImplShaderLoader {
-	FileIncluder includer;
-//	libv::gl::GLSLCompiler compiler;
-	libv::fsw::Watcher watcher;
-
-	std::mutex update_queue_m;
-	boost::container::flat_set<libv::observer_ref<BaseShader>> update_queue;
-	std::map<libv::observer_ref<BaseShader>, std::vector<libv::fsw::WatchToken>> tokens;
-
-//	libv::gl::IncludeResult include(const std::string_view include_path);
-//
-//	ImplShaderLoader() :
-//		compiler(std::ref(includer)) { }
-};
-
-// -------------------------------------------------------------------------------------------------
-
-//Shader ShaderLoader::load(std::filesystem::path vs, std::filesystem::path fs) {
-//	load(libv::gl::ShaderType::Vertex, std::move(vs), libv::gl::ShaderType::Fragment, std::move(fs));
-//}
-//
-//Shader ShaderLoader::load(std::filesystem::path vs, std::filesystem::path gs, std::filesystem::path fs) {
-//	load(libv::gl::ShaderType::Vertex, std::move(vs), libv::gl::ShaderType::Geometry, std::move(gs), libv::gl::ShaderType::Fragment, std::move(fs));
-//}
-
-BaseShader ShaderLoader::aux_lookup(std::type_index uniforms_type_index, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) {
-
 }
 
-BaseShader ShaderLoader::aux_lookup(std::type_index uniforms_type_index, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2) {
+void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
+	const auto fallback_to_default = [](auto& internal) {
+		// If this is the first load, create a new program to replace the default one
+		static constexpr auto fallback_red_vs = R"(
+		#version 330 core
 
-}
+		layout(location = 0) in vec3 vertexPosition;
 
-//void ShaderLoader::subscribe(const libv::observer_ref<BaseShader> shader) {
-//	std::unique_lock lock(self->update_queue_m);
-//
-//	self->update_queue.emplace(shader);
-//}
-//
-//void ShaderLoader::unsubscribe(const libv::observer_ref<BaseShader> shader) {
-//	std::unique_lock lock(self->update_queue_m);
-//
-//	self->update_queue.erase(shader);
-//
-//	auto& tokens = self->tokens[shader];
-//	for (const auto& token : tokens)
-//		self->watcher.unsubscribe(token);
-//
-//	tokens.clear();
-//}
+		void main() {
+			gl_Position = vec4(vertexPosition, 1);
+		})";
 
-void ShaderLoader::update(libv::gl::GL& gl, success_cb_type success_cb, failure_cb_type failure_cb) {
-	std::unique_lock lock(self->update_queue_m);
+		static constexpr auto fallback_red_fs = R"(
+		#version 330 core
+
+		out vec4 result;
+
+		void main() {
+			result = vec4(1.0, 0.0, 0.0, 1.0);
+		})";
+
+		if (internal->never_loaded) {
+			// Assigning a default red sources to the shader
+			internal->program.vertex(fallback_red_vs);
+			internal->program.fragment(fallback_red_fs);
+			// We still bind the uniforms to ensure allocation of layout/index variables inside glr
+			internal->uniformContainer->bind_assign(internal->program);
+
+			log_rev.error("Settings shader: {} ({}) to fallback red", internal->name_, internal->id());
+		} else {
+			log_rev.error("Keeping shader: {} ({}) as last working version", internal->name_, internal->id());
+		}
+	};
 
 	auto previous_program = gl.bound_program();
 
-	for (const auto& update : self->update_queue) {
-		self->includer.current_sources = &update->source_files;
+	while (auto internal_opt = queue_shader_failed_load.pop_optional()) {
+		// For those who failed to load: just assign the fallback
+		auto& internal = *internal_opt;
+		fallback_to_default(internal);
+	}
+
+	while (auto internal_opt = queue_shader_update.pop_optional()) {
+		auto& internal = *internal_opt;
+
+		log_rev.info("Updating {}", internal->name_);
 
 		libv::gl::Program program;
 		gl(program).create();
 
-		bool shader_compile_failed = false;
-		std::string shader_compile_error;
+		auto shader_compile_failed = false;
+		auto shader_compile_error = std::string{};
 
-		for (const auto& stage : update->stages) {
-			// TODO P1: Load source "here", but "not here".
-			//          Delaying source loading (until update) is a good idea
-			//          But FS calls between gl calls are not that sexy
-			const auto source = self->compiler.load(stage.path);
-
+		for (const auto& stage : internal->stages) {
 			libv::gl::Shader shader;
 
 			gl(shader).create(stage.type);
-			gl(shader).compile(source);
+			gl(shader).compile(stage.source_code);
 
 			if (!gl(shader).status()) {
 				shader_compile_failed = true;
 				shader_compile_error = gl(shader).info();
-				break;
+			} else {
+				gl(program).attach(shader);
 			}
-			gl(program).attach(shader);
+
 			gl(shader).destroy();
+
+			if (shader_compile_failed)
+				break;
 		}
 
-		if (!shader_compile_failed)
+		if (shader_compile_failed) {
+			log_rev.error("--- Failed to compile shader: {} ({}) ---\n{}", internal->name_, internal->id(), shader_compile_error);
+			_broadcast(ShaderLoadFailure{
+					internal->id(),
+					BaseShader(internal),
+					std::nullopt,
+					ShaderLoadFailure::CompileFailure{
+							std::move(shader_compile_error)
+					},
+					std::nullopt});
+			fallback_to_default(internal);
+
+		} else {
+			// Shaders compiled
 			gl(program).link();
 
-		if (shader_compile_failed) {
-			failure_cb(ShaderLoadFailure{*update, shader_compile_error});
-		} else if (!gl(program).status()) {
-			failure_cb(ShaderLoadFailure{*update, gl(program).info()});
-		} else {
-			update->program._native_swap(program);
-			(*update->update_ptr)(*update);
-			success_cb(ShaderLoadSuccess{*update});
+			if (!gl(program).status()) {
+				auto shader_link_error = gl(program).info();
+				log_rev.error("--- Failed to link shader: {} ({}) ---\n{}", internal->name_, internal->id(), shader_link_error);
+				_broadcast(ShaderLoadFailure{
+						internal->id(),
+						BaseShader(internal),
+						std::nullopt,
+						std::nullopt,
+						ShaderLoadFailure::LinkFailure{
+								std::move(shader_link_error)
+						}});
+				fallback_to_default(internal);
+
+			} else {
+				internal->never_loaded = false;
+				internal->program._native_swap(program);
+				internal->uniformContainer->bind_assign(internal->program);
+				_broadcast(ShaderLoadSuccess{internal->id(), BaseShader(internal)});
+			}
 		}
 
 		if (program.id != 0)
-			// Destroy the freshly failed or the previously used program object
+			// Destroy the failed or the swapped out old program
 			gl(program).destroy();
-
-		{
-			// TODO P1: Handle watcher changes the moment a file is included (even before the read operation)
-			//          And not here
-			//          | This also kills requirement to store update->source_files
-			// Cleanup Watchers - Add new ones first, remove old one second
-			auto& tokens = self->tokens[update];
-			const auto old_tokens = std::move(tokens);
-			tokens.clear();
-
-			for (const auto& source_file : update->source_files)
-				tokens.emplace_back(self->watcher.subscribe_file(source_file, [this, update](libv::fsw::Event) {
-					std::unique_lock lock(self->update_queue_m);
-					self->update_queue.emplace(update);
-				}));
-
-			for (const auto& token : old_tokens)
-				self->watcher.unsubscribe(token);
-		}
 	}
 
-	// Cleanup
-	self->update_queue.clear();
-	self->includer.current_sources = nullptr;
+	// Cleanup - Restore the OpenGL state's original program use
 	gl(previous_program).use();
+	libv::gl::checkGL();
+}
+
+void ShaderLoader::update(libv::gl::GL& gl) {
+	auto lock = std::unique_lock(self->mutex);
+	self->update_fs();
+	self->update_gl(gl);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
-	self(std::make_unique<ImplShaderLoader>()) {
+void ShaderLoader::foreach_shader(libv::function_ref<void(BaseShader)> func) {
+	const auto lock = std::unique_lock(self->mutex);
+	for (const auto& internal_ptr : self->shaders) {
+		auto internal_sp = internal_ptr->shared_from_this();
+		if (!internal_sp)
+			continue; // This shader was destroyed in the meantime, skip
+
+		func(BaseShader(std::move(internal_sp)));
+	}
 }
 
-ShaderLoader::~ShaderLoader() {
-	// For the sake of forward declared unique_ptr
+void ShaderLoader::on_update(shader_load_success_cb success_cb) {
+	const auto lock = std::unique_lock(self->mutex);
+	self->success_cbs.emplace_back(std::move(success_cb));
+}
+
+void ShaderLoader::on_update(shader_load_failure_cb failure_cb) {
+	const auto lock = std::unique_lock(self->mutex);
+	self->failure_cbs.emplace_back(std::move(failure_cb));
+}
+
+void ShaderLoader::on_update(shader_unload_cb unload_cb) {
+	const auto lock = std::unique_lock(self->mutex);
+	self->unload_cbs.emplace_back(std::move(unload_cb));
+}
+
+void ShaderLoader::clear_on_updates() {
+	const auto lock = std::unique_lock(self->mutex);
+	self->success_cbs.clear();
+	self->failure_cbs.clear();
+	self->unload_cbs.clear();
 }
 
 // -------------------------------------------------------------------------------------------------

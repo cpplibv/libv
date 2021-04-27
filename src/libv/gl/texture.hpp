@@ -249,7 +249,7 @@ public:
 	}
 
 public:
-	inline int32_t getSize1D(int32_t level = 0) noexcept {
+	[[nodiscard]] inline int32_t getSize1D(int32_t level = 0) const noexcept {
 		object.template assert_target<TextureTarget::_1D>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
@@ -258,7 +258,7 @@ public:
 		checkGL();
 		return result;
 	}
-	inline libv::vec2i getSize2D(int32_t level = 0) noexcept {
+	[[nodiscard]] inline libv::vec2i getSize2D(int32_t level = 0) const noexcept {
 		object.template assert_target<TextureTarget::_1DArray, TextureTarget::_2D, TextureTarget::Rectangle, TextureTarget::CubeMap>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 
@@ -268,7 +268,7 @@ public:
 		checkGL();
 		return result;
 	}
-	inline libv::vec3i getSize3D(int32_t level = 0) noexcept {
+	[[nodiscard]] inline libv::vec3i getSize3D(int32_t level = 0) const noexcept {
 		object.template assert_target<TextureTarget::_2DArray, TextureTarget::_3D, TextureTarget::CubeMapArray>();
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 

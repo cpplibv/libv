@@ -20,7 +20,7 @@ protected:
 	Buffer& object;
 
 public:
-	AccessBuffer(Buffer& object) :
+	inline AccessBuffer(Buffer& object) noexcept :
 		object(object) { }
 
 public:

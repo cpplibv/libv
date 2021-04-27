@@ -12,20 +12,14 @@ namespace libv {
 
 template <typename Range, typename Key>
 [[nodiscard]] constexpr inline bool linear_contains(const Range& range, const Key& key) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	const auto it = std::find(begin, end, key);
-	return it != end;
+	const auto it = std::ranges::find(range, key);
+	return it != std::end(range);
 }
 
 template <typename Range, typename Pred>
 [[nodiscard]] constexpr inline bool linear_contains_if(const Range& range, const Pred& pred) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	const auto it = std::find_if(begin, end, pred);
-	return it != end;
+	const auto it = std::ranges::find_if(range, pred);
+	return it != std::end(range);
 }
 
 // -------------------------------------------------------------------------------------------------

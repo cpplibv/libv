@@ -72,7 +72,7 @@ public:
 		return result;
 	}
 
-	//	OpenGL 4.4+ only
+	//	OpenGL 4.4+ only, use has_result + result instead
 	//	[[nodiscard]] inline int32_t result_no_wait() noexcept {
 	//		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 	//		GLint result;

@@ -22,7 +22,7 @@ namespace gl {
 /// @supported GLI backend: KTX, KMG, DDS
 /// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR, GIF, PIC, PKM, PVR
 /// @context ANY
-[[nodiscard]] Image load_image_or(const std::string_view data, const Image& fallback);
+[[nodiscard]] Image load_image_or(const std::string_view data, const Image& fallback) noexcept;
 
 /// @supported GLI backend: KTX, KMG, DDS
 /// @supported SOIL backend: BMP, PNG, JPG, TGA, DDS, PSD, HDR, GIF, PIC, PKM, PVR

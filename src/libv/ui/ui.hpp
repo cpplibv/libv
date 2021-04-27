@@ -3,7 +3,8 @@
 #pragma once
 
 // libv
-#include <libv/glr/queue_fwd.hpp>
+//#include <libv/glr/queue_fwd.hpp>
+#include <libv/gl/gl_fwd.hpp>
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 // std
@@ -66,6 +67,7 @@ public:
 	void event(const libv::input::EventMouseScroll& event);
 
 public:
+	libv::gl::GL& gl();
 	ContextState& state();
 	ContextUI& context();
 	template <typename Frame> void attach(Frame& frame);
@@ -85,12 +87,12 @@ private:
 
 template <typename Frame>
 void UI::attach(Frame& frame) {
-	frame.onSize.output([this](const auto& e) {
+//	frame.onSize.output([this](const auto& e) {
+//		this->setSize(e.size);
+//	});
+	frame.onFramebufferSize.output([this](const auto& e) {
 		this->setSize(e.size);
 	});
-//	frame.onFramebufferSize.output([this](const auto& e) {
-//		this->setFramebufferSize(e.size);
-//	});
 
 	frame.onChar.output([this](const auto& e) {
 		this->event(e);

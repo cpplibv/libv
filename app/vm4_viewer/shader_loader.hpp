@@ -33,7 +33,7 @@ public:
 	using callback_failure_type = libv::function_ref<void(const app::ShaderReportFailure&)>;
 
 private:
-	std::unique_ptr<class ImplShaderLoader> self;
+	std::unique_ptr<class InternalShaderLoader> self;
 
 public:
 	ShaderLoader();

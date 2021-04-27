@@ -51,6 +51,10 @@
 
 
 
+libv.rev: Implement shader management
+app.space: Improve arrow
+app.space: Add grid
+app.space: Add multi camera / camera frustum visualization
 
 
 
@@ -99,15 +103,11 @@ What do I need from libv to make a 'minimal' working iris program?
 
 
 
-iris.lore: Yellow line, red line, black line -ing. Overclocking the engine: Maintenance in 2 week of any yellow line, Maintenance at the end of the mission on red line, Engine melts by the end of the mission
-
-place.it:
-    E = confirm (the same as pressing the green button)
-    Esc = cancel (the same as pressing the [X] button)
-
-
-
-
 iris: Make a main menu
 
 
+blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
+		full screen quad pass with render_resolution / 2 with v blur shader
+		full screen quad pass with render_resolution / 2 with h blur shader
+		full screen quad pass with render_resolution / 8 with v blur shader
+		full screen quad pass with render_resolution / 8 with h blur shader

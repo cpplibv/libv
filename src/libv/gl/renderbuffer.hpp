@@ -25,17 +25,17 @@ private:
 	Renderbuffer& object;
 
 public:
-	AccessRenderbuffer(Renderbuffer& object) :
+	inline AccessRenderbuffer(Renderbuffer& object) noexcept :
 		object(object) { }
 
 public:
-	inline void create() {
+	inline void create() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id == 0);
 		glGenRenderbuffers(1, &object.id);
 		checkGL();
 	}
 
-	inline void destroy() {
+	inline void destroy() noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDeleteRenderbuffers(1, &object.id);
 		object.id = 0;

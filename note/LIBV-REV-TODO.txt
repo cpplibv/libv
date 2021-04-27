@@ -1,8 +1,17 @@
 
 REV - Render Engine Vader
 
-
-
+libv.gl: Add support for GL Queries
+libv.rev: Shader
+libv.rev: ShaderLoader
+libv.gl: kill glsl compiler
+app.space: adopt libv.rev's Shader and ShaderLoader
+libv.rev: Implement the shader reload event hooks for GLSL source code error
+libv.rev: Implement the shader reload event hooks for successful reload
+libv.rev: Implement the shader reload event hooks for unloads
+libv.rev: Add multi thread support for the whole shader manager system
+libv.rev: Implement the shader reload event hooks for include or IO failure
+libv.rev: Cleanup shader manager system implementation
 
 
 
@@ -55,11 +64,31 @@ REV - Render Engine Vader
 
 
 
+
+
+
+
+
+
+app.vm4viewer: adopt libv.rev's Shader and ShaderLoader
+libv.ui: adopt libv.rev's Shader and ShaderLoader
+
 libv.gl: Add support for GL_TEXTURE_COMPARE_MODE
 libv.gl: Add support for GL_TEXTURE_COMPARE_FUNC
-libv.rev: Multiple shadow casters:
-		Use a texture3D (glFramebufferTextureLayer needed)
 
+libv.gl: Add support for glDrawBuffers https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawBuffers.xhtml
+		| Might not be necessary | Maybe needed for a shadow pass
+libv.glr: Add support for glDrawBuffers
+		| Might not be necessary | Maybe needed for a shadow pass
+
+libv.glr: Add support for GL Queries
+
+libv.gl: glColorMask
+libv.glr: glColorMask
+
+libv.rev: Shadow
+	libv.rev: Multiple shadow casters:
+			Use a texture3D (glFramebufferTextureLayer needed)
 
 libv.rev: Render Pass
 		Opaque (0..N)
@@ -87,6 +116,47 @@ libv.rev: Material
 			DepthTest/Mask
 			AKA: The whole OpenGL capability and other state (libv.glr.state)
 
+libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
-libv.rev: 'Global' uniforms: read what unity has https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+libv.rev: HDR: automatic exposure adjustment opengl
+
+
+libv.rev: Skeleton animation
+	Renderer
+	AnimatedModel
+		VAO
+			pos, uv, normal, ...
+			vec4i boneIDs
+			vec4f boneWeights
+		Joint root
+			int id
+			vector<Joint>
+			mat4 transform
+	Animator
+		float animationTime
+		Animation
+			vector<KeyFrame>
+				float time
+				vector<JointTransform>
+					vec3 pos
+					quat rot
+
+	Renderer - Renders an animated model in the pose determined by the joint transforms
+	AnimatedModel - Mesh and skeleton data (VAO aka skin data is immutable)
+	Joint - Backed joint transforms that are modified by the Animator
+	Animator - Runs the animation timer and burns the Animation at the current interpolated state onto the AnimatedModel
+	Animation - Animation data (immutable)
+	KeyFrame - Animation data (immutable)
+	JointTransform - Animation data (immutable)
+
+
+
+
+app.space: //out GeometryData VS_OUTPUT(geometry, fragment);
+		| so it turns out only the in/out and the type matters, the name is just there to scope it
+		| this means i can call them however i want, but good naming needed: ?vs_out ?fs_in
+
+libv.rev: glsl_source_loader: Add query API, aka what would this include be resolve too
+		has to handling errors, query could result in error (it should probe the file, so: no such file, cannot open, etc)
+		has to handling no match, query could result in no mapping
 

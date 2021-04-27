@@ -1,0 +1,115 @@
+
+IDEA 1
+	Instead of main merge use 3 function: vertex,geometry,fragment and a bunch of preprocessor magic to allow 3 inclusion
+	Macros
+		v2g
+		g2f
+	Functions
+		vertex
+		geometry
+		fragment
+	The in-out interface blocks needs some trickery
+	Geometry shader layout needs some trickery
+
+
+IDEA 2
+	Instead of functions use PP directives
+	#common
+	#vertex
+	#fragment
+	#geometry triangles triangle_strip 3
+
+
+--------------------------------------------------------------------------------------------------
+IDEA 1 example
+
+
+#version 330 core
+
+#include <block/sphere.glsl>
+
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 1) in vec3 vertexNormal;
+layout(location = 8) in vec2 vertexTexture0;
+layout(location = 15) in vec4 vertex_SP_SS_TP_TS;// SegmentPosition, SegmentSize, TotalPosition, TotalSize
+
+v2g GeometryData {
+	vec3 normal;
+	vec2 texture0;
+	float segmentPosition;
+	float segmentSize;
+	float totalPosition;
+	float totalSize;
+} geometry;
+
+g2f FragmentData {
+	vec3 normal;
+	vec2 texture0;
+	float segmentPosition;
+	float segmentSize;
+	float totalPosition;
+	float totalSize;
+} fragment;
+
+// VS
+//out GeometryData geometry;
+
+// GS
+geometry_shader(triangles, triangle_strip, 3);
+//	layout (triangles) in;
+//	layout (triangle_strip, max_vertices = 3) out;
+//in GeometryData geometry[3];
+//out FragmentData fragment;
+
+// FS
+fragment_shader(vec4 result);
+//	out vec4 result;
+//in FragmentData fragment;
+
+void vertex() {
+	float vertexSegmentPosition = vertex_SP_SS_TP_TS.x;
+	float vertexSegmentSize = vertex_SP_SS_TP_TS.y;
+	float vertexTotalPosition = vertex_SP_SS_TP_TS.z;
+	float vertexTotalSize = vertex_SP_SS_TP_TS.w;
+
+	gl_Position = matMVP * vec4(vertexPosition, 1);
+	geometry.normal = normalize(vertexNormal);
+	geometry.texture0 = vertexTexture0;
+
+	geometry.segmentPosition = vertexSegmentPosition;
+	geometry.segmentSize = vertexSegmentSize;
+	geometry.totalPosition = vertexTotalPosition;
+	geometry.totalSize = vertexTotalSize;
+}
+
+void geometry() {
+	for (int i = 0; i < 3; i++) {
+		gl_Position = gl_in[i].gl_Position;
+		fragment.normal = geometry[i].normal;
+		fragment.texture0 = geometry[i].texture0;
+		fragment.segmentPosition = geometry[i].segmentPosition;
+		fragment.segmentSize = geometry[i].segmentSize;
+		fragment.totalPosition = geometry[i].totalPosition;
+		fragment.totalSize = geometry[i].totalSize;
+
+		EmitVertex();
+	}
+	EndPrimitive();
+}
+
+void fragment() {
+	const vec4 color_body = vec4(0.60, 0.60, 0.60, 1);
+	const vec4 color_edge = vec4(0.85, 0.85, 0.85, 1);
+	const float body_size = 0.400;
+	const float edge_size = 0.075;
+
+	float distance_from_middle = abs(fragment.texture0.x - 0.5);
+
+	result = vec4(color_body.rgb, 0);
+
+	float body_sdf = distance_from_middle - body_size * 0.5;
+	result = mix(result, color_body, mask_aa(body_sdf));
+
+	float edge_sdf = distance_from_middle - body_size * 0.5 + edge_size;
+	result = mix(result, color_edge, mask_aa(edge_sdf));
+}

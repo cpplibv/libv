@@ -61,10 +61,12 @@ void RemoteProgram::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	}
 
 	if (dirty_binding) {
-		for (const auto& pendingBinding : pending_bindings)
+		for (const auto& pendingBinding : block_bindings
+				| ranges::view::drop(bound_block_count)) {
 			gl(program).uniformBlockBinding(pendingBinding.identifier.c_str(), pendingBinding.binding);
+			bound_block_count++;
+		}
 
-		pending_bindings.clear();
 		dirty_binding = false;
 	}
 
@@ -101,50 +103,47 @@ Program::Program() noexcept :
 Program::Program(std::shared_ptr<RemoteProgram> remote) noexcept :
 	remote(std::move(remote)) { }
 
-void Program::vertex(std::string source) noexcept {
-	remote->vertex = std::move(source);
-
+void Program::mark_for_full_reload() {
 	remote->dirty = true;
 	remote->dirty_source = true;
+	remote->dirty_binding = true;
+	remote->dirty_location = true;
+	remote->uniform_locations.clear();
+	remote->bound_block_count = 0;
+}
+
+void Program::vertex(std::string source) noexcept {
+	remote->vertex = std::move(source);
+	mark_for_full_reload();
 }
 
 void Program::geometry(std::string source) noexcept {
 	remote->geometry = std::move(source);
-
-	remote->dirty = true;
-	remote->dirty_source = true;
+	mark_for_full_reload();
 }
 
 void Program::fragment(std::string source) noexcept {
 	remote->fragment = std::move(source);
-
-	remote->dirty = true;
-	remote->dirty_source = true;
+	mark_for_full_reload();
 }
 
 void Program::compute(std::string source) noexcept {
 	remote->compute = std::move(source);
-
-	remote->dirty = true;
-	remote->dirty_source = true;
+	mark_for_full_reload();
 }
 
 void Program::tess_control(std::string source) noexcept {
 	remote->tess_control = std::move(source);
-
-	remote->dirty = true;
-	remote->dirty_source = true;
+	mark_for_full_reload();
 }
 
 void Program::tess_evaluation(std::string source) noexcept {
 	remote->tess_evaluation = std::move(source);
-
-	remote->dirty = true;
-	remote->dirty_source = true;
+	mark_for_full_reload();
 }
 
 void Program::block_binding(UniformBlockBinding binding) noexcept {
-	remote->pending_bindings.emplace_back(std::move(binding));
+	remote->block_bindings.emplace_back(std::move(binding));
 
 	remote->dirty = true;
 	remote->dirty_binding = true;
@@ -170,6 +169,7 @@ void Program::_native_swap(libv::gl::Program& program) noexcept {
 
 	remote->uniform_identifiers.clear();
 	remote->uniform_locations.clear();
+	remote->bound_block_count = 0;
 
 	remote->created = true;
 	remote->dirty = true;

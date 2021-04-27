@@ -631,51 +631,51 @@ private:
 			const GLchar* message, const void* userData) {
 
 		(void) length;
-
-//		const auto source_str = [&] {
-//			switch (source) {
-//			case GL_DEBUG_SOURCE_API:             return "API"; break;
-//			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Window System"; break;
-//			case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Shader Compiler"; break;
-//			case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Third Party"; break;
-//			case GL_DEBUG_SOURCE_APPLICATION:     return "Application"; break;
-//			case GL_DEBUG_SOURCE_OTHER:           return "Other"; break;
-//			default:                              return ""; break;
-//			}
-//		}();
-//
-//		const auto type_str = [&] {
-//			switch (type) {
-//			case GL_DEBUG_TYPE_ERROR:               return "Error"; break;
-//			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Deprecated Behaviour"; break;
-//			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Undefined Behaviour"; break;
-//			case GL_DEBUG_TYPE_PORTABILITY:         return "Portability"; break;
-//			case GL_DEBUG_TYPE_PERFORMANCE:         return "Performance"; break;
-//			case GL_DEBUG_TYPE_MARKER:              return "Marker"; break;
-//			case GL_DEBUG_TYPE_PUSH_GROUP:          return "Push Group"; break;
-//			case GL_DEBUG_TYPE_POP_GROUP:           return "Pop Group"; break;
-//			case GL_DEBUG_TYPE_OTHER:               return "Other"; break;
-//			default:                                return ""; break;
-//			}
-//		}();
-//
-//		const auto severity_str = [&] {
-//			switch (severity) {
-//			case GL_DEBUG_SEVERITY_HIGH:         return "high"; break;
-//			case GL_DEBUG_SEVERITY_MEDIUM:       return "medium"; break;
-//			case GL_DEBUG_SEVERITY_LOW:          return "low"; break;
-//			case GL_DEBUG_SEVERITY_NOTIFICATION: return "notification"; break;
-//			default:                             return ""; break;
-//			}
-//		}();
-
 		auto& self = *static_cast<const GL*>(userData);
+
+		const auto source_str = [&] {
+			switch (source) {
+			case GL_DEBUG_SOURCE_API:             return "API";
+			case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   return "Window System";
+			case GL_DEBUG_SOURCE_SHADER_COMPILER: return "Shader Compiler";
+			case GL_DEBUG_SOURCE_THIRD_PARTY:     return "Third Party";
+			case GL_DEBUG_SOURCE_APPLICATION:     return "Application";
+			case GL_DEBUG_SOURCE_OTHER:           return "Other";
+			default:                              return "?";
+			}
+		}();
+
+		const auto type_str = [&] {
+			switch (type) {
+			case GL_DEBUG_TYPE_ERROR:               return "Error";
+			case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: return "Deprecated Behaviour";
+			case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  return "Undefined Behaviour";
+			case GL_DEBUG_TYPE_PORTABILITY:         return "Portability";
+			case GL_DEBUG_TYPE_PERFORMANCE:         return "Performance";
+			case GL_DEBUG_TYPE_MARKER:              return "Marker";
+			case GL_DEBUG_TYPE_PUSH_GROUP:          return "Push Group";
+			case GL_DEBUG_TYPE_POP_GROUP:           return "Pop Group";
+			case GL_DEBUG_TYPE_OTHER:               return "Other";
+			default:                                return "?";
+			}
+		}();
+
+		const auto severity_str = [&] {
+			switch (severity) {
+			case GL_DEBUG_SEVERITY_HIGH:         return "high";
+			case GL_DEBUG_SEVERITY_MEDIUM:       return "medium";
+			case GL_DEBUG_SEVERITY_LOW:          return "low";
+			case GL_DEBUG_SEVERITY_NOTIFICATION: return "notification";
+			default:                             return "?";
+			}
+		}();
+
 		if (type == GL_DEBUG_TYPE_ERROR && self.debug)
-			log_gl.error("OpenGL: src {}, type {:X}, id {}, severity {:X}, message: {}",
-					source, type, id, severity, message);
+			log_gl.error("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
+					source_str, source, type_str, type, id, severity_str, severity, message);
 		else if (self.trace)
-			log_gl.trace("OpenGL: src {}, type {:X}, id {}, severity {:X}, message: {}",
-					source, type, id, severity, message);
+			log_gl.trace("OpenGL: src {} ({}), type {} ({:X}), id {}, severity {} ({:X}), message: {}",
+					source_str, source, type_str, type, id, severity_str, severity, message);
 	};
 
 public:

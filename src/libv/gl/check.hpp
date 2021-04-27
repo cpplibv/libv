@@ -16,11 +16,8 @@ namespace gl {
 // -------------------------------------------------------------------------------------------------
 
 inline void checkGL(libv::source_location loc = libv::source_location::current()) noexcept {
-	GLenum err = glGetError();
-	while (err != GL_NO_ERROR) {
+	while (GLenum err = glGetError())
 		log_gl.error({"OpenGL: {}: {}", loc}, err, glewGetErrorString(err));
-		err = glGetError();
-	}
 }
 
 // -------------------------------------------------------------------------------------------------

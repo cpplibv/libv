@@ -24,6 +24,7 @@ namespace app {
 //	[[nodiscard]] vec3 eye() const noexcept;
 //	[[nodiscard]] vec3 direction() const noexcept;
 //  [[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
+//  [[nodiscard]] frustum frustum() const noexcept;
 //};
 
 // -------------------------------------------------------------------------------------------------

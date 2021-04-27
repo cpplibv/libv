@@ -43,7 +43,8 @@ struct RemoteProgram {
 	std::vector<std::string> uniform_identifiers;
 	std::vector<int32_t> uniform_locations;
 
-	std::vector<UniformBlockBinding> pending_bindings;
+	std::vector<UniformBlockBinding> block_bindings;
+	size_t bound_block_count = 0;
 
 public:
 	std::string vertex;
@@ -80,6 +81,17 @@ public:
 	Program base_ref() {
 		return Program(remote);
 	}
+
+public:
+	[[nodiscard]] friend inline bool operator==(const Program& lhs, const Program& rhs) noexcept {
+		return lhs.remote == rhs.remote;
+	}
+	[[nodiscard]] friend inline bool operator!=(const Program& lhs, const Program& rhs) noexcept {
+		return lhs.remote != rhs.remote;
+	}
+
+private:
+	void mark_for_full_reload();
 
 public:
 	void vertex(std::string source) noexcept;

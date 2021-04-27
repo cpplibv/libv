@@ -66,19 +66,21 @@ struct BaseAttribute<libv::vec_t<N, T>> : public BaseAttributeCore {
 template <typename T>
 class AttributeLocation : public BaseAttribute<T> {
 public:
+	inline AttributeLocation() noexcept = default;
+	inline AttributeLocation(const Program& program, const char* name) {
+		assign(program.id, name);
+	}
+	inline AttributeLocation(const Program& program, const std::string& name) {
+		assign(program.id, name.c_str());
+	}
+
+public:
 	inline void assign(const Program& program, const char* name) {
 		LIBV_GL_DEBUG_ASSERT(program.id != 0);
 		this->location = glGetAttribLocation(program.id, name);
 		checkGL();
 	}
 	inline void assign(const Program& program, const std::string& name) {
-		assign(program.id, name.c_str());
-	}
-	AttributeLocation() = default;
-	inline AttributeLocation(const Program& program, const char* name) {
-		assign(program.id, name);
-	}
-	inline AttributeLocation(const Program& program, const std::string& name) {
 		assign(program.id, name.c_str());
 	}
 };
@@ -88,16 +90,18 @@ public:
 template <typename T>
 class AttributeFixLocation : public BaseAttribute<T> {
 public:
-	inline void assign(GLint location) {
+	inline AttributeFixLocation() noexcept = default;
+	inline AttributeFixLocation(GLint location) noexcept {
 		this->location = location;
 	}
-	inline AttributeFixLocation<T>& operator=(GLint location) & {
+
+public:
+	inline void assign(GLint location) noexcept {
+		this->location = location;
+	}
+	inline AttributeFixLocation<T>& operator=(GLint location) & noexcept {
 		this->location = location;
 		return *this;
-	}
-	AttributeFixLocation() {}
-	inline AttributeFixLocation(GLint location) {
-		this->location = location;
 	}
 };
 

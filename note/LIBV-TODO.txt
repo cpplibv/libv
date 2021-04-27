@@ -123,7 +123,7 @@ libv.ui: implement component destroy
 libv.ui: implement top level ui detach on exit
 libv.ui: implement top level ui destroy on exit
 libv.ui: Hide component internals
-libv.ui: kill every immediate importance TODO and make a proper commit
+libv.ui: kill every immediate importance task and make a proper commit
 libv.ui.style: account for event based style changing or state based style declaration
 libv.ui.style: style and property update | might be optional, or the animation system itself used for it | fullscan approch was implemented
 libv.ui.style: style could store each component using them making invalidation possible, would listen to attach/detach | fullscan
@@ -592,12 +592,32 @@ libv.diff: New library for diff and patch management
 libv.diff: Implement in memory diff and patch support
 libv.diff: make sure every stream of lvalue ref output respects offset
 ext: adopt colony https://github.com/mattreecebentley/plf_colony
+libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+GCC 11.1
+	cmake_minimum_required(VERSION 3.20)
+	set(CMAKE_CXX_STANDARD 23)
+
+	size_t literals: 0uz
+
+	std::from_chars and std::to_chars for floating-point types.
+	std::bit_cast
+	std::source_location
+
+	Atomic wait and notify operations.
+	<barrier>, <latch>, and <semaphore>
+
+	Look into: <syncstream>
+	Check on: Calendar additions to <chrono>
+
+	Experimental C++23 support, including:
+		std::to_underlying, std::is_scoped_enum
 
 
 This looks like a useful concepts:
@@ -609,6 +629,24 @@ libv.sys: New library for OS related tools
 libv.sys: Open links/files with the OS defaults: https://stackoverflow.com/a/60225910
 			WIN: start https://corruptedai.com
 			UNIX: xdg-open https://corruptedai.com
+
+
+libv.res: Resource - New library for resource and asset loading, caching and tracking
+		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
+		assets, audio, textures, mods/scripts and models
+
+		Requirements:
+			cache
+			load and inclusion/extension of tracking set (recursion should be possible)
+			filesystem resources
+			filesystem resource fragments (inclusion subjects)
+			virtual resources
+			virtual generated resources
+			tracking of virtual resources
+			tracking of filesystem resources
+			load/reload/unload/tracking events
+			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
+
 
 app.editor:
 	small app for first line and include order fix-ups
@@ -664,8 +702,28 @@ IDE live templates:
 		fori - // Unify, Iterator version
 		fora - // Unify, const auto& v : range
 	Netbeans:
+		pimpl
+			class $CLASS$ {
+			private:
+				std::unique_ptr<class Impl$CLASS$> self;
+
+			public:
+				$CLASS$();
+				~$CLASS$();
+			};
+
+			$CLASS$::$CLASS$() :
+				self(std::make_unique<Impl$CLASS$>()) {
+			}
+
+			$CLASS$::~$CLASS$() {
+				// For the sake of forward declared unique_ptr
+			}
+		str - std::string
+		strv - std::string_view
 		coutv
 			std::cout << "$COPY_OF_VAR$: " << $VAR$ << std::endl;$END$
+		mv - std::move(args)
 		fw - std::forward<Args>(args)
 		fwa - std::forward<decltype(args)>(args)
 		fwp - std::forward<Args>(args)...
@@ -1516,24 +1574,41 @@ libv.fsw: Improve callback and tokens to not hold the mutex during event broadca
 
 
 libv.audio: Paper
+	For audio HARD API BARRIER IS REQUIRED (Every lib / backend is a shitshow)
+
+	Backend possibilities
+		Best solution would be audeo at first, but that will pull in the SDL chain, even if it is only used for audio
+
+		OpenAL - License issue: https://github.com/kcat/openal-soft
+		PortAudio - Too low level: http://www.portaudio.com/docs.html
+			sndfile lib in order to load/save all kinds of audio files.
+		audeo - Based on top of SDL_Mixer: https://github.com/NotAPenguin0/audeo
+									https://github.com/SDL-mirror/SDL_mixer
+									https://github.com/SDL-mirror/SDL
+		soloud - Another good candidate: https://sol.gfxile.net/soloud/quickstart.html
+			has many-many backend (even OS native ones), API looks ok, license ok (zlib)
+
 	Sound
 		Sound - What to play
 		+/- Variations
-		+/- Effects
+		+/- Effects /  Filters
+		? Other
 
  	Play
 		Sound - What to play
 		Channel - What mixing channel should it be played on
 		Operation - Start, Repeat, Stop
 		Edge - Fade in, Fade out, Normal
-		Position or Centered - For positioning and sound delay
-		Speed - For Doppler effect
-		+/- Effect
+		Position or Centered - For positioning [and sound delay]
+		[Speed - For Doppler effect]
+		+/- Effects / Filters
+		? Other
 
 	Option
 		Center position - So play can use abs position and not rel
 		Center speed - So play can use abs speed and not rel
-		Channel volume
+		Channel volumes
+		? Other
 
 
 

@@ -1,11 +1,13 @@
 #version 330 core
 
-in vec4 fragmentColor;
+layout(location = 0) in vec3 vertexPosition;
+layout(location = 2) in vec4 vertexColor;
 
-out vec4 result;
+out vec4 fragmentColor;
 
 #include <block/sphere.glsl>
 
 void main() {
-	result = fragmentColor;
+	gl_Position = matMVP * vec4(vertexPosition, 1);
+	fragmentColor = vertexColor;
 }

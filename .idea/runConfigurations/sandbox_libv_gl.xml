@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="sandbox_libv_gl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" WORKING_DIR="file://.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_gl" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_gl">
+  <configuration default="false" name="sandbox_libv_gl" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" WORKING_DIR="file://.." PASS_PARENT_ENVS_2="true" PROJECT_NAME="libv" TARGET_NAME="sandbox_libv_gl" CONFIG_NAME="Dev" RUN_TARGET_PROJECT_NAME="libv" RUN_TARGET_NAME="sandbox_libv_gl">
     <method v="2">
       <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
     </method>

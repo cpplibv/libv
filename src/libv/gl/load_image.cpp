@@ -30,7 +30,7 @@ std::optional<Image> load_image(const std::string_view data) noexcept {
 	return result;
 }
 
-Image load_image_or(const std::string_view data, const Image& fallback) {
+Image load_image_or(const std::string_view data, const Image& fallback) noexcept {
 	auto result = load_image(data);
 
 	if (result.has_value())

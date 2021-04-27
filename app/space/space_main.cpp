@@ -4,7 +4,6 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
-#include <libv/gl/glsl_compiler.hpp>
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/layout_to_string.hpp>
 #include <libv/glr/mesh.hpp>
@@ -15,12 +14,13 @@
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
 #include <libv/math/noise/white.hpp>
-#include <libv/rev/glsl_include_engine.hpp>
+//#include <libv/rev/glsl_include_engine.hpp>
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/ui.hpp>
+#include <libv/utility/hex_dump.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <iostream>
@@ -28,6 +28,7 @@
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
+#include <libv/ui/property/orientation.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -86,8 +87,6 @@ constexpr auto attribute_color0	= libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0 = libv::glr::Attribute<8, libv::vec2f>{};
 constexpr auto attribute_custom0 = libv::glr::Attribute<15, libv::vec4f>{};
 
-const auto uniformBlock_sphere   = libv::glr::UniformBlockBinding{0, "Sphere"};
-
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
@@ -101,6 +100,7 @@ struct SphereUniformLayout {
 	LIBV_REFLECTION_ACCESS(matM);
 	LIBV_REFLECTION_ACCESS(color);
 };
+const auto uniformBlock_sphere = libv::glr::UniformBlockBinding{0, "Sphere"};
 const auto arrow_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
 
 // -------------------------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const Ar
 
 		const auto [length, dir] = length_and_dir(b - a);
 
-		std::cout << length << " " << dir << std::endl;
+//		std::cout << length << " " << dir << std::endl;
 
 		const auto right = cross(dir, up);
 		const auto top = cross(dir, right);
@@ -227,7 +227,7 @@ void draw_gizmo_lines(libv::glr::Mesh& mesh) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::rev::ShaderLoader shader_manager("app/space/shader/");
+libv::rev::ShaderLoader shader_manager("../app/space/shader/");
 
 // -------------------------------------------------------------------------------------------------
 
@@ -238,19 +238,32 @@ struct BackgroundUniforms {
 	libv::glr::Uniform_texture textureNoise;
 
 	template <typename Access>
-	void update_uniforms(Access& access) {
+	void access_uniforms(Access& access) {
 		access(noiseUVScale, "noiseUVScale");
 		access(noiseScale, "noiseScale");
 		access(noiseOffset, "noiseOffset");
 		access(textureNoise, "textureNoise", textureChannel_pattern);
 	}
 };
-
 using ShaderBackground = libv::rev::Shader<BackgroundUniforms>;
+
+struct TestModeUniforms {
+	libv::glr::Uniform_int32 test_mode;
+
+	template <typename Access>
+	void access_uniforms(Access& access) {
+		access(test_mode, "test_mode", 0);
+	}
+};
+using ShaderTestMode = libv::rev::Shader<TestModeUniforms>;
+
+//using Shader = libv::rev::Shader<>;
+
+
 struct Background {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
-	libv::rev::Shader<BackgroundUniforms> shader(shader_manager, "editor_background.vs", "editor_background.fs");
+	ShaderBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
 //	libv::glr::Program program_background;
 //	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
@@ -299,7 +312,6 @@ struct Background {
 
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		const auto s_guard = gl.state.push_guard();
-
 		gl.state.disableDepthMask();
 		gl.state.disableDepthTest();
 		gl.state.polygonModeFill();
@@ -345,8 +357,6 @@ struct Background {
 ////		program_background.assign(background_uniform_noiseScale, "noiseScale");
 ////		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
 ////		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
-////		// TODO P1: Switch to blue noise once implemented
-////		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
 ////
 ////		background_texture_pattern.storage(1, noise_size);
 ////		background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
@@ -429,27 +439,20 @@ struct SpaceCanvas : libv::ui::Canvas {
 	int32_t test_mode = 0;
 
 	libv::glr::Mesh mesh_gizmo{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Program program_gizmo;
+	ShaderTestMode shader_gizmo{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
 
 	Background background;
 
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	libv::glr::Program program;
-	libv::glr::UniformBuffer arrow_uniforms{libv::gl::BufferUsage::StreamDraw};
-	libv::glr::Uniform_int32 uniform_test_mode;
-
+	ShaderTestMode shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
+	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 	explicit SpaceCanvas(app::CameraPlayer& camera) :
 		camera(camera) {
 
-		program.vertex(shader_arrow_vs);
-		program.fragment(shader_arrow_fs);
-		program.assign(uniform_test_mode, "test_mode");
-		program.block_binding(uniformBlock_sphere);
-
-		program_gizmo.vertex(shader_gizmo_vs);
-		program_gizmo.fragment(shader_gizmo_fs);
-		program_gizmo.block_binding(uniformBlock_sphere);
+		// TODO P1: libv.rev: Auto block binding based on include detection
+		shader_gizmo.program().block_binding(uniformBlock_sphere);
+		shader_arrow.program().block_binding(uniformBlock_sphere);
 
 		ArrowOptions options;
 
@@ -491,6 +494,11 @@ struct SpaceCanvas : libv::ui::Canvas {
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
+//		gl.callback([](libv::gl::GL& gl) {
+//            // if glr was immediate this could be here
+//			shader_manager.update(gl);
+//		});
+
 		const auto s_guard = gl.state.push_guard();
 
 		gl.state.enableDepthTest();
@@ -505,12 +513,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 		background.render(gl, canvas_size);
 
 		{
-			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
+			auto uniforms = uniform_stream.block_unique(arrow_layout);
 			uniforms[arrow_layout.matMVP] = gl.mvp();
 			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
-			gl.program(program_gizmo);
+			gl.program(shader_gizmo.program());
 			gl.uniform(std::move(uniforms));
 			gl.render(mesh_gizmo);
 		}
@@ -522,12 +530,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 			gl.model.translate(camera.orbit_point());
 			gl.model.scale(0.2f);
 
-			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
+			auto uniforms = uniform_stream.block_unique(arrow_layout);
 			uniforms[arrow_layout.matMVP] = gl.mvp();
 			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
-			gl.program(program_gizmo);
+			gl.program(shader_gizmo.program());
 			gl.uniform(std::move(uniforms));
 			gl.render(mesh_gizmo);
 		}
@@ -542,19 +550,66 @@ struct SpaceCanvas : libv::ui::Canvas {
 			//        | USE THE VERTEX SHADER TO ALTER THE SHAPE!! Just send an extra pair of vertex for each arrow
 			gl.state.disableDepthMask();
 
-			auto uniforms = arrow_uniforms.block_unique(arrow_layout);
+			auto uniforms = uniform_stream.block_unique(arrow_layout);
 			uniforms[arrow_layout.matMVP] = gl.mvp();
 			uniforms[arrow_layout.matM] = gl.model;
 			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
 
-			gl.program(program);
+			gl.program(shader_arrow.program());
 			gl.uniform(std::move(uniforms));
-			gl.uniform(uniform_test_mode, test_mode);
+			gl.uniform(shader_arrow.uniform().test_mode, test_mode);
 			gl.render(mesh);
 		}
 	}
 };
 
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
+namespace libv {
+namespace ui {
+
+// -------------------------------------------------------------------------------------------------
+
+class StatusLog {
+private:
+	using EntryID = std::string;
+
+	struct LogEntry {
+		std::string id;
+		std::string style;
+		libv::ui::Label label;
+		time_point death_time;
+//		time_duration lifetime;
+	};
+
+private:
+	std::vector<LogEntry> entries;
+	std::unordered_map<EntryID, std::shared_ptr<LogEntry>> index;
+
+//public:
+//	void add(EntryID id, std::string style, std::string text, time_duration lifetime);
+//	void remove(EntryID id);
+//
+//private:
+//	virtual void update(time_duration dt) override {
+//
+//	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+} // namespace ui
+} // namespace libv
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
 // -------------------------------------------------------------------------------------------------
 
 // TODO P1: Controls camera should only be placed into context if the canvas is focused
@@ -583,11 +638,15 @@ int main() {
 	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 	frame.setOpenGLVersion(3, 3);
 	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
-//	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
+	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 
-	// TODO P1: Timer management should be smoother with control and frame attachment
 	libv::Timer timer;
 	frame.onContextUpdate.output([&](const auto&) {
+		// shader_manager.update MUST run before any other render queue operation
+		// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
+		shader_manager.update(ui.gl());
+
+		// TODO P1: Timer management should be smoother with control and frame attachment -> controls.attach(frame)
 		controls.update(timer.time());
 	});
 
@@ -625,6 +684,8 @@ int main() {
 
 //	std::cout << libv::glr::layout_to_string<SphereUniformLayout>("Sphere") << std::endl;
 
+	std::map<libv::rev::ShaderID, std::string> shader_states; // TODO P1: Shove it into status_log
+
 	{
 		libv::ui::PanelFull layers;
 		libv::ui::Label label;
@@ -632,8 +693,63 @@ int main() {
 		label.align_vertical(libv::ui::AlignVertical::bottom);
 //		label.align_horizontal(libv::ui::AlignHorizontal::center);
 //		label.align_vertical(libv::ui::AlignVertical::center);
-		label.text("SPACE!");
-		label.font_color({.7f, 0.2f, 0.4f, 1.f});
+		label.text("");
+//		label.font_color({.7f, 0.2f, 0.4f, 1.f});
+//		label.font_color({.95f, 0.25f, 0.35f, 1.f});
+		label.font_color({.9333f, 0.8235f, 0.0078f, 1.f}); // Warning yellow
+
+//		libv::ui::StatusLog status_log;
+//		status_log.align_horizontal(libv::ui::AlignHorizontal::center);
+//		status_log.align_vertical(libv::ui::AlignVertical::center);
+//		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+
+		// TODO P1: [label] causes lifetimes issues, ui event hub or weak_ptr like behaviour is required
+		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadSuccess& e) mutable {
+			shader_states.erase(e.id);
+
+			label.text("");
+			for (const auto& shader_state : shader_states)
+				label.text(label.text() + "\n" + shader_state.second);
+		});
+		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadFailure& e) mutable {
+			if (e.include_failure) {
+				auto& message = shader_states[e.id];
+				message += fmt::format("--- Failed to load shader: {} ({}) ---\n", e.shader.name(), e.id);
+				message += fmt::format("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
+				for (const auto& [file, line] : e.include_failure->include_stack)
+					message += fmt::format("\n    Included from: {}:{}", file, line);
+
+			} else if (e.compile_failure) {
+				shader_states[e.id] = fmt::format("--- Failed to compile shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.compile_failure->message);
+
+			} else if (e.link_failure) {
+				shader_states[e.id] = fmt::format("--- Failed to link shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.link_failure->message);
+			}
+
+			label.text("");
+			for (const auto& shader_state : shader_states)
+				label.text(label.text() + "\n" + shader_state.second);
+		});
+		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderUnload& e) mutable {
+			shader_states.erase(e.id);
+
+			label.text("");
+			for (const auto& shader_state : shader_states)
+				label.text(label.text() + "\n" + shader_state.second);
+		});
+
+		// ---
+		// TODO P4: libv.ui: Implement UI based event routing hub
+		// TODO P4: space: Use UI based event routing hub instead of lambda connection
+		// TODO P1: Hook in shader loader update event callback
+//		shader_manager.on_update([status_log](const libv::rev::ShaderLoader::Update& update) {
+//			status_log.add(
+//					update.id,
+//					update.success ? "shader_success" : "shader_failure",
+//					update.message(),
+//					update.success ? std::chrono::seconds(1) : 0);
+//		});
+		// ---
 
 		libv::ui::CanvasAdaptor canvas;
 		canvas.adopt(&space);
@@ -641,11 +757,14 @@ int main() {
 
 		layers.add(label);
 		layers.add(canvas);
+//		layers.add(status_log);
 		ui.add(layers);
 	}
 
 	frame.show();
 	frame.join();
+
+	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that issue
 
 	return 0;
 }

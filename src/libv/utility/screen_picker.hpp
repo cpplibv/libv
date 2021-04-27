@@ -46,6 +46,10 @@ public:
 
 	vec2 to_screen(const vec3 worldCoord) const {
 		auto objectSPosition = matrixPV * vec4(worldCoord, float_type{1});
+
+//		if (objectSPosition.w <= 0)
+//			// Point not on screen
+
 		objectSPosition /= objectSPosition.w;
 
 		return (libv::vec::xy(objectSPosition) + float_type{1}) * float_type{0.5} * canvas_size;

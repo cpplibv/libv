@@ -11,8 +11,8 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-struct dynarray {
-	// types:
+class dyn_array {
+public:
 	typedef T value_type;
 	typedef T& reference;
 	typedef const T& const_reference;
@@ -23,37 +23,41 @@ struct dynarray {
 	typedef size_t size_type;
 	typedef ptrdiff_t difference_type;
 
-	// fields:
 private:
 	T* store;
 	size_type count;
 
-	// helper functions:
+private:
 	void check(size_type n) {
-		if (n >= count) throw std::out_of_range("dynarray");
+		if (n >= count)
+			throw std::out_of_range("dyn_array");
 	}
+
 	T* alloc(size_type n) {
-		return reinterpret_cast<T*> (new char[ n * sizeof (T) ]);
+		return reinterpret_cast<T*>(new char[n * sizeof(T)]);
 	}
 
 public:
-	// construct and destruct:
-	dynarray() = delete;
-	const dynarray operator=(const dynarray&) = delete;
-	explicit dynarray(size_type c)
-		: store(alloc(c)), count(c) {
+	dyn_array() = delete;
+	const dyn_array operator=(const dyn_array&) = delete;
+
+	explicit dyn_array(size_type c) :
+		store(alloc(c)),
+		count(c) {
 		size_type i;
 		try {
 			for (i = 0; i < count; ++i)
-				new (store + i) T;
+				new(store + i) T;
 		} catch (...) {
 			for (; i > 0; --i)
 				(store + (i - 1))->~T();
 			throw;
 		}
 	}
-	dynarray(const dynarray& d)
-		: store(alloc(d.count)), count(d.count) {
+
+	dyn_array(const dyn_array& d) :
+		store(alloc(d.count)),
+		count(d.count) {
 		try {
 			std::uninitialized_copy(d.begin(), d.end(), begin());
 		} catch (...) {
@@ -61,12 +65,14 @@ public:
 			throw;
 		}
 	}
-	~dynarray() {
+
+	~dyn_array() {
 		for (size_type i = 0; i < count; ++i)
 			(store + i)->~T();
 		delete[] store;
 	}
 
+public:
 	// iterators:
 	iterator begin() {
 		return store;

@@ -47,7 +47,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplShaderLoader {
+class InternalShaderLoader {
 	FileIncluder includer;
 	libv::gl::GLSLCompiler compiler;
 	libv::fsw::Watcher watcher;
@@ -58,7 +58,7 @@ class ImplShaderLoader {
 
 	libv::gl::IncludeResult include(const std::string_view include_path);
 
-	ImplShaderLoader() :
+	InternalShaderLoader() :
 		compiler(std::ref(includer)) { }
 };
 
@@ -139,7 +139,7 @@ void ShaderLoader::update(libv::gl::GL& gl, callback_success_type success_cb, ca
 			tokens.clear();
 
 			for (const auto& source_file : update->source_files)
-				tokens.emplace_back(self->watcher.subscribe_file(source_file, [this, update](libv::fsw::Event) {
+				tokens.emplace_back(self->watcher.subscribe_file(source_file, [this, update](const libv::fsw::Event&) {
 					std::unique_lock lock(self->update_queue_m);
 					self->update_queue.emplace(update);
 				}));
@@ -155,7 +155,7 @@ void ShaderLoader::update(libv::gl::GL& gl, callback_success_type success_cb, ca
 // -------------------------------------------------------------------------------------------------
 
 ShaderLoader::ShaderLoader() :
-	self(std::make_unique<ImplShaderLoader>()) { }
+	self(std::make_unique<InternalShaderLoader>()) { }
 
 ShaderLoader::~ShaderLoader() {
 	// For the sake of forward declared unique_ptr

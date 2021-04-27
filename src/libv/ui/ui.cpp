@@ -544,6 +544,10 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::gl::GL& UI::gl() {
+	return self->remote.gl();
+}
+
 ContextUI& UI::context() {
 	return self->context;
 }

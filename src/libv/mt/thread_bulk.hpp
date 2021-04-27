@@ -77,6 +77,11 @@ public:
 	}
 
 public:
+	[[nodiscard]] inline size_t size() const noexcept {
+		return group.size();
+	}
+
+public:
 	/// Executes func from multiple thread. Stops when false was returned.
 	/// @note There may be multiple calls even after the first false was returned.
 	void execute_and_wait(std::function<bool()> func) {
@@ -100,8 +105,9 @@ void parallel_for(thread_bulk& worker, I start, const I end, F&& func) {
 	std::atomic<I> it = start;
 
 	worker.execute_and_wait([&] {
-		if (++it < end) {
-			func(*it);
+		const auto i = it++;
+		if (i < end) {
+			func(i);
 			return true;
 		}
 		return false;

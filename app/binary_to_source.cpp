@@ -15,7 +15,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-const auto payload_max_line_lenght = 255;
+const auto payload_max_line_Length = 255;
 const auto file_template_hpp =
 R"(// File: {output_file}.hpp - Generated on YYYY.MM.DD. HH:mm from {input_file}
 
@@ -73,18 +73,18 @@ int main(int argc, const char** argv) {
 
 	const auto size = content.size();
 
-	std::ostringstream paylaod;
+	std::ostringstream payload;
 
-	auto lineLenght = size_t{0};
-	for (const auto& btye_ : content) {
-		const auto btyestr = fmt::format("{:d},", static_cast<uint8_t>(btye_));
+	auto lineLength = size_t{0};
+	for (const auto& byte_ : content) {
+		const auto byteStr = fmt::format("{:d},", static_cast<uint8_t>(byte_));
 
-		if (lineLenght + btyestr.size() > payload_max_line_lenght - 1) {
-			paylaod << '\n';
-			lineLenght = 0;
+		if (lineLength + byteStr.size() > payload_max_line_Length - 1) {
+			payload << '\n';
+			lineLength = 0;
 		}
-		paylaod << btyestr;
-		lineLenght += btyestr.size();
+		payload << byteStr;
+		lineLength += byteStr.size();
 	}
 
 	auto ec_write_hpp = libv::write_file_ec(libv::concat(output_file, ".hpp"), fmt::format(file_template_hpp,
@@ -103,7 +103,7 @@ int main(int argc, const char** argv) {
 			fmt::arg("input_file", input_file),
 			fmt::arg("output_file", output_file),
 			fmt::arg("function_name", function_name),
-			fmt::arg("payload", paylaod.str()),
+			fmt::arg("payload", payload.str()),
 			fmt::arg("size", size)
 	));
 

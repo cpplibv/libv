@@ -3,12 +3,11 @@
 #pragma once
 
 // std
+#include <cassert>
 #include <cstdint>
 // libv
 #include <libv/utility/to_underlying.hpp>
 
-
-#include <gl/glew.h>
 
 // -------------------------------------------------------------------------------------------------
 
@@ -264,6 +263,8 @@ enum class DataType : GLenum {
 	case DataType::U32_R10_G10_B10_A2: return Result{4, 4};
 	case DataType::U32_A2_B10_G10_R10: return Result{4, 4};
 	}
+
+	assert(false && "Invalid DataType enum value");
 	return Result{1, 1}; // [[unreachable]]
 }
 
@@ -414,6 +415,7 @@ enum class FormatSized : GLenum {
 	case FormatBase::DEPTH_STENCIL: return 2;
 	case FormatBase::STENCIL: return 1;
 	}
+	assert(false && "Invalid FormatBase enum value");
 	return 1; // [[unreachable]]
 }
 
@@ -424,6 +426,7 @@ enum class FormatSized : GLenum {
 	case FormatDepth::DEPTH_COMPONENT32:  return FormatBase::DEPTH;
 	case FormatDepth::DEPTH_COMPONENT32F: return FormatBase::DEPTH;
 	}
+	assert(false && "Invalid FormatDepth enum value");
 	return FormatBase::DEPTH; // [[unreachable]]
 }
 
@@ -432,6 +435,7 @@ enum class FormatSized : GLenum {
 	case FormatDepthStencil::DEPTH24_STENCIL8:  return FormatBase::DEPTH_STENCIL;
 	case FormatDepthStencil::DEPTH32F_STENCIL8: return FormatBase::DEPTH_STENCIL;
 	}
+	assert(false && "Invalid FormatDepthStencil enum value");
 	return FormatBase::DEPTH_STENCIL; // [[unreachable]]
 }
 
@@ -442,6 +446,7 @@ enum class FormatSized : GLenum {
 	case FormatStencil::STENCIL_INDEX8:  return FormatBase::STENCIL;
 	case FormatStencil::STENCIL_INDEX16: return FormatBase::STENCIL;
 	}
+	assert(false && "Invalid FormatStencil enum value");
 	return FormatBase::STENCIL; // [[unreachable]]
 }
 
@@ -471,6 +476,7 @@ enum class FormatSized : GLenum {
 	case FormatCompressed::SRGBA_S3TC_DXT3_EXT:     return FormatBase::RGBA;
 	case FormatCompressed::SRGBA_S3TC_DXT5_EXT:     return FormatBase::RGBA;
 	}
+	assert(false && "Invalid FormatCompressed enum value");
 	return FormatBase::R; // [[unreachable]]
 }
 
@@ -538,6 +544,7 @@ enum class FormatSized : GLenum {
 	case FormatSized::RGBA32I:        return FormatBase::RGBA;
 	case FormatSized::RGBA32UI:       return FormatBase::RGBA;
 	}
+	assert(false && "Invalid FormatSized enum value");
 	return FormatBase::R; // [[unreachable]]
 }
 
@@ -586,6 +593,7 @@ enum class ShaderType : GLenum {
 	case ShaderType::TessControl: return "tess-control";
 	case ShaderType::TessEvaluation: return "tess-evaluation";
 	}
+	assert(false && "Invalid ShaderType enum value");
 	return "<<invalid>>";
 }
 
@@ -598,7 +606,21 @@ enum class ShaderType : GLenum {
 	case ShaderType::TessControl: return "tc";
 	case ShaderType::TessEvaluation: return "te";
 	}
-	return "?";
+	assert(false && "Invalid ShaderType enum value");
+	return "x";
+}
+
+[[nodiscard]] inline const char* to_string_ext(ShaderType type) noexcept {
+	switch (type) {
+	case ShaderType::Vertex: return "vs";
+	case ShaderType::Geometry: return "gs";
+	case ShaderType::Fragment: return "fs";
+	case ShaderType::Compute: return "cs";
+	case ShaderType::TessControl: return "tcs";
+	case ShaderType::TessEvaluation: return "tes";
+	}
+	assert(false && "Invalid ShaderType enum value");
+	return "x";
 }
 
 // TextureChannel ----------------------------------------------------------------------------------

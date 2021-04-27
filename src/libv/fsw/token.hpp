@@ -9,7 +9,7 @@ namespace fsw {
 // -------------------------------------------------------------------------------------------------
 
 struct WatchToken {
-	// TODO P5: hide or use a better token
+	// TODO P5: hide or use a better token | not the worst
 	void* id = nullptr;
 
 	constexpr inline WatchToken() noexcept = default;
