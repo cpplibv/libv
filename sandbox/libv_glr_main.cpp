@@ -119,6 +119,7 @@ void main() {
 	output = output + texture(texture1Sampler, fragmentTexture0);
 	output = output + vec4(vec3(fragmentTexture0 * 0.3 + 0.4, 0.5) * color, 1.0) * 3;
 	output = output / 10;
+	output = output * 2; // To over expose so I can test HDR
 
 	//output = output + vec4(vec3(fragmentTexture0 * 0.3 + 0.4, 0.5) * color, 1.0);
 }
@@ -198,7 +199,9 @@ in vec2 fragmentUV;
 out vec4 color;
 
 void main() {
-	color = texture2D(texture0Sampler, fragmentUV, 0).rgba;
+	vec4 sample = texture2D(texture0Sampler, fragmentUV, 0).rgba;
+	color = vec4(fract(sample.rgb), sample.a);
+//	color = sample;
 })";
 
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
@@ -294,11 +297,14 @@ struct Sandbox {
 	libv::glr::Texture sky_texture0;
 
 	libv::glr::Framebuffer framebuffer;
-	libv::glr::Texture2DMultisample::R8_G8_B8_A8 framebufferColor;
+//	libv::glr::Texture2DMultisample::R8_G8_B8_A8 framebufferColor;
+	libv::glr::Texture2DMultisample::R32F framebufferColor;
+//	libv::glr::Texture2DMultisample::RGBA32F framebufferColor;
 	libv::glr::Renderbuffer::D32 framebufferDepth;
 
 	libv::glr::Framebuffer framebuffer2;
-	libv::glr::Texture2D::R8_G8_B8_A8 framebuffer2Color;
+//	libv::glr::Texture2D::R8_G8_B8_A8 framebuffer2Color;
+	libv::glr::Texture2D::RGBA32F framebuffer2Color;
 
 	Sandbox() {
 		// --- Sphere ---
@@ -461,7 +467,7 @@ struct Sandbox {
 	void render() {
 		auto queue = remote.queue();
 
-		if (std::fmod(time, 4.f) < 2.f)
+		if (std::fmod(time, 4.f) < 2.f) // NOTE: This multisample only for the 'default' (and might be for blit ms->ss too) frame buffer render
 			queue.state.enableMultisample();
 		else
 			queue.state.disableMultisample();
@@ -471,18 +477,18 @@ struct Sandbox {
 		queue.viewport({0, 0}, windowSize);
 		render_remote(queue);
 
-		// Draw world lower resolution onto background framebuffer
+		// Draw world lower resolution onto background framebuffer (on the whole screen)
 		queue.framebuffer_draw(framebuffer);
 		queue.viewport({0, 0}, framebufferSize);
 		render_remote(queue);
 
-		// Downsample background multisampled framebuffer to framebuffer2
+		// Downsample background multisampled framebuffer to framebuffer2 (on the whole screen)
 		queue.blit(framebuffer, framebuffer2,
 				{}, framebufferSize,
 				{}, framebufferSize,
 				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
 
-		// Render a quad with framebuffer2 ower the normal output
+		// Render a quad with framebuffer2 over the normal output (on a small window)
 		queue.framebuffer_draw_deafult();
 		queue.viewport({0, 0}, windowSize);
 		render_remote_quad(queue);
