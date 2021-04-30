@@ -23,6 +23,7 @@
 #include <libv/gl/buffer_object.hpp>
 #include <libv/gl/framebuffer_object.hpp>
 #include <libv/gl/program_object.hpp>
+#include <libv/gl/query_object.hpp>
 #include <libv/gl/renderbuffer_object.hpp>
 #include <libv/gl/shader_object.hpp>
 #include <libv/gl/texture_object.hpp>
@@ -779,6 +780,10 @@ public:
 	template <typename Access = AccessProgram>
 	inline Access operator()(Program& object) noexcept {
 		return Access{object, *this};
+	}
+	template <typename Access = AccessQuery>
+	inline Access operator()(Query& object) noexcept {
+		return Access{object};
 	}
 	template <typename Access = AccessShader>
 	inline Access operator()(Shader& object) noexcept {

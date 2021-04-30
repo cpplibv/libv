@@ -8,6 +8,8 @@
 #include <libv/utility/to_underlying.hpp>
 
 
+#include <gl/glew.h>
+
 // -------------------------------------------------------------------------------------------------
 
 using GLenum = uint32_t;
@@ -719,6 +721,17 @@ enum class FramebufferStatus : GLenum {
 	IncompleteReadBuffer = 0x8CDC, /// GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER
 	Undefined = 0x8219, /// GL_FRAMEBUFFER_UNDEFINED
 	Unsupported = 0x8CDD, /// GL_FRAMEBUFFER_UNSUPPORTED
+};
+
+// -------------------------------------------------------------------------------------------------
+
+enum class QueryType : GLenum {
+	SamplesPassed = 0x8914,/// GL_SAMPLES_PASSED
+	AnySamplesPassed = 0x8C2F,/// GL_ANY_SAMPLES_PASSED
+	AnySamplesPassedConservative = 0x8D6A,/// GL_ANY_SAMPLES_PASSED_CONSERVATIVE
+	PrimitivesGenerated = 0x8C87,/// GL_PRIMITIVES_GENERATED
+	TransformFeedbackPrimitivesWritten = 0x8C88,/// GL_TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN
+	TimeElapsed = 0x88BF,/// GL_TIME_ELAPSED
 };
 
 // -------------------------------------------------------------------------------------------------
