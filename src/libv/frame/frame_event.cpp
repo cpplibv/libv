@@ -6,8 +6,6 @@
 #include <GLFW/glfw3.h>
 // libv
 #include <libv/utility/overload.hpp>
-// std
-#include <mutex>
 // pro
 #include <libv/frame/events.hpp>
 #include <libv/frame/impl_frame.lpp>
@@ -19,104 +17,83 @@ namespace frame {
 
 // -------------------------------------------------------------------------------------------------
 
-std::mutex windowHandlers_m;
-std::map<GLFWwindow*, Frame*> windowHandlers;
-
 template <typename E>
 struct DispatchGLFWEvent {
 	static inline void eventDrop(GLFWwindow* window, int count, const char** data) {
-		try {
-			std::vector<std::string> payload;
-			payload.reserve(count);
-			for (int i = 0; i < count; ++i)
-				payload.emplace_back(data[i]);
+		std::vector<std::string> payload;
+		payload.reserve(count);
+		for (int i = 0; i < count; ++i)
+			payload.emplace_back(data[i]);
 
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E{std::move(payload)});
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		frame->self->eventQueue.emplace_back(E{std::move(payload)});
 	}
 
 	static inline void eventKey(GLFWwindow* window, int key, int scancode, int action, int mods) {
-		(void) mods; // TODO P1: Store mods and create events from caps/num/scroll lock changes
+		(void) mods; // TODO P1: Store mods and create events from caps/num/scroll lock changes | Also check if any other has mods too
 
-		try {
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E{libv::input::Keycode{key}, libv::input::Scancode{scancode}, libv::input::Action{action}});
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		frame->self->eventQueue.emplace_back(E{libv::input::Keycode{key}, libv::input::Scancode{scancode}, libv::input::Action{action}});
 	}
 
 	static inline void eventMouseButton(GLFWwindow* window, int button, int action, int mods) {
-		(void) mods; // TODO P1: Store mods and create events from caps/num/scroll lock changes
+		(void) mods; // TODO P1: Store mods and create events from caps/num/scroll lock changes | Also check if any other has mods too
 
-		try {
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E{libv::input::MouseButton{button}, libv::input::Action{action}});
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		frame->self->eventQueue.emplace_back(E{libv::input::MouseButton{button}, libv::input::Action{action}});
 	}
 
 	template <typename... Args>
 	static inline void call(GLFWwindow* window, Args... args) {
-		try {
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E(args...));
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		frame->self->eventQueue.emplace_back(E(args...));
 	}
 
 	template <typename... Args>
 	static inline void frame(GLFWwindow* window, Args... args) {
-		try {
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			frame.self->eventQueue.emplace_back(E(args...));
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-			glfwGetWindowFrameSize(window,
-					&frame.self->frameSize.x,
-					&frame.self->frameSize.y,
-					&frame.self->frameSize.z,
-					&frame.self->frameSize.w);
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		frame->self->eventQueue.emplace_back(E(args...));
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		glfwGetWindowFrameSize(window,
+				&frame->self->frameSize.x,
+				&frame->self->frameSize.y,
+				&frame->self->frameSize.z,
+				&frame->self->frameSize.w);
 	}
 
 	static inline void mouse(GLFWwindow* window, double x, double y) {
-		try {
-			std::lock_guard lock_handler(windowHandlers_m);
-			Frame& frame = *windowHandlers.at(window);
-			std::vector<Event>& queue = frame.self->eventQueue;
-			auto size = frame.getSize();
+		Frame* frame = reinterpret_cast<Frame*>(glfwGetWindowUserPointer(window));
+		if (frame == nullptr)
+			return log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
 
-			std::lock_guard lock_queue(frame.self->eventQueue_m);
-			if (!queue.empty() && std::holds_alternative<E>(queue.back()))
-				std::get<E>(queue.back()).position = libv::vec2d{x, size.y - y - 1};
-			else
-				queue.emplace_back(E(x, size.y - y - 1));
+		std::vector<Event>& queue = frame->self->eventQueue;
+		auto size = frame->getSize();
 
-		} catch (const std::out_of_range& e) {
-			log_event.error("Unhandled event. No event handler (frame) assigned to this GLFW window.");
-		}
+		std::lock_guard lock_queue(frame->self->eventQueue_m);
+		if (!queue.empty() && std::holds_alternative<E>(queue.back()))
+			std::get<E>(queue.back()).position = libv::vec2d{x, size.y - y - 1};
+		else
+			queue.emplace_back(E(x, size.y - y - 1));
 	}
 
 	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window size and framebuffer size to zero, and does not restore it on focus gain.
@@ -148,10 +125,7 @@ struct DispatchGLFWEvent {
 };
 
 void Frame::registerEventCallbacks(Frame* frame, GLFWwindow* window) {
-	{
-		std::lock_guard lock(windowHandlers_m);
-		windowHandlers[window] = frame;
-	}
+	glfwSetWindowUserPointer(window, frame);
 
 	glfwSetCharCallback              (window, DispatchGLFWEvent<libv::input::EventChar         >::call);
 	glfwSetWindowContentScaleCallback(window, DispatchGLFWEvent<EventContentScale              >::call);
@@ -190,10 +164,7 @@ void Frame::unregisterEventCallbacks(GLFWwindow* window) {
 	glfwSetWindowRefreshCallback     (window, nullptr);
 	glfwSetWindowSizeCallback        (window, nullptr);
 
-	{
-		std::lock_guard lock(windowHandlers_m);
-		windowHandlers.erase(window);
-	}
+	glfwSetWindowUserPointer(window, nullptr);
 }
 
 // -------------------------------------------------------------------------------------------------
