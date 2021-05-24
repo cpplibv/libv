@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/utility/guard.hpp>
 // ext
 #include <GL/glew.h>
 // pro
@@ -55,7 +56,7 @@ public:
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {
-		return bind(), Guard([this] { unbind(); });
+		return bind(), libv::guard([this] { unbind(); });
 	}
 
 public:

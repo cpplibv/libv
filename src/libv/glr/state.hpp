@@ -140,7 +140,7 @@ public:
 
 	[[nodiscard]] inline auto push_guard() noexcept {
 		push();
-		return libv::Guard([this] { pop(); });
+		return libv::guard([this] { pop(); });
 	}
 
 	inline State state() const noexcept {

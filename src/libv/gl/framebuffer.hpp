@@ -4,6 +4,8 @@
 
 // ext
 #include <GL/glew.h>
+// libv
+#include <libv/utility/guard.hpp>
 // pro
 #include <libv/gl/assert.hpp>
 #include <libv/gl/check.hpp>
@@ -76,13 +78,13 @@ public:
 	}
 
 	[[nodiscard]] inline auto bind_guard() noexcept {
-		return bind(), Guard([this] { unbind(); });
+		return bind(), libv::guard([this] { unbind(); });
 	}
 	[[nodiscard]] inline auto bind_draw_guard() noexcept {
-		return bind_draw(), Guard([this] { unbind_draw(); });
+		return bind_draw(), libv::guard([this] { unbind_draw(); });
 	}
 	[[nodiscard]] inline auto bind_read_guard() noexcept {
-		return bind_read(), Guard([this] { unbind_read(); });
+		return bind_read(), libv::guard([this] { unbind_read(); });
 	}
 
 private:

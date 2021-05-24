@@ -57,7 +57,7 @@ public:
 	[[nodiscard]] inline auto bind_guard() noexcept {
 	    bind();
 
-		return Guard([this] {
+		return libv::guard([this] {
 			unbind();
 		});
 	}

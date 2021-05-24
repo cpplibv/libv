@@ -97,7 +97,7 @@ struct BlendFunctionSetter {
 		auto past_source = current_source;
 		auto past_destination = current_destination;
 		set(source, destination);
-		return Guard([this, past_source, past_destination] { set(past_source, past_destination); });
+		return libv::guard([this, past_source, past_destination] { set(past_source, past_destination); });
 	}
 };
 
@@ -137,17 +137,17 @@ struct CapabilitySetter {
 		[[nodiscard]] inline auto enable_guard() noexcept {
 			auto past = current;
 			enable();
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto disable_guard() noexcept {
 			auto past = current;
 			disable();
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto set_guard(bool enable_) noexcept {
 			auto past = current;
 			set(enable_);
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 	};
 
@@ -197,7 +197,7 @@ struct ClipPlanesSetter {
 	[[nodiscard]] inline auto set_guard(uint32_t value) noexcept {
 		auto past = current;
 		set(value);
-		return Guard([this, past] { set(past); });
+		return libv::guard([this, past] { set(past); });
 	}
 };
 
@@ -219,7 +219,7 @@ struct CullFaceSetter {
 	[[nodiscard]] inline auto set_guard(CullFace face) noexcept {
 		auto past = current;
 		set(face);
-		return Guard([this, past] { set(past); });
+		return libv::guard([this, past] { set(past); });
 	}
 
 	inline void front() noexcept {
@@ -254,7 +254,7 @@ struct DepthFunctionSetter {
 	[[nodiscard]] inline auto set_guard(TestFunction value) noexcept {
 		auto past = current;
 		set(value);
-		return Guard([this, past] { set(past); });
+		return libv::guard([this, past] { set(past); });
 	}
 
 	inline void always() noexcept {
@@ -325,7 +325,7 @@ struct FrontFaceSetter {
 	[[nodiscard]] inline auto set_guard(FrontFace face) noexcept {
 		auto past = current;
 		set(face);
-		return Guard([this, past] { set(past); });
+		return libv::guard([this, past] { set(past); });
 	}
 
 	inline void ccw() noexcept {
@@ -360,7 +360,7 @@ struct PolygonModeSetter {
 	[[nodiscard]] inline auto set_guard(PolygonMode mode) noexcept {
 		auto past = current;
 		set(mode);
-		return Guard([this, past] { set(past); });
+		return libv::guard([this, past] { set(past); });
 	}
 
 	inline void point() noexcept {
@@ -417,17 +417,17 @@ struct MaskSetter {
 		[[nodiscard]] inline auto enable_guard() noexcept {
 			auto past = current;
 			enable();
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto disable_guard() noexcept {
 			auto past = current;
 			disable();
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 		[[nodiscard]] inline auto set_guard(bool enable_) noexcept {
 			auto past = current;
 			set(enable_);
-			return Guard([this, past] { set(past); });
+			return libv::guard([this, past] { set(past); });
 		}
 	};
 	struct Color {

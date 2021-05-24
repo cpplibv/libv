@@ -42,11 +42,11 @@ public:
 	}
 	[[nodiscard]] inline auto push_guard() noexcept {
 		push();
-		return Guard([this] { pop(); });
+		return libv::guard([this] { pop(); });
 	}
 	[[nodiscard]] inline auto push_guard(const Mat& mx) noexcept {
 		push(mx);
-		return Guard([this] { pop(); });
+		return libv::guard([this] { pop(); });
 	}
 	inline MatrixStack<Mat>& pop() {
 		// Asserting for 1 because because empty stack is not allowed

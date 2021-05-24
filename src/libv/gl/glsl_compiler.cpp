@@ -108,8 +108,8 @@ bool ImplGLSLCompiler::is_mixed_indentation(const std::string_view line) const n
 void ImplGLSLCompiler::preprocess_includes(const std::string_view source, const std::string_view filename, const int include_line) {
 	int line_number = 1;
 
-	includeStack.emplace_back(filename, include_line);
-	libv::Guard stack_guard{[this] { includeStack.pop_back(); }};
+	includeStack.emplace_back(filename, 0);
+	libv::guard stack_guard{[this] { includeStack.pop_back(); }};
 
 	for (std::string_view line : source | libv::view::lines_string_view()) {
 		const auto include = extract_include(line);

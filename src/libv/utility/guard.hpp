@@ -10,33 +10,45 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P3: rename Guard file and class to scope_guard
-
 /// @usage \code
 /// [[nodiscard]] inline auto push_guard() noexcept {
 /// 	push();
-/// 	return libv::Guard([this] { pop(); });
+/// 	return libv::guard([this] { pop(); });
+/// } \endcode
+///
+/// @usage \code
+/// auto foo() {
+/// 	push();
+/// 	auto pop_guard = libv::guard([&] { pop(); });
+/// 	// ... Lot of code that might exit in many ways
 /// } \endcode
 template <typename F>
-class Guard {
+class guard {
+private:
 	F action;
+
 public:
-	Guard() = delete;
-	Guard(const Guard&) = delete;
-	Guard(Guard&&) = delete;
-	Guard& operator=(const Guard&) = delete;
-	Guard& operator=(Guard&&) = delete;
+	guard() = delete;
+	guard(const guard&) = delete;
+	guard& operator=(const guard&) & = delete;
+	guard(guard&&) = delete;
+	guard& operator=(guard&&) & = delete;
 
 	template <typename CF>
-	inline explicit Guard(CF&& func) : action(std::forward<CF>(func)) {}
+	inline explicit guard(CF&& func) : action(std::forward<CF>(func)) {}
 
-	inline ~Guard() {
+	inline ~guard() {
 		action();
 	}
 };
 
 template <typename F>
-Guard(F) -> Guard<F>;
+guard(F) -> guard<F>;
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename F>
+using scope_guard = guard<F>;
 
 // -------------------------------------------------------------------------------------------------
 
