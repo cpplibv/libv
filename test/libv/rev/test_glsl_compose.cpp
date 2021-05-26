@@ -3,16 +3,8 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
-#include <libv/gl/glsl_compiler.hpp>
+#include <libv/rev/glsl_compose.hpp>
 
-
-// -------------------------------------------------------------------------------------------------
-
-namespace {
-
-
-
-} // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -22,49 +14,49 @@ TEST_CASE("enable logger", "[libv.gl.glsl_compiler]") {
 	std::cout << libv::logger_stream;
 }
 
-TEST_CASE("GLSL Include pre-processing", "[libv.gl.glsl_compiler]") {
-	libv::gl::GLSLCompiler compiler([](const auto& str) -> libv::gl::IncludeResult {
+TEST_CASE("GLSL source include pre-processing", "[libv.rev.glsl_compose]") {
+	const auto includer = [](const auto& str) -> libv::rev::IncludeResult {
 		if (str == "A.glsl")
-			return {true, "A1\nA2\nA3"}; // No newline at the end
+			return {std::error_code(), "A1\nA2\nA3"}; // No newline at the end
 		if (str == "B.glsl")
-			return {true, "B1\nB2\nB3\n"};
+			return {std::error_code(), "B1\nB2\nB3\n"};
 		if (str == "C.glsl")
-			return {true, "C1\nC2\nC3\n"};
+			return {std::error_code(), "C1\nC2\nC3\n"};
 
 		if (str == "DinA.glsl")
-			return {true, "#include <A.glsl>\nD2\nD3\nD4\n"};
+			return {std::error_code(), "#include <A.glsl>\nD2\nD3\nD4\n"};
 		if (str == "DinAB.glsl")
-			return {true, "#include <A.glsl>\n#include <B.glsl>\nD3\nD4\nD5\n"};
+			return {std::error_code(), "#include <A.glsl>\n#include <B.glsl>\nD3\nD4\nD5\n"};
 		if (str == "DinABC.glsl")
-			return {true, "#include <A.glsl>\n#include <B.glsl>\n#include <C.glsl>\nD4\nD5\nD6\n"};
+			return {std::error_code(), "#include <A.glsl>\n#include <B.glsl>\n#include <C.glsl>\nD4\nD5\nD6\n"};
 
 		if (str == "FinABC.glsl")
-			return {true, "F1\n#include <A.glsl>\nF3\n#include <B.glsl>\nF5\n#include <C.glsl>\nF7\n"};
+			return {std::error_code(), "F1\n#include <A.glsl>\nF3\n#include <B.glsl>\nF5\n#include <C.glsl>\nF7\n"};
 
 		if (str == "EinE.glsl")
-			return {true, "#include <EinE.glsl>\nE2\nE3\nE4\n"};
+			return {std::error_code(), "#include <EinE.glsl>\nE2\nE3\nE4\n"};
 
 		if (str == "HinGinH.glsl")
-			return {true, "#include <GinHinG.glsl>\nH2"};
+			return {std::error_code(), "#include <GinHinG.glsl>\nH2"};
 		if (str == "GinHinG.glsl")
-			return {true, "#include <HinGinH.glsl>\nG2"};
+			return {std::error_code(), "#include <HinGinH.glsl>\nG2"};
 
 		if (str == "P.glsl")
-			return {true, "#pragma once\nP1"};
+			return {std::error_code(), "#pragma once\nP1"};
 		if (str == "Q.glsl")
-			return {true, "#include <P.glsl>\nQ1"};
+			return {std::error_code(), "#include <P.glsl>\nQ1"};
 
 		if (str == "W.glsl")
-			return {true, "\r\n01234\r\n56789"};
+			return {std::error_code(), "\r\n01234\r\n56789"};
 
 		if (str == "Z.glsl")
-			return {true, "    \tZ1\n\t Z2"};
+			return {std::error_code(), "    \tZ1\n\t Z2"};
 
-		return {false, "ERROR Could not find source \"" + std::string(str) + '"'};
-	});
+		return {std::make_error_code(std::errc::no_such_file_or_directory), "ERROR Could not find source \"" + std::string(str) + '"'};
+	};
 
 	const auto test = [&] (auto source) {
-		return compiler.compile(source, "main");
+		return libv::rev::glsl_compose_from_source(includer, source);
 	};
 
 	CHECK(test("") == "");

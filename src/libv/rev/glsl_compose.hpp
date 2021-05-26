@@ -51,14 +51,14 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<const std::string> defines = {}, std::span<const std::string> includes = {});
-[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<std::span<const std::string>> defines_list = {}, std::span<const std::string> includes_list = {});
-[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<const std::string> defines = {}, std::span<std::span<const std::string>> includes = {});
+[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<const std::string> defines, std::span<const std::string> includes);
+[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes_list);
+[[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<const std::string> defines, std::span<std::span<const std::string>> includes = {});
 [[nodiscard]] std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view main_path, std::span<std::span<const std::string>> defines_list = {}, std::span<std::span<const std::string>> includes_list = {});
 
-[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<const std::string> defines = {}, std::span<const std::string> includes = {});
-[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<std::span<const std::string>> defines_list = {}, std::span<const std::string> includes_list = {});
-[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<const std::string> defines = {}, std::span<std::span<const std::string>> includes = {});
+[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<const std::string> defines, std::span<const std::string> includes);
+[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes_list);
+[[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<const std::string> defines, std::span<std::span<const std::string>> includes = {});
 [[nodiscard]] std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view main_source, std::span<std::span<const std::string>> defines_list = {}, std::span<std::span<const std::string>> includes_list = {});
 
 // -------------------------------------------------------------------------------------------------

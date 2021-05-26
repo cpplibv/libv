@@ -27,8 +27,8 @@ namespace rev {
 class LoadShaderSourceContext {
 public:
 	const IncludeLoadFunc& loader;
-	std::span<std::span<const std::string>> global_defines_list;
-	std::span<std::span<const std::string>> global_includes_list;
+	std::span<std::span<const std::string>> injected_defines_list;
+	std::span<std::span<const std::string>> injected_includes_list;
 
 	std::stringstream output;
 	std::vector<std::pair<std::string, int>> include_stack;
@@ -41,7 +41,7 @@ private:
 	static bool is_mixed_indentation(std::string_view line) noexcept;
 
 private:
-	void process_include(const std::string_view filename);
+	bool process_include(const std::string_view filename);
 	void process_source(const std::string_view source, const std::string_view filename);
 
 public:
@@ -74,16 +74,16 @@ bool LoadShaderSourceContext::is_mixed_indentation(const std::string_view line) 
 	return ctre::match<R"qq(^(\t+ +| +\t+).*)qq">(line);
 }
 
-void LoadShaderSourceContext::process_include(const std::string_view filename) {
+bool LoadShaderSourceContext::process_include(const std::string_view filename) {
 	if (libv::linear_contains(include_stack | std::views::keys, filename)) {
 		log_rev.error("Cyclic source inclusion detected for {}. Skipping inclusion.", filename);
 		for (const auto& entry : include_stack | std::views::reverse)
 			log_rev.error("    Included from {}:{}", entry.first, entry.second);
-		return;
+		return false;
 	}
 
 	if (libv::linear_contains(includePragmaOnce, filename))
-		return;
+		return false;
 
 	auto included_source = loader(filename);
 	if (included_source.ec) {
@@ -98,12 +98,15 @@ void LoadShaderSourceContext::process_include(const std::string_view filename) {
 		throw e;
 	}
 
-	{
-		const auto stack_guard = libv::guard{[this] { include_stack.pop_back(); }};
-		include_stack.emplace_back(filename, 0);
+	const auto stack_guard = libv::guard{[this] { include_stack.pop_back(); }};
+	include_stack.emplace_back(filename, 0);
 
-		process_source(included_source.result, filename);
-	}
+	const auto is_main_source = include_stack.size() == 1;
+	if (!is_main_source)
+		output << "#line " << 1 << " \"" << filename << "\"\n";
+	process_source(included_source.result, filename);
+
+	return true;
 }
 
 void LoadShaderSourceContext::process_source(const std::string_view source, const std::string_view filename) {
@@ -113,9 +116,8 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 		line_number()++;
 
 		if (const auto include_opt = extract_include(line)) {
-			output << "#line " << 1 << " \"" << *include_opt << "\"\n";
-			process_include(*include_opt);
-			output << "#line " << line_number() + 1 << " \"" << filename << "\"\n";
+			if (process_include(*include_opt))
+				output << "#line " << line_number() + 1 << " \"" << filename << "\"\n";
 
 		} else if (is_pragma_once(line)) {
 			includePragmaOnce.emplace_back(filename);
@@ -149,25 +151,28 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 			output << line << '\n';
 
 			if (is_version(line)) {
-				const auto has_global_define = std::ranges::any_of(global_defines_list, [](const auto& r){ return !r.empty(); });
-				const auto has_global_include = std::ranges::any_of(global_includes_list, [](const auto& r){ return !r.empty(); });
+				const auto has_injected_define = std::ranges::any_of(injected_defines_list, [](const auto& r){ return !r.empty(); });
+				const auto has_injected_include = std::ranges::any_of(injected_includes_list, [](const auto& r){ return !r.empty(); });
 				const auto is_main_source = include_stack.size() == 1;
 
-				if (is_main_source && has_global_define) {
+				if (is_main_source && has_injected_define) {
 					// If this is the main file inject defines
-					output << "#line 1 \"injected_defines\" // Source code injected defines\n";
-					for (const auto& defines : global_defines_list)
+					output << "// --- Source code injected defines start ---\n";
+					output << "#line 1 \"injected_defines\"\n";
+					for (const auto& defines : injected_defines_list)
 						for (const auto& define : defines)
 							output << "#define " << define << "\n";
+					output << "// --- Source code injected defines end ---\n";
 				}
 
-				if (is_main_source && has_global_include) {
-					for (const auto& global_includes : global_includes_list) {
-						for (const auto& global_include : global_includes) {
-							output << "#line " << 1 << " \"" << global_include << "\" // Source code injected includes\n";
-							process_include(global_include);
+				if (is_main_source && has_injected_include) {
+					output << "// --- Source code injected includes start ---\n";
+					for (const auto& injected_includes : injected_includes_list) {
+						for (const auto& injected_include : injected_includes) {
+							process_include(injected_include);
 						}
 					}
+					output << "// --- Source code injected includes end ---\n";
 				}
 
 				// NOTE: Inserting top level source information after version (version has to come first)

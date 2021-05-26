@@ -1162,12 +1162,6 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET test_libv_gl
-	SOURCE test/libv/gl/*.cpp
-	LINK   obj_test_runner libv_gl
-)
-
-wish_create_executable(
 	TARGET test_libv_glr
 	SOURCE test/libv/glr/*.cpp
 	LINK   obj_test_runner libv_glr libv_math libv_meta
@@ -1213,6 +1207,12 @@ wish_create_executable(
 	TARGET test_libv_range
 	SOURCE test/libv/range/*.cpp
 	LINK   obj_test_runner libv_range
+)
+
+wish_create_executable(
+	TARGET test_libv_rev
+	SOURCE test/libv/rev/*.cpp
+	LINK   obj_test_runner libv_rev
 )
 
 wish_create_executable(
