@@ -1,15 +1,14 @@
 #version 330 core
 
 #include <command_arrow.glsl>
-#include <block/sphere.glsl>
+#include <block/matrices.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
-layout(location = 1) in vec3 vertexNormal;
-layout(location = 8) in vec2 vertexTexture0;
+//layout(location = 1) in vec3 vertexNormal;
+//layout(location = 8) in vec2 vertexTexture0;
 layout(location = 15) in vec4 vertex_SP_SS_TP_TS;// SegmentPosition, SegmentSize, TotalPosition, TotalSize
 
-out GeometryData geometry;
-//out GeometryData VS_OUTPUT(geometry, fragment);
+out GeometryData vs_out;
 
 void main() {
 	float vertexSegmentPosition = vertex_SP_SS_TP_TS.x;
@@ -18,11 +17,9 @@ void main() {
 	float vertexTotalSize = vertex_SP_SS_TP_TS.w;
 
 	gl_Position = matMVP * vec4(vertexPosition, 1);
-	geometry.normal = normalize(vertexNormal);
-	geometry.texture0 = vertexTexture0;
 
-	geometry.segmentPosition = vertexSegmentPosition;
-	geometry.segmentSize = vertexSegmentSize;
-	geometry.totalPosition = vertexTotalPosition;
-	geometry.totalSize = vertexTotalSize;
+	vs_out.segmentPosition = vertexSegmentPosition;
+	vs_out.segmentSize = vertexSegmentSize;
+	vs_out.totalPosition = vertexTotalPosition;
+	vs_out.totalSize = vertexTotalSize;
 }

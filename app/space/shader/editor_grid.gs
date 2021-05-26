@@ -8,9 +8,10 @@ in vec4 geometryColor[2];
 
 out vec4 fragmentColor;
 
-//#include <block/sphere.glsl>
+//#include <block/matrices.glsl>
 
 //TODO P1: If line thickness is less then 1 px reduce alpha instead
+//TODO P1: for grid/line shaders: If line thickness is less then 1 px reduce alpha instead
 
 void main() {
 	gl_Position = gl_in[0].gl_Position;

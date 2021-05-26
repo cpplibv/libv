@@ -1,4 +1,7 @@
 
+Space - System integration demo
+
+libv.rev: Implement shader management
 
 
 
@@ -50,9 +53,12 @@
 --- STACK ------------------------------------------------------------------------------------------
 
 
+https://learnopengl.com/Getting-started/Coordinate-Systems
+https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
 
-libv.rev: Implement shader management
-app.space: Improve arrow
+app.space: Improve arrow with geometry shader
+
+
 app.space: Add grid
 app.space: Add multi camera / camera frustum visualization
 

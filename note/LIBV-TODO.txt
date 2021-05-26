@@ -600,6 +600,15 @@ libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 
+CLion Edit configuratin template, drop down on target selection, configure, bottom left edit template
+	cmake applications
+
+check on that recent modification that i just did in ui.context_state to start the frame time at now
+	test time values at first frame
+
+#define implicit explicit(false)
+libv: Change /*implicit*/ comments to explicit(false)
+
 GCC 11.1
 	cmake_minimum_required(VERSION 3.20)
 	set(CMAKE_CXX_STANDARD 23)
@@ -683,6 +692,10 @@ place.it:
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
+	opengl.knowledge: learnopengl.com - Great tutorial site
+	opengl.knowledge: opengl-tutorial.org - Great tutorial site
+	opengl.knowledge: open.gl - Great tutorial site
+	opengl.knowledge: docs.gl - Reference documentations
 
 	ext: For utf ranges check out: https://github.com/tcbrindle/utf_ranges
 	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend
@@ -1609,6 +1622,12 @@ libv.audio: Paper
 		Center speed - So play can use abs speed and not rel
 		Channel volumes
 		? Other
+
+	Other
+		ducking by over powering volume of sound
+		ducking by over powering volume of channel
+		ducking by importance of sound
+		ducking by importance of channel
 
 
 

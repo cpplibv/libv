@@ -1,9 +1,11 @@
 // Project: libv, File: app/space/space_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
+#include <libv/algo/adjacent_pairs.hpp>
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
+#include <libv/gl/gl.hpp> // <<< only line width debug
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/layout_to_string.hpp>
 #include <libv/glr/mesh.hpp>
@@ -14,11 +16,11 @@
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
 #include <libv/math/noise/white.hpp>
-//#include <libv/rev/glsl_include_engine.hpp>
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/hex_dump.hpp>
 #include <libv/utility/timer.hpp>
@@ -67,10 +69,10 @@ inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // TODO P2: libv.glr: Shader automated block binding by watching the includes
 //          So this should work:
-//          shader_loader.register_block<SphereUniformLayout>("block/sphere.glsl");
+//          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
 //          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
 //          And this would be called on any program that includes block/sphere.glsl
-//          program.block_binding(uniformBlock_sphere)
+//          program.block_binding(uniformBlock_matrices)
 //          | issue: some struct might have already been defined, so block to string might have to skip them
 //                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
 //                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
@@ -86,115 +88,38 @@ constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
 
-struct SphereUniformLayout {
+struct UniformLayoutMatrices {
 	libv::glr::Uniform_mat4f matMVP;
+	libv::glr::Uniform_mat4f matP;
 	libv::glr::Uniform_mat4f matM;
-	libv::glr::Uniform_vec3f color;
+//	libv::glr::Uniform_vec3f color;
 
 	LIBV_REFLECTION_ACCESS(matMVP);
+	LIBV_REFLECTION_ACCESS(matP);
 	LIBV_REFLECTION_ACCESS(matM);
-	LIBV_REFLECTION_ACCESS(color);
+//	LIBV_REFLECTION_ACCESS(color);
 };
-const auto uniformBlock_sphere = libv::glr::UniformBlockBinding{0, "Sphere"};
-const auto arrow_layout = libv::glr::layout_std140<SphereUniformLayout>(uniformBlock_sphere);
+const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
+const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename V0>
-[[nodiscard]] constexpr inline auto length_and_dir(const V0& vec) noexcept {
-	struct Result {
-		typename V0::value_type length;
-		V0 dir;
-	};
-
-	Result result;
-
-	result.length = vec.length();
-	result.dir = vec / result.length;
-
-	return result;
-}
+//template <typename V0>
+//[[nodiscard]] constexpr inline auto length_and_dir(const V0& vec) noexcept {
+//	struct Result {
+//		typename V0::value_type length;
+//		V0 dir;
+//	};
+//
+//	Result result;
+//
+//	result.length = vec.length();
+//	result.dir = vec / result.length;
+//
+//	return result;
+//}
 
 // -------------------------------------------------------------------------------------------------
-
-struct ArrowOptions {
-	float width = 0.1f;
-
-//	float body_width = 0.1f;
-//	float head_width = 0.3f;
-//	float joint_cap = {round, cut, extent, none};
-//	float end_cap = {round, none};
-};
-
-void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points, const ArrowOptions& options) {
-	using vec3 = libv::vec3f;
-	using f = float;
-
-	static constexpr vec3 up{0, 0, 1};
-
-	if (points.size() < 2)
-		return;
-
-	auto position = mesh.attribute(attribute_position);
-	auto normal = mesh.attribute(attribute_normal);
-	auto texture0 = mesh.attribute(attribute_texture0);
-	auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
-	auto index = mesh.index();
-
-	f total_position = 0;
-	f total_size = 0;
-
-	for (int32_t i = 0; i < static_cast<int32_t>(points.size()) - 1; i++) {
-		const auto a = points[i];
-		const auto b = points[i + 1];
-
-		total_size += (b - a).length();
-	}
-
-	for (int32_t i = 0; i < static_cast<int32_t>(points.size()) - 1; i++) {
-		const auto a = points[i];
-		const auto b = points[i + 1];
-
-		// TODO P3: Range adjacent pairs: for (const auto& [a, b] : points | view::adjacent);
-		// TODO P3: Range adjacent ring pairs: for (const auto& [a, b] : points | view::adjacent_ring);
-
-		if (a == b)
-			continue;
-
-		const auto [length, dir] = length_and_dir(b - a);
-
-//		std::cout << length << " " << dir << std::endl;
-
-		const auto right = cross(dir, up);
-		const auto top = cross(dir, right);
-
-		const auto side = right * options.width * 0.5f;
-
-		position(a - side);
-		position(a + side);
-		position(b + side);
-		position(b - side);
-
-		normal(top);
-		normal(top);
-		normal(top);
-		normal(top);
-
-		texture0(0, 0);
-		texture0(1, 0);
-		texture0(1, 1);
-		texture0(0, 1);
-
-		sp_ss_tp_ts(0, length, total_position, total_size);
-		sp_ss_tp_ts(0, length, total_position, total_size);
-		sp_ss_tp_ts(length, length, total_position, total_size);
-		sp_ss_tp_ts(length, length, total_position, total_size);
-
-		index.quad(i * 4 + 0, i * 4 + 1, i * 4 + 2, i * 4 + 3);
-
-		total_position += length;
-	}
-}
 
 void draw_gizmo_lines(libv::glr::Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
@@ -222,38 +147,54 @@ void draw_gizmo_lines(libv::glr::Mesh& mesh) {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P1: space: Have space working from the correct dir
+//libv::rev::ShaderLoader shader_manager("shader/");
 libv::rev::ShaderLoader shader_manager("../app/space/shader/");
 
 // -------------------------------------------------------------------------------------------------
 
-struct BackgroundUniforms {
+struct UniformsBackground {
 	libv::glr::Uniform_vec2f noiseUVScale;
 	libv::glr::Uniform_vec4f noiseScale;
 	libv::glr::Uniform_vec4f noiseOffset;
 	libv::glr::Uniform_texture textureNoise;
 
-	template <typename Access>
-	void access_uniforms(Access& access) {
+	template <typename Access> void access_uniforms(Access& access) {
 		access(noiseUVScale, "noiseUVScale");
 		access(noiseScale, "noiseScale");
 		access(noiseOffset, "noiseOffset");
 		access(textureNoise, "textureNoise", textureChannel_pattern);
 	}
 };
-using ShaderBackground = libv::rev::Shader<BackgroundUniforms>;
 
-struct TestModeUniforms {
+struct UniformsTestMode {
 	libv::glr::Uniform_int32 test_mode;
 
-	template <typename Access>
-	void access_uniforms(Access& access) {
+	template <typename Access> void access_uniforms(Access& access) {
 		access(test_mode, "test_mode", 0);
 	}
 };
-using ShaderTestMode = libv::rev::Shader<TestModeUniforms>;
 
+struct UniformsCommandArrow {
+	libv::glr::Uniform_int32 test_mode;
+	libv::glr::Uniform_float time;
+	libv::glr::Uniform_vec2f render_resolution;
+	libv::glr::Uniform_vec4f color;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(color, "color");
+		access(render_resolution, "render_resolution");
+		access(test_mode, "test_mode", 0);
+		access(time, "time", 0.f);
+	}
+};
+
+using ShaderBackground = libv::rev::Shader<UniformsBackground>;
+using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
+using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 //using Shader = libv::rev::Shader<>;
 
+// =================================================================================================
 
 struct Background {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
@@ -309,19 +250,18 @@ struct Background {
 		gl.render(mesh_background);
 	}
 };
+float space_time = 0.0f; // <<< kill this one
 
 struct CommandArrow {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
+	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	ShaderCommandArrow shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
 
 	int test_mode = 0;
 
 public:
 	CommandArrow() {
 		// TODO P1: libv.rev: Auto block binding based on include detection
-		shader_arrow.program().block_binding(uniformBlock_sphere);
-
-		ArrowOptions options;
+		shader_arrow.program().block_binding(uniformBlock_matrices);
 
 		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
 		for (int i = 0; i < 60; i++) {
@@ -338,7 +278,42 @@ public:
 			points.emplace_back(x, y, z);
 		}
 
-		draw_arrow(mesh, points, options);
+		draw_arrow(mesh, points);
+	}
+
+	void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points) {
+		if (points.size() < 2)
+			return;
+
+		auto position = mesh.attribute(attribute_position);
+		auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
+		auto index = mesh.index();
+
+		float total_length = 0;
+		float current_length = 0;
+
+		libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
+			total_length += (b - a).length();
+		});
+
+		libv::glr::VertexIndex i = 0;
+		libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
+			if (a == b) // Sanity check
+				return;
+
+			const auto length = (b - a).length();
+
+			position(a);
+			position(b);
+
+			sp_ss_tp_ts(0, length, current_length, total_length);
+			sp_ss_tp_ts(length, length, current_length, total_length);
+
+			index.line(i + 0, i + 1);
+			i += 2;
+
+			current_length += length;
+		});
 	}
 
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
@@ -348,19 +323,17 @@ public:
 		gl.state.blendSrc_SourceAlpha();
 		gl.state.blendDst_One_Minus_SourceAlpha();
 
-		// TODO P1: With glsl generated shapes depth writing is not a good idea
-		//		  Also, the current mode would require glsl fwidth AA, possible but cumbersome
-		//        | USE THE VERTEX SHADER TO ALTER THE SHAPE!! Just send an extra pair of vertex for each arrow
-		gl.state.disableDepthMask();
-
-		auto uniforms = uniform_stream.block_unique(arrow_layout);
-		uniforms[arrow_layout.matMVP] = gl.mvp();
-		uniforms[arrow_layout.matM] = gl.model;
-		uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = gl.mvp();
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.matM] = gl.model;
 
 		gl.program(shader_arrow.program());
 		gl.uniform(std::move(uniforms));
+		gl.uniform(shader_arrow.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+		gl.uniform(shader_arrow.uniform().render_resolution, canvas_size);
 		gl.uniform(shader_arrow.uniform().test_mode, test_mode);
+		gl.uniform(shader_arrow.uniform().time, space_time);
 		gl.render(mesh);
 	}
 };
@@ -372,16 +345,15 @@ struct Gizmo {
 public:
 	Gizmo() {
 		// TODO P1: libv.rev: Auto block binding based on include detection
-		shader.program().block_binding(uniformBlock_sphere);
+		shader.program().block_binding(uniformBlock_matrices);
 
 		draw_gizmo_lines(mesh);
 	}
 
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
-		auto uniforms = uniform_stream.block_unique(arrow_layout);
-		uniforms[arrow_layout.matMVP] = gl.mvp();
-		uniforms[arrow_layout.matM] = gl.model;
-		uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = gl.mvp();
+		uniforms[layout_matrices.matM] = gl.model;
 
 		gl.program(shader.program());
 		gl.uniform(std::move(uniforms));
@@ -492,6 +464,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 		time += dtf;
+		space_time += dtf;
 
 		// TODO P2: Value tracking UI component for debugging
 //		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
@@ -510,6 +483,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 		const auto s_guard = gl.state.push_guard();
 
 		gl.state.enableDepthTest();
+		gl.state.enableDepthMask();
+
+		gl.state.cullBackFace();
+		gl.state.enableCullFace();
+
+//		gl.state.disableMultisample(); // <<<
 
 		gl.projection = camera.projection(canvas_size);
 		gl.view = camera.view();
@@ -590,7 +569,16 @@ int main() {
 	std::cout << libv::logger_stream;
 	log_space.info("Hello Space!");
 
+	// TODO P1: space: Have space working from the correct dir
+//	std::filesystem::current_path("../app/space/");
+
 	libv::Frame frame("Space", 1280, 800);
+	// TODO P1: space: Have space working from the correct dir
+//	libv::ui::Settings ui_settings;
+//	ui_settings.res_font = "../../res/font";
+//	ui_settings.res_shader = "../../res/shader";
+//	ui_settings.res_texture = "../../res/texture";
+//	libv::ui::UI ui(ui_settings);
 	libv::ui::UI ui;
 	libv::ctrl::Controls controls;
 
@@ -631,25 +619,25 @@ int main() {
 		// TODO P1: Persist auto runtime hook options
 		//          > Requires persistence
 		// TODO P1: Auto runtime hook option for random uniform variables
-//		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
-//			const int32_t mode_count = 4;
-//			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
-//				space.arrow.test_mode = space.arrow.test_mode == 0 ? mode_count - 1 : space.arrow.test_mode - 1;
-//			else
-//				space.arrow.test_mode = (space.arrow.test_mode + 1) % mode_count;
-//		}
-//		if (e.keycode == libv::input::Keycode::Backtick)
-//			space.arrow.test_mode = 0;
-//		if (e.keycode == libv::input::Keycode::Num1)
-//			space.arrow.test_mode = 1;
-//		if (e.keycode == libv::input::Keycode::Num2)
-//			space.arrow.test_mode = 2;
-//		if (e.keycode == libv::input::Keycode::Num3)
-//			space.arrow.test_mode = 3;
-//		log_space.info("Test mode: {}", space.test_mode);
+		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
+			const int32_t mode_count = 4;
+			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
+				space.arrow.test_mode = space.arrow.test_mode == 0 ? mode_count - 1 : space.arrow.test_mode - 1;
+			else
+				space.arrow.test_mode = (space.arrow.test_mode + 1) % mode_count;
+		}
+		if (e.keycode == libv::input::Keycode::Backtick)
+			space.arrow.test_mode = 0;
+		if (e.keycode == libv::input::Keycode::Num1)
+			space.arrow.test_mode = 1;
+		if (e.keycode == libv::input::Keycode::Num2)
+			space.arrow.test_mode = 2;
+		if (e.keycode == libv::input::Keycode::Num3)
+			space.arrow.test_mode = 3;
+		log_space.info("Test mode: {}", space.arrow.test_mode);
 	});
 
-	std::cout << libv::glr::layout_to_string<SphereUniformLayout>("Sphere") << std::endl;
+//	std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
 	std::map<libv::rev::ShaderID, std::string> shader_states; // TODO P1: Shove it into status_log
 

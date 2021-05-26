@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <blur_kernel.glsl>
+#include <post_process/blur_kernel.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
 
@@ -15,5 +15,5 @@ void main() {
 	vec2 pixel_size = 1.0 / render_resolution; // TODO P4: pixel_size could be a uniform
 
 	for (int i = 0; i < kernel_size; i++)
-		fragment_kernel_uvs[i] = uv + (i - kernel_half_size) * pixel_size.y;
+		fragment_kernel_uvs[i] = uv + (i - kernel_half_size) * pixel_size.x;
 }

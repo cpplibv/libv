@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <blur_kernel.glsl>
+#include <post_process/blur_kernel.glsl>
 
 in vec2 fragment_kernel_uvs[kernel_size];
 

@@ -26,7 +26,7 @@ IDEA 1 example
 
 #version 330 core
 
-#include <block/sphere.glsl>
+#include <block/matrices.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;

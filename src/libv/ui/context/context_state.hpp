@@ -24,7 +24,7 @@ class ContextState {
 	friend class UI;
 
 	size_t frame_count_ = 0; /// Number of UI frame operations since the UI initialization
-	time_point time_frame_{}; /// Time point of frame start, does not change during the same frame
+	time_point time_frame_ = clock::now(); /// Time point of frame start, does not change during the same frame
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
 	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
 	time_duration time_delta_{}; /// Duration between time_frame and previous time_frame, does not change during the same frame

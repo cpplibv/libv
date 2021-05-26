@@ -4,7 +4,7 @@ in vec4 fragmentColor;
 
 out vec4 result;
 
-#include <block/sphere.glsl>
+#include <block/matrices.glsl>
 
 void main() {
 	result = fragmentColor;

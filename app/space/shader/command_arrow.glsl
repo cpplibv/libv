@@ -1,8 +1,9 @@
 #pragma once
 
 struct GeometryData {
-	vec3 normal;
-	vec2 texture0;
+	vec3 position;
+//	vec3 normal;
+//	vec2 texture0;
 	float segmentPosition;
 	float segmentSize;
 	float totalPosition;
@@ -10,8 +11,9 @@ struct GeometryData {
 };
 
 struct FragmentData {
-	vec3 normal;
-	vec2 texture0;
+	vec4 color;
+//	vec3 normal;
+//	vec2 texture0;
 	float segmentPosition;
 	float segmentSize;
 	float totalPosition;

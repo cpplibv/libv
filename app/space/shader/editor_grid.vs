@@ -5,7 +5,7 @@ layout(location = 2) in vec4 vertexColor;
 
 out vec4 fragmentColor;
 
-#include <block/sphere.glsl>
+#include <block/matrices.glsl>
 
 void main() {
 	gl_Position = matMVP * vec4(vertexPosition, 1);
