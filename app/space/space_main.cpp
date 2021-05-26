@@ -64,11 +64,6 @@ inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // TODO P1: In shader_arrow_fs body_size/edge_size is UV but head_size is world space. Unify them
 // TODO P1: Organize vertex_SP_SS_TP_TS to SS_SP_SE_TS s.start, s.position, s.end, t.size or with some more sane name
-// TODO P1: Move shaders to files
-// TODO P1: Move mask_aa into its own file
-// TODO P1: Shader hot (re-)loader
-// TODO P2: No sdTriangle (at all) solve the problem without triangle sdf
-// TODO P4: Shader Importer
 
 // TODO P2: libv.glr: Shader automated block binding by watching the includes
 //          So this should work:
@@ -265,26 +260,12 @@ struct Background {
 
 	ShaderBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-//	libv::glr::Program program_background;
-//	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
-//	libv::glr::Uniform_vec4f background_uniform_noiseScale;
-//	libv::glr::Uniform_vec4f background_uniform_noiseOffset;
-//	libv::glr::Uniform_texture background_uniform_textureNoise;
 
 	static constexpr libv::vec2i noise_size = {128, 128};
 
 	Background() {
-//		std::string shader_script_dir = "../app/space/shader/";
-//		libv::glv::load_shader_source(loader, shader_script_dir + "editor_background.vs");
-//		libv::glv::load_shader_source(loader, shader_script_dir + "editor_background.fs");
-
-//		program_background.vertex(shader_background_vs);
-//		program_background.fragment(shader_background_fs);
-//		program_background.assign(background_uniform_noiseUVScale, "noiseUVScale");
-//		program_background.assign(background_uniform_noiseScale, "noiseScale");
-//		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
-//		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
 		// TODO P1: Switch to blue noise once implemented
+		//  		| It will not be implemented anytime soon so burn in a couple of textures from it
 		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
 
 		background_texture_pattern.storage(1, noise_size);
@@ -305,10 +286,6 @@ struct Background {
 			index.quad(0, 1, 2, 3);
 		}
 	}
-
-//	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
-//	void render_gizmos(libv::glr::Queue& gl, libv::vec2f canvas_size);
-//	void render_gizmos_selected(libv::glr::Queue& gl, libv::vec2f canvas_size);
 
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 		const auto s_guard = gl.state.push_guard();
@@ -333,12 +310,89 @@ struct Background {
 	}
 };
 
-//struct Grid {
+struct CommandArrow {
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	ShaderTestMode shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
+
+	int test_mode = 0;
+
+public:
+	CommandArrow() {
+		// TODO P1: libv.rev: Auto block binding based on include detection
+		shader_arrow.program().block_binding(uniformBlock_sphere);
+
+		ArrowOptions options;
+
+		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
+		for (int i = 0; i < 60; i++) {
+			const auto r = i / 30.0;
+			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+			points.emplace_back(x, y, 0);
+		}
+		for (int i = 60; i < 120; i++) {
+			const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
+			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+			const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
+			points.emplace_back(x, y, z);
+		}
+
+		draw_arrow(mesh, points, options);
+	}
+
+	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
+		const auto s_guard = gl.state.push_guard();
+
+		gl.state.enableBlend();
+		gl.state.blendSrc_SourceAlpha();
+		gl.state.blendDst_One_Minus_SourceAlpha();
+
+		// TODO P1: With glsl generated shapes depth writing is not a good idea
+		//		  Also, the current mode would require glsl fwidth AA, possible but cumbersome
+		//        | USE THE VERTEX SHADER TO ALTER THE SHAPE!! Just send an extra pair of vertex for each arrow
+		gl.state.disableDepthMask();
+
+		auto uniforms = uniform_stream.block_unique(arrow_layout);
+		uniforms[arrow_layout.matMVP] = gl.mvp();
+		uniforms[arrow_layout.matM] = gl.model;
+		uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
+
+		gl.program(shader_arrow.program());
+		gl.uniform(std::move(uniforms));
+		gl.uniform(shader_arrow.uniform().test_mode, test_mode);
+		gl.render(mesh);
+	}
+};
+
+struct Gizmo {
+	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	ShaderTestMode shader{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
+
+public:
+	Gizmo() {
+		// TODO P1: libv.rev: Auto block binding based on include detection
+		shader.program().block_binding(uniformBlock_sphere);
+
+		draw_gizmo_lines(mesh);
+	}
+
+	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+		auto uniforms = uniform_stream.block_unique(arrow_layout);
+		uniforms[arrow_layout.matMVP] = gl.mvp();
+		uniforms[arrow_layout.matM] = gl.model;
+		uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
+
+		gl.program(shader.program());
+		gl.uniform(std::move(uniforms));
+		gl.render(mesh);
+	}
+};
+
+struct Grid {
 //	libv::glr::Mesh mesh_lines{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 //	libv::glr::Program program_lines;
-////	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-////	libv::glr::Uniform_vec2f background_uniform_noiseUVScale;
-////	libv::glr::Uniform_texture background_uniform_textureNoise;
+//
 //	libv::glr::Uniform_vec4f uniform_color_x;
 //	libv::glr::Uniform_vec4f uniform_color_y;
 //	libv::glr::Uniform_vec4f uniform_color_z;
@@ -348,22 +402,7 @@ struct Background {
 //
 ////	float far;
 //
-//	static constexpr libv::vec2i noise_size = {128, 128};
-//
 //	Grid() {
-////		program_background.vertex(shader_background_vs);
-////		program_background.fragment(shader_background_fs);
-////		program_background.assign(background_uniform_noiseUVScale, "noiseUVScale");
-////		program_background.assign(background_uniform_noiseScale, "noiseScale");
-////		program_background.assign(background_uniform_noiseOffset, "noiseOffset");
-////		program_background.assign(background_uniform_textureNoise, "textureNoise", textureChannel_pattern);
-////
-////		background_texture_pattern.storage(1, noise_size);
-////		background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
-////		background_texture_pattern.set(libv::gl::MagFilter::Nearest);
-////		background_texture_pattern.set(libv::gl::MinFilter::Nearest);
-////		background_texture_pattern.set(libv::gl::Wrap::Repeat, libv::gl::Wrap::Repeat);
-//
 //		{
 //			auto position = mesh_background.attribute(attribute_position);
 //			auto index = mesh_background.index();
@@ -403,8 +442,10 @@ struct Background {
 //			index.quad(0, 1, 2, 3);
 //		}
 //	}
-//
-//	void render(libv::glr::Queue& gl) {
+
+	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+		(void) gl;
+		(void) uniform_stream;
 ////		const auto s_guard = gl.state.push_guard();
 ////
 ////		gl.state.disableDepthMask();
@@ -425,8 +466,8 @@ struct Background {
 //////		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0, 0, 0, 0));
 ////		gl.texture(background_texture_pattern, textureChannel_pattern);
 ////		gl.render(mesh_background);
-//	}
-//};
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -436,43 +477,15 @@ struct SpaceCanvas : libv::ui::Canvas {
 	float angle = 0.0f;
 	float time = 0.0f;
 
-	int32_t test_mode = 0;
-
-	libv::glr::Mesh mesh_gizmo{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader_gizmo{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
-
 	Background background;
+	Grid grid;
+	Gizmo origin_gizmo;
+	CommandArrow arrow;
 
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 	explicit SpaceCanvas(app::CameraPlayer& camera) :
 		camera(camera) {
-
-		// TODO P1: libv.rev: Auto block binding based on include detection
-		shader_gizmo.program().block_binding(uniformBlock_sphere);
-		shader_arrow.program().block_binding(uniformBlock_sphere);
-
-		ArrowOptions options;
-
-		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
-		for (int i = 0; i < 60; i++) {
-			const auto r = i / 30.0;
-			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-			points.emplace_back(x, y, 0);
-		}
-		for (int i = 60; i < 120; i++) {
-			const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
-			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-			const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
-			points.emplace_back(x, y, z);
-		}
-
-		draw_gizmo_lines(mesh_gizmo);
-		draw_arrow(mesh, points, options);
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
@@ -494,72 +507,26 @@ struct SpaceCanvas : libv::ui::Canvas {
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
-//		gl.callback([](libv::gl::GL& gl) {
-//            // if glr was immediate this could be here
-//			shader_manager.update(gl);
-//		});
-
 		const auto s_guard = gl.state.push_guard();
 
 		gl.state.enableDepthTest();
 
 		gl.projection = camera.projection(canvas_size);
 		gl.view = camera.view();
-//		gl.projection = libv::mat4f::perspective(1.f, 1.f * canvas_size.x / canvas_size.y, 0.1f, 1000.f);
-//		gl.view = libv::mat4f::lookAt({2.f, 2.f, 1.2f}, {0.f, 0.f, 0.f}, {0.f, 0.f, 1.f});
-//		gl.view.rotate(libv::Degrees{angle}, 0.f, 0.f, 1.f);
 		gl.model = libv::mat4f::identity();
 
 		background.render(gl, canvas_size);
-
-		{
-			auto uniforms = uniform_stream.block_unique(arrow_layout);
-			uniforms[arrow_layout.matMVP] = gl.mvp();
-			uniforms[arrow_layout.matM] = gl.model;
-			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
-
-			gl.program(shader_gizmo.program());
-			gl.uniform(std::move(uniforms));
-			gl.render(mesh_gizmo);
-		}
+		grid.render(gl, uniform_stream);
+		origin_gizmo.render(gl, uniform_stream);
 
 		{
 			const auto m_guard = gl.model.push_guard();
-
-//			std::cout << "Eye: " << camera.eye() << " Cam: " << camera.orbit_point() << " rot: " << camera.rotations() << " dir: " << camera.direction() << std::endl;
 			gl.model.translate(camera.orbit_point());
 			gl.model.scale(0.2f);
-
-			auto uniforms = uniform_stream.block_unique(arrow_layout);
-			uniforms[arrow_layout.matMVP] = gl.mvp();
-			uniforms[arrow_layout.matM] = gl.model;
-			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
-
-			gl.program(shader_gizmo.program());
-			gl.uniform(std::move(uniforms));
-			gl.render(mesh_gizmo);
+			origin_gizmo.render(gl, uniform_stream);
 		}
 
-		{
-			gl.state.enableBlend();
-			gl.state.blendSrc_SourceAlpha();
-			gl.state.blendDst_One_Minus_SourceAlpha();
-
-			// TODO P1: With glsl generated shapes depth writing is not a good idea
-			//		  Also, the current mode would require glsl fwidth AA, possible but cumbersome
-			//        | USE THE VERTEX SHADER TO ALTER THE SHAPE!! Just send an extra pair of vertex for each arrow
-			gl.state.disableDepthMask();
-
-			auto uniforms = uniform_stream.block_unique(arrow_layout);
-			uniforms[arrow_layout.matMVP] = gl.mvp();
-			uniforms[arrow_layout.matM] = gl.model;
-			uniforms[arrow_layout.color] = libv::vec3f(1.0f, 1.0f, 1.0f);
-
-			gl.program(shader_arrow.program());
-			gl.uniform(std::move(uniforms));
-			gl.uniform(shader_arrow.uniform().test_mode, test_mode);
-			gl.render(mesh);
-		}
+		arrow.render(gl, canvas_size, uniform_stream);
 	}
 };
 
@@ -569,41 +536,41 @@ struct SpaceCanvas : libv::ui::Canvas {
 // =================================================================================================
 // =================================================================================================
 
-namespace libv {
-namespace ui {
-
-// -------------------------------------------------------------------------------------------------
-
-class StatusLog {
-private:
-	using EntryID = std::string;
-
-	struct LogEntry {
-		std::string id;
-		std::string style;
-		libv::ui::Label label;
-		time_point death_time;
-//		time_duration lifetime;
-	};
-
-private:
-	std::vector<LogEntry> entries;
-	std::unordered_map<EntryID, std::shared_ptr<LogEntry>> index;
-
-//public:
-//	void add(EntryID id, std::string style, std::string text, time_duration lifetime);
-//	void remove(EntryID id);
+//namespace libv {
+//namespace ui {
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//class StatusLog {
+//private:
+//	using EntryID = std::string;
+//
+//	struct LogEntry {
+//		std::string id;
+//		std::string style;
+//		libv::ui::Label label;
+//		time_point death_time;
+////		time_duration lifetime;
+//	};
 //
 //private:
-//	virtual void update(time_duration dt) override {
+//	std::vector<LogEntry> entries;
+//	std::unordered_map<EntryID, std::shared_ptr<LogEntry>> index;
 //
-//	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-} // namespace ui
-} // namespace libv
+////public:
+////	void add(EntryID id, std::string style, std::string text, time_duration lifetime);
+////	void remove(EntryID id);
+////
+////private:
+////	virtual void update(time_duration dt) override {
+////
+////	}
+//};
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//} // namespace ui
+//} // namespace libv
 
 // =================================================================================================
 // =================================================================================================
@@ -667,22 +634,22 @@ int main() {
 //		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
 //			const int32_t mode_count = 4;
 //			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
-//				space.test_mode = space.test_mode == 0 ? mode_count - 1 : space.test_mode - 1;
+//				space.arrow.test_mode = space.arrow.test_mode == 0 ? mode_count - 1 : space.arrow.test_mode - 1;
 //			else
-//				space.test_mode = (space.test_mode + 1) % mode_count;
+//				space.arrow.test_mode = (space.arrow.test_mode + 1) % mode_count;
 //		}
 //		if (e.keycode == libv::input::Keycode::Backtick)
-//			space.test_mode = 0;
+//			space.arrow.test_mode = 0;
 //		if (e.keycode == libv::input::Keycode::Num1)
-//			space.test_mode = 1;
+//			space.arrow.test_mode = 1;
 //		if (e.keycode == libv::input::Keycode::Num2)
-//			space.test_mode = 2;
+//			space.arrow.test_mode = 2;
 //		if (e.keycode == libv::input::Keycode::Num3)
-//			space.test_mode = 3;
+//			space.arrow.test_mode = 3;
 //		log_space.info("Test mode: {}", space.test_mode);
 	});
 
-//	std::cout << libv::glr::layout_to_string<SphereUniformLayout>("Sphere") << std::endl;
+	std::cout << libv::glr::layout_to_string<SphereUniformLayout>("Sphere") << std::endl;
 
 	std::map<libv::rev::ShaderID, std::string> shader_states; // TODO P1: Shove it into status_log
 
@@ -758,13 +725,14 @@ int main() {
 		layers.add(label);
 		layers.add(canvas);
 //		layers.add(status_log);
+//		layers.add(pref_graph);
 		ui.add(layers);
 	}
 
 	frame.show();
 	frame.join();
 
-	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that issue
+	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that event-ui-lifetime issue
 
 	return 0;
 }
