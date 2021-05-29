@@ -12,13 +12,6 @@ out FragmentData fs_in;
 
 uniform vec2 render_resolution;
 
-const float body_width = 7;
-const float head_width = 16;
-const float head_height = 28;
-//const float body_width = 15;
-//const float head_width = 50;
-//const float head_height = 50;
-
 
 // -------------------------------------------------------------------------------------------------
 
@@ -88,6 +81,7 @@ void main() {
 
 	fs_in.segmentSize = vs_out[0].segmentSize;
 	fs_in.totalSize = vs_out[0].totalSize;
+	fs_in.color = vs_out[0].color;
 
 	// Head
 	fs_in.head = 1;
@@ -169,20 +163,6 @@ void main() {
 //	gl_Position = target_P; EmitVertex();
 //	EndPrimitive();
 }
-
-//	vec4 source_P = gl_in[0].gl_Position;
-//	vec4 target_P = gl_in[1].gl_Position;
-//	vec4 source_S = source_P / source_P.w;
-//	vec4 target_S = target_P / target_P.w;
-//
-//	vec2 diff = target_S.xy - source_S.xy;
-//	vec2 dir = normalize(vec2(diff.x / aspect, diff.y));
-//	vec2 dir = normalize(diff / pixel_size);
-//	vec2 dir = normalize((target_S.xy - source_S.xy) / pixel_size);
-//	if (target_P.w * source_P.w < 0) // If only one endpoint is behind the camera the negative w coord would flip the direction
-//		dir *= -1;
-//
-//	vec2 normal = vec2(dir.y, -dir.x);
 
 // =================================================================================================
 

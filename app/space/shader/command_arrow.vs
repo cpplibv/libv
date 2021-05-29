@@ -4,6 +4,7 @@
 #include <block/matrices.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
+layout(location = 2) in vec4 vertexColor;
 layout(location = 15) in vec4 vertex_SP_SS_TP_TS; // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 
 out GeometryData vs_out;
@@ -16,6 +17,7 @@ void main() {
 
 	gl_Position = matMVP * vec4(vertexPosition, 1);
 
+	vs_out.color = vertexColor;
 	vs_out.segmentPosition = vertexSegmentPosition;
 	vs_out.segmentSize = vertexSegmentSize;
 	vs_out.totalPosition = vertexTotalPosition;

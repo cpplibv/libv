@@ -2,6 +2,7 @@
 Space - System integration demo
 
 libv.rev: Implement shader management
+app.space: Improve arrow with geometry shader
 
 
 
@@ -53,10 +54,6 @@ libv.rev: Implement shader management
 --- STACK ------------------------------------------------------------------------------------------
 
 
-https://learnopengl.com/Getting-started/Coordinate-Systems
-https://learnopengl.com/Advanced-OpenGL/Geometry-Shader
-
-app.space: Improve arrow with geometry shader
 
 
 app.space: Add grid
