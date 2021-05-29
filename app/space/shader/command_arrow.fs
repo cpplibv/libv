@@ -4,7 +4,7 @@
 #include <command_arrow.glsl>
 #include <lib/linearize_depth.glsl>
 #include <lib/mask_aa.glsl>
-#include <lib/sd_triangle.glsl>
+//#include <lib/sd_triangle.glsl>
 
 in FragmentData fs_in;
 
@@ -18,10 +18,21 @@ void main() {
 	float depth = fract(linearize_depth(gl_FragCoord.z, 0.01, 1000) / 2 + time / 5);
 //	float depth = fract(linearize_depth(gl_FragCoord.z, 0.01, 1000) / 2);
 //	float depth = (linearize_depth(gl_FragCoord.z, 0.01, 1000));
-	result = color * fs_in.color;
+//	result = color * fs_in.color;
 //	result.a = depth;
-	result.g = depth;
-	result.b = depth;
+//	result = color;
+	result = vec4(0, 0, 0, 1);
+
+	result.x = fract((fs_in.totalPosition) / fs_in.totalSize * 10 - time / 3);
+//	result.x = fract(fs_in.totalPosition);
+
+	// Input debugs
+	//	result.x = fs_in.segmentPosition / fs_in.segmentSize;
+	//	result.x = fs_in.totalPosition / fs_in.totalSize;
+	//	result.x = fs_in.head;
+	//	result.xy = fs_in.uv;
+	//	result.xy = fs_in.part_uv;
+	//	result.r = depth;
 
 
 	// TODO P5: Visual improvments of command arrow

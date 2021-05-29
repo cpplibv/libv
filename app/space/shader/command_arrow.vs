@@ -4,9 +4,7 @@
 #include <block/matrices.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
-//layout(location = 1) in vec3 vertexNormal;
-//layout(location = 8) in vec2 vertexTexture0;
-layout(location = 15) in vec4 vertex_SP_SS_TP_TS;// SegmentPosition, SegmentSize, TotalPosition, TotalSize
+layout(location = 15) in vec4 vertex_SP_SS_TP_TS; // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 
 out GeometryData vs_out;
 

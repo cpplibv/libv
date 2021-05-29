@@ -1,24 +1,23 @@
 #version 330 core
 
 #include <command_arrow.glsl>
-#include <block/matrices.glsl>
 #include <lib/linearize_depth.glsl>
 
 layout (lines) in;
-//layout (line_strip, max_vertices = 64) out;
 layout (triangle_strip, max_vertices = 9) out;
 
 in GeometryData vs_out[2];
 
 out FragmentData fs_in;
 
-uniform int test_mode;
-uniform float time;
 uniform vec2 render_resolution;
 
 const float body_width = 7;
 const float head_width = 16;
 const float head_height = 28;
+//const float body_width = 15;
+//const float head_width = 50;
+//const float head_height = 50;
 
 
 // -------------------------------------------------------------------------------------------------
@@ -80,19 +79,76 @@ void main() {
 	v6.xyz *= v6.w;
 
 
-	// Arrow Line
-	fs_in.color = vec4(1, 1, 1, 1);
+	float neck_ratio = head_height / dir_pixel_length;
+	float neck_v = max(1-neck_ratio, 0);
+	float neck_u_left = body_width / head_width;
+	float neck_u_right = 1 - neck_u_left;
+	float neck_segmentPosition = neck_v * vs_out[0].segmentSize;
+	float neck_totalPosition = vs_out[0].totalPosition + neck_v * vs_out[0].segmentSize;
+
+	fs_in.segmentSize = vs_out[0].segmentSize;
+	fs_in.totalSize = vs_out[0].totalSize;
+
+	// Head
+	fs_in.head = 1;
+	// v6
+	fs_in.uv = vec2(0, neck_v);
+	fs_in.part_uv = vec2(0, 0);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v6; EmitVertex();
+	// v5
+	fs_in.uv = vec2(neck_u_left, neck_v);
+	fs_in.part_uv = vec2(neck_u_left, 0);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v5; EmitVertex();
+	// v0
+	fs_in.uv = vec2(0.5, 1);
+	fs_in.part_uv = vec2(0.5, 1);
+	fs_in.segmentPosition = vs_out[0].segmentPosition;
+	fs_in.totalPosition = vs_out[0].totalPosition + vs_out[0].segmentSize;
 	gl_Position = v0; EmitVertex();
+	// v2
+	fs_in.uv = vec2(neck_u_right, neck_v);
+	fs_in.part_uv = vec2(neck_u_right, 0);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v2; EmitVertex();
+	// v1
+	fs_in.uv = vec2(1, neck_v);
+	fs_in.part_uv = vec2(1, 0);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v1; EmitVertex();
 	EndPrimitive();
-	fs_in.color = vec4(1, 1, 1, 1);
-	gl_Position = v5; EmitVertex();
+
+	// Body
+	fs_in.head = 0;
+	// v4
+	fs_in.uv = vec2(neck_u_left, 0);
+	fs_in.part_uv = vec2(0, 0);
+	fs_in.segmentPosition = vs_out[0].segmentPosition;
+	fs_in.totalPosition = vs_out[0].totalPosition;
 	gl_Position = v4; EmitVertex();
-	gl_Position = v2; EmitVertex();
+	// v3
+	fs_in.uv = vec2(neck_u_right, 0);
+	fs_in.part_uv = vec2(1, 0);
+	fs_in.segmentPosition = vs_out[0].segmentPosition;
+	fs_in.totalPosition = vs_out[0].totalPosition;
 	gl_Position = v3; EmitVertex();
+	// v5
+	fs_in.uv = vec2(neck_u_left, neck_v);
+	fs_in.part_uv = vec2(0, 1);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
+	gl_Position = v5; EmitVertex();
+	// v2
+	fs_in.uv = vec2(neck_u_right, neck_v);
+	fs_in.part_uv = vec2(1, 1);
+	fs_in.segmentPosition = neck_segmentPosition;
+	fs_in.totalPosition = neck_totalPosition;
+	gl_Position = v2; EmitVertex();
 	EndPrimitive();
 
 //	// Arrow Line
