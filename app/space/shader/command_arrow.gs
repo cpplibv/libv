@@ -46,6 +46,7 @@ void main() {
 	dir_SP /= dir_pixel_length;
 
 	// TODO P1: If dir_pixel_length is very small the neck coordinates are catapulted out off clip space
+	// TODO P1: Vertexes yeeted behind the camera normal plane causes incorrect uvs
 
 	// If only one endpoint is behind the camera the negative w coord would flip the direction
 	if (target_P.w * source_P.w < 0)
