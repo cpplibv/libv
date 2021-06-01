@@ -92,12 +92,12 @@ struct UniformLayoutMatrices {
 	libv::glr::Uniform_mat4f matMVP;
 	libv::glr::Uniform_mat4f matP;
 	libv::glr::Uniform_mat4f matM;
-//	libv::glr::Uniform_vec3f color;
+	libv::glr::Uniform_vec3f eye;
 
 	LIBV_REFLECTION_ACCESS(matMVP);
 	LIBV_REFLECTION_ACCESS(matP);
 	LIBV_REFLECTION_ACCESS(matM);
-//	LIBV_REFLECTION_ACCESS(color);
+	LIBV_REFLECTION_ACCESS(eye);
 };
 const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
 const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
@@ -118,32 +118,6 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 //
 //	return result;
 //}
-
-// -------------------------------------------------------------------------------------------------
-
-void draw_gizmo_lines(libv::glr::Mesh& mesh) {
-	auto position = mesh.attribute(attribute_position);
-	auto color0 = mesh.attribute(attribute_color0);
-	auto index = mesh.index();
-
-	position(0, 0, 0);
-	position(1, 0, 0);
-	position(0, 0, 0);
-	position(0, 1, 0);
-	position(0, 0, 0);
-	position(0, 0, 1);
-
-	color0(1, 0, 0, 1);
-	color0(1, 0, 0, 1);
-	color0(0, 1, 0, 1);
-	color0(0, 1, 0, 1);
-	color0(0, 0, 1, 1);
-	color0(0, 0, 1, 1);
-
-	index.line(0, 1);
-	index.line(2, 3);
-	index.line(4, 5);
-}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -286,6 +260,7 @@ public:
 			return;
 
 		auto position = mesh.attribute(attribute_position);
+		auto color0 = mesh.attribute(attribute_color0);
 		auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 		auto index = mesh.index();
 
@@ -306,6 +281,9 @@ public:
 			position(a);
 			position(b);
 
+			color0(1, 1, 1, 1);
+			color0(1, 1, 1, 1);
+
 			sp_ss_tp_ts(0, length, current_length, total_length);
 			sp_ss_tp_ts(length, length, current_length, total_length);
 
@@ -325,8 +303,9 @@ public:
 
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matP] = gl.projection;
 		uniforms[layout_matrices.matM] = gl.model;
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.eye] = gl.eye();
 
 		gl.program(shader_arrow.program());
 		gl.uniform(std::move(uniforms));
@@ -350,10 +329,36 @@ public:
 		draw_gizmo_lines(mesh);
 	}
 
+	void draw_gizmo_lines(libv::glr::Mesh& mesh) {
+		auto position = mesh.attribute(attribute_position);
+		auto color0 = mesh.attribute(attribute_color0);
+		auto index = mesh.index();
+
+		position(0, 0, 0);
+		position(1, 0, 0);
+		position(0, 0, 0);
+		position(0, 1, 0);
+		position(0, 0, 0);
+		position(0, 0, 1);
+
+		color0(1, 0, 0, 1);
+		color0(1, 0, 0, 1);
+		color0(0, 1, 0, 1);
+		color0(0, 1, 0, 1);
+		color0(0, 0, 1, 1);
+		color0(0, 0, 1, 1);
+
+		index.line(0, 1);
+		index.line(2, 3);
+		index.line(4, 5);
+	}
+
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
 		uniforms[layout_matrices.matMVP] = gl.mvp();
 		uniforms[layout_matrices.matM] = gl.model;
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.eye] = gl.eye();
 
 		gl.program(shader.program());
 		gl.uniform(std::move(uniforms));
@@ -362,9 +367,12 @@ public:
 };
 
 struct Grid {
-//	libv::glr::Mesh mesh_lines{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-//	libv::glr::Program program_lines;
-//
+	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	ShaderTestMode shader{shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs"};
+//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "editor_grid.fs"};
+//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "editor_grid.gs", "editor_grid.fs"};
+//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "line.gs", "line.fs"};
+
 //	libv::glr::Uniform_vec4f uniform_color_x;
 //	libv::glr::Uniform_vec4f uniform_color_y;
 //	libv::glr::Uniform_vec4f uniform_color_z;
@@ -374,13 +382,62 @@ struct Grid {
 //
 ////	float far;
 //
-//	Grid() {
-//		{
-//			auto position = mesh_background.attribute(attribute_position);
-//			auto index = mesh_background.index();
+	Grid() {
+		shader.program().block_binding(uniformBlock_matrices);
+
+		// Alternative approach is:
+		// http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+
+		{
+			// Minor lines - 1 px dark
+			// Major lines - 2 px light
+			// Axis lines  - 2 px colored
+			// Auto tessalate Minors -> Major with new Minors
+			//      on smooth
+			// Min size is 0.001
+			// Fade based on inclination
+
+			auto position = mesh_grid.attribute(attribute_position);
+			auto index = mesh_grid.index();
+
+			position(-1, -1, 0);
+			position(+1, -1, 0);
+			position(+1, +1, 0);
+			position(-1, +1, 0);
+
+			index.quad(0, 1, 2, 3); // Front face quad
+			index.quad(0, 3, 2, 1); // Back face quad
+
+			// Main axes
+//			position(-1, 0, 0);
+//			position(+1, 0, 0);
+//			color0(1);
+//			color0(1);
+//			index.line(current_index + 0, current_index + 1);
+//			current_index += 2;
 //
-//			int count = 5000;
-//			float limit = 5000;
+//			position(0, -1, 0);
+//			position(0, +1, 0);
+//			color0(1);
+//			color0(1);
+//			index.line(current_index + 0, current_index + 1);
+//			current_index += 2;
+//
+//			position(0, 0, -1);
+//			position(0, 0, +1);
+//			color0(1);
+//			color0(1);
+//			index.line(current_index + 0, current_index + 1);
+//			current_index += 2;
+		}
+
+//		{
+//			auto position = mesh_grid.attribute(attribute_position);
+//			auto color0 = mesh_grid.attribute(attribute_color0);
+////			auto normal = mesh_grid.attribute(attribute_normal);
+////			auto level = mesh_grid.attribute(attribute_custom0);
+//			auto index = mesh_grid.index();
+//
 //
 //			// Minor lines - 1 px dark
 //			// Major lines - 2 px light
@@ -390,54 +447,80 @@ struct Grid {
 //			// Min size is 0.001
 //			// Fade based on inclination
 //
-//			for (int i = 0; i < count; ++i) {
-//				position(-limit, limit, 0);
-//				position(limit, limit, 0);
+//			int zone_count = 500;
 //
-//				position(limit, -limit, 0);
-//				position(limit, limit, 0);
+//			int current_index = 0;
+//			int num_layer = 3;
+//
+//			for (int layer = 0; layer < num_layer; ++layer) {
+//				for (int i = 0; i <= zone_count; ++i) {
+//					if (layer != num_layer - 1 && i % 10 == 0)
+//						continue;
+//
+//					float fi = static_cast<float>(i * 2 - zone_count) / static_cast<float>(zone_count); // -1 -> +1
+//
+//					position(fi, -1, static_cast<float>(layer));
+//					position(fi, +1, static_cast<float>(layer));
+//					color0(fi, 1, layer / num_layer, 1);
+//					color0(0, 1, layer / num_layer, 1);
+//					index.line(current_index + 0, current_index + 1);
+//					current_index += 2;
+//				}
+//				for (int i = 0; i <= zone_count; ++i) {
+//					if (layer != num_layer - 1 && i % 10 == 0)
+//						continue;
+//
+//					float fi = static_cast<float>(i * 2 - zone_count) / static_cast<float>(zone_count); // -1 -> +1
+//
+//					position(-1, fi, static_cast<float>(layer));
+//					position(+1, fi, static_cast<float>(layer));
+//					color0(1, fi, layer / num_layer, 1);
+//					color0(1, 0, layer / num_layer, 1);
+//					index.line(current_index + 0, current_index + 1);
+//					current_index += 2;
+//				}
 //			}
 //
-//			for (int i = 0; i < count; ++i) {
-//				position(-limit, limit, 0);
-//				position(limit, limit, 0);
-//
-//				position(limit, -limit, 0);
-//				position(limit, limit, 0);
-//			}
-//
-////			position(-1, -1, 0);
-////			position( 1, -1, 0);
-////			position( 1,  1, 0);
-////			position(-1,  1, 0);
-//
-//			index.quad(0, 1, 2, 3);
+//			// Main axes
+////			position(-1, 0, 0);
+////			position(+1, 0, 0);
+////			color0(1);
+////			color0(1);
+////			index.line(current_index + 0, current_index + 1);
+////			current_index += 2;
+////
+////			position(0, -1, 0);
+////			position(0, +1, 0);
+////			color0(1);
+////			color0(1);
+////			index.line(current_index + 0, current_index + 1);
+////			current_index += 2;
+////
+////			position(0, 0, -1);
+////			position(0, 0, +1);
+////			color0(1);
+////			color0(1);
+////			index.line(current_index + 0, current_index + 1);
+////			current_index += 2;
 //		}
-//	}
+	}
 
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
-		(void) gl;
-		(void) uniform_stream;
-////		const auto s_guard = gl.state.push_guard();
-////
-////		gl.state.disableDepthMask();
-////		gl.state.disableDepthTest();
-////		gl.state.polygonModeFill();
-////
-////		gl.program(program_background);
-////		// TODO P1: Update shader to operate on color and noise uniforms
-//////		const auto bg_noise = 1.f;
-////		const auto bg_noise = 5.f / 255.f;
-////		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
-////		gl.uniform(background_uniform_noiseUVScale, canvas_size / noise_size.cast<float>());
-////		gl.uniform(background_uniform_noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
-////		gl.uniform(background_uniform_noiseOffset, bg_color);
-//////		gl.uniform(background_uniform_noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
-//////		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
-//////		gl.uniform(background_uniform_noiseScale, libv::vec4f(0, 0, 0, 0));
-//////		gl.uniform(background_uniform_noiseOffset, libv::vec4f(0, 0, 0, 0));
-////		gl.texture(background_texture_pattern, textureChannel_pattern);
-////		gl.render(mesh_background);
+		const auto s_guard = gl.state.push_guard();
+
+		gl.state.enableBlend();
+		gl.state.blendSrc_SourceAlpha();
+		gl.state.blendDst_One_Minus_SourceAlpha();
+
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = gl.mvp();
+		uniforms[layout_matrices.matM] = gl.model;
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.eye] = gl.eye();
+
+		gl.program(shader.program());
+		gl.uniform(std::move(uniforms));
+		gl.render(mesh_grid);
 	}
 };
 
@@ -448,6 +531,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 	float angle = 0.0f;
 	float time = 0.0f;
+	float test_sin_time = 0.0f;
 
 	Background background;
 	Grid grid;
@@ -477,6 +561,22 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		value_tracker.differential("camera.orbit_point", camera.orbit_point());
 //		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 //		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
+
+		if (arrow.test_mode != 0) {
+			test_sin_time += dtf;
+			auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
+			if (arrow.test_mode == 1) {
+				camera.pitch(-t * libv::pi_f * 0.5f);
+			} else if (arrow.test_mode == 2) {
+				t = t > 0.5f ? 1.f - t : t;
+				camera.pitch(-t * libv::pi_f * 0.5f);
+			} else if (arrow.test_mode == 3) {
+				const float part = 4;
+				auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
+				t = t > 0.5f ? 1.f - t : t;
+				camera.pitch(-t * libv::pi_f * 0.5f / part);
+			}
+		}
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
@@ -488,14 +588,14 @@ struct SpaceCanvas : libv::ui::Canvas {
 		gl.state.cullBackFace();
 		gl.state.enableCullFace();
 
-//		gl.state.disableMultisample(); // <<<
-
 		gl.projection = camera.projection(canvas_size);
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
 
+//		gl.setClearColor(0, 0, 0, 0);
+//		gl.clearColor();
+
 		background.render(gl, canvas_size);
-		grid.render(gl, uniform_stream);
 		origin_gizmo.render(gl, uniform_stream);
 
 		{
@@ -506,6 +606,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 		}
 
 		arrow.render(gl, canvas_size, uniform_stream);
+
+		grid.render(gl, uniform_stream);
 	}
 };
 
@@ -613,6 +715,17 @@ int main() {
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
 			frame.closeForce();
+
+		// TODO P1: Ui focus base camera context switch
+		// Hack workaround until ui focus does not operates control contexts
+		if (e.keycode == libv::input::Keycode::F12 && e.action == libv::input::Action::press) {
+			static int hack_camera_control_ui_mode = 0;
+			hack_camera_control_ui_mode = (hack_camera_control_ui_mode + 1) % 3;
+			if (hack_camera_control_ui_mode == 1)
+				controls.context_leave<app::BaseCameraOrbit>();
+			else
+				controls.context_enter<app::BaseCameraOrbit>(&camera);
+		}
 
 		// TODO P1: Shortcut to save camera position and reload it upon restart
 		//          > Requires persistence

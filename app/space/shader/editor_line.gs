@@ -26,9 +26,7 @@ void main() {
 }
 
 
-//[maxvertexcount(4)]
-//void geo(line v2g v[2], inout TriangleStream<g2f> ts)
-//{
+//void geo(line v2g v[2], inout TriangleStream<g2f> ts) {
 //    g2f g[4];
 //
 //    float4 p1 = mul(UNITY_MATRIX_MVP, v[0].vertex);
@@ -61,4 +59,3 @@ void main() {
 //
 // Fix #2
 //offset.x *= _ScreenParams.y/_ScreenParams.x;
-//

@@ -68,6 +68,10 @@ libv.rev: Cleanup shader manager system implementation
 
 
 
+libv.gl: Add support for anisotropic filtering
+libv.glr: Add support for anisotropic filtering
+			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+			glGenerateMipmap(GL_TEXTURE_2D);
 
 
 app.vm4viewer: adopt libv.rev's Shader and ShaderLoader

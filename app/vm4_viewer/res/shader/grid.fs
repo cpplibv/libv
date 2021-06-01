@@ -1,9 +1,9 @@
 #version 330 core
 
-out vec4 output;
+out vec4 result;
 
 uniform vec4 color;
 
 void main() {
-	output = color;
+	result = color;
 }

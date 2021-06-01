@@ -1,7 +1,7 @@
 #pragma once
 
-#include <common/light.glsl>
-#include <common/material.glsl>
+#include <lib_vm4/light.glsl>
+#include <lib_vm4/material.glsl>
 
 
 

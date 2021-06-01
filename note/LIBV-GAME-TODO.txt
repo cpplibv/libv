@@ -3,6 +3,12 @@ Space - System integration demo
 
 libv.rev: Implement shader management
 app.space: Improve arrow with geometry shader
+app.space: Add grid
+visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
+visual.grid: For grids expand and fade out line endings
+visual.grid: For grids fade out lines based on ray incident angle, lines should fade into the sky-box as seamlessly as possible
+visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
+visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 
 
 
@@ -56,16 +62,10 @@ app.space: Improve arrow with geometry shader
 
 
 
-app.space: Add grid
+
 app.space: Add multi camera / camera frustum visualization
 
 
-
-visual.grid: Make a pretty grid: Blender grid is awesome. Implement it:
-visual.grid: For grids expand and fade out line endings
-visual.grid: For grids fade out lines based on ray incident angle, lines should fade into the sky-box as seamlessly as possible
-visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
-visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
@@ -114,3 +114,12 @@ blur: (shaders are already implemented in app.space, but downscaling is not) htt
 		full screen quad pass with render_resolution / 2 with h blur shader
 		full screen quad pass with render_resolution / 8 with v blur shader
 		full screen quad pass with render_resolution / 8 with h blur shader
+
+
+
+
+
+--- Article collection -----------------------------------------------------------------------------
+
+Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
+

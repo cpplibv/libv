@@ -2,8 +2,8 @@
 
 in vec4 fragmentColor;
 
-out vec4 output;
+out vec4 result;
 
 void main() {
-	output = fragmentColor;
+	result = fragmentColor;
 }
