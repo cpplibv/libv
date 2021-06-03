@@ -10,7 +10,7 @@ in GeometryData vs_out[2];
 
 out FragmentData fs_in;
 
-uniform vec2 render_resolution;
+uniform vec2 render_resolution; // Program block
 
 
 // -------------------------------------------------------------------------------------------------
@@ -164,42 +164,3 @@ void main() {
 //	gl_Position = target_P; EmitVertex();
 //	EndPrimitive();
 }
-
-// =================================================================================================
-
-//[maxvertexcount(4)]
-//void geo(line v2g v[2], inout TriangleStream<g2f> ts)
-//{
-//    g2f g[4];
-//
-//    float4 p1 = mul(UNITY_MATRIX_MVP, v[0].vertex);
-//    float4 p2 = mul(UNITY_MATRIX_MVP, v[1].vertex);
-//
-//    float2 dir = normalize(p2.xy - p1.xy);
-//    float2 normal = float2(-dir.y, dir.x);
-//
-//    float4 offset1 = float4(normal * p1.w * _Thickness / 2.0f, 0, 0);
-//    float4 offset2 = float4(normal * p2.w * _Thickness / 2.0f, 0, 0);
-//
-//    float4 o1 = p1 + offset1;
-//    float4 o2 = p1 - offset1;
-//    float4 o3 = p2 + offset2;
-//    float4 o4 = p2 - offset2;
-//
-//    g[0].pos = o1;
-//    g[1].pos = o2;
-//    g[2].pos = o3;
-//    g[3].pos = o4;
-//
-//    ts.Append(g[0]);
-//    ts.Append(g[1]);
-//    ts.Append(g[2]);
-//    ts.Append(g[3]);
-//}
-//
-// Fix #1
-//float2 dir = normalize(p2.xy /p2.w - p1.xy /p1.w);
-//
-// Fix #2
-//offset.x *= _ScreenParams.y/_ScreenParams.x;
-//

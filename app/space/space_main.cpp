@@ -5,7 +5,6 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
-#include <libv/gl/gl.hpp> // <<< only line width debug
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/layout_to_string.hpp>
 #include <libv/glr/mesh.hpp>
@@ -20,17 +19,16 @@
 #include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
 #include <libv/utility/hex_dump.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <iostream>
-#include <libv/ui/component/panel_full.hpp>
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
-#include <libv/ui/property/orientation.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -128,16 +126,21 @@ libv::rev::ShaderLoader shader_manager("../app/space/shader/");
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsBackground {
-	libv::glr::Uniform_vec2f noiseUVScale;
-	libv::glr::Uniform_vec4f noiseScale;
-	libv::glr::Uniform_vec4f noiseOffset;
-	libv::glr::Uniform_texture textureNoise;
+//	libv::glr::Uniform_vec2f noiseUVScale;
+//	libv::glr::Uniform_vec4f noiseScale;
+//	libv::glr::Uniform_vec4f noiseOffset;
+//	libv::glr::Uniform_texture textureNoise;
+
+	libv::glr::Uniform_texture texture_noise;
+	libv::glr::Uniform_vec2f render_resolution;
+	libv::glr::Uniform_vec4f noise_scale;
+	libv::glr::Uniform_vec4f base_color;
 
 	template <typename Access> void access_uniforms(Access& access) {
-		access(noiseUVScale, "noiseUVScale");
-		access(noiseScale, "noiseScale");
-		access(noiseOffset, "noiseOffset");
-		access(textureNoise, "textureNoise", textureChannel_pattern);
+		access(texture_noise, "texture_noise", textureChannel_pattern);
+		access(render_resolution, "render_resolution");
+		access(base_color, "base_color");
+		access(noise_scale, "noise_scale");
 	}
 };
 
@@ -167,6 +170,12 @@ using ShaderBackground = libv::rev::Shader<UniformsBackground>;
 using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 //using Shader = libv::rev::Shader<>;
+
+// =================================================================================================
+
+// TODO P1: kill these ones, aka implement 'program' uniform block
+float global_time = 0.0f;
+int32_t global_test_mode = 0;
 
 // =================================================================================================
 
@@ -209,32 +218,23 @@ struct Background {
 		gl.state.polygonModeFill();
 
 		gl.program(shader.program());
-		// TODO P1: Update shader to operate on color and noise uniforms
-//		const auto bg_noise = 1.f;
-		const auto bg_noise = 5.f / 255.f;
-		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f) - bg_noise * 0.5f;
-		gl.uniform(shader.uniform().noiseUVScale, canvas_size / noise_size.cast<float>());
-		gl.uniform(shader.uniform().noiseScale, libv::vec4f(bg_noise, bg_noise, bg_noise, 0));
-		gl.uniform(shader.uniform().noiseOffset, bg_color);
-//		gl.uniform(shader.uniform().noiseScale, libv::vec4f(0.1f, 0.1f, 0.1f, 1));
-//		gl.uniform(shader.uniform().noiseOffset, libv::vec4f(0.6f, 0.6f, 0.6f, 0));
-//		gl.uniform(shader.uniform().noiseScale, libv::vec4f(0, 0, 0, 0));
-//		gl.uniform(shader.uniform().noiseOffset, libv::vec4f(0, 0, 0, 0));
+		const auto bg_noise = libv::vec4f(1, 1, 1, 0) * (5.f / 255.f);
+		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f);
+		gl.uniform(shader.uniform().render_resolution, canvas_size);
+		gl.uniform(shader.uniform().noise_scale, bg_noise);
+		gl.uniform(shader.uniform().base_color, bg_color);
 		gl.texture(background_texture_pattern, textureChannel_pattern);
 		gl.render(mesh_background);
 	}
 };
-float space_time = 0.0f; // <<< kill this one
 
 struct CommandArrow {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	ShaderCommandArrow shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
 
-	int test_mode = 0;
-
 public:
 	CommandArrow() {
-		// TODO P1: libv.rev: Auto block binding based on include detection
+		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
 		shader_arrow.program().block_binding(uniformBlock_matrices);
 
 		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
@@ -311,8 +311,8 @@ public:
 		gl.uniform(std::move(uniforms));
 		gl.uniform(shader_arrow.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 		gl.uniform(shader_arrow.uniform().render_resolution, canvas_size);
-		gl.uniform(shader_arrow.uniform().test_mode, test_mode);
-		gl.uniform(shader_arrow.uniform().time, space_time);
+		gl.uniform(shader_arrow.uniform().test_mode, global_test_mode);
+		gl.uniform(shader_arrow.uniform().time, global_time);
 		gl.render(mesh);
 	}
 };
@@ -323,7 +323,7 @@ struct Gizmo {
 
 public:
 	Gizmo() {
-		// TODO P1: libv.rev: Auto block binding based on include detection
+		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
 		shader.program().block_binding(uniformBlock_matrices);
 
 		draw_gizmo_lines(mesh);
@@ -369,34 +369,13 @@ public:
 struct Grid {
 	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader{shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs"};
-//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "editor_grid.fs"};
-//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "editor_grid.gs", "editor_grid.fs"};
-//	ShaderTestMode shader{shader_manager, "editor_grid.vs", "line.gs", "line.fs"};
 
-//	libv::glr::Uniform_vec4f uniform_color_x;
-//	libv::glr::Uniform_vec4f uniform_color_y;
-//	libv::glr::Uniform_vec4f uniform_color_z;
-//	libv::glr::Uniform_vec4f uniform_color_line_low;
-//	libv::glr::Uniform_vec4f uniform_color_line_mid;
-//	libv::glr::Uniform_vec4f uniform_color_line_high;
-//
-////	float far;
-//
+public:
 	Grid() {
+		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
 		shader.program().block_binding(uniformBlock_matrices);
 
-		// Alternative approach is:
-		// http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
-
 		{
-			// Minor lines - 1 px dark
-			// Major lines - 2 px light
-			// Axis lines  - 2 px colored
-			// Auto tessalate Minors -> Major with new Minors
-			//      on smooth
-			// Min size is 0.001
-			// Fade based on inclination
-
 			auto position = mesh_grid.attribute(attribute_position);
 			auto index = mesh_grid.index();
 
@@ -407,102 +386,7 @@ struct Grid {
 
 			index.quad(0, 1, 2, 3); // Front face quad
 			index.quad(0, 3, 2, 1); // Back face quad
-
-			// Main axes
-//			position(-1, 0, 0);
-//			position(+1, 0, 0);
-//			color0(1);
-//			color0(1);
-//			index.line(current_index + 0, current_index + 1);
-//			current_index += 2;
-//
-//			position(0, -1, 0);
-//			position(0, +1, 0);
-//			color0(1);
-//			color0(1);
-//			index.line(current_index + 0, current_index + 1);
-//			current_index += 2;
-//
-//			position(0, 0, -1);
-//			position(0, 0, +1);
-//			color0(1);
-//			color0(1);
-//			index.line(current_index + 0, current_index + 1);
-//			current_index += 2;
 		}
-
-//		{
-//			auto position = mesh_grid.attribute(attribute_position);
-//			auto color0 = mesh_grid.attribute(attribute_color0);
-////			auto normal = mesh_grid.attribute(attribute_normal);
-////			auto level = mesh_grid.attribute(attribute_custom0);
-//			auto index = mesh_grid.index();
-//
-//
-//			// Minor lines - 1 px dark
-//			// Major lines - 2 px light
-//			// Axis lines  - 2 px colored
-//			// Auto tessalate Minors -> Major with new Minors
-//			//      on smooth
-//			// Min size is 0.001
-//			// Fade based on inclination
-//
-//			int zone_count = 500;
-//
-//			int current_index = 0;
-//			int num_layer = 3;
-//
-//			for (int layer = 0; layer < num_layer; ++layer) {
-//				for (int i = 0; i <= zone_count; ++i) {
-//					if (layer != num_layer - 1 && i % 10 == 0)
-//						continue;
-//
-//					float fi = static_cast<float>(i * 2 - zone_count) / static_cast<float>(zone_count); // -1 -> +1
-//
-//					position(fi, -1, static_cast<float>(layer));
-//					position(fi, +1, static_cast<float>(layer));
-//					color0(fi, 1, layer / num_layer, 1);
-//					color0(0, 1, layer / num_layer, 1);
-//					index.line(current_index + 0, current_index + 1);
-//					current_index += 2;
-//				}
-//				for (int i = 0; i <= zone_count; ++i) {
-//					if (layer != num_layer - 1 && i % 10 == 0)
-//						continue;
-//
-//					float fi = static_cast<float>(i * 2 - zone_count) / static_cast<float>(zone_count); // -1 -> +1
-//
-//					position(-1, fi, static_cast<float>(layer));
-//					position(+1, fi, static_cast<float>(layer));
-//					color0(1, fi, layer / num_layer, 1);
-//					color0(1, 0, layer / num_layer, 1);
-//					index.line(current_index + 0, current_index + 1);
-//					current_index += 2;
-//				}
-//			}
-//
-//			// Main axes
-////			position(-1, 0, 0);
-////			position(+1, 0, 0);
-////			color0(1);
-////			color0(1);
-////			index.line(current_index + 0, current_index + 1);
-////			current_index += 2;
-////
-////			position(0, -1, 0);
-////			position(0, +1, 0);
-////			color0(1);
-////			color0(1);
-////			index.line(current_index + 0, current_index + 1);
-////			current_index += 2;
-////
-////			position(0, 0, -1);
-////			position(0, 0, +1);
-////			color0(1);
-////			color0(1);
-////			index.line(current_index + 0, current_index + 1);
-////			current_index += 2;
-//		}
 	}
 
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
@@ -548,7 +432,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 		time += dtf;
-		space_time += dtf;
+		global_time += dtf;
 
 		// TODO P2: Value tracking UI component for debugging
 //		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
@@ -562,15 +446,15 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 //		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 
-		if (arrow.test_mode != 0) {
+		if (global_test_mode != 0) {
 			test_sin_time += dtf;
 			auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
-			if (arrow.test_mode == 1) {
+			if (global_test_mode == 1) {
 				camera.pitch(-t * libv::pi_f * 0.5f);
-			} else if (arrow.test_mode == 2) {
+			} else if (global_test_mode == 2) {
 				t = t > 0.5f ? 1.f - t : t;
 				camera.pitch(-t * libv::pi_f * 0.5f);
-			} else if (arrow.test_mode == 3) {
+			} else if (global_test_mode == 3) {
 				const float part = 4;
 				auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
 				t = t > 0.5f ? 1.f - t : t;
@@ -735,19 +619,19 @@ int main() {
 		if (e.keycode == libv::input::Keycode::C && e.action != libv::input::Action::release) {
 			const int32_t mode_count = 4;
 			if (frame.isKeyPressed(libv::input::Keycode::ShiftLeft) || frame.isKeyPressed(libv::input::Keycode::ShiftRight))
-				space.arrow.test_mode = space.arrow.test_mode == 0 ? mode_count - 1 : space.arrow.test_mode - 1;
+				global_test_mode = global_test_mode == 0 ? mode_count - 1 : global_test_mode - 1;
 			else
-				space.arrow.test_mode = (space.arrow.test_mode + 1) % mode_count;
+				global_test_mode = (global_test_mode + 1) % mode_count;
 		}
 		if (e.keycode == libv::input::Keycode::Backtick)
-			space.arrow.test_mode = 0;
+			global_test_mode = 0;
 		if (e.keycode == libv::input::Keycode::Num1)
-			space.arrow.test_mode = 1;
+			global_test_mode = 1;
 		if (e.keycode == libv::input::Keycode::Num2)
-			space.arrow.test_mode = 2;
+			global_test_mode = 2;
 		if (e.keycode == libv::input::Keycode::Num3)
-			space.arrow.test_mode = 3;
-		log_space.info("Test mode: {}", space.arrow.test_mode);
+			global_test_mode = 3;
+		log_space.info("Test mode: {}", global_test_mode);
 	});
 
 //	std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;

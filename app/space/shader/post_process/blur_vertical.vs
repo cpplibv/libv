@@ -4,7 +4,7 @@
 
 layout(location = 0) in vec3 vertexPosition;
 
-uniform vec2 render_resolution;
+uniform vec2 render_resolution; // Program block
 
 out vec2 fragment_kernel_uvs[kernel_size];
 
