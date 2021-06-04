@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/frame/fwd.hpp>
 // libv
 #include <libv/input/event.hpp>
 #include <libv/input/input.hpp>
@@ -46,7 +48,6 @@ namespace frame {
 // -------------------------------------------------------------------------------------------------
 
 class ImplFrame;
-class Icon;
 
 class Frame : public Trackable {
 	// "frame" - refers to the entire window with its Frame objects, handlers, events, states etc...
@@ -288,6 +289,10 @@ public:
 
 	void setTitle(std::string title);
 
+	/// Good sizes are 16, [24], 32, 48, [64]. If required size is not provided the closest will be scaled
+	///	16 - Windows 10: Title image
+	///	16 - Windows 10: Small task bar image
+	///	24 - Windows 10: Normal task bar image (2021.06.04: If provided uses the 32 as scaled instead of the 24 even though the displayed image space is 24)
 	void setIcon(std::vector<Icon> icon);
 	void clearIcon();
 

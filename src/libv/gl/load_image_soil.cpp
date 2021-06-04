@@ -28,6 +28,7 @@ public:
 		size_(size_), channels(channels), storage(std::move(storage)) { }
 
 	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
+	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept override;
 	[[nodiscard]] virtual Texture createTexture() const noexcept override;
 	virtual ~ImageSOIL() noexcept override = default;
 };
@@ -55,11 +56,24 @@ libv::vec2i ImageSOIL::size() const noexcept {
 	return size_;
 }
 
+libv::vec4f ImageSOIL::pixel(int32_t level, int32_t x, int32_t y) const noexcept {
+	(void) level;
+
+	const auto raw = storage.get();
+	const auto index = size_.x * y * 4 + x * 4;
+	return {
+		static_cast<float>(raw[index + 0]),
+		static_cast<float>(raw[index + 1]),
+		static_cast<float>(raw[index + 2]),
+		static_cast<float>(raw[index + 3])
+	};
+}
+
 Texture ImageSOIL::createTexture() const noexcept {
 	// NOTE: SOIL_create_OGL_texture Fails in OpenGL 3.3 core profile
 	// SOIL_create_OGL_texture(storage.get(), size_.x, size_.y, channels, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 
-	// TODO P3: Would be nice to have on the fly compression requests
+	// TODO P3: Would be nice to have on-the-fly compression requests option
 
 	{
 		// Flip Y axis

@@ -21,6 +21,7 @@ class ImageGLI : public detail::ImageImplementation {
 public:
 	ImageGLI(gli::texture&& texture) noexcept : texture(std::move(texture)) { }
 	[[nodiscard]] virtual libv::vec2i size() const noexcept override;
+	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept override;
 	[[nodiscard]] virtual Texture createTexture() const noexcept override;
 	virtual ~ImageGLI() noexcept override = default;
 };
@@ -38,6 +39,28 @@ std::optional<Image> load_image_GLI(const std::string_view data) noexcept {
 
 libv::vec2i ImageGLI::size() const noexcept {
 	return {texture.extent().x, texture.extent().y};
+}
+
+libv::vec4f ImageGLI::pixel(int32_t level, int32_t x, int32_t y) const noexcept {
+//	assert(!gli::is_compressed(texture.format()) && "Not yet implemented");
+//	assert(texture.target() == gli::TARGET_2D && "Not yet implemented");
+//
+//	gli::gl gli_gl(gli::gl::PROFILE_GL33);
+//	const gli::gl::format format = gli_gl.translate(texture.format(), texture.swizzles());
+//
+//	assert(format.Type == gli::gl::type_format::TYPE_U8 && "Not yet implemented");
+//	assert(format.External == gli::gl::external_format::EXTERNAL_RGBA && "Not yet implemented");
+//
+//	auto raw = reinterpret_cast<const uint8_t*>(texture.data(0, 0, level));
+//
+//	glm::tvec3<GLsizei> levelSize(texture.extent(level));
+//
+//	const auto index = levelSize.x * y * 4 + x * 4;
+//
+//	return {raw[index + 0], raw[index + 1], raw[index + 2], raw[index + 3]};
+
+	assert("Not yet implemented");
+	return {0, 0, 0, 0};
 }
 
 Texture ImageGLI::createTexture() const noexcept {
@@ -58,7 +81,7 @@ Texture ImageGLI::createTexture() const noexcept {
 	libv::gl::checkGL();
 
 	const glm::tvec3<GLsizei> baseSize = texture.extent();
-	const GLsizei faceTotal = static_cast<GLsizei>(texture.layers() * texture.faces());
+	const auto faceTotal = static_cast<GLsizei>(texture.layers() * texture.faces());
 
 	switch (texture.target()) {
 	case gli::TARGET_1D:
@@ -82,14 +105,13 @@ Texture ImageGLI::createTexture() const noexcept {
 		break;
 	default:
 		return {textureID, TextureTarget{original_target}};
-		break;
 	}
 	libv::gl::checkGL();
 
 	for (size_t layer = 0; layer < texture.layers(); ++layer) {
 		for (size_t face = 0; face < texture.faces(); ++face) {
 			for (size_t level = 0; level < texture.levels(); ++level) {
-				const GLsizei layerGL = static_cast<GLsizei>(layer);
+				const auto layerGL = static_cast<GLsizei>(layer);
 				glm::tvec3<GLsizei> levelSize(texture.extent(level));
 				target = gli::is_target_cube(texture.target()) ?
 						static_cast<GLenum>(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face) : target;
@@ -147,6 +169,10 @@ Texture ImageGLI::createTexture() const noexcept {
 								format.External, format.Type,
 								texture.data(layer, face, level));
 					break;
+//				case gli::TARGET_RECT:
+//					break;
+//				case gli::TARGET_RECT_ARRAY:
+//					break;
 				default: break;
 				}
 			}

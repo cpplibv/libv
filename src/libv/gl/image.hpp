@@ -19,6 +19,7 @@ namespace detail {
 
 struct ImageImplementation {
 	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
+	[[nodiscard]] virtual libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept = 0;
 	[[nodiscard]] virtual Texture createTexture() const noexcept = 0;
 	virtual ~ImageImplementation() noexcept = default;
 };
@@ -40,6 +41,10 @@ public:
 public:
 	[[nodiscard]] inline libv::vec2i size() const noexcept {
 		return size_;
+	}
+
+	[[nodiscard]] libv::vec4f pixel(int32_t level, int32_t x, int32_t y) const noexcept {
+		return impl->pixel(level, x, y);
 	}
 
 	/// @context OpenGL

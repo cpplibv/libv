@@ -114,3 +114,48 @@ int main(int argc, const char** argv) {
 
 	return EXIT_SUCCESS;
 }
+
+// =================================================================================================
+//
+// // Image support
+//
+//#include <libv/gl/image.hpp>
+//#include <libv/gl/load_image.hpp>
+//#include <libv/utility/read_file.hpp>
+//
+//std::vector<libv::frame::Icon> generate_icons() {
+//	std::vector<libv::frame::Icon> icons;
+//
+//
+//	auto gen = [&](auto path, auto test_r, auto test_g, auto test_b){
+//		const auto image = libv::gl::load_image_or_throw(libv::read_file_str_or_throw(path));
+//		std::cout << path << std::endl;
+//
+//		libv::frame::Icon icon;
+//
+//		icon.size = image.size();
+//		icon.pixels.resize(icon.size.x * icon.size.y);
+//		for (int y = 0; y < image.size().y; ++y) {
+//			for (int x = 0; x < image.size().x; ++x) {
+//				icon.pixels[icon.size.x * y + x] = image.pixel(0, x, y).template cast<uint8_t>();
+//
+//				std::cout << "{";
+//				std::cout << image.pixel(0, x, y).x << ", ";
+//				std::cout << image.pixel(0, x, y).y << ", ";
+//				std::cout << image.pixel(0, x, y).z << ", ";
+//				std::cout << image.pixel(0, x, y).w << "}, ";
+//			}
+//			std::cout << std::endl;
+//		}
+//
+//		icons.push_back(icon);
+//	};
+//
+//	gen("d:\\project\\iris\\texture\\ico\\cyan_16.png");
+////	gen("d:\\project\\iris\\texture\\ico\\cyan_24.png");
+//	gen("d:\\project\\iris\\texture\\ico\\cyan_32.png");
+//	gen("d:\\project\\iris\\texture\\ico\\cyan_48.png");
+////	gen("d:\\project\\iris\\texture\\ico\\cyan_64.png");
+//
+//	return icons;
+//}

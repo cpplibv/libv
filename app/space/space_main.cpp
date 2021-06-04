@@ -29,6 +29,7 @@
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
+#include <space/icons.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -580,6 +581,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 // TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
 // TODO P4: Nicer arrow strips, animation
 
+
 int main() {
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 
@@ -611,6 +613,7 @@ int main() {
 	frame.setOpenGLVersion(3, 3);
 	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
 	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
+	frame.setIcon(app::icon_set_iris_cyan());
 
 	libv::Timer timer;
 	frame.onContextUpdate.output([&](const auto&) {

@@ -10,6 +10,7 @@ visual.grid: For grids fade out lines based on ray incident angle, lines should 
 visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
 visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 app.space: Move origin gizmo into top right corner into screen space
+app.space: Frame icon
 
 
 
@@ -62,9 +63,6 @@ app.space: Move origin gizmo into top right corner into screen space
 
 
 
-corner gizmo
-
-app.space: Frame icon
 
 
 some gameplay stuffy, not sure, star map and fleets
