@@ -120,9 +120,7 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: space: Have space working from the correct dir
-//libv::rev::ShaderLoader shader_manager("shader/");
-libv::rev::ShaderLoader shader_manager("../app/space/shader/");
+libv::rev::ShaderLoader shader_manager("shader/");
 
 // -------------------------------------------------------------------------------------------------
 
@@ -576,7 +574,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 // =================================================================================================
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: Controls camera should only be placed into context if the canvas is focused
+// TODO P1: Controls camera should only be placed into context if the canvas is focused | Remove the F12 tracking manual workaround too for mode switching (this might be a second task, as it could be two separate system)
 // TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
 // TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
 // TODO P4: Nicer arrow strips, animation
@@ -588,17 +586,24 @@ int main() {
 	std::cout << libv::logger_stream;
 	log_space.info("Hello Space!");
 
-	// TODO P1: space: Have space working from the correct dir
-//	std::filesystem::current_path("../app/space/");
+	// Change working directory
+	std::filesystem::current_path("app/space/");
 
 	libv::Frame frame("Space", 1280, 800);
-	// TODO P1: space: Have space working from the correct dir
-//	libv::ui::Settings ui_settings;
-//	ui_settings.res_font = "../../res/font";
-//	ui_settings.res_shader = "../../res/shader";
-//	ui_settings.res_texture = "../../res/texture";
-//	libv::ui::UI ui(ui_settings);
-	libv::ui::UI ui;
+	frame.setPosition(libv::Frame::FramePosition::center_current_monitor);
+	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
+	frame.setOpenGLVersion(3, 3);
+	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
+	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
+	frame.setIcon(app::icon_set_iris_cyan());
+
+	libv::ui::Settings ui_settings;
+	// TODO P1: Internalize used UI resources under space, currently: app/space/../../res/
+	ui_settings.res_font.base_path = "../../res/font/";
+	ui_settings.res_shader.base_path = "../../res/shader/";
+	ui_settings.res_texture.base_path = "../../res/texture/";
+	libv::ui::UI ui(ui_settings);
+
 	libv::ctrl::Controls controls;
 
 	app::CameraBehaviour::register_controls(controls);
@@ -607,13 +612,6 @@ int main() {
 	app::CameraPlayer camera;
 	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 	controls.context_enter<app::BaseCameraOrbit>(&camera); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
-
-	frame.setPosition(libv::Frame::FramePosition::center_current_monitor);
-	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
-	frame.setOpenGLVersion(3, 3);
-	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
-	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
-	frame.setIcon(app::icon_set_iris_cyan());
 
 	libv::Timer timer;
 	frame.onContextUpdate.output([&](const auto&) {
@@ -753,5 +751,5 @@ int main() {
 
 	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that event-ui-lifetime issue
 
-	return 0;
+	return EXIT_SUCCESS;
 }
