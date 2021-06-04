@@ -4,6 +4,8 @@
 //    float time_sim;
 //    float time_real;
 //    float time_real_hcap;
+// render_resolution might be camera or viewport/pass related, it can change within a frame based on what we are rendering
+//		'pass' sounds pretty good to me
 //    vec2 render_resolution;
 //    vec2 pixel_size; // 1.0 / render_resolution
 //    // ...

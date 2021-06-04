@@ -149,6 +149,13 @@ public:
 		return result;
 	}
 
+	constexpr inline mat_t& translate(const T x, const T y, const T z) noexcept {
+		return translate(libv::vec3_t<T>(x, y, z));
+	}
+	[[nodiscard]] constexpr inline mat_t translate_copy(const T x, const T y, const T z) const noexcept {
+		return translate_copy(libv::vec3_t<T>(x, y, z));
+	}
+
 	// ---------------------------------------------------------------------------------------------
 
 	[[nodiscard]] constexpr inline vec_t<R, T> operator*(const vec_t<R, T>& vec) const noexcept {
@@ -165,7 +172,7 @@ public:
 	[[nodiscard]] constexpr inline decltype(auto) operator[](int col) const noexcept {
 		return mx()[col];
 	}
-	[[nodiscard]] constexpr inline const vec_t<R, T> at_v(int col) const noexcept {
+	[[nodiscard]] constexpr inline vec_t<R, T> at_v(int col) const noexcept {
 		return vec_t<R, T>{mx()[col]};
 	}
 
@@ -193,6 +200,10 @@ public:
 		return ortho(position.x, position.x + size.x, position.y, position.y + size.y);
 	}
 
+	[[nodiscard]] static constexpr inline mat_t ortho(const libv::vec2_t<T> position, const libv::vec2_t<T> size, const T near, const T far) noexcept {
+		return ortho(position.x, position.x + size.x, position.y, position.y + size.y, near, far);
+	}
+
 	[[nodiscard]] static constexpr inline mat_t ortho(const T left, const T right, const T bottom, const T top, const T near, const T far) noexcept {
 		mat_t result;
 		result = glm::ortho<T>(left, right, bottom, top, near, far);
@@ -202,6 +213,16 @@ public:
 	[[nodiscard]] static constexpr inline mat_t ortho(const libv::vec3_t<T> position, const libv::vec3_t<T> size) noexcept {
 		return ortho(position.x, position.x + size.x, position.y, position.y + size.y, position.z, position.z + size.z);
 	}
+
+//	[[nodiscard]] static constexpr inline mat_t make_translate(const libv::vec3_t<T>& v) noexcept {
+//		mat_t result;
+//		mx() = glm::translate(mx(), to_glm(v));
+//		return result;
+//	}
+//
+//	[[nodiscard]] static constexpr inline mat_t make_translate(const T x, const T y, const T z) noexcept {
+//		return translate(libv::vec3_t<T>(x, y, z));
+//	}
 
 	[[nodiscard]] static constexpr inline mat_t identity() noexcept {
 		return mat_t(1);

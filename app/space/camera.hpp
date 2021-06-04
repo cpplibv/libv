@@ -25,6 +25,11 @@ namespace app {
 //	[[nodiscard]] vec3 direction() const noexcept;
 //  [[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
 //  [[nodiscard]] frustum frustum() const noexcept;
+//	Maybe:
+//	[[nodiscard]] mat4 orientation() const noexcept; /// View without the orbit and the position translates
+//	[[nodiscard]] vec3 direction_up() const noexcept;
+//	[[nodiscard]] vec3 direction_forward() const noexcept;
+//	[[nodiscard]] vec3 direction_right() const noexcept;
 //};
 
 // -------------------------------------------------------------------------------------------------
@@ -82,6 +87,8 @@ public:
 	[[nodiscard]] vec3 eye() const noexcept;
 	[[nodiscard]] vec3 direction() const noexcept;
 	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
+
+	[[nodiscard]] mat4 orientation() const noexcept; /// View without the orbit and the position translates
 
 public:
 	void look_at(vec3 eye, vec3 target) noexcept;

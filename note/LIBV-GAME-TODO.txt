@@ -9,7 +9,7 @@ visual.grid: For grids expand and fade out line endings
 visual.grid: For grids fade out lines based on ray incident angle, lines should fade into the sky-box as seamlessly as possible
 visual.grid: For grids fade out small lines based on distance from the camera and make higher grid lines more visible
 visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
-
+app.space: Move origin gizmo into top right corner into screen space
 
 
 
@@ -64,15 +64,21 @@ visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 
 corner gizmo
 
-uni block in shader type binding
-render target
+app.space: Frame icon
+
+
 some gameplay stuffy, not sure, star map and fleets
 
+uni block in shader type binding
+render target
+line shader
+frustum visualization
 
 
 
 
-app.space: Move origin gizmo into bottom right corner to screen space
+
+
 
 app.space: Add multi camera / camera frustum visualization
 

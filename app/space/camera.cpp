@@ -26,6 +26,16 @@ BaseCameraOrbit::mat4 BaseCameraOrbit::view() const noexcept {
 	return mat;
 }
 
+BaseCameraOrbit::mat4 BaseCameraOrbit::orientation() const noexcept {
+	mat4 mat = base_camera_orientation; // Forward is X+, Right is Y-, Up is Z+
+
+	mat.rotate(-roll_, axis_forward);
+	mat.rotate(-pitch_, axis_right);
+	mat.rotate(yaw_, axis_up);
+
+	return mat;
+}
+
 BaseCameraOrbit::vec3 BaseCameraOrbit::eye() const noexcept {
 	return orbit_point_ + direction() * -orbit_distance_;
 }

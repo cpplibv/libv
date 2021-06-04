@@ -476,22 +476,53 @@ struct SpaceCanvas : libv::ui::Canvas {
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
 
-//		gl.setClearColor(0, 0, 0, 0);
+//		gl.setClearColor(0, 0, 0, 0); // For debug, break some of the UI
 //		gl.clearColor();
 
-		background.render(gl, canvas_size);
-		origin_gizmo.render(gl, uniform_stream);
+		// --- Render Opaque ---
 
-		{
+		// ...
+
+		// --- Render Background/Sky ---
+
+		background.render(gl, canvas_size);
+
+		// --- Render Transparent ---
+
+		arrow.render(gl, canvas_size, uniform_stream);
+		grid.render(gl, uniform_stream);
+
+		// --- Render UI/HUD ---
+
+		gl.state.disableDepthTest();
+		gl.state.disableDepthMask();
+
+//		origin_gizmo.render(gl, uniform_stream);
+
+		{ // Camera orbit point
 			const auto m_guard = gl.model.push_guard();
 			gl.model.translate(camera.orbit_point());
 			gl.model.scale(0.2f);
 			origin_gizmo.render(gl, uniform_stream);
 		}
+		{ // Camera orientation gizmo in top right
+			const auto p_guard = gl.projection.push_guard();
+			const auto v_guard = gl.view.push_guard();
+			const auto m_guard = gl.model.push_guard();
 
-		arrow.render(gl, canvas_size, uniform_stream);
+			const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
+			const auto orientation_gizmo_margin = 4.f;
 
-		grid.render(gl, uniform_stream);
+			gl.projection = libv::mat4f::ortho(
+					-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
+					canvas_size,
+					-orientation_gizmo_size,
+					+orientation_gizmo_size);
+			gl.view = camera.orientation().translate(-1, 0, 0);
+			gl.model.scale(orientation_gizmo_size * 0.5f);
+
+			origin_gizmo.render(gl, uniform_stream);
+		}
 	}
 };
 
