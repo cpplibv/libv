@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/shader_loader.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/shader_loader.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

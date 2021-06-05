@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/glsl_include_engine.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/glsl_source_loader.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

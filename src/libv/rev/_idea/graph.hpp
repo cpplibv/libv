@@ -1,4 +1,4 @@
-// Created by Vader on 2021.05.07..
+// Project: libv.rev, File: src/libv/rev/_idea/graph.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

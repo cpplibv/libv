@@ -11,7 +11,7 @@ visual.grid: For grids fade out small lines based on distance from the camera an
 visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 app.space: Move origin gizmo into top right corner into screen space
 app.space: Burn a frame icon set into the binary and use it
-
+app.space: Have space working from the correct dir
 
 
 
@@ -64,11 +64,20 @@ app.space: Burn a frame icon set into the binary and use it
 
 
 
-	// TODO P1: space: Have space working from the correct dir
 
 
-some gameplay stuffy, not sure, star map and fleets
+app.space: Fleet that moves (without any arrow)
+app.space: Fleet with arrow and movement toward target (primitive)
+app.space: Optimized VAO update for command arrows
+
+
+
+
+
 render target
+	ms / ss support
+	depth support
+	make a blur or a bloom
 
 uni block in shader type binding | only manual binding, no auto binding in this task yet.
 line shader

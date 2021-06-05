@@ -8,18 +8,22 @@ namespace meta {
 
 // -------------------------------------------------------------------------------------------------
 
+// TODO P5: resolve might not support empty list of Args: so to resolve int foo() you have to resolve<int()>(foo) but cant just resolve<>(foo)
+
+/// Template parameter R is deduced
 template <typename... Args, typename R>
-constexpr inline auto resolve(R fun_ptr(Args...)) -> R(*)(Args...) {
+[[nodiscard]] constexpr inline auto resolve(R fun_ptr(Args...)) -> R(*)(Args...) noexcept {
 	return fun_ptr;
 }
 
 template <typename Sig>
-constexpr inline Sig* resolve(Sig* fun_ptr) {
+[[nodiscard]] constexpr inline Sig* resolve(Sig* fun_ptr) noexcept {
 	return fun_ptr;
 }
 
+/// Template parameter C and R are deduced
 template <typename... Args, typename R, typename C>
-constexpr inline auto resolve(R(C::*mem_ptr)(Args...)) -> R(C::*)(Args...) {
+[[nodiscard]] constexpr inline auto resolve(R(C::*mem_ptr)(Args...)) -> R(C::*)(Args...) noexcept {
 	return mem_ptr;
 }
 

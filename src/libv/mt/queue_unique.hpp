@@ -1,4 +1,4 @@
-// Created by Vader on 2021.05.17..
+// Project: libv.mt, File: src/libv/mt/queue_unique.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

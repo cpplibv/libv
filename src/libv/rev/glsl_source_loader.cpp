@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/glsl_include_engine.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/glsl_source_loader.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/rev/glsl_source_loader.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.container, File: src/libv/container/dynarray.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.container, File: src/libv/container/dyn_array.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -600,13 +600,15 @@ libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 
-CLion Edit configuratin template, drop down on target selection, configure, bottom left edit template
-	cmake applications
 
-check on that recent modification that i just did in ui.context_state to start the frame time at now
+libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
 
-#define implicit explicit(false)
+
+
+
+
+cpp: Cursed idea: #define implicit explicit(false)
 libv: Change /*implicit*/ comments to explicit(false)
 
 GCC 11.1
@@ -1007,6 +1009,7 @@ libv.ctrl: Paper
 		right click to move command, long right click to move command with final direction/shape
 
 
+libv.ctrl: Per binding decision of collusion handling by the user: priority, fall through, stop, stop if successful (feature can yield success or failure), call order, etc
 libv.ctrl: Binding profiles, and inheritance
 libv.ctrl: Gamepad/joystick analog should be time related, but mouse and scroll are event based
 libv.ctrl: Click and double click support would be nice
@@ -1369,7 +1372,7 @@ overlay
 		libv.ui: overlay resource viewer (textures, fonts, shaders (?))
 
 
---- [[[ deadline: 2019.12.01 ]]] ---
+--- Checkpoint ---
 
 
 
@@ -1494,7 +1497,7 @@ libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
 
 
---- [[[ deadline: 2020.01.01 ]]] ---
+--- Checkpoint ---
 
 
 libv.ui: constraints: a way of syncing data between the world and the ui
@@ -1538,7 +1541,7 @@ libv.glr: Tiled-Deferred-Shading
 libv.glr: Order Independent Transparency (OIT)
 
 
---- [[[ deadline: 2020.02.01 ]]] ---
+--- Checkpoint ---
 
 
 libv.ecui: state based ui, separate control and data

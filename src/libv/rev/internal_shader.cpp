@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/shader.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/internal_shader.cpp, Author: Császár Mátyás [Vader]
 
 // fwd
 #include <libv/rev/fwd.hpp>

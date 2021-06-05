@@ -20,7 +20,6 @@
 #include <glm/vec4.hpp>
 // libv
 #include <libv/meta/always.hpp>
-#include <libv/meta/resolve.hpp>
 // pro
 #include <libv/math/angle.hpp>
 #include <libv/math/vec.hpp>

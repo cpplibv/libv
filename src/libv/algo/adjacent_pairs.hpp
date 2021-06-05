@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/outer_join.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/adjacent_pairs.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Created by Vader on 2021.05.21..
+// Project: libv.glr, File: src/libv/glr/fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
