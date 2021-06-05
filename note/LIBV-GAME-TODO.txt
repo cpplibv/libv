@@ -66,6 +66,8 @@ app.space: Have space working from the correct dir
 
 
 
+app.space: Screen picker - Place something onto the 3D world on mouse click
+
 app.space: Fleet that moves (without any arrow)
 app.space: Fleet with arrow and movement toward target (primitive)
 app.space: Optimized VAO update for command arrows

@@ -25,7 +25,7 @@ private:
 	mat4 inversePV;
 
 public:
-	screen_picker(mat4 matrixPV, vec2 canvas_size) :
+	screen_picker(const mat4& matrixPV, vec2 canvas_size) :
 		canvas_size(canvas_size),
 		matrixPV(matrixPV),
 		inversePV(matrixPV.inverse_copy()) { }

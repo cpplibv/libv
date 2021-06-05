@@ -48,7 +48,7 @@ namespace app {
 /// Yaw - A positive yawing motion moves the nose of the aircraft to the right.
 ///
 struct BaseCameraOrbit {
-protected:
+public:
 	using float_type = float;
 	using vec2 = libv::vec2_t<float_type>;
 	using vec3 = libv::vec3_t<float_type>;
@@ -187,7 +187,7 @@ public:
 
 // =================================================================================================
 
-struct CameraPlayer : BaseCameraOrbit {
+struct CameraPlayer : public BaseCameraOrbit {
 private:
 	using duration = std::chrono::duration<float_type, std::chrono::seconds::period>;
 
@@ -213,7 +213,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct CameraDeveloper : BaseCameraOrbit {
+struct CameraDeveloper : public BaseCameraOrbit {
 private:
 	using duration = std::chrono::duration<float, std::chrono::seconds::period>;
 
