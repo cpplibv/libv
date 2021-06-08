@@ -126,11 +126,6 @@ libv::rev::ShaderLoader shader_manager("shader/");
 // -------------------------------------------------------------------------------------------------
 
 struct UniformsBackground {
-//	libv::glr::Uniform_vec2f noiseUVScale;
-//	libv::glr::Uniform_vec4f noiseScale;
-//	libv::glr::Uniform_vec4f noiseOffset;
-//	libv::glr::Uniform_texture textureNoise;
-
 	libv::glr::Uniform_texture texture_noise;
 	libv::glr::Uniform_vec2f render_resolution;
 	libv::glr::Uniform_vec4f noise_scale;
@@ -171,6 +166,8 @@ struct UniformsCommandArrow {
 		access(render_resolution, "render_resolution");
 		access(test_mode, "test_mode", 0);
 		access(time, "time", 0.f);
+
+//		access(uniformBlock_matrices);
 	}
 };
 
@@ -445,7 +442,7 @@ public:
 	}
 };
 
-//struct Fleet {
+struct Fleet {
 //	enum class CommandType {
 //		movement,
 //		attack,
@@ -461,23 +458,35 @@ public:
 //		libv::vec3f target;
 ////		int32_t target;
 //	};
-//
-//public:
-//	libv::vec3f position;
+
+public:
+	libv::vec3f position;
+	libv::vec3f target;
 //	libv::vec3f movement;
 //	CommandArrow command_arrow; // <<< Yes, but no, maybe-, Think about it how should ownership and references fork regarding renderers
 //	std::vector<Command> commands;
-//
-//public:
+
+public:
 //	void queue_command(CommandType type, libv::vec3f target) {
 //		commands.emplace_back(type, target);
 ////		command_arrow.add(target, color);
 //	}
-////
-////	void queue_command(CommandType type, int32_t target) {
-////
-////	}
-//};
+//
+//	void queue_command(CommandType type, int32_t target) {
+//
+//	}
+
+	void update(libv::ui::time_duration delta_time) {
+		const auto dt = static_cast<float>(delta_time.count());
+
+		if ((position - target).length() < dt) {
+			position = target;
+		} else {
+			const auto dir = (target - position).normalize();
+			position = position + dir * dt;
+		}
+	}
+};
 
 //struct Map {
 //	FleetRender fleet_render;
@@ -509,6 +518,9 @@ libv::vec3f intersect_ray_plane(libv::vec3f ray_point, libv::vec3f ray_dir, libv
 
 // -------------------------------------------------------------------------------------------------
 
+#include <libv/ui/context/context_state.hpp>
+libv::ui::UI* global_ui; // <<< Remove this one
+
 struct SpaceCanvas : libv::ui::Canvas {
 	app::CameraPlayer& camera;
 	app::CameraPlayer::screen_picker screen_picker;
@@ -522,7 +534,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 	Gizmo origin_gizmo;
 	CommandArrow arrow;
 	FleetRender render_fleet;
-	std::vector<libv::vec3f> fleet_positions;
+	std::vector<Fleet> fleets;
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
@@ -541,20 +553,39 @@ struct SpaceCanvas : libv::ui::Canvas {
 //				.js_analog = 1.0
 //		};
 
-		controls.feature_action<SpaceCanvas>("space.add_fleet", [](const auto& arg, SpaceCanvas& ctx) {
+		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
 			(void) arg;
 
-			// <<< Use correct mouse coords
-			const auto mouse_coord = libv::vec2f{ctx.canvas_size * 0.5f};
+			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
+			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
+			const auto mouse_coord = global_ui->state().mouse_position();
 			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			ctx.fleet_positions.emplace_back(world_coord);
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command
+			if (!ctx.fleets.empty())
+				ctx.fleets.back().target = world_coord;
+			ctx.fleets.emplace_back(world_coord, world_coord);
+			std::cout << "world_coord: " << world_coord << std::endl;
+		});
+
+		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
+			(void) arg;
+
+			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
+			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
+			const auto mouse_coord = global_ui->state().mouse_position();
+			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command
+			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
+			ctx.camera.warp_to(world_coord);
 			std::cout << "world_coord: " << world_coord << std::endl;
 		});
 	}
 
 	static void bind_default_controls(libv::ctrl::Controls& controls) {
-		controls.bind("space.add_fleet", "Ctrl + LMB [press]");
+		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+		controls.bind("space.warp_camera_to_mouse", "Z");
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
@@ -591,8 +622,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 			}
 		}
 
-		// <<< Events should update this (or mark as dirty), not update
+		// <<< Events should update this (or mark as dirty), not update,
+		//  		and/or precalc the world space mouse ray, because that looks like used a lot
 		screen_picker = camera.picker(canvas_size);
+
+		for (auto& fleet : fleets)
+			fleet.update(delta_time);
 	}
 
 	virtual void render(libv::glr::Queue& gl) override {
@@ -611,6 +646,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		gl.state.polygonModeFill();
 
 		gl.projection = camera.projection(canvas_size);
+		// TODO P2: No not reset view, use the UI's current view
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
 
@@ -619,9 +655,9 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 		// --- Render Opaque ---
 
-		for (const auto& position : fleet_positions) {
+		for (const auto& fleet : fleets) {
 			const auto m_guard = gl.model.push_guard();
-			gl.model.translate(position);
+			gl.model.translate(fleet.position);
 			gl.model.scale(0.2f);
 			render_fleet.render(gl, uniform_stream);
 //			origin_gizmo.render(gl, uniform_stream);
@@ -672,6 +708,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 						canvas_size,
 						-orientation_gizmo_size,
 						+orientation_gizmo_size);
+				// TODO P2: No not reset view, use the UI's current view
 				gl.view = camera.orientation().translate(-1, 0, 0);
 				gl.model.scale(orientation_gizmo_size * 0.5f);
 
@@ -759,6 +796,7 @@ int main() {
 	ui_settings.res_shader.base_path = "../../res/shader/";
 	ui_settings.res_texture.base_path = "../../res/texture/";
 	libv::ui::UI ui(ui_settings);
+	global_ui = &ui; // <<< Remove global ui workaround for canvas access to event states
 
 	libv::ctrl::Controls controls;
 

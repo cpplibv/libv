@@ -25,6 +25,10 @@
 #include <vm4_viewer/ui/keyboard.hpp>
 
 
+#include <libv/ctrl/controls.hpp>
+#include <libv/ctrl/binding.hpp>
+
+
 namespace app {
 namespace ui {
 
@@ -104,11 +108,52 @@ namespace ui {
 //	bezier({0, 0}, {0, 1}, {1, 1}, {1, 0});
 //}
 
+
 struct Button {
 	libv::ctrl::InputID input;
 	libv::vec2f position;
 	libv::vec2f size;
 };
+
+// ---
+
+//void foo() {
+//	libv::ctrl::Controls controls;
+//	std::vector<Button> keyboard_buttons;
+//
+//	for (const Button& button : keyboard_buttons) {
+//		controls.foreach_bindings_search([&](const libv::ctrl::Binding& binding) {
+//			static constexpr auto c = libv::ctrl::Modifier::control;
+//			static constexpr auto s = libv::ctrl::Modifier::shift;
+//			static constexpr auto a = libv::ctrl::Modifier::alt;
+////			static constexpr auto u = libv::ctrl::Modifier::super;
+//
+//			if (binding.sequence().contains(c + s + a))
+//				0;
+//			else if (binding.sequence().contains(c + s))
+//				0;
+//			else if (binding.sequence().contains(c + a))
+//				0;
+//			else if (binding.sequence().contains(s + a))
+//				0;
+//			else if (binding.sequence().contains(c))
+//				0;
+//			else if (binding.sequence().contains(s))
+//				0;
+//			else if (binding.sequence().contains(a))
+//				0;
+//			else
+//				0;
+//
+//			// OR just
+//			if (binding.sequence().contains(viewed_current_modifiers))
+//				1;
+//
+//			binding.feature_name();
+//
+//		}, button.input, libv::ctrl::search_mode::contains);
+//	}
+//}
 
 // ---
 

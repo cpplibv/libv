@@ -92,6 +92,7 @@ void CameraPlayer::warp_to(vec3 target) {
 //		const auto v = libv::math::ease_in_cubic(x);
 //		const auto v = libv::math::ease_in_out_cubic(x);
 //		const auto v = libv::math::ease_out_cubic(x);
+	orbit_point(target);
 }
 
 //	void warp_to(vec3 eye, vec3 target);

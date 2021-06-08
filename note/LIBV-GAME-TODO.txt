@@ -12,6 +12,8 @@ visual.editor_bg: Non uniform color, use a grainy texture (like blue noise)
 app.space: Move origin gizmo into top right corner into screen space
 app.space: Burn a frame icon set into the binary and use it
 app.space: Have space working from the correct dir
+app.space: Screen picker integration - Place something onto the 3D world on mouse click
+app.space: Fleet that moves (without any arrow)
 
 
 
@@ -66,9 +68,7 @@ app.space: Have space working from the correct dir
 
 
 
-app.space: Screen picker - Place something onto the 3D world on mouse click
 
-app.space: Fleet that moves (without any arrow)
 app.space: Fleet with arrow and movement toward target (primitive)
 app.space: Optimized VAO update for command arrows
 
@@ -129,12 +129,7 @@ What do I need from libv to make a 'minimal' working iris program?
 		4 button states (state styles)
 		5 font outline render
 
-
-
-
-
 iris: Make a main menu
-
 
 blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
 		full screen quad pass with render_resolution / 2 with v blur shader
@@ -143,6 +138,7 @@ blur: (shaders are already implemented in app.space, but downscaling is not) htt
 		full screen quad pass with render_resolution / 8 with h blur shader
 
 
+game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
 
 
 

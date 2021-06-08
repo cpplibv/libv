@@ -220,7 +220,7 @@ public:
 
 	void foreach_bindings(libv::function_ref<void(const Binding&)> function);
 	void foreach_bindings_search(libv::function_ref<void(const Binding&)> function, const Sequence& seq, search_mode mode = search_mode::contains);
-	void foreach_bindings_search(libv::function_ref<void(const Binding&)> function, std::string_view name, search_mode mode = search_mode::contains);
+	void foreach_bindings_search(libv::function_ref<void(const Binding&)> function, std::string_view feature_name, search_mode mode = search_mode::contains);
 
 public:
 	[[nodiscard]] std::string export_bindings();

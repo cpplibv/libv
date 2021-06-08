@@ -142,9 +142,9 @@ void Controls::foreach_bindings_search(libv::function_ref<void(const Binding&)> 
 			function(*binding);
 }
 
-void Controls::foreach_bindings_search(libv::function_ref<void(const Binding&)> function, std::string_view name, search_mode mode) {
+void Controls::foreach_bindings_search(libv::function_ref<void(const Binding&)> function, std::string_view feature_name, search_mode mode) {
 	for (const auto& binding : self->bindings)
-		if (check_feature(binding->feature_name(), name, mode))
+		if (check_feature(binding->feature_name(), feature_name, mode))
 			function(*binding);
 }
 

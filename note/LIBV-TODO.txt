@@ -1599,8 +1599,8 @@ libv.audio: Paper
 		PortAudio - Too low level: http://www.portaudio.com/docs.html
 			sndfile lib in order to load/save all kinds of audio files.
 		audeo - Based on top of SDL_Mixer: https://github.com/NotAPenguin0/audeo
-									https://github.com/SDL-mirror/SDL_mixer
-									https://github.com/SDL-mirror/SDL
+									https://github.com/libsdl-org/SDL_mixer
+									https://github.com/libsdl-org/SDL
 		soloud - Another good candidate: https://sol.gfxile.net/soloud/quickstart.html
 			has many-many backend (even OS native ones), API looks ok, license ok (zlib)
 
