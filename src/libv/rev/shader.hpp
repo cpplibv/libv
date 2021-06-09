@@ -32,6 +32,12 @@ public:
 		};
 		uniforms.access_uniforms(access);
 	}
+	virtual void bind_blocks(libv::glr::Program& program) override {
+		auto access = [&program](const libv::glr::UniformBlockBinding& block) {
+			program.block_binding(block);
+		};
+		uniforms.access_blocks(access);
+	}
 };
 
 } // namespace detail ------------------------------------------------------------------------------

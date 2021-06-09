@@ -170,6 +170,7 @@ void Program::_native_swap(libv::gl::Program& program) noexcept {
 	remote->uniform_identifiers.clear();
 	remote->uniform_locations.clear();
 	remote->bound_block_count = 0;
+	remote->block_bindings.clear();
 
 	remote->created = true;
 	remote->dirty = true;

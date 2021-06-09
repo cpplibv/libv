@@ -81,7 +81,6 @@ render target
 	depth support
 	make a blur or a bloom
 
-uni block in shader type binding | only manual binding, no auto binding in this task yet.
 line shader
 frustum visualization
 

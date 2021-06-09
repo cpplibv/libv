@@ -64,15 +64,12 @@ inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: In shader_arrow_fs body_size/edge_size is UV but head_size is world space. Unify them
-// TODO P1: Organize vertex_SP_SS_TP_TS to SS_SP_SE_TS s.start, s.position, s.end, t.size or with some more sane name
-
 // TODO P2: libv.glr: Shader automated block binding by watching the includes
 //          So this should work:
 //          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
 //          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
 //          And this would be called on any program that includes block/sphere.glsl
-//          program.block_binding(uniformBlock_matrices)
+//          program.block_binding(uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
 //          | issue: some struct might have already been defined, so block to string might have to skip them
 //                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
 //                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
@@ -89,6 +86,10 @@ constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
 constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
 
 struct UniformLayoutMatrices {
+	// Could be split into two: Camera and Model
+	// 			Camera: matV, matP, near, far, ...
+	// 			Model: matM, matMVP
+
 	libv::glr::Uniform_mat4f matMVP;
 	libv::glr::Uniform_mat4f matP;
 	libv::glr::Uniform_mat4f matM;
@@ -99,8 +100,35 @@ struct UniformLayoutMatrices {
 	LIBV_REFLECTION_ACCESS(matM);
 	LIBV_REFLECTION_ACCESS(eye);
 };
+
+//struct UniformLayoutPass {
+//	libv::glr::Uniform_float time_sim;
+//	libv::glr::Uniform_float time_real;
+//	libv::glr::Uniform_float time_real_hcap;
+//	libv::glr::Uniform_vec2f render_resolution;
+//	libv::glr::Uniform_vec2f pixel_size; // 1.0 / render_resolution
+//
+//	libv::glr::Uniform_int32 test_mode0;
+//
+//    libv::glr::Uniform_vec4f frame_random_vec4; // [0..1] random numbers changing each frame
+//    libv::glr::Uniform_vec4i frame_random_ivec4; // [int_min..int_max] random numbers changing each frame
+//
+//	LIBV_REFLECTION_ACCESS(time_sim);
+//	LIBV_REFLECTION_ACCESS(time_real);
+//	LIBV_REFLECTION_ACCESS(time_real_hcap);
+//	LIBV_REFLECTION_ACCESS(render_resolution);
+//	LIBV_REFLECTION_ACCESS(pixel_size);
+//
+//	LIBV_REFLECTION_ACCESS(test_mode0);
+//
+//	LIBV_REFLECTION_ACCESS(frame_random_vec4);
+//	LIBV_REFLECTION_ACCESS(frame_random_ivec4);
+//};
+
 const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
+//const auto uniformBlock_pass = libv::glr::UniformBlockBinding{1, "Pass"};
 const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
+//const auto layout_pass = libv::glr::layout_std140<UniformLayoutPass>(uniformBlock_pass);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -137,6 +165,8 @@ struct UniformsBackground {
 		access(base_color, "base_color");
 		access(noise_scale, "noise_scale");
 	}
+	template <typename Access> void access_blocks(Access&) {
+	}
 };
 
 struct UniformsTestMode {
@@ -145,6 +175,9 @@ struct UniformsTestMode {
 	template <typename Access> void access_uniforms(Access& access) {
 		access(test_mode, "test_mode", 0);
 	}
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
 };
 
 struct UniformsColor {
@@ -152,6 +185,9 @@ struct UniformsColor {
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(base_color, "base_color");
+	}
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
 	}
 };
 
@@ -166,8 +202,9 @@ struct UniformsCommandArrow {
 		access(render_resolution, "render_resolution");
 		access(test_mode, "test_mode", 0);
 		access(time, "time", 0.f);
-
-//		access(uniformBlock_matrices);
+	}
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
 	}
 };
 
@@ -180,7 +217,7 @@ using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 
 // =================================================================================================
 
-// TODO P1: kill these ones, aka implement 'program' uniform block
+// TODO P1: kill these ones, aka implement 'pass' / 'program' uniform block (requires glr shared block allocation)
 float global_time = 0.0f;
 int32_t global_test_mode = 0;
 
@@ -236,9 +273,6 @@ struct CommandArrow {
 
 public:
 	CommandArrow() {
-		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
-		shader_arrow.program().block_binding(uniformBlock_matrices);
-
 		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
 		for (int i = 0; i < 60; i++) {
 			const auto r = i / 30.0;
@@ -327,9 +361,6 @@ struct Gizmo {
 
 public:
 	Gizmo() {
-		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
-		shader.program().block_binding(uniformBlock_matrices);
-
 		draw_gizmo_lines(mesh);
 	}
 
@@ -376,9 +407,6 @@ struct Grid {
 
 public:
 	Grid() {
-		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
-		shader.program().block_binding(uniformBlock_matrices);
-
 		{
 			auto position = mesh_grid.attribute(attribute_position);
 			auto index = mesh_grid.index();
@@ -412,9 +440,6 @@ struct FleetRender {
 
 public:
 	FleetRender() {
-		// TODO P1: libv.rev: Auto block binding based on include detection | intermediate step: integrate to shader function type / override
-		shader.program().block_binding(uniformBlock_matrices);
-
 		draw_mesh(mesh);
 	}
 
@@ -561,7 +586,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 			const auto mouse_coord = global_ui->state().mouse_position();
 			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
 			if (!ctx.fleets.empty())
 				ctx.fleets.back().target = world_coord;
 			ctx.fleets.emplace_back(world_coord, world_coord);
@@ -576,7 +601,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 			const auto mouse_coord = global_ui->state().mouse_position();
 			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
 			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
 			ctx.camera.warp_to(world_coord);
 			std::cout << "world_coord: " << world_coord << std::endl;
@@ -646,11 +671,12 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		gl.state.polygonModeFill();
 
 		gl.projection = camera.projection(canvas_size);
+		// TODO P2: Test with a second non full screen quad canvas
 		// TODO P2: No not reset view, use the UI's current view
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
 
-//		gl.setClearColor(0, 0, 0, 0); // For debug, this would break some of the UI
+//		gl.setClearColor(0, 0, 0, 0); // For debug only, this would break some of the UI
 //		gl.clearColor();
 
 		// --- Render Opaque ---

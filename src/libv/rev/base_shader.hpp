@@ -21,6 +21,7 @@ namespace detail {
 class BaseUniformContainer {
 public:
 	virtual void bind_assign(libv::glr::Program& program) = 0;
+	virtual void bind_blocks(libv::glr::Program& program) = 0;
 	virtual ~BaseUniformContainer() = default;
 };
 

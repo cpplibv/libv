@@ -204,6 +204,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			internal->program.fragment(fallback_red_fs);
 			// We still bind the uniforms to ensure allocation of layout/index variables inside glr
 			internal->uniformContainer->bind_assign(internal->program);
+			internal->uniformContainer->bind_blocks(internal->program);
 
 			log_rev.error("Settings shader: {} ({}) to fallback red", internal->name_, internal->id());
 		} else {
@@ -282,6 +283,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 				internal->never_loaded = false;
 				internal->program._native_swap(program);
 				internal->uniformContainer->bind_assign(internal->program);
+				internal->uniformContainer->bind_blocks(internal->program);
 				_broadcast(ShaderLoadSuccess{internal->id(), BaseShader(internal)});
 			}
 		}

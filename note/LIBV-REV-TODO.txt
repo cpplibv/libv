@@ -12,7 +12,7 @@ libv.rev: Implement the shader reload event hooks for unloads
 libv.rev: Add multi thread support for the whole shader manager system
 libv.rev: Implement the shader reload event hooks for include or IO failure
 libv.rev: Cleanup shader manager system implementation
-
+libv.rev: Add block binding support on shader uniform container level
 
 
 
