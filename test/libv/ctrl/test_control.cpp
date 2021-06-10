@@ -113,20 +113,20 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [auto]"));
 		controls.bind("never.binary", parse("B [auto]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
@@ -141,15 +141,15 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [press]"));
 		controls.bind("never.binary", parse("B [press]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 3);
@@ -163,20 +163,20 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [repeat]"));
 		controls.bind("never.binary", parse("B [repeat]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -190,12 +190,12 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [release]"));
 		controls.bind("never.binary", parse("B [release]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
@@ -213,16 +213,16 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [any]"));
 		controls.bind("never.binary", parse("B [any]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
@@ -240,20 +240,20 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("B [hold]"));
 		controls.bind("never.binary", parse("B [hold]"));
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
@@ -269,14 +269,14 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 //		controls.bind("never.analog", parse("B [free]"));
 //		controls.bind("never.binary", parse("B [free]"));
 //
-//		controls.input(event_key_a_press);
+//		controls.event(event_key_a_press);
 //		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 //
 //		controls.update(std::chrono::seconds{1});
-//		controls.input(event_key_a_repeat);
+//		controls.event(event_key_a_repeat);
 //		controls.update(std::chrono::seconds{1});
 //
-//		controls.input(event_key_a_release);
+//		controls.event(event_key_a_release);
 //		CHECK(feature_action.consume_first());
 //		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 //
@@ -294,14 +294,14 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("MY"));
 		controls.bind("never.binary", parse("MY"));
 
-		controls.input(event_mouse_x_p);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
@@ -319,14 +319,14 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("MY+"));
 		controls.bind("never.binary", parse("MY+"));
 
-		controls.input(event_mouse_x_p);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
@@ -342,12 +342,12 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("MY-"));
 		controls.bind("never.binary", parse("MY-"));
 
-		controls.input(event_mouse_x_p);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
@@ -370,24 +370,24 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [auto]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [auto]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -404,17 +404,17 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [press]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [press]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_release);
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_a_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 3);
@@ -431,22 +431,22 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [repeat]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [repeat]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_release);
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_a_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -463,18 +463,18 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [release]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [release]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 3);
@@ -491,22 +491,22 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [any]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [any]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -523,24 +523,24 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft [auto] + A [hold]"));
 		controls.bind("never.binary", parse("Shft [auto] + A [hold]"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_key_a_press);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -557,19 +557,19 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 //		controls.bind("never.analog", parse("Shft [auto] + A [free]"));
 //		controls.bind("never.binary", parse("Shft [auto] + A [free]"));
 //
-//		controls.input(event_key_ctrl_press);
-//		controls.input(event_key_a_press);
+//		controls.event(event_key_ctrl_press);
+//		controls.event(event_key_a_press);
 //		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 //
 //		controls.update(std::chrono::seconds{1});
-//		controls.input(event_key_a_repeat);
+//		controls.event(event_key_a_repeat);
 //		controls.update(std::chrono::seconds{1});
 //
-//		controls.input(event_key_a_release);
+//		controls.event(event_key_a_release);
 //		CHECK(feature_action.consume_first());
 //		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 //
-//		controls.input(event_key_ctrl_release);
+//		controls.event(event_key_ctrl_release);
 //		controls.update(std::chrono::seconds{1});
 //		CHECK(feature_analog.consume_first());
 //
@@ -590,20 +590,20 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft + MX"));
 		controls.bind("never.binary", parse("Shft + MX"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_mouse_x_p);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -623,18 +623,18 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft + MX+"));
 		controls.bind("never.binary", parse("Shft + MX+"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_mouse_x_p);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 4);
@@ -654,18 +654,18 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.analog", parse("Shft + MX-"));
 		controls.bind("never.binary", parse("Shft + MX-"));
 
-		controls.input(event_key_ctrl_press);
-		controls.input(event_mouse_x_p);
+		controls.event(event_key_ctrl_press);
+		controls.event(event_mouse_x_p);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_mouse_x_m);
+		controls.event(event_mouse_x_m);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_ctrl_release);
+		controls.event(event_key_ctrl_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 4);
@@ -691,72 +691,72 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.binary", parse("Shft [auto] + A [auto]"));
 
 		SECTION("Sequence activation 1a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
 		}
 		SECTION("Sequence activation 1b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
 		}
 		SECTION("Sequence activation 2a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 2b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 3a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 3b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 4a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 4b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_ctrl_release);
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_ctrl_release);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 5a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_release);
-			controls.input(event_key_a_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_release);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 5b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 		}
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
@@ -782,46 +782,46 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.binary", parse("Shft [auto] + A [press]"));
 
 		SECTION("Sequence activation 1a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
 		}
 		SECTION("Sequence activation 2a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 3a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 4a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 5a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_release);
-			controls.input(event_key_a_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_release);
+			controls.event(event_key_a_release);
 		}
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 		CHECK(feature_analog.consume_first());
 
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 		controls.update(std::chrono::seconds{1});
@@ -847,42 +847,42 @@ TEST_CASE("Control shall execute features", "[libv.control]") {
 		controls.bind("never.binary", parse("Shft [auto] + A [release]"));
 
 		SECTION("Sequence activation 3a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 3b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_release);
 		}
 		SECTION("Sequence activation 4a") {
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 		}
 		SECTION("Sequence activation 5b") {
-			controls.input(event_key_a_press);
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_a_press);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 		}
 
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(feature_action.consume_first());
 		CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 		CHECK(feature_analog.consume_first());
 
 		controls.update(std::chrono::seconds{1});
-		controls.input(event_key_a_release);
+		controls.event(event_key_a_release);
 		controls.update(std::chrono::seconds{1});
 
 		CHECK(context.access_count == 6);
@@ -912,10 +912,10 @@ TEST_CASE("Select more specialized binding in case of collision", "[libv.control
 	controls.bind("test.action", parse("Ctrl + A"));
 	controls.bind("never.action", parse("A"));
 
-	controls.input(event_key_ctrl_press);
-	controls.input(event_key_a_press);
-	controls.input(event_key_a_release);
-	controls.input(event_key_ctrl_release);
+	controls.event(event_key_ctrl_press);
+	controls.event(event_key_a_press);
+	controls.event(event_key_a_release);
+	controls.event(event_key_ctrl_release);
 
 	CHECK(feature_action.consume_first());
 	CHECK(context.access_count == 1);
@@ -949,43 +949,43 @@ TEST_CASE("Reset sequence on unrelated event", "[libv.control]") {
 		controls.bind("test.binary", parse("Ctrl + A, A"));
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
-			controls.input(event_key_s_press); // <- unrelated button event
+			controls.event(event_key_s_press); // <- unrelated button event
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			controls.update(std::chrono::seconds{1});
 		}
 
 		// Nothing so far, try again
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			CHECK(feature_action.consume_first());
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			CHECK(feature_action.consume_first());
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 			controls.update(std::chrono::seconds{1});
@@ -994,43 +994,43 @@ TEST_CASE("Reset sequence on unrelated event", "[libv.control]") {
 		// Try again with cancelling
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
-			controls.input(event_mouse_x_p); // <- unrelated analog event
+			controls.event(event_mouse_x_p); // <- unrelated analog event
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			controls.update(std::chrono::seconds{1});
 		}
 
 		// Nothing so far, try again
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			CHECK(feature_action.consume_first());
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			CHECK(feature_action.consume_first());
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 			controls.update(std::chrono::seconds{1});
@@ -1039,43 +1039,43 @@ TEST_CASE("Reset sequence on unrelated event", "[libv.control]") {
 		// Try again with cancelling
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
 			controls.update(std::chrono::seconds{300}); // <- timeout
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			controls.update(std::chrono::seconds{1});
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			controls.update(std::chrono::seconds{1});
 		}
 
 		// Nothing so far, try again
 
 		{
-			controls.input(event_key_ctrl_press);
-			controls.input(event_key_a_press);
-			controls.input(event_key_a_release);
-			controls.input(event_key_ctrl_release);
+			controls.event(event_key_ctrl_press);
+			controls.event(event_key_a_press);
+			controls.event(event_key_a_release);
+			controls.event(event_key_ctrl_release);
 
-			controls.input(event_key_a_press);
+			controls.event(event_key_a_press);
 			CHECK(feature_action.consume_first());
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{true});
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_repeat);
+			controls.event(event_key_a_repeat);
 			CHECK(feature_action.consume_first());
 
 			controls.update(std::chrono::seconds{1});
 			CHECK(feature_analog.consume_first());
 
-			controls.input(event_key_a_release);
+			controls.event(event_key_a_release);
 			CHECK(feature_binary.consume_first() == lc::arg_binary_t{false});
 
 			controls.update(std::chrono::seconds{1});
@@ -1135,28 +1135,28 @@ TEST_CASE("Routing scale and impulse", "[libv.control]") {
 	controls.scale_time(41);
 
 	{
-		controls.input(event_key_a_press);
+		controls.event(event_key_a_press);
 		CHECK(get_or_nan(feature_abi) == ap(2 * 17 * 29));
 
-		controls.input(event_mouse_x71_y73);
-		CHECK(get_or_nan(feature_aas) == ap(67 * 23 * 37 * 71 * lc::MOUSE_NORMALIZATION_SCALE));
+		controls.event(event_mouse_x71_y73);
+		CHECK(get_or_nan(feature_aas) == ap(67 * 23 * 37 * 71));
 
 		controls.update(std::chrono::seconds{43});
 		CHECK(get_or_nan(feature_abt0) == ap(7 * 19 * 41 * 43));
 
-		controls.input(event_key_a_repeat);
+		controls.event(event_key_a_repeat);
 		CHECK(get_or_nan(feature_abi) == ap(2 * 17 * 29));
 
 		controls.update(std::chrono::seconds{47});
 		CHECK(get_or_nan(feature_abt0) == ap(7 * 19 * 41 * 47));
 
-		controls.input(event_key_a_release);
-		controls.input(event_mouse_left_press);
+		controls.event(event_key_a_release);
+		controls.event(event_mouse_left_press);
 
 		controls.update(std::chrono::seconds{107});
 		CHECK(get_or_nan(feature_abt1) == ap(41 * 107 * 79 * 89));
 
-		controls.input(event_mouse_left_release);
+		controls.event(event_mouse_left_release);
 		controls.update(std::chrono::seconds{53});
 
 		CHECK(context.access_count == 6);
