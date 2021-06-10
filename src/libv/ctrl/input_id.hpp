@@ -302,7 +302,7 @@ public:
 [[nodiscard]] bool alias_match(const InputID a, const InputID b) noexcept;
 
 /// This function does not account for analog dimension, scancode or codepoint aliasing
-/// @return 0 If A and B are equal or not aliases, -1 if A is more specialized, +1 if B is more specialized
+/// @return 0 If A and B are equal or if they are not aliases, -1 if A is more specialized, +1 if B is more specialized
 [[nodiscard]] int more_specialized(const InputID a, const InputID b) noexcept;
 
 // -------------------------------------------------------------------------------------------------
