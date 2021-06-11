@@ -71,7 +71,8 @@ void main() {
 		//	const float spark_fade_pow  = 4;
 
 	float spark_time_offset = -time * spark_run_speed;
-	float spark_t = fract((fs_in.totalPosition + spark_time_offset) / spark_distance);
+	float spark_shape_delay = abs(fs_in.uv.x - 0.5) * 0.5;
+	float spark_t = fract((fs_in.totalPosition + spark_shape_delay + spark_time_offset) / spark_distance);
 	float spark_lin_v = max(0, spark_t / spark_length * spark_distance - spark_distance / spark_length + 1);
 	float spark_v = pow(spark_lin_v, spark_fade_pow);
 

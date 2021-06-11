@@ -60,22 +60,27 @@ vec4 weight_mix(vec4 x, vec4 y, float wx, float wy) {
 // -------------------------------------------------------------------------------------------------
 
 void main() {
-	const float plane_size = 100;
+	const float camera_far = 1000;
+	const float plane_size_far_rate = 0.8;
+	const float plane_size_far = camera_far * plane_size_far_rate;
+	float plane_size = 100 + abs(eye.z) * 100;
 
 	float eye_distance = length(eye - fragmentPositionM);
 
-	float fading_0 = max(0, 1 - inv_lerp(0, lod_level * plane_size *    .1, eye_distance));
-	float fading_1 = max(0, 1 - inv_lerp(0, lod_level * plane_size *   1.0, eye_distance));
-	float fading_2 = max(0, 1 - inv_lerp(0, lod_level * plane_size *  10.0, eye_distance));
-	float fading_3 = max(0, 1 - inv_lerp(0, lod_level * plane_size * 100.0, eye_distance));
+	float fading_0 = max(0, 1 - inv_lerp(0, lod_level * 100 *    .1, eye_distance));
+	float fading_1 = max(0, 1 - inv_lerp(0, lod_level * 100 *   1.0, eye_distance));
+	float fading_2 = max(0, 1 - inv_lerp(0, lod_level * 100 *  10.0, eye_distance));
+	float fading_3 = max(0, 1 - inv_lerp(0, lod_level * 100 * 100.0, eye_distance));
 	fading_3 *= lod_transition;
 
 	// Linear fade out to the edge of the whole grid quad
-	float fading_grid_global = max(0, 1 - inv_lerp(0, plane_size, eye_distance));
+	float fading_grid_global = max(0, 1 - inv_lerp(0, plane_size_far, eye_distance));
 
 	// Linear fade out if incident angle is too shallow (< 2°)
 	float incident_threshold = 1 / (180 / pi);
-	float incident_angle = asin(abs(normalize(eye - fragmentPositionM).z));
+	vec3 E = normalize(eye - fragmentPositionM);
+	vec3 L = vec3(0, 0, 1);
+	float incident_angle = abs(dot(E, L));
 	float fading_grid_angle = min(1, incident_angle / incident_threshold);
 
 	const float grid_line_width_base = 0.9;
@@ -86,8 +91,7 @@ void main() {
 	axis = 1 - pow(1 - axis, vec2(2)); // More sharper line body
 	axis *= (fading_grid_global < 0.01 ? 0 : 1);
 	axis *= fading_grid_angle;
-	if (abs(fragmentPositionM.x) > 0.5 && abs(fragmentPositionM.y) > 0.5)
-		axis *= 0; // Discard some edge artifacts caused by fwidth
+	// TODO P4: The end of axes on the far cutof looking slanted
 
 	float line_width = grid_line_width_base + grid_line_width_per_level * (1.0 - lod_transition);
 
@@ -99,7 +103,7 @@ void main() {
 	const float level_power_0 = 0.2;
 	const float level_power_1 = 0.35;
 	const float level_power_2 = 0.50;
-	const float level_power_3 = 0.50;
+	const float level_power_3 = level_power_2;
 
 	float grid = 0;
 	grid = max(grid, grid_0 * fading_0 * mix(level_power_0, level_power_1, 1 - lod_transition));
@@ -109,7 +113,7 @@ void main() {
 	grid *= min(fading_grid_global, fading_grid_angle);
 
 	// Fake lighting: Little extra kick for lighting effect on the grid based on the angle
-	grid += min(1, grid * pow(incident_angle, 4) * 0.4);
+	grid += min(1, grid * pow(incident_angle, 32));
 
 	result = vec4(vec3(0.6), grid);
 

@@ -45,7 +45,6 @@ void main() {
 	float dir_pixel_length = length(dir_SP.xy / pixel_size);
 	dir_SP /= dir_pixel_length;
 
-	// TODO P1: If dir_pixel_length is very small the neck coordinates are catapulted out off clip space
 	// TODO P1: Vertexes yeeted behind the camera normal plane causes incorrect uvs
 
 	// If only one endpoint is behind the camera the negative w coord would flip the direction
@@ -64,6 +63,12 @@ void main() {
 	vec4 v5 = target_SP + normal_SP * -body_width * 0.5 + dir_SP * -head_height;
 	vec4 v6 = target_SP + normal_SP * -head_width * 0.5 + dir_SP * -head_height;
 
+//	if (dir_pixel_length < 1)
+		// If the arrow is less than 1 pixel long
+	if (dir_pixel_length < head_height)
+		// If the arrow is shorter than the head use target's depth to avoid yeeting verticies out of the clip space
+		v1.zw = v2.zw = v3.zw = v4.zw = v5.zw = v6.zw = v0.zw;
+
 	v0.xyz *= v0.w;
 	v1.xyz *= v1.w;
 	v2.xyz *= v2.w;
@@ -71,7 +76,6 @@ void main() {
 	v4.xyz *= v4.w;
 	v5.xyz *= v5.w;
 	v6.xyz *= v6.w;
-
 
 	float neck_ratio = head_height / dir_pixel_length;
 	float neck_v = max(1-neck_ratio, 0);

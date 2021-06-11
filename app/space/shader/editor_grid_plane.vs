@@ -18,8 +18,8 @@ float log10(float v) {
 }
 
 void main() {
-	const float plane_size = 100;
 	const float grid_size_min = 0.001;
+	float plane_size = 100 + abs(eye.z) * 100;
 
 	vec3 posM = vertexPosition * plane_size + vec3(eye.xy, 0);
 
