@@ -65,32 +65,26 @@ app.space: Fleet that moves (without any arrow)
 
 
 
+app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 
 
-
+app.space / libv.rev: Render target
+		ms / ss support
+		depth support
+		easy render target inspection
+app.space: make a blur or a bloom
 
 app.space: Fleet with arrow and movement toward target (primitive)
+app.space: Sim state manipulation only with commands
+
 app.space: Optimized VAO update for command arrows
+app.space: Iris and space has to merge in some way
+
+app.space: line shader
+app.space: frustum visualization
+app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
 
 
-
-
-
-render target
-	ms / ss support
-	depth support
-	make a blur or a bloom
-
-line shader
-frustum visualization
-
-
-
-
-
-
-
-app.space: Add multi camera / camera frustum visualization
 
 
 

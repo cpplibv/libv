@@ -4,56 +4,39 @@
 
 // std
 #include <algorithm>
-#include <memory>
-// libv
-#include <libv/utility/observer_ptr.hpp>
 
 
 namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Range, typename Key>
-constexpr inline observer_ptr<typename Range::value_type> linear_find_optional(Range& range, const Key& key) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
+template <typename Range, typename Key, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto linear_find_iterator(Range& range, const Key& key, Proj proj = {}) {
 
-	const auto it = std::find(begin, end, key);
-	return libv::make_observer(it != end ? std::addressof(*it) : nullptr);
+//	const auto begin = std::begin(range);
+//	const auto end = std::end(range);
+
+//	return std::find(begin, end, key);
+//	return std::ranges::find(range, key, proj);
+//	return std::ranges::find(begin, end, key, proj);
+	return std::ranges::find(range, key, proj);
 }
 
-template <typename Range, typename Proj, typename Key>
-constexpr inline auto* linear_find_optional(Range& range, const Key& key, const Proj& proj) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	const auto it = std::ranges::find(begin, end, key, proj);
-	return it != end ? std::addressof(*it) : nullptr;
+template <typename Range, typename Pred, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto linear_find_if_iterator(Range& range, Pred pred, Proj proj = {}) {
+	return std::ranges::find_if(range, pred, proj);
 }
 
-template <typename Range, typename Pred>
-constexpr inline observer_ptr<typename Range::value_type> linear_find_if_optional(Range& range, const Pred& pred) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	const auto it = std::find_if(begin, end, pred);
-	return libv::make_observer(it != end ? std::addressof(*it) : nullptr);
+template <typename Range, typename Key, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto* linear_find_optional(Range& range, const Key& key, Proj proj = {}) {
+	const auto it = std::ranges::find(range, key, proj);
+	return it != std::end(range) ? std::addressof(*it) : nullptr;
 }
 
-template <typename Range, typename Key>
-constexpr inline auto linear_find_iterator(Range& range, const Key& key) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	return std::find(begin, end, key);
-}
-
-template <typename Range, typename Pred>
-constexpr inline auto linear_find_if_iterator(Range& range, const Pred& pred) {
-	const auto begin = std::begin(range);
-	const auto end = std::end(range);
-
-	return std::find_if(begin, end, pred);
+template <typename Range, typename Pred, typename Proj = std::identity>
+[[nodiscard]] constexpr inline auto* linear_find_if_optional(Range& range, Pred pred, Proj proj = {}) {
+	const auto it = std::ranges::find_if(range, pred, proj);
+	return it != std::end(range) ? std::addressof(*it) : nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -49,6 +49,36 @@
 
 --- STACK ------------------------------------------------------------------------------------------
 
+
+
+
+
+
+
+libv.ui: Panel Status Log (aka first composite component)
+
+libv.ui: Composite component style / property system
+
+libv.ui: UI Event hub
+
+libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
+
+libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
+		A simple const void* that can be passed to any function that can produce a event
+			(or in case of a stack a ui global stack of const void*)
+		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
+		if (label.ui().event_initiator_check_loop(&shared_state))
+		if (event.check_initiator_loop(&shared_state))
+			return;
+		Implement in: app.theme: control.slider.event().change
+
+libv.ui/libv.ctrl: Keyboard binding display
+
+libv.ui: Relative mouse coordinate access for a state
+
+
+
+
 https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html
 table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -60,26 +90,7 @@ imageHolder.minWidthProperty().bind(Bindings.createDoubleBinding(() ->
 
 
 
-libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
-		A simple const void* that can be passed to any function that can produce a event
-			(or in case of a stack a ui global stack of const void*)
-		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
-		if (label.ui().event_initiator_check_loop(&shared_state))
-		if (event.check_initiator_loop(&shared_state))
-			return;
-		Implement in: app.theme: control.slider.event().change
-
-
-
-
 app.theme: create theme exporter: json and atlas texture
-
-
-
-
-libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
-
-
 
 
 app.theme: connect the theme gen with a running app to live update

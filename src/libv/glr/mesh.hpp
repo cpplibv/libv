@@ -54,11 +54,6 @@ public:
 		channel(channel), type(type), dim(dim) { }
 
 public:
-	[[nodiscard]] inline bool operator==(AttributeChannel other) const noexcept {
-		return channel == other;
-	}
-
-public:
 	template <typename T>
 	inline T* data() {
 		return reinterpret_cast<T*>(reinterpret_cast<void*>(data_.data()));
@@ -369,7 +364,7 @@ public:
 		using underlying_type = typename attribute_type::value_type;
 
 		remote->dirty = true;
-		auto it = libv::linear_find_iterator(remote->attributes, T::channel);
+		auto it = libv::linear_find_iterator(remote->attributes, T::channel, &RemoteMeshAttribute::channel);
 
 		if (it != remote->attributes.end())
 			return MeshAttribute<attribute_type>{remote->attributes, static_cast<size_t>(std::distance(remote->attributes.begin(), it))};

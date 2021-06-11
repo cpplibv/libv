@@ -60,6 +60,9 @@ libv::vec4f ImageGLI::pixel(int32_t level, int32_t x, int32_t y) const noexcept 
 //	return {raw[index + 0], raw[index + 1], raw[index + 2], raw[index + 3]};
 
 	assert("Not yet implemented");
+	(void) level;
+	(void) x;
+	(void) y;
 	return {0, 0, 0, 0};
 }
 
