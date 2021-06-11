@@ -19,25 +19,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-AlignVertical parse_align_vertical_or(const std::string_view str, const AlignVertical fallback) {
-	const auto result = parse_align_vertical_optional(str);
-	return result ? *result : fallback;
-}
+namespace {
 
-AlignVertical parse_align_vertical_or_throw(const std::string_view str) {
-	const auto result = parse_align_vertical_optional(str);
-	if (result)
-		return *result;
-	else
-		throw std::invalid_argument(libv::concat('"', str, "\" is not a valid Vertical Alignment"));
-}
+namespace x3 = boost::spirit::x3;
 
-std::optional<AlignVertical> parse_align_vertical_optional(const std::string_view str) {
-	namespace x3 = boost::spirit::x3;
-
-	struct named_aligns_ : x3::symbols<AlignVertical> {
-		named_aligns_() {
-			add
+struct named_aligns_v_ : x3::symbols<AlignVertical> {
+	named_aligns_v_() {
+		add
 				("top", AlignVertical::top)
 				("center", AlignVertical::center)
 				("bottom", AlignVertical::bottom)
@@ -53,41 +41,13 @@ std::optional<AlignVertical> parse_align_vertical_optional(const std::string_vie
 				("s", AlignVertical::bottom)
 				("ja", AlignVertical::justify_all)
 				("j", AlignVertical::justify)
-			;
-		}
-	} named_aligns;
+				;
+	}
+} named_aligns_v;
 
-	AlignVertical result = AlignVertical::center;
-
-	auto it = str.begin();
-	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
-	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::unicode::space, result);
-	success = success && it == str.end();
-
-	return success ? std::optional<AlignVertical>{result} : std::nullopt;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-AlignHorizontal parse_align_horizontal_or(const std::string_view str, const AlignHorizontal fallback) {
-	const auto result = parse_align_horizontal_optional(str);
-	return result ? *result : fallback;
-}
-
-AlignHorizontal parse_align_horizontal_or_throw(const std::string_view str) {
-	const auto result = parse_align_horizontal_optional(str);
-	if (result)
-		return *result;
-	else
-		throw std::invalid_argument(libv::concat('"', str, "\" is not a valid Horizontal Alignment"));
-}
-
-std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string_view str) {
-	namespace x3 = boost::spirit::x3;
-
-	struct named_aligns_ : x3::symbols<AlignHorizontal> {
-		named_aligns_() {
-			add
+struct named_aligns_h_ : x3::symbols<AlignHorizontal> {
+	named_aligns_h_() {
+		add
 				("left", AlignHorizontal::left)
 				("center", AlignHorizontal::center)
 				("right", AlignHorizontal::right)
@@ -103,18 +63,60 @@ std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string
 				("e", AlignHorizontal::right)
 				("ja", AlignHorizontal::justify_all)
 				("j", AlignHorizontal::justify)
-			;
-		}
-	} named_aligns;
+				;
+	}
+} named_aligns_h;
 
+} // namespace -------------------------------------------------------------------------------------
+
+std::optional<AlignVertical> parse_align_vertical_optional(const std::string_view str) {
+	AlignVertical result = AlignVertical::center;
+
+	auto it = str.begin();
+	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
+	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns_v], x3::unicode::space, result);
+	success = success && it == str.end();
+
+	return success ? std::optional<AlignVertical>{result} : std::nullopt;
+}
+
+AlignVertical parse_align_vertical_or(const std::string_view str, const AlignVertical fallback) {
+	const auto result = parse_align_vertical_optional(str);
+	return result ? *result : fallback;
+}
+
+AlignVertical parse_align_vertical_or_throw(const std::string_view str) {
+	const auto result = parse_align_vertical_optional(str);
+	if (result)
+		return *result;
+	else
+		throw std::invalid_argument(libv::concat('"', str, "\" is not a valid Vertical Alignment"));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+std::optional<AlignHorizontal> parse_align_horizontal_optional(const std::string_view str) {
 	AlignHorizontal result = AlignHorizontal::center;
 
 	auto it = str.begin();
 	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert
-	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns], x3::unicode::space, result);
+	auto success = x3::phrase_parse(it, str.end(), x3::no_case[named_aligns_h], x3::unicode::space, result);
 	success = success && it == str.end();
 
 	return success ? std::optional<AlignHorizontal>{result} : std::nullopt;
+}
+
+AlignHorizontal parse_align_horizontal_or(const std::string_view str, const AlignHorizontal fallback) {
+	const auto result = parse_align_horizontal_optional(str);
+	return result ? *result : fallback;
+}
+
+AlignHorizontal parse_align_horizontal_or_throw(const std::string_view str) {
+	const auto result = parse_align_horizontal_optional(str);
+	if (result)
+		return *result;
+	else
+		throw std::invalid_argument(libv::concat('"', str, "\" is not a valid Horizontal Alignment"));
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -2,8 +2,6 @@
 
 // hpp
 #include <catch/catch.hpp>
-// libv
-#include <libv/utility/approx.hpp>
 // std
 #include <sstream>
 // pro

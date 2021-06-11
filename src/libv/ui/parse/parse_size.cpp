@@ -17,63 +17,55 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-Size parse_size_or(const std::string_view str, const Size fallback) {
-	const auto result = parse_size_optional(str);
-	return result ? *result : fallback;
-}
+namespace {
 
-Size parse_size_or_throw(const std::string_view str) {
-	const auto result = parse_size_optional(str);
-	if (result)
-		return *result;
+namespace x3 = boost::spirit::x3;
+
+using SizeDim3 = std::tuple<SizeDim, SizeDim, SizeDim>;
+
+const auto fa_pixel = [](auto& ctx) {
+	if (std::not_equal_to<float>()(_val(ctx).pixel, 0.0f))
+		_pass(ctx) = false;
 	else
-		throw std::invalid_argument(std::string(str) + " is not a valid size");
-}
+		_val(ctx).pixel = _attr(ctx);
+};
+const auto fa_percent = [](auto& ctx) {
+	if (std::not_equal_to<float>()(_val(ctx).percent, 0.0f))
+		_pass(ctx) = false;
+	else
+		_val(ctx).percent = _attr(ctx);
+};
+const auto fa_ratio = [](auto& ctx) {
+	if (std::not_equal_to<float>()(_val(ctx).ratio, 0.0f))
+		_pass(ctx) = false;
+	else
+		_val(ctx).ratio = _attr(ctx);
+};
+const auto fa_dynamic = [](auto& ctx) {
+	if (_val(ctx).dynamic)
+		_pass(ctx) = false;
+	else
+		_val(ctx).dynamic = true;
+};
+
+const auto dimension = x3::rule<class dimension_, SizeDim>{} =
+		+(
+			(x3::float_ >> x3::no_case[x3::lit("px")])[fa_pixel] |
+			(x3::float_ >> x3::no_case[x3::lit("%")])[fa_percent] |
+			(x3::float_ >> x3::no_case[x3::lit("r")])[fa_ratio] |
+			x3::no_case[x3::lit("dynamic")][fa_dynamic] |
+			x3::no_case[x3::lit("d")][fa_dynamic] |
+			x3::lit("0")
+		);
+
+const auto size_rule = x3::rule<class size_rule_, SizeDim3>{} =
+		dimension >> x3::lit(',') >
+		dimension >
+		(x3::lit(',') >> dimension | x3::attr(ratio(1)));
+
+} // namespace -------------------------------------------------------------------------------------
 
 std::optional<Size> parse_size_optional(const std::string_view str) {
-	namespace x3 = boost::spirit::x3;
-	using SizeDim3 = std::tuple<SizeDim, SizeDim, SizeDim>;
-
-	const auto map_pixel = [](auto& ctx) {
-		if (std::not_equal_to<float>()(_val(ctx).pixel, 0.0f))
-			_pass(ctx) = false;
-		else
-			_val(ctx).pixel = _attr(ctx);
-	};
-	const auto map_percent = [](auto& ctx) {
-		if (std::not_equal_to<float>()(_val(ctx).percent, 0.0f))
-			_pass(ctx) = false;
-		else
-			_val(ctx).percent = _attr(ctx);
-	};
-	const auto map_ratio = [](auto& ctx) {
-		if (std::not_equal_to<float>()(_val(ctx).ratio, 0.0f))
-			_pass(ctx) = false;
-		else
-			_val(ctx).ratio = _attr(ctx);
-	};
-	const auto map_dynamic = [](auto& ctx) {
-		if (_val(ctx).dynamic)
-			_pass(ctx) = false;
-		else
-			_val(ctx).dynamic = true;
-	};
-
-	const auto dimension = x3::rule<class dimension_, SizeDim>{} =
-			+(
-				(x3::float_ >> x3::no_case[x3::lit("px")])[map_pixel] |
-				(x3::float_ >> x3::no_case[x3::lit("%")])[map_percent] |
-				(x3::float_ >> x3::no_case[x3::lit("r")])[map_ratio] |
-				x3::no_case[x3::lit("dynamic")][map_dynamic] |
-				x3::no_case[x3::lit("d")][map_dynamic] |
-				x3::lit("0")
-			);
-
-	const auto size_rule = x3::rule<class size_rule_, SizeDim3>{} =
-			dimension >> x3::lit(',') >
-			dimension >
-			(x3::lit(',') >> dimension | x3::attr(ratio(1)));
-
 	SizeDim3 result;
 	std::get<0>(result).ratio = 0.0f;
 	std::get<1>(result).ratio = 0.0f;
@@ -90,6 +82,19 @@ std::optional<Size> parse_size_optional(const std::string_view str) {
 	// TODO P5: Would be nice to implement paring error diagnostics, x3 should support it
 	//	https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/annotation.html
 	//	https://www.boost.org/doc/libs/1_69_0/libs/spirit/doc/x3/html/spirit_x3/tutorials/error_handling.html
+}
+
+Size parse_size_or(const std::string_view str, const Size& fallback) {
+	const auto result = parse_size_optional(str);
+	return result ? *result : fallback;
+}
+
+Size parse_size_or_throw(const std::string_view str) {
+	const auto result = parse_size_optional(str);
+	if (result)
+		return *result;
+	else
+		throw std::invalid_argument(std::string(str) + " is not a valid size");
 }
 
 // -------------------------------------------------------------------------------------------------
