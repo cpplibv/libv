@@ -601,8 +601,6 @@ libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 
-libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
-	test time values at first frame
 
 
 
@@ -831,9 +829,8 @@ libv.ctrl: save xls from thesis archive
 
 
 
-ext.x3: make sure that every rule is static
-	libv.ui: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
-	libv.parse: move x3 parse rules to globals with internal linkage to improve performance BUT ! static initialization order fiasco
+ext.x3: make sure that every rule is static, BUT ! What about static initialization order fiasco?
+	libv.parse: move x3 parse rules to globals with internal linkage to improve performance
 ext.x3: make sure that no header dependency exposed by libv parsers (headers)
 
 libv.ctrl: clean up visibility (especially for Sequence and StateSequence and related types) cleanup distant member accesses (from control)
@@ -1010,6 +1007,7 @@ libv.ctrl: Paper
 
 
 libv.ctrl: Per binding decision of collusion handling by the user: priority, fall through, stop, stop if successful (feature can yield success or failure), call order, etc
+libv.ctrl: In feature callback ability to reject the event/binding and allow the next candidate to be called
 libv.ctrl: Binding profiles, and inheritance
 libv.ctrl: Gamepad/joystick analog should be time related, but mouse and scroll are event based
 libv.ctrl: Click and double click support would be nice
@@ -1175,7 +1173,6 @@ vm4 hash and timestamp
 libv.vm4lua: lua binding for vm4 and vm4 importer
 
 glsl: quaternion https://github.com/mattatz/ShibuyaCrowd/blob/master/source/shaders/common/quaternion.glsl and http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-17-quaternions/
-libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 app.vm4_viewer: display statistics
 
 app.vm4_viewer: import model
@@ -1189,191 +1186,11 @@ app.vm4_viewer.shader: ui feedback for glsl shader failed include
 app.vm4_viewer.shader: use a fallback shader on init failure
 app.vm4_viewer.shader: do not notify success on first shader init, it is not needed
 
-libv.ui: read nana 3rd party property tree lib API (again)
-
-component
-	libv.ui: static_component system
-
-	libv.ui: Component ideas from other systems
-		button	 			Clickable elements.
-		sprite-button	 	A button that displays an image rather than text.
-		checkbox	 			Clickable elements with a cross in the middle that can be turned off or on.
-		flow					Invisible containers that lay out children either horizontally or vertically.
-		frame	 			Grey semi-transparent boxes that contain other elements. They have a caption, and, just like flows, they lay out children either horizontally or vertically.
-		label	 			A piece of text.
-		progressbar	 		Indicate progress by displaying a partially filled bar.
-		table	 			An invisible container that lays out children in a specific number of columns. Column width is given by the largest element contained.
-		textfield	 		Boxes of text the user can type in.
-		radiobutton	 		Identical to checkbox except circular.
-		sprite	 			An element that shows an image.
-		scroll-pane	 		Similar to a flow but includes the ability to show and use scroll bars.
-		drop-down	 		A drop down list of other elements.
-		list-box	 			A list of other elements.
-		camera	 			A camera that shows the game at the given position on the given surface.
-		choose-elem-button	A button that lets the player pick one of an: item, entity, tile, or signal similar to the filter-select window.
-		text-box				A multi-line text box that supports selection and copy-paste.
-		slider				A number picker.
-		entity-preview		A preview of an entity.
-		split-pane
-		tab-pane
-
-atlas
-	libv.ui: texture atlas definition/parsing
-	libv.ui.atlas: ui theme atlas loading and auto-preview, semi-auto atlas definition
-	libv.ui: support atlas based images
-
-ui
-	libv.ui: if ui size is 0, do not execute anything from ui loop (frame buffer protection)
-	libv.ui: layout padding
-	libv.ui: fragments, sub component reusable codes
-	libv.ui: background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
-	libv.ui: ContextResource
-	libv.ui: ContextConfig
-	libv.ui: ContextFileWatcher
-	libv.ui: ContextLoopExecutor: any_thread_callable_cb = context.loop.callback_as_event(my_event_callback)
-	libv.ui: ContextExecutor
-		libv.ui: async_task<T> work_async(const function<progress_report(multi_entry_call, stop_token)>& task);
-	libv.ui: ContextStat (not ContextState, stat is for ui statistics)
-	libv.ui: mark remove is non-sense for static component system, or composite objects, hide it
-	libv.ui: add a glr::remote& to UI to simplify app::frame
-	libv.ui: idea: For UI 2D picker use the mouse wheel with indication beside the cursor to select underlying components
-
-cleanup
-	libv.ui: context_ui and libv.gl:image verify that targets are matching the requested target (2D)
-	libv.ui: cleanup context_ui redundant codes
-	libv.ui: fatal log before every assert
-
-mouse
-	libv.ui: mouse events should consider depending on if the window is focused or not | non trivial either way, might be best to have both option dynamically | need this as component level dynamically (camera controls need global, for other ui actions local is enough)
-	libv.ui: unchanged - updating watcher (any property) without change should not yield any event | do I care about it?
-	libv.ui: Mouse acquire should leave any over component (?)
-	libv.ui: Mouse release should enter any over component (?) (respect non-pass_through)
-	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
-
-event
-	libv.ui: Unignorable event handlers
-	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable
-	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met
-
-properties / style
-	libv.ui.property: property system interaction with static_component system
-	libv.ui.property: complex composite component would result in "nested" property sets
-	libv.ui.property: scope / sheet / component type based style rules
-	libv.ui.property: if fallback value is requested log a warning
-	libv.ui.property: dynamic access
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
-	libv.ui.property: account for cyclic owning references with style property
-	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
-	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
-	libv.ui.style: do not track style changes, require ui to be prompted about change
-	libv.ui.property: solve name/type collusion
-	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not fallback.)
-	libv.ui.style: Style based on component state (bit-mask)
-	libv.ui.property: typed property registry
-	libv.ui.property: optimize property reset: address could be used to lookup
-
-interactive
-	libv.ui: Cursor image change
-	libv.ui: Make a sandbox for a input->button->label->list
-	libv.ui: mouse drag and drop system
-	libv.ui.input_field: Implement FocusSelectPolicy
-	libv.ui.input_field: Implement NewLine/MultiLinePolicy
-	libv.ui.input_field: if text does not fit, crop/layer it and only display around caret
-	libv.ui.input_field: if text does not fit, display a popup with full text on mouse hover and idle
-	libv.ui.input_field: input mask (this will possibly a different input_field type)
-	libv.ui.input_field: mask('*') for passwords
-	libv.ui.input_field: mouse hover cursor change to cursor-caret symbol
-	libv.ui.input_field: multi_line(true)
-	libv.ui.input_field: selection support
-	libv.ui.input_field: multi-selection support
-	libv.ui.input_field: synthetize selection property
-	libv.ui.input_field: synthetize multi-selection property
-	libv.ui.input_field: text function call should produce event
-	libv.ui.input_field: background_shadow_tip_string("Password")
-	libv.ui.input_field: tip_string("Generic password related tip")
-	libv.ui.input_field: undo/redo support
-	libv.ui.qol: On selecting a file name input field the caret should be placed before the extension (even if the click is after the dot), but for a second click it should jump where it is requested
-
-hotkey
-	libv.ui.hotkey: hotkey system are an extension to the keyboard system
-	libv.ui.hotkey: ui.focus-backward = shift+tab
-	libv.ui.hotkey: ui.focus-forward = tab
-	libv.ui.hotkey: ui.focus-tab-backward = ctrl+shift+tab
-	libv.ui.hotkey: ui.focus-tab-forward = ctrl+tab
-	libv.ui.hotkey: ui.new-line = enter
-	libv.ui.hotkey: ui.select = space
-	libv.ui.hotkey: ui.send = enter
-	libv.ui.hotkey: ui.send = kp-enter
-	libv.ui.hotkey: ui.send-alt = shift+enter
-	libv.ui.hotkey: ui.send-alt = shift+kp-enter
-	libv.ui.hotkey: ui.text.cursor-down = down
-	libv.ui.hotkey: ui.text.cursor-left = left
-	libv.ui.hotkey: ui.text.cursor-right = right
-	libv.ui.hotkey: ui.text.cursor-up = up
-	libv.ui.hotkey: ui.text.jump-end = end
-	libv.ui.hotkey: ui.text.jump-home = home
-	libv.ui.hotkey: ui.text.remove-backward = backspace
-	libv.ui.hotkey: ui.text.remove-forward = delete
-	libv.ui.hotkey: ui.text.remove-word-backward = ctrl+backspace
-	libv.ui.hotkey: ui.text.remove-word-forward = ctrl+delete
-	libv.ui.hotkey: ui.text.select = lmb [hold]
-	libv.ui.hotkey: ui.text.select-left = shift+left
-	libv.ui.hotkey: ui.text.select-right = shift+right
-	libv.ui.hotkey: ui.text.select-word = lmb, lmb
-	libv.ui.hotkey: ui.text.select-word-left = ctrl+shift+left
-	libv.ui.hotkey: ui.text.select-word-right = ctrl+shift+right
-	libv.ui.hotkey: ui.redo = ctrl+[y] // logical y key
-	libv.ui.hotkey: ui.undo = ctrl+[z] // logical z key
-	libv.ui.hotkey: ui.redo-non-destructive // emacs style redo, not the default
-	libv.ui.hotkey: ui.undo-non-destructive // emacs style undo, not the default
-
-focus
-	libv.ui.focus: Key/Hotkey events can trigger focus-traverseal
-	libv.ui.focus: easy way to trigger Focus traverseal from events/components
-	libv.ui.focus: by default unhandled [tab] hotkeys should trigger focus traverseal
-	libv.ui.focus: by default unhandled [esc] hotkeys should trigger focus clear
-	libv.ui.focus: Ability to yield focus gain, when a component receives the onFocus (gain) event it would be nice to have a way to refusing it forcing it to travel further
-	libv.ui.focus: Focus traverseal order: direct link (ptr, ptr)
-	libv.ui.focus: Focus-traverseal needs a component hierarchy independent way to be defined, no raw id or index, use ptr/refs when direct setting it
-
-	libv.ui.focus: Focus traverseal order: layout driven (layout knows the orientation)
-	libv.ui.focus: Focus traverseal order: position based
-
-libv.ui: include check everything / fwd everything
-libv.ui: statistics: each ui operation (attach, style, render, ...) histogram, min, max, count
-
 libv.console: new console lib? A UI component will also be needed for it, but the backend should work without gui
 libv.console: should depend on libv.arg
 
-style
-	libv.ui: style sheets | aka themes
-	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
-	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
-
-overlay
-	libv.ui: generic orthogonal component level overlay system
-		libv.ui: overlay event freeze
-			libv.ui: overlay event grab / multi-root / fake-root / overlay focus shaky
-			libv.ui: overlay controls / mode switches / overlay mode display / overlay control display
-
-		libv.ui: overlay zoom
-			libv.ui: pixel distance measure / pixel region measure
-
-		libv.ui: overlay cursor pixel highlight, coordinate display and mouse region stack display
-		libv.ui: overlay magnifier (local zoom) (optionally slow mouse movement speed (freeze cursor with frame))
-		libv.ui: overlay (mouse) stack display
-		libv.ui: overlay component tree display
-		libv.ui: overlay debug data stream, a context based output that can be written and displayed as a HUD
-
-		libv.ui.property: hybrid reflection - dynamic
-			libv.ui: detach should also be an event (mouse_table could utilize it to cleanup, debug observers could also use it)
-				libv.ui: overlay property inspector (name it inspector)
-
-		libv.ui: overlay resource viewer (textures, fonts, shaders (?))
-
 
 --- Checkpoint ---
-
 
 
 libv.[lua|eval]: A small [lua] engine that can be used in the ui for number inputs with support to math expressions
@@ -1402,13 +1219,8 @@ app.vm4_viewer: display statistics of texture density and estimated texture pixe
 libv.sig: merge back the sig codebase rework a lighter version of the lib
 libv.gl: move glew init into GL (with the ability to optionally disable it with a constructor argument)
 
-libv.ui: 2Dify UI: layout only makes sense in 2D, this does not forbids 3D element nor 3D layers nor 3D positions, but layouts makes no sense in 3D 99.99% of the cases | positions are 3D sizes are 2D and maybe 3D normals (?) | normal is not necessary per component, its enough to have one on the "tilting" container
-libv.ui.layout: size over 100% is not an error
 libv.glr: (?) (if passible) std140 implementation should be moved to libv.gl
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
-
-libv.ui: lua binding | or rather a lua component or prototype parsing
-libv.ui: make sandbox_ui.lua work
 
 wish: Force colored output, useful for IDEs like clion and netbeans, also for ninja too
 		option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
@@ -1429,34 +1241,11 @@ wish: correct cmake target private/interface/public dependency (link and include
 wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
 wish: add a dummy.cpp to targets that would require at least one source file but GLOB was empty
 
-libv.ui: Label select / copy from a label (?) if specific property is set for it | its a property
-
-libv.ui: font failure to load means fallback | verify
-libv.ui: shader failure to load means fallback | verify
-libv.ui: shader dynamic loading from file
-
-libv.ui.font: fallback to Unicode Character 'REPLACEMENT CHARACTER' (U+FFFD) | add it back to fallback consolas_min font | https://www.fileformat.info/info/unicode/char/fffd/index.htm
-libv.ui.font: fallback to ascii '?'
-libv.ui.font: fallback to simple square (render the not found character by 'hand')
-libv.ui.font: https://www.freetype.org/freetype2/docs/tutorial/step2.html
-libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is because the function always sets the content of delta to (0,0) if an error occurs.
-
 libv.ppc: new Pre-Processor Compiler library, a cpp "like" pre-processor implementation for shader loading
 
 libv.color: New libv.color library, color space conversion and manipulations, template color space, template representation
 libv.color: implement HCL and other color conversion functions http://www.chilliant.com/rgb2hsv.html
 libv.ui: Color picker
-
-libv.ui: Docker layout with movable components (frames), who handles which responsibility? Think about it and postpone this task
-
-libv.ui: group: RadioButton
-libv.ui: Splitter
-libv.ui: composite: TextField (Label, TableImage, Label, +Events)
-libv.ui: possible component list https://en.wikipedia.org/wiki/Widget_(GUI)
-
-libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations
-
-libv.ui.warning: warning if percent used inside a content is invalid | not just log, but a generalized ui report system | console with extras | Cancel! 100%+ is valid (Example: button with a 120% shadow around it)
 
 libv.glr: MAYOR OVERHAUL: remove the queue, use thread local GLR context variable access, remove the idea of sorting, switch to immediate mode
 
@@ -1492,7 +1281,6 @@ libv.gl: Check on TextureRect if it is working properly (attempted to use it in 
 libv.glr: Mesh attributes inside the remote should be stable, vector<unique_ptr<Attribute>>
 libv.glr: Mesh attributes should use a single VBO
 
-libv.ui: Label link support (?)
 libv.glr: Procedural gizmo mesh
 libv.glr: UniformBlockSharedView_std140
 
@@ -1505,10 +1293,6 @@ libv.ui.layout: Flow
 libv.ui.layout: 2D <-> 3D based on game state
 libv.ui: ui <-> 3D layout linkage: planet names and additional information is part of the ui and not the scene
 		ui therefore has to access the game state (trivial, but this code has to happen now)
-
-libv.ui: text | easy text
-libv.ui: idea: A component could signal the UI if it want to execute a heavy computation task before (attach, layout, create, render, destroy)
-libv.ui: String2D scream at the user if the API get a \r (or any non printable character beside \n \t), and ignore it
 
 libv.glr: strong type locations and indices with enum classes, also use libv::gl::uniform
 libv.glr: Fix uniform naming mess, Reduce the number of public members
@@ -1553,8 +1337,6 @@ libv.frame.input: Question should I couple scancode with key for each key states
 libv.frame: remove clipboard support, ext clip will take care of it.
 
 libv.utility: pointer facade for: observer_ptr, observer_ref, etc...
-
-libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Events are timed (a lot of timestamp)
 
 ext.sol2: update and there is a new fwd header, use it if/where appropriate: sol_forward.hpp
 cpp: enun class default underlying type is int, specify underlying type for every enum class

@@ -68,14 +68,13 @@ libv.rev: Add block binding support on shader uniform container level
 
 
 
-libv.gl: Add support for anisotropic filtering
+libv.gl: Add support for anisotropic filtering (not always available)
 libv.glr: Add support for anisotropic filtering
 			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 
 app.vm4viewer: adopt libv.rev's Shader and ShaderLoader
-libv.ui: adopt libv.rev's Shader and ShaderLoader
 
 libv.gl: Add support for GL_TEXTURE_COMPARE_MODE
 libv.gl: Add support for GL_TEXTURE_COMPARE_FUNC
