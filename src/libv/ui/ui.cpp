@@ -19,7 +19,7 @@
 #include <variant>
 #include <vector>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/chrono.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>

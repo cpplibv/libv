@@ -3,10 +3,10 @@
 // hpp
 #include <libv/ui/basic_event_proxy.hpp>
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
 
 
 namespace libv {
@@ -16,8 +16,8 @@ namespace detail {
 // -------------------------------------------------------------------------------------------------
 
 void internal_connect(Component& signal, Component& slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback) {
-	auto signal_c = &signal.core();
-	auto slot_c = &slot.core();
+	auto signal_c = get_core(signal);
+	auto slot_c = get_core(slot);
 
 	signal_c->flagDirect(Flag::signal);
 	slot_c->flagDirect(Flag::slot);
@@ -26,7 +26,7 @@ void internal_connect(Component& signal, Component& slot, std::type_index event_
 }
 
 void internal_connect_global(Component& slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback) {
-	auto slot_c = &slot.core();
+	auto slot_c = get_core(slot);
 	slot_c->flagDirect(Flag::slot);
 	slot_c->context().event.connect_global(slot_c, event_type, front, system, std::move(callback));
 }
@@ -40,7 +40,7 @@ void internal_disconnect(CoreComponent* component) {
 }
 
 void internal_fire(Component& signal, std::type_index event_type, const void* event_ptr) {
-	internal_fire(&signal.core(), event_type, event_ptr);
+	internal_fire(get_core(signal), event_type, event_ptr);
 }
 
 void internal_fire(CoreComponent* signal, std::type_index event_type, const void* event_ptr) {
@@ -50,7 +50,7 @@ void internal_fire(CoreComponent* signal, std::type_index event_type, const void
 }
 
 void internal_fire_global(Component& ctx, std::type_index event_type, const void* event_ptr) {
-	internal_fire_global(ctx.core().context().event, event_type, event_ptr);
+	internal_fire_global(get_core(ctx)->context().event, event_type, event_ptr);
 }
 
 void internal_fire_global(ContextEvent& ctx, std::type_index event_type, const void* event_ptr) {

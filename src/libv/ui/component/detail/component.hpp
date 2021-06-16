@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/detail/component.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -6,10 +6,9 @@
 #include <libv/math/vec.hpp>
 // std
 #include <string>
-#include <string_view>
 // pro
+#include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/event_host.hpp>
-#include <libv/ui/generate_name.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
@@ -21,25 +20,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-using core_ptr = class CoreComponent*;
-
-template <typename T, typename... Args>
-[[nodiscard]] inline core_ptr create_core_ptr(Args&&... args) noexcept {
-	return new T(std::forward<Args>(args)...);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 /// Handler class for components
 /// @Warning: Derived classes must not contain any data member
 class Component {
 private:
 	core_ptr ptr = nullptr;
 
-//protected:
-//	Component() noexcept = default;
 public:
 	Component() noexcept = delete;
+
+	explicit Component(core_ptr ptr_) noexcept;
 
 public:
 	Component(const Component& other) noexcept;
@@ -47,9 +37,6 @@ public:
 	Component& operator=(const Component& other) & noexcept;
 	Component& operator=(Component&& other) & noexcept;
 	~Component() noexcept;
-
-protected:
-	explicit Component(core_ptr ptr_) noexcept;
 
 public:
 	[[nodiscard]] inline EventHostGeneral<Component> event() noexcept {
@@ -102,42 +89,6 @@ public:
 
 	friend inline bool operator!=(const Component& lhs, const Component& rhs) noexcept {
 		return lhs.ptr != rhs.ptr;
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename ComponentT, typename EventHostT>
-struct ComponentHandler : public Component {
-private:
-	static inline size_t nextID = 0;
-
-protected:
-	template <typename DelayedT = ComponentT>
-	explicit inline ComponentHandler(std::string name) :
-		Component(create_core_ptr<DelayedT>(std::move(name))) { }
-
-	template <typename DelayedT = ComponentT>
-	explicit inline ComponentHandler(GenerateName_t = {}, const std::string_view type = "component") :
-		Component(create_core_ptr<DelayedT>(GenerateName, type, nextID++)) { }
-
-	explicit inline ComponentHandler(core_ptr ptr) noexcept :
-		Component(ptr) {
-
-		assert(dynamic_cast<ComponentT*>(ptr) != nullptr && "Invalid component pointer initialization");
-	}
-
-protected:
-	[[nodiscard]] constexpr inline ComponentT& self() noexcept {
-		return static_cast<ComponentT&>(core());
-	}
-	[[nodiscard]] constexpr inline const ComponentT& self() const noexcept {
-		return static_cast<const ComponentT&>(core());
-	}
-
-public:
-	[[nodiscard]] inline EventHostT event() noexcept {
-		return EventHostT{static_cast<typename EventHostT::component_type&>(*this)};
 	}
 };
 

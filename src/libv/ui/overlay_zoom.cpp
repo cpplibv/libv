@@ -12,7 +12,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
@@ -323,21 +323,13 @@ void CoreOverlayZoom::postRender(Renderer& r) {
 	});
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-OverlayZoom::OverlayZoom(std::string name) :
-	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(std::move(name)) {
-	self().init();
-}
-
-OverlayZoom::OverlayZoom(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(gen, type) {
-	self().init();
-}
-
-OverlayZoom::OverlayZoom(core_ptr core) noexcept :
-	ComponentHandler<CoreOverlayZoom, EventHostGeneral<OverlayZoom>>(core) {
-	self().init();
+core_ptr OverlayZoom::create_core(std::string name) {
+	auto core = create_core_ptr<CoreOverlayZoom>(std::move(name));
+	// TODO P5: Try to find a way to get back the ctors
+	static_cast<CoreOverlayZoom*>(core)->init();
+	return core;
 }
 
 // -------------------------------------------------------------------------------------------------

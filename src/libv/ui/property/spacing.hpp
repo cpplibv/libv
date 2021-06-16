@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property/padding.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/property/spacing.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

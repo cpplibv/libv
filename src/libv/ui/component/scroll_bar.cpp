@@ -16,7 +16,7 @@
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/event/event_mouse.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
@@ -544,14 +544,9 @@ void CoreScrollBar::make_scroll(double amount) noexcept {
 
 // =================================================================================================
 
-ScrollBar::ScrollBar(std::string name) :
-		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(std::move(name)) { }
-
-ScrollBar::ScrollBar(GenerateName_t gen, const std::string_view type) :
-		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(gen, type) { }
-
-ScrollBar::ScrollBar(core_ptr core) noexcept :
-		ComponentHandler<CoreScrollBar, EventHostScroll<ScrollBar>>(core) { }
+core_ptr ScrollBar::create_core(std::string name) {
+	return create_core_ptr<CoreScrollBar>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

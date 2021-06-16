@@ -7,7 +7,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
@@ -20,7 +20,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreLabel : CoreComponent {
+struct CoreLabel : public CoreComponent {
 	friend class Label;
 	[[nodiscard]] inline auto handler() { return Label{this}; }
 
@@ -37,7 +37,9 @@ private:
 		PropertyL<> font_size;
 	} property;
 
-private:
+//private:
+//protected:
+public:
 	TextLayout text_;
 
 public:
@@ -131,16 +133,11 @@ void CoreLabel::doRender(Renderer& r) {
 			property.font_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Label::Label(std::string name) :
-	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(std::move(name)) { }
-
-Label::Label(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(gen, type) { }
-
-Label::Label(core_ptr core) noexcept :
-	ComponentHandler<CoreLabel, EventHostGeneral<Label>>(core) { }
+core_ptr Label::create_core(std::string name) {
+	return create_core_ptr<CoreLabel>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

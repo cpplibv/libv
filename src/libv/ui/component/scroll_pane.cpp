@@ -13,7 +13,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
 
@@ -317,14 +317,9 @@ void CoreScrollArea::doForeachChildren(libv::function_ref<void(Component&)> call
 
 // =================================================================================================
 
-ScrollArea::ScrollArea(std::string name) :
-	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(std::move(name)) { }
-
-ScrollArea::ScrollArea(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(gen, type) { }
-
-ScrollArea::ScrollArea(core_ptr core) noexcept :
-	ComponentHandler<CoreScrollArea, EventHostScrollArea<ScrollArea>>(core) { }
+core_ptr ScrollArea::create_core(std::string name) {
+	return create_core_ptr<CoreScrollArea>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

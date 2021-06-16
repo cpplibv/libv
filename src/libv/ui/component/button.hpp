@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -17,11 +17,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Button : public ComponentHandler<class CoreButton, EventHostSubmittable<Button>> {
+class Button : public ComponentAPI<Component, Button, class CoreButton, EventHostSubmittable> {
 public:
-	explicit Button(std::string name);
-	explicit Button(GenerateName_t = {}, const std::string_view type = "button");
-	explicit Button(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "button";
+	static core_ptr create_core(std::string name);
 
 public:
 	void color(Color value);

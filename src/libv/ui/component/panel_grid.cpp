@@ -15,7 +15,7 @@
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
@@ -422,14 +422,9 @@ void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 
 // =================================================================================================
 
-PanelGrid::PanelGrid(std::string name) :
-	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(std::move(name)) { }
-
-PanelGrid::PanelGrid(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(gen, type) { }
-
-PanelGrid::PanelGrid(core_ptr core) noexcept :
-	ComponentHandler<CorePanelGrid, EventHostGeneral<PanelGrid>>(core) { }
+core_ptr PanelGrid::create_core(std::string name) {
+	return create_core_ptr<CorePanelGrid>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

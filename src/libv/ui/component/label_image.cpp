@@ -7,7 +7,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_access_context.hpp>
@@ -162,16 +162,11 @@ void CoreLabelImage::doRender(Renderer& r) {
 			property.font_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-LabelImage::LabelImage(std::string name) :
-	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(std::move(name)) { }
-
-LabelImage::LabelImage(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(gen, type) { }
-
-LabelImage::LabelImage(core_ptr core) noexcept :
-	ComponentHandler<CoreLabelImage, EventHostGeneral<LabelImage>>(core) { }
+core_ptr LabelImage::create_core(std::string name) {
+	return create_core_ptr<CoreLabelImage>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

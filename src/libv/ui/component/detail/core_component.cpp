@@ -1,12 +1,11 @@
-// Project: libv.ui, File: src/libv/ui/core_component.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/detail/core_component.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/core_component.hpp>
-// libv
-#include <libv/utility/concat.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 // std
 #include <cassert>
 // pro
+#include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/context/context_event.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
@@ -20,8 +19,6 @@
 #include <libv/ui/log.hpp>
 #include <libv/ui/style.hpp>
 
-#include <libv/ui/component.hpp>
-
 
 namespace libv {
 namespace ui {
@@ -31,10 +28,6 @@ namespace ui {
 CoreComponent::CoreComponent(std::string name) :
 	context_(current_thread_context()),
 	name(std::move(name)) { }
-
-CoreComponent::CoreComponent(GenerateName_t, const std::string_view type, size_t index) :
-	context_(current_thread_context()),
-	name(libv::concat(type, '-', index)) { }
 
 CoreComponent::~CoreComponent() {
 	log_ui.error_if(isAttached(), "Component is destructed in an attached state: {}", path());
@@ -91,7 +84,7 @@ void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 		Flag_t childFlags = Flag::none;
 
 		it->doForeachChildren([&childFlags](Component& child) {
-			childFlags |= child.core().flags;
+			childFlags |= get_core(child)->flags;
 		});
 
 		if (it->flags.match_mask(Flag::mask_propagate, childFlags))
@@ -204,7 +197,7 @@ void CoreComponent::markRemove() noexcept {
 	flags.reset(Flag::layout | Flag::render);
 
 	doForeachChildren([](Component& child) {
-		child.markRemove();
+		get_core(child)->markRemove();
 	});
 }
 
@@ -309,8 +302,8 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 
 	if (flags.match_any(Flag::pendingAttachChild)) {
 		doForeachChildren([this](Component& child) {
-			if (child.core().flags.match_any(Flag::pendingAttach))
-				child.core().attach(*this);
+			if (get_core(child)->flags.match_any(Flag::pendingAttach))
+				get_core(child)->attach(*this);
 		});
 		flags.reset(Flag::pendingAttachChild);
 	}
@@ -323,13 +316,13 @@ void CoreComponent::detach(CoreComponent& old_parent) {
 		Flag_t childFlags = Flag::none;
 
 		doDetachChildren([this, &childFlags](Component& child) {
-			bool remove = child.core().flags.match_any(Flag::pendingDetachSelf);
+			bool remove = get_core(child)->flags.match_any(Flag::pendingDetachSelf);
 
-			if (child.core().flags.match_any(Flag::pendingDetach))
-				child.core().detach(*this);
+			if (get_core(child)->flags.match_any(Flag::pendingDetach))
+				get_core(child)->detach(*this);
 
 			if (!remove)
-				childFlags |= child.core().flags;
+				childFlags |= get_core(child)->flags;
 
 			return remove;
 		});
@@ -377,8 +370,8 @@ void CoreComponent::style() {
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
 		doForeachChildren([](Component& child) {
-			if (child.core().flags.match_any(Flag::pendingStyle))
-				child.core().style();
+			if (get_core(child)->flags.match_any(Flag::pendingStyle))
+				get_core(child)->style();
 		});
 		flags.reset(Flag::pendingStyleChild);
 	}
@@ -391,7 +384,7 @@ void CoreComponent::styleScan() {
 		parent_->doStyle(ctx, childID);
 	}
 	doForeachChildren([](Component& child) {
-		child.core().styleScan();
+		get_core(child)->styleScan();
 	});
 	flags.reset(Flag::pendingStyle);
 }
@@ -444,7 +437,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 		} else {
 			// Layout the children only
 			doForeachChildren([&layout_env](Component& child) {
-				child.core().layout2(layout_env.enter(child.layout_position(), child.layout_size()));
+				get_core(child)->layout2(layout_env.enter(get_core(child)->layout_position(), get_core(child)->layout_size()));
 			});
 			log_ui.trace("   |   {:>11}, {:>11}, {}", xy(layout_position_), xy(layout_size_), path());
 		}

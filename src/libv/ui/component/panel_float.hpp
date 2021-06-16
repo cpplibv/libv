@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
 
@@ -13,11 +13,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFloat : public ComponentHandler<class CorePanelFloat, EventHostGeneral<PanelFloat>> {
+class PanelFloat : public ComponentAPI<Component, PanelFloat, class CorePanelFloat, EventHostGeneral> {
 public:
-	explicit PanelFloat(std::string name);
-	explicit PanelFloat(GenerateName_t = {}, const std::string_view type = "float");
-	explicit PanelFloat(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "float";
+	static core_ptr create_core(std::string name);
 
 public:
 	void snap_to_edge(SnapToEdge value);

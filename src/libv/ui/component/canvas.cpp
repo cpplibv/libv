@@ -8,7 +8,7 @@
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/style.hpp>
 
@@ -97,16 +97,11 @@ void CoreCanvasAdaptor::doDestroy(Renderer& r) {
 	});
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-CanvasAdaptor::CanvasAdaptor(std::string name) :
-	ComponentHandler<CoreCanvasAdaptor, EventHostGeneral<CanvasAdaptor>>(std::move(name)) { }
-
-CanvasAdaptor::CanvasAdaptor(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreCanvasAdaptor, EventHostGeneral<CanvasAdaptor>>(gen, type) { }
-
-CanvasAdaptor::CanvasAdaptor(core_ptr core) noexcept :
-	ComponentHandler<CoreCanvasAdaptor, EventHostGeneral<CanvasAdaptor>>(core) { }
+core_ptr CanvasAdaptor::create_core(std::string name) {
+	return create_core_ptr<CoreCanvasAdaptor>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

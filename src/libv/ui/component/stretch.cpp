@@ -7,7 +7,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
@@ -137,16 +137,11 @@ void CoreStretch::doRender(Renderer& r) {
 	r.end(property.bg_image(), property.bg_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Stretch::Stretch(std::string name) :
-	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(std::move(name)) { }
-
-Stretch::Stretch(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(gen, type) { }
-
-Stretch::Stretch(core_ptr core) noexcept :
-	ComponentHandler<CoreStretch, EventHostGeneral<Stretch>>(core) { }
+core_ptr Stretch::create_core(std::string name) {
+	return create_core_ptr<CoreStretch>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

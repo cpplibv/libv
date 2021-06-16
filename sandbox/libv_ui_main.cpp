@@ -18,6 +18,7 @@
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component/panel_status_log.hpp>
 #include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
@@ -63,6 +64,8 @@ private:
 	libv::ui::ScrollBar scroll_bar_iy;
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
+	libv::ui::PanelLine status_log;
+//	libv::ui::PanelStatusLog status_log;
 
 public:
 	SandboxFrame() :
@@ -270,6 +273,13 @@ public:
 		}
 		panel_line_scrolled.add(image);
 
+		for (int i = 0; i < 5; ++i) {
+			libv::ui::Label tmp;
+			tmp.text(fmt::format("status entry {}", i));
+//			status_log.add(i, tmp);
+			status_log.add(tmp);
+		}
+
 		panel_full.add(button1);
 
 		panel_float.add(button2);
@@ -293,6 +303,7 @@ public:
 		panel_grid.add(scroll_bar_y);
 		panel_grid.add(scroll_bar_ix);
 		panel_grid.add(scroll_bar_iy);
+		panel_grid.add(label);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
 //		panel_line.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
@@ -301,9 +312,9 @@ public:
 		panel_line.spacing(libv::ui::Spacing{6});
 //		panel_line.spacing(libv::ui::Spacing{2});
 		panel_line.add(panel_grid);
+		panel_line.add(status_log);
 		panel_line.add(button);
 		panel_line.add(scroll_area_outer);
-		panel_line.add(label);
 		panel_line.add(label_image2);
 
 		ui.add(panel_line);

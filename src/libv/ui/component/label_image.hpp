@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -17,11 +17,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class LabelImage : public ComponentHandler<class CoreLabelImage, EventHostGeneral<LabelImage>> {
+class LabelImage : public ComponentAPI<Component, LabelImage, class CoreLabelImage, EventHostGeneral> {
 public:
-	explicit LabelImage(std::string name);
-	explicit LabelImage(GenerateName_t = {}, const std::string_view type = "label-image");
-	explicit LabelImage(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "label-image";
+	static core_ptr create_core(std::string name);
 
 public:
 	void color(Color value);

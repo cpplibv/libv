@@ -9,7 +9,7 @@
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -473,16 +473,11 @@ void CoreInputField::doRender(Renderer& r) {
 	}
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-InputField::InputField(std::string name) :
-	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(std::move(name)) { }
-
-InputField::InputField(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(gen, type) { }
-
-InputField::InputField(core_ptr core) noexcept :
-	ComponentHandler<CoreInputField, EventHostEditable<InputField>>(core) { }
+core_ptr InputField::create_core(std::string name) {
+	return create_core_ptr<CoreInputField>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

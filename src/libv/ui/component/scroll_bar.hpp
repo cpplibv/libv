@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/orientation.hpp>
@@ -34,7 +34,12 @@ struct EventHostScroll : EventHostGeneral<ComponentT> {
 
 // -------------------------------------------------------------------------------------------------
 
-class ScrollBar : public ComponentHandler<class CoreScrollBar, EventHostScroll<ScrollBar>> {
+class ScrollBar : public ComponentAPI<Component, ScrollBar, class CoreScrollBar, EventHostScroll> {
+public:
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "s-bar";
+	static core_ptr create_core(std::string name);
+
 public:
 //	enum class BarMode : uint8_t {
 //		bar_range = 0,
@@ -42,11 +47,6 @@ public:
 //		fill_high,
 //		fill_low,
 //	};
-
-public:
-	explicit ScrollBar(std::string name);
-	explicit ScrollBar(GenerateName_t = {}, const std::string_view type = "s-bar");
-	explicit ScrollBar(core_ptr core) noexcept;
 
 public:
 	void value(double value);

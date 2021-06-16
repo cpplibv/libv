@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -15,11 +15,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Label : public ComponentHandler<class CoreLabel, EventHostGeneral<Label>> {
+class Label : public ComponentAPI<Component, Label, class CoreLabel, EventHostGeneral> {
 public:
-	explicit Label(std::string name);
-	explicit Label(GenerateName_t = {}, const std::string_view type = "label");
-	explicit Label(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "label";
+	static core_ptr create_core(std::string name);
 
 public:
 	void align_horizontal(AlignHorizontal value);

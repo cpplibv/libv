@@ -5,8 +5,8 @@
 // std
 #include <vector>
 // pro
-#include <libv/ui/core_component.hpp>
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/detail/component.hpp>
 
 
 namespace libv {

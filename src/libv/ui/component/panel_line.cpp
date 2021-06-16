@@ -2,6 +2,7 @@
 
 // hpp
 #include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/component/panel_line_core.hpp>
 // ext
 #include <boost/container/small_vector.hpp>
 #include <range/v3/view/zip.hpp>
@@ -10,7 +11,7 @@
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
@@ -22,39 +23,6 @@
 
 namespace libv {
 namespace ui {
-
-// -------------------------------------------------------------------------------------------------
-
-class CorePanelLine : public CoreBasePanel {
-	friend class PanelLine;
-	[[nodiscard]] inline auto handler() { return PanelLine{this}; }
-
-private:
-	struct Properties {
-		PropertyL<AlignHorizontal> align_horizontal;
-		PropertyL<AlignVertical> align_vertical;
-		PropertyL<Orientation> orientation;
-		PropertyL<Spacing> spacing;
-	} property;
-
-	struct ChildProperties {
-	};
-
-	template <typename T> static void access_properties(T& ctx);
-	template <typename T> static void access_child_properties(T& ctx);
-
-//	static ComponentPropertyDescription description;
-//	static ComponentPropertyDescription child_description;
-
-public:
-	using CoreBasePanel::CoreBasePanel;
-
-private:
-	virtual void doStyle(ContextStyle& context) override;
-	virtual void doStyle(ContextStyle& context, ChildID childID) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
-	virtual void doLayout2(const ContextLayout2& le) override;
-};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -99,41 +67,6 @@ static constexpr AlignmentData AlignmentTableV[] = {
 };
 
 } // namespace
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T>
-void CorePanelLine::access_properties(T& ctx) {
-	ctx.property(
-			[](auto& c) -> auto& { return c.align_horizontal; },
-			AlignHorizontal::left,
-			pgr::layout, pnm::align_horizontal,
-			"Horizontal align of the inner content of the component"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.align_vertical; },
-			AlignVertical::top,
-			pgr::layout, pnm::align_vertical,
-			"Vertical align of the inner content of the component"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.orientation; },
-			Orientation::LEFT_TO_RIGHT,
-			pgr::layout, pnm::orientation,
-			"Orientation of subsequent components"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.spacing; },
-			Spacing{0},
-			pgr::layout, pnm::spacing,
-			"Spacing between the components along the orientation"
-	);
-}
-
-template <typename T>
-void CorePanelLine::access_child_properties(T& ctx) {
-	(void) ctx;
-}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -303,14 +236,9 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 
 // =================================================================================================
 
-PanelLine::PanelLine(std::string name) :
-	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(std::move(name)) { }
-
-PanelLine::PanelLine(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(gen, type) { }
-
-PanelLine::PanelLine(core_ptr core) noexcept :
-	ComponentHandler<CorePanelLine, EventHostGeneral<PanelLine>>(core) { }
+core_ptr PanelLine::create_core(std::string name) {
+	return create_core_ptr<CorePanelLine>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

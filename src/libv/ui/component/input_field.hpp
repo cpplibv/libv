@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -60,11 +60,11 @@ struct EventHostEditable : EventHostSubmittable<ComponentT> {
 
 // -------------------------------------------------------------------------------------------------
 
-class InputField : public ComponentHandler<class CoreInputField, EventHostEditable<InputField>> {
+class InputField : public ComponentAPI<Component, InputField, class CoreInputField, EventHostEditable> {
 public:
-	explicit InputField(std::string name);
-	explicit InputField(GenerateName_t = {}, const std::string_view type = "input-field");
-	explicit InputField(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "input-field";
+	static core_ptr create_core(std::string name);
 
 public:
 	void color(Color value);

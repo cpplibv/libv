@@ -6,7 +6,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
@@ -76,16 +76,11 @@ void CoreQuad::doRender(Renderer& r) {
 			property.quad_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Quad::Quad(std::string name) :
-	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(std::move(name)) { }
-
-Quad::Quad(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(gen, type) { }
-
-Quad::Quad(core_ptr core) noexcept :
-	ComponentHandler<CoreQuad, EventHostGeneral<Quad>>(core) { }
+core_ptr Quad::create_core(std::string name) {
+	return create_core_ptr<CoreQuad>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

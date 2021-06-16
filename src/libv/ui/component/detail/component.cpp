@@ -1,9 +1,11 @@
-// Project: libv.ui, File: src/libv/ui/component.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/detail/component.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component.hpp>
+// libv
+#include <libv/utility/concat.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 
 
 namespace libv {
@@ -11,26 +13,15 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-//template <typename T, typename... Args>
-//core_ptr create_core_ptr(Args&&... args) noexcept {
-//	static_assert(std::is_base_of_v<CoreComponent, T>, "");
-//
-//	return new T(std::forward<Args>(args)...);
-//}
-//
-//void add_ref_core_ptr(core_ptr ptr) noexcept {
-//	++ptr->ref_count;
-//}
-//
-//bool remove_ref_core_ptr(core_ptr ptr) noexcept {
-//	return --ptr->ref_count == 0;
-//}
-//
-//void destroy_core_ptr(core_ptr ptr) noexcept {
-//	delete ptr;
-//}
+std::string generate_component_name(const std::string_view type, size_t index) noexcept {
+	return libv::concat(type, '-', index);
+}
 
-// -------------------------------------------------------------------------------------------------
+Component::Component(core_ptr ptr_) noexcept :
+	ptr(std::move(ptr_)) {
+	assert(ptr != nullptr && "Internal error: Component cannot be null");
+	++ptr->ref_count;
+}
 
 Component::Component(const Component& other) noexcept {
 	ptr = other.ptr;
@@ -57,12 +48,6 @@ Component& Component::operator=(Component&& other) & noexcept {
 Component::~Component() noexcept {
 	if (ptr && --ptr->ref_count == 0)
 		delete ptr;
-}
-
-Component::Component(core_ptr ptr_) noexcept :
-	ptr(std::move(ptr_)) {
-	assert(ptr != nullptr && "Internal error: Component cannot be null");
-	++ptr->ref_count;
 }
 
 bool Component::isFloatRegion() const noexcept {

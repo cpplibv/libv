@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/texture_2D.hpp>
@@ -14,11 +14,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Stretch : public ComponentHandler<class CoreStretch, EventHostGeneral<Stretch>> {
+class Stretch : public ComponentAPI<Component, Stretch, class CoreStretch, EventHostGeneral> {
 public:
-	explicit Stretch(std::string name);
-	explicit Stretch(GenerateName_t = {}, const std::string_view type = "image");
-	explicit Stretch(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "stretch";
+	static core_ptr create_core(std::string name);
 
 public:
 	void color(Color value);

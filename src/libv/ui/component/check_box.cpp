@@ -6,7 +6,7 @@
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>
 // pro
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
@@ -258,16 +258,11 @@ namespace ui {
 //	}
 //}
 //
-//// -------------------------------------------------------------------------------------------------
+//// =================================================================================================
 //
-//RadioButton::RadioButton(std::string name) :
-//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(std::move(name)) { }
-//
-//RadioButton::RadioButton(GenerateName_t gen, const std::string_view type) :
-//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(gen, type) { }
-//
-//RadioButton::RadioButton(core_ptr core) noexcept :
-//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(core) { }
+//core_ptr RadioButton::create_core(std::string name) {
+//	return create_core_ptr<CoreRadioButton>(std::move(name));
+//}
 //
 //// -------------------------------------------------------------------------------------------------
 //

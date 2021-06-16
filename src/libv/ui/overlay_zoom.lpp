@@ -5,7 +5,7 @@
 // libv
 #include <libv/math/vec.hpp>
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/event_host.hpp>
 
 
@@ -20,11 +20,11 @@ enum class OverlayZoomMode {
 	view,
 };
 
-class OverlayZoom : public ComponentHandler<class CoreOverlayZoom, EventHostGeneral<OverlayZoom>> {
+class OverlayZoom : public ComponentAPI<Component, OverlayZoom, class CoreOverlayZoom, EventHostGeneral> {
 public:
-	explicit OverlayZoom(std::string name);
-	explicit OverlayZoom(GenerateName_t = {}, const std::string_view type = "overlay-zoom");
-	explicit OverlayZoom(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "overlay-zoom";
+	static core_ptr create_core(std::string name);
 
 public:
 	void control();

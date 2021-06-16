@@ -12,7 +12,7 @@
 #include <string>
 #include <string_view>
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/log.hpp>

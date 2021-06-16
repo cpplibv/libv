@@ -13,7 +13,7 @@
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component.hpp>
 #include <libv/ui/font_2D.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>

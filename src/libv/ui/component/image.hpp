@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/texture_2D.hpp>
@@ -14,11 +14,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Image : public ComponentHandler<class CoreImage, EventHostGeneral<Image>> {
+class Image : public ComponentAPI<Component, Image, class CoreImage, EventHostGeneral> {
 public:
-	explicit Image(std::string name);
-	explicit Image(GenerateName_t = {}, const std::string_view type = "image");
-	explicit Image(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "image";
+	static core_ptr create_core(std::string name);
 
 public:
 	void color(Color value);

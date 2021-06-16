@@ -8,7 +8,7 @@
 #include <string_view>
 #include <type_traits>
 // pro
-//#include <libv/ui/core_component.hpp>
+//#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/style.hpp>
 
 
@@ -26,7 +26,7 @@ class CoreComponent;
 //	std::string name;
 //	std::string description;
 //
-//	virtual std::shared_ptr<CoreComponent> makeEditor() = 0;
+//	virtual Component makeEditor() = 0;
 //	virtual std::string toString() = 0;
 //	virtual ~BasePropertyInfo() = default;
 //};
@@ -52,18 +52,18 @@ class CoreComponent;
 // -------------------------------------------------------------------------------------------------
 
 /// Style setter
-template <typename Owner>
+template <typename CoreOwner>
 struct PropertyAccessContext {
-	Owner& owner;
+	CoreOwner& owner;
 	CoreComponent& component;
 	libv::observer_ptr<Style> style;
 	ContextUI& context;
 
 private:
 	template <typename Access>
-	using access_value_type_t = typename std::remove_cvref_t<decltype(std::declval<const Access&>()(std::declval<Owner&>()))>::value_type;
+	using access_value_type_t = typename std::remove_cvref_t<decltype(std::declval<const Access&>()(std::declval<CoreOwner&>()))>::value_type;
 	template <typename Get>
-	using get_value_type_t = std::remove_cvref_t<decltype(std::declval<const Get&>()(std::declval<Owner&>()))>;
+	using get_value_type_t = std::remove_cvref_t<decltype(std::declval<const Get&>()(std::declval<CoreOwner&>()))>;
 
 //	template <typename Access>
 //	static constexpr bool is_access_v = false;

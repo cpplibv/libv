@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/core_component.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/detail/core_component.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -13,8 +13,8 @@
 #include <string_view>
 #include <typeindex>
 // pro
-#include <libv/ui/flag.hpp>
-#include <libv/ui/generate_name.hpp>
+#include <libv/ui/component/detail/generate_name.hpp>
+#include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the std::variant is killing me)
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
@@ -35,6 +35,7 @@ class ContextLayout1;
 class ContextLayout2;
 class ContextStyle;
 class ContextUI;
+class CoreComponent;
 class EventChar;
 class EventFocus;
 class EventKey;
@@ -42,6 +43,12 @@ class EventMouseButton;
 class EventMouseMovement;
 class EventMouseScroll;
 class Renderer;
+
+namespace detail {
+// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
+void internal_fire(CoreComponent* signal, std::type_index event_type, const void* event_ptr);
+void internal_disconnect(CoreComponent* component);
+} // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 
@@ -88,7 +95,6 @@ public:
 
 public:
 	explicit CoreComponent(std::string name);
-	explicit CoreComponent(GenerateName_t, const std::string_view type, size_t index);
 
 	CoreComponent(const CoreComponent&) = delete;
 	CoreComponent(CoreComponent&&) = delete;
@@ -342,11 +348,6 @@ inline void CoreComponent::reset(Property& property) {
 }
 
 // -------------------------------------------------------------------------------------------------
-
-namespace detail {
-// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
-void internal_fire(class CoreComponent* signal, std::type_index event_type, const void* event_ptr);
-} // namespace detail
 
 template <typename Event>
 inline void CoreComponent::fire(const Event& event) {

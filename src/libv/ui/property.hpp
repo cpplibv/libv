@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <variant>
 // pro
-#include <libv/ui/flag.hpp>
+#include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/color.hpp>

@@ -126,14 +126,9 @@ void CorePanelFull::doLayout2(const ContextLayout2& layout_env) {
 
 // =================================================================================================
 
-PanelFull::PanelFull(std::string name) :
-	ComponentHandler<CorePanelFull, EventHostGeneral<PanelFull>>(std::move(name)) { }
-
-PanelFull::PanelFull(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CorePanelFull, EventHostGeneral<PanelFull>>(gen, type) { }
-
-PanelFull::PanelFull(core_ptr core) noexcept :
-	ComponentHandler<CorePanelFull, EventHostGeneral<PanelFull>>(core) { }
+core_ptr PanelFull::create_core(std::string name) {
+	return create_core_ptr<CorePanelFull>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

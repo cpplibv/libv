@@ -3,7 +3,7 @@
 #pragma once
 
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/orientation2.hpp>
 #include <libv/ui/property/spacing.hpp>
@@ -14,11 +14,11 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelGrid : public ComponentHandler<class CorePanelGrid, EventHostGeneral<PanelGrid>> {
+class PanelGrid : public ComponentAPI<Component, PanelGrid, class CorePanelGrid, EventHostGeneral> {
 public:
-	explicit PanelGrid(std::string name);
-	explicit PanelGrid(GenerateName_t = {}, const std::string_view type = "grid");
-	explicit PanelGrid(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "grid";
+	static core_ptr create_core(std::string name);
 
 public:
 	void column_count(ColumnCount value);

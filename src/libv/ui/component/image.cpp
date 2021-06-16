@@ -7,7 +7,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
@@ -87,16 +87,11 @@ void CoreImage::doRender(Renderer& r) {
 			property.bg_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Image::Image(std::string name) :
-	ComponentHandler<CoreImage, EventHostGeneral<Image>>(std::move(name)) { }
-
-Image::Image(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreImage, EventHostGeneral<Image>>(gen, type) { }
-
-Image::Image(core_ptr core) noexcept :
-	ComponentHandler<CoreImage, EventHostGeneral<Image>>(core) { }
+core_ptr Image::create_core(std::string name) {
+	return create_core_ptr<CoreImage>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 

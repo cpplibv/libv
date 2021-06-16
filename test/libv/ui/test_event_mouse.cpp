@@ -9,7 +9,7 @@
 // pro
 #include <libv/ui/context/context_mouse.hpp>
 //#include <libv/ui/event/mouse_watcher.hpp>
-#include <libv/ui/flag.hpp>
+#include <libv/ui/component/detail/flag.hpp>
 
 
 // -------------------------------------------------------------------------------------------------

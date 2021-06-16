@@ -5,7 +5,7 @@
 // libv
 #include <libv/glr/queue_fwd.hpp>
 // pro
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/chrono.hpp>
 
 
@@ -25,11 +25,11 @@ public:
 	virtual ~Canvas() = default;
 };
 
-class CanvasAdaptor : public ComponentHandler<class CoreCanvasAdaptor, EventHostGeneral<CanvasAdaptor>> {
+class CanvasAdaptor : public ComponentAPI<Component, CanvasAdaptor, class CoreCanvasAdaptor, EventHostGeneral> {
 public:
-	explicit CanvasAdaptor(std::string name);
-	explicit CanvasAdaptor(GenerateName_t = {}, const std::string_view type = "canvas");
-	explicit CanvasAdaptor(core_ptr core) noexcept;
+	using ComponentAPI::ComponentAPI;
+	static constexpr std::string_view component_type = "canvas";
+	static core_ptr create_core(std::string name);
 
 public:
 	void adopt(Canvas* canvas);

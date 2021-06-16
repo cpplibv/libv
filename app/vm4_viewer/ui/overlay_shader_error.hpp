@@ -1,7 +1,7 @@
 // Project: libv.ui, File: app/vm4_viewer/ui/overlay_shader_error.hpp, Author: Császár Mátyás [Vader]
 
 // libv
-#include <libv/ui/component.hpp>
+#include <libv/ui/component/detail/component.hpp>
 //#include <libv/ui/component/fwd.hpp>
 #include <libv/ui/component/panel_line.hpp>
 // std

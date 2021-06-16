@@ -7,7 +7,7 @@
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/core_component.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -225,16 +225,11 @@ void CoreButton::doRender(Renderer& r) {
 			property.font_shader());
 }
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-Button::Button(std::string name) :
-	ComponentHandler<CoreButton, EventHostSubmittable<Button>>(std::move(name)) { }
-
-Button::Button(GenerateName_t gen, const std::string_view type) :
-	ComponentHandler<CoreButton, EventHostSubmittable<Button>>(gen, type) { }
-
-Button::Button(core_ptr core) noexcept :
-	ComponentHandler<CoreButton, EventHostSubmittable<Button>>(core) { }
+core_ptr Button::create_core(std::string name) {
+	return create_core_ptr<CoreButton>(std::move(name));
+}
 
 // -------------------------------------------------------------------------------------------------
 
