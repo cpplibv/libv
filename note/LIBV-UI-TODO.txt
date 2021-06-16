@@ -3,13 +3,9 @@ libv.ui: Read nana 3rd party property tree lib API https://github.com/besh81/nan
 libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations | context_render take care of this
 libv.ui: Implement system (aka unignorable) event handlers
 libv.ui: Improve event connection (event_proxy API): operator() / connect / connect_front / connect_system
-
-
-
-
-
-
-
+libv.ui: Implement UI global dynamic event host
+libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
+libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
 
 
 
@@ -51,22 +47,18 @@ libv.ui: Improve event connection (event_proxy API): operator() / connect / conn
 
 
 
+place.it:
+	idea: bloom_filter usage if there is a 8/16/32 bit implementation of it: Component "signal"-iness per event type
+	libv: Document Padding, Margin, Spacing:
+			Padding: Not part of the component
+				| incomplete
+			Margin: Part of the background but not part of the component
+				| incomplete
+			Spacing: Container mandated padding between elements
+				| incomplete
 
 
-
-idea: bloom_filter usage if there is a 8/16/32 bit implementation of it: Component "signal"-iness per event type
-
-
-
-
-
-
-UI level message/event bus/system
-	libv.ui: UI level message/event bus/system could use support for hierarchical up-walking 'context' iteration
-	libv.ui: UI level message/event bus/system might be required: (UI Event HUB)
-			context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
-			context().events().fire("shader_reload", ...);
-
+libv.ui: (?) Rename PanelFloat to PanelAnchor
 
 
 --- Must have ---
@@ -91,14 +83,6 @@ libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or 
 			return;
 		Implement in: app.theme: control.slider.event().change
 
-libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
-		panel_grid
-		panel_line
-		panel_full
-		panel_float
-		? panel_status_log
-		? scroll_pane
-		? scroll_area
 
 libv.ui: Relative mouse coordinate access for a state
 	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
@@ -110,12 +94,15 @@ libv.ui: Relative mouse coordinate access for a state
 
 
 
-libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
-
 libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
+		should be accessible via UI too
+	libv.ui: Component scoped storage system
+			context().scoped_storage<FloatFrame>(label) : FloatFrame&
+			should be accessible via UI too
 
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
+		should be accessible via UI too
 
 libv.ui/libv.ctrl: Keyboard binding display
 
@@ -485,6 +472,11 @@ mouse
 event
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met | context_mouse.cpp
 	libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Time the events (it will be a lot of timestamp)
+	libv.ui.event.host: UI global event host (optional) support for component hierarchical up-walking iteration over handlers
+	libv.ui.event.host: UI component hierarchically scoped custom event host (just like UI global)
+	libv.ui.event.host: UI global event host support for named global channels
+			context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
+			context().events().fire("shader_reload", ShaderReportFailure{});
 
 properties / style
 	libv.ui.property: scope / sheet / component type based style rules

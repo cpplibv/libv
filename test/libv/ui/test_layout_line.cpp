@@ -9,7 +9,7 @@
 
 // TODO P5: Layout separation was removed, a ui component based testing is required, re-enable these tests
 
-// ------------------------------prometheus::prometheus::prometheus::prometheus::-------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 //namespace {
 //

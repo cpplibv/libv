@@ -34,6 +34,7 @@ private:
 		PropertyL<AlignHorizontal> align_horizontal;
 		PropertyL<AlignVertical> align_vertical;
 		PropertyL<Orientation> orientation;
+		PropertyL<Spacing> spacing;
 	} property;
 
 	struct ChildProperties {
@@ -121,6 +122,12 @@ void CorePanelLine::access_properties(T& ctx) {
 			pgr::layout, pnm::orientation,
 			"Orientation of subsequent components"
 	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.spacing; },
+			Spacing{0},
+			pgr::layout, pnm::spacing,
+			"Spacing between the components along the orientation"
+	);
 }
 
 template <typename T>
@@ -144,12 +151,21 @@ void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
-	const auto env_size = layout_env.size - padding_size3();
-
 	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
 	const auto _Z_ = orientData._Z_;
+
+	const auto num_layouted_children = std::ranges::distance(children | view_layouted());
+
+	libv::vec3f spacing_sum;
+	spacing_sum[_X_] = static_cast<float>(std::max(int64_t{0}, num_layouted_children - 1)) * property.spacing();
+	spacing_sum[_Y_] = 0;
+	spacing_sum[_Z_] = 0;
+
+	const auto env_size = layout_env.size
+			- spacing_sum
+			- padding_size3();
 
 	auto result = libv::vec3f{};
 	auto pixelX = 0.f;
@@ -189,19 +205,28 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 
 	result[_X_] = resolvePercent(pixelX + contentX, percentX, *this);
 
-	return result + padding_size3();
+	return result
+			+ spacing_sum
+			+ padding_size3();
 }
 
 void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
-	const auto env_size = layout_env.size - padding_size3();
-
 	const auto& alignHData = AlignmentTableH[property.align_horizontal()];
 	const auto& alignVData = AlignmentTableV[property.align_vertical()];
 	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
-
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
 	const auto _Z_ = orientData._Z_;
+
+	const auto num_layouted_children = std::ranges::distance(children | view_layouted());
+
+	libv::vec3f spacing_sum;
+	spacing_sum[_X_] = static_cast<float>(std::max(int64_t{0}, num_layouted_children - 1)) * property.spacing();
+	spacing_sum[_Y_] = 0;
+	spacing_sum[_Z_] = 0;
+
+	const auto percent_size = layout_env.size - padding_size3();
+	const auto env_size = layout_env.size - spacing_sum - padding_size3();
 
 	// Size ---
 
@@ -219,13 +244,14 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 		libv::meta::for_constexpr<0, 3>([&](auto&& i) {
 			childSize[i] =
 					child.size()[i].pixel +
-					child.size()[i].percent * 0.01f * env_size[i] +
+					child.size()[i].percent * 0.01f * percent_size[i] +
 					(child.size()[i].dynamic ? child_dynamic[i] : 0.f);
 		});
 
 		sumRatioX += child.size()[_X_].ratio;
 		contentX += childSize[_X_];
 	}
+//	contentX += spacing_sum[_X_];
 
 	auto leftoverX = env_size[_X_] - contentX;
 	auto ratioScalerX = sumRatioX > 0.f ? leftoverX / sumRatioX : 0.f;
@@ -240,10 +266,11 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 		sizeContent[_Y_] = std::max(sizeContent[_Y_], childSize[_Y_]);
 		sizeContent[_Z_] = std::max(sizeContent[_Z_], childSize[_Z_]);
 	}
+	sizeContent[_X_] += spacing_sum[_X_];
 
 	// Position ---
 
-	auto environmentUnused = env_size - sizeContent;
+	auto environmentUnused = env_size - sizeContent + spacing_sum;
 	const auto justifyGapX = alignHData.justifyGap * environmentUnused[_X_] / std::max(static_cast<float>(children.size()) - 1.0f, 1.0f);
 	if (alignHData.justified)
 		environmentUnused[_X_] = 0.0f;
@@ -261,8 +288,6 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 		baseToPosition[_Y_] = (sizeContent[_Y_] - childSize[_Y_]) * aligmentScale[_Y_];
 		const auto position = padding_LB3() + originToContent + contentToStart + startToPen + penToBase + baseToPosition;
 
-		startToPen[_X_] += orientData.direction[_X_] * childSize[_X_] + justifyGapX;
-
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
 
@@ -270,6 +295,9 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 				child.core(),
 				layout_env.enter(roundedPosition, roundedSize)
 		);
+
+		startToPen[_X_] += orientData.direction[_X_] * childSize[_X_] + justifyGapX;
+		startToPen[_X_] += orientData.direction[_X_] * property.spacing();
 	}
 }
 
@@ -308,6 +336,14 @@ void PanelLine::orientation(Orientation value) {
 
 Orientation PanelLine::orientation() const noexcept {
 	return self().property.orientation();
+}
+
+void PanelLine::spacing(Spacing value) {
+	AccessProperty::manual(self(), self().property.spacing, value);
+}
+
+Spacing PanelLine::spacing() const noexcept{
+	return self().property.spacing();
 }
 
 // -------------------------------------------------------------------------------------------------

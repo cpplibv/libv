@@ -29,6 +29,7 @@
 #include <libv/ui/property/shader_quad.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
+#include <libv/ui/property/spacing.hpp>
 #include <libv/ui/property/squish.hpp>
 #include <libv/ui/property/texture_2D.hpp>
 #include <libv/ui/style_fwd.hpp>
@@ -65,6 +66,8 @@ using PropertyDynamic = std::variant<
 		ShaderQuad_view,
 		Size,
 		SnapToEdge,
+		// Spacing,
+		Spacing2,
 		Squish,
 		Texture2D_view,
 
@@ -102,6 +105,8 @@ static constexpr std::string_view quad_shader = "quad_shader";
 static constexpr std::string_view scroll_area_mode = "scroll_area_mode";
 static constexpr std::string_view size = "size";
 static constexpr std::string_view snap_to_edge = "snap_to_edge";
+static constexpr std::string_view spacing = "spacing";
+static constexpr std::string_view spacing2 = "spacing2";
 static constexpr std::string_view squish = "squish";
 static constexpr std::string_view text = "text";
 static constexpr std::string_view value = "value";

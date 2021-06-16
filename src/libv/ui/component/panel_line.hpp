@@ -6,6 +6,7 @@
 #include <libv/ui/component.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/orientation.hpp>
+#include <libv/ui/property/spacing.hpp>
 
 
 namespace libv {
@@ -28,6 +29,9 @@ public:
 
 	void orientation(Orientation value);
 	[[nodiscard]] Orientation orientation() const noexcept;
+
+	void spacing(Spacing value);
+	[[nodiscard]] Spacing spacing() const noexcept;
 
 public:
 	void add(Component component);

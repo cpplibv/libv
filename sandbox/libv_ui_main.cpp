@@ -277,7 +277,9 @@ public:
 
 		panel_grid.column_count(5);
 		panel_grid.padding({5, 5, 5, 10});
+//		panel_grid.padding({5, 5, 5, 5});
 		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+		panel_grid.spacing2(libv::ui::Spacing2{1, 2});
 		panel_grid.size(libv::ui::parse_size_or_throw("1r, 3r"));
 
 		panel_grid.add(button0);
@@ -293,7 +295,11 @@ public:
 		panel_grid.add(scroll_bar_iy);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+//		panel_line.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
 		panel_line.padding({20, 10, 20, 10});
+//		panel_line.padding({5, 5, 5, 5});
+		panel_line.spacing(libv::ui::Spacing{6});
+//		panel_line.spacing(libv::ui::Spacing{2});
 		panel_line.add(panel_grid);
 		panel_line.add(button);
 		panel_line.add(scroll_area_outer);
