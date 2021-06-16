@@ -262,6 +262,12 @@ void CoreOverlayZoom::doAttach() {
 	watchFocus(true);
 	watchKey(true);
 	watchMouse(true);
+
+	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
+	// vvv Start of workaround
+	if (control_)
+		context().mouse.acquire(*this);
+	// ^^^ End of workaround
 }
 
 void CoreOverlayZoom::doLayout2(const ContextLayout2& environment) {
@@ -338,7 +344,10 @@ OverlayZoom::OverlayZoom(core_ptr core) noexcept :
 
 void OverlayZoom::control() {
 	self().control_ = true;
-	self().context().mouse.acquire(self());
+	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
+	// vvv Start of workaround (comment / uncomment)
+	//self().context().mouse.acquire(self());
+	// ^^^ Start of workaround
 }
 
 void OverlayZoom::view() {

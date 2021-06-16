@@ -138,8 +138,7 @@ void CoreComponent::watchMouse(bool value) noexcept {
 	if (flags.match_full(Flag::watchMouse) == value)
 		return;
 
-	// NOTE: pendingAttachSelf flag is used instead of isAttached to allow usage of this function in doAttach
-	if (!flags.match_any(Flag::pendingAttachSelf)) { // Already attached
+	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
 		if (value)
 			context().mouse.subscribe(*this);
 		else
@@ -153,8 +152,7 @@ void CoreComponent::floatRegion(bool value) noexcept {
 	if (flags.match_full(Flag::floatRegion) == value)
 		return;
 
-	// NOTE: pendingAttachSelf flag is used instead of isAttached to allow usage of this function in doAttach
-	if (!flags.match_any(Flag::pendingAttachSelf)) { // Already attached
+	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
 		if (value)
 			context().mouse.subscribe_region(*this);
 		else
@@ -296,15 +294,15 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 
 		log_ui.trace("Attaching {}", path());
 
-		doAttach();
-
-		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
-
 		if (flags.match_any(Flag::watchMouse))
 			context().mouse.subscribe(*this);
 
 		if (flags.match_any(Flag::floatRegion))
 			context().mouse.subscribe_region(*this);
+
+		doAttach();
+
+		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
 
 		flags.reset(Flag::pendingAttachSelf);
 	}
