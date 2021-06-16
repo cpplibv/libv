@@ -31,7 +31,7 @@ enum class CheckBoxValue {
 
 // =================================================================================================
 
-class CheckBox : public ComponentHandler<class CoreCheckBox, EventHostSubmitable<CheckBox>> {
+class CheckBox : public ComponentHandler<class CoreCheckBox, EventHostSubmittable<CheckBox>> {
 public:
 	explicit CheckBox(std::string name);
 	explicit CheckBox(GenerateName_t = {}, const std::string_view type = "check-box");

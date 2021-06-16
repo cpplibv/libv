@@ -34,23 +34,25 @@ struct EventChange : BaseEvent {
 //
 //		// Caret position
 //		int32_t caret;
+//		int32_t amount;
 //		Change change;
 //		// Change type: insert/push_back/remove/pop_back | Kind of important, could be used for optimization
 };
 
 struct EventCaret : BaseEvent {
+	// int32_t previous_caret_position;
 };
 
 struct EventSelect : BaseEvent {
 };
 
 template <typename ComponentT>
-struct EventHostEditable : EventHostSubmitable<ComponentT> {
+struct EventHostEditable : EventHostSubmittable<ComponentT> {
 	BasicEventProxy<ComponentT, EventCaret> caret;
 	BasicEventProxy<ComponentT, EventChange> change;
 	BasicEventProxy<ComponentT, EventSelect> select;
 
-	explicit inline EventHostEditable(ComponentT& core) : EventHostSubmitable<ComponentT>(core),
+	explicit inline EventHostEditable(ComponentT& core) : EventHostSubmittable<ComponentT>(core),
 		caret(core),
 		change(core),
 		select(core) {}
@@ -94,9 +96,9 @@ public:
 	void text(std::string value);
 	[[nodiscard]] const std::string& text() const noexcept;
 
-	/// 0 = Before the first character, n = Before the nth character, length() = After the last character
+	/// 0 = Before the first character, n = Before the nth character, length() = After the last character (which is also a perfectly valid position)
 	void caret(uint32_t value);
-	/// 0 = Before the first character, n = Before the nth character, length() = After the last character
+	/// 0 = Before the first character, n = Before the nth character, length() = After the last character (which is also a perfectly valid position)
 	[[nodiscard]] uint32_t caret() const noexcept;
 
 	void focus_select_policy(FocusSelectPolicy value);

@@ -17,7 +17,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Button : public ComponentHandler<class CoreButton, EventHostSubmitable<Button>> {
+class Button : public ComponentHandler<class CoreButton, EventHostSubmittable<Button>> {
 public:
 	explicit Button(std::string name);
 	explicit Button(GenerateName_t = {}, const std::string_view type = "button");

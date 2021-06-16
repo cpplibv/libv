@@ -83,6 +83,16 @@ public:
 			(void) event;
 			log_sandbox.info("Button pressed {}", component.path());
 			component.text(component.text() + ".");
+			event.stop_propagation(); // stop propagation so 'connect' handler is not called
+		});
+		button.event().submit.connect([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect"); // never called as propagation in stopped
+		});
+		button.event().submit.connect_system([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect_system"); // always called as system handler
+		});
+		button.event().submit.connect_system_front([](const libv::ui::EventSubmit&) {
+			log_sandbox.info("connect_system_front"); // always called as system handler
 		});
 
 		button0.text("Button 0!");
@@ -395,6 +405,17 @@ public:
 				label.align_vertical(libv::ui::AlignVertical::justify_all);
 				input_field0.align_vertical(libv::ui::AlignVertical::justify_all);
 			}
+
+			if (e.keycode == libv::input::Keycode::KPNum0) {
+				button.event().submit.fire({});
+				ui.context().fire(std::string("Test string passed as global event"));
+			}
+		});
+		label.event().global.connect<std::string>([](const std::string& e){
+			log_sandbox.trace("global.connect {}", e);
+		});
+		label.event().global.connect<std::string>([](libv::ui::Label& label, const std::string& e){
+			log_sandbox.trace("global.connect {} {}", e, label.path());
 		});
 		onChar.output([&](const libv::input::EventChar& e) {
 //			label0->string.push_back(e.utf8);

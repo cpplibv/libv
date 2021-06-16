@@ -15,7 +15,7 @@
 // pro
 #include <libv/ui/flag.hpp>
 #include <libv/ui/generate_name.hpp>
-#include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the variant is killing me)
+#include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the std::variant is killing me)
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
@@ -50,7 +50,6 @@ static constexpr ChildID ChildIDSelf = -2;
 static constexpr ChildID ChildIDNone = -1;
 
 class CoreComponent {
-	friend struct AccessConnect;
 	friend struct AccessEvent;
 	friend struct AccessLayout;
 	friend struct AccessParent;
@@ -70,11 +69,11 @@ private:
 private:
 	Size size_;
 	Anchor anchor_;
-	libv::vec4f margin_; /// x: left, y: down, z: right, w: top
-	libv::vec4f padding_; /// x: left, y: down, z: right, w: top
+	Margin margin_; /// x: left, y: down, z: right, w: top
+	Padding padding_; /// x: left, y: down, z: right, w: top
 
-//	libv::vec4f margin_{10, 10, 10, 10}; // Theme::default_margin
-//	libv::vec4f padding_{5, 5, 5, 5}; // Theme::default_padding
+//	Margin margin_{10, 10, 10, 10}; // Theme::default_margin
+//	Padding padding_{5, 5, 5, 5}; // Theme::default_padding
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
@@ -119,6 +118,12 @@ public:
 	}
 	[[nodiscard]] inline bool isFocused() const noexcept {
 		return flags.match_any(Flag::focused);
+	}
+	[[nodiscard]] inline bool isSignal() const noexcept {
+		return flags.match_any(Flag::signal);
+	}
+	[[nodiscard]] inline bool isSlot() const noexcept {
+		return flags.match_any(Flag::slot);
 	}
 
 	[[nodiscard]] inline libv::vec3f layout_position() const noexcept {
@@ -236,11 +241,9 @@ public:
 	template <typename T>
 	void access_properties(T& ctx);
 
-protected:
-	void flagDirect(Flag_t flags_) noexcept;
-	void flagAncestors(Flag_t flags_) noexcept;
-
 public:
+	void flagAncestors(Flag_t flags_) noexcept;
+	void flagDirect(Flag_t flags_) noexcept;
 	void flagAuto(Flag_t flags_) noexcept;
 	void flagForce(Flag_t flags_) noexcept;
 
@@ -272,15 +275,9 @@ public:
 	template <typename Property>
 	inline void reset(Property& property);
 
-private:
-	void _fire(std::type_index type, const void* event_ptr);
-
 public:
 	template <typename Event>
 	inline void fire(const Event& event);
-
-private:
-	static void connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback);
 
 private:
 	ContextStyle makeStyleContext() noexcept;
@@ -346,9 +343,14 @@ inline void CoreComponent::reset(Property& property) {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename EventT>
-inline void CoreComponent::fire(const EventT& event) {
-	_fire(std::type_index(typeid(EventT)), &event);
+namespace detail {
+// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
+void internal_fire(class CoreComponent* signal, std::type_index event_type, const void* event_ptr);
+} // namespace detail
+
+template <typename Event>
+inline void CoreComponent::fire(const Event& event) {
+	detail::internal_fire(this, std::type_index(typeid(Event)), &event);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -413,12 +415,6 @@ struct AccessParent {
 	}
 	static inline decltype(auto) render(CoreComponent& component, Renderer& r) {
 		return component.render(r);
-	}
-};
-
-struct AccessConnect {
-	static inline void connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
-		CoreComponent::connect(signal, slot, type, std::move(callback));
 	}
 };
 

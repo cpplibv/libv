@@ -9,6 +9,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <typeindex>
 // pro
 #include <libv/ui/settings.hpp>
 #include <libv/ui/style_fwd.hpp>
@@ -41,6 +42,8 @@ class ContextUI {
 	//			- lookup  - find the resource
 	//			- cache   - cache the resource
 	//			- provide - yield the result
+	//			+ tracking
+	//			+ preprocess/include/recurse
 	// TODO P1: Implement higher level cache functions:
 	//			auto __ = cacheResolve(cacheFile, filePath);
 	//			auto __ = cacheLookup(cacheFile, filePath);
@@ -68,11 +71,11 @@ public:
 	ContextUI& operator=(ContextUI&&) = delete;
 
 public:
-	std::string clipboardText();
+	[[nodiscard]] std::string clipboardText();
 	void clipboardText(const std::string& string);
 
 public:
-	bool isAnyStyleDirty() const noexcept;
+	[[nodiscard]] bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
 
 public:
@@ -81,22 +84,37 @@ public:
 	void detachFocusLinked(CoreComponent& component);
 
 public:
-	std::shared_ptr<Font2D> font(const std::filesystem::path& path);
-	std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
-	libv::intrusive_ptr<Style> style(const std::string_view style_name);
-
-	std::shared_ptr<Shader> shader(const std::string& name);
-	std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
-	std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
-	std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
+	template <typename Event> inline void fire(const Event& event);
 
 public:
-	std::shared_ptr<ShaderFont> shaderFont();
-	std::shared_ptr<ShaderImage> shaderImage();
-	std::shared_ptr<ShaderQuad> shaderQuad();
-	std::shared_ptr<Font2D> fallbackFont() const;
-	std::shared_ptr<Texture2D> fallbackTexture2D() const;
+	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
+	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
+	[[nodiscard]] libv::intrusive_ptr<Style> style(const std::string_view style_name);
+
+	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string& name);
+	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
+	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
+	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
+
+public:
+	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont();
+	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage();
+	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad();
+	[[nodiscard]] std::shared_ptr<Font2D> fallbackFont() const;
+	[[nodiscard]] std::shared_ptr<Texture2D> fallbackTexture2D() const;
 };
+
+// -------------------------------------------------------------------------------------------------
+
+namespace detail {
+// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
+void internal_fire_global(ContextEvent& ctx, std::type_index event_type, const void* event_ptr);
+} // namespace detail
+
+template <typename Event>
+inline void ContextUI::fire(const Event& event) {
+	detail::internal_fire_global(this->event, std::type_index(typeid(Event)), &event);
+}
 
 // -------------------------------------------------------------------------------------------------
 

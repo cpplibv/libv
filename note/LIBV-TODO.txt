@@ -601,8 +601,12 @@ libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 
+https://pages.jetbrains.com/cppnow2021#g-603902215
 
-
+libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesystem::path::u8string and std::filesystem::path::generic_u8string
+		Search for .string(), not that many
+		Search for generic_string(), not that many
+		also, review/kill .string usages (?)
 
 
 

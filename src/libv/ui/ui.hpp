@@ -3,7 +3,6 @@
 #pragma once
 
 // libv
-//#include <libv/glr/queue_fwd.hpp>
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
@@ -65,6 +64,8 @@ public:
 	void event(const libv::input::EventMouseEnter& event);
 	void event(const libv::input::EventMousePosition& event);
 	void event(const libv::input::EventMouseScroll& event);
+
+//	ContextEventHub event_hub();
 
 public:
 	libv::gl::GL& gl();

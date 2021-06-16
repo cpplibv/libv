@@ -261,13 +261,13 @@ namespace ui {
 //// -------------------------------------------------------------------------------------------------
 //
 //RadioButton::RadioButton(std::string name) :
-//	ComponentHandler<CoreRadioButton, EventHostSubmitable<RadioButton>>(std::move(name)) { }
+//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(std::move(name)) { }
 //
 //RadioButton::RadioButton(GenerateName_t gen, const std::string_view type) :
-//	ComponentHandler<CoreRadioButton, EventHostSubmitable<RadioButton>>(gen, type) { }
+//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(gen, type) { }
 //
 //RadioButton::RadioButton(core_ptr core) noexcept :
-//	ComponentHandler<CoreRadioButton, EventHostSubmitable<RadioButton>>(core) { }
+//	ComponentHandler<CoreRadioButton, EventHostSubmittable<RadioButton>>(core) { }
 //
 //// -------------------------------------------------------------------------------------------------
 //

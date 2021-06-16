@@ -12,13 +12,6 @@ namespace libv {
 
 template <typename Range, typename Key, typename Proj = std::identity>
 [[nodiscard]] constexpr inline auto linear_find_iterator(Range& range, const Key& key, Proj proj = {}) {
-
-//	const auto begin = std::begin(range);
-//	const auto end = std::end(range);
-
-//	return std::find(begin, end, key);
-//	return std::ranges::find(range, key, proj);
-//	return std::ranges::find(begin, end, key, proj);
 	return std::ranges::find(range, key, proj);
 }
 

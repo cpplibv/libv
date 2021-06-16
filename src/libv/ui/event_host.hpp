@@ -15,6 +15,8 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
+// IDEA from nana:
+//
 //Mouse events
 //	mouse_enter     - Cursor enters or leaves the component
 //	mouse_move      - Cursor moves over the component
@@ -50,6 +52,10 @@ struct EventSubmit : BaseEvent {
 
 // -------------------------------------------------------------------------------------------------
 
+// NOTE: EventHost system has no/low run-time overhead
+// Creating a temporary host object with proxy members that point to the component can be optimized away
+// Proof: https://godbolt.org/z/vM5zhf3Yf
+
 template <typename ComponentT>
 struct EventHostGeneral {
 	using component_type = ComponentT;
@@ -64,28 +70,32 @@ public:
 	BasicEventProxy<ComponentT, EventMouseMovement> mouse_movement;
 	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll;
 
+	BasicEventProxyGlobal<ComponentT> global;
+
 public:
-	explicit inline EventHostGeneral(ComponentT& core) noexcept :
-		char_(core),
-		key(core),
-		focus(core),
-		mouse_button(core),
-		mouse_movement(core),
-		mouse_scroll(core) {}
+	explicit inline EventHostGeneral(ComponentT& owner) noexcept :
+		char_(owner),
+		key(owner),
+		focus(owner),
+		mouse_button(owner),
+		mouse_movement(owner),
+		mouse_scroll(owner),
+		global(owner) {}
 };
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename ComponentT>
-struct EventHostSubmitable : EventHostGeneral<ComponentT> {
+struct EventHostSubmittable : EventHostGeneral<ComponentT> {
 	using component_type = ComponentT;
 
 public:
 	BasicEventProxy<ComponentT, EventSubmit> submit;
 
 public:
-	explicit inline EventHostSubmitable(ComponentT& core) : EventHostGeneral<ComponentT>(core),
-		submit(core) {}
+	explicit inline EventHostSubmittable(ComponentT& owner) :
+		EventHostGeneral<ComponentT>(owner),
+		submit(owner) {}
 };
 
 // -------------------------------------------------------------------------------------------------

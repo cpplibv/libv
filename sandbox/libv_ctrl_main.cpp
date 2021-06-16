@@ -272,17 +272,17 @@ int main() {
 	std::cout << global_controls().export_settings() << std::endl;
 	std::cout << "---" << std::endl;
 
-	controls.input(libv::input::EventKey{libv::input::Keycode::A, libv::input::Scancode{30}, libv::input::Action::press});
-	controls.input(libv::input::EventKey{libv::input::Keycode::A, libv::input::Scancode{30}, libv::input::Action::release});
-	controls.input(libv::input::EventKey{libv::input::Keycode::S, libv::input::Scancode{31}, libv::input::Action::press});
-	controls.input(libv::input::EventKey{libv::input::Keycode::S, libv::input::Scancode{31}, libv::input::Action::release});
-	controls.input(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::press});
-	controls.input(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::release});
-	controls.input(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::press});
-	controls.input(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::release});
-	controls.input(libv::input::EventKey{libv::input::Keycode::F, libv::input::Scancode{33}, libv::input::Action::press});
+	controls.event(libv::input::EventKey{libv::input::Keycode::A, libv::input::Scancode{30}, libv::input::Action::press});
+	controls.event(libv::input::EventKey{libv::input::Keycode::A, libv::input::Scancode{30}, libv::input::Action::release});
+	controls.event(libv::input::EventKey{libv::input::Keycode::S, libv::input::Scancode{31}, libv::input::Action::press});
+	controls.event(libv::input::EventKey{libv::input::Keycode::S, libv::input::Scancode{31}, libv::input::Action::release});
+	controls.event(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::press});
+	controls.event(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::release});
+	controls.event(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::press});
+	controls.event(libv::input::EventKey{libv::input::Keycode::D, libv::input::Scancode{32}, libv::input::Action::release});
+	controls.event(libv::input::EventKey{libv::input::Keycode::F, libv::input::Scancode{33}, libv::input::Action::press});
 	controls.update(std::chrono::microseconds{16667});
-	controls.input(libv::input::EventKey{libv::input::Keycode::F, libv::input::Scancode{33}, libv::input::Action::release});
+	controls.event(libv::input::EventKey{libv::input::Keycode::F, libv::input::Scancode{33}, libv::input::Action::release});
 
 	return EXIT_SUCCESS;
 }

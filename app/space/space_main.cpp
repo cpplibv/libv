@@ -777,6 +777,16 @@ int main() {
 	libv::ui::UI ui(ui_settings);
 	global_ui = &ui; // <<< Remove global ui workaround for canvas access to event states
 
+	shader_manager.on_success([ui = ui.event_hub()](const libv::rev::ShaderLoadSuccess& e) mutable {
+		ui.broadcast(e);
+	});
+	shader_manager.on_failure([ui = ui.event_hub()](const libv::rev::ShaderLoadFailure& e) mutable {
+		ui.broadcast(e);
+	});
+	shader_manager.on_unload([ui = ui.event_hub()](const libv::rev::ShaderUnload& e) mutable {
+		ui.broadcast(e);
+	});
+
 	libv::ctrl::Controls controls;
 
 	app::CameraBehaviour::register_controls(controls);
@@ -858,20 +868,14 @@ int main() {
 //		label.font_color({.95f, 0.25f, 0.35f, 1.f});
 		label.font_color({.9333f, 0.8235f, 0.0078f, 1.f}); // Warning yellow
 
-//		libv::ui::StatusLog status_log;
-//		status_log.align_horizontal(libv::ui::AlignHorizontal::center);
-//		status_log.align_vertical(libv::ui::AlignVertical::center);
-//		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
-
-		// TODO P1: [label] causes lifetimes issues, ui event hub or weak_ptr like behaviour is required
-		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadSuccess& e) mutable {
+		label.event().ui([](libv::ui::Label& label, const libv::rev::ShaderLoadSuccess& e) mutable {
 			shader_states.erase(e.id);
 
 			label.text("");
 			for (const auto& shader_state : shader_states)
 				label.text(label.text() + "\n" + shader_state.second);
 		});
-		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadFailure& e) mutable {
+		label.event().ui([](libv::ui::Label& label, const libv::rev::ShaderLoadFailure& e) mutable {
 			if (e.include_failure) {
 				auto& message = shader_states[e.id];
 				message += fmt::format("--- Failed to load shader: {} ({}) ---\n", e.shader.name(), e.id);
@@ -890,13 +894,88 @@ int main() {
 			for (const auto& shader_state : shader_states)
 				label.text(label.text() + "\n" + shader_state.second);
 		});
-		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderUnload& e) mutable {
+		label.event().ui([](libv::ui::Label& label, const libv::rev::ShaderUnload& e) mutable {
 			shader_states.erase(e.id);
 
 			label.text("");
 			for (const auto& shader_state : shader_states)
 				label.text(label.text() + "\n" + shader_state.second);
 		});
+		// =================================================================================================
+//		ui.event_hub().listen(label, [](libv::ui::Label& label, const libv::rev::ShaderLoadSuccess& e) mutable {
+//			shader_states.erase(e.id);
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
+//		ui.event_hub().listen(label, [](libv::ui::Label& label, const libv::rev::ShaderLoadFailure& e) mutable {
+//			if (e.include_failure) {
+//				auto& message = shader_states[e.id];
+//				message += fmt::format("--- Failed to load shader: {} ({}) ---\n", e.shader.name(), e.id);
+//				message += fmt::format("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
+//				for (const auto& [file, line] : e.include_failure->include_stack)
+//					message += fmt::format("\n    Included from: {}:{}", file, line);
+//
+//			} else if (e.compile_failure) {
+//				shader_states[e.id] = fmt::format("--- Failed to compile shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.compile_failure->message);
+//
+//			} else if (e.link_failure) {
+//				shader_states[e.id] = fmt::format("--- Failed to link shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.link_failure->message);
+//			}
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
+//		ui.event_hub().listen(label, [](libv::ui::Label& label, const libv::rev::ShaderUnload& e) mutable {
+//			shader_states.erase(e.id);
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
+		// =================================================================================================
+
+//		libv::ui::StatusLog status_log;
+//		status_log.align_horizontal(libv::ui::AlignHorizontal::center);
+//		status_log.align_vertical(libv::ui::AlignVertical::center);
+//		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+
+		// TODO P1: [label] causes lifetimes issues, ui event hub or weak_ptr like behaviour is required
+//		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadSuccess& e) mutable {
+//			shader_states.erase(e.id);
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
+//		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderLoadFailure& e) mutable {
+//			if (e.include_failure) {
+//				auto& message = shader_states[e.id];
+//				message += fmt::format("--- Failed to load shader: {} ({}) ---\n", e.shader.name(), e.id);
+//				message += fmt::format("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
+//				for (const auto& [file, line] : e.include_failure->include_stack)
+//					message += fmt::format("\n    Included from: {}:{}", file, line);
+//
+//			} else if (e.compile_failure) {
+//				shader_states[e.id] = fmt::format("--- Failed to compile shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.compile_failure->message);
+//
+//			} else if (e.link_failure) {
+//				shader_states[e.id] = fmt::format("--- Failed to link shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.link_failure->message);
+//			}
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
+//		shader_manager.on_update([label, &shader_states](const libv::rev::ShaderUnload& e) mutable {
+//			shader_states.erase(e.id);
+//
+//			label.text("");
+//			for (const auto& shader_state : shader_states)
+//				label.text(label.text() + "\n" + shader_state.second);
+//		});
 
 		// ---
 		// TODO P4: libv.ui: Implement UI based event routing hub
@@ -925,7 +1004,7 @@ int main() {
 	frame.show();
 	frame.join();
 
-	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that event-ui-lifetime issue
+//	shader_manager.clear_on_updates(); // TODO P1: [label] forces this one where, solve that event-ui-lifetime issue
 
 	return EXIT_SUCCESS;
 }

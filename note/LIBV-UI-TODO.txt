@@ -1,6 +1,8 @@
 libv.ui: Move x3 parser rules to globals with internal linkage
 libv.ui: Read nana 3rd party property tree lib API https://github.com/besh81/nana-extra
 libv.ui: batch component meshes into a bigger ui mesh cluster and use subcomponents, optimizations-optimizations | context_render take care of this
+libv.ui: Implement system (aka unignorable) event handlers
+libv.ui: Improve event connection (event_proxy API): operator() / connect / connect_front / connect_system
 
 
 
@@ -49,12 +51,21 @@ libv.ui: batch component meshes into a bigger ui mesh cluster and use subcompone
 
 
 
+
+
+
+idea: bloom_filter usage if there is a 8/16/32 bit implementation of it: Component "signal"-iness per event type
+
+
+
+
+
+
 UI level message/event bus/system
 	libv.ui: UI level message/event bus/system could use support for hierarchical up-walking 'context' iteration
 	libv.ui: UI level message/event bus/system might be required: (UI Event HUB)
 			context().events().connect<ShaderReportFailure>(this, "shader_reload", [](const auto& report){ ... });
 			context().events().fire("shader_reload", ...);
-
 
 
 
@@ -68,6 +79,7 @@ libv.ui: static_component system
 	libv.ui: Composite component style / property system
 		libv.ui.property: complex composite component would result in "nested" property sets
 		libv.ui.property: property system interaction with static_component system
+		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
 
 
 libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
@@ -471,8 +483,6 @@ mouse
 	libv.ui: Absorb - make sure absorb/shield/plates is easy to have/access for even non interactive components
 
 event
-	libv.ui: Unignorable event handlers
-	libv.ui: Improve event connection: operator() / connect / connect_front / connect_unignorable | basic_event_proxy.hpp has the full list
 	libv.ui: if 'everything' 'above' is done re-read the requirements of mouse events and verify if all of them are met | context_mouse.cpp
 	libv.ui.event: mouse/keyboard/joystick ability to query sub-frame resolution of press/held/release cycle. Time the events (it will be a lot of timestamp)
 

@@ -24,13 +24,9 @@ public:
 
 	struct Target {
 		ptr slot;
-		std::type_index type;
-		std::function<void(void*, const void*)> callback;
-
-		Target(ptr slot, std::type_index type, std::function<void(void*, const void*)>&& callback) :
-			slot(slot),
-			type(type),
-			callback(std::move(callback)) { }
+		std::type_index event_type;
+		bool is_system; /// unignorable
+		std::function<bool(void*, const void*)> callback;
 	};
 
 public:
@@ -47,21 +43,49 @@ ContextEvent::~ContextEvent() {
 	// For the sake of forward declared unique_ptr
 }
 
-void ContextEvent::connect(ptr signal, ptr slot, std::type_index type, std::function<void(void*, const void*)>&& func) {
+void ContextEvent::connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
 	self->slots[slot].emplace_back(signal);
-	self->signals[signal].emplace_back(slot, type, std::move(func));
+	auto& targets = self->signals[signal];
+	if (front)
+		targets.emplace(targets.begin(), slot, event_type, system, std::move(func));
+	else
+		targets.emplace_back(slot, event_type, system, std::move(func));
 }
 
-void ContextEvent::fire(ptr signal, std::type_index type, const void* event_ptr) {
+void ContextEvent::connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+	self->slots[slot].emplace_back(nullptr);
+	auto& targets = self->signals[nullptr];
+	if (front)
+		targets.emplace(targets.begin(), slot, event_type, system, std::move(func));
+	else
+		targets.emplace_back(slot, event_type, system, std::move(func));
+}
+
+void ContextEvent::fire(ptr signal, std::type_index event_type, const void* event_ptr) {
 	const auto it = self->signals.find(signal);
 	if (it == self->signals.end()) {
 		assert(false && "Attempted to fire a not connected signal");
 		return;
 	}
 
+	bool stopped = false;
 	for (const ImplContextEvent::Target& target : it->second)
-		if (target.type == type)
-			target.callback(&*signal, event_ptr);
+		if (target.event_type == event_type)
+			if (target.is_system || !stopped)
+				stopped |= target.callback(&*signal, event_ptr);
+}
+
+void ContextEvent::fire_global(std::type_index event_type, const void* event_ptr) {
+	const auto it = self->signals.find(nullptr);
+	if (it == self->signals.end())
+		return;
+
+	bool stopped = false;
+	for (const ImplContextEvent::Target& target : it->second)
+		if (target.event_type == event_type)
+			if (target.is_system || !stopped)
+				// For global events the slot is used as component in the callbacks (as there is no real signal)
+				stopped |= target.callback(&*target.slot, event_ptr);
 }
 
 void ContextEvent::disconnect_signal(ptr signal) {
@@ -85,7 +109,7 @@ void ContextEvent::disconnect_signal(ptr signal) {
 }
 
 void ContextEvent::disconnect_slot(ptr slot) {
-	auto it = self->slots.find(slot);
+	const auto it = self->slots.find(slot);
 	if (it == self->slots.end()) {
 		assert(false && "Attempted to disconnect a not connected slot");
 		return;

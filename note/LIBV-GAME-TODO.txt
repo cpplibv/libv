@@ -87,6 +87,7 @@ app.space: Add multi camera / camera frustum visualization (uniforms and C++ cli
 
 
 
+app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 

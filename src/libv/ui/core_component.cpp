@@ -65,13 +65,13 @@ void CoreComponent::size(Size value) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreComponent::flagDirect(Flag_t flags_) noexcept {
-	flags.set(flags_);
-}
-
 void CoreComponent::flagAncestors(Flag_t flags_) noexcept {
 	for (auto it = parent_; !it->flags.match_mask(flags_); it = it->parent_)
 		it->flags.set(flags_);
+}
+
+void CoreComponent::flagDirect(Flag_t flags_) noexcept {
+	flags.set(flags_);
 }
 
 void CoreComponent::flagAuto(Flag_t flags_) noexcept {
@@ -217,25 +217,8 @@ void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void CoreComponent::_fire(std::type_index type, const void* event_ptr) {
-	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (attach) codes
-	if (isAttached() && flags.match_any(Flag::signal))
-		context().event.fire(this, type, event_ptr);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 ContextStyle CoreComponent::makeStyleContext() noexcept {
 	return ContextStyle{libv::make_observer(style_.get()), *this};
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void CoreComponent::connect(CoreComponent& signal, CoreComponent& slot, std::type_index type, std::function<void(void*, const void*)>&& callback) {
-	signal.context().event.connect(&signal, &slot, type, std::move(callback));
-
-	signal.flagDirect(Flag::signal);
-	slot.flagDirect(Flag::slot);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -374,11 +357,7 @@ void CoreComponent::detach(CoreComponent& old_parent) {
 //		if (flags.match_any(Flag::focusLinked))
 //			context().detachFocusLinked(*this);
 
-		if (flags.match_any(Flag::signal))
-			context().event.disconnect_signal(this);
-
-		if (flags.match_any(Flag::slot))
-			context().event.disconnect_slot(this);
+		detail::internal_disconnect(this);
 
 		doDetach();
 

@@ -19,7 +19,7 @@ namespace ui {
 
 class RadioGroup;
 
-class RadioButton : public ComponentHandler<class CoreRadioButton, EventHostSubmitable<RadioButton>> {
+class RadioButton : public ComponentHandler<class CoreRadioButton, EventHostSubmittable<RadioButton>> {
 public:
 	explicit RadioButton(std::string name);
 	explicit RadioButton(GenerateName_t = {}, const std::string_view type = "radio-button");

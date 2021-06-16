@@ -2,6 +2,7 @@
 
 #pragma once
 
+// std
 #include <utility>
 
 
@@ -18,8 +19,8 @@ struct always_true : std::true_type {
 	}
 };
 
-template <typename... T>
-static constexpr bool always_true_v = always_true<T...>::value;
+template <typename...>
+static constexpr bool always_true_v = true;
 
 template <typename... T>
 struct always_false : std::false_type {
@@ -29,8 +30,8 @@ struct always_false : std::false_type {
 	}
 };
 
-template <typename... T>
-static constexpr bool always_false_v = always_false<T...>::value;
+template <typename...>
+static constexpr bool always_false_v = false;
 
 // -------------------------------------------------------------------------------------------------
 
