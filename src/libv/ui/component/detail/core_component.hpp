@@ -310,6 +310,7 @@ private:
 	void attach(CoreComponent& parent);
 	void detach();
 	void detachScan();
+	void update();
 	void style();
 	void styleScan();
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
@@ -322,6 +323,7 @@ protected:
 	virtual void doAttach();
 	virtual void doDetach();
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback);
+	virtual void doUpdate();
 	virtual void doStyle(ContextStyle& context);
 	virtual void doStyle(ContextStyle& context, ChildID childID);
 	virtual libv::observer_ptr<CoreComponent> doFocusTraverse(const ContextFocusTraverse& context, ChildID current);
@@ -416,6 +418,9 @@ struct AccessParent {
 	}
 	static inline decltype(auto) doFocusTraverse(CoreComponent& component, const ContextFocusTraverse& context, ChildID current) {
 		return component.doFocusTraverse(context, current);
+	}
+	static inline decltype(auto) update(CoreComponent& component) {
+		return component.update();
 	}
 	static inline decltype(auto) render(CoreComponent& component, Renderer& r) {
 		return component.render(r);

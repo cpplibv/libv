@@ -36,7 +36,7 @@ public:
 	using CorePanelLine::CorePanelLine;
 
 private:
-	virtual void doRender(Renderer& r) override {
+	virtual void doUpdate() override {
 		const auto time_of_frame = context().state.time_frame();
 
 		libv::erase_if_unstable(entries, [&](LogEntry& entry) {
@@ -47,7 +47,7 @@ private:
 			return false;
 		});
 
-		CorePanelLine::doRender(r);
+		CorePanelLine::doUpdate();
 	}
 };
 

@@ -408,6 +408,14 @@ void CoreComponent::detach() {
 	layout_size_ = {};
 }
 
+void CoreComponent::update() {
+	doUpdate();
+
+	doForeachChildren([](Component& child) {
+		get_core(child)->update();
+	});
+}
+
 void CoreComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		ContextStyle ctx = makeStyleContext();
@@ -574,6 +582,9 @@ libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {
 
 void CoreComponent::doLayout2(const ContextLayout2& environment) {
 	(void) environment;
+}
+
+void CoreComponent::doUpdate() {
 }
 
 void CoreComponent::doCreate(Renderer& context) {

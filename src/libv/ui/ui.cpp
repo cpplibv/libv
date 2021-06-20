@@ -276,12 +276,12 @@ public:
 			context_state.time_frame_ = now;
 			context_state.time_ = context_state.time_frame_ - context_state.time_ui_;
 
-			// --- Attach ---
+			// --- Attach #1 ---
 			try {
 				AccessRoot::attach(root.core(), root.core());
 				stat.attach1.sample(timer.time_ns());
 			} catch (const std::exception& ex) {
-				log_ui.error("Exception occurred during attach1 in UI: {}", ex.what());
+				log_ui.error("Exception occurred during attach #1 in UI: {}", ex.what());
 			}
 
 			// --- Event ---
@@ -321,7 +321,8 @@ public:
 
 			// --- UI loop tasks ---
 			{
-				// Usual pattern to lift the entry out of locking scope, candidate for generalization
+				// TODO P5: libv.mt: Usual pattern to lift the entry out of locking scope, candidate for generalization
+				//				libv.mt: queue
 				size_t i = 0;
 				std::function<void()> current_task;
 				while (true) {
@@ -346,27 +347,20 @@ public:
 				stat.loopTask.sample(timer.time_ns());
 			}
 
-			// --- Attach ---
+			// --- Update ---
+			try {
+				AccessRoot::update(root.core());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during update in UI: {}", ex.what());
+			}
+
+			// --- Attach #2 ---
 			try {
 				AccessRoot::attach(root.core(), root.core());
 				stat.attach2.sample(timer.time_ns());
 			} catch (const std::exception& ex) {
-				log_ui.error("Exception occurred during attach2 in UI: {}", ex.what());
+				log_ui.error("Exception occurred during attach #2 in UI: {}", ex.what());
 			}
-
-	//	// --- Update ---
-	//	try {
-	//		//AccessRoot::update(root);
-	//	} catch (const std::exception& ex) {
-	//		log_ui.error("Exception occurred during update in UI: {}", ex.what());
-	//	}
-	//
-	//	// --- Attach ---
-	//	try {
-	//		//AccessRoot::attach(root, root);
-	//	} catch (const std::exception& ex) {
-	//		log_ui.error("Exception occurred during attach3 in UI: {}", ex.what());
-	//	}
 
 			// --- Style ---
 			try {
