@@ -36,6 +36,16 @@ CoreComponent::~CoreComponent() {
 // -------------------------------------------------------------------------------------------------
 
 std::string CoreComponent::path() const {
+	//	size_t path_length = name.size() + 1;
+	//	for
+	//		path_length += it->name.size() + 1;
+	//
+	//	size_t i = 1;
+	//	std::string result(path_length, '/');
+	//	for
+	//  	strcpy i parent.name
+	//  	i += parent.name.size()
+
 	std::string result = name;
 
 	for (auto it = make_observer_ref(this); it != it->parent_; it = it->parent_)
@@ -195,6 +205,7 @@ void CoreComponent::markRemove() noexcept {
 
 	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
+	parent_->flagAuto(Flag::pendingLayout);
 
 	doForeachChildren([](Component& child) {
 		get_core(child)->markRemove();

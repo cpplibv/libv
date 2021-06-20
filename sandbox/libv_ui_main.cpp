@@ -43,6 +43,7 @@ private:
 	libv::ui::Button button2;
 	libv::ui::Button button3;
 	libv::ui::Button button4;
+	libv::ui::Button button5;
 	libv::ui::Button button;
 	libv::ui::Image image;
 	libv::ui::InputField input_field0;
@@ -64,8 +65,7 @@ private:
 	libv::ui::ScrollBar scroll_bar_iy;
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
-	libv::ui::PanelLine status_log;
-//	libv::ui::PanelStatusLog status_log;
+	libv::ui::PanelStatusLog status_log;
 
 public:
 	SandboxFrame() :
@@ -273,12 +273,25 @@ public:
 		}
 		panel_line_scrolled.add(image);
 
-		for (int i = 0; i < 5; ++i) {
-			libv::ui::Label tmp;
-			tmp.text(fmt::format("status entry {}", i));
-//			status_log.add(i, tmp);
-			status_log.add(tmp);
-		}
+		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+
+		button5.text("Fill status log");
+		button5.align_horizontal(libv::ui::AlignHorizontal::center);
+		button5.align_vertical(libv::ui::AlignVertical::center);
+		button5.event().submit(status_log, [this] {
+			for (int i = 0; i < 5; ++i) {
+				const auto t = std::chrono::seconds(i + 1);
+				libv::ui::Button tmp;
+				tmp.color({0.7f, 0.7f, 0.5f, 1.0f});
+				tmp.align_horizontal(libv::ui::AlignHorizontal::center);
+				tmp.align_vertical(libv::ui::AlignVertical::center);
+				tmp.text(fmt::format("Status entry {} for {}s", i, t.count()));
+				tmp.event().submit([](libv::ui::Button& btn) {
+					btn.markRemove();
+				});
+				status_log.add(i, tmp, libv::ui::clock::now() + t);
+			}
+		});
 
 		panel_full.add(button1);
 
@@ -304,6 +317,7 @@ public:
 		panel_grid.add(scroll_bar_ix);
 		panel_grid.add(scroll_bar_iy);
 		panel_grid.add(label);
+		panel_grid.add(button5);
 
 		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
 //		panel_line.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);

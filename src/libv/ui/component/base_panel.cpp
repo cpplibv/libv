@@ -27,7 +27,8 @@ void CoreBasePanel::add(Component component) {
 }
 
 void CoreBasePanel::remove(Component& component) {
-	if (children[AccessParent::childID(component.core())] != component) {
+	const auto id = AccessParent::childID(component.core());
+	if (id >= static_cast<ChildID>(children.size()) || children[id] != component) {
 		log_ui.error("Attempted to remove a non child element: {} from: {}", component.path(), path());
 		return;
 	}

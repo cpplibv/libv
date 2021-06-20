@@ -315,7 +315,7 @@ private:
 	void layout2(const ContextLayout2& environment);
 	void render(Renderer& r);
 
-private:
+protected:
 	virtual void doAttach();
 	virtual void doDetach();
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback);

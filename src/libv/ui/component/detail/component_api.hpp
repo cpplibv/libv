@@ -29,6 +29,9 @@ struct ComponentAPI : public BaseT {
 private:
 	static inline size_t nextID = 0;
 
+protected:
+	using Base = BaseT;
+
 public:
 	explicit inline ComponentAPI(core_ptr ptr) noexcept :
 		BaseT(ptr) { }

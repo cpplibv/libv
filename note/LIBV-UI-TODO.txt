@@ -6,7 +6,7 @@ libv.ui: Improve event connection (event_proxy API): operator() / connect / conn
 libv.ui: Implement UI global dynamic event host
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
-
+libv.ui: Add support for component inheritance
 
 
 
@@ -47,107 +47,20 @@ libv.ui: Spacing, not just margin, not just padding, but container level spacing
 
 
 
-place.it:
-	cpp: Virtual inheritance can be a solution for base injection: All virtual base subobjects are initialized before any non-virtual base subobject, so only the most derived class calls the constructors of the virtual bases in its member initializer list:
-			this can kill libv::net::detail::current_io_context
-			investigate the runtime cost
-			has memory overhead (I think it is merged with vtable ptr, so class already has one its zero)
-	idea: bloom_filter usage if there is a 8/16/32 bit implementation of it: Component "signal"-iness per event type
-	libv: Document what Padding/Margin/Spacing is: (Maybe in a table form)
-			? When/if they merge/collapse
-			? Interaction with border
-			? Interaction with mouse region
-			? Interaction with background
-			Padding: Not part of the component
-				| incomplete
-			Margin: Part of the background but not part of the component
-				| incomplete
-			Spacing: Container mandated padding between elements
-				| incomplete
-
-
-// =================================================================================================
-
-class Label2 : public ComponentAPI<Label, Label2, class CoreLabel2, EventHostGeneral> {
-public:
-	using ComponentAPI::ComponentAPI;
-	static core_ptr create_core(std::string name);
-
-public:
-	void text2(std::string value);
-	[[nodiscard]] const std::string& text2() const noexcept;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-inline void foo() {
-	Label l1;
-	Label2 l2;
-
-	l1.text("x");
-	l2.text("x");
-	l2.text2("x");
-
-//	l2.event().key.connect([](Label2& il2){
-//		il2.text2("x");
-//	});
-	l2.event().key.connect([](Label& il2){
-		il2.text("x");
-	});
-}
-
-// =================================================================================================
-
-struct CoreLabel2 : public CoreLabel {
-	friend class Label2;
-	[[nodiscard]] inline auto handler() { return Label2{this}; }
-
-//private:
-//	template <typename T> static void access_properties(T& ctx);
-
-//	struct Properties {
-//		PropertyR<Color> font_color;
-//		PropertyR<ShaderFont_view> font_shader;
-//
-//		PropertyL<> align_horizontal;
-//		PropertyL<> align_vertical;
-//		PropertyL<> font;
-//		PropertyL<> font_size;
-//	} property;
-//
-//private:
-//	TextLayout text_;
-	int label2int = 0;
-
-public:
-	using CoreLabel::CoreLabel;
-
-//private:
-//	virtual void doStyle(ContextStyle& ctx) override;
-//	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
-//	virtual void doLayout2(const ContextLayout2& environment) override;
-//	virtual void doRender(Renderer& r) override;
-};
-
-core_ptr Label2::create_core(std::string name) {
-	return create_core_ptr<CoreLabel2>(std::move(name));
-}
-
-void Label2::text2(std::string value) {
-	text(value + std::to_string(self().label2int++));
-}
-
-const std::string& Label2::text2() const noexcept {
-	return self().text_.string();
-}
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-
-src/libv/ui/component/panel_line_core.hpp
 src/libv/ui/component/panel_status_log.hpp
+
+
+
+markRemove does not invalidates the parent's layout / render
+markRemove would be nice if there were no downward recursion
+panel_status_log single frame flicker where a child is removed during render
+
+
+
+
+
+cleanup:
+	src/libv/ui/component/panel_line_core.hpp
 
 
 
@@ -156,8 +69,16 @@ Next in queue:
 		maybe CRTP base for core components
 
 Cleanup
-	src/libv/ui/component/base_panel_static.hpp
-	src/libv/ui/component/file_picker.hpp
+	src/libv/ui/component/base_panel_static.*
+	src/libv/ui/component/check_box.*
+	src/libv/ui/component/file_picker.*
+	src/libv/ui/component/radio_button.*
+	src/libv/ui/component/radio_group.*
+
+
+
+
+
 
 
 --- Must have ---
@@ -165,7 +86,7 @@ Cleanup
 
 
 
-libv.ui: static_component system
+libv.ui: static_component system (lite)
 	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 	libv.ui: Composite component style / property system
 		libv.ui.property: complex composite component would result in "nested" property sets
@@ -213,6 +134,25 @@ libv.ui: check on that recent modification that i just did in ui.context_state t
 libv.ui: adopt libv.rev's Shader and ShaderLoader
 
 libv.ui: (?) Rename PanelFloat to PanelAnchor
+
+
+place.it:
+	cpp: Virtual inheritance can be a solution for base injection: All virtual base subobjects are initialized before any non-virtual base subobject, so only the most derived class calls the constructors of the virtual bases in its member initializer list:
+			this can kill libv::net::detail::current_io_context
+			investigate the runtime cost
+			has memory overhead (I think it is merged with vtable ptr, so class already has one its zero)
+	idea: bloom_filter usage if there is a 8/16/32 bit implementation of it: Component "signal"-iness per event type
+	libv: Document what Padding/Margin/Spacing is: (Maybe in a table form)
+			? When/if they merge/collapse
+			? Interaction with border
+			? Interaction with mouse region
+			? Interaction with background
+			Padding: Not part of the component
+				| incomplete
+			Margin: Part of the background but not part of the component
+				| incomplete
+			Spacing: Container mandated padding between elements
+				| incomplete
 
 
 
