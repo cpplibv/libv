@@ -18,7 +18,7 @@
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
-#include <libv/ui/component/panel_status_log.hpp>
+#include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
@@ -65,7 +65,7 @@ private:
 	libv::ui::ScrollBar scroll_bar_iy;
 	libv::ui::ScrollArea scroll_area_outer;
 	libv::ui::ScrollArea scroll_area_inner;
-	libv::ui::PanelStatusLog status_log;
+	libv::ui::PanelStatusLine status_log;
 
 public:
 	SandboxFrame() :

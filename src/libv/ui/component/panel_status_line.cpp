@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/component/panel_status_log.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/component/panel_status_log.hpp>
+#include <libv/ui/component/panel_status_line.hpp>
 // libv
 #include <libv/algo/erase_if_unstable.hpp>
 #include <libv/algo/erase_unstable.hpp>
@@ -18,13 +18,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CorePanelStatusLog : public CorePanelLine {
-	friend class PanelStatusLog;
-	[[nodiscard]] inline auto handler() { return PanelStatusLog{this}; }
+struct CorePanelStatusLine : public CorePanelLine {
+	friend class PanelStatusLine;
+	[[nodiscard]] inline auto handler() { return PanelStatusLine{this}; }
 
 private:
 	struct LogEntry {
-		PanelStatusLog::EntryID id;
+		PanelStatusLine::EntryID id;
 //		std::string style;
 		Component component;
 		time_point time_of_death;
@@ -53,21 +53,21 @@ private:
 
 // =================================================================================================
 
-core_ptr PanelStatusLog::create_core(std::string name) {
-	return create_core_ptr<CorePanelStatusLog>(std::move(name));
+core_ptr PanelStatusLine::create_core(std::string name) {
+	return create_core_ptr<CorePanelStatusLine>(std::move(name));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void PanelStatusLog::add(EntryID id, Component component, time_duration lifetime) {
+void PanelStatusLine::add(EntryID id, Component component, time_duration lifetime) {
 	add(id, std::move(component), self().context().state.time_frame() + lifetime);
 }
 
-void PanelStatusLog::add(EntryID id, Component component, time_point time_of_death) {
+void PanelStatusLine::add(EntryID id, Component component, time_point time_of_death) {
 	const auto time_of_frame = self().context().state.time_frame();
 	const auto already_dead = time_of_death < time_of_frame;
 
-	const auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLog::LogEntry::id);
+	const auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);
 	if (it != self().entries.end()) {
 		if (already_dead) {
 			Base::remove(it->component);
@@ -88,15 +88,15 @@ void PanelStatusLog::add(EntryID id, Component component, time_point time_of_dea
 	}
 }
 
-void PanelStatusLog::remove(EntryID id) {
-	auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLog::LogEntry::id);
+void PanelStatusLine::remove(EntryID id) {
+	auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);
 	if (it != self().entries.end()) {
 		libv::erase_unstable(self().entries, it);
 		Base::remove(it->component);
 	}
 }
 
-void PanelStatusLog::clear() {
+void PanelStatusLine::clear() {
 	self().entries.clear();
 	Base::clear();
 }

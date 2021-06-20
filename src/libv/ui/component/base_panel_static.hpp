@@ -68,7 +68,7 @@ private:
 //		CoreComponent::access_properties(setter);
 //	}
 //
-//void CorePanelStatusLog::doStyle(ContextStyle& ctx, ChildID childID) {
+//void CorePanelStatusLine::doStyle(ContextStyle& ctx, ChildID childID) {
 //	(void) ctx;
 //	(void) childID;
 //}

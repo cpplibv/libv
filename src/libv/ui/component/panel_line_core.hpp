@@ -2,22 +2,9 @@
 
 // hpp
 #include <libv/ui/component/panel_line.hpp>
-// ext
-//#include <boost/container/small_vector.hpp>
-//#include <range/v3/view/zip.hpp>
-// libv
-//#include <libv/utility/approx.hpp>
-//#include <libv/utility/min_max.hpp>
-//#include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>
-//#include <libv/ui/context/context_layout.hpp>
-//#include <libv/ui/context/context_style.hpp>
-//#include <libv/ui/layout/view_layouted.lpp>
-//#include <libv/ui/log.hpp>
-//#include <libv/ui/property.hpp>
-//#include <libv/ui/property_access_context.hpp>
 
 
 namespace libv {
@@ -42,9 +29,6 @@ private:
 
 	template <typename T> static void access_properties(T& ctx);
 	template <typename T> static void access_child_properties(T& ctx);
-
-//	static ComponentPropertyDescription description;
-//	static ComponentPropertyDescription child_description;
 
 public:
 	using CoreBasePanel::CoreBasePanel;

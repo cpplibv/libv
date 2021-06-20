@@ -12,10 +12,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelStatusLog : public ComponentAPI<PanelLine, PanelStatusLog, class CorePanelStatusLog, EventHostGeneral> {
+class PanelStatusLine : public ComponentAPI<PanelLine, PanelStatusLine, class CorePanelStatusLine, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
-	static constexpr std::string_view component_type = "status";
+	static constexpr std::string_view component_type = "status-line";
 	static core_ptr create_core(std::string name);
 
 public:

@@ -10,8 +10,9 @@ libv.ui: Add support for component inheritance
 libv.ui: Fix that component removal does not invalidates the parent's layout
 libv.ui: Fix and improve markInvalidLayout related code
 libv.ui: Remove down recursion from component removal
-
-
+libv.ui: Add explicit component update step to UI loop
+libv.ui: Fix the one frame flicker in panel_status_log on removed children
+libv.ui: Rename PanelStatusLog to PanelStatusLine
 
 
 
@@ -46,14 +47,8 @@ libv.ui: Remove down recursion from component removal
 
 
 
-panel_status_log single frame flicker where a child is removed during render
 
 
-
-
-
-cleanup:
-	src/libv/ui/component/panel_line_core.hpp
 
 
 
@@ -79,6 +74,11 @@ Cleanup
 
 
 
+libv.ui: Relative mouse coordinate access for a state
+	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
+	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+
+
 libv.ui: static_component system (lite)
 	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 	libv.ui: Composite component style / property system
@@ -95,11 +95,6 @@ libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or 
 		if (event.check_initiator_loop(&shared_state))
 			return;
 		Implement in: app.theme: control.slider.event().change
-
-
-libv.ui: Relative mouse coordinate access for a state
-	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
-	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 
 
 
