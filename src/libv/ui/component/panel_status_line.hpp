@@ -12,7 +12,21 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelStatusLine : public ComponentAPI<PanelLine, PanelStatusLine, class CorePanelStatusLine, EventHostGeneral> {
+struct EventPanelStatusExpired : BaseEvent {
+	uint64_t id;
+};
+
+template <typename ComponentT>
+struct EventHostPanelStatus : EventHostGeneral<ComponentT> {
+	BasicEventProxy<ComponentT, EventPanelStatusExpired> expire;
+
+	explicit inline EventHostPanelStatus(ComponentT& core) : EventHostGeneral<ComponentT>(core),
+		expire(core) {}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class PanelStatusLine : public ComponentAPI<PanelLine, PanelStatusLine, class CorePanelStatusLine, EventHostPanelStatus> {
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "status-line";

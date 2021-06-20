@@ -10,7 +10,6 @@
 #include <libv/ui/component/panel_line_core.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_ui.hpp>
-//#include <libv/ui/log.hpp>
 
 
 namespace libv {
@@ -42,6 +41,7 @@ private:
 		libv::erase_if_unstable(entries, [&](LogEntry& entry) {
 			if (entry.time_of_death < time_of_frame) {
 				entry.component.markRemove();
+				fire(EventPanelStatusExpired{{}, entry.id});
 				return true;
 			}
 			return false;
