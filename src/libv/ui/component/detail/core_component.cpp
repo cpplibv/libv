@@ -48,8 +48,12 @@ std::string CoreComponent::path() const {
 
 	std::string result = name;
 
-	for (auto it = make_observer_ref(this); it != it->parent_; it = it->parent_)
-		result = it->parent_->name + '/' + std::move(result);
+	// Iterate every component except the root
+	for (auto it = parent_; it != it->parent_; it = it->parent_)
+		result = it->name + '/' + std::move(result);
+
+	// Place the root marker in the front
+	result = '/' + std::move(result);
 
 	return result;
 }
@@ -59,11 +63,7 @@ std::string CoreComponent::path() const {
 void CoreComponent::size(Size value) noexcept {
 	size_ = value;
 	flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
-
-	// This is the same to what size, margin, remove does
-	flagAuto(Flag::pendingLayout);
-	for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
-		it->flagDirect(Flag::pendingLayoutSelf);
+	markInvalidLayout();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ void CoreComponent::flagPurge(Flag_t flags_) noexcept {
 		it->flags.set(calculatePropagateFlags(childFlags));
 
 		if (it == it->parent_)
-			return;
+			break;
 	}
 }
 
@@ -204,17 +204,27 @@ void CoreComponent::markRemove() noexcept {
 		return; // Early return optimization if we are already marked for remove
 
 	flags.reset(Flag::layout | Flag::render);
-	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
+	flagAuto(Flag::pendingDetach);
 
-	// Parent most likely has to be relayouted (could be optimized with another parentDependOnRemove like parentDependOnLayout)
-	// This is the same to what size, margin, remove does (nearly, this one start at parent)
+	// Parent most likely has to be relayouted (could be optimized with another parentDependOnRemove like flag)
+	markInvalidLayout();
+}
+
+void CoreComponent::markInvalidLayout() noexcept {
+	// Invalidate the parent container so it can recalculate the bounds with the changed properties
+	// If that result in bound changes, the layout logic will recalculate anyone who needs it
 	parent_->flagAuto(Flag::pendingLayout);
-	for (auto it = parent_; it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
+
+	// Invalidate anyone upstream whom might depend on layout
+	for (auto it = parent_->parent_; true; it = it->parent_) {
+		if (!it->flags.match_any(Flag::parentDependOnLayout))
+			break;
+
 		it->flagDirect(Flag::pendingLayoutSelf);
 
-	doForeachChildren([](Component& child) {
-		get_core(child)->markRemove();
-	});
+		if (it == it->parent_)
+			break;
+	}
 }
 
 void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
@@ -231,28 +241,43 @@ ContextStyle CoreComponent::makeStyleContext() noexcept {
 // -------------------------------------------------------------------------------------------------
 
 bool CoreComponent::isFocusableComponent() const noexcept {
-	return !flags.match_any(Flag::pendingDetachSelf) &&
-			flags.match_any(Flag::render) &&
-			flags.match_any(Flag::focusableSelf);
+	if (!flags.match_any(Flag::focusableSelf))
+		return false;
+
+	if (!flags.match_any(Flag::render))
+		return false;
+
+	for (auto it = make_observer_ref(this); true; it = it->parent_) {
+		if (it->flags.match_any(Flag::pendingDetachSelf))
+			return false;
+		if (it == it->parent_)
+			break;
+	}
+
+	return true;
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent_; i = i->parent_) {
-		if (i->flags.match_any(Flag::watchChar))
-			i->onChar(event);
+	for (auto it = make_observer_ref(component); true; it = it->parent_) {
+		if (it->flags.match_any(Flag::watchChar))
+			it->onChar(event);
 		if (event.propagation_stopped())
-			return;
+			break;
+		if (it == it->parent_)
+			break;
 	}
 }
 
 void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
-	for (auto i = libv::make_observer_ref(component); i != i->parent_; i = i->parent_) {
-		if (i->flags.match_any(Flag::watchKey))
-			i->onKey(event);
+	for (auto it = make_observer_ref(component); true; it = it->parent_) {
+		if (it->flags.match_any(Flag::watchKey))
+			it->onKey(event);
 		if (event.propagation_stopped())
-			return;
+			break;
+		if (it == it->parent_)
+			break;
 	}
 }
 
@@ -325,9 +350,7 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 	}
 }
 
-void CoreComponent::detach(CoreComponent& old_parent) {
-	(void) old_parent;
-
+void CoreComponent::detachScan() {
 	if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
@@ -335,7 +358,7 @@ void CoreComponent::detach(CoreComponent& old_parent) {
 			bool remove = get_core(child)->flags.match_any(Flag::pendingDetachSelf);
 
 			if (get_core(child)->flags.match_any(Flag::pendingDetach))
-				get_core(child)->detach(*this);
+				get_core(child)->detachScan();
 
 			if (!remove)
 				childFlags |= get_core(child)->flags;
@@ -348,32 +371,41 @@ void CoreComponent::detach(CoreComponent& old_parent) {
 	}
 
 	if (flags.match_any(Flag::pendingDetachSelf)) {
-		log_ui.trace("Detaching {}", path());
-
-		if (flags.match_any(Flag::watchMouse))
-			context().mouse.unsubscribe(*this);
-
-		if (flags.match_any(Flag::floatRegion))
-			context().mouse.unsubscribe_region(*this);
-
-		if (flags.match_any(Flag::focused)) {
-			flags.reset(Flag::focusable);
-			context().detachFocused(*this);
-		}
-
-//		if (flags.match_any(Flag::focusLinked))
-//			context().detachFocusLinked(*this);
-
-		detail::internal_disconnect(this);
-
-		doDetach();
-
-		childID = 0;
-		flags = Flag::mask_init;
-		parent_ = *this;
-		layout_position_ = {};
-		layout_size_ = {};
+		detach();
 	}
+}
+
+void CoreComponent::detach() {
+	log_ui.trace("Detaching {}", path());
+
+	doDetachChildren([](Component& child) {
+		get_core(child)->detach();
+		return true;
+	});
+
+	if (flags.match_any(Flag::watchMouse))
+		context().mouse.unsubscribe(*this);
+
+	if (flags.match_any(Flag::floatRegion))
+		context().mouse.unsubscribe_region(*this);
+
+	if (flags.match_any(Flag::focused)) {
+		flagPurge(Flag::focusable);
+		context().detachFocused(*this);
+	}
+
+//	if (flags.match_any(Flag::focusLinked))
+//		context().detachFocusLinked(*this);
+
+	detail::internal_disconnect(this);
+
+	doDetach();
+
+	childID = 0;
+	flags = Flag::mask_init;
+	parent_ = *this;
+	layout_position_ = {};
+	layout_size_ = {};
 }
 
 void CoreComponent::style() {
@@ -490,8 +522,20 @@ void CoreComponent::render(Renderer& r) {
 	}
 
 	if (flags.match_any(Flag::pendingDetachSelf)) {
-		doDestroy(r);
+		renderDestroy(r);
 	}
+}
+
+void CoreComponent::renderDestroy(Renderer& r) {
+	doForeachChildren([&r](Component& child) {
+		// For now we can get away with not entering render contexts
+		get_core(child)->renderDestroy(r);
+
+		//Renderer rc = r.enter(child);
+		//get_core(child)->renderDestroy(rc);
+	});
+
+	doDestroy(r);
 }
 
 // -------------------------------------------------------------------------------------------------

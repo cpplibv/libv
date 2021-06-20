@@ -425,7 +425,7 @@ public:
 
 			// --- Detach ---
 			try {
-				AccessRoot::detach(root.core(), root.core());
+				AccessRoot::detachScan(root.core());
 				stat.detach.sample(timer.time_ns());
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during detach in UI: {}", ex.what());
@@ -467,7 +467,7 @@ public:
 
 			// --- Detach ---
 			{
-				AccessRoot::detach(root.core(), root.core());
+				AccessRoot::detachScan(root.core());
 			}
 		}
 

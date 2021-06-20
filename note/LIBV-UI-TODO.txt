@@ -8,10 +8,8 @@ libv.ui: context_event does not handle stop propagation, special case if type is
 libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
 libv.ui: Add support for component inheritance
 libv.ui: Fix that component removal does not invalidates the parent's layout
-
-
-
-
+libv.ui: Fix and improve markInvalidLayout related code
+libv.ui: Remove down recursion from component removal
 
 
 
@@ -48,7 +46,6 @@ libv.ui: Fix that component removal does not invalidates the parent's layout
 
 
 
-markRemove would be nice if there were no downward recursion
 panel_status_log single frame flicker where a child is removed during render
 
 
@@ -132,9 +129,8 @@ libv.ui: adopt libv.rev's Shader and ShaderLoader
 libv.ui: (?) Rename PanelFloat to PanelAnchor
 
 libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
-		flagAuto(Flag::pendingLayout);
-		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
-			it->flagDirect(Flag::pendingLayoutSelf);
+		markInvalidLayout();
+		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
 
 place.it:
 	cpp: Virtual inheritance can be a solution for base injection: All virtual base subobjects are initialized before any non-virtual base subobject, so only the most derived class calls the constructors of the virtual bases in its member initializer list:
@@ -449,6 +445,7 @@ libv.ui: Idea: Zombie state, instead of keeping the dying component in their con
 			and detach will just doDetach and remove every zombies from the ui global storage
 		What does it solve?
 			viewLayouted and viewRendered container management during layouts
+			focusable also wins, no need to scan up for detaching parent | or at least traverse will skip obviously wrong candidates
 			layout flag would no longer be required
 		What issue could it cause?
 			? Maaaaaybe something around expecting it inside parent, but, even that
@@ -667,6 +664,7 @@ libv.ui.font: We do not check the error code returned by FT_Get_Kerning. This is
 
 libv.ui: String2D scream at the user if the API get a \r (or any non printable character beside \n \t), and ignore it
 
+libv.ui.event: slot / signal flags could be unflagged if a disconnect leaves an empty entry in the event context
 
 
 

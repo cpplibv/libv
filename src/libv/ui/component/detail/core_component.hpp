@@ -156,16 +156,12 @@ public:
 	}
 	inline void anchor(Anchor value) noexcept {
 		anchor_ = value;
-		flagAuto(Flag::pendingLayout);
-		parent_->flagDirect(Flag::pendingLayoutSelf);
+		markInvalidLayout();
 	}
 
 	inline void margin(Margin value) noexcept {
 		margin_ = value;
-		// This is the same to what size, margin, remove does
-		flagAuto(Flag::pendingLayout);
-		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
-			it->flagDirect(Flag::pendingLayoutSelf);
+		markInvalidLayout();
 	}
 	inline void margin(float left_down_right_top) noexcept {
 		margin({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
@@ -207,10 +203,7 @@ public:
 
 	inline void padding(Padding value) noexcept {
 		padding_ = value;
-		// This is the same to what size, margin, remove does
-		flagAuto(Flag::pendingLayout);
-		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
-			it->flagDirect(Flag::pendingLayoutSelf);
+		markInvalidLayout();
 	}
 	inline void padding(float left_down_right_top) noexcept {
 		padding({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
@@ -280,6 +273,7 @@ public:
 public:
 	void focus() noexcept;
 	void markRemove() noexcept;
+	void markInvalidLayout() noexcept;
 	void style(libv::intrusive_ptr<Style> style) noexcept;
 
 public:
@@ -314,13 +308,15 @@ private:
 
 private:
 	void attach(CoreComponent& parent);
-	void detach(CoreComponent& parent);
+	void detach();
+	void detachScan();
 	void style();
 	void styleScan();
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
 	libv::vec3f layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
 	void render(Renderer& r);
+	void renderDestroy(Renderer& r);
 
 protected:
 	virtual void doAttach();
@@ -463,8 +459,8 @@ struct AccessRoot : AccessEvent, AccessLayout, AccessParent {
 	static inline decltype(auto) attach(CoreComponent& component, CoreComponent& parent) {
 		return component.attach(parent);
 	}
-	static inline decltype(auto) detach(CoreComponent& component, CoreComponent& parent) {
-		return component.detach(parent);
+	static inline decltype(auto) detachScan(CoreComponent& component) {
+		return component.detachScan();
 	}
 	static inline decltype(auto) style(CoreComponent& component) {
 		return component.style();
