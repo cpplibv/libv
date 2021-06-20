@@ -156,12 +156,16 @@ public:
 	}
 	inline void anchor(Anchor value) noexcept {
 		anchor_ = value;
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		flagAuto(Flag::pendingLayout);
+		parent_->flagDirect(Flag::pendingLayoutSelf);
 	}
 
 	inline void margin(Margin value) noexcept {
 		margin_ = value;
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		// This is the same to what size, margin, remove does
+		flagAuto(Flag::pendingLayout);
+		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
+			it->flagDirect(Flag::pendingLayoutSelf);
 	}
 	inline void margin(float left_down_right_top) noexcept {
 		margin({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
@@ -203,7 +207,10 @@ public:
 
 	inline void padding(Padding value) noexcept {
 		padding_ = value;
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		// This is the same to what size, margin, remove does
+		flagAuto(Flag::pendingLayout);
+		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
+			it->flagDirect(Flag::pendingLayoutSelf);
 	}
 	inline void padding(float left_down_right_top) noexcept {
 		padding({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});

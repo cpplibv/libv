@@ -60,10 +60,10 @@ void CoreComponent::size(Size value) noexcept {
 	size_ = value;
 	flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
 
+	// This is the same to what size, margin, remove does
+	flagAuto(Flag::pendingLayout);
 	for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
 		it->flagDirect(Flag::pendingLayoutSelf);
-
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -203,9 +203,14 @@ void CoreComponent::markRemove() noexcept {
 	if (flags.match_full(Flag::pendingDetachSelf))
 		return; // Early return optimization if we are already marked for remove
 
-	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
 	flags.reset(Flag::layout | Flag::render);
+	flagAuto(Flag::pendingDetach | Flag::pendingLayout);
+
+	// Parent most likely has to be relayouted (could be optimized with another parentDependOnRemove like parentDependOnLayout)
+	// This is the same to what size, margin, remove does (nearly, this one start at parent)
 	parent_->flagAuto(Flag::pendingLayout);
+	for (auto it = parent_; it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
+		it->flagDirect(Flag::pendingLayoutSelf);
 
 	doForeachChildren([](Component& child) {
 		get_core(child)->markRemove();
@@ -434,6 +439,9 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 		flags.set(Flag::updatedSize);
 		layout_size_ = layout_env.size;
 	}
+
+	if (boundsChanged)
+		flagAuto(Flag::pendingRender);
 
 	if (boundsChanged && flags.match_any(Flag::watchMouse | Flag::floatRegion)) {
 		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});

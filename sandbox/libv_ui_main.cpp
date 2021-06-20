@@ -275,6 +275,13 @@ public:
 
 		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
 
+		button3.event().submit([this] {
+			if (button3.anchor() != libv::ui::Anchor::center_center)
+				button3.anchor(libv::ui::Anchor::center_center);
+			else
+				button3.anchor(libv::ui::Anchor::bottom_right);
+		});
+
 		button5.text("Fill status log");
 		button5.align_horizontal(libv::ui::AlignHorizontal::center);
 		button5.align_vertical(libv::ui::AlignVertical::center);

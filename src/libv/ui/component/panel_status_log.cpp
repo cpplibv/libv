@@ -22,7 +22,7 @@ struct CorePanelStatusLog : public CorePanelLine {
 	friend class PanelStatusLog;
 	[[nodiscard]] inline auto handler() { return PanelStatusLog{this}; }
 
-public:
+private:
 	struct LogEntry {
 		PanelStatusLog::EntryID id;
 //		std::string style;

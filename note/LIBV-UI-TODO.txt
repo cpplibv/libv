@@ -7,7 +7,7 @@ libv.ui: Implement UI global dynamic event host
 libv.ui: context_event does not handle stop propagation, special case if type is derived from BaseEvent
 libv.ui: Spacing, not just margin, not just padding, but container level spacing support | SUPER useful
 libv.ui: Add support for component inheritance
-
+libv.ui: Fix that component removal does not invalidates the parent's layout
 
 
 
@@ -47,11 +47,7 @@ libv.ui: Add support for component inheritance
 
 
 
-src/libv/ui/component/panel_status_log.hpp
 
-
-
-markRemove does not invalidates the parent's layout / render
 markRemove would be nice if there were no downward recursion
 panel_status_log single frame flicker where a child is removed during render
 
@@ -135,6 +131,10 @@ libv.ui: adopt libv.rev's Shader and ShaderLoader
 
 libv.ui: (?) Rename PanelFloat to PanelAnchor
 
+libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
+		flagAuto(Flag::pendingLayout);
+		for (auto it = make_observer_ref(this); it != it->parent_ && it->flags.match_any(Flag::parentDependOnLayout); it = it->parent_)
+			it->flagDirect(Flag::pendingLayoutSelf);
 
 place.it:
 	cpp: Virtual inheritance can be a solution for base injection: All virtual base subobjects are initialized before any non-virtual base subobject, so only the most derived class calls the constructors of the virtual bases in its member initializer list:
@@ -442,6 +442,16 @@ libv.ui: The UI Paper
 
 libv.ui: Idea for over restricted string_2D: if content would exceed limit, just push the lines or characters closer to each other (could be policy driven)
 
+libv.ui: Idea: Zombie state, instead of keeping the dying component in their container move them into a ui global zombie land, they would still point to their parent, but their parent would no longer know about them
+			zombie flag (rename / rework / reuse detach also works)
+			change removal to be instant (or at least before/during layout step)
+			first step of render is to render destroy all zombies
+			and detach will just doDetach and remove every zombies from the ui global storage
+		What does it solve?
+			viewLayouted and viewRendered container management during layouts
+			layout flag would no longer be required
+		What issue could it cause?
+			? Maaaaaybe something around expecting it inside parent, but, even that
 
 
 --- "The" backlog ---
