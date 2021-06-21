@@ -56,7 +56,7 @@ in vec2 fragmentUV;
 out vec4 color;
 
 void main() {
-	color = vec4(1, 1, 1, 1) * 0.75 + texture2D(textureDiffuseSampler, fragmentUV, 0).rgba * 0.25;
+	color = vec4(1, 1, 1, 1) * 0.75 + texture(textureDiffuseSampler, fragmentUV, 0).rgba * 0.25;
 })";
 
 // =================================================================================================
@@ -83,7 +83,7 @@ in vec2 fragmentUV;
 out vec4 color;
 
 void main() {
-	color = texture2D(textureSampler, fragmentUV, 0).rgba;
+	color = texture(textureSampler, fragmentUV, 0).rgba;
 })";
 
 // -------------------------------------------------------------------------------------------------

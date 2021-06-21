@@ -35,12 +35,12 @@ struct ShaderQuad : Shader {
 			in vec4 fragmentColor0;
 			in vec2 fragmentTexture0;
 
-			out vec4 output;
+			out vec4 result;
 
 			void main() {
-				output = fragmentColor0;
+				result = fragmentColor0;
 
-				clip_component_fs(output);
+				clip_component_fs(result);
 			}
 		)");
 

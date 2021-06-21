@@ -12,7 +12,7 @@ uniform vec4 base_color;
 
 void main() {
 	vec2 uv_scale = render_resolution / textureSize(texture_noise, 0);
-	vec4 noise_sample = texture2D(texture_noise, fragmentTexture0 * uv_scale, 0).rgba;
+	vec4 noise_sample = texture(texture_noise, fragmentTexture0 * uv_scale, 0).rgba;
 
 	result = base_color - noise_scale * 0.5 + noise_sample * noise_scale;
 }

@@ -37,15 +37,15 @@ struct ShaderImage : Shader {
 			in vec4 fragmentColor0;
 			in vec2 fragmentTexture0;
 
-			out vec4 output;
+			out vec4 result;
 
 			uniform sampler2D samplerTexture0;
 
 			void main() {
 				vec4 sample = texture(samplerTexture0, fragmentTexture0);
-				output = sample * fragmentColor0;
+				result = sample * fragmentColor0;
 
-				clip_component_fs(output);
+				clip_component_fs(result);
 			}
 		)");
 

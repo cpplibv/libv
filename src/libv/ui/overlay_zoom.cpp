@@ -72,7 +72,7 @@ in vec2 fragmentUV;
 out vec4 color0;
 
 void main() {
-	color0 = texture2D(sampler0, fragmentUV, 0).rgba;
+	color0 = texture(sampler0, fragmentUV, 0).rgba;
 })";
 
 // -------------------------------------------------------------------------------------------------

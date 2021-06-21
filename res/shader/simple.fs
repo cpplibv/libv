@@ -12,7 +12,7 @@ out vec4 color;
 
 void main() {
 	vec3 normal = normalize(fragmentNormalW);
-	//color = texture2D( textureDiffuseSampler, fragmentUV ).rgba * fragmentColor;
+	//color = texture( textureDiffuseSampler, fragmentUV ).rgba * fragmentColor;
 	//color = fragmentColor;
 	//color = vec4(1, 0, 0, 1);
 
