@@ -3,8 +3,8 @@
 #pragma once
 
 // std
-#include <iterator>
-#include <utility>
+#include <algorithm>
+#include <functional>
 
 
 namespace libv {
@@ -23,9 +23,9 @@ constexpr inline void erase_unstable(Container& container, typename Container::i
 	container.erase(last);
 }
 
-template <typename Container>
-constexpr inline void erase_unstable(Container& container, const typename Container::value_type& value) noexcept {
-	const auto it = std::find(container.begin(), container.end(), value);
+template <typename Container, typename Proj = std::identity>
+constexpr inline void erase_unstable(Container& container, const std::invoke_result_t<Proj, const typename Container::value_type&>& value, Proj proj = {}) noexcept {
+	const auto it = std::ranges::find(container, value, proj);
 
 	if (it == container.end())
 		return;

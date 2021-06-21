@@ -35,8 +35,8 @@ constexpr inline void erase_all_unstable(Container& container, const Value& valu
 }
 
 ///
-template <typename Container, typename Proj>
-constexpr inline void erase_all_unstable(Container& container, const std::invoke_result_t<Proj, typename Container::value_type>& value, const Proj& proj) noexcept {
+template <typename Container, typename Proj = std::identity>
+constexpr inline void erase_all_unstable(Container& container, const std::invoke_result_t<Proj, const typename Container::value_type&>& value, Proj proj = {}) noexcept {
 	auto it = container.begin();
 	auto last = container.end();
 
