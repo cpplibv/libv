@@ -7,5 +7,5 @@ in vec2 fragmentUV;
 out vec4 color;
 
 void main() {
-	color = texture2D(textureDiffuseSampler, fragmentUV, 0).rgba;
+	color = texture(textureDiffuseSampler, fragmentUV, 0).rgba;
 }

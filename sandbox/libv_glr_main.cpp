@@ -199,7 +199,7 @@ in vec2 fragmentUV;
 out vec4 color;
 
 void main() {
-	vec4 sample = texture2D(texture0Sampler, fragmentUV, 0).rgba;
+	vec4 sample = texture(texture0Sampler, fragmentUV, 0).rgba;
 	color = vec4(fract(sample.rgb), sample.a);
 //	color = sample;
 })";

@@ -74,14 +74,14 @@ struct Shader : libv::glr::Program {
 	static inline const std::string CommonCodeFS = R"(
 		in vec4 debug_clip_var;
 
-		void clip_component_fs(inout vec4 output) {
+		void clip_component_fs(inout vec4 result) {
 			if (debug_clip && debug_clip_var.x < 0 || debug_clip_var.y < 0 || debug_clip_var.z < 0 || debug_clip_var.w < 0)
-				output = output * vec4(1.5, 0.3, 0.3, 0.6);
+				result = result * vec4(1.5, 0.3, 0.3, 0.6);
 		}
 
-		void clip_component_fs(inout vec4 output, inout vec4 mask) {
+		void clip_component_fs(inout vec4 result, inout vec4 mask) {
 			if (debug_clip && debug_clip_var.x < 0 || debug_clip_var.y < 0 || debug_clip_var.z < 0 || debug_clip_var.w < 0) {
-				output = mix(vec4(0.8, 0.2, 0.2, 0.0), vec4(1.0, 0.5, 0.5, 1.0), output);
+				result = mix(vec4(0.8, 0.2, 0.2, 0.0), vec4(1.0, 0.5, 0.5, 1.0), result);
 				mask = mask * 0.6;
 			}
 		}
