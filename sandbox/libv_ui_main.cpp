@@ -296,7 +296,7 @@ public:
 				tmp.event().submit([](libv::ui::Button& btn) {
 					btn.markRemove();
 				});
-				status_log.add(i, tmp, libv::ui::clock::now() + t);
+				status_log.add(i, tmp, t);
 			}
 		});
 

@@ -351,7 +351,10 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 }
 
 void CoreComponent::detachScan() {
-	if (flags.match_any(Flag::pendingDetachChild)) {
+	if (flags.match_any(Flag::pendingDetachSelf)) {
+		detach();
+
+	} else if (flags.match_any(Flag::pendingDetachChild)) {
 		Flag_t childFlags = Flag::none;
 
 		doDetachChildren([this, &childFlags](Component& child) {
@@ -368,10 +371,6 @@ void CoreComponent::detachScan() {
 
 		flags.reset(Flag::mask_propagate);
 		flags.set(calculatePropagateFlags(childFlags));
-	}
-
-	if (flags.match_any(Flag::pendingDetachSelf)) {
-		detach();
 	}
 }
 

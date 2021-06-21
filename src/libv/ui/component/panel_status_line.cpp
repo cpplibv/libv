@@ -34,7 +34,7 @@ private:
 public:
 	using CorePanelLine::CorePanelLine;
 
-private:
+protected:
 	virtual void doUpdate() override {
 		const auto time_of_frame = context().state.time_frame();
 
@@ -48,6 +48,15 @@ private:
 		});
 
 		CorePanelLine::doUpdate();
+	}
+
+	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override {
+		CorePanelLine::doDetachChildren([this, &callback](auto& child) {
+			const auto remove = callback(child);
+			if (remove)
+				libv::erase_unstable(entries, child, &LogEntry::component);
+			return remove;
+		});
 	}
 };
 

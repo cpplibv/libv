@@ -17,7 +17,7 @@ libv.ui: Rename PanelStatusLog to PanelStatusLine
 
 
 
-
+libv.ui: Fix PanelStatusLine's missing children detach cleanup
 
 
 
@@ -42,7 +42,6 @@ libv.ui: Rename PanelStatusLog to PanelStatusLine
 
 
 --- STACK ------------------------------------------------------------------------------------------
-
 
 
 
