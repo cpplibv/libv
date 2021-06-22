@@ -47,11 +47,11 @@ public:
 
 public:
 	/// Every update event is called under the same mutex
-	void on_update(shader_load_success_cb success_cb);
+	void on_success(shader_load_success_cb success_cb);
 	/// Every update event is called under the same mutex
-	void on_update(shader_load_failure_cb failure_cb);
+	void on_failure(shader_load_failure_cb failure_cb);
 	/// Every update event is called under the same mutex
-	void on_update(shader_unload_cb unload_cb);
+	void on_unload(shader_unload_cb unload_cb);
 	void clear_on_updates();
 };
 

@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/input/event_fwd.hpp>
@@ -27,18 +29,11 @@ namespace ui {
 // TODO P5: libv.ui: Render ui into a separate frame buffer, or option set its target
 // TODO P5: libv.ui: (?) void setFocusPolicy(...);
 
-class CoreComponent;
-class Component;
-class ContextState;
-class ContextUI;
-class ImplUI;
-class Settings;
-
 class UI {
 	friend class ContextUI;
 
 private:
-	std::unique_ptr<ImplUI> self;
+	std::shared_ptr<class ImplUI> self;
 
 public:
 	UI();
@@ -65,7 +60,8 @@ public:
 	void event(const libv::input::EventMousePosition& event);
 	void event(const libv::input::EventMouseScroll& event);
 
-//	ContextEventHub event_hub();
+public:
+	EventHub event_hub();
 
 public:
 	libv::gl::GL& gl();

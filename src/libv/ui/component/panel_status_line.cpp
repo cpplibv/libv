@@ -79,8 +79,10 @@ void PanelStatusLine::add(EntryID id, Component component, time_point time_of_de
 	const auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);
 	if (it != self().entries.end()) {
 		if (already_dead) {
-			Base::remove(it->component);
+			auto comp = std::move(it->component);
 			libv::erase_unstable(self().entries, it);
+			Base::remove(comp);
+//			Base::remove(it->component);
 		} else {
 			if (it->component != component) {
 				Base::remove(it->component);
@@ -100,8 +102,10 @@ void PanelStatusLine::add(EntryID id, Component component, time_point time_of_de
 void PanelStatusLine::remove(EntryID id) {
 	auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);
 	if (it != self().entries.end()) {
+		auto comp = std::move(it->component);
 		libv::erase_unstable(self().entries, it);
-		Base::remove(it->component);
+		Base::remove(comp);
+//		Base::remove(it->component);
 	}
 }
 

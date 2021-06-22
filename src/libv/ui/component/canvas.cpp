@@ -32,6 +32,7 @@ public:
 	using CoreComponent::CoreComponent;
 
 private:
+	virtual void doUpdate() override;
 	virtual void doStyle(ContextStyle& ctx) override;
 	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
@@ -49,6 +50,13 @@ void CoreCanvasAdaptor::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
+void CoreCanvasAdaptor::doUpdate() {
+	if (canvas == nullptr)
+		return;
+
+	canvas->update(context().state.time_delta());
+}
+
 void CoreCanvasAdaptor::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreCanvasAdaptor> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
@@ -65,7 +73,7 @@ void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
 	if (canvas == nullptr)
 		return;
 
-	canvas->canvas_size = xy(environment.size);
+	canvas->canvas_size = xy(environment.size) - padding_size();
 }
 
 void CoreCanvasAdaptor::doCreate(Renderer& r) {
@@ -80,8 +88,6 @@ void CoreCanvasAdaptor::doCreate(Renderer& r) {
 void CoreCanvasAdaptor::doRender(Renderer& r) {
 	if (canvas == nullptr)
 		return;
-
-	canvas->update(context().state.time_delta());
 
 	r.native([this](libv::glr::Queue& glr){
 		canvas->render(glr);
