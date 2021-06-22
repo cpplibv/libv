@@ -16,7 +16,7 @@ libv.ui: Rename PanelStatusLog to PanelStatusLine
 libv.ui: Implement expire event for PanelStatusLine
 libv.ui: Fix PanelStatusLine's missing children detach cleanup
 libv.ui: Add context entering to EventHub event broadcasting
-
+libv.ui: Implement permanent entry support in PanelStatusLine
 
 
 
@@ -43,10 +43,6 @@ libv.ui: Add context entering to EventHub event broadcasting
 --- STACK ------------------------------------------------------------------------------------------
 
 
-
-
-libv.ui: PanelStatusLine zero lifetime = immortal entry
-		// <<< app.space: Make it immortal
 
 
 

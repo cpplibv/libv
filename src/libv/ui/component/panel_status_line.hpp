@@ -35,8 +35,9 @@ public:
 public:
 	using EntryID = uint64_t;
 
-	void add(EntryID id, Component component, time_duration lifetime = {});
-	void add(EntryID id, Component component, time_point time_of_death);
+	void add(EntryID id, Component component, time_duration lifetime);
+	/// Zero time point means it is a permanent entry
+	void add(EntryID id, Component component, time_point time_of_death = {});
 	void remove(EntryID id);
 	void clear();
 };
