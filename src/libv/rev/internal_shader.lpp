@@ -40,7 +40,8 @@ public:
 	libv::glr::Program program;
 	std::unique_ptr<detail::BaseUniformContainer> uniformContainer;
 
-	bool never_loaded = true;
+	int current_version = -1;
+	int load_version = -1;
 	std::string name_;
 	std::weak_ptr<InternalShaderLoader> loader;
 

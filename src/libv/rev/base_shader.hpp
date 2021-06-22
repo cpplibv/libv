@@ -54,8 +54,10 @@ public:
 	// .
 
 	// span<stage> stages();
-	[[nodiscard]] ShaderID id() const; /// Not OpenGL ID, it is C++ Unique ID
-	[[nodiscard]] const std::string& name() const;
+	[[nodiscard]] ShaderID id() const noexcept; /// Not OpenGL ID, it is C++ Unique ID
+	[[nodiscard]] const std::string& name() const noexcept;
+	[[nodiscard]] int current_version() const noexcept; /// Value -1 means loading never succeeded, using fallback shader instead
+	[[nodiscard]] int load_version() const noexcept;
 
 	[[nodiscard]] libv::glr::Program& program();
 	[[nodiscard]] const libv::glr::Program& program() const;
