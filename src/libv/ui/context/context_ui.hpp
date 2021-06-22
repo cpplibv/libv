@@ -11,6 +11,7 @@
 #include <string_view>
 #include <typeindex>
 // pro
+#include <libv/ui/fwd.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/style_fwd.hpp>
 
@@ -19,21 +20,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-class CoreComponent;
-class ContextEvent;
-class ContextMouse;
-class ContextState;
-class Font2D;
-class Shader;
-class ShaderFont;
-class ShaderImage;
-class ShaderQuad;
-class Style;
-class Texture2D;
-class UI;
-
-class ImplContextUI;
 
 class ContextUI {
 	// TODO P1: The Uniform UI Resource System:
@@ -51,7 +37,7 @@ class ContextUI {
 	// TODO P5: cleanup weak_ptr references with intrusive ptrs
 	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
 
-	std::unique_ptr<ImplContextUI> self;
+	std::unique_ptr<class ImplContextUI> self;
 
 	UI& ui;
 

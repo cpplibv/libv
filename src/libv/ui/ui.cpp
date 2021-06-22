@@ -30,6 +30,7 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
+#include <libv/ui/event_hub.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/overlay_zoom.lpp>
 
@@ -129,6 +130,10 @@ public:
 		context(ui, context_state, settings),
 		// NOTE: operator, utilized to set current_thread_context to prepare for root constructor
 		root((current_thread_context(context), "")) { }
+
+	~ImplUI() {
+		clear_current_thread_context();
+	}
 
 public:
 	void focus(libv::observer_ptr<CoreComponent> old_focus, libv::observer_ptr<CoreComponent> new_focus) {
@@ -475,17 +480,14 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 UI::UI() {
-	self = std::make_unique<ImplUI>(*this);
-	current_thread_context(context());
+	self = std::make_shared<ImplUI>(*this);
 }
 
 UI::UI(const Settings& settings) {
-	self = std::make_unique<ImplUI>(*this, settings);
-	current_thread_context(context());
+	self = std::make_shared<ImplUI>(*this, settings);
 }
 
 UI::~UI() {
-	clear_current_thread_context();
 }
 
 void UI::add(Component component) {
@@ -534,6 +536,13 @@ void UI::event(const libv::input::EventMousePosition& event) {
 void UI::event(const libv::input::EventMouseScroll& event) {
 	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+EventHub UI::event_hub() {
+	auto sp = std::shared_ptr<ContextEvent>(self, &self->context.event);
+	return EventHub(std::weak_ptr<ContextEvent>(sp));
 }
 
 // -------------------------------------------------------------------------------------------------
