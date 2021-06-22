@@ -661,12 +661,13 @@ struct SpaceCanvas : libv::ui::Canvas {
 		// <<< Events should update this (or mark as dirty), not update,
 		//  		and/or precalc the world space mouse ray, because that looks like used a lot
 		// Has to be placed around render, as canvas_size is only set after layout, eehhh its fine
-		//      But thats too late for the event, hmmmmmm
+		//      But thats too late for input the events, hmmmmmm
 		screen_picker = camera.picker(canvas_size);
 
 		const auto s_guard = gl.state.push_guard();
 
 		gl.state.enableDepthTest();
+		gl.state.depthFunctionLess();
 		gl.state.enableDepthMask();
 
 		gl.state.enableBlend();
@@ -675,7 +676,9 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 		gl.state.cullBackFace();
 		gl.state.enableCullFace();
+		gl.state.frontFaceCCW();
 
+		gl.state.clipPlanes(0);
 //		gl.state.polygonModeFill();
 
 		gl.projection = camera.projection(canvas_size);
@@ -701,7 +704,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 		// --- Render Background/Sky ---
 
 		{
-			const auto s_guard2 = gl.state.push_guard();
+			const auto s2_guard = gl.state.push_guard();
 			// No need to write depth data for the background
 			gl.state.disableDepthMask();
 			background.render(gl, canvas_size);
@@ -714,23 +717,29 @@ struct SpaceCanvas : libv::ui::Canvas {
 		// --- Render UI/HUD ---
 
 		{
-			const auto s_guard2 = gl.state.push_guard();
-			gl.state.disableDepthMask();
-
 			{ // Grid
+				const auto s2_guard = gl.state.push_guard();
+				gl.state.disableDepthMask();
+
 				grid.render(gl, uniform_stream);
 			}
 
 			{ // Camera orbit point
+				const auto s2_guard = gl.state.push_guard();
+				gl.state.disableDepthMask();
+
 				const auto m_guard = gl.model.push_guard();
 				gl.model.translate(camera.orbit_point());
 				gl.model.scale(0.2f);
 				origin_gizmo.render(gl, uniform_stream);
 			}
 
-			gl.state.disableDepthTest();
 
 			{ // Camera orientation gizmo in top right
+				const auto s2_guard = gl.state.push_guard();
+				gl.state.disableDepthTest();
+				gl.state.disableDepthMask();
+
 				const auto p_guard = gl.projection.push_guard();
 				const auto v_guard = gl.view.push_guard();
 				const auto m_guard = gl.model.push_guard();
@@ -866,10 +875,6 @@ int main() {
 	{
 		libv::ui::PanelFull layers;
 
-		// <<< app.space: Bug label
-		libv::ui::Label label;
-		label.text("BUG");
-
 		libv::ui::PanelStatusLine shader_errors;
 		shader_errors.align_horizontal(libv::ui::AlignHorizontal::left);
 		shader_errors.align_vertical(libv::ui::AlignVertical::bottom);
@@ -931,9 +936,8 @@ int main() {
 		canvas.adopt(&space);
 //		libv::ui::Canvas2<SpaceCanvas> canvas;
 
-		layers.add(label);
-		layers.add(shader_errors);
 		layers.add(canvas);
+		layers.add(shader_errors);
 //		layers.add(pref_graph);
 		ui.add(layers);
 	}

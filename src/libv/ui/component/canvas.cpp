@@ -80,7 +80,7 @@ void CoreCanvasAdaptor::doCreate(Renderer& r) {
 	if (canvas == nullptr)
 		return;
 
-	r.native([this](libv::glr::Queue& glr){
+	r.native([this](libv::glr::Queue& glr) {
 		canvas->create(glr);
 	});
 }
@@ -89,7 +89,7 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 	if (canvas == nullptr)
 		return;
 
-	r.native([this](libv::glr::Queue& glr){
+	r.native([this](libv::glr::Queue& glr) {
 		canvas->render(glr);
 	});
 }
@@ -98,7 +98,7 @@ void CoreCanvasAdaptor::doDestroy(Renderer& r) {
 	if (canvas == nullptr)
 		return;
 
-	r.native([this](libv::glr::Queue& glr){
+	r.native([this](libv::glr::Queue& glr) {
 		canvas->destroy(glr);
 	});
 }

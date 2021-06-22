@@ -26,33 +26,27 @@ using SequenceNumber = uint32_t;
 
 // -------------------------------------------------------------------------------------------------
 
-struct QueueTaskMesh {
-	SequenceNumber sequenceNumber;
-	State state;
-	std::shared_ptr<RemoteProgram> program;
-	std::shared_ptr<RemoteMesh> mesh;
+static inline void changeState(libv::gl::GL& gl, State target) {
+	gl.capability.blend.set(target.capabilityBlend != 0);
+	gl.capability.cullFace.set(target.capabilityCullFace != 0);
+	gl.capability.depthTest.set(target.capabilityDepthTest != 0);
+	gl.capability.multisample.set(target.capabilityMultisample != 0);
+	gl.capability.rasterizerDiscard.set(target.capabilityRasterizerDiscard != 0);
+	gl.capability.scissorTest.set(target.capabilityScissorTest != 0);
+	gl.capability.stencilTest.set(target.capabilityStencilTest != 0);
+	gl.capability.textureCubeMapSeamless.set(target.capabilityTextureCubeMapSeamless != 0);
 
-	inline void changeState(libv::gl::GL& gl, State target) const noexcept {
-		gl.capability.blend.set(target.capabilityBlend != 0);
-		gl.capability.cullFace.set(target.capabilityCullFace != 0);
-		gl.capability.depthTest.set(target.capabilityDepthTest != 0);
-		gl.capability.multisample.set(target.capabilityMultisample != 0);
-		gl.capability.rasterizerDiscard.set(target.capabilityRasterizerDiscard != 0);
-		gl.capability.scissorTest.set(target.capabilityScissorTest != 0);
-		gl.capability.stencilTest.set(target.capabilityStencilTest != 0);
-		gl.capability.textureCubeMapSeamless.set(target.capabilityTextureCubeMapSeamless != 0);
+	gl.frontFace.set(target.frontFaceCCW == 0 ? libv::gl::FrontFace::CW : libv::gl::FrontFace::CCW);
+	gl.cullFace.set(target.cullFace == 0 ? libv::gl::CullFace::Back : libv::gl::CullFace::Front);
 
-		gl.frontFace.set(target.frontFaceCCW == 0 ? libv::gl::FrontFace::CW : libv::gl::FrontFace::CCW);
-		gl.cullFace.set(target.cullFace == 0 ? libv::gl::CullFace::Back : libv::gl::CullFace::Front);
-
-		std::array polygonModeTable{
+	std::array polygonModeTable{
 			libv::gl::PolygonMode::Fill,
 			libv::gl::PolygonMode::Line,
 			libv::gl::PolygonMode::Point,
-		};
-		gl.polygonMode.set(polygonModeTable[target.polygonMode]);
+	};
+	gl.polygonMode.set(polygonModeTable[target.polygonMode]);
 
-		std::array depthFunctionTable{
+	std::array depthFunctionTable{
 			libv::gl::TestFunction::LEqual,
 			libv::gl::TestFunction::GEqual,
 			libv::gl::TestFunction::Less,
@@ -61,10 +55,10 @@ struct QueueTaskMesh {
 			libv::gl::TestFunction::NotEqual,
 			libv::gl::TestFunction::Always,
 			libv::gl::TestFunction::Never,
-		};
-		gl.depthFunction.set(depthFunctionTable[target.depthFunction]);
+	};
+	gl.depthFunction.set(depthFunctionTable[target.depthFunction]);
 
-		std::array blendFunctionTable{
+	std::array blendFunctionTable{
 			libv::gl::BlendFunction::ConstantAlpha,
 			libv::gl::BlendFunction::ConstantColor,
 			libv::gl::BlendFunction::DestinationAlpha,
@@ -84,15 +78,23 @@ struct QueueTaskMesh {
 			libv::gl::BlendFunction::SourceAlphaSaturate,
 			libv::gl::BlendFunction::SourceColor,
 			libv::gl::BlendFunction::Zero,
-		};
-		gl.blendFunction.set(blendFunctionTable[target.blendSrcFunction], blendFunctionTable[target.blendDstFunction]);
+	};
+	gl.blendFunction.set(blendFunctionTable[target.blendSrcFunction], blendFunctionTable[target.blendDstFunction]);
 
-		gl.clipPlanes.set(target.clipPlanes);
+	gl.clipPlanes.set(target.clipPlanes);
 
-		gl.mask.depth.set(target.maskDepth);
-	}
+	gl.mask.depth.set(target.maskDepth);
+}
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State currentState) const noexcept {
+// -------------------------------------------------------------------------------------------------
+
+struct QueueTaskMesh {
+	SequenceNumber sequenceNumber;
+	State state;
+	std::shared_ptr<RemoteProgram> program;
+	std::shared_ptr<RemoteMesh> mesh;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -108,7 +110,7 @@ struct QueueTaskMeshVII : QueueTaskMesh {
 	VertexIndex baseIndex;
 	VertexIndex numIndices;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote, State currentState) const noexcept {
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
 		if (currentState != state) {
 			changeState(gl, state);
 			currentState = state;
@@ -124,16 +126,39 @@ struct QueueTaskClear {
 	libv::gl::BufferBit buffers;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		// TODO P5: Color mask in not auto enabled, Stencil mask need verification
 		(void) remote;
-		gl.clear(buffers);
+		if ((buffers & libv::gl::BufferBit::DepthStencil) == libv::gl::BufferBit::DepthStencil) {
+			auto cap_d = gl.capability.depthTest.enable_guard();
+			auto cap_s = gl.capability.stencilTest.enable_guard();
+			auto mask_d = gl.mask.depth.enable_guard();
+			// auto mask_s = gl.mask.stencil.enable_guard();
+			gl.clear(buffers);
+		} else if ((buffers & libv::gl::BufferBit::Depth) == libv::gl::BufferBit::Depth) {
+			auto cap_d = gl.capability.depthTest.enable_guard();
+			auto mask_d = gl.mask.depth.enable_guard();
+			gl.clear(buffers);
+		} else if ((buffers & libv::gl::BufferBit::Stencil) == libv::gl::BufferBit::Stencil) {
+			auto cap_s = gl.capability.stencilTest.enable_guard();
+			// auto mask_s = gl.mask.stencil.enable_guard();
+			gl.clear(buffers);
+		} else {
+			gl.clear(buffers);
+		}
 	}
 };
 
 struct QueueTaskCallback {
 	SequenceNumber sequenceNumber;
+	State state;
 	std::function<void(libv::gl::GL&)> callback;
 
-	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
 		(void) remote;
 		callback(gl);
 	}
@@ -173,6 +198,8 @@ struct QueueTaskTexture {
 	libv::gl::TextureChannel channel;
 
 	inline void execute(libv::gl::GL& gl, Remote& remote) const noexcept {
+		// TODO P4: Could be optimized with gl addition: Only change activeTexture if binding is different
+		//		gl.bind(channel, object); BUT sync_might_bind might interfere
 		gl.activeTexture(channel);
 		auto object = AttorneyRemoteTexture::sync_might_bind(texture, gl, remote);
 		gl.bind(object);
@@ -284,7 +311,7 @@ public:
 	>> tasks;
 
 	SequenceNumber sequenceNumber = 0;
-	State currentState;
+	State currentState{};
 
 	template <typename T, typename... Args>
 	inline void add(Args&&... args) {
@@ -319,7 +346,7 @@ void Queue::sequencePoint() noexcept {
 
 void Queue::callback(std::function<void(libv::gl::GL&)> func) {
 	sequencePoint();
-	self->add<QueueTaskCallback>(std::move(func));
+	self->add<QueueTaskCallback>(state.state(), std::move(func));
 	sequencePoint();
 }
 
@@ -600,6 +627,8 @@ void Queue::execute(libv::gl::GL& gl, Remote& remote) {
 	for (const auto& task_variant : self->tasks) {
 		auto execution = [&](const auto& task) {
 			if constexpr (std::is_base_of_v<QueueTaskMesh, std::remove_cvref_t<decltype(task)>>)
+				task.execute(gl, remote, self->currentState);
+			else if constexpr (std::is_same_v<QueueTaskCallback, std::remove_cvref_t<decltype(task)>>)
 				task.execute(gl, remote, self->currentState);
 			else
 				task.execute(gl, remote);

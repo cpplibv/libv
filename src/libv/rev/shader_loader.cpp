@@ -42,7 +42,7 @@ ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
 			loader_sp->queue_source_reload.push_back(std::move(internal_sp));
 		};
 
-		log_rev.info("Tracking file {} for {} because of include {}", file_path, (*self->current_loading_internal)->name_, include_path);
+		log_rev.trace("Tracking file {} for {} because of include {}", file_path, (*self->current_loading_internal)->name_, include_path);
 		const auto token = self->watcher.subscribe_file(file_path, std::move(queue_reload));
 		self->current_loading_stage->included_sources.emplace_back(std::string(include_path), token);
 	};

@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/glr/queue_fwd.hpp>
 #include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/component/detail/component_api.hpp>
@@ -36,7 +37,7 @@ public:
 	[[nodiscard]] libv::vec2f screen_TR() const;
 
 public:
-	void postRender(class Renderer& r);
+	void postRender(libv::glr::Queue& gl);
 };
 
 // -------------------------------------------------------------------------------------------------

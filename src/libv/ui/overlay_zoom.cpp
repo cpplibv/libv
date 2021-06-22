@@ -121,7 +121,7 @@ private:
 	virtual void doRender(Renderer& r) override;
 
 public:
-	void postRender(Renderer& r);
+	void postRender(libv::glr::Queue& gl);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -285,42 +285,40 @@ void CoreOverlayZoom::doRender(Renderer& r) {
 	(void) r;
 }
 
-void CoreOverlayZoom::postRender(Renderer& r) {
-	r.native([this](libv::glr::Queue& gl) {
-		const auto fboSize = libv::vec::cast<float>(framebufferSize_);
-		const auto blitPosition = libv::vec::max(displayPosition, libv::vec2f{0, 0}).cast<int32_t>();
-		const auto blitSize = libv::vec::min(displayPosition + fboSize / zoom_, fboSize).cast<int32_t>();
+void CoreOverlayZoom::postRender(libv::glr::Queue& gl) {
+	const auto fboSize = libv::vec::cast<float>(framebufferSize_);
+	const auto blitPosition = libv::vec::max(displayPosition, libv::vec2f{0, 0}).cast<int32_t>();
+	const auto blitSize = libv::vec::min(displayPosition + fboSize / zoom_, fboSize).cast<int32_t>();
 
-		gl.blit_from_default(framebuffer,
-				blitPosition, blitSize,
-				blitPosition, blitSize,
-				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
+	gl.blit_from_default(framebuffer,
+			blitPosition, blitSize,
+			blitPosition, blitSize,
+			libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
 
-		gl.setClearColor(0, 0, 0, 1);
-		gl.clearColor();
-		gl.clearDepth();
+	gl.setClearColor(0, 0, 0, 1);
+	gl.clearColor();
+	gl.clearDepth();
 
-		const auto guard_s = gl.state.push_guard();
+	const auto guard_s = gl.state.push_guard();
 
-		gl.state.blendSrc_One();
-		gl.state.blendDst_Zero();
-		gl.state.disableDepthTest();
+	gl.state.blendSrc_One();
+	gl.state.blendDst_Zero();
+	gl.state.disableDepthTest();
 
-		{
-			gl.program(program);
-			gl.texture(framebufferColor0, libv::gl::TextureChannel{0});
-			gl.render(quad);
-		}
-		{
-			gl.program(lineProgram);
-			gl.render(lines_border);
-		}
-		{
-			update_cursor();
-			gl.program(lineProgram);
-			gl.render(lines_cursor);
-		}
-	});
+	{
+		gl.program(program);
+		gl.texture(framebufferColor0, libv::gl::TextureChannel{0});
+		gl.render(quad);
+	}
+	{
+		gl.program(lineProgram);
+		gl.render(lines_border);
+	}
+	{
+		update_cursor();
+		gl.program(lineProgram);
+		gl.render(lines_cursor);
+	}
 }
 
 // =================================================================================================
@@ -360,8 +358,8 @@ libv::vec2f OverlayZoom::screen_TR() const {
 	return self().displayPosition + self().framebufferSize_.cast<float>() / self().zoom_ - 1.0f;
 }
 
-void OverlayZoom::postRender(class Renderer& r) {
-	self().postRender(r);
+void OverlayZoom::postRender(libv::glr::Queue& gl) {
+	self().postRender(gl);
 }
 
 // -------------------------------------------------------------------------------------------------
