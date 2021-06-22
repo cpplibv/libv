@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/utility/function_ref.hpp>
@@ -13,8 +15,9 @@
 #include <string_view>
 #include <typeindex>
 // pro
-#include <libv/ui/component/detail/generate_name.hpp>
 #include <libv/ui/component/detail/flag.hpp>
+#include <libv/ui/component/detail/generate_name.hpp>
+#include <libv/ui/event/detail/internal_event_linkage.hpp>
 #include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the std::variant is killing me)
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
@@ -25,30 +28,6 @@
 
 namespace libv {
 namespace ui {
-
-// -------------------------------------------------------------------------------------------------
-
-//class ContextRender;
-class Component;
-class ContextFocusTraverse;
-class ContextLayout1;
-class ContextLayout2;
-class ContextStyle;
-class ContextUI;
-class CoreComponent;
-class EventChar;
-class EventFocus;
-class EventKey;
-class EventMouseButton;
-class EventMouseMovement;
-class EventMouseScroll;
-class Renderer;
-
-namespace detail {
-// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
-void internal_fire(CoreComponent* signal, std::type_index event_type, const void* event_ptr);
-void internal_disconnect(CoreComponent* component);
-} // namespace detail
 
 // -------------------------------------------------------------------------------------------------
 

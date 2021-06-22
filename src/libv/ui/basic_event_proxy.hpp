@@ -10,6 +10,8 @@
 #include <typeindex>
 // pro
 #include <libv/ui/event/base_event.hpp>
+#include <libv/ui/event/detail/internal_event_linkage.hpp>
+
 
 
 namespace libv {
@@ -22,14 +24,6 @@ class ContextEvent;
 class CoreComponent;
 
 namespace detail { // ------------------------------------------------------------------------------
-
-void internal_connect(Component& signal, Component& slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback);
-void internal_connect_global(Component& slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& callback);
-void internal_disconnect(CoreComponent* component);
-void internal_fire(Component& signal, std::type_index event_type, const void* event_ptr);
-void internal_fire(CoreComponent* signal, std::type_index event_type, const void* event_ptr);
-void internal_fire_global(Component& ctx, std::type_index event_type, const void* event_ptr);
-void internal_fire_global(ContextEvent& ctx, std::type_index event_type, const void* event_ptr);
 
 template <typename ComponentT, typename EventT, typename Func>
 [[nodiscard]] std::function<bool(void*, const void*)> internal_callback(Func&& func) {

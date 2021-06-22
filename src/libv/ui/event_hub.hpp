@@ -15,28 +15,39 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class EventHub {
+	ContextUI* contextUI;
 	std::weak_ptr<ContextEvent> contextEvent;
 
 public:
-	explicit inline EventHub(std::weak_ptr<ContextEvent>&& wp) : contextEvent(std::move(wp)) { }
+	explicit inline EventHub(ContextUI* contextUI, std::weak_ptr<ContextEvent>&& wp) :
+		contextUI(contextUI),
+		contextEvent(std::move(wp)) { }
+
+private:
+	void _broadcast(std::type_index event_type, const void* event_ptr);
+	void _broadcast_in_ui_loop(std::type_index event_type, const void* event_ptr);
 
 public:
+	/// Enters the UI context
+	/// Broadcasts the event synchronously
 	template <typename Event>
 	inline void broadcast(const Event& event);
+
+	/// Broadcasts the event asynchronously as part of the event loop
+	template <typename Event>
+	inline void broadcast_in_ui_loop(const Event& event);
 };
 
 // -------------------------------------------------------------------------------------------------
 
-namespace detail {
-// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
-void internal_fire_global(ContextEvent& ctx, std::type_index event_type, const void* event_ptr);
-} // namespace detail
-
 template <typename Event>
 inline void EventHub::broadcast(const Event& event) {
-	const auto sp = contextEvent.lock();
-	if (sp)
-		detail::internal_fire_global(*sp, std::type_index(typeid(Event)), &event);
+	_broadcast(std::type_index(typeid(Event)), &event);
+}
+
+template <typename Event>
+inline void EventHub::broadcast_in_ui_loop(const Event& event) {
+	_broadcast_in_ui_loop(std::type_index(typeid(Event)), &event);
 }
 
 // -------------------------------------------------------------------------------------------------

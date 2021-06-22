@@ -14,10 +14,9 @@ libv.ui: Add explicit component update step to UI loop
 libv.ui: Fix the one frame flicker in panel_status_log on removed children
 libv.ui: Rename PanelStatusLog to PanelStatusLine
 libv.ui: Implement expire event for PanelStatusLine
-
-
-
 libv.ui: Fix PanelStatusLine's missing children detach cleanup
+libv.ui:
+
 
 
 
@@ -44,20 +43,17 @@ libv.ui: Fix PanelStatusLine's missing children detach cleanup
 --- STACK ------------------------------------------------------------------------------------------
 
 
-SOLVED
-	bug status log: if the component is removed from 3rd party, during timeout we try to remove it again
-		So the issue is that remove/detach of a component does not removes stuff from the "entries"
-	| solved with wiring into doDetachChildren, Not a big fan of the solution, but it works
 
 
-
+BUG: shader_loader events could add stuff to UI too early and break it as no context set yet
+	Cause: shader_loader enters from the side, outside of the UI loop (from the Frame loop)
+	Resolution #1: Event hub broadcasts should set ui context (reasonable, but not complete)
+	Resolution #2: Event hub broadcasts should reschedule into the UI loop (maybe with different name)
+	Chosen: Both
 
 BUG: without bug label rendering is broken
 	most likely render sets some state during text that is needed in canvas
 		// <<< app.space: Bug label
-
-BUG: shader_loader events could add stuff to UI too early and break it as no context set yet
-		// <<< app.space: UI error
 
 libv.ui: PanelStatusLine zero lifetime = immortal entry
 		// <<< app.space: Make it immortal

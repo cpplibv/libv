@@ -542,7 +542,7 @@ void UI::event(const libv::input::EventMouseScroll& event) {
 
 EventHub UI::event_hub() {
 	auto sp = std::shared_ptr<ContextEvent>(self, &self->context.event);
-	return EventHub(std::weak_ptr<ContextEvent>(sp));
+	return EventHub(&self->context, std::weak_ptr<ContextEvent>(sp));
 }
 
 // -------------------------------------------------------------------------------------------------

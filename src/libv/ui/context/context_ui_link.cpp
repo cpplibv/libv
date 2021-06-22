@@ -2,8 +2,8 @@
 
 // hpp
 #include <libv/ui/context/context_ui_link.hpp>
-// libv
-#include <libv/utility/observer_ptr.hpp>
+// std
+#include <cassert>
 
 
 namespace libv {
@@ -11,7 +11,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-thread_local libv::observer_ptr<ContextUI> thread_context_ = nullptr;
+thread_local ContextUI* thread_context_ = nullptr;
 
 ContextUI& current_thread_context() noexcept {
 	assert(thread_context_ != nullptr);
@@ -19,11 +19,15 @@ ContextUI& current_thread_context() noexcept {
 }
 
 void current_thread_context(ContextUI& context) noexcept {
-	thread_context_ = libv::make_observer(context);
+	thread_context_ = &context;
 }
 
 void clear_current_thread_context() noexcept {
 	thread_context_ = nullptr;
+}
+
+bool has_current_thread_context() noexcept {
+	return thread_context_ != nullptr;
 }
 
 // -------------------------------------------------------------------------------------------------
