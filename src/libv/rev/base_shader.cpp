@@ -33,12 +33,20 @@ BaseShader::~BaseShader() {
 	// For the sake of forward declared shared_ptr
 }
 
-ShaderID BaseShader::id() const {
+ShaderID BaseShader::id() const noexcept {
 	return internal_->id();
 }
 
-const std::string& BaseShader::name() const {
+const std::string& BaseShader::name() const noexcept {
 	return internal_->name_;
+}
+
+int BaseShader::current_version() const noexcept {
+	return internal_->current_version;
+}
+
+int BaseShader::load_version() const noexcept {
+	return internal_->load_version;
 }
 
 libv::glr::Program& BaseShader::program() {

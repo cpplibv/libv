@@ -15,7 +15,7 @@ libv.ui: Fix the one frame flicker in panel_status_log on removed children
 libv.ui: Rename PanelStatusLog to PanelStatusLine
 libv.ui: Implement expire event for PanelStatusLine
 libv.ui: Fix PanelStatusLine's missing children detach cleanup
-libv.ui:
+libv.ui: Add context entering to EventHub event broadcasting
 
 
 
@@ -45,18 +45,14 @@ libv.ui:
 
 
 
-BUG: shader_loader events could add stuff to UI too early and break it as no context set yet
-	Cause: shader_loader enters from the side, outside of the UI loop (from the Frame loop)
-	Resolution #1: Event hub broadcasts should set ui context (reasonable, but not complete)
-	Resolution #2: Event hub broadcasts should reschedule into the UI loop (maybe with different name)
-	Chosen: Both
+libv.ui: PanelStatusLine zero lifetime = immortal entry
+		// <<< app.space: Make it immortal
+
+
 
 BUG: without bug label rendering is broken
 	most likely render sets some state during text that is needed in canvas
 		// <<< app.space: Bug label
-
-libv.ui: PanelStatusLine zero lifetime = immortal entry
-		// <<< app.space: Make it immortal
 
 libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime
 		auto ev = ui.event_hub(); ev.broadcast(e);

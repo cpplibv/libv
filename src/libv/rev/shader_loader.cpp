@@ -122,7 +122,8 @@ void InternalShaderLoader::update_fs() {
 	while (auto internal_opt = queue_source_reload.pop_optional()) {
 		auto& internal = *internal_opt;
 
-		log_rev.info("Reloading {}", internal->name_);
+		++internal->load_version;
+		log_rev.info("Loading {} v{}", internal->name_, internal->load_version);
 
 		bool had_load_source_error = false;
 		for (auto& stage : internal->stages) {
@@ -141,7 +142,7 @@ void InternalShaderLoader::update_fs() {
 				current_loading_internal = nullptr; // Clear temp var
 
 			} catch (const glsl_failed_include_exception& e) {
-				log_rev.error("--- Failed to load shader: {} ({}) ---", internal->name_, internal->id());
+				log_rev.error("--- Failed to load shader: {} v{} ({}) ---", internal->name_, internal->load_version, internal->id());
 				log_rev.error("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_path, e.file_path, e.ec, e.ec.message());
 				for (const auto& [file, line] : e.include_stack)
 					log_rev.error("    Included from: {}:{}", file, line);
@@ -198,7 +199,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			result = vec4(1.0, 0.0, 0.0, 1.0);
 		})";
 
-		if (internal->never_loaded) {
+		if (internal->current_version == -1) {
 			// Assigning a default red sources to the shader
 			internal->program.vertex(fallback_red_vs);
 			internal->program.fragment(fallback_red_fs);
@@ -206,9 +207,9 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			internal->uniformContainer->bind_assign(internal->program);
 			internal->uniformContainer->bind_blocks(internal->program);
 
-			log_rev.error("Settings shader: {} ({}) to fallback red", internal->name_, internal->id());
+			log_rev.error("Settings shader: {} v{} ({}) to fallback red", internal->name_, internal->load_version, internal->id());
 		} else {
-			log_rev.error("Keeping shader: {} ({}) as last working version", internal->name_, internal->id());
+			log_rev.error("Keeping shader: {} v{} ({}) as last working version v{}", internal->name_, internal->load_version, internal->id(), internal->current_version);
 		}
 	};
 
@@ -223,7 +224,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 	while (auto internal_opt = queue_shader_update.pop_optional()) {
 		auto& internal = *internal_opt;
 
-		log_rev.info("Updating {}", internal->name_);
+		log_rev.info("Updating {} v{}", internal->name_, internal->load_version);
 
 		libv::gl::Program program;
 		gl(program).create();
@@ -251,7 +252,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 		}
 
 		if (shader_compile_failed) {
-			log_rev.error("--- Failed to compile shader: {} ({}) ---\n{}", internal->name_, internal->id(), shader_compile_error);
+			log_rev.error("--- Failed to compile shader: {} v{} ({}) ---\n{}", internal->name_, internal->load_version, internal->id(), shader_compile_error);
 			_broadcast(ShaderLoadFailure{
 					internal->id(),
 					BaseShader(internal),
@@ -268,7 +269,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 
 			if (!gl(program).status()) {
 				auto shader_link_error = gl(program).info();
-				log_rev.error("--- Failed to link shader: {} ({}) ---\n{}", internal->name_, internal->id(), shader_link_error);
+				log_rev.error("--- Failed to link shader: {} v{} ({}) ---\n{}", internal->name_, internal->load_version, internal->id(), shader_link_error);
 				_broadcast(ShaderLoadFailure{
 						internal->id(),
 						BaseShader(internal),
@@ -280,7 +281,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 				fallback_to_default(internal);
 
 			} else {
-				internal->never_loaded = false;
+				internal->current_version = internal->load_version;
 				internal->program._native_swap(program);
 				internal->uniformContainer->bind_assign(internal->program);
 				internal->uniformContainer->bind_blocks(internal->program);
