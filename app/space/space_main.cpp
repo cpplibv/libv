@@ -1,5 +1,8 @@
 // Project: libv, File: app/space/space_main.cpp, Author: Császár Mátyás [Vader]
 
+// ext
+#include <fmt/chrono.h>
+#include <fmt/format.h>
 // libv
 #include <libv/algo/adjacent_pairs.hpp>
 #include <libv/ctrl/controls.hpp>
@@ -874,40 +877,35 @@ int main() {
 		shader_errors.spacing(10);
 
 		shader_errors.event().global.connect<libv::rev::ShaderLoadSuccess>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadSuccess& e) mutable {
-			psl.remove(e.id);
+			libv::ui::Label label;
+			label.align_horizontal(libv::ui::AlignHorizontal::left);
+			label.align_vertical(libv::ui::AlignVertical::bottom);
+			label.size(libv::ui::parse_size_or_throw("1r, D"));
+			label.font_color({.7235f, 0.9333f, 0.2433f, 1.f});
 
-			// <<< app.space: UI error
-//			libv::ui::Label label;
-//			label.align_horizontal(libv::ui::AlignHorizontal::left);
-//			label.align_vertical(libv::ui::AlignVertical::bottom);
-//			label.font_color({.8235f, 0.9333f, 0.0078f, 1.f});
-//
-//			label.text(fmt::format("Successful shader reload: {} ({})\n{}", e.shader.name(), e.id));
-//			psl.add(e.id, label, std::chrono::seconds(3));
+			label.text(fmt::format("[{:%H:%M:%S}] Successful shader reload: {} ({})", std::chrono::system_clock::now(), e.shader.name(), e.id));
+			psl.add(e.id, label, std::chrono::seconds(3));
 		});
 		shader_errors.event().global.connect<libv::rev::ShaderLoadFailure>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadFailure& e) mutable {
 			libv::ui::Label label;
 			label.align_horizontal(libv::ui::AlignHorizontal::left);
 			label.align_vertical(libv::ui::AlignVertical::bottom);
 			label.size(libv::ui::parse_size_or_throw("1r, D"));
-//			label.font_color({.7f, 0.2f, 0.4f, 1.f});
-//			label.font_color({.95f, 0.25f, 0.35f, 1.f});
-//			label.font_color({.8235f, 0.9333f, 0.0078f, 1.f});
 			label.font_color({.9333f, 0.8235f, 0.0078f, 1.f}); // Warning yellow
 
 			if (e.include_failure) {
 				std::string message;
-				message += fmt::format("--- Failed to load shader: {} ({}) ---\n", e.shader.name(), e.id);
+				message += fmt::format("[{:%H:%M:%S}] Failed to load shader: {} ({})\n", std::chrono::system_clock::now(), e.shader.name(), e.id);
 				message += fmt::format("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
 				for (const auto& [file, line] : e.include_failure->include_stack)
 					message += fmt::format("\n    Included from: {}:{}", file, line);
 				label.text(message);
 
 			} else if (e.compile_failure) {
-				label.text(fmt::format("--- Failed to compile shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.compile_failure->message));
+				label.text(fmt::format("[{:%H:%M:%S}] Failed to compile shader: {} ({})\n{}", std::chrono::system_clock::now(), e.shader.name(), e.id, e.compile_failure->message));
 
 			} else if (e.link_failure) {
-				label.text(fmt::format("--- Failed to link shader: {} ({}) ---\n{}", e.shader.name(), e.id, e.link_failure->message));
+				label.text(fmt::format("[{:%H:%M:%S}] Failed to link shader: {} ({})\n{}", std::chrono::system_clock::now(), e.shader.name(), e.id, e.link_failure->message));
 			}
 
 			psl.add(e.id, label, std::chrono::seconds(60)); // <<< app.space: Make it immortal
@@ -931,8 +929,8 @@ int main() {
 //		libv::ui::Canvas2<SpaceCanvas> canvas;
 
 		layers.add(label);
-		layers.add(canvas);
 		layers.add(shader_errors);
+		layers.add(canvas);
 //		layers.add(pref_graph);
 		ui.add(layers);
 	}

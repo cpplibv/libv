@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/utility/intrusive_ptr.hpp>
 // std
@@ -11,7 +13,7 @@
 #include <string_view>
 #include <typeindex>
 // pro
-#include <libv/ui/fwd.hpp>
+#include <libv/ui/event/detail/internal_event_linkage.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/style_fwd.hpp>
 
@@ -91,11 +93,6 @@ public:
 };
 
 // -------------------------------------------------------------------------------------------------
-
-namespace detail {
-// Skipping the inclusion for this function only #include <libv/ui/basic_event_proxy.hpp> (or the creation of a new header)
-void internal_fire_global(ContextEvent& ctx, std::type_index event_type, const void* event_ptr);
-} // namespace detail
 
 template <typename Event>
 inline void ContextUI::fire(const Event& event) {

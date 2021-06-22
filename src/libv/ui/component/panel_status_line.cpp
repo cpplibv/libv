@@ -51,6 +51,9 @@ protected:
 	}
 
 	virtual void doDetachChildren(libv::function_ref<bool(Component&)> callback) override {
+		// This pattern is not my favorite, for now it will do
+		//	I think if the remove were instant (and detach would happen later with a global pit)
+		//	this could have a chance of improving, but have no concrete idea so far
 		CorePanelLine::doDetachChildren([this, &callback](auto& child) {
 			const auto remove = callback(child);
 			if (remove)

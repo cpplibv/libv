@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/basic_event_proxy.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/basic_event_proxy.hpp>
+#include <libv/ui/event/detail/internal_event_linkage.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/detail/core_ptr.hpp>
