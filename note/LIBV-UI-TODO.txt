@@ -17,9 +17,9 @@ libv.ui: Implement expire event for PanelStatusLine
 libv.ui: Fix PanelStatusLine's missing children detach cleanup
 libv.ui: Add context entering to EventHub event broadcasting
 libv.ui: Implement permanent entry support in PanelStatusLine
-
-
-
+libv.glr: Fix clear if the depth buffer mask was disabled
+libv.glr: Add missing state update before native callback
+libv.ui: Fix renderer native callback execution order
 
 
 
@@ -46,9 +46,13 @@ libv.ui: Implement permanent entry support in PanelStatusLine
 
 
 
-BUG: without bug label rendering is broken
-	most likely render sets some state during text that is needed in canvas
-		// <<< app.space: Bug label
+
+
+
+
+
+
+
 
 libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime
 		auto ev = ui.event_hub(); ev.broadcast(e);
@@ -58,6 +62,13 @@ libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates i
 
 
 
+
+
+
+
+Canvas2
+	composition
+	state and mouse access
 
 
 Next in queue:

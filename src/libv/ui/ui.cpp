@@ -415,7 +415,7 @@ public:
 	//		AccessRoot::destroy(root.core(), context);
 
 				if (overlayZoomMode != OverlayZoomMode::disabled)
-					overlayZoom.postRender(r);
+					overlayZoom.postRender(glr);
 
 				stat.render.sample(timer.time_ns());
 			} catch (const std::exception& ex) {

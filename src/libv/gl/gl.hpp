@@ -431,6 +431,7 @@ struct MaskSetter {
 		}
 	};
 	struct Color {
+		// R G B A
 		// ?
 	};
 	struct Stencil {

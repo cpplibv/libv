@@ -151,9 +151,6 @@ public:
 	void render(Mesh mesh);
 	void render(Mesh mesh, uint32_t baseVertex, uint32_t baseIndex, uint32_t numIndices);
 
-private:
-	static inline void changeState(libv::gl::GL& gl, State target);
-
 public:
 	void execute(libv::gl::GL& gl, Remote& remote);
 };

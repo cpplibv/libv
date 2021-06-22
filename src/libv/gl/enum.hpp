@@ -36,6 +36,10 @@ enum class BufferBit : GLenum {
 	return static_cast<BufferBit>(libv::to_value(lhs) | libv::to_value(rhs));
 }
 
+[[nodiscard]] constexpr inline BufferBit operator&(BufferBit lhs, BufferBit rhs) noexcept {
+	return static_cast<BufferBit>(libv::to_value(lhs) & libv::to_value(rhs));
+}
+
 enum class BufferUsage : GLenum {
 	StreamDraw = 0x88E0, /// GL_STREAM_DRAW
 	StreamRead = 0x88E1, /// GL_STREAM_READ

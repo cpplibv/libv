@@ -5,8 +5,8 @@
 // libv
 #include <libv/glr/queue_fwd.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/function_ref.hpp>
 // std
+#include <functional>
 #include <memory>
 #include <span>
 // pro
@@ -106,7 +106,7 @@ public: // --- Component level ---
 	[[nodiscard]] Renderer enter(const Component& child);
 
 public: // --- Native level ---
-	void native(libv::function_ref<void(libv::glr::Queue& glr)> func);
+	void native(std::function<void(libv::glr::Queue&)>);
 };
 
 // -------------------------------------------------------------------------------------------------

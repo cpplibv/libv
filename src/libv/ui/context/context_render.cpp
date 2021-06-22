@@ -101,7 +101,7 @@ public:
 	size_t ll_num_index;
 
 public:
-	struct Task {
+	struct TaskUI {
 		libv::glr::State state;
 		libv::glr::Program shader;
 		libv::glr::Texture texture0;
@@ -113,7 +113,12 @@ public:
 		libv::glr::VertexIndex num_indices;
 	};
 
-	std::vector<Task> tasks;
+	struct TaskNative {
+		libv::glr::State state;
+		std::function<void(libv::glr::Queue&)> callback;
+	};
+
+	std::vector<std::variant<TaskUI, TaskNative>> tasks;
 
 private:
 	void init() {
@@ -185,12 +190,17 @@ public:
 		}
 
 		// Execute (queue) tasks
-		for (Task& task : tasks) {
-			glr.state = task.state;
-			glr.program(task.shader);
-			glr.uniform(task.uniform_block);
-			glr.texture(task.texture0, texture_channel0);
-			glr.render(mesh_stream, task.base_vertex, task.base_index, task.num_indices);
+		for (auto& task : tasks) {
+			if (auto* t = std::get_if<ImplContextRender::TaskUI>(&task)) {
+				glr.state = t->state;
+				glr.program(t->shader);
+				glr.uniform(t->uniform_block);
+				glr.texture(t->texture0, texture_channel0);
+				glr.render(mesh_stream, t->base_vertex, t->base_index, t->num_indices);
+			} else if (auto* t = std::get_if<ImplContextRender::TaskNative>(&task)) {
+				glr.state = t->state;
+				t->callback(glr);
+			}
 		}
 
 		// Cleanup
@@ -283,7 +293,8 @@ void Renderer::begin_triangles() {
 void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader) {
 	const auto& layout_UIInfo = context.layout_UIInfo;
 
-	auto& task = context.tasks.emplace_back(
+	auto& task = std::get<ImplContextRender::TaskUI>(context.tasks.emplace_back(
+			std::in_place_type<ImplContextRender::TaskUI>,
 			glr.state.state(),
 			shader->base_ref(),
 			texture->texture().base_ref(),
@@ -291,7 +302,7 @@ void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader
 			static_cast<uint32_t>(context.ll_base_vertex),
 			static_cast<uint32_t>(context.ll_base_index),
 			static_cast<uint32_t>(context.ll_num_index)
-	);
+	));
 
 	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp();
 	task.uniform_block[layout_UIInfo.matM] = glr.model.top();
@@ -444,15 +455,16 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 	vtx_indices.emplace_back(3);
 	vtx_indices.emplace_back(0);
 
-	auto& task = tasks.emplace_back(
-		glr.state.state(),
-		std::move(shader),
-		std::move(texture),
-		uniform_stream.block_stream(layout_UIInfo),
-		static_cast<uint32_t>(base_vertex),
-		static_cast<uint32_t>(base_index),
-		static_cast<uint32_t>(num_index)
-	);
+	auto& task = std::get<TaskUI>(tasks.emplace_back(
+			std::in_place_type<TaskUI>,
+			glr.state.state(),
+			std::move(shader),
+			std::move(texture),
+			uniform_stream.block_stream(layout_UIInfo),
+			static_cast<uint32_t>(base_vertex),
+			static_cast<uint32_t>(base_index),
+			static_cast<uint32_t>(num_index)
+	));
 
 	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp();
 	task.uniform_block[layout_UIInfo.matM] = glr.model;
@@ -495,15 +507,16 @@ void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const
 
 	const auto& layout_UIInfo = context.layout_UIInfo;
 
-	auto& task = context.tasks.emplace_back(
-		glr.state.state(),
-		shader->base_ref(),
-		font->texture().base_ref(),
-		context.uniform_stream.block_stream(layout_UIInfo),
-		static_cast<uint32_t>(base_vertex),
-		static_cast<uint32_t>(base_index),
-		static_cast<uint32_t>(num_index)
-	);
+	auto& task = std::get<ImplContextRender::TaskUI>(context.tasks.emplace_back(
+			std::in_place_type<ImplContextRender::TaskUI>,
+			glr.state.state(),
+			shader->base_ref(),
+			font->texture().base_ref(),
+			context.uniform_stream.block_stream(layout_UIInfo),
+			static_cast<uint32_t>(base_vertex),
+			static_cast<uint32_t>(base_index),
+			static_cast<uint32_t>(num_index)
+	));
 
 	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp().translate({pos, 0});
 	task.uniform_block[layout_UIInfo.matM] = glr.model.top().translate_copy({pos, 0});
@@ -534,8 +547,12 @@ Renderer Renderer::enter(const Component& child) {
 
 // --- Native level --------------------------------------------------------------------------------
 
-void Renderer::native(libv::function_ref<void(libv::glr::Queue& glr)> func) {
-	func(glr);
+void Renderer::native(std::function<void(libv::glr::Queue&)> func) {
+	context.tasks.emplace_back(
+			std::in_place_type<ImplContextRender::TaskNative>,
+			glr.state.state(),
+			std::move(func)
+	);
 }
 
 // -------------------------------------------------------------------------------------------------
