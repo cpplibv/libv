@@ -911,7 +911,7 @@ int main() {
 				label.text(fmt::format("[{:%H:%M:%S}] Failed to link shader: {} v{} ({}) using v{}\n{}", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id, e.shader.current_version(), e.link_failure->message));
 			}
 
-			psl.add(e.id, label, std::chrono::seconds(60)); // <<< app.space: Make it immortal
+			psl.add(e.id, label);
 		});
 		shader_errors.event().global.connect<libv::rev::ShaderUnload>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderUnload& e) mutable {
 			psl.remove(e.id);

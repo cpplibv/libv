@@ -39,7 +39,7 @@ protected:
 		const auto time_of_frame = context().state.time_frame();
 
 		libv::erase_if_unstable(entries, [&](LogEntry& entry) {
-			if (entry.time_of_death < time_of_frame) {
+			if (entry.time_of_death != time_point{} && entry.time_of_death < time_of_frame) {
 				entry.component.markRemove();
 				fire(EventPanelStatusExpired{{}, entry.id});
 				return true;
@@ -77,7 +77,7 @@ void PanelStatusLine::add(EntryID id, Component component, time_duration lifetim
 
 void PanelStatusLine::add(EntryID id, Component component, time_point time_of_death) {
 	const auto time_of_frame = self().context().state.time_frame();
-	const auto already_dead = time_of_death < time_of_frame;
+	const auto already_dead = time_of_death == time_point{} ? false : time_of_death < time_of_frame;
 
 	const auto it = libv::linear_find_iterator(self().entries, id, &CorePanelStatusLine::LogEntry::id);
 	if (it != self().entries.end()) {
