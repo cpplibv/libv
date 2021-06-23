@@ -126,7 +126,7 @@ public:
 	template <typename T>
 	Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) {
 		remote->dirty = true;
-		const auto ptr = libv::make_observer_ref(remote->data.data() + block.offset + location.location);
+		const auto ptr = make_observer_ref(remote->data.data() + block.offset + location.location);
 		return Proxy<T>{ptr};
 	}
 
@@ -198,7 +198,7 @@ public:
 	template <typename T>
 	Proxy<T> operator[](const libv::glr::Uniform_t<T>& location) {
 		remote->dirty = true;
-		const auto ptr = libv::make_observer_ref(remote->data.data() + block.offset + location.location);
+		const auto ptr = make_observer_ref(remote->data.data() + block.offset + location.location);
 		return Proxy<T>{ptr};
 	}
 

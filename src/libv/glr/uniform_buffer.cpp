@@ -19,7 +19,7 @@ namespace glr {
 void RemoteUniformBuffer::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(buffer).create();
 
-	remote = remote_.destroyQueues();
+	remote = make_observer_ptr(&remote_.destroyQueues());
 	created = true;
 }
 

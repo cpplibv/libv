@@ -21,7 +21,7 @@ namespace glr {
 void RemoteProgram::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	gl(program).create();
 
-	remote = remote_.destroyQueues();
+	remote = make_observer_ptr(&remote_.destroyQueues());
 	created = true;
 }
 

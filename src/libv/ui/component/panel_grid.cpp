@@ -105,7 +105,7 @@ inline auto buildLayoutedChildrenRandomAccessRange(Range& children, libv::vec3f 
 				AccessLayout::layout1(child.core(), ContextLayout1{env_bounds}) :
 				libv::vec3f{};
 
-		result.emplace_back(libv::make_observer_ref(child), child_dynamic);
+		result.emplace_back(libv::make_observer_ref(&child), child_dynamic);
 	}
 
 	return result;

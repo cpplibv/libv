@@ -578,16 +578,14 @@ void UI::destroy() {
 void UI::focus(CoreComponent& component) {
 	current_thread_context(context());
 
-	self->focus(self->context_state.focus_, component);
-	self->context_state.focus_ = component;
+	self->focus(self->context_state.focus_, libv::make_observer_ptr(&component));
+	self->context_state.focus_ = libv::make_observer_ptr(&component);
 }
 
 void UI::detachFocused(CoreComponent& component) {
 	current_thread_context(context());
 
-	(void) component;
-
-	assert(component == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
+	assert(libv::make_observer_ptr(&component) == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
 	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, Degrees<float>{315});
 }
 

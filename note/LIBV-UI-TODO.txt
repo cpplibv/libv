@@ -31,7 +31,7 @@ libv.ui: Fix renderer native callback execution order
 
 
 
-
+libv: Add support for disabling observer_ptr and observer_ref validations
 
 
 
@@ -76,6 +76,12 @@ Next in queue:
 		maybe CRTP base for core components
 		| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
 
+
+libv.ui: Relative mouse coordinate access for a state
+	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
+	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+
+
 Cleanup
 	src/libv/ui/component/base_panel_static.*
 	src/libv/ui/component/check_box.*
@@ -85,18 +91,8 @@ Cleanup
 
 
 
-
-
-
-
 --- Must have ---
 
-
-
-
-libv.ui: Relative mouse coordinate access for a state
-	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
-	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
 
 
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params

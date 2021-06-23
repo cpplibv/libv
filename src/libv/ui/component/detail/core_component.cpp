@@ -26,7 +26,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 CoreComponent::CoreComponent(std::string name) :
-	context_(current_thread_context()),
+	context_(&current_thread_context()),
 	name(std::move(name)) { }
 
 CoreComponent::~CoreComponent() {
@@ -235,7 +235,7 @@ void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 ContextStyle CoreComponent::makeStyleContext() noexcept {
-	return ContextStyle{libv::make_observer(style_.get()), *this};
+	return ContextStyle{libv::make_observer_ptr(style_.get()), *this};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -260,7 +260,7 @@ bool CoreComponent::isFocusableComponent() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) {
-	for (auto it = make_observer_ref(component); true; it = it->parent_) {
+	for (auto it = make_observer_ref(&component); true; it = it->parent_) {
 		if (it->flags.match_any(Flag::watchChar))
 			it->onChar(event);
 		if (event.propagation_stopped())
@@ -271,7 +271,7 @@ void CoreComponent::eventChar(CoreComponent& component, const EventChar& event) 
 }
 
 void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
-	for (auto it = make_observer_ref(component); true; it = it->parent_) {
+	for (auto it = make_observer_ref(&component); true; it = it->parent_) {
 		if (it->flags.match_any(Flag::watchKey))
 			it->onKey(event);
 		if (event.propagation_stopped())
@@ -324,7 +324,7 @@ void CoreComponent::onMouseScroll(const EventMouseScroll& event) {
 void CoreComponent::attach(CoreComponent& new_parent) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		// NOTE: context_ is already set in the constructor
-		parent_ = new_parent;
+		parent_ = make_observer_ref(&new_parent);
 
 		log_ui.trace("Attaching {}", path());
 
@@ -402,7 +402,7 @@ void CoreComponent::detach() {
 
 	childID = 0;
 	flags = Flag::mask_init;
-	parent_ = *this;
+	parent_ = make_observer_ref(this);
 	layout_position_ = {};
 	layout_size_ = {};
 }
@@ -448,7 +448,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::focusTraverse(const ContextFocu
 	// Algorithm driver method, does not directly recurse, only does the up walking
 
 	libv::observer_ptr<CoreComponent> result = doFocusTraverse(context, ChildIDSelf);
-	libv::observer_ref<CoreComponent> ancestor = *this;
+	libv::observer_ref<CoreComponent> ancestor = make_observer_ref(this);
 
 	while (result == nullptr && ancestor != ancestor->parent_) {
 		result = ancestor->parent_->doFocusTraverse(context, ancestor->childID);
@@ -570,7 +570,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::doFocusTraverse(const ContextFo
 	if (current == ChildIDSelf || !isFocusableComponent())
 		return nullptr;
 
-	return libv::make_observer(this);
+	return libv::make_observer_ptr(this);
 }
 
 libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {

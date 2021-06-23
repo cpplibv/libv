@@ -30,18 +30,18 @@ public:
 	inline Address() = default;
 
 	template <typename Str>
-			requires std::convertible_to<Str, std::string>
+			requires std::constructible_from<std::string, Str>
 	inline Address(Str&& address, uint16_t port) :
 		address(std::forward<Str>(address)),
 		service(std::to_string(port)) { }
 
 	template <typename Str0, typename Str1>
-			requires (std::convertible_to<Str0, std::string> && std::convertible_to<Str1, std::string>)
+			requires (std::constructible_from<std::string, Str0> && std::convertible_to<std::string, Str1>)
 	inline Address(Str0&& address, Str1&& port) :
 		address(std::forward<Str0>(address)),
 		service(std::forward<Str1>(port)) { }
 
-	static std::optional<Address> parse(const std::string_view addressport) {
+	[[nodiscard]] static std::optional<Address> parse(const std::string_view addressport) {
 		std::optional<Address> result;
 
 		auto pos = addressport.find(':');

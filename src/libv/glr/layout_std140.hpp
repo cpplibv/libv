@@ -353,14 +353,14 @@ inline UniformBlockLayout<T> layout_std140(const libv::glr::UniformBlockBinding&
 	return result;
 }
 
-inline void write_std140(const libv::observer_ref<std::byte> target, const bool& value) noexcept {
+inline void write_std140(const libv::observer_ref<std::byte> target, const bool value) noexcept {
 	const auto value_ = static_cast<int32_t>(value);
-	std::memcpy(target.get(), &value_, sizeof(value_));
+	std::memcpy(target, &value_, sizeof(value_));
 }
 
 template <typename T>
 inline void write_std140(const libv::observer_ref<std::byte> target, const T& value) noexcept {
-	std::memcpy(target.get(), &value, sizeof(T));
+	std::memcpy(target, &value, sizeof(T));
 }
 
 template <typename T, size_t N>
@@ -368,7 +368,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const std::
 	const auto stride = layout_std140_stride<T>();
 
 	libv::meta::for_constexpr<0, N>([&](auto i) {
-		std::memcpy(target.get() + i * stride, &value[i], sizeof(value[i]));
+		std::memcpy(target + i * stride, &value[i], sizeof(value[i]));
 	});
 }
 
@@ -377,7 +377,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 	const auto stride = layout_std140_stride<libv::vec_t<N, T >> ();
 
 	libv::meta::for_constexpr<0, N>([&](auto i) {
-		std::memcpy(target.get() + i * stride, &value[i], sizeof(value[i]));
+		std::memcpy(target + i * stride, &value[i], sizeof(value[i]));
 	});
 }
 
