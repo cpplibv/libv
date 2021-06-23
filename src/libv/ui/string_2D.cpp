@@ -442,7 +442,7 @@ void String2D::layout() {
 		finishLine();
 
 		const auto lastEnd = line->end;
-		line = make_observer_ref(lines.emplace_back());
+		line = make_observer_ref(&lines.emplace_back());
 		line->begin = lastEnd;
 		line->end = lastEnd;
 

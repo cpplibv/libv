@@ -84,7 +84,7 @@ template <bool Both, bool Draw, bool Read>
 void RemoteFramebuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
 		gl(object).create();
-		remote = remote_.destroyQueues();
+		remote = make_observer_ptr(&remote_.destroyQueues());
 	}
 
 	if constexpr (Both)

@@ -36,7 +36,7 @@ public:
 
 void RemoteRenderbuffer::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
-		remote = remote_.destroyQueues();
+		remote = make_observer_ptr(&remote_.destroyQueues());
 
 		gl(head.renderbuffer).create();
 	}

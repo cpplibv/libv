@@ -767,7 +767,6 @@ struct SpaceCanvas : libv::ui::Canvas {
 // TODO P1: Controls camera should only be placed into context if the canvas is focused | Remove the F12 tracking manual workaround too for mode switching (this might be a second task, as it could be two separate system)
 // TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
 // TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
-// TODO P4: Nicer arrow strips, animation
 
 
 int main() {

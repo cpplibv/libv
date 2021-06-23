@@ -72,7 +72,7 @@ namespace ui {
 //	if (current == ChildIDNone) {
 //		// unrelated component is focused, focus self or iterate every children
 //		if (AccessParent::isFocusableComponent(*this))
-//			return libv::make_observer(this);
+//			return libv::make_observer_ptr(this);
 //
 //	} else if (current == ChildIDSelf) {
 //		// this component itself is currently focused, iterate every children

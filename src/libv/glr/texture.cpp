@@ -78,7 +78,7 @@ public:
 
 void RemoteTexture::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 	if (remote == nullptr) {
-		remote = remote_.destroyQueues();
+		remote = make_observer_ptr(&remote_.destroyQueues());
 
 		if (!dirty_load) {
 			// TODO P5: Sort out this create mess, ideal solution would be to improve Image to accept a texture

@@ -278,7 +278,7 @@ libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextF
 	if (current == ChildIDNone) {
 		// unrelated component is focused, focus self or iterate every children
 		if (AccessParent::isFocusableComponent(*this))
-			return libv::make_observer(this);
+			return libv::make_observer_ptr(this);
 
 	} else if (current == ChildIDSelf) {
 		// this component itself is currently focused, iterate every children
@@ -287,7 +287,7 @@ libv::observer_ptr<CoreComponent> CoreScrollArea::doFocusTraverse(const ContextF
 		// one of the children is currently focused, iterate remaining children
 		if (!context.isForward())
 			if (AccessParent::isFocusableComponent(*this))
-				return libv::make_observer(this);
+				return libv::make_observer_ptr(this);
 
 		return nullptr;
 	}

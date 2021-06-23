@@ -22,7 +22,7 @@ void RemoteMesh::create(libv::gl::GL& gl, Remote& remote_) noexcept {
 	for (RemoteMeshAttribute& attribute : attributes)
 		gl(attribute.buffer).create();
 
-	remote = remote_.destroyQueues();
+	remote = make_observer_ptr(&remote_.destroyQueues());
 	created = true;
 }
 
