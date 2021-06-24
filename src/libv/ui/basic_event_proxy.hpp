@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/meta/always.hpp>
 // std
@@ -18,10 +20,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-class Component;
-class ContextEvent;
-class CoreComponent;
 
 namespace detail { // ------------------------------------------------------------------------------
 

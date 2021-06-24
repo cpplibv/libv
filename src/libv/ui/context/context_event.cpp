@@ -7,10 +7,9 @@
 // std
 #include <cassert>
 #include <functional>
-#include <memory>
-#include <typeindex>
 #include <unordered_map>
 #include <vector>
+#include <mutex>
 
 
 namespace libv {
@@ -25,11 +24,12 @@ public:
 	struct Target {
 		ptr slot;
 		std::type_index event_type;
-		bool is_system; /// unignorable
+		bool is_system; /// Callback is not ignorable
 		std::function<bool(void*, const void*)> callback;
 	};
 
 public:
+	std::recursive_mutex mutex;
 	std::unordered_map<ptr, std::vector<Target>> signals;
 	std::unordered_map<ptr, std::vector<ptr>> slots;
 };
@@ -44,6 +44,8 @@ ContextEvent::~ContextEvent() {
 }
 
 void ContextEvent::connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+	auto lock = std::unique_lock(self->mutex);
+
 	self->slots[slot].emplace_back(signal);
 	auto& targets = self->signals[signal];
 	if (front)
@@ -53,6 +55,8 @@ void ContextEvent::connect(ptr signal, ptr slot, std::type_index event_type, boo
 }
 
 void ContextEvent::connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+	auto lock = std::unique_lock(self->mutex);
+
 	self->slots[slot].emplace_back(nullptr);
 	auto& targets = self->signals[nullptr];
 	if (front)
@@ -62,6 +66,8 @@ void ContextEvent::connect_global(ptr slot, std::type_index event_type, bool fro
 }
 
 void ContextEvent::fire(ptr signal, std::type_index event_type, const void* event_ptr) {
+	auto lock = std::unique_lock(self->mutex);
+
 	const auto it = self->signals.find(signal);
 	if (it == self->signals.end()) {
 		assert(false && "Attempted to fire a not connected signal");
@@ -76,6 +82,8 @@ void ContextEvent::fire(ptr signal, std::type_index event_type, const void* even
 }
 
 void ContextEvent::fire_global(std::type_index event_type, const void* event_ptr) {
+	auto lock = std::unique_lock(self->mutex);
+
 	const auto it = self->signals.find(nullptr);
 	if (it == self->signals.end())
 		return;
@@ -89,6 +97,8 @@ void ContextEvent::fire_global(std::type_index event_type, const void* event_ptr
 }
 
 void ContextEvent::disconnect_signal(ptr signal) {
+	auto lock = std::unique_lock(self->mutex);
+
 	const auto it = self->signals.find(signal);
 	if (it == self->signals.end()) {
 		assert(false && "Attempted to disconnect a not connected signal");
@@ -109,6 +119,8 @@ void ContextEvent::disconnect_signal(ptr signal) {
 }
 
 void ContextEvent::disconnect_slot(ptr slot) {
+	auto lock = std::unique_lock(self->mutex);
+
 	const auto it = self->slots.find(slot);
 	if (it == self->slots.end()) {
 		assert(false && "Attempted to disconnect a not connected slot");
