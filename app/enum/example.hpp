@@ -34,11 +34,11 @@ private:
 	enum_type enum_value_;
 
 public:
-	/* implicit */ constexpr inline color_type(enum_type value) noexcept :
+	explicit(false) constexpr inline color_type(enum_type value) noexcept :
 			enum_value_(value) {
 	}
 
-	/* implicit */ [[nodiscard]] constexpr inline operator enum_type() const noexcept {
+	explicit(false) [[nodiscard]] constexpr inline operator enum_type() const noexcept {
 		return enum_value_;
 	}
 
@@ -47,6 +47,10 @@ public:
 	}
 
 	[[nodiscard]] constexpr inline underlying_type underlying() const noexcept {
+		return static_cast<underlying_type>(enum_value_);
+	}
+
+	[[nodiscard]] constexpr inline underlying_type operator+() const noexcept {
 		return static_cast<underlying_type>(enum_value_);
 	}
 
@@ -114,6 +118,10 @@ std::ostream& operator<<(std::ostream& os, const color var) {
 }
 
 [[nodiscard]] constexpr inline int32_t underlying(color enum_value) noexcept {
+	return static_cast<int32_t>(enum_value);
+}
+
+[[nodiscard]] constexpr inline int32_t operator+(color enum_value) noexcept {
 	return static_cast<int32_t>(enum_value);
 }
 
