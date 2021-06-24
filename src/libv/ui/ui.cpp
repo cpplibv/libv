@@ -3,8 +3,8 @@
 // hpp
 #include <libv/ui/ui.hpp>
 // libv
-#include <libv/glr/remote.hpp>
 #include <libv/glr/queue.hpp>
+#include <libv/glr/remote.hpp>
 #include <libv/input/event.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/utility/histogram.hpp>
@@ -19,8 +19,8 @@
 #include <variant>
 #include <vector>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>

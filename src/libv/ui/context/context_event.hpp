@@ -37,9 +37,6 @@ public:
 	void connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func);
 	void connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func);
 
-	void fire(ptr signal, std::type_index event_type, const void* event_ptr);
-	void fire_global(std::type_index event_type, const void* event_ptr);
-
 	void disconnect_signal(ptr signal);
 	void disconnect_slot(ptr slot);
 
@@ -47,6 +44,9 @@ public:
 	void disconnect(ptr signal, ptr slot, std::type_index event_type); /// Exposition only, Implement on demand
 	template <typename Event>
 	void disconnect(ptr signal, ptr slot); /// Exposition only, Implement on demand
+
+	void fire(ptr signal, std::type_index event_type, const void* event_ptr);
+	void fire_global(std::type_index event_type, const void* event_ptr);
 };
 
 // -------------------------------------------------------------------------------------------------

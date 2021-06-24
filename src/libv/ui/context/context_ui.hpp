@@ -39,6 +39,7 @@ class ContextUI {
 	// TODO P5: cleanup weak_ptr references with intrusive ptrs
 	// TODO P5: style unordered_map could be a unordered_set, (generalize dereference hasher)
 
+private:
 	std::unique_ptr<class ImplContextUI> self;
 
 	UI& ui;
@@ -72,7 +73,7 @@ public:
 	void detachFocusLinked(CoreComponent& component);
 
 public:
-	template <typename Event> inline void fire(const Event& event);
+	template <typename Event> inline void broadcast(const Event& event);
 
 public:
 	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
@@ -95,7 +96,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 template <typename Event>
-inline void ContextUI::fire(const Event& event) {
+inline void ContextUI::broadcast(const Event& event) {
 	detail::internal_fire_global(this->event, std::type_index(typeid(Event)), &event);
 }
 

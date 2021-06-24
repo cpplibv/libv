@@ -20,18 +20,19 @@ libv.ui: Implement permanent entry support in PanelStatusLine
 libv.glr: Fix clear if the depth buffer mask was disabled
 libv.glr: Add missing state update before native callback
 libv.ui: Fix renderer native callback execution order
-
-
-
-
-
-
-
-
-
-
-
 libv: Add support for disabling observer_ptr and observer_ref validations
+libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime | auto ev = ui.event_hub(); ev.broadcast(e);
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -45,18 +46,6 @@ libv: Add support for disabling observer_ptr and observer_ref validations
 
 
 
-
-
-
-
-
-
-
-
-
-libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime
-		auto ev = ui.event_hub(); ev.broadcast(e);
-	! I dont like the lifetime extension properties of the weak_ptr. Would rather do a mutex + bool, But think about it a little
 
 
 
