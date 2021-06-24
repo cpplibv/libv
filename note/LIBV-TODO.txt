@@ -593,6 +593,7 @@ libv.diff: Implement in memory diff and patch support
 libv.diff: make sure every stream of lvalue ref output respects offset
 ext: adopt colony https://github.com/mattreecebentley/plf_colony
 libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
+app.enum: Add unary operator+ as an alias for to underlying
 
 
 
@@ -602,6 +603,9 @@ libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 
 
 https://pages.jetbrains.com/cppnow2021#g-603902215
+
+
+ext: adopt https://github.com/olegpublicprofile/stdfwd
 
 libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesystem::path::u8string and std::filesystem::path::generic_u8string
 		Search for .string(), not that many
@@ -1311,6 +1315,7 @@ libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate
 
 libv.gl: https://learnopengl.com/PBR/Lighting
 libv.glr: post-processing emission / bloom
+		Some idea / look like Dirt texture and stronger sky bleed: https://www.youtube.com/watch?v=ThA9pueKvus
 libv.glr: post-processing gamma
 libv.glr: post-processing haze
 

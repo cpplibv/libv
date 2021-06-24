@@ -166,11 +166,11 @@ public:
 
 		out("\n");
 		out("public:\n");
-		out("	/* implicit */ constexpr inline {}(enum_type value) noexcept :\n", class_enum_type_name);
+		out("	explicit(false) constexpr inline {}(enum_type value) noexcept :\n", class_enum_type_name);
 		out("		enum_value_(value) {{\n");
 		out("	}}\n");
 		out("\n");
-		out("	/* implicit */ [[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
+		out("	explicit(false) [[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
 		out("		return enum_value_;\n");
 		out("	}}\n");
 		out("\n");
@@ -179,6 +179,10 @@ public:
 		out("	}}\n");
 		out("\n");
 		out("	[[nodiscard]] constexpr inline underlying_type underlying() const noexcept {{\n");
+		out("		return static_cast<underlying_type>(enum_value_);\n");
+		out("	}}\n");
+		out("\n");
+		out("	[[nodiscard]] constexpr inline underlying_type operator+() const noexcept {{\n");
 		out("		return static_cast<underlying_type>(enum_value_);\n");
 		out("	}}\n");
 		out("\n");
@@ -307,6 +311,11 @@ public:
 
 		out("\n");
 		out("[[nodiscard]] constexpr inline {} underlying({} enum_value) noexcept {{\n", enum_type, enum_name);
+		out("	return static_cast<{}>(enum_value);\n", enum_type);
+		out("}}\n");
+
+		out("\n");
+		out("[[nodiscard]] constexpr inline {} operator+({} enum_value) noexcept {{\n", enum_type, enum_name);
 		out("	return static_cast<{}>(enum_value);\n", enum_type);
 		out("}}\n");
 
@@ -527,6 +536,9 @@ int main() {
 		void foo8(std::ostream& os, color c) {
 		    os << c;
 		    os << type(c);
+		}
+		auto foo9(color a) {
+		    return +a;
 		}
  */
 
