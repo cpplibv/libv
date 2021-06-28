@@ -49,7 +49,8 @@ libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates i
 
 
 
-
+libv.ui: Restructure contexts, centralize and unify them, their construction, their referencing, improve naming (event -> comm)
+		organize which is public (like context_state), which is privet (like context_event)
 
 
 
@@ -58,18 +59,18 @@ libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates i
 Canvas2
 	composition
 	state and mouse access
+	gl.viewport call
+
+libv.ui: Relative mouse coordinate access for a state
+	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
+	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
+
 
 
 Next in queue:
 	property context creation stuffy simplification
 		maybe CRTP base for core components
 		| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-
-libv.ui: Relative mouse coordinate access for a state
-	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
-	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
-
 
 Cleanup
 	src/libv/ui/component/base_panel_static.*
@@ -99,6 +100,7 @@ libv.ui: Background fragment, property type that can be quad/image/stretch/param
 
 
 libv.ui: static_component system (lite)
+		Check on the _pastebin/legacy codes for this one
 	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 	libv.ui: Composite component style / property system
 		libv.ui.property: complex composite component would result in "nested" property sets

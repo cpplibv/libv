@@ -611,7 +611,7 @@ libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesyste
 		Search for .string(), not that many
 		Search for generic_string(), not that many
 		also, review/kill .string usages (?)
-
+cpp.chrono: zoned_now = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
 
 
 cpp: Cursed idea: #define implicit explicit(false)
@@ -635,6 +635,8 @@ GCC 11.1
 
 	Experimental C++23 support, including:
 		std::to_underlying, std::is_scoped_enum
+
+	ext: update fmt to 8.0
 
 
 This looks like a useful concepts:
