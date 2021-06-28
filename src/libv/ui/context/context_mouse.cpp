@@ -307,6 +307,32 @@ void ContextMouse::release(CoreComponent& component) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::vec2f ContextMouse::get_global_position(CoreComponent& component) {
+	libv::vec2f offset;
+
+	for (auto it = &component; true; it = it->parent()) {
+		if (it->isFloatRegion()) {
+			auto node = self->container.find(&component);
+
+			if (node == nullptr)
+				log_ui.warn("Attempted to find a not subscribed region: {} {}", static_cast<void*>(it), it->path());
+			else
+				offset -= node->region_offset;
+				// <<< Need testing
+		}
+
+		offset -= it->layout_position2();
+		// <<< Need testing, cant remember is layout pos abs or rel to parent
+
+		if (it == it->parent())
+			break;
+	}
+
+	return offset;
+}
+
+// -------------------------------------------------------------------------------------------------
+
 namespace {
 
 struct Hit {

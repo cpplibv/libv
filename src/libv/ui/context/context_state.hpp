@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
@@ -16,8 +18,6 @@ namespace libv {
 namespace ui {
 
 // -------------------------------------------------------------------------------------------------
-
-class CoreComponent;
 
 class ContextState {
 	friend class ImplUI;

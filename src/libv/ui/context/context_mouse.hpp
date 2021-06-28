@@ -51,6 +51,9 @@ public:
 //	void foreach_mouse_over(libv::function_ref<void(const ComponentMouseInfo&)> func);
 
 public:
+	libv::vec2f get_global_position(CoreComponent& component);
+
+public:
 	void event_enter();
 	void event_leave();
 	void event_button(libv::input::MouseButton mouse, libv::input::Action action);
