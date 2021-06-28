@@ -203,7 +203,7 @@ function(wish_create_library)
 
 	# add
 	if(arg_STATIC)
-		add_library(${arg_TARGET} STATIC ${matching_sources} ${target_objects})
+		add_library(${arg_TARGET} SHARED ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} ${arg_LINK} ${__wish_static_link_std})
 	elseif(arg_INTERFACE)
 		add_library(${arg_TARGET} INTERFACE ${matching_sources} ${target_objects})

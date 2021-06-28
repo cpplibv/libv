@@ -400,6 +400,7 @@ wish_create_external(
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
+		-DBUILD_SHARED_LIBS=ON
 	LINK fmt
 )
 
@@ -424,12 +425,14 @@ wish_create_external(
 wish_create_external(
 	NAME glew
 	GIT_REPOSITORY https://github.com/Perlmint/glew-cmake.git
-	GIT_TAG 679246fadb5780963151c676056772fedebab694
+	GIT_TAG 883e35a3d493d93fa27da5abb6225654c360f9d0
 	CMAKE_ARGS
-		-Dglew-cmake_BUILD_SHARED=OFF
+		-Dglew-cmake_BUILD_SHARED=ON
 		-Dglew-cmake_BUILD_STATIC=ON
-	LINK glew
-	DEFINE GLEW_STATIC
+		-DONLY_LIBS=ON
+#	LINK glew
+	LINK glew-shared
+#	DEFINE GLEW_STATIC
 )
 
 wish_create_external(
