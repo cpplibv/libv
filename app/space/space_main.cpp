@@ -23,6 +23,7 @@
 #include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
+#include <libv/ui/component/panel_float.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/event_hub.hpp>
@@ -549,77 +550,26 @@ libv::vec3f intersect_ray_plane(libv::vec3f ray_point, libv::vec3f ray_dir, libv
 
 // -------------------------------------------------------------------------------------------------
 
+#include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_state.hpp>
+#include <libv/ui/context/context_ui.hpp>
 libv::ui::UI* global_ui; // <<< Remove this one
 
-struct SpaceCanvas : libv::ui::Canvas {
+struct SpaceState {
 	app::CameraPlayer& camera;
-	app::CameraPlayer::screen_picker screen_picker;
 
 	float angle = 0.0f;
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
 
-	Background background;
-	Grid grid;
-	Gizmo origin_gizmo;
-	CommandArrow arrow;
-	FleetRender render_fleet;
 	std::vector<Fleet> fleets;
 
-	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
-
-	explicit SpaceCanvas(app::CameraPlayer& camera) :
-		camera(camera),
-		screen_picker(camera.picker({100, 100})) { // <<< This line is wrong, canvas_size is not initialized at this point
+public:
+	SpaceState(app::CameraPlayer& camera) :
+		camera(camera) { // <<< This line is wrong, canvas_size is not initialized at this point
 	}
 
-	static void register_controls(libv::ctrl::FeatureRegister controls) {
-//		libv::ctrl::scale_group sg_translate{
-//				.impulse = 0.1,
-//				.time = 1.0,
-//				.mouse = 1.0 / 600.0,
-//				.scroll = 0.1,
-//				.gp_analog = 1.0,
-//				.js_analog = 1.0
-//		};
-
-		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
-
-			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
-			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
-			const auto mouse_coord = global_ui->state().mouse_position();
-			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			if (!ctx.fleets.empty())
-				ctx.fleets.back().target = world_coord;
-			ctx.fleets.emplace_back(world_coord, world_coord);
-			std::cout << "world_coord: " << world_coord << std::endl;
-		});
-
-		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
-
-			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
-			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
-			const auto mouse_coord = global_ui->state().mouse_position();
-			const auto world_coord = intersect_ray_plane(ctx.camera.eye(), ctx.screen_picker.to_world(mouse_coord), libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
-			ctx.camera.warp_to(world_coord);
-			std::cout << "world_coord: " << world_coord << std::endl;
-		});
-	}
-
-	static void bind_default_controls(libv::ctrl::Controls& controls) {
-		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
-		controls.bind("space.warp_camera_to_mouse", "Z");
-	}
-
-	virtual void update(libv::ui::time_duration delta_time) override {
+	void update(libv::ui::time_duration delta_time) {
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 		time += dtf;
@@ -656,8 +606,101 @@ struct SpaceCanvas : libv::ui::Canvas {
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
+};
+
+struct SpaceCanvas : libv::ui::Canvas {
+	bool main_canvas;
+	SpaceState& state;
+	app::CameraPlayer& camera;
+	app::CameraPlayer::screen_picker screen_picker;
+
+	Background background;
+	Grid grid;
+	Gizmo origin_gizmo;
+	CommandArrow arrow;
+	FleetRender render_fleet;
+
+	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+
+	explicit SpaceCanvas(SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
+		main_canvas(main_canvas),
+		state(state),
+		camera(camera),
+		screen_picker(camera.picker({100, 100})) {
+	}
+
+	static void register_controls(libv::ctrl::FeatureRegister controls) {
+//		libv::ctrl::scale_group sg_translate{
+//				.impulse = 0.1,
+//				.time = 1.0,
+//				.mouse = 1.0 / 600.0,
+//				.scroll = 0.1,
+//				.gp_analog = 1.0,
+//				.js_analog = 1.0
+//		};
+
+		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
+			(void) arg;
+
+			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
+			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
+			const auto mouse_global_coord = global_ui->state().mouse_position();
+			const auto mouse_global_offset = global_ui->context().mouse.get_global_position(*ctx.core);
+			const auto mouse_local_coord = mouse_global_coord + mouse_global_offset;
+			// <<< This needs to be simpler
+
+			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+			const auto mouse_ray_pos = ctx.camera.eye();
+			const auto world_coord = intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
+			if (!ctx.state.fleets.empty())
+				ctx.state.fleets.back().target = world_coord;
+			ctx.state.fleets.emplace_back(world_coord, world_coord);
+			std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
+			std::cout << "world_coord: " << world_coord << std::endl;
+		});
+
+		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
+			(void) arg;
+
+			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
+			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
+			const auto mouse_global_coord = global_ui->state().mouse_position();
+			const auto mouse_global_offset = global_ui->context().mouse.get_global_position(*ctx.core);
+			const auto mouse_local_coord = mouse_global_coord + mouse_global_offset;
+			// <<< This needs to be simpler
+
+			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+			const auto mouse_ray_pos = ctx.camera.eye();
+			const auto world_coord = intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
+			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
+			ctx.camera.warp_to(world_coord);
+			std::cout << "world_coord: " << world_coord << std::endl;
+		});
+	}
+
+	static void bind_default_controls(libv::ctrl::Controls& controls) {
+		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+		controls.bind("space.warp_camera_to_mouse", "Z");
+	}
+
+	virtual void update(libv::ui::time_duration delta_time) override {
+		if (main_canvas)
+			state.update(delta_time);
+	}
 
 	virtual void render(libv::glr::Queue& gl) override {
+		// <<< UI Component position is lost
+		//				gl.viewport() or matrix manipulation
+		// <<< Incorrect, does not account for parent's parent pos and so on...
+		gl.viewport(
+				cast<int>(round(canvas_position)),
+				cast<int>(round(canvas_size))
+		);
+
 		// <<< Events should update this (or mark as dirty), not update,
 		//  		and/or precalc the world space mouse ray, because that looks like used a lot
 		// Has to be placed around render, as canvas_size is only set after layout, eehhh its fine
@@ -691,9 +734,18 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		gl.clearColor();
 //		gl.clearDepth();
 
+		// --- Render Background/Sky ---
+
+		if (!main_canvas) {
+			const auto s2_guard = gl.state.push_guard();
+			// Clear the depth data for the background of the mini display
+			gl.state.depthFunctionAlways();
+			background.render(gl, canvas_size);
+		}
+
 		// --- Render Opaque ---
 
-		for (const auto& fleet : fleets) {
+		for (const auto& fleet : state.fleets) {
 			const auto m_guard = gl.model.push_guard();
 			gl.model.translate(fleet.position);
 			gl.model.scale(0.2f);
@@ -703,9 +755,9 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 		// --- Render Background/Sky ---
 
-		{
+		if (main_canvas) {
 			const auto s2_guard = gl.state.push_guard();
-			// No need to write depth data for the background
+			// No need to write depth data for the main background
 			gl.state.disableDepthMask();
 			background.render(gl, canvas_size);
 		}
@@ -734,7 +786,6 @@ struct SpaceCanvas : libv::ui::Canvas {
 				origin_gizmo.render(gl, uniform_stream);
 			}
 
-
 			{ // Camera orientation gizmo in top right
 				const auto s2_guard = gl.state.push_guard();
 				gl.state.disableDepthTest();
@@ -752,7 +803,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 						canvas_size,
 						-orientation_gizmo_size,
 						+orientation_gizmo_size);
-				// TODO P2: No not reset view, use the UI's current view
+				// TODO P1: No not reset view, use the UI's current view
 				gl.view = camera.orientation().translate(-1, 0, 0);
 				gl.model.scale(orientation_gizmo_size * 0.5f);
 
@@ -828,8 +879,10 @@ int main() {
 	ui.attach(frame);
 	controls.attach(frame);
 
-	SpaceCanvas space(camera);
-	controls.context_enter<SpaceCanvas>(&space); // TODO P1: Enter / leave on canvas focus-unfocus
+	SpaceState space_state(camera);
+	SpaceCanvas space_main(space_state, camera, true);
+	SpaceCanvas space_mini(space_state, camera, false);
+	controls.context_enter<SpaceCanvas>(&space_main); // TODO P1: Enter / leave on canvas focus-unfocus
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
@@ -872,12 +925,14 @@ int main() {
 //	std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
 	{
-		libv::ui::PanelFull layers;
+//		libv::ui::PanelFull layers;
+		libv::ui::PanelFloat layers;
 
 		libv::ui::PanelStatusLine shader_errors;
 		shader_errors.align_horizontal(libv::ui::AlignHorizontal::left);
 		shader_errors.align_vertical(libv::ui::AlignVertical::bottom);
 		shader_errors.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+//		shader_errors.size(libv::ui::parse_size_or_throw("1r, 1r"));
 		shader_errors.spacing(10);
 
 		shader_errors.event().global.connect<libv::rev::ShaderLoadSuccess>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadSuccess& e) mutable {
@@ -931,11 +986,19 @@ int main() {
 
 		// ---
 
-		libv::ui::CanvasAdaptor canvas;
-		canvas.adopt(&space);
-//		libv::ui::Canvas2<SpaceCanvas> canvas;
+		libv::ui::CanvasAdaptor canvas_main;
+		canvas_main.adopt(&space_main);
+		libv::ui::CanvasAdaptor canvas_mini;
+		canvas_mini.adopt(&space_mini);
+//		libv::ui::Canvas2<SpaceCanvas> canvas_main;
+//		libv::ui::Canvas2<SpaceCanvas> canvas_mini;
 
-		layers.add(canvas);
+		canvas_mini.size(libv::ui::parse_size_or_throw("20%, 20%"));
+		canvas_mini.padding({0, 0, 10, 0});
+		canvas_mini.anchor(libv::ui::Anchor::center_right);
+
+		layers.add(canvas_main);
+		layers.add(canvas_mini);
 		layers.add(shader_errors);
 //		layers.add(pref_graph);
 		ui.add(layers);

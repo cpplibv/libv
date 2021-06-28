@@ -73,6 +73,7 @@ void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
 	if (canvas == nullptr)
 		return;
 
+	canvas->canvas_position = xy(environment.position) + padding_LB();
 	canvas->canvas_size = xy(environment.size) - padding_size();
 }
 
@@ -90,6 +91,14 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
+//		// <<< UI Component position is lost
+//		//				gl.viewport() or matrix manipulation
+//		// <<< Incorrect, does not account for parent's parent pos and so on...
+//		glr.viewport(
+//				cast<int>(round(canvas->canvas_position)),
+//				cast<int>(round(canvas->canvas_size))
+//		);
+
 		canvas->render(glr);
 	});
 }
@@ -112,6 +121,7 @@ core_ptr CanvasAdaptor::create_core(std::string name) {
 // -------------------------------------------------------------------------------------------------
 
 void CanvasAdaptor::adopt(Canvas* canvas) {
+	canvas->core = &core();
 	self().canvas = canvas;
 	self().flagAuto(Flag::pendingRender);
 }
