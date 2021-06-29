@@ -5,9 +5,12 @@
 // libv
 #include <libv/glr/queue_fwd.hpp>
 #include <libv/utility/observer_ptr.hpp>
+#include <libv/utility/observer_ref.hpp>
+// std
+#include <memory>
 // pro
-#include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/component/detail/component_api.hpp>
 
 
 namespace libv {
@@ -15,52 +18,73 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Canvas {
-	libv::observer_ptr<CoreComponent> core = nullptr;
+class CoreCanvasAdaptor;
+
+struct CanvasBase {
+	friend CoreCanvasAdaptor;
+
+private:
+	libv::observer_ref<CoreComponent> core;
+
+protected:
 	libv::vec2f canvas_position;
 	libv::vec2f canvas_size;
 
-public:
+protected:
+	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
+
+protected:
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
 	virtual void update(time_duration delta_time) = 0;
 	virtual void render(libv::glr::Queue& glr) = 0;
 	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }
-	virtual ~Canvas() = default;
+
+public:
+	virtual ~CanvasBase() = default;
 };
 
-class CanvasAdaptor : public ComponentAPI<Component, CanvasAdaptor, class CoreCanvasAdaptor, EventHostGeneral> {
+// -------------------------------------------------------------------------------------------------
+
+class CanvasAdaptor : public ComponentAPI<Component, CanvasAdaptor, CoreCanvasAdaptor, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
-	static constexpr std::string_view component_type = "canvas";
-	static core_ptr create_core(std::string name);
 
 public:
-	void adopt(Canvas* canvas);
-	void clear();
+	static constexpr std::string_view component_type = "canvas";
+	static core_ptr create_core(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
+
+protected:
+	CanvasBase& object_base() noexcept;
 };
 
+template <typename T>
+class CanvasAdaptorT : public ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostGeneral> {
+	using BaseAPI = ComponentAPI<CanvasAdaptor, CanvasAdaptorT<T>, CoreCanvasAdaptor, EventHostGeneral>;
 
-//struct Canvas2Base {
-//	libv::vec2f canvas_size;
-//
-//public:
-//	virtual void create(libv::glr::Queue& glr) { (void) glr; }
-//	virtual void update(time_duration delta_time) = 0;
-//	virtual void render(libv::glr::Queue& glr) = 0;
-//	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }
-//	virtual ~Canvas2Base() = default;
-//};
-//
-//class Canvas2Adaptor : public ComponentAPI<Component, Canvas2Adaptor, class CoreCanvas2Adaptor, EventHostGeneral> {
-//public:
-//	using ComponentAPI::ComponentAPI;
-//	static constexpr std::string_view component_type = "canvas";
-//	static core_ptr create_core(std::string name);
-//
-//public:
-//	void adopt(Canvas2Base* canvas);
-//	void clear();
-//};
+public:
+	explicit CanvasAdaptorT(core_ptr ptr) :
+		BaseAPI(ptr) {
+	}
+
+	template <typename... Args>
+	explicit CanvasAdaptorT(std::string name, Args&&... args) :
+		BaseAPI(std::move(name), std::make_unique<T>(std::forward<Args>(args)...)) {
+	}
+
+	template <typename... Args>
+	explicit CanvasAdaptorT(GenerateName_t name = {}, Args&&... args) :
+		BaseAPI(std::move(name), std::make_unique<T>(std::forward<Args>(args)...)) {
+	}
+
+public:
+	inline T& object() noexcept {
+		return static_cast<T&>(this->object_base());
+	}
+
+	inline const T& object() const noexcept {
+		return static_cast<const T&>(this->object_base());
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 

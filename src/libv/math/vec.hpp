@@ -311,7 +311,7 @@ struct vec_t : vec_base_t<N, T> {
 	/** Return the square length of the vector
 	 * @note Does not change the original vector
 	 * @return The vector */
-	[[nodiscard]] constexpr inline T lengthSQ() const noexcept {
+	[[nodiscard]] constexpr inline T length_sq() const noexcept {
 		T result{};
 		libv::meta::for_constexpr<0, N>([&](const auto index) { result += this->data()[index] * this->data()[index]; });
 		return result;
@@ -321,25 +321,34 @@ struct vec_t : vec_base_t<N, T> {
 	 * @note Does not change the original vector
 	 * @return The vector */
 	[[nodiscard]] constexpr inline T length() const noexcept {
-		return std::sqrt(lengthSQ());
+		return std::sqrt(length_sq());
+	}
+
+	[[nodiscard]] constexpr inline auto length_and_dir() const noexcept {
+		struct Result {
+			value_type length;
+			vec_t dir;
+		};
+
+		const auto len = length();
+		const auto dir =  *this / len;
+
+		return Result{len, dir};
 	}
 
 	/** Normalize the vector (by divide each component by the length)
 	 * @return The vector */
 	constexpr inline vec_t<N, T>& normalize() noexcept {
-		assert(lengthSQ() != 0);
+		assert(length_sq() != 0);
 		return operator/=(length());
 	}
 
 	/** Return the normalized vector (by divide each component by the length).
 	 * @note Does not change the original vector
-	 * @template K The minimum precision type Default: T
 	 * @return The normalized vector */
-	template <typename K = T>
 	[[nodiscard]] constexpr inline vec_t<N, T> normalize_copy() const noexcept {
-		assert(lengthSQ() != 0);
-		auto l = length();
-		return build_vec<N>([&](const auto index) { return this->data()[index] / l; });
+		assert(length_sq() != 0);
+		return *this / length();
 	}
 
 	/// \return The static_cast-ed vector to the requested K type
@@ -471,55 +480,55 @@ template <size_t N, typename T, typename K>
 // operator<(vec, vec) -----------------------------------------------------------------------------
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return lhs.lengthSQ() < rhs.lengthSQ();
+	return lhs.length_sq() < rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return lhs.lengthSQ() <= rhs.lengthSQ();
+	return lhs.length_sq() <= rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return lhs.lengthSQ() > rhs.lengthSQ();
+	return lhs.length_sq() > rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>=(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return lhs.lengthSQ() >= rhs.lengthSQ();
+	return lhs.length_sq() >= rhs.length_sq();
 }
 
 // operator<(vec, scalar) --------------------------------------------------------------------------
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return lhs.lengthSQ() < rhs * rhs;
+	return lhs.length_sq() < rhs * rhs;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<=(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return lhs.lengthSQ() <= rhs * rhs;
+	return lhs.length_sq() <= rhs * rhs;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return lhs.lengthSQ() > rhs * rhs;
+	return lhs.length_sq() > rhs * rhs;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>=(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return lhs.lengthSQ() >= rhs * rhs;
+	return lhs.length_sq() >= rhs * rhs;
 }
 
 // operator<(scalar, vec) --------------------------------------------------------------------------
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<(const K& lhs, const vec_t<N, T>& rhs) noexcept {
-	return lhs * lhs < rhs.lengthSQ();
+	return lhs * lhs < rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator<=(const K& lhs, const vec_t<N, T>& rhs) noexcept {
-	return lhs * lhs <= rhs.lengthSQ();
+	return lhs * lhs <= rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>(const K& lhs, const vec_t<N, T>& rhs) noexcept {
-	return lhs * lhs > rhs.lengthSQ();
+	return lhs * lhs > rhs.length_sq();
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline bool operator>=(const K& lhs, const vec_t<N, T>& rhs) noexcept {
-	return lhs * lhs >= rhs.lengthSQ();
+	return lhs * lhs >= rhs.length_sq();
 }
 
 inline namespace vec { // vec utility namespace ----------------------------------------------------
@@ -602,6 +611,8 @@ template <size_t N, typename T>
 	return vec.data()[3];
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// \return The dot product of the two vector
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline std::common_type_t<T, K> dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
@@ -677,11 +688,35 @@ template <size_t N, typename T>
 	return build_vec<N>([&](const auto index) { return std::abs(vec.data()[index]); });
 }
 
+// -------------------------------------------------------------------------------------------------
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto length(const vec_t<N, T>& vec) noexcept {
+	return vec.length();
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto length_sq(const vec_t<N, T>& vec) noexcept {
+	return vec.length_sq();
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto length_and_dir(const vec_t<N, T>& vec) noexcept {
+	return vec.length_and_dir();
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto normalize(const vec_t<N, T>& vec) noexcept {
+	return vec.normalize_copy();
+}
+
 /// \return The static_cast-ed vector to the requested K type
 template <typename K, size_t N, typename T>
 [[nodiscard]] constexpr inline vec_t<N, K> cast(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return static_cast<K>(vec.data()[index]); });
+	return vec.template cast<K>();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto floor(const vec_t<N, T>& vec) noexcept {

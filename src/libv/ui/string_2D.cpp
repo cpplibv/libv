@@ -297,7 +297,7 @@ size_t String2D::getClosestCharacterIndex(libv::vec2f position) {
 		const auto left_center = libv::vec2f{pen.x, pen.y + lineHeight * 0.5f};
 		// As the caret is displayed on the left side of the glyph, calculations are based on the left center
 
-		const auto distance_sq = (position - left_center).lengthSQ();
+		const auto distance_sq = (position - left_center).length_sq();
 
 		if (distance_sq < min_distance_sq) {
 			min_index = i;

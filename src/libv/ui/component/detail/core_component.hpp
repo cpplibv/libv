@@ -256,6 +256,9 @@ public:
 	void style(libv::intrusive_ptr<Style> style) noexcept;
 
 public:
+	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
+
+public:
 	template <typename Property>
 	inline void set(Property& property, typename Property::value_type value);
 	template <typename Property>

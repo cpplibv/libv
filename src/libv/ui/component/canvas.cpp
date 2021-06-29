@@ -2,13 +2,15 @@
 
 // hpp
 #include <libv/ui/component/canvas.hpp>
+// libv
+#include <libv/glr/queue.hpp>
 // pro
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
+#include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
-#include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/style.hpp>
 
@@ -18,23 +20,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreCanvasAdaptor : CoreComponent {
-	friend class CanvasAdaptor;
-	[[nodiscard]] inline auto handler() { return CanvasAdaptor{this}; }
+class CoreCanvasAdaptor : public CoreComponent {
+	friend CanvasAdaptor;
 
 private:
-	Canvas* canvas = nullptr;
-
-private:
-	template <typename T> static void access_properties(T& ctx);
+	std::unique_ptr<CanvasBase> canvas_object;
 
 public:
-	using CoreComponent::CoreComponent;
+	CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
 
-private:
+protected:
 	virtual void doUpdate() override;
-	virtual void doStyle(ContextStyle& ctx) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doCreate(Renderer& r) override;
 	virtual void doRender(Renderer& r) override;
@@ -43,92 +39,84 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T>
-void CoreCanvasAdaptor::access_properties(T& ctx) {
-	(void) ctx;
+CoreCanvasAdaptor::CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object) :
+	CoreComponent(std::move(name)), canvas_object(std::move(canvas_object)) {
+	this->canvas_object->core = libv::make_observer_ptr(this);
 }
-
-// -------------------------------------------------------------------------------------------------
 
 void CoreCanvasAdaptor::doUpdate() {
-	if (canvas == nullptr)
+	if (not canvas_object)
 		return;
 
-	canvas->update(context().state.time_delta());
-}
-
-void CoreCanvasAdaptor::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CoreCanvasAdaptor> setter{*this, ctx.component, ctx.style, context()};
-	access_properties(setter);
-	CoreComponent::access_properties(setter);
-}
-
-libv::vec3f CoreCanvasAdaptor::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-
-	return {padding_size(), 0.f};
+	canvas_object->update(context().state.time_delta());
 }
 
 void CoreCanvasAdaptor::doLayout2(const ContextLayout2& environment) {
-	if (canvas == nullptr)
+	if (not canvas_object)
 		return;
 
-	canvas->canvas_position = xy(environment.position) + padding_LB();
-	canvas->canvas_size = xy(environment.size) - padding_size();
+	// NOTE: canvas_position is used for view porting so it has to account for global position
+	const auto global_pos = context().mouse.get_global_position(*this);
+
+	canvas_object->canvas_position = global_pos + padding_LB();
+	canvas_object->canvas_size = xy(environment.size) - padding_size();
 }
 
 void CoreCanvasAdaptor::doCreate(Renderer& r) {
-	if (canvas == nullptr)
+	if (not canvas_object)
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
-		canvas->create(glr);
+		canvas_object->create(glr);
 	});
 }
 
 void CoreCanvasAdaptor::doRender(Renderer& r) {
-	if (canvas == nullptr)
+	if (not canvas_object)
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
-//		// <<< UI Component position is lost
-//		//				gl.viewport() or matrix manipulation
-//		// <<< Incorrect, does not account for parent's parent pos and so on...
-//		glr.viewport(
-//				cast<int>(round(canvas->canvas_position)),
-//				cast<int>(round(canvas->canvas_size))
-//		);
+		// TODO P1: Does not account for clipping
+		//				this would require shader support in canvas
+		// 				or use a framebuffer for this and render with UI texture shader
 
-		canvas->render(glr);
+		const auto prev_view_pos = glr.viewport_position();
+		const auto prev_view_size = glr.viewport_size();
+
+		glr.viewport(
+				cast<int>(round(canvas_object->canvas_position)),
+				cast<int>(round(canvas_object->canvas_size))
+		);
+
+		canvas_object->render(glr);
+
+		glr.viewport(prev_view_pos, prev_view_size);
 	});
 }
 
 void CoreCanvasAdaptor::doDestroy(Renderer& r) {
-	if (canvas == nullptr)
+	if (not canvas_object)
 		return;
 
 	r.native([this](libv::glr::Queue& glr) {
-		canvas->destroy(glr);
+		canvas_object->destroy(glr);
 	});
 }
 
 // =================================================================================================
 
-core_ptr CanvasAdaptor::create_core(std::string name) {
-	return create_core_ptr<CoreCanvasAdaptor>(std::move(name));
+libv::vec2f CanvasBase::calculate_local_mouse_coord() const noexcept {
+	return core->calculate_local_mouse_coord();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void CanvasAdaptor::adopt(Canvas* canvas) {
-	canvas->core = &core();
-	self().canvas = canvas;
-	self().flagAuto(Flag::pendingRender);
+core_ptr CanvasAdaptor::create_core(std::string name, std::unique_ptr<CanvasBase>&& canvas_object) {
+	return create_core_ptr<CoreCanvasAdaptor>(std::move(name), std::move(canvas_object));
 }
 
-void CanvasAdaptor::clear() {
-	self().canvas = nullptr;
-	self().flagAuto(Flag::pendingRender);
+CanvasBase& CanvasAdaptor::object_base() noexcept {
+	return *self().canvas_object;
 }
 
 // -------------------------------------------------------------------------------------------------

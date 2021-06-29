@@ -114,6 +114,12 @@ Padding Component::padding() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::vec2f Component::calculate_local_mouse_coord() const noexcept {
+	return ptr->calculate_local_mouse_coord();
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void Component::markRemove() {
 	ptr->markRemove();
 }

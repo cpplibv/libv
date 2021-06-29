@@ -2,7 +2,7 @@
 
 #pragma once
 
-//// libv
+// libv
 #include <libv/gl/enum.hpp>
 #include <libv/gl/gl_fwd.hpp>
 #include <libv/gl/matrix_stack.hpp>
@@ -75,6 +75,8 @@ public:
 
 public:
 	void viewport(libv::vec2i position, libv::vec2i size);
+	libv::vec2i viewport_position() const;
+	libv::vec2i viewport_size() const;
 
 public:
 	void framebuffer(Framebuffer framebuffer);

@@ -34,7 +34,6 @@ public:
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
-	virtual libv::vec3f doLayout1(const ContextLayout1& environment) override;
 	virtual void doRender(Renderer& r) override;
 };
 
@@ -62,12 +61,6 @@ void CoreQuad::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreQuad> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
 	CoreComponent::access_properties(setter);
-}
-
-libv::vec3f CoreQuad::doLayout1(const ContextLayout1& environment) {
-	(void) environment;
-
-	return {padding_size(), 0.f};
 }
 
 void CoreQuad::doRender(Renderer& r) {

@@ -684,7 +684,7 @@ void PanelViewer::init() { }
 //			const auto vertexPositionM = scene.model.vertices[vertexID].position;
 //			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;
 //
-//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).lengthSQ();
+//			const auto vertexDistanceWSQ = (vertexPositionW - referencePointW).length_sq();
 //			if (vertexDistanceWSQ > referenceDistanceWSQ) {
 //				referencePointW
 //

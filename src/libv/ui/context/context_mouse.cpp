@@ -80,7 +80,8 @@ inline void component_notify(CoreComponent* target, const EventMouseScroll& even
 
 // ---
 
-using MouseKey = CoreComponent*;
+using MouseKey = observer_ptr<CoreComponent>;
+using MouseKeyConst = observer_ptr<const CoreComponent>;
 
 class MouseRegionContainer {
 public:
@@ -114,7 +115,7 @@ public:
 
 private:
 	// NOTE: unordered_map's memory address stability is utilized in the nodes
-	std::unordered_map<MouseKey, Node> index_and_storage;
+	std::unordered_map<MouseKeyConst, Node> index_and_storage;
 	Node* root;
 
 public:
@@ -149,7 +150,7 @@ public:
 		add_node(parent_key, new_key);
 	}
 
-	Node* find(MouseKey key) noexcept {
+	Node* find(MouseKeyConst key) noexcept {
 		const auto it = index_and_storage.find(key);
 
 		if (it != index_and_storage.end())
@@ -307,7 +308,7 @@ void ContextMouse::release(CoreComponent& component) {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec2f ContextMouse::get_global_position(CoreComponent& component) {
+libv::vec2f ContextMouse::get_global_position(const CoreComponent& component) {
 	libv::vec2f offset;
 
 	for (auto it = &component; true; it = it->parent()) {
@@ -315,14 +316,12 @@ libv::vec2f ContextMouse::get_global_position(CoreComponent& component) {
 			auto node = self->container.find(&component);
 
 			if (node == nullptr)
-				log_ui.warn("Attempted to find a not subscribed region: {} {}", static_cast<void*>(it), it->path());
+				log_ui.warn("Attempted to find a not subscribed region: {} {}", static_cast<const void*>(it), it->path());
 			else
-				offset -= node->region_offset;
-				// <<< Need testing
+				offset += node->region_offset;
 		}
 
-		offset -= it->layout_position2();
-		// <<< Need testing, cant remember is layout pos abs or rel to parent
+		offset += it->layout_position2();
 
 		if (it == it->parent())
 			break;

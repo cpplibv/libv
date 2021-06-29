@@ -25,9 +25,9 @@ namespace libv {
 	float t0, t1;
 
 	auto l = linePos - spherePos;
-	auto a = dir.lengthSQ();
+	auto a = dir.length_sq();
 	auto b = 2 * libv::vec::dot(dir, l);
-	auto c = l.lengthSQ() - sphereRadius * sphereRadius;
+	auto c = l.length_sq() - sphereRadius * sphereRadius;
 
 	if (!solve_quadratic(a, b, c, t0, t1))
 		return Result(false, 0.f);
@@ -45,11 +45,11 @@ namespace libv {
 }
 
 /// http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
-[[nodiscard]] inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f point) noexcept {
+[[nodiscard]] constexpr inline auto distanceLineToPoint(libv::vec3f linePos, libv::vec3f lineDir, libv::vec3f point) noexcept {
 	auto w = point - linePos;
 
 	auto c1 = libv::vec::dot(w, lineDir);
-	auto c2 = lineDir.lengthSQ();
+	auto c2 = lineDir.length_sq();
 	auto b = c1 / c2;
 
 	auto pb = linePos + b * lineDir;

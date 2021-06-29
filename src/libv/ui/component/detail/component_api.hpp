@@ -36,11 +36,13 @@ public:
 	explicit inline ComponentAPI(core_ptr ptr) noexcept :
 		BaseT(ptr) { }
 
-	explicit inline ComponentAPI(std::string name) :
-		ComponentAPI(HandlerT::create_core(std::move(name))) { }
+	template <typename... Args>
+	explicit inline ComponentAPI(std::string name, Args&&... args) :
+		ComponentAPI(HandlerT::create_core(std::move(name), std::forward<Args>(args)...)) { }
 
-	explicit inline ComponentAPI(GenerateName_t = {}) :
-		ComponentAPI(generate_component_name(HandlerT::component_type, nextID++)) { }
+	template <typename... Args>
+	explicit inline ComponentAPI(GenerateName_t = {}, Args&&... args) :
+		ComponentAPI(generate_component_name(HandlerT::component_type, nextID++), std::forward<Args>(args)...) { }
 
 protected:
 	[[nodiscard]] constexpr inline CoreT& self() noexcept {

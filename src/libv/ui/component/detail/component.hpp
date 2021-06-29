@@ -80,6 +80,9 @@ public:
 	[[nodiscard]] Padding padding() const noexcept;
 
 public:
+	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
+
+public:
 	void markRemove();
 
 public:
