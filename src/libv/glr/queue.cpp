@@ -297,11 +297,14 @@ struct QueueTaskBlit {
 	}
 };
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 class ImplQueue {
 public:
 	std::stack<std::shared_ptr<RemoteProgram>, std::vector<std::shared_ptr<RemoteProgram>>> programStack;
+
+	libv::vec2i current_viewport_position;
+	libv::vec2i current_viewport_size;
 
 	std::vector<std::variant<
 			QueueTaskCallback,
@@ -319,7 +322,7 @@ public:
 	}
 };
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 Queue::Queue() :
 	self(std::make_unique<ImplQueue>()) {
@@ -382,7 +385,17 @@ void Queue::clearDepth() {
 // -------------------------------------------------------------------------------------------------
 
 void Queue::viewport(libv::vec2i position, libv::vec2i size) {
+	self->current_viewport_position = position;
+	self->current_viewport_size = size;
 	self->add<QueueTaskViewport>(position, size);
+}
+
+libv::vec2i Queue::viewport_position() const {
+	return self->current_viewport_position;
+}
+
+libv::vec2i Queue::viewport_size() const {
+	return self->current_viewport_size;
 }
 
 // -------------------------------------------------------------------------------------------------

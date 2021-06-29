@@ -446,7 +446,7 @@ public:
 
 			if (e.keycode == libv::input::Keycode::KPNum0) {
 				button.event().submit.fire({});
-				ui.context().fire(std::string("Test string passed as global event"));
+				ui.context().broadcast(std::string("Test string passed as global event"));
 			}
 		});
 		label.event().global.connect<std::string>([](const std::string& e){

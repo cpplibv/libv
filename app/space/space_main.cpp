@@ -18,6 +18,7 @@
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/log/log.hpp>
+#include <libv/math/distance/intersect.hpp>
 #include <libv/math/noise/white.hpp>
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
@@ -37,7 +38,7 @@
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
-#include <space/icons.hpp>
+#include <space/icon_set.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -70,17 +71,6 @@
 inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // -------------------------------------------------------------------------------------------------
-
-// TODO P2: libv.glr: Shader automated block binding by watching the includes
-//          So this should work:
-//          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
-//          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
-//          And this would be called on any program that includes block/sphere.glsl
-//          program.block_binding(uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
-//          | issue: some struct might have already been defined, so block to string might have to skip them
-//                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
-//                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
-
 
 constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
 constexpr auto attribute_normal	= libv::glr::Attribute<1, libv::vec3f>{};
@@ -139,26 +129,19 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 
 // -------------------------------------------------------------------------------------------------
 
-//template <typename V0>
-//[[nodiscard]] constexpr inline auto length_and_dir(const V0& vec) noexcept {
-//	struct Result {
-//		typename V0::value_type length;
-//		V0 dir;
-//	};
-//
-//	Result result;
-//
-//	result.length = vec.length();
-//	result.dir = vec / result.length;
-//
-//	return result;
-//}
-
-// -------------------------------------------------------------------------------------------------
-
 libv::rev::ShaderLoader shader_manager("shader/");
 
 // -------------------------------------------------------------------------------------------------
+
+// TODO P2: libv.glr: Shader automated block binding by watching the includes
+//          So this should work:
+//          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
+//          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
+//          And this would be called on any program that includes block/sphere.glsl
+//          program.block_binding(uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
+//          | issue: some struct might have already been defined, so block to string might have to skip them
+//                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
+//                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
 
 struct UniformsBackground {
 	libv::glr::Uniform_texture texture_noise;
@@ -217,7 +200,6 @@ struct UniformsCommandArrow {
 
 using ShaderBackground = libv::rev::Shader<UniformsBackground>;
 using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
-
 using ShaderColor = libv::rev::Shader<UniformsColor>;
 using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 //using Shader = libv::rev::Shader<>;
@@ -253,10 +235,10 @@ struct Background {
 			auto position = mesh_background.attribute(attribute_position);
 			auto index = mesh_background.index();
 
-			position(-1, -1, 0);
-			position( 1, -1, 0);
-			position( 1,  1, 0);
-			position(-1,  1, 0);
+			position(-1, -1, 1);
+			position( 1, -1, 1);
+			position( 1,  1, 1);
+			position(-1,  1, 1);
 
 			index.quad(0, 1, 2, 3);
 		}
@@ -474,7 +456,19 @@ public:
 	}
 };
 
+//struct ScreenPickableType {
+//	float radius_direct;
+//	float radius_indirect;
+//
+//	constexpr inline ScreenPickable(float radiusDirect, float radiusIndirect) noexcept :
+//		radius_direct(radiusDirect),
+//		radius_indirect(radiusIndirect) {}
+//};
+
+//struct Fleet : ScreenPickable {
 struct Fleet {
+//	ScreenPickableType* screen_pick_type;
+
 //	enum class CommandType {
 //		movement,
 //		attack,
@@ -499,6 +493,12 @@ public:
 //	std::vector<Command> commands;
 
 public:
+	explicit Fleet(libv::vec3f position) :
+//		ScreenPickable(50.f, 100.f),
+		position(position),
+		target(position) {}
+
+public:
 //	void queue_command(CommandType type, libv::vec3f target) {
 //		commands.emplace_back(type, target);
 ////		command_arrow.add(target, color);
@@ -510,13 +510,12 @@ public:
 
 	void update(libv::ui::time_duration delta_time) {
 		const auto dt = static_cast<float>(delta_time.count());
+		const auto [len, dir] = (target - position).length_and_dir();
 
-		if ((position - target).length() < dt) {
+		if (len < dt)
 			position = target;
-		} else {
-			const auto dir = (target - position).normalize();
+		else
 			position = position + dir * dt;
-		}
 	}
 };
 
@@ -540,36 +539,104 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f intersect_ray_plane(libv::vec3f ray_point, libv::vec3f ray_dir, libv::vec3f plane_point, libv::vec3f plane_normal) {
-	const auto diff = ray_point - plane_point;
-	const auto prod1 = libv::vec::dot(diff, plane_normal);
-	const auto prod2 = libv::vec::dot(ray_dir, plane_normal);
-	const auto prod3 = prod1 / prod2;
-	return ray_point - ray_dir * prod3;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-#include <libv/ui/context/context_mouse.hpp>
-#include <libv/ui/context/context_state.hpp>
-#include <libv/ui/context/context_ui.hpp>
-libv::ui::UI* global_ui; // <<< Remove this one
-
 struct SpaceState {
+//	app::CameraPlayer& camera;
+//
+//	float angle = 0.0f;
+//	float time = 0.0f;
+//	float test_sin_time = 0.0f;
+
+	std::vector<Fleet> fleets;
+
+public:
+//	SpaceState(app::CameraPlayer& camera) :
+//		camera(camera) {
+//	}
+
+	void update(libv::ui::time_duration delta_time) {
+		for (auto& fleet : fleets)
+			fleet.update(delta_time);
+	}
+};
+
+struct SpaceCanvas : libv::ui::CanvasBase {
+	bool main_canvas;
+	SpaceState& state;
 	app::CameraPlayer& camera;
+	app::CameraPlayer::screen_picker screen_picker;
 
 	float angle = 0.0f;
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
 
-	std::vector<Fleet> fleets;
+	Background background;
+	Grid grid;
+	Gizmo origin_gizmo;
+	CommandArrow arrow;
+	FleetRender render_fleet;
 
-public:
-	SpaceState(app::CameraPlayer& camera) :
-		camera(camera) { // <<< This line is wrong, canvas_size is not initialized at this point
+	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+
+	explicit SpaceCanvas(SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
+		main_canvas(main_canvas),
+		state(state),
+		camera(camera),
+		screen_picker(camera.picker({100, 100})) {
+		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
+		//			Component shall not receive any event before onLayout gets called
 	}
 
-	void update(libv::ui::time_duration delta_time) {
+	static void register_controls(libv::ctrl::FeatureRegister controls) {
+//		libv::ctrl::scale_group sg_translate{
+//				.impulse = 0.1,
+//				.time = 1.0,
+//				.mouse = 1.0 / 600.0,
+//				.scroll = 0.1,
+//				.gp_analog = 1.0,
+//				.js_analog = 1.0
+//		};
+
+		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
+			(void) arg;
+
+			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+			const auto mouse_ray_pos = ctx.camera.eye();
+			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
+			if (!ctx.state.fleets.empty())
+				ctx.state.fleets.back().target = world_coord;
+			ctx.state.fleets.emplace_back(world_coord);
+			std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
+			std::cout << "world_coord: " << world_coord << std::endl;
+		});
+
+		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
+			(void) arg;
+
+			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+			const auto mouse_ray_pos = ctx.camera.eye();
+			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
+			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
+			//			khm-khm: MVC - Model View Control
+			ctx.camera.warp_to(world_coord);
+			std::cout << "world_coord: " << world_coord << std::endl;
+		});
+	}
+
+	static void bind_default_controls(libv::ctrl::Controls& controls) {
+		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+		controls.bind("space.warp_camera_to_mouse", "Z");
+	}
+
+	virtual void update(libv::ui::time_duration delta_time) override {
+		if (main_canvas)
+			state.update(delta_time);
+
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 		time += dtf;
@@ -602,104 +669,20 @@ public:
 				camera.pitch(-t * libv::pi_f * 0.5f / part);
 			}
 		}
-
-		for (auto& fleet : fleets)
-			fleet.update(delta_time);
-	}
-};
-
-struct SpaceCanvas : libv::ui::Canvas {
-	bool main_canvas;
-	SpaceState& state;
-	app::CameraPlayer& camera;
-	app::CameraPlayer::screen_picker screen_picker;
-
-	Background background;
-	Grid grid;
-	Gizmo origin_gizmo;
-	CommandArrow arrow;
-	FleetRender render_fleet;
-
-	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
-
-	explicit SpaceCanvas(SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
-		main_canvas(main_canvas),
-		state(state),
-		camera(camera),
-		screen_picker(camera.picker({100, 100})) {
 	}
 
-	static void register_controls(libv::ctrl::FeatureRegister controls) {
-//		libv::ctrl::scale_group sg_translate{
-//				.impulse = 0.1,
-//				.time = 1.0,
-//				.mouse = 1.0 / 600.0,
-//				.scroll = 0.1,
-//				.gp_analog = 1.0,
-//				.js_analog = 1.0
-//		};
-
-		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
-
-			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
-			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
-			const auto mouse_global_coord = global_ui->state().mouse_position();
-			const auto mouse_global_offset = global_ui->context().mouse.get_global_position(*ctx.core);
-			const auto mouse_local_coord = mouse_global_coord + mouse_global_offset;
-			// <<< This needs to be simpler
-
-			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
-			const auto mouse_ray_pos = ctx.camera.eye();
-			const auto world_coord = intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			if (!ctx.state.fleets.empty())
-				ctx.state.fleets.back().target = world_coord;
-			ctx.state.fleets.emplace_back(world_coord, world_coord);
-			std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
-			std::cout << "world_coord: " << world_coord << std::endl;
-		});
-
-		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
-
-			// <<< Use correct mouse coords (canvas might not occupy the whole space), therefore:
-			// TODO P1: libv.ui: Canvas needs access to component relative mouse position (every component does)
-			const auto mouse_global_coord = global_ui->state().mouse_position();
-			const auto mouse_global_offset = global_ui->context().mouse.get_global_position(*ctx.core);
-			const auto mouse_local_coord = mouse_global_coord + mouse_global_offset;
-			// <<< This needs to be simpler
-
-			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
-			const auto mouse_ray_pos = ctx.camera.eye();
-			const auto world_coord = intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
-			ctx.camera.warp_to(world_coord);
-			std::cout << "world_coord: " << world_coord << std::endl;
-		});
-	}
-
-	static void bind_default_controls(libv::ctrl::Controls& controls) {
-		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
-		controls.bind("space.warp_camera_to_mouse", "Z");
-	}
-
-	virtual void update(libv::ui::time_duration delta_time) override {
-		if (main_canvas)
-			state.update(delta_time);
-	}
+//	virtual void layout() override {
+//
+//	}
 
 	virtual void render(libv::glr::Queue& gl) override {
 		// <<< UI Component position is lost
 		//				gl.viewport() or matrix manipulation
 		// <<< Incorrect, does not account for parent's parent pos and so on...
-		gl.viewport(
-				cast<int>(round(canvas_position)),
-				cast<int>(round(canvas_size))
-		);
+//		gl.viewport(
+//				cast<int>(round(canvas_position)),
+//				cast<int>(round(canvas_size))
+//		);
 
 		// <<< Events should update this (or mark as dirty), not update,
 		//  		and/or precalc the world space mouse ray, because that looks like used a lot
@@ -725,8 +708,7 @@ struct SpaceCanvas : libv::ui::Canvas {
 //		gl.state.polygonModeFill();
 
 		gl.projection = camera.projection(canvas_size);
-		// TODO P2: Test with a second non full screen quad canvas
-		// TODO P2: No not reset view, use the UI's current view
+		// TODO P2: No not reset view, use the UI's current view (? Is UI based gl.viewport solves this?, at least for canvas it could)
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
 
@@ -815,7 +797,8 @@ struct SpaceCanvas : libv::ui::Canvas {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P1: Controls camera should only be placed into context if the canvas is focused | Remove the F12 tracking manual workaround too for mode switching (this might be a second task, as it could be two separate system)
+// TODO P1: Controls camera should only be placed into context if the canvas is focused
+// TODO P1: Remove the F12 tracking manual workaround too for mode switching
 // TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
 // TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
 
@@ -843,7 +826,6 @@ int main() {
 	ui_settings.res_shader.base_path = "../../res/shader/";
 	ui_settings.res_texture.base_path = "../../res/texture/";
 	libv::ui::UI ui(ui_settings);
-	global_ui = &ui; // <<< Remove global ui workaround for canvas access to event states
 
 	shader_manager.on_success([hub = ui.event_hub()](const libv::rev::ShaderLoadSuccess& e) mutable {
 		hub.broadcast(e);
@@ -862,10 +844,6 @@ int main() {
 	SpaceCanvas::register_controls(controls);
 	SpaceCanvas::bind_default_controls(controls);
 
-	app::CameraPlayer camera;
-	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
-	controls.context_enter<app::BaseCameraOrbit>(&camera); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
-
 	libv::Timer timer;
 	frame.onContextUpdate.output([&](const auto&) {
 		// shader_manager.update MUST run before any other render queue operation
@@ -879,10 +857,12 @@ int main() {
 	ui.attach(frame);
 	controls.attach(frame);
 
-	SpaceState space_state(camera);
-	SpaceCanvas space_main(space_state, camera, true);
-	SpaceCanvas space_mini(space_state, camera, false);
-	controls.context_enter<SpaceCanvas>(&space_main); // TODO P1: Enter / leave on canvas focus-unfocus
+	app::CameraPlayer camera_main;
+	app::CameraPlayer camera_mini;
+	camera_main.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
+	camera_mini.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
+
+	SpaceState space_state;
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
@@ -896,7 +876,7 @@ int main() {
 			if (hack_camera_control_ui_mode == 1)
 				controls.context_leave<app::BaseCameraOrbit>();
 			else
-				controls.context_enter<app::BaseCameraOrbit>(&camera);
+				controls.context_enter<app::BaseCameraOrbit>(&camera_main);
 		}
 
 		// TODO P1: Shortcut to save camera position and reload it upon restart
@@ -937,7 +917,7 @@ int main() {
 
 		shader_errors.event().global.connect<libv::rev::ShaderLoadSuccess>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadSuccess& e) mutable {
 			if (e.shader.load_version() == 0)
-				return; // Do not display first load successes on program startup
+				return; // Do not display the first load successes on program startup
 
 			libv::ui::Label label;
 			label.align_horizontal(libv::ui::AlignHorizontal::left);
@@ -986,14 +966,13 @@ int main() {
 
 		// ---
 
-		libv::ui::CanvasAdaptor canvas_main;
-		canvas_main.adopt(&space_main);
-		libv::ui::CanvasAdaptor canvas_mini;
-		canvas_mini.adopt(&space_mini);
-//		libv::ui::Canvas2<SpaceCanvas> canvas_main;
-//		libv::ui::Canvas2<SpaceCanvas> canvas_mini;
+		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, camera_main, true);
+		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, camera_mini, false);
 
-		canvas_mini.size(libv::ui::parse_size_or_throw("20%, 20%"));
+		controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
+		controls.context_enter<SpaceCanvas>(&canvas_main.object()); // TODO P1: Enter / leave on canvas focus-unfocus
+
+		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
 		canvas_mini.padding({0, 0, 10, 0});
 		canvas_mini.anchor(libv::ui::Anchor::center_right);
 

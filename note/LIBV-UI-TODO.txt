@@ -22,7 +22,10 @@ libv.glr: Add missing state update before native callback
 libv.ui: Fix renderer native callback execution order
 libv: Add support for disabling observer_ptr and observer_ref validations
 libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates if UI dies in the meantime | auto ev = ui.event_hub(); ev.broadcast(e);
-
+libv.ui: Add component access to relative mouse position
+libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too | they already did
+libv.ui: Relative mouse coordinate access for a state
+libv.ui: Panel Status Log (aka first composite component) | It ended up being something else
 
 
 
@@ -49,41 +52,21 @@ libv.ui: Event hub, a proxy for ui global events, weak_ptr like, and tolerates i
 
 
 
-libv.ui: Restructure contexts, centralize and unify them, their construction, their referencing, improve naming (event -> comm)
-		organize which is public (like context_state), which is privet (like context_event)
 
 
+libv.ui: Adopt local mouse position: update related code in scroll_bar
+		!Double check with zoom overlay
 
-
-
-Canvas2
-	composition
-	state and mouse access
-	gl.viewport call
-
-libv.ui: Relative mouse coordinate access for a state
-	libv.ui: local mouse position (for both button, scroll and movement), update related code in scroll_bar | or 'global' way to query local mouse position (or query component global position (account for zoom overlay))
-	libv.ui: relative - mouse event should contain a watcher relative (local) coordinates too
-
-
-
-Next in queue:
-	property context creation stuffy simplification
-		maybe CRTP base for core components
-		| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-Cleanup
-	src/libv/ui/component/base_panel_static.*
-	src/libv/ui/component/check_box.*
-	src/libv/ui/component/file_picker.*
-	src/libv/ui/component/radio_button.*
-	src/libv/ui/component/radio_group.*
-
-
-
---- Must have ---
-
-
+libv.ui: static_component system (lite)
+	Check on the _pastebin/legacy codes for this one
+	libv.ui: Restructure: property context creation stuffy simplification
+			maybe CRTP base for core components
+			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
+	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
+	libv.ui: Composite component style / property system
+		libv.ui.property: complex composite component would result in "nested" property sets
+		libv.ui.property: property system interaction with static_component system
+		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
 
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
 	background
@@ -98,16 +81,6 @@ libv.ui: Background fragment, property type that can be quad/image/stretch/param
 
 	libv.ui: In every component background should not contribute to layout1 size
 
-
-libv.ui: static_component system (lite)
-		Check on the _pastebin/legacy codes for this one
-	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
-	libv.ui: Composite component style / property system
-		libv.ui.property: complex composite component would result in "nested" property sets
-		libv.ui.property: property system interaction with static_component system
-		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
-
-
 libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
 		A simple const void* that can be passed to any function that can produce a event
 			(or in case of a stack a ui global stack of const void*)
@@ -117,11 +90,23 @@ libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or 
 			return;
 		Implement in: app.theme: control.slider.event().change
 
+libv.ui: Restructure: contexts, centralize and unify them, their construction, their referencing, improve naming (event -> comm)
+		organize which is public (like context_state), which is privet (like context_event)
+
+Cleanup / Implement
+	src/libv/ui/component/base_panel_static.*
+	src/libv/ui/component/check_box.*
+	src/libv/ui/component/file_picker.*
+	src/libv/ui/component/radio_button.*
+	src/libv/ui/component/radio_group.*
+
 
 
 --- Checkpoint ---
 
 
+
+libv.ui/libv.ctrl: Keyboard binding display (For useful fun)
 
 libv.ui: UI level storage system
 		context().storage<UIUserConfig>() : UIUserConfig&
@@ -132,10 +117,6 @@ libv.ui: UI level storage system
 
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 		should be accessible via UI too
-
-libv.ui/libv.ctrl: Keyboard binding display
-
-libv.ui: Panel Status Log (aka first composite component)
 
 libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame

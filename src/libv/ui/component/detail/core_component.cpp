@@ -11,6 +11,7 @@
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
+#include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
@@ -230,6 +231,15 @@ void CoreComponent::markInvalidLayout() noexcept {
 void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 	style_ = std::move(newStyle);
 	flagAuto(Flag::pendingStyle);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+libv::vec2f CoreComponent::calculate_local_mouse_coord() const noexcept {
+	const auto mouse_global_coord = context().state.mouse_position();
+	const auto mouse_global_offset = context().mouse.get_global_position(*this);
+	const auto mouse_local_coord = mouse_global_coord - mouse_global_offset;
+	return mouse_local_coord;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -576,7 +586,7 @@ libv::observer_ptr<CoreComponent> CoreComponent::doFocusTraverse(const ContextFo
 libv::vec3f CoreComponent::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
-	return {};
+	return padding_size3();
 }
 
 void CoreComponent::doLayout2(const ContextLayout2& environment) {

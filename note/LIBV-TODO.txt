@@ -601,7 +601,6 @@ app.enum: Add unary operator+ as an alias for to underlying
 
 
 
-
 https://pages.jetbrains.com/cppnow2021#g-603902215
 
 
@@ -614,6 +613,7 @@ libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesyste
 cpp.chrono: zoned_now = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
 
 
+libv: Remove friend class X; and use friend X; and ensure that X is fwd declared in the proper scope
 cpp: Cursed idea: #define implicit explicit(false)
 libv: Change /*implicit*/ comments to explicit(false)
 
@@ -702,10 +702,11 @@ place.it:
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
-	opengl.knowledge: learnopengl.com - Great tutorial site
-	opengl.knowledge: opengl-tutorial.org - Great tutorial site
-	opengl.knowledge: open.gl - Great tutorial site
+	opengl.knowledge: 3dgep.com - Extensive guides from math to shaders to game engine technuqies
 	opengl.knowledge: docs.gl - Reference documentations
+	opengl.knowledge: learnopengl.com - Great tutorial site
+	opengl.knowledge: open.gl - Great tutorial site
+	opengl.knowledge: opengl-tutorial.org - Great tutorial site
 
 	ext: For utf ranges check out: https://github.com/tcbrindle/utf_ranges
 	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend

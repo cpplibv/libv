@@ -54,11 +54,11 @@ public:
 		stack.pop_back();
 		return *this;
 	}
-	inline decltype(auto) top() const {
+	[[nodiscard]] inline decltype(auto) top() const {
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
 		return stack.back();
 	}
-	inline decltype(auto) top() {
+	[[nodiscard]] inline decltype(auto) top() {
 		LIBV_GL_DEBUG_ASSERT(stack.size() > 0);
 		return stack.back();
 	}
@@ -66,13 +66,13 @@ public:
 		top() = mat;
 		return *this;
 	}
-	inline decltype(auto) operator*(const vec4_t<T>& v) const {
+	[[nodiscard]] inline decltype(auto) operator*(const vec4_t<T>& v) const {
 		return top() * v;
 	}
-	inline decltype(auto) operator*(const Mat& mat) const {
+	[[nodiscard]] inline decltype(auto) operator*(const Mat& mat) const {
 		return top() * mat;
 	}
-	inline decltype(auto) operator*(const MatrixStack<Mat>& ms) const {
+	[[nodiscard]] inline decltype(auto) operator*(const MatrixStack<Mat>& ms) const {
 		return top() * ms.top();
 	}
 	inline decltype(auto) operator*=(const Mat& mat) {

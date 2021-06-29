@@ -267,11 +267,24 @@ public:
 	}
 
 	void update() {
+		// UI Loop:
+		// - Frame state roll
+		// - Attach #1
+		// - Event
+		// - Update
+		// - UI loop tasks
+		// - Attach #2
+		// - Style
+		// - Layout
+		// - Render
+		// - Detach
+
 		current_thread_context(context);
 
 		auto glr = remote.queue();
 
 		{
+			// --- Frame state roll ---
 			timer.reset();
 			timerFrame.reset();
 
@@ -324,6 +337,13 @@ public:
 				stat.event.sample(timer.time_ns());
 			}
 
+			// --- Update ---
+			try {
+				AccessRoot::update(root.core());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during update in UI: {}", ex.what());
+			}
+
 			// --- UI loop tasks ---
 			{
 				// TODO P5: libv.mt: Usual pattern to lift the entry out of locking scope, candidate for generalization
@@ -350,13 +370,6 @@ public:
 				}
 
 				stat.loopTask.sample(timer.time_ns());
-			}
-
-			// --- Update ---
-			try {
-				AccessRoot::update(root.core());
-			} catch (const std::exception& ex) {
-				log_ui.error("Exception occurred during update in UI: {}", ex.what());
 			}
 
 			// --- Attach #2 ---

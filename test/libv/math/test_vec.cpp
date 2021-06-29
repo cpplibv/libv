@@ -398,9 +398,9 @@ TEST_CASE("length") {
 	libv::vec_t<2, float> v1(10, 10);
 
 	CHECK(10.0f == Approx(v0.length()));
-	CHECK(100.0f == Approx(v0.lengthSQ()));
+	CHECK(100.0f == Approx(v0.length_sq()));
 	CHECK(14.1421f == Approx(v1.length()));
-	CHECK(200.0f == Approx(v1.lengthSQ()));
+	CHECK(200.0f == Approx(v1.length_sq()));
 }
 
 TEST_CASE("operator*(vec, vec)") {
