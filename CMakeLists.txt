@@ -921,10 +921,17 @@ wish_create_executable(
 	LINK   ext_colony
 )
 
+wish_create_library(
+	TARGET sandbox_libv_ctrl_foo SHARED
+	SOURCE sandbox/libv_ctrl_main_foo.cpp
+	LINK   libv_ctrl libv_input
+)
+
 wish_create_executable(
 	TARGET sandbox_libv_ctrl
 	SOURCE sandbox/libv_ctrl_main.cpp
-	LINK   libv_log libv_ctrl libv_frame libv_ui libv_utility
+	LINK   libv_log libv_ctrl libv_input libv_frame libv_ui libv_utility
+	LINK   sandbox_libv_ctrl_foo
 )
 
 wish_create_executable(
