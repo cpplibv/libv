@@ -184,7 +184,7 @@ endfunction()
 # --- Library --------------------------------------------------------------------------------------
 
 function(wish_create_library)
-	cmake_parse_arguments(arg "DEBUG;STATIC;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
+	cmake_parse_arguments(arg "DEBUG;STATIC;SHARED;INTERFACE" "TARGET" "SOURCE;OBJECT;LINK" ${ARGN})
 
 	# check
 	list(GET arg_TARGET 0 arg_target_name)
@@ -201,15 +201,18 @@ function(wish_create_library)
 		list(APPEND matching_sources $<TARGET_OBJECTS:${obj}>)
 	endforeach()
 
-	# add
+	# add_library
 	if(arg_STATIC)
 		add_library(${arg_TARGET} STATIC ${matching_sources} ${target_objects})
+		target_link_libraries(${arg_TARGET} ${arg_LINK} ${__wish_static_link_std})
+	elseif(arg_SHARED)
+		add_library(${arg_TARGET} SHARED ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} ${arg_LINK} ${__wish_static_link_std})
 	elseif(arg_INTERFACE)
 		add_library(${arg_TARGET} INTERFACE ${matching_sources} ${target_objects})
 		target_link_libraries(${arg_TARGET} INTERFACE ${arg_LINK})
 	else()
-		message(FATAL_ERROR "Library has to be either STATIC or INTERFACE")
+		message(FATAL_ERROR "Library has to be either STATIC, SHARED or INTERFACE")
 	endif()
 
 #	add_library(${arg_TARGET} $<IF:$<BOOL:${arg_STATIC}>,"STATIC",""> $<IF:$<BOOL:${arg_INTERFACE}>,"INTERFACE",""> ${matching_sources} ${target_objects})
@@ -230,6 +233,7 @@ function(wish_create_library)
 		message("	Object    : ${arg_OBJECT}")
 		message("	Link      : ${arg_LINK}")
 		message("	Static    : ${arg_STATIC}")
+		message("	Shared    : ${arg_SHARED}")
 		message("	Interface : ${arg_INTERFACE}")
 		message("	Group     : ${__wish_current_group_stack}")
 	endif()
