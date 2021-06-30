@@ -79,6 +79,7 @@ void CoreCanvasAdaptor::doRender(Renderer& r) {
 		// TODO P1: Does not account for clipping
 		//				this would require shader support in canvas
 		// 				or use a framebuffer for this and render with UI texture shader
+		//				(Matrix stacks reset view and discards the UI's current view, fine for now, but with clipping support it will break)
 
 		const auto prev_view_pos = glr.viewport_position();
 		const auto prev_view_size = glr.viewport_size();
@@ -116,6 +117,10 @@ core_ptr CanvasAdaptor::create_core(std::string name, std::unique_ptr<CanvasBase
 }
 
 CanvasBase& CanvasAdaptor::object_base() noexcept {
+	return *self().canvas_object;
+}
+
+const CanvasBase& CanvasAdaptor::object_base() const noexcept {
 	return *self().canvas_object;
 }
 

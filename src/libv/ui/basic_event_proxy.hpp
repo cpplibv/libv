@@ -28,30 +28,30 @@ template <typename ComponentT, typename EventT, typename Func>
 	static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
 
 	if constexpr (std::is_invocable_r_v<void, Func, ComponentT&, const EventT&>) {
-		return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
-			auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
+		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
+			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
 			f(handler, *static_cast<const EventT*>(event_ptr));
 			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func, const EventT&>) {
-		return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
-			(void) component_ptr; // Callback is not interested in the component
+		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
+			(void) signal_ptr; // Callback is not interested in the component
 			f(*static_cast<const EventT*>(event_ptr));
 			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func, ComponentT&>) {
-		return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
+		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
 			(void) event_ptr; // Callback is not interested in the event
-			auto handler = ComponentT{static_cast<CoreComponent*>(component_ptr)};
+			auto handler = ComponentT{static_cast<CoreComponent*>(signal_ptr)};
 			f(handler);
 			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
 		};
 
 	} else if constexpr (std::is_invocable_r_v<void, Func>) {
-		return [f = std::forward<Func>(func)](void* component_ptr, const void* event_ptr) mutable {
-			(void) component_ptr; // Callback is not interested in the component
+		return [f = std::forward<Func>(func)](void* signal_ptr, const void* event_ptr) mutable {
+			(void) signal_ptr; // Callback is not interested in the component
 			(void) event_ptr; // Callback is not interested in the event
 			f();
 			return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();

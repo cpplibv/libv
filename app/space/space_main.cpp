@@ -20,8 +20,10 @@
 #include <libv/log/log.hpp>
 #include <libv/math/distance/intersect.hpp>
 #include <libv/math/noise/white.hpp>
+//#include <libv/math/ray.hpp>
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
+#include <libv/ui/component/button.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_float.hpp>
@@ -38,7 +40,9 @@
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
+#include <space/command.hpp>
 #include <space/icon_set.hpp>
+#include <space/world.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -456,112 +460,11 @@ public:
 	}
 };
 
-//struct ScreenPickableType {
-//	float radius_direct;
-//	float radius_indirect;
-//
-//	constexpr inline ScreenPickable(float radiusDirect, float radiusIndirect) noexcept :
-//		radius_direct(radiusDirect),
-//		radius_indirect(radiusIndirect) {}
-//};
-
-//struct Fleet : ScreenPickable {
-struct Fleet {
-//	ScreenPickableType* screen_pick_type;
-
-//	enum class CommandType {
-//		movement,
-//		attack,
-////		follow,
-////		merge,
-////		block,
-////		land,
-////		...,
-//	};
-//
-//	struct Command {
-//		CommandType type;
-//		libv::vec3f target;
-////		int32_t target;
-//	};
-
-public:
-	libv::vec3f position;
-	libv::vec3f target;
-//	libv::vec3f movement;
-//	CommandArrow command_arrow; // <<< Yes, but no, maybe-, Think about it how should ownership and references fork regarding renderers
-//	std::vector<Command> commands;
-
-public:
-	explicit Fleet(libv::vec3f position) :
-//		ScreenPickable(50.f, 100.f),
-		position(position),
-		target(position) {}
-
-public:
-//	void queue_command(CommandType type, libv::vec3f target) {
-//		commands.emplace_back(type, target);
-////		command_arrow.add(target, color);
-//	}
-//
-//	void queue_command(CommandType type, int32_t target) {
-//
-//	}
-
-	void update(libv::ui::time_duration delta_time) {
-		const auto dt = static_cast<float>(delta_time.count());
-		const auto [len, dir] = (target - position).length_and_dir();
-
-		if (len < dt)
-			position = target;
-		else
-			position = position + dir * dt;
-	}
-};
-
-//struct Map {
-//	FleetRender fleet_render;
-//	std::vector<Fleet> fleets;
-//
-//	void render_fleets(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
-//		for (const auto& fleet : fleets) {
-//			const auto m_guard = gl.model.push_guard();
-//			gl.model.translate(fleet.position);
-//			fleet_render.render(gl, uniform_stream);
-//		}
-//	}
-//
-//	void render_fleet_arrows(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
-//		for (const auto& fleet : fleets)
-//			fleet.command_arrow.render(gl, canvas_size, uniform_stream);
-//	}
-//};
-
 // -------------------------------------------------------------------------------------------------
-
-struct SpaceState {
-//	app::CameraPlayer& camera;
-//
-//	float angle = 0.0f;
-//	float time = 0.0f;
-//	float test_sin_time = 0.0f;
-
-	std::vector<Fleet> fleets;
-
-public:
-//	SpaceState(app::CameraPlayer& camera) :
-//		camera(camera) {
-//	}
-
-	void update(libv::ui::time_duration delta_time) {
-		for (auto& fleet : fleets)
-			fleet.update(delta_time);
-	}
-};
 
 struct SpaceCanvas : libv::ui::CanvasBase {
 	bool main_canvas;
-	SpaceState& state;
+	app::SpaceState& state;
 	app::CameraPlayer& camera;
 	app::CameraPlayer::screen_picker screen_picker;
 
@@ -577,7 +480,7 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
-	explicit SpaceCanvas(SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
+	explicit SpaceCanvas(app::SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
 		main_canvas(main_canvas),
 		state(state),
 		camera(camera),
@@ -671,24 +574,10 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 		}
 	}
 
-//	virtual void layout() override {
-//
-//	}
-
 	virtual void render(libv::glr::Queue& gl) override {
-		// <<< UI Component position is lost
-		//				gl.viewport() or matrix manipulation
-		// <<< Incorrect, does not account for parent's parent pos and so on...
-//		gl.viewport(
-//				cast<int>(round(canvas_position)),
-//				cast<int>(round(canvas_size))
-//		);
-
-		// <<< Events should update this (or mark as dirty), not update,
-		//  		and/or precalc the world space mouse ray, because that looks like used a lot
-		// Has to be placed around render, as canvas_size is only set after layout, eehhh its fine
-		//      But thats too late for input the events, hmmmmmm
+		// NOTE: Screen_picker update has to be placed around render, as canvas_size is only set after layout
 		screen_picker = camera.picker(canvas_size);
+		//
 
 		const auto s_guard = gl.state.push_guard();
 
@@ -705,16 +594,11 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 		gl.state.frontFaceCCW();
 
 		gl.state.clipPlanes(0);
-//		gl.state.polygonModeFill();
+		gl.state.polygonModeFill();
 
 		gl.projection = camera.projection(canvas_size);
-		// TODO P2: No not reset view, use the UI's current view (? Is UI based gl.viewport solves this?, at least for canvas it could)
 		gl.view = camera.view();
 		gl.model = libv::mat4f::identity();
-
-//		gl.setClearColor(0, 0, 0, 0); // For debug only, this would break some of the UI
-//		gl.clearColor();
-//		gl.clearDepth();
 
 		// --- Render Background/Sky ---
 
@@ -732,7 +616,6 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 			gl.model.translate(fleet.position);
 			gl.model.scale(0.2f);
 			render_fleet.render(gl, uniform_stream);
-//			origin_gizmo.render(gl, uniform_stream);
 		}
 
 		// --- Render Background/Sky ---
@@ -785,7 +668,6 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 						canvas_size,
 						-orientation_gizmo_size,
 						+orientation_gizmo_size);
-				// TODO P1: No not reset view, use the UI's current view
 				gl.view = camera.orientation().translate(-1, 0, 0);
 				gl.model.scale(orientation_gizmo_size * 0.5f);
 
@@ -798,10 +680,51 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 // -------------------------------------------------------------------------------------------------
 
 // TODO P1: Controls camera should only be placed into context if the canvas is focused
-// TODO P1: Remove the F12 tracking manual workaround too for mode switching
-// TODO P2: UI Canvas, find a better API, let the component take the ownership of the canvas
-// TODO P3: Arrow strip control from lua (or something lua related) (With auto reload and everything)
+// TODO P1: Remove the F12 tracking manual workaround too for mode switching (Related to controls bypass)
+// TODO P3: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
 
+struct SpaceFrame : public libv::Frame {
+	libv::ui::UI ui;
+	libv::ctrl::Controls controls;
+	libv::Timer timer; // <<< use frame loop to call controls
+
+	SpaceFrame() :
+		Frame("Space", 1280, 800),
+		ui([] {
+			libv::ui::Settings ui_settings;
+			// TODO P1: Internalize used UI resources under space, currently: app/space/../../res/
+			ui_settings.res_font.base_path = "../../res/font/";
+			ui_settings.res_shader.base_path = "../../res/shader/";
+			ui_settings.res_texture.base_path = "../../res/texture/";
+			return ui_settings;
+		}()) {
+
+		setPosition(libv::Frame::FramePosition::center_current_monitor);
+		setOpenGLProfile(libv::Frame::OpenGLProfile::core);
+		setOpenGLVersion(3, 3);
+		setOpenGLSamples(libv::Frame::OpenGLSamples{4});
+		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
+		setIcon(app::icon_set_iris_cyan());
+
+		app::CameraBehaviour::register_controls(controls);
+		app::CameraBehaviour::bind_default_controls(controls);
+		SpaceCanvas::register_controls(controls);
+		SpaceCanvas::bind_default_controls(controls);
+
+		shader_manager.attach_libv_ui_hub(ui.event_hub());
+		onContextUpdate.output([&](const auto&) {
+			// shader_manager.update MUST run before any other render queue operation
+			// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
+			shader_manager.update(ui.gl());
+
+			// TODO P1: Timer management should be smoother with control and frame attachment -> controls.attach(frame)
+			controls.update(timer.time());
+		});
+
+		ui.attach(*this);
+		controls.attach(*this);
+	}
+};
 
 int main() {
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
@@ -812,57 +735,14 @@ int main() {
 	// Change working directory
 	std::filesystem::current_path("app/space/");
 
-	libv::Frame frame("Space", 1280, 800);
-	frame.setPosition(libv::Frame::FramePosition::center_current_monitor);
-	frame.setOpenGLProfile(libv::Frame::OpenGLProfile::core);
-	frame.setOpenGLVersion(3, 3);
-	frame.setOpenGLSamples(libv::Frame::OpenGLSamples{4});
-	frame.setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
-	frame.setIcon(app::icon_set_iris_cyan());
-
-	libv::ui::Settings ui_settings;
-	// TODO P1: Internalize used UI resources under space, currently: app/space/../../res/
-	ui_settings.res_font.base_path = "../../res/font/";
-	ui_settings.res_shader.base_path = "../../res/shader/";
-	ui_settings.res_texture.base_path = "../../res/texture/";
-	libv::ui::UI ui(ui_settings);
-
-	shader_manager.on_success([hub = ui.event_hub()](const libv::rev::ShaderLoadSuccess& e) mutable {
-		hub.broadcast(e);
-	});
-	shader_manager.on_failure([hub = ui.event_hub()](const libv::rev::ShaderLoadFailure& e) mutable {
-		hub.broadcast(e);
-	});
-	shader_manager.on_unload([hub = ui.event_hub()](const libv::rev::ShaderUnload& e) mutable {
-		hub.broadcast(e);
-	});
-
-	libv::ctrl::Controls controls;
-
-	app::CameraBehaviour::register_controls(controls);
-	app::CameraBehaviour::bind_default_controls(controls);
-	SpaceCanvas::register_controls(controls);
-	SpaceCanvas::bind_default_controls(controls);
-
-	libv::Timer timer;
-	frame.onContextUpdate.output([&](const auto&) {
-		// shader_manager.update MUST run before any other render queue operation
-		// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
-		shader_manager.update(ui.gl());
-
-		// TODO P1: Timer management should be smoother with control and frame attachment -> controls.attach(frame)
-		controls.update(timer.time());
-	});
-
-	ui.attach(frame);
-	controls.attach(frame);
+	SpaceFrame frame;
 
 	app::CameraPlayer camera_main;
 	app::CameraPlayer camera_mini;
 	camera_main.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 	camera_mini.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
-	SpaceState space_state;
+	app::SpaceState space_state;
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
@@ -874,9 +754,9 @@ int main() {
 			static int hack_camera_control_ui_mode = 0;
 			hack_camera_control_ui_mode = (hack_camera_control_ui_mode + 1) % 3;
 			if (hack_camera_control_ui_mode == 1)
-				controls.context_leave<app::BaseCameraOrbit>();
+				frame.controls.context_leave<app::BaseCameraOrbit>();
 			else
-				controls.context_enter<app::BaseCameraOrbit>(&camera_main);
+				frame.controls.context_enter<app::BaseCameraOrbit>(&camera_main);
 		}
 
 		// TODO P1: Shortcut to save camera position and reload it upon restart
@@ -968,19 +848,32 @@ int main() {
 
 		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, camera_main, true);
 		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, camera_mini, false);
-
-		controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
-		controls.context_enter<SpaceCanvas>(&canvas_main.object()); // TODO P1: Enter / leave on canvas focus-unfocus
-
 		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
 		canvas_mini.padding({0, 0, 10, 0});
 		canvas_mini.anchor(libv::ui::Anchor::center_right);
 
+		libv::ui::Button clear_fleets;
+		clear_fleets.align_horizontal(libv::ui::AlignHorizontal::center);
+		clear_fleets.align_vertical(libv::ui::AlignVertical::center);
+		clear_fleets.anchor(libv::ui::Anchor::bottom_center);
+		clear_fleets.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
+		clear_fleets.padding({0, 0, 0, 0});
+		clear_fleets.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+		clear_fleets.text("Clear Fleets");
+//		clear_fleets.event().submit.connect(canvas_main, [](libv::ui::CanvasAdaptorT<SpaceCanvas>& canvas) {
+		clear_fleets.event().submit.connect([canvas = canvas_main]() {
+			canvas.object().state.fleets.clear();
+		});
+
 		layers.add(canvas_main);
 		layers.add(canvas_mini);
 		layers.add(shader_errors);
+		layers.add(clear_fleets);
 //		layers.add(pref_graph);
-		ui.add(layers);
+		frame.ui.add(layers);
+
+		frame.controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
+		frame.controls.context_enter<SpaceCanvas>(&canvas_main.object()); // TODO P1: Enter / leave on canvas focus-unfocus
 	}
 
 	frame.show();

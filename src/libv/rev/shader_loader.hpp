@@ -53,6 +53,10 @@ public:
 	/// Every update event is called under the same mutex
 	void on_unload(shader_unload_cb unload_cb);
 	void clear_on_updates();
+
+public:
+	template <typename Hub>
+	void attach_libv_ui_hub(Hub hub);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -60,6 +64,21 @@ public:
 template <typename T, typename... Args>
 inline Shader<T> ShaderLoader::load(Args&&... args) {
 	return Shader<T>(*this, std::forward<Args>(args)...);
+}
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename Hub>
+void ShaderLoader::attach_libv_ui_hub(Hub hub) {
+	on_success([hub](const libv::rev::ShaderLoadSuccess& e) mutable {
+		hub.broadcast(e);
+	});
+	on_failure([hub](const libv::rev::ShaderLoadFailure& e) mutable {
+		hub.broadcast(e);
+	});
+	on_unload([hub](const libv::rev::ShaderUnload& e) mutable {
+		hub.broadcast(e);
+	});
 }
 
 // -------------------------------------------------------------------------------------------------
