@@ -3,68 +3,118 @@
 #pragma once
 
 // libv
-//#include <libv/math/vec.hpp>
+#include <libv/math/vec.hpp>
+#include <libv/ui/chrono.hpp>
 // std
-//#include <cstdint>
-//#include <vector>
+#include <vector>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct SpaceState {
+//struct ScreenPickableType {
+//	float radius_direct;
+//	float radius_indirect;
+//
+//	constexpr inline ScreenPickable(float radiusDirect, float radiusIndirect) noexcept :
+//		radius_direct(radiusDirect),
+//		radius_indirect(radiusIndirect) {}
+//};
+
+//struct Fleet : ScreenPickable {
+struct Fleet {
+//	ScreenPickableType* screen_pick_type;
+
+//	enum class CommandType {
+//		movement,
+//		attack,
+////		follow,
+////		merge,
+////		block,
+////		land,
+////		...,
+//	};
+//
+//	struct Command {
+//		CommandType type;
+//		libv::vec3f target;
+////		int32_t target;
+//	};
+
+public:
+	libv::vec3f position;
+	libv::vec3f target;
+//	libv::vec3f movement;
+//	CommandArrow command_arrow; // <<< Yes, but no, maybe-, Think about it how should ownership and references fork regarding renderers
+//	std::vector<Command> commands;
+
+public:
+	explicit Fleet(libv::vec3f position) :
+//		ScreenPickable(50.f, 100.f),
+			position(position),
+			target(position) {}
+
+public:
+//	void queue_command(CommandType type, libv::vec3f target) {
+//		commands.emplace_back(type, target);
+////		command_arrow.add(target, color);
+//	}
+//
+//	void queue_command(CommandType type, int32_t target) {
+//
+//	}
+
+	void update(libv::ui::time_duration delta_time) {
+		const auto dt = static_cast<float>(delta_time.count());
+		const auto [len, dir] = (target - position).length_and_dir();
+
+		if (len < dt)
+			position = target;
+		else
+			position = position + dir * dt;
+	}
+};
+
+//struct Map {
+//	FleetRender fleet_render;
+//	std::vector<Fleet> fleets;
+//
+//	void render_fleets(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
+//		for (const auto& fleet : fleets) {
+//			const auto m_guard = gl.model.push_guard();
+//			gl.model.translate(fleet.position);
+//			fleet_render.render(gl, uniform_stream);
+//		}
+//	}
+//
+//	void render_fleet_arrows(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
+//		for (const auto& fleet : fleets)
+//			fleet.command_arrow.render(gl, canvas_size, uniform_stream);
+//	}
+//};
+
+// -------------------------------------------------------------------------------------------------
+
+struct SpaceState {
 //	app::CameraPlayer& camera;
 //
 //	float angle = 0.0f;
 //	float time = 0.0f;
 //	float test_sin_time = 0.0f;
-//
-//	std::vector<Fleet> fleets;
-//
-//public:
+
+	std::vector<Fleet> fleets;
+
+public:
 //	SpaceState(app::CameraPlayer& camera) :
-//			camera(camera) {
+//		camera(camera) {
 //	}
-//
-//	void update(libv::ui::time_duration delta_time) {
-//		const auto dtf = static_cast<float>(delta_time.count());
-//		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
-//		time += dtf;
-//		global_time += dtf;
-//
-//		// TODO P2: Value tracking UI component for debugging
-////		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
-////		value_tracker(160);
-////		value_tracker.pause();
-////		value_tracker.resume();
-////		value_tracker("camera.orbit_point", camera.orbit_point());
-////		value_tracker("camera.orbit_distance", camera.orbit_distance());
-////		value_tracker("camera.rotations", camera.rotations());
-////		value_tracker.differential("camera.orbit_point", camera.orbit_point());
-////		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-////		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-//
-//		if (global_test_mode != 0) {
-//			test_sin_time += dtf;
-//			auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
-//			if (global_test_mode == 1) {
-//				camera.pitch(-t * libv::pi_f * 0.5f);
-//			} else if (global_test_mode == 2) {
-//				t = t > 0.5f ? 1.f - t : t;
-//				camera.pitch(-t * libv::pi_f * 0.5f);
-//			} else if (global_test_mode == 3) {
-//				const float part = 4;
-//				auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
-//				t = t > 0.5f ? 1.f - t : t;
-//				camera.pitch(-t * libv::pi_f * 0.5f / part);
-//			}
-//		}
-//
-//		for (auto& fleet : fleets)
-//			fleet.update(delta_time);
-//	}
-//};
+
+	void update(libv::ui::time_duration delta_time) {
+		for (auto& fleet : fleets)
+			fleet.update(delta_time);
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 

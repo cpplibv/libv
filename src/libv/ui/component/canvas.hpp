@@ -55,6 +55,7 @@ public:
 
 protected:
 	CanvasBase& object_base() noexcept;
+	const CanvasBase& object_base() const noexcept;
 };
 
 template <typename T>
