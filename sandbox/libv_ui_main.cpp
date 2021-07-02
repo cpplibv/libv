@@ -292,6 +292,7 @@ public:
 				tmp.color({0.7f, 0.7f, 0.5f, 1.0f});
 				tmp.align_horizontal(libv::ui::AlignHorizontal::center);
 				tmp.align_vertical(libv::ui::AlignVertical::center);
+				tmp.margin({static_cast<float>(i) * 15.f, 1, static_cast<float>(i) * 15.f, 3});
 				tmp.text(fmt::format("Status entry {} for {}s", i, t.count()));
 				tmp.event().submit([](libv::ui::Button& btn) {
 					btn.markRemove();
@@ -307,6 +308,7 @@ public:
 
 		panel_grid.column_count(5);
 		panel_grid.padding({5, 5, 5, 10});
+//		panel_grid.padding({5, 5, 5, 50});
 //		panel_grid.padding({5, 5, 5, 5});
 		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
 		panel_grid.spacing2(libv::ui::Spacing2{1, 2});

@@ -138,18 +138,20 @@ public:
 		markInvalidLayout();
 	}
 
+	// --- Margin ---
+
 	inline void margin(Margin value) noexcept {
 		margin_ = value;
 		markInvalidLayout();
 	}
 	inline void margin(float left_down_right_top) noexcept {
-		margin({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
+		margin(Margin{left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
 	}
 	inline void margin(float left_right, float down_top) noexcept {
-		margin({left_right, down_top, left_right, down_top});
+		margin(Margin{left_right, down_top, left_right, down_top});
 	}
 	inline void margin(float left, float down, float right, float top) noexcept {
-		margin({left, down, right, top});
+		margin(Margin{left, down, right, top});
 	}
 	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Margin margin() const noexcept {
@@ -180,18 +182,20 @@ public:
 		return {margin_size(), 0.0f};
 	}
 
+	// --- Padding ---
+
 	inline void padding(Padding value) noexcept {
 		padding_ = value;
 		markInvalidLayout();
 	}
 	inline void padding(float left_down_right_top) noexcept {
-		padding({left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
+		padding(Padding{left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
 	}
 	inline void padding(float left_right, float down_top) noexcept {
-		padding({left_right, down_top, left_right, down_top});
+		padding(Padding{left_right, down_top, left_right, down_top});
 	}
 	inline void padding(float left, float down, float right, float top) noexcept {
-		padding({left, down, right, top});
+		padding(Padding{left, down, right, top});
 	}
 	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Padding padding() const noexcept {

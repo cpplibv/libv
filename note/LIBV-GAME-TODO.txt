@@ -15,7 +15,7 @@ app.space: Have space working from the correct dir
 app.space: Screen picker integration - Place something onto the 3D world on mouse click
 app.space: Fleet that moves (without any arrow)
 app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
-
+app.space: Sim state manipulation only with commands
 
 
 
@@ -66,9 +66,11 @@ app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 
 
 
-app.space: Networking: Mouse, Camera, Fleet commands sharing
+app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
 
-app.space: Sim state manipulation only with commands
+app.space: Self-Updater
+app.space: Mini canvas show other clients view
+
 app.space: Fleet with arrow and movement toward target (primitive)
 
 app.space: frustum visualization
@@ -85,13 +87,12 @@ app.space: Iris and space has to merge in some way
 
 app.space: line shader
 
-app.space: Self-Updater
 
 
-architecture:
-	'MSVC'
+architecture: 'MSSVC'
 	- Model
 	- Simulation
+	- Syncronization
 	- View
 	- Control
 

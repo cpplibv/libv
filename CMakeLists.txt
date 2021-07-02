@@ -504,7 +504,7 @@ wish_create_external(
 wish_create_external(
 	NAME range
 	GIT_REPOSITORY https://github.com/ericniebler/range-v3.git
-	GIT_TAG 08ef81acf5617366f8daa9d8b3b9bc8f7064ecf5
+	GIT_TAG 0487cca29e352e8f16bbd91fda38e76e39a0ed28
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND mkdir -p ${PATH_EXT}/range/
