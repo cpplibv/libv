@@ -102,6 +102,7 @@ libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& layout_env) {
 					resolvePercent(
 							child.size()[i].pixel + (child.size()[i].dynamic ? child_dynamic[i] : 0.f),
 							child.size()[i].percent, child.core())
+						+ child.core().margin_size3()[i]
 			);
 		});
 	}
@@ -110,13 +111,13 @@ libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& layout_env) {
 }
 
 void CorePanelFull::doLayout2(const ContextLayout2& layout_env) {
-	const auto env_size = layout_env.size - padding_size3();
-
-	const auto position = padding_LB3();
-	const auto roundedPosition = libv::vec::round(position);
-	const auto roundedSize = libv::vec::round(position + env_size) - roundedPosition;
-
 	for (auto& child : children | view_layouted()) {
+		const auto env_size = layout_env.size - padding_size3() - child.core().margin_size3();
+		const auto position = padding_LB3() + child.core().margin_LB3();
+
+		const auto roundedPosition = libv::vec::round(position);
+		const auto roundedSize = libv::vec::round(position + env_size) - roundedPosition;
+
 		AccessLayout::layout2(
 				child.core(),
 				layout_env.enter(roundedPosition, roundedSize)
