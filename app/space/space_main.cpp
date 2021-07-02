@@ -27,13 +27,13 @@
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_float.hpp>
-#include <libv/ui/component/panel_full.hpp>
-#include <libv/ui/component/panel_status_line.hpp>
+//#include <libv/ui/component/panel_full.hpp>
+//#include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
-#include <libv/utility/hex_dump.hpp>
+//#include <libv/utility/hex_dump.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <iostream>
@@ -42,6 +42,7 @@
 #include <space/camera_behaviour.hpp>
 #include <space/command.hpp>
 #include <space/icon_set.hpp>
+#include <space/make_shader_error_overlay.hpp>
 #include <space/state.hpp>
 #include <space/sync.hpp>
 
@@ -724,7 +725,6 @@ struct SpaceFrame : public libv::Frame {
 		SpaceCanvas::register_controls(controls);
 		SpaceCanvas::bind_default_controls(controls);
 
-		shader_manager.attach_libv_ui_hub(ui.event_hub());
 		onContextUpdate.output([&](const auto&) {
 			// shader_manager.update MUST run before any other render queue operation
 			// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
@@ -734,6 +734,12 @@ struct SpaceFrame : public libv::Frame {
 			controls.update(timer.time());
 		});
 
+		onKey.output([this](const libv::input::EventKey& e) {
+			if (e.keycode == libv::input::Keycode::Escape)
+				closeForce();
+		});
+
+		shader_manager.attach_libv_ui_hub(ui.event_hub());
 		ui.attach(*this);
 		controls.attach(*this);
 	}
@@ -760,11 +766,8 @@ int main() {
 	app::PlayoutDelayBuffer playout_delay_buffer;
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
-		if (e.keycode == libv::input::Keycode::Escape)
-			frame.closeForce();
-
 		// TODO P1: Ui focus base camera context switch
-		// Hack workaround until ui focus does not operates control contexts
+		//			Hack workaround until ui focus does not operates control contexts
 		if (e.keycode == libv::input::Keycode::F12 && e.action == libv::input::Action::press) {
 			static int hack_camera_control_ui_mode = 0;
 			hack_camera_control_ui_mode = (hack_camera_control_ui_mode + 1) % 3;
@@ -803,65 +806,8 @@ int main() {
 //		libv::ui::PanelFull layers;
 		libv::ui::PanelFloat layers;
 
-		libv::ui::PanelStatusLine shader_errors;
-		shader_errors.align_horizontal(libv::ui::AlignHorizontal::left);
-		shader_errors.align_vertical(libv::ui::AlignVertical::bottom);
-		shader_errors.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
-//		shader_errors.size(libv::ui::parse_size_or_throw("1r, 1r"));
-		shader_errors.spacing(10);
-
-		shader_errors.event().global.connect<libv::rev::ShaderLoadSuccess>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadSuccess& e) mutable {
-			if (e.shader.load_version() == 0)
-				return; // Do not display the first load successes on program startup
-
-			libv::ui::Label label;
-			label.align_horizontal(libv::ui::AlignHorizontal::left);
-			label.align_vertical(libv::ui::AlignVertical::bottom);
-			label.size(libv::ui::parse_size_or_throw("1r, D"));
-			label.font_color({.7235f, 0.9333f, 0.2433f, 1.f});
-
-			label.text(fmt::format("[{:%H:%M:%S}] Successful shader reload: {} v{} ({})", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id));
-			psl.add(e.id, label, std::chrono::seconds(3));
-		});
-		shader_errors.event().global.connect<libv::rev::ShaderLoadFailure>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderLoadFailure& e) mutable {
-			libv::ui::Label label;
-			label.align_horizontal(libv::ui::AlignHorizontal::left);
-			label.align_vertical(libv::ui::AlignVertical::bottom);
-			label.size(libv::ui::parse_size_or_throw("1r, D"));
-			label.font_color({.9333f, 0.8235f, 0.0078f, 1.f}); // Warning yellow
-
-			if (e.include_failure) {
-				std::string message;
-				message += fmt::format("[{:%H:%M:%S}] Failed to load shader: {} v{} ({}) using v{}\n", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id, e.shader.current_version());
-				message += fmt::format("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_failure->include_path, e.include_failure->file_path, e.include_failure->ec, e.include_failure->ec.message());
-				for (const auto& [file, line] : e.include_failure->include_stack)
-					message += fmt::format("\n    Included from: {}:{}", file, line);
-				label.text(message);
-
-			} else if (e.compile_failure) {
-				label.text(fmt::format("[{:%H:%M:%S}] Failed to compile shader: {} v{} ({}) using v{}\n{}", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id, e.shader.current_version(), e.compile_failure->message));
-
-			} else if (e.link_failure) {
-				label.text(fmt::format("[{:%H:%M:%S}] Failed to link shader: {} v{} ({}) using v{}\n{}", std::chrono::system_clock::now(), e.shader.name(), e.shader.load_version(), e.id, e.shader.current_version(), e.link_failure->message));
-			}
-
-			psl.add(e.id, label);
-		});
-		shader_errors.event().global.connect<libv::rev::ShaderUnload>([](libv::ui::PanelStatusLine& psl, const libv::rev::ShaderUnload& e) mutable {
-			psl.remove(e.id);
-		});
-
-//		shader_manager.on_update([status_log](const libv::rev::ShaderLoader::Update& update) {
-//			status_log.add(
-//					update.id,
-//					update.success ? "shader_success" : "shader_failure",
-//					update.message(),
-//					update.success ? std::chrono::seconds(1) : 0);
-//		});
-
-		// ---
-
 		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, space_session, playout_delay_buffer, camera_main, true);
+
 		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, space_session, playout_delay_buffer, camera_mini, false);
 		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
 		canvas_mini.padding({0, 0, 10, 0});
@@ -875,17 +821,16 @@ int main() {
 		clear_fleets.padding({0, 0, 0, 0});
 		clear_fleets.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
 		clear_fleets.text("Clear Fleets");
-//		clear_fleets.event().submit.connect(canvas_main, [](libv::ui::CanvasAdaptorT<SpaceCanvas>& canvas) {
-		clear_fleets.event().submit.connect([canvas = canvas_main]() {
-			canvas.object().state.fleets.clear();
-			// <<< Has to be command, has to make state immutable
+		clear_fleets.event().submit.connect([&playout_delay_buffer]() {
+			playout_delay_buffer.queue<app::CommandClearFleets>();
 		});
 
 		layers.add(canvas_main);
 		layers.add(canvas_mini);
-		layers.add(shader_errors);
+		layers.add(app::make_shader_error_overlay());
 		layers.add(clear_fleets);
 //		layers.add(pref_graph);
+
 		frame.ui.add(layers);
 
 		frame.controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?

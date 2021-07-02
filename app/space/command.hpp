@@ -79,6 +79,9 @@ struct CommandFleetMove : CommandState {
 	CommandFleetMove(FleetID fleetId, const libv::vec3f& targetPosition) : fleetID(fleetId), target_position(targetPosition) {}
 };
 
+struct CommandClearFleets : CommandState {
+};
+
 // -------------------------------------------------------------------------------------------------
 
 struct CommandTrackView : CommandTrack {
