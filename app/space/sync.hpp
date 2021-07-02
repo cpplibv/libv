@@ -88,9 +88,20 @@ void apply(SpaceState& state, SpaceSession& session, CommandFleetSpawn& command)
 	state.fleets.emplace_back(command.position);
 }
 
+void apply(SpaceState& state, SpaceSession& session, CommandClearFleets& command) {
+	(void) session;
+	(void) command;
+
+	// Permission check
+	// Bound check
+	state.fleets.clear();
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void apply(SpaceState& state, SpaceSession& session, CommandTrackView& command) {
+	(void) state;
+	(void) session;
 }
 
 void apply(SpaceState& state, SpaceSession& session, CommandCameraWarpTo& command) {
