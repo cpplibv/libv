@@ -54,9 +54,6 @@ libv.ui: Panel Status Log (aka first composite component) | It ended up being so
 
 
 
-libv.ui: Adopt local mouse position: update related code in scroll_bar
-		!Double check with zoom overlay
-
 libv.ui: static_component system (lite)
 	Check on the _pastebin/legacy codes for this one
 	libv.ui: Restructure: property context creation stuffy simplification

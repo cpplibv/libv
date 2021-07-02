@@ -18,7 +18,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P2: libv.ui: Implement Setting to disable Font2D LCD sub pixel rendering
+// TODO P2: libv.ui: Implement global Setting and local property to disable Font2D LCD sub pixel rendering (both are required to be true to enable it)
 // TODO P2: libv.ui: Resource debugger: font and texture view at first
 // TODO P2: libv.ui: UI Debugger: Component stack on Hover (needs std::vector<observer_ptr<CoreComponent>> getComponentAt(int, int);) | Not just mouse region based!
 // TODO P2: libv.ui: Record or report create/layout/render/destroy statistics

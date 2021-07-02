@@ -66,25 +66,34 @@ app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 
 
 
+app.space: Networking: Mouse, Camera, Fleet commands sharing
 
-app.space / libv.rev: Render target
+app.space: Sim state manipulation only with commands
+app.space: Fleet with arrow and movement toward target (primitive)
+
+app.space: frustum visualization
+app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
+
+app.space / libv.rev: Render target/Framebuffer abstraction
 		ms / ss support
 		depth support
 		easy render target inspection
 app.space: make a blur or a bloom
 
-app.space: Fleet with arrow and movement toward target (primitive)
-app.space: Sim state manipulation only with commands
-
 app.space: Optimized VAO update for command arrows
 app.space: Iris and space has to merge in some way
 
 app.space: line shader
-app.space: frustum visualization
-app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
+
+app.space: Self-Updater
 
 
-
+architecture:
+	'MSVC'
+	- Model
+	- Simulation
+	- View
+	- Control
 
 game.sim:
 		- Command based sim state manipulation

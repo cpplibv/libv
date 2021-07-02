@@ -42,7 +42,8 @@
 #include <space/camera_behaviour.hpp>
 #include <space/command.hpp>
 #include <space/icon_set.hpp>
-#include <space/world.hpp>
+#include <space/state.hpp>
+#include <space/sync.hpp>
 
 //#include <libv/lua/lua.hpp>
 
@@ -465,6 +466,8 @@ public:
 struct SpaceCanvas : libv::ui::CanvasBase {
 	bool main_canvas;
 	app::SpaceState& state;
+	app::SpaceSession& session;
+	app::PlayoutDelayBuffer& playout_delay_buffer;
 	app::CameraPlayer& camera;
 	app::CameraPlayer::screen_picker screen_picker;
 
@@ -480,9 +483,11 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
-	explicit SpaceCanvas(app::SpaceState& state, app::CameraPlayer& camera, bool main_canvas) :
+	explicit SpaceCanvas(app::SpaceState& state, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
 		main_canvas(main_canvas),
 		state(state),
+		session(session),
+		playout_delay_buffer(playout_delay_buffer),
 		camera(camera),
 		screen_picker(camera.picker({100, 100})) {
 		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
@@ -507,12 +512,17 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 			const auto mouse_ray_pos = ctx.camera.eye();
 			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			if (!ctx.state.fleets.empty())
-				ctx.state.fleets.back().target = world_coord;
-			ctx.state.fleets.emplace_back(world_coord);
 			std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
 			std::cout << "world_coord: " << world_coord << std::endl;
+
+			if (!ctx.state.fleets.empty()) {
+				ctx.playout_delay_buffer.queue<app::CommandFleetMove>(
+						static_cast<app::FleetID>(ctx.state.fleets.size() - 1),
+						world_coord
+				);
+			}
+
+			ctx.playout_delay_buffer.queue<app::CommandFleetSpawn>(world_coord);
 		});
 
 		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
@@ -523,11 +533,12 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 			const auto mouse_ray_pos = ctx.camera.eye();
 			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			// TODO P1: app.space: Instead of direct apply create a command, and apply that command (in this example, this can be a direct function call into sim, but the command param is a must)
-			//  		(even tho its not a sim command, for replays client view tracking is also important, but it may be a different type of command)
-			//			khm-khm: MVC - Model View Control
-			ctx.camera.warp_to(world_coord);
 			std::cout << "world_coord: " << world_coord << std::endl;
+
+			const auto playerID = app::PlayerID{0};
+			ctx.playout_delay_buffer.queue<app::CommandCameraWarpTo>(playerID, world_coord);
+
+			ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
 		});
 	}
 
@@ -537,8 +548,10 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
-		if (main_canvas)
+		if (main_canvas) {
+			playout_delay_buffer.update(state, session);
 			state.update(delta_time);
+		}
 
 		const auto dtf = static_cast<float>(delta_time.count());
 		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
@@ -743,6 +756,8 @@ int main() {
 	camera_mini.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 
 	app::SpaceState space_state;
+	app::SpaceSession space_session;
+	app::PlayoutDelayBuffer playout_delay_buffer;
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		if (e.keycode == libv::input::Keycode::Escape)
@@ -846,8 +861,8 @@ int main() {
 
 		// ---
 
-		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, camera_main, true);
-		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, camera_mini, false);
+		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, space_session, playout_delay_buffer, camera_main, true);
+		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, space_session, playout_delay_buffer, camera_mini, false);
 		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
 		canvas_mini.padding({0, 0, 10, 0});
 		canvas_mini.anchor(libv::ui::Anchor::center_right);
@@ -863,6 +878,7 @@ int main() {
 //		clear_fleets.event().submit.connect(canvas_main, [](libv::ui::CanvasAdaptorT<SpaceCanvas>& canvas) {
 		clear_fleets.event().submit.connect([canvas = canvas_main]() {
 			canvas.object().state.fleets.clear();
+			// <<< Has to be command, has to make state immutable
 		});
 
 		layers.add(canvas_main);
