@@ -122,7 +122,7 @@ private:
 
 	template <typename... Tags>
 	void apply(TestComponent& comp, MarginTag t, Tags&&... tags) {
-		comp.padding(t);
+		comp.margin(t);
 		apply(comp, std::forward<Tags>(tags)...);
 	}
 
