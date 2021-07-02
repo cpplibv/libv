@@ -117,6 +117,7 @@ libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& layout_env) {
 					resolvePercent(
 							child.size()[i].pixel + (child.size()[i].dynamic ? child_dynamic[i] : 0.f),
 							child.size()[i].percent, child.core())
+						+ child.core().margin_size3()[i]
 			);
 		});
 	}
@@ -151,10 +152,15 @@ void CorePanelFloat::doLayout2(const ContextLayout2& layout_env) {
 
 		// Position ---
 
+		size += child.core().margin_size3();
+
 		const auto position =
 				+ padding_LB3()
+				+ child.core().margin_LB3()
 				+ child.anchor().to_info() * env_size
 				- child.anchor().to_info() * size;
+
+		size -= child.core().margin_size3();
 
 		const auto roundedPosition = libv::vec::round(position);
 		const auto roundedSize = libv::vec::round(position + size) - roundedPosition;
