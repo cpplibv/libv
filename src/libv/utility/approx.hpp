@@ -79,8 +79,8 @@ Approx(T) -> Approx<T>;
 
 // --- Aliases -------------------------------------------------------------------------------------
 
-template <typename T>
-using approx = Approx<T>;
+template <typename T, int Precision = -5>
+using approx = Approx<T, Precision>;
 
 // -------------------------------------------------------------------------------------------------
 
