@@ -65,8 +65,8 @@ app.space: Sim state manipulation only with commands
 
 
 
-
 app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
+app.space: Structure the whole program: UML time is upon us
 
 app.space: Self-Updater
 app.space: Mini canvas show other clients view

@@ -164,13 +164,13 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 				resolvePercent(
 						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? child_dynamic[_Y_] : 0.0f),
 						child.size()[_Y_].percent, child)
-					+ std::max(0.f, child.margin_size3()[_Y_] - padding_size3()[_Y_]));
+					+ std::max(0.f, child.margin()[orientData.inset_topY] - padding()[orientData.inset_topY])
+					+ std::max(0.f, child.margin()[orientData.inset_bottomY] - padding()[orientData.inset_bottomY]));
 
 		result[_Z_] = libv::max(result[_Z_],
 				resolvePercent(
 						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? child_dynamic[_Z_] : 0.0f),
-						child.size()[_Z_].percent, child)
-					+ std::max(0.f, child.margin_size3()[_Z_] - padding_size3()[_Z_]));
+						child.size()[_Z_].percent, child));
 	}
 
 	result[_X_] = resolvePercent(pixelX + contentX, percentX, *this);
@@ -211,7 +211,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 
 	if (!entries.empty()) { // First child only
 		Entry& b = entries.front();
-		b.front_spacingX = b.child->margin()[orientData.inset_frontX];
+		b.front_spacingX = std::max(0.f, b.child->margin()[orientData.inset_frontX] - padding()[orientData.inset_frontX]);
 		margin_spacing_sumX += b.front_spacingX;
 	}
 
@@ -270,6 +270,8 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 		childSize[_X_] += ratioScalerX * child.size()[_X_].ratio;
 		if (child.size()[_Y_].ratio > 0.f)
 			childSize[_Y_] = env_size[_Y_]
+//					- child.margin()[orientData.inset_topY]
+//					- child.margin()[orientData.inset_bottomY];
 					- std::max(0.f, child.margin()[orientData.inset_topY] - padding()[orientData.inset_topY])
 					- std::max(0.f, child.margin()[orientData.inset_bottomY] - padding()[orientData.inset_bottomY]);
 		if (child.size()[_Z_].ratio > 0.f)

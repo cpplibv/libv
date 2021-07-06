@@ -58,49 +58,50 @@ libv.ui: Panel line: Implement margin alignment: only push elements if they woul
 
 
 
-libv: Document what Padding/Margin/Spacing is: (Maybe in a table form)
-		? Interaction with border
-		Padding:
-			Part of the component but not part of the component 'content area'
-			Part of the background
-			Part of the size
-			Part of the mouse region
-			Does not collapses
-		Margin:
-			Not part of the component
-			Not part of the background (Invisible)
-			Not part of the size
-			Not part of the mouse region
-			Does collapses with neighboring Margin, Container spacing and container justify gap
-		Spacing:
-			Container mandated margin (only) between elements
-			Not part of the background (Invisible)
-			Not part of the component
-			Not part of the size
-			Not part of the mouse region
-			Does collapses with neighboring Margin, Container spacing and container justify gap
-
-
-libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
-				panel_full DONE
-				panel_line DONE
-			panel_float (Partial: Margin and padding does not collapse)
-        panel_grid
-        scroll_pane
-        scroll_area
-				label_image NO-OP
-				button NO-OP
-				check_box NO-OP
-				image NO-OP
-				input_field NO-OP
-				label NO-OP
-				quad NO-OP
-				radio_button NO-OP
-				scroll_bar NO-OP
-				stretch NO-OP
-
-libv.ui: padding support in every component (layout)
-		scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)
+libv.ui: Margin, Padding, Spacing and Alignment gaps
+	libv.ui: Document what Padding/Margin/Spacing is: (Maybe in a table form)
+			? Interaction with border
+			Padding:
+				Part of the component but not part of the component 'content area'
+				Part of the background
+				Part of the size
+				Part of the mouse region
+				Does not collapses
+			Margin:
+				Not part of the component
+				Not part of the background (Invisible)
+				Not part of the size
+				Not part of the mouse region
+				Does collapses with neighboring Margin, Container spacing and container justify gap
+			Spacing:
+				Container mandated margin (only) between elements
+				Not part of the background (Invisible)
+				Not part of the component
+				Not part of the size
+				Not part of the mouse region
+				Does collapses with neighboring Margin, Container spacing and container justify gap
+	libv.ui: Make panel_line margin not collapsing with padding
+	libv.ui: Make panel_line alignment not considering padding region
+	libv.ui: Make panel_float child margin push away border if there is not enough space
+	libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
+				panel_full DONE?
+				panel_line (Partial)
+				panel_float (Partial)
+			panel_grid
+			scroll_pane
+			scroll_area
+					label_image NO-OP
+					button NO-OP
+					check_box NO-OP
+					image NO-OP
+					input_field NO-OP
+					label NO-OP
+					quad NO-OP
+					radio_button NO-OP
+					scroll_bar NO-OP
+					stretch NO-OP
+	libv.ui: padding support in every component (layout)
+			scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)
 
 libv.ui: static_component system (lite)
 	Check on the _pastebin/legacy codes for this one
