@@ -53,7 +53,7 @@ private:
 	std::shared_ptr<ServerState> state;
 
 public:
-	NetworkResourceServer(std::shared_ptr<ServerState> state) :
+	explicit NetworkResourceServer(std::shared_ptr<ServerState> state) :
 		state(std::move(state)) {}
 
 	~NetworkResourceServer() {
