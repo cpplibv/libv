@@ -17,7 +17,6 @@
 #include <libv/glr/queue.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
-#include <libv/log/log.hpp>
 #include <libv/math/distance/intersect.hpp>
 #include <libv/math/noise/white.hpp>
 //#include <libv/math/ray.hpp>
@@ -27,6 +26,7 @@
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_line.hpp>
 //#include <libv/ui/component/panel_full.hpp>
 //#include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/event_hub.hpp>
@@ -42,7 +42,10 @@
 #include <space/camera_behaviour.hpp>
 #include <space/command.hpp>
 #include <space/icon_set.hpp>
+#include <space/log.hpp>
 #include <space/make_shader_error_overlay.hpp>
+#include <space/network_client.hpp>
+#include <space/network_server.hpp>
 #include <space/state.hpp>
 #include <space/sync.hpp>
 
@@ -71,10 +74,6 @@
 //#include <clip/clip.h>
 //#include <fmt/format.h>
 
-
-// -------------------------------------------------------------------------------------------------
-
-inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -745,11 +744,13 @@ struct SpaceFrame : public libv::Frame {
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
 int main() {
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 
 	std::cout << libv::logger_stream;
-	log_space.info("Hello Space!");
+	app::log_space.info("Hello Space!");
 
 	// Change working directory
 	std::filesystem::current_path("app/space/");
@@ -760,10 +761,6 @@ int main() {
 	app::CameraPlayer camera_mini;
 	camera_main.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 	camera_mini.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
-
-	app::SpaceState space_state;
-	app::SpaceSession space_session;
-	app::PlayoutDelayBuffer playout_delay_buffer;
 
 	frame.onKey.output([&](const libv::input::EventKey& e) {
 		// TODO P1: Ui focus base camera context switch
@@ -797,8 +794,14 @@ int main() {
 			global_test_mode = 2;
 		if (e.keycode == libv::input::Keycode::Num3)
 			global_test_mode = 3;
-		log_space.info("Test mode: {}", global_test_mode);
+		app::log_space.info("Test mode: {}", global_test_mode);
 	});
+
+	app::SpaceState space_state;
+	app::SpaceSession space_session;
+	app::PlayoutDelayBuffer playout_delay_buffer;
+	std::optional<app::NetworkServer> server;
+	std::optional<app::NetworkClient> client;
 
 //	std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
@@ -810,26 +813,60 @@ int main() {
 
 		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, space_session, playout_delay_buffer, camera_mini, false);
 		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
-		canvas_mini.padding({0, 0, 10, 0});
+		canvas_mini.margin(10);
 		canvas_mini.anchor(libv::ui::Anchor::center_right);
 
 		libv::ui::Button clear_fleets;
 		clear_fleets.align_horizontal(libv::ui::AlignHorizontal::center);
 		clear_fleets.align_vertical(libv::ui::AlignVertical::center);
-		clear_fleets.anchor(libv::ui::Anchor::bottom_center);
+//		clear_fleets.anchor(libv::ui::Anchor::bottom_center);
+		clear_fleets.anchor(libv::ui::Anchor::bottom_right);
 		clear_fleets.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		clear_fleets.padding({0, 0, 0, 0});
+		clear_fleets.margin(5);
 		clear_fleets.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
 		clear_fleets.text("Clear Fleets");
 		clear_fleets.event().submit.connect([&playout_delay_buffer]() {
 			playout_delay_buffer.queue<app::CommandClearFleets>();
 		});
 
+		libv::ui::PanelLine mp_buttons;
+		mp_buttons.anchor(libv::ui::Anchor::top_center);
+		mp_buttons.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		mp_buttons.size(libv::ui::parse_size_or_throw("D, D"));
+		mp_buttons.spacing(5);
+		mp_buttons.margin(5);
+
+		{
+			libv::ui::Button btn_host;
+			btn_host.align_horizontal(libv::ui::AlignHorizontal::center);
+			btn_host.align_vertical(libv::ui::AlignVertical::center);
+			btn_host.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
+			btn_host.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+			btn_host.text("Host");
+			btn_host.event().submit.connect([&]() {
+				server.emplace(25080, playout_delay_buffer);
+			});
+
+			libv::ui::Button btn_join;
+			btn_join.align_horizontal(libv::ui::AlignHorizontal::center);
+			btn_join.align_vertical(libv::ui::AlignVertical::center);
+			btn_join.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
+			btn_join.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+			btn_join.text("Join: rs0.corruptedai.com");
+			btn_join.event().submit.connect([&]() {
+				client.emplace("rs0.corruptedai.com", 25080, "Name", playout_delay_buffer);
+			});
+
+			mp_buttons.add(btn_host);
+			mp_buttons.add(btn_join);
+		}
+
 		layers.add(canvas_main);
 		layers.add(canvas_mini);
-		layers.add(app::make_shader_error_overlay());
 		layers.add(clear_fleets);
+		layers.add(mp_buttons);
 //		layers.add(pref_graph);
+		layers.add(app::make_shader_error_overlay());
 
 		frame.ui.add(layers);
 

@@ -82,22 +82,22 @@ libv: Document what Padding/Margin/Spacing is: (Maybe in a table form)
 
 
 libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
-				panel_float DONE
 				panel_full DONE
 				panel_line DONE
+			panel_float (Partial: Margin and padding does not collapse)
         panel_grid
         scroll_pane
         scroll_area
-				label_image NOOP
-				button NOOP
-				check_box NOOP
-				image NOOP
-				input_field NOOP
-				label NOOP
-				quad NOOP
-				radio_button NOOP
-				scroll_bar NOOP
-				stretch NOOP
+				label_image NO-OP
+				button NO-OP
+				check_box NO-OP
+				image NO-OP
+				input_field NO-OP
+				label NO-OP
+				quad NO-OP
+				radio_button NO-OP
+				scroll_bar NO-OP
+				stretch NO-OP
 
 libv.ui: padding support in every component (layout)
 		scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)

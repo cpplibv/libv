@@ -132,7 +132,7 @@ public:
 template <typename CRTP>
 class AcceptorHandler : public BaseAcceptorHandler {
 protected:
-	inline Acceptor<CRTP> connection_from_this() noexcept {
+	inline Acceptor<CRTP> acceptor_from_this() noexcept {
 		return Acceptor<CRTP>(this, static_cast<CRTP*>(this));
 	}
 };

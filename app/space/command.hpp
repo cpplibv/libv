@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 //#include <vector>

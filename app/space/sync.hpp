@@ -62,7 +62,7 @@ public:
 ////	state.
 //}
 
-void apply(SpaceState& state, SpaceSession& session, CommandChatMessage& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandChatMessage& command) {
 	(void) state;
 
 	// Permission check
@@ -72,7 +72,7 @@ void apply(SpaceState& state, SpaceSession& session, CommandChatMessage& command
 
 // -------------------------------------------------------------------------------------------------
 
-void apply(SpaceState& state, SpaceSession& session, CommandFleetMove& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandFleetMove& command) {
 	(void) session;
 
 	// Permission check
@@ -80,7 +80,7 @@ void apply(SpaceState& state, SpaceSession& session, CommandFleetMove& command) 
 	state.fleets[+command.fleetID].target = command.target_position;
 }
 
-void apply(SpaceState& state, SpaceSession& session, CommandFleetSpawn& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandFleetSpawn& command) {
 	(void) session;
 
 	// Permission check
@@ -88,7 +88,7 @@ void apply(SpaceState& state, SpaceSession& session, CommandFleetSpawn& command)
 	state.fleets.emplace_back(command.position);
 }
 
-void apply(SpaceState& state, SpaceSession& session, CommandClearFleets& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandClearFleets& command) {
 	(void) session;
 	(void) command;
 
@@ -99,21 +99,21 @@ void apply(SpaceState& state, SpaceSession& session, CommandClearFleets& command
 
 // -------------------------------------------------------------------------------------------------
 
-void apply(SpaceState& state, SpaceSession& session, CommandTrackView& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandTrackView& command) {
 	(void) state;
 	(void) session;
 }
 
-void apply(SpaceState& state, SpaceSession& session, CommandCameraWarpTo& command) {
+inline void apply(SpaceState& state, SpaceSession& session, CommandCameraWarpTo& command) {
 	(void) state;
 	(void) session;
 }
 
-//void apply(SpaceState& state, CommandCameraMovement& command) {
+//inline void apply(SpaceState& state, CommandCameraMovement& command) {
 ////	state.
 //}
 //
-//void apply(SpaceState& state, CommandMouseMovement& command) {
+//inline void apply(SpaceState& state, CommandMouseMovement& command) {
 ////	state.
 //}
 

@@ -1619,7 +1619,8 @@ Ports: Used default port ranges in LIBV
 	10122 - SSH (tunnel for rs0)
 	18080 - Jenkins
 
-	[25080-25089] - Network Sandbox
+	[25080-25089] - Network Sandboxes
+		25080 - app.space
 
 	25090 - Update server listening
 	25091 - RESERVED
