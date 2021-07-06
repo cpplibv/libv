@@ -365,6 +365,48 @@ TEST_CASE("Layout Line: padding test", "[libv.ui.layout.line]") {
 	}
 }
 
+//TEST_CASE("Layout Line: padding doesnt affects alignment space, unless it has to", "[libv.ui.layout.line]") {
+//	TestPanel<libv::ui::PanelLine> panel;
+//
+//	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+//	panel.align_horizontal(libv::ui::AlignHorizontal::center);
+//	panel.align_vertical(libv::ui::AlignVertical::center);
+//
+//	panel.padding({0, 100, 0, 0});
+//
+//	SECTION("padding does not effect children layouted size") {
+//		TestComponent comp0 = panel.add("10px, 10px", P(1, 2, 3, 4));
+//		TestComponent comp1 = panel.add("20px, 20px", P(4, 3, 2, 1));
+//		TestComponent comp2 = panel.add("30px, 40px", P(1, 4, 3, 2));
+//		TestComponent comp3 = panel.add("40px, 30px", P(2, 3, 4, 1));
+//
+//		CHECK(panel.layout1(0, 0, 0) == approx_size(100, 40, 0));
+//		panel.layout2(400, 300);
+//
+//		CHECK(comp0.bounds() == Bounds(  0, 0, 0, 10, 10, 0));
+//		CHECK(comp1.bounds() == Bounds( 10, 0, 0, 20, 20, 0));
+//		CHECK(comp2.bounds() == Bounds( 30, 0, 0, 30, 40, 0));
+//		CHECK(comp3.bounds() == Bounds( 60, 0, 0, 40, 30, 0));
+//	}
+//
+//	SECTION("panel padding does effect children layouted positions") {
+//		panel.padding({40, 41, 42, 43});
+//
+//		TestComponent comp0 = panel.add("10px, 10px", P(1, 2, 3, 4));
+//		TestComponent comp1 = panel.add("20px, 20px", P(4, 3, 2, 1));
+//		TestComponent comp2 = panel.add("30px, 40px", P(1, 4, 3, 2));
+//		TestComponent comp3 = panel.add("40px, 30px", P(2, 3, 4, 1));
+//
+//		CHECK(panel.layout1(0, 0, 0) == approx_size(100 + 40 + 42, 40 + 41 + 43, 0));
+//		panel.layout2(400, 300);
+//
+//		CHECK(comp0.bounds() == Bounds(40 +  0, 41, 0, 10, 10, 0));
+//		CHECK(comp1.bounds() == Bounds(40 + 10, 41, 0, 20, 20, 0));
+//		CHECK(comp2.bounds() == Bounds(40 + 30, 41, 0, 30, 40, 0));
+//		CHECK(comp3.bounds() == Bounds(40 + 60, 41, 0, 40, 30, 0));
+//	}
+//}
+
 TEST_CASE("Layout Line: spacing test", "[libv.ui.layout.line]") {
 	TestPanel<libv::ui::PanelLine> panel;
 
