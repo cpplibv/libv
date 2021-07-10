@@ -218,10 +218,10 @@ void CoreComponent::markInvalidLayout() noexcept {
 
 	// Invalidate anyone upstream whom might depend on layout
 	for (auto it = parent_->parent_; true; it = it->parent_) {
+		it->flagDirect(Flag::pendingLayoutSelf);
+
 		if (!it->flags.match_any(Flag::parentDependOnLayout))
 			break;
-
-		it->flagDirect(Flag::pendingLayoutSelf);
 
 		if (it == it->parent_)
 			break;
