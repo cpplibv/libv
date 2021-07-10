@@ -32,7 +32,7 @@ libv.ui: Panel line: Implement correct justify alignment including margin and sp
 libv.ui: Test layout line: Spacing, Padding, Margin
 libv.ui: Implement margin support in PanelLine
 libv.ui: Panel line: Implement margin alignment: only push elements if they would collide with the containers border
-
+libv.ui: Resolve missing layout invalidation with dynamic
 
 
 
@@ -50,7 +50,6 @@ libv.ui: Panel line: Implement margin alignment: only push elements if they woul
 
 
 --- STACK ------------------------------------------------------------------------------------------
-
 
 
 
