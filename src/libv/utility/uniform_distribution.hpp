@@ -78,21 +78,15 @@ T to_exclusive_max(const T value) {
 }
 
 template <typename C>
-[[nodiscard]] constexpr inline auto aux_make_uniform_distribution(const C min, const C max) noexcept
-		WISH_REQUIRES(std::is_integral_v<C>) {
-	return std::uniform_int_distribution<C>{min, max};
-}
-
-template <typename C>
-[[nodiscard]] constexpr inline auto aux_make_uniform_distribution(const C min, const C max) noexcept
-		WISH_REQUIRES(std::is_floating_point_v<C>) {
-	return std::uniform_real_distribution<C>{min, max};
-}
-
-template <typename C>
-[[nodiscard]] constexpr inline auto aux_make_uniform_distribution(const C min, const C max) noexcept
-		WISH_REQUIRES(is_std_chrono_duration_v<C>) {
-	return uniform_duration_distribution<C>{min, max};
+[[nodiscard]] constexpr inline auto aux_make_uniform_distribution(const C min, const C max) noexcept {
+	if constexpr (std::is_integral_v<C>)
+		return std::uniform_int_distribution<C>{min, max};
+	else if constexpr (std::is_floating_point_v<C>)
+		return std::uniform_real_distribution<C>{min, max};
+	else if constexpr (is_std_chrono_duration_v<C>)
+		return uniform_duration_distribution<C>{min, max};
+	else
+		static_assert(libv::meta::always_false_v<C>, "Uniform distribution for type C is not supported");
 }
 
 } // namespace detail ------------------------------------------------------------------------------
