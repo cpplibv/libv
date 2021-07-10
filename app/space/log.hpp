@@ -1,4 +1,4 @@
-// Created by Vader on 2021.07.06..
+// Project: libv, File: app/space/log.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

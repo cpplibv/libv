@@ -21,6 +21,10 @@ struct Quad;
 struct ScrollBar;
 struct Stretch;
 
+class CanvasBase;
+class CanvasAdaptor;
+template <typename T> class CanvasAdaptorT;
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

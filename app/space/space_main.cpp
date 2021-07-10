@@ -2,499 +2,46 @@
 
 // ext
 #include <fmt/chrono.h>
-#include <fmt/format.h>
+//#include <fmt/format.h>
+//#include <clip/clip.h>
 // libv
-#include <libv/algo/adjacent_pairs.hpp>
 #include <libv/ctrl/controls.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/frame/frame.hpp>
-#include <libv/glr/attribute.hpp>
-#include <libv/glr/layout_to_string.hpp>
-#include <libv/glr/mesh.hpp>
-#include <libv/glr/procedural/cube.hpp>
-#include <libv/glr/procedural/sphere.hpp>
-#include <libv/glr/program.hpp>
-#include <libv/glr/queue.hpp>
-#include <libv/glr/texture.hpp>
-#include <libv/glr/uniform_buffer.hpp>
 #include <libv/math/distance/intersect.hpp>
-#include <libv/math/noise/white.hpp>
-//#include <libv/math/ray.hpp>
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
-#include <libv/ui/component/button.hpp>
 #include <libv/ui/component/canvas.hpp>
-#include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel_float.hpp>
-#include <libv/ui/component/panel_line.hpp>
-//#include <libv/ui/component/panel_full.hpp>
-//#include <libv/ui/component/panel_status_line.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/settings.hpp>
 #include <libv/ui/ui.hpp>
-//#include <libv/utility/hex_dump.hpp>
 #include <libv/utility/timer.hpp>
+//#include <libv/glr/layout_to_string.hpp>
+//#include <libv/lua/lua.hpp>
+//#include <libv/math/ray.hpp>
+//#include <libv/utility/hex_dump.hpp>
+
 // std
 #include <iostream>
 // pro
 #include <space/camera.hpp>
 #include <space/camera_behaviour.hpp>
 #include <space/command.hpp>
+#include <space/hud.hpp>
 #include <space/icon_set.hpp>
 #include <space/log.hpp>
 #include <space/make_shader_error_overlay.hpp>
 #include <space/network_client.hpp>
 #include <space/network_server.hpp>
+#include <space/playout.hpp>
+#include <space/render.hpp>
 #include <space/state.hpp>
-#include <space/sync.hpp>
-
-//#include <libv/lua/lua.hpp>
-
-//#include <libv/ui/component/panel_line.hpp>
-
-//#include <libv/ui/style.hpp>
-//#include <libv/input/event.hpp>
-//#include <libv/input/input.hpp>
-//#include <libv/parse/color.hpp>
-//#include <libv/ui/component/button.hpp>
-//#include <libv/ui/component/image.hpp>
-//#include <libv/ui/component/input_field.hpp>
-//#include <libv/ui/component/label_image.hpp>
-//#include <libv/ui/component/panel_float.hpp>
-//#include <libv/ui/component/panel_full.hpp>
-//#include <libv/ui/component/panel_grid.hpp>
-//#include <libv/ui/component/quad.hpp>
-//#include <libv/ui/component/scroll_bar.hpp>
-//#include <libv/ui/component/scroll_pane.hpp>
-//#include <libv/ui/component/stretch.hpp>
-//#include <libv/ui/context/context_ui.hpp>
-//#include <libv/ui/parse/parse_size.hpp>
-// ext
-//#include <clip/clip.h>
-//#include <fmt/format.h>
 
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
-constexpr auto attribute_normal	= libv::glr::Attribute<1, libv::vec3f>{};
-constexpr auto attribute_color0	= libv::glr::Attribute<2, libv::vec4f>{};
-constexpr auto attribute_texture0 = libv::glr::Attribute<8, libv::vec2f>{};
-constexpr auto attribute_custom0 = libv::glr::Attribute<15, libv::vec4f>{};
-
-constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
-constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
-
-struct UniformLayoutMatrices {
-	// Could be split into two: Camera and Model
-	// 			Camera: matV, matP, near, far, ...
-	// 			Model: matM, matMVP
-
-	libv::glr::Uniform_mat4f matMVP;
-	libv::glr::Uniform_mat4f matP;
-	libv::glr::Uniform_mat4f matM;
-	libv::glr::Uniform_vec3f eye;
-
-	LIBV_REFLECTION_ACCESS(matMVP);
-	LIBV_REFLECTION_ACCESS(matP);
-	LIBV_REFLECTION_ACCESS(matM);
-	LIBV_REFLECTION_ACCESS(eye);
-};
-
-//struct UniformLayoutPass {
-//	libv::glr::Uniform_float time_sim;
-//	libv::glr::Uniform_float time_real;
-//	libv::glr::Uniform_float time_real_hcap;
-//	libv::glr::Uniform_vec2f render_resolution;
-//	libv::glr::Uniform_vec2f pixel_size; // 1.0 / render_resolution
-//
-//	libv::glr::Uniform_int32 test_mode0;
-//
-//    libv::glr::Uniform_vec4f frame_random_vec4; // [0..1] random numbers changing each frame
-//    libv::glr::Uniform_vec4i frame_random_ivec4; // [int_min..int_max] random numbers changing each frame
-//
-//	LIBV_REFLECTION_ACCESS(time_sim);
-//	LIBV_REFLECTION_ACCESS(time_real);
-//	LIBV_REFLECTION_ACCESS(time_real_hcap);
-//	LIBV_REFLECTION_ACCESS(render_resolution);
-//	LIBV_REFLECTION_ACCESS(pixel_size);
-//
-//	LIBV_REFLECTION_ACCESS(test_mode0);
-//
-//	LIBV_REFLECTION_ACCESS(frame_random_vec4);
-//	LIBV_REFLECTION_ACCESS(frame_random_ivec4);
-//};
-
-const auto uniformBlock_matrices = libv::glr::UniformBlockBinding{0, "Matrices"};
-//const auto uniformBlock_pass = libv::glr::UniformBlockBinding{1, "Pass"};
-const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uniformBlock_matrices);
-//const auto layout_pass = libv::glr::layout_std140<UniformLayoutPass>(uniformBlock_pass);
-
-// -------------------------------------------------------------------------------------------------
-
-libv::rev::ShaderLoader shader_manager("shader/");
-
-// -------------------------------------------------------------------------------------------------
-
-// TODO P2: libv.glr: Shader automated block binding by watching the includes
-//          So this should work:
-//          shader_loader.register_block<UniformLayoutMatrices>("block/sphere.glsl");
-//          Note that this also could generate the file block/sphere.glsl (OR just be an in memory resource)
-//          And this would be called on any program that includes block/sphere.glsl
-//          program.block_binding(uniformBlock_matrices) and access_blocks(Access&) will be replaced by this system
-//          | issue: some struct might have already been defined, so block to string might have to skip them
-//                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
-//                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
-
-struct UniformsBackground {
-	libv::glr::Uniform_texture texture_noise;
-	libv::glr::Uniform_vec2f render_resolution;
-	libv::glr::Uniform_vec4f noise_scale;
-	libv::glr::Uniform_vec4f base_color;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(texture_noise, "texture_noise", textureChannel_pattern);
-		access(render_resolution, "render_resolution");
-		access(base_color, "base_color");
-		access(noise_scale, "noise_scale");
-	}
-	template <typename Access> void access_blocks(Access&) {
-	}
-};
-
-struct UniformsTestMode {
-	libv::glr::Uniform_int32 test_mode;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(test_mode, "test_mode", 0);
-	}
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
-	}
-};
-
-struct UniformsColor {
-	libv::glr::Uniform_vec4f base_color;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(base_color, "base_color");
-	}
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
-	}
-};
-
-struct UniformsCommandArrow {
-	libv::glr::Uniform_int32 test_mode;
-	libv::glr::Uniform_float time;
-	libv::glr::Uniform_vec2f render_resolution;
-	libv::glr::Uniform_vec4f color;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(color, "color");
-		access(render_resolution, "render_resolution");
-		access(test_mode, "test_mode", 0);
-		access(time, "time", 0.f);
-	}
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
-	}
-};
-
-using ShaderBackground = libv::rev::Shader<UniformsBackground>;
-using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
-using ShaderColor = libv::rev::Shader<UniformsColor>;
-using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
-//using Shader = libv::rev::Shader<>;
-
-// =================================================================================================
-
-// TODO P1: kill these ones, aka implement 'pass' / 'program' uniform block (requires glr shared block allocation)
-float global_time = 0.0f;
-int32_t global_test_mode = 0;
-
-// =================================================================================================
-
-struct Background {
-	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-
-	ShaderBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
-	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
-
-	static constexpr libv::vec2i noise_size = {128, 128};
-
-	Background() {
-		// TODO P1: Switch to blue noise once implemented
-		//  		| It will not be implemented anytime soon so burn in a couple of textures from it
-		const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
-
-		background_texture_pattern.storage(1, noise_size);
-		background_texture_pattern.image(0, {0, 0}, noise_size, tex_data.data());
-		background_texture_pattern.set(libv::gl::MagFilter::Nearest);
-		background_texture_pattern.set(libv::gl::MinFilter::Nearest);
-		background_texture_pattern.set(libv::gl::Wrap::Repeat, libv::gl::Wrap::Repeat);
-
-		{
-			auto position = mesh_background.attribute(attribute_position);
-			auto index = mesh_background.index();
-
-			position(-1, -1, 1);
-			position( 1, -1, 1);
-			position( 1,  1, 1);
-			position(-1,  1, 1);
-
-			index.quad(0, 1, 2, 3);
-		}
-	}
-
-	void render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
-		gl.program(shader.program());
-		const auto bg_noise = libv::vec4f(1, 1, 1, 0) * (5.f / 255.f);
-		const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f);
-		gl.uniform(shader.uniform().render_resolution, canvas_size);
-		gl.uniform(shader.uniform().noise_scale, bg_noise);
-		gl.uniform(shader.uniform().base_color, bg_color);
-		gl.texture(background_texture_pattern, textureChannel_pattern);
-		gl.render(mesh_background);
-	}
-};
-
-struct CommandArrow {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	ShaderCommandArrow shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
-
-public:
-	CommandArrow() {
-		std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
-		for (int i = 0; i < 60; i++) {
-			const auto r = i / 30.0;
-			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-			points.emplace_back(x, y, 0);
-		}
-		for (int i = 60; i < 120; i++) {
-			const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
-			const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-			const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-			const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
-			points.emplace_back(x, y, z);
-		}
-
-		draw_arrow(mesh, points);
-	}
-
-	void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points) {
-		if (points.size() < 2)
-			return;
-
-		auto position = mesh.attribute(attribute_position);
-		auto color0 = mesh.attribute(attribute_color0);
-		auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
-		auto index = mesh.index();
-
-		float total_length = 0;
-		float current_length = 0;
-
-		libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-			total_length += (b - a).length();
-		});
-
-		libv::glr::VertexIndex i = 0;
-		libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-			if (a == b) // Sanity check
-				return;
-
-			const auto length = (b - a).length();
-
-			position(a);
-			position(b);
-
-			color0(1, 1, 1, 1);
-			color0(1, 1, 1, 1);
-
-			sp_ss_tp_ts(0, length, current_length, total_length);
-			sp_ss_tp_ts(length, length, current_length, total_length);
-
-			index.line(i + 0, i + 1);
-			i += 2;
-
-			current_length += length;
-		});
-	}
-
-	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) const {
-		// TODO P2: This will require to re upload to VAO every render
-		//  		but it could be optimized if we give it a 'pretend' start offset
-		//  		single uniform value that adjust the 'fake' starting point (not only the first section could have this)
-		//			This also means VAO update only required on NEW command (SUPER GOOD), every normal render only changes some uniform
-		//			| MAJOR ISSUE: Command arrows that move, like follow would break this system
-		//				Resolution ideas: indirections?, uniform array as coordinates?, VBA update is okey?
-		//			and/or Command arrows could be merged into a single VAO and use sub-meshes to render
-
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-
-		gl.program(shader_arrow.program());
-		gl.uniform(std::move(uniforms));
-		gl.uniform(shader_arrow.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
-		gl.uniform(shader_arrow.uniform().render_resolution, canvas_size);
-		gl.uniform(shader_arrow.uniform().test_mode, global_test_mode);
-		gl.uniform(shader_arrow.uniform().time, global_time);
-		gl.render(mesh);
-	}
-};
-
-struct Gizmo {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
-
-public:
-	Gizmo() {
-		draw_gizmo_lines(mesh);
-	}
-
-	void draw_gizmo_lines(libv::glr::Mesh& mesh) {
-		auto position = mesh.attribute(attribute_position);
-		auto color0 = mesh.attribute(attribute_color0);
-		auto index = mesh.index();
-
-		position(0, 0, 0);
-		position(1, 0, 0);
-		position(0, 0, 0);
-		position(0, 1, 0);
-		position(0, 0, 0);
-		position(0, 0, 1);
-
-		color0(1, 0, 0, 1);
-		color0(1, 0, 0, 1);
-		color0(0, 1, 0, 1);
-		color0(0, 1, 0, 1);
-		color0(0, 0, 1, 1);
-		color0(0, 0, 1, 1);
-
-		index.line(0, 1);
-		index.line(2, 3);
-		index.line(4, 5);
-	}
-
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-
-		gl.program(shader.program());
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh);
-	}
-};
-
-struct Grid {
-	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader{shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs"};
-
-public:
-	Grid() {
-		{
-			auto position = mesh_grid.attribute(attribute_position);
-			auto index = mesh_grid.index();
-
-			position(-1, -1, 0);
-			position(+1, -1, 0);
-			position(+1, +1, 0);
-			position(-1, +1, 0);
-
-			index.quad(0, 1, 2, 3); // Front face quad
-			index.quad(0, 3, 2, 1); // Back face quad
-		}
-	}
-
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-
-		gl.program(shader.program());
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh_grid);
-	}
-};
-
-struct FleetRender {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderColor shader{shader_manager, "flat.vs", "flat.fs"};
-
-public:
-	FleetRender() {
-		draw_mesh(mesh);
-	}
-
-	void draw_mesh(libv::glr::Mesh& mesh) {
-		auto position = mesh.attribute(attribute_position);
-		auto normal = mesh.attribute(attribute_normal);
-		auto texture0 = mesh.attribute(attribute_texture0);
-		auto index = mesh.index();
-
-		libv::glr::generateSpherifiedCube(8, position, normal, texture0, index);
-//		libv::glr::generateCube(position, normal, texture0, index);
-	}
-
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
-		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-
-		gl.program(shader.program());
-		gl.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh);
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-struct SpaceCanvas : libv::ui::CanvasBase {
-	bool main_canvas;
-	app::SpaceState& state;
-	app::SpaceSession& session;
-	app::PlayoutDelayBuffer& playout_delay_buffer;
-	app::CameraPlayer& camera;
-	app::CameraPlayer::screen_picker screen_picker;
-
-	float angle = 0.0f;
-	float time = 0.0f;
-	float test_sin_time = 0.0f;
-
-	Background background;
-	Grid grid;
-	Gizmo origin_gizmo;
-	CommandArrow arrow;
-	FleetRender render_fleet;
-
-	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
-
-	explicit SpaceCanvas(app::SpaceState& state, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
-		main_canvas(main_canvas),
-		state(state),
-		session(session),
-		playout_delay_buffer(playout_delay_buffer),
-		camera(camera),
-		screen_picker(camera.picker({100, 100})) {
-		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
-		//			Component shall not receive any event before onLayout gets called
-	}
-
-	static void register_controls(libv::ctrl::FeatureRegister controls) {
+void register_controls(libv::ctrl::FeatureRegister controls) {
 //		libv::ctrl::scale_group sg_translate{
 //				.impulse = 0.1,
 //				.time = 1.0,
@@ -504,191 +51,48 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 //				.js_analog = 1.0
 //		};
 
-		controls.feature_action<SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
+	controls.feature_action<app::SpaceCanvas>("space.add_fleet_by_mouse", [](const auto& arg, app::SpaceCanvas& ctx) {
+		(void) arg;
 
-			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
-			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
-			const auto mouse_ray_pos = ctx.camera.eye();
-			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+		const auto mouse_ray_pos = ctx.camera.eye();
+		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-			std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
-			std::cout << "world_coord: " << world_coord << std::endl;
+		std::cout << "mouse_local_coord: " << mouse_local_coord << std::endl;
+		std::cout << "world_coord: " << world_coord << std::endl;
 
-			if (!ctx.state.fleets.empty()) {
-				ctx.playout_delay_buffer.queue<app::CommandFleetMove>(
-						static_cast<app::FleetID>(ctx.state.fleets.size() - 1),
-						world_coord
-				);
-			}
-
-			ctx.playout_delay_buffer.queue<app::CommandFleetSpawn>(world_coord);
-		});
-
-		controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, SpaceCanvas& ctx) {
-			(void) arg;
-
-			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
-			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
-			const auto mouse_ray_pos = ctx.camera.eye();
-			const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-
-			std::cout << "world_coord: " << world_coord << std::endl;
-
-			const auto playerID = app::PlayerID{0};
-			ctx.playout_delay_buffer.queue<app::CommandCameraWarpTo>(playerID, world_coord);
-
-			ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
-		});
-	}
-
-	static void bind_default_controls(libv::ctrl::Controls& controls) {
-		controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
-		controls.bind("space.warp_camera_to_mouse", "Z");
-	}
-
-	virtual void update(libv::ui::time_duration delta_time) override {
-		if (main_canvas) {
-			playout_delay_buffer.update(state, session);
-			state.update(delta_time);
+		if (!ctx.state.fleets.empty()) {
+			ctx.playout_delay_buffer.queue<app::CommandFleetMove>(
+					static_cast<app::FleetID>(ctx.state.fleets.size() - 1),
+					world_coord
+			);
 		}
 
-		const auto dtf = static_cast<float>(delta_time.count());
-		angle = std::fmod(angle + 5.0f * dtf, 360.0f);
-		time += dtf;
-		global_time += dtf;
+		ctx.playout_delay_buffer.queue<app::CommandFleetSpawn>(world_coord);
+	});
 
-		// TODO P2: Value tracking UI component for debugging
-//		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
-//		value_tracker(160);
-//		value_tracker.pause();
-//		value_tracker.resume();
-//		value_tracker("camera.orbit_point", camera.orbit_point());
-//		value_tracker("camera.orbit_distance", camera.orbit_distance());
-//		value_tracker("camera.rotations", camera.rotations());
-//		value_tracker.differential("camera.orbit_point", camera.orbit_point());
-//		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-//		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
+	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto& arg, app::SpaceCanvas& ctx) {
+		(void) arg;
 
-		if (global_test_mode != 0) {
-			test_sin_time += dtf;
-			auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
-			if (global_test_mode == 1) {
-				camera.pitch(-t * libv::pi_f * 0.5f);
-			} else if (global_test_mode == 2) {
-				t = t > 0.5f ? 1.f - t : t;
-				camera.pitch(-t * libv::pi_f * 0.5f);
-			} else if (global_test_mode == 3) {
-				const float part = 4;
-				auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
-				t = t > 0.5f ? 1.f - t : t;
-				camera.pitch(-t * libv::pi_f * 0.5f / part);
-			}
-		}
-	}
+		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+		const auto mouse_ray_pos = ctx.camera.eye();
+		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
-	virtual void render(libv::glr::Queue& gl) override {
-		// NOTE: Screen_picker update has to be placed around render, as canvas_size is only set after layout
-		screen_picker = camera.picker(canvas_size);
-		//
+		std::cout << "world_coord: " << world_coord << std::endl;
 
-		const auto s_guard = gl.state.push_guard();
+		const auto playerID = app::PlayerID{0};
+		ctx.playout_delay_buffer.queue<app::CommandCameraWarpTo>(playerID, world_coord);
 
-		gl.state.enableDepthTest();
-		gl.state.depthFunctionLess();
-		gl.state.enableDepthMask();
+		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
+	});
+}
 
-		gl.state.enableBlend();
-		gl.state.blendSrc_SourceAlpha();
-		gl.state.blendDst_One_Minus_SourceAlpha();
-
-		gl.state.cullBackFace();
-		gl.state.enableCullFace();
-		gl.state.frontFaceCCW();
-
-		gl.state.clipPlanes(0);
-		gl.state.polygonModeFill();
-
-		gl.projection = camera.projection(canvas_size);
-		gl.view = camera.view();
-		gl.model = libv::mat4f::identity();
-
-		// --- Render Background/Sky ---
-
-		if (!main_canvas) {
-			const auto s2_guard = gl.state.push_guard();
-			// Clear the depth data for the background of the mini display
-			gl.state.depthFunctionAlways();
-			background.render(gl, canvas_size);
-		}
-
-		// --- Render Opaque ---
-
-		for (const auto& fleet : state.fleets) {
-			const auto m_guard = gl.model.push_guard();
-			gl.model.translate(fleet.position);
-			gl.model.scale(0.2f);
-			render_fleet.render(gl, uniform_stream);
-		}
-
-		// --- Render Background/Sky ---
-
-		if (main_canvas) {
-			const auto s2_guard = gl.state.push_guard();
-			// No need to write depth data for the main background
-			gl.state.disableDepthMask();
-			background.render(gl, canvas_size);
-		}
-
-		// --- Render Transparent ---
-
-		arrow.render(gl, canvas_size, uniform_stream);
-
-		// --- Render UI/HUD ---
-
-		{
-			{ // Grid
-				const auto s2_guard = gl.state.push_guard();
-				gl.state.disableDepthMask();
-
-				grid.render(gl, uniform_stream);
-			}
-
-			{ // Camera orbit point
-				const auto s2_guard = gl.state.push_guard();
-				gl.state.disableDepthMask();
-
-				const auto m_guard = gl.model.push_guard();
-				gl.model.translate(camera.orbit_point());
-				gl.model.scale(0.2f);
-				origin_gizmo.render(gl, uniform_stream);
-			}
-
-			{ // Camera orientation gizmo in top right
-				const auto s2_guard = gl.state.push_guard();
-				gl.state.disableDepthTest();
-				gl.state.disableDepthMask();
-
-				const auto p_guard = gl.projection.push_guard();
-				const auto v_guard = gl.view.push_guard();
-				const auto m_guard = gl.model.push_guard();
-
-				const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
-				const auto orientation_gizmo_margin = 4.f;
-
-				gl.projection = libv::mat4f::ortho(
-						-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
-						canvas_size,
-						-orientation_gizmo_size,
-						+orientation_gizmo_size);
-				gl.view = camera.orientation().translate(-1, 0, 0);
-				gl.model.scale(orientation_gizmo_size * 0.5f);
-
-				origin_gizmo.render(gl, uniform_stream);
-			}
-		}
-	}
-};
+void bind_default_controls(libv::ctrl::Controls& controls) {
+	controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+	controls.bind("space.warp_camera_to_mouse", "Z");
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -721,8 +125,8 @@ struct SpaceFrame : public libv::Frame {
 
 		app::CameraBehaviour::register_controls(controls);
 		app::CameraBehaviour::bind_default_controls(controls);
-		SpaceCanvas::register_controls(controls);
-		SpaceCanvas::bind_default_controls(controls);
+		register_controls(controls);
+		bind_default_controls(controls);
 
 		onContextUpdate.output([&](const auto&) {
 			// shader_manager.update MUST run before any other render queue operation
@@ -794,9 +198,10 @@ int main() {
 			global_test_mode = 2;
 		if (e.keycode == libv::input::Keycode::Num3)
 			global_test_mode = 3;
-		app::log_space.info("Test mode: {}", global_test_mode);
+//		app::log_space.info("Test mode: {}", global_test_mode);
 	});
 
+	// TODO P3: State object are all around, tidy up
 	app::SpaceState space_state;
 	app::SpaceSession space_session;
 	app::PlayoutDelayBuffer playout_delay_buffer;
@@ -805,74 +210,22 @@ int main() {
 
 //	std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
-	{
-//		libv::ui::PanelFull layers;
-		libv::ui::PanelFloat layers;
+	std::optional<libv::ui::CanvasAdaptorT<app::SpaceCanvas>> canvas_main; // TODO P1: Make HUD an object, store UI components that has to accessed, create API around it (Having to access UI components is fine)
 
-		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", space_state, space_session, playout_delay_buffer, camera_main, true);
+	frame.ui.add(app::create_hud( // TODO P1: Too many argument passed in: Use a better communication channel (Maybe event bus)
+			playout_delay_buffer,
+			space_session,
+			space_state,
+			client,
+			server,
+			camera_main,
+			camera_mini,
 
-		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", space_state, space_session, playout_delay_buffer, camera_mini, false);
-		canvas_mini.size(libv::ui::parse_size_or_throw("25%, 15%"));
-		canvas_mini.margin(10);
-		canvas_mini.anchor(libv::ui::Anchor::center_right);
+			canvas_main // out
+	));
 
-		libv::ui::Button clear_fleets;
-		clear_fleets.align_horizontal(libv::ui::AlignHorizontal::center);
-		clear_fleets.align_vertical(libv::ui::AlignVertical::center);
-//		clear_fleets.anchor(libv::ui::Anchor::bottom_center);
-		clear_fleets.anchor(libv::ui::Anchor::bottom_right);
-		clear_fleets.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		clear_fleets.margin(5);
-		clear_fleets.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
-		clear_fleets.text("Clear Fleets");
-		clear_fleets.event().submit.connect([&playout_delay_buffer]() {
-			playout_delay_buffer.queue<app::CommandClearFleets>();
-		});
-
-		libv::ui::PanelLine mp_buttons;
-		mp_buttons.anchor(libv::ui::Anchor::top_center);
-		mp_buttons.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-		mp_buttons.size(libv::ui::parse_size_or_throw("D, D"));
-		mp_buttons.spacing(5);
-		mp_buttons.margin(5);
-
-		{
-			libv::ui::Button btn_host;
-			btn_host.align_horizontal(libv::ui::AlignHorizontal::center);
-			btn_host.align_vertical(libv::ui::AlignVertical::center);
-			btn_host.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-			btn_host.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
-			btn_host.text("Host");
-			btn_host.event().submit.connect([&]() {
-				server.emplace(25080, playout_delay_buffer);
-			});
-
-			libv::ui::Button btn_join;
-			btn_join.align_horizontal(libv::ui::AlignHorizontal::center);
-			btn_join.align_vertical(libv::ui::AlignVertical::center);
-			btn_join.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-			btn_join.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
-			btn_join.text("Join: rs0.corruptedai.com");
-			btn_join.event().submit.connect([&]() {
-				client.emplace("rs0.corruptedai.com", 25080, "Name", playout_delay_buffer);
-			});
-
-			mp_buttons.add(btn_host);
-			mp_buttons.add(btn_join);
-		}
-
-		layers.add(canvas_main);
-		layers.add(canvas_mini);
-		layers.add(clear_fleets);
-		layers.add(mp_buttons);
-//		layers.add(pref_graph);
-		layers.add(app::make_shader_error_overlay());
-
-		frame.ui.add(layers);
-
-		frame.controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
-		frame.controls.context_enter<SpaceCanvas>(&canvas_main.object()); // TODO P1: Enter / leave on canvas focus-unfocus
-	}
+	frame.controls.context_enter<app::BaseCameraOrbit>(&camera_main); // TODO P4: <app::BaseCameraOrbit> Question mark? Context variables and inheritance?
+	frame.controls.context_enter<app::SpaceCanvas>(&canvas_main->object()); // TODO P1: Enter / leave on canvas focus-unfocus
 
 	frame.show();
 	frame.join();

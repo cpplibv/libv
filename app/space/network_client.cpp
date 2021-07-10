@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/icons.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <space/network_client.hpp>
@@ -8,7 +8,7 @@
 #include <libv/net/mtcp/connection_he.hpp>
 // pro
 #include <space/log.hpp>
-#include <space/sync.hpp>
+#include <space/playout.hpp>
 
 
 namespace app {

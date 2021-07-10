@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/ui.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event_hub.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/event_hub.hpp>

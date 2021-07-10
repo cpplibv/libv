@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/basic_event_proxy.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event/detail/internal_event_linkage.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

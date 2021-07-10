@@ -8,7 +8,6 @@
 #include <span>
 #include <typeindex>
 #include <vector>
-#include <sstream> // TODO P4: Remove dependency once libv.serial supports non stream io
 // pro
 #include <libv/serial/serial.hpp>
 
@@ -71,6 +70,12 @@ public:
 
 		auto type = std::type_index(typeid(MessageType));
 		decoders.emplace_back(type, MessageIndex, std::move(decode_fn));
+	}
+
+	template <MessageID MessageIndex, typename MessageType>
+	void register_type() {
+		register_decoder_type<MessageIndex, MessageType>();
+		register_encoder_type<MessageIndex, MessageType>();
 	}
 
 private:
