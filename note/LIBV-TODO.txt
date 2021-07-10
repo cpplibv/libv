@@ -605,6 +605,7 @@ https://pages.jetbrains.com/cppnow2021#g-603902215
 
 
 ext: adopt https://github.com/olegpublicprofile/stdfwd
+ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
 
 libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesystem::path::u8string and std::filesystem::path::generic_u8string
 		Search for .string(), not that many

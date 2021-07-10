@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/distance/distance.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/distance/intersect.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

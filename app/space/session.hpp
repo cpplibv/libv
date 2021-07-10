@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/icons.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/session.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -15,13 +15,17 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 struct SpaceSession {
-	struct ChatEntries {
+	struct ChatEntry {
 		std::string sender;
 		std::string message;
 	};
 
-//	std::vector<Player> players;
-	std::vector<ChatEntries> chat_entries;
+	struct Player {
+		std::string name;
+	};
+
+	std::vector<Player> players;
+	std::vector<ChatEntry> chat_entries;
 };
 
 // -------------------------------------------------------------------------------------------------

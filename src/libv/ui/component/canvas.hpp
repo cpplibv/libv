@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/component/fwd.hpp>
 // libv
 #include <libv/glr/queue_fwd.hpp>
 #include <libv/utility/observer_ptr.hpp>
@@ -20,7 +22,7 @@ namespace ui {
 
 class CoreCanvasAdaptor;
 
-struct CanvasBase {
+class CanvasBase {
 	friend CoreCanvasAdaptor;
 
 private:
@@ -30,7 +32,7 @@ protected:
 	libv::vec2f canvas_position;
 	libv::vec2f canvas_size;
 
-protected:
+public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
 
 protected:

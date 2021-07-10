@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/space_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/make_shader_error_overlay.cpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <fmt/chrono.h>

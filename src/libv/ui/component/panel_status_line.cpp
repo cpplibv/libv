@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_status_log.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/panel_status_line.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/ui/component/panel_status_line.hpp>
