@@ -336,7 +336,8 @@ namespace ui {
 //
 //void RadioButton::text(std::string value) {
 //	self().text_.string(std::move(value));
-//	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+//	self().markInvalidLayout();
+//	self().flagAuto(Flag::pendingRender);
 //}
 //
 //const std::string& RadioButton::text() const noexcept {

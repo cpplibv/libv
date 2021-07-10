@@ -188,7 +188,8 @@ void CoreInputField::onChar(const EventChar& event) {
 
 	caret++;
 	caretStartTime = clock::now();
-	flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	markInvalidLayout();
+	flagAuto(Flag::pendingRender);
 	fire(EventChange{});
 	fire(EventCaret{});
 	event.stop_propagation();
@@ -201,7 +202,8 @@ void CoreInputField::onKey(const EventKey& event) {
 			caret--;
 		}
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		return event.stop_propagation();
 	}
@@ -212,7 +214,8 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		// On delete caret does not moves
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		return event.stop_propagation();
 	}
@@ -228,7 +231,8 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		caret++;
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
 	}
@@ -255,18 +259,20 @@ void CoreInputField::onKey(const EventKey& event) {
 		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
+		const auto mouse_coord = calculate_local_mouse_coord();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
 	}
 	if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = context().state.mouse_position() - libv::vec::xy(layout_position());
+		const auto mouse_coord = calculate_local_mouse_coord();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
 	}
@@ -295,7 +301,8 @@ void CoreInputField::onKey(const EventKey& event) {
 		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		fire(EventCaret{});
 		return event.stop_propagation();
@@ -307,7 +314,8 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		caret = 0;
 		caretStartTime = clock::now();
-		flagAuto(Flag::pendingLayout | Flag::pendingRender);
+		markInvalidLayout();
+		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		fire(EventCaret{});
 		return event.stop_propagation();
@@ -559,7 +567,8 @@ const Color& InputField::font_color() const noexcept {
 
 void InputField::text(std::string value) {
 	self().text_.string(std::move(value));
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().markInvalidLayout();
+	self().flagAuto(Flag::pendingRender);
 	self().fire(EventChange{});
 }
 
