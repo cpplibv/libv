@@ -55,6 +55,7 @@ libv.ui: Resolve missing layout invalidation with dynamic
 
 
 
+libv.ui: Position change of a component does not always updates mouse region
 
 
 libv.ui: Margin, Padding, Spacing and Alignment gaps
