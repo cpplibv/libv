@@ -141,9 +141,10 @@ void CoreLabelImage::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreLabelImage::doLayout1(const ContextLayout1& environment) {
 	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
-
-	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
+//	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
+//
+//	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
+	return {dynamic_size_text, 0.f};
 }
 
 void CoreLabelImage::doLayout2(const ContextLayout2& environment) {
@@ -248,7 +249,8 @@ const Color& LabelImage::font_color() const noexcept {
 
 void LabelImage::text(std::string value) {
 	self().text_.string(std::move(value));
-	self().flagAuto(Flag::pendingLayout | Flag::pendingRender);
+	self().markInvalidLayout();
+	self().flagAuto(Flag::pendingRender);
 }
 
 const std::string& LabelImage::text() const noexcept {
