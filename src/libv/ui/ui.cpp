@@ -399,7 +399,7 @@ public:
 				log_ui.error("Exception occurred during layout in UI: {}", ex.what());
 			}
 
-			// --- Mouse update ---
+			// --- Mouse Update ---
 			try {
 				context.mouse.event_update();
 				stat.mouse.sample(timer.time_ns());
@@ -440,6 +440,10 @@ public:
 				log_ui.error("Exception occurred during render in UI: {}", ex.what());
 			}
 
+			// --- Execute Render Queue ---
+			remote.queue(std::move(glr));
+			remote.execute();
+
 			// --- Detach ---
 			try {
 				AccessRoot::detachScan(root.core());
@@ -456,15 +460,12 @@ public:
 //			i = 0;
 //			log_ui.trace("UI Statistics:\n{}", stat);
 //		}
-
-		remote.queue(std::move(glr));
-		remote.execute();
 	}
 
 	void destroy() {
-		auto glr = remote.queue();
-
 		{
+			auto glr = remote.queue();
+
 			current_thread_context(context);
 
 			root.markRemove();
@@ -483,14 +484,15 @@ public:
 				context_render.execute_render(glr);
 			}
 
+			// --- Execute Destroy Queue ---
+			remote.queue(std::move(glr));
+			remote.execute();
+
 			// --- Detach ---
 			{
 				AccessRoot::detachScan(root.core());
 			}
 		}
-
-		remote.queue(std::move(glr));
-		remote.execute();
 
 		remote.destroy();
 	}
