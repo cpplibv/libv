@@ -65,6 +65,7 @@ app.space: Sim state manipulation only with commands
 
 
 
+
 app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
 app.space: Structure the whole program: UML time is upon us
 
@@ -75,6 +76,7 @@ app.space: Fleet with arrow and movement toward target (primitive)
 
 app.space: frustum visualization
 app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
+app.space: Camera: Pressing the camera alteration in one direction for long time (>1-3s) increase speed
 
 app.space / libv.rev: Render target/Framebuffer abstraction
 		ms / ss support

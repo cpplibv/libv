@@ -56,6 +56,7 @@ class ImplUI {
 		libv::Histogram<100> styleScan{t_min, t_max};
 		libv::Histogram<100> style{t_min, t_max};
 		libv::Histogram<100> layout{t_min, t_max};
+		libv::Histogram<100> mouse{t_min, t_max};
 		libv::Histogram<100> render{t_min, t_max};
 		libv::Histogram<100> detach{t_min, t_max};
 
@@ -69,6 +70,7 @@ class ImplUI {
 			os << "\nstyleScan: " << var.styleScan;
 			os << "\nstyle:     " << var.style;
 			os << "\nlayout:    " << var.layout;
+			os << "\nmouse:     " << var.mouse;
 			os << "\nrender:    " << var.render;
 			os << "\ndetach:    " << var.detach;
 			os << "\n-------------------------------------------------------------------------------------";
@@ -276,6 +278,7 @@ public:
 		// - Attach #2
 		// - Style
 		// - Layout
+		// - Mouse update
 		// - Render
 		// - Detach
 
@@ -304,12 +307,6 @@ public:
 
 			// --- Event ---
 			{
-				try {
-					context.mouse.event_update();
-				} catch (const std::exception& ex) {
-					log_ui.error("Exception occurred during virtual events in UI: {}. Discarding rest of the virtual events", ex.what());
-				}
-
 				// Usual pattern to lift the entry out of locking scope, candidate for generalization
 				size_t i = 0;
 				std::optional<EventVariant> current_event;
@@ -402,6 +399,14 @@ public:
 				log_ui.error("Exception occurred during layout in UI: {}", ex.what());
 			}
 
+			// --- Mouse update ---
+			try {
+				context.mouse.event_update();
+				stat.mouse.sample(timer.time_ns());
+			} catch (const std::exception& ex) {
+				log_ui.error("Exception occurred during virtual events in UI: {}. Discarding rest of the virtual events", ex.what());
+			}
+
 			// --- Render ---
 			try {
 				glr.setClearColor(0.098f, 0.2f, 0.298f, 1.0f);
@@ -413,7 +418,7 @@ public:
 				const auto guard_v = glr.view.push_guard();
 				const auto guard_p = glr.projection.push_guard();
 
-	//		AccessRoot::create(root.core(), context);
+				//AccessRoot::create(root.core(), context);
 				auto r = context_render.root_renderer(
 						root,
 						glr,
@@ -425,7 +430,7 @@ public:
 
 				AccessRoot::render(root.core(), r);
 				context_render.execute_render(glr);
-	//		AccessRoot::destroy(root.core(), context);
+				//AccessRoot::destroy(root.core(), context);
 
 				if (overlayZoomMode != OverlayZoomMode::disabled)
 					overlayZoom.postRender(glr);
@@ -446,10 +451,11 @@ public:
 			stat.frame.sample(timerFrame.time_ns());
 		}
 
-		//	if (++self->i == 1200) {
-		//		self->i = 0;
-		//		std::cout << '\n' << self->stat << std::endl;
-		//	}
+//		static int i = 0;
+//		if (++i == 1200) {
+//			i = 0;
+//			log_ui.trace("UI Statistics:\n{}", stat);
+//		}
 
 		remote.queue(std::move(glr));
 		remote.execute();

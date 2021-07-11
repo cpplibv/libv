@@ -33,7 +33,7 @@ libv.ui: Test layout line: Spacing, Padding, Margin
 libv.ui: Implement margin support in PanelLine
 libv.ui: Panel line: Implement margin alignment: only push elements if they would collide with the containers border
 libv.ui: Resolve missing layout invalidation with dynamic
-
+libv.ui: Changing dynamic size (text of button) causes flicker (maybe double layout) | layout ran after mouse update: A new step was introduced into UI loop
 
 
 
@@ -55,7 +55,31 @@ libv.ui: Resolve missing layout invalidation with dynamic
 
 
 
-libv.ui: Position change of a component does not always updates mouse region
+libv.ui: Position change of a component does not always updates mouse regions
+libv.ui: Window resize does not always updates mouse regions
+
+
+in app.space: In shutdown mode on host button
+
+should not call     Layout dynamic          108  19       /hud/cmd-bar/button-0
+should not call     Layout dynamic          118  23       /hud/cmd-bar
+is this a must?     Layout dynamic           45  19       /hud/mp-bar/mp-name-lbl
+is this a must?     Layout dynamic           36  19       /hud/mp-bar/mp-name-in
+is this a must?     Layout dynamic           36  19       /hud/mp-bar/mp-state
+is this a must?     Layout dynamic           36  19       /hud/mp-bar/mp-host
+is this a must?     Layout dynamic          225  19       /hud/mp-bar/mp-join
+is this a must?     Layout dynamic          448  23       /hud/mp-bar
+                    Layout dynamic           45  19       /hud/mp-bar/mp-name-lbl
+                    Layout dynamic           36  19       /hud/mp-bar/mp-name-in
+                    Layout dynamic           36  19       /hud/mp-bar/mp-state
+                    Layout dynamic           36  19       /hud/mp-bar/mp-host
+                    Layout dynamic          225  19       /hud/mp-bar/mp-join
+                    Layout       111 0,      46  23       /hud/mp-bar/mp-state
+                    Layout       162 0,      46  23       /hud/mp-bar/mp-host
+                    Layout       213 0,     235  23       /hud/mp-bar/mp-join
+                    Layout     416 772,     448  23       /hud/mp-bar
+                    Layout         0 0,    1280 800       /hud
+                       |           0 0,    1280 800       /
 
 
 libv.ui: Margin, Padding, Spacing and Alignment gaps
