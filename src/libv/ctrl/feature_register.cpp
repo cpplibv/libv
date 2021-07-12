@@ -11,15 +11,15 @@ namespace ctrl {
 
 // -------------------------------------------------------------------------------------------------
 
-void FeatureRegister::_feature_action(std::type_index context, std::string&& name, ft_action function) {
+void FeatureRegister::_feature_action(libv::type_uid context, std::string&& name, ft_action function) {
 	target->_feature_action(context, std::move(name), std::move(function));
 }
 
-void FeatureRegister::_feature_binary(std::type_index context, std::string&& name, ft_binary function) {
+void FeatureRegister::_feature_binary(libv::type_uid context, std::string&& name, ft_binary function) {
 	target->_feature_binary(context, std::move(name), std::move(function));
 }
 
-void FeatureRegister::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers) {
+void FeatureRegister::_feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers) {
 	target->_feature_analog(context, std::move(name), std::move(function), multipliers);
 }
 

@@ -129,9 +129,11 @@ libv.ui: Margin, Padding, Spacing and Alignment gaps
 
 libv.ui: static_component system (lite)
 	Check on the _pastebin/legacy codes for this one
+
 	libv.ui: Restructure: property context creation stuffy simplification
 			maybe CRTP base for core components
 			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
+
 	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
 	libv.ui: Composite component style / property system
 		libv.ui.property: complex composite component would result in "nested" property sets

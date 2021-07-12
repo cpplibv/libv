@@ -6,14 +6,13 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/meta/always.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <functional>
 #include <type_traits>
-#include <typeindex>
 // pro
 #include <libv/ui/event/base_event.hpp>
 #include <libv/ui/event/detail/internal_event_linkage.hpp>
-
 
 
 namespace libv {
@@ -114,7 +113,7 @@ public:
 		detail::internal_connect(
 				this->component,
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				false, // front
 				false, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -130,7 +129,7 @@ public:
 		detail::internal_connect(
 				this->component,
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				true, // front
 				false, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -146,7 +145,7 @@ public:
 		detail::internal_connect(
 				this->component,
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				false, // front
 				true, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -162,14 +161,14 @@ public:
 		detail::internal_connect(
 				this->component,
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				true, // front
 				true, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
 	}
 
 	inline void fire(const EventT& event) {
-		detail::internal_fire(this->component, std::type_index{typeid(EventT)}, &event);
+		detail::internal_fire(this->component, libv::type_key<EventT>(), &event);
 	}
 
 	template <typename... Args>
@@ -208,7 +207,7 @@ public:
 	inline void connect(Component& slot, F&& func) {
 		detail::internal_connect_global(
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				false, // front
 				false, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -223,7 +222,7 @@ public:
 	inline void connect_front(Component& slot, F&& func) {
 		detail::internal_connect_global(
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				true, // front
 				false, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -238,7 +237,7 @@ public:
 	inline void connect_system(Component& slot, F&& func) {
 		detail::internal_connect_global(
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				false, // front
 				true, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -253,7 +252,7 @@ public:
 	inline void connect_system_front(Component& slot, F&& func) {
 		detail::internal_connect_global(
 				slot,
-				std::type_index{typeid(EventT)},
+				libv::type_key<EventT>(),
 				true, // front
 				true, // system
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
@@ -261,7 +260,7 @@ public:
 
 	template <typename EventT>
 	inline void fire(const EventT& event) {
-		detail::internal_fire_global(this->component, std::type_index{typeid(EventT)}, &event);
+		detail::internal_fire_global(this->component, libv::type_key<EventT>(), &event);
 	}
 
 	template <typename EventT, typename... Args>

@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <space/fwd.hpp>
 // std
 #include <memory>
 
@@ -10,14 +12,13 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-class PlayoutDelayBuffer;
 class ImplNetworkServer;
 
 class NetworkServer {
 	std::unique_ptr<ImplNetworkServer> self;
 
 public:
-	NetworkServer(uint16_t server_port, PlayoutDelayBuffer& pdb);
+	NetworkServer(uint16_t server_port, Playout& playout);
 	~NetworkServer();
 };
 

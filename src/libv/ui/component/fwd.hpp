@@ -8,18 +8,20 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Button;
-struct Image;
-struct InputField;
-struct Label;
-struct LabelImage;
-struct PanelFloat;
-struct PanelFull;
-struct PanelGrid;
-struct PanelLine;
-struct Quad;
-struct ScrollBar;
-struct Stretch;
+class Component;
+
+class Button;
+class Image;
+class InputField;
+class Label;
+class LabelImage;
+class PanelFloat;
+class PanelFull;
+class PanelGrid;
+class PanelLine;
+class Quad;
+class ScrollBar;
+class Stretch;
 
 class CanvasBase;
 class CanvasAdaptor;

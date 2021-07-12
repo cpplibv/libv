@@ -54,7 +54,7 @@ public:
 	void size(const FontSize fontSize);
 	void string(std::string string);
 	void limit(const libv::vec2f limit);
-	inline void limit(const float x, const float y) { limit({x, y}); }
+	inline void limit(const float x, const float y) { limit(libv::vec2f(x, y)); }
 
 public:
 	[[nodiscard]] inline AlignHorizontal align_horizontal() const noexcept {

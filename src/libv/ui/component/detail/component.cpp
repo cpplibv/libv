@@ -18,110 +18,110 @@ std::string generate_component_name(const std::string_view type, size_t index) n
 }
 
 Component::Component(core_ptr ptr_) noexcept :
-	ptr(std::move(ptr_)) {
-	assert(ptr != nullptr && "Internal error: Component cannot be null");
-	++ptr->ref_count;
+	ptr_(std::move(ptr_)) {
+	assert(ptr_ != nullptr && "Internal error: Component cannot be null");
+	++ptr_->ref_count;
 }
 
 Component::Component(const Component& other) noexcept {
-	ptr = other.ptr;
-	++ptr->ref_count;
+	ptr_ = other.ptr_;
+	++ptr_->ref_count;
 }
 
 Component::Component(Component&& other) noexcept {
-	ptr = other.ptr;
-	other.ptr = nullptr;
+	ptr_ = other.ptr_;
+	other.ptr_ = nullptr;
 }
 
 Component& Component::operator=(const Component& other) & noexcept {
-	ptr = other.ptr;
-	++ptr->ref_count;
+	ptr_ = other.ptr_;
+	++ptr_->ref_count;
 	return *this;
 }
 
 Component& Component::operator=(Component&& other) & noexcept {
-	ptr = other.ptr;
-	other.ptr = nullptr;
+	ptr_ = other.ptr_;
+	other.ptr_ = nullptr;
 	return *this;
 }
 
 Component::~Component() noexcept {
-	if (ptr && --ptr->ref_count == 0)
-		delete ptr;
+	if (ptr_ && --ptr_->ref_count == 0)
+		delete ptr_;
 }
 
 bool Component::isFloatRegion() const noexcept {
-	return ptr->isFloatRegion();
+	return ptr_->isFloatRegion();
 }
 
 const std::string& Component::name() const noexcept {
-	return ptr->name;
+	return ptr_->name;
 }
 
 std::string Component::path() const noexcept {
-	return ptr->path();
+	return ptr_->path();
 }
 
 libv::vec3f Component::layout_position() const noexcept {
-	return ptr->layout_position();
+	return ptr_->layout_position();
 }
 
 libv::vec2f Component::layout_position2() const noexcept {
-	return ptr->layout_position2();
+	return ptr_->layout_position2();
 }
 
 libv::vec3f Component::layout_size() const noexcept {
-	return ptr->layout_size();
+	return ptr_->layout_size();
 }
 
 libv::vec2f Component::layout_size2() const noexcept {
-	return ptr->layout_size2();
+	return ptr_->layout_size2();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Component::size(const Size& value) noexcept {
-	ptr->size(value);
+	ptr_->size(value);
 }
 
 const Size& Component::size() const noexcept {
-	return ptr->size();
+	return ptr_->size();
 }
 
 void Component::anchor(Anchor value) noexcept {
-	ptr->anchor(value);
+	ptr_->anchor(value);
 }
 
 Anchor Component::anchor() const noexcept {
-	return ptr->anchor();
+	return ptr_->anchor();
 }
 
 void Component::margin(Margin value) noexcept {
-	ptr->margin(value);
+	ptr_->margin(value);
 }
 
 Margin Component::margin() const noexcept {
-	return ptr->margin();
+	return ptr_->margin();
 }
 
 void Component::padding(Padding value) noexcept {
-	ptr->padding(value);
+	ptr_->padding(value);
 }
 
 Padding Component::padding() const noexcept {
-	return ptr->padding();
+	return ptr_->padding();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f Component::calculate_local_mouse_coord() const noexcept {
-	return ptr->calculate_local_mouse_coord();
+	return ptr_->calculate_local_mouse_coord();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 void Component::markRemove() {
-	ptr->markRemove();
+	ptr_->markRemove();
 }
 
 // -------------------------------------------------------------------------------------------------

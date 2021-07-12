@@ -4,17 +4,17 @@
 
 // ext
 #include <boost/container/flat_set.hpp>
-// std
-#include <array>
-#include <ostream>
-#include <sstream>
-#include <typeindex>
 // libv
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/identity.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/type_traits.hpp>
+#include <libv/utility/type_key.hpp>
+// std
+#include <array>
+#include <ostream>
+#include <sstream>
 // pro
 #include <libv/glr/uniform.hpp>
 
@@ -38,7 +38,7 @@ inline void stream_struct_name(std::ostream& os) {
 
 struct ToStringLayouter {
 	std::ostream& os;
-	boost::container::flat_set<std::type_index> seen_types;
+	boost::container::flat_set<libv::type_uid> seen_types;
 
 	std::string_view type_string(libv::meta::identity_t<bool>) { return "bool"; }
 	std::string_view type_string(libv::meta::identity_t<int32_t>) { return "int"; }
@@ -144,13 +144,13 @@ struct ToStringLayouter {
 				// Skip non struct
 
 			} else if constexpr (libv::meta::is_array_v<M>) {
-				if (seen_types.insert(std::type_index(typeid(typename M::value_type))).second) {
+				if (seen_types.insert(libv::type_key<typename M::value_type>()).second) {
 					pass_structs<typename M::value_type>();
 					print_struct<typename M::value_type>();
 				}
 
 			} else {
-				if (seen_types.insert(std::type_index(typeid(M))).second) {
+				if (seen_types.insert(libv::type_key<M>()).second) {
 					pass_structs<M>();
 					print_struct<M>();
 				}

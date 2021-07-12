@@ -657,7 +657,7 @@ void ImplControls::process_time(const duration delta_time, scale_type scale) {
 
 Controls::Controls() : self(std::make_unique<ImplControls>()) {
 	// NOTE: void context is always present and it is never passed to any feature callback
-	_context_enter(std::type_index(typeid(void)), nullptr);
+	_context_enter(libv::type_key<void>(), nullptr);
 }
 
 Controls::~Controls() {
@@ -666,35 +666,35 @@ Controls::~Controls() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Controls::_context_enter(std::type_index type, void* ctx) {
+void Controls::_context_enter(libv::type_uid type, void* ctx) {
 	self->active_contexts.insert_or_assign(type, ctx);
 }
 
-void Controls::_context_leave(std::type_index type) {
+void Controls::_context_leave(libv::type_uid type) {
 	self->active_contexts.erase(type);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void Controls::_feature_action(std::type_index context, std::string&& name, ft_action function) {
+void Controls::_feature_action(libv::type_uid context, std::string&& name, ft_action function) {
 	// TODO P2: C++20 Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function)));
 }
 
-void Controls::_feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers) {
+void Controls::_feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers) {
 	// TODO P2: C++20 Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function), multipliers));
 }
 
-void Controls::_feature_binary(std::type_index context, std::string&& name, ft_binary function) {
+void Controls::_feature_binary(libv::type_uid context, std::string&& name, ft_binary function) {
 	// TODO P2: C++20 Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function)));
 }
 
-void Controls::_remove_feature(std::type_index context, std::string_view name) {
+void Controls::_remove_feature(libv::type_uid context, std::string_view name) {
 	// TODO P2: C++20 equal_range with temporary string instead of string_view
 	// TODO P5: Unordered multi map and equal range based erase if algorithm
 	const auto range = self->features.equal_range(std::string(name));

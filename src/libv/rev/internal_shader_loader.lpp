@@ -7,6 +7,7 @@
 // libv
 #include <libv/fsw/watcher.hpp>
 #include <libv/mt/queue_unique.hpp>
+#include <libv/utility/type_uid.hpp>
 // std
 #include <mutex>
 #include <vector>
@@ -57,8 +58,8 @@ public:
 
 public:
 	using ucc_type = std::unique_ptr<detail::BaseUniformContainer>(*)(); /// Uniform container creator function
-	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1);
-	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2);
+	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1);
+	[[nodiscard]] std::shared_ptr<InternalShader> internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2);
 
 public:
 	void unsubscribe(InternalShader* internal_shader);

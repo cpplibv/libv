@@ -68,7 +68,7 @@ public:	// --- Feature ---
 	std::unordered_multimap<std::string, Feature> features;
 
 public:	// --- Context ---
-	std::unordered_map<std::type_index, void*> active_contexts;
+	std::unordered_map<libv::type_uid, void*> active_contexts;
 
 public:	// --- Binding ---
 	std::vector<std::unique_ptr<Binding>> bindings;

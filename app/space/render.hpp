@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <space/fwd.hpp>
 // libv
 #include <libv/ctrl/fwd.hpp>
 #include <libv/glr/attribute.hpp>
@@ -24,20 +26,11 @@
 // TODO P1: kill these ones, aka implement 'pass' / 'program' uniform block (requires glr shared block allocation)
 inline float global_time = 0.0f;
 inline int32_t global_test_mode = 0;
-
-// -------------------------------------------------------------------------------------------------
-
 inline libv::rev::ShaderLoader shader_manager("shader/");
 
 // =================================================================================================
 
 namespace app {
-
-// --- FWD -----------------------------------------------------------------------------------------
-
-class PlayoutDelayBuffer;
-class SpaceSession;
-class SpaceState;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -107,8 +100,9 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 //          | issue: some struct might have already been defined, so block to string might have to skip them
 //                  This mean tracking of structs OR pushing the problem back to the include system pragma once solution
 //                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
+//			std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
-struct UniformsBackground {
+struct UniformsEditorBackground {
 	libv::glr::Uniform_texture texture_noise;
 	libv::glr::Uniform_vec2f render_resolution;
 	libv::glr::Uniform_vec4f noise_scale;
@@ -163,7 +157,7 @@ struct UniformsCommandArrow {
 	}
 };
 
-using ShaderBackground = libv::rev::Shader<UniformsBackground>;
+using ShaderEditorBackground = libv::rev::Shader<UniformsEditorBackground>;
 using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 using ShaderColor = libv::rev::Shader<UniformsColor>;
 using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
@@ -171,57 +165,67 @@ using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 
 // =================================================================================================
 
-struct Background {
+struct RendererEditorBackground {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
-	ShaderBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
+	ShaderEditorBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
 
 	static constexpr libv::vec2i noise_size = {128, 128};
 
-	Background();
+	RendererEditorBackground();
 
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
 };
 
-struct CommandArrow {
-	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+struct RendererCommandArrow {
+	struct ArrowData {
+		libv::vec3f source;
+		libv::vec3f target;
+	};
+
+	std::vector<ArrowData> arrows;
+	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StreamDraw};
 	ShaderCommandArrow shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
 
 public:
-	CommandArrow();
+	RendererCommandArrow();
 
-	void draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points);
-	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) const;
+public:
+	void add_arrow(libv::vec3f source, libv::vec3f target);
+
+public:
+	void rebuild_mesh();
+	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct Gizmo {
+struct RendererGizmo {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
 
 public:
-	Gizmo();
+	RendererGizmo();
 
 	void draw_gizmo_lines(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct Grid {
+struct RendererEditorGrid {
 	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader{shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs"};
 
 public:
-	Grid();
+	RendererEditorGrid();
 
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
-struct FleetRender {
+struct RendererFleet {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderColor shader{shader_manager, "flat.vs", "flat.fs"};
 
 public:
-	FleetRender();
+	RendererFleet();
 
 	void draw_mesh(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
@@ -231,9 +235,11 @@ public:
 
 struct SpaceCanvas : libv::ui::CanvasBase {
 	bool main_canvas;
-	SpaceState& state;
-	SpaceSession& session;
-	PlayoutDelayBuffer& playout_delay_buffer;
+	GameSession& game_session;
+	Universe& universe;
+	Playout& playout;
+//	SpaceSession& session;
+//	PlayoutDelayBuffer& playout_delay_buffer;
 	CameraPlayer& camera;
 	CameraPlayer::screen_picker screen_picker;
 
@@ -241,16 +247,20 @@ struct SpaceCanvas : libv::ui::CanvasBase {
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
 
-	Background background;
-	Grid grid;
-	Gizmo origin_gizmo;
-	CommandArrow arrow;
-	FleetRender render_fleet;
+	RendererEditorBackground rendererEditorBackground;
+	RendererEditorGrid rendererGrid;
+	RendererGizmo rendererGizmo;
+	RendererCommandArrow rendererArrow;
+	RendererFleet rendererFleet;
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 public:
-	explicit SpaceCanvas(app::SpaceState& state, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas);
+//	explicit SpaceCanvas(Universe& universe, SpaceSession& session, PlayoutDelayBuffer& playout_delay_buffer, CameraPlayer& camera, bool main_canvas);
+//	explicit SpaceCanvas(Universe& universe, PlayoutDelayBuffer& playout_delay_buffer, CameraPlayer& camera, bool main_canvas);
+//	explicit SpaceCanvas(GameInstance& game, app::CameraPlayer& camera, bool main_canvas);
+
+	SpaceCanvas(GameSession& game_session, Universe& universe, Playout& playout, CameraPlayer& camera, bool main_canvas);
 
 	virtual void update(libv::ui::time_duration delta_time) override;
 	virtual void render(libv::glr::Queue& gl) override;

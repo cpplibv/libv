@@ -4,9 +4,10 @@
 
 // libv
 #include <libv/algo/linear_find.hpp>
+#include <libv/utility/type_key.hpp>
 // std
+#include <cassert>
 #include <span>
-#include <typeindex>
 #include <vector>
 // pro
 #include <libv/serial/serial.hpp>
@@ -20,7 +21,7 @@ namespace serial {
 template <typename Handler, typename Archive>
 struct Codec {
 	using MessageID = uint8_t;
-	using TypeID = std::type_index;
+	using TypeID = libv::type_uid;
 	using Message = std::vector<std::byte>;
 	using Message_view = std::span<const std::byte>;
 
@@ -54,7 +55,7 @@ public:
 			oar << LIBV_NVP_NAMED("message", *static_cast<const MessageType*>(object_ptr));
 		};
 
-		auto type = std::type_index(typeid(MessageType));
+		auto type = libv::type_key<MessageType>();
 		encoders.emplace_back(type, MessageIndex, std::move(encode_fn));
 	}
 
@@ -68,7 +69,7 @@ public:
 			handler.receive(std::move(object));
 		};
 
-		auto type = std::type_index(typeid(MessageType));
+		auto type = libv::type_key<MessageType>();
 		decoders.emplace_back(type, MessageIndex, std::move(decode_fn));
 	}
 
@@ -79,7 +80,7 @@ public:
 	}
 
 private:
-	[[nodiscard]] bool aux_is(std::type_index type, Message_view message) const {
+	[[nodiscard]] bool aux_is(TypeID type, Message_view message) const {
 		IArchive iar(message);
 
 		MessageID id;
@@ -97,7 +98,7 @@ private:
 		return false;
 	}
 
-	[[nodiscard]] Message aux_encode(std::type_index type, const void* object) const {
+	[[nodiscard]] Message aux_encode(TypeID type, const void* object) const {
 		Message message;
 
 		{
@@ -133,12 +134,12 @@ private:
 public:
 	template <typename T>
 	[[nodiscard]] inline bool is(Message_view message) const {
-		const auto type = std::type_index(typeid(T));
+		const auto type = libv::type_key<T>();
 		return aux_is(type, message);
 	}
 	template <typename T>
 	[[nodiscard]] inline bool is(std::string_view message_str) const {
-		const auto type = std::type_index(typeid(T));
+		const auto type = libv::type_key<T>();
 		const auto message = std::span<const std::byte>(
 				reinterpret_cast<const std::byte*>(message_str.data()),
 				reinterpret_cast<const std::byte*>(message_str.data() + message_str.size())
@@ -149,7 +150,7 @@ public:
 public:
 	template <typename T>
 	[[nodiscard]] inline Message encode(const T& object) const {
-		const auto type = std::type_index(typeid(T));
+		const auto type = libv::type_key<T>();
 		const auto object_ptr = static_cast<const void*>(&object);
 
 		return aux_encode(type, object_ptr);

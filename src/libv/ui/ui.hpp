@@ -42,6 +42,7 @@ public:
 
 public:
 	void add(Component component);
+	void remove(Component component);
 
 	void setSize(libv::vec2i size_) noexcept;
 	inline void setSize(int32_t x, int32_t y) noexcept {

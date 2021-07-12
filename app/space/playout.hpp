@@ -11,12 +11,13 @@
 #include <libv/serial/codec.hpp>
 // std
 #include <memory>
+#include <random>
 #include <vector>
 // pro
 #include <space/command.hpp>
 #include <space/log.hpp>
 #include <space/session.hpp>
-#include <space/state.hpp>
+#include <space/universe.hpp>
 
 
 //// =================================================================================================
@@ -135,7 +136,7 @@ struct msg_pdb {
 
 class PlayoutDelayBuffer {
 	struct StateChangeEntry {
-		using apply_func_t = void(*)(SpaceState&, SpaceSession&, Command*);
+		using apply_func_t = void(*)(Universe&, SpaceSession&, Command*);
 
 //		FrameIndex frameIndex;
 		std::unique_ptr<Command> command;
@@ -161,46 +162,53 @@ class PlayoutDelayBuffer {
 //	}
 
 public:
-	template <typename T, typename... Args>
+	template <typename CommandT, typename... Args>
 	void queue(Args&&... args) {
 		stateChangeEntries.emplace_back(
 //			FrameIndex{0},
-			std::make_unique<T>(std::forward<Args>(args)...),
-			+[](SpaceState& st, SpaceSession& se, Command* c) {
+			// TODO P1: Temp unique_ptr usage, replace it with a cache local solution (variant_queue)
+			std::make_unique<CommandT>(std::forward<Args>(args)...),
+			+[](Universe& u, SpaceSession& se, Command* c) {
 
 				// =================================================================================================
 
 				std::string data;
 				{
 					libv::archive::BinaryOutput os(data);
-					os << LIBV_NVP_NAMED("command", static_cast<T&>(*c));
+					os << LIBV_NVP_NAMED("command", static_cast<CommandT&>(*c));
 				}
 				log_space.info("Command:\n{}", libv::hex_dump_with_ascii(data));
 
 				// =================================================================================================
 
-				apply(st, se, static_cast<T&>(*c));
+				apply(u, se, static_cast<CommandT&>(*c));
 			}
 		);
 	}
 
 //	void update_to(FrameIndex nextFrameIndex) {
-	void update(SpaceState& state, SpaceSession& session) {
+	void update(Universe& universe, SpaceSession& session) {
 		for (auto& entry : stateChangeEntries)
-			entry.apply_func(state, session, entry.command.get());
+			entry.apply_func(universe, session, entry.command.get());
 
 		stateChangeEntries.clear();
 	}
 };
 
+// =================================================================================================
+
+struct Playout {
+	PlayoutDelayBuffer buffer;
+};
+
 // -------------------------------------------------------------------------------------------------
 
-//void apply(SpaceState& state, CommandPlayerKick& command) {
+//void apply(Universe& universe, CommandPlayerKick& command) {
 ////	state.
 //}
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandChatMessage& command) {
-	(void) state;
+inline void apply(Universe& universe, SpaceSession& session, CommandChatMessage& command) {
+	(void) universe;
 
 	// Permission check
 	// Identity check
@@ -209,49 +217,69 @@ inline void apply(SpaceState& state, SpaceSession& session, CommandChatMessage& 
 
 // -------------------------------------------------------------------------------------------------
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandFleetMove& command) {
+inline void apply(Universe& universe, SpaceSession& session, CommandFleetMove& command) {
 	(void) session;
 
 	// Permission check
 	// Bound check
-	state.fleets[+command.fleetID].target = command.target_position;
+	universe.fleets[+command.fleetID].target = command.target_position;
 }
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandFleetSpawn& command) {
+inline void apply(Universe& universe, SpaceSession& session, CommandFleetSpawn& command) {
 	(void) session;
 
 	// Permission check
 	// Bound check
-	state.fleets.emplace_back(command.position);
+	universe.fleets.emplace_back(command.position);
 }
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandClearFleets& command) {
+inline void apply(Universe& universe, SpaceSession& session, CommandClearFleets& command) {
 	(void) session;
 	(void) command;
 
 	// Permission check
 	// Bound check
-	state.fleets.clear();
+	universe.fleets.clear();
+}
+
+inline void apply(Universe& universe, SpaceSession& session, CommandShuffle& command) {
+	(void) session;
+	(void) command;
+
+	// Permission check
+	// Bound check
+
+	auto positions = std::vector<libv::vec3f>{};
+	for (const auto& fleet : universe.fleets)
+		positions.emplace_back(fleet.position);
+
+	auto seed = std::random_device{}();
+	auto rng = std::mt19937_64{seed};
+
+	std::ranges::shuffle(positions, rng);
+
+	for (size_t i = 0; i < positions.size(); ++i)
+		universe.fleets[i].target = positions[i];
 }
 
 // -------------------------------------------------------------------------------------------------
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandTrackView& command) {
-	(void) state;
+inline void apply(Universe& universe, SpaceSession& session, CommandTrackView& command) {
+	(void) universe;
 	(void) session;
 }
 
-inline void apply(SpaceState& state, SpaceSession& session, CommandCameraWarpTo& command) {
-	(void) state;
+inline void apply(Universe& universe, SpaceSession& session, CommandCameraWarpTo& command) {
+	(void) universe;
 	(void) session;
 }
 
-//inline void apply(SpaceState& state, CommandCameraMovement& command) {
-////	state.
+//inline void apply(Universe& universe, CommandCameraMovement& command) {
+////	universe.
 //}
 //
-//inline void apply(SpaceState& state, CommandMouseMovement& command) {
-////	state.
+//inline void apply(Universe& universe, CommandMouseMovement& command) {
+////	universe.
 //}
 
 // -------------------------------------------------------------------------------------------------

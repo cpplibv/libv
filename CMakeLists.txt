@@ -396,7 +396,7 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG d6e882ed84f0db76fad69b700a73243c4aad4bd5
+	GIT_TAG d141cdbeb0fb422a3fb7173b285fd38e0d1772dc #8.0.1
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
@@ -877,7 +877,7 @@ wish_create_executable(
 	TARGET space
 	SOURCE app/space/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial
 )
 
 wish_create_executable(

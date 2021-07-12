@@ -50,6 +50,8 @@ public:
 
 public:
 	IncludeResult load(const std::string_view include_path) {
+		// TODO P1: security: enforce filesystem scope (requested file must be under the 'root' folder)
+		// TODO P5: normalize include_path (to remove things like a/../xyz.glsl -> xyz.glsl)
 		IncludeResult result;
 
 		for (const auto& mapping : mappings) {

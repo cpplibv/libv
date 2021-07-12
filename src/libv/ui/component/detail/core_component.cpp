@@ -15,6 +15,7 @@
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
+#include <libv/ui/event/event_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
@@ -346,6 +347,8 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 
 		doAttach();
 
+		fire(EventAttach{});
+
 		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
 
 		flags.reset(Flag::pendingAttachSelf);
@@ -405,6 +408,8 @@ void CoreComponent::detach() {
 
 //	if (flags.match_any(Flag::focusLinked))
 //		context().detachFocusLinked(*this);
+
+	fire(EventDetach{});
 
 	detail::internal_disconnect(this);
 

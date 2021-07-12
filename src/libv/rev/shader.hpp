@@ -6,10 +6,10 @@
 #include <libv/rev/fwd.hpp>
 // libv
 #include <libv/glr/program.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <memory>
 #include <string>
-#include <typeindex>
 // pro
 #include <libv/rev/base_shader.hpp>
 
@@ -65,11 +65,11 @@ public:
 	}
 
 	Shader(ShaderLoader& loader, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) :
-		BaseShader(loader, std::type_index(typeid(Uniforms)), ucc, type0, std::move(path0), type1, std::move(path1)) {
+		BaseShader(loader, libv::type_key<Uniforms>(), ucc, type0, std::move(path0), type1, std::move(path1)) {
 	}
 
 	Shader(ShaderLoader& loader, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2) :
-		BaseShader(loader, std::type_index(typeid(Uniforms)), ucc, type0, std::move(path0), type1, std::move(path1), type2, std::move(path2)) {
+		BaseShader(loader, libv::type_key<Uniforms>(), ucc, type0, std::move(path0), type1, std::move(path1), type2, std::move(path2)) {
 	}
 
 	inline Shader(const Shader&) noexcept = default;

@@ -6,12 +6,11 @@
 #include <libv/algo/erase_if_stable.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/program.hpp>
-#include <libv/utility/bit_cast.hpp>
 // pro
+#include <libv/rev/glsl_compose.hpp>
 #include <libv/rev/internal_shader.lpp>
 #include <libv/rev/internal_shader_loader.lpp>
 #include <libv/rev/log.hpp>
-#include "glsl_compose.hpp"
 
 
 namespace libv {
@@ -77,7 +76,7 @@ void InternalShaderLoader::unsubscribe(InternalShader* internal_ptr) {
 
 // -------------------------------------------------------------------------------------------------
 
-std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) {
+std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1) {
 	const auto lock = std::unique_lock(mutex);
 
 	const auto comp = [&](const auto* s) { return s->compare(uniformTID, type0, path0, type1, path1); };
@@ -96,7 +95,7 @@ std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(std::type_in
 	return internal_shader;
 }
 
-std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(std::type_index uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2) {
+std::shared_ptr<InternalShader> InternalShaderLoader::internal_load(libv::type_uid uniformTID, ucc_type ucc, libv::gl::ShaderType type0, std::string path0, libv::gl::ShaderType type1, std::string path1, libv::gl::ShaderType type2, std::string path2) {
 	const auto lock = std::unique_lock(mutex);
 
 	const auto comp = [&](const auto* s) { return s->compare(uniformTID, type0, path0, type1, path1, type2, path2); };

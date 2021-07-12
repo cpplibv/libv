@@ -11,18 +11,18 @@ namespace ctrl {
 
 // -------------------------------------------------------------------------------------------------
 
-Feature::Feature(std::type_index context, std::string&& name, ft_action function) :
+Feature::Feature(libv::type_uid context, std::string&& name, ft_action function) :
 	context(context),
 	name_(std::move(name)),
 	function_action(std::move(function)) { }
 
-Feature::Feature(std::type_index context, std::string&& name, ft_analog function, scale_group feature_multiplier) :
+Feature::Feature(libv::type_uid context, std::string&& name, ft_analog function, scale_group feature_multiplier) :
 	context(context),
 	name_(std::move(name)),
 	function_analog(std::move(function)),
 	feature_multiplier(feature_multiplier) { }
 
-Feature::Feature(std::type_index context, std::string&& name, ft_binary function) :
+Feature::Feature(libv::type_uid context, std::string&& name, ft_binary function) :
 	context(context),
 	name_(std::move(name)),
 	function_binary(std::move(function)) { }

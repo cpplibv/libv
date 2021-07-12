@@ -10,10 +10,10 @@
 #include <libv/utility/intrusive_ptr.hpp>
 #include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/observer_ref.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <string>
 #include <string_view>
-#include <typeindex>
 // pro
 #include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/component/detail/generate_name.hpp>
@@ -342,7 +342,7 @@ inline void CoreComponent::reset(Property& property) {
 
 template <typename Event>
 inline void CoreComponent::fire(const Event& event) {
-	detail::internal_fire(this, std::type_index(typeid(Event)), &event);
+	detail::internal_fire(this, libv::type_key<Event>(), &event);
 }
 
 // -------------------------------------------------------------------------------------------------

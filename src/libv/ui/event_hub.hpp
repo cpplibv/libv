@@ -4,9 +4,10 @@
 
 // fwd
 #include <libv/ui/fwd.hpp>
+// libv
+#include <libv/utility/type_key.hpp>
 // std
 #include <memory>
-#include <typeindex>
 
 
 namespace libv {
@@ -24,8 +25,8 @@ public:
 		contextEvent(std::move(wp)) { }
 
 private:
-	void _broadcast(std::type_index event_type, const void* event_ptr);
-	void _broadcast_in_ui_loop(std::type_index event_type, const void* event_ptr);
+	void aux_broadcast(uintptr_t event_type, const void* event_ptr);
+	void aux_broadcast_in_ui_loop(uintptr_t event_type, const void* event_ptr);
 
 public:
 	/// Enters the UI context
@@ -42,12 +43,12 @@ public:
 
 template <typename Event>
 inline void EventHub::broadcast(const Event& event) {
-	_broadcast(std::type_index(typeid(Event)), &event);
+	aux_broadcast(libv::type_key<Event>(), &event);
 }
 
 template <typename Event>
 inline void EventHub::broadcast_in_ui_loop(const Event& event) {
-	_broadcast_in_ui_loop(std::type_index(typeid(Event)), &event);
+	aux_broadcast_in_ui_loop(libv::type_key<Event>(), &event);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -66,6 +66,11 @@ libv.rev: Add load and current version numbering for shaders
 
 
 
+Kill full screen quads
+	Full screen quads are dead, Long live the oversized triangle (0,0,0)(3,0,0)(0,3,0)
+	(It might also be possible to skip VBO/VAO for it)
+	https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
+
 
 
 libv.gl: Add support for anisotropic filtering (not always available)

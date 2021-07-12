@@ -123,11 +123,10 @@ public:
 	}
 
 	void save() {
-		libv::Timer timer;
 
 		const auto file_path_str = libv::generic_path(file_path);
 
-		timer.reset();
+		libv::Timer timer;
 		auto ec = libv::write_file_ec(file_path, serialize<libv::archive::JSON>(self()));
 		app::log_app.error_if(ec, "Failed to save config: {} {}:{}", file_path_str, ec, ec.message());
 		app::log_app.trace_if(!ec, "Saved config {} in {:5.1f}ms", file_path_str, timer.timef_ms().count());
@@ -137,6 +136,8 @@ public:
 		save();
 	}
 };
+
+// -------------------------------------------------------------------------------------------------
 
 using ConfigViewer = Config<detail::ConfigViewer>;
 using ConfigProject = Config<detail::ConfigProject>;

@@ -18,7 +18,7 @@ namespace rev {
 InternalShader::InternalShader(
 		std::weak_ptr<InternalShaderLoader> loader,
 		std::unique_ptr<detail::BaseUniformContainer>&& uniformContainer,
-		std::type_index uniformTID) :
+		libv::type_uid uniformTID) :
 	uniformContainer(std::move(uniformContainer)),
 	loader(std::move(loader)),
 	uniformTID(uniformTID) {
@@ -77,7 +77,7 @@ void InternalShader::finish() {
 	}();
 }
 
-int InternalShader::compare(std::type_index uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const {
+int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const {
 	if (this->uniformTID < uniformTID) return -1;
 	if (this->uniformTID > uniformTID) return 1;
 
@@ -99,7 +99,7 @@ int InternalShader::compare(std::type_index uniformTID, libv::gl::ShaderType t0,
 	return 0;
 }
 
-int InternalShader::compare(std::type_index uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const {
+int InternalShader::compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const {
 	if (this->uniformTID < uniformTID) return -1;
 	if (this->uniformTID > uniformTID) return 1;
 

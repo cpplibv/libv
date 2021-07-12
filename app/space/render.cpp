@@ -14,19 +14,16 @@
 // pro
 #include <space/camera.hpp>
 #include <space/command.hpp>
+#include <space/game_instance.hpp>
 #include <space/playout.hpp>
-#include <space/state.hpp>
-//#include <space/camera_behaviour.hpp>
-
-
-#include <iostream>
+#include <space/universe.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-Background::Background() {
+RendererEditorBackground::RendererEditorBackground() {
 	// TODO P1: Switch to blue noise once implemented
 	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
 	const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
@@ -42,15 +39,15 @@ Background::Background() {
 		auto index = mesh_background.index();
 
 		position(-1, -1, 1);
-		position( 1, -1, 1);
-		position( 1,  1, 1);
-		position(-1,  1, 1);
+		position(1, -1, 1);
+		position(1, 1, 1);
+		position(-1, 1, 1);
 
 		index.quad(0, 1, 2, 3);
 	}
 }
 
-void Background::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
+void RendererEditorBackground::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 	gl.program(shader.program());
 	const auto bg_noise = libv::vec4f(1, 1, 1, 0) * (5.f / 255.f);
 	const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f);
@@ -63,65 +60,91 @@ void Background::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
 
 // -------------------------------------------------------------------------------------------------
 
-CommandArrow::CommandArrow() {
-	std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
-	for (int i = 0; i < 60; i++) {
-		const auto r = i / 30.0;
-		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-		points.emplace_back(x, y, 0);
-	}
-	for (int i = 60; i < 120; i++) {
-		const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
-		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-		const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
-		points.emplace_back(x, y, z);
-	}
-
-	draw_arrow(mesh, points);
+RendererCommandArrow::RendererCommandArrow() {
+//	std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
+//	for (int i = 0; i < 60; i++) {
+//		const auto r = i / 30.0;
+//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+//		points.emplace_back(x, y, 0);
+//	}
+//	for (int i = 60; i < 120; i++) {
+//		const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
+//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+//		const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
+//		points.emplace_back(x, y, z);
+//	}
+//
+//	build_mesh(mesh, points);
 }
 
-void CommandArrow::draw_arrow(libv::glr::Mesh& mesh, std::vector<libv::vec3f> points) {
-	if (points.size() < 2)
+void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target) {
+	if (source == target) // Sanity check
 		return;
+
+	arrows.emplace_back(source, target);
+}
+
+void RendererCommandArrow::rebuild_mesh() {
+	mesh.clear(); // <<< Better support for Dynamic VAO data
 
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto sp_ss_tp_ts = mesh.attribute(attribute_custom0); // SegmentPosition, SegmentSize, TotalPosition, TotalSize
 	auto index = mesh.index();
 
-	float total_length = 0;
-	float current_length = 0;
-
-	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-		total_length += (b - a).length();
-	});
-
 	libv::glr::VertexIndex i = 0;
-	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-		if (a == b) // Sanity check
-			return;
+	for (const auto& arrow : arrows) {
+		const auto length = (arrow.target - arrow.source).length();
 
-		const auto length = (b - a).length();
-
-		position(a);
-		position(b);
+		position(arrow.source);
+		position(arrow.target);
 
 		color0(1, 1, 1, 1);
 		color0(1, 1, 1, 1);
 
-		sp_ss_tp_ts(0, length, current_length, total_length);
-		sp_ss_tp_ts(length, length, current_length, total_length);
+		sp_ss_tp_ts(0, length, 0, length);
+		sp_ss_tp_ts(length, length, length, length);
 
 		index.line(i + 0, i + 1);
 		i += 2;
+	}
 
-		current_length += length;
-	});
+	arrows.clear();
+
+	//	float total_length = 0;
+	//	float current_length = 0;
+	//
+	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
+	//		total_length += (b - a).length();
+	//	});
+
+	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
+	//		if (a == b) // Sanity check
+	//			return;
+	//
+	//		const auto length = (b - a).length();
+	//
+	//		position(a);
+	//		position(b);
+	//
+	//		color0(1, 1, 1, 1);
+	//		color0(1, 1, 1, 1);
+	//
+	//		sp_ss_tp_ts(0, length, current_length, total_length);
+	//		sp_ss_tp_ts(length, length, current_length, total_length);
+	//
+	//		index.line(i + 0, i + 1);
+	//		i += 2;
+	//
+	//		current_length += length;
+	//	});
 }
 
-void CommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) const {
+void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
+	rebuild_mesh();
+
 	// TODO P2: This will require to re upload to VAO every render
 	//  		but it could be optimized if we give it a 'pretend' start offset
 	//  		single uniform value that adjust the 'fake' starting point (not only the first section could have this)
@@ -147,11 +170,11 @@ void CommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::g
 
 // -------------------------------------------------------------------------------------------------
 
-Gizmo::Gizmo() {
+RendererGizmo::RendererGizmo() {
 	draw_gizmo_lines(mesh);
 }
 
-void Gizmo::draw_gizmo_lines(libv::glr::Mesh& mesh) {
+void RendererGizmo::draw_gizmo_lines(libv::glr::Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
@@ -175,7 +198,7 @@ void Gizmo::draw_gizmo_lines(libv::glr::Mesh& mesh) {
 	index.line(4, 5);
 }
 
-void Gizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 	uniforms[layout_matrices.matMVP] = gl.mvp();
 	uniforms[layout_matrices.matM] = gl.model;
@@ -189,7 +212,7 @@ void Gizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_strea
 
 // -------------------------------------------------------------------------------------------------
 
-Grid::Grid() {
+RendererEditorGrid::RendererEditorGrid() {
 	{
 		auto position = mesh_grid.attribute(attribute_position);
 		auto index = mesh_grid.index();
@@ -204,7 +227,7 @@ Grid::Grid() {
 	}
 }
 
-void Grid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 	uniforms[layout_matrices.matMVP] = gl.mvp();
 	uniforms[layout_matrices.matM] = gl.model;
@@ -218,11 +241,11 @@ void Grid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream
 
 // -------------------------------------------------------------------------------------------------
 
-FleetRender::FleetRender() {
+RendererFleet::RendererFleet() {
 	draw_mesh(mesh);
 }
 
-void FleetRender::draw_mesh(libv::glr::Mesh& mesh) {
+void RendererFleet::draw_mesh(libv::glr::Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto texture0 = mesh.attribute(attribute_texture0);
@@ -232,7 +255,7 @@ void FleetRender::draw_mesh(libv::glr::Mesh& mesh) {
 //		libv::glr::generateCube(position, normal, texture0, index);
 }
 
-void FleetRender::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 	uniforms[layout_matrices.matMVP] = gl.mvp();
 	uniforms[layout_matrices.matM] = gl.model;
@@ -247,11 +270,18 @@ void FleetRender::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform
 
 // -------------------------------------------------------------------------------------------------
 
-SpaceCanvas::SpaceCanvas(app::SpaceState& state, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
+//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
+//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
+//SpaceCanvas::SpaceCanvas(GameInstance& game, app::CameraPlayer& camera, bool main_canvas) :
+SpaceCanvas::SpaceCanvas(GameSession& game_session, app::Universe& universe, Playout& playout, app::CameraPlayer& camera, bool main_canvas) :
 		main_canvas(main_canvas),
-		state(state),
-		session(session),
-		playout_delay_buffer(playout_delay_buffer),
+		game_session(game_session),
+//		universe(game.game_session->universe),
+		universe(universe),
+//		session(session),
+		playout(playout),
+//		playout_delay_buffer(playout_delay_buffer),
+//		playout_delay_buffer(game.game_session->playout.buffer),
 		camera(camera),
 		screen_picker(camera.picker({100, 100})) {
 	// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
@@ -259,11 +289,6 @@ SpaceCanvas::SpaceCanvas(app::SpaceState& state, app::SpaceSession& session, app
 }
 
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {
-	if (main_canvas) {
-		playout_delay_buffer.update(state, session);
-		state.update(delta_time);
-	}
-
 	const auto dtf = static_cast<float>(delta_time.count());
 	angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 	time += dtf;
@@ -296,6 +321,10 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 			camera.pitch(-t * libv::pi_f * 0.5f / part);
 		}
 	}
+
+	if (main_canvas)
+		// <<<
+		game_session.update(delta_time);
 }
 
 void SpaceCanvas::render(libv::glr::Queue& gl) {
@@ -324,36 +353,39 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	gl.view = camera.view();
 	gl.model = libv::mat4f::identity();
 
-	// --- Render Background/Sky ---
+	// --- Render RendererEditorBackground/Sky ---
 
 	if (!main_canvas) {
 		const auto s2_guard = gl.state.push_guard();
 		// Clear the depth data for the background of the mini display
 		gl.state.depthFunctionAlways();
-		background.render(gl, canvas_size);
+		rendererEditorBackground.render(gl, canvas_size);
 	}
 
 	// --- Render Opaque ---
 
-	for (const auto& fleet : state.fleets) {
+	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = gl.model.push_guard();
 		gl.model.translate(fleet.position);
 		gl.model.scale(0.2f);
-		render_fleet.render(gl, uniform_stream);
+		rendererFleet.render(gl, uniform_stream);
 	}
 
-	// --- Render Background/Sky ---
+	// --- Render EditorBackground/Sky ---
 
 	if (main_canvas) {
 		const auto s2_guard = gl.state.push_guard();
 		// No need to write depth data for the main background
 		gl.state.disableDepthMask();
-		background.render(gl, canvas_size);
+		rendererEditorBackground.render(gl, canvas_size);
 	}
 
 	// --- Render Transparent ---
 
-	arrow.render(gl, canvas_size, uniform_stream);
+	for (const auto& fleet : universe.fleets)
+		rendererArrow.add_arrow(fleet.position, fleet.target);
+
+	rendererArrow.render(gl, canvas_size, uniform_stream);
 
 	// --- Render UI/HUD ---
 
@@ -362,7 +394,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 			const auto s2_guard = gl.state.push_guard();
 			gl.state.disableDepthMask();
 
-			grid.render(gl, uniform_stream);
+			rendererGrid.render(gl, uniform_stream);
 		}
 
 		{ // Camera orbit point
@@ -372,7 +404,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 			const auto m_guard = gl.model.push_guard();
 			gl.model.translate(camera.orbit_point());
 			gl.model.scale(0.2f);
-			origin_gizmo.render(gl, uniform_stream);
+			rendererGizmo.render(gl, uniform_stream);
 		}
 
 		{ // Camera orientation gizmo in top right
@@ -395,7 +427,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 			gl.view = camera.orientation().translate(-1, 0, 0);
 			gl.model.scale(orientation_gizmo_size * 0.5f);
 
-			origin_gizmo.render(gl, uniform_stream);
+			rendererGizmo.render(gl, uniform_stream);
 		}
 	}
 }

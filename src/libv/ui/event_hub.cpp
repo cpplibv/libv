@@ -12,7 +12,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void EventHub::_broadcast(std::type_index event_type, const void* event_ptr) {
+void EventHub::aux_broadcast(uintptr_t event_type, const void* event_ptr) {
 	const auto sp = contextEvent.lock();
 	if (sp) {
 		auto* previous_context = has_current_thread_context() ? &current_thread_context() : nullptr;

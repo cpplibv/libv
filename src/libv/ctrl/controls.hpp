@@ -7,11 +7,11 @@
 // libv
 #include <libv/input/event_fwd.hpp>
 #include <libv/utility/function_ref.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <memory>
 #include <string>
 #include <string_view>
-#include <typeindex>
 // pro
 #include <libv/ctrl/binding_level.hpp>
 #include <libv/ctrl/duration.hpp>
@@ -67,14 +67,14 @@ public:
     ~Controls();
 
 private:
-	void _context_enter(std::type_index type, void* ctx);
-	void _context_leave(std::type_index type);
+	void _context_enter(libv::type_uid type, void* ctx);
+	void _context_leave(libv::type_uid type);
 
-	void _feature_action(std::type_index context, std::string&& name, ft_action function);
-	void _feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers);
-	void _feature_binary(std::type_index context, std::string&& name, ft_binary function);
+	void _feature_action(libv::type_uid context, std::string&& name, ft_action function);
+	void _feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers);
+	void _feature_binary(libv::type_uid context, std::string&& name, ft_binary function);
 
-	void _remove_feature(std::type_index context, std::string_view name);
+	void _remove_feature(libv::type_uid context, std::string_view name);
 
 public:
 	template <typename T>
@@ -271,12 +271,12 @@ void Controls::attach(Frame& frame) {
 
 template <typename T>
 inline void Controls::context_enter(T* context) {
-	_context_enter(std::type_index(typeid(T)), static_cast<void*>(context));
+	_context_enter(libv::type_key<T>(), static_cast<void*>(context));
 }
 
 template <typename T>
 inline void Controls::context_leave() {
-	_context_leave(std::type_index(typeid(T)));
+	_context_leave(libv::type_key<T>());
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -285,7 +285,7 @@ template <typename T, typename F>
 inline void Controls::feature_action(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_action(context, std::move(name), [function = std::forward<F>(function)](arg_action params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)
@@ -299,7 +299,7 @@ template <typename T, typename F>
 inline void Controls::feature_analog(std::string name, F&& function, scale_group multipliers) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_analog(context, std::move(name), [function = std::forward<F>(function)](arg_analog params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)
@@ -332,7 +332,7 @@ template <typename T, typename F>
 inline void Controls::feature_binary(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_binary(context, std::move(name), [function = std::forward<F>(function)](arg_binary params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)
@@ -344,7 +344,7 @@ inline void Controls::feature_binary(std::string name, F&& function) {
 
 template <typename T>
 inline void Controls::remove_feature(std::string_view name) {
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_remove_feature(context, name);
 }

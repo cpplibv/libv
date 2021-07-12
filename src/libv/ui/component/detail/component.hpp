@@ -24,7 +24,7 @@ namespace ui {
 /// @Warning: Derived classes must not contain any data member
 class Component {
 private:
-	core_ptr ptr = nullptr;
+	core_ptr ptr_ = nullptr;
 
 public:
 	Component() noexcept = delete;
@@ -45,10 +45,13 @@ public:
 
 public:
 	[[nodiscard]] inline CoreComponent& core() noexcept {
-		return *ptr;
+		return *ptr_;
 	}
 	[[nodiscard]] inline const CoreComponent& core() const noexcept {
-		return *ptr;
+		return *ptr_;
+	}
+	[[nodiscard]] inline const void* ptr() const noexcept {
+		return ptr_;
 	}
 
 public:
@@ -157,11 +160,11 @@ public:
 
 public:
 	friend inline bool operator==(const Component& lhs, const Component& rhs) noexcept {
-		return lhs.ptr == rhs.ptr;
+		return lhs.ptr_ == rhs.ptr_;
 	}
 
 	friend inline bool operator!=(const Component& lhs, const Component& rhs) noexcept {
-		return lhs.ptr != rhs.ptr;
+		return lhs.ptr_ != rhs.ptr_;
 	}
 };
 

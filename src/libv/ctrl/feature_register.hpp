@@ -4,9 +4,10 @@
 
 // fwd
 #include <libv/ctrl/fwd.hpp>
+// libv
+#include <libv/utility/type_key.hpp>
 // std
 #include <string>
-#include <typeindex>
 // pro
 #include <libv/ctrl/arg.hpp>
 #include <libv/ctrl/function_type.hpp>
@@ -36,9 +37,9 @@ public:
     inline ~FeatureRegister() noexcept = default;
 
 private:
-	void _feature_action(std::type_index context, std::string&& name, ft_action function);
-	void _feature_analog(std::type_index context, std::string&& name, ft_analog function, scale_group multipliers);
-	void _feature_binary(std::type_index context, std::string&& name, ft_binary function);
+	void _feature_action(libv::type_uid context, std::string&& name, ft_action function);
+	void _feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers);
+	void _feature_binary(libv::type_uid context, std::string&& name, ft_binary function);
 
 public:
 	template <typename T, typename F>
@@ -74,7 +75,7 @@ template <typename T, typename F>
 inline void FeatureRegister::feature_action(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_action(context, std::move(name), [function = std::forward<F>(function)](arg_action params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)
@@ -88,7 +89,7 @@ template <typename T, typename F>
 inline void FeatureRegister::feature_analog(std::string name, F&& function, scale_group multipliers) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_analog(context, std::move(name), [function = std::forward<F>(function)](arg_analog params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)
@@ -121,7 +122,7 @@ template <typename T, typename F>
 inline void FeatureRegister::feature_binary(std::string name, F&& function) {
 	// Concept: F is callable
 	// NOTE: T could be deduced, but it is better to be explicit
-	const auto context = std::type_index(typeid(T));
+	const auto context = libv::type_key<T>();
 
 	_feature_binary(context, std::move(name), [function = std::forward<F>(function)](arg_binary params, void* context) mutable {
 		if constexpr (std::is_void_v<T>)

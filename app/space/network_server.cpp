@@ -142,7 +142,7 @@ struct ImplNetworkServer {
 
 // -------------------------------------------------------------------------------------------------
 
-NetworkServer::NetworkServer(uint16_t server_port, PlayoutDelayBuffer& pdb) :
+NetworkServer::NetworkServer(uint16_t server_port, Playout& playout) :
 	self(std::make_unique<ImplNetworkServer>()) {
 
 	if (auto ec = self->acceptor.acceptor().listen(server_port, 4))

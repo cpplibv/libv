@@ -1,16 +1,14 @@
-// Project: libv, File: app/vm4_viewer/console.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/nexus_fwd.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 
-namespace app {
+namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Console {
-	
-};
+class Nexus;
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace libv

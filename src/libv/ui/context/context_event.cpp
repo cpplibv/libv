@@ -23,7 +23,7 @@ public:
 
 	struct Target {
 		ptr slot;
-		std::type_index event_type;
+		libv::type_uid event_type;
 		bool is_system; /// Callback is not ignorable
 		std::function<bool(void*, const void*)> callback;
 	};
@@ -43,7 +43,7 @@ ContextEvent::~ContextEvent() {
 	// For the sake of forward declared unique_ptr
 }
 
-void ContextEvent::connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+void ContextEvent::connect(ptr signal, ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 
 	self->slots[slot].emplace_back(signal);
@@ -54,7 +54,7 @@ void ContextEvent::connect(ptr signal, ptr slot, std::type_index event_type, boo
 		targets.emplace_back(slot, event_type, system, std::move(func));
 }
 
-void ContextEvent::connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+void ContextEvent::connect_global(ptr slot, libv::type_uid event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
 	auto lock = std::unique_lock(self->mutex);
 
 	self->slots[slot].emplace_back(nullptr);
@@ -65,7 +65,7 @@ void ContextEvent::connect_global(ptr slot, std::type_index event_type, bool fro
 		targets.emplace_back(slot, event_type, system, std::move(func));
 }
 
-void ContextEvent::fire(ptr signal, std::type_index event_type, const void* event_ptr) {
+void ContextEvent::fire(ptr signal, libv::type_uid event_type, const void* event_ptr) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto it = self->signals.find(signal);
@@ -81,7 +81,7 @@ void ContextEvent::fire(ptr signal, std::type_index event_type, const void* even
 				stopped |= target.callback(&*signal, event_ptr);
 }
 
-void ContextEvent::fire_global(std::type_index event_type, const void* event_ptr) {
+void ContextEvent::fire_global(libv::type_uid event_type, const void* event_ptr) {
 	auto lock = std::unique_lock(self->mutex);
 
 	const auto it = self->signals.find(nullptr);
@@ -113,6 +113,10 @@ void ContextEvent::disconnect_signal(ptr signal) {
 		}
 
 		libv::erase_all_unstable(itt->second, signal);
+
+		// NOTE: No need to erase slots entry as disconnect_slot will also be called
+		//		if (itt->second.empty())
+		//			self->slots.erase(itt);
 	}
 
 	self->signals.erase(it);
@@ -135,6 +139,10 @@ void ContextEvent::disconnect_slot(ptr slot) {
 		}
 
 		libv::erase_all_unstable(itt->second, slot, &ImplContextEvent::Target::slot);
+
+		// NOTE: No need to erase slots entry as disconnect_signal will also be called
+		//		if (itt->second.empty())
+		//			self->signals.erase(itt);
 	}
 
 	self->slots.erase(it);

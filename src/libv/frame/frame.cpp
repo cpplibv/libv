@@ -623,42 +623,42 @@ const Monitor& Frame::getCurrentMonitor() const {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::input::KeyState Frame::key(libv::input::Keycode key) {
+libv::input::KeyState Frame::key(libv::input::Keycode key) const {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
-bool Frame::isKeyPressed(libv::input::Keycode key) {
+bool Frame::isKeyPressed(libv::input::Keycode key) const {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedKeys.contains(key);
 }
 
-bool Frame::isKeyReleased(libv::input::Keycode key) {
+bool Frame::isKeyReleased(libv::input::Keycode key) const {
 	std::lock_guard lock(self->frameState_m);
 	return not self->pressedKeys.contains(key);
 }
 
-libv::input::KeyState Frame::mouse(libv::input::MouseButton key) {
+libv::input::KeyState Frame::mouse(libv::input::MouseButton key) const {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key) ? libv::input::KeyState::pressed : libv::input::KeyState::released;
 }
 
-bool Frame::isMousePressed(libv::input::MouseButton key) {
+bool Frame::isMousePressed(libv::input::MouseButton key) const {
 	std::lock_guard lock(self->frameState_m);
 	return self->pressedMouseButtons.contains(key);
 }
 
-bool Frame::isMouseReleased(libv::input::MouseButton key) {
+bool Frame::isMouseReleased(libv::input::MouseButton key) const {
 	std::lock_guard lock(self->frameState_m);
 	return not self->pressedMouseButtons.contains(key);
 }
 
-libv::vec2d Frame::getMousePosition() {
+libv::vec2d Frame::getMousePosition() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->mousePosition;
 }
 
-libv::vec2d Frame::getScrollPosition() {
+libv::vec2d Frame::getScrollPosition() const {
 	std::lock_guard lock(self->frameState_m);
 	return self->scrollPosition;
 }

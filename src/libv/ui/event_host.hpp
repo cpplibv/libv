@@ -5,6 +5,7 @@
 // pro
 #include <libv/ui/basic_event_proxy.hpp>
 #include <libv/ui/event/base_event.hpp>
+#include <libv/ui/event/event_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -47,8 +48,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct EventSubmit : BaseEvent {
-};
+struct EventSubmit : BaseEvent { };
 
 // -------------------------------------------------------------------------------------------------
 
@@ -64,11 +64,14 @@ public:
 	BasicEventProxy<ComponentT, EventChar> char_;
 	BasicEventProxy<ComponentT, EventKey> key;
 
-	BasicEventProxy<ComponentT, EventFocus> focus;
-
 	BasicEventProxy<ComponentT, EventMouseButton> mouse_button;
 	BasicEventProxy<ComponentT, EventMouseMovement> mouse_movement;
 	BasicEventProxy<ComponentT, EventMouseScroll> mouse_scroll;
+
+	BasicEventProxy<ComponentT, EventAttach> attach;
+	BasicEventProxy<ComponentT, EventDetach> detach;
+
+	BasicEventProxy<ComponentT, EventFocus> focus;
 
 	BasicEventProxyGlobal<ComponentT> global;
 
@@ -76,10 +79,12 @@ public:
 	explicit inline EventHostGeneral(ComponentT& owner) noexcept :
 		char_(owner),
 		key(owner),
-		focus(owner),
 		mouse_button(owner),
 		mouse_movement(owner),
 		mouse_scroll(owner),
+		attach(owner),
+		detach(owner),
+		focus(owner),
 		global(owner) {}
 };
 

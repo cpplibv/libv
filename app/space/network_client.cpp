@@ -83,8 +83,9 @@ struct ImplNetworkClient {
 
 // -------------------------------------------------------------------------------------------------
 
-NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, std::string name, PlayoutDelayBuffer& pdb) :
+NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, std::string name, Playout& playout) :
 	self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, std::move(name))) {
+	playout;
 }
 
 NetworkClient::~NetworkClient() {

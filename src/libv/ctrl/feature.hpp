@@ -4,9 +4,10 @@
 
 // fwd
 #include <libv/ctrl/fwd.hpp>
+// libv
+#include <libv/utility/type_uid.hpp>
 // std
 #include <string>
-#include <typeindex>
 // pro
 #include <libv/ctrl/enum.hpp>
 #include <libv/ctrl/function_type.hpp>
@@ -20,7 +21,7 @@ namespace ctrl {
 // -------------------------------------------------------------------------------------------------
 
 struct Feature {
-	std::type_index context;
+	libv::type_uid context;
 	std::string name_;
 
 	ft_action function_action;
@@ -32,9 +33,9 @@ struct Feature {
 	scale_group feature_multiplier;
 
 public:
-	Feature(std::type_index context, std::string&& name, ft_action function);
-	Feature(std::type_index context, std::string&& name, ft_analog function, scale_group feature_multiplier);
-	Feature(std::type_index context, std::string&& name, ft_binary function);
+	Feature(libv::type_uid context, std::string&& name, ft_action function);
+	Feature(libv::type_uid context, std::string&& name, ft_analog function, scale_group feature_multiplier);
+	Feature(libv::type_uid context, std::string&& name, ft_binary function);
 
 public:
 	void fire_action(void* ctx_ptr);

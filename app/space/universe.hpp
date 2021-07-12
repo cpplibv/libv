@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/state.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/world.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -96,7 +96,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct SpaceState {
+struct Universe {
 //	app::CameraPlayer& camera;
 //
 //	float angle = 0.0f;
@@ -106,7 +106,7 @@ struct SpaceState {
 	std::vector<Fleet> fleets;
 
 public:
-//	SpaceState(app::CameraPlayer& camera) :
+//	Universe(app::CameraPlayer& camera) :
 //		camera(camera) {
 //	}
 

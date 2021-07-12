@@ -9,10 +9,10 @@
 #include <libv/gl/enum.hpp>
 #include <libv/glr/program.hpp>
 #include <libv/utility/bit_cast.hpp>
+#include <libv/utility/type_uid.hpp>
 // std
 #include <memory>
 #include <string>
-#include <typeindex>
 #include <vector>
 
 
@@ -45,14 +45,14 @@ public:
 	std::string name_;
 	std::weak_ptr<InternalShaderLoader> loader;
 
-	std::type_index uniformTID;
+	libv::type_uid uniformTID;
 	std::vector<InternalShaderStage> stages;
 
 public:
 	InternalShader(
 			std::weak_ptr<InternalShaderLoader> loader,
 			std::unique_ptr<detail::BaseUniformContainer>&& uniformContainer,
-			std::type_index uniformTID);
+			libv::type_uid uniformTID);
 
 	~InternalShader();
 
@@ -64,8 +64,8 @@ public:
 	void finish();
 
 public:
-	int compare(std::type_index uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const;
-	int compare(std::type_index uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const;
+	int compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1) const;
+	int compare(libv::type_uid uniformTID, libv::gl::ShaderType t0, const std::string& p0, libv::gl::ShaderType t1, const std::string& p1, libv::gl::ShaderType t2, const std::string& p2) const;
 };
 
 // -------------------------------------------------------------------------------------------------

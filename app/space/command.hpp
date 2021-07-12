@@ -8,7 +8,7 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serial/enable.hpp>
 #include <libv/serial/types/std_string.hpp>
-//#include <libv/utility/to_underlying.hpp>
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 #include <string>
@@ -106,6 +106,9 @@ struct CommandFleetMove : CommandState {
 };
 
 struct CommandClearFleets : CommandState {
+};
+
+struct CommandShuffle : CommandState {
 };
 
 // -------------------------------------------------------------------------------------------------

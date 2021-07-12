@@ -315,16 +315,16 @@ public:
 	const Monitor& getCurrentMonitor() const;
 
 public:
-	libv::input::KeyState key(libv::input::Keycode key);
-	bool isKeyPressed(libv::input::Keycode key);
-	bool isKeyReleased(libv::input::Keycode key);
+	libv::input::KeyState key(libv::input::Keycode key) const;
+	bool isKeyPressed(libv::input::Keycode key) const;
+	bool isKeyReleased(libv::input::Keycode key) const;
 
-	libv::input::KeyState mouse(libv::input::MouseButton key);
-	bool isMousePressed(libv::input::MouseButton key);
-	bool isMouseReleased(libv::input::MouseButton key);
+	libv::input::KeyState mouse(libv::input::MouseButton key) const;
+	bool isMousePressed(libv::input::MouseButton key) const;
+	bool isMouseReleased(libv::input::MouseButton key) const;
 
-	libv::vec2d getMousePosition();
-	libv::vec2d getScrollPosition();
+	libv::vec2d getMousePosition() const;
+	libv::vec2d getScrollPosition() const;
 
 	// TODO P2: libv.frame: Joystick/Gamepad support: Getters to state
 

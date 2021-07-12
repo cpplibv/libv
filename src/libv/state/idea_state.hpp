@@ -1,11 +1,13 @@
 // Project: libv.state, File: src/libv/state/idea_state.hpp, Author: Császár Mátyás [Vader]
 
+#pragma once
+
+//#include <libv/utility/type_uid.hpp>
 #include <array>
 #include <string_view>
 #include <stdexcept>
 #include <algorithm>
 #include <map>
-#include <typeindex>
 #include <type_traits>
 #include <optional>
 #include <cassert>

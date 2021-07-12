@@ -6,12 +6,12 @@
 #include <libv/ui/fwd.hpp>
 // libv
 #include <libv/utility/intrusive_ptr.hpp>
+#include <libv/utility/type_key.hpp>
 // std
 #include <filesystem>
 #include <memory>
 #include <string>
 #include <string_view>
-#include <typeindex>
 // pro
 #include <libv/ui/event/detail/internal_event_linkage.hpp>
 #include <libv/ui/settings.hpp>
@@ -97,7 +97,7 @@ public:
 
 template <typename Event>
 inline void ContextUI::broadcast(const Event& event) {
-	detail::internal_fire_global(this->event, std::type_index(typeid(Event)), &event);
+	detail::internal_fire_global(this->event, libv::type_key<Event>(), &event);
 }
 
 // -------------------------------------------------------------------------------------------------

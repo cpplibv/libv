@@ -11,7 +11,7 @@ ui.style("vm4_viewer") {
 	layout = ui.layout_float(
 			ui.ANCHOR_TOP_LEFT,     -- Info
 			ui.ANCHOR_BOTTOM_RIGHT, -- Help
-			ui.ANCHOR_TOP_RIGHT,    --
+			ui.ANCHOR_TOP_RIGHT     --
 	),
 }
 

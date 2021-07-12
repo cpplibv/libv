@@ -515,6 +515,10 @@ void UI::add(Component component) {
 	self->root.add(std::move(component));
 }
 
+void UI::remove(Component component) {
+	self->root.remove(component);
+}
+
 void UI::setSize(libv::vec2i size_) noexcept {
 	AccessRoot::layout_size(self->root.core()) = libv::vec3f{libv::vec::cast<float>(size_), 0};
 	AccessRoot::flagAuto(self->root.core(), Flag::pendingLayout);
