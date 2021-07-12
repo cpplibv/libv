@@ -66,6 +66,12 @@ app.space: Sim state manipulation only with commands
 
 
 
+2 main question needs resolution
+	- How does UI interfaces with the business logic
+	- How does network interfaces with the playout logic
+
+
+
 app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
 app.space: Structure the whole program: UML time is upon us
 
