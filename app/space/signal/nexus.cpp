@@ -1,7 +1,7 @@
 //// Project: libv.ui, File: src/libv/ui/context/context_event.cpp, Author: Császár Mátyás [Vader]
 //
 //// hpp
-//#include <space/signal/event_hub.hpp>
+//#include <space/signal/nexus.hpp>
 //// libv
 //#include <libv/algo/erase_all_unstable.hpp>
 //// std
@@ -16,9 +16,9 @@
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//class ImplEventHub {
+//class ImplNexus {
 //public:
-//	using ptr = EventHub::ptr;
+//	using ptr = Nexus::ptr;
 //
 //	struct Target {
 //		ptr slot;
@@ -35,14 +35,14 @@
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//EventHub::EventHub() :
-//	self(std::make_unique<ImplEventHub>()) { }
+//Nexus::Nexus() :
+//	self(std::make_unique<ImplNexus>()) { }
 //
-//EventHub::~EventHub() {
+//Nexus::~Nexus() {
 //	// For the sake of forward declared unique_ptr
 //}
 //
-//void EventHub::connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+//void Nexus::connect(ptr signal, ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	self->slots[slot].emplace_back(signal);
@@ -53,7 +53,7 @@
 //		targets.emplace_back(slot, event_type, system, std::move(func));
 //}
 //
-//void EventHub::connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
+//void Nexus::connect_global(ptr slot, std::type_index event_type, bool front, bool system, std::function<bool(void*, const void*)>&& func) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	self->slots[slot].emplace_back(nullptr);
@@ -64,7 +64,7 @@
 //		targets.emplace_back(slot, event_type, system, std::move(func));
 //}
 //
-//void EventHub::fire(ptr signal, std::type_index event_type, const void* event_ptr) {
+//void Nexus::fire(ptr signal, std::type_index event_type, const void* event_ptr) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	const auto it = self->signals.find(signal);
@@ -74,13 +74,13 @@
 //	}
 //
 //	bool stopped = false;
-//	for (const ImplEventHub::Target& target : it->second)
+//	for (const ImplNexus::Target& target : it->second)
 //		if (target.event_type == event_type)
 //			if (target.is_system || !stopped)
 //				stopped |= target.callback(&*signal, event_ptr);
 //}
 //
-//void EventHub::fire_global(std::type_index event_type, const void* event_ptr) {
+//void Nexus::fire_global(std::type_index event_type, const void* event_ptr) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	const auto it = self->signals.find(nullptr);
@@ -88,14 +88,14 @@
 //		return;
 //
 //	bool stopped = false;
-//	for (const ImplEventHub::Target& target : it->second)
+//	for (const ImplNexus::Target& target : it->second)
 //		if (target.event_type == event_type)
 //			if (target.is_system || !stopped)
 //				// For global events the slot is used as component in the callbacks (as there is no real signal)
 //				stopped |= target.callback(&*target.slot, event_ptr);
 //}
 //
-//void EventHub::disconnect_signal(ptr signal) {
+//void Nexus::disconnect_signal(ptr signal) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	const auto it = self->signals.find(signal);
@@ -104,7 +104,7 @@
 //		return;
 //	}
 //
-//	for (const ImplEventHub::Target& target : it->second) {
+//	for (const ImplNexus::Target& target : it->second) {
 //		const auto itt = self->slots.find(target.slot);
 //		if (itt == self->slots.end()) {
 //			assert(false && "Internal consistency violation");
@@ -117,7 +117,7 @@
 //	self->signals.erase(it);
 //}
 //
-//void EventHub::disconnect_slot(ptr slot) {
+//void Nexus::disconnect_slot(ptr slot) {
 //	auto lock = std::unique_lock(self->mutex);
 //
 //	const auto it = self->slots.find(slot);
@@ -133,7 +133,7 @@
 //			continue;
 //		}
 //
-//		libv::erase_all_unstable(itt->second, slot, &ImplEventHub::Target::slot);
+//		libv::erase_all_unstable(itt->second, slot, &ImplNexus::Target::slot);
 //	}
 //
 //	self->slots.erase(it);

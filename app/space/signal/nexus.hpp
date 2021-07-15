@@ -14,22 +14,22 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-class ImplEventHub;
+class ImplNexus;
 
-class EventHub {
+class Nexus {
 	using channel_key_type = std::string;
 	using channel_key_view_type = std::string_view;
 
 private:
-	std::shared_ptr<ImplEventHub> self;
+	std::shared_ptr<ImplNexus> self;
 
 public:
-	EventHub();
-	inline EventHub(const EventHub&) noexcept = default;
-	inline EventHub& operator=(const EventHub&) & noexcept = default;
-	inline EventHub(EventHub&&) noexcept = default;
-	inline EventHub& operator=(EventHub&&) & noexcept = default;
-	~EventHub();
+	Nexus();
+	inline Nexus(const Nexus&) noexcept = default;
+	inline Nexus& operator=(const Nexus&) & noexcept = default;
+	inline Nexus(Nexus&&) noexcept = default;
+	inline Nexus& operator=(Nexus&&) & noexcept = default;
+	~Nexus();
 
 private:
 	void aux_connect(channel_key_type channel, std::type_index event_type, std::function<void(const void*)> func);

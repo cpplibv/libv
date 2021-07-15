@@ -24,6 +24,8 @@
 //#include <space/camera.hpp>
 //#include <space/state.hpp>
 
+//#include <space/signal/nexus.hpp>
+
 
 namespace app {
 
@@ -63,6 +65,7 @@ libv::ui::Component create_hud(
 		app::CameraPlayer& camera_mini,
 
 //		Console console,
+//		libv::Nexus nexus,
 
 		std::optional<libv::ui::CanvasAdaptorT<SpaceCanvas>>& out_canvas_main) {
 
@@ -101,19 +104,22 @@ libv::ui::Component create_hud(
 			clear_fleets.event().submit.connect([&playout_delay_buffer]() {
 				playout_delay_buffer.queue<app::CommandClearFleets>();
 //				console.execute("clear_fleets");
+//				nexus.broadcast<ClearFleets>();
 			});
 			cmd_bar.add(std::move(clear_fleets));
 
-//			libv::ui::Button clear_fleets2;
-//			clear_fleets2.align_horizontal(libv::ui::AlignHorizontal::center);
-//			clear_fleets2.align_vertical(libv::ui::AlignVertical::center);
-//			clear_fleets2.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-//			clear_fleets2.size(libv::ui::parse_size_or_throw("10pxD1r, 4pxD"));
-//			clear_fleets2.text("Clear Fleets Clear Fleets");
-//			clear_fleets2.event().submit.connect([&playout_delay_buffer]() {
-//				playout_delay_buffer.queue<app::CommandClearFleets>();
-//			});
-//			cmd_bar.add(std::move(clear_fleets2));
+			libv::ui::Button clear_fleets2;
+			clear_fleets2.align_horizontal(libv::ui::AlignHorizontal::center);
+			clear_fleets2.align_vertical(libv::ui::AlignVertical::center);
+			clear_fleets2.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
+			clear_fleets2.size(libv::ui::parse_size_or_throw("10pxD1r, 4pxD"));
+			clear_fleets2.text("Clear Fleets With Longer Label");
+			clear_fleets2.event().submit.connect([&playout_delay_buffer]() {
+				playout_delay_buffer.queue<app::CommandClearFleets>();
+//				console.execute("clear_fleets");
+//				nexus.broadcast<ClearFleets>();
+			});
+			cmd_bar.add(std::move(clear_fleets2));
 		}
 		layers.add(cmd_bar);
 	}
@@ -170,6 +176,8 @@ libv::ui::Component create_hud(
 					client.reset();
 //					console.execute_fmt("name {}", in_name.text());
 //					console.execute_fmt("host {}", 25080);
+//					nexus.broadcast<NameChange>(in_name.text());
+//					nexus.broadcast<NetworkHost>(25080);
 					btn_join.text("Join: rs0.corruptedai.com");
 				}
 			});
@@ -193,16 +201,31 @@ libv::ui::Component create_hud(
 					server.reset();
 //					console.execute_fmt("name {}", name);
 //					console.execute_fmt("join {} {}", "rs0.corruptedai.com", 25080);
+//					nexus.broadcast<NameChange>(name);
+//					nexus.broadcast<NetworkJoin>("rs0.corruptedai.com", 25080);
 					btn_host.text("Host");
 				}
 			});
 			mp_bar.add(btn_join);
+
+//			nexus.listen<NetworkHost>(hud_id, [=] {
+//				btn_host.text("Shutdown");
+//				btn_join.text("Join: rs0.corruptedai.com");
+//			});
+//			nexus.listen<NetworkJoin>(hud_id, [=] {
+//				btn_host.text("Host");
+//				btn_join.text("Shutdown");
+//			});
 		}
 		layers.add(mp_bar);
 	}
 
 //	layers.add(pref_graph);
 	layers.add(make_shader_error_overlay());
+
+//	layers.event().detach.connect([] {
+//		nexus.disconnect(hud_id);
+//	});
 
 	return layers;
 }
@@ -319,9 +342,9 @@ libv::ui::Component create_hud(
 //
 //	return layers;
 //}
-
-// =================================================================================================
-
+//
+//// =================================================================================================
+//
 //libv::ui::Component create_hud_styled_build_chain(
 //		PlayoutDelayBuffer& playout_delay_buffer,
 //		SpaceSession& space_session,
@@ -374,7 +397,7 @@ libv::ui::Component create_hud(
 //			auto lbl_state = mp_bar.add_ns<uic::LabelImage>("name-lbl", "space.hud-bar.mp.lbl")
 //					.text("Name:");
 //
-//			auto in_name = mp_bar.add_ns<uic::LabelImage>("name-in", "space.hud-bar.mp.input")
+//			auto in_name = mp_bar.add_ns<uic::InputField>("name-in", "space.hud-bar.mp.input")
 //					.text(generate_random_name(4));
 //
 //			mp_bar.add_ns<uic::LabelImage>("state", "space.hud-bar.mp.lbl")
