@@ -11,6 +11,71 @@ namespace math {
 
 // -------------------------------------------------------------------------------------------------
 
+//enum class ease_function {
+//	linear,
+//	ease_in_quadratic,
+//	ease_out_quadratic,
+//	ease_in_out_quadratic,
+//	ease_in_cubic,
+//	ease_out_cubic,
+//	ease_in_out_cubic,
+//	ease_in_quartic,
+//	ease_out_quartic,
+//	ease_in_out_quartic,
+//	ease_in_quintic,
+//	ease_out_quintic,
+//	ease_in_out_quintic,
+//	ease_in_sine,
+//	ease_out_sine,
+//	ease_in_out_sine,
+//	ease_in_circular,
+//	ease_out_circular,
+//	ease_in_out_circular,
+//	ease_in_exponential,
+//	ease_out_exponential,
+//	ease_in_out_exponential,
+//	ease_in_elastic,
+//	ease_out_elastic,
+//	ease_in_out_elastic,
+//	ease_in_back,
+//	ease_out_back,
+//	ease_in_out_back,
+//	ease_in_bounce,
+//	ease_out_bounce,
+//	ease_in_out_bounce,
+//};
+
+// -------------------------------------------------------------------------------------------------
+
+/// Slower but custom exponent variant ease in function
+/// \param x parameter in [0, 1]
+/// \param e used exponent
+template <typename T>
+[[nodiscard]] constexpr inline T ease_in_custom(const T x, const T e) noexcept {
+	return std::pow(x, e);
+}
+
+/// Slower but custom exponent variant ease out function
+/// \param x parameter in [0, 1]
+/// \param e used exponent
+template <typename T>
+[[nodiscard]] constexpr inline T ease_out_custom(const T x, const T e) noexcept {
+	return T{1} - std::pow(T{1} - x, e);
+}
+
+/// Slower but custom exponent variant ease in out function
+/// \param x parameter in [0, 1]
+/// \param e used exponent
+template <typename T>
+[[nodiscard]] constexpr inline T ease_in_out_custom(const T x, const T e) noexcept {
+	if (x < T{0.5})
+		return std::pow(T{2} * x, e) * T{0.5};
+	else
+		return (T{2} - std::pow(T{2} - T{2} * x, e)) * T{0.5};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 /// Modelled after the line y = x
 /// \param x parameter in [0, 1]
 template <typename T>
