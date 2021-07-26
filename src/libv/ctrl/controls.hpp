@@ -120,6 +120,10 @@ public:
 	template <typename Frame>
 	void attach(Frame& frame);
 
+public:
+	void ignore_events(bool value);
+
+public:
 	void event(const libv::input::EventKey& event);
 	void event(const libv::input::EventMouseButton& event);
 	void event(const libv::input::EventMousePosition& event);
@@ -129,7 +133,6 @@ public:
 	void event(const libv::input::EventJoystickButton& event);
 	void event(const libv::input::EventJoystickAnalog& event);
 
-public:
 	void update(duration delta_time);
 
 public:

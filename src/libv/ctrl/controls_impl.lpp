@@ -100,6 +100,9 @@ public:	// --- Settings ---
 	scale_type impulse_joystick_button = 1;
 	scale_type_2D scale_joystick_analog = {1, 1};
 
+public:	// --- Misc ---
+	bool ignore_events = false;
+
 public:	// --- SOW ---
 	time_point input_time = time_point{};
 	duration sequence_timeout_timer = duration::zero();
