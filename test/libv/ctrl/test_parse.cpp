@@ -651,15 +651,23 @@ TEST_CASE("Parse Combination general", "[libv.control.parse]") {
 	test("A + \"'\"            ", lc::Input{lc::Keycode::A}, lc::Input{utf8_codepoint("'")});
 	test("'+'                  ", lc::Input{utf8_codepoint("+")});
 	test("'+ '                 ", lc::Input{lc::Keycode::Apostrophe}, lc::Input{lc::Keycode::Apostrophe});
-	// TODO P4: Fix the parser to handle the following case
-//	test("'+'+'                ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
+	test("'+'+'                ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
 	test("'+'+'+'              ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});
+	test("'+'+'+'+'            ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
+	test("'+'+'+'+'+'          ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});
+	test("\"+\"+\"+\"          ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});
+	test("'+'+'+A              ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe}, lc::Input{lc::Keycode::A});
+	test("'+'+Apostrophe       ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
+	test("Apostrophe+'+'       ", lc::Input{lc::Keycode::Apostrophe}, lc::Input{utf8_codepoint("+")});
+	test("'+'+'                ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
+	test("'+'+ '               ", lc::Input{utf8_codepoint("+")}, lc::Input{lc::Keycode::Apostrophe});
 	test("'+' + '+'            ", lc::Input{utf8_codepoint("+")}, lc::Input{utf8_codepoint("+")});
 	test("A+'+'                ", lc::Input{lc::Keycode::A}, lc::Input{utf8_codepoint("+")});
 	test("A+'+ '               ", lc::Input{lc::Keycode::A}, lc::Input{lc::Keycode::Apostrophe}, lc::Input{lc::Keycode::Apostrophe});
 	test("A+\"+\"              ", lc::Input{lc::Keycode::A}, lc::Input{utf8_codepoint("+")});
-	test("MX+\"+\"             ", lc::Input{lc::MouseMovement::x}, lc::Input{utf8_codepoint("+")});
+	test("MX+'                 ", lc::Input{lc::MouseMovement::x}, lc::Input{lc::Keycode::Apostrophe});
 	test("MX+'+'               ", lc::Input{lc::MouseMovement::x}, lc::Input{utf8_codepoint("+")});
+	test("MX+\"+\"             ", lc::Input{lc::MouseMovement::x}, lc::Input{utf8_codepoint("+")});
 	test("MX++'                ", lc::Input{lc::MouseMovement::x_plus}, lc::Input{lc::Keycode::Apostrophe});
 	test("MX+A                 ", lc::Input{lc::MouseMovement::x}, lc::Input{lc::Keycode::A});
 	test("Kp+                  ", lc::Input{lc::Keycode::KPPlus});
@@ -677,15 +685,24 @@ TEST_CASE("Parse Combination general", "[libv.control.parse]") {
 	test("MX", lc::Input{lc::MouseMovement::x});
 	test("MX+", lc::Input{lc::MouseMovement::x_plus});
 	test("MX+ ", lc::Input{lc::MouseMovement::x_plus});
+	test(" MX+", lc::Input{lc::MouseMovement::x_plus});
+	test(" MX+ ", lc::Input{lc::MouseMovement::x_plus});
 
 	CHECK(not lc::parse_combination_optional(""));
 	CHECK(not lc::parse_combination_optional(" "));
 
 	CHECK(not lc::parse_combination_optional("KP++"));
+	CHECK(not lc::parse_combination_optional("KP+ +"));
+	CHECK(not lc::parse_combination_optional("KP+++"));
+	CHECK(not lc::parse_combination_optional("KP+++A"));
 	CHECK(not lc::parse_combination_optional("MX++"));
 	CHECK(not lc::parse_combination_optional("MX+'+"));
 	CHECK(not lc::parse_combination_optional("MX+\"+"));
 	CHECK(not lc::parse_combination_optional("MX++\""));
+
+	CHECK(not lc::parse_combination_optional("\"+\"+\""));
+	CHECK(not lc::parse_combination_optional("++'+'"));
+	CHECK(not lc::parse_combination_optional("'+'++"));
 }
 
 TEST_CASE("Parse Sequence general", "[libv.control.parse]") {

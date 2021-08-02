@@ -674,6 +674,13 @@ static constexpr auto seek_delim = [](const auto begin, const auto end, const au
 	return it;
 };
 
+static constexpr auto next_delim = [](const auto begin, const auto end, const auto delim) {
+	auto it = begin;
+	while (it != end && *it != delim)
+		++it;
+	return it;
+};
+
 static constexpr auto sv = [](const auto begin, const auto end) {
 	return std::string_view(&*begin, std::distance(begin, end));
 };
@@ -696,50 +703,74 @@ Combination parse_combination_or_throw(const std::string_view str) {
 }
 
 std::optional<Combination> parse_combination_optional(const std::string_view str) {
+	//libv.ctrl: I think it is possible to improvement performance by around 15%
+	//			The new parser is correct, but it often hits the failure case
+	//
+	//	With forward parsing (New)
+	//	Try eager eval from the front and consume two token, then fallback to one
+	//	w1_parse: 1529, w1_parse_fail: 30, w2_parse: 708, w2_parse_fail: 571
+	//		27% Overhead and most of this is on longer strings
+	//		But has no correctness issue
+	//
+	//	With backward parsing (Old) (pre 1ce9dee)
+	//	Try lazy eval from the back consume one token, then fallback to two
+	//	w1_parse: 1658, w1_parse_fail: 149, w2_parse: 128, w2_parse_fail: 15
+	//		9% Overhead and most of this is on shorter strings
+	//		Issue with:
+	//				Apostrophe + "+" == "+" + Apostrophe
+	//				Apostrophe + "+" + "+" == "+" + "+" + Apostrophe
+	//				Apostrophe + "+" + A == "+" + Apostrophe + A
+
 	boost::container::small_vector<Input, 3> inputs;
 
-	// Reverse iteration
-	auto itr = str.rbegin();
-	while (itr != str.rend()) {
-		const auto segment_rbegin = itr;
+	const auto begin = str.begin();
+	const auto end = str.end();
+	auto it = begin;
 
-		// First attempt parsing
-		itr = seek_delim(segment_rbegin, str.rend(), '+');
-		const auto window = sv(itr.base(), segment_rbegin.base());
-		auto parsed_input = parse_input_optional(window);
+	while (it != end) {
+		const auto w1_begin = it;
+		const auto w1_end = next_delim(w1_begin, end, '+');
+		const auto w1 = sv(w1_begin, w1_end);
 
-		// Second attempt parsing with including the last delimiter as part of the segment
-		if (!parsed_input && itr != str.rend()) {
-			itr++;
-			itr = seek_delim(itr, str.rend(), '+');
+		if (w1_end != end) {
+			const auto w2_begin = it;
+			const auto w2_end = next_delim(std::next(w1_end), end, '+');
+			const auto w2 = sv(w2_begin, w2_end);
+			auto parsed_w2 = parse_input_optional(w2);
 
-			const auto fallback_window = sv(itr.base(), segment_rbegin.base());
-			parsed_input = parse_input_optional(fallback_window);
+			if (parsed_w2) {
+				inputs.emplace_back(*parsed_w2);
+				if (w2_end == end)
+					break;
+				it = std::next(w2_end);
+				if (it == end)
+					return std::nullopt; // Skipping the token caused exhaustion, there is a missing segment
+				continue;
+			}
 		}
 
-		if (parsed_input)
-			inputs.emplace_back(std::move(*parsed_input));
-		else
-			// Both first and second pass failed
-			return std::nullopt;
+		auto parsed_w1 = parse_input_optional(w1);
 
-		if (itr != str.rend()) {
-			// Skip the used delimiter token
-			itr++;
-
-			if (itr == str.rend())
-				// Skipping the token caused exhaustion, there is a missing segment
-				return std::nullopt;
+		if (parsed_w1) {
+			inputs.emplace_back(*parsed_w1);
+			if (w1_end == end)
+				break;
+			it = std::next(w1_end);
+			if (it == end)
+				return std::nullopt; // Skipping the token caused exhaustion, there is a missing segment
+			continue;
 		}
+
+		return std::nullopt;
 	}
 
 	if (inputs.empty())
 		return std::nullopt;
 
-	// Reverse fill result
+	// Fill result
 	Combination result;
-	for (auto it = inputs.rbegin(); it != inputs.rend(); ++it)
-		result.add_input(*it);
+	for (auto& input : inputs)
+		result.add_input(std::move(input));
 
 	return result;
 }
