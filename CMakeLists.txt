@@ -249,7 +249,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 endif()
 wish_create_external(
 	NAME boost
-	URL https://dl.bintray.com/boostorg/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
+	URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
 	BUILD_IN_SOURCE 1
 	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
 	BUILD_COMMAND ./b2 --ignore-site-config install
