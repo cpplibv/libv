@@ -801,6 +801,10 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_sys INTERFACE
+)
+
+wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
 	GENERATE enum src/libv/ui/*.in.lua
