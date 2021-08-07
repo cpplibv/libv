@@ -10,8 +10,7 @@
 namespace libv {
 namespace meta {
 
-// -------------------------------------------------------------------------------------------------
-// is_less_comparable
+// --- is_less_comparable --------------------------------------------------------------------------
 
 template <typename L, typename R, typename = void> struct is_less_comparable : std::false_type {
 };
@@ -24,8 +23,7 @@ struct is_less_comparable<L, R, std::void_t<decltype(
 template <typename L, typename R>
 static constexpr bool is_less_comparable_v = is_less_comparable<L, R>::value;
 
-// -------------------------------------------------------------------------------------------------
-// ostreamable
+// --- ostreamable ---------------------------------------------------------------------------------
 
 template <typename L, typename R, typename = void> struct is_ostreamable : std::false_type {
 };
@@ -38,7 +36,7 @@ struct is_ostreamable<L, R, std::void_t<decltype(
 template <typename L, typename R>
 static constexpr bool is_ostreamable_v = is_ostreamable<L, R>::value;
 
-// -------------------------------------------------------------------------------------------------
+// --- is_same_as_any_v ----------------------------------------------------------------------------
 
 template <typename T, typename K, typename... Args>
 static constexpr bool is_same_as_any_v = std::is_same_v<T, K> || (std::is_same_v<T, Args> || ...);

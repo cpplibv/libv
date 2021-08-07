@@ -30,6 +30,7 @@
 #include <memory>
 #include <string>
 #include <fstream>
+#include <thread>
 // pro
 //#include <libv/update/patch_applier.hpp>
 //#include <libv/update/patch.hpp>

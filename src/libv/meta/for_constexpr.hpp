@@ -2,12 +2,11 @@
 
 #pragma once
 
+// libv
+#include <libv/meta/always.hpp>
 // std
 #include <cstddef> // consider changing size_t usage to int or T in this file
 #include <utility>
-
-// TODO P5: Take a look at boost::callable_traits for deduction into n_times or n_times_index
-// TODO P5: n_times and n_times_index can be merged based on F accepting a "size_t" or not
 
 
 namespace libv {
@@ -40,10 +39,9 @@ constexpr inline void aux_for_constexpr(F&& func, std::index_sequence<Indices...
 /// @usage for_constexpr\<0, 10>( [] (auto i) { do_work(i); } );
 template <size_t Start, size_t End, typename F>
 constexpr inline void for_constexpr(F&& func) {
-	if constexpr(Start > End)
-        static_assert(Start > End, "End has to be greater or equal to Start");
-    else
-		aux_for_constexpr<F, Start>(std::forward<F>(func), std::make_index_sequence<End - Start>{});
+	if constexpr (Start > End)
+		static_assert(libv::meta::always_false_v<F>, "End has to be greater or equal to Start");
+	aux_for_constexpr<F, Start>(std::forward<F>(func), std::make_index_sequence<End - Start>{});
 }
 
 } // namespace detail ------------------------------------------------------------------------------

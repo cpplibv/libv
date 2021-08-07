@@ -23,83 +23,83 @@
 
 namespace {
 
-size_t num_server_thread = 1;
-size_t num_client_thread = 1;
-uint16_t test_port = 1800;
+//size_t num_server_thread = 1;
+//size_t num_client_thread = 1;
+//uint16_t test_port = 1800;
+//
+//const auto msg_32 = "123456789_123456789_123456789_12";
+//const auto msg_64 = "123456789_123456789_123456789_123456789_123456789_123456789_1234";
 
-const auto msg_32 = "123456789_123456789_123456789_12";
-const auto msg_64 = "123456789_123456789_123456789_123456789_123456789_123456789_1234";
-
-template <typename Connection>
-struct TestClient {
-	Connection conn;
-
-	std::vector<std::error_code> errors{};
-	std::vector<libv::net::mtcp::Endpoint> connects{};
-	std::vector<int> disconnects{};
-	std::vector<libv::net::mtcp::Message> receives{};
-	std::vector<libv::net::mtcp::Message> sends{};
-
-	explicit TestClient(Connection&& conn) : conn(std::move(conn)) {
-		init();
-	}
-	explicit TestClient(libv::net::IOContext& context) : conn(context) {
-		init();
-	}
-	void init() {
-		conn.handle_connect([&](libv::net::mtcp::Endpoint local_endpoint, libv::net::mtcp::Endpoint remote_endpoint) {
-			(void) local_endpoint;
-
-			libv::log.info("Connected");
-			connects.emplace_back(remote_endpoint);
-		});
-		conn.handle_disconnect([&]() {
-			libv::log.info("Disconnected");
-			disconnects.emplace_back(0);
-		});
-		conn.handle_error([&](auto operation, std::error_code ec) {
-			(void) operation;
-
-			libv::log.error("Client " + libv::net::to_string(ec));
-			errors.emplace_back(ec);
-		});
-		conn.handle_receive([&](libv::net::mtcp::Message&& packet) {
-			libv::log.info("Message received with {} byte", packet.size());
-			receives.emplace_back(std::move(packet));
-		});
-		conn.handle_send([&](libv::net::mtcp::Message&& packet) {
-			libv::log.info("Message sent");
-			sends.emplace_back(std::move(packet));
-		});
-	}
-};
-
-template <typename Acceptor>
-struct TestServer {
-	using Connection = typename Acceptor::Connection;
-	Acceptor acc;
-
-	std::vector<std::error_code> errors{};
-	std::vector<TestClient<Connection>> accepts{};
-	libv::BinaryLatch on_accept;
-
-	TestServer(libv::net::IOContext& io_context) :
-		acc(io_context) {
-		acc.handle_accept([this](Connection conn) {
-			libv::log.info("Accepted");
-			accepts.emplace_back(std::move(conn));
-			accepts.back().conn.start();
-
-			on_accept.raise();
-		});
-		acc.handle_error([this](auto operation, std::error_code ec) {
-			(void) operation;
-
-			libv::log.error("Server " + libv::net::to_string(ec));
-			errors.emplace_back(ec);
-		});
-	}
-};
+//template <typename Connection>
+//struct TestClient {
+//	Connection conn;
+//
+//	std::vector<std::error_code> errors{};
+//	std::vector<libv::net::mtcp::Endpoint> connects{};
+//	std::vector<int> disconnects{};
+//	std::vector<libv::net::mtcp::Message> receives{};
+//	std::vector<libv::net::mtcp::Message> sends{};
+//
+//	explicit TestClient(Connection&& conn) : conn(std::move(conn)) {
+//		init();
+//	}
+//	explicit TestClient(libv::net::IOContext& context) : conn(context) {
+//		init();
+//	}
+//	void init() {
+//		conn.handle_connect([&](libv::net::mtcp::Endpoint local_endpoint, libv::net::mtcp::Endpoint remote_endpoint) {
+//			(void) local_endpoint;
+//
+//			libv::log.info("Connected");
+//			connects.emplace_back(remote_endpoint);
+//		});
+//		conn.handle_disconnect([&]() {
+//			libv::log.info("Disconnected");
+//			disconnects.emplace_back(0);
+//		});
+//		conn.handle_error([&](auto operation, std::error_code ec) {
+//			(void) operation;
+//
+//			libv::log.error("Client " + libv::net::to_string(ec));
+//			errors.emplace_back(ec);
+//		});
+//		conn.handle_receive([&](libv::net::mtcp::Message&& packet) {
+//			libv::log.info("Message received with {} byte", packet.size());
+//			receives.emplace_back(std::move(packet));
+//		});
+//		conn.handle_send([&](libv::net::mtcp::Message&& packet) {
+//			libv::log.info("Message sent");
+//			sends.emplace_back(std::move(packet));
+//		});
+//	}
+//};
+//
+//template <typename Acceptor>
+//struct TestServer {
+//	using Connection = typename Acceptor::Connection;
+//	Acceptor acc;
+//
+//	std::vector<std::error_code> errors{};
+//	std::vector<TestClient<Connection>> accepts{};
+//	libv::BinaryLatch on_accept;
+//
+//	TestServer(libv::net::IOContext& io_context) :
+//		acc(io_context) {
+//		acc.handle_accept([this](Connection conn) {
+//			libv::log.info("Accepted");
+//			accepts.emplace_back(std::move(conn));
+//			accepts.back().conn.start();
+//
+//			on_accept.raise();
+//		});
+//		acc.handle_error([this](auto operation, std::error_code ec) {
+//			(void) operation;
+//
+//			libv::log.error("Server " + libv::net::to_string(ec));
+//			errors.emplace_back(ec);
+//		});
+//	}
+//};
 
 } // namespace
 

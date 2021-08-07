@@ -7,10 +7,7 @@
 #include <libv/input/input.hpp>
 #include <libv/input/event.hpp>
 // std
-#include <array>
 #include <string>
-#include <variant>
-#include <vector>
 
 
 namespace libv {
@@ -23,87 +20,87 @@ class Monitor;
 struct EventContentScale {
 	libv::vec2f scale;
 
-	inline EventContentScale(float xpos, float ypos) :
+	inline EventContentScale(float xpos, float ypos) noexcept :
 		scale(xpos, ypos) { }
-	inline EventContentScale(libv::vec2f scale) :
+	explicit inline EventContentScale(libv::vec2f scale) noexcept :
 		scale(scale) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventFocus {
 	bool focused;
 
-	inline EventFocus(int focused) :
+	explicit inline EventFocus(int focused) noexcept :
 		focused(focused != 0) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventFramebufferSize {
 	libv::vec2i size;
 
-	inline EventFramebufferSize(int width, int height) :
+	inline EventFramebufferSize(int width, int height) noexcept :
 		size(width, height) { }
-	inline EventFramebufferSize(libv::vec2i size) :
+	explicit inline EventFramebufferSize(libv::vec2i size) noexcept :
 		size(size) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMaximize {
 	bool maximized;
 
-	inline EventMaximize(int maximized) :
+	explicit inline EventMaximize(int maximized) noexcept :
 		maximized(maximized != 0) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMinimize {
 	bool minimized;
 
-	inline EventMinimize(int minimized) :
+	explicit inline EventMinimize(int minimized) noexcept :
 		minimized(minimized != 0) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventMonitor {
 	const Monitor& monitor;
 	libv::input::MonitorEvent event;
 
-	inline EventMonitor(const Monitor& monitor, int event) :
+	inline EventMonitor(const Monitor& monitor, int event) noexcept :
 		monitor(monitor),
 		event{event} { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventPosition {
 	libv::vec2i position;
 
-	inline EventPosition(int x, int y) :
+	inline EventPosition(int x, int y) noexcept :
 		position(x, y) { }
-	inline EventPosition(libv::vec2i position) :
+	explicit inline EventPosition(libv::vec2i position) noexcept :
 		position(position) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventRefresh {
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventSize {
 	libv::vec2i size;
 
-	inline EventSize(int x, int y) :
+	inline EventSize(int x, int y) noexcept :
 		size(x, y) { }
-	inline EventSize(libv::vec2i size) :
+	explicit inline EventSize(libv::vec2i size) noexcept :
 		size(size) { }
 
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -111,6 +108,7 @@ struct EventSize {
 struct EventCloseRequest {
 private:
 	mutable bool abortClose = false;
+
 public:
 	void abort() const {
 		abortClose = true;
@@ -118,46 +116,22 @@ public:
 	bool isAborted() const {
 		return abortClose;
 	}
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 // -------------------------------------------------------------------------------------------------
 
 struct EventContextCreate {
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventContextUpdate {
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
 
 struct EventContextDestroy {
-	std::string toPrettyString() const;
+	[[nodiscard]] std::string toPrettyString() const;
 };
-
-// -------------------------------------------------------------------------------------------------
-
-using Event = std::variant<
-		libv::input::EventChar,
-		EventContentScale,
-		libv::input::EventDrop,
-		EventFocus,
-		EventFramebufferSize,
-		libv::input::EventKey,
-		EventMaximize,
-		EventMinimize,
-		libv::input::EventMouseButton,
-		libv::input::EventMouseEnter,
-		libv::input::EventMousePosition,
-		libv::input::EventMouseScroll,
-		libv::input::EventGamepadAnalog,
-		libv::input::EventGamepadButton,
-		libv::input::EventJoystickAnalog,
-		libv::input::EventJoystickButton,
-		EventPosition,
-		EventRefresh,
-		EventSize
->;
 
 // -------------------------------------------------------------------------------------------------
 

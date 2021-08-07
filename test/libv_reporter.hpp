@@ -256,7 +256,7 @@ private:
 //				}
 //			}
 
-			stream << fmt::format(format,
+			stream << fmt::format(fmt::runtime(format),
 //					fmt::arg("section", section),
 					fmt::arg("source", source),
 					fmt::arg("expression", result.hasExpression() ? result.getExpression() : ""),

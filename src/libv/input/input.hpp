@@ -43,11 +43,11 @@ enum class KeyModifier : int32_t {
 };
 
 [[nodiscard]] constexpr inline KeyModifier operator|(KeyModifier lhs, KeyModifier rhs) noexcept {
-	return KeyModifier{libv::to_value(lhs) | libv::to_value(rhs)};
+	return KeyModifier{libv::to_underlying(lhs) | libv::to_underlying(rhs)};
 }
 
 [[nodiscard]] constexpr inline KeyModifier operator&(KeyModifier lhs, KeyModifier rhs) noexcept {
-	return KeyModifier{libv::to_value(lhs) & libv::to_value(rhs)};
+	return KeyModifier{libv::to_underlying(lhs) & libv::to_underlying(rhs)};
 }
 
 enum class MouseButton : int32_t {

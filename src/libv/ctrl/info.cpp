@@ -4,7 +4,7 @@
 #include <libv/ctrl/info.hpp>
 // ext
 #include <fmt/format.h>
-#include <fmt/printf.h>
+#include <fmt/ostream.h>
 // libv
 #include <libv/utility/utf8.hpp>
 // std

@@ -7,6 +7,7 @@
 // ext
 #include <SOIL2/SOIL2.h>
 // std
+#include <cassert>
 #include <vector>
 
 

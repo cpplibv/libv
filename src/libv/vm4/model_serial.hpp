@@ -10,4 +10,5 @@
 #include <libv/serial/reflection.hpp>
 #include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
-#include <libv/vm4/serial/material.hpp>
+// pro
+#include <libv/vm4/material_serial.hpp>

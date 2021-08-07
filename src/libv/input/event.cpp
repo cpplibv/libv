@@ -17,11 +17,11 @@ namespace input {
 
 EventChar::EventChar(uint32_t unicode) :
 	unicode(unicode) {
-	libv::unicode_to_utf8(unicode, utf8.data());
+	libv::unicode_to_utf8(unicode, utf8);
 }
 
 std::string EventChar::toPrettyString() const {
-	return fmt::format("Char: unicode = {}, utf8 = {}", unicode, utf8.data());
+	return fmt::format("Char: unicode = {}, utf8 = {}", unicode, utf8);
 }
 
 std::string EventDrop::toPrettyString() const {

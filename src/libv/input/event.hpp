@@ -2,15 +2,14 @@
 
 #pragma once
 
+// fwd
+#include <libv/input/event_fwd.hpp>
 // libv
 #include <libv/math/vec.hpp>
 // std
-#include <array>
 #include <string>
-#include <variant>
 #include <vector>
 // pro
-#include <libv/input/event_fwd.hpp>
 #include <libv/input/input.hpp>
 
 
@@ -21,7 +20,7 @@ namespace input {
 
 struct EventChar {
 	uint32_t unicode;
-	std::array<char, 5> utf8; /// Null terminated utf8 representation of the unicode character (one to four octet + terminating zero)
+	char utf8[5]; /// Null terminated utf8 representation of the unicode character (one to four octet + terminating zero)
 
 	EventChar(uint32_t unicode);
 	[[nodiscard]] std::string toPrettyString() const;

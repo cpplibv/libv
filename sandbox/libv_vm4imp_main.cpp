@@ -12,7 +12,7 @@
 #include <fstream>
 // pro
 #include <libv/vm4/model.hpp>
-#include <libv/vm4/serial/model.hpp>
+#include <libv/vm4/model_serial.hpp>
 #include <libv/vm4imp/importer.hpp>
 #include <libv/vm4imp/log.hpp>
 

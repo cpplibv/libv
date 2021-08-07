@@ -5,6 +5,7 @@
 // ext
 #include <GLFW/glfw3.h>
 // std
+#include <cassert>
 #include <limits>
 
 

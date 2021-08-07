@@ -11,6 +11,8 @@
 #include <libv/utility/approx.hpp>
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
+// std
+#include <algorithm>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel.lpp>

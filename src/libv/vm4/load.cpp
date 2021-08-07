@@ -9,7 +9,7 @@
 // std
 #include <sstream>
 // pro
-#include <libv/vm4/serial/model.hpp>
+#include <libv/vm4/model_serial.hpp>
 
 
 namespace libv {

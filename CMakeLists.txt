@@ -396,10 +396,11 @@ wish_create_external(
 wish_create_external(
 	NAME fmt
 	GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-	GIT_TAG f468b203add3b04fb8fac473ec7a04ed64c429c1
+	GIT_TAG d6e882ed84f0db76fad69b700a73243c4aad4bd5
 	CMAKE_ARGS
 		-DFMT_DOC=OFF
 		-DFMT_TEST=OFF
+		-DBUILD_SHARED_LIBS=OFF
 	LINK fmt
 )
 
@@ -658,7 +659,7 @@ wish_create_library(
 
 wish_create_library(
 	TARGET libv_log INTERFACE
-	LINK   ext_fmt Threads::Threads
+	LINK   libv_mt ext_fmt
 )
 
 wish_create_library(
@@ -1170,7 +1171,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET test_libv_log
 	SOURCE test/libv/log/*.cpp
-	LINK   obj_test_runner
+	LINK   obj_test_runner libv_log
 )
 
 wish_create_executable(

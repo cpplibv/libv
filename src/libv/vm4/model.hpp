@@ -8,7 +8,6 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serial/enable.hpp>
 // std
-#include <chrono>
 #include <vector>
 // pro
 #include <libv/vm4/material.hpp>

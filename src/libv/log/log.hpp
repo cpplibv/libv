@@ -3,8 +3,8 @@
 #pragma once
 
 // ext
-#include <fmt/ostream.h>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 // libv
 #include <libv/mt/number.hpp>
 #include <libv/utility/observer_ref.hpp>
@@ -334,7 +334,7 @@ private:
 			const Args&... args) {
 		std::string message;
 		try {
-			message = fmt::format(isColored() ? color_args(fmt) : fmt, args...);
+			message = fmt::format(fmt::runtime(isColored() ? color_args(fmt) : fmt), args...);
 		} catch (const fmt::format_error& ex) {
 			message = fmt::format("Failed to format log message: \"{}\" reason: \"{}\" arguments:", fmt, ex.what());
 			std::ostringstream argument_ss;
@@ -356,7 +356,7 @@ private:
 		// 	std::replace(generic_file_path_tmp.begin(), generic_file_path_tmp.end(), '\\', '/');
 		// }
 
-		const auto entry = fmt::format(this->format,
+		const auto entry = fmt::format(fmt::runtime(this->format),
 				fmt::arg("message", message),
 				fmt::arg("module", module),
 				fmt::arg("severity",

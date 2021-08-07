@@ -8,6 +8,7 @@
 #include <libv/gl/gl.hpp>
 // std
 #include <optional>
+#include <thread>
 // pro
 #include <libv/glr/destroy_queue.hpp>
 #include <libv/glr/queue.hpp>
