@@ -405,6 +405,27 @@ wish_create_external(
 )
 
 wish_create_external(
+	NAME openssl
+	GIT_REPOSITORY https://github.com/openssl/openssl
+	GIT_TAG OpenSSL_1_1_1k
+
+	BUILD_IN_SOURCE 1
+	CONFIGURE_COMMAND ./config no-tests no-shared
+	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # Calling 'make' is not really nice, but I lost my patience for now
+
+	INSTALL_COMMAND
+		COMMAND mkdir -p ${PATH_EXT}/openssl/include/openssl/
+		COMMAND mkdir -p ${PATH_EXT}/openssl/lib/
+		COMMAND cp -r -f -T ${PATH_EXT_SRC}/openssl/src/get_openssl/include/openssl/ ${PATH_EXT}/openssl/include/openssl/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/openssl/src/get_openssl/libssl.a ${PATH_EXT}/openssl/lib/
+		COMMAND cp -r -f ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/
+
+#	LINK ssl
+	LINK crypto
+	LINK wsock32 ws2_32 crypt32
+)
+
+wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG f686ad46a3a9801ffa78063202250c68276330cb
@@ -1028,9 +1049,9 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET sandbox_libv_update
-	SOURCE sandbox/libv_update_main.cpp
-	LINK   libv_update libv_net libv_log
+	TARGET sandbox_libv_openssl
+	SOURCE sandbox/libv_openssl_main.cpp
+	LINK   ext_openssl
 )
 
 wish_create_executable(
@@ -1079,6 +1100,12 @@ wish_create_executable(
 	TARGET sandbox_libv_sml
 	SOURCE sandbox/libv_sml_main.cpp
 	LINK   libv_log libv_state
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_update
+	SOURCE sandbox/libv_update_main.cpp
+	LINK   libv_update libv_net libv_log
 )
 
 wish_create_executable(
