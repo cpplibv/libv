@@ -15,10 +15,11 @@
 // pro
 #include <space/command.hpp>
 #include <space/game_instance.hpp>
-#include <space/make_shader_error_overlay.hpp>
+#include <space/game_session.hpp>
+#include <space/view/make_shader_error_overlay.hpp>
 #include <space/message_control.hpp>
 #include <space/playout.hpp>
-#include <space/render.hpp>
+#include <space/canvas.hpp>
 //#include <space/network_client.hpp>
 //#include <space/network_server.hpp>
 //#include <space/user.hpp>
@@ -61,7 +62,7 @@ libv::ui::Component Scene::init_canvas_main() {
 //	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", universe, playout_delay_buffer, camera, true);
 //	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game, camera, true);
 //	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", universe, camera, true);
-	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game_session, game_session.universe, game_session.playout, camera, true);
+	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game.renderer, game_session, game_session.universe, game_session.playout, camera, true);
 //		style("space-canvas-main");
 
 //	out_canvas_main.emplace(canvas_main);

@@ -380,40 +380,96 @@
 //}
 //
 //// =================================================================================================
+//
+//#include <libv/process/lock_file.hpp>
+//#include <libv/utility/uniform_distribution.hpp>
+//#include <chrono>
+//#include <iostream>
+//#include <mutex>
+//#include <thread>
+//#include <random>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//int main(int argc, const char** argv) {
+//	if (argc < 2)
+//		return EXIT_FAILURE;
+//
+//	std::random_device rng;
+//	std::this_thread::sleep_for(libv::make_uniform_distribution_inclusive(std::chrono::milliseconds(1000))(rng));
+//
+//	libv::process::lock_file mutex(".lock");
+//	std::unique_lock lock(mutex, std::defer_lock);
+//
+//	for (int i = 0; i < 1000; i++) {
+//		if (lock.try_lock()) {
+//			break;
+//		}
+//		std::cout << argv[1] << " Waiting" << std::endl;
+//		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//	}
+//
+//	for (int i = 0; i < 10; i++) {
+//		std::cout << argv[1] << " Working" << std::endl;
+//		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//	}
+//
+//	return EXIT_SUCCESS;
+//}
+//
+//// -------------------------------------------------------------------------------------------------
 
-#include <libv/process/lock_file.hpp>
-#include <libv/utility/uniform_distribution.hpp>
-#include <chrono>
 #include <iostream>
-#include <mutex>
-#include <thread>
-#include <random>
+#include <libv/utility/hash.hpp>
+#include <libv/utility/bit_cast.hpp>
+#include <libv/math/fixed_point.hpp>
+#include <libv/utility/histogram.hpp>
 
 // -------------------------------------------------------------------------------------------------
 
-int main(int argc, const char** argv) {
-	if (argc < 2)
-		return EXIT_FAILURE;
+template <size_t N>
+struct Spectrum {
+	std::array<size_t, N> data;
 
-	std::random_device rng;
-	std::this_thread::sleep_for(libv::make_uniform_distribution_inclusive(std::chrono::milliseconds(1000))(rng));
+	float min = 0;
+	float max = 3600;
 
-	libv::process::lock_file mutex(".lock");
-	std::unique_lock lock(mutex, std::defer_lock);
-
-	for (int i = 0; i < 1000; i++) {
-		if (lock.try_lock()) {
-			break;
-		}
-		std::cout << argv[1] << " Waiting" << std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	Spectrum() {
+		data.fill(0);
 	}
 
-	for (int i = 0; i < 10; i++) {
-		std::cout << argv[1] << " Working" << std::endl;
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	void sample(float value) {
+//		data[(value - min) / ((max - min) / N)]++;
+		data[static_cast<size_t>((value - min) / ((max - min) / static_cast<float>(N)))]++;
 	}
 
+	friend std::ostream& operator<<(std::ostream& os, const Spectrum& var) {
+		for (size_t i = 0; i < N; ++i)
+			os << var.data[i] << ' ';
+		return os;
+	}
+};
+
+int main() {
+	Spectrum<1000> spectrum;
+
+	for (int32_t i = 0; i < 1000000; ++i) {
+		const auto ui = libv::bit_cast<uint32_t>(i + 1);
+		const auto hash = libv::hash_int(ui);
+		const auto f_high = ((hash & 0xFFFF0000u) >> 16u) % 3600u;
+		const auto f_low = (hash & 0x0000FFFFu);
+
+		const auto offset = static_cast<float>(f_high) + static_cast<float>(f_low) / static_cast<float>(0xFFFF);
+
+//		const auto f = libv::convert_from_16_16<float>(hash);
+//		const auto offset = std::fmod(f, 3600.0f);
+//		std::cout << i << ") Hash: " << hash << ", float: " << f << ", offset: " << offset << std::endl;
+//		std::cout << i << ") Hash: " << hash << ", offset: " << offset << std::endl;
+
+		spectrum.sample(offset);
+	}
+
+	std::cout << spectrum << std::endl;
 	return EXIT_SUCCESS;
 }
 

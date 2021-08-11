@@ -41,7 +41,7 @@ private:
 	std::unique_ptr<ImplQueue> self;
 
 public:
-	Queue();
+	Queue(Remote& remote);
 	Queue(Queue&&) noexcept;
 	~Queue();
 
@@ -59,6 +59,7 @@ public:
 
 public:
 	void callback(std::function<void(libv::gl::GL&)>);
+	libv::gl::GL& out_of_order_gl() noexcept;
 
 public:
 	inline void setClearColor(const float r, const float g, const float b, const float a) {

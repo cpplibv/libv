@@ -12,6 +12,7 @@
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/program.hpp>
+#include <libv/glr/remote.hpp>
 #include <libv/glr/state.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform_buffer.hpp>
@@ -39,14 +40,14 @@ static inline void changeState(libv::gl::GL& gl, State target) {
 	gl.frontFace.set(target.frontFaceCCW == 0 ? libv::gl::FrontFace::CW : libv::gl::FrontFace::CCW);
 	gl.cullFace.set(target.cullFace == 0 ? libv::gl::CullFace::Back : libv::gl::CullFace::Front);
 
-	std::array polygonModeTable{
+	static constexpr std::array polygonModeTable{
 			libv::gl::PolygonMode::Fill,
 			libv::gl::PolygonMode::Line,
 			libv::gl::PolygonMode::Point,
 	};
 	gl.polygonMode.set(polygonModeTable[target.polygonMode]);
 
-	std::array depthFunctionTable{
+	static constexpr std::array depthFunctionTable{
 			libv::gl::TestFunction::LEqual,
 			libv::gl::TestFunction::GEqual,
 			libv::gl::TestFunction::Less,
@@ -58,7 +59,7 @@ static inline void changeState(libv::gl::GL& gl, State target) {
 	};
 	gl.depthFunction.set(depthFunctionTable[target.depthFunction]);
 
-	std::array blendFunctionTable{
+	static constexpr std::array blendFunctionTable{
 			libv::gl::BlendFunction::ConstantAlpha,
 			libv::gl::BlendFunction::ConstantColor,
 			libv::gl::BlendFunction::DestinationAlpha,
@@ -316,6 +317,13 @@ public:
 	SequenceNumber sequenceNumber = 0;
 	State currentState{};
 
+	libv::gl::GL& gl;
+
+public:
+	ImplQueue(gl::GL& gl) :
+		gl(gl) {}
+
+public:
 	template <typename T, typename... Args>
 	inline void add(Args&&... args) {
 		tasks.emplace_back(std::in_place_type<T>, T{sequenceNumber, std::forward<Args>(args)...});
@@ -324,8 +332,8 @@ public:
 
 // =================================================================================================
 
-Queue::Queue() :
-	self(std::make_unique<ImplQueue>()) {
+Queue::Queue(Remote& remote) :
+	self(std::make_unique<ImplQueue>(remote.gl())) {
 	self->programStack.emplace();
 }
 
@@ -351,6 +359,10 @@ void Queue::callback(std::function<void(libv::gl::GL&)> func) {
 	sequencePoint();
 	self->add<QueueTaskCallback>(state.state(), std::move(func));
 	sequencePoint();
+}
+
+libv::gl::GL& Queue::out_of_order_gl() noexcept {
+	return self->gl;
 }
 
 // -------------------------------------------------------------------------------------------------

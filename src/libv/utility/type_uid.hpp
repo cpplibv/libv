@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/bit_cast.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/type_uid.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

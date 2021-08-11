@@ -56,7 +56,7 @@ public:
 
 public:
 	template <typename Hub>
-	void attach_libv_ui_hub(Hub hub);
+	void attach_libv_ui_hub(Hub&& hub);
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -69,7 +69,7 @@ inline Shader<T> ShaderLoader::load(Args&&... args) {
 // -------------------------------------------------------------------------------------------------
 
 template <typename Hub>
-void ShaderLoader::attach_libv_ui_hub(Hub hub) {
+void ShaderLoader::attach_libv_ui_hub(Hub&& hub) {
 	on_success([hub](const libv::rev::ShaderLoadSuccess& e) mutable {
 		hub.broadcast(e);
 	});

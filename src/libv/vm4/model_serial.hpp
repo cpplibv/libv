@@ -1,4 +1,4 @@
-// Project: libv.serial, File: src/libv/vm4/serial/model.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4, File: src/libv/vm4/model_serial.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

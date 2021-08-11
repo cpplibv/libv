@@ -175,7 +175,7 @@ public:
 
 public:
 	libv::mt::worker_thread worker_thread{"lua-engine-worker"};
-	libv::mt::work_heatup_cooldown load_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
+	libv::mt::work_warmup_cooldown load_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
 	libv::mt::work_cooldown run_cd{std::chrono::milliseconds{5}};
 	libv::fsw::Watcher file_watcher;
 

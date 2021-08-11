@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/world.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/universe.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
@@ -7,6 +7,8 @@
 #include <libv/ui/chrono.hpp>
 // std
 #include <vector>
+// pro
+#include <space/universe/ids.hpp>
 
 
 namespace app {
@@ -43,6 +45,7 @@ struct Fleet {
 //	};
 
 public:
+	FleetID id;
 	libv::vec3f position;
 	libv::vec3f target;
 //	libv::vec3f movement;
@@ -50,10 +53,11 @@ public:
 //	std::vector<Command> commands;
 
 public:
-	explicit Fleet(libv::vec3f position) :
+	explicit Fleet(FleetID id, libv::vec3f position) :
+		id(id),
 //		ScreenPickable(50.f, 100.f),
-			position(position),
-			target(position) {}
+		position(position),
+		target(position) {}
 
 public:
 //	void queue_command(CommandType type, libv::vec3f target) {
@@ -103,6 +107,7 @@ struct Universe {
 //	float time = 0.0f;
 //	float test_sin_time = 0.0f;
 
+	FleetID nextFleetID{0};
 	std::vector<Fleet> fleets;
 
 public:

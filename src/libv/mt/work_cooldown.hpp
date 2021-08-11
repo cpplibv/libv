@@ -70,12 +70,12 @@ private:
 	std::atomic_bool in_flight = false;
 	std::mutex cooldown_m;
 	std::chrono::steady_clock::time_point cooldown_at = std::chrono::steady_clock::time_point::min();
-	std::chrono::steady_clock::duration heatup{std::chrono::milliseconds{100}};
+	std::chrono::steady_clock::duration warmup{std::chrono::milliseconds{100}};
 	std::chrono::steady_clock::duration cooldown{std::chrono::milliseconds{100}};
 
 public:
-	inline work_heatup_cooldown(std::chrono::steady_clock::duration heatup, std::chrono::steady_clock::duration cooldown) noexcept :
-		heatup(heatup),
+	inline work_warmup_cooldown(std::chrono::steady_clock::duration warmup, std::chrono::steady_clock::duration cooldown) noexcept :
+		warmup(warmup),
 		cooldown(cooldown) {}
 
 public:

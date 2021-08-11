@@ -29,6 +29,12 @@ inline T convert_from_s24_8(uint32_t value) {
 	return tmp;
 }
 
+template <typename T>
+inline T convert_from_16_16(uint32_t value) {
+	return static_cast<T>((value & 0xFFFF0000) >> 16) +
+		static_cast<T>((value & 0x0000FFFF) >> 0) * (T{1} / 0xFFFF);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace libv

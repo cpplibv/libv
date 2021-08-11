@@ -1,5 +1,7 @@
 // Project: libv, File: app/space/make_shader_error_overlay.cpp, Author: Császár Mátyás [Vader]
 
+// hpp
+#include <space/view/make_shader_error_overlay.hpp>
 // ext
 #include <fmt/chrono.h>
 #include <fmt/format.h>

@@ -26,7 +26,6 @@
 // TODO P1: kill these ones, aka implement 'pass' / 'program' uniform block (requires glr shared block allocation)
 inline float global_time = 0.0f;
 inline int32_t global_test_mode = 0;
-inline libv::rev::ShaderLoader shader_manager("shader/");
 
 // =================================================================================================
 
@@ -165,16 +164,23 @@ using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 
 // =================================================================================================
 
+struct RendererResourceContext {
+	libv::rev::ShaderLoader shader_manager{"shader/"};
+	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+};
+
+// -------------------------------------------------------------------------------------------------
+
 struct RendererEditorBackground {
 	libv::glr::Mesh mesh_background{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
-	ShaderEditorBackground shader{shader_manager, "editor_background.vs", "editor_background.fs"};
+	ShaderEditorBackground shader;
 	libv::glr::Texture2D::R8_G8_B8 background_texture_pattern;
 
 	static constexpr libv::vec2i noise_size = {128, 128};
 
-	RendererEditorBackground();
-
+public:
+	explicit RendererEditorBackground(RendererResourceContext& rctx);
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
 };
 
@@ -186,10 +192,10 @@ struct RendererCommandArrow {
 
 	std::vector<ArrowData> arrows;
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StreamDraw};
-	ShaderCommandArrow shader_arrow{shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"};
+	ShaderCommandArrow shader;
 
 public:
-	RendererCommandArrow();
+	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
 	void add_arrow(libv::vec3f source, libv::vec3f target);
@@ -201,69 +207,50 @@ public:
 
 struct RendererGizmo {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader{shader_manager, "editor_gizmo.vs", "editor_gizmo.fs"};
+	ShaderTestMode shader;
 
 public:
-	RendererGizmo();
+	explicit RendererGizmo(RendererResourceContext& rctx);
 
-	void draw_gizmo_lines(libv::glr::Mesh& mesh);
+	void build_gizmo_lines(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererEditorGrid {
 	libv::glr::Mesh mesh_grid{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderTestMode shader{shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs"};
+	ShaderTestMode shader;
 
 public:
-	RendererEditorGrid();
+	explicit RendererEditorGrid(RendererResourceContext& rctx);
 
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererFleet {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderColor shader{shader_manager, "flat.vs", "flat.fs"};
+	ShaderColor shader;
 
 public:
-	RendererFleet();
+	explicit RendererFleet(RendererResourceContext& rctx);
 
-	void draw_mesh(libv::glr::Mesh& mesh);
+	void build_mesh(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct SpaceCanvas : libv::ui::CanvasBase {
-	bool main_canvas;
-	GameSession& game_session;
-	Universe& universe;
-	Playout& playout;
-//	SpaceSession& session;
-//	PlayoutDelayBuffer& playout_delay_buffer;
-	CameraPlayer& camera;
-	CameraPlayer::screen_picker screen_picker;
+struct Renderer {
+	RendererResourceContext resource_context;
 
-	float angle = 0.0f;
-	float time = 0.0f;
-	float test_sin_time = 0.0f;
-
-	RendererEditorBackground rendererEditorBackground;
-	RendererEditorGrid rendererGrid;
-	RendererGizmo rendererGizmo;
-	RendererCommandArrow rendererArrow;
-	RendererFleet rendererFleet;
-
-	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+	RendererEditorBackground editorBackground{resource_context};
+	RendererEditorGrid editorGrid{resource_context};
+	RendererGizmo gizmo{resource_context};
+	RendererCommandArrow arrow{resource_context};
+	RendererFleet fleet{resource_context};
 
 public:
-//	explicit SpaceCanvas(Universe& universe, SpaceSession& session, PlayoutDelayBuffer& playout_delay_buffer, CameraPlayer& camera, bool main_canvas);
-//	explicit SpaceCanvas(Universe& universe, PlayoutDelayBuffer& playout_delay_buffer, CameraPlayer& camera, bool main_canvas);
-//	explicit SpaceCanvas(GameInstance& game, app::CameraPlayer& camera, bool main_canvas);
-
-	SpaceCanvas(GameSession& game_session, Universe& universe, Playout& playout, CameraPlayer& camera, bool main_canvas);
-
-	virtual void update(libv::ui::time_duration delta_time) override;
-	virtual void render(libv::glr::Queue& gl) override;
+	explicit Renderer(libv::ui::UI& ui);
+	void prepare_for_render(libv::glr::Queue& gl);
 };
 
 // -------------------------------------------------------------------------------------------------

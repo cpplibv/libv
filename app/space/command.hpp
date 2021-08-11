@@ -8,32 +8,15 @@
 #include <libv/meta/reflection_access.hpp>
 #include <libv/serial/enable.hpp>
 #include <libv/serial/types/std_string.hpp>
-#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 #include <string>
 //#include <vector>
+// pro
+#include <space/universe/ids.hpp>
 
 
 namespace app {
-
-// -------------------------------------------------------------------------------------------------
-
-enum class FrameIndex : int64_t {};
-enum class Timestamp : int64_t {};
-
-enum class PlayerID : int32_t {};
-
-enum class FactionID : int32_t {};
-enum class FleetID : int32_t {};
-
-[[nodiscard]] constexpr inline auto operator+(FrameIndex e) noexcept { return libv::to_underlying(e); }
-[[nodiscard]] constexpr inline auto operator+(Timestamp e) noexcept { return libv::to_underlying(e); }
-
-[[nodiscard]] constexpr inline auto operator+(PlayerID e) noexcept { return libv::to_underlying(e); }
-
-[[nodiscard]] constexpr inline auto operator+(FactionID e) noexcept { return libv::to_underlying(e); }
-[[nodiscard]] constexpr inline auto operator+(FleetID e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
 
@@ -106,9 +89,18 @@ struct CommandFleetMove : CommandState {
 };
 
 struct CommandClearFleets : CommandState {
+	LIBV_REFLECTION_EMPTY();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct CommandShuffle : CommandState {
+	uint64_t seed;
+
+	LIBV_REFLECTION_ACCESS(seed);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+	explicit constexpr inline CommandShuffle(uint64_t seed) noexcept :
+		seed(seed) {}
 };
 
 // -------------------------------------------------------------------------------------------------

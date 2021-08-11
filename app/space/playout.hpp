@@ -17,91 +17,8 @@
 #include <space/command.hpp>
 #include <space/log.hpp>
 #include <space/session.hpp>
-#include <space/universe.hpp>
+#include <space/universe/universe.hpp>
 
-
-//// =================================================================================================
-//// =================================================================================================
-//// =================================================================================================
-//
-//template <typename CRTP>
-//struct NewCodec {
-//	template <typename Handler>
-//	struct DecodeHandleAccessType {
-//		template <typename T, size_t N>
-//		using result_type = std::array<T, N>;
-//
-//		template <uint8_t Index, typename Object>
-//		auto entry() {
-//			return +[](void* handler, void* object) {
-//				static_cast<Handler*>(handler)->receive(*static_cast<Object*>(object));
-//			};
-//		}
-//	};
-//
-//	template <typename Handler>
-//	void decode_handle(Handler&& handler) {
-//		// IDEA: Instantiate a access_types with decode_handle(); so the handler type is not burned into the Codec type
-//		//			This could even be a bases for a state machine
-//
-//		static constexpr DecodeHandleAccessType<Handler> access;
-//		static constexpr auto dispatch_table = CRTP::access_types(access);
-//
-//		dispatch(handler, dispatch_table);
-////		dispatch_table[]
-////		handler(types());
-//	}
-//};
-//
-//struct CommandCodec : NewCodec<CommandCodec> {
-//	template <typename Access>
-//	static constexpr inline auto access_types(Access& access) {
-//		return Access::result_type{
-//				access.template entry<10, app::CommandChatMessage>(),
-//
-//				access.template entry<20, app::CommandFleetSpawn>(),
-//				access.template entry<21, app::CommandFleetMove>(),
-//				access.template entry<22, app::CommandClearFleets>(),
-//
-//				access.template entry<30, app::CommandTrackView>(),
-//				access.template entry<31, app::CommandCameraWarpTo>()
-//				//		access.template entry<32, app::CommandCameraMovement>(),
-//				//		access.template entry<33, app::CommandMouseMovement>(),
-//		};
-//	}
-//};
-//
-//// =================================================================================================
-//// =================================================================================================
-//// =================================================================================================
-//
-//template <typename CRTP>
-//struct NewCodec2 {
-//	struct Registry {
-//		NewCodec2& owner;
-//	};
-//};
-//
-//struct CommandCodec2 : NewCodec2<CommandCodec2> {
-//	static void register_types(Registry& registry) {
-//		registry.entry<10, app::CommandChatMessage>([](CommandCodec2& c, app::CommandChatMessage& m) {
-//			c.session.message(m);
-//		});
-//
-//		registry.entry<20, app::CommandFleetSpawn>();
-//		registry.entry<21, app::CommandFleetMove>();
-//		registry.entry<22, app::CommandClearFleets>();
-//
-//		registry.entry<30, app::CommandTrackView>();
-//		registry.entry<31, app::CommandCameraWarpTo>();
-//		registry.entry<32, app::CommandCameraMovement>();
-//		registry.entry<33, app::CommandMouseMovement>();
-//	}
-//};
-//
-//// =================================================================================================
-//// =================================================================================================
-//// =================================================================================================
 
 namespace app {
 
@@ -113,24 +30,6 @@ namespace app {
 // delta update
 // playout delay buffer
 // adaptive playout delay
-
-// =================================================================================================
-
-struct msg_pdb {
-	template <typename Codec>
-	static constexpr inline void message_types(Codec& codec) {
-		codec.template register_type<10, CommandChatMessage>();
-
-		codec.template register_type<10, CommandFleetSpawn>();
-		codec.template register_type<11, CommandFleetMove>();
-		codec.template register_type<12, CommandClearFleets>();
-
-		codec.template register_type<30, CommandTrackView>();
-		codec.template register_type<31, CommandCameraWarpTo>();
-//		codec.template register_type<32, CommandCameraMovement>();
-//		codec.template register_type<33, CommandMouseMovement>();
-	}
-};
 
 // =================================================================================================
 
@@ -230,7 +129,9 @@ inline void apply(Universe& universe, SpaceSession& session, CommandFleetSpawn& 
 
 	// Permission check
 	// Bound check
-	universe.fleets.emplace_back(command.position);
+	universe.fleets.emplace_back(universe.nextFleetID, command.position);
+	// !!! Synchronized FleetID generation
+	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
 }
 
 inline void apply(Universe& universe, SpaceSession& session, CommandClearFleets& command) {
@@ -251,10 +152,9 @@ inline void apply(Universe& universe, SpaceSession& session, CommandShuffle& com
 
 	auto positions = std::vector<libv::vec3f>{};
 	for (const auto& fleet : universe.fleets)
-		positions.emplace_back(fleet.position);
+		positions.emplace_back(fleet.target);
 
-	auto seed = std::random_device{}();
-	auto rng = std::mt19937_64{seed};
+	auto rng = std::mt19937_64{command.seed};
 
 	std::ranges::shuffle(positions, rng);
 
@@ -284,4 +184,113 @@ inline void apply(Universe& universe, SpaceSession& session, CommandCameraWarpTo
 
 // -------------------------------------------------------------------------------------------------
 
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
+struct msg_pdb {
+	template <typename Codec>
+	static constexpr inline void message_types(Codec& codec) {
+		codec.template register_type<10, CommandChatMessage>();
+
+		codec.template register_type<10, CommandFleetSpawn>();
+		codec.template register_type<11, CommandFleetMove>();
+		codec.template register_type<12, CommandClearFleets>();
+
+		codec.template register_type<30, CommandTrackView>();
+		codec.template register_type<31, CommandCameraWarpTo>();
+		//		codec.template register_type<32, CommandCameraMovement>();
+		//		codec.template register_type<33, CommandMouseMovement>();
+	}
+};
+
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
 } // namespace app
+
+
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================
+//
+//template <typename CRTP>
+//struct NewCodec {
+//	template <typename Handler>
+//	struct DecodeHandleAccessType {
+//		template <typename T, size_t N>
+//		using result_type = std::array<T, N>;
+//
+//		template <uint8_t Index, typename Object>
+//		auto entry() {
+//			return +[](void* handler, void* object) {
+//				static_cast<Handler*>(handler)->receive(*static_cast<Object*>(object));
+//			};
+//		}
+//	};
+//
+//	template <typename Handler>
+//	void decode_handle(Handler&& handler) {
+//		// IDEA: Instantiate a access_types with decode_handle(); so the handler type is not burned into the Codec type
+//		//			This could even be a bases for a state machine
+//
+//		static constexpr DecodeHandleAccessType<Handler> access;
+//		static constexpr auto dispatch_table = CRTP::access_types(access);
+//
+//		dispatch(handler, dispatch_table);
+////		dispatch_table[]
+////		handler(types());
+//	}
+//};
+//
+//struct CommandCodec : NewCodec<CommandCodec> {
+//	template <typename Access>
+//	static constexpr inline auto access_types(Access& access) {
+//		return Access::result_type{
+//				access.template entry<10, app::CommandChatMessage>(),
+//
+//				access.template entry<20, app::CommandFleetSpawn>(),
+//				access.template entry<21, app::CommandFleetMove>(),
+//				access.template entry<22, app::CommandClearFleets>(),
+//
+//				access.template entry<30, app::CommandTrackView>(),
+//				access.template entry<31, app::CommandCameraWarpTo>()
+//				//		access.template entry<32, app::CommandCameraMovement>(),
+//				//		access.template entry<33, app::CommandMouseMovement>(),
+//		};
+//	}
+//};
+//
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================
+//
+//template <typename CRTP>
+//struct NewCodec2 {
+//	struct Registry {
+//		NewCodec2& owner;
+//	};
+//};
+//
+//struct CommandCodec2 : NewCodec2<CommandCodec2> {
+//	static void register_types(Registry& registry) {
+//		registry.entry<10, app::CommandChatMessage>([](CommandCodec2& c, app::CommandChatMessage& m) {
+//			c.session.message(m);
+//		});
+//
+//		registry.entry<20, app::CommandFleetSpawn>();
+//		registry.entry<21, app::CommandFleetMove>();
+//		registry.entry<22, app::CommandClearFleets>();
+//
+//		registry.entry<30, app::CommandTrackView>();
+//		registry.entry<31, app::CommandCameraWarpTo>();
+//		registry.entry<32, app::CommandCameraMovement>();
+//		registry.entry<33, app::CommandMouseMovement>();
+//	}
+//};
+//
+//// =================================================================================================
+//// =================================================================================================
+//// =================================================================================================

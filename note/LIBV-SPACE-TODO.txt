@@ -16,6 +16,7 @@ app.space: Screen picker integration - Place something onto the 3D world on mous
 app.space: Fleet that moves (without any arrow)
 app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 app.space: Sim state manipulation only with commands
+app.space: Fleet with arrow and movement toward target (primitive)
 
 
 
@@ -143,10 +144,18 @@ GameInstance (an object spawned when you launch the application and that remains
 
 
 
+architecture: 'MSSVC'
+	- Model
+	- Simulation
+	- Syncronization
+	- View
+	- Control
+
 
 
 
 app.space: Structure the whole program: UML time is upon us
+app.space: Pause, Unpause (It will be a good practise for timers and controls)
 
 app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
 app.space: Mini canvas show other clients view
@@ -155,8 +164,6 @@ app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, 
 app.space: Cannibalize style.lua from vm4_viewer
 
 app.space: Self-Updater
-
-app.space: Fleet with arrow and movement toward target (primitive)
 
 app.space: frustum visualization
 app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
@@ -174,13 +181,17 @@ app.space: Iris and space has to merge in some way
 app.space: line shader
 
 
+app.space: Command arrow improvements
+	app.space: Add support for command arrow animation offset
+	app.space: Add support for command arrow 'intent' (color) specification
+	app.space: Add support for chained command arrows
+	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
+	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
+	app.space: Revive original arrow spiral
+	app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
 
-architecture: 'MSSVC'
-	- Model
-	- Simulation
-	- Syncronization
-	- View
-	- Control
+	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
+
 
 game.sim:
 		- Command based sim state manipulation

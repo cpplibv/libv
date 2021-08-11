@@ -40,7 +40,7 @@ Remote::~Remote() {
 }
 
 Queue Remote::queue() {
-	return {};
+	return Queue{*this};
 }
 
 void Remote::queue(Queue&& queue) {

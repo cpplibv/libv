@@ -709,6 +709,15 @@ void Controls::_remove_feature(libv::type_uid context, std::string_view name) {
 	}
 }
 
+void Controls::aux_update(duration delta_time) {
+	// Update SOW
+	self->input_time += delta_time;
+
+	// Process event
+	const auto scale = self->scale_time;
+	self->process_time(delta_time, scale);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 binding_outcome Controls::bind(std::string feature_name, Sequence seq, binding_level level) {
@@ -990,16 +999,23 @@ void Controls::event(const libv::input::EventJoystickButton& event) {
 // -------------------------------------------------------------------------------------------------
 
 void Controls::update(const duration delta_time) {
+	self->last_update_timer.reset();
+
 	if (self->ignore_events)
 		return;
 
-	// Update SOW
-	self->input_time += delta_time;
-
-	// Process event
-	const auto scale = self->scale_time;
-	self->process_time(delta_time, scale);
+	aux_update(delta_time);
 }
+
+void Controls::update_since_last_update() {
+	if (self->ignore_events) {
+		self->last_update_timer.reset();
+		return;
+	}
+
+	aux_update(self->last_update_timer.time());
+}
+
 
 // -------------------------------------------------------------------------------------------------
 

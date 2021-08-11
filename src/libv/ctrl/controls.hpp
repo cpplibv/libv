@@ -76,6 +76,8 @@ private:
 
 	void _remove_feature(libv::type_uid context, std::string_view name);
 
+	void aux_update(duration delta_time);
+
 public:
 	template <typename T>
 	inline void context_enter(T* context);
@@ -134,6 +136,7 @@ public:
 	void event(const libv::input::EventJoystickAnalog& event);
 
 	void update(duration delta_time);
+	void update_since_last_update();
 
 public:
 	/// Sets the sequence timeout period, after a valid sequence step will abort and resets to its start state
@@ -261,6 +264,10 @@ void Controls::attach(Frame& frame) {
 	});
 	frame.onJoystickButton.output([this](const auto& e) {
 		this->event(e);
+	});
+
+	frame.onContextUpdate.output([this](const auto&) {
+		this->update_since_last_update();
 	});
 
 	// TODO P5: libv.ctrl: Joystick/Gamepad support: Might need to observe Connect-Disconnect events

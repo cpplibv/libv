@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/canvas.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/carry.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

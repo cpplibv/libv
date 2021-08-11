@@ -12,6 +12,8 @@ class CameraPlayer;
 class GameInstance;
 class GameSession;
 
+class Renderer;
+
 class Player;
 class Universe;
 

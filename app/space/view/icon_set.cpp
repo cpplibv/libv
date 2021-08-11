@@ -1,7 +1,9 @@
 // Project: libv, File: app/space/icon_set.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <space/icon_set.hpp>
+#include <space/view/icon_set.hpp>
+// libv
+#include <libv/math/vec.hpp>
 
 
 namespace app {

@@ -1,29 +1,33 @@
 // Project: libv, File: app/space/render.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <space/render.hpp>
+#include <space/renderer.hpp>
 // libv
-#include <libv/algo/adjacent_pairs.hpp>
-#include <libv/ctrl/controls.hpp>
-#include <libv/ctrl/feature_register.hpp>
+#include <libv/ui/ui.hpp>
+#include <libv/ui/event_hub.hpp>
+//#include <libv/algo/adjacent_pairs.hpp>
+//#include <libv/ctrl/controls.hpp>
+//#include <libv/ctrl/feature_register.hpp>
 #include <libv/glr/procedural/sphere.hpp>
-#include <libv/glr/program.hpp>
+//#include <libv/glr/program.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/noise/white.hpp>
 //#include <libv/glr/texture.hpp>
 // pro
-#include <space/camera.hpp>
-#include <space/command.hpp>
-#include <space/game_instance.hpp>
-#include <space/playout.hpp>
-#include <space/universe.hpp>
+//#include <space/camera.hpp>
+//#include <space/command.hpp>
+//#include <space/game_instance.hpp>
+//#include <space/playout.hpp>
+//#include <space/universe/universe.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-RendererEditorBackground::RendererEditorBackground() {
+RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx) :
+	shader(rctx.shader_manager, "editor_background.vs", "editor_background.fs") {
+
 	// TODO P1: Switch to blue noise once implemented
 	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
 	const auto tex_data = libv::noise_white_2D_3uc(0x5EED, noise_size.x, noise_size.y);
@@ -60,23 +64,24 @@ void RendererEditorBackground::render(libv::glr::Queue& gl, libv::vec2f canvas_s
 
 // -------------------------------------------------------------------------------------------------
 
-RendererCommandArrow::RendererCommandArrow() {
-//	std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
-//	for (int i = 0; i < 60; i++) {
-//		const auto r = i / 30.0;
-//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-//		points.emplace_back(x, y, 0);
-//	}
-//	for (int i = 60; i < 120; i++) {
-//		const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
-//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-//		const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
-//		points.emplace_back(x, y, z);
-//	}
-//
-//	build_mesh(mesh, points);
+RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
+	shader{rctx.shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
+	//	std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
+	//	for (int i = 0; i < 60; i++) {
+	//		const auto r = i / 30.0;
+	//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+	//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+	//		points.emplace_back(x, y, 0);
+	//	}
+	//	for (int i = 60; i < 120; i++) {
+	//		const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
+	//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
+	//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
+	//		const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
+	//		points.emplace_back(x, y, z);
+	//	}
+	//
+	//	build_mesh(mesh, points);
 }
 
 void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target) {
@@ -159,22 +164,23 @@ void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size,
 	uniforms[layout_matrices.matP] = gl.projection;
 	uniforms[layout_matrices.eye] = gl.eye();
 
-	gl.program(shader_arrow.program());
+	gl.program(shader.program());
 	gl.uniform(std::move(uniforms));
-	gl.uniform(shader_arrow.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
-	gl.uniform(shader_arrow.uniform().render_resolution, canvas_size);
-	gl.uniform(shader_arrow.uniform().test_mode, global_test_mode);
-	gl.uniform(shader_arrow.uniform().time, global_time);
+	gl.uniform(shader.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+	gl.uniform(shader.uniform().render_resolution, canvas_size);
+	gl.uniform(shader.uniform().test_mode, global_test_mode);
+	gl.uniform(shader.uniform().time, global_time);
 	gl.render(mesh);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-RendererGizmo::RendererGizmo() {
-	draw_gizmo_lines(mesh);
+RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
+	shader(rctx.shader_manager, "editor_gizmo.vs", "editor_gizmo.fs") {
+	build_gizmo_lines(mesh);
 }
 
-void RendererGizmo::draw_gizmo_lines(libv::glr::Mesh& mesh) {
+void RendererGizmo::build_gizmo_lines(libv::glr::Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
@@ -212,7 +218,9 @@ void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 
 // -------------------------------------------------------------------------------------------------
 
-RendererEditorGrid::RendererEditorGrid() {
+RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
+	shader(rctx.shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+
 	{
 		auto position = mesh_grid.attribute(attribute_position);
 		auto index = mesh_grid.index();
@@ -241,18 +249,19 @@ void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& 
 
 // -------------------------------------------------------------------------------------------------
 
-RendererFleet::RendererFleet() {
-	draw_mesh(mesh);
+RendererFleet::RendererFleet(RendererResourceContext& rctx) :
+	shader(rctx.shader_manager, "flat.vs", "flat.fs") {
+	build_mesh(mesh);
 }
 
-void RendererFleet::draw_mesh(libv::glr::Mesh& mesh) {
+void RendererFleet::build_mesh(libv::glr::Mesh& mesh) {
 	auto position = mesh.attribute(attribute_position);
 	auto normal = mesh.attribute(attribute_normal);
 	auto texture0 = mesh.attribute(attribute_texture0);
 	auto index = mesh.index();
 
 	libv::glr::generateSpherifiedCube(8, position, normal, texture0, index);
-//		libv::glr::generateCube(position, normal, texture0, index);
+	//		libv::glr::generateCube(position, normal, texture0, index);
 }
 
 void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
@@ -270,166 +279,15 @@ void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 
 // -------------------------------------------------------------------------------------------------
 
-//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
-//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
-//SpaceCanvas::SpaceCanvas(GameInstance& game, app::CameraPlayer& camera, bool main_canvas) :
-SpaceCanvas::SpaceCanvas(GameSession& game_session, app::Universe& universe, Playout& playout, app::CameraPlayer& camera, bool main_canvas) :
-		main_canvas(main_canvas),
-		game_session(game_session),
-//		universe(game.game_session->universe),
-		universe(universe),
-//		session(session),
-		playout(playout),
-//		playout_delay_buffer(playout_delay_buffer),
-//		playout_delay_buffer(game.game_session->playout.buffer),
-		camera(camera),
-		screen_picker(camera.picker({100, 100})) {
-	// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
-	//			Component shall not receive any event before onLayout gets called
+Renderer::Renderer(libv::ui::UI& ui) {
+	resource_context.shader_manager.attach_libv_ui_hub(ui.event_hub());
 }
 
-void SpaceCanvas::update(libv::ui::time_duration delta_time) {
-	const auto dtf = static_cast<float>(delta_time.count());
-	angle = std::fmod(angle + 5.0f * dtf, 360.0f);
-	time += dtf;
-	global_time += dtf;
-
-	// TODO P2: Value tracking UI component for debugging
-//		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
-//		value_tracker(160);
-//		value_tracker.pause();
-//		value_tracker.resume();
-//		value_tracker("camera.orbit_point", camera.orbit_point());
-//		value_tracker("camera.orbit_distance", camera.orbit_distance());
-//		value_tracker("camera.rotations", camera.rotations());
-//		value_tracker.differential("camera.orbit_point", camera.orbit_point());
-//		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-//		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-
-	if (global_test_mode != 0) {
-		test_sin_time += dtf;
-		auto t = (std::sin(test_sin_time / 10.f) * 0.5f + 0.5f);
-		if (global_test_mode == 1) {
-			camera.pitch(-t * libv::pi_f * 0.5f);
-		} else if (global_test_mode == 2) {
-			t = t > 0.5f ? 1.f - t : t;
-			camera.pitch(-t * libv::pi_f * 0.5f);
-		} else if (global_test_mode == 3) {
-			const float part = 4;
-			auto t = (std::sin(test_sin_time / 10.f * part) * 0.5f + 0.5f);
-			t = t > 0.5f ? 1.f - t : t;
-			camera.pitch(-t * libv::pi_f * 0.5f / part);
-		}
-	}
-
-	if (main_canvas)
-		// <<<
-		game_session.update(delta_time);
-}
-
-void SpaceCanvas::render(libv::glr::Queue& gl) {
-	// NOTE: Screen_picker update has to be placed around render, as canvas_size is only set after layout
-	screen_picker = camera.picker(canvas_size);
-	//
-
-	const auto s_guard = gl.state.push_guard();
-
-	gl.state.enableDepthTest();
-	gl.state.depthFunctionLess();
-	gl.state.enableDepthMask();
-
-	gl.state.enableBlend();
-	gl.state.blendSrc_SourceAlpha();
-	gl.state.blendDst_One_Minus_SourceAlpha();
-
-	gl.state.cullBackFace();
-	gl.state.enableCullFace();
-	gl.state.frontFaceCCW();
-
-	gl.state.clipPlanes(0);
-	gl.state.polygonModeFill();
-
-	gl.projection = camera.projection(canvas_size);
-	gl.view = camera.view();
-	gl.model = libv::mat4f::identity();
-
-	// --- Render RendererEditorBackground/Sky ---
-
-	if (!main_canvas) {
-		const auto s2_guard = gl.state.push_guard();
-		// Clear the depth data for the background of the mini display
-		gl.state.depthFunctionAlways();
-		rendererEditorBackground.render(gl, canvas_size);
-	}
-
-	// --- Render Opaque ---
-
-	for (const auto& fleet : universe.fleets) {
-		const auto m_guard = gl.model.push_guard();
-		gl.model.translate(fleet.position);
-		gl.model.scale(0.2f);
-		rendererFleet.render(gl, uniform_stream);
-	}
-
-	// --- Render EditorBackground/Sky ---
-
-	if (main_canvas) {
-		const auto s2_guard = gl.state.push_guard();
-		// No need to write depth data for the main background
-		gl.state.disableDepthMask();
-		rendererEditorBackground.render(gl, canvas_size);
-	}
-
-	// --- Render Transparent ---
-
-	for (const auto& fleet : universe.fleets)
-		rendererArrow.add_arrow(fleet.position, fleet.target);
-
-	rendererArrow.render(gl, canvas_size, uniform_stream);
-
-	// --- Render UI/HUD ---
-
-	{
-		{ // Grid
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthMask();
-
-			rendererGrid.render(gl, uniform_stream);
-		}
-
-		{ // Camera orbit point
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthMask();
-
-			const auto m_guard = gl.model.push_guard();
-			gl.model.translate(camera.orbit_point());
-			gl.model.scale(0.2f);
-			rendererGizmo.render(gl, uniform_stream);
-		}
-
-		{ // Camera orientation gizmo in top right
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthTest();
-			gl.state.disableDepthMask();
-
-			const auto p_guard = gl.projection.push_guard();
-			const auto v_guard = gl.view.push_guard();
-			const auto m_guard = gl.model.push_guard();
-
-			const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
-			const auto orientation_gizmo_margin = 4.f;
-
-			gl.projection = libv::mat4f::ortho(
-					-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
-					canvas_size,
-					-orientation_gizmo_size,
-					+orientation_gizmo_size);
-			gl.view = camera.orientation().translate(-1, 0, 0);
-			gl.model.scale(orientation_gizmo_size * 0.5f);
-
-			rendererGizmo.render(gl, uniform_stream);
-		}
-	}
+void Renderer::prepare_for_render(libv::glr::Queue& gl) {
+	// shader_manager.update MUST run before any other render queue operation
+	// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
+	// | So this is a better place than before, still not the best, When UI gets rev updates in the future maybe there will be better solutions
+	resource_context.shader_manager.update(gl.out_of_order_gl());
 }
 
 // -------------------------------------------------------------------------------------------------

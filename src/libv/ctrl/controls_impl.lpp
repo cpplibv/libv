@@ -5,6 +5,8 @@
 // ext
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
+// libv
+#include <libv/utility/timer.hpp>
 // std
 #include <unordered_map>
 #include <vector>
@@ -101,6 +103,7 @@ public:	// --- Settings ---
 	scale_type_2D scale_joystick_analog = {1, 1};
 
 public:	// --- Misc ---
+	libv::Timer last_update_timer;
 	bool ignore_events = false;
 
 public:	// --- SOW ---

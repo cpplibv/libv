@@ -10,7 +10,7 @@
 #include <space/command.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>
-#include <space/render.hpp>
+#include <space/canvas.hpp>
 
 
 namespace app {

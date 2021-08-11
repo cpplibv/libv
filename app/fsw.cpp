@@ -59,7 +59,7 @@ int main(int argc, const char** argv) {
 	cmd = argv[2];
 
 	libv::mt::worker_thread worker_thread;
-	libv::mt::work_heatup_cooldown work_ht_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
+	libv::mt::work_warmup_cooldown work_ht_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
 
 	libv::fsw::Watcher watcher;
 

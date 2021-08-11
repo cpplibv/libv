@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_openssl_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.security, File: sandbox/libv_security_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
 #include <libv/security/rsa_signature.hpp>
@@ -10,7 +10,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-// This is an unsecure random 2048 key pair (shared with the public) and used only for development/testing
+// This is an unsecure (exposed in a public repo) 2048 key pair and used only for development/testing
 std::string private_key_2048 = R"(-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEApI+E+YKZZP2Tq5puLUYaCXcC/Axwdn0dNloJVqEKkIdh/GAV
 6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNRa42qZMa25W1FNMB3rzGJu9/gktwO
@@ -39,7 +39,7 @@ sNETHmx4NeitreNKMsmEsyFIjXB0rGp5oIV4uEzx4E+I2qZ8WsP2lmj84zaMU357
 NT2SR86+yteOyq6t76h7fnTbnc+jHzsv4ufxDWBTKv4NZw0Esw/7zEk=
 -----END RSA PRIVATE KEY-----)";
 
-// This is an unsecure random 2048 key pair (shared with the public) and used only for development/testing
+// This is an unsecure (exposed in a public repo) 2048 key pair and used only for development/testing
 std::string public_key_2048 = R"(-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI+E+YKZZP2Tq5puLUYa
 CXcC/Axwdn0dNloJVqEKkIdh/GAV6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNR
@@ -50,7 +50,7 @@ EhJeKwUc/CLyTo7nSx9bm3SCn8TtppHJXoWDFJGjRhW2vuTXuFKjOZSiqd5wSzd+
 qwIDAQAB
 -----END PUBLIC KEY-----)";
 
-// This is an unsecure random 4096 key pair (shared with the public) and used only for development/testing
+// This is an unsecure (exposed in a public repo) 4096 key pair and used only for development/testing
 std::string private_key_4096 = R"(-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAxNuKgIjZVsbZxflW0T6zGFye8zNuNSlBSTvBlTwT8JOp6qb3
 L8h2mML5Ju3fnjsGs99SCtSdSvIGYqitegCgH0pT5j3Uu4lUWLp+mLFoFCg+PIvQ
@@ -103,7 +103,7 @@ u9EBgKX09lxfXtJ/l5+T7M9vKCD16hajzXuligavarDmNWtJSqdGYrb1fNyEpg6E
 HOak2h8QkKjkOfTSpC4vACKy0fIiAaCqB5lNmspwgOO7nfCMvPaBfPtmOx8=
 -----END RSA PRIVATE KEY-----)";
 
-// This is an unsecure random 4096 key pair (shared with the public) and used only for development/testing
+// This is an unsecure (exposed in a public repo) 4096 key pair and used only for development/testing
 std::string public_key_4096 = R"(-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxNuKgIjZVsbZxflW0T6z
 GFye8zNuNSlBSTvBlTwT8JOp6qb3L8h2mML5Ju3fnjsGs99SCtSdSvIGYqitegCg
@@ -136,7 +136,7 @@ int main() {
 
 	const auto signature = libv::security::rsa_sign_message(message_original, private_key_4096);
 
-	std::cout << "signature (" << signature.size() << " byte):\n" << libv::hex_dump_with_ascii(signature) << std::endl;
+	std::cout << "Signature (" << signature.size() << " byte):\n" << libv::hex_dump_with_ascii(signature) << std::endl;
 
 	const auto authentic = libv::security::rsa_verify_signature(message_received, public_key_4096, signature);
 

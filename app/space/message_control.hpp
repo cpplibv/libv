@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/internal_messages.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/message_control.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

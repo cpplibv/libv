@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/game_session.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/game_session.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <space/game_session.hpp>
@@ -10,7 +10,7 @@
 #include <space/network_server.hpp>
 #include <space/playout.hpp>
 #include <space/scene.hpp>
-#include <space/universe.hpp>
+#include <space/universe/universe.hpp>
 
 
 namespace app {

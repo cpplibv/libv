@@ -1,4 +1,4 @@
-// Created by Vader on 2021.08.12..
+// Project: libv.security, File: src/libv/security/rsa_signature.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <libv/security/rsa_signature.hpp>

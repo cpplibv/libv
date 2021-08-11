@@ -24,7 +24,7 @@ libv.update: Implement real server side version check response calculation
 libv.net: Add support for non string based connection send / receive
 libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
 libv.utility: Implement IntervalRegistry utility type
-
+libv.security: Move signature checking of sandbox_openssl into a new wrapper lib (public / private key)
 
 
 
@@ -49,7 +49,6 @@ libv.utility: Implement IntervalRegistry utility type
 
 
 
-libv.security: Move signature checking of sandbox_openssl into a new wrapper lib (public / private key)
 
 
 libv.update: Resource Client
