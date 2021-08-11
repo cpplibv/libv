@@ -421,8 +421,10 @@ wish_create_external(
 		COMMAND cp -r -f ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/
 
 #	LINK ssl
+#	LINK wsock32 ws2_32
+
 	LINK crypto
-	LINK wsock32 ws2_32 crypt32
+	LINK crypt32
 )
 
 wish_create_external(
@@ -1051,7 +1053,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_openssl
 	SOURCE sandbox/libv_openssl_main.cpp
-	LINK   ext_openssl
+	LINK   ext_openssl libv_utility
 )
 
 wish_create_executable(

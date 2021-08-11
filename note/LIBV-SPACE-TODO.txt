@@ -96,8 +96,6 @@ game instance (desktop)
 		ui session (cmd bar)
 		ui session mp (mp mini canvas list)
 
-https://gist.github.com/irbull/08339ddcd5686f509e9826964b17bb59
-https://github.com/viaduck/openssl-cmake
 
 
 
@@ -215,9 +213,6 @@ What do I need from libv to make a 'minimal' working iris program?
 			1 Marry Resource and Update
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
-
-	libv.security
-		1 public / private key signature checking
 
 	libv.serial
 		1 safe container resize/reserve

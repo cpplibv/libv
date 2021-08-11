@@ -49,6 +49,9 @@ libv.utility: Implement IntervalRegistry utility type
 
 
 
+libv.security: Move signature checking of sandbox_openssl into a new wrapper lib (public / private key)
+
+
 libv.update: Resource Client
 	Single file download: Partial download recovery IDEA of an alternative approach would be to only write out the progress meta data every X seconds
 

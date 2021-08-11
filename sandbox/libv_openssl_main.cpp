@@ -1,215 +1,172 @@
 //
 
 // ext
-#include <openssl/aes.h>
-#include <openssl/bio.h>
-#include <openssl/err.h>
-#include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/rsa.h>
-#include <openssl/ssl.h>
+// libv
+#include <libv/utility/hex_dump.hpp>
 // std
-#include <cassert>
-#include <cstring>
 #include <iostream>
+#include <string>
+#include <string_view>
+
 
 // -------------------------------------------------------------------------------------------------
 
+RSA* createPrivateRSA(const std::string_view key) {
+	BIO* keybio = BIO_new_mem_buf(static_cast<const void*>(key.data()), static_cast<int>(key.size()));
 
-std::string privateKey = "-----BEGIN RSA PRIVATE KEY-----\n"\
-		"MIIEowIBAAKCAQEAy8Dbv8prpJ/0kKhlGeJYozo2t60EG8L0561g13R29LvMR5hy\n"\
-		"vGZlGJpmn65+A4xHXInJYiPuKzrKUnApeLZ+vw1HocOAZtWK0z3r26uA8kQYOKX9\n"\
-		"Qt/DbCdvsF9wF8gRK0ptx9M6R13NvBxvVQApfc9jB9nTzphOgM4JiEYvlV8FLhg9\n"\
-		"yZovMYd6Wwf3aoXK891VQxTr/kQYoq1Yp+68i6T4nNq7NWC+UNVjQHxNQMQMzU6l\n"\
-		"WCX8zyg3yH88OAQkUXIXKfQ+NkvYQ1cxaMoVPpY72+eVthKzpMeyHkBn7ciumk5q\n"\
-		"gLTEJAfWZpe4f4eFZj/Rc8Y8Jj2IS5kVPjUywQIDAQABAoIBADhg1u1Mv1hAAlX8\n"\
-		"omz1Gn2f4AAW2aos2cM5UDCNw1SYmj+9SRIkaxjRsE/C4o9sw1oxrg1/z6kajV0e\n"\
-		"N/t008FdlVKHXAIYWF93JMoVvIpMmT8jft6AN/y3NMpivgt2inmmEJZYNioFJKZG\n"\
-		"X+/vKYvsVISZm2fw8NfnKvAQK55yu+GRWBZGOeS9K+LbYvOwcrjKhHz66m4bedKd\n"\
-		"gVAix6NE5iwmjNXktSQlJMCjbtdNXg/xo1/G4kG2p/MO1HLcKfe1N5FgBiXj3Qjl\n"\
-		"vgvjJZkh1as2KTgaPOBqZaP03738VnYg23ISyvfT/teArVGtxrmFP7939EvJFKpF\n"\
-		"1wTxuDkCgYEA7t0DR37zt+dEJy+5vm7zSmN97VenwQJFWMiulkHGa0yU3lLasxxu\n"\
-		"m0oUtndIjenIvSx6t3Y+agK2F3EPbb0AZ5wZ1p1IXs4vktgeQwSSBdqcM8LZFDvZ\n"\
-		"uPboQnJoRdIkd62XnP5ekIEIBAfOp8v2wFpSfE7nNH2u4CpAXNSF9HsCgYEA2l8D\n"\
-		"JrDE5m9Kkn+J4l+AdGfeBL1igPF3DnuPoV67BpgiaAgI4h25UJzXiDKKoa706S0D\n"\
-		"4XB74zOLX11MaGPMIdhlG+SgeQfNoC5lE4ZWXNyESJH1SVgRGT9nBC2vtL6bxCVV\n"\
-		"WBkTeC5D6c/QXcai6yw6OYyNNdp0uznKURe1xvMCgYBVYYcEjWqMuAvyferFGV+5\n"\
-		"nWqr5gM+yJMFM2bEqupD/HHSLoeiMm2O8KIKvwSeRYzNohKTdZ7FwgZYxr8fGMoG\n"\
-		"PxQ1VK9DxCvZL4tRpVaU5Rmknud9hg9DQG6xIbgIDR+f79sb8QjYWmcFGc1SyWOA\n"\
-		"SkjlykZ2yt4xnqi3BfiD9QKBgGqLgRYXmXp1QoVIBRaWUi55nzHg1XbkWZqPXvz1\n"\
-		"I3uMLv1jLjJlHk3euKqTPmC05HoApKwSHeA0/gOBmg404xyAYJTDcCidTg6hlF96\n"\
-		"ZBja3xApZuxqM62F6dV4FQqzFX0WWhWp5n301N33r0qR6FumMKJzmVJ1TA8tmzEF\n"\
-		"yINRAoGBAJqioYs8rK6eXzA8ywYLjqTLu/yQSLBn/4ta36K8DyCoLNlNxSuox+A5\n"\
-		"w6z2vEfRVQDq4Hm4vBzjdi3QfYLNkTiTqLcvgWZ+eX44ogXtdTDO7c+GeMKWz4XX\n"\
-		"uJSUVL5+CVjKLjZEJ6Qc2WZLl94xSwL71E41H4YciVnSCQxVc4Jw\n"\
-		"-----END RSA PRIVATE KEY-----\n\0";
+	if (keybio == nullptr)
+		return nullptr;
 
-std::string publicKey = "-----BEGIN PUBLIC KEY-----\n"\
-        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy8Dbv8prpJ/0kKhlGeJY\n"\
-        "ozo2t60EG8L0561g13R29LvMR5hyvGZlGJpmn65+A4xHXInJYiPuKzrKUnApeLZ+\n"\
-        "vw1HocOAZtWK0z3r26uA8kQYOKX9Qt/DbCdvsF9wF8gRK0ptx9M6R13NvBxvVQAp\n"\
-        "fc9jB9nTzphOgM4JiEYvlV8FLhg9yZovMYd6Wwf3aoXK891VQxTr/kQYoq1Yp+68\n"\
-        "i6T4nNq7NWC+UNVjQHxNQMQMzU6lWCX8zyg3yH88OAQkUXIXKfQ+NkvYQ1cxaMoV\n"\
-        "PpY72+eVthKzpMeyHkBn7ciumk5qgLTEJAfWZpe4f4eFZj/Rc8Y8Jj2IS5kVPjUy\n"\
-        "wQIDAQAB\n"\
-        "-----END PUBLIC KEY-----\n";
-
-RSA* createPrivateRSA(std::string key) {
 	RSA* rsa = nullptr;
-	const char* c_string = key.c_str();
-	BIO* keybio = BIO_new_mem_buf((void*) c_string, -1);
-	if (keybio == nullptr) {
-		return 0;
-	}
 	rsa = PEM_read_bio_RSAPrivateKey(keybio, &rsa, nullptr, nullptr);
+
+	BIO_free(keybio);
 	return rsa;
 }
 
-RSA* createPublicRSA(std::string key) {
+RSA* createPublicRSA(const std::string_view key) {
+	BIO* keybio = BIO_new_mem_buf(static_cast<const void*>(key.data()), static_cast<int>(key.size()));
+
+	if (keybio == nullptr)
+		return nullptr;
+
 	RSA* rsa = nullptr;
-	BIO* keybio;
-	const char* c_string = key.c_str();
-	keybio = BIO_new_mem_buf((void*) c_string, -1);
-	if (keybio == nullptr) {
-		return 0;
-	}
 	rsa = PEM_read_bio_RSA_PUBKEY(keybio, &rsa, nullptr, nullptr);
+
+	BIO_free(keybio);
 	return rsa;
 }
 
-bool RSASign(RSA* rsa,
-		const unsigned char* Msg,
-		size_t MsgLen,
-		unsigned char** EncMsg,
-		size_t* MsgLenEnc) {
-	EVP_MD_CTX* m_RSASignCtx = EVP_MD_CTX_create();
+std::string signMessage(std::string_view private_key, std::string_view message) {
+	std::string signature;
+
 	EVP_PKEY* priKey = EVP_PKEY_new();
-	EVP_PKEY_assign_RSA(priKey, rsa);
+	EVP_PKEY_assign_RSA(priKey, createPrivateRSA(private_key));
+
+	EVP_MD_CTX* m_RSASignCtx = EVP_MD_CTX_create();
+
 	if (EVP_DigestSignInit(m_RSASignCtx, nullptr, EVP_sha256(), nullptr, priKey) <= 0) {
-		return false;
+		EVP_MD_CTX_free(m_RSASignCtx);
+		EVP_PKEY_free(priKey);
+		return signature;
 	}
-	if (EVP_DigestSignUpdate(m_RSASignCtx, Msg, MsgLen) <= 0) {
-		return false;
+
+	if (EVP_DigestSignUpdate(m_RSASignCtx, message.data(), message.size()) <= 0) {
+		EVP_MD_CTX_free(m_RSASignCtx);
+		EVP_PKEY_free(priKey);
+		return signature;
 	}
-	if (EVP_DigestSignFinal(m_RSASignCtx, nullptr, MsgLenEnc) <= 0) {
-		return false;
+
+	size_t signature_length;
+	if (EVP_DigestSignFinal(m_RSASignCtx, nullptr, &signature_length) <= 0) {
+		EVP_MD_CTX_free(m_RSASignCtx);
+		EVP_PKEY_free(priKey);
+		return signature;
 	}
-	*EncMsg = (unsigned char*) malloc(*MsgLenEnc);
-	if (EVP_DigestSignFinal(m_RSASignCtx, *EncMsg, MsgLenEnc) <= 0) {
-		return false;
+
+	signature.resize(signature_length);
+	if (EVP_DigestSignFinal(m_RSASignCtx, reinterpret_cast<unsigned char*>(signature.data()), &signature_length) <= 0) {
+		EVP_MD_CTX_free(m_RSASignCtx);
+		EVP_PKEY_free(priKey);
+		return signature;
 	}
+
 	EVP_MD_CTX_free(m_RSASignCtx);
-	return true;
+	EVP_PKEY_free(priKey);
+	return signature;
 }
 
-bool RSAVerifySignature(RSA* rsa,
-		unsigned char* MsgHash,
-		size_t MsgHashLen,
-		const char* Msg,
-		size_t MsgLen,
-		bool* Authentic) {
-	*Authentic = false;
+bool verifySignature(std::string_view public_key, std::string_view message, std::string_view signature) {
 	EVP_PKEY* pubKey = EVP_PKEY_new();
-	EVP_PKEY_assign_RSA(pubKey, rsa);
+	EVP_PKEY_assign_RSA(pubKey, createPublicRSA(public_key));
+
 	EVP_MD_CTX* m_RSAVerifyCtx = EVP_MD_CTX_create();
 
 	if (EVP_DigestVerifyInit(m_RSAVerifyCtx, nullptr, EVP_sha256(), nullptr, pubKey) <= 0) {
+		EVP_MD_CTX_free(m_RSAVerifyCtx);
+		EVP_PKEY_free(pubKey);
 		return false;
 	}
-	if (EVP_DigestVerifyUpdate(m_RSAVerifyCtx, Msg, MsgLen) <= 0) {
+
+	if (EVP_DigestVerifyUpdate(m_RSAVerifyCtx, message.data(), message.size()) <= 0) {
+		EVP_MD_CTX_free(m_RSAVerifyCtx);
+		EVP_PKEY_free(pubKey);
 		return false;
 	}
-	int AuthStatus = EVP_DigestVerifyFinal(m_RSAVerifyCtx, MsgHash, MsgHashLen);
-	if (AuthStatus == 1) {
-		*Authentic = true;
-		EVP_MD_CTX_free(m_RSAVerifyCtx);
-		return true;
-	} else if (AuthStatus == 0) {
-		*Authentic = false;
-		EVP_MD_CTX_free(m_RSAVerifyCtx);
-		return true;
-	} else {
-		*Authentic = false;
-		EVP_MD_CTX_free(m_RSAVerifyCtx);
-		return false;
-	}
+
+	int auth_status = EVP_DigestVerifyFinal(m_RSAVerifyCtx, reinterpret_cast<const unsigned char*>(signature.data()), signature.size());
+	EVP_MD_CTX_free(m_RSAVerifyCtx);
+	EVP_PKEY_free(pubKey);
+
+	return auth_status == 1;
 }
 
-void Base64Encode(const unsigned char* buffer, size_t length, char** base64Text) {
-	BIO* bio, * b64;
-	BUF_MEM* bufferPtr;
-
-	b64 = BIO_new(BIO_f_base64());
-	bio = BIO_new(BIO_s_mem());
-	bio = BIO_push(b64, bio);
-
-	BIO_write(bio, buffer, length);
-	BIO_flush(bio);
-	BIO_get_mem_ptr(bio, &bufferPtr);
-	BIO_set_close(bio, BIO_NOCLOSE);
-	BIO_free_all(bio);
-
-	*base64Text = (*bufferPtr).data;
-}
-
-size_t calcDecodeLength(const char* b64input) {
-	size_t len = std::strlen(b64input), padding = 0;
-
-	if (b64input[len - 1] == '=' && b64input[len - 2] == '=') //last two chars are =
-		padding = 2;
-	else if (b64input[len - 1] == '=') //last char is =
-		padding = 1;
-	return (len * 3) / 4 - padding;
-}
-
-void Base64Decode(char* b64message, unsigned char** buffer, size_t* length) {
-	BIO* bio, * b64;
-
-	int decodeLen = calcDecodeLength(b64message);
-	*buffer = (unsigned char*) malloc(decodeLen + 1);
-	(*buffer)[decodeLen] = '\0';
-
-	bio = BIO_new_mem_buf(b64message, -1);
-	b64 = BIO_new(BIO_f_base64());
-	bio = BIO_push(b64, bio);
-
-	*length = BIO_read(bio, *buffer, std::strlen(b64message));
-	BIO_free_all(bio);
-}
-
-char* signMessage(std::string privateKey, std::string plainText) {
-	RSA* privateRSA = createPrivateRSA(privateKey);
-	unsigned char* encMessage;
-	char* base64Text;
-	size_t encMessageLength;
-	RSASign(privateRSA, (unsigned char*) plainText.c_str(), plainText.length(), &encMessage, &encMessageLength);
-	Base64Encode(encMessage, encMessageLength, &base64Text);
-	free(encMessage);
-	return base64Text;
-}
-
-bool verifySignature(std::string publicKey, std::string plainText, char* signatureBase64) {
-	RSA* publicRSA = createPublicRSA(publicKey);
-	unsigned char* encMessage;
-	size_t encMessageLength;
-	bool authentic;
-	Base64Decode(signatureBase64, &encMessage, &encMessageLength);
-	bool result = RSAVerifySignature(publicRSA, encMessage, encMessageLength, plainText.c_str(), plainText.length(), &authentic);
-	return result & authentic;
-}
+// -------------------------------------------------------------------------------------------------
 
 int main() {
-	std::string plainText = "My secret message.\n";
+	// These are unsecure random test dev keys
+	std::string private_key = R"(-----BEGIN RSA PRIVATE KEY-----
+MIIEpQIBAAKCAQEApI+E+YKZZP2Tq5puLUYaCXcC/Axwdn0dNloJVqEKkIdh/GAV
+6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNRa42qZMa25W1FNMB3rzGJu9/gktwO
+Sse8jNwQWPLf9J90EpDSBKoLuqZR9M0tEUQFfQKENaey+vYjTQn6Qf6mID5CiJxX
+kD4h/MhFbpoDLra7lBDINKYEPyhoR4wgy5ddHHJzV+jx0ai4x2qAfHonmMh21zON
+ViFvSWogzL+r116oAi3MGzGRmNMiPXW5r/RHEhJeKwUc/CLyTo7nSx9bm3SCn8Tt
+ppHJXoWDFJGjRhW2vuTXuFKjOZSiqd5wSzd+qwIDAQABAoIBAGjj5gFYAkhB7VdL
+JwEKltwDlM5ta13LH8yeFSe3nFFFSeqgoDaH33N4cDNmX+340zdev+sHjmIbAJeF
+ygfcUiB4+uwjUT7pqFwYdfEgZUdwSuexBhcaOw+Z0X2wyZlV7ZlL3+IDNViyXLjp
+8tj3f3wQF49PpiCatSOMwYxBMUiJARtmFDEvh/tuJ+WnXOtEiV6Qk6JWDeTvLrYr
+J+VfaQzw4aQnHVJ++Gnwq1bio/mS80QkGnuRqn2kys6TWK7UQkDkC6WWWOUaScO4
+q/Tbhj6ubCKRKKz3TZOPbwU56e2sYfD77wK7cRsoUxYXBafeMxnUP/CHHq95PYXM
+Hz9BXFECgYEAzxWGwost5JMuh9sXACR8Go38iqZ8ZgFPhr9Dhzkk3bOxxneb4Qls
+ZJfw9HrnLcxcB012GRGlsUq0h6ce4NGeyO7MJz7kpyChO05++9aIkfLilSyYY2oK
+8BsTnXdfD//8PfWxRMizbWX+PIh5Dp4a8kP2f3A4cqBdnxoCMeTnDYkCgYEAy26U
+LZuzQma2l0G6KeI+q3jTqimkF410QWb7nwRVt2CaMqh3kBU2UtgI6w26DqPH3y8X
+3K89DgeJ4cJ59lF4zN+huAUiPb0pkX3mJ3Mwy4HpE8WsniCKoVAD4s++XSx4lUfb
+u3S+/TqTxqPDWVi47LG/P/QTdBYkWNHJB/P3sZMCgYEAosPBqvFn/eutO/z5JBSJ
+Mvn80CGxTx+imT+F3SgOEO+nQF5Mt+EHQD2olxBu2jFw+BBrTaLwP9x+7sxtWbmI
++1euQP6PC8l60LmO13S03Tox25w0npb/x98QWMk1f8btROnzDiRN2yO6Y2vE8rdU
+aK0AdwQGahof2+i+ZucKsDkCgYEAr339JjsjMS0aZvG0f11FYvcg4bJ6dDb7C1Cj
+0FIU/9S+MOVT/1/NNTpYty1oTCjNy6L8mswxh2DJeZAjVnKCG3rwL6d+GnSM344U
+dgPRHD49q2jjuKWp8e7s60T7m7U5cM5EqDnWaO2XfczYQMNhBA9yROFxxrszL8wJ
++GpmSzECgYEAsWSraM93gALPrg6+GTqDW7qGiACqTYIcgkwSG+o7PZ1emn5BKP8m
+sNETHmx4NeitreNKMsmEsyFIjXB0rGp5oIV4uEzx4E+I2qZ8WsP2lmj84zaMU357
+NT2SR86+yteOyq6t76h7fnTbnc+jHzsv4ufxDWBTKv4NZw0Esw/7zEk=
+-----END RSA PRIVATE KEY-----)";
 
-	char* signature = signMessage(privateKey, plainText);
+	// These are unsecure random test dev keys
+	std::string public_key = R"(-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI+E+YKZZP2Tq5puLUYa
+CXcC/Axwdn0dNloJVqEKkIdh/GAV6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNR
+a42qZMa25W1FNMB3rzGJu9/gktwOSse8jNwQWPLf9J90EpDSBKoLuqZR9M0tEUQF
+fQKENaey+vYjTQn6Qf6mID5CiJxXkD4h/MhFbpoDLra7lBDINKYEPyhoR4wgy5dd
+HHJzV+jx0ai4x2qAfHonmMh21zONViFvSWogzL+r116oAi3MGzGRmNMiPXW5r/RH
+EhJeKwUc/CLyTo7nSx9bm3SCn8TtppHJXoWDFJGjRhW2vuTXuFKjOZSiqd5wSzd+
+qwIDAQAB
+-----END PUBLIC KEY-----)";
 
-	bool authentic = verifySignature(publicKey, "My secret message.\n", signature);
+	const auto message_original = "My secret message.\n";
+//	const auto message_received = "Dirty message.\n";
+	const auto message_received = message_original;
 
-	if (authentic) {
-		std::cout << "Authentic" << std::endl;
-	} else {
-		std::cout << "Not Authentic" << std::endl;
-	}
+//	// -------------------------------------------------------------------------------------------------
+//	const auto message_received2 = "My secret message. Dirty\n";
+//	for (int i = 0; i < 100000000; ++i) {
+//		const auto signature = signMessage(private_key, message_original);
+//		const auto authentic = verifySignature(public_key, i % 2 == 0 ? message_received : message_received2, signature);
+//		if (i % 1000 == 0)
+//			std::cout << i << " " << authentic << std::endl;
+//	}
+//	// -------------------------------------------------------------------------------------------------
+
+	const auto signature = signMessage(private_key, message_original);
+
+	std::cout << "signature (" << signature.size() << " byte):\n" << libv::hex_dump_with_ascii(signature) << std::endl;
+
+	const auto authentic = verifySignature(public_key, message_received, signature);
+
+	std::cout << (authentic ? "Authentic" : "Not Authentic") << std::endl;
 
 	return EXIT_SUCCESS;
 }
