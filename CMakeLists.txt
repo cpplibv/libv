@@ -737,6 +737,13 @@ wish_create_library(
 )
 
 wish_create_library(
+	TARGET libv_security STATIC
+	SOURCE src/libv/security/*.cpp
+	LINK   ext_openssl
+#	LINK   libv_utility
+)
+
+wish_create_library(
 	TARGET libv_serial INTERFACE
 	LINK   ext_cereal
 	LINK   ext_boost # Remove
@@ -1051,12 +1058,6 @@ wish_create_executable(
 )
 
 wish_create_executable(
-	TARGET sandbox_libv_openssl
-	SOURCE sandbox/libv_openssl_main.cpp
-	LINK   ext_openssl libv_utility
-)
-
-wish_create_executable(
 	TARGET sandbox_libv_physics
 	SOURCE sandbox/libv_physics_main.cpp
 	LINK   ext_reactphysics3d libv_math
@@ -1072,6 +1073,12 @@ wish_create_executable(
 	TARGET sandbox_libv_reflection2
 	SOURCE sandbox/libv_reflection2_main.cpp
 	LINK   libv_serial
+)
+
+wish_create_executable(
+	TARGET sandbox_libv_security
+	SOURCE sandbox/libv_security_main.cpp
+	LINK   libv_security libv_utility
 )
 
 wish_create_executable(
