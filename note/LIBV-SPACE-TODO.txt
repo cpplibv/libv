@@ -17,6 +17,8 @@ app.space: Fleet that moves (without any arrow)
 app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 app.space: Sim state manipulation only with commands
 app.space: Fleet with arrow and movement toward target (primitive)
+app.space: Add support for command arrow 'intent' (color) specification
+
 
 
 
@@ -183,7 +185,6 @@ app.space: line shader
 
 app.space: Command arrow improvements
 	app.space: Add support for command arrow animation offset
-	app.space: Add support for command arrow 'intent' (color) specification
 	app.space: Add support for chained command arrows
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)

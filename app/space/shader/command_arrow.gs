@@ -17,7 +17,7 @@ uniform vec2 render_resolution; // Program block
 
 void main() {
 	//       Input Line     Output Vertices    Output Triangles
-	//   0=Target 1=Source
+	//   0=Source 1=Target
 	//
 	//           1                 0                  +         -+
 	//          .|.               / \                /|\         |
@@ -86,35 +86,44 @@ void main() {
 
 	fs_in.segmentSize = vs_out[0].segmentSize;
 	fs_in.totalSize = vs_out[0].totalSize;
-	fs_in.color = vs_out[0].color;
+//	fs_in.color = vs_out[0].color;
+
+	vec4 neck_color = mix(vs_out[0].color, vs_out[1].color, neck_v);
 
 	// Head
 	fs_in.head = 1;
 	// v6
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(0, neck_v);
 	fs_in.part_uv = vec2(0, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
 	fs_in.totalPosition = neck_totalPosition;
+
 	gl_Position = v6; EmitVertex();
 	// v5
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_left, neck_v);
 	fs_in.part_uv = vec2(neck_u_left, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
 	fs_in.totalPosition = neck_totalPosition;
+
 	gl_Position = v5; EmitVertex();
 	// v0
+	fs_in.color = vs_out[1].color;
 	fs_in.uv = vec2(0.5, 1);
 	fs_in.part_uv = vec2(0.5, 1);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
 	fs_in.totalPosition = vs_out[0].totalPosition + vs_out[0].segmentSize;
 	gl_Position = v0; EmitVertex();
 	// v2
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_right, neck_v);
 	fs_in.part_uv = vec2(neck_u_right, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
 	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v2; EmitVertex();
 	// v1
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(1, neck_v);
 	fs_in.part_uv = vec2(1, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
@@ -125,24 +134,28 @@ void main() {
 	// Body
 	fs_in.head = 0;
 	// v4
+	fs_in.color = vs_out[0].color;
 	fs_in.uv = vec2(neck_u_left, 0);
 	fs_in.part_uv = vec2(0, 0);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
 	fs_in.totalPosition = vs_out[0].totalPosition;
 	gl_Position = v4; EmitVertex();
 	// v3
+	fs_in.color = vs_out[0].color;
 	fs_in.uv = vec2(neck_u_right, 0);
 	fs_in.part_uv = vec2(1, 0);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
 	fs_in.totalPosition = vs_out[0].totalPosition;
 	gl_Position = v3; EmitVertex();
 	// v5
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_left, neck_v);
 	fs_in.part_uv = vec2(0, 1);
 	fs_in.segmentPosition = neck_segmentPosition;
 	fs_in.totalPosition = neck_totalPosition;
 	gl_Position = v5; EmitVertex();
 	// v2
+	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_right, neck_v);
 	fs_in.part_uv = vec2(1, 1);
 	fs_in.segmentPosition = neck_segmentPosition;

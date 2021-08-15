@@ -84,11 +84,11 @@ RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
 	//	build_mesh(mesh, points);
 }
 
-void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target) {
+void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style) {
 	if (source == target) // Sanity check
 		return;
 
-	arrows.emplace_back(source, target);
+	arrows.emplace_back(source, target, style);
 }
 
 void RendererCommandArrow::rebuild_mesh() {
@@ -106,8 +106,8 @@ void RendererCommandArrow::rebuild_mesh() {
 		position(arrow.source);
 		position(arrow.target);
 
-		color0(1, 1, 1, 1);
-		color0(1, 1, 1, 1);
+		color0(arrow.style.color_source);
+		color0(arrow.style.color_target);
 
 		sp_ss_tp_ts(0, length, 0, length);
 		sp_ss_tp_ts(length, length, length, length);

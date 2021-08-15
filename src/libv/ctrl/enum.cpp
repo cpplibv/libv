@@ -2,6 +2,8 @@
 
 // hpp
 #include <libv/ctrl/enum.hpp>
+// std
+#include <cassert>
 
 
 namespace libv {
@@ -22,6 +24,7 @@ std::string_view to_string(const DigitalInputAction& var) {
 	case DigitalInputAction::free: return "free";
 	}
 
+	assert(false && "Invalid DigitalInputAction enum value");
 	return "<<invalid>>";
 }
 
@@ -35,6 +38,7 @@ std::string_view to_string(const OperationBinary& var) {
 	case OperationBinary::inverted: return "inverted";
 	}
 
+	assert(false && "Invalid OperationBinary enum value");
 	return "<<invalid>>";
 }
 

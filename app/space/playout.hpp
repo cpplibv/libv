@@ -160,6 +160,10 @@ inline void apply(Universe& universe, SpaceSession& session, CommandShuffle& com
 
 	for (size_t i = 0; i < positions.size(); ++i)
 		universe.fleets[i].target = positions[i];
+
+	std::uniform_int_distribution dst(0, 1);
+	for (auto& fleet : universe.fleets)
+		fleet.command_type = dst(rng) ? Fleet::CommandType::movement :  Fleet::CommandType::attack;
 }
 
 // -------------------------------------------------------------------------------------------------

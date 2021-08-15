@@ -33,15 +33,15 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
-constexpr auto attribute_normal	= libv::glr::Attribute<1, libv::vec3f>{};
-constexpr auto attribute_color0	= libv::glr::Attribute<2, libv::vec4f>{};
+constexpr auto attribute_position = libv::glr::Attribute<0, libv::vec3f>{};
+constexpr auto attribute_normal = libv::glr::Attribute<1, libv::vec3f>{};
+constexpr auto attribute_color0 = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0 = libv::glr::Attribute<8, libv::vec2f>{};
 constexpr auto attribute_custom0 = libv::glr::Attribute<15, libv::vec4f>{};
 
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
-constexpr auto textureChannel_normal  = libv::gl::TextureChannel{1};
-constexpr auto textureChannel_pattern  = libv::gl::TextureChannel{7};
+constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
+constexpr auto textureChannel_pattern = libv::gl::TextureChannel{7};
 
 struct UniformLayoutMatrices {
 	// Could be split into two: Camera and Model
@@ -113,6 +113,7 @@ struct UniformsEditorBackground {
 		access(base_color, "base_color");
 		access(noise_scale, "noise_scale");
 	}
+
 	template <typename Access> void access_blocks(Access&) {
 	}
 };
@@ -123,6 +124,7 @@ struct UniformsTestMode {
 	template <typename Access> void access_uniforms(Access& access) {
 		access(test_mode, "test_mode", 0);
 	}
+
 	template <typename Access> void access_blocks(Access& access) {
 		access(uniformBlock_matrices);
 	}
@@ -134,6 +136,7 @@ struct UniformsColor {
 	template <typename Access> void access_uniforms(Access& access) {
 		access(base_color, "base_color");
 	}
+
 	template <typename Access> void access_blocks(Access& access) {
 		access(uniformBlock_matrices);
 	}
@@ -151,6 +154,7 @@ struct UniformsCommandArrow {
 		access(test_mode, "test_mode", 0);
 		access(time, "time", 0.f);
 	}
+
 	template <typename Access> void access_blocks(Access& access) {
 		access(uniformBlock_matrices);
 	}
@@ -185,9 +189,16 @@ public:
 };
 
 struct RendererCommandArrow {
+	struct ArrowStyle {
+		libv::vec4f color_source;
+		libv::vec4f color_target;
+//		float size;
+//		Pattern pattern;
+	};
 	struct ArrowData {
 		libv::vec3f source;
 		libv::vec3f target;
+		ArrowStyle style;
 	};
 
 	std::vector<ArrowData> arrows;
@@ -198,7 +209,7 @@ public:
 	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
-	void add_arrow(libv::vec3f source, libv::vec3f target);
+	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
 
 public:
 	void rebuild_mesh();

@@ -28,15 +28,15 @@ namespace app {
 struct Fleet {
 //	ScreenPickableType* screen_pick_type;
 
-//	enum class CommandType {
-//		movement,
-//		attack,
-////		follow,
-////		merge,
-////		block,
-////		land,
-////		...,
-//	};
+	enum class CommandType {
+		movement,
+		attack
+//		follow,
+//		merge,
+//		block,
+//		land,
+//		...,
+	};
 //
 //	struct Command {
 //		CommandType type;
@@ -48,6 +48,7 @@ public:
 	FleetID id;
 	libv::vec3f position;
 	libv::vec3f target;
+	CommandType command_type = CommandType::movement;
 //	libv::vec3f movement;
 //	CommandArrow command_arrow; // <<< Yes, but no, maybe-, Think about it how should ownership and references fork regarding renderers
 //	std::vector<Command> commands;

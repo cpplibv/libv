@@ -609,7 +609,7 @@ libv: Adopt the new type_key in every map that uses types as a key
 
 
 
-
+read: https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/
 
     Make the requirements less dumb.
     Try very hard to delete the part or process.

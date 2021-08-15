@@ -11,6 +11,8 @@
 #include <libv/glr/queue.hpp>
 #include <libv/math/noise/white.hpp>
 //#include <libv/glr/texture.hpp>
+// std
+#include <cassert>
 // pro
 #include <space/camera.hpp>
 #include <space/command.hpp>
@@ -22,6 +24,20 @@
 
 
 namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type) {
+	switch (type) {
+	case Fleet::CommandType::attack:
+		return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0, 0, 1, 1)};
+	case Fleet::CommandType::movement:
+		return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
+	}
+
+	assert(false && "Invalid Fleet::CommandType enum value");
+	return {libv::vec4f(1, 0, 1, 1), libv::vec4f(1, 0, 1, 1)};
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -142,7 +158,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	// --- Render Transparent ---
 
 	for (const auto& fleet : universe.fleets)
-		renderer.arrow.add_arrow(fleet.position, fleet.target);
+		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
 
