@@ -86,7 +86,6 @@ void main() {
 
 	fs_in.segmentSize = vs_out[0].segmentSize;
 	fs_in.totalSize = vs_out[0].totalSize;
-//	fs_in.color = vs_out[0].color;
 
 	vec4 neck_color = mix(vs_out[0].color, vs_out[1].color, neck_v);
 

@@ -28,6 +28,10 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type) {
+	//	const vec4 base_color_c = vec4(0.48, 0.65, 0.70, 0.5);
+	//	const vec4 base_color_r = vec4(0.80, 0.30, 0.30, 0.5);
+	//	const vec4 base_color_g = vec4(0.42, 0.75, 0.40, 0.5);
+	//	const vec4 base_color_p = vec4(0.38, 0.38, 0.40, 0.3);
 	switch (type) {
 	case Fleet::CommandType::attack:
 		return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0, 0, 1, 1)};
@@ -156,6 +160,8 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	}
 
 	// --- Render Transparent ---
+
+	renderer.arrow.add_debug_spiral();
 
 	for (const auto& fleet : universe.fleets)
 		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));

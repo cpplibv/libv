@@ -26,7 +26,7 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx) :
-	shader(rctx.shader_manager, "editor_background.vs", "editor_background.fs") {
+		shader(rctx.shader_manager, "editor_background.vs", "editor_background.fs") {
 
 	// TODO P1: Switch to blue noise once implemented
 	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
@@ -65,23 +65,7 @@ void RendererEditorBackground::render(libv::glr::Queue& gl, libv::vec2f canvas_s
 // -------------------------------------------------------------------------------------------------
 
 RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
-	shader{rctx.shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
-	//	std::vector<libv::vec3f> points{{0, 0, 0}, {1, 0.5, 0.5}, {1, 1, 0}, {1, 2, 2}, {-1, -1, -1}};
-	//	for (int i = 0; i < 60; i++) {
-	//		const auto r = i / 30.0;
-	//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-	//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-	//		points.emplace_back(x, y, 0);
-	//	}
-	//	for (int i = 60; i < 120; i++) {
-	//		const auto r = 2.0 - (i - 60) / 30.0 * 0.5;
-	//		const auto x = std::sin(libv::deg_to_rad(i * 15.0)) * r;
-	//		const auto y = std::cos(libv::deg_to_rad(i * 15.0)) * r;
-	//		const auto z = std::sin(libv::deg_to_rad((i - 60) * 30.0)) * 0.25;
-	//		points.emplace_back(x, y, z);
-	//	}
-	//
-	//	build_mesh(mesh, points);
+		shader{rctx.shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
 }
 
 void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style) {
@@ -89,6 +73,35 @@ void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, Arr
 		return;
 
 	arrows.emplace_back(source, target, style);
+}
+
+void RendererCommandArrow::add_debug_spiral() {
+	add_arrow({0, 0, 0}, {1, 0.5f, 0.5f}, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+	add_arrow({1, 0.5f, 0.5f}, {1, 1, 0}, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+	add_arrow({1, 1, 0}, {1, 2, 2}, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+	add_arrow({1, 2, 2}, {-1, -1, -1}, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+
+	libv::vec3f prev_point;
+	for (int i = 0; i < 60; i++) {
+		const auto if_ = static_cast<float>(i);
+		const auto r = if_ / 30.f;
+		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
+		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
+
+		const auto curr_point = libv::vec3f{x, y, 0};
+		add_arrow(prev_point, curr_point, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		prev_point = curr_point;
+	}
+	for (int i = 60; i < 120; i++) {
+		const auto if_ = static_cast<float>(i);
+		const auto r = 2.f - (if_ - 60.f) / 30.f * 0.5f;
+		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
+		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
+
+		const auto curr_point = libv::vec3f{x, y, 0};
+		add_arrow(prev_point, curr_point, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		prev_point = curr_point;
+	}
 }
 
 void RendererCommandArrow::rebuild_mesh() {
@@ -176,7 +189,7 @@ void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size,
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-	shader(rctx.shader_manager, "editor_gizmo.vs", "editor_gizmo.fs") {
+		shader(rctx.shader_manager, "editor_gizmo.vs", "editor_gizmo.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -219,7 +232,7 @@ void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-	shader(rctx.shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+		shader(rctx.shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs") {
 
 	{
 		auto position = mesh_grid.attribute(attribute_position);
@@ -250,7 +263,7 @@ void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& 
 // -------------------------------------------------------------------------------------------------
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
-	shader(rctx.shader_manager, "flat.vs", "flat.fs") {
+		shader(rctx.shader_manager, "flat.vs", "flat.fs") {
 	build_mesh(mesh);
 }
 

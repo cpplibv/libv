@@ -198,6 +198,7 @@ struct RendererCommandArrow {
 	struct ArrowData {
 		libv::vec3f source;
 		libv::vec3f target;
+//		float animation_offset;
 		ArrowStyle style;
 	};
 
@@ -210,6 +211,10 @@ public:
 
 public:
 	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
+//	void start_chain();
+//	void end_chain();
+
+	void add_debug_spiral();
 
 public:
 	void rebuild_mesh();

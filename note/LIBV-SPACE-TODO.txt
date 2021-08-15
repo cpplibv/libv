@@ -18,6 +18,7 @@ app.space: Cleanup the shader error overlay code (PanelStatusLog + UIEventHub)
 app.space: Sim state manipulation only with commands
 app.space: Fleet with arrow and movement toward target (primitive)
 app.space: Add support for command arrow 'intent' (color) specification
+app.space: Revive the original debug arrow spiral
 
 
 
@@ -188,7 +189,6 @@ app.space: Command arrow improvements
 	app.space: Add support for chained command arrows
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
-	app.space: Revive original arrow spiral
 	app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
 
 	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)

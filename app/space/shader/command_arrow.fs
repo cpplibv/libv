@@ -20,25 +20,7 @@ void main() {
 	//	result.xy = fs_in.part_uv;
 	//	result.r = fract(linearize_depth(gl_FragCoord.z, 0.01, 1000) / 2 + time / 5);
 
-	// --- START: Test only base color selection
-//	const vec4 base_color_c = vec4(0.48, 0.65, 0.70, 0.5);
-//	const vec4 base_color_r = vec4(0.80, 0.30, 0.30, 0.5);
-//	const vec4 base_color_g = vec4(0.42, 0.75, 0.40, 0.5);
-//	const vec4 base_color_p = vec4(0.38, 0.38, 0.40, 0.3);
-
-//	float test_base_color_t = 4 * fract((fs_in.totalPosition - fs_in.uv.y * fs_in.segmentSize) / fs_in.totalSize - time / 50);
-//	vec4 base_color;
-//	if (test_base_color_t > 0)
-//		base_color = base_color_c;
-//	if (test_base_color_t > 1)
-//		base_color = base_color_r;
-//	if (test_base_color_t > 2)
-//		base_color = base_color_g;
-//	if (test_base_color_t > 3)
-//		base_color = base_color_p;
-	// --- NORMAL: Test only base color selection
 	vec4 base_color = fs_in.color;
-	// --- END: Test only base color selection
 
 	// Base color
 	result = base_color;
