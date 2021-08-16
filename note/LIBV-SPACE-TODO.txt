@@ -19,6 +19,7 @@ app.space: Sim state manipulation only with commands
 app.space: Fleet with arrow and movement toward target (primitive)
 app.space: Add support for command arrow 'intent' (color) specification
 app.space: Revive the original debug arrow spiral
+app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
 
 
 
@@ -181,7 +182,7 @@ app.space: make a blur or a bloom
 app.space: Optimized VAO update for command arrows
 app.space: Iris and space has to merge in some way
 
-app.space: line shader
+app.space: line shader (Dalma)
 
 
 app.space: Command arrow improvements
@@ -189,8 +190,6 @@ app.space: Command arrow improvements
 	app.space: Add support for chained command arrows
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
-	app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
-
 	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
 
 

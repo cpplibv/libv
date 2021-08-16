@@ -7,7 +7,6 @@ in FragmentData fs_in;
 
 out vec4 result;
 
-//uniform vec4 base_color; // base_color is most likely an attribute
 uniform float time;
 
 

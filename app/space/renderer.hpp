@@ -210,11 +210,16 @@ public:
 	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
+	void restart_chain(float animation_offset);
 	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
-//	void start_chain();
 //	void end_chain();
 
 	void add_debug_spiral();
+	void add_debug_view01();
+	void add_debug_view02();
+	void add_debug_view03();
+	void add_debug_view04();
+	void add_debug_view05();
 
 public:
 	void rebuild_mesh();

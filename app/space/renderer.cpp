@@ -84,6 +84,7 @@ void RendererCommandArrow::add_debug_spiral() {
 	libv::vec3f prev_point;
 	for (int i = 0; i < 60; i++) {
 		const auto if_ = static_cast<float>(i);
+
 		const auto r = if_ / 30.f;
 		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
 		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
@@ -94,13 +95,86 @@ void RendererCommandArrow::add_debug_spiral() {
 	}
 	for (int i = 60; i < 120; i++) {
 		const auto if_ = static_cast<float>(i);
+
 		const auto r = 2.f - (if_ - 60.f) / 30.f * 0.5f;
 		const auto x = std::sin(libv::deg_to_rad(if_ * 15.f)) * r;
 		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
+		const auto z = std::sin(libv::deg_to_rad((if_ - 60.f) * 30.f)) * 0.25f;
 
-		const auto curr_point = libv::vec3f{x, y, 0};
+		const auto curr_point = libv::vec3f{x, y, z};
 		add_arrow(prev_point, curr_point, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 		prev_point = curr_point;
+	}
+}
+
+void RendererCommandArrow::add_debug_view01() {
+	const auto style = ArrowStyle{libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)};
+	for (int i = 0; i < 10; i++) {
+		const auto if_ = static_cast<float>(i);
+
+		add_arrow({5, std::pow(2.f, if_) - 1, 0}, {5, std::pow(2.f, if_ + 1) - 1, 0}, style);
+	}
+}
+
+void RendererCommandArrow::add_debug_view02() {
+	const auto style = ArrowStyle{libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)};
+	const auto d = 0.5f;
+	const auto max_n = 30;
+	for (int i = 3; i <= max_n; ++i) {
+		const auto if_ = static_cast<float>(i);
+
+		for (int j = 0; j < i; ++j) {
+			const auto jf = static_cast<float>(j);
+
+			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
+			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
+			const auto x2 = std::sin(libv::tau / if_ * (jf - 1)) * d;
+			const auto y2 = std::cos(libv::tau / if_ * (jf - 1)) * d;
+			add_arrow({x1 + 3, if_ - 3, y1}, {x2 + 3, if_ - 3, y2}, style);
+		}
+	}
+}
+
+void RendererCommandArrow::add_debug_view03() {
+	const auto style = ArrowStyle{libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)};
+	const auto d = 0.5f;
+	const auto max_n = 30;
+	for (int i = 3; i <= max_n; ++i) {
+		const auto if_ = static_cast<float>(i);
+
+		for (int j = 0; j < i; ++j) {
+			const auto jf = static_cast<float>(j);
+
+			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
+			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
+			add_arrow({x1 + 6, if_ - 3, y1}, {6, if_ - 3, 0}, style);
+		}
+	}
+}
+
+void RendererCommandArrow::add_debug_view04() {
+	const auto style = ArrowStyle{libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)};
+	const auto d = 0.5f;
+	const auto max_n = 30;
+	for (int i = 3; i <= max_n; ++i) {
+		const auto if_ = static_cast<float>(i);
+
+		for (int j = 0; j < i; ++j) {
+			const auto jf = static_cast<float>(j);
+
+			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
+			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
+			add_arrow({9, if_ - 3, 0}, {x1 + 9, if_ - 3, y1}, style);
+		}
+	}
+}
+
+void RendererCommandArrow::add_debug_view05() {
+	const auto style = ArrowStyle{libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)};
+	for (int i = 0; i < 100; i++) {
+		const auto if_ = static_cast<float>(i);
+
+		add_arrow({10, if_, 0}, {10 + (if_ + 1) * 0.25f, if_, 0}, style);
 	}
 }
 
@@ -137,24 +211,12 @@ void RendererCommandArrow::rebuild_mesh() {
 	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
 	//		total_length += (b - a).length();
 	//	});
-
+	//
 	//	libv::algo::adjacent_pairs(points, [&](auto a, auto b) {
-	//		if (a == b) // Sanity check
-	//			return;
-	//
 	//		const auto length = (b - a).length();
-	//
-	//		position(a);
-	//		position(b);
-	//
-	//		color0(1, 1, 1, 1);
-	//		color0(1, 1, 1, 1);
 	//
 	//		sp_ss_tp_ts(0, length, current_length, total_length);
 	//		sp_ss_tp_ts(length, length, current_length, total_length);
-	//
-	//		index.line(i + 0, i + 1);
-	//		i += 2;
 	//
 	//		current_length += length;
 	//	});

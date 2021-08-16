@@ -127,6 +127,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	gl.state.clipPlanes(0);
 	gl.state.polygonModeFill();
+//	gl.state.polygonModeLine();
 
 	gl.projection = camera.projection(canvas_size);
 	gl.view = camera.view();
@@ -162,6 +163,11 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	// --- Render Transparent ---
 
 	renderer.arrow.add_debug_spiral();
+	renderer.arrow.add_debug_view01();
+	renderer.arrow.add_debug_view02();
+	renderer.arrow.add_debug_view03();
+	renderer.arrow.add_debug_view04();
+	renderer.arrow.add_debug_view05();
 
 	for (const auto& fleet : universe.fleets)
 		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));
