@@ -4,8 +4,6 @@
 
 // fwd
 #include <libv/math/vec_fwd.hpp>
-// libv
-#include <libv/meta/for_constexpr.hpp>
 // std
 #include <cmath>
 #include <ostream> // Remove include after https://github.com/fmtlib/fmt/issues/2449 is resolved
@@ -22,15 +20,6 @@
 
 
 namespace libv {
-
-// build / make helper functions -------------------------------------------------------------------
-
-template <size_t N, typename F>
-[[nodiscard]] constexpr inline auto build_vec(F&& func) noexcept {
-	return libv::meta::call_with_n_index<N>([&](const auto... indices) {
-		return vec_t<N, decltype(func(std::declval<size_t>()))>(func(indices)...);
-	});
-}
 
 // vec_base_t --------------------------------------------------------------------------------------
 
@@ -192,11 +181,23 @@ struct vec_t : vec_base_t<N, T> {
 	// operator= -----------------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t& operator=(const vec_t<N, K>& rhs) & noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] = rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] = rhs.data()[i];
 		return *this;
 	}
 
 	// Special value constructors ------------------------------------------------------------------
+
+	[[nodiscard]] static constexpr inline vec_t one(T value) noexcept {
+		vec_t result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = value;
+		return result;
+	}
+
+	[[nodiscard]] static constexpr inline vec_t one() noexcept {
+		return one(T{1});
+	}
 
 	[[nodiscard]] static constexpr inline vec_t zero() noexcept {
 		return vec_t{};
@@ -205,7 +206,7 @@ struct vec_t : vec_base_t<N, T> {
 	template <bool always_false = false>
 	[[nodiscard]] static constexpr inline vec_t inf() noexcept {
 		if constexpr (std::numeric_limits<T>::has_infinity)
-			return build_vec<N>([&](const auto) { return std::numeric_limits<T>::infinity(); });
+			return one(std::numeric_limits<T>::infinity());
 		else
 			static_assert(always_false, "Underlying type has no infinity");
 	}
@@ -213,90 +214,108 @@ struct vec_t : vec_base_t<N, T> {
 	template <bool always_false = false>
 	[[nodiscard]] static constexpr inline vec_t nan() noexcept {
 		if constexpr (std::numeric_limits<T>::has_quiet_NaN)
-			return build_vec<N>([&](const auto) { return std::numeric_limits<T>::quiet_NaN(); });
+			return one(std::numeric_limits<T>::quiet_NaN());
 		else
 			static_assert(always_false, "Underlying type has no NaN");
 	}
 
 	[[nodiscard]] static constexpr inline vec_t max() noexcept {
-		return build_vec<N>([&](const auto) { return std::numeric_limits<T>::max(); });
+		return one(std::numeric_limits<T>::max());
 	}
 
 	[[nodiscard]] static constexpr inline vec_t min() noexcept {
-		return build_vec<N>([&](const auto) { return std::numeric_limits<T>::min(); });
+		return one(std::numeric_limits<T>::min());
 	}
 
 	[[nodiscard]] static constexpr inline vec_t lowest() noexcept {
-		return build_vec<N>([&](const auto) { return std::numeric_limits<T>::lowest(); });
+		return one(std::numeric_limits<T>::lowest());
 	}
 
 	// operator*=(scalar) --------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t& operator+=(const K& v) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] += v; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] += v;
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator-=(const K& v) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] -= v; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] -= v;
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator*=(const K& v) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] *= v; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] *= v;
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator/=(const K& v) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] /= v; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] /= v;
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator%=(const K& v) noexcept {
 		if constexpr (std::is_floating_point_v<T>)
-			libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] = std::fmod(this->data()[index], v); });
+			for (size_t i = 0; i < N; ++i)
+				this->data()[i] = std::fmod(this->data()[i], v);
 		else
-			libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] %= v; });
+			for (size_t i = 0; i < N; ++i)
+				this->data()[i] %= v;
 		return *this;
 	}
 
 	// operator*=(vec) -----------------------------------------------------------------------------
 	template <typename K>
 	constexpr inline vec_t& operator+=(const vec_t<N, K>& rhs) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] += rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] += rhs.data()[i];
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator-=(const vec_t<N, K>& rhs) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] -= rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] -= rhs.data()[i];
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator*=(const vec_t<N, K>& rhs) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] *= rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] *= rhs.data()[i];
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator/=(const vec_t<N, K>& rhs) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] /= rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			this->data()[i] /= rhs.data()[i];
 		return *this;
 	}
 	template <typename K>
 	constexpr inline vec_t& operator%=(const vec_t<N, K>& rhs) noexcept {
 		if constexpr (std::is_floating_point_v<T>)
-			libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] = std::fmod(this->data()[index], rhs.data()[index]); });
+			for (size_t i = 0; i < N; ++i)
+				this->data()[i] = std::fmod(this->data()[i], rhs.data()[i]);
 		else
-			libv::meta::for_constexpr<0, N>([&](const auto index) { this->data()[index] %= rhs.data()[index]; });
+			for (size_t i = 0; i < N; ++i)
+				this->data()[i] %= rhs.data()[i];
 		return *this;
 	}
 
 	// operator+ -----------------------------------------------------------------------------------
 	[[nodiscard]] constexpr inline vec_t operator+() const noexcept {
-		return build_vec<N>([&](const auto index) { return +this->data()[index]; });
+		vec_t result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = +this->data()[i];
+		return result;
 	}
 
 	[[nodiscard]] constexpr inline vec_t operator-() const noexcept {
-		return build_vec<N>([&](const auto index) { return -this->data()[index]; });
+		vec_t result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = -this->data()[i];
+		return result;
 	}
 
 	// ---------------------------------------------------------------------------------------------
@@ -306,7 +325,8 @@ struct vec_t : vec_base_t<N, T> {
 	 * @return The vector */
 	[[nodiscard]] constexpr inline T length_sq() const noexcept {
 		T result{};
-		libv::meta::for_constexpr<0, N>([&](const auto index) { result += this->data()[index] * this->data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			result += this->data()[i] * this->data()[i];
 		return result;
 	}
 
@@ -345,7 +365,10 @@ struct vec_t : vec_base_t<N, T> {
 	/// \return The static_cast-ed vector to the requested K type
 	template <typename K>
 	[[nodiscard]] constexpr inline vec_t<N, K> cast() const noexcept {
-		return build_vec<N>([&](const auto index) { return static_cast<K>(this->data()[index]); });
+		vec_t<N, K> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = static_cast<K>(this->data()[i]);
+		return result;
 	}
 
 	// observers -----------------------------------------------------------------------------------
@@ -360,20 +383,23 @@ struct vec_t : vec_base_t<N, T> {
 
 	template <typename F>
 	constexpr inline void sequential_foreach(F&& func) noexcept {
-		libv::meta::for_constexpr<0, N>([&](const auto index) { func(this->data()[index]); });
+		for (size_t i = 0; i < N; ++i)
+			func(this->data()[i]);
 	}
 
 	// operator==(vec, vec) ------------------------------------------------------------------------
 	template <typename K>
 	[[nodiscard]] friend constexpr inline bool operator==(const vec_t& lhs, const vec_t<N, K>& rhs) noexcept {
 		bool result = true;
-		libv::meta::for_constexpr<0, N>([&](const auto index) { result = result && lhs.data()[index] == rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			result &= lhs.data()[i] == rhs.data()[i];
 		return result;
 	}
 	template <typename K>
 	[[nodiscard]] friend constexpr inline bool operator!=(const vec_t& lhs, const vec_t<N, K>& rhs) noexcept {
 		bool result = false;
-		libv::meta::for_constexpr<0, N>([&](const auto index) { result = result || lhs.data()[index] != rhs.data()[index]; });
+		for (size_t i = 0; i < N; ++i)
+			result |= lhs.data()[i] != rhs.data()[i];
 		return result;
 	}
 
@@ -391,11 +417,11 @@ struct vec_t : vec_base_t<N, T> {
 	//	friend inline OStream& operator<<(OStream& os, const vec_t& vec) {
 	// --- END ---
 
-		libv::meta::for_constexpr<0, N>([&](const auto index) {
-			if constexpr (index != 0)
+		for (size_t i = 0; i < N; ++i) {
+			if (i != 0)
 				os << ' ';
-			os << vec.data()[index];
-		});
+			os << vec.data()[i];
+		}
 		return os;
 	}
 };
@@ -404,78 +430,135 @@ struct vec_t : vec_base_t<N, T> {
 
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator+(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] + rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() + std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] + rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator-(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] - rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() - std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] - rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator*(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] * rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() * std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] * rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator/(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() / std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] / rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator%(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	if constexpr (std::is_floating_point_v<T>)
-		return build_vec<N>([&](const auto index) { return std::fmod(lhs.data()[index], rhs.data()[index]); });
-	else
-		return build_vec<N>([&](const auto index) { return lhs.data()[index] % rhs.data()[index]; });
+	if constexpr (std::is_floating_point_v<T>) {
+		vec_t<N, decltype(std::fmod(std::declval<T>(), std::declval<K>()))> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = std::fmod(lhs.data()[i], rhs.data()[i]);
+		return result;
+	} else {
+		vec_t<N, decltype(std::declval<T>() % std::declval<K>())> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = lhs.data()[i] % rhs.data()[i];
+		return result;
+	}
 }
 
 // operator*(vec, scalar) --------------------------------------------------------------------------
 
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator+(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] + rhs; });
+	vec_t<N, decltype(std::declval<T>() + std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] + rhs;
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator-(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] - rhs; });
+	vec_t<N, decltype(std::declval<T>() - std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] - rhs;
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator*(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] * rhs; });
+	vec_t<N, decltype(std::declval<T>() * std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] * rhs;
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator/(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs.data()[index] / rhs; });
+	vec_t<N, decltype(std::declval<T>() / std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs.data()[i] / rhs;
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator%(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	if constexpr (std::is_floating_point_v<T>)
-		return build_vec<N>([&](const auto index) { return std::fmod(lhs.data()[index], rhs); });
-	else
-		return build_vec<N>([&](const auto index) { return lhs.data()[index] % rhs; });
+	if constexpr (std::is_floating_point_v<T>) {
+		vec_t<N, decltype(std::fmod(std::declval<T>(), std::declval<K>()))> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = std::fmod(lhs.data()[i], rhs);
+		return result;
+	} else {
+		vec_t<N, decltype(std::declval<T>() % std::declval<K>())> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = lhs.data()[i] % rhs;
+		return result;
+	}
 }
 
 // operator*(scalar, vec) --------------------------------------------------------------------------
 
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator+(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs + rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() + std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs + rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator-(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs - rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() - std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs - rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator*(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs * rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() * std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs * rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator/(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return lhs / rhs.data()[index]; });
+	vec_t<N, decltype(std::declval<T>() / std::declval<K>())> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = lhs / rhs.data()[i];
+	return result;
 }
 template <size_t N, typename T, typename K>
 [[nodiscard]] constexpr inline auto operator%(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	if constexpr (std::is_floating_point_v<T>)
-		return build_vec<N>([&](const auto index) { return std::fmod(lhs, rhs.data()[index]); });
-	else
-		return build_vec<N>([&](const auto index) { return lhs % rhs.data()[index]; });
+	if constexpr (std::is_floating_point_v<T>) {
+		vec_t<N, decltype(std::fmod(std::declval<T>(), std::declval<K>()))> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = std::fmod(lhs, rhs.data()[i]);
+		return result;
+	} else {
+		vec_t<N, decltype(std::declval<T>() % std::declval<K>())> result{};
+		for (size_t i = 0; i < N; ++i)
+			result.data()[i] = lhs % rhs.data()[i];
+		return result;
+	}
 }
 
 // operator<(vec, vec) -----------------------------------------------------------------------------
@@ -615,88 +698,112 @@ template <size_t N, typename T>
 // -------------------------------------------------------------------------------------------------
 
 /// \return The dot product of the two vector
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline std::common_type_t<T, K> dot(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	std::common_type_t<T, K> result{};
-	libv::meta::for_constexpr<0, N>([&](const auto index) { result += lhs.data()[index] * rhs.data()[index]; });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto dot(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs) noexcept {
+	T result{};
+	for (size_t i = 0; i < N; ++i)
+		result += lhs.data()[i] * rhs.data()[i];
 	return result;
 }
 
 /// \return The cross product of the two 2D vector
-template <typename V0, typename V1>
-		WISH_REQUIRES(Vec2<V0> && Vec2<V1>)
-[[nodiscard]] constexpr inline auto cross(const V0& lhs, const V1& rhs) noexcept {
+template <typename T>
+[[nodiscard]] constexpr inline auto cross(const vec_t<2, T>& lhs, const vec_t<2, T>& rhs) noexcept {
 	return lhs.x * rhs.y - lhs.y * rhs.x;
 }
 
 /// \return The cross product of the two 3D vector
-template <typename V0, typename V1>
-		WISH_REQUIRES(Vec3<V0> && Vec3<V1>)
-[[nodiscard]] constexpr inline auto cross(const V0& lhs, const V1& rhs) noexcept {
-	return vec_t<3, decltype(lhs.y * rhs.z - lhs.z * rhs.y)>(
+template <typename T>
+[[nodiscard]] constexpr inline auto cross(const vec_t<3, T>& lhs, const vec_t<3, T>& rhs) noexcept {
+	return vec_t<3, T>(
 			lhs.y * rhs.z - lhs.z * rhs.y,
 			lhs.z * rhs.x - lhs.x * rhs.z,
 			lhs.x * rhs.y - lhs.y * rhs.x);
 }
 
 /// \return The maximum vector with the greater value on each dimension from the two vector
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto max(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::max(lhs.data()[index], rhs.data()[index]); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto max(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::max(lhs.data()[i], rhs.data()[i]);
+	return result;
 }
 /// \return The maximum vector with the greater value on each dimension
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto max(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::max(lhs.data()[index], rhs); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto max(const vec_t<N, T>& lhs, const T& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::max(lhs.data()[i], rhs);
+	return result;
 }
 /// \return The maximum vector with the greater value on each dimension
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto max(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::max(lhs, rhs.data()[index]); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto max(const T& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::max(lhs, rhs.data()[i]);
+	return result;
 }
 
 /// \return The minimum vector with the smaller value on each dimension from the two vector
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto min(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::min(lhs.data()[index], rhs.data()[index]); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto min(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::min(lhs.data()[i], rhs.data()[i]);
+	return result;
 }
 /// \return The minimum vector with the smaller value on each dimension
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto min(const vec_t<N, T>& lhs, const K& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::min(lhs.data()[index], rhs); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto min(const vec_t<N, T>& lhs, const T& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::min(lhs.data()[i], rhs);
+	return result;
 }
 /// \return The minimum vector with the smaller value on each dimension
-template <size_t N, typename T, typename K>
-[[nodiscard]] constexpr inline auto min(const T& lhs, const vec_t<N, K>& rhs) noexcept {
-	return build_vec<N>([&](const auto index) { return std::min(lhs, rhs.data()[index]); });
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto min(const T& lhs, const vec_t<N, T>& rhs) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::min(lhs, rhs.data()[i]);
+	return result;
 }
 
 /// \return Clamps the vector's each dimension within the range of [\c high, \c low]
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto clamp(const vec_t<N, T>& vec, const T& low, const T& high) noexcept {
-	return build_vec<N>([&](const auto index) {
-		// NOTE: vec.hpp is a sensitive header: <algorithm> would be too heavy include for std::clamp only
-		auto value = vec.data()[index];
-		return (value < low) ? low : (high < value) ? high : value;
-	});
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i) {
+		// NOTE: vec.hpp is a sensitive header: <algorithm> would be too heavy include for only std::clamp
+		const auto& value = vec.data()[i];
+		result.data()[i] = (value < low) ? low : (high < value) ? high : value;
+	}
+	return result;
 }
 
 /// \return Clamps the vector's each dimension within the range of [\c high, \c low] matching component
 template <size_t N, typename T>
-[[nodiscard]] constexpr inline auto clamp(const vec_t<N, T>& vec, const vec_t<N, T>&  low, const vec_t<N, T>& high) noexcept {
-	return build_vec<N>([&](const auto index) {
-		// NOTE: vec.hpp is a sensitive header: <algorithm> would be too heavy include for std::clamp only
-		auto value = vec.data()[index];
-		auto low = low.data()[index];
-		auto high = high.data()[index];
-		return (value < low) ? low : (high < value) ? high : value;
-	});
+[[nodiscard]] constexpr inline auto clamp(const vec_t<N, T>& vec, const vec_t<N, T>& low, const vec_t<N, T>& high) noexcept {
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i) {
+		// NOTE: vec.hpp is a sensitive header: <algorithm> would be too heavy include for only std::clamp
+		const auto& value = vec.data()[i];
+		const auto& low_ = low.data()[i];
+		const auto& high_ = high.data()[i];
+		result.data()[i] = (value < low_) ? low_ : (high_ < value) ? high_ : value;
+	}
+	return result;
 }
 
 /// \return Abs the vector's each dimension
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto abs(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::abs(vec.data()[index]); });
+	vec_t<N, T> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::abs(vec.data()[i]);
+	return result;
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -731,44 +838,59 @@ template <typename K, size_t N, typename T>
 
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto floor(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::floor(vec.data()[index]); });
+	vec_t<N, decltype(std::floor(std::declval<T>()))> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::floor(vec.data()[i]);
+	return result;
 }
 
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto ceil(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::ceil(vec.data()[index]); });
+	vec_t<N, decltype(std::ceil(std::declval<T>()))> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::ceil(vec.data()[i]);
+	return result;
 }
 
 template <size_t N, typename T>
 [[nodiscard]] constexpr inline auto round(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::round(vec.data()[index]); });
-}
-template <size_t N, typename T>
-[[nodiscard]] constexpr inline auto lround(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::lround(vec.data()[index]); });
-}
-template <size_t N, typename T>
-[[nodiscard]] constexpr inline auto llround(const vec_t<N, T>& vec) noexcept {
-	return build_vec<N>([&](const auto index) { return std::llround(vec.data()[index]); });
-}
-
-template <size_t N, typename T, typename K, typename L = std::common_type_t<T, K>>
-[[nodiscard]] constexpr inline bool approx_eq(const vec_t<N, T>& lhs, const vec_t<N, K>& rhs, L&& epsilon = L{0.00001}) noexcept {
-	bool result = true;
-	libv::meta::for_constexpr<0, N>([&](const auto index) {
-		result = result && std::abs(lhs.data()[index] - rhs.data()[index]) < epsilon;
-	});
+	vec_t<N, decltype(std::round(std::declval<T>()))> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::round(vec.data()[i]);
 	return result;
 }
 
-template <size_t N, typename T, typename K, typename L>
-[[nodiscard]] constexpr inline bool within(const vec_t<N, T>& value, const vec_t<N, K>& min, const vec_t<N, L>& max) noexcept {
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto lround(const vec_t<N, T>& vec) noexcept {
+	vec_t<N, decltype(std::lround(std::declval<T>()))> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::lround(vec.data()[i]);
+	return result;
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline auto llround(const vec_t<N, T>& vec) noexcept {
+	vec_t<N, decltype(std::llround(std::declval<T>()))> result{};
+	for (size_t i = 0; i < N; ++i)
+		result.data()[i] = std::llround(vec.data()[i]);
+	return result;
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline bool approx_eq(const vec_t<N, T>& lhs, const vec_t<N, T>& rhs, T epsilon = T{0.00001}) noexcept {
 	bool result = true;
-	libv::meta::for_constexpr<0, N>([&](const auto index) {
-		result = result &&
-				value.data()[index] >= min.data()[index] &&
-				value.data()[index] <= max.data()[index];
-	});
+	for (size_t i = 0; i < N; ++i)
+		result &= std::abs(lhs.data()[i] - rhs.data()[i]) < epsilon;
+	return result;
+}
+
+template <size_t N, typename T>
+[[nodiscard]] constexpr inline bool within(const vec_t<N, T>& value, const vec_t<N, T>& min, const vec_t<N, T>& max) noexcept {
+	bool result = true;
+	for (size_t i = 0; i < N; ++i)
+		result &=
+				value.data()[i] >= min.data()[i] &&
+				value.data()[i] <= max.data()[i];
 	return result;
 }
 

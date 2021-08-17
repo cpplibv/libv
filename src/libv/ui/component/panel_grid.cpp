@@ -10,6 +10,7 @@
 // libv
 #include <libv/algo/bisect.hpp>
 #include <libv/algo/sum.hpp>
+#include <libv/meta/for_constexpr.hpp>
 #include <libv/range/view_deinterleave.hpp>
 #include <libv/utility/approx.hpp>
 #include <libv/utility/observer_ref.hpp>
@@ -369,8 +370,8 @@ void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 		for (const auto& [x, child] : row | ranges::view::enumerate) {
 			auto& childSize = childSizes[y * column_count + x];
 
-			childSize = libv::build_vec<3>([&](const auto i) {
-				return child->size()[i].pixel +
+			libv::meta::for_constexpr<0, 3>([&](const auto i) {
+				childSize[i] = child->size()[i].pixel +
 						child->size()[i].percent * percent_size[i] * 0.01f +
 						child->size()[i].ratio * ratioContribution[i] +
 						(child->size()[i].dynamic ? child.dynamic[i] : 0.f);

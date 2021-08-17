@@ -8,6 +8,7 @@
 #include <range/v3/view/zip.hpp>
 // libv
 #include <libv/algo/adjacent_pairs.hpp>
+#include <libv/meta/for_constexpr.hpp>
 #include <libv/utility/approx.hpp>
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>

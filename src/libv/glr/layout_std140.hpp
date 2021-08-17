@@ -10,6 +10,7 @@
 #include <libv/math/mat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/meta/always.hpp>
+#include <libv/meta/for_constexpr.hpp>
 #include <libv/meta/reflection.hpp>
 #include <libv/meta/type_traits.hpp>
 #include <libv/utility/align.hpp>
