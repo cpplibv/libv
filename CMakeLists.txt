@@ -536,13 +536,16 @@ wish_create_external(
 )
 
 wish_create_external(
-	NAME reactphysics3d
+	NAME rp3d
+#	GIT_REPOSITORY https://github.com/DanielChappuis/reactphysics3d
+#	GIT_TAG c237cecf6871af44d54fc641af6f0dea15dd3187
+#	Main reason for the fork is long namespace if not the monolith header is used
 	GIT_REPOSITORY https://github.com/VaderY/reactphysics3d.git
-#	GIT_TAG 9fb21277
-	GIT_TAG b213ca34
+	GIT_TAG patched_c237cecf
 	CMAKE_ARGS
 		-DCMAKE_BUILD_TYPE=RELEASE
-	LINK reactphysics3d
+#	LINK reactphysics3d
+	LINK rp3d
 )
 
 wish_create_external(
@@ -1060,7 +1063,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_physics
 	SOURCE sandbox/libv_physics_main.cpp
-	LINK   ext_reactphysics3d libv_math
+	LINK   ext_rp3d libv_math
 )
 
 wish_create_executable(
