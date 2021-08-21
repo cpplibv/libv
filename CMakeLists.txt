@@ -124,10 +124,14 @@ endif()
 option(FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
 if (${FORCE_COLORED_OUTPUT})
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+		message(STATUS "Force colored output: GCC")
 		add_compile_options(-fdiagnostics-color=always)
 	elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		message(STATUS "Force colored output: Clang")
 		add_compile_options(-fcolor-diagnostics)
 	endif()
+else()
+	message(STATUS "Force colored output: False")
 endif()
 
 option(SKIP_EXTERNAL_CONFIGURES "Do not configure external projects only use the fake interface targets" FALSE)
@@ -224,15 +228,17 @@ wish_create_external(
 wish_create_external(
 	NAME libbacktrace
 	GIT_REPOSITORY https://github.com/ianlancetaylor/libbacktrace.git
-	GIT_TAG 5a99ff7fed66b8ea8f09c9805c138524a7035ece
+	GIT_TAG d0f5e95a87a4d3e0a1ed6c069b5dae7cbab3ed2a
 	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND ./configure
-	BUILD_COMMAND make
+	CONFIGURE_COMMAND
+		COMMAND ${CMAKE_COMMAND} -E rm -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/config.status # Workaround, sometimes it stucks and configure fails
+		COMMAND bash -C ./configure # 'bash' is used for Windows cmd to not fail
+	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT}
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/libbacktrace/include/libbacktrace/
-		COMMAND mkdir -p ${PATH_EXT}/libbacktrace/lib/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/backtrace.h ${PATH_EXT}/libbacktrace/include/libbacktrace/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/.libs/libbacktrace.a ${PATH_EXT}/libbacktrace/lib/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/include/libbacktrace/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/libbacktrace/lib/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/backtrace.h ${PATH_EXT}/libbacktrace/include/libbacktrace/backtrace.h
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/libbacktrace/src/get_libbacktrace/.libs/libbacktrace.a ${PATH_EXT}/libbacktrace/lib/libbacktrace.a
 	LINK backtrace
 )
 
@@ -251,7 +257,7 @@ wish_create_external(
 	NAME boost
 	URL https://boostorg.jfrog.io/artifactory/main/release/${Boost_Version}/source/boost_${Boost_Version_Underscore}.zip
 	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND ./bootstrap.sh ${TOOLSET}
+	CONFIGURE_COMMAND bash -C ./bootstrap.sh ${TOOLSET} # 'bash' is used for Windows cmd to not fail
 	BUILD_COMMAND ./b2 --ignore-site-config install
 		toolset=${TOOLSET}
 		variant=release
@@ -290,8 +296,8 @@ wish_create_external(
 	GIT_TAG v2.2.3
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/catch/include/catch/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/catch/src/get_catch/single_include/ ${PATH_EXT}/catch/include/catch/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/catch/include/catch/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/catch/src/get_catch/single_include/ ${PATH_EXT}/catch/include/catch/
 #	GIT_REPOSITORY https://github.com/catchorg/Catch2.git
 #	GIT_TAG 7d0b205564567359ced799af93bbf7b1f051110
 #	CMAKE_ARGS
@@ -318,10 +324,10 @@ wish_create_external(
 		-DCLIP_EXAMPLES=OFF
 		-DCLIP_TESTS=OFF
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/clip/include/clip/
-		COMMAND mkdir -p ${PATH_EXT}/clip/lib/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/clip/src/get_clip/clip.h ${PATH_EXT}/clip/include/clip/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/clip/src/get_clip-build/libclip.a ${PATH_EXT}/clip/lib/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/clip/include/clip/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/clip/lib/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/clip/src/get_clip/clip.h ${PATH_EXT}/clip/include/clip/clip.h
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/clip/src/get_clip-build/libclip.a ${PATH_EXT}/clip/lib/libclip.a
 	LINK clip
 )
 
@@ -331,8 +337,8 @@ wish_create_external(
 	GIT_TAG 80cb82f542bb176ab7f7e3393ab530a79223bb13
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/colony/include/colony/
-		COMMAND cp -f ${PATH_EXT_SRC}/colony/src/get_colony/plf_colony.h ${PATH_EXT}/colony/include/colony/plf_colony.h
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/colony/include/colony/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/colony/src/get_colony/plf_colony.h ${PATH_EXT}/colony/include/colony/plf_colony.h
 )
 
 wish_create_external(
@@ -370,8 +376,8 @@ wish_create_external(
 #		-DUSE_TZ_DB_IN_DOT=ON
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/date/include/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/date/src/get_date/include/ ${PATH_EXT}/date/include/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/date/include/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/date/src/get_date/include/ ${PATH_EXT}/date/include/
 )
 
 wish_create_external(
@@ -410,15 +416,14 @@ wish_create_external(
 	GIT_TAG OpenSSL_1_1_1k
 
 	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND ./config no-tests no-shared
-	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # Calling 'make' is not really nice, but I lost my patience for now
-
+	CONFIGURE_COMMAND bash -C ./config no-tests no-shared # 'bash' is used for Windows cmd to not fail
+	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # OpenSSL is 'make' based
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/openssl/include/openssl/
-		COMMAND mkdir -p ${PATH_EXT}/openssl/lib/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/openssl/src/get_openssl/include/openssl/ ${PATH_EXT}/openssl/include/openssl/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/openssl/src/get_openssl/libssl.a ${PATH_EXT}/openssl/lib/
-		COMMAND cp -r -f ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/include/openssl/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/lib/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/openssl/src/get_openssl/include/openssl/ ${PATH_EXT}/openssl/include/openssl/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libssl.a ${PATH_EXT}/openssl/lib/libssl.a
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/openssl/src/get_openssl/libcrypto.a ${PATH_EXT}/openssl/lib/libcrypto.a
 
 #	LINK ssl
 #	LINK wsock32 ws2_32
@@ -531,8 +536,8 @@ wish_create_external(
 	GIT_TAG 0487cca29e352e8f16bbd91fda38e76e39a0ed28
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/range/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/range/src/get_range/include/ ${PATH_EXT}/range/include/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/range/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/range/src/get_range/include/ ${PATH_EXT}/range/include/
 )
 
 wish_create_external(
@@ -561,8 +566,8 @@ wish_create_external(
 	GIT_TAG v3.0.2
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/sol/include/sol/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sol/src/get_sol/include/sol/ ${PATH_EXT}/sol/include/sol/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/sol/include/sol/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/sol/src/get_sol/include/sol/ ${PATH_EXT}/sol/include/sol/
 	LINK ext_lua
 #	DEFINE SOL_USE_BOOST=1
 	DEFINE SOL_CXX17_FEATURES=1
@@ -575,8 +580,8 @@ wish_create_external(
 	GIT_TAG 7b6a54dd84067cfc3a42f869e2df1b65d38bd711
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/sml/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/include/
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/sml/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/sml/src/get_sml/include/ ${PATH_EXT}/sml/include/
 )
 
 wish_create_external(
@@ -585,8 +590,8 @@ wish_create_external(
 	GIT_TAG e6bde7819c60c453b720b5de8c7c5ee9ffd9805a
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/utf8cpp/include/utf8cpp/
-		COMMAND cp -r -f -T ${PATH_EXT_SRC}/utf8cpp/src/get_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/utf8cpp/include/utf8cpp/
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${PATH_EXT_SRC}/utf8cpp/src/get_utf8cpp/source ${PATH_EXT}/utf8cpp/include/utf8cpp
 )
 
 wish_create_external(
@@ -595,8 +600,8 @@ wish_create_external(
 	GIT_TAG fc9ed1ce6661ccc73783ee9193fa77e8a673b839
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
-		COMMAND mkdir -p ${PATH_EXT}/jc_voronoi/include/jc_voronoi/
-		COMMAND cp -f -T ${PATH_EXT_SRC}/jc_voronoi/src/get_jc_voronoi/src/jc_voronoi.h ${PATH_EXT}/jc_voronoi/include/jc_voronoi/jc_voronoi.h
+		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/jc_voronoi/include/jc_voronoi/
+		COMMAND ${CMAKE_COMMAND} -E copy ${PATH_EXT_SRC}/jc_voronoi/src/get_jc_voronoi/src/jc_voronoi.h ${PATH_EXT}/jc_voronoi/include/jc_voronoi/jc_voronoi.h
 )
 
 wish_end_group()
