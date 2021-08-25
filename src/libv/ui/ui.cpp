@@ -533,6 +533,12 @@ void UI::execute_in_ui_loop(std::function<void()> func) {
 
 // -------------------------------------------------------------------------------------------------
 
+EventHostGlobal<Component> UI::event() {
+	return EventHostGlobal<Component>{self->root};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void UI::event(const libv::input::EventChar& event) {
 	std::unique_lock lock{self->event_queue_m};
 	self->event_queue.emplace_back(event);

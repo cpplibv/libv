@@ -145,15 +145,7 @@ SceneMPBar::~SceneMPBar() {
 // =================================================================================================
 // <<< Do not forget about the prettier API and styles
 
-//		style("space-canvas-main");
-//		style("space-canvas-mini");
-//		style("space.hud-bar.cmd");
-//		style("space.hud-bar.cmd.button");
-//		style("space.hud-bar.mp");
-//		style("space.hud-bar.mp-cam");
-//		style("space.hud-bar.mp.btn");
-//		style("space.hud-bar.mp.input");
-//		style("space.hud-bar.mp.lbl");
+
 
 //libv::ui::Component create_hud_styled_build_chain(
 //		PlayoutDelayBuffer& playout_delay_buffer,

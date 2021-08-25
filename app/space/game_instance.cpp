@@ -4,6 +4,7 @@
 #include <space/game_instance.hpp>
 // libv
 #include <libv/ctrl/feature_register.hpp>
+#include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/settings.hpp>
 //#include <libv/ctrl/controls.hpp>
@@ -46,21 +47,6 @@ inline void event_for_global_test_mode(const libv::Frame& frame, const libv::inp
 	log_space.info_if(old_global_test_mode != global_test_mode, "Test mode: {}", global_test_mode);
 }
 
-inline void event_for_ui_overlay_camera_hack(libv::ctrl::Controls& controls, const libv::input::EventKey& e) {
-	// TODO P1: Controls camera should only be placed into context if the canvas is focused
-	// TODO P1: Remove the F12 tracking manual workaround too for mode switching (Related to controls bypass)
-	// TODO P1: Ui focus for controls switch
-	//			Hack workaround until ui focus does not operates control contexts
-	if (e.keycode == libv::input::Keycode::F12 && e.action == libv::input::Action::press) {
-		static int hack_camera_control_ui_mode = 0;
-		hack_camera_control_ui_mode = (hack_camera_control_ui_mode + 1) % 3;
-		if (hack_camera_control_ui_mode == 1)
-			controls.ignore_events(true);
-		else
-			controls.ignore_events(false);
-	}
-}
-
 // -------------------------------------------------------------------------------------------------
 
 GameInstance::GameInstance() :
@@ -82,7 +68,12 @@ GameInstance::GameInstance() :
 	frame.onKey.output([this](const libv::input::EventKey& e) {
 		// TODO P1: Remove these hacks
 		event_for_global_test_mode(this->frame, e);
-		event_for_ui_overlay_camera_hack(this->controls, e);
+	});
+
+	ui.event().global.connect_system<libv::ui::EventOverlay>([this](const libv::ui::EventOverlay& event) {
+		log_space.info("Controls intercepted: {}", event.controls_intercepted());
+		// TODO P1: A more seamless integration of UI and Controls would be nice
+		controls.ignore_events(event.controls_intercepted());
 	});
 }
 

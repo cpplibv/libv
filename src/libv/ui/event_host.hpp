@@ -57,7 +57,21 @@ struct EventSubmit : BaseEvent { };
 // Proof: https://godbolt.org/z/vM5zhf3Yf
 
 template <typename ComponentT>
-struct EventHostGeneral {
+struct EventHostGlobal {
+	using component_type = ComponentT;
+
+public:
+	BasicEventProxyGlobal<ComponentT> global;
+
+public:
+	explicit inline EventHostGlobal(ComponentT& owner) noexcept :
+		global(owner) {}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename ComponentT>
+struct EventHostGeneral : EventHostGlobal<ComponentT> {
 	using component_type = ComponentT;
 
 public:
@@ -73,10 +87,9 @@ public:
 
 	BasicEventProxy<ComponentT, EventFocus> focus;
 
-	BasicEventProxyGlobal<ComponentT> global;
-
 public:
 	explicit inline EventHostGeneral(ComponentT& owner) noexcept :
+		EventHostGlobal<ComponentT>(owner),
 		char_(owner),
 		key(owner),
 		mouse_button(owner),
@@ -84,8 +97,7 @@ public:
 		mouse_scroll(owner),
 		attach(owner),
 		detach(owner),
-		focus(owner),
-		global(owner) {}
+		focus(owner) {}
 };
 
 // -------------------------------------------------------------------------------------------------

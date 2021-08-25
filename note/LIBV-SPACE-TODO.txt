@@ -64,11 +64,16 @@ app.space: Add support for chained command arrows
 --- STACK ------------------------------------------------------------------------------------------
 
 
-//		controls.context_enter<app::BaseCameraOrbit>(&scene.camera);
-//		controls.context_enter<app::SpaceCanvas>(scene.canvas);
 
-call
-	add_game_scene(GameInstance& game, GameSession& game_session, libv::Nexus& nexus)
+
+
+
+
+
+app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
+app.space: Mini canvas show other clients view
+
+app.space: Pause, Unpause (It will be a good practise for timers and controls)
 
 
 
@@ -121,10 +126,6 @@ app.space: Main structure paper
 
 
 app.space: Structure the whole program: UML time is upon us
-app.space: Pause, Unpause (It will be a good practise for timers and controls)
-
-app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
-app.space: Mini canvas show other clients view
 
 app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 app.space: Cannibalize style.lua from vm4_viewer
@@ -141,9 +142,7 @@ app.space / libv.rev: Render target/Framebuffer abstraction
 		easy render target inspection
 app.space: make a blur or a bloom
 
-app.space: Optimized VAO update for command arrows
-app.space: Iris and space has to merge in some way
-
+app.space: Optimized VAO update for command arrows (prepare / render step is done, mesh re-upload and glr side should be checked)
 
 app.space: Command arrow improvements
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
@@ -153,6 +152,8 @@ app.space: Command arrow improvements
 	app.space.visual: Command arrow make the edges less bright to help with AA edge
 
 app.space: line shader (Dalma)
+
+app.space: Iris and space has to merge in some way
 
 game.sim:
 		- Command based sim state manipulation | Playout

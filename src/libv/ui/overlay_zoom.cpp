@@ -19,6 +19,7 @@
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/event/event_mouse.hpp>
+#include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/log.hpp>
 
 
@@ -264,7 +265,7 @@ void CoreOverlayZoom::doAttach() {
 	watchMouse(true);
 
 	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
-	// vvv Start of workaround
+	// vvv Start of workaround (More below)
 	if (control_)
 		context().mouse.acquire(*this);
 	// ^^^ End of workaround
@@ -334,20 +335,23 @@ core_ptr OverlayZoom::create_core(std::string name) {
 
 void OverlayZoom::control() {
 	self().control_ = true;
+	self().context().broadcast(EventOverlay(true));
 	// TODO P4: Fix ability to instantly acquire mouse on component creation (before attach run)
-	// vvv Start of workaround (comment / uncomment)
+	// vvv Start of workaround (comment / uncomment) (More above)
 	//self().context().mouse.acquire(self());
-	// ^^^ Start of workaround
+	// ^^^ Stop of workaround
 }
 
 void OverlayZoom::view() {
 	self().control_ = false;
 	self().context().mouse.release(self());
+	self().context().broadcast(EventOverlay(false));
 }
 
 void OverlayZoom::disable() {
 	self().control_ = false;
 	self().context().mouse.release(self());
+	self().context().broadcast(EventOverlay(false));
 }
 
 libv::vec2f OverlayZoom::screen_BL() const {

@@ -11,20 +11,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class EventFocus : BaseEvent {
+class EventOverlay : BaseEvent {
 private:
-	bool focus;
+	bool controls_intercepted_;
 
 public:
-	explicit constexpr inline EventFocus(bool focus) noexcept : focus(focus) { }
+	explicit constexpr inline EventOverlay(bool controls_intercepted_) noexcept :
+		controls_intercepted_(controls_intercepted_) { }
 
 public:
-	[[nodiscard]] constexpr inline bool gain() const noexcept {
-		return focus;
-	}
-
-	[[nodiscard]] constexpr inline bool loss() const noexcept {
-		return !focus;
+	[[nodiscard]] constexpr inline bool controls_intercepted() const noexcept {
+		return controls_intercepted_;
 	}
 };
 
