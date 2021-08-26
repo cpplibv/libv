@@ -71,7 +71,7 @@ SceneGame::~SceneGame() {
 }
 
 libv::ui::Component SceneGame::init_canvas_main() {
-	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game.renderer, game_session, game_session.universe, game_session.playout, camera, true);
+	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game.renderer, game_session, game_session.universe, *game_session.playout, camera, true);
 //		style("space-canvas-main");
 
 //	out_canvas_main.emplace(canvas_main);

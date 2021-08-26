@@ -24,7 +24,7 @@ struct Command {
 
 };
 
-struct CommandSession : Command {
+struct CommandLobby : Command {
 	static constexpr bool is_session_command = true;
 	static constexpr bool is_state_command = false;
 	static constexpr bool is_track_command = false;
@@ -44,11 +44,11 @@ struct CommandTrack : Command {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct CommandPlayerKick : CommandSession {
+//struct CommandPlayerKick : CommandLobby {
 //	PlayerID playerID;
 //};
 
-struct CommandChatMessage : CommandSession {
+struct CommandChatMessage : CommandLobby {
 //	PlayerID playerID;
 	//	Timestamp timestamp;
 	std::string sender;
@@ -59,8 +59,10 @@ struct CommandChatMessage : CommandSession {
 	LIBV_REFLECTION_ACCESS(message);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
-//	CommandChatMessage(PlayerID playerId, std::string message) : playerID(playerId), message(std::move(message)) {}
-	CommandChatMessage(std::string sender, std::string message) : sender(std::move(sender)), message(std::move(message)) {}
+	inline CommandChatMessage() noexcept = default;
+	//	CommandChatMessage(PlayerID playerId, std::string message) : playerID(playerId), message(std::move(message)) {}
+	inline CommandChatMessage(std::string sender, std::string message) :
+			sender(std::move(sender)), message(std::move(message)) {}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -73,7 +75,8 @@ struct CommandFleetSpawn : CommandState {
 	LIBV_REFLECTION_ACCESS(position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
-	explicit CommandFleetSpawn(const libv::vec3f& position) : position(position) {}
+	constexpr inline CommandFleetSpawn() noexcept = default;
+	explicit constexpr inline CommandFleetSpawn(const libv::vec3f& position) : position(position) {}
 };
 
 struct CommandFleetMove : CommandState {
@@ -85,7 +88,9 @@ struct CommandFleetMove : CommandState {
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
-	CommandFleetMove(FleetID fleetId, const libv::vec3f& targetPosition) : fleetID(fleetId), target_position(targetPosition) {}
+	constexpr inline CommandFleetMove() noexcept = default;
+	constexpr inline CommandFleetMove(FleetID fleetId, const libv::vec3f& targetPosition) :
+			fleetID(fleetId), target_position(targetPosition) {}
 };
 
 struct CommandClearFleets : CommandState {
@@ -99,8 +104,9 @@ struct CommandShuffle : CommandState {
 	LIBV_REFLECTION_ACCESS(seed);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
+	constexpr inline CommandShuffle() noexcept = default;
 	explicit constexpr inline CommandShuffle(uint64_t seed) noexcept :
-		seed(seed) {}
+			seed(seed) {}
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -117,7 +123,9 @@ struct CommandTrackView : CommandTrack {
 	LIBV_REFLECTION_ACCESS(mouse_direction);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
-	CommandTrackView(PlayerID playerId, const libv::vec3f& eye, const libv::vec3f& target, const libv::vec3f& mouseDirection) : playerID(playerId), eye(eye), target(target), mouse_direction(mouseDirection) {}
+	constexpr inline CommandTrackView() noexcept = default;
+	constexpr inline CommandTrackView(PlayerID playerId, const libv::vec3f& eye, const libv::vec3f& target, const libv::vec3f& mouseDirection) :
+			playerID(playerId), eye(eye), target(target), mouse_direction(mouseDirection) {}
 };
 
 struct CommandCameraWarpTo : CommandTrack {
@@ -128,7 +136,9 @@ struct CommandCameraWarpTo : CommandTrack {
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
-	CommandCameraWarpTo(PlayerID playerId, const libv::vec3f& target_position) : playerID(playerId), target_position(target_position) {}
+	constexpr inline CommandCameraWarpTo() noexcept = default;
+	constexpr inline CommandCameraWarpTo(PlayerID playerId, const libv::vec3f& target_position) :
+			playerID(playerId), target_position(target_position) {}
 };
 
 //struct CommandCameraMovement : CommandTrack {

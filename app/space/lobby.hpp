@@ -14,17 +14,17 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct SpaceLobby {
+struct Lobby {
 	struct ChatEntry {
 		std::string sender;
 		std::string message;
 	};
 
-	struct Player {
-		std::string name;
-	};
+//	struct Player {
+//		std::string name;
+//	};
 
-	std::vector<Player> players;
+//	std::vector<Player> players;
 	std::vector<ChatEntry> chat_entries;
 };
 

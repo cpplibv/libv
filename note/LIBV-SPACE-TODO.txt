@@ -22,7 +22,8 @@ app.space: Revive the original debug arrow spiral
 app.space: Implement a more complete test arrow set (parallel, different length, star, spiral, rings, multiple chains with different rotation angles)
 app.space: Add support for command arrow animation offset
 app.space: Add support for chained command arrows
-
+app.space: Basic hacky networking
+libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
 
 
 
@@ -70,8 +71,22 @@ app.space: Add support for chained command arrows
 
 
 
-app.space: Networking: Mouse, Camera, Fleet, Chat commands sharing
-app.space: Mini canvas show other clients view
+app.space.net: Networking (Stage 2)
+	app.space.net: Introduction, Name
+	app.space.net: Lobby
+		app.space.net: List of connected clients and their state
+	app.space.net: Snapshot
+		app.space.net: Snapshot saving
+		app.space.net: Snapshot sending upon newly connected client
+		app.space.net: Snapshot loading
+		app.space.net: Fast forwarding after a snapshot loading happened
+			app.space.net: Apply, update, skip render repeat until catch up
+
+app.space.net: Networking (Stage 3)
+	app.space.net: Latency hiding
+
+
+app.space: Mini canvas show other clients view (Needs lobby)
 
 app.space: Pause, Unpause (It will be a good practise for timers and controls)
 
@@ -80,11 +95,9 @@ app.space: Pause, Unpause (It will be a good practise for timers and controls)
 
 
 
-libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
 
-Pending:
-	- How does network interfaces with the playout logic?
 Solved:
+	- How does network interfaces with the playout logic? | Reference and codec, but a lot of thing is unclear
 	- How does UI interfaces with the business logic? | Nexus
 	- How does UI accesses business state? | References and Nexus subscriptions
 

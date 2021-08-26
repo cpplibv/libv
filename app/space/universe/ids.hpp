@@ -12,7 +12,8 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class FrameIndex : int64_t {};
+enum class TickIndex : int64_t {};
+
 enum class Timestamp : int64_t {};
 
 enum class PlayerID : int32_t {};
@@ -20,7 +21,8 @@ enum class PlayerID : int32_t {};
 enum class FactionID : int32_t {};
 enum class FleetID : int32_t {};
 
-[[nodiscard]] constexpr inline auto operator+(FrameIndex e) noexcept { return libv::to_underlying(e); }
+[[nodiscard]] constexpr inline auto operator+(TickIndex e) noexcept { return libv::to_underlying(e); }
+
 [[nodiscard]] constexpr inline auto operator+(Timestamp e) noexcept { return libv::to_underlying(e); }
 
 [[nodiscard]] constexpr inline auto operator+(PlayerID e) noexcept { return libv::to_underlying(e); }

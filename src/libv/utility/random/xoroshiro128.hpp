@@ -27,6 +27,10 @@ private:
 public:
 	constexpr inline xoroshiro128() noexcept = default;
 
+	explicit constexpr inline xoroshiro128(uint64_t s0) noexcept :
+		s{s0, s0 ^ 1341429377760273161u} {
+	}
+
 	/// The seed cannot be {0, 0}
 	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1) noexcept :
 		s{s0, s1} {
@@ -74,11 +78,10 @@ public:
 		return result;
 	}
 
-	// Create a new random number generator with the state of the next two value from this generator
+	// Create a new random number generator with the state and the next value from this generator
 	[[nodiscard]] constexpr inline xoroshiro128 fork() noexcept {
 		const auto s0 = next<uint64_t>();
-		const auto s1 = next<uint64_t>();
-		return xoroshiro128{s0, s1};
+		return xoroshiro128{s0, s[1]};
 	}
 };
 

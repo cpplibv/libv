@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <space/fwd.hpp>
 // libv
 //#include <libv/math/vec.hpp>
 //#include <libv/ui/chrono.hpp>
@@ -15,34 +17,183 @@
 #include <vector>
 // pro
 #include <space/command.hpp>
+#include <space/lobby.hpp>
 #include <space/log.hpp>
-#include <space/session.hpp>
 #include <space/universe/universe.hpp>
+
+#include <space/network_client.hpp>
+#include <space/network_server.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-// Deterministic lockstep
-// article: https://gafferongames.com/post/deterministic_lockstep/
-// snapshot
-// delta update
-// playout delay buffer
-// adaptive playout delay
+// Some random buzz words:
+//	Deterministic lockstep
+//	article: https://gafferongames.com/post/deterministic_lockstep/
+//	snapshot
+//	delta update
+//	playout delay buffer
+//	adaptive playout delay
+
+// -------------------------------------------------------------------------------------------------
+
+struct msg_pdb {
+	template <typename Codec>
+	static constexpr inline void message_types(Codec& codec) {
+		codec.template register_type<0x10, CommandChatMessage>();
+
+		codec.template register_type<0x21, CommandFleetSpawn>();
+		codec.template register_type<0x22, CommandFleetMove>();
+		codec.template register_type<0x23, CommandClearFleets>();
+		codec.template register_type<0x24, CommandShuffle>();
+
+		codec.template register_type<0x30, CommandTrackView>();
+		codec.template register_type<0x31, CommandCameraWarpTo>();
+		//		codec.template register_type<0x32, CommandCameraMovement>();
+		//		codec.template register_type<0x33, CommandMouseMovement>();
+	}
+};
 
 // =================================================================================================
 
-class PlayoutDelayBuffer {
-	struct StateChangeEntry {
-		using apply_func_t = void(*)(Universe&, SpaceLobby&, Command*);
+struct Playout {
+	using encode_func_t = std::vector<std::byte>(*)(Command&);
+	using apply_func_t = void(*)(Universe&, Lobby&, Command&);
 
-//		FrameIndex frameIndex;
+	struct StateChangeEntry {
+		//		TickIndex frameIndex;
+		// TODO P1: Temp unique_ptr usage, replace it with a cache local solution (packed variant_queue)
 		std::unique_ptr<Command> command;
 		apply_func_t apply_func;
 	};
 
-	std::vector<StateChangeEntry> stateChangeEntries;
+protected:
+	//TickIndex currentTickIndex;
+	std::vector<StateChangeEntry> stateChangeEntries; // TODO P1: Use some kind of ring buffer (or deque like)
+
+public:
+	template <typename CommandT, typename... Args>
+	void queue(Args&&... args) {
+		aux_queue(
+				std::make_unique<CommandT>(std::forward<Args>(args)...),
+				+[](Universe& u, Lobby& se, Command& c) {
+					apply(u, se, static_cast<CommandT&>(c));
+				},
+				+[](Command& c) {
+//					std::string data;
+//					{
+//						libv::archive::BinaryOutput os(data);
+//						os << LIBV_NVP_NAMED("command", static_cast<CommandT&>(c));
+//					}
+//					log_space.info("Encoded:\n{}", libv::hex_dump_with_ascii(data));
+//					return data;
+					return codec.encode(static_cast<CommandT&>(c));
+				});
+	}
+
+public:
+	static inline libv::serial::CodecCommon<Playout, libv::archive::Binary> codec{msg_pdb{}};
+
+	template <typename CommandT>
+	void receive(CommandT&& command) {
+		stateChangeEntries.emplace_back(
+				std::make_unique<CommandT>(std::move(command)),
+				+[](Universe& u, Lobby& se, Command& c) {
+					apply(u, se, static_cast<CommandT&>(c));
+				});
+	}
+
+	void queue_from_network(const std::string_view message) {
+		log_space.info("Decoding:\n{}", libv::hex_dump_with_ascii(message));
+		codec.decode(*this, message);
+	}
+
+public:
+	//void update_to(TickIndex nextTickIndex) {
+	void update(Universe& universe) {
+		for (auto& entry : stateChangeEntries) {
+			Lobby* lobby = nullptr; // <<< Need a better solution for non lobby owned apply, branching, maybe
+			entry.apply_func(universe, *lobby, *entry.command);
+		}
+
+		stateChangeEntries.clear();
+	}
+	void update(Universe& universe, Lobby& lobby) {
+		for (auto& entry : stateChangeEntries)
+			entry.apply_func(universe, lobby, *entry.command);
+
+		stateChangeEntries.clear();
+	}
+
+private:
+	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) = 0;
+
+public:
+	virtual	~Playout() = default;
+};
+
+// ---
+
+class PlayoutSinglePlayer : public Playout {
+public:
+	PlayoutSinglePlayer() {}
+
+private:
+	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+		stateChangeEntries.emplace_back(std::move(command), apply_func);
+	}
+};
+
+class PlayoutMultiPlayerClient : public Playout {
+	NetworkClient& network;
+
+public:
+	explicit PlayoutMultiPlayerClient(NetworkClient& network) : network(network) {}
+
+private:
+	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+		(void) apply_func;
+
+		network.send(encode_func(*command));
+		// Server will echo, that will queue
+	}
+};
+
+class PlayoutMultiPlayerServer : public Playout {
+	NetworkServer& network;
+
+public:
+	explicit PlayoutMultiPlayerServer(NetworkServer& network) : network(network) {}
+
+private:
+	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+		network.broadcast(encode_func(*command));
+		stateChangeEntries.emplace_back(std::move(command), apply_func);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
+void apply(Universe& universe, Lobby& lobby, CommandChatMessage& command);
+
+void apply(Universe& universe, Lobby& lobby, CommandFleetMove& command);
+void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command);
+void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command);
+void apply(Universe& universe, Lobby& lobby, CommandShuffle& command);
+
+void apply(Universe& universe, Lobby& lobby, CommandTrackView& command);
+void apply(Universe& universe, Lobby& lobby, CommandCameraWarpTo& command);
+
+//void apply(Universe& universe, CommandCameraMovement& command);
+//void apply(Universe& universe, CommandMouseMovement& command);
+
+// -------------------------------------------------------------------------------------------------
+
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
 
 //	static auto codec = libv::serial::CodecClient<PlayoutDelayBuffer, libv::archive::Binary>{msg_pdb{}};
 //	static CommandCodec codec;
@@ -59,157 +210,6 @@ class PlayoutDelayBuffer {
 //
 //		};
 //	}
-
-public:
-	template <typename CommandT, typename... Args>
-	void queue(Args&&... args) {
-		stateChangeEntries.emplace_back(
-//			FrameIndex{0},
-			// TODO P1: Temp unique_ptr usage, replace it with a cache local solution (variant_queue)
-			std::make_unique<CommandT>(std::forward<Args>(args)...),
-			+[](Universe& u, SpaceLobby& se, Command* c) {
-
-				// =================================================================================================
-
-				std::string data;
-				{
-					libv::archive::BinaryOutput os(data);
-					os << LIBV_NVP_NAMED("command", static_cast<CommandT&>(*c));
-				}
-				log_space.info("Command:\n{}", libv::hex_dump_with_ascii(data));
-
-				// =================================================================================================
-
-				apply(u, se, static_cast<CommandT&>(*c));
-			}
-		);
-	}
-
-//	void update_to(FrameIndex nextFrameIndex) {
-	void update(Universe& universe, SpaceLobby& session) {
-		for (auto& entry : stateChangeEntries)
-			entry.apply_func(universe, session, entry.command.get());
-
-		stateChangeEntries.clear();
-	}
-};
-
-// =================================================================================================
-
-struct Playout {
-	PlayoutDelayBuffer buffer;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-//void apply(Universe& universe, CommandPlayerKick& command) {
-////	state.
-//}
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandChatMessage& command) {
-	(void) universe;
-
-	// Permission check
-	// Identity check
-	session.chat_entries.emplace_back(command.sender, command.message);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandFleetMove& command) {
-	(void) session;
-
-	// Permission check
-	// Bound check
-	universe.fleets[+command.fleetID].target = command.target_position;
-}
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandFleetSpawn& command) {
-	(void) session;
-
-	// Permission check
-	// Bound check
-	universe.fleets.emplace_back(universe.nextFleetID, command.position);
-	// !!! Synchronized FleetID generation
-	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
-}
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandClearFleets& command) {
-	(void) session;
-	(void) command;
-
-	// Permission check
-	// Bound check
-	universe.fleets.clear();
-}
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandShuffle& command) {
-	(void) session;
-	(void) command;
-
-	// Permission check
-	// Bound check
-
-	auto positions = std::vector<libv::vec3f>{};
-	for (const auto& fleet : universe.fleets)
-		positions.emplace_back(fleet.target);
-
-	auto rng = std::mt19937_64{command.seed};
-
-	std::ranges::shuffle(positions, rng);
-
-	for (size_t i = 0; i < positions.size(); ++i)
-		universe.fleets[i].target = positions[i];
-
-	std::uniform_int_distribution dst(0, 1);
-	for (auto& fleet : universe.fleets)
-		fleet.command_type = dst(rng) ? Fleet::CommandType::movement :  Fleet::CommandType::attack;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandTrackView& command) {
-	(void) universe;
-	(void) session;
-	(void) command; // <<< P5
-}
-
-inline void apply(Universe& universe, SpaceLobby& session, CommandCameraWarpTo& command) {
-	(void) universe;
-	(void) session;
-	(void) command; // <<< P5
-}
-
-//inline void apply(Universe& universe, CommandCameraMovement& command) {
-////	universe.
-//}
-//
-//inline void apply(Universe& universe, CommandMouseMovement& command) {
-////	universe.
-//}
-
-// -------------------------------------------------------------------------------------------------
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-
-struct msg_pdb {
-	template <typename Codec>
-	static constexpr inline void message_types(Codec& codec) {
-		codec.template register_type<10, CommandChatMessage>();
-
-		codec.template register_type<10, CommandFleetSpawn>();
-		codec.template register_type<11, CommandFleetMove>();
-		codec.template register_type<12, CommandClearFleets>();
-
-		codec.template register_type<30, CommandTrackView>();
-		codec.template register_type<31, CommandCameraWarpTo>();
-		//		codec.template register_type<32, CommandCameraMovement>();
-		//		codec.template register_type<33, CommandMouseMovement>();
-	}
-};
-
 
 // =================================================================================================
 // =================================================================================================

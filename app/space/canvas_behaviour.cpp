@@ -36,7 +36,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
 
 		if (!ctx.universe.fleets.empty()) {
-			ctx.playout.buffer.queue<app::CommandFleetMove>(
+			ctx.playout.queue<app::CommandFleetMove>(
 					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
 					world_coord
 			);
@@ -45,7 +45,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 //			nexus.broadcast<mc::RequestCommandFleetMove>(world_coord);
 		}
 
-		ctx.playout.buffer.queue<app::CommandFleetSpawn>(world_coord);
+		ctx.playout.queue<app::CommandFleetSpawn>(world_coord);
 //		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 	});
 
@@ -58,7 +58,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
 
 		const auto playerID = app::PlayerID{0};
-		ctx.playout.buffer.queue<app::CommandCameraWarpTo>(playerID, world_coord);
+		ctx.playout.queue<app::CommandCameraWarpTo>(playerID, world_coord);
 
 		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
 	});

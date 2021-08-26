@@ -26,13 +26,14 @@ struct SinglePlayer : GameSession {
 
 public:
 	SinglePlayer(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls) :
+		GameSession(std::make_unique<PlayoutSinglePlayer>()),
 //		scene(game, *this, nexus),
 		controls(controls) {
 		game.main_ui_stage.add_game_scene(game, *this, nexus, controls);
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
-		playout.buffer.update(universe, session);
+		playout->update(universe);
 		universe.update(delta_time);
 	}
 
@@ -48,11 +49,15 @@ struct MultiPlayerClient : GameSession {
 //	CameraPlayer camera;
 	NetworkClient client;
 
+	Lobby lobby;
+
 public:
 	MultiPlayerClient(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls, std::string server_address, uint16_t server_port) :
+		GameSession(std::make_unique<PlayoutMultiPlayerClient>(client)),
+		// <<< network client reference is passed before it init ran, (should not be an issue now, but not nice)
 //		scene(game, *this, nexus),
 		controls(controls),
-		client(std::move(server_address), server_port, game.player.name, playout) {
+		client(std::move(server_address), server_port, game.player.name, *playout) {
 		game.main_ui_stage.add_game_scene(game, *this, nexus, controls);
 	}
 
@@ -60,7 +65,7 @@ public:
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
-		playout.buffer.update(universe, session);
+		playout->update(universe, lobby);
 		universe.update(delta_time);
 	}
 };
@@ -73,11 +78,15 @@ struct MultiPlayerServer : GameSession {
 //	CameraPlayer camera;
 	NetworkServer server;
 
+	Lobby lobby;
+
 public:
 	MultiPlayerServer(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls, uint16_t port) :
+		GameSession(std::make_unique<PlayoutMultiPlayerServer>(server)),
+		// <<< network client reference is passed before it init ran, (should not be an issue now, but not nice)
 //		scene(game, *this, nexus),
 		controls(controls),
-		server(port, playout) {
+		server(port, *playout) {
 		game.main_ui_stage.add_game_scene(game, *this, nexus, controls);
 	}
 
@@ -85,7 +94,7 @@ public:
 	}
 
 	virtual void update(libv::ui::time_duration delta_time) override {
-		playout.buffer.update(universe, session);
+		playout->update(universe, lobby);
 		universe.update(delta_time);
 	}
 };

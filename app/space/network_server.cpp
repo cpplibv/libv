@@ -5,6 +5,7 @@
 // libv
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/acceptor_he.hpp>
+#include <libv/net/mtcp/connection_he.hpp>
 // std
 #include <mutex>
 #include <string>
@@ -31,7 +32,7 @@ namespace app {
 //
 
 [[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
-	return std::string_view(reinterpret_cast<const char*>(s.data()), s.size());
+	return {reinterpret_cast<const char*>(s.data()), s.size()};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -44,7 +45,13 @@ class NetworkLobby {
 private:
 	std::mutex mutex;
 	std::set<libv::net::mtcp::Connection<NetworkPeer>> participants;
+
+public:
+	Playout& playout; // !!! NetworkLobby does not keeps alive the playout, message right after closing server could segfault
 //	std::deque<std::string> recent_msgs;
+
+public:
+	NetworkLobby(Playout& playout) : playout(playout) {}
 
 public:
 	void join(libv::net::mtcp::Connection<NetworkPeer> participant) {
@@ -59,15 +66,7 @@ public:
 		participants.erase(participant);
 	}
 
-	void broadcast(const std::string& msg) {
-		std::unique_lock lock(mutex);
-//		recent_msgs.push_back(msg);
-//		while (recent_msgs.size() > max_recent_msgs)
-//			recent_msgs.pop_front();
-
-//		for (const auto& participant : participants)
-//			participant->deliver(msg);
-	}
+	void broadcast(const std::vector<std::byte>& msg);
 
 	void disconnect_all() {
 		for (const auto& participant : participants)
@@ -101,8 +100,10 @@ private:
 			lobby->join(connection_from_this());
 	}
 	virtual void on_receive(error_code ec, message m) override {
-		if (!ec)
-			lobby->broadcast(std::string(as_sv(m)));
+		if (!ec) {
+			lobby->broadcast(std::vector<std::byte>{m.begin(), m.end()});
+			lobby->playout.queue_from_network(as_sv(m));
+		}
 	}
 	virtual void on_send(error_code ec, message m) override {
 		(void) ec;
@@ -114,11 +115,29 @@ private:
 	}
 };
 
+// ---
+
+void NetworkLobby::broadcast(const std::vector<std::byte>& msg) {
+	std::unique_lock lock(mutex);
+//		recent_msgs.push_back(msg);
+//		while (recent_msgs.size() > max_recent_msgs)
+//			recent_msgs.pop_front();
+
+	for (const auto& participant : participants)
+		participant.connection().send_async(msg);
+}
+
+// ---
+
 class AcceptorHandler : public libv::net::mtcp::AcceptorHandler<AcceptorHandler> {
-private:
-	std::shared_ptr<NetworkLobby> lobby = std::make_shared<NetworkLobby>();
+//private:
+public:
+	std::shared_ptr<NetworkLobby> lobby;
 
 public:
+	AcceptorHandler(Playout& playout) :
+		lobby(std::make_shared<NetworkLobby>(playout)) {}
+
 	~AcceptorHandler() {
 		lobby->disconnect_all();
 	}
@@ -133,17 +152,19 @@ private:
 };
 using Acceptor = libv::net::mtcp::Acceptor<AcceptorHandler>;
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 struct ImplNetworkServer {
 	libv::net::IOContext io_context{4};
-	Acceptor acceptor{io_context};
+	Acceptor acceptor;
+
+	ImplNetworkServer(Playout& playout) : acceptor(io_context, playout) {}
 };
 
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 NetworkServer::NetworkServer(uint16_t server_port, Playout& playout) :
-	self(std::make_unique<ImplNetworkServer>()) {
+	self(std::make_unique<ImplNetworkServer>(playout)) {
 
 	if (auto ec = self->acceptor.acceptor().listen(server_port, 4))
 		throw std::system_error(ec);
@@ -152,6 +173,12 @@ NetworkServer::NetworkServer(uint16_t server_port, Playout& playout) :
 }
 
 NetworkServer::~NetworkServer() {
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void NetworkServer::broadcast(std::vector<std::byte> message) {
+	self->acceptor->lobby->broadcast(std::move(message));
 }
 
 // -------------------------------------------------------------------------------------------------

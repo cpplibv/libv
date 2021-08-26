@@ -16,11 +16,7 @@
 #include <space/player.hpp>
 #include <space/renderer.hpp>
 #include <space/view/frame.hpp>
-
-
-
 #include <space/view/scene_main_ui.hpp>
-//#include <libv/ui/component/component.hpp> // Not for long ?
 
 
 namespace app {

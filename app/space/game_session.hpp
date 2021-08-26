@@ -14,7 +14,6 @@
 // pro
 #include <space/playout.hpp>
 #include <space/universe/universe.hpp>
-#include <space/session.hpp> // <<< Nope
 
 
 namespace app {
@@ -23,11 +22,10 @@ namespace app {
 
 struct GameSession {
 	Universe universe;
-	Playout playout;
-
-	SpaceLobby session; // <<< Nope
+	std::unique_ptr<Playout> playout;
 
 public:
+	explicit GameSession(std::unique_ptr<Playout> playout) : playout(std::move(playout)) {}
 	virtual ~GameSession() = default;
 
 public:

@@ -37,7 +37,7 @@ namespace mtcp {
 /// - on_connect will always be the first function to be called
 /// - on_disconnect will always be the last function to be called
 /// - both on_connect and on_disconnect called at most once
-/// - on_disconnect will be called if there was a on_connect call without any error
+/// - on_disconnect will be called if there was a on_connect call without an error
 
 // -------------------------------------------------------------------------------------------------
 

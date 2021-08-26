@@ -224,6 +224,35 @@ public:
 	}
 };
 
+// ---
+
+template <typename Handler, typename Archive>
+struct CodecCommon : public Codec<Handler, Archive> {
+	template <typename... MessageGroups>
+	explicit inline CodecCommon(MessageGroups...) {
+		(register_message_types<MessageGroups>(), ...);
+	}
+
+public:
+	template <typename MessageGroup>
+	inline void register_message_types() {
+		MessageGroup::message_types(*this);
+	}
+
+public:
+	template <Codec<Handler, Archive>::MessageID MessageIndex, typename MessageType>
+	inline void type_client() {
+		this->template register_encoder_type<MessageIndex, MessageType>();
+		this->template register_decoder_type<MessageIndex, MessageType>();
+	}
+
+	template <Codec<Handler, Archive>::MessageID MessageIndex, typename MessageType>
+	inline void type_server() {
+		this->template register_encoder_type<MessageIndex, MessageType>();
+		this->template register_decoder_type<MessageIndex, MessageType>();
+	}
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace serial
