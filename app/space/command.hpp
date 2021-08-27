@@ -44,11 +44,15 @@ struct CommandTrack : Command {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct CommandPlayerKick : CommandLobby {
+//struct CommandPlayerKick {
+//	using command_type = CommandLobby;
+//
 //	PlayerID playerID;
 //};
 
-struct CommandChatMessage : CommandLobby {
+struct CommandChatMessage {
+	using command_type = CommandLobby;
+
 //	PlayerID playerID;
 	//	Timestamp timestamp;
 	std::string sender;
@@ -58,64 +62,72 @@ struct CommandChatMessage : CommandLobby {
 	LIBV_REFLECTION_ACCESS(sender);
 	LIBV_REFLECTION_ACCESS(message);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	inline CommandChatMessage() noexcept = default;
-	//	CommandChatMessage(PlayerID playerId, std::string message) : playerID(playerId), message(std::move(message)) {}
-	inline CommandChatMessage(std::string sender, std::string message) :
-			sender(std::move(sender)), message(std::move(message)) {}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct CommandFleetSpawn : CommandState {
+struct CommandFleetSpawn {
+	using command_type = CommandState;
+
 //	FactionID factionID;
 //	FleetID fleetID;
 	libv::vec3f position;
 
 	LIBV_REFLECTION_ACCESS(position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	constexpr inline CommandFleetSpawn() noexcept = default;
-	explicit constexpr inline CommandFleetSpawn(const libv::vec3f& position) : position(position) {}
 };
 
-struct CommandFleetMove : CommandState {
-//	FactionID factionID;
+struct CommandFleetMove {
+	using command_type = CommandState;
+
+	//	FactionID factionID;
 	FleetID fleetID;
 	libv::vec3f target_position;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	constexpr inline CommandFleetMove() noexcept = default;
-	constexpr inline CommandFleetMove(FleetID fleetId, const libv::vec3f& targetPosition) :
-			fleetID(fleetId), target_position(targetPosition) {}
 };
 
-struct CommandFleetQueueMove : CommandFleetMove {
-	using CommandFleetMove::CommandFleetMove;
+//struct CommandFleetQueueMove : CommandFleetMove {
+//	using command_type = CommandState;
+//
+//	using CommandFleetMove::CommandFleetMove;
+//};
+
+struct CommandFleetQueueMove {
+	using command_type = CommandState;
+
+	//	FactionID factionID;
+	FleetID fleetID;
+	libv::vec3f target_position;
+
+	LIBV_REFLECTION_ACCESS(fleetID);
+	LIBV_REFLECTION_ACCESS(target_position);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CommandClearFleets : CommandState {
+struct CommandClearFleets {
+	using command_type = CommandState;
+
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CommandShuffle : CommandState {
+struct CommandShuffle {
+	using command_type = CommandState;
+
 	uint64_t seed;
 
 	LIBV_REFLECTION_ACCESS(seed);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	constexpr inline CommandShuffle() noexcept = default;
-	explicit constexpr inline CommandShuffle(uint64_t seed) noexcept :
-			seed(seed) {}
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct CommandTrackView : CommandTrack {
+struct CommandTrackView {
+	using command_type = CommandTrack;
+
 	PlayerID playerID;
 	libv::vec3f eye;
 	libv::vec3f target;
@@ -126,26 +138,22 @@ struct CommandTrackView : CommandTrack {
 	LIBV_REFLECTION_ACCESS(target);
 	LIBV_REFLECTION_ACCESS(mouse_direction);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	constexpr inline CommandTrackView() noexcept = default;
-	constexpr inline CommandTrackView(PlayerID playerId, const libv::vec3f& eye, const libv::vec3f& target, const libv::vec3f& mouseDirection) :
-			playerID(playerId), eye(eye), target(target), mouse_direction(mouseDirection) {}
 };
 
-struct CommandCameraWarpTo : CommandTrack {
+struct CommandCameraWarpTo {
+	using command_type = CommandTrack;
+
 	PlayerID playerID;
 	libv::vec3f target_position;
 
 	LIBV_REFLECTION_ACCESS(playerID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-	constexpr inline CommandCameraWarpTo() noexcept = default;
-	constexpr inline CommandCameraWarpTo(PlayerID playerId, const libv::vec3f& target_position) :
-			playerID(playerId), target_position(target_position) {}
 };
 
 //struct CommandCameraMovement : CommandTrack {
+//	using command_type = CommandTrack;
+//
 //	PlayerID playerID;
 //	libv::vec3f eye;
 //	libv::vec3f target;
@@ -153,6 +161,8 @@ struct CommandCameraWarpTo : CommandTrack {
 //};
 //
 //struct CommandMouseMovement : CommandTrack {
+//	using command_type = CommandTrack;
+//
 //	PlayerID playerID;
 //	libv::vec3f mouse_position;
 //	libv::vec3f mouse_direction;

@@ -27,7 +27,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 //				.js_analog = 1.0
 //		};
 
-	controls.feature_action<app::SpaceCanvas>("space.add_fleet_by_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<app::SpaceCanvas>("space.add_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
 		const auto mouse_ray_pos = ctx.camera.eye();
@@ -40,7 +40,6 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
 					world_coord
 			);
-
 //			nexus.broadcast<app::CommandFleetMove>(static_cast<app::FleetID>(ctx.universe.fleets.size() - 1), world_coord);
 //			nexus.broadcast<mc::RequestCommandFleetMove>(world_coord);
 		}
@@ -62,7 +61,6 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
 					world_coord
 			);
-
 		}
 	});
 
@@ -79,7 +77,6 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
 					world_coord
 			);
-
 		}
 	});
 
@@ -99,7 +96,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 }
 
 void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
-	controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+	controls.bind("space.add_fleet_at_mouse", "Ctrl + LMB [press]");
 	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
 	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");

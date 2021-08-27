@@ -60,13 +60,13 @@ struct msg_pdb {
 // =================================================================================================
 
 struct Playout {
-	using encode_func_t = std::vector<std::byte>(*)(Command&);
-	using apply_func_t = void(*)(Universe&, Lobby&, Command&);
+	using encode_func_t = std::vector<std::byte>(*)(void*);
+	using apply_func_t = void(*)(Universe&, Lobby&, void*);
 
 	struct StateChangeEntry {
 		//		TickIndex frameIndex;
-		// TODO P1: Temp unique_ptr usage, replace it with a cache local solution (packed variant_queue)
-		std::unique_ptr<Command> command;
+		// TODO P1: Temp shared_ptr usage, replace it with a cache local solution (packed variant_queue), (shared_ptr used for deleter)
+		std::shared_ptr<void> command;
 		apply_func_t apply_func;
 	};
 
@@ -78,11 +78,11 @@ public:
 	template <typename CommandT, typename... Args>
 	void queue(Args&&... args) {
 		aux_queue(
-				std::make_unique<CommandT>(std::forward<Args>(args)...),
-				+[](Universe& u, Lobby& se, Command& c) {
-					apply(u, se, static_cast<CommandT&>(c));
+				std::make_shared<CommandT>(std::forward<Args>(args)...),
+				+[](Universe& u, Lobby& se, void* c) {
+					apply(u, se, *reinterpret_cast<CommandT*>(c));
 				},
-				+[](Command& c) {
+				+[](void* c) {
 //					std::string data;
 //					{
 //						libv::archive::BinaryOutput os(data);
@@ -90,7 +90,7 @@ public:
 //					}
 //					log_space.info("Encoded:\n{}", libv::hex_dump_with_ascii(data));
 //					return data;
-					return codec.encode(static_cast<CommandT&>(c));
+					return codec.encode(*reinterpret_cast<CommandT*>(c));
 				});
 	}
 
@@ -101,8 +101,8 @@ public:
 	void receive(CommandT&& command) {
 		stateChangeEntries.emplace_back(
 				std::make_unique<CommandT>(std::move(command)),
-				+[](Universe& u, Lobby& se, Command& c) {
-					apply(u, se, static_cast<CommandT&>(c));
+				+[](Universe& u, Lobby& se, void* c) {
+					apply(u, se, *reinterpret_cast<CommandT*>(c));
 				});
 	}
 
@@ -116,20 +116,20 @@ public:
 	void update(Universe& universe) {
 		for (auto& entry : stateChangeEntries) {
 			Lobby* lobby = nullptr; // <<< Need a better solution for non lobby owned apply, branching, maybe
-			entry.apply_func(universe, *lobby, *entry.command);
+			entry.apply_func(universe, *lobby, entry.command.get());
 		}
 
 		stateChangeEntries.clear();
 	}
 	void update(Universe& universe, Lobby& lobby) {
 		for (auto& entry : stateChangeEntries)
-			entry.apply_func(universe, lobby, *entry.command);
+			entry.apply_func(universe, lobby, entry.command.get());
 
 		stateChangeEntries.clear();
 	}
 
 private:
-	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) = 0;
+	virtual void aux_queue(std::shared_ptr<void> command, apply_func_t apply_func, encode_func_t encode_func) = 0;
 
 public:
 	virtual	~Playout() = default;
@@ -142,7 +142,7 @@ public:
 	PlayoutSinglePlayer() {}
 
 private:
-	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+	virtual void aux_queue(std::shared_ptr<void> command, apply_func_t apply_func, encode_func_t encode_func) override {
 		(void) encode_func;
 
 		stateChangeEntries.emplace_back(std::move(command), apply_func);
@@ -156,10 +156,10 @@ public:
 	explicit PlayoutMultiPlayerClient(NetworkClient& network) : network(network) {}
 
 private:
-	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+	virtual void aux_queue(std::shared_ptr<void> command, apply_func_t apply_func, encode_func_t encode_func) override {
 		(void) apply_func;
 
-		network.send(encode_func(*command));
+		network.send(encode_func(command.get()));
 		// Server will echo, that will queue
 	}
 };
@@ -171,8 +171,8 @@ public:
 	explicit PlayoutMultiPlayerServer(NetworkServer& network) : network(network) {}
 
 private:
-	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
-		network.broadcast(encode_func(*command));
+	virtual void aux_queue(std::shared_ptr<void> command, apply_func_t apply_func, encode_func_t encode_func) override {
+		network.broadcast(encode_func(command.get()));
 		stateChangeEntries.emplace_back(std::move(command), apply_func);
 	}
 };
