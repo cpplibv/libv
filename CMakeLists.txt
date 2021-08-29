@@ -516,8 +516,8 @@ wish_create_external(
 
 wish_create_external(
 	NAME lua
-	GIT_REPOSITORY https://github.com/LuaDist/lua.git
-	GIT_TAG 5.3.2
+	GIT_REPOSITORY https://github.com/bensanmorris/lua.git
+	GIT_TAG b58e02325cb13f4902676f195e02d9320c65dd01 # v5.4.3
 	CMAKE_ARGS
 		-DBUILD_SHARED_LIBS=OFF
 	LINK lua
@@ -575,7 +575,7 @@ wish_create_external(
 wish_create_external(
 	NAME sol
 	GIT_REPOSITORY https://github.com/ThePhD/sol2.git
-	GIT_TAG v3.0.2
+	GIT_TAG v3.2.3
 	SKIP_CONFIGURE_AND_BUILD
 	INSTALL_COMMAND
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/sol/include/sol/
