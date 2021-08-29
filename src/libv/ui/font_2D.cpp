@@ -46,9 +46,11 @@ void _incFreetypeLibRef() {
 }
 
 void _decFreetypeLibRef() {
-	if (!--FT_LibUseCount)
+	if (!--FT_LibUseCount) {
 		if (const auto err = FT_Done_FreeType(freetype_lib))
 			log_ui_ft.error("FT_Done_FreeType failed: {}", err);
+		freetype_lib = nullptr;
+	}
 }
 
 } // namespace
