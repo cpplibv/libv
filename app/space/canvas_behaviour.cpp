@@ -7,10 +7,10 @@
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/distance/intersect.hpp>
 // pro
+#include <space/canvas.hpp>
 #include <space/command.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>
-#include <space/canvas.hpp>
 
 
 namespace app {
@@ -18,15 +18,6 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
-//		libv::ctrl::scale_group sg_translate{
-//				.impulse = 0.1,
-//				.time = 1.0,
-//				.mouse = 1.0 / 600.0,
-//				.scroll = 0.1,
-//				.gp_analog = 1.0,
-//				.js_analog = 1.0
-//		};
-
 	controls.feature_action<app::SpaceCanvas>("space.add_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -40,6 +31,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
 					world_coord
 			);
+			// <<< should controls use nexus or playout directly? Think about console and lua scripts too.
 //			nexus.broadcast<app::CommandFleetMove>(static_cast<app::FleetID>(ctx.universe.fleets.size() - 1), world_coord);
 //			nexus.broadcast<mc::RequestCommandFleetMove>(world_coord);
 		}

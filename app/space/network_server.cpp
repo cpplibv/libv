@@ -23,13 +23,6 @@
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
-//
-//class chat_participant {
-//public:
-//	virtual void deliver(const std::string& msg) = 0;
-//	virtual ~chat_participant() = default;
-//};
-//
 
 [[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
 	return {reinterpret_cast<const char*>(s.data()), s.size()};
@@ -51,7 +44,7 @@ public:
 //	std::deque<std::string> recent_msgs;
 
 public:
-	NetworkLobby(Playout& playout) : playout(playout) {}
+	explicit NetworkLobby(Playout& playout) : playout(playout) {}
 
 public:
 	void join(libv::net::mtcp::Connection<NetworkPeer> participant) {
@@ -135,7 +128,7 @@ public:
 	std::shared_ptr<NetworkLobby> lobby;
 
 public:
-	AcceptorHandler(Playout& playout) :
+	explicit AcceptorHandler(Playout& playout) :
 		lobby(std::make_shared<NetworkLobby>(playout)) {}
 
 	~AcceptorHandler() {
@@ -158,7 +151,7 @@ struct ImplNetworkServer {
 	libv::net::IOContext io_context{4};
 	Acceptor acceptor;
 
-	ImplNetworkServer(Playout& playout) : acceptor(io_context, playout) {}
+	explicit ImplNetworkServer(Playout& playout) : acceptor(io_context, playout) {}
 };
 
 // =================================================================================================

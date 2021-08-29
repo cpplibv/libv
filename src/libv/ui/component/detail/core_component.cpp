@@ -2,8 +2,6 @@
 
 // hpp
 #include <libv/ui/component/detail/core_component.hpp>
-// std
-#include <cassert>
 // pro
 #include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/context/context_event.hpp>
@@ -482,44 +480,83 @@ libv::vec3f CoreComponent::layout1(const ContextLayout1& layout_env) {
 	return result;
 }
 
-void CoreComponent::layout2(const ContextLayout2& layout_env) {
-	bool boundsChanged = false;
+void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, int32_t depth) {
+	if (flags.match_any(Flag::floatRegion))
+		// Float positions can't change under a float region component
+		return;
 
-	if (layout_env.position != layout_position_) {
-		boundsChanged = true;
+	log_ui.trace("MScan  {:>11}, {:>11}, A {}", xy(layout_position_), xy(layout_size_), path());
+
+	doForeachChildren([parentFloatPosition = floatPosition, parentDepth = depth](Component& child) {
+		// Scan children and mouse update if needed
+		auto& child_core = *get_core(child);
+
+		const auto childFloatPosition = child_core.layout_position() + parentFloatPosition;
+		const auto size = child_core.layout_size();
+		const auto childDepth = parentDepth + 1;
+
+		if (child_core.flags.match_any(Flag::watchMouse | Flag::floatRegion))
+			child_core.context().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth});
+
+		child_core.layout2FloatPositionUpdateScan(childFloatPosition, childDepth);
+	});
+}
+
+void CoreComponent::layout2(const ContextLayout2& layout_env) {
+	bool changedSize = layout_env.size != layout_size_;
+	bool changedPosition = layout_env.position != layout_position_;
+	bool changedBounds = changedSize || changedPosition;
+
+	bool changedFloatPosition = layout_env.float_position_changed || changedPosition;
+
+	if (changedPosition) {
 		flags.set(Flag::updatedPosition);
 		layout_position_ = layout_env.position;
 	}
 
-	if (layout_env.size != layout_size_) {
-		boundsChanged = true;
+	if (changedSize) {
 		flags.set(Flag::updatedSize);
 		layout_size_ = layout_env.size;
 	}
 
-	if (boundsChanged)
+	if (changedBounds)
 		flagAuto(Flag::pendingRender);
 
-	if (boundsChanged && flags.match_any(Flag::watchMouse | Flag::floatRegion)) {
+	if ((changedFloatPosition || changedBounds) && flags.match_any(Flag::watchMouse | Flag::floatRegion))
+		// We update the mouse context
 		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});
+
+	if (!changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout))
+		// No need to re-layout this component sub-tree
+		return;
+
+	if (changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout)) {
+		// No need to re-layout this component sub-tree, but the float position changed
+		// so mouse context has to be updated
+		layout2FloatPositionUpdateScan(layout_env.float_position, layout_env.depth);
+		return;
 	}
 
-	if (boundsChanged || flags.match_any(Flag::pendingLayout)) {
-		if (boundsChanged || flags.match_any(Flag::pendingLayoutSelf)) {
-			// Layout self
-			doLayout2(layout_env);
-			log_ui.trace("Layout {:>11}, {:>11}, {}", xy(layout_position_), xy(layout_size_), path());
+	// Update float_position_changed based on this component and the current layout request
+	layout_env.float_position_changed = (layout_env.float_position_changed || changedFloatPosition) && !flags.match_any(Flag::floatRegion);
 
-		} else {
-			// Layout the children only
-			doForeachChildren([&layout_env](Component& child) {
-				get_core(child)->layout2(layout_env.enter(get_core(child)->layout_position(), get_core(child)->layout_size()));
-			});
-			log_ui.trace("   |   {:>11}, {:>11}, {}", xy(layout_position_), xy(layout_size_), path());
-		}
+	if (changedBounds || flags.match_any(Flag::pendingLayoutSelf)) {
+		// Layout self and the children with the derived class
+		doLayout2(layout_env);
+		log_ui.trace("Layout {:>11}, {:>11}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 
-		flags.reset(Flag::pendingLayout);
+	} else if (flags.match_any(Flag::pendingLayoutChild)) {
+		// No need to re-layout this component, layout the children only
+		doForeachChildren([&layout_env, changedFloatPosition](Component& child) {
+			get_core(child)->layout2(layout_env.enter(
+					get_core(child)->layout_position(),
+					get_core(child)->layout_size()
+			));
+		});
+		log_ui.trace("   |   {:>11}, {:>11}, {} {}", xy(layout_position_), xy(layout_size_), layout_env.float_position_changed ? "A" : " ", path());
 	}
+
+	flags.reset(Flag::pendingLayout);
 }
 
 void CoreComponent::render(Renderer& r) {

@@ -195,32 +195,60 @@ void apply(Universe& universe, Lobby& lobby, CommandCameraWarpTo& command);
 
 // -------------------------------------------------------------------------------------------------
 
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-
-//	static auto codec = libv::serial::CodecClient<PlayoutDelayBuffer, libv::archive::Binary>{msg_pdb{}};
-//	static CommandCodec codec;
-//
-//	void receive(const auto& m) {
-//	}
-//	void foo() {
-////		codec.
-//
-//		codec.decode_handle([](){ }, );
-//	}
-//	void bar() {
-//		[](auto& m) {
-//
-//		};
-//	}
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-
 } // namespace app
 
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+
+//using encode_fn_t = int(*)(void*);
+//using decode_fn_t = int(*)(int);
+//
+//
+//struct CodecInfo {
+//	int index;
+//	encode_fn_t encode;
+//	decode_fn_t decode;
+//};
+//
+///*struct Codec {
+//    std::vector<CodecInfo> registry;
+//} codec;*/
+//
+//auto& codec_registry() {
+//	static std::vector<CodecInfo> registry;
+//	return registry;
+//}
+//
+//template <typename CRTP>
+//int register_codec(int x) {
+//	codec_registry().emplace_back(CodecInfo{x, +[](void* x){ return reinterpret_cast<CRTP*>(x)->v0; }, +[](int x){ return x; }});
+//	return x;
+//}
+//
+//struct Command {
+//
+//};
+//
+//struct CommandA : Command {
+//	static inline int index = register_codec<CommandA>(3);
+//
+//	int v0;
+//};
+//
+//struct CommandB : Command {
+//	static inline int index = register_codec<CommandB>(5);
+//
+//	int v0;
+//};
+//
+//
+//int main() {
+//	std::cout << "Types: " << codec_registry().size() << "\n";
+//	for (const auto& info : codec_registry())
+//		std::cout << info.index << "\n";
+//	return 0;
+//}
 
 //// =================================================================================================
 //// =================================================================================================

@@ -302,6 +302,7 @@ private:
 	libv::observer_ptr<CoreComponent> focusTraverse(const ContextFocusTraverse& context);
 	libv::vec3f layout1(const ContextLayout1& environment);
 	void layout2(const ContextLayout2& environment);
+	void layout2FloatPositionUpdateScan(libv::vec3f floatPosition, int32_t depth);
 	void render(Renderer& r);
 	void renderDestroy(Renderer& r);
 

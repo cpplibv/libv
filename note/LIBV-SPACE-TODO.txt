@@ -67,31 +67,51 @@ libv.ui: Add overlay events to the global events, then use those to alter contro
 
 
 
+place.it:
+	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
+	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
 
 
+git:
+	Change the author of these commits:
+	* 2021-08-27 app.space: Implement fleet movement queue  Császár Mátyás [Vader]
+	* 2021-08-17 review - app.space: Command arrow chains  Császár Mátyás [Vader]
+    * 2021-08-17 review - app.space: Progress on command arrow animation offset  Császár Mátyás [Vader]
+    * 2021-08-16 review - app.space: Implement a more complete test arrow set  Császár Mátyás [Vader]
+    * 2021-08-16 review - app.space: Revive the original debug arrow spiral  Császár Mátyás [Vader]
+    * 2021-08-15 review - app.space: Add support for command arrow 'intent' (color) specification  Császár Mátyás [Vader]
 
 
-app.space.net: Networking (Stage 2)
-	app.space.net: Introduction, Name
-	app.space.net: Lobby
-		app.space.net: List of connected clients and their state
-	app.space.net: Snapshot
-		app.space.net: Snapshot saving
-		app.space.net: Snapshot sending upon newly connected client
-		app.space.net: Snapshot loading
-		app.space.net: Fast forwarding after a snapshot loading happened
-			app.space.net: Apply, update, skip render repeat until catch up
+app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
+app.space: Cannibalize style.lua from vm4_viewer
 
-app.space.net: Networking (Stage 3)
-	app.space.net: Latency hiding
+app.space: Simulation time control
+	app.space: Pause, Unpause (It will be a good practise for timers and controls)
+	app.space: Speed x1 x2 x4
 
+app.space.net: Networking
+	app.space.net: Networking (Stage 2)
+		app.space.net: Introduction, Name
+		app.space.net: Lobby
+			app.space.net: List of connected clients and their state
 
-app.space: Mini canvas show other clients view (Needs lobby)
+	app.space.net: Networking (Stage 3)
+		app.space.net: Snapshot
+			app.space.net: Snapshot saving
+			app.space.net: Snapshot sending upon newly connected client (with pause)
+			app.space.net: Snapshot loading
+			app.space.net: Non paused snapshot join
+				app.space.net: Fast forwarding after a snapshot loading happened
+				app.space.net: Apply, update, skip render repeat until catch up
+			app.space.net: [Optional] Snapshot delta to help catchup
 
-app.space: Pause, Unpause (It will be a good practise for timers and controls)
+	app.space.net: Networking (Stage 4)
+		app.space.net: Latency hiding
 
+	app.space: Mini canvas show other clients view (Needs lobby)
 
-
+app.space: Simulation
+	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
 
 
 
@@ -139,9 +159,6 @@ app.space: Main structure paper
 
 
 app.space: Structure the whole program: UML time is upon us
-
-app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-app.space: Cannibalize style.lua from vm4_viewer
 
 app.space: Self-Updater
 

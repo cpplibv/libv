@@ -18,6 +18,7 @@ struct ContextLayout1 {
 struct ContextLayout2 {
 public:
 	libv::vec3f float_position;
+	mutable bool float_position_changed = false; // Mutable as CoreComponent::layout2 sets it after it 'enters' a child (there are better ways for this)
 
 	libv::vec3f position;
 	libv::vec3f size;
@@ -30,8 +31,9 @@ public:
 		size(size) { }
 
 private:
-	constexpr inline ContextLayout2(libv::vec3f abs_position, libv::vec3f position, libv::vec3f size, int depth) noexcept :
+	constexpr inline ContextLayout2(libv::vec3f abs_position, bool float_position_changed, libv::vec3f position, libv::vec3f size, int depth) noexcept :
 		float_position(abs_position),
+		float_position_changed(float_position_changed),
 		position(position),
 		size(size),
 		depth(depth) { }
@@ -40,6 +42,7 @@ public:
 	[[nodiscard]] constexpr inline ContextLayout2 enter(libv::vec3f position_, libv::vec3f size_) const noexcept {
 		return ContextLayout2{
 				float_position + position_,
+				float_position_changed,
 				position_,
 				size_,
 				depth + 1
