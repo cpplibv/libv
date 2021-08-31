@@ -17,6 +17,7 @@
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
+#include <libv/ui/property_access_context.hpp>
 #include <libv/ui/style.hpp>
 
 
@@ -56,14 +57,6 @@ std::string CoreComponent::path() const {
 	result = '/' + std::move(result);
 
 	return result;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void CoreComponent::size(Size value) noexcept {
-	size_ = value;
-	flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
-	markInvalidLayout();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -230,6 +223,10 @@ void CoreComponent::markInvalidLayout() noexcept {
 void CoreComponent::style(libv::intrusive_ptr<Style> newStyle) noexcept {
 	style_ = std::move(newStyle);
 	flagAuto(Flag::pendingStyle);
+}
+
+void CoreComponent::style(std::string_view style_name) {
+	style(context().style(style_name));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -435,17 +432,16 @@ void CoreComponent::style() {
 	if (flags.match_any(Flag::pendingStyleSelf)) {
 		ContextStyle ctx = makeStyleContext();
 		doStyle(ctx);
-		if (parent_ != this) // NOTE: Condition is required to Avoid root component edge case
+		if (parent_ != this) // NOTE: Condition is required to avoid root component edge case
 			parent_->doStyle(ctx, childID);
-		flags.reset(Flag::pendingStyleSelf);
 	}
 	if (flags.match_any(Flag::pendingStyleChild)) {
 		doForeachChildren([](Component& child) {
 			if (get_core(child)->flags.match_any(Flag::pendingStyle))
 				get_core(child)->style();
 		});
-		flags.reset(Flag::pendingStyleChild);
 	}
+	flags.reset(Flag::pendingStyle);
 }
 
 void CoreComponent::styleScan() {
@@ -610,8 +606,9 @@ void CoreComponent::doDetachChildren(libv::function_ref<bool(Component&)> callba
 	(void) callback;
 }
 
-void CoreComponent::doStyle(ContextStyle& context) {
-	(void) context;
+void CoreComponent::doStyle(ContextStyle& ctx) {
+	PropertyAccessContext<CoreComponent> setter{*this, ctx.component, ctx.style, context()};
+	access_properties(setter);
 }
 
 void CoreComponent::doStyle(ContextStyle& context, ChildID childID) {

@@ -9,8 +9,9 @@
 #include <libv/input/event_fwd.hpp>
 #include <libv/math/vec.hpp>
 // std
-#include <memory>
 #include <functional>
+#include <memory>
+#include <string>
 // pro
 #include <libv/ui/event_host.hpp>
 
@@ -54,6 +55,10 @@ public:
 public:
 	/// This is the only thread-safe operation on UI, every other member function can only be called from the main UI thread
 	void execute_in_ui_loop(std::function<void()> func);
+
+public:
+	/// Loads a lua style script file
+	void load_style_script_file(std::string path);
 
 public:
 	EventHostGlobal<Component> event();

@@ -6,6 +6,7 @@
 #include <libv/math/vec.hpp>
 // std
 #include <string>
+#include <string_view>
 // pro
 #include <libv/ui/component/detail/core_ptr.hpp>
 #include <libv/ui/event_host.hpp>
@@ -13,6 +14,8 @@
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
+//#include <libv/ui/style_fwd.hpp>
+//#include <libv/utility/intrusive_ptr.hpp>
 
 
 namespace libv {
@@ -157,6 +160,8 @@ public:
 
 public:
 	void markRemove();
+//	void style(libv::intrusive_ptr<Style> style) noexcept;
+	void style(std::string_view style_name);
 
 public:
 	friend inline bool operator==(const Component& lhs, const Component& rhs) noexcept {

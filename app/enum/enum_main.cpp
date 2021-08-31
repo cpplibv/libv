@@ -44,6 +44,8 @@ private:
 	};
 	std::map<std::string, Property> properties; // Property name -> Property
 
+//	std::map<std::string, std::string> parse_aliases; // -> Enum entry name
+
 	std::vector<std::string> namespaces;
 	std::set<std::string> includes;
 
@@ -450,6 +452,8 @@ int main() {
 		value("red"  , "Red"  , {rgba("libv::vec4f{1, 0, 0, 1}")})
 		value("green", "Green", {rgba("libv::vec4f{0, 1, 0, 1}")})
 		value("blue" , "Blue" , {rgba("libv::vec4f{0, 0, 1, 1}")})
+
+--		parse_alias("cyan", "blue")
 )";
 
 //	clipboard(result);

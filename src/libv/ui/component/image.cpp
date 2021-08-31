@@ -70,7 +70,7 @@ void CoreImage::access_properties(T& ctx) {
 void CoreImage::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreImage::doLayout1(const ContextLayout1& environment) {

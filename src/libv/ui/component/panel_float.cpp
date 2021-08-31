@@ -80,7 +80,7 @@ void CorePanelFloat::access_child_properties(T& ctx) {
 void CorePanelFloat::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 void CorePanelFloat::doStyle(ContextStyle& ctx, ChildID childID) {

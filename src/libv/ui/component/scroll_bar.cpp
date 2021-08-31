@@ -397,7 +397,7 @@ void CoreScrollBar::doAttach() {
 void CoreScrollBar::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreScrollBar> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreScrollBar::doLayout1(const ContextLayout1& environment) {

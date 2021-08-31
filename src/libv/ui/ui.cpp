@@ -3,17 +3,19 @@
 // hpp
 #include <libv/ui/ui.hpp>
 // libv
+#include <libv/fsw/watcher.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/glr/remote.hpp>
 #include <libv/input/event.hpp>
+#include <libv/lua/lua.hpp>
 #include <libv/math/remap.hpp>
 #include <libv/utility/histogram.hpp>
 #include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/overload.hpp>
+#include <libv/utility/read_file.hpp>
 #include <libv/utility/timer.hpp>
 // std
-#include <array>
 #include <mutex>
 #include <ostream>
 #include <variant>
@@ -33,6 +35,7 @@
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/overlay_zoom.lpp>
+#include <libv/ui/ui_lua.hpp>
 
 
 namespace libv {
@@ -99,13 +102,15 @@ public:
 	ContextRender context_render;
 	bool context_render_created = false;
 
-	Root root;
+	std::vector<EventVariant> event_queue;
+	std::mutex event_queue_m;
 
 	std::vector<std::function<void()>> loop_tasks;
 	std::mutex loop_tasks_m;
 
-	std::vector<EventVariant> event_queue;
-	std::mutex event_queue_m;
+	libv::fsw::Watcher fsw;
+
+	Root root;
 
 public:
 	Stat stat;
@@ -529,6 +534,38 @@ void UI::setSize(libv::vec2i size_) noexcept {
 void UI::execute_in_ui_loop(std::function<void()> func) {
 	std::unique_lock lock{self->loop_tasks_m};
 	self->loop_tasks.emplace_back(std::move(func));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+//void UI::load_style_script(std::string_view script) {
+void UI::load_style_script_file(std::string path) {
+
+	execute_in_ui_loop([this, path] {
+		auto script = libv::read_file_str_ec(path);
+		if (script.ec)
+			return log_ui.error("Failed to reload style script {}: {}: {}", path, script.ec, script.ec.message());
+
+		// TODO P4: Persist/reuse lua state, make sure sandboxing happens
+		auto lua = libv::lua::create_state(libv::lua::lualib::base);
+		script_style(*this, lua, script.data);
+	});
+
+	if (context().settings.track_style_scripts) {
+		// TODO P1: fsw token and/or kill fsw before dtor reaches it, so handle late events during termination
+		self->fsw.subscribe_file(path, [this, path](const auto&) {
+			// TODO P4: Warmup / Cooldown for tracking reload
+			execute_in_ui_loop([this, path] {
+				auto script = libv::read_file_str_ec(path);
+				if (script.ec)
+					return log_ui.error("Failed to reload style script {}: {}: {}", path, script.ec, script.ec.message());
+
+				// TODO P4: Persist/reuse lua state, make sure sandboxing happens
+				auto lua = libv::lua::create_state(libv::lua::lualib::base);
+				script_style(*this, lua, script.data);
+			});
+		});
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 // fwd
 #include <libv/ui/fwd.hpp>
 // libv
+#include <libv/utility/function_ref.hpp>
 #include <libv/utility/intrusive_ptr.hpp>
 #include <libv/utility/type_key.hpp>
 // std
@@ -66,6 +67,7 @@ public:
 public:
 	[[nodiscard]] bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
+	void foreach_style(libv::function_ref<void(std::string_view name, Style& style)> func);
 
 public:
 	void focus(CoreComponent& component);

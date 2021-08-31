@@ -65,7 +65,7 @@ private:
 //	void doStyle(ContextStyle& ctx) {
 //		PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 //		access_properties(setter);
-//		CoreComponent::access_properties(setter);
+//		CoreComponent::doStyle(ctx);
 //	}
 //
 //void CorePanelStatusLine::doStyle(ContextStyle& ctx, ChildID childID) {

@@ -71,7 +71,7 @@ SceneGame::~SceneGame() {
 }
 
 libv::ui::Component SceneGame::init_canvas_main() {
-	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("canvas-main", game.renderer, game_session, game_session.universe, *game_session.playout, camera, true);
+	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_main("space.canvas.main", game.renderer, game_session, game_session.universe, *game_session.playout, camera, true);
 //		style("space-canvas-main");
 
 //	out_canvas_main.emplace(canvas_main);
@@ -82,19 +82,11 @@ libv::ui::Component SceneGame::init_canvas_main() {
 
 libv::ui::Component SceneGame::init_canvas_mini_bar() {
 	libv::ui::PanelLine mp_cam_bar("mp-cam-bar");
-//		style("space.hud-bar.mp-cam");
-	mp_cam_bar.anchor(libv::ui::Anchor::center_right);
-	mp_cam_bar.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
-	mp_cam_bar.size(libv::ui::parse_size_or_throw("25%, 100%"));
-	mp_cam_bar.spacing(5);
-	mp_cam_bar.margin(5);
+	mp_cam_bar.style("space.hud-bar.mp-cam.panel");
 
 //	{
-//		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("canvas-mini", game, game->session->player[X]->camera, false);
-////		style("space-canvas-mini");
-//		canvas_mini.size(libv::ui::parse_size_or_throw("1r, 15%"));
-//		canvas_mini.margin(10);
-//		canvas_mini.anchor(libv::ui::Anchor::center_right);
+//		libv::ui::CanvasAdaptorT<SpaceCanvas> canvas_mini("space.canvas.mini", game, game->session->player[X]->camera, false);
+//		canvas_mini.style("space.canvas.mini");
 //		mp_cam_bar.add(canvas_mini);
 //	}
 
@@ -103,20 +95,11 @@ libv::ui::Component SceneGame::init_canvas_mini_bar() {
 
 libv::ui::Component SceneGame::init_cmd_bar() {
 	libv::ui::PanelLine cmd_bar("cmd-bar");
-//		style("space.hud-bar.cmd");
-	cmd_bar.anchor(libv::ui::Anchor::bottom_right);
-	cmd_bar.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
-	cmd_bar.size(libv::ui::parse_size_or_throw("D, D"));
-	cmd_bar.spacing(5);
-	cmd_bar.margin(5);
+	cmd_bar.style("space.hud-bar.cmd.panel");
 
 	{
 		libv::ui::Button clear_fleets;
-//			style("space.hud-bar.cmd.button");
-		clear_fleets.align_horizontal(libv::ui::AlignHorizontal::center);
-		clear_fleets.align_vertical(libv::ui::AlignVertical::center);
-		clear_fleets.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		clear_fleets.size(libv::ui::parse_size_or_throw("10pxD1r, 4pxD"));
+		clear_fleets.style("space.hud-bar.cmd.btn");
 		clear_fleets.text("Clear Fleets");
 		clear_fleets.event().submit.connect([this]() {
 			nexus.broadcast(mc::RequestClearFleets{});
@@ -124,11 +107,7 @@ libv::ui::Component SceneGame::init_cmd_bar() {
 		cmd_bar.add(std::move(clear_fleets));
 
 		libv::ui::Button clear_fleets_long;
-//			style("space.hud-bar.cmd.button");
-		clear_fleets_long.align_horizontal(libv::ui::AlignHorizontal::center);
-		clear_fleets_long.align_vertical(libv::ui::AlignVertical::center);
-		clear_fleets_long.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		clear_fleets_long.size(libv::ui::parse_size_or_throw("10pxD1r, 4pxD"));
+		clear_fleets_long.style("space.hud-bar.cmd.btn");
 		clear_fleets_long.text("Clear Fleets With Longer Label");
 		clear_fleets_long.event().submit.connect([this]() {
 			nexus.broadcast(mc::RequestClearFleets{});
@@ -136,11 +115,7 @@ libv::ui::Component SceneGame::init_cmd_bar() {
 		cmd_bar.add(std::move(clear_fleets_long));
 
 		libv::ui::Button shuffle;
-//			style("space.hud-bar.cmd.button");
-		shuffle.align_horizontal(libv::ui::AlignHorizontal::center);
-		shuffle.align_vertical(libv::ui::AlignVertical::center);
-		shuffle.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		shuffle.size(libv::ui::parse_size_or_throw("10pxD1r, 4pxD"));
+		shuffle.style("space.hud-bar.cmd.btn");
 		shuffle.text("Shuffle");
 		shuffle.event().submit.connect([this]() {
 			nexus.broadcast(mc::RequestShuffle{});

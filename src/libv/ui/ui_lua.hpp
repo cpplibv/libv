@@ -2,11 +2,12 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/lua/fwd.hpp>
 // std
-#include <filesystem>
-#include <memory>
+#include <string_view>
 
 
 namespace libv {
@@ -14,10 +15,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class Component;
-class UI;
-
-Component script_file(UI& ui, lua::State& lua, const std::filesystem::path& file);
+void script_style(UI& ui, lua::State& lua, const std::string_view script);
 
 // -------------------------------------------------------------------------------------------------
 

@@ -85,7 +85,7 @@ static constexpr AlignmentData AlignmentTableV[] = {
 void CorePanelLine::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {

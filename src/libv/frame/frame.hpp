@@ -36,6 +36,12 @@
 // TODO P5: Support glfw hint GLFW_CONTEXT_CREATION_API
 // TODO P5: Support glfw hint GLFW_CONTEXT_RELEASE_BEHAVIOR
 //
+// TODO P5: libv.frame: Frame without 'show' call refuses to close and join (even with closeForce, join or dtor)
+//		Frame frame;
+//		//frame.show();
+//		frame.closeForce();
+//		frame.join();
+//
 // TODO P5: Context sharing
 // TODO P5: Understand EventRefresh, i think i have to work with it to 'force' refresh
 //			if context is frozen due to event queue 'lock' in glfw (moving window)

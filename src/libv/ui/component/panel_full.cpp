@@ -63,10 +63,9 @@ void CorePanelFull::access_child_properties(T& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void CorePanelFull::doStyle(ContextStyle& ctx) {
-	// TODO P2: Having property mentioned here is incorrect, but the class based access context will solve he problem
-	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
+	PropertyAccessContext<CorePanelFull> setter{*this, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {

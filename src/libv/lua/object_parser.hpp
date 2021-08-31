@@ -13,13 +13,24 @@
 #include <string_view>
 #include <tuple>
 #include <type_traits>
+// pro
+#include <libv/lua/sol_type_to_string.hpp>
 
 
-// TODO P4: Design not that clean, some restructure could help, details unknown
-// TODO P5: Generalize variable/matcher/expression concept to be interchangeable (if implemented correctly could allow or_ and any_of to be the same)
-// TODO P5: Tables should handle members without a keys for constants and generators
-// TODO P5: Ability to name pattern and better name concatenation, maybe stream
-
+// =================================================================================================
+//
+// NOTE: Current state of the object parser:
+//
+//	It is working, functional and tested, but...
+//
+//	This seamed like a good idea, but the compile-time and the complexity detoured me from actually using it.
+//	It is an actually functional and working implementation (apart from the reporters which are not implemented fully,
+//	but their concept is proven)
+//
+//	The alternative imperative design ideas couldn't address my concerns, and they would be a different implementation
+//	anyways, so for now I shelf this implementation
+//
+// =================================================================================================
 
 // IDEA: Alternative imperative design idea #1: ---
 //
@@ -63,7 +74,7 @@
 //
 //
 //
-// IDEA: Alternative imperative design idea #2: ---
+// IDEA: Alternative imperative design idea #2 (multiple reentry with different template instance): ---
 //      Not sure if this would be good, as side effects could repeat
 //
 //template <typename Magic>
@@ -172,12 +183,17 @@
 
 namespace libv {
 namespace lua {
+
+// *** P5: Generalize variable/matcher/expression concept to be interchangeable (if implemented correctly could allow or_ and any_of to be the same)
+// *** P5: Tables should handle members without a keys for constants and generators
+// *** P5: Ability to name pattern and better name concatenation, maybe stream
+
 namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename CppT, typename LuaT, const char* LuaTypeName, sol::type LuaTypeEnum, bool CheckIsType, typename Reporter>
-inline auto primitive_eval(const sol::object& var, Reporter&& reporter) {
+inline auto primitive_eval(const sol::object& var, Reporter& reporter) {
 	if constexpr (std::is_void_v<CppT>) {
 		if (var.get_type() == LuaTypeEnum)
 			return true;
@@ -215,7 +231,7 @@ struct PrimitiveType {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		return primitive_eval<CppType, LuaT, LuaTypeName, LuaTypeEnum, CheckIsType>(var, reporter);
 	}
 };
@@ -276,7 +292,7 @@ struct Table {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		const auto table = primitive_eval<sol::table, sol::table, LuaTypeNameTable, sol::type::table, false>(var, reporter);
 
 		if constexpr (std::is_void_v<CppType>) {
@@ -295,7 +311,7 @@ struct Table {
 //						return EvalType(std::in_place, member_results.value()...);
 						return EvalType(CppType{member_results.value()...});
 					} else {
-						// TODO P5: report missing / failed members
+						// *** P5: report missing / failed members
 //						reporter.missing_member(...);
 //						reporter.member_matcher_failed?(...);
 //						reporter.rejected(...);
@@ -316,7 +332,7 @@ struct MatcherAs : Matcher {
 	using EvalType = std::conditional_t<std::is_void_v<CppType>, bool, std::optional<CppType>>;
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		auto result = Matcher::eval(var, reporter);
 
 		if constexpr (std::is_void_v<CppT>) {
@@ -346,7 +362,7 @@ struct MatcherOr : Matcher {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		auto result = Matcher::eval(var, reporter);
 		return result ? result : std::optional<typename Matcher::CppType>(fallback);
 	}
@@ -360,14 +376,14 @@ struct MatcherOneOf {
 	std::tuple<Matchers...> matchers;
 
 	inline auto name() const noexcept {
-		// TODO P5: Better name for any
+		// *** P5: Better name for any
 		return libv::concat(Matchers::name()...);
 	}
 
 	template <typename Reporter>
-	inline auto impl(const sol::object& var, Reporter&& reporter) const {
+	inline auto impl(const sol::object& var, Reporter& reporter) const {
 		(void) var;
-		(void) reporter; // TODO P5: Report
+		(void) reporter; // *** P5: Report
 
 		if constexpr (std::is_void_v<CppType>)
 			return false;
@@ -376,8 +392,8 @@ struct MatcherOneOf {
 	}
 
 	template <typename Reporter, typename Head, typename... Tail>
-	inline auto impl(const sol::object& var, Reporter&& reporter, const Head& head, const Tail&... tail) const {
-		(void) reporter; // TODO P5: Report
+	inline auto impl(const sol::object& var, Reporter& reporter, const Head& head, const Tail&... tail) const {
+		(void) reporter; // *** P5: Report
 
 		auto result = head.eval(var, reporter);
 		if (result)
@@ -387,7 +403,7 @@ struct MatcherOneOf {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		return std::apply([this, &var, &reporter](const auto&... m){
 			return impl(var, reporter, m...);
 		}, matchers);
@@ -406,7 +422,7 @@ struct MatcherTransform : Matcher {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		auto result = Matcher::eval(var, reporter);
 
 		constexpr bool void_in = std::is_void_v<typename Matcher::CppType>;
@@ -453,13 +469,18 @@ struct MatcherParser : String<> {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		auto result = String<>::eval(var, reporter);
 
-		if (result)
-			return func(*result);
-		else
+		if (!result)
 			return EvalType{std::nullopt};
+
+		auto parse_result = func(*result);
+		if (parse_result)
+			return parse_result;
+
+		reporter.string_parse_failed(name(), *result);
+		return EvalType{std::nullopt};
 	}
 };
 
@@ -475,7 +496,7 @@ struct MatcherConstant {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		(void) var;
 		(void) reporter;
 
@@ -495,7 +516,7 @@ struct MatcherGenerate {
 	}
 
 	template <typename Reporter>
-	inline auto eval(const sol::object& var, Reporter&& reporter) const {
+	inline auto eval(const sol::object& var, Reporter& reporter) const {
 		(void) var;
 		(void) reporter;
 
@@ -659,7 +680,7 @@ constexpr inline auto string_accept(F&& func) noexcept {
 // -------------------------------------------------------------------------------------------------
 
 struct ReportNoop {
-	inline void lua_type_mismatch(const std::string_view name, const sol::type found, const sol::type expected) noexcept {
+	inline void lua_type_mismatch(const std::string_view name, const sol::type expected, const sol::type found) noexcept {
 		(void) name;
 		(void) found;
 		(void) expected;
@@ -677,16 +698,27 @@ struct ReportNoop {
 
 struct ReportString {
 	std::ostringstream ss;
+//	int depth = 0;
 
-	inline void lua_type_mismatch(const std::string_view name, const sol::type found, const sol::type expected) noexcept {
+	inline void lua_type_mismatch(const std::string_view name, const sol::type expected, const sol::type found) noexcept {
 //		ss << name << found << expected;
 		(void) found;
 		(void) expected;
 
-		ss << name;
+//		ss << "Type mismatch: " << name << ". Expected: " << lua_type_to_string(expected) << " Found: " << lua_type_to_string(found) << "\n";
+
+		//	Candidate [Userdata]
+		//		Rejected: Type mismatch, Expected a [Userdata] but got a [String]
+		ss << "Candidate [" << name << "]\n";
+		ss << "    Rejected: Type mismatch: Expected a [" << lua_type_to_string(expected) << "] but got a [" << lua_type_to_string(found) << "]\n";
 	}
 	inline void string_parse_failed(const std::string_view name, const std::string_view value) noexcept {
-		ss << name << value;
+//		ss << name << value;
+
+		//	Candidate [Parsed String]
+		//		Rejected: String is not a valid color format
+		ss << "Candidate [" << name << "]\n";
+		ss << "    Rejected: Not a valid string: [" << value << "]\n";
 	}
 	inline auto reason() const {
 		return ss.str();
@@ -704,3 +736,182 @@ inline auto parse(const sol::object& var, Parser&& parser, Reporter&& reporter =
 
 } // namespace lua
 } // namespace libv
+
+// =================================================================================================
+// Usage example:
+// =================================================================================================
+//
+//
+//namespace {
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//inline const auto pattern_color() noexcept {
+//	return libv::lua::one_of(
+//			libv::lua::string_parse(&libv::parse::parse_color_optional),
+//			libv::lua::as<Color>(libv::lua::userdata<libv::vec4f>()),
+//			libv::lua::transform(libv::lua::userdata<libv::vec3f>(), [](const libv::vec3f& vec) { return Color(vec, 1.f); }),
+//			libv::lua::table<Color>(
+//					libv::lua::member("r", libv::lua::number<float>()),
+//					libv::lua::member("g", libv::lua::number<float>()),
+//					libv::lua::member("b", libv::lua::number<float>()),
+//					libv::lua::member("a", libv::lua::or_(libv::lua::number<float>(), 1.f))),
+//			libv::lua::table<Color>(
+//					libv::lua::member("x", libv::lua::number<float>()),
+//					libv::lua::member("y", libv::lua::number<float>()),
+//					libv::lua::member("z", libv::lua::number<float>()),
+//					libv::lua::member("w", libv::lua::or_(libv::lua::number<float>(), 1.f))),
+//			libv::lua::table<Color>(
+//					libv::lua::member(1, libv::lua::number<float>()),
+//					libv::lua::member(2, libv::lua::number<float>()),
+//					libv::lua::member(3, libv::lua::number<float>()),
+//					libv::lua::member(4, libv::lua::or_(libv::lua::number<float>(), 1.f)))
+//	);
+//}
+//
+//template <typename F>
+//inline const auto pattern_protocol(std::string protocol, F&& func) {
+//	auto parse_func = [protocol = std::move(protocol)](auto str) {
+//		if (not str.starts_with(protocol))
+//			return std::optional<std::string_view>(std::nullopt);
+//
+//		str.remove_prefix(protocol.size());
+//		return std::optional<std::string_view>(str);
+//	};
+//
+//	return libv::lua::transform(libv::lua::string_parse(std::move(parse_func)), std::forward<F>(func));
+//}
+//
+//inline const auto pattern_background(UI& ui) noexcept {
+////	return libv::lua::string<std::string>();
+//	return pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); });
+////	return libv::lua::variant(
+////			pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); }),
+//////			pattern_protocol("color ", ),
+//////			pattern_protocol("stretch ", ),
+////			libv::lua::string_parse(&libv::parse::parse_color_optional)
+////	);
+//}
+//
+//void process_style_property(UI& ui, Style& style, const std::string_view key, const sol::object& value) {
+//	const auto property = [&](const std::string_view name, const auto& pattern) {
+//		if (name != key)
+//			return false;
+//
+//		auto reporter = libv::lua::ReportString{};
+//		const auto result = libv::lua::parse(value, pattern, reporter);
+//		if (result) {
+//			style.set(std::string(name), *result);
+//		} else {
+//			// TODO P4: Detailed error message with libv.lua.object_parser reporter API
+//			log_ui.warn("Failed to parse style {} property {} value \"{}\". Property is set to fallback value. Reason:\n{}",
+//					style.style_name, key, value.as<std::string_view>(), reporter.reason());
+//		}
+//
+//		return true;
+//	};
+//
+//	if (property("align", libv::lua::string_parse(&libv::ui::parse_align_horizontal_optional))) return;
+//	if (property("align_vertical", libv::lua::string_parse(&libv::ui::parse_align_vertical_optional))) return;
+//	if (property("background", pattern_background(ui))) return;
+//	if (property("color", pattern_color())) return;
+//	if (property("font", libv::lua::string_accept([&ui](const auto path){ return ui.context().font(path); }))) return;
+//	if (property("font_color", pattern_color())) return;
+//	if (property("font_outline", pattern_color())) return;
+//	if (property("font_size", libv::lua::as<FontSize>(libv::lua::number<int16_t>()))) return;
+//	if (property("size", libv::lua::string_parse(&libv::ui::parse_size_optional))) return;
+////	if (property("font_shader", libv::lua::string())) return;
+////	if (property("layout", libv::lua::string_parse(&libv::ui::parse_layout_optional))) return;
+//
+//	log_ui.warn("Ignoring unrecognized property style {} property {} value \"{}\".",
+//			style.style_name, key, value.as<std::string_view>());
+//}
+//
+//} // namespace
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//Component script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
+//
+//	auto ui_table = lua.create_table();
+//	ui_table["bottom"] = "bottom";
+//	ui_table["center"] = "center";
+//	ui_table["justify"] = "justify";
+//	ui_table["justifyall"] = "justifyall";
+//	ui_table["left"] = "left";
+//	ui_table["right"] = "right";
+//	ui_table["top"] = "top";
+//
+//	ui_table["ORIENT_BOTTOM_TO_TOP"] = Orientation::BOTTOM_TO_TOP;
+//	ui_table["ORIENT_LEFT_TO_RIGHT"] = Orientation::LEFT_TO_RIGHT;
+//	ui_table["ORIENT_RIGHT_TO_LEFT"] = Orientation::RIGHT_TO_LEFT;
+//	ui_table["ORIENT_TOP_TO_BOTTOM"] = Orientation::TOP_TO_BOTTOM;
+//
+//	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+//
+//	ui_table.set_function("style", [&styles, &ui](const std::string_view style_name) {
+//		auto& style_ip = styles[std::string(style_name)]; // TODO P5: C++20: std::string(std::string_view) temp string for hash lookup
+//		if (!style_ip)
+//			style_ip = libv::make_intrusive<Style>(std::string(style_name));
+//
+//		return [style_ip, &ui](const sol::table& table) {
+//			for (const auto& [key, value] : table) {
+//				if (key.get_type() != sol::type::string) {
+//					log_ui.warn("Style's property key \"{}\" is expected to be a string. Style name: {}, key: {}, value: {}",
+//							key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
+//					continue;
+//				}
+//
+//				const auto key_sv = key.as<std::string_view>();
+//				process_style_property(ui, *style_ip, key_sv, value);
+//			}
+//		};
+//	});
+//
+////	ui_table.set_function("component", [](const std::string_view component_name) {
+////		return [component_name = std::string(component_name)](const sol::table& table) {
+////			for (const auto& [key, value] : table) {
+////				log_ui.info("{}/{} = {}", component_name, key.as<std::string_view>(), value.as<std::string_view>());
+////			}
+////		};
+////	});
+////
+////	ui_table.set_function("color", [](const std::string_view color_str) -> sol::object {
+////		auto color = libv::parse::parse_color_optional(color_str);
+////		if (color)
+////			return *color;
+////		else
+////			return sol::nil;
+////	});
+//
+//	ui_table.set_function("component", [](const std::string_view) { return "Not implemented yet."; });
+//	ui_table.set_function("image", [](const std::string_view) { return "Not implemented yet."; });
+//	ui_table.set_function("stretch", [](const std::string_view) { return "Not implemented yet."; });
+//	ui_table.set_function("layout_line", [](const std::string_view) { return "Not implemented yet."; });
+//
+//	lua["ui"] = ui_table;
+//	const auto table = lua.script_file(file.string());
+////	const auto table = lua.safe_script_file(file.string());
+//
+//	(void) ui;
+//
+//	// -------------------------------------------------------------------------------------------------
+//
+//	log_ui.trace("Parsed styles:");
+//	for (const auto& [name, style] : styles)
+//		style->foreach([&name](const auto& key, const auto& value) {
+//			std::visit([&](const auto& var) {
+//				if constexpr (std::is_enum_v<std::decay_t<decltype(var)>>)
+//					log_ui.trace("{}/{} = {}", name, key, libv::to_value(var));
+//				else
+//					log_ui.trace("{}/{} = {}", name, key, var);
+//			}, value);
+//		});
+//
+////	return Component{nullptr};
+//	assert(false && "Not implemented yet.");
+//	Label tmp{"lua"};
+//	tmp.text("Lua script component");
+//	return tmp;
+//}
+// =================================================================================================

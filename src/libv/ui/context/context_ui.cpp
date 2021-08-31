@@ -72,7 +72,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-bool secure_path(const std::filesystem::path& base, const std::filesystem::path& target, const std::filesystem::path& path) {
+bool secure_path(const std::filesystem::path& base, bool restict_under_base, const std::filesystem::path& target, const std::filesystem::path& path) {
 	std::error_code ec;
 
 	// TODO P1: Nicer file not found error (it will be detected with the canonical call)
@@ -94,7 +94,7 @@ bool secure_path(const std::filesystem::path& base, const std::filesystem::path&
 		return false;
 	}
 
-	const auto is_parent = libv::is_parent_folder_of(base, relative_to_current);
+	const auto is_parent = !restict_under_base || libv::is_parent_folder_of(base, relative_to_current);
 	if (!is_parent) {
 		log_ui.error("Canonical path is expected to be under the base folder:"
 				"\n\tPath:      {}"
@@ -186,6 +186,11 @@ void ContextUI::clearEveryStyleDirty() noexcept {
 		style_->clearDirty();
 }
 
+void ContextUI::foreach_style(libv::function_ref<void(std::string_view name, Style& style)> func) {
+	for (const auto& [name, style_] : self->styles)
+		func(name, *style_);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void ContextUI::focus(CoreComponent& component) {
@@ -230,7 +235,7 @@ std::shared_ptr<Font2D> ContextUI::font(const std::filesystem::path& path) {
 
 	const auto target = settings.res_font.base_path / lexically_normal;
 
-	if (!secure_path(settings.res_font.base_path, target, lexically_normal)) {
+	if (!secure_path(settings.res_font.base_path, settings.res_font.restict_under_base, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback font");
 		sp = self->fallback_font;
 		return sp;
@@ -286,7 +291,7 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 
 	const auto target = settings.res_texture.base_path / lexically_normal;
 
-	if (!secure_path(settings.res_texture.base_path, target, lexically_normal)) {
+	if (!secure_path(settings.res_texture.base_path, settings.res_texture.restict_under_base, target, lexically_normal)) {
 		log_ui.error("Path validation failed. Using fallback texture2D");
 		sp = self->fallback_texture2D;
 		return sp;

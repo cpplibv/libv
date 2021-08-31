@@ -70,7 +70,7 @@ void CoreStretch::access_properties(T& ctx) {
 void CoreStretch::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreStretch> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreStretch::doLayout1(const ContextLayout1& environment) {

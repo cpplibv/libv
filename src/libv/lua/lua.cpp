@@ -9,7 +9,6 @@
 // pro
 #include <libv/lua/vec.hpp>
 #include <libv/lua/vm4.hpp>
-#include <libv/lua/ui.hpp>
 
 
 namespace libv {
@@ -45,11 +44,6 @@ State create_state(lualib libmask) {
 //	if ((libv::to_value(libmask) & libv::to_value(lualib::vm4)) != 0) {
 //		registerLuaVM4(lua, "vec4d");
 //	}
-
-	if ((libv::to_value(libmask) & libv::to_value(lualib::ui)) != 0) {
-		registerUI(lua);
-	}
-
 
 	return lua;
 }

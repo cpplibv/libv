@@ -60,7 +60,7 @@ void CoreQuad::access_properties(T& ctx) {
 void CoreQuad::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreQuad> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 void CoreQuad::doRender(Renderer& r) {

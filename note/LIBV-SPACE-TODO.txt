@@ -24,6 +24,7 @@ app.space: Add support for command arrow animation offset
 app.space: Add support for chained command arrows
 app.space: Basic hacky networking
 libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
+app.space: Cannibalize style.lua from vm4_viewer
 
 
 
@@ -66,11 +67,30 @@ libv.ui: Add overlay events to the global events, then use those to alter contro
 
 
 
+generate some source?
+	https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
+
+	add_executable(generator generator.cpp)
+
+	add_custom_command(
+		OUTPUT  generated.cpp
+		COMMAND generator ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp
+		DEPENDS generator someInputFile.cpp.in
+	)
+
+	add_executable(myapp
+		main.cpp
+		${CMAKE_CURRENT_BINARY_DIR}/generated.cpp
+	)
+
+
 
 place.it:
 	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
 	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
+	libv.sys: Move clipboard text to it from libv.ui.context_ui
 
+	lua: Install luacheck and setup it in CLion https://github.com/mpeterv/luacheck
 
 git:
 	Change the author of these commits:
@@ -83,7 +103,6 @@ git:
 
 
 app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-app.space: Cannibalize style.lua from vm4_viewer
 
 app.space: Simulation time control
 	app.space: Pause, Unpause (It will be a good practise for timers and controls)
@@ -113,6 +132,13 @@ app.space.net: Networking
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
 
+app.space: Fleet merge/follow/attack commands
+	app.space: 3D fleet picking
+	app.space: 3D secondary fleet picking
+	app.space: Fleet selection, selection based commands
+	app.space: Multi fleet selection
+	app.space: 3D fleet box selection
+	app.space: Fleet factions
 
 
 
@@ -222,10 +248,8 @@ What do I need from libv to make a 'minimal' working iris program?
 
 	libv.ui
 		1 background generalization
-		2 style lua loader
 		2 list component
 		3 scroll pane = scroll area + scroll bar + connecting them
-		3 container spacing property
 		4 button states (state styles)
 		5 font outline render
 			freetype2 Now has SDF
@@ -250,4 +274,4 @@ game.architect: Networking: To get a free networking integration prepare simulat
 --- Article collection -----------------------------------------------------------------------------
 
 Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
-
+CMake source generation step: https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/

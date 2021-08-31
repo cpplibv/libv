@@ -24,9 +24,9 @@ struct CoreLabel : public CoreComponent {
 	friend class Label;
 	[[nodiscard]] inline auto handler() { return Label{this}; }
 
-private:
+protected:
 	template <typename T> static void access_properties(T& ctx);
-
+private:
 	struct Properties {
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
@@ -113,7 +113,7 @@ void CoreLabel::access_properties(T& ctx) {
 void CoreLabel::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabel> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreLabel::doLayout1(const ContextLayout1& environment) {

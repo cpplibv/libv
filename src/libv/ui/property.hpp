@@ -45,6 +45,8 @@ using Style_view = libv::intrusive_ptr<Style>;
 // -------------------------------------------------------------------------------------------------
 
 using PropertyDynamic = std::variant<
+//		std::monostate, // For empty variants
+
 		float,
 		Style_view,
 
@@ -76,7 +78,7 @@ using PropertyDynamic = std::variant<
 
 namespace pnm { // ---------------------------------------------------------------------------------
 
-static constexpr std::string_view align_horizontal = "align";
+static constexpr std::string_view align_horizontal = "align_horizontal";
 static constexpr std::string_view align_vertical = "align_vertical";
 static constexpr std::string_view anchor = "anchor";
 static constexpr std::string_view area_position = "area_position";
@@ -173,19 +175,22 @@ class Property<void> : public BaseProperty {
 template <typename T = void>
 class PropertyB : public Property<T> {
 public:
-	static constexpr Flag_t invalidate = Flag::none;
+	static constexpr bool invalidate_render = false;
+	static constexpr bool invalidate_layout = false;
 };
 
 template <typename T = void>
 class PropertyR : public Property<T> {
 public:
-	static constexpr Flag_t invalidate = Flag::pendingRender;
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout = false;
 };
 
 template <typename T = void>
 class PropertyL : public Property<T> {
 public:
-	static constexpr Flag_t invalidate = Flag::pendingLayout | Flag::pendingRender;
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout = true;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -205,19 +210,34 @@ struct AccessProperty {
 	static constexpr inline void value(Component& component, P& property, TC&& value) noexcept {
 		property.value = std::move(value);
 		property.changed = true;
-		component.flagAuto(property.invalidate);
+		if (property.invalidate_layout)
+			component.markInvalidLayout();
+		if (property.invalidate_render)
+			component.flagAuto(Flag::pendingRender);
 	}
 
 	template <typename Component, typename P, typename F>
 	static constexpr inline void setter(Component& component, P& property, PropertyDriver driver, F&& func) noexcept {
-		if (property.changed && driver != PropertyDriver::manual)
+		if (driver != PropertyDriver::manual)
 			return;
+
+		func();
 
 		property.driver = driver;
 		property.changed = true;
-		component.flagAuto(property.invalidate);
+		if (property.invalidate_layout)
+			component.markInvalidLayout();
+		if (property.invalidate_render)
+			component.flagAuto(Flag::pendingRender);
+	}
 
-		func();
+	template <typename Component, typename P>
+	static constexpr inline void changed(Component& component, P& property) noexcept {
+		property.changed = true;
+		if (property.invalidate_layout)
+			component.markInvalidLayout();
+		if (property.invalidate_render)
+			component.flagAuto(Flag::pendingRender);
 	}
 
 	// ---
@@ -231,7 +251,10 @@ struct AccessProperty {
 
 		property.value = std::forward<TC>(value);
 		property.changed = true;
-		component.flagAuto(property.invalidate);
+		if (property.invalidate_layout)
+			component.markInvalidLayout();
+		if (property.invalidate_render)
+			component.flagAuto(Flag::pendingRender);
 	}
 };
 

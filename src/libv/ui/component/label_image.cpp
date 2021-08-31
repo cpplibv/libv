@@ -136,7 +136,7 @@ void CoreLabelImage::access_properties(T& ctx) {
 void CoreLabelImage::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabelImage> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreLabelImage::doLayout1(const ContextLayout1& environment) {

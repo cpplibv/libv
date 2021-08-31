@@ -134,7 +134,7 @@ public:
 
 	template <typename Access, typename Set, typename Get, typename Init>
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
-//		static_assert(Access yields Property<void>);
+//		static_assert(Access yields Property<void|T>);
 //		static_assert(Set is callable with invoke result of Get + driver);
 //		static_assert(Get yields a non void);
 //		static_assert(Init can be passed to Set);
@@ -151,20 +151,24 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != get(owner))
+				if (*value_opt != get(owner)) {
 					set(owner, *value_opt);
+					AccessProperty::changed(component, property);
+				}
 				return;
 			}
 		}
 
-		if (init != get(owner))
+		if (init != get(owner)) {
 			set(owner, std::move(init));
+			AccessProperty::changed(component, property);
+		}
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>
 			WISH_REQUIRES(std::is_invocable_v<Init, ContextUI&>)
 	void indirect(Access&& access, Set&& set, Get&& get, Init&& init, std::string_view group, std::string_view name, std::string_view description) {
-//		static_assert(Access yields Property<void>);
+//		static_assert(Access yields Property<void|T>);
 //		static_assert(Set is callable with invoke result of Get + driver);
 //		static_assert(Get yields a non void);
 //		static_assert(Init invoke with ContextUI& result can be passed to Set);
@@ -181,15 +185,19 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != get(owner))
+				if (*value_opt != get(owner)) {
 					set(owner, *value_opt);
+					AccessProperty::changed(component, property);
+				}
 				return;
 			}
 		}
 
 		auto value = init(context);
-		if (value != get(owner))
+		if (value != get(owner)) {
 			set(owner, std::move(value));
+			AccessProperty::changed(component, property);
+		}
 	}
 
 	template <typename Set, typename Get>

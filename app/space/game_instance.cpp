@@ -7,6 +7,7 @@
 #include <libv/ui/event/event_overlay.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/settings.hpp>
+#include <libv/utility/read_file.hpp>
 //#include <libv/ctrl/controls.hpp>
 //#include <libv/ui/component/component.hpp>
 // pro
@@ -56,6 +57,12 @@ GameInstance::GameInstance() :
 		ui_settings.res_font.base_path = "../../res/font/";
 		ui_settings.res_shader.base_path = "../../res/shader/";
 		ui_settings.res_texture.base_path = "../../res/texture/";
+
+		ui_settings.res_font.restict_under_base = false; // TODO P1: Should go away with proper res folder
+		ui_settings.res_shader.restict_under_base = false; // TODO P1: Should go away with proper res folder
+		ui_settings.res_texture.restict_under_base = false; // TODO P1: Should go away with proper res folder
+
+		ui_settings.track_style_scripts = true;
 		return ui_settings;
 	}()) {
 
@@ -74,6 +81,9 @@ GameInstance::GameInstance() :
 		// TODO P1: A more seamless integration of UI and Controls would be nice
 		controls.ignore_events(event.controls_intercepted());
 	});
+
+//	ui.load_style_script(libv::read_file_or_throw("style.lua"));
+	ui.load_style_script_file("style.lua");
 }
 
 GameInstance::~GameInstance() {

@@ -95,6 +95,14 @@ const PropertyDynamic& Style::get_or_throw(const std::string_view property) cons
 
 // -------------------------------------------------------------------------------------------------
 
+void Style::clear() {
+	// TODO P1: Clear inheritances (that are not dot based) (but only if this side initiated it)
+	properties.clear();
+	dirty();
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void intrusive_ptr_add_ref(Style* style) {
 	++style->ref_count;
 }

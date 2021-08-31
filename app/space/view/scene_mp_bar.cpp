@@ -26,47 +26,24 @@ libv::ui::Component SceneMPBar::create(libv::Nexus& nexus, Player& player) {
 }
 
 libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar) {
-	//		style("space.hud-bar.mp");
-	mp_bar.anchor(libv::ui::Anchor::top_center);
-	mp_bar.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
-	mp_bar.size(libv::ui::parse_size_or_throw("D, D"));
-	mp_bar.spacing(5);
-	mp_bar.margin(5);
+	mp_bar.style("space.hud-bar.mp.panel");
 
 	{
 		libv::ui::LabelImage lbl_name("mp-name-lbl");
-		//			style("space.hud-bar.mp.lbl");
-		lbl_name.align_horizontal(libv::ui::AlignHorizontal::center);
-		lbl_name.align_vertical(libv::ui::AlignVertical::center);
-		lbl_name.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		lbl_name.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+		lbl_name.style("space.hud-bar.mp.lbl");
 		lbl_name.text("Name:");
 		mp_bar.add(lbl_name);
 
 		libv::ui::InputField in_name("mp-name-in");
-		//			style("space.hud-bar.mp.input");
-		in_name.align_horizontal(libv::ui::AlignHorizontal::center);
-		in_name.align_vertical(libv::ui::AlignVertical::center);
-		in_name.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		in_name.size(libv::ui::parse_size_or_throw("10pxD, 1r"));
+		in_name.style("space.hud-bar.mp.input");
 		in_name.text(generate_random_name(4));
 		mp_bar.add(in_name);
 
-//		libv::ui::LabelImage lbl_state("mp-state");
-		//			style("space.hud-bar.mp.lbl");
-		lbl_state.align_horizontal(libv::ui::AlignHorizontal::center);
-		lbl_state.align_vertical(libv::ui::AlignVertical::center);
-		lbl_state.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		lbl_state.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+		lbl_state.style("space.hud-bar.mp.lbl");
 		lbl_state.text("Status: Idle");
 		mp_bar.add(lbl_state);
 
-//		libv::ui::Button btn_host("mp-host");
-		//			style("space.hud-bar.mp.btn");
-		btn_host.align_horizontal(libv::ui::AlignHorizontal::center);
-		btn_host.align_vertical(libv::ui::AlignVertical::center);
-		btn_host.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		btn_host.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+		btn_host.style("space.hud-bar.mp.btn");
 		btn_host.text("Host");
 		btn_host.event().submit.connect([this, in_name] {
 			if (server_active) {
@@ -78,12 +55,7 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar) {
 		});
 		mp_bar.add(btn_host);
 
-//		libv::ui::Button btn_join("mp-join");
-		//			style("space.hud-bar.mp.btn");
-		btn_join.align_horizontal(libv::ui::AlignHorizontal::center);
-		btn_join.align_vertical(libv::ui::AlignVertical::center);
-		btn_join.color(libv::ui::Color(0.5f, 0.5f, 0.5f, 0.65f));
-		btn_join.size(libv::ui::parse_size_or_throw("10pxD, 4pxD"));
+		btn_join.style("space.hud-bar.mp.btn");
 		btn_join.text("Join: rs0.corruptedai.com");
 		btn_join.event().submit.connect([this, in_name] {
 			if (client_active) {

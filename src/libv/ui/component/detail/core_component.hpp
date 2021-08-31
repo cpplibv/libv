@@ -52,14 +52,17 @@ private:
 	libv::vec3f layout_position_; /// Component position relative to parent in pixels
 	libv::vec3f layout_size_;     /// Component size in pixels
 
+protected:
+	template <typename T> static void access_properties(T& ctx);
 private:
-	Size size_;
-	Anchor anchor_;
-	Margin margin_; /// x: left, y: down, z: right, w: top
-	Padding padding_; /// x: left, y: down, z: right, w: top
-
-//	Margin margin_{10, 10, 10, 10}; // Theme::default_margin
-//	Padding padding_{5, 5, 5, 5}; // Theme::default_padding
+	struct Properties {
+		PropertyL<Size> size;
+		PropertyL<Anchor> anchor;
+		PropertyL<Margin> margin; /// x: left, y: down, z: right, w: top
+		PropertyL<Padding> padding; /// x: left, y: down, z: right, w: top
+		//	Margin margin_{10, 10, 10, 10}; // Theme::default_margin
+		//	Padding padding_{5, 5, 5, 5}; // Theme::default_padding
+	} property;
 
 private:
 	/// Never null, points to self if its a (temporal) root element otherwise points to parent
@@ -126,23 +129,24 @@ public:
 
 public:
 	[[nodiscard]] inline const Size& size() const noexcept {
-		return size_;
+		return property.size();
 	}
-	void size(Size value) noexcept;
+	void size(Size value) noexcept {
+		AccessProperty::manual(*this, property.size, value);
+		flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
+	}
 
 	[[nodiscard]] inline Anchor anchor() const noexcept {
-		return anchor_;
+		return property.anchor();
 	}
 	inline void anchor(Anchor value) noexcept {
-		anchor_ = value;
-		markInvalidLayout();
+		AccessProperty::manual(*this, property.anchor, value);
 	}
 
 	// --- Margin ---
 
 	inline void margin(Margin value) noexcept {
-		margin_ = value;
-		markInvalidLayout();
+		AccessProperty::manual(*this, property.margin, value);
 	}
 	inline void margin(float left_down_right_top) noexcept {
 		margin(Margin{left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
@@ -155,11 +159,11 @@ public:
 	}
 	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Margin margin() const noexcept {
-		return margin_;
+		return property.margin();
 	}
 	/// x: left, y: down
 	[[nodiscard]] inline libv::vec2f margin_LB() const noexcept {
-		return xy(margin_);
+		return xy(property.margin());
 	}
 	/// x: left, y: down, z: 0
 	[[nodiscard]] inline libv::vec3f margin_LB3() const noexcept {
@@ -167,7 +171,7 @@ public:
 	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f margin_RT() const noexcept {
-		return zw(margin_);
+		return zw(property.margin());
 	}
 	/// x: right, y: top, z: 0
 	[[nodiscard]] inline libv::vec3f margin_RT3() const noexcept {
@@ -185,8 +189,7 @@ public:
 	// --- Padding ---
 
 	inline void padding(Padding value) noexcept {
-		padding_ = value;
-		markInvalidLayout();
+		AccessProperty::manual(*this, property.padding, value);
 	}
 	inline void padding(float left_down_right_top) noexcept {
 		padding(Padding{left_down_right_top, left_down_right_top, left_down_right_top, left_down_right_top});
@@ -199,11 +202,11 @@ public:
 	}
 	/// x: left, y: down, z: right, w: top
 	[[nodiscard]] inline Padding padding() const noexcept {
-		return padding_;
+		return property.padding();
 	}
 	/// x: left, y: down
 	[[nodiscard]] inline libv::vec2f padding_LB() const noexcept {
-		return xy(padding_);
+		return xy(property.padding());
 	}
 	/// x: left, y: down, z: 0
 	[[nodiscard]] inline libv::vec3f padding_LB3() const noexcept {
@@ -211,7 +214,7 @@ public:
 	}
 	/// x: right, y: top
 	[[nodiscard]] inline libv::vec2f padding_RT() const noexcept {
-		return zw(padding_);
+		return zw(property.padding());
 	}
 	/// x: right, y: top, z: 0
 	[[nodiscard]] inline libv::vec3f padding_RT3() const noexcept {
@@ -225,10 +228,6 @@ public:
 	[[nodiscard]] inline libv::vec3f padding_size3() const noexcept {
 		return {padding_size(), 0.0f};
 	}
-
-public:
-	template <typename T>
-	void access_properties(T& ctx);
 
 public:
 	void flagAncestors(Flag_t flags_) noexcept;
@@ -258,6 +257,7 @@ public:
 	void markRemove() noexcept;
 	void markInvalidLayout() noexcept;
 	void style(libv::intrusive_ptr<Style> style) noexcept;
+	void style(std::string_view style_name);
 
 public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
@@ -350,29 +350,32 @@ inline void CoreComponent::fire(const Event& event) {
 
 template <typename T>
 void CoreComponent::access_properties(T& ctx) {
-	ctx.synthetize(
-			[](auto& c, auto v) { c.size(v); },
+	ctx.indirect(
+			[](auto& c) -> auto& { return c.property.size; },
+			// Size has to maintain the parentDependOnLayout flags, have to use its setter (but that is manual, so restore to style driver)
+			[](auto& c, auto&& v) { c.size(std::move(v)); AccessProperty::driver(c.property.size, PropertyDriver::style); },
 			[](const auto& c) { return c.size(); },
+			Size(),
 			pgr::layout, pnm::size,
 			"Component size in pixel, percent, ratio and dynamic units"
 	);
-	ctx.synthetize(
-			[](auto& c, auto v) { c.anchor(v); },
-			[](const auto& c) { return c.anchor(); },
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.anchor; },
+			Anchor::center_center,
 			pgr::layout, pnm::anchor,
 			"Component's anchor point"
 	);
-	ctx.synthetize(
-			[](auto& c, auto v) { c.margin(v); },
-			[](const auto& c) { return c.margin(); },
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.margin; },
+			Margin(),
 			pgr::layout, pnm::margin,
-			"Component's margin"
+			"Component's margin (left, down, right, top)"
 	);
-	ctx.synthetize(
-			[](auto& c, auto v) { c.padding(v); },
-			[](const auto& c) { return c.padding(); },
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.padding; },
+			Padding(),
 			pgr::layout, pnm::padding,
-			"Component's padding"
+			"Component's padding (left, down, right, top)"
 	);
 }
 

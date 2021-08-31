@@ -25,7 +25,7 @@ class ImplNexus;
 class Nexus {
 public:
 	using track_ptr = const void*;
-	using key_type = uintptr_t;
+	using key_type = libv::type_uid;
 
 private:
 	std::shared_ptr<ImplNexus> self;

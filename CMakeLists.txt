@@ -781,10 +781,17 @@ wish_create_library(
 	LINK   ext_boost # For boost statechart based
 )
 
+#wish_generator(
+#	TARGET enum
+#	COMMAND enum
+#)
+
 wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
+#	GENERATE enum src/libv/ui/*.in.lua
 	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp ext_clip
+	LINK   libv_fsw
 )
 
 wish_create_library(
@@ -1146,7 +1153,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET sandbox_libv_ui_lua
 	SOURCE sandbox/libv_ui_lua_main.cpp
-	LINK   libv_log libv_ui libv_frame libv_utility libv_lua
+	LINK   libv_log libv_ui libv_frame libv_utility libv_lua libv_fsw
 )
 
 wish_create_executable(

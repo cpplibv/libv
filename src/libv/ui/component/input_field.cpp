@@ -438,7 +438,7 @@ void CoreInputField::doAttach() {
 void CoreInputField::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreInputField> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
-	CoreComponent::access_properties(setter);
+	CoreComponent::doStyle(ctx);
 }
 
 libv::vec3f CoreInputField::doLayout1(const ContextLayout1& environment) {

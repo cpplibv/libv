@@ -124,6 +124,14 @@ void Component::markRemove() {
 	ptr_->markRemove();
 }
 
+//void Component::style(libv::intrusive_ptr<Style> style) noexcept {
+//	ptr_->style(std::move(style));
+//}
+
+void Component::style(std::string_view style_name) {
+	ptr_->style(style_name);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ui

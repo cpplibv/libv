@@ -18,7 +18,7 @@ namespace ui {
 struct ResourceSettings {
 	std::filesystem::path base_path; /// Relative resource path base
 	// bool relative_path_only = true; /// Forbid requests with absolute path
-	// bool restict_under_base = true; /// Forbid requests that would leave the base path
+	 bool restict_under_base = true; /// Forbid requests that would leave the base path
 	// bool cache_fallback = true; /// Insert failed resource lookups into cache as the fallback value
 	// bool track_every = false; /// Track every resource and reload resource upon file change
 	// std::unordered_set<std::filesystem::path> track; /// Track specific resource and reload resource upon file change
@@ -45,6 +45,11 @@ struct Settings {
 	double scroll_hold_button = scroll_step_button * 10.0;
 	double scroll_hold_scroll = scroll_step_scroll * 10.0;
 	double scroll_hold_track = scroll_step_track * 10.0;
+
+	bool track_style_scripts = false;
+//	bool track_fonts = false;
+//	bool track_shaders = false;
+//	bool track_textures = false;
 };
 
 // -------------------------------------------------------------------------------------------------

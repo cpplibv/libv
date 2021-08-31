@@ -91,6 +91,9 @@ public:
 	}
 
 public:
+	void clear();
+
+public:
 	template <typename F>
 	inline void foreach(const F& func) {
 		// TODO P4: foreach should also iterate over inherited properties, or at least has an API for it
