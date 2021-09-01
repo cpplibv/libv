@@ -941,7 +941,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET enum
 	SOURCE app/enum/*.cpp
-	LINK   ext_fmt ext_clip ext_range libv_lua
+	LINK   ext_fmt ext_clip ext_range libv_lua libv_utility
 )
 
 wish_create_executable(
@@ -949,12 +949,6 @@ wish_create_executable(
 	SOURCE app/space/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial
-)
-
-wish_create_executable(
-	TARGET app_enum_generator
-	SOURCE app/enum_generator.cpp
-	LINK   ext_fmt ext_clip
 )
 
 wish_create_executable(

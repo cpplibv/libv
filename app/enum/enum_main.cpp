@@ -2,6 +2,8 @@
 
 // libv
 #include <libv/lua/lua.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/write_file.hpp>
 // ext
 #include <clip/clip.h>
 #include <fmt/format.h>
@@ -18,7 +20,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v14";
+static constexpr std::string_view enum_gen_version = "v2.4";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -102,18 +104,27 @@ public:
 	// -------------------------------------------------------------------------------------------------
 
 public:
-	[[nodiscard]] std::string generate_source_code() const {
+	[[nodiscard]] std::string generate_source_code(std::string_view input_file) const {
 		std::stringstream os;
 
 		const auto out = [&os](std::string_view fmt, auto&&... args) {
 			os << fmt::format(fmt::runtime(fmt), std::forward<decltype(args)>(args)...);
 		};
 
-		out("// Generated source for enum: {}\n", enum_name);
-		out("// Generator: enum {}\n", enum_gen_version);
+		out("// Generated source code for enum: {}\n", enum_name);
+		out("// Generator version: enum {}\n", enum_gen_version);
+		if (!input_file.empty())
+			out("// Input file: {}\n", input_file);
 		out("\n");
 		out("#pragma once\n");
 		out("\n");
+
+		// Generate docs
+		// out("\n");
+		// list main entry point of usage:
+		// enum X
+		// class X_type, type(X) to create
+		// auto X_enum
 
 		if (gen_to_string || gen_to_stream || gen_to_span) {
 			out("// std\n");
@@ -121,10 +132,10 @@ public:
 			if (gen_to_string || gen_to_stream || !properties.empty())
 				out("#include <cassert>\n");
 
-			if (gen_to_stream) {
-				out("#include <iosfwd>\n");
+			out("#include <cstdint>\n");
+
+			if (gen_to_stream)
 				out("#include <ostream>\n");
-			}
 
 			if (gen_to_span)
 				out("#include <span>\n");
@@ -346,6 +357,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct EnumBuilderLua {
+//	libv::lua::State lua = libv::lua::create_state(libv::lua::lualib::base);
 	libv::lua::State lua;
 	std::optional<EnumBuilder> eb;
 
@@ -400,12 +412,12 @@ struct EnumBuilderLua {
 		});
 	}
 
-	std::string generate_source_code(std::string_view source_script) {
+	std::string generate_source_code(std::string_view input_file, std::string_view source_script) {
 		auto env = sol::environment(lua, sol::create, lua.globals());
 
 		lua.script(source_script, env);
 
-		auto result = eb->generate_source_code();
+		auto result = eb->generate_source_code(input_file);
 		eb.reset();
 
 		return result;
@@ -422,7 +434,22 @@ void clipboard(const std::string& string) {
 
 // -------------------------------------------------------------------------------------------------
 
-int main() {
+int main(int argc, const char** argv) {
+	EnumBuilderLua eb;
+
+	if (argc < 3) {
+		std::cerr << "Usage: enum <input_file> <output_file>" << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	std::cout << " input_file: " << argv[1] << std::endl;
+	std::cout << "output_file: " << argv[2] << std::endl;
+//	std::cout << eb.generate_source_code(libv::read_file_or_throw(argv[1])) << std::endl;
+
+	libv::write_file_or_throw(argv[2], eb.generate_source_code(argv[1], libv::read_file_or_throw(argv[1])));
+
+	return EXIT_SUCCESS;
+
 //	EnumBuilder eb("color", "int32_t");
 //
 ////	eb.gen_operator_eq = true;
@@ -439,27 +466,25 @@ int main() {
 //	eb.value("red", "red", false);     eb.property_value("rgba", "red",   "libv::vec4f{1, 0, 0, 1}");
 //	eb.value("green", "green", false); eb.property_value("rgba", "green", "libv::vec4f{0, 1, 0, 1}");
 //	eb.value("blue", "blue", false);   eb.property_value("rgba", "blue",  "libv::vec4f{0, 0, 1, 1}");
-
-	EnumBuilderLua eb;
-
-	const auto script = R"(
-		enum("color", "int32_t")
-		namespace("libv::ns")
-		include("libv/math/vec.hpp")
-		rgba = property("rgba", "libv::vec4f")
-
---		custom_function("int calc() { return 42; }")
-		value("red"  , "Red"  , {rgba("libv::vec4f{1, 0, 0, 1}")})
-		value("green", "Green", {rgba("libv::vec4f{0, 1, 0, 1}")})
-		value("blue" , "Blue" , {rgba("libv::vec4f{0, 0, 1, 1}")})
-
---		parse_alias("cyan", "blue")
-)";
-
+//
+//	EnumBuilderLua eb;
+//
+//	const auto script = R"(
+//		enum("color", "int32_t")
+//		namespace("libv::ns")
+//		include("libv/math/vec.hpp")
+//		rgba = property("rgba", "libv::vec4f")
+//
+//--		custom_function("int calc() { return 42; }")
+//		value("red"  , "Red"  , {rgba("libv::vec4f{1, 0, 0, 1}")})
+//		value("green", "Green", {rgba("libv::vec4f{0, 1, 0, 1}")})
+//		value("blue" , "Blue" , {rgba("libv::vec4f{0, 0, 1, 1}")})
+//
+//--		parse_alias("cyan", "blue")
+//)";
+//
 //	clipboard(result);
-	std::cout << eb.generate_source_code(script) << std::endl;
-
-	return 0;
+//	std::cout << eb.generate_source_code(script) << std::endl;
 }
 
 
