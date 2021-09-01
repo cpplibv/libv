@@ -204,19 +204,38 @@ void CoreComponent::markRemove() noexcept {
 }
 
 void CoreComponent::markInvalidLayout() noexcept {
-	// Invalidate the parent container so it can recalculate the bounds with the changed properties
+
+	// Invalidate self
+	flagDirect(Flag::pendingLayoutSelf);
+
+	auto it = this;
+
+	// Invalidate the parent containers, so it can recalculate the bounds with the changed properties
 	// If that result in bound changes, the layout logic will recalculate anyone who needs it
-	parent_->flagAuto(Flag::pendingLayout);
+	// Invalidate anyone upstream whom might depend on our layout
+	for (; it->flags.match_any(Flag::parentDependOnLayout);) {
+		it = it->parent_;
 
-	// Invalidate anyone upstream whom might depend on layout
-	for (auto it = parent_->parent_; true; it = it->parent_) {
-		it->flagDirect(Flag::pendingLayoutSelf);
+		if (it->flags.match_any(Flag::pendingLayoutSelf))
+			return; // Already has invalid self flag, upstream already know what to do HARD STOP
 
-		if (!it->flags.match_any(Flag::parentDependOnLayout))
-			break;
+		it->flagDirect(Flag::pendingLayoutSelf | Flag::pendingLayoutChild);
 
 		if (it == it->parent_)
-			break;
+			break; // Reached root
+	}
+
+	// Indicate that there is an invalid children downstream
+	for (;;) {
+		it = it->parent_;
+
+		if (it->flags.match_any(Flag::pendingLayoutChild))
+			break; // Already has invalid child flag, upstream already know what to do
+
+		it->flagDirect(Flag::pendingLayoutChild);
+
+		if (it == it->parent_)
+			break; // Reached root
 	}
 }
 
