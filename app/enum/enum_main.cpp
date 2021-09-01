@@ -111,6 +111,7 @@ public:
 			os << fmt::format(fmt::runtime(fmt), std::forward<decltype(args)>(args)...);
 		};
 
+		out("//\n"); // Empty first line to allow first line watermark
 		out("// Generated source code for enum: {}\n", enum_name);
 		out("// Generator version: enum {}\n", enum_gen_version);
 		if (!input_file.empty())

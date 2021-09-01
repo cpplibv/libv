@@ -59,6 +59,7 @@ libv.ui: Implement style sheets loading and hot reloading support
 
 
 
+libv.ui: Alignment justify should not 'start' at top left but from the orientation's starting point (therefore AlignVertical rate 1.0 for justifieds are incorrect)
 
 libv.ui: Margin, Padding, Spacing and Alignment gaps
 	libv.ui: Make panel_line margin not collapsing with padding

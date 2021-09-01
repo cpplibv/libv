@@ -9,14 +9,16 @@
 -- -------------------------------------------------------------------------------------------------
 
 local colors = {
-	text = "hsva(  0°,  0%,  80%, 100%)",
+	text_light = "hsva(  0°,  0%,  80%, 100%)",
+	text_dark = "hsva(  0°,  0%,  20%, 100%)",
+	hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
 }
 
 -- -------------------------------------------------------------------------------------------------
 
 ui.style("space") {
 	font = "consola.ttf",
-	font_color = "rgba(1, 0, 0, 0)",
+	font_color = "rgba(0.0, 0.0, 0.0, 1.0)",
 	font_size = 12,
 }
 
@@ -41,7 +43,7 @@ ui.style("space.hud-bar.cmd.panel") {
 ui.style("space.hud-bar.cmd.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
+	bg_color = colors.hud_light_bg_color,
 	size = "10pxD1r, 4pxD",
 }
 
@@ -56,21 +58,21 @@ ui.style("space.hud-bar.mp.panel") {
 ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
+	bg_color = colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.input") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
+	bg_color = colors.hud_light_bg_color,
 	size = "10pxD, 1r",
 }
 
 ui.style("space.hud-bar.mp.lbl") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
+	bg_color = colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 

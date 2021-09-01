@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/scene.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/scene_mp_bar.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

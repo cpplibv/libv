@@ -1,4 +1,4 @@
-// Project: libv.lua, File: src/libv/lua/object_parser.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: src/libv/lua/sol_type_to_string.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

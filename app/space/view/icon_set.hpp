@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/icon_set.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/icon_set.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

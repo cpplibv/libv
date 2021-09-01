@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/universe.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/universe/universe.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

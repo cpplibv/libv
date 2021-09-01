@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/render.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/renderer.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
 #include <space/renderer.hpp>

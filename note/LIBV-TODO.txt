@@ -733,6 +733,7 @@ app.enum: new enum gen | rename and refactor
 place.it:
 	tool.profiler: https://github.com/bombomby/optick - But it doesnt support OpenGL
 	tool.profiler: https://github.com/wolfpld/tracy
+	tool.audio: https://non.tuxfamily.org/
 
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
 	cpp.tool: build-bench.com - Benchmark compile time

@@ -1,4 +1,4 @@
-// Project: libv, File: app/enum_generator.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/enum/_legacy_enum_generator.hpp, Author: Császár Mátyás [Vader]
 
 // ext
 #include <clip/clip.h>

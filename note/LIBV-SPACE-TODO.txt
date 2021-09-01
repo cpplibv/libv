@@ -67,21 +67,7 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
-generate some source?
-	https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
 
-	add_executable(generator generator.cpp)
-
-	add_custom_command(
-		OUTPUT  generated.cpp
-		COMMAND generator ${CMAKE_CURRENT_BINARY_DIR}/generated.cpp
-		DEPENDS generator someInputFile.cpp.in
-	)
-
-	add_executable(myapp
-		main.cpp
-		${CMAKE_CURRENT_BINARY_DIR}/generated.cpp
-	)
 
 
 
@@ -90,7 +76,6 @@ place.it:
 	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
 	libv.sys: Move clipboard text to it from libv.ui.context_ui
 
-	lua: Install luacheck and setup it in CLion https://github.com/mpeterv/luacheck
 
 git:
 	Change the author of these commits:
@@ -102,11 +87,11 @@ git:
     * 2021-08-15 review - app.space: Add support for command arrow 'intent' (color) specification  Császár Mátyás [Vader]
 
 
-app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-
 app.space: Simulation time control
 	app.space: Pause, Unpause (It will be a good practise for timers and controls)
 	app.space: Speed x1 x2 x4
+
+app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 
 app.space.net: Networking
 	app.space.net: Networking (Stage 2)

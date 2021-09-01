@@ -1,4 +1,4 @@
--- Project: libv.ui, File: src/libv/ui/property/align.hpp, Author: Császár Mátyás [Vader]
+-- Project: libv.ui, File: src/libv/ui/property/align_horizontal.hpp.in.lua, Author: Császár Mátyás [Vader]
 
 enum("AlignHorizontal", "int32_t")
 namespace("libv::ui")

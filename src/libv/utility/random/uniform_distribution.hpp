@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/uniform_distribution.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/random/uniform_distribution.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 

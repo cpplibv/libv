@@ -1,3 +1,4 @@
+//
 // Generated source code for enum: AlignHorizontal
 // Generator version: enum v2.4.2
 // Input file: src/libv/ui/property/align_horizontal.hpp.in.lua

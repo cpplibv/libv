@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/session.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/lobby.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
