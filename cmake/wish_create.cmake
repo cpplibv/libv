@@ -167,7 +167,8 @@ function(wish_generate out_generated_outputs)
 		file(GLOB_RECURSE matching_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS ${arg_${generator}})
 
 		foreach(matching_file ${matching_files})
-			set(output_files "")
+			set(output_files_rel "")
+			set(output_files_abs "") # For CMake/Ninja to properly track dependencies output has to use abs path
 			set(output_rules_left ${__wish_generator_output_rules_${generator}})
 			while(output_rules_left)
 				list(FIND output_rules_left "OUTPUT" end_index)
@@ -175,7 +176,8 @@ function(wish_generate out_generated_outputs)
 				list(SUBLIST output_rules_left 0 ${end_index} output_rule)
 				# Use ${output_rule} list
 				string(${output_rule} output_file ${matching_file})
-				list(APPEND output_files ${output_file})
+				list(APPEND output_files_rel ${output_file})
+				list(APPEND output_files_abs ${CMAKE_CURRENT_SOURCE_DIR}/${output_file})
 
 				# Jump to next segment
 				if (${end_index} EQUAL -1)
@@ -187,13 +189,13 @@ function(wish_generate out_generated_outputs)
 			endwhile()
 
 			add_custom_command(
-					OUTPUT  ${output_files}
-					COMMAND ${__wish_generator_command_${generator}} ${matching_file} ${output_files}
+					OUTPUT  ${output_files_abs}
+					COMMAND ${__wish_generator_command_${generator}} ${matching_file} ${output_files_rel}
 					DEPENDS ${generator} ${matching_file}
 					WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 			)
 
-			list(APPEND generated_outputs ${output_files})
+			list(APPEND generated_outputs ${output_files_abs})
 		endforeach()
 	endforeach()
 
