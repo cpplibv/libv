@@ -20,7 +20,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v2.4";
+static constexpr std::string_view enum_gen_version = "v2.4.2";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -183,7 +183,7 @@ public:
 		out("		enum_value_(value) {{\n");
 		out("	}}\n");
 		out("\n");
-		out("	explicit(false) [[nodiscard]] constexpr inline operator enum_type() const noexcept {{\n");
+		out("	explicit(false) constexpr inline operator enum_type() const noexcept {{\n");
 		out("		return enum_value_;\n");
 		out("	}}\n");
 		out("\n");
@@ -315,8 +315,7 @@ public:
 			out("}}\n");
 
 			if (gen_to_stream) {
-				out("\n");
-				out("std::ostream& operator<<(std::ostream& os, const {} var) {{\n", enum_name);
+				out("inline std::ostream& operator<<(std::ostream& os, const {} var) {{\n", enum_name);
 				out("	return os << {}(var).to_string();\n", class_enum_type_name);
 				out("}}\n");
 			}
@@ -326,14 +325,15 @@ public:
 		out("[[nodiscard]] constexpr inline {} underlying({} enum_value) noexcept {{\n", enum_type, enum_name);
 		out("	return static_cast<{}>(enum_value);\n", enum_type);
 		out("}}\n");
-
-		out("\n");
 		out("[[nodiscard]] constexpr inline {} operator+({} enum_value) noexcept {{\n", enum_type, enum_name);
 		out("	return static_cast<{}>(enum_value);\n", enum_type);
 		out("}}\n");
 
 		out("\n");
 		out("[[nodiscard]] constexpr inline {} type({} enum_value) noexcept {{\n", class_enum_type_name, enum_name);
+		out("	return {}(enum_value);\n", class_enum_type_name);
+		out("}}\n");
+		out("[[nodiscard]] constexpr inline {} info({} enum_value) noexcept {{\n", class_enum_type_name, enum_name);
 		out("	return {}(enum_value);\n", class_enum_type_name);
 		out("}}\n");
 
