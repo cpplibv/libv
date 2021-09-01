@@ -620,6 +620,25 @@ wish_end_group()
 
 # === Targets ======================================================================================
 
+wish_create_group(GROUP_GENERATOR) # Generators ---------------------------------------------------
+
+wish_generator(
+	TARGET  enum
+	COMMAND enum
+	OUTPUT  REPLACE ".hpp.in.lua" ".hpp"
+#	OUTPUT  REPLACE ".hpp.in.lua" ".cpp"
+)
+
+#wish_generator(
+#	TARGET  enum_split
+#	COMMAND enum --split
+#	OUTPUT  REPLACE .hpp.in.lua .hpp
+#	OUTPUT  REPLACE .hpp.in.lua .cpp
+#	OUTPUT  REGEX REPLACE "\\.hpp\\.in\\.lua$" ".hpp"
+#	OUTPUT  REGEX REPLACE "\\.hpp\\.in\\.lua$" ".cpp"
+#)
+
+wish_end_group()
 wish_create_group(GROUP_LIBRARY) # Libraries -------------------------------------------------------
 
 wish_create_library(
@@ -780,11 +799,6 @@ wish_create_library(
 	LINK   ext_sml # For SML based
 	LINK   ext_boost # For boost statechart based
 )
-
-#wish_generator(
-#	TARGET enum
-#	COMMAND enum
-#)
 
 wish_create_library(
 	TARGET libv_ui STATIC
@@ -1304,15 +1318,17 @@ wish_end_group()
 add_custom_target(group_application DEPENDS ${GROUP_APPLICATION})
 add_custom_target(group_example     DEPENDS ${GROUP_EXAMPLE})
 add_custom_target(group_externals   DEPENDS ${GROUP_EXTERNAL_PROJECT})
+add_custom_target(group_generator   DEPENDS ${GROUP_GENERATOR})
 add_custom_target(group_library     DEPENDS ${GROUP_LIBRARY})
 add_custom_target(group_sandbox     DEPENDS ${GROUP_SANDBOX})
 add_custom_target(group_unit_test   DEPENDS ${GROUP_UNIT_TEST})
 
-add_custom_target(app     DEPENDS group_application)
-add_custom_target(example DEPENDS group_example)
-add_custom_target(ext     DEPENDS group_externals)
-add_custom_target(lib     DEPENDS group_library)
-add_custom_target(sandbox DEPENDS group_sandbox)
-add_custom_target(test    DEPENDS group_unit_test)
+add_custom_target(app       DEPENDS group_application)
+add_custom_target(example   DEPENDS group_example)
+add_custom_target(ext       DEPENDS group_externals)
+add_custom_target(generator DEPENDS group_generator)
+add_custom_target(lib       DEPENDS group_library)
+add_custom_target(sandbox   DEPENDS group_sandbox)
+add_custom_target(test      DEPENDS group_unit_test)
 
 wish_create_ide_target()
