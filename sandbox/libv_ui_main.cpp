@@ -427,34 +427,68 @@ public:
 				label.text(label.text() + "\n");
 			}
 
-			if (e.keycode == libv::input::Keycode::F7) {
-				log_sandbox.trace("AlignVertical::top");
-				label.align_vertical(libv::ui::AlignVertical::top);
-				input_field0.align_vertical(libv::ui::AlignVertical::top);
-			}
-
-			if (e.keycode == libv::input::Keycode::F8) {
-				log_sandbox.trace("AlignVertical::center");
-				label.align_vertical(libv::ui::AlignVertical::center);
-				input_field0.align_vertical(libv::ui::AlignVertical::center);
-			}
-
-			if (e.keycode == libv::input::Keycode::F9) {
-				log_sandbox.trace("AlignVertical::bottom");
-				label.align_vertical(libv::ui::AlignVertical::bottom);
-				input_field0.align_vertical(libv::ui::AlignVertical::bottom);
-			}
-
-			if (e.keycode == libv::input::Keycode::F10) {
-				log_sandbox.trace("AlignVertical::justify");
-				label.align_vertical(libv::ui::AlignVertical::justify);
-				input_field0.align_vertical(libv::ui::AlignVertical::justify);
-			}
-
-			if (e.keycode == libv::input::Keycode::F11) {
-				log_sandbox.trace("AlignVertical::justify_all");
-				label.align_vertical(libv::ui::AlignVertical::justify_all);
-				input_field0.align_vertical(libv::ui::AlignVertical::justify_all);
+			if (isKeyPressed(libv::input::Keycode::ShiftLeft) || isKeyPressed(libv::input::Keycode::ShiftRight)) {
+				if (e.keycode == libv::input::Keycode::F7) {
+					log_sandbox.trace("AlignVertical::bottom");
+					label.align_vertical(libv::ui::AlignVertical::bottom);
+					input_field0.align_vertical(libv::ui::AlignVertical::bottom);
+					status_log.align_vertical(libv::ui::AlignVertical::bottom);
+				}
+				if (e.keycode == libv::input::Keycode::F8) {
+					log_sandbox.trace("AlignVertical::center");
+					label.align_vertical(libv::ui::AlignVertical::center);
+					input_field0.align_vertical(libv::ui::AlignVertical::center);
+					status_log.align_vertical(libv::ui::AlignVertical::center);
+				}
+				if (e.keycode == libv::input::Keycode::F9) {
+					log_sandbox.trace("AlignVertical::top");
+					label.align_vertical(libv::ui::AlignVertical::top);
+					input_field0.align_vertical(libv::ui::AlignVertical::top);
+					status_log.align_vertical(libv::ui::AlignVertical::top);
+				}
+				if (e.keycode == libv::input::Keycode::F10) {
+					log_sandbox.trace("AlignVertical::justify");
+					label.align_vertical(libv::ui::AlignVertical::justify);
+					input_field0.align_vertical(libv::ui::AlignVertical::justify);
+					status_log.align_vertical(libv::ui::AlignVertical::justify);
+				}
+				if (e.keycode == libv::input::Keycode::F11) {
+					log_sandbox.trace("AlignVertical::justify_all");
+					label.align_vertical(libv::ui::AlignVertical::justify_all);
+					input_field0.align_vertical(libv::ui::AlignVertical::justify_all);
+					status_log.align_vertical(libv::ui::AlignVertical::justify_all);
+				}
+			} else {
+				if (e.keycode == libv::input::Keycode::F7) {
+					log_sandbox.trace("AlignHorizontal::left");
+					label.align_horizontal(libv::ui::AlignHorizontal::left);
+					input_field0.align_horizontal(libv::ui::AlignHorizontal::left);
+					status_log.align_horizontal(libv::ui::AlignHorizontal::left);
+				}
+				if (e.keycode == libv::input::Keycode::F8) {
+					log_sandbox.trace("AlignHorizontal::center");
+					label.align_horizontal(libv::ui::AlignHorizontal::center);
+					input_field0.align_horizontal(libv::ui::AlignHorizontal::center);
+					status_log.align_horizontal(libv::ui::AlignHorizontal::center);
+				}
+				if (e.keycode == libv::input::Keycode::F9) {
+					log_sandbox.trace("AlignHorizontal::right");
+					label.align_horizontal(libv::ui::AlignHorizontal::right);
+					input_field0.align_horizontal(libv::ui::AlignHorizontal::right);
+					status_log.align_horizontal(libv::ui::AlignHorizontal::right);
+				}
+				if (e.keycode == libv::input::Keycode::F10) {
+					log_sandbox.trace("AlignHorizontal::justify");
+					label.align_horizontal(libv::ui::AlignHorizontal::justify);
+					input_field0.align_horizontal(libv::ui::AlignHorizontal::justify);
+					status_log.align_horizontal(libv::ui::AlignHorizontal::justify);
+				}
+				if (e.keycode == libv::input::Keycode::F11) {
+					log_sandbox.trace("AlignHorizontal::justify_all");
+					label.align_horizontal(libv::ui::AlignHorizontal::justify_all);
+					input_field0.align_horizontal(libv::ui::AlignHorizontal::justify_all);
+					status_log.align_horizontal(libv::ui::AlignHorizontal::justify_all);
+				}
 			}
 
 			if (e.keycode == libv::input::Keycode::KPNum0) {

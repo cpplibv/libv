@@ -291,7 +291,7 @@ void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 
 	auto environmentUnused = layout_env.size - sizeContent;
 
-	if (alignHData.justified && entries.size() >= 2) {
+	if ((_X_ == 0 ? alignHData.justified : alignVData.justified) && entries.size() >= 2) {
 		// Gather GAPS
 		// Sort GAPS by size
 		// Calculate new value for the lowest N GAP
