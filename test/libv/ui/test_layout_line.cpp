@@ -710,6 +710,187 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		}
 	}
 
+	SECTION("Single child justify positions") {
+		SECTION("s0") {
+			panel.align_horizontal(libv::ui::AlignHorizontal::left);
+			panel.align_vertical(libv::ui::AlignVertical::justify);
+			SECTION("s0.0") {
+				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+			}
+			SECTION("s0.1") {
+				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+			}
+			SECTION("s0.2") {
+				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+			}
+			SECTION("s0.3") {
+				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+			}
+
+			TestComponent comp0 = panel.add("10px, 10px");
+			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+			panel.layout2(100, 100);
+			CHECK(comp0.bounds() == Bounds(0, 90, 0, 10, 10, 0));
+		}
+		SECTION("s1") {
+			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
+			panel.align_vertical(libv::ui::AlignVertical::top);
+			SECTION("s1.0") {
+				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+			}
+			SECTION("s1.1") {
+				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+			}
+			SECTION("s1.2") {
+				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+			}
+			SECTION("s1.3") {
+				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+			}
+
+			TestComponent comp0 = panel.add("10px, 10px");
+			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+			panel.layout2(100, 100);
+			CHECK(comp0.bounds() == Bounds(0, 90, 0, 10, 10, 0));
+		}
+		SECTION("s2") {
+			panel.align_horizontal(libv::ui::AlignHorizontal::center);
+			panel.align_vertical(libv::ui::AlignVertical::justify);
+			SECTION("s2.0") {
+				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+			}
+			SECTION("s2.1") {
+				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+			}
+			SECTION("s2.2") {
+				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+			}
+			SECTION("s2.3") {
+				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+			}
+
+			TestComponent comp0 = panel.add("10px, 10px");
+			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+			panel.layout2(100, 100);
+			CHECK(comp0.bounds() == Bounds(45, 90, 0, 10, 10, 0));
+		}
+		SECTION("s3") {
+			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
+			panel.align_vertical(libv::ui::AlignVertical::center);
+			SECTION("s3.0") {
+				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+			}
+			SECTION("s3.1") {
+				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+			}
+			SECTION("s3.2") {
+				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+			}
+			SECTION("s3.3") {
+				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+			}
+
+			TestComponent comp0 = panel.add("10px, 10px");
+			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+			panel.layout2(100, 100);
+			CHECK(comp0.bounds() == Bounds(0, 45, 0, 10, 10, 0));
+		}
+	}
+
+//	SECTION("Two child justify positions") {
+//		SECTION("s0") {
+//			panel.align_horizontal(libv::ui::AlignHorizontal::left);
+//			panel.align_vertical(libv::ui::AlignVertical::justify);
+////			SECTION("s0.0") {
+////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////			}
+////			SECTION("s0.1") {
+////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////			}
+////			SECTION("s0.2") {
+////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////			}
+////			SECTION("s0.3") {
+////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////			}
+//
+//			TestComponent comp0 = panel.add("10px, 10px");
+//			TestComponent comp1 = panel.add("10px, 10px");
+//			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+//			panel.layout2(100, 100);
+//			CHECK(comp0.bounds() == Bounds(0, 90, 0, 10, 10, 0));
+//			CHECK(comp1.bounds() == Bounds(0, 90, 0, 10, 10, 0));
+//		}
+////		SECTION("s1") {
+////			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
+////			panel.align_vertical(libv::ui::AlignVertical::top);
+////			SECTION("s1.0") {
+////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////			}
+////			SECTION("s1.1") {
+////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////			}
+////			SECTION("s1.2") {
+////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////			}
+////			SECTION("s1.3") {
+////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////			}
+////
+////			TestComponent comp0 = panel.add("10px, 10px");
+////			TestComponent comp1 = panel.add("10px, 10px");
+////			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+////			panel.layout2(100, 100);
+////			CHECK(comp1.bounds() == Bounds(0, 90, 0, 10, 10, 0));
+////		}
+////		SECTION("s2") {
+////			panel.align_horizontal(libv::ui::AlignHorizontal::center);
+////			panel.align_vertical(libv::ui::AlignVertical::justify);
+////			SECTION("s2.0") {
+////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////			}
+////			SECTION("s2.1") {
+////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////			}
+////			SECTION("s2.2") {
+////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////			}
+////			SECTION("s2.3") {
+////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////			}
+////
+////			TestComponent comp0 = panel.add("10px, 10px");
+////			TestComponent comp1 = panel.add("10px, 10px");
+////			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+////			panel.layout2(100, 100);
+////			CHECK(comp0.bounds() == Bounds(45, 90, 0, 10, 10, 0));
+////			CHECK(comp1.bounds() == Bounds(45, 90, 0, 10, 10, 0));
+////		}
+////		SECTION("s3") {
+////			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
+////			panel.align_vertical(libv::ui::AlignVertical::center);
+////			SECTION("s3.0") {
+////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////			}
+////			SECTION("s3.1") {
+////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////			}
+////			SECTION("s3.2") {
+////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////			}
+////			SECTION("s3.3") {
+////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////			}
+////
+////			TestComponent comp0 = panel.add("10px, 10px");
+////			TestComponent comp1 = panel.add("10px, 10px");
+////			CHECK(panel.layout1(0, 0, 0) == approx_size(10, 10, 0));
+////			panel.layout2(100, 100);
+////			CHECK(comp0.bounds() == Bounds(0, 45, 0, 10, 10, 0));
+////			CHECK(comp1.bounds() == Bounds(0, 45, 0, 10, 10, 0));
+////		}
+//	}
+
 	SECTION("3 children and Spacing and Alignment center") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::center);
 		panel.align_vertical(libv::ui::AlignVertical::center);
@@ -761,9 +942,9 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(panel.layout1(0, 0, 0) == approx_size(71, 49, 0));
 			panel.layout2(400, 300);
 
-			CHECK(comp0.bounds() == Bounds(  1, 2, 0, 10, 10, 0));
-			CHECK(comp1.bounds() == Bounds(180, 4, 0, 20, 20, 0));
-			CHECK(comp2.bounds() == Bounds(400-30-2, 5, 0, 30, 40, 0));
+			CHECK(comp0.bounds() == Bounds(  1, 285, 0, 10, 10, 0));
+			CHECK(comp1.bounds() == Bounds(180, 279, 0, 20, 20, 0));
+			CHECK(comp2.bounds() == Bounds(400-30-2, 256, 0, 30, 40, 0));
 		}
 
 		SECTION("RIGHT_TO_LEFT") {
@@ -772,9 +953,9 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(panel.layout1(0, 0, 0) == approx_size(73, 49, 0));
 			panel.layout2(400, 300);
 
-			CHECK(comp0.bounds() == Bounds(386, 2, 0, 10, 10, 0));
-			CHECK(comp1.bounds() == Bounds(199, 4, 0, 20, 20, 0));
-			CHECK(comp2.bounds() == Bounds(  1, 5, 0, 30, 40, 0));
+			CHECK(comp0.bounds() == Bounds(386, 285, 0, 10, 10, 0));
+			CHECK(comp1.bounds() == Bounds(199, 279, 0, 20, 20, 0));
+			CHECK(comp2.bounds() == Bounds(  1, 256, 0, 30, 40, 0));
 		}
 
 		SECTION("TOP_TO_BOTTOM") {

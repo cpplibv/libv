@@ -803,7 +803,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_ui STATIC
 	SOURCE src/libv/ui/*.cpp
-#	GENERATE enum src/libv/ui/*.in.lua
+	GENERATE enum src/libv/ui/*.in.lua
 	LINK   libv_glr libv_parse libv_lua libv_input ext_freetype ext_utf8cpp ext_clip
 	LINK   libv_fsw
 )

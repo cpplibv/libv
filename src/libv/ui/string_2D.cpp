@@ -12,7 +12,6 @@
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/utf8.hpp>
 // std
-#include <array>
 #include <cmath>
 // pro
 #include <libv/ui/context/context_render.hpp>
@@ -26,27 +25,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-namespace {
-
-static constexpr std::array AlignHorizontalTable = {
-	0.0f, // Left
-	0.5f, // Center
-	1.0f, // Right
-	0.0f, // Justify
-	0.0f, // JustifyAll
-};
-
-static constexpr std::array AlignVerticalTable = {
-	0.0f, // Top
-	0.5f, // Center
-	1.0f, // Bottom
-	0.0f, // Justify
-	0.0f, // JustifyAll
-};
-
 static constexpr uint32_t invalidCodepointReplacement = '_';
-
-} // namespace
 
 // -------------------------------------------------------------------------------------------------
 
@@ -508,13 +487,15 @@ void String2D::layout() {
 	finishLine();
 
 	// --- Alignments ---
+	const auto alignv = info(align_vertical_);
+	const auto alignh = info(align_horizontal_);
 
 	const auto num_lines_f = static_cast<float>(lines.size());
 	const auto lines_height_sum = num_lines_f * lineAdvance;
 
 	const auto leftoverY = hasLimitY ? (limit_.y - lines_height_sum) : 0.f;
-	const auto offsetY = -1.f * leftoverY * AlignVerticalTable[align_vertical_.to_value()];
-	const auto isJustifiedY = align_vertical_ == AlignVertical::justify_all || align_vertical_ == AlignVertical::justify;
+	const auto offsetY = -1.f * leftoverY * (1.f - alignv.rate());
+	const auto isJustifiedY = alignv.justified();
 	const auto justifyGapY = isJustifiedY ?
 			-1.f * leftoverY / std::max(1.f, num_lines_f - 1.0f) : 0.0f;
 
@@ -522,7 +503,7 @@ void String2D::layout() {
 		const auto line_index_f = static_cast<float>(line_index);
 
 		const auto leftoverX = contentWidth - line.width;
-		const auto offsetX = leftoverX * AlignHorizontalTable[align_horizontal_.to_value()];
+		const auto offsetX = leftoverX * alignh.rate();
 		const auto isLastLine = static_cast<size_t>(line_index) == lines.size() - 1;
 		const auto isJustifiedLine = align_horizontal_ == AlignHorizontal::justify_all || (align_horizontal_ == AlignHorizontal::justify && !isLastLine);
 		const auto justifyGapX = isJustifiedLine ?

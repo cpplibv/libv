@@ -62,22 +62,6 @@ struct AlignmentData {
 	bool justified;
 };
 
-static constexpr AlignmentData AlignmentTableH[] = {
-	{0.0f, false}, // Left
-	{0.5f, false}, // Center
-	{1.0f, false}, // Right
-	{0.0f, true}, // Justify
-	{0.0f, true}, // JustifyAll
-};
-
-static constexpr AlignmentData AlignmentTableV[] = {
-	{1.0f, false}, // Top
-	{0.5f, false}, // Center
-	{0.0f, false}, // Bottom
-	{0.0f, true}, // Justify
-	{0.0f, true}, // JustifyAll
-};
-
 } // namespace
 
 // -------------------------------------------------------------------------------------------------
@@ -185,8 +169,8 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 }
 
 void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
-	const auto& alignHData = AlignmentTableH[property.align_horizontal()];
-	const auto& alignVData = AlignmentTableV[property.align_vertical()];
+	const auto& alignHData = AlignmentData(info(property.align_horizontal()).rate(), info(property.align_horizontal()).justified());
+	const auto& alignVData = AlignmentData(info(property.align_vertical()).rate(), info(property.align_vertical()).justified());
 	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;

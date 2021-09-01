@@ -294,6 +294,7 @@ public:
 				tmp.color({0.7f, 0.7f, 0.5f, 1.0f});
 				tmp.align_horizontal(libv::ui::AlignHorizontal::center);
 				tmp.align_vertical(libv::ui::AlignVertical::center);
+//				tmp.size(libv::ui::parse_size_or_throw("150px, 10px"));
 				tmp.margin({static_cast<float>(i) * 15.f, 1, static_cast<float>(i) * 15.f, 3});
 				tmp.text(fmt::format("Status entry {} for {}s", i, t.count()));
 				tmp.event().submit([](libv::ui::Button& btn) {
