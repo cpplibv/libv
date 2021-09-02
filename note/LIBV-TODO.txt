@@ -599,7 +599,7 @@ build.ninja: some ext target fails, otherwise it should be clear
 build.ninja: (Ninja only) Make all external job part of a JOB_POOLS with 3 running at max | Cancelled: ExternalProject_Add has no support for JOB_POOL
 libv.sys: New library for OS related tools
 libv.sys: Open links/files with the OS defaults: https://stackoverflow.com/a/60225910
-
+libv.sys: Clipboard text (light wrapper above clip:: + deal with windows line ending)
 
 
 
@@ -664,7 +664,6 @@ This looks like a useful concepts:
 
 
 
-libv.sys: Clipboard text (light wrapper above clip:: + deal with windows line ending)
 libv.sys: Keep awake
 		WIN: Repeated call to:
 			Header 	winbase.h (include Windows.h)
