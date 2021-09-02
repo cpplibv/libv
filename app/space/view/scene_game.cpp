@@ -3,6 +3,7 @@
 // hpp
 #include <space/view/scene_game.hpp>
 // libv
+#include <libv/sys/start.hpp>
 #include <libv/ui/attach_state.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/canvas.hpp>
@@ -121,6 +122,14 @@ libv::ui::Component SceneGame::init_cmd_bar() {
 			nexus.broadcast(mc::RequestShuffle{});
 		});
 		cmd_bar.add(std::move(shuffle));
+
+		libv::ui::Button link;
+		link.style("space.hud-bar.cmd.btn");
+		link.text("Open link: corruptedai.com");
+		link.event().submit.connect([]() {
+			libv::sys::start_unsafe("https://corruptedai.com");
+		});
+		cmd_bar.add(std::move(link));
 	}
 
 	return cmd_bar;

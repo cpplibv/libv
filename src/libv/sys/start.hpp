@@ -18,7 +18,7 @@ namespace sys {
 ///		UNIX: xdg-open https://corruptedai.com
 ///	Note: For links it is important to include either www. or http:// as prefix
 /// Security: UNSAFE - Calls system with the passed argument as a non escaped part of it
-void start(std::string link) {
+void start_unsafe(std::string link) {
 #ifdef _WIN32
 	std::system(("start " + std::move(link)).c_str());
 #else
