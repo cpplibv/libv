@@ -801,7 +801,9 @@ wish_create_library(
 )
 
 wish_create_library(
-	TARGET libv_sys INTERFACE
+	TARGET libv_sys STATIC
+	SOURCE src/libv/sys/*.cpp
+	LINK   libv_log ext_clip
 )
 
 wish_create_library(

@@ -129,6 +129,13 @@ libv::ui::Component SceneGame::init_cmd_bar() {
 		link.event().submit.connect([]() {
 			libv::sys::start_unsafe("https://corruptedai.com");
 		});
+//		libv::ui::InputField lin;
+//		lin.style("space.hud-bar.cmd.btn");
+//		lin.text("https://corruptedai.com");
+//		cmd_bar.add(lin);
+//		link.event().submit.connect([lin]() {
+//			libv::sys::start_unsafe(lin.text());
+//		});
 		cmd_bar.add(std::move(link));
 	}
 
