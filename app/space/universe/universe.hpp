@@ -113,6 +113,8 @@ struct Universe {
 //	float test_sin_time = 0.0f;
 
 	FleetID nextFleetID{0};
+	FleetID selectedFleetID{nextFleetID};
+//	FleetID selectedFleetID{noSelectionID or nullFleetID};
 	std::vector<Fleet> fleets;
 
 public:

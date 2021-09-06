@@ -77,6 +77,19 @@ struct CommandFleetSpawn {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
+struct CommandFleetSelect {
+	using command_type = CommandState;
+
+	//	FactionID factionID;
+//	FleetID fleetID;
+//	libv::vec3f position;
+
+//	LIBV_REFLECTION_ACCESS(fleetID);
+//	LIBV_REFLECTION_ACCESS(position);
+	LIBV_REFLECTION_EMPTY();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
 struct CommandFleetMove {
 	using command_type = CommandState;
 

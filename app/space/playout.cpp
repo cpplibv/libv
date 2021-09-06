@@ -18,7 +18,7 @@
 #include <space/lobby.hpp>
 #include <space/universe/ids.hpp>
 #include <space/universe/universe.hpp>
-//#include <space/log.hpp>
+#include <space/log.hpp>
 
 
 namespace app {
@@ -70,6 +70,28 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command) {
 	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
 }
 
+void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command) {
+	(void) lobby;
+
+	const auto prev_selection = universe.selectedFleetID;
+	// Permission check
+	// Bound check
+	// !!! Synchronized FleetID generation
+	for (auto it = universe.fleets.begin(); it != universe.fleets.end(); ++it) {
+		if (it->id == universe.selectedFleetID) {
+			if ((++it) != universe.fleets.end())
+				universe.selectedFleetID = it->id;
+			else
+				universe.selectedFleetID = universe.fleets.front().id;
+			break;
+		}
+	}
+
+	log_space.trace("Selected fleet ID = {} -> {}", +prev_selection, +universe.selectedFleetID);
+
+//	universe.selectedFleetID = command.fleetID
+}
+
 void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command) {
 	(void) lobby;
 	(void) command;
@@ -77,6 +99,8 @@ void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command) {
 	// Permission check
 	// Bound check
 	universe.fleets.clear();
+	universe.nextFleetID = FleetID{0};
+	universe.selectedFleetID = universe.nextFleetID;
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandShuffle& command) {

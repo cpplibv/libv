@@ -148,7 +148,10 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = gl.model.push_guard();
 		gl.model.translate(fleet.position);
-		gl.model.scale(0.2f);
+		if (fleet.id == universe.selectedFleetID)
+			gl.model.scale(0.1f);
+		else
+			gl.model.scale(0.2f);
 		renderer.fleet.render(gl, renderer.resource_context.uniform_stream);
 	}
 

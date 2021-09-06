@@ -49,6 +49,7 @@ struct msg_pdb {
 		codec.template register_type<0x22, CommandFleetQueueMove>();
 		codec.template register_type<0x23, CommandClearFleets>();
 		codec.template register_type<0x24, CommandShuffle>();
+		codec.template register_type<0x25, CommandFleetSelect>();
 
 		codec.template register_type<0x30, CommandTrackView>();
 		codec.template register_type<0x31, CommandCameraWarpTo>();
@@ -186,6 +187,7 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command);
 void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command);
 void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command);
 void apply(Universe& universe, Lobby& lobby, CommandShuffle& command);
+void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command);
 
 void apply(Universe& universe, Lobby& lobby, CommandTrackView& command);
 void apply(Universe& universe, Lobby& lobby, CommandCameraWarpTo& command);
