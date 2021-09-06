@@ -119,11 +119,12 @@ app.space: Simulation
 
 app.space: Fleet merge/follow/attack commands
 	app.space: 3D fleet picking
+	app.space: Selected fleet highlight, hover fleet highlight
 	app.space: 3D secondary fleet picking
 	app.space: Fleet selection, selection based commands
 	app.space: Multi fleet selection
 	app.space: 3D fleet box selection
-	app.space: Fleet factions
+	//app.space: Fleet factions
 
 
 
@@ -185,6 +186,13 @@ app.space: make a blur or a bloom
 
 app.space: Optimized VAO update for command arrows (prepare / render step is done, mesh re-upload and glr side should be checked)
 
+app.space: Fleet visualization (render separate ships and group art)
+	app.space: Generate random number of ships and position them appropriately (simple mesh)
+	app.space: Movement, momentum, turning
+	app.space: Different fleet shapes (?blockade as shape)
+	app.space: Modernize and integrate model rendering for ships in fleets (from vm4_viewer)
+
+
 app.space: Command arrow improvements
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
@@ -237,7 +245,7 @@ What do I need from libv to make a 'minimal' working iris program?
 		3 scroll pane = scroll area + scroll bar + connecting them
 		4 button states (state styles)
 		5 font outline render
-			freetype2 Now has SDF
+			freetype2 Now has an SDF render option
 			spread property set:
 				const FT_Int spread = 8;
 				FT_Property_Set(library, "sdf", "spread", &spread);

@@ -47,6 +47,7 @@ struct Fleet {
 public:
 	FleetID id;
 	libv::vec3f position;
+//	bool selected;
 	std::vector<Command> commands;
 
 public:
@@ -54,6 +55,7 @@ public:
 	//		ScreenPickable(50.f, 100.f),
 			id(id),
 			position(position) {}
+
 
 public:
 //	void queue_command(CommandType type, libv::vec3f target) {

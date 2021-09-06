@@ -74,18 +74,20 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command) {
 	(void) lobby;
 
 	const auto prev_selection = universe.selectedFleetID;
-	// Permission check
-	// Bound check
-	// !!! Synchronized FleetID generation
-	for (auto it = universe.fleets.begin(); it != universe.fleets.end(); ++it) {
-		if (it->id == universe.selectedFleetID) {
-			if ((++it) != universe.fleets.end())
-				universe.selectedFleetID = it->id;
-			else
-				universe.selectedFleetID = universe.fleets.front().id;
-			break;
-		}
-	}
+//	// Permission check
+//	// Bound check
+//	// !!! Synchronized FleetID generation
+//	for (auto it = universe.fleets.begin(); it != universe.fleets.end(); ++it) {
+//		if (it->id == universe.selectedFleetID) {
+//			if ((++it) != universe.fleets.end())
+//				universe.selectedFleetID = it->id;
+//			else
+//				universe.selectedFleetID = universe.fleets.front().id;
+//			break;
+//		}
+//	}
+
+	universe.selectedFleetID = command.fleetID;
 
 	log_space.trace("Selected fleet ID = {} -> {}", +prev_selection, +universe.selectedFleetID);
 

@@ -13,13 +13,13 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-bool solve_quadratic(float a, float b, float c, float& x0, float& x1) {
+[[nodiscard]] constexpr inline bool solve_quadratic(float a, float b, float c, float& x0, float& x1) noexcept {
 	float discr = b * b - 4 * a * c;
 
 	if (discr < 0) {
 		return false;
 
-	} else if (libv::float_equal(discr, 0)) {
+	} else if (libv::float_equal(discr, 0.0f)) {
 		x0 = x1 = -0.5f * b / a;
 
 	} else {
