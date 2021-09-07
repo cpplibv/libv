@@ -4,6 +4,7 @@
 #include <libv/utility/last_write_time.hpp>
 // ext
 #include <fmt/chrono.h>
+#include <fmt/ostream.h>
 // std
 #include <filesystem>
 #include <iostream>

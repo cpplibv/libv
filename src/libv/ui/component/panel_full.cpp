@@ -138,6 +138,10 @@ void PanelFull::add(Component component) {
 	self().add(std::move(component));
 }
 
+void PanelFull::add_front(Component component) {
+	self().add_front(std::move(component));
+}
+
 void PanelFull::remove(Component& component) {
 	self().remove(component);
 }

@@ -423,6 +423,9 @@ void CoreComponent::detach() {
 }
 
 void CoreComponent::update() {
+	if (flags.match_any(Flag::pendingDetachSelf))
+		return; // Do not update detaching components
+
 	doUpdate();
 
 	doForeachChildren([](Component& child) {

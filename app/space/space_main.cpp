@@ -28,8 +28,13 @@ int main(int argc, const char** argv) {
 	try {
 		app::log_space.info("Hello Space!");
 
-		std::filesystem::current_path("app/space/"); // Change working directory
+		// Change working directory
+		if (std::filesystem::exists("app/space/"))
+			std::filesystem::current_path("app/space/");
+		else
+			std::filesystem::current_path("../app/space/"); // During development artifact created under /bin
 
+		// Run the game
 		app::GameInstance game;
 		game.enter_single_player();
 		game.execute();

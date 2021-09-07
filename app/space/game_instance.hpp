@@ -18,8 +18,9 @@
 #include <space/view/frame.hpp>
 
 
-// Not for long ?
-#include <libv/ui/component/component.hpp>
+
+#include <space/view/scene_main_ui.hpp>
+//#include <libv/ui/component/component.hpp> // Not for long ?
 
 
 namespace app {
@@ -39,8 +40,12 @@ public:
 
 	Player player;
 
+private:
+public:
+	SceneMainUI main_ui_stage{ui, nexus, player};
+
+private:
 	std::shared_ptr<GameSession> game_session;
-	std::optional<libv::ui::Component> game_session_ui; // <<<
 
 public:
 	GameInstance();
@@ -52,6 +57,7 @@ public:
 //		game_session->update();
 //	}
 
+private:
 	void register_nexus();
 	void unregister_nexus();
 

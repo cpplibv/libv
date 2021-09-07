@@ -87,7 +87,7 @@ int main(int argc, const char** argv) {
 		lineLength += byteStr.size();
 	}
 
-	auto ec_write_hpp = libv::write_file_ec(libv::concat(output_file, ".hpp"), fmt::format(file_template_hpp,
+	auto ec_write_hpp = libv::write_file_ec(libv::concat(output_file, ".hpp"), fmt::format(fmt::runtime(file_template_hpp),
 			fmt::arg("input_file", input_file),
 			fmt::arg("output_file", output_file),
 			fmt::arg("function_name", function_name),
@@ -99,7 +99,7 @@ int main(int argc, const char** argv) {
 		return EXIT_FAILURE;
 	}
 
-	auto ec_write_cpp = libv::write_file_ec(libv::concat(output_file, ".cpp"), fmt::format(file_template_cpp,
+	auto ec_write_cpp = libv::write_file_ec(libv::concat(output_file, ".cpp"), fmt::format(fmt::runtime(file_template_cpp),
 			fmt::arg("input_file", input_file),
 			fmt::arg("output_file", output_file),
 			fmt::arg("function_name", function_name),

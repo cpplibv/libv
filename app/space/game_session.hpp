@@ -25,14 +25,13 @@ struct GameSession {
 	Universe universe;
 	Playout playout;
 
-	SpaceSession session; // <<< Nope
+	SpaceLobby session; // <<< Nope
 
 public:
 	virtual ~GameSession() = default;
 
 public:
 	virtual void update(libv::ui::time_duration delta_time) = 0;
-	[[nodiscard]] virtual libv::ui::Component create_ui() = 0;
 };
 
 std::shared_ptr<GameSession> createSinglePlayer(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls);

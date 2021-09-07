@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <vector>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -140,18 +141,18 @@ public:
 
 private:
 	void make_value(std::string_view name, std::string_view value, size_t index) {
-		ref_decl += fmt::format(fmt_ref_declaration,
+		ref_decl += fmt::format(fmt::runtime(fmt_ref_declaration),
 				fmt::arg("enum_name", enum_name),
 				fmt::arg("name", name),
 				fmt::arg("value", value)
 		);
-		ref_def += fmt::format(fmt_ref_def,
+		ref_def += fmt::format(fmt::runtime(fmt_ref_def),
 				fmt::arg("enum_name", enum_name),
 				fmt::arg("name", name),
 				fmt::arg("longest_value_name", longest_value_name),
 				fmt::arg("index", index)
 		);
-		value_objects += fmt::format(fmt_value_objects,
+		value_objects += fmt::format(fmt::runtime(fmt_value_objects),
 				fmt::arg("enum_name", enum_name),
 				fmt::arg("name", name),
 				fmt::arg("value", value)
@@ -159,7 +160,7 @@ private:
 	}
 
 	void make_op_function(std::string_view fmt_function, std::string_view operator_) {
-		member_functions += fmt::format(fmt_function,
+		member_functions += fmt::format(fmt::runtime(fmt_function),
 				fmt::arg("enum_name", enum_name),
 				fmt::arg("enum_type", enum_type),
 				fmt::arg("operator", operator_)
@@ -184,13 +185,13 @@ private:
 //		std::string cases;
 //
 //		for (const auto& kv : values)
-//			cases += fmt::format(fmt_to_string_case,
+//			cases += fmt::format(fmt::runtime(fmt_to_string_case),
 //					fmt::arg("enum_name", enum_name),
 //					fmt::arg("name", kv.name)
 //			);
 //
-//		member_functions += fmt::format(fmt_to_string_decl);
-//		cpp_functions += fmt::format(fmt_to_string_def,
+//		member_functions += fmt::format(fmt::runtime(fmt_to_string_decl));
+//		cpp_functions += fmt::format(fmt::runtime(fmt_to_string_def),
 //				fmt::arg("enum_name", enum_name),
 //				fmt::arg("cases", cases)
 //		);
@@ -306,7 +307,7 @@ public:
 		if (!functions.empty()) {
 			member_functions += "\npublic:\n";
 			for (const auto& fmt_fn : functions)
-				member_functions += fmt::format(fmt_fn,
+				member_functions += fmt::format(fmt::runtime(fmt_fn),
 						fmt::arg("enum_name", enum_name),
 						fmt::arg("enum_type", enum_type)
 				);
@@ -363,7 +364,7 @@ public:
 			includes_str += "\n\n";
 		}
 
-		auto result = fmt::format(fmt_enum_body,
+		auto result = fmt::format(fmt::runtime(fmt_enum_body),
 				fmt::arg("enum_gen_version", enum_gen_version),
 				fmt::arg("includes_str", includes_str),
 				fmt::arg("enum_name", enum_name),

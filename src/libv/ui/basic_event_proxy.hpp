@@ -167,6 +167,35 @@ public:
 				detail::internal_callback<ComponentT, EventT>(std::forward<F>(func)));
 	}
 
+	template <typename F>
+	inline F& connect_system_out_ref(F&& func) {
+		static constexpr bool is_base_event = std::is_base_of_v<BaseEvent, EventT>;
+
+		struct Target {
+			F f;
+
+			bool operator()(void* signal_ptr, const void* event_ptr) {
+				(void) signal_ptr; // Callback is not interested in the component
+				(void) event_ptr; // Callback is not interested in the event
+				f();
+				return is_base_event && static_cast<const BaseEvent*>(event_ptr)->propagation_stopped();
+			}
+		};
+
+		auto callback = std::function<bool(void*, const void*)>{Target{std::forward<F>(func)}};
+		auto& target = callback.template target<Target>()->f;
+
+		detail::internal_connect(
+				this->component,
+				this->component,
+				libv::type_key<EventT>(),
+				false, // front
+				true, // system
+				std::move(callback));
+
+		return target;
+	}
+
 	inline void fire(const EventT& event) {
 		detail::internal_fire(this->component, libv::type_key<EventT>(), &event);
 	}

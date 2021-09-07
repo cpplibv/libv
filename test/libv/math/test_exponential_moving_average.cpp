@@ -9,7 +9,7 @@
 
 //#include <random>
 //#include <iostream>
-//#include <libv/utility/uniform_distribution.hpp>
+//#include <libv/utility/random/uniform_distribution.hpp>
 
 // -------------------------------------------------------------------------------------------------
 

@@ -101,7 +101,6 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 	if (main_canvas)
 		// <<< P1: Game_session update shouldnt come from the canvas, or should it?
 		game_session.update(delta_time);
-
 }
 
 void SpaceCanvas::render(libv::glr::Queue& gl) {

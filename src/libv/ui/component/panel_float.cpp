@@ -202,6 +202,10 @@ void PanelFloat::add(Component component) {
 	self().add(std::move(component));
 }
 
+void PanelFloat::add_front(Component component) {
+	self().add_front(std::move(component));
+}
+
 void PanelFloat::remove(Component& component) {
 	self().remove(component);
 }

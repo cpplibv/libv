@@ -14,7 +14,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct SpaceSession {
+struct SpaceLobby {
 	struct ChatEntry {
 		std::string sender;
 		std::string message;

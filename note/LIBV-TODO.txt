@@ -595,6 +595,8 @@ ext: adopt colony https://github.com/mattreecebentley/plf_colony
 libv.frame: Use glfwSetWindowUserPointer glfwGetWindowUserPointer
 app.enum: Add unary operator+ as an alias for to underlying
 libv: Adopt the new type_key in every map that uses types as a key
+build.ninja: some ext target fails, otherwise it should be clear
+build.ninja: (Ninja only) Make all external job part of a JOB_POOLS with 3 running at max | Cancelled: ExternalProject_Add has no support for JOB_POOL
 
 
 
@@ -729,6 +731,9 @@ app.enum: new enum gen | rename and refactor
 
 
 place.it:
+	tool.profiler: https://github.com/bombomby/optick - But it doesnt support OpenGL
+	tool.profiler: https://github.com/wolfpld/tracy
+
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
@@ -744,6 +749,8 @@ place.it:
 	ext: For utf ranges check out: https://github.com/tcbrindle/utf_ranges
 	glsl: Blend function implementations (with single opacity only) https://github.com/jamieowen/glsl-blend
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
+	cpp.modules: https://blog.feabhas.com/2021/08/c20-modules-with-gcc11/
+	cpp.modules: g++ -fmodules-ts -std=c++20 -c -x c++-system-header iostream
 	math / glsl: https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 	model: Generate texture for LOD meshes
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
@@ -819,7 +826,6 @@ IDE live templates:
 			constexpr inline $TYPE$& operator=($TYPE$&&) & noexcept = default;
 		lock - auto lock = std::unique_lock($VAR$);
 
-build.ninja: some ext target fails, otherwise it should be clear
 
 glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
 

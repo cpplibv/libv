@@ -74,6 +74,16 @@ struct EventListener : rp3d::EventListener {
 	}
 };
 
+//struct RaycastListener : rp3d::RaycastCallback {
+//	virtual rp3d::decimal notifyRaycastHit(const rp3d::RaycastInfo& info) override {
+//		std::cout << info.body << info. << std::endl;
+//		std::cout << " body1      : " << libv::bit_cast<size_t>(info.body) << std::endl;
+//		std::cout << " world point: " << libv::vec3f(info.worldPoint) << std::endl;
+//
+//		return 1; // indicates that the ray is not clipped and the ray cast should continue as if no hit occurred
+//	}
+//};
+
 // https://www.reactphysics3d.com/usermanual.html
 
 int main() {
@@ -103,32 +113,66 @@ int main() {
 //	rp3d::SphereShape shape(0.5f);
 	rp3d::RigidBody* body = world->createRigidBody(transform);
 	body->setMass(mass);
-	rp3d::Collider* collider = body->addCollider(box_shape, rp3d::Transform::identity());
+	rp3d::Transform box_shape_transform = rp3d::Transform::identity();
+//	box_shape_transform.setPosition({-0.5f, -0.5f, -0.5f});
+	rp3d::Collider* collider = body->addCollider(box_shape, box_shape_transform);
 	collider->setCollisionCategoryBits(CATEGORY1 | CATEGORY2);
 	collider->setCollideWithMaskBits(CATEGORY1 | CATEGORY2);
 	rp3d::Material& material = collider->getMaterial();
 	material.setBounciness(0.4f);
 	material.setFrictionCoefficient(0.2f);
 
-	rp3d::Vector3 floor_position(0.0f, 0.0f, 0.0f);
-	rp3d::Quaternion floor_orientation(1, 0, 0, 0.1f);
+	rp3d::Vector3 floor_position(0.0f, 0.0f, -0.5f);
+//	rp3d::Quaternion floor_orientation(0, 0.0871558f, 0, 0.9961947f); // 10° tilt
+	rp3d::Quaternion floor_orientation(0, 0.1305262f, 0, 0.9914449f); // 15° tilt
+//	rp3d::Quaternion floor_orientation(0, 0.2588190f, 0, 0.9659258f); // 30° tilt
+//	rp3d::Quaternion floor_orientation(0, 0.3826834f, 0, 0.9238795f); // 45° tilt
 	rp3d::Transform floor_transform(floor_position, floor_orientation);
 	rp3d::BoxShape* floor_shape = physicsCommon.createBoxShape({1000, 1000, 1});
 	rp3d::RigidBody* floor = world->createRigidBody(floor_transform);
 	floor->setType(rp3d::BodyType::STATIC);
-	rp3d::Collider* floor_collider = floor->addCollider(floor_shape, rp3d::Transform::identity());
+	rp3d::Transform floor_shape_transform = rp3d::Transform::identity();
+	floor_shape_transform.setPosition({50.f, 50.0f, 0.5f});
+	rp3d::Collider* floor_collider = floor->addCollider(floor_shape, floor_shape_transform);
 	floor_collider->setCollisionCategoryBits(CATEGORY1 | CATEGORY2);
 	floor_collider->setCollideWithMaskBits(CATEGORY1 | CATEGORY2);
 	rp3d::Material& floor_material = floor_collider->getMaterial();
-	floor_material.setBounciness(0.2f);
+	floor_material.setBounciness(0.4f);
 	floor_material.setFrictionCoefficient(0.6f);
 
 	const float timeStep = 1.0f / 60.0f;
-	for (size_t i = 0; i < 60 * 10; ++i) {
+	for (size_t i = 0; i <= 60 * 8; ++i) {
 		world->update(timeStep);
+		std::cout
+				<< "\ntime           : " << std::setw(1) << std::setprecision(6) << std::fixed << timeStep * static_cast<float>(i) << ' ';
+
+		const auto ray_pos = body->getTransform().getPosition();
+		const auto ray_low = ray_pos + rp3d::Vector3(0, 0, -5);
+		rp3d::Ray ray(ray_pos, ray_low);
+		rp3d::Vector3 floor_point_below_box(0, 0, -100);
+		rp3d::RaycastInfo ray_info;
+//		RaycastListener raycast_listener;
+//		world->raycast(ray, &raycast_listener);
+		bool floot_hit = floor->raycast(ray, ray_info);
+		if (floot_hit)
+			floor_point_below_box = ray_info.worldPoint;
+
+		std::cout << '[';
+		for (float j = -10.f; j < 10.f; j += 0.25f) {
+			if (std::abs(j - floor_point_below_box.z) < 0.125f)
+				std::cout << '#';
+			else
+				std::cout << (std::abs(j) < 0.1f ? '|' : (j < body->getTransform().getPosition().z ? '-' : ' '));
+		}
+		std::cout << ']';
+
 		std::cout
 				<< "\nobject         : Floor"
 				<< "\nsleep          : " << floor->isSleeping();
+		if (floot_hit)
+			std::cout << "\nfloor_below_box: " << libv::vec3f(floor_point_below_box);
+		else
+			std::cout << "\nfloor_below_box: Unknown";
 
 		std::cout
 				<< "\nobject         : Box"
@@ -145,6 +189,9 @@ int main() {
 
 	world->destroyRigidBody(body);
 	world->destroyRigidBody(floor);
+
+	physicsCommon.destroyBoxShape(box_shape);
+	physicsCommon.destroyBoxShape(floor_shape);
 
 	physicsCommon.destroyPhysicsWorld(world);
 

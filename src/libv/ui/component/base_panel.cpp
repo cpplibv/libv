@@ -26,6 +26,17 @@ void CoreBasePanel::add(Component component) {
 	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
 }
 
+void CoreBasePanel::add_front(Component component) {
+	children.emplace(children.begin(), std::move(component));
+	// NOTE: LayoutSelf is necessary to make container layout the new child into the correct place
+	flagForce(Flag::pendingAttachChild | Flag::pendingLayoutSelf);
+
+	// Reassign IDs
+	int32_t id = 0;
+	for (auto& child : children)
+		AccessParent::childID(child.core()) = ChildID{id++};
+}
+
 void CoreBasePanel::remove(Component& component) {
 	const auto id = AccessParent::childID(component.core());
 	if (id >= static_cast<ChildID>(children.size()) || children[id] != component) {

@@ -3,7 +3,7 @@
 // hpp
 #include <libv/math/noise/white.hpp>
 // libv
-#include <libv/utility/uniform_distribution.hpp>
+#include <libv/utility/random/uniform_distribution.hpp>
 // std
 #include <random>
 

@@ -346,7 +346,7 @@ wish_create_external(
 #	GIT_REPOSITORY https://github.com/andreasbuhr/cppcoro.git
 #	GIT_TAG 7cc9433436fe8f2482138019cfaafce8e1d7a896
 	GIT_REPOSITORY https://github.com/VaderY/cppcoro.git
-	GIT_TAG bf48f908410b9977377e2c74a9c56d1b7686c2d8
+	GIT_TAG a99556e1768b1b6b3c411b6f06e31934a5b56c26
 	CMAKE_ARGS
 		-DBUILD_TESTING=OFF
 	LINK cppcoro
@@ -436,6 +436,18 @@ wish_create_external(
 	NAME freetype
 	GIT_REPOSITORY http://git.sv.nongnu.org/r/freetype/freetype2.git
 	GIT_TAG f686ad46a3a9801ffa78063202250c68276330cb
+
+#	GIT_REPOSITORY https://github.com/freetype/freetype
+#	GIT_TAG VER-2-11-0
+#	CMAKE_ARGS
+#		-DFT_DISABLE_ZLIB=ON
+#		-DFT_DISABLE_BZIP2=ON
+#		-DFT_DISABLE_PNG=ON
+#		-DFT_DISABLE_HARFBUZZ=ON
+#		-DFT_DISABLE_BROTLI=ON
+#	LINK freetype
+#	LINK freetype bz2 zlibstatic ibs
+
 	# TODO P5: Create dedicated external target for bz2
 	# TODO P3: Create dedicated external target for zlibstatic
 	LINK freetype bz2 zlibstatic

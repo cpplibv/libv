@@ -5,49 +5,43 @@
 // fwd
 #include <space/fwd.hpp>
 // libv
+#include <libv/ctrl/fwd.hpp>
 #include <libv/ui/component/fwd.hpp>
+//#include <libv/ui/component/button.hpp>
+//#include <libv/ui/component/label_image.hpp>
+//#include <libv/ui/component/panel_float.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
-#include <memory>
-#include <optional>
+//#include <memory>
+//#include <optional>
 // pro
-#include <space/canvas.hpp>
+//#include <space/canvas.hpp>
+#include <space/camera.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Scene {
+struct SceneGame {
 	GameInstance& game;
 	GameSession& game_session;
 	libv::Nexus& nexus;
-
-	const void* track_ptr = nullptr;
-
-//	enum class State {
-//		idle,
-//		client,
-//		server,
-//	};
-//	State active_state = State::idle;
-	bool client_active = false;
-	bool server_active = false;
+	libv::ctrl::Controls& controls;
 
 public:
 	SpaceCanvas* canvas = nullptr;
 	CameraPlayer camera;
 
 public:
-	Scene(GameInstance& game, GameSession& game_session, libv::Nexus& nexus);
-
-	libv::ui::Component create_ui();
+	static libv::ui::Component create(GameInstance& game, GameSession& game_session, libv::Nexus& nexus, libv::ctrl::Controls& controls);
+	SceneGame(libv::ui::PanelFloat& layers, GameInstance& game, GameSession& game_session, libv::Nexus& nexus, libv::ctrl::Controls& controls);
+	~SceneGame();
 
 private:
 	libv::ui::Component init_canvas_main();
 	libv::ui::Component init_canvas_mini_bar();
 	libv::ui::Component init_cmd_bar();
-	libv::ui::Component init_mp_bar();
 };
 
 // -------------------------------------------------------------------------------------------------

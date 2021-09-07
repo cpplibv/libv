@@ -17,7 +17,7 @@ template <class Target, class Source>
 	static_assert(std::is_trivially_copyable_v<Target>, "Target has to be trivially_copyable");
 	static_assert(std::is_trivially_copyable_v<Source>, "Source has to be trivially_copyable");
 	Target dest;
-	std::memcpy(&dest, &source, sizeof (dest));
+	std::memcpy(&dest, &source, sizeof(Target));
 	return dest;
 }
 

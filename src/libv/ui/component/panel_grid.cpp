@@ -459,6 +459,10 @@ void PanelGrid::add(Component component) {
 	self().add(std::move(component));
 }
 
+void PanelGrid::add_front(Component component) {
+	self().add_front(std::move(component));
+}
+
 void PanelGrid::remove(Component& component) {
 	self().remove(component);
 }

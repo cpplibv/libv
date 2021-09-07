@@ -35,6 +35,7 @@ public:
 
 public:
 	void add(Component component);
+	void add_front(Component component);
 	void remove(Component& component);
 	void clear();
 };

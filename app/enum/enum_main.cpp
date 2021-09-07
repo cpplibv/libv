@@ -104,7 +104,7 @@ public:
 		std::stringstream os;
 
 		const auto out = [&os](std::string_view fmt, auto&&... args) {
-			os << fmt::format(fmt, std::forward<decltype(args)>(args)...);
+			os << fmt::format(fmt::runtime(fmt), std::forward<decltype(args)>(args)...);
 		};
 
 		out("// Generated source for enum: {}\n", enum_name);

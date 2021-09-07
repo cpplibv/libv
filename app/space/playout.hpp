@@ -35,7 +35,7 @@ namespace app {
 
 class PlayoutDelayBuffer {
 	struct StateChangeEntry {
-		using apply_func_t = void(*)(Universe&, SpaceSession&, Command*);
+		using apply_func_t = void(*)(Universe&, SpaceLobby&, Command*);
 
 //		FrameIndex frameIndex;
 		std::unique_ptr<Command> command;
@@ -67,7 +67,7 @@ public:
 //			FrameIndex{0},
 			// TODO P1: Temp unique_ptr usage, replace it with a cache local solution (variant_queue)
 			std::make_unique<CommandT>(std::forward<Args>(args)...),
-			+[](Universe& u, SpaceSession& se, Command* c) {
+			+[](Universe& u, SpaceLobby& se, Command* c) {
 
 				// =================================================================================================
 
@@ -86,7 +86,7 @@ public:
 	}
 
 //	void update_to(FrameIndex nextFrameIndex) {
-	void update(Universe& universe, SpaceSession& session) {
+	void update(Universe& universe, SpaceLobby& session) {
 		for (auto& entry : stateChangeEntries)
 			entry.apply_func(universe, session, entry.command.get());
 
@@ -106,7 +106,7 @@ struct Playout {
 ////	state.
 //}
 
-inline void apply(Universe& universe, SpaceSession& session, CommandChatMessage& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandChatMessage& command) {
 	(void) universe;
 
 	// Permission check
@@ -116,7 +116,7 @@ inline void apply(Universe& universe, SpaceSession& session, CommandChatMessage&
 
 // -------------------------------------------------------------------------------------------------
 
-inline void apply(Universe& universe, SpaceSession& session, CommandFleetMove& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandFleetMove& command) {
 	(void) session;
 
 	// Permission check
@@ -124,7 +124,7 @@ inline void apply(Universe& universe, SpaceSession& session, CommandFleetMove& c
 	universe.fleets[+command.fleetID].target = command.target_position;
 }
 
-inline void apply(Universe& universe, SpaceSession& session, CommandFleetSpawn& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandFleetSpawn& command) {
 	(void) session;
 
 	// Permission check
@@ -134,7 +134,7 @@ inline void apply(Universe& universe, SpaceSession& session, CommandFleetSpawn& 
 	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
 }
 
-inline void apply(Universe& universe, SpaceSession& session, CommandClearFleets& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandClearFleets& command) {
 	(void) session;
 	(void) command;
 
@@ -143,7 +143,7 @@ inline void apply(Universe& universe, SpaceSession& session, CommandClearFleets&
 	universe.fleets.clear();
 }
 
-inline void apply(Universe& universe, SpaceSession& session, CommandShuffle& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandShuffle& command) {
 	(void) session;
 	(void) command;
 
@@ -168,14 +168,16 @@ inline void apply(Universe& universe, SpaceSession& session, CommandShuffle& com
 
 // -------------------------------------------------------------------------------------------------
 
-inline void apply(Universe& universe, SpaceSession& session, CommandTrackView& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandTrackView& command) {
 	(void) universe;
 	(void) session;
+	(void) command; // <<< P5
 }
 
-inline void apply(Universe& universe, SpaceSession& session, CommandCameraWarpTo& command) {
+inline void apply(Universe& universe, SpaceLobby& session, CommandCameraWarpTo& command) {
 	(void) universe;
 	(void) session;
+	(void) command; // <<< P5
 }
 
 //inline void apply(Universe& universe, CommandCameraMovement& command) {

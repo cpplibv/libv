@@ -318,7 +318,7 @@
 //// =================================================================================================
 //
 //#include <iostream>
-//#include <libv/utility/uniform_distribution.hpp>
+//#include <libv/utility/random/uniform_distribution.hpp>
 //#include <random>
 //#include <chrono>
 //
@@ -382,7 +382,7 @@
 //// =================================================================================================
 //
 //#include <libv/process/lock_file.hpp>
-//#include <libv/utility/uniform_distribution.hpp>
+//#include <libv/utility/random/uniform_distribution.hpp>
 //#include <chrono>
 //#include <iostream>
 //#include <mutex>

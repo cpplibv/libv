@@ -64,97 +64,58 @@ app.space: Add support for chained command arrows
 --- STACK ------------------------------------------------------------------------------------------
 
 
+//		controls.context_enter<app::BaseCameraOrbit>(&scene.camera);
+//		controls.context_enter<app::SpaceCanvas>(scene.canvas);
 
-
-update
-	playout.update
-	universe.update
-
-Clear Fleet
-
-
-
-
-- main issues needs resolution is how to package user data into a ui component
-and how those two should share lifetime
-
-- object and component ownership coupling
-
-
-
-game instance (desktop)
-	frame
-	controls
-	nexus
-	settings
-	user/player
-	ui
-	ui main (mp bar, shader overlay)
-	renderers
-	session (aka old game mode)
-		[Network base]
-		[Network server]
-		[Network client]
-		gamemode (aka new control concept)
-		universe
-		playout
-		canvas
-			& renderers
-		ui session (cmd bar)
-		ui session mp (mp mini canvas list)
+call
+	add_game_scene(GameInstance& game, GameSession& game_session, libv::Nexus& nexus)
 
 
 
 
 
 
+libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
 
-2 main question needs resolution
-	- How does UI interfaces with the business logic
-	- How does network interfaces with the playout logic
-
-Options for UI:
-	Interface
-	Interface + Inheritance
-	Object with everything in it
-	Nexus
-	Console
-
-Nexus is most likely the best choice
-	question: how UI accesses state
-
-I might two listener types: action and reaction
-	action is needed to enforce it runs before and reaction
-		this would allow 'request' type events where instead of executing then notifying it requests, executes and notify
-
-it would mean 3 main function in the Nexus
-	broadcast<E>
-	action<E>
-	listen<E>
-
-fuck 3: make it 2, broadcast and connect
-	action / listen split shall be implemented with a different event type, for multiplayer and delay and other reasons
-
-UI would also have to react to its own initiation
-
-'mp-bar' and 'shader-overlay' are persistent between game_sessions, 'cmd-bar' and canvas are not
+Pending:
+	- How does network interfaces with the playout logic?
+Solved:
+	- How does UI interfaces with the business logic? | Nexus
+	- How does UI accesses business state? | References and Nexus subscriptions
 
 
 
-GameInstance (an object spawned when you launch the application and that remains the same until you close it)
-	GameSession (spawned when a level is loaded)
-		GameState (spawned by the gameMode)
-		PlayerController [UI, Controls]
-			PlayerState (spawned when a PlayerController is spawned = when a player arrives in the game)
 
 
 
-architecture: 'MSSVC'
-	- Model
-	- Simulation
-	- Syncronization
-	- View
-	- Control
+app.space: Main structure paper
+
+	game instance (desktop) - GameInstance (an object spawned when you launch the application and that remains the same until you close it)
+		frame
+		controls
+		nexus
+		settings
+		user/player
+		ui
+		ui main (mp bar, shader overlay)
+			renderer(s)
+			session (aka old game mode) - GameSession (spawned when a level is loaded)
+				[Network base]
+				[Network server]
+				[Network client]
+				gamemode (aka new control concept)
+				universe - GameState (spawned by the gameMode)
+				playout
+				canvas
+					& renderers
+				ui session (cmd bar)
+				ui session mp (mp mini canvas list)
+
+				PlayerController [UI, Controls]
+					PlayerState (spawned when a PlayerController is spawned = when a player arrives in the game)
+
+
+
 
 
 
@@ -188,11 +149,13 @@ app.space: Command arrow improvements
 	app.space: Add support for source position offset (Instead of origin use an offset toward the heading direction)
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
 	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
+	app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
+	app.space.visual: Command arrow make the edges less bright to help with AA edge
 
 app.space: line shader (Dalma)
 
 game.sim:
-		- Command based sim state manipulation
+		- Command based sim state manipulation | Playout
 			Types:
 			- Control tracking (Camera / Mouse movement, ?Selection)
 			- Sim state manipulation (Move, Attack, Production command, ?Selection)
@@ -203,7 +166,6 @@ app.space: headless server
 	a separate executable needed without any symbol usage of non-headless gamemode
 
 
-app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
 
@@ -235,6 +197,11 @@ What do I need from libv to make a 'minimal' working iris program?
 		3 container spacing property
 		4 button states (state styles)
 		5 font outline render
+			freetype2 Now has SDF
+			spread property set:
+				const FT_Int spread = 8;
+				FT_Property_Set(library, "sdf", "spread", &spread);
+				8bit uint normalized to [+spread .. -spread]
 
 iris: Make a main menu
 

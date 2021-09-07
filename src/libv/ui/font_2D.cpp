@@ -178,6 +178,10 @@ Font2D::Character Font2D::_renderCharacter(uint32_t unicode, FontSize size) {
 		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
 		return _getFallbackCharacter();
 	}
+//	if (const auto err = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_SDF, nullptr, true)) {
+//		log_ui_ft.error("FT_Glyph_To_Bitmap failed: {} for: {} size: {}", err, unicode, libv::to_value(currentSize));
+//		return _getFallbackCharacter();
+//	}
 
 	const auto bitmapGlyph = reinterpret_cast<FT_BitmapGlyph>(glyph);
 	const auto& bitmap = bitmapGlyph->bitmap;

@@ -10,9 +10,10 @@ namespace ctrl {
 
 class ImplControls;
 
+class Controls;
+
 class Binding;
 class Combination;
-class Controls;
 class Feature;
 class FeatureRegister;
 class Input;

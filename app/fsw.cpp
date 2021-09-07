@@ -38,6 +38,11 @@ void run() {
 	std::cout << "Executing: " << cmd << std::endl;
 	std::cout << "--------------------------------------------------------------------------------" << std::endl;
 
+	// TODO P2: Instead of a system call use 'fork' and start in 'context' like what the unix 'time' command does
+	//		Also the os signals forwarding part is also nice
+	//		Source:
+	// 			https://www.gnu.org/software/time/
+	// 			https://ftp.gnu.org/gnu/time/
 	const auto result = ::system(cmd.c_str());
 
 	std::cout << "--------------------------------------------------------------------------------" << std::endl;
@@ -59,7 +64,7 @@ int main(int argc, const char** argv) {
 	cmd = argv[2];
 
 	libv::mt::worker_thread worker_thread;
-	libv::mt::work_warmup_cooldown work_ht_cd{std::chrono::milliseconds{20}, std::chrono::milliseconds{100}};
+	libv::mt::work_warmup_cooldown work_wu_cd{std::chrono::milliseconds{100}, std::chrono::milliseconds{100}};
 
 	libv::fsw::Watcher watcher;
 
@@ -68,11 +73,11 @@ int main(int argc, const char** argv) {
 	bool is_dir = std::filesystem::exists(path) && std::filesystem::is_directory(path);
 	bool is_file = std::filesystem::exists(path) && std::filesystem::is_regular_file(path);
 
-	const auto schedule_run = [&work_ht_cd, &worker_thread](const libv::fsw::Event& event) {
+	const auto schedule_run = [&work_wu_cd, &worker_thread](const libv::fsw::Event& event) {
 		const auto now = std::chrono::system_clock::now();
 
-		work_ht_cd.execute_async(worker_thread, [event, now] {
-			::system("clear");
+		work_wu_cd.execute_async(worker_thread, [event, now] {
+			fmt::print("\033[2J\033[1;1H"); // ::system("clear");
 			fmt::print("{:%Y.%m.%d %H:%M:%S}: ", now);
 			std::cout << event << std::endl;
 			run();
@@ -88,8 +93,8 @@ int main(int argc, const char** argv) {
 		watcher.subscribe_file(path, schedule_run);
 	}
 
-	work_ht_cd.execute_async(worker_thread, [argv] {
-		::system("clear");
+	work_wu_cd.execute_async(worker_thread, [argv] {
+		fmt::print("\033[2J\033[1;1H"); // ::system("clear");
 		std::cout << "Watching: " << argv[1] << std::endl;
 		run();
 	});

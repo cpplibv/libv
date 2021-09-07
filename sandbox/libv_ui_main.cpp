@@ -28,6 +28,8 @@
 #include <libv/ui/ui.hpp>
 //#include <libv/ui/style.hpp>
 
+#include <libv/ui/attach_state.hpp>
+
 
 // -------------------------------------------------------------------------------------------------
 
@@ -340,6 +342,15 @@ public:
 		panel_line.add(scroll_area_outer);
 		panel_line.add(label_image2);
 
+		struct State {
+			libv::ui::PanelLine component;
+
+			explicit State(libv::ui::PanelLine component) :
+				component(std::move(component)) {
+			}
+		};
+		libv::ui::attach_state<State>(panel_line)(panel_line);
+
 		ui.add(panel_line);
 
 
@@ -462,8 +473,8 @@ public:
 //			label2->string.push_back(e.utf8);
 //			label0->flag(libv::ui::Flag::invalidLayout);
 //			label2->flag(libv::ui::Flag::invalidLayout);
-			log_sandbox.trace("Append string {}", e.utf8.data());
-			label.text(label.text() + e.utf8.data());
+			log_sandbox.trace("Append string {}", e.utf8);
+			label.text(label.text() + e.utf8);
 		});
 	}
 	~SandboxFrame() {

@@ -21,7 +21,7 @@ class Playout;
 class PlayoutDelayBuffer;
 
 class SpaceCanvas;
-class SpaceSession;
+class SpaceLobby;
 
 class NetworkClient;
 class NetworkServer;

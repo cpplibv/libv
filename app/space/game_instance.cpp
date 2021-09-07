@@ -74,6 +74,7 @@ GameInstance::GameInstance() :
 	}()) {
 
 	register_nexus();
+//	init_main_bar();
 
 	controls.attach(frame);
 	ui.attach(frame);
@@ -88,7 +89,7 @@ GameInstance::GameInstance() :
 GameInstance::~GameInstance() {
 	//		if (game_session_ui)
 	//			ui.remove(*game_session_ui);
-	game_session_ui.reset();
+//	game_session_ui.reset();
 	unregister_nexus();
 }
 
@@ -134,7 +135,6 @@ void GameInstance::register_nexus() {
 	// <<< These are game session requests
 	nexus.connect<mc::RequestClearFleets>(this, [this] {
 		game_session->playout.buffer.queue<app::CommandClearFleets>();
-		// <<< Do this in the playout buffer
 //			nexus.broadcast<mc::OnClearFleets>();
 	});
 	nexus.connect<mc::RequestShuffle>(this, [this] {
@@ -149,30 +149,30 @@ void GameInstance::unregister_nexus() {
 }
 
 void GameInstance::enter_single_player() {
-	if (game_session_ui)
-		ui.remove(*game_session_ui);
+//	if (game_session_ui)
+//		ui.remove(*game_session_ui);
 	game_session.reset();
 	game_session = createSinglePlayer(*this, nexus, controls);
-	game_session_ui = game_session->create_ui();
-	ui.add(*game_session_ui);
+//	game_session_ui = game_session->create_ui();
+//	ui.add(*game_session_ui);
 }
 
 void GameInstance::enter_multi_player_client(std::string server_address, uint16_t server_port) {
-	if (game_session_ui)
-		ui.remove(*game_session_ui);
+//	if (game_session_ui)
+//		ui.remove(*game_session_ui);
 	game_session.reset();
 	game_session = createMultiPlayerClient(*this, nexus, controls, std::move(server_address), server_port);
-	game_session_ui = game_session->create_ui();
-	ui.add(*game_session_ui);
+//	game_session_ui = game_session->create_ui();
+//	ui.add(*game_session_ui);
 }
 
 void GameInstance::enter_multi_player_server(uint16_t port) {
-	if (game_session_ui)
-		ui.remove(*game_session_ui);
+//	if (game_session_ui)
+//		ui.remove(*game_session_ui);
 	game_session.reset();
 	game_session = createMultiPlayerServer(*this, nexus, controls, port);
-	game_session_ui = game_session->create_ui();
-	ui.add(*game_session_ui);
+//	game_session_ui = game_session->create_ui();
+//	ui.add(*game_session_ui);
 }
 
 // -------------------------------------------------------------------------------------------------
