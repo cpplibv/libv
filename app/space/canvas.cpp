@@ -34,7 +34,7 @@ RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type)
 	//	const vec4 base_color_p = vec4(0.38, 0.38, 0.40, 0.3);
 	switch (type) {
 	case Fleet::CommandType::attack:
-		return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0, 0, 1, 1)};
+		return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0.7f, 0.4f, 0, 1)};
 	case Fleet::CommandType::movement:
 		return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
 	}
@@ -169,8 +169,10 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	renderer.arrow.add_debug_view04();
 	renderer.arrow.add_debug_view05();
 
-	for (const auto& fleet : universe.fleets)
-		renderer.arrow.add_arrow(fleet.position, fleet.target, fleet.animation_offset(), convert_to_arrow_style(fleet.command_type));
+	for (const auto& fleet : universe.fleets) {
+		renderer.arrow.restart_chain(fleet.animation_offset());
+		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));
+	}
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
 

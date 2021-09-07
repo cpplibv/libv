@@ -201,8 +201,11 @@ struct RendererCommandArrow {
 		libv::vec3f target;
 		float animation_offset;
 		ArrowStyle style;
+		bool start_of_chain;
 	};
 
+	float curr_animation_offset = 0.f;
+	bool curr_start_of_chain = true;
 	std::vector<ArrowData> arrows;
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StreamDraw};
 	ShaderCommandArrow shader;
@@ -211,8 +214,8 @@ public:
 	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
-//	void restart_chain(float animation_offset);
-	void add_arrow(libv::vec3f source, libv::vec3f target, float animation_offset, ArrowStyle style);
+	void restart_chain(float animation_offset );
+	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
 //	void end_chain();
 
 	void add_debug_spiral();

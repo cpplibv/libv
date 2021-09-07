@@ -110,8 +110,8 @@ void main() {
 	fs_in.color = vs_out[1].color;
 	fs_in.uv = vec2(0.5, 1);
 	fs_in.part_uv = vec2(0.5, 1);
-	fs_in.segmentPosition = vs_out[0].segmentPosition;
-	fs_in.chainPosition = vs_out[0].chainPosition + vs_out[0].segmentSize;
+	fs_in.segmentPosition = vs_out[1].segmentPosition;
+	fs_in.chainPosition = vs_out[1].chainPosition;
 	gl_Position = v0; EmitVertex();
 	// v2
 	fs_in.color = neck_color;

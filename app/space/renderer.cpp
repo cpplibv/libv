@@ -68,21 +68,26 @@ RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
 		shader{rctx.shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
 }
 
-//void RendererCommandArrow::restart_chain(float animation_offset) {
-//
-//}
+void RendererCommandArrow::restart_chain(float animation_offset) {
+//	if(!arrows.empty()){
+//		arrows.back().start_of_chain = true;
+//	}
+	curr_animation_offset = animation_offset;
+	curr_start_of_chain = true;
+}
 
-void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, float animation_offset, ArrowStyle style) {
+void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style) {
 	if (source == target) // Sanity check
 		return;
 
-	arrows.emplace_back(source, target, animation_offset, style);
+	arrows.emplace_back(source, target, curr_animation_offset, style, std::exchange(curr_start_of_chain, false));
 }
 
 void RendererCommandArrow::add_debug_spiral() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
+	restart_chain(0);
 
 	add({0, 0, 0}, {1, 0.5f, 0.5f});
 	add({1, 0.5f, 0.5f}, {1, 1, 0});
@@ -117,9 +122,10 @@ void RendererCommandArrow::add_debug_spiral() {
 
 void RendererCommandArrow::add_debug_view01() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
 
+	restart_chain(0);
 	for (int i = 0; i < 10; i++) {
 		const auto if_ = static_cast<float>(i);
 
@@ -129,7 +135,7 @@ void RendererCommandArrow::add_debug_view01() {
 
 void RendererCommandArrow::add_debug_view02() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
 
 	const auto d = 0.5f;
@@ -138,6 +144,7 @@ void RendererCommandArrow::add_debug_view02() {
 	for (int i = 3; i <= max_n; ++i) {
 		const auto if_ = static_cast<float>(i);
 
+		restart_chain(0);
 		for (int j = 0; j < i; ++j) {
 			const auto jf = static_cast<float>(j);
 
@@ -152,7 +159,7 @@ void RendererCommandArrow::add_debug_view02() {
 
 void RendererCommandArrow::add_debug_view03() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
 
 	const auto d = 0.5f;
@@ -161,6 +168,7 @@ void RendererCommandArrow::add_debug_view03() {
 	for (int i = 3; i <= max_n; ++i) {
 		const auto if_ = static_cast<float>(i);
 
+		restart_chain(0);
 		for (int j = 0; j < i; ++j) {
 			const auto jf = static_cast<float>(j);
 
@@ -173,14 +181,16 @@ void RendererCommandArrow::add_debug_view03() {
 
 void RendererCommandArrow::add_debug_view04() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
 
 	const auto d = 0.5f;
 	const auto max_n = 30;
+
 	for (int i = 3; i <= max_n; ++i) {
 		const auto if_ = static_cast<float>(i);
 
+		restart_chain(0);
 		for (int j = 0; j < i; ++j) {
 			const auto jf = static_cast<float>(j);
 
@@ -193,12 +203,13 @@ void RendererCommandArrow::add_debug_view04() {
 
 void RendererCommandArrow::add_debug_view05() {
 	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, 0, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
+		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
 	};
 
 	for (int i = 0; i < 100; i++) {
 		const auto if_ = static_cast<float>(i);
 
+		restart_chain(0);
 		add({10, if_, 0}, {10 + (if_ + 1) * 0.25f, if_, 0});
 	}
 }
@@ -213,8 +224,23 @@ void RendererCommandArrow::rebuild_mesh() {
 	auto index = mesh.index();
 
 	libv::glr::VertexIndex i = 0;
-	for (const auto& arrow : arrows) {
+
+	auto chain_pos = 0.f;
+	auto chain_size = 0.f;
+
+	for (size_t j = 0; j < arrows.size(); ++j) {
+		const auto& arrow = arrows[j];
 		const auto length = (arrow.target - arrow.source).length();
+
+		if (arrow.start_of_chain == true) {
+			// TODO P5: Instead of forward scan on rebuild mesh, calculate and assign values on add_arrow() and on start_chain()
+			chain_pos = 0.f;
+			chain_size = length;
+			for (size_t k = j + 1; k < arrows.size() && !arrows[k].start_of_chain; ++k) {
+				const auto& a = arrows[k];
+				chain_size += (a.target - a.source).length();
+			}
+		}
 
 		position(arrow.source);
 		position(arrow.target);
@@ -222,14 +248,16 @@ void RendererCommandArrow::rebuild_mesh() {
 		color0(arrow.style.color_source);
 		color0(arrow.style.color_target);
 
-		ao_nu_nu_nu(0, 0, 0, 0);
-		ao_nu_nu_nu(0, 0, 0, 0);
+		ao_nu_nu_nu(arrow.animation_offset, 0, 0, 0);
+		ao_nu_nu_nu(arrow.animation_offset, 0, 0, 0);
 
-		sp_ss_cp_cs(0, length, 0, length);
-		sp_ss_cp_cs(length, length, length, length);
+		sp_ss_cp_cs(0, length, chain_pos, chain_size);
+		sp_ss_cp_cs(length, length, chain_pos + length, chain_size);
 
 		index.line(i + 0, i + 1);
 		i += 2;
+
+		chain_pos += length;
 	}
 
 	arrows.clear();

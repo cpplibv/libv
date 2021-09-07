@@ -12,8 +12,13 @@ uniform float time;
 
 void main() {
 	// Debug inputs
-	//	result.x = fs_in.segmentPosition / fs_in.segmentSize;
-	//	result.x = fs_in.chainPosition / fs_in.chainSize;
+//	result = vec4(0, 0, 0, 1);
+//	result.x = fs_in.segmentPosition / fs_in.segmentSize;
+//	result.x = fs_in.chainPosition / fs_in.chainSize;
+//	result.x = fs_in.chainPosition / fs_in.chainSize;
+//	result.x = fs_in.chainPosition / fs_in.chainSize;
+//	result.x = fract(fs_in.chainPosition);
+//	result.a = 1;
 	//	result.x = fs_in.head;
 	//	result.xy = fs_in.uv;
 	//	result.xy = fs_in.part_uv;
