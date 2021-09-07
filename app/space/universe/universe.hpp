@@ -55,10 +55,10 @@ public:
 
 public:
 	explicit Fleet(FleetID id, libv::vec3f position) :
-		id(id),
+			id(id),
 //		ScreenPickable(50.f, 100.f),
-		position(position),
-		target(position) {}
+			position(position),
+			target(position) {}
 
 public:
 //	void queue_command(CommandType type, libv::vec3f target) {
@@ -69,10 +69,13 @@ public:
 //	void queue_command(CommandType type, int32_t target) {
 //
 //	}
+	[[nodiscard]] constexpr inline float animation_offset() const noexcept {
+		return static_cast<float>(id) * 13;
+	}
 
 	void update(libv::ui::time_duration delta_time) {
 		const auto dt = static_cast<float>(delta_time.count());
-		const auto [len, dir] = (target - position).length_and_dir();
+		const auto[len, dir] = (target - position).length_and_dir();
 
 		if (len < dt)
 			position = target;
@@ -120,7 +123,6 @@ public:
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
-
 
 };
 

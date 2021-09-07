@@ -13,8 +13,9 @@ struct GeometryData {
 	vec4 color;
 	float segmentPosition;
 	float segmentSize;
-	float totalPosition;
-	float totalSize;
+	float chainPosition;
+	float chainSize;
+	float animationOffset;
 };
 
 struct FragmentData {
@@ -24,6 +25,7 @@ struct FragmentData {
 	float head;
 	float segmentPosition;
 	float segmentSize;
-	float totalPosition;
-	float totalSize;
+	float chainPosition;
+	float chainSize;
+	float animationOffset;
 };

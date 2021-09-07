@@ -38,6 +38,7 @@ constexpr auto attribute_normal = libv::glr::Attribute<1, libv::vec3f>{};
 constexpr auto attribute_color0 = libv::glr::Attribute<2, libv::vec4f>{};
 constexpr auto attribute_texture0 = libv::glr::Attribute<8, libv::vec2f>{};
 constexpr auto attribute_custom0 = libv::glr::Attribute<15, libv::vec4f>{};
+constexpr auto attribute_custom1 = libv::glr::Attribute<14, libv::vec4f>{};
 
 constexpr auto textureChannel_diffuse = libv::gl::TextureChannel{0};
 constexpr auto textureChannel_normal = libv::gl::TextureChannel{1};
@@ -198,7 +199,7 @@ struct RendererCommandArrow {
 	struct ArrowData {
 		libv::vec3f source;
 		libv::vec3f target;
-//		float animation_offset;
+		float animation_offset;
 		ArrowStyle style;
 	};
 
@@ -210,8 +211,8 @@ public:
 	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
-	void restart_chain(float animation_offset);
-	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
+//	void restart_chain(float animation_offset);
+	void add_arrow(libv::vec3f source, libv::vec3f target, float animation_offset, ArrowStyle style);
 //	void end_chain();
 
 	void add_debug_spiral();

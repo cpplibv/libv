@@ -170,7 +170,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	renderer.arrow.add_debug_view05();
 
 	for (const auto& fleet : universe.fleets)
-		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));
+		renderer.arrow.add_arrow(fleet.position, fleet.target, fleet.animation_offset(), convert_to_arrow_style(fleet.command_type));
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
 

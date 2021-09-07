@@ -182,8 +182,6 @@ app.space: make a blur or a bloom
 app.space: Optimized VAO update for command arrows
 app.space: Iris and space has to merge in some way
 
-app.space: line shader (Dalma)
-
 
 app.space: Command arrow improvements
 	app.space: Add support for command arrow animation offset
@@ -192,6 +190,7 @@ app.space: Command arrow improvements
 	app.space: Add support for target position offset (Instead of origin use an offset from the incoming direction)
 	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
 
+app.space: line shader (Dalma)
 
 game.sim:
 		- Command based sim state manipulation

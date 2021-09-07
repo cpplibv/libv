@@ -82,10 +82,11 @@ void main() {
 	float neck_u_left = body_width / head_width;
 	float neck_u_right = 1 - neck_u_left;
 	float neck_segmentPosition = neck_v * vs_out[0].segmentSize;
-	float neck_totalPosition = vs_out[0].totalPosition + neck_v * vs_out[0].segmentSize;
+	float neck_chainPosition = vs_out[0].chainPosition + neck_v * vs_out[0].segmentSize;
 
 	fs_in.segmentSize = vs_out[0].segmentSize;
-	fs_in.totalSize = vs_out[0].totalSize;
+	fs_in.chainSize = vs_out[0].chainSize;
+	fs_in.animationOffset = vs_out[0].animationOffset;
 
 	vec4 neck_color = mix(vs_out[0].color, vs_out[1].color, neck_v);
 
@@ -96,37 +97,35 @@ void main() {
 	fs_in.uv = vec2(0, neck_v);
 	fs_in.part_uv = vec2(0, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
-
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v6; EmitVertex();
 	// v5
 	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_left, neck_v);
 	fs_in.part_uv = vec2(neck_u_left, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
-
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v5; EmitVertex();
 	// v0
 	fs_in.color = vs_out[1].color;
 	fs_in.uv = vec2(0.5, 1);
 	fs_in.part_uv = vec2(0.5, 1);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
-	fs_in.totalPosition = vs_out[0].totalPosition + vs_out[0].segmentSize;
+	fs_in.chainPosition = vs_out[0].chainPosition + vs_out[0].segmentSize;
 	gl_Position = v0; EmitVertex();
 	// v2
 	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_right, neck_v);
 	fs_in.part_uv = vec2(neck_u_right, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v2; EmitVertex();
 	// v1
 	fs_in.color = neck_color;
 	fs_in.uv = vec2(1, neck_v);
 	fs_in.part_uv = vec2(1, 0);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v1; EmitVertex();
 	EndPrimitive();
 
@@ -137,28 +136,28 @@ void main() {
 	fs_in.uv = vec2(neck_u_left, 0);
 	fs_in.part_uv = vec2(0, 0);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
-	fs_in.totalPosition = vs_out[0].totalPosition;
+	fs_in.chainPosition = vs_out[0].chainPosition;
 	gl_Position = v4; EmitVertex();
 	// v3
 	fs_in.color = vs_out[0].color;
 	fs_in.uv = vec2(neck_u_right, 0);
 	fs_in.part_uv = vec2(1, 0);
 	fs_in.segmentPosition = vs_out[0].segmentPosition;
-	fs_in.totalPosition = vs_out[0].totalPosition;
+	fs_in.chainPosition = vs_out[0].chainPosition;
 	gl_Position = v3; EmitVertex();
 	// v5
 	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_left, neck_v);
 	fs_in.part_uv = vec2(0, 1);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v5; EmitVertex();
 	// v2
 	fs_in.color = neck_color;
 	fs_in.uv = vec2(neck_u_right, neck_v);
 	fs_in.part_uv = vec2(1, 1);
 	fs_in.segmentPosition = neck_segmentPosition;
-	fs_in.totalPosition = neck_totalPosition;
+	fs_in.chainPosition = neck_chainPosition;
 	gl_Position = v2; EmitVertex();
 	EndPrimitive();
 

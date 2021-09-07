@@ -13,7 +13,7 @@ uniform float time;
 void main() {
 	// Debug inputs
 	//	result.x = fs_in.segmentPosition / fs_in.segmentSize;
-	//	result.x = fs_in.totalPosition / fs_in.totalSize;
+	//	result.x = fs_in.chainPosition / fs_in.chainSize;
 	//	result.x = fs_in.head;
 	//	result.xy = fs_in.uv;
 	//	result.xy = fs_in.part_uv;
@@ -51,9 +51,9 @@ void main() {
 		//	const float spark_run_speed = 5.50; // Unit / sec, Blink running speed
 		//	const float spark_fade_pow  = 4;
 
-	float spark_time_offset = -time * spark_run_speed;
+	float spark_time_offset = -time * spark_run_speed + fs_in.animationOffset;
 	float spark_shape_delay = abs(fs_in.uv.x - 0.5) * 0.5;
-	float spark_t = fract((fs_in.totalPosition + spark_shape_delay + spark_time_offset) / spark_distance);
+	float spark_t = fract((fs_in.chainPosition + spark_shape_delay + spark_time_offset ) / spark_distance);
 	float spark_lin_v = max(0, spark_t / spark_length * spark_distance - spark_distance / spark_length + 1);
 	float spark_v = pow(spark_lin_v, spark_fade_pow);
 
