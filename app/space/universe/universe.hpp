@@ -38,27 +38,22 @@ struct Fleet {
 //		...,
 	};
 //
-//	struct Command {
-//		CommandType type;
-//		libv::vec3f target;
-////		int32_t target;
-//	};
+	struct Command {
+		libv::vec3f target;
+		CommandType type;
+//		int32_t target;
+	};
 
 public:
 	FleetID id;
 	libv::vec3f position;
-	libv::vec3f target;
-	CommandType command_type = CommandType::movement;
-//	libv::vec3f movement;
-//	CommandArrow command_arrow; // <<< Yes, but no, maybe-, Think about it how should ownership and references fork regarding renderers
-//	std::vector<Command> commands;
+	std::vector<Command> commands;
 
 public:
 	explicit Fleet(FleetID id, libv::vec3f position) :
+	//		ScreenPickable(50.f, 100.f),
 			id(id),
-//		ScreenPickable(50.f, 100.f),
-			position(position),
-			target(position) {}
+			position(position) {}
 
 public:
 //	void queue_command(CommandType type, libv::vec3f target) {
@@ -69,17 +64,23 @@ public:
 //	void queue_command(CommandType type, int32_t target) {
 //
 //	}
+
 	[[nodiscard]] constexpr inline float animation_offset() const noexcept {
 		return static_cast<float>(id) * 13;
 	}
 
 	void update(libv::ui::time_duration delta_time) {
-		const auto dt = static_cast<float>(delta_time.count());
-		const auto[len, dir] = (target - position).length_and_dir();
+		if(commands.empty())
+			return;
 
-		if (len < dt)
-			position = target;
-		else
+		const auto dt = static_cast<float>(delta_time.count());
+		const auto[len, dir] = (commands.front().target - position).length_and_dir();
+
+		if (len < dt) {
+			position = commands.front().target;
+			commands.erase(commands.begin());
+			// TODO P3: Do not waste energy, roll the excess 'movement time' into the next command
+		} else
 			position = position + dir * dt;
 	}
 };

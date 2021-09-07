@@ -49,6 +49,40 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 //		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 	});
 
+	controls.feature_action<app::SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+		const auto mouse_ray_pos = ctx.camera.eye();
+		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+		log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
+
+		if (!ctx.universe.fleets.empty()) {
+			ctx.playout.queue<app::CommandFleetMove>(
+					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
+					world_coord
+			);
+
+		}
+	});
+
+	controls.feature_action<app::SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+		const auto mouse_ray_pos = ctx.camera.eye();
+		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+		log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
+
+		if (!ctx.universe.fleets.empty()) {
+			ctx.playout.queue<app::CommandFleetQueueMove>(
+					static_cast<app::FleetID>(ctx.universe.fleets.size() - 1),
+					world_coord
+			);
+
+		}
+	});
+
 	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -66,6 +100,8 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 
 void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("space.add_fleet_by_mouse", "Ctrl + LMB [press]");
+	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
+	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");
 }
 

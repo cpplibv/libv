@@ -44,7 +44,20 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetMove& command) {
 
 	// Permission check
 	// Bound check
-	universe.fleets[+command.fleetID].target = command.target_position;
+
+	// TODO P3: Use the command API of the fleet
+	universe.fleets[+command.fleetID].commands.clear();
+	universe.fleets[+command.fleetID].commands.emplace_back(command.target_position, Fleet::CommandType::movement);
+}
+
+void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command) {
+	(void) lobby;
+
+	// Permission check
+	// Bound check
+
+	// TODO P3: Use the command API of the fleet
+	universe.fleets[+command.fleetID].commands.emplace_back(command.target_position, Fleet::CommandType::movement);
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command) {
@@ -75,18 +88,18 @@ void apply(Universe& universe, Lobby& lobby, CommandShuffle& command) {
 
 	auto positions = std::vector<libv::vec3f>{};
 	for (const auto& fleet : universe.fleets)
-		positions.emplace_back(fleet.target);
+		positions.emplace_back(fleet.commands.empty() ? fleet.position : fleet.commands.back().target);
 
 	auto rng = std::mt19937_64{command.seed};
 
 	std::ranges::shuffle(positions, rng);
 
-	for (size_t i = 0; i < positions.size(); ++i)
-		universe.fleets[i].target = positions[i];
-
 	std::uniform_int_distribution dst(0, 1);
-	for (auto& fleet : universe.fleets)
-		fleet.command_type = dst(rng) ? Fleet::CommandType::movement :  Fleet::CommandType::attack;
+	for (size_t i = 0; i < positions.size(); ++i) {
+		auto& fleet = universe.fleets[i];
+		fleet.commands.clear();
+		fleet.commands.emplace_back(positions[i], dst(rng) ? Fleet::CommandType::movement : Fleet::CommandType::attack);
+	}
 }
 
 // -------------------------------------------------------------------------------------------------

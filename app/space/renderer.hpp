@@ -218,6 +218,9 @@ public:
 	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
 //	void end_chain();
 
+public:
+	ArrowStyle debug_arrow_style{libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f), libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f)};
+
 	void add_debug_spiral();
 	void add_debug_view01();
 	void add_debug_view02();

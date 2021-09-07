@@ -33,10 +33,12 @@ RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type)
 	//	const vec4 base_color_g = vec4(0.42, 0.75, 0.40, 0.5);
 	//	const vec4 base_color_p = vec4(0.38, 0.38, 0.40, 0.3);
 	switch (type) {
+//	case Fleet::CommandType::attack:   return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0.7, 0.4, 0, 1)};
+//	case Fleet::CommandType::movement: return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
 	case Fleet::CommandType::attack:
-		return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0.7f, 0.4f, 0, 1)};
+		return {libv::vec4f(0.80f, 0.30f, 0.30f, 0.5f), libv::vec4f(0.80f, 0.30f, 0.30f, 0.5f)};
 	case Fleet::CommandType::movement:
-		return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
+		return {libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f), libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f)};
 	}
 
 	assert(false && "Invalid Fleet::CommandType enum value");
@@ -170,7 +172,12 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	for (const auto& fleet : universe.fleets) {
 		renderer.arrow.restart_chain(fleet.animation_offset());
-		renderer.arrow.add_arrow(fleet.position, fleet.target, convert_to_arrow_style(fleet.command_type));
+
+		auto prev = fleet.position;
+		for (const auto& command : fleet.commands) {
+			renderer.arrow.add_arrow(prev, command.target, convert_to_arrow_style(command.type));
+			prev = command.target;
+		}
 	}
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);

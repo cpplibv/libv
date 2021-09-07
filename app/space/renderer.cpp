@@ -84,15 +84,12 @@ void RendererCommandArrow::add_arrow(libv::vec3f source, libv::vec3f target, Arr
 }
 
 void RendererCommandArrow::add_debug_spiral() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
 	restart_chain(0);
 
-	add({0, 0, 0}, {1, 0.5f, 0.5f});
-	add({1, 0.5f, 0.5f}, {1, 1, 0});
-	add({1, 1, 0}, {1, 2, 2});
-	add({1, 2, 2}, {-1, -1, -1});
+	add_arrow({0, 0, 0}, {1, 0.5f, 0.5f}, debug_arrow_style);
+	add_arrow({1, 0.5f, 0.5f}, {1, 1, 0}, debug_arrow_style);
+	add_arrow({1, 1, 0}, {1, 2, 2}, debug_arrow_style);
+	add_arrow({1, 2, 2}, {-1, -1, -1}, debug_arrow_style);
 
 	libv::vec3f prev_point;
 	for (int i = 0; i < 60; i++) {
@@ -103,7 +100,7 @@ void RendererCommandArrow::add_debug_spiral() {
 		const auto y = std::cos(libv::deg_to_rad(if_ * 15.f)) * r;
 
 		const auto curr_point = libv::vec3f{x, y, 0};
-		add(prev_point, curr_point);
+		add_arrow(prev_point, curr_point, debug_arrow_style);
 		prev_point = curr_point;
 	}
 	for (int i = 60; i < 120; i++) {
@@ -115,29 +112,21 @@ void RendererCommandArrow::add_debug_spiral() {
 		const auto z = std::sin(libv::deg_to_rad((if_ - 60.f) * 30.f)) * 0.25f;
 
 		const auto curr_point = libv::vec3f{x, y, z};
-		add(prev_point, curr_point);
+		add_arrow(prev_point, curr_point, debug_arrow_style);
 		prev_point = curr_point;
 	}
 }
 
 void RendererCommandArrow::add_debug_view01() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
-
 	restart_chain(0);
 	for (int i = 0; i < 10; i++) {
 		const auto if_ = static_cast<float>(i);
 
-		add({5, std::pow(2.f, if_) - 1, 0}, {5, std::pow(2.f, if_ + 1) - 1, 0});
+		add_arrow({5, std::pow(2.f, if_) - 1, 0}, {5, std::pow(2.f, if_ + 1) - 1, 0}, debug_arrow_style);
 	}
 }
 
 void RendererCommandArrow::add_debug_view02() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
-
 	const auto d = 0.5f;
 	const auto max_n = 30;
 
@@ -152,16 +141,12 @@ void RendererCommandArrow::add_debug_view02() {
 			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
 			const auto x2 = std::sin(libv::tau / if_ * (jf - 1)) * d;
 			const auto y2 = std::cos(libv::tau / if_ * (jf - 1)) * d;
-			add({x1 + 3, if_ - 3, y1}, {x2 + 3, if_ - 3, y2});
+			add_arrow({x1 + 3, if_ - 3, y1}, {x2 + 3, if_ - 3, y2}, debug_arrow_style);
 		}
 	}
 }
 
 void RendererCommandArrow::add_debug_view03() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
-
 	const auto d = 0.5f;
 	const auto max_n = 30;
 
@@ -174,16 +159,12 @@ void RendererCommandArrow::add_debug_view03() {
 
 			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
 			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
-			add({x1 + 6, if_ - 3, y1}, {6, if_ - 3, 0});
+			add_arrow({x1 + 6, if_ - 3, y1}, {6, if_ - 3, 0}, debug_arrow_style);
 		}
 	}
 }
 
 void RendererCommandArrow::add_debug_view04() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
-
 	const auto d = 0.5f;
 	const auto max_n = 30;
 
@@ -196,21 +177,17 @@ void RendererCommandArrow::add_debug_view04() {
 
 			const auto x1 = std::sin(libv::tau / if_ * jf) * d;
 			const auto y1 = std::cos(libv::tau / if_ * jf) * d;
-			add({9, if_ - 3, 0}, {x1 + 9, if_ - 3, y1});
+			add_arrow({9, if_ - 3, 0}, {x1 + 9, if_ - 3, y1}, debug_arrow_style);
 		}
 	}
 }
 
 void RendererCommandArrow::add_debug_view05() {
-	const auto add = [this](libv::vec3f s, libv::vec3f t) {
-		add_arrow(s, t, {libv::vec4f(0, 1, 0, 1), libv::vec4f(1, 0, 0, 1)});
-	};
-
 	for (int i = 0; i < 100; i++) {
 		const auto if_ = static_cast<float>(i);
 
 		restart_chain(0);
-		add({10, if_, 0}, {10 + (if_ + 1) * 0.25f, if_, 0});
+		add_arrow({10, if_, 0}, {10 + (if_ + 1) * 0.25f, if_, 0}, debug_arrow_style);
 	}
 }
 

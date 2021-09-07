@@ -44,8 +44,9 @@ struct msg_pdb {
 	static constexpr inline void message_types(Codec& codec) {
 		codec.template register_type<0x10, CommandChatMessage>();
 
-		codec.template register_type<0x21, CommandFleetSpawn>();
-		codec.template register_type<0x22, CommandFleetMove>();
+		codec.template register_type<0x20, CommandFleetSpawn>();
+		codec.template register_type<0x21, CommandFleetMove>();
+		codec.template register_type<0x22, CommandFleetQueueMove>();
 		codec.template register_type<0x23, CommandClearFleets>();
 		codec.template register_type<0x24, CommandShuffle>();
 
@@ -142,6 +143,8 @@ public:
 
 private:
 	virtual void aux_queue(std::unique_ptr<Command> command, apply_func_t apply_func, encode_func_t encode_func) override {
+		(void) encode_func;
+
 		stateChangeEntries.emplace_back(std::move(command), apply_func);
 	}
 };
@@ -179,6 +182,7 @@ private:
 void apply(Universe& universe, Lobby& lobby, CommandChatMessage& command);
 
 void apply(Universe& universe, Lobby& lobby, CommandFleetMove& command);
+void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command);
 void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command);
 void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command);
 void apply(Universe& universe, Lobby& lobby, CommandShuffle& command);

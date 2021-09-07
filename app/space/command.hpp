@@ -93,6 +93,10 @@ struct CommandFleetMove : CommandState {
 			fleetID(fleetId), target_position(targetPosition) {}
 };
 
+struct CommandFleetQueueMove : CommandFleetMove {
+	using CommandFleetMove::CommandFleetMove;
+};
+
 struct CommandClearFleets : CommandState {
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
