@@ -19,6 +19,7 @@
 //#include <libv/glr/layout_to_string.hpp>
 // pro
 #include <space/camera.hpp>
+#include <space/universe/universe.hpp>
 
 
 // =================================================================================================
@@ -254,15 +255,18 @@ public:
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
+
 struct RendererFleet {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	ShaderColor shader;
 
 public:
+//	libv::vec4f color;
 	explicit RendererFleet(RendererResourceContext& rctx);
 
 	void build_mesh(libv::glr::Mesh& mesh);
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected);
+//	void render_selected(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -90,14 +90,27 @@ struct CommandFleetSelect {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CommandFleetMove {
+struct CommandFleetChainSelect {
 	using command_type = CommandState;
 
 	//	FactionID factionID;
 	FleetID fleetID;
-	libv::vec3f target_position;
+	//	libv::vec3f position;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
+	//	LIBV_REFLECTION_ACCESS(position);
+	//	LIBV_REFLECTION_EMPTY();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CommandFleetMove {
+	using command_type = CommandState;
+
+	//	FactionID factionID;
+//	FleetID fleetID;
+	libv::vec3f target_position;
+
+//	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
@@ -112,10 +125,10 @@ struct CommandFleetQueueMove {
 	using command_type = CommandState;
 
 	//	FactionID factionID;
-	FleetID fleetID;
+//	FleetID fleetID;
 	libv::vec3f target_position;
 
-	LIBV_REFLECTION_ACCESS(fleetID);
+//	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };

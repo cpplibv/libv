@@ -120,6 +120,7 @@ app.space: Simulation
 app.space: Fleet merge/follow/attack commands
 	app.space: 3D fleet picking
 	app.space: Selected fleet highlight, hover fleet highlight
+		app.space: edge highlight (fresnel shader) https://forum.playcanvas.com/t/solved-custom-shader-fresnel/17355
 	app.space: 3D secondary fleet picking
 	app.space: Fleet selection, selection based commands
 	app.space: Multi fleet selection

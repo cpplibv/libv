@@ -37,6 +37,11 @@ struct Fleet {
 //		land,
 //		...,
 	};
+//	enum class FleetState {
+//		idle,
+//		selected
+//
+//	};
 //
 	struct Command {
 		libv::vec3f target;
@@ -49,12 +54,13 @@ public:
 	libv::vec3f position;
 //	bool selected;
 	std::vector<Command> commands;
+//	FleetState state;
 
 public:
 	explicit Fleet(FleetID id, libv::vec3f position) :
 	//		ScreenPickable(50.f, 100.f),
 			id(id),
-			position(position) {}
+			position(position){}
 
 
 public:
@@ -115,7 +121,7 @@ struct Universe {
 //	float test_sin_time = 0.0f;
 
 	FleetID nextFleetID{0};
-	FleetID selectedFleetID{nextFleetID};
+	std::vector<FleetID> selectedFleetIDList{nextFleetID};
 //	FleetID selectedFleetID{noSelectionID or nullFleetID};
 	std::vector<Fleet> fleets;
 

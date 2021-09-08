@@ -148,11 +148,25 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = gl.model.push_guard();
 		gl.model.translate(fleet.position);
-		if (fleet.id == universe.selectedFleetID)
-			gl.model.scale(0.1f);
-		else
-			gl.model.scale(0.2f);
-		renderer.fleet.render(gl, renderer.resource_context.uniform_stream);
+		gl.model.scale(0.2f);
+//		if (fleet.id == universe.selectedFleetID)
+//			renderer.fleet.color = libv::vec4f(0.99f, 0.1f, 0.3f, 1.0f);
+////			gl.uniform(renderer.fleet.shader.uniform().base_color, libv::vec4f(0.99f, 0.1f, 0.3f, 1.0f));
+////			renderer.fleet.render_selected(gl, renderer.resource_context.uniform_stream);
+//		else
+//			renderer.fleet.color = libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f);
+
+//			gl.uniform(renderer.fleet.shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
+
+//	renderer.fleet.render(gl, renderer.resource_context.uniform_stream, fleet.id == universe.selectedFleetID);
+		if (std::find(universe.selectedFleetIDList.begin(), universe.selectedFleetIDList.end(), fleet.id) != universe.selectedFleetIDList.end()) {
+//			log_space.trace("Element found");
+			renderer.fleet.render(gl, renderer.resource_context.uniform_stream, true);
+		} else {
+//			log_space.trace("Element not found");
+			renderer.fleet.render(gl, renderer.resource_context.uniform_stream, false);
+		}
+
 	}
 
 	// --- Render EditorBackground/Sky ---

@@ -359,7 +359,7 @@ void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& 
 // -------------------------------------------------------------------------------------------------
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "flat.vs", "flat.fs") {
+shader(rctx.shader_manager, "flat.vs", "flat.fs") {
 	build_mesh(mesh);
 }
 
@@ -373,7 +373,7 @@ void RendererFleet::build_mesh(libv::glr::Mesh& mesh) {
 	//		libv::glr::generateCube(position, normal, texture0, index);
 }
 
-void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
 	uniforms[layout_matrices.matMVP] = gl.mvp();
 	uniforms[layout_matrices.matM] = gl.model;
@@ -381,10 +381,26 @@ void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 	uniforms[layout_matrices.eye] = gl.eye();
 
 	gl.program(shader.program());
-	gl.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
+	if(selected)
+		gl.uniform(shader.uniform().base_color, libv::vec4f(0.99f, 0.1f, 0.3f, 1.0f));
+	else
+		gl.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
 	gl.uniform(std::move(uniforms));
 	gl.render(mesh);
 }
+
+//void RendererFleet::render_selected(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+//	auto uniforms = uniform_stream.block_unique(layout_matrices);
+//	uniforms[layout_matrices.matMVP] = gl.mvp();
+//	uniforms[layout_matrices.matM] = gl.model;
+//	uniforms[layout_matrices.matP] = gl.projection;
+//	uniforms[layout_matrices.eye] = gl.eye();
+//
+//	gl.program(shader.program());
+//	gl.uniform(shader.uniform().base_color, libv::vec4f(0.99f, 0.1f, 0.3f, 1.0f));
+//	gl.uniform(std::move(uniforms));
+//	gl.render(mesh);
+//}
 
 // -------------------------------------------------------------------------------------------------
 
