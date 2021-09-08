@@ -10,6 +10,7 @@
 #include <libv/utility/guard.hpp>
 // std
 #include <algorithm>
+#include <map>
 #include <optional>
 #include <ranges>
 #include <span>
@@ -34,11 +35,21 @@ public:
 	std::vector<std::pair<std::string, int>> include_stack;
 	std::vector<std::string> includePragmaOnce;
 
+	int mappingFilenameNextIndex = 2090909000; // High index start to avoid random collisions in error strings
+	std::map<int, std::string> mappingIndexToFilename;
+	std::map<std::string, int, std::less<>> mappingFilenameToIndex;
+
+public:
+	LoadShaderSourceContext(const IncludeLoadFunc& loader, std::span<std::span<const std::string>> injectedDefinesList, std::span<std::span<const std::string>> injectedIncludesList);
+
 private:
 	static std::optional<std::string_view> extract_include(std::string_view line) noexcept;
 	static bool is_pragma_once(std::string_view line) noexcept;
 	static bool is_version(std::string_view line) noexcept;
 	static bool is_mixed_indentation(std::string_view line) noexcept;
+
+private:
+	int filenameToIndex(std::string_view name);
 
 private:
 	bool process_include(const std::string_view filename);
@@ -48,6 +59,13 @@ public:
 	std::string load_from_include(const std::string_view filename);
 	std::string load_from_source(const std::string_view source);
 };
+
+// -------------------------------------------------------------------------------------------------
+
+LoadShaderSourceContext::LoadShaderSourceContext(const IncludeLoadFunc& loader, std::span<std::span<const std::string>> injectedDefinesList, std::span<std::span<const std::string>> injectedIncludesList) :
+		loader(loader),
+		injected_defines_list(injectedDefinesList),
+		injected_includes_list(injectedIncludesList) {}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -72,6 +90,16 @@ bool LoadShaderSourceContext::is_version(const std::string_view line) noexcept {
 
 bool LoadShaderSourceContext::is_mixed_indentation(const std::string_view line) noexcept {
 	return ctre::match<R"qq(^(\t+ +| +\t+).*)qq">(line);
+}
+
+int LoadShaderSourceContext::filenameToIndex(std::string_view name) {
+	if (auto it = mappingFilenameToIndex.find(name); it != mappingFilenameToIndex.end())
+		return it->second;
+
+	const auto index = mappingFilenameNextIndex++;
+	mappingFilenameToIndex.emplace(name, index);
+	mappingIndexToFilename.emplace(index, name);
+	return index;
 }
 
 bool LoadShaderSourceContext::process_include(const std::string_view filename) {
@@ -103,7 +131,7 @@ bool LoadShaderSourceContext::process_include(const std::string_view filename) {
 
 	const auto is_main_source = include_stack.size() == 1;
 	if (!is_main_source)
-		output << "#line " << 1 << " \"" << filename << "\"\n";
+		output << "#line " << 1 << " " << filenameToIndex(filename) << " // " << filename << "\n";
 	process_source(included_source.result, filename);
 
 	return true;
@@ -117,7 +145,7 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 
 		if (const auto include_opt = extract_include(line)) {
 			if (process_include(*include_opt))
-				output << "#line " << line_number() + 1 << " \"" << filename << "\"\n";
+				output << "#line " << line_number() + 1 << " " << filenameToIndex(filename) << " // " << filename << "\n";
 
 		} else if (is_pragma_once(line)) {
 			includePragmaOnce.emplace_back(filename);
@@ -158,7 +186,7 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 				if (is_main_source && has_injected_define) {
 					// If this is the main file inject defines
 					output << "// --- Source code injected defines start ---\n";
-					output << "#line 1 \"injected_defines\"\n";
+					output << "#line 1 " << filenameToIndex("injected_defines") << " // injected_defines\n";
 					for (const auto& defines : injected_defines_list)
 						for (const auto& define : defines)
 							output << "#define " << define << "\n";
@@ -176,7 +204,7 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 				}
 
 				// NOTE: Inserting top level source information after version (version has to come first)
-				output << "#line " << line_number() + 1 << " \"" << filename << "\"\n";
+				output << "#line " << line_number() + 1 << " " << filenameToIndex(filename) << " // " << filename << "\n";
 			}
 		}
 	}
@@ -195,46 +223,46 @@ std::string LoadShaderSourceContext::load_from_source(const std::string_view sou
 
 // -------------------------------------------------------------------------------------------------
 
-std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<const std::string> includes) {
+GLSLSourceCode glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<const std::string> includes) {
 	std::span<std::span<const std::string>> defines_list(&defines, 1);
 	std::span<std::span<const std::string>> includes_list(&includes, 1);
 	return glsl_compose_from_include(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes) {
+GLSLSourceCode glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes) {
 	std::span<std::span<const std::string>> includes_list(&includes, 1);
 	return glsl_compose_from_include(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<std::span<const std::string>> includes_list) {
+GLSLSourceCode glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<std::span<const std::string>> includes_list) {
 	std::span<std::span<const std::string>> defines_list(&defines, 1);
 	return glsl_compose_from_include(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<std::span<const std::string>> includes_list) {
-	LoadShaderSourceContext context{loader, defines_list, includes_list, {}, {}, {}};
-	return context.load_from_include(path_main);
+GLSLSourceCode glsl_compose_from_include(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<std::span<const std::string>> includes_list) {
+	LoadShaderSourceContext context{loader, defines_list, includes_list};
+	return {context.load_from_include(path_main), std::move(context.mappingIndexToFilename)};
 }
 
-std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<const std::string> includes) {
+GLSLSourceCode glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<const std::string> includes) {
 	std::span<std::span<const std::string>> defines_list(&defines, 1);
 	std::span<std::span<const std::string>> includes_list(&includes, 1);
 	return glsl_compose_from_source(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes) {
+GLSLSourceCode glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<const std::string> includes) {
 	std::span<std::span<const std::string>> includes_list(&includes, 1);
 	return glsl_compose_from_source(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<std::span<const std::string>> includes_list) {
+GLSLSourceCode glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<const std::string> defines, std::span<std::span<const std::string>> includes_list) {
 	std::span<std::span<const std::string>> defines_list(&defines, 1);
 	return glsl_compose_from_source(loader, path_main, defines_list, includes_list);
 }
 
-std::string glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<std::span<const std::string>> includes_list) {
-	LoadShaderSourceContext context{loader, defines_list, includes_list, {}, {}, {}};
-	return context.load_from_source(path_main);
+GLSLSourceCode glsl_compose_from_source(const IncludeLoadFunc& loader, const std::string_view path_main, std::span<std::span<const std::string>> defines_list, std::span<std::span<const std::string>> includes_list) {
+	LoadShaderSourceContext context{loader, defines_list, includes_list};
+	return {context.load_from_source(path_main), std::move(context.mappingIndexToFilename)};
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -136,7 +136,7 @@ void InternalShaderLoader::update_fs() {
 			try {
 				current_loading_internal = &internal; // Setup temp var
 				current_loading_stage = &stage; // Setup temp var
-				stage.source_code = glsl_source_loader.load_source(stage.source_path, stage.defines);
+				stage.source = glsl_source_loader.load_source(stage.source_path, stage.defines);
 				current_loading_stage = nullptr; // Clear temp var
 				current_loading_internal = nullptr; // Clear temp var
 
@@ -235,11 +235,11 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			libv::gl::Shader shader;
 
 			gl(shader).create(stage.type);
-			gl(shader).compile(stage.source_code);
+			gl(shader).compile(stage.source.code);
 
 			if (!gl(shader).status()) {
 				shader_compile_failed = true;
-				shader_compile_error = gl(shader).info();
+				shader_compile_error = stage.source.translateErrorMessageFilenames(gl(shader).info());
 			} else {
 				gl(program).attach(shader);
 			}
@@ -256,9 +256,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 					internal->id(),
 					BaseShader(internal),
 					std::nullopt,
-					ShaderLoadFailure::CompileFailure{
-							std::move(shader_compile_error)
-					},
+					ShaderLoadFailure::CompileFailure{std::move(shader_compile_error)},
 					std::nullopt});
 			fallback_to_default(internal);
 
@@ -274,9 +272,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 						BaseShader(internal),
 						std::nullopt,
 						std::nullopt,
-						ShaderLoadFailure::LinkFailure{
-								std::move(shader_link_error)
-						}});
+						ShaderLoadFailure::LinkFailure{std::move(shader_link_error)}});
 				fallback_to_default(internal);
 
 			} else {

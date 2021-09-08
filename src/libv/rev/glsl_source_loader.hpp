@@ -8,6 +8,8 @@
 #include <span>
 #include <string>
 #include <string_view>
+// pro
+#include <libv/rev/glsl_source_code.hpp>
 
 
 namespace libv {
@@ -46,7 +48,7 @@ public:
 
 public:
 	/// \throws glsl_failed_include_exception upon failed include
-	std::string load_source(std::string_view main_path, std::span<const std::string> defines = {}, std::span<const std::string> includes = {});
+	GLSLSourceCode load_source(std::string_view main_path, std::span<const std::string> defines = {}, std::span<const std::string> includes = {});
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -136,7 +136,7 @@ void GLSLSourceLoader::add_virtual_source(std::string include_path, std::string 
 	self->mappings.emplace_back(std::move(include_path), std::move(source_code));
 }
 
-std::string GLSLSourceLoader::load_source(std::string_view main_path, std::span<const std::string> local_defines, std::span<const std::string> local_includes) {
+GLSLSourceCode GLSLSourceLoader::load_source(std::string_view main_path, std::span<const std::string> local_defines, std::span<const std::string> local_includes) {
 	std::span<const std::string> defines_list[2]{
 			self->global_defines,
 			local_defines
