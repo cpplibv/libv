@@ -11,7 +11,6 @@
 // std
 #include <cstdint>
 #include <string>
-//#include <vector>
 // pro
 #include <space/universe/ids.hpp>
 
@@ -80,55 +79,35 @@ struct CommandFleetSpawn {
 struct CommandFleetSelect {
 	using command_type = CommandState;
 
-	//	FactionID factionID;
 	FleetID fleetID;
-//	libv::vec3f position;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
-//	LIBV_REFLECTION_ACCESS(position);
-//	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CommandFleetChainSelect {
+struct CommandFleetSelectAdd {
 	using command_type = CommandState;
 
-	//	FactionID factionID;
 	FleetID fleetID;
-	//	libv::vec3f position;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
-	//	LIBV_REFLECTION_ACCESS(position);
-	//	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 struct CommandFleetMove {
 	using command_type = CommandState;
 
-	//	FactionID factionID;
-//	FleetID fleetID;
 	libv::vec3f target_position;
 
-//	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-//struct CommandFleetQueueMove : CommandFleetMove {
-//	using command_type = CommandState;
-//
-//	using CommandFleetMove::CommandFleetMove;
-//};
-
 struct CommandFleetQueueMove {
 	using command_type = CommandState;
 
-	//	FactionID factionID;
-//	FleetID fleetID;
 	libv::vec3f target_position;
 
-//	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };

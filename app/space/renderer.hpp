@@ -144,6 +144,20 @@ struct UniformsColor {
 	}
 };
 
+struct UniformsFleet {
+	libv::glr::Uniform_vec4f base_color;
+	libv::glr::Uniform_bool selected;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(base_color, "base_color");
+		access(selected, "selected");
+	}
+
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
+};
+
 struct UniformsCommandArrow {
 	libv::glr::Uniform_int32 test_mode;
 	libv::glr::Uniform_float time;
@@ -166,6 +180,7 @@ using ShaderEditorBackground = libv::rev::Shader<UniformsEditorBackground>;
 using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 using ShaderColor = libv::rev::Shader<UniformsColor>;
 using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
+using ShaderFleet = libv::rev::Shader<UniformsFleet>;
 //using Shader = libv::rev::Shader<>;
 
 // =================================================================================================
@@ -258,15 +273,13 @@ public:
 
 struct RendererFleet {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-	ShaderColor shader;
+	ShaderFleet shader;
 
 public:
-//	libv::vec4f color;
 	explicit RendererFleet(RendererResourceContext& rctx);
 
 	void build_mesh(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected);
-//	void render_selected(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 // -------------------------------------------------------------------------------------------------

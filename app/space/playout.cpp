@@ -44,19 +44,11 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetMove& command) {
 
 	// Permission check
 	// Bound check
-
-
 	// TODO P3: Use the command API of the fleet
 	for (const auto& fleetID : universe.selectedFleetIDList) {
 		universe.fleets[+fleetID].commands.clear();
 		universe.fleets[+fleetID].commands.emplace_back(command.target_position, Fleet::CommandType::movement);
 	}
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command) {
@@ -64,17 +56,10 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command) {
 
 	// Permission check
 	// Bound check
-
 	// TODO P3: Use the command API of the fleet
 	for (const auto& fleetID : universe.selectedFleetIDList) {
 		universe.fleets[+fleetID].commands.emplace_back(command.target_position, Fleet::CommandType::movement);
 	}
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command) {
@@ -86,26 +71,21 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command) {
 	universe.fleets.emplace_back(universe.nextFleetID, command.position);
 	// !!! Synchronized FleetID generation
 	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command) {
 	(void) lobby;
-//	log_space.trace("Selected fleet ID = {}", +command.fleetID);
 
 	universe.selectedFleetIDList.clear();
-	universe.selectedFleetIDList.emplace_back(command.fleetID);
+	universe.selectedFleetIDList.insert(command.fleetID);
+}
 
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
+void apply(Universe& universe, Lobby& lobby, CommandFleetSelectAdd& command) {
+	(void) lobby;
+	universe.selectedFleetIDList.insert(command.fleetID);
+}
+
+// paging
 //	const auto prev_selection = universe.selectedFleetID;
 //	// Permission check
 //	// Bound check
@@ -120,41 +100,6 @@ void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command) {
 //		}
 //	}
 
-
-//	log_space.trace("Selected fleet ID = {} -> {}", +prev_selection, +command.fleetID);
-
-//	universe.selectedFleetID = command.fleetID
-}
-
-void apply(Universe& universe, Lobby& lobby, CommandFleetChainSelect& command) {
-	(void) lobby;
-
-	universe.selectedFleetIDList.emplace_back(command.fleetID);
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
-//	const auto prev_selection = universe.selectedFleetID;
-	//	// Permission check
-	//	// Bound check
-	//	// !!! Synchronized FleetID generation
-	//	for (auto it = universe.fleets.begin(); it != universe.fleets.end(); ++it) {
-	//		if (it->id == universe.selectedFleetID) {
-	//			if ((++it) != universe.fleets.end())
-	//				universe.selectedFleetID = it->id;
-	//			else
-	//				universe.selectedFleetID = universe.fleets.front().id;
-	//			break;
-	//		}
-	//	}
-
-//	log_space.trace("Selected fleet ID = {} -> {}", +prev_selection, +universe.selectedFleetID);
-
-	//	universe.selectedFleetID = command.fleetID
-}
-
 void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command) {
 	(void) lobby;
 	(void) command;
@@ -164,13 +109,6 @@ void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command) {
 	universe.selectedFleetIDList.clear();
 	universe.fleets.clear();
 	universe.nextFleetID = FleetID{0};
-	universe.selectedFleetIDList.emplace_back(universe.nextFleetID);
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
 }
 
 void apply(Universe& universe, Lobby& lobby, CommandShuffle& command) {
@@ -179,7 +117,6 @@ void apply(Universe& universe, Lobby& lobby, CommandShuffle& command) {
 
 	// Permission check
 	// Bound check
-
 	auto positions = std::vector<libv::vec3f>{};
 	for (const auto& fleet : universe.fleets)
 		positions.emplace_back(fleet.commands.empty() ? fleet.position : fleet.commands.back().target);
@@ -194,12 +131,6 @@ void apply(Universe& universe, Lobby& lobby, CommandShuffle& command) {
 		fleet.commands.clear();
 		fleet.commands.emplace_back(positions[i], dst(rng) ? Fleet::CommandType::movement : Fleet::CommandType::attack);
 	}
-
-	log_space.trace("-------------------");
-	for (const auto & fleetID: universe.selectedFleetIDList) {
-		log_space.trace("Selected fleet ID = {}", +fleetID);
-	}
-	log_space.trace("-------------------");
 }
 
 // -------------------------------------------------------------------------------------------------

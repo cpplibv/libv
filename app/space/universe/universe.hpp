@@ -2,6 +2,8 @@
 
 #pragma once
 
+// ext
+#include <boost/container/flat_set.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/ui/chrono.hpp>
@@ -60,8 +62,7 @@ public:
 	explicit Fleet(FleetID id, libv::vec3f position) :
 	//		ScreenPickable(50.f, 100.f),
 			id(id),
-			position(position){}
-
+			position(position) {}
 
 public:
 //	void queue_command(CommandType type, libv::vec3f target) {
@@ -78,7 +79,7 @@ public:
 	}
 
 	void update(libv::ui::time_duration delta_time) {
-		if(commands.empty())
+		if (commands.empty())
 			return;
 
 		const auto dt = static_cast<float>(delta_time.count());
@@ -121,7 +122,7 @@ struct Universe {
 //	float test_sin_time = 0.0f;
 
 	FleetID nextFleetID{0};
-	std::vector<FleetID> selectedFleetIDList{nextFleetID};
+	boost::container::flat_set<FleetID> selectedFleetIDList;
 //	FleetID selectedFleetID{noSelectionID or nullFleetID};
 	std::vector<Fleet> fleets;
 
@@ -134,7 +135,6 @@ public:
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
-
 };
 
 // -------------------------------------------------------------------------------------------------

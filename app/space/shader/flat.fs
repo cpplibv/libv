@@ -1,6 +1,7 @@
 #version 330 core
 
 #include <block/matrices.glsl>
+#include <lib/fresnel.glsl>
 
 in vec3 fragmentPositionW;
 in vec3 fragmentNormal;
@@ -9,6 +10,7 @@ in vec2 fragmentTexture0;
 out vec4 result;
 
 uniform vec4 base_color;
+uniform bool selected;
 
 
 void main() {
@@ -24,6 +26,10 @@ void main() {
 	float attenuation =
 			strength_diffuse +
 			strength_specular * 0.2;
-
 	result = vec4(base_color.rgb * attenuation, base_color.a);
+
+	if (selected) {
+		vec4 fresnel_color = fresnel(2, vec4(0.95, 0.55, 0.0, 0.8), N, V);
+		result += fresnel_color;
+	}
 }
