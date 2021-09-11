@@ -56,12 +56,10 @@ protected:
 	template <typename T> static void access_properties(T& ctx);
 private:
 	struct Properties {
-		PropertyL<Size> size;
-		PropertyL<Anchor> anchor;
-		PropertyL<Margin> margin; /// x: left, y: down, z: right, w: top
-		PropertyL<Padding> padding; /// x: left, y: down, z: right, w: top
-		//	Margin margin_{10, 10, 10, 10}; // Theme::default_margin
-		//	Padding padding_{5, 5, 5, 5}; // Theme::default_padding
+		PropertyL1L2LP<Size> size;
+		PropertyLP<Anchor> anchor;
+		PropertyLP<Margin> margin; /// x: left, y: down, z: right, w: top
+		PropertyL1L2LP<Padding> padding; /// x: left, y: down, z: right, w: top
 	} property;
 
 private:
@@ -133,7 +131,7 @@ public:
 	}
 	void size(Size value) noexcept {
 		AccessProperty::manual(*this, property.size, value);
-		flags.set_to(Flag::parentDependOnLayout, value.has_dynamic());
+		flags.set_to(Flag::layoutDependsOnContent, value.has_dynamic());
 	}
 
 	[[nodiscard]] inline Anchor anchor() const noexcept {
@@ -255,7 +253,7 @@ public:
 public:
 	void focus() noexcept;
 	void markRemove() noexcept;
-	void markInvalidLayout() noexcept;
+	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
 	void style(libv::intrusive_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
 
@@ -328,9 +326,7 @@ protected:
 // TODO P2: libv.ui: Remove set/reset from here (?)
 template <typename Property>
 inline void CoreComponent::set(Property& property, typename Property::value_type value) {
-	AccessProperty::driver(property, PropertyDriver::manual);
-	if (value != property())
-		AccessProperty::value(*this, property, std::move(value));
+	AccessProperty::manual(*this, property, std::move(value));
 }
 
 template <typename Property>
@@ -352,8 +348,11 @@ template <typename T>
 void CoreComponent::access_properties(T& ctx) {
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.size; },
-			// Size has to maintain the parentDependOnLayout flags, have to use its setter (but that is manual, so restore to style driver)
-			[](auto& c, auto&& v) { c.size(std::move(v)); AccessProperty::driver(c.property.size, PropertyDriver::style); },
+			[](auto& c, auto&& v) {
+				// Size has to maintain the layoutDependsOnContent flags, have to use custom indirect setter
+				c.flags.set_to(Flag::layoutDependsOnContent, v.has_dynamic());
+				AccessProperty::force_value(c.property.size, std::move(v));
+			},
 			[](const auto& c) { return c.size(); },
 			Size(),
 			pgr::layout, pnm::size,

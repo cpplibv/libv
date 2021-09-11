@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/component/radio_button.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/component/radio_button.hpp>
+#include <libv/ui/component/_idea_radio_button.hpp>
 // libv
 #include <libv/glr/mesh.hpp>
 #include <libv/glr/queue.hpp>

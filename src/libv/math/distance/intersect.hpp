@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f intersect_ray_plane(libv::vec3f ray_point, libv::vec3f ray_dir, libv::vec3f plane_point, libv::vec3f plane_normal) {
+[[nodiscard]] constexpr inline libv::vec3f intersect_ray_plane(libv::vec3f ray_point, libv::vec3f ray_dir, libv::vec3f plane_point, libv::vec3f plane_normal) noexcept {
 	const auto diff = ray_point - plane_point;
 	const auto prod1 = libv::vec::dot(diff, plane_normal);
 	const auto prod2 = libv::vec::dot(ray_dir, plane_normal);

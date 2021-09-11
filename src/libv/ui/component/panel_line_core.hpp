@@ -18,10 +18,10 @@ class CorePanelLine : public CoreBasePanel {
 
 private:
 	struct Properties {
-		PropertyL<AlignHorizontal> align_horizontal;
-		PropertyL<AlignVertical> align_vertical;
-		PropertyL<Orientation> orientation;
-		PropertyL<Spacing> spacing;
+		PropertyL2<AlignHorizontal> align_horizontal;
+		PropertyL2<AlignVertical> align_vertical;
+		PropertyL1L2<Orientation> orientation;
+		PropertyL1L2<Spacing> spacing;
 	} property;
 
 	struct ChildProperties {

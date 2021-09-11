@@ -92,14 +92,12 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != property())
-					AccessProperty::value(component, property, *value_opt);
+				AccessProperty::value(component, property, *value_opt);
 				return;
 			}
 		}
 
-		if (init != property())
-			AccessProperty::value(component, property, std::move(init));
+		AccessProperty::value(component, property, std::move(init));
 	}
 
 	template <typename Access, typename Init>
@@ -121,15 +119,13 @@ public:
 		if (style != nullptr) {
 			const value_type* value_opt = style->get_optional<value_type>(name);
 			if (value_opt) {
-				if (*value_opt != property())
-					AccessProperty::value(component, property, *value_opt);
+				AccessProperty::value(component, property, *value_opt);
 				return;
 			}
 		}
 
 		auto value = init(context);
-		if (value != property())
-			AccessProperty::value(component, property, std::move(value));
+		AccessProperty::value(component, property, std::move(value));
 	}
 
 	template <typename Access, typename Set, typename Get, typename Init>

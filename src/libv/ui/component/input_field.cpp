@@ -41,7 +41,7 @@ private:
 		PropertyB<FocusSelectPolicy> focus_select_policy;
 
 		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
+		PropertyR<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
 
 		PropertyR<Color> caret_color;
@@ -50,10 +50,10 @@ private:
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyL<> align_horizontal;
-		PropertyL<> align_vertical;
-		PropertyL<> font;
-		PropertyL<> font_size;
+		PropertyL2<> align_horizontal;
+		PropertyL2<> align_vertical;
+		PropertyL1L2<> font;
+		PropertyL1L2<> font_size;
 	} property;
 
 private:
@@ -188,7 +188,7 @@ void CoreInputField::onChar(const EventChar& event) {
 
 	caret++;
 	caretStartTime = clock::now();
-	markInvalidLayout();
+	markInvalidLayout(true, false);
 	flagAuto(Flag::pendingRender);
 	fire(EventChange{});
 	fire(EventCaret{});
@@ -202,7 +202,7 @@ void CoreInputField::onKey(const EventKey& event) {
 			caret--;
 		}
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(true, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		return event.stop_propagation();
@@ -214,7 +214,7 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		// On delete caret does not moves
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(true, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		return event.stop_propagation();
@@ -231,7 +231,7 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		caret++;
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(true, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
@@ -262,7 +262,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		const auto mouse_coord = calculate_local_mouse_coord();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(false, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
@@ -271,7 +271,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		const auto mouse_coord = calculate_local_mouse_coord();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(false, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventCaret{});
 		return event.stop_propagation();
@@ -301,7 +301,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(true, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		fire(EventCaret{});
@@ -314,7 +314,7 @@ void CoreInputField::onKey(const EventKey& event) {
 
 		caret = 0;
 		caretStartTime = clock::now();
-		markInvalidLayout();
+		markInvalidLayout(true, false);
 		flagAuto(Flag::pendingRender);
 		fire(EventChange{});
 		fire(EventCaret{});
@@ -567,7 +567,7 @@ const Color& InputField::font_color() const noexcept {
 
 void InputField::text(std::string value) {
 	self().text_.string(std::move(value));
-	self().markInvalidLayout();
+	self().markInvalidLayout(true, false);
 	self().flagAuto(Flag::pendingRender);
 	self().fire(EventChange{});
 }

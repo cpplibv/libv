@@ -37,7 +37,7 @@ libv.ui: Changing dynamic size (text of button) causes flicker (maybe double lay
 libv.ui: Position change of a component does not always updates mouse regions
 libv.ui: Window resize does not always updates mouse regions
 libv.ui: Implement style sheets loading and hot reloading support
-
+libv.ui: Fix and rework layout invalidation and layout properties
 
 
 
@@ -53,6 +53,10 @@ libv.ui: Implement style sheets loading and hot reloading support
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
+
+
+
 
 
 

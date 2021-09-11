@@ -355,6 +355,98 @@ public:
 		ui.add(panel_line);
 
 
+		// -------------------------------------------------------------------------------------------------
+
+//		This was a test case for layout invalidation on style reloading, would be nice to move it into a unit test
+
+//		ui.style("space.hud-bar.mp.iris-lbl") {
+//			align_horizontal = "center",
+//			align_vertical = "center",
+//			font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+//			--background = "color: red";
+//			--background = "color:" .. colors.hud_light_bg_color;
+//			--background = "texture: atlas_ui_slate.png";
+//			--background = "texture: hexagon_metal_0001_diffuse.dds";
+//			--background = "texture: separator_bar_256x16.png";
+//			--background = "texture: stretch_border.png";
+//			background = "border: stretch_border.png";
+//			--size = "200px, 200px",
+//			--size = "300px, 300px",
+//			--size = "100px, 100px",
+//			size = "100px, 100px",
+//			--size = "50px, 50px",
+//			--size = "10pxD, 4pxD",
+//		}
+
+//		libv::ui::PanelLine xp("xp"); {
+//			libv::ui::Label_2 lbl_iris("inner");
+//			lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//			lbl_iris.text("Inner");
+//			xp.add(lbl_iris);
+//		}
+//		xp.size(libv::ui::parse_size_or_throw("100px, 100px"));
+//		mp_bar.add(xp);
+//
+//		libv::ui::PanelLine xp2("xp2"); {
+//			libv::ui::PanelLine xp3("xp3"); {
+//				libv::ui::Label_2 lbl_iris("PX PX Inner");
+//				lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//				lbl_iris.text("PX PX\nInner");
+//				xp3.add(lbl_iris);
+//			}
+//			xp3.size(libv::ui::parse_size_or_throw("100px, 100px"));
+//			xp2.add(xp3);
+//		}
+//		xp2.size(libv::ui::parse_size_or_throw("100px, 100px"));
+//		mp_bar.add(xp2);
+//
+//		libv::ui::PanelLine xp5("xp5"); {
+//			libv::ui::PanelLine xp6("xp6"); {
+//				libv::ui::Label_2 lbl_iris("D  PX Inner");
+//				lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//				lbl_iris.text("D  PX\nInner");
+//				xp6.add(lbl_iris);
+//			}
+//			xp6.size(libv::ui::parse_size_or_throw("100px, 100px"));
+//			xp5.add(xp6);
+//		}
+//		xp5.size(libv::ui::parse_size_or_throw("D, D"));
+//		mp_bar.add(xp5);
+//
+//		libv::ui::PanelLine xp7("xp7"); {
+//			libv::ui::PanelLine xp8("xp8"); {
+//				libv::ui::Label_2 lbl_iris("PX D  Inner");
+//				lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//				lbl_iris.text("PX D \nInner");
+//				xp8.add(lbl_iris);
+//			}
+//			xp8.size(libv::ui::parse_size_or_throw("D, D"));
+//			xp7.add(xp8);
+//		}
+//		xp7.size(libv::ui::parse_size_or_throw("100px, 100px"));
+//		mp_bar.add(xp7);
+//
+//		libv::ui::PanelLine xp9("xp9"); {
+//			libv::ui::PanelLine xp10("xp10"); {
+//				libv::ui::Label_2 lbl_iris("D  D  Inner");
+//				lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//				lbl_iris.text("D  D \nInner");
+//				xp10.add(lbl_iris);
+//			}
+//			xp10.size(libv::ui::parse_size_or_throw("D, D"));
+//			xp9.add(xp10);
+//		}
+//		xp9.size(libv::ui::parse_size_or_throw("D, D"));
+//		mp_bar.add(xp9);
+//
+//		libv::ui::Label_2 lbl_iris("outer");
+//		lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris.text("Outer");
+//		mp_bar.add(lbl_iris);
+
+		// -------------------------------------------------------------------------------------------------
+
+
 //		libv::ui::PanelLine mouse_stack;
 //		foreach_mouse_over([](const auto& arg) {
 //			libv::ui::Label lbl;

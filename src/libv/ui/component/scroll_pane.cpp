@@ -29,7 +29,7 @@ class CoreScrollArea : public CoreComponent {
 
 private:
 	struct Properties {
-		PropertyL<ScrollAreaMode> mode;
+		PropertyL1L2LP<ScrollAreaMode> mode;
 //		PropertyL<libv::vec2f> area_position;
 //		PropertyL<libv::vec2f> area_size;
 	} property;

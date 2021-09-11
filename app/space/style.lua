@@ -79,6 +79,7 @@ ui.style("space.hud-bar.mp.lbl") {
 ui.style("space.hud-bar.mp.iris-lbl") {
 	align_horizontal = "center",
 	align_vertical = "center",
+	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
 	--background = "color: red";
 	--background = "color:" .. colors.hud_light_bg_color;
 	--background = "texture: atlas_ui_slate.png";
@@ -86,7 +87,9 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = "texture: separator_bar_256x16.png";
 	--background = "texture: stretch_border.png";
 	background = "border: stretch_border.png";
-	size = "500px, 500px",
+	--size = "200px, 200px",
+	--size = "100px, 100px",
+	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp-cam.panel") {

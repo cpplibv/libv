@@ -31,10 +31,10 @@ private:
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyL<> align_horizontal;
-		PropertyL<> align_vertical;
-		PropertyL<> font;
-		PropertyL<> font_size;
+		PropertyL2<> align_horizontal;
+		PropertyL2<> align_vertical;
+		PropertyL1L2<> font;
+		PropertyL1L2<> font_size;
 	} property;
 
 //private:
@@ -193,7 +193,7 @@ const Color& Label::font_color() const noexcept {
 
 void Label::text(std::string value) {
 	self().text_.string(std::move(value));
-	self().markInvalidLayout();
+	self().markInvalidLayout(true, false);
 	self().flagAuto(Flag::pendingRender);
 }
 

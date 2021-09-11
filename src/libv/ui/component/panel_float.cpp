@@ -28,9 +28,9 @@ class CorePanelFloat : public CoreBasePanel {
 private:
 	struct Properties {
 		// TODO P5: libv.ui: Implement Snap to edge in float layout
-		PropertyL<SnapToEdge> snap_to_edge;
+		PropertyL1L2<SnapToEdge> snap_to_edge;
 		// TODO P5: libv.ui: Implement Squish in float layout
-		PropertyL<Squish> squish;
+		PropertyL1L2<Squish> squish;
 	} property;
 
 	struct ChildProperties {

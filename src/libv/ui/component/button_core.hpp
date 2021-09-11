@@ -23,16 +23,16 @@ private:
 
 	struct Properties {
 		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
+		PropertyR<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
 
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
 
-		PropertyL<> align_horizontal;
-		PropertyL<> align_vertical;
-		PropertyL<> font;
-		PropertyL<> font_size;
+		PropertyL2<> align_horizontal;
+		PropertyL2<> align_vertical;
+		PropertyL1L2<> font;
+		PropertyL1L2<> font_size;
 	} property;
 
 private:

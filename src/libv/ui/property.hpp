@@ -175,25 +175,68 @@ class Property<void> : public BaseProperty {
 	friend class AccessProperty;
 };
 
+/// PropertyB: Behaviour, no change in layout nor render
 template <typename T = void>
 class PropertyB : public Property<T> {
 public:
 	static constexpr bool invalidate_render = false;
-	static constexpr bool invalidate_layout = false;
+	static constexpr bool invalidate_layout1 = false;
+	static constexpr bool invalidate_layout2 = false;
+	static constexpr bool invalidate_parent_layout = false;
 };
 
 template <typename T = void>
 class PropertyR : public Property<T> {
 public:
 	static constexpr bool invalidate_render = true;
-	static constexpr bool invalidate_layout = false;
+	static constexpr bool invalidate_layout1 = false;
+	static constexpr bool invalidate_layout2 = false;
+	static constexpr bool invalidate_parent_layout = false;
 };
 
 template <typename T = void>
-class PropertyL : public Property<T> {
+class PropertyL1 : public Property<T> {
 public:
 	static constexpr bool invalidate_render = true;
-	static constexpr bool invalidate_layout = true;
+	static constexpr bool invalidate_layout1 = true;
+	static constexpr bool invalidate_layout2 = false;
+	static constexpr bool invalidate_parent_layout = false;
+};
+
+template <typename T = void>
+class PropertyL2 : public Property<T> {
+public:
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout1 = false;
+	static constexpr bool invalidate_layout2 = true;
+	static constexpr bool invalidate_parent_layout = false;
+};
+
+template <typename T = void>
+class PropertyLP : public Property<T> {
+public:
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout1 = false;
+	static constexpr bool invalidate_layout2 = false;
+	static constexpr bool invalidate_parent_layout = true;
+};
+
+template <typename T = void>
+class PropertyL1L2 : public Property<T> {
+public:
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout1 = true;
+	static constexpr bool invalidate_layout2 = true;
+	static constexpr bool invalidate_parent_layout = false;
+};
+
+template <typename T = void>
+class PropertyL1L2LP : public Property<T> {
+public:
+	static constexpr bool invalidate_render = true;
+	static constexpr bool invalidate_layout1 = true;
+	static constexpr bool invalidate_layout2 = true;
+	static constexpr bool invalidate_parent_layout = true;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -209,12 +252,20 @@ struct AccessProperty {
 		property.driver = driver;
 	}
 
+	template <typename P, typename TC>
+	static constexpr inline void force_value(P& property, TC&& value) noexcept {
+		property.value = std::move(value);
+	}
+
 	template <typename Component, typename P, typename TC>
 	static constexpr inline void value(Component& component, P& property, TC&& value) noexcept {
+		if (property.value == value)
+			return;
+
 		property.value = std::move(value);
 		property.changed = true;
-		if (property.invalidate_layout)
-			component.markInvalidLayout();
+		if (property.invalidate_layout1 || property.invalidate_layout2 || property.invalidate_parent_layout)
+			component.markInvalidLayout(property.invalidate_layout1, property.invalidate_parent_layout);
 		if (property.invalidate_render)
 			component.flagAuto(Flag::pendingRender);
 	}
@@ -228,8 +279,8 @@ struct AccessProperty {
 
 		property.driver = driver;
 		property.changed = true;
-		if (property.invalidate_layout)
-			component.markInvalidLayout();
+		if (property.invalidate_layout1 || property.invalidate_layout2 || property.invalidate_parent_layout)
+			component.markInvalidLayout(property.invalidate_layout1, property.invalidate_parent_layout);
 		if (property.invalidate_render)
 			component.flagAuto(Flag::pendingRender);
 	}
@@ -237,8 +288,8 @@ struct AccessProperty {
 	template <typename Component, typename P>
 	static constexpr inline void changed(Component& component, P& property) noexcept {
 		property.changed = true;
-		if (property.invalidate_layout)
-			component.markInvalidLayout();
+		if (property.invalidate_layout1 || property.invalidate_layout2 || property.invalidate_parent_layout)
+			component.markInvalidLayout(property.invalidate_layout1, property.invalidate_parent_layout);
 		if (property.invalidate_render)
 			component.flagAuto(Flag::pendingRender);
 	}
@@ -254,8 +305,8 @@ struct AccessProperty {
 
 		property.value = std::forward<TC>(value);
 		property.changed = true;
-		if (property.invalidate_layout)
-			component.markInvalidLayout();
+		if (property.invalidate_layout1 || property.invalidate_layout2 || property.invalidate_parent_layout)
+			component.markInvalidLayout(property.invalidate_layout1, property.invalidate_parent_layout);
 		if (property.invalidate_render)
 			component.flagAuto(Flag::pendingRender);
 	}

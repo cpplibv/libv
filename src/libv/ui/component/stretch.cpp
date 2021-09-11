@@ -28,7 +28,7 @@ private:
 
 	struct Properties {
 		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
+		PropertyR<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
 	} property;
 
@@ -75,9 +75,8 @@ void CoreStretch::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreStretch::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>() + padding_size();
 
-	return {dynamic_size_image, 0.f};
+	return padding_size3();
 }
 
 void CoreStretch::doRender(Renderer& r) {

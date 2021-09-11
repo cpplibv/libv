@@ -52,14 +52,14 @@ private:
 
 	struct Properties {
 		PropertyR<Color> bar_color;
-		PropertyL<Texture2D_view> bar_image;
+		PropertyL1<Texture2D_view> bar_image;
 		PropertyR<ShaderImage_view> bar_shader;
 
 		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
+		PropertyL1<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
 
-		PropertyL<Orientation> orientation;
+		PropertyL1L2<Orientation> orientation;
 	} property;
 
 private:

@@ -199,43 +199,50 @@ void CoreComponent::markRemove() noexcept {
 	flags.reset(Flag::layout | Flag::render);
 	flagAuto(Flag::pendingDetach);
 
-	// Parent most likely has to be relayouted (could be optimized with another parentDependOnRemove like flag)
-	markInvalidLayout();
+	// Parent has to be relayouted (could be optimized with another parentDependOnRemove like flag)
+	markInvalidLayout(false, true);
 }
 
-void CoreComponent::markInvalidLayout() noexcept {
+void CoreComponent::markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept {
 
 	// Invalidate self
-	flagDirect(Flag::pendingLayoutSelf);
-
 	auto it = this;
+	it->flagDirect(Flag::pendingLayoutSelf);
 
-	// Invalidate the parent containers, so it can recalculate the bounds with the changed properties
-	// If that result in bound changes, the layout logic will recalculate anyone who needs it
+	// Invalidate direct parent, if we might changed our size
+	if (invalidate_parent_layout || (invalidate_layout1 && it->parent_->flags.match_any(Flag::layoutDependsOnContent))) {
+		// If size could have changed, our parent has to re-layout us
+		it = it->parent_;
+		it->flagDirect(Flag::pendingLayoutSelf | Flag::pendingLayoutChild);
+	}
+
 	// Invalidate anyone upstream whom might depend on our layout
-	for (; it->flags.match_any(Flag::parentDependOnLayout);) {
+	// NOTE: Testing self and flag the parent as parent has to re-layout us
+	while (it->flags.match_any(Flag::layoutDependsOnContent)) {
 		it = it->parent_;
 
-		if (it->flags.match_any(Flag::pendingLayoutSelf))
-			return; // Already has invalid self flag, upstream already know what to do HARD STOP
+		if (it->flags.match_any(Flag::pendingLayoutSelf)) {
+			it->flagDirect(Flag::pendingLayoutChild);
+			return; // Already has invalid self flag, upstream already know what to do, make sure child is set, HARD STOP
+		}
 
 		it->flagDirect(Flag::pendingLayoutSelf | Flag::pendingLayoutChild);
 
 		if (it == it->parent_)
-			break; // Reached root
+			return; // Reached root
 	}
 
 	// Indicate that there is an invalid children downstream
-	for (;;) {
+	while (true) {
 		it = it->parent_;
 
 		if (it->flags.match_any(Flag::pendingLayoutChild))
-			break; // Already has invalid child flag, upstream already know what to do
+			return; // Already has invalid child flag, upstream already know what to do
 
 		it->flagDirect(Flag::pendingLayoutChild);
 
 		if (it == it->parent_)
-			break; // Reached root
+			return; // Reached root
 	}
 }
 

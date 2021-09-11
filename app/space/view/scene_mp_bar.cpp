@@ -30,11 +30,9 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar) {
 	mp_bar.style("space.hud-bar.mp.panel");
 
 	{
-		libv::ui::Label_2 lbl_iris("mp-iris-lbl");
+		libv::ui::Label_2 lbl_iris("outer");
 		lbl_iris.style("space.hud-bar.mp.iris-lbl");
-		lbl_iris.text("Iris");
-//		lbl_iris.size(libv::ui::parse_size_or_throw("15pxD, 15pxD"));
-//		lbl_iris.background(libv::ui::Background::color({1, 0, 0, 1}));
+		lbl_iris.text("Outer");
 		mp_bar.add(lbl_iris);
 
 		libv::ui::LabelImage lbl_name("mp-name-lbl");

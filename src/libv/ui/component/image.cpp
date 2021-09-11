@@ -28,7 +28,7 @@ private:
 
 	struct Properties {
 		PropertyR<Color> bg_color;
-		PropertyL<Texture2D_view> bg_image;
+		PropertyL1<Texture2D_view> bg_image;
 		PropertyR<ShaderImage_view> bg_shader;
 	} property;
 

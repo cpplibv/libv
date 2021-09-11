@@ -35,9 +35,9 @@ class CorePanelGrid : public CoreBasePanel {
 
 private:
 	struct Properties {
-		PropertyL<ColumnCount> column_count;
-		PropertyL<Orientation2> orientation2;
-		PropertyL<Spacing2> spacing2;
+		PropertyL1L2<ColumnCount> column_count;
+		PropertyL1L2<Orientation2> orientation2;
+		PropertyL1L2<Spacing2> spacing2;
 	} property;
 
 	struct ChildProperties {

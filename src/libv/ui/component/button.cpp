@@ -196,7 +196,7 @@ const Color& Button::font_color() const noexcept {
 
 void Button::text(std::string value) {
 	self().text_.string(std::move(value));
-	self().markInvalidLayout();
+	self().markInvalidLayout(true, false);
 	self().flagAuto(Flag::pendingRender);
 }
 
