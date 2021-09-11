@@ -90,9 +90,10 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 
 	controls.feature_action<app::SpaceCanvas>("space.add_fleet_to_selection", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
-		ctx.playout.queue<app::CommandFleetSelectAdd>(
-				*fleet_id
-		);
+		if (fleet_id)
+			ctx.playout.queue<app::CommandFleetSelectAdd>(
+					*fleet_id
+			);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
