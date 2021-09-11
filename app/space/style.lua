@@ -84,10 +84,12 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = "color:" .. colors.hud_light_bg_color;
 	--background = "texture: atlas_ui_slate.png";
 	--background = "texture: hexagon_metal_0001_diffuse.dds";
+	--background = "pattern: hexagon_metal_0001_diffuse.dds";
 	--background = "texture: separator_bar_256x16.png";
 	--background = "texture: stretch_border.png";
-	background = "border: stretch_border.png";
-	--size = "200px, 200px",
+	--background = "border: stretch_border.png";
+	background = "pattern: stretch_border.png";
+	size = "200px, 200px",
 	--size = "100px, 100px",
 	size = "10pxD, 4pxD",
 }

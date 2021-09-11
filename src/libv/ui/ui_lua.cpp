@@ -234,11 +234,17 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 
 		//	border             (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	pattern            (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "pattern:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::pattern({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
 		//	pattern            (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	padding_pattern    (Color color, Texture2D_view texture)
 		//	padding_pattern    (Color color, Texture2D_view texture, ShaderImage_view shader)
 		//	gradient_linear    (std::vector<GradientPoint> points)
 		//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
+
+		// TODO P1: last resort: try parse it as color or texture
 	}
 
 //	UI& ui;

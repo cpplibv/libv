@@ -303,12 +303,11 @@ public:
 
 private:
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+		(void) padding;
 
-//		(void) r;
-//		(void) pos;
-//		(void) size;
-//		(void) padding;
+		const auto pattern_size = texture->size().cast<float>();
 
+		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, color, texture, shader);
 	}
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
@@ -332,16 +331,14 @@ public:
 
 private:
 	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-
-//		(void) r;
-//		(void) pos;
-//		(void) size;
-//		(void) padding;
-
 //		9 border table except the middle
 //		in the middle use texture as pattern but leave out non padding area
 
 //		Required by reference picture ref_ui_bg_padding_pattern
+
+//		const auto pattern_size = texture->size().cast<float>();
+//
+//		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, color, texture, shader);
 	}
 
 	virtual std::string to_string() const override {

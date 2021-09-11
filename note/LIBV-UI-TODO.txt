@@ -63,6 +63,9 @@ libv.ui: Fix and rework layout invalidation and layout properties
 
 
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
+	libv.ui: background to_string's: "Not implemented yet";
+	libv.ui: background bring back size() query, not used on background, but for foreground it will be
+
 	background
 		anchor point
 		repeat, stretch, flexpoint
