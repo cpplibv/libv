@@ -307,7 +307,7 @@ private:
 
 		const auto pattern_size = texture->size().cast<float>();
 
-		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, color, texture, shader);
+		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, {0, 0, 1, 1}, color, texture, shader);
 	}
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
@@ -338,7 +338,7 @@ private:
 
 //		const auto pattern_size = texture->size().cast<float>();
 //
-//		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, color, texture, shader);
+//		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, {0, 0, 1, 1}, color, texture, shader);
 	}
 
 	virtual std::string to_string() const override {

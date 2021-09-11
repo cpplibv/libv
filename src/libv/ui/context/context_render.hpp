@@ -101,6 +101,7 @@ public: // --- High level ---
 	void quad(libv::vec2f pos, libv::vec2f size, libv::vec4f color, const ShaderQuad_view& shader);
 	void text(libv::vec2f pos, class TextLayout& text, libv::vec4f color, const Font2D_view& font, const ShaderFont_view& shader);
 	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader);
+	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader);
 
 public: // --- Component level ---
 	[[nodiscard]] Renderer enter(const Component& child);

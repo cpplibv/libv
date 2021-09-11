@@ -15,12 +15,13 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-constexpr auto texture_channel0    = libv::gl::TextureChannel{0};
+constexpr auto texture_channel0        = libv::gl::TextureChannel{0};
 
-constexpr auto attribute_position  = libv::glr::Attribute<0, libv::vec3f>{};
-constexpr auto attribute_normal    = libv::glr::Attribute<1, libv::vec3f>{};
-constexpr auto attribute_color0    = libv::glr::Attribute<2, libv::vec4f>{};
-constexpr auto attribute_texture0  = libv::glr::Attribute<8, libv::vec2f>{};
+constexpr auto attribute_position      = libv::glr::Attribute<0, libv::vec3f>{};
+constexpr auto attribute_normal        = libv::glr::Attribute<1, libv::vec3f>{};
+constexpr auto attribute_color0        = libv::glr::Attribute<2, libv::vec4f>{};
+constexpr auto attribute_texture0      = libv::glr::Attribute<8, libv::vec2f>{};
+constexpr auto attribute_texture0_tile = libv::glr::Attribute<9, libv::vec4f>{};
 
 inline const libv::glr::UniformBlockBinding uniform_block_UIInfo{0, "UIInfo"};
 

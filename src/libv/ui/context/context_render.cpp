@@ -57,6 +57,7 @@ public:
 	std::vector<libv::vec3f> vtx_positions;
 	std::vector<libv::vec4f> vtx_color0s;
 	std::vector<libv::vec2f> vtx_texture0s;
+	std::vector<libv::vec4f> vtx_texture0_tiles;
 	std::vector<uint32_t> vtx_indices;
 
 	struct UniformLayoutUIInfo {
@@ -177,16 +178,19 @@ public:
 			auto position = mesh_stream.attribute(attribute_position);
 			auto color0 = mesh_stream.attribute(attribute_color0);
 			auto texture0 = mesh_stream.attribute(attribute_texture0);
+			auto texture0tile = mesh_stream.attribute(attribute_texture0_tile);
 			auto index = mesh_stream.index();
 
 			position.set_from_range(vtx_positions);
 			color0.set_from_range(vtx_color0s);
 			texture0.set_from_range(vtx_texture0s);
+			texture0tile.set_from_range(vtx_texture0_tiles);
 			index.set_from_range(vtx_indices);
 
 			vtx_positions.clear();
 			vtx_color0s.clear();
 			vtx_texture0s.clear();
+			vtx_texture0_tiles.clear();
 			vtx_indices.clear();
 		}
 
@@ -211,7 +215,7 @@ public:
 		});
 	}
 
-	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color, libv::glr::Texture texture, libv::glr::Program shader,
+	void texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, libv::glr::Texture texture, libv::glr::Program shader,
 			libv::glr::Queue& glr,
 			const Component& current_component,
 			libv::vec2f clip_pos,
@@ -316,6 +320,7 @@ void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader
 	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
 
 	assert(context.vtx_positions.size() == context.vtx_texture0s.size());
+	assert(context.vtx_positions.size() == context.vtx_texture0_tiles.size());
 	assert(context.vtx_positions.size() == context.vtx_color0s.size());
 	assert(context.vtx_positions.size() == context.ll_base_vertex + context.ll_num_vertex);
 	assert(context.vtx_indices.size() == context.ll_base_index + context.ll_num_index);
@@ -356,6 +361,7 @@ void Renderer::index_strip(std::initializer_list<const uint32_t> indices) {
 void Renderer::vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f color) {
 	context.vtx_positions.emplace_back(pos);
 	context.vtx_texture0s.emplace_back(uv);
+	context.vtx_texture0_tiles.emplace_back(0, 0, 1, 1);
 	context.vtx_color0s.emplace_back(color);
 	context.ll_num_vertex++;
 }
@@ -396,7 +402,7 @@ void Renderer::vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f color) {
 
 // --- High level ----------------------------------------------------------------------------------
 
-void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color, libv::glr::Texture texture, libv::glr::Program shader,
+void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, libv::glr::Texture texture, libv::glr::Program shader,
 		libv::glr::Queue& glr,
 		const Component& current_component,
 		libv::vec2f clip_pos,
@@ -447,6 +453,8 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 	vtx_texture0s.emplace_back(uv11.x, uv11.y);
 	vtx_texture0s.emplace_back(uv00.x, uv11.y);
 
+	vtx_texture0_tiles.insert(vtx_texture0_tiles.end(), num_vertex, tile);
+
 	vtx_color0s.insert(vtx_color0s.end(), num_vertex, color);
 
 	vtx_indices.emplace_back(0);
@@ -478,13 +486,14 @@ void ImplContextRender::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2
 	task.uniform_block[layout_UIInfo.time_frame] = current_time;
 
 	assert(vtx_positions.size() == vtx_texture0s.size());
+	assert(vtx_positions.size() == vtx_texture0_tiles.size());
 	assert(vtx_positions.size() == vtx_color0s.size());
 	assert(base_vertex + num_vertex == vtx_positions.size());
 	assert(base_index + num_index == vtx_indices.size());
 }
 
 void Renderer::quad(libv::vec2f pos, libv::vec2f size, libv::vec4f color, const ShaderQuad_view& shader) {
-	context.texture_2D(pos, size, {0, 0}, {1, 1}, color, context.white_zero_texture, shader->base_ref(),
+	context.texture_2D(pos, size, {0, 0}, {1, 1}, {0, 0, 1, 1}, color, context.white_zero_texture, shader->base_ref(),
 			glr, current_component, clip_pos, clip_size);
 }
 
@@ -498,6 +507,7 @@ void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const
 
 	context.vtx_positions.insert(context.vtx_positions.end(), vd.positions.begin(), vd.positions.end());
 	context.vtx_texture0s.insert(context.vtx_texture0s.end(), vd.texture0s.begin(), vd.texture0s.end());
+	context.vtx_texture0_tiles.insert(context.vtx_texture0_tiles.end(), num_vertex, libv::vec4f(0, 0, 1, 1));
 	context.vtx_color0s.insert(context.vtx_color0s.end(), num_vertex, color);
 	context.vtx_indices.insert(context.vtx_indices.end(), vd.indices.begin(), vd.indices.end());
 
@@ -530,13 +540,19 @@ void Renderer::text(libv::vec2f pos, TextLayout& text_, libv::vec4f color, const
 	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
 
 	assert(context.vtx_positions.size() == context.vtx_texture0s.size());
+	assert(context.vtx_positions.size() == context.vtx_texture0_tiles.size());
 	assert(context.vtx_positions.size() == context.vtx_color0s.size());
 	assert(base_vertex + num_vertex == context.vtx_positions.size());
 	assert(base_index + num_index == context.vtx_indices.size());
 }
 
 void Renderer::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader) {
-	context.texture_2D(pos, size, uv00, uv11, color, texture->texture().base_ref(), shader->base_ref(),
+	context.texture_2D(pos, size, uv00, uv11, {0, 0, 1, 1}, color, texture->texture().base_ref(), shader->base_ref(),
+			glr, current_component, clip_pos, clip_size);
+}
+
+void Renderer::texture_2D(libv::vec2f pos, libv::vec2f size, libv::vec2f uv00, libv::vec2f uv11, libv::vec4f tile, libv::vec4f color, const Texture2D_view& texture, const ShaderImage_view& shader) {
+	context.texture_2D(pos, size, uv00, uv11, tile, color, texture->texture().base_ref(), shader->base_ref(),
 			glr, current_component, clip_pos, clip_size);
 }
 
