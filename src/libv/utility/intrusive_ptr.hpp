@@ -11,6 +11,31 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+/// Usage:
+///
+///	Forward declaration:
+///		class Style;
+///		void intrusive_ptr_add_ref(Style*);
+///		void intrusive_ptr_release(Style*);
+///
+///	Declaration:
+///		class Style {
+///			int32_t ref_count = 0;
+///			friend void intrusive_ptr_add_ref(Style*);
+///			friend void intrusive_ptr_release(Style*);
+///			// ... Actual members
+/// 	};
+///
+///	Implementation:
+///		void intrusive_ptr_add_ref(Style* style) {
+///			++style->ref_count;
+///		}
+///
+///		void intrusive_ptr_release(Style* style) {
+///			if (--style->ref_count == 0)
+///				delete style;
+///		}
+
 template <typename T>
 using intrusive_ptr = boost::intrusive_ptr<T>;
 

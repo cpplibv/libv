@@ -58,6 +58,23 @@ libv.ui: Implement style sheets loading and hot reloading support
 
 
 
+libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
+	background
+		anchor point
+		repeat, stretch, flexpoint
+
+	libv.ui.render:	bg.render(pos, size, ?padding, ?...)
+			render background plane
+			render borders (outer shadow/edge)
+			render component
+			render borders (inner shadow/edge)
+
+	libv.ui: In every component background should not contribute to layout1 size
+
+
+
+
+
 
 libv.ui: Alignment justify should not 'start' at top left but from the orientation's starting point (therefore AlignVertical rate 1.0 for justifieds are incorrect)
 
@@ -118,19 +135,6 @@ libv.ui: static_component system (lite)
 		libv.ui.property: complex composite component would result in "nested" property sets
 		libv.ui.property: property system interaction with static_component system
 		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
-
-libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
-	background
-		anchor point
-		repeat, stretch, flexpoint
-
-	libv.ui.render:	bg.render(pos, size, ?padding, ?...)
-			render background plane
-			render borders (outer shadow/edge)
-			render component
-			render borders (inner shadow/edge)
-
-	libv.ui: In every component background should not contribute to layout1 size
 
 libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
 		A simple const void* that can be passed to any function that can produce a event

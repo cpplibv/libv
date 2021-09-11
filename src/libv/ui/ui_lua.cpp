@@ -6,6 +6,7 @@
 #include <libv/lua/lua.hpp>
 #include <libv/parse/bool.hpp>
 #include <libv/parse/color.hpp>
+#include <libv/utility/trim.hpp>
 //#include <libv/algo/slice.hpp>
 // std
 #include <memory>
@@ -185,20 +186,74 @@ namespace ui {
 //	return libv::lua::transform(libv::lua::string_parse(std::move(parse_func)), std::forward<F>(func));
 //}
 
-std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& object); // {
-////	UI& ui;
-////
-////	if (not is_string())
-////		return;
-////
-////	pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); });
-////	return pattern_protocol("color ", [&ui](const auto path){ return ui.context().texture2D(path); });
-////	return pattern_protocol("stretch ", [&ui](const auto path){ return ui.context().texture2D(path); });
-////	pattern_protocol("color ", ),
-////	pattern_protocol("stretch ", ),
+std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& object) {
+
+	if (object.get_type() == sol::type::string) {
+
+		const auto chop_prefix = [](std::string_view str, std::string_view prefix) -> std::optional<std::string_view> {
+			if (!str.starts_with(prefix))
+				return std::nullopt;
+
+			str.remove_prefix(prefix.size());
+			return libv::trim(str);
+		};
+
+		auto str = libv::trim(object.as<std::string_view>());
+
+		//	none               ()
+		if (str == "none")
+			return libv::ui::Background::none();
+
+		//	color              (Color color)
+		if (const auto value = chop_prefix(str, "color:")) {
+			const auto color = libv::parse::parse_color_optional(*value);
+			if (!color)
+				return std::nullopt;
+
+			return libv::ui::Background::color(*color);
+		}
+
+		//	color              (Color color, ShaderQuad_view shader)
+
+		//	texture            (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "texture:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
+
+		//	texture            (Color color, Texture2D_view texture, ShaderImage_view shader)
+
+		//	border             (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "border:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
+
+		// TODO P1: Implement the rest of the background types
+		// TODO P1: Implement lua table based background loading, rely on other convert functions to do so, generalize convert function API for this
+
+		//	border             (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	pattern            (Color color, Texture2D_view texture)
+		//	pattern            (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	padding_pattern    (Color color, Texture2D_view texture)
+		//	padding_pattern    (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	gradient_linear    (std::vector<GradientPoint> points)
+		//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
+	}
+
+//	UI& ui;
 //
-//	return std::nullopt;
-//}
+//	if (not is_string())
+//		return;
+//
+//	pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); });
+//	return pattern_protocol("color ", [&ui](const auto path){ return ui.context().texture2D(path); });
+//	return pattern_protocol("stretch ", [&ui](const auto path){ return ui.context().texture2D(path); });
+//	pattern_protocol("color ", ),
+//	pattern_protocol("stretch ", ),
+
+	return std::nullopt;
+}
 
 std::optional<PropertyDynamic> convert_color(UI&, const sol::object& object) {
 
@@ -390,7 +445,7 @@ public:
 		property_loaders.emplace(pnm::anchor, convert_string_parse(&libv::ui::parse_anchor_optional));
 		//		property_loaders.emplace(pnm::area_position, _______);
 		//		property_loaders.emplace(pnm::area_size, _______);
-//		property_loaders.emplace(pnm::background, convert_background);
+		property_loaders.emplace(pnm::background, convert_background);
 		property_loaders.emplace(pnm::bar_color, convert_color);
 		property_loaders.emplace(pnm::bar_image, convert_image);
 //		property_loaders.emplace(pnm::bar_shader, _______);

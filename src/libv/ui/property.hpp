@@ -15,6 +15,7 @@
 #include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/background.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/font_2D.hpp>
@@ -53,6 +54,7 @@ using PropertyDynamic = std::variant<
 		AlignHorizontal,
 		AlignVertical,
 		Anchor,
+		Background,
 		Color,
 		ColumnCount,
 		Font2D_view,
@@ -83,6 +85,7 @@ static constexpr std::string_view align_vertical = "align_vertical";
 static constexpr std::string_view anchor = "anchor";
 static constexpr std::string_view area_position = "area_position";
 static constexpr std::string_view area_size = "area_size";
+static constexpr std::string_view background = "background";
 static constexpr std::string_view bar_color = "bar_color";
 static constexpr std::string_view bar_image = "bar_image";
 static constexpr std::string_view bar_shader = "bar_shader";

@@ -7,6 +7,7 @@
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label_image.hpp>
+#include <libv/ui/component/label_2.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/nexus.hpp>
@@ -29,6 +30,13 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar) {
 	mp_bar.style("space.hud-bar.mp.panel");
 
 	{
+		libv::ui::Label_2 lbl_iris("mp-iris-lbl");
+		lbl_iris.style("space.hud-bar.mp.iris-lbl");
+		lbl_iris.text("Iris");
+//		lbl_iris.size(libv::ui::parse_size_or_throw("15pxD, 15pxD"));
+//		lbl_iris.background(libv::ui::Background::color({1, 0, 0, 1}));
+		mp_bar.add(lbl_iris);
+
 		libv::ui::LabelImage lbl_name("mp-name-lbl");
 		lbl_name.style("space.hud-bar.mp.lbl");
 		lbl_name.text("Name:");

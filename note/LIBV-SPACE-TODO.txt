@@ -77,19 +77,10 @@ place.it:
 	libv.sys: Move clipboard text to it from libv.ui.context_ui
 
 
-git:
-	Change the author of these commits:
-	* 2021-08-27 app.space: Implement fleet movement queue  Császár Mátyás [Vader]
-	* 2021-08-17 review - app.space: Command arrow chains  Császár Mátyás [Vader]
-    * 2021-08-17 review - app.space: Progress on command arrow animation offset  Császár Mátyás [Vader]
-    * 2021-08-16 review - app.space: Implement a more complete test arrow set  Császár Mátyás [Vader]
-    * 2021-08-16 review - app.space: Revive the original debug arrow spiral  Császár Mátyás [Vader]
-    * 2021-08-15 review - app.space: Add support for command arrow 'intent' (color) specification  Császár Mátyás [Vader]
-
-
 app.space: Simulation time control
 	app.space: Pause, Unpause (It will be a good practise for timers and controls)
 	app.space: Speed x1 x2 x4
+	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
 
 app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 

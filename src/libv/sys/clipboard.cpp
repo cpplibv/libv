@@ -1,7 +1,5 @@
 // Project: libv.sys, File: src/libv/sys/clipboard.cpp, Author: Császár Mátyás [Vader]
 
-#pragma once
-
 // hpp
 #include <libv/sys/clipboard.hpp>
 // ext

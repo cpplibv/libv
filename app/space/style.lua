@@ -76,6 +76,19 @@ ui.style("space.hud-bar.mp.lbl") {
 	size = "10pxD, 4pxD",
 }
 
+ui.style("space.hud-bar.mp.iris-lbl") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	--background = "color: red";
+	--background = "color:" .. colors.hud_light_bg_color;
+	--background = "texture: atlas_ui_slate.png";
+	--background = "texture: hexagon_metal_0001_diffuse.dds";
+	--background = "texture: separator_bar_256x16.png";
+	--background = "texture: stretch_border.png";
+	background = "border: stretch_border.png";
+	size = "500px, 500px",
+}
+
 ui.style("space.hud-bar.mp-cam.panel") {
 	anchor = "center_right",
 	orientation = "down",
