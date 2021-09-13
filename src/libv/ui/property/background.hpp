@@ -42,9 +42,7 @@ public:
 	[[nodiscard]] libv::vec2i size() const noexcept;
 
 public:
-	[[nodiscard]] friend inline bool operator==(const Background& lhs, const Background& rhs) noexcept {
-		return lhs.fragment == rhs.fragment;
-	}
+	[[nodiscard]] friend bool operator==(const Background& lhs, const Background& rhs) noexcept;
 	[[nodiscard]] friend inline bool operator!=(const Background& lhs, const Background& rhs) noexcept {
 		return !(lhs == rhs);
 	}

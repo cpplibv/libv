@@ -38,7 +38,8 @@ libv.ui: Position change of a component does not always updates mouse regions
 libv.ui: Window resize does not always updates mouse regions
 libv.ui: Implement style sheets loading and hot reloading support
 libv.ui: Fix and rework layout invalidation and layout properties
-
+libv.ui: background bring back size() query, not used on background, but for foreground it will be
+libv.ui: In every component background should not contribute to layout1 size
 
 
 
@@ -56,36 +57,61 @@ libv.ui: Fix and rework layout invalidation and layout properties
 
 
 
-libv.ui: Component Image could have a foreground fragment too (layout 1 should switch to that size)
-implement getInnerContentBounds for every component
-	DONE: label
-	DONE: button
-	DONE: input_field
+
+
+
 
 
 libv.ui: Padding pattern support for internal padding
 
 
+
+
+
+
+
+
+
+libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
+	test time values at first frame
+
+libv.ui: static_component system (lite)
+	Check on the _pastebin/legacy codes for this one
+
+	libv.ui: Restructure: property context creation stuffy simplification
+			maybe CRTP base for core components
+			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
+
+	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
+	libv.ui: Composite component style / property system
+		libv.ui.property: complex composite component would result in "nested" property sets
+		libv.ui.property: property system interaction with static_component system
+		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
+
+libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
+		A simple const void* that can be passed to any function that can produce a event
+			(or in case of a stack a ui global stack of const void*)
+		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
+		if (label.ui().event_initiator_check_loop(&shared_state))
+		if (event.check_initiator_loop(&shared_state))
+			return;
+		Implement in: app.theme: control.slider.event().change
+
+libv.ui: Component Image, CheckBox, Slider(for bar) could have a foreground fragment too (layout 1 should switch to that size)
+
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
 	libv.ui: background to_string's: "Not implemented yet";
-	libv.ui: background bring back size() query, not used on background, but for foreground it will be
 
-	background
-		anchor point
-		repeat, stretch, flexpoint
+	libv.ui: Iplement getInnerContentBounds for every component
+		DONE: label
+		DONE: button
+		DONE: input_field
 
-	libv.ui.render:	bg.render(pos, size, ?padding, ?...)
+	idea: Multiple fragment interaction?
 			render background plane
 			render borders (outer shadow/edge)
-			render component
+			render content
 			render borders (inner shadow/edge)
-
-	libv.ui: In every component background should not contribute to layout1 size
-
-
-
-
-
 
 libv.ui: Alignment justify should not 'start' at top left but from the orientation's starting point (therefore AlignVertical rate 1.0 for justifieds are incorrect)
 
@@ -134,28 +160,6 @@ libv.ui: Margin, Padding, Spacing and Alignment gaps
 				Not part of the mouse region
 				Does collapses with neighboring Margin, Container spacing and container justify gap
 
-libv.ui: static_component system (lite)
-	Check on the _pastebin/legacy codes for this one
-
-	libv.ui: Restructure: property context creation stuffy simplification
-			maybe CRTP base for core components
-			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
-	libv.ui: Composite component style / property system
-		libv.ui.property: complex composite component would result in "nested" property sets
-		libv.ui.property: property system interaction with static_component system
-		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
-
-libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
-		A simple const void* that can be passed to any function that can produce a event
-			(or in case of a stack a ui global stack of const void*)
-		Not a 100% fool prof, but it 99.9% will do just fine, in case if its not, custom logic will do
-		if (label.ui().event_initiator_check_loop(&shared_state))
-		if (event.check_initiator_loop(&shared_state))
-			return;
-		Implement in: app.theme: control.slider.event().change
-
 libv.ui: Restructure: contexts, centralize and unify them, their construction, their referencing, improve naming (event -> comm)
 		organize which is public (like context_state), which is privet (like context_event)
 
@@ -190,9 +194,7 @@ libv.ui: UI level storage system
 
 libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadcast
 		should be accessible via UI too
-
-libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
-	test time values at first frame
+		! There is one now for style script tracking, make it more ui-wise
 
 libv.ui: adopt libv.rev's Shader and ShaderLoader
 
@@ -203,8 +205,8 @@ libv.ui: Fix layout invalidation up propagation possibility (remove access to fl
 		| Also this logic might punches through floatRegion "layout barriers" that I dont think it should, or is that not a barrier?
 
 
---- Theme ---
 
+--- Theme ---
 
 
 

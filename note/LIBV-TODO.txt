@@ -615,9 +615,6 @@ libv.sys: Clipboard text (light wrapper above clip:: + deal with windows line en
 
 
 
-read: https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/
-
-
 ext: adopt https://github.com/olegpublicprofile/stdfwd
 ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
 
@@ -723,7 +720,6 @@ place.it:
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
-	opengl.knowledge: 3dgep.com - Extensive guides from math to shaders to game engine technuqies
 	opengl.knowledge: docs.gl - Reference documentations
 	opengl.knowledge: learnopengl.com - Great tutorial site
 	opengl.knowledge: ogldev.org - Great tutorial site
@@ -735,6 +731,7 @@ place.it:
 	reference.ui: Amazing Game UI reference page: gameuidatabase.com
 
 	cpp.chrono: zoned_now = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
+	cpp.modules: A solid read: https://devblogs.microsoft.com/cppblog/moving-a-project-to-cpp-named-modules/
 	cpp.modules: g++ -fmodules-ts -std=c++20 -c -x c++-system-header iostream
 	cpp.modules: https://blog.feabhas.com/2021/08/c20-modules-with-gcc11/
 	cpp: cppinclude is a program to analyze file includes https://github.com/cppinclude/cppinclude
@@ -1620,14 +1617,15 @@ libv: generic general container storage
 
 --- NOTE -------------------------------------------------------------------------------------------
 
-cpp: C++ has a nice nested exception facility: std::throw_with_nested(std::runtime_error("Outer operation")); and std::rethrow_if_nested(e);
-cpp: hash_maps: https://martin.ankerl.com/2019/04/01/hashmap-benchmarks-01-overview/
 app: for apps you can cd next to the binary to solve any relative path issue (command line arguments should be handled beforehand)
 bash: To repleace first line in files: sed -i '1s/.*/\/\/ Created on 2020.05.01. 10:30, Author: Vader/' *
 clion: -G"Ninja" -DCMAKE_BUILD_TYPE=RELEASE -DSKIP_EXTERNAL_CONFIGURES=FALSE -DFORCE_COLORED_OUTPUT=TRUE
+cpp: C++ has a nice nested exception facility: std::throw_with_nested(std::runtime_error("Outer operation")); and std::rethrow_if_nested(e);
+cpp: hash_maps: https://martin.ankerl.com/2019/04/01/hashmap-benchmarks-01-overview/
+git: Commit count up to a revision: git rev-list --count HEAD
 ninja: CLICOLOR_FORCE=1 env var to have colored output
-UX: Upon first run avoid full-screening a desktop app by default, this makes it less scary, less intrusive and leave the clint more in control
 UX: For windows position history: Remember not just position and size but if it was in maximized state or not (clion fucked it up, and it show a pixel line on a secondary monitor)
+UX: Upon first run avoid full-screening a desktop app by default, this makes it less scary, less intrusive and leave the clint more in control
 
 --- INFO -------------------------------------------------------------------------------------------
 

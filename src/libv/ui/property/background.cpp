@@ -31,7 +31,8 @@ class BaseBackground {
 public:
 	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
 	[[nodiscard]] virtual std::string to_string() const = 0;
-	[[nodiscard]] virtual libv::vec2i size() const noexcept { return {}; }; // TODO P1: Make it =0
+	[[nodiscard]] virtual libv::vec2i size() const noexcept = 0;
+	[[nodiscard]] virtual bool equal_to(const BaseBackground& other) const noexcept = 0;
 
 public:
 	virtual ~BaseBackground() = default;
@@ -56,8 +57,19 @@ private:
 		(void) size;
 		(void) component;
 	}
+
 	virtual std::string to_string() const override {
 		return "none";
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return libv::vec2i{0, 0};
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundNone&>(other_base);
+		(void) other;
+		return true;
 	}
 };
 
@@ -79,8 +91,18 @@ private:
 
 		r.quad(pos, size, color, shader);
 	}
+
 	virtual std::string to_string() const override {
 		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return libv::vec2i{0, 0};
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundColor&>(other_base);
+		return color == other.color && shader == other.shader;
 	}
 };
 
@@ -104,9 +126,19 @@ private:
 
 		r.texture_2D(pos, size, {0, 0}, {1, 1}, color, texture, shader);
 	}
+
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
 		return "Not implemented yet"; // !!!
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return texture->size();
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundTexture&>(other_base);
+		return color == other.color && texture == other.texture && shader == other.shader;
 	}
 };
 
@@ -181,9 +213,19 @@ private:
 
 		r.end(texture, shader);
 	}
+
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
 		return "Not implemented yet"; // !!!
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return texture->size();
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundBorder&>(other_base);
+		return color == other.color && texture == other.texture && shader == other.shader;
 	}
 };
 
@@ -209,9 +251,19 @@ private:
 
 		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, {0, 0, 1, 1}, color, texture, shader);
 	}
+
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
 		return "Not implemented yet"; // !!!
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return texture->size();
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundPattern&>(other_base);
+		return color == other.color && texture == other.texture && shader == other.shader;
 	}
 };
 
@@ -297,6 +349,15 @@ private:
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
 		return "Not implemented yet"; // !!!
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return texture->size();
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundPaddingPattern&>(other_base);
+		return color == other.color && texture == other.texture && shader == other.shader;
 	}
 };
 
@@ -414,6 +475,18 @@ std::string Background::to_string() const {
 
 libv::vec2i Background::size() const noexcept {
 	return fragment->size();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+[[nodiscard]] bool operator==(const Background& lhs, const Background& rhs) noexcept {
+	if (lhs.fragment == nullptr || rhs.fragment == nullptr)
+		return false;
+
+	if (typeid(*lhs.fragment) != typeid(*rhs.fragment))
+		return false;
+
+	return lhs.fragment->equal_to(*rhs.fragment);
 }
 
 // -------------------------------------------------------------------------------------------------
