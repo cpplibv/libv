@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/ui/fwd.hpp>
 // libv
 #include <libv/math/vec_fwd.hpp>
 #include <libv/utility/intrusive_ptr.hpp>
@@ -35,7 +37,7 @@ public:
 	explicit inline Background(intrusive_ptr<libv::ui::BaseBackground> fragment) : fragment(std::move(fragment)) {}
 
 public:
-	void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) const;
+	void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const;
 	[[nodiscard]] std::string to_string() const;
 
 public:

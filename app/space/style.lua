@@ -66,7 +66,7 @@ ui.style("space.hud-bar.mp.input") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	bg_color = colors.hud_light_bg_color,
-	size = "10pxD, 1r",
+	size = "10pxD, D1r",
 }
 
 ui.style("space.hud-bar.mp.lbl") {
@@ -88,9 +88,27 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = "texture: separator_bar_256x16.png";
 	--background = "texture: stretch_border.png";
 	--background = "border: stretch_border.png";
-	background = "pattern: stretch_border.png";
-	size = "200px, 200px",
+	--background = "pattern: stretch_border.png";
+	--background = "padding_pattern: padding_stripes.png";
+	background = "padding_pattern: stripes.png";
+
+	padding = { 40, 7 },
+	--padding = {  0, 7 },
+
+	--size = "200px, 200px",
 	--size = "100px, 100px",
+	--size = "6px D 1r, 10px D",
+	--size = "6px D 1r, 16px",
+	--size = "6px D 1r, 19px",
+
+	--size = "6px D 1r, 1px D",
+	--size = "6px D 1r, 2px D",
+	--size = "6px D 1r, 4px D",
+	--size = "6px D 1r, 8px D",
+
+	--size = "6px D 1r, D",
+	--size = "6px D 1r, 20px",
+	--size = "4pxD, D",
 	size = "10pxD, 4pxD",
 }
 

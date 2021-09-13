@@ -357,6 +357,88 @@ public:
 
 		// -------------------------------------------------------------------------------------------------
 
+//		This was a test case for padding_pattern background
+
+//		ui.style("space.hud-bar.mp.panel") {
+//			anchor = "top_center",
+//					orientation = "right",
+//					size = "D, D",
+//					spacing = 5,
+//					margin = 5,
+//
+//					orientation = "down",
+//					align_horizontal = "center",
+//					align_vertical = "center",
+//		}
+//
+//		ui.style("space.hud-bar.mp.iris-lbl") {
+//			align_horizontal = "center",
+//					--align_horizontal = "left",
+//					--align_horizontal = "right",
+//					--align_horizontal = "justify",
+//					--align_horizontal = "justify-all",
+//					align_vertical = "center",
+//					--align_vertical = "bottom",
+//					--align_vertical = "top",
+//					--align_vertical = "justify",
+//					--align_vertical = "justify-all",
+//					font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+//					--background = "color: red";
+//			--background = "color:" .. colors.hud_light_bg_color;
+//			--background = "texture: atlas_ui_slate.png";
+//			--background = "texture: hexagon_metal_0001_diffuse.dds";
+//			--background = "pattern: hexagon_metal_0001_diffuse.dds";
+//			--background = "texture: separator_bar_256x16.png";
+//			--background = "texture: stretch_border.png";
+//			--background = "border: stretch_border.png";
+//			--background = "pattern: stretch_border.png";
+//			--background = "padding_pattern: padding_stripes.png";
+//			background = "padding_pattern: stripes.png";
+//			--size = "200px, 200px",
+//					--size = "100px, 100px",
+//					--padding = { 40, 7 },
+//					--padding = {  0, 7 },
+//					--size = "6px D 1r, 10px D",
+//					--size = "6px D 1r, 16px",
+//					--size = "6px D 1r, 19px",
+//
+//					--size = "6px D 1r, 1px D",
+//					--size = "6px D 1r, 2px D",
+//					--size = "6px D 1r, 4px D",
+//					size = "6px D 1r, 8px D",
+//
+//					--size = "6px D 1r, D",
+//					--size = "6px D 1r, 20px",
+//					--size = "4pxD, D",
+//		}
+
+//		libv::ui::Label_2 lbl_iris("mp-title-iris");
+//		lbl_iris.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris.text("Iris");
+//		mp_bar.add(lbl_iris);
+//
+//		libv::ui::Label_2 lbl_iris0("mp-title-iris");
+//		lbl_iris0.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris0.text("First Line");
+//		mp_bar.add(lbl_iris0);
+//
+//		libv::ui::Label_2 lbl_iris1("mp-title-iris");
+//		lbl_iris1.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris1.text("");
+//		mp_bar.add(lbl_iris1);
+//
+//		libv::ui::Label_2 lbl_iris2("mp-title-iris");
+//		lbl_iris2.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris2.text("First Line\nSecond Line");
+//		mp_bar.add(lbl_iris2);
+//
+//		libv::ui::Label_2 lbl_iris3("mp-title-iris");
+//		lbl_iris3.style("space.hud-bar.mp.iris-lbl");
+//		lbl_iris3.text("Iris\nSecond Line");
+//		mp_bar.add(lbl_iris3);
+
+		// -------------------------------------------------------------------------------------------------
+
 //		This was a test case for layout invalidation on style reloading, would be nice to move it into a unit test
 
 //		ui.style("space.hud-bar.mp.iris-lbl") {

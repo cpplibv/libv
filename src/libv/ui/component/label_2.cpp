@@ -14,8 +14,6 @@
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/text_layout.hpp>
-//#include <libv/ui/shader/shader_image.hpp>
-//#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -47,6 +45,9 @@ private:
 
 public:
 	using CoreComponent::CoreComponent;
+
+public:
+	virtual	libv::vec4f getInnerContentBounds() override;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -119,6 +120,12 @@ void CoreLabel_2::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::vec4f CoreLabel_2::getInnerContentBounds() {
+	return {padding_LB() + text_.content_bounding_pos(), text_.content_bounding_size()};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void CoreLabel_2::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabel_2> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
@@ -127,9 +134,7 @@ void CoreLabel_2::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreLabel_2::doLayout1(const ContextLayout1& environment) {
 	const auto dynamic_size_text = text_.content(xy(environment.size) - padding_size()) + padding_size();
-//	const auto dynamic_size_image = property.bg_image()->size().cast<float>();
-//
-//	return {libv::vec::max(dynamic_size_text, dynamic_size_image), 0.f};
+
 	return {dynamic_size_text, 0.f};
 }
 
@@ -138,7 +143,7 @@ void CoreLabel_2::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreLabel_2::doRender(Renderer& r) {
-	property.background().render(r, {0, 0}, layout_size2(), padding());
+	property.background().render(r, {0, 0}, layout_size2(), *this);
 
 	r.text(padding_LB(), text_,
 			property.font_color(),

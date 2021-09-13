@@ -387,8 +387,8 @@ void TextLayout::layout() {
 	positions.reserve(string_.size() * 4);
 	texture0s.reserve(string_.size() * 4);
 	indices.reserve(string_.size() * 6);
-	auto vi = 0;
-	auto ii = 0;
+	auto vi = 0; // Vertex Index
+	auto ii = 0; // Index 'Index'
 
 	const auto vertex = [&](auto pos, auto uv0) {
 		positions.emplace_back(pos, 0);
@@ -423,8 +423,8 @@ void TextLayout::layout() {
 
 	auto pen = libv::vec2f{0, heightAdjusment};
 	auto previousCodepoint = uint32_t{'\n'};
-	auto lines = boost::container::small_vector<Line, 8>{1}; // ~2240 Byte on the stack
-	auto line = libv::observer_ref<Line>{lines.data()};
+	auto lines = boost::container::small_vector<Line, 8>(); // ~2240 Byte on the stack
+	auto line = make_observer_ref(&lines.emplace_back());
 	auto contentWidth = limit_.x;
 
 	const auto finishLine = [&] {
@@ -500,6 +500,9 @@ void TextLayout::layout() {
 	const auto num_lines_f = static_cast<float>(lines.size());
 	const auto lines_height_sum = num_lines_f * lineAdvance;
 
+	const auto isJustifiedX = alignh.justified();
+	auto leftoverMinX = std::numeric_limits<float>::infinity(); // Used for content_bounding calculation
+
 	const auto leftoverY = hasLimitY ? (limit_.y - lines_height_sum) : 0.f;
 	const auto offsetY = -1.f * leftoverY * (1.f - alignv.rate());
 	const auto isJustifiedY = alignv.justified();
@@ -518,6 +521,8 @@ void TextLayout::layout() {
 
 		const auto adjusmentY = std::round(offsetY + line_index_f * justifyGapY);
 
+		leftoverMinX = std::min(leftoverMinX, isJustifiedLine && line.wordEndings.size() > 1 ? 0.0f : leftoverX); // If it's a isJustifiedLine with at least two word than there is no leftover at all
+
 		size_t i = line.begin;
 		for (const auto& [word_index, wordEnd] : line.wordEndings | ranges::view::enumerate) {
 			const auto word_index_f = static_cast<float>(word_index);
@@ -531,6 +536,13 @@ void TextLayout::layout() {
 			}
 		}
 	}
+
+	content_bounding_pos_ = libv::vec::round(libv::vec2f{
+			leftoverMinX * alignh.rate(),
+			isJustifiedY && lines.size() > 1 ? 0.0f : (string_.empty() ? 0.0f : leftoverY) * alignv.rate()});
+	content_bounding_size_ = libv::vec::round(libv::vec2f{
+			contentWidth - leftoverMinX,
+			string_.empty() ? 0.0f : lines_height_sum + (isJustifiedY && lines.size() > 1 ? leftoverY : 0.0f)});
 
 	dirty = false;
 }

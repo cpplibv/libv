@@ -7,6 +7,7 @@
 // libv
 #include <libv/math/vec.hpp>
 // pro
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
@@ -28,7 +29,7 @@ class BaseBackground {
 //	static libv::intrusive_ptr<BaseBackground> parse_lua(const sol::object& object);
 
 public:
-	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) = 0;
+	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
 	[[nodiscard]] virtual std::string to_string() const = 0;
 
 public:
@@ -48,11 +49,11 @@ void intrusive_ptr_release(BaseBackground* var) {
 
 class BackgroundNone : public BaseBackground {
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
 		(void) r;
 		(void) pos;
 		(void) size;
-		(void) padding;
+		(void) component;
 	}
 	virtual std::string to_string() const override {
 		return "none";
@@ -72,8 +73,8 @@ public:
 			shader(std::move(shader)) {}
 
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-		(void) padding;
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		(void) component;
 
 		r.quad(pos, size, color, shader);
 	}
@@ -97,8 +98,8 @@ public:
 			shader(std::move(shader)) {}
 
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-		(void) padding;
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		(void) component;
 
 		r.texture_2D(pos, size, {0, 0}, {1, 1}, color, texture, shader);
 	}
@@ -123,8 +124,8 @@ public:
 			shader(std::move(shader)) {}
 
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-		(void) padding;
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		(void) component;
 
 		// y3   12--13--14--15
 		//      | / | / | / |
@@ -187,108 +188,6 @@ private:
 
 // -------------------------------------------------------------------------------------------------
 
-class BackgroundGradientLinear : public BaseBackground {
-private:
-	enum class PointMode {
-		fixed,
-		relative, /// [0..1]
-	};
-	enum class Corner {
-		top_left,
-		top_center,
-		top_right,
-		center_left,
-		center_center,
-		center_right,
-		bottom_left,
-		bottom_center,
-		bottom_right,
-	};
-	struct Point {
-		float pos_x;
-		float pos_y;
-		PointMode mode_x;
-		PointMode mode_y;
-		Corner anchor;
-		Color color;
-	};
-
-private:
-	std::vector<Point> points;
-
-//private:
-//	libv::vec2f start;
-//	PointMode start_mode;
-//	libv::vec2f end;
-//	PointMode end_mode;
-//	std::vector<Color> colors;
-
-	ShaderQuad_view shader;
-
-public:
-	BackgroundGradientLinear(std::vector<Point> points, ShaderQuad_view shader) :
-			points(std::move(points)),
-			shader(std::move(shader)) {}
-
-private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-//		(void) r;
-//		(void) pos;
-//		(void) size;
-//		(void) padding;
-
-//		const auto p0 = pos;
-//		const auto p1 = pos + border_pos;
-//		const auto p2 = pos + size - border_pos;
-//		const auto p3 = pos + size;
-//
-//		const auto t0 = libv::vec2f{0.0f, 0.0f};
-//		const auto t1 = border_tex;
-//		const auto t2 = 1.0f - border_tex;
-//		const auto t3 = libv::vec2f{1.0f, 1.0f};
-
-//		r.begin_triangles();
-
-//		for () {
-//
-//		}
-
-//		r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
-//		r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
-//		r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
-//		r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
-//
-//		r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
-//		r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
-//		r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
-//		r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
-//
-//		r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
-//		r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
-//		r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
-//		r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
-//
-//		r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
-//		r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
-//		r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
-//		r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
-//
-//		r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
-//		r.index_strip({3, 8}); // jump
-//		r.index_strip({8, 4, 9, 5, 10, 6, 11, 7});
-//		r.index_strip({7, 12}); // jump
-//		r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
-
-//		r.end(shader);
-	}
-	virtual std::string to_string() const override {
-//		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
 class BackgroundPattern : public BaseBackground {
 private:
 	Color color;
@@ -302,8 +201,8 @@ public:
 			shader(std::move(shader)) {}
 
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-		(void) padding;
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		(void) component;
 
 		const auto pattern_size = texture->size().cast<float>();
 
@@ -330,15 +229,68 @@ public:
 			shader(std::move(shader)) {}
 
 private:
-	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) override {
-//		9 border table except the middle
-//		in the middle use texture as pattern but leave out non padding area
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		// in the middle use texture as pattern but leave out non padding area
 
-//		Required by reference picture ref_ui_bg_padding_pattern
+		// y3   12--13--14--15
+		//      | / | / | / |
+		// y2   8---9---10--11
+		//      | / |   | / |
+		// y1   4---5---6---7
+		//      | / | / | / |
+		// y0   0---1---2---3
+		//
+		//      x0  x1  x2  x3
 
-//		const auto pattern_size = texture->size().cast<float>();
-//
-//		r.texture_2D(pos, size, {0, 0}, 1.0f / pattern_size * size, {0, 0, 1, 1}, color, texture, shader);
+		const auto content_bounds = component.getInnerContentBounds();
+		const auto content_pos = xy(content_bounds);
+		const auto content_size = zw(content_bounds);
+
+		const auto pattern_size = texture->size().cast<float>();
+
+		const auto p0 = pos;
+		const auto p1 = pos + content_pos;
+		const auto p2 = content_pos + content_size;
+		const auto p3 = pos + size;
+
+		const auto t0 = (p0 - pos) / pattern_size;
+		const auto t1 = (p1 - pos) / pattern_size;
+		const auto t2 = (p2 - pos) / pattern_size;
+		const auto t3 = (p3 - pos) / pattern_size;
+
+		r.begin_triangles();
+
+		r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
+		r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
+		r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
+		r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
+
+		r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
+		r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
+		r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
+		r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
+
+		r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
+		r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
+		r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
+		r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
+
+		r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
+		r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
+		r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
+		r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
+
+		r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
+		r.index_strip({3, 8}); // jump
+
+		r.index_strip({8, 4, 9, 5});
+		r.index_strip({5, 10}); // jump (skip middle quad)
+		r.index_strip({10, 6, 11, 7});
+
+		r.index_strip({7, 12}); // jump
+		r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
+
+		r.end(texture, shader);
 	}
 
 	virtual std::string to_string() const override {
@@ -347,10 +299,112 @@ private:
 	}
 };
 
+// -------------------------------------------------------------------------------------------------
+
+//class BackgroundGradientLinear : public BaseBackground {
+//private:
+//	enum class PointMode {
+//		fixed,
+//		relative, /// [0..1]
+//	};
+//	enum class Corner {
+//		top_left,
+//		top_center,
+//		top_right,
+//		center_left,
+//		center_center,
+//		center_right,
+//		bottom_left,
+//		bottom_center,
+//		bottom_right,
+//	};
+//	struct Point {
+//		float pos_x;
+//		float pos_y;
+//		PointMode mode_x;
+//		PointMode mode_y;
+//		Corner anchor;
+//		Color color;
+//	};
+//
+//private:
+//	std::vector<Point> points;
+//
+////private:
+////	libv::vec2f start;
+////	PointMode start_mode;
+////	libv::vec2f end;
+////	PointMode end_mode;
+////	std::vector<Color> colors;
+//
+//	ShaderQuad_view shader;
+//
+//public:
+//	BackgroundGradientLinear(std::vector<Point> points, ShaderQuad_view shader) :
+//			points(std::move(points)),
+//			shader(std::move(shader)) {}
+//
+//private:
+//	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+////		(void) r;
+////		(void) pos;
+////		(void) size;
+////		(void) component;
+//
+////		const auto p0 = pos;
+////		const auto p1 = pos + border_pos;
+////		const auto p2 = pos + size - border_pos;
+////		const auto p3 = pos + size;
+////
+////		const auto t0 = libv::vec2f{0.0f, 0.0f};
+////		const auto t1 = border_tex;
+////		const auto t2 = 1.0f - border_tex;
+////		const auto t3 = libv::vec2f{1.0f, 1.0f};
+//
+////		r.begin_triangles();
+//
+////		for () {
+////
+////		}
+//
+////		r.vertex({p0.x, p0.y, 0}, {t0.x, t0.y}, color);
+////		r.vertex({p1.x, p0.y, 0}, {t1.x, t0.y}, color);
+////		r.vertex({p2.x, p0.y, 0}, {t2.x, t0.y}, color);
+////		r.vertex({p3.x, p0.y, 0}, {t3.x, t0.y}, color);
+////
+////		r.vertex({p0.x, p1.y, 0}, {t0.x, t1.y}, color);
+////		r.vertex({p1.x, p1.y, 0}, {t1.x, t1.y}, color);
+////		r.vertex({p2.x, p1.y, 0}, {t2.x, t1.y}, color);
+////		r.vertex({p3.x, p1.y, 0}, {t3.x, t1.y}, color);
+////
+////		r.vertex({p0.x, p2.y, 0}, {t0.x, t2.y}, color);
+////		r.vertex({p1.x, p2.y, 0}, {t1.x, t2.y}, color);
+////		r.vertex({p2.x, p2.y, 0}, {t2.x, t2.y}, color);
+////		r.vertex({p3.x, p2.y, 0}, {t3.x, t2.y}, color);
+////
+////		r.vertex({p0.x, p3.y, 0}, {t0.x, t3.y}, color);
+////		r.vertex({p1.x, p3.y, 0}, {t1.x, t3.y}, color);
+////		r.vertex({p2.x, p3.y, 0}, {t2.x, t3.y}, color);
+////		r.vertex({p3.x, p3.y, 0}, {t3.x, t3.y}, color);
+////
+////		r.index_strip({4, 0, 5, 1, 6, 2, 7, 3});
+////		r.index_strip({3, 8}); // jump
+////		r.index_strip({8, 4, 9, 5, 10, 6, 11, 7});
+////		r.index_strip({7, 12}); // jump
+////		r.index_strip({12, 8, 13, 9, 14, 10, 15, 11});
+//
+////		r.end(shader);
+//	}
+//	virtual std::string to_string() const override {
+////		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
+//		return "Not implemented yet"; // !!!
+//	}
+//};
+
 // =================================================================================================
 
-void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, libv::vec4f padding) const {
-	fragment->render(r, pos, size, padding);
+void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const {
+	fragment->render(r, pos, size, component);
 }
 
 std::string Background::to_string() const {

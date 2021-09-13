@@ -304,6 +304,9 @@ private:
 	void render(Renderer& r);
 	void renderDestroy(Renderer& r);
 
+public:
+	[[nodiscard]] virtual libv::vec4f getInnerContentBounds();
+
 protected:
 	virtual void doAttach();
 	virtual void doDetach();

@@ -46,6 +46,9 @@ private:
 
 	std::string string_;
 
+	libv::vec2f content_bounding_pos_;
+	libv::vec2f content_bounding_size_;
+
 public:
 	void align_horizontal(const AlignHorizontal align);
 	void align_vertical(const AlignVertical align);
@@ -114,6 +117,17 @@ public:
 	/// @return the necessary space to layout while obeying the \c limit
 	[[nodiscard]] inline libv::vec2f content(const float x, const float y) {
 		return content({x, y});
+	}
+
+	[[nodiscard]] inline libv::vec2f content_bounding_pos() {
+		if (dirty)
+			layout();
+		return content_bounding_pos_;
+	}
+	[[nodiscard]] inline libv::vec2f content_bounding_size() {
+		if (dirty)
+			layout();
+		return content_bounding_size_;
 	}
 
 private:

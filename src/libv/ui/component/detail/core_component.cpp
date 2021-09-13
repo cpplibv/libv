@@ -624,6 +624,12 @@ void CoreComponent::renderDestroy(Renderer& r) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::vec4f CoreComponent::getInnerContentBounds() {
+	return {padding_LB(), layout_size2() - padding_size()};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void CoreComponent::doAttach() { }
 
 void CoreComponent::doDetach() { }
