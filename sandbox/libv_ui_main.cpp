@@ -13,16 +13,13 @@
 #include <libv/ui/component/image.hpp>
 #include <libv/ui/component/input_field.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/label_image.hpp>
 #include <libv/ui/component/panel_float.hpp>
 #include <libv/ui/component/panel_full.hpp>
 #include <libv/ui/component/panel_grid.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/panel_status_line.hpp>
-#include <libv/ui/component/quad.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/scroll_pane.hpp>
-#include <libv/ui/component/stretch.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/ui/ui.hpp>
@@ -52,15 +49,15 @@ private:
 	libv::ui::InputField input_field1;
 	libv::ui::InputField input_field2;
 	libv::ui::Label label;
-	libv::ui::LabelImage label_image1;
-	libv::ui::LabelImage label_image2;
+	libv::ui::Label label_image1;
+	libv::ui::Label label_image2;
 	libv::ui::PanelFloat panel_float;
 	libv::ui::PanelFull panel_full;
 	libv::ui::PanelGrid panel_grid;
 	libv::ui::PanelLine panel_line;
 	libv::ui::PanelLine panel_line_scrolled;
-	libv::ui::Stretch stretch;
-	libv::ui::Quad quad;
+	libv::ui::Image stretch;
+	libv::ui::Image quad;
 	libv::ui::ScrollBar scroll_bar_x;
 	libv::ui::ScrollBar scroll_bar_y;
 	libv::ui::ScrollBar scroll_bar_ix;
@@ -102,36 +99,39 @@ public:
 
 		button0.text("Button 0!");
 		button1.text("Button 1!");
-		button1.image(ui.context().texture2D("separator_bar_256x16.png"));
+		button1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
 
+		button2.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
 		button2.text("Button 2!");
 		button2.anchor(libv::ui::Anchor::top_left);
 		button2.size(libv::ui::parse_size_or_throw("33%, 33%"));
+
+		button3.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
 		button3.text("Button 3!");
 		button3.anchor(libv::ui::Anchor::bottom_right);
 		button3.size(libv::ui::parse_size_or_throw("33%, 33%"));
 
+		button4.background(libv::ui::Background::color({1.f, 1.f, 1.f, 0.4f}));
 		button4.text("Button 4!");
 		button4.size(libv::ui::parse_size_or_throw("D, D"));
-		button4.image(ui.context().texture2D("separator_bar_256x16.png"));
+		button4.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
 
 		label.text("Label");
 		label.align_horizontal(libv::ui::AlignHorizontal::center);
 		label.align_vertical(libv::ui::AlignVertical::center);
 
 		label_image1.text("Label image");
-		label_image1.image(ui.context().texture2D("separator_bar_256x16.png"));
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.0f}, ui.context().texture2D("separator_bar_256x16.png")));
 
 		label_image2.text("Label image2");
-		label_image2.image(ui.context().texture2D("separator_bar_256x16.png"));
-		label_image2.color({1.f, 1.f, 1.f, 0.5f});
+		label_image1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 0.5f}, ui.context().texture2D("separator_bar_256x16.png")));
 
-		image.image(ui.context().texture2D("separator_bar_256x16.png"));
+		image.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("separator_bar_256x16.png")));
 		image.size(libv::ui::parse_size_or_throw("25%, 50px"));
 
-		input_field0.image(ui.context().texture2D("gray256.png"));
-		input_field1.image(ui.context().texture2D("gray256.png"));
-		input_field2.image(ui.context().texture2D("gray256.png"));
+		input_field0.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		input_field1.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
+		input_field2.background(libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("gray256.png")));
 
 		input_field0.text("Input field 0");
 		input_field0.event().change([](auto& component, const auto&) {
@@ -170,9 +170,9 @@ public:
 		});
 		input_field2.size(libv::ui::parse_size_or_throw("D, D"));
 
-		stretch.image(ui.context().texture2D("stretch_border.png"));
+		stretch.background(libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D("stretch_border.png")));
 
-		quad.color({.8f, .5f, .5f, 1.f});
+		quad.background(libv::ui::Background::color({.8f, .5f, .5f, 1.f}));
 		quad.anchor(libv::ui::Anchor::center_center);
 		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
 
@@ -291,7 +291,7 @@ public:
 			for (int i = 0; i < 5; ++i) {
 				const auto t = std::chrono::seconds(i + 1);
 				libv::ui::Button tmp;
-				tmp.color({0.7f, 0.7f, 0.5f, 1.0f});
+				tmp.background(libv::ui::Background::color({0.7f, 0.7f, 0.5f, 1.0f}));
 				tmp.align_horizontal(libv::ui::AlignHorizontal::center);
 				tmp.align_vertical(libv::ui::AlignVertical::center);
 //				tmp.size(libv::ui::parse_size_or_throw("150px, 10px"));
@@ -412,27 +412,27 @@ public:
 //					--size = "4pxD, D",
 //		}
 
-//		libv::ui::Label_2 lbl_iris("mp-title-iris");
+//		libv::ui::Label lbl_iris("mp-title-iris");
 //		lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris.text("Iris");
 //		mp_bar.add(lbl_iris);
 //
-//		libv::ui::Label_2 lbl_iris0("mp-title-iris");
+//		libv::ui::Label lbl_iris0("mp-title-iris");
 //		lbl_iris0.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris0.text("First Line");
 //		mp_bar.add(lbl_iris0);
 //
-//		libv::ui::Label_2 lbl_iris1("mp-title-iris");
+//		libv::ui::Label lbl_iris1("mp-title-iris");
 //		lbl_iris1.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris1.text("");
 //		mp_bar.add(lbl_iris1);
 //
-//		libv::ui::Label_2 lbl_iris2("mp-title-iris");
+//		libv::ui::Label lbl_iris2("mp-title-iris");
 //		lbl_iris2.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris2.text("First Line\nSecond Line");
 //		mp_bar.add(lbl_iris2);
 //
-//		libv::ui::Label_2 lbl_iris3("mp-title-iris");
+//		libv::ui::Label lbl_iris3("mp-title-iris");
 //		lbl_iris3.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris3.text("Iris\nSecond Line");
 //		mp_bar.add(lbl_iris3);
@@ -461,7 +461,7 @@ public:
 //		}
 
 //		libv::ui::PanelLine xp("xp"); {
-//			libv::ui::Label_2 lbl_iris("inner");
+//			libv::ui::Label lbl_iris("inner");
 //			lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //			lbl_iris.text("Inner");
 //			xp.add(lbl_iris);
@@ -471,7 +471,7 @@ public:
 //
 //		libv::ui::PanelLine xp2("xp2"); {
 //			libv::ui::PanelLine xp3("xp3"); {
-//				libv::ui::Label_2 lbl_iris("PX PX Inner");
+//				libv::ui::Label lbl_iris("PX PX Inner");
 //				lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //				lbl_iris.text("PX PX\nInner");
 //				xp3.add(lbl_iris);
@@ -484,7 +484,7 @@ public:
 //
 //		libv::ui::PanelLine xp5("xp5"); {
 //			libv::ui::PanelLine xp6("xp6"); {
-//				libv::ui::Label_2 lbl_iris("D  PX Inner");
+//				libv::ui::Label lbl_iris("D  PX Inner");
 //				lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //				lbl_iris.text("D  PX\nInner");
 //				xp6.add(lbl_iris);
@@ -497,7 +497,7 @@ public:
 //
 //		libv::ui::PanelLine xp7("xp7"); {
 //			libv::ui::PanelLine xp8("xp8"); {
-//				libv::ui::Label_2 lbl_iris("PX D  Inner");
+//				libv::ui::Label lbl_iris("PX D  Inner");
 //				lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //				lbl_iris.text("PX D \nInner");
 //				xp8.add(lbl_iris);
@@ -510,7 +510,7 @@ public:
 //
 //		libv::ui::PanelLine xp9("xp9"); {
 //			libv::ui::PanelLine xp10("xp10"); {
-//				libv::ui::Label_2 lbl_iris("D  D  Inner");
+//				libv::ui::Label lbl_iris("D  D  Inner");
 //				lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //				lbl_iris.text("D  D \nInner");
 //				xp10.add(lbl_iris);
@@ -521,7 +521,7 @@ public:
 //		xp9.size(libv::ui::parse_size_or_throw("D, D"));
 //		mp_bar.add(xp9);
 //
-//		libv::ui::Label_2 lbl_iris("outer");
+//		libv::ui::Label lbl_iris("outer");
 //		lbl_iris.style("space.hud-bar.mp.iris-lbl");
 //		lbl_iris.text("Outer");
 //		mp_bar.add(lbl_iris);

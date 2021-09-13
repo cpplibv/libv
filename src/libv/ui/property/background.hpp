@@ -39,6 +39,7 @@ public:
 public:
 	void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const;
 	[[nodiscard]] std::string to_string() const;
+	[[nodiscard]] libv::vec2i size() const noexcept;
 
 public:
 	[[nodiscard]] friend inline bool operator==(const Background& lhs, const Background& rhs) noexcept {

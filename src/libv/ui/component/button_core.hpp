@@ -22,9 +22,7 @@ private:
 	template <typename T> static void access_properties(T& ctx);
 
 	struct Properties {
-		PropertyR<Color> bg_color;
-		PropertyR<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
+		PropertyR<Background> background;
 
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
@@ -47,6 +45,9 @@ private:
 	virtual void onMouseMovement(const EventMouseMovement& event) override;
 	virtual void onMouseScroll(const EventMouseScroll& event) override;
 
+public:
+	virtual	libv::vec4f getInnerContentBounds() override;
+
 private:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -60,23 +61,11 @@ private:
 template <typename T>
 void CoreButton::access_properties(T& ctx) {
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_color; },
-			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::bg_color,
-			"Background color"
-			);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_image; },
-			[](auto& u) { return u.fallbackTexture2D(); },
-			pgr::appearance, pnm::bg_image,
-			"Background image"
-			);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_shader; },
-			[](auto& u) { return u.shaderImage(); },
-			pgr::appearance, pnm::bg_shader,
-			"Background shader"
-			);
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::color({0.9f, 1.f, 0.9f, 1.f}),
+			pgr::appearance, pnm::background,
+			"Background"
+	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
 			[](auto& c, auto v) { c.text_.align_horizontal(v); },
@@ -84,7 +73,7 @@ void CoreButton::access_properties(T& ctx) {
 			AlignHorizontal::left,
 			pgr::appearance, pnm::align_horizontal,
 			"Horizontal alignment of the text"
-			);
+	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_vertical; },
 			[](auto& c, auto v) { c.text_.align_vertical(v); },
@@ -92,19 +81,19 @@ void CoreButton::access_properties(T& ctx) {
 			AlignVertical::top,
 			pgr::appearance, pnm::align_vertical,
 			"Vertical alignment of the text"
-			);
+	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_color; },
 			Color(0, 0, 0, 1),
 			pgr::appearance, pnm::font_color,
 			"Font color"
-			);
+	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.font_shader; },
 			[](auto& u) { return u.shaderFont(); },
 			pgr::appearance, pnm::font_shader,
 			"Font shader"
-			);
+	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font; },
 			[](auto& c, auto v) { c.text_.font(std::move(v)); },
@@ -112,7 +101,7 @@ void CoreButton::access_properties(T& ctx) {
 			[](auto& u) { return u.fallbackFont(); },
 			pgr::font, pnm::font,
 			"Font file"
-			);
+	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.font_size; },
 			[](auto& c, auto v) { c.text_.size(v); },
@@ -120,13 +109,13 @@ void CoreButton::access_properties(T& ctx) {
 			FontSize{12},
 			pgr::font, pnm::font_size,
 			"Font size in pixel"
-			);
+	);
 	ctx.synthetize(
 			[](auto& c, auto v) { c.handler().text(std::move(v)); },
 			[](const auto& c) { return c.handler().text(); },
 			pgr::behaviour, pnm::text,
 			"Displayed text"
-			);
+	);
 }
 
 // -------------------------------------------------------------------------------------------------

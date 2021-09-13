@@ -3,12 +3,13 @@
 // hpp
 #include <libv/ui/component/label.hpp>
 // pro
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/font_2D.hpp>
+#include <libv/ui/property.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/style.hpp>
@@ -20,14 +21,16 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-struct CoreLabel : public CoreComponent {
+struct CoreLabel : CoreComponent {
 	friend class Label;
 	[[nodiscard]] inline auto handler() { return Label{this}; }
 
-protected:
-	template <typename T> static void access_properties(T& ctx);
 private:
+	template <typename T> static void access_properties(T& ctx);
+
 	struct Properties {
+		PropertyR<Background> background;
+
 		PropertyR<Color> font_color;
 		PropertyR<ShaderFont_view> font_shader;
 
@@ -37,13 +40,14 @@ private:
 		PropertyL1L2<> font_size;
 	} property;
 
-//private:
-//protected:
-public:
+private:
 	TextLayout text_;
 
 public:
 	using CoreComponent::CoreComponent;
+
+public:
+	virtual	libv::vec4f getInnerContentBounds() override;
 
 private:
 	virtual void doStyle(ContextStyle& ctx) override;
@@ -56,6 +60,12 @@ private:
 
 template <typename T>
 void CoreLabel::access_properties(T& ctx) {
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::none(),
+			pgr::appearance, pnm::background,
+			"Background"
+	);
 	ctx.indirect(
 			[](auto& c) -> auto& { return c.property.align_horizontal; },
 			[](auto& c, auto v) { c.text_.align_horizontal(v); },
@@ -110,6 +120,12 @@ void CoreLabel::access_properties(T& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
+libv::vec4f CoreLabel::getInnerContentBounds() {
+	return {padding_LB() + text_.content_bounding_pos(), text_.content_bounding_size()};
+}
+
+// -------------------------------------------------------------------------------------------------
+
 void CoreLabel::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CoreLabel> setter{*this, ctx.component, ctx.style, context()};
 	access_properties(setter);
@@ -127,6 +143,8 @@ void CoreLabel::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreLabel::doRender(Renderer& r) {
+	property.background().render(r, {0, 0}, layout_size2(), *this);
+
 	r.text(padding_LB(), text_,
 			property.font_color(),
 			text_.font(),
@@ -137,6 +155,16 @@ void CoreLabel::doRender(Renderer& r) {
 
 core_ptr Label::create_core(std::string name) {
 	return create_core_ptr<CoreLabel>(std::move(name));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Label::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
+}
+
+[[nodiscard]] const Background& Label::background() const noexcept {
+	return self().property.background();
 }
 
 // -------------------------------------------------------------------------------------------------

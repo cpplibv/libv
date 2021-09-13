@@ -7,7 +7,7 @@
 // libv
 //#include <libv/ui/component/fwd.hpp>
 #include <libv/ui/component/button.hpp>
-#include <libv/ui/component/label_image.hpp>
+#include <libv/ui/component/label.hpp>
 //#include <libv/ui/component/panel_float.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
@@ -35,7 +35,7 @@ struct SceneMPBar {
 	bool server_active = false;
 
 //private:
-	libv::ui::LabelImage lbl_state{"mp-state"};
+	libv::ui::Label lbl_state{"mp-state"};
 	libv::ui::Button btn_host{"mp-host"};
 	libv::ui::Button btn_join{"mp-join"};
 

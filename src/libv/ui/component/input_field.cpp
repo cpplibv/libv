@@ -22,7 +22,6 @@
 #include <libv/ui/shader/shader_quad.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/text_layout.hpp>
-#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -40,9 +39,7 @@ private:
 	struct Properties {
 		PropertyB<FocusSelectPolicy> focus_select_policy;
 
-		PropertyR<Color> bg_color;
-		PropertyR<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
+		PropertyR<Background> background;
 
 		PropertyR<Color> caret_color;
 		PropertyR<ShaderQuad_view> caret_shader;
@@ -75,6 +72,9 @@ private:
 	virtual void onMouseMovement(const EventMouseMovement& event) override;
 	virtual void onMouseScroll(const EventMouseScroll& event) override;
 
+public:
+	virtual	libv::vec4f getInnerContentBounds() override;
+
 private:
 	virtual void doAttach() override;
 	virtual void doStyle(ContextStyle& context) override;
@@ -94,22 +94,10 @@ void CoreInputField::access_properties(T& ctx) {
 //			"Focus select policy"
 //	);
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_color; },
-			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::bg_color,
-			"Background color"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_image; },
-			[](auto& u) { return u.fallbackTexture2D(); },
-			pgr::appearance, pnm::bg_image,
-			"Background image"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_shader; },
-			[](auto& u) { return u.shaderImage(); },
-			pgr::appearance, pnm::bg_shader,
-			"Background shader"
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::color({0.9f, 0.9f, 1.f, 1.f}),
+			pgr::appearance, pnm::background,
+			"Background"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.caret_color; },
@@ -395,14 +383,14 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 }
 
 void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
-	if (event.enter)
-		set(property.bg_color, property.bg_color() + 0.2f);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-
-	if (event.leave)
-		set(property.bg_color, property.bg_color() - 0.2f);
+//	if (event.enter)
+//		set(property.bg_color, property.bg_color() + 0.2f);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//
+//	if (event.leave)
+//		set(property.bg_color, property.bg_color() - 0.2f);
 //		reset(property.bg_color);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	// === TEMP ========================================================================================
 	if (context().state.key_pressed(libv::input::Keycode::F1)) {
@@ -424,6 +412,12 @@ void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 
 void CoreInputField::onMouseScroll(const EventMouseScroll& event) {
 	event.stop_propagation();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+libv::vec4f CoreInputField::getInnerContentBounds() {
+	return {padding_LB() + text_.content_bounding_pos(), text_.content_bounding_size()};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -455,10 +449,7 @@ void CoreInputField::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreInputField::doRender(Renderer& r) {
-	r.texture_2D({0, 0}, layout_size2(), {0, 0}, {1, 1},
-			property.bg_color(),
-			property.bg_image(),
-			property.bg_shader());
+	property.background().render(r, {0, 0}, layout_size2(), *this);
 
 	r.text(padding_LB(), text_,
 			property.font_color(),
@@ -489,28 +480,12 @@ core_ptr InputField::create_core(std::string name) {
 
 // -------------------------------------------------------------------------------------------------
 
-void InputField::color(Color value) {
-	AccessProperty::manual(self(), self().property.bg_color, value);
+void InputField::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
 }
 
-const Color& InputField::color() const noexcept {
-	return self().property.bg_color();
-}
-
-void InputField::image(Texture2D_view value) {
-	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
-}
-
-const Texture2D_view& InputField::image() const noexcept {
-	return self().property.bg_image();
-}
-
-void InputField::shader(ShaderImage_view value) {
-	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
-}
-
-const ShaderImage_view& InputField::shader() const noexcept {
-	return self().property.bg_shader();
+[[nodiscard]] const Background& InputField::background() const noexcept {
+	return self().property.background();
 }
 
 // -------------------------------------------------------------------------------------------------

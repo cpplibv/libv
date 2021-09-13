@@ -18,7 +18,6 @@
 #include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/text_layout.hpp>
-#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -53,14 +52,14 @@ void CoreButton::onMouseButton(const EventMouseButton& event) {
 }
 
 void CoreButton::onMouseMovement(const EventMouseMovement& event) {
-	if (event.enter)
-		set(property.bg_color, property.bg_color() + 0.2f);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-
-	if (event.leave)
-//		reset(property.bg_color);
-		set(property.bg_color, property.bg_color() - 0.2f);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//	if (event.enter)
+//		set(property.bg_color, property.bg_color() + 0.2f);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//
+//	if (event.leave)
+////		reset(property.bg_color);
+//		set(property.bg_color, property.bg_color() - 0.2f);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 
 	fire(EventMouseMovement{event});
 
@@ -71,6 +70,12 @@ void CoreButton::onMouseScroll(const EventMouseScroll& event) {
 	fire(EventMouseScroll{event});
 
 	event.stop_propagation();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+libv::vec4f CoreButton::getInnerContentBounds() {
+	return {padding_LB() + text_.content_bounding_pos(), text_.content_bounding_size()};
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -99,10 +104,7 @@ void CoreButton::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreButton::doRender(Renderer& r) {
-	r.texture_2D({0, 0}, layout_size2(), {0, 0}, {1, 1},
-			property.bg_color(),
-			property.bg_image(),
-			property.bg_shader());
+	property.background().render(r, {0, 0}, layout_size2(), *this);
 
 	r.text(padding_LB(), text_,
 			property.font_color(),
@@ -118,28 +120,12 @@ core_ptr Button::create_core(std::string name) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Button::color(Color value) {
-	AccessProperty::manual(self(), self().property.bg_color, value);
+void Button::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
 }
 
-const Color& Button::color() const noexcept {
-	return self().property.bg_color();
-}
-
-void Button::image(Texture2D_view value) {
-	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
-}
-
-const Texture2D_view& Button::image() const noexcept {
-	return self().property.bg_image();
-}
-
-void Button::shader(ShaderImage_view value) {
-	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
-}
-
-const ShaderImage_view& Button::shader() const noexcept {
-	return self().property.bg_shader();
+[[nodiscard]] const Background& Button::background() const noexcept {
+	return self().property.background();
 }
 
 // -------------------------------------------------------------------------------------------------

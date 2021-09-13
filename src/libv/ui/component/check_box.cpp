@@ -20,7 +20,6 @@
 #include <libv/ui/shader/shader_image.hpp>
 //#include <libv/ui/string_2D.hpp>
 #include <libv/ui/style.hpp>
-#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -36,9 +35,7 @@ namespace ui {
 //	template <typename T> static void access_properties(T& ctx);
 //
 //	struct Properties {
-//		PropertyR<Color> bg_color;
-//		PropertyL<Texture2D_view> bg_image;
-//		PropertyR<ShaderImage_view> bg_shader;
+//		PropertyR<Background> background;
 //
 //		PropertyR<Color> font_color;
 //		PropertyR<ShaderFont_view> font_shader;
@@ -75,10 +72,10 @@ namespace ui {
 //template <typename T>
 //void CoreRadioButton::access_properties(T& ctx) {
 //	ctx.property(
-//			[](auto& c) -> auto& { return c.property.bg_color; },
-//			Color(1, 1, 1, 1),
-//			pgr::appearance, pnm::bg_color,
-//			"Background color"
+//			[](auto& c) -> auto& { return c.property.background; },
+//			Background::none(),
+//			pgr::appearance, pnm::background,
+//			"Background"
 //	);
 //	ctx.property(
 //			[](auto& c) -> auto& { return c.property.bg_image; },
@@ -266,28 +263,12 @@ namespace ui {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//void RadioButton::color(Color value) {
-//	AccessProperty::manual(self(), self().property.bg_color, value);
+//void RadioButton::background(Background value) {
+//	AccessProperty::manual(self(), self().property.background, std::move(value));
 //}
 //
-//const Color& RadioButton::color() const noexcept {
-//	return self().property.bg_color();
-//}
-//
-//void RadioButton::image(Texture2D_view value) {
-//	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
-//}
-//
-//const Texture2D_view& RadioButton::image() const noexcept {
-//	return self().property.bg_image();
-//}
-//
-//void RadioButton::shader(ShaderImage_view value) {
-//	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
-//}
-//
-//const ShaderImage_view& RadioButton::shader() const noexcept {
-//	return self().property.bg_shader();
+//[[nodiscard]] const Background& RadioButton::background() const noexcept {
+//	return self().property.background();
 //}
 //
 //// -------------------------------------------------------------------------------------------------

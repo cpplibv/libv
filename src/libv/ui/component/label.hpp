@@ -1,10 +1,11 @@
-// Project: libv.ui, File: src/libv/ui/component/label.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/label_image.hpp, Author: Császár Mátyás [Vader]
 
 #pragma once
 
 // pro
 #include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
+#include <libv/ui/property/background.hpp>
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
@@ -20,6 +21,10 @@ public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "label";
 	static core_ptr create_core(std::string name);
+
+public:
+	void background(Background value);
+	[[nodiscard]] const Background& background() const noexcept;
 
 public:
 	void align_horizontal(AlignHorizontal value);

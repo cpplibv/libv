@@ -4,9 +4,7 @@
 
 // pro
 #include <libv/ui/component/detail/component_api.hpp>
-#include <libv/ui/property/color.hpp>
-#include <libv/ui/property/shader_image.hpp>
-#include <libv/ui/property/texture_2D.hpp>
+#include <libv/ui/property/background.hpp>
 
 
 namespace libv {
@@ -21,14 +19,8 @@ public:
 	static core_ptr create_core(std::string name);
 
 public:
-	void color(Color value);
-	[[nodiscard]] const Color& color() const noexcept;
-
-	void image(Texture2D_view value);
-	[[nodiscard]] const Texture2D_view& image() const noexcept;
-
-	void shader(ShaderImage_view value);
-	[[nodiscard]] const ShaderImage_view& shader() const noexcept;
+	void background(Background value);
+	[[nodiscard]] const Background& background() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -56,7 +56,14 @@ libv.ui: Fix and rework layout invalidation and layout properties
 
 
 
+libv.ui: Component Image could have a foreground fragment too (layout 1 should switch to that size)
+implement getInnerContentBounds for every component
+	DONE: label
+	DONE: button
+	DONE: input_field
 
+
+libv.ui: Padding pattern support for internal padding
 
 
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params

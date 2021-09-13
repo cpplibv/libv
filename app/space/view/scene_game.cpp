@@ -8,7 +8,7 @@
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/canvas.hpp>
 #include <libv/ui/component/input_field.hpp>
-#include <libv/ui/component/label_image.hpp>
+//#include <libv/ui/component/label.hpp>
 #include <libv/ui/component/panel_float.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/parse/parse_size.hpp>

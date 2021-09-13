@@ -10,8 +10,6 @@
 #include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/style.hpp>
-#include <libv/ui/texture_2D.hpp>
 
 
 namespace libv {
@@ -27,9 +25,7 @@ private:
 	template <typename T> static void access_properties(T& ctx);
 
 	struct Properties {
-		PropertyR<Color> bg_color;
-		PropertyL1<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
+		PropertyR<Background> background;
 	} property;
 
 public:
@@ -46,22 +42,10 @@ private:
 template <typename T>
 void CoreImage::access_properties(T& ctx) {
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_color; },
-			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::bg_color,
-			"Background color"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_image; },
-			[](auto& u) { return u.fallbackTexture2D(); },
-			pgr::appearance, pnm::bg_image,
-			"Background image"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_shader; },
-			[](auto& u) { return u.shaderImage(); },
-			pgr::appearance, pnm::bg_shader,
-			"Background shader"
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::none(),
+			pgr::appearance, pnm::background,
+			"Background"
 	);
 }
 
@@ -75,16 +59,13 @@ void CoreImage::doStyle(ContextStyle& ctx) {
 
 libv::vec3f CoreImage::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
-	const auto dynamic_size_image = property.bg_image()->size().cast<float>() + padding_size();
+	const auto dynamic_size_image = property.background().size().cast<float>() + padding_size();
 
 	return {dynamic_size_image, 0.f};
 }
 
 void CoreImage::doRender(Renderer& r) {
-	r.texture_2D(padding_LB(), layout_size2() - padding_size(), {0, 0}, {1, 1},
-			property.bg_color(),
-			property.bg_image(),
-			property.bg_shader());
+	property.background().render(r, {0, 0}, layout_size2(), *this);
 }
 
 // =================================================================================================
@@ -95,29 +76,14 @@ core_ptr Image::create_core(std::string name) {
 
 // -------------------------------------------------------------------------------------------------
 
-void Image::color(Color value) {
-	AccessProperty::manual(self(), self().property.bg_color, value);
+void Image::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
 }
 
-const Color& Image::color() const noexcept {
-	return self().property.bg_color();
+[[nodiscard]] const Background& Image::background() const noexcept {
+	return self().property.background();
 }
 
-void Image::image(Texture2D_view value) {
-	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
-}
-
-const Texture2D_view& Image::image() const noexcept {
-	return self().property.bg_image();
-}
-
-void Image::shader(ShaderImage_view value) {
-	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
-}
-
-const ShaderImage_view& Image::shader() const noexcept {
-	return self().property.bg_shader();
-}
 
 // -------------------------------------------------------------------------------------------------
 

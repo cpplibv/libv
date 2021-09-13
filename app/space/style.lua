@@ -43,7 +43,7 @@ ui.style("space.hud-bar.cmd.panel") {
 ui.style("space.hud-bar.cmd.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = colors.hud_light_bg_color,
+	background = "color: " .. colors.hud_light_bg_color,
 	size = "10pxD1r, 4pxD",
 }
 
@@ -58,25 +58,26 @@ ui.style("space.hud-bar.mp.panel") {
 ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = colors.hud_light_bg_color,
+	background = "color: " .. colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.input") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = colors.hud_light_bg_color,
+	background = "color: " .. colors.hud_light_bg_color,
 	size = "10pxD, D1r",
 }
 
 ui.style("space.hud-bar.mp.lbl") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	bg_color = colors.hud_light_bg_color,
+	background = "color: " .. colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.iris-lbl") {
+--ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",

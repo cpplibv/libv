@@ -460,9 +460,6 @@ public:
 		property_loaders.emplace(pnm::bar_color, convert_color);
 		property_loaders.emplace(pnm::bar_image, convert_image);
 //		property_loaders.emplace(pnm::bar_shader, _______);
-		property_loaders.emplace(pnm::bg_color, convert_color);
-		property_loaders.emplace(pnm::bg_image, convert_image);
-//		property_loaders.emplace(pnm::bg_shader, _______);
 		//		property_loaders.emplace(pnm::caret, _______);
 		property_loaders.emplace(pnm::caret_color, convert_color);
 		//		property_loaders.emplace(pnm::caret_shader, _______);

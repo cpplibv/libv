@@ -31,6 +31,7 @@ class BaseBackground {
 public:
 	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
 	[[nodiscard]] virtual std::string to_string() const = 0;
+	[[nodiscard]] virtual libv::vec2i size() const noexcept { return {}; }; // TODO P1: Make it =0
 
 public:
 	virtual ~BaseBackground() = default;
@@ -409,6 +410,10 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 
 std::string Background::to_string() const {
 	return fragment->to_string();
+}
+
+libv::vec2i Background::size() const noexcept {
+	return fragment->size();
 }
 
 // -------------------------------------------------------------------------------------------------

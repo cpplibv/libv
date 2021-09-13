@@ -55,9 +55,7 @@ private:
 		PropertyL1<Texture2D_view> bar_image;
 		PropertyR<ShaderImage_view> bar_shader;
 
-		PropertyR<Color> bg_color;
-		PropertyL1<Texture2D_view> bg_image;
-		PropertyR<ShaderImage_view> bg_shader;
+		PropertyR<Background> background;
 
 		PropertyL1L2<Orientation> orientation;
 	} property;
@@ -149,22 +147,10 @@ void CoreScrollBar::access_properties(T& ctx) {
 	);
 
 	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_color; },
-			Color(1, 1, 1, 1),
-			pgr::appearance, pnm::bg_color,
-			"Background color"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_image; },
-			[](auto& u) { return u.fallbackTexture2D(); },
-			pgr::appearance, pnm::bg_image,
-			"Background image"
-	);
-	ctx.property(
-			[](auto& c) -> auto& { return c.property.bg_shader; },
-			[](auto& u) { return u.shaderImage(); },
-			pgr::appearance, pnm::bg_shader,
-			"Background shader"
+			[](auto& c) -> auto& { return c.property.background; },
+			Background::none(),
+			pgr::appearance, pnm::background,
+			"Background"
 	);
 
 	ctx.property(
@@ -332,13 +318,13 @@ void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 
 void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	if (event.enter) {
-		set(property.bg_color, property.bg_color() + 0.2f);
+//		set(property.bg_color, property.bg_color() + 0.2f);
 		set(property.bar_color, property.bar_color() + 0.2f);
 		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 	}
 
 	if (event.leave) {
-		set(property.bg_color, property.bg_color() - 0.2f);
+//		set(property.bg_color, property.bg_color() - 0.2f);
 		set(property.bar_color, property.bar_color() - 0.2f);
 //		reset(property.bg_color);
 //		reset(property.bar_color);
@@ -404,9 +390,10 @@ libv::vec3f CoreScrollBar::doLayout1(const ContextLayout1& environment) {
 	(void) environment;
 
 	const auto dynamic_size_bar = property.bar_image()->size().cast<float>();
-	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
+//	const auto dynamic_size_bg = property.bg_image()->size().cast<float>();
 
-	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
+//	return {libv::vec::max(dynamic_size_bar, dynamic_size_bg), 0.f};
+	return {dynamic_size_bar, 0.f};
 }
 
 void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
@@ -416,10 +403,7 @@ void CoreScrollBar::doLayout2(const ContextLayout2& environment) {
 }
 
 void CoreScrollBar::doRender(Renderer& r) {
-	r.texture_2D({0, 0}, layout_size2(), {0, 0}, {1, 1},
-			property.bg_color(),
-			property.bg_image(),
-			property.bg_shader());
+	property.background().render(r, {0, 0}, layout_size2(), *this);
 
 	r.texture_2D(bar_bounds_.position, bar_bounds_.size, {0, 0}, {1, 1},
 			property.bar_color(),
@@ -622,28 +606,12 @@ const ShaderImage_view& ScrollBar::bar_shader() const noexcept {
 	return self().property.bar_shader();
 }
 
-void ScrollBar::color(Color value) {
-	AccessProperty::manual(self(), self().property.bg_color, value);
+void ScrollBar::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
 }
 
-const Color& ScrollBar::color() const noexcept {
-	return self().property.bg_color();
-}
-
-void ScrollBar::image(Texture2D_view value) {
-	AccessProperty::manual(self(), self().property.bg_image, std::move(value));
-}
-
-const Texture2D_view& ScrollBar::image() const noexcept {
-	return self().property.bg_image();
-}
-
-void ScrollBar::shader(ShaderImage_view value) {
-	AccessProperty::manual(self(), self().property.bg_shader, std::move(value));
-}
-
-const ShaderImage_view& ScrollBar::shader() const noexcept {
-	return self().property.bg_shader();
+[[nodiscard]] const Background& ScrollBar::background() const noexcept {
+	return self().property.background();
 }
 
 // -------------------------------------------------------------------------------------------------
