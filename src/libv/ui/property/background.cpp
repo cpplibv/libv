@@ -27,6 +27,7 @@ class BaseBackground {
 //public:
 //	static libv::intrusive_ptr<BaseBackground> parse_string(std::string_view);
 //	static libv::intrusive_ptr<BaseBackground> parse_lua(const sol::object& object);
+//	static Component create_edit_ui();
 
 public:
 	virtual void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) = 0;
@@ -68,7 +69,7 @@ private:
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
 		const auto& other = static_cast<const BackgroundNone&>(other_base);
-		(void) other;
+		(void) other; // None's are always equal, they are stateless
 		return true;
 	}
 };
@@ -129,7 +130,7 @@ private:
 
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
+		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
 	virtual libv::vec2i size() const noexcept override {
@@ -216,7 +217,7 @@ private:
 
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
+		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
 	virtual libv::vec2i size() const noexcept override {
@@ -254,7 +255,7 @@ private:
 
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
+		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
 	virtual libv::vec2i size() const noexcept override {
@@ -350,7 +351,7 @@ private:
 
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
+		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
 	virtual libv::vec2i size() const noexcept override {
@@ -510,7 +511,7 @@ private:
 
 	virtual std::string to_string() const override {
 //		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-		return "Not implemented yet"; // !!!
+		return "Not implemented yet"; // TODO P5: Implement to_string
 	}
 
 	virtual libv::vec2i size() const noexcept override {
@@ -627,11 +628,18 @@ private:
 //	}
 //	virtual std::string to_string() const override {
 ////		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
-//		return "Not implemented yet"; // !!!
+//		return "Not implemented yet"; // TODO P5: Implement to_string
 //	}
 //};
 
 // =================================================================================================
+
+/// BackgroundNone has only a single instance that is shared for all defaults and the 'none' itself
+const auto global_shared_none = libv::make_intrusive<BackgroundNone>();
+
+Background::Background() noexcept :
+	fragment(global_shared_none) {
+}
 
 void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const {
 	fragment->render(r, pos, size, component);
@@ -648,9 +656,6 @@ libv::vec2i Background::size() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] bool operator==(const Background& lhs, const Background& rhs) noexcept {
-	if (lhs.fragment == nullptr || rhs.fragment == nullptr)
-		return false;
-
 	if (typeid(*lhs.fragment) != typeid(*rhs.fragment))
 		return false;
 
@@ -660,7 +665,7 @@ libv::vec2i Background::size() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] Background Background::none() {
-	return Background{libv::make_intrusive<BackgroundNone>()};
+	return Background{global_shared_none};
 }
 
 [[nodiscard]] Background Background::color(Color color) {

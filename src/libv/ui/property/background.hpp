@@ -15,7 +15,6 @@
 #include <libv/ui/property/texture_2D.hpp>
 // std
 #include <string>
-#include <string_view>
 
 
 namespace libv {
@@ -34,8 +33,8 @@ private:
 	libv::intrusive_ptr<BaseBackground> fragment;
 
 public:
-	explicit inline Background() : fragment(nullptr) {} // !!! (? use none instead)
-	explicit inline Background(intrusive_ptr<libv::ui::BaseBackground> fragment) : fragment(std::move(fragment)) {}
+	explicit Background() noexcept; // Uses none
+	explicit inline Background(intrusive_ptr<libv::ui::BaseBackground> fragment) noexcept : fragment(std::move(fragment)) {}
 
 public:
 	void render(class Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) const;
