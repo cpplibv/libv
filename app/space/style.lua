@@ -101,7 +101,7 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, -1}, border_extent = 3, texture = "stripes_border.png"},
 	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 
-	padding = {50, 7},
+	padding = {60, 8},
 	--padding = { 0, 7},
 
 	--size = "200px, 200px",

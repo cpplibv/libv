@@ -41,8 +41,8 @@ libv.ui: Fix and rework layout invalidation and layout properties
 libv.ui: background bring back size() query, not used on background, but for foreground it will be
 libv.ui: In every component background should not contribute to layout1 size
 libv.ui: Padding pattern support for internal padding
-
-
+libv.ui: bordered_padding_pattern (stripes_border.png with proper border handling)
+libv.ui: Fix input local positions when using padding
 
 
 
@@ -61,16 +61,13 @@ libv.ui: Padding pattern support for internal padding
 
 
 
-libv.ui: bordered_padding_pattern (padding_stripes.png with proper border handling)
-
-
-caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
-event.local_position does not account for padding
 
 
 
 
-Button state:
+
+
+Component styled states:
 
 	libv.ui.property: scope / sheet / component type based style rules
 	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)

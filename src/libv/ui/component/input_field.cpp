@@ -247,7 +247,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return handler().font_size(libv::ui::FontSize(libv::to_value(handler().font_size()) - 3)), event.stop_propagation();
 
 	if (event.keycode == libv::input::Keycode::F1 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = calculate_local_mouse_coord();
+		const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(mouse_coord));
 		caretStartTime = clock::now();
 		markInvalidLayout(false, false);
@@ -256,7 +256,7 @@ void CoreInputField::onKey(const EventKey& event) {
 		return event.stop_propagation();
 	}
 	if (event.keycode == libv::input::Keycode::F2 && event.action == libv::input::Action::press) {
-		const auto mouse_coord = calculate_local_mouse_coord();
+		const auto mouse_coord = calculate_local_mouse_coord() - padding_LB();
 		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(mouse_coord));
 		caretStartTime = clock::now();
 		markInvalidLayout(false, false);
@@ -375,7 +375,7 @@ void CoreInputField::onMouseButton(const EventMouseButton& event) {
 		focus();
 
 	if (event.action == libv::input::Action::press) {
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
@@ -394,13 +394,13 @@ void CoreInputField::onMouseMovement(const EventMouseMovement& event) {
 
 	// === TEMP ========================================================================================
 	if (context().state.key_pressed(libv::input::Keycode::F1)) {
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndex(event.local_position - padding_LB()));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
 	}
 	if (context().state.key_pressed(libv::input::Keycode::F2)) {
-		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
+		caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position - padding_LB()));
 		caretStartTime = clock::now();
 		flagAuto(Flag::pendingLayout | Flag::pendingRender);
 		fire(EventCaret{});
@@ -466,7 +466,7 @@ void CoreInputField::doRender(Renderer& r) {
 		const auto scale = context().settings.caret_width_scale;
 		const auto caretWidth = std::floor(std::clamp((lineHeight + offset) / scale, min, max));
 
-		r.quad(caretPosition, {caretWidth, lineHeight},
+		r.quad(padding_LB() + caretPosition, {caretWidth, lineHeight},
 				property.caret_color(),
 				property.caret_shader());
 	}
