@@ -157,8 +157,8 @@ void CorePanelFloat::doLayout2(const ContextLayout2& layout_env) {
 		const auto position =
 				+ padding_LB3()
 				+ child.core().margin_LB3()
-				+ child.anchor().to_info() * env_size
-				- child.anchor().to_info() * size;
+				+ info(child.anchor()).rate() * env_size
+				- info(child.anchor()).rate() * size;
 
 		size -= child.core().margin_size3();
 

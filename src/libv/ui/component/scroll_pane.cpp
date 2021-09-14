@@ -231,8 +231,8 @@ void CoreScrollArea::doLayout2(const ContextLayout2& layout_env) {
 
 	// Position ---
 
-	const auto client_area_anchor = client->anchor().to_info();
-	const auto client_anchor = client->anchor().to_info();
+	const auto client_area_anchor = info(client->anchor()).rate();
+	const auto client_anchor = info(client->anchor()).rate();
 	// NOTE: For now client_area_anchor is the same as client_anchor, if needed this could be a property of the scroll area
 
 	const auto position =

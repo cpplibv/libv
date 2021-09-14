@@ -389,7 +389,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 	sizeContent[_Y_] = libv::sum(advanceY, 0);
 	sizeContent += spacing_sum;
 
-	const auto originToContent = (env_size - sizeContent + spacing_sum) * anchor().to_info();
+	const auto originToContent = (env_size - sizeContent + spacing_sum) * info(anchor()).rate();
 	const auto contentToStart = sizeContent * orient.start;
 	auto startToPen = vec3f{};
 
@@ -403,7 +403,7 @@ void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 			cellSize[_Z_] = env_size[_Z_];
 
 			const auto penToCell = orient.penCorner * cellSize;
-			const auto cellToPosition = (cellSize - childSize) * child->anchor().to_info();
+			const auto cellToPosition = (cellSize - childSize) * info(child->anchor()).rate();
 
 			const auto position = padding_LB3() + originToContent + contentToStart + startToPen + penToCell + cellToPosition;
 			const auto roundedPosition = libv::vec::round(position);
