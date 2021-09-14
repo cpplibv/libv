@@ -44,6 +44,14 @@ ui.style("space.hud-bar.cmd.btn") {
 	size = "10pxD1r, 4pxD",
 }
 
+ui.style("space.hud-bar.mp.main") {
+	anchor = "top_center",
+	align_horizontal = "center",
+	align_vertical = "center",
+	orientation = "up",
+	size = "D, D",
+}
+
 ui.style("space.hud-bar.mp.panel") {
 	anchor = "top_center",
 	orientation = "right",
@@ -74,7 +82,7 @@ ui.style("space.hud-bar.mp.lbl") {
 	size = "10pxD, 4pxD",
 }
 
-ui.style("space.hud-bar.mp.iris-lbl") {
+ui.style("space.hud-bar.mp.space") {
 	--ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",

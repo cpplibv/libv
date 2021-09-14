@@ -75,6 +75,7 @@ app.space: Cannibalize style.lua from vm4_viewer
 place.it:
 	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
 	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
+	game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
 
 
 app.space: Simulation time control
@@ -160,7 +161,7 @@ app.space: Main structure paper
 
 
 
-
+app.space: Commands have a conflicting name, resolve it with an acronym like CTO (Command Transfer Object)
 
 app.space: Structure the whole program: UML time is upon us
 
@@ -195,6 +196,7 @@ app.space: Command arrow improvements
 app.space: line shader (Dalma)
 
 app.space: Iris and space has to merge in some way
+	iris: Make a main menu
 
 game.sim:
 		- Command based sim state manipulation | Playout
@@ -210,8 +212,6 @@ app.space: headless server
 
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis
-
-libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
 
 watch shader part 3 https://www.youtube.com/watch?v=E4PHFnvMzFc
 
@@ -229,30 +229,28 @@ What do I need from libv to make a 'minimal' working iris program?
 			2 Scripts to create a new build and deploy to libv.update servers
 
 	libv.serial
-		1 safe container resize/reserve
+		1 Safe container resize/reserve on deserialization
 
 	libv.ui
-		1 background generalization
-		2 list component
-		3 scroll pane = scroll area + scroll bar + connecting them
-		4 button states (state styles)
-		5 font outline render
+		1 Button states (state styles)
+		2 List component
+		3 Scroll pane = scroll area + scroll bar + connecting them
+		5 Font outline render
 			freetype2 Now has an SDF render option
 			spread property set:
 				const FT_Int spread = 8;
 				FT_Property_Set(library, "sdf", "spread", &spread);
 				8bit uint normalized to [+spread .. -spread]
 
-iris: Make a main menu
+	libv.ctrl
+		2 Interaction with UI
+		5 Resolve analog-binary accidental collusion with time
 
 blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
 		full screen quad pass with render_resolution / 2 with v blur shader
 		full screen quad pass with render_resolution / 2 with h blur shader
 		full screen quad pass with render_resolution / 8 with v blur shader
 		full screen quad pass with render_resolution / 8 with h blur shader
-
-
-game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
 
 
 

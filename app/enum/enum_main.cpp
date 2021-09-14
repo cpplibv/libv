@@ -247,7 +247,7 @@ public:
 			out("	}}\n");
 		}
 
-		// TODO P1: parse
+		// TODO P1: parse (with and without: aliases, case sensitivity, ignore whitespace, ignore all whitespace (even mid word ones too)
 
 		for (const auto& [property_name, property] : properties) {
 			out("\n");

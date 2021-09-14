@@ -25,14 +25,20 @@ libv::ui::Component SceneMPBar::create(libv::Nexus& nexus, Player& player) {
 	return mp_bar;
 }
 
-libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar) {
+libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
+
+	mp_bar_main.style("space.hud-bar.mp.main");
+
+	libv::ui::Label lbl_space("mp-title-space");
+	lbl_space.style("space.hud-bar.mp.space");
+	lbl_space.text("SPACE");
+	mp_bar_main.add(lbl_space);
+
+	libv::ui::PanelLine mp_bar;
 	mp_bar.style("space.hud-bar.mp.panel");
+	mp_bar_main.add(mp_bar);
 
 	{
-		libv::ui::Label lbl_iris("mp-title-iris");
-		lbl_iris.style("space.hud-bar.mp.iris-lbl");
-		lbl_iris.text("NETWORK");
-		mp_bar.add(lbl_iris);
 
 		libv::ui::Label lbl_name("mp-name-lbl");
 		lbl_name.style("space.hud-bar.mp.lbl");
@@ -120,7 +126,7 @@ SceneMPBar::~SceneMPBar() {
 // =================================================================================================
 // =================================================================================================
 // =================================================================================================
-// <<< Do not forget about the prettier API and styles
+// <<< Do not forget about the prettier API (auto c = container.add<Component>())
 
 
 

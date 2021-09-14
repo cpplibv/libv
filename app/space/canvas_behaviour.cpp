@@ -67,17 +67,13 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 } // namespace -------------------------------------------------------------------------------------
 
 void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
-	controls.feature_action<app::SpaceCanvas>("space.add_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<app::SpaceCanvas>("space.spawn_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.queue<app::CommandFleetMove>(
-				world_coord
-		);
-		// <<< should controls use nexus or playout directly? Think about console and lua scripts too.
-//			nexus.broadcast<app::CommandFleetMove>(static_cast<app::FleetID>(ctx.universe.fleets.size()), world_coord);
-//			nexus.broadcast<mc::RequestCommandFleetMove>(world_coord);
+
+		// <<< should controls use nexus or playout directly? Think about the console and the lua scripts too.
+//		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 
 		ctx.playout.queue<app::CommandFleetSpawn>(world_coord);
-//		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.select_fleet", [](const auto&, app::SpaceCanvas& ctx) {
@@ -88,7 +84,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 			);
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.add_fleet_to_selection", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<app::SpaceCanvas>("space.select_fleet_add", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
 		if (fleet_id)
 			ctx.playout.queue<app::CommandFleetSelectAdd>(
@@ -122,9 +118,9 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	// TODO P1: libv.ctrl: analog feature (on time update) bypasses the accidental collusion resolution system (specialization) with an action feature
 
-	controls.bind("space.add_fleet_at_mouse", "Ctrl + LMB [press]");
+	controls.bind("space.spawn_fleet_at_mouse", "Ctrl + LMB [press]");
 	controls.bind("space.select_fleet", "LMB [press]");
-	controls.bind("space.add_fleet_to_selection", "Shift + LMB [press]");
+	controls.bind("space.select_fleet_add", "Shift + LMB [press]");
 	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
 	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");

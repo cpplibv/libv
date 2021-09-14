@@ -75,8 +75,6 @@ Component styled states:
 	libv.ui.style: Style based on component state (bit-mask)
 
 
-
-
 	libv.ui.theme:
 		Possible button states:
 			Normal
@@ -86,7 +84,6 @@ Component styled states:
 			Progress/Loading
 			Disabled
 			Error
-
 
 
 	libv.ui: static_component system (lite)

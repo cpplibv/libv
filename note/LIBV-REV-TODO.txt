@@ -95,6 +95,8 @@ libv.glr: Add support for GL Queries
 libv.gl: glColorMask
 libv.glr: glColorMask
 
+libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
+
 libv.rev: Shadow
 	libv.rev: Multiple shadow casters:
 			Use a texture3D (glFramebufferTextureLayer needed)

@@ -44,7 +44,7 @@ TaskPool::TaskPool(libv::net::IOContext& io_context, std::vector<libv::net::Addr
 	io_context(io_context),
 	server_addresses(std::move(servers_)) {
 
-	std::random_device rd; // Expensive random number engine (but only a few uses, not worth to spin up an mt)
+	std::random_device rd; // Expensive random number engine (but only a few uses, not worth to spin up a mt)
 	std::ranges::shuffle(server_addresses, rd);
 
 	const auto server_peer_count = std::min(static_cast<int>(server_addresses.size()), 2);
