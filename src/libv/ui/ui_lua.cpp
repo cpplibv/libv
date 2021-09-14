@@ -186,87 +186,7 @@ namespace ui {
 //	return libv::lua::transform(libv::lua::string_parse(std::move(parse_func)), std::forward<F>(func));
 //}
 
-std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& object) {
-
-	if (object.get_type() == sol::type::string) {
-
-		const auto chop_prefix = [](std::string_view str, std::string_view prefix) -> std::optional<std::string_view> {
-			if (!str.starts_with(prefix))
-				return std::nullopt;
-
-			str.remove_prefix(prefix.size());
-			return libv::trim(str);
-		};
-
-		auto str = libv::trim(object.as<std::string_view>());
-
-		//	none               ()
-		if (str == "none")
-			return libv::ui::Background::none();
-
-		//	color              (Color color)
-		if (const auto value = chop_prefix(str, "color:")) {
-			const auto color = libv::parse::parse_color_optional(*value);
-			if (!color)
-				return std::nullopt;
-
-			return libv::ui::Background::color(*color);
-		}
-
-		//	color              (Color color, ShaderQuad_view shader)
-
-		//	texture            (Color color, Texture2D_view texture)
-		if (const auto value = chop_prefix(str, "texture:")) {
-			// TODO P2: Handle not found resource?
-			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
-		}
-
-		//	texture            (Color color, Texture2D_view texture, ShaderImage_view shader)
-
-		//	border             (Color color, Texture2D_view texture)
-		if (const auto value = chop_prefix(str, "border:")) {
-			// TODO P2: Handle not found resource?
-			return libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
-		}
-
-		// TODO P1: Implement the rest of the background types
-		// TODO P1: Implement lua table based background loading, rely on other convert functions to do so, generalize convert function API for this
-
-		//	border             (Color color, Texture2D_view texture, ShaderImage_view shader)
-		//	pattern            (Color color, Texture2D_view texture)
-		if (const auto value = chop_prefix(str, "pattern:")) {
-			// TODO P2: Handle not found resource?
-			return libv::ui::Background::pattern({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
-		}
-
-		//	pattern            (Color color, Texture2D_view texture, ShaderImage_view shader)
-		//	padding_pattern    (Color color, Texture2D_view texture)
-		if (const auto value = chop_prefix(str, "padding_pattern:")) {
-			// TODO P2: Handle not found resource?
-			return libv::ui::Background::padding_pattern({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
-		}
-		//	padding_pattern    (Color color, Texture2D_view texture, ShaderImage_view shader)
-		//	gradient_linear    (std::vector<GradientPoint> points)
-		//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
-
-		// TODO P1: last resort: try parse it as color or texture
-	}
-
-//	UI& ui;
-//
-//	if (not is_string())
-//		return;
-//
-//	pattern_protocol("image ", [&ui](const auto path){ return ui.context().texture2D(path); });
-//	return pattern_protocol("color ", [&ui](const auto path){ return ui.context().texture2D(path); });
-//	return pattern_protocol("stretch ", [&ui](const auto path){ return ui.context().texture2D(path); });
-//	pattern_protocol("color ", ),
-//	pattern_protocol("stretch ", ),
-
-	return std::nullopt;
-}
-
-std::optional<PropertyDynamic> convert_color(UI&, const sol::object& object) {
+std::optional<Color> convert_color(UI&, const sol::object& object) {
 
 	if (object.get_type() == sol::type::string) {
 		return {libv::parse::parse_color_optional(object.as<std::string_view>())};
@@ -327,7 +247,7 @@ std::optional<PropertyDynamic> convert_color(UI&, const sol::object& object) {
 	}
 }
 
-std::optional<PropertyDynamic> convert_margin_padding(UI&, const sol::object& object) {
+std::optional<Padding> convert_margin_padding(UI&, const sol::object& object) {
 	if (object.get_type() == sol::type::number) {
 		// left_down_right_top
 		return libv::vec4f::one(object.as<float>());
@@ -394,18 +314,204 @@ std::optional<PropertyDynamic> convert_margin_padding(UI&, const sol::object& ob
 	}
 }
 
+std::optional<Texture2D_view> convert_texture(UI& ui, const sol::object& object) {
+	if (object.get_type() != sol::type::string)
+		return std::nullopt;
+
+	return ui.context().texture2D(object.as<std::string_view>());
+}
+
+template <typename F, typename T>
+auto convert_member(UI& ui, const sol::table& table, std::string_view key, F&& convert_fn, T&& fallback_if_missing) {
+	const auto member = table.get<sol::object>(key);
+
+	if (member.valid())
+		return convert_fn(ui, member);
+	else
+		return decltype(convert_fn(ui, member)){std::forward<T>(fallback_if_missing)};
+}
+
+template <typename F>
+auto convert_member(UI& ui, const sol::table& table, std::string_view key, F&& convert_fn) {
+	const auto member = table.get<sol::object>(key);
+
+	if (member.valid())
+		return convert_fn(ui, member);
+	else
+		return decltype(convert_fn(ui, member)){std::nullopt};
+}
+
+std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& object) {
+
+	if (object.get_type() == sol::type::string) {
+
+		const auto chop_prefix = [](std::string_view str, std::string_view prefix) -> std::optional<std::string_view> {
+			if (!str.starts_with(prefix))
+				return std::nullopt;
+
+			str.remove_prefix(prefix.size());
+			return libv::trim(str);
+		};
+
+		auto str = libv::trim(object.as<std::string_view>());
+
+		//	none               ()
+		if (str == "none")
+			return libv::ui::Background::none();
+
+		//	color              (Color color)
+		if (const auto value = chop_prefix(str, "color:")) {
+			const auto color = libv::parse::parse_color_optional(*value);
+			if (!color)
+				return std::nullopt;
+
+			return libv::ui::Background::color(*color);
+		}
+
+		//	color              (Color color, ShaderQuad_view shader)
+		//	texture            (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "texture:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
+
+		//	texture            (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	border             (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "border:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::border({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
+
+		//	border             (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	pattern            (Color color, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "pattern:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::pattern({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(*value));
+		}
+
+		//	pattern            (Color color, Texture2D_view texture, ShaderImage_view shader)
+		//	padding_pattern    (Color color, Padding inner_padding, Texture2D_view texture)
+		if (const auto value = chop_prefix(str, "padding_pattern:")) {
+			// TODO P2: Handle not found resource?
+			return libv::ui::Background::padding_pattern({1.f, 1.f, 1.f, 1.f}, {0, 0, 0, 0}, ui.context().texture2D(*value));
+		}
+		//	padding_pattern    (Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader)
+		//	gradient_linear    (std::vector<GradientPoint> points)
+		//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
+
+		// Last resort 1/2: try parse it as color
+		const auto color = libv::parse::parse_color_optional(str);
+		if (color)
+			return libv::ui::Background::color(*color);
+
+		// Last resort 2/2: try parse it as texture
+		if (ui.context().texture2D_exists(str))
+			return libv::ui::Background::texture({1.f, 1.f, 1.f, 1.f}, ui.context().texture2D(str));
+
+		return std::nullopt;
+	}
+
+	if (object.get_type() == sol::type::table) {
+		const auto table = object.as<sol::table>();
+
+		const auto member_type = table.get<sol::object>("type");
+		if (member_type.get_type() != sol::type::string)
+			return std::nullopt;
+
+		const auto type_str = member_type.as<std::string_view>();
+
+		if (type_str == "none") {
+			return libv::ui::Background::none();
+
+		} else if (type_str == "color") {
+			const auto color = convert_member(ui, table, "color", convert_color);
+			if (!color)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::color(*color, *shader);
+//			else
+			return libv::ui::Background::color(*color);
+
+		} else if (type_str == "texture") {
+			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			if (!color)
+				return std::nullopt;
+
+			const auto texture = convert_member(ui, table, "texture", convert_texture);
+			if (!texture)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::texture(color, *texture, *shader);
+//			else
+			return libv::ui::Background::texture(*color, *texture);
+
+		} else if (type_str == "border") {
+			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			if (!color)
+				return std::nullopt;
+
+			const auto texture = convert_member(ui, table, "texture", convert_texture);
+			if (!texture)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::border(*color, *texture, *shader);
+//			else
+			return libv::ui::Background::border(*color, *texture);
+
+		} else if (type_str == "pattern") {
+			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			if (!color)
+				return std::nullopt;
+
+			const auto texture = convert_member(ui, table, "texture", convert_texture);
+			if (!texture)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::border(*color, *texture, *shader);
+//			else
+			return libv::ui::Background::pattern(*color, *texture);
+
+		} else if (type_str == "padding_pattern") {
+			const auto color = convert_member(ui, table, "color", convert_color, Color{1, 1, 1, 1});
+			if (!color)
+				return std::nullopt;
+
+			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			if (!inner_padding)
+				return std::nullopt;
+
+			const auto texture = convert_member(ui, table, "texture", convert_texture);
+			if (!texture)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::border(*color, *inner_padding, *texture, *shader);
+//			else
+			return libv::ui::Background::padding_pattern(*color, *inner_padding, *texture);
+
+//		} else if (type_str == "padding_pattern") {
+//			//	gradient_linear    (std::vector<GradientPoint> points)
+//			//	gradient_linear    (std::vector<GradientPoint> points, ShaderQuad_view shader)
+		}
+	}
+
+	return std::nullopt;
+}
+
 std::optional<PropertyDynamic> convert_font(UI& ui, const sol::object& object) {
 	if (object.get_type() != sol::type::string)
 		return std::nullopt;
 
 	return ui.context().font(object.as<std::string_view>());
-}
-
-std::optional<PropertyDynamic> convert_image(UI& ui, const sol::object& object) {
-	if (object.get_type() != sol::type::string)
-		return std::nullopt;
-
-	return ui.context().texture2D(object.as<std::string_view>());
 }
 
 template <typename Enum>
@@ -437,6 +543,12 @@ auto convert_string_parse = [](auto parse_function) {
 	};
 };
 
+const auto conv_fn = [](auto&& fn) {
+	return [fn = std::forward<decltype(fn)>(fn)](UI& ui, const sol::object& object) -> std::optional<PropertyDynamic> {
+		return fn(ui, object);
+	};
+};
+
 using load_fn = std::function<std::optional<PropertyDynamic>(UI&, const sol::object&)>;
 
 // =================================================================================================
@@ -457,24 +569,24 @@ public:
 		//		property_loaders.emplace(pnm::area_position, _______);
 		//		property_loaders.emplace(pnm::area_size, _______);
 		property_loaders.emplace(pnm::background, convert_background);
-		property_loaders.emplace(pnm::bar_color, convert_color);
-		property_loaders.emplace(pnm::bar_image, convert_image);
+		property_loaders.emplace(pnm::bar_color, conv_fn(convert_color));
+		property_loaders.emplace(pnm::bar_image, conv_fn(convert_texture));
 //		property_loaders.emplace(pnm::bar_shader, _______);
 		//		property_loaders.emplace(pnm::caret, _______);
-		property_loaders.emplace(pnm::caret_color, convert_color);
+		property_loaders.emplace(pnm::caret_color, conv_fn(convert_color));
 		//		property_loaders.emplace(pnm::caret_shader, _______);
-		property_loaders.emplace(pnm::color, convert_color);
+		property_loaders.emplace(pnm::color, conv_fn(convert_color));
 //		property_loaders.emplace(pnm::column_count, _______);
 //		property_loaders.emplace(pnm::focus_select_policy, _______);
 		property_loaders.emplace(pnm::font, convert_font);
 //		property_loaders.emplace(pnm::font_outline, convert_font_outline);
-		property_loaders.emplace(pnm::font_color, convert_color);
+		property_loaders.emplace(pnm::font_color, conv_fn(convert_color));
 //		property_loaders.emplace(pnm::font_shader, _______);
 		property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
-		property_loaders.emplace(pnm::margin, convert_margin_padding);
+		property_loaders.emplace(pnm::margin, conv_fn(convert_margin_padding));
 		property_loaders.emplace(pnm::orientation, convert_string_parse(&libv::ui::parse_orientation_optional));
 //		property_loaders.emplace(pnm::orientation2, _______);
-		property_loaders.emplace(pnm::padding, convert_margin_padding);
+		property_loaders.emplace(pnm::padding, conv_fn(convert_margin_padding));
 //		property_loaders.emplace(pnm::quad_shader, _______);
 //		property_loaders.emplace(pnm::scroll_area_mode, _______);
 		property_loaders.emplace(pnm::size, convert_string_parse(&libv::ui::parse_size_optional));

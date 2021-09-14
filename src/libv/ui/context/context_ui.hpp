@@ -80,6 +80,7 @@ public:
 public:
 	[[nodiscard]] std::shared_ptr<Font2D> font(const std::filesystem::path& path);
 	[[nodiscard]] std::shared_ptr<Texture2D> texture2D(const std::filesystem::path& path);
+	[[nodiscard]] bool texture2D_exists(const std::filesystem::path& path);
 	[[nodiscard]] libv::intrusive_ptr<Style> style(const std::string_view style_name);
 
 	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string& name);

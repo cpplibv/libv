@@ -40,6 +40,7 @@ libv.ui: Implement style sheets loading and hot reloading support
 libv.ui: Fix and rework layout invalidation and layout properties
 libv.ui: background bring back size() query, not used on background, but for foreground it will be
 libv.ui: In every component background should not contribute to layout1 size
+libv.ui: Padding pattern support for internal padding
 
 
 
@@ -62,7 +63,6 @@ libv.ui: In every component background should not contribute to layout1 size
 
 
 
-libv.ui: Padding pattern support for internal padding
 
 
 
@@ -72,7 +72,7 @@ libv.ui: Padding pattern support for internal padding
 
 
 
-libv.ui: check on that recent modification that i just did in ui.context_state to start the frame time at now
+libv.ui: check on that "recent" modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
 
 libv.ui: static_component system (lite)

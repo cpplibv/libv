@@ -9,6 +9,7 @@
 #include <libv/utility/intrusive_ptr.hpp>
 // pro
 #include <libv/ui/property/color.hpp>
+#include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/shader_image.hpp>
 #include <libv/ui/property/shader_quad.hpp>
 #include <libv/ui/property/texture_2D.hpp>
@@ -56,8 +57,8 @@ public:
 	[[nodiscard]] static Background border(Color color, Texture2D_view texture, ShaderImage_view shader);
 	[[nodiscard]] static Background pattern(Color color, Texture2D_view texture);
 	[[nodiscard]] static Background pattern(Color color, Texture2D_view texture, ShaderImage_view shader);
-	[[nodiscard]] static Background padding_pattern(Color color, Texture2D_view texture);
-	[[nodiscard]] static Background padding_pattern(Color color, Texture2D_view texture, ShaderImage_view shader);
+	[[nodiscard]] static Background padding_pattern(Color color, Padding inner_padding, Texture2D_view texture);
+	[[nodiscard]] static Background padding_pattern(Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader);
 //	[[nodiscard]] static Background gradient_linear(std::vector<GradientPoint> points);
 //	[[nodiscard]] static Background gradient_linear(std::vector<GradientPoint> points, ShaderQuad_view shader);
 };

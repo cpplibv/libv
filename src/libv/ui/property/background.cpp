@@ -272,12 +272,14 @@ private:
 class BackgroundPaddingPattern : public BaseBackground {
 private:
 	Color color;
+	Padding inner_padding;
 	Texture2D_view texture;
 	ShaderImage_view shader;
 
 public:
-	BackgroundPaddingPattern(Color color, Texture2D_view texture, ShaderImage_view shader) :
+	BackgroundPaddingPattern(Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader) :
 			color(color),
+			inner_padding(inner_padding),
 			texture(std::move(texture)),
 			shader(std::move(shader)) {}
 
@@ -302,8 +304,8 @@ private:
 		const auto pattern_size = texture->size().cast<float>();
 
 		const auto p0 = pos;
-		const auto p1 = pos + content_pos;
-		const auto p2 = content_pos + content_size;
+		const auto p1 = libv::vec::max(pos, pos + content_pos - xy(inner_padding));
+		const auto p2 = libv::vec::min(pos + size, content_pos + content_size + zw(inner_padding));
 		const auto p3 = pos + size;
 
 		const auto t0 = (p0 - pos) / pattern_size;
@@ -357,7 +359,11 @@ private:
 
 	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
 		const auto& other = static_cast<const BackgroundPaddingPattern&>(other_base);
-		return color == other.color && texture == other.texture && shader == other.shader;
+		return
+				color == other.color &&
+				inner_padding == other.inner_padding &&
+				texture == other.texture &&
+				shader == other.shader;
 	}
 };
 
@@ -527,12 +533,12 @@ libv::vec2i Background::size() const noexcept {
 	return Background{libv::make_intrusive<BackgroundPattern>(color, std::move(texture), std::move(shader))};
 }
 
-[[nodiscard]] Background Background::padding_pattern(Color color, Texture2D_view texture) {
-	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, std::move(texture), current_thread_context().shaderImage())};
+[[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture) {
+	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), current_thread_context().shaderImage())};
 }
 
-[[nodiscard]] Background Background::padding_pattern(Color color, Texture2D_view texture, ShaderImage_view shader) {
-	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, std::move(texture), std::move(shader))};
+[[nodiscard]] Background Background::padding_pattern(Color color, Padding inner_padding, Texture2D_view texture, ShaderImage_view shader) {
+	return Background{libv::make_intrusive<BackgroundPaddingPattern>(color, inner_padding, std::move(texture), std::move(shader))};
 }
 
 //[[nodiscard]] static Background Background::gradient_linear(std::vector<GradientPoint> points) {

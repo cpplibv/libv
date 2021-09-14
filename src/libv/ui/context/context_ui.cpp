@@ -325,6 +325,17 @@ std::shared_ptr<Texture2D> ContextUI::texture2D(const std::filesystem::path& pat
 	return sp;
 }
 
+[[nodiscard]] bool ContextUI::texture2D_exists(const std::filesystem::path& path) {
+	const auto lexically_normal = path.lexically_normal();
+	const auto target = settings.res_texture.base_path / lexically_normal;
+
+	if (!secure_path(settings.res_texture.base_path, settings.res_texture.restict_under_base, target, lexically_normal))
+		return false;
+
+	std::error_code ignore_ec;
+	return std::filesystem::exists(target, ignore_ec);
+}
+
 libv::intrusive_ptr<Style> ContextUI::style(const std::string_view style_name) {
 	// TODO P5: std::string(string_view) for hash lookup, I know there is or there will be a solution for it
 	const auto it = self->styles.find(std::string(style_name));

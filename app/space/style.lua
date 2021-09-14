@@ -1,6 +1,3 @@
-
-
-
 -- -------------------------------------------------------------------------------------------------
 
 --	font_shader = "default",
@@ -9,8 +6,8 @@
 -- -------------------------------------------------------------------------------------------------
 
 local colors = {
-	text_light = "hsva(  0°,  0%,  80%, 100%)",
-	text_dark = "hsva(  0°,  0%,  20%, 100%)",
+	text_light =         "hsva(  0°,  0%,  80%, 100%)",
+	text_dark =          "hsva(  0°,  0%,  20%, 100%)",
 	hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
 }
 
@@ -43,7 +40,7 @@ ui.style("space.hud-bar.cmd.panel") {
 ui.style("space.hud-bar.cmd.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	background = "color: " .. colors.hud_light_bg_color,
+	background = colors.hud_light_bg_color,
 	size = "10pxD1r, 4pxD",
 }
 
@@ -58,26 +55,27 @@ ui.style("space.hud-bar.mp.panel") {
 ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	background = "color: " .. colors.hud_light_bg_color,
+	background = colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.input") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	background = "color: " .. colors.hud_light_bg_color,
-	size = "10pxD, D1r",
+	background = colors.hud_light_bg_color,
+	--size = "10pxD, D1r",
+	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.lbl") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	background = "color: " .. colors.hud_light_bg_color,
+	background = colors.hud_light_bg_color,
 	size = "10pxD, 4pxD",
 }
 
 ui.style("space.hud-bar.mp.iris-lbl") {
---ui.style("space.hud-bar.mp.btn") {
+	--ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
@@ -91,10 +89,12 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = "border: stretch_border.png";
 	--background = "pattern: stretch_border.png";
 	--background = "padding_pattern: padding_stripes.png";
-	background = "padding_pattern: stripes.png";
+	--background = "padding_pattern: stripes.png";
+	--background = "padding_pattern: stripes.png";
+	background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
 
-	padding = { 40, 7 },
-	--padding = {  0, 7 },
+	padding = {40, 7},
+	--padding = { 0, 7},
 
 	--size = "200px, 200px",
 	--size = "100px, 100px",
