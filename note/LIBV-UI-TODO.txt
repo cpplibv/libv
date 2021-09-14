@@ -78,11 +78,11 @@ Component styled states:
 
 
 	libv.ui.theme:
-		Button states:
+		Possible button states:
 			Normal
 			Focus
 			Hover
-			Active/Press
+			Active/Press/Held Down
 			Progress/Loading
 			Disabled
 			Error

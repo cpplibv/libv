@@ -2,8 +2,6 @@
 
 // hpp
 #include <libv/ui/context/context_ui.hpp>
-// ext
-#include <clip/clip.h>
 // libv
 #include <libv/gl/load_image.hpp>
 #include <libv/utility/generic_path.hpp>
@@ -152,23 +150,6 @@ ContextUI::ContextUI(UI& ui, ContextState& state, Settings settings) :
 
 ContextUI::~ContextUI() {
 	// For forward declared unique_ptr
-}
-
-// -------------------------------------------------------------------------------------------------
-
-std::string ContextUI::clipboardText() {
-	std::string result;
-	bool success = clip::get_text(result);
-	log_ui.error_if(!success, "Failed to get clipboard");
-
-	std::erase(result, '\r'); // NOTE: Cleanup any crlf line ending by removing every cr
-
-	return result;
-}
-
-void ContextUI::clipboardText(const std::string& string) {
-	bool success = clip::set_text(string);
-	log_ui.error_if(!success, "Failed to set clipboard text of length {}: \"{}\"", string.size(), string);
 }
 
 // -------------------------------------------------------------------------------------------------

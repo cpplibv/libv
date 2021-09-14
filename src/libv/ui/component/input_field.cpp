@@ -2,14 +2,16 @@
 
 // hpp
 #include <libv/ui/component/input_field.hpp>
+// libv
+#include <libv/sys/clipboard.hpp>
 // pro
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_state.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -18,9 +20,7 @@
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
-#include <libv/ui/shader/shader_image.hpp>
 #include <libv/ui/shader/shader_quad.hpp>
-#include <libv/ui/style.hpp>
 #include <libv/ui/text_layout.hpp>
 
 
@@ -278,14 +278,14 @@ void CoreInputField::onKey(const EventKey& event) {
 	}
 
 	if (event.keycode == libv::input::Keycode::C && event.action != libv::input::Action::release && ctrl) {
-		context().clipboardText(text_.string());
+		libv::sys::clipboard_text(text_.string());
 
 		caretStartTime = clock::now();
 		return event.stop_propagation();
 	}
 
 	if (event.keycode == libv::input::Keycode::V && event.action != libv::input::Action::release && ctrl) {
-		const auto clip = context().clipboardText();
+		const auto clip = libv::sys::clipboard_text();
 		caret += static_cast<uint32_t>(text_.insert(caret, clip));
 
 		caretStartTime = clock::now();
@@ -297,7 +297,7 @@ void CoreInputField::onKey(const EventKey& event) {
 	}
 
 	if (event.keycode == libv::input::Keycode::X && event.action != libv::input::Action::release && ctrl) {
-		context().clipboardText(text_.string());
+		libv::sys::clipboard_text(text_.string());
 		text_.clear();
 
 		caret = 0;

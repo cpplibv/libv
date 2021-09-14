@@ -71,10 +71,10 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
+
 place.it:
 	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
 	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
-	libv.sys: Move clipboard text to it from libv.ui.context_ui
 
 
 app.space: Simulation time control

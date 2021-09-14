@@ -11,7 +11,7 @@ namespace sys {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Convert any incoming crlf to lf
+/// Converts any incoming crlf to lf
 [[nodiscard]] std::string clipboard_text();
 
 void clipboard_text(const std::string& string);

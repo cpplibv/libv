@@ -11,7 +11,6 @@
 // std
 #include <filesystem>
 #include <memory>
-#include <string>
 #include <string_view>
 // pro
 #include <libv/ui/event/detail/internal_event_linkage.hpp>
@@ -61,10 +60,6 @@ public:
 	ContextUI& operator=(ContextUI&&) = delete;
 
 public:
-	[[nodiscard]] std::string clipboardText();
-	void clipboardText(const std::string& string);
-
-public:
 	[[nodiscard]] bool isAnyStyleDirty() const noexcept;
 	void clearEveryStyleDirty() noexcept;
 	void foreach_style(libv::function_ref<void(std::string_view name, Style& style)> func);
@@ -83,7 +78,7 @@ public:
 	[[nodiscard]] bool texture2D_exists(const std::filesystem::path& path);
 	[[nodiscard]] libv::intrusive_ptr<Style> style(const std::string_view style_name);
 
-	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string& name);
+	[[nodiscard]] std::shared_ptr<Shader> shader(const std::string_view name);
 	[[nodiscard]] std::shared_ptr<ShaderFont> shaderFont(const std::string_view name);
 	[[nodiscard]] std::shared_ptr<ShaderImage> shaderImage(const std::string_view name);
 	[[nodiscard]] std::shared_ptr<ShaderQuad> shaderQuad(const std::string_view name);
