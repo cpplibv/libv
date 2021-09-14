@@ -494,9 +494,36 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 
 //			const auto shader = convert_shader(table.get<sol::object>("shader"));
 //			if (shader)
-//				return libv::ui::Background::border(*color, *inner_padding, *texture, *shader);
+//				return libv::ui::Background::padding_pattern(*color, *inner_padding, *texture, *shader);
 //			else
 			return libv::ui::Background::padding_pattern(*color, *inner_padding, *texture);
+
+		} else if (type_str == "border_padding_pattern") {
+			const auto color_border = convert_member(ui, table, "color_border", convert_color, Color{1, 1, 1, 1});
+			if (!color_border)
+				return std::nullopt;
+
+			const auto color_pattern = convert_member(ui, table, "color_pattern", convert_color, Color{1, 1, 1, 1});
+			if (!color_pattern)
+				return std::nullopt;
+
+			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			if (!inner_padding)
+				return std::nullopt;
+
+			const auto border_extent = convert_member(ui, table, "border_extent", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			if (!border_extent)
+				return std::nullopt;
+
+			const auto texture = convert_member(ui, table, "texture", convert_texture);
+			if (!texture)
+				return std::nullopt;
+
+//			const auto shader = convert_shader(table.get<sol::object>("shader"));
+//			if (shader)
+//				return libv::ui::Background::border_padding_pattern(*color, *inner_padding, *texture, *shader);
+//			else
+			return libv::ui::Background::border_padding_pattern(*color_border, *color_pattern, *inner_padding, *border_extent, *texture);
 
 //		} else if (type_str == "padding_pattern") {
 //			//	gradient_linear    (std::vector<GradientPoint> points)

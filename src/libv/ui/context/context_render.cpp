@@ -366,6 +366,14 @@ void Renderer::vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f color) {
 	context.ll_num_vertex++;
 }
 
+void Renderer::vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f tile, libv::vec4f color) {
+	context.vtx_positions.emplace_back(pos);
+	context.vtx_texture0s.emplace_back(uv);
+	context.vtx_texture0_tiles.emplace_back(tile);
+	context.vtx_color0s.emplace_back(color);
+	context.ll_num_vertex++;
+}
+
 //void Renderer::vertex_2(libv::vec2f pos, libv::vec2f uv, libv::vec4f color) {
 //	(void) pos;
 //	(void) uv;

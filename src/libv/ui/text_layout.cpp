@@ -500,7 +500,6 @@ void TextLayout::layout() {
 	const auto num_lines_f = static_cast<float>(lines.size());
 	const auto lines_height_sum = num_lines_f * lineAdvance;
 
-	const auto isJustifiedX = alignh.justified();
 	auto leftoverMinX = std::numeric_limits<float>::infinity(); // Used for content_bounding calculation
 
 	const auto leftoverY = hasLimitY ? (limit_.y - lines_height_sum) : 0.f;

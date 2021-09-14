@@ -61,6 +61,52 @@ libv.ui: Padding pattern support for internal padding
 
 
 
+libv.ui: bordered_padding_pattern (padding_stripes.png with proper border handling)
+
+
+caret = static_cast<uint32_t>(text_.getClosestCharacterIndexInline(event.local_position));
+event.local_position does not account for padding
+
+
+
+
+Button state:
+
+	libv.ui.property: scope / sheet / component type based style rules
+	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
+		libv.ui.property: account for cyclic owning references with style property
+	libv.ui.style: Style based on component state (bit-mask)
+
+
+
+
+	libv.ui.theme:
+		Button states:
+			Normal
+			Focus
+			Hover
+			Active/Press
+			Progress/Loading
+			Disabled
+			Error
+
+
+
+	libv.ui: static_component system (lite)
+		Check on the _pastebin/legacy codes for this one
+
+		libv.ui: Restructure: property context creation stuffy simplification
+				maybe CRTP base for core components
+				| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
+
+		libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
+		libv.ui: Composite component style / property system
+			libv.ui.property: complex composite component would result in "nested" property sets
+			libv.ui.property: property system interaction with static_component system
+			libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
+
+
+
 
 
 
@@ -74,19 +120,6 @@ libv.ui: Padding pattern support for internal padding
 
 libv.ui: check on that "recent" modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
-
-libv.ui: static_component system (lite)
-	Check on the _pastebin/legacy codes for this one
-
-	libv.ui: Restructure: property context creation stuffy simplification
-			maybe CRTP base for core components
-			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
-	libv.ui: Composite component style / property system
-		libv.ui.property: complex composite component would result in "nested" property sets
-		libv.ui.property: property system interaction with static_component system
-		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
 
 libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or initiator stack)
 		A simple const void* that can be passed to any function that can produce a event
@@ -261,18 +294,6 @@ libv.ui.theme: Property substructure system example: https://docs.oracle.com/jav
 libv.ui: set_clear_color (?) | no need, client could use a full background any time, but this means client has to clear
 libv.ui: Button icon support (with left, top, down, right placement), if icon or text is not set, it is skipped
 
-
-libv.ui.theme:
-	Button states:
-		Normal
-		Focus
-		Hover
-		Active/Press
-		Progress/Loading
-		Disabled
-		Error
-
-
 libv.ui: implement base_line alignment: most likely will need a vec2 get_base_line() function
 libv.ui: scroll area: request_scroll_to(pos, size) or request_display_of(pos, size)
 libv.ui: vec2 get_scroll_size() and use in use min(client.get_scroll_size, client.layout_size)
@@ -292,10 +313,6 @@ libv.ui: make access_property a class member function (or use a single composite
 
 libv.ui: Make sure to invalidate flags after every child is iterated to prevent exception caused false unflagging
 libv.ui: Clean up redundant shader codes and add run time (with shader recompile) to switch between debug clip and no clip
-libv.ui: Fragments:
-		also, render fragments in on "bundle"
-			r.quad({0, 0}, layout_size2(), {0, 0}, {1, 1}, property.background());
-			r.text(padding_LB(), text_, property.font());
 
 libv.ui: Make sure that (only) position change does not invalidates layout
 
@@ -397,6 +414,7 @@ libv.ui: OverlayZoom use linearized zoom (like the Camera2 in vm4viewer)
 libv.ui: OverlayZoom in control mode should scale "sensitivity" based on zoom
 
 libv.ui: modernize every enum based property to match anchor's pattern: global table, to_string, operator<< | there will be another pass when UI gets dynamic property manipulation, like lists and such
+		| use enum generator
 libv.ui: Remove the half manual - half automated public property access (this might remove the whole AccessProperty | not really, but still a cleanup that is worth it)
 
 libv.ui: content property.hpp can be more hidden toward components (Especially the variant)
@@ -549,17 +567,13 @@ event
 			context().events().fire("shader_reload", ShaderReportFailure{});
 
 properties / style
-	libv.ui.property: scope / sheet / component type based style rules
 	libv.ui.property: if fallback value is requested log a warning
 	libv.ui.property: dynamic access
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
-	libv.ui.property: account for cyclic owning references with style property
 	libv.ui.style: verify that style change in child causes restyle in properties stored inside the parent
-	libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
-	libv.ui.style: do not track style changes, require ui to be prompted about change
 	libv.ui.property: solve name/type collusion
+		libv.ui.style: either I centralize and static bind every property name to a single type OR i allow multiple different type/value under a single name
+	libv.ui.style: do not track style changes, require ui to be prompted about change
 	libv.ui.style: Style Sheet / A proper default style or a way to auto assign styles to components would be nice (this is not property fallback, its style sheet fallback.)
-	libv.ui.style: Style based on component state (bit-mask)
 	libv.ui.property: typed property registry
 	libv.ui.property: optimize property reset: address could be used to lookup
 

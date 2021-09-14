@@ -79,6 +79,7 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	font_size = 18,
 	--background = "color: red";
 	--background = "color:" .. colors.hud_light_bg_color;
 	--background = "texture: atlas_ui_slate.png";
@@ -88,12 +89,19 @@ ui.style("space.hud-bar.mp.iris-lbl") {
 	--background = "texture: stretch_border.png";
 	--background = "border: stretch_border.png";
 	--background = "pattern: stretch_border.png";
-	--background = "padding_pattern: padding_stripes.png";
+	--background = "padding_pattern: stripes_border.png";
 	--background = "padding_pattern: stripes.png";
 	--background = "padding_pattern: stripes.png";
-	background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
+	--background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
+	--background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border = 3, texture = "stripes.png"},
+	--background = {type = "pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
+	--background = {type = "border_padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, border_extent = 3, texture = "stripes_border.png"},
+	--background = {type = "border_padding_pattern", color = {1, 1, 1, 1}, inner_padding = {4, 0}, border_extent = 3, texture = "stripes_border.png"},
+	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, 0}, border_extent = 3, texture = "stripes_border.png"},
+	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, -1}, border_extent = 3, texture = "stripes_border.png"},
+	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 
-	padding = {40, 7},
+	padding = {50, 7},
 	--padding = { 0, 7},
 
 	--size = "200px, 200px",

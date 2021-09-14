@@ -77,7 +77,8 @@ public: // --- Low level ---
 
 	void begin_triangles();
 	void end(const Texture2D_view& texture, const ShaderImage_view& shader);
-	void vertex(libv::vec3f pos, libv::vec2f uv = {0, 0}, libv::vec4f color = {1, 1, 1, 1});
+	void vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f color);
+	void vertex(libv::vec3f pos, libv::vec2f uv, libv::vec4f tile, libv::vec4f color);
 	void index_strip(std::span<const uint32_t> indices);
 	void index_strip(std::initializer_list<const uint32_t> indices);
 
