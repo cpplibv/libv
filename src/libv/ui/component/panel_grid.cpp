@@ -73,14 +73,14 @@ struct Orientation2Data {
 };
 
 static constexpr Orientation2Data Orientation2Table[] = {
-	{1u, 0u, 2u, {1.f, 1.f, 0.f}, {-1.f, -1.f, +1.f}, {-1.f, -1.f, +0.f}}, // DOWN_LEFT
-	{1u, 0u, 2u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // DOWN_RIGHT
-	{0u, 1u, 2u, {1.f, 1.f, 0.f}, {-1.f, -1.f, +1.f}, {-1.f, -1.f, +0.f}}, // LEFT_DOWN
-	{0u, 1u, 2u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // LEFT_UP
-	{0u, 1u, 2u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // RIGHT_DOWN
-	{0u, 1u, 2u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // RIGHT_UP
-	{1u, 0u, 2u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // UP_LEFT
-	{1u, 0u, 2u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // UP_RIGHT
+	{1u, 0u, 2u, {1.f, 1.f, 0.f}, {-1.f, -1.f, +1.f}, {-1.f, -1.f, +0.f}}, // down_left
+	{1u, 0u, 2u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // down_right
+	{0u, 1u, 2u, {1.f, 1.f, 0.f}, {-1.f, -1.f, +1.f}, {-1.f, -1.f, +0.f}}, // left_down
+	{0u, 1u, 2u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // left_up
+	{0u, 1u, 2u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // right_down
+	{0u, 1u, 2u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // right_up
+	{1u, 0u, 2u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // up_left
+	{1u, 0u, 2u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // up_right
 };
 
 template <typename Range>
@@ -131,7 +131,7 @@ void CorePanelGrid::access_properties(T& ctx) {
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.orientation2; },
-			Orientation2::RIGHT_DOWN,
+			Orientation2::right_down,
 			pgr::layout, pnm::orientation2,
 			"Two dimensional orientation of subsequent components"
 	);

@@ -79,33 +79,33 @@
 //		layout.column_count(2);
 //
 //		SECTION("Horizontal > Vertical") {
-//			SECTION("Orientation2 LEFT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//			SECTION("Orientation2 left_down") {
+//				layout.orientation2(libv::ui::Orientation2::left_down);
 //			}
-//			SECTION("Orientation2 LEFT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//			SECTION("Orientation2 left_up") {
+//				layout.orientation2(libv::ui::Orientation2::left_up);
 //			}
-//			SECTION("Orientation2 RIGHT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			SECTION("Orientation2 right_down") {
+//				layout.orientation2(libv::ui::Orientation2::right_down);
 //			}
-//			SECTION("Orientation2 RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("Orientation2 right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(5, 4, 0));
 //		}
 //
 //		SECTION("Vertical > Horizontal") {
-//			SECTION("Orientation2 DOWN_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//			SECTION("Orientation2 down_left") {
+//				layout.orientation2(libv::ui::Orientation2::down_left);
 //			}
-//			SECTION("Orientation2 DOWN_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			SECTION("Orientation2 down_right") {
+//				layout.orientation2(libv::ui::Orientation2::down_right);
 //			}
-//			SECTION("Orientation2 UP_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//			SECTION("Orientation2 up_left") {
+//				layout.orientation2(libv::ui::Orientation2::up_left);
 //			}
-//			SECTION("Orientation2 UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("Orientation2 up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(4, 5, 0));
 //		}
@@ -119,33 +119,33 @@
 //		layout.column_count(3);
 //
 //		SECTION("Horizontal > Vertical") {
-//			SECTION("Orientation2 LEFT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//			SECTION("Orientation2 left_down") {
+//				layout.orientation2(libv::ui::Orientation2::left_down);
 //			}
-//			SECTION("Orientation2 LEFT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//			SECTION("Orientation2 left_up") {
+//				layout.orientation2(libv::ui::Orientation2::left_up);
 //			}
-//			SECTION("Orientation2 RIGHT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			SECTION("Orientation2 right_down") {
+//				layout.orientation2(libv::ui::Orientation2::right_down);
 //			}
-//			SECTION("Orientation2 RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("Orientation2 right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(6, 5, 0));
 //		}
 //
 //		SECTION("Vertical > Horizontal") {
-//			SECTION("Orientation2 DOWN_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//			SECTION("Orientation2 down_left") {
+//				layout.orientation2(libv::ui::Orientation2::down_left);
 //			}
-//			SECTION("Orientation2 DOWN_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			SECTION("Orientation2 down_right") {
+//				layout.orientation2(libv::ui::Orientation2::down_right);
 //			}
-//			SECTION("Orientation2 UP_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//			SECTION("Orientation2 up_left") {
+//				layout.orientation2(libv::ui::Orientation2::up_left);
 //			}
-//			SECTION("Orientation2 UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("Orientation2 up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(5, 6, 0));
 //		}
@@ -159,33 +159,33 @@
 //		layout.column_count(2);
 //
 //		SECTION("Horizontal > Vertical") {
-//			SECTION("Orientation2 LEFT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//			SECTION("Orientation2 left_down") {
+//				layout.orientation2(libv::ui::Orientation2::left_down);
 //			}
-//			SECTION("Orientation2 LEFT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//			SECTION("Orientation2 left_up") {
+//				layout.orientation2(libv::ui::Orientation2::left_up);
 //			}
-//			SECTION("Orientation2 RIGHT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			SECTION("Orientation2 right_down") {
+//				layout.orientation2(libv::ui::Orientation2::right_down);
 //			}
-//			SECTION("Orientation2 RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("Orientation2 right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(300, 200, 0));
 //		}
 //
 //		SECTION("Vertical > Horizontal") {
-//			SECTION("Orientation2 DOWN_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//			SECTION("Orientation2 down_left") {
+//				layout.orientation2(libv::ui::Orientation2::down_left);
 //			}
-//			SECTION("Orientation2 DOWN_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			SECTION("Orientation2 down_right") {
+//				layout.orientation2(libv::ui::Orientation2::down_right);
 //			}
-//			SECTION("Orientation2 UP_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//			SECTION("Orientation2 up_left") {
+//				layout.orientation2(libv::ui::Orientation2::up_left);
 //			}
-//			SECTION("Orientation2 UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("Orientation2 up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(400, 200, 0));
 //		}
@@ -199,33 +199,33 @@
 //		layout.column_count(3);
 //
 //		SECTION("Horizontal > Vertical") {
-//			SECTION("Orientation2 LEFT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//			SECTION("Orientation2 left_down") {
+//				layout.orientation2(libv::ui::Orientation2::left_down);
 //			}
-//			SECTION("Orientation2 LEFT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//			SECTION("Orientation2 left_up") {
+//				layout.orientation2(libv::ui::Orientation2::left_up);
 //			}
-//			SECTION("Orientation2 RIGHT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			SECTION("Orientation2 right_down") {
+//				layout.orientation2(libv::ui::Orientation2::right_down);
 //			}
-//			SECTION("Orientation2 RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("Orientation2 right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(400, 200, 0));
 //		}
 //
 //		SECTION("Vertical > Horizontal") {
-//			SECTION("Orientation2 DOWN_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//			SECTION("Orientation2 down_left") {
+//				layout.orientation2(libv::ui::Orientation2::down_left);
 //			}
-//			SECTION("Orientation2 DOWN_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			SECTION("Orientation2 down_right") {
+//				layout.orientation2(libv::ui::Orientation2::down_right);
 //			}
-//			SECTION("Orientation2 UP_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//			SECTION("Orientation2 up_left") {
+//				layout.orientation2(libv::ui::Orientation2::up_left);
 //			}
-//			SECTION("Orientation2 UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("Orientation2 up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(400, 101, 0));
 //		}
@@ -239,33 +239,33 @@
 //		layout.column_count(100);
 //
 //		SECTION("Horizontal > Vertical") {
-//			SECTION("Orientation2 LEFT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//			SECTION("Orientation2 left_down") {
+//				layout.orientation2(libv::ui::Orientation2::left_down);
 //			}
-//			SECTION("Orientation2 LEFT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//			SECTION("Orientation2 left_up") {
+//				layout.orientation2(libv::ui::Orientation2::left_up);
 //			}
-//			SECTION("Orientation2 RIGHT_DOWN") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			SECTION("Orientation2 right_down") {
+//				layout.orientation2(libv::ui::Orientation2::right_down);
 //			}
-//			SECTION("Orientation2 RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("Orientation2 right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(400, 100, 0));
 //		}
 //
 //		SECTION("Vertical > Horizontal") {
-//			SECTION("Orientation2 DOWN_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//			SECTION("Orientation2 down_left") {
+//				layout.orientation2(libv::ui::Orientation2::down_left);
 //			}
-//			SECTION("Orientation2 DOWN_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			SECTION("Orientation2 down_right") {
+//				layout.orientation2(libv::ui::Orientation2::down_right);
 //			}
-//			SECTION("Orientation2 UP_LEFT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//			SECTION("Orientation2 up_left") {
+//				layout.orientation2(libv::ui::Orientation2::up_left);
 //			}
-//			SECTION("Orientation2 UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("Orientation2 up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //			}
 //			CHECK(layout.layout1(env1) == libv::vec3f(100, 400, 0));
 //		}
@@ -294,10 +294,10 @@
 //		comp3.size("25px, 25px, 25px"); comp3.dynamic(25, 25, 25);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(100, 25, 25));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(25, 100, 25));
 //	}
 //
@@ -308,10 +308,10 @@
 //		comp3.size("25%, 25%, 25%"); comp3.dynamic(25, 25, 25);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(0, 0, 0));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(0, 0, 0));
 //	}
 //
@@ -322,10 +322,10 @@
 //		comp3.size("25r, 25r, 25r"); comp3.dynamic(25, 25, 25);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(0, 0, 0));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(0, 0, 0));
 //	}
 //
@@ -336,10 +336,10 @@
 //		comp3.size("D, D, D"); comp3.dynamic(25, 25, 25);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(100, 25, 25));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(25, 100, 25));
 //	}
 //
@@ -350,10 +350,10 @@
 //		comp3.size("400px 20%, 0"); comp3.dynamic(3, 3);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(5000, 0, 0));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(500, 0, 0));
 //	}
 //
@@ -364,10 +364,10 @@
 //		comp3.size("250px  0% 4r D,   0px 10% 4r  "); comp3.dynamic(3, 0);
 //		layout.column_count(4);
 //
-//		layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		layout.orientation2(libv::ui::Orientation2::right_down);
 //		CHECK(layout.layout1(env1) == libv::vec3f(1210, 83, 0));
 //
-//		layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		layout.orientation2(libv::ui::Orientation2::down_right);
 //		CHECK(layout.layout1(env1) == libv::vec3f(253, 225, 0));
 //	}
 //
@@ -380,46 +380,46 @@
 //		SECTION("0-1-2-3-x") {
 //			layout.column_count(5);
 //
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			CHECK(layout.layout1(env1) == libv::vec3f(1270, 107, 283));
 //
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			CHECK(layout.layout1(env1) == libv::vec3f(263, 294, 283));
 //		}
 //		SECTION("0-1-2-3") {
 //			layout.column_count(4);
 //
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			CHECK(layout.layout1(env1) == libv::vec3f(1270, 107, 283));
 //
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			CHECK(layout.layout1(env1) == libv::vec3f(263, 294, 283));
 //		}
 //		SECTION("0-1-2  3") {
 //			layout.column_count(3);
 //
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			CHECK(layout.layout1(env1) == libv::vec3f(893, 120, 283));
 //
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			CHECK(layout.layout1(env1) == libv::vec3f(528, 251, 283));
 //		}
 //		SECTION("0-1  2-3") {
 //			layout.column_count(2);
 //
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			CHECK(layout.layout1(env1) == libv::vec3f(528, 209, 283));
 //
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			CHECK(layout.layout1(env1) == libv::vec3f(517, 209, 283));
 //		}
 //		SECTION("0  1  2  3") {
 //			layout.column_count(1);
 //
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			CHECK(layout.layout1(env1) == libv::vec3f(263, 294, 283));
 //
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			CHECK(layout.layout1(env1) == libv::vec3f(1270, 107, 283));
 //		}
 //	}
@@ -450,8 +450,8 @@
 //		comp2.size("30px, 30px, 30px"); comp2.dynamic(12, 22, 32);
 //		comp3.size("40px, 40px, 40px"); comp3.dynamic(13, 23, 33);
 //
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -460,8 +460,8 @@
 //			CHECK(comp2.bounds() == Bounds(1000, 2020, 3000, 30, 30, 30));
 //			CHECK(comp3.bounds() == Bounds(1030, 2020, 3000, 40, 40, 40));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -477,8 +477,8 @@
 //		comp2.size("30%, 30%, 30%"); comp2.dynamic(12, 22, 32);
 //		comp3.size("40%, 40%, 40%"); comp3.dynamic(13, 23, 33);
 //
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -487,8 +487,8 @@
 //			CHECK(comp2.bounds() == Bounds(1000, 2060, 3000, 120,  90, 60));
 //			CHECK(comp3.bounds() == Bounds(1120, 2060, 3000, 160, 120, 80));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -500,8 +500,8 @@
 //	}
 //	SECTION("ratio") {
 //		const auto tests = [&](){
-//			SECTION("RIGHT_UP") {
-//				layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//			SECTION("right_up") {
+//				layout.orientation2(libv::ui::Orientation2::right_up);
 //				layout.layout1(env1);
 //				layout.layout2(env2);
 //
@@ -510,8 +510,8 @@
 //				CHECK(comp2.bounds() == Bounds(1000, 2100, 3000, 171, 150, 150));
 //				CHECK(comp3.bounds() == Bounds(1171, 2100, 3000, 229, 200, 200));
 //			}
-//			SECTION("UP_RIGHT") {
-//				layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//			SECTION("up_right") {
+//				layout.orientation2(libv::ui::Orientation2::up_right);
 //				layout.layout1(env1);
 //				layout.layout2(env2);
 //
@@ -545,8 +545,8 @@
 //		comp2.size("D, D, D"); comp2.dynamic(12, 22, 32);
 //		comp3.size("D, D, D"); comp3.dynamic(13, 23, 33);
 //
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -555,8 +555,8 @@
 //			CHECK(comp2.bounds() == Bounds(1000, 2021, 3000, 12, 22, 32));
 //			CHECK(comp3.bounds() == Bounds(1012, 2021, 3000, 13, 23, 33));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -572,8 +572,8 @@
 //		comp2.size("200px 10%    D,  50px 20% 3r  , 200px 10% 3r D"); comp2.dynamic(12, 22, 32);
 //		comp3.size("250px  0% 4r D,   0px 10% 4r  ,   0px  0%     "); comp3.dynamic(13, 23, 33);
 //
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -582,8 +582,8 @@
 //			CHECK(comp2.bounds() == Bounds(1000, 2152, 3000, 252, 148, 200));
 //			CHECK(comp3.bounds() == Bounds(1252, 2152, 3000,  99,  81,   0));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -620,8 +620,8 @@
 //	SECTION("column 2") {
 //		layout.column_count(2);
 //
-//		SECTION("DOWN_LEFT") {
-//			layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//		SECTION("down_left") {
+//			layout.orientation2(libv::ui::Orientation2::down_left);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -630,8 +630,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2040, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2000, 3000));
 //		}
-//		SECTION("DOWN_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		SECTION("down_right") {
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -640,8 +640,8 @@
 //			CHECK(comp2.bounds().position == Pos(1002, 2040, 3000));
 //			CHECK(comp3.bounds().position == Pos(1002, 2000, 3000));
 //		}
-//		SECTION("LEFT_DOWN") {
-//			layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//		SECTION("left_down") {
+//			layout.orientation2(libv::ui::Orientation2::left_down);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -650,8 +650,8 @@
 //			CHECK(comp2.bounds().position == Pos(1004, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2000, 3000));
 //		}
-//		SECTION("LEFT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//		SECTION("left_up") {
+//			layout.orientation2(libv::ui::Orientation2::left_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -660,8 +660,8 @@
 //			CHECK(comp2.bounds().position == Pos(1004, 2020, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2020, 3000));
 //		}
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -670,8 +670,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2020, 3000));
 //			CHECK(comp3.bounds().position == Pos(1003, 2020, 3000));
 //		}
-//		SECTION("RIGHT_DOWN") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		SECTION("right_down") {
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -680,8 +680,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1003, 2000, 3000));
 //		}
-//		SECTION("UP_LEFT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//		SECTION("up_left") {
+//			layout.orientation2(libv::ui::Orientation2::up_left);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -690,8 +690,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2030, 3000));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -705,8 +705,8 @@
 //	SECTION("column 3") {
 //		layout.column_count(3);
 //
-//		SECTION("DOWN_LEFT") {
-//			layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//		SECTION("down_left") {
+//			layout.orientation2(libv::ui::Orientation2::down_left);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -715,8 +715,8 @@
 //			CHECK(comp2.bounds().position == Pos(1004, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2050, 3000));
 //		}
-//		SECTION("DOWN_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::DOWN_RIGHT);
+//		SECTION("down_right") {
+//			layout.orientation2(libv::ui::Orientation2::down_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -725,8 +725,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1003, 2050, 3000));
 //		}
-//		SECTION("LEFT_DOWN") {
-//			layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//		SECTION("left_down") {
+//			layout.orientation2(libv::ui::Orientation2::left_down);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -735,8 +735,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2040, 3000));
 //			CHECK(comp3.bounds().position == Pos(1005, 2000, 3000));
 //		}
-//		SECTION("LEFT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::LEFT_UP);
+//		SECTION("left_up") {
+//			layout.orientation2(libv::ui::Orientation2::left_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -745,8 +745,8 @@
 //			CHECK(comp2.bounds().position == Pos(1000, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1005, 2030, 3000));
 //		}
-//		SECTION("RIGHT_UP") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_UP);
+//		SECTION("right_up") {
+//			layout.orientation2(libv::ui::Orientation2::right_up);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -755,8 +755,8 @@
 //			CHECK(comp2.bounds().position == Pos(1006, 2000, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2030, 3000));
 //		}
-//		SECTION("RIGHT_DOWN") {
-//			layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//		SECTION("right_down") {
+//			layout.orientation2(libv::ui::Orientation2::right_down);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -765,8 +765,8 @@
 //			CHECK(comp2.bounds().position == Pos(1006, 2040, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2000, 3000));
 //		}
-//		SECTION("UP_LEFT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_LEFT);
+//		SECTION("up_left") {
+//			layout.orientation2(libv::ui::Orientation2::up_left);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -775,8 +775,8 @@
 //			CHECK(comp2.bounds().position == Pos(1004, 2060, 3000));
 //			CHECK(comp3.bounds().position == Pos(1000, 2000, 3000));
 //		}
-//		SECTION("UP_RIGHT") {
-//			layout.orientation2(libv::ui::Orientation2::UP_RIGHT);
+//		SECTION("up_right") {
+//			layout.orientation2(libv::ui::Orientation2::up_right);
 //			layout.layout1(env1);
 //			layout.layout2(env2);
 //
@@ -803,7 +803,7 @@
 //	libv::ui::ContextLayout1 env1;
 //	libv::ui::ContextLayout2 env2{libv::vec3f(100, 200, 300), libv::vec3f(100, 100, 100), libv::ui::MouseOrder{0}};
 //
-//	layout.orientation2(libv::ui::Orientation2::DOWN_LEFT);
+//	layout.orientation2(libv::ui::Orientation2::down_left);
 //	comp0.size("1px, 2px, 3px"); comp0.dynamic(0, 0, 0);
 //	comp1.size("1px, 2px, 3px"); comp1.dynamic(0, 0, 0);
 //	comp2.size("1px, 2px, 3px"); comp2.dynamic(0, 0, 0);
@@ -1011,7 +1011,7 @@
 //	libv::ui::ContextLayout2 env2{libv::vec3f(100, 200, 300), libv::vec3f(100, 100, 100), libv::ui::MouseOrder{0}};
 //
 //	layout.anchor_content(libv::ui::ANCHOR_CENTER_CENTER);
-//	layout.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+//	layout.orientation2(libv::ui::Orientation2::right_down);
 //	comp0.size("10px, 20px, 30px"); comp0.dynamic(0, 0, 0);
 //	comp1.size("10px,  4px,  3px"); comp1.dynamic(0, 0, 0);
 //	comp2.size(" 2px, 20px,  3px"); comp2.dynamic(0, 0, 0);
@@ -1171,7 +1171,7 @@
 //	libv::ui::ContextLayout2 env2{libv::vec3f(0, 0, 0), libv::vec3f(400, 300, 200), libv::ui::MouseOrder{0}};
 //
 //	layout.anchor_content(libv::ui::ANCHOR_CENTER_CENTER);
-//	layout.orientation2(libv::ui::Orientation2::LEFT_DOWN);
+//	layout.orientation2(libv::ui::Orientation2::left_down);
 //	layout.column_count(3);
 //	comp0.anchor(libv::ui::ANCHOR_BOTTOM_RIGHT);
 //	comp1.anchor(libv::ui::ANCHOR_BOTTOM_LEFT);

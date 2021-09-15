@@ -313,7 +313,7 @@ public:
 		panel_grid.padding({5, 5, 5, 10});
 //		panel_grid.padding({5, 5, 5, 50});
 //		panel_grid.padding({5, 5, 5, 5});
-		panel_grid.orientation2(libv::ui::Orientation2::RIGHT_DOWN);
+		panel_grid.orientation2(libv::ui::Orientation2::right_down);
 		panel_grid.spacing2(libv::ui::Spacing2{1, 2});
 		panel_grid.size(libv::ui::parse_size_or_throw("1r, 3r"));
 
