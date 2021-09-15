@@ -23,7 +23,7 @@ libv::ui::Component make_shader_error_overlay() {
 
 	shader_errors.align_horizontal(libv::ui::AlignHorizontal::left);
 	shader_errors.align_vertical(libv::ui::AlignVertical::bottom);
-	shader_errors.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+	shader_errors.orientation(libv::ui::Orientation::down);
 //		shader_errors.size(libv::ui::parse_size_or_throw("1r, 1r"));
 	shader_errors.spacing(10);
 

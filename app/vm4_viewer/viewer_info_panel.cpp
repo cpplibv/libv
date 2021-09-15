@@ -27,7 +27,7 @@ ViewerInfoPanel::ViewerInfoPanel(CoreComponent& parent, libv::ui::GenerateName_t
 void ViewerInfoPanel::doAttach() {
 	set(property.align_horizontal, libv::ui::AlignHorizontal::left);
 	set(property.align_vertical, libv::ui::AlignVertical::top);
-	set(property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
+	set(property.orientation, libv::ui::Orientation::down);
 
 //	{
 //		auto style = context().style("vm4pv.label_info");
@@ -135,7 +135,7 @@ void ViewerInfoPanel::update(const libv::vm4::Model& model) {
 //			panel_info.style(context().style("vm4_viewer.info"));
 
 //	panel_general.title("General");
-//	panel_general.set(panel_general.property.orientation, libv::ui::Orientation::TOP_TO_BOTTOM);
+//	panel_general.set(panel_general.property.orientation, libv::ui::Orientation::down);
 //
 //	{
 //		auto tmp = std::make_shared<libv::ui::Label>(*this);

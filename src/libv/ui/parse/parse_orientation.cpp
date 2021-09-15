@@ -26,25 +26,25 @@ namespace x3 = boost::spirit::x3;
 struct named_orientations_v_ : x3::symbols<Orientation> {
 	named_orientations_v_() {
 		add
-				("bottom_to_top", Orientation::BOTTOM_TO_TOP)
-				("left_to_right", Orientation::LEFT_TO_RIGHT)
-				("right_to_left", Orientation::RIGHT_TO_LEFT)
-				("top_to_bottom", Orientation::TOP_TO_BOTTOM)
+				("bottom_to_top", Orientation::up)
+				("left_to_right", Orientation::right)
+				("right_to_left", Orientation::left)
+				("top_to_bottom", Orientation::down)
 
-				("bottom-to-top", Orientation::BOTTOM_TO_TOP)
-				("left-to-right", Orientation::LEFT_TO_RIGHT)
-				("right-to-left", Orientation::RIGHT_TO_LEFT)
-				("top-to-bottom", Orientation::TOP_TO_BOTTOM)
+				("bottom-to-top", Orientation::up)
+				("left-to-right", Orientation::right)
+				("right-to-left", Orientation::left)
+				("top-to-bottom", Orientation::down)
 
-				("bottom to top", Orientation::BOTTOM_TO_TOP)
-				("left to right", Orientation::LEFT_TO_RIGHT)
-				("right to left", Orientation::RIGHT_TO_LEFT)
-				("top to bottom", Orientation::TOP_TO_BOTTOM)
+				("bottom to top", Orientation::up)
+				("left to right", Orientation::right)
+				("right to left", Orientation::left)
+				("top to bottom", Orientation::down)
 
-				("up", Orientation::BOTTOM_TO_TOP)
-				("right", Orientation::LEFT_TO_RIGHT)
-				("left", Orientation::RIGHT_TO_LEFT)
-				("down", Orientation::TOP_TO_BOTTOM)
+				("up", Orientation::up)
+				("right", Orientation::right)
+				("left", Orientation::left)
+				("down", Orientation::down)
 				;
 	}
 } named_orientations_v;
@@ -52,7 +52,7 @@ struct named_orientations_v_ : x3::symbols<Orientation> {
 } // namespace -------------------------------------------------------------------------------------
 
 std::optional<Orientation> parse_orientation_optional(const std::string_view str) {
-	Orientation result = Orientation::TOP_TO_BOTTOM;
+	Orientation result = Orientation::down;
 
 	auto it = str.begin();
 	// NOTE: x3::unicode::space is required for certain invalid UTF8 inputs as x3::space skipper would assert

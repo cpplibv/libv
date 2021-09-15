@@ -164,7 +164,7 @@ local foo = function(theme)
 	theme.style("overlay.notification.bubble", {
 		--style->set("align", libv::ui::AlignHorizontal::center);
 		--style->set("align_vertical", libv::ui::AlignVertical::center);
-		--//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		--//		style->set("orientation", libv::ui::Orientation::down);
 		--style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 		--style->set("bg_shader", context().shaderQuad());
 		--style->set("font", context().font("consola.ttf"));
@@ -178,7 +178,7 @@ local foo = function(theme)
 	theme.style("overlay.notification.text", {
 		--//		style->set("align", libv::ui::AlignHorizontal::center);
 		--//		style->set("align_vertical", libv::ui::AlignVertical::top);
-		--//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		--//		style->set("orientation", libv::ui::Orientation::down);
 		--//		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 		--//		style->set("bg_shader", context().shaderQuad());
 		--//		style->set("font", context().font("consola.ttf"));

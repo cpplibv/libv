@@ -176,12 +176,12 @@ public:
 		quad.anchor(libv::ui::Anchor::center_center);
 		quad.size(libv::ui::parse_size_or_throw("0.5r, 0.5r"));
 
-		panel_line_scrolled.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		panel_line_scrolled.orientation(libv::ui::Orientation::down);
 		panel_line_scrolled.anchor(libv::ui::Anchor::top_left);
 
 		scroll_bar_x.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_x.bar_color({0.8f, 0.2f, 0.2f, 1.0f});
-		scroll_bar_x.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		scroll_bar_x.orientation(libv::ui::Orientation::right);
 		scroll_bar_x.value_min(-500);
 		scroll_bar_x.value_max(500);
 		scroll_bar_x.value(0);
@@ -192,7 +192,7 @@ public:
 
 		scroll_bar_y.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_y.bar_color({0.2f, 0.8f, 0.2f, 1.0f});
-		scroll_bar_y.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		scroll_bar_y.orientation(libv::ui::Orientation::up);
 		scroll_bar_y.value_min(-1000);
 		scroll_bar_y.value_max(1000);
 		scroll_bar_y.value(0);
@@ -203,7 +203,7 @@ public:
 
 		scroll_bar_ix.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_ix.bar_color({0.8f, 0.2f, 1.0f, 1.0f});
-		scroll_bar_ix.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		scroll_bar_ix.orientation(libv::ui::Orientation::right);
 		scroll_bar_ix.value_min(-500);
 		scroll_bar_ix.value_max(500);
 		scroll_bar_ix.value(0);
@@ -214,7 +214,7 @@ public:
 
 		scroll_bar_iy.bar_image(ui.context().texture2D("separator_bar_256x16.png"));
 		scroll_bar_iy.bar_color({0.2f, 0.8f, 1.0f, 1.0f});
-		scroll_bar_iy.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		scroll_bar_iy.orientation(libv::ui::Orientation::up);
 		scroll_bar_iy.value_min(-1000);
 		scroll_bar_iy.value_max(1000);
 		scroll_bar_iy.value(0);
@@ -275,7 +275,7 @@ public:
 		}
 		panel_line_scrolled.add(image);
 
-		status_log.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		status_log.orientation(libv::ui::Orientation::down);
 
 		button3.event().submit([this] {
 			if (button3.anchor() != libv::ui::Anchor::center_center)
@@ -331,8 +331,8 @@ public:
 		panel_grid.add(label);
 		panel_grid.add(button5);
 
-		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
-//		panel_line.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		panel_line.orientation(libv::ui::Orientation::down);
+//		panel_line.orientation(libv::ui::Orientation::up);
 		panel_line.padding({20, 10, 20, 10});
 //		panel_line.padding({5, 5, 5, 5});
 		panel_line.spacing(libv::ui::Spacing{6});
@@ -567,7 +567,7 @@ public:
 //
 //		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 //		panel0->layout.alignVertical = libv::ui::Alignment::CENTER;
-//		panel0->layout.orient = libv::ui::Orientation::TOP_TO_BOTTOM;
+//		panel0->layout.orient = libv::ui::Orientation::down;
 //		panel0->add(label0);
 //		panel0->add(image0);
 //		panel0->add(panel1);
@@ -575,7 +575,7 @@ public:
 //
 //		panel1->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 //		panel1->layout.alignVertical = libv::ui::Alignment::CENTER;
-//		panel1->layout.orient = libv::ui::Orientation::LEFT_TO_RIGHT;
+//		panel1->layout.orient = libv::ui::Orientation::right;
 //		panel1->add(quad0);
 //		panel1->add(label2);
 //		panel1->add(stretch0);

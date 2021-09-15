@@ -45,16 +45,16 @@ struct OrientationData {
 	libv::vec3f penCorner;
 };
 
-static_assert(libv::to_underlying(Orientation::BOTTOM_TO_TOP) == 0u);
-static_assert(libv::to_underlying(Orientation::LEFT_TO_RIGHT) == 1u);
-static_assert(libv::to_underlying(Orientation::RIGHT_TO_LEFT) == 2u);
-static_assert(libv::to_underlying(Orientation::TOP_TO_BOTTOM) == 3u);
+static_assert(libv::to_underlying(Orientation::up) == 0u);
+static_assert(libv::to_underlying(Orientation::right) == 1u);
+static_assert(libv::to_underlying(Orientation::left) == 2u);
+static_assert(libv::to_underlying(Orientation::down) == 3u);
 // Inset: 0 = left, 1 = bottom, 2 = right, 3 = top
 static constexpr OrientationData OrientationTable[] = {
-	{1u, 0u, 2u, 1u, 3u, 2u, 0u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // BOTTOM_TO_TOP;
-	{0u, 1u, 2u, 0u, 2u, 3u, 1u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // LEFT_TO_RIGHT;
-	{0u, 1u, 2u, 2u, 0u, 3u, 1u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // RIGHT_TO_LEFT;
-	{1u, 0u, 2u, 3u, 1u, 2u, 0u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // TOP_TO_BOTTOM;
+	{1u, 0u, 2u, 1u, 3u, 2u, 0u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::up;
+	{0u, 1u, 2u, 0u, 2u, 3u, 1u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::right;
+	{0u, 1u, 2u, 2u, 0u, 3u, 1u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // Orientation::left;
+	{1u, 0u, 2u, 3u, 1u, 2u, 0u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // Orientation::down;
 };
 
 struct AlignmentData {

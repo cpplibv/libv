@@ -155,7 +155,7 @@ void CoreScrollBar::access_properties(T& ctx) {
 
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.orientation; },
-			Orientation::BOTTOM_TO_TOP,
+			Orientation::up,
 			pgr::layout, pnm::orientation,
 			"Orientation"
 	);
@@ -204,10 +204,10 @@ struct OrientationData {
 };
 
 static constexpr OrientationData OrientationTable[] = {
-	{1, 0, false, +1}, // BOTTOM_TO_TOP;
-	{0, 1, false, +1}, // LEFT_TO_RIGHT;
-	{0, 1,  true, -1}, // RIGHT_TO_LEFT;
-	{1, 0,  true, -1}, // TOP_TO_BOTTOM;
+	{1, 0, false, +1}, // Orientation::up;
+	{0, 1, false, +1}, // Orientation::right;
+	{0, 1,  true, -1}, // Orientation::left;
+	{1, 0,  true, -1}, // Orientation::down;
 };
 
 } // namespace
@@ -216,7 +216,7 @@ static constexpr OrientationData OrientationTable[] = {
 
 inline CoreScrollBar::BarBounds CoreScrollBar::bar_bounds() const noexcept {
 	//
-	//                    Orientation::BOTTOM_TO_TOP
+	//                    Orientation::up
 	//          value == value_min             value == value_max
 	//
 	//         +->   |..|                     +->   |##|   <-+

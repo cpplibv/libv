@@ -115,7 +115,7 @@ void PanelViewer::doAttach() {
 		auto style = context().style("vm4pv.info");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::top);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 		style->set("anchor_target", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
 		style->set("anchor_parent", libv::ui::Anchor{0.0f, 1.0f, 0.0f});
 		style->set("size", libv::ui::parse_size_or_throw("d, 100%"));
@@ -125,7 +125,7 @@ void PanelViewer::doAttach() {
 		auto style = context().style("vm4pv.scroll-show");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::top);
-		style->set("orientation", libv::ui::Orientation::LEFT_TO_RIGHT);
+		style->set("orientation", libv::ui::Orientation::right);
 		style->set("anchor_target", libv::ui::ANCHOR_CENTER_RIGHT);
 		style->set("anchor_parent", libv::ui::ANCHOR_CENTER_RIGHT);
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
@@ -133,7 +133,7 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.scroll-bar");
-		style->set("orientation", libv::ui::Orientation::BOTTOM_TO_TOP);
+		style->set("orientation", libv::ui::Orientation::up);
 		style->set("size", libv::ui::parse_size_or_throw("8px, 200px"));
 
 		style->set("bg_color", libv::parse::parse_color_or_throw("hsva(120, 30%, 90%, 100%)"));
@@ -153,7 +153,7 @@ void PanelViewer::doAttach() {
 		auto style = context().style("vm4pv.scroll-show2");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::top);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 		style->set("anchor_target", libv::ui::ANCHOR_BOTTOM_CENTER);
 		style->set("anchor_parent", libv::ui::ANCHOR_BOTTOM_CENTER);
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
@@ -161,7 +161,7 @@ void PanelViewer::doAttach() {
 
 	{
 		auto style = context().style("vm4pv.scroll-bar2");
-		style->set("orientation", libv::ui::Orientation::LEFT_TO_RIGHT);
+		style->set("orientation", libv::ui::Orientation::right);
 		style->set("size", libv::ui::parse_size_or_throw("200px, 8px"));
 
 		style->set("bg_color", libv::parse::parse_color_or_throw("hsva(120, 30%, 90%, 100%)"));
@@ -198,7 +198,7 @@ void PanelViewer::doAttach() {
 //		auto style = context().style("vm4pv.file_list");
 //		style->set("align", libv::ui::AlignHorizontal::left);
 //		style->set("align_vertical", libv::ui::AlignVertical::top);
-//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+//		style->set("orientation", libv::ui::Orientation::down);
 //		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
 //		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.5f, 0.0f});
 //		style->set("font_size", libv::ui::FontSize{11});
@@ -893,7 +893,7 @@ void PanelViewer::update_info() {
 
 //		panel0->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 //		panel0->layout.alignVertical = libv::ui::Alignment::CENTER;
-//		panel0->layout.orient = libv::ui::Orientation::TOP_TO_BOTTOM;
+//		panel0->layout.orient = libv::ui::Orientation::down;
 //		panel0->add(label0);
 //		panel0->add(image0);
 //		panel0->add(panel1);
@@ -901,7 +901,7 @@ void PanelViewer::update_info() {
 //
 //		panel1->layout.alignHorizontal = libv::ui::Alignment::CENTER;
 //		panel1->layout.alignVertical = libv::ui::Alignment::CENTER;
-//		panel1->layout.orient = libv::ui::Orientation::LEFT_TO_RIGHT;
+//		panel1->layout.orient = libv::ui::Orientation::right;
 //		panel1->add(quad0);
 //		panel1->add(label2);
 //		panel1->add(stretch0);

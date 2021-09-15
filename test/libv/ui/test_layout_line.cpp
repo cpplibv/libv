@@ -23,7 +23,7 @@ TEST_CASE("Layout Line: positioning with alignment", "[libv.ui.layout.line]") {
 	TestComponent comp1 = panel.add("50px, 50px", D( 60,  40, 0));
 	TestComponent comp2 = panel.add("60px, 40px", D(100,  10, 0));
 
-	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+	panel.orientation(libv::ui::Orientation::right);
 
 	SECTION("alignment: TOP_LEFT") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::left);
@@ -199,8 +199,8 @@ TEST_CASE("Layout Line: positioning with orientation", "[libv.ui.layout.line]") 
 	TestComponent comp1 = panel.add("50px, 50px", D( 60,  40, 0));
 	TestComponent comp2 = panel.add("60px, 40px", D(100,  10, 0));
 
-	SECTION("orient: BOTTOM_TO_TOP") {
-		panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+	SECTION("orient: Orientation::up") {
+		panel.orientation(libv::ui::Orientation::up);
 
 		CHECK(panel.layout1(0, 0, 0) == approx_size(60, 150, 0));
 		panel.layout2(400, 300);
@@ -210,8 +210,8 @@ TEST_CASE("Layout Line: positioning with orientation", "[libv.ui.layout.line]") 
 		CHECK(comp2.bounds().position == approx_pos(0.f, 260.f, 0.f));
 	}
 
-	SECTION("orient: LEFT_TO_RIGHT") {
-		panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+	SECTION("orient: Orientation::right") {
+		panel.orientation(libv::ui::Orientation::right);
 
 		CHECK(panel.layout1(0, 0, 0) == approx_size(150, 60, 0));
 		panel.layout2(400, 300);
@@ -221,8 +221,8 @@ TEST_CASE("Layout Line: positioning with orientation", "[libv.ui.layout.line]") 
 		CHECK(comp2.bounds().position == approx_pos(90.f, 260.f, 0.f));
 	}
 
-	SECTION("orient: RIGHT_TO_LEFT") {
-		panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+	SECTION("orient: Orientation::left") {
+		panel.orientation(libv::ui::Orientation::left);
 
 		CHECK(panel.layout1(0, 0, 0) == approx_size(150, 60, 0));
 		panel.layout2(400, 300);
@@ -232,8 +232,8 @@ TEST_CASE("Layout Line: positioning with orientation", "[libv.ui.layout.line]") 
 		CHECK(comp2.bounds().position == approx_pos(0.f, 260.f, 0.f));
 	}
 
-	SECTION("orient: TOP_TO_BOTTOM") {
-		panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+	SECTION("orient: Orientation::down") {
+		panel.orientation(libv::ui::Orientation::down);
 
 		CHECK(panel.layout1(0, 0, 0) == approx_size(60, 150, 0));
 		panel.layout2(400, 300);
@@ -251,7 +251,7 @@ TEST_CASE("Layout Line: positioning with orientation", "[libv.ui.layout.line]") 
 TEST_CASE("Layout Line: sizing one quad", "[libv.ui.layout.line]") {
 	TestPanel<libv::ui::PanelLine> panel;
 
-	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+	panel.orientation(libv::ui::Orientation::right);
 	panel.align_horizontal(libv::ui::AlignHorizontal::left);
 	panel.align_vertical(libv::ui::AlignVertical::bottom);
 
@@ -299,7 +299,7 @@ TEST_CASE("Layout Line: sizing one quad", "[libv.ui.layout.line]") {
 TEST_CASE("Layout Line: complex test 0", "[libv.ui.layout.line]") {
 	TestPanel<libv::ui::PanelLine> panel;
 
-	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+	panel.orientation(libv::ui::Orientation::right);
 	panel.align_horizontal(libv::ui::AlignHorizontal::left);
 	panel.align_vertical(libv::ui::AlignVertical::top);
 
@@ -322,7 +322,7 @@ TEST_CASE("Layout Line: complex test 0", "[libv.ui.layout.line]") {
 TEST_CASE("Layout Line: padding test", "[libv.ui.layout.line]") {
 	TestPanel<libv::ui::PanelLine> panel;
 
-	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+	panel.orientation(libv::ui::Orientation::right);
 	panel.align_horizontal(libv::ui::AlignHorizontal::left);
 	panel.align_vertical(libv::ui::AlignVertical::bottom);
 
@@ -368,7 +368,7 @@ TEST_CASE("Layout Line: padding test", "[libv.ui.layout.line]") {
 //TEST_CASE("Layout Line: padding doesnt affects alignment space, unless it has to", "[libv.ui.layout.line]") {
 //	TestPanel<libv::ui::PanelLine> panel;
 //
-//	panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+//	panel.orientation(libv::ui::Orientation::right);
 //	panel.align_horizontal(libv::ui::AlignHorizontal::center);
 //	panel.align_vertical(libv::ui::AlignVertical::center);
 //
@@ -424,8 +424,8 @@ TEST_CASE("Layout Line: spacing test", "[libv.ui.layout.line]") {
 		TestComponent comp2 = panel.add("30px, 40px", P(1, 4, 3, 2));
 		TestComponent comp3 = panel.add("40px, 30px", P(2, 3, 4, 1));
 
-		SECTION("LEFT_TO_RIGHT") {
-			panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		SECTION("Orientation::right") {
+			panel.orientation(libv::ui::Orientation::right);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(115, 40, 0));
 			panel.layout2(400, 300);
@@ -436,8 +436,8 @@ TEST_CASE("Layout Line: spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp3.bounds() == Bounds( 75, 0, 0, 40, 30, 0));
 		}
 
-		SECTION("RIGHT_TO_LEFT") {
-			panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		SECTION("Orientation::left") {
+			panel.orientation(libv::ui::Orientation::left);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(115, 40, 0));
 			panel.layout2(400, 300);
@@ -448,8 +448,8 @@ TEST_CASE("Layout Line: spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp3.bounds() == Bounds(  0, 0, 0, 40, 30, 0));
 		}
 
-		SECTION("TOP_TO_BOTTOM") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(40, 115, 0));
 			panel.layout2(400, 300);
@@ -460,8 +460,8 @@ TEST_CASE("Layout Line: spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp3.bounds() == Bounds(0,   0, 0, 40, 30, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(40, 115, 0));
 			panel.layout2(400, 300);
@@ -479,7 +479,7 @@ TEST_CASE("Layout Line: padding and spacing over ratios", "[libv.ui.layout.line]
 
 	panel.align_horizontal(libv::ui::AlignHorizontal::right);
 	panel.align_vertical(libv::ui::AlignVertical::top);
-	panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+	panel.orientation(libv::ui::Orientation::down);
 	panel.padding({20, 10, 20, 10});
 	panel.spacing(libv::ui::Spacing{6});
 
@@ -513,7 +513,7 @@ TEST_CASE("Layout Line: margin and spacing over ratios", "[libv.ui.layout.line]"
 		panel.align_vertical(libv::ui::AlignVertical::bottom);
 	}
 
-	panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+	panel.orientation(libv::ui::Orientation::down);
 	panel.padding({20, 10, 10, 10});
 	panel.spacing(libv::ui::Spacing{10});
 
@@ -551,8 +551,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		TestComponent comp1 = panel.add("20px, 20px", M(4, 3, 2, 1));
 		TestComponent comp2 = panel.add("30px, 40px", M(1, 4, 2, 3));
 
-		SECTION("LEFT_TO_RIGHT") {
-			panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		SECTION("Orientation::right") {
+			panel.orientation(libv::ui::Orientation::right);
 			CHECK(panel.layout1(0, 0, 0) == approx_size(60 + 1 + 4 + 2 + 2, 40 + 4 + 3, 0));
 			panel.layout2(400, 300);
 
@@ -561,8 +561,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(37, 4, 0, 30, 40, 0));
 		}
 
-		SECTION("RIGHT_TO_LEFT") {
-			panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		SECTION("Orientation::left") {
+			panel.orientation(libv::ui::Orientation::left);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(60 + 1 + 4 + 2 + 3, 40 + 4 + 3, 0));
 			panel.layout2(400, 300);
@@ -572,8 +572,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(1, 4, 0, 30, 40, 0));
 		}
 
-		SECTION("TOP_TO_BOTTOM") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(30 + 1 + 2, 70 + 2 + 4 + 4 + 3, 0));
 			panel.layout2(400, 300);
@@ -583,8 +583,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(1, 4, 0, 30, 40, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(30 + 1 + 2, 70 + 4 + 3 + 2 + 4, 0));
 			panel.layout2(400, 300);
@@ -602,8 +602,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		TestComponent comp1 = panel.add("20px, 20px", M(5, 4, 2, 1));
 		TestComponent comp2 = panel.add("30px, 40px", M(1, 5, 2, 4));
 
-		SECTION("LEFT_TO_RIGHT") {
-			panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		SECTION("Orientation::right") {
+			panel.orientation(libv::ui::Orientation::right);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(71, 49, 0));
 			panel.layout2(400, 300);
@@ -613,8 +613,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(39, 5, 0, 30, 40, 0));
 		}
 
-		SECTION("RIGHT_TO_LEFT") {
-			panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		SECTION("Orientation::left") {
+			panel.orientation(libv::ui::Orientation::left);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(73, 49, 0));
 			panel.layout2(400, 300);
@@ -624,8 +624,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(1, 5, 0, 30, 40, 0));
 		}
 
-		SECTION("TOP_TO_BOTTOM") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(33, 87, 0));
 			panel.layout2(400, 300);
@@ -635,8 +635,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(1, 5, 0, 30, 40, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(33, 86, 0));
 			panel.layout2(400, 300);
@@ -650,7 +650,7 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 	SECTION("Child pushed away from border by big margin aligned to top") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::left);
 		panel.align_vertical(libv::ui::AlignVertical::top);
-		panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		panel.orientation(libv::ui::Orientation::left);
 
 		SECTION("s0") {
 			TestComponent comp0 = panel.add("10px, 10px", M(0, 0, 0, 50));
@@ -669,7 +669,7 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 	SECTION("Child pushed away from border by big margin aligned to center") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::left);
 		panel.align_vertical(libv::ui::AlignVertical::center);
-		panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		panel.orientation(libv::ui::Orientation::left);
 
 		SECTION("s0") {
 			TestComponent comp0 = panel.add("10px, 10px", M(0, 0, 0, 50));
@@ -694,7 +694,7 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 	SECTION("Child pushed away from border by big margin aligned to bottom") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::left);
 		panel.align_vertical(libv::ui::AlignVertical::bottom);
-		panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		panel.orientation(libv::ui::Orientation::left);
 
 		SECTION("s0") {
 			TestComponent comp0 = panel.add("10px, 10px", M(0, 0, 0, 50));
@@ -715,16 +715,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			panel.align_horizontal(libv::ui::AlignHorizontal::left);
 			panel.align_vertical(libv::ui::AlignVertical::justify);
 			SECTION("s0.0") {
-				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				panel.orientation(libv::ui::Orientation::right);
 			}
 			SECTION("s0.1") {
-				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+				panel.orientation(libv::ui::Orientation::left);
 			}
 			SECTION("s0.2") {
-				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+				panel.orientation(libv::ui::Orientation::down);
 			}
 			SECTION("s0.3") {
-				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+				panel.orientation(libv::ui::Orientation::up);
 			}
 
 			TestComponent comp0 = panel.add("10px, 10px");
@@ -736,16 +736,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
 			panel.align_vertical(libv::ui::AlignVertical::top);
 			SECTION("s1.0") {
-				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				panel.orientation(libv::ui::Orientation::right);
 			}
 			SECTION("s1.1") {
-				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+				panel.orientation(libv::ui::Orientation::left);
 			}
 			SECTION("s1.2") {
-				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+				panel.orientation(libv::ui::Orientation::down);
 			}
 			SECTION("s1.3") {
-				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+				panel.orientation(libv::ui::Orientation::up);
 			}
 
 			TestComponent comp0 = panel.add("10px, 10px");
@@ -757,16 +757,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			panel.align_horizontal(libv::ui::AlignHorizontal::center);
 			panel.align_vertical(libv::ui::AlignVertical::justify);
 			SECTION("s2.0") {
-				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				panel.orientation(libv::ui::Orientation::right);
 			}
 			SECTION("s2.1") {
-				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+				panel.orientation(libv::ui::Orientation::left);
 			}
 			SECTION("s2.2") {
-				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+				panel.orientation(libv::ui::Orientation::down);
 			}
 			SECTION("s2.3") {
-				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+				panel.orientation(libv::ui::Orientation::up);
 			}
 
 			TestComponent comp0 = panel.add("10px, 10px");
@@ -778,16 +778,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
 			panel.align_vertical(libv::ui::AlignVertical::center);
 			SECTION("s3.0") {
-				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				panel.orientation(libv::ui::Orientation::right);
 			}
 			SECTION("s3.1") {
-				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+				panel.orientation(libv::ui::Orientation::left);
 			}
 			SECTION("s3.2") {
-				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+				panel.orientation(libv::ui::Orientation::down);
 			}
 			SECTION("s3.3") {
-				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+				panel.orientation(libv::ui::Orientation::up);
 			}
 
 			TestComponent comp0 = panel.add("10px, 10px");
@@ -802,16 +802,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 //			panel.align_horizontal(libv::ui::AlignHorizontal::left);
 //			panel.align_vertical(libv::ui::AlignVertical::justify);
 ////			SECTION("s0.0") {
-////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////				panel.orientation(libv::ui::Orientation::right);
 ////			}
 ////			SECTION("s0.1") {
-////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////				panel.orientation(libv::ui::Orientation::left);
 ////			}
 ////			SECTION("s0.2") {
-////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////				panel.orientation(libv::ui::Orientation::down);
 ////			}
 ////			SECTION("s0.3") {
-////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////				panel.orientation(libv::ui::Orientation::up);
 ////			}
 //
 //			TestComponent comp0 = panel.add("10px, 10px");
@@ -825,16 +825,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 ////			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
 ////			panel.align_vertical(libv::ui::AlignVertical::top);
 ////			SECTION("s1.0") {
-////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////				panel.orientation(libv::ui::Orientation::right);
 ////			}
 ////			SECTION("s1.1") {
-////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////				panel.orientation(libv::ui::Orientation::left);
 ////			}
 ////			SECTION("s1.2") {
-////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////				panel.orientation(libv::ui::Orientation::down);
 ////			}
 ////			SECTION("s1.3") {
-////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////				panel.orientation(libv::ui::Orientation::up);
 ////			}
 ////
 ////			TestComponent comp0 = panel.add("10px, 10px");
@@ -847,16 +847,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 ////			panel.align_horizontal(libv::ui::AlignHorizontal::center);
 ////			panel.align_vertical(libv::ui::AlignVertical::justify);
 ////			SECTION("s2.0") {
-////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////				panel.orientation(libv::ui::Orientation::right);
 ////			}
 ////			SECTION("s2.1") {
-////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////				panel.orientation(libv::ui::Orientation::left);
 ////			}
 ////			SECTION("s2.2") {
-////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////				panel.orientation(libv::ui::Orientation::down);
 ////			}
 ////			SECTION("s2.3") {
-////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////				panel.orientation(libv::ui::Orientation::up);
 ////			}
 ////
 ////			TestComponent comp0 = panel.add("10px, 10px");
@@ -870,16 +870,16 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 ////			panel.align_horizontal(libv::ui::AlignHorizontal::justify);
 ////			panel.align_vertical(libv::ui::AlignVertical::center);
 ////			SECTION("s3.0") {
-////				panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+////				panel.orientation(libv::ui::Orientation::right);
 ////			}
 ////			SECTION("s3.1") {
-////				panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+////				panel.orientation(libv::ui::Orientation::left);
 ////			}
 ////			SECTION("s3.2") {
-////				panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+////				panel.orientation(libv::ui::Orientation::down);
 ////			}
 ////			SECTION("s3.3") {
-////				panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+////				panel.orientation(libv::ui::Orientation::up);
 ////			}
 ////
 ////			TestComponent comp0 = panel.add("10px, 10px");
@@ -900,8 +900,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		TestComponent comp1 = panel.add("20px, 20px", M(5, 4, 2, 1));
 		TestComponent comp2 = panel.add("30px, 40px", M(1, 5, 2, 4));
 
-		SECTION("LEFT_TO_RIGHT") {
-			panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		SECTION("Orientation::right") {
+			panel.orientation(libv::ui::Orientation::right);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(71, 49, 0));
 			panel.layout2(400, 300);
@@ -913,8 +913,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(cx + 39, cy(40), 0, 30, 40, 0));
 		}
 
-		SECTION("RIGHT_TO_LEFT") {
-			panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		SECTION("Orientation::left") {
+			panel.orientation(libv::ui::Orientation::left);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(73, 49, 0));
 			panel.layout2(400, 300);
@@ -936,8 +936,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		TestComponent comp1 = panel.add("20px, 20px", M(5, 4, 2, 1));
 		TestComponent comp2 = panel.add("30px, 40px", M(1, 5, 2, 4));
 
-		SECTION("LEFT_TO_RIGHT") {
-			panel.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+		SECTION("Orientation::right") {
+			panel.orientation(libv::ui::Orientation::right);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(71, 49, 0));
 			panel.layout2(400, 300);
@@ -947,8 +947,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(400-30-2, 256, 0, 30, 40, 0));
 		}
 
-		SECTION("RIGHT_TO_LEFT") {
-			panel.orientation(libv::ui::Orientation::RIGHT_TO_LEFT);
+		SECTION("Orientation::left") {
+			panel.orientation(libv::ui::Orientation::left);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(73, 49, 0));
 			panel.layout2(400, 300);
@@ -958,8 +958,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(  1, 256, 0, 30, 40, 0));
 		}
 
-		SECTION("TOP_TO_BOTTOM") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(33, 87, 0));
 			panel.layout2(400, 300);
@@ -969,8 +969,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(1,   5, 0, 30, 40, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			CHECK(panel.layout1(0, 0, 0) == approx_size(33, 86, 0));
 			panel.layout2(400, 300);
@@ -985,8 +985,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 		panel.align_horizontal(libv::ui::AlignHorizontal::justify);
 		panel.align_vertical(libv::ui::AlignVertical::justify);
 
-		SECTION("TOP_TO_BOTTOM everything to one gap") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down everything to one gap") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			TestComponent comp0 = panel.add("10px, 10px", M(0, 0, 0, 0));
 			TestComponent comp1 = panel.add("20px, 20px", M(0, 200, 0, 0));
@@ -1000,8 +1000,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(0,   0, 0, 30, 40, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP everything to one gap") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up everything to one gap") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			TestComponent comp0 = panel.add("10px, 10px", M(0, 0, 0, 0));
 			TestComponent comp1 = panel.add("20px, 20px", M(0, 200, 0, 0));
@@ -1015,8 +1015,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp2.bounds() == Bounds(0, 260, 0, 30, 40, 0));
 		}
 
-		SECTION("TOP_TO_BOTTOM split between multiple, but not all") {
-			panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		SECTION("Orientation::down split between multiple, but not all") {
+			panel.orientation(libv::ui::Orientation::down);
 
 			TestComponent comp0 = panel.add("1px, 10px", M(0, 0, 0, 0));
 			TestComponent comp1 = panel.add("1px, 20px", M(0, 100, 0, 0));
@@ -1037,8 +1037,8 @@ TEST_CASE("Layout Line: margin and spacing test", "[libv.ui.layout.line]") {
 			CHECK(comp3.bounds() == Bounds(0,   0, 0, 1, 80, 0));
 		}
 
-		SECTION("BOTTOM_TO_TOP split between multiple, but not all") {
-			panel.orientation(libv::ui::Orientation::BOTTOM_TO_TOP);
+		SECTION("Orientation::up split between multiple, but not all") {
+			panel.orientation(libv::ui::Orientation::up);
 
 			TestComponent comp0 = panel.add("1px, 10px", M(0, 0, 0, 0));
 			TestComponent comp1 = panel.add("1px, 20px", M(0, 100, 0, 0));

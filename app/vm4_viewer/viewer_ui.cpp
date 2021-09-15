@@ -176,7 +176,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("vm4pv.file_list");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::top);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 		style->set("anchor_target", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
 		style->set("anchor_parent", libv::ui::Anchor{0.5f, 0.0f, 0.0f});
 		style->set("size", libv::ui::parse_size_or_throw("d, d"));
@@ -198,7 +198,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.notification");
 		style->set("align", libv::ui::AlignHorizontal::center);
 		style->set("align_vertical", libv::ui::AlignVertical::top);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 //		style->set("bg_shader", context().shaderQuad());
 //		style->set("font", context().font("consola.ttf"));
@@ -211,7 +211,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.notification.bubble");
 		style->set("align", libv::ui::AlignHorizontal::center);
 		style->set("align_vertical", libv::ui::AlignVertical::center);
-//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+//		style->set("orientation", libv::ui::Orientation::down);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 		style->set("bg_shader", context().shaderQuad());
 		style->set("font", context().font("consola.ttf"));
@@ -224,7 +224,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.notification.text");
 //		style->set("align", libv::ui::AlignHorizontal::center);
 //		style->set("align_vertical", libv::ui::AlignVertical::top);
-//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+//		style->set("orientation", libv::ui::Orientation::down);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 255, 255, 35%)"));
 //		style->set("bg_shader", context().shaderQuad());
 //		style->set("font", context().font("consola.ttf"));
@@ -237,7 +237,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.shader_error");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::center);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 0, 0, 20%)"));
 //		style->set("bg_shader", context().shaderQuad());
 //		style->set("font", context().font("consola.ttf"));
@@ -250,7 +250,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.shader_error.text");
 		style->set("align_horizontal", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::center);
-//		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+//		style->set("orientation", libv::ui::Orientation::down);
 //		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(255, 0, 0, 20%)"));
 //		style->set("bg_shader", context().shaderQuad());
 		style->set("font", context().font("consola.ttf"));
@@ -264,7 +264,7 @@ void ViewerUI::doAttach() {
 		auto style = context().style("overlay.shader_inspector");
 		style->set("align", libv::ui::AlignHorizontal::left);
 		style->set("align_vertical", libv::ui::AlignVertical::center);
-		style->set("orientation", libv::ui::Orientation::TOP_TO_BOTTOM);
+		style->set("orientation", libv::ui::Orientation::down);
 		style->set("bg_color", libv::parse::parse_color_or_throw("rgba(0, 0, 0, 40%)"));
 		style->set("bg_shader", context().shaderQuad());
 		style->set("font", context().font("consola.ttf"));

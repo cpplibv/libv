@@ -76,7 +76,7 @@ public:
 		//
 
 		panel_line.add(button0);
-		panel_line.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		panel_line.orientation(libv::ui::Orientation::down);
 
 		canvas_adaptor.adopt(&canvas);
 
@@ -114,7 +114,7 @@ public:
 	std::unordered_map<std::string, VarControl> var_controls;
 
 	void init() {
-		var_panel.orientation(libv::ui::Orientation::TOP_TO_BOTTOM);
+		var_panel.orientation(libv::ui::Orientation::down);
 		var_panel.size({libv::ui::pixel(400), libv::ui::ratio()});
 		panel_line.add(var_panel);
 
@@ -142,12 +142,12 @@ public:
 				continue;
 
 			} else if (var.state == app::DynamicVar::State::create || full_init) {
-				control.line.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				control.line.orientation(libv::ui::Orientation::right);
 				control.line.size({libv::ui::ratio(), libv::ui::pixel(20)});
 				var_panel.add(control.line);
 
 				control.slider.bar_color({1, 0, 0, 1});
-				control.slider.orientation(libv::ui::Orientation::LEFT_TO_RIGHT);
+				control.slider.orientation(libv::ui::Orientation::right);
 				control.slider.value_max(var.high[d]);
 				control.slider.value_min(var.low[d]);
 				control.slider.value_step(var.step[d]);

@@ -649,10 +649,10 @@ public:
 	//	ui_table["right"] = "right";
 	//	ui_table["top"] = "top";
 	//
-	//	ui_table["ORIENT_BOTTOM_TO_TOP"] = Orientation::BOTTOM_TO_TOP;
-	//	ui_table["ORIENT_LEFT_TO_RIGHT"] = Orientation::LEFT_TO_RIGHT;
-	//	ui_table["ORIENT_RIGHT_TO_LEFT"] = Orientation::RIGHT_TO_LEFT;
-	//	ui_table["ORIENT_TOP_TO_BOTTOM"] = Orientation::TOP_TO_BOTTOM;
+	//	ui_table["ORIENT_Orientation::up"] = Orientation::up;
+	//	ui_table["ORIENT_Orientation::right"] = Orientation::right;
+	//	ui_table["ORIENT_Orientation::left"] = Orientation::left;
+	//	ui_table["ORIENT_Orientation::down"] = Orientation::down;
 
 		ui_table.set_function("style", [this](const std::string_view style_name) mutable {
 			auto style_ip = ui.context().style(style_name);
@@ -742,10 +742,10 @@ void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
 //	ui_table["right"] = "right";
 //	ui_table["top"] = "top";
 //
-//	ui_table["ORIENT_BOTTOM_TO_TOP"] = Orientation::BOTTOM_TO_TOP;
-//	ui_table["ORIENT_LEFT_TO_RIGHT"] = Orientation::LEFT_TO_RIGHT;
-//	ui_table["ORIENT_RIGHT_TO_LEFT"] = Orientation::RIGHT_TO_LEFT;
-//	ui_table["ORIENT_TOP_TO_BOTTOM"] = Orientation::TOP_TO_BOTTOM;
+//	ui_table["ORIENT_Orientation::up"] = Orientation::up;
+//	ui_table["ORIENT_Orientation::right"] = Orientation::right;
+//	ui_table["ORIENT_Orientation::left"] = Orientation::left;
+//	ui_table["ORIENT_Orientation::down"] = Orientation::down;
 //
 //	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
 //

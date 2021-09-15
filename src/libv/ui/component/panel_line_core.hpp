@@ -58,7 +58,7 @@ void CorePanelLine::access_properties(T& ctx) {
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.orientation; },
-			Orientation::LEFT_TO_RIGHT,
+			Orientation::right,
 			pgr::layout, pnm::orientation,
 			"Orientation of subsequent components"
 	);
