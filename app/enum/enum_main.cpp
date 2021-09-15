@@ -20,7 +20,7 @@
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr std::string_view enum_gen_version = "v2.4.2";
+static constexpr std::string_view enum_gen_version = "v2.5.0";
 
 // -------------------------------------------------------------------------------------------------
 
@@ -68,6 +68,7 @@ private:
 public:
 //	bool gen_operator_eq = true;
 //	bool gen_operator_rel = true;
+	bool gen_next_prev = true;
 	bool gen_to_string = true;
 	bool gen_to_stream = true;
 	bool gen_to_span = true;
@@ -182,6 +183,7 @@ public:
 		out("public:\n");
 		out("	explicit(false) constexpr inline {}(enum_type value) noexcept :\n", class_enum_type_name);
 		out("		enum_value_(value) {{\n");
+		out("		assert(underlying() >= 0 && underlying() < {});\n", enum_entries.size());
 		out("	}}\n");
 		out("\n");
 		out("	explicit(false) constexpr inline operator enum_type() const noexcept {{\n");
@@ -229,6 +231,19 @@ public:
 //			}
 //		}
 
+		if (gen_next_prev && !enum_entries.empty()) {
+			out("\n");
+			out("public:\n");
+			out("	[[nodiscard]] constexpr inline enum_type next() noexcept {{\n");
+			out("		const underlying_type u = static_cast<underlying_type>(enum_value_);\n");
+			out("		return enum_type{{u == {} ? 0 : u + 1}};\n", enum_entries.size() - 1);
+			out("	}}\n");
+			out("	[[nodiscard]] constexpr inline enum_type prev() noexcept {{\n");
+			out("		const underlying_type u = static_cast<underlying_type>(enum_value_);\n");
+			out("		return enum_type{{u == 0 ? {} : u - 1}};\n", enum_entries.size() - 1);
+			out("	}}\n");
+		}
+
 		if (gen_to_string || gen_to_stream) {
 			out("\n");
 			out("private:\n");
@@ -242,8 +257,7 @@ public:
 			out("\n");
 			out("public:\n");
 			out("	[[nodiscard]] constexpr inline std::string_view to_string() const noexcept {{\n");
-			out("		assert(underlying() >= 0 && underlying() < {});\n", enum_entries.size());
-			out("		return table_to_string[underlying()];\n");
+			out("		return table_to_string[static_cast<underlying_type>(enum_value_)];\n");
 			out("	}}\n");
 		}
 
@@ -262,8 +276,7 @@ public:
 			out("\n");
 			out("public:\n");
 			out("	[[nodiscard]] constexpr inline {} {}() const noexcept {{\n", property.type, property_name);
-			out("		assert(underlying() >= 0 && underlying() < {});\n", enum_entries.size());
-			out("		return table_{}[underlying()];\n", property_name);
+			out("		return table_{}[static_cast<underlying_type>(enum_value_)];\n", property_name);
 			out("	}}\n");
 		}
 

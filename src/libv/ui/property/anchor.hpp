@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: Anchor
-// Generator version: enum v2.4.2
+// Generator version: enum v2.5.0
 // Input file: src/libv/ui/property/anchor.hpp.in.lua
 
 #pragma once
@@ -44,6 +44,7 @@ private:
 public:
 	explicit(false) constexpr inline Anchor_type(enum_type value) noexcept :
 		enum_value_(value) {
+		assert(underlying() >= 0 && underlying() < 9);
 	}
 
 	explicit(false) constexpr inline operator enum_type() const noexcept {
@@ -66,6 +67,16 @@ public:
 		return enum_value();
 	}
 
+public:
+	[[nodiscard]] constexpr inline enum_type next() noexcept {
+		const underlying_type u = static_cast<underlying_type>(enum_value_);
+		return enum_type{u == 8 ? 0 : u + 1};
+	}
+	[[nodiscard]] constexpr inline enum_type prev() noexcept {
+		const underlying_type u = static_cast<underlying_type>(enum_value_);
+		return enum_type{u == 0 ? 8 : u - 1};
+	}
+
 private:
 	static constexpr std::string_view table_to_string[] = {
 			"top-left",      // top_left
@@ -81,8 +92,7 @@ private:
 
 public:
 	[[nodiscard]] constexpr inline std::string_view to_string() const noexcept {
-		assert(underlying() >= 0 && underlying() < 9);
-		return table_to_string[underlying()];
+		return table_to_string[static_cast<underlying_type>(enum_value_)];
 	}
 
 private:
@@ -100,8 +110,7 @@ private:
 
 public:
 	[[nodiscard]] constexpr inline libv::vec3f rate() const noexcept {
-		assert(underlying() >= 0 && underlying() < 9);
-		return table_rate[underlying()];
+		return table_rate[static_cast<underlying_type>(enum_value_)];
 	}
 };
 

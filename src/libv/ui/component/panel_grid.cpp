@@ -165,7 +165,7 @@ void CorePanelGrid::doStyle(ContextStyle& ctx, ChildID childID) {
 
 libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
 	const auto column_count = property.column_count();
-	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
+	const auto& orient = Orientation2Table[underlying(property.orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;
@@ -243,7 +243,7 @@ libv::vec3f CorePanelGrid::doLayout1(const ContextLayout1& layout_env) {
 void CorePanelGrid::doLayout2(const ContextLayout2& layout_env) {
 	// TODO P4: generalize a way for table lookup for various table lookup and handle invalid enum values
 	const auto column_count = property.column_count();
-	const auto& orient = Orientation2Table[libv::to_value(property.orientation2())];
+	const auto& orient = Orientation2Table[underlying(property.orientation2())];
 	const auto _X_ = orient._X_;
 	const auto _Y_ = orient._Y_;
 	const auto _Z_ = orient._Z_;

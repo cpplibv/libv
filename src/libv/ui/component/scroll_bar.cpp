@@ -240,7 +240,7 @@ inline CoreScrollBar::BarBounds CoreScrollBar::bar_bounds() const noexcept {
 	//      value_range' = (value_range) / (value_max - value_min)
 	//
 
-	const auto orient = OrientationTable[libv::to_value(property.orientation())];
+	const auto orient = OrientationTable[underlying(property.orientation())];
 
 	const auto value_extent = std::abs(value_max_ - value_min_);
 
@@ -276,7 +276,7 @@ inline CoreScrollBar::BarBounds CoreScrollBar::bar_bounds() const noexcept {
 
 void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 	if (event.button == libv::input::MouseButton::Left && event.action == libv::input::Action::press) {
-		const auto orient = OrientationTable[libv::to_value(property.orientation())];
+		const auto orient = OrientationTable[underlying(property.orientation())];
 		const auto bar = bar_bounds_;
 		const auto local_mouse = event.local_position;
 
@@ -334,7 +334,7 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 	if (drag_mode == DragMode::idle)
 		return;
 
-	const auto orient = OrientationTable[libv::to_value(property.orientation())];
+	const auto orient = OrientationTable[underlying(property.orientation())];
 	const auto bar = bar_bounds_; // Cache bar_bounds
 	const auto local_mouse = event.local_position;
 	const auto value_extent = std::abs(value_max_ - value_min_);
@@ -364,7 +364,7 @@ void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
 }
 
 void CoreScrollBar::onMouseScroll(const EventMouseScroll& event) {
-	const auto orient = OrientationTable[libv::to_value(property.orientation())];
+	const auto orient = OrientationTable[underlying(property.orientation())];
 	const auto movement = static_cast<double>(event.scroll_movement.y * orient.control_direction);
 	const auto inverse_interval = value_min_ < value_max_ ? 1.0 : -1.0;
 	handler().make_scroll(movement * inverse_interval);

@@ -1,6 +1,6 @@
 //
 // Generated source code for enum: ScrollAreaMode
-// Generator version: enum v2.4.2
+// Generator version: enum v2.5.0
 // Input file: src/libv/ui/property/scroll_area_mode.hpp.in.lua
 
 #pragma once
@@ -36,6 +36,7 @@ private:
 public:
 	explicit(false) constexpr inline ScrollAreaMode_type(enum_type value) noexcept :
 		enum_value_(value) {
+		assert(underlying() >= 0 && underlying() < 3);
 	}
 
 	explicit(false) constexpr inline operator enum_type() const noexcept {
@@ -58,6 +59,16 @@ public:
 		return enum_value();
 	}
 
+public:
+	[[nodiscard]] constexpr inline enum_type next() noexcept {
+		const underlying_type u = static_cast<underlying_type>(enum_value_);
+		return enum_type{u == 2 ? 0 : u + 1};
+	}
+	[[nodiscard]] constexpr inline enum_type prev() noexcept {
+		const underlying_type u = static_cast<underlying_type>(enum_value_);
+		return enum_type{u == 0 ? 2 : u - 1};
+	}
+
 private:
 	static constexpr std::string_view table_to_string[] = {
 			"both",       // both
@@ -67,8 +78,7 @@ private:
 
 public:
 	[[nodiscard]] constexpr inline std::string_view to_string() const noexcept {
-		assert(underlying() >= 0 && underlying() < 3);
-		return table_to_string[underlying()];
+		return table_to_string[static_cast<underlying_type>(enum_value_)];
 	}
 };
 

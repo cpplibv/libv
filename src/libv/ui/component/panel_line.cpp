@@ -80,7 +80,7 @@ void CorePanelLine::doStyle(ContextStyle& ctx, ChildID childID) {
 // -------------------------------------------------------------------------------------------------
 
 libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
-	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
+	const auto& orientData = OrientationTable[underlying(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
 	const auto _Z_ = orientData._Z_;
@@ -171,7 +171,7 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 	const auto& alignHData = AlignmentData(info(property.align_horizontal()).rate(), info(property.align_horizontal()).justified());
 	const auto& alignVData = AlignmentData(info(property.align_vertical()).rate(), info(property.align_vertical()).justified());
-	const auto& orientData = OrientationTable[libv::to_value(property.orientation())];
+	const auto& orientData = OrientationTable[underlying(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
 	const auto _Z_ = orientData._Z_;
