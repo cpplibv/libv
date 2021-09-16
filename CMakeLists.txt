@@ -416,7 +416,10 @@ wish_create_external(
 	GIT_TAG OpenSSL_1_1_1k
 
 	BUILD_IN_SOURCE 1
-	CONFIGURE_COMMAND bash -C ./config no-tests no-shared # 'bash' is used for Windows cmd to not fail
+	CONFIGURE_COMMAND bash -c [=[[[ `uname -s` == MSYS_NT* ]] && source shell mingw64 && ./config no-tests no-shared || ./config no-tests no-shared]=]
+			# Bash is used for Windows cmd to not fail by trying to execute the config.com
+			# Windows MSYS_NT system would fail inside openssl configure, so switch to msys2's mingw64 shell
+			# The && CONFIG and || CONFIG pattern is used because cmake eats the semicolon
 	BUILD_COMMAND make -j${WISH_PROCESSOR_COUNT} # OpenSSL is 'make' based
 	INSTALL_COMMAND
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${PATH_EXT}/openssl/include/openssl/
