@@ -35,10 +35,11 @@ macro(wish_end_group)
 	list(REMOVE_AT __wish_current_group_stack -1)
 endmacro()
 
-# --- IDE ------------------------------------------------------------------------------------------
+# --- IDE / Build info -----------------------------------------------------------------------------
 
 set(__wish_external_include_directories)
 set(__wish_external_defines)
+set(__wish_external_raw_arguments "wish_version(3.0)")
 
 ## Creates wish_ide target that can be used to obtain various information for IDEs
 function(wish_create_ide_target)
@@ -54,6 +55,18 @@ function(wish_create_ide_target)
 	add_custom_target(wish
 		COMMAND ${CMAKE_COMMAND} -E echo Wish
 	)
+
+    file(WRITE "${CMAKE_BINARY_DIR}/__wish_external_raw_arguments.new.txt" "${__wish_external_raw_arguments}")
+    add_custom_target(wish_ext_lazy
+		# TODO P1: Different folder for different build types on ext is bypassed (ext currently built by build/release)
+		# TODO P3: Its working, but would be nice, if not a re-entering call would execute it
+		#			Creating a custom target for every external would improve this
+		#			This would also mean that only the touched external are tried to be rebuilt
+		#			Careful with multiple custom targets as USES_TERMINAL could force being serial
+		USES_TERMINAL
+        COMMAND ${CMAKE_COMMAND} -E compare_files "${CMAKE_BINARY_DIR}/__wish_external_raw_arguments.new.txt" "${CMAKE_BINARY_DIR}/__wish_external_raw_arguments.old.txt" || ${CMAKE_COMMAND} --build . --target ext -- -j 3
+        COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_BINARY_DIR}/__wish_external_raw_arguments.new.txt" "${CMAKE_BINARY_DIR}/__wish_external_raw_arguments.old.txt"
+    )
 endfunction()
 
 # --- External -------------------------------------------------------------------------------------
@@ -62,6 +75,10 @@ endfunction()
 ## Unrecognized parameters after INCLUDE_DIR, LINK or DEFINE are forbidden.
 function(wish_create_external)
 	cmake_parse_arguments(arg "DEBUG;SKIP_CONFIGURE_AND_BUILD;SKIP_CONFIGURE;SKIP_BUILD" "NAME" "INCLUDE_DIR;LINK;DEFINE" ${ARGN})
+
+	set(temp_list ${__wish_external_raw_arguments})
+	list(APPEND temp_list ${ARGN})
+	set(__wish_external_raw_arguments ${temp_list} PARENT_SCOPE)
 
 	# options
 	set(command_str_configure)
