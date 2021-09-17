@@ -457,10 +457,21 @@ int main(int argc, const char** argv) {
 	}
 
 	std::cout << " input_file: " << argv[1] << std::endl;
-	std::cout << "output_file: " << argv[2] << std::endl;
-//	std::cout << eb.generate_source_code(libv::read_file_or_throw(argv[1])) << std::endl;
+	std::cout << "output_file: " << argv[2] << std::flush;
 
-	libv::write_file_or_throw(argv[2], eb.generate_source_code(argv[1], libv::read_file_or_throw(argv[1])));
+	const auto generated_source = eb.generate_source_code(argv[1], libv::read_file_or_throw(argv[1]));
+
+	// Try to read back the current content of the output file, to check if its changed
+	const auto current_source = libv::read_file_ec(argv[2]);
+
+	if (!current_source.ec && current_source.data == generated_source)
+		// Output file is already up-to-date, skip write to not invalidate timestamps on files
+		std::cout << " (up-to-date)";
+	else
+		// The output file is out-of-date, write out the fresh source
+		libv::write_file_or_throw(argv[2], generated_source);
+
+	std::cout << std::endl;
 
 	return EXIT_SUCCESS;
 
