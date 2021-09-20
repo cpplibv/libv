@@ -49,6 +49,8 @@ void RemoteMesh::update(libv::gl::GL& gl, Remote& remote_) noexcept {
 }
 
 void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_) noexcept {
+	assert(!attributes.empty() && "Mesh attributes were not initialized");
+
 	if (dirty)
 		update(gl, remote_);
 	else
@@ -58,6 +60,8 @@ void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_) noexcept {
 }
 
 void RemoteMesh::render(libv::gl::GL& gl, Remote& remote_, VertexIndex baseVertex, VertexIndex baseIndex, VertexIndex numIndices) noexcept {
+	assert(!attributes.empty() && "Mesh attributes were not initialized");
+
 	if (dirty)
 		update(gl, remote_);
 	else
