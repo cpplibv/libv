@@ -13,7 +13,9 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-using Flag_t = libv::flag_enum<uint32_t, class tag_Flag>;
+class tag_Flag;
+using Flag_t = libv::flag_enum<uint32_t, tag_Flag>;
+
 namespace Flag {
 
 static constexpr Flag_t none = Flag_t{};

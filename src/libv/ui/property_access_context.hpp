@@ -90,7 +90,7 @@ public:
 			return;
 
 		if (style != nullptr) {
-			const value_type* value_opt = style->get_optional<value_type>(name);
+			const value_type* value_opt = style->get_optional<value_type>(component.style_state(), name);
 			if (value_opt) {
 				AccessProperty::value(component, property, *value_opt);
 				return;
@@ -117,7 +117,7 @@ public:
 			return;
 
 		if (style != nullptr) {
-			const value_type* value_opt = style->get_optional<value_type>(name);
+			const value_type* value_opt = style->get_optional<value_type>(component.style_state(), name);
 			if (value_opt) {
 				AccessProperty::value(component, property, *value_opt);
 				return;
@@ -145,7 +145,7 @@ public:
 			return;
 
 		if (style != nullptr) {
-			const value_type* value_opt = style->get_optional<value_type>(name);
+			const value_type* value_opt = style->get_optional<value_type>(component.style_state(), name);
 			if (value_opt) {
 				if (*value_opt != get(owner)) {
 					set(owner, *value_opt);
@@ -179,7 +179,7 @@ public:
 			return;
 
 		if (style != nullptr) {
-			const value_type* value_opt = style->get_optional<value_type>(name);
+			const value_type* value_opt = style->get_optional<value_type>(component.style_state(), name);
 			if (value_opt) {
 				if (*value_opt != get(owner)) {
 					set(owner, *value_opt);

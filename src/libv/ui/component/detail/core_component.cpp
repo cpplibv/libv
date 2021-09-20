@@ -255,6 +255,11 @@ void CoreComponent::style(std::string_view style_name) {
 	style(context().style(style_name));
 }
 
+void CoreComponent::style_state(StyleState state, bool value) noexcept {
+	style_state_ = value ? style_state_ | state : style_state_ & ~state;
+	flagAuto(Flag::pendingStyle);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 libv::vec2f CoreComponent::calculate_local_mouse_coord() const noexcept {

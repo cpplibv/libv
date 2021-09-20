@@ -29,17 +29,16 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 
 	mp_bar_main.style("space.hud-bar.mp.main");
 
-	libv::ui::Label lbl_space("mp-title-space");
-	lbl_space.style("space.hud-bar.mp.space");
-	lbl_space.text("SPACE");
-	mp_bar_main.add(lbl_space);
+	libv::ui::Button title_space("title-space");
+	title_space.style("space.title-space");
+	title_space.text("SPACE");
+	mp_bar_main.add(title_space);
 
 	libv::ui::PanelLine mp_bar;
 	mp_bar.style("space.hud-bar.mp.panel");
 	mp_bar_main.add(mp_bar);
 
 	{
-
 		libv::ui::Label lbl_name("mp-name-lbl");
 		lbl_name.style("space.hud-bar.mp.lbl");
 		lbl_name.text("Name:");

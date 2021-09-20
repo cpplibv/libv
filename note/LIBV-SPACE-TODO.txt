@@ -72,10 +72,8 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
-place.it:
-	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
-	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
-	game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
+
+
 
 
 app.space: Simulation time control
@@ -217,6 +215,23 @@ watch shader part 3 https://www.youtube.com/watch?v=E4PHFnvMzFc
 
 
 What do I need from libv to make a 'minimal' working iris program?
+	libv.ui
+		2 List component
+		3 Scroll pane = scroll area + scroll bar + connecting them
+		5 Font outline render
+			freetype2 Now has an SDF render option
+			spread property set:
+				const FT_Int spread = 8;
+				FT_Property_Set(library, "sdf", "spread", &spread);
+				8bit uint normalized to [+spread .. -spread]
+			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
+
+	libv.ctrl
+		2 Interaction with UI
+		5 Resolve analog-binary accidental collusion with time
+
+	libv.serial
+		1 Safe container resize/reserve on deserialization
 
 	libv.update
 		Resource
@@ -228,23 +243,6 @@ What do I need from libv to make a 'minimal' working iris program?
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
 
-	libv.serial
-		1 Safe container resize/reserve on deserialization
-
-	libv.ui
-		1 Button states (state styles)
-		2 List component
-		3 Scroll pane = scroll area + scroll bar + connecting them
-		5 Font outline render
-			freetype2 Now has an SDF render option
-			spread property set:
-				const FT_Int spread = 8;
-				FT_Property_Set(library, "sdf", "spread", &spread);
-				8bit uint normalized to [+spread .. -spread]
-
-	libv.ctrl
-		2 Interaction with UI
-		5 Resolve analog-binary accidental collusion with time
 
 blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
 		full screen quad pass with render_resolution / 2 with v blur shader

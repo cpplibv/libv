@@ -82,24 +82,24 @@ ui.style("space.hud-bar.mp.lbl") {
 	size = "10pxD, 4pxD",
 }
 
-ui.style("space.hud-bar.mp.space") {
+ui.style("space.title-space") {
 	--ui.style("space.hud-bar.mp.btn") {
 	align_horizontal = "center",
 	align_vertical = "center",
 	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
 	font_size = 18,
-	--background = "color: red";
-	--background = "color:" .. colors.hud_light_bg_color;
-	--background = "texture: atlas_ui_slate.png";
-	--background = "texture: hexagon_metal_0001_diffuse.dds";
-	--background = "pattern: hexagon_metal_0001_diffuse.dds";
-	--background = "texture: separator_bar_256x16.png";
-	--background = "texture: stretch_border.png";
-	--background = "border: stretch_border.png";
-	--background = "pattern: stretch_border.png";
-	--background = "padding_pattern: stripes_border.png";
-	--background = "padding_pattern: stripes.png";
-	--background = "padding_pattern: stripes.png";
+	--background = "color: red",
+	--background = "color:" .. colors.hud_light_bg_color,
+	--background = "texture: atlas_ui_slate.png",
+	--background = "texture: hexagon_metal_0001_diffuse.dds",
+	--background = "pattern: hexagon_metal_0001_diffuse.dds",
+	--background = "texture: separator_bar_256x16.png",
+	--background = "texture: stretch_border.png",
+	--background = "border: stretch_border.png",
+	--background = "pattern: stretch_border.png",
+	--background = "padding_pattern: stripes_border.png",
+	--background = "padding_pattern: stripes.png",
+	--background = "padding_pattern: stripes.png",
 	--background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
 	--background = {type = "padding_pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border = 3, texture = "stripes.png"},
 	--background = {type = "pattern", color = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, 0}, texture = "stripes.png"},
@@ -107,7 +107,22 @@ ui.style("space.hud-bar.mp.space") {
 	--background = {type = "border_padding_pattern", color = {1, 1, 1, 1}, inner_padding = {4, 0}, border_extent = 3, texture = "stripes_border.png"},
 	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, 0}, border_extent = 3, texture = "stripes_border.png"},
 	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, -1}, border_extent = 3, texture = "stripes_border.png"},
-	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+
+	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+
+	state("focus") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("active") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover, active") {
+		background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
 
 	padding = {60, 8},
 	--padding = { 0, 7},

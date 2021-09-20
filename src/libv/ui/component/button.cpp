@@ -4,11 +4,11 @@
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/button_core.hpp>
 // pro
+#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -16,7 +16,7 @@
 #include <libv/ui/property_access_context.hpp>
 #include <libv/ui/shader/shader_font.hpp>
 #include <libv/ui/shader/shader_image.hpp>
-#include <libv/ui/style.hpp>
+#include <libv/ui/style_state.hpp>
 #include <libv/ui/text_layout.hpp>
 
 
@@ -27,40 +27,43 @@ namespace ui {
 
 void CoreButton::onFocus(const EventFocus& event) {
 	(void) event;
-	// TODO P3: listen to hotkey event (ui.select)
+	// TODO P3: listen to hotkey event (ui.select) (? aka libv.ctrl enter context)
 
-	if (event.loss())
-		{} // Set style to normal or disabled
-
-	if (event.gain())
-		{} // Set style to active if not disabled
-
-	flagAuto(Flag::pendingRender);
+	style_state(StyleState::focus, event.gain());
 }
 
 void CoreButton::onMouseButton(const EventMouseButton& event) {
+	if (event.action == libv::input::Action::release && event.button == libv::input::MouseButton::Left)
+		style_state(StyleState::active, false);
+
 	if (event.action == libv::input::Action::press)
 		focus();
 
 	fire(EventMouseButton{event});
 
 	// TODO P3: use hotkey event (ui.select) (even for mouse)
-	if (event.action == libv::input::Action::press && event.button == libv::input::MouseButton::Left)
+	if (event.action == libv::input::Action::press && event.button == libv::input::MouseButton::Left) {
+		style_state(StyleState::active, true);
 		fire(EventSubmit{});
+	}
 
 	event.stop_propagation();
 }
 
 void CoreButton::onMouseMovement(const EventMouseMovement& event) {
-//	if (event.enter)
-//		set(property.bg_color, property.bg_color() + 0.2f);
-//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-//
-//	if (event.leave)
-////		reset(property.bg_color);
-//		set(property.bg_color, property.bg_color() - 0.2f);
-//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+	if (event.enter)
+//		if (button_is_pressed_down)
+//			style_state(StyleState::hover | StyleState::active, true);
+//		else
+		style_state(StyleState::hover, true);
 
+	if (event.leave)
+		style_state(StyleState::hover, false);
+
+	// TODO P1: style_state(StyleState::active, false); after the mouse leaves the component area (while it was active): maybe it has to acquire or soft acquire the mouse? so it can track the release (ergo deactivate) event
+	//		style_state(StyleState::active, false);
+
+	// TODO P5: Set style to hover if not disabled and updates layout properties in parent
 	fire(EventMouseMovement{event});
 
 	event.stop_propagation();

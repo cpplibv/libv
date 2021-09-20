@@ -13,18 +13,18 @@ namespace ui {
 
 class EventFocus : BaseEvent {
 private:
-	bool focus;
+	bool focus_;
 
 public:
-	explicit constexpr inline EventFocus(bool focus) noexcept : focus(focus) { }
+	explicit constexpr inline EventFocus(bool focus) noexcept : focus_(focus) { }
 
 public:
 	[[nodiscard]] constexpr inline bool gain() const noexcept {
-		return focus;
+		return focus_;
 	}
 
 	[[nodiscard]] constexpr inline bool loss() const noexcept {
-		return !focus;
+		return !focus_;
 	}
 };
 

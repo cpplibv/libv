@@ -308,28 +308,29 @@ void CoreScrollBar::onMouseButton(const EventMouseButton& event) {
 		return event.stop_propagation();
 	}
 
-	// === TEMP ========================================================================================
-	if (event.button == libv::input::MouseButton::Right && event.action == libv::input::Action::press) {
-		set(property.orientation, Orientation{(libv::to_value(property.orientation()) + 1) % 4});
-		return event.stop_propagation();
-	}
-	// === TEMP ========================================================================================
+//	// === TEMP ========================================================================================
+//	if (event.button == libv::input::MouseButton::Right && event.action == libv::input::Action::press) {
+//		set(property.orientation, Orientation{(underlying(property.orientation()) + 1) % 4});
+//		type(property.orientation()).next()
+//		return event.stop_propagation();
+//	}
+//	// === TEMP ========================================================================================
 }
 
 void CoreScrollBar::onMouseMovement(const EventMouseMovement& event) {
-	if (event.enter) {
-//		set(property.bg_color, property.bg_color() + 0.2f);
-		set(property.bar_color, property.bar_color() + 0.2f);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-	}
-
-	if (event.leave) {
-//		set(property.bg_color, property.bg_color() - 0.2f);
-		set(property.bar_color, property.bar_color() - 0.2f);
-//		reset(property.bg_color);
-//		reset(property.bar_color);
-		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
-	}
+//	if (event.enter) {
+////		set(property.bg_color, property.bg_color() + 0.2f);
+//		set(property.bar_color, property.bar_color() + 0.2f);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//	}
+//
+//	if (event.leave) {
+////		set(property.bg_color, property.bg_color() - 0.2f);
+//		set(property.bar_color, property.bar_color() - 0.2f);
+////		reset(property.bg_color);
+////		reset(property.bar_color);
+//		// TODO P5: Set style to hover if not disabled and updates layout properties in parent
+//	}
 
 	if (drag_mode == DragMode::idle)
 		return;

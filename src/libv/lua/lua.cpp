@@ -19,7 +19,7 @@ namespace lua {
 State create_state(lualib libmask) {
 	State lua;
 
-	if ((libv::to_value(libmask) & libv::to_value(lualib::base)) != 0) {
+	if ((libv::to_underlying(libmask) & libv::to_underlying(lualib::base)) != 0) {
 		lua.open_libraries(sol::lib::base);
 		lua.open_libraries(sol::lib::coroutine);
 		lua.open_libraries(sol::lib::debug);
@@ -28,11 +28,11 @@ State create_state(lualib libmask) {
 		lua.open_libraries(sol::lib::string);
 		lua.open_libraries(sol::lib::table);
 
-		// TODO P4: lua["package"]["path"]
-		lua["package"]["path"] = ";res/script/?.lua";
+		// TODO P1: Proper setting of lua["package"]["path"] during init
+		lua["package"]["path"] = ";res/script/?.lua;script/?.lua;?.lua";
 	}
 
-	if ((libv::to_value(libmask) & libv::to_value(lualib::vec)) != 0) {
+	if ((libv::to_underlying(libmask) & libv::to_underlying(lualib::vec)) != 0) {
 		registerLuaVec2<libv::vec2f>(lua, "vec2f");
 		registerLuaVec2<libv::vec2d>(lua, "vec2d");
 		registerLuaVec3<libv::vec3f>(lua, "vec3f");
@@ -41,7 +41,7 @@ State create_state(lualib libmask) {
 		registerLuaVec4<libv::vec4d>(lua, "vec4d");
 	}
 
-//	if ((libv::to_value(libmask) & libv::to_value(lualib::vm4)) != 0) {
+//	if ((libv::to_underlying(libmask) & libv::to_underlying(lualib::vm4)) != 0) {
 //		registerLuaVM4(lua, "vec4d");
 //	}
 

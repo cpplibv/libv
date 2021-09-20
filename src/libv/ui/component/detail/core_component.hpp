@@ -18,12 +18,13 @@
 #include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/component/detail/generate_name.hpp>
 #include <libv/ui/event/detail/internal_event_linkage.hpp>
-#include <libv/ui/property.hpp> // TODO P1: Remove property.hpp from here (the std::variant is killing me)
+#include <libv/ui/property.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/style_fwd.hpp>
+#include <libv/ui/style_state.hpp>
 
 
 namespace libv {
@@ -46,6 +47,7 @@ class CoreComponent {
 
 private:
 	Flag_t flags = Flag::mask_init;
+	StyleState_t style_state_ = StyleState::none;
 	ChildID childID = 0;
 	uint32_t ref_count = 0;
 
@@ -256,15 +258,13 @@ public:
 	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
 	void style(libv::intrusive_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
+	void style_state(StyleState state, bool value) noexcept;
+	[[nodiscard]] constexpr inline StyleState style_state() const noexcept {
+		return style_state_;
+	}
 
 public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
-
-public:
-	template <typename Property>
-	inline void set(Property& property, typename Property::value_type value);
-	template <typename Property>
-	inline void reset(Property& property);
 
 public:
 	template <typename Event>
@@ -323,20 +323,6 @@ protected:
 	virtual void doForeachChildren(libv::function_ref<bool(Component&)> callback);
 	virtual void doForeachChildren(libv::function_ref<void(Component&)> callback);
 };
-
-// -------------------------------------------------------------------------------------------------
-
-// TODO P2: libv.ui: Remove set/reset from here (?)
-template <typename Property>
-inline void CoreComponent::set(Property& property, typename Property::value_type value) {
-	AccessProperty::manual(*this, property, std::move(value));
-}
-
-template <typename Property>
-inline void CoreComponent::reset(Property& property) {
-	AccessProperty::driver(property, PropertyDriver::style);
-	flagAuto(Flag::pendingStyle);
-}
 
 // -------------------------------------------------------------------------------------------------
 

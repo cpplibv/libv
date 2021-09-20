@@ -283,7 +283,7 @@ public:
 		// - Attach #2
 		// - Style
 		// - Layout
-		// - Mouse update
+		// - Mouse update // Comes after layout: Mouse needs the updated mouse region bounds to produce the events
 		// - Render
 		// - Detach
 

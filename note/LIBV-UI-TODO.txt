@@ -43,6 +43,7 @@ libv.ui: In every component background should not contribute to layout1 size
 libv.ui: Padding pattern support for internal padding
 libv.ui: bordered_padding_pattern (stripes_border.png with proper border handling)
 libv.ui: Fix input local positions when using padding
+libv.ui.style: Style based on component state (bit-mask)
 
 
 
@@ -61,56 +62,21 @@ libv.ui: Fix input local positions when using padding
 
 
 
+libv.ui: Stateify every UI component (minimal: hover and focus)
+		label
+		button
+		input_field
+		***
 
+libv.ui: Stateify every UI component (extended: active)
+		label
+		button
+		input_field
+		***
 
+libv.ui: Add missing button state switch on off component active release
 
-
-
-
-Component styled states:
-
-	libv.ui.property: scope / sheet / component type based style rules
-	libv.ui.property: style property (literally a property that is a style ptr, useful for interactive components and their changes)
-		libv.ui.property: account for cyclic owning references with style property
-	libv.ui.style: Style based on component state (bit-mask)
-
-
-	libv.ui.theme:
-		Possible button states:
-			Normal
-			Focus
-			Hover
-			Active/Press/Held Down
-			Progress/Loading
-			Disabled
-			Error
-
-
-	libv.ui: static_component system (lite)
-		Check on the _pastebin/legacy codes for this one
-
-		libv.ui: Restructure: property context creation stuffy simplification
-				maybe CRTP base for core components
-				| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
-
-		libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
-		libv.ui: Composite component style / property system
-			libv.ui.property: complex composite component would result in "nested" property sets
-			libv.ui.property: property system interaction with static_component system
-			libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
-
-
-
-
-
-
-
-
-
-
-
-
-
+libv.ui: border fragment = chained/nested background fragments
 
 libv.ui: check on that "recent" modification that i just did in ui.context_state to start the frame time at now
 	test time values at first frame
@@ -124,12 +90,31 @@ libv.ui: THE SOLUTION to event shared state loop back is: initiator pointer (or 
 			return;
 		Implement in: app.theme: control.slider.event().change
 
+
+
+
+
+libv.ui.property: scope / sheet / component type based style rules
+
+libv.ui: static_component system (lite)
+	Check on the _pastebin/legacy codes for this one
+
+	libv.ui: Restructure: property context creation stuffy simplification
+			maybe CRTP base for core components
+			| if core_component gets a CRTP base also implement virtual function overload detection idiom with it
+
+	libv.ui: non-dynamic based panels, aka static_containers (no remove, only auto add)
+	libv.ui: Composite component style / property system
+		libv.ui.property: complex composite component would result in "nested" property sets
+		libv.ui.property: property system interaction with static_component system
+		libv.ui.event: Composite components internal behaviour should be events that are hooked up in ctor with connect_unignorable_front
+
 libv.ui: Component Image, CheckBox, Slider(for bar) could have a foreground fragment too (layout 1 should switch to that size)
 
 libv.ui: Background fragment, property type that can be quad/image/stretch/paramed_stretch/gradient with color/shader/params
 	libv.ui: background to_string's: "Not implemented yet";
 
-	libv.ui: Iplement getInnerContentBounds for every component
+	libv.ui: Implement getInnerContentBounds for every component
 		DONE: label
 		DONE: button
 		DONE: input_field
@@ -694,3 +679,31 @@ libv.ui.event: slot / signal flags could be unflagged if a disconnect leaves an 
 
 
 
+=== PAPERS ========================================================================================
+
+PAPER: libv.ui: Component styled states PAPER:
+		Possible states:
+			Button
+				 Disabled : Normal : Hover : Focus : Active(Pressing) : Progress : Done/Error
+
+			Input Field
+				 Disabled : Normal : Hover : Focus
+
+			Slider
+				 Disabled : Normal : Hover : Focus : Active(Dragging)
+
+		- states are independent
+			bit-mask
+			limited number of state (max 32)
+			state names has to assigned to a unique int
+
+		- state def in style sheet
+				ui.style("style.name") {
+					properties...
+
+					state("[!]state{, [!]state}") {
+						conditional properties...
+					}
+				}
+
+		- overriding: in case of multiple definition of the same property the last with matching state wins

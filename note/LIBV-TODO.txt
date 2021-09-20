@@ -616,6 +616,13 @@ libv.sys: Clipboard text (light wrapper above clip:: + deal with windows line en
 
 
 
+
+
+git: Change author:
+	* 49b2726 2021-06-21 libv.ui: Fix PanelStatusLine's missing children detach cleanu
+	* 94eee39 2021-06-21 glsl: Remove output keyword and texture2D usages  Dalma
+
+
 ext: adopt https://github.com/olegpublicprofile/stdfwd
 ext: Light SQL database engine, maybe useful for updating: https://github.com/azadkuh/sqlite-amalgamation
 
@@ -687,7 +694,6 @@ libv.res: Resource - New library for resource and asset loading, caching and tra
 			load/reload/unload/tracking events
 			excellent compile time: runtime polymorphism or easy pimpl (2 hook class, 1 manager, 1 resource that are type erased)
 
-
 app.editor:
 	small app for first line and include order fix-ups
 	use the folder .editor in the project root are store
@@ -712,6 +718,26 @@ ext: Edit Distance https://github.com/erikerlandson/edit_distance
 
 
 
+place.it: flat_varfix_map (would be usable for style.properties)
+	template <typename Key, typename Value>
+	struct flat_varfix_map {
+		std::byte* data;
+
+		explicit flat_varfix_map(size_t num_value) {
+			const auto padding = alignof(Key) > alignof(Value) ? 0 : alignof(Value) - alignof(Key);
+			const auto mem_size = sizeof(Key) + padding + sizeof(Value) * num_value;
+
+			data = new std::byte[mem_size];
+		}
+		ctor
+		cctor
+		cassign
+		mctor
+		massign
+		~flat_varfix_map() {
+			...
+		}
+	};
 
 place.it:
 	tool.profiler: https://github.com/bombomby/optick - But it doesnt support OpenGL
@@ -748,12 +774,61 @@ place.it:
 	sound: Sound effect generator: http://www.drpetter.se/project_sfxr.html
 	voice-chat: If I ever want to implement voice chat: https://opus-codec.org/
 
+	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
+	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
+	game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
+
 	5 step design
 		Make the requirements less dumb
 		Try very hard to delete the part or process
 		Simplify and optimize the design
 		Accelerate cycle time
 		Automate
+
+glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
+
+
+libv.ctrl: rename every "scale" to "multiplier"
+
+app.fsw: libv.arg-ify
+app.enum: libv.arg-ify
+app.bin_to_src: libv.arg-ify
+app.bin_to_src: command line argument for line length
+app.bin_to_src: use std::span<const std::byte>
+app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
+
+
+Naming changes:
+	libv.utility: Naming for bit extract: I originally thought about using set/get pair, but extract/deposit are used in asm and bit world
+	libv: (?) naming change: func_optional -> func_opt
+	libv: (?) naming change: func_or_throw -> func_throw
+	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
+	libv: (?) naming change: func_or       -> func_or    (unchanged)
+
+
+IDE:
+	ide: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
+
+	IDE	Colors:
+		BBBFC3
+		B5B6E3
+		5F8C8A
+
+		enum decl - C76863
+		enum usage - 9FB4C7
+		enumerator decl - 579058
+		enumerator usage - 579058
+
+	CLion:
+		Fixable: wrong working directory to run in
+			(generally the relationship between bin and res should be solved too)
+				? arg for res folder
+				? auto discover 1 folder up
+			| Solved with setting each IDE target
+			| Re-Solved it with detection and auto change of directory
+
+		Issue: TODO list is shit
+			| a separate app that I make could solve it that calls back to CLion
 
 IDE live templates:
 	Netbeans and CLion:
@@ -822,57 +897,11 @@ IDE live templates:
 		lock - auto lock = std::unique_lock($VAR$);
 
 
-glew: Investigate: every context requires its own glewinit call (Some builds of GLEW are multi context aware and do this internally.)
-
-
-libv.ctrl: rename every "scale" to "multiplier"
-
-app.fsw: libv.arg-ify
-app.enum: libv.arg-ify
-app.bin_to_src: libv.arg-ify
-app.bin_to_src: command line argument for line length
-app.bin_to_src: use std::span<const std::byte>
-app.bin_to_src: use // <editor-fold defaultstate="collapsed" desc="Binary data ..."> and // </editor-fold>
-
-
-Naming changes:
-	libv.utility: Naming for bit extract: I originally thought about using set/get pair, but extract/deposit are used in asm and bit world
-	libv: (?) naming change: func_optional -> func_opt
-	libv: (?) naming change: func_or_throw -> func_throw
-	libv: (?) naming change: func_ec       -> func_ec    (unchanged)
-	libv: (?) naming change: func_or       -> func_or    (unchanged)
-
-
-IDE:
-	ide: Use MSYS2_HOME env var for toolchain settings in IDEs | to help with sharing IDE project files
-
-	IDE	Colors:
-		BBBFC3
-		B5B6E3
-		5F8C8A
-
-		enum decl - C76863
-		enum usage - 9FB4C7
-		enumerator decl - 579058
-		enumerator usage - 579058
-
-	CLion:
-		Fixable: wrong working directory to run in
-			(generally the relationship between bin and res should be solved too)
-				? arg for res folder
-				? auto discover 1 folder up
-			| Solved with setting each IDE target
-
-		Issue: TODO list is shit
-			| a separate app that I make could solve it that calls back to CLion
-
-
 
 libv.utility: non repeating random numbers: lottery problem, on collusion shuffle to back
 
 libv.ctrl: "alterator_feature" (with better name, maybe mode_feature) -> only stateful, like hold shift to show more information | its kind of an analog with ignored value, but not really, and it would be nice to have state getter for this, and that would make it a binary, but with properly guarded
 libv.ctrl: save xls from thesis archive
-
 
 
 ext.x3: make sure that every rule is static, BUT ! What about static initialization order fiasco?

@@ -4,14 +4,16 @@
 #include <libv/ui/ui_lua.hpp>
 // libv
 #include <libv/lua/lua.hpp>
+#include <libv/lua/sol_type_to_string.hpp>
 #include <libv/parse/bool.hpp>
 #include <libv/parse/color.hpp>
+#include <libv/range/view_lines_string_view.hpp>
 #include <libv/utility/trim.hpp>
-//#include <libv/algo/slice.hpp>
 // std
 #include <memory>
-#include <string>
 #include <optional>
+#include <ranges>
+#include <string>
 #include <string_view>
 // pro
 //#include <libv/ui/component/detail/component.hpp>
@@ -586,6 +588,9 @@ struct LoadLuaContext {
 
 	UI& ui;
 
+	StyleState current_state_mask = StyleState::none;
+	StyleState current_state_value = StyleState::none;
+
 public:
 	explicit LoadLuaContext(UI& ui, lua::State& lua) :
 		ui(ui) {
@@ -638,6 +643,129 @@ public:
 		bind(lua);
 	}
 
+	void load_style_property(Style& style, const std::string& key, const sol::object& value) {
+
+		auto it = property_loaders.find(key);
+		if (it == property_loaders.end())
+			return log_ui.warn("Ignoring unrecognized property style {} property {} value \"{}\".",
+					style.style_name, key, value.as<std::string_view>());
+
+		const auto& loader = it->second;
+		auto result = loader(ui, value);
+		if (!result)
+			return log_ui.error("Failed to load style {} property {} value \"{}\"",
+					style.style_name, key, value.as<std::string_view>());
+
+		style.set(current_state_mask, current_state_value, std::move(key), std::move(*result));
+	}
+
+	void load_style_table(Style& style, const sol::table& table) {
+		// Process normal key value pairs first
+		for (const auto& [key, value] : table) {
+			if (key.get_type() != sol::type::string)
+				continue;
+
+			const auto key_str = key.as<std::string>();
+			if (key_str == "state_condition")
+				continue; // Skip state_condition marker
+
+			load_style_property(style, key_str, value);
+		}
+
+		// Process Sub Tables (They are most likely stated property tables)
+		// NOTE: These tables are loaded after the key-value pairs were already loaded on the current level
+		for (const auto& [key, value] : table) {
+			if (key.get_type() != sol::type::number)
+				continue;
+
+			const auto sub_table = sol::table(value);
+
+			const auto state_member = sub_table.get<sol::object>("state_condition");
+			if (!state_member.valid() || state_member.get_type() != sol::type::string) {
+				log_ui.warn_if(state_member.valid(), "Expected state_condition member in style sub-table of {} to be a string but was {}. Processing the table without constraint", style.style_name, libv::lua::lua_type_to_string(state_member.get_type()));
+
+				// Recurse into stated sub table without extra state_condition
+				load_style_table(style, sub_table);
+
+			} else {
+				const auto state_str = state_member.as<std::string_view>();
+
+				const auto old_state_mask = current_state_mask;
+				const auto old_state_value = current_state_value;
+
+				for (auto state_str_member : libv::view::lines_string_view(state_str, ',')) {
+					if (state_str_member.ends_with(','))
+						state_str_member.remove_suffix(1);
+					auto s = libv::trim(state_str_member);
+
+//				for (const std::string_view state_str_member : std::views::split(state_str, ',')) { // GCC 12
+//					const auto s = libv::trim(state_str_member);
+
+					const auto negate = s.starts_with('!');
+					if (negate) {
+						s.remove_prefix(1);
+						s = libv::trim_front(s);
+					}
+
+					const auto process_state = [&](std::string_view state_name, StyleState state_enum) {
+						if (s != state_name)
+							return false;
+
+						current_state_mask = current_state_mask | state_enum;
+						if (negate)
+							current_state_value = current_state_value & ~state_enum;
+						else
+							current_state_value = current_state_value | state_enum;
+
+						return true;
+					};
+
+					if (process_state("disable", StyleState::disable)) continue;
+					if (process_state("hover", StyleState::hover)) continue;
+					if (process_state("focus", StyleState::focus)) continue;
+					if (process_state("active", StyleState::active)) continue;
+					if (process_state("progress", StyleState::progress)) continue;
+					if (process_state("done", StyleState::done)) continue;
+					if (process_state("error", StyleState::error)) continue;
+
+					if (process_state("custom0", StyleState::custom0)) continue;
+					if (process_state("custom1", StyleState::custom1)) continue;
+					if (process_state("custom2", StyleState::custom2)) continue;
+					if (process_state("custom3", StyleState::custom3)) continue;
+					if (process_state("custom4", StyleState::custom4)) continue;
+					if (process_state("custom5", StyleState::custom5)) continue;
+					if (process_state("custom6", StyleState::custom6)) continue;
+					if (process_state("custom7", StyleState::custom7)) continue;
+					if (process_state("custom8", StyleState::custom8)) continue;
+					if (process_state("custom9", StyleState::custom9)) continue;
+					if (process_state("custom10", StyleState::custom10)) continue;
+					if (process_state("custom11", StyleState::custom11)) continue;
+					if (process_state("custom12", StyleState::custom12)) continue;
+					if (process_state("custom13", StyleState::custom13)) continue;
+					if (process_state("custom14", StyleState::custom14)) continue;
+					if (process_state("custom15", StyleState::custom15)) continue;
+
+					log_ui.warn("Ignoring unrecognized state {} in style {}", s, style.style_name);
+				}
+
+				// Recurse into stated sub table
+				load_style_table(style, sub_table);
+
+				current_state_mask = old_state_mask;
+				current_state_value = old_state_value;
+			}
+		}
+
+		// Warn on any unexpected types
+		for (const auto& [key, value] : table) {
+			if (key.get_type() == sol::type::string || key.get_type() == sol::type::number)
+				continue;
+
+			log_ui.warn("Style's property key \"{}\" is expected to be a string. Entry ignored: Style name: {}, key: {}, value: {}",
+					key.as<std::string_view>(), style.style_name, key.as<std::string_view>(), value.as<std::string_view>());
+		}
+	}
+
 	void bind(lua::State& lua) {
 		auto ui_table = lua.create_named_table("ui");
 
@@ -653,6 +781,14 @@ public:
 	//	ui_table["ORIENT_Orientation::right"] = Orientation::right;
 	//	ui_table["ORIENT_Orientation::left"] = Orientation::left;
 	//	ui_table["ORIENT_Orientation::down"] = Orientation::down;
+	//
+	//	ui_table.set_function("color", [](const std::string_view color_str) -> sol::object {
+	//		auto color = libv::parse::parse_color_optional(color_str);
+	//		if (color)
+	//			return *color;
+	//		else
+	//			return sol::nil;
+	//	});
 
 		ui_table.set_function("style", [this](const std::string_view style_name) mutable {
 			auto style_ip = ui.context().style(style_name);
@@ -660,135 +796,40 @@ public:
 			return [style_ip = std::move(style_ip), this](const sol::table& table) {
 				style_ip->clear();
 
-				for (const auto& [key, value] : table) {
-					if (key.get_type() != sol::type::string) {
-						log_ui.warn("Style's property key \"{}\" is expected to be a string. Entry ignored: Style name: {}, key: {}, value: {}",
-								key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
-						continue;
-					}
-
-					load_style_property(*style_ip, key.as<std::string>(), value);
-				}
+				load_style_table(*style_ip, table);
 			};
 		});
 
-	////	ui_table.set_function("color", [](const std::string_view color_str) -> sol::object {
-	////		auto color = libv::parse::parse_color_optional(color_str);
-	////		if (color)
-	////			return *color;
-	////		else
-	////			return sol::nil;
-	////	});
-	//
-	//	ui_table.set_function("image", [](const std::string_view) { return "Not implemented yet."; });
-	//	ui_table.set_function("stretch", [](const std::string_view) { return "Not implemented yet."; });
-	//	ui_table.set_function("layout_line", [](const std::string_view) { return "Not implemented yet."; });
-	}
-
-	// std::string key because key will be consumed by style.set anyways
-	void load_style_property(Style& style, std::string key, const sol::object& value) {
-
-		auto it = property_loaders.find(key);
-		if (it == property_loaders.end())
-			return log_ui.warn("Ignoring unrecognized property style {} property {} value \"{}\".",
-					style.style_name, key, value.as<std::string_view>());
-
-		const auto& loader = it->second;
-		auto result = loader(ui, value);
-		if (!result)
-			return log_ui.warn("Failed to load style {} property {} value \"{}\"",
-					style.style_name, key, value.as<std::string_view>());
-
-		style.set(std::move(key), std::move(*result));
+		lua.set_function("state", [](std::string state_string) {
+			return [state_string = std::move(state_string)](sol::table table) {
+				table["state_condition"] = state_string;
+				return table;
+			};
+		});
 	}
 };
 
 void script_style(UI& ui, lua::State& lua, const std::string_view script_str) {
 	LoadLuaContext context(ui, lua);
 
-//	try {
+	try {
 		// TODO P1: Create a sandbox around the script execution
-		const auto result = lua.safe_script(script_str, sol::script_pass_on_error);
+		const auto result = lua.safe_script(script_str, sol::script_throw_on_error);
 
 		if (!result.valid()) {
 			sol::error err = result;
-			return log_ui.error("Script loading failed: {}", err.what());
+			return log_ui.error("Script execution failed: {}", err.what());
 		}
 
 		if (result.get_type() != sol::type::none)
-			log_ui.warn("Script return value is unused: {} - {}", libv::to_value(result.get_type()), std::string(result));
+			log_ui.warn("Script return value is unused: {}:{} - {}", libv::to_underlying(result.get_type()), libv::lua::lua_type_to_string(result.get_type()), std::string(result));
 
 		log_ui.info("Script loading successful");
 
-//	} catch (const std::exception& e) {
-//		log_ui.error("Failed to load texture due to exception: {}", e.what());
-//	}
+	} catch (const std::exception& e) {
+		log_ui.error("Script execution failed: {}", e.what());
+	}
 }
-
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// =================================================================================================
-// -------------------------------------------------------------------------------------------------
-
-//Component script_file(UI& ui, lua::State& lua, const std::filesystem::path& file) {
-//	auto ui_table = lua.create_table();
-//	ui_table["bottom"] = "bottom";
-//	ui_table["center"] = "center";
-//	ui_table["justify"] = "justify";
-//	ui_table["justifyall"] = "justifyall";
-//	ui_table["left"] = "left";
-//	ui_table["right"] = "right";
-//	ui_table["top"] = "top";
-//
-//	ui_table["ORIENT_Orientation::up"] = Orientation::up;
-//	ui_table["ORIENT_Orientation::right"] = Orientation::right;
-//	ui_table["ORIENT_Orientation::left"] = Orientation::left;
-//	ui_table["ORIENT_Orientation::down"] = Orientation::down;
-//
-//	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
-//
-//	ui_table.set_function("style", [&styles, &ui](const std::string_view style_name) {
-//		auto& style_ip = styles[std::string(style_name)]; // TODO P5: C++20: std::string(std::string_view) temp string for hash lookup
-//		if (!style_ip)
-//			style_ip = libv::make_intrusive<Style>(std::string(style_name));
-//
-//		return [style_ip, &ui](const sol::table& table) {
-//			for (const auto& [key, value] : table) {
-//				if (key.get_type() != sol::type::string) {
-//					log_ui.warn("Style's property key \"{}\" is expected to be a string. Style name: {}, key: {}, value: {}",
-//							key.as<std::string_view>(), style_ip->style_name, key.as<std::string_view>(), value.as<std::string_view>());
-//					continue;
-//				}
-//
-//				const auto key_sv = key.as<std::string_view>();
-//				process_style_property(ui, *style_ip, key_sv, value);
-//			}
-//		};
-//	});
-//
-////	ui_table.set_function("component", [](const std::string_view component_name) {
-////		return [component_name = std::string(component_name)](const sol::table& table) {
-////			for (const auto& [key, value] : table) {
-////				log_ui.info("{}/{} = {}", component_name, key.as<std::string_view>(), value.as<std::string_view>());
-////			}
-////		};
-////	});
-////
-////	ui_table.set_function("color", [](const std::string_view color_str) -> sol::object {
-////		auto color = libv::parse::parse_color_optional(color_str);
-////		if (color)
-////			return *color;
-////		else
-////			return sol::nil;
-////	});
-//
-//	ui_table.set_function("component", [](const std::string_view) { return "Not implemented yet."; });
-//	ui_table.set_function("image", [](const std::string_view) { return "Not implemented yet."; });
-//	ui_table.set_function("stretch", [](const std::string_view) { return "Not implemented yet."; });
-//	ui_table.set_function("layout_line", [](const std::string_view) { return "Not implemented yet."; });
-//}
 
 // -------------------------------------------------------------------------------------------------
 

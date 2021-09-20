@@ -19,6 +19,7 @@
 #include <unordered_set>
 // pro
 #include <libv/ui/property.hpp>
+#include <libv/ui/style_state.hpp>
 
 
 namespace libv {
@@ -27,6 +28,12 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class Style {
+	struct PropertyEntry {
+		StyleState state_mask = StyleState::none;
+		StyleState state_value = StyleState::none;
+		PropertyDynamic value;
+	};
+
 private:
 	int32_t ref_count = 0;
 	friend void intrusive_ptr_add_ref(Style*);
@@ -36,9 +43,7 @@ private:
 	bool dirty_ = false;
 	std::vector<libv::intrusive_ref<Style>> parents;
 	boost::container::flat_set<libv::observer_ref<Style>> children;
-
-	boost::container::flat_map<std::string, PropertyDynamic, std::less<>> properties;
-//	boost::container::flat_set<PropertyDynamic, libv::variant_index> properties;
+	boost::container::flat_map<std::string, std::vector<PropertyEntry>, std::less<>> properties;
 
 public:
 	const std::string style_name;
@@ -65,25 +70,25 @@ public:
 	void inherit(const libv::intrusive_ref<Style>& parent);
 
 public:
-	void set(std::string property, PropertyDynamic value);
+	void set(StyleState state_mask, StyleState state_value, const std::string& property, PropertyDynamic value);
 
 	template <typename T>
-	inline void set(std::string property, T&& value) {
-		set(std::move(property), PropertyDynamic{std::forward<T>(value)});
+	inline void set(StyleState state, std::string property, T&& value) {
+		set(state, std::move(property), PropertyDynamic{std::forward<T>(value)});
 	}
 
 public:
-	[[nodiscard]] libv::optional_ref<const PropertyDynamic> get_optional(const std::string_view property) const;
+	[[nodiscard]] libv::optional_ref<const PropertyDynamic> get_optional(StyleState state, const std::string_view property) const;
 	template <typename T>
-	[[nodiscard]] auto get_optional(const std::string_view property) const {
-		const auto& result = get_optional(property);
+	[[nodiscard]] auto get_optional(StyleState state, const std::string_view property) const {
+		const auto& result = get_optional(state, property);
 		return result && std::holds_alternative<T>(*result) ? &std::get<T>(*result) : nullptr;
 	}
 
-	[[nodiscard]] const PropertyDynamic& get_or_throw(const std::string_view property) const;
+	[[nodiscard]] const PropertyDynamic& get_or_throw(StyleState state, const std::string_view property) const;
 	template <typename T>
-	[[nodiscard]] const T& get_or_throw(const std::string_view property) const {
-		const auto& result = get_or_throw(property);
+	[[nodiscard]] const T& get_or_throw(StyleState state, const std::string_view property) const {
+		const auto& result = get_or_throw(state, property);
 		if (not std::holds_alternative<T>(result))
 			throw std::invalid_argument(libv::concat("Requested property \"", property, "\" has different type"));
 
