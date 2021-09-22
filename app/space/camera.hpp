@@ -52,6 +52,7 @@ public:
 	using float_type = float;
 	using vec2 = libv::vec2_t<float_type>;
 	using vec3 = libv::vec3_t<float_type>;
+	using vec4 = libv::vec4_t<float_type>;
 	using mat4 = libv::mat4_t<float_type>;
 	using screen_picker = libv::screen_picker<float_type>;
 
@@ -84,9 +85,18 @@ private:
 public:
 	[[nodiscard]] mat4 projection(vec2 canvas_size) const noexcept;
 	[[nodiscard]] mat4 view() const noexcept;
-	[[nodiscard]] mat4 orientation() const noexcept; /// View without the orbit and the position translates
+	/// View without the orbit and the position translates
+	/// Includes the OpenGL base_camera_orientation so this version is useful for OpenGL operations
+	[[nodiscard]] mat4 orientation_view() const noexcept;
+	/// View without the orbit and the position translates
+	/// Does not includes the OpenGL base_camera_orientation so this version is useful for Universe operations
+	[[nodiscard]] mat4 orientation_universe() const noexcept;
 	[[nodiscard]] vec3 eye() const noexcept;
-	[[nodiscard]] vec3 direction() const noexcept;
+
+	[[nodiscard]] vec3 forward() const noexcept;
+	[[nodiscard]] vec3 right() const noexcept;
+	[[nodiscard]] vec3 up() const noexcept;
+
 	[[nodiscard]] screen_picker picker(vec2 canvas_size) const noexcept;
 
 public:

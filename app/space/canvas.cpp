@@ -221,7 +221,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 					canvas_size,
 					-orientation_gizmo_size,
 					+orientation_gizmo_size);
-			gl.view = camera.orientation().translate(-1, 0, 0);
+			gl.view = camera.orientation_view().translate(-1, 0, 0);
 			gl.model.scale(orientation_gizmo_size * 0.5f);
 
 			renderer.gizmo.render(gl, renderer.resource_context.uniform_stream);

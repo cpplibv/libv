@@ -26,7 +26,7 @@ BaseCameraOrbit::mat4 BaseCameraOrbit::view() const noexcept {
 	return mat;
 }
 
-BaseCameraOrbit::mat4 BaseCameraOrbit::orientation() const noexcept {
+BaseCameraOrbit::mat4 BaseCameraOrbit::orientation_view() const noexcept {
 	mat4 mat = base_camera_orientation; // Forward is X+, Right is Y-, Up is Z+
 
 	mat.rotate(-roll_, axis_forward);
@@ -36,11 +36,21 @@ BaseCameraOrbit::mat4 BaseCameraOrbit::orientation() const noexcept {
 	return mat;
 }
 
-BaseCameraOrbit::vec3 BaseCameraOrbit::eye() const noexcept {
-	return orbit_point_ + direction() * -orbit_distance_;
+BaseCameraOrbit::mat4 BaseCameraOrbit::orientation_universe() const noexcept {
+	mat4 mat = mat4::identity();
+
+	mat.rotate(-roll_, axis_forward);
+	mat.rotate(-pitch_, axis_right);
+	mat.rotate(yaw_, axis_up);
+
+	return mat;
 }
 
-BaseCameraOrbit::vec3 BaseCameraOrbit::direction() const noexcept {
+BaseCameraOrbit::vec3 BaseCameraOrbit::eye() const noexcept {
+	return orbit_point_ + forward() * -orbit_distance_;
+}
+
+BaseCameraOrbit::vec3 BaseCameraOrbit::forward() const noexcept {
 	const auto xy_len = std::cos(pitch_);
 	const auto x = xy_len * std::cos(-yaw_); // Yaw is CW but math is CCW
 	const auto y = xy_len * std::sin(-yaw_); // Yaw is CW but math is CCW
@@ -48,8 +58,18 @@ BaseCameraOrbit::vec3 BaseCameraOrbit::direction() const noexcept {
 	return vec3(x, y, z);
 }
 
+BaseCameraOrbit::vec3 BaseCameraOrbit::right() const noexcept {
+	// TODO P1: Improve performance (orientation and inverse are expensive and could be avoided like forward did (but this case a little more complicated due to roll))
+	return xyz(orientation_universe().inverse() * vec4(axis_right, 1));
+}
+
+BaseCameraOrbit::vec3 BaseCameraOrbit::up() const noexcept {
+	// TODO P1: Improve performance (orientation and inverse are expensive and could be avoided like forward did (but this case a little more complicated due to roll))
+	return xyz(orientation_universe().inverse() * vec4(axis_up, 1));
+}
+
 BaseCameraOrbit::screen_picker BaseCameraOrbit::picker(vec2 canvas_size) const noexcept {
-	return screen_picker(projection(canvas_size) * view(), canvas_size);
+	return {projection(canvas_size) * view(), canvas_size};
 }
 
 void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept  {
