@@ -519,8 +519,11 @@ wish_create_external(
 
 wish_create_external(
 	NAME lua
-	GIT_REPOSITORY https://github.com/bensanmorris/lua.git
-	GIT_TAG b58e02325cb13f4902676f195e02d9320c65dd01 # v5.4.3
+	GIT_REPOSITORY https://github.com/LuaDist/lua.git
+	GIT_TAG 5.3.2
+#	Segfault and issues with requires with:
+#	GIT_REPOSITORY https://github.com/bensanmorris/lua.git
+#	GIT_TAG b58e02325cb13f4902676f195e02d9320c65dd01 # v5.4.3
 	CMAKE_ARGS
 		-DBUILD_SHARED_LIBS=OFF
 	LINK lua
