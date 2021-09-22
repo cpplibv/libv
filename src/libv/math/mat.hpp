@@ -92,7 +92,7 @@ public:
 	}
 
 	constexpr inline mat_t& inverse() noexcept {
-		glm::inverse(mx());
+		mx() = glm::inverse(mx());
 		return *this;
 	}
 	[[nodiscard]] constexpr inline mat_t inverse_copy() const noexcept {
