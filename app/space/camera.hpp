@@ -43,16 +43,15 @@ namespace app {
 ///     Z   -> Y     -> X
 ///     Yaw -> Pitch -> Roll
 ///
-/// Roll - A positive rolling motion lifts the left wing and lowers the right wing.
-/// Pitch - A positive pitching motion raises the nose of the aircraft and lowers the tail.
-/// Yaw - A positive yawing motion moves the nose of the aircraft to the right.
+/// Roll - A positive rolling motion lifts the left wing and lowers the right wing. (CCW)
+/// Pitch - A positive pitching motion raises the nose of the aircraft and lowers the tail. (CCW)
+/// Yaw - A positive yawing motion moves the nose of the aircraft to the right. (CW)
 ///
 struct BaseCameraOrbit {
 public:
 	using float_type = float;
 	using vec2 = libv::vec2_t<float_type>;
 	using vec3 = libv::vec3_t<float_type>;
-	using vec4 = libv::vec4_t<float_type>;
 	using mat4 = libv::mat4_t<float_type>;
 	using screen_picker = libv::screen_picker<float_type>;
 

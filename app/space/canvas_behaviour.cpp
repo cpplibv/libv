@@ -115,13 +115,11 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.dev0", [](const auto&, app::SpaceCanvas& ctx) {
-		log_space.info("Forward {}", ctx.camera.forward());
-		log_space.info("Right {}", ctx.camera.right());
-		log_space.info("Up {}", ctx.camera.up());
-
-		log_space.info("Dot Forward Right {:+1.6f}", dot(ctx.camera.forward(), ctx.camera.right()));
-		log_space.info("Dot Forward Up    {:+1.6f}", dot(ctx.camera.forward(), ctx.camera.up()));
-		log_space.info("Dot Right   Up    {:+1.6f}", dot(ctx.camera.right(), ctx.camera.up()));
+		log_space.info("Camera:"
+			   "\n\tEye     {}"
+			   "\n\tForward {}"
+			   "\n\tRight   {}"
+			   "\n\tUp      {}", ctx.camera.eye(), ctx.camera.forward(), ctx.camera.right(), ctx.camera.up());
 	});
 }
 
@@ -135,7 +133,7 @@ void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");
 
-	controls.bind("space.dev0", "kp0");
+	controls.bind("space.dev0", "KP0");
 }
 
 // -------------------------------------------------------------------------------------------------

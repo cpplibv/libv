@@ -51,21 +51,46 @@ BaseCameraOrbit::vec3 BaseCameraOrbit::eye() const noexcept {
 }
 
 BaseCameraOrbit::vec3 BaseCameraOrbit::forward() const noexcept {
-	const auto xy_len = std::cos(pitch_);
-	const auto x = xy_len * std::cos(-yaw_); // Yaw is CW but math is CCW
-	const auto y = xy_len * std::sin(-yaw_); // Yaw is CW but math is CCW
-	const auto z = std::sin(pitch_);
-	return vec3(x, y, z);
+	const auto sP = std::sin(pitch_);
+	const auto cP = std::cos(pitch_);
+	const auto sY = std::sin(-yaw_); // Yaw is CW but math is CCW
+	const auto cY = std::cos(-yaw_);
+
+	const auto x = cY * cP;
+	const auto y = sY * cP;
+	const auto z = sP;
+
+	return {x, y, z};
 }
 
 BaseCameraOrbit::vec3 BaseCameraOrbit::right() const noexcept {
-	// TODO P1: Improve performance (orientation and inverse are expensive and could be avoided like forward did (but this case a little more complicated due to roll))
-	return xyz(orientation_universe().inverse() * vec4(axis_right, 1));
+	const auto sR = std::sin(roll_);
+	const auto cR = std::cos(roll_);
+	const auto sP = std::sin(pitch_);
+	const auto cP = std::cos(pitch_);
+	const auto sY = std::sin(-yaw_); // Yaw is CW but math is CCW
+	const auto cY = std::cos(-yaw_);
+
+	const auto x = sY * cR + cY * sP * sR;
+	const auto y = -cY * cR + sY * sP * sR;
+	const auto z = -cP * sR;
+
+	return {x, y, z};
 }
 
 BaseCameraOrbit::vec3 BaseCameraOrbit::up() const noexcept {
-	// TODO P1: Improve performance (orientation and inverse are expensive and could be avoided like forward did (but this case a little more complicated due to roll))
-	return xyz(orientation_universe().inverse() * vec4(axis_up, 1));
+	const auto sR = std::sin(roll_);
+	const auto cR = std::cos(roll_);
+	const auto sP = std::sin(pitch_);
+	const auto cP = std::cos(pitch_);
+	const auto sY = std::sin(-yaw_); // Yaw is CW but math is CCW
+	const auto cY = std::cos(-yaw_);
+
+	const auto x = sY * sR - cY * sP * cR;
+	const auto y = -cY * sR - sY * sP * cR;
+	const auto z = cP * cR;
+
+	return {x, y, z};
 }
 
 BaseCameraOrbit::screen_picker BaseCameraOrbit::picker(vec2 canvas_size) const noexcept {
@@ -83,14 +108,11 @@ void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept  {
 		return;
 	}
 
-	// TODO P5: libv.math: length_and_dir
-//	const auto [distance, dir] = length_and_dir(target - eye);
-	const auto diff = target - eye;
-	const auto dir = diff.normalize_copy();
+	const auto [length, dir] = (target - eye).length_and_dir();
 	roll_ = 0;
 	pitch_ = std::asin(dir.z);
 	yaw_ = -std::atan2(dir.y, dir.x); // Yaw is CW but atan2 is CCW
-	orbit_distance_ = diff.length();
+	orbit_distance_ = length;
 }
 
 // =================================================================================================
