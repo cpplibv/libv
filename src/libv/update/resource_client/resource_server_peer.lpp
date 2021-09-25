@@ -40,8 +40,8 @@ class ResourceServerPeer : public libv::net::mtcp::ConnectionHandler<ResourceSer
 	}
 
 	virtual void on_connect(error_code ec) override;
-	virtual void on_receive(error_code ec, message m) override;
-	virtual void on_send(error_code ec, message m) override;
+	virtual void on_receive(error_code ec, message_view m) override;
+	virtual void on_send(error_code ec, message_view m) override;
 	virtual void on_disconnect(error_code ec) override;
 
 	// ---

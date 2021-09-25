@@ -75,14 +75,6 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
-
-app.space: Simulation time control
-	app.space: Pause, Unpause (It will be a good practise for timers and controls)
-	app.space: Speed x1 x2 x4
-	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
-
-app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
-
 app.space.net: Networking
 	app.space.net: Networking (Stage 2)
 		app.space.net: Introduction, Name
@@ -100,9 +92,29 @@ app.space.net: Networking
 			app.space.net: [Optional] Snapshot delta to help catchup
 
 	app.space.net: Networking (Stage 4)
+		app.space.net: Deterministic execution (Frame Index and lockstep)
 		app.space.net: Latency hiding
 
 	app.space: Mini canvas show other clients view (Needs lobby)
+
+app.space: Simulation time control
+	app.space: Pause, Unpause (It will be a good practise for timers and controls)
+	app.space: Speed x1 x2 x4
+	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
+
+app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command

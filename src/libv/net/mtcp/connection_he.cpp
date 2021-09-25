@@ -50,12 +50,12 @@ struct message_entry {
 	inline message_entry(message_header header_, message_body_bin&& body) :
 		header(header_),
 		memory_bin(std::move(body)),
-		body_view(memory_bin.data(), memory_bin.size()) {
+		body_view(memory_bin) {
 	}
 	inline message_entry(message_header header_, message_body_str&& body) :
 		header(header_),
 		memory_str(std::move(body)),
-		body_view(reinterpret_cast<const std::byte*>(memory_str.data()), memory_str.size()) {
+		body_view(memory_str) {
 	}
 	inline message_entry(message_header header_, message_body_bin_view body) :
 		header(header_),
@@ -500,7 +500,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 			stream->cancel();
 		}
 
-		handler->on_receive(ec, read_message_body);
+		handler->on_receive(ec, message_body_view{read_message_body});
 
 		if (_no_on_flight_operation())
 			_terminate();
@@ -509,7 +509,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 
 	} else {
 		num_total_message_read++;
-		handler->on_receive(ec, read_message_body);
+		handler->on_receive(ec, message_body_view{read_message_body});
 
 		if (state != State::Connected) {
 			if (_no_on_flight_operation())

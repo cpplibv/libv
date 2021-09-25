@@ -45,8 +45,8 @@ public:
 
 private:
 	virtual void on_connect(error_code ec) override;
-	virtual void on_receive(error_code ec, message m) override;
-	virtual void on_send(error_code ec, message m) override;
+	virtual void on_receive(error_code ec, message_view m) override;
+	virtual void on_send(error_code ec, message_view m) override;
 	virtual void on_disconnect(error_code ec) override;
 };
 
@@ -129,14 +129,14 @@ void aux_update_session::on_connect(error_code ec) {
 		server->join(connection_from_this());
 }
 
-void aux_update_session::on_receive(error_code ec, message m) {
-	log_update.debug("session report:\n{}", libv::hex_dump_with_ascii(m)); // <<< hex_dump_with_ascii
+void aux_update_session::on_receive(error_code ec, message_view m) {
+	log_update.debug("session report:\n{}", libv::hex_dump_with_ascii(m.as_bin())); // <<< hex_dump_with_ascii
 
 	if (!ec)
-		codec.decode(*this, m);
+		codec.decode(*this, m.as_bin());
 }
 
-void aux_update_session::on_send(error_code ec, message m) {
+void aux_update_session::on_send(error_code ec, message_view m) {
 }
 
 void aux_update_session::on_disconnect(error_code ec) {

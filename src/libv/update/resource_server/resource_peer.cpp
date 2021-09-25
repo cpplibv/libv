@@ -19,18 +19,18 @@ void ResourcePeer::on_connect(error_code ec) {
 	server->join(connection_from_this());
 }
 
-void ResourcePeer::on_receive(error_code ec, message m) {
+void ResourcePeer::on_receive(error_code ec, message_view m) {
 	if (ec)
 		return;
 
-	codec.decode(*this, m);
+	codec.decode(*this, m.as_str());
 }
 
-void ResourcePeer::on_send(error_code ec, message m) {
+void ResourcePeer::on_send(error_code ec, message_view m) {
 	if (ec)
 		return;
 
-	if (codec.is<msg_res::ResponseResourceData>(m))
+	if (codec.is<msg_res::ResponseResourceData>(m.as_bin()))
 		continue_current_task();
 }
 

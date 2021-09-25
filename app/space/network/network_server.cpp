@@ -24,12 +24,6 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
-	return {reinterpret_cast<const char*>(s.data()), s.size()};
-}
-
-// -------------------------------------------------------------------------------------------------
-
 class NetworkPeer;
 
 class NetworkLobby {
@@ -92,13 +86,13 @@ private:
 		if (!ec)
 			lobby->join(connection_from_this());
 	}
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec) {
-			lobby->broadcast(std::vector<std::byte>{m.begin(), m.end()});
-			lobby->playout.queue_from_network(as_sv(m));
+			lobby->broadcast(m.copy_bin());
+			lobby->playout.queue_from_network(m.as_str());
 		}
 	}
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		(void) ec;
 		(void) m;
 	}

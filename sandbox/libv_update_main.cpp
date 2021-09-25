@@ -16,6 +16,8 @@
 #include <string>
 #include <utility>
 #include <mutex>
+// pro
+#include <libv/update/resource_server/resource_server.hpp>
 
 
 // =================================================================================================
@@ -152,13 +154,13 @@ private:
 
 		DEBUG_COUT("[Session " << ID << "] on_connect " << libv::net::to_string(ec));
 	}
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec)
-			room->deliver(m);
+			room->deliver(std::string(m.as_str()));
 
 		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
 	}
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		(void) ec;
 		(void) m;
 		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
@@ -227,17 +229,17 @@ private:
 		DEBUG_COUT("[" << name << "] on_connect " << libv::net::to_string(ec));
 	}
 
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec)
-			std::cout << m << std::endl;
+			std::cout << m.as_str() << std::endl;
 
-		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
 	}
 
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		(void) ec;
 		(void) m;
-		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
 	}
 
 	virtual void on_disconnect(error_code ec) override {

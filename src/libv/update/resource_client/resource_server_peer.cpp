@@ -22,14 +22,14 @@ void ResourceServerPeer::on_connect(error_code ec) {
 	task_pool->connect(connection_from_this());
 }
 
-void ResourceServerPeer::on_receive(error_code ec, message m) {
+void ResourceServerPeer::on_receive(error_code ec, message_view m) {
 	if (ec)
 		return;
 
-	codec.decode(*this, m);
+	codec.decode(*this, m.as_str());
 }
 
-void ResourceServerPeer::on_send(error_code ec, message m) {
+void ResourceServerPeer::on_send(error_code ec, message_view m) {
 	if (ec)
 		return;
 

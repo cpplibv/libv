@@ -15,12 +15,6 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
-	return {reinterpret_cast<const char*>(s.data()), s.size()};
-}
-
-// -------------------------------------------------------------------------------------------------
-
 class ConnectionHandler : public libv::net::mtcp::ConnectionHandler<ConnectionHandler> {
 private:
 	std::string name;
@@ -51,17 +45,17 @@ private:
 			log_space.error("[{}] on_connect {}", name, libv::net::to_string(ec));
 	}
 
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec) {
-			log_space.trace("[{}] on_receive {}", name, as_sv(m));
-			playout.queue_from_network(as_sv(m));
+			log_space.trace("[{}] on_receive {}", name, m.as_str());
+			playout.queue_from_network(m.as_str());
 		} else
 			log_space.error("[{}] on_receive {}", name, libv::net::to_string(ec));
 	}
 
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		if (!ec)
-			log_space.trace("[{}] on_send {}", name, as_sv(m));
+			log_space.trace("[{}] on_send {}", name, m.as_str());
 		else
 			log_space.error("[{}] on_send {}", name, libv::net::to_string(ec));
 	}

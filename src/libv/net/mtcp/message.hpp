@@ -25,7 +25,7 @@ using message_body_str = std::string;
 using message_body_str_view = std::string_view;
 
 using message_body = message_body_str_view;
-using message_body_view = message_body_bin_view;
+//using message_body_view = message_body_bin_view;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ public:
 			mtcp_message_type type = mtcp_message_type::message,
 			uint16_t channel = 0,
 			uint32_t size = 0) noexcept :
-		network_type(libv::host_to_network(libv::to_value(type))),
+		network_type(libv::host_to_network(libv::to_underlying(type))),
 		_reserved(0),
 		network_channel(libv::host_to_network(channel)),
 		network_size(libv::host_to_network(size)) {}
@@ -78,7 +78,7 @@ public:
 
 public:
 	constexpr inline void type(mtcp_message_type value) noexcept {
-		network_type = libv::host_to_network(libv::to_value(value));
+		network_type = libv::host_to_network(libv::to_underlying(value));
 	}
 	[[nodiscard]] constexpr inline mtcp_message_type type() const noexcept {
 		return mtcp_message_type{static_cast<uint8_t>(libv::network_to_host(network_type))};
@@ -105,6 +105,46 @@ public:
 
 static_assert(MTCP_MESSAGE_MAX_SIZE < std::numeric_limits<decltype(std::declval<message_header>().size())>::max());
 static_assert(sizeof(message_header) == 8); // Just a check, not a must
+
+// -------------------------------------------------------------------------------------------------
+
+struct message_body_view {
+private:
+	message_body_bin_view data_view;
+
+public:
+	explicit constexpr inline message_body_view(message_body_bin_view bin_view) noexcept :
+		data_view(bin_view) {}
+
+	explicit inline message_body_view(message_body_str_view str_view) noexcept :
+		data_view(reinterpret_cast<const std::byte*>(str_view.data()), str_view.size()) {}
+
+public:
+	[[nodiscard]] constexpr inline const std::byte* data() const noexcept {
+		return data_view.data();
+	}
+
+	[[nodiscard]] constexpr inline size_t size() const noexcept {
+		return data_view.size();
+	}
+
+	[[nodiscard]] constexpr inline message_body_bin_view as_bin() const noexcept {
+		return data_view;
+	}
+
+	[[nodiscard]] inline message_body_str_view as_str() const noexcept {
+		return {reinterpret_cast<const char*>(data_view.data()), data_view.size()};
+	}
+
+public:
+	[[nodiscard]] inline message_body_bin copy_bin() const {
+		return {data_view.begin(), data_view.end()};
+	}
+
+	[[nodiscard]] inline message_body_str copy_str() const {
+		return message_body_str{as_str()};
+	}
+};
 
 // -------------------------------------------------------------------------------------------------
 

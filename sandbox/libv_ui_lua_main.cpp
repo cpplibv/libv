@@ -48,7 +48,7 @@ int main(int, char**) {
 				std::visit([&key](auto& v) {
 					if constexpr (requires { std::cout << v; })
 						log_sandbox.info("    {} = {} [{}]", key, v, typeid(v).name());
-					else if constexpr (requires { libv::to_underlying(v); })
+					else if constexpr (std::is_enum_v<decltype(v)>)
 						log_sandbox.info("    {} = {} [{}]", key, libv::to_underlying(v), typeid(v).name());
 					else
 						log_sandbox.info("    {} = ?? [{}]", key, typeid(v).name());

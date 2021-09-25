@@ -138,7 +138,7 @@ private:
 
 public:
 	using error_code = std::error_code;
-	using message = message_body_bin_view;
+	using message_view = message_body_view;
 	using io_context = IOContext;
 
 private:
@@ -174,8 +174,8 @@ private:
 
 private:
 	virtual void on_connect(error_code ec) = 0;
-	virtual void on_receive(error_code ec, message m) = 0;
-	virtual void on_send(error_code ec, message m) = 0;
+	virtual void on_receive(error_code ec, message_view m) = 0;
+	virtual void on_send(error_code ec, message_view m) = 0;
 	virtual void on_disconnect(error_code ec) = 0;
 
 //	virtual void on_connect() = 0;

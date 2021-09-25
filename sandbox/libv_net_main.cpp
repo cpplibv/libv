@@ -33,10 +33,6 @@ template <typename T> using AcceptorHandler = libv::net::mtcp::AcceptorHandler<T
 
 } // namespace net
 
-[[nodiscard]] inline std::string_view as_sv(const std::span<const std::byte> s) noexcept {
-	return std::string_view(reinterpret_cast<const char*>(s.data()), s.size());
-}
-
 // -------------------------------------------------------------------------------------------------
 
 inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
@@ -127,16 +123,16 @@ private:
 
 		DEBUG_COUT("[Session " << ID << "] on_connect " << libv::net::to_string(ec));
 	}
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec)
-			room->deliver(std::string(as_sv(m)));
+			room->deliver(std::string(m.as_str()));
 
-		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : as_sv(m)) << "'");
+		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
 	}
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		(void) ec;
 		(void) m;
-		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : as_sv(m)) << "'");
+		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
 	}
 	virtual void on_disconnect(error_code ec) override {
 		(void) ec;
@@ -202,17 +198,17 @@ private:
 		DEBUG_COUT("[" << name << "] on_connect " << libv::net::to_string(ec));
 	}
 
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec)
-			std::cout << as_sv(m) << std::endl;
+			std::cout << m.as_str() << std::endl;
 
-		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : as_sv(m)) << "'");
+		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : m.as_str()) << "'");
 	}
 
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 		(void) ec;
 		(void) m;
-		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : as_sv(m)) << "'");
+		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string_view("") : m.as_str()) << "'");
 	}
 
 	virtual void on_disconnect(error_code ec) override {

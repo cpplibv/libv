@@ -57,14 +57,14 @@ private:
 		}
 	}
 
-	virtual void on_receive(error_code ec, message m) override {
+	virtual void on_receive(error_code ec, message_view m) override {
 		if (!ec) {
-			response = std::vector<std::byte>(m.begin(), m.end());
+			response = m.copy_bin();
 			connection.disconnect_async();
 		}
 	}
 
-	virtual void on_send(error_code ec, message m) override {
+	virtual void on_send(error_code ec, message_view m) override {
 	}
 
 	virtual void on_disconnect(error_code ec) override {
