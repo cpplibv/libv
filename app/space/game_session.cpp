@@ -6,8 +6,8 @@
 #include <libv/ctrl/controls.hpp>
 // pro
 #include <space/game_instance.hpp>
-#include <space/network_client.hpp>
-#include <space/network_server.hpp>
+#include <space/network/network_client.hpp>
+#include <space/network/network_server.hpp>
 #include <space/playout.hpp>
 #include <space/view/scene_main_ui.hpp>
 #include <space/universe/universe.hpp>

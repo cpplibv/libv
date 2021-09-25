@@ -23,8 +23,8 @@
 
 //#include <space/view/scene_mp_bar.hpp>
 
-//#include <space/network_client.hpp>
-//#include <space/network_server.hpp>
+//#include <space/network/network_client.hpp>
+//#include <space/network/network_server.hpp>
 //#include <space/user.hpp>
 //#include <space/camera.hpp>
 //#include <space/state.hpp>

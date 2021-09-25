@@ -1,7 +1,7 @@
 // Project: libv, File: app/space/network_server.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <space/network_server.hpp>
+#include <space/network/network_server.hpp>
 // libv
 #include <libv/net/io_context.hpp>
 #include <libv/net/mtcp/acceptor_he.hpp>

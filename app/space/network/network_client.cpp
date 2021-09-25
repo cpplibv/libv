@@ -1,7 +1,7 @@
 // Project: libv, File: app/space/network_client.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <space/network_client.hpp>
+#include <space/network/network_client.hpp>
 // libv
 #include <libv/net/error.hpp>
 #include <libv/net/io_context.hpp>

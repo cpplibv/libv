@@ -21,8 +21,8 @@
 #include <space/log.hpp>
 #include <space/universe/universe.hpp>
 
-#include <space/network_client.hpp>
-#include <space/network_server.hpp>
+#include <space/network/network_client.hpp>
+#include <space/network/network_server.hpp>
 
 
 namespace app {
