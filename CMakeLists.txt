@@ -928,16 +928,18 @@ wish_create_executable(
 	LINK   ext_fmt libv_utility
 )
 
-wish_create_executable(
-	TARGET app_vm4_viewer
-	#OUTPUT_FOLDER vm4_viewer
-	#OUTPUT_NAME vm4_viewer
-	#OUTPUT_RESOURCE res
-	#RESOURCE app/vm4_viewer/res
-	SOURCE app/vm4_viewer/*.cpp
-	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw libv_ctrl
-#	LINK   ext_date
-)
+# app.vm4_viewer: Disable vm4_viewer build target until the project is not resurrected
+#
+#wish_create_executable(
+#	TARGET app_vm4_viewer
+#	#OUTPUT_FOLDER vm4_viewer
+#	#OUTPUT_NAME vm4_viewer
+#	#OUTPUT_RESOURCE res
+#	#RESOURCE app/vm4_viewer/res
+#	SOURCE app/vm4_viewer/*.cpp
+#	LINK   libv_log libv_vm4imp libv_ui libv_frame libv_utility libv_fsw libv_ctrl
+##	LINK   ext_date
+#)
 
 wish_create_executable(
 	TARGET theme
