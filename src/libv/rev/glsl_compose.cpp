@@ -146,9 +146,12 @@ void LoadShaderSourceContext::process_source(const std::string_view source, cons
 		if (const auto include_opt = extract_include(line)) {
 			if (process_include(*include_opt))
 				output << "#line " << line_number() + 1 << " " << filenameToIndex(filename) << " // " << filename << "\n";
+			else
+				output << "\n"; // Place an empty line instead of the 'include' directive to keep line numbers intact
 
 		} else if (is_pragma_once(line)) {
 			includePragmaOnce.emplace_back(filename);
+			output << "\n"; // Place an empty line instead of the 'pragma once' directive to keep line numbers intact
 
 		} else {
 			const auto crlf = line.ends_with("\r\n");

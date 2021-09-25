@@ -42,9 +42,9 @@ TEST_CASE("GLSL source include pre-processing", "[libv.rev.glsl_compose]") {
 			return {std::error_code(), "#include <HinGinH.glsl>\nG2"};
 
 		if (str == "P.glsl")
-			return {std::error_code(), "#pragma once\nP1"};
+			return {std::error_code(), "#pragma once\nP2"};
 		if (str == "Q.glsl")
-			return {std::error_code(), "#include <P.glsl>\nQ1"};
+			return {std::error_code(), "#include <P.glsl>\nQ2"};
 
 		if (str == "W.glsl")
 			return {std::error_code(), "\r\n01234\r\n56789"};
@@ -56,7 +56,7 @@ TEST_CASE("GLSL source include pre-processing", "[libv.rev.glsl_compose]") {
 	};
 
 	const auto test = [&] (auto source) {
-		return libv::rev::glsl_compose_from_source(includer, source);
+		return libv::rev::glsl_compose_from_source(includer, source).code;
 	};
 
 	CHECK(test("") == "");
@@ -64,29 +64,194 @@ TEST_CASE("GLSL source include pre-processing", "[libv.rev.glsl_compose]") {
 	CHECK(test("M1\nM2\nM3") == "M1\nM2\nM3\n");
 	CHECK(test("M1\nM2\nM3\n") == "M1\nM2\nM3\n");
 
-	CHECK(test("#include <A.glsl>\nM1\nM2\nM3\n") == "#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"main\"\nM1\nM2\nM3\n");
-	CHECK(test("#include \"A.glsl\"\nM1\nM2\nM3\n") == "#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"main\"\nM1\nM2\nM3\n");
+	CHECK(test("#include <A.glsl>\nM1\nM2\nM3\n") ==
+			"#line 1 2090909000 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909001 // main\n"
+			"M1\n"
+			"M2\n"
+			"M3\n");
+	CHECK(test("#include \"A.glsl\"\nM1\nM2\nM3\n") ==
+			"#line 1 2090909000 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909001 // main\n"
+			"M1\n"
+			"M2\n"
+			"M3\n");
 
-	CHECK(test("#include <A.glsl>") == "#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"main\"\n");
-	CHECK(test("#include <B.glsl>") == "#line 1 \"B.glsl\"\nB1\nB2\nB3\n#line 2 \"main\"\n");
-	CHECK(test("#include <C.glsl>") == "#line 1 \"C.glsl\"\nC1\nC2\nC3\n#line 2 \"main\"\n");
+	CHECK(test("#include <A.glsl>") ==
+			"#line 1 2090909000 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909001 // main\n");
+	CHECK(test("#include <B.glsl>") ==
+			"#line 1 2090909000 // B.glsl\n"
+			"B1\n"
+			"B2\n"
+			"B3\n"
+			"#line 2 2090909001 // main\n");
+	CHECK(test("#include <C.glsl>") ==
+			"#line 1 2090909000 // C.glsl\n"
+			"C1\n"
+			"C2\n"
+			"C3\n"
+			"#line 2 2090909001 // main\n");
 
-	CHECK(test("#include <DinA.glsl>") == "#line 1 \"DinA.glsl\"\n#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"DinA.glsl\"\nD2\nD3\nD4\n#line 2 \"main\"\n");
-	CHECK(test("#include <DinAB.glsl>") == "#line 1 \"DinAB.glsl\"\n#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"DinAB.glsl\"\n#line 1 \"B.glsl\"\nB1\nB2\nB3\n#line 3 \"DinAB.glsl\"\nD3\nD4\nD5\n#line 2 \"main\"\n");
-	CHECK(test("#include <DinABC.glsl>") == "#line 1 \"DinABC.glsl\"\n#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 2 \"DinABC.glsl\"\n#line 1 \"B.glsl\"\nB1\nB2\nB3\n#line 3 \"DinABC.glsl\"\n#line 1 \"C.glsl\"\nC1\nC2\nC3\n#line 4 \"DinABC.glsl\"\nD4\nD5\nD6\n#line 2 \"main\"\n");
+	CHECK(test("#include <DinA.glsl>") ==
+			"#line 1 2090909000 // DinA.glsl\n"
+			"#line 1 2090909001 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909000 // DinA.glsl\n"
+			"D2\n"
+			"D3\n"
+			"D4\n"
+			"#line 2 2090909002 // main\n");
+	CHECK(test("#include <DinAB.glsl>") ==
+			"#line 1 2090909000 // DinAB.glsl\n"
+			"#line 1 2090909001 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909000 // DinAB.glsl\n"
+			"#line 1 2090909002 // B.glsl\n"
+			"B1\n"
+			"B2\n"
+			"B3\n"
+			"#line 3 2090909000 // DinAB.glsl\n"
+			"D3\n"
+			"D4\n"
+			"D5\n"
+			"#line 2 2090909003 // main\n");
+	CHECK(test("#include <DinABC.glsl>") ==
+			"#line 1 2090909000 // DinABC.glsl\n"
+			"#line 1 2090909001 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 2 2090909000 // DinABC.glsl\n"
+			"#line 1 2090909002 // B.glsl\n"
+			"B1\n"
+			"B2\n"
+			"B3\n"
+			"#line 3 2090909000 // DinABC.glsl\n"
+			"#line 1 2090909003 // C.glsl\n"
+			"C1\n"
+			"C2\n"
+			"C3\n"
+			"#line 4 2090909000 // DinABC.glsl\n"
+			"D4\n"
+			"D5\n"
+			"D6\n"
+			"#line 2 2090909004 // main\n");
 
-	CHECK(test("#include <FinABC.glsl>") == "#line 1 \"FinABC.glsl\"\nF1\n#line 1 \"A.glsl\"\nA1\nA2\nA3\n#line 3 \"FinABC.glsl\"\nF3\n#line 1 \"B.glsl\"\nB1\nB2\nB3\n#line 5 \"FinABC.glsl\"\nF5\n#line 1 \"C.glsl\"\nC1\nC2\nC3\n#line 7 \"FinABC.glsl\"\nF7\n#line 2 \"main\"\n");
+	CHECK(test("#include <FinABC.glsl>") ==
+			"#line 1 2090909000 // FinABC.glsl\n"
+			"F1\n"
+			"#line 1 2090909001 // A.glsl\n"
+			"A1\n"
+			"A2\n"
+			"A3\n"
+			"#line 3 2090909000 // FinABC.glsl\n"
+			"F3\n"
+			"#line 1 2090909002 // B.glsl\n"
+			"B1\n"
+			"B2\n"
+			"B3\n"
+			"#line 5 2090909000 // FinABC.glsl\n"
+			"F5\n"
+			"#line 1 2090909003 // C.glsl\n"
+			"C1\n"
+			"C2\n"
+			"C3\n"
+			"#line 7 2090909000 // FinABC.glsl\n"
+			"F7\n"
+			"#line 2 2090909004 // main\n");
 
-	CHECK(test("#include <EinE.glsl>") == "#line 1 \"EinE.glsl\"\nE2\nE3\nE4\n#line 2 \"main\"\n");
-	CHECK(test("#include <GinHinG.glsl>\nM2") == "#line 1 \"GinHinG.glsl\"\n#line 1 \"HinGinH.glsl\"\nH2\n#line 2 \"GinHinG.glsl\"\nG2\n#line 2 \"main\"\nM2\n");
+	CHECK(test("#include <EinE.glsl>") ==
+			"#line 1 2090909000 // EinE.glsl\n"
+			"\n" // Empty line for failed include
+			"E2\n"
+			"E3\n"
+			"E4\n"
+			"#line 2 2090909001 // main\n");
+	CHECK(test("#include <GinHinG.glsl>\nM2") ==
+			"#line 1 2090909000 // GinHinG.glsl\n"
+			"#line 1 2090909001 // HinGinH.glsl\n"
+			"\n" // Empty line for failed include
+			"H2\n"
+			"#line 2 2090909000 // GinHinG.glsl\n"
+			"G2\n"
+			"#line 2 2090909002 // main\n"
+			"M2\n");
 
-	CHECK(test("#include <P.glsl>") == "#line 1 \"P.glsl\"\nP1\n#line 2 \"main\"\n");
-	CHECK(test("#include <P.glsl>\n#include <P.glsl>") == "#line 1 \"P.glsl\"\nP1\n#line 2 \"main\"\n");
-	CHECK(test("#include <P.glsl>\n#include <P.glsl>\n#include <P.glsl>") == "#line 1 \"P.glsl\"\nP1\n#line 2 \"main\"\n");
+	CHECK(test("#include <P.glsl>") ==
+			"#line 1 2090909000 // P.glsl\n"
+			"\n" // Empty line for #pragma once
+			"P2\n"
+			"#line 2 2090909001 // main\n");
+	CHECK(test(
+			"#include <P.glsl>\n"
+			"#include <P.glsl>")
+			==
+			"#line 1 2090909000 // P.glsl\n"
+			"\n" // Empty line for #pragma once
+			"P2\n"
+			"#line 2 2090909001 // main\n"
+			"\n");
+	CHECK(test(
+			"#include <P.glsl>\n"
+			"#include <P.glsl>\n"
+			"#include <P.glsl>")
+			==
+			"#line 1 2090909000 // P.glsl\n"
+			"\n" // Empty line for #pragma once
+			"P2\n"
+			"#line 2 2090909001 // main\n"
+			"\n" // Empty line for failed include
+			"\n"); // Empty line for failed include
 
-	CHECK(test("#include <P.glsl>\n#include <Q.glsl>") == "#line 1 \"P.glsl\"\nP1\n#line 2 \"main\"\n#line 1 \"Q.glsl\"\nQ1\n#line 3 \"main\"\n");
-	CHECK(test("#include <Q.glsl>\n#include <Q.glsl>") == "#line 1 \"Q.glsl\"\n#line 1 \"P.glsl\"\nP1\n#line 2 \"Q.glsl\"\nQ1\n#line 2 \"main\"\n#line 1 \"Q.glsl\"\nQ1\n#line 3 \"main\"\n");
+	CHECK(test("#include <P.glsl>\n"
+			"#include <Q.glsl>")
+			==
+			"#line 1 2090909000 // P.glsl\n"
+			"\n" // Empty line for #pragma once
+			"P2\n"
+			"#line 2 2090909001 // main\n"
+			"#line 1 2090909002 // Q.glsl\n"
+			"\n" // Empty line for failed include
+			"Q2\n"
+			"#line 3 2090909001 // main\n");
+	CHECK(test("#include <Q.glsl>\n"
+			"#include <Q.glsl>")
+			==
+			"#line 1 2090909000 // Q.glsl\n"
+			"#line 1 2090909001 // P.glsl\n"
+			"\n" // Empty line for #pragma once
+			"P2\n"
+			"#line 2 2090909000 // Q.glsl\n"
+			"Q2\n"
+			"#line 2 2090909002 // main\n"
+			"#line 1 2090909000 // Q.glsl\n"
+			"\n" // Empty line for failed include
+			"Q2\n"
+			"#line 3 2090909002 // main\n");
 
-	CHECK(test("#include <W.glsl>") == "#line 1 \"W.glsl\"\n\n01234\n56789\n#line 2 \"main\"\n");
-	CHECK(test("#include <Z.glsl>") == "#line 1 \"Z.glsl\"\n    \tZ1\n\t Z2\n#line 2 \"main\"\n");
+	CHECK(test("#include <W.glsl>") ==
+			"#line 1 2090909000 // W.glsl\n"
+			"\n" // Empty line in source
+			"01234\n"
+			"56789\n"
+			"#line 2 2090909001 // main\n");
+	CHECK(test("#include <Z.glsl>") ==
+			"#line 1 2090909000 // Z.glsl\n"
+			"    \tZ1\n"
+			"\t Z2\n"
+			"#line 2 2090909001 // main\n");
 }
