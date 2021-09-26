@@ -6,11 +6,12 @@
 #include <libv/ctrl/controls.hpp>
 // pro
 #include <space/game_instance.hpp>
+#include <space/network/lobby.hpp>
 #include <space/network/network_client.hpp>
 #include <space/network/network_server.hpp>
 #include <space/playout.hpp>
-#include <space/view/scene_main_ui.hpp>
 #include <space/universe/universe.hpp>
+#include <space/view/scene_main_ui.hpp>
 
 
 namespace app {

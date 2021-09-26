@@ -3,15 +3,16 @@
 // hpp
 #include <space/canvas_behaviour.hpp>
 // libv
-#include <libv/ctrl/controls.hpp> // TODO P0: temporary for binds
+#include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/distance/distance.hpp>
 #include <libv/math/distance/intersect.hpp>
 // pro
 #include <space/canvas.hpp>
-#include <space/command.hpp>
+#include <space/cto.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>
+#include <space/universe/universe.hpp>
 
 
 namespace app {
@@ -73,43 +74,35 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		// <<< should controls use nexus or playout directly? Think about the console and the lua scripts too.
 //		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 
-		ctx.playout.queue<app::CommandFleetSpawn>(world_coord);
+		ctx.playout.queue<CTO_FleetSpawn>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.select_fleet", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
 		if (fleet_id)
-			ctx.playout.queue<app::CommandFleetSelect>(
-					*fleet_id
-			);
+			ctx.playout.queue<CTO_FleetSelect>(*fleet_id);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.select_fleet_add", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
 		if (fleet_id)
-			ctx.playout.queue<app::CommandFleetSelectAdd>(
-					*fleet_id
-			);
+			ctx.playout.queue<CTO_FleetSelectAdd>(*fleet_id);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.queue<app::CommandFleetMove>(
-				world_coord
-		);
+		ctx.playout.queue<CTO_FleetMove>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.queue<app::CommandFleetQueueMove>(
-				world_coord
-		);
+		ctx.playout.queue<CTO_FleetQueueMove>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 		const auto playerID = app::PlayerID{0};
-		ctx.playout.queue<app::CommandCameraWarpTo>(playerID, world_coord);
+		ctx.playout.queue<CTO_CameraWarpTo>(playerID, world_coord);
 
 		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
 	});

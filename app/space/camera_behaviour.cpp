@@ -3,7 +3,7 @@
 // hpp
 #include <space/camera_behaviour.hpp>
 // libv
-#include <libv/ctrl/controls.hpp> // TODO P0: temporary for binds
+#include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
 // pro

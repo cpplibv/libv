@@ -42,6 +42,22 @@ ui.style("space.hud-bar.cmd.btn") {
 	align_vertical = "center",
 	background = colors.hud_light_bg_color,
 	size = "10pxD1r, 4pxD",
+
+	font_color = "rgba(1.0, 1.0, 1.0, 1.0)",
+	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+
+	state("focus") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("active") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover") {
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
+	state("hover, active") {
+		background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	},
 }
 
 ui.style("space.hud-bar.mp.main") {
@@ -112,7 +128,7 @@ ui.style("space.title-space") {
 	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
 
 	state("focus") {
-		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 	},
 	state("active") {
 		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},

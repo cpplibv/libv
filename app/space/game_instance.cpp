@@ -131,11 +131,11 @@ void GameInstance::register_nexus() {
 
 	// <<< These are game session requests
 	nexus.connect<mc::RequestClearFleets>(this, [this] {
-		game_session->playout->queue<app::CommandClearFleets>();
+		game_session->playout->queue<CTO_ClearFleets>();
 //			nexus.broadcast<mc::OnClearFleets>();
 	});
 	nexus.connect<mc::RequestShuffle>(this, [this] {
-		game_session->playout->queue<app::CommandShuffle>(std::random_device{}());
+		game_session->playout->queue<CTO_Shuffle>(std::random_device{}());
 		// <<< Do this in the playout buffer
 		//			nexus.broadcast<mc::OnShuffle>();
 	});

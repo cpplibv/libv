@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <space/fwd.hpp>
 // libv
 #include <libv/math/vec.hpp>
 #include <libv/math/vec_serial.hpp>
@@ -19,23 +21,27 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Command {
+// CTO - Command Transfer Object
+
+// -------------------------------------------------------------------------------------------------
+
+struct CTOType {
 
 };
 
-struct CommandLobby : Command {
+struct CTOType_Lobby : CTOType {
 	static constexpr bool is_session_command = true;
 	static constexpr bool is_state_command = false;
 	static constexpr bool is_track_command = false;
 };
 
-struct CommandState : Command {
+struct CTOType_State : CTOType {
 	static constexpr bool is_session_command = false;
 	static constexpr bool is_state_command = true;
 	static constexpr bool is_track_command = false;
 };
 
-struct CommandTrack : Command {
+struct CTOType_Track : CTOType {
 	static constexpr bool is_session_command = false;
 	static constexpr bool is_state_command = false;
 	static constexpr bool is_track_command = true;
@@ -43,14 +49,14 @@ struct CommandTrack : Command {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct CommandPlayerKick {
-//	using command_type = CommandLobby;
+//struct CTO_PlayerKick {
+//	using type = CTOType_Lobby;
 //
 //	PlayerID playerID;
 //};
 
-struct CommandChatMessage {
-	using command_type = CommandLobby;
+struct CTO_ChatMessage {
+	using type = CTOType_Lobby;
 
 //	PlayerID playerID;
 	//	Timestamp timestamp;
@@ -61,12 +67,15 @@ struct CommandChatMessage {
 	LIBV_REFLECTION_ACCESS(sender);
 	LIBV_REFLECTION_ACCESS(message);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct CommandFleetSpawn {
-	using command_type = CommandState;
+struct CTO_FleetSpawn {
+	using type = CTOType_State;
 
 //	FactionID factionID;
 //	FleetID fleetID;
@@ -74,64 +83,85 @@ struct CommandFleetSpawn {
 
 	LIBV_REFLECTION_ACCESS(position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandFleetSelect {
-	using command_type = CommandState;
+struct CTO_FleetSelect {
+	using type = CTOType_State;
 
 	FleetID fleetID;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandFleetSelectAdd {
-	using command_type = CommandState;
+struct CTO_FleetSelectAdd {
+	using type = CTOType_State;
 
 	FleetID fleetID;
 
 	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandFleetMove {
-	using command_type = CommandState;
+struct CTO_FleetMove {
+	using type = CTOType_State;
 
 	libv::vec3f target_position;
 
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandFleetQueueMove {
-	using command_type = CommandState;
+struct CTO_FleetQueueMove {
+	using type = CTOType_State;
 
 	libv::vec3f target_position;
 
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandClearFleets {
-	using command_type = CommandState;
+struct CTO_ClearFleets {
+	using type = CTOType_State;
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandShuffle {
-	using command_type = CommandState;
+struct CTO_Shuffle {
+	using type = CTOType_State;
 
 	uint64_t seed;
 
 	LIBV_REFLECTION_ACCESS(seed);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
 // -------------------------------------------------------------------------------------------------
 
-struct CommandTrackView {
-	using command_type = CommandTrack;
+struct CTO_TrackView {
+	using type = CTOType_Track;
 
 	PlayerID playerID;
 	libv::vec3f eye;
@@ -143,10 +173,13 @@ struct CommandTrackView {
 	LIBV_REFLECTION_ACCESS(target);
 	LIBV_REFLECTION_ACCESS(mouse_direction);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-struct CommandCameraWarpTo {
-	using command_type = CommandTrack;
+struct CTO_CameraWarpTo {
+	using type = CTOType_Track;
 
 	PlayerID playerID;
 	libv::vec3f target_position;
@@ -154,10 +187,13 @@ struct CommandCameraWarpTo {
 	LIBV_REFLECTION_ACCESS(playerID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe, Lobby& lobby);
 };
 
-//struct CommandCameraMovement : CommandTrack {
-//	using command_type = CommandTrack;
+//struct CTO_CameraMovement : CommandTrack {
+//	using type = CTOType_Track;
 //
 //	PlayerID playerID;
 //	libv::vec3f eye;
@@ -165,8 +201,8 @@ struct CommandCameraWarpTo {
 //	libv::vec3f mouse_direction;
 //};
 //
-//struct CommandMouseMovement : CommandTrack {
-//	using command_type = CommandTrack;
+//struct CTO_MouseMovement : CommandTrack {
+//	using type = CTOType_Track;
 //
 //	PlayerID playerID;
 //	libv::vec3f mouse_position;

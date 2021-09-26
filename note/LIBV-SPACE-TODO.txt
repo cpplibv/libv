@@ -80,6 +80,7 @@ app.space.net: Networking
 		app.space.net: Introduction, Name
 		app.space.net: Lobby
 			app.space.net: List of connected clients and their state
+		app.space.net: Chat
 
 	app.space.net: Networking (Stage 3)
 		app.space.net: Snapshot
@@ -96,6 +97,17 @@ app.space.net: Networking
 		app.space.net: Latency hiding
 
 	app.space: Mini canvas show other clients view (Needs lobby)
+
+app.space.net: Networking PAPER:
+	Some random buzz words:
+		Deterministic lockstep
+		article: https://gafferongames.com/post/deterministic_lockstep/
+		snapshot
+		delta update
+		playout delay buffer
+		adaptive playout delay
+
+
 
 app.space: Simulation time control
 	app.space: Pause, Unpause (It will be a good practise for timers and controls)

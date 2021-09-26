@@ -15,7 +15,7 @@
 #include <cassert>
 // pro
 #include <space/camera.hpp>
-#include <space/command.hpp>
+#include <space/cto.hpp>
 #include <space/game_instance.hpp>
 #include <space/game_session.hpp>
 #include <space/playout.hpp>

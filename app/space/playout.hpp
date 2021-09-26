@@ -16,11 +16,11 @@
 #include <random>
 #include <vector>
 // pro
-#include <space/command.hpp>
-#include <space/lobby.hpp>
+#include <space/cto.hpp>
 #include <space/log.hpp>
-#include <space/universe/universe.hpp>
+//#include <space/universe/universe.hpp>
 
+//#include <space/network/lobby.hpp>
 #include <space/network/network_client.hpp>
 #include <space/network/network_server.hpp>
 
@@ -29,33 +29,23 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-// Some random buzz words:
-//	Deterministic lockstep
-//	article: https://gafferongames.com/post/deterministic_lockstep/
-//	snapshot
-//	delta update
-//	playout delay buffer
-//	adaptive playout delay
-
-// -------------------------------------------------------------------------------------------------
-
 struct msg_pdb {
 	template <typename Codec>
 	static constexpr inline void message_types(Codec& codec) {
-		codec.template register_type<0x10, CommandChatMessage>();
+		codec.template register_type<0x10, CTO_ChatMessage>();
 
-		codec.template register_type<0x20, CommandFleetSpawn>();
-		codec.template register_type<0x21, CommandFleetMove>();
-		codec.template register_type<0x22, CommandFleetQueueMove>();
-		codec.template register_type<0x23, CommandClearFleets>();
-		codec.template register_type<0x24, CommandShuffle>();
-		codec.template register_type<0x25, CommandFleetSelect>();
-		codec.template register_type<0x26, CommandFleetSelectAdd>();
+		codec.template register_type<0x20, CTO_FleetSpawn>();
+		codec.template register_type<0x21, CTO_FleetMove>();
+		codec.template register_type<0x22, CTO_FleetQueueMove>();
+		codec.template register_type<0x23, CTO_ClearFleets>();
+		codec.template register_type<0x24, CTO_Shuffle>();
+		codec.template register_type<0x25, CTO_FleetSelect>();
+		codec.template register_type<0x26, CTO_FleetSelectAdd>();
 
-		codec.template register_type<0x30, CommandTrackView>();
-		codec.template register_type<0x31, CommandCameraWarpTo>();
-		//		codec.template register_type<0x32, CommandCameraMovement>();
-		//		codec.template register_type<0x33, CommandMouseMovement>();
+		codec.template register_type<0x30, CTO_TrackView>();
+		codec.template register_type<0x31, CTO_CameraWarpTo>();
+		//		codec.template register_type<0x32, CTO_CameraMovement>();
+		//		codec.template register_type<0x33, CTO_MouseMovement>();
 	}
 };
 
@@ -82,7 +72,7 @@ public:
 		aux_queue(
 				std::make_shared<CommandT>(std::forward<Args>(args)...),
 				+[](Universe& u, Lobby& se, void* c) {
-					apply(u, se, *reinterpret_cast<CommandT*>(c));
+					reinterpret_cast<CommandT*>(c)->apply(u, se);
 				},
 				+[](void* c) {
 //					std::string data;
@@ -104,7 +94,7 @@ public:
 		stateChangeEntries.emplace_back(
 				std::make_unique<CommandT>(std::move(command)),
 				+[](Universe& u, Lobby& se, void* c) {
-					apply(u, se, *reinterpret_cast<CommandT*>(c));
+					reinterpret_cast<CommandT*>(c)->apply(u, se);
 				});
 	}
 
@@ -178,24 +168,6 @@ private:
 		stateChangeEntries.emplace_back(std::move(command), apply_func);
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-void apply(Universe& universe, Lobby& lobby, CommandChatMessage& command);
-
-void apply(Universe& universe, Lobby& lobby, CommandFleetMove& command);
-void apply(Universe& universe, Lobby& lobby, CommandFleetQueueMove& command);
-void apply(Universe& universe, Lobby& lobby, CommandFleetSpawn& command);
-void apply(Universe& universe, Lobby& lobby, CommandClearFleets& command);
-void apply(Universe& universe, Lobby& lobby, CommandShuffle& command);
-void apply(Universe& universe, Lobby& lobby, CommandFleetSelect& command);
-void apply(Universe& universe, Lobby& lobby, CommandFleetSelectAdd& command);
-
-void apply(Universe& universe, Lobby& lobby, CommandTrackView& command);
-void apply(Universe& universe, Lobby& lobby, CommandCameraWarpTo& command);
-
-//void apply(Universe& universe, CommandCameraMovement& command);
-//void apply(Universe& universe, CommandMouseMovement& command);
 
 // -------------------------------------------------------------------------------------------------
 

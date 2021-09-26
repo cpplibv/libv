@@ -65,17 +65,23 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 		});
 		mp_bar.add(btn_host);
 
+		libv::ui::InputField in_server_address("mp-server-address-in");
+		in_server_address.style("space.hud-bar.mp.input");
+		in_server_address.text("rs0.corruptedai.com");
+
 		btn_join.style("space.hud-bar.mp.btn");
-		btn_join.text("Join: rs0.corruptedai.com");
-		btn_join.event().submit.connect([this, in_name] {
+		btn_join.text("Join");
+		btn_join.event().submit.connect([this, in_name, in_server_address] {
 			if (client_active) {
 				nexus.broadcast(mc::RequestDestroyClient{});
 			} else {
 				nexus.broadcast(mc::RequestNameChange{in_name.text()});
-				nexus.broadcast(mc::RequestCreateClient{"rs0.corruptedai.com", uint16_t{25080}});
+				nexus.broadcast(mc::RequestCreateClient{in_server_address.text(), uint16_t{25080}});
 			}
 		});
 		mp_bar.add(btn_join);
+
+		mp_bar.add(in_server_address);
 
 		//		nexus.connect<mc::RequestCreateClient>(track_ptr, [this] {
 		//			lbl_state.text("Creating Client as [" + game.player.name + "]");
@@ -99,19 +105,19 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 			server_active = true;
 			lbl_state.text("Running as Server [" + player.name + "]");
 			btn_host.text("Shutdown");
-			btn_join.text("Join: rs0.corruptedai.com");
+			btn_join.text("Join");
 		});
 		nexus.connect<mc::OnDestroyClient>(this, [this]() mutable {
 			client_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");
-			btn_join.text("Join: rs0.corruptedai.com");
+			btn_join.text("Join");
 		});
 		nexus.connect<mc::OnDestroyServer>(this, [this]() mutable {
 			server_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");
-			btn_join.text("Join: rs0.corruptedai.com");
+			btn_join.text("Join");
 		});
 	}
 

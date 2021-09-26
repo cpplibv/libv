@@ -1,36 +1,34 @@
 // Project: libv, File: app/space/console.hpp, Author: Császár Mátyás [Vader]
 
-#pragma once
-
-// libv
-//#include <libv/math/vec.hpp>
-//#include <libv/math/vec_serial.hpp>
-//#include <libv/meta/reflection_access.hpp>
-//#include <libv/serial/enable.hpp>
-//#include <libv/serial/types/std_string.hpp>
-//#include <libv/utility/to_underlying.hpp>
-// std
-//#include <cstdint>
-//#include <string>
+//#pragma once
+//
+//// libv
+////#include <libv/math/vec.hpp>
+////#include <libv/math/vec_serial.hpp>
+////#include <libv/meta/reflection_access.hpp>
+////#include <libv/serial/enable.hpp>
+////#include <libv/serial/types/std_string.hpp>
+////#include <libv/utility/to_underlying.hpp>
+//// std
 //#include <string_view>
-//#include <vector>
-
-
-namespace app {
-
-// -------------------------------------------------------------------------------------------------
-
+//#include <memory>
+//
+//
+//namespace app {
+//
+//// -------------------------------------------------------------------------------------------------
+//
 //class ImplConsole;
-
-//struct Console {
+//
+//class Console {
+//private:
 //	std::shared_ptr<ImplConsole> self;
 //
-//	inline Console(const Console&) noexcept = default;
-//	inline Console& operator=(const Console&) & noexcept = default;
-//	inline Console(Console&&) noexcept = default;
-//	inline Console& operator=(Console&&) & noexcept = default;
+//public:
+//	Console();
+//	~Console();
 //
-////	void execute(std::string command);
+//public:
 //	void execute(std::string_view command) {
 ////		if (command == "clear_fleets") {
 ////			// clear_fleets
@@ -52,7 +50,18 @@ namespace app {
 ////		}
 //	}
 //};
-
+//
 // -------------------------------------------------------------------------------------------------
-
-} // namespace app
+//
+//
+//Console::Console() :
+//	self(std::make_unique<ImplConsole>()) {
+//}
+//
+//Console::~Console() {
+//	// For the sake of forward declared unique_ptr
+//}
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//} // namespace app
