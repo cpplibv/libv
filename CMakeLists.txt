@@ -310,7 +310,7 @@ wish_create_external(
 wish_create_external(
 	NAME cereal
 	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
-	GIT_TAG v1.2.2
+	GIT_TAG v1.3.0
 	CMAKE_ARGS
 		-DJUST_INSTALL_CEREAL=ON
 	DEFINE CEREAL_XML_STRING_VALUE="root"
