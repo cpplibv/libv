@@ -32,10 +32,9 @@ private:
 	std::shared_ptr<detail::ImageImplementation> impl;
 
 public:
-	inline Image(std::shared_ptr<detail::ImageImplementation>&& impl) noexcept :
-		size_(impl ? impl->size() : libv::vec2i{}), // operator?: to suppress -Wnull-dereference
+	explicit inline Image(std::shared_ptr<detail::ImageImplementation>&& impl) noexcept :
+		size_((assert("ImageImplementation cannot be null" && impl != nullptr), impl->size())),
 		impl(std::move(impl)) {
-		assert("ImageImplementation cannot be null" && this->impl != nullptr);
 	}
 
 public:

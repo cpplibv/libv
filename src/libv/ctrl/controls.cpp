@@ -1019,6 +1019,9 @@ void Controls::update_since_last_update() {
 
 // -------------------------------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings on flat_map operator[]
+
 void Controls::timeout_sequence(duration timeout) noexcept {
 	// NOTE: This could abort some currently active sequences, but the next update will takes care of it
 	self->timeout_sequence = timeout;
@@ -1114,7 +1117,12 @@ void Controls::scale_scroll(scale_type_2D scale) noexcept {
 	self->scale_scroll = scale;
 }
 
+#pragma GCC diagnostic pop
+
 // -------------------------------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings on flat_map operator[]
 
 duration Controls::timeout_sequence() const noexcept {
 	return self->timeout_sequence;
@@ -1167,6 +1175,8 @@ scale_type_2D Controls::scale_mouse_move() const noexcept {
 scale_type_2D Controls::scale_scroll() const noexcept {
 	return self->scale_scroll;
 }
+
+#pragma GCC diagnostic pop
 
 // -------------------------------------------------------------------------------------------------
 

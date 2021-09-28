@@ -406,8 +406,8 @@ void String2D::layout() {
 
 	auto pen = libv::vec2f{0, heightAdjusment};
 	auto previousCodepoint = uint32_t{'\n'};
-	auto lines = boost::container::small_vector<Line, 8>{1}; // ~2240 Byte on the stack
-	auto line = libv::observer_ref<Line>{lines.data()};
+	auto lines = boost::container::small_vector<Line, 8>(); // ~2240 Byte on the stack
+	auto line = make_observer_ref(&lines.emplace_back());
 	auto contentWidth = limit_.x;
 
 	const auto finishLine = [&] {
@@ -422,8 +422,11 @@ void String2D::layout() {
 
 		const auto lastEnd = line->end;
 		line = make_observer_ref(&lines.emplace_back());
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 		line->begin = lastEnd;
 		line->end = lastEnd;
+#pragma GCC diagnostic pop
 
 		previousCodepoint = 0;
 		pen.x = 0.0f;

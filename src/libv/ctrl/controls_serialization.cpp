@@ -165,6 +165,8 @@ void Controls::import_settings(std::string_view data) {
 				var.y = std::stod(std::string(range_value));
 		};
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 		const auto in_div_1D = [&](auto name, auto& map, auto mptr) {
 			using id = std::remove_reference_t<decltype(map)>::key_type;
 
@@ -180,6 +182,7 @@ void Controls::import_settings(std::string_view data) {
 			if (has_div && range_key.starts_with(name) && range_key.ends_with("_y"))
 				(map[static_cast<id>(std::stoi(std::string(range_id)))].*mptr).y = std::stod(std::string(range_value));
 		};
+#pragma GCC diagnostic pop
 
 		if (range_key == "timeout_sequence")
 				self->timeout_sequence = duration{std::stod(std::string(libv::trim(range_value)))};
