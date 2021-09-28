@@ -10,6 +10,7 @@
 #include <libv/utility/hex_dump.hpp>
 #include <libv/serial/reflection.hpp>
 #include <libv/serial/archive/binary.hpp>
+//#include <libv/serial/archive/json_any.hpp>
 #include <libv/serial/codec.hpp>
 // std
 #include <memory>
@@ -88,6 +89,7 @@ public:
 
 public:
 	static inline libv::serial::CodecCommon<Playout, libv::archive::Binary> codec{msg_pdb{}};
+//	static inline libv::serial::CodecCommon<Playout, libv::archive::JSONAny> codec{msg_pdb{}};
 
 	template <typename CommandT>
 	void receive(CommandT&& command) {

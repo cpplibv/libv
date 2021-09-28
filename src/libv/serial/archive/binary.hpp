@@ -28,6 +28,37 @@ inline void swap_bytes(std::byte* data) {
 
 } // namespace detail ------------------------------------------------------------------------------
 
+class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
+private:
+	libv::input_bytes input_stream;
+	size_t input_it = 0;
+
+public:
+	/// Construct, loading from the provided stream
+	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
+	explicit BinaryInput(libv::input_bytes input) :
+		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
+		input_stream(input) {
+	}
+
+	~BinaryInput() noexcept = default;
+
+	template <size_t DataSize>
+	inline void loadBinary(void* const data, size_t size) {
+		const auto readSize = input_stream.read(reinterpret_cast<std::byte*>(data), input_it, size);
+		input_it += size; // (readSize would yield same result)
+
+		if (readSize != size)
+			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
+
+		if constexpr (!is_network_endian())
+			for (size_t i = 0; i < size; i += DataSize)
+				detail::swap_bytes<DataSize>(reinterpret_cast<std::byte*>(data) + i);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
 private:
 	libv::output_bytes output_stream;
@@ -66,38 +97,6 @@ public:
 
 //		if (writtenSize != size)
 //			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
-
-private:
-	libv::input_bytes input_stream;
-	size_t input_it = 0;
-
-public:
-	/// Construct, loading from the provided stream
-	/// @param stream The stream to read from. Should be opened with std::ios::binary flag.
-	explicit BinaryInput(libv::input_bytes input) :
-		InputArchive<BinaryInput, cereal::AllowEmptyClassElision>(this),
-			input_stream(input) {
-	}
-
-	~BinaryInput() noexcept = default;
-
-	template <size_t DataSize>
-	inline void loadBinary(void* const data, size_t size) {
-		const auto readSize = input_stream.read(reinterpret_cast<std::byte*>(data), input_it, size);
-		input_it += size; // (readSize would yield same result)
-
-		if (readSize != size)
-			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
-
-		if constexpr (!is_network_endian())
-			for (size_t i = 0; i < size; i += DataSize)
-				detail::swap_bytes<DataSize>(reinterpret_cast<std::byte*>(data) + i);
 	}
 };
 
