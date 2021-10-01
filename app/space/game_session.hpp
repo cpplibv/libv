@@ -20,21 +20,42 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct GameSession {
+class GameSession {
+private:
+	libv::Nexus& nexus;
+
+public:
 	Universe universe;
-	std::unique_ptr<Playout> playout;
+	Playout playout;
 
 public:
-	explicit GameSession(std::unique_ptr<Playout> playout) : playout(std::move(playout)) {}
-	virtual ~GameSession() = default;
+	explicit inline GameSession(libv::Nexus& nexus) : nexus(nexus), playout() {
+		register_nexus();
+	}
+
+	explicit inline GameSession(libv::Nexus& nexus, NetworkClient& network_client) : nexus(nexus), playout(network_client) {
+		register_nexus();
+	}
+
+	explicit inline GameSession(libv::Nexus& nexus, NetworkServer& network_server) : nexus(nexus), playout(network_server) {
+		register_nexus();
+	}
+
+	virtual ~GameSession() {
+		unregister_nexus();
+	}
+
+private:
+	void register_nexus();
+	void unregister_nexus();
 
 public:
-	virtual void update(libv::ui::time_duration delta_time) = 0;
+	void update(libv::ui::time_duration delta_time);
 };
 
-std::shared_ptr<GameSession> createSinglePlayer(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls);
-std::shared_ptr<GameSession> createMultiPlayerClient(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls, std::string server_address, uint16_t server_port);
-std::shared_ptr<GameSession> createMultiPlayerServer(GameInstance& game, libv::Nexus& nexus, libv::ctrl::Controls& controls, uint16_t port);
+std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus& nexus);
+std::shared_ptr<GameSession> createMultiPlayerClient(GameThread& game_thread, libv::Nexus& nexus, std::string server_address, uint16_t server_port, User& user);
+std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, libv::Nexus& nexus, uint16_t port, User& user);
 
 // -------------------------------------------------------------------------------------------------
 

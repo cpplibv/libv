@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/view/scene_mp_bar.cpp
+// Project: libv, File: app/space/view/scene_menu_bar.cpp
 
 // hpp
-#include <space/view/scene_mp_bar.hpp>
+#include <space/view/scene_menu_bar.hpp>
 // libv
 #include <libv/ui/attach_state.hpp>
 #include <libv/ui/component/button.hpp>
@@ -11,21 +11,21 @@
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/nexus.hpp>
 // pro
-#include <space/player.hpp>
-#include <space/message_control.hpp>
+#include <space/user.hpp>
+#include <space/internal_events.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component SceneMPBar::create(libv::Nexus& nexus, Player& player) {
+libv::ui::Component SceneMenuBar::create(libv::Nexus& nexus, User& user) {
 	libv::ui::PanelLine mp_bar("mp-bar");
-	libv::ui::attach_state<SceneMPBar>(mp_bar)(nexus, player).init(mp_bar);
+	libv::ui::attach_state<SceneMenuBar>(mp_bar)(nexus, user).init(mp_bar);
 	return mp_bar;
 }
 
-libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
+libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar_main) {
 
 	mp_bar_main.style("space.hud-bar.mp.main");
 
@@ -46,7 +46,7 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 
 		libv::ui::InputField in_name("mp-name-in");
 		in_name.style("space.hud-bar.mp.input");
-		in_name.text(generate_random_name(4));
+		in_name.text(user.name);
 		mp_bar.add(in_name);
 
 		lbl_state.style("space.hud-bar.mp.lbl");
@@ -84,19 +84,19 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 		mp_bar.add(in_server_address);
 
 //		nexus.connect<mc::OnNameChange>(this, [this] mutable {
-//			in_name.text(player.name);
+//			in_name.text(user.name);
 //		});
 		nexus.connect<mc::OnCreateClient>(this, [this] mutable {
 			client_active = true;
 			server_active = false;
-			lbl_state.text("Running as Client [" + player.name + "]");
+			lbl_state.text("Running as Client [" + user.name + "]");
 			btn_host.text("Host");
 			btn_join.text("Disconnect");
 		});
 		nexus.connect<mc::OnCreateServer>(this, [this] mutable {
 			client_active = false;
 			server_active = true;
-			lbl_state.text("Running as Server [" + player.name + "]");
+			lbl_state.text("Running as Server [" + user.name + "]");
 			btn_host.text("Shutdown");
 			btn_join.text("Join");
 		});
@@ -117,7 +117,7 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 	return mp_bar;
 }
 
-SceneMPBar::~SceneMPBar() {
+SceneMenuBar::~SceneMenuBar() {
 	nexus.disconnect_all(this);
 }
 

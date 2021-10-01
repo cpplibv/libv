@@ -25,10 +25,14 @@ app.space: Add support for chained command arrows
 app.space: Basic hacky networking
 libv.ui: Add overlay events to the global events, then use those to alter controls input ignore (attach can auto do this)
 app.space: Cannibalize style.lua from vm4_viewer
-
-
-
-
+app.space: Rename player -> user (and the ID, and the members vars in CTOs)
+app.space.net: Networking (Stage 2)
+app.space.net: Introduction with name, Protocol messages
+app.space.net: Lobby with list of connected clients
+app.space.net: Implement lobby snapshot sending/loading on connect
+app.space: Solve canvas and ui ctrl conflict
+app.space: Commands have a conflicting name, resolve it with an acronym like CTO (Command Transfer Object)
+app.space: Structure the whole program: UML time is upon us | Still not the cleanest, but improved
 
 
 
@@ -73,18 +77,29 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
-app.space.net: Networking
-	app.space.net: Networking (Stage 2)
-		app.space.net: Introduction, Name
-		app.space.net: Lobby
-			app.space.net: List of connected clients and their state
-		app.space.net: Chat
 
+
+app.space: Move cto.apply(universe) -> universe.apply(cto)
+		this creates a pattern with lobby.apply(cto) (and others in future)
+		visibility will make sense, no forced public on everything
+		const / non-const access will make sense, ability to control to everything only have non-const access
+app.space: F1 menu, list every keybind
+app.space: Rename files *_behaviour -> *_control
+app.space: Move canvas and camera under view
+
+
+
+
+
+
+app.space.net: Networking
 	app.space.net: Networking (Stage 3)
+		app.space.net: Connection stages and states
 		app.space.net: Snapshot
 			app.space.net: Snapshot saving
 			app.space.net: Snapshot sending upon newly connected client (with pause)
 			app.space.net: Snapshot loading
+		app.space.net: Smooth Snapshot
 			app.space.net: Non paused snapshot join
 				app.space.net: Fast forwarding after a snapshot loading happened
 				app.space.net: Apply, update, skip render repeat until catch up
@@ -92,14 +107,22 @@ app.space.net: Networking
 
 	app.space.net: Networking (Stage 4)
 		app.space.net: Deterministic execution (Frame Index and lockstep)
+		app.space.net: Latency prediction
 		app.space.net: Latency hiding
 
-	app.space: Mini canvas show other clients view (Needs lobby)
+	app.space.net: Networking leftovers
+		app.space.net: Timer to kick "connectings" after X sec if they dont identify (Intro) themselves
+		app.space.net: Implement lobby status event
+		app.space.net: Implement lobby chat message event
+		app.space: Mini canvas show other clients view
+
+
 
 app.space.net: Networking PAPER:
+	A good article on this subject: https://gafferongames.com/post/deterministic_lockstep/
+
 	Some random buzz words:
 		Deterministic lockstep
-		article: https://gafferongames.com/post/deterministic_lockstep/
 		snapshot
 		delta update
 		playout delay buffer
@@ -124,7 +147,25 @@ app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, 
 
 
 
+CI/CD:
+	jenkins: pull
+	jenkins: build (parameterized with branch and version number (and git commit count))
+	jenkins: package
+	jenkins: ssh upload the release package to the update master
+	jenkins: trigger the update master
+	update-master: by default every release marked as internal
+	update-master: on some GUI mark this release not internal and mark update routes to be built
+	jenkins could ping update-master on build start (option to auto release feature)
 
+
+libv.ctrl: Box selection support
+		start
+			[press]
+		update tick
+			[hold]
+		end
+			[release]
+libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
 
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
@@ -141,17 +182,8 @@ app.space: Fleet merge/follow/attack commands
 
 
 
-Solved:
-	- How does network interfaces with the playout logic? | Reference and codec, but a lot of thing is unclear
-	- How does UI interfaces with the business logic? | Nexus
-	- How does UI accesses business state? | References and Nexus subscriptions
 
-
-
-
-
-
-app.space: Main structure paper
+app.space: Main structure paper OUTDATED
 
 	game instance (desktop) - GameInstance (an object spawned when you launch the application and that remains the same until you close it)
 		frame
@@ -177,13 +209,16 @@ app.space: Main structure paper
 				PlayerController [UI, Controls]
 					PlayerState (spawned when a PlayerController is spawned = when a player arrives in the game)
 
+	game.sim:
+		- Command based sim state manipulation | Playout
+			Types:
+			- Control tracking (Camera / Mouse movement, ?Selection)
+			- Sim state manipulation (Move, Attack, Production command, ?Selection)
+			- Session manipulation (Permission alteration, Kick, Ban, etc)
 
 
 
 
-app.space: Commands have a conflicting name, resolve it with an acronym like CTO (Command Transfer Object)
-
-app.space: Structure the whole program: UML time is upon us
 
 app.space: Self-Updater
 
@@ -213,17 +248,10 @@ app.space: Command arrow improvements
 	app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
 	app.space.visual: Command arrow make the edges less bright to help with AA edge
 
-app.space: line shader (Dalma)
+app.space: Line shader
 
 app.space: Iris and space has to merge in some way
 	iris: Make a main menu
-
-game.sim:
-		- Command based sim state manipulation | Playout
-			Types:
-			- Control tracking (Camera / Mouse movement, ?Selection)
-			- Sim state manipulation (Move, Attack, Production command, ?Selection)
-			- Session manipulation (Permission alteration, Kick, Ban, etc)
 
 app.space: headless server
 	To optimize the binary size and skip linking in shit for headless,
@@ -249,11 +277,11 @@ What do I need from libv to make a 'minimal' working iris program?
 			(There is also a newly found lib: https://github.com/Chlumsky/msdfgen and https://github.com/Chlumsky/msdf-atlas-gen)
 
 	libv.ctrl
-		2 Interaction with UI
+		4 Interaction with UI
 		5 Resolve analog-binary accidental collusion with time
 
 	libv.serial
-		1 Safe container resize/reserve on deserialization
+		3 Safe container resize/reserve on deserialization
 
 	libv.update
 		Resource
@@ -278,3 +306,6 @@ blur: (shaders are already implemented in app.space, but downscaling is not) htt
 
 Infinite Grid: http://asliceofrendering.com/scene%20helper/2020/01/05/InfiniteGrid/
 CMake source generation step: https://crascit.com/2017/04/18/generated-sources-in-cmake-builds/
+Deterministic Lockstep: https://gafferongames.com/post/deterministic_lockstep/
+
+

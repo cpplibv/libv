@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/scene_mp_bar.hpp
+// Project: libv, File: app/space/view/scene_menu_bar.hpp
 
 #pragma once
 
@@ -21,9 +21,9 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct SceneMPBar {
+struct SceneMenuBar {
 	libv::Nexus& nexus;
-	Player& player;
+	User& user;
 
 	//	enum class State {
 	//		idle,
@@ -42,8 +42,8 @@ struct SceneMPBar {
 //	libv::ui::Component root;
 
 public:
-	static libv::ui::Component create(libv::Nexus& nexus, Player& player);
-	~SceneMPBar();
+	static libv::ui::Component create(libv::Nexus& nexus, User& user);
+	~SceneMenuBar();
 	libv::ui::Component init(libv::ui::PanelLine& mp_bar);
 };
 

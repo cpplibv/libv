@@ -603,7 +603,9 @@ libv.sys: Open links/files with the OS defaults: https://stackoverflow.com/a/602
 libv.sys: Move clipboard text to it from libv.ui.context_ui
 libv.sys: Clipboard text (light wrapper above clip:: + deal with windows line ending)
 libv: Rebase every branch to a recent commit
-
+libv: Change /*implicit*/ comments to explicit(false)
+libv: Upgrade to GCC 11.2 and C++23
+libv: Default operator== where applicable
 
 
 
@@ -633,7 +635,6 @@ libv: Make sure that ALL usage of fs::path's .string() uses UTF8: std::filesyste
 		also, review/kill .string usages (?)
 
 libv: Remove friend class X; and use friend X; and ensure that X is fwd declared in the proper scope
-libv: Change /*implicit*/ comments to explicit(false)
 
 C++20
 	Look into: <syncstream> https://en.cppreference.com/w/cpp/io/basic_syncbuf
@@ -642,7 +643,6 @@ C++20
 	<barrier>, <latch>, and <semaphore>
 
 	Immediate functions (consteval)
-	Synthesizing three-way comparison for specified comparison category
 	Standard library header units
 
 
@@ -767,6 +767,10 @@ place.it:
 
 	ux: Game opening sound (menu music or intro animation) is extremely important, it should always be pleasant and not intrusive
 	ux: On actions that are meant for list entries (delete or edit list element) the action should be placed in the row. Selecting an entry then pressing a button on a different location on the UI is very cumbersome
+	ux: Two step user mouse interaction feedback:
+			1) Instant hard and visible change in color or shape
+			2) Slow animation that eases into a final color or shape
+			The first provides shard feedback while the second gives it a fancy kick
 	game.architect: Networking: To get a free networking integration prepare simulation in a way, that any input action is serialized into data/message first, then apply that data/message
 
 	5 step design

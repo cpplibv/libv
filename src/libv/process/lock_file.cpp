@@ -45,7 +45,7 @@ lock_file::~lock_file() {
 	std::filesystem::remove(self->filepath, ignore_ec);
 
 #else
-	// NOTE: On unix deleting a file will would succeed even if it is opened by another process
+	// NOTE: On unix deleting a file would succeed even if it is opened by another process
 	//          so we have to leave the lockfile there. Not a clean solution, but an acceptable compromise for now.
 
 #endif

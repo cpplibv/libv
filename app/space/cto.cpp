@@ -2,21 +2,11 @@
 
 // hpp
 #include <space/cto.hpp>
-// libv
-//#include <libv/math/vec.hpp>
-//#include <libv/math/vec_serial.hpp>
-//#include <libv/meta/reflection_access.hpp>
-//#include <libv/serial/enable.hpp>
-//#include <libv/serial/types/std_string.hpp>
 // std
-//#include <cstdint>
-//#include <string>
 #include <algorithm>
 #include <random>
 // pro
 #include <space/log.hpp>
-#include <space/network/lobby.hpp>
-#include <space/universe/ids.hpp>
 #include <space/universe/ids.hpp>
 #include <space/universe/universe.hpp>
 
@@ -25,23 +15,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-//void CTO_PlayerKick::apply(Universe& universe) {
-////	state.
-//}
-
-void CTO_ChatMessage::apply(Universe& universe, Lobby& lobby) {
-	(void) universe;
-
-	// Permission check
-	// Identity check
-	lobby.chat_entries.emplace_back(sender, message);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void CTO_FleetMove::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_FleetMove::apply(Universe& universe) {
 	// Permission check
 	// Bound check
 	// TODO P3: Use the command API of the fleet
@@ -51,9 +25,7 @@ void CTO_FleetMove::apply(Universe& universe, Lobby& lobby) {
 	}
 }
 
-void CTO_FleetQueueMove::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_FleetQueueMove::apply(Universe& universe) {
 	// Permission check
 	// Bound check
 	// TODO P3: Use the command API of the fleet
@@ -62,9 +34,7 @@ void CTO_FleetQueueMove::apply(Universe& universe, Lobby& lobby) {
 	}
 }
 
-void CTO_FleetSpawn::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_FleetSpawn::apply(Universe& universe) {
 	// Permission check
 	// Bound check
 
@@ -73,15 +43,12 @@ void CTO_FleetSpawn::apply(Universe& universe, Lobby& lobby) {
 	universe.nextFleetID = FleetID{+universe.nextFleetID + 1};
 }
 
-void CTO_FleetSelect::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_FleetSelect::apply(Universe& universe) {
 	universe.selectedFleetIDList.clear();
 	universe.selectedFleetIDList.insert(fleetID);
 }
 
-void CTO_FleetSelectAdd::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
+void CTO_FleetSelectAdd::apply(Universe& universe) {
 	universe.selectedFleetIDList.insert(fleetID);
 }
 
@@ -100,9 +67,7 @@ void CTO_FleetSelectAdd::apply(Universe& universe, Lobby& lobby) {
 //		}
 //	}
 
-void CTO_ClearFleets::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_ClearFleets::apply(Universe& universe) {
 	// Permission check
 	// Bound check
 	universe.selectedFleetIDList.clear();
@@ -110,9 +75,7 @@ void CTO_ClearFleets::apply(Universe& universe, Lobby& lobby) {
 	universe.nextFleetID = FleetID{0};
 }
 
-void CTO_Shuffle::apply(Universe& universe, Lobby& lobby) {
-	(void) lobby;
-
+void CTO_Shuffle::apply(Universe& universe) {
 	// Permission check
 	// Bound check
 	auto positions = std::vector<libv::vec3f>{};

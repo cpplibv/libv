@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/console.hpp
+// Project: libv, File: app/space/_idea_console.hpp
 
 //#pragma once
 //
@@ -36,7 +36,7 @@
 ////
 ////		} else if (command.starts_with("name ")) {
 ////			// host <name>
-////			player.name = arg(1);
+////			user.name = arg(1);
 ////
 ////		} else if (command.starts_with("host ")) {
 ////			// host <port>
@@ -46,7 +46,7 @@
 ////		} else if (command.starts_with("join ")) {
 ////			// join <address> <port>
 ////			server.reset();
-////			client.emplace(arg(1), arg(2), player.name, playout_delay_buffer);
+////			client.emplace(arg(1), arg(2), user.name, playout_delay_buffer);
 ////		}
 //	}
 //};

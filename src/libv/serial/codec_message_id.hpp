@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
 
@@ -12,6 +14,8 @@ namespace serial {
 // -------------------------------------------------------------------------------------------------
 
 enum class CodecMessageID : uint8_t {};
+
+[[nodiscard]] constexpr inline auto operator+(CodecMessageID e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
 

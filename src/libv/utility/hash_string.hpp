@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/hash.hpp
+// Project: libv.utility, File: src/libv/utility/hash_string.hpp
 
 #pragma once
 

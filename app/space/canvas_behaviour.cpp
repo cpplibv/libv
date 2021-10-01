@@ -23,6 +23,7 @@ namespace {
 // -------------------------------------------------------------------------------------------------
 
 std::optional<FleetID> calculate_hit_fleet(SpaceCanvas& ctx) {
+	// TODO P2: Use a ScreenPickableType based dynamic values for screen picking
 	constexpr auto SECONDARY_HIT_MIN_PIXEL_DISTANCE = 100.f;
 
 	bool direct_hit = false;
@@ -31,8 +32,6 @@ std::optional<FleetID> calculate_hit_fleet(SpaceCanvas& ctx) {
 	const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 	const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
 	const auto mouse_ray_pos = ctx.camera.eye();
-	const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-	log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
 
 	auto hover_distance = std::numeric_limits<float>::max();
 
@@ -62,7 +61,6 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 	const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
 	const auto mouse_ray_pos = ctx.camera.eye();
 	const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
-	log_space.info("mouse_local_coord: {}, world_coord: {}", mouse_local_coord, world_coord);
 
 	return world_coord;
 }
@@ -76,37 +74,37 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		// <<< should controls use nexus or playout directly? Think about the console and the lua scripts too.
 //		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
 
-		ctx.playout.queue<CTO_FleetSpawn>(world_coord);
+		ctx.playout.process<CTO_FleetSpawn>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.select_fleet", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
 		if (fleet_id)
-			ctx.playout.queue<CTO_FleetSelect>(*fleet_id);
+			ctx.playout.process<CTO_FleetSelect>(*fleet_id);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.select_fleet_add", [](const auto&, app::SpaceCanvas& ctx) {
 		std::optional<FleetID> fleet_id = calculate_hit_fleet(ctx);
 		if (fleet_id)
-			ctx.playout.queue<CTO_FleetSelectAdd>(*fleet_id);
+			ctx.playout.process<CTO_FleetSelectAdd>(*fleet_id);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.queue<CTO_FleetMove>(world_coord);
+		ctx.playout.process<CTO_FleetMove>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.queue<CTO_FleetQueueMove>(world_coord);
+		ctx.playout.process<CTO_FleetQueueMove>(world_coord);
 	});
 
 	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		const auto playerID = app::PlayerID{0};
-		ctx.playout.queue<CTO_CameraWarpTo>(playerID, world_coord);
+//		const auto userID = app::UserID{0};
+//		ctx.playout.process<CTO_CameraWarpTo>(userID, world_coord);
 
-		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
+		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply for tracking
 	});
 }
 

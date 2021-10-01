@@ -3,27 +3,30 @@
 // hpp
 #include <space/canvas.hpp>
 // libv
-#include <libv/algo/adjacent_pairs.hpp>
-#include <libv/ctrl/controls.hpp>
-#include <libv/ctrl/feature_register.hpp>
-#include <libv/glr/procedural/sphere.hpp>
-#include <libv/glr/program.hpp>
 #include <libv/glr/queue.hpp>
-#include <libv/math/noise/white.hpp>
-//#include <libv/glr/texture.hpp>
 // std
 #include <cassert>
 // pro
-#include <space/camera.hpp>
-#include <space/cto.hpp>
-#include <space/game_instance.hpp>
 #include <space/game_session.hpp>
-#include <space/playout.hpp>
 #include <space/renderer.hpp>
 #include <space/universe/universe.hpp>
 
 
 namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+// TODO P2: Value tracking UI component for debugging
+//		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
+//		value_tracker(160);
+//		value_tracker.pause();
+//		value_tracker.resume();
+//		value_tracker("camera.orbit_point", camera.orbit_point());
+//		value_tracker("camera.orbit_distance", camera.orbit_distance());
+//		value_tracker("camera.rotations", camera.rotations());
+//		value_tracker.differential("camera.orbit_point", camera.orbit_point());
+//		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
+//		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 
 // -------------------------------------------------------------------------------------------------
 
@@ -47,23 +50,19 @@ RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type)
 
 // -------------------------------------------------------------------------------------------------
 
-//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::SpaceSession& session, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
-//SpaceCanvas::SpaceCanvas(app::Universe& universe, app::PlayoutDelayBuffer& playout_delay_buffer, app::CameraPlayer& camera, bool main_canvas) :
-//SpaceCanvas::SpaceCanvas(GameInstance& game, app::CameraPlayer& camera, bool main_canvas) :
-SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, app::Universe& universe, Playout& playout, app::CameraPlayer& camera, bool main_canvas) :
+SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool main_canvas) :
 		main_canvas(main_canvas),
 		game_session(game_session),
-//		universe(game.game_session->universe),
-		universe(universe),
-//		session(session),
-		playout(playout),
-//		playout_delay_buffer(playout_delay_buffer),
-//		playout_delay_buffer(game.game_session->playout.buffer),
-		camera(camera),
+		universe(game_session.universe),
+		playout(game_session.playout),
+//		camera(camera),
 		screen_picker(camera.picker({100, 100})),
 		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
 		//			Component shall not receive any event before onLayout gets called
 		renderer(renderer) {
+
+	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
+//	screen_picker = camera.picker(?, ?); // <<< ?
 }
 
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {
@@ -71,18 +70,6 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 	angle = std::fmod(angle + 5.0f * dtf, 360.0f);
 	time += dtf;
 	global_time += dtf;
-
-	// TODO P2: Value tracking UI component for debugging
-//		libv::ui::value_tracker tracker(600 /*sample*/, 0.15, 0.85);
-//		value_tracker(160);
-//		value_tracker.pause();
-//		value_tracker.resume();
-//		value_tracker("camera.orbit_point", camera.orbit_point());
-//		value_tracker("camera.orbit_distance", camera.orbit_distance());
-//		value_tracker("camera.rotations", camera.rotations());
-//		value_tracker.differential("camera.orbit_point", camera.orbit_point());
-//		value_tracker.differential_focused("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
-//		value_tracker.differential_focused_timed("camera.orbit_point", camera.orbit_point(), 0.15, 0.85);
 
 	if (global_test_mode != 0) {
 		test_sin_time += dtf;
@@ -108,7 +95,8 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 void SpaceCanvas::render(libv::glr::Queue& gl) {
 	renderer.prepare_for_render(gl);
 
-	// NOTE: Screen_picker update has to be placed around render, as canvas_size is only set after layout
+	// NOTE: screen_picker update has to be placed around render, as canvas_size is only set after layout
+	// TODO P1: Move screen_picker update into a layout post hook so mouse event use the update value
 	screen_picker = camera.picker(canvas_size);
 	//
 

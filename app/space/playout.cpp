@@ -2,19 +2,20 @@
 
 // hpp
 #include <space/playout.hpp>
-// pro
-//#include <space/cto.hpp>
-//#include <space/log.hpp>
-//#include <space/network/lobby.hpp>
-//#include <space/universe/ids.hpp>
-//#include <space/universe/universe.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
+void Playout::update(Universe& universe) {
+	auto lock = std::unique_lock(mutex);
 
+	for (auto& entry : stateChangeEntries)
+		entry.apply_func(universe, entry.command.get());
+
+	stateChangeEntries.clear();
+}
 
 // -------------------------------------------------------------------------------------------------
 

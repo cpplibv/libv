@@ -13,10 +13,11 @@
 #include <optional>
 #include <string>
 // pro
-#include <space/player.hpp>
+#include <space/game_thread.hpp>
 #include <space/renderer.hpp>
+#include <space/user.hpp>
 #include <space/view/frame.hpp>
-#include <space/view/scene_main_ui.hpp>
+#include <space/view/scene_main.hpp>
 
 
 namespace app {
@@ -34,18 +35,20 @@ public:
 
 	Renderer renderer{ui};
 
-	Player player;
+	GameThread game_thread{ui, nexus};
+
+	User user;
 
 private:
-public:
-	SceneMainUI main_ui_stage{ui, nexus, player};
-
-private:
-	std::shared_ptr<GameSession> game_session;
+	SceneMain scene_main{ui, renderer, game_thread, nexus, controls, user};
 
 public:
 	GameInstance();
 	~GameInstance();
+
+private:
+	void register_nexus();
+	void unregister_nexus();
 
 public:
 	void execute();
@@ -53,14 +56,10 @@ public:
 //		game_session->update();
 //	}
 
-private:
-	void register_nexus();
-	void unregister_nexus();
-
 public:
-	void enter_single_player();
-	void enter_multi_player_client(std::string server_address, uint16_t server_port);
-	void enter_multi_player_server(uint16_t port);
+	void enterSinglePlayer();
+	void enterMultiPlayerClient(std::string server_address, uint16_t server_port);
+	void enterMultiPlayerServer(uint16_t port);
 };
 
 // ---

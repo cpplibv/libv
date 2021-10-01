@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/player.hpp
+// Project: libv, File: app/space/user.hpp
 
 #pragma once
 
@@ -15,8 +15,8 @@ std::string generate_random_name(size_t length);
 
 // -------------------------------------------------------------------------------------------------
 
-struct Player {
-	std::string name = generate_random_name(4);
+struct User {
+	std::string name = generate_random_name(5);
 };
 
 // -------------------------------------------------------------------------------------------------

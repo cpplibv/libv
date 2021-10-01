@@ -869,11 +869,7 @@ void BaseConnectionAsyncHE::send_view_async(message_body_bin_view message) noexc
 	internals->send_async(std::move(message));
 }
 void BaseConnectionAsyncHE::send_view_async(message_body_str_view message_str) noexcept {
-	const auto message = std::span<const std::byte>(
-			reinterpret_cast<const std::byte*>(message_str.data()),
-			reinterpret_cast<const std::byte*>(message_str.data() + message_str.size())
-	);
-	internals->send_async(std::move(message));
+	internals->send_async(std::as_bytes(std::span(message_str)));
 }
 
 // -------------------------------------------------------------------------------------------------

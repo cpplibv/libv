@@ -8,9 +8,14 @@
 #include <libv/math/vec.hpp>
 #include <libv/math/vec_serial.hpp>
 #include <libv/meta/reflection_access.hpp>
+#include <libv/serial/codec_message_id.hpp>
 #include <libv/serial/enable.hpp>
+#include <libv/serial/reflection.hpp>
+#include <libv/serial/types/std_chrono.hpp>
 #include <libv/serial/types/std_string.hpp>
+#include <libv/serial/types/std_vector.hpp>
 // std
+#include <chrono>
 #include <cstdint>
 #include <string>
 // pro
@@ -21,61 +26,123 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-// CTO - Command Transfer Object
+/// CTO - Command Transfer Object
+///
+/// Main group of CTO messages:
+/// 	Lobby: Lobby messages relate to the network lobby state replication to clients. All info comes from the host
+///				Delay acceptable
+/// 	State:
+///				Delay not acceptable, always highest priority messages
+/// 	Tracking: WIP: Camera position, Selections and other view related tracking information
+///				Delay acceptable
 
 // -------------------------------------------------------------------------------------------------
 
-struct CTOType {
+struct CTO_Introduction {
+//	using lobby_command = void;
+	static constexpr libv::serial::CodecMessageID id{0xA0};
 
-};
+	//	UserID userID;
+	std::string user_name;
+	uint64_t version;
 
-struct CTOType_Lobby : CTOType {
-	static constexpr bool is_session_command = true;
-	static constexpr bool is_state_command = false;
-	static constexpr bool is_track_command = false;
-};
-
-struct CTOType_State : CTOType {
-	static constexpr bool is_session_command = false;
-	static constexpr bool is_state_command = true;
-	static constexpr bool is_track_command = false;
-};
-
-struct CTOType_Track : CTOType {
-	static constexpr bool is_session_command = false;
-	static constexpr bool is_state_command = false;
-	static constexpr bool is_track_command = true;
+	LIBV_REFLECTION_ACCESS(user_name);
+	LIBV_REFLECTION_ACCESS(version);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
 // -------------------------------------------------------------------------------------------------
 
-//struct CTO_PlayerKick {
-//	using type = CTOType_Lobby;
+struct CTO_ClientJoined {
+	using lobby_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x10};
+
+	UserID userID;
+	std::string user_name;
+	std::chrono::system_clock::time_point joined_at;
+//	Timestamp joined_at;
+	uint64_t version;
+
+	LIBV_REFLECTION_ACCESS(userID);
+	LIBV_REFLECTION_ACCESS(user_name);
+	LIBV_REFLECTION_ACCESS(joined_at);
+	LIBV_REFLECTION_ACCESS(version);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_ClientLeave {
+	using lobby_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x11};
+
+	UserID userID;
+	//	Timestamp timestamp;
+
+	LIBV_REFLECTION_ACCESS(userID);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+//struct CTO_ClientKick {
+//	using lobby_command = void;
+//	static constexpr libv::serial::CodecMessageID id{0x11};
 //
-//	PlayerID playerID;
+//	UserID userID;
+//
+//	LIBV_REFLECTION_ACCESS(userID);
+//	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 //};
 
 struct CTO_ChatMessage {
-	using type = CTOType_Lobby;
+	using lobby_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x12};
 
-//	PlayerID playerID;
-	//	Timestamp timestamp;
-	std::string sender;
+	UserID userID;
+	std::chrono::system_clock::time_point sent_at;
+	//	Timestamp sent_at;
 	std::string message;
 //	libv::serial::limit<std::string, 64 * 1024> message;
 
-	LIBV_REFLECTION_ACCESS(sender);
+	LIBV_REFLECTION_ACCESS(userID);
+	LIBV_REFLECTION_ACCESS(sent_at);
 	LIBV_REFLECTION_ACCESS(message);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe, Lobby& lobby);
 };
+
+struct CTO_LobbyStatus {
+	using lobby_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x13};
+
+	struct Entry {
+		UserID userID;
+		float ping;
+//		float jitter;
+//		float packet_loss;
+
+		LIBV_REFLECTION_ACCESS(userID);
+		LIBV_REFLECTION_ACCESS(ping);
+//		LIBV_REFLECTION_ACCESS(jitter);
+//		LIBV_REFLECTION_ACCESS(packet_loss);
+		LIBV_SERIALIZATION_ENABLE_REFLECTION();
+	};
+
+	std::vector<Entry> pings;
+
+	LIBV_REFLECTION_ACCESS(pings);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+//struct CTO_LobbyClose {
+//	using lobby_command = void;
+//	static constexpr libv::serial::CodecMessageID id{0x14};
+//
+//	LIBV_REFLECTION_EMPTY();
+//	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+//};
 
 // -------------------------------------------------------------------------------------------------
 
 struct CTO_FleetSpawn {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x20};
 
 //	FactionID factionID;
 //	FleetID fleetID;
@@ -85,11 +152,12 @@ struct CTO_FleetSpawn {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_FleetSelect {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x21};
 
 	FleetID fleetID;
 
@@ -97,11 +165,12 @@ struct CTO_FleetSelect {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_FleetSelectAdd {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x22};
 
 	FleetID fleetID;
 
@@ -109,11 +178,12 @@ struct CTO_FleetSelectAdd {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_FleetMove {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x23};
 
 	libv::vec3f target_position;
 
@@ -121,11 +191,12 @@ struct CTO_FleetMove {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_FleetQueueMove {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x24};
 
 	libv::vec3f target_position;
 
@@ -133,21 +204,23 @@ struct CTO_FleetQueueMove {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_ClearFleets {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x25};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 struct CTO_Shuffle {
-	using type = CTOType_State;
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x26};
 
 	uint64_t seed;
 
@@ -155,20 +228,21 @@ struct CTO_Shuffle {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
-	void apply(Universe& universe, Lobby& lobby);
+	void apply(Universe& universe);
 };
 
 // -------------------------------------------------------------------------------------------------
 
 struct CTO_TrackView {
-	using type = CTOType_Track;
+	using track_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x30};
 
-	PlayerID playerID;
+	UserID userID;
 	libv::vec3f eye;
 	libv::vec3f target;
 	libv::vec3f mouse_direction;
 
-	LIBV_REFLECTION_ACCESS(playerID);
+	LIBV_REFLECTION_ACCESS(userID);
 	LIBV_REFLECTION_ACCESS(eye);
 	LIBV_REFLECTION_ACCESS(target);
 	LIBV_REFLECTION_ACCESS(mouse_direction);
@@ -179,12 +253,13 @@ public:
 };
 
 struct CTO_CameraWarpTo {
-	using type = CTOType_Track;
+	using track_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x31};
 
-	PlayerID playerID;
+	UserID userID;
 	libv::vec3f target_position;
 
-	LIBV_REFLECTION_ACCESS(playerID);
+	LIBV_REFLECTION_ACCESS(userID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
@@ -193,18 +268,20 @@ public:
 };
 
 //struct CTO_CameraMovement : CommandTrack {
-//	using type = CTOType_Track;
+//	using track_command = void;
+//	static constexpr libv::serial::CodecMessageID id{0x32};
 //
-//	PlayerID playerID;
+//	UserID userID;
 //	libv::vec3f eye;
 //	libv::vec3f target;
 //	libv::vec3f mouse_direction;
 //};
 //
 //struct CTO_MouseMovement : CommandTrack {
-//	using type = CTOType_Track;
+//	using track_command = void;
+//	static constexpr libv::serial::CodecMessageID id{0x33};
 //
-//	PlayerID playerID;
+//	UserID userID;
 //	libv::vec3f mouse_position;
 //	libv::vec3f mouse_direction;
 //};

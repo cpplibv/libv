@@ -167,3 +167,32 @@ ui.style("space.hud-bar.mp-cam.panel") {
 	spacing = 5,
 	margin = 5,
 }
+
+
+
+
+
+ui.style("space.hud-bar.lobby.panel") {
+	align_horizontal = "left",
+	align_vertical = "center",
+	anchor = "center_left",
+	background = colors.hud_light_bg_color, -- TODO P3: Panels have no background, implement it
+	margin = 5,
+	orientation = "down",
+	size = "D, D",
+	spacing = 5,
+}
+
+ui.style("space.hud-bar.lobby.name") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	background = colors.hud_light_bg_color,
+	size = "10pxD, 4pxD",
+}
+
+ui.style("space.hud-bar.lobby.title") {
+	align_horizontal = "center",
+	align_vertical = "center",
+	font_color = colors.text_light,
+	size = "10pxD, 4pxD",
+}

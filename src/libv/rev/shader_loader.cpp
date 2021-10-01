@@ -3,7 +3,7 @@
 // hpp
 #include <libv/rev/shader_loader.hpp>
 // libv
-#include <libv/algo/erase_if_stable.hpp>
+#include <libv/algo/erase_stable.hpp>
 #include <libv/gl/gl.hpp>
 #include <libv/gl/program.hpp>
 // pro

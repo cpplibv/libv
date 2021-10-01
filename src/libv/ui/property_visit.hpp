@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property.hpp
+// Project: libv.ui, File: src/libv/ui/property_visit.hpp
 
 #pragma once
 

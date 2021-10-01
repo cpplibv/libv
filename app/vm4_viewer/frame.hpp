@@ -4,7 +4,6 @@
 
 // libv
 #include <libv/frame/frame.hpp>
-#include <libv/glr/remote.hpp>
 #include <libv/ui/ui.hpp>
 // std
 #include <memory>

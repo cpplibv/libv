@@ -21,7 +21,7 @@ private:
 	std::unique_ptr<ImplNetworkClient> self;
 
 public:
-	NetworkClient(std::string server_address, uint16_t server_port, std::string name, Playout& playout);
+	NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, User& user);
 	~NetworkClient();
 
 public:

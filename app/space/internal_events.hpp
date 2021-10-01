@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/message_control.hpp
+// Project: libv, File: app/space/internal_events.hpp
 
 #pragma once
 
@@ -45,7 +45,6 @@ struct RequestClearFleets {
 //		return "clear_fleets";
 //	}
 };
-//struct OnClearFleets {};
 
 // -------------------------------------------------------------------------------------------------
 

@@ -2,10 +2,8 @@
 
 // hpp
 #include <vm4_viewer/frame.hpp>
-// libv
-#include <libv/glr/queue.hpp>
 // pro
-#include <vm4_viewer/log.hpp>
+//#include <vm4_viewer/log.hpp>
 #include <vm4_viewer/viewer_ui.hpp>
 
 

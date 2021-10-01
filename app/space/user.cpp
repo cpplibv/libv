@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/player.cpp
+// Project: libv, File: app/space/user.cpp
 
 // hpp
-#include <space/player.hpp>
+#include <space/user.hpp>
 // libv
 #include <libv/utility/random/uniform_distribution.hpp>
 // std
@@ -18,7 +18,7 @@ std::string generate_random_name(uint64_t seed, size_t length) {
 			"0123456789"
 			"abcdefghijklmnopqrstuvwxyz"
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	static constexpr size_t charset_size = sizeof(charset);
+	static constexpr size_t charset_size = sizeof(charset) - 1;
 
 	auto rng = std::mt19937_64{seed};
 	auto dist = libv::make_uniform_distribution_exclusive(charset_size);
@@ -35,10 +35,6 @@ std::string generate_random_name(uint64_t seed, size_t length) {
 std::string generate_random_name(size_t length) {
 	return generate_random_name(std::random_device{}(), length);
 }
-
-// -------------------------------------------------------------------------------------------------
-
-// Player::
 
 // -------------------------------------------------------------------------------------------------
 

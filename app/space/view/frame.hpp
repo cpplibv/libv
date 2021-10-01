@@ -4,6 +4,7 @@
 
 // libv
 #include <libv/frame/frame.hpp>
+//#include <libv/frame/monitor.hpp>
 // pro
 #include <space/view/icon_set.hpp>
 //#include <space/log.hpp>
@@ -35,6 +36,17 @@ struct SpaceFrame : public libv::Frame {
 //				config.window_height = e.size.y;
 //			}
 //		});
+
+//		int frame_index = 0;
+//		int frame_total = 6;
+//		int num_row = 4; // TODO P5: math to keep good ratio based on total;
+//		getCurrentMonitor().workAreaPosition;
+//		const auto workAreaSize = workAreaSize;
+//		setPosition(...)
+//		setSize(...
+//				workAreaSize.x / num_row,
+//				workAreaSize.y / (frame_total / num_row
+//		);
 	}
 
 	~SpaceFrame() {

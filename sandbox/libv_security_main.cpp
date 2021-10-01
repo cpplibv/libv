@@ -7,7 +7,6 @@
 #include <libv/utility/hex_dump.hpp>
 // std
 #include <iostream>
-#include <string>
 
 
 // -------------------------------------------------------------------------------------------------
@@ -153,7 +152,6 @@ int main() {
 	std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
 	const auto signature = libv::security::rsa_sign_message(message_short_original, private_key_4096);
-
 	std::cout << "Signature (" << signature.size() << " byte):\n" << libv::hex_dump_with_ascii(signature) << std::endl;
 
 	const auto authentic0 = libv::security::rsa_verify_signature(message_short_original, public_key_4096, signature);

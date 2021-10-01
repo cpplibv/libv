@@ -5,38 +5,34 @@
 // fwd
 #include <space/fwd.hpp>
 // libv
-//#include <libv/ui/component/fwd.hpp>
-//#include <libv/ui/component/button.hpp>
-//#include <libv/ui/component/label.hpp>
-//#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/fwd.hpp>
+#include <libv/ui/component/panel_line.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
-//#include <memory>
-//#include <optional>
+#include <map>
 // pro
-//#include <space/canvas.hpp>
+#include <space/universe/ids.hpp>
 
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-struct SceneMPStatus {
+class SceneMPStatus {
+private:
+	libv::ui::PanelLine bar;
+	std::map<UserID, libv::ui::Component> entries;
+
 	libv::Nexus& nexus;
-	Lobby& lobby;
-//	Player& player;
-
-//private:
-//	libv::ui::Label lbl_state{"mp-state"};
-//	libv::ui::Button btn_host{"mp-host"};
-//	libv::ui::Button btn_join{"mp-join"};
-
-//	libv::ui::Component root;
 
 public:
-//	static libv::ui::Component create(libv::Nexus& nexus, Player& player);
-//	~SceneMPStatus();
-//	libv::ui::Component init(libv::ui::PanelLine& mp_bar);
+	static libv::ui::Component create(libv::Nexus& nexus);
+	explicit SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus& nexus);
+	~SceneMPStatus();
+
+private:
+	void register_nexus();
+	void unregister_nexus();
 };
 
 // -------------------------------------------------------------------------------------------------

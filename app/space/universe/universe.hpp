@@ -94,29 +94,9 @@ public:
 	}
 };
 
-//struct Map {
-//	FleetRender fleet_render;
-//	std::vector<Fleet> fleets;
-//
-//	void render_fleets(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
-//		for (const auto& fleet : fleets) {
-//			const auto m_guard = gl.model.push_guard();
-//			gl.model.translate(fleet.position);
-//			fleet_render.render(gl, uniform_stream);
-//		}
-//	}
-//
-//	void render_fleet_arrows(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
-//		for (const auto& fleet : fleets)
-//			fleet.command_arrow.render(gl, canvas_size, uniform_stream);
-//	}
-//};
-
 // -------------------------------------------------------------------------------------------------
 
 struct Universe {
-//	app::CameraPlayer& camera;
-//
 //	float angle = 0.0f;
 //	float time = 0.0f;
 //	float test_sin_time = 0.0f;
@@ -127,8 +107,7 @@ struct Universe {
 	std::vector<Fleet> fleets;
 
 public:
-//	Universe(app::CameraPlayer& camera) :
-//		camera(camera) {
+//	Universe() {
 //	}
 
 	void update(libv::ui::time_duration delta_time) {

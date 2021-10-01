@@ -15,23 +15,6 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-//class NetworkControlMPServer {
-//	/// Sends message to everyone connect to the server
-//	void broadcast(std::string message);
-//};
-//
-//class NetworkControlMPClient {
-//	/// Sends message to the server to be broadcasted to everyone connected
-//	void broadcast(std::string message);
-//};
-//
-//class NetworkControlSP {
-//	/// Noop
-//	void broadcast(std::string message);
-//};
-//
-//// -------------------------------------------------------------------------------------------------
-//
 //namespace mn {
 //
 //struct ClientStatus {
@@ -60,15 +43,6 @@ namespace app {
 //
 //} // namespace mn
 
-//struct SomethingCodec {
-//
-//	template <typename T>
-//	void send(const T& message);
-//
-//	template <typename T>
-//	T receive();
-//};
-
 // -------------------------------------------------------------------------------------------------
 
 class ImplNetworkServer;
@@ -77,7 +51,7 @@ class NetworkServer {
 	std::unique_ptr<ImplNetworkServer> self;
 
 public:
-	NetworkServer(uint16_t server_port, Playout& playout);
+	NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, User& user);
 	~NetworkServer();
 
 public:

@@ -118,7 +118,7 @@ public:
 		data_view(bin_view) {}
 
 	explicit inline message_body_view(message_body_str_view str_view) noexcept :
-		data_view(reinterpret_cast<const std::byte*>(str_view.data()), str_view.size()) {}
+		data_view(std::as_bytes(std::span(str_view))) {}
 
 public:
 	[[nodiscard]] constexpr inline const std::byte* data() const noexcept {

@@ -53,7 +53,6 @@ public:
 
 	~ImplIOContext() {
 		work_guard.reset();
-		io_context.stop();
 		join();
 	}
 

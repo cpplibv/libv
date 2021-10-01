@@ -5,7 +5,6 @@
 // fwd
 #include <space/fwd.hpp>
 // libv
-//#include <libv/ctrl/fwd.hpp>
 #include <libv/ui/component/canvas.hpp>
 // pro
 #include <space/camera.hpp>
@@ -21,7 +20,9 @@ public:
 	GameSession& game_session;
 	Universe& universe;
 	Playout& playout;
-	CameraPlayer& camera;
+
+//	CameraPlayer& camera;
+	CameraPlayer camera;
 	CameraPlayer::screen_picker screen_picker;
 
 	float angle = 0.0f;
@@ -31,7 +32,7 @@ public:
 	Renderer& renderer;
 
 public:
-	SpaceCanvas(Renderer& renderer, GameSession& game_session, Universe& universe, Playout& playout, CameraPlayer& camera, bool main_canvas);
+	SpaceCanvas(Renderer& renderer, GameSession& game_session, bool main_canvas);
 
 	virtual void update(libv::ui::time_duration delta_time) override;
 	virtual void render(libv::glr::Queue& gl) override;

@@ -7,7 +7,6 @@
 // std
 #include <atomic>
 #include <cassert>
-#include <concepts>
 #include <memory>
 #include <system_error>
 // pro

@@ -152,7 +152,7 @@ void CameraDeveloper::update(duration delta_time) {
 }
 
 void CameraDeveloper::warp_to(vec3 target) {
-	// instant
+	orbit_point(target);
 }
 
 // -------------------------------------------------------------------------------------------------
