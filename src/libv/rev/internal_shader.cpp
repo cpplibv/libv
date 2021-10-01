@@ -3,11 +3,11 @@
 // fwd
 #include <libv/rev/fwd.hpp>
 // hpp
-#include <libv/rev/internal_shader.lpp>
+#include <libv/rev/internal_shader.hxx>
 // libv
 #include <libv/algo/slice.hpp>
 // pro
-#include <libv/rev/internal_shader_loader.lpp>
+#include <libv/rev/internal_shader_loader.hxx>
 
 
 namespace libv {

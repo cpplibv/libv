@@ -2,7 +2,7 @@
 
 // hpp
 #include <libv/fsw/watcher.hpp>
-#include <libv/fsw/watcher.lpp>
+#include <libv/fsw/watcher.hxx>
 // ext
 #include <efsw/efsw.hpp>
 // libv

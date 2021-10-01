@@ -6,7 +6,7 @@
 #include <cassert>
 // pro
 #include <libv/ctrl/binding.hpp>
-#include <libv/ctrl/controls_impl.lpp>
+#include <libv/ctrl/controls_impl.hxx>
 #include <libv/ctrl/feature.hpp>
 #include <libv/ctrl/search_mode.hpp>
 

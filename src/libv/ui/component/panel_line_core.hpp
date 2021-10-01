@@ -4,7 +4,7 @@
 #include <libv/ui/component/panel_line.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/base_panel.lpp>
+#include <libv/ui/component/base_panel.hpp>
 
 
 namespace libv {

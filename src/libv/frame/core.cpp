@@ -1,7 +1,7 @@
 // Project: libv.frame, File: src/libv/frame/core.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/frame/core.lpp>
+#include <libv/frame/core.hxx>
 // ext
 #include <GLFW/glfw3.h>
 // libv
@@ -13,7 +13,7 @@
 #include <mutex>
 // pro
 #include <libv/frame/frame.hpp>
-#include <libv/frame/impl_frame.lpp>
+#include <libv/frame/impl_frame.hxx>
 #include <libv/frame/log.hpp>
 #include <libv/frame/monitor.hpp>
 

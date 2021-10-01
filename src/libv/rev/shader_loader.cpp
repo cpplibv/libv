@@ -8,8 +8,8 @@
 #include <libv/gl/program.hpp>
 // pro
 #include <libv/rev/glsl_compose.hpp>
-#include <libv/rev/internal_shader.lpp>
-#include <libv/rev/internal_shader_loader.lpp>
+#include <libv/rev/internal_shader.hxx>
+#include <libv/rev/internal_shader_loader.hxx>
 #include <libv/rev/log.hpp>
 
 

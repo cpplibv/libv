@@ -1,14 +1,14 @@
 // Project: libv.update, File: src/libv/update/resource_server/resource_server_state.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/resource_server/resource_server_state.lpp>
+#include <libv/update/resource_server/resource_server_state.hxx>
 // libv
 //#include <libv/mt/worker_thread_pool.hpp>
 #include <libv/algo/linear_find.hpp>
 // pro
 //#include <libv/update/log.hpp>
-//#include <libv/update/resource_server/resource_file.lpp>
-//#include <libv/update/resource_server/resource_peer.lpp>
+//#include <libv/update/resource_server/resource_file.hxx>
+//#include <libv/update/resource_server/resource_peer.hxx>
 
 
 namespace libv {

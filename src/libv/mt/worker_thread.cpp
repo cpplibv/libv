@@ -5,7 +5,7 @@
 // std
 #include <thread>
 // pro
-#include <libv/mt/basic_worker_thread.lpp>
+#include <libv/mt/basic_worker_thread.hxx>
 
 
 namespace libv {

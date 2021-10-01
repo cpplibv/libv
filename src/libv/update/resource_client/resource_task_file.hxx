@@ -5,8 +5,8 @@
 // std
 #include <filesystem>
 // pro
-#include <libv/update/resource_client/resource_task.lpp>
-#include <libv/update/resource_client/resource_file.lpp>
+#include <libv/update/resource_client/resource_task.hxx>
+#include <libv/update/resource_client/resource_file.hxx>
 
 
 namespace libv {

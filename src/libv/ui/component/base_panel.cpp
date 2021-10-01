@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/component/base_panel.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/component/base_panel.lpp>
+#include <libv/ui/component/base_panel.hpp>
 // libv
 #include <libv/algo/erase_if_stable.hpp>
 // pro

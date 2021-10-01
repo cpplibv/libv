@@ -34,7 +34,7 @@
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/log.hpp>
-#include <libv/ui/overlay_zoom.lpp>
+#include <libv/ui/overlay_zoom.hxx>
 #include <libv/ui/ui_lua.hpp>
 
 

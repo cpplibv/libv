@@ -8,10 +8,10 @@
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
-#include <libv/ui/component/base_panel.lpp>
+#include <libv/ui/component/base_panel.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
-#include <libv/ui/layout/view_layouted.lpp>
+#include <libv/ui/layout/view_layouted.hxx>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
 

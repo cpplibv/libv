@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/overlay_zoom.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/overlay_zoom.lpp>
+#include <libv/ui/overlay_zoom.hxx>
 // libv
 #include <libv/glr/attribute.hpp>
 #include <libv/glr/framebuffer.hpp>

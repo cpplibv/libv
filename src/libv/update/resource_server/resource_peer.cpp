@@ -1,10 +1,10 @@
 // Project: libv.update, File: src/libv/update/resource_server/resource_peer.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/update/resource_server/resource_peer.lpp>
+#include <libv/update/resource_server/resource_peer.hxx>
 // pro
-#include <libv/update/resource_server/resource_file.lpp>
-#include <libv/update/resource_server/resource_server_state.lpp>
+#include <libv/update/resource_server/resource_file.hxx>
+#include <libv/update/resource_server/resource_server_state.hxx>
 
 
 namespace libv {

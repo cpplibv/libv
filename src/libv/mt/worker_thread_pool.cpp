@@ -3,7 +3,7 @@
 // hpp
 #include <libv/mt/worker_thread_pool.hpp>
 // pro
-#include <libv/mt/basic_worker_thread.lpp>
+#include <libv/mt/basic_worker_thread.hxx>
 #include <libv/mt/thread_group.hpp>
 
 

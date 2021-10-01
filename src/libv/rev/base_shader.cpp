@@ -3,8 +3,8 @@
 // hpp
 #include <libv/rev/shader.hpp>
 // pro
-#include <libv/rev/internal_shader.lpp>
-#include <libv/rev/internal_shader_loader.lpp>
+#include <libv/rev/internal_shader.hxx>
+#include <libv/rev/internal_shader_loader.hxx>
 #include <libv/rev/shader_loader.hpp>
 
 

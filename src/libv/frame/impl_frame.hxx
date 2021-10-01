@@ -13,7 +13,7 @@
 // std
 #include <mutex>
 // pro
-#include <libv/frame/core.lpp>
+#include <libv/frame/core.hxx>
 #include <libv/frame/events.hpp>
 #include <libv/frame/events_variant.hpp>
 #include <libv/frame/icon.hpp>
