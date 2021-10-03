@@ -6,8 +6,11 @@
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/angle.hpp>
+// std
+#include <cmath>
 // pro
 #include <space/camera.hpp>
+#include <space/log.hpp>
 
 
 namespace app {
@@ -90,6 +93,30 @@ void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		ctx.orbit_distance(std::clamp(value, ctx.near() * 2.0f, ctx.far() * 0.5f));
 	});
+
+
+	controls.feature_action<BaseCameraOrbit>("camera.snap_angle", [](const auto&, BaseCameraOrbit& camera) {
+		const auto snap_angle = 8.f / libv::tau; // 8 snapping point per circles = 45°
+
+		camera.roll(std::round(camera.roll() * snap_angle) / snap_angle);
+		camera.pitch(std::round(camera.pitch() * snap_angle) / snap_angle);
+		camera.yaw(std::round(camera.yaw() * snap_angle) / snap_angle);
+	});
+
+	controls.feature_action<BaseCameraOrbit>("camera.snap_position", [](const auto&, BaseCameraOrbit& camera) {
+		const auto snap_position = 1.f;
+
+		camera.orbit_point(libv::vec::round(camera.orbit_point() * snap_position) / snap_position);
+		camera.orbit_distance(std::round(camera.orbit_distance() * snap_position) / snap_position);
+	});
+
+	controls.feature_action<BaseCameraOrbit>("camera.debug", [](const auto&, BaseCameraOrbit& camera) {
+		log_space.info("Camera:"
+					   "\n\tEye     {}"
+					   "\n\tForward {}"
+					   "\n\tRight   {}"
+					   "\n\tUp      {}", camera.eye(), camera.forward(), camera.right(), camera.up());
+	});
 }
 
 void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
@@ -123,6 +150,14 @@ void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.move_up", "Y");
 	controls.bind("camera.move_up", "H", -1);
 	controls.bind("camera.move_up", "MMB + Mouse Y");
+
+	// Debug / dev tools:
+	controls.bind("camera.debug", "Shift + Ctrl + P");
+	controls.bind("camera.snap_position", "Shift + Ctrl + O");
+	controls.bind("camera.snap_angle", "Shift + Ctrl + I");
+
+	controls.bind("camera.snap_angle", "Shift + Ctrl + U");
+	controls.bind("camera.snap_position", "Shift + Ctrl + U");
 }
 
 // -------------------------------------------------------------------------------------------------

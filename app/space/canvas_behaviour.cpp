@@ -106,14 +106,6 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply
 	});
-
-	controls.feature_action<app::SpaceCanvas>("space.dev0", [](const auto&, app::SpaceCanvas& ctx) {
-		log_space.info("Camera:"
-			   "\n\tEye     {}"
-			   "\n\tForward {}"
-			   "\n\tRight   {}"
-			   "\n\tUp      {}", ctx.camera.eye(), ctx.camera.forward(), ctx.camera.right(), ctx.camera.up());
-	});
 }
 
 void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
@@ -125,8 +117,6 @@ void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
 	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");
-
-	controls.bind("space.dev0", "KP0");
 }
 
 // -------------------------------------------------------------------------------------------------
