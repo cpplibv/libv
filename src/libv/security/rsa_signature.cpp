@@ -3,43 +3,15 @@
 // hpp
 #include <libv/security/rsa_signature.hpp>
 // ext
-#include <openssl/pem.h>
 #include <openssl/rsa.h>
+// pro
+#include <libv/security/rsa.hxx>
 
 
 namespace libv {
 namespace security {
-namespace {
 
 // -------------------------------------------------------------------------------------------------
-
-RSA* createPrivateRSA(const std::string_view key) {
-	BIO* keybio = BIO_new_mem_buf(static_cast<const void*>(key.data()), static_cast<int>(key.size()));
-
-	if (keybio == nullptr)
-		return nullptr;
-
-	RSA* rsa = nullptr;
-	rsa = PEM_read_bio_RSAPrivateKey(keybio, &rsa, nullptr, nullptr);
-
-	BIO_free(keybio);
-	return rsa;
-}
-
-RSA* createPublicRSA(const std::string_view key) {
-	BIO* keybio = BIO_new_mem_buf(static_cast<const void*>(key.data()), static_cast<int>(key.size()));
-
-	if (keybio == nullptr)
-		return nullptr;
-
-	RSA* rsa = nullptr;
-	rsa = PEM_read_bio_RSA_PUBKEY(keybio, &rsa, nullptr, nullptr);
-
-	BIO_free(keybio);
-	return rsa;
-}
-
-} // namespace -------------------------------------------------------------------------------------
 
 std::string rsa_sign_message(std::string_view message, std::string_view private_key) {
 	std::string signature;

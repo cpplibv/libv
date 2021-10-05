@@ -1,6 +1,8 @@
 // Project: libv.security, File: sandbox/libv_security_main.cpp, Author: Császár Mátyás [Vader]
 
 // libv
+#include <libv/security/hash_sha256.hpp>
+#include <libv/security/rsa_encrypt.hpp>
 #include <libv/security/rsa_signature.hpp>
 #include <libv/utility/hex_dump.hpp>
 // std
@@ -11,7 +13,7 @@
 // -------------------------------------------------------------------------------------------------
 
 // This is an unsecure (exposed in a public repo) 2048 key pair and used only for development/testing
-std::string private_key_2048 = R"(-----BEGIN RSA PRIVATE KEY-----
+const std::string_view private_key_2048 = R"(-----BEGIN RSA PRIVATE KEY-----
 MIIEpQIBAAKCAQEApI+E+YKZZP2Tq5puLUYaCXcC/Axwdn0dNloJVqEKkIdh/GAV
 6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNRa42qZMa25W1FNMB3rzGJu9/gktwO
 Sse8jNwQWPLf9J90EpDSBKoLuqZR9M0tEUQFfQKENaey+vYjTQn6Qf6mID5CiJxX
@@ -40,7 +42,7 @@ NT2SR86+yteOyq6t76h7fnTbnc+jHzsv4ufxDWBTKv4NZw0Esw/7zEk=
 -----END RSA PRIVATE KEY-----)";
 
 // This is an unsecure (exposed in a public repo) 2048 key pair and used only for development/testing
-std::string public_key_2048 = R"(-----BEGIN PUBLIC KEY-----
+const std::string_view public_key_2048 = R"(-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApI+E+YKZZP2Tq5puLUYa
 CXcC/Axwdn0dNloJVqEKkIdh/GAV6OvOk644nOCWigcODbPrDUoIesWVJi0HSNNR
 a42qZMa25W1FNMB3rzGJu9/gktwOSse8jNwQWPLf9J90EpDSBKoLuqZR9M0tEUQF
@@ -51,7 +53,7 @@ qwIDAQAB
 -----END PUBLIC KEY-----)";
 
 // This is an unsecure (exposed in a public repo) 4096 key pair and used only for development/testing
-std::string private_key_4096 = R"(-----BEGIN RSA PRIVATE KEY-----
+const std::string_view private_key_4096 = R"(-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAxNuKgIjZVsbZxflW0T6zGFye8zNuNSlBSTvBlTwT8JOp6qb3
 L8h2mML5Ju3fnjsGs99SCtSdSvIGYqitegCgH0pT5j3Uu4lUWLp+mLFoFCg+PIvQ
 AgQdC0zB3gaqHrmb8LeT4sVwnWtlzmKxw8lsjxvJs0oTun5zf8c+wWvLCK4gfkOJ
@@ -104,7 +106,7 @@ HOak2h8QkKjkOfTSpC4vACKy0fIiAaCqB5lNmspwgOO7nfCMvPaBfPtmOx8=
 -----END RSA PRIVATE KEY-----)";
 
 // This is an unsecure (exposed in a public repo) 4096 key pair and used only for development/testing
-std::string public_key_4096 = R"(-----BEGIN PUBLIC KEY-----
+const std::string_view public_key_4096 = R"(-----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxNuKgIjZVsbZxflW0T6z
 GFye8zNuNSlBSTvBlTwT8JOp6qb3L8h2mML5Ju3fnjsGs99SCtSdSvIGYqitegCg
 H0pT5j3Uu4lUWLp+mLFoFCg+PIvQAgQdC0zB3gaqHrmb8LeT4sVwnWtlzmKxw8ls
@@ -119,11 +121,26 @@ jSgA5drNbeOHvSXkkImPvteCaD3TX6MuR7U6+5gqFLxxuauOH3u3B+zZb2hqUG/8
 CEzZByI7LZzSdU13nm4oDa0CAwEAAQ==
 -----END PUBLIC KEY-----)";
 
-int main() {
-	const auto message_original = "My secret message.\n";
-//	const auto message_received = "Dirty message.\n";
-	const auto message_received = message_original;
+const std::string_view message_short_original = "My secret message.\n";
+const std::string_view message_short_received = "Dirty message.\n";
 
+const std::string_view message_long_original = R"(
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+- Do you know what it means when something chases you very slowly? - What? - It means there's a reason that they don't have to run.
+)";
+
+int main() {
 //	// -------------------------------------------------------------------------------------------------
 //	const auto message_received2 = "My secret message. Dirty\n";
 //	for (int i = 0; i < 100000000; ++i) {
@@ -132,15 +149,38 @@ int main() {
 //		if (i % 1000 == 0)
 //			std::cout << i << " " << authentic << std::endl;
 //	}
-//	// -------------------------------------------------------------------------------------------------
 
-	const auto signature = libv::security::rsa_sign_message(message_original, private_key_4096);
+	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+	const auto signature = libv::security::rsa_sign_message(message_short_original, private_key_4096);
 
 	std::cout << "Signature (" << signature.size() << " byte):\n" << libv::hex_dump_with_ascii(signature) << std::endl;
 
-	const auto authentic = libv::security::rsa_verify_signature(message_received, public_key_4096, signature);
+	const auto authentic0 = libv::security::rsa_verify_signature(message_short_original, public_key_4096, signature);
+	const auto authentic1 = libv::security::rsa_verify_signature(message_short_received, public_key_4096, signature);
+	std::cout << (authentic0 ? "Authentic" : "Not Authentic") << std::endl;
+	std::cout << (authentic1 ? "Authentic" : "Not Authentic") << std::endl;
 
-	std::cout << (authentic ? "Authentic" : "Not Authentic") << std::endl;
+	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+	const auto sha256 = libv::security::hash_sha256(message_short_original);
+	std::cout << "SHA256 (" << std::size(sha256.value) << " byte):\n" << libv::hex_dump(sha256.value) << std::endl;
+
+	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+	std::cout << "Original (" << message_long_original.size() << " byte):\n" << message_long_original << std::endl;
+	const auto encrypted0 = libv::security::rsa_encrypt_message(message_long_original, public_key_2048);
+	std::cout << "Encrypted (" << encrypted0.size() << " byte):\n" << libv::hex_dump(encrypted0) << std::endl;
+	const auto decrypted0 = libv::security::rsa_decrypt_message(encrypted0, private_key_2048);
+	std::cout << "Decrypted (" << decrypted0.size() << " byte):\n" << decrypted0 << std::endl;
+
+	std::cout << "-----------------------------------------------------------------------------" << std::endl;
+
+//	std::cout << "Original (" << message_long_original.size() << " byte):\n" << message_long_original << std::endl;
+//	const auto encrypted1 = libv::security::rsa_encrypt_message(message_long_original, public_key_2048);
+//	std::cout << "Encrypted (" << encrypted1.size() << " byte):\n" << libv::hex_dump(encrypted1) << std::endl;
+//	const auto decrypted1 = libv::security::rsa_decrypt_message(encrypted1, private_key_2048);
+//	std::cout << "Decrypted (" << decrypted1.size() << " byte):\n" << decrypted1 << std::endl;
 
 	return EXIT_SUCCESS;
 }
