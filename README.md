@@ -1,14 +1,14 @@
 # LIBV
 
-LIBV is a library collection that contains a lot of reusable code.  
+LIBV is a library collection that contains a lot of reusable code.
 
-Feature development is mostly on-demand, but most library were designed in a bottom-top manner.  
-Documentation is sparse, but for most cases the strict conventions and code quality should be sufficiently high enough to be self documenting.  
+Feature development is mostly on-demand, but most library were designed in a bottom-top manner.
+Documentation is sparse, but for most cases the strict conventions and code quality should be sufficiently high enough to be self documenting.
 
 ## Libraries
 
 Most of the libraries in the collection are design complete and can be considered stable, but the collection
-prioritizes research and velocity over API stability.  
+prioritizes research and velocity over API stability.
 
 | Library   | Status / API | Description                                                                |
 |:----------|--------------|:---------------------------------------------------------------------------|
@@ -50,12 +50,12 @@ prioritizes research and velocity over API stability.
 
 ## Install
 
-The cmake script is not setup for proper installation of the library yet, only for development builds.  
+The cmake script is not setup for proper installation of the library yet, only for development builds.
 To create a proper packaging I am waiting on the C++ packaging and dependency management ecosystem to evolve,
 but even without fully adopting the whole library collection, I made it available and open source, so it might help out some.
 
-Building the libraries is possible with the usual CMake method except 
-during the first build the `ext` target has to be built to fetch the dependencies 
+Building the libraries is possible with the usual CMake method except
+during the first build the `ext` target has to be built to fetch the dependencies
 (This step is only required for the first time and when the dependencies change).
 
 ## License
