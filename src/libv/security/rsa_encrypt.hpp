@@ -12,8 +12,11 @@ namespace security {
 
 // -------------------------------------------------------------------------------------------------
 
-[[nodiscard]] std::string rsa_encrypt_message(std::string_view message, std::string_view public_key);
-[[nodiscard]] std::string rsa_decrypt_message(std::string_view encrypted, std::string_view private_key);
+[[nodiscard]] std::string rsa_encrypt_public(std::string_view message, std::string_view public_key);
+[[nodiscard]] std::string rsa_decrypt_private(std::string_view encrypted, std::string_view private_key);
+
+[[nodiscard]] std::string rsa_encrypt_private(std::string_view message, std::string_view private_key);
+[[nodiscard]] std::string rsa_decrypt_public(std::string_view encrypted, std::string_view public_key);
 
 // -------------------------------------------------------------------------------------------------
 

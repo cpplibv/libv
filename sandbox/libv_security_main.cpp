@@ -169,18 +169,18 @@ int main() {
 	std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
 	std::cout << "Original (" << message_long_original.size() << " byte):\n" << message_long_original << std::endl;
-	const auto encrypted0 = libv::security::rsa_encrypt_message(message_long_original, public_key_2048);
+	const auto encrypted0 = libv::security::rsa_encrypt_public(message_long_original, public_key_2048);
 	std::cout << "Encrypted (" << encrypted0.size() << " byte):\n" << libv::hex_dump(encrypted0) << std::endl;
-	const auto decrypted0 = libv::security::rsa_decrypt_message(encrypted0, private_key_2048);
+	const auto decrypted0 = libv::security::rsa_decrypt_private(encrypted0, private_key_2048);
 	std::cout << "Decrypted (" << decrypted0.size() << " byte):\n" << decrypted0 << std::endl;
 
 	std::cout << "-----------------------------------------------------------------------------" << std::endl;
 
-//	std::cout << "Original (" << message_long_original.size() << " byte):\n" << message_long_original << std::endl;
-//	const auto encrypted1 = libv::security::rsa_encrypt_message(message_long_original, public_key_2048);
-//	std::cout << "Encrypted (" << encrypted1.size() << " byte):\n" << libv::hex_dump(encrypted1) << std::endl;
-//	const auto decrypted1 = libv::security::rsa_decrypt_message(encrypted1, private_key_2048);
-//	std::cout << "Decrypted (" << decrypted1.size() << " byte):\n" << decrypted1 << std::endl;
+	std::cout << "Original (" << message_long_original.size() << " byte):\n" << message_long_original << std::endl;
+	const auto encrypted1 = libv::security::rsa_encrypt_private(message_long_original, private_key_2048);
+	std::cout << "Encrypted (" << encrypted1.size() << " byte):\n" << libv::hex_dump(encrypted1) << std::endl;
+	const auto decrypted1 = libv::security::rsa_decrypt_public(encrypted1, public_key_2048);
+	std::cout << "Decrypted (" << decrypted1.size() << " byte):\n" << decrypted1 << std::endl;
 
 	return EXIT_SUCCESS;
 }
