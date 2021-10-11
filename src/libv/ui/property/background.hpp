@@ -82,6 +82,8 @@ public:
 	[[nodiscard]] static Background border_padding_pattern(Color color_border, Color color_pattern, Padding inner_padding, Padding border_extent, Texture2D_view texture, ShaderImage_view shader);
 //	[[nodiscard]] static Background gradient_linear(std::vector<GradientPoint> points);
 //	[[nodiscard]] static Background gradient_linear(std::vector<GradientPoint> points, ShaderQuad_view shader);
+
+	[[nodiscard]] static Background nested(Background back, Background front);
 };
 
 // -------------------------------------------------------------------------------------------------

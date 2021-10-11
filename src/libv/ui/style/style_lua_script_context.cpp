@@ -628,6 +628,7 @@ StyleLuaScriptContext::StyleLuaScriptContext(UI& ui, OnErrorFn onError) :
 	// property_loaders.emplace(pnm::bar_color, conv_fn(libv::lua::convert_color));
 	// property_loaders.emplace(pnm::bar_image, conv_fn(convert_texture));
 	// property_loaders.emplace(pnm::bar_shader, _______);
+	property_loaders.emplace(pnm::border, convert_background);
 	// property_loaders.emplace(pnm::caret, _______);
 	property_loaders.emplace(pnm::caret_color, conv_fn(libv::lua::convert_color));
 	// property_loaders.emplace(pnm::caret_shader, _______);

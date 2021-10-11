@@ -603,6 +603,43 @@ private:
 //	}
 //};
 
+// -------------------------------------------------------------------------------------------------
+
+class BackgroundNested : public BaseBackground {
+private:
+	Background back;
+	Background front;
+
+public:
+	BackgroundNested(Background&& back, Background&& front) :
+		back(std::move(back)),
+		front(std::move(front)) {}
+
+private:
+	virtual void render(Renderer& r, libv::vec2f pos, libv::vec2f size, CoreComponent& component) override {
+		// TODO P1: Adjust pos and size based on front (passing in component might be missleading, might need another abstraction for "inner region" getter)
+//		front.render(r, pos, size, component);
+//		back.render(r, pos, size, component);
+	}
+
+	virtual std::string to_string() const override {
+//		return fmt::format("color: rgba({}, {}, {}, {})", color.x, color.y, color.z, color.w);
+		return "Not implemented yet"; // TODO P5: Implement to_string
+	}
+
+	virtual libv::vec2i size() const noexcept override {
+		return max(back.size(), front.size());
+	}
+
+	virtual bool equal_to(const BaseBackground& other_base) const noexcept override {
+		const auto& other = static_cast<const BackgroundNested&>(other_base);
+		return
+				back == other.back &&
+				front == other.front;
+	}
+};
+
+
 // =================================================================================================
 
 /// BackgroundNone has only a single instance that is shared for all defaults and the 'none' itself
@@ -680,6 +717,9 @@ void Background::render(class Renderer& r, libv::vec2f pos, libv::vec2f size, Co
 //
 //}
 
+[[nodiscard]] Background Background::nested(Background back, Background front) {
+	return Background{libv::make_intrusive<BackgroundNested>(std::move(back), std::move(front))};
+}
 
 // -------------------------------------------------------------------------------------------------
 

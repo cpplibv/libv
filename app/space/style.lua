@@ -125,20 +125,37 @@ ui.style("space.title-space") {
 	--background = {type = "border_padding_pattern", color_border = {1, 1, 1, 1}, color_pattern = {1, 1, 1, 1}, inner_padding = {4, -1}, border_extent = 3, texture = "stripes_border.png"},
 	--background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
 
-	background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+	border = {type = "color", color = {0.8, 0.8, 0.8, 0.8}, size = 2, padding = 3},
+	background = "none",
 
 	state("focus") {
-		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		background = {type = "pattern_hole", color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, texture = "stripes.png"},
 	},
 	state("active") {
-		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		background = {type = "pattern_hole", color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, texture = "stripes.png"},
 	},
 	state("hover") {
-		background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		background = {type = "pattern_hole", color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, texture = "stripes.png"},
 	},
 	state("hover, active") {
-		background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+		border = {type = "color", color = {1.0, 0.8, 0.8, 0.8}, size = 2, padding = 3},
+		background = {type = "pattern_hole", color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, texture = "stripes.png"},
 	},
+
+	--background = {type = "border", color = {0.8, 0.8, 0.8, 0.8}, texture = "light_border.png"},
+	--
+	--state("focus") {
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.4}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--},
+	--state("active") {
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--},
+	--state("hover") {
+	--	background = {type = "border_padding_pattern", color_border = {0.8, 0.8, 0.8, 0.8}, color_pattern = {0.8, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--},
+	--state("hover, active") {
+	--	background = {type = "border_padding_pattern", color_border = {1.0, 0.8, 0.8, 0.8}, color_pattern = {1.0, 0.8, 0.8, 0.6}, inner_padding = {4, -3}, border_extent = 3, texture = "stripes_border.png"},
+	--},
 
 	padding = {60, 8},
 	--padding = { 0, 7},

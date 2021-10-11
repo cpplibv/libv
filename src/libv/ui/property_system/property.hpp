@@ -29,6 +29,7 @@ static constexpr std::string_view background = "background";
 // static constexpr std::string_view bar_image = "bar_image";
 // static constexpr std::string_view bar_shader = "bar_shader";
 static constexpr std::string_view bar_visual = "bar_visual";
+static constexpr std::string_view border = "border";
 static constexpr std::string_view caret = "caret";
 static constexpr std::string_view caret_color = "caret_color";
 static constexpr std::string_view caret_shader = "caret_shader";
