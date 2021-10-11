@@ -1,7 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/ui_lua.cpp, Author: Császár Mátyás [Vader]
 
 // hpp
-#include <libv/ui/ui_lua.hpp>
+#include <libv/ui/lua/script_style.hpp>
 // libv
 #include <libv/lua/lua.hpp>
 #include <libv/lua/sol_type_to_string.hpp>
@@ -249,7 +249,7 @@ std::optional<Color> convert_color(UI&, const sol::object& object) {
 	}
 }
 
-std::optional<Padding> convert_margin_padding(UI&, const sol::object& object) {
+std::optional<Padding> convert_extent(UI&, const sol::object& object) {
 	if (object.get_type() == sol::type::number) {
 		// left_down_right_top
 		return libv::vec4f::one(object.as<float>());
@@ -486,7 +486,7 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			if (!color)
 				return std::nullopt;
 
-			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_extent, libv::vec4f{0, 0, 0, 0});
 			if (!inner_padding)
 				return std::nullopt;
 
@@ -509,11 +509,11 @@ std::optional<PropertyDynamic> convert_background(UI& ui, const sol::object& obj
 			if (!color_pattern)
 				return std::nullopt;
 
-			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			const auto inner_padding = convert_member(ui, table, "inner_padding", convert_extent, libv::vec4f{0, 0, 0, 0});
 			if (!inner_padding)
 				return std::nullopt;
 
-			const auto border_extent = convert_member(ui, table, "border_extent", convert_margin_padding, libv::vec4f{0, 0, 0, 0});
+			const auto border_extent = convert_member(ui, table, "border_extent", convert_extent, libv::vec4f{0, 0, 0, 0});
 			if (!border_extent)
 				return std::nullopt;
 
@@ -615,10 +615,10 @@ public:
 		property_loaders.emplace(pnm::font_color, conv_fn(convert_color));
 //		property_loaders.emplace(pnm::font_shader, _______);
 		property_loaders.emplace(pnm::font_size, convert_enum_value<FontSize>());
-		property_loaders.emplace(pnm::margin, conv_fn(convert_margin_padding));
+		property_loaders.emplace(pnm::margin, conv_fn(convert_extent));
 		property_loaders.emplace(pnm::orientation, convert_string_parse(&libv::ui::parse_orientation_optional));
 //		property_loaders.emplace(pnm::orientation2, _______);
-		property_loaders.emplace(pnm::padding, conv_fn(convert_margin_padding));
+		property_loaders.emplace(pnm::padding, conv_fn(convert_extent));
 //		property_loaders.emplace(pnm::quad_shader, _______);
 //		property_loaders.emplace(pnm::scroll_area_mode, _______);
 		property_loaders.emplace(pnm::size, convert_string_parse(&libv::ui::parse_size_optional));

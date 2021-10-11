@@ -11,7 +11,7 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
-#include <libv/ui/ui_lua.hpp>
+#include <libv/ui/lua/script_style.hpp>
 
 
 #include <thread>
@@ -79,7 +79,7 @@ int main(int, char**) {
 //#include <iostream>
 //// pro
 //#include <libv/lua/lua.hpp>
-//#include <libv/ui/ui_lua.hpp>
+//#include <libv/ui/lua/script_style.hpp>
 //#include <libv/ui/ui.hpp>
 
 //class SandboxFrame : public libv::Frame {
