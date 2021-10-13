@@ -44,12 +44,23 @@ void CTO_FleetSpawn::apply(Universe& universe) {
 }
 
 void CTO_FleetSelect::apply(Universe& universe) {
+	// Permission check
+	// Bound check
 	universe.selectedFleetIDList.clear();
 	universe.selectedFleetIDList.insert(fleetID);
 }
 
 void CTO_FleetSelectAdd::apply(Universe& universe) {
+	// Permission check
+	// Bound check
 	universe.selectedFleetIDList.insert(fleetID);
+}
+
+void CTO_FleetBoxSelect::apply(Universe& universe) {
+	// Permission check
+	// Bound check
+	universe.selectedFleetIDList.clear();
+	universe.selectedFleetIDList.insert(fleetIDs.begin(), fleetIDs.end());
 }
 
 // paging

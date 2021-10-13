@@ -99,6 +99,80 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		ctx.playout.process<CTO_FleetQueueMove>(world_coord);
 	});
 
+	controls.feature_action<app::SpaceCanvas>("space.selection_box_start", [](const auto&, app::SpaceCanvas& ctx) {
+		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+		const auto mouse_ray_pos = ctx.camera.eye();
+		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+		log_space.info("mouse_ray_pos: {}, mouse_ray_dir: {}", mouse_ray_pos, mouse_ray_dir);
+
+		SpaceCanvas::Line line1 = {mouse_ray_pos, world_coord};
+		SpaceCanvas::Line line = {mouse_ray_pos, mouse_ray_pos + (world_coord - mouse_ray_pos).normalize()};
+		ctx.start_line = line1;
+	});
+
+	///VERSION 2: Box selection in real 2.5D (on grid)
+	controls.feature_analog<app::SpaceCanvas>("space.selection_box_end_25D", [](const auto&, app::SpaceCanvas& ctx) {
+		const auto world_coord = calculate_world_coord(ctx);
+		const auto eye = ctx.camera.eye();
+		libv::vec3f A = ctx.start_line.b;
+		libv::vec3f C = world_coord;
+
+		// Project the up and right vectors to the z=0 plane
+		const auto plane_up = libv::vec3f(xy(ctx.camera.up()), 0.f);
+		const auto plane_right = libv::vec3f(xy(ctx.camera.right()), 0.f);
+
+		// TODO P2: Handle some corner cases when the camera is on the z=0 plane and the users clicks to +/- inf
+		const float x2 = ((C.y - A.y) * plane_up.x - (C.x - A.x) * plane_up.y) / (plane_right.y * plane_up.x - plane_right.x * plane_up.y);
+		// const float x1 = (B.x - A.x - x2 * plane_right.x) / plane_up.x; // No need for it
+
+//		libv::vec3f C = A + x1 * plane_up;
+		libv::vec3f B = C - x2 * plane_right;
+		libv::vec3f D = A + x2 * plane_right;
+
+//		A----------------D
+//		|				 |
+//		|				 |
+//		B----------------C
+
+		std::vector<FleetID> selected_fleet_ids;
+		const auto AD = D - A;
+		const auto AB = B - A;
+		const auto dot_AD = dot(AD, AD);
+		const auto dot_AB = dot(AB, AB);
+		for (const auto& fleet : ctx.universe.fleets) {
+			const auto M = libv::vec3f(xy(fleet.position), 0.f);
+//			(0<AM⋅AB<AB⋅AB)∧(0<AM⋅AD<AD⋅AD)
+			const auto AM = M - A;
+			if (0 < dot(AM, AD) && dot(AM, AD) < dot_AD && 0 < dot(AM, AB) && dot(AM, AB) < dot_AB)
+				selected_fleet_ids.emplace_back(fleet.id);
+		}
+		ctx.playout.process<CTO_FleetBoxSelect>(selected_fleet_ids);
+
+		//Debug views
+		if (true) {
+			SpaceCanvas::Line line_a = {eye, A};
+			SpaceCanvas::Line line_b = {eye, B};
+			SpaceCanvas::Line line_c = {eye, C};
+			SpaceCanvas::Line line_d = {eye, D};
+
+			const auto axis = ((A - eye) + (line_c.b - line_c.a)).normalize();
+			line_a.a += axis * ctx.camera.near() * 1.5;
+			line_b.a += axis * ctx.camera.near() * 1.5;
+			line_c.a += axis * ctx.camera.near() * 1.5;
+			line_d.a += axis * ctx.camera.near() * 1.5;
+
+			ctx.clear_debug_shapes();
+			libv::vec4f line_color = {0.9f, 0.2f, 0, 0.9f};
+			ctx.add_debug_line(line_a.a, line_a.b, line_color);
+			ctx.add_debug_line(line_b.a, line_b.b, line_color);
+			ctx.add_debug_line(line_c.a, line_c.b, line_color);
+			ctx.add_debug_line(line_d.a, line_d.b, line_color);
+			ctx.add_debug_frustum(line_a.b, line_b.b, line_c.b, line_d.b, line_a.a, {1, 0, 0, 1}, {0.2f, 0, 0.8f, 0.6f});
+			ctx.add_debug_quad(line_a.b, line_b.b, line_c.b, line_d.b, {0, 0.8f, 0.8f, 0.6f});
+		}
+	});
+
 	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 //		const auto userID = app::UserID{0};
@@ -111,11 +185,16 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
 	// TODO P1: libv.ctrl: analog feature (on time update) bypasses the accidental collusion resolution system (specialization) with an action feature
 
-	controls.bind("space.spawn_fleet_at_mouse", "Ctrl + LMB [press]");
-	controls.bind("space.select_fleet", "LMB [press]");
-	controls.bind("space.select_fleet_add", "Shift + LMB [press]");
 	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
 	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
+	controls.bind("space.select_fleet", "LMB [press]");
+	controls.bind("space.select_fleet_add", "Shift + LMB [press]");
+//	controls.bind("space.selection_box_end", "O [release]");
+	controls.bind("space.selection_box_start", "O [press]");
+	controls.bind("space.selection_box_start", "I [press]");
+	controls.bind("space.selection_box_end_3D", "O [auto]");
+	controls.bind("space.selection_box_end_25D", "I [auto]");
+	controls.bind("space.spawn_fleet_at_mouse", "Ctrl + LMB [press]");
 	controls.bind("space.warp_camera_to_mouse", "Z");
 }
 

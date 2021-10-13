@@ -323,6 +323,7 @@ struct RendererEditorGrid {
 public:
 	explicit RendererEditorGrid(RendererResourceContext& rctx);
 
+//	void build_mesh();
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 

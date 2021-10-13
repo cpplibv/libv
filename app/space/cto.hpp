@@ -181,20 +181,20 @@ public:
 	void apply(Universe& universe);
 };
 
-struct CTO_FleetMove {
+struct CTO_FleetBoxSelect {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x23};
 
-	libv::vec3f target_position;
+	std::vector<FleetID> fleetIDs;
 
-	LIBV_REFLECTION_ACCESS(target_position);
+	LIBV_REFLECTION_ACCESS(fleetIDs);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 
 public:
 	void apply(Universe& universe);
 };
 
-struct CTO_FleetQueueMove {
+struct CTO_FleetMove {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x24};
 
@@ -207,9 +207,22 @@ public:
 	void apply(Universe& universe);
 };
 
-struct CTO_ClearFleets {
+struct CTO_FleetQueueMove {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x25};
+
+	libv::vec3f target_position;
+
+	LIBV_REFLECTION_ACCESS(target_position);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+public:
+	void apply(Universe& universe);
+};
+
+struct CTO_ClearFleets {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x26};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -220,7 +233,7 @@ public:
 
 struct CTO_Shuffle {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x26};
+	static constexpr libv::serial::CodecMessageID id{0x27};
 
 	uint64_t seed;
 

@@ -40,13 +40,14 @@ struct Codec : libv::serial::Codec3<Codec> {
 //				create_entry<Ar, F, CTO_LobbyClose>(),
 
 				create_entry<Ar, F, CTO_FleetSpawn>(),
+				create_entry<Ar, F, CTO_FleetSelect>(),
+				create_entry<Ar, F, CTO_FleetSelectAdd>(),
+				create_entry<Ar, F, CTO_FleetBoxSelect>(),
 				create_entry<Ar, F, CTO_FleetMove>(),
 				create_entry<Ar, F, CTO_FleetQueueMove>(),
 				create_entry<Ar, F, CTO_ClearFleets>(),
 				create_entry<Ar, F, CTO_Shuffle>(),
-				create_entry<Ar, F, CTO_FleetSelect>(),
-				create_entry<Ar, F, CTO_FleetSelectAdd>(),
-//
+
 				create_entry<Ar, F, CTO_TrackView>(),
 				create_entry<Ar, F, CTO_CameraWarpTo>(),
 				//	create_entry<Ar, F, CTO_CameraMovement>(),

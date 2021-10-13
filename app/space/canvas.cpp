@@ -175,7 +175,14 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 	{
 		const auto s2_guard = gl.state.push_guard();
 		gl.state.disableDepthMask();
+//		gl.state.polygonModeLine();
+//		for (int i = 0 ; i < 20 ; ++i) {
+//			for (int j = 0 ; j < 20 ; ++j) {
+//				add_debug_sphere({static_cast<float>(-i), static_cast<float>(-j), 1}, 0.4f, {i / 20.0f, j / 20.0f, 0, 0.8f}, i, j);
+//			}
+//		}
 		renderer.debug.render(gl, renderer.resource_context.uniform_stream);
+		renderer.debug.spheres.clear();
 	}
 
 	// --- Render UI/HUD ---
@@ -236,6 +243,8 @@ void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c
 	renderer.debug.triangles.emplace_back(a, b, c, color);
 }
 
+//void SpaceCanvas::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag style) {
+//	renderer.debug.spheres.emplace_back(center, radius, color, ring_count, segment_count);
 void SpaceCanvas::add_debug_sphere(libv::vec3f a, float radius, libv::vec4f color, StyleFlag style) {
 
 }
