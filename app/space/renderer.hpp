@@ -251,8 +251,8 @@ public:
 struct RendererDebug {
 	struct Point {
 		libv::vec3f a;
-//		float size;
 		libv::vec4f color;
+//		float width;
 	};
 
 	struct Line {
@@ -283,23 +283,32 @@ struct RendererDebug {
 	};
 
 	struct Sphere {
-		std::vector<Point> points;
+		libv::vec3f center;
+		float radius;
 		libv::vec4f color;
+		int ring_count;
+		int segment_count;
 	};
 
+public:
 	std::vector<Point> points;
 	std::vector<Line> lines;
 	std::vector<Triangle> triangles;
 	std::vector<Quad> quads;
 	std::vector<Frustum> frustums;
 	std::vector<Sphere> spheres;
+
+private:
+	libv::glr::Mesh mesh_point{libv::gl::Primitive::Points, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+
 	ShaderTestMode shader;
 
 public:
 	explicit RendererDebug(RendererResourceContext& rctx);
 
+	void build_points_mesh(libv::glr::Mesh& mesh);
 	void build_lines_mesh(libv::glr::Mesh& mesh);
 	void build_triangles_mesh(libv::glr::Mesh& mesh);
 	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);

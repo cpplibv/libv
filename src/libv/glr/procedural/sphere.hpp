@@ -31,13 +31,13 @@ void generateSpherifiedCube(uint32_t divisions, Position& position, Normal& norm
 	const auto step = F{1} / static_cast<F>(divisions);
 
 	static const vec3 faces[6][3] = {
-		//     origin             right              up
-		vec3(-1, -1, -1), vec3( 2,  0,  0), vec3( 0,  2,  0),
-		vec3( 1, -1, -1), vec3( 0,  0,  2), vec3( 0,  2,  0),
-		vec3( 1, -1,  1), vec3(-2,  0,  0), vec3( 0,  2,  0),
-		vec3(-1, -1,  1), vec3( 0,  0, -2), vec3( 0,  2,  0),
-		vec3(-1,  1, -1), vec3( 2,  0,  0), vec3( 0,  0,  2),
-		vec3(-1, -1,  1), vec3( 2,  0,  0), vec3( 0,  0, -2)
+			//     origin             right              up
+			vec3(-1, -1, -1), vec3(2, 0, 0), vec3(0, 2, 0),
+			vec3(1, -1, -1), vec3(0, 0, 2), vec3(0, 2, 0),
+			vec3(1, -1, 1), vec3(-2, 0, 0), vec3(0, 2, 0),
+			vec3(-1, -1, 1), vec3(0, 0, -2), vec3(0, 2, 0),
+			vec3(-1, 1, -1), vec3(2, 0, 0), vec3(0, 0, 2),
+			vec3(-1, -1, 1), vec3(2, 0, 0), vec3(0, 0, -2)
 	};
 
 	const auto k = divisions + 1;
@@ -96,6 +96,25 @@ void generateSpherifiedCube(uint32_t divisions, Position& position, Normal& norm
 		}
 	}
 }
+
+// -------------------------------------------------------------------------------------------------
+
+//std::vector<libv::vec3f> fibonacci_sphere_generator(libv::vec3f a, float radius, int sample_size) {
+//	std::vector<libv::vec3f> points;
+//	float phi = libv::pi * (3.0f - sqrt(5.0f));  // golden angle in radians
+//	for (int i = 0; i < sample_size; ++i) {
+//		const float z = 1.0f - (i / (sample_size - 1.0f)) * 2.0f;  // z goes from 1 to -1
+//		const float radius0 = sqrt(1 - z * z);  // radius at z
+//
+//		const float theta = phi * i;  // golden angle increment
+//
+//		const float x = cos(theta) * radius0;
+//		const float y = sin(theta) * radius0;
+//		const libv::vec3f point = {x, y, z};
+//		points.emplace_back(point * radius + a);
+//	}
+//	return points;
+//}
 
 // -------------------------------------------------------------------------------------------------
 

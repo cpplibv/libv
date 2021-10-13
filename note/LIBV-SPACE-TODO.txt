@@ -93,6 +93,14 @@ app.space: F1 menu, list every keybind
 app.space: Rename files *_behaviour -> *_control
 app.space: Move canvas and camera under view
 
+libv.ctrl: Box selection support
+		start
+			[press]
+		update tick
+			[hold]
+		end
+			[release]
+libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
 
 
 
@@ -164,26 +172,22 @@ CI/CD:
 	jenkins could ping update-master on build start (option to auto release feature)
 
 
-libv.ctrl: Box selection support
-		start
-			[press]
-		update tick
-			[hold]
-		end
-			[release]
-libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
-
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
 
 app.space: RendererDebug
-	color property
-	line, triangle, circle, quad, sphere, [box]
+	DONE: color property
+	line, triangle, circle, quad, [box]
+	sphere:
+		UV sphere, tessalation in renderer.cpp instead of canvas.cpp
+    frustum
+    plane
+    2D shapes in screen space(rectangle)
+	--------------
 	orientation (aka gizmo with colored endpoints)
     arrow (not command arrow, but a 3D arrow model)
-    plane
-    frustum
-    2D shapes in screen space(rectangle, point, triangle, line, circle)
+    2D shapes in screen space(point, triangle, line, circle)
+
 app.space: Fleet merge/follow/attack commands
 	app.space: 3D fleet box selection:
 		a: local coordinates starting anchor
@@ -192,6 +196,7 @@ app.space: Fleet merge/follow/attack commands
 		a: rectangle selection on grid
 		b: frustum selection (TODO: plane model: 4 float, frustum model)
 		edge case: inf (clicking on sky, negative testing)
+
 	app.space: hover fleet highlight
 
 

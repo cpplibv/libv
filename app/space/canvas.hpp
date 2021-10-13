@@ -14,6 +14,7 @@
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
+
 enum class StyleFlag : uint8_t{
 	WORLD = 1 << 0,
 	FILL = 1 << 1,
@@ -27,18 +28,22 @@ enum class StyleFlag : uint8_t{
 	return static_cast<StyleFlag>(libv::to_underlying(lhs) | libv::to_underlying(rhs));
 }
 
+// -------------------------------------------------------------------------------------------------
+
 struct SpaceCanvas : libv::ui::CanvasBase {
+public:
 	struct Line {
+		// TODO P5: Move into a generalized geometry primitive neighborhood
 		libv::vec3f a;
 		libv::vec3f b;
 	};
+
 public:
 	bool main_canvas;
 	GameSession& game_session;
 	Universe& universe;
 	Playout& playout;
 
-//	CameraPlayer& camera;
 	CameraPlayer camera;
 	CameraPlayer::screen_picker screen_picker;
 
@@ -47,20 +52,17 @@ public:
 	float test_sin_time = 0.0f;
 	Line start_line;
 
-//	std::vector<Line> debug_lines;
-
 	Renderer& renderer;
-
 
 public:
 	SpaceCanvas(Renderer& renderer, GameSession& game_session, bool main_canvas);
 
-	void add_debug_point(libv::vec3f a, float size, libv::vec4f color, StyleFlag style = StyleFlag::DEFAULT);
-	void add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag style = StyleFlag::DEFAULT);
-	void add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag style = StyleFlag::DEFAULT);
-	void add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag style = StyleFlag::DEFAULT);
-	void add_debug_sphere(libv::vec3f a, float radius, libv::vec4f color, StyleFlag style = StyleFlag::DEFAULT);
-	void add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag style = StyleFlag::DEFAULT);
+	void add_debug_point(libv::vec3f a, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
 	void clear_debug_shapes();
 	virtual void update(libv::ui::time_duration delta_time) override;
 	virtual void render(libv::glr::Queue& gl) override;

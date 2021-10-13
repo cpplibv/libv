@@ -153,12 +153,12 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	// --- Render Transparent ---
 
-	renderer.arrow.add_debug_spiral();
-	renderer.arrow.add_debug_view01();
-	renderer.arrow.add_debug_view02();
-	renderer.arrow.add_debug_view03();
-	renderer.arrow.add_debug_view04();
-	renderer.arrow.add_debug_view05();
+//	renderer.arrow.add_debug_spiral();
+//	renderer.arrow.add_debug_view01();
+//	renderer.arrow.add_debug_view02();
+//	renderer.arrow.add_debug_view03();
+//	renderer.arrow.add_debug_view04();
+//	renderer.arrow.add_debug_view05();
 
 	for (const auto& fleet : universe.fleets) {
 		renderer.arrow.restart_chain(fleet.animation_offset());
@@ -172,15 +172,18 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
 
+	// --- Render Debug shapes ---
 	{
 		const auto s2_guard = gl.state.push_guard();
 		gl.state.disableDepthMask();
 //		gl.state.polygonModeLine();
-//		for (int i = 0 ; i < 20 ; ++i) {
-//			for (int j = 0 ; j < 20 ; ++j) {
-//				add_debug_sphere({static_cast<float>(-i), static_cast<float>(-j), 1}, 0.4f, {i / 20.0f, j / 20.0f, 0, 0.8f}, i, j);
-//			}
-//		}
+		for (int i = 0 ; i < 20 ; ++i) {
+			const auto fi = static_cast<float>(i);
+			for (int j = 0 ; j < 20 ; ++j) {
+				const auto fj = static_cast<float>(j);
+				add_debug_sphere({-fi, -fj, 0.4f}, 0.4f, {fi / 20.0f, fj / 20.0f, 0, 0.8f}, i, j);
+			}
+		}
 		renderer.debug.render(gl, renderer.resource_context.uniform_stream);
 		renderer.debug.spheres.clear();
 	}
@@ -230,31 +233,35 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 }
 
 // -------------------------------------------------------------------------------------------------
+// TODO P5: Implement style flag modes
 
-void SpaceCanvas::add_debug_point(libv::vec3f a, float size, libv::vec4f color, StyleFlag style) {
+void SpaceCanvas::add_debug_point(libv::vec3f a, libv::vec4f color, StyleFlag mode) {
+	(void) mode;
 	renderer.debug.points.emplace_back(a, color);
 }
 
-void SpaceCanvas::add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag style) {
+void SpaceCanvas::add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag mode) {
+	(void) mode;
 	renderer.debug.lines.emplace_back(a, b, color);
 }
 
-void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag style) {
+void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag mode) {
+	(void) mode;
 	renderer.debug.triangles.emplace_back(a, b, c, color);
 }
 
-//void SpaceCanvas::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag style) {
-//	renderer.debug.spheres.emplace_back(center, radius, color, ring_count, segment_count);
-void SpaceCanvas::add_debug_sphere(libv::vec3f a, float radius, libv::vec4f color, StyleFlag style) {
-
+void SpaceCanvas::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode) {
+	(void) mode;
+	renderer.debug.spheres.emplace_back(center, radius, color, ring_count, segment_count);
 }
 
-void SpaceCanvas::add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag style) {
-//	renderer.debug.frustums.emplace_back({a, b, c, d, e}, color_sides, color_wire);
+void SpaceCanvas::add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode) {
+	(void) mode;
 	renderer.debug.frustums.push_back(RendererDebug::Frustum{{a, b, c, d, e}, color_sides, color_wire});
 }
 
-void SpaceCanvas::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag style) {
+void SpaceCanvas::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode) {
+	(void) mode;
 	renderer.debug.quads.emplace_back(a, b, c, d, color);
 }
 
@@ -266,5 +273,7 @@ void SpaceCanvas::clear_debug_shapes() {
 	renderer.debug.frustums.clear();
 	renderer.debug.spheres.clear();
 }
+
+// -------------------------------------------------------------------------------------------------
 
 } // namespace app

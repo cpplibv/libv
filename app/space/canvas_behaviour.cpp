@@ -106,9 +106,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		const auto world_coord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 		log_space.info("mouse_ray_pos: {}, mouse_ray_dir: {}", mouse_ray_pos, mouse_ray_dir);
 
-		SpaceCanvas::Line line1 = {mouse_ray_pos, world_coord};
-		SpaceCanvas::Line line = {mouse_ray_pos, mouse_ray_pos + (world_coord - mouse_ray_pos).normalize()};
-		ctx.start_line = line1;
+		ctx.start_line = SpaceCanvas::Line{mouse_ray_pos, world_coord};
 	});
 
 	///VERSION 2: Box selection in real 2.5D (on grid)
@@ -130,10 +128,10 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		libv::vec3f B = C - x2 * plane_right;
 		libv::vec3f D = A + x2 * plane_right;
 
-//		A----------------D
-//		|				 |
-//		|				 |
-//		B----------------C
+		// A---------D
+		// |         |
+		// |         |
+		// B---------C
 
 		std::vector<FleetID> selected_fleet_ids;
 		const auto AD = D - A;
@@ -149,21 +147,17 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 		}
 		ctx.playout.process<CTO_FleetBoxSelect>(selected_fleet_ids);
 
-		//Debug views
+		// Debug visualization
 		if (true) {
-			SpaceCanvas::Line line_a = {eye, A};
-			SpaceCanvas::Line line_b = {eye, B};
-			SpaceCanvas::Line line_c = {eye, C};
-			SpaceCanvas::Line line_d = {eye, D};
+			const auto axis = normalize((A + C) * 0.5f - eye);
 
-			const auto axis = ((A - eye) + (line_c.b - line_c.a)).normalize();
-			line_a.a += axis * ctx.camera.near() * 1.5;
-			line_b.a += axis * ctx.camera.near() * 1.5;
-			line_c.a += axis * ctx.camera.near() * 1.5;
-			line_d.a += axis * ctx.camera.near() * 1.5;
+			const auto line_a = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, A};
+			const auto line_b = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, B};
+			const auto line_c = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, C};
+			const auto line_d = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, D};
 
+			const auto line_color = libv::vec4f{0.9f, 0.2f, 0, 0.9f};
 			ctx.clear_debug_shapes();
-			libv::vec4f line_color = {0.9f, 0.2f, 0, 0.9f};
 			ctx.add_debug_line(line_a.a, line_a.b, line_color);
 			ctx.add_debug_line(line_b.a, line_b.b, line_color);
 			ctx.add_debug_line(line_c.a, line_c.b, line_color);
