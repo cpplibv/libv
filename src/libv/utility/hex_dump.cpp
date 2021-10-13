@@ -17,6 +17,10 @@ std::string hex_dump(const std::string_view& s) {
 	for (size_t i = 0; i < s.size();) {
 		ss << std::setw(2) << uint16_t{static_cast<unsigned char>(s[i])};
 		++i;
+
+		if (i == s.size())
+			break;
+
 		if (i % 32 == 0)
 			ss << "\n";
 		else if (i % 8 == 0)

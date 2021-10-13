@@ -27,10 +27,13 @@ private:
 	read_fn_t read_fn;
 
 public:
-	/*implicit*/ input_bytes(const std::byte* data, size_t size) noexcept;
-	/*implicit*/ input_bytes(const std::string_view s) noexcept;
-	/*implicit*/ input_bytes(const std::span<const std::byte> s) noexcept;
-	/*implicit*/ input_bytes(std::istream& s) noexcept;
+	explicit(false) input_bytes(const std::byte* data, size_t size) noexcept;
+	explicit(false) input_bytes(const std::string_view s) noexcept;
+	explicit(false) input_bytes(const std::span<const std::byte> s) noexcept;
+	explicit(false) input_bytes(std::istream& s) noexcept;
+
+	template <typename ContiguousRange>
+	explicit(false) inline input_bytes(const ContiguousRange& r) noexcept : input_bytes(std::as_bytes(std::span(r))) { }
 
 public:
 	/// Read \c size byte starting from \c pos into \c dst

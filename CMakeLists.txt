@@ -973,7 +973,7 @@ wish_create_executable(
 )
 
 wish_end_group()
-wish_create_group(GROUP_EXAMPLE) # EXAMPLE ---------------------------------------------------------
+wish_create_group(GROUP_EXAMPLE) # Example ---------------------------------------------------------
 
 wish_create_executable(
 	TARGET example_libv_ctrl_camera
@@ -1300,6 +1300,12 @@ wish_create_executable(
 	TARGET test_libv_rev
 	SOURCE test/libv/rev/*.cpp
 	LINK   obj_test_runner libv_rev
+)
+
+wish_create_executable(
+	TARGET test_libv_serial
+	SOURCE test/libv/serial/*.cpp
+	LINK   obj_test_runner libv_serial
 )
 
 wish_create_executable(

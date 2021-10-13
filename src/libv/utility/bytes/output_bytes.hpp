@@ -27,10 +27,10 @@ private:
 	write_fn_t write_fn;
 
 public:
-	/*implicit*/ output_bytes(std::byte* data, size_t size) noexcept;
-	/*implicit*/ output_bytes(std::string& s) noexcept;
-	/*implicit*/ output_bytes(std::vector<std::byte>& s) noexcept;
-	/*implicit*/ output_bytes(std::ostream& s) noexcept;
+	explicit(false) output_bytes(std::byte* data, size_t size) noexcept;
+	explicit(false) output_bytes(std::string& s) noexcept;
+	explicit(false) output_bytes(std::vector<std::byte>& s) noexcept;
+	explicit(false) output_bytes(std::ostream& s) noexcept;
 
 public:
 	/// Write \c size byte starting at \c pos from \c src
