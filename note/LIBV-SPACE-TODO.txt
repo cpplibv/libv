@@ -33,6 +33,12 @@ app.space.net: Implement lobby snapshot sending/loading on connect
 app.space: Solve canvas and ui ctrl conflict
 app.space: Commands have a conflicting name, resolve it with an acronym like CTO (Command Transfer Object)
 app.space: Structure the whole program: UML time is upon us | Still not the cleanest, but improved
+app.space: 3D fleet picking
+app.space: Selected fleet highlight
+app.space: edge highlight (fresnel shader) https://forum.playcanvas.com/t/solved-custom-shader-fresnel/17355
+app.space: 3D secondary fleet picking
+app.space: Fleet selection, selection based commands
+app.space: Multi fleet selection
 
 
 
@@ -170,14 +176,25 @@ libv.ctrl: Late enter of feature_binary: On context_enter call any binary featur
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
 
+app.space: RendererDebug
+	color property
+	line, triangle, circle, quad, sphere, [box]
+	orientation (aka gizmo with colored endpoints)
+    arrow (not command arrow, but a 3D arrow model)
+    plane
+    frustum
+    2D shapes in screen space(rectangle, point, triangle, line, circle)
 app.space: Fleet merge/follow/attack commands
-	app.space: 3D fleet picking
-	app.space: Selected fleet highlight, hover fleet highlight
-		app.space: edge highlight (fresnel shader) https://forum.playcanvas.com/t/solved-custom-shader-fresnel/17355
-	app.space: 3D secondary fleet picking
-	app.space: Fleet selection, selection based commands
-	app.space: Multi fleet selection
-	app.space: 3D fleet box selection
+	app.space: 3D fleet box selection:
+		a: local coordinates starting anchor
+		b: world space starting anchor
+	app.space: 2.5D fleet box selection:
+		a: rectangle selection on grid
+		b: frustum selection (TODO: plane model: 4 float, frustum model)
+		edge case: inf (clicking on sky, negative testing)
+	app.space: hover fleet highlight
+
+
 	//app.space: Fleet factions
 
 

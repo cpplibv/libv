@@ -172,13 +172,18 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
 
+	{
+		const auto s2_guard = gl.state.push_guard();
+		gl.state.disableDepthMask();
+		renderer.debug.render(gl, renderer.resource_context.uniform_stream);
+	}
+
 	// --- Render UI/HUD ---
 
 	{
 		{ // Grid
 			const auto s2_guard = gl.state.push_guard();
 			gl.state.disableDepthMask();
-
 			renderer.editorGrid.render(gl, renderer.resource_context.uniform_stream);
 		}
 
@@ -218,5 +223,39 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void SpaceCanvas::add_debug_point(libv::vec3f a, float size, libv::vec4f color, StyleFlag style) {
+	renderer.debug.points.emplace_back(a, color);
+}
+
+void SpaceCanvas::add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag style) {
+	renderer.debug.lines.emplace_back(a, b, color);
+}
+
+void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag style) {
+	renderer.debug.triangles.emplace_back(a, b, c, color);
+}
+
+void SpaceCanvas::add_debug_sphere(libv::vec3f a, float radius, libv::vec4f color, StyleFlag style) {
+
+}
+
+void SpaceCanvas::add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag style) {
+//	renderer.debug.frustums.emplace_back({a, b, c, d, e}, color_sides, color_wire);
+	renderer.debug.frustums.push_back(RendererDebug::Frustum{{a, b, c, d, e}, color_sides, color_wire});
+}
+
+void SpaceCanvas::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag style) {
+	renderer.debug.quads.emplace_back(a, b, c, d, color);
+}
+
+void SpaceCanvas::clear_debug_shapes() {
+	renderer.debug.points.clear();
+	renderer.debug.lines.clear();
+	renderer.debug.triangles.clear();
+	renderer.debug.quads.clear();
+	renderer.debug.frustums.clear();
+	renderer.debug.spheres.clear();
+}
 
 } // namespace app

@@ -97,7 +97,7 @@ BaseCameraOrbit::screen_picker BaseCameraOrbit::picker(vec2 canvas_size) const n
 	return {projection(canvas_size) * view(), canvas_size};
 }
 
-void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept  {
+void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept {
 	orbit_point_ = target;
 
 	if (target == eye) {

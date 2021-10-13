@@ -284,8 +284,132 @@ void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size,
 
 // -------------------------------------------------------------------------------------------------
 
+RendererDebug::RendererDebug(RendererResourceContext& rctx) :
+		shader(rctx.shader_manager, "flat_color.vs", "flat_color.fs") {
+	build_lines_mesh(mesh_line);
+}
+
+void RendererDebug::build_lines_mesh(libv::glr::Mesh& mesh) {
+	mesh.clear();
+	auto position = mesh.attribute(attribute_position);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto index = mesh.index();
+	libv::glr::VertexIndex i = 0;
+
+	for (const auto& line : lines) {
+		position(line.a);
+		position(line.b);
+
+		color0(line.color);
+		color0(line.color);
+
+		index.line(i + 0, i + 1);
+		i += 2;
+	}
+}
+
+void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
+	mesh.clear();
+	auto position = mesh.attribute(attribute_position);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto index = mesh.index();
+	libv::glr::VertexIndex i = 0;
+
+	for (const auto& triangle : triangles) {
+		position(triangle.a);
+		position(triangle.b);
+		position(triangle.c);
+
+		color0(triangle.color);
+		color0(triangle.color);
+		color0(triangle.color);
+
+		index.triangle(i + 0, i + 1, i + 2);
+		index.triangle(i + 0, i + 2, i + 1);
+		i += 3;
+	}
+
+	//  A---------D
+	//  |  \   /  |
+	//  |    E    |
+	//  |  /   \  |
+	//  B---------C
+	for (const auto& frustum : frustums) {
+		const auto a = frustum.points[0];
+		const auto b = frustum.points[1];
+		const auto c = frustum.points[2];
+		const auto d = frustum.points[3];
+		const auto e = frustum.points[4];
+
+		position(e);
+		position(a);
+		position(b);
+		position(c);
+		position(d);
+
+		color0(frustum.color_sides);
+		color0(frustum.color_sides);
+		color0(frustum.color_sides);
+		color0(frustum.color_sides);
+		color0(frustum.color_sides);
+
+		index.triangle(i + 0, i + 1, i + 2);
+		index.triangle(i + 0, i + 2, i + 1);
+		index.triangle(i + 0, i + 2, i + 3);
+		index.triangle(i + 0, i + 3, i + 2);
+		index.triangle(i + 0, i + 3, i + 4);
+		index.triangle(i + 0, i + 4, i + 3);
+		index.triangle(i + 0, i + 4, i + 1);
+		index.triangle(i + 0, i + 1, i + 4);
+		i += 5;
+	}
+
+	for (const auto& quad : quads) {
+		position(quad.a);
+		position(quad.b);
+		position(quad.c);
+		position(quad.d);
+
+		color0(quad.color);
+		color0(quad.color);
+		color0(quad.color);
+		color0(quad.color);
+
+		index.quad(i, i + 1, i + 2, i + 3);
+		index.quad(i, i + 3, i + 2, i + 1);
+		i += 4;
+	}
+}
+
+void RendererDebug::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+	build_lines_mesh(mesh_line);
+	build_triangles_mesh(mesh_triangle);
+	gl.program(shader.program());
+
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = gl.mvp();
+		uniforms[layout_matrices.matM] = gl.model;
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.eye] = gl.eye();
+		gl.uniform(std::move(uniforms));
+		gl.render(mesh_triangle);
+	}
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = gl.mvp();
+		uniforms[layout_matrices.matM] = gl.model;
+		uniforms[layout_matrices.matP] = gl.projection;
+		uniforms[layout_matrices.eye] = gl.eye();
+		gl.uniform(std::move(uniforms));
+		gl.render(mesh_line);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "editor_gizmo.vs", "editor_gizmo.fs") {
+		shader(rctx.shader_manager, "flat_color.vs", "flat_color.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -329,19 +453,16 @@ void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 
 RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
 		shader(rctx.shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+	auto position = mesh_grid.attribute(attribute_position);
+	auto index = mesh_grid.index();
 
-	{
-		auto position = mesh_grid.attribute(attribute_position);
-		auto index = mesh_grid.index();
+	position(-1, -1, 0);
+	position(+1, -1, 0);
+	position(+1, +1, 0);
+	position(-1, +1, 0);
 
-		position(-1, -1, 0);
-		position(+1, -1, 0);
-		position(+1, +1, 0);
-		position(-1, +1, 0);
-
-		index.quad(0, 1, 2, 3); // Front face quad
-		index.quad(0, 3, 2, 1); // Back face quad
-	}
+	index.quad(0, 1, 2, 3); // Front face quad
+	index.quad(0, 3, 2, 1); // Back face quad
 }
 
 void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {

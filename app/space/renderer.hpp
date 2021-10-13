@@ -230,9 +230,8 @@ public:
 	explicit RendererCommandArrow(RendererResourceContext& rctx);
 
 public:
-	void restart_chain(float animation_offset );
+	void restart_chain(float animation_offset);
 	void add_arrow(libv::vec3f source, libv::vec3f target, ArrowStyle style);
-//	void end_chain();
 
 public:
 	ArrowStyle debug_arrow_style{libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f), libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f)};
@@ -247,6 +246,63 @@ public:
 public:
 	void rebuild_mesh();
 	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream);
+};
+
+struct RendererDebug {
+	struct Point {
+		libv::vec3f a;
+//		float size;
+		libv::vec4f color;
+	};
+
+	struct Line {
+		libv::vec3f a;
+		libv::vec3f b;
+		libv::vec4f color;
+	};
+
+	struct Triangle {
+		libv::vec3f a;
+		libv::vec3f b;
+		libv::vec3f c;
+		libv::vec4f color;
+	};
+
+	struct Quad {
+		libv::vec3f a;
+		libv::vec3f b;
+		libv::vec3f c;
+		libv::vec3f d;
+		libv::vec4f color;
+	};
+
+	struct Frustum {
+		std::array<libv::vec3f, 5> points;
+		libv::vec4f color_sides;
+		libv::vec4f color_wire;
+	};
+
+	struct Sphere {
+		std::vector<Point> points;
+		libv::vec4f color;
+	};
+
+	std::vector<Point> points;
+	std::vector<Line> lines;
+	std::vector<Triangle> triangles;
+	std::vector<Quad> quads;
+	std::vector<Frustum> frustums;
+	std::vector<Sphere> spheres;
+	libv::glr::Mesh mesh_line{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
+	libv::glr::Mesh mesh_triangle{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	ShaderTestMode shader;
+
+public:
+	explicit RendererDebug(RendererResourceContext& rctx);
+
+	void build_lines_mesh(libv::glr::Mesh& mesh);
+	void build_triangles_mesh(libv::glr::Mesh& mesh);
+	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererGizmo {
@@ -290,6 +346,7 @@ struct Renderer {
 	RendererEditorBackground editorBackground{resource_context};
 	RendererEditorGrid editorGrid{resource_context};
 	RendererGizmo gizmo{resource_context};
+	RendererDebug debug{resource_context};
 	RendererCommandArrow arrow{resource_context};
 	RendererFleet fleet{resource_context};
 
