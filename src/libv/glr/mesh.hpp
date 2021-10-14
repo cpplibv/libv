@@ -26,7 +26,7 @@ namespace glr {
 // -------------------------------------------------------------------------------------------------
 
 using VertexIndex = uint32_t;
-using AttributeChannel = int32_t;
+using AttributeChannel = uint32_t;
 struct DestroyQueues;
 struct Remote;
 struct RemoteMesh;

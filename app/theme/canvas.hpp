@@ -91,7 +91,7 @@ const auto sphere_layout = libv::glr::layout_std140<SphereUniformLayout>(uniform
 
 } // namespace -------------------------------------------------------------------------------------
 
-class Canvas : public libv::ui::Canvas {
+class Canvas : public libv::ui::CanvasBase {
 	libv::glr::Program sphere_program;
 	libv::glr::Mesh sphere_mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::UniformBuffer sphere_uniforms{libv::gl::BufferUsage::StreamDraw};

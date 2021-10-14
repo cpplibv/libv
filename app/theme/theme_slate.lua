@@ -45,10 +45,10 @@ end
 
 -- -------------------------------------------------------------------------------------------------
 
-register_var("normal_os_size", 0, 8, 0.1, 3.5);
-register_var("normal_is_size", 0, 8, 0.1, -3.5);
-register_var("normal_oe_size", 0, 8, 0.1, 1.5);
-register_var("normal_ie_size", 0, 8, 0.1, -1.5);
+register_var("normal_os_size", 0, 8, 0.1, 3.5)
+register_var("normal_is_size", 0, 8, 0.1, -3.5)
+register_var("normal_oe_size", 0, 8, 0.1, 1.5)
+register_var("normal_ie_size", 0, 8, 0.1, -1.5)
 
 --edge_color = rgba()
 
@@ -62,7 +62,8 @@ main = function (theme)
 	theme.texture_size(64, 64);
 
 	theme.atlas("button.normal", merge(button_base, {
-		glow(-1, 1, rgba(0, 0, 0, 0.5)),
+		--glow(-1, 1, rgba(0, 0, 0, 0.5)),
+		glow(normal_os_size, 1, rgba(0, 0, 0, 0.5)),
 	}))
 
 	theme.atlas("button.pressed", merge(button_base, {

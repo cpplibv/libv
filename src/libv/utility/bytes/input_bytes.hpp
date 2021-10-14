@@ -33,6 +33,7 @@ public:
 	explicit(false) input_bytes(std::istream& s) noexcept;
 
 	template <typename ContiguousRange>
+		requires requires { std::span(std::declval<const ContiguousRange&>()); }
 	explicit(false) inline input_bytes(const ContiguousRange& r) noexcept : input_bytes(std::as_bytes(std::span(r))) { }
 
 public:

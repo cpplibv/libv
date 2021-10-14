@@ -44,18 +44,18 @@ private:
 	libv::ui::UI ui;
 
 private:
-	app::Canvas canvas;
 	app::Engine lua_engine;
 
 private:
 	libv::ui::Button button0;
 	libv::ui::PanelLine panel_line;
-	libv::ui::CanvasAdaptor canvas_adaptor;
+	libv::ui::CanvasAdaptorT<app::Canvas> canvas;
 
 public:
 	UIThemeGenFrame() :
 		Frame("Gen UI Theme", 128+1024+30, 1024+20),
-		lua_engine("app/theme/theme_slate.lua", [this](auto&&... v) { canvas.update_texture(std::forward<decltype(v)>(v)...); }) {
+		lua_engine("app/theme/theme_slate.lua", [this](auto&&... v) { canvas.object().update_texture(std::forward<decltype(v)>(v)...); }) {
+//		lua_engine("app/theme/theme_slate_4quad.lua", [this](auto&&... v) { canvas.object().update_texture(std::forward<decltype(v)>(v)...); }) {
 
 		setPosition(FramePosition::center_current_monitor);
 		setOpenGLProfile(OpenGLProfile::core);
@@ -69,8 +69,8 @@ public:
 		button0.padding({5, 2, 5, 2});
 		button0.size(libv::ui::parse_size_or_throw("D, 22px"));
 		button0.event().submit([this](libv::ui::Button& component) {
-			canvas.pulse = !canvas.pulse;
-			component.text(canvas.pulse ? "Mode: Pulse" : "Mode: Steady");
+			canvas.object().pulse = !canvas.object().pulse;
+			component.text(canvas.object().pulse ? "Mode: Pulse" : "Mode: Steady");
 		});
 
 		//
@@ -78,9 +78,7 @@ public:
 		panel_line.add(button0);
 		panel_line.orientation(libv::ui::Orientation::down);
 
-		canvas_adaptor.adopt(&canvas);
-
-		ui.add(canvas_adaptor);
+		ui.add(canvas);
 		ui.add(panel_line);
 
 		//
@@ -93,7 +91,7 @@ public:
 				closeDefault();
 
 			if (e.keycode == libv::input::Keycode::Space)
-				canvas.pulse = !canvas.pulse;
+				canvas.object().pulse = !canvas.object().pulse;
 		});
 
 		init();

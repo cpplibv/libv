@@ -195,19 +195,19 @@ public:
 	}
 
 	void create_check(const SubEntry& watcher, std::string expected_path) {
-		_check_event(watcher.id, "Create " + expected_path);
+		_check_event(watcher.id, "Created " + expected_path);
 	}
 
 	void remove_check(const SubEntry& watcher, std::string expected_path) {
-		_check_event(watcher.id, "Remove " + expected_path);
+		_check_event(watcher.id, "Removed " + expected_path);
 	}
 
 	void modify_check(const SubEntry& watcher, std::string expected_path) {
-		_check_event(watcher.id, "Modify " + expected_path);
+		_check_event(watcher.id, "Modified " + expected_path);
 	}
 
 	void rename_check(const SubEntry& watcher, std::string expected_path, std::string expected_old_path) {
-		_check_event(watcher.id, "Rename " + expected_path + " was " + expected_old_path);
+		_check_event(watcher.id, "Moved " + expected_path + " from " + expected_old_path);
 	}
 
 	void create_file(std::string path) {

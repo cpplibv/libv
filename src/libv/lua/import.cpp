@@ -15,14 +15,14 @@ namespace lua {
 
 // -------------------------------------------------------------------------------------------------
 
-void Importer::map(std::string prefix, std::string directory_path) {
-	const auto loader = [](const std::string_view path) {
-		//		const auto script_str = libv::read_file_str_or_throw(path);
-		//		try_catch;
-		return LoadResult{false, "Not Implemented Yet"};
-	};
-	import_mapping.emplace_back(std::move(prefix), loader);
-}
+//void Importer::map(std::string prefix, std::string directory_path) {
+//	const auto loader = [](const std::string_view path) {
+//		//		const auto script_str = libv::read_file_str_or_throw(path);
+//		//		try_catch;
+//		return LoadResult{false, "Not Implemented Yet"};
+//	};
+//	import_mapping.emplace_back(std::move(prefix), loader);
+//}
 
 void Importer::map(std::string prefix, SourceLoaderFunc loader) {
 	import_mapping.emplace_back(std::move(prefix), std::move(loader));

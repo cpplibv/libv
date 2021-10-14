@@ -291,9 +291,9 @@ void ImplEngine::init() {
 //			},
 	));
 
-	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
-
-	});
+//	lua.set_function("define_flex_point", [](libv::vec2f bl, libv::vec2f tr) {
+//
+//	});
 }
 
 void ImplEngine::schedule_load_script() {
@@ -352,7 +352,7 @@ void ImplEngine::_load_script() {
 		if (func_main.get_type() != sol::type::function)
 			return log_app.error("Main is not a function: {} - {}", libv::to_value(func_main.get_type()), std::string(func_main));
 
-		lua_main_func = func_main;
+		lua_main_func = sol::safe_function(sol::function(func_main));
 		log_app.info("Script loading successful  : {:7.3f}ms", timer.timef_ms().count());
 
 		// ...
@@ -369,8 +369,16 @@ void ImplEngine::_run_script() {
 		libv::vec2i texture_size;
 
 		for (const auto& var : dynamic_var_sow.list())
-			if (var.state != DynamicVar::State::remove)
-				lua[var.name] = var.value;
+			if (var.state != DynamicVar::State::remove) {
+				if (var.dim == 1)
+					lua[var.name] = var.value.x;
+				else if (var.dim == 2)
+					lua[var.name] = xy(var.value);
+				else if (var.dim == 3)
+					lua[var.name] = xyz(var.value);
+				else if (var.dim == 4)
+					lua[var.name] = var.value;
+			}
 
 		const auto lua_theme_table = lua.create_table(0, 2,
 				"atlas", [&](std::string_view name, sol::table effects) {

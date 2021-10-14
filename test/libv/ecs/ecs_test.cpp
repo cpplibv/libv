@@ -183,6 +183,9 @@ TEST_CASE("non existing component store", "[libv.ecs]") {
 	es.foreach<TestCompA, TestCompB>([&](const auto&...) {
 		++foreach_run_count;
 	});
+	es.foreach<TestCompB>([&](const auto&...) {
+		++foreach_run_count;
+	});
 
 	CHECK(foreach_run_count == 0);
 	CHECK(es.entityCount() == 1);

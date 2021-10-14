@@ -118,7 +118,10 @@ void BaseCameraOrbit::look_at(vec3 eye, vec3 target) noexcept  {
 // =================================================================================================
 
 void CameraPlayer::update(duration delta_time) {
-	// warp: out - move - in
+	(void) delta_time;
+
+	// TODO P2: Camera movement over time: warp: out - move - in
+	// shake
 	// inclination correction
 }
 
@@ -144,7 +147,8 @@ void CameraPlayer::warp_to(vec3 target) {
 // -------------------------------------------------------------------------------------------------
 
 void CameraDeveloper::update(duration delta_time) {
-	// nothing
+	// Nothing: No screen shake, no warp animation, Dev cam is fixed
+	(void) delta_time;
 }
 
 void CameraDeveloper::warp_to(vec3 target) {

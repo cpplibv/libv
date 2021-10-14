@@ -23,7 +23,7 @@ SHA256 hash_sha256(std::span<const std::byte> data) {
 }
 
 SHA256 hash_sha256(std::string_view data) {
-	return hash_sha256(std::span<const std::byte>(reinterpret_cast<const std::byte*>(data.data()), data.size()));
+	return hash_sha256(std::as_bytes(std::span(data)));
 }
 
 // -------------------------------------------------------------------------------------------------
