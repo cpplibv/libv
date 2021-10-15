@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/source_location.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/source_location.hpp
 
 #pragma once
 

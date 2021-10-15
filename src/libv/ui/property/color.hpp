@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property/color.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/property/color.hpp
 
 #pragma once
 

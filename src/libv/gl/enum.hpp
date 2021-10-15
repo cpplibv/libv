@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/enum.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/enum.hpp
 
 #pragma once
 

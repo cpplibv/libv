@@ -1,3 +1,3 @@
-// Project: libv.sig, File: src/libv/sig/dummy.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: src/libv/sig/dummy.cpp
 
 // VSIG is a header only implementation.

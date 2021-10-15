@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/base_panel_static.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/base_panel_static.cpp
 
 // hpp
 #include <libv/ui/component/base_panel_static.hpp>

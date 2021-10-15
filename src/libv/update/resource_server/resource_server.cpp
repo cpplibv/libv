@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/resource_server/resource_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_server/resource_server.cpp
 
 // hpp
 #include <libv/update/resource_server/resource_server.hpp>

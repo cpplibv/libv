@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/destroy_queue.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/destroy_queue.cpp
 
 // hpp
 #include <libv/glr/destroy_queue.hpp>

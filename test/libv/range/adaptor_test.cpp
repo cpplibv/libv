@@ -1,4 +1,4 @@
-// Project: libv.range, File: test/libv/range/adaptor_test.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: test/libv/range/adaptor_test.cpp
 
 #include <catch/catch.hpp>
 

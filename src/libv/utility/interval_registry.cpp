@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/interval_registry.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/interval_registry.cpp
 
 // hpp
 #include <libv/utility/interval_registry.hpp>

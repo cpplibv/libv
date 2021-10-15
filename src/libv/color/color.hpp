@@ -1,4 +1,4 @@
-// Project: libv.color, File: src/libv/color/color.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.color, File: src/libv/color/color.hpp
 
 #pragma once
 

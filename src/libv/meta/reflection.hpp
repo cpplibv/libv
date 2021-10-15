@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/reflection.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/reflection.hpp
 
 #pragma once
 

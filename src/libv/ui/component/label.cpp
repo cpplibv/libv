@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/label.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/label.cpp
 
 // hpp
 #include <libv/ui/component/label.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/detail/rate_policy.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/detail/rate_policy.hpp
 
 #pragma once
 

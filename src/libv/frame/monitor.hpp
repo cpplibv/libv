@@ -1,4 +1,4 @@
-// Project: libv.frame, File: src/libv/frame/monitor.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.frame, File: src/libv/frame/monitor.hpp
 
 #pragma once
 

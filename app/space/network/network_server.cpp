@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/network_server.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/network/network_server.cpp
 
 // hpp
 #include <space/network/network_server.hpp>

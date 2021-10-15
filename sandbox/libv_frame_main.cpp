@@ -1,4 +1,4 @@
-// Project: libv.frame, File: sandbox/libv_frame_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.frame, File: sandbox/libv_frame_main.cpp
 
 // libv
 #include <libv/input/event.hpp>

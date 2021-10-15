@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/is_parent_folder_of.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/is_parent_folder_of.hpp
 
 #pragma once
 

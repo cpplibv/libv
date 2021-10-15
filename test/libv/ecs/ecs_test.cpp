@@ -1,4 +1,4 @@
-// Project: libv.ecs, File: test/libv/ecs/ecs_test.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ecs, File: test/libv/ecs/ecs_test.cpp
 
 #include <catch/catch.hpp>
 

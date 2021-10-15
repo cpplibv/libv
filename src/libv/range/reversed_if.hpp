@@ -1,4 +1,4 @@
-// Project: libv.range, File: src/libv/range/reversed_if.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: src/libv/range/reversed_if.hpp
 
 #pragma once
 

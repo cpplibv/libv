@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_old_ui_pastebin.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/_old_ui_pastebin.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.input, File: src/libv/input/event.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.input, File: src/libv/input/event.hpp
 
 #pragma once
 

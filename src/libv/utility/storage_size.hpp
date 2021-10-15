@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/storage_size.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/storage_size.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/viewer_ui.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/viewer_ui.hpp
 
 // libv
 #include <libv/ctrl/fwd.hpp>

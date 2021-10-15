@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/fixed_string.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/fixed_string.hpp
 
 #pragma once
 

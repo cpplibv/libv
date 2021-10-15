@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/type_key.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/type_key.hpp
 
 #pragma once
 

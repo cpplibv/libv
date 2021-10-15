@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/lnv.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/lnv.hpp
 
 #pragma once
 

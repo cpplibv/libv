@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/main.cpp
 
 // libv
 #include <libv/utility/last_write_time.hpp>

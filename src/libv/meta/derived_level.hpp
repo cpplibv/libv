@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/derived_level.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/derived_level.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/attach_state.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/attach_state.hpp
 
 #pragma once
 

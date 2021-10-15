@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/mtcp/endpoint.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/mtcp/endpoint.cpp
 
 // hpp
 #include <libv/net/mtcp/endpoint.hpp>

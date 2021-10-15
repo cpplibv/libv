@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/ui_lua.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: src/libv/ui/lua/script_style.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/hex_dump.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/hex_dump.hpp
 
 #pragma once
 

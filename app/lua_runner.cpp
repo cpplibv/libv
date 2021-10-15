@@ -1,4 +1,4 @@
-// Project: libv, File: app/lua_runner.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/lua_runner.cpp
 
 // std
 #include <iostream>

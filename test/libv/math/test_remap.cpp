@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_remap.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: test/libv/math/test_remap.cpp
 
 // hpp
 #include <catch/catch.hpp>

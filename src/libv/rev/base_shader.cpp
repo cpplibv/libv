@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/base_shader.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/base_shader.cpp
 
 // hpp
 #include <libv/rev/shader.hpp>

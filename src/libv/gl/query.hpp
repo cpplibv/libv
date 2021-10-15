@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/query.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/query.hpp
 
 #pragma once
 

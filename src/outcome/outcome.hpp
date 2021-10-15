@@ -1,4 +1,4 @@
-// Project: libv, File: src/outcome/outcome.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: src/outcome/outcome.hpp
 (C) 2018 Niall Douglas <http://www.nedproductions.biz/> (59 commits)
 File Created: Mar 2018
 

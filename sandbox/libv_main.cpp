@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: sandbox/libv_main.cpp
 
 // ext
 //#include <boost/container/flat_map.hpp>

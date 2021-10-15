@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_status_line.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/panel_status_line.hpp
 
 #pragma once
 

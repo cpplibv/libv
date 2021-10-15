@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/event/event_mouse.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event/event_mouse.hpp
 
 #pragma once
 

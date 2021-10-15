@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/feature.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/feature.cpp
 
 // hpp
 #include <libv/ctrl/feature.hpp>

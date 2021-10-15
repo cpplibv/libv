@@ -1,4 +1,4 @@
-// Project: libv.update, File: sandbox/libv_update_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: sandbox/libv_update_main.cpp
 
 // libv
 #include <libv/log/log.hpp>

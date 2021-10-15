@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/stated_sequence.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/stated_sequence.hpp
 
 #pragma once
 

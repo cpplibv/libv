@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/make_shader_error_overlay.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/make_shader_error_overlay.cpp
 
 // hpp
 #include <space/view/make_shader_error_overlay.hpp>

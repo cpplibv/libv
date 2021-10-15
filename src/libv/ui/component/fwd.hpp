@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/fwd.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/fwd.hpp
 
 #pragma once
 

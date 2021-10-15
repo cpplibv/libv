@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/error.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/error.hpp
 
 #pragma once
 

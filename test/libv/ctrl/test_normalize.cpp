@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: test/libv/ctrl/test_normalize.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: test/libv/ctrl/test_normalize.cpp
 
 // hpp
 #include <catch/catch.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/procedural/progress_segmented_ring.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/procedural/progress_segmented_ring.hpp
 
 #pragma once
 

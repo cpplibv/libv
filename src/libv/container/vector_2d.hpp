@@ -1,4 +1,4 @@
-// Project: libv.container, File: src/libv/container/vector_2d.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.container, File: src/libv/container/vector_2d.hpp
 
 #pragma once
 

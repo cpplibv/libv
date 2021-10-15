@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_serialize_cereal_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: sandbox/libv_serialize_cereal_main.cpp
 
 // ext
 #include <cereal/archives/binary.hpp>

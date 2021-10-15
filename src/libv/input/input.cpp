@@ -1,4 +1,4 @@
-// Project: libv.input, File: src/libv/input/input.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.input, File: src/libv/input/input.cpp
 
 // hpp
 #include <libv/input/input.hpp>

@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/space_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/space_main.cpp
 
 // std
 #include <filesystem>

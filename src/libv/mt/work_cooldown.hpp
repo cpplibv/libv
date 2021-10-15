@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/work_cooldown.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/work_cooldown.hpp
 
 #pragma once
 

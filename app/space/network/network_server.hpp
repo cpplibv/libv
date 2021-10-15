@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/network_server.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/network/network_server.hpp
 
 #pragma once
 

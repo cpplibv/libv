@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/float_equal.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/float_equal.hpp
 
 #pragma once
 

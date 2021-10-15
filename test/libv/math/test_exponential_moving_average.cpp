@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_exponential_moving_average.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: test/libv/math/test_exponential_moving_average.cpp
 
 // hpp
 #include <catch/catch.hpp>

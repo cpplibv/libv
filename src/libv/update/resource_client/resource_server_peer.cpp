@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/resource_client/resource_server_peer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_client/resource_server_peer.cpp
 
 // hpp
 #include <libv/update/resource_client/resource_server_peer.hxx>

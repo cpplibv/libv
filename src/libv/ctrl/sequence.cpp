@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/sequence.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/sequence.cpp
 
 // hpp
 #include <libv/ctrl/sequence.hpp>

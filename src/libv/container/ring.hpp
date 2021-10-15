@@ -1,4 +1,4 @@
-// Project: libv.container, File: src/libv/container/ring.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.container, File: src/libv/container/ring.hpp
 
 #pragma once
 

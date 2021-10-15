@@ -1,4 +1,4 @@
-// Project: libv.serial, File: src/libv/serial/safe.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/safe.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/last_write_time.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/last_write_time.hpp
 
 #pragma once
 

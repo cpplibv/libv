@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/detail/fwd_io_context.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/detail/fwd_io_context.hpp
 
 #pragma once
 

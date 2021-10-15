@@ -1,4 +1,4 @@
-// Project: libv.ui, File: test/libv/ui/test_property_set.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: test/libv/ui/test_property_set.cpp
 
 // hpp
 #include <catch/catch.hpp>

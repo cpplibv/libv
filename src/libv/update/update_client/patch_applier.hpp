@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/update_client/patch_applier.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/patch_applier.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/concat.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/concat.hpp
 
 #pragma once
 

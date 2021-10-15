@@ -1,4 +1,4 @@
-// Project: libv.frame, File: src/libv/frame/frame.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.frame, File: src/libv/frame/frame.cpp
 
 // hpp
 #include <libv/frame/frame.hpp>

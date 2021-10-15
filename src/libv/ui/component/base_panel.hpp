@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/base_panel.lpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/base_panel.hpp
 
 #pragma once
 

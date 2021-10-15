@@ -1,4 +1,4 @@
-// Project: libv.vm4, File: src/libv/vm4/load.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4, File: src/libv/vm4/load.cpp
 
 // hpp
 #include <libv/vm4/load.hpp>

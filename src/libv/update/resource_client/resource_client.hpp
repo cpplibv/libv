@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/resource_client/resource_client.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_client/resource_client.hpp
 
 #pragma once
 

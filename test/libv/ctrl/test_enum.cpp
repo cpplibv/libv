@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: test/libv/ctrl/test_enum.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: test/libv/ctrl/test_enum.cpp
 
 // hpp
 #include <catch/catch.hpp>

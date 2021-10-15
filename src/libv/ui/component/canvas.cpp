@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/canvas.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/canvas.cpp
 
 // hpp
 #include <libv/ui/component/canvas.hpp>

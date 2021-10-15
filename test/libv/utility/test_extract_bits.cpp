@@ -1,4 +1,4 @@
-// Project: libv.utility, File: test/libv/utility/test_extract_bits.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: test/libv/utility/test_extract_bits.cpp
 
 // hpp
 #include <catch/catch.hpp>

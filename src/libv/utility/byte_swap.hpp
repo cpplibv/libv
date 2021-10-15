@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/byte_swap.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/byte_swap.hpp
 
 #pragma once
 

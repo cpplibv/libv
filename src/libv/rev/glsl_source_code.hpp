@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/glsl_compose.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/glsl_source_code.hpp
 
 #pragma once
 

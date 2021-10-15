@@ -1,4 +1,4 @@
-// Project: libv.frame, File: src/libv/frame/events_variant.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.frame, File: src/libv/frame/events_variant.hpp
 
 #pragma once
 

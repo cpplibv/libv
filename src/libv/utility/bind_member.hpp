@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/bind_member.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/bind_member.hpp
 
 #pragma once
 

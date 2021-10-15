@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/time_point.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/time_point.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.sys, File: src/libv/sys/start.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.sys, File: src/libv/sys/start.cpp
 
 // hpp
 #include <libv/sys/start.hpp>

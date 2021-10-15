@@ -1,4 +1,4 @@
-// Project: libv, File: app/enum/enum_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/enum/enum_main.cpp
 
 // libv
 #include <libv/lua/lua.hpp>

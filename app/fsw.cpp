@@ -1,4 +1,4 @@
-// Project: libv, File: app/fsw.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/fsw.cpp
 
 // ext
 #include <fmt/chrono.h>

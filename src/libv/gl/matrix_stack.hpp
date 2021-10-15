@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/matrix_stack.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/matrix_stack.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: test/libv/utility/test_interval_registry.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: test/libv/utility/test_interval_registry.cpp
 
 // hpp
 #include <catch/catch.hpp>

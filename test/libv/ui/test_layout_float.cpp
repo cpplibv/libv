@@ -1,4 +1,4 @@
-// Project: libv.ui, File: test/libv/ui/test_layout_float.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: test/libv/ui/test_layout_float.cpp
 
 // hpp
 #include <catch/catch.hpp>

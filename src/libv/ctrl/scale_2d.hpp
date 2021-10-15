@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/scale_2d.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/scale_2d.hpp
 
 #pragma once
 

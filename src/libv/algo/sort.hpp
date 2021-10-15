@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/sort.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/sort.hpp
 
 #pragma once
 

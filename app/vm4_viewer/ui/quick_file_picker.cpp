@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/quick_file_picker.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: app/vm4_viewer/ui/quick_file_picker.cpp
 
 // hpp
 #include <vm4_viewer/ui/quick_file_picker.hpp>

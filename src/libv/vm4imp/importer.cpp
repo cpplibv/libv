@@ -1,4 +1,4 @@
-// Project: libv.vm4imp, File: src/libv/vm4imp/importer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4imp, File: src/libv/vm4imp/importer.cpp
 
 // hpp
 #include <libv/vm4imp/importer.hpp>

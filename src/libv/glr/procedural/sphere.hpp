@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/procedural/sphere.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/procedural/sphere.hpp
 
 #pragma once
 

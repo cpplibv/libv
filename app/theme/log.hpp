@@ -1,4 +1,4 @@
-// Project: libv, File: app/theme/log.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/log.hpp
 
 #pragma once
 

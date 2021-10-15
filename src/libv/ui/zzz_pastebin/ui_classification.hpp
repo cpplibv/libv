@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/zzz_pastebin/ui_classification.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/zzz_pastebin/ui_classification.hpp
 
 #pragma once
 

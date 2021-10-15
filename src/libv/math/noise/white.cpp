@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/noise/white.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/noise/white.cpp
 
 // hpp
 #include <libv/math/noise/white.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/ui/parse/parse_align.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: src/libv/ui/parse/parse_align.cpp
 
 // hpp
 #include <libv/ui/parse/parse_align.hpp>

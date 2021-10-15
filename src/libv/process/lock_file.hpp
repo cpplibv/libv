@@ -1,4 +1,4 @@
-// Project: libv.process, File: src/libv/process/lock_file.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.process, File: src/libv/process/lock_file.hpp
 
 #pragma once
 

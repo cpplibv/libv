@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/update_client/update_client.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_client/update_client.cpp
 
 // hpp
 #include <libv/update/update_client/update_client.hpp>

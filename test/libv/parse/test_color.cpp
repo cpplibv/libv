@@ -1,4 +1,4 @@
-// Project: libv.parse, File: test/libv/parse/test_color.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: test/libv/parse/test_color.cpp
 
 #include <catch/catch.hpp>
 

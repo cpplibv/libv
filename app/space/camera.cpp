@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/camera.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/camera.cpp
 
 // hpp
 #include <space/camera.hpp>

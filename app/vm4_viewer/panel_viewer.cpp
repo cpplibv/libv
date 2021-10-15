@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/panel_viewer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/panel_viewer.cpp
 
 // hpp
 #include <vm4_viewer/panel_viewer.hpp>

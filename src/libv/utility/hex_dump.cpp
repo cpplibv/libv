@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/hex_dump.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/hex_dump.cpp
 
 // hpp
 #include <libv/utility/hex_dump.hpp>

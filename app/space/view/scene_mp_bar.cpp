@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/scene_mp_bar.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/scene_mp_bar.cpp
 
 // hpp
 #include <space/view/scene_mp_bar.hpp>

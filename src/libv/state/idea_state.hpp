@@ -1,4 +1,4 @@
-// Project: libv.state, File: src/libv/state/idea_state.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.state, File: src/libv/state/idea_state.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/read_file.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/read_file.cpp
 
 // hpp
 #include <libv/utility/read_file.hpp>

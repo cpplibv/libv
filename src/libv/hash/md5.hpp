@@ -1,4 +1,4 @@
-// Project: libv.hash, File: src/libv/hash/md5.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.hash, File: src/libv/hash/md5.hpp
 
 #pragma once
 

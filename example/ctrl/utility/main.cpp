@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: example/ctrl/utility/main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/utility/main.cpp
 
 // libv
 #include <libv/input/event.hpp>

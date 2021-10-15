@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property/font_size.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/property/font_size.hpp
 
 #pragma once
 

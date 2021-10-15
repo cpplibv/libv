@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/context/context_mouse.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/context/context_mouse.cpp
 
 // hpp
 #include <libv/ui/context/context_mouse.hpp>

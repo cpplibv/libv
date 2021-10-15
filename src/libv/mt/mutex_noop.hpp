@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/mutex_noop.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/mutex_noop.hpp
 
 #pragma once
 

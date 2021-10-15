@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/worker_thread.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/worker_thread.cpp
 
 // hpp
 #include <libv/mt/worker_thread.hpp>

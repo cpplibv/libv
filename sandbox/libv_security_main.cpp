@@ -1,4 +1,4 @@
-// Project: libv.security, File: sandbox/libv_security_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.security, File: sandbox/libv_security_main.cpp
 
 // libv
 #include <libv/security/hash_sha256.hpp>

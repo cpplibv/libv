@@ -1,4 +1,4 @@
-// Project: libv.sig, File: test/libv/sig/signal_test.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: test/libv/sig/signal_test.cpp
 
 #include <catch/catch.hpp>
 

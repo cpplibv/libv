@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/check_box.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/check_box.cpp
 
 // hpp
 #include <libv/ui/component/check_box.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.ui, File: sandbox/libv_ui_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: sandbox/libv_ui_main.cpp
 
 // libv
 #include <libv/frame/frame.hpp>

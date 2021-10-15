@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/bytes/output_bytes.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/bytes/output_bytes.hpp
 
 #pragma once
 

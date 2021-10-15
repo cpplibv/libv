@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/observer_ref.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/observer_ref.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: sandbox/libv_ctrl_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: sandbox/libv_ctrl_main.cpp
 
 // ext
 #include <GLFW/glfw3.h>

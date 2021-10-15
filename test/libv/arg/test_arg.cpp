@@ -1,4 +1,4 @@
-// Project: libv.arg, File: test/libv/arg/test_arg.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.arg, File: test/libv/arg/test_arg.cpp
 
 // hpp
 #include <catch/catch.hpp>

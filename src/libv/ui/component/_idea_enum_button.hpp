@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/enum_button.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/_idea_enum_button.hpp
 
 #pragma once
 

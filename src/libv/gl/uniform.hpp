@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/uniform.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/uniform.hpp
 
 #pragma once
 

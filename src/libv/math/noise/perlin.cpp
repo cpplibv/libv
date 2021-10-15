@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/noise/perlin.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/noise/perlin.cpp
 
 // hpp
 #include <libv/math/noise/perlin.hpp>

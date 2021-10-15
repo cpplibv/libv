@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/canvas.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/canvas.cpp
 
 // hpp
 #include <space/canvas.hpp>

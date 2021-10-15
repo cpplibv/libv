@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/log.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/log.hpp
 
 #pragma once
 

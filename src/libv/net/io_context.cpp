@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/io_context.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/io_context.cpp
 
 // hpp
 #include <libv/net/io_context.hpp>

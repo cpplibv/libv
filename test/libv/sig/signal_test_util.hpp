@@ -1,4 +1,4 @@
-// Project: libv.sig, File: test/libv/sig/signal_test_util.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: test/libv/sig/signal_test_util.hpp
 
 #pragma once
 

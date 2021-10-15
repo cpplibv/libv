@@ -1,4 +1,4 @@
-// Project: libv.ui, File: test/libv/ui/test_style.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: test/libv/ui/test_style.cpp
 
 // hpp
 #include <catch/catch.hpp>

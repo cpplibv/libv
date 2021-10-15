@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/text_2D.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/text_2D.cpp
 //
 //// hpp
 //#include <libv/ui/component/string_2D.hpp>

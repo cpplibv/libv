@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/recurse.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/recurse.hpp
 
 // std
 #include <utility>

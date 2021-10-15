@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/error.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/error.cpp
 
 // hpp
 #include <libv/net/error.hpp>

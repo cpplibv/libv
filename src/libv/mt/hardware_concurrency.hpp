@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/hardware_concurrency.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/hardware_concurrency.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/procedural/grid.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/procedural/grid.hpp
 
 #pragma once
 

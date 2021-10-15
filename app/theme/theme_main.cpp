@@ -1,4 +1,4 @@
-// Project: libv, File: app/theme/theme_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/theme_main.cpp
 
 // libv
 #include <libv/frame/frame.hpp>

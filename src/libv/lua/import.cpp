@@ -1,4 +1,4 @@
-// Project: libv.lua, File: src/libv/lua/import.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: src/libv/lua/import.cpp
 
 // hpp
 #include <libv/lua/import.hpp>

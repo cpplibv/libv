@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property/shader_quad.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/property/shader_quad.hpp
 
 #pragma once
 

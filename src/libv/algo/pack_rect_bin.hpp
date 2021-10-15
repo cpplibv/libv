@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/pack_rect_bin.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/pack_rect_bin.hpp
 
 #pragma once
 

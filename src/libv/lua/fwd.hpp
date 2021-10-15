@@ -1,4 +1,4 @@
-// Project: libv.lua, File: src/libv/lua/fwd.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: src/libv/lua/fwd.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/random/xoroshiro128.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/random/xoroshiro128.hpp
 
 #pragma once
 

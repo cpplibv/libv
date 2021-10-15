@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/event/mouse_order.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event/mouse_order.hpp
 
 #pragma once
 

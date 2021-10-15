@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/keyboard.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: app/vm4_viewer/ui/keyboard.hpp
 
 #pragma once
 

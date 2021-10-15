@@ -1,4 +1,4 @@
-// Project: libv.fsw, File: src/libv/fsw/watcher.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.fsw, File: src/libv/fsw/watcher.cpp
 
 // hpp
 #include <libv/fsw/watcher.hpp>

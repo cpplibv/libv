@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/raw/font_consolas_min.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/raw/font_consolas_min.cpp
 
 // pro
 #include <libv/ui/raw/font_consolas_min.hpp>

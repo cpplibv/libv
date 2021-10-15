@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: example/ctrl/camera/global_controls.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/camera/global_controls.cpp
 // --- Client side singleton source file - global_controls.cpp
 
 #include "global_controls.hpp"

@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: test/libv/ctrl/test_validate.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: test/libv/ctrl/test_validate.cpp
 
 // hpp
 #include <catch/catch.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.net, File: sandbox/libv_net_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: sandbox/libv_net_main.cpp
 
 // libv
 #include <libv/log/log.hpp>

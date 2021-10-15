@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/_idea/graph.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/_idea/graph.hpp
 
 #pragma once
 

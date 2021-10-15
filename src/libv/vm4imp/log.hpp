@@ -1,4 +1,4 @@
-// Project: libv.vm4imp, File: src/libv/vm4imp/log.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4imp, File: src/libv/vm4imp/log.hpp
 
 #pragma once
 

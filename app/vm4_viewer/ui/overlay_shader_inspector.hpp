@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/overlay_shader_inspector.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: app/vm4_viewer/ui/overlay_shader_inspector.hpp
 
 // libv
 #include <libv/ui/component/panel_line.hpp>

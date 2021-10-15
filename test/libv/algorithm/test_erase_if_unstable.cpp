@@ -1,4 +1,4 @@
-// Project: libv, File: test/libv/algorithm/test_erase_if_unstable.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: test/libv/algorithm/test_erase_if_unstable.cpp
 
 // hpp
 #include <catch/catch.hpp>

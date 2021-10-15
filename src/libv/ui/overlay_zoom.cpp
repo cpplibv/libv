@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/overlay_zoom.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/overlay_zoom.cpp
 
 // hpp
 #include <libv/ui/overlay_zoom.hxx>

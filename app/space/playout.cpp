@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/playout.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/playout.cpp
 
 // hpp
 #include <space/playout.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/generic_path.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/generic_path.hpp
 
 #pragma once
 

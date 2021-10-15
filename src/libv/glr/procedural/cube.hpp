@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/procedural/cube.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/procedural/cube.hpp
 
 #pragma once
 

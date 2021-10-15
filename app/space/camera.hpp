@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/camera.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/camera.hpp
 
 #pragma once
 

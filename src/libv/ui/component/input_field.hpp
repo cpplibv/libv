@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/input_field.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/input_field.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.sig, File: src/libv/sig/accumulator.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: src/libv/sig/accumulator.hpp
 
 #pragma once
 

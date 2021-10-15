@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: test/libv/ctrl/mock_feature.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: test/libv/ctrl/mock_feature.hpp
 
 // std
 #include <vector>

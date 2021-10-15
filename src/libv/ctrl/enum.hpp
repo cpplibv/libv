@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/enum.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/enum.hpp
 
 #pragma once
 

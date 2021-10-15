@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/exponential_moving_average.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/exponential_moving_average.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv, File: sandbox/libv_reflection2_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: sandbox/libv_reflection2_main.cpp
 
 // libv
 #include <libv/meta/for_constexpr.hpp>

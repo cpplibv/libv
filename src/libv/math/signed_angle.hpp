@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/signed_angle.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/signed_angle.hpp
 
 #pragma once
 

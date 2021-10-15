@@ -1,4 +1,4 @@
-// Project: libv.net, File: test/libv/net/mtcp_test.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: test/libv/net/mtcp_test.cpp
 
 // test
 #include <catch/catch.hpp>

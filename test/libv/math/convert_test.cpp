@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/convert_test.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: test/libv/math/convert_test.cpp
 
 #include <catch/catch.hpp>
 

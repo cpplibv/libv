@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/icon_set.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/icon_set.cpp
 
 // hpp
 #include <space/view/icon_set.hpp>

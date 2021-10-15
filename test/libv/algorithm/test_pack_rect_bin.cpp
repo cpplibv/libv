@@ -1,4 +1,4 @@
-// Project: libv, File: test/libv/algorithm/test_pack_rect_bin.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: test/libv/algorithm/test_pack_rect_bin.cpp
 
 // hpp
 #include <catch/catch.hpp>

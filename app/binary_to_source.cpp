@@ -1,4 +1,4 @@
-// Project: libv, File: app/binary_to_source.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/binary_to_source.cpp
 
 // ext
 #include <fmt/format.h>

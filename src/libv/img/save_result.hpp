@@ -1,4 +1,4 @@
-// Project: libv.img, File: src/libv/img/save_result.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.img, File: src/libv/img/save_result.hpp
 
 #pragma once
 

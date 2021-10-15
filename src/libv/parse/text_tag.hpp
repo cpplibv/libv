@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/parse/text_tag.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: src/libv/parse/text_tag.hpp
 
 #pragma once
 

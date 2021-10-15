@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/endian.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/endian.hpp
 
 #pragma once
 

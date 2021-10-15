@@ -1,4 +1,4 @@
-// Project: libv.container, File: src/libv/container/memory_store.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.container, File: src/libv/container/memory_store.hpp
 
 #pragma once
 

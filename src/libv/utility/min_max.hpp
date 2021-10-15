@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/min_max.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/min_max.hpp
 
 #pragma once
 

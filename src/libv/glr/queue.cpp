@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/queue.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/queue.cpp
 
 // hpp
 #include <libv/glr/queue.hpp>

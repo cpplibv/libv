@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/shader_load_event.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/shader_load_event.hpp
 
 #pragma once
 

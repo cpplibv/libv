@@ -1,4 +1,4 @@
-// Project: libv.color, File: test/libv/color/test_spread.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.color, File: test/libv/color/test_spread.cpp
 
 // hpp
 #include <catch/catch.hpp>

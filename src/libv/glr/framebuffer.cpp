@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/framebuffer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/framebuffer.cpp
 
 // hpp
 #include <libv/glr/framebuffer.hpp>

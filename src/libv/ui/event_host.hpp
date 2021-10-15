@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/event_host.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event_host.hpp
 
 #pragma once
 

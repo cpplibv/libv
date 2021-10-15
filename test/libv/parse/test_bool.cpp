@@ -1,4 +1,4 @@
-// Project: libv.parse, File: test/libv/parse/test_bool.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: test/libv/parse/test_bool.cpp
 
 #include <catch/catch.hpp>
 

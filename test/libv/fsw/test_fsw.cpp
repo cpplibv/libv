@@ -1,4 +1,4 @@
-// Project: libv.fsw, File: test/libv/fsw/test_fsw.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.fsw, File: test/libv/fsw/test_fsw.cpp
 
 // hpp
 #include <catch/catch.hpp>

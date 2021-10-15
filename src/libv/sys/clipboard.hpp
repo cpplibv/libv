@@ -1,4 +1,4 @@
-// Project: libv.sys, File: src/libv/sys/clipboard.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.sys, File: src/libv/sys/clipboard.hpp
 
 #pragma once
 

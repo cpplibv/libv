@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/unique_function.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/unique_function.hpp
 
 #pragma once
 

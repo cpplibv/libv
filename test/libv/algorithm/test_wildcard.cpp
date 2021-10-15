@@ -1,4 +1,4 @@
-// Project: libv, File: test/libv/algorithm/test_wildcard.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: test/libv/algorithm/test_wildcard.cpp
 
 // hpp
 #include <catch/catch.hpp>

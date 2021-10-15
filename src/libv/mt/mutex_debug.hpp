@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/mutex_debug.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/mutex_debug.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.sig, File: src/libv/sig/trackable.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: src/libv/sig/trackable.hpp
 
 #pragma once
 

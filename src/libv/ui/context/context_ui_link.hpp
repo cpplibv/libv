@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/context/context_ui_link.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/context/context_ui_link.hpp
 
 #pragma once
 

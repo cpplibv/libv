@@ -1,4 +1,4 @@
-// Project: libv.utility, File: test/libv/utility/flag_enum.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: test/libv/utility/flag_enum.cpp
 
 // hpp
 #include <catch/catch.hpp>

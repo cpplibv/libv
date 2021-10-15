@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/vertex_array.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/vertex_array.hpp
 
 #pragma once
 

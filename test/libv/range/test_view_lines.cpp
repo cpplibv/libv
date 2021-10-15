@@ -1,4 +1,4 @@
-// Project: libv.range, File: test/libv/range/test_view_lines.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: test/libv/range/test_view_lines.cpp
 
 // hpp
 #include <catch/catch.hpp>

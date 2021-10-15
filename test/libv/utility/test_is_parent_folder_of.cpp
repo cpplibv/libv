@@ -1,4 +1,4 @@
-// Project: libv.utility, File: test/libv/utility/test_is_parent_folder_of.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: test/libv/utility/test_is_parent_folder_of.cpp
 
 // hpp
 #include <catch/catch.hpp>

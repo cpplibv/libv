@@ -1,4 +1,4 @@
-// Project: libv.ui, File: test/libv/ui/test_event_mouse.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: test/libv/ui/test_event_mouse.cpp
 
 // hpp
 #include <catch/catch.hpp>

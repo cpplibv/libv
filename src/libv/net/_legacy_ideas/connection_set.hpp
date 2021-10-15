@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/_legacy_ideas/connection_set.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/_legacy_ideas/connection_set.hpp
 
 #pragma once
 

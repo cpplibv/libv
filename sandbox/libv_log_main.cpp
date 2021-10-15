@@ -1,4 +1,4 @@
-// Project: libv.log, File: sandbox/libv_log_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.log, File: sandbox/libv_log_main.cpp
 
 // std
 #include <iostream>

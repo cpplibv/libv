@@ -1,4 +1,4 @@
-// Project: libv.sig, File: src/libv/sig/signal.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.sig, File: src/libv/sig/signal.hpp
 
 #pragma once
 

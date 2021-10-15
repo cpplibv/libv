@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/member_offset.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/member_offset.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: example/ctrl/camera/camera.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/camera/camera.cpp
 // --- Client business logic source file - camera.cpp
 
 #include "camera.hpp"

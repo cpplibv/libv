@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/input_field.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/input_field.cpp
 
 // hpp
 #include <libv/ui/component/input_field.hpp>

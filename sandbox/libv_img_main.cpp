@@ -1,4 +1,4 @@
-// Project: libv.img, File: sandbox/libv_img_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.img, File: sandbox/libv_img_main.cpp
 
 // libv
 #include <libv/img/save.hpp>

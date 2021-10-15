@@ -1,4 +1,4 @@
-// Project: libv.fsw, File: src/libv/fsw/action.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.fsw, File: src/libv/fsw/action.hpp
 
 #pragma once
 

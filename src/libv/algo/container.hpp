@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/container.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/container.hpp
 
 #pragma once
 

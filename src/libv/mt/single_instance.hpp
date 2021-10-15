@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/single_instance.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/single_instance.hpp
 
 #pragma once
 

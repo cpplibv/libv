@@ -1,4 +1,4 @@
-// Project: libv.rev, File: test/libv/rev/test_glsl_compose.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: test/libv/rev/test_glsl_compose.cpp
 
 // hpp
 #include <catch/catch.hpp>

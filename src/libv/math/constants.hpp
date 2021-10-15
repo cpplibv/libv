@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/constants.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/constants.hpp
 
 #pragma once
 

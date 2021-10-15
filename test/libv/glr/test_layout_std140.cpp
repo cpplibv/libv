@@ -1,4 +1,4 @@
-// Project: libv.glr, File: test/libv/glr/test_layout_std140.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: test/libv/glr/test_layout_std140.cpp
 
 // hpp
 #include <catch/catch.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_line_core.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/panel_line_core.hpp
 
 // hpp
 #include <libv/ui/component/panel_line.hpp>

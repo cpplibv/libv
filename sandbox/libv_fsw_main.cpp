@@ -1,4 +1,4 @@
-// Project: libv.fsw, File: sandbox/libv_fsw_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.fsw, File: sandbox/libv_fsw_main.cpp
 
 // std
 #include <chrono>

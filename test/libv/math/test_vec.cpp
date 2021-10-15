@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_vec.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: test/libv/math/test_vec.cpp
 
 #include <libv/math/vec.hpp>
 

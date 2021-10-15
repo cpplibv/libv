@@ -1,4 +1,4 @@
-// Project: libv.ui, File: app/vm4_viewer/ui/overlay_notification.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: app/vm4_viewer/ui/overlay_notification.hpp
 
 // libv
 #include <libv/ui/chrono.hpp>

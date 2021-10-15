@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/to_tuple.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/to_tuple.hpp
 
 #pragma once
 

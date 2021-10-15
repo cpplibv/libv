@@ -1,4 +1,4 @@
-// Project: libv.gl, File: sandbox/libv_gl_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: sandbox/libv_gl_main.cpp
 
 // hpp
 #include "libv_gl_runner.hpp"

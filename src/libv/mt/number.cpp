@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/number.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/number.cpp
 
 // hpp
 #include <libv/mt/number.hpp>

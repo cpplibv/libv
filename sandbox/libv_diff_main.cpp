@@ -1,4 +1,4 @@
-// Project: libv.diff, File: sandbox/libv_diff_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.diff, File: sandbox/libv_diff_main.cpp
 
 // libv
 #include <libv/utility/hex_dump.hpp>

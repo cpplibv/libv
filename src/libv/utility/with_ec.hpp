@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/with_ec.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/with_ec.hpp
 
 #pragma once
 

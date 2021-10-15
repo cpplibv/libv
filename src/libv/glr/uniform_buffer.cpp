@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/uniform_buffer.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/uniform_buffer.cpp
 
 // hpp
 #include <libv/glr/uniform_buffer.hpp>

@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/object.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/scene/object.hpp
 
 #pragma once
 

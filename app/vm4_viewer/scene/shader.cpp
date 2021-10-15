@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/shader.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/scene/shader.cpp
 
 // hpp
 #include <vm4_viewer/scene/shader.hpp>

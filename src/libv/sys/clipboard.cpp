@@ -1,4 +1,4 @@
-// Project: libv.sys, File: src/libv/sys/clipboard.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.sys, File: src/libv/sys/clipboard.cpp
 
 // hpp
 #include <libv/sys/clipboard.hpp>

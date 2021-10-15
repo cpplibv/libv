@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/detail/core_component.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/detail/core_component.cpp
 
 // hpp
 #include <libv/ui/component/detail/core_component.hpp>

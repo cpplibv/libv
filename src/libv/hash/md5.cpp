@@ -1,4 +1,4 @@
-// Project: libv.hash, File: src/libv/hash/md5.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.hash, File: src/libv/hash/md5.cpp
 
 // hpp
 #include <libv/hash/md5.hpp>

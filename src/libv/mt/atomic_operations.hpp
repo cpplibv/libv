@@ -1,4 +1,4 @@
-// Project: libv.mt, File: src/libv/mt/atomic_operations.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: src/libv/mt/atomic_operations.hpp
 
 #pragma once
 

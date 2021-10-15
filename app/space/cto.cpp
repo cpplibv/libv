@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/cto.cpp
 
 // hpp
 #include <space/cto.hpp>

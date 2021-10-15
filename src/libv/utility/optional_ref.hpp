@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/optional_ref.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/optional_ref.hpp
 
 #pragma once
 

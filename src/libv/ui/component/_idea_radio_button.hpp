@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/radio_button.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/_idea_radio_button.hpp
 
 #pragma once
 

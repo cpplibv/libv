@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/saturate.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: src/libv/math/saturate.hpp
 
 #pragma once
 

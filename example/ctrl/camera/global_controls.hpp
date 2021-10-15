@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: example/ctrl/camera/global_controls.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/camera/global_controls.hpp
 // --- Client side singleton header file - global_controls.hpp
 
 #pragma once

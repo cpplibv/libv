@@ -1,4 +1,4 @@
-// Project: libv.ecs, File: src/libv/ecs/entity.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ecs, File: src/libv/ecs/entity.hpp
 
 #pragma once
 

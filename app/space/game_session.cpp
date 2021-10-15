@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/game_session.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/game_session.cpp
 
 // hpp
 #include <space/game_session.hpp>

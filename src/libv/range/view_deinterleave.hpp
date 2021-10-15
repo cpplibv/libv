@@ -1,4 +1,4 @@
-// Project: libv.range, File: src/libv/range/view_deinterleave.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: src/libv/range/view_deinterleave.hpp
 
 #pragma once
 

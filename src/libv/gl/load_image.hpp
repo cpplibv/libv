@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/load_image.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/load_image.hpp
 
 #pragma once
 

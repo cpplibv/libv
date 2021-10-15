@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/layout_std140.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/layout_std140.hpp
 
 #pragma once
 

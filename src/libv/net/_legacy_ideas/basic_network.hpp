@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/_legacy_ideas/basic_network.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/_legacy_ideas/basic_network.hpp
 
 #pragma once
 

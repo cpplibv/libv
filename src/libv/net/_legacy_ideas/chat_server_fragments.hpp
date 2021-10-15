@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/_legacy_ideas/chat_server_fragments.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/_legacy_ideas/chat_server_fragments.hpp
 
 #pragma once
 

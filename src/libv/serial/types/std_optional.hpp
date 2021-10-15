@@ -1,4 +1,4 @@
-// Project: libv.serial, File: src/libv/serial/types/std_optional.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.serial, File: src/libv/serial/types/std_optional.hpp
 
 #pragma once
 

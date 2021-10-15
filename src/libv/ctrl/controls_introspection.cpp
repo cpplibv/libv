@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/controls_introspection.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/controls_introspection.cpp
 
 // hpp
 #include <libv/ctrl/controls.hpp>

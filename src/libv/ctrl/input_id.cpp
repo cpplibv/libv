@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/input_id.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/input_id.cpp
 
 // hpp
 #include <libv/ctrl/input_id.hpp>

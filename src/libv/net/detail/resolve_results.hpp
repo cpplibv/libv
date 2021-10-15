@@ -1,4 +1,4 @@
-// Project: libv.net, File: src/libv/net/detail/resolve_results.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.net, File: src/libv/net/detail/resolve_results.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/extract_bits.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/extract_bits.hpp
 
 #pragma once
 

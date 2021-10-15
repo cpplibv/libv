@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/identity.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/identity.hpp
 
 #pragma once
 

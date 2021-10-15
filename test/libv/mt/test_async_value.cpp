@@ -1,4 +1,4 @@
-// Project: libv.mt, File: test/libv/mt/test_async_value.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.mt, File: test/libv/mt/test_async_value.cpp
 
 // hpp
 #include <catch/catch.hpp>

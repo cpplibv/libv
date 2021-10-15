@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/always.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/always.hpp
 
 #pragma once
 

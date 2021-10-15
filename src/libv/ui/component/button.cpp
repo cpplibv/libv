@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/button.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/button.cpp
 
 // hpp
 #include <libv/ui/component/button.hpp>

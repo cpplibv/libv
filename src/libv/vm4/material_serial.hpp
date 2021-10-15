@@ -1,4 +1,4 @@
-// Project: libv.vm4, File: src/libv/vm4/material_serial.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4, File: src/libv/vm4/material_serial.hpp
 
 #pragma once
 

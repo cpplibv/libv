@@ -1,4 +1,4 @@
-// Project: libv.lua, File: test/libv/lua/test_import.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.lua, File: test/libv/lua/test_import.cpp
 
 // hpp
 #include <catch/catch.hpp>

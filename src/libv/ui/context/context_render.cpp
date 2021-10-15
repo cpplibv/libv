@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/context/context_render.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/context/context_render.cpp
 
 // hpp
 #include <libv/ui/context/context_render.hpp>

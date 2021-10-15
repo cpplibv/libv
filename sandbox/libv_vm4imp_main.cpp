@@ -1,4 +1,4 @@
-// Project: libv.vm4imp, File: sandbox/libv_vm4imp_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.vm4imp, File: sandbox/libv_vm4imp_main.cpp
 
 // ext
 #include <fmt/printf.h>

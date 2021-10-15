@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/property/column_count.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/property/column_count.hpp
 
 #pragma once
 

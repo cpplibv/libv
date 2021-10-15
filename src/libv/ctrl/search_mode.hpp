@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/search_mode.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/search_mode.hpp
 
 #pragma once
 

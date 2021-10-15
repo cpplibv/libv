@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/update_server/update_info_database.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/update_server/update_info_database.cpp
 
 // hpp
 #include <libv/update/update_server/update_info_database.hpp>

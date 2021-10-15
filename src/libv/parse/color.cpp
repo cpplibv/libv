@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/parse/color.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: src/libv/parse/color.cpp
 
 // hpp
 #include <libv/parse/color.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/program.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/program.cpp
 
 // hpp
 #include <libv/glr/program.hpp>

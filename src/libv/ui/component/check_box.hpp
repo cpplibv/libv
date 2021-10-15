@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/check_box.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/check_box.hpp
 
 #pragma once
 

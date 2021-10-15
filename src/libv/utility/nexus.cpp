@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/nexus.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.utility, File: src/libv/utility/nexus.cpp
 
 // hpp
 #include <libv/utility/nexus.hpp>

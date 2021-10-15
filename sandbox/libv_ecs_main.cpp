@@ -1,4 +1,4 @@
-// Project: libv.ecs, File: sandbox/libv_ecs_main.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ecs, File: sandbox/libv_ecs_main.cpp
 
 // ext
 #include <fmt/format.h>

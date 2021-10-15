@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/raw/texture2D_white256.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/raw/texture2D_white256.hpp
 
 #pragma once
 

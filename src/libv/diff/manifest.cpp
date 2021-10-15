@@ -1,4 +1,4 @@
-// Project: libv.diff, File: src/libv/diff/manifest.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.diff, File: src/libv/diff/manifest.cpp
 
 // hpp
 #include <libv/diff/manifest.hpp>

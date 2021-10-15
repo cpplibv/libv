@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: example/ctrl/camera/camera.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: example/ctrl/camera/camera.hpp
 // --- Client business logic header file - camera.hpp
 
 #pragma once

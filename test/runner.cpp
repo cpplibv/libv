@@ -1,4 +1,4 @@
-// Project: libv, File: test/runner.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: test/runner.cpp
 
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_CONSOLE_WIDTH 100

@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/fwd.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/fwd.hpp
 
 #pragma once
 

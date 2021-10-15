@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/_idea/_idea_uniform_stream.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.rev, File: src/libv/rev/_idea/_idea_uniform_stream.hpp
 
 #pragma once
 

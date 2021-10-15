@@ -1,4 +1,4 @@
-// Project: libv.parse, File: src/libv/parse/bool.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.parse, File: src/libv/parse/bool.cpp
 
 // hpp
 #include <libv/parse/bool.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.security, File: src/libv/security/hash_sha256.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.security, File: src/libv/security/hash_sha256.hpp
 
 #pragma once
 

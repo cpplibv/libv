@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/file_picker.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/component/_idea_file_picker.cpp
 //
 //// hpp
 //#include <libv/ui/component/file_picker.hpp>

@@ -1,4 +1,4 @@
-// Project: libv.security, File: src/libv/security/rsa_signature.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.security, File: src/libv/security/rsa_signature.hpp
 
 #pragma once
 

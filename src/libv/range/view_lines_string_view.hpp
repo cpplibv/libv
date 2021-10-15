@@ -1,4 +1,4 @@
-// Project: libv.range, File: src/libv/range/view_lines_string_view.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.range, File: src/libv/range/view_lines_string_view.hpp
 
 #pragma once
 

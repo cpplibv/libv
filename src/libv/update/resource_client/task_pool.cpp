@@ -1,4 +1,4 @@
-// Project: libv.update, File: src/libv/update/resource_client/task_pool.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.update, File: src/libv/update/resource_client/task_pool.cpp
 
 // hpp
 #include <libv/update/resource_client/task_pool.hxx>

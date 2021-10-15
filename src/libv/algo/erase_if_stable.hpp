@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/erase_if_stable.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/erase_if_stable.hpp
 
 #pragma once
 

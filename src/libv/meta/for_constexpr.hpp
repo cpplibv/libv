@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/for_constexpr.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/for_constexpr.hpp
 
 #pragma once
 

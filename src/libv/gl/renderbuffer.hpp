@@ -1,4 +1,4 @@
-// Project: libv.gl, File: src/libv/gl/renderbuffer.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.gl, File: src/libv/gl/renderbuffer.hpp
 
 #pragma once
 

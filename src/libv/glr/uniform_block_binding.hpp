@@ -1,4 +1,4 @@
-// Project: libv.glr, File: src/libv/glr/uniform_block_binding.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.glr, File: src/libv/glr/uniform_block_binding.hpp
 
 #pragma once
 

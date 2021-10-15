@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/player.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/player.hpp
 
 #pragma once
 

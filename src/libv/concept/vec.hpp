@@ -1,4 +1,4 @@
-// Project: libv.concept, File: src/libv/concept/vec.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.concept, File: src/libv/concept/vec.hpp
 
 #pragma once
 

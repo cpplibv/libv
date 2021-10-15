@@ -1,4 +1,4 @@
-// Project: libv, File: app/theme/engine.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/theme/engine.cpp
 
 // hpp
 #include <theme/engine.hpp>

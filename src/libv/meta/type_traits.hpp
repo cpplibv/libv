@@ -1,4 +1,4 @@
-// Project: libv.meta, File: src/libv/meta/type_traits.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.meta, File: src/libv/meta/type_traits.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/scene_main_ui.cpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/view/scene_main_ui.cpp
 
 // hpp
 #include <space/view/scene_main_ui.hpp>

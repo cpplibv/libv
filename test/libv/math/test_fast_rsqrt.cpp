@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_fast_rsqrt.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.math, File: test/libv/math/test_fast_rsqrt.cpp
 
 
 // hpp

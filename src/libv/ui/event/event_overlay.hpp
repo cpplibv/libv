@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/event/event_overlay.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ui, File: src/libv/ui/event/event_overlay.hpp
 
 #pragma once
 

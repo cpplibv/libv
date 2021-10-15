@@ -1,4 +1,4 @@
-// Project: libv.ctrl, File: src/libv/ctrl/binding_level.hpp, Author: Császár Mátyás [Vader]
+// Project: libv.ctrl, File: src/libv/ctrl/binding_level.hpp
 
 #pragma once
 

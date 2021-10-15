@@ -1,4 +1,4 @@
-// Project: libv.algo, File: src/libv/algo/wildcard.cpp, Author: Császár Mátyás [Vader]
+// Project: libv.algo, File: src/libv/algo/wildcard.cpp
 
 // hpp
 #include <libv/algo/wildcard.hpp>

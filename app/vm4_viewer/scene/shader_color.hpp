@@ -1,4 +1,4 @@
-// Project: libv, File: app/vm4_viewer/scene/shader_color.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/vm4_viewer/scene/shader_color.hpp
 
 #pragma once
 
