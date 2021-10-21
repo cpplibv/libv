@@ -20,7 +20,7 @@ struct BezierCurve {
 	std::vector<libv::vec2f> points;
 
 public:
-	[[nodiscard]] inline size_t size() const noexcept { // C++20 constexpr
+	[[nodiscard]] inline size_t size() const noexcept {
 		return (points.size() + 2) / 3;
 	}
 
@@ -28,7 +28,7 @@ public:
 		return 0.f;
 	}
 
-	[[nodiscard]] inline float max() const noexcept { // C++20 constexpr
+	[[nodiscard]] inline float max() const noexcept {
 		return static_cast<float>((points.size() - 1) / 3);
 	}
 

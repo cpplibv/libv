@@ -4,6 +4,7 @@
 #include <libv/ctrl/controls.hpp>
 // libv
 #include <libv/utility/float_equal.hpp>
+#include <libv/utility/parse_number.hpp>
 #include <libv/utility/trim.hpp>
 // std
 #include <sstream>
@@ -103,7 +104,6 @@ std::string Controls::export_settings() {
 }
 
 void Controls::import_bindings(std::string_view data) {
-	// TODO P4: C++20 replace temporary strings that are created for stoi and stod
 	while (!data.empty()) {
 		const auto it_lf = data.find('\n');
 		const auto line = libv::trim(data.substr(0, it_lf));
@@ -112,13 +112,13 @@ void Controls::import_bindings(std::string_view data) {
 		if (line.empty() || line.starts_with("//"))
 			continue;
 
-		const auto it_seq = line.find(":");
+		const auto it_seq = line.find(':');
 
 		const auto range_info = line.substr(0, it_seq);
 		const auto range_sequence = libv::trim(line.substr(it_seq + 1));
 
-		const auto it_number = range_info.find("#");
-		const auto it_scale = range_info.find("*");
+		const auto it_number = range_info.find('#');
+		const auto it_scale = range_info.find('*');
 		const bool has_scale = it_scale == std::string_view::npos;
 
 		const auto range_feature = libv::trim(range_info.substr(0, it_number));
@@ -128,14 +128,13 @@ void Controls::import_bindings(std::string_view data) {
 		bind(
 				std::string(range_feature),
 				range_sequence,
-				has_scale ? scale_type{1} : std::stod(std::string(range_scale)),
-				binding_level{std::stoi(std::string(range_level))}
+				has_scale ? scale_type{1} : libv::parse_number_or_throw<double>(range_scale),
+				static_cast<binding_level>(libv::parse_number_or_throw<int32_t>(range_level))
 		);
 	}
 }
 
 void Controls::import_settings(std::string_view data) {
-	// TODO P4: C++20 replace temporary strings that are created for stoi and stod
 	while (!data.empty()) {
 		const auto it_lf = data.find('\n');
 		const auto line = libv::trim(data.substr(0, it_lf));
@@ -144,8 +143,8 @@ void Controls::import_settings(std::string_view data) {
 		if (line.empty() || line.starts_with("//"))
 			continue;
 
-		const auto it_seq = line.find(":");
-		const auto it_div = line.find("#");
+		const auto it_seq = line.find(':');
+		const auto it_div = line.find('#');
 		const auto has_div = it_div != std::string_view::npos;
 
 		const auto range_info = libv::trim(line.substr(0, it_seq));
@@ -155,37 +154,35 @@ void Controls::import_settings(std::string_view data) {
 
 		const auto in_1D = [&](auto name, auto& var) {
 			if (range_key == name)
-				var = std::stod(std::string(range_value));
+				var = libv::parse_number_or_throw<double>(range_value);
 		};
 
 		const auto in_2D = [&](auto name, auto& var) {
 			if (range_key.starts_with(name) && range_key.ends_with("_x"))
-				var.x = std::stod(std::string(range_value));
+				var.x = libv::parse_number_or_throw<double>(range_value);
 			if (range_key.starts_with(name) && range_key.ends_with("_y"))
-				var.y = std::stod(std::string(range_value));
+				var.y = libv::parse_number_or_throw<double>(range_value);
 		};
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 		const auto in_div_1D = [&](auto name, auto& map, auto mptr) {
 			using id = std::remove_reference_t<decltype(map)>::key_type;
 
 			if (has_div && range_key == name)
-				map[static_cast<id>(std::stoi(std::string(range_id)))].*mptr = std::stod(std::string(range_value));
+				map[static_cast<id>(libv::parse_number_or_throw<int>(range_id))].*mptr = libv::parse_number_or_throw<double>(range_value);
 		};
 
 		const auto in_div_2D = [&](auto name, auto& map, auto mptr) {
 			using id = std::remove_reference_t<decltype(map)>::key_type;
+			auto& entry = map[static_cast<id>(libv::parse_number_or_throw<int>(range_id))].*mptr;
 
 			if (has_div && range_key.starts_with(name) && range_key.ends_with("_x"))
-				(map[static_cast<id>(std::stoi(std::string(range_id)))].*mptr).x = std::stod(std::string(range_value));
+				entry.x = libv::parse_number_or_throw<double>(range_value);
 			if (has_div && range_key.starts_with(name) && range_key.ends_with("_y"))
-				(map[static_cast<id>(std::stoi(std::string(range_id)))].*mptr).y = std::stod(std::string(range_value));
+				entry.y = libv::parse_number_or_throw<double>(range_value);
 		};
-#pragma GCC diagnostic pop
 
 		if (range_key == "timeout_sequence")
-				self->timeout_sequence = duration{std::stod(std::string(libv::trim(range_value)))};
+				self->timeout_sequence = duration{libv::parse_number_or_throw<double>(range_value)};
 
 		in_2D("scale_analog", self->scale_analog);
 		in_1D("impulse_button", self->impulse_button);

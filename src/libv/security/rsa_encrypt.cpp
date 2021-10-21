@@ -45,8 +45,8 @@ std::string aux_rsa_encrypt(std::string_view message, std::string_view key_strin
 
 	auto src = reinterpret_cast<const unsigned char*>(message.data());
 	auto dst = reinterpret_cast<unsigned char*>(result.data());
-	auto it_src = size_t{0};
-	auto it_dst = size_t{0};
+	auto it_src = 0uz;
+	auto it_dst = 0uz;
 
 	for (size_t i = 0 ; i < block_full_count ; ++i) {
 		int result_code = encrypt_func(block_size_in, src + it_src, dst + it_dst, key, padding);
@@ -93,8 +93,8 @@ std::string aux_rsa_decrypt(std::string_view encrypted, std::string_view key_str
 
 	const auto src = reinterpret_cast<const unsigned char*>(encrypted.data());
 	const auto dst = reinterpret_cast<unsigned char*>(result.data());
-	auto it_src = size_t{0};
-	auto it_dst = size_t{0};
+	auto it_src = 0uz;
+	auto it_dst = 0uz;
 	const auto end_src = encrypted.size();
 
 	while (it_src < end_src) {

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <deque>
 #include <mutex>
+#include <optional>
 
 
 namespace libv {

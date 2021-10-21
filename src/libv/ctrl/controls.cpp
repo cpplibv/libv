@@ -509,8 +509,7 @@ inline auto ImplControls::gather_feature(const C& target_binding, const O& opera
 	const auto& binary_operation = target_binding.operation_binary;
 	const auto value = target_binding.scale() * value_;
 
-	// TODO P2: C++20 equal_range with temporary string instead of string_view
-	const auto range = features.equal_range(std::string(feature_name));
+	const auto range = features.equal_range(feature_name);
 	if (range.first == range.second)
 		return;
 
@@ -677,27 +676,26 @@ void Controls::_context_leave(libv::type_uid type) {
 // -------------------------------------------------------------------------------------------------
 
 void Controls::_feature_action(libv::type_uid context, std::string&& name, ft_action function) {
-	// TODO P2: C++20 Better container would remove key copy
+	// TODO P4: Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function)));
 }
 
 void Controls::_feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers) {
-	// TODO P2: C++20 Better container would remove key copy
+	// TODO P4: Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function), multipliers));
 }
 
 void Controls::_feature_binary(libv::type_uid context, std::string&& name, ft_binary function) {
-	// TODO P2: C++20 Better container would remove key copy
+	// TODO P4: Better container would remove key copy
 	auto key = name;
 	self->features.emplace(std::move(key), Feature(context, std::move(name), std::move(function)));
 }
 
 void Controls::_remove_feature(libv::type_uid context, std::string_view name) {
-	// TODO P2: C++20 equal_range with temporary string instead of string_view
-	// TODO P5: Unordered multi map and equal range based erase if algorithm
-	const auto range = self->features.equal_range(std::string(name));
+	// TODO P5: Unordered multi map and equal range based erase algorithm
+	const auto range = self->features.equal_range(name);
 	auto i = range.first;
 	const auto last = range.second;
 
@@ -920,10 +918,7 @@ void Controls::event(const libv::input::EventGamepadAnalog& event) {
 
 	// Update SOW
 	auto& sow = self->gamepads[event.gamepadID];
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 	sow.analogs[event.analogID] = event.position;
-#pragma GCC diagnostic pop
 
 	// Process event
 	const auto scale = self->scale_analog * self->scale_gamepad_analog * sow.scale_analog;
@@ -961,10 +956,7 @@ void Controls::event(const libv::input::EventJoystickAnalog& event) {
 
 	// Update SOW
 	auto& sow = self->joysticks[event.joystickID];
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 	sow.analogs[event.analogID] = event.position;
-#pragma GCC diagnostic pop
 
 	// Process event
 	const auto scale = self->scale_analog * self->scale_joystick_analog * sow.scale_analog;
@@ -1018,9 +1010,6 @@ void Controls::update_since_last_update() {
 
 
 // -------------------------------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings on flat_map operator[]
 
 void Controls::timeout_sequence(duration timeout) noexcept {
 	// NOTE: This could abort some currently active sequences, but the next update will takes care of it
@@ -1117,12 +1106,7 @@ void Controls::scale_scroll(scale_type_2D scale) noexcept {
 	self->scale_scroll = scale;
 }
 
-#pragma GCC diagnostic pop
-
 // -------------------------------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings on flat_map operator[]
 
 duration Controls::timeout_sequence() const noexcept {
 	return self->timeout_sequence;
@@ -1175,8 +1159,6 @@ scale_type_2D Controls::scale_mouse_move() const noexcept {
 scale_type_2D Controls::scale_scroll() const noexcept {
 	return self->scale_scroll;
 }
-
-#pragma GCC diagnostic pop
 
 // -------------------------------------------------------------------------------------------------
 

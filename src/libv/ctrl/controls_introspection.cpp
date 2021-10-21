@@ -110,8 +110,7 @@ void Controls::foreach_codepoints(libv::function_ref<void(Keycode, Codepoint)> f
 }
 
 bool Controls::is_feature(std::string_view name) const noexcept {
-	// TODO P2: C++20 contains with temporary string instead of string_view
-	return self->features.contains(std::string(name));
+	return self->features.contains(name);
 }
 
 void Controls::foreach_features(libv::function_ref<void(const Feature&)> function) {

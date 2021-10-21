@@ -8,7 +8,6 @@
 #include <libv/fsw/token.hpp>
 #include <libv/gl/enum.hpp>
 #include <libv/glr/program.hpp>
-#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/type_uid.hpp>
 // std
 #include <memory>
@@ -59,7 +58,7 @@ public:
 	~InternalShader();
 
 	[[nodiscard]] constexpr inline ShaderID id() const noexcept {
-		return libv::bit_cast<ShaderID>(this);
+		return std::bit_cast<ShaderID>(this);
 	}
 
 public:

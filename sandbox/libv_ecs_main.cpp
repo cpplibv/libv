@@ -28,9 +28,6 @@ size_t result;
 std::vector<ABCDE*> r;
 std::vector<ABCDE> r2;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
-
 int main(int, char**) {
 	libv::Timer timer;
 
@@ -143,5 +140,3 @@ int main(int, char**) {
 
 	return 0;
 }
-
-#pragma GCC diagnostic pop

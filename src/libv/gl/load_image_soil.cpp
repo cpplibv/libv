@@ -8,6 +8,7 @@
 #include <libv/container/dyn_array.hpp>
 // std
 #include <cstring>
+#include <optional>
 // pro
 #include <libv/gl/check.hpp>
 #include <libv/gl/texture_object.hpp>

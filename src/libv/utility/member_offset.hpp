@@ -2,8 +2,8 @@
 
 #pragma once
 
-// libv
-#include <libv/utility/bit_cast.hpp>
+// std
+#include <bit>
 
 
 namespace libv {
@@ -12,7 +12,7 @@ namespace libv {
 
 template <typename T, typename M>
 [[nodiscard]] constexpr inline size_t member_offset(M T::* member) noexcept {
-	return libv::bit_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
+	return std::bit_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 #include <boost/container/flat_map.hpp>
 #include <boost/container/flat_set.hpp>
 // libv
+#include <libv/utility/hash_string.hpp>
 #include <libv/utility/timer.hpp>
 // std
 #include <unordered_map>
@@ -65,9 +66,8 @@ public:
 
 class ImplControls {
 public:	// --- Feature ---
-	// TODO P2: C++20 Use unordered_multiset or use a better feature container to not duplicate feature_name as key, and has a better iteration speed (later is optional)
-	//				Waiting implementation of p0919r3 / p1690r1
-	std::unordered_multimap<std::string, Feature> features;
+	// TODO P4: Use a better feature container to not duplicate feature names as key (and has a better iteration speed)
+	std::unordered_multimap<std::string, Feature, libv::hash_string, std::equal_to<>> features;
 
 public:	// --- Context ---
 	std::unordered_map<libv::type_uid, void*> active_contexts;

@@ -4,8 +4,8 @@
 
 // libv
 #include <libv/utility/endian.hpp>
-#include <libv/utility/bit_cast.hpp>
 // std
+#include <bit>
 #include <cstdint>
 
 

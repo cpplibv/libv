@@ -3,9 +3,9 @@
 #pragma once
 
 // libv
-#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/guard.hpp>
 // std
+#include <bit>
 #include <cstdint>
 #include <stack>
 #include <vector>
@@ -109,7 +109,7 @@ struct State {
 	type _reserved:35 = 0;
 
 	bool operator==(const State& rhs) const {
-		return libv::bit_cast<type>(*this) == libv::bit_cast<type>(rhs);
+		return std::bit_cast<type>(*this) == std::bit_cast<type>(rhs);
 	}
 
 	bool operator!=(const State& rhs) const {

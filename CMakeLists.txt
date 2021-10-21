@@ -1,6 +1,6 @@
 #
 
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.20)
 project(libv)
 
 include(ExternalProject)
@@ -71,7 +71,6 @@ wish_warning(
 	GNU -Wlogical-op
 	GNU -Wmultistatement-macros
 	GNU -Wnon-virtual-dtor # Causes some false positives with efsw (suppressed)
-	GNU -Wnull-dereference # Causes some false positives with libv.ecs.system.create and libv.ctrl.controls.input (suppressed)
 	GNU -Wold-style-cast
 	GNU -Wpedantic
 	GNU -Wrestrict
@@ -103,6 +102,7 @@ wish_warning(
 	# Warnings that I don't care about
 	Clang -Wno-comment
 	GNU -Wno-comment
+	# GNU -Wnull-dereference # Causes too many false positives as of GCC 11.2
 )
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
@@ -165,7 +165,8 @@ else()
 endif()
 
 add_compile_options(-m64)
-set(CMAKE_CXX_STANDARD 20)
+add_compile_options(-std=c++23)
+#set(CMAKE_CXX_STANDARD 23) # This stupid thing uses -std=gnu++23
 
 # Tooling ------------------------------------------------------------------------------------------
 
@@ -532,7 +533,7 @@ wish_create_external(
 wish_create_external(
 	NAME prometheus
 	GIT_REPOSITORY https://github.com/jupp0r/prometheus-cpp.git
-	GIT_TAG de66b57c42cc23b5b412ef4ae01697dbda259da4
+	GIT_TAG v0.13.0
 	CMAKE_ARGS
 		-DENABLE_TESTING=OFF
 	LINK prometheus-cpp-pull

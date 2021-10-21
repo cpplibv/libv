@@ -75,7 +75,7 @@ int main(int argc, const char** argv) {
 
 	std::ostringstream payload;
 
-	auto lineLength = size_t{0};
+	auto lineLength = 0uz;
 	for (const auto& byte_ : content) {
 		const auto byteStr = fmt::format("{:d},", static_cast<uint8_t>(byte_));
 

@@ -39,7 +39,7 @@ public:
 		const auto now = std::chrono::steady_clock::now();
 		const auto guard = std::scoped_lock(cooldown_m);
 
-		auto callback = [this, f = std::forward<F>(func)]() mutable {
+		auto callback = [this, f = std::forward<F>(func)] mutable {
 			in_flight = false;
 			std::forward<F>(f)();
 		};
@@ -88,7 +88,7 @@ public:
 		const auto now = std::chrono::steady_clock::now();
 		const auto guard = std::scoped_lock(cooldown_m);
 
-		auto callback = [this, f = std::forward<F>(func)]() mutable {
+		auto callback = [this, f = std::forward<F>(func)] mutable {
 			in_flight = false;
 			std::forward<F>(f)();
 		};
@@ -132,7 +132,7 @@ public:
 		const auto now = std::chrono::steady_clock::now();
 		const auto guard = std::scoped_lock(cooldown_m);
 
-		auto callback = [this, f = std::forward<F>(func)]() mutable {
+		auto callback = [this, f = std::forward<F>(func)] mutable {
 			in_flight = false;
 			std::forward<F>(f)();
 		};

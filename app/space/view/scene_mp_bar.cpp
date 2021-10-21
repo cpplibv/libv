@@ -83,37 +83,30 @@ libv::ui::Component SceneMPBar::init(libv::ui::PanelLine& mp_bar_main) {
 
 		mp_bar.add(in_server_address);
 
-		//		nexus.connect<mc::RequestCreateClient>(track_ptr, [this] {
-		//			lbl_state.text("Creating Client as [" + game.player.name + "]");
-		//			btn_host.text("Host");
-		//			btn_join.text("Disconnect");
-		//		});
-		//		nexus.connect<mc::RequestCreateServer>(track_ptr, [this] {
-		//			lbl_state.text("Creating Server as [" + game.player.name + "]");
-		//			btn_host.text("Shutdown");
-		//			btn_join.text("Join: rs0.corruptedai.com");
-		//		});
-		nexus.connect<mc::OnCreateClient>(this, [this]() mutable {
+//		nexus.connect<mc::OnNameChange>(this, [this] mutable {
+//			in_name.text(player.name);
+//		});
+		nexus.connect<mc::OnCreateClient>(this, [this] mutable {
 			client_active = true;
 			server_active = false;
 			lbl_state.text("Running as Client [" + player.name + "]");
 			btn_host.text("Host");
 			btn_join.text("Disconnect");
 		});
-		nexus.connect<mc::OnCreateServer>(this, [this]() mutable {
+		nexus.connect<mc::OnCreateServer>(this, [this] mutable {
 			client_active = false;
 			server_active = true;
 			lbl_state.text("Running as Server [" + player.name + "]");
 			btn_host.text("Shutdown");
 			btn_join.text("Join");
 		});
-		nexus.connect<mc::OnDestroyClient>(this, [this]() mutable {
+		nexus.connect<mc::OnDestroyClient>(this, [this] mutable {
 			client_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");
 			btn_join.text("Join");
 		});
-		nexus.connect<mc::OnDestroyServer>(this, [this]() mutable {
+		nexus.connect<mc::OnDestroyServer>(this, [this] mutable {
 			server_active = false;
 			lbl_state.text("Status: Idle");
 			btn_host.text("Host");
@@ -195,7 +188,7 @@ SceneMPBar::~SceneMPBar() {
 //
 //			mp_bar.add_ns<uic::LabelImage>("host-btn", "space.hud-bar.mp.btn")
 //					.text("Host")
-//					.event().submit.connect([&, lbl_state, in_name]() mutable {
+//					.event().submit.connect([&, lbl_state, in_name] mutable {
 //						if (server) {
 //							lbl_state.text("Idle");
 //							server.reset();
@@ -208,7 +201,7 @@ SceneMPBar::~SceneMPBar() {
 //
 //			mp_bar.add_ns<uic::LabelImage>("join-btn", "space.hud-bar.mp.btn")
 //					.text("Join: rs0.corruptedai.com")
-//					.event().submit.connect([&, lbl_state, in_name]() mutable {
+//					.event().submit.connect([&, lbl_state, in_name] mutable {
 //						if (client) {
 //							lbl_state.text("Idle");
 //							client.reset();

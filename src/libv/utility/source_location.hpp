@@ -3,7 +3,7 @@
 #pragma once
 
 // std
-#include <experimental/source_location>
+#include <source_location>
 #include <utility>
 
 
@@ -11,7 +11,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-using source_location = std::experimental::source_location; // C++20
+using source_location = std::source_location;
 
 /// Proxy type with implicit constructor to be called from a functions where call site where
 /// a default argument for source_location is not possible, and at least one argument present

@@ -419,9 +419,9 @@
 //
 //// -------------------------------------------------------------------------------------------------
 
+#include <bit>
 #include <iostream>
 #include <libv/utility/hash.hpp>
-#include <libv/utility/bit_cast.hpp>
 #include <libv/math/fixed_point.hpp>
 #include <libv/utility/histogram.hpp>
 
@@ -454,7 +454,7 @@ int main() {
 	Spectrum<1000> spectrum;
 
 	for (int32_t i = 0; i < 1000000; ++i) {
-		const auto ui = libv::bit_cast<uint32_t>(i + 1);
+		const auto ui = std::bit_cast<uint32_t>(i + 1);
 		const auto hash = libv::hash_int(ui);
 		const auto f_high = ((hash & 0xFFFF0000u) >> 16u) % 3600u;
 		const auto f_low = (hash & 0x0000FFFFu);

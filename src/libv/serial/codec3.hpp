@@ -32,12 +32,13 @@ public:
 		}
 	};
 
-private:
+protected:
 	struct TypeAccessEntry {
 		MessageID id;
 		void(*decode_fn)(void* ar, const void* ob);
 	};
 
+private:
 	template <MessageID id>
 	static void unexpected_message_handler(void*, const void*) {
 		throw UnexpectedIDException(id);

@@ -9,6 +9,7 @@
 #include <libv/utility/bytes/input_bytes.hpp>
 #include <libv/utility/bytes/output_bytes.hpp>
 // std
+#include <optional>
 #include <sstream>
 
 

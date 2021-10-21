@@ -440,11 +440,8 @@ void TextLayout::layout() {
 		const auto lastEnd = line->end;
 		line = make_observer_ref(&lines.emplace_back());
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wnull-dereference" // False positive warnings
 		line->begin = lastEnd;
 		line->end = lastEnd;
-#pragma GCC diagnostic pop
 
 		previousCodepoint = 0;
 		pen.x = 0.0f;

@@ -5,9 +5,10 @@
 // ext
 #include <GL/glew.h>
 // libv
-#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/guard.hpp>
 #include <libv/utility/member_offset.hpp>
+// std
+#include <bit>
 // pro
 #include <libv/gl/array_buffer_object.hpp>
 #include <libv/gl/assert.hpp>
@@ -74,13 +75,13 @@ public:
 
 	inline void drawElements(Primitive mode, size_t vertexCount, size_t indexOffset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, libv::bit_cast<const void*>(sizeof (GLuint) * indexOffset));
+		glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<const void*>(sizeof (GLuint) * indexOffset));
 		checkGL();
 	}
 
 	inline void drawElementsBaseVertex(Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
-		glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, libv::bit_cast<void*>(sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
+		glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<void*>(sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
 		checkGL();
 	}
 
@@ -98,7 +99,7 @@ public:
 				BaseAttribute<T>::attributeType,
 				false,
 				stride,
-				libv::bit_cast<const void*>(offset));
+				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
@@ -115,7 +116,7 @@ public:
 				BaseAttribute<T>::attributeSize,
 				BaseAttribute<T>::attributeType,
 				stride,
-				libv::bit_cast<const void*>(offset));
+				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
@@ -133,7 +134,7 @@ public:
 				BaseAttribute<T>::attributeSize,
 				BaseAttribute<T>::attributeType,
 				stride,
-				libv::bit_cast<const void*>(offset));
+				std::bit_cast<const void*>(offset));
 		checkGL();
 	}
 
@@ -191,7 +192,7 @@ public:
 					dimension,
 					to_value(type),
 					stride,
-					libv::bit_cast<const void*>(offset));
+					std::bit_cast<const void*>(offset));
 			break;
 
 		case AttributeType::FLOAT:
@@ -202,7 +203,7 @@ public:
 					to_value(type),
 					false,
 					stride,
-					libv::bit_cast<const void*>(offset));
+					std::bit_cast<const void*>(offset));
 			break;
 
 		case AttributeType::DOUBLE:
@@ -211,7 +212,7 @@ public:
 					dimension,
 					to_value(type),
 					stride,
-					libv::bit_cast<const void*>(offset));
+					std::bit_cast<const void*>(offset));
 			break;
 
 		default: // TODO P5: libv.gl: instead of default log and assert invalid input

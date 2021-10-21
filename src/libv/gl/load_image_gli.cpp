@@ -5,9 +5,11 @@
 // ext
 #include <GL/glew.h>
 #include <gli/gli.hpp>
+// std
+#include <optional>
 // pro
 #include <libv/gl/check.hpp>
-#include <libv/gl/texture_object.hpp>
+//#include <libv/gl/texture_object.hpp>
 
 
 namespace libv {

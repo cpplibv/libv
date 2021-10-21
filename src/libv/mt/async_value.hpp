@@ -6,6 +6,7 @@
 #include <cassert>
 #include <memory>
 #include <mutex>
+#include <optional>
 #include <stop_token>
 
 
@@ -109,7 +110,7 @@ async_value<Value> aux_load_async(Executor& executor, LoadFunc&& func, Args&&...
 	executor.execute_async([
 			result_sp = av.result,
 			f = std::forward<LoadFunc>(func),
-			...a = std::forward<Args>(args)] () mutable {
+			...a = std::forward<Args>(args)]  mutable {
 		// By value capture for the function object and for the arguments
 
 		if (result_sp->stop_source.stop_requested())

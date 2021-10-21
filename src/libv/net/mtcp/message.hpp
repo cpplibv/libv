@@ -8,6 +8,7 @@
 #include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
+#include <limits>
 #include <span>
 #include <string>
 #include <vector>

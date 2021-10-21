@@ -8,6 +8,7 @@
 #include <libv/parse/bool.hpp>
 #include <libv/parse/color.hpp>
 #include <libv/range/view_lines_string_view.hpp>
+#include <libv/utility/hash_string.hpp>
 #include <libv/utility/trim.hpp>
 // std
 #include <memory>
@@ -583,8 +584,8 @@ using load_fn = std::function<std::optional<PropertyDynamic>(UI&, const sol::obj
 // =================================================================================================
 
 struct LoadLuaContext {
-	std::unordered_map<std::string, load_fn> property_loaders;
-	std::unordered_map<std::string, std::string> property_aliases;
+	std::unordered_map<std::string, load_fn, libv::hash_string, std::equal_to<>> property_loaders;
+	std::unordered_map<std::string, std::string, libv::hash_string, std::equal_to<>> property_aliases;
 
 	UI& ui;
 
@@ -643,7 +644,7 @@ public:
 		bind(lua);
 	}
 
-	void load_style_property(Style& style, const std::string& key, const sol::object& value) {
+	void load_style_property(Style& style, const std::string_view& key, const sol::object& value) {
 
 		auto it = property_loaders.find(key);
 		if (it == property_loaders.end())
@@ -656,18 +657,18 @@ public:
 			return log_ui.error("Failed to load style {} property {} value \"{}\"",
 					style.style_name, key, value.as<std::string_view>());
 
-		style.set(current_state_mask, current_state_value, std::move(key), std::move(*result));
+		style.set(current_state_mask, current_state_value, std::string(key), std::move(*result));
 	}
 
 	void load_style_table(Style& style, const sol::table& table) {
 		// Process normal key value pairs first
 		for (const auto& [key, value] : table) {
 			if (key.get_type() != sol::type::string)
-				continue;
+				continue; // Skip non key-value pairs (where key is string and therefore yields a property)
 
-			const auto key_str = key.as<std::string>();
+			const auto key_str = key.as<std::string_view>();
 			if (key_str == "state_condition")
-				continue; // Skip state_condition marker
+				continue; // Skip state_condition marker, it will be read by another get
 
 			load_style_property(style, key_str, value);
 		}

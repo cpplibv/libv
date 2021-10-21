@@ -21,8 +21,8 @@
 #include <libv/math/constants.hpp>
 #include <libv/math/quaternion.hpp>
 #include <libv/math/vec.hpp>
-#include <libv/utility/bit_cast.hpp>
 // std
+#include <bit>
 #include <iostream>
 
 
@@ -44,10 +44,10 @@ struct EventListener : rp3d::EventListener {
 
 			std::cout << '\n';
 			std::cout << "\tNew contact:"
-					<< " body1: " << libv::bit_cast<size_t>(contact.getBody1())
-					<< " body2: " << libv::bit_cast<size_t>(contact.getBody2())
-					<< " collider1: " << libv::bit_cast<size_t>(contact.getCollider1())
-					<< " collider2: " << libv::bit_cast<size_t>(contact.getCollider2())
+					<< " body1: " << std::bit_cast<size_t>(contact.getBody1())
+					<< " body2: " << std::bit_cast<size_t>(contact.getBody2())
+					<< " collider1: " << std::bit_cast<size_t>(contact.getCollider1())
+					<< " collider2: " << std::bit_cast<size_t>(contact.getCollider2())
 					<< '\n';
 
 			std::cout << "\t\tcontact count     : " << contact.getNbContactPoints() << '\n';
@@ -77,7 +77,7 @@ struct EventListener : rp3d::EventListener {
 //struct RaycastListener : rp3d::RaycastCallback {
 //	virtual rp3d::decimal notifyRaycastHit(const rp3d::RaycastInfo& info) override {
 //		std::cout << info.body << info. << std::endl;
-//		std::cout << " body1      : " << libv::bit_cast<size_t>(info.body) << std::endl;
+//		std::cout << " body1      : " << std::bit_cast<size_t>(info.body) << std::endl;
 //		std::cout << " world point: " << libv::vec3f(info.worldPoint) << std::endl;
 //
 //		return 1; // indicates that the ray is not clipped and the ray cast should continue as if no hit occurred

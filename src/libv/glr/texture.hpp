@@ -209,11 +209,11 @@ public:
 	using R8_G8_B8    = TS<Params<FS::RGB8,               libv::gl::DataType::U8, libv::vec3uc>>;
 	using R8_G8_B8_A8 = TS<Params<FS::RGBA8,              libv::gl::DataType::U8, libv::vec4uc>>;
 
+	// C++20: short float
 //	using R16F        = TS<Params<FS::R16F,               libv::gl::DataType::F16, short float>>;
 //	using RG16F       = TS<Params<FS::RG16F,              libv::gl::DataType::F16, libv::vec2sf>>;
 //	using RGB16F      = TS<Params<FS::RGB16F,             libv::gl::DataType::F16, libv::vec3sf>>;
 //	using RGBA16F     = TS<Params<FS::RGBA16F,            libv::gl::DataType::F16, libv::vec4sf>>;
-	// C++20: short float
 	using R16F        = TS<Params<FS::R16F,               libv::gl::DataType::F32, float>>;
 	using RG16F       = TS<Params<FS::RG16F,              libv::gl::DataType::F32, libv::vec2f>>;
 	using RGB16F      = TS<Params<FS::RGB16F,             libv::gl::DataType::F32, libv::vec3f>>;

@@ -572,7 +572,7 @@ void ImplBaseConnectionAsyncHE::do_start(SelfPtr&& self_sp) noexcept {
 	const auto self = self_sp.get();
 
 	self->on_flight_connect = true;
-	self->io_context.post([self_sp = std::move(self_sp)]() mutable {
+	self->io_context.post([self_sp = std::move(self_sp)] mutable {
 		const auto self = self_sp.get();
 
 		self->outcome_connect(std::move(self_sp), std::error_code());
@@ -629,7 +629,7 @@ void ImplBaseConnectionAsyncHE::do_disconnect(SelfPtr&& self_sp) noexcept {
 	const auto self = self_sp.get();
 
 	self->on_flight_disconnect = true;
-	self->io_context.post([self_sp = std::move(self_sp)]() mutable {
+	self->io_context.post([self_sp = std::move(self_sp)] mutable {
 		const auto self = self_sp.get();
 
 		// Disconnecting will always succeed (in one way or an another)

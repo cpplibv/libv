@@ -4,6 +4,7 @@
 
 // std
 #include <iosfwd>
+#include <limits>
 #include <string>
 #include <vector>
 

@@ -28,7 +28,7 @@ class thread_bulk {
 
 	std::mutex mutex;
 	std::condition_variable work_cv;
-	std::condition_variable done_cv; // C++20 'done_cv' can be folded under the 'done' atomic
+	std::condition_variable done_cv; // TODO P5: C++20 'done_cv' can be folded under the 'done' atomic
 
 	thread_group group;
 

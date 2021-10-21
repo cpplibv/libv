@@ -7,6 +7,8 @@
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/distance/distance.hpp>
 #include <libv/math/distance/intersect.hpp>
+// std
+#include <optional>
 // pro
 #include <space/canvas.hpp>
 #include <space/cto.hpp>

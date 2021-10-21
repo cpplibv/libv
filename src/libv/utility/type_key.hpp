@@ -3,9 +3,9 @@
 #pragma once
 
 // libv
-#include <libv/utility/bit_cast.hpp>
 #include <libv/utility/type_uid.hpp>
 // std
+#include <bit>
 #include <typeindex>
 
 
@@ -21,7 +21,7 @@ namespace libv {
 
 template <typename T>
 [[nodiscard]] inline libv::type_uid type_key() noexcept {
-	return libv::bit_cast<libv::type_uid>(std::type_index(typeid(T)));
+	return std::bit_cast<libv::type_uid>(std::type_index(typeid(T)));
 }
 
 // -------------------------------------------------------------------------------------------------

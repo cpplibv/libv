@@ -847,10 +847,10 @@ inline auto parse(const sol::object& var, Parser&& parser, Reporter&& reporter =
 //	ui_table["ORIENT_Orientation::left"] = Orientation::left;
 //	ui_table["ORIENT_Orientation::down"] = Orientation::down;
 //
-//	std::unordered_map<std::string, libv::intrusive_ptr<Style>> styles;
+//	std::unordered_map<std::string, libv::intrusive_ptr<Style>, libv::hash_string, std::equal_to<>> styles;
 //
 //	ui_table.set_function("style", [&styles, &ui](const std::string_view style_name) {
-//		auto& style_ip = styles[std::string(style_name)]; // TODO P5: C++20: std::string(std::string_view) temp string for hash lookup
+//		auto& style_ip = styles[style_name];
 //		if (!style_ip)
 //			style_ip = libv::make_intrusive<Style>(std::string(style_name));
 //
