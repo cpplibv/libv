@@ -90,10 +90,7 @@ public:
 
 public:
 	[[nodiscard]] friend bool operator<(const Sequence& lhs, const Sequence& rhs) noexcept;
-	[[nodiscard]] friend bool operator==(const Sequence& lhs, const Sequence& rhs) noexcept;
-	[[nodiscard]] friend inline bool operator!=(const Sequence& lhs, const Sequence& rhs) noexcept {
-		return !(lhs == rhs);
-	}
+	[[nodiscard]] bool operator==(const Sequence& other) const noexcept = default;
 
 public:
 	std::ostream& to_stream_symbol(std::ostream& os) const;

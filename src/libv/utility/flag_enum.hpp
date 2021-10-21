@@ -141,12 +141,7 @@ public:
 		return flag_enum(static_cast<Underlying>(~value_));
 	}
 
-	constexpr inline bool operator==(const flag_enum f) const noexcept {
-		return value_ == f.value_;
-	}
-	constexpr inline bool operator!=(const flag_enum f) const noexcept {
-		return value_ != f.value_;
-	}
+	constexpr inline bool operator==(const flag_enum& f) const noexcept = default;
 
 	constexpr inline flag_enum& operator|=(const flag_enum f) & noexcept {
 		value_ |= f.value_;

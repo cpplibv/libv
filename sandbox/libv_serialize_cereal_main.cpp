@@ -38,6 +38,8 @@ struct SimpleServerFieldSet {
 	LIBV_REFLECTION_ACCESS(name);
 	LIBV_REFLECTION_ACCESS(players_current);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+
+	bool operator==(const SimpleServerFieldSet& other) const = default;
 };
 
 struct Memberwise {
@@ -46,6 +48,8 @@ struct Memberwise {
 	std::string a;
 	double b;
 	std::variant<int, double, std::string> c;
+
+	bool operator==(const Memberwise& other) const = default;
 };
 
 struct Inner {
@@ -58,6 +62,8 @@ struct Inner {
 	inline void serialize(Archive& ar) {
 		ar & LIBV_NVP(x);
 	}
+
+	bool operator==(const Inner& other) const = default;
 };
 
 struct Test {
@@ -88,23 +94,7 @@ struct Test {
 		ar & LIBV_NVP(server);
 	}
 
-	bool operator==(const Test& rhs) const {
-		return name == rhs.name &&
-				data == rhs.data &&
-				(shader && rhs.shader ? shader->x == rhs.shader->x : shader == rhs.shader) &&
-				variant == rhs.variant &&
-				flat_map == rhs.flat_map &&
-				flat_map_empty == rhs.flat_map_empty &&
-				std_map == rhs.std_map &&
-				dead == rhs.dead &&
-				size == rhs.size &&
-				memberwise.a == rhs.memberwise.a &&
-				memberwise.b == rhs.memberwise.b &&
-				memberwise.c == rhs.memberwise.c &&
-				server.has_mod == rhs.server.has_mod &&
-				server.name == rhs.server.name &&
-				server.players_current == rhs.server.players_current;
-	}
+	bool operator==(const Test& other) const = default;
 };
 
 // TODO P5: Basically this file could be a unit test

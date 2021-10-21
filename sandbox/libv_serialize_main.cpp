@@ -28,6 +28,8 @@ struct Inner {
 	inline void serialize(Archive& ar, const unsigned int) {
 		ar & LIBV_NVP(x);
 	}
+
+	bool operator==(const Inner& other) const = default;
 };
 
 struct Test {
@@ -46,13 +48,7 @@ struct Test {
 		ar & LIBV_NVP(size);
 	}
 
-	bool operator==(const Test& rhs) const {
-		return name == rhs.name &&
-				data == rhs.data &&
-				(shader && rhs.shader ? shader->x == rhs.shader->x : shader == rhs.shader) &&
-				dead == rhs.dead &&
-				size == rhs.size;
-	}
+	bool operator==(const Test& other) const = default;
 };
 
 int main(int, char **) {

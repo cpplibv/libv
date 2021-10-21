@@ -164,13 +164,7 @@ public:
 	void style(std::string_view style_name);
 
 public:
-	friend inline bool operator==(const Component& lhs, const Component& rhs) noexcept {
-		return lhs.ptr_ == rhs.ptr_;
-	}
-
-	friend inline bool operator!=(const Component& lhs, const Component& rhs) noexcept {
-		return lhs.ptr_ != rhs.ptr_;
-	}
+	[[nodiscard]] inline bool operator==(const Component& other) const noexcept = default;
 };
 
 // -------------------------------------------------------------------------------------------------

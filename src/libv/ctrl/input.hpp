@@ -64,15 +64,7 @@ public:
 		Input(InputID{joystick, id, dim}, DigitalInputAction::auto_) { }
 
 public:
-	[[nodiscard]] friend constexpr inline bool operator<(const Input& lhs, const Input& rhs) noexcept {
-		return lhs.id < rhs.id || (lhs.id == rhs.id && lhs.dia < rhs.dia);
-	}
-	[[nodiscard]] friend constexpr inline bool operator==(const Input& lhs, const Input& rhs) noexcept {
-		return lhs.id == rhs.id && lhs.dia == rhs.dia;
-	}
-	[[nodiscard]] friend constexpr inline bool operator!=(const Input& lhs, const Input& rhs) noexcept {
-		return !(lhs == rhs);
-	}
+	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(const Input& other) const noexcept = default;
 
 public:
 	std::ostream& to_stream_symbol(std::ostream& os) const;

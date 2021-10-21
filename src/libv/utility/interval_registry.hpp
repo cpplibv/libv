@@ -22,9 +22,7 @@ public:
 			return lhs.offset < rhs.offset;
 		}
 
-		[[nodiscard]] friend constexpr inline bool operator==(const Interval& lhs, const Interval& rhs) noexcept {
-			return lhs.offset == rhs.offset && lhs.size == rhs.size;
-		}
+		[[nodiscard]] inline bool operator==(const Interval& other) const noexcept = default;
 	};
 
 private:

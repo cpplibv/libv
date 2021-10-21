@@ -66,10 +66,7 @@ struct Planet {
 	float radius;
 	float mass;
 
-	friend inline bool operator==(const Planet& lhs, const Planet& rhs) noexcept {
-		return std::tie(lhs.name, lhs.color0, lhs.color1, lhs.color2, lhs.radius, lhs.mass) ==
-				std::tie(rhs.name, rhs.color0, rhs.color1, rhs.color2, rhs.radius, rhs.mass);
-	}
+	inline bool operator==(const Planet& other) const noexcept = default;
 
 	friend inline std::ostream& operator<<(std::ostream& os, const Planet& rhs) {
 		return os << '[' << rhs.name << ',' << rhs.color0 << ',' << rhs.color1 << ',' << rhs.color2 << ',' << rhs.radius << ',' << rhs.mass << ']';

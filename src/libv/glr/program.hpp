@@ -83,12 +83,7 @@ public:
 	}
 
 public:
-	[[nodiscard]] friend inline bool operator==(const Program& lhs, const Program& rhs) noexcept {
-		return lhs.remote == rhs.remote;
-	}
-	[[nodiscard]] friend inline bool operator!=(const Program& lhs, const Program& rhs) noexcept {
-		return lhs.remote != rhs.remote;
-	}
+	[[nodiscard]] inline bool operator==(const Program& other) const noexcept = default;
 
 private:
 	void mark_for_full_reload();

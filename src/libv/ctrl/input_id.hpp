@@ -263,15 +263,7 @@ public:
 	}
 
 public:
-	[[nodiscard]] friend constexpr inline bool operator==(const InputID& lhs, const InputID& rhs) noexcept {
-		return lhs.value == rhs.value;
-	}
-	[[nodiscard]] friend constexpr inline bool operator!=(const InputID& lhs, const InputID& rhs) noexcept {
-		return !(lhs == rhs);
-	}
-	[[nodiscard]] friend constexpr inline bool operator<(const InputID& lhs, const InputID& rhs) noexcept {
-		return lhs.value < rhs.value;
-	}
+	[[nodiscard]] constexpr inline std::strong_ordering operator<=>(const InputID& other) const noexcept = default;
 
 public:
 	std::ostream& to_stream_symbol(std::ostream& os) const;

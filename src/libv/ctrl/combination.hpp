@@ -39,10 +39,7 @@ public:
 
 public:
 	[[nodiscard]] friend bool operator<(const Combination& lhs, const Combination& rhs) noexcept;
-	[[nodiscard]] friend bool operator==(const Combination& lhs, const Combination& rhs) noexcept;
-	[[nodiscard]] friend inline bool operator!=(const Combination& lhs, const Combination& rhs) noexcept {
-		return !(lhs == rhs);
-	}
+	[[nodiscard]] bool operator==(const Combination& other) const noexcept = default;
 
 public:
 	std::ostream& to_stream_symbol(std::ostream& os) const;

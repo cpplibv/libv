@@ -53,17 +53,7 @@ struct SizeDim {
 		return os;
 	}
 
-	[[nodiscard]] friend constexpr inline bool operator==(const SizeDim& lhs, const SizeDim& rhs) noexcept {
-		return
-				lhs.pixel == rhs.pixel &&
-				lhs.percent == rhs.percent &&
-				lhs.ratio == rhs.ratio &&
-				lhs.dynamic == rhs.dynamic;
-	}
-
-	[[nodiscard]] friend constexpr inline bool operator!=(const SizeDim& lhs, const SizeDim& rhs) noexcept {
-		return !(lhs == rhs);
-	}
+	[[nodiscard]] inline bool operator==(const SizeDim& other) const noexcept = default;
 };
 
 inline auto pixel(float value) {
@@ -105,13 +95,7 @@ struct Size {
 		return os;
 	}
 
-	[[nodiscard]] friend constexpr inline bool operator==(const Size& lhs, const Size& rhs) noexcept {
-		return lhs.value == rhs.value;
-	}
-
-	[[nodiscard]] friend constexpr inline bool operator!=(const Size& lhs, const Size& rhs) noexcept {
-		return lhs.value != rhs.value;
-	}
+	[[nodiscard]] inline bool operator==(const Size& other) const noexcept = default;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -138,10 +138,6 @@ bool operator<(const Combination& lhs, const Combination& rhs) noexcept {
 	return std::lexicographical_compare(lhs.inputs.begin(), lhs.inputs.end(), rhs.inputs.begin(), rhs.inputs.end());
 }
 
-bool operator==(const Combination& lhs, const Combination& rhs) noexcept {
-	return std::equal(lhs.inputs.begin(), lhs.inputs.end(), rhs.inputs.begin(), rhs.inputs.end());
-}
-
 // -------------------------------------------------------------------------------------------------
 
 } // namespace ctrl
