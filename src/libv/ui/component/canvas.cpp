@@ -30,6 +30,8 @@ public:
 	CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
 
 protected:
+	virtual void onMouseButton(const EventMouseButton& event) override;
+
 	virtual void doUpdate() override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doCreate(Renderer& r) override;
@@ -42,6 +44,15 @@ protected:
 CoreCanvasAdaptor::CoreCanvasAdaptor(std::string name, std::unique_ptr<CanvasBase>&& canvas_object) :
 	CoreComponent(std::move(name)), canvas_object(std::move(canvas_object)) {
 	this->canvas_object->core = libv::make_observer_ptr(this);
+
+	// TODO P1: Optionally watch mouse/focus: opt-in? opt-out?
+	watchFocus(true);
+	watchMouse(true);
+}
+
+void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
+	event.stop_propagation();
+	focus();
 }
 
 void CoreCanvasAdaptor::doUpdate() {

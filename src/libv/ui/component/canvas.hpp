@@ -55,8 +55,8 @@ public:
 	static core_ptr create_core(std::string name, std::unique_ptr<CanvasBase>&& canvas_object);
 
 protected:
-	CanvasBase& object_base() noexcept;
-	const CanvasBase& object_base() const noexcept;
+	[[nodiscard]] CanvasBase& object_base() noexcept;
+	[[nodiscard]] const CanvasBase& object_base() const noexcept;
 };
 
 template <typename T>
