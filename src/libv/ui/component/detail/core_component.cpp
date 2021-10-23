@@ -319,15 +319,23 @@ void CoreComponent::eventKey(CoreComponent& component, const EventKey& event) {
 }
 
 void CoreComponent::focusGain(CoreComponent& component) {
-	if (component.flags.match_any(Flag::watchFocus))
-		component.onFocus(EventFocus{true});
+	if (!component.flags.match_any(Flag::watchFocus))
+		return;
+
 	component.flags.set(Flag::focused);
+	const auto event = EventFocus(true);
+	component.onFocus(event);
+	component.fire(event);
 }
 
 void CoreComponent::focusLoss(CoreComponent& component) {
-	if (component.flags.match_any(Flag::watchFocus))
-		component.onFocus(EventFocus{false});
+	if (!component.flags.match_any(Flag::watchFocus))
+		return;
+
 	component.flags.reset(Flag::focused);
+	const auto event = EventFocus(false);
+	component.onFocus(event);
+	component.fire(event);
 }
 
 // -------------------------------------------------------------------------------------------------
