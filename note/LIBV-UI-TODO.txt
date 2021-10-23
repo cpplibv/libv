@@ -707,3 +707,30 @@ PAPER: libv.ui: Component styled states PAPER:
 				}
 
 		- overriding: in case of multiple definition of the same property the last with matching state wins
+
+
+
+
+
+
+Heritage:
+	struct FontEffect {};
+	struct FontFamily {};
+	struct FontSize {}; //font-size/line-height
+	struct FontStyle {}; //font-style - Specifies the font style. Default value is "normal". See font-style for possible values
+	struct FontVariant {}; //font-variant - Specifies the font variant. Default value is "normal". See font-variant for possible values
+	struct FontWeight {}; //font-weight - Specifies the font weight. Default value is "normal". See font-weight for possible values
+	text						The text to display in the label. The text can contain newlines.
+	NoTextInteraction			No interaction with the text is possible.
+	LinksAccessibleByKeyboard	Links can be focused using tab and activated with enter.
+	LinksAccessibleByMouse		Links can be highlighted and activated with the mouse.
+	TabIndex / Focusable		If true, the widget accepts input focus. The default is false. (takeFocus/TakeFocus)
+	TextSelectableByKeyboard	Text can be selected with the cursor keys on the keyboard.
+	TextSelectableByMouse		Text can be selected with the mouse and copied to the clipboard using a context menu or standard keyboard shortcuts.
+	horizontally_stretchable	If the GUI element stretches its size horizontally to other elements
+	vertically_stretchable		If the GUI element stretches its size vertically to other elements
+	horizontally_squashable		If the GUI element can be squashed (by maximal with of some parent element) horizontally This is mainly meant to be used for scroll-pane The default value is false
+	vertically_squashable		If the GUI element can be squashed (by maximal height of some parent element) vertically This is mainly meant to be used for scroll-pane The default (parent) value for scroll pane is true, false otherwise
+	cell_spacing				Space between the table cell contents and border.
+	horizontal_spacing			Horizontal space between individual cells.
+	vertical_spacing			Vertical space between individual cells.

@@ -9,6 +9,7 @@
 #include <libv/ui/property/color.hpp>
 #include <libv/ui/property/font_2D.hpp>
 #include <libv/ui/property/font_size.hpp>
+#include <libv/ui/property/shader_font.hpp>
 
 
 namespace libv {
@@ -41,6 +42,8 @@ public:
 
 	void font_color(Color value);
 	[[nodiscard]] const Color& font_color() const noexcept;
+
+	// TODO P5: Shader font set/get
 
 public:
 	void text(std::string value);

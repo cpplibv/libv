@@ -3,6 +3,7 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
+#include <libv/ui/property/color.hpp>
 #include <libv/ui/style.hpp>
 
 
@@ -13,13 +14,13 @@ TEST_CASE("Style supports set and get property", "[libv.ui]") {
 
 	style.set(libv::ui::StyleState::none, libv::ui::StyleState::none, "color", libv::ui::Color{1, 0, 0, 1});
 
-	const auto& color = style.get_optional(libv::ui::StyleState::none, "color");
-	const auto& color2 = style.get_optional(libv::ui::StyleState::none, "color2");
+	const auto* color = style.get_optional(libv::ui::StyleState::none, "color");
+	const auto* color2 = style.get_optional(libv::ui::StyleState::none, "color2");
 
 	CHECK(style.style_name == "test");
 	REQUIRE(color);
-	REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-	CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+	REQUIRE(std::any_cast<libv::ui::Color>(color));
+	CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 
 	CHECK(not color2);
 }
@@ -32,21 +33,21 @@ TEST_CASE("Style single inheritance", "[libv.ui]") {
 	style_base->set(libv::ui::StyleState::none, libv::ui::StyleState::none, "color", libv::ui::Color{1, 0, 0, 1});
 
 	{
-		const auto& color = style_base->get_optional(libv::ui::StyleState::none, "color");
-		const auto& color2 = style_base->get_optional(libv::ui::StyleState::none, "color2");
+		const auto* color = style_base->get_optional(libv::ui::StyleState::none, "color");
+		const auto* color2 = style_base->get_optional(libv::ui::StyleState::none, "color2");
 
 		REQUIRE(color);
-		REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-		CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+		REQUIRE(std::any_cast<libv::ui::Color>(color));
+		CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 		CHECK(not color2);
 	}
 	{
-		const auto& color = style_derived.get_optional(libv::ui::StyleState::none, "color");
-		const auto& color2 = style_derived.get_optional(libv::ui::StyleState::none, "color2");
+		const auto* color = style_derived.get_optional(libv::ui::StyleState::none, "color");
+		const auto* color2 = style_derived.get_optional(libv::ui::StyleState::none, "color2");
 
 		REQUIRE(color);
-		REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-		CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+		REQUIRE(std::any_cast<libv::ui::Color>(color));
+		CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 		CHECK(not color2);
 	}
 }
@@ -68,12 +69,12 @@ TEST_CASE("Style multiple inheritance", "[libv.ui]") {
 		style_derived->set(libv::ui::StyleState::none, libv::ui::StyleState::none, "color", libv::ui::Color{1, 0, 0, 1});
 	}
 
-	const auto& color = style_derived->get_optional(libv::ui::StyleState::none, "color");
-	const auto& color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
+	const auto* color = style_derived->get_optional(libv::ui::StyleState::none, "color");
+	const auto* color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
 
 	REQUIRE(color);
-	REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-	CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+	REQUIRE(std::any_cast<libv::ui::Color>(color));
+	CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 	CHECK(not color2);
 }
 
@@ -94,12 +95,12 @@ TEST_CASE("Style transitive inheritance", "[libv.ui]") {
 		style_derived->set(libv::ui::StyleState::none, libv::ui::StyleState::none, "color", libv::ui::Color{1, 0, 0, 1});
 	}
 
-	const auto& color = style_derived->get_optional(libv::ui::StyleState::none, "color");
-	const auto& color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
+	const auto* color = style_derived->get_optional(libv::ui::StyleState::none, "color");
+	const auto* color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
 
 	REQUIRE(color);
-	REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-	CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+	REQUIRE(std::any_cast<libv::ui::Color>(color));
+	CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 	CHECK(not color2);
 }
 
@@ -125,12 +126,12 @@ TEST_CASE("Style multiple transitive inheritance", "[libv.ui]") {
 		style_derived->set(libv::ui::StyleState::none, libv::ui::StyleState::none, "color", libv::ui::Color{1, 0, 0, 1});
 	}
 
-	const auto& color = style_derived->get_optional(libv::ui::StyleState::none, "color");
-	const auto& color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
+	const auto* color = style_derived->get_optional(libv::ui::StyleState::none, "color");
+	const auto* color2 = style_derived->get_optional(libv::ui::StyleState::none, "color2");
 
 	REQUIRE(color);
-	REQUIRE(std::holds_alternative<libv::ui::Color>(*color));
-	CHECK(std::get<libv::ui::Color>(*color) == libv::ui::Color{1, 0, 0, 1});
+	REQUIRE(std::any_cast<libv::ui::Color>(color));
+	CHECK(*std::any_cast<libv::ui::Color>(color) == libv::ui::Color{1, 0, 0, 1});
 	CHECK(not color2);
 }
 

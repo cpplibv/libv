@@ -6,33 +6,11 @@
 #include <libv/utility/intrusive_ptr.hpp>
 //#include <libv/utility/fixed_string.hpp>
 // std
-#include <memory>
-#include <string>
+#include <any>
 #include <string_view>
-#include <type_traits>
-#include <variant>
+#include <utility>
 // pro
 #include <libv/ui/component/detail/flag.hpp>
-#include <libv/ui/property/align.hpp>
-#include <libv/ui/property/anchor.hpp>
-#include <libv/ui/property/background.hpp>
-#include <libv/ui/property/color.hpp>
-#include <libv/ui/property/column_count.hpp>
-#include <libv/ui/property/font_2D.hpp>
-#include <libv/ui/property/font_size.hpp>
-#include <libv/ui/property/margin.hpp>
-#include <libv/ui/property/orientation.hpp>
-#include <libv/ui/property/orientation2.hpp>
-#include <libv/ui/property/padding.hpp>
-#include <libv/ui/property/scroll_area_mode.hpp>
-#include <libv/ui/property/shader_font.hpp>
-#include <libv/ui/property/shader_image.hpp>
-#include <libv/ui/property/shader_quad.hpp>
-#include <libv/ui/property/size.hpp>
-#include <libv/ui/property/snap_to_edge.hpp>
-#include <libv/ui/property/spacing.hpp>
-#include <libv/ui/property/squish.hpp>
-#include <libv/ui/property/texture_2D.hpp>
 #include <libv/ui/style_fwd.hpp>
 
 
@@ -43,40 +21,7 @@ namespace ui {
 
 using Style_view = libv::intrusive_ptr<Style>;
 
-// -------------------------------------------------------------------------------------------------
-
-using PropertyDynamic = std::variant<
-//		std::monostate, // For empty variants
-
-		float,
-		Style_view,
-
-		AlignHorizontal,
-		AlignVertical,
-		Anchor,
-		Background,
-		Color,
-		ColumnCount,
-		Font2D_view,
-		// FontColor,
-		FontSize,
-		// Margin,
-		Orientation,
-		Orientation2,
-		// Padding,
-		ScrollAreaMode,
-		ShaderFont_view,
-		ShaderImage_view,
-		ShaderQuad_view,
-		Size,
-		SnapToEdge,
-		// Spacing,
-		Spacing2,
-		Squish,
-		Texture2D_view,
-
-		std::string // For debug only
->;
+using PropertyDynamic = std::any;
 
 namespace pnm { // ---------------------------------------------------------------------------------
 
@@ -251,7 +196,7 @@ struct AccessProperty {
 
 	template <typename P, typename TC>
 	static constexpr inline void force_value(P& property, TC&& value) noexcept {
-		property.value = std::move(value);
+		property.value = std::forward<TC>(value);
 	}
 
 	template <typename Component, typename P, typename TC>
@@ -259,7 +204,7 @@ struct AccessProperty {
 		if (property.value == value)
 			return;
 
-		property.value = std::move(value);
+		property.value = std::forward<TC>(value);
 		property.changed = true;
 		if (property.invalidate_layout1 || property.invalidate_layout2 || property.invalidate_parent_layout)
 			component.markInvalidLayout(property.invalidate_layout1, property.invalidate_parent_layout);
@@ -308,35 +253,6 @@ struct AccessProperty {
 			component.flagAuto(Flag::pendingRender);
 	}
 };
-
-// -------------------------------------------------------------------------------------------------
-
-// enable/disable and show/hide are Not a property but flags
-//
-// Heritage:
-//		struct FontEffect {};
-//		struct FontFamily {};
-//		struct FontSize {}; //font-size/line-height
-//		struct FontStyle {}; //font-style - Specifies the font style. Default value is "normal". See font-style for possible values
-//		struct FontVariant {}; //font-variant - Specifies the font variant. Default value is "normal". See font-variant for possible values
-//		struct FontWeight {}; //font-weight - Specifies the font weight. Default value is "normal". See font-weight for possible values
-//
-//		text						The text to display in the label. The text can contain newlines.
-//
-//		NoTextInteraction			No interaction with the text is possible.
-//		LinksAccessibleByKeyboard	Links can be focused using tab and activated with enter.
-//		LinksAccessibleByMouse		Links can be highlighted and activated with the mouse.
-//		TabIndex / Focusable		If true, the widget accepts input focus. The default is false. (takeFocus/TakeFocus)
-//		TextSelectableByKeyboard	Text can be selected with the cursor keys on the keyboard.
-//		TextSelectableByMouse		Text can be selected with the mouse and copied to the clipboard using a context menu or standard keyboard shortcuts.
-//
-//		horizontally_stretchable	If the GUI element stretches its size horizontally to other elements
-//		vertically_stretchable		If the GUI element stretches its size vertically to other elements
-//		horizontally_squashable		If the GUI element can be squashed (by maximal with of some parent element) horizontally This is mainly meant to be used for scroll-pane The default value is false
-//		vertically_squashable		If the GUI element can be squashed (by maximal height of some parent element) vertically This is mainly meant to be used for scroll-pane The default (parent) value for scroll pane is true, false otherwise
-//		cell_spacing				Space between the table cell contents and border.
-//		horizontal_spacing			Horizontal space between individual cells.
-//		vertical_spacing			Vertical space between individual cells.
 
 // -------------------------------------------------------------------------------------------------
 

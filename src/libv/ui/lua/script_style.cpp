@@ -17,18 +17,31 @@
 #include <string>
 #include <string_view>
 // pro
-//#include <libv/ui/component/detail/component.hpp>
-//#include <libv/ui/component/label.hpp>
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/parse/parse_align.hpp>
 #include <libv/ui/parse/parse_anchor.hpp>
 #include <libv/ui/parse/parse_orientation.hpp>
 #include <libv/ui/parse/parse_size.hpp>
+#include <libv/ui/property/align.hpp>
+#include <libv/ui/property/anchor.hpp>
+#include <libv/ui/property/background.hpp>
+#include <libv/ui/property/color.hpp>
+#include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/font_size.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/orientation.hpp>
+#include <libv/ui/property/orientation2.hpp>
+#include <libv/ui/property/padding.hpp>
+#include <libv/ui/property/size.hpp>
 #include <libv/ui/property/spacing.hpp>
+//#include <libv/ui/property/font_2D.hpp>
+//#include <libv/ui/property/scroll_area_mode.hpp>
+//#include <libv/ui/property/shader_font.hpp>
+//#include <libv/ui/property/shader_image.hpp>
+//#include <libv/ui/property/shader_quad.hpp>
+//#include <libv/ui/property/snap_to_edge.hpp>
+//#include <libv/ui/property/squish.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
 
@@ -541,7 +554,7 @@ std::optional<PropertyDynamic> convert_font(UI& ui, const sol::object& object) {
 	if (object.get_type() != sol::type::string)
 		return std::nullopt;
 
-	return ui.context().font(object.as<std::string_view>());
+	return PropertyDynamic{ui.context().font(object.as<std::string_view>())};
 }
 
 template <typename Enum>
@@ -550,7 +563,7 @@ struct convert_enum_value {
 		if (object.get_type() != sol::type::number)
 			return std::nullopt;
 
-		return {static_cast<Enum>(object.as<int64_t>())};
+		return PropertyDynamic{static_cast<Enum>(object.as<int64_t>())};
 	}
 };
 
@@ -560,22 +573,30 @@ struct convert_userdata {
 		if (!object.is<T>())
 			return std::nullopt;
 
-		return {object.as<T>()};
+		return PropertyDynamic{object.as<T>()};
 	}
 };
 
-auto convert_string_parse = [](auto parse_function) {
-	return [parse_function](UI&, const sol::object& object) -> std::optional<PropertyDynamic> {
+const auto convert_string_parse = [](auto&& parse_fn) {
+	return [parse_function = std::forward<decltype(parse_fn)>(parse_fn)](UI&, const sol::object& object) -> std::optional<PropertyDynamic> {
 		if (object.get_type() != sol::type::string)
 			return std::nullopt;
 
-		return {parse_function(object.as<std::string_view>())};
+		auto result_opt = parse_function(object.as<std::string_view>());
+		if (!result_opt)
+			return std::nullopt;
+
+		return PropertyDynamic{std::move(*result_opt)};
 	};
 };
 
 const auto conv_fn = [](auto&& fn) {
 	return [fn = std::forward<decltype(fn)>(fn)](UI& ui, const sol::object& object) -> std::optional<PropertyDynamic> {
-		return fn(ui, object);
+		auto result_opt = fn(ui, object);
+		if (!result_opt)
+			return std::nullopt;
+
+		return PropertyDynamic{std::move(*result_opt)};
 	};
 };
 

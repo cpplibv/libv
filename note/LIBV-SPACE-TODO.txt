@@ -73,8 +73,6 @@ app.space: Cannibalize style.lua from vm4_viewer
 
 
 
-
-
 app.space.net: Networking
 	app.space.net: Networking (Stage 2)
 		app.space.net: Introduction, Name

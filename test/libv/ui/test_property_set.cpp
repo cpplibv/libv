@@ -3,6 +3,7 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
+#include <libv/ui/property/color.hpp>
 #include <libv/ui/style.hpp>
 
 

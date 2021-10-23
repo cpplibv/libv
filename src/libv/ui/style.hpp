@@ -18,6 +18,7 @@
 #include <string_view>
 #include <unordered_set>
 // pro
+#include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/style_state.hpp>
 
@@ -80,19 +81,29 @@ public:
 public:
 	[[nodiscard]] libv::optional_ref<const PropertyDynamic> get_optional(StyleState state, const std::string_view property) const;
 	template <typename T>
-	[[nodiscard]] auto get_optional(StyleState state, const std::string_view property) const {
-		const auto& result = get_optional(state, property);
-		return result && std::holds_alternative<T>(*result) ? &std::get<T>(*result) : nullptr;
+	[[nodiscard]] const T* get_optional(StyleState state, const std::string_view property) const {
+		const auto* result = get_optional(state, property);
+
+		if (result == nullptr)
+			return nullptr;
+
+		const auto* value = std::any_cast<T>(result);
+		log_ui.warn_if(value == nullptr, "Property type missmatch: {}", property);
+		return value;
 	}
 
 	[[nodiscard]] const PropertyDynamic& get_or_throw(StyleState state, const std::string_view property) const;
 	template <typename T>
 	[[nodiscard]] const T& get_or_throw(StyleState state, const std::string_view property) const {
 		const auto& result = get_or_throw(state, property);
-		if (not std::holds_alternative<T>(result))
-			throw std::invalid_argument(libv::concat("Requested property \"", property, "\" has different type"));
+		const auto* value = std::any_cast<T>(&result);
 
-		return std::get<T>(result);
+		if (value == nullptr) {
+			log_ui.warn("Property type missmatch: {}", property);
+			throw std::invalid_argument(libv::concat("Requested property \"", property, "\" has different type"));
+		}
+
+		return *value;
 	}
 
 public:

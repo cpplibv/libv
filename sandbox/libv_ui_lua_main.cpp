@@ -9,9 +9,10 @@
 // pro
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/lua/script_style.hpp>
+#include <libv/ui/property_visit.hpp>
 #include <libv/ui/style.hpp>
 #include <libv/ui/ui.hpp>
-#include <libv/ui/lua/script_style.hpp>
 
 
 #include <thread>
@@ -45,14 +46,14 @@ int main(int, char**) {
 			log_sandbox.info("Style: {}", name);
 
 			style.foreach([](std::string_view key, const libv::ui::PropertyDynamic& property) {
-				std::visit([&key](auto& v) {
+				libv::ui::visitProperty(property, [&key](auto& v) {
 					if constexpr (requires { std::cout << v; })
 						log_sandbox.info("    {} = {} [{}]", key, v, typeid(v).name());
 					else if constexpr (std::is_enum_v<decltype(v)>)
 						log_sandbox.info("    {} = {} [{}]", key, libv::to_underlying(v), typeid(v).name());
 					else
 						log_sandbox.info("    {} = ?? [{}]", key, typeid(v).name());
-				}, property);
+				});
 			});
 		};
 		ui.context().foreach_style(f);
