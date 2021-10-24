@@ -673,6 +673,16 @@ void Controls::_context_leave(libv::type_uid type) {
 	self->active_contexts.erase(type);
 }
 
+void Controls::_context_leave_if_matches(libv::type_uid type, void* ctx) {
+	auto it = self->active_contexts.find(type);
+	if (it == self->active_contexts.end())
+		return;
+
+	if (it->second != ctx)
+		return;
+
+	self->active_contexts.erase(it);
+}
 // -------------------------------------------------------------------------------------------------
 
 void Controls::_feature_action(libv::type_uid context, std::string&& name, ft_action function) {

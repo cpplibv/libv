@@ -69,6 +69,7 @@ public:
 private:
 	void _context_enter(libv::type_uid type, void* ctx);
 	void _context_leave(libv::type_uid type);
+	void _context_leave_if_matches(libv::type_uid type, void* ctx);
 
 	void _feature_action(libv::type_uid context, std::string&& name, ft_action function);
 	void _feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers);
@@ -84,6 +85,9 @@ public:
 
 	template <typename T>
 	inline void context_leave();
+
+	template <typename T>
+	inline void context_leave_if_matches(T* context);
 
 public:
 	template <typename T, typename F>
@@ -284,6 +288,11 @@ inline void Controls::context_enter(T* context) {
 template <typename T>
 inline void Controls::context_leave() {
 	_context_leave(libv::type_key<T>());
+}
+
+template <typename T>
+inline void Controls::context_leave_if_matches(T* context) {
+	_context_leave_if_matches(libv::type_key<T>(), static_cast<void*>(context));
 }
 
 // -------------------------------------------------------------------------------------------------
