@@ -355,3 +355,44 @@ TEST_CASE("mouse leave", "[libv.ui.event.mouse]") {
 //}
 
 // -------------------------------------------------------------------------------------------------
+
+TEST_CASE("Overlapping non pass-through components", "[libv.ui.event.mouse]") {
+	libv::ui::ContextMouse table;
+
+	TestCoreComponent watcher0("watcher0"); watcher0.pass_through = false;
+	TestCoreComponent watcher1("watcher1"); watcher1.pass_through = false;
+
+	subscribe(table, watcher0, {2, 2, 0}, {10, 10, 0}, libv::ui::MouseOrder{0});
+	subscribe(table, watcher1, {6, 6, 0}, {10, 10, 0}, libv::ui::MouseOrder{1});
+	table.event_position(libv::vec2f{0, 0});
+	table.event_update(); // Register the new subscriptions
+
+	CHECK(watcher0.num_event == 0);
+	CHECK(watcher1.num_event == 0);
+
+	table.event_position({8, 8});
+	CHECK(watcher0.num_event == 0);
+	CHECK(watcher1.num_event == 1);
+	table.event_scroll({1, 1});
+	CHECK(watcher0.num_event == 0);
+	CHECK(watcher1.num_event == 2);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
+	CHECK(watcher0.num_event == 0);
+	CHECK(watcher1.num_event == 3);
+
+	table.event_position({4, 4});
+	CHECK(watcher0.num_event == 1);
+	CHECK(watcher1.num_event == 4);
+	table.event_scroll({1, 1});
+	CHECK(watcher0.num_event == 2);
+	CHECK(watcher1.num_event == 4);
+	table.event_button(libv::input::MouseButton::Left, libv::input::Action::press);
+	CHECK(watcher0.num_event == 3);
+	CHECK(watcher1.num_event == 4);
+
+	table.event_position(libv::vec2f{0, 0});
+	CHECK(watcher0.num_event == 4);
+	CHECK(watcher1.num_event == 4);
+}
+
+// -------------------------------------------------------------------------------------------------

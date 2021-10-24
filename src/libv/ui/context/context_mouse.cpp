@@ -26,12 +26,11 @@ namespace ui {
 
 //Mouse event requirements:
 //
-//	- 1 callback (for memory footprint reasons, branching on variant is cheaper (ECS can change this))
 //	- Even with a hotkey system in place, There is viable usecases for querying keyboard (and other input) states in the event callbacks
 //	- Events (including focus, key, char and mouse) has to be broadcaster serialized
 //
-//	- By default every component should be click through
-//	- To prevent click through an absorb/shield/plate is necessary (for ui window or solid ui elements)
+//	- By default every component should be click through | only every non-interactive components are click through by default
+//	- To prevent click through an absorb/shield/plate is necessary (for ui window or solid ui elements) | pass_through is used
 //	- There should be an easy and generic way for non interactive components to shield mouse events
 //
 //	- If two area/region is affected by an event both should be notified
@@ -92,8 +91,8 @@ public:
 		libv::vec2f cornerTR = {-1, -1};
 		MouseOrder order = MouseOrder{0};
 
-		bool over = false; /// Mouse pointer is over (but might be clipped by region)
-		bool inside = false; /// Mouse pointer is over and it is interacting with the node (relates to pass_through)
+		bool over = false; /// Mouse pointer is above (but might be clipped by region or covered with another component)
+		bool interacting = false; /// Mouse pointer is above AND it is interacting with the node (relates to pass_through)
 		bool pendingUpdate = true;
 
 		Node* region_parent = nullptr;
@@ -330,9 +329,7 @@ libv::vec2f ContextMouse::get_global_position(const CoreComponent& component) {
 	return offset;
 }
 
-// -------------------------------------------------------------------------------------------------
-
-namespace {
+namespace { // -------------------------------------------------------------------------------------
 
 struct Hit {
 	MouseRegionContainer::Node* node;
@@ -359,7 +356,7 @@ inline void sort_hits(Hits& hits) noexcept {
 template <typename Event>
 inline void notify_hits(Hits& hits, Event& event) noexcept {
 	for (const auto& hit : hits) {
-		if (!hit.node->inside)
+		if (!hit.node->interacting)
 			continue;
 
 		event.local_position = hit.local_position;
@@ -374,13 +371,11 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
 
-		if (!hit.node->inside && !hit.enter)
-			continue;
-
-		hit.node->inside = !hit.leave;
+		const auto old_interacting = hit.node->interacting;
+		hit.node->interacting = !hit.leave;
 
 		event.local_position = hit.local_position;
-		event.enter = hit.enter;
+		event.enter = hit.enter || (!old_interacting && !hit.leave);
 		event.leave = hit.leave;
 
 		component_notify(hit.node->target, event);
@@ -399,9 +394,9 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 	// Leave every other hit that was previously entered in the hit list
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
-		hit.node->inside = false;
+		hit.node->interacting = false;
 
-		if (!hit.enter) { // If it's not a new enter for the component, leave that component
+		if (!hit.enter) { // If this would have been an 'enter' skip, otherwise leave that component
 			event.local_position = hit.local_position;
 			event.enter = false;
 			event.leave = true;
@@ -411,12 +406,10 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 	}
 }
 
-} // namespace
-
-// -------------------------------------------------------------------------------------------------
+} // namespace -------------------------------------------------------------------------------------
 
 void ContextMouse::event_enter() {
-	// No-op, the mouse position event that follows the mouse enter event will take care of it
+	// No-op, the mouse position event that follows the mouse enter event will take care of everything
 }
 
 void ContextMouse::event_leave() {
