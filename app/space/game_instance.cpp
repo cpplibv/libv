@@ -8,8 +8,8 @@
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/settings.hpp>
 // pro
-#include <space/camera_behaviour.hpp>
-#include <space/canvas_behaviour.hpp>
+#include <space/camera_control.hpp>
+#include <space/canvas_control.hpp>
 #include <space/internal_events.hpp>
 #include <space/log.hpp>
 
@@ -59,10 +59,10 @@ GameInstance::GameInstance() :
 	}()) {
 
 	register_nexus();
-	CameraBehaviour::register_controls(controls);
-	CameraBehaviour::bind_default_controls(controls);
-	CanvasBehaviour::register_controls(controls);
-	CanvasBehaviour::bind_default_controls(controls);
+	CameraControl::register_controls(controls);
+	CameraControl::bind_default_controls(controls);
+	CanvasControl::register_controls(controls);
+	CanvasControl::bind_default_controls(controls);
 
 	frame.onKey.output([this](const libv::input::EventKey& e) {
 		// TODO P1: Remove this, global test variables should be a generic concept

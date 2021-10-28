@@ -1,7 +1,7 @@
 // Project: libv, File: app/space/canvas_behaviour.cpp
 
 // hpp
-#include <space/canvas_behaviour.hpp>
+#include <space/canvas_control.hpp>
 // libv
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
@@ -67,7 +67,7 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 
 } // namespace -------------------------------------------------------------------------------------
 
-void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
+void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	controls.feature_action<app::SpaceCanvas>("space.spawn_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 
@@ -176,7 +176,7 @@ void CanvasBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void CanvasBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
+void CanvasControl::bind_default_controls(libv::ctrl::Controls& controls) {
 	// TODO P1: libv.ctrl: analog feature (on time update) bypasses the accidental collusion resolution system (specialization) with an action feature
 
 	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");

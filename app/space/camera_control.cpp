@@ -1,7 +1,7 @@
 // Project: libv, File: app/space/camera_behaviour.cpp
 
 // hpp
-#include <space/camera_behaviour.hpp>
+#include <space/camera_control.hpp>
 // libv
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
@@ -17,7 +17,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
+void CameraControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	// TODO P2: libv.ctrl: These groups are kind of universal, make them libv.ctrl level constant with a multiplier support over them
 	//                  So one could just write: auto my_sg_rotate = ctrl::sg_rotate * 2.0;
 	//                  Include groups for:
@@ -119,7 +119,7 @@ void CameraBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 }
 
-void CameraBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
+void CameraControl::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("camera.orbit_distance", "T", -1);
 	controls.bind("camera.orbit_distance", "G");
 	controls.bind("camera.orbit_distance", "Scroll", -1);

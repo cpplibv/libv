@@ -39,6 +39,7 @@ app.space: edge highlight (fresnel shader) https://forum.playcanvas.com/t/solved
 app.space: 3D secondary fleet picking
 app.space: Fleet selection, selection based commands
 app.space: Multi fleet selection
+app.space: Rename files *_behaviour -> *_control
 
 
 
@@ -90,7 +91,6 @@ app.space: Move cto.apply(universe) -> universe.apply(cto)
 		visibility will make sense, no forced public on everything
 		const / non-const access will make sense, ability to control to everything only have non-const access
 app.space: F1 menu, list every keybind
-app.space: Rename files *_behaviour -> *_control
 app.space: Move canvas and camera under view
 
 libv.ctrl: Box selection support

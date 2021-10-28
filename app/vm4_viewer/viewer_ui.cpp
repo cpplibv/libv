@@ -38,8 +38,8 @@ ViewerUI::ViewerUI(CoreComponent& parent) :
 
 	// <<< P95: app_vm4v: control integration
 	auto fr = libv::ctrl::FeatureRegister{controls};
-	CameraBehaviour::register_controls(fr);
-	CameraBehaviour::bind_controls(controls);
+	CameraControl::register_controls(fr);
+	CameraControl::bind_controls(controls);
 	controls.context_enter(&scene.camera);
 //	controls.context_enter(&scene.camera2);
 }
@@ -85,7 +85,7 @@ void ViewerUI::load(const std::string& path) {
 // -------------------------------------------------------------------------------------------------
 
 //void ViewerUI::register_controls(libv::ctrl::FeatureRegister& controls) {
-//	CameraBehaviour::register_controls(controls);
+//	CameraControl::register_controls(controls);
 //}
 
 // -------------------------------------------------------------------------------------------------
