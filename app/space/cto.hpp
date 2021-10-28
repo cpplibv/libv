@@ -150,9 +150,6 @@ struct CTO_FleetSpawn {
 
 	LIBV_REFLECTION_ACCESS(position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_FleetSelect {
@@ -163,9 +160,6 @@ struct CTO_FleetSelect {
 
 	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_FleetSelectAdd {
@@ -176,9 +170,6 @@ struct CTO_FleetSelectAdd {
 
 	LIBV_REFLECTION_ACCESS(fleetID);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_FleetBoxSelect {
@@ -189,9 +180,6 @@ struct CTO_FleetBoxSelect {
 
 	LIBV_REFLECTION_ACCESS(fleetIDs);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_FleetMove {
@@ -202,9 +190,6 @@ struct CTO_FleetMove {
 
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_FleetQueueMove {
@@ -215,9 +200,6 @@ struct CTO_FleetQueueMove {
 
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_ClearFleets {
@@ -226,9 +208,6 @@ struct CTO_ClearFleets {
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 struct CTO_Shuffle {
@@ -239,9 +218,6 @@ struct CTO_Shuffle {
 
 	LIBV_REFLECTION_ACCESS(seed);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe);
 };
 
 // -------------------------------------------------------------------------------------------------

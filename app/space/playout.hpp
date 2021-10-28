@@ -13,6 +13,7 @@
 #include <space/network/codec.hpp>
 #include <space/network/network_client.hpp>
 #include <space/network/network_server.hpp>
+#include <space/universe/universe.hpp> // Only to access the process member function
 
 
 namespace app {
@@ -31,8 +32,7 @@ class Playout {
 
 	template <typename CTO> struct ApplyFunc {
 		static void call(Universe& universe, void* cto) {
-			reinterpret_cast<CTO*>(cto)->apply(universe);
-//			universe.apply(*reinterpret_cast<CTO*>(cto));
+			universe.process(std::move(*reinterpret_cast<CTO*>(cto)));
 		}
 	};
 

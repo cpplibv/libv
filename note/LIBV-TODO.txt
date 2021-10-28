@@ -621,9 +621,6 @@ libv: Default operator== where applicable
 
 
 
-git: Change author:
-	* 49b2726 2021-06-21 libv.ui: Fix PanelStatusLine's missing children detach cleanu
-	* 94eee39 2021-06-21 glsl: Remove output keyword and texture2D usages  Dalma
 
 
 ext: adopt https://github.com/olegpublicprofile/stdfwd

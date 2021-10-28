@@ -40,6 +40,7 @@ app.space: 3D secondary fleet picking
 app.space: Fleet selection, selection based commands
 app.space: Multi fleet selection
 app.space: Rename files *_behaviour -> *_control
+app.space: Move cto apply functions into universe
 
 
 
@@ -86,10 +87,6 @@ app.space: Rename files *_behaviour -> *_control
 
 
 
-app.space: Move cto.apply(universe) -> universe.apply(cto)
-		this creates a pattern with lobby.apply(cto) (and others in future)
-		visibility will make sense, no forced public on everything
-		const / non-const access will make sense, ability to control to everything only have non-const access
 app.space: F1 menu, list every keybind
 app.space: Move canvas and camera under view
 

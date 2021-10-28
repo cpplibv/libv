@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <space/fwd.hpp>
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
@@ -114,6 +116,16 @@ public:
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
+
+public:
+	void process(CTO_FleetSpawn&& message);
+	void process(CTO_FleetSelect&& message);
+	void process(CTO_FleetSelectAdd&& message);
+	void process(CTO_FleetBoxSelect&& message);
+	void process(CTO_FleetMove&& message);
+	void process(CTO_FleetQueueMove&& message);
+	void process(CTO_ClearFleets&& message);
+	void process(CTO_Shuffle&& message);
 };
 
 // -------------------------------------------------------------------------------------------------
