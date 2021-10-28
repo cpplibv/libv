@@ -14,7 +14,7 @@
 //#include <memory>
 //#include <optional>
 // pro
-#include <space/canvas.hpp>
+#include <space/view/canvas.hpp>
 
 
 namespace app {

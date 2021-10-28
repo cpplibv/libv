@@ -8,8 +8,8 @@
 #include <libv/ui/event_hub.hpp>
 #include <libv/ui/settings.hpp>
 // pro
-#include <space/camera_control.hpp>
-#include <space/canvas_control.hpp>
+#include <space/view/camera_control.hpp>
+#include <space/view/canvas_control.hpp>
 #include <space/internal_events.hpp>
 #include <space/log.hpp>
 

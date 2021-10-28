@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/canvas.hpp
+// Project: libv, File: app/space/view/canvas.hpp
 
 #pragma once
 
@@ -7,7 +7,7 @@
 // libv
 #include <libv/ui/component/canvas.hpp>
 // pro
-#include <space/camera.hpp>
+#include <space/view/camera.hpp>
 #include <space/renderer.hpp>
 
 

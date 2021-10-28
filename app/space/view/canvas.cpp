@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/canvas.cpp
+// Project: libv, File: app/space/view/canvas.cpp
 
 // hpp
-#include <space/canvas.hpp>
+#include <space/view/canvas.hpp>
 // libv
 #include <libv/glr/queue.hpp>
 // std

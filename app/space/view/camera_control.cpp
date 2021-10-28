@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/camera_behaviour.cpp
+// Project: libv, File: app/space/view/camera_behaviour.cpp
 
 // hpp
-#include <space/camera_control.hpp>
+#include <space/view/camera_control.hpp>
 // libv
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
@@ -9,7 +9,7 @@
 // std
 #include <cmath>
 // pro
-#include <space/camera.hpp>
+#include <space/view/camera.hpp>
 #include <space/log.hpp>
 
 

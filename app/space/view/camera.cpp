@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/camera.cpp
+// Project: libv, File: app/space/view/camera.cpp
 
 // hpp
-#include <space/camera.hpp>
+#include <space/view/camera.hpp>
 // libv
 //#include <libv/math/ease.hpp>
 

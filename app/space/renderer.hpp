@@ -18,7 +18,7 @@
 #include <libv/ui/component/canvas.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
-#include <space/camera.hpp>
+#include <space/view/camera.hpp>
 #include <space/universe/universe.hpp>
 
 

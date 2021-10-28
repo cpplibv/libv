@@ -14,7 +14,7 @@
 #include <libv/math/noise/white.hpp>
 //#include <libv/glr/texture.hpp>
 // pro
-//#include <space/camera.hpp>
+//#include <space/view/camera.hpp>
 //#include <space/command.hpp>
 //#include <space/game_instance.hpp>
 //#include <space/playout.hpp>

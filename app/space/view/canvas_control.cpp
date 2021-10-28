@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/canvas_behaviour.cpp
+// Project: libv, File: app/space/view/canvas_behaviour.cpp
 
 // hpp
-#include <space/canvas_control.hpp>
+#include <space/view/canvas_control.hpp>
 // libv
 #include <libv/ctrl/controls.hpp> // TODO P0: temporary for default binds
 #include <libv/ctrl/feature_register.hpp>
@@ -10,7 +10,7 @@
 // std
 #include <optional>
 // pro
-#include <space/canvas.hpp>
+#include <space/view/canvas.hpp>
 #include <space/cto.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>

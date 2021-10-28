@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/camera_behaviour.hpp
+// Project: libv, File: app/space/view/camera_behaviour.hpp
 
 #pragma once
 
