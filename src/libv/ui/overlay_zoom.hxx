@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/glr/queue_fwd.hpp>
+#include <libv/glr/fwd.hpp>
 #include <libv/math/vec.hpp>
 // pro
 #include <libv/ui/component/detail/component_api.hpp>

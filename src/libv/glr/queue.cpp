@@ -122,6 +122,24 @@ struct QueueTaskMeshVII : QueueTaskMesh {
 	}
 };
 
+struct QueueTaskMeshFullScreen {
+	SequenceNumber sequenceNumber;
+	State state;
+	std::shared_ptr<RemoteProgram> program;
+
+	inline void execute(libv::gl::GL& gl, Remote& remote, State& currentState) const noexcept {
+		if (currentState != state) {
+			changeState(gl, state);
+			currentState = state;
+		}
+
+		program->use(gl, remote);
+		// !!! a non zero VAO should be bound, check on it
+		glDrawArrays(GL_TRIANGLES, 0, 3); // !!!
+		//		mesh->render(gl, remote);
+	}
+};
+
 struct QueueTaskClear {
 	SequenceNumber sequenceNumber;
 	libv::gl::BufferBit buffers;
@@ -310,7 +328,7 @@ public:
 	std::vector<std::variant<
 			QueueTaskCallback,
 			QueueTaskClear, QueueTaskClearColor, QueueTaskViewport,
-			QueueTaskMesh, QueueTaskMeshVII, QueueTaskUniformBlock, QueueTaskUniformBlockStream, QueueTaskTexture,
+			QueueTaskMesh, QueueTaskMeshVII, QueueTaskMeshFullScreen, QueueTaskUniformBlock, QueueTaskUniformBlockStream, QueueTaskTexture,
 			QueueTaskFramebuffer, QueueTaskBlit
 	>> tasks;
 
@@ -428,19 +446,19 @@ void Queue::framebuffer_read(Framebuffer framebuffer) {
 	sequencePoint();
 }
 
-void Queue::framebuffer_deafult() {
+void Queue::framebuffer_default() {
 	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_both);
 	sequencePoint();
 }
 
-void Queue::framebuffer_draw_deafult() {
+void Queue::framebuffer_draw_default() {
 	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_draw);
 	sequencePoint();
 }
 
-void Queue::framebuffer_read_deafult() {
+void Queue::framebuffer_read_default() {
 	sequencePoint();
 	self->add<QueueTaskFramebuffer>(QueueTaskFramebuffer::Mode::default_read);
 	sequencePoint();
@@ -644,14 +662,19 @@ void Queue::render(Mesh mesh, VertexIndex baseVertex, VertexIndex baseIndex, Ver
 	self->add<QueueTaskMeshVII>(state.state(), self->programStack.top(), AttorneyMeshRemote::remote(mesh), baseVertex, baseIndex, numIndices);
 }
 
+void Queue::render_full_screen() {
+	self->programStack.top()->uniformStream.endBatch();
+	self->add<QueueTaskMeshFullScreen>(state.state(), self->programStack.top());
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Queue::execute(libv::gl::GL& gl, Remote& remote) {
 	for (const auto& task_variant : self->tasks) {
-		auto execution = [&](const auto& task) {
-			if constexpr (std::is_base_of_v<QueueTaskMesh, std::remove_cvref_t<decltype(task)>>)
+		auto execution = [&]<typename T>(const T& task) {
+			if constexpr (std::is_base_of_v<QueueTaskMesh, T> || std::is_same_v<QueueTaskMeshFullScreen, T>)
 				task.execute(gl, remote, self->currentState);
-			else if constexpr (std::is_same_v<QueueTaskCallback, std::remove_cvref_t<decltype(task)>>)
+			else if constexpr (std::is_same_v<QueueTaskCallback, T>)
 				task.execute(gl, remote, self->currentState);
 			else
 				task.execute(gl, remote);

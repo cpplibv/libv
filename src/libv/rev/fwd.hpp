@@ -30,5 +30,9 @@ template <typename T> class Shader;
 
 using ShaderID = uint64_t;
 
+class PostProcessing;
+
+class RenderTarget;
+
 } // namespace rev ---------------------------------------------------------------------------------
 } // namespace libv

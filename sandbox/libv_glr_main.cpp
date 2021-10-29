@@ -473,7 +473,7 @@ struct Sandbox {
 			queue.state.disableMultisample();
 
 		// Draw world normal
-		queue.framebuffer_draw_deafult();
+		queue.framebuffer_draw_default();
 		queue.viewport({0, 0}, windowSize);
 		render_remote(queue);
 
@@ -489,7 +489,7 @@ struct Sandbox {
 				libv::gl::BufferBit::Color, libv::gl::MagFilter::Nearest);
 
 		// Render a quad with framebuffer2 over the normal output (on a small window)
-		queue.framebuffer_draw_deafult();
+		queue.framebuffer_draw_default();
 		queue.viewport({0, 0}, windowSize);
 		render_remote_quad(queue);
 

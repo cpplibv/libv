@@ -5,7 +5,7 @@
 // fwd
 #include <libv/ui/component/fwd.hpp>
 // libv
-#include <libv/glr/queue_fwd.hpp>
+#include <libv/glr/fwd.hpp>
 #include <libv/utility/observer_ref.hpp>
 // std
 #include <memory>

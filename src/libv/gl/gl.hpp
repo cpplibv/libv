@@ -552,6 +552,9 @@ private:
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		checkGL();
 
+//		glDisable(GL_FRAMEBUFFER_SRGB);
+//		glEnable(GL_FRAMEBUFFER_SRGB);
+
 		// Fetch OpenGL context current state
 		capability.blend.init();
 		capability.cullFace.init();

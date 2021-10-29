@@ -83,9 +83,9 @@ public:
 	void framebuffer(Framebuffer framebuffer);
 	void framebuffer_draw(Framebuffer framebuffer);
 	void framebuffer_read(Framebuffer framebuffer);
-	void framebuffer_deafult();
-	void framebuffer_draw_deafult();
-	void framebuffer_read_deafult();
+	void framebuffer_default();
+	void framebuffer_draw_default();
+	void framebuffer_read_default();
 
 public:
 	void blit(Framebuffer src, Framebuffer dst, libv::vec2i src_pos, libv::vec2i src_size, libv::vec2i dst_pos, libv::vec2i dst_size, libv::gl::BufferBit mask, libv::gl::MagFilter filter);
@@ -153,6 +153,7 @@ public:
 	void program(Program program_);
 	void render(Mesh mesh);
 	void render(Mesh mesh, uint32_t baseVertex, uint32_t baseIndex, uint32_t numIndices);
+	void render_full_screen();
 
 public:
 	void execute(libv::gl::GL& gl, Remote& remote);

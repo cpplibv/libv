@@ -14,23 +14,13 @@ libv.rev: Implement the shader reload event hooks for include or IO failure
 libv.rev: Cleanup shader manager system implementation
 libv.rev: Add block binding support on shader uniform container level
 libv.rev: Add load and current version numbering for shaders
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+libv.gl: Add support for GL_TEXTURE_COMPARE_MODE
+libv.gl: Add support for GL_TEXTURE_COMPARE_FUNC
+libv.rev: Render target abstraction (over Framebuffer + RenderTarget / Texture)
+libv.rev: Post processing stack
+libv.rev: Tone mapping
+libv.rev: Vignette
+libv.rev: Bloom
 
 
 
@@ -62,14 +52,27 @@ libv.rev: Add load and current version numbering for shaders
 
 
 
+place.it: Age of empires 4 menu show/hide effect is cool
 
 
 
 
-Kill full screen quads
-	Full screen quads are dead, Long live the oversized triangle (0,0,0)(3,0,0)(0,3,0)
-	(It might also be possible to skip VBO/VAO for it)
-	https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
+
+
+libv.rev: Post processing
+
+	libv.rev: HDR: automatic exposure adjustment opengl
+	libv.rev: Post-processing exposure (I think it affects both bloom prefilter and combine input)
+
+	libv.rev: Bloom dirt texture
+			Some idea / look like Dirt texture and stronger sky bleed: https://www.youtube.com/watch?v=ThA9pueKvus
+				https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.postprocessing/PostProcessing/Shaders/Builtins/Bloom.shader
+				https://github.com/Unity-Technologies/Graphics/tree/master/com.unity.render-pipelines.universal
+
+	libv.rev: Vignette texture
+
+
+
 
 
 
@@ -82,14 +85,13 @@ libv.glr: Add support for anisotropic filtering
 app.vm4viewer: adopt libv.rev's Shader and ShaderLoader
 		| Well it looks like vm4viewer was killed in the meantime
 
-libv.gl: Add support for GL_TEXTURE_COMPARE_MODE
-libv.gl: Add support for GL_TEXTURE_COMPARE_FUNC
-
 libv.gl: Add support for glDrawBuffers https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glDrawBuffers.xhtml
 		| Might not be necessary | Maybe needed for a shadow pass
 libv.glr: Add support for glDrawBuffers
 		| Might not be necessary | Maybe needed for a shadow pass
 
+libv.glr: Add support for GL_TEXTURE_COMPARE_MODE
+libv.glr: Add support for GL_TEXTURE_COMPARE_FUNC
 libv.glr: Add support for GL Queries
 
 libv.gl: glColorMask
@@ -106,8 +108,10 @@ libv.rev: Render Pass
 		[Sky]
 		OpaqueReflective (0..N)
 		Transparent (0..N)
-		Bloom
 		Post processing
+			Bloom
+			Vignette
+			Tone mapping
 
 libv.rev: Paper
 		Mesh - What
@@ -128,8 +132,6 @@ libv.rev: Material
 			AKA: The whole OpenGL capability and other state (libv.glr.state)
 
 libv.rev: 'Global' uniforms: read what unity has to offer https://docs.unity3d.com/Manual/SL-UnityShaderVariables.html
-
-libv.rev: HDR: automatic exposure adjustment opengl
 
 
 libv.rev: Skeleton animation
@@ -163,11 +165,49 @@ libv.rev: Skeleton animation
 
 
 
-app.space: //out GeometryData VS_OUTPUT(geometry, fragment);
-		| so it turns out only the in/out and the type matters, the name is just there to scope it
-		| this means i can call them however i want, but good naming needed: ?vs_out ?fs_in
 
 libv.rev: glsl_source_loader: Add query API, aka what would this include be resolve too
 		has to handling errors, query could result in error (it should probe the file, so: no such file, cannot open, etc)
 		has to handling no match, query could result in no mapping
+
+
+
+--- Paper collection -------------------------------------------------------------------------------
+
+Bloom Paper
+	Input: HDR Color
+	Output: A texture with blurred bloom data with half the resolution of the input (last upsampling happens on combine)
+
+	Configuration:
+		threshold
+		knee
+		intensity
+
+	Quality options:
+		number of MIPs
+		downsample with 4 or 13
+		upsample with box or tent
+
+	Passes:
+		- Downsample 13 tap + Prefilter
+		- Downsample blur (N times)
+			- V Blur 9 tap
+			- H Blur 5 tap
+		- Upsample 9 tap (N+1 times)
+		- Combine (Upsample 9 tap)
+
+	Sources:
+		http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare
+		'Cherno' bloom overview: https://www.youtube.com/watch?v=ThA9pueKvus
+		'Cherno' bloom guide: https://www.youtube.com/watch?v=tI70-HIc5ro
+		sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
+		https://learnopengl.com/Advanced-Lighting/Bloom
+		Unity source PostProcessPass.cs: https://github.com/Unity-Technologies/Graphics/blob/31106afc882d7d1d7e3c0a51835df39c6f5e3073/com.unity.render-pipelines.universal/Runtime/Passes/PostProcessPass.cs
+		Unity source UberPost.shader:    https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/PostProcessing/UberPost.shader
+		Unity source Bloom.shader:       https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.render-pipelines.universal/Shaders/PostProcessing/Bloom.shader
+
+--- Article collection -----------------------------------------------------------------------------
+
+Full screen triangle: https://wallisc.github.io/rendering/2021/04/18/Fullscreen-Pass.html
+sRGB, linearRGB, gamma, HDR, Tone mapping: https://www.youtube.com/watch?v=iikdcAA7cww
 

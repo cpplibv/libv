@@ -84,9 +84,31 @@ app.space: Move canvas and camera files under view
 
 
 
+Main areas of focus: Cost / Value
+	80 / 9: Visual: Post Processing
+	40 / 8: Visual: Glow / Bloom
+
+	 2 / 2: UX: F1 help overlay
+	 1 / 2: UX: Default focus canvas
+
+	40 / 6: Control: Ctrl box selection support
+	 2 / 6: Network: 'Universe' Snapshot
+
+	60 / 4: Library: State machine generation
+	12 / 4: Library: Shader / Uniform block generation
+
+	24 / 5: Visual: Fleet visualization (Simple mesh, orientation)
+	 8 / 3: Visual: Debug renderer text (2D Label on a 3D point)
+	 8 / 1: Visual: Fleet name (2D Label)
+	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
+	20 / 2: UI: Card layout
+
+	Bug P1: repeated smashing of host/join can cause failure
+	Bug P1: app.space: "Vader2" as client name breaks the lobby layout
 
 
 
+app.space: Adopt libv.rev post-processing
 app.space: F1 menu, list every control bindings
 
 libv.ctrl: Box selection support
@@ -97,6 +119,7 @@ libv.ctrl: Box selection support
 		end
 			[release]
 libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
+libv.ctrl: 'Acquire "mouse"' similarly as UI does it
 
 
 
@@ -114,6 +137,7 @@ app.space.net: Networking
 				app.space.net: Fast forwarding after a snapshot loading happened
 				app.space.net: Apply, update, skip render repeat until catch up
 			app.space.net: [Optional] Snapshot delta to help catchup
+		app.space.net: Snapshot compression above X KB (64)
 
 	app.space.net: Networking (Stage 4)
 		app.space.net: Deterministic execution (Frame Index and lockstep)
@@ -129,8 +153,6 @@ app.space.net: Networking
 
 
 app.space.net: Networking PAPER:
-	A good article on this subject: https://gafferongames.com/post/deterministic_lockstep/
-
 	Some random buzz words:
 		Deterministic lockstep
 		snapshot
@@ -243,12 +265,6 @@ app.space: Self-Updater
 app.space: frustum visualization
 app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
 app.space: Camera: Pressing the camera alteration in one direction for long time (>1-3s) increase speed
-
-app.space / libv.rev: Render target/Framebuffer abstraction
-		ms / ss support
-		depth support
-		easy render target inspection
-app.space: make a blur or a bloom
 
 app.space: Optimized VAO update for command arrows (prepare / render step is done, mesh re-upload and glr side should be checked)
 

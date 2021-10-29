@@ -3,12 +3,12 @@
 #pragma once
 
 // libv
-//#include <libv/glr/mesh.hpp>
-//#include <libv/glr/program.hpp>
-//#include <libv/glr/queue_fwd.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/math/vec.hpp>
+//#include <libv/glr/fwd.hpp>
+//#include <libv/glr/mesh.hpp>
+//#include <libv/glr/program.hpp>
 // std
 //#include <optional>
 // pro

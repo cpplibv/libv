@@ -193,9 +193,14 @@ ui.style("space.hud-bar.lobby.name") {
 	padding = {4, 4},
 	size = "D1r, D",
 
-	-- !!! This causes a layout bug, bigger or smaller padding along X is fine, but this interval is incorrect
+	-- !!! These value causes a layout bug, bigger or smaller padding along X is fine, but this interval is incorrect
+	-- 		As it is interval related most likely a merging if goes wrong or along the wrong dim
 	--padding = {10, 4},
 	--size = "10pxD1r, D",
+	--
+	-- The goal:
+	--padding = {10, 4},
+	--size = "D1r, D",
 }
 
 ui.style("space.hud-bar.lobby.title") {

@@ -206,7 +206,7 @@ void InternalShaderLoader::update_gl(libv::gl::GL& gl) {
 			internal->uniformContainer->bind_assign(internal->program);
 			internal->uniformContainer->bind_blocks(internal->program);
 
-			log_rev.error("Settings shader: {} v{} ({}) to fallback red", internal->name_, internal->load_version, internal->id());
+			log_rev.error("Setting shader: {} v{} ({}) to fallback red", internal->name_, internal->load_version, internal->id());
 		} else {
 			log_rev.error("Keeping shader: {} v{} ({}) as last working version v{}", internal->name_, internal->load_version, internal->id(), internal->current_version);
 		}

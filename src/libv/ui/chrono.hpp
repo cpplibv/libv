@@ -2,10 +2,10 @@
 
 #pragma once
 
+// libv
+#include <libv/utility/chrono_mod.hpp>
 // std
 #include <chrono>
-#include <cmath>
-#include <type_traits>
 
 
 namespace libv {
@@ -29,21 +29,6 @@ struct clock {
 using time_duration_f = std::chrono::duration<float, clock::period>;
 using time_duration = clock::duration;
 using time_point = clock::time_point;
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename RepX, typename PeriodX, typename RepY, typename PeriodY>
-[[nodiscard]] constexpr inline auto time_mod(std::chrono::duration<RepX, PeriodX> x, std::chrono::duration<RepY, PeriodY> y) noexcept {
-	using common_type = std::common_type_t<decltype(x), decltype(y)>;
-
-	common_type commonX{x};
-	common_type commonY{y};
-
-	if constexpr (std::is_floating_point_v<typename time_duration::rep>)
-		return common_type{std::fmod(commonX.count(), commonY.count())};
-	else
-		return common_type{commonX.count() % commonY.count()};
-}
 
 // -------------------------------------------------------------------------------------------------
 

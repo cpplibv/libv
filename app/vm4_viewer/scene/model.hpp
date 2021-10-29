@@ -3,8 +3,8 @@
 #pragma once
 
 // libv
+#include <libv/glr/fwd.hpp>
 #include <libv/glr/mesh.hpp>
-#include <libv/glr/queue_fwd.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/vm4/model.hpp>
 //#include <libv/math/quaternion.hpp>

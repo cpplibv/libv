@@ -49,7 +49,7 @@ auto running = std::atomic_bool{true};
 ///		void render();
 ///	};
 template <typename Sandbox>
-int run_sandbox(const std::string& title, const uint32_t window_height, const uint32_t window_width) {
+int run_sandbox(const std::string& title, const uint32_t window_height, const uint32_t window_width, int samples = 4, int depth_bits = 32) {
 	glfwSetErrorCallback([](int code, const char* description) {
 		log_sandbox.error("GLFW {}: {}", code, description);
 	});
@@ -62,13 +62,15 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, samples);
 
+//	glfwWindowHint(GLFW_SRGB_CAPABLE, false);
+//	glfwWindowHint(GLFW_SRGB_CAPABLE, true);
 	glfwWindowHint(GLFW_RED_BITS, 8);
 	glfwWindowHint(GLFW_GREEN_BITS, 8);
 	glfwWindowHint(GLFW_BLUE_BITS, 8);
 	glfwWindowHint(GLFW_ALPHA_BITS, 0);
-	glfwWindowHint(GLFW_DEPTH_BITS, 32);
+	glfwWindowHint(GLFW_DEPTH_BITS, depth_bits);
 	glfwWindowHint(GLFW_STENCIL_BITS, 0);
 
 	// --- Windowed ------------------------------------------------------------------------------------
@@ -147,14 +149,26 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 	// -------------------------------------------------------------------------------------------------
 
 	glfwMakeContextCurrent(window);
-	glfwSetKeyCallback(window, [](GLFWwindow*, int key, int, int, int) {
+	glfwSetKeyCallback(window, [](GLFWwindow* window_, int key, int scancode, int action, int mods) {
+		auto& sandbox = *reinterpret_cast<Sandbox*>(glfwGetWindowUserPointer(window_));
+
+		if constexpr (requires { sandbox.onKey(key, scancode, action, mods); })
+			sandbox.onKey(key, scancode, action, mods);
+
 		if (key == GLFW_KEY_ESCAPE)
 			running = false;
+	});
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window_, int width, int height) {
+		auto& sandbox = *reinterpret_cast<Sandbox*>(glfwGetWindowUserPointer(window_));
+
+		if constexpr (requires { sandbox.onResize(width, height); })
+			sandbox.onResize(width, height);
 	});
 	glfwSwapInterval(1);
 
 	try {
 		Sandbox sandbox;
+		glfwSetWindowUserPointer(window, &sandbox);
 
 		libv::stat_counter<std::chrono::nanoseconds> time_outside;
 		libv::stat_counter<std::chrono::nanoseconds> time_update;
@@ -186,8 +200,9 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 			if (timer_print.elapsed() > print_interval) {
 				timer_print.adjust(print_interval);
 
-				log_sandbox.info("--- Report of {} frame --------------------------------------", time_outside.count());
-				log_sandbox.info("MIN) Poll: {:7.3f}μs, Update: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
+				log_sandbox.info("--- Report of {} frame ----------------------------------------------", time_outside.count());
+				log_sandbox.info("    | Poll μs  |Update μs |Render μs | Other μs | Swap μs  |  Sum μs  ");
+				log_sandbox.info("MIN |{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}",
 						static_cast<float>(time_poll.min().count()) / 1000.f,
 						static_cast<float>(time_update.min().count()) / 1000.f,
 						static_cast<float>(time_render.min().count()) / 1000.f,
@@ -196,7 +211,7 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 						static_cast<float>((time_outside.min() + time_render.min() + time_render.min() + time_swap.min() + time_poll.min()).count()) / 1000.f
 				);
 
-				log_sandbox.info("AVG) Poll: {:7.3f}μs, Update: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
+				log_sandbox.info("AVG |{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}",
 						static_cast<float>(time_poll.avg().count()) / 1000.f,
 						static_cast<float>(time_update.avg().count()) / 1000.f,
 						static_cast<float>(time_render.avg().count()) / 1000.f,
@@ -205,7 +220,7 @@ int run_sandbox(const std::string& title, const uint32_t window_height, const ui
 						static_cast<float>((time_outside.avg() + time_render.avg() + time_render.avg() + time_swap.avg() + time_poll.avg()).count()) / 1000.f
 				);
 
-				log_sandbox.info("MAX) Poll: {:7.3f}μs, Update: {:7.3f}μs, Render: {:7.3f}μs, Other: {:7.3f}μs, Swap: {:7.3f}μs, Sum: {:7.3f}μs",
+				log_sandbox.info("MAX |{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}|{:10.3f}",
 						static_cast<float>(time_poll.max().count()) / 1000.f,
 						static_cast<float>(time_update.max().count()) / 1000.f,
 						static_cast<float>(time_render.max().count()) / 1000.f,

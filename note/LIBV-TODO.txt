@@ -1301,6 +1301,7 @@ libv.color: implement HCL and other color conversion functions http://www.chilli
 libv.ui: Color picker
 
 libv.glr: MAYOR OVERHAUL: remove the queue, use thread local GLR context variable access, remove the idea of sorting, switch to immediate mode
+		| NOTE: uniform streams do rely on the queue, so any code using them will have to change
 
 libv.glr: Cleanup includes for:
 			libv/glr/mesh.cpp
@@ -1359,13 +1360,6 @@ libv.va4/ia4: (Iris/Vader Asset 4) New "library" to handle vm4 models and bundle
 libv.va4/ia4: Animation drivers: look at, rotate around world/local xyz, pulsate, play animation, etc...
 
 libv.gl: https://learnopengl.com/PBR/Lighting
-libv.glr: post-processing emission / bloom
-		Some idea / look like Dirt texture and stronger sky bleed: https://www.youtube.com/watch?v=ThA9pueKvus
-		THE correct guide on Bloom: https://www.youtube.com/watch?v=tI70-HIc5ro
-			https://github.com/Unity-Technologies/Graphics/blob/master/com.unity.postprocessing/PostProcessing/Shaders/Builtins/Bloom.shader
-			http://www.iryoku.com/next-generation-post-processing-in-call-of-duty-advanced-warfare
-		Tone mapping: https://github.com/dmnsgn/glsl-tone-map
-libv.glr: post-processing gamma
 libv.glr: post-processing haze
 
 libv.glr: Shadow
@@ -1375,8 +1369,7 @@ libv.glr: Tiled Forward Shading (aka Forward+) https://www.3dgep.com/forward-plu
 libv.glr: Volume Tiled Forward Shading https://www.3dgep.com/wp-content/uploads/2017/07/3910539_Jeremiah_van_Oosten_Volume_Tiled_Forward_Shading.pdf
 libv.glr: Deferred-Shading https://learnopengl.com/Advanced-Lighting/Deferred-Shading and https://www.3dgep.com/volume-tiled-forward-shading/
 libv.glr: SSAO https://learnopengl.com/Advanced-Lighting/SSAO
-libv.glr: HDR https://learnopengl.com/Advanced-Lighting/HDR
-libv.glr: Bloom https://learnopengl.com/Advanced-Lighting/Bloom
+libv.glr: Exposure https://learnopengl.com/Advanced-Lighting/HDR
 libv.glr: FXAA
 libv.glr: SRAA
 libv.glr: Tiled-Deferred-Shading

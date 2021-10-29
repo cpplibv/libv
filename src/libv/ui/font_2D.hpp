@@ -5,10 +5,10 @@
 // ext
 #include <boost/container/flat_map.hpp>
 // libv
-//#include <libv/glr/queue_fwd.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/guard.hpp>
+//#include <libv/glr/fwd.hpp>
 // std
 #include <array>
 #include <mutex>

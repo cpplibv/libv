@@ -7,8 +7,8 @@
 // libv
 #include <libv/ctrl/fwd.hpp>
 #include <libv/glr/attribute.hpp>
+#include <libv/glr/fwd.hpp>
 #include <libv/glr/mesh.hpp>
-#include <libv/glr/queue_fwd.hpp>
 #include <libv/glr/texture.hpp>
 #include <libv/glr/uniform.hpp>
 #include <libv/glr/uniform_buffer.hpp>

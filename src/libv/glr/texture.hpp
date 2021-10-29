@@ -224,6 +224,8 @@ public:
 	using RGB32F      = TS<Params<FS::RGB32F,             libv::gl::DataType::F32, libv::vec3f>>;
 	using RGBA32F     = TS<Params<FS::RGBA32F,            libv::gl::DataType::F32, libv::vec4f>>;
 
+	using R11F_G11F_B10F = TS<Params<FS::R11F_G11F_B10F,  libv::gl::DataType::F32, libv::vec3f>>;
+
 	using RGB_DXT1    = TS<Params<FC::RGB_S3TC_DXT1_EXT,  libv::gl::DataType::U8, libv::vec3uc>>;
 	using RGBA_DXT1   = TS<Params<FC::RGBA_S3TC_DXT1_EXT, libv::gl::DataType::U8, libv::vec4uc>>;
 	using RGBA_DXT3   = TS<Params<FC::RGBA_S3TC_DXT3_EXT, libv::gl::DataType::U8, libv::vec4uc>>;
