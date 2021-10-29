@@ -606,8 +606,11 @@ libv: Rebase every branch to a recent commit
 libv: Change /*implicit*/ comments to explicit(false)
 libv: Upgrade to GCC 11.2 and C++23
 libv: Default operator== where applicable
-
-
+wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file
+wish: use ProcessorCount instead of system call
+ext: Acquire a crypto lib
+ext: Acquire a hashing lib (the MD5 will not be enough forever)
+libv: Move from std::holds_alternative to std::get_if
 
 
 
@@ -700,10 +703,7 @@ app.editor:
 		| warning on [cpp,c,cxx,...] aka source extension include
 
 
-ext: Acquire a crypto lib
-ext: Acquire a hashing lib (the MD5 will not be enough forever)
 ext: Edit Distance https://github.com/erikerlandson/edit_distance
-
 
 
 place.it: flat_varfix_map (would be usable for style.properties)
@@ -740,6 +740,7 @@ place.it:
 	opengl.knowledge: ogldev.org - Great tutorial site
 	opengl.knowledge: open.gl - Great tutorial site
 	opengl.knowledge: opengl-tutorial.org - Great tutorial site
+	opengl.tool: renderdoc.org - Renderdoc
 	regex.tool: regex101.com
 	regex.tool: regexr.com
 
@@ -1147,16 +1148,18 @@ libv.ctrl: Implementation queue:
 	libv.ctrl: Store more information about Context. Name, orthogonal and concurrent contexts
 	libv.ctrl: Idea of context groups, and under a group there are multiple types
 
-cpp: move from to holds_alternative to get_if https://en.cppreference.com/w/cpp/utility/variant/get_if
-
-app.vm4_viewer: Camera controller class
-app.vm4_viewer: Camera controller class jump controls with multiple interpolation type (linear camera motion is sickening, jumping camera movement/rotation should always ease out and in, in case of very long jumps with a skip in the middle segment)
-app.vm4_viewer: Camera controller class with lua binding
+	libv.ctrl: IDEA: Soft enter contexts:
+			Soft enter would allow on demand context change based on unhandled events
+			Scenario:
+				A UI Object is focused
+				Mouse is above a canvas and no longer above the UI component
+					The Mouse hover effect marks the canvas to soft enter
+				On the canvas there is a binding for 'F1'
+				'F1' is pressed but no active context handles it
+				Soft entered contexts could auto enter and handle the event
 
 app.vm4_viewer: light source indicator
 app.vm4_viewer: light source mover
-app.vm4_viewer: camera pivot indicator
-app.vm4_viewer: camera orientation indicator
 app.vm4_viewer: ortho camera, and swapping
 
 app.vm4_viewer: Rulers: Display size rulers along the 3 dimension (3/6/9 value) of the max ranges
@@ -1227,15 +1230,9 @@ app.vm4_viewer: camera movement should acquire and mutex mouse position
 app: about page with executable path, build and compiler information, git hash and software version
 libv.main: Small library to wrap main and command line arguments into a modern C++ format with global access: span<string_view>
 
-vm4 hash and timestamp
-	ext: cryptopp https://github.com/weidai11/cryptopp
-	ext: openssl https://github.com/janbar/openssl-cmake
-	libv: MD5
-	libv: SHA3-256
-	libv: SHA3-512
-	libv.vm4: model hash (calculated at import)
-	libv.serialization: std::chrono::system_clock::time_point (convert to UTC) (serialize a normalized value around a fixed epoch)
-	libv.vm4: model import timestamp
+ext: cryptopp https://github.com/weidai11/cryptopp
+libv.vm4: model hash (calculated at import)
+libv.vm4: model import timestamp
 
 libv.vm4lua: lua binding for vm4 and vm4 importer
 
@@ -1289,20 +1286,9 @@ libv.gl: move glew init into GL (with the ability to optionally disable it with 
 libv.glr: (?) (if passible) std140 implementation should be moved to libv.gl
 libv.glr: layout_to_string.hpp stream_struct_name test / use #include <boost/type_index.hpp> boost::typeindex::type_id_with_cvr<T>.pretty_name()
 
-wish: Force colored output, useful for IDEs like clion and netbeans, also for ninja too
-		option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." FALSE)
-		if (${FORCE_COLORED_OUTPUT})
-			if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-				add_compile_options (-fdiagnostics-color=always)
-			elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-				add_compile_options (-fcolor-diagnostics)
-			endif ()
-		endif ()
 wish: update cmake version and use add_compile_definitions() instead of add_definitions()
 wish: target_link_directories()
-wish: file glob CONFIGURE_DEPENDS https://cmake.org/cmake/help/v3.14/command/file.html#command:file
 wish: add support for OUTPUT_NAME and use it for the apps https://cmake.org/cmake/help/latest/prop_tgt/OUTPUT_NAME.html
-wish: use NUMBER_OF_LOGICAL_CORES https://cmake.org/cmake/help/v3.14/command/cmake_host_system_information.html#command:cmake_host_system_information
 wish: use include guards https://cmake.org/cmake/help/v3.14/command/include_guard.html#command:include_guard
 wish: correct cmake target private/interface/public dependency (link and include (and source and definitions)) usage https://www.youtube.com/watch?v=y7ndUhdQuU8
 wish: revisit catch object file linkage (only need to figure out a way to build it) as "target_link_libraries() command now supports Object Libraries"
@@ -1428,12 +1414,7 @@ libv.glr: IDEA: Versioned resources, beside what tell which version are we want 
 libv.glr: Make the reordering explicit and opt-in
 libv.glr: Refactor the variants
 
-libv.ecs: Test fails with an assert in boost vector
-
 libv.lua: function to immediately destroy a variable (useful for game object or gui object cleanup that would hold a resource otherwise)
-
-ext.clara: remove dependency
-ext.lua: update to 8eb1482b493a3a44f004c86baeeb0683ec094542 at https://github.com/xpol/lua for 5.3.5
 
 libv.math: Catmull-Rom spline https://www.youtube.com/watch?v=9_aJGUTePYo and code https://github.com/OneLoneCoder/videos/blob/master/OneLoneCoder_Splines2.cpp
 
@@ -1491,9 +1472,7 @@ libv.audio: Paper
 --- AWAITING ---------------------------------------------------------------------------------------
 
 
-Async: https://www.youtube.com/watch?v=t4etEwG2_LY
-cli: Clara, most important questions are: multi, optional, required, positional and default arguments
-			argument parsing lib idea to specify requirements: bool like temple expression: args.require(arg0 && arg1 || arg2), (arg3.count > 5 || arg4)
+async: https://www.youtube.com/watch?v=t4etEwG2_LY
 cmake: generator expressions https://cmake.org/cmake/help/v3.8/manual/cmake-generator-expressions.7.html#manual:cmake-generator-expressions(7)
 cmake: Revisit the external auto rebuild feature, if() + file(TOUCH) + target_dependency() | could I use separate cmake file for each ext and make a dependency on it ?
 color: color picker http://www.colorhexa.com/3affce
@@ -1549,9 +1528,6 @@ ext.mysql: mysql connector source https://dev.mysql.com/get/Downloads/Connector-
 ext: adopt a better hash_map and remove every std::unordered container
 ext: adopt mdspan https://github.com/kokkos/mdspan/wiki/A-Gentle-Introduction-to-mdspan
 ext: adopt zlib (remove assimp internal zlib) https://github.com/madler/zlib (light wrapper for usage: https://gist.github.com/gomons/9d446024fbb7ccb6536ab984e29e154a )
-gl: docs http://docs.gl
-gl: glEnable(GL_DEBUG_OUTPUT);
-gl: renderdoc https://renderdoc.org/
 gold: And if thou gaze long at a finite automaton, a finite automaton also gazes into thee.
 gold: UNLESS someone like you cares a whole awful lot, nothing is going to get better. It's not.
 gold: existence / super-position based predication
@@ -1582,7 +1558,6 @@ libv.ui: https://www.factorio.com/blog/post/fff-246
 libv.ui: strong constraint: It has to keep up with 1000 character/sec input in mid sequence. Why? Because the 7.5cps is a reasonable high typing speed.
 libv.utility: Make a proper copy-pastable noisy type
 libv: LIBV_ASSERT, LIBV_DEBUG_ASSERT, LIBV_STATIC_ASSERT in utility header
-libv: think about versioned namespace: namespace LIBV_NAMESPACE_VERSION { ... content ... } namespace libv = LIBV_NAMESPACE_VERSION
 
 ide.options:
 	- profile:
@@ -1739,13 +1714,6 @@ glfw: glfwSetGammaRamp
 
 // -------------------------------------------------------------------------------------------------
 
-I dont know yet what it could be used for, but this is could be VERY handy!
-sfinae + decltype + operator ,
-decltype(os << obj, void())
-yeee i get it now: void to regular void by: "(void_expression, regular_void)" and operator,(T, regular_void)
-
-// -------------------------------------------------------------------------------------------------
-
 Base class for lights and cameras
 
 http://www.cmake.org/cmake/help/v3.3/command/configure_file.html
@@ -1765,87 +1733,6 @@ Shader types
 	OrenNayar - More avg lambert
 
 --- PASTEBIN ---------------------------------------------------------------------------------------
-
-IDEA: NamedUniform_t + reflection
-
-template <libv::static_string Name, typename Type>
-struct NamedUniform_t : Uniform_t<Type> {
-	static constexpr inline libv::static_string name = Name;
-};
-
-struct UniformsShaderLine {
-	app::Uniform_vec4f<"color"> uniform_color;
-	app::Uniform_mat4f<"matMVP"> uniform_matMVP;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-libv::gl::Uniform_vec3f cameraPositionW;
-libv::gl::Uniform_mat4f matrixMVP;
-libv::gl::Uniform_mat4f matrixModel;
-libv::gl::Uniform_mat4f matrixModelView;
-libv::gl::Uniform_mat4f matrixProjection;
-libv::gl::Uniform_mat4f matrixView;
-libv::gl::Uniform_vec2f mousePositionH; // Not sure about this one
-libv::gl::Uniform_vec2f mousePositionS; // Not sure about this one
-libv::gl::Uniform_vec2f resolution;
-libv::gl::Uniform_float timeReal;
-libv::gl::Uniform_float timeSimulation;
-
-void assignBaseUniforms() {
-	program.assign(cameraPositionW, "cameraPositionW");
-	program.assign(matrixMVP, "matrixMVP");
-	program.assign(matrixModel, "matrixModel");
-	program.assign(matrixModelView, "matrixModelView");
-	program.assign(matrixProjection, "matrixProjection");
-	program.assign(matrixView, "matrixView");
-	program.assign(mousePositionH, "mousePositionH");
-	program.assign(mousePositionS, "mousePositionS");
-	program.assign(resolution, "resolution");
-	program.assign(timeReal, "timeReal");
-	program.assign(timeSimulation, "timeSimulation");
-}
-
-void use(Queue& queue) {
-	queue.program(program);
-
-	if (matrixMVP.isActive())
-		queue.uniform(uniformMatrixMVP, mvp());
-	if (matrixModel.isActive())
-		queue.uniform(uniformMatrixModel, model);
-	if (matrixModelView.isActive())
-		queue.uniform(uniformMatrixModelView, view * model);
-	if (matrixProjection.isActive())
-		queue.uniform(uniformMatrixProjection, projection);
-	if (matrixView.isActive())
-		queue.uniform(uniformMatrixView, view);
-
-	if (cameraPositionW.isActive())
-		queue.uniform(uniformCameraPositionW, eye());
-
-	if (timeReal.isActive())
-		queue.uniform(uniformTimeReal, timeFrame);
-	if (timeSimulation.isActive())
-		queue.uniform(uniformTimeSimulation, timeSimulation);
-
-	if (mousePositionH.isActive())
-		queue.uniform(uniformMousePositionH, mousePosition / resolution);
-	if (mousePositionS.isActive())
-		queue.uniform(uniformMousePositionS, mousePosition);
-	if (resolution.isActive())
-		queue.uniform(uniformResolution, resolution);
-}
-
-// -------------------------------------------------------------------------------------------------
-
-diffuse(1.0f, 1.0f, 1.0f, 1.0f),
-specular(0.8f, 0.8f, 0.8f, 1.0f),
-emission(0.0f, 0.0f, 0.0f, 1.0f),
-ambient(0.1f, 0.1f, 0.1f, 1.0f),
-reflective(1.0f, 1.0f, 1.0f, 1.0f),
-shininess(32.0f) { }
-
-// -------------------------------------------------------------------------------------------------
 
 // Planned attribute locations:
 //   0  |     position  |             |

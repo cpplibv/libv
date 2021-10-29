@@ -51,14 +51,14 @@ public:
 
 public:
 	template <typename K>
-	inline /*implicit*/ HandlerGuard(const HandlerGuard<BaseHandler, K>& orig) noexcept
+	inline explicit(false) HandlerGuard(const HandlerGuard<BaseHandler, K>& orig) noexcept
 			requires std::derived_from<K, T> || std::same_as<const K*, T*> || std::same_as<T, void> :
 		handler_(orig.handler_),
 		user_object(orig.user_object) {
 		handler_->increment_ref_count();
 	}
 	template <typename K>
-	inline /*implicit*/ HandlerGuard(HandlerGuard<BaseHandler, K>&& orig) noexcept
+	inline explicit(false) HandlerGuard(HandlerGuard<BaseHandler, K>&& orig) noexcept
 			requires std::derived_from<K, T> || std::same_as<const K*, T*> || std::same_as<T, void> :
 		handler_(orig.handler_),
 		user_object(orig.user_object) {

@@ -97,7 +97,7 @@ struct DispatchGLFWEvent {
 	}
 
 	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window size and framebuffer size to zero, and does not restore it on focus gain.
-	//		As a zero area window makes no sense it safe to discard these events
+	//		As a zero area window makes no sense its safe to discard these events
 	static inline void sizeFB(GLFWwindow* window, int x, int y) {
 		if (x == 0 && y == 0)
 			return log_event.warn("Discarded zero size FrameBufferSize event");
@@ -106,7 +106,7 @@ struct DispatchGLFWEvent {
 	}
 
 	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window size and framebuffer size to zero, and does not restore it on focus gain.
-	//		As a zero area window makes no sense it safe to discard these events
+	//		As a zero area window makes no sense its safe to discard these events
 	static inline void sizeWS(GLFWwindow* window, int x, int y) {
 		if (x == 0 && y == 0)
 			return log_event.warn("Discarded zero size WindowSize event");
@@ -115,7 +115,7 @@ struct DispatchGLFWEvent {
 	}
 
 	// Workaround: 2019.09.07 Win7: Windowed full-screen focus loss sets the window position to (-32000, -32000), and does not restore it on focus gain.
-	//		As such position values would make no sense it safe to discard these events
+	//		As such position values would make no sense its safe to discard these events
 	static inline void pos(GLFWwindow* window, int x, int y) {
 		if (x == -32000 && y == -32000)
 			return log_event.warn("Discarded invalid WindowPosition event");

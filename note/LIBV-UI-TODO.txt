@@ -62,6 +62,9 @@ libv.ui.style: Style based on component state (bit-mask)
 
 
 
+libv.ui: Add background property to panels
+libv.ui: Clicks into nothingness should clear focus
+
 libv.ui: Stateify every UI component (minimal: hover and focus)
 		label
 		button

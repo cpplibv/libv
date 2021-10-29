@@ -34,7 +34,7 @@ class OutcomeArgumentParse {
 	std::optional<std::string> warning_;
 
 public:
-	/*implicit*/ inline operator bool() const {
+	explicit(false) inline operator bool() const {
 		return !error_ && !warning_;
 	}
 	inline void error(std::string message) {

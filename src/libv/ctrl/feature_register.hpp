@@ -25,9 +25,9 @@ private:
 
 public:
 	// Implicit constructor from Controls
-	constexpr inline FeatureRegister(Controls* target) noexcept : target(target) { }
+	explicit(false) constexpr inline FeatureRegister(Controls* target) noexcept : target(target) { }
 	// Implicit constructor from Controls
-	constexpr inline FeatureRegister(Controls& target) noexcept : target(&target) { }
+	explicit(false) constexpr inline FeatureRegister(Controls& target) noexcept : target(&target) { }
 
 public:
     constexpr inline FeatureRegister(FeatureRegister&& other) noexcept = default;
@@ -40,6 +40,11 @@ private:
 	void _feature_action(libv::type_uid context, std::string&& name, ft_action function);
 	void _feature_analog(libv::type_uid context, std::string&& name, ft_analog function, scale_group multipliers);
 	void _feature_binary(libv::type_uid context, std::string&& name, ft_binary function);
+
+public:
+	[[nodiscard]] constexpr inline Controls& owner() const noexcept {
+		return *target;
+	}
 
 public:
 	template <typename T, typename F>

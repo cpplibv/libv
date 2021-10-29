@@ -87,7 +87,7 @@ app.space: Move canvas and camera files under view
 
 
 
-app.space: F1 menu, list every keybind
+app.space: F1 menu, list every control bindings
 
 libv.ctrl: Box selection support
 		start
@@ -252,6 +252,7 @@ app.space: make a blur or a bloom
 
 app.space: Optimized VAO update for command arrows (prepare / render step is done, mesh re-upload and glr side should be checked)
 
+app.space: Fleet name display (UI Label / Unit plates) 2D<->3D UI layout
 app.space: Fleet visualization (render separate ships and group art)
 	app.space: Generate random number of ships and position them appropriately (simple mesh)
 	app.space: Movement, momentum, turning
@@ -266,7 +267,7 @@ app.space: Command arrow improvements
 	app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
 	app.space.visual: Command arrow make the edges less bright to help with AA edge
 
-app.space: Line shader
+app.space: Line shader (Geometry shader with custom width support) (<1px width = transparency at 1 px)
 
 app.space: Iris and space has to merge in some way
 	iris: Make a main menu
@@ -311,6 +312,8 @@ What do I need from libv to make a 'minimal' working iris program?
 		Deployment
 			2 Scripts to create a new build and deploy to libv.update servers
 
+	libv.state
+		5 Generated source for state machines
 
 blur: (shaders are already implemented in app.space, but downscaling is not) https://www.youtube.com/watch?v=uZlwbWqQKpc
 		full screen quad pass with render_resolution / 2 with v blur shader
