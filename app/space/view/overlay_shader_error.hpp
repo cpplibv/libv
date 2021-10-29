@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/make_shader_error_overlay.hpp
+// Project: libv, File: app/space/view/overlay_shader_error.hpp
 
 // libv
 #include <libv/ui/component/component.hpp>
@@ -12,7 +12,7 @@ namespace app {
 /// 	libv::rev::ShaderLoadSuccess
 /// 	libv::rev::ShaderLoadFailure
 /// 	libv::rev::ShaderUnload
-libv::ui::Component make_shader_error_overlay();
+libv::ui::Component overlay_shader_error();
 
 // -------------------------------------------------------------------------------------------------
 

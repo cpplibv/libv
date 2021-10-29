@@ -145,6 +145,10 @@ void PanelFull::remove(Component& component) {
 	self().remove(component);
 }
 
+void PanelFull::remove(std::string_view component_name) {
+	self().remove(component_name);
+}
+
 void PanelFull::clear() {
 	self().clear();
 }

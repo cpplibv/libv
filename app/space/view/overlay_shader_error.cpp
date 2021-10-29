@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/view/make_shader_error_overlay.cpp
+// Project: libv, File: app/space/view/overlay_shader_error.cpp
 
 // hpp
-#include <space/view/make_shader_error_overlay.hpp>
+#include <space/view/overlay_shader_error.hpp>
 // ext
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -18,7 +18,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-libv::ui::Component make_shader_error_overlay() {
+libv::ui::Component overlay_shader_error() {
 	libv::ui::PanelStatusLine shader_errors;
 
 	shader_errors.align_horizontal(libv::ui::AlignHorizontal::left);

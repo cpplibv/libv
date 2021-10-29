@@ -209,3 +209,11 @@ ui.style("space.hud-bar.lobby.title") {
 	font_color = colors.text_black,
 	size = "10pxD, 4pxD",
 }
+
+ui.style("space.overlay.controls-help.lbl") {
+	align_horizontal = "left",
+	align_vertical = "center",
+	anchor = "center",
+	font_color = colors.text_light,
+	size = "D, D",
+}

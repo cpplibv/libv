@@ -49,6 +49,18 @@ void CoreBasePanel::remove(Component& component) {
 	component.markRemove();
 }
 
+void CoreBasePanel::remove(std::string_view component_name) {
+	int match_count = 0;
+
+	for (auto& child : children)
+		if (child.name() == component_name) {
+			child.markRemove();
+			++match_count;
+		}
+
+	log_ui.error_if(match_count == 0, "Attempted to remove a non child element by name: {} from: {}", component_name, path());
+}
+
 void CoreBasePanel::clear() {
 	for (auto& child : children)
 		child.markRemove();

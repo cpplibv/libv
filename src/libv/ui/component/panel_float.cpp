@@ -210,6 +210,10 @@ void PanelFloat::remove(Component& component) {
 	self().remove(component);
 }
 
+void PanelFloat::remove(std::string_view component_name) {
+	self().remove(component_name);
+}
+
 void PanelFloat::clear() {
 	self().clear();
 }

@@ -442,6 +442,10 @@ void PanelLine::remove(Component& component) {
 	self().remove(component);
 }
 
+void PanelLine::remove(std::string_view component_name) {
+	self().remove(component_name);
+}
+
 void PanelLine::clear() {
 	self().clear();
 }

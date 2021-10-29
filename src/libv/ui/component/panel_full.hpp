@@ -21,6 +21,7 @@ public:
 	void add(Component component);
 	void add_front(Component component);
 	void remove(Component& component);
+	void remove(std::string_view component_name);
 	void clear();
 };
 

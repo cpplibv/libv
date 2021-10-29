@@ -19,6 +19,8 @@ namespace app {
 // -------------------------------------------------------------------------------------------------
 
 class SceneMain {
+	friend SceneMainControl;
+
 private:
 	libv::Nexus& nexus;
 	libv::ctrl::Controls& controls;

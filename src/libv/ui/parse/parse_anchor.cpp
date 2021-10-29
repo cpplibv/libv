@@ -66,6 +66,7 @@ struct named_anchors_v_ : x3::symbols<Anchor> {
 				("bottom", Anchor::bottom_center)
 				("down", Anchor::bottom_center)
 				("left", Anchor::center_left)
+				("center", Anchor::center_center)
 				("right", Anchor::center_right)
 				("up", Anchor::top_center)
 				("top", Anchor::top_center)

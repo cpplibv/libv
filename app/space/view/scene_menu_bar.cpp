@@ -215,7 +215,7 @@ SceneMenuBar::~SceneMenuBar() {
 //		}
 //	}
 //
-//	layers.add(make_shader_error_overlay());
+//	layers.add(overlay_shader_error());
 //
 //	return layers;
 //}

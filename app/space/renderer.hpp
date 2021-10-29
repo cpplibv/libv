@@ -190,6 +190,7 @@ struct RendererResourceContext {
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 
 	RendererResourceContext() {
+		// Include the res/shader folder from libv
 		shader_manager.add_include_directory("", "../../res/shader/");
 	}
 };

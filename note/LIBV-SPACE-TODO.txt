@@ -44,6 +44,7 @@ app.space: Move cto apply functions into universe
 app.space: Move canvas and camera files under view
 app.space: Adopt libv.rev post-processing
 app.space: Default focus canvas
+app.space: Add Controls help overlay (Simple, list only)
 
 
 
@@ -72,8 +73,9 @@ app.space: Default focus canvas
 
 
 Main areas of focus: Cost / Value
-
-	 2 / 2: UX: F1 help overlay (Simple, list only)
+	24 / 5: Visual: Fleet visualization (Simple mesh, orientation)
+	 8 / 3: Visual: Debug renderer text (2D Label on a 3D point)
+	 8 / 1: Visual: Fleet name (2D Label)
 
 	40 / 6: Control: Ctrl box selection support
 	 2 / 6: Network: 'Universe' Snapshot
@@ -81,9 +83,6 @@ Main areas of focus: Cost / Value
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
 
-	24 / 5: Visual: Fleet visualization (Simple mesh, orientation)
-	 8 / 3: Visual: Debug renderer text (2D Label on a 3D point)
-	 8 / 1: Visual: Fleet name (2D Label)
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
 	20 / 2: UI: Card layout
 

@@ -10,6 +10,7 @@
 // pro
 #include <space/view/camera_control.hpp>
 #include <space/view/canvas_control.hpp>
+#include <space/view/scene_main_control.hpp>
 #include <space/internal_events.hpp>
 #include <space/log.hpp>
 
@@ -63,6 +64,8 @@ GameInstance::GameInstance() :
 	CameraControl::bind_default_controls(controls);
 	CanvasControl::register_controls(controls);
 	CanvasControl::bind_default_controls(controls);
+	SceneMainControl::register_controls(controls);
+	SceneMainControl::bind_default_controls(controls);
 
 	frame.onKey.output([this](const libv::input::EventKey& e) {
 		// TODO P1: Remove this, global test variables should be a generic concept

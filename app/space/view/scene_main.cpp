@@ -9,16 +9,13 @@
 #include <space/game_session.hpp>
 #include <space/internal_events.hpp>
 #include <space/log.hpp>
-#include <space/view/make_shader_error_overlay.hpp>
+#include <space/view/overlay_shader_error.hpp>
 #include <space/view/scene_command_bar.hpp>
 #include <space/view/scene_menu_bar.hpp>
 #include <space/view/scene_mp_status.hpp>
 
-
 // <<< Will this file have the controls context enter/leave?
 #include <libv/ctrl/controls.hpp>
-//#include <libv/ctrl/binding.hpp>
-//#include <libv/ctrl/feature_register.hpp>
 
 
 namespace app {
@@ -36,14 +33,16 @@ SceneMain::SceneMain(libv::ui::UI& ui, Renderer& renderer, GameThread& game_thre
 
 	main_layers.add(game_layers);
 	main_layers.add(SceneMenuBar::create(nexus, user));
-	main_layers.add(app::make_shader_error_overlay());
+	main_layers.add(overlay_shader_error());
 
 	ui.add(main_layers);
 
 	register_nexus();
+	controls.context_enter<SceneMain>(this);
 }
 
 SceneMain::~SceneMain() {
+	controls.context_leave_if_matches<SceneMain>(this);
 	unregister_nexus();
 }
 
@@ -67,6 +66,10 @@ void SceneMain::register_nexus() {
 		openSP();
 		nexus.broadcast<mc::OnDestroyServer>();
 	});
+
+//	nexus.connect<mc::RequestHelpControls>(this, [this] {
+//		main_layers.add(OverlayHelpControls::create(nexus, controls));
+//	});
 }
 
 void SceneMain::unregister_nexus() {
@@ -94,7 +97,7 @@ auto createCanvas(const std::shared_ptr<GameSession>& game_session, Renderer& re
 	return canvas;
 }
 
-// =================================================================================================
+// -------------------------------------------------------------------------------------------------
 
 void SceneMain::openSP() {
 	game_session.reset();
@@ -113,7 +116,6 @@ void SceneMain::openMPClient(std::string server_address, uint16_t server_port) {
 	game_layers.add(createCanvas(game_session, renderer, controls));
 	game_layers.add(SceneCommandBar::create(nexus));
 	game_layers.add(SceneMPStatus::create(nexus));
-//	game_layers.add(SceneMPStatus::create(nexus, lobby));
 }
 
 void SceneMain::openMPServer(uint16_t port) {
@@ -124,19 +126,7 @@ void SceneMain::openMPServer(uint16_t port) {
 	game_layers.add(createCanvas(game_session, renderer, controls));
 	game_layers.add(SceneCommandBar::create(nexus));
 	game_layers.add(SceneMPStatus::create(nexus));
-//	game_layers.add(SceneMPStatus::create(nexus, lobby));
 }
-
-//void SceneMain::add_game_scene(GameInstance& game, GameSession& game_session, libv::Nexus& nexus, libv::ctrl::Controls& controls) {
-//	if (game_scene) {
-//		game_scene->markRemove();
-//		game_scene.reset();
-//	}
-//	game_scene.emplace(SceneGame::create(game, game_session, nexus, controls));
-//	main_layers.add_front(*game_scene);
-//	main_layers.add(SceneMPStatus::create(nexus));
-////	main_layers.add(SceneMPStatus::create(nexus, lobby));
-//}
 
 // -------------------------------------------------------------------------------------------------
 
