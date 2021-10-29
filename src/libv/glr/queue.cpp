@@ -373,9 +373,8 @@ void Queue::setClearColor(const libv::vec4f rgba) {
 }
 
 void Queue::clearColor() {
-	if (!self->tasks.empty() && std::holds_alternative<QueueTaskClear>(self->tasks.back())) {
-		auto& buff = std::get<QueueTaskClear>(self->tasks.back()).buffers;
-		buff = buff | libv::gl::BufferBit::Color;
+	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
+		task->buffers = task->buffers | libv::gl::BufferBit::Color;
 	} else {
 		sequencePoint();
 		self->add<QueueTaskClear>(libv::gl::BufferBit::Color);
@@ -384,9 +383,8 @@ void Queue::clearColor() {
 }
 
 void Queue::clearDepth() {
-	if (!self->tasks.empty() && std::holds_alternative<QueueTaskClear>(self->tasks.back())) {
-		auto& buff = std::get<QueueTaskClear>(self->tasks.back()).buffers;
-		buff = buff | libv::gl::BufferBit::Depth;
+	if (auto* task = self->tasks.empty() ? nullptr : std::get_if<QueueTaskClear>(&self->tasks.back())) {
+		task->buffers = task->buffers | libv::gl::BufferBit::Depth;
 	} else {
 		sequencePoint();
 		self->add<QueueTaskClear>(libv::gl::BufferBit::Depth);

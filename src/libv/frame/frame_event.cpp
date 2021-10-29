@@ -90,8 +90,8 @@ struct DispatchGLFWEvent {
 		auto size = frame->getSize();
 
 		std::lock_guard lock_queue(frame->self->eventQueue_m);
-		if (!queue.empty() && std::holds_alternative<E>(queue.back()))
-			std::get<E>(queue.back()).position = libv::vec2d{x, size.y - y - 1};
+		if (auto* e = queue.empty() ? nullptr : std::get_if<E>(&queue.back()))
+			e->position = libv::vec2d{x, size.y - y - 1};
 		else
 			queue.emplace_back(E(x, size.y - y - 1));
 	}
