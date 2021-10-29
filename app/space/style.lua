@@ -8,6 +8,7 @@
 local colors = {
 	text_light =         "hsva(  0°,  0%,  80%, 100%)",
 	text_dark =          "hsva(  0°,  0%,  20%, 100%)",
+	text_black =         "hsva(  0°,  0%,   0%, 100%)",
 	hud_light_bg_color = "rgba(0.5, 0.5, 0.5, 0.65)",
 }
 
@@ -178,21 +179,28 @@ ui.style("space.hud-bar.lobby.panel") {
 	anchor = "center_left",
 	background = colors.hud_light_bg_color, -- TODO P3: Panels have no background, implement it
 	margin = 5,
+	padding = 2,
 	orientation = "down",
 	size = "D, D",
-	spacing = 5,
+	spacing = 2,
 }
 
 ui.style("space.hud-bar.lobby.name") {
-	align_horizontal = "center",
+	align_horizontal = "left",
 	align_vertical = "center",
 	background = colors.hud_light_bg_color,
-	size = "10pxD, 4pxD",
+	font_color = colors.text_black,
+	padding = {4, 4},
+	size = "D1r, D",
+
+	-- !!! This causes a layout bug, bigger or smaller padding along X is fine, but this interval is incorrect
+	--padding = {10, 4},
+	--size = "10pxD1r, D",
 }
 
 ui.style("space.hud-bar.lobby.title") {
 	align_horizontal = "center",
 	align_vertical = "center",
-	font_color = colors.text_light,
+	font_color = colors.text_black,
 	size = "10pxD, 4pxD",
 }

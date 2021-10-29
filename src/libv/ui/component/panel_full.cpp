@@ -65,7 +65,7 @@ void CorePanelFull::access_child_properties(T& ctx) {
 void CorePanelFull::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<CorePanelFull> setter{*this, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
-	CoreComponent::doStyle(ctx);
+	CoreBasePanel::doStyle(ctx);
 }
 
 void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {

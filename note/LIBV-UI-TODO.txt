@@ -44,6 +44,7 @@ libv.ui: Padding pattern support for internal padding
 libv.ui: bordered_padding_pattern (stripes_border.png with proper border handling)
 libv.ui: Fix input local positions when using padding
 libv.ui.style: Style based on component state (bit-mask)
+libv.ui: Add background property to panels
 
 
 
@@ -62,8 +63,7 @@ libv.ui.style: Style based on component state (bit-mask)
 
 
 
-libv.ui: Add background property to panels
-libv.ui: Clicks into nothingness should clear focus
+libv.ui: Clicks into nothingness should clear focus | True, but define nothingness first
 
 libv.ui: Stateify every UI component (minimal: hover and focus)
 		label
