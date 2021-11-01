@@ -203,6 +203,7 @@ place.it:
 	tool.profiler: https://github.com/bombomby/optick - But it doesnt support OpenGL
 	tool.profiler: https://github.com/wolfpld/tracy
 	tool.audio: https://non.tuxfamily.org/
+	cpp.scraper_site: cpp.hotexamples.com/examples (github search, but less)
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
 	cpp.tool: quick-bench.com - Mirco benchmark runtime

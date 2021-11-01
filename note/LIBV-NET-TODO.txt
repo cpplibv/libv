@@ -298,5 +298,6 @@ libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connecti
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 		| investigate shared_ptr with custom deleter
 
+security: hashing, encryption, signing: https://www.youtube.com/watch?v=NuyzuNBFWxQ
 
 security: password storage https://www.youtube.com/watch?v=qgpsIBLvrGY
