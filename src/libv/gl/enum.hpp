@@ -154,6 +154,14 @@ enum class TestFunction : GLenum {
 	Never = 0x0200, /// GL_NEVER
 };
 
+enum class BlendEquation : GLenum {
+	Add = 0x8006, /// GL_FUNC_ADD
+	Subtract = 0x800A, /// GL_FUNC_SUBTRACT
+	ReverseSubtract = 0x800B, /// GL_FUNC_REVERSE_SUBTRACT
+	Min = 0x8007, /// GL_MIN
+	Max = 0x8008, /// GL_MAX
+};
+
 enum class BlendFunction : GLenum {
 	ConstantAlpha = 0x8003, /// GL_CONSTANT_ALPHA
 	ConstantColor = 0x8001, /// GL_CONSTANT_COLOR

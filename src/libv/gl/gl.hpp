@@ -58,6 +58,59 @@ struct AccessVertexArray;
 
 // -------------------------------------------------------------------------------------------------
 
+struct BlendEquationSetter {
+	BlendEquation current = BlendEquation::Add;
+
+	inline void set(BlendEquation value) noexcept {
+		if (current != value) {
+			current = value;
+			glBlendEquation(to_value(value));
+			checkGL();
+		}
+	}
+	inline void operator()(BlendEquation value) noexcept {
+		set(value);
+	}
+	[[nodiscard]] inline auto set_guard(BlendEquation value) noexcept {
+		auto past = current;
+		set(value);
+		return libv::guard([this, past] { set(past); });
+	}
+
+	inline void add() noexcept {
+		set(BlendEquation::Add);
+	}
+	[[nodiscard]] inline auto add_guard() noexcept {
+		return set_guard(BlendEquation::Add);
+	}
+	inline void subtract() noexcept {
+		set(BlendEquation::Subtract);
+	}
+	[[nodiscard]] inline auto subtract_guard() noexcept {
+		return set_guard(BlendEquation::Subtract);
+	}
+	inline void reverseSubtract() noexcept {
+		set(BlendEquation::ReverseSubtract);
+	}
+	[[nodiscard]] inline auto reverseSubtract_guard() noexcept {
+		return set_guard(BlendEquation::ReverseSubtract);
+	}
+	inline void min() noexcept {
+		set(BlendEquation::Min);
+	}
+	[[nodiscard]] inline auto min_guard() noexcept {
+		return set_guard(BlendEquation::Min);
+	}
+	inline void max() noexcept {
+		set(BlendEquation::Max);
+	}
+	[[nodiscard]] inline auto max_guard() noexcept {
+		return set_guard(BlendEquation::Max);
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
+
 struct BlendFunctionSetter {
 	BlendFunction current_source{0};
 	BlendFunction current_destination{0};
@@ -446,7 +499,7 @@ struct MaskSetter {
 
 // -------------------------------------------------------------------------------------------------
 
-struct GL {
+class GL {
 public:
 	MatrixStack<libv::mat4f> model;
 	MatrixStack<libv::mat4f> view;
@@ -457,6 +510,7 @@ private:
 	bool trace = false;
 
 public:
+	BlendEquationSetter blendEquation;
 	BlendFunctionSetter blendFunction;
 	CapabilitySetter capability;
 	ClipPlanesSetter clipPlanes;
