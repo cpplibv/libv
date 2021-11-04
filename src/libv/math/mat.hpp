@@ -6,6 +6,7 @@
 #include <libv/math/mat_fwd.hpp>
 // ext
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 #include <glm/mat2x2.hpp>
 #include <glm/mat2x3.hpp>
 #include <glm/mat2x4.hpp>
@@ -102,24 +103,24 @@ public:
 	}
 
 	constexpr inline mat_t& rotate(const Radian<T> angle, const libv::vec3_t<T>& axis) noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4) {
+			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mx() = glm::rotate(mx(), angle.value, to_glm(axis));
 		return *this;
 	}
 	[[nodiscard]] constexpr inline mat_t rotate_copy(const Radian<T> angle, const libv::vec3_t<T>& axis) const noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4) {
+			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mat_t result;
 		result = glm::rotate(mx(), angle.value, to_glm(axis));
 		return result;
 	}
 
 	constexpr inline mat_t& rotate(const T angle, const libv::vec3_t<T>& axis) noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4) {
+			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mx() = glm::rotate(mx(), angle, to_glm(axis));
 		return *this;
 	}
 	[[nodiscard]] constexpr inline mat_t rotate_copy(const T angle, const libv::vec3_t<T>& axis) const noexcept
-			WISH_REQUIRES(Column == 4 && Row == 4) {
+			WISH_REQUIRES(Column == 4 && Row == 4 || Column == 3 && Row == 3) {
 		mat_t result;
 		result = glm::rotate(mx(), angle, to_glm(axis));
 		return result;
