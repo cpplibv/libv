@@ -127,6 +127,13 @@ struct RendererDebug {
 		libv::vec4f color;
 	};
 
+	struct Disc {
+		libv::vec3f center;
+		float radius;
+		libv::vec3f normal;
+		libv::vec4f color;
+	};
+
 	struct Quad {
 		libv::vec3f a;
 		libv::vec3f b;
@@ -135,8 +142,15 @@ struct RendererDebug {
 		libv::vec4f color;
 	};
 
+//	struct Box {
+//		libv::vec3f center;
+//		libv::vec3f size;
+//		libv::vec3f direction; //indicates the X+ face
+//		libv::vec4f color;
+//	};
+
 	struct Frustum {
-		std::array<libv::vec3f, 5> points;
+		std::array<libv::vec3f, 8> points;
 		libv::vec4f color_sides;
 		libv::vec4f color_wire;
 	};
@@ -154,6 +168,7 @@ public:
 	std::vector<Line> lines;
 	std::vector<Triangle> triangles;
 	std::vector<Quad> quads;
+	std::vector<Disc> discs;
 	std::vector<Frustum> frustums;
 	std::vector<Sphere> spheres;
 
@@ -202,7 +217,7 @@ struct RendererFleet {
 public:
 	explicit RendererFleet(RendererResourceContext& rctx);
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, bool selected);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::SelectionStatus selection_status);
 };
 
 struct RendererText {

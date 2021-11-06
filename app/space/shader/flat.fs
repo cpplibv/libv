@@ -10,7 +10,7 @@ in vec2 fragmentTexture0;
 out vec4 result;
 
 uniform vec4 base_color;
-uniform bool selected;
+uniform int selected;
 
 
 void main() {
@@ -28,10 +28,15 @@ void main() {
 			strength_specular * 0.2;
 	result = vec4(base_color.rgb * attenuation, base_color.a);
 
-	if (selected) {
-//		vec3 fresnel_color = fresnel(2, vec3(0.95, 0.55, 0.0), N, V);
+
+	if (selected == 1) { // Selected
 		vec3 fresnel_color = fresnel(2, vec3(2.0, 1.0, 0.2), N, V);
 		result.rgb += fresnel_color;
+
+//	} else if (selected == 2) {
+//	} else if (selected == 3) {
+//		vec4 fresnel_color = fresnel(2, vec4(0.95, 0, 0.66, 0.8), N, V);
+//		result += fresnel_color;
 	}
 
 //	result.rgb = N;

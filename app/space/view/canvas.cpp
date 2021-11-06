@@ -100,6 +100,9 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 		}
 	}
 
+	// hover logic
+	// calculate_world_coord(*this);
+
 	if (main_canvas)
 		// <<< P1: Game_session update shouldnt come from the canvas, or should it?
 		game_session.update(delta_time);
@@ -160,7 +163,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(fleet.position);
-		glr.model.scale(0.2f);
+		glr.model.scale(pickingInfoFleet.radius_universe);
 
 		std::string fleetLabel;
 
@@ -186,8 +189,13 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 				std::move(fleetLabel)
 		);
 
-		const auto isSelected = universe.selectedFleetIDList.contains(fleet.id);
-		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, isSelected);
+		const auto it = universe.fleetIdSelectionMap.find(fleet.id);
+		if (it != universe.fleetIdSelectionMap.end()) {
+			const auto selection_type = it->second;
+			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, selection_type);
+		}
+		else
+			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, Fleet::SelectionStatus::not_selected);
 	}
 
 	// --- Render EditorBackground/Sky ---
@@ -233,7 +241,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 //			}
 //		}
 		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
-		renderer.debug.spheres.clear();
+//		renderer.debug.spheres.clear();
 	}
 
 	// --- Render UI/HUD ---
@@ -311,14 +319,22 @@ void SpaceCanvas::add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c
 	renderer.debug.triangles.emplace_back(a, b, c, color);
 }
 
+void SpaceCanvas::add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color, StyleFlag mode) {
+	(void) mode;
+	renderer.debug.discs.emplace_back(center, radius, normal, color);
+}
+
 void SpaceCanvas::add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode) {
 	(void) mode;
 	renderer.debug.spheres.emplace_back(center, radius, color, ring_count, segment_count);
 }
 
-void SpaceCanvas::add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode) {
+void SpaceCanvas::add_debug_frustum(
+		libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr, libv::vec3f ntl,
+		libv::vec3f fbl, libv::vec3f fbr, libv::vec3f ftr, libv::vec3f ftl,
+		libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode) {
 	(void) mode;
-	renderer.debug.frustums.push_back(RendererDebug::Frustum{{a, b, c, d, e}, color_sides, color_wire});
+	renderer.debug.frustums.push_back(RendererDebug::Frustum{{nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl}, color_sides, color_wire});
 }
 
 void SpaceCanvas::add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode) {

@@ -10,6 +10,7 @@
 #include <libv/math/vec.hpp>
 #include <libv/ui/chrono.hpp>
 // std
+#include <map>
 #include <vector>
 // pro
 #include <space/universe/ids.hpp>
@@ -19,14 +20,14 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-//struct ScreenPickableType {
-//	float radius_direct;
-//	float radius_indirect;
-//
-//	constexpr inline ScreenPickable(float radiusDirect, float radiusIndirect) noexcept :
-//		radius_direct(radiusDirect),
-//		radius_indirect(radiusIndirect) {}
-//};
+struct ScreenPickableType {
+	float radius_universe;
+	float radius_screen;
+};
+
+constexpr inline ScreenPickableType pickingInfoFleet{0.2f, 50.f};
+
+// -------------------------------------------------------------------------------------------------
 
 enum class FleetCommandType {
 	movement,
@@ -39,9 +40,17 @@ enum class FleetCommandType {
 };
 [[nodiscard]] constexpr inline auto operator+(FleetCommandType e) noexcept { return libv::to_underlying(e); }
 
+// -------------------------------------------------------------------------------------------------
 
 //struct Fleet : ScreenPickable {
 struct Fleet {
+	enum class SelectionStatus : int32_t {
+		not_selected = 0,
+//		unselected = 0,
+		intersected = 3,
+		hoover = 2,
+		selected = 1,
+	};
 //	ScreenPickableType* screen_pick_type;
 
 //	enum class FleetState {
@@ -61,6 +70,7 @@ public:
 	libv::vec3f position;
 //	bool selected;
 	std::vector<Command> commands;
+//	SelectionStatus selection_status;
 //	FleetState state;
 
 public:
@@ -105,9 +115,9 @@ struct Universe {
 //	float angle = 0.0f;
 //	float time = 0.0f;
 //	float test_sin_time = 0.0f;
-
 	FleetID nextFleetID{0};
 	boost::container::flat_set<FleetID> selectedFleetIDList;
+	std::map<FleetID, Fleet::SelectionStatus> fleetIdSelectionMap;
 //	FleetID selectedFleetID{noSelectionID or nullFleetID};
 	std::vector<Fleet> fleets;
 

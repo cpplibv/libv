@@ -28,12 +28,15 @@ void Universe::process(CTO_FleetSelect&& cto) {
 	// Permission check
 	// Bound check
 	selectedFleetIDList.clear();
+	fleetIdSelectionMap.clear();
+	fleetIdSelectionMap.emplace(cto.fleetID, Fleet::SelectionStatus::selected);
 	selectedFleetIDList.insert(cto.fleetID);
 }
 
 void Universe::process(CTO_FleetSelectAdd&& cto) {
 	// Permission check
 	// Bound check
+	fleetIdSelectionMap.insert_or_assign(cto.fleetID, Fleet::SelectionStatus::selected);
 	selectedFleetIDList.insert(cto.fleetID);
 }
 
@@ -41,6 +44,10 @@ void Universe::process(CTO_FleetBoxSelect&& cto) {
 	// Permission check
 	// Bound check
 	selectedFleetIDList.clear();
+	fleetIdSelectionMap.clear();
+	for (const auto & fleetID : cto.fleetIDs) {
+		fleetIdSelectionMap.emplace(fleetID, Fleet::SelectionStatus::selected);
+	}
 	selectedFleetIDList.insert(cto.fleetIDs.begin(), cto.fleetIDs.end());
 }
 

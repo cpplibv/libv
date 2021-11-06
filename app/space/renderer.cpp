@@ -320,40 +320,74 @@ void RendererDebug::build_lines_mesh(libv::glr::Mesh& mesh) {
 		vi += 2;
 	}
 
-	for (const auto& sphere : spheres) {
-		//k0-1 -- k0
-		// |    / |
-		// |   /  |
-		// |  /   |
-		//k1-1 -- k1
-		const auto ring_step = libv::pi / static_cast<float>(sphere.ring_count);
-		const auto segment_step = libv::tau / static_cast<float>(sphere.segment_count);
+//	for (const auto& sphere : spheres) {
+//		//k0-1 -- k0
+//		// |    / |
+//		// |   /  |
+//		// |  /   |
+//		//k1-1 -- k1
+//		const auto ring_step = libv::pi / static_cast<float>(sphere.ring_count);
+//		const auto segment_step = libv::tau / static_cast<float>(sphere.segment_count);
+//
+//		for (int i = 0; i <= sphere.ring_count; ++i) {
+//			const auto fi = static_cast<float>(i);
+//			const auto u = libv::pi / 2.0f - fi * ring_step;
+//			const auto z = sphere.radius * std::sin(u);
+//
+//			for (int j = 0; j <= sphere.segment_count; ++j) {
+//				const auto fj = static_cast<float>(j);
+//				const auto v = fj * segment_step;
+//				const auto x = sphere.radius * std::cos(u) * std::cos(v);
+//				const auto y = sphere.radius * std::cos(u) * std::sin(v);
+//
+//				libv::vec3f point = {x, y, z};
+//				position(point + sphere.center);
+//				color0({0.6f, 0, 1, 1});
+//
+//				const auto k1 = vi;
+//				const auto k0 = k1 - sphere.segment_count - 1;
+//				vi += 1;
+//
+//				if (i > 0 && j > 0) {
+//					index.line(k0, k1);
+//					index.line(k0 - 1, k0);
+//				}
+//			}
+//		}
+//	}
 
-		for (int i = 0; i <= sphere.ring_count; ++i) {
-			const auto fi = static_cast<float>(i);
-			const auto u = libv::pi / 2.0f - fi * ring_step;
-			const auto z = sphere.radius * std::sin(u);
-
-			for (int j = 0; j <= sphere.segment_count; ++j) {
-				const auto fj = static_cast<float>(j);
-				const auto v = fj * segment_step;
-				const auto x = sphere.radius * std::cos(u) * std::cos(v);
-				const auto y = sphere.radius * std::cos(u) * std::sin(v);
-
-				libv::vec3f point = {x, y, z};
-				position(point + sphere.center);
-				color0({0.6f, 0, 1, 1});
-
-				const auto k1 = vi;
-				const auto k0 = k1 - sphere.segment_count - 1;
-				vi += 1;
-
-				if (i > 0 && j > 0) {
-					index.line(k0, k1);
-					index.line(k0 - 1, k0);
-				}
-			}
+	//  7-------------6
+	//  | \         / |
+	//  |   \     /   |
+	//  |    3---2    |
+	//  |    |   |    |
+	//  |    0---1    |
+	//  |   /     \   |
+	//  | /         \ |
+	//  4-------------5
+	for (const auto& frustum : frustums) {
+		for (const auto& point : frustum.points) {
+			position(point);
+			color0(frustum.color_wire);
 		}
+
+		// Front-face
+		index.line(vi + 0, vi + 1);
+		index.line(vi + 1, vi + 2);
+		index.line(vi + 2, vi + 3);
+		index.line(vi + 3, vi + 0);
+
+		index.line(vi + 4, vi + 5);
+		index.line(vi + 5, vi + 6);
+		index.line(vi + 6, vi + 7);
+		index.line(vi + 7, vi + 4);
+
+		index.line(vi + 0, vi + 4);
+		index.line(vi + 1, vi + 5);
+		index.line(vi + 2, vi + 6);
+		index.line(vi + 3, vi + 7);
+
+		vi += 8;
 	}
 }
 
@@ -378,39 +412,37 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 		vi += 3;
 	}
 
-	//  A---------D
-	//  |  \   /  |
-	//  |    E    |
-	//  |  /   \  |
-	//  B---------C
+	//  7-------------6
+	//  | \         / |
+	//  |   \     /   |
+	//  |    3---2    |
+	//  |    |   |    |
+	//  |    0---1    |
+	//  |   /     \   |
+	//  | /         \ |
+	//  4-------------5
 	for (const auto& frustum : frustums) {
-		const auto a = frustum.points[0];
-		const auto b = frustum.points[1];
-		const auto c = frustum.points[2];
-		const auto d = frustum.points[3];
-		const auto e = frustum.points[4];
+		for (const auto& point : frustum.points) {
+			position(point);
+			color0(frustum.color_sides);
+		}
 
-		position(e);
-		position(a);
-		position(b);
-		position(c);
-		position(d);
+		// Front-face
+		index.quad(vi + 0, vi + 1, vi + 2, vi + 3);
+		index.quad(vi + 4, vi + 5, vi + 6, vi + 7);
+		index.quad(vi + 4, vi + 5, vi + 1, vi + 0);
+		index.quad(vi + 5, vi + 6, vi + 2, vi + 1);
+		index.quad(vi + 6, vi + 7, vi + 3, vi + 2);
+		index.quad(vi + 7, vi + 4, vi + 0, vi + 3);
 
-		color0(frustum.color_sides);
-		color0(frustum.color_sides);
-		color0(frustum.color_sides);
-		color0(frustum.color_sides);
-		color0(frustum.color_sides);
-
-		index.triangle(vi + 0, vi + 1, vi + 2);
-		index.triangle(vi + 0, vi + 2, vi + 1);
-		index.triangle(vi + 0, vi + 2, vi + 3);
-		index.triangle(vi + 0, vi + 3, vi + 2);
-		index.triangle(vi + 0, vi + 3, vi + 4);
-		index.triangle(vi + 0, vi + 4, vi + 3);
-		index.triangle(vi + 0, vi + 4, vi + 1);
-		index.triangle(vi + 0, vi + 1, vi + 4);
-		vi += 5;
+		// Back-face
+		index.quad(vi + 3, vi + 2, vi + 1, vi + 0);
+		index.quad(vi + 7, vi + 6, vi + 5, vi + 4);
+		index.quad(vi + 0, vi + 1, vi + 5, vi + 4);
+		index.quad(vi + 1, vi + 2, vi + 6, vi + 5);
+		index.quad(vi + 2, vi + 3, vi + 7, vi + 6);
+		index.quad(vi + 3, vi + 0, vi + 4, vi + 7);
+		vi += 8;
 	}
 
 	for (const auto& quad : quads) {
@@ -427,6 +459,35 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 		index.quad(vi, vi + 1, vi + 2, vi + 3);
 		index.quad(vi, vi + 3, vi + 2, vi + 1);
 		vi += 4;
+	}
+
+	for (const auto& disc : discs) {
+		const auto centeri = vi;
+		position(disc.center);
+		color0(disc.color);
+		vi += 1;
+
+		static constexpr auto count = 64;
+		const auto up = libv::vec3f{0, 0, 1};
+		const auto dot_prod = dot(disc.normal, up);
+		const auto rotation_mat = dot_prod < 0.9999f ?
+				libv::mat4f::identity().rotate(std::acos(dot_prod), cross(disc.normal, up)) :
+				libv::mat4f::identity();
+		for (int i = 0 ; i <= count ; ++i) {
+			float a = libv::tau / count * static_cast<float>(i);
+			const auto x = disc.radius * std::cos(a);
+			const auto y = disc.radius * std::sin(a);
+			libv::vec3f point = {x, y, 0};
+			auto rotated_point = rotation_mat * libv::vec4f{point, 1};
+			position(xyz(rotated_point) + disc.center);
+			color0(disc.color);
+
+			if (i > 0) {
+				index.triangle(vi - 1, centeri, vi);
+				index.triangle(vi, centeri, vi - 1);
+			}
+			vi += 1;
+		}
 	}
 
 	for (const auto& sphere : spheres) {
@@ -586,10 +647,10 @@ RendererFleet::RendererFleet(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat.vs", "flat.fs") {
 }
 
-void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, bool selected) {
+void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::SelectionStatus selection_status) {
 	glr.program(shader.program());
 	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
-	glr.uniform(shader.uniform().selected, selected);
+	glr.uniform(shader.uniform().selected, libv::to_underlying(selection_status));
 
 	model.render(glr, shader, uniform_stream);
 }

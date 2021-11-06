@@ -69,6 +69,7 @@ app.space: Implement basic 2D text rendering over a 3D anchor point
 --- STACK ------------------------------------------------------------------------------------------
 
 
+app.space: Selection state storage
 
 Main areas of focus: Cost / Value
 	 2 / 6: Network: 'Universe' Snapshot
@@ -125,6 +126,7 @@ app.space.net: Networking
 			app.space.net: Snapshot saving
 			app.space.net: Snapshot sending upon newly connected client (with pause)
 			app.space.net: Snapshot loading
+			app.space.net: ? Non-snapshot data members (fleet selection)
 		app.space.net: Smooth Snapshot
 			app.space.net: Non paused snapshot join
 				app.space.net: Fast forwarding after a snapshot loading happened
@@ -188,10 +190,11 @@ app.space: Simulation
 
 app.space: RendererDebug
 	DONE: color property
-	line, triangle, circle, quad, [box]
-	sphere:
-		UV sphere, tessalation in renderer.cpp instead of canvas.cpp
-    frustum
+	DONE: line, triangle, quad, disc
+	DONE: sphere:
+		DONE: UV sphere, tessalation in renderer.cpp instead of canvas.cpp
+    DONE: frustum: 5 points, 1 quad, 4 sides
+    circle, [box]
     plane
     2D shapes in screen space(rectangle)
 	--------------
@@ -209,9 +212,17 @@ app.space: Fleet merge/follow/attack commands
 		edge case: inf (clicking on sky, negative testing)
 
 	app.space: hover fleet highlight
+		not selected - not Network
+        primary/secondary hit hover - not Network
+        box hover - not Network
+        selected - Network
+	app.space: deselect
 
 
 	//app.space: Fleet factions
+app.space: Selection structure
+	- General API over the current selection whatever types those maybe, whatever API client code might need
+	-it can go into GameState as well as Universe
 
 
 

@@ -52,7 +52,10 @@ public:
 	float angle = 0.0f;
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
-	Line start_line;
+//	Line start_line;
+//	libv::vec3f start_eye;
+	libv::vec3f start_selected_grid_point;
+	libv::vec3f start_dir;
 
 	libv::rev::RenderTarget renderTarget;
 	libv::rev::PostProcessing postProcessing;
@@ -65,8 +68,12 @@ public:
 	void add_debug_line(libv::vec3f a, libv::vec3f b, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode = StyleFlag::DEFAULT);
-	void add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_frustum(
+			libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr, libv::vec3f ntl,
+			libv::vec3f fbl, libv::vec3f fbr, libv::vec3f ftr, libv::vec3f ftl,
+			libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
 	void clear_debug_shapes();
 
 private:

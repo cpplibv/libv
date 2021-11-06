@@ -138,7 +138,7 @@ struct UniformsEditorBackground {
 
 struct UniformsFleet {
 	libv::glr::Uniform_vec4f base_color;
-	libv::glr::Uniform_bool selected;
+	libv::glr::Uniform_int32 selected;
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(base_color, "base_color");
