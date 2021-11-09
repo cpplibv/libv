@@ -42,19 +42,7 @@ app.space: Multi fleet selection
 app.space: Rename files *_behaviour -> *_control
 app.space: Move cto apply functions into universe
 app.space: Move canvas and camera files under view
-
-
-
-
-
-
-
-
-
-
-
-
-
+app.space: Adopt libv.rev post-processing
 
 
 
@@ -82,11 +70,9 @@ app.space: Move canvas and camera files under view
 
 
 
-
+libv.rev: PostProcess should respect original framebuffer and viewport values
 
 Main areas of focus: Cost / Value
-	80 / 9: Visual: Post Processing
-	40 / 8: Visual: Glow / Bloom
 
 	 2 / 2: UX: F1 help overlay
 	 1 / 2: UX: Default focus canvas
@@ -104,11 +90,17 @@ Main areas of focus: Cost / Value
 	20 / 2: UI: Card layout
 
 	Bug P1: repeated smashing of host/join can cause failure
+			| Also: Simple disconnect as a non connected client will do long timeout
 	Bug P1: app.space: "Vader2" as client name breaks the lobby layout
+	Bug P1: app.space: 200*200 debug sphere causes low fps
+	Bug P1: app.space: "Space" title button is mouse shielded by the canvas
+			| Maybe mouse movement only | Dont think so
+			\ Should be a mouse order issue
+
+	Bug P5: libv.gl: missing file name replacement
+			2090909000(33) : error C7011: implicit cast from "vec4" to "vec3"
 
 
-
-app.space: Adopt libv.rev post-processing
 app.space: F1 menu, list every control bindings
 
 libv.ctrl: Box selection support

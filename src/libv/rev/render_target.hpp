@@ -23,8 +23,8 @@ private:
 
 public:
 	RenderTarget(libv::vec2i size_, int sampleCount_);
-	RenderTarget(RenderTarget&&);
-	RenderTarget& operator=(RenderTarget&&);
+	RenderTarget(RenderTarget&&) noexcept;
+	RenderTarget& operator=(RenderTarget&&) & noexcept;
 	~RenderTarget();
 
 public:

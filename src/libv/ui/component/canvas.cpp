@@ -31,6 +31,7 @@ public:
 
 protected:
 	virtual void onMouseButton(const EventMouseButton& event) override;
+//	virtual void onMouseMovement(const EventMouseMovement& event) override;
 
 	virtual void doUpdate() override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
@@ -54,6 +55,10 @@ void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
 	event.stop_propagation();
 	focus();
 }
+
+//void CoreCanvasAdaptor::onMouseMovement(const EventMouseMovement& event) {
+//	event.pass_through();
+//}
 
 void CoreCanvasAdaptor::doUpdate() {
 	if (not canvas_object)

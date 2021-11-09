@@ -469,6 +469,8 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 }
 
 void RendererDebug::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+	// !!! P3: Rebuild is too expensive on each frame
+
 	build_points_mesh(mesh_point);
 	build_lines_mesh(mesh_line);
 	build_triangles_mesh(mesh_triangle);

@@ -877,7 +877,7 @@ constexpr inline size_t GL::convertToTargetIndex(TextureTarget target) const noe
 	case TextureTarget::_2DMultisample: return 9;
 	case TextureTarget::_2DMultisampleArray: return 10;
 	}
-	// TODO P5: libv.gl: instead of default log and assert invalid input
+	// TODO P5: libv.gl: instead of default (0): log and assert invalid input
 	return 0;
 }
 

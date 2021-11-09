@@ -5,6 +5,8 @@
 // fwd
 #include <space/fwd.hpp>
 // libv
+#include <libv/rev/post_processing.hpp>
+#include <libv/rev/render_target.hpp>
 #include <libv/ui/component/canvas.hpp>
 // pro
 #include <space/view/camera.hpp>
@@ -52,6 +54,8 @@ public:
 	float test_sin_time = 0.0f;
 	Line start_line;
 
+	libv::rev::RenderTarget renderTarget;
+	libv::rev::PostProcessing postProcessing;
 	Renderer& renderer;
 
 public:
@@ -65,7 +69,7 @@ public:
 	void add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
 	void clear_debug_shapes();
 	virtual void update(libv::ui::time_duration delta_time) override;
-	virtual void render(libv::glr::Queue& gl) override;
+	virtual void render(libv::glr::Queue& glr) override;
 };
 
 // -------------------------------------------------------------------------------------------------

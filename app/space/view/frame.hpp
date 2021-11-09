@@ -21,7 +21,7 @@ struct SpaceFrame : public libv::Frame {
 		setPosition(libv::Frame::FramePosition::center_current_monitor);
 		setOpenGLProfile(libv::Frame::OpenGLProfile::core);
 		setOpenGLVersion(3, 3);
-		setOpenGLSamples(libv::Frame::OpenGLSamples{4});
+		setOpenGLSamples(libv::Frame::OpenGLSamples{0});
 		setOpenGLRefreshRate(libv::Frame::OpenGLRefreshRate{1});
 		setIcon(icon_set_iris_cyan());
 

@@ -3,6 +3,7 @@
 // hpp
 #include <space/view/canvas.hpp>
 // libv
+#include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
 // std
 #include <cassert>
@@ -57,12 +58,17 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 		playout(game_session.playout),
 //		camera(camera),
 		screen_picker(camera.picker({100, 100})),
+		renderTarget({100, 100}, 4),
+		postProcessing(renderer.resource_context.shader_manager, {100, 100}),
 		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
 		//			Component shall not receive any event before onLayout gets called
+		// <<< renderTarget ctor: ^same
+		// <<< postProcessing ctor: ^same
 		renderer(renderer) {
 
 	camera.look_at({1.6f, 1.6f, 1.2f}, {0.5f, 0.5f, 0.f});
 //	screen_picker = camera.picker(?, ?); // <<< ?
+	postProcessing.vignetteIntensity(0.15f);
 }
 
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {
@@ -92,63 +98,70 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 		game_session.update(delta_time);
 }
 
-void SpaceCanvas::render(libv::glr::Queue& gl) {
-	renderer.prepare_for_render(gl);
+void SpaceCanvas::render(libv::glr::Queue& glr) {
+	renderer.prepare_for_render(glr);
 
 	// NOTE: screen_picker update has to be placed around render, as canvas_size is only set after layout
 	// TODO P1: Move screen_picker update into a layout post hook so mouse event use the update value
 	screen_picker = camera.picker(canvas_size);
+	renderTarget.size(canvas_size.cast<int32_t>());
+	postProcessing.size(canvas_size.cast<int32_t>());
 	//
 
-	const auto s_guard = gl.state.push_guard();
+	const auto s_guard = glr.state.push_guard();
 
-	gl.state.enableDepthTest();
-	gl.state.depthFunctionLess();
-	gl.state.enableDepthMask();
+	glr.state.enableDepthTest();
+	glr.state.depthFunctionLess();
+	glr.state.enableDepthMask();
 
-	gl.state.enableBlend();
-	gl.state.blendSrc_SourceAlpha();
-	gl.state.blendDst_One_Minus_SourceAlpha();
+	glr.state.enableBlend();
+	glr.state.blendSrc_SourceAlpha();
+	glr.state.blendDst_One_Minus_SourceAlpha();
 
-	gl.state.cullBackFace();
-	gl.state.enableCullFace();
-	gl.state.frontFaceCCW();
+	glr.state.cullBackFace();
+	glr.state.enableCullFace();
+	glr.state.frontFaceCCW();
 
-	gl.state.clipPlanes(0);
-	gl.state.polygonModeFill();
+	glr.state.clipPlanes(0);
+	glr.state.polygonModeFill();
 //	gl.state.polygonModeLine();
 
-	gl.projection = camera.projection(canvas_size);
-	gl.view = camera.view();
-	gl.model = libv::mat4f::identity();
+	glr.projection = camera.projection(canvas_size);
+	glr.view = camera.view();
+	glr.model = libv::mat4f::identity();
+
+	glr.framebuffer_draw(renderTarget.framebuffer());
+
+	glr.clearColor();
+	glr.clearDepth();
 
 	// --- Render EditorBackground/Sky ---
 
 	if (!main_canvas) {
-		const auto s2_guard = gl.state.push_guard();
+		const auto s2_guard = glr.state.push_guard();
 		// Clear the depth data for the background of the mini display
-		gl.state.depthFunctionAlways();
-		renderer.editorBackground.render(gl, canvas_size);
+		glr.state.depthFunctionAlways();
+		renderer.editorBackground.render(glr, canvas_size);
 	}
 
 	// --- Render Opaque ---
 
 	for (const auto& fleet : universe.fleets) {
-		const auto m_guard = gl.model.push_guard();
-		gl.model.translate(fleet.position);
-		gl.model.scale(0.2f);
+		const auto m_guard = glr.model.push_guard();
+		glr.model.translate(fleet.position);
+		glr.model.scale(0.2f);
 
 		const auto isSelected = universe.selectedFleetIDList.contains(fleet.id);
-		renderer.fleet.render(gl, renderer.resource_context.uniform_stream, isSelected);
+		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, isSelected);
 	}
 
 	// --- Render EditorBackground/Sky ---
 
 	if (main_canvas) {
-		const auto s2_guard = gl.state.push_guard();
+		const auto s2_guard = glr.state.push_guard();
 		// No need to write depth data for the main background
-		gl.state.disableDepthMask();
-		renderer.editorBackground.render(gl, canvas_size);
+		glr.state.disableDepthMask();
+		renderer.editorBackground.render(glr, canvas_size);
 	}
 
 	// --- Render Transparent ---
@@ -170,12 +183,12 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 		}
 	}
 
-	renderer.arrow.render(gl, canvas_size, renderer.resource_context.uniform_stream);
+	renderer.arrow.render(glr, canvas_size, renderer.resource_context.uniform_stream);
 
 	// --- Render Debug shapes ---
 	{
-		const auto s2_guard = gl.state.push_guard();
-		gl.state.disableDepthMask();
+		const auto s2_guard = glr.state.push_guard();
+		glr.state.disableDepthMask();
 //		gl.state.polygonModeLine();
 		for (int i = 0 ; i < 20 ; ++i) {
 			const auto fi = static_cast<float>(i);
@@ -184,7 +197,7 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 				add_debug_sphere({-fi, -fj, 0.4f}, 0.4f, {fi / 20.0f, fj / 20.0f, 0, 0.8f}, i, j);
 			}
 		}
-		renderer.debug.render(gl, renderer.resource_context.uniform_stream);
+		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 		renderer.debug.spheres.clear();
 	}
 
@@ -192,44 +205,49 @@ void SpaceCanvas::render(libv::glr::Queue& gl) {
 
 	{
 		{ // Grid
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthMask();
-			renderer.editorGrid.render(gl, renderer.resource_context.uniform_stream);
+			const auto s2_guard = glr.state.push_guard();
+			glr.state.disableDepthMask();
+			renderer.editorGrid.render(glr, renderer.resource_context.uniform_stream);
 		}
 
 		{ // Camera orbit point
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthMask();
+			const auto s2_guard = glr.state.push_guard();
+			glr.state.disableDepthMask();
 
-			const auto m_guard = gl.model.push_guard();
-			gl.model.translate(camera.orbit_point());
-			gl.model.scale(0.2f);
-			renderer.gizmo.render(gl, renderer.resource_context.uniform_stream);
+			const auto m_guard = glr.model.push_guard();
+			glr.model.translate(camera.orbit_point());
+			glr.model.scale(0.2f);
+			renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
 		}
 
 		{ // Camera orientation gizmo in top right
-			const auto s2_guard = gl.state.push_guard();
-			gl.state.disableDepthTest();
-			gl.state.disableDepthMask();
+			const auto s2_guard = glr.state.push_guard();
+			glr.state.disableDepthTest();
+			glr.state.disableDepthMask();
 
-			const auto p_guard = gl.projection.push_guard();
-			const auto v_guard = gl.view.push_guard();
-			const auto m_guard = gl.model.push_guard();
+			const auto p_guard = glr.projection.push_guard();
+			const auto v_guard = glr.view.push_guard();
+			const auto m_guard = glr.model.push_guard();
 
 			const auto orientation_gizmo_size = 64.f; // The axes of the gizmo will be half of this size
 			const auto orientation_gizmo_margin = 4.f;
 
-			gl.projection = libv::mat4f::ortho(
+			glr.projection = libv::mat4f::ortho(
 					-canvas_size + orientation_gizmo_size * 0.5f + orientation_gizmo_margin,
 					canvas_size,
 					-orientation_gizmo_size,
 					+orientation_gizmo_size);
-			gl.view = camera.orientation_view().translate(-1, 0, 0);
-			gl.model.scale(orientation_gizmo_size * 0.5f);
+			glr.view = camera.orientation_view().translate(-1, 0, 0);
+			glr.model.scale(orientation_gizmo_size * 0.5f);
 
-			renderer.gizmo.render(gl, renderer.resource_context.uniform_stream);
+			renderer.gizmo.render(glr, renderer.resource_context.uniform_stream);
 		}
 	}
+
+	const auto& mainTexture = renderTarget.resolve(glr);
+	postProcessing.pass(glr, mainTexture);
+
+//	glr.framebuffer_draw_default();
 }
 
 // -------------------------------------------------------------------------------------------------

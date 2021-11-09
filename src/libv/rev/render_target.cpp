@@ -23,9 +23,9 @@ RenderTarget::RenderTarget(libv::vec2i size_, int sampleCount_) :
 	self->createSSFramebuffer();
 }
 
-RenderTarget::RenderTarget(RenderTarget&&) = default;
+RenderTarget::RenderTarget(RenderTarget&&) noexcept = default;
 
-RenderTarget& RenderTarget::operator=(RenderTarget&&) = default;
+RenderTarget& RenderTarget::operator=(RenderTarget&&) & noexcept = default;
 
 RenderTarget::~RenderTarget() {
 	// For the sake of forward declared unique_ptr

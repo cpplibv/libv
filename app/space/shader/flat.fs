@@ -29,7 +29,8 @@ void main() {
 	result = vec4(base_color.rgb * attenuation, base_color.a);
 
 	if (selected) {
-		vec4 fresnel_color = fresnel(2, vec4(0.95, 0.55, 0.0, 0.8), N, V);
-		result += fresnel_color;
+//		vec3 fresnel_color = fresnel(2, vec3(0.95, 0.55, 0.0), N, V);
+		vec3 fresnel_color = fresnel(2, vec3(2.0, 1.0, 0.2), N, V);
+		result.rgb += fresnel_color;
 	}
 }
