@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <bloom/sample.glsl>
+#include <lib/sample.glsl>
 
 in vec2 fragmentTexture0;
 

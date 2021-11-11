@@ -188,6 +188,10 @@ using ShaderFleet = libv::rev::Shader<UniformsFleet>;
 struct RendererResourceContext {
 	libv::rev::ShaderLoader shader_manager{"shader/"};
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
+
+	RendererResourceContext() {
+		shader_manager.add_include_directory("", "../../res/shader/");
+	}
 };
 
 // -------------------------------------------------------------------------------------------------

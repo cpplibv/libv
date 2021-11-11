@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <bloom/block/matrices.glsl>
+#include <rev_sandbox/block/matrices.glsl>
 
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 8) in vec2 vertexTexture0;

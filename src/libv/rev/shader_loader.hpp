@@ -34,6 +34,9 @@ public:
 	~ShaderLoader();
 
 public:
+	void add_include_directory(std::string include_dir, std::string filesystem_dir);
+
+public:
 	/// Can be called from any thread
 	template <typename T, typename... Args>
 	[[nodiscard]] inline Shader<T> load(Args&&... args);

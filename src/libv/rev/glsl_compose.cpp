@@ -122,7 +122,6 @@ bool LoadShaderSourceContext::process_include(const std::string_view filename) {
 				include_stack
 		);
 		std::ranges::reverse(e.include_stack);
-
 		throw e;
 	}
 

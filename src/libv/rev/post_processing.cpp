@@ -197,11 +197,11 @@ const libv::glr::Texture2D::R11F_G11F_B10F& PostProcessing::view(libv::glr::Queu
 
 ImplPostProcessing::ImplPostProcessing(ShaderLoader& shaderLoader, libv::vec2i framebufferSize) :
 	framebufferSize(framebufferSize),
-	shaderDownsamplePrefilter{shaderLoader, "bloom/full_screen.vs", "bloom/pp_bloom_down_prefilter.fs"},
-	shaderDownsampleBlurH{shaderLoader, "bloom/full_screen.vs", "bloom/pp_bloom_down_blur_h.fs"},
-	shaderDownsampleBlurV{shaderLoader, "bloom/full_screen.vs", "bloom/pp_bloom_down_blur_v.fs"},
-	shaderUpsample{shaderLoader, "bloom/full_screen.vs", "bloom/pp_bloom_up.fs"},
-	shaderCombine{shaderLoader, "bloom/full_screen.vs", "bloom/pp_combine.fs"} {
+	shaderDownsamplePrefilter{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_prefilter.fs"},
+	shaderDownsampleBlurH{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_h.fs"},
+	shaderDownsampleBlurV{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_down_blur_v.fs"},
+	shaderUpsample{shaderLoader, "post_process/full_screen.vs", "post_process/pp_bloom_up.fs"},
+	shaderCombine{shaderLoader, "post_process/full_screen.vs", "post_process/pp_combine.fs"} {
 
 	const auto mipCount = calculateMipCount(framebufferSize);
 

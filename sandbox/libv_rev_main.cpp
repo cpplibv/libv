@@ -109,15 +109,15 @@ struct Sandbox {
 
 	libv::vec2i window_size = {WINDOW_WIDTH, WINDOW_HEIGHT};
 
-	libv::glr::Remote remote; // Remote has to be the first data member to cleanup gl resources
+	libv::glr::Remote remote; // Remote has to be the first data member to clean up gl resources
 
 	libv::glr::Mesh mesh_sphere{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 	libv::glr::Mesh mesh_color_bar{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
 
 	libv::glr::UniformBuffer uniform_stream{libv::gl::BufferUsage::StreamDraw};
 	libv::rev::ShaderLoader shader_loader{"../res/shader/"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "bloom/sphere.vs", "bloom/sphere.fs"};
-	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "bloom/sphere.vs", "bloom/color_bar.fs"};
+	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_sphere{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/sphere.fs"};
+	libv::rev::Shader<UniformsOnlyMatrixBlock> shader_color_bar{shader_loader, "rev_sandbox/sphere.vs", "rev_sandbox/color_bar.fs"};
 
 	libv::rev::RenderTarget render_target{window_size, 4};
 

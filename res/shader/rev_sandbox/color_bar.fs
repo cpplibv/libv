@@ -1,6 +1,6 @@
 #version 330 core
 
-#include <bloom/color_spaces.glsl>
+#include <lib/color_spaces.glsl>
 
 in vec2 fragmentTexture0;
 

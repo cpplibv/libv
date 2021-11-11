@@ -54,30 +54,36 @@ public:
 		// TODO P5: normalize include_path (to remove things like a/../xyz.glsl -> xyz.glsl)
 		IncludeResult result;
 
+		std::vector<const Route*> include_dir_attempts;
+
 		for (const auto& mapping : mappings) {
 			if (!include_path.starts_with(mapping.include_dir))
 				continue;
 
-			if (!mapping.source_code.empty()) { // Static source code
+			if (!mapping.source_code.empty()) {
+				// Mapping is static source code
 				result.ec.clear();
 				result.result = mapping.source_code;
 
-			} else if (mapping.generate_cb) { // Generate directory
+			} else if (mapping.generate_cb) {
+				// Mapping is generate directory
 				result.ec.clear();
 				result.result = mapping.generate_cb(include_path);
 
-			} else { // Include directory
+			} else {
+				// Mapping is include directory
 				const auto file_part = libv::slice_off_view(include_path, mapping.include_dir.size());
 				auto file_path = libv::concat(mapping.filesystem_dir, file_part);
 
 				auto read_result = libv::read_file_str_ec(file_path);
 				mapping.included_cb(include_path, file_path);
 
-				// TODO P2: If the file was not found, store lookup attempt and continue with other mappings
-//				if (read_result.ec == std::errc::no_such_file_or_directory) {
-//					continue;
-//				} else if (read_result.ec) {
-				if (read_result.ec) {
+				if (read_result.ec == std::errc::no_such_file_or_directory) {
+					// If the file was not found, store lookup attempt and continue with other mappings
+					include_dir_attempts.emplace_back(&mapping);
+					continue;
+
+				} else if (read_result.ec) {
 					result.ec = read_result.ec;
 					result.result = std::move(file_path);
 
@@ -90,19 +96,32 @@ public:
 			return result;
 		}
 
-		// TODO P5: If there was no include mapping
-		// TODO P5: report search paths with include failure information
-		// TODO P5: If there was any include directory with no_such_file_or_directory include that information
-		// 			otherwise "No include mapping found"
+		if (!include_dir_attempts.empty()) {
+			result.ec = std::make_error_code(std::errc::no_such_file_or_directory);
+			result.result = "";
+
+			// TODO P5: Replace result.result abused with a proper error reason report channel (maybe with exceptions from this layer)
+			if (include_dir_attempts.size() > 1)
+				result.result += "\n";
+			for (const auto& attempt : include_dir_attempts) {
+				const auto file_part = libv::slice_off_view(include_path, attempt->include_dir.size());
+				result.result += libv::concat(attempt->filesystem_dir, file_part, "\n");
+			}
+			if (include_dir_attempts.size() == 1)
+				result.result.pop_back(); // Discard trailing \n
+			return result;
+
+		} else {
+			result.ec = std::make_error_code(std::errc::argument_out_of_domain);
+			result.result = "No include mapping found";
+			return result;
+		}
+
+		// TODO P5: Detailed report of search paths with include failure information
 		//		"Failed to include \"{}\"\n", include_path
 		//		"\tMapping \"{}\": {}\n", mapping.include_dir, "Not matches prefix"
 		//		"\tMapping \"{}\"->\"{}\": {}\n", mapping.include_dir, mapping.filesystem_dir, "Not matches prefix"
 		//		"\tMapping \"{}\"->\"{}\": {}\n", mapping.include_dir, mapping.filesystem_dir, "No such file or directory"
-
-		assert(false && "No include mapping found"); // The default include mapping should always catch everyone
-		result.ec = std::make_error_code(std::errc::argument_out_of_domain);
-		result.result = "No include mapping found";
-		return result;
 	}
 };
 

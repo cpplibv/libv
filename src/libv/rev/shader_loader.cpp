@@ -21,6 +21,24 @@ namespace rev {
 ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
 	self(std::make_shared<InternalShaderLoader>()) {
 
+//	self->glsl_source_loader.add_include_directory("block/", lookup_block_source);
+	add_include_directory("", base_include_directory.generic_string());
+//	for (const auto mod : mods) {
+//		self->glsl_source_loader.add_include_directory(
+//				mod.shader_include_path,
+//				mod.shader_filesystem_path,
+//				std::move(file_loader));
+//	}
+}
+
+ShaderLoader::~ShaderLoader() {
+	// For the sake of forward declared shared_ptr
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void ShaderLoader::add_include_directory(std::string include_dir, std::string filesystem_dir) {
+
 	auto file_tracker = [this](std::string_view include_path, std::string_view file_path) {
 		// Callback for glsl_source_loader whenever a new include loaded a file
 		// NOTE: Indirectly protected by mutex lock in internal_load
@@ -46,18 +64,7 @@ ShaderLoader::ShaderLoader(std::filesystem::path base_include_directory) :
 		self->current_loading_stage->included_sources.emplace_back(std::string(include_path), token);
 	};
 
-//	self->glsl_source_loader.add_include_directory("block/", lookup_block_source);
-	self->glsl_source_loader.add_include_directory("", base_include_directory.generic_string(), std::move(file_tracker));
-//	for (const auto mod : mods) {
-//		self->glsl_source_loader.add_include_directory(
-//				mod.shader_include_path,
-//				mod.shader_filesystem_path,
-//				std::move(file_loader));
-//	}
-}
-
-ShaderLoader::~ShaderLoader() {
-	// For the sake of forward declared shared_ptr
+	self->glsl_source_loader.add_include_directory(std::move(include_dir), std::move(filesystem_dir), std::move(file_tracker));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -142,7 +149,7 @@ void InternalShaderLoader::update_fs() {
 
 			} catch (const glsl_failed_include_exception& e) {
 				log_rev.error("--- Failed to load shader: {} v{} ({}) ---", internal->name_, internal->load_version, internal->id());
-				log_rev.error("Failed to include: \"{}\" from file: \"{}\" - {}: {}", e.include_path, e.file_path, e.ec, e.ec.message());
+				log_rev.error("Failed to include: \"{}\" from file: {} - {}: {}", e.include_path, e.file_path, e.ec, e.ec.message());
 				for (const auto& [file, line] : e.include_stack)
 					log_rev.error("    Included from: {}:{}", file, line);
 
