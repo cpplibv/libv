@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/canvas_behaviour.hpp
+// Project: libv, File: app/space/view/canvas_control.hpp
 
 #pragma once
 

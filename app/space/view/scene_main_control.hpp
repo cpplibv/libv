@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/scene_main.hpp
+// Project: libv, File: app/space/view/scene_main_control.hpp
 
 #pragma once
 

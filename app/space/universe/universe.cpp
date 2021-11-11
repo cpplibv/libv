@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/universe/universe.hpp
+// Project: libv, File: app/space/universe/universe.cpp
 
 // hpp
 #include <space/universe/universe.hpp>

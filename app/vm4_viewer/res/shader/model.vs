@@ -3,7 +3,7 @@
 layout(location = 0) in vec3 vertexPosition;
 layout(location = 1) in vec3 vertexNormal;
 layout(location = 4) in ivec4 vertexBondID;
-layout(location = 5) in vec4 vertexBondWieght;
+layout(location = 5) in vec4 vertexBondWeight;
 layout(location = 6) in vec3 vertexTangent;
 layout(location = 7) in vec3 vertexBitangent;
 layout(location = 8) in vec2 vertexTexture0;

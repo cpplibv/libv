@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/canvas_behaviour.cpp
+// Project: libv, File: app/space/view/canvas_control.cpp
 
 // hpp
 #include <space/view/canvas_control.hpp>

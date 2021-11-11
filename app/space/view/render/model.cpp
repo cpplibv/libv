@@ -1,23 +1,23 @@
-// Project: libv, File: app/vm4_viewer/scene/model.cpp
+// Project: libv, File: app/space/view/model.cpp
 
 // hpp
-#include <vm4_viewer/scene/model.hpp>
+#include <space/view/render/model.hpp>
 // libv
+#include <libv/glr/attribute.hpp>
 #include <libv/glr/queue.hpp>
+#include <libv/glr/uniform_buffer.hpp>
+#include <libv/vm4/model.hpp>
 // pro
-#include <vm4_viewer/attribute.hpp>
-#include <vm4_viewer/log.hpp>
+//#include <space/renderer.hpp>
 
-
-// -------------------------------------------------------------------------------------------------
 
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
 Model::Model(libv::vm4::Model model) :
-	mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw},
-	vm4{std::move(model)} {
+		mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw},
+		vm4{std::move(model)} {
 	load();
 }
 
@@ -63,17 +63,22 @@ void Model::load() {
 	index(vm4.indices);
 }
 
-void Model::render(libv::glr::Queue& gl, ShaderModel& shader) {
-	node(gl, vm4.lods[0].rootNodeID, shader);
+void Model::render(libv::glr::Queue& glr, ShaderFleet& shader, libv::glr::UniformBuffer& uniform_stream) {
+	render_node(glr, vm4.lods[0].rootNodeID, shader, uniform_stream);
 }
 
-void Model::node(libv::glr::Queue& gl, uint32_t nodeID, ShaderModel& shader) {
-	const auto guard = gl.model.push_guard();
+void Model::render_node(libv::glr::Queue& glr, uint32_t nodeID, ShaderFleet& shader, libv::glr::UniformBuffer& uniform_stream) {
+	const auto guard = glr.model.push_guard();
 
-	gl.model *= vm4.nodes[nodeID].transformation;
+	glr.model *= vm4.nodes[nodeID].transformation;
 
-	gl.uniform(shader.uniform.matM, gl.model);
-	gl.uniform(shader.uniform.matMVP, gl.mvp());
+	auto uniforms = uniform_stream.block_unique(layout_matrices);
+	uniforms[layout_matrices.matMVP] = glr.mvp();
+	uniforms[layout_matrices.matM] = glr.model;
+	uniforms[layout_matrices.matP] = glr.projection;
+	uniforms[layout_matrices.eye] = glr.eye();
+
+	glr.uniform(std::move(uniforms));
 
 	// TODO P2: Bind textures here
 	// node->material->get<std::string>("diffuseTexture")
@@ -81,13 +86,11 @@ void Model::node(libv::glr::Queue& gl, uint32_t nodeID, ShaderModel& shader) {
 	// TODO P2: Bind material here
 	// libv::glsl::material = materials[entries[i].MaterialIndex];
 
-	for (const auto& meshID : vm4.nodes[nodeID].meshIDs) {
-		gl.render(mesh, vm4.meshes[meshID].baseVertex, vm4.meshes[meshID].baseIndex, vm4.meshes[meshID].numIndices);
-	}
+	for (const auto& meshID : vm4.nodes[nodeID].meshIDs)
+		glr.render(mesh, vm4.meshes[meshID].baseVertex, vm4.meshes[meshID].baseIndex, vm4.meshes[meshID].numIndices);
 
-	for (auto childID : vm4.nodes[nodeID].childrenIDs) {
-		node(gl, childID, shader);
-	}
+	for (auto childID : vm4.nodes[nodeID].childrenIDs)
+		render_node(glr, childID, shader, uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------

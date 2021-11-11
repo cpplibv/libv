@@ -964,6 +964,7 @@ wish_create_executable(
 	SOURCE app/space/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial
+	LINK   libv_vm4
 	LINK   libv_sys
 )
 

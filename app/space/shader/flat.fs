@@ -33,4 +33,6 @@ void main() {
 		vec3 fresnel_color = fresnel(2, vec3(2.0, 1.0, 0.2), N, V);
 		result.rgb += fresnel_color;
 	}
+
+//	result.rgb = N;
 }

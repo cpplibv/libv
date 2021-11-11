@@ -226,7 +226,7 @@ public:
 
 				if (mesh->HasBones()) {
 					//vertex.boneID = vec4i();
-					//vertex.boneWieght = vec4();
+					//vertex.boneWeight = vec4();
 				}
 			}
 

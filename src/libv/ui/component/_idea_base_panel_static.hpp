@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/base_panel_static.hpp
+// Project: libv.ui, File: src/libv/ui/component/_idea_base_panel_static.hpp
 
 #pragma once
 

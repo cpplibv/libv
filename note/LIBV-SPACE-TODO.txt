@@ -45,7 +45,8 @@ app.space: Move canvas and camera files under view
 app.space: Adopt libv.rev post-processing
 app.space: Default focus canvas
 app.space: Add Controls help overlay (Simple, list only)
-
+app.space: Fleet visualisation with a simple model and orientation
+libv.rev: Bloom textures should not repeat, they could clamp
 
 
 
@@ -69,22 +70,23 @@ app.space: Add Controls help overlay (Simple, list only)
 
 
 
-
+app.space: Model loading failure causes silent error and soft-lock
 
 
 Main areas of focus: Cost / Value
-	24 / 5: Visual: Fleet visualization (Simple mesh, orientation)
 	 8 / 3: Visual: Debug renderer text (2D Label on a 3D point)
 	 8 / 1: Visual: Fleet name (2D Label)
 
+	20 / 2: UI: Card layout
+
 	40 / 6: Control: Ctrl box selection support
 	 2 / 6: Network: 'Universe' Snapshot
+	 		\ Need for unsynchronized / non-snapshot members in Universe
 
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
 
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
-	20 / 2: UI: Card layout
 
 	Bug P1: repeated smashing of host/join can cause failure
 			| Also: Simple disconnect as a non connected client will do long timeout

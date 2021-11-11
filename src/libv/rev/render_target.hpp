@@ -1,4 +1,4 @@
-// Project: libv.rev, File: src/libv/rev/shader.hpp
+// Project: libv.rev, File: src/libv/rev/render_target.hpp
 
 #pragma once
 

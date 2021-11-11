@@ -59,7 +59,7 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 //		camera(camera),
 		screen_picker(camera.picker({100, 100})),
 		renderTarget({100, 100}, 4),
-		postProcessing(renderer.resource_context.shader_manager, {100, 100}),
+		postProcessing(renderer.resource_context.shader_loader, {100, 100}),
 		// <<< screen_picker ctor: This line is wrong, canvas_size is not initialized at this point
 		//			Component shall not receive any event before onLayout gets called
 		// <<< renderTarget ctor: ^same
@@ -156,6 +156,18 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		glr.model.translate(fleet.position);
 		glr.model.scale(0.2f);
 
+		if (!fleet.commands.empty()) {
+			const auto direction = normalize(fleet.commands.front().target - fleet.position);
+
+			float angle = std::atan2(direction.y, direction.x);
+			float angleZ = -std::asin(direction.z);
+
+			angle += libv::pi * 0.5f; // <<< Model is incorrectly oriented
+
+			glr.model.rotate(libv::Radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
+			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
+		}
+
 		const auto isSelected = universe.selectedFleetIDList.contains(fleet.id);
 		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, isSelected);
 	}
@@ -195,13 +207,13 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		const auto s2_guard = glr.state.push_guard();
 		glr.state.disableDepthMask();
 //		gl.state.polygonModeLine();
-		for (int i = 0 ; i < 20 ; ++i) {
-			const auto fi = static_cast<float>(i);
-			for (int j = 0 ; j < 20 ; ++j) {
-				const auto fj = static_cast<float>(j);
-				add_debug_sphere({-fi, -fj, 0.4f}, 0.4f, {fi / 20.0f, fj / 20.0f, 0, 0.8f}, i, j);
-			}
-		}
+//		for (int i = 0 ; i < 20 ; ++i) {
+//			const auto fi = static_cast<float>(i);
+//			for (int j = 0 ; j < 20 ; ++j) {
+//				const auto fj = static_cast<float>(j);
+//				add_debug_sphere({-fi, -fj, 0.4f}, 0.4f, {fi / 20.0f, fj / 20.0f, 0, 0.8f}, i, j);
+//			}
+//		}
 		renderer.debug.render(glr, renderer.resource_context.uniform_stream);
 		renderer.debug.spheres.clear();
 	}

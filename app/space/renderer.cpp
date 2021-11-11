@@ -5,14 +5,9 @@
 // libv
 #include <libv/ui/ui.hpp>
 #include <libv/ui/event_hub.hpp>
-//#include <libv/algo/adjacent_pairs.hpp>
-//#include <libv/ctrl/controls.hpp>
-//#include <libv/ctrl/feature_register.hpp>
 #include <libv/glr/procedural/sphere.hpp>
-//#include <libv/glr/program.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/noise/white.hpp>
-//#include <libv/glr/texture.hpp>
 // pro
 //#include <space/view/camera.hpp>
 //#include <space/command.hpp>
@@ -22,12 +17,17 @@
 #include <space/log.hpp>
 
 
+#include <libv/vm4/load.hpp>
+#include <libv/utility/read_file.hpp>
+
+
+
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "editor_background.vs", "editor_background.fs") {
+		shader(rctx.shader_loader, "editor_background.vs", "editor_background.fs") {
 
 	// TODO P1: Switch to blue noise once implemented
 	//  		| It will not be implemented anytime soon so burn in a couple of textures from it
@@ -66,7 +66,7 @@ void RendererEditorBackground::render(libv::glr::Queue& gl, libv::vec2f canvas_s
 // -------------------------------------------------------------------------------------------------
 
 RendererCommandArrow::RendererCommandArrow(RendererResourceContext& rctx) :
-		shader{rctx.shader_manager, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
+		shader{rctx.shader_loader, "command_arrow.vs", "command_arrow.gs", "command_arrow.fs"} {
 }
 
 void RendererCommandArrow::restart_chain(float animation_offset) {
@@ -286,7 +286,7 @@ void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size,
 // -------------------------------------------------------------------------------------------------
 
 RendererDebug::RendererDebug(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
 }
 
 void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
@@ -509,7 +509,7 @@ void RendererDebug::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 RendererGizmo::RendererGizmo(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "flat_color.vs", "flat_color.fs") {
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
 	build_gizmo_lines(mesh);
 }
 
@@ -552,7 +552,7 @@ void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "editor_grid_plane.vs", "editor_grid_plane.fs") {
+		shader(rctx.shader_loader, "editor_grid_plane.vs", "editor_grid_plane.fs") {
 	auto position = mesh_grid.attribute(attribute_position);
 	auto index = mesh_grid.index();
 
@@ -580,45 +580,31 @@ void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& 
 // -------------------------------------------------------------------------------------------------
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
-		shader(rctx.shader_manager, "flat.vs", "flat.fs") {
-	build_mesh(mesh);
+		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4"))),
+//		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
+//		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
+		shader(rctx.shader_loader, "flat.vs", "flat.fs") {
 }
 
-void RendererFleet::build_mesh(libv::glr::Mesh& mesh) {
-	auto position = mesh.attribute(attribute_position);
-	auto normal = mesh.attribute(attribute_normal);
-	auto texture0 = mesh.attribute(attribute_texture0);
-	auto index = mesh.index();
+void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, bool selected) {
+	glr.program(shader.program());
+	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
+	glr.uniform(shader.uniform().selected, selected);
 
-	libv::glr::generateSpherifiedCube(12, position, normal, texture0, index);
-	//		libv::glr::generateCube(position, normal, texture0, index);
-}
-
-void RendererFleet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected) {
-	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
-
-	gl.program(shader.program());
-	gl.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
-	gl.uniform(shader.uniform().selected, selected);
-	gl.uniform(std::move(uniforms));
-	gl.render(mesh);
+	model.render(glr, shader, uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------
 
 Renderer::Renderer(libv::ui::UI& ui) {
-	resource_context.shader_manager.attach_libv_ui_hub(ui.event_hub());
+	resource_context.shader_loader.attach_libv_ui_hub(ui.event_hub());
 }
 
-void Renderer::prepare_for_render(libv::glr::Queue& gl) {
-	// shader_manager.update MUST run before any other render queue operation
+void Renderer::prepare_for_render(libv::glr::Queue& glr) {
+	// shader_loader.update MUST run before any other render queue operation
 	// OTHERWISE the not loaded uniform locations are attempted to be used and placed into the streams
 	// | So this is a better place than before, still not the best, When UI gets rev updates in the future maybe there will be better solutions
-	resource_context.shader_manager.update(gl.out_of_order_gl());
+	resource_context.shader_loader.update(glr.out_of_order_gl());
 }
 
 // -------------------------------------------------------------------------------------------------

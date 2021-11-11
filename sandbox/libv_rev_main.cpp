@@ -1,4 +1,4 @@
-// Project: libv.glr, File: sandbox/libv_glr_main2.cpp
+// Project: libv.rev, File: sandbox/libv_rev_main.cpp
 
 // hpp
 #include "libv_gl_runner.hpp"

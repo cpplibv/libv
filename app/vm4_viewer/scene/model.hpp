@@ -17,7 +17,19 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-class Model : Object {
+class Model {
+// Node:
+	std::string name;
+	//	Node** children;
+	std::vector<std::unique_ptr<Node>> children;
+
+// Object:
+	libv::vec3f position;
+	// TODO P4: use quaternion for rotation
+	libv::vec3f rotation; // RAD
+	libv::vec3f scale;
+
+// Model:
 private:
 //	libv::vec3f position;
 //	libv::quatf direction;

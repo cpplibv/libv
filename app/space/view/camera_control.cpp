@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/camera_behaviour.cpp
+// Project: libv, File: app/space/view/camera_control.cpp
 
 // hpp
 #include <space/view/camera_control.hpp>

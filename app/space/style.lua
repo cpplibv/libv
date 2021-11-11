@@ -214,6 +214,8 @@ ui.style("space.overlay.controls-help.lbl") {
 	align_horizontal = "left",
 	align_vertical = "center",
 	anchor = "center",
+	background = "color: rgba(0.0, 0.0, 0.0, 0.6)",
+	padding = {6, 4},
 	font_color = colors.text_light,
 	size = "D, D",
 }

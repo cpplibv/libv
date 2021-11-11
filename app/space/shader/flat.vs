@@ -14,6 +14,8 @@ out vec2 fragmentTexture0;
 void main() {
 	gl_Position = matMVP * vec4(vertexPosition, 1);
 	fragmentPositionW = (matM * vec4(vertexPosition, 1)).xyz;
-	fragmentNormal = vertexNormal;
+//	fragmentNormal = (matM * vec4(vertexNormal, 1)).xyz;
+//	fragmentNormal = vertexNormal;
+	fragmentNormal = mat3(matM) * vertexNormal;
 	fragmentTexture0 = vertexTexture0;
 }

@@ -41,7 +41,7 @@ struct Vertex {
 	libv::vec3f bitangent;
 	libv::vec2f texture0;
 	libv::vec4i boneID;
-	libv::vec4f boneWieght;
+	libv::vec4f boneWeight;
 
 	LIBV_REFLECTION_ACCESS(position);
 	LIBV_REFLECTION_ACCESS(normal);
@@ -49,7 +49,7 @@ struct Vertex {
 	LIBV_REFLECTION_ACCESS(bitangent);
 	LIBV_REFLECTION_ACCESS(texture0);
 	LIBV_REFLECTION_ACCESS(boneID);
-	LIBV_REFLECTION_ACCESS(boneWieght);
+	LIBV_REFLECTION_ACCESS(boneWeight);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
@@ -127,7 +127,7 @@ struct Model {
 //	std::vector<libv::vec3f> vertex_bitangents;
 //	std::vector<libv::vec2f> vertex_texCoord0s;
 //	std::vector<libv::vec4i> vertex_boneIDs;
-//	std::vector<libv::vec4f> vertex_boneWieghts;
+//	std::vector<libv::vec4f> vertex_boneWeights;
 	std::vector<Vertex> vertices;
 	std::vector<uint32_t> indices;
 
@@ -155,7 +155,7 @@ struct Model {
 //	LIBV_REFLECTION_ACCESS(vertex_bitangents);
 //	LIBV_REFLECTION_ACCESS(vertex_texCoord0s);
 //	LIBV_REFLECTION_ACCESS(vertex_boneIDs);
-//	LIBV_REFLECTION_ACCESS(vertex_boneWieghts);
+//	LIBV_REFLECTION_ACCESS(vertex_boneWeights);
 	LIBV_REFLECTION_ACCESS(vertices);
 	LIBV_REFLECTION_ACCESS(indices);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();

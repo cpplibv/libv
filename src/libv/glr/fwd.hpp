@@ -12,6 +12,7 @@ class Framebuffer;
 class Program;
 class Queue;
 class Remote;
+class UniformBuffer;
 
 // -------------------------------------------------------------------------------------------------
 
