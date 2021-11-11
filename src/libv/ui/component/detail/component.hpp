@@ -164,6 +164,9 @@ public:
 	void style(std::string_view style_name);
 
 public:
+	void focus();
+
+public:
 	[[nodiscard]] inline bool operator==(const Component& other) const noexcept = default;
 };
 

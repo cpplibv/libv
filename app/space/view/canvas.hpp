@@ -68,6 +68,9 @@ public:
 	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_frustum(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec3f e, libv::vec4f color_wire, libv::vec4f color_sides, StyleFlag mode = StyleFlag::DEFAULT);
 	void clear_debug_shapes();
+
+private:
+	virtual void attach() override;
 	virtual void update(libv::ui::time_duration delta_time) override;
 	virtual void render(libv::glr::Queue& glr) override;
 };

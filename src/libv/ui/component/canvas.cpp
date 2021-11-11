@@ -33,6 +33,7 @@ protected:
 	virtual void onMouseButton(const EventMouseButton& event) override;
 //	virtual void onMouseMovement(const EventMouseMovement& event) override;
 
+	virtual void doAttach() override;
 	virtual void doUpdate() override;
 	virtual void doLayout2(const ContextLayout2& environment) override;
 	virtual void doCreate(Renderer& r) override;
@@ -59,6 +60,10 @@ void CoreCanvasAdaptor::onMouseButton(const EventMouseButton& event) {
 //void CoreCanvasAdaptor::onMouseMovement(const EventMouseMovement& event) {
 //	event.pass_through();
 //}
+
+void CoreCanvasAdaptor::doAttach() {
+	canvas_object->attach();
+}
 
 void CoreCanvasAdaptor::doUpdate() {
 	if (not canvas_object)
@@ -124,6 +129,12 @@ void CoreCanvasAdaptor::doDestroy(Renderer& r) {
 
 libv::vec2f CanvasBase::calculate_local_mouse_coord() const noexcept {
 	return core->calculate_local_mouse_coord();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CanvasBase::focus() {
+	core->focus();
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -141,34 +141,3 @@ void SceneMain::openMPServer(uint16_t port) {
 // -------------------------------------------------------------------------------------------------
 
 } // namespace app
-
-// =================================================================================================
-
-//struct GameBehaviour {
-//	void register_controls(libv::ctrl::FeatureRegister controls);
-//	void bind_default_controls(libv::ctrl::Controls& controls);
-//};
-//
-//void GameBehaviour::register_controls(libv::ctrl::FeatureRegister controls) {
-//	controls.feature_binary<app::SpaceCanvas>("space.show_controls", [&controls = controls.owner()](libv::ctrl::arg_binary& arg, app::SpaceCanvas& ctx) {
-//		if (arg.value) {
-//			std::ostringstream os;
-//			controls.foreach_bindings([&os](const libv::ctrl::Binding& binding) {
-//				os << binding.feature_name() << ":" << binding.sequence().to_string() << "\n";
-//			});
-//			auto text = std::move(os).str();
-//			if (!text.empty())
-//				text.pop_back(); // Discard the last \n character
-//
-//			libv::ui::Label label("help-controls");
-//			label.text(std::move(text));
-//			main_layers.add(label);
-//		} else {
-//			main_layers.remove(label);
-//		}
-//	});
-//}
-//
-//void GameBehaviour::bind_default_controls(libv::ctrl::Controls& controls) {
-//	controls.bind("space.show_controls", "F1");
-//}

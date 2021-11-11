@@ -71,6 +71,11 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 	postProcessing.vignetteIntensity(0.15f);
 }
 
+void SpaceCanvas::attach() {
+	if (main_canvas)
+		focus();
+}
+
 void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 	const auto dtf = static_cast<float>(delta_time.count());
 	angle = std::fmod(angle + 5.0f * dtf, 360.0f);

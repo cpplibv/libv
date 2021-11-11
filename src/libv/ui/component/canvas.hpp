@@ -34,7 +34,11 @@ protected:
 public:
 	[[nodiscard]] libv::vec2f calculate_local_mouse_coord() const noexcept;
 
+public:
+	void focus();
+
 protected:
+	virtual void attach() { }
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
 	virtual void update(time_duration delta_time) = 0;
 	virtual void render(libv::glr::Queue& glr) = 0;
