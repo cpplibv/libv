@@ -75,4 +75,6 @@ void main() {
 
 	// Gradient in segment
 	// TODO P4: Segment gradient
+
+	result = clamp(result, 0, 1);
 }
