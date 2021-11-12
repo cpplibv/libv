@@ -43,7 +43,10 @@ void ImplRenderTarget::createMSFramebuffer() {
 
 void ImplRenderTarget::createSSFramebuffer() {
 	ss_color0.storage(1, framebufferSize);
-	// ss_color0.set(libv::gl::MagFilter::Nearest);
+	// NOTE: ClampToBorder is mostly used because of blur effect in bloom post-processing
+	//			In the future this might not be suitable for all application of the RenderTarget class
+	ss_color0.set(libv::gl::Wrap::ClampToBorder, libv::gl::Wrap::ClampToBorder);
+//	ss_color0.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 	ss_color0.set(libv::gl::MagFilter::Linear);
 	ss_color0.set(libv::gl::MinFilter::Linear);
 
