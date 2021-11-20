@@ -28,19 +28,22 @@ namespace app {
 //		radius_indirect(radiusIndirect) {}
 //};
 
-//struct Fleet : ScreenPickable {
-struct Fleet {
-//	ScreenPickableType* screen_pick_type;
-
-	enum class CommandType {
-		movement,
-		attack
+enum class FleetCommandType {
+	movement,
+	attack
 //		follow,
 //		merge,
 //		block,
 //		land,
 //		...,
-	};
+};
+[[nodiscard]] constexpr inline auto operator+(FleetCommandType e) noexcept { return libv::to_underlying(e); }
+
+
+//struct Fleet : ScreenPickable {
+struct Fleet {
+//	ScreenPickableType* screen_pick_type;
+
 //	enum class FleetState {
 //		idle,
 //		selected
@@ -49,7 +52,7 @@ struct Fleet {
 //
 	struct Command {
 		libv::vec3f target;
-		CommandType type;
+		FleetCommandType type;
 //		int32_t target;
 	};
 
@@ -67,12 +70,12 @@ public:
 			position(position) {}
 
 public:
-//	void queue_command(CommandType type, libv::vec3f target) {
+//	void queue_command(FleetCommandType type, libv::vec3f target) {
 //		commands.emplace_back(type, target);
 ////		command_arrow.add(target, color);
 //	}
 //
-//	void queue_command(CommandType type, int32_t target) {
+//	void queue_command(FleetCommandType type, int32_t target) {
 //
 //	}
 

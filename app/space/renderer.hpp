@@ -15,6 +15,7 @@
 #include <libv/rev/shader.hpp>
 #include <libv/rev/shader_loader.hpp>
 #include <libv/ui/component/canvas.hpp>
+#include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
 #include <space/universe/universe.hpp>
@@ -60,7 +61,7 @@ struct RendererEditorBackground {
 
 public:
 	explicit RendererEditorBackground(RendererResourceContext& rctx);
-	void render(libv::glr::Queue& gl, libv::vec2f canvas_size);
+	void render(libv::glr::Queue& glr, libv::vec2f canvas_size);
 };
 
 struct RendererCommandArrow {
@@ -103,7 +104,7 @@ public:
 
 public:
 	void rebuild_mesh();
-	void render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererDebug {
@@ -169,7 +170,7 @@ public:
 	void build_points_mesh(libv::glr::Mesh& mesh);
 	void build_lines_mesh(libv::glr::Mesh& mesh);
 	void build_triangles_mesh(libv::glr::Mesh& mesh);
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererGizmo {
@@ -180,7 +181,7 @@ public:
 	explicit RendererGizmo(RendererResourceContext& rctx);
 
 	void build_gizmo_lines(libv::glr::Mesh& mesh);
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererEditorGrid {
@@ -191,7 +192,7 @@ public:
 	explicit RendererEditorGrid(RendererResourceContext& rctx);
 
 //	void build_mesh();
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
 struct RendererFleet {
@@ -201,19 +202,45 @@ struct RendererFleet {
 public:
 	explicit RendererFleet(RendererResourceContext& rctx);
 
-	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, bool selected);
 };
 
-//struct RendererText {
-//	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
-//	ShaderFleet shader;
-//
-//public:
-//	explicit RendererFleet(RendererResourceContext& rctx);
-//
-//	void build_mesh(libv::glr::Mesh& mesh);
-//	void render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, bool selected);
-//};
+struct RendererText {
+private:
+	ShaderText shader;
+
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::DynamicDraw};
+
+	struct Entry {
+		libv::vec3f position;
+		libv::vec2f screenOffset;
+		libv::vec4f color;
+		libv::ui::TextLayout layout;
+	};
+	std::vector<Entry> texts;
+
+public:
+	// TODO P3: Make default font private, and init it in ctor
+	std::shared_ptr<libv::ui::Font2D> font;
+
+public:
+	explicit RendererText(RendererResourceContext& rctx);
+
+	// TODO P3: A better lifetime/ownership model for rendered 'asset' reuse is necessary (same for debug)
+	void add_text(
+			libv::vec3f position,
+			libv::vec2f screenOffset,
+			std::string str,
+			libv::vec4f color = libv::vec4f(1, 1, 1, 1),
+			libv::ui::FontSize fontSize = libv::ui::FontSize{12},
+			libv::ui::AlignHorizontal alignH = libv::ui::AlignHorizontal::center,
+			libv::ui::AlignVertical alignV = libv::ui::AlignVertical::center);
+
+	void clear_texts();
+	void add_debug_coordinates_if_nothing_else();
+
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const CameraPlayer::screen_picker& screen_picker);
+};
 
 // -------------------------------------------------------------------------------------------------
 
@@ -226,7 +253,7 @@ struct Renderer {
 	RendererDebug debug{resource_context};
 	RendererCommandArrow arrow{resource_context};
 	RendererFleet fleet{resource_context};
-//	RendererText text{resource_context};
+	RendererText text{resource_context};
 
 public:
 	explicit Renderer(libv::ui::UI& ui);

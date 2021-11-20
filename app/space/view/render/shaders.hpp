@@ -89,54 +89,11 @@ const auto layout_matrices = libv::glr::layout_std140<UniformLayoutMatrices>(uni
 //                  With additional mapping and includes to struct/my_struct_that_is_in_a_block.glsl
 //			std::cout << libv::glr::layout_to_string<UniformLayoutMatrices>("Sphere") << std::endl;
 
-struct UniformsEditorBackground {
-	libv::glr::Uniform_texture texture_noise;
-	libv::glr::Uniform_vec2f render_resolution;
-	libv::glr::Uniform_vec4f noise_scale;
-	libv::glr::Uniform_vec4f base_color;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(texture_noise, "texture_noise", textureChannel_pattern);
-		access(render_resolution, "render_resolution");
-		access(base_color, "base_color");
-		access(noise_scale, "noise_scale");
-	}
-
-	template <typename Access> void access_blocks(Access&) {
-	}
-};
-
-struct UniformsTestMode {
-	libv::glr::Uniform_int32 test_mode;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(test_mode, "test_mode", 0);
-	}
-
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
-	}
-};
-
 struct UniformsColor {
 	libv::glr::Uniform_vec4f base_color;
 
 	template <typename Access> void access_uniforms(Access& access) {
 		access(base_color, "base_color");
-	}
-
-	template <typename Access> void access_blocks(Access& access) {
-		access(uniformBlock_matrices);
-	}
-};
-
-struct UniformsFleet {
-	libv::glr::Uniform_vec4f base_color;
-	libv::glr::Uniform_bool selected;
-
-	template <typename Access> void access_uniforms(Access& access) {
-		access(base_color, "base_color");
-		access(selected, "selected");
 	}
 
 	template <typename Access> void access_blocks(Access& access) {
@@ -157,6 +114,62 @@ struct UniformsCommandArrow {
 		access(time, "time", 0.f);
 	}
 
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
+};
+
+struct UniformsEditorBackground {
+	libv::glr::Uniform_texture texture_noise;
+	libv::glr::Uniform_vec2f render_resolution;
+	libv::glr::Uniform_vec4f noise_scale;
+	libv::glr::Uniform_vec4f base_color;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(texture_noise, "texture_noise", textureChannel_pattern);
+		access(render_resolution, "render_resolution");
+		access(base_color, "base_color");
+		access(noise_scale, "noise_scale");
+	}
+
+	template <typename Access> void access_blocks(Access&) {
+	}
+};
+
+struct UniformsFleet {
+	libv::glr::Uniform_vec4f base_color;
+	libv::glr::Uniform_bool selected;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(base_color, "base_color");
+		access(selected, "selected");
+	}
+
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
+};
+
+struct UniformsTestMode {
+	libv::glr::Uniform_int32 test_mode;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(test_mode, "test_mode", 0);
+	}
+
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
+};
+
+struct UniformsText {
+	libv::glr::Uniform_texture font_texture;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(font_texture, "texture_font", textureChannel_diffuse);
+	}
+
+//	template <typename Access> void access_blocks(Access&) {
 	template <typename Access> void access_blocks(Access& access) {
 		access(uniformBlock_matrices);
 	}
@@ -253,11 +266,12 @@ struct UniformsCommandArrow {
 //	}
 //};
 
-using ShaderEditorBackground = libv::rev::Shader<UniformsEditorBackground>;
-using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 using ShaderColor = libv::rev::Shader<UniformsColor>;
-using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
+using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
+using ShaderEditorBackground = libv::rev::Shader<UniformsEditorBackground>;
 using ShaderFleet = libv::rev::Shader<UniformsFleet>;
+using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
+using ShaderText = libv::rev::Shader<UniformsText>;
 //using ShaderModel = libv::rev::Shader<UniformsModel>;
 //using Shader = libv::rev::Shader<>;
 

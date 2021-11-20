@@ -3,11 +3,15 @@
 // hpp
 #include <space/renderer.hpp>
 // libv
-#include <libv/ui/ui.hpp>
-#include <libv/ui/event_hub.hpp>
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
 #include <libv/math/noise/white.hpp>
+#include <libv/ui/context/context_ui.hpp>
+#include <libv/ui/event_hub.hpp>
+#include <libv/ui/font_2D.hpp>
+#include <libv/ui/ui.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/vm4/load.hpp>
 // pro
 //#include <space/view/camera.hpp>
 //#include <space/command.hpp>
@@ -15,10 +19,6 @@
 //#include <space/playout.hpp>
 //#include <space/universe/universe.hpp>
 #include <space/log.hpp>
-
-
-#include <libv/vm4/load.hpp>
-#include <libv/utility/read_file.hpp>
 
 
 
@@ -52,15 +52,15 @@ RendererEditorBackground::RendererEditorBackground(RendererResourceContext& rctx
 	}
 }
 
-void RendererEditorBackground::render(libv::glr::Queue& gl, libv::vec2f canvas_size) {
-	gl.program(shader.program());
+void RendererEditorBackground::render(libv::glr::Queue& glr, libv::vec2f canvas_size) {
+	glr.program(shader.program());
 	const auto bg_noise = libv::vec4f(1, 1, 1, 0) * (5.f / 255.f);
 	const auto bg_color = libv::vec4f(0.098f, 0.2f, 0.298f, 1.0f);
-	gl.uniform(shader.uniform().render_resolution, canvas_size);
-	gl.uniform(shader.uniform().noise_scale, bg_noise);
-	gl.uniform(shader.uniform().base_color, bg_color);
-	gl.texture(background_texture_pattern, textureChannel_pattern);
-	gl.render(mesh_background);
+	glr.uniform(shader.uniform().render_resolution, canvas_size);
+	glr.uniform(shader.uniform().noise_scale, bg_noise);
+	glr.uniform(shader.uniform().base_color, bg_color);
+	glr.texture(background_texture_pattern, textureChannel_pattern);
+	glr.render(mesh_background);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -257,7 +257,7 @@ void RendererCommandArrow::rebuild_mesh() {
 	//	});
 }
 
-void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
+void RendererCommandArrow::render(libv::glr::Queue& glr, libv::vec2f canvas_size, libv::glr::UniformBuffer& uniform_stream) {
 	rebuild_mesh();
 
 	// TODO P2: This will require to re upload to VAO every render
@@ -269,18 +269,18 @@ void RendererCommandArrow::render(libv::glr::Queue& gl, libv::vec2f canvas_size,
 	//			and/or Command arrows could be merged into a single VAO and use sub-meshes to render
 
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
+	uniforms[layout_matrices.matMVP] = glr.mvp();
+	uniforms[layout_matrices.matM] = glr.model;
+	uniforms[layout_matrices.matP] = glr.projection;
+	uniforms[layout_matrices.eye] = glr.eye();
 
-	gl.program(shader.program());
-	gl.uniform(std::move(uniforms));
-	gl.uniform(shader.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
-	gl.uniform(shader.uniform().render_resolution, canvas_size);
-	gl.uniform(shader.uniform().test_mode, global_test_mode);
-	gl.uniform(shader.uniform().time, global_time);
-	gl.render(mesh);
+	glr.program(shader.program());
+	glr.uniform(std::move(uniforms));
+	glr.uniform(shader.uniform().color, libv::vec4f(1.0f, 1.0f, 1.0f, 1.0f));
+	glr.uniform(shader.uniform().render_resolution, canvas_size);
+	glr.uniform(shader.uniform().test_mode, global_test_mode);
+	glr.uniform(shader.uniform().time, global_time);
+	glr.render(mesh);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -468,41 +468,41 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 	}
 }
 
-void RendererDebug::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererDebug::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	// !!! P3: Rebuild is too expensive on each frame
 
 	build_points_mesh(mesh_point);
 	build_lines_mesh(mesh_line);
 	build_triangles_mesh(mesh_triangle);
 
-	gl.program(shader.program());
+	glr.program(shader.program());
 
 	{
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh_triangle);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh_triangle);
 	}
 	{
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh_line);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh_line);
 	}
 	{
 		auto uniforms = uniform_stream.block_unique(layout_matrices);
-		uniforms[layout_matrices.matMVP] = gl.mvp();
-		uniforms[layout_matrices.matM] = gl.model;
-		uniforms[layout_matrices.matP] = gl.projection;
-		uniforms[layout_matrices.eye] = gl.eye();
-		gl.uniform(std::move(uniforms));
-		gl.render(mesh_point);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh_point);
 	}
 }
 
@@ -537,16 +537,16 @@ void RendererGizmo::build_gizmo_lines(libv::glr::Mesh& mesh) {
 	index.line(4, 5);
 }
 
-void RendererGizmo::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererGizmo::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
+	uniforms[layout_matrices.matMVP] = glr.mvp();
+	uniforms[layout_matrices.matM] = glr.model;
+	uniforms[layout_matrices.matP] = glr.projection;
+	uniforms[layout_matrices.eye] = glr.eye();
 
-	gl.program(shader.program());
-	gl.uniform(std::move(uniforms));
-	gl.render(mesh);
+	glr.program(shader.program());
+	glr.uniform(std::move(uniforms));
+	glr.render(mesh);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -565,16 +565,16 @@ RendererEditorGrid::RendererEditorGrid(RendererResourceContext& rctx) :
 	index.quad(0, 3, 2, 1); // Back face quad
 }
 
-void RendererEditorGrid::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream) {
+void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream) {
 	auto uniforms = uniform_stream.block_unique(layout_matrices);
-	uniforms[layout_matrices.matMVP] = gl.mvp();
-	uniforms[layout_matrices.matM] = gl.model;
-	uniforms[layout_matrices.matP] = gl.projection;
-	uniforms[layout_matrices.eye] = gl.eye();
+	uniforms[layout_matrices.matMVP] = glr.mvp();
+	uniforms[layout_matrices.matM] = glr.model;
+	uniforms[layout_matrices.matP] = glr.projection;
+	uniforms[layout_matrices.eye] = glr.eye();
 
-	gl.program(shader.program());
-	gl.uniform(std::move(uniforms));
-	gl.render(mesh_grid);
+	glr.program(shader.program());
+	glr.uniform(std::move(uniforms));
+	glr.render(mesh_grid);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -596,8 +596,145 @@ void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 
 // -------------------------------------------------------------------------------------------------
 
+RendererText::RendererText(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "font_2D.vs", "font_2D.fs") {
+}
+
+void RendererText::add_text(
+			libv::vec3f position,
+			libv::vec2f screenOffset,
+			std::string str,
+			libv::vec4f color,
+			libv::ui::FontSize fontSize,
+			libv::ui::AlignHorizontal alignH,
+			libv::ui::AlignVertical alignV) {
+
+	texts.emplace_back(
+			position,
+			screenOffset,
+			color,
+			libv::ui::TextLayout(
+					font,
+					fontSize,
+					alignH,
+					alignV,
+					std::move(str)
+			)
+	);
+}
+
+void RendererText::clear_texts() {
+	texts.clear();
+}
+
+void RendererText::add_debug_coordinates_if_nothing_else() {
+	if (!texts.empty())
+		return;
+
+	add_text({0, 0, 0}, {0, 0}, "(0, 0, 0)");
+	add_text({5, 0, 0}, {0, 0}, "(5, 0, 0)");
+	add_text({0, 5, 0}, {0, 0}, "(0, 5, 0)");
+	add_text({0, 0, 5}, {0, 0}, "(0, 0, 5)");
+	add_text({-5, 0, 0}, {0, 0}, "(-5, 0, 0)", {1, 0.4f, 0.4f, 1});
+	add_text({0, -5, 0}, {0, 0}, "(0, -5, 0)", {0.4f, 1, 0.4f, 1});
+	add_text({0, 0, -5}, {0, 0}, "(0, 0, -5)", {0.4f, 0.4f, 1, 1});
+}
+
+void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const CameraPlayer::screen_picker& screen_picker) {
+
+//	auto& task = std::get<ImplContextRender::TaskUI>(context.tasks.emplace_back(
+//			std::in_place_type<ImplContextRender::TaskUI>,
+//			glr.state.state(),
+//			shader->base_ref(),
+//			font->texture().base_ref(),
+//			context.uniform_stream.block_stream(layout_UIInfo),
+//			static_cast<uint32_t>(base_vertex),
+//			static_cast<uint32_t>(base_index),
+//			static_cast<uint32_t>(num_index)
+//	));
+//
+//	task.uniform_block[layout_UIInfo.matMVP] = glr.mvp().translate({pos, 0});
+//	task.uniform_block[layout_UIInfo.matM] = glr.model.top().translate_copy({pos, 0});
+//	task.uniform_block[layout_UIInfo.clip_pos] = clip_pos;
+//	task.uniform_block[layout_UIInfo.clip_size] = clip_size;
+//	task.uniform_block[layout_UIInfo.component_pos] = current_component.layout_position2();
+//	task.uniform_block[layout_UIInfo.component_size] = current_component.layout_size2();
+//	task.uniform_block[layout_UIInfo.mouse_position] = context.mouse_position;
+//	task.uniform_block[layout_UIInfo.ui_size] = context.ui_size;
+//	task.uniform_block[layout_UIInfo.time_frame] = context.current_time;
+
+	const auto guard_p = glr.projection.push_guard();
+	const auto guard_v = glr.view.push_guard();
+
+	glr.projection = libv::mat4f::ortho({0, 0}, screen_picker.canvas_size(), -1000, +1000);
+	glr.view = libv::mat4f::identity();
+
+	{
+		mesh.clear();
+
+		auto position = mesh.attribute(attribute_position); // Character quad vertex positions
+		//	texture0_tiles.insert(context.vtx_texture0_tiles.end(), num_vertex, libv::vec4f(0, 0, 1, 1));
+		auto texture0 = mesh.attribute(attribute_texture0);
+		auto color0 = mesh.attribute(attribute_color0);
+		auto positionOffset = mesh.attribute(attribute_custom0); // Whole text position offset (so we don't have to use uniforms, and it can be a single pass)
+		auto index = mesh.index();
+
+		auto vi_offset = libv::glr::VertexIndex{0};
+		for (auto& entry : texts) {
+			const auto content_size = entry.layout.content(-1, -1);
+			entry.layout.limit(content_size);
+			const auto& vd = entry.layout.vertices_data();
+
+			const auto alignment_offset =
+					entry.screenOffset +
+					content_size *
+					libv::vec2f(
+						-info(entry.layout.align_vertical()).rate(),
+						-info(entry.layout.align_horizontal()).rate());
+
+			const auto [position2DAnchor, onScreen] = screen_picker.to_screen_ahead(entry.position);
+			if (!onScreen)
+				continue;
+
+			position.append_from_range(vd.positions);
+			texture0.append_from_range(vd.texture0s);
+			color0.append_n_times(vd.positions.size(), entry.color);
+			positionOffset.append_n_times(vd.positions.size(), libv::vec4f{alignment_offset + position2DAnchor, 0, 0});
+			index.append_from_range(vd.indices);
+
+			for (auto& i : index.view_last(vd.indices.size()))
+				i += vi_offset;
+
+			vi_offset += static_cast<libv::glr::VertexIndex>(vd.positions.size());
+		}
+	}
+
+	const auto guard_s = glr.state.push_guard();
+
+	glr.state.blendSrc_Source1Color();
+	glr.state.blendDst_One_Minus_Source1Color();
+	glr.state.disableDepthTest();
+	glr.state.disableDepthMask();
+
+	auto uniforms = uniform_stream.block_unique(layout_matrices);
+	uniforms[layout_matrices.matMVP] = glr.mvp();
+	uniforms[layout_matrices.matM] = glr.model;
+	uniforms[layout_matrices.matP] = glr.projection;
+	uniforms[layout_matrices.eye] = glr.eye();
+
+	glr.program(shader.program());
+	glr.texture(font->texture().base_ref(), textureChannel_diffuse);
+//	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
+//	glr.uniform(shader.uniform().selected, selected);
+	glr.uniform(std::move(uniforms));
+	glr.render(mesh);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 Renderer::Renderer(libv::ui::UI& ui) {
 	resource_context.shader_loader.attach_libv_ui_hub(ui.event_hub());
+	text.font = ui.context().font("consola.ttf");
 }
 
 void Renderer::prepare_for_render(libv::glr::Queue& glr) {

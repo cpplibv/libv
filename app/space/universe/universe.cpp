@@ -50,7 +50,7 @@ void Universe::process(CTO_FleetMove&& cto) {
 	// TODO P3: Use a command API of the fleet
 	for (const auto& fleetID : selectedFleetIDList) {
 		fleets[+fleetID].commands.clear();
-		fleets[+fleetID].commands.emplace_back(cto.target_position, Fleet::CommandType::movement);
+		fleets[+fleetID].commands.emplace_back(cto.target_position, FleetCommandType::movement);
 	}
 }
 
@@ -59,7 +59,7 @@ void Universe::process(CTO_FleetQueueMove&& cto) {
 	// Bound check
 	// TODO P3: Use the command API of the fleet
 	for (const auto& fleetID : selectedFleetIDList) {
-		fleets[+fleetID].commands.emplace_back(cto.target_position, Fleet::CommandType::movement);
+		fleets[+fleetID].commands.emplace_back(cto.target_position, FleetCommandType::movement);
 	}
 }
 
@@ -88,7 +88,7 @@ void Universe::process(CTO_Shuffle&& cto) {
 	for (size_t i = 0; i < positions.size(); ++i) {
 		auto& fleet = fleets[i];
 		fleet.commands.clear();
-		fleet.commands.emplace_back(positions[i], dst(rng) ? Fleet::CommandType::movement : Fleet::CommandType::attack);
+		fleet.commands.emplace_back(positions[i], dst(rng) ? FleetCommandType::movement : FleetCommandType::attack);
 	}
 }
 

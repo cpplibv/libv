@@ -50,6 +50,11 @@ private:
 	libv::vec2f content_bounding_size_;
 
 public:
+	TextLayout() = default;
+	TextLayout(std::shared_ptr<Font2D> font, FontSize fontSize, AlignHorizontal alignH, AlignVertical alignV, std::string string) :
+		font_(std::move(font)), fontSize_(fontSize), align_horizontal_(alignH), align_vertical_(alignV), string_(std::move(string)) {}
+
+public:
 	void align_horizontal(const AlignHorizontal align);
 	void align_vertical(const AlignVertical align);
 	void font(std::shared_ptr<Font2D> font);

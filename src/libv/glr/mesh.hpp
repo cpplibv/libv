@@ -89,22 +89,13 @@ public:
 	}
 
 	template <typename T>
-	inline void push_back_all(const std::span<const T> values) {
-		const auto size = data_.size();
-		const auto count = values.size();
-
-		data_.resize(size + sizeof(T) * count);
-		std::memcpy(data_.data() + size, values.data(), sizeof(T) * count);
-	}
-
-	template <typename T>
 	inline T& at(size_t index) {
 		return *(data<T>() + index);
 	}
 };
 using RemoteMeshAttributes = boost::container::small_vector<RemoteMeshAttribute, 4>;
 
-struct RemoteMeshIndecies {
+struct RemoteMeshIndices {
 	libv::gl::ArrayBuffer buffer;
 	std::vector<VertexIndex> data;
 };
@@ -119,7 +110,7 @@ struct RemoteMesh {
 	VertexIndex count = 0;
 
 	libv::gl::VertexArray vao;
-	RemoteMeshIndecies indices;
+	RemoteMeshIndices indices;
 	RemoteMeshAttributes attributes;
 
 	libv::gl::Primitive primitive = libv::gl::Primitive::Triangles;
@@ -164,17 +155,34 @@ public:
 		return static_cast<CRTP&>(*this);
 	}
 	inline CRTP& operator()(const std::span<const T> values) {
-		ptr[ptr_index].push_back_all<T>(values);
+		this->append_from_range(values);
 		return static_cast<CRTP&>(*this);
 	}
 
-	template <typename Range>
-	inline CRTP& set_from_range(const Range& range) {
-		static_assert(std::is_same_v<typename Range::value_type, value_type>);
+	inline CRTP& set_from_range(const std::span<const value_type> range) {
 		ptr[ptr_index].resize<T>(range.size());
 		void* dst = ptr[ptr_index].data<T>();
 		const void* src = range.data();
 		std::memcpy(dst, src, range.size() * sizeof(value_type));
+		return static_cast<CRTP&>(*this);
+	}
+
+	inline CRTP& append_from_range(const std::span<const value_type> range) {
+		const auto originalSize = ptr[ptr_index].size<T>();
+		ptr[ptr_index].resize<T>(originalSize + range.size());
+		void* dst = ptr[ptr_index].data<T>() + originalSize;
+		const void* src = range.data();
+		std::memcpy(dst, src, range.size() * sizeof(value_type));
+		return static_cast<CRTP&>(*this);
+	}
+
+	inline CRTP& append_n_times(size_t count, const value_type value) {
+		const auto originalSize = ptr[ptr_index].size<T>();
+		ptr[ptr_index].resize<T>(originalSize + count);
+		T* dst = ptr[ptr_index].data<T>() + originalSize;
+		const T* end = dst + count;
+		for (; dst != end; ++dst)
+			*dst = value;
 		return static_cast<CRTP&>(*this);
 	}
 
@@ -257,10 +265,10 @@ public:
 	using value_type = VertexIndex;
 
 private:
-	RemoteMeshIndecies& ref;
+	RemoteMeshIndices& ref;
 
 public:
-	MeshIndices(RemoteMeshIndecies& ref) : ref(ref) { }
+	explicit MeshIndices(RemoteMeshIndices& ref) : ref(ref) { }
 
 public:
 	inline MeshIndices& operator()(const VertexIndex i0) {
@@ -272,7 +280,7 @@ public:
 		return *this;
 	}
 	inline MeshIndices& operator()(const std::span<const VertexIndex> indices) {
-		libv::insert_all(ref.data, indices);
+		this->append_from_range(indices);
 		return *this;
 	}
 
@@ -301,11 +309,16 @@ public:
 		return *this;
 	}
 
-	template <typename Range>
-	inline MeshIndices& set_from_range(const Range& range) {
-		static_assert(std::is_same_v<typename Range::value_type, value_type>);
+	inline MeshIndices& set_from_range(const std::span<const value_type> range) {
 		ref.data.resize(range.size());
-		std::memcpy(ref.data.data(), range.data(), (range.size() * sizeof(value_type)));
+		std::memcpy(ref.data.data(), range.data(), range.size() * sizeof(value_type));
+		return *this;
+	}
+
+	inline MeshIndices& append_from_range(const std::span<const value_type> range) {
+		const auto originalSize = ref.data.size();
+		ref.data.resize(originalSize + range.size());
+		std::memcpy(ref.data.data() + originalSize, range.data(), range.size() * sizeof(value_type));
 		return *this;
 	}
 

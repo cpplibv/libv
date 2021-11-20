@@ -2,6 +2,8 @@
 
 // hpp
 #include <space/view/canvas.hpp>
+// ext
+#include <fmt/format.h>
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
@@ -31,21 +33,21 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-RendererCommandArrow::ArrowStyle convert_to_arrow_style(Fleet::CommandType type) {
+RendererCommandArrow::ArrowStyle convert_to_arrow_style(FleetCommandType type) {
 	//	const vec4 base_color_c = vec4(0.48, 0.65, 0.70, 0.5);
 	//	const vec4 base_color_r = vec4(0.80, 0.30, 0.30, 0.5);
 	//	const vec4 base_color_g = vec4(0.42, 0.75, 0.40, 0.5);
 	//	const vec4 base_color_p = vec4(0.38, 0.38, 0.40, 0.3);
 	switch (type) {
-//	case Fleet::CommandType::attack:   return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0.7, 0.4, 0, 1)};
-//	case Fleet::CommandType::movement: return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
-	case Fleet::CommandType::attack:
+//	case FleetCommandType::attack:   return {libv::vec4f(1, 0, 0, 1), libv::vec4f(0.7, 0.4, 0, 1)};
+//	case FleetCommandType::movement: return {libv::vec4f(0, 1, 0, 1), libv::vec4f(0, 0, 1, 1)};
+	case FleetCommandType::attack:
 		return {libv::vec4f(0.80f, 0.30f, 0.30f, 0.5f), libv::vec4f(0.80f, 0.30f, 0.30f, 0.5f)};
-	case Fleet::CommandType::movement:
+	case FleetCommandType::movement:
 		return {libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f), libv::vec4f(0.48f, 0.65f, 0.70f, 0.5f)};
 	}
 
-	assert(false && "Invalid Fleet::CommandType enum value");
+	assert(false && "Invalid FleetCommandType enum value");
 	return {libv::vec4f(1, 0, 1, 1), libv::vec4f(1, 0, 1, 1)};
 }
 
@@ -135,6 +137,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	glr.view = camera.view();
 	glr.model = libv::mat4f::identity();
 
+	// Set framebuffer to the post-processing target
 	glr.framebuffer_draw(renderTarget.framebuffer());
 
 	glr.clearColor();
@@ -151,10 +154,15 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 	// --- Render Opaque ---
 
+	// TODO P1: Find a better way of managing text (and debug shape) lifetimes
+	renderer.text.clear_texts();
+
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(fleet.position);
 		glr.model.scale(0.2f);
+
+		std::string fleetLabel;
 
 		if (!fleet.commands.empty()) {
 			const auto direction = normalize(fleet.commands.front().target - fleet.position);
@@ -166,7 +174,17 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 			glr.model.rotate(libv::Radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
 			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
+
+			fleetLabel = fmt::format("Fleet {}\nI:{} D:{:.2f}", +fleet.id, +fleet.commands.front().type, (fleet.commands.front().target - fleet.position).length());
+		} else {
+			fleetLabel = fmt::format("Fleet {}", +fleet.id);
 		}
+
+		renderer.text.add_text(
+				fleet.position,
+				libv::vec2f{0, -15.f},
+				std::move(fleetLabel)
+		);
 
 		const auto isSelected = universe.selectedFleetIDList.contains(fleet.id);
 		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, isSelected);
@@ -261,10 +279,18 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		}
 	}
 
+	// --- Post Processing ---
+
 	const auto& mainTexture = renderTarget.resolve(glr);
 	postProcessing.pass(glr, mainTexture);
 
-//	glr.framebuffer_draw_default();
+	// Post-Processing sets the framebuffer back to the default
+	// glr.framebuffer_draw_default();
+
+	// --- Text ---
+
+	renderer.text.add_debug_coordinates_if_nothing_else();
+	renderer.text.render(glr, renderer.resource_context.uniform_stream, screen_picker);
 }
 
 // -------------------------------------------------------------------------------------------------

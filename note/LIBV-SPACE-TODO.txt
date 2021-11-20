@@ -47,6 +47,7 @@ app.space: Default focus canvas
 app.space: Add Controls help overlay (Simple, list only)
 app.space: Fleet visualisation with a simple model and orientation
 libv.rev: Bloom textures should not repeat, they could clamp
+app.space: Implement basic 2D text rendering over a 3D anchor point
 
 
 
@@ -69,19 +70,13 @@ libv.rev: Bloom textures should not repeat, they could clamp
 
 
 
-
-app.space: Model loading failure causes silent error and soft-lock
-
-
 Main areas of focus: Cost / Value
-	 8 / 3: Visual: Debug renderer text (2D Label on a 3D point)
-	 8 / 1: Visual: Fleet name (2D Label)
+	 2 / 6: Network: 'Universe' Snapshot
+	 		\ Need for unsynchronized / non-snapshot members in Universe
 
 	20 / 2: UI: Card layout
 
 	40 / 6: Control: Ctrl box selection support
-	 2 / 6: Network: 'Universe' Snapshot
-	 		\ Need for unsynchronized / non-snapshot members in Universe
 
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
@@ -96,8 +91,11 @@ Main areas of focus: Cost / Value
 			| Maybe mouse movement only | Dont think so
 			\ Should be a mouse order issue
 
+	Bug P3: app.space: Model loading failure causes silent error and soft-lock
+			\ Who catches that exception and why?
 	Bug P5: libv.gl: missing file name replacement
 			2090909000(33) : error C7011: implicit cast from "vec4" to "vec3"
+
 
 libv.rev: PostProcess should respect original framebuffer and viewport values
 
@@ -110,9 +108,12 @@ libv.ctrl: Box selection support
 			[hold]
 		end
 			[release]
+libv.ctrl: Accidental collusion with Ctrl+A[press] and A[hold]
+
 libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
 libv.ctrl: 'Acquire "mouse"' similarly as UI does it
 
+libv.ui: UI: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
 
 
 
