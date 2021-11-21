@@ -10,6 +10,7 @@
 #include <space/log.hpp>
 #include <space/network/codec.hpp>
 #include <space/playout.hpp>
+#include <space/universe/universe.hpp>
 #include <space/user.hpp>
 
 
@@ -17,9 +18,10 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-NetworkLobby::NetworkLobby(GameThread& game_thread, Playout& playout, User& hosting_user) :
+NetworkLobby::NetworkLobby(GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user) :
 	game_thread(game_thread),
-	playout(playout) {
+	playout(playout),
+	universe(universe) {
 
 	// Self join the hosted lobby
 	const auto program_version = 0; // TODO P1: Fetch global version
@@ -47,6 +49,9 @@ void NetworkLobby::join(libv::net::mtcp::Connection<NetworkPeer> peer, std::stri
 
 	lobby.process(std::move(join_event));
 	peer.connection().send_async(network_encode(static_cast<SnapshotLobby&>(lobby)));
+	peer.connection().send_async(network_encode(static_cast<SnapshotUniverse&>(universe)));
+//	peer.connection().send_async(network_encode(SnapshotUniverse(universe)));
+//	peer.connection().send_async(network_encode(universe));
 
 	// TODO P1: Universe Snapshot here (after lobby snapshot are done, but maybe not in the same "task"). Maybe even async it
 }
@@ -191,8 +196,8 @@ void AcceptorHandler::on_accept(error_code ec) {
 
 // =================================================================================================
 
-NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, User& hosting_user) :
-	self(std::make_unique<ImplNetworkServer>(std::make_shared<NetworkLobby>(game_thread, playout, hosting_user))) {
+NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user) :
+	self(std::make_unique<ImplNetworkServer>(std::make_shared<NetworkLobby>(game_thread, playout, universe, hosting_user))) {
 
 	if (auto ec = self->acceptor.acceptor().listen(server_port, 4))
 		throw std::system_error(ec);

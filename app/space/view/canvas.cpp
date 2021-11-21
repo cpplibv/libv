@@ -163,7 +163,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(fleet.position);
-		glr.model.scale(pickingInfoFleet.radius_universe);
+		glr.model.scale(Fleet::pickingType.radius_universe);
 
 		std::string fleetLabel;
 

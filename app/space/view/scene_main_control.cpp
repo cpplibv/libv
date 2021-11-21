@@ -16,12 +16,51 @@
 #include <space/view/scene_main.hpp>
 
 
+
+// Save/Load related
+#include <libv/serial/archive/binary.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/write_file.hpp>
+#include <space/game_session.hpp>
+#include <space/universe/universe.hpp>
+
+
+
 namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
 void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
-	controls.feature_binary<app::SceneMain>("space.show_controls", [](libv::ctrl::arg_binary& arg, SceneMain& ctx) {
+	controls.feature_action<app::SceneMain>("space.save", [](libv::ctrl::arg_action, SceneMain& ctx) {
+		std::vector<std::byte> save_data;
+
+		{
+			libv::archive::Binary::output oar(save_data);
+			ctx.game_session->universe.save(oar);
+			// ctx.game_session->playout.save(oar);
+		}
+
+		libv::write_file_or_throw("universe.sav", save_data);
+		// <<< handle write error
+
+		// TODO P4: Place / folder of save file, async write file, more logging, event on saving
+		log_space.info("Saved: {}", "universe.sav");
+	});
+
+	controls.feature_action<app::SceneMain>("space.load", [](libv::ctrl::arg_action, SceneMain& ctx) {
+		const auto save_data = libv::read_file_or_throw("universe.sav");
+		// <<< handle read error
+
+		{
+			libv::archive::Binary::input iar(save_data);
+			ctx.game_session->universe.load(iar);
+			// ctx.game_session->playout.load(iar);
+		}
+
+		log_space.info("Loaded: {}", "universe.sav");
+	});
+
+	controls.feature_binary<app::SceneMain>("space.show_controls", [](libv::ctrl::arg_binary arg, SceneMain& ctx) {
 		if (arg.value) {
 			std::ostringstream os;
 
@@ -39,7 +78,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 			if (!text.empty())
 				text.pop_back(); // Discard the last \n character
 
-			app::log_space.trace("Controls:\n{}", text);
+			log_space.trace("Controls:\n{}", text);
 
 			libv::ui::Label label("help-controls");
 			label.style("space.overlay.controls-help.lbl");
@@ -54,6 +93,8 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 void SceneMainControl::bind_default_controls(libv::ctrl::Controls& controls) {
 	controls.bind("space.show_controls", "F1");
+	controls.bind("space.save", "F5");
+	controls.bind("space.load", "F6");
 }
 
 // -------------------------------------------------------------------------------------------------

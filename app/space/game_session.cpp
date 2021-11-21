@@ -62,7 +62,7 @@ public:
 	MultiPlayerClient(GameThread& game_thread, libv::Nexus& nexus, std::string server_address, uint16_t server_port, User& user) :
 		GameSession(nexus, client),
 		// <<< network client reference is passed before its init ran, (should not be an issue now, but not nice)
-		client(std::move(server_address), server_port, game_thread, playout, user) {
+		client(std::move(server_address), server_port, game_thread, playout, universe, user) {
 	}
 
 	virtual ~MultiPlayerClient() {
@@ -79,7 +79,7 @@ public:
 	MultiPlayerServer(GameThread& game_thread, libv::Nexus& nexus, uint16_t port, User& user) :
 		GameSession(nexus, server),
 		// <<< network server reference is passed before its init ran, (should not be an issue now, but not nice)
-		server(port, game_thread, playout, user) {
+		server(port, game_thread, playout, universe, user) {
 	}
 
 	virtual ~MultiPlayerServer() {

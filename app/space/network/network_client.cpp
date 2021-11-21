@@ -28,6 +28,7 @@ private:
 
 	GameThread& game_thread;
 	Playout& playout;
+	Universe& universe;
 	Lobby lobby{game_thread};
 
 private:
@@ -36,9 +37,10 @@ public:
 	bool disconnectExpected = false;
 
 public:
-	inline ConnectionHandler(std::string_view server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout) :
+	inline ConnectionHandler(std::string_view server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Universe& universe) :
 			game_thread(game_thread),
 			playout(playout),
+			universe(universe),
 			name(std::move(name)) {
 		connection.connect_async(libv::net::Address(server_address, server_port));
 	}
@@ -73,7 +75,12 @@ private:
 				if constexpr(std::is_same_v<T, SnapshotLobby>)
 					lobby.process(std::move(message));
 
-				else  if constexpr(requires { typename T::lobby_command; })
+				else if constexpr(std::is_same_v<T, SnapshotUniverse>)
+					game_thread.execute([&, snapshot = std::move(message)] {
+						static_cast<SnapshotUniverse&>(universe) = std::move(snapshot);
+					});
+
+				else if constexpr(requires { typename T::lobby_command; })
 					lobby.process(std::move(message));
 
 				else if constexpr(requires { typename T::state_command; })
@@ -128,14 +135,14 @@ struct ImplNetworkClient {
 	libv::net::IOContext io_context{2};
 	Connection connection;
 
-	ImplNetworkClient(std::string server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout) :
-			connection(io_context, std::move(server_address), server_port, std::move(name), game_thread, playout) {}
+	ImplNetworkClient(std::string server_address, uint16_t server_port, std::string name, GameThread& game_thread, Playout& playout, Universe& universe) :
+			connection(io_context, std::move(server_address), server_port, std::move(name), game_thread, playout, universe) {}
 };
 
 // =================================================================================================
 
-NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, User& user) :
-		self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, user.name, game_thread, playout)) {
+NetworkClient::NetworkClient(std::string server_address, uint16_t server_port, GameThread& game_thread, Playout& playout, Universe& universe, User& user) :
+		self(std::make_unique<ImplNetworkClient>(std::move(server_address), server_port, user.name, game_thread, playout, universe)) {
 }
 
 NetworkClient::~NetworkClient() {

@@ -4,6 +4,8 @@
 
 // fwd
 #include <space/fwd.hpp>
+// libv
+#include <libv/serial/archive/binary_fwd.hpp>
 // std
 #include <memory>
 #include <mutex>
@@ -77,6 +79,10 @@ public:
 			stateChangeEntries.emplace_back(std::move(cto), ApplyFunc<CTO>::call);
 		}
 	}
+
+//public:
+//	void save(libv::archive::Binary::output& ar) const;
+//	void load(libv::archive::Binary::input& ar);
 
 public:
 	//void update_to(TickIndex nextTickIndex)

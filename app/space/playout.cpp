@@ -2,9 +2,21 @@
 
 // hpp
 #include <space/playout.hpp>
+// libv
+#include <libv/serial/archive/binary.hpp>
 
 
 namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+//void Playout::save(libv::archive::Binary::output& ar) const {
+//	const_cast<Playout*>(this)->serialize(ar);
+//}
+//
+//void Playout::load(libv::archive::Binary::input& ar) {
+//	serialize(ar);
+//}
 
 // -------------------------------------------------------------------------------------------------
 

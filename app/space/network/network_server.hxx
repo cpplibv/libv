@@ -34,10 +34,11 @@ private:
 public:
 	GameThread& game_thread;
 	Playout& playout;
+	Universe& universe;
 	Lobby lobby{game_thread};
 
 public:
-	explicit NetworkLobby(GameThread& game_thread, Playout& playout, User& hosting_user);
+	explicit NetworkLobby(GameThread& game_thread, Playout& playout, Universe& universe, User& hosting_user);
 
 private:
 	void _broadcast(std::vector<std::byte>&& msg);

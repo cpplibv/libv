@@ -8,6 +8,13 @@
 #include <boost/container/flat_set.hpp>
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/math/vec_serial.hpp>
+#include <libv/serial/archive/binary_fwd.hpp>
+#include <libv/serial/codec_message_id.hpp>
+#include <libv/serial/serial.hpp>
+#include <libv/serial/types/boost_flat_map.hpp>
+#include <libv/serial/types/boost_flat_set.hpp>
+#include <libv/serial/types/std_vector.hpp>
 #include <libv/ui/chrono.hpp>
 // std
 #include <map>
@@ -25,8 +32,6 @@ struct ScreenPickableType {
 	float radius_screen;
 };
 
-constexpr inline ScreenPickableType pickingInfoFleet{0.2f, 50.f};
-
 // -------------------------------------------------------------------------------------------------
 
 enum class FleetCommandType {
@@ -36,58 +41,60 @@ enum class FleetCommandType {
 //		merge,
 //		block,
 //		land,
+//		repair,
+//		upgrade,
 //		...,
 };
 [[nodiscard]] constexpr inline auto operator+(FleetCommandType e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
 
-//struct Fleet : ScreenPickable {
 struct Fleet {
+public:
+	static constexpr inline ScreenPickableType pickingType{0.2f, 50.f};
+
+public:
 	enum class SelectionStatus : int32_t {
 		not_selected = 0,
-//		unselected = 0,
-		intersected = 3,
-		hoover = 2,
 		selected = 1,
+		hoover = 2,
+		intersected = 3,
 	};
-//	ScreenPickableType* screen_pick_type;
 
-//	enum class FleetState {
-//		idle,
-//		selected
-//
-//	};
-//
+private:
 	struct Command {
 		libv::vec3f target;
 		FleetCommandType type;
 //		int32_t target;
+
+		template <class Archive> void serialize(Archive& ar) {
+			ar & LIBV_NVP(target);
+			ar & LIBV_NVP(type);
+		}
 	};
 
 public:
-	FleetID id;
+	FleetID id = invalidFleetID;
 	libv::vec3f position;
-//	bool selected;
 	std::vector<Command> commands;
 //	SelectionStatus selection_status;
-//	FleetState state;
+
 
 public:
-	explicit Fleet(FleetID id, libv::vec3f position) :
-	//		ScreenPickable(50.f, 100.f),
+	Fleet() = default; // For de-serialization only
+	Fleet(FleetID id, libv::vec3f position) :
 			id(id),
 			position(position) {}
 
 public:
-//	void queue_command(FleetCommandType type, libv::vec3f target) {
-//		commands.emplace_back(type, target);
-////		command_arrow.add(target, color);
-//	}
-//
-//	void queue_command(FleetCommandType type, int32_t target) {
-//
-//	}
+	template <class Archive> void serialize(Archive& ar) {
+		ar & LIBV_NVP(id);
+		ar & LIBV_NVP(position);
+		ar & LIBV_NVP(commands);
+	}
+
+//	void queue_command(FleetCommandType type, libv::vec3f target);
+//	void queue_command(FleetCommandType type, int32_t target);
 
 	[[nodiscard]] constexpr inline float animation_offset() const noexcept {
 		return static_cast<float>(id) * 13;
@@ -111,24 +118,37 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-struct Universe {
-//	float angle = 0.0f;
-//	float time = 0.0f;
-//	float test_sin_time = 0.0f;
-	FleetID nextFleetID{0};
-	boost::container::flat_set<FleetID> selectedFleetIDList;
-	std::map<FleetID, Fleet::SelectionStatus> fleetIdSelectionMap;
-//	FleetID selectedFleetID{noSelectionID or nullFleetID};
-	std::vector<Fleet> fleets;
+struct SnapshotUniverse {
+	static constexpr libv::serial::CodecMessageID id{0xC0};
 
 public:
-//	Universe() {
-//	}
+//	float time = 0.0f;
+//	float test_sin_time = 0.0f;
 
+	FleetID nextFleetID{0};
+	std::vector<Fleet> fleets;
+
+	boost::container::flat_set<FleetID> selectedFleetIDList;
+	boost::container::flat_map<FleetID, Fleet::SelectionStatus> fleetIdSelectionMap;
+
+	template <class Archive> void serialize(Archive& ar) {
+		ar & LIBV_NVP(nextFleetID);
+		ar & LIBV_NVP(fleets);
+		ar & LIBV_NVP(selectedFleetIDList);
+		ar & LIBV_NVP(fleetIdSelectionMap);
+	}
+};
+
+struct Universe : SnapshotUniverse {
+public:
 	void update(libv::ui::time_duration delta_time) {
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
+
+public:
+	void save(libv::archive::Binary::output& ar) const;
+	void load(libv::archive::Binary::input& ar);
 
 public:
 	void process(CTO_FleetSpawn&& message);

@@ -2,6 +2,8 @@
 
 // hpp
 #include <space/universe/universe.hpp>
+// libv
+#include <libv/serial/archive/binary.hpp>
 // std
 #include <algorithm>
 #include <random>
@@ -12,6 +14,16 @@
 
 
 namespace app {
+
+// -------------------------------------------------------------------------------------------------
+
+void Universe::save(libv::archive::Binary::output& ar) const {
+	const_cast<Universe*>(this)->serialize(ar);
+}
+
+void Universe::load(libv::archive::Binary::input& ar) {
+	serialize(ar);
+}
 
 // -------------------------------------------------------------------------------------------------
 

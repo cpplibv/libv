@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/serial/archive/binary_fwd.hpp>
 // ext
 #include <cereal/cereal.hpp>
 // libv
@@ -98,13 +100,6 @@ public:
 //		if (writtenSize != size)
 //			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Wrote " + std::to_string(writtenSize));
 	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
-struct Binary {
-	using input = BinaryInput;
-	using output = BinaryOutput;
 };
 
 // -------------------------------------------------------------------------------------------------

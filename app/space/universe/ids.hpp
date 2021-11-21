@@ -15,6 +15,8 @@ namespace app {
 enum class FactionID : int32_t {};
 enum class FleetID : int32_t {};
 
+constexpr inline FleetID invalidFleetID = FleetID{-1};
+
 [[nodiscard]] constexpr inline auto operator+(FactionID e) noexcept { return libv::to_underlying(e); }
 [[nodiscard]] constexpr inline auto operator+(FleetID e) noexcept { return libv::to_underlying(e); }
 

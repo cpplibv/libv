@@ -24,9 +24,6 @@ namespace {
 // -------------------------------------------------------------------------------------------------
 
 std::optional<FleetID> calculate_hit_fleet(SpaceCanvas& ctx) {
-	// TODO P2: Use a ScreenPickableType based dynamic values for screen picking
-	constexpr auto SECONDARY_HIT_MIN_PIXEL_DISTANCE = 100.f;
-
 	bool direct_hit = false;
 	std::optional<FleetID> fleet_id;
 
@@ -48,7 +45,7 @@ std::optional<FleetID> calculate_hit_fleet(SpaceCanvas& ctx) {
 			const auto objectSPosition = ctx.screen_picker.to_screen(fleet.position);
 			distance = (mouse_local_coord - objectSPosition).length();
 
-			if (distance < hover_distance && distance < SECONDARY_HIT_MIN_PIXEL_DISTANCE) {
+			if (distance < hover_distance && distance < Fleet::pickingType.radius_screen) {
 				fleet_id = fleet.id;
 				hover_distance = distance;
 			}
@@ -194,8 +191,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		std::vector<FleetID> selected_fleet_ids;
 		for (auto& fleet : ctx.universe.fleets) {
-			const auto result = frustum.sphereInFrustum(fleet.position, pickingInfoFleet.radius_universe);
-			log_space.info("result: {}", libv::to_underlying(result));
+			const auto result = frustum.sphereInFrustum(fleet.position, Fleet::pickingType.radius_universe);
 
 			switch (result) {
 			case Frustum::Position::OUTSIDE:
@@ -300,7 +296,6 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 			const auto line_c = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, C};
 			const auto line_d = SpaceCanvas::Line{eye + axis * ctx.camera.near() * 1.5f, D};
 
-			const auto line_color = libv::vec4f{0.9f, 0.2f, 0, 0.9f};
 			ctx.clear_debug_shapes();
 //			const auto count = 100;
 //			for (int i = 0 ; i < count ; ++i) {
@@ -312,6 +307,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 //			}
 
 
+//			const auto line_color = libv::vec4f{0.9f, 0.2f, 0, 0.9f};
 //			ctx.add_debug_line(line_a.a, line_a.b, line_color);
 //			ctx.add_debug_line(line_b.a, line_b.b, line_color);
 //			ctx.add_debug_line(line_c.a, line_c.b, line_color);

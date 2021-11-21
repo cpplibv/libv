@@ -12,6 +12,7 @@
 #include <space/cto.hpp>
 //#include <space/network/nto.hpp>
 #include <space/network/lobby.hpp> // TODO P2: Find a better place for SnapshotLobby
+#include <space/universe/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
 
 
 namespace app {
@@ -32,6 +33,8 @@ struct Codec : libv::serial::Codec3<Codec> {
 				create_entry<Ar, F, CTO_Introduction>(),
 
 				create_entry<Ar, F, SnapshotLobby>(),
+
+				create_entry<Ar, F, SnapshotUniverse>(),
 
 				create_entry<Ar, F, CTO_ChatMessage>(),
 				create_entry<Ar, F, CTO_ClientJoined>(),
