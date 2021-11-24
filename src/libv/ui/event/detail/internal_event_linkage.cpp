@@ -44,8 +44,10 @@ void internal_fire(Component& signal, libv::type_uid event_type, const void* eve
 }
 
 void internal_fire(CoreComponent* signal, libv::type_uid event_type, const void* event_ptr) {
-	// NOTE: isAttached() is an experiment to stop early events that would occur in setup (during attach) codes
-	if (signal->isAttached() && signal->isSignal())
+	// NOTE: isAttached() was an experiment to stop early events that would occur in setup (during attach) codes
+	//	if (signal->isAttached() && signal->isSignal())
+	//		| Result: This would not allow listeners to react to changed made before attach happens
+	if (signal->isSignal())
 		signal->context().event.fire(signal, event_type, event_ptr);
 }
 

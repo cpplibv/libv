@@ -4,7 +4,7 @@
 #include <libv/ui/component/panel_line.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/base_panel.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 
 
 namespace libv {
@@ -13,7 +13,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelLine : public CoreBasePanel {
-	friend class PanelLine;
+	friend PanelLine;
 	[[nodiscard]] inline auto handler() { return PanelLine{this}; }
 
 private:

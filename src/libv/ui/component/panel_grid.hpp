@@ -3,6 +3,7 @@
 #pragma once
 
 // pro
+#include <libv/ui/component/base_panel.hpp>
 #include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/column_count.hpp>
 #include <libv/ui/property/orientation2.hpp>
@@ -14,7 +15,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelGrid : public ComponentAPI<Component, PanelGrid, class CorePanelGrid, EventHostGeneral> {
+class PanelGrid : public ComponentAPI<BasePanel, PanelGrid, class CorePanelGrid, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "grid";
@@ -29,13 +30,6 @@ public:
 
 	void spacing2(Spacing2 value);
 	[[nodiscard]] Spacing2 spacing2() const noexcept;
-
-public:
-	void add(Component component);
-	void add_front(Component component);
-	void remove(Component& component);
-	void remove(std::string_view component_name);
-	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

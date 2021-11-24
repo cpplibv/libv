@@ -197,7 +197,7 @@ public:
 	}
 
 	template <typename Set, typename Get>
-	void synthetize(Set&& set, Get&& get, std::string_view group, std::string_view name, std::string_view description) {
+	void synthesize(Set&& set, Get&& get, std::string_view group, std::string_view name, std::string_view description) {
 //		static_assert(Set is callable with invoke result of Get);
 //		static_assert(Get yields a non void);
 

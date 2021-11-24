@@ -17,7 +17,7 @@
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
-#include <libv/ui/component/base_panel.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/layout/view_layouted.hxx>
@@ -30,7 +30,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CorePanelGrid : public CoreBasePanel {
-	friend class PanelGrid;
+	friend PanelGrid;
 	[[nodiscard]] inline auto handler() { return PanelGrid{this}; }
 
 private:
@@ -451,28 +451,6 @@ void PanelGrid::spacing2(Spacing2 value) {
 
 Spacing2 PanelGrid::spacing2() const noexcept{
 	return self().property.spacing2();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void PanelGrid::add(Component component) {
-	self().add(std::move(component));
-}
-
-void PanelGrid::add_front(Component component) {
-	self().add_front(std::move(component));
-}
-
-void PanelGrid::remove(Component& component) {
-	self().remove(component);
-}
-
-void PanelGrid::remove(std::string_view component_name) {
-	self().remove(component_name);
-}
-
-void PanelGrid::clear() {
-	self().clear();
 }
 
 // -------------------------------------------------------------------------------------------------

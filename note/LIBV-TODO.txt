@@ -259,7 +259,7 @@ libv.ui: clipboard access from ContextUI
 libv.ui.input_field: paste support
 libv.ui.input_field: copy support
 libv.ui.input_field: caret support
-libv.ui: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ? | Yep, implemented as synthetize property
+libv.ui: Is text is a component property that cannot be set from style, BUT it can be accessed dynamically in a uniform manner? | do I really have to implement a 'property' method ? | Yep, implemented as synthesize property
 libv.ui: String2D fix for new line (glyphless) mean no entry in the mesh for it | solved by hidden glyphs
 libv.ui: String2D fix new line before after glyph is not possible if there is no glyph in the line | solved by hidden glyphs
 libv.ui: String2D fix new line before after glyph bearing issue (test char '[') | solved by hidden glyphs
@@ -278,7 +278,7 @@ libv.ui: Make focus nullable
 libv.ui: Remove context_state.focus_ handling from ImplUI, remove ImplUI from ContextState
 libv.ui.input_field: caret mouse support
 libv.ui: String2D getClosestCharacterIndex should use pen position, some glyphs are all over the place
-libv.ui.input_field: synthetize caret property
+libv.ui.input_field: synthesize caret property
 libv.ui.input_field: mouse caret placement respect line
 libv.ui.input_field: fix that lines tend to snap down | Solved by determining that LineAdvance != LineHeight
 libv.ui: String2D API to find nearest character position

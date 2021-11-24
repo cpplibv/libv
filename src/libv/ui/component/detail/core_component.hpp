@@ -252,7 +252,15 @@ protected:
 public:
 	[[nodiscard]] bool isFloatRegion() const noexcept;
 
+private:
+	void auxEnableScan(bool value) noexcept;
+
 public:
+	void show(bool value) noexcept;
+	[[nodiscard]] bool show() const noexcept;
+	void enable(bool value) noexcept;
+	[[nodiscard]] bool enable() const noexcept;
+
 	void focus() noexcept;
 	void markRemove() noexcept;
 	void markInvalidLayout(bool invalidate_layout1, bool invalidate_parent_layout) noexcept;
@@ -274,7 +282,7 @@ private:
 	ContextStyle makeStyleContext() noexcept;
 
 private:
-	bool isFocusableComponent() const noexcept;
+	[[nodiscard]] bool isFocusableComponent() const noexcept;
 
 private:
 	static void eventChar(CoreComponent& component, const EventChar& event);
@@ -393,6 +401,9 @@ struct AccessParent {
 	}
 	static inline decltype(auto) isFocusableChild(const CoreComponent& component) {
 		return component.flags.match_any(Flag::focusableChild);
+	}
+	static inline decltype(auto) isPendingDetachSelf(const CoreComponent& component) {
+		return component.flags.match_any(Flag::pendingDetachSelf);
 	}
 	static inline decltype(auto) doFocusTraverse(CoreComponent& component, const ContextFocusTraverse& context, ChildID current) {
 		return component.doFocusTraverse(context, current);

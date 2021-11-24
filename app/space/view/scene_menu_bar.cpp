@@ -141,7 +141,7 @@ SceneMenuBar::~SceneMenuBar() {
 //
 //	namespace uic = libv::ui::component;
 //
-//	auto layers = libv::ui::PanelFloat("hud");
+//	auto layers = libv::ui::PanelAnchor("hud");
 //
 //	{
 //		auto canvas_main = layers.add_ns<uic::CanvasAdaptorT<SpaceCanvas>>(

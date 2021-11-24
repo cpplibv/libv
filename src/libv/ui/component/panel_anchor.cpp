@@ -1,14 +1,14 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_float.cpp
+// Project: libv.ui, File: src/libv/ui/component/panel_anchor.cpp
 
 // hpp
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/utility/approx.hpp>
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
-#include <libv/ui/component/base_panel.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/layout/view_layouted.hxx>
@@ -21,9 +21,9 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class CorePanelFloat : public CoreBasePanel {
-	friend class PanelFloat;
-	[[nodiscard]] inline auto handler() { return PanelFloat{this}; }
+class CorePanelAnchor : public CoreBasePanel {
+	friend PanelAnchor;
+	[[nodiscard]] inline auto handler() { return PanelAnchor{this}; }
 
 private:
 	struct Properties {
@@ -55,7 +55,7 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-void CorePanelFloat::access_properties(T& ctx) {
+void CorePanelAnchor::access_properties(T& ctx) {
 	ctx.property(
 			[](auto& c) -> auto& { return c.snap_to_edge; },
 			SnapToEdge{false},
@@ -71,26 +71,26 @@ void CorePanelFloat::access_properties(T& ctx) {
 }
 
 template <typename T>
-void CorePanelFloat::access_child_properties(T& ctx) {
+void CorePanelAnchor::access_child_properties(T& ctx) {
 	(void) ctx;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelFloat::doStyle(ContextStyle& ctx) {
+void CorePanelAnchor::doStyle(ContextStyle& ctx) {
 	PropertyAccessContext<Properties> setter{property, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
 	CoreBasePanel::doStyle(ctx);
 }
 
-void CorePanelFloat::doStyle(ContextStyle& ctx, ChildID childID) {
+void CorePanelAnchor::doStyle(ContextStyle& ctx, ChildID childID) {
 	(void) ctx;
 	(void) childID;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& layout_env) {
+libv::vec3f CorePanelAnchor::doLayout1(const ContextLayout1& layout_env) {
 	const auto env_size = layout_env.size - padding_size3();
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
@@ -125,7 +125,7 @@ libv::vec3f CorePanelFloat::doLayout1(const ContextLayout1& layout_env) {
 	return result + padding_size3();
 }
 
-void CorePanelFloat::doLayout2(const ContextLayout2& layout_env) {
+void CorePanelAnchor::doLayout2(const ContextLayout2& layout_env) {
 	const auto env_size = layout_env.size - padding_size3();
 
 	for (auto& child : children | view_layouted()) {
@@ -174,48 +174,26 @@ void CorePanelFloat::doLayout2(const ContextLayout2& layout_env) {
 
 // =================================================================================================
 
-core_ptr PanelFloat::create_core(std::string name) {
-	return create_core_ptr<CorePanelFloat>(std::move(name));
+core_ptr PanelAnchor::create_core(std::string name) {
+	return create_core_ptr<CorePanelAnchor>(std::move(name));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void PanelFloat::snap_to_edge(SnapToEdge value) {
+void PanelAnchor::snap_to_edge(SnapToEdge value) {
 	AccessProperty::manual(self(), self().property.snap_to_edge, value);
 }
 
-SnapToEdge PanelFloat::snap_to_edge() const noexcept {
+SnapToEdge PanelAnchor::snap_to_edge() const noexcept {
 	return self().property.snap_to_edge();
 }
 
-void PanelFloat::squish(Squish value) {
+void PanelAnchor::squish(Squish value) {
 	AccessProperty::manual(self(), self().property.squish, value);
 }
 
-Squish PanelFloat::squish() const noexcept {
+Squish PanelAnchor::squish() const noexcept {
 	return self().property.squish();
-}
-
-// -------------------------------------------------------------------------------------------------
-
-void PanelFloat::add(Component component) {
-	self().add(std::move(component));
-}
-
-void PanelFloat::add_front(Component component) {
-	self().add_front(std::move(component));
-}
-
-void PanelFloat::remove(Component& component) {
-	self().remove(component);
-}
-
-void PanelFloat::remove(std::string_view component_name) {
-	self().remove(component_name);
-}
-
-void PanelFloat::clear() {
-	self().clear();
 }
 
 // -------------------------------------------------------------------------------------------------

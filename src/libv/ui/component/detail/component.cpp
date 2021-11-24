@@ -50,6 +50,12 @@ Component::~Component() noexcept {
 		delete ptr_;
 }
 
+// -------------------------------------------------------------------------------------------------
+
+Flag_t Component::flags() const noexcept {
+	return ptr_->flags;
+}
+
 bool Component::isFloatRegion() const noexcept {
 	return ptr_->isFloatRegion();
 }
@@ -132,10 +138,40 @@ void Component::style(std::string_view style_name) {
 	ptr_->style(style_name);
 }
 
+void Component::style_state(StyleState state, bool value) noexcept {
+	ptr_->style_state(state, value);
+}
+
 // -------------------------------------------------------------------------------------------------
 
 void Component::focus() {
 	ptr_->focus();
+}
+
+void Component::enable(bool value) {
+	ptr_->enable(value);
+}
+bool Component::enable() const {
+	return ptr_->enable();
+}
+void Component::show(bool value) {
+	ptr_->show(value);
+}
+bool Component::show() const {
+	return ptr_->show();
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void Component::foreach_children(libv::function_ref<void(Component&)> callback) {
+	ptr_->doForeachChildren(callback);
+}
+
+void Component::foreach_recursive_children(libv::function_ref<void(Component&)> callback) {
+	ptr_->doForeachChildren([&callback](Component& child) {
+		callback(child);
+		child.foreach_recursive_children(callback);
+	});
 }
 
 // -------------------------------------------------------------------------------------------------

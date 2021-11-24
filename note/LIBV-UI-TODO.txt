@@ -45,6 +45,11 @@ libv.ui: bordered_padding_pattern (stripes_border.png with proper border handlin
 libv.ui: Fix input local positions when using padding
 libv.ui.style: Style based on component state (bit-mask)
 libv.ui: Add background property to panels
+libv.ui: Card layout | Its ended up being a full layout with card show/enable management
+libv.ui: Issue: In the ui sandbox tabs not tracking active card properly
+libv.ui: For 'Tabs' selected style state
+libv.ui: In card layout create an event for card change
+libv.ui: Issue: In the ui sandbox 1 frame flicker on card removal | solved by switching active card before the frame ends
 
 
 
@@ -63,19 +68,27 @@ libv.ui: Add background property to panels
 
 
 
+
+
+
+
+
+libv.ui: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
+
+libv.ui: Allow focus not yet attached components
 libv.ui: Clicks into nothingness should clear focus | True, but define nothingness first
 
 libv.ui: Stateify every UI component (minimal: hover and focus)
 		label
 		button
 		input_field
-		***
+		...
 
-libv.ui: Stateify every UI component (extended: active)
+libv.ui: Stateify every UI component (extended: active (and selected))
 		label
 		button
 		input_field
-		***
+		...
 
 libv.ui: Add missing button state switch on off component active release
 
@@ -133,13 +146,13 @@ libv.ui: Alignment justify should not 'start' at top left but from the orientati
 libv.ui: Margin, Padding, Spacing and Alignment gaps
 	libv.ui: Make panel_line margin not collapsing with padding
 	libv.ui: Make panel_line alignment not considering padding region
-	libv.ui: Make panel_float child margin push away border if there is not enough space
+	libv.ui: Make panel_anchor child margin push away border if there is not enough space
 	libv.ui: padding support in every component (layout)
 			scroll_bar | what is used in padding? The bar? | Most likely yes, the bar (bar could be replaced to component in future anyways)
 	libv.ui: margin support in every component | margin only effects layouts, and considered outside of the component boundaries, so ratio and parent percent calculation should not include it
 				panel_full DONE?
 				panel_line (Partial)
-				panel_float (Partial)
+				panel_anchor (Partial)
 			panel_grid
 			scroll_pane
 			scroll_area
@@ -213,7 +226,7 @@ libv.ui: UI based file watcher, libv.fsw > queue > ui loop event stage > broadca
 
 libv.ui: adopt libv.rev's Shader and ShaderLoader
 
-libv.ui: (?) Rename PanelFloat to PanelAnchor
+libv.ui: (?) Rename PanelAnchor to PanelAnchor
 
 libv.ui: Fix layout invalidation up propagation possibility (remove access to flags, and provide mark functions)
 		markInvalidLayout();
@@ -576,8 +589,8 @@ interactive
 	libv.ui.input_field: multi_line(true)
 	libv.ui.input_field: selection support
 	libv.ui.input_field: multi-selection support
-	libv.ui.input_field: synthetize selection property
-	libv.ui.input_field: synthetize multi-selection property
+	libv.ui.input_field: synthesize selection property
+	libv.ui.input_field: synthesize multi-selection property
 	libv.ui.input_field: text function call should produce event
 	libv.ui.input_field: background_shadow_tip_string("Password")
 	libv.ui.input_field: tip_string("Generic password related tip")
@@ -631,7 +644,7 @@ focus
 style
 	libv.ui: style sheets | aka themes
 	libv.ui: lua style parsing and lua file tracking with auto re-style | only style parsing
-	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthetized styles?
+	libv.ui.style: (style exclusive / multiple) multiple style usage in a component would still be nice, maybe synthesized styles?
 
 overlay
 	libv.ui: generic orthogonal component level overlay system

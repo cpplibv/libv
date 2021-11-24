@@ -12,11 +12,17 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFull : public ComponentAPI<BasePanel, PanelFull, class CorePanelFull, EventHostGeneral> {
+class PanelAnchor3D : public ComponentAPI<BasePanel, PanelAnchor3D, class CorePanelAnchor3D, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
-	static constexpr std::string_view component_type = "full";
+	static constexpr std::string_view component_type = "anchor3D";
 	static core_ptr create_core(std::string name);
+
+public:
+//	void add(Component component);
+//	void add(libv::vec3f position, Component component);
+//	void add(Component component, std::function<libv::vec3f()> position_scraper);
+//	PositionSetterProxy add(Component component);
 };
 
 // -------------------------------------------------------------------------------------------------

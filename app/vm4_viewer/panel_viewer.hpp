@@ -3,7 +3,7 @@
 // libv
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_line.hpp>
 //#include <libv/ui/component_static.hpp>
 //#include <libv/ui/layout_line.hpp>
@@ -24,7 +24,7 @@ class QuickFilePicker;
 
 } // namespace ui
 
-class PanelViewer : public libv::ui::PanelFloat {
+class PanelViewer : public libv::ui::PanelAnchor {
 private:
 	std::shared_ptr<libv::ui::Button> button_close;
 	std::shared_ptr<libv::ui::Label> label_help;

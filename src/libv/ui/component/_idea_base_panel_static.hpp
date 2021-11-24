@@ -11,7 +11,7 @@
 
 
 // hpp
-#include <libv/ui/component/base_panel.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 // libv
 #include <libv/algo/erase_if_stable.hpp>
 // pro

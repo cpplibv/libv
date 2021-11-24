@@ -1,8 +1,9 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_float.hpp
+// Project: libv.ui, File: src/libv/ui/component/panel_anchor.hpp
 
 #pragma once
 
 // pro
+#include <libv/ui/component/base_panel.hpp>
 #include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/snap_to_edge.hpp>
 #include <libv/ui/property/squish.hpp>
@@ -13,10 +14,10 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelFloat : public ComponentAPI<Component, PanelFloat, class CorePanelFloat, EventHostGeneral> {
+class PanelAnchor : public ComponentAPI<BasePanel, PanelAnchor, class CorePanelAnchor, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
-	static constexpr std::string_view component_type = "float";
+	static constexpr std::string_view component_type = "anchor";
 	static core_ptr create_core(std::string name);
 
 public:
@@ -25,13 +26,6 @@ public:
 
 	void squish(Squish value);
 	[[nodiscard]] Squish squish() const noexcept;
-
-public:
-	void add(Component component);
-	void add_front(Component component);
-	void remove(Component& component);
-	void remove(std::string_view component_name);
-	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

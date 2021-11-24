@@ -11,7 +11,7 @@
 #include <libv/ui/component/image.hpp> // testing only, remove it
 #include <libv/ui/component/label.hpp>
 #include <libv/ui/component/label_image.hpp>
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/scroll_bar.hpp>
 #include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/component/quad.hpp> // testing only, remove it
@@ -34,7 +34,7 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-PanelViewer::PanelViewer(CoreComponent& parent) : libv::ui::PanelFloat(parent, "VM4Viewer") { }
+PanelViewer::PanelViewer(CoreComponent& parent) : libv::ui::PanelAnchor(parent, "VM4Viewer") { }
 
 void PanelViewer::key(libv::input::Keycode key) {
 	if (!isAttached())

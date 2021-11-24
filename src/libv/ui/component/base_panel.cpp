@@ -2,6 +2,7 @@
 
 // hpp
 #include <libv/ui/component/base_panel.hpp>
+#include <libv/ui/component/base_panel_core.hpp>
 // libv
 #include <libv/algo/erase_if_stable.hpp>
 // pro
@@ -135,6 +136,44 @@ void CoreBasePanel::doForeachChildren(libv::function_ref<bool(Component&)> callb
 void CoreBasePanel::doForeachChildren(libv::function_ref<void(Component&)> callback) {
 	for (auto& child : children)
 		callback(child);
+}
+
+// =================================================================================================
+
+core_ptr BasePanel::create_core(std::string name) {
+	return create_core_ptr<CoreBasePanel>(std::move(name));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void BasePanel::background(Background value) {
+	AccessProperty::manual(self(), self().property.background, std::move(value));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+[[nodiscard]] const Background& BasePanel::background() const noexcept {
+	return self().property.background();
+}
+
+void BasePanel::add(Component component) {
+	self().add(std::move(component));
+}
+
+void BasePanel::add_front(Component component) {
+	self().add_front(std::move(component));
+}
+
+void BasePanel::remove(Component& component) {
+	self().remove(component);
+}
+
+void BasePanel::remove(std::string_view component_name) {
+	self().remove(component_name);
+}
+
+void BasePanel::clear() {
+	self().clear();
 }
 
 // -------------------------------------------------------------------------------------------------

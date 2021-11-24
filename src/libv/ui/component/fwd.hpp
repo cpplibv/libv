@@ -15,7 +15,7 @@ class Image;
 class InputField;
 class Label;
 class LabelImage;
-class PanelFloat;
+class PanelAnchor;
 class PanelFull;
 class PanelGrid;
 class PanelLine;

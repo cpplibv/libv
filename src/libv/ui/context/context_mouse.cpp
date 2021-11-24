@@ -87,6 +87,7 @@ public:
 	struct Node {
 		const MouseKey target;
 
+		bool enabled = true;
 		libv::vec2f cornerBL = {0, 0};
 		libv::vec2f cornerTR = {-1, -1};
 		MouseOrder order = MouseOrder{0};
@@ -178,23 +179,36 @@ public:
 	}
 
 public:
-//	void aux_debug(Node& node, int depth = 0) noexcept {
-//		if (depth != 0) {
-//			if (node.region_nodes.empty())
-//				log_ui.info("{:<60} [{:>9}-{:>9}]({})", std::string((depth - 1) * 4, ' ') +
-//						node.target->path(), node.global_offset() + node.cornerBL, node.global_offset() + node.cornerTR, node.over ? "X" : " ");
-//			else
-//				log_ui.info("{:<60} [{:>9}-{:>9}]({}) -> {}", std::string((depth - 1) * 4, ' ') +
-//						node.target->path(), node.global_offset() + node.cornerBL, node.global_offset() + node.cornerTR, node.over ? "X" : " ", node.region_offset);
-//		}
-//
-//		for (auto& child_node : node.region_nodes)
-//			aux_debug(*child_node, depth + 1);
-//	}
-//
-//	void debug() noexcept {
-//		aux_debug(*root);
-//	}
+	void aux_debug(Node& node, int depth = 0) noexcept {
+		if (depth != 0) {
+			if (node.region_nodes.empty())
+				log_ui.info("{:<40} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]({})", std::string((depth - 1) * 4, ' ') +
+						node.target->path(),
+						node.enabled,
+						node.over,
+						node.interacting,
+						node.global_offset() + node.cornerBL,
+						node.global_offset() + node.cornerTR,
+						node.over ? "X" : " ");
+			else
+				log_ui.info("{:<40} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]({}) -> {}", std::string((depth - 1) * 4, ' ') +
+						node.target->path(),
+						node.enabled,
+						node.over,
+						node.interacting,
+						node.global_offset() + node.cornerBL,
+						node.global_offset() + node.cornerTR,
+						node.over ? "X" : " ",
+						node.region_offset);
+		}
+
+		for (auto& child_node : node.region_nodes)
+			aux_debug(*child_node, depth + 1);
+	}
+
+	void debug() noexcept {
+		aux_debug(*root);
+	}
 
 	template <typename F>
 	void aux_foreach_tree(Node& node, const F& f, libv::vec2f offset) noexcept {
@@ -243,6 +257,16 @@ void ContextMouse::subscribe(CoreComponent& component) {
 
 void ContextMouse::subscribe_region(CoreComponent& component) {
 	self->container.add_region(component_region(component), &component);
+}
+
+void ContextMouse::enable(CoreComponent& component, bool value) {
+	auto it = self->container.find(&component);
+
+	if (it == nullptr)
+		return log_ui.warn("Attempted to enable/disable a not subscribed component: {} {}", static_cast<void*>(&component), component.path());
+
+	it->enabled = value;
+	it->pendingUpdate = true;
 }
 
 void ContextMouse::update(CoreComponent& component, libv::vec3f abs_position, libv::vec3f size, MouseOrder order) {
@@ -307,6 +331,12 @@ void ContextMouse::release(CoreComponent& component) {
 
 // -------------------------------------------------------------------------------------------------
 
+void ContextMouse::debug() {
+	self->container.debug();
+}
+
+// -------------------------------------------------------------------------------------------------
+
 libv::vec2f ContextMouse::get_global_position(const CoreComponent& component) {
 	libv::vec2f offset;
 
@@ -364,19 +394,22 @@ inline void notify_hits(Hits& hits, Event& event) noexcept {
 	}
 }
 
-template <typename Event>
-inline void notify_hits(HitELs& hits, Event& event) noexcept {
+inline void notify_hits(HitELs& hits, EventMouseMovement& event) noexcept {
 	size_t i = 0;
 
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
 
 		const auto old_interacting = hit.node->interacting;
-		hit.node->interacting = !hit.leave;
+		const auto new_interacting = !hit.leave && hit.node->enabled;
+		hit.node->interacting = new_interacting;
+
+		if (!old_interacting && !new_interacting)
+			continue;
 
 		event.local_position = hit.local_position;
-		event.enter = hit.enter || (!old_interacting && !hit.leave);
-		event.leave = hit.leave;
+		event.enter = !old_interacting && new_interacting;
+		event.leave = old_interacting && !new_interacting;
 
 		component_notify(hit.node->target, event);
 
@@ -394,15 +427,16 @@ inline void notify_hits(HitELs& hits, Event& event) noexcept {
 	// Leave every other hit that was previously entered in the hit list
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];
-		hit.node->interacting = false;
 
-		if (!hit.enter) { // If this would have been an 'enter' skip, otherwise leave that component
+		if (!hit.enter && hit.node->interacting) { // If this would have been an 'enter' skip, otherwise leave that component
 			event.local_position = hit.local_position;
 			event.enter = false;
 			event.leave = true;
 
 			component_notify(hit.node->target, event);
 		}
+
+		hit.node->interacting = false;
 	}
 }
 
@@ -594,7 +628,7 @@ void ContextMouse::event_scroll(libv::vec2f movement) {
 	notify_hits(hits, event);
 }
 
-void ContextMouse::event_update() {
+void ContextMouse::event_update_layout() {
 	EventMouseMovement event;
 	event.mouse_position = self->mouse_position;
 	event.mouse_movement = {0, 0};
@@ -610,23 +644,35 @@ void ContextMouse::event_update() {
 		if (!node.pendingUpdate && !node.over)
 			return true;
 
+		node.pendingUpdate = false;
+
 		const auto test_position = self->mouse_position - offset;
 		const auto local_position = test_position - node.cornerBL;
 		const bool over_new = libv::vec::within(test_position, node.cornerBL, node.cornerTR);
 		const bool over_old = node.over;
 
-		node.pendingUpdate = false;
 		node.over = over_new;
 
-		if (over_old == over_new)
+		if (!over_old && !over_new)
 			return true;
 
 		const bool enter = !over_old && over_new;
 		const bool leave = over_old && !over_new;
 
 		hits.emplace_back(&node, local_position, enter, leave);
+
+//		if (leave) {
+//			// Shortcut tree iteration as this region is left, gather every child that was 'over' to leave
+//			gather_over_for_leave(hits, node, self->mouse_position, offset);
+//			return false;
+//		} else {
+//			return true;
+//		}
 		return true;
 	});
+
+//	if noone had pendingUpdate [and/or no enter / leave event was be generated]
+//		return
 
 	sort_hits(hits);
 	notify_hits(hits, event);

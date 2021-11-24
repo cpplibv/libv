@@ -6,6 +6,7 @@
 #include <libv/ui/basic_event_proxy.hpp>
 #include <libv/ui/event/base_event.hpp>
 #include <libv/ui/event/event_component.hpp>
+#include <libv/ui/event/event_enable.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/event/event_mouse.hpp>
@@ -85,6 +86,7 @@ public:
 	BasicEventProxy<ComponentT, EventAttach> attach;
 	BasicEventProxy<ComponentT, EventDetach> detach;
 
+	BasicEventProxy<ComponentT, EventEnable> enable;
 	BasicEventProxy<ComponentT, EventFocus> focus;
 
 public:
@@ -97,6 +99,7 @@ public:
 		mouse_scroll(owner),
 		attach(owner),
 		detach(owner),
+		enable(owner),
 		focus(owner) {}
 };
 

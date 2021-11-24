@@ -3,6 +3,7 @@
 #pragma once
 
 // pro
+#include <libv/ui/component/base_panel.hpp>
 #include <libv/ui/component/detail/component_api.hpp>
 #include <libv/ui/property/align.hpp>
 #include <libv/ui/property/orientation.hpp>
@@ -14,7 +15,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class PanelLine : public ComponentAPI<Component, PanelLine, class CorePanelLine, EventHostGeneral> {
+class PanelLine : public ComponentAPI<BasePanel, PanelLine, class CorePanelLine, EventHostGeneral> {
 public:
 	using ComponentAPI::ComponentAPI;
 	static constexpr std::string_view component_type = "line";
@@ -32,13 +33,6 @@ public:
 
 	void spacing(Spacing value);
 	[[nodiscard]] Spacing spacing() const noexcept;
-
-public:
-	void add(Component component);
-	void add_front(Component component);
-	void remove(Component& component);
-	void remove(std::string_view component_name);
-	void clear();
 };
 
 // -------------------------------------------------------------------------------------------------

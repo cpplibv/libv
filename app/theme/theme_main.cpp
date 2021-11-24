@@ -28,7 +28,7 @@
 
 //#include <libv/ui/component/image.hpp>
 //#include <libv/ui/component/label_image.hpp>
-//#include <libv/ui/component/panel_float.hpp>
+//#include <libv/ui/component/panel_anchor.hpp>
 //#include <libv/ui/component/panel_full.hpp>
 //#include <libv/ui/component/panel_grid.hpp>
 //#include <libv/ui/component/quad.hpp>

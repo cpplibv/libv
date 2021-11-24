@@ -4,7 +4,7 @@
 #include <libv/ui/component/fwd.hpp>
 #include <libv/ui/component/panel_line.hpp>
 //#include <libv/ui/component/label.hpp>
-//#include <libv/ui/component/panel_float.hpp>
+//#include <libv/ui/component/panel_anchor.hpp>
 //#include <libv/ui/component/panel_full.hpp>
 //#include <libv/ui/component_static.hpp>
 //#include <libv/ui/layout_line.hpp>

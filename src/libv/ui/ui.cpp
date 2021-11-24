@@ -283,7 +283,7 @@ public:
 		// - Attach #2
 		// - Style
 		// - Layout
-		// - Mouse update // Comes after layout: Mouse needs the updated mouse region bounds to produce the events
+		// - Mouse update layout // Comes after layout: Mouse needs the updated mouse region bounds to produce the events
 		// - Render
 		// - Detach
 
@@ -404,9 +404,9 @@ public:
 				log_ui.error("Exception occurred during layout in UI: {}", ex.what());
 			}
 
-			// --- Mouse Update ---
+			// --- Mouse Update Layout ---
 			try {
-				context.mouse.event_update();
+				context.mouse.event_update_layout();
 				stat.mouse.sample(timer.time_ns());
 			} catch (const std::exception& ex) {
 				log_ui.error("Exception occurred during virtual events in UI: {}. Discarding rest of the virtual events", ex.what());

@@ -33,11 +33,12 @@ enum class StyleState : uint32_t {
 
 	active         = 1u << 3u,
 
-	progress       = 1u << 4u,
-	done           = 1u << 5u,
-	error          = 1u << 6u,
+	select         = 1u << 4u, // Tabs is active
 
-//	_              = 1u << 7u,
+	progress       = 1u << 5u,
+	done           = 1u << 6u,
+	error          = 1u << 7u,
+
 //	_              = 1u << 8u,
 //	_              = 1u << 9u,
 //	_              = 1u << 10u,
@@ -65,6 +66,10 @@ enum class StyleState : uint32_t {
 	custom15       = 1u << 31u,
 };
 
+[[nodiscard]] constexpr inline auto operator+(StyleState var) noexcept {
+	return libv::to_underlying(var);
+}
+
 [[nodiscard]] constexpr inline StyleState operator|(StyleState lhs, StyleState rhs) noexcept {
 	return StyleState{libv::to_underlying(lhs) | libv::to_underlying(rhs)};
 }
@@ -75,10 +80,6 @@ enum class StyleState : uint32_t {
 
 [[nodiscard]] constexpr inline StyleState operator~(StyleState var) noexcept {
 	return StyleState{~libv::to_underlying(var)};
-}
-
-[[nodiscard]] constexpr inline auto operator+(StyleState var) noexcept {
-	return libv::to_underlying(var);
 }
 
 /// Returns true if \c state_new will always shadow \c state_old

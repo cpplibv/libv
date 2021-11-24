@@ -110,7 +110,7 @@ void CoreButton::access_properties(T& ctx) {
 			pgr::font, pnm::font_size,
 			"Font size in pixel"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().text(std::move(v)); },
 			[](const auto& c) { return c.handler().text(); },
 			pgr::behaviour, pnm::text,

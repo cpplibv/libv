@@ -50,8 +50,9 @@ libv.security: Move signature checking of sandbox_openssl into a new wrapper lib
 
 
 
-
-git: Commit count up to a revision: git rev-list --count HEAD
+place.it:
+	CICD:
+		git: Commit count up to a revision: git rev-list --count HEAD
 
 libv.update: Resource Client
 	Single file download: Partial download recovery IDEA of an alternative approach would be to only write out the progress meta data every X seconds
@@ -321,5 +322,6 @@ libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connecti
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 		| investigate shared_ptr with custom deleter
 libv.utility: libv::storage<T> with: initialize, destroy, alignas(T) std::byte storage[sizeof(T)];
+		| Use std::destroy_at and std::construct_at to allow constexpr-ness
 
 

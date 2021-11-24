@@ -14,6 +14,7 @@
 #include <libv/ui/context/context_ui.hpp>
 #include <libv/ui/context/context_ui_link.hpp>
 #include <libv/ui/event/event_component.hpp>
+#include <libv/ui/event/event_enable.hpp>
 #include <libv/ui/event/event_focus.hpp>
 #include <libv/ui/event/event_keyboard.hpp>
 #include <libv/ui/log.hpp>
@@ -47,14 +48,29 @@ std::string CoreComponent::path() const {
 	//  	strcpy i parent.name
 	//  	i += parent.name.size()
 
-	std::string result = name;
+	// ---
+
+//	std::string result = name;
+//
+//	// Iterate every component except the root
+//	for (auto it = parent_; it != it->parent_; it = it->parent_)
+//		result = it->name + '/' + std::move(result);
+//
+//	// Place the root marker in the front
+//	result = '/' + std::move(result);
+
+	// ---
+
+	std::string result = std::to_string(childID) + ':' + name;
 
 	// Iterate every component except the root
 	for (auto it = parent_; it != it->parent_; it = it->parent_)
-		result = it->name + '/' + std::move(result);
+		result = std::to_string(it->childID) + ':' + it->name + '/' + std::move(result);
 
 	// Place the root marker in the front
 	result = '/' + std::move(result);
+
+	// ---
 
 	return result;
 }
@@ -135,10 +151,13 @@ void CoreComponent::watchMouse(bool value) noexcept {
 		return;
 
 	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
-		if (value)
+		if (value) {
 			context().mouse.subscribe(*this);
-		else
+			if (flags.match_any(Flag::disabled))
+				context().mouse.enable(*this, false);
+		} else {
 			context().mouse.unsubscribe(*this);
+		}
 	}
 
 	flags.set_to(Flag::watchMouse, value);
@@ -149,10 +168,13 @@ void CoreComponent::floatRegion(bool value) noexcept {
 		return;
 
 	if (isAttached()) { // Skip subscribe if not yet attached or not yet attaching
-		if (value)
+		if (value) {
 			context().mouse.subscribe_region(*this);
-		else
+			if (flags.match_any(Flag::disabled))
+				context().mouse.enable(*this, false);
+		} else {
 			context().mouse.unsubscribe_region(*this);
+		}
 	}
 
 	flags.set_to(Flag::floatRegion, value);
@@ -179,6 +201,67 @@ bool CoreComponent::isFloatRegion() const noexcept {
 }
 
 // -------------------------------------------------------------------------------------------------
+
+void CoreComponent::show(bool value) noexcept {
+	if (show() == value)
+		return;
+
+	flags.set_to(Flag::render, value);
+	flagAuto(Flag::pendingRender);
+}
+
+bool CoreComponent::show() const noexcept {
+	return flags.match_any(Flag::render);
+}
+
+void CoreComponent::auxEnableScan(bool value) noexcept {
+	if (enable() == value)
+		return;
+
+	if (flags.match_any(Flag::disableControlled))
+		return;
+
+	flags.set_to(Flag::disabled, !value);
+	style_state(StyleState::disable, !value);
+
+	if (isAttached()) {
+		if (flags.match_any(Flag::watchMouse | Flag::floatRegion))
+			context().mouse.enable(*this, value);
+
+		fire(EventEnable{value});
+	}
+
+	doForeachChildren([value](Component& child) {
+		get_core(child)->auxEnableScan(value);
+	});
+}
+
+void CoreComponent::enable(bool value) noexcept {
+
+	if (enable() == value) {
+		flags.set_to(Flag::disableControlled, !value);
+		return;
+	}
+
+	flags.set_to(Flag::disabled | Flag::disableControlled, !value);
+	style_state(StyleState::disable, !value);
+
+	if (isAttached()) {
+		if (flags.match_any(Flag::watchMouse | Flag::floatRegion))
+			context().mouse.enable(*this, value);
+
+		fire(EventEnable{value});
+	}
+
+	// Note: Full tree traversal could be optimized out but style states, enable getter function and (the possibly sparse) mouse watching children would complicate it
+	doForeachChildren([value](Component& child) {
+		get_core(child)->auxEnableScan(value);
+	});
+}
+
+bool CoreComponent::enable() const noexcept {
+	return !flags.match_any(Flag::disabled);
+}
 
 void CoreComponent::focus() noexcept {
 	// Note: focus has to be sync to allow correct event processing
@@ -256,6 +339,9 @@ void CoreComponent::style(std::string_view style_name) {
 }
 
 void CoreComponent::style_state(StyleState state, bool value) noexcept {
+	if ((value && style_state_ == (style_state_ & state)) || (!value && (style_state_ & state) == StyleState::none))
+		return;
+
 	style_state_ = value ? style_state_ | state : style_state_ & ~state;
 	flagAuto(Flag::pendingStyle);
 }
@@ -281,7 +367,10 @@ bool CoreComponent::isFocusableComponent() const noexcept {
 	if (!flags.match_any(Flag::focusableSelf))
 		return false;
 
-	if (!flags.match_any(Flag::render))
+//	if (!flags.match_any(Flag::render))
+//		return false;
+
+	if (flags.match_any(Flag::disabled))
 		return false;
 
 	for (auto it = make_observer_ref(this); true; it = it->parent_) {
@@ -370,19 +459,28 @@ void CoreComponent::attach(CoreComponent& new_parent) {
 	if (flags.match_any(Flag::pendingAttachSelf)) {
 		// NOTE: context_ is already set in the constructor
 		parent_ = make_observer_ref(&new_parent);
-
 		log_ui.trace("Attaching {}", path());
 
+		// Inherit flags from parent
+		if (parent_->flags.match_any(Flag::disabled))
+			flags.set(Flag::disabled);
+
+		// Attach to mouse context
 		if (flags.match_any(Flag::watchMouse))
 			context().mouse.subscribe(*this);
 
 		if (flags.match_any(Flag::floatRegion))
 			context().mouse.subscribe_region(*this);
 
+		if (flags.match_any(Flag::watchMouse | Flag::floatRegion) && flags.match_any(Flag::disabled))
+			context().mouse.enable(*this, false);
+
+		// Broadcast events
 		doAttach();
 
 		fire(EventAttach{});
 
+		// Maintain flags
 		flagAncestors(calculatePropagateFlags(flags)); // Trigger flag propagation
 
 		flags.reset(Flag::pendingAttachSelf);

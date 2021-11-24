@@ -134,8 +134,8 @@ struct QueueTaskMeshFullScreen {
 		}
 
 		program->use(gl, remote);
-		// !!! a non zero VAO should be bound, check on it
-		glDrawArrays(GL_TRIANGLES, 0, 3); // !!!
+		// TODO P1: a non zero VAO should be bound, check on it
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		//		mesh->render(gl, remote);
 	}
 };

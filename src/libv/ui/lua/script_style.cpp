@@ -746,6 +746,7 @@ public:
 					if (process_state("hover", StyleState::hover)) continue;
 					if (process_state("focus", StyleState::focus)) continue;
 					if (process_state("active", StyleState::active)) continue;
+					if (process_state("select", StyleState::select)) continue;
 					if (process_state("progress", StyleState::progress)) continue;
 					if (process_state("done", StyleState::done)) continue;
 					if (process_state("error", StyleState::error)) continue;

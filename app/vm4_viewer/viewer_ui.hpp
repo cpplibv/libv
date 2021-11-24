@@ -5,7 +5,7 @@
 #include <libv/ctrl/controls.hpp>
 #include <libv/ui/component/button.hpp>
 #include <libv/ui/component/label.hpp>
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/ui/component/panel_line.hpp>
 //#include <libv/ui/component_static.hpp>
 //#include <libv/ui/layout_line.hpp>
@@ -31,7 +31,7 @@ class QuickFilePicker;
 
 class ViewerInfoPanel;
 
-class ViewerUI : public libv::ui::PanelFloat {
+class ViewerUI : public libv::ui::PanelAnchor {
 private:
 	std::shared_ptr<libv::ui::Label> label_help;
 	std::shared_ptr<libv::ui::Label> label_version;

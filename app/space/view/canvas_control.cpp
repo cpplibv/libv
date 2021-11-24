@@ -114,7 +114,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 		const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
 		const auto eye = ctx.camera.eye();
-		const auto world_coord = libv::intersect_ray_plane(eye, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+//		const auto world_coord = libv::intersect_ray_plane(eye, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
 
 		// A---------D
 		// |         |
@@ -149,13 +149,13 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 			x2 = ((cn.y - an.y) * up.z - (cn.z - an.z) * up.y) / (right.y * up.z - right.z * up.y);
 
 		// There is at least one component that is greater than sqrt(1/3) = 0.57735, 0.5 is a good enough check
-		float x1;
-		if (std::abs(up.x) > 0.5f)
-			x1 = (cn.x - an.x - x2 * right.x) / up.x;
-		else if (std::abs(up.y) > 0.5f)
-			x1 = (cn.y - an.y - x2 * right.y) / up.y;
-		else
-			x1 = (cn.z - an.z - x2 * right.z) / up.z;
+//		float x1;
+//		if (std::abs(up.x) > 0.5f)
+//			x1 = (cn.x - an.x - x2 * right.x) / up.x;
+//		else if (std::abs(up.y) > 0.5f)
+//			x1 = (cn.y - an.y - x2 * right.y) / up.y;
+//		else
+//			x1 = (cn.z - an.z - x2 * right.z) / up.z;
 
 		// <<< const bn
 		// <<< const dn
@@ -224,7 +224,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 					libv::rad_to_deg(a_far), libv::rad_to_deg(b_far), libv::rad_to_deg(c_far), libv::rad_to_deg(d_far));
 			ctx.add_debug_frustum(
 					nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl,
-					{0.8f, 0, 1, 1}, {0.2f, 0.2f, 0.6, 0.2f});
+					{0.8f, 0, 1, 1}, {0.2f, 0.2f, 0.6f, 0.2f});
 
 //			{
 //				for (int i = -20 ; i < 20 ; ++i) {

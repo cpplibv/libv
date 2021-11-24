@@ -70,11 +70,13 @@ app.space: Implement Universe Snapshots
 --- STACK ------------------------------------------------------------------------------------------
 
 
+
+
+
+
 app.space: Selection state storage
 
 Main areas of focus: Cost / Value
-	20 / 2: UI: Card layout
-
 	40 / 6: Control: Ctrl box selection support
 
 	60 / 4: Library: State machine generation
@@ -86,6 +88,7 @@ Main areas of focus: Cost / Value
 			| Also: Simple disconnect as a non connected client will do long timeout
 	Bug P1: app.space: "Vader2" as client name breaks the lobby layout
 	Bug P1: app.space: 200*200 debug sphere causes low fps
+			| debug shapes have to switch to pre-uploaded meshes
 	Bug P1: app.space: "Space" title button is mouse shielded by the canvas
 			| Maybe mouse movement only | Dont think so
 			\ Should be a mouse order issue
@@ -114,8 +117,24 @@ libv.ctrl: Late enter of feature_binary: On context_enter call any binary featur
 libv.ctrl: 'Acquire "mouse"' similarly as UI does it
 libv.ctrl: arg.reject_feature(); aka a way to reject the feature activation from within the feature: in this case the next candidates would be called
 
-libv.ui: UI: 3D Anchor point layout (input camera) (For labels / UI Components over objects) (Most interesting stuff may happen in update or events)
 
+
+
+place.it:
+	ext: Adopt expected (should be coming in C++23): https://github.com/TartanLlama/expected
+
+	ranges chunk, pairwise and slide (might be in ranges::v3, but planned to come with C++23)
+		std::views::chunk(column_count)
+			could replace the column count view used by ui grid
+		std::views::pairwise
+		std::views::slide(number_of_nlets)
+			could replace the adjacent_pair algo is called with number_of_nlets=2
+
+	fmt::print("{}", container);
+	fmt::print("{}", container | view::join(":"));
+
+watch.it:
+	vue cc - https://www.youtube.com/watch?v=qZXt1Aom3Cs
 
 
 

@@ -4,16 +4,19 @@
 
 // libv
 #include <libv/math/vec.hpp>
+#include <libv/utility/function_ref.hpp>
 // std
 #include <string>
 #include <string_view>
 // pro
 #include <libv/ui/component/detail/core_ptr.hpp>
+#include <libv/ui/component/detail/flag.hpp>
 #include <libv/ui/event_host.hpp>
 #include <libv/ui/property/anchor.hpp>
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
+#include <libv/ui/style_state.hpp>
 //#include <libv/ui/style_fwd.hpp>
 //#include <libv/utility/intrusive_ptr.hpp>
 
@@ -58,6 +61,8 @@ public:
 	}
 
 public:
+	[[nodiscard]] Flag_t flags() const noexcept;
+
 	[[nodiscard]] bool isFloatRegion() const noexcept;
 
 	[[nodiscard]] const std::string& name() const noexcept;
@@ -163,8 +168,19 @@ public:
 //	void style(libv::intrusive_ptr<Style> style) noexcept;
 	void style(std::string_view style_name);
 
+	void style_state(StyleState state, bool value) noexcept;
+
 public:
 	void focus();
+
+	void enable(bool value);
+	[[nodiscard]] bool enable() const;
+	void show(bool value);
+	[[nodiscard]] bool show() const;
+
+public:
+	void foreach_children(libv::function_ref<void(Component&)> callback);
+	void foreach_recursive_children(libv::function_ref<void(Component&)> callback);
 
 public:
 	[[nodiscard]] inline bool operator==(const Component& other) const noexcept = default;

@@ -3,14 +3,14 @@
 // hpp
 #include <catch/catch.hpp>
 // pro
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include "test_layout_utility.hpp"
 
 
 // -------------------------------------------------------------------------------------------------
 
 TEST_CASE("Layout Float: empty", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 
 	CHECK(panel.layout1(0, 0, 0) == approx_size(0, 0, 0));
 	panel.layout2(0, 0);
@@ -19,7 +19,7 @@ TEST_CASE("Layout Float: empty", "[libv.ui.layout.float]") {
 TEST_CASE("Layout Float: snap_to_edge", "[libv.ui.layout.float]") {
 	// Not implemented yet
 
-	//	TestPanel<libv::ui::PanelFloat> panel;
+	//	TestPanel<libv::ui::PanelAnchor> panel;
 
 	//	libv::ui::ContextLayout1 env1;
 	//	libv::ui::ContextLayout2 env2(libv::vec3f(0, 0, 0), libv::vec3f(400, 300, 0));
@@ -34,7 +34,7 @@ TEST_CASE("Layout Float: snap_to_edge", "[libv.ui.layout.float]") {
 TEST_CASE("Layout Float: squish", "[libv.ui.layout.float]") {
 	// Not implemented yet
 
-	//	TestPanel<libv::ui::PanelFloat> panel;
+	//	TestPanel<libv::ui::PanelAnchor> panel;
 
 	//	libv::ui::ContextLayout1 env1;
 	//	libv::ui::ContextLayout2 env2(libv::vec3f(0, 0, 0), libv::vec3f(400, 300, 0));
@@ -47,7 +47,7 @@ TEST_CASE("Layout Float: squish", "[libv.ui.layout.float]") {
 }
 
 TEST_CASE("Layout Float: positioning with anchors", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 
 	TestComponent comp0 = panel.add("100px, 100px");
 
@@ -88,7 +88,7 @@ TEST_CASE("Layout Float: positioning with anchors", "[libv.ui.layout.float]") {
 }
 
 TEST_CASE("Layout Float: positioning with anchors, with padding", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 	panel.padding(5, 10, 15, 20);
 
 	TestComponent comp0 = panel.add("100px, 100px");
@@ -128,7 +128,7 @@ TEST_CASE("Layout Float: positioning with anchors, with padding", "[libv.ui.layo
 }
 
 TEST_CASE("Layout Float: positioning with anchors, with padding and margin", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 	panel.padding(5, 10, 15, 20);
 
 	TestComponent comp0 = panel.add("100px, 100px");
@@ -169,7 +169,7 @@ TEST_CASE("Layout Float: positioning with anchors, with padding and margin", "[l
 }
 
 //TEST_CASE("Layout Float: positioning with anchors, with padding and margin pushes away border", "[libv.ui.layout.float]") {
-//	TestPanel<libv::ui::PanelFloat> panel;
+//	TestPanel<libv::ui::PanelAnchor> panel;
 //	panel.padding(5, 10, 15, 20);
 //
 //	TestComponent comp0 = panel.add("100px, 100px");
@@ -210,7 +210,7 @@ TEST_CASE("Layout Float: positioning with anchors, with padding and margin", "[l
 //}
 
 TEST_CASE("Layout Float: simple size tests 0", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 
 	SECTION("ratio") {
 		TestComponent comp0 = panel.add("1r, 1r", D(20, 100, 0));
@@ -278,7 +278,7 @@ TEST_CASE("Layout Float: simple size tests 0", "[libv.ui.layout.float]") {
 }
 
 TEST_CASE("Layout Float: complex size test 0", "[libv.ui.layout.float]") {
-	TestPanel<libv::ui::PanelFloat> panel;
+	TestPanel<libv::ui::PanelAnchor> panel;
 
 	TestComponent comp0 = panel.add("  0px 20% 1r D,  10px  0% 1r D,   0px 20% 1r D", D(10, 20, 30));
 	TestComponent comp1 = panel.add("150px 20% 2r  ,  75px 10% 2r D, 150px 20% 2r  ", D(11, 21, 31));

@@ -1,8 +1,7 @@
 // Project: libv.ui, File: src/libv/ui/component/panel_full.cpp
 
 // hpp
-#include <libv/ui/component/panel_full.hpp>
-#include <libv/ui/component/panel_full_core.hpp>
+#include <libv/ui/component/panel_anchor_3d.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/utility/approx.hpp>
@@ -22,20 +21,61 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-void CorePanelFull::doStyle(ContextStyle& ctx) {
-	PropertyAccessContext<CorePanelFull> setter{*this, ctx.component, ctx.style, ctx.component.context()};
+class CorePanelAnchor3D : public CoreBasePanel {
+	friend PanelAnchor3D;
+	[[nodiscard]] inline auto handler() { return PanelAnchor3D{this}; }
+
+private:
+	struct Properties {
+	} property;
+
+	struct ChildProperties {
+	};
+
+	template <typename T> static void access_properties(T& ctx);
+	template <typename T> static void access_child_properties(T& ctx);
+
+//	static ComponentPropertyDescription description;
+//	static ComponentPropertyDescription child_description;
+
+public:
+	using CoreBasePanel::CoreBasePanel;
+
+private:
+	virtual void doStyle(ContextStyle& context) override;
+	virtual void doStyle(ContextStyle& context, ChildID childID) override;
+	virtual libv::vec3f doLayout1(const ContextLayout1& le) override;
+	virtual void doLayout2(const ContextLayout2& le) override;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+template <typename T>
+void CorePanelAnchor3D::access_properties(T& ctx) {
+	(void) ctx;
+}
+
+template <typename T>
+void CorePanelAnchor3D::access_child_properties(T& ctx) {
+	(void) ctx;
+}
+
+// -------------------------------------------------------------------------------------------------
+
+void CorePanelAnchor3D::doStyle(ContextStyle& ctx) {
+	PropertyAccessContext<CorePanelAnchor3D> setter{*this, ctx.component, ctx.style, ctx.component.context()};
 	access_properties(setter);
 	CoreBasePanel::doStyle(ctx);
 }
 
-void CorePanelFull::doStyle(ContextStyle& ctx, ChildID childID) {
+void CorePanelAnchor3D::doStyle(ContextStyle& ctx, ChildID childID) {
 	(void) ctx;
 	(void) childID;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& layout_env) {
+libv::vec3f CorePanelAnchor3D::doLayout1(const ContextLayout1& layout_env) {
 	const auto env_size = layout_env.size - padding_size3();
 
 	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
@@ -70,7 +110,7 @@ libv::vec3f CorePanelFull::doLayout1(const ContextLayout1& layout_env) {
 	return result + padding_size3();
 }
 
-void CorePanelFull::doLayout2(const ContextLayout2& layout_env) {
+void CorePanelAnchor3D::doLayout2(const ContextLayout2& layout_env) {
 	for (auto& child : children | view_layouted()) {
 		const auto env_size = layout_env.size - padding_size3() - child.core().margin_size3();
 		const auto position = padding_LB3() + child.core().margin_LB3();
@@ -87,8 +127,8 @@ void CorePanelFull::doLayout2(const ContextLayout2& layout_env) {
 
 // =================================================================================================
 
-core_ptr PanelFull::create_core(std::string name) {
-	return create_core_ptr<CorePanelFull>(std::move(name));
+core_ptr PanelAnchor3D::create_core(std::string name) {
+	return create_core_ptr<CorePanelAnchor3D>(std::move(name));
 }
 
 // -------------------------------------------------------------------------------------------------

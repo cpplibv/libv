@@ -30,6 +30,8 @@ public:
 	void subscribe(CoreComponent& component);
 	void subscribe_region(CoreComponent& component);
 
+	void enable(CoreComponent& component, bool value);
+
 	void update(CoreComponent& component, libv::vec3f position, libv::vec3f size, MouseOrder order);
 	void update_region(CoreComponent& component, libv::vec2f remap_offset);
 
@@ -51,6 +53,9 @@ public:
 //	void foreach_mouse_over(libv::function_ref<void(const ComponentMouseInfo&)> func);
 
 public:
+	void debug();
+
+public:
 	libv::vec2f get_global_position(const CoreComponent& component);
 
 public:
@@ -61,7 +66,7 @@ public:
 	void event_scroll(libv::vec2f movement);
 
 	/// Event update is necessary to support multiple 'subscribe' and 'update' changes atomically
-	void event_update();
+	void event_update_layout();
 };
 
 // -------------------------------------------------------------------------------------------------

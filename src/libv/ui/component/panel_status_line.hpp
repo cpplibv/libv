@@ -3,8 +3,9 @@
 #pragma once
 
 // pro
-#include <libv/ui/component/panel_line.hpp>
 #include <libv/ui/chrono.hpp>
+#include <libv/ui/component/panel_line.hpp>
+#include <libv/ui/property/background.hpp>
 
 
 namespace libv {

@@ -24,7 +24,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreScrollArea : public CoreComponent {
-	friend class ScrollArea;
+	friend ScrollArea;
 	[[nodiscard]] inline auto handler() { return ScrollArea{this}; }
 
 private:
@@ -89,19 +89,19 @@ void CoreScrollArea::access_properties(T& ctx) {
 			pgr::appearance, pnm::scroll_area_mode,
 			"Scroll area mode"
 	);
-//	ctx.synthetize(
+//	ctx.synthesize(
 //			[](auto& c, auto v) { c.handler().mode(std::move(v)); },
 //			[](const auto& c) { return c.handler().mode(); },
 //			pgr::behaviour, pnm::scroll_area_mode,
 //			"Scroll area mode"
 //	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().area_position(std::move(v)); },
 			[](const auto& c) { return c.handler().area_position(); },
 			pgr::behaviour, pnm::area_position,
 			"Scroll area view position"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().area_size(std::move(v)); },
 			[](const auto& c) { return c.handler().area_size(); },
 			pgr::behaviour, pnm::area_size,

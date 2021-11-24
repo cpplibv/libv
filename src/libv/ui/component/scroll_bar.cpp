@@ -32,7 +32,7 @@ namespace ui {
 // -------------------------------------------------------------------------------------------------
 
 class CoreScrollBar : public CoreComponent {
-	friend class ScrollBar;
+	friend ScrollBar;
 	[[nodiscard]] inline auto handler() { return ScrollBar{this}; }
 
 private:
@@ -160,31 +160,31 @@ void CoreScrollBar::access_properties(T& ctx) {
 			"Orientation"
 	);
 
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().value(std::move(v)); },
 			[](const auto& c) { return c.handler().value(); },
 			pgr::behaviour, pnm::value,
 			"Current value"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().value_min(std::move(v)); },
 			[](const auto& c) { return c.handler().value_min(); },
 			pgr::behaviour, pnm::value_min,
 			"Minimum value"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().value_max(std::move(v)); },
 			[](const auto& c) { return c.handler().value_max(); },
 			pgr::behaviour, pnm::value_max,
 			"Maximum value"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().value_range(std::move(v)); },
 			[](const auto& c) { return c.handler().value_range(); },
 			pgr::behaviour, pnm::value_range,
 			"Value range covered by the scroll bar"
 	);
-	ctx.synthetize(
+	ctx.synthesize(
 			[](auto& c, auto v) { c.handler().value_step(std::move(v)); },
 			[](const auto& c) { return c.handler().value_step(); },
 			pgr::behaviour, pnm::value_step,

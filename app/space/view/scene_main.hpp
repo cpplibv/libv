@@ -7,7 +7,7 @@
 // libv
 #include <libv/ctrl/fwd.hpp>
 #include <libv/ui/component/component.hpp>
-#include <libv/ui/component/panel_float.hpp>
+#include <libv/ui/component/panel_anchor.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
 #include <optional>
@@ -28,8 +28,8 @@ private:
 	User& user;
 	GameThread& game_thread;
 
-	libv::ui::PanelFloat main_layers; // libv::ui::Component main_layers;
-	libv::ui::PanelFloat game_layers; // libv::ui::Component game_layers;
+	libv::ui::PanelAnchor main_layers; // libv::ui::Component main_layers;
+	libv::ui::PanelAnchor game_layers; // libv::ui::Component game_layers;
 
 	std::shared_ptr<GameSession> game_session;
 //	std::optional<libv::ui::Component> game_scene;
