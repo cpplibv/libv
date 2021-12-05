@@ -5,21 +5,17 @@
 #include <libv/ui/component/panel_line_core.hpp>
 // ext
 #include <boost/container/small_vector.hpp>
-#include <range/v3/view/zip.hpp>
 // libv
-#include <libv/algo/adjacent_pairs.hpp>
-#include <libv/meta/for_constexpr.hpp>
-#include <libv/utility/approx.hpp>
-#include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
 // std
 #include <algorithm>
 // pro
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/component/base_panel_core.hpp>
+#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
-#include <libv/ui/layout/view_layouted.hxx>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property.hpp>
 #include <libv/ui/property_access_context.hpp>
@@ -51,10 +47,11 @@ static_assert(libv::to_underlying(Orientation::left) == 2u);
 static_assert(libv::to_underlying(Orientation::down) == 3u);
 // Inset: 0 = left, 1 = bottom, 2 = right, 3 = top
 static constexpr OrientationData OrientationTable[] = {
-	{1u, 0u, 2u, 1u, 3u, 2u, 0u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::up;
-	{0u, 1u, 2u, 0u, 2u, 3u, 1u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::right;
-	{0u, 1u, 2u, 2u, 0u, 3u, 1u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // Orientation::left;
-	{1u, 0u, 2u, 3u, 1u, 2u, 0u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // Orientation::down;
+//       X   Y   Z   Fro Bac Top Bot  Start            Direction           PenCorner
+		{1u, 0u, 2u, 1u, 3u, 2u, 0u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::up;
+		{0u, 1u, 2u, 0u, 2u, 3u, 1u, {0.f, 0.f, 0.f}, {+1.f, +1.f, +1.f}, {+0.f, +0.f, +0.f}}, // Orientation::right;
+		{0u, 1u, 2u, 2u, 0u, 3u, 1u, {1.f, 0.f, 0.f}, {-1.f, +1.f, +1.f}, {-1.f, +0.f, +0.f}}, // Orientation::left;
+		{1u, 0u, 2u, 3u, 1u, 2u, 0u, {0.f, 1.f, 0.f}, {+1.f, -1.f, +1.f}, {+0.f, -1.f, +0.f}}, // Orientation::down;
 };
 
 struct AlignmentData {
@@ -83,308 +80,247 @@ libv::vec3f CorePanelLine::doLayout1(const ContextLayout1& layout_env) {
 	const auto& orientData = OrientationTable[underlying(property.orientation())];
 	const auto _X_ = orientData._X_;
 	const auto _Y_ = orientData._Y_;
-	const auto _Z_ = orientData._Z_;
 
-	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
-		if (fix == libv::Approx(0.f)) {
-			return fix;
-		} else if (percent == libv::Approx(100.f)) {
-			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
-			return fix * 2.f;
-		} else {
-			return fix / (1.f - percent * 0.01f);
-		}
-	};
+	// --- Sum: MarginX / SpacingX / Padding ---
 
-	// --- SpacingX ---
+	auto num_layouted_child = int32_t{0};
+	auto margin_sumX = 0.f;
 
-	auto margin_spacing_sumX = 0.f;
-
-	for (const Component& child : children) {
-		if (child.core().isLayouted()) {
-			// First child only
-			margin_spacing_sumX += child.margin()[orientData.inset_frontX];
-			break;
-		}
+	for (auto& child : children | view_layouted()) {
+		margin_sumX += child.margin_size3()[_X_];
+		num_layouted_child++;
 	}
 
-	for (const Component& child : children | std::views::reverse) {
-		if (child.core().isLayouted()) {
-			// Last child only
-			margin_spacing_sumX += child.margin()[orientData.inset_backX];
-			break;
-		}
-	}
+	const auto spacing_sumX = property.spacing() * static_cast<float>(std::max(0, num_layouted_child - 1));
 
-	libv::algo::adjacent_pairs(children | view_layouted(), [&](const Component& a, const Component& b) {
-		const auto a_back = a.margin()[orientData.inset_backX];
-		const auto b_front = b.margin()[orientData.inset_frontX];
-		margin_spacing_sumX += std::max(property.spacing(), std::max(a_back, b_front));
-	});
-
-	libv::vec3f margin_spacing_sum;
-	margin_spacing_sum[_X_] = margin_spacing_sumX;
+	const auto sum_marginX_spacingX_padding =
+			build_vec3f(_X_, margin_sumX) +
+			build_vec3f(_X_, spacing_sumX) +
+			padding_size3();
 
 	// --- Size pass 1 ---
 
-	const auto env_size = layout_env.size
-			- margin_spacing_sum
-			- padding_size3();
+	const auto base_content_area_size = layout_env.size - sum_marginX_spacingX_padding;
 
-	auto result = libv::vec3f{};
 	auto pixelX = 0.f;
 	auto percentX = 0.f;
 	auto contentX = 0.f;
+	auto resultX = 0.f;
+	auto resultY = 0.f;
 
 	for (auto& child : children | view_layouted()) {
-		auto child_env_size = env_size;
-		child_env_size[_Y_] -= child.padding_size3()[_Y_];
-		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child.core(), ContextLayout1{child_env_size}) :
-				libv::vec3f{};
+		const auto child_max_size = base_content_area_size - child.margin_size3()[_Y_];
+		const auto child_dynamic = calculate_layout1_contrib(child.core(), child_max_size);
 
 		pixelX += child.size()[_X_].pixel;
 		percentX += child.size()[_X_].percent;
-		contentX += (child.size()[_X_].dynamic ? child_dynamic[_X_] : 0.0f);
+		contentX += child_dynamic[_X_];
 
-		result[_Y_] = libv::max(result[_Y_],
+		resultY = std::max(resultY,
 				resolvePercent(
-						child.size()[_Y_].pixel + (child.size()[_Y_].dynamic ? child_dynamic[_Y_] : 0.0f),
-						child.size()[_Y_].percent, child)
-					+ std::max(0.f, child.margin()[orientData.inset_topY] - padding()[orientData.inset_topY])
-					+ std::max(0.f, child.margin()[orientData.inset_bottomY] - padding()[orientData.inset_bottomY]));
-
-		result[_Z_] = libv::max(result[_Z_],
-				resolvePercent(
-						child.size()[_Z_].pixel + (child.size()[_Z_].dynamic ? child_dynamic[_Z_] : 0.0f),
-						child.size()[_Z_].percent, child));
+					child.size()[_Y_].pixel + child_dynamic[_Y_],
+					child.size()[_Y_].percent, child)
+				+ child.margin_size()[_Y_]);
 	}
 
-	result[_X_] = resolvePercent(pixelX + contentX, percentX, *this);
+	resultX = resolvePercent(pixelX + contentX, percentX, *this);
 
 	// --- Sum ---
-	return result
-			+ margin_spacing_sum
-			+ padding_size3();
+
+	const auto result = build_vec3f(_X_, resultX, _Y_, resultY, 2, 0.f);
+
+	return result + sum_marginX_spacingX_padding;
 }
 
 void CorePanelLine::doLayout2(const ContextLayout2& layout_env) {
 	const auto& alignHData = AlignmentData(info(property.align_horizontal()).rate(), info(property.align_horizontal()).justified());
 	const auto& alignVData = AlignmentData(info(property.align_vertical()).rate(), info(property.align_vertical()).justified());
 	const auto& orientData = OrientationTable[underlying(property.orientation())];
-	const auto _X_ = orientData._X_;
-	const auto _Y_ = orientData._Y_;
-	const auto _Z_ = orientData._Z_;
+
+	//
+	//                       +-------------------------+     ^   ^
+	//                       | Padding Front           |     |   | Child layout position
+	//           ^ ^         |    Child Margin Front   |     |   | (The final value passed to the child layout2)
+	//           | |         |  +---------------------+|     | ^ v
+	//           | |         |  | Child Padding Front ||     | |
+	//           | |         |  | Child Content       ||     | | Child layout Size
+	//           | |         |  | Child Padding Back  ||     | | (The final value passed to the child layout2)
+	//           | |         |  +---------------------+|     | v
+	//           | v         |    Child Margin Back    |     |
+	//           |           | Spacing                 |     |
+	//           | ^         |    Child Margin Front   |     |
+	//           | |         |  +---------------------+|     | ^
+	//           | |         |  | Child Padding Front ||     | |
+	//           | |         |  | Child Content       ||     | |
+	//           | |         |  | Child Padding Back  ||     | | Child layout Size
+	//           | |         |  +---------------------+|     | v
+	//           v |         |    Child Margin Back    |     |
+	//             |         |                         |     |
+	//             |         | Unused space            |     |
+	//             v         |                         |     |
+	//            \ \        | Padding Back            |     | Layout Size
+	//             \ \       +-------------------------+     v
+	//              \ \
+	//               \  Size that is distributed by 'percent' type of children's size (Layout Size minus spacings and parent padding)
+	//                \
+	//                  Content area size (Layout Size minus parent padding and unused space)
+	//
+	// Pixel   - Excludes the child margin
+	// Percent - Uses the space, Includes the child margin
+	// Ratio   - ? the child margin
+	// Dynamic - Excludes the child margin
 
 	// --- Build entries ---
 
-	struct Entry {
-		CoreComponent* child = nullptr;
-		libv::vec3f size;
-		float front_spacingX;
-//		float jastifyGapRatio;
-	};
-
-	boost::container::small_vector<Entry, 32> entries;
-	entries.resize(children.size()); // Note: This resize may allocate more memory as children may include non-layouted components too, but that is rare and saves a pass
-	int entries_num = 0;
-	for (auto& c : children | view_layouted())
-		entries[entries_num++].child = &c.core();
-	entries.resize(entries_num);
-
-	// --- SpacingX ---
-
-	auto margin_spacing_sumX = 0.f;
-
-	if (!entries.empty()) { // First child only
-		Entry& b = entries.front();
-		b.front_spacingX = std::max(0.f, b.child->margin()[orientData.inset_frontX] - padding()[orientData.inset_frontX]);
-		margin_spacing_sumX += b.front_spacingX;
-	}
-
-	if (!entries.empty()) { // Last child only
-		Entry& a = entries.back();
-		margin_spacing_sumX += a.child->margin()[orientData.inset_backX];
-	}
-
-	libv::algo::adjacent_pairs(entries, [&](Entry& a, Entry& b) {
-		const auto a_back = a.child->margin()[orientData.inset_backX];
-		const auto b_front = b.child->margin()[orientData.inset_frontX];
-		b.front_spacingX = std::max(property.spacing(), std::max(a_back, b_front));
-		margin_spacing_sumX += b.front_spacingX;
-	});
-
-	libv::vec3f margin_spacing_sum;
-	margin_spacing_sum[_X_] = margin_spacing_sumX;
+	boost::container::small_vector<LayoutEntry, 32> entries;
+	build_entries(entries, children, orientData._X_, orientData._Y_, orientData.inset_frontX, orientData.inset_backX, orientData.inset_bottomY);
 
 	// --- Size ---
 
-	const auto percent_size = layout_env.size - padding_size3();
-	const auto env_size = layout_env.size - margin_spacing_sum - padding_size3();
+	// Margin / Spacing
 
-	auto contentX = 0.f;
-	auto sumRatioX = 0.f;
+	const auto layout_sizeX = layout_env.size[orientData._X_];
+	const auto layout_sizeY = layout_env.size[orientData._Y_];
+	const auto padding_sizeX = padding_size()[orientData._X_];
+	const auto padding_sizeY = padding_size()[orientData._Y_];
+	const auto padding_size = libv::vec2f{padding_sizeX, padding_sizeY};
+	const auto spacing_sumX = entries.empty() ? 0.f : property.spacing() * static_cast<float>(entries.size() - 1);
 
-	for (auto& entry : entries) {
-		auto& child = *entry.child;
-		auto& childSize = entry.size;
+	auto children_sum_marginX = 0.f;
+	auto children_sum_ratioX = 0.f;
+	auto unused_spaceX = layout_sizeX - padding_sizeX - spacing_sumX;
 
-		auto child_env_size = env_size;
-		child_env_size[_Y_] -= child.padding_size3()[_Y_];
-		const auto child_dynamic = child.size().has_dynamic() ?
-				AccessLayout::layout1(child, ContextLayout1{child_env_size}) :
-				libv::vec3f{};
-
-		libv::meta::for_constexpr<0, 3>([&](auto&& i) {
-			childSize[i] =
-					child.size()[i].pixel +
-					child.size()[i].percent * 0.01f * percent_size[i] +
-					(child.size()[i].dynamic ? child_dynamic[i] : 0.f);
-		});
-
-		sumRatioX += child.size()[_X_].ratio;
-		contentX += childSize[_X_];
-	}
-
-	auto leftoverX = env_size[_X_] - contentX;
-	auto ratioScalerX = sumRatioX > 0.f ? leftoverX / sumRatioX : 0.f;
-	auto sizeContent = vec3f{};
+	// Pixel, Percent / Pre process pass
+	const auto spaceDistributedByPercentX = layout_sizeX - padding_sizeX - spacing_sumX;
+	const auto spaceDistributedByPercentY = layout_sizeY - padding_sizeY;
 
 	for (auto& entry : entries) {
-		const auto& child = *entry.child;
-		auto& childSize = entry.size;
+		children_sum_marginX += entry.marginSizeSW.x;
+		children_sum_ratioX += entry.propertySizeSW.x.ratio;
 
-		childSize[_X_] += ratioScalerX * child.size()[_X_].ratio;
-		if (child.size()[_Y_].ratio > 0.f)
-			childSize[_Y_] = env_size[_Y_]
-//					- child.margin()[orientData.inset_topY]
-//					- child.margin()[orientData.inset_bottomY];
-					- std::max(0.f, child.margin()[orientData.inset_topY] - padding()[orientData.inset_topY])
-					- std::max(0.f, child.margin()[orientData.inset_bottomY] - padding()[orientData.inset_bottomY]);
-		if (child.size()[_Z_].ratio > 0.f)
-			childSize[_Z_] = env_size[_Z_];
+		entry.resultSizeSW.x += entry.propertySizeSW.x.pixel;
+		entry.resultSizeSW.y += entry.propertySizeSW.y.pixel;
+		entry.resultSizeSW.x += entry.propertySizeSW.x.percent * 0.01f * spaceDistributedByPercentX;
+		entry.resultSizeSW.y += entry.propertySizeSW.y.percent * 0.01f * spaceDistributedByPercentY;
 
-		sizeContent[_X_] += childSize[_X_];
-		sizeContent[_Y_] = std::max(sizeContent[_Y_], childSize[_Y_]);
-		sizeContent[_Z_] = std::max(sizeContent[_Z_], childSize[_Z_]);
+		unused_spaceX -= entry.resultSizeSW.x;
 	}
 
-	sizeContent[_X_] += margin_spacing_sumX;
+	unused_spaceX -= children_sum_marginX;
 
-	// --- SpacingX Justify distribution ---
+	// Dynamic
+	for (auto& entry : entries) {
+		const auto max_child_size = libv::vec2f{unused_spaceX, layout_sizeY - padding_sizeY - entry.marginSizeSW.y};
+		const auto dynamic_contrib_size = swizzle(calculate_layout1_contrib(*entry.child, unswizzle(max_child_size, orientData._X_, orientData._Y_)), orientData._X_, orientData._Y_);
+		entry.resultSizeSW += dynamic_contrib_size;
 
-	auto environmentUnused = layout_env.size - sizeContent;
+		unused_spaceX -= dynamic_contrib_size.x;
+	}
 
-	if ((_X_ == 0 ? alignHData.justified : alignVData.justified) && entries.size() >= 2) {
-		// Gather GAPS
-		// Sort GAPS by size
-		// Calculate new value for the lowest N GAP
-		// Assign the new value to lowest N GAP
+	// Ratio / Post process pass
+	auto maxUsedY = 0.f;
 
-		boost::container::small_vector<Entry*, 32> gaps(entries_num - 1, nullptr);
-		for (size_t i = 1; i < entries.size(); ++i) // Skip first entry
-			gaps[i - 1] = &entries[i];
+	const auto spaceDistributedByRatioX = unused_spaceX;
+	const auto spaceDistributedByRatioScalerX = children_sum_ratioX > 0.f ? spaceDistributedByRatioX / children_sum_ratioX : 0.f;;
+	if (children_sum_ratioX > 0.f)
+		unused_spaceX = 0.f;
 
-		std::ranges::sort(gaps, std::less<>{}, [](Entry* e) { return e->front_spacingX; });
+	for (auto& entry : entries) {
+		entry.resultSizeSW.x += entry.propertySizeSW.x.ratio * spaceDistributedByRatioScalerX;
 
-		auto unused_gap_size_sum = environmentUnused[_X_];
-		auto lowest_gap_size = gaps[0]->front_spacingX;
+		if (entry.propertySizeSW.y.ratio > 0.f)
+			entry.resultSizeSW.y = layout_sizeY - padding_sizeY - entry.marginSizeSW.y;
 
-		size_t i = 1;
-		for (; i < gaps.size(); ++i) {
-			const auto i_f = static_cast<float>(i);
-
-			const auto curr_gap_size = gaps[i - 1]->front_spacingX;
-			const auto next_gap_size = gaps[i - 0]->front_spacingX;
-
-			const auto diff_to_next = next_gap_size - curr_gap_size;
-			const auto diff_to_next_times_i = (i_f) * diff_to_next;
-
-			if (diff_to_next_times_i < unused_gap_size_sum) {
-				lowest_gap_size += diff_to_next;
-				unused_gap_size_sum -= diff_to_next_times_i;
-			} else {
-				break;
-			}
-		}
-
-		lowest_gap_size += unused_gap_size_sum / static_cast<float>(i);
-
-		for (size_t j = 0; j < i; ++j)
-			gaps[j]->front_spacingX = lowest_gap_size;
-
-		sizeContent[_X_] += environmentUnused[_X_];
-		environmentUnused[_X_] = 0.0f;
+		const auto usedY = padding_sizeY + entry.resultSizeSW.y + entry.marginSizeSW.y;
+		maxUsedY = std::max(maxUsedY, usedY);
 	}
 
 	// --- Position ---
 
-	const auto alignmentScale = vec3f{alignHData.scale, alignVData.scale, 0.0f};
+	// Justify
+	const auto isJustified = entries.size() >= 2 && (orientData._X_ == 0 ? alignHData.justified : alignVData.justified);
+	const auto spaceDistributedForJustifyX = unused_spaceX;
+	const auto justifyGapX = isJustified ? spaceDistributedForJustifyX / static_cast<float>(entries.size() - 1) : 0.f;
+	if (isJustified)
+		unused_spaceX = 0.f;
 
-	const auto originToContent = (environmentUnused - padding_size3()) * alignmentScale;
-	const auto contentToStart = sizeContent * orientData.start;
+	// Alignment
+	const auto alignmentScaleX = orientData._X_ == 0 ? alignHData.scale : alignVData.scale;
+	const auto alignmentScaleY = orientData._Y_ == 0 ? alignHData.scale : alignVData.scale;
+	const auto alignmentScale = libv::vec2f{alignmentScaleX, alignmentScaleY};
 
-	auto startToPen = vec3f{};
+	// Assign
+	const auto unused_spaceY = layout_sizeY - maxUsedY;
+	const auto unused_space = libv::vec2f{unused_spaceX, unused_spaceY};
+	const auto used_space = swizzle(layout_env.size, orientData._X_, orientData._Y_) - unused_space;
+
+	const auto originToContent = unused_space * alignmentScale;
+	const auto contentToStart = (used_space - padding_size) * swizzle(orientData.start, orientData._X_, orientData._Y_);
+
+	auto startToPen = vec2f{};
 
 	for (auto& entry : entries) {
-		auto& child = *entry.child;
-		auto& childSize = entry.size;
+		startToPen.x += orientData.direction[orientData._X_] * entry.marginFrontX;
 
-		startToPen[_X_] += orientData.direction[_X_] * entry.front_spacingX;
+		auto penToBase = entry.resultSizeSW * swizzle(orientData.penCorner, orientData._X_, orientData._Y_);
+		penToBase.y += entry.marginSizeSW.y * orientData.penCorner[orientData._Y_];
 
-		auto penToBase = childSize * orientData.penCorner;
-		penToBase[_Y_] += child.margin_size3()[_Y_] * orientData.penCorner[_Y_];
+		const auto unusedSpaceAboveChildY = used_space.y - padding_sizeY - entry.resultSizeSW.y - entry.marginSizeSW.y;
+		auto baseToPosition = vec2f{};
+		baseToPosition.y = unusedSpaceAboveChildY * alignmentScale.y;
+		baseToPosition.y += entry.marginBottomY;
 
-		const auto spaceY_to_border_top = padding()[orientData.inset_topY] + (env_size[_Y_] - childSize[_Y_]) * (1.f - alignmentScale[_Y_]);
-		const auto spaceY_to_border_bottom = padding()[orientData.inset_bottomY] + (env_size[_Y_] - childSize[_Y_]) * alignmentScale[_Y_];
-		const auto marginY_needs_more_top = std::max(0.f, child.margin()[orientData.inset_topY] - spaceY_to_border_top);
-		const auto marginY_needs_more_bottom = std::max(0.f, child.margin()[orientData.inset_bottomY] - spaceY_to_border_bottom);
-
-		if (marginY_needs_more_bottom > 0.f && marginY_needs_more_top > 0.f)
-			log_ui.warn("Insufficient space for margins for {}. Requested additional space on both secondary side", child.path());
-
-		auto baseToPosition = vec3f{};
-		baseToPosition[_Y_] = (sizeContent[_Y_] - childSize[_Y_]) * alignmentScale[_Y_];
-		baseToPosition[_Y_] += marginY_needs_more_bottom;
-		baseToPosition[_Y_] -= marginY_needs_more_top;
-
-		const auto position = padding_LB3()
+		const auto position = swizzle(padding_LB(), orientData._X_, orientData._Y_)
 				+ originToContent
 				+ contentToStart
 				+ startToPen
 				+ penToBase
 				+ baseToPosition;
 
-		// std::cout << "---------: " << child.path() << std::endl;
-		// std::cout << "env_size: " << env_size << std::endl;
-		// std::cout << "sizeContent: " << sizeContent << std::endl;
-		// std::cout << "padding(): " << padding() << std::endl;
-		// std::cout << "childSize: " << childSize << std::endl;
-		// std::cout << "child.margin(): " << child.margin() << std::endl;
-		// std::cout << std::endl;
-		// std::cout << "spaceY_to_border_bottom: " << spaceY_to_border_bottom << std::endl;
-		// std::cout << "spaceY_to_border_top: " << spaceY_to_border_top << std::endl;
-		// std::cout << "marginY_needs_more_bottom: " << marginY_needs_more_bottom << std::endl;
-		// std::cout << "marginY_needs_more_top: " << marginY_needs_more_top << std::endl;
-		// std::cout << std::endl;
-		// std::cout << "position = : " << position << std::endl;
-		// std::cout << "    + padding_LB3(): " << padding_LB3() << std::endl;
-		// std::cout << "    + originToContent: " << originToContent << std::endl;
-		// std::cout << "    + contentToStart: " << contentToStart << std::endl;
-		// std::cout << "    + startToPen: " << startToPen << std::endl;
-		// std::cout << "    + penToBase: " << penToBase << std::endl;
-		// std::cout << "    + baseToPosition: " << baseToPosition << std::endl;
-		// std::cout << std::endl;
+		const auto roundedPositionSW = libv::vec::round(position);
+		const auto roundedPosition = unswizzle(roundedPositionSW, orientData._X_, orientData._Y_);
+		const auto roundedSizeSW = libv::vec::round(position + entry.resultSizeSW) - roundedPositionSW;
+		const auto roundedSize = unswizzle(roundedSizeSW, orientData._X_, orientData._Y_);
 
-		const auto roundedPosition = libv::vec::round(position);
-		const auto roundedSize = libv::vec::round(position + childSize) - roundedPosition;
+//		std::cout << "---------: " << entry.child->path() << std::endl;
+//		std::cout << "layout_env.size: " << layout_env.size << std::endl;
+//		std::cout << "unused_space: " << unused_space << std::endl;
+//		std::cout << "used_space: " << used_space << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "alignmentScale: " << alignmentScale << std::endl;
+//		std::cout << "unusedSpaceAboveChildY: " << unusedSpaceAboveChildY << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "isJustified: " << isJustified << std::endl;
+//		std::cout << "spaceDistributedForJustifyX: " << spaceDistributedForJustifyX << std::endl;
+//		std::cout << "justifyGapX: " << justifyGapX << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "padding_sizeX: " << padding_sizeX << std::endl;
+//		std::cout << "padding_sizeY: " << padding_sizeY << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "entry.child->size(): " << entry.child->size() << std::endl;
+//		std::cout << "entry.child->margin(): " << entry.child->margin() << std::endl;
+//		std::cout << "entry.resultSizeSW: " << entry.resultSizeSW << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "position = : " << position << std::endl;
+//		std::cout << "    + padding_LB3(): " << swizzle(padding_LB(), orientData._X_, orientData._Y_) << std::endl;
+//		std::cout << "    + originToContent: " << originToContent << std::endl;
+//		std::cout << "    + contentToStart: " << contentToStart << std::endl;
+//		std::cout << "    + startToPen: " << startToPen << std::endl;
+//		std::cout << "    + penToBase: " << penToBase << std::endl;
+//		std::cout << "    + baseToPosition: " << baseToPosition << std::endl;
+//		std::cout << std::endl;
+//		std::cout << "roundedPositionSW: " << roundedPositionSW << std::endl;
+//		std::cout << "roundedSizeSW    : " << roundedSizeSW << std::endl;
+//		std::cout << "roundedPosition  : " << roundedPosition << std::endl;
+//		std::cout << "roundedSize      : " << roundedSize << std::endl;
+//		std::cout << std::endl;
 
 		AccessLayout::layout2(
-				child,
-				layout_env.enter(roundedPosition, roundedSize)
+				*entry.child,
+				layout_env.enter(libv::vec3f{roundedPosition, 0.f}, libv::vec3f{roundedSize, 0.f})
 		);
 
-		startToPen[_X_] += orientData.direction[_X_] * childSize[_X_];
+		startToPen.x += (entry.resultSizeSW.x + entry.marginBackX + property.spacing() + justifyGapX) * orientData.direction[orientData._X_];
 	}
 }
 
@@ -424,7 +360,7 @@ void PanelLine::spacing(Spacing value) {
 	AccessProperty::manual(self(), self().property.spacing, value);
 }
 
-Spacing PanelLine::spacing() const noexcept{
+Spacing PanelLine::spacing() const noexcept {
 	return self().property.spacing();
 }
 

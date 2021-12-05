@@ -12,9 +12,9 @@
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/panel_full_core.hpp>
+#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
-#include <libv/ui/layout/view_layouted.hxx>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
 

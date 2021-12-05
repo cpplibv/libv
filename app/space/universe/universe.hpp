@@ -45,6 +45,7 @@ enum class FleetCommandType {
 //		upgrade,
 //		...,
 };
+
 [[nodiscard]] constexpr inline auto operator+(FleetCommandType e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------

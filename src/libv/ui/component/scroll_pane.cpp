@@ -2,18 +2,18 @@
 
 // hpp
 #include <libv/ui/component/scroll_pane.hpp>
-#include <libv/utility/approx.hpp>
 #include <libv/meta/for_constexpr.hpp>
 // std
 #include <optional>
 // pro
+#include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/layout/layout_utility.hxx>
 #include <libv/ui/context/context_focus_traverse.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_mouse.hpp>
 #include <libv/ui/context/context_render.hpp>
 #include <libv/ui/context/context_style.hpp>
 #include <libv/ui/context/context_ui.hpp>
-#include <libv/ui/component/detail/core_component.hpp>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
 
@@ -155,17 +155,6 @@ libv::vec3f CoreScrollArea::doLayout1(const ContextLayout1& layout_env) {
 			is_horizontal ? -1.0f : env_size.x,
 			is_vertical ? -1.0f : env_size.y,
 			env_size.z};
-
-	const auto resolvePercent = [](const float fix, const float percent, const auto& component) {
-		if (fix == libv::Approx(0.f)) {
-			return fix;
-		} else if (percent == libv::Approx(100.f)) {
-			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
-			return fix * 2.f;
-		} else {
-			return fix / (1.f - percent * 0.01f);
-		}
-	};
 
 	auto result = libv::vec3f{};
 
@@ -457,17 +446,6 @@ void ScrollArea::area_position(libv::vec2f value) noexcept {
 //
 //libv::vec3f CoreScrollPane::doLayout1(const ContextLayout1& environment) {
 //	(void) environment;
-//
-//	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
-//		if (fix == libv::Approx(0.f)) {
-//			return fix;
-//		} else if (percent == libv::Approx(100.f)) {
-//			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
-//			return fix * 2.f;
-//		} else {
-//			return fix / (1.f - percent * 0.01f);
-//		}
-//	};
 //
 //	auto result = libv::vec3f{};
 //

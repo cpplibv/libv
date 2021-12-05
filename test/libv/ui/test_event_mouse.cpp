@@ -169,9 +169,9 @@ public:
 // =================================================================================================
 // TODO P5: Test scroll area (float region)
 
-TEST_CASE("AAA libv.ui.event.mouse log", "[libv.ui.event.mouse]") {
-	std::cout << libv::logger_stream;
-}
+//TEST_CASE("AAA libv.ui.event.mouse log", "[libv.ui.event.mouse]") {
+//	std::cout << libv::logger_stream;
+//}
 
 TEST_CASE("Mouse: subscribe and unsubscribe watcher test", "[libv.ui.event.mouse]") {
 	TestContextMouse table;

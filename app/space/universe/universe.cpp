@@ -57,7 +57,7 @@ void Universe::process(CTO_FleetBoxSelect&& cto) {
 	// Bound check
 	selectedFleetIDList.clear();
 	fleetIdSelectionMap.clear();
-	for (const auto & fleetID : cto.fleetIDs) {
+	for (const auto& fleetID : cto.fleetIDs) {
 		fleetIdSelectionMap.emplace(fleetID, Fleet::SelectionStatus::selected);
 	}
 	selectedFleetIDList.insert(cto.fleetIDs.begin(), cto.fleetIDs.end());
@@ -87,6 +87,7 @@ void Universe::process(CTO_ClearFleets&& cto) {
 
 	// Permission check
 	// Bound check
+	fleetIdSelectionMap.clear();
 	selectedFleetIDList.clear();
 	fleets.clear();
 	nextFleetID = FleetID{0};

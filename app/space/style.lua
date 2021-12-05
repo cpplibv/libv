@@ -177,7 +177,7 @@ ui.style("space.hud-bar.lobby.panel") {
 	align_horizontal = "left",
 	align_vertical = "center",
 	anchor = "center_left",
-	background = colors.hud_light_bg_color, -- TODO P3: Panels have no background, implement it
+	background = colors.hud_light_bg_color,
 	margin = 5,
 	padding = 2,
 	orientation = "down",
@@ -190,17 +190,8 @@ ui.style("space.hud-bar.lobby.name") {
 	align_vertical = "center",
 	background = colors.hud_light_bg_color,
 	font_color = colors.text_black,
-	padding = {4, 4},
+	padding = {10, 4},
 	size = "D1r, D",
-
-	-- !!! These value causes a layout bug, bigger or smaller padding along X is fine, but this interval is incorrect
-	-- 		As it is interval related most likely a merging if goes wrong or along the wrong dim
-	--padding = {10, 4},
-	--size = "10pxD1r, D",
-	--
-	-- The goal:
-	--padding = {10, 4},
-	--size = "D1r, D",
 }
 
 ui.style("space.hud-bar.lobby.title") {
@@ -217,5 +208,6 @@ ui.style("space.overlay.controls-help.lbl") {
 	background = "color: rgba(0.0, 0.0, 0.0, 0.6)",
 	padding = {6, 4},
 	font_color = colors.text_light,
+
 	size = "D, D",
 }

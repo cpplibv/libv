@@ -22,7 +22,6 @@ libv::ui::Component SceneMPStatus::create(libv::Nexus& nexus) {
 	return bar;
 }
 
-//SceneMPStatus::SceneMPStatus(libv::Nexus& nexus, Lobby& lobby) : nexus(nexus), lobby(lobby) {}
 SceneMPStatus::SceneMPStatus(libv::ui::PanelLine bar, libv::Nexus& nexus) :
 		bar(std::move(bar)),
 		nexus(nexus) {

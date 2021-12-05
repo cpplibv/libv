@@ -74,30 +74,35 @@ app.space: Implement Universe Snapshots
 
 
 
+Bug P1: repeated smashing of host/join can cause failure
+		| Also: Simple disconnect as a non connected client will do long timeout
+
+Bug P1: app.space: "Space" title button is mouse shielded by the canvas
+		| Maybe mouse movement only | Dont think so
+		\ Should be a mouse order issue
+
+
+
+
+Bug P3: app.space: Model loading failure causes silent error and soft-lock
+		\ Who catches that exception and why?
+
+Performance Bug P4: app.space: 200*200 debug sphere causes low fps
+		| debug shapes have to switch to pre-uploaded meshes
+
+
+
+
 app.space: Selection state storage
 
 Main areas of focus: Cost / Value
 	40 / 6: Control: Ctrl box selection support
+			| Maybe enough if we switch to binary feature for now
 
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
 
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
-
-	Bug P1: repeated smashing of host/join can cause failure
-			| Also: Simple disconnect as a non connected client will do long timeout
-	Bug P1: app.space: "Vader2" as client name breaks the lobby layout
-	Bug P1: app.space: 200*200 debug sphere causes low fps
-			| debug shapes have to switch to pre-uploaded meshes
-	Bug P1: app.space: "Space" title button is mouse shielded by the canvas
-			| Maybe mouse movement only | Dont think so
-			\ Should be a mouse order issue
-
-	Bug P3: app.space: Model loading failure causes silent error and soft-lock
-			\ Who catches that exception and why?
-	Bug P5: libv.gl: missing file name replacement
-			2090909000(33) : error C7011: implicit cast from "vec4" to "vec3"
-
 
 
 libv.rev: PostProcess should respect original framebuffer and viewport values

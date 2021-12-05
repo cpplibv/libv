@@ -449,17 +449,20 @@ libv.ui: The UI Paper
 		double step_arrow; // [up/down] 1 or 3 or settings.scroll_unit
 		double step_page; // [pageup/pagedown] num_lines_displayed
 
-	Spacing
-		In a container space between elements (none on the outside borders, only between elements)
-		Its a very useful 'alias' for margins
+	Spacing / Margin / Padding
 
-	Margin
-		space between elements
-		always collapses with neighbouring margins (? and spacings)
-			(?) except respects negative
+		TODO P5: ASCII diagram
 
-	Padding
-		space between border and content
+		Spacing
+			In a container space between elements (none on the outside borders, only between elements)
+			It's a useful 'alias' for margins
+			Space between elements
+
+		Margin
+			Space around an element
+
+		Padding
+			Space between the border and the content inside an element
 
 	NOTES: fragments
 		caption

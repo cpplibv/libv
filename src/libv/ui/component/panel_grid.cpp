@@ -12,15 +12,15 @@
 #include <libv/algo/sum.hpp>
 #include <libv/meta/for_constexpr.hpp>
 #include <libv/range/view_deinterleave.hpp>
-#include <libv/utility/approx.hpp>
 #include <libv/utility/observer_ref.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/detail/core_component.hpp>
+#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/component/base_panel_core.hpp>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
-#include <libv/ui/layout/view_layouted.hxx>
 #include <libv/ui/property_access_context.hpp>
 
 

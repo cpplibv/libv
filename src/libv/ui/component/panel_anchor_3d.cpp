@@ -4,14 +4,14 @@
 #include <libv/ui/component/panel_anchor_3d.hpp>
 // libv
 #include <libv/meta/for_constexpr.hpp>
-#include <libv/utility/approx.hpp>
 #include <libv/utility/min_max.hpp>
 #include <libv/utility/to_underlying.hpp>
 // pro
 #include <libv/ui/component/base_panel_core.hpp>
+#include <libv/ui/component/layout/layout_utility.hxx>
+#include <libv/ui/component/layout/view_layouted.hxx>
 #include <libv/ui/context/context_layout.hpp>
 #include <libv/ui/context/context_style.hpp>
-#include <libv/ui/layout/view_layouted.hxx>
 #include <libv/ui/log.hpp>
 #include <libv/ui/property_access_context.hpp>
 
@@ -77,17 +77,6 @@ void CorePanelAnchor3D::doStyle(ContextStyle& ctx, ChildID childID) {
 
 libv::vec3f CorePanelAnchor3D::doLayout1(const ContextLayout1& layout_env) {
 	const auto env_size = layout_env.size - padding_size3();
-
-	const auto resolvePercent = [](const float fix, const float percent, auto& component) {
-		if (fix == libv::Approx(0.f)) {
-			return fix;
-		} else if (percent == libv::Approx(100.f)) {
-			log_ui.warn("Invalid sum of size percent {} with fixed width of {} during layout of {}", percent, fix, component.path());
-			return fix * 2.f;
-		} else {
-			return fix / (1.f - percent * 0.01f);
-		}
-	};
 
 	auto result = libv::vec3f{};
 
