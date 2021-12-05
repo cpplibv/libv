@@ -73,27 +73,31 @@ app.space: Implement Universe Snapshots
 
 
 
+app.space: Selection state storage
+app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
+		| Solution: Special archives with members to indicate the reason for the serialization, and inside the serializers branching on this info
+
+app.space: Controls: Clicking on shuffle button deselects
+app.space: Controls: Clicking and rotating the camera it deselects
+		| Should analog features have priority over action/binary?
+				Or does (0,0) 'magic' happens and that causes the issue?
+
+
+
 
 Bug P1: repeated smashing of host/join can cause failure
 		| Also: Simple disconnect as a non connected client will do long timeout
-
 Bug P1: app.space: "Space" title button is mouse shielded by the canvas
 		| Maybe mouse movement only | Dont think so
 		\ Should be a mouse order issue
-
-
-
-
 Bug P3: app.space: Model loading failure causes silent error and soft-lock
 		\ Who catches that exception and why?
-
 Performance Bug P4: app.space: 200*200 debug sphere causes low fps
 		| debug shapes have to switch to pre-uploaded meshes
 
 
 
 
-app.space: Selection state storage
 
 Main areas of focus: Cost / Value
 	40 / 6: Control: Ctrl box selection support
@@ -107,8 +111,6 @@ Main areas of focus: Cost / Value
 
 libv.rev: PostProcess should respect original framebuffer and viewport values
 
-app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
-
 libv.ctrl: Box selection support
 		start
 			[press]
@@ -117,7 +119,6 @@ libv.ctrl: Box selection support
 		end
 			[release]
 libv.ctrl: Accidental collusion with Ctrl+A[press] and A[hold]
-
 libv.ctrl: Late enter of feature_binary: On context_enter call any binary feature that would become active with the current state
 libv.ctrl: 'Acquire "mouse"' similarly as UI does it
 libv.ctrl: arg.reject_feature(); aka a way to reject the feature activation from within the feature: in this case the next candidates would be called

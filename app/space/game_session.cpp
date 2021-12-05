@@ -34,7 +34,7 @@ void GameSession::unregister_nexus() {
 	nexus.disconnect_all(this);
 }
 
-void GameSession::update(libv::ui::time_duration delta_time) {
+void GameSession::update(libv::time_duration delta_time) {
 	playout.update(universe);
 	universe.update(delta_time);
 }

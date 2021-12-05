@@ -52,10 +52,15 @@ public:
 	float angle = 0.0f;
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
-//	Line start_line;
-//	libv::vec3f start_eye;
-	libv::vec3f start_selected_grid_point;
-	libv::vec3f start_dir;
+
+	enum class SelectionMode {
+		none,
+		d25,
+		d3,
+	};
+	SelectionMode selectionMode = SelectionMode::none;
+	libv::vec3f selectionStartGridPoint;
+	libv::vec3f selectionStartDir;
 
 	libv::rev::RenderTarget renderTarget;
 	libv::rev::PostProcessing postProcessing;

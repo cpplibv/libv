@@ -11,6 +11,7 @@
 #include <cassert>
 // pro
 #include <space/game_session.hpp>
+#include <space/view/canvas_control.hpp>
 #include <space/renderer.hpp>
 #include <space/universe/universe.hpp>
 
@@ -100,12 +101,12 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 		}
 	}
 
-	// hover logic
-	// calculate_world_coord(*this);
-
-	if (main_canvas)
+	if (main_canvas) {
 		// <<< P1: Game_session update shouldnt come from the canvas, or should it?
 		game_session.update(delta_time);
+
+		CanvasControl::update(*this, delta_time);
+	}
 }
 
 void SpaceCanvas::render(libv::glr::Queue& glr) {
@@ -163,7 +164,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	for (const auto& fleet : universe.fleets) {
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(fleet.position);
-		glr.model.scale(Fleet::pickingType.radius_universe);
+//		glr.model.scale(Fleet::pickingType.radius_universe);
+		glr.model.scale(0.2f);
 
 		std::string fleetLabel;
 
@@ -189,13 +191,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 				std::move(fleetLabel)
 		);
 
-		const auto it = universe.fleetIdSelectionMap.find(fleet.id);
-		if (it != universe.fleetIdSelectionMap.end()) {
-			const auto selection_type = it->second;
-			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, selection_type);
-		}
-		else
-			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, Fleet::SelectionStatus::not_selected);
+		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
 	}
 
 	// --- Render EditorBackground/Sky ---

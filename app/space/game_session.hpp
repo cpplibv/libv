@@ -7,6 +7,7 @@
 // libv
 #include <libv/ctrl/fwd.hpp>
 #include <libv/ui/component/fwd.hpp>
+#include <libv/utility/chrono.hpp>
 #include <libv/utility/nexus_fwd.hpp>
 // std
 #include <memory>
@@ -50,7 +51,7 @@ private:
 	void unregister_nexus();
 
 public:
-	void update(libv::ui::time_duration delta_time);
+	void update(libv::time_duration delta_time);
 };
 
 std::shared_ptr<GameSession> createSinglePlayer(GameThread& game_thread, libv::Nexus& nexus);

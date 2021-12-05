@@ -29,15 +29,23 @@ void main() {
 	result = vec4(base_color.rgb * attenuation, base_color.a);
 
 
-	if (selected == 1) { // Selected
-		vec3 fresnel_color = fresnel(2, vec3(2.0, 1.0, 0.2), N, V);
-		result.rgb += fresnel_color;
+	if (selected == 0) // NotSelected
+		;
 
-//	} else if (selected == 2) {
-//	} else if (selected == 3) {
-//		vec4 fresnel_color = fresnel(2, vec4(0.95, 0, 0.66, 0.8), N, V);
-//		result += fresnel_color;
-	}
+	else if (selected == 1) // hoverSingle
+		result.rgb += fresnel(4, vec3(2.0, 1.0, 0.2) * 2, N, V);
+
+	else if (selected == 2) // hoverBox
+		result.rgb += fresnel(4, vec3(2.0, 1.0, 0.2) * 2, N, V);
+
+	else if (selected == 3) // Selected
+		result.rgb += fresnel(2, vec3(2.0, 1.0, 0.2) * 4, N, V);
+
+	else if (selected == 4) // selectedHoverSingle
+		result.rgb += fresnel(2, vec3(2.0, 1.0, 0.2) * 6, N, V);
+
+	else if (selected == 5) // selectedHoverBox
+		result.rgb += fresnel(2, vec3(2.0, 1.0, 0.2) * 6, N, V);
 
 //	result.rgb = N;
 }

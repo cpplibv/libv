@@ -45,6 +45,7 @@ struct Codec : libv::serial::Codec3<Codec> {
 				create_entry<Ar, F, CTO_FleetSpawn>(),
 				create_entry<Ar, F, CTO_FleetSelect>(),
 				create_entry<Ar, F, CTO_FleetSelectAdd>(),
+				create_entry<Ar, F, CTO_FleetClearSelection>(),
 				create_entry<Ar, F, CTO_FleetBoxSelect>(),
 				create_entry<Ar, F, CTO_FleetMove>(),
 				create_entry<Ar, F, CTO_FleetQueueMove>(),

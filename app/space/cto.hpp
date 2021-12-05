@@ -182,17 +182,15 @@ struct CTO_FleetBoxSelect {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_FleetMove {
+struct CTO_FleetClearSelection {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x24};
 
-	libv::vec3f target_position;
-
-	LIBV_REFLECTION_ACCESS(target_position);
+	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_FleetQueueMove {
+struct CTO_FleetMove {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x25};
 
@@ -202,9 +200,19 @@ struct CTO_FleetQueueMove {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_ClearFleets {
+struct CTO_FleetQueueMove {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{0x26};
+
+	libv::vec3f target_position;
+
+	LIBV_REFLECTION_ACCESS(target_position);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_ClearFleets {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{0x27};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -212,7 +220,7 @@ struct CTO_ClearFleets {
 
 struct CTO_Shuffle {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x27};
+	static constexpr libv::serial::CodecMessageID id{0x28};
 
 	uint64_t seed;
 

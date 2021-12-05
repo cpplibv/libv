@@ -31,6 +31,8 @@ void Universe::process(CTO_FleetSpawn&& cto) {
 	// Permission check
 	// Bound check
 
+//	fleets.emplace_back(cto.id, cto.position);
+
 	fleets.emplace_back(nextFleetID, cto.position);
 	// !!! Synchronized FleetID generation
 	nextFleetID = FleetID{+nextFleetID + 1};
@@ -40,15 +42,12 @@ void Universe::process(CTO_FleetSelect&& cto) {
 	// Permission check
 	// Bound check
 	selectedFleetIDList.clear();
-	fleetIdSelectionMap.clear();
-	fleetIdSelectionMap.emplace(cto.fleetID, Fleet::SelectionStatus::selected);
 	selectedFleetIDList.insert(cto.fleetID);
 }
 
 void Universe::process(CTO_FleetSelectAdd&& cto) {
 	// Permission check
 	// Bound check
-	fleetIdSelectionMap.insert_or_assign(cto.fleetID, Fleet::SelectionStatus::selected);
 	selectedFleetIDList.insert(cto.fleetID);
 }
 
@@ -56,11 +55,13 @@ void Universe::process(CTO_FleetBoxSelect&& cto) {
 	// Permission check
 	// Bound check
 	selectedFleetIDList.clear();
-	fleetIdSelectionMap.clear();
-	for (const auto& fleetID : cto.fleetIDs) {
-		fleetIdSelectionMap.emplace(fleetID, Fleet::SelectionStatus::selected);
-	}
 	selectedFleetIDList.insert(cto.fleetIDs.begin(), cto.fleetIDs.end());
+}
+
+void Universe::process(CTO_FleetClearSelection&&) {
+	// Permission check
+	// Bound check
+	selectedFleetIDList.clear();
 }
 
 void Universe::process(CTO_FleetMove&& cto) {
@@ -82,12 +83,9 @@ void Universe::process(CTO_FleetQueueMove&& cto) {
 	}
 }
 
-void Universe::process(CTO_ClearFleets&& cto) {
-	(void) cto;
-
+void Universe::process(CTO_ClearFleets&&) {
 	// Permission check
 	// Bound check
-	fleetIdSelectionMap.clear();
 	selectedFleetIDList.clear();
 	fleets.clear();
 	nextFleetID = FleetID{0};

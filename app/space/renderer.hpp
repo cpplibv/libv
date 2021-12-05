@@ -217,7 +217,7 @@ struct RendererFleet {
 public:
 	explicit RendererFleet(RendererResourceContext& rctx);
 
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::SelectionStatus selection_status);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status);
 };
 
 struct RendererText {

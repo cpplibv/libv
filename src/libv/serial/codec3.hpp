@@ -68,7 +68,7 @@ protected:
 public:
 	template <typename IArchive, typename F>
 	auto decode(IArchive& iar, F&& f) {
-		MessageID id = MessageID{0};
+		MessageID id;
 		iar >> LIBV_NVP_NAMED("type", id);
 
 		for (const auto& c : CRTP::template gen_table<IArchive, std::decay_t<F>>::types)

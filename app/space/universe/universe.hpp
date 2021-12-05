@@ -7,15 +7,18 @@
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
+//#include <libv/math/constants.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/math/vec_serial.hpp>
+//#include <libv/math/quat.hpp>
+//#include <libv/math/quat_serial.hpp>
 #include <libv/serial/archive/binary_fwd.hpp>
 #include <libv/serial/codec_message_id.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/boost_flat_map.hpp>
 #include <libv/serial/types/boost_flat_set.hpp>
 #include <libv/serial/types/std_vector.hpp>
-#include <libv/ui/chrono.hpp>
+#include <libv/utility/chrono.hpp>
 // std
 #include <map>
 #include <vector>
@@ -52,14 +55,16 @@ enum class FleetCommandType {
 
 struct Fleet {
 public:
-	static constexpr inline ScreenPickableType pickingType{0.2f, 50.f};
+	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
 
 public:
-	enum class SelectionStatus : int32_t {
-		not_selected = 0,
-		selected = 1,
-		hoover = 2,
-		intersected = 3,
+	enum class Selection : int32_t {
+		notSelected = 0,
+		hoverSingle = 1,
+		hoverBox = 2,
+		selected = 3,
+		selectedHoverSingle = 4,
+		selectedHoverBox = 5,
 	};
 
 private:
@@ -77,9 +82,9 @@ private:
 public:
 	FleetID id = invalidFleetID;
 	libv::vec3f position;
+//	libv::quat orientation;
 	std::vector<Command> commands;
-//	SelectionStatus selection_status;
-
+	Selection selectionStatus = Selection::notSelected;
 
 public:
 	Fleet() = default; // For de-serialization only
@@ -91,7 +96,11 @@ public:
 	template <class Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(id);
 		ar & LIBV_NVP(position);
+//		ar & LIBV_NVP(orientation);
 		ar & LIBV_NVP(commands);
+
+//		if constexpr (ar.is_local())
+//			ar & LIBV_NVP(selectionStatus);
 	}
 
 //	void queue_command(FleetCommandType type, libv::vec3f target);
@@ -101,7 +110,7 @@ public:
 		return static_cast<float>(id) * 13;
 	}
 
-	void update(libv::ui::time_duration delta_time) {
+	void update(libv::time_duration delta_time) {
 		if (commands.empty())
 			return;
 
@@ -130,19 +139,17 @@ public:
 	std::vector<Fleet> fleets;
 
 	boost::container::flat_set<FleetID> selectedFleetIDList;
-	boost::container::flat_map<FleetID, Fleet::SelectionStatus> fleetIdSelectionMap;
 
 	template <class Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(nextFleetID);
 		ar & LIBV_NVP(fleets);
 		ar & LIBV_NVP(selectedFleetIDList);
-		ar & LIBV_NVP(fleetIdSelectionMap);
 	}
 };
 
 struct Universe : SnapshotUniverse {
 public:
-	void update(libv::ui::time_duration delta_time) {
+	void update(libv::time_duration delta_time) {
 		for (auto& fleet : fleets)
 			fleet.update(delta_time);
 	}
@@ -155,6 +162,7 @@ public:
 	void process(CTO_FleetSpawn&& message);
 	void process(CTO_FleetSelect&& message);
 	void process(CTO_FleetSelectAdd&& message);
+	void process(CTO_FleetClearSelection&& message);
 	void process(CTO_FleetBoxSelect&& message);
 	void process(CTO_FleetMove&& message);
 	void process(CTO_FleetQueueMove&& message);

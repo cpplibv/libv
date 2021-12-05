@@ -45,6 +45,7 @@ class CTO_LobbyStatus;
 class CTO_FleetSpawn;
 class CTO_FleetSelect;
 class CTO_FleetSelectAdd;
+class CTO_FleetClearSelection;
 class CTO_FleetBoxSelect;
 class CTO_FleetMove;
 class CTO_FleetQueueMove;
