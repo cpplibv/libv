@@ -283,7 +283,8 @@ wish_create_external(
 	# For boost asio usage
 	DEFINE _WIN32_WINNT=0x0501
 	LINK boost_system-mt-s-x64
-	LINK wsock32 ws2_32
+	LINK $<IF:$<BOOL:${WIN32}>, wsock32, >
+	LINK $<IF:$<BOOL:${WIN32}>, ws2_32, >
 )
 
 wish_create_library(
@@ -433,7 +434,7 @@ wish_create_external(
 #	LINK wsock32 ws2_32
 
 	LINK crypto
-	LINK crypt32
+	LINK $<IF:$<BOOL:${WIN32}>, crypt32, >
 )
 
 wish_create_external(
@@ -473,8 +474,9 @@ wish_create_external(
 	CMAKE_ARGS
 		-Dglew-cmake_BUILD_SHARED=OFF
 		-Dglew-cmake_BUILD_STATIC=ON
-	LINK glew
 	DEFINE GLEW_STATIC
+	LINK glew
+	LINK ${OPENGL_LIBRARIES}
 )
 
 wish_create_external(
@@ -486,6 +488,7 @@ wish_create_external(
 		-DGLFW_BUILD_TESTS=OFF
 		-DGLFW_BUILD_DOCS=OFF
 	LINK glfw3
+	LINK ${OPENGL_LIBRARIES}
 #	LINK $<IF:$<PLATFORM_ID:Windows,MinGW>, gdi32,>
 #	LINK $<IF:$<PLATFORM_ID:Linux>, dl X11 Xi Xrandr Xxf86vm Xinerama Xcursor rt,>
 	LINK $<IF:$<BOOL:${WIN32}>,
@@ -528,6 +531,7 @@ wish_create_external(
 	CMAKE_ARGS
 		-DBUILD_SHARED_LIBS=OFF
 	LINK lua
+	LINK $<IF:$<BOOL:${UNIX}>, dl, >
 )
 
 wish_create_external(
@@ -540,13 +544,9 @@ wish_create_external(
 	LINK prometheus-cpp-push
 	LINK prometheus-cpp-core
 	LINK z
-
-	# TODO P3: Add support for linux link / define for net_ts
-	#	LINK $<IF:$<BOOL:${WIN32}>,
-	#			wsock32 ws2_32, # Win 32
-	#			 # Ubuntu 18.04
-	#		>
-	LINK wsock32 ws2_32
+	LINK Threads::Threads
+	LINK $<IF:$<BOOL:${WIN32}>, wsock32, >
+	LINK $<IF:$<BOOL:${WIN32}>, ws2_32, >
 )
 
 wish_create_external(
@@ -699,7 +699,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_frame STATIC
 	SOURCE src/libv/frame/*.cpp
-	LINK   libv_log libv_math libv_input ext_boost ext_glfw ${OPENGL_LIBRARIES} Threads::Threads
+	LINK   libv_log libv_math libv_input ext_boost ext_glfw Threads::Threads
 )
 
 wish_create_library(
@@ -717,7 +717,7 @@ wish_create_library(
 wish_create_library(
 	TARGET libv_gl STATIC
 	SOURCE src/libv/gl/*.cpp
-	LINK   libv_log libv_math libv_utility ext_ctre ext_glew ext_boost ext_gli ext_soil2 ${OPENGL_LIBRARIES}
+	LINK   libv_log libv_math libv_utility ext_ctre ext_glew ext_boost ext_gli ext_soil2
 )
 
 wish_create_library(
@@ -956,7 +956,7 @@ wish_create_executable(
 wish_create_executable(
 	TARGET enum
 	SOURCE app/enum/*.cpp
-	LINK   ext_fmt ext_clip ext_range libv_lua libv_utility
+	LINK   ext_fmt ext_range libv_lua libv_utility
 )
 
 wish_create_executable(

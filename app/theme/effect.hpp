@@ -53,7 +53,7 @@ template <typename CRTP>
 struct PixelEffect : BasePixelEffect {
 public:
 	virtual void execute(EffectEngineContext& context) override {
-		std::atomic_std::size_t next_row = 0;
+		std::atomic_size_t next_row = 0;
 		const auto num_row = context.image.size().y;
 
 		context.threads.execute_and_wait([&] {

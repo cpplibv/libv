@@ -101,7 +101,7 @@ bool apply_patch(libv::input_bytes old, libv::input_bytes diff, libv::output_byt
 
 	// HDiffPatch API: patch_decompress requires the new stream's size to be exact
 	// (To why I have no idea because this is an output and not an input, but there, have it your way)
-	new_stream.streamSize = std::min(new_stream.streamSize, diff_info.new_size);
+	new_stream.streamSize = std::min(new_stream.streamSize, static_cast<hpatch_StreamPos_t>(diff_info.new_size));
 
 	return patch_decompress(&new_stream, &old_stream, &diff_stream, nullptr);
 }

@@ -67,7 +67,7 @@ libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar_main) {
 
 		libv::ui::InputField in_server_address("mp-server-address-in");
 		in_server_address.style("space.hud-bar.mp.input");
-		in_server_address.text("rs0.corruptedai.com");
+		in_server_address.text("horizon.corruptedai.com");
 
 		btn_join.style("space.hud-bar.mp.btn");
 		btn_join.text("Join");

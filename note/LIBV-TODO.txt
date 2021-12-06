@@ -1637,6 +1637,7 @@ Extensions: Used default file extensions in LIBV
 	p01.00.patch - p{new}.{old}.patch - patch file naming convention
 	iris.01.00.patch - {program}.{new}.{old}.patch - patch file naming convention
 	program.variant.01.00.patch - {program}.{variant}.{new}.{old}.patch - patch file naming convention
+	program.variant.01.00.update - {program}.{variant}.{new}.{old}.update - patch file naming convention
 
 Files: Used default file names in LIBV
 	.lock - active write opened lock file

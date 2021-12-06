@@ -27,8 +27,8 @@ private:
 	std::size_t write_limit_ = all;
 
 private:
-	std::atomic_std::size_t read_total = 0;
-	std::atomic_std::size_t write_total = 0;
+	std::atomic_size_t read_total = 0;
+	std::atomic_size_t write_total = 0;
 
 private:
 	[[nodiscard]] inline std::size_t available_read_bytes() const noexcept {

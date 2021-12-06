@@ -24,7 +24,7 @@ class thread_bulk {
 
 	bool terminate = false;
 	std::atomic_bool finishing = false;
-	std::atomic_std::size_t working{0};
+	std::atomic_size_t working{0};
 
 	std::mutex mutex;
 	std::condition_variable work_cv;

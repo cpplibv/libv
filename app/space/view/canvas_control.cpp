@@ -66,13 +66,14 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P2: Selection Single: Clicking onto nothing should deselect everything
 // TODO P2: Selection 2.5D: Handle cases when the camera is on the z=0 plane and/or the users clicks to +/- inf
 // TODO P3: Selection 2.5D: Use hitbox in intersection mode
 // TODO P4: Selection 2.5D: Use hitbox in full contain mode
 // TODO P3: Selection 2.5D: Variant: Implement both column selection and frustum selection based on the grid coordinates
 // TODO P2: Selection 3D: Handle cases where box is drawn in a BL<->TR direction causes no selection
 // TODO P2: Selection 3D: Handle case where staring and ending the box on the same frame causes everyone to be selected
+// TODO P4: Selection 3D: Variant (Figure out what was the 2 variant, maybe full contain and intersect?)
+// TODO P4: Selection 3D: Cleanup a little bit
 
 // TODO P2: libv.ctrl: Upon leave context, (box selection) binary features may want to receive a deactivate call
 //				| NOTE: This would conflict with binary false in selection, bc this time selection shouldn't commit

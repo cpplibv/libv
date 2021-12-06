@@ -5,7 +5,6 @@
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 // ext
-#include <clip/clip.h>
 #include <fmt/format.h>
 #include <range/v3/view/reverse.hpp>
 #include <range/v3/view/transform.hpp>
@@ -440,14 +439,6 @@ struct EnumBuilderLua {
 
 // -------------------------------------------------------------------------------------------------
 
-void clipboard(const std::string& string) {
-	bool success = clip::set_text(string);
-	if (!success)
-		std::cerr << fmt::format("Failed to set clipboard text of length {}: \"{}\"", string.size(), string) << std::endl;
-}
-
-// -------------------------------------------------------------------------------------------------
-
 int main(int argc, const char** argv) {
 	EnumBuilderLua eb;
 
@@ -474,129 +465,90 @@ int main(int argc, const char** argv) {
 	std::cout << std::endl;
 
 	return EXIT_SUCCESS;
-
-//	EnumBuilder eb("color", "int32_t");
-//
-////	eb.gen_operator_eq = true;
-////	eb.gen_operator_rel = true;
-//	eb.gen_to_string = true;
-//	eb.gen_to_stream = true;
-//	eb.gen_to_span = true;
-//
-//	eb.add_namespace("libv::ns");
-//	eb.add_namespace("color");
-//	eb.include("libv/math/vec.hpp");
-//
-//	eb.property("rgba", "libv::vec4f");
-//	eb.value("red", "red", false);     eb.property_value("rgba", "red",   "libv::vec4f{1, 0, 0, 1}");
-//	eb.value("green", "green", false); eb.property_value("rgba", "green", "libv::vec4f{0, 1, 0, 1}");
-//	eb.value("blue", "blue", false);   eb.property_value("rgba", "blue",  "libv::vec4f{0, 0, 1, 1}");
-//
-//	EnumBuilderLua eb;
-//
-//	const auto script = R"(
-//		enum("color", "int32_t")
-//		namespace("libv::ns")
-//		include("libv/math/vec.hpp")
-//		rgba = property("rgba", "libv::vec4f")
-//
-//--		custom_function("int calc() { return 42; }")
-//		value("red"  , "Red"  , {rgba("libv::vec4f{1, 0, 0, 1}")})
-//		value("green", "Green", {rgba("libv::vec4f{0, 1, 0, 1}")})
-//		value("blue" , "Blue" , {rgba("libv::vec4f{0, 0, 1, 1}")})
-//
-//--		parse_alias("cyan", "blue")
-//)";
-//
-//	clipboard(result);
-//	std::cout << eb.generate_source_code(script) << std::endl;
 }
 
 
 // =================================================================================================
 // === GEN 2.0 =====================================================================================
 
+//	INPUT - LUA script
+//		enum("color", "int32_t")
+//		namespace("libv::ns")
+//		include("libv/math/vec.hpp")
+//		rgba = property("rgba", "libv::vec4f")
+//		custom_function("int calc() { return 42; }")
+//		values{
+//				red =   { rgba("1, 0, 0, 1") },
+//				green = { rgba("0, 1, 0, 1") },
+//				blue =  { rgba("0, 0, 1, 1") },
+//		)
+//
+//	OUTPUT
+//		see example.hpp
+//
+//	TEST
+//		auto foo(color a) {
+//		    return
+//		        a == a ||
+//		        a != a ||
+//		        a <= a ||
+//		        a < a ||
+//		        a >= a ||
+//		        a > a ||
+//
+//		        type(a) == type(a) ||
+//		        type(a) != type(a) ||
+//		        type(a) <= type(a) ||
+//		        type(a) < type(a) ||
+//		        type(a) >= type(a) ||
+//		        type(a) > type(a) ||
+//
+//		        a == type(a) ||
+//		        a != type(a) ||
+//		        a <= type(a) ||
+//		        a < type(a) ||
+//		        a >= type(a) ||
+//		        a > type(a) ||
+//
+//		        type(a) == a ||
+//		        type(a) != a ||
+//		        type(a) <= a ||
+//		        type(a) < a ||
+//		        type(a) >= a ||
+//		        type(a) > a;
+//		}
+//		auto foo2(color a) {
+//		    return type(a).to_string();
+//		}
+//		auto foo3(color a) {
+//		    return to_string(a);
+//		}
+//		auto foo4(color a) {
+//		    return to_string(type(a));
+//		}
+//		auto foo5(color a) {
+//		    return
+//		        std::hash<color>()(a) +
+//		        std::hash<color>()(type(a)) +
+//		        0;
+//		        //std::hash<color_type>()(type(a)) +
+//		        //std::hash<color_type>()(a);
+//		}
+//		auto foo6() {
+//		    return color_enum.values();
+//		}
+//		auto foo7() {
+//		    for (const auto c : color_enum.values());
+//		}
+//		void foo8(std::ostream& os, color c) {
+//		    os << c;
+//		    os << type(c);
+//		}
+//		auto foo9(color a) {
+//		    return +a;
+//		}
 
-/*
-	INPUT - LUA script
-		enum("color", "int32_t")
-		namespace("libv::ns")
-		include("libv/math/vec.hpp")
-		rgba = property("rgba", "libv::vec4f")
-		custom_function("int calc() { return 42; }")
-		values{
-				red =   { rgba("1, 0, 0, 1") },
-				green = { rgba("0, 1, 0, 1") },
-				blue =  { rgba("0, 0, 1, 1") },
-		)
-
-	OUTPUT
-		see example.hpp
-
-	TEST
-		auto foo(color a) {
-		    return
-		        a == a ||
-		        a != a ||
-		        a <= a ||
-		        a < a ||
-		        a >= a ||
-		        a > a ||
-
-		        type(a) == type(a) ||
-		        type(a) != type(a) ||
-		        type(a) <= type(a) ||
-		        type(a) < type(a) ||
-		        type(a) >= type(a) ||
-		        type(a) > type(a) ||
-
-		        a == type(a) ||
-		        a != type(a) ||
-		        a <= type(a) ||
-		        a < type(a) ||
-		        a >= type(a) ||
-		        a > type(a) ||
-
-		        type(a) == a ||
-		        type(a) != a ||
-		        type(a) <= a ||
-		        type(a) < a ||
-		        type(a) >= a ||
-		        type(a) > a;
-		}
-		auto foo2(color a) {
-		    return type(a).to_string();
-		}
-		auto foo3(color a) {
-		    return to_string(a);
-		}
-		auto foo4(color a) {
-		    return to_string(type(a));
-		}
-		auto foo5(color a) {
-		    return
-		        std::hash<color>()(a) +
-		        std::hash<color>()(type(a)) +
-		        0;
-		        //std::hash<color_type>()(type(a)) +
-		        //std::hash<color_type>()(a);
-		}
-		auto foo6() {
-		    return color_enum.values();
-		}
-		auto foo7() {
-		    for (const auto c : color_enum.values());
-		}
-		void foo8(std::ostream& os, color c) {
-		    os << c;
-		    os << type(c);
-		}
-		auto foo9(color a) {
-		    return +a;
-		}
- */
-
-//CONSTEXPR MAP - Might be useful for something
+// CONSTEXPR MAP - Might be useful for something
 //
 //	#include <array>
 //	#include <string_view>

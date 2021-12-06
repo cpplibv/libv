@@ -20,16 +20,16 @@ namespace rev {
 // -------------------------------------------------------------------------------------------------
 
 struct ImplGLSLSourceLoader {
-	using included_cb = GLSLSourceLoader::included_cb;
-	using generate_cb = GLSLSourceLoader::generate_cb;
+	using IncludedCB = GLSLSourceLoader::included_cb;
+	using GenerateCB = GLSLSourceLoader::generate_cb;
 
 	struct Route {
 		std::string include_dir;
 
 		std::string filesystem_dir;
-		included_cb included_cb;
+		IncludedCB included_cb;
 
-		generate_cb generate_cb;
+		GenerateCB generate_cb;
 
 		std::string source_code;
 

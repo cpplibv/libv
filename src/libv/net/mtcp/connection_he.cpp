@@ -727,8 +727,8 @@ void ImplBaseConnectionAsyncHE::do_write_header(SelfPtr&& self_sp) noexcept {
 
 	self->write_next_header = self->write_messages.front().header;
 
-	const auto write_body_size = self->write_next_header.size();
-	assert(write_body_size <= MTCP_MESSAGE_MAX_SIZE);
+	assert(self->write_next_header.size() <= MTCP_MESSAGE_MAX_SIZE);
+	// TODO P1: In not assert builds this will just try to execute, make a return / abort branch for it
 	// TODO P3: replace assert with recoverable error
 
 	const auto header_buffer = boost::asio::buffer(self->write_next_header.header_data(), self->write_next_header.header_size());
