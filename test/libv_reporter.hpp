@@ -246,7 +246,7 @@ private:
 
 //			std::string section;
 //			if (sectionsDirty > 0 && !sections.empty()) {
-//				for (size_t i = sections.size() - sectionsDirty; i < sections.size(); ++i) {
+//				for (std::size_t i = sections.size() - sectionsDirty; i < sections.size(); ++i) {
 //
 //					std::string section_source = sections[i].lineInfo.file != testInfo->lineInfo.file ?
 //							fmt::format("\t{}:{}", sections[i].lineInfo.file + WISH_SHORT_PATH_CUTOFF + 5, sections[i].lineInfo.line) :

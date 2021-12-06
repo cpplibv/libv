@@ -12,9 +12,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N>
+template <std::size_t N>
 struct Histogram {
-	std::array<size_t, N> data;
+	std::array<std::size_t, N> data;
 
 	std::chrono::nanoseconds min;
 	std::chrono::nanoseconds max;
@@ -33,7 +33,7 @@ struct Histogram {
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const Histogram& var) {
-		for (size_t i = 0; i < N; ++i)
+		for (std::size_t i = 0; i < N; ++i)
 			os << var.data[i] << ' ';
 		return os;
 	}

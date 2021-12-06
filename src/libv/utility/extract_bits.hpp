@@ -12,7 +12,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 // TODO P2: extract is the wrong name, it suggests removal. Rename to observe
-template <typename T, size_t Start, size_t Count = sizeof(T) * 8, typename Value>
+template <typename T, std::size_t Start, std::size_t Count = sizeof(T) * 8, typename Value>
 [[nodiscard]] constexpr inline T extract_high_bits(Value value) noexcept {
 	static_assert(Count >= 0);
 	static_assert(Start >= 0);
@@ -23,7 +23,7 @@ template <typename T, size_t Start, size_t Count = sizeof(T) * 8, typename Value
 
 	Value mask = 0;
 
-	for (size_t i = 0; i < Count; ++i)
+	for (std::size_t i = 0; i < Count; ++i)
 		mask |= 1ull << i;
 
 	return static_cast<T>(value >> (sizeof(Value) * 8 - Start - Count) & mask);

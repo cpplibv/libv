@@ -131,7 +131,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11
 	glr.render_full_screen();
 
 	// Bloom: Downsample
-	for (size_t i = 1; i < self->bloomMips.size(); ++i) {
+	for (std::size_t i = 1; i < self->bloomMips.size(); ++i) {
 		// Horizontal blur (using 'temp' mip as temporary place for 2 step downsample blur)
 		glr.framebuffer_draw(self->bloomMips[i].temp.framebuffer());
 		glr.viewport({0, 0}, self->bloomMips[i].temp.size());
@@ -155,7 +155,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11
 		glr.state.blendSrc_One();
 		glr.state.blendDst_One();
 
-		for (size_t i = self->bloomMips.size() - 1; i > 0; --i) {
+		for (std::size_t i = self->bloomMips.size() - 1; i > 0; --i) {
 			glr.framebuffer_draw(self->bloomMips[i - 1].main.framebuffer());
 			glr.viewport({0, 0}, self->bloomMips[i - 1].main.size());
 
@@ -183,7 +183,7 @@ void PostProcessing::pass(libv::glr::Queue& glr, const libv::glr::Texture2D::R11
 const libv::glr::Texture2D::R11F_G11F_B10F& PostProcessing::view(libv::glr::Queue& glr, int step) {
 	const auto size = static_cast<int>(self->bloomMips.size());
 	const auto ref_step = step < 0 ? std::abs(step + size) : step;
-	const auto bound_step = static_cast<size_t>(ref_step % size);
+	const auto bound_step = static_cast<std::size_t>(ref_step % size);
 
 //	glr.viewport({0, 0}, mips[bound_step].size());
 

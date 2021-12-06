@@ -79,7 +79,7 @@ Texture ImageSOIL::createTexture() const noexcept {
 	{
 		// Flip Y axis
 		const auto row_size = size_.x * channels;
-		auto row_tmp = libv::dyn_array<uint8_t>{static_cast<size_t>(row_size)};
+		auto row_tmp = libv::dyn_array<uint8_t>{static_cast<std::size_t>(row_size)};
 
 		for (int32_t y = 0; y < size_.y / 2; ++y) {
 			auto* const tmp = row_tmp.data();

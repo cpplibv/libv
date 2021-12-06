@@ -59,8 +59,8 @@ namespace ui {
 //
 //	std::vector<vec> vertices;
 //
-//	size_t last = 0;
-//	for (size_t i = 0; i < outline.size(); ++i) {
+//	std::size_t last = 0;
+//	for (std::size_t i = 0; i < outline.size(); ++i) {
 //		if (is_curvature_negative)
 //			continue;
 //
@@ -90,11 +90,11 @@ namespace ui {
 //		vertices.emplace_back(p1);
 //	};
 //
-//	const auto bezier = [&](vec p0, vec p1, vec p2, vec p3, size_t n) {
+//	const auto bezier = [&](vec p0, vec p1, vec p2, vec p3, std::size_t n) {
 //		const auto nf = 1.0f / static_cast<float>(n);
 //
 //		vertices.emplace_back(p0);
-//		for (size_t i = 1; i < n - 1; ++i) {
+//		for (std::size_t i = 1; i < n - 1; ++i) {
 //			const auto if_ = static_cast<float>(i);
 //			const auto t = nf * if_;
 //			vertices.emplace_back(libv::math::bezierCurvePoint(p0, p1, p2, p3, t));

@@ -19,13 +19,13 @@ struct hash_string {
 	using hash_type = std::hash<std::string_view>;
 
 public:
-	[[nodiscard]] inline size_t operator()(const char* txt) const {
+	[[nodiscard]] inline std::size_t operator()(const char* txt) const {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] inline size_t operator()(std::string_view txt) const {
+	[[nodiscard]] inline std::size_t operator()(std::string_view txt) const {
 		return hash_type{}(txt);
 	}
-	[[nodiscard]] inline size_t operator()(const std::string& txt) const {
+	[[nodiscard]] inline std::size_t operator()(const std::string& txt) const {
 		return hash_type{}(txt);
 	}
 };

@@ -71,7 +71,7 @@ public:
 		update_check_result check_result = update_check_result::communication_error;
 		log_update.trace("Checking update for program: [{}] variant: [{}] version: [{}]", settings.program_name, settings.program_variant, libv::to_value(settings.current_version));
 
-		for (size_t i = 0;; i++) {
+		for (std::size_t i = 0;; i++) {
 			std::ranges::shuffle(settings.update_servers, rd);
 
 			for (const auto& server_address : settings.update_servers) {

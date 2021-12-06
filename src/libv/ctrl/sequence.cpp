@@ -46,8 +46,8 @@ validation_result Sequence::validate() const noexcept {
 	// redundant_input_in_combination
 
 	for (const auto& combination : combinations) {
-		for (size_t i = 0; i < combination.inputs.size(); ++i) {
-			for (size_t j = 0; j < combination.inputs.size(); ++j) {
+		for (std::size_t i = 0; i < combination.inputs.size(); ++i) {
+			for (std::size_t j = 0; j < combination.inputs.size(); ++j) {
 				if (i == j)
 					continue;
 
@@ -60,7 +60,7 @@ validation_result Sequence::validate() const noexcept {
 	// multiple_action_in_combination
 
 	for (const auto& combination : combinations) {
-		size_t count = 0;
+		std::size_t count = 0;
 		for (const auto& input : combination.inputs)
 			if (input.dia == DigitalInputAction::press
 					|| input.dia == DigitalInputAction::repeat
@@ -82,8 +82,8 @@ validation_result Sequence::validate() const noexcept {
 	// opposite_analog_dimension
 
 	for (const auto& combination : combinations) {
-		for (size_t i = 0; i < combination.inputs.size(); ++i) {
-			for (size_t j = 0; j < combination.inputs.size(); ++j) {
+		for (std::size_t i = 0; i < combination.inputs.size(); ++i) {
+			for (std::size_t j = 0; j < combination.inputs.size(); ++j) {
 				if (i == j)
 					continue;
 

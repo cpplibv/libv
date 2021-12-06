@@ -13,11 +13,11 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-input_bytes::input_bytes(const std::byte* data, size_t size) noexcept :
+input_bytes::input_bytes(const std::byte* data, std::size_t size) noexcept :
 	object(const_cast<std::byte*>(data)), // No modification will be made on the pointer by read_fn
 	input_offset(0),
 	input_size(size),
-	read_fn(+[](void* object_, std::byte* ptr, size_t pos, size_t size_) noexcept {
+	read_fn(+[](void* object_, std::byte* ptr, std::size_t pos, std::size_t size_) noexcept {
 		std::memcpy(ptr, reinterpret_cast<const std::byte*>(object_) + pos, size_);
 		return size_;
 	}) { }
@@ -38,19 +38,19 @@ input_bytes::input_bytes(std::istream& s) noexcept {
 	const auto end_g = s.tellg();
 	s.seekg(0, std::ios::beg);
 
-	input_offset = cur_g < 0 ? 0 : static_cast<size_t>(cur_g);
-	input_size = end_g < 0 ? 0 : static_cast<size_t>(end_g);
+	input_offset = cur_g < 0 ? 0 : static_cast<std::size_t>(cur_g);
+	input_size = end_g < 0 ? 0 : static_cast<std::size_t>(end_g);
 
-	read_fn = +[](void* object, std::byte* ptr, size_t pos, size_t size) noexcept {
+	read_fn = +[](void* object, std::byte* ptr, std::size_t pos, std::size_t size) noexcept {
 		auto& ss = *reinterpret_cast<std::istream*>(object);
 
 		const auto g = ss.tellg();
-		if (static_cast<size_t>(g) != pos)
+		if (static_cast<std::size_t>(g) != pos)
 			ss.seekg(pos);
 
 		ss.read(reinterpret_cast<char*>(ptr), size);
 
-		return static_cast<size_t>(ss.gcount());
+		return static_cast<std::size_t>(ss.gcount());
 	};
 }
 

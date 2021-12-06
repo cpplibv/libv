@@ -73,7 +73,7 @@ concept Vec4 = requires(Vector vector) {
 ///// template <typename V, CONCEPT_REQUIRES_(Vec<V, 3>())> void function(V& vec) {}\endcode
 ///// @example Concept usage with Element type specified:\code
 ///// template <typename V, CONCEPT_REQUIRES_(Vec<V, 3, float>())> void function(V& vec) {}\endcode
-//template <typename Vector, size_t N, typename Element = void>
+//template <typename Vector, std::size_t N, typename Element = void>
 //concept Vec = requires(Vector vector) {
 //		requires std::is_void_v<Element> || std::is_same_v<decltype(vector[0]), Element>;
 //		requires sizeof(vector) == N * sizeof(libv::meta::lnv_t<Element, decltype(vector[0])>);
@@ -81,7 +81,7 @@ concept Vec4 = requires(Vector vector) {
 //
 //// -------------------------------------------------------------------------------------------------
 //
-//template <typename Type, size_t Dimension, typename... Element>
+//template <typename Type, std::size_t Dimension, typename... Element>
 //struct Vec : VecData<Type, Dimension, Element...> {};
 //
 //template <typename Type, typename... Element>

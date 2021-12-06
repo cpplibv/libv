@@ -22,7 +22,7 @@ private:
 	std::unique_ptr<class ImplIOContext> impl;
 
 public:
-	explicit IOContext(size_t thread_count = 1);
+	explicit IOContext(std::size_t thread_count = 1);
 	~IOContext();
 
 public:

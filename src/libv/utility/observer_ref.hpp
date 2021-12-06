@@ -145,7 +145,7 @@ namespace std {
 
 template <typename T>
 struct hash<::libv::observer_ref<T>> {
-	constexpr inline size_t operator()(::libv::observer_ref<T> p) const noexcept {
+	constexpr inline std::size_t operator()(::libv::observer_ref<T> p) const noexcept {
 		return hash<T*>{}(&*p);
 	}
 };

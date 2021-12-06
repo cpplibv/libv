@@ -23,7 +23,7 @@
 namespace {
 
 struct Event {
-	size_t watcher = 7777;
+	std::size_t watcher = 7777;
 	std::string event;
 };
 
@@ -83,7 +83,7 @@ public:
 		return queue.empty();
 	}
 
-	inline size_t size() const {
+	inline std::size_t size() const {
 		std::unique_lock lock(mutex);
 		return queue.size();
 	}
@@ -92,7 +92,7 @@ public:
 // -------------------------------------------------------------------------------------------------
 
 struct SubEntry {
-	size_t id = 7777;
+	std::size_t id = 7777;
 	libv::fsw::Watcher::token_type token;
 };
 
@@ -105,8 +105,8 @@ private:
 	std::set<std::string> files;
 	std::set<std::string> dirs;
 
-//	std::map<size_t, libv::fsw::Watcher::token_type> tokens;
-	size_t nextSubID = 0;
+//	std::map<std::size_t, libv::fsw::Watcher::token_type> tokens;
+	std::size_t nextSubID = 0;
 
 	std::chrono::milliseconds time_init    {1500};
 	std::chrono::milliseconds time_sub_pre {1500};
@@ -143,7 +143,7 @@ private:
 		std::this_thread::sleep_for(time_dir);
 	}
 
-	void _check_event(size_t expected_watcher, std::string expected_event) {
+	void _check_event(std::size_t expected_watcher, std::string expected_event) {
 		Event event;
 		const auto event_in_time = events.pull_for(event, time_event);
 

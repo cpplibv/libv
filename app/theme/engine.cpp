@@ -180,7 +180,7 @@ public:
 	libv::fsw::Watcher file_watcher;
 
 public:
-	ImplEngine(size_t n) : engine(n) {}
+	ImplEngine(std::size_t n) : engine(n) {}
 
 public:
 	void init();
@@ -410,7 +410,7 @@ void ImplEngine::_run_script() {
 	AtlasBuilder builder;
 
 	for (const Task& task : tasks) {
-		app::Image task_image(task.texture_size.cast<size_t>());
+		app::Image task_image(task.texture_size.cast<std::size_t>());
 		engine.process(task_image, task.effects);
 
 		builder.add(task.name, task_image.generate_8bit_channels());

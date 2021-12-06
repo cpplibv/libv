@@ -21,7 +21,7 @@ namespace app {
 //	KeyValuePanel(CoreComponent& parent, libv::ui::GenerateName_t, const std::string_view type);
 //
 //public:
-//	std::shared_ptr<CoreComponent>& operator()(size_t x, size_t y);
+//	std::shared_ptr<CoreComponent>& operator()(std::size_t x, std::size_t y);
 //};
 
 class PropertyPanelGroupProxy {

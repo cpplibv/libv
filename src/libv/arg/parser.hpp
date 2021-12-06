@@ -109,7 +109,7 @@ constexpr inline void parser_function(T& value, std::string_view str, OutcomeArg
 
 // This could be removed once Clang/GCC implements from_chars to floating point types
 inline void parser_function(float& value, std::string_view str, OutcomeArgumentParse& outcome) {
-	size_t pos = 0;
+	std::size_t pos = 0;
 	try {
 		value = std::stof(std::string(str), &pos);
 	} catch (const std::invalid_argument& e) {
@@ -123,7 +123,7 @@ inline void parser_function(float& value, std::string_view str, OutcomeArgumentP
 
 // This could be removed once Clang/GCC implements from_chars to floating point types
 inline void parser_function(double& value, std::string_view str, OutcomeArgumentParse& outcome) {
-	size_t pos = 0;
+	std::size_t pos = 0;
 	try {
 		value = std::stod(std::string(str), &pos);
 	} catch (const std::invalid_argument& e) {
@@ -206,7 +206,7 @@ public:
 		os << ": [";
 		if (!value_.empty())
 			os << value_.front();
-		for (size_t i = 1; i < value_.size(); ++i)
+		for (std::size_t i = 1; i < value_.size(); ++i)
 			os << ", " << value_[i];
 		os << ']';
 	}
@@ -454,7 +454,7 @@ public:
 
 public:
 	bool parse(const int argc, const char* const* argv) {
-		size_t positional_index = 0;
+		std::size_t positional_index = 0;
 
 		for (int i = 1; i < argc; ++i) {
 			BaseArgument* selected;
@@ -573,7 +573,7 @@ public:
 			const auto& aliases = argument->aliases();
 			if (!aliases.empty())
 				os << "  " << aliases[0];
-			for (size_t i = 1; i < aliases.size(); ++i)
+			for (std::size_t i = 1; i < aliases.size(); ++i)
 				os << ", " << aliases[i];
 
 			os << "  " << argument->name();

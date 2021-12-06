@@ -528,7 +528,7 @@ struct Sandbox {
 		gl.model = libv::mat4f::identity();
 
 		{
-			for (size_t i = 0; i < 3; ++i) {
+			for (std::size_t i = 0; i < 3; ++i) {
 				const auto guard_m2 = gl.model.push_guard();
 				gl.model.translate(0, 0, 2 * static_cast<float>(i) - 2);
 

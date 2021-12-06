@@ -38,7 +38,7 @@
 //	May consider a "compare" function for determining uniqueness
 //: ConditionalSignal - Forward the call only if the predicate function allows it
 //: HistorySignal - Stores and forward calls but also distibute them to late subscribers.
-//	Also a template size_t N for limit max call memory number
+//	Also a template std::size_t N for limit max call memory number
 //: TransformSignal - Manipulating the arguments flowing through it using a
 //	manipulator function. Similar to std::transform.
 //: AsyncSignal - Put the fire method and the arguments into a worker
@@ -162,11 +162,11 @@ public:
 		while (!outputs.empty())
 			disconnect(outputs.begin()->first);
 	}
-	inline size_t inputSize() const {
+	inline std::size_t inputSize() const {
 		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
 		return inputs.size();
 	}
-	inline size_t outputSize() const {
+	inline std::size_t outputSize() const {
 		std::lock_guard<std::recursive_mutex> thread_guard(mutex);
 		return outputs.size();
 	}
@@ -277,7 +277,7 @@ public:
 	//	void output(Args... args) {
 	//		flushHelper(std::index_sequence_for<Args...>{});
 	//	}
-	inline size_t historySize() const {
+	inline std::size_t historySize() const {
 		std::lock_guard<std::recursive_mutex> thread_guard(this->mutex);
 		return history.size();
 	}

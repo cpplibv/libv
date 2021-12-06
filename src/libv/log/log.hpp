@@ -285,12 +285,12 @@ private:
 		// Note: This function could be implemented in a true constexpr way.
 		//			Implementation could also be improved.
 		std::string result;
-		size_t size = format.size();
+		std::size_t size = format.size();
 		result.reserve(size + 32);
 
-		size_t open = 0;
-		size_t close = 0;
-		for (size_t i = 0; i < size; i++) {
+		std::size_t open = 0;
+		std::size_t close = 0;
+		for (std::size_t i = 0; i < size; i++) {
 			if (format[i] == '{') {
 				if (i + 1 < size && format[i + 1] == '{') {
 					result += "{{";

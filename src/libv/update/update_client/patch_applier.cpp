@@ -335,7 +335,7 @@ static constexpr int64_t progress_weight_io_read_byte  = 1;
 static constexpr int64_t progress_weight_io_write_byte = 1;
 static constexpr int64_t progress_weight_step_plan     = 4 * 1024;
 
-[[nodiscard]] static constexpr int64_t pw_iorw(size_t num_io, size_t num_read_byte, size_t num_write_byte) noexcept {
+[[nodiscard]] static constexpr int64_t pw_iorw(std::size_t num_io, std::size_t num_read_byte, std::size_t num_write_byte) noexcept {
 	return progress_weight_io_operation * static_cast<int64_t>(num_io) +
 			progress_weight_io_read_byte * static_cast<int64_t>(num_read_byte) +
 			progress_weight_io_write_byte * static_cast<int64_t>(num_write_byte);
@@ -617,10 +617,10 @@ public:
 	ExecutionPlan plan;
 
 public:
-//	size_t num_steps = 0;
+//	std::size_t num_steps = 0;
 //
-//	size_t work_current = 0;
-//	size_t work_total = 0;
+//	std::size_t work_current = 0;
+//	std::size_t work_total = 0;
 
 	int64_t progress_current = 0;
 	int64_t progress_total = 0;
@@ -646,7 +646,7 @@ public:
 	};
 
 	progress_stage current_stage = progress_stage::init;
-	size_t current_stage_it = 0;
+	std::size_t current_stage_it = 0;
 
 public:
 	std::vector<PatchApplyFailure> failures;

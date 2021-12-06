@@ -113,9 +113,9 @@ Texture ImageGLI::createTexture() const noexcept {
 	}
 	libv::gl::checkGL();
 
-	for (size_t layer = 0; layer < texture.layers(); ++layer) {
-		for (size_t face = 0; face < texture.faces(); ++face) {
-			for (size_t level = 0; level < texture.levels(); ++level) {
+	for (std::size_t layer = 0; layer < texture.layers(); ++layer) {
+		for (std::size_t face = 0; face < texture.faces(); ++face) {
+			for (std::size_t level = 0; level < texture.levels(); ++level) {
 				const auto layerGL = static_cast<GLsizei>(layer);
 				glm::tvec3<GLsizei> levelSize(texture.extent(level));
 				target = gli::is_target_cube(texture.target()) ?

@@ -58,8 +58,8 @@ public:
 //	uint16_t num_texture;
 //	uint16_t num_uniform;
 //	uint16_t num_vao;
-////	size_t start;
-////	size_t size;
+////	std::size_t start;
+////	std::size_t size;
 //
 //	// Pass
 //	//	UIProgramProxy program;
@@ -138,8 +138,8 @@ public:
 //		State state;
 //		uint16_t program;
 //
-//		size_t first_texture;
-//		size_t first_uniform;
+//		std::size_t first_texture;
+//		std::size_t first_uniform;
 //		uint8_t pass;
 //		uint8_t num_texture;
 //		uint16_t num_uniform;

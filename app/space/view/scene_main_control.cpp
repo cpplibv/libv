@@ -64,7 +64,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		if (arg.value) {
 			std::ostringstream os;
 
-			size_t max_feature_name_length = 0;
+			std::size_t max_feature_name_length = 0;
 			ctx.controls.foreach_bindings([&](const libv::ctrl::Binding& binding) {
 				max_feature_name_length = std::max(max_feature_name_length, binding.feature_name().size());
 			});

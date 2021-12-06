@@ -78,7 +78,7 @@ public:
 		const auto color_ = mesh.attribute(...);
 		const auto index_ = mesh.index(...);
 
-		for (size_t i = 0; i < count; ++i) {
+		for (std::size_t i = 0; i < count; ++i) {
 			const auto index = full ? (current_index + i + 1) % count : i;
 			dont_use_modulo_or_check_if_optimizer_kills_it();
 

@@ -41,10 +41,10 @@ inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 struct Config {
 	uint16_t port = 25090;
-	size_t num_client_io_thread = 2;
-	size_t num_server_io_thread = 4;
-//	size_t num_client_io_thread = 1;
-//	size_t num_server_io_thread = 1;
+	std::size_t num_client_io_thread = 2;
+	std::size_t num_server_io_thread = 4;
+//	std::size_t num_client_io_thread = 1;
+//	std::size_t num_server_io_thread = 1;
 } const config;
 
 // =================================================================================================

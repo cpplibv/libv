@@ -16,7 +16,7 @@ private:
 	T max_{};
 	T min_{};
 	T sum{};
-	size_t count_ = 0;
+	std::size_t count_ = 0;
 
 public:
 	void record(T value) {
@@ -44,7 +44,7 @@ public:
 	T avg() {
 		return sum / count_;
 	}
-	size_t count() {
+	std::size_t count() {
 		return count_;
 	}
 };

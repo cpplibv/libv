@@ -206,7 +206,7 @@ void RendererCommandArrow::rebuild_mesh() {
 	auto chain_pos = 0.f;
 	auto chain_size = 0.f;
 
-	for (size_t j = 0; j < arrows.size(); ++j) {
+	for (std::size_t j = 0; j < arrows.size(); ++j) {
 		const auto& arrow = arrows[j];
 		const auto length = (arrow.target - arrow.source).length();
 
@@ -214,7 +214,7 @@ void RendererCommandArrow::rebuild_mesh() {
 			// TODO P5: Instead of forward scan on rebuild mesh, calculate and assign values on add_arrow() and on start_chain()
 			chain_pos = 0.f;
 			chain_size = length;
-			for (size_t k = j + 1; k < arrows.size() && !arrows[k].start_of_chain; ++k) {
+			for (std::size_t k = j + 1; k < arrows.size() && !arrows[k].start_of_chain; ++k) {
 				const auto& a = arrows[k];
 				chain_size += (a.target - a.source).length();
 			}

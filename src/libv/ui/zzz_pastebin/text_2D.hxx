@@ -227,7 +227,7 @@ public:
 			layoutSize.x = std::max(layoutSize.x, line.size.x);
 			layoutSize.y += line.size.y;
 
-			for (size_t i = line.start; i < line.last; ++i)
+			for (std::size_t i = line.start; i < line.last; ++i)
 				for (auto& vertex : characters[i].vertices)
 					vertex.position.y -= layoutSize.y;
 		}

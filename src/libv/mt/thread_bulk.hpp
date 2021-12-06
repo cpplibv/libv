@@ -24,7 +24,7 @@ class thread_bulk {
 
 	bool terminate = false;
 	std::atomic_bool finishing = false;
-	std::atomic_size_t working{0};
+	std::atomic_std::size_t working{0};
 
 	std::mutex mutex;
 	std::condition_variable work_cv;
@@ -66,7 +66,7 @@ private:
 	}
 
 public:
-	explicit thread_bulk(size_t n) :
+	explicit thread_bulk(std::size_t n) :
 		group(n, &thread_bulk::loop, this) {
 	}
 
@@ -77,7 +77,7 @@ public:
 	}
 
 public:
-	[[nodiscard]] inline size_t size() const noexcept {
+	[[nodiscard]] inline std::size_t size() const noexcept {
 		return group.size();
 	}
 

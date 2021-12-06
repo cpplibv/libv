@@ -395,7 +395,7 @@ inline void notify_hits(Hits& hits, Event& event) noexcept {
 }
 
 inline void notify_hits(HitELs& hits, EventMouseMovement& event) noexcept {
-	size_t i = 0;
+	std::size_t i = 0;
 
 	for (; i < hits.size(); i++) {
 		const auto& hit = hits[i];

@@ -67,26 +67,26 @@ public:
 	}
 
 	// TODO P4: reverse the order of offset and count (for all overload)
-	inline void drawArrays(Primitive mode, size_t vertexCount, size_t vertexOffset) noexcept {
+	inline void drawArrays(Primitive mode, std::size_t vertexCount, std::size_t vertexOffset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDrawArrays(to_value(mode), static_cast<GLint>(vertexOffset), static_cast<GLsizei>(vertexCount));
 		checkGL();
 	}
 
-	inline void drawElements(Primitive mode, size_t vertexCount, size_t indexOffset) noexcept {
+	inline void drawElements(Primitive mode, std::size_t vertexCount, std::size_t indexOffset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDrawElements(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<const void*>(sizeof (GLuint) * indexOffset));
 		checkGL();
 	}
 
-	inline void drawElementsBaseVertex(Primitive mode, size_t vertexCount, size_t indexOffset, size_t vertexOffset) noexcept {
+	inline void drawElementsBaseVertex(Primitive mode, std::size_t vertexCount, std::size_t indexOffset, std::size_t vertexOffset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		glDrawElementsBaseVertex(to_value(mode), static_cast<GLsizei>(vertexCount), GL_UNSIGNED_INT, std::bit_cast<void*>(sizeof (GLuint) * indexOffset), static_cast<GLint>(vertexOffset));
 		checkGL();
 	}
 
 	template <typename T>
-	inline void bindAttribute(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, size_t offset) noexcept {
+	inline void bindAttribute(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
 		if (attribute.id() == -1)
@@ -104,7 +104,7 @@ public:
 	}
 
 	template <typename T>
-	inline void bindAttributeInt(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, size_t offset) noexcept {
+	inline void bindAttributeInt(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
 		if (attribute.id() == -1)
@@ -121,7 +121,7 @@ public:
 	}
 
 	template <typename T>
-	inline void bindAttributeDouble(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, size_t offset) noexcept {
+	inline void bindAttributeDouble(const ArrayBuffer& buffer, const BaseAttribute<T>& attribute, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
 		LIBV_GL_DEBUG_ASSERT_STATIC(BaseAttribute<T>::attributeType == to_value(AttributeType::DOUBLE), "");
@@ -173,7 +173,7 @@ public:
 	/// @param stride - the byte offset between two entry
 	/// @param offset
 	///
-	inline void bindAttribute(const ArrayBuffer& buffer, GLuint channel, AttributeType type, GLint dimension, GLsizei stride, size_t offset) noexcept {
+	inline void bindAttribute(const ArrayBuffer& buffer, GLuint channel, AttributeType type, GLint dimension, GLsizei stride, std::size_t offset) noexcept {
 		LIBV_GL_DEBUG_ASSERT(object.id != 0);
 		LIBV_GL_DEBUG_ASSERT(buffer.id != 0);
 

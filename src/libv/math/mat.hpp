@@ -46,11 +46,11 @@ template <typename T>
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t R, size_t C, typename T>
+template <std::size_t R, std::size_t C, typename T>
 struct mat_t : public glm::mat<static_cast<int>(R), static_cast<int>(C), T, glm::precision::highp> {
 	using value_type = T;
-	static constexpr size_t Column = C;
-	static constexpr size_t Row = R;
+	static constexpr std::size_t Column = C;
+	static constexpr std::size_t Row = R;
 	static constexpr int Ci = static_cast<int>(C);
 	static constexpr int Ri = static_cast<int>(R);
 

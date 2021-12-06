@@ -53,15 +53,15 @@ template <typename CRTP>
 struct PixelEffect : BasePixelEffect {
 public:
 	virtual void execute(EffectEngineContext& context) override {
-		std::atomic_size_t next_row = 0;
+		std::atomic_std::size_t next_row = 0;
 		const auto num_row = context.image.size().y;
 
 		context.threads.execute_and_wait([&] {
-			size_t y = next_row++;
+			std::size_t y = next_row++;
 			if (y >= num_row)
 				return false;
 
-			for (size_t x = 0; x < context.image.size().x; ++x)
+			for (std::size_t x = 0; x < context.image.size().x; ++x)
 				static_cast<CRTP&>(*this).apply(context.image, x, y);
 
 			return true;
@@ -86,7 +86,7 @@ public:
 			corner_sharpness(corner_sharpness) {}
 
 public:
-	inline void apply(Image& image, size_t x, size_t y) const noexcept {
+	inline void apply(Image& image, std::size_t x, std::size_t y) const noexcept {
 		const auto fx = static_cast<float>(x);
 		const auto fy = static_cast<float>(y);
 
@@ -119,7 +119,7 @@ public:
 			color(color) {}
 
 public:
-	inline void apply(Image& image, size_t x, size_t y) const noexcept {
+	inline void apply(Image& image, std::size_t x, std::size_t y) const noexcept {
 		const auto signed_dist = image.sdistance(x, y);
 		auto& output = image.color(x, y);
 
@@ -147,7 +147,7 @@ class EffectApplyEngine {
 	libv::mt::thread_bulk threads;
 
 public:
-	explicit EffectApplyEngine(size_t n) : threads(n) {}
+	explicit EffectApplyEngine(std::size_t n) : threads(n) {}
 
 public:
 	void process(Image& image, const std::vector<std::unique_ptr<BasePixelEffect>>& effects) {

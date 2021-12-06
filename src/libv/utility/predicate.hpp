@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N, typename Pred>
+template <std::size_t N, typename Pred>
 auto on_nth(Pred&& pred) {
 	return [pred = std::forward<Pred>(pred)](auto&& arg) {
 		return pred(std::get<N>(std::forward<decltype(arg)>(arg)));

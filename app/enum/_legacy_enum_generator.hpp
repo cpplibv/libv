@@ -124,8 +124,8 @@ private:
 	std::string ref_decl;
 	std::string ref_def;
 	std::string value_objects;
-	size_t longest_value_name = 0;
-	size_t longest_value_text = 0;
+	std::size_t longest_value_name = 0;
+	std::size_t longest_value_text = 0;
 
 public:
 	bool operator_eq = true;
@@ -140,7 +140,7 @@ public:
 		enum_type(std::move(enum_type)) { }
 
 private:
-	void make_value(std::string_view name, std::string_view value, size_t index) {
+	void make_value(std::string_view name, std::string_view value, std::size_t index) {
 		ref_decl += fmt::format(fmt::runtime(fmt_ref_declaration),
 				fmt::arg("enum_name", enum_name),
 				fmt::arg("name", name),
@@ -218,7 +218,7 @@ public:
 
 public:
 	std::string make() {
-		for (size_t i = 0; const auto& kv : values)
+		for (std::size_t i = 0; const auto& kv : values)
 			make_value(kv.name, kv.value, i++);
 
 		if (operator_eq || operator_rel) {

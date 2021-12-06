@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 struct ray_t {
 	libv::vec_t<N, T> position;
 	libv::vec_t<N, T> direction;

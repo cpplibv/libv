@@ -427,9 +427,9 @@
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N>
+template <std::size_t N>
 struct Spectrum {
-	std::array<size_t, N> data;
+	std::array<std::size_t, N> data;
 
 	float min = 0;
 	float max = 3600;
@@ -440,11 +440,11 @@ struct Spectrum {
 
 	void sample(float value) {
 //		data[(value - min) / ((max - min) / N)]++;
-		data[static_cast<size_t>((value - min) / ((max - min) / static_cast<float>(N)))]++;
+		data[static_cast<std::size_t>((value - min) / ((max - min) / static_cast<float>(N)))]++;
 	}
 
 	friend std::ostream& operator<<(std::ostream& os, const Spectrum& var) {
-		for (size_t i = 0; i < N; ++i)
+		for (std::size_t i = 0; i < N; ++i)
 			os << var.data[i] << ' ';
 		return os;
 	}

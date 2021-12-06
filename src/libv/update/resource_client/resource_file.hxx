@@ -25,8 +25,8 @@ private:
 	std::filesystem::path path;
 	std::fstream file;
 
-	size_t resource_size = 0;
-	size_t metadata_cursor = 0;
+	std::size_t resource_size = 0;
+	std::size_t metadata_cursor = 0;
 	IntervalRegistry remaining_intervals;
 
 public:
@@ -47,8 +47,8 @@ public:
 //	}
 
 public:
-	std::span<const IntervalRegistry::Interval> create(std::filesystem::path path_, size_t resource_size_);
-	void write(size_t offset, std::span<const std::byte> data);
+	std::span<const IntervalRegistry::Interval> create(std::filesystem::path path_, std::size_t resource_size_);
+	void write(std::size_t offset, std::span<const std::byte> data);
 };
 
 // -------------------------------------------------------------------------------------------------

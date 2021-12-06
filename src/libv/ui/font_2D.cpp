@@ -30,7 +30,7 @@ namespace ui {
 namespace {
 
 FT_Library freetype_lib = nullptr;
-std::atomic<size_t> FT_LibUseCount{0};
+std::atomic<std::size_t> FT_LibUseCount{0};
 std::mutex freetype_lib_m;
 
 // - One can use a single `FT_Library' object across threads as long as a mutex lock is used around

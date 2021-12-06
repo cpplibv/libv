@@ -23,7 +23,7 @@ class ContextState {
 	friend class ImplUI;
 	friend class UI;
 
-	size_t frame_count_ = 0; /// Number of UI frame operations since the UI initialization
+	std::size_t frame_count_ = 0; /// Number of UI frame operations since the UI initialization
 	time_point time_frame_ = clock::now(); /// Time point of frame start, does not change during the same frame
 	time_point time_ui_ = clock::now(); /// Time point of UI initialization
 	time_duration time_{}; /// Duration between time_ui and time_frame, does not change during the same frame
@@ -52,7 +52,7 @@ class ContextState {
 	// TODO P5: libv.ui: joystick analog states
 
 public:
-	[[nodiscard]] constexpr inline size_t frame_count() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t frame_count() const noexcept {
 		return frame_count_;
 	}
 

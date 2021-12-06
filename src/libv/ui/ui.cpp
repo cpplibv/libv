@@ -313,7 +313,7 @@ public:
 			// --- Event ---
 			{
 				// Usual pattern to lift the entry out of locking scope, candidate for generalization
-				size_t i = 0;
+				std::size_t i = 0;
 				std::optional<EventVariant> current_event;
 				while (true) {
 					{
@@ -350,7 +350,7 @@ public:
 			{
 				// TODO P5: libv.mt: Usual pattern to lift the entry out of locking scope, candidate for generalization
 				//				libv.mt: queue
-				size_t i = 0;
+				std::size_t i = 0;
 				std::function<void()> current_task;
 				while (true) {
 					{

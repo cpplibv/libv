@@ -10,13 +10,13 @@ namespace libv {
 template <typename T>
 struct StreamRepeat {
 	const T& object;
-	size_t count;
+	std::size_t count;
 
-	StreamRepeat(const T& object, size_t count) : object(object), count(count) {}
+	StreamRepeat(const T& object, std::size_t count) : object(object), count(count) {}
 
 	template <typename OStream>
 	friend OStream& operator<<(OStream& os, const StreamRepeat<T>& repeater) {
-		for (size_t i = 0; i < repeater.count; ++i) {
+		for (std::size_t i = 0; i < repeater.count; ++i) {
 			os << repeater.object;
 		}
 		return os;

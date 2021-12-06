@@ -78,10 +78,10 @@ struct Size {
 	constexpr inline Size(SizeDim x, SizeDim y, SizeDim z = SizeDim{}) :
 		value{std::move(x), std::move(y), std::move(z)} {}
 
-	[[nodiscard]] SizeDim& operator[](size_t dim) {
+	[[nodiscard]] SizeDim& operator[](std::size_t dim) {
 		return value[dim];
 	}
-	[[nodiscard]] const SizeDim& operator[](size_t dim) const {
+	[[nodiscard]] const SizeDim& operator[](std::size_t dim) const {
 		return value[dim];
 	}
 

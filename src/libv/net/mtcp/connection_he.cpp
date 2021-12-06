@@ -117,8 +117,8 @@ private:
 	std::deque<message_entry> write_messages;
 
 private:
-	size_t num_total_message_read = 0;
-	size_t num_total_message_write = 0;
+	std::size_t num_total_message_read = 0;
+	std::size_t num_total_message_write = 0;
 
 public:
 	explicit inline ImplBaseConnectionAsyncHE(IOContext& io_context) noexcept;
@@ -126,16 +126,16 @@ public:
 	inline void abandon_handler() noexcept;
 
 public:
-	inline void read_limit(size_t bytes_per_second) noexcept;
-	inline void write_limit(size_t bytes_per_second) noexcept;
+	inline void read_limit(std::size_t bytes_per_second) noexcept;
+	inline void write_limit(std::size_t bytes_per_second) noexcept;
 
-	[[nodiscard]] inline size_t num_byte_read() const noexcept;
-	[[nodiscard]] inline size_t num_byte_wrote() const noexcept;
+	[[nodiscard]] inline std::size_t num_byte_read() const noexcept;
+	[[nodiscard]] inline std::size_t num_byte_wrote() const noexcept;
 
-	[[nodiscard]] inline size_t num_message_received() const noexcept;
-	[[nodiscard]] inline size_t num_message_sent() const noexcept;
+	[[nodiscard]] inline std::size_t num_message_received() const noexcept;
+	[[nodiscard]] inline std::size_t num_message_sent() const noexcept;
 
-	[[nodiscard]] inline size_t send_queue_size() const noexcept;
+	[[nodiscard]] inline std::size_t send_queue_size() const noexcept;
 
 public:
 	inline void connect_async(detail::Socket&& socket) noexcept;
@@ -172,7 +172,7 @@ private:
 
 	static void do_read(SelfPtr&& self_sp) noexcept;
 	static void do_read_header(SelfPtr&& self_sp) noexcept;
-	static void do_read_body(SelfPtr&& self_sp, size_t read_body_size) noexcept;
+	static void do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept;
 
 	static void do_write(SelfPtr&& self_sp) noexcept;
 	static void do_write_header(SelfPtr&& self_sp) noexcept;
@@ -200,33 +200,33 @@ inline void ImplBaseConnectionAsyncHE::abandon_handler() noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-inline void ImplBaseConnectionAsyncHE::read_limit(size_t bytes_per_second) noexcept {
+inline void ImplBaseConnectionAsyncHE::read_limit(std::size_t bytes_per_second) noexcept {
 	std::unique_lock lock{mutex};
 	stream->rate_policy().read_limit(bytes_per_second);
 }
 
-inline void ImplBaseConnectionAsyncHE::write_limit(size_t bytes_per_second) noexcept {
+inline void ImplBaseConnectionAsyncHE::write_limit(std::size_t bytes_per_second) noexcept {
 	std::unique_lock lock{mutex};
 	stream->rate_policy().write_limit(bytes_per_second);
 }
 
-inline size_t ImplBaseConnectionAsyncHE::num_byte_read() const noexcept {
+inline std::size_t ImplBaseConnectionAsyncHE::num_byte_read() const noexcept {
 	return stream->rate_policy().num_byte_read();
 }
 
-inline size_t ImplBaseConnectionAsyncHE::num_byte_wrote() const noexcept {
+inline std::size_t ImplBaseConnectionAsyncHE::num_byte_wrote() const noexcept {
 	return stream->rate_policy().num_byte_wrote();
 }
 
-inline size_t ImplBaseConnectionAsyncHE::num_message_received() const noexcept {
+inline std::size_t ImplBaseConnectionAsyncHE::num_message_received() const noexcept {
 	return num_total_message_write;
 }
 
-inline size_t ImplBaseConnectionAsyncHE::num_message_sent() const noexcept {
+inline std::size_t ImplBaseConnectionAsyncHE::num_message_sent() const noexcept {
 	return num_total_message_read;
 }
 
-inline size_t ImplBaseConnectionAsyncHE::send_queue_size() const noexcept {
+inline std::size_t ImplBaseConnectionAsyncHE::send_queue_size() const noexcept {
 	std::unique_lock lock{mutex};
 	return write_messages.size();
 }
@@ -653,7 +653,7 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 	boost::asio::async_read(
 			*self->stream,
 			boost::asio::buffer(self->read_message_header.header_data(), self->read_message_header.header_size()),
-			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
+			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
 				if (ec) {
@@ -675,7 +675,7 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 			});
 }
 
-void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, size_t read_body_size) noexcept {
+void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept {
 	const auto self = self_sp.get();
 
 	self->read_message_body.clear();
@@ -692,7 +692,7 @@ void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, size_t read_body
 	boost::asio::async_read(
 			*self->stream,
 			boost::asio::dynamic_buffer(self->read_message_body, read_body_size),
-			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
+			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
 				log_net.error_if(ec, "MTCP-{} Failed to read {} payload byte: {}", self->id, size, libv::net::to_string(ec));
@@ -735,7 +735,7 @@ void ImplBaseConnectionAsyncHE::do_write_header(SelfPtr&& self_sp) noexcept {
 	boost::asio::async_write(
 			*self->stream,
 			header_buffer,
-			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
+			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
 				if (ec) {
@@ -758,7 +758,7 @@ void ImplBaseConnectionAsyncHE::do_write_body(SelfPtr&& self_sp) noexcept {
 	boost::asio::async_write(
 			*self->stream,
 			body_buffer,
-			[self_sp = std::move(self_sp)](const std::error_code ec, size_t size) mutable {
+			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
 				log_net.error_if(ec, "MTCP-{} Failed to write {} payload byte: {}", self->id, size, libv::net::to_string(ec));
@@ -782,11 +782,11 @@ void BaseConnectionAsyncHE::abandon_handler() noexcept {
 	internals->abandon_handler();
 }
 
-void BaseConnectionAsyncHE::read_limit(size_t bytes_per_second) noexcept {
+void BaseConnectionAsyncHE::read_limit(std::size_t bytes_per_second) noexcept {
 	internals->read_limit(bytes_per_second);
 }
 
-void BaseConnectionAsyncHE::write_limit(size_t bytes_per_second) noexcept {
+void BaseConnectionAsyncHE::write_limit(std::size_t bytes_per_second) noexcept {
 	internals->write_limit(bytes_per_second);
 }
 

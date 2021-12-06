@@ -10,8 +10,8 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-std::string generate_random_name(uint64_t seed, size_t length);
-std::string generate_random_name(size_t length);
+std::string generate_random_name(uint64_t seed, std::size_t length);
+std::string generate_random_name(std::size_t length);
 
 // -------------------------------------------------------------------------------------------------
 

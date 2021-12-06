@@ -13,7 +13,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-std::string generate_component_name(const std::string_view type, size_t index) noexcept {
+std::string generate_component_name(const std::string_view type, std::size_t index) noexcept {
 	return libv::concat(type, '-', index);
 }
 

@@ -40,7 +40,7 @@ int main(int, char**) {
 	{
 		libv::ecs::System es;
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			es.create<A, B, C, D>([] (auto& a, auto&...) {
 				a.value = 1;
 			});
@@ -57,7 +57,7 @@ int main(int, char**) {
 	{
 		libv::ecs::System es;
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			es.create<A, B, C, D>([] (auto& a, auto&...) {
 				a.value = 1;
 			});
@@ -75,7 +75,7 @@ int main(int, char**) {
 	{
 		libv::ecs::System es;
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			es.create<ABCDE>([] (auto& a) {
 				a.value = 1;
 			});
@@ -92,7 +92,7 @@ int main(int, char**) {
 	{
 		libv::ecs::System es;
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			es.create<ABCDE>([] (auto& a) {
 				a.value = 1;
 			});
@@ -108,7 +108,7 @@ int main(int, char**) {
 		fmt::print("ECS2ch: {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			r.emplace_back(new ABCDE());
 		}
 
@@ -116,14 +116,14 @@ int main(int, char**) {
 
 		timer.reset();
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			result += r[i]->value % mod;
 		}
 
 		fmt::print("RAW:    {:7.3f}ms\n", timer.timef_ms().count());
 	}
 	{
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			r2.emplace_back();
 		}
 
@@ -131,7 +131,7 @@ int main(int, char**) {
 
 		timer.reset();
 
-		for (size_t i = 0; i < 2'000'000; ++i) {
+		for (std::size_t i = 0; i < 2'000'000; ++i) {
 			result += r2[i].value % mod;
 		}
 

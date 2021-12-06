@@ -37,8 +37,8 @@ class ImplUniformStream {
 
 	std::vector<Header> header;
 	std::vector<std::byte> data;
-	size_t current_header = 0;
-	size_t current_data = 0;
+	std::size_t current_header = 0;
+	std::size_t current_data = 0;
 
 	inline void clear() {
 		header.clear();

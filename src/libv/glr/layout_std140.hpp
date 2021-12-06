@@ -217,21 +217,21 @@ template <typename T> struct AlignSTD140<libv::vec3_t<T>> {
 };
 
 // 4) array of scalars or vectors
-template <typename T, size_t S> WISH_REQUIRES(is_glsl_scalar_v<T>) struct AlignSTD140<std::array<T, S>> {
+template <typename T, std::size_t S> WISH_REQUIRES(is_glsl_scalar_v<T>) struct AlignSTD140<std::array<T, S>> {
 	static constexpr uint32_t align = libv::align(AlignSTD140<T>::align, AlignSTD140<libv::vec4f>::align);
 	static constexpr uint32_t size = S * libv::align(AlignSTD140<T>::size, AlignSTD140<libv::vec4f>::size);
 };
-template <typename T, size_t N, size_t S> struct AlignSTD140<std::array<libv::vec_t<N, T>, S>> {
+template <typename T, std::size_t N, std::size_t S> struct AlignSTD140<std::array<libv::vec_t<N, T>, S>> {
 	static_assert(is_glsl_scalar_v<T>, "T has to be a glsl scalar type in array<vec<T>>");
 	static constexpr uint32_t align = libv::align(AlignSTD140<libv::vec_t<N, T>>::align, AlignSTD140<libv::vec4f>::align);
 	static constexpr uint32_t size = S * libv::align(AlignSTD140<libv::vec_t<N, T>>::size, AlignSTD140<libv::vec4f>::size);
 };
-template <typename T, size_t S> struct AlignSTD140<std::array<T, S>> {
+template <typename T, std::size_t S> struct AlignSTD140<std::array<T, S>> {
 	static_assert(libv::meta::always_false_v<T>, "T has to be a scalar or vec type in array<T>");
 };
 
 // 5) 7) matrix
-template <typename T, size_t R, size_t C> struct AlignSTD140<libv::mat_t<R, C, T>> :
+template <typename T, std::size_t R, std::size_t C> struct AlignSTD140<libv::mat_t<R, C, T>> :
 	AlignSTD140<std::array<libv::vec_t<C, T>, R>> {
 	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
 	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
@@ -239,7 +239,7 @@ template <typename T, size_t R, size_t C> struct AlignSTD140<libv::mat_t<R, C, T
 };
 
 // 6) 8) array of matrices
-template <typename T, size_t R, size_t C, size_t S> struct AlignSTD140<std::array<libv::mat_t<R, C, T>, S>> :
+template <typename T, std::size_t R, std::size_t C, std::size_t S> struct AlignSTD140<std::array<libv::mat_t<R, C, T>, S>> :
 	AlignSTD140<std::array<libv::vec_t<C, T>, R * S>> {
 	static_assert(2 <= C && C <= 4, "Matrix type column dimension has to be 2, 3 or 4");
 	static_assert(2 <= R && R <= 4, "Matrix type row dimension has to be 2, 3 or 4");
@@ -364,7 +364,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const T& va
 	std::memcpy(target, &value, sizeof(T));
 }
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 inline void write_std140(const libv::observer_ref<std::byte> target, const std::array<T, N>& value) noexcept {
 	const auto stride = layout_std140_stride<T>();
 
@@ -373,7 +373,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const std::
 	});
 }
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 inline void write_std140(const libv::observer_ref<std::byte> target, const libv::mat_t<N, N, T>& value) noexcept {
 	const auto stride = layout_std140_stride<libv::vec_t<N, T >> ();
 
@@ -430,7 +430,7 @@ inline void write_std140(const libv::observer_ref<std::byte> target, const libv:
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec3d>)   { return {32, 24}; }
 //inline UnfirormLayoutRule rule_std140(identity<libv::vec4d>)   { return {32, 32}; }
 //
-//template <typename T, size_t N>
+//template <typename T, std::size_t N>
 //inline UnfirormLayoutRule rule_std140(identity<std::array<T, N>) {
 //	const auto member_rule = rule_std140(identity<T>{});
 //	const auto vec4_rule = rule_std140(identity<libv::vec4f>{});

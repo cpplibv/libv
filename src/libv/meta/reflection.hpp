@@ -17,36 +17,36 @@ namespace detail {
 // member ------------------------------------------------------------------------------------------
 
 template <typename T>
-constexpr inline size_t member_count() noexcept {
+constexpr inline std::size_t member_count() noexcept {
 	return decltype(std::decay_t<T>::__libv_reflection_next_index(derived_top{}))::value;
 }
 
 template <typename T>
-constexpr inline size_t member_count_v = member_count<T>();
+constexpr inline std::size_t member_count_v = member_count<T>();
 
-template <size_t Index, typename T>
+template <std::size_t Index, typename T>
 constexpr inline auto member_info(T&& object) noexcept {
 	static_assert(Index < member_count_v<T>, "Invalid member index used for T object");
-	return object.__libv_reflection_member(std::integral_constant<size_t, Index>{});
+	return object.__libv_reflection_member(std::integral_constant<std::size_t, Index>{});
 }
 
-template <size_t Index, typename T>
+template <std::size_t Index, typename T>
 constexpr inline auto member_static_info() noexcept {
 	static_assert(Index < member_count_v<T>, "Invalid member index used for T object");
-	return T::template __libv_reflection_static<T>(std::integral_constant<size_t, Index>{});
+	return T::template __libv_reflection_static<T>(std::integral_constant<std::size_t, Index>{});
 }
 
-template <typename T, size_t Index>
+template <typename T, std::size_t Index>
 using member_tpye_t = typename decltype(member_info<Index, T>(std::declval<T&>()))::value_type;
 
-template <size_t Index, typename T>
+template <std::size_t Index, typename T>
 constexpr inline decltype(auto) member_reference(T&& object) noexcept {
 	return member_info<Index>(object).reference;
 }
 
 // apply -------------------------------------------------------------------------------------------
 
-template <typename T, typename F, size_t... Indices>
+template <typename T, typename F, std::size_t... Indices>
 constexpr inline void apply_member_helper(T&& object, F&& func, std::index_sequence<Indices...>) {
 	std::forward<F>(func)(member_info<Indices>(object)...);
 }
@@ -58,7 +58,7 @@ constexpr inline void apply_member(T&& object, F&& func) {
 
 // foreach -----------------------------------------------------------------------------------------
 
-template <typename T, typename F, size_t... Indices>
+template <typename T, typename F, std::size_t... Indices>
 constexpr inline void foreach_member_helper(T&& object, F&& func, std::index_sequence<Indices...>) {
 	(func(member_info<Indices>(object)), ...);
 }
@@ -98,7 +98,7 @@ constexpr inline void foreach_member_reference(T&& object, F&& func) {
 
 // foreach static ----------------------------------------------------------------------------------
 
-template <typename T, typename F, size_t... Indices>
+template <typename T, typename F, std::size_t... Indices>
 constexpr inline void foreach_static_member_helper(F&& func, std::index_sequence<Indices...>) {
 	(func(member_static_info<Indices, T>()), ...);
 }
@@ -124,12 +124,12 @@ constexpr inline void foreach_static_member_pointer(F&& func) {
 
 // interleave --------------------------------------------------------------------------------------
 
-template <size_t Index, typename Func, typename... Args>
+template <std::size_t Index, typename Func, typename... Args>
 constexpr inline void interleave_member_value_helper2(Func& func, Args&... args) {
 	func(member_reference<Index>(args)...);
 }
 
-template <typename Func, typename... Args, size_t... Indices>
+template <typename Func, typename... Args, std::size_t... Indices>
 constexpr inline void interleave_member_value_helper(Func& func, std::index_sequence<Indices...>, Args&... args) {
 	(interleave_member_value_helper2<Indices>(func, args...), ...);
 }

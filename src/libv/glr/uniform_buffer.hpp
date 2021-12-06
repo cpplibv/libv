@@ -28,14 +28,14 @@ class RemoteUniformBuffer;
 struct Remote;
 
 struct UniformDataBlock {
-	size_t offset;
-	size_t size;
+	std::size_t offset;
+	std::size_t size;
 
 	inline bool operator<(UniformDataBlock rhs) const noexcept {
 		return offset < rhs.offset;
 	}
 
-	inline bool operator<(size_t index_) const noexcept {
+	inline bool operator<(std::size_t index_) const noexcept {
 		return offset < index_;
 	}
 };
@@ -52,7 +52,7 @@ public:
 
 	std::vector<std::byte> data;
 	boost::container::flat_set<UniformDataBlock, std::less<>> frees;
-	static constexpr size_t BLOCK_ALIGNMENT = 256;
+	static constexpr std::size_t BLOCK_ALIGNMENT = 256;
 	// TODO P5: load BLOCK_ALIGNMENT run-time
 
 	libv::observer_ptr<DestroyQueues> remote = nullptr;
@@ -73,7 +73,7 @@ public:
 	RemoteUniformBuffer& operator=(RemoteUniformBuffer&&) = delete;
 
 public:
-	UniformDataBlock allocate(size_t size) noexcept;
+	UniformDataBlock allocate(std::size_t size) noexcept;
 	void deallocate(UniformDataBlock block) noexcept;
 };
 
@@ -157,7 +157,7 @@ public:
 		return UniformBlockUniqueView_std140{layout.binding, remote->allocate(layout.size), remote};
 	}
 
-	void reserve(size_t byte_size) {
+	void reserve(std::size_t byte_size) {
 		remote->data.reserve(byte_size);
 	}
 };

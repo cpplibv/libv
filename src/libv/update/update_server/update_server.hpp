@@ -24,9 +24,9 @@ class UpdateServer {
 public:
 	struct Settings {
 		libv::net::mtcp::Endpoint endpoint;
-		size_t num_accept_backlog = 4;
+		std::size_t num_accept_backlog = 4;
 
-		size_t num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
+		std::size_t num_thread_net = libv::mt::hardware_concurrency_or(2) + 2;
 
 		std::vector<libv::net::Address> resource_servers;
 	};

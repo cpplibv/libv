@@ -33,11 +33,11 @@ public:
 			size_(size),
 			storage(size.x * size.y, init_value) {}
 
-	constexpr inline vector_2D(size_t x, size_t y) :
+	constexpr inline vector_2D(std::size_t x, std::size_t y) :
 			size_(x, y),
 			storage(x * y) {}
 
-	constexpr inline vector_2D(size_t x, size_t y, const T& init_value) :
+	constexpr inline vector_2D(std::size_t x, std::size_t y, const T& init_value) :
 			size_(x, y),
 			storage(x * y, init_value) {}
 
@@ -46,7 +46,7 @@ public:
 		return storage[size_.x * xy.y + xy.x];
 	}
 
-	[[nodiscard]] constexpr inline T& operator()(size_t x, size_t y) noexcept {
+	[[nodiscard]] constexpr inline T& operator()(std::size_t x, std::size_t y) noexcept {
 		return storage[size_.x * y + x];
 	}
 
@@ -54,7 +54,7 @@ public:
 		return storage[size_.x * xy.y + xy.x];
 	}
 
-	[[nodiscard]] constexpr inline const T& operator()(size_t x, size_t y) const noexcept {
+	[[nodiscard]] constexpr inline const T& operator()(std::size_t x, std::size_t y) const noexcept {
 		return storage[size_.x * y + x];
 	}
 
@@ -63,11 +63,11 @@ public:
 		return size_;
 	}
 
-	[[nodiscard]] constexpr inline size_t size_x() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size_x() const noexcept {
 		return size_.x;
 	}
 
-	[[nodiscard]] constexpr inline size_t size_y() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size_y() const noexcept {
 		return size_.y;
 	}
 

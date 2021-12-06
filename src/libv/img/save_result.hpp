@@ -14,7 +14,7 @@ namespace img {
 
 struct formated_image_data_view {
 	const std::byte* data;
-	size_t size;
+	std::size_t size;
 };
 
 class [[nodiscard]] save_result {
@@ -29,7 +29,7 @@ public:
 		return view->data;
 	}
 
-	[[nodiscard]] inline size_t size() const noexcept {
+	[[nodiscard]] inline std::size_t size() const noexcept {
 		return view->size;
 	}
 

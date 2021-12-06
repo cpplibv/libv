@@ -69,7 +69,7 @@ public:
 	}
 
 public:
-	size_t download_rate_bps();
+	std::size_t download_rate_bps();
 	void assign_task(std::shared_ptr<ResourceTask> task, uint64_t offset, uint64_t amount, bool prepare);
 //	void cancel_task();
 

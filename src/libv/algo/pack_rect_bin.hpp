@@ -78,11 +78,11 @@ public:
 		return insert(root, size.x, size.y);
 	}
 
-	[[nodiscard]] inline size_t used_area() const {
+	[[nodiscard]] inline std::size_t used_area() const {
 		return used_area(root);
 	}
 
-	[[nodiscard]] inline size_t total_area() const {
+	[[nodiscard]] inline std::size_t total_area() const {
 		return bin_size.x * bin_size.y;
 	}
 
@@ -95,7 +95,7 @@ public:
 
 private:
 	/// @return The surface area used by the subtree rooted at node.
-	[[nodiscard]] size_t used_area(const Node& node) const;
+	[[nodiscard]] std::size_t used_area(const Node& node) const;
 
 	/// Inserts a new rectangle in the subtree rooted at the given node.
 	Node* insert(Node& node, int32_t width, int32_t height);

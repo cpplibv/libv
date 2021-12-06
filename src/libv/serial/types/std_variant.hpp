@@ -13,8 +13,8 @@ namespace detail {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N, typename Archive, typename... Types>
-inline void libv_load_std_variant(size_t index, Archive& ar, std::variant<Types...>& variant) {
+template <std::size_t N, typename Archive, typename... Types>
+inline void libv_load_std_variant(std::size_t index, Archive& ar, std::variant<Types...>& variant) {
 	if (N == index) {
 		std::variant_alternative_t<N, std::variant<Types...>> value;
 		ar & LIBV_NVP(value);

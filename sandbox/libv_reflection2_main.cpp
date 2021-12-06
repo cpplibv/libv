@@ -100,7 +100,7 @@ template <typename Key, template <template <typename> class> class FieldSet>
 class FieldSetTable {
 private:
 	struct PackedState {
-		size_t changeID;
+		std::size_t changeID;
 		State<FieldSet> state;
 
 		LIBV_REFLECTION_ACCESS(changeID);

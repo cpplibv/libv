@@ -16,17 +16,17 @@ namespace diff {
 
 // -------------------------------------------------------------------------------------------------
 
-static constexpr size_t default_match_block_size = 64;
+static constexpr std::size_t default_match_block_size = 64;
 
 // -------------------------------------------------------------------------------------------------
 
 struct diff_info {
 private:
-	static constexpr size_t invalid = std::numeric_limits<size_t>::max();
+	static constexpr std::size_t invalid = std::numeric_limits<std::size_t>::max();
 
 public:
-	size_t old_size = invalid;
-	size_t new_size = invalid;
+	std::size_t old_size = invalid;
+	std::size_t new_size = invalid;
 
 public:
 	[[nodiscard]] constexpr inline bool valid() const noexcept {
@@ -44,7 +44,7 @@ public:
 
 namespace detail { // ------------------------------------------------------------------------------
 
-void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output_bytes out_diff, size_t match_block_size);
+void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output_bytes out_diff, std::size_t match_block_size);
 [[nodiscard]] diff_info aux_get_diff_info(libv::input_bytes diff);
 [[nodiscard]] bool aux_check_diff(libv::input_bytes old, libv::input_bytes new_, libv::input_bytes diff);
 [[nodiscard]] bool apply_patch(libv::input_bytes old, libv::input_bytes diff, libv::output_bytes out_new);
@@ -58,7 +58,7 @@ void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output
 /// \param match_block_size - Smaller block size improves compression but at the cost of performance. Recommended 16-16384
 /// \return The resulting diff that can be applied to \c old to get \c new
 template <typename In0, typename In1, typename Out>
-inline void create_diff(In0&& old, In1&& new_, Out&& out_diff, size_t match_block_size = default_match_block_size) {
+inline void create_diff(In0&& old, In1&& new_, Out&& out_diff, std::size_t match_block_size = default_match_block_size) {
 	detail::aux_create_diff(libv::input_bytes(old), libv::input_bytes(new_), libv::output_bytes(out_diff), match_block_size);
 }
 
@@ -70,19 +70,19 @@ inline void create_diff(In0&& old, In1&& new_, Out&& out_diff, size_t match_bloc
 /// \param match_block_size - Smaller block size improves compression but at the cost of performance. Recommended 16-16384
 /// \return The resulting diff that can be applied to \c old to get \c new
 template <typename T, typename In0, typename In1>
-[[nodiscard]] inline T create_diff(In0&& old, In1&& new_, size_t match_block_size = default_match_block_size) {
+[[nodiscard]] inline T create_diff(In0&& old, In1&& new_, std::size_t match_block_size = default_match_block_size) {
 	T diff;
 	create_diff(old, new_, diff, match_block_size);
 	return diff;
 }
 
 template <typename In0, typename In1>
-[[nodiscard]] inline std::string create_diff_str(In0&& old, In1&& new_, size_t match_block_size = default_match_block_size) {
+[[nodiscard]] inline std::string create_diff_str(In0&& old, In1&& new_, std::size_t match_block_size = default_match_block_size) {
 	return create_diff<std::string>(old, new_, match_block_size);
 }
 
 template <typename In0, typename In1>
-[[nodiscard]] inline std::vector<std::byte> create_diff_bin(In0&& old, In1&& new_, size_t match_block_size = default_match_block_size) {
+[[nodiscard]] inline std::vector<std::byte> create_diff_bin(In0&& old, In1&& new_, std::size_t match_block_size = default_match_block_size) {
 	return create_diff<std::vector<std::byte>>(old, new_, match_block_size);
 }
 

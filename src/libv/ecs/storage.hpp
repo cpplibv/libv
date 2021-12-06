@@ -82,7 +82,7 @@ private:
 		// TODO P4: storage.begin() - 1 could fail with assert if storage is empty, bypassed with empty check, refactor to avoid the need of -1 start
 		//		return [iter = storage.begin() - 1, end = storage.end()] (auto next) mutable -> T& {
 		return [iter = (storage.empty() ? storage.begin() : storage.begin() - 1), end = storage.end()] (auto next) mutable -> T& {
-			size_t jump = 1;
+			std::size_t jump = 1;
 			++iter;
 			while (iter->first != next) {
 				auto guess = iter + jump;
@@ -104,7 +104,7 @@ private:
 		// TODO P4: storage.begin() - 1 could fail with assert if storage is empty, bypassed with empty check, refactor to avoid the need of -1 start
 		//		return [iter = storage.begin() - 1, end = storage.end()] (auto next) mutable -> T* {
 		return [iter = (storage.empty() ? storage.begin() : storage.begin() - 1), end = storage.end()] (auto next) mutable -> T* {
-			size_t jump = 1;
+			std::size_t jump = 1;
 			while (true) {
 				auto guess = iter + jump;
 

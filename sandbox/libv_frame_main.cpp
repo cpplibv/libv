@@ -20,7 +20,7 @@ inline libv::LoggerModule log_sandbox{libv::logger_stream, "sandbox"};
 
 using libv::input::Keycode;
 
-libv::frame::Icon generateIcon(size_t size, libv::vec4uc color) {
+libv::frame::Icon generateIcon(std::size_t size, libv::vec4uc color) {
 	libv::frame::Icon result;
 
 	result.size.x = static_cast<int>(size);
@@ -29,8 +29,8 @@ libv::frame::Icon generateIcon(size_t size, libv::vec4uc color) {
 
 	const double radius = static_cast<double>(size - 1);
 
-	for (size_t x = 0; x < size; ++x)
-		for (size_t y = 0; y < size; ++y)
+	for (std::size_t x = 0; x < size; ++x)
+		for (std::size_t y = 0; y < size; ++y)
 			if (std::sqrt(static_cast<double>(x * x + y * y)) < radius)
 				result.pixels[y * size + x] = color;
 

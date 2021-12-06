@@ -679,7 +679,7 @@ void PanelViewer::init() { }
 //		const auto indexBegin = mesh.baseIndex;
 //		const auto indexEnd = mesh.baseIndex + mesh.numIndices;
 //
-//		for (size_t index = indexBegin; index < indexEnd; ++index) {
+//		for (std::size_t index = indexBegin; index < indexEnd; ++index) {
 //			const auto vertexID = scene.model.indices[index] + mesh.baseVertex;
 //			const auto vertexPositionM = scene.model.vertices[vertexID].position;
 //			const auto vertexPositionW = parentTransformation * node.transformation * vertexPositionM;

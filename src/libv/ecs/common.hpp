@@ -17,7 +17,7 @@ using EntityID = uint64_t;
 using EntityFlags = std::bitset<32>; // TODO P4: unacceptable padding in std::bitset sizeof(std::bitset<32>) == 8
 using EntityComponents = std::bitset<64>;
 
-template <size_t... N>
+template <std::size_t... N>
 constexpr auto make_bitset() {
 	EntityComponents result;
 	(result.set(N), ...);

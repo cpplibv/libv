@@ -23,7 +23,7 @@ pack_rect_bin::pack_rect_bin(libv::vec2i size) noexcept :
 ///	Recursively calls itself.
 size_t pack_rect_bin::used_area(const Node& node) const {
 	if (node.left || node.right) {
-		size_t usedSurfaceArea = node.size.x * node.size.y;
+		std::size_t usedSurfaceArea = node.size.x * node.size.y;
 		if (node.left)
 			usedSurfaceArea += used_area(*node.left);
 		if (node.right)

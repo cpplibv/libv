@@ -11,8 +11,8 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T, typename M>
-[[nodiscard]] constexpr inline size_t member_offset(M T::* member) noexcept {
-	return std::bit_cast<size_t>(&(static_cast<T*>(nullptr)->*member));
+[[nodiscard]] constexpr inline std::size_t member_offset(M T::* member) noexcept {
+	return std::bit_cast<std::size_t>(&(static_cast<T*>(nullptr)->*member));
 }
 
 // -------------------------------------------------------------------------------------------------

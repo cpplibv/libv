@@ -20,14 +20,14 @@ template <typename T, typename... Args>
 	return new T(std::forward<Args>(args)...);
 }
 
-[[nodiscard]] std::string generate_component_name(std::string_view type, size_t index) noexcept;
+[[nodiscard]] std::string generate_component_name(std::string_view type, std::size_t index) noexcept;
 
 // -------------------------------------------------------------------------------------------------
 
 template <typename BaseT, typename HandlerT, typename CoreT, template <typename> typename EventHostT>
 struct ComponentAPI : public BaseT {
 private:
-	static inline size_t nextID = 0;
+	static inline std::size_t nextID = 0;
 
 protected:
 	using Base = BaseT;

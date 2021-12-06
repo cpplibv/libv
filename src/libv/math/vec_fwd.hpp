@@ -10,7 +10,7 @@ namespace libv {
 
 // vec_t forward -----------------------------------------------------------------------------------
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 struct vec_t;
 
 // aliases -----------------------------------------------------------------------------------------
@@ -52,9 +52,9 @@ using vec4l = vec4_t<int64_t>;
 using vec2ul = vec2_t<uint64_t>;
 using vec3ul = vec3_t<uint64_t>;
 using vec4ul = vec4_t<uint64_t>;
-using vec2z = vec2_t<size_t>;
-using vec3z = vec3_t<size_t>;
-using vec4z = vec4_t<size_t>;
+using vec2z = vec2_t<std::size_t>;
+using vec3z = vec3_t<std::size_t>;
+using vec4z = vec4_t<std::size_t>;
 
 // -------------------------------------------------------------------------------------------------
 

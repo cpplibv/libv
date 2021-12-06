@@ -35,7 +35,7 @@ private:
 	const ID id = nextID++; /// Informative ID for logging and monitoring
 
 private:
-	void start_thread(size_t i, size_t thread_count) {
+	void start_thread(std::size_t i, std::size_t thread_count) {
 		const auto parentID = libv::thread_number();
 		threads.emplace_back([this, parentID, i, thread_count] {
 			log_net.trace("IOContext-{} worker thread {} ({}/{}) started by thread {}", id, libv::thread_number(), i + 1, thread_count, parentID);
@@ -44,10 +44,10 @@ private:
 	}
 
 public:
-	explicit ImplIOContext(size_t thread_count = 1) :
+	explicit ImplIOContext(std::size_t thread_count = 1) :
 		resolver(io_context),
 		work_guard(io_context.get_executor()) {
-		for (size_t i = 0; i < thread_count; ++i)
+		for (std::size_t i = 0; i < thread_count; ++i)
 			start_thread(i, thread_count);
 	}
 
@@ -96,7 +96,7 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-IOContext::IOContext(size_t thread_count) :
+IOContext::IOContext(std::size_t thread_count) :
 	impl(std::make_unique<ImplIOContext>(thread_count)) {
 }
 

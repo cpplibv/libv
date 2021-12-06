@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-void IntervalRegistry::mark(size_t offset, size_t size) noexcept {
+void IntervalRegistry::mark(std::size_t offset, std::size_t size) noexcept {
 	if (size == 0)
 		return;
 
@@ -40,7 +40,7 @@ void IntervalRegistry::mark(const IntervalRegistry& intervals) noexcept {
 		mark(interval.offset, interval.size);
 }
 
-void IntervalRegistry::unmark(size_t offset, size_t size) noexcept {
+void IntervalRegistry::unmark(std::size_t offset, std::size_t size) noexcept {
 	if (size == 0)
 		return;
 

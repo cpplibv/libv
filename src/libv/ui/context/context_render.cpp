@@ -97,10 +97,10 @@ public:
 	libv::vec2f ui_size;
 
 public:
-	size_t ll_base_index;
-	size_t ll_base_vertex;
-	size_t ll_num_vertex;
-	size_t ll_num_index;
+	std::size_t ll_base_index;
+	std::size_t ll_base_vertex;
+	std::size_t ll_num_vertex;
+	std::size_t ll_num_index;
 
 public:
 	struct TaskUI {
@@ -327,7 +327,7 @@ void Renderer::end(const Texture2D_view& texture, const ShaderImage_view& shader
 }
 
 void Renderer::index_strip(std::span<const uint32_t> indices) {
-	size_t i = 0;
+	std::size_t i = 0;
 
 	for (; i < indices.size() && context.ll_num_index + i < 3; ++i) {
 		context.vtx_indices.emplace_back(indices[i]);

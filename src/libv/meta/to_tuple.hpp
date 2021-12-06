@@ -21,7 +21,7 @@ struct any_type {
 
 //#pragma clang diagnostic push
 //#pragma clang diagnostic ignored "-Wmissing-field-initializers"
-template <typename T, size_t... I>
+template <typename T, std::size_t... I>
 decltype(void(T{(I, std::declval<any_type>())...}), std::true_type{})
 test_is_braces_constructible_n(std::index_sequence<I...>);
 //#pragma clang diagnostic pop
@@ -29,12 +29,12 @@ test_is_braces_constructible_n(std::index_sequence<I...>);
 template <typename, typename...>
 std::false_type test_is_braces_constructible_n(...);
 
-template <typename T, size_t N>
+template <typename T, std::size_t N>
 using is_braces_constructible_n = decltype(test_is_braces_constructible_n<T>(std::make_index_sequence<N>{}));
 
-template <typename T, size_t L = 0u, size_t R = sizeof (T) + 1u >
-inline constexpr size_t to_tuple_size_f() {
-	constexpr size_t M = (L + R) / 2u;
+template <typename T, std::size_t L = 0u, std::size_t R = sizeof (T) + 1u >
+inline constexpr std::size_t to_tuple_size_f() {
+	constexpr std::size_t M = (L + R) / 2u;
 	if constexpr (M == 0)
 		return std::is_empty<T>{} ? 0u : throw std::runtime_error("Unable to determine number of elements");
 	else if constexpr (L == M)
@@ -46,21 +46,21 @@ inline constexpr size_t to_tuple_size_f() {
 }
 
 template <typename T>
-using to_tuple_size = std::integral_constant<size_t, to_tuple_size_f<T>()>;
+using to_tuple_size = std::integral_constant<std::size_t, to_tuple_size_f<T>()>;
 
 #ifndef LIBV_TO_TUPLE_MAX
 #    define LIBV_TO_TUPLE_MAX 32
 #endif
 
 template <typename T>
-inline auto to_tuple_impl(T&&, std::integral_constant<size_t, 0>) noexcept {
+inline auto to_tuple_impl(T&&, std::integral_constant<std::size_t, 0>) noexcept {
 	return std::make_tuple();
 }
 
 #define LIBV_TO_TUPLE_P(Z,N,_) , p ## N
 #define LIBV_TO_TUPLE_SPECIALIZATION(Z,N,_)                                                        \
 template <typename T>                                                                              \
-inline auto to_tuple_impl(T&& object, std::integral_constant<size_t, N + 1>) noexcept {            \
+inline auto to_tuple_impl(T&& object, std::integral_constant<std::size_t, N + 1>) noexcept {            \
 		auto&& [p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil)] = object;                        \
 		return std::make_tuple(p BOOST_PP_REPEAT_ ## Z(N, LIBV_TO_TUPLE_P, nil));                  \
 }
@@ -72,8 +72,8 @@ BOOST_PP_REPEAT(LIBV_TO_TUPLE_MAX, LIBV_TO_TUPLE_SPECIALIZATION, nil)
 // Workaround end
 // =================================================================================================
 
-template <typename T, typename = struct current_value, size_t = LIBV_TO_TUPLE_MAX, typename = struct required_value, size_t N>
-inline auto to_tuple_impl(T&&, std::integral_constant<size_t, N>) noexcept {
+template <typename T, typename = struct current_value, std::size_t = LIBV_TO_TUPLE_MAX, typename = struct required_value, std::size_t N>
+inline auto to_tuple_impl(T&&, std::integral_constant<std::size_t, N>) noexcept {
 	static_assert(N <= LIBV_TO_TUPLE_MAX, "Please increase LIBV_TO_TUPLE_MAX");
 }
 

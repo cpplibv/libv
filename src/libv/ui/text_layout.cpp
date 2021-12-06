@@ -100,7 +100,7 @@ size_t TextLayout::length() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void TextLayout::insert(size_t position, uint32_t unicode) {
+void TextLayout::insert(std::size_t position, uint32_t unicode) {
 	if (!utf8::internal::is_code_point_valid(unicode)) {
 		log_ui.error("Attempted to insert an invalid codepoint: {} at {} substituting with {}", unicode, position, invalidCodepointReplacement);
 		unicode = invalidCodepointReplacement;
@@ -111,8 +111,8 @@ void TextLayout::insert(size_t position, uint32_t unicode) {
 	dirty = true;
 }
 
-size_t TextLayout::insert(size_t position, const std::string_view value) {
-	size_t codepoints = 0;
+size_t TextLayout::insert(std::size_t position, const std::string_view value) {
+	std::size_t codepoints = 0;
 
 	if (utf8::is_valid(value.begin(), value.end())) {
 		libv::insert_utf8_unchecked(string_, position, value);
@@ -132,7 +132,7 @@ size_t TextLayout::insert(size_t position, const std::string_view value) {
 	return codepoints;
 }
 
-void TextLayout::erase(size_t position, size_t count) {
+void TextLayout::erase(std::size_t position, std::size_t count) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), position))
@@ -212,7 +212,7 @@ libv::vec2f TextLayout::getCharacterPosition() {
 	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
-libv::vec2f TextLayout::getCharacterPosition(size_t characterIndex) {
+libv::vec2f TextLayout::getCharacterPosition(std::size_t characterIndex) {
 	auto it = string_.begin();
 
 	if (!libv::advance_utf8_unchecked(it, string_.end(), characterIndex))
@@ -234,11 +234,11 @@ libv::vec2f TextLayout::getCharacterPosition(size_t characterIndex) {
 	return {position.x - glyph.pos[0].x, position.y - glyph.pos[0].y + descender};
 }
 
-//size_t TextLayout::getLineOfCharacter() {
+//std::size_t TextLayout::getLineOfCharacter() {
 //	return {}; // Not implemented yet.
 //}
 //
-//size_t TextLayout::getLineOfCharacter(size_t characterIndex) {
+//std::size_t TextLayout::getLineOfCharacter(std::size_t characterIndex) {
 //	return {}; // Not implemented yet.
 //}
 //
@@ -246,7 +246,7 @@ libv::vec2f TextLayout::getCharacterPosition(size_t characterIndex) {
 //	return {}; // Not implemented yet.
 //}
 //
-//libv::vec2f TextLayout::getLinePosition(size_t lineIndex) {
+//libv::vec2f TextLayout::getLinePosition(std::size_t lineIndex) {
 //	return {}; // Not implemented yet.
 //}
 
@@ -257,10 +257,10 @@ size_t TextLayout::getClosestCharacterIndex(libv::vec2f position) {
 	const auto lineHeight = font_->getLineHeight(fontSize_);
 
 	float min_distance_sq = std::numeric_limits<float>::infinity();
-	size_t min_index = 0; // In case of empty string, index 0 is valid
-	size_t index = 0;
+	std::size_t min_index = 0; // In case of empty string, index 0 is valid
+	std::size_t index = 0;
 
-	const auto check = [&](uint32_t codepoint, size_t i) {
+	const auto check = [&](uint32_t codepoint, std::size_t i) {
 		const auto& descender = font_->getDescender(fontSize_);
 		const auto& glyph = font_->getCharacter(codepoint, fontSize_);
 
@@ -293,10 +293,10 @@ size_t TextLayout::getClosestCharacterIndexInline(libv::vec2f position) {
 
 	float min_distance_x = std::numeric_limits<float>::infinity();
 	float min_distance_y = std::numeric_limits<float>::infinity();
-	size_t min_index = 0; // In case of empty string, index 0 is valid
-	size_t index = 0;
+	std::size_t min_index = 0; // In case of empty string, index 0 is valid
+	std::size_t index = 0;
 
-	const auto check = [&](uint32_t codepoint, size_t i) {
+	const auto check = [&](uint32_t codepoint, std::size_t i) {
 		const auto& descender = font_->getDescender(fontSize_);
 		const auto& glyph = font_->getCharacter(codepoint, fontSize_);
 
@@ -328,7 +328,7 @@ size_t TextLayout::getClosestCharacterIndexInline(libv::vec2f position) {
 	return min_index;
 }
 
-//size_t TextLayout::getClosestLineIndex(libv::vec2f position) {
+//std::size_t TextLayout::getClosestLineIndex(libv::vec2f position) {
 //	return {}; // Not implemented yet.
 //}
 
@@ -409,10 +409,10 @@ void TextLayout::layout() {
 	// ---
 
 	struct Line {
-		size_t begin = 0;
-		size_t end = 0;
+		std::size_t begin = 0;
+		std::size_t end = 0;
 		float width = 0.0f;
-		boost::container::small_vector<size_t, 32> wordEndings{};
+		boost::container::small_vector<std::size_t, 32> wordEndings{};
 	};
 
 	const auto lineAdvance = font_->getLineAdvance(fontSize_);
@@ -514,7 +514,7 @@ void TextLayout::layout() {
 
 		const auto leftoverX = contentWidth - line.width;
 		const auto offsetX = leftoverX * alignh.rate();
-		const auto isLastLine = static_cast<size_t>(line_index) == lines.size() - 1;
+		const auto isLastLine = static_cast<std::size_t>(line_index) == lines.size() - 1;
 		const auto isJustifiedLine = align_horizontal_ == AlignHorizontal::justify_all || (align_horizontal_ == AlignHorizontal::justify && !isLastLine);
 		const auto justifyGapX = isJustifiedLine ?
 				leftoverX / std::max(1.f, static_cast<float>(line.wordEndings.size() - 1)) : 0.0f;
@@ -523,7 +523,7 @@ void TextLayout::layout() {
 
 		leftoverMinX = std::min(leftoverMinX, isJustifiedLine && line.wordEndings.size() > 1 ? 0.0f : leftoverX); // If it's a isJustifiedLine with at least two word than there is no leftover at all
 
-		size_t i = line.begin;
+		std::size_t i = line.begin;
 		for (const auto& [word_index, wordEnd] : line.wordEndings | ranges::view::enumerate) {
 			const auto word_index_f = static_cast<float>(word_index);
 

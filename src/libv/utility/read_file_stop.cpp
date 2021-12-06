@@ -14,7 +14,7 @@ ReadFileResult fn_read_file_stop::operator()(std::stop_token st, const std::file
 	return operator()(st, filepath, default_read_file_stop_chunk_size);
 }
 
-ReadFileResult fn_read_file_stop::operator()(std::stop_token st, const std::filesystem::path& filepath, size_t chunk_size) const noexcept {
+ReadFileResult fn_read_file_stop::operator()(std::stop_token st, const std::filesystem::path& filepath, std::size_t chunk_size) const noexcept {
 	ReadFileResult result;
 	std::ifstream file(filepath, std::ios::binary | std::ios::in | std::ios::ate);
 

@@ -122,7 +122,7 @@ void TaskPool::queue_task_file(std::string identifier, std::filesystem::path fil
 	}
 }
 
-void TaskPool::add_active_task(std::shared_ptr<ResourceTask> task, size_t offset, size_t size) {
+void TaskPool::add_active_task(std::shared_ptr<ResourceTask> task, std::size_t offset, std::size_t size) {
 	auto lock = std::unique_lock(mutex);
 	done_bl.reset();
 

@@ -149,12 +149,12 @@ public: // get -----------------------------------------------------------------
 	}
 
 public: // -----------------------------------------------------------------------------------------
-	size_t entityCount() {
+	std::size_t entityCount() {
 		return entities.size();
 	}
 
 	template <typename C>
-	size_t componentCount() {
+	std::size_t componentCount() {
 		return storage<typename C::type>(C::ID).size();
 	}
 

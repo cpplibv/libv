@@ -14,7 +14,7 @@ namespace libv {
 std::string hex_dump(const std::string_view& s) {
 	std::ostringstream ss;
 	ss << std::hex << std::setfill('0') << std::setw(2) << std::uppercase;
-	for (size_t i = 0; i < s.size();) {
+	for (std::size_t i = 0; i < s.size();) {
 		ss << std::setw(2) << uint16_t{static_cast<unsigned char>(s[i])};
 		++i;
 
@@ -43,7 +43,7 @@ std::string hex_dump_with_ascii(const std::string_view& s) {
 	std::ostringstream ss;
 	ss << std::hex << std::setfill('0') << std::setw(2) << std::uppercase;
 
-	size_t i = 0;
+	std::size_t i = 0;
 	while (true) {
 		ss << std::setw(2) << uint16_t{static_cast<unsigned char>(s[i])};
 		++i;
@@ -53,7 +53,7 @@ std::string hex_dump_with_ascii(const std::string_view& s) {
 
 		if (i % 32 == 0) {
 			ss << " | ";
-			for (size_t j = i - 32; j < i;) {
+			for (std::size_t j = i - 32; j < i;) {
 				ss << (std::isprint(s[j]) ? s[j] : '.');
 				++j;
 				if (j % 8 == 0 && j % 32 != 0)
@@ -71,7 +71,7 @@ std::string hex_dump_with_ascii(const std::string_view& s) {
 		const auto r_begin = i;
 		const auto r_end = (i / 32 + 1) * 32;
 
-		for (size_t r = r_begin; r < r_end; ++r) {
+		for (std::size_t r = r_begin; r < r_end; ++r) {
 			if (r % 32 == 0) {
 				ss << " ";
 			} else if (r % 8 == 0) {
@@ -83,7 +83,7 @@ std::string hex_dump_with_ascii(const std::string_view& s) {
 	}
 
 	ss << " | ";
-	for (size_t j = (i - 1) / 32 * 32; j < i;) {
+	for (std::size_t j = (i - 1) / 32 * 32; j < i;) {
 		ss << (std::isprint(s[j]) ? s[j] : '.');
 		++j;
 		if (j % 8 == 0 && j % 32 != 0)

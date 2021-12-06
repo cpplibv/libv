@@ -22,9 +22,9 @@ namespace archive {
 
 namespace detail {
 
-template <size_t DataSize>
+template <std::size_t DataSize>
 inline void swap_bytes(std::byte* data) {
-	for (size_t i = 0, end = DataSize / 2; i < end; ++i)
+	for (std::size_t i = 0, end = DataSize / 2; i < end; ++i)
 		std::swap(data[i], data[DataSize - i - 1]);
 }
 
@@ -33,7 +33,7 @@ inline void swap_bytes(std::byte* data) {
 class BinaryInput : public cereal::InputArchive<BinaryInput, cereal::AllowEmptyClassElision> {
 private:
 	libv::input_bytes input_stream;
-	size_t input_it = 0;
+	std::size_t input_it = 0;
 
 public:
 	/// Construct, loading from the provided stream
@@ -45,8 +45,8 @@ public:
 
 	~BinaryInput() noexcept = default;
 
-	template <size_t DataSize>
-	inline void loadBinary(void* const data, size_t size) {
+	template <std::size_t DataSize>
+	inline void loadBinary(void* const data, std::size_t size) {
 		const auto readSize = input_stream.read(reinterpret_cast<std::byte*>(data), input_it, size);
 		input_it += size; // (readSize would yield same result)
 
@@ -54,7 +54,7 @@ public:
 			throw cereal::Exception("Failed to read " + std::to_string(size) + " bytes from input stream! Read " + std::to_string(readSize));
 
 		if constexpr (!is_network_endian())
-			for (size_t i = 0; i < size; i += DataSize)
+			for (std::size_t i = 0; i < size; i += DataSize)
 				detail::swap_bytes<DataSize>(reinterpret_cast<std::byte*>(data) + i);
 	}
 };
@@ -64,7 +64,7 @@ public:
 class BinaryOutput : public cereal::OutputArchive<BinaryOutput, cereal::AllowEmptyClassElision> {
 private:
 	libv::output_bytes output_stream;
-	size_t output_it = 0;
+	std::size_t output_it = 0;
 
 public:
 	/// Construct, outputting to the provided stream
@@ -76,15 +76,15 @@ public:
 
 	~BinaryOutput() noexcept = default;
 
-	template <size_t DataSize>
-	inline void saveBinary(const void* const data, size_t size) {
-//		size_t writtenSize = 0;
+	template <std::size_t DataSize>
+	inline void saveBinary(const void* const data, std::size_t size) {
+//		std::size_t writtenSize = 0;
 
 		if (output_stream.size() < output_it + size)
 			throw cereal::Exception("Failed to write " + std::to_string(size) + " bytes to output stream! Output stream only has " + std::to_string(output_stream.size() - output_it) + " byte storage left");
 
 		if constexpr (!is_network_endian() && DataSize != 1) {
-			for (size_t i = 0; i < size; i += DataSize) {
+			for (std::size_t i = 0; i < size; i += DataSize) {
 				std::byte swap_buffer[DataSize];
 				std::memcpy(swap_buffer, reinterpret_cast<const std::byte*>(data) + i, DataSize);
 				detail::swap_bytes<DataSize>(swap_buffer);
@@ -147,7 +147,7 @@ void CEREAL_SAVE_FUNCTION_NAME(BinaryOutput& ar, cereal::BinaryData<T> const& bd
 			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
 			"Portable binary only supports IEEE 754 standardized floating point");
 
-	ar.template saveBinary<sizeof (TT)>(bd.data, static_cast<size_t>(bd.size));
+	ar.template saveBinary<sizeof (TT)>(bd.data, static_cast<std::size_t>(bd.size));
 }
 
 /// Loading binary data from portable binary
@@ -158,7 +158,7 @@ void CEREAL_LOAD_FUNCTION_NAME(BinaryInput& ar, cereal::BinaryData<T>& bd) {
 			(std::is_floating_point<TT>::value && std::numeric_limits<TT>::is_iec559),
 			"Portable binary only supports IEEE 754 standardized floating point");
 
-	ar.template loadBinary<sizeof (TT)>(bd.data, static_cast<size_t>(bd.size));
+	ar.template loadBinary<sizeof (TT)>(bd.data, static_cast<std::size_t>(bd.size));
 }
 
 // -------------------------------------------------------------------------------------------------

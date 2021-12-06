@@ -62,8 +62,8 @@ private:
 //	}
 
 private:
-	size_t longest_value_name = 0;
-	size_t longest_value_text = 0;
+	std::size_t longest_value_name = 0;
+	std::size_t longest_value_text = 0;
 
 public:
 //	bool gen_operator_eq = true;
@@ -299,7 +299,7 @@ public:
 		out("	}};\n");
 		out("\n");
 		out("public:\n");
-		out("	static constexpr size_t size = {};\n", enum_entries.size());
+		out("	static constexpr std::size_t size = {};\n", enum_entries.size());
 
 		if (gen_to_span) {
 			out("\n");

@@ -82,13 +82,13 @@ public:
 	}
 
 public:
-	[[nodiscard]] size_t length() const noexcept;
+	[[nodiscard]] std::size_t length() const noexcept;
 
 public:
-	void insert(size_t position, uint32_t unicode);
+	void insert(std::size_t position, uint32_t unicode);
 	/// @return the number of codepoints inserted
-	size_t insert(size_t position, const std::string_view string_);
-	void erase(size_t position, size_t count = 1);
+	std::size_t insert(std::size_t position, const std::string_view string_);
+	void erase(std::size_t position, std::size_t count = 1);
 
 	void push_back(uint32_t unicode);
 	void push_back(const std::string_view string_);
@@ -101,15 +101,15 @@ public:
 
 public:
 	[[nodiscard]] libv::vec2f getCharacterPosition();
-	[[nodiscard]] libv::vec2f getCharacterPosition(size_t characterIndex);
-//	size_t getLineOfCharacter();
-//	size_t getLineOfCharacter(size_t characterIndex);
+	[[nodiscard]] libv::vec2f getCharacterPosition(std::size_t characterIndex);
+//	std::size_t getLineOfCharacter();
+//	std::size_t getLineOfCharacter(std::size_t characterIndex);
 //	libv::vec2f getLinePosition();
-//	libv::vec2f getLinePosition(size_t lineIndex);
+//	libv::vec2f getLinePosition(std::size_t lineIndex);
 
-	[[nodiscard]] size_t getClosestCharacterIndex(libv::vec2f position);
-	[[nodiscard]] size_t getClosestCharacterIndexInline(libv::vec2f position);
-//	size_t getClosestLineIndex(libv::vec2f position);
+	[[nodiscard]] std::size_t getClosestCharacterIndex(libv::vec2f position);
+	[[nodiscard]] std::size_t getClosestCharacterIndexInline(libv::vec2f position);
+//	std::size_t getClosestLineIndex(libv::vec2f position);
 
 	/// @param limit - The maximum available space that can be used to layout
 	/// @note Negative \c limit values are representing unbounded limits

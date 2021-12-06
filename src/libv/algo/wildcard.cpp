@@ -18,25 +18,25 @@ bool match_wildcard(const std::string_view str, const std::string_view pattern) 
 
 	boost::container::small_vector<bool, 1024> table;
 	table.resize((str.size() + 1) * (pattern.size() + 1), false);
-	const auto index = [&](size_t i, size_t j) -> bool& {
+	const auto index = [&](std::size_t i, std::size_t j) -> bool& {
 		return table[(pattern.size() + 1) * i + j];
 	};
 
 	// clear
-	for (size_t i = 0; i <= str.size(); ++i)
-		for (size_t j = 0; j <= pattern.size(); ++j)
+	for (std::size_t i = 0; i <= str.size(); ++i)
+		for (std::size_t j = 0; j <= pattern.size(); ++j)
 			index(i, j) = false;
 
 	// accept any leading WILDCARD_ANY as str start
-	for (size_t j = 1; j <= pattern.size() && pattern[j - 1] == WILDCARD_ANY; ++j)
+	for (std::size_t j = 1; j <= pattern.size() && pattern[j - 1] == WILDCARD_ANY; ++j)
 		index(0, j) = true;
 
 	// base case
 	index(0, 0) = true;
 
 	// solve
-	for (size_t i = 1; i <= str.size(); i++) {
-		for (size_t j = 1; j <= pattern.size(); j++) {
+	for (std::size_t i = 1; i <= str.size(); i++) {
+		for (std::size_t j = 1; j <= pattern.size(); j++) {
 			if (str[i - 1] == pattern[j - 1] || pattern[j - 1] == WILDCARD_SINGLE)
 				index(i, j) = index(i - 1, j - 1);
 
@@ -74,8 +74,8 @@ struct ImplWildcardGlobMatcher {
 
 	struct Token {
 		TokenType type;
-		size_t begin = 0;
-		size_t size = 0;
+		std::size_t begin = 0;
+		std::size_t size = 0;
 	};
 
 public:
@@ -91,7 +91,7 @@ public:
 		pattern_literals.clear();
 
 		// Preprocess pattern
-		for (size_t i = 0; i < pattern_str.size();) {
+		for (std::size_t i = 0; i < pattern_str.size();) {
 			if (pattern_str.substr(i).starts_with(WILDCARD_ESCAPE) && pattern_str.size() - i != WILDCARD_ESCAPE.size()) {
 				i += WILDCARD_ESCAPE.size();
 
@@ -135,7 +135,7 @@ public:
 		}
 	}
 
-	inline bool& index(size_t i, size_t j) const noexcept {
+	inline bool& index(std::size_t i, std::size_t j) const noexcept {
 		return table[(pattern.size() + 1) * i + j];
 	}
 
@@ -145,7 +145,7 @@ public:
 		// accept any leading WILDCARD_ANY and at most one WILDCARD_LAYER as str start
 		{
 			bool layer_accept = false;
-			for (size_t j = 1; j <= pattern.size(); ++j) {
+			for (std::size_t j = 1; j <= pattern.size(); ++j) {
 				if (pattern[j - 1].type == TokenType::layer && !layer_accept) {
 					layer_accept = true;
 					index(0, j) = true;
@@ -163,8 +163,8 @@ public:
 		index(0, 0) = true;
 
 		// solve
-		for (size_t i = 1; i <= str.size(); i++) {
-			for (size_t j = 1; j <= pattern.size(); j++) {
+		for (std::size_t i = 1; i <= str.size(); i++) {
+			for (std::size_t j = 1; j <= pattern.size(); j++) {
 				if (index(i, j)) // Optimization: Already calculated
 					continue;
 
@@ -179,14 +179,14 @@ public:
 					const bool accept = str_literal.starts_with(std::string_view(pattern_literals.data() + token.begin, token.size));
 					if (accept && up_left)
 						// Optimization: Prefill the every matched character
-						for (size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
+						for (std::size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
 							index(i + s, j) = true;
 
 				} else if (token.type == TokenType::single) {
 					const bool accept = str_literal.size() >= token.size && str_literal.substr(0, token.size).find_first_of(WILDCARD_SEPARATOR) == str_literal.npos;
 					if (accept && up_left)
 						// Optimization: Prefill the every matched character
-						for (size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
+						for (std::size_t s = 0; s < token.size && i + s <= str.size() && index(i + s, j) == false; ++s)
 							index(i + s, j) = true;
 
 				} else if (token.type == TokenType::layer_any) {

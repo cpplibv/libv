@@ -42,7 +42,7 @@ class SingleInstance {
 private:
 	std::mutex mutex;
 	std::optional<T> variable; // Instead of optional: libv::storage<T> variable; aka alignas(T) std::byte storage[sizeof(T)]
-	size_t ref_count = 0;
+	std::size_t ref_count = 0;
 	// NOTE: Not implemented with weak_ptr because the destructors are also guarded with the same mutex
 
 public:

@@ -44,12 +44,12 @@ static constexpr bool is_same_as_any_v = std::is_same_v<T, K> || (std::is_same_v
 // -------------------------------------------------------------------------------------------------
 
 template <typename T> struct is_array : std::false_type {};
-template <typename T, size_t N> struct is_array<std::array<T, N>> : std::true_type {};
+template <typename T, std::size_t N> struct is_array<std::array<T, N>> : std::true_type {};
 template <typename T> constexpr bool is_array_v = is_array<T>::value;
 
 template <typename T> struct array_size;
-template <typename T, size_t N> struct array_size<std::array<T, N>> : std::integral_constant<size_t, N> {};
-template <typename T> constexpr size_t array_size_v = array_size<T>::value;
+template <typename T, std::size_t N> struct array_size<std::array<T, N>> : std::integral_constant<std::size_t, N> {};
+template <typename T> constexpr std::size_t array_size_v = array_size<T>::value;
 
 // -------------------------------------------------------------------------------------------------
 

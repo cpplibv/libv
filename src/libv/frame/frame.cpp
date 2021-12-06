@@ -534,7 +534,7 @@ void Frame::setIcon(std::vector<Icon> icons) {
 		self->icons = std::move(icons);
 		self->iconsGLFW.resize(self->icons.size());
 
-		for (size_t i = 0; i < self->icons.size(); ++i) {
+		for (std::size_t i = 0; i < self->icons.size(); ++i) {
 			self->iconsGLFW[i].width = self->icons[i].size.x;
 			self->iconsGLFW[i].height = self->icons[i].size.y;
 			self->iconsGLFW[i].pixels = self->icons[i].pixels[0].ptr();

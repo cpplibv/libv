@@ -48,8 +48,8 @@ public:
 		return false;
 	}
 
-	size_t progress_current();
-	size_t progress_total();
+	std::size_t progress_current();
+	std::size_t progress_total();
 	int operation();
 	std::string operation_file();
 };
@@ -71,10 +71,10 @@ public:
 		std::vector<libv::net::Address> update_servers;
 		std::vector<libv::net::Address> resource_servers;
 
-		size_t num_thread_fs = 2;
-		size_t num_thread_net = 4;
+		std::size_t num_thread_fs = 2;
+		std::size_t num_thread_net = 4;
 
-//		size_t limit_bps_global_download = 0;
+//		std::size_t limit_bps_global_download = 0;
 
 		bool remove_patch_files_after_success = true;
 	};

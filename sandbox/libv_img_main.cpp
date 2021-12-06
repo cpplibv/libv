@@ -17,10 +17,10 @@ int main() {
 	std::vector<libv::vec3uc> v3uc;
 	std::vector<libv::vec4uc> v4uc;
 
-	static constexpr size_t size_x = 256;
-	static constexpr size_t size_y = 256;
-	static constexpr size_t size_fx = static_cast<float>(size_x);
-	static constexpr size_t size_fy = static_cast<float>(size_y);
+	static constexpr std::size_t size_x = 256;
+	static constexpr std::size_t size_y = 256;
+	static constexpr std::size_t size_fx = static_cast<float>(size_x);
+	static constexpr std::size_t size_fy = static_cast<float>(size_y);
 
 	const auto add = [&](float x, float y, float z, float w) {
 		const auto xi = static_cast<uint8_t>(x * 255.f);
@@ -49,8 +49,8 @@ int main() {
 		save(fn, v4uc, "tmp/" + name + "_v4uc." + name);
 	};
 
-	for (size_t x = 0; x < size_x; ++x) {
-		for (size_t y = 0; y < size_y; ++y) {
+	for (std::size_t x = 0; x < size_x; ++x) {
+		for (std::size_t y = 0; y < size_y; ++y) {
 			const auto fx = static_cast<float>(x);
 			const auto fy = static_cast<float>(y);
 

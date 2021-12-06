@@ -26,7 +26,7 @@ R"(// File: {output_file}.hpp - Generated on YYYY.MM.DD. HH:mm from {input_file}
 
 // -------------------------------------------------------------------------------------------------
 
-std::pair<void*, size_t> {function_name}();
+std::pair<void*, std::size_t> {function_name}();
 
 // -------------------------------------------------------------------------------------------------
 )";
@@ -40,7 +40,7 @@ R"(// File: {output_file}.cpp - Generated on YYYY.MM.DD. HH:mm from {input_file}
 
 // -------------------------------------------------------------------------------------------------
 
-std::pair<void*, size_t> {function_name}() {{
+std::pair<void*, std::size_t> {function_name}() {{
 	static constexpr unsigned char data[] = {{
 {payload}
 	}};

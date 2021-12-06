@@ -38,11 +38,11 @@ CoreComponent::~CoreComponent() {
 // -------------------------------------------------------------------------------------------------
 
 std::string CoreComponent::path() const {
-	//	size_t path_length = name.size() + 1;
+	//	std::size_t path_length = name.size() + 1;
 	//	for
 	//		path_length += it->name.size() + 1;
 	//
-	//	size_t i = 1;
+	//	std::size_t i = 1;
 	//	std::string result(path_length, '/');
 	//	for
 	//  	strcpy i parent.name

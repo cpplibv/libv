@@ -72,7 +72,7 @@ public:
 	[[nodiscard]] inline std::byte* header_data() noexcept {
 		return reinterpret_cast<std::byte*>(this);
 	}
-	[[nodiscard]] constexpr inline size_t header_size() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t header_size() const noexcept {
 		static_assert(sizeof(message_header) == sizeof(uint64_t));
 		return sizeof(message_header);
 	}
@@ -125,7 +125,7 @@ public:
 		return data_view.data();
 	}
 
-	[[nodiscard]] constexpr inline size_t size() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size() const noexcept {
 		return data_view.size();
 	}
 

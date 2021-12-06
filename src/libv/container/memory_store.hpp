@@ -24,12 +24,12 @@ struct MemoryStore {
 	}
 
 	template <typename T>
-	inline void reserve(size_t count) {
+	inline void reserve(std::size_t count) {
 		data.reserve(sizeof(T) * count);
 	}
 
 	template <typename T>
-	inline void resize(size_t count) {
+	inline void resize(std::size_t count) {
 		data.resize(sizeof(T) * count);
 	}
 

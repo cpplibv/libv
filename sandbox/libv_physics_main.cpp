@@ -44,10 +44,10 @@ struct EventListener : rp3d::EventListener {
 
 			std::cout << '\n';
 			std::cout << "\tNew contact:"
-					<< " body1: " << std::bit_cast<size_t>(contact.getBody1())
-					<< " body2: " << std::bit_cast<size_t>(contact.getBody2())
-					<< " collider1: " << std::bit_cast<size_t>(contact.getCollider1())
-					<< " collider2: " << std::bit_cast<size_t>(contact.getCollider2())
+					<< " body1: " << std::bit_cast<std::size_t>(contact.getBody1())
+					<< " body2: " << std::bit_cast<std::size_t>(contact.getBody2())
+					<< " collider1: " << std::bit_cast<std::size_t>(contact.getCollider1())
+					<< " collider2: " << std::bit_cast<std::size_t>(contact.getCollider2())
 					<< '\n';
 
 			std::cout << "\t\tcontact count     : " << contact.getNbContactPoints() << '\n';
@@ -77,7 +77,7 @@ struct EventListener : rp3d::EventListener {
 //struct RaycastListener : rp3d::RaycastCallback {
 //	virtual rp3d::decimal notifyRaycastHit(const rp3d::RaycastInfo& info) override {
 //		std::cout << info.body << info. << std::endl;
-//		std::cout << " body1      : " << std::bit_cast<size_t>(info.body) << std::endl;
+//		std::cout << " body1      : " << std::bit_cast<std::size_t>(info.body) << std::endl;
 //		std::cout << " world point: " << libv::vec3f(info.worldPoint) << std::endl;
 //
 //		return 1; // indicates that the ray is not clipped and the ray cast should continue as if no hit occurred
@@ -141,7 +141,7 @@ int main() {
 	floor_material.setFrictionCoefficient(0.6f);
 
 	const float timeStep = 1.0f / 60.0f;
-	for (size_t i = 0; i <= 60 * 8; ++i) {
+	for (std::size_t i = 0; i <= 60 * 8; ++i) {
 		world->update(timeStep);
 		std::cout
 				<< "\ntime           : " << std::setw(1) << std::setprecision(6) << std::fixed << timeStep * static_cast<float>(i) << ' ';

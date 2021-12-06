@@ -45,8 +45,8 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 template<typename... Args>
-constexpr inline size_t hash_combine(const Args&... args) noexcept {
-	size_t seed = 0;
+constexpr inline std::size_t hash_combine(const Args&... args) noexcept {
+	std::size_t seed = 0;
 	((void) (seed ^= std::hash<Args>{}(args) + 0x9e3779b9 + (seed << 6) + (seed >> 2)), ...);
 	return seed;
 }
@@ -61,6 +61,6 @@ constexpr inline size_t hash_combine(const Args&... args) noexcept {
 #define LIBV_MAKE_HASHABLE(TYPE, ...)                                                              \
 namespace std {                                                                                    \
 	template <> struct hash<TYPE> {                                                                \
-		constexpr size_t operator()(const TYPE &t) const noexcept {                                \
+		constexpr std::size_t operator()(const TYPE &t) const noexcept {                                \
 			return ::libv::hash_combine(__VA_ARGS__);                                              \
 }};}

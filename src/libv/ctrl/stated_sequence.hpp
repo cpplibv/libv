@@ -37,7 +37,7 @@ public:
 
 struct StatedSequence {
 	boost::container::small_vector<StatedCombination, 2> combinations;
-	size_t checkpoint = 0; // The index of the currently active combination
+	std::size_t checkpoint = 0; // The index of the currently active combination
 	bool active = false;
 
 	StatedSequence(const Sequence& src_sequence) {

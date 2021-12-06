@@ -8,13 +8,13 @@
 // -------------------------------------------------------------------------------------------------
 
 struct MockContext {
-	size_t access_count = 0;
+	std::size_t access_count = 0;
 };
 
 template <typename T>
 class MockFeature {
 	std::vector<T> queue;
-	size_t head = 0;
+	std::size_t head = 0;
 
 public:
 	auto callback() {
@@ -24,11 +24,11 @@ public:
 		};
 	}
 
-	size_t queue_size() {
+	std::size_t queue_size() {
 		return queue.size();
 	}
 
-	size_t consume_queue() {
+	std::size_t consume_queue() {
 		const auto n = queue.size();
 		queue.clear();
 		return n;

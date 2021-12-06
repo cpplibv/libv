@@ -15,9 +15,9 @@ namespace vm4 {
 class Model;
 //class ImportResult;
 
-//ImportResult import_ec(const char* data, size_t size);
+//ImportResult import_ec(const char* data, std::size_t size);
 //ImportResult import_ec(const std::filesystem::path& filePath);
-//Model import(const char* data, size_t size);
+//Model import(const char* data, std::size_t size);
 //Model import(const std::filesystem::path& filePath);
 
 std::optional<Model> import(const std::string& filePath);

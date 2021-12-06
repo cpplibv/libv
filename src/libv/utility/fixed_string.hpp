@@ -11,7 +11,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <size_t N>
+template <std::size_t N>
 class fixed_string {
 private:
 	char content[N + 1] = {};
@@ -19,22 +19,22 @@ private:
 public:
 	template <typename T>
 	constexpr inline fixed_string(const T (&input)[N + 1]) noexcept {
-		for (size_t i = 0; i != N; ++i)
+		for (std::size_t i = 0; i != N; ++i)
 			content[i] = input[i];
 		content[N] = 0;
 	}
 	constexpr inline fixed_string(const char* const input) noexcept {
-		for (size_t i = 0; i != N; ++i)
+		for (std::size_t i = 0; i != N; ++i)
 			content[i] = input[i];
 		content[N] = 0;
 	}
 	constexpr inline fixed_string(const fixed_string& other) noexcept {
-		for (size_t i{0}; i < N; ++i)
+		for (std::size_t i{0}; i < N; ++i)
 			content[i] = other.content[i];
 		content[N] = 0;
 	}
 
-	constexpr inline size_t size() const noexcept {
+	constexpr inline std::size_t size() const noexcept {
 		return N;
 	}
 	constexpr inline const char* begin() const noexcept {
@@ -43,7 +43,7 @@ public:
 	constexpr inline const char* end() const noexcept {
 		return content + N;
 	}
-	constexpr inline char operator[](size_t i) const noexcept {
+	constexpr inline char operator[](std::size_t i) const noexcept {
 		return content[i];
 	}
 	constexpr inline operator const char*() const noexcept {
@@ -53,11 +53,11 @@ public:
 		return std::string_view{content, N};
 	}
 
-	template <size_t M>
+	template <std::size_t M>
 	constexpr inline bool operator==(const fixed_string<M> & rhs) const noexcept {
 		if (N != M)
 			return false;
-		for (size_t i = 0; i != N; ++i) {
+		for (std::size_t i = 0; i != N; ++i) {
 			if (content[i] != rhs[i])
 				return false;
 		}
@@ -65,8 +65,8 @@ public:
 	}
 };
 
-template <size_t N> fixed_string(const char (&)[N]) -> fixed_string<N - 1>;
-template <size_t N> fixed_string(fixed_string<N>) -> fixed_string<N>;
+template <std::size_t N> fixed_string(const char (&)[N]) -> fixed_string<N - 1>;
+template <std::size_t N> fixed_string(fixed_string<N>) -> fixed_string<N>;
 
 // -------------------------------------------------------------------------------------------------
 

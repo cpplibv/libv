@@ -60,7 +60,7 @@ static inline auto output_bytes_adaptor(libv::output_bytes& s) noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output_bytes out_diff, size_t match_block_size) {
+void aux_create_diff(libv::input_bytes old, libv::input_bytes new_, libv::output_bytes out_diff, std::size_t match_block_size) {
 	auto old_stream = input_bytes_adaptor(old);
 	auto new_stream = input_bytes_adaptor(new_);
 	auto diff_stream = output_bytes_adaptor(out_diff);

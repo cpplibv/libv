@@ -47,7 +47,7 @@ RemoteUniformBuffer::~RemoteUniformBuffer() noexcept {
 			(frees.size() == 1 && frees.begin()->offset == 0 && frees.begin()->size == data.size()));
 }
 
-UniformDataBlock RemoteUniformBuffer::allocate(size_t size) noexcept {
+UniformDataBlock RemoteUniformBuffer::allocate(std::size_t size) noexcept {
 	size = libv::align_of_2(size, BLOCK_ALIGNMENT);
 
 	UniformDataBlock result;

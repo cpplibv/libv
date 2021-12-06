@@ -135,7 +135,7 @@ private:
 	};
 
 public:
-	static constexpr size_t size = 9;
+	static constexpr std::size_t size = 9;
 
 	[[nodiscard]] static std::span<const enum_type> values() noexcept {
 		return table_enum_values;

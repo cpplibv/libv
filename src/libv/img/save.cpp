@@ -32,15 +32,15 @@ namespace img {
 //	RGBA_DXT5_SRGB,
 //};
 //
-//save_result save_dds(const libv::vec3f* data, size_t size_x, size_t size_y, dds_format format = dds_format::RGBA_DXT5);
-//save_result save_dds(const libv::vec4f* data, size_t size_x, size_t size_y, dds_format format = dds_format::RGBA_DXT5);
-//save_result save_dds(const libv::vec3uc* data, size_t size_x, size_t size_y, dds_format format = dds_format::RGBA_DXT5);
-//save_result save_dds(const libv::vec4uc* data, size_t size_x, size_t size_y, dds_format format = dds_format::RGBA_DXT5);
+//save_result save_dds(const libv::vec3f* data, std::size_t size_x, std::size_t size_y, dds_format format = dds_format::RGBA_DXT5);
+//save_result save_dds(const libv::vec4f* data, std::size_t size_x, std::size_t size_y, dds_format format = dds_format::RGBA_DXT5);
+//save_result save_dds(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y, dds_format format = dds_format::RGBA_DXT5);
+//save_result save_dds(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y, dds_format format = dds_format::RGBA_DXT5);
 //
 // -------------------------------------------------------------------------------------------------
 //
 //template <typename T>
-//static gli::texture2d create_gli_texture(const T* data, size_t size_x, size_t size_y, gli::format format) {
+//static gli::texture2d create_gli_texture(const T* data, std::size_t size_x, std::size_t size_y, gli::format format) {
 //
 //	gli::texture2d gli_texture(format, gli::texture2d::extent_type(size_x, size_y), 1);
 //	std::memcpy(gli_texture.data(), data, sizeof(T) * size_x * size_y);
@@ -95,22 +95,22 @@ namespace img {
 //
 // -------------------------------------------------------------------------------------------------
 //
-//save_result save_dds(const libv::vec3f* data, size_t size_x, size_t size_y, dds_format format) {
+//save_result save_dds(const libv::vec3f* data, std::size_t size_x, std::size_t size_y, dds_format format) {
 //	gli::format src_format = gli::format::FORMAT_RGB32_SFLOAT_PACK32;
 //	return aux_save_dds(create_gli_texture<libv::vec3f>(data, size_x, size_y, src_format), format);
 //}
 //
-//save_result save_dds(const libv::vec4f* data, size_t size_x, size_t size_y, dds_format format) {
+//save_result save_dds(const libv::vec4f* data, std::size_t size_x, std::size_t size_y, dds_format format) {
 //	gli::format src_format = gli::format::FORMAT_RGBA32_SFLOAT_PACK32;
 //	return aux_save_dds(create_gli_texture<libv::vec4f>(data, size_x, size_y, src_format), format);
 //}
 //
-//save_result save_dds(const libv::vec3uc* data, size_t size_x, size_t size_y, dds_format format) {
+//save_result save_dds(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y, dds_format format) {
 //	gli::format src_format = gli::format::FORMAT_RGB8_UINT_PACK8;
 //	return aux_save_dds(create_gli_texture<libv::vec3uc>(data, size_x, size_y, src_format), format);
 //}
 //
-//save_result save_dds(const libv::vec4uc* data, size_t size_x, size_t size_y, dds_format format) {
+//save_result save_dds(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y, dds_format format) {
 //	gli::format src_format = gli::format::FORMAT_RGBA8_UINT_PACK8;
 //	return aux_save_dds(create_gli_texture<libv::vec4uc>(data, size_x, size_y, src_format), format);
 //}
@@ -125,7 +125,7 @@ struct formated_image_data_dds {
 // -------------------------------------------------------------------------------------------------
 
 template <typename T>
-static save_result aux_save(const T* data, size_t size_x, size_t size_y, size_t channels, int format, int quality = 100) {
+static save_result aux_save(const T* data, std::size_t size_x, std::size_t size_y, std::size_t channels, int format, int quality = 100) {
 	const unsigned char* data_ptr;
 
 	// Pre-process data
@@ -133,9 +133,9 @@ static save_result aux_save(const T* data, size_t size_x, size_t size_y, size_t 
 	std::unique_ptr<byte[]> processed_data;
 	if constexpr (std::is_floating_point_v<typename T::value_type>) {
 		processed_data.reset(new byte[size_x * size_y * channels]);
-		for (size_t y = 0; y < size_y; ++y)
-			for (size_t x = 0; x < size_x; ++x)
-				for (size_t c = 0; c < channels; ++c) {
+		for (std::size_t y = 0; y < size_y; ++y)
+			for (std::size_t x = 0; x < size_x; ++x)
+				for (std::size_t c = 0; c < channels; ++c) {
 					auto v = data[size_x * y + x][c];
 					v = v < 0 ? 0 : v;
 					v = v > 1 ? 1 : v;
@@ -202,109 +202,109 @@ static inline int to_soil_format(save_format f) noexcept {
 	return SOIL_SAVE_TYPE_PNG;
 }
 
-save_result save(save_format f, const libv::vec3f* data, size_t size_x, size_t size_y, int quality) {
+save_result save(save_format f, const libv::vec3f* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, to_soil_format(f), quality);
 }
 
-save_result save(save_format f, const libv::vec4f* data, size_t size_x, size_t size_y, int quality) {
+save_result save(save_format f, const libv::vec4f* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, to_soil_format(f), quality);
 }
 
-save_result save(save_format f, const libv::vec3uc* data, size_t size_x, size_t size_y, int quality) {
+save_result save(save_format f, const libv::vec3uc* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, to_soil_format(f), quality);
 }
 
-save_result save(save_format f, const libv::vec4uc* data, size_t size_x, size_t size_y, int quality) {
+save_result save(save_format f, const libv::vec4uc* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, to_soil_format(f), quality);
 }
 
 // -------------------------------------------------------------------------------------------------
 
-save_result save_bmp(const libv::vec3f* data, size_t size_x, size_t size_y) {
+save_result save_bmp(const libv::vec3f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_BMP);
 }
 
-save_result save_bmp(const libv::vec4f* data, size_t size_x, size_t size_y) {
+save_result save_bmp(const libv::vec4f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_BMP);
 }
 
-save_result save_bmp(const libv::vec3uc* data, size_t size_x, size_t size_y) {
+save_result save_bmp(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_BMP);
 }
 
-save_result save_bmp(const libv::vec4uc* data, size_t size_x, size_t size_y) {
+save_result save_bmp(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_BMP);
 }
 
 // ---
 
-save_result save_dds(const libv::vec3f* data, size_t size_x, size_t size_y) {
+save_result save_dds(const libv::vec3f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_DDS);
 }
 
-save_result save_dds(const libv::vec4f* data, size_t size_x, size_t size_y) {
+save_result save_dds(const libv::vec4f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_DDS);
 }
 
-save_result save_dds(const libv::vec3uc* data, size_t size_x, size_t size_y) {
+save_result save_dds(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_DDS);
 }
 
-save_result save_dds(const libv::vec4uc* data, size_t size_x, size_t size_y) {
+save_result save_dds(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_DDS);
 }
 
 // ---
 
-save_result save_jpg(const libv::vec3f* data, size_t size_x, size_t size_y, int quality) {
+save_result save_jpg(const libv::vec3f* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_JPG, quality);
 }
 
-save_result save_jpg(const libv::vec4f* data, size_t size_x, size_t size_y, int quality) {
+save_result save_jpg(const libv::vec4f* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_JPG, quality);
 }
 
-save_result save_jpg(const libv::vec3uc* data, size_t size_x, size_t size_y, int quality) {
+save_result save_jpg(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_JPG, quality);
 }
 
-save_result save_jpg(const libv::vec4uc* data, size_t size_x, size_t size_y, int quality) {
+save_result save_jpg(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y, int quality) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_JPG, quality);
 }
 
 // ---
 
-save_result save_png(const libv::vec3f* data, size_t size_x, size_t size_y) {
+save_result save_png(const libv::vec3f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_PNG);
 }
 
-save_result save_png(const libv::vec4f* data, size_t size_x, size_t size_y) {
+save_result save_png(const libv::vec4f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_PNG);
 }
 
-save_result save_png(const libv::vec3uc* data, size_t size_x, size_t size_y) {
+save_result save_png(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_PNG);
 }
 
-save_result save_png(const libv::vec4uc* data, size_t size_x, size_t size_y) {
+save_result save_png(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_PNG);
 }
 
 // ---
 
-save_result save_tga(const libv::vec3f* data, size_t size_x, size_t size_y) {
+save_result save_tga(const libv::vec3f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_TGA);
 }
 
-save_result save_tga(const libv::vec4f* data, size_t size_x, size_t size_y) {
+save_result save_tga(const libv::vec4f* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_TGA);
 }
 
-save_result save_tga(const libv::vec3uc* data, size_t size_x, size_t size_y) {
+save_result save_tga(const libv::vec3uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 3, SOIL_SAVE_TYPE_TGA);
 }
 
-save_result save_tga(const libv::vec4uc* data, size_t size_x, size_t size_y) {
+save_result save_tga(const libv::vec4uc* data, std::size_t size_x, std::size_t size_y) {
 	return aux_save(data, size_x, size_y, 4, SOIL_SAVE_TYPE_TGA);
 }
 

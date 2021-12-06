@@ -32,8 +32,8 @@ class ResourceServer : libv::net::mtcp::SimpleServer {
 	libv::net::mtcp::ConnectionQueue<> queued_peers;
 
 //	libv::load_trend peer_trend;
-////	libv::trend<size_t> peer_satisfaction_trend;
-////	libv::trend<size_t> peer_connection_trend;
+////	libv::trend<std::size_t> peer_satisfaction_trend;
+////	libv::trend<std::size_t> peer_connection_trend;
 	int file_maps;
 
 private:

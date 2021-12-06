@@ -36,7 +36,7 @@ std::ostream& operator<<(std::ostream& os, const md5& md5) {
 static inline md5 digest_to_md5(const boost::uuids::detail::md5::digest_type& value) {
 	md5 result;
 
-	for (size_t i = 0; i < std::size(value); i++) {
+	for (std::size_t i = 0; i < std::size(value); i++) {
 		const auto temp = libv::host_to_network(value[i]);
 		std::memcpy(&result.value[i * sizeof(temp)], &temp, sizeof(temp));
 	}
@@ -61,7 +61,7 @@ md5 hash_md5(const std::span<const std::byte> data) {
 }
 
 md5 hash_md5(std::istream& stream) {
-	static constexpr size_t batch_size = 16 * 1024;
+	static constexpr std::size_t batch_size = 16 * 1024;
 	char buffer[batch_size];
 
 	boost::uuids::detail::md5 hasher;

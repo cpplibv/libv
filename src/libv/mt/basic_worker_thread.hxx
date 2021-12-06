@@ -64,7 +64,7 @@ public:
 	[[nodiscard]] inline const std::string& name() const noexcept {
 		return name_;
 	}
-	[[nodiscard]] inline size_t task_queue_size() const noexcept {
+	[[nodiscard]] inline std::size_t task_queue_size() const noexcept {
 		std::unique_lock lock(queue_m);
 		return queue.size();
 	}

@@ -157,7 +157,7 @@ struct BlendFunctionSetter {
 // -------------------------------------------------------------------------------------------------
 
 struct CapabilitySetter {
-	template <size_t CAPABILITY>
+	template <std::size_t CAPABILITY>
 	struct Selector {
 		bool current = false;
 
@@ -616,7 +616,7 @@ private:
 	}
 
 private:
-	constexpr inline size_t convertToTargetIndex(TextureTarget target) const noexcept;
+	constexpr inline std::size_t convertToTargetIndex(TextureTarget target) const noexcept;
 
 public:
 	inline GLint getMaxColorAttachments() const {
@@ -863,7 +863,7 @@ public:
 
 // =================================================================================================
 
-constexpr inline size_t GL::convertToTargetIndex(TextureTarget target) const noexcept {
+constexpr inline std::size_t GL::convertToTargetIndex(TextureTarget target) const noexcept {
 	switch (target) {
 	case TextureTarget::_2D: return 0;
 	case TextureTarget::CubeMap: return 1;
@@ -929,7 +929,7 @@ inline void GL::clear(BufferBit buffers) {
 // -------------------------------------------------------------------------------------------------
 
 inline void GL::bind(TextureTarget target, uint32_t id) {
-	size_t targetID = convertToTargetIndex(target);
+	std::size_t targetID = convertToTargetIndex(target);
 
 	auto& binding = textureBindings[targetID][to_value(currentActiveTexture)];
 	if (binding != id) {
@@ -953,7 +953,7 @@ inline void GL::unbind(const Texture& texture) {
 }
 
 inline Texture GL::bound_texture(TextureTarget target) noexcept {
-	size_t targetID = convertToTargetIndex(target);
+	std::size_t targetID = convertToTargetIndex(target);
 
 	return Texture{textureBindings[targetID][libv::to_value(currentActiveTexture)], target};
 }

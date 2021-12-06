@@ -51,7 +51,7 @@ void InternalShader::finish() {
 
 		bool matching_basenames = true;
 		const auto first_basename = view_basename(stages.front().source_path);
-		for (size_t i = 1; i < stages.size(); ++i)
+		for (std::size_t i = 1; i < stages.size(); ++i)
 			matching_basenames &= first_basename == view_basename(stages[i].source_path);
 
 		if (matching_basenames)

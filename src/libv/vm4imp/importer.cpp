@@ -235,7 +235,7 @@ public:
 				if (face.mNumIndices != 3) {
 					log_vm4.warn("Illegal number of vertex {} in face {} of a mesh: {}. Filling face indices with 0", face.mNumIndices, j, mesh->mName.C_Str());
 					// Filling in indices to not leave a hole in the indices container
-					for (size_t k = 0; k < face.mNumIndices; ++k) {
+					for (std::size_t k = 0; k < face.mNumIndices; ++k) {
 						model.indices.push_back(0);
 					}
 					continue;
@@ -259,7 +259,7 @@ public:
 
 			model.indices.resize(model.indices.size() + mesh.numIndices);
 
-			for (size_t i = 0; i < mesh.numIndices; i += 3) {
+			for (std::size_t i = 0; i < mesh.numIndices; i += 3) {
 				model.indices[fixedStart + i + 0] = model.indices[mesh.baseIndex + i + 2];
 				model.indices[fixedStart + i + 1] = model.indices[mesh.baseIndex + i + 1];
 				model.indices[fixedStart + i + 2] = model.indices[mesh.baseIndex + i + 0];
@@ -290,7 +290,7 @@ public:
 		const auto globalMat = parentMat * model.nodes[nodeID].transformation;
 
 		for (const auto& meshID : model.nodes[nodeID].meshIDs) {
-			for (size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
+			for (std::size_t i = 0; i < model.meshes[meshID].numIndices; ++i) {
 				const auto vertexID = model.meshes[meshID].baseVertex + model.indices[model.meshes[meshID].baseIndex + i];
 				const auto vertexPositionW = libv::xyz(globalMat * libv::vec4f(model.vertices[vertexID].position, 1));
 

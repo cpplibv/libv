@@ -24,7 +24,7 @@ class async_value {
 private:
 	struct payload_t {
 		mutable std::mutex mutex;
-		size_t async_value_ref_count = 1; // ref count used to cancel async task (shared/weak ptr has no viable event for it)
+		std::size_t async_value_ref_count = 1; // ref count used to cancel async task (shared/weak ptr has no viable event for it)
 		std::optional<T> value;
 		std::stop_source stop_source;
 

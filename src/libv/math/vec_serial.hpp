@@ -33,7 +33,7 @@ inline void serialize(Archive& ar, ::libv::vec4_t<T>& var) {
 }
 
 // TODO P5: Implement vec serialization with N dim
-//template <typename Archive, size_t N, typename T>
+//template <typename Archive, std::size_t N, typename T>
 //inline void serialize(Archive& ar, ::libv::vec_t<N, T>& vec, const unsigned int) {
 //	ar & boost::serialization::make_array<T>(vec.ptr, N);
 //}

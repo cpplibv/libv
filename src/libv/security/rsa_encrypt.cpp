@@ -17,7 +17,7 @@ namespace security {
 //			#include <openssl/err.h>
 //			ERR_get_error
 //			ERR_error_string
-//			ERR_print_errors_cb(+[](const char *str, size_t len, void *u) { std::cout << str << std::endl; return 0; }, nullptr);
+//			ERR_print_errors_cb(+[](const char *str, std::size_t len, void *u) { std::cout << str << std::endl; return 0; }, nullptr);
 
 // Reference:
 // https://www.openssl.org/docs/man1.1.1/man3/RSA_private_encrypt.html
@@ -48,7 +48,7 @@ std::string aux_rsa_encrypt(std::string_view message, std::string_view key_strin
 	auto it_src = 0uz;
 	auto it_dst = 0uz;
 
-	for (size_t i = 0 ; i < block_full_count ; ++i) {
+	for (std::size_t i = 0 ; i < block_full_count ; ++i) {
 		int result_code = encrypt_func(block_size_in, src + it_src, dst + it_dst, key, padding);
 		if (result_code < 0) {
 			result.clear();

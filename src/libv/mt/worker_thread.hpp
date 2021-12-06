@@ -31,7 +31,7 @@ public:
 
 public:
 	[[nodiscard]] const std::string& name() const noexcept;
-	[[nodiscard]] size_t task_queue_size() const noexcept;
+	[[nodiscard]] std::size_t task_queue_size() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

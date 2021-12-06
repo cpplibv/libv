@@ -19,7 +19,7 @@ class worker_thread_pool {
 	std::unique_ptr<class impl_worker_thread_pool> self;
 
 public:
-	explicit worker_thread_pool(size_t n, std::string name = "unnamed-pool");
+	explicit worker_thread_pool(std::size_t n, std::string name = "unnamed-pool");
 	~worker_thread_pool() noexcept;
 
 public:
@@ -31,7 +31,7 @@ public:
 
 public:
 	[[nodiscard]] const std::string& name() const noexcept;
-	[[nodiscard]] size_t task_queue_size() const noexcept;
+	[[nodiscard]] std::size_t task_queue_size() const noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------

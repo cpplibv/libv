@@ -18,16 +18,16 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 class input_bytes {
-	using read_fn_t = size_t(*)(void* object, std::byte* dst, size_t pos, size_t size) noexcept;
+	using read_fn_t = std::size_t(*)(void* object, std::byte* dst, std::size_t pos, std::size_t size) noexcept;
 
 private:
 	void* object;
-	size_t input_offset;
-	size_t input_size;
+	std::size_t input_offset;
+	std::size_t input_size;
 	read_fn_t read_fn;
 
 public:
-	explicit(false) input_bytes(const std::byte* data, size_t size) noexcept;
+	explicit(false) input_bytes(const std::byte* data, std::size_t size) noexcept;
 	explicit(false) input_bytes(const std::string_view s) noexcept;
 	explicit(false) input_bytes(const std::span<const std::byte> s) noexcept;
 	explicit(false) input_bytes(std::istream& s) noexcept;
@@ -38,13 +38,13 @@ public:
 
 public:
 	/// Read \c size byte starting from \c pos into \c dst
-	inline size_t read(std::byte* dst, size_t pos, size_t size) noexcept {
+	inline std::size_t read(std::byte* dst, std::size_t pos, std::size_t size) noexcept {
 		// assert(input_size >= pos + size); // No need to assert here, as returned size marks and makes the error recoverable
 		pos = input_offset + pos;
 		return read_fn(object, dst, pos, std::min(size, input_size - pos));
 	}
 
-	[[nodiscard]] constexpr inline size_t size() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size() const noexcept {
 		return input_size;
 	}
 };

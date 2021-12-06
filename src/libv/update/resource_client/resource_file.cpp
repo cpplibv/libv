@@ -64,7 +64,7 @@ void ResourceFile::_recover_meta_blocks() {
 	}
 }
 
-std::span<const IntervalRegistry::Interval> ResourceFile::create(std::filesystem::path path_, size_t resource_size_) {
+std::span<const IntervalRegistry::Interval> ResourceFile::create(std::filesystem::path path_, std::size_t resource_size_) {
 	const auto lock = std::scoped_lock(mutex);
 //	if (created)
 //		return;
@@ -86,7 +86,7 @@ std::span<const IntervalRegistry::Interval> ResourceFile::create(std::filesystem
 	return remaining_intervals.marked_intervals();
 }
 
-void ResourceFile::write(size_t offset, std::span<const std::byte> data) {
+void ResourceFile::write(std::size_t offset, std::span<const std::byte> data) {
 	const auto lock = std::scoped_lock(mutex);
 	assert(created);
 	assert(offset + data.size() <= resource_size);

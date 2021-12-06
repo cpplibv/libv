@@ -13,12 +13,12 @@ namespace app {
 
 // -------------------------------------------------------------------------------------------------
 
-std::string generate_random_name(uint64_t seed, size_t length) {
+std::string generate_random_name(uint64_t seed, std::size_t length) {
 	static constexpr char charset[] =
 			"0123456789"
 			"abcdefghijklmnopqrstuvwxyz"
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	static constexpr size_t charset_size = sizeof(charset) - 1;
+	static constexpr std::size_t charset_size = sizeof(charset) - 1;
 
 	auto rng = std::mt19937_64{seed};
 	auto dist = libv::make_uniform_distribution_exclusive(charset_size);
@@ -32,7 +32,7 @@ std::string generate_random_name(uint64_t seed, size_t length) {
 	return str;
 }
 
-std::string generate_random_name(size_t length) {
+std::string generate_random_name(std::size_t length) {
 	return generate_random_name(std::random_device{}(), length);
 }
 

@@ -28,7 +28,7 @@ namespace libv {
 
 	const auto index_lo = std::clamp(lo < 0 ? lo + size : lo, int64_t{0}, size);
 	const auto index_hi = std::clamp(hi < 0 ? hi + size : hi, int64_t{0}, size);
-	const auto length = static_cast<size_t>(std::max(index_hi - index_lo, int64_t{0}));
+	const auto length = static_cast<std::size_t>(std::max(index_hi - index_lo, int64_t{0}));
 
 	return std::string_view{str.data() + index_lo, length};
 }
@@ -58,7 +58,7 @@ namespace libv {
 /// @example `slice_off_view("Hello world!", -7) == "Hello"`
 [[nodiscard]] constexpr inline std::string_view slice_off_view(const std::string_view str, const int64_t cut) noexcept {
 	if (cut < 0) {
-		const auto cut_s = static_cast<size_t>(std::abs(cut));
+		const auto cut_s = static_cast<std::size_t>(std::abs(cut));
 
 		if (cut_s > str.size())
 			return "";
@@ -66,7 +66,7 @@ namespace libv {
 			return std::string_view(str.data(), str.size() - cut_s);
 
 	} else {
-		const auto cut_s = static_cast<size_t>(cut);
+		const auto cut_s = static_cast<std::size_t>(cut);
 
 		if (cut_s > str.size())
 			return "";

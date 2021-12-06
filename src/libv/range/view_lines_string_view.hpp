@@ -29,7 +29,7 @@ private:
 
 private:
 	constexpr inline std::string_view read() const noexcept {
-		return std::string_view{it_begin, static_cast<size_t>(std::distance(it_begin, it_end))};
+		return std::string_view{it_begin, static_cast<std::size_t>(std::distance(it_begin, it_end))};
 	}
 	constexpr inline bool equal(ranges::default_sentinel_t) const noexcept {
 		return it_begin == range.end();

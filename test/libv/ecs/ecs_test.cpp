@@ -126,7 +126,7 @@ TEST_CASE("insert or emplace component", "[libv.ecs]") {
 		es.insertComponent(entity, TestCompC{43, 44});
 	}
 
-	size_t foreach_run_count = 0;
+	std::size_t foreach_run_count = 0;
 	es.foreach<TestCompA, TestCompB, TestCompC>([&](const auto& a, const auto& b, const auto& c) {
 		++foreach_run_count;
 		CHECK(a.value0 == 0);
@@ -158,7 +158,7 @@ TEST_CASE("non matching foreach", "[libv.ecs]") {
 
 	es.emplaceComponent<TestCompC>(entity1, 42);
 
-	size_t foreach_run_count = 0;
+	std::size_t foreach_run_count = 0;
 	es.foreach<TestCompA, TestCompB, TestCompC>([&](const auto&...) {
 		++foreach_run_count;
 	});
@@ -174,7 +174,7 @@ TEST_CASE("non existing component store", "[libv.ecs]") {
 
 	es.emplaceComponent<TestCompA>(entity0);
 
-	size_t foreach_run_count = 0;
+	std::size_t foreach_run_count = 0;
 	es.foreach<TestCompA, TestCompB>([&](const auto&...) {
 		++foreach_run_count;
 	});
@@ -214,12 +214,12 @@ TEST_CASE("foreach children", "[libv.ecs]") {
 		es.create(parent1);
 	}
 
-	size_t foreach_run_count0 = 0;
+	std::size_t foreach_run_count0 = 0;
 	es.foreach_children<>(parent0, [&](const auto&) {
 		++foreach_run_count0;
 	});
 
-	size_t foreach_run_count1 = 0;
+	std::size_t foreach_run_count1 = 0;
 	es.foreach_children<>(parent1, [&](const auto&) {
 		++foreach_run_count1;
 	});
@@ -238,8 +238,8 @@ TEST_CASE("optional component request", "[libv.ecs]") {
 	const auto entity1 = es.create();
 	es.emplaceComponent<TestCompB>(entity1);
 
-	size_t foreach_run_count = 0;
-	size_t a_found_count = 0;
+	std::size_t foreach_run_count = 0;
+	std::size_t a_found_count = 0;
 	es.foreach<TestCompA::optional>([&](auto&& a) {
 		++foreach_run_count;
 		if (a)
@@ -256,8 +256,8 @@ TEST_CASE("optional component request", "[libv.ecs]") {
 TEST_CASE("hybrid optional and basic component request", "[libv.ecs]") {
 	libv::ecs::System es;
 
-	size_t expected_foreach_run_count = 0;
-	size_t expected_c_found_count = 0;
+	std::size_t expected_foreach_run_count = 0;
+	std::size_t expected_c_found_count = 0;
 
 	const auto entity0 = es.create();
 	const auto entity1 = es.create();
@@ -308,8 +308,8 @@ TEST_CASE("hybrid optional and basic component request", "[libv.ecs]") {
 		expected_c_found_count = 2;
 	}
 
-	size_t foreach_run_count = 0;
-	size_t c_found_count = 0;
+	std::size_t foreach_run_count = 0;
+	std::size_t c_found_count = 0;
 	es.foreach<TestCompA, TestCompC::optional>([&](auto&& a, auto&& c) {
 		++foreach_run_count;
 		if (c)
@@ -329,7 +329,7 @@ TEST_CASE("foreach component", "[libv.ecs]") {
 	const auto entity0 = es.create();
 	const auto entity1 = es.create();
 
-	size_t foreach_run_left = 0;
+	std::size_t foreach_run_left = 0;
 
 	SECTION("none") {
 		foreach_run_left = 0;
@@ -368,7 +368,7 @@ TEST_CASE("get simple", "[libv.ecs]") {
 	const auto entity0 = es.create();
 	es.emplaceComponent<TestCompA>(entity0);
 
-	size_t foreach_run_left = 1;
+	std::size_t foreach_run_left = 1;
 	es.get<TestCompA>(entity0, [&](auto&& a) {
 		--foreach_run_left;
 		static_assert(std::is_same_v<decltype(a), TestCompA&>, "");
@@ -399,7 +399,7 @@ TEST_CASE("get optional", "[libv.ecs]") {
 	const auto entity0 = es.create();
 	es.emplaceComponent<TestCompA>(entity0);
 
-	size_t foreach_run_left = 1;
+	std::size_t foreach_run_left = 1;
 	es.get<TestCompA, TestCompC::optional>(entity0, [&](auto&& a, auto&& c) {
 		--foreach_run_left;
 		static_assert(std::is_same_v<decltype(a), TestCompA&>, "");

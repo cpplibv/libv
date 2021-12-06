@@ -53,7 +53,7 @@ public:
 		return foreground_;
 	}
 
-	size_t foreground_size() const noexcept {
+	std::size_t foreground_size() const noexcept {
 		return foreground_.size();
 	}
 

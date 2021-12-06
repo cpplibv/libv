@@ -121,7 +121,7 @@ enum class result : int {
 
 template <typename... E>
 struct list {
-	static constexpr size_t size = sizeof...(E);
+	static constexpr std::size_t size = sizeof...(E);
 };
 
 
@@ -172,21 +172,21 @@ struct state_traits;
 
 template <>
 struct state_traits<void> {
-	static constexpr size_t num_substate = 0;
+	static constexpr std::size_t num_substate = 0;
 	using initial = void;
 	static constexpr bool has_initial = false;
-	static constexpr size_t sizeof_largest_live_substate = 0;
+	static constexpr std::size_t sizeof_largest_live_substate = 0;
 };
 
 template <typename State>
 struct state_traits {
-	static constexpr size_t num_substate = State::states::size;
+	static constexpr std::size_t num_substate = State::states::size;
 	using initial = typename State::initial;
 	static constexpr bool has_initial = !std::is_void_v<initial>;
 
-//	static constexpr size_t sizeof_largest_live_substate = num_substate > 0 ? sizeof(initial) + 1024 : 256;
-//	static constexpr size_t sizeof_largest_live_substate = num_substate > 0 ? state_traits<initial>::sizeof_largest_live_substate + 1024 : 256;
-	static constexpr size_t sizeof_largest_live_substate = has_initial ? state_traits<initial>::sizeof_largest_live_substate + 1024 : 256;
+//	static constexpr std::size_t sizeof_largest_live_substate = num_substate > 0 ? sizeof(initial) + 1024 : 256;
+//	static constexpr std::size_t sizeof_largest_live_substate = num_substate > 0 ? state_traits<initial>::sizeof_largest_live_substate + 1024 : 256;
+	static constexpr std::size_t sizeof_largest_live_substate = has_initial ? state_traits<initial>::sizeof_largest_live_substate + 1024 : 256;
 };
 
 

@@ -140,7 +140,7 @@ void generateSpherifiedCube(uint32_t divisions, Position& position, Normal& norm
 //	for (int i = 0; i < 20; i++)
 //		subdivide(vdata[tindices[i][0]], vdata[tindices[i][1]], vdata[tindices[i][2]], vertices, subdiv);
 //
-//	for (size_t i = 0; i < vertices.size(); ++i)
+//	for (std::size_t i = 0; i < vertices.size(); ++i)
 //		indices.push_back(i);
 //}
 

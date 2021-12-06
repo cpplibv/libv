@@ -15,15 +15,15 @@ namespace mtcp {
 // -------------------------------------------------------------------------------------------------
 
 Endpoint parse_endpoint_or_throw(std::string_view address, uint16_t port) {
-	size_t p0 = address.find('.', 0);
+	std::size_t p0 = address.find('.', 0);
 	if (p0 == std::string_view::npos)
 		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address, missing first '.'");
 
-	size_t p1 = address.find('.', p0 + 1);
+	std::size_t p1 = address.find('.', p0 + 1);
 	if (p1 == std::string_view::npos)
 		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address, missing second '.'");
 
-	size_t p2 = address.find('.', p1 + 1);
+	std::size_t p2 = address.find('.', p1 + 1);
 	if (p2 == std::string_view::npos)
 		throw std::invalid_argument("\"" + std::string(address) + "\" is not a valid IPv4 address, missing third '.'");
 
@@ -39,7 +39,7 @@ Endpoint parse_endpoint_or_throw(std::string_view address, uint16_t port) {
 }
 
 Endpoint parse_endpoint_or_throw(std::string_view endpoint) {
-	size_t p0 = endpoint.find(':', 0);
+	std::size_t p0 = endpoint.find(':', 0);
 	if (p0 == std::string_view::npos)
 		throw std::invalid_argument("\"" + std::string(endpoint) + "\" is not a valid IPv4 endpoint, missing ':'");
 

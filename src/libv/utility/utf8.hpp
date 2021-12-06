@@ -66,14 +66,14 @@ template <typename = void>
 }
 
 template <typename = void>
-void insert_utf8_unchecked(std::string& string, size_t position, std::string_view segment) {
+void insert_utf8_unchecked(std::string& string, std::size_t position, std::string_view segment) {
 	auto it = string.begin();
 	utf8::unchecked::advance(it, position);
 	string.insert(it, segment.begin(), segment.end());
 }
 
 template <typename = void>
-void insert_utf8_unchecked(std::string& string, size_t position, uint32_t unicode) {
+void insert_utf8_unchecked(std::string& string, std::size_t position, uint32_t unicode) {
 	const auto utf8array = libv::unicode_to_utf8_array_unchecked(unicode);
 
 	insert_utf8_unchecked(string, position, utf8array.data());
@@ -88,8 +88,8 @@ constexpr inline void advance_utf8_unchecked(octet_iterator& it) noexcept {
 
 /// Returns true on success, returns false if end was reached before count step were taken
 template <typename octet_iterator, typename octet_sentinel>
-constexpr inline bool advance_utf8_unchecked(octet_iterator& it, const octet_sentinel end, size_t count) noexcept {
-	for (size_t i = 0; i < count; ++i) {
+constexpr inline bool advance_utf8_unchecked(octet_iterator& it, const octet_sentinel end, std::size_t count) noexcept {
+	for (std::size_t i = 0; i < count; ++i) {
 		if (it == end)
 			return false;
 		advance_utf8_unchecked(it);
@@ -98,8 +98,8 @@ constexpr inline bool advance_utf8_unchecked(octet_iterator& it, const octet_sen
 }
 
 template <typename octet_iterator, typename octet_sentinel>
-[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(octet_iterator it, const octet_sentinel end) noexcept {
-	size_t result = 0;
+[[nodiscard]] constexpr inline std::size_t distance_utf8_unchecked(octet_iterator it, const octet_sentinel end) noexcept {
+	std::size_t result = 0;
 
 	for (; it != end; advance_utf8_unchecked(it))
 		result++;
@@ -108,7 +108,7 @@ template <typename octet_iterator, typename octet_sentinel>
 }
 
 template <typename octet_range>
-[[nodiscard]] constexpr inline size_t distance_utf8_unchecked(const octet_range& range) noexcept {
+[[nodiscard]] constexpr inline std::size_t distance_utf8_unchecked(const octet_range& range) noexcept {
 	return distance_utf8_unchecked(range.begin(), range.end());
 }
 

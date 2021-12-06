@@ -20,11 +20,11 @@ class concurrent_queue {
 	mutable std::condition_variable received_cv;
 	mutable std::condition_variable consumed_cv;
 
-	const size_t limit = std::numeric_limits<size_t>::max();
+	const std::size_t limit = std::numeric_limits<std::size_t>::max();
 
 public:
 	inline explicit concurrent_queue() noexcept = default;
-	inline explicit concurrent_queue(size_t limit) noexcept : limit(limit) { }
+	inline explicit concurrent_queue(std::size_t limit) noexcept : limit(limit) { }
 
 public:
 	template <typename... Args>

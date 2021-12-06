@@ -12,7 +12,7 @@ namespace color {
 // -------------------------------------------------------------------------------------------------
 
 template <typename F = float>
-constexpr inline F incremental_spread_to_01(size_t index) noexcept {
+constexpr inline F incremental_spread_to_01(std::size_t index) noexcept {
 	if (index == 0)
 		return F{0};
 
@@ -31,7 +31,7 @@ constexpr inline F incremental_spread_to_01(size_t index) noexcept {
 }
 
 template <typename Color>
-constexpr inline Color incremental_spread(size_t global_index) noexcept {
+constexpr inline Color incremental_spread(std::size_t global_index) noexcept {
 
 	//         | Y/G                           R R R R R     G G G G |     ---(G)--+
 	//         |                               R R R R R     G G G G |     B B B B |
@@ -50,7 +50,7 @@ constexpr inline Color incremental_spread(size_t global_index) noexcept {
 	//   /
 	//  / Z/B
 
-	const auto level = static_cast<size_t>(std::pow(global_index, 1.0 / 3.0));
+	const auto level = static_cast<std::size_t>(std::pow(global_index, 1.0 / 3.0));
 	const auto level_start = level * level * level;
 	const auto level_index = global_index - level_start;
 
@@ -67,8 +67,8 @@ constexpr inline Color incremental_spread(size_t global_index) noexcept {
 		const auto row_length = level + 1;
 
 		const auto r = incremental_spread_to_01(level);
-		const auto g = incremental_spread_to_01(static_cast<size_t>(std::floor(plane_index / row_length)));
-		const auto b = incremental_spread_to_01(static_cast<size_t>(std::fmod(plane_index, row_length)));
+		const auto g = incremental_spread_to_01(static_cast<std::size_t>(std::floor(plane_index / row_length)));
+		const auto b = incremental_spread_to_01(static_cast<std::size_t>(std::fmod(plane_index, row_length)));
 		return Color{r, g, b};
 	}
 
@@ -77,9 +77,9 @@ constexpr inline Color incremental_spread(size_t global_index) noexcept {
 		const auto plane_index = level_index - g_start;
 		const auto row_length = level + 1;
 
-		const auto r = incremental_spread_to_01(static_cast<size_t>(std::floor(plane_index / row_length)));
+		const auto r = incremental_spread_to_01(static_cast<std::size_t>(std::floor(plane_index / row_length)));
 		const auto g = incremental_spread_to_01(level);
-		const auto b = incremental_spread_to_01(static_cast<size_t>(std::fmod(plane_index, row_length)));
+		const auto b = incremental_spread_to_01(static_cast<std::size_t>(std::fmod(plane_index, row_length)));
 		return Color{r, g, b};
 	}
 
@@ -88,8 +88,8 @@ constexpr inline Color incremental_spread(size_t global_index) noexcept {
 		const auto plane_index = level_index - b_start;
 		const auto row_length = level;
 
-		const auto r = incremental_spread_to_01(static_cast<size_t>(std::floor(plane_index / row_length)));
-		const auto g = incremental_spread_to_01(static_cast<size_t>(std::fmod(plane_index, row_length)));
+		const auto r = incremental_spread_to_01(static_cast<std::size_t>(std::floor(plane_index / row_length)));
+		const auto g = incremental_spread_to_01(static_cast<std::size_t>(std::fmod(plane_index, row_length)));
 		const auto b = incremental_spread_to_01(level);
 		return Color{r, g, b};
 	}

@@ -48,11 +48,11 @@ public:
 		return queue.empty();
 	}
 
-	size_t queue_size() {
+	std::size_t queue_size() {
 		return queue.size();
 	}
 
-	size_t clear() {
+	std::size_t clear() {
 		const auto n = queue.size();
 		queue.clear();
 		return n;

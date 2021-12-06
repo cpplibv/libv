@@ -20,7 +20,7 @@ struct BezierCurve {
 	std::vector<libv::vec2f> points;
 
 public:
-	[[nodiscard]] inline size_t size() const noexcept {
+	[[nodiscard]] inline std::size_t size() const noexcept {
 		return (points.size() + 2) / 3;
 	}
 
@@ -40,11 +40,11 @@ public:
 			return points.back();
 
 		const float base_t = std::floor(t);
-		const size_t i = static_cast<size_t>(t) * 3;
-		const size_t p0 = i + 0;
-		const size_t p1 = i + 1;
-		const size_t p2 = i + 2;
-		const size_t p3 = i + 3;
+		const std::size_t i = static_cast<std::size_t>(t) * 3;
+		const std::size_t p0 = i + 0;
+		const std::size_t p1 = i + 1;
+		const std::size_t p2 = i + 2;
+		const std::size_t p3 = i + 3;
 
 		return bezierCurvePoint(points[p0], points[p1], points[p2], points[p3], t - base_t);
 	}

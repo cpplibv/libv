@@ -19,10 +19,10 @@ namespace update {
 class ResourceClient {
 public:
 	struct Settings {
-//		size_t limit_bps_global_upload = libv::MB(10);
-//		size_t limit_bps_global_download = 0;
-//		size_t limit_bps_peer_upload = 0;
-//		size_t limit_bps_peer_download = 0;
+//		std::size_t limit_bps_global_upload = libv::MB(10);
+//		std::size_t limit_bps_global_download = 0;
+//		std::size_t limit_bps_peer_upload = 0;
+//		std::size_t limit_bps_peer_download = 0;
 
 		int limit_active_server_peer_count = 4;
 
@@ -38,7 +38,7 @@ public:
 	~ResourceClient();
 
 public:
-//	void rate_limit(size_t read_bps, size_t write_bps);
+//	void rate_limit(std::size_t read_bps, std::size_t write_bps);
 
 	void download_file(std::string identifier, std::filesystem::path save_filepath);
 	void wait();

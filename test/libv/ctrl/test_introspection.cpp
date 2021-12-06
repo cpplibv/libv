@@ -22,16 +22,16 @@ auto parse(std::string_view str) {
 }
 
 struct TestContext0 {
-	size_t access_count = 0;
+	std::size_t access_count = 0;
 };
 struct TestContext1 {
-	size_t access_count = 0;
+	std::size_t access_count = 0;
 };
 struct TestContext2 {
-	size_t access_count = 0;
+	std::size_t access_count = 0;
 };
 struct TestContext3 {
-	size_t access_count = 0;
+	std::size_t access_count = 0;
 };
 
 const auto sink_callback = [](auto...) {

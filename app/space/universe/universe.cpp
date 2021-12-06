@@ -103,7 +103,7 @@ void Universe::process(CTO_Shuffle&& cto) {
 	std::ranges::shuffle(positions, rng);
 
 	std::uniform_int_distribution dst(0, 1);
-	for (size_t i = 0; i < positions.size(); ++i) {
+	for (std::size_t i = 0; i < positions.size(); ++i) {
 		auto& fleet = fleets[i];
 		fleet.commands.clear();
 		fleet.commands.emplace_back(positions[i], dst(rng) ? FleetCommandType::movement : FleetCommandType::attack);

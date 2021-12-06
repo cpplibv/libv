@@ -46,9 +46,9 @@ private:
 	std::deque<std::shared_ptr<ResourceTask>> waiting_task_queue;
 	std::deque<ActiveResourceTask> active_task_queue;
 
-//	size_t settings_limit_keep_do_not_split = libv::KB(512);
-//	size_t settings_limit_always_split = libv::KB(512);
-	size_t settings_download_block_size_in_time = 5;
+//	std::size_t settings_limit_keep_do_not_split = libv::KB(512);
+//	std::size_t settings_limit_always_split = libv::KB(512);
+	std::size_t settings_download_block_size_in_time = 5;
 
 public:
 	explicit TaskPool(libv::net::IOContext& io_context, std::vector<libv::net::Address> servers);
@@ -61,11 +61,11 @@ private:
 public:
 	void queue_task_file(std::string identifier, std::filesystem::path filepath);
 //	void queue_task_file(std::string identifier, std::filesystem::path filepath, resource_signature signature);
-//	void queue_task_file(std::string identifier, std::filesystem::path filepath, size_t size);
-//	void queue_task_file(std::string identifier, std::filesystem::path filepath, size_t size, resource_signature signature);
+//	void queue_task_file(std::string identifier, std::filesystem::path filepath, std::size_t size);
+//	void queue_task_file(std::string identifier, std::filesystem::path filepath, std::size_t size, resource_signature signature);
 	void wait();
 
-	void add_active_task(std::shared_ptr<ResourceTask> task, size_t offset, size_t size);
+	void add_active_task(std::shared_ptr<ResourceTask> task, std::size_t offset, std::size_t size);
 	void task_finished(Connection connection);
 
 	void connect(Connection connection);

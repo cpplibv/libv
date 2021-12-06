@@ -90,7 +90,7 @@ void main() {
 
 struct Sandbox {
 	float angle = 0.f;
-	size_t frame_counter = 0;
+	std::size_t frame_counter = 0;
 
 	libv::gl::GL gl;
 

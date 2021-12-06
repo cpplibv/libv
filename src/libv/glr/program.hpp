@@ -44,7 +44,7 @@ struct RemoteProgram {
 	std::vector<int32_t> uniform_locations;
 
 	std::vector<UniformBlockBinding> block_bindings;
-	size_t bound_block_count = 0;
+	std::size_t bound_block_count = 0;
 
 public:
 	std::string vertex;

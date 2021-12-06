@@ -38,7 +38,7 @@ std::vector<std::byte> to_bytes(std::string_view str) {
 // -------------------------------------------------------------------------------------------------
 
 template <typename OT, typename T1, typename T2>
-bool test_memory(const T1& old_, const T2& new_, size_t block_size) {
+bool test_memory(const T1& old_, const T2& new_, std::size_t block_size) {
 	std::cout << "=================================================================================================" << std::endl;
 
 	const auto diff = libv::diff::create_diff<OT>(old_, new_, block_size);
@@ -76,7 +76,7 @@ bool test_memory(const T1& old_, const T2& new_, size_t block_size) {
 	return true;
 }
 
-bool test_stream(const std::string_view str_old_, const std::string_view str_new_, size_t block_size) {
+bool test_stream(const std::string_view str_old_, const std::string_view str_new_, std::size_t block_size) {
 	std::cout << "=================================================================================================" << std::endl;
 
 	std::istringstream old_{std::string(str_old_)};
@@ -129,7 +129,7 @@ bool test_stream(const std::string_view str_old_, const std::string_view str_new
 	return true;
 }
 
-bool test_file(const std::string_view file_old_, const std::string_view file_new_, size_t block_size) {
+bool test_file(const std::string_view file_old_, const std::string_view file_new_, std::size_t block_size) {
 	std::cout << "=================================================================================================" << std::endl;
 
 	const auto diff_file_path = std::string(file_old_) + ".diff";

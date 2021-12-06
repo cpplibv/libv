@@ -65,18 +65,18 @@ public:
 	}
 
 	template <typename T>
-	inline size_t size() const {
+	inline std::size_t size() const {
 		return data_.size() / sizeof(T);
 	}
 
 public:
 	template <typename T>
-	inline void reserve(size_t count) {
+	inline void reserve(std::size_t count) {
 		data_.reserve(sizeof(T) * count);
 	}
 
 	template <typename T>
-	inline void resize(size_t count) {
+	inline void resize(std::size_t count) {
 		data_.resize(sizeof(T) * count);
 	}
 
@@ -89,7 +89,7 @@ public:
 	}
 
 	template <typename T>
-	inline T& at(size_t index) {
+	inline T& at(std::size_t index) {
 		return *(data<T>() + index);
 	}
 };
@@ -142,10 +142,10 @@ public:
 
 private:
 	RemoteMeshAttributes& ptr;
-	size_t ptr_index;
+	std::size_t ptr_index;
 
 public:
-	BaseMeshAttribute(RemoteMeshAttributes& ptr, size_t index) :
+	BaseMeshAttribute(RemoteMeshAttributes& ptr, std::size_t index) :
 		ptr(ptr),
 		ptr_index(index) { }
 
@@ -176,7 +176,7 @@ public:
 		return static_cast<CRTP&>(*this);
 	}
 
-	inline CRTP& append_n_times(size_t count, const value_type value) {
+	inline CRTP& append_n_times(std::size_t count, const value_type value) {
 		const auto originalSize = ptr[ptr_index].size<T>();
 		ptr[ptr_index].resize<T>(originalSize + count);
 		T* dst = ptr[ptr_index].data<T>() + originalSize;
@@ -186,15 +186,15 @@ public:
 		return static_cast<CRTP&>(*this);
 	}
 
-	inline T& operator[](const size_t index) {
+	inline T& operator[](const std::size_t index) {
 		return ptr[ptr_index].at<T>(index);
 	}
-	inline const T& operator[](const size_t index) const {
+	inline const T& operator[](const std::size_t index) const {
 		return ptr[ptr_index].at<T>(index);
 	}
 
 public:
-	inline std::span<T> view_last(const size_t count) {
+	inline std::span<T> view_last(const std::size_t count) {
 		return {
 				ptr[ptr_index].data<T>() + ptr[ptr_index].size<T>() - count,
 				static_cast<typename std::span<T>::index_type>(count)
@@ -202,13 +202,13 @@ public:
 	}
 
 public:
-	inline size_t size() const {
+	inline std::size_t size() const {
 		return ptr[ptr_index].size<T>();
 	}
-	inline void reserve(const size_t count) {
+	inline void reserve(const std::size_t count) {
 		ptr[ptr_index].reserve<T>(count);
 	}
-	inline void resize(const size_t count) {
+	inline void resize(const std::size_t count) {
 		ptr[ptr_index].resize<T>(count);
 	}
 };
@@ -323,31 +323,31 @@ public:
 	}
 
 public:
-	inline std::span<VertexIndex> view_last(const size_t count) {
+	inline std::span<VertexIndex> view_last(const std::size_t count) {
 		return {
 				ref.data.data() + ref.data.size() - count,
 				static_cast<std::span<VertexIndex>::size_type>(count)
 		};
 	}
 
-	inline VertexIndex& operator[](const size_t index) {
+	inline VertexIndex& operator[](const std::size_t index) {
 		return ref.data[index];
 	}
-	inline const VertexIndex& operator[](const size_t index) const {
+	inline const VertexIndex& operator[](const std::size_t index) const {
 		return ref.data[index];
 	}
 
 public:
-	inline size_t size() const {
+	inline std::size_t size() const {
 		return ref.data.size();
 	}
 
 public:
-	inline void reserve(const size_t count) {
+	inline void reserve(const std::size_t count) {
 		ref.data.reserve(count);
 	}
 
-	inline void resize(const size_t count) {
+	inline void resize(const std::size_t count) {
 		ref.data.resize(count);
 	}
 };
@@ -380,7 +380,7 @@ public:
 		auto it = libv::linear_find_iterator(remote->attributes, T::channel, &RemoteMeshAttribute::channel);
 
 		if (it != remote->attributes.end())
-			return MeshAttribute<attribute_type>{remote->attributes, static_cast<size_t>(std::distance(remote->attributes.begin(), it))};
+			return MeshAttribute<attribute_type>{remote->attributes, static_cast<std::size_t>(std::distance(remote->attributes.begin(), it))};
 
 		static_assert(std::is_integral_v<underlying_type>
 				|| std::is_same_v<underlying_type, float>
@@ -400,7 +400,7 @@ public:
 		return MeshIndices{remote->indices};
 	}
 
-	[[nodiscard]] size_t index_size() const noexcept {
+	[[nodiscard]] std::size_t index_size() const noexcept {
 		return remote->indices.data.size();
 	}
 
@@ -409,14 +409,14 @@ public:
 		remote = std::make_shared<RemoteMesh>(remote->primitive, remote->usage);
 	}
 
-	void reserve(size_t vertex_count, size_t index_count) {
+	void reserve(std::size_t vertex_count, std::size_t index_count) {
 		for (RemoteMeshAttribute& attribute : remote->attributes)
 			attribute.data_.reserve(vertex_count);
 
 		remote->indices.data.reserve(index_count);
 	}
 
-	void resize(size_t vertex_count, size_t index_count) {
+	void resize(std::size_t vertex_count, std::size_t index_count) {
 		for (RemoteMeshAttribute& attribute : remote->attributes)
 			attribute.data_.resize(vertex_count);
 

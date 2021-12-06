@@ -45,8 +45,8 @@ void Combination::normalize() {
 	//		any > release
 	//		any > repeat
 	//		repeat > press
-	for (size_t i = 0; i < inputs.size(); ++i) {
-		for (size_t j = 0; j < inputs.size(); ++j) {
+	for (std::size_t i = 0; i < inputs.size(); ++i) {
+		for (std::size_t j = 0; j < inputs.size(); ++j) {
 			if (i == j)
 				continue;
 
@@ -77,8 +77,8 @@ void Combination::normalize() {
 	//		X > X-
 	//		Y > Y+
 	//		Y > Y-
-	for (size_t i = 0; i < inputs.size(); ++i) {
-		for (size_t j = 0; j < inputs.size(); ++j) {
+	for (std::size_t i = 0; i < inputs.size(); ++i) {
+		for (std::size_t j = 0; j < inputs.size(); ++j) {
 			if (i == j)
 				continue;
 
@@ -102,8 +102,8 @@ void Combination::normalize() {
 	}
 
 	// Choose more specialized alias
-	for (size_t i = 0; i < inputs.size(); ++i) {
-		for (size_t j = 0; j < inputs.size(); ++j) {
+	for (std::size_t i = 0; i < inputs.size(); ++i) {
+		for (std::size_t j = 0; j < inputs.size(); ++j) {
 			if (i == j)
 				continue;
 

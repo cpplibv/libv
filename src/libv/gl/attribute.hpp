@@ -55,7 +55,7 @@ template <> struct BaseAttribute<double> : public BaseAttributeCore {
 	static constexpr GLint attributeSize = 1;
 };
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 struct BaseAttribute<libv::vec_t<N, T>> : public BaseAttributeCore {
 	static constexpr GLenum attributeType = BaseAttribute<T>::attributeType;
 	static constexpr GLint attributeSize = N;

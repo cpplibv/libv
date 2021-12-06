@@ -73,16 +73,16 @@ public:
 	}
 
 public:
-	void read_limit(size_t bytes_per_second) noexcept;
-	void write_limit(size_t bytes_per_second) noexcept;
+	void read_limit(std::size_t bytes_per_second) noexcept;
+	void write_limit(std::size_t bytes_per_second) noexcept;
 
-	[[nodiscard]] size_t num_byte_read() const noexcept;
-	[[nodiscard]] size_t num_byte_wrote() const noexcept;
+	[[nodiscard]] std::size_t num_byte_read() const noexcept;
+	[[nodiscard]] std::size_t num_byte_wrote() const noexcept;
 
-	[[nodiscard]] size_t num_message_received() const noexcept;
-	[[nodiscard]] size_t num_message_sent() const noexcept;
+	[[nodiscard]] std::size_t num_message_received() const noexcept;
+	[[nodiscard]] std::size_t num_message_sent() const noexcept;
 
-	[[nodiscard]] size_t send_queue_size() const noexcept;
+	[[nodiscard]] std::size_t send_queue_size() const noexcept;
 
 public:
 	/// Queues an asynchronous connect task by adopting an already open socket.

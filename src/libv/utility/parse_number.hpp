@@ -32,7 +32,7 @@ template <typename T> WISH_REQUIRES(std::is_arithmetic_v<T>)
 			ec = std::make_error_code(std::errc::invalid_argument);
 
 	} else { // --- This branch will be removed ---
-		size_t pos = 0;
+		std::size_t pos = 0;
 
 		try {
 			if constexpr (std::is_same_v<T, double>) {

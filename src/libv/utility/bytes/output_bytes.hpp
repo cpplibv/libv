@@ -19,27 +19,27 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 class output_bytes {
-	using write_fn_t = void(*)(void* object, const std::byte* src, size_t pos, size_t size);
+	using write_fn_t = void(*)(void* object, const std::byte* src, std::size_t pos, std::size_t size);
 
 private:
 	void* object;
-	size_t output_offset;
-	size_t output_size;
+	std::size_t output_offset;
+	std::size_t output_size;
 	write_fn_t write_fn;
 
 public:
-	explicit(false) output_bytes(std::byte* data, size_t size) noexcept;
+	explicit(false) output_bytes(std::byte* data, std::size_t size) noexcept;
 	explicit(false) output_bytes(std::string& s) noexcept;
 	explicit(false) output_bytes(std::vector<std::byte>& s) noexcept;
 	explicit(false) output_bytes(std::ostream& s) noexcept;
 
 public:
 	/// Write \c size byte starting at \c pos from \c src
-	inline void write(const std::byte* src, size_t pos, size_t size) {
+	inline void write(const std::byte* src, std::size_t pos, std::size_t size) {
 		write_fn(object, src, output_offset + pos, size);
 	}
 
-	[[nodiscard]] constexpr inline size_t size() const noexcept {
+	[[nodiscard]] constexpr inline std::size_t size() const noexcept {
 		return output_size;
 	}
 

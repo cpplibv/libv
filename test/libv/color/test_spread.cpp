@@ -99,7 +99,7 @@ TEST_CASE("Test incremental_spread", "[libv.color.spread]") {
 	using vecd = libv::vec3_t<double>;
 	using appd = libv::vec3_t<libv::Approx<double, -3>>;
 
-	const auto incf = [](size_t r, size_t g, size_t b) {
+	const auto incf = [](std::size_t r, std::size_t g, std::size_t b) {
 		return appf(
 				libv::color::incremental_spread_to_01<float>(r),
 				libv::color::incremental_spread_to_01<float>(g),
@@ -107,7 +107,7 @@ TEST_CASE("Test incremental_spread", "[libv.color.spread]") {
 		);
 	};
 
-	const auto incd = [](size_t r, size_t g, size_t b) {
+	const auto incd = [](std::size_t r, std::size_t g, std::size_t b) {
 		return appd(
 				libv::color::incremental_spread_to_01<double>(r),
 				libv::color::incremental_spread_to_01<double>(g),

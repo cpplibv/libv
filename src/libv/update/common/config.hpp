@@ -18,17 +18,17 @@ namespace update {
 // -------------------------------------------------------------------------------------------------
 
 //struct Config {
-////	size_t num_client = 3;
-////	size_t num_client_io_thread = 2;
-////	size_t num_server_io_thread = 2;
+////	std::size_t num_client = 3;
+////	std::size_t num_client_io_thread = 2;
+////	std::size_t num_server_io_thread = 2;
 //
-////	size_t num_io_thread = 4;
+////	std::size_t num_io_thread = 4;
 //
-//	size_t max_active_client = 100;
-//	size_t max_queue_client = 10000;
+//	std::size_t max_active_client = 100;
+//	std::size_t max_queue_client = 10000;
 //
-//	size_t max_upload_bps = 10000;
-//	size_t max_upload_bps_per_client = 10000;
+//	std::size_t max_upload_bps = 10000;
+//	std::size_t max_upload_bps_per_client = 10000;
 //};
 //
 //const Config config{};

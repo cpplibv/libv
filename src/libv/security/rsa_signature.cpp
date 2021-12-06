@@ -38,7 +38,7 @@ std::string rsa_sign_message(std::string_view message, std::string_view private_
 		return signature;
 	}
 
-	size_t signature_length;
+	std::size_t signature_length;
 	if (EVP_DigestSignFinal(m_RSASignCtx, nullptr, &signature_length) <= 0) {
 		EVP_MD_CTX_free(m_RSASignCtx);
 		EVP_PKEY_free(priKey);

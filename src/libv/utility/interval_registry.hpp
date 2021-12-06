@@ -15,8 +15,8 @@ namespace libv {
 class IntervalRegistry {
 public:
 	struct Interval {
-		size_t offset;
-		size_t size;
+		std::size_t offset;
+		std::size_t size;
 
 		[[nodiscard]] friend constexpr inline bool operator<(const Interval& lhs, const Interval& rhs) noexcept {
 			return lhs.offset < rhs.offset;
@@ -55,14 +55,14 @@ public:
 		return !empty();
 	}
 
-	[[nodiscard]] inline size_t interval_count() const noexcept {
+	[[nodiscard]] inline std::size_t interval_count() const noexcept {
 		return marked.size();
 	}
 
 public:
-	void mark(size_t offset, size_t size) noexcept;
+	void mark(std::size_t offset, std::size_t size) noexcept;
 	void mark(const IntervalRegistry& intervals) noexcept;
-	void unmark(size_t offset, size_t size) noexcept;
+	void unmark(std::size_t offset, std::size_t size) noexcept;
 	void unmark(const IntervalRegistry& intervals) noexcept;
 };
 
