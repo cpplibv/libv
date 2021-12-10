@@ -33,7 +33,7 @@ Fleet* calculate_hit_fleet(SpaceCanvas& ctx) {
 
 	auto hover_distance = std::numeric_limits<float>::max();
 
-	for (Fleet& fleet : ctx.universe.fleets) {
+	for (Fleet& fleet : ctx.universe.galaxy.fleets) {
 		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet.position, 0.2f);
 
 		if (hit && (!directHit || distance < hover_distance)) {
@@ -90,10 +90,10 @@ void selectionSingle(SpaceCanvas& ctx, bool commitSelection) {
 	};
 
 	if (commitSelection)
-		for (auto& fl : ctx.universe.fleets)
+		for (auto& fl : ctx.universe.galaxy.fleets)
 			fl.selectionStatus = Fleet::Selection::notSelected;
 	else
-		for (auto& fl : ctx.universe.fleets)
+		for (auto& fl : ctx.universe.galaxy.fleets)
 			fl.selectionStatus = isSelected(fl) ? Fleet::Selection::selected : Fleet::Selection::notSelected;
 
 	if (fleet) {
@@ -136,7 +136,7 @@ void selection25D(SpaceCanvas& ctx, bool commitSelection) {
 
 	std::vector<FleetID> selectedFleetIDs;
 
-	for (auto& fleet : ctx.universe.fleets) {
+	for (auto& fleet : ctx.universe.galaxy.fleets) {
 		const auto M = libv::vec3f(xy(fleet.position), 0.f);
 		// (0 < AM ⋅ AB < AB ⋅ AB) ∧ (0 < AM ⋅ AD < AD ⋅ AD)
 		const auto AM = M - A;
@@ -240,7 +240,7 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 	const auto frustum = Frustum(nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl);
 
 	std::vector<FleetID> selectedFleetIDs;
-	for (auto& fleet : ctx.universe.fleets) {
+	for (auto& fleet : ctx.universe.galaxy.fleets) {
 		const auto result = frustum.sphereInFrustum(fleet.position, Fleet::pickingType.radius_universe);
 
 		switch (result) {
@@ -308,7 +308,7 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 } // namespace -------------------------------------------------------------------------------------
 
 void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
-	controls.feature_action<app::SpaceCanvas>("space.spawn_fleet_at_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.spawn_fleet_at_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 
 		// <<< should controls use nexus or playout directly? Think about the console and the lua scripts too.
@@ -317,11 +317,20 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		ctx.playout.process<CTO_FleetSpawn>(world_coord);
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.select_fleet", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.spawn_planet_at_mouse", [](const auto&, SpaceCanvas& ctx) {
+		const auto world_coord = calculate_world_coord(ctx);
+
+		// <<< should controls use nexus or playout directly? Think about the console and the lua scripts too.
+//		nexus.broadcast<mc::RequestCommandFleetSpawn>(world_coord);
+
+		ctx.playout.process<CTO_PlanetSpawn>(world_coord);
+	});
+
+	controls.feature_action<SpaceCanvas>("space.select_fleet", [](const auto&, SpaceCanvas& ctx) {
 		selectionSingle(ctx, true);
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.select_fleet_add", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.select_fleet_add", [](const auto&, SpaceCanvas& ctx) {
 		auto* fleet = calculate_hit_fleet(ctx);
 		if (fleet) {
 			fleet->selectionStatus = Fleet::Selection::selected;
@@ -329,19 +338,19 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		}
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.move_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 		ctx.playout.process<CTO_FleetMove>(world_coord);
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
 		ctx.playout.process<CTO_FleetQueueMove>(world_coord);
 	});
 
-	controls.feature_binary<app::SpaceCanvas>("space.selection_box_25D", [](libv::ctrl::arg_binary arg, app::SpaceCanvas& ctx) {
+	controls.feature_binary<SpaceCanvas>("space.selection_box_25D", [](libv::ctrl::arg_binary arg, SpaceCanvas& ctx) {
 		if (arg.value) {
-			ctx.selectionMode = app::SpaceCanvas::SelectionMode::d25;
+			ctx.selectionMode = SpaceCanvas::SelectionMode::d25;
 
 			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -353,13 +362,13 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		} else {
 			selection25D(ctx, true);
-			ctx.selectionMode = app::SpaceCanvas::SelectionMode::none;
+			ctx.selectionMode = SpaceCanvas::SelectionMode::none;
 		}
 	});
 
-	controls.feature_binary<app::SpaceCanvas>("space.selection_box_3D", [](libv::ctrl::arg_binary arg, app::SpaceCanvas& ctx) {
+	controls.feature_binary<SpaceCanvas>("space.selection_box_3D", [](libv::ctrl::arg_binary arg, SpaceCanvas& ctx) {
 		if (arg.value) {
-			ctx.selectionMode = app::SpaceCanvas::SelectionMode::d3;
+			ctx.selectionMode = SpaceCanvas::SelectionMode::d3;
 
 			const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 			const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -371,13 +380,13 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		} else {
 			selection3D(ctx, true);
-			ctx.selectionMode = app::SpaceCanvas::SelectionMode::none;
+			ctx.selectionMode = SpaceCanvas::SelectionMode::none;
 		}
 	});
 
-	controls.feature_action<app::SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, app::SpaceCanvas& ctx) {
+	controls.feature_action<SpaceCanvas>("space.warp_camera_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-//		const auto userID = app::UserID{0};
+//		const auto userID = UserID{0};
 //		ctx.playout.process<CTO_CameraWarpTo>(userID, world_coord);
 
 		ctx.camera.warp_to(world_coord); // <<< Move this line to CommandCameraWarpTo apply for tracking
@@ -388,11 +397,11 @@ void CanvasControl::update(SpaceCanvas& ctx, libv::time_duration delta_time) {
 	(void) delta_time;
 
 	switch (ctx.selectionMode) {
-	break; case app::SpaceCanvas::SelectionMode::none:
+	break; case SpaceCanvas::SelectionMode::none:
 		selectionSingle(ctx, false);
-	break; case app::SpaceCanvas::SelectionMode::d25:
+	break; case SpaceCanvas::SelectionMode::d25:
 		selection25D(ctx, false);
-	break; case app::SpaceCanvas::SelectionMode::d3:
+	break; case SpaceCanvas::SelectionMode::d3:
 		selection3D(ctx, false);
 	}
 }
@@ -411,6 +420,8 @@ void CanvasControl::bind_default_controls(libv::ctrl::Controls& controls) {
 //	controls.bind("space.selection_box_end_3D", "O [auto]");
 //	controls.bind("space.selection_box_end_25D", "I [auto]");
 	controls.bind("space.spawn_fleet_at_mouse", "Ctrl + LMB [press]");
+	controls.bind("space.spawn_planet_at_mouse", "Ctrl + B [press]");
+	controls.bind("space.spawn_planet_at_mouse", "J [hold]");
 	controls.bind("space.warp_camera_to_mouse", "Z");
 }
 

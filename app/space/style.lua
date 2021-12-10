@@ -61,13 +61,13 @@ ui.style("space.hud-bar.cmd.btn") {
 	},
 }
 
-ui.style("space.hud-bar.mp.main") {
-	anchor = "top_center",
-	align_horizontal = "center",
-	align_vertical = "center",
-	orientation = "up",
-	size = "D, D",
-}
+--ui.style("space.hud-bar.mp.main") {
+--	anchor = "top_center",
+--	align_horizontal = "center",
+--	align_vertical = "center",
+--	orientation = "up",
+--	size = "D, D",
+--}
 
 ui.style("space.hud-bar.mp.panel") {
 	anchor = "top_center",

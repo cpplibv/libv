@@ -29,6 +29,14 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 		});
 		cmd_bar.add(std::move(clear_fleets));
 
+		libv::ui::Button clear_planets;
+		clear_planets.style("space.hud-bar.cmd.btn");
+		clear_planets.text("Clear Planets");
+		clear_planets.event().submit.connect([&nexus]() {
+			nexus.broadcast(mc::RequestClearPlanets{});
+		});
+		cmd_bar.add(std::move(clear_planets));
+
 		libv::ui::Button clear_fleets_long;
 		clear_fleets_long.style("space.hud-bar.cmd.btn");
 		clear_fleets_long.text("Clear Fleets With Longer Label");

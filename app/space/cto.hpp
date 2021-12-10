@@ -40,7 +40,7 @@ namespace space {
 
 struct CTO_Introduction {
 //	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{0xA0};
+	static constexpr libv::serial::CodecMessageID id{0};
 
 	//	UserID userID;
 	std::string user_name;
@@ -55,7 +55,7 @@ struct CTO_Introduction {
 
 struct CTO_ClientJoined {
 	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x10};
+	static constexpr libv::serial::CodecMessageID id{20};
 
 	UserID userID;
 	std::string user_name;
@@ -72,7 +72,7 @@ struct CTO_ClientJoined {
 
 struct CTO_ClientLeave {
 	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x11};
+	static constexpr libv::serial::CodecMessageID id{21};
 
 	UserID userID;
 	//	Timestamp timestamp;
@@ -83,7 +83,7 @@ struct CTO_ClientLeave {
 
 //struct CTO_ClientKick {
 //	using lobby_command = void;
-//	static constexpr libv::serial::CodecMessageID id{0x11};
+//	static constexpr libv::serial::CodecMessageID id{21};
 //
 //	UserID userID;
 //
@@ -93,7 +93,7 @@ struct CTO_ClientLeave {
 
 struct CTO_ChatMessage {
 	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x12};
+	static constexpr libv::serial::CodecMessageID id{22};
 
 	UserID userID;
 	std::chrono::system_clock::time_point sent_at;
@@ -109,7 +109,7 @@ struct CTO_ChatMessage {
 
 struct CTO_LobbyStatus {
 	using lobby_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x13};
+	static constexpr libv::serial::CodecMessageID id{23};
 
 	struct Entry {
 		UserID userID;
@@ -132,7 +132,7 @@ struct CTO_LobbyStatus {
 
 //struct CTO_LobbyClose {
 //	using lobby_command = void;
-//	static constexpr libv::serial::CodecMessageID id{0x14};
+//	static constexpr libv::serial::CodecMessageID id{24};
 //
 //	LIBV_REFLECTION_EMPTY();
 //	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -142,7 +142,7 @@ struct CTO_LobbyStatus {
 
 struct CTO_FleetSpawn {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x20};
+	static constexpr libv::serial::CodecMessageID id{30};
 
 //	FactionID factionID;
 //	FleetID fleetID;
@@ -154,7 +154,7 @@ struct CTO_FleetSpawn {
 
 struct CTO_FleetSelect {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x21};
+	static constexpr libv::serial::CodecMessageID id{31};
 
 	FleetID fleetID;
 
@@ -164,7 +164,7 @@ struct CTO_FleetSelect {
 
 struct CTO_FleetSelectAdd {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x22};
+	static constexpr libv::serial::CodecMessageID id{32};
 
 	FleetID fleetID;
 
@@ -174,7 +174,7 @@ struct CTO_FleetSelectAdd {
 
 struct CTO_FleetBoxSelect {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x23};
+	static constexpr libv::serial::CodecMessageID id{33};
 
 	std::vector<FleetID> fleetIDs;
 
@@ -184,7 +184,7 @@ struct CTO_FleetBoxSelect {
 
 struct CTO_FleetClearSelection {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x24};
+	static constexpr libv::serial::CodecMessageID id{34};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -192,7 +192,7 @@ struct CTO_FleetClearSelection {
 
 struct CTO_FleetMove {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x25};
+	static constexpr libv::serial::CodecMessageID id{35};
 
 	libv::vec3f target_position;
 
@@ -202,7 +202,7 @@ struct CTO_FleetMove {
 
 struct CTO_FleetQueueMove {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x26};
+	static constexpr libv::serial::CodecMessageID id{36};
 
 	libv::vec3f target_position;
 
@@ -212,7 +212,7 @@ struct CTO_FleetQueueMove {
 
 struct CTO_ClearFleets {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x27};
+	static constexpr libv::serial::CodecMessageID id{37};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -220,7 +220,7 @@ struct CTO_ClearFleets {
 
 struct CTO_Shuffle {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x28};
+	static constexpr libv::serial::CodecMessageID id{38};
 
 	uint64_t seed;
 
@@ -228,11 +228,31 @@ struct CTO_Shuffle {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
+struct CTO_PlanetSpawn {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{39};
+
+//	FactionID factionID;
+//	FleetID fleetID;
+	libv::vec3f position;
+
+	LIBV_REFLECTION_ACCESS(position);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_ClearPlanets {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{40};
+
+	LIBV_REFLECTION_EMPTY();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
 // -------------------------------------------------------------------------------------------------
 
 struct CTO_TrackView {
 	using track_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x30};
+	static constexpr libv::serial::CodecMessageID id{50};
 
 	UserID userID;
 	libv::vec3f eye;
@@ -251,7 +271,7 @@ public:
 
 struct CTO_CameraWarpTo {
 	using track_command = void;
-	static constexpr libv::serial::CodecMessageID id{0x31};
+	static constexpr libv::serial::CodecMessageID id{51};
 
 	UserID userID;
 	libv::vec3f target_position;
@@ -266,7 +286,7 @@ public:
 
 //struct CTO_CameraMovement : CommandTrack {
 //	using track_command = void;
-//	static constexpr libv::serial::CodecMessageID id{0x32};
+//	static constexpr libv::serial::CodecMessageID id{52};
 //
 //	UserID userID;
 //	libv::vec3f eye;
@@ -276,7 +296,7 @@ public:
 //
 //struct CTO_MouseMovement : CommandTrack {
 //	using track_command = void;
-//	static constexpr libv::serial::CodecMessageID id{0x33};
+//	static constexpr libv::serial::CodecMessageID id{43};
 //
 //	UserID userID;
 //	libv::vec3f mouse_position;

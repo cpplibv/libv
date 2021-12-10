@@ -25,6 +25,9 @@ void GameSession::register_nexus() {
 	nexus.connect<mc::RequestClearFleets>(this, [this] {
 		playout.process<CTO_ClearFleets>();
 	});
+	nexus.connect<mc::RequestClearPlanets>(this, [this] {
+		playout.process<CTO_ClearPlanets>();
+	});
 	nexus.connect<mc::RequestShuffle>(this, [this] {
 		playout.process<CTO_Shuffle>(std::random_device{}());
 	});

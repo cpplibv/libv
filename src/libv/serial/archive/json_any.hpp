@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/serial/archive/json_any_fwd.hpp>
 // ext
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
@@ -179,13 +181,6 @@ template <class T>
 inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny&, cereal::SizeTag<T> const&) {
 	// nothing to do here, we don't explicitly save the size
 }
-
-// =================================================================================================
-
-struct JSONAny {
-	using input = JSONInputAny;
-	using output = JSONOutputAny;
-};
 
 // -------------------------------------------------------------------------------------------------
 

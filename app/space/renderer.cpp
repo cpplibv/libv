@@ -657,6 +657,42 @@ void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 
 // -------------------------------------------------------------------------------------------------
 
+RendererPlanet::RendererPlanet(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "planet.vs", "planet.fs") {
+	build_mesh(mesh);
+}
+
+void RendererPlanet::build_mesh(libv::glr::Mesh& mesh) {
+	auto position = mesh.attribute(attribute_position);
+	auto normal = mesh.attribute(attribute_normal);
+	auto texture0 = mesh.attribute(attribute_texture0);
+	auto index = mesh.index();
+
+	libv::glr::generateSpherifiedCube(12, position, normal, texture0, index);
+	//      libv::glr::generateCube(position, normal, texture0, index);
+}
+
+void RendererPlanet::render(libv::glr::Queue& gl, libv::glr::UniformBuffer& uniform_stream, const Planet& planet) {
+
+	const auto m_guard = gl.model.push_guard();
+	gl.model.scale(planet.radius);
+
+	auto uniforms = uniform_stream.block_unique(layout_matrices);
+	uniforms[layout_matrices.matMVP] = gl.mvp();
+	uniforms[layout_matrices.matM] = gl.model;
+	uniforms[layout_matrices.matP] = gl.projection;
+	uniforms[layout_matrices.eye] = gl.eye();
+
+	gl.program(shader.program());
+	gl.uniform(shader.uniform().base_color0, planet.color0);
+	gl.uniform(shader.uniform().base_color1, planet.color1);
+//	gl.uniform(shader.uniform().selected, selected);
+	gl.uniform(std::move(uniforms));
+	gl.render(mesh);
+}
+
+// -------------------------------------------------------------------------------------------------
+
 RendererText::RendererText(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "font_2D.vs", "font_2D.fs") {
 }

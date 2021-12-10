@@ -46,6 +46,12 @@ struct RequestClearFleets {
 //	}
 };
 
+struct RequestClearPlanets {
+//	std::string to_console_command() const {
+//		return "clear_fleets";
+//	}
+};
+
 // -------------------------------------------------------------------------------------------------
 
 } // namespace mc

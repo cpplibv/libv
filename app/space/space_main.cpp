@@ -31,7 +31,7 @@ int main(int argc, const char** argv) {
 	std::cout << libv::logger_stream;
 
 	try {
-		app::log_space.info("Hello Space!");
+		space::log_space.info("Hello Space!");
 
 		// Change working directory
 		if (std::filesystem::exists("app/space/"))
@@ -40,12 +40,12 @@ int main(int argc, const char** argv) {
 			std::filesystem::current_path("../app/space/"); // During development artifact created under /bin
 
 		// Run the game
-		app::GameInstance game;
+		space::GameInstance game;
 		game.enterSinglePlayer();
 		game.execute();
 
 	} catch (const std::exception& e) {
-		app::log_space.fatal("Execution failed with an exception: {}", e.what());
+		space::log_space.fatal("Execution failed with an exception: {}", e.what());
 		std::cerr << "Execution failed with an exception: " << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}

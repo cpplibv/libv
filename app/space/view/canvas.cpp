@@ -7,6 +7,7 @@
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
+#include <libv/math/smoothstep.hpp>
 // std
 #include <cassert>
 // pro
@@ -141,6 +142,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	glr.view = camera.view();
 	glr.model = libv::mat4f::identity();
 
+	const auto eye = glr.eye();
+
 	// Set framebuffer to the post-processing target
 	glr.framebuffer_draw(renderTarget.framebuffer());
 
@@ -161,7 +164,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	// TODO P1: Find a better way of managing text (and debug shape) lifetimes
 	renderer.text.clear_texts();
 
-	for (const auto& fleet : universe.fleets) {
+	for (const auto& fleet : universe.galaxy.fleets) {
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(fleet.position);
 //		glr.model.scale(Fleet::pickingType.radius_universe);
@@ -185,13 +188,32 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			fleetLabel = fmt::format("Fleet {}", +fleet.id);
 		}
 
-		renderer.text.add_text(
-				fleet.position,
-				libv::vec2f{0, -15.f},
-				std::move(fleetLabel)
-		);
+		const auto a = libv::smoothstep((eye - fleet.position).length(), 160.f, 80.f);
+		if (a > 0.02f) // Skip barely and not visible texts
+			renderer.text.add_text(
+					fleet.position,
+					libv::vec2f{0, -15.f},
+					std::move(fleetLabel),
+					libv::vec4f{1.f, 1.f, 1.f, a}
+			);
 
 		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
+	}
+
+	for (const auto& planet : universe.galaxy.planets) {
+		const auto m_guard = glr.model.push_guard();
+		glr.model.translate(planet.position);
+
+		renderer.planet.render(glr, renderer.resource_context.uniform_stream, planet);
+
+		const auto a = libv::smoothstep((eye - planet.position).length(), 100.f, 20.f);
+		if (a > 0.02f) // Skip barely and not visible texts
+			renderer.text.add_text(
+					planet.position,
+					libv::vec2f{0, -15.f},
+					fmt::format("Planet {}", +planet.id),
+					libv::vec4f{1.f, 1.f, 1.f, a}
+			);
 	}
 
 	// --- Render EditorBackground/Sky ---
@@ -212,7 +234,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 //	renderer.arrow.add_debug_view04();
 //	renderer.arrow.add_debug_view05();
 
-	for (const auto& fleet : universe.fleets) {
+	for (const auto& fleet : universe.galaxy.fleets) {
 		renderer.arrow.restart_chain(fleet.animation_offset());
 
 		auto prev = fleet.position;

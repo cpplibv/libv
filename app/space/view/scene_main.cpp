@@ -86,11 +86,11 @@ auto createCanvas(const std::shared_ptr<GameSession>& game_session, Renderer& re
 		log_space.trace("Space Canvas Focus: {}", event.gain());
 
 		if (event.gain()) {
-			controls.context_enter<app::SpaceCanvas>(&self.object());
-			controls.context_enter<app::BaseCameraOrbit>(&self.object().camera);
+			controls.context_enter<SpaceCanvas>(&self.object());
+			controls.context_enter<BaseCameraOrbit>(&self.object().camera);
 		} else {
-			controls.context_leave_if_matches<app::BaseCameraOrbit>(&self.object().camera);
-			controls.context_leave_if_matches<app::SpaceCanvas>(&self.object());
+			controls.context_leave_if_matches<BaseCameraOrbit>(&self.object().camera);
+			controls.context_leave_if_matches<SpaceCanvas>(&self.object());
 		}
 	});
 

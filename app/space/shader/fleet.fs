@@ -9,8 +9,8 @@ in vec2 fragmentTexture0;
 
 out vec4 result;
 
-uniform vec4 base_color;
-uniform int selected;
+uniform vec4 base_color = vec4(1, 1, 1, 1);
+uniform int selected = 0;
 
 
 void main() {

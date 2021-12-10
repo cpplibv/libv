@@ -30,15 +30,24 @@ public:
 	Playout playout;
 
 public:
-	explicit inline GameSession(libv::Nexus& nexus) : nexus(nexus), playout() {
+	explicit inline GameSession(libv::Nexus& nexus) :
+			nexus(nexus),
+			universe(GalaxyGenerationSettings{}),
+			playout() {
 		register_nexus();
 	}
 
-	explicit inline GameSession(libv::Nexus& nexus, NetworkClient& network_client) : nexus(nexus), playout(network_client) {
+	explicit inline GameSession(libv::Nexus& nexus, NetworkClient& network_client) :
+			nexus(nexus),
+			universe(GalaxyGenerationSettings{}),
+			playout(network_client) {
 		register_nexus();
 	}
 
-	explicit inline GameSession(libv::Nexus& nexus, NetworkServer& network_server) : nexus(nexus), playout(network_server) {
+	explicit inline GameSession(libv::Nexus& nexus, NetworkServer& network_server) :
+			nexus(nexus),
+			universe(GalaxyGenerationSettings{}),
+			playout(network_server) {
 		register_nexus();
 	}
 

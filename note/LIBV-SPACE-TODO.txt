@@ -71,14 +71,34 @@ app.space: Implement Universe Snapshots
 
 
 
+app.space: Debug views and grid on/off (and other options) with persistence
+
+app.space: Map generation
+
+app.space: Direction idea:
+		Create a working UI mockup project
+		Create a working sim mockup project
+		Create a working render mockup project
+		Merge them
+
+
+
 
 
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
 app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
 		| Solution: Special archives with members to indicate the reason for the serialization, and inside the serializers branching on this info
+		| Disadvantage: 'Local' members makes the otherwise immutable view for universe mutable
+
+
+
+
+
+
 
 app.space: Controls: Clicking on shuffle button deselects
+		| feature_binary_raii
 app.space: Controls: Clicking and rotating the camera it deselects
 		| Should analog features have priority over action/binary?
 				Or does (0,0) 'magic' happens and that causes the issue?
@@ -109,6 +129,14 @@ Main areas of focus: Cost / Value
 	12 / 4: Library: Shader / Uniform block generation
 
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
+
+	app.space: Main menu
+	app.space: In game menu
+	app.space: Multiplayer lobby list
+	app.space: Planets
+	app.space: Map generation with lua
+	app.space: Factions
+	libv.ui: Component / Style composition
 
 
 libv.rev: PostProcess should respect original framebuffer and viewport values

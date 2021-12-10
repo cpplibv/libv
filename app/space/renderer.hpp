@@ -18,7 +18,9 @@
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
-#include <space/universe/universe.hpp>
+//#include <space/universe/universe.hpp>
+#include <space/universe/fleet.hpp> // For selection status
+#include <space/universe/planet.hpp> // For nothing (yet)
 #include <space/view/camera.hpp>
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>
@@ -220,6 +222,19 @@ public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status);
 };
 
+struct RendererPlanet {
+	libv::glr::Mesh mesh{libv::gl::Primitive::Triangles, libv::gl::BufferUsage::StaticDraw};
+	ShaderPlanet shader;
+
+private:
+	void build_mesh(libv::glr::Mesh& mesh);
+
+public:
+	explicit RendererPlanet(RendererResourceContext& rctx);
+
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Planet& planet);
+};
+
 struct RendererText {
 private:
 	ShaderText shader;
@@ -268,6 +283,7 @@ struct Renderer {
 	RendererDebug debug{resource_context};
 	RendererCommandArrow arrow{resource_context};
 	RendererFleet fleet{resource_context};
+	RendererPlanet planet{resource_context};
 	RendererText text{resource_context};
 
 public:

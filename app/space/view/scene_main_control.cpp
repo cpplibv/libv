@@ -31,7 +31,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
-	controls.feature_action<app::SceneMain>("space.save", [](libv::ctrl::arg_action, SceneMain& ctx) {
+	controls.feature_action<SceneMain>("space.save", [](libv::ctrl::arg_action, SceneMain& ctx) {
 		std::vector<std::byte> save_data;
 
 		{
@@ -47,7 +47,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		log_space.info("Saved: {}", "universe.sav");
 	});
 
-	controls.feature_action<app::SceneMain>("space.load", [](libv::ctrl::arg_action, SceneMain& ctx) {
+	controls.feature_action<SceneMain>("space.load", [](libv::ctrl::arg_action, SceneMain& ctx) {
 		const auto save_data = libv::read_file_or_throw("universe.sav");
 		// <<< handle read error
 
@@ -60,7 +60,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		log_space.info("Loaded: {}", "universe.sav");
 	});
 
-	controls.feature_binary<app::SceneMain>("space.show_controls", [](libv::ctrl::arg_binary arg, SceneMain& ctx) {
+	controls.feature_binary<SceneMain>("space.show_controls", [](libv::ctrl::arg_binary arg, SceneMain& ctx) {
 		if (arg.value) {
 			std::ostringstream os;
 

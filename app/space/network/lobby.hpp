@@ -27,7 +27,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 struct SnapshotLobby {
-	static constexpr libv::serial::CodecMessageID id{0xA1};
+	static constexpr libv::serial::CodecMessageID id{10};
 
 protected:
 	struct Client {

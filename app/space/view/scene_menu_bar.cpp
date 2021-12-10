@@ -25,18 +25,21 @@ libv::ui::Component SceneMenuBar::create(libv::Nexus& nexus, User& user) {
 	return mp_bar;
 }
 
-libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar_main) {
+//libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar_main) {
+//
+//	mp_bar_main.style("space.hud-bar.mp.main");
+//
+//	libv::ui::Button title_space("title-space");
+//	title_space.style("space.title-space");
+//	title_space.text("SPACE");
+//	mp_bar_main.add(title_space);
+//
+//	libv::ui::PanelLine mp_bar;
+//	mp_bar.style("space.hud-bar.mp.panel");
+//	mp_bar_main.add(mp_bar);
 
-	mp_bar_main.style("space.hud-bar.mp.main");
-
-	libv::ui::Button title_space("title-space");
-	title_space.style("space.title-space");
-	title_space.text("SPACE");
-	mp_bar_main.add(title_space);
-
-	libv::ui::PanelLine mp_bar;
+libv::ui::Component SceneMenuBar::init(libv::ui::PanelLine& mp_bar) {
 	mp_bar.style("space.hud-bar.mp.panel");
-	mp_bar_main.add(mp_bar);
 
 	{
 		libv::ui::Label lbl_name("mp-name-lbl");
@@ -134,8 +137,8 @@ SceneMenuBar::~SceneMenuBar() {
 //		World& world,
 //		std::optional<NetworkClient>& client,
 //		std::optional<NetworkServer>& server,
-//		app::CameraPlayer& camera_main,
-//		app::CameraPlayer& camera_mini,
+//		CameraPlayer& camera_main,
+//		CameraPlayer& camera_mini,
 //
 //		std::optional<libv::ui::CanvasAdaptorT<SpaceCanvas>>& out_canvas_main) {
 //
@@ -163,13 +166,13 @@ SceneMenuBar::~SceneMenuBar() {
 //			cmd_bar.add_s<libv::ui::Button>("space.hud-bar.cmd.button")
 //					.text("Clear Fleets")
 //					.event().submit.connect([&playout_delay_buffer]() {
-//						playout_delay_buffer.queue<app::CommandClearFleets>();
+//						playout_delay_buffer.queue<CommandClearFleets>();
 //					});
 //
 //			cmd_bar.add_s<libv::ui::Button>("space.hud-bar.cmd.button")
 //					.text("Clear Fleets With Longer Label")
 //					.event().submit.connect([&playout_delay_buffer]() {
-//						playout_delay_buffer.queue<app::CommandClearFleets>();
+//						playout_delay_buffer.queue<CommandClearFleets>();
 //					});
 //		}
 //	}

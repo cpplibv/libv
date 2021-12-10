@@ -30,6 +30,11 @@ struct SpaceFrame : public libv::Frame {
 				closeForce();
 		});
 
+		// TODO P1: Fix bug where setDecoration false does nothing from ctor
+		//		setDecoration(false);
+		// TODO P1: Fix bug where setDisplayMode(DisplayMode::fullscreen_windowed) fails with assert (incorrect matrix)
+		//		setDisplayMode(DisplayMode::fullscreen_windowed);
+
 //		onSize.output([&](const libv::frame::EventSize& e) {
 //			if (config.save_window_size) {
 //				config.window_width = e.size.x;

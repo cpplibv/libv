@@ -16,7 +16,11 @@ class GameThread;
 class Renderer;
 
 class User;
+
 class Universe;
+class Galaxy;
+class Planet;
+class Fleet;
 
 class Playout;
 class PlayoutDelayBuffer;
@@ -51,6 +55,8 @@ class CTO_FleetMove;
 class CTO_FleetQueueMove;
 class CTO_ClearFleets;
 class CTO_Shuffle;
+class CTO_PlanetSpawn;
+class CTO_ClearPlanets;
 
 class CTO_TrackView;
 class CTO_CameraWarpTo;
