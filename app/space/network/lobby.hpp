@@ -22,7 +22,7 @@
 #include <space/universe/ids.hpp> // TODO P2: UserID should be moved somewhere else
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -112,4 +112,4 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

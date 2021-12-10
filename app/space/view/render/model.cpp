@@ -11,7 +11,7 @@
 //#include <space/renderer.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -95,4 +95,4 @@ void Model::render_node(libv::glr::Queue& glr, uint32_t nodeID, ShaderFleet& sha
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

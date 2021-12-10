@@ -4,7 +4,7 @@
 #include <space/view/frustum.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -139,4 +139,4 @@ Frustum::Frustum(libv::vec3f nbl_, libv::vec3f nbr_, libv::vec3f ntr_, libv::vec
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

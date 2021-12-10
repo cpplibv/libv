@@ -18,7 +18,7 @@
 #include <space/user.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -160,4 +160,4 @@ void NetworkClient::send(std::vector<std::byte> message) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

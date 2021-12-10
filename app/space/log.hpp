@@ -6,7 +6,7 @@
 #include <libv/log/log.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -14,4 +14,4 @@ inline libv::LoggerModule log_space{libv::logger_stream, "space"};
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

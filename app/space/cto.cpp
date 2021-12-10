@@ -6,7 +6,7 @@
 #include <space/universe/universe.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -34,4 +34,4 @@ void CTO_CameraWarpTo::apply(Universe& universe, Lobby& lobby) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

@@ -14,7 +14,7 @@
 #include <libv/ui/parse/parse_size.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -75,4 +75,4 @@ libv::ui::Component overlay_shader_error() {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

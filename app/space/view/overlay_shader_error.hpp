@@ -4,7 +4,7 @@
 #include <libv/ui/component/component.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -16,4 +16,4 @@ libv::ui::Component overlay_shader_error();
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

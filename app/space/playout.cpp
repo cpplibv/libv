@@ -6,7 +6,7 @@
 #include <libv/serial/archive/binary.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -31,4 +31,4 @@ void Playout::update(Universe& universe) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

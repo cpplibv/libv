@@ -18,7 +18,7 @@
 #include <space/universe/universe.hpp> // Only to access the process member function
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -94,4 +94,4 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

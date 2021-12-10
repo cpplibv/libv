@@ -15,7 +15,7 @@
 #include <space/log.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -119,4 +119,4 @@ void GameInstance::enterMultiPlayerServer(uint16_t port) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

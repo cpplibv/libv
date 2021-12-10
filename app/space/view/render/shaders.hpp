@@ -11,7 +11,7 @@
 //#include <libv/glr/layout_to_string.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -277,4 +277,4 @@ using ShaderText = libv::rev::Shader<UniformsText>;
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

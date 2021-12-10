@@ -18,7 +18,7 @@
 #include <libv/ctrl/controls.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -130,4 +130,4 @@ void SceneMain::openMPServer(uint16_t port) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

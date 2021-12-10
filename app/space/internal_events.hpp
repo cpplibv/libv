@@ -6,7 +6,7 @@
 #include <string>
 
 
-namespace app {
+namespace space {
 namespace mc {
 
 // -------------------------------------------------------------------------------------------------
@@ -49,4 +49,4 @@ struct RequestClearFleets {
 // -------------------------------------------------------------------------------------------------
 
 } // namespace mc
-} // namespace app
+} // namespace space

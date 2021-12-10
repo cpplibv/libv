@@ -26,7 +26,7 @@
 
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -99,4 +99,4 @@ void SceneMainControl::bind_default_controls(libv::ctrl::Controls& controls) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

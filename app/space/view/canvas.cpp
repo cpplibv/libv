@@ -16,7 +16,7 @@
 #include <space/universe/universe.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -349,4 +349,4 @@ void SpaceCanvas::clear_debug_shapes() {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

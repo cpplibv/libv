@@ -12,7 +12,7 @@
 #include <space/internal_events.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -66,4 +66,4 @@ libv::ui::Component SceneCommandBar::create(libv::Nexus& nexus) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

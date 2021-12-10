@@ -15,7 +15,7 @@
 #include <space/universe/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -90,4 +90,4 @@ void network_decode(std::span<const std::byte> message, F& handler) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

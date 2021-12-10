@@ -9,7 +9,7 @@
 #include <libv/serial/archive/json_any.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -41,4 +41,4 @@ std::string debug_binary_as_json(std::span<const std::byte> message) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

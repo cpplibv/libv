@@ -14,7 +14,7 @@
 #include <space/user.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -214,4 +214,4 @@ void NetworkServer::broadcast(std::vector<std::byte> message) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

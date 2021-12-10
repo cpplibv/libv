@@ -7,7 +7,7 @@
 //#include <libv/utility/nexus.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -22,4 +22,4 @@ void GameThread::execute(std::function<void()> task) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

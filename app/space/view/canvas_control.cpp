@@ -18,7 +18,7 @@
 #include <space/universe/universe.hpp>
 
 
-namespace app {
+namespace space {
 namespace {
 
 // -------------------------------------------------------------------------------------------------
@@ -416,4 +416,4 @@ void CanvasControl::bind_default_controls(libv::ctrl::Controls& controls) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

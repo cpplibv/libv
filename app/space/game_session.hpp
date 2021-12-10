@@ -17,7 +17,7 @@
 #include <space/universe/universe.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -60,4 +60,4 @@ std::shared_ptr<GameSession> createMultiPlayerServer(GameThread& game_thread, li
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

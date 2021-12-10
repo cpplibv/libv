@@ -13,7 +13,7 @@
 #include <space/log.hpp>
 
 
-namespace app {
+namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
@@ -162,4 +162,4 @@ void CameraControl::bind_default_controls(libv::ctrl::Controls& controls) {
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace app
+} // namespace space

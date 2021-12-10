@@ -74,6 +74,7 @@ app.space: Implement Universe Snapshots
 
 
 app.space: Selection state storage
+		selectedFleetIDList have to die, or became a better index
 app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
 		| Solution: Special archives with members to indicate the reason for the serialization, and inside the serializers branching on this info
 
