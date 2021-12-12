@@ -432,7 +432,8 @@ struct Spectrum {
 	std::array<std::size_t, N> data;
 
 	float min = 0;
-	float max = 3600;
+//	float max = 3600;
+	float max = 1;
 
 	Spectrum() {
 		data.fill(0);
@@ -443,6 +444,10 @@ struct Spectrum {
 		data[static_cast<std::size_t>((value - min) / ((max - min) / static_cast<float>(N)))]++;
 	}
 
+	void clear() {
+		data.fill(0);
+	}
+
 	friend std::ostream& operator<<(std::ostream& os, const Spectrum& var) {
 		for (std::size_t i = 0; i < N; ++i)
 			os << var.data[i] << ' ';
@@ -450,26 +455,135 @@ struct Spectrum {
 	}
 };
 
+//int main() {
+//	Spectrum<1000> spectrum;
+//
+//	for (int32_t i = 0; i < 1000000; ++i) {
+//		const auto ui = std::bit_cast<uint32_t>(i + 1);
+//		const auto hash = libv::hash_int(ui);
+//		const auto f_high = ((hash & 0xFFFF0000u) >> 16u) % 3600u;
+//		const auto f_low = (hash & 0x0000FFFFu);
+//
+//		const auto offset = static_cast<float>(f_high) + static_cast<float>(f_low) / static_cast<float>(0xFFFF);
+//
+////		const auto f = libv::convert_from_16_16<float>(hash);
+////		const auto offset = std::fmod(f, 3600.0f);
+////		std::cout << i << ") Hash: " << hash << ", float: " << f << ", offset: " << offset << std::endl;
+////		std::cout << i << ") Hash: " << hash << ", offset: " << offset << std::endl;
+//
+//		spectrum.sample(offset);
+//	}
+//
+//	std::cout << spectrum << std::endl;
+//	return EXIT_SUCCESS;
+//}
+
+#include <libv/utility/random/xoroshiro128.hpp>
+#include <libv/utility/random/uniform_distribution.hpp>
+#include <libv/utility/timer.hpp>
+#include <random>
+
 int main() {
-	Spectrum<1000> spectrum;
+	// libv::xoroshiro128 benchmarking
 
-	for (int32_t i = 0; i < 1000000; ++i) {
-		const auto ui = std::bit_cast<uint32_t>(i + 1);
-		const auto hash = libv::hash_int(ui);
-		const auto f_high = ((hash & 0xFFFF0000u) >> 16u) % 3600u;
-		const auto f_low = (hash & 0x0000FFFFu);
+	Spectrum<1000> spectrumXO;
+	Spectrum<1000> spectrumFork;
+	Spectrum<1000> spectrumBad;
+	Spectrum<1000> spectrumMT;
+	Spectrum<1000> spectrumMT64;
 
-		const auto offset = static_cast<float>(f_high) + static_cast<float>(f_low) / static_cast<float>(0xFFFF);
+	auto dist = libv::make_uniform_distribution_inclusive(0.f, 1.f);
 
-//		const auto f = libv::convert_from_16_16<float>(hash);
-//		const auto offset = std::fmod(f, 3600.0f);
-//		std::cout << i << ") Hash: " << hash << ", float: " << f << ", offset: " << offset << std::endl;
-//		std::cout << i << ") Hash: " << hash << ", offset: " << offset << std::endl;
+	for (int j = 0; j < 3; ++j) {
+		auto forkParent = libv::xoroshiro128(j);
 
-		spectrum.sample(offset);
+		libv::Timer timer;
+
+		for (int32_t i = 0; i < 5000000; ++i) {
+			auto rngXO = libv::xoroshiro128(i);
+			spectrumXO.sample(dist(rngXO));
+		}
+		const auto timeXO = timer.timef_ms();
+
+		for (int32_t i = 0; i < 5000000; ++i) {
+			auto rngFork = forkParent.fork();
+			spectrumFork.sample(dist(rngFork));
+		}
+		const auto timeFork = timer.timef_ms();
+
+		for (int32_t i = 0; i < 5000000; ++i) {
+			auto rngBad = libv::xoroshiro128::high_quality_seed(i);
+			spectrumBad.sample(dist(rngBad));
+		}
+		const auto timeBad = timer.timef_ms();
+
+		for (int32_t i = 0; i < 5000000; ++i) {
+			auto rngMT = std::mt19937(i);
+			spectrumMT.sample(dist(rngMT));
+		}
+		const auto timeMT = timer.timef_ms();
+
+		for (int32_t i = 0; i < 5000000; ++i) {
+			auto rngMT64 = std::mt19937_64(i);
+			spectrumMT64.sample(dist(rngMT64));
+		}
+		const auto timeMT64 = timer.timef_ms();
+
+		std::cout << "Construction timeXO  : " << timeXO.count() << std::endl;
+		std::cout << "Construction timeFork: " << timeFork.count() << std::endl;
+		std::cout << "Construction timeBad : " << timeBad.count() << std::endl;
+		std::cout << "Construction timeMT  : " << timeMT.count() << std::endl;
+		std::cout << "Construction timeMT64: " << timeMT64.count() << std::endl;
+		std::cout << std::endl;
 	}
 
-	std::cout << spectrum << std::endl;
+	std::cout << spectrumXO << std::endl;
+	std::cout << spectrumFork << std::endl;
+	std::cout << spectrumBad << std::endl;
+	std::cout << spectrumMT << std::endl;
+	std::cout << spectrumMT64 << std::endl;
+	spectrumXO.clear();
+	spectrumFork.clear();
+	spectrumBad.clear();
+	spectrumMT.clear();
+	spectrumMT64.clear();
+
+	for (int j = 0; j < 3; ++j) {
+		auto rngXO = libv::xoroshiro128(j);
+		auto rngMT = std::mt19937(j);
+		auto rngMT64 = std::mt19937_64(j);
+
+		libv::Timer timer;
+		for (int32_t i = 0; i < 500000000; ++i) {
+			spectrumXO.sample(dist(rngXO));
+		}
+		const auto timeXO = timer.timef_ms();
+
+		for (int32_t i = 0; i < 500000000; ++i) {
+			spectrumMT.sample(dist(rngMT));
+		}
+		const auto timeMT = timer.timef_ms();
+
+		for (int32_t i = 0; i < 500000000; ++i) {
+			spectrumMT64.sample(dist(rngMT64));
+		}
+		const auto timeMT64 = timer.timef_ms();
+
+		std::cout << "Generation timeXO  : " << timeXO.count() << std::endl;
+		std::cout << "Generation timeMT  : " << timeMT.count() << std::endl;
+		std::cout << "Generation timeMT64: " << timeMT64.count() << std::endl;
+		std::cout << std::endl;
+	}
+
+	std::cout << spectrumXO << std::endl;
+	std::cout << spectrumMT << std::endl;
+	std::cout << spectrumMT64 << std::endl;
+	std::cout << std::endl;
+
+	std::cout << "sizeof(libv::xoroshiro128): " << sizeof(libv::xoroshiro128) << std::endl;
+	std::cout << "sizeof(std::mt19937)      : " << sizeof(std::mt19937) << std::endl;
+	std::cout << "sizeof(std::mt19937_64)   : " << sizeof(std::mt19937_64) << std::endl;
+
 	return EXIT_SUCCESS;
 }
 

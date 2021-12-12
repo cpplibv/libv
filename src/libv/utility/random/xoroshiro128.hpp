@@ -14,7 +14,13 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 /// Fast and small forkable pseudorandom number generator
-/// Based on xoroshiro128++ 1.0 (but added fork, and type safe next function)
+/// Based on xoroshiro128++ 1.0 (but added fork, seed quality protected construction, type safe next function and UniformRandomBitGenerator concept requirements)
+/// Performance:
+/// 	Construction from low quality seed is 7 times faster than mt19937 and 10 times mt19937_64.
+/// 	Construction from fork is 170 times faster than mt19937 and 250 times mt19937_64.
+/// 	Construction from high quality seed is 280 times faster than mt19937 and 400 times mt19937_64.
+///		Generation is (maybe a 1-10% slower, but mostly) on-par with mt19937 and twice as fast as mt19937_64.
+/// Memory footprint: 16 byte (mt19937 and mt19937_64 are 2504 byte)
 /// \source: https://prng.di.unimi.it/xoroshiro128plusplus.c
 /// \source: https://www.youtube.com/watch?v=xMdwK9p5qOw
 class xoroshiro128 {
@@ -27,14 +33,39 @@ private:
 public:
 	constexpr inline xoroshiro128() noexcept = default;
 
+	/// Accepts low quality seeds (like IDs or Indices)
 	explicit constexpr inline xoroshiro128(uint64_t s0) noexcept :
-		s{s0, s0 ^ 1341429377760273161u} {
+		s{s0, s0 + 1} { // Seed cannot be {0, 0} and +1 will make sure of that
+		jump(); // Call to jump() to accept low quality seed
 	}
 
+	/// Accepts low quality seeds (like IDs or Indices)
 	/// The seed cannot be {0, 0}
 	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1) noexcept :
 		s{s0, s1} {
 		assert((s0 != 0 || s1 != 0) && "The seed for xoroshiro128 cannot be {0, 0}");
+		jump(); // Call to jump() to accept low quality seed
+	}
+
+private:
+	struct HighQ {};
+	/// The seed cannot be {0, 0}, Seed is required to be high quality
+	constexpr inline xoroshiro128(uint64_t s0, uint64_t s1, HighQ) noexcept :
+		s{s0, s1} {
+		assert((s0 != 0 || s1 != 0) && "The seed for xoroshiro128 cannot be {0, 0}");
+	}
+
+public:
+	/// Directly seeds the pseudorandom number generator internal state using s0.
+	/// The provided seed must be a high quality 64 random bits otherwise the starting sequence's quality will poor
+	static constexpr inline xoroshiro128 high_quality_seed(uint64_t s0) {
+		return xoroshiro128{~s0 ^ 1341429377760273161u, s0 ^ 1341429377760273161u, HighQ{}};
+	}
+
+	/// Directly seeds the pseudorandom number generator internal state using s0 and s1
+	/// The provided seed must be a high quality 64 random bits otherwise the starting sequence's quality will poor
+	static constexpr inline xoroshiro128 high_quality_seed(uint64_t s0, uint64_t s1) {
+		return xoroshiro128{s0, s1, HighQ{}};
 	}
 
 private:
@@ -58,7 +89,7 @@ public:
 	}
 
 	[[nodiscard]] static constexpr inline result_type max() noexcept {
-		return 18446744073709551615;
+		return 18446744073709551615u;
 	}
 
 	[[nodiscard]] constexpr inline result_type operator()() noexcept {
@@ -66,7 +97,29 @@ public:
 	}
 
 public:
-	// Generates the next random number
+	/// This is the jump function for the generator. It is equivalent
+	/// to 2^64 calls to next(); it can be used to generate 2^64
+	/// non-overlapping subsequences for parallel computations.
+	constexpr inline void jump() noexcept {
+		constexpr uint64_t JUMP[] = {0x2BD7A6A6E99C2DDCu, 0x0992CCAF6A6FCA05u};
+
+		uint64_t s0 = 0;
+		uint64_t s1 = 0;
+
+		for (uint64_t i : JUMP)
+			for (uint64_t b = 0; b < 64; b++) {
+				if (i & 1u << b) {
+					s0 ^= s[0];
+					s1 ^= s[1];
+				}
+				[[maybe_unused]] auto ignore = aux_next();
+			}
+
+		s[0] = s0;
+		s[1] = s1;
+	}
+
+	/// Generates the next random number
 	template <typename Result>
 	[[nodiscard]] constexpr inline Result next() noexcept {
 		static_assert(sizeof(Result) <= 8, "Requested Result type is not supported");
@@ -78,10 +131,11 @@ public:
 		return result;
 	}
 
-	// Create a new random number generator with the state and the next value from this generator
+	/// Create a new random number generator with the state and the next value from this generator
 	[[nodiscard]] constexpr inline xoroshiro128 fork() noexcept {
 		const auto s0 = next<uint64_t>();
-		return xoroshiro128{s0, s[1]};
+		const auto s1 = next<uint64_t>();
+		return high_quality_seed(s0, s1);
 	}
 };
 
