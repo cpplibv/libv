@@ -3,6 +3,7 @@
 // hpp
 #include <space/universe/universe.hpp>
 // libv
+#include <libv/algo/linear_find.hpp>
 #include <libv/serial/archive/binary.hpp>
 #include <libv/serial/archive/json_any.hpp>
 #include <libv/utility/random/uniform_distribution.hpp>
@@ -101,19 +102,27 @@ void Universe::process(CTO_FleetClearSelection&&) {
 void Universe::process(CTO_FleetMove&& cto) {
 	// Permission check
 	// Bound check
-	// TODO P3: Use a command API of the fleet
 	for (const auto& fleetID : galaxy.selectedFleetIDList) {
-		galaxy.fleets[+fleetID].commands.clear();
-		galaxy.fleets[+fleetID].commands.emplace_back(cto.target_position, FleetCommandType::movement);
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+		// TODO P3: Use a command API of the fleet
+		fleet->commands.clear();
+		fleet->commands.emplace_back(cto.target_position, FleetCommandType::movement);
 	}
 }
 
 void Universe::process(CTO_FleetQueueMove&& cto) {
 	// Permission check
 	// Bound check
-	// TODO P3: Use the command API of the fleet
 	for (const auto& fleetID : galaxy.selectedFleetIDList) {
-		galaxy.fleets[+fleetID].commands.emplace_back(cto.target_position, FleetCommandType::movement);
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+		// TODO P3: Use the command API of the fleet
+		fleet->commands.emplace_back(cto.target_position, FleetCommandType::movement);
 	}
 }
 
