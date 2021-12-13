@@ -431,17 +431,17 @@ template <std::size_t N>
 struct Spectrum {
 	std::array<std::size_t, N> data;
 
-	float min = 0;
-//	float max = 3600;
-	float max = 1;
+	float min;
+	float max;
 
-	Spectrum() {
+	explicit Spectrum(float min = 0.f, float max = 0.f) : min(min), max(max) {
 		data.fill(0);
 	}
 
 	void sample(float value) {
 //		data[(value - min) / ((max - min) / N)]++;
-		data[static_cast<std::size_t>((value - min) / ((max - min) / static_cast<float>(N)))]++;
+		const auto index = static_cast<std::size_t>(std::clamp((value - min) / ((max - min) / static_cast<float>(N)), 0.f, static_cast<float>(N - 1)));
+		data[index]++;
 	}
 
 	void clear() {
@@ -456,7 +456,7 @@ struct Spectrum {
 };
 
 //int main() {
-//	Spectrum<1000> spectrum;
+//	Spectrum<1000> spectrum{0, 3600};
 //
 //	for (int32_t i = 0; i < 1000000; ++i) {
 //		const auto ui = std::bit_cast<uint32_t>(i + 1);
@@ -478,113 +478,181 @@ struct Spectrum {
 //	return EXIT_SUCCESS;
 //}
 
-#include <libv/utility/random/xoroshiro128.hpp>
+// -------------------------------------------------------------------------------------------------
+
+//#include <libv/utility/random/xoroshiro128.hpp>
+//#include <libv/utility/random/uniform_distribution.hpp>
+//#include <libv/utility/timer.hpp>
+//#include <random>
+//
+//int main() {
+//	// libv::xoroshiro128 benchmarking
+//
+//	Spectrum<1000> spectrumXO{0, 1};
+//	Spectrum<1000> spectrumFork{0, 1};
+//	Spectrum<1000> spectrumBad{0, 1};
+//	Spectrum<1000> spectrumMT{0, 1};
+//	Spectrum<1000> spectrumMT64{0, 1};
+//
+//	auto dist = libv::make_uniform_distribution_inclusive(0.f, 1.f);
+//
+//	for (int j = 0; j < 3; ++j) {
+//		auto forkParent = libv::xoroshiro128(j);
+//
+//		libv::Timer timer;
+//
+//		for (int32_t i = 0; i < 5000000; ++i) {
+//			auto rngXO = libv::xoroshiro128(i);
+//			spectrumXO.sample(dist(rngXO));
+//		}
+//		const auto timeXO = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 5000000; ++i) {
+//			auto rngFork = forkParent.fork();
+//			spectrumFork.sample(dist(rngFork));
+//		}
+//		const auto timeFork = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 5000000; ++i) {
+//			auto rngBad = libv::xoroshiro128::high_quality_seed(i);
+//			spectrumBad.sample(dist(rngBad));
+//		}
+//		const auto timeBad = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 5000000; ++i) {
+//			auto rngMT = std::mt19937(i);
+//			spectrumMT.sample(dist(rngMT));
+//		}
+//		const auto timeMT = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 5000000; ++i) {
+//			auto rngMT64 = std::mt19937_64(i);
+//			spectrumMT64.sample(dist(rngMT64));
+//		}
+//		const auto timeMT64 = timer.timef_ms();
+//
+//		std::cout << "Construction timeXO  : " << timeXO.count() << std::endl;
+//		std::cout << "Construction timeFork: " << timeFork.count() << std::endl;
+//		std::cout << "Construction timeBad : " << timeBad.count() << std::endl;
+//		std::cout << "Construction timeMT  : " << timeMT.count() << std::endl;
+//		std::cout << "Construction timeMT64: " << timeMT64.count() << std::endl;
+//		std::cout << std::endl;
+//	}
+//
+//	std::cout << spectrumXO << std::endl;
+//	std::cout << spectrumFork << std::endl;
+//	std::cout << spectrumBad << std::endl;
+//	std::cout << spectrumMT << std::endl;
+//	std::cout << spectrumMT64 << std::endl;
+//	spectrumXO.clear();
+//	spectrumFork.clear();
+//	spectrumBad.clear();
+//	spectrumMT.clear();
+//	spectrumMT64.clear();
+//
+//	for (int j = 0; j < 3; ++j) {
+//		auto rngXO = libv::xoroshiro128(j);
+//		auto rngMT = std::mt19937(j);
+//		auto rngMT64 = std::mt19937_64(j);
+//
+//		libv::Timer timer;
+//		for (int32_t i = 0; i < 500000000; ++i) {
+//			spectrumXO.sample(dist(rngXO));
+//		}
+//		const auto timeXO = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 500000000; ++i) {
+//			spectrumMT.sample(dist(rngMT));
+//		}
+//		const auto timeMT = timer.timef_ms();
+//
+//		for (int32_t i = 0; i < 500000000; ++i) {
+//			spectrumMT64.sample(dist(rngMT64));
+//		}
+//		const auto timeMT64 = timer.timef_ms();
+//
+//		std::cout << "Generation timeXO  : " << timeXO.count() << std::endl;
+//		std::cout << "Generation timeMT  : " << timeMT.count() << std::endl;
+//		std::cout << "Generation timeMT64: " << timeMT64.count() << std::endl;
+//		std::cout << std::endl;
+//	}
+//
+//	std::cout << spectrumXO << std::endl;
+//	std::cout << spectrumMT << std::endl;
+//	std::cout << spectrumMT64 << std::endl;
+//	std::cout << std::endl;
+//
+//	std::cout << "sizeof(libv::xoroshiro128): " << sizeof(libv::xoroshiro128) << std::endl;
+//	std::cout << "sizeof(std::mt19937)      : " << sizeof(std::mt19937) << std::endl;
+//	std::cout << "sizeof(std::mt19937_64)   : " << sizeof(std::mt19937_64) << std::endl;
+//
+//	return EXIT_SUCCESS;
+//}
+
+// -------------------------------------------------------------------------------------------------
+
+#include <libv/utility/random/normal_distribution.hpp>
 #include <libv/utility/random/uniform_distribution.hpp>
+#include <libv/utility/random/xoroshiro128.hpp>
 #include <libv/utility/timer.hpp>
 #include <random>
 
+
+
 int main() {
-	// libv::xoroshiro128 benchmarking
+	Spectrum<1000> spectrum_normal995_clamp{0, 3};
+	Spectrum<1000> spectrum_normal995_repeat{0, 3};
+	Spectrum<1000> spectrum_normal995d_clamp{0, 3};
+	Spectrum<1000> spectrum_normal995d_repeat{0, 3};
+//	Spectrum<1000> spectrum_normal995i_clamp{0, 3000};
+//	Spectrum<1000> spectrum_normal995i_repeat{0, 3000};
 
-	Spectrum<1000> spectrumXO;
-	Spectrum<1000> spectrumFork;
-	Spectrum<1000> spectrumBad;
-	Spectrum<1000> spectrumMT;
-	Spectrum<1000> spectrumMT64;
+	libv::xoroshiro128 rng;
 
-	auto dist = libv::make_uniform_distribution_inclusive(0.f, 1.f);
+	libv::Timer timer;
 
-	for (int j = 0; j < 3; ++j) {
-		auto forkParent = libv::xoroshiro128(j);
-
-		libv::Timer timer;
-
-		for (int32_t i = 0; i < 5000000; ++i) {
-			auto rngXO = libv::xoroshiro128(i);
-			spectrumXO.sample(dist(rngXO));
-		}
-		const auto timeXO = timer.timef_ms();
-
-		for (int32_t i = 0; i < 5000000; ++i) {
-			auto rngFork = forkParent.fork();
-			spectrumFork.sample(dist(rngFork));
-		}
-		const auto timeFork = timer.timef_ms();
-
-		for (int32_t i = 0; i < 5000000; ++i) {
-			auto rngBad = libv::xoroshiro128::high_quality_seed(i);
-			spectrumBad.sample(dist(rngBad));
-		}
-		const auto timeBad = timer.timef_ms();
-
-		for (int32_t i = 0; i < 5000000; ++i) {
-			auto rngMT = std::mt19937(i);
-			spectrumMT.sample(dist(rngMT));
-		}
-		const auto timeMT = timer.timef_ms();
-
-		for (int32_t i = 0; i < 5000000; ++i) {
-			auto rngMT64 = std::mt19937_64(i);
-			spectrumMT64.sample(dist(rngMT64));
-		}
-		const auto timeMT64 = timer.timef_ms();
-
-		std::cout << "Construction timeXO  : " << timeXO.count() << std::endl;
-		std::cout << "Construction timeFork: " << timeFork.count() << std::endl;
-		std::cout << "Construction timeBad : " << timeBad.count() << std::endl;
-		std::cout << "Construction timeMT  : " << timeMT.count() << std::endl;
-		std::cout << "Construction timeMT64: " << timeMT64.count() << std::endl;
-		std::cout << std::endl;
+	for (int32_t i = 0; i < 10000000; ++i) {
+		spectrum_normal995_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
 	}
+	const auto time_normal995_clamp = timer.timef_ms();
 
-	std::cout << spectrumXO << std::endl;
-	std::cout << spectrumFork << std::endl;
-	std::cout << spectrumBad << std::endl;
-	std::cout << spectrumMT << std::endl;
-	std::cout << spectrumMT64 << std::endl;
-	spectrumXO.clear();
-	spectrumFork.clear();
-	spectrumBad.clear();
-	spectrumMT.clear();
-	spectrumMT64.clear();
-
-	for (int j = 0; j < 3; ++j) {
-		auto rngXO = libv::xoroshiro128(j);
-		auto rngMT = std::mt19937(j);
-		auto rngMT64 = std::mt19937_64(j);
-
-		libv::Timer timer;
-		for (int32_t i = 0; i < 500000000; ++i) {
-			spectrumXO.sample(dist(rngXO));
-		}
-		const auto timeXO = timer.timef_ms();
-
-		for (int32_t i = 0; i < 500000000; ++i) {
-			spectrumMT.sample(dist(rngMT));
-		}
-		const auto timeMT = timer.timef_ms();
-
-		for (int32_t i = 0; i < 500000000; ++i) {
-			spectrumMT64.sample(dist(rngMT64));
-		}
-		const auto timeMT64 = timer.timef_ms();
-
-		std::cout << "Generation timeXO  : " << timeXO.count() << std::endl;
-		std::cout << "Generation timeMT  : " << timeMT.count() << std::endl;
-		std::cout << "Generation timeMT64: " << timeMT64.count() << std::endl;
-		std::cout << std::endl;
+	for (int32_t i = 0; i < 10000000; ++i) {
+		spectrum_normal995_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
 	}
+	const auto time_normal995_repeat = timer.timef_ms();
 
-	std::cout << spectrumXO << std::endl;
-	std::cout << spectrumMT << std::endl;
-	std::cout << spectrumMT64 << std::endl;
-	std::cout << std::endl;
+	for (int32_t i = 0; i < 10000000; ++i) {
+		spectrum_normal995d_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
+	}
+	const auto time_normal995d_clamp = timer.timef_ms();
 
-	std::cout << "sizeof(libv::xoroshiro128): " << sizeof(libv::xoroshiro128) << std::endl;
-	std::cout << "sizeof(std::mt19937)      : " << sizeof(std::mt19937) << std::endl;
-	std::cout << "sizeof(std::mt19937_64)   : " << sizeof(std::mt19937_64) << std::endl;
+	for (int32_t i = 0; i < 10000000; ++i) {
+		spectrum_normal995d_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
+	}
+	const auto time_normal995d_repeat = timer.timef_ms();
 
+//	for (int32_t i = 0; i < 10000000; ++i) {
+//		spectrum_normal995i_clamp.sample(normal995_clamp(rng, 1000, 2000));
+//	}
+//	const auto time_normal995i_clamp = timer.timef_ms();
+//
+//	for (int32_t i = 0; i < 10000000; ++i) {
+//		spectrum_normal995i_repeat.sample(normal995_repeat(rng, 1000, 2000));
+//	}
+//	const auto time_normal995i_repeat = timer.timef_ms();
+
+	std::cout << "Time spectrum_normal995_clamp : " << time_normal995_clamp.count() << std::endl;
+	std::cout << "Time spectrum_normal995_repeat : " << time_normal995_repeat.count() << std::endl;
+	std::cout << "Time spectrum_normal995d_clamp : " << time_normal995d_clamp.count() << std::endl;
+	std::cout << "Time spectrum_normal995d_repeat : " << time_normal995d_repeat.count() << std::endl;
+//	std::cout << "Time spectrum_normal995i_clamp : " << time_normal995i_clamp.count() << std::endl;
+//	std::cout << "Time spectrum_normal995i_repeat : " << time_normal995i_repeat.count() << std::endl;
+
+	std::cout << "spectrum_normal995_clamp " << spectrum_normal995_clamp << std::endl;
+	std::cout << "spectrum_normal995_repeat " << spectrum_normal995_repeat << std::endl;
+	std::cout << "spectrum_normal995d_clamp " << spectrum_normal995d_clamp << std::endl;
+	std::cout << "spectrum_normal995d_repeat " << spectrum_normal995d_repeat << std::endl;
+//	std::cout << "spectrum_normal995i_clamp " << spectrum_normal995i_clamp << std::endl;
+//	std::cout << "spectrum_normal995i_repeat " << spectrum_normal995i_repeat << std::endl;
 	return EXIT_SUCCESS;
 }
-
-// -------------------------------------------------------------------------------------------------
