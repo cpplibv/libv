@@ -73,7 +73,7 @@ void main() {
 	ivec2 size = textureSize(texture_font, 0);
 	vec3 sample0 = texture(texture_font, fragmentTexture0 / size).xyz;
 	outputColor = fragmentColor0;
-	outputMask = vec4(sample0, 1);
+	outputMask = vec4(sample0, 1) * fragmentColor0.a;
 
 //	clip_component_fs(outputColor, outputMask);
 }

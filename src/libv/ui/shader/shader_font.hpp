@@ -46,7 +46,7 @@ struct ShaderFont : Shader {
 				ivec2 size = textureSize(samplerTexture0, 0);
 				vec3 sample = texture(samplerTexture0, fragmentTexture0 / size).xyz;
 				outputColor = fragmentColor0;
-				outputMask = vec4(sample, 1);
+				outputMask = vec4(sample, 1) * fragmentColor0.a;
 
 				clip_component_fs(outputColor, outputMask);
 			}
