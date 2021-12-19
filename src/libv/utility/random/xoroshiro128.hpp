@@ -68,6 +68,24 @@ public:
 		return xoroshiro128{s0, s1, HighQ{}};
 	}
 
+public:
+	/// State accessors, mostly only useful for serialization
+	[[nodiscard]] constexpr inline uint64_t state_s0() const noexcept {
+		return s[0];
+	}
+	/// State accessors, mostly only useful for serialization
+	[[nodiscard]] constexpr inline uint64_t state_s1() const noexcept {
+		return s[1];
+	}
+	/// State accessors, mostly only useful for serialization
+	constexpr inline void state_s0(uint64_t s0) noexcept {
+		s[0] = s0;
+	}
+	/// State accessors, mostly only useful for serialization
+	constexpr inline void state_s1(uint64_t s1) noexcept {
+		s[1] = s1;
+	}
+
 private:
 	[[nodiscard]] constexpr inline result_type aux_next() noexcept {
 		const auto s0 = s[0];
