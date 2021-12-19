@@ -6,6 +6,8 @@
 #include <libv/math/vec.hpp>
 #include <libv/math/vec_serial.hpp>
 #include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_memory.hpp>
+#include <libv/serial/types/std_string.hpp>
 //#include <libv/meta/reflection_access.hpp>
 //#include <libv/serial/enable.hpp>
 // std
@@ -13,6 +15,7 @@
 #include <string>
 #include <vector>
 // pro
+#include <space/universe/faction.hpp>
 //#include <space/universe/planet.hpp>
 #include <space/universe/engine/screen_pickable_type.hpp>
 #include <space/universe/ids.hpp>
@@ -133,9 +136,12 @@ private:
 public:
 	FleetID id = invalidFleetID;
 	libv::vec3f position;
+	std::string name;
 //	libv::quat orientation;
 	std::vector<Command> commands;
 	Selection selectionStatus = Selection::notSelected;
+
+	std::shared_ptr<Faction> faction;
 
 //	float speed;
 	//soi_type sphere_of_influence;
@@ -146,19 +152,23 @@ public:
 
 public:
 	Fleet() = default; /// For de-serialization only
-	Fleet(FleetID id, libv::vec3f position) :
+	Fleet(FleetID id, libv::vec3f position, std::shared_ptr<Faction> faction) :
 			id(id),
-			position(position) {}
+			position(position),
+			faction(std::move(faction)) {}
 
 public:
 	template <class Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(id);
 		ar & LIBV_NVP(position);
+		ar & LIBV_NVP(name);
 //		ar & LIBV_NVP(orientation);
 		ar & LIBV_NVP(commands);
 
 //		if constexpr (ar.is_local())
 //			ar & LIBV_NVP(selectionStatus);
+
+		ar & LIBV_NVP(faction);
 	}
 
 //	void queue_command(FleetCommandType type, libv::vec3f target);

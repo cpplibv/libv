@@ -15,7 +15,7 @@ trim_trailing_whitespace = true
 
 
 # Indentation for structured text files
-[*.{js,jsx,html,sass,scss,css,xml}]
+[*.{js,jsx,ts,tsx,html,sass,scss,css,xml}]
 indent_size = 2
 indent_style = tab
 

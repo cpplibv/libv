@@ -183,9 +183,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			glr.model.rotate(libv::Radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
 			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
 
-			fleetLabel = fmt::format("Fleet {}\nI:{} D:{:.2f}", +fleet.id, +fleet.commands.front().type, (fleet.commands.front().target - fleet.position).length());
+			fleetLabel = fmt::format("Fleet {}\nFaction {}\nI:{} D:{:.2f}", +fleet.id, +fleet.faction->id, +fleet.commands.front().type, (fleet.commands.front().target - fleet.position).length());
 		} else {
-			fleetLabel = fmt::format("Fleet {}", +fleet.id);
+			fleetLabel = fmt::format("Fleet {}\nFaction {}", +fleet.id, +fleet.faction->id);
 		}
 
 		const auto a = libv::smoothstep((eye - fleet.position).length(), 160.f, 80.f);
@@ -211,7 +211,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			renderer.text.add_text(
 					planet.position,
 					libv::vec2f{0, -15.f},
-					fmt::format("Planet {}", +planet.id),
+					fmt::format("Planet {}\nFaction {}", +planet.id, +planet.faction->id),
 					libv::vec4f{1.f, 1.f, 1.f, a}
 			);
 	}

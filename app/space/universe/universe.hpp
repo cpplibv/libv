@@ -9,6 +9,8 @@
 #include <libv/serial/archive/json_any_fwd.hpp>
 #include <libv/serial/codec_message_id.hpp>
 #include <libv/serial/serial.hpp>
+#include <libv/utility/random/xoroshiro128.hpp>
+#include <libv/utility/random/xoroshiro128_serial.hpp>
 // pro
 #include <space/universe/engine/chrono.hpp>
 #include <space/universe/galaxy.hpp>
@@ -26,6 +28,7 @@ struct Universe {
 
 public:
 	Galaxy galaxy;
+	libv::xoroshiro128 universe_rng;
 
 //	uint64_t nextPlayerID = 0;
 //	plf::colony<Player> players;
@@ -34,6 +37,7 @@ public:
 private:
 	template <class Archive> void aux_serialize(Archive& ar) {
 		ar & LIBV_NVP(galaxy);
+		ar & LIBV_NVP(universe_rng);
 	}
 
 public:

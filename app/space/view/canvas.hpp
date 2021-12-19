@@ -49,10 +49,12 @@ public:
 	CameraPlayer camera;
 	CameraPlayer::screen_picker screen_picker;
 
+private:
 	float angle = 0.0f;
 	float time = 0.0f;
 	float test_sin_time = 0.0f;
 
+public:
 	enum class SelectionMode {
 		none,
 		d25,
@@ -62,6 +64,7 @@ public:
 	libv::vec3f selectionStartGridPoint;
 	libv::vec3f selectionStartDir;
 
+private:
 	libv::rev::RenderTarget renderTarget;
 	libv::rev::PostProcessing postProcessing;
 	Renderer& renderer;

@@ -24,16 +24,15 @@ void main() {
 	float strength_diffuse = max(dot(N, L), 0.0);
 	float strength_specular = pow(max(dot(V, R), 0.0), 16);
 
-	float attenuation =
-			strength_diffuse +
-			strength_specular * 0.2;
+	result = vec4(
+			(strength_diffuse * 0.9 + 0.1 ) * base_color0.rgb +
+			strength_specular * 0.5 +
+			fresnel(2, base_color1.rgb * 2, N, V) * strength_diffuse
+			, base_color0.a
+	);
 
-	vec4 surface_color = mix(base_color0, base_color1, dot(N, V));
+//	result = vec4(base_color0.rgb * attenuation + strength_specular_atmo * base_color1.rgb, base_color0.a);
 
-	result = vec4(surface_color.rgb * attenuation, surface_color.a);
-
-//	result = base_color1;
-//	result = base_color1;
 
 //	if (selected == 0) // NotSelected
 //		;

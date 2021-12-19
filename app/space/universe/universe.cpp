@@ -23,7 +23,8 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 Universe::Universe(GalaxyGenerationSettings ggs) :
-	galaxy(generateGalaxy(ggs)) {
+	galaxy(generateGalaxy(ggs)),
+	universe_rng(ggs.seed) {
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -70,7 +71,10 @@ void Universe::process(CTO_FleetSpawn&& cto) {
 //	fleets.emplace_back(cto.id, cto.position);
 
 	// !!! Synchronized FleetID generation
-	galaxy.fleets.emplace_back(galaxy.nextFleetID++, cto.position);
+
+	auto dist = libv::make_uniform_distribution_inclusive(0, 2);
+	auto faction = galaxy.faction("Faction " + std::to_string(dist(universe_rng)));
+	galaxy.fleets.emplace_back(galaxy.nextFleetID++, cto.position, std::move(faction));
 }
 
 void Universe::process(CTO_FleetSelect&& cto) {
@@ -159,6 +163,8 @@ void Universe::process(CTO_PlanetSpawn&& cto) {
 	auto rng_planet = libv::xoroshiro128(+galaxy.nextPlanetID);
 	// !!! Synchronized PlanetID generation (Split request and action CTO's?)
 	galaxy.planets.emplace_back(generatePlanet(galaxy.nextPlanetID++, cto.position, rng_planet));
+	// <<< Assign Neutral faction in a better way
+	galaxy.planets.back().faction = galaxy.faction("Neutral");
 }
 
 void Universe::process(CTO_ClearPlanets&&) {

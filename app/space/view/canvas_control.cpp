@@ -11,11 +11,11 @@
 // std
 #include <optional>
 // pro
-#include <space/view/canvas.hpp>
 #include <space/cto.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>
 #include <space/universe/universe.hpp>
+#include <space/view/canvas.hpp>
 
 
 namespace space {

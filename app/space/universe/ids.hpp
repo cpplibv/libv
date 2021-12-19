@@ -30,15 +30,12 @@ constexpr inline PlanetID invalidPlanetID = PlanetID{-1};
 // -------------------------------------------------------------------------------------------------
 
 enum class TickIndex : int64_t {};
-
-enum class Timestamp : int64_t {};
-
-enum class UserID : int32_t {};
-
 [[nodiscard]] constexpr inline auto operator+(TickIndex e) noexcept { return libv::to_underlying(e); }
 
+enum class Timestamp : int64_t {};
 [[nodiscard]] constexpr inline auto operator+(Timestamp e) noexcept { return libv::to_underlying(e); }
 
+enum class UserID : int32_t {};
 [[nodiscard]] constexpr inline auto operator+(UserID e) noexcept { return libv::to_underlying(e); }
 
 // -------------------------------------------------------------------------------------------------
