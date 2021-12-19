@@ -34,6 +34,7 @@ Fleet* calculateHitFleet(SpaceCanvas& ctx) {
 	auto hover_distance = std::numeric_limits<float>::max();
 
 	for (Fleet& fleet : ctx.universe.galaxy.fleets) {
+		//TODO P4?: Readjusting is needed for multiple ship fleets (either multiple spheres, or an oblong/cuboid shape)
 		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet.position, 0.2f);
 
 		if (hit && (!directHit || distance < hover_distance)) {
@@ -150,9 +151,8 @@ void selectionSingle(SpaceCanvas& ctx, bool commitSelection) {
 			ctx.playout.process<CTO_FleetSelect>(fleet->id);
 		} else
 			fleet->selectionStatus = isSelected(*fleet) ? Fleet::Selection::selectedHoverSingle : Fleet::Selection::hoverSingle;
-	} else
-		if (commitSelection)
-			ctx.playout.process<CTO_FleetClearSelection>();
+	} else if (commitSelection)
+		ctx.playout.process<CTO_FleetClearSelection>();
 }
 
 // VERSION 1: Box selection in real 2.5D (on grid)
@@ -261,9 +261,8 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 	auto bn = (cn - x2 * right);
 	auto dn = (an + x2 * right);
 
-	//			const auto near = ctx.camera.near();
-	//			const auto far = ctx.camera.far();
-	const auto far = 15.f;
+	//const auto near = ctx.camera.near();
+	const auto far = ctx.camera.far() * 0.8f;
 	const auto near = 5.f;
 
 	const auto ann = normalize(an);
@@ -330,7 +329,7 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 				nbl, nbr, ntr, ntl, fbl, fbr, ftr, ftl,
 				{0.8f, 0, 1, 1}, {0.2f, 0.2f, 0.6f, 0.2f});
 
-//			{
+		//			{
 //				for (int i = -20 ; i < 20 ; ++i) {
 //					for (int j = -20 ; j < 20 ; ++j) {
 //						const auto result = frustum.sphereInFrustum({i, j, 0}, 0.25f);
@@ -487,11 +486,14 @@ void CanvasControl::update(SpaceCanvas& ctx, libv::time_duration delta_time) {
 	(void) delta_time;
 
 	switch (ctx.selectionMode) {
-	break; case SpaceCanvas::SelectionMode::none:
+		break;
+	case SpaceCanvas::SelectionMode::none:
 		selectionSingle(ctx, false);
-	break; case SpaceCanvas::SelectionMode::d25:
+		break;
+	case SpaceCanvas::SelectionMode::d25:
 		selection25D(ctx, false);
-	break; case SpaceCanvas::SelectionMode::d3:
+		break;
+	case SpaceCanvas::SelectionMode::d3:
 		selection3D(ctx, false);
 	}
 }

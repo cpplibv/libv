@@ -22,6 +22,10 @@
 #include <space/universe/planet.hpp>
 
 
+#include <libv/utility/random/uniform_distribution.hpp>
+#include <libv/utility/random/xoroshiro128.hpp>
+
+
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
@@ -177,6 +181,7 @@ public:
 	libv::vec3f position;
 	std::string name;
 //	libv::quat orientation;
+
 	std::vector<Command> commands;
 	Selection selectionStatus = Selection::notSelected;
 
@@ -186,6 +191,12 @@ public:
 	//soi_type sphere_of_influence;
 
 //	std::vector<Order> order_queue;
+	int32_t number_of_ships;
+//	int32_t number_of_big_ships = 3;
+//	int32_t number_of_medium_ships = 3;
+//	int32_t number_of_small_ships = 3;
+	float distance_travelled = 0;
+
 //	std::vector<Ship> ships;
 //	std::vector<Tank> tanks;
 
@@ -194,7 +205,13 @@ public:
 	Fleet(FleetID id, libv::vec3f position, std::shared_ptr<Faction> faction) :
 			id(id),
 			position(position),
-			faction(std::move(faction)) {}
+			faction(std::move(faction)) {
+
+		// <<< Random number of ships
+		auto rng = libv::xoroshiro128(+id);
+		auto dist = libv::make_uniform_distribution_inclusive(1, 5000);
+		number_of_ships = dist(rng);
+	}
 
 public:
 	template <class Archive> void serialize(Archive& ar) {
@@ -230,6 +247,7 @@ public:
 
 		const auto targetPosition = command.target();
 		const auto[len, dir] = (targetPosition - position).length_and_dir();
+		distance_travelled += std::min(movementProgress, len);
 
 		switch (command.type) {
 
@@ -239,7 +257,7 @@ public:
 				// TODO P3: Do not waste energy, roll the excess 'movement time' into the next command
 				commands.erase(commands.begin());
 			} else {
-				position += dir * dt;
+				position += dir * dt; //*speed, no?
 			}
 
 		break; case FleetCommandType::attack:

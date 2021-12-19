@@ -2,6 +2,8 @@
 
 #pragma once
 
+// libv
+#include <libv/math/vec.hpp>
 // std
 #include <cstdint>
 #include <vector>
@@ -12,6 +14,7 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 std::vector<double> noise_perlin_2D(uint64_t seed, uint32_t X, uint32_t Y);
+float perlin_sample(libv::vec2f coord);
 
 // -------------------------------------------------------------------------------------------------
 

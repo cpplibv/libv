@@ -40,6 +40,8 @@ building_result Colony::try_building(BuildingType type, libv::vec2i position) {
 }
 
 void Colony::update(sim_duration dt) {
+	(void) dt;
+
 	// TODO P1: Things that can affect production rate:
 	//      - Lobby base settings (Could be folded under Race)
 	//      - Race / Race Traits
@@ -107,7 +109,7 @@ void Colony::update(sim_duration dt) {
 //		}
 //	}
 
-	empire->balance += resources[BuildingResource::Upkeep] * dt.count();
+//	empire->balance += resources[BuildingResource::Upkeep] * dt.count();
 
 //	empire.production -= resources[BuildingResource::Upkeep] * dt;
 ////		empire.workforce -=

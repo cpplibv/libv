@@ -7,6 +7,8 @@
 #include <random>
 #include <algorithm>
 #include <numeric>
+//glm
+#include <glm/gtc/noise.hpp>
 
 
 namespace libv {
@@ -91,6 +93,10 @@ std::vector<double> noise_perlin_2D(uint64_t seed, uint32_t X, uint32_t Y) {
 		}
 	}
 	return value;
+}
+
+float perlin_sample(libv::vec2f coord){
+	return glm::perlin(glm::vec2{coord.x, coord.y});
 }
 
 // -------------------------------------------------------------------------------------------------
