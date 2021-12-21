@@ -19,6 +19,7 @@ class User;
 
 class Universe;
 class Galaxy;
+class Faction;
 class Planet;
 class Fleet;
 
@@ -49,10 +50,14 @@ class CTO_LobbyStatus;
 class CTO_FleetSpawn;
 class CTO_FleetSelect;
 class CTO_FleetSelectAdd;
+class CTO_FleetSelectBox;
 class CTO_FleetClearSelection;
-class CTO_FleetBoxSelect;
 class CTO_FleetMove;
-class CTO_FleetQueueMove;
+class CTO_FleetMoveQueue;
+class CTO_FleetAttackFleet;
+class CTO_FleetAttackFleetQueue;
+class CTO_FleetAttackPlanet;
+class CTO_FleetAttackPlanetQueue;
 class CTO_ClearFleets;
 class CTO_Shuffle;
 class CTO_PlanetSpawn;

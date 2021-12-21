@@ -311,8 +311,10 @@ wish_create_external(
 
 wish_create_external(
 	NAME cereal
-	GIT_REPOSITORY https://github.com/USCiLab/cereal.git
-	GIT_TAG 46a4a910077bf9e9f8327c8f6ea761c89b06da53
+	GIT_REPOSITORY https://github.com/VaderY/cereal.git
+	GIT_TAG f83778df4d2cad4e5ce0350a31893b3728bd10d2
+#	GIT_REPOSITORY /e/dev/cpp/forks/cereal
+#	GIT_TAG dev
 	CMAKE_ARGS
 		-DJUST_INSTALL_CEREAL=ON
 	DEFINE CEREAL_XML_STRING_VALUE="root"
@@ -962,7 +964,7 @@ wish_create_executable(
 	TARGET space
 	SOURCE app/space/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
-	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
 	LINK   libv_vm4
 	LINK   libv_sys
 )

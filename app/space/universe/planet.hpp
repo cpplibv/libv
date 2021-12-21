@@ -27,6 +27,10 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 struct Planet {
+public:
+	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
+
+public:
 	PlanetID id = invalidPlanetID;
 	libv::vec3f position;
 	std::string name;

@@ -29,8 +29,8 @@ using JSONInput = cereal::JSONInputArchive;
 using JSONOutput = cereal::JSONOutputArchive;
 
 class JSONAny;
-class JSONInputAny;
-class JSONOutputAny;
+class JSONAnyInput;
+class JSONAnyOutput;
 
 class XML;
 using XMLInput = cereal::XMLInputArchive;

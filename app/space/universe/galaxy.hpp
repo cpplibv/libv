@@ -68,14 +68,17 @@ public:
 		ar & LIBV_NVP(factions);
 		ar & LIBV_NVP(planets);
 		ar & LIBV_NVP(fleets);
-		ar & LIBV_NVP(selectedFleetIDList);
+		if (ar.isLocal())
+			ar & LIBV_NVP(selectedFleetIDList);
+//		else
+//			clear_and_or_maintain_the_selected_fleets_list();
 	}
 
 	Galaxy() {
 		// <<< app.space: Faction Maybe a lookup map? (Linear search most likely the fastest)
 		//			Maybe not shared_ptr? I dont think factions would be ever removed, at most they are marked as extinct
 		// <<< app.space: "Neutral" faction might be references a lot, make a hard coded getter (member) for it
-		factions.push_back(std::make_shared<Faction>(nextFactionID++, "Neutral"));
+		factions.push_back(std::make_shared<Faction>(nextFactionID++, "Neutral", libv::vec4f{0.65f, 0.70f, 0.70f, 0.8f}, libv::vec4f{0.4f, 0.4f, 0.4f, 1.f}));
 //		factions.push_back(std::make_shared<Faction>(nextFactionID++, "StoryTeller", aiController));
 //		factions.push_back(std::make_shared<Faction>(nextFactionID++, "AI", aiController));
 	}

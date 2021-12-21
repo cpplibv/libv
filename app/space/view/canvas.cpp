@@ -59,6 +59,7 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 		main_canvas(main_canvas),
 		game_session(game_session),
 		universe(game_session.universe),
+		controlledFaction{universe.galaxy.faction("Faction 1")}, // <<<
 		playout(game_session.playout),
 //		camera(camera),
 		screen_picker(camera.picker({100, 100})),
@@ -173,7 +174,7 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		std::string fleetLabel;
 
 		if (!fleet.commands.empty()) {
-			const auto direction = normalize(fleet.commands.front().target - fleet.position);
+			const auto direction = normalize(fleet.commands.front().target() - fleet.position);
 
 			float angle = std::atan2(direction.y, direction.x);
 			float angleZ = -std::asin(direction.z);
@@ -181,9 +182,10 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			angle += libv::pi * 0.5f; // <<< Model is incorrectly oriented
 
 			glr.model.rotate(libv::Radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
-			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
+//			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
+			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{1.0f, 0.0f, 0.0f}); // <<< Model is incorrectly oriented (rotation should be around Y)
 
-			fleetLabel = fmt::format("Fleet {}\nFaction {}\nI:{} D:{:.2f}", +fleet.id, +fleet.faction->id, +fleet.commands.front().type, (fleet.commands.front().target - fleet.position).length());
+			fleetLabel = fmt::format("Fleet {}\nFaction {}\nI:{} D:{:.2f}", +fleet.id, +fleet.faction->id, +fleet.commands.front().type, (fleet.commands.front().target() - fleet.position).length());
 		} else {
 			fleetLabel = fmt::format("Fleet {}\nFaction {}", +fleet.id, +fleet.faction->id);
 		}
@@ -194,7 +196,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 					fleet.position,
 					libv::vec2f{0, -15.f},
 					std::move(fleetLabel),
-					libv::vec4f{1.f, 1.f, 1.f, a}
+//					libv::vec4f{1.f, 1.f, 1.f, a}
+					fleet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
 			);
 
 		renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
@@ -212,7 +215,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 					planet.position,
 					libv::vec2f{0, -15.f},
 					fmt::format("Planet {}\nFaction {}", +planet.id, +planet.faction->id),
-					libv::vec4f{1.f, 1.f, 1.f, a}
+//					libv::vec4f{1.f, 1.f, 1.f, a}
+					planet.faction->colorPrimary * libv::vec4f{1.f, 1.f, 1.f, a}
 			);
 	}
 
@@ -239,8 +243,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 		auto prev = fleet.position;
 		for (const auto& command : fleet.commands) {
-			renderer.arrow.add_arrow(prev, command.target, convert_to_arrow_style(command.type));
-			prev = command.target;
+			const auto targetPosition = command.target();
+			renderer.arrow.add_arrow(prev, targetPosition, convert_to_arrow_style(command.type));
+			prev = targetPosition;
 		}
 	}
 

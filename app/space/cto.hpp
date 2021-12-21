@@ -172,21 +172,21 @@ struct CTO_FleetSelectAdd {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_FleetBoxSelect {
+struct CTO_FleetClearSelection {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{33};
+
+	LIBV_REFLECTION_EMPTY();
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_FleetSelectBox {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{34};
 
 	std::vector<FleetID> fleetIDs;
 
 	LIBV_REFLECTION_ACCESS(fleetIDs);
-	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-};
-
-struct CTO_FleetClearSelection {
-	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{34};
-
-	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
@@ -200,7 +200,7 @@ struct CTO_FleetMove {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_FleetQueueMove {
+struct CTO_FleetMoveQueue {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{36};
 
@@ -210,9 +210,49 @@ struct CTO_FleetQueueMove {
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
 };
 
-struct CTO_ClearFleets {
+struct CTO_FleetAttackFleet {
 	using state_command = void;
 	static constexpr libv::serial::CodecMessageID id{37};
+
+	FleetID targetFleetID;
+
+	LIBV_REFLECTION_ACCESS(targetFleetID);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_FleetAttackFleetQueue {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{38};
+
+	FleetID targetFleetID;
+
+	LIBV_REFLECTION_ACCESS(targetFleetID);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_FleetAttackPlanet {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{39};
+
+	PlanetID targetPlanetID;
+
+	LIBV_REFLECTION_ACCESS(targetPlanetID);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_FleetAttackPlanetQueue {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{40};
+
+	PlanetID targetPlanetID;
+
+	LIBV_REFLECTION_ACCESS(targetPlanetID);
+	LIBV_SERIALIZATION_ENABLE_REFLECTION();
+};
+
+struct CTO_ClearFleets {
+	using state_command = void;
+	static constexpr libv::serial::CodecMessageID id{41};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
@@ -220,7 +260,7 @@ struct CTO_ClearFleets {
 
 struct CTO_Shuffle {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{38};
+	static constexpr libv::serial::CodecMessageID id{42};
 
 	uint64_t seed;
 
@@ -230,7 +270,7 @@ struct CTO_Shuffle {
 
 struct CTO_PlanetSpawn {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{39};
+	static constexpr libv::serial::CodecMessageID id{43};
 
 //	FactionID factionID;
 //	FleetID fleetID;
@@ -242,7 +282,7 @@ struct CTO_PlanetSpawn {
 
 struct CTO_ClearPlanets {
 	using state_command = void;
-	static constexpr libv::serial::CodecMessageID id{40};
+	static constexpr libv::serial::CodecMessageID id{44};
 
 	LIBV_REFLECTION_EMPTY();
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();

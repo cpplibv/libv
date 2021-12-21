@@ -50,7 +50,13 @@ libv.rev: Bloom textures should not repeat, they could clamp
 app.space: F1 menu, list every control bindings
 app.space: Implement basic 2D text rendering over a 3D anchor point
 app.space: Implement Universe Snapshots
-
+app.space: Modernize and integrate model rendering for ships in fleets
+app.space: Fleet visual: Generate random number of ships and position them appropriately (simple mesh)
+app.space: Serialization of pointers/views
+app.space: Serialization of Snapshots in isLocal/isShared mode
+app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
+app.space: Planets
+app.space: Factions
 
 
 
@@ -71,15 +77,24 @@ app.space: Implement Universe Snapshots
 
 
 
-app.space: Debug views and grid on/off (and other options) with persistence
 
-app.space: Map generation
 
-app.space: Direction idea:
-		Create a working UI mockup project
-		Create a working sim mockup project
-		Create a working render mockup project
-		Merge them
+app.space: Fleet Attack / Follow commands on Planets / Fleets
+	!!! Wtf am I even doing, fleet / planet are not stored in a memory stable container!
+
+
+Serialization archive with context:
+	the best solution would be nested encapsulation
+	-> so when serializing universe, it creates a nested serializer
+		-> [This could even be a side channel, if must (aka extra arg)]
+	\ This generally takes care of many issues, so this solution is preferred
+
+
+
+document the const_cast
+document the pointer write back better
+refine the file placement of stuff
+
 
 
 
@@ -87,13 +102,43 @@ app.space: Direction idea:
 
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
-app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
-		| Solution: Special archives with members to indicate the reason for the serialization, and inside the serializers branching on this info
-		| Disadvantage: 'Local' members makes the otherwise immutable view for universe mutable
+
+app.space: Simulation (container / master controller object)
+			A new container object/class that has the universe in it
+			Process functions are the member of the simulation
+
+app.space: Simulation time control
+	app.space: Pause, Unpause (It will be a good practise for timers and controls)
+	app.space: Speed x1 x2 x4
+	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
+
+app.space: Debug views and grid on/off (and other options) with persistence
 
 
 
 
+
+
+
+app.space: Galaxy generation (scripted)
+
+
+
+-----------------------------------------------------------------
+
+app.space: Formation
+		Float, slight movement, perlin noise based on position? and or time
+		Single ship join the fleet
+		Fleet-fleet merge
+
+-----------------------------------------------------------------
+
+
+app.space: Direction idea:
+		Create a working UI mockup project
+		Create a working sim mockup project
+		Create a working render mockup project
+		Merge them
 
 
 
@@ -105,14 +150,17 @@ app.space: Controls: Clicking and rotating the camera it deselects
 
 
 
-
-Bug P1: repeated smashing of host/join can cause failure
-		| Also: Simple disconnect as a non connected client will do long timeout
 Bug P1: app.space: "Space" title button is mouse shielded by the canvas
 		| Maybe mouse movement only | Dont think so
 			Should be a mouse order issue
+Bug P1: repeated smashing of host/join can cause failure
+		| Also: Simple disconnect as a non connected client will do long timeout
 Bug P3: app.space: Model loading failure causes silent error and soft-lock
 			Who catches that exception and why?
+		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
+			So it looks like any exception (what is interesting that it kills the thread)
+
+
 Performance Bug P4: app.space: 200*200 debug sphere causes low fps
 		| debug shapes have to switch to pre-uploaded meshes
 
@@ -120,10 +168,10 @@ Performance Bug P4: app.space: 200*200 debug sphere causes low fps
 
 
 
-Main areas of focus: Cost / Value
+Main areas of focus:
 	40 / 6: Control: Ctrl box selection support
 			| Maybe enough if we switch to binary feature for now
-				Good start, but need some working on the conflict
+				Good start, but need some working on the conflicts
 
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
@@ -133,10 +181,9 @@ Main areas of focus: Cost / Value
 	app.space: Main menu
 	app.space: In game menu
 	app.space: Multiplayer lobby list
-	app.space: Planets
 	app.space: Map generation with lua
-	app.space: Factions
-	libv.ui: Component / Style composition
+	libv.ui: Component / Style composition (Tabs component)
+
 
 
 libv.rev: PostProcess should respect original framebuffer and viewport values
@@ -168,9 +215,6 @@ place.it:
 
 	fmt::print("{}", container);
 	fmt::print("{}", container | view::join(":"));
-
-watch.it:
-	vue cc - https://www.youtube.com/watch?v=qZXt1Aom3Cs
 
 
 
@@ -211,12 +255,6 @@ app.space.net: Networking PAPER:
 		adaptive playout delay
 
 
-
-app.space: Simulation time control
-	app.space: Pause, Unpause (It will be a good practise for timers and controls)
-	app.space: Speed x1 x2 x4
-	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
-
 app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, investigate it)
 
 
@@ -226,22 +264,22 @@ app.space: Cannibalize config.hpp from vm4_viewer (but maybe change it to CTRP, 
 
 
 
-
-
-
-CI/CD:
-	jenkins: pull
-	jenkins: build (parameterized with branch and version number (and git commit count))
-	jenkins: package
-	jenkins: ssh upload the release package to the update master
-	jenkins: trigger the update master
-	update-master: by default every release marked as internal
-	update-master: on some GUI mark this release not internal and mark update routes to be built
-	jenkins could ping update-master on build start (option to auto release feature)
+place.it:
+	CI/CD:
+		jenkins: pull
+		jenkins: build (parameterized with branch and version number (and git commit count))
+		jenkins: package
+		jenkins: ssh upload the release package to the update master
+		jenkins: trigger the update master
+		update-master: by default every release marked as internal
+		update-master: on some GUI mark this release not internal and mark update routes to be built
+		jenkins could ping update-master on build start (option to auto release feature)
 
 
 app.space: Simulation
 	app.space: On fleet command completion in chain: Do not waste energy, roll the excess 'movement time' into the next command
+
+
 
 app.space: RendererDebug
 	DONE: color property
@@ -257,32 +295,45 @@ app.space: RendererDebug
     arrow (not command arrow, but a 3D arrow model)
     2D shapes in screen space(point, triangle, line, circle)
 
-app.space: Fleet merge/follow/attack commands
+app.space: Fleet merge commands
+	Fleet dtor has to cleanup references to it, tracking should be upon us
+
+app.space: Selection
 	app.space: 3D fleet box selection:
 		a: local coordinates starting anchor
 		b: world space starting anchor
 	app.space: 2.5D fleet box selection:
 		a: rectangle selection on grid
-		b: frustum selection (TODO: plane model: 4 float, frustum model)
-		edge case: inf (clicking on sky, negative testing)
+		b: frustum selection
 
-	app.space: hover fleet highlight
-		not selected - not Network
-        primary/secondary hit hover - not Network
-        box hover - not Network
-        selected - Network
-	app.space: deselect
+	TODO P3: Selection Single: Expand / Invert / Subtract to current selection
+	TODO P2: Selection 2.5D: Handle cases when the camera is on the z=0 plane and/or the users clicks to +/- inf
+	TODO P3: Selection 2.5D: Use hitbox in intersection mode
+	TODO P4: Selection 2.5D: Use hitbox in full contain mode
+	TODO P3: Selection 2.5D: Variant: Implement both column selection and frustum selection based on the grid coordinates
+	TODO P3: Selection 2.5D: Expand / Invert / Subtract to current selection
+	TODO P2: Selection 3D: Handle cases where box is drawn in a BL<->TR direction causes no selection
+	TODO P2: Selection 3D: Handle case where staring and ending the box on the same frame causes everyone to be selected
+	TODO P4: Selection 3D: Variant (Figure out what was the 2 variant, maybe full contain and intersect?)
+	TODO P4: Selection 3D: Cleanup a little bit
+	TODO P3: Selection 3D: Expand / Invert / Subtract to current selection
+
+	TODO P3: * Expand / Invert / Subtract to current selection means ->
+			Box selections should not deselect by default
+
+	TODO P2: libv.ctrl: Upon leave context, (box selection) binary features may want to receive a deactivate call
+				| NOTE: This would conflict with binary false in selection, bc this time selection shouldn't commit
+					So not tri bool: True, False, Cancel?
+				| Thinking about it, starting a box select can be considered as an intent to replace current selection, so global deselect is reasonable
 
 
-	//app.space: Fleet factions
 app.space: Selection structure
 	- General API over the current selection whatever types those maybe, whatever API client code might need
-	-it can go into GameState as well as Universe
+	- It can go into Simulation / GameState as well as Universe
 
 
 
-
-app.space: Main structure paper OUTDATED
+app.space: Main structure paper ! OUTDATED !
 
 	game instance (desktop) - GameInstance (an object spawned when you launch the application and that remains the same until you close it)
 		frame
@@ -321,18 +372,18 @@ app.space: Main structure paper OUTDATED
 
 app.space: Self-Updater
 
-app.space: frustum visualization
+app.space: Frustum visualization
+
+app.space: Camera: Pressing the camera alteration (move/rotate) in one direction for long time (>1-3s) increases speed
 app.space: Add multi camera / camera frustum visualization (uniforms and C++ clipping from the main camera, but view from another)
-app.space: Camera: Pressing the camera alteration in one direction for long time (>1-3s) increase speed
 
 app.space: Optimized VAO update for command arrows (prepare / render step is done, mesh re-upload and glr side should be checked)
 
-app.space: Fleet name display (UI Label / Unit plates) 2D<->3D UI layout
-app.space: Fleet visualization (render separate ships and group art)
-	app.space: Generate random number of ships and position them appropriately (simple mesh)
+app.space: Fleet visualization
+	app.space: Render fleet group art
 	app.space: Movement, momentum, turning
 	app.space: Different fleet shapes (?blockade as shape)
-	app.space: Modernize and integrate model rendering for ships in fleets (from vm4_viewer)
+	app.space: Fleet name display (UI Label / Unit plates) 2D<->3D UI layout
 
 
 app.space: Command arrow improvements
@@ -341,16 +392,14 @@ app.space: Command arrow improvements
 	app.space: Arrow strip placement control from lua (or something lua related) (With auto reload and everything)
 	app.space.visual: Command arrow add a glossy holo texture (~simple cloud mixture) to the arrows body (idea come from flowstorm's checkpoint body)
 	app.space.visual: Command arrow make the edges less bright to help with AA edge
+	app.space.debug: Make the debug command arrow shapes more uniform
+	app.space.debug: Make the debug command arrow shapes hooked into the options / settings / config persistent storage
 
 app.space: Line shader (Geometry shader with custom width support) (<1px width = transparency at 1 px)
-
-app.space: Iris and space has to merge in some way
-	iris: Make a main menu
 
 app.space: headless server
 	To optimize the binary size and skip linking in shit for headless,
 	a separate executable needed without any symbol usage of non-headless gamemode
-
 
 
 visual.shader: glow net: https://www.youtube.com/watch?v=3CycKKJiwis

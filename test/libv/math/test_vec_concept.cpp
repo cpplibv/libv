@@ -9,7 +9,7 @@
 // std
 #include <string>
 // pro
-#include <libv/concept/vec.hpp>
+#include <libv/math/vec_concept.hpp>
 #include <libv/math/vec.hpp>
 
 

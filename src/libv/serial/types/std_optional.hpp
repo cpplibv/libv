@@ -27,9 +27,8 @@ inline void load(Archive& ar, std::optional<T>& optional) {
 	if (!has_value) {
 		optional.reset();
 	} else {
-		T value;
-		ar & LIBV_NVP_NAMED("value", value);
-		optional.emplace(std::move(value));
+		optional.emplace();
+		ar & LIBV_NVP_NAMED("value", *optional);
 	}
 }
 

@@ -3,7 +3,7 @@
 #pragma once
 
 // libv
-#include <libv/math/vec.hpp> // fwdable
+#include <libv/math/vec_fwd.hpp>
 #include <libv/utility/random/xoroshiro128.hpp> // fwdable
 // pro
 #include <space/fwd.hpp>

@@ -8,13 +8,21 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-class JSONInputAny;
-class JSONOutputAny;
+template <typename CRTP> class BasicJSONAnyInput;
+template <typename CRTP> class BasicJSONAnyOutput;
 
-struct JSONAny {
-	using input = JSONInputAny;
-	using output = JSONOutputAny;
+template <typename CRTP = void>
+struct BasicJSONAny {
+	using input = BasicJSONAnyInput<CRTP>;
+	using output = BasicJSONAnyOutput<CRTP>;
 };
+
+// -------------------------------------------------------------------------------------------------
+
+using JSONAnyInput = BasicJSONAnyInput<void>;
+using JSONAnyOutput = BasicJSONAnyOutput<void>;
+
+using JSONAny = BasicJSONAny<void>;
 
 // -------------------------------------------------------------------------------------------------
 

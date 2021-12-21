@@ -16,9 +16,8 @@ namespace detail {
 template <std::size_t N, typename Archive, typename... Types>
 inline void libv_load_std_variant(std::size_t index, Archive& ar, std::variant<Types...>& variant) {
 	if (N == index) {
-		std::variant_alternative_t<N, std::variant<Types...>> value;
-		ar & LIBV_NVP(value);
-		variant = std::move(value);
+		variant.template emplace<N>();
+		ar & LIBV_NVP_NAMED("value", std::get<N>(variant));
 	} else if constexpr (N + 1 < sizeof...(Types))
 		libv_load_std_variant<N + 1>(index, ar, variant);
 }
@@ -47,6 +46,10 @@ inline void load(Archive& ar, std::variant<Types...>& variant) {
 
 	detail::libv_load_std_variant<0>(index, ar, variant);
 }
+
+/// Serializing a std::monostate
+template <class Archive>
+void CEREAL_SERIALIZE_FUNCTION_NAME(Archive&, const std::monostate&) {}
 
 // -------------------------------------------------------------------------------------------------
 

@@ -19,9 +19,12 @@
 
 // Save/Load related
 #include <libv/serial/archive/binary.hpp>
+#include <libv/serial/archive/json_any.hpp>
+#include <libv/serial/archive/json.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 #include <space/game_session.hpp>
+#include <space/universe/engine/snapshot_archive.hpp>
 #include <space/universe/universe.hpp>
 
 
@@ -35,10 +38,17 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		std::vector<std::byte> save_data;
 
 		{
-			libv::archive::Binary::output oar(save_data);
+			SnapshotArchive<libv::archive::BasicBinaryOutput> oar{true, save_data};
 			ctx.game_session->universe.save(oar);
-			// ctx.game_session->playout.save(oar);
 		}
+//		{
+//			std::string debug_data;
+//			{
+//				SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(true, debug_data);
+//				oar & LIBV_NVP_NAMED("universe", ctx.game_session->universe);
+//			}
+//			log_space.info("Saved data: {}", debug_data);
+//		}
 
 		libv::write_file_or_throw("universe.sav", save_data);
 		// <<< handle write error
@@ -52,9 +62,9 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		// <<< handle read error
 
 		{
-			libv::archive::Binary::input iar(save_data);
-			ctx.game_session->universe.load(iar);
-			// ctx.game_session->playout.load(iar);
+			SnapshotArchive<libv::archive::BasicBinaryInput> iar{true, save_data};
+
+			iar & LIBV_NVP_NAMED("universe", ctx.game_session->universe);
 		}
 
 		log_space.info("Loaded: {}", "universe.sav");

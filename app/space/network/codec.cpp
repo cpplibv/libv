@@ -17,9 +17,12 @@ std::string debug_binary_as_json(std::span<const std::byte> message) {
 	std::string result;
 
 	try {
+//		libv::archive::Binary::input iar(message);
+//		libv::archive::JSONAny::output oar(result);
 
-		libv::archive::Binary::input iar(message);
-		libv::archive::JSONAny::output oar(result);
+		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
+		SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(false, result);
+
 		network_codec.decode(iar, [&oar](const auto& object) {
 			network_codec.encode(oar, object);
 		});

@@ -8,7 +8,7 @@
 #include <cmath>
 #include <ostream> // Remove include after https://github.com/fmtlib/fmt/issues/2449 is resolved
 // pro
-#include <libv/concept/vec.hpp>
+#include <libv/math/vec_concept.hpp>
 
 
 // TODO P1: Modify (bool operator<) to (vec<bool, N> operator<)

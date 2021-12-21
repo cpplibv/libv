@@ -624,6 +624,11 @@ libv: Move from std::holds_alternative to std::get_if
 
 
 
+ext: lexy https://github.com/foonathan/lexy
+		try out / adopt
+		AMAZING Parser lib
+		https://www.youtube.com/watch?v=Cb0j6DVmwzY
+
 
 
 ext: adopt https://github.com/olegpublicprofile/stdfwd

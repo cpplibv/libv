@@ -45,12 +45,18 @@ struct Codec : libv::serial::Codec3<Codec> {
 				create_entry<Ar, F, CTO_FleetSpawn>(),
 				create_entry<Ar, F, CTO_FleetSelect>(),
 				create_entry<Ar, F, CTO_FleetSelectAdd>(),
+				create_entry<Ar, F, CTO_FleetSelectBox>(),
 				create_entry<Ar, F, CTO_FleetClearSelection>(),
-				create_entry<Ar, F, CTO_FleetBoxSelect>(),
 				create_entry<Ar, F, CTO_FleetMove>(),
-				create_entry<Ar, F, CTO_FleetQueueMove>(),
+				create_entry<Ar, F, CTO_FleetMoveQueue>(),
+				create_entry<Ar, F, CTO_FleetAttackFleet>(),
+				create_entry<Ar, F, CTO_FleetAttackFleetQueue>(),
+				create_entry<Ar, F, CTO_FleetAttackPlanet>(),
+				create_entry<Ar, F, CTO_FleetAttackPlanetQueue>(),
 				create_entry<Ar, F, CTO_ClearFleets>(),
 				create_entry<Ar, F, CTO_Shuffle>(),
+				create_entry<Ar, F, CTO_PlanetSpawn>(),
+				create_entry<Ar, F, CTO_ClearPlanets>(),
 
 				create_entry<Ar, F, CTO_TrackView>(),
 				create_entry<Ar, F, CTO_CameraWarpTo>(),
@@ -70,7 +76,9 @@ template <typename T>
 std::vector<std::byte> network_encode(const T& message) {
 	std::vector<std::byte> result;
 	{
-		libv::archive::Binary::output oar(result);
+//		UniverseArchive<libv::archive::Binary::output> oar{universe, true, result};
+//		libv::archive::Binary::output oar(result);
+		SnapshotArchive<libv::archive::BasicBinaryOutput> oar{false, result};
 		network_codec.encode(oar, message);
 	}
 	return result;
@@ -79,7 +87,9 @@ std::vector<std::byte> network_encode(const T& message) {
 template <typename F>
 void network_decode(std::span<const std::byte> message, F& handler) {
 	{
-		libv::archive::Binary::input iar(message);
+//		UniverseArchive<libv::archive::Binary::input> iar{universe, true, message};
+//		libv::archive::Binary::input iar(message);
+		SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, message};
 		network_codec.decode(iar, handler);
 	}
 }

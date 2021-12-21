@@ -70,7 +70,9 @@ private:
 		log_space.trace("[{}] on_receive:\n{}", name, debug_binary_as_json(m.as_bin()));
 
 		try {
-			libv::archive::Binary::input iar(m.as_bin());
+//			UniverseArchive<libv::archive::Binary::input> iar{universe, false, m.as_bin()};
+//			libv::archive::Binary::input iar(m.as_bin());
+			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
 			network_codec.decode(iar, [this]<typename T>(T&& message) {
 				if constexpr(std::is_same_v<T, SnapshotLobby>)
 					lobby.process(std::move(message));

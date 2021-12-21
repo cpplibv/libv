@@ -4,6 +4,7 @@
 #include <space/universe/generation/generation.hpp>
 // libv
 #include <libv/math/constants.hpp>
+#include <libv/math/vec.hpp>
 #include <libv/utility/random/normal_distribution.hpp>
 #include <libv/utility/random/uniform_distribution.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>

@@ -46,24 +46,6 @@ void Universe::debug() {
 
 // -------------------------------------------------------------------------------------------------
 
-void Universe::save(libv::archive::Binary::output& ar) const {
-	const_cast<Universe*>(this)->aux_serialize(ar);
-}
-
-void Universe::save(libv::archive::JSONAny::output& ar) const {
-	const_cast<Universe*>(this)->aux_serialize(ar);
-}
-
-void Universe::load(libv::archive::Binary::input& ar) {
-	aux_serialize(ar);
-}
-
-void Universe::load(libv::archive::JSONAny::input& ar) {
-	aux_serialize(ar);
-}
-
-// -------------------------------------------------------------------------------------------------
-
 void Universe::process(CTO_FleetSpawn&& cto) {
 	// Permission check
 	// Bound check
@@ -72,7 +54,8 @@ void Universe::process(CTO_FleetSpawn&& cto) {
 
 	// !!! Synchronized FleetID generation
 
-	auto dist = libv::make_uniform_distribution_inclusive(0, 2);
+	// <<< Random faction assignments, and yeah, random string generation
+	auto dist = libv::make_uniform_distribution_inclusive(0, 6);
 	auto faction = galaxy.faction("Faction " + std::to_string(dist(universe_rng)));
 	galaxy.fleets.emplace_back(galaxy.nextFleetID++, cto.position, std::move(faction));
 }
@@ -90,17 +73,17 @@ void Universe::process(CTO_FleetSelectAdd&& cto) {
 	galaxy.selectedFleetIDList.insert(cto.fleetID);
 }
 
-void Universe::process(CTO_FleetBoxSelect&& cto) {
-	// Permission check
-	// Bound check
-	galaxy.selectedFleetIDList.clear();
-	galaxy.selectedFleetIDList.insert(cto.fleetIDs.begin(), cto.fleetIDs.end());
-}
-
 void Universe::process(CTO_FleetClearSelection&&) {
 	// Permission check
 	// Bound check
 	galaxy.selectedFleetIDList.clear();
+}
+
+void Universe::process(CTO_FleetSelectBox&& cto) {
+	// Permission check
+	// Bound check
+	galaxy.selectedFleetIDList.clear();
+	galaxy.selectedFleetIDList.insert(cto.fleetIDs.begin(), cto.fleetIDs.end());
 }
 
 void Universe::process(CTO_FleetMove&& cto) {
@@ -111,13 +94,13 @@ void Universe::process(CTO_FleetMove&& cto) {
 		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
 		if (!fleet)
 			continue;
-		// TODO P3: Use a command API of the fleet
-		fleet->commands.clear();
-		fleet->commands.emplace_back(cto.target_position, FleetCommandType::movement);
+
+		fleet->clearCommandQueue();
+		fleet->queueMoveTo(cto.target_position);
 	}
 }
 
-void Universe::process(CTO_FleetQueueMove&& cto) {
+void Universe::process(CTO_FleetMoveQueue&& cto) {
 	// Permission check
 	// Bound check
 	for (const auto& fleetID : galaxy.selectedFleetIDList) {
@@ -125,8 +108,78 @@ void Universe::process(CTO_FleetQueueMove&& cto) {
 		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
 		if (!fleet)
 			continue;
-		// TODO P3: Use the command API of the fleet
-		fleet->commands.emplace_back(cto.target_position, FleetCommandType::movement);
+
+		fleet->queueMoveTo(cto.target_position);
+	}
+}
+
+void Universe::process(CTO_FleetAttackFleet&& cto) {
+	// Permission check
+	// Bound check
+	auto target = libv::linear_find_optional(galaxy.fleets, cto.targetFleetID, &Fleet::id);
+	if (!target)
+		return;
+
+	for (const auto& fleetID : galaxy.selectedFleetIDList) {
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+
+		fleet->clearCommandQueue();
+		fleet->queueAttack(target);
+	}
+}
+
+void Universe::process(CTO_FleetAttackFleetQueue&& cto) {
+	// Permission check
+	// Bound check
+	auto target = libv::linear_find_optional(galaxy.fleets, cto.targetFleetID, &Fleet::id);
+	if (!target)
+		return;
+
+	for (const auto& fleetID : galaxy.selectedFleetIDList) {
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+
+		fleet->queueAttack(target);
+	}
+}
+
+void Universe::process(CTO_FleetAttackPlanet&& cto) {
+	// Permission check
+	// Bound check
+	auto target = libv::linear_find_optional(galaxy.planets, cto.targetPlanetID, &Planet::id);
+	if (!target)
+		return;
+
+	for (const auto& fleetID : galaxy.selectedFleetIDList) {
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+
+		fleet->clearCommandQueue();
+		fleet->queueAttack(target);
+	}
+}
+
+void Universe::process(CTO_FleetAttackPlanetQueue&& cto) {
+	// Permission check
+	// Bound check
+	auto target = libv::linear_find_optional(galaxy.planets, cto.targetPlanetID, &Planet::id);
+	if (!target)
+		return;
+
+	for (const auto& fleetID : galaxy.selectedFleetIDList) {
+		// TODO P1: O(n^2), because selection stored as IDs
+		auto fleet = libv::linear_find_optional(galaxy.fleets, fleetID, &Fleet::id);
+		if (!fleet)
+			continue;
+
+		fleet->queueAttack(target);
 	}
 }
 
@@ -143,7 +196,8 @@ void Universe::process(CTO_Shuffle&& cto) {
 	// Bound check
 	auto positions = std::vector<libv::vec3f>{};
 	for (const auto& fleet : galaxy.fleets)
-		positions.emplace_back(fleet.commands.empty() ? fleet.position : fleet.commands.back().target);
+//		positions.emplace_back(fleet.commands.empty() ? fleet.position : fleet.commands.back().target);
+		positions.emplace_back(fleet.position);
 
 	auto rng = libv::xoroshiro128(cto.seed);
 
@@ -152,8 +206,13 @@ void Universe::process(CTO_Shuffle&& cto) {
 	auto dst = libv::make_uniform_distribution_inclusive(0, 1);
 	for (std::size_t i = 0; i < positions.size(); ++i) {
 		auto& fleet = galaxy.fleets[i];
-		fleet.commands.clear();
-		fleet.commands.emplace_back(positions[i], dst(rng) ? FleetCommandType::movement : FleetCommandType::attack);
+		fleet.clearCommandQueue();
+		if (dst(rng))
+			fleet.queueAttack(positions[i]);
+		else
+			fleet.queueMoveTo(positions[i]);
+//		fleet.commands.clear();
+//		fleet.commands.emplace_back(positions[i], dst(rng) ? FleetCommandType::movement : FleetCommandType::attack);
 	}
 }
 

@@ -23,7 +23,7 @@ namespace {
 
 // -------------------------------------------------------------------------------------------------
 
-Fleet* calculate_hit_fleet(SpaceCanvas& ctx) {
+Fleet* calculateHitFleet(SpaceCanvas& ctx) {
 	bool directHit = false;
 	Fleet* fleetHit = nullptr;
 
@@ -55,6 +55,68 @@ Fleet* calculate_hit_fleet(SpaceCanvas& ctx) {
 	return fleetHit;
 }
 
+auto calculateHit(SpaceCanvas& ctx) {
+	struct Result {
+		Planet* planetHit = nullptr;
+		Fleet* fleetHit = nullptr;
+		libv::vec3f worldCoord;
+	} result;
+
+	bool directHit = false;
+
+	const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
+	const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
+	const auto mouse_ray_pos = ctx.camera.eye();
+
+	auto hover_distance = std::numeric_limits<float>::max();
+
+	for (Planet& planet : ctx.universe.galaxy.planets) {
+		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, planet.position, 0.2f);
+
+		if (hit && (!directHit || distance < hover_distance)) {
+			directHit = true;
+			result.planetHit = &planet;
+			hover_distance = distance;
+
+		} else if (!directHit) {
+			const auto objectSPosition = ctx.screen_picker.to_screen(planet.position);
+			distance = (mouse_local_coord - objectSPosition).length();
+
+			if (distance < hover_distance && distance < Planet::pickingType.radius_screen) {
+				result.planetHit = &planet;
+				hover_distance = distance;
+			}
+		}
+	}
+
+	for (Fleet& fleet : ctx.universe.galaxy.fleets) {
+		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet.position, 0.2f);
+
+		if (hit && (!directHit || distance < hover_distance)) {
+			directHit = true;
+			result.fleetHit = &fleet;
+			hover_distance = distance;
+
+		} else if (!directHit) {
+			const auto objectSPosition = ctx.screen_picker.to_screen(fleet.position);
+			distance = (mouse_local_coord - objectSPosition).length();
+
+			if (distance < hover_distance && distance < Fleet::pickingType.radius_screen) {
+				result.fleetHit = &fleet;
+				hover_distance = distance;
+			}
+		}
+	}
+
+	if (result.fleetHit)
+		result.planetHit = nullptr;
+
+	if (!result.fleetHit && !result.planetHit)
+		result.worldCoord = libv::intersect_ray_plane(mouse_ray_pos, mouse_ray_dir, libv::vec3f(0, 0, 0), libv::vec3f(0, 0, 1));
+
+	return result;
+}
+
 libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 	const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 	const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -66,22 +128,8 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 
 // -------------------------------------------------------------------------------------------------
 
-// TODO P2: Selection 2.5D: Handle cases when the camera is on the z=0 plane and/or the users clicks to +/- inf
-// TODO P3: Selection 2.5D: Use hitbox in intersection mode
-// TODO P4: Selection 2.5D: Use hitbox in full contain mode
-// TODO P3: Selection 2.5D: Variant: Implement both column selection and frustum selection based on the grid coordinates
-// TODO P2: Selection 3D: Handle cases where box is drawn in a BL<->TR direction causes no selection
-// TODO P2: Selection 3D: Handle case where staring and ending the box on the same frame causes everyone to be selected
-// TODO P4: Selection 3D: Variant (Figure out what was the 2 variant, maybe full contain and intersect?)
-// TODO P4: Selection 3D: Cleanup a little bit
-
-// TODO P2: libv.ctrl: Upon leave context, (box selection) binary features may want to receive a deactivate call
-//				| NOTE: This would conflict with binary false in selection, bc this time selection shouldn't commit
-//					So not tri bool: True, False, Cancel?
-//				| Thinking about it, starting a box select can be considered as an intent to replace current selection, so global deselect is reasonable
-
 void selectionSingle(SpaceCanvas& ctx, bool commitSelection) {
-	auto* fleet = calculate_hit_fleet(ctx);
+	auto* fleet = calculateHitFleet(ctx);
 
 	const auto isSelected = [](const auto& fl) {
 		return fl.selectionStatus == Fleet::Selection::selected ||
@@ -151,7 +199,7 @@ void selection25D(SpaceCanvas& ctx, bool commitSelection) {
 	}
 
 	if (commitSelection)
-		ctx.playout.process<CTO_FleetBoxSelect>(std::move(selectedFleetIDs));
+		ctx.playout.process<CTO_FleetSelectBox>(std::move(selectedFleetIDs));
 
 	// Debug visualization
 	if (true) {
@@ -260,7 +308,7 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 	}
 
 	if (commitSelection)
-		ctx.playout.process<CTO_FleetBoxSelect>(std::move(selectedFleetIDs));
+		ctx.playout.process<CTO_FleetSelectBox>(std::move(selectedFleetIDs));
 
 	if (true) {
 		ctx.clear_debug_shapes();
@@ -331,7 +379,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 
 	controls.feature_action<SpaceCanvas>("space.select_fleet_add", [](const auto&, SpaceCanvas& ctx) {
-		auto* fleet = calculate_hit_fleet(ctx);
+		auto* fleet = calculateHitFleet(ctx);
 		if (fleet) {
 			fleet->selectionStatus = Fleet::Selection::selected;
 			ctx.playout.process<CTO_FleetSelectAdd>(fleet->id);
@@ -345,7 +393,49 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 	controls.feature_action<SpaceCanvas>("space.queue_move_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto world_coord = calculate_world_coord(ctx);
-		ctx.playout.process<CTO_FleetQueueMove>(world_coord);
+		ctx.playout.process<CTO_FleetMoveQueue>(world_coord);
+	});
+
+	controls.feature_action<SpaceCanvas>("space.order_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
+		const auto mouse = calculateHit(ctx);
+		if (mouse.fleetHit) {
+			if (ctx.controlledFaction->canAttack(*mouse.fleetHit->faction))
+				ctx.playout.process<CTO_FleetAttackFleet>(mouse.fleetHit->id);
+			else
+				// <<< Not complete, Merge? Land? Go there? go near, or something
+				ctx.playout.process<CTO_FleetMove>(mouse.fleetHit->position);
+
+		} else if (mouse.planetHit) {
+			if (ctx.controlledFaction->canAttack(*mouse.planetHit->faction))
+				ctx.playout.process<CTO_FleetAttackPlanet>(mouse.planetHit->id);
+			else
+				// <<< Not complete, Merge? Land? Go there? go near, or something
+				ctx.playout.process<CTO_FleetMove>(mouse.planetHit->position);
+
+		} else {
+			ctx.playout.process<CTO_FleetMove>(mouse.worldCoord);
+		}
+	});
+
+	controls.feature_action<SpaceCanvas>("space.queue_order_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
+		const auto mouse = calculateHit(ctx);
+		if (mouse.fleetHit) {
+			if (ctx.controlledFaction->canAttack(*mouse.fleetHit->faction))
+				ctx.playout.process<CTO_FleetAttackFleetQueue>(mouse.fleetHit->id);
+			else
+				// <<< Not complete, Merge? Land? Go there? go near, or something
+				ctx.playout.process<CTO_FleetMoveQueue>(mouse.fleetHit->position);
+
+		} else if (mouse.planetHit) {
+			if (ctx.controlledFaction->canAttack(*mouse.planetHit->faction))
+				ctx.playout.process<CTO_FleetAttackPlanetQueue>(mouse.planetHit->id);
+			else
+				// <<< Not complete, Merge? Land? Go there? go near, or something
+				ctx.playout.process<CTO_FleetMoveQueue>(mouse.planetHit->position);
+
+		} else {
+			ctx.playout.process<CTO_FleetMoveQueue>(mouse.worldCoord);
+		}
 	});
 
 	controls.feature_binary<SpaceCanvas>("space.selection_box_25D", [](libv::ctrl::arg_binary arg, SpaceCanvas& ctx) {
@@ -409,16 +499,18 @@ void CanvasControl::update(SpaceCanvas& ctx, libv::time_duration delta_time) {
 void CanvasControl::bind_default_controls(libv::ctrl::Controls& controls) {
 	// TODO P1: libv.ctrl: analog feature (on time update) bypasses the accidental collusion resolution system (specialization) with an action feature
 
-	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
-	controls.bind("space.queue_move_fleet_to_mouse", "Shift + RMB [press]");
+//	controls.bind("space.move_fleet_to_mouse", "Ctrl + RMB [press]");
+//	controls.bind("space.queue_move_fleet_to_mouse", "Ctrl + Shift + RMB [press]");
+
+//	controls.bind("space.order_fleet_to_mouse", "L");
+	controls.bind("space.order_fleet_to_mouse", "RMB [press]");
+//	controls.bind("space.queue_order_fleet_to_mouse", "Shift + L");
+	controls.bind("space.queue_order_fleet_to_mouse", "Shift + RMB [press]");
+
 	controls.bind("space.select_fleet", "LMB [press]");
 	controls.bind("space.select_fleet_add", "Shift + LMB [press]");
 	controls.bind("space.selection_box_25D", "I");
 	controls.bind("space.selection_box_3D", "O");
-//	controls.bind("space.selection_box_start", "O [press]");
-//	controls.bind("space.selection_box_start", "I [press]");
-//	controls.bind("space.selection_box_end_3D", "O [auto]");
-//	controls.bind("space.selection_box_end_25D", "I [auto]");
 	controls.bind("space.spawn_fleet_at_mouse", "Ctrl + LMB [press]");
 	controls.bind("space.spawn_planet_at_mouse", "Ctrl + B [press]");
 	controls.bind("space.spawn_planet_at_mouse", "J [hold]");

@@ -8,13 +8,21 @@ namespace archive {
 
 // -------------------------------------------------------------------------------------------------
 
-class BinaryInput;
-class BinaryOutput;
+template <typename CRTP> class BasicBinaryInput;
+template <typename CRTP> class BasicBinaryOutput;
 
-struct Binary {
-	using input = BinaryInput;
-	using output = BinaryOutput;
+template <typename CRTP = void>
+struct BasicBinary {
+	using input = BasicBinaryInput<CRTP>;
+	using output = BasicBinaryOutput<CRTP>;
 };
+
+// -------------------------------------------------------------------------------------------------
+
+using BinaryInput = BasicBinaryInput<void>;
+using BinaryOutput = BasicBinaryOutput<void>;
+
+using Binary = BasicBinary<void>;
 
 // -------------------------------------------------------------------------------------------------
 

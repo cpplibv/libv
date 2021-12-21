@@ -8,6 +8,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
 // libv
+#include <libv/meta/derived_from_specialization.hpp>
 #include <libv/utility/bytes/input_bytes.hpp>
 #include <libv/utility/bytes/output_bytes.hpp>
 // std
@@ -22,16 +23,19 @@ namespace archive {
 
 namespace detail {
 
-struct JSONInputAnyTempStream {
+struct JSONAnyInputTempStream {
 	std::istringstream temp_ss_stream;
-	explicit inline JSONInputAnyTempStream(std::string&& str) : temp_ss_stream(std::move(str)) {}
+	explicit inline JSONAnyInputTempStream(std::string&& str) : temp_ss_stream(std::move(str)) {}
 };
 
 } // namespace detail
 
+// -------------------------------------------------------------------------------------------------
+
 /// Not efficient temporary implementation that uses an additional string stream to bypass std / cereal stream limitations
 /// Remove when possible
-class JSONInputAny : private detail::JSONInputAnyTempStream, public cereal::JSONInputArchive {
+template <typename CRTP = void>
+class BasicJSONAnyInput : private detail::JSONAnyInputTempStream, public cereal::JSONInputArchive {
 private:
 	static std::string read_all_from_input_stream(libv::input_bytes& input_stream) {
 		std::string result;
@@ -41,16 +45,18 @@ private:
 	}
 
 public:
-	explicit JSONInputAny(libv::input_bytes input_stream) :
-		detail::JSONInputAnyTempStream{read_all_from_input_stream(input_stream)},
+	explicit BasicJSONAnyInput(libv::input_bytes input_stream) :
+		detail::JSONAnyInputTempStream{read_all_from_input_stream(input_stream)},
 		JSONInputArchive(temp_ss_stream) {
 	}
 };
 
 /// Not efficient temporary implementation that uses an additional string stream to bypass std / cereal stream limitations
 /// Remove when possible
-class JSONOutputAny : public cereal::OutputArchive<JSONOutputAny>, public cereal::traits::TextArchive {
+template <typename CRTP = void>
+class BasicJSONAnyOutput : public cereal::OutputArchive<libv::meta::lnv_t<CRTP, BasicJSONAnyOutput<void>>>, public cereal::traits::TextArchive {
 public:
+	using ArchiveType = libv::meta::lnv_t<CRTP, BasicJSONAnyOutput<void>>;
 	using Options = cereal::JSONOutputArchive::Options;
 
 private:
@@ -59,13 +65,13 @@ private:
 	std::optional<cereal::JSONOutputArchive> impl;
 
 public:
-	explicit JSONOutputAny(libv::output_bytes output_stream, const Options& options = Options::Default()) :
-		OutputArchive<JSONOutputAny>(this),
+	explicit BasicJSONAnyOutput(libv::output_bytes output_stream, const Options& options = Options::Default()) :
+		cereal::OutputArchive<ArchiveType>(static_cast<ArchiveType*>(this)),
 		output_stream(output_stream),
 		impl(std::in_place, this->temp_ss_stream, options) {
 	}
 
-	~JSONOutputAny() {
+	~BasicJSONAnyOutput() {
 		impl.reset();
 		const auto result = std::move(temp_ss_stream).str();
 		output_stream.write(reinterpret_cast<const std::byte*>(result.data()), 0, result.size());
@@ -100,85 +106,111 @@ public:
 
 // -------------------------------------------------------------------------------------------------
 
-template <class T>
-inline void prologue(JSONOutputAny&, cereal::NameValuePair<T> const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void prologue(Archive&, cereal::NameValuePair<T> const&) {}
 
-template <class T>
-inline void epilogue(JSONOutputAny&, cereal::NameValuePair<T> const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void epilogue(Archive&, cereal::NameValuePair<T> const&) {}
 
-template <class T>
-inline void prologue(JSONOutputAny&, cereal::DeferredData<T> const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void prologue(Archive&, cereal::DeferredData<T> const&) {}
 
-template <class T>
-inline void epilogue(JSONOutputAny&, cereal::DeferredData<T> const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void epilogue(Archive&, cereal::DeferredData<T> const&) {}
 
-template <class T>
-inline void prologue(JSONOutputAny& ar, cereal::SizeTag<T> const&) {
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void prologue(Archive& ar, cereal::SizeTag<T> const&) {
 	ar.makeArray();
 }
 
-template <class T>
-inline void epilogue(JSONOutputAny&, cereal::SizeTag<T> const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void epilogue(Archive&, cereal::SizeTag<T> const&) {}
 
-template <class T, cereal::traits::EnableIf<!std::is_arithmetic<T>::value,
-		!cereal::traits::has_minimal_base_class_serialization<T, cereal::traits::has_minimal_output_serialization, JSONOutputAny>::value,
-		!cereal::traits::has_minimal_output_serialization<T, JSONOutputAny>::value> = cereal::traits::sfinae>
-inline void prologue(JSONOutputAny& ar, T const&) {
+template <typename Archive, class T>
+	requires (libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput> &&
+		!std::is_arithmetic_v<T> &&
+		!cereal::traits::has_minimal_base_class_serialization<T, cereal::traits::has_minimal_output_serialization, Archive>::value &&
+		!cereal::traits::has_minimal_output_serialization<T, Archive>::value)
+inline void prologue(Archive& ar, T const&) {
 	ar.startNode();
 }
 
-template <class T, cereal::traits::EnableIf<!std::is_arithmetic<T>::value,
-		!cereal::traits::has_minimal_base_class_serialization<T, cereal::traits::has_minimal_output_serialization, JSONOutputAny>::value,
-		!cereal::traits::has_minimal_output_serialization<T, JSONOutputAny>::value> = cereal::traits::sfinae>
-inline void epilogue(JSONOutputAny& ar, T const&) {
+template <typename Archive, class T>
+	requires (libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput> &&
+		!std::is_arithmetic_v<T> &&
+		!cereal::traits::has_minimal_base_class_serialization<T, cereal::traits::has_minimal_output_serialization, Archive>::value &&
+		!cereal::traits::has_minimal_output_serialization<T, Archive>::value)
+inline void epilogue(Archive& ar, T const&) {
 	ar.finishNode();
 }
 
-inline void prologue(JSONOutputAny& ar, std::nullptr_t const&) {
+template <typename Archive>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void prologue(Archive& ar, std::nullptr_t const&) {
 	ar.writeName();
 }
 
-inline void epilogue(JSONOutputAny&, std::nullptr_t const&) {}
+template <typename Archive>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void epilogue(Archive&, std::nullptr_t const&) {}
 
-template <class T, cereal::traits::EnableIf<std::is_arithmetic<T>::value> = cereal::traits::sfinae>
-inline void prologue(JSONOutputAny& ar, T const&) {
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput> &&
+			std::is_arithmetic_v<T>
+inline void prologue(Archive& ar, T const&) {
 	ar.writeName();
 }
 
-template <class T, cereal::traits::EnableIf<std::is_arithmetic<T>::value> = cereal::traits::sfinae>
-inline void epilogue(JSONOutputAny&, T const&) {}
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput> &&
+			std::is_arithmetic_v<T>
+inline void epilogue(Archive&, T const&) {}
 
-template <class CharT, class Traits, class Alloc>
-inline void prologue(JSONOutputAny& ar, std::basic_string<CharT, Traits, Alloc> const&) {
+template <typename Archive, class CharT, class Traits, class Alloc>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void prologue(Archive& ar, std::basic_string<CharT, Traits, Alloc> const&) {
 	ar.writeName();
 }
 
-template <class CharT, class Traits, class Alloc>
-inline void epilogue(JSONOutputAny&, std::basic_string<CharT, Traits, Alloc> const&) {}
+template <typename Archive, class CharT, class Traits, class Alloc>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void epilogue(Archive&, std::basic_string<CharT, Traits, Alloc> const&) {}
 
-template <class T>
-inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny& ar, cereal::NameValuePair<T> const& t) {
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, cereal::NameValuePair<T> const& t) {
 	ar.setNextName(t.name);
 	ar(t.value);
 }
 
-
-inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny& ar, std::nullptr_t const& t) {
+template <typename Archive>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, std::nullptr_t const& t) {
 	ar.saveValue(t);
 }
 
-template <class T, cereal::traits::EnableIf<std::is_arithmetic<T>::value> = cereal::traits::sfinae>
-inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny& ar, T const& t) {
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput> &&
+			std::is_arithmetic_v<T>
+inline void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, T const& t) {
 	ar.saveValue(t);
 }
 
-template <class CharT, class Traits, class Alloc>
-inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny& ar, std::basic_string<CharT, Traits, Alloc> const& str) {
+template <typename Archive, class CharT, class Traits, class Alloc>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void CEREAL_SAVE_FUNCTION_NAME(Archive& ar, std::basic_string<CharT, Traits, Alloc> const& str) {
 	ar.saveValue(str);
 }
 
-template <class T>
-inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny&, cereal::SizeTag<T> const&) {
+template <typename Archive, class T>
+	requires libv::meta::derived_from_specialization<Archive, BasicJSONAnyOutput>
+inline void CEREAL_SAVE_FUNCTION_NAME(Archive&, cereal::SizeTag<T> const&) {
 	// nothing to do here, we don't explicitly save the size
 }
 
@@ -187,7 +219,5 @@ inline void CEREAL_SAVE_FUNCTION_NAME(JSONOutputAny&, cereal::SizeTag<T> const&)
 } // namespace archive
 } // namespace libv
 
-CEREAL_REGISTER_ARCHIVE(::libv::archive::JSONInputAny)
-CEREAL_REGISTER_ARCHIVE(::libv::archive::JSONOutputAny)
-
-CEREAL_SETUP_ARCHIVE_TRAITS(::libv::archive::JSONInputAny, ::libv::archive::JSONOutputAny)
+CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyInput<>)
+CEREAL_REGISTER_ARCHIVE(::libv::archive::BasicJSONAnyOutput<>)
