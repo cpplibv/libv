@@ -162,7 +162,7 @@ public:
 		}
 	}
 
-	libv::observer_ptr<CoreComponent> focusTraverse(libv::observer_ptr<CoreComponent> old_focus, Degrees<float> direction) {
+	libv::observer_ptr<CoreComponent> focusTraverse(libv::observer_ptr<CoreComponent> old_focus, degrees<float> direction) {
 		ContextFocusTraverse ctx{direction};
 
 		libv::observer_ptr<CoreComponent> new_focus = nullptr;
@@ -654,7 +654,7 @@ void UI::detachFocused(CoreComponent& component) {
 	current_thread_context(context());
 
 	assert(libv::make_observer_ptr(&component) == self->context_state.focus_ && "Attempted to detachFocused the not focused element");
-	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, Degrees<float>{315});
+	self->context_state.focus_ = self->focusTraverse(self->context_state.focus_, degrees<float>{315});
 }
 
 void UI::detachFocusLinked(CoreComponent& component) {

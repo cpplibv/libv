@@ -219,7 +219,7 @@ struct Sandbox {
 
 		gl.projection = libv::mat4f::perspective(1.f, 1.f * WINDOW_WIDTH / WINDOW_HEIGHT, 1.f, 1000.f);
 		gl.view = libv::mat4f::lookAt({5.f, 3.f, 5.f}, {0.f, 0.f, 0.f}, {0.f, 1.f, 0.f});
-		gl.view.rotate(libv::Degrees{angle}, 0.f, 1.f, 0.f);
+		gl.view.rotate(libv::degrees{angle}, 0.f, 1.f, 0.f);
 		gl.model = libv::mat4f::identity();
 		// -----------------------------------------------------------------------------------------
 

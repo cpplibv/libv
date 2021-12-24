@@ -95,12 +95,12 @@ public:
 
 	// ---------------------------------------------------------------------------------------------
 
-	inline decltype(auto) rotate(const Radian<T> a, const vec3_t<T>& v) {
+	inline decltype(auto) rotate(const radian<T> a, const vec3_t<T>& v) {
 		top().rotate(a, v);
 		return *this;
 	}
 
-	inline decltype(auto) rotate(const Radian<T> a, const T x, const T y, const T z) {
+	inline decltype(auto) rotate(const radian<T> a, const T x, const T y, const T z) {
 		top().rotate(a, vec3_t<T>(x, y, z));
 		return *this;
 	}

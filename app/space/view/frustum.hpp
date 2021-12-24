@@ -179,8 +179,8 @@ public:
 //
 //	 private Matrix4f calculateCameraRotationMatrix() {
 //		 Matrix4f rotation = new Matrix4f();
-//		 rotation.rotate((float) Math.toRadians(-cam.getYaw()), new Vector3f(0, 1, 0));
-//		 rotation.rotate((float) Math.toRadians(-cam.getPitch()), new Vector3f(1, 0, 0));
+//		 rotation.rotate((float) Math.toradians(-cam.getYaw()), new Vector3f(0, 1, 0));
+//		 rotation.rotate((float) Math.toradians(-cam.getPitch()), new Vector3f(1, 0, 0));
 //		 return rotation;
 //	 }
 //

@@ -12,8 +12,8 @@ namespace LIBV_SERIAL_EXTENSION_NAMESPACE {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename Archive>
-inline void serialize(Archive& ar, ::libv::quat& var) {
+template <typename Archive, typename T>
+inline void serialize(Archive& ar, ::libv::quat_t<T>& var) {
 	ar & LIBV_NVP_NAMED("x", var.x);
 	ar & LIBV_NVP_NAMED("y", var.y);
 	ar & LIBV_NVP_NAMED("z", var.z);

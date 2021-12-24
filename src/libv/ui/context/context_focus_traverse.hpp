@@ -16,16 +16,16 @@ namespace ui {
 class CoreComponent;
 
 struct ContextFocusTraverse {
-	Degrees<float> direction;
+	degrees<float> direction;
 	// libv::vec3f direction;
 
 public:
 	constexpr inline bool isForward() const noexcept {
-		return Degrees<float>(45).value > direction.value || direction.value >= Degrees<float>(225).value;
+		return degrees<float>(45).value > direction.value || direction.value >= degrees<float>(225).value;
 	}
 
 	constexpr inline bool isBackward() const noexcept {
-		return Degrees<float>(45).value <= direction.value && direction.value < Degrees<float>(225).value;
+		return degrees<float>(45).value <= direction.value && direction.value < degrees<float>(225).value;
 	}
 };
 

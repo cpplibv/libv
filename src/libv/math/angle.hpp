@@ -11,19 +11,19 @@ namespace libv {
 // -------------------------------------------------------------------------------------------------
 
 [[nodiscard]] constexpr inline float deg_to_rad(float x) noexcept {
-	return x / libv::deg_v<float>;
+	return x / libv::rad_v<float>;
 }
 
 [[nodiscard]] constexpr inline double deg_to_rad(double x) noexcept {
-	return x / libv::deg_v<double>;
+	return x / libv::rad_v<double>;
 }
 
 [[nodiscard]] constexpr inline float rad_to_deg(float x) noexcept {
-	return x * libv::deg_v<float>;
+	return x * libv::rad_v<float>;
 }
 
 [[nodiscard]] constexpr inline double rad_to_deg(double x) noexcept {
-	return x * libv::deg_v<double>;
+	return x * libv::rad_v<double>;
 }
 
 [[nodiscard]] constexpr inline float to_rad(float x) noexcept {
@@ -42,28 +42,28 @@ namespace libv {
 	return rad_to_deg(x);
 }
 
-template <typename T> struct Degrees;
-template <typename T> struct Radian;
+template <typename T> struct degrees;
+template <typename T> struct radian;
 
 template <typename T = float>
-struct Degrees {
+struct degrees {
 	T value;
 
-	constexpr explicit Degrees(T value) noexcept : value(value) { }
+	constexpr explicit degrees(T value) noexcept : value(value) { }
 
-	constexpr inline operator Radian<T>() const noexcept {
-		return Radian<T>{deg_to_rad(value)};
+	constexpr inline operator radian<T>() const noexcept {
+		return radian<T>{deg_to_rad(value)};
 	}
 };
 
 template <typename T = float>
-struct Radian {
+struct radian {
 	T value;
 
-	constexpr explicit Radian(T value) noexcept : value(value) { }
+	constexpr explicit radian(T value) noexcept : value(value) { }
 
-	constexpr inline operator Degrees<T>() const noexcept {
-		return Degrees<T>{rad_to_deg(value)};
+	constexpr inline operator degrees<T>() const noexcept {
+		return degrees<T>{rad_to_deg(value)};
 	}
 };
 

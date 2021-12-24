@@ -10,7 +10,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
-template <typename T> static constexpr T deg_v       = static_cast<T>(57.295779513082320876800);
+template <typename T> static constexpr T rad_v       = static_cast<T>(57.295779513082320876800);
 template <typename T> static constexpr T inv_sqrt2_v = static_cast<T>( 0.707106781186547524401);
 template <typename T> static constexpr T tau_v       = static_cast<T>( 6.283185307179586476926);
 
@@ -28,7 +28,7 @@ template <typename T> static constexpr T pi_v         = std::numbers::pi_v<T>;
 template <typename T> static constexpr T sqrt2_v      = std::numbers::sqrt2_v<T>;
 template <typename T> static constexpr T sqrt3_v      = std::numbers::sqrt3_v<T>;
 
-static constexpr float deg_f        = deg_v<float>;
+static constexpr float rad_f        = rad_v<float>;
 static constexpr float e_f          = e_v<float>;
 static constexpr float egamma_f     = egamma_v<float>;
 static constexpr float inv_pi_f     = inv_pi_v<float>;
@@ -45,7 +45,7 @@ static constexpr float sqrt2_f      = sqrt2_v<float>;
 static constexpr float sqrt3_f      = sqrt3_v<float>;
 static constexpr float tau_f        = tau_v<float>;
 
-static constexpr double deg_d        = deg_v<double>;
+static constexpr double rad_d        = rad_v<double>;
 static constexpr double e_d          = e_v<double>;
 static constexpr double egamma_d     = egamma_v<double>;
 static constexpr double inv_pi_d     = inv_pi_v<double>;
@@ -64,7 +64,7 @@ static constexpr double tau_d        = tau_v<double>;
 
 using default_constants_type = float;
 
-static constexpr default_constants_type deg        = deg_v<default_constants_type>;
+static constexpr default_constants_type rad        = rad_v<default_constants_type>;
 static constexpr default_constants_type e          = e_v<default_constants_type>;
 static constexpr default_constants_type egamma     = egamma_v<default_constants_type>;
 static constexpr default_constants_type inv_pi     = inv_pi_v<default_constants_type>;

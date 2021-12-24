@@ -254,9 +254,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 
 			angle += libv::pi * 0.5f; // <<< Model is incorrectly oriented
 
-			glr.model.rotate(libv::Radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
-			//glr.model.rotate(libv::Radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
-			glr.model.rotate(libv::Radian(angleZ), libv::vec3f{1.0f, 0.0f, 0.0f}); // <<< Model is incorrectly oriented
+			glr.model.rotate(libv::radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
+			//glr.model.rotate(libv::radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
+			glr.model.rotate(libv::radian(angleZ), libv::vec3f{1.0f, 0.0f, 0.0f}); // <<< Model is incorrectly oriented
 		}
 
 		const auto numShipRendered = static_cast<int>(std::log(static_cast<float>(fleet.number_of_ships)) / std::log(2.f) * 2.f);

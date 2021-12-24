@@ -2,13 +2,11 @@
 
 // hpp
 #include <libv/math/noise/perlin.hpp>
+// ext
+#include <glm/gtc/noise.hpp>
 // std
-#include <cmath>
 #include <random>
 #include <algorithm>
-#include <numeric>
-//glm
-#include <glm/gtc/noise.hpp>
 
 
 namespace libv {

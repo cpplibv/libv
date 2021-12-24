@@ -268,7 +268,7 @@ struct Sandbox {
 			const auto guard_m2 = glr.model.push_guard();
 			glr.model.translate(static_cast<float>(window_size.x) * 0.5f, static_cast<float>(window_size.y) * 0.5f, 0);
 			glr.model.scale(300.f);
-			glr.model.rotate(libv::Degrees(running_time.count() * 5.f), 0, 1, 0);
+			glr.model.rotate(libv::degrees(running_time.count() * 5.f), 0, 1, 0);
 
 			auto uniforms = uniform_stream.block_unique(layout_matrices);
 			uniforms[layout_matrices.matMVP] = glr.mvp();
@@ -285,7 +285,7 @@ struct Sandbox {
 			const auto guard_m2 = glr.model.push_guard();
 			glr.model.translate(static_cast<float>(window_size.x) * 0.9f + std::sin(running_time.count()) * 50.f, (0.5f + fi) / mini_countf * static_cast<float>(window_size.y), 0);
 			glr.model.scale(15.f);
-			glr.model.rotate(libv::Radian(libv::pi * fi / mini_countf), 0, 1, 0); // Using pi and not tau as only half rotation is enough, sphere is symmetric
+			glr.model.rotate(libv::radian(libv::pi * fi / mini_countf), 0, 1, 0); // Using pi and not tau as only half rotation is enough, sphere is symmetric
 
 			auto uniforms = uniform_stream.block_unique(layout_matrices);
 			uniforms[layout_matrices.matMVP] = glr.mvp();

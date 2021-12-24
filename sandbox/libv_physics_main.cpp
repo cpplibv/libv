@@ -19,7 +19,7 @@
 // libv
 #include <libv/math/angle.hpp>
 #include <libv/math/constants.hpp>
-#include <libv/math/quaternion.hpp>
+#include <libv/math/quat.hpp>
 #include <libv/math/vec.hpp>
 // std
 #include <bit>
@@ -180,9 +180,9 @@ int main() {
 				<< "\nposition       : " << libv::vec3f(body->getTransform().getPosition())
 				<< "\norientation    : " << libv::vec4f(body->getTransform().getOrientation())
 				<< "\nangles         : "
-				<< libv::rad_to_deg(libv::math::toEulerAngles(body->getTransform().getOrientation()).x) << " "
-				<< libv::rad_to_deg(libv::math::toEulerAngles(body->getTransform().getOrientation()).y) << " "
-				<< libv::rad_to_deg(libv::math::toEulerAngles(body->getTransform().getOrientation()).z)
+				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).x) << " "
+				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).y) << " "
+				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).z)
 				<< "\nlinearVelocity : " << libv::vec3f(body->getLinearVelocity())
 				<< "\nangularVelocity: " << libv::vec3f(body->getAngularVelocity()) << std::endl;
 	}
