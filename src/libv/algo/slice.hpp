@@ -85,7 +85,7 @@ namespace libv {
 [[nodiscard]] constexpr inline std::string_view slice_suffix_view(const std::string_view str, const std::string_view suffix) noexcept {
 	auto result = str;
 	if (result.substr(str.size() - suffix.size(), suffix.size()) == suffix)
-		result.remove_prefix(suffix.size());
+		result.remove_suffix(suffix.size());
 	return result;
 }
 
