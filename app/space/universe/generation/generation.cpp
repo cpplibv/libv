@@ -56,7 +56,7 @@ Galaxy generateGalaxy(GalaxyGenerationSettings settings) {
 		auto rng_planet = galaxy_rng.fork();
 		galaxy.planets.push_back(generatePlanet(galaxy.nextPlanetID++, position, rng_planet));
 		// <<< Assign Neutral faction in a better way
-		galaxy.planets.back().faction = galaxy.faction("Neutral");
+		galaxy.planets.back().faction = galaxy.factionNeutral();
 	}
 
 	return galaxy;

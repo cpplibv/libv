@@ -5,13 +5,9 @@
 // fwd
 #include <space/fwd.hpp>
 // libv
-#include <libv/serial/archive/binary_fwd.hpp>
-#include <libv/serial/archive/binary.hpp>
-#include <libv/serial/archive/json_any_fwd.hpp>
 #include <libv/serial/codec_message_id.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>
-#include <libv/utility/random/xoroshiro128_serial.hpp>
 // pro
 #include <space/universe/engine/chrono.hpp>
 #include <space/universe/engine/serial_id.hpp>
@@ -38,14 +34,14 @@ public:
 //	std::vector<Player> players;
 
 public:
-	template <class Archive> void save(Archive& ar) const {
+	template <typename Archive> void save(Archive& ar) const {
 		static_assert(cxSnapshotArchive<Archive>);
 
 		ar & LIBV_NVP(galaxy);
 		ar & LIBV_NVP(universe_rng);
 	}
 
-	template <class Archive> void load(Archive& ar) {
+	template <typename Archive> void load(Archive& ar) {
 		static_assert(cxSnapshotArchive<Archive>);
 
 		ar & LIBV_NVP(galaxy);
@@ -60,6 +56,12 @@ public:
 public:
 	Universe() = default; // For de-serialization only
 	explicit Universe(GalaxyGenerationSettings ggs);
+
+//	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
+//	Universe(const Universe&) noexcept = default;
+//	Universe& operator=(const Universe&) & noexcept = default;
+	Universe(Universe&&) noexcept = default;
+	Universe& operator=(Universe&&) & noexcept = default;
 
 public:
 	void update(sim_duration delta_time);

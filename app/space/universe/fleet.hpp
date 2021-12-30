@@ -120,38 +120,16 @@ private:
 				return targetPosition;
 		}
 
-		template <class Archive> void serialize(Archive& ar) {
+		template <typename Archive> void serialize(Archive& ar) {
 			ar & LIBV_NVP(type);
 			ar & LIBV_NVP(targetPosition);
-			// !!! Serialization of pointers
 
 			ar & LIBV_NVP_NAMED("targetPlanet", SerialID{&targetPlanet});
 			ar & LIBV_NVP_NAMED("targetFleet", SerialID{&targetFleet});
 		}
-
-//		template <class Archive> void save(Archive& ar) const {
-//			ar & LIBV_NVP(type);
-//			ar & LIBV_NVP(targetPosition);
-//			ar.resolve()
-////			ar & LIBV_NVP(targetPlanet);
-////			ar & LIBV_NVP(targetFleet);
-//		}
-//
-//		template <class Archive> void load(Archive& ar) {
-//			ar & LIBV_NVP(type);
-//			ar & LIBV_NVP(targetPosition);
-////			ar & LIBV_NVP(targetPlanet);
-////			ar & LIBV_NVP(targetFleet);
-//		}
 	};
 
-	//	struct Order {
-	//		uint64_t targetID;
-	//		int targetType;
-	//		Waypoint targetWaypoint;
-	//	};
-
-	// Orders:
+	// Commands:
 	//
 	// - Stop                   -
 	// - (Hold position)        -
@@ -214,7 +192,7 @@ public:
 	}
 
 public:
-	template <class Archive> void serialize(Archive& ar) {
+	template <typename Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(id);
 		ar & LIBV_NVP(position);
 		ar & LIBV_NVP(name);
@@ -225,11 +203,12 @@ public:
 			ar & LIBV_NVP(selectionStatus);
 
 		ar & LIBV_NVP(faction);
+
+		ar & LIBV_NVP(number_of_ships);
+		ar & LIBV_NVP(distance_travelled);
 	}
 
-//	void queue_command(FleetCommandType type, libv::vec3f target);
-//	void queue_command(FleetCommandType type, int32_t target);
-
+public:
 	[[nodiscard]] constexpr inline float animation_offset() const noexcept {
 		return static_cast<float>(id) * 13;
 	}
@@ -242,7 +221,6 @@ public:
 		const auto speed = 1.0f;
 		const auto movementProgress = dt * speed;
 
-//		while (true) {
 		auto& command = commands.front();
 
 		const auto targetPosition = command.target();
@@ -277,7 +255,6 @@ public:
 			}
 
 		}
-//		}
 
 //		{
 //			FleetOrderMovement order;
@@ -313,15 +290,10 @@ public:
 	}
 
 	void queueAttack(Planet* target) {
-		// <<< 'Track' position (planets dont move, but use the same system as for fleets anyways)
-		// 		handle tracked lifetime
-//		commands.emplace_back(FleetCommandType::attack, target->position);
 		commands.emplace_back(FleetCommandType::attack, target);
 	}
 
 	void queueAttack(Fleet* target) {
-		// <<< Track position, handle tracked lifetime
-//		commands.emplace_back(FleetCommandType::attack, target->position);
 		commands.emplace_back(FleetCommandType::attack, target);
 	}
 

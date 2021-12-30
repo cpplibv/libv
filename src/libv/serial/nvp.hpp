@@ -3,15 +3,13 @@
 #pragma once
 
 // ext
-#include <cereal/macros.hpp>
-// pro
-#include <libv/serial/enable.hpp>
-#include <libv/serial/nvp.hpp>
-#include <libv/serial/access_fwd.hpp>
+#include <cereal/nvp.hpp>
 
 
 // -------------------------------------------------------------------------------------------------
 
-#define LIBV_SERIAL_EXTENSION_NAMESPACE cereal
+#define LIBV_NVP(NAME) CEREAL_NVP(NAME)
+#define LIBV_NVP_NAMED(NAME, VAR) CEREAL_NVP_(NAME, VAR)
+#define LIBV_NVP_FORCED(NAME, VAR) ::cereal::make_nvp(NAME, VAR)
 
 // -------------------------------------------------------------------------------------------------

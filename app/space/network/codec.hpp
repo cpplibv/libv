@@ -10,9 +10,11 @@
 #include <vector>
 // pro
 #include <space/cto.hpp>
-//#include <space/network/nto.hpp>
 #include <space/network/lobby.hpp> // TODO P2: Find a better place for SnapshotLobby
+#include <space/universe/engine/snapshot_archive.hpp>
 #include <space/universe/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
+#include <space/universe/universe_serial.hpp> // TODO P2: Find a better place for SnapshotUniverse
+//#include <space/network/nto.hpp>
 
 
 namespace space {
@@ -76,8 +78,6 @@ template <typename T>
 std::vector<std::byte> network_encode(const T& message) {
 	std::vector<std::byte> result;
 	{
-//		UniverseArchive<libv::archive::Binary::output> oar{universe, true, result};
-//		libv::archive::Binary::output oar(result);
 		SnapshotArchive<libv::archive::BasicBinaryOutput> oar{false, result};
 		network_codec.encode(oar, message);
 	}
@@ -87,8 +87,6 @@ std::vector<std::byte> network_encode(const T& message) {
 template <typename F>
 void network_decode(std::span<const std::byte> message, F& handler) {
 	{
-//		UniverseArchive<libv::archive::Binary::input> iar{universe, true, message};
-//		libv::archive::Binary::input iar(message);
 		SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, message};
 		network_codec.decode(iar, handler);
 	}

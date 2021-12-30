@@ -740,6 +740,8 @@ place.it:
 	cpp.tool: build-bench.com - Benchmark compile time
 	cpp.tool: godbolt.org - Test build and analyze compiler asm
 	cpp.tool: quick-bench.com - Mirco benchmark runtime
+	cpp.tool: perfbench.com - Mirco benchmark runtime with more detail
+	cpp.tool: cppinsights.io
 	opengl.knowledge: docs.gl - Reference documentations
 	opengl.knowledge: learnopengl.com - Great tutorial site
 	opengl.knowledge: ogldev.org - Great tutorial site

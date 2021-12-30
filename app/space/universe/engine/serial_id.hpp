@@ -10,6 +10,7 @@
 // pro
 #include <space/fwd.hpp>
 #include <space/universe/ids.hpp>
+#include <space/log.hpp>
 
 
 namespace space {
@@ -73,7 +74,7 @@ inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::
 /// can be used with this: T* resolve(decltype(T.id) id) signature to reverse look up IDs to pointers
 ///
 /// \Usage
-///		template <class Archive> void serialize(Archive& ar) {
+///		template <typename Archive> void serialize(Archive& ar) {
 ///			ar & LIBV_NVP(position);
 ///			ar & LIBV_NVP_NAMED("target", SerialID{&target});
 ///		}
@@ -90,7 +91,7 @@ public:
 	T** ptr;
 
 private:
-	template <class Archive>
+	template <typename Archive>
 	inline underlying_type save_minimal(const Archive&) const {
 		if (*ptr == nullptr)
 			return -1;
@@ -98,20 +99,19 @@ private:
 			return static_cast<underlying_type>((*ptr)->id);
 	}
 
-	template <class Archive>
+	template <typename Archive>
 	inline void load_minimal(const Archive&, const underlying_type& id) {
 		*ptr = reinterpret_cast<T*>(id);
 	}
 
-	template <class Archive>
-	inline underlying_type save_minimal(Archive& ar) const
-			requires requires { { ar.resolve(std::declval<id_type>()) } -> std::same_as<T*>; } {
-
+//	template <typename Archive>
+//			requires requires (Archive& ar, id_type id){ { ar.resolve(id) } -> std::same_as<T*>; }
+//	inline underlying_type save_minimal(const Archive& ar) const {
+	inline underlying_type save_minimal(const SnapshotPtrResolverArchive& ar) const {
 		// The id was already saved in place of the pointer: grab it, resolve it, place it back
 		const auto id = id_type{*reinterpret_cast<underlying_type*>(ptr)};
 
-		// Const cast
-		*ptr = const_cast<Archive&>(ar).resolve(id);
+		*ptr = ar.resolve(id);
 
 		return 0; // Return value will be discarded
 	}

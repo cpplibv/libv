@@ -312,7 +312,7 @@ wish_create_external(
 wish_create_external(
 	NAME cereal
 	GIT_REPOSITORY https://github.com/VaderY/cereal.git
-	GIT_TAG f83778df4d2cad4e5ce0350a31893b3728bd10d2
+	GIT_TAG e0e7ba6722e138afd70641c2dcab3681d87b94ab
 #	GIT_REPOSITORY /e/dev/cpp/forks/cereal
 #	GIT_TAG dev
 	CMAKE_ARGS
@@ -1081,6 +1081,7 @@ wish_create_executable(
 	TARGET sandbox_libv_libv
 	SOURCE sandbox/libv_main.cpp
 	LINK   libv_log libv_utility
+	LINK   libv_range
 #	LINK   libv_ctrl ext_boost ext_boost_stacktrace ext_glm ext_range
 	LINK   libv_diff
 	LINK   libv_mt libv_process

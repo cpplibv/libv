@@ -17,6 +17,7 @@ GameThread::GameThread(libv::ui::UI& ui, libv::Nexus& nexus) :
 }
 
 void GameThread::execute(std::function<void()> task) {
+//void GameThread::execute(libv::unique_function<void()> task) {
 	ui.execute_in_ui_loop(std::move(task));
 }
 

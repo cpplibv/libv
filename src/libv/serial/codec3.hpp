@@ -45,7 +45,7 @@ private:
 	}
 
 protected:
-	template <typename IArchive, typename Handler, typename T>
+	template <typename Archive, typename Handler, typename T>
 	static constexpr TypeAccessEntry create_entry() {
 		if constexpr (!std::is_invocable_v<Handler, T&&>)
 			return {T::id, unexpected_message_handler<T::id>};
@@ -55,7 +55,7 @@ protected:
 
 		else
 			return {T::id, +[](void* iar_ptr, const void* handler_ptr) {
-				auto& iar = *static_cast<IArchive*>(iar_ptr);
+				auto& iar = *static_cast<Archive*>(iar_ptr);
 				auto& handler = *static_cast<Handler*>(const_cast<void*>(handler_ptr));
 
 				T object;
@@ -66,12 +66,12 @@ protected:
 	}
 
 public:
-	template <typename IArchive, typename F>
-	auto decode(IArchive& iar, F&& f) {
+	template <typename Archive, typename F>
+	auto decode(Archive& iar, F&& f) {
 		MessageID id;
 		iar >> LIBV_NVP_NAMED("type", id);
 
-		for (const auto& c : CRTP::template gen_table<IArchive, std::decay_t<F>>::types)
+		for (const auto& c : CRTP::template gen_table<Archive, std::decay_t<F>>::types)
 			if (c.id == id) {
 				c.decode_fn(&iar, &f);
 				return;
@@ -80,8 +80,8 @@ public:
 		throw UnexpectedIDException(id);
 	}
 
-	template <typename OArchive, typename T>
-	auto encode(OArchive& oar, T&& t) {
+	template <typename Archive, typename T>
+	auto encode(Archive& oar, T&& t) {
 		oar << LIBV_NVP_NAMED("type", std::remove_cvref_t<T>::id);
 		oar << LIBV_NVP_NAMED("message", t);
 	}

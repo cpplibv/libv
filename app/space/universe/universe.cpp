@@ -18,6 +18,14 @@
 //#include <space/universe/ids.hpp>
 
 
+//#include <space/universe/colony.hpp>
+//#include <space/universe/empire.hpp>
+#include <space/universe/faction.hpp>
+#include <space/universe/fleet.hpp>
+#include <space/universe/planet.hpp>
+//#include <space/universe/trade.hpp>
+
+
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
@@ -223,7 +231,7 @@ void Universe::process(CTO_PlanetSpawn&& cto) {
 	// !!! Synchronized PlanetID generation (Split request and action CTO's?)
 	galaxy.planets.emplace_back(generatePlanet(galaxy.nextPlanetID++, cto.position, rng_planet));
 	// <<< Assign Neutral faction in a better way
-	galaxy.planets.back().faction = galaxy.faction("Neutral");
+	galaxy.planets.back().faction = galaxy.factionNeutral();
 }
 
 void Universe::process(CTO_ClearPlanets&&) {

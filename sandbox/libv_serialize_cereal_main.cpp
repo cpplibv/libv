@@ -58,7 +58,7 @@ struct Inner {
 	Inner() { }
 	explicit Inner(std::string xv) : x(xv) { }
 
-	template <class Archive>
+	template <typename Archive>
 	inline void serialize(Archive& ar) {
 		ar & LIBV_NVP(x);
 	}
@@ -79,7 +79,7 @@ struct Test {
 	Memberwise memberwise;
 	SimpleServerFieldSet server;
 
-	template <class Archive>
+	template <typename Archive>
 	inline void serialize(Archive& ar) {
 		ar & LIBV_NVP(name);
 		ar & LIBV_NVP(shader);

@@ -40,7 +40,7 @@ protected:
 //		float jitter = -1;
 //		float packet_loss = -1;
 
-		template <class Archive> void serialize(Archive& ar) {
+		template <typename Archive> void serialize(Archive& ar) {
 			ar & LIBV_NVP(userID);
 			ar & LIBV_NVP(name);
 			ar & LIBV_NVP(joined_at);
@@ -57,7 +57,7 @@ protected:
 		std::chrono::system_clock::time_point sent_at;
 		std::string message;
 
-		template <class Archive> void serialize(Archive& ar) {
+		template <typename Archive> void serialize(Archive& ar) {
 			ar & LIBV_NVP(sender);
 			ar & LIBV_NVP(sent_at);
 			ar & LIBV_NVP(message);
@@ -69,7 +69,7 @@ public:
 	std::deque<ChatEntry> chat_entries;
 
 public:
-	template <class Archive> void serialize(Archive& ar) {
+	template <typename Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(clients);
 		ar & LIBV_NVP(chat_entries);
 	}

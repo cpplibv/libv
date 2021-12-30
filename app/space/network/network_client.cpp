@@ -73,15 +73,16 @@ private:
 //			UniverseArchive<libv::archive::Binary::input> iar{universe, false, m.as_bin()};
 //			libv::archive::Binary::input iar(m.as_bin());
 			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
-			network_codec.decode(iar, [this]<typename T>(T&& message) {
+			network_codec.decode(iar, [this]<typename T>(T&& message) mutable {
 				if constexpr(std::is_same_v<T, SnapshotLobby>)
 					lobby.process(std::move(message));
 
-				else if constexpr(std::is_same_v<T, SnapshotUniverse>)
-					game_thread.execute([&, snapshot = std::move(message)] {
-						static_cast<SnapshotUniverse&>(universe) = std::move(snapshot);
+				else if constexpr(std::is_same_v<T, SnapshotUniverse>) {
+					game_thread.execute([&, snapshot = std::make_shared<SnapshotUniverse>(std::move(message))] mutable {
+						// NOTE: shared_ptr is required as std::function requires copy ctor, maybe a switch to unique_function would solve this
+						static_cast<SnapshotUniverse&>(universe) = std::move(*snapshot);
 					});
-
+				}
 				else if constexpr(requires { typename T::lobby_command; })
 					lobby.process(std::move(message));
 

@@ -27,7 +27,7 @@ struct msg_upd {
 		version_number version;
 
 	public:
-		template <class Archive>
+		template <typename Archive>
 		inline void serialize(Archive& ar) {
 			ar & LIBV_NVP(program);
 			ar & LIBV_NVP(variant);
@@ -51,7 +51,7 @@ struct msg_upd {
 			uint64_t size;
 			resource_signature signature;
 
-			template <class Archive> inline void serialize(Archive& ar) {
+			template <typename Archive> inline void serialize(Archive& ar) {
 				ar & LIBV_NVP(version_source);
 				ar & LIBV_NVP(version_target);
 				ar & LIBV_NVP(size);
@@ -66,7 +66,7 @@ struct msg_upd {
 //		std::vector<libv::net::Address> resource_servers;
 
 	public:
-		template <class Archive> inline void serialize(Archive& ar) {
+		template <typename Archive> inline void serialize(Archive& ar) {
 			ar & LIBV_NVP(program);
 			ar & LIBV_NVP(variant);
 			ar & LIBV_NVP(updates);

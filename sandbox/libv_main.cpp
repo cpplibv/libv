@@ -419,41 +419,41 @@
 //
 //// -------------------------------------------------------------------------------------------------
 
-#include <bit>
-#include <iostream>
-#include <libv/utility/hash.hpp>
-#include <libv/math/fixed_point.hpp>
-#include <libv/utility/histogram.hpp>
-
-// -------------------------------------------------------------------------------------------------
-
-template <std::size_t N>
-struct Spectrum {
-	std::array<std::size_t, N> data;
-
-	float min;
-	float max;
-
-	explicit Spectrum(float min = 0.f, float max = 0.f) : min(min), max(max) {
-		data.fill(0);
-	}
-
-	void sample(float value) {
-//		data[(value - min) / ((max - min) / N)]++;
-		const auto index = static_cast<std::size_t>(std::clamp((value - min) / ((max - min) / static_cast<float>(N)), 0.f, static_cast<float>(N - 1)));
-		data[index]++;
-	}
-
-	void clear() {
-		data.fill(0);
-	}
-
-	friend std::ostream& operator<<(std::ostream& os, const Spectrum& var) {
-		for (std::size_t i = 0; i < N; ++i)
-			os << var.data[i] << ' ';
-		return os;
-	}
-};
+//#include <bit>
+//#include <iostream>
+//#include <libv/utility/hash.hpp>
+//#include <libv/math/fixed_point.hpp>
+//#include <libv/utility/histogram.hpp>
+//
+//// -------------------------------------------------------------------------------------------------
+//
+//template <std::size_t N>
+//struct Spectrum {
+//	std::array<std::size_t, N> data;
+//
+//	float min;
+//	float max;
+//
+//	explicit Spectrum(float min = 0.f, float max = 0.f) : min(min), max(max) {
+//		data.fill(0);
+//	}
+//
+//	void sample(float value) {
+////		data[(value - min) / ((max - min) / N)]++;
+//		const auto index = static_cast<std::size_t>(std::clamp((value - min) / ((max - min) / static_cast<float>(N)), 0.f, static_cast<float>(N - 1)));
+//		data[index]++;
+//	}
+//
+//	void clear() {
+//		data.fill(0);
+//	}
+//
+//	friend std::ostream& operator<<(std::ostream& os, const Spectrum& var) {
+//		for (std::size_t i = 0; i < N; ++i)
+//			os << var.data[i] << ' ';
+//		return os;
+//	}
+//};
 
 //int main() {
 //	Spectrum<1000> spectrum{0, 3600};
@@ -591,68 +591,195 @@ struct Spectrum {
 
 // -------------------------------------------------------------------------------------------------
 
-#include <libv/utility/random/normal_distribution.hpp>
-#include <libv/utility/random/uniform_distribution.hpp>
-#include <libv/utility/random/xoroshiro128.hpp>
-#include <libv/utility/timer.hpp>
-#include <random>
-
-
-
-int main() {
-	Spectrum<1000> spectrum_normal995_clamp{0, 3};
-	Spectrum<1000> spectrum_normal995_repeat{0, 3};
-	Spectrum<1000> spectrum_normal995d_clamp{0, 3};
-	Spectrum<1000> spectrum_normal995d_repeat{0, 3};
-//	Spectrum<1000> spectrum_normal995i_clamp{0, 3000};
-//	Spectrum<1000> spectrum_normal995i_repeat{0, 3000};
-
-	libv::xoroshiro128 rng;
-
-	libv::Timer timer;
-
-	for (int32_t i = 0; i < 10000000; ++i) {
-		spectrum_normal995_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
-	}
-	const auto time_normal995_clamp = timer.timef_ms();
-
-	for (int32_t i = 0; i < 10000000; ++i) {
-		spectrum_normal995_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
-	}
-	const auto time_normal995_repeat = timer.timef_ms();
-
-	for (int32_t i = 0; i < 10000000; ++i) {
-		spectrum_normal995d_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
-	}
-	const auto time_normal995d_clamp = timer.timef_ms();
-
-	for (int32_t i = 0; i < 10000000; ++i) {
-		spectrum_normal995d_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
-	}
-	const auto time_normal995d_repeat = timer.timef_ms();
-
-//	for (int32_t i = 0; i < 10000000; ++i) {
-//		spectrum_normal995i_clamp.sample(normal995_clamp(rng, 1000, 2000));
-//	}
-//	const auto time_normal995i_clamp = timer.timef_ms();
+//#include <libv/utility/random/normal_distribution.hpp>
+//#include <libv/utility/random/uniform_distribution.hpp>
+//#include <libv/utility/random/xoroshiro128.hpp>
+//#include <libv/utility/timer.hpp>
+//#include <random>
+//
+//
+//
+//int main() {
+//	Spectrum<1000> spectrum_normal995_clamp{0, 3};
+//	Spectrum<1000> spectrum_normal995_repeat{0, 3};
+//	Spectrum<1000> spectrum_normal995d_clamp{0, 3};
+//	Spectrum<1000> spectrum_normal995d_repeat{0, 3};
+////	Spectrum<1000> spectrum_normal995i_clamp{0, 3000};
+////	Spectrum<1000> spectrum_normal995i_repeat{0, 3000};
+//
+//	libv::xoroshiro128 rng;
+//
+//	libv::Timer timer;
 //
 //	for (int32_t i = 0; i < 10000000; ++i) {
-//		spectrum_normal995i_repeat.sample(normal995_repeat(rng, 1000, 2000));
+//		spectrum_normal995_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
 //	}
-//	const auto time_normal995i_repeat = timer.timef_ms();
+//	const auto time_normal995_clamp = timer.timef_ms();
+//
+//	for (int32_t i = 0; i < 10000000; ++i) {
+//		spectrum_normal995_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
+//	}
+//	const auto time_normal995_repeat = timer.timef_ms();
+//
+//	for (int32_t i = 0; i < 10000000; ++i) {
+//		spectrum_normal995d_clamp.sample(libv::normal995_clamp(rng, 1.5f, 0.5f));
+//	}
+//	const auto time_normal995d_clamp = timer.timef_ms();
+//
+//	for (int32_t i = 0; i < 10000000; ++i) {
+//		spectrum_normal995d_repeat.sample(libv::normal995_repeat(rng, 1.5f, 0.5f));
+//	}
+//	const auto time_normal995d_repeat = timer.timef_ms();
+//
+////	for (int32_t i = 0; i < 10000000; ++i) {
+////		spectrum_normal995i_clamp.sample(normal995_clamp(rng, 1000, 2000));
+////	}
+////	const auto time_normal995i_clamp = timer.timef_ms();
+////
+////	for (int32_t i = 0; i < 10000000; ++i) {
+////		spectrum_normal995i_repeat.sample(normal995_repeat(rng, 1000, 2000));
+////	}
+////	const auto time_normal995i_repeat = timer.timef_ms();
+//
+//	std::cout << "Time spectrum_normal995_clamp : " << time_normal995_clamp.count() << std::endl;
+//	std::cout << "Time spectrum_normal995_repeat : " << time_normal995_repeat.count() << std::endl;
+//	std::cout << "Time spectrum_normal995d_clamp : " << time_normal995d_clamp.count() << std::endl;
+//	std::cout << "Time spectrum_normal995d_repeat : " << time_normal995d_repeat.count() << std::endl;
+////	std::cout << "Time spectrum_normal995i_clamp : " << time_normal995i_clamp.count() << std::endl;
+////	std::cout << "Time spectrum_normal995i_repeat : " << time_normal995i_repeat.count() << std::endl;
+//
+//	std::cout << "spectrum_normal995_clamp " << spectrum_normal995_clamp << std::endl;
+//	std::cout << "spectrum_normal995_repeat " << spectrum_normal995_repeat << std::endl;
+//	std::cout << "spectrum_normal995d_clamp " << spectrum_normal995d_clamp << std::endl;
+//	std::cout << "spectrum_normal995d_repeat " << spectrum_normal995d_repeat << std::endl;
+////	std::cout << "spectrum_normal995i_clamp " << spectrum_normal995i_clamp << std::endl;
+////	std::cout << "spectrum_normal995i_repeat " << spectrum_normal995i_repeat << std::endl;
+//	return EXIT_SUCCESS;
+//}
 
-	std::cout << "Time spectrum_normal995_clamp : " << time_normal995_clamp.count() << std::endl;
-	std::cout << "Time spectrum_normal995_repeat : " << time_normal995_repeat.count() << std::endl;
-	std::cout << "Time spectrum_normal995d_clamp : " << time_normal995d_clamp.count() << std::endl;
-	std::cout << "Time spectrum_normal995d_repeat : " << time_normal995d_repeat.count() << std::endl;
-//	std::cout << "Time spectrum_normal995i_clamp : " << time_normal995i_clamp.count() << std::endl;
-//	std::cout << "Time spectrum_normal995i_repeat : " << time_normal995i_repeat.count() << std::endl;
+// =================================================================================================
 
-	std::cout << "spectrum_normal995_clamp " << spectrum_normal995_clamp << std::endl;
-	std::cout << "spectrum_normal995_repeat " << spectrum_normal995_repeat << std::endl;
-	std::cout << "spectrum_normal995d_clamp " << spectrum_normal995d_clamp << std::endl;
-	std::cout << "spectrum_normal995d_repeat " << spectrum_normal995d_repeat << std::endl;
-//	std::cout << "spectrum_normal995i_clamp " << spectrum_normal995i_clamp << std::endl;
-//	std::cout << "spectrum_normal995i_repeat " << spectrum_normal995i_repeat << std::endl;
-	return EXIT_SUCCESS;
+// libv
+#include <libv/algo/slice.hpp>
+#include <libv/range/view_split_sv.hpp>
+#include <libv/utility/parse_number.hpp>
+#include <libv/utility/read_file.hpp>
+#include <libv/utility/write_file.hpp>
+// std
+#include <filesystem>
+#include <iostream>
+#include <map>
+#include <sstream>
+#include <vector>
+
+
+struct Entry {
+	std::vector<uint64_t> values;
+};
+
+int main() {
+
+	// Configs
+
+	const auto prefix = "build/dev/CMakeFiles/space.dir/app/";
+	const auto dir = std::filesystem::path(prefix);
+	const auto stats_file = "build/dev/space.stats.csv";
+
+	// Load file
+
+	std::string stat_history;
+
+	try {
+		stat_history = libv::read_file_or_throw(stats_file);
+	} catch (const std::system_error& ex) {
+		if (ex.code() != std::make_error_code(std::errc::no_such_file_or_directory)) {
+			std::cerr << "Failed to load statics history:\n" << ex.what() << std::endl;
+			return EXIT_FAILURE;
+		}
+	}
+
+	// Parse file
+
+	std::map<std::string, Entry, std::less<>> statistics;
+	uint64_t history_depth = 0;
+
+	try {
+		if (!stat_history.empty()) {
+			for (const auto& line : stat_history | libv::view::split_sv('\n')) {
+				if (line.empty())
+					continue;
+
+				uint64_t current_history_depth = 0;
+				bool is_first_cell = true;
+				Entry* currentEntry = nullptr;
+
+				for (const auto& cell : line | libv::view::split_sv(',')) {
+					if (is_first_cell) {
+						currentEntry = &statistics.emplace(cell, Entry{}).first->second;
+						is_first_cell = false;
+						continue;
+					}
+
+					++current_history_depth;
+					currentEntry->values.emplace_back(libv::parse_number_or_throw<uint64_t>(cell));
+				}
+
+				history_depth = std::max(history_depth, current_history_depth);
+			}
+		}
+
+	} catch (const std::exception& ex) {
+		std::cerr << "Failed to parse statics history:\n"
+				<< ex.what() << "\n"
+				<< "line: " << statistics.size()
+				<< std::endl;
+		return EXIT_FAILURE;
+	}
+
+	// Record current state
+
+	for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+		if (!entry.is_regular_file())
+			continue;
+
+		const auto full_path = entry.path().generic_string();
+		const auto path = libv::slice_prefix_view(libv::slice_suffix_view(full_path, ".obj"), prefix);
+
+		const auto size = entry.file_size();
+		std::cout << path << " " << static_cast<double>(size) / 1024.0 << " KB" << std::endl;
+
+		auto stat_it = statistics.find(path);
+		if (stat_it == statistics.end()) {
+			stat_it = statistics.emplace(path, Entry{}).first;
+			stat_it->second.values.resize(history_depth);
+		}
+
+		stat_it->second.values.emplace_back(size);
+	}
+
+	for (auto& [key, stats] : statistics)
+		if (stats.values.size() != history_depth + 1)
+			stats.values.emplace_back(0);
+
+	// touch /E/dev/cpp/libv/app/space/network/network_client.cpp
+	// time ninja -C build/dev /E/dev/cpp/libv/app/space/network/network_client.cpp^
+
+	// Serialize statistics
+
+	std::ostringstream new_stat_history;
+	for (const auto& [key, stats] : statistics) {
+		new_stat_history << key;
+		for (const auto& value : stats.values)
+			new_stat_history << ',' << value;
+		new_stat_history << '\n';
+	}
+
+	// Save statistics
+
+	try {
+		libv::write_file_or_throw(stats_file, std::move(new_stat_history).str());
+	} catch (const std::system_error& ex) {
+		std::cerr << "Failed to save statics history:\n" << ex.what() << std::endl;
+		return EXIT_FAILURE;
+	}
 }

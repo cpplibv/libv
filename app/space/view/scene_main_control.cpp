@@ -39,7 +39,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 
 		{
 			SnapshotArchive<libv::archive::BasicBinaryOutput> oar{true, save_data};
-			ctx.game_session->universe.save(oar);
+			oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
 		}
 //		{
 //			std::string debug_data;
@@ -64,7 +64,7 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 		{
 			SnapshotArchive<libv::archive::BasicBinaryInput> iar{true, save_data};
 
-			iar & LIBV_NVP_NAMED("universe", ctx.game_session->universe);
+			iar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
 		}
 
 		log_space.info("Loaded: {}", "universe.sav");

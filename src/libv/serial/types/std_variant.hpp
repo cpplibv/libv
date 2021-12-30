@@ -48,7 +48,7 @@ inline void load(Archive& ar, std::variant<Types...>& variant) {
 }
 
 /// Serializing a std::monostate
-template <class Archive>
+template <typename Archive>
 void CEREAL_SERIALIZE_FUNCTION_NAME(Archive&, const std::monostate&) {}
 
 // -------------------------------------------------------------------------------------------------

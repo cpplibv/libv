@@ -78,9 +78,31 @@ app.space: Factions
 
 
 
+huge compile time regression
+	make serial nvp indenednt from all the cereal shit
+	universe has to include less and has to affect less
 
-app.space: Fleet Attack / Follow commands on Planets / Fleets
-	!!! Wtf am I even doing, fleet / planet are not stored in a memory stable container!
+
+sim_ptr or entity_ptr
+	extra entity flag is dead
+	extra entity ref count
+
+	whenever dereferenced, is dead has to be checked, and the ptr has to be thrown away
+
+	entities stored in deque
+
+	when last ref dies, notifies the 'deque' to swap with last
+
+	serialization would still use SerialID
+		ref count is not serialized
+		but duting deserialization with resolve the returned type is this sim_ptr type that will increment the ref count
+
+	usages:
+		command target planet
+		command target fleet
+		fleet faction
+		planet faction
+
 
 
 Serialization archive with context:
@@ -98,6 +120,8 @@ refine the file placement of stuff
 
 
 
+Bug P1: app.space: mp menu is not responsive
+
 
 
 app.space: Selection state storage
@@ -106,6 +130,7 @@ app.space: Selection state storage
 app.space: Simulation (container / master controller object)
 			A new container object/class that has the universe in it
 			Process functions are the member of the simulation
+	app.space: Rename universe folder to simulation
 
 app.space: Simulation time control
 	app.space: Pause, Unpause (It will be a good practise for timers and controls)
@@ -113,7 +138,6 @@ app.space: Simulation time control
 	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
 
 app.space: Debug views and grid on/off (and other options) with persistence
-
 
 
 

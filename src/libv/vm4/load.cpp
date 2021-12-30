@@ -24,7 +24,7 @@ Model load_or_throw(const std::string& data) {
 	libv::archive::BinaryInput ar(ss);
 
 	Model model;
-	ar(LIBV_NVP_NAMED("model", model));
+	ar(LIBV_NVP_FORCED("model", model));
 	return model;
 }
 

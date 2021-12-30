@@ -5,9 +5,10 @@
 // libv
 #include <libv/ui/fwd.hpp>
 //#include <libv/utility/nexus_fwd.hpp>
+//#include <libv/utility/unique_function.hpp>
 #include <libv/utility/nexus.hpp>
-// std
-#include <functional>
+//// std
+//#include <functional>
 
 
 namespace space {
@@ -24,6 +25,7 @@ public:
 
 public:
 	void execute(std::function<void()> task);
+//	void execute(libv::unique_function<void()> task);
 
 	template <typename T>
 	void broadcast_on_thread(T&& event) {

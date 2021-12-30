@@ -10,19 +10,6 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-//template <typename Archive, typename Context>
-//struct ArchiveContextIO : Archive {
-//	Context& context;
-//
-//	template <typename... Args>
-//	explicit inline ArchiveContextIO(Context& context, Args&&... args) :
-//			Archive(std::forward<Args>(args)...),
-//			context(context) {
-//	}
-//};
-
-// -------------------------------------------------------------------------------------------------
-
 template <typename Archive>
 concept cxSnapshotArchive = requires(const Archive& car) {
 //	// TODO P5: Basic Input / Output Archive stuff

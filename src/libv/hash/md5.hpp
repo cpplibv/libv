@@ -26,7 +26,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const md5& md5);
 
 public:
-	template <class Archive>
+	template <typename Archive>
 	inline void serialize(Archive& ar) {
 		ar(value);
 	}

@@ -24,7 +24,7 @@ struct Inner {
 
 	Inner(std::string x) : x(x) { }
 
-	template <class Archive>
+	template <typename Archive>
 	inline void serialize(Archive& ar, const unsigned int) {
 		ar & LIBV_NVP(x);
 	}
@@ -39,7 +39,7 @@ struct Test {
 	bool dead = false;
 	int32_t size = 500100;
 
-	template <class Archive>
+	template <typename Archive>
 	inline void serialize(Archive& ar, const unsigned int) {
 		ar & LIBV_NVP(name);
 		ar & LIBV_NVP(shader);

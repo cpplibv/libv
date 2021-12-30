@@ -77,7 +77,9 @@ struct lines_string_view_fn : lines_string_view_base_fn {
 	}
 };
 
-/// Includes the new line characters
+// -------------------------------------------------------------------------------------------------
+
+/// Includes the separator characters
 /// Every line will contain at least the newline character (no empty line will be yielded)
 static constexpr ranges::view::view_closure<lines_string_view_fn> lines_string_view{};
 

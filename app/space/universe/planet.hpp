@@ -16,6 +16,7 @@
 //#include <vector>
 // pro
 #include <space/universe/engine/chrono.hpp>
+#include <space/universe/engine/screen_pickable_type.hpp>
 #include <space/universe/faction.hpp>
 #include <space/universe/ids.hpp>
 //#include <space/universe/colony.hpp>
@@ -54,7 +55,7 @@ public:
 			position(position) {}
 
 public:
-	template <class Archive> void serialize(Archive& ar) {
+	template <typename Archive> void serialize(Archive& ar) {
 		ar & LIBV_NVP(id);
 		ar & LIBV_NVP(position);
 		ar & LIBV_NVP(name);

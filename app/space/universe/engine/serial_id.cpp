@@ -2,21 +2,15 @@
 
 // hpp
 #include <space/universe/engine/serial_id.hpp>
-// ext
-//#include <cereal/cereal.hpp>
-// std
-//#include <concepts>
-//#include <type_traits>
-// pro
-
-
-//#include <space/fwd.hpp>
-//#include <space/log.hpp>
-//#include <space/universe/ids.hpp>
-#include <space/universe/universe.hpp>
-
+// libv
 #include <libv/algo/linear_find.hpp>
 #include <libv/utility/projection.hpp>
+// pro
+#include <space/universe/universe.hpp>
+
+// TODO P3: Further refine project include hierarchy
+#include <space/universe/fleet.hpp>
+#include <space/universe/planet.hpp>
 
 
 namespace space {
