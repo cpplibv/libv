@@ -32,10 +32,6 @@ std::string hex_dump(const std::string_view& s) {
 	return std::move(ss).str();
 }
 
-std::string hex_dump(const std::span<const std::byte> s) {
-	return hex_dump(std::string_view(reinterpret_cast<const char*>(s.data()), s.size()));
-}
-
 std::string hex_dump_with_ascii(const std::string_view& s) {
 	if (s.empty())
 		return "";
@@ -91,10 +87,6 @@ std::string hex_dump_with_ascii(const std::string_view& s) {
 	}
 
 	return std::move(ss).str();
-}
-
-std::string hex_dump_with_ascii(const std::span<const std::byte> s) {
-	return hex_dump_with_ascii(std::string_view(reinterpret_cast<const char*>(s.data()), s.size()));
 }
 
 // -------------------------------------------------------------------------------------------------

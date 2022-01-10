@@ -78,44 +78,32 @@ app.space: Factions
 
 
 
-huge compile time regression
-	make serial nvp indenednt from all the cereal shit
-	universe has to include less and has to affect less
 
-
-sim_ptr or entity_ptr
-	extra entity flag is dead
-	extra entity ref count
-
-	whenever dereferenced, is dead has to be checked, and the ptr has to be thrown away
-
-	entities stored in deque
-
-	when last ref dies, notifies the 'deque' to swap with last
-
-	serialization would still use SerialID
+entity_ptr
+	serialization
+		load is not trivial! serialization has no access to ctor call!
+		save is 'trivial'
+		SerialID usage
+			serialization would still use SerialID
+			but duting deserialization with resolve the returned type is this sim_ptr type
+			that will increment the ref count
 		ref count is not serialized
-		but duting deserialization with resolve the returned type is this sim_ptr type that will increment the ref count
 
 	usages:
-		command target planet
-		command target fleet
-		fleet faction
-		planet faction
+		- command target planet
+		- command target fleet
+		- fleet faction
+		- planet faction
 
 
 
-Serialization archive with context:
-	the best solution would be nested encapsulation
-	-> so when serializing universe, it creates a nested serializer
-		-> [This could even be a side channel, if must (aka extra arg)]
-	\ This generally takes care of many issues, so this solution is preferred
 
 
 
-document the const_cast
-document the pointer write back better
-refine the file placement of stuff
+document snapshot archive
+	document the const_cast
+	SerialID document the pointer write back better
+	local / shared
 
 
 

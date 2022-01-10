@@ -58,7 +58,6 @@ inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, T&) {
 template <typename T>
 inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::SizeTag<T>&) {
 	// Visitation is no-op, type serializers will call into the archive
-
 }
 
 /// Loading binary data from portable binary
