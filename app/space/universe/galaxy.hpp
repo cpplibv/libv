@@ -6,6 +6,10 @@
 #include <boost/container/flat_set.hpp>
 // libv
 #include <libv/serial/serial.hpp>
+#include <libv/serial/types/std_vector.hpp>
+#include <libv/utility/entity/entity_ptr.hpp>
+#include <libv/utility/entity/entity_ptr_serial.hpp>
+#include <libv/utility/observer_ptr.hpp>
 // std
 #include <deque>
 #include <memory>
@@ -14,6 +18,7 @@
 // pro
 #include <space/fwd.hpp>
 #include <space/universe/engine/chrono.hpp>
+#include <space/universe/engine/memory_store.hpp>
 #include <space/universe/ids.hpp>
 //#include <space/universe/galaxy_serial.hpp>
 
@@ -34,16 +39,15 @@ public:
 //	uint64_t nextEmpireID = 0;
 //	uint64_t nextTradeID = 0;
 
-	// TODO P1: Simulation entity_ptr and entity_store
-	std::vector<std::shared_ptr<Faction>> factions;
-//	std::vector<Faction> factions;
-	std::deque<Planet> planets; // Memory address stability is utilized
-	std::deque<Fleet> fleets; // Memory address stability is utilized
-//	std::vector<Colony> colonies;
-//	std::vector<Empire> empires;
-//	std::vector<Trade> trades;
+	libv::observer_ptr<MemoryStore> memory; // Would be nice to not store a pointer to memory in here
+	std::vector<libv::entity_ptr<Faction>> factions;
+	std::vector<libv::entity_ptr<Planet>> planets;
+	std::vector<libv::entity_ptr<Fleet>> fleets;
+//	std::vector<libv::entity_ptr<Colony>> colonies;
+//	std::vector<libv::entity_ptr<Empire>> empires;
+//	std::vector<libv::entity_ptr<Trade>> trades;
 
-	std::shared_ptr<Faction> factionNeutral_; // "Neutral" faction is references a lot, store a direct lookup for it
+	libv::entity_ptr<Faction> factionNeutral_; // "Neutral" faction is references a lot, store a direct lookup for it
 
 	boost::container::flat_set<FleetID> selectedFleetIDList;
 
@@ -52,9 +56,11 @@ public:
 		ar & LIBV_NVP(nextFactionID);
 		ar & LIBV_NVP(nextPlanetID);
 		ar & LIBV_NVP(nextFleetID);
-		ar & LIBV_NVP(factions);
-		ar & LIBV_NVP(planets);
-		ar & LIBV_NVP(fleets);
+
+		ar & LIBV_NVP_NAMED("factions", libv::entity_primary_owner(memory->faction, factions));
+		ar & LIBV_NVP_NAMED("planets", libv::entity_primary_owner(memory->planet, planets));
+		ar & LIBV_NVP_NAMED("fleets", libv::entity_primary_owner(memory->fleet, fleets));
+
 		if (ar.isLocal())
 			ar & LIBV_NVP(selectedFleetIDList);
 		else
@@ -64,7 +70,7 @@ public:
 	}
 
 public:
-	Galaxy();
+	explicit Galaxy(MemoryStore& memory);
 //	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
 //	Galaxy(const Galaxy&);
 //	Galaxy& operator=(const Galaxy&) &;
@@ -73,8 +79,8 @@ public:
 	~Galaxy();
 
 public:
-	[[nodiscard]] std::shared_ptr<Faction> faction(std::string_view name);
-	[[nodiscard]] std::shared_ptr<Faction> factionNeutral() const;
+	[[nodiscard]] libv::entity_ptr<Faction> faction(std::string_view name);
+	[[nodiscard]] libv::entity_ptr<Faction> factionNeutral() const;
 
 public:
 	void update(sim_duration delta_time);

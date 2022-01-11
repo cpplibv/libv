@@ -22,10 +22,10 @@ int main(int argc, const char** argv) {
 	(void) argc;
 	(void) argv;
 
-	libv::logger_stream.deny_below("libv.gl", libv::Logger::Severity::Info);
-	libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
-	libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
-	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
+//	libv::logger_stream.deny_below("libv.gl", libv::Logger::Severity::Info);
+//	libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
+//	libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
+//	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;
@@ -37,7 +37,7 @@ int main(int argc, const char** argv) {
 		if (std::filesystem::exists("app/space/"))
 			std::filesystem::current_path("app/space/");
 		else
-			std::filesystem::current_path("../app/space/"); // During development artifact created under /bin
+			std::filesystem::current_path("../app/space/"); // During development binary artifacts created under /bin
 
 		// Run the game
 		space::GameInstance game;

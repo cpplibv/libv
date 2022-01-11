@@ -641,10 +641,22 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 // -------------------------------------------------------------------------------------------------
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
+		// <<< P2: Model loader
 		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 //		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
 		shader(rctx.shader_loader, "fleet.vs", "fleet.fs") {
+
+//	log_space.fatal("RendererFleet...");
+//
+//	log_space.fatal("read_file_or_throw...");
+//	auto file = libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4");
+//	log_space.fatal("load_or_throw...");
+//	auto model_t = libv::vm4::load_or_throw(file);
+//	// !!! exception from here gets silently ignored
+//	log_space.fatal("done...");
+//
+//	model.emplace(std::move(model_t));
 }
 
 void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Fleet::Selection selection_status) {
@@ -652,7 +664,7 @@ void RendererFleet::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unif
 	glr.uniform(shader.uniform().base_color, libv::vec4f(0.7f, 0.7f, 0.7f, 1.0f));
 	glr.uniform(shader.uniform().selected, libv::to_underlying(selection_status));
 
-	model.render(glr, shader, uniform_stream);
+	model->render(glr, shader, uniform_stream);
 }
 
 // -------------------------------------------------------------------------------------------------

@@ -14,6 +14,7 @@
 #include <space/universe/engine/snapshot_archive.hpp>
 #include <space/universe/galaxy.hpp>
 #include <space/universe/generation/generation_settings.hpp>
+#include <space/universe/engine/memory_store.hpp>
 //#include <space/universe/engine/tick.hpp>
 //#include <space/universe/ids.hpp>
 
@@ -24,6 +25,9 @@ namespace space {
 
 struct Universe {
 	static constexpr libv::serial::CodecMessageID id{11};
+
+public:
+	MemoryStore memory;
 
 public:
 	Galaxy galaxy;
@@ -54,7 +58,7 @@ public:
 	}
 
 public:
-	Universe() = default; // For de-serialization only
+	Universe() : galaxy(memory) {}; // For de-serialization only
 	explicit Universe(GalaxyGenerationSettings ggs);
 
 //	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function

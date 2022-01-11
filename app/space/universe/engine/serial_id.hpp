@@ -4,6 +4,9 @@
 
 // ext
 #include <cereal/cereal.hpp>
+// libv
+#include <libv/utility/entity/entity_ptr.hpp>
+#include <libv/utility/int_to_ptr.hpp>
 // std
 #include <concepts>
 #include <type_traits>
@@ -37,9 +40,9 @@ public:
 	}
 
 public:
-//	Faction* resolve(FactionID id) const;
-	Planet* resolve(PlanetID id) const;
-	Fleet* resolve(FleetID id) const;
+	libv::entity_ptr<Faction> resolve(FactionID id) const;
+	libv::entity_ptr<Planet> resolve(PlanetID id) const;
+	libv::entity_ptr<Fleet> resolve(FleetID id) const;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -60,7 +63,6 @@ inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::
 	// Visitation is no-op, type serializers will call into the archive
 }
 
-/// Loading binary data from portable binary
 template <class T>
 inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::BinaryData<T>&) {
 	// Visitation is no-op, type serializers will call into the archive
@@ -73,9 +75,10 @@ inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::
 /// can be used with this: T* resolve(decltype(T.id) id) signature to reverse look up IDs to pointers
 ///
 /// \Usage
+///		libv::entity_ptr<T> target;
 ///		template <typename Archive> void serialize(Archive& ar) {
 ///			ar & LIBV_NVP(position);
-///			ar & LIBV_NVP_NAMED("target", SerialID{&target});
+///			ar & LIBV_NVP_NAMED("target", SerialID{target});
 ///		}
 ///
 template <typename T>
@@ -83,24 +86,27 @@ class SerialID {
 	friend cereal::access;
 
 private:
-	using id_type = decltype(std::declval<T>().id);
+	using id_type = decltype(std::declval<T&>().id);
 	using underlying_type = std::underlying_type_t<id_type>;
 
 public:
-	T** ptr;
+	libv::entity_ptr<T>& ptr;
+
+public:
+	explicit inline SerialID(libv::entity_ptr<T>& ptr) noexcept : ptr(ptr) {}
 
 private:
 	template <typename Archive>
 	inline underlying_type save_minimal(const Archive&) const {
-		if (*ptr == nullptr)
+		if (ptr == nullptr)
 			return -1;
 		else
-			return static_cast<underlying_type>((*ptr)->id);
+			return static_cast<underlying_type>(ptr->id);
 	}
 
 	template <typename Archive>
 	inline void load_minimal(const Archive&, const underlying_type& id) {
-		*ptr = reinterpret_cast<T*>(id);
+		ptr.adopt(libv::int_to_ptr<T>(id));
 	}
 
 //	template <typename Archive>
@@ -108,9 +114,9 @@ private:
 //	inline underlying_type save_minimal(const Archive& ar) const {
 	inline underlying_type save_minimal(const SnapshotPtrResolverArchive& ar) const {
 		// The id was already saved in place of the pointer: grab it, resolve it, place it back
-		const auto id = id_type{*reinterpret_cast<underlying_type*>(ptr)};
+		const auto id = id_type{libv::ptr_to_int<underlying_type>(ptr.abandon())};
 
-		*ptr = ar.resolve(id);
+		ptr = ar.resolve(id);
 
 		return 0; // Return value will be discarded
 	}

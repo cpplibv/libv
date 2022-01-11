@@ -8,6 +8,7 @@
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_memory.hpp>
 #include <libv/serial/types/std_string.hpp>
+#include <libv/utility/entity/entity_ptr_fwd.hpp>
 //#include <libv/meta/reflection_access.hpp>
 //#include <libv/serial/enable.hpp>
 // std
@@ -100,16 +101,16 @@ private:
 		FleetCommandType type;
 		libv::vec3f targetPosition;
 		// <<< Variant?
-		Planet* targetPlanet = nullptr;
-		Fleet* targetFleet = nullptr;
+		libv::entity_ptr<Planet> targetPlanet = nullptr;
+		libv::entity_ptr<Fleet> targetFleet = nullptr;
 
 		Command() = default; /// For de-serialization only
 
 		Command(FleetCommandType type, libv::vec3f targetPosition) : type(type), targetPosition(targetPosition) {}
 
-		Command(FleetCommandType type, Fleet* targetFleet) : type(type), targetFleet(targetFleet) {}
+		Command(FleetCommandType type, libv::entity_ptr<Fleet> targetFleet) : type(type), targetFleet(std::move(targetFleet)) {}
 
-		Command(FleetCommandType type, Planet* targetPlanet) : type(type), targetPlanet(targetPlanet) {}
+		Command(FleetCommandType type, libv::entity_ptr<Planet> targetPlanet) : type(type), targetPlanet(std::move(targetPlanet)) {}
 
 		[[nodiscard]] libv::vec3f target() const {
 			if (targetPlanet)
@@ -124,8 +125,8 @@ private:
 			ar & LIBV_NVP(type);
 			ar & LIBV_NVP(targetPosition);
 
-			ar & LIBV_NVP_NAMED("targetPlanet", SerialID{&targetPlanet});
-			ar & LIBV_NVP_NAMED("targetFleet", SerialID{&targetFleet});
+			ar & LIBV_NVP_NAMED("targetPlanet", SerialID{targetPlanet});
+			ar & LIBV_NVP_NAMED("targetFleet", SerialID{targetFleet});
 		}
 	};
 
@@ -154,6 +155,10 @@ private:
 	//
 	// - Colonize               inhabited planet
 
+private:
+	friend libv::entity_access;
+	uint32_t ref_count = 0;
+
 public:
 	FleetID id = invalidFleetID;
 	libv::vec3f position;
@@ -163,7 +168,7 @@ public:
 	std::vector<Command> commands;
 	Selection selectionStatus = Selection::notSelected;
 
-	std::shared_ptr<Faction> faction;
+	libv::entity_ptr<Faction> faction;
 
 //	float speed;
 	//soi_type sphere_of_influence;
@@ -180,7 +185,7 @@ public:
 
 public:
 	Fleet() = default; /// For de-serialization only
-	Fleet(FleetID id, libv::vec3f position, std::shared_ptr<Faction> faction) :
+	Fleet(FleetID id, libv::vec3f position, libv::entity_ptr<Faction> faction) :
 			id(id),
 			position(position),
 			faction(std::move(faction)) {
@@ -202,7 +207,7 @@ public:
 		if (ar.isLocal())
 			ar & LIBV_NVP(selectionStatus);
 
-		ar & LIBV_NVP(faction);
+		ar & LIBV_NVP_NAMED("faction", SerialID{faction});
 
 		ar & LIBV_NVP(number_of_ships);
 		ar & LIBV_NVP(distance_travelled);
@@ -289,12 +294,12 @@ public:
 		commands.emplace_back(FleetCommandType::attack, targetPosition);
 	}
 
-	void queueAttack(Planet* target) {
-		commands.emplace_back(FleetCommandType::attack, target);
+	void queueAttack(libv::entity_ptr<Planet> target) {
+		commands.emplace_back(FleetCommandType::attack, std::move(target));
 	}
 
-	void queueAttack(Fleet* target) {
-		commands.emplace_back(FleetCommandType::attack, target);
+	void queueAttack(libv::entity_ptr<Fleet> target) {
+		commands.emplace_back(FleetCommandType::attack, std::move(target));
 	}
 
 //	void update_stage_2(sim_time dt) {

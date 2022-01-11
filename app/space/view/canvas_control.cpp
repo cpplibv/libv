@@ -23,9 +23,9 @@ namespace {
 
 // -------------------------------------------------------------------------------------------------
 
-Fleet* calculateHitFleet(SpaceCanvas& ctx) {
+libv::entity_ptr<Fleet> calculateHitFleet(SpaceCanvas& ctx) {
 	bool directHit = false;
-	Fleet* fleetHit = nullptr;
+	libv::entity_ptr<Fleet> fleetHit = nullptr;
 
 	const auto mouse_local_coord = ctx.calculate_local_mouse_coord();
 	const auto mouse_ray_dir = ctx.screen_picker.to_world(mouse_local_coord);
@@ -33,21 +33,21 @@ Fleet* calculateHitFleet(SpaceCanvas& ctx) {
 
 	auto hover_distance = std::numeric_limits<float>::max();
 
-	for (Fleet& fleet : ctx.universe.galaxy.fleets) {
+	for (auto& fleet : ctx.universe.galaxy.fleets) {
 		//TODO P4?: Readjusting is needed for multiple ship fleets (either multiple spheres, or an oblong/cuboid shape)
-		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet.position, 0.2f);
+		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet->position, 0.2f);
 
 		if (hit && (!directHit || distance < hover_distance)) {
 			directHit = true;
-			fleetHit = &fleet;
+			fleetHit = fleet;
 			hover_distance = distance;
 
 		} else if (!directHit) {
-			const auto objectSPosition = ctx.screen_picker.to_screen(fleet.position);
+			const auto objectSPosition = ctx.screen_picker.to_screen(fleet->position);
 			distance = (mouse_local_coord - objectSPosition).length();
 
 			if (distance < hover_distance && distance < Fleet::pickingType.radius_screen) {
-				fleetHit = &fleet;
+				fleetHit = fleet;
 				hover_distance = distance;
 			}
 		}
@@ -58,8 +58,8 @@ Fleet* calculateHitFleet(SpaceCanvas& ctx) {
 
 auto calculateHit(SpaceCanvas& ctx) {
 	struct Result {
-		Planet* planetHit = nullptr;
-		Fleet* fleetHit = nullptr;
+		libv::entity_ptr<Planet> planetHit = nullptr;
+		libv::entity_ptr<Fleet> fleetHit = nullptr;
 		libv::vec3f worldCoord;
 	} result;
 
@@ -71,39 +71,39 @@ auto calculateHit(SpaceCanvas& ctx) {
 
 	auto hover_distance = std::numeric_limits<float>::max();
 
-	for (Planet& planet : ctx.universe.galaxy.planets) {
-		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, planet.position, 0.2f);
+	for (auto& planet : ctx.universe.galaxy.planets) {
+		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, planet->position, 0.2f);
 
 		if (hit && (!directHit || distance < hover_distance)) {
 			directHit = true;
-			result.planetHit = &planet;
+			result.planetHit = planet;
 			hover_distance = distance;
 
 		} else if (!directHit) {
-			const auto objectSPosition = ctx.screen_picker.to_screen(planet.position);
+			const auto objectSPosition = ctx.screen_picker.to_screen(planet->position);
 			distance = (mouse_local_coord - objectSPosition).length();
 
 			if (distance < hover_distance && distance < Planet::pickingType.radius_screen) {
-				result.planetHit = &planet;
+				result.planetHit = planet;
 				hover_distance = distance;
 			}
 		}
 	}
 
-	for (Fleet& fleet : ctx.universe.galaxy.fleets) {
-		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet.position, 0.2f);
+	for (auto& fleet : ctx.universe.galaxy.fleets) {
+		auto[hit, distance] = libv::distanceTestLineToSphere(mouse_ray_pos, mouse_ray_dir, fleet->position, 0.2f);
 
 		if (hit && (!directHit || distance < hover_distance)) {
 			directHit = true;
-			result.fleetHit = &fleet;
+			result.fleetHit = fleet;
 			hover_distance = distance;
 
 		} else if (!directHit) {
-			const auto objectSPosition = ctx.screen_picker.to_screen(fleet.position);
+			const auto objectSPosition = ctx.screen_picker.to_screen(fleet->position);
 			distance = (mouse_local_coord - objectSPosition).length();
 
 			if (distance < hover_distance && distance < Fleet::pickingType.radius_screen) {
-				result.fleetHit = &fleet;
+				result.fleetHit = fleet;
 				hover_distance = distance;
 			}
 		}
@@ -130,7 +130,7 @@ libv::vec3f calculate_world_coord(SpaceCanvas& ctx) {
 // -------------------------------------------------------------------------------------------------
 
 void selectionSingle(SpaceCanvas& ctx, bool commitSelection) {
-	auto* fleet = calculateHitFleet(ctx);
+	auto fleet = calculateHitFleet(ctx);
 
 	const auto isSelected = [](const auto& fl) {
 		return fl.selectionStatus == Fleet::Selection::selected ||
@@ -140,10 +140,10 @@ void selectionSingle(SpaceCanvas& ctx, bool commitSelection) {
 
 	if (commitSelection)
 		for (auto& fl : ctx.universe.galaxy.fleets)
-			fl.selectionStatus = Fleet::Selection::notSelected;
+			fl->selectionStatus = Fleet::Selection::notSelected;
 	else
 		for (auto& fl : ctx.universe.galaxy.fleets)
-			fl.selectionStatus = isSelected(fl) ? Fleet::Selection::selected : Fleet::Selection::notSelected;
+			fl->selectionStatus = isSelected(*fl) ? Fleet::Selection::selected : Fleet::Selection::notSelected;
 
 	if (fleet) {
 		if (commitSelection) {
@@ -185,17 +185,17 @@ void selection25D(SpaceCanvas& ctx, bool commitSelection) {
 	std::vector<FleetID> selectedFleetIDs;
 
 	for (auto& fleet : ctx.universe.galaxy.fleets) {
-		const auto M = libv::vec3f(xy(fleet.position), 0.f);
+		const auto M = libv::vec3f(xy(fleet->position), 0.f);
 		// (0 < AM ⋅ AB < AB ⋅ AB) ∧ (0 < AM ⋅ AD < AD ⋅ AD)
 		const auto AM = M - A;
 		if (0 < dot(AM, AD) && dot(AM, AD) < dot_AD && 0 < dot(AM, AB) && dot(AM, AB) < dot_AB) {
 			if (commitSelection) {
-				selectedFleetIDs.emplace_back(fleet.id);
-				fleet.selectionStatus = Fleet::Selection::selected;
+				selectedFleetIDs.emplace_back(fleet->id);
+				fleet->selectionStatus = Fleet::Selection::selected;
 			} else
-				fleet.selectionStatus = Fleet::Selection::hoverBox;
+				fleet->selectionStatus = Fleet::Selection::hoverBox;
 		} else
-			fleet.selectionStatus = Fleet::Selection::notSelected;
+			fleet->selectionStatus = Fleet::Selection::notSelected;
 	}
 
 	if (commitSelection)
@@ -288,20 +288,20 @@ void selection3D(SpaceCanvas& ctx, bool commitSelection) {
 
 	std::vector<FleetID> selectedFleetIDs;
 	for (auto& fleet : ctx.universe.galaxy.fleets) {
-		const auto result = frustum.sphereInFrustum(fleet.position, Fleet::pickingType.radius_universe);
+		const auto result = frustum.sphereInFrustum(fleet->position, Fleet::pickingType.radius_universe);
 
 		switch (result) {
 		case Frustum::Position::OUTSIDE:
-			fleet.selectionStatus = Fleet::Selection::notSelected;
+			fleet->selectionStatus = Fleet::Selection::notSelected;
 			break;
 		case Frustum::Position::INTERSECT:
 			[[fallthrough]];
 		case Frustum::Position::INSIDE:
 			if (commitSelection) {
-				selectedFleetIDs.emplace_back(fleet.id);
-				fleet.selectionStatus = Fleet::Selection::selected;
+				selectedFleetIDs.emplace_back(fleet->id);
+				fleet->selectionStatus = Fleet::Selection::selected;
 			} else
-				fleet.selectionStatus = Fleet::Selection::hoverBox;
+				fleet->selectionStatus = Fleet::Selection::hoverBox;
 			break;
 		}
 	}
@@ -378,7 +378,7 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	});
 
 	controls.feature_action<SpaceCanvas>("space.select_fleet_add", [](const auto&, SpaceCanvas& ctx) {
-		auto* fleet = calculateHitFleet(ctx);
+		auto fleet = calculateHitFleet(ctx);
 		if (fleet) {
 			fleet->selectionStatus = Fleet::Selection::selected;
 			ctx.playout.process<CTO_FleetSelectAdd>(fleet->id);

@@ -17,6 +17,8 @@ class Renderer;
 
 class User;
 
+class MemoryStore;
+
 class Universe;
 class Galaxy;
 class Faction;

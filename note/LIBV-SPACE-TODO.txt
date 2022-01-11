@@ -79,24 +79,9 @@ app.space: Factions
 
 
 
-entity_ptr
-	serialization
-		load is not trivial! serialization has no access to ctor call!
-		save is 'trivial'
-		SerialID usage
-			serialization would still use SerialID
-			but duting deserialization with resolve the returned type is this sim_ptr type
-			that will increment the ref count
-		ref count is not serialized
-
-	usages:
-		- command target planet
-		- command target fleet
-		- fleet faction
-		- planet faction
-
-
-
+entity_store
+	cheap non alloc default ctor
+	entity_store rename current context ptr to store_ptr and (re)introduce a context_ptr
 
 
 
@@ -106,6 +91,10 @@ document snapshot archive
 	local / shared
 
 
+app.space: Make serial_id.hpp not include cereal.hpp
+
+app.space: Compile time regression:
+		compile time regression is mostly due to link time
 
 
 Bug P1: app.space: mp menu is not responsive

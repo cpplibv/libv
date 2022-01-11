@@ -31,7 +31,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 Universe::Universe(GalaxyGenerationSettings ggs) :
-	galaxy(generateGalaxy(ggs)),
+	galaxy(generateGalaxy(memory, ggs)),
 	universe_rng(ggs.seed) {
 }
 
@@ -65,7 +65,7 @@ void Universe::process(CTO_FleetSpawn&& cto) {
 	// <<< Random faction assignments, and yeah, random string generation
 	auto dist = libv::make_uniform_distribution_inclusive(0, 6);
 	auto faction = galaxy.faction("Faction " + std::to_string(dist(universe_rng)));
-	galaxy.fleets.emplace_back(galaxy.nextFleetID++, cto.position, std::move(faction));
+	galaxy.fleets.emplace_back(memory.fleet.create(galaxy.nextFleetID++, cto.position, std::move(faction)));
 }
 
 void Universe::process(CTO_FleetSelect&& cto) {
@@ -103,8 +103,8 @@ void Universe::process(CTO_FleetMove&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->clearCommandQueue();
-		fleet->queueMoveTo(cto.target_position);
+		(*fleet)->clearCommandQueue();
+		(*fleet)->queueMoveTo(cto.target_position);
 	}
 }
 
@@ -117,7 +117,7 @@ void Universe::process(CTO_FleetMoveQueue&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->queueMoveTo(cto.target_position);
+		(*fleet)->queueMoveTo(cto.target_position);
 	}
 }
 
@@ -134,8 +134,8 @@ void Universe::process(CTO_FleetAttackFleet&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->clearCommandQueue();
-		fleet->queueAttack(target);
+		(*fleet)->clearCommandQueue();
+		(*fleet)->queueAttack(*target);
 	}
 }
 
@@ -152,7 +152,7 @@ void Universe::process(CTO_FleetAttackFleetQueue&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->queueAttack(target);
+		(*fleet)->queueAttack(*target);
 	}
 }
 
@@ -169,8 +169,8 @@ void Universe::process(CTO_FleetAttackPlanet&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->clearCommandQueue();
-		fleet->queueAttack(target);
+		(*fleet)->clearCommandQueue();
+		(*fleet)->queueAttack(*target);
 	}
 }
 
@@ -187,7 +187,7 @@ void Universe::process(CTO_FleetAttackPlanetQueue&& cto) {
 		if (!fleet)
 			continue;
 
-		fleet->queueAttack(target);
+		(*fleet)->queueAttack(*target);
 	}
 }
 
@@ -205,7 +205,7 @@ void Universe::process(CTO_Shuffle&& cto) {
 	auto positions = std::vector<libv::vec3f>{};
 	for (const auto& fleet : galaxy.fleets)
 //		positions.emplace_back(fleet.commands.empty() ? fleet.position : fleet.commands.back().target);
-		positions.emplace_back(fleet.position);
+		positions.emplace_back(fleet->position);
 
 	auto rng = libv::xoroshiro128(cto.seed);
 
@@ -213,7 +213,7 @@ void Universe::process(CTO_Shuffle&& cto) {
 
 	auto dst = libv::make_uniform_distribution_inclusive(0, 1);
 	for (std::size_t i = 0; i < positions.size(); ++i) {
-		auto& fleet = galaxy.fleets[i];
+		auto& fleet = *galaxy.fleets[i];
 		fleet.clearCommandQueue();
 		if (dst(rng))
 			fleet.queueAttack(positions[i]);
@@ -229,9 +229,9 @@ void Universe::process(CTO_PlanetSpawn&& cto) {
 	// Bound check
 	auto rng_planet = libv::xoroshiro128(+galaxy.nextPlanetID);
 	// !!! Synchronized PlanetID generation (Split request and action CTO's?)
-	galaxy.planets.emplace_back(generatePlanet(galaxy.nextPlanetID++, cto.position, rng_planet));
+	galaxy.planets.emplace_back(generatePlanet(memory, galaxy.nextPlanetID++, cto.position, rng_planet));
 	// <<< Assign Neutral faction in a better way
-	galaxy.planets.back().faction = galaxy.factionNeutral();
+	galaxy.planets.back()->faction = galaxy.factionNeutral();
 }
 
 void Universe::process(CTO_ClearPlanets&&) {

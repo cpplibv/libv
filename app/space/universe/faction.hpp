@@ -6,6 +6,7 @@
 #include <libv/math/vec.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_string.hpp>
+#include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
 #include <string>
 // pro
@@ -18,9 +19,15 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 class Faction {
+	friend libv::entity_access;
+
 private:
+	uint32_t ref_count = 0;
+
 public: // TODO P5: Make the interface more closed
 	FactionID id = invalidFactionID;
+
+public:
 	std::string name;
 	libv::vec4f colorPrimary;
 	libv::vec4f colorSecondary;

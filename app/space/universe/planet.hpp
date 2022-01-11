@@ -8,6 +8,7 @@
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_memory.hpp>
 #include <libv/serial/types/std_string.hpp>
+#include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
 //#include <optional>
 #include <memory>
@@ -17,6 +18,7 @@
 // pro
 #include <space/universe/engine/chrono.hpp>
 #include <space/universe/engine/screen_pickable_type.hpp>
+#include <space/universe/engine/serial_id.hpp>
 #include <space/universe/faction.hpp>
 #include <space/universe/ids.hpp>
 //#include <space/universe/colony.hpp>
@@ -31,6 +33,10 @@ struct Planet {
 public:
 	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
 
+private:
+	friend libv::entity_access;
+	uint32_t ref_count = 0;
+
 public:
 	PlanetID id = invalidPlanetID;
 	libv::vec3f position;
@@ -42,9 +48,7 @@ public:
 	libv::vec4f color1;
 //	float mass;
 
-//	FactionID ownerFaction;
-//	std::optional<FactionID> ownerFaction;
-	std::shared_ptr<Faction> faction;
+	libv::entity_ptr<Faction> faction;
 
 //	std::optional<Colony> colony;
 
@@ -62,7 +66,7 @@ public:
 		ar & LIBV_NVP(radius);
 		ar & LIBV_NVP(color0);
 		ar & LIBV_NVP(color1);
-		ar & LIBV_NVP(faction);
+		ar & LIBV_NVP_NAMED("faction", SerialID{faction});
 	}
 
 public:

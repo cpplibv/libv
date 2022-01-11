@@ -44,7 +44,7 @@ public:
 	bool main_canvas;
 	GameSession& game_session;
 	Universe& universe;
-	std::shared_ptr<Faction> controlledFaction;
+	libv::entity_ptr<Faction> controlledFaction;
 	Playout& playout;
 
 	CameraPlayer camera;

@@ -41,14 +41,14 @@ void SceneMainControl::register_controls(libv::ctrl::FeatureRegister controls) {
 			SnapshotArchive<libv::archive::BasicBinaryOutput> oar{true, save_data};
 			oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
 		}
-//		{
-//			std::string debug_data;
-//			{
-//				SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(true, debug_data);
-//				oar & LIBV_NVP_NAMED("universe", ctx.game_session->universe);
-//			}
-//			log_space.info("Saved data: {}", debug_data);
-//		}
+		{
+			std::string debug_data;
+			{
+				SnapshotArchive<libv::archive::BasicJSONAnyOutput> oar(true, debug_data);
+				oar & LIBV_NVP_FORCED("universe", ctx.game_session->universe);
+			}
+			log_space.info("Saved data: {}", debug_data);
+		}
 
 		libv::write_file_or_throw("universe.sav", save_data);
 		// <<< handle write error

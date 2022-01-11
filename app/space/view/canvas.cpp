@@ -239,7 +239,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 	// TODO P1: Find a better way of managing text (and debug shape) lifetimes
 	renderer.text.clear_texts();
 
-	for (const auto& fleet : universe.galaxy.fleets) {
+	for (const auto& fleet_ptr : universe.galaxy.fleets) {
+		const auto& fleet = *fleet_ptr;
 		const auto m_guard = glr.model.push_guard();
 		const auto idf = static_cast<float>(+fleet.id);
 
@@ -296,7 +297,8 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		}
 	}
 
-	for (const auto& planet : universe.galaxy.planets) {
+	for (const auto& planet_ptr : universe.galaxy.planets) {
+		const auto& planet = *planet_ptr;
 		const auto m_guard = glr.model.push_guard();
 		glr.model.translate(planet.position);
 
@@ -332,10 +334,10 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 //	renderer.arrow.add_debug_view05();
 
 	for (const auto& fleet : universe.galaxy.fleets) {
-		renderer.arrow.restart_chain(fleet.animation_offset());
+		renderer.arrow.restart_chain(fleet->animation_offset());
 
-		auto prev = fleet.position;
-		for (const auto& command : fleet.commands) {
+		auto prev = fleet->position;
+		for (const auto& command : fleet->commands) {
 			const auto targetPosition = command.target();
 			renderer.arrow.add_arrow(prev, targetPosition, convert_to_arrow_style(command.type));
 			prev = targetPosition;

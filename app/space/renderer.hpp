@@ -213,7 +213,8 @@ public:
 };
 
 struct RendererFleet {
-	Model model;
+//	Model model;
+	std::optional<Model> model;
 	ShaderFleet shader;
 
 public:
