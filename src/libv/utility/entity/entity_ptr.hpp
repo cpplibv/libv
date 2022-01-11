@@ -2,6 +2,8 @@
 
 #pragma once
 
+// fwd
+#include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
 #include <bit>
 #include <cassert>
@@ -190,8 +192,14 @@ public:
 
 // =================================================================================================
 
-template <typename T>
-struct entity_store;
+struct entity_access {
+	template <typename T>
+	[[nodiscard]] static constexpr inline auto& ref_count(T& entity) noexcept {
+		return entity.ref_count;
+	}
+};
+
+// -------------------------------------------------------------------------------------------------
 
 template <typename T>
 struct entity_ptr {
@@ -208,7 +216,7 @@ public:
 		const auto tmp = ptr;
 		ptr = nullptr;
 
-		if (--tmp->ref_count != 0)
+		if (--entity_access::ref_count(*tmp) != 0)
 			return;
 
 		auto ctx = entity_store<T>::context_from_pointer(tmp);
@@ -220,14 +228,16 @@ public:
 
 private:
 	explicit constexpr inline entity_ptr(T* ptr) noexcept : ptr(ptr) {
-		++ptr->ref_count;
+		++entity_access::ref_count(*ptr);
 	}
 
 public:
 	constexpr inline entity_ptr() noexcept = default;
 
+	constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
+
 	constexpr inline entity_ptr(const entity_ptr& other) noexcept : ptr(other.ptr) {
-		++ptr->ref_count;
+		++entity_access::ref_count(*ptr);
 	}
 
 	constexpr inline entity_ptr& operator=(const entity_ptr& other) & noexcept {
@@ -237,7 +247,7 @@ public:
 
 		reset();
 		ptr = other.ptr;
-		++ptr->ref_count;
+		++entity_access::ref_count(*ptr);
 		return *this;
 	}
 
@@ -272,6 +282,20 @@ public:
 //	[[nodiscard]] explicit(false) constexpr inline operator T*() const noexcept {
 //		return ptr;
 //	}
+
+public:
+	/// Abandon the stored pointer without (dereferencing it and) decrementing its ref_count
+	[[nodiscard]] constexpr inline T* abandon() noexcept {
+		auto tmp = ptr;
+		ptr = nullptr;
+		return tmp;
+	}
+
+	/// Adopt a pointer without (dereferencing it and) incrementing its ref_count
+	constexpr inline void adopt(T* ptr_) noexcept {
+		reset();
+		ptr = ptr_;
+	}
 
 public:
 	[[nodiscard]] friend constexpr inline std::strong_ordering operator<=>(const entity_ptr& lhs, const entity_ptr& rhs) noexcept = default;

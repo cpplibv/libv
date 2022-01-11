@@ -32,12 +32,12 @@ constexpr inline auto min(const T& lhs, const Args&... args) noexcept {
 } // namespace detail
 
 template <typename... Args>
-constexpr inline auto max(const Args&... args) noexcept {
+[[nodiscard]] constexpr inline auto max(const Args&... args) noexcept {
 	return detail::max(std::common_type_t<Args...>{args}...);
 }
 
 template <typename... Args>
-constexpr inline auto min(const Args&... args) noexcept {
+[[nodiscard]] constexpr inline auto min(const Args&... args) noexcept {
 	return detail::min(std::common_type_t<Args...>{args}...);
 }
 
