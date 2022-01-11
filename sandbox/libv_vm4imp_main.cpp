@@ -10,6 +10,7 @@
 // std
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 // pro
 #include <libv/vm4/model.hpp>
 #include <libv/vm4/model_serial.hpp>
@@ -45,7 +46,7 @@ int main(int, char**) {
 
 			std::ofstream ofs(output_path, std::ios::out | std::ios::binary);
 			libv::archive::BinaryOutput oar(ofs);
-			oar << LIBV_NVP_NAMED("model", *model);
+			oar << LIBV_NVP_FORCED("model", *model);
 		} else {
 			libv::vm4::log_vm4.error("Failed to import {}", gp);
 		}

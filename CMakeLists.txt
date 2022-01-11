@@ -312,7 +312,7 @@ wish_create_external(
 wish_create_external(
 	NAME cereal
 	GIT_REPOSITORY https://github.com/VaderY/cereal.git
-	GIT_TAG e0e7ba6722e138afd70641c2dcab3681d87b94ab
+	GIT_TAG 7c1ac3f21d04da6609bd127f45dabbc2bf6c28a8
 #	GIT_REPOSITORY /e/dev/cpp/forks/cereal
 #	GIT_TAG dev
 	CMAKE_ARGS
