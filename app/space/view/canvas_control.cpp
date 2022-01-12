@@ -14,7 +14,7 @@
 #include <space/cto.hpp>
 #include <space/log.hpp>
 #include <space/playout.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/universe.hpp>
 #include <space/view/canvas.hpp>
 
 

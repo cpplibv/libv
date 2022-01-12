@@ -11,7 +11,7 @@
 // std
 #include <map>
 // pro
-#include <space/universe/ids.hpp>
+#include <space/sim/ids.hpp>
 
 
 namespace space {

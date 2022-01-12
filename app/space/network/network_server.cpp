@@ -10,7 +10,7 @@
 #include <space/log.hpp>
 #include <space/network/codec.hpp>
 #include <space/playout.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/universe.hpp>
 #include <space/user.hpp>
 
 

@@ -14,8 +14,8 @@
 #include <string>
 // pro
 #include <space/playout.hpp>
-#include <space/universe/generation/generation_settings.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/gen/generation_settings.hpp>
+#include <space/sim/universe.hpp>
 
 
 namespace space {

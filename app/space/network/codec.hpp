@@ -11,9 +11,9 @@
 // pro
 #include <space/cto.hpp>
 #include <space/network/lobby.hpp> // TODO P2: Find a better place for SnapshotLobby
-#include <space/universe/engine/snapshot_archive.hpp>
-#include <space/universe/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
-#include <space/universe/universe_serial.hpp> // TODO P2: Find a better place for SnapshotUniverse
+#include <space/sim/engine/snapshot_archive.hpp>
+#include <space/sim/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
+#include <space/sim/universe_serial.hpp> // TODO P2: Find a better place for SnapshotUniverse
 //#include <space/network/nto.hpp>
 
 

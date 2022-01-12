@@ -58,8 +58,8 @@ app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in
 app.space: Planets
 app.space: Factions
 app.space: Common base for entities
-
-
+app.space: Mitigate the compile-time regression
+app.space: Rename universe folder to sim
 
 
 
@@ -77,23 +77,33 @@ app.space: Common base for entities
 
 
 
-space/universe -> space/sim
-space/sim/generation -> space/sim/gen
 
 
 
+Bug hunting:
+	Bug P1: app.space: mp menu is not responsive
+	Bug P1: app.space: "Space" title button is mouse shielded by the canvas
+			| Maybe mouse movement only | Dont think so
+				Should be a mouse order issue
 
-app.space: Make snapshot_ptr_resolver.hpp not include the whole cereal.hpp
+	Bug P1: repeated smashing of host/join can cause failure
+			| Also: Simple disconnect as a non connected client will do long timeout
 
-app.space: Compile time regression:
-		compile time regression is mostly due to link time
+	Bug P3: app.space: Model loading failure causes silent error and soft-lock
+				Who catches that exception and why?
+			| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
+				So it looks like any exception (what is interesting that it kills the thread)
+			| If the exception comes from model loading (model not file loading) it was a silent crash
+				| This is a different issue, corrupt model file loading
 
+	Performance Bug P4: app.space: 200*200 debug sphere causes low fps
+			| debug shapes have to switch to pre-uploaded meshes
 
-Bug P1: app.space: mp menu is not responsive
 
 
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
+
 
 Simulation
 	app.space: Simulation (container / master controller object)
@@ -107,7 +117,8 @@ Simulation
 		app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
 
 
-app.space: Debug views and grid on/off (and other options) with persistence
+Options
+	app.space: Debug views and grid on/off (and other options) with persistence
 
 
 entity_ptr
@@ -120,6 +131,7 @@ entity_ptr
 				- will call kill() if dtored
 		- kill could auto use the serialization to discover entity_ptr-s with another archives
 
+app.space: Make snapshot_ptr_resolver.hpp not include the whole cereal.hpp
 
 place.it:
 	libv.serial: Maybe create a hjson archive https://hjson.github.io/
@@ -134,34 +146,11 @@ app.space: Formation
 -----------------------------------------------------------------
 
 
-app.space: Galaxy generation (scripted)
-
-
 app.space: Controls: Clicking on shuffle button deselects
 		| feature_binary_raii
 app.space: Controls: Clicking and rotating the camera it deselects
 		| Should analog features have priority over action/binary?
 				Or does (0,0) 'magic' happens and that causes the issue?
-
-
-
-Bug P1: app.space: "Space" title button is mouse shielded by the canvas
-		| Maybe mouse movement only | Dont think so
-			Should be a mouse order issue
-Bug P1: repeated smashing of host/join can cause failure
-		| Also: Simple disconnect as a non connected client will do long timeout
-Bug P3: app.space: Model loading failure causes silent error and soft-lock
-			Who catches that exception and why?
-		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
-			So it looks like any exception (what is interesting that it kills the thread)
-
-
-Performance Bug P4: app.space: 200*200 debug sphere causes low fps
-		| debug shapes have to switch to pre-uploaded meshes
-
-
-
-
 
 Main areas of focus:
 	40 / 6: Control: Ctrl box selection support
@@ -173,6 +162,7 @@ Main areas of focus:
 
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
 
+	app.space: Galaxy generation (scripted)
 	app.space: Main menu
 	app.space: In game menu
 	app.space: Multiplayer lobby list

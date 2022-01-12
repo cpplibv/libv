@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 // pro
-#include <space/universe/ids.hpp> // TODO P2: UserID should be moved somewhere else
+#include <space/sim/ids.hpp> // TODO P2: UserID should be moved somewhere else
 
 
 namespace space {

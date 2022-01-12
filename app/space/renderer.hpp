@@ -18,9 +18,9 @@
 #include <libv/ui/text_layout.hpp>
 //#include <libv/glr/layout_to_string.hpp>
 // pro
-//#include <space/universe/universe.hpp>
-#include <space/universe/fleet.hpp> // For selection status
-#include <space/universe/planet.hpp> // For nothing (yet)
+//#include <space/sim/universe.hpp>
+#include <space/sim/fleet.hpp> // For selection status
+#include <space/sim/planet.hpp> // For nothing (yet)
 #include <space/view/camera.hpp>
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>

@@ -9,7 +9,7 @@
 #include <space/network/network_client.hpp>
 #include <space/network/network_server.hpp>
 #include <space/playout.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/universe.hpp>
 #include <space/view/scene_main.hpp>
 
 #include <space/internal_events.hpp>

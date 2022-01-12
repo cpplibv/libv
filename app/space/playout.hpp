@@ -15,7 +15,7 @@
 #include <space/network/codec.hpp>
 #include <space/network/network_client.hpp>
 #include <space/network/network_server.hpp>
-#include <space/universe/universe.hpp> // Only to access the process member function
+#include <space/sim/universe.hpp> // Only to access the process member function
 
 
 namespace space {

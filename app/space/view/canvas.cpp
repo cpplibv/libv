@@ -14,7 +14,7 @@
 #include <space/game_session.hpp>
 #include <space/view/canvas_control.hpp>
 #include <space/renderer.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/universe.hpp>
 
 
 #include <libv/log/log.hpp>

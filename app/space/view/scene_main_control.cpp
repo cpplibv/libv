@@ -24,8 +24,8 @@
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
 #include <space/game_session.hpp>
-#include <space/universe/engine/snapshot_archive.hpp>
-#include <space/universe/universe.hpp>
+#include <space/sim/engine/snapshot_archive.hpp>
+#include <space/sim/universe.hpp>
 
 
 

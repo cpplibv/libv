@@ -3,7 +3,7 @@
 // hpp
 #include <space/cto.hpp>
 // pro
-#include <space/universe/universe.hpp>
+#include <space/sim/universe.hpp>
 
 
 namespace space {

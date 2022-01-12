@@ -14,7 +14,7 @@
 #include <string>
 // pro
 #include <space/network/lobby.hpp>
-#include <space/universe/ids.hpp>
+#include <space/sim/ids.hpp>
 
 
 namespace space {
