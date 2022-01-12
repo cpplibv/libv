@@ -237,7 +237,8 @@ public:
 	constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
 
 	constexpr inline entity_ptr(const entity_ptr& other) noexcept : ptr(other.ptr) {
-		++entity_access::ref_count(*ptr);
+		if (other.ptr != nullptr)
+			++entity_access::ref_count(*ptr);
 	}
 
 	constexpr inline entity_ptr& operator=(const entity_ptr& other) & noexcept {
@@ -247,7 +248,8 @@ public:
 
 		reset();
 		ptr = other.ptr;
-		++entity_access::ref_count(*ptr);
+		if (other.ptr != nullptr)
+			++entity_access::ref_count(*ptr);
 		return *this;
 	}
 
