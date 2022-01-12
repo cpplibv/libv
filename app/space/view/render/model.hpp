@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/model.hpp
+// Project: libv, File: app/space/view/render/model.hpp
 
 #pragma once
 

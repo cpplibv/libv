@@ -23,7 +23,7 @@
 #include <libv/serial/archive/json.hpp>
 #include <libv/utility/read_file.hpp>
 #include <libv/utility/write_file.hpp>
-#include <space/game_session.hpp>
+#include <space/game/game_session.hpp>
 #include <space/sim/engine/snapshot_archive.hpp>
 #include <space/sim/universe.hpp>
 

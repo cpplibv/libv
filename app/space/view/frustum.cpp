@@ -1,4 +1,4 @@
-// Created by Dalma on 2021.11.08..
+// Project: libv, File: app/space/view/frustum.cpp
 
 // hpp
 #include <space/view/frustum.hpp>

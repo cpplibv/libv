@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/game_instance.cpp
+// Project: libv, File: app/space/game/game_instance.cpp
 
 // hpp
-#include <space/game_instance.hpp>
+#include <space/game/game_instance.hpp>
 // libv
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/ui/event/event_overlay.hpp>
@@ -11,7 +11,7 @@
 #include <space/view/camera_control.hpp>
 #include <space/view/canvas_control.hpp>
 #include <space/view/scene_main_control.hpp>
-#include <space/internal_events.hpp>
+#include <space/message/internal_events.hpp>
 #include <space/log.hpp>
 
 

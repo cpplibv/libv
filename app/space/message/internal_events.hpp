@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/internal_events.hpp
+// Project: libv, File: app/space/message/internal_events.hpp
 
 #pragma once
 

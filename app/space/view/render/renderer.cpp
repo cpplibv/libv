@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/renderer.cpp
+// Project: libv, File: app/space/view/render/renderer.cpp
 
 // hpp
-#include <space/renderer.hpp>
+#include <space/view/render/renderer.hpp>
 // libv
 #include <libv/glr/procedural/sphere.hpp>
 #include <libv/glr/queue.hpp>
@@ -15,8 +15,8 @@
 // pro
 //#include <space/view/camera.hpp>
 //#include <space/command.hpp>
-//#include <space/game_instance.hpp>
-//#include <space/playout.hpp>
+//#include <space/game/game_instance.hpp>
+//#include <space/sim/playout/playout.hpp>
 //#include <space/sim/universe.hpp>
 #include <space/log.hpp>
 

@@ -9,8 +9,8 @@
 // std
 //#include <cassert>
 // pro
-#include <space/cto.hpp>
-#include <space/game_thread.hpp>
+#include <space/message/cto.hpp>
+#include <space/game/game_thread.hpp>
 //#include <space/log.hpp>
 
 

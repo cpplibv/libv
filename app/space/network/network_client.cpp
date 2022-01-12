@@ -9,13 +9,13 @@
 // std
 //#include <mutex>
 // pro
-#include <space/game_thread.hpp>
-#include <space/internal_events.hpp>
+#include <space/game/game_thread.hpp>
+#include <space/game/user.hpp>
 #include <space/log.hpp>
+#include <space/message/internal_events.hpp>
 #include <space/network/codec.hpp>
 #include <space/network/lobby.hpp>
-#include <space/playout.hpp>
-#include <space/user.hpp>
+#include <space/sim/playout/playout.hpp>
 
 
 namespace space {

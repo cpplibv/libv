@@ -1,4 +1,4 @@
-// Project: libv, File: src/space/universe/galaxy.hpp
+// Project: libv, File: app/space/sim/galaxy.cpp
 
 // hpp
 #include <space/sim/galaxy.hpp>
@@ -49,6 +49,8 @@ libv::entity_ptr<Faction> Galaxy::factionNeutral() const {
 }
 
 void Galaxy::kill() {
+	factionNeutral_.reset();
+
 	for (const auto& faction : factions)
 		faction->kill();
 

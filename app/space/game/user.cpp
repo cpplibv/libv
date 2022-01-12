@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/user.cpp
+// Project: libv, File: app/space/game/user.cpp
 
 // hpp
-#include <space/user.hpp>
+#include <space/game/user.hpp>
 // libv
 #include <libv/utility/random/uniform_distribution.hpp>
 // std

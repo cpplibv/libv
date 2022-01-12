@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.11..
+// Project: libv, File: app/space/sim/engine/screen_pickable_type.hpp
 
 #pragma once
 

@@ -112,6 +112,7 @@ Simulation
 		app.space: Rename universe folder to simulation
 
 	app.space: Simulation time control
+		app.space: Fix time step
 		app.space: Pause, Unpause (It will be a good practise for timers and controls)
 		app.space: Speed x1 x2 x4
 		app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed

@@ -1,4 +1,4 @@
-// Project: libv.utility, File: src/libv/utility/chrono_mod.hpp
+// Project: libv.utility, File: src/libv/utility/chrono.hpp
 
 #pragma once
 

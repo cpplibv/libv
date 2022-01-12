@@ -1,4 +1,4 @@
-// Project: libv.color, File: src/libv/color/color.hpp
+// Project: libv.color, File: src/libv/color/space.hpp
 
 #pragma once
 

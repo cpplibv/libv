@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/game_instance.hpp
+// Project: libv, File: app/space/game/game_instance.hpp
 
 #pragma once
 
@@ -13,10 +13,10 @@
 #include <optional>
 #include <string>
 // pro
-#include <space/game_thread.hpp>
-#include <space/renderer.hpp>
-#include <space/user.hpp>
+#include <space/game/game_thread.hpp>
+#include <space/game/user.hpp>
 #include <space/view/frame.hpp>
+#include <space/view/render/renderer.hpp>
 #include <space/view/scene_main.hpp>
 
 

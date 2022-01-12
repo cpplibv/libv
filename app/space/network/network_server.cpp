@@ -6,12 +6,12 @@
 // libv
 #include <libv/net/error.hpp>
 // pro
-#include <space/game_thread.hpp>
+#include <space/game/game_thread.hpp>
+#include <space/game/user.hpp>
 #include <space/log.hpp>
 #include <space/network/codec.hpp>
-#include <space/playout.hpp>
+#include <space/sim/playout/playout.hpp>
 #include <space/sim/universe.hpp>
-#include <space/user.hpp>
 
 
 namespace space {

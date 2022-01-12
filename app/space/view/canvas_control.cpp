@@ -11,9 +11,9 @@
 // std
 #include <optional>
 // pro
-#include <space/cto.hpp>
+#include <space/message/cto.hpp>
 #include <space/log.hpp>
-#include <space/playout.hpp>
+#include <space/sim/playout/playout.hpp>
 #include <space/sim/universe.hpp>
 #include <space/view/canvas.hpp>
 

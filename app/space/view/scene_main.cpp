@@ -6,8 +6,8 @@
 #include <libv/ui/ui.hpp>
 #include <libv/utility/nexus.hpp>
 // pro
-#include <space/game_session.hpp>
-#include <space/internal_events.hpp>
+#include <space/game/game_session.hpp>
+#include <space/message/internal_events.hpp>
 #include <space/log.hpp>
 #include <space/view/overlay_shader_error.hpp>
 #include <space/view/scene_command_bar.hpp>

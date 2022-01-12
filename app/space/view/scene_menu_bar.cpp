@@ -11,8 +11,8 @@
 #include <libv/ui/parse/parse_size.hpp>
 #include <libv/utility/nexus.hpp>
 // pro
-#include <space/user.hpp>
-#include <space/internal_events.hpp>
+#include <space/game/user.hpp>
+#include <space/message/internal_events.hpp>
 
 
 namespace space {

@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.20..
+// Project: libv, File: app/space/sim/engine/snapshot_ptr_resolver.cpp
 
 // hpp
 #include <space/sim/engine/snapshot_ptr_resolver.hpp>

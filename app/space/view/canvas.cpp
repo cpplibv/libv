@@ -11,9 +11,9 @@
 // std
 #include <cassert>
 // pro
-#include <space/game_session.hpp>
+#include <space/game/game_session.hpp>
 #include <space/view/canvas_control.hpp>
-#include <space/renderer.hpp>
+#include <space/view/render/renderer.hpp>
 #include <space/sim/universe.hpp>
 
 

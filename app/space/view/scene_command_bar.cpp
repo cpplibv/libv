@@ -9,7 +9,7 @@
 #include <libv/utility/nexus.hpp>
 //#include <libv/ui/component/input_field.hpp>
 // pro
-#include <space/internal_events.hpp>
+#include <space/message/internal_events.hpp>
 
 
 namespace space {

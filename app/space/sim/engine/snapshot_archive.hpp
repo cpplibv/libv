@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.20..
+// Project: libv, File: app/space/sim/engine/snapshot_archive.hpp
 
 #pragma once
 

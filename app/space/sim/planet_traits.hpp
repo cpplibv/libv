@@ -1,4 +1,4 @@
-// Project: libv, File: src/space/universe/planet.hpp
+// Project: libv, File: app/space/sim/planet_traits.hpp
 
 #pragma once
 

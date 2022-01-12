@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <iostream>
 // pro
-#include <space/game_instance.hpp>
+#include <space/game/game_instance.hpp>
 #include <space/log.hpp>
 
 

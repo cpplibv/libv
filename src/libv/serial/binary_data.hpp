@@ -1,4 +1,4 @@
-// Created by Vader on 2022.01.11..
+// Project: libv.serial, File: src/libv/serial/binary_data.hpp
 
 #pragma once
 

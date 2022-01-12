@@ -1,4 +1,4 @@
-// Project: libv.ui, File: src/libv/ui/component/panel_full.cpp
+// Project: libv.ui, File: src/libv/ui/component/panel_anchor_3d.cpp
 
 // hpp
 #include <libv/ui/component/panel_anchor_3d.hpp>

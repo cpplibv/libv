@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/game_session.hpp
+// Project: libv, File: app/space/game/game_session.hpp
 
 #pragma once
 
@@ -13,7 +13,7 @@
 #include <memory>
 #include <string>
 // pro
-#include <space/playout.hpp>
+#include <space/sim/playout/playout.hpp>
 #include <space/sim/gen/generation_settings.hpp>
 #include <space/sim/universe.hpp>
 

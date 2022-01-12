@@ -1,7 +1,7 @@
-// Project: libv, File: app/space/game_thread.cpp
+// Project: libv, File: app/space/game/game_thread.cpp
 
 // hpp
-#include <space/game_thread.hpp>
+#include <space/game/game_thread.hpp>
 // libv
 #include <libv/ui/ui.hpp>
 //#include <libv/utility/nexus.hpp>

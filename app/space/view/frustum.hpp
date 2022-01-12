@@ -1,4 +1,4 @@
-// Created by Vader on 2021.11.08..
+// Project: libv, File: app/space/view/frustum.hpp
 
 #pragma once
 

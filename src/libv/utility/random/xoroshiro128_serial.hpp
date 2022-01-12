@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/mat_serial.hpp
+// Project: libv.utility, File: src/libv/utility/random/xoroshiro128_serial.hpp
 
 #pragma once
 

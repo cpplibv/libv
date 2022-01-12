@@ -1,4 +1,4 @@
-// Project: libv.concept, File: src/libv/concept/vec.hpp
+// Project: libv.math, File: src/libv/math/vec_concept.hpp
 
 #pragma once
 

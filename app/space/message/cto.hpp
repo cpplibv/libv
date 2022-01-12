@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/cto.hpp
+// Project: libv, File: app/space/message/cto.hpp
 
 #pragma once
 
@@ -304,9 +304,6 @@ struct CTO_TrackView {
 	LIBV_REFLECTION_ACCESS(target);
 	LIBV_REFLECTION_ACCESS(mouse_direction);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe, Lobby& lobby);
 };
 
 struct CTO_CameraWarpTo {
@@ -319,9 +316,6 @@ struct CTO_CameraWarpTo {
 	LIBV_REFLECTION_ACCESS(userID);
 	LIBV_REFLECTION_ACCESS(target_position);
 	LIBV_SERIALIZATION_ENABLE_REFLECTION();
-
-public:
-	void apply(Universe& universe, Lobby& lobby);
 };
 
 //struct CTO_CameraMovement : CommandTrack {

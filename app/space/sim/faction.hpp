@@ -1,4 +1,4 @@
-// Project: libv, File: src/space/universe/force.hpp
+// Project: libv, File: app/space/sim/faction.hpp
 
 #pragma once
 

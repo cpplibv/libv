@@ -1,4 +1,4 @@
-// Project: libv.utility, File: test/libv/utility/test_interval_registry.cpp
+// Project: libv.utility, File: test/libv/utility/test_entity_ptr.cpp
 
 // hpp
 #include <catch/catch.hpp>

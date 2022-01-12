@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/view/model.cpp
+// Project: libv, File: app/space/view/render/model.cpp
 
 // hpp
 #include <space/view/render/model.hpp>
@@ -8,7 +8,7 @@
 #include <libv/glr/uniform_buffer.hpp>
 #include <libv/vm4/model.hpp>
 // pro
-//#include <space/renderer.hpp>
+//#include <space/view/render/renderer.hpp>
 
 
 namespace space {

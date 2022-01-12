@@ -1,4 +1,4 @@
-// Project: libv.math, File: test/libv/math/test_vec.cpp
+// Project: libv.math, File: test/libv/math/test_quat.cpp
 
 // hpp
 #include <catch/catch.hpp>

@@ -100,6 +100,11 @@ libv.net: Add support for endpoint access in mtcp on_accept (passing other type 
 
 
 !!! libv.serial: For safety the only change I should do for now, is get rid of reserves / resizes in serializers
+		This includes every:
+		cereal/types
+		libv/serial/types
+		libv/utility/entity/entity_ptr_serial
+		any *_serial file that serializes a size_type
 
 libv.update: PAPER
 	Update file name

@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/game_thread.hpp
+// Project: libv, File: app/space/game/game_thread.hpp
 
 #pragma once
 

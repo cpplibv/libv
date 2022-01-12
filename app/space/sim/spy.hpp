@@ -1,4 +1,4 @@
-// Project: libv, File: src/space/universe/spy.hpp
+// Project: libv, File: app/space/sim/spy.hpp
 
 // std
 #include <vector>

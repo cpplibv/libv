@@ -1,4 +1,4 @@
-// Project: libv, File: app/space/universe/universe.cpp
+// Project: libv, File: app/space/sim/universe.cpp
 
 // hpp
 #include <space/sim/universe.hpp>
@@ -9,7 +9,7 @@
 // std
 #include <algorithm>
 // pro
-#include <space/cto.hpp>
+#include <space/message/cto.hpp>
 #include <space/sim/faction.hpp>
 #include <space/sim/fleet.hpp>
 #include <space/sim/gen/generation.hpp>
@@ -234,7 +234,6 @@ void Universe::process(CTO_PlanetSpawn&& cto) {
 	auto rng_planet = libv::xoroshiro128(+galaxy.nextPlanetID);
 	// !!! Synchronized PlanetID generation (Split request and action CTO's?)
 	galaxy.planets.emplace_back(generatePlanet(memory, galaxy.nextPlanetID++, cto.position, rng_planet));
-	// <<< Assign Neutral faction in a better way
 	galaxy.planets.back()->faction = galaxy.factionNeutral();
 }
 

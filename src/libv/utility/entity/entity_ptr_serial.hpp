@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.20..
+// Project: libv.utility, File: src/libv/utility/entity/entity_ptr_serial.hpp
 
 #pragma once
 

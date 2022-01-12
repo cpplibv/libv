@@ -1,4 +1,4 @@
-// Project: libv, File: src/iris/eg1/engine/save_format.hpp, Author: Császár Mátyás [Vader]
+// Project: libv, File: app/space/sim/engine/save_format.hpp
 
 #pragma once
 

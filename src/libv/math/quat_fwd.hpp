@@ -1,4 +1,4 @@
-// Project: libv.math, File: src/libv/math/quat.hpp
+// Project: libv.math, File: src/libv/math/quat_fwd.hpp
 
 #pragma once
 

@@ -1,4 +1,4 @@
-// Project: libv, File: src/space/universe/kredit.hpp
+// Project: libv, File: app/space/sim/kredit.hpp
 
 #pragma once
 

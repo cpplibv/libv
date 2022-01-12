@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.13..
+// Project: libv, File: app/space/sim/gen/generation_settings.hpp
 
 #pragma once
 

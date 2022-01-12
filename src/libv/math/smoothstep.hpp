@@ -1,4 +1,4 @@
-// Created by Vader on 2021.12.13..
+// Project: libv.math, File: src/libv/math/smoothstep.hpp
 
 #pragma once
 

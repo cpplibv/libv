@@ -9,7 +9,7 @@
 #include <span>
 #include <vector>
 // pro
-#include <space/cto.hpp>
+#include <space/message/cto.hpp>
 #include <space/network/lobby.hpp> // TODO P2: Find a better place for SnapshotLobby
 #include <space/sim/engine/snapshot_archive.hpp>
 #include <space/sim/universe.hpp> // TODO P2: Find a better place for SnapshotUniverse
