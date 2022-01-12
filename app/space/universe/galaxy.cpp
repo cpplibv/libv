@@ -6,12 +6,12 @@
 #include <libv/algo/linear_find.hpp>
 #include <libv/utility/projection.hpp>
 // pro
-//#include <space/universe/colony.hpp>
-//#include <space/universe/empire.hpp>
+#include <space/universe/engine/memory_store.hpp>
 #include <space/universe/faction.hpp>
 #include <space/universe/fleet.hpp>
 #include <space/universe/planet.hpp>
-#include <space/universe/engine/memory_store.hpp>
+//#include <space/universe/colony.hpp>
+//#include <space/universe/empire.hpp>
 //#include <space/universe/trade.hpp>
 
 
@@ -23,18 +23,16 @@ Galaxy::Galaxy(MemoryStore& memory) :
 		memory(&memory) {
 	factionNeutral_ = memory.faction.create(nextFactionID++, "Neutral", libv::vec4f{0.65f, 0.70f, 0.70f, 0.8f}, libv::vec4f{0.4f, 0.4f, 0.4f, 1.f});
 	factions.push_back(factionNeutral_);
-//		factions.push_back(std::make_shared<Faction>(nextFactionID++, "StoryTeller", aiController));
-//		factions.push_back(std::make_shared<Faction>(nextFactionID++, "AI", aiController));
+
+//	factions.push_back(memory.faction.create(nextFactionID++, "StoryTeller", aiController, libv::vec4f{0.65f, 0.70f, 0.70f, 0.8f}, libv::vec4f{0.4f, 0.4f, 0.4f, 1.f}));
+//	factions.push_back(memory.faction.create(nextFactionID++, "AI", aiController, libv::vec4f{0.65f, 0.70f, 0.70f, 0.8f}, libv::vec4f{0.4f, 0.4f, 0.4f, 1.f}));
 }
 
-//Galaxy::Galaxy(const Galaxy&) = default;
-//Galaxy& Galaxy::operator=(const Galaxy&) & = default;
 Galaxy::Galaxy(Galaxy&&) noexcept = default;
+
 Galaxy& Galaxy::operator=(Galaxy&&) & noexcept = default;
 
-Galaxy::~Galaxy() {
-	//
-}
+Galaxy::~Galaxy() = default;
 
 libv::entity_ptr<Faction> Galaxy::faction(std::string_view name) {
 	auto cacheHit = libv::linear_find_optional(factions, name, libv::proj_indirect(&Faction::name));
@@ -48,6 +46,26 @@ libv::entity_ptr<Faction> Galaxy::faction(std::string_view name) {
 
 libv::entity_ptr<Faction> Galaxy::factionNeutral() const {
 	return factionNeutral_;
+}
+
+void Galaxy::kill() {
+	for (const auto& faction : factions)
+		faction->kill();
+
+	for (const auto& planet : planets)
+		planet->kill();
+
+	for (const auto& fleet : fleets)
+		fleet->kill();
+
+//		for (auto& i : colonies)
+//			i.kill(dt);
+//
+//		for (auto& i : empires)
+//			i.kill(dt);
+//
+//		for (auto& i : trades)
+//			i.kill(dt);
 }
 
 void Galaxy::update(sim_duration delta_time) {
@@ -72,7 +90,7 @@ void Galaxy::update(sim_duration delta_time) {
 //			i.update(dt);
 }
 
-void debug() {
+void Galaxy::debug() {
 
 }
 

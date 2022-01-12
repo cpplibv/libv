@@ -18,6 +18,11 @@ struct MemoryStore {
 	libv::entity_store<Fleet> fleet;
 
 	MemoryStore();
+	MemoryStore(const MemoryStore&) = delete;
+	MemoryStore& operator=(const MemoryStore&) & = delete;
+	MemoryStore(MemoryStore&&) noexcept;
+	MemoryStore& operator=(MemoryStore&&) & noexcept;
+	~MemoryStore();
 };
 
 // -------------------------------------------------------------------------------------------------

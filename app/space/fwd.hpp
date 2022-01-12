@@ -2,6 +2,9 @@
 
 #pragma once
 
+// pro
+#include <space/universe/fwd.hpp>
+
 
 namespace space {
 
@@ -19,11 +22,7 @@ class User;
 
 class MemoryStore;
 
-class Universe;
-class Galaxy;
-class Faction;
-class Planet;
-class Fleet;
+class GalaxyGenerationSettings;
 
 class Playout;
 class PlayoutDelayBuffer;

@@ -4,8 +4,6 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/serial/serial.hpp>
-#include <libv/serial/types/std_string.hpp>
 #include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
 #include <string>
@@ -19,9 +17,8 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 class Faction {
-	friend libv::entity_access;
-
 private:
+	friend libv::entity_access;
 	uint32_t ref_count = 0;
 
 public: // TODO P5: Make the interface more closed
@@ -34,12 +31,7 @@ public:
 //	Controller* controller = passive, ai, player;
 
 public:
-	template <typename Archive> void serialize(Archive& ar) {
-		ar & LIBV_NVP(id);
-		ar & LIBV_NVP(name);
-		ar & LIBV_NVP(colorPrimary);
-		ar & LIBV_NVP(colorSecondary);
-	}
+	template <typename Archive> void serialize(Archive& ar);
 
 public:
 	Faction() = default; /// For de-serialization only
@@ -47,6 +39,7 @@ public:
 	Faction(FactionID id, std::string name, libv::vec4f colorPrimary, libv::vec4f colorSecondary);
 
 public:
+	void kill();
 	void update(sim_duration delta_time);
 
 public:

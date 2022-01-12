@@ -9,6 +9,7 @@
 #include <libv/utility/random/uniform_distribution.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>
 // pro
+#include <space/universe/faction.hpp>
 #include <space/universe/galaxy.hpp>
 #include <space/universe/planet.hpp>
 #include <space/universe/engine/memory_store.hpp>

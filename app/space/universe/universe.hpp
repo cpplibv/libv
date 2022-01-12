@@ -6,17 +6,11 @@
 #include <space/fwd.hpp>
 // libv
 #include <libv/serial/codec_message_id.hpp>
-#include <libv/serial/serial.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>
 // pro
 #include <space/universe/engine/chrono.hpp>
-#include <space/universe/engine/serial_id.hpp>
-#include <space/universe/engine/snapshot_archive.hpp>
-#include <space/universe/galaxy.hpp>
-#include <space/universe/generation/generation_settings.hpp>
 #include <space/universe/engine/memory_store.hpp>
-//#include <space/universe/engine/tick.hpp>
-//#include <space/universe/ids.hpp>
+#include <space/universe/galaxy.hpp>
 
 
 namespace space {
@@ -30,35 +24,15 @@ public:
 	MemoryStore memory;
 
 public:
-	Galaxy galaxy;
 	libv::xoroshiro128 universe_rng;
-
-//	uint64_t nextPlayerID = 0;
-//	plf::colony<Player> players;
-//	std::vector<Player> players;
+	Galaxy galaxy;
 
 public:
-	template <typename Archive> void save(Archive& ar) const {
-		static_assert(cxSnapshotArchive<Archive>);
-
-		ar & LIBV_NVP(galaxy);
-		ar & LIBV_NVP(universe_rng);
-	}
-
-	template <typename Archive> void load(Archive& ar) {
-		static_assert(cxSnapshotArchive<Archive>);
-
-		ar & LIBV_NVP(galaxy);
-		ar & LIBV_NVP(universe_rng);
-
-		SnapshotPtrResolverArchive resolver{*this, ar.isLocal()};
-
-		resolver & LIBV_NVP(galaxy);
-		resolver & LIBV_NVP(universe_rng);
-	}
+	template <typename Archive> void save(Archive& ar) const;
+	template <typename Archive> void load(Archive& ar);
 
 public:
-	Universe() : galaxy(memory) {}; // For de-serialization only
+	Universe(); // For de-serialization only
 	explicit Universe(GalaxyGenerationSettings ggs);
 
 //	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
@@ -66,6 +40,8 @@ public:
 //	Universe& operator=(const Universe&) & noexcept = default;
 	Universe(Universe&&) noexcept = default;
 	Universe& operator=(Universe&&) & noexcept = default;
+
+	~Universe();
 
 public:
 	void update(sim_duration delta_time);

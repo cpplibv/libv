@@ -77,12 +77,28 @@ app.space: Factions
 
 
 
+space/universe -> space/sim
+space/sim/generation -> space/sim/gen
+
+
+app.space:
+	!!! mem leak detection due to circular references in entity_ptrs
+	!!! fleet currently can mem leak A->B, B->A, clear fleets
+			-> kill, is_dead function
+	> have a primary owning ptr version too, which is move only,
+			can create view references, but will call kill() if dtored
+	> kill could auto use the serialization to discover entity_ptr-s with another archives
 
 
 entity_store
 	cheap non alloc default ctor
 	entity_store rename current context ptr to store_ptr and (re)introduce a context_ptr
 
+app.space:
+	maybe common base for entities to take care of
+		- future context ptr to universe (simulation)
+		- ref count
+		- is_dead
 
 
 document snapshot archive
@@ -123,7 +139,8 @@ app.space: Debug views and grid on/off (and other options) with persistence
 
 app.space: Galaxy generation (scripted)
 
-
+place.it:
+	libv.serial: Maybe create a hjson archive https://hjson.github.io/
 
 -----------------------------------------------------------------
 

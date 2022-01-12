@@ -5,10 +5,7 @@
 // ext
 #include <boost/container/flat_set.hpp>
 // libv
-#include <libv/serial/serial.hpp>
-#include <libv/serial/types/std_vector.hpp>
 #include <libv/utility/entity/entity_ptr.hpp>
-#include <libv/utility/entity/entity_ptr_serial.hpp>
 #include <libv/utility/observer_ptr.hpp>
 // std
 #include <deque>
@@ -18,23 +15,19 @@
 // pro
 #include <space/fwd.hpp>
 #include <space/universe/engine/chrono.hpp>
-#include <space/universe/engine/memory_store.hpp>
+#include <space/universe/fwd.hpp>
 #include <space/universe/ids.hpp>
-//#include <space/universe/galaxy_serial.hpp>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-struct Galaxy {
+class Galaxy {
 public:
-//	float time = 0.0f;
-//	float test_sin_time = 0.0f;
-
-	FactionID nextFactionID{0};
-	PlanetID nextPlanetID{0};
-	FleetID nextFleetID{0};
+	FactionID nextFactionID = firstFactionID;
+	PlanetID nextPlanetID = firstPlanetID;
+	FleetID nextFleetID = firstFleetID;
 //	uint64_t nextColonyID = 0;
 //	uint64_t nextEmpireID = 0;
 //	uint64_t nextTradeID = 0;
@@ -52,28 +45,12 @@ public:
 	boost::container::flat_set<FleetID> selectedFleetIDList;
 
 public:
-	template <typename Archive> void serialize(Archive& ar) {
-		ar & LIBV_NVP(nextFactionID);
-		ar & LIBV_NVP(nextPlanetID);
-		ar & LIBV_NVP(nextFleetID);
-
-		ar & LIBV_NVP_NAMED("factions", libv::entity_primary_owner(memory->faction, factions));
-		ar & LIBV_NVP_NAMED("planets", libv::entity_primary_owner(memory->planet, planets));
-		ar & LIBV_NVP_NAMED("fleets", libv::entity_primary_owner(memory->fleet, fleets));
-
-		if (ar.isLocal())
-			ar & LIBV_NVP(selectedFleetIDList);
-		else
-			if constexpr (Archive::is_loading::value)
-				// TODO P5: Instead of full clear, remove/update only the elements that are no longer available (for seamless snapshot update)
-				selectedFleetIDList.clear();
-	}
+	template <typename Archive> void serialize(Archive& ar);
 
 public:
 	explicit Galaxy(MemoryStore& memory);
-//	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
-//	Galaxy(const Galaxy&);
-//	Galaxy& operator=(const Galaxy&) &;
+	Galaxy(const Galaxy&) = delete;
+	Galaxy& operator=(const Galaxy&) & = delete;
 	Galaxy(Galaxy&&) noexcept;
 	Galaxy& operator=(Galaxy&&) & noexcept;
 	~Galaxy();
@@ -83,11 +60,10 @@ public:
 	[[nodiscard]] libv::entity_ptr<Faction> factionNeutral() const;
 
 public:
+	void kill();
 	void update(sim_duration delta_time);
 
-	void debug() {
-
-	}
+	void debug();
 };
 
 // -------------------------------------------------------------------------------------------------

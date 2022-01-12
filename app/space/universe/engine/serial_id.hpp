@@ -8,65 +8,13 @@
 #include <libv/utility/entity/entity_ptr.hpp>
 #include <libv/utility/int_to_ptr.hpp>
 // std
-#include <concepts>
+//#include <concepts>
 #include <type_traits>
 // pro
-#include <space/fwd.hpp>
-#include <space/universe/ids.hpp>
-#include <space/log.hpp>
+#include <space/universe/engine/snapshot_ptr_resolver.hpp>
 
 
 namespace space {
-
-// -------------------------------------------------------------------------------------------------
-
-class SnapshotPtrResolverArchive : public cereal::OutputArchive<SnapshotPtrResolverArchive, cereal::IgnoreNVP> {
-private:
-	const Universe& universe;
-	bool isLocal_;
-
-public:
-	explicit inline SnapshotPtrResolverArchive(const Universe& universe, bool isLocal) :
-			cereal::OutputArchive<SnapshotPtrResolverArchive, cereal::IgnoreNVP>(this),
-			universe(universe),
-			isLocal_(isLocal) {}
-
-public:
-	[[nodiscard]] constexpr inline bool isLocal() const noexcept {
-		return isLocal_;
-	}
-	[[nodiscard]] constexpr inline bool isShared() const noexcept {
-		return !isLocal_;
-	}
-
-public:
-	libv::entity_ptr<Faction> resolve(FactionID id) const;
-	libv::entity_ptr<Planet> resolve(PlanetID id) const;
-	libv::entity_ptr<Fleet> resolve(FleetID id) const;
-};
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive& ar, cereal::NameValuePair<T>& var) {
-	ar(var.value);
-}
-
-template <typename T>
-	requires (std::is_arithmetic_v<T>)
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, T&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
-
-template <typename T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::SizeTag<T>&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
-
-template <class T>
-inline void CEREAL_SERIALIZE_FUNCTION_NAME(SnapshotPtrResolverArchive&, cereal::BinaryData<T>&) {
-	// Visitation is no-op, type serializers will call into the archive
-}
 
 // -------------------------------------------------------------------------------------------------
 

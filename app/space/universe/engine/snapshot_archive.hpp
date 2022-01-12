@@ -3,19 +3,10 @@
 #pragma once
 
 // std
-#include <concepts>
+#include <utility>
 
 
 namespace space {
-
-// -------------------------------------------------------------------------------------------------
-
-template <typename Archive>
-concept cxSnapshotArchive = requires(const Archive& car) {
-//	// TODO P5: Basic Input / Output Archive stuff
-	{ car.isLocal() } -> std::same_as<bool>;
-	{ car.isShared() } -> std::same_as<bool>;
-};
 
 // -------------------------------------------------------------------------------------------------
 

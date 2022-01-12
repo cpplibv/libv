@@ -14,16 +14,19 @@ namespace space {
 
 enum class FactionID : int32_t {};
 constexpr inline FactionID invalidFactionID = FactionID{-1};
+constexpr inline FactionID firstFactionID = FactionID{0};
 [[nodiscard]] constexpr inline auto operator+(FactionID e) noexcept { return libv::to_underlying(e); }
 [[nodiscard]] constexpr inline auto operator++(FactionID& e, int) noexcept { auto r = e; e = FactionID{libv::to_underlying(e) + 1}; return r; }
 
 enum class FleetID : int32_t {};
 constexpr inline FleetID invalidFleetID = FleetID{-1};
+constexpr inline FleetID firstFleetID = FleetID{0};
 [[nodiscard]] constexpr inline auto operator+(FleetID e) noexcept { return libv::to_underlying(e); }
 [[nodiscard]] constexpr inline auto operator++(FleetID& e, int) noexcept { auto r = e; e = FleetID{+e + 1}; return r; }
 
 enum class PlanetID : int32_t {};
 constexpr inline PlanetID invalidPlanetID = PlanetID{-1};
+constexpr inline PlanetID firstPlanetID = PlanetID{0};
 [[nodiscard]] constexpr inline auto operator+(PlanetID e) noexcept { return libv::to_underlying(e); }
 [[nodiscard]] constexpr inline auto operator++(PlanetID& e, int) noexcept { auto r = e; e = PlanetID{+e + 1}; return r; }
 

@@ -29,8 +29,8 @@ public:
 	struct schedule_operation : std::suspend_always {
 		my_coro_thread_pool* thread_pool;
 
-		inline void await_suspend(cppcoro::coroutine_handle<> coro) noexcept {
-			thread_pool->threads.execute_async([coro] { coro.resume(); });
+		inline void await_suspend(cppcoro::coroutine_handle<> coro) const noexcept {
+			thread_pool->threads.execute_async([coro = std::move(coro)] { coro.resume(); });
 		}
 	};
 
@@ -38,8 +38,8 @@ public:
 		my_coro_thread_pool* thread_pool;
 		std::chrono::steady_clock::duration after;
 
-		inline void await_suspend(cppcoro::coroutine_handle<> coro) noexcept {
-			thread_pool->threads.execute_async([coro] { coro.resume(); }, after);
+		inline void await_suspend(cppcoro::coroutine_handle<> coro) const noexcept {
+			thread_pool->threads.execute_async([coro = std::move(coro)] { coro.resume(); }, after);
 		}
 	};
 
@@ -47,8 +47,8 @@ public:
 		my_coro_thread_pool* thread_pool;
 		std::chrono::steady_clock::time_point at;
 
-		inline void await_suspend(cppcoro::coroutine_handle<> coro) noexcept {
-			thread_pool->threads.execute_async([coro] { coro.resume(); }, at);
+		inline void await_suspend(cppcoro::coroutine_handle<> coro) const noexcept {
+			thread_pool->threads.execute_async([coro = std::move(coro)] { coro.resume(); }, at);
 		}
 	};
 
@@ -209,5 +209,111 @@ int main() {
 //			}
 //	);
 //
+
+//template <typename C>
+//cppcoro::task<> example_test_network_protocol_task_2(C connection) {
+//	int codec;
+//	int con = codec + connection + intent_to_coro;
+//	int* resource;
+//
+//	{
+//		co_await con.receive()
+//				[](RequestResourceSelect&& request) {
+//					resource = server.find_resource(request->resource);
+//					if (!resource)
+//						con.send(ResponseResourceNotFound{});
+//				},
+//				[](RequestResourceDescription&& request) {
+//					resource = server.find_resource(request->resource);
+//					if (!resource)
+//						con.send(ResponseResourceNotFound{});
+//					else
+//						con.send(ResponseResourceDescription{resource->size()});
+//				}
+//		);
+//
+//		while (con.connected) {
+//			co_await con.receive(
+//					[](RequestResourceSelect&& request) {
+//						resource = server.find_resource(request->resource);
+//						if (!resource)
+//							con.send(ResponseResourceNotFound{});
+//					},
+//					[](RequestResourceDescription&& request) {
+//						resource = server.find_resource(request->resource);
+//						if (!resource)
+//							con.send(ResponseResourceNotFound{});
+//						else
+//							con.send(ResponseResourceDescription{resource->size()});
+//					},
+//					[](RequestResourceData&& request) {
+//						if (!resource) {
+//							log.error("...");
+//							co_return disconnect_state_error;
+//						}
+//
+//						for (int i = request.offset; i < request.offset + request.amount; i += network_chunk_size)
+//							// "SPAWN" ASYNC STATE to handle cancel
+//							co_await con.send_with_queue(2, ResponseResourceChunk{i, resource->chunk(i)});
+//					}
+//			);
+//		}
+//	}
+//}
+
+//template <typename C>
+//cppcoro::task<> example_test_network_protocol_task_3(C connection) {
+//	int codec;
+//	int con = codec + connection + intent_to_coro;
+//	int* resource;
+//
+//	{
+//		const auto message = co_await con.receive();
+//
+//		if (auto request = message.handle<RequestResourceSelect>()) {
+//			resource = server.find_resource(request->resource);
+//			if (!resource)
+//				con.send(ResponseResourceNotFound{});
+//		}
+//		if (auto request = message.handle<RequestResourceDescription>()) {
+//			resource = server.find_resource(request->resource);
+//			if (!resource)
+//				con.send(ResponseResourceNotFound{});
+//			else
+//				con.send(ResponseResourceDescription{resource->size()});
+//		}
+//		if (message.is_unhandled()) {
+//			log.error("...");
+//			co_return disconnect_communtion_error;
+//		}
+//
+//		while (con.connected) {
+//			co_await con.receive(
+//					[](RequestResourceSelect&& request) {
+//						resource = server.find_resource(request->resource);
+//						if (!resource)
+//							con.send(ResponseResourceNotFound{});
+//					},
+//					[](RequestResourceDescription&& request) {
+//						resource = server.find_resource(request->resource);
+//						if (!resource)
+//							con.send(ResponseResourceNotFound{});
+//						else
+//							con.send(ResponseResourceDescription{resource->size()});
+//					},
+//					[](RequestResourceData&& request) {
+//						if (!resource) {
+//							log.error("...");
+//							co_return disconnect_state_error;
+//						}
+//
+//						for (int i = request.offset; i < request.offset + request.amount; i += network_chunk_size)
+//							// "SPAWN" ASYNC STATE to handle cancel
+//							co_await con.send_with_queue(2, ResponseResourceChunk{i, resource->chunk(i)});
+//					}
+//			);
+//		}
+//	}
+//}
 
 // -------------------------------------------------------------------------------------------------

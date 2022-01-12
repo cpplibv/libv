@@ -1,16 +1,14 @@
 // Created by Vader on 2021.12.20..
 
 // hpp
-#include <space/universe/engine/serial_id.hpp>
+#include <space/universe/engine/snapshot_ptr_resolver.hpp>
 // libv
 #include <libv/algo/linear_find.hpp>
-#include <libv/utility/projection.hpp>
 // pro
-#include <space/universe/universe.hpp>
-
-// TODO P3: Further refine project include hierarchy
+#include <space/universe/faction.hpp>
 #include <space/universe/fleet.hpp>
 #include <space/universe/planet.hpp>
+#include <space/universe/universe.hpp>
 
 
 namespace space {

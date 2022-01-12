@@ -4,35 +4,37 @@
 #include <space/universe/universe.hpp>
 // libv
 #include <libv/algo/linear_find.hpp>
-#include <libv/serial/archive/binary.hpp>
-#include <libv/serial/archive/json_any.hpp>
 #include <libv/utility/random/uniform_distribution.hpp>
 #include <libv/utility/random/xoroshiro128.hpp>
 // std
 #include <algorithm>
-#include <random>
 // pro
 #include <space/cto.hpp>
-#include <space/universe/generation/generation.hpp>
-//#include <space/log.hpp>
-//#include <space/universe/ids.hpp>
-
-
-//#include <space/universe/colony.hpp>
-//#include <space/universe/empire.hpp>
 #include <space/universe/faction.hpp>
 #include <space/universe/fleet.hpp>
+#include <space/universe/generation/generation.hpp>
+#include <space/universe/generation/generation_settings.hpp>
 #include <space/universe/planet.hpp>
+//#include <space/universe/colony.hpp>
+//#include <space/universe/empire.hpp>
 //#include <space/universe/trade.hpp>
+//#include <space/log.hpp>
 
 
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
+Universe::Universe() : galaxy(memory) { // For de-serialization only
+}
+
 Universe::Universe(GalaxyGenerationSettings ggs) :
-	galaxy(generateGalaxy(memory, ggs)),
-	universe_rng(ggs.seed) {
+	universe_rng(ggs.seed),
+	galaxy(generateGalaxy(memory, std::move(ggs))) {
+}
+
+Universe::~Universe() {
+	galaxy.kill();
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -195,8 +197,10 @@ void Universe::process(CTO_ClearFleets&&) {
 	// Permission check
 	// Bound check
 	galaxy.selectedFleetIDList.clear();
+	for (const auto& fleet : galaxy.fleets)
+		fleet->kill();
 	galaxy.fleets.clear();
-//	galaxy.nextFleetID = FleetID{0};
+//	galaxy.nextFleetID = firstFleetID;
 }
 
 void Universe::process(CTO_Shuffle&& cto) {
@@ -238,7 +242,7 @@ void Universe::process(CTO_ClearPlanets&&) {
 	// Permission check
 	// Bound check
 	galaxy.planets.clear();
-//	galaxy.nextPlanetID = PlanetID{0};
+//	galaxy.nextPlanetID = firstPlanetID;
 }
 
 // -------------------------------------------------------------------------------------------------
