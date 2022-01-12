@@ -10,6 +10,7 @@
 #include <vector>
 // pro
 #include <space/universe/engine/chrono.hpp>
+#include <space/universe/engine/entity.hpp>
 #include <space/universe/engine/screen_pickable_type.hpp>
 #include <space/universe/fwd.hpp>
 #include <space/universe/ids.hpp>
@@ -70,7 +71,7 @@ enum class FleetCommandType {
 
 // -------------------------------------------------------------------------------------------------
 
-class Fleet {
+class Fleet : public Entity<Fleet, FleetID, invalidFleetID> {
 public:
 	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
 
@@ -128,12 +129,7 @@ private:
 	//
 	// - Colonize               inhabited planet
 
-private:
-	friend libv::entity_access;
-	uint32_t ref_count = 0;
-
 public:
-	FleetID id = invalidFleetID;
 	libv::vec3f position;
 	std::string name;
 //	libv::quat orientation;
@@ -171,14 +167,13 @@ public:
 
 	void kill();
 	void update(libv::time_duration delta_time);
+//	void update_stage_2(sim_time dt);
 
 	void clearCommandQueue();
 	void queueMoveTo(libv::vec3f targetPosition);
 	void queueAttack(libv::vec3f targetPosition);
 	void queueAttack(libv::entity_ptr<Planet> target);
 	void queueAttack(libv::entity_ptr<Fleet> target);
-
-//	void update_stage_2(sim_time dt);
 };
 
 // -------------------------------------------------------------------------------------------------

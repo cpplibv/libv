@@ -10,6 +10,13 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
+/// SnapshotArchive is an archive wrapper that includes isLocal/isShared bool property to determine the usage of the snapshot
+///
+///	Local Snapshot: Includes everything from the simulation. Meant for quick save / load
+///	Shared Snapshot: Excludes some local perspective from the simulation (Like selection). Meant to be shared on the network or in a save file
+///
+/// \Usage
+/// 		SnapshotArchive<libv::archive::BasicBinaryInput> iar(false, message);
 template <template <typename CRTP> typename Archive>
 class SnapshotArchive : public Archive<SnapshotArchive<Archive>> {
 	bool isLocal_;

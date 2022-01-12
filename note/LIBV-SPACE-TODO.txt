@@ -57,7 +57,7 @@ app.space: Serialization of Snapshots in isLocal/isShared mode
 app.space: 'Universe' Snapshot need for unsynchronized / non-snapshot members in Universe
 app.space: Planets
 app.space: Factions
-
+app.space: Common base for entities
 
 
 
@@ -81,33 +81,9 @@ space/universe -> space/sim
 space/sim/generation -> space/sim/gen
 
 
-app.space:
-	!!! mem leak detection due to circular references in entity_ptrs
-	!!! fleet currently can mem leak A->B, B->A, clear fleets
-			-> kill, is_dead function
-	> have a primary owning ptr version too, which is move only,
-			can create view references, but will call kill() if dtored
-	> kill could auto use the serialization to discover entity_ptr-s with another archives
 
 
-entity_store
-	cheap non alloc default ctor
-	entity_store rename current context ptr to store_ptr and (re)introduce a context_ptr
-
-app.space:
-	maybe common base for entities to take care of
-		- future context ptr to universe (simulation)
-		- ref count
-		- is_dead
-
-
-document snapshot archive
-	document the const_cast
-	SerialID document the pointer write back better
-	local / shared
-
-
-app.space: Make serial_id.hpp not include cereal.hpp
+app.space: Make snapshot_ptr_resolver.hpp not include the whole cereal.hpp
 
 app.space: Compile time regression:
 		compile time regression is mostly due to link time
@@ -116,28 +92,34 @@ app.space: Compile time regression:
 Bug P1: app.space: mp menu is not responsive
 
 
-
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
 
-app.space: Simulation (container / master controller object)
-			A new container object/class that has the universe in it
-			Process functions are the member of the simulation
-	app.space: Rename universe folder to simulation
+Simulation
+	app.space: Simulation (container / master controller object)
+				A new container object/class that has the universe in it
+				Process functions are the member of the simulation
+		app.space: Rename universe folder to simulation
 
-app.space: Simulation time control
-	app.space: Pause, Unpause (It will be a good practise for timers and controls)
-	app.space: Speed x1 x2 x4
-	app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
+	app.space: Simulation time control
+		app.space: Pause, Unpause (It will be a good practise for timers and controls)
+		app.space: Speed x1 x2 x4
+		app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
+
 
 app.space: Debug views and grid on/off (and other options) with persistence
 
 
+entity_ptr
+	libv.utility: entity_store: cheap non alloc default ctor
+	libv.utility: entity_store context_ptr: rename current context ptr to store_ptr and (re)introduce a context_ptr
+	app.space: entity_ptr circular reference leak mitigation ideas:
+		- have a primary owning ptr version too, which is
+				- move only
+				- can create (normal) view references
+				- will call kill() if dtored
+		- kill could auto use the serialization to discover entity_ptr-s with another archives
 
-
-
-
-app.space: Galaxy generation (scripted)
 
 place.it:
 	libv.serial: Maybe create a hjson archive https://hjson.github.io/
@@ -152,12 +134,7 @@ app.space: Formation
 -----------------------------------------------------------------
 
 
-app.space: Direction idea:
-		Create a working UI mockup project
-		Create a working sim mockup project
-		Create a working render mockup project
-		Merge them
-
+app.space: Galaxy generation (scripted)
 
 
 app.space: Controls: Clicking on shuffle button deselects

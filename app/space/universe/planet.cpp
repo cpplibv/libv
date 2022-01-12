@@ -15,7 +15,7 @@ Planet::Planet() = default; /// For de-serialization only
 Planet::~Planet() = default;
 
 Planet::Planet(PlanetID id, libv::vec3f position) :
-	id(id),
+	Base(id),
 	position(position) {}
 
 void Planet::kill() {

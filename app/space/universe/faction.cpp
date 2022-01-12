@@ -13,7 +13,7 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 Faction::Faction(FactionID id, std::string name) :
-		id(id),
+		Base(id),
 		name(std::move(name)) {
 
 	if (+id < 13) {
@@ -40,7 +40,7 @@ Faction::Faction(FactionID id, std::string name) :
 }
 
 Faction::Faction(FactionID id, std::string name, libv::vec4f colorPrimary, libv::vec4f colorSecondary) :
-		id(id), name(std::move(name)), colorPrimary(colorPrimary), colorSecondary(colorSecondary) {}
+		Base(id), name(std::move(name)), colorPrimary(colorPrimary), colorSecondary(colorSecondary) {}
 
 void Faction::kill() {
 	// noop

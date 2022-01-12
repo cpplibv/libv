@@ -42,10 +42,11 @@ libv::vec3f Fleet::Command::target() const {
 // -------------------------------------------------------------------------------------------------
 
 Fleet::Fleet() = default; /// For de-serialization only
+
 Fleet::~Fleet() = default;
 
 Fleet::Fleet(FleetID id, libv::vec3f position, libv::entity_ptr<Faction> faction) :
-		id(id),
+		Base(id),
 		position(position),
 		faction(std::move(faction)) {
 

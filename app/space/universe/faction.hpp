@@ -4,11 +4,11 @@
 
 // libv
 #include <libv/math/vec.hpp>
-#include <libv/utility/entity/entity_ptr_fwd.hpp>
 // std
 #include <string>
 // pro
 #include <space/universe/engine/chrono.hpp>
+#include <space/universe/engine/entity.hpp>
 #include <space/universe/ids.hpp>
 
 
@@ -16,14 +16,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-class Faction {
-private:
-	friend libv::entity_access;
-	uint32_t ref_count = 0;
-
-public: // TODO P5: Make the interface more closed
-	FactionID id = invalidFactionID;
-
+class Faction : public Entity<Faction, FactionID, invalidFactionID> {
 public:
 	std::string name;
 	libv::vec4f colorPrimary;

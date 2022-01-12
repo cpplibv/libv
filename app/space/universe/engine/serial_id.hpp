@@ -2,8 +2,6 @@
 
 #pragma once
 
-// ext
-#include <cereal/cereal.hpp>
 // libv
 #include <libv/utility/entity/entity_ptr.hpp>
 #include <libv/utility/int_to_ptr.hpp>
@@ -20,7 +18,7 @@ namespace space {
 
 /// SerialID can be used during serialization to save the pointers ID instead of its value
 /// During deserialization an output archive (yes, output and not input, due to input would modify everything)
-/// can be used with this: T* resolve(decltype(T.id) id) signature to reverse look up IDs to pointers
+/// can be used with this: libv::entity_ptr<T> resolve(decltype(T.id) id) signature to reverse look up IDs to pointers
 ///
 /// \Usage
 ///		libv::entity_ptr<T> target;
@@ -29,6 +27,11 @@ namespace space {
 ///			ar & LIBV_NVP_NAMED("target", SerialID{target});
 ///		}
 ///
+///		template <typename Archive> void top_level_load(Archive& ar) {
+///			ar & LIBV_NVP(universe);
+///			SnapshotPtrResolverArchive resolver{*this, ar.isLocal()};
+///			resolver & LIBV_NVP(universe);
+///		}
 template <typename T>
 class SerialID {
 	friend cereal::access;
@@ -64,7 +67,7 @@ private:
 		// The id was already saved in place of the pointer: grab it, resolve it, place it back
 		const auto id = id_type{libv::ptr_to_int<underlying_type>(ptr.abandon())};
 
-		ptr = ar.resolve(id);
+		ptr = ar.resolve(id); // NOTE: SerialID is allowed to edit the ptr during "save" as the resolver uses save inside a load, so the object is not const
 
 		return 0; // Return value will be discarded
 	}

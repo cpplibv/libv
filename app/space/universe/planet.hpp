@@ -8,9 +8,10 @@
 // std
 #include <string>
 // pro
-#include <space/universe/fwd.hpp>
 #include <space/universe/engine/chrono.hpp>
+#include <space/universe/engine/entity.hpp>
 #include <space/universe/engine/screen_pickable_type.hpp>
+#include <space/universe/fwd.hpp>
 #include <space/universe/ids.hpp>
 //#include <space/universe/colony.hpp>
 //#include <space/universe/planet_traits.hpp>
@@ -20,16 +21,11 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-class Planet {
+class Planet : public Entity<Planet, PlanetID, invalidPlanetID> {
 public:
 	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
 
-private:
-	friend libv::entity_access;
-	uint32_t ref_count = 0;
-
 public:
-	PlanetID id = invalidPlanetID;
 	libv::vec3f position;
 	std::string name;
 //	uint64_t seed;
