@@ -182,24 +182,26 @@ public:
 	void aux_debug(Node& node, int depth = 0) noexcept {
 		if (depth != 0) {
 			if (node.region_nodes.empty())
-				log_ui.info("{:<40} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]({})", std::string((depth - 1) * 4, ' ') +
+				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]", std::string((depth - 1) * 4, ' ') +
 						node.target->path(),
-						node.enabled,
-						node.over,
-						node.interacting,
+						libv::to_underlying(node.order),
+						node.enabled ? "Y" : " ",
+						node.over ? "Y" : " ",
+						node.interacting ? "Y" : " ",
 						node.global_offset() + node.cornerBL,
-						node.global_offset() + node.cornerTR,
-						node.over ? "X" : " ");
+						node.global_offset() + node.cornerTR
+				);
 			else
-				log_ui.info("{:<40} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}]({}) -> {}", std::string((depth - 1) * 4, ' ') +
+				log_ui.info("{:<40} Order:{:2} Enabled:{} Over:{} Interact:{} [BL:{:>9} TR:{:>9}] -> {}", std::string((depth - 1) * 4, ' ') +
 						node.target->path(),
-						node.enabled,
-						node.over,
-						node.interacting,
+						libv::to_underlying(node.order),
+						node.enabled ? "Y" : " ",
+						node.over ? "Y" : " ",
+						node.interacting ? "Y" : " ",
 						node.global_offset() + node.cornerBL,
 						node.global_offset() + node.cornerTR,
-						node.over ? "X" : " ",
-						node.region_offset);
+						node.region_offset
+				);
 		}
 
 		for (auto& child_node : node.region_nodes)
@@ -486,6 +488,8 @@ void ContextMouse::event_leave() {
 }
 
 void ContextMouse::event_button(libv::input::MouseButton mouse, libv::input::Action action) {
+	//	debug();
+
 	// Define event
 	EventMouseButton event;
 	event.mouse_position = self->mouse_position;

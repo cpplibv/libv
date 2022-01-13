@@ -35,6 +35,7 @@
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
 #include <libv/ui/property/spacing.hpp>
+#include <libv/ui/property/z_index_offset.hpp>
 //#include <libv/ui/property/font_2D.hpp>
 //#include <libv/ui/property/scroll_area_mode.hpp>
 //#include <libv/ui/property/shader_font.hpp>
@@ -648,6 +649,7 @@ public:
 		property_loaders.emplace(pnm::spacing, convert_enum_value<Spacing>());
 //		property_loaders.emplace(pnm::spacing2, _______);
 //		property_loaders.emplace(pnm::squish, _______);
+		property_loaders.emplace(pnm::z_index_offset, convert_enum_value<ZIndexOffset>());
 		//		property_loaders.emplace(pnm::text, _______);
 		//		property_loaders.emplace(pnm::value, _______);
 		//		property_loaders.emplace(pnm::value_max, _______);

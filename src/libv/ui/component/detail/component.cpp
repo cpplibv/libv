@@ -102,6 +102,14 @@ Anchor Component::anchor() const noexcept {
 	return ptr_->anchor();
 }
 
+void Component::z_index_offset(ZIndexOffset value) noexcept {
+	ptr_->z_index_offset(value);
+}
+
+ZIndexOffset Component::z_index_offset() const noexcept {
+	return ptr_->z_index_offset();
+}
+
 void Component::margin(Margin value) noexcept {
 	ptr_->margin(value);
 }

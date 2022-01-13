@@ -60,8 +60,8 @@ app.space: Factions
 app.space: Common base for entities
 app.space: Mitigate the compile-time regression
 app.space: Rename universe folder to sim
-
-
+libv.ui: Add support for Z-Index offset (Mouse only for now)
+app.space: Fix Z-Index issue with mp menu
 
 
 
@@ -78,17 +78,13 @@ app.space: Rename universe folder to sim
 
 
 
+Bug P1: repeated smashing of host/join can cause failure
+		| Also: Simple disconnect as a non connected client will do long timeout
+		| Also: Connect with a client seg fault
+
 
 
 Bug hunting:
-	Bug P1: app.space: mp menu is not responsive
-	Bug P1: app.space: "Space" title button is mouse shielded by the canvas
-			| Maybe mouse movement only | Dont think so
-				Should be a mouse order issue
-
-	Bug P1: repeated smashing of host/join can cause failure
-			| Also: Simple disconnect as a non connected client will do long timeout
-
 	Bug P3: app.space: Model loading failure causes silent error and soft-lock
 				Who catches that exception and why?
 			| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87

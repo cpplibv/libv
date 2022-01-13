@@ -629,7 +629,7 @@ void CoreComponent::layout2FloatPositionUpdateScan(libv::vec3f floatPosition, in
 		const auto childDepth = parentDepth + 1;
 
 		if (child_core.flags.match_any(Flag::watchMouse | Flag::floatRegion))
-			child_core.context().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth});
+			child_core.context().mouse.update(child_core, childFloatPosition, size, libv::ui::MouseOrder{childDepth + child_core.property.z_index_offset()});
 
 		child_core.layout2FloatPositionUpdateScan(childFloatPosition, childDepth);
 	});
@@ -657,7 +657,7 @@ void CoreComponent::layout2(const ContextLayout2& layout_env) {
 
 	if ((changedFloatPosition || changedBounds) && flags.match_any(Flag::watchMouse | Flag::floatRegion))
 		// We update the mouse context
-		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth});
+		context().mouse.update(*this, layout_env.float_position, layout_env.size, libv::ui::MouseOrder{layout_env.depth + property.z_index_offset()});
 
 	if (!changedFloatPosition && !changedBounds && !flags.match_any(Flag::pendingLayout))
 		// No need to re-layout this component sub-tree

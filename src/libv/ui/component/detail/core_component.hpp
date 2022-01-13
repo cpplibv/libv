@@ -23,6 +23,7 @@
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
+#include <libv/ui/property/z_index_offset.hpp>
 #include <libv/ui/style_fwd.hpp>
 #include <libv/ui/style_state.hpp>
 
@@ -60,6 +61,7 @@ private:
 	struct Properties {
 		PropertyL1L2LP<Size> size;
 		PropertyLP<Anchor> anchor;
+		PropertyL2<ZIndexOffset> z_index_offset;
 		PropertyLP<Margin> margin; /// x: left, y: down, z: right, w: top
 		PropertyL1L2LP<Padding> padding; /// x: left, y: down, z: right, w: top
 	} property;
@@ -141,6 +143,13 @@ public:
 	}
 	inline void anchor(Anchor value) noexcept {
 		AccessProperty::manual(*this, property.anchor, value);
+	}
+
+	[[nodiscard]] inline ZIndexOffset z_index_offset() const noexcept {
+		return property.z_index_offset();
+	}
+	inline void z_index_offset(ZIndexOffset value) noexcept {
+		AccessProperty::manual(*this, property.z_index_offset, value);
 	}
 
 	// --- Margin ---
@@ -360,6 +369,12 @@ void CoreComponent::access_properties(T& ctx) {
 			Anchor::center_center,
 			pgr::layout, pnm::anchor,
 			"Component's anchor point"
+	);
+	ctx.property(
+			[](auto& c) -> auto& { return c.property.z_index_offset; },
+			ZIndexOffset{0},
+			pgr::layout, pnm::z_index_offset,
+			"Component's Z-Index offset"
 	);
 	ctx.property(
 			[](auto& c) -> auto& { return c.property.margin; },

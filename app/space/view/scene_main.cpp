@@ -81,6 +81,7 @@ void SceneMain::unregister_nexus() {
 // <<< Whos member is this?
 auto createCanvas(const std::shared_ptr<GameSession>& game_session, Renderer& renderer, libv::ctrl::Controls& controls) {
 	libv::ui::CanvasAdaptorT<SpaceCanvas> canvas("space.canvas.main", renderer, *game_session, true);
+	canvas.z_index_offset(-100);
 
 	canvas.event().focus.connect([&controls](libv::ui::CanvasAdaptorT<SpaceCanvas>& self, const libv::ui::EventFocus& event) {
 		log_space.trace("Space Canvas Focus: {}", event.gain());

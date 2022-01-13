@@ -16,6 +16,7 @@
 #include <libv/ui/property/margin.hpp>
 #include <libv/ui/property/padding.hpp>
 #include <libv/ui/property/size.hpp>
+#include <libv/ui/property/z_index_offset.hpp>
 #include <libv/ui/style_state.hpp>
 //#include <libv/ui/style_fwd.hpp>
 //#include <libv/utility/intrusive_ptr.hpp>
@@ -79,6 +80,9 @@ public:
 
 	void anchor(Anchor value) noexcept;
 	[[nodiscard]] Anchor anchor() const noexcept;
+
+	void z_index_offset(ZIndexOffset value) noexcept;
+	[[nodiscard]] ZIndexOffset z_index_offset() const noexcept;
 
 	// --- Margin ---
 

@@ -61,6 +61,7 @@ static constexpr std::string_view value_max = "value_max";
 static constexpr std::string_view value_min = "value_min";
 static constexpr std::string_view value_range = "value_range";
 static constexpr std::string_view value_step = "value_step";
+static constexpr std::string_view z_index_offset = "z_index_offset";
 
 } // namespace pnm ---------------------------------------------------------------------------------
 namespace pgr { // ---------------------------------------------------------------------------------
