@@ -157,7 +157,7 @@ private:
 	[[nodiscard]] inline bool _is_writing() const noexcept;
 
 private:
-	inline void _terminate() noexcept;
+	inline void _terminate(std::unique_lock<std::recursive_mutex>& lock) noexcept;
 
 private:
 	inline void outcome_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept;
@@ -194,8 +194,12 @@ inline void ImplBaseConnectionAsyncHE::abandon_handler() noexcept {
 	std::unique_lock lock{mutex};
 	abandoned_handler = true;
 
-	if (state == State::Constructed || state == State::Disconnected)
-		auto temp = std::move(handler); // Move handler to stack to commit suicide
+	if (state == State::Constructed || state == State::Disconnected) {
+		// Move handler to stack to commit suicide
+		auto temp = std::move(handler);
+		lock.unlock();
+		return;
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -407,7 +411,7 @@ inline bool ImplBaseConnectionAsyncHE::_is_writing() const noexcept {
 
 // -------------------------------------------------------------------------------------------------
 
-inline void ImplBaseConnectionAsyncHE::_terminate() noexcept {
+inline void ImplBaseConnectionAsyncHE::_terminate(std::unique_lock<std::recursive_mutex>& lock) noexcept {
 	boost::system::error_code ec_c;
 
 	stream->socket().shutdown(stream->socket().shutdown_both, ec_c);
@@ -417,8 +421,13 @@ inline void ImplBaseConnectionAsyncHE::_terminate() noexcept {
 
 	state = State::Disconnected;
 	handler->on_disconnect(ec_c);
-	if (abandoned_handler)
-		auto temp = std::move(handler); // Move handler to stack to commit suicide
+
+	if (abandoned_handler) {
+		// Move handler to stack to commit suicide
+		auto temp = std::move(handler);
+		lock.unlock();
+		return;
+	}
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept {
@@ -428,8 +437,12 @@ inline void ImplBaseConnectionAsyncHE::outcome_connect(SelfPtr&& self_sp, const 
 	if (ec) {
 		state = State::Constructed;
 		handler->on_connect(ec);
-		if (abandoned_handler)
-			auto temp = std::move(handler); // Move handler to stack to commit suicide
+		if (abandoned_handler) {
+			// Move handler to stack to commit suicide
+			auto temp = std::move(handler);
+			lock.unlock();
+			return;
+		}
 
 	} else {
 		{
@@ -484,7 +497,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_disconnect(SelfPtr&& self_sp) noe
 
 	if (state != State::Connected) {
 		if (_no_on_flight_operation())
-			_terminate();
+			return _terminate(lock);
 		// else
 		//      Noop, the other on flight operation will take care of it
 	}
@@ -503,7 +516,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 		handler->on_receive(ec, message_body_view{read_message_body});
 
 		if (_no_on_flight_operation())
-			_terminate();
+			return _terminate(lock);
 		// else
 		//      Noop, the other on flight operation will take care of it
 
@@ -513,7 +526,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 
 		if (state != State::Connected) {
 			if (_no_on_flight_operation())
-				_terminate();
+				return _terminate(lock);
 			// else
 			//      Noop, the other on flight operation will take care of it
 
@@ -540,7 +553,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 		handler->on_send(ec, std::move(write_messages.front().body_view));
 
 		if (_no_on_flight_operation())
-			_terminate();
+			return _terminate(lock);
 		// else
 		//      Noop, the other on flight operation will take care of it
 
@@ -552,7 +565,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 
 		if (state != State::Connected) {
 			if (_no_on_flight_operation())
-				_terminate();
+				return _terminate(lock);
 			// else
 			//      Noop, the other on flight operation will take care of it
 

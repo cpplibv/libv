@@ -44,8 +44,12 @@ public:
 		std::unique_lock lock{mutex};
 		abandoned_handler = true;
 
-		if (!accepting)
-			auto temp = std::move(handler); // Move handler to stack to commit suicide
+		if (!accepting) {
+			// Move handler to stack to commit suicide
+			auto temp = std::move(handler);
+			lock.unlock();
+			return;
+		}
 	}
 
 public:
@@ -120,8 +124,12 @@ public:
 
 			if (self_sp->accepting)
 				self_sp->_do_accept(std::move(self_sp));
-			else if (self_sp->abandoned_handler)
-				auto temp = std::move(self_sp->handler); // Move handler to stack to commit suicide
+			else if (self_sp->abandoned_handler) {
+				// Move handler to stack to commit suicide
+				auto temp = std::move(self_sp->handler);
+				lock.unlock();
+				return;
+			}
 		});
 	}
 };

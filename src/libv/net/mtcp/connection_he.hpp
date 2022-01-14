@@ -166,8 +166,11 @@ private:
 
 	inline void decrement_ref_count() noexcept {
 		if (--ref_count == 0) {
-			connection.abandon_handler();
-			connection.disconnect_if_connected_async();
+			// abandon_handler will discard this handler object:
+			// Copy the connection to the stack to keep alive the connection object while this code runs
+			auto temp = connection;
+			temp.abandon_handler();
+			temp.disconnect_if_connected_async();
 		}
 	}
 
