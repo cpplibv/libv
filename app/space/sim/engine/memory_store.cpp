@@ -14,9 +14,9 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 MemoryStore::MemoryStore() :
-		faction(100),
-		planet(1000),
-		fleet(2000) {
+		faction(50),
+		planet(200),
+		fleet(100) {
 	log_space.trace("Faction initial capacity: {}", faction.capacity());
 	log_space.trace("Planet initial capacity: {}", planet.capacity());
 	log_space.trace("Fleet initial capacity: {}", fleet.capacity());

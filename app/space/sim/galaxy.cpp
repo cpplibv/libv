@@ -30,7 +30,32 @@ Galaxy::Galaxy(MemoryStore& memory) :
 
 Galaxy::Galaxy(Galaxy&&) noexcept = default;
 
-Galaxy& Galaxy::operator=(Galaxy&&) & noexcept = default;
+Galaxy& Galaxy::operator=(Galaxy&& other) & noexcept = default;
+//Galaxy& Galaxy::operator=(Galaxy&& other) & noexcept {
+//	kill();
+//
+//	nextFactionID = std::move(other.nextFactionID);
+//	nextPlanetID = std::move(other.nextPlanetID);
+//	nextFleetID = std::move(other.nextFleetID);
+//
+////	nextColonyID = std::move(other.nextColonyID);
+////	nextEmpireID = std::move(other.nextEmpireID);
+////	nextTradeID = std::move(other.nextTradeID);
+//
+//	memory = std::move(other.memory);
+//	factions = std::move(other.factions);
+//	planets = std::move(other.planets);
+//	fleets = std::move(other.fleets);
+////	colonies = std::move(other.colonies);
+////	empires = std::move(other.empires);
+////	trades = std::move(other.trades);
+//
+//	factionNeutral_ = std::move(other.factionNeutral_);
+//
+//	selectedFleetIDList = std::move(other.selectedFleetIDList);
+//
+//	return *this;
+//}
 
 Galaxy::~Galaxy() = default;
 

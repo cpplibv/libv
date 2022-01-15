@@ -38,8 +38,10 @@ public:
 //	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
 //	Universe(const Universe&) noexcept = default;
 //	Universe& operator=(const Universe&) & noexcept = default;
-	Universe(Universe&&) noexcept = default;
-	Universe& operator=(Universe&&) & noexcept = default;
+	Universe(const Universe&) noexcept = delete;
+	Universe& operator=(const Universe&) & noexcept = delete;
+	Universe(Universe&&) noexcept;
+	Universe& operator=(Universe&&) & noexcept;
 
 	~Universe();
 

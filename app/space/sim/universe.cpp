@@ -33,6 +33,18 @@ Universe::Universe(GalaxyGenerationSettings ggs) :
 	galaxy(generateGalaxy(memory, std::move(ggs))) {
 }
 
+Universe::Universe(Universe&&) noexcept = default;
+
+Universe& Universe::operator=(Universe&& other) & noexcept {
+	galaxy.kill();
+
+	memory = std::move(other.memory);
+	universe_rng = std::move(other.universe_rng);
+	galaxy = std::move(other.galaxy);
+
+	return *this;
+}
+
 Universe::~Universe() {
 	galaxy.kill();
 }
