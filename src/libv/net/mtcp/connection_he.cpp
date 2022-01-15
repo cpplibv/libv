@@ -335,10 +335,15 @@ inline void ImplBaseConnectionAsyncHE::cancel_and_disconnect_async() noexcept {
 
 	queue_disconnect = true;
 
+	// TODO P5: Properly cancel the read operation (or the stream itself)
+	// TODO P5: Properly cancel every write operation, including the current one
+
 	// Stop reading
 	queue_read = false;
 	// Stop writing
-	write_messages.clear();
+	if (!write_messages.empty())
+		// Drop the write queue's tail. The first element cannot be dropped as there might be an outstanding write operation on it
+		write_messages.erase(++write_messages.begin(), write_messages.end());
 
 	state = State::Disconnecting;
 	do_disconnect(shared_from_this());
@@ -369,7 +374,7 @@ inline void ImplBaseConnectionAsyncHE::resume_receive_async() noexcept {
 template <typename M>
 inline void ImplBaseConnectionAsyncHE::send_async(M&& message) noexcept {
 	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} Send requested", id);
+	log_net.trace("MTCP-{} Send requested for {} byte", id, message.size());
 
 	if (state != State::Connecting && state != State::Connected)
 		return log_net.error("MTCP-{} Logic error: Called send on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
@@ -769,7 +774,6 @@ void ImplBaseConnectionAsyncHE::do_write_body(SelfPtr&& self_sp) noexcept {
 	const auto& front_message = self->write_messages.front().body_view;
 	const auto body_buffer = boost::asio::buffer(front_message.data(), front_message.size());
 
-	self->on_flight_write = true;
 	boost::asio::async_write(
 			*self->stream,
 			body_buffer,
