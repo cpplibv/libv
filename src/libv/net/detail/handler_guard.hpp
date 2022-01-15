@@ -79,12 +79,28 @@ public:
 		orig.user_object = nullptr;
 	}
 	inline HandlerGuard& operator=(const HandlerGuard& orig) & noexcept {
+		if (this == &orig)
+			return *this;
+
+		if (handler_ != nullptr)
+			handler_->decrement_ref_count();
+
 		handler_ = orig.handler_;
 		user_object = orig.user_object;
-		handler_->increment_ref_count();
+
+		if (handler_ != nullptr)
+			handler_->increment_ref_count();
+
 		return *this;
 	}
 	inline HandlerGuard& operator=(HandlerGuard&& orig) & noexcept {
+		// NOTE: using this == &other instead of ptr == other.ptr to have all moved from state the same (and be reset)
+		if (this == &orig)
+			return *this;
+
+		if (handler_ != nullptr)
+			handler_->decrement_ref_count();
+
 		handler_ = std::move(orig.handler_);
 		user_object = std::move(orig.user_object);
 		orig.handler_ = nullptr;
