@@ -19,27 +19,44 @@ std::string generate_component_name(const std::string_view type, std::size_t ind
 
 Component::Component(core_ptr ptr_) noexcept :
 	ptr_(std::move(ptr_)) {
-	assert(ptr_ != nullptr && "Internal error: Component cannot be null");
+	assert(ptr_ != nullptr && "Internal error: Component core cannot be null on direct construction");
 	++ptr_->ref_count;
 }
 
-Component::Component(const Component& other) noexcept {
-	ptr_ = other.ptr_;
-	++ptr_->ref_count;
+Component::Component(const Component& other) noexcept :
+	ptr_(other.ptr_) {
+	if (ptr_)
+		++ptr_->ref_count;
 }
 
-Component::Component(Component&& other) noexcept {
-	ptr_ = other.ptr_;
+Component::Component(Component&& other) noexcept :
+	ptr_(other.ptr_) {
 	other.ptr_ = nullptr;
 }
 
 Component& Component::operator=(const Component& other) & noexcept {
+	if (ptr_ == other.ptr_)
+		return *this;
+
+	if (ptr_ && --ptr_->ref_count == 0)
+		delete ptr_;
+
 	ptr_ = other.ptr_;
-	++ptr_->ref_count;
+
+	if (ptr_)
+		++ptr_->ref_count;
+
 	return *this;
 }
 
 Component& Component::operator=(Component&& other) & noexcept {
+	// NOTE: using this == &other instead of ptr == other.ptr to have all moved from state the same (and be reset)
+	if (this == &other)
+		return *this;
+
+	if (ptr_ && --ptr_->ref_count == 0)
+		delete ptr_;
+
 	ptr_ = other.ptr_;
 	other.ptr_ = nullptr;
 	return *this;

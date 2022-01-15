@@ -228,6 +228,7 @@ public:
 
 private:
 	explicit constexpr inline entity_ptr(T* ptr) noexcept : ptr(ptr) {
+		assert(ptr != nullptr && "Internal error: Entity_ptr cannot be null on direct construction");
 		++entity_access::ref_count(*ptr);
 	}
 
@@ -237,7 +238,7 @@ public:
 	constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
 
 	constexpr inline entity_ptr(const entity_ptr& other) noexcept : ptr(other.ptr) {
-		if (other.ptr != nullptr)
+		if (ptr != nullptr)
 			++entity_access::ref_count(*ptr);
 	}
 
@@ -248,8 +249,10 @@ public:
 
 		reset();
 		ptr = other.ptr;
-		if (other.ptr != nullptr)
+
+		if (ptr != nullptr)
 			++entity_access::ref_count(*ptr);
+
 		return *this;
 	}
 
