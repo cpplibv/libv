@@ -23,18 +23,21 @@ namespace mtcp {
 
 class ImplBaseAcceptorAsyncHE : public std::enable_shared_from_this<ImplBaseAcceptorAsyncHE> {
 private:
+	mutable std::recursive_mutex mutex;
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
+	IOContext& io_context;
+
 	bool accepting = false;
 	boost::asio::ip::tcp::acceptor acceptor;
-	std::recursive_mutex mutex;
-	IOContext& io_context;
 
 	bool abandoned_handler = false;
 	std::unique_ptr<BaseAcceptorHandler> handler;
 
 public:
 	explicit inline ImplBaseAcceptorAsyncHE(IOContext& io_context) :
-		acceptor(io_context.context()),
-		io_context(io_context) { }
+		work_guard(io_context.context().get_executor()),
+		io_context(io_context),
+		acceptor(io_context.context()) { }
 
 	inline void inject_handler(std::unique_ptr<BaseAcceptorHandler>&& handler_) noexcept {
 		handler = std::move(handler_);

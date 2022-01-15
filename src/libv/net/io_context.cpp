@@ -24,8 +24,9 @@ namespace net {
 class ImplIOContext {
 private:
 	boost::asio::io_context io_context;
-	boost::asio::ip::tcp::resolver resolver;
 	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
+
+	boost::asio::ip::tcp::resolver resolver;
 
 	std::vector<std::thread> threads;
 
@@ -45,14 +46,13 @@ private:
 
 public:
 	explicit ImplIOContext(std::size_t thread_count = 1) :
-		resolver(io_context),
-		work_guard(io_context.get_executor()) {
+		work_guard(io_context.get_executor()),
+		resolver(io_context) {
 		for (std::size_t i = 0; i < thread_count; ++i)
 			start_thread(i, thread_count);
 	}
 
 	~ImplIOContext() {
-		work_guard.reset();
 		join();
 	}
 
@@ -86,6 +86,7 @@ public:
 
 public:
 	void join() {
+		log_net.trace("IOContext-{} Reseting work_guard by thread {}", id, libv::thread_number());
 		work_guard.reset();
 		for (auto& thread : threads) {
 			if (thread.joinable())

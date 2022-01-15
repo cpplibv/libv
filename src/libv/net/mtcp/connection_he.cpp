@@ -84,7 +84,10 @@ private:
 
 private:
 	mutable std::recursive_mutex mutex; // Has to be recursive to handle reentry from callbacks
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 	IOContext& io_context;
+
+	bool abandoned_handler = false;
 	std::unique_ptr<BaseConnectionHandler> handler;
 
 private:
@@ -94,8 +97,6 @@ private:
 
 private:
 	State state = State::Constructed;
-
-	bool abandoned_handler = false;
 
 	bool failure_happened = false;
 
@@ -184,6 +185,7 @@ private:
 // -------------------------------------------------------------------------------------------------
 
 inline ImplBaseConnectionAsyncHE::ImplBaseConnectionAsyncHE(IOContext& io_context) noexcept :
+	work_guard(io_context.context().get_executor()),
 	io_context(io_context) { }
 
 inline void ImplBaseConnectionAsyncHE::inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler_) noexcept {
@@ -742,7 +744,7 @@ void ImplBaseConnectionAsyncHE::do_write_header(SelfPtr&& self_sp) noexcept {
 
 	assert(self->write_next_header.size() <= MTCP_MESSAGE_MAX_SIZE);
 	// TODO P1: In not assert builds this will just try to execute, make a return / abort branch for it
-	// TODO P3: replace assert with recoverable error
+	// TODO P3: replace assert with recoverable error (Simple exception)
 
 	const auto header_buffer = boost::asio::buffer(self->write_next_header.header_data(), self->write_next_header.header_size());
 	boost::asio::async_write(
