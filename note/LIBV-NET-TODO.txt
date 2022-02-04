@@ -25,8 +25,9 @@ libv.net: Add support for non string based connection send / receive
 libv.net: Solve the problem for resource server in connection_he, I need to track how many outgoing messages there are from a certain type to know to schedule the next fragment
 libv.utility: Implement IntervalRegistry utility type
 libv.security: Move signature checking of sandbox_openssl into a new wrapper lib (public / private key)
-
-
+libv.net.mtcp: Refactor the connection internal states
+libv.net.mtcp: Refactor the connection API
+libv.net.mtcp: Single write op for header and body
 
 
 
@@ -46,6 +47,7 @@ libv.security: Move signature checking of sandbox_openssl into a new wrapper lib
 
 
 --- STACK ------------------------------------------------------------------------------------------
+
 
 
 
@@ -326,7 +328,9 @@ libv.mt: worker_thread_pool and worker_thread, solve the next index loop around 
 libv.net.mtcp: Idea of channel: open, close, receive, send, error, so a connection within a connection
 libv.utility: usage_ptr: A shared_ptr that runs code upon 0 or 1 external reference remaining
 		| investigate shared_ptr with custom deleter
-libv.utility: libv::storage<T> with: initialize, destroy, alignas(T) std::byte storage[sizeof(T)];
+libv.utility: libv::storage<T> with: initialize, destroy
+			alignas(T) std::byte storage[sizeof(T)];
+			std::aligned_storage_t<sizeof(T), alignof(T)> storage;
 		| Use std::destroy_at and std::construct_at to allow constexpr-ness
 
 

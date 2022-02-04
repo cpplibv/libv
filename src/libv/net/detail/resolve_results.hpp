@@ -3,7 +3,7 @@
 #pragma once
 
 // fwd
-#include <libv/net/detail/fwd_resolve_results.hpp>
+#include <libv/net/detail/resolve_results_fwd.hpp>
 // ext
 #include <boost/asio/ip/tcp.hpp>
 

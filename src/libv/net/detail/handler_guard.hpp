@@ -121,7 +121,7 @@ public:
 	}
 
 public:
-	inline operator bool() const noexcept {
+	[[nodiscard]] explicit inline operator bool() const noexcept {
 		return user_object != nullptr;
 	}
 
@@ -134,7 +134,7 @@ public:
 
 	template <typename TT = T>
 			requires (!std::is_void_v<TT>)
-	inline TT& operator*() const noexcept {
+	[[nodiscard]] inline TT& operator*() const noexcept {
 		assert(user_object != nullptr);
 		return *user_object;
 	}
@@ -164,7 +164,7 @@ namespace std { // -------------------------------------------------------------
 
 template <typename BaseHandler, typename T>
 struct hash<libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>> {
-	constexpr std::size_t operator()(const libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>& t) const noexcept {
+	[[nodiscard]] constexpr std::size_t operator()(const libv::net::mtcp::detail::HandlerGuard<BaseHandler, T>& t) const noexcept {
 		return std::hash<BaseHandler*>{}(t.handler_);
 	}
 };

@@ -72,22 +72,31 @@ private:
 	enum class State {
 		Constructed,   // Does nothing
 		Connecting,    // Resolve / Connect / Start on flight
+
 		Connected,     // Stand by / Read / Write / Read and Write on flight
-		Failure,       // Failing, canceled every operation and waiting for them to return
-		Disconnecting, // Disconnect on flight
+
+		Completing,    // Finishing any outstanding write, canceling reads, when every outstanding operation completes goes to disconnect
+		Canceling,     // Canceled every operation and waiting for them to return, when every outstanding operation completes goes to disconnect
+
 		Disconnected,  // Does nothing
 	};
 
 private:
 	static inline std::atomic<uint64_t> nextID = 0;
+public:
 	const uint64_t id = nextID++; /// Informative ID for logging and monitoring only
 
 private:
-	mutable std::recursive_mutex mutex; // Has to be recursive to handle reentry from callbacks
+	using Mutex = std::mutex;
+
+	mutable std::mutex strand; // Not a real strand, only simulates one, inefficient
+	mutable std::mutex mutex;
 	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> work_guard;
 	IOContext& io_context;
 
-	bool abandoned_handler = false;
+//	mutable Mutex handler_mutex{"MTCP-" + std::to_string(id) + "-handler_mutex"};
+////	mutable std::mutex handler_mutex; /// To acquire this lock, 'mutex' always has to be held first
+	bool handler_abandoned = false;
 	std::unique_ptr<BaseConnectionHandler> handler;
 
 private:
@@ -98,14 +107,10 @@ private:
 private:
 	State state = State::Constructed;
 
-	bool failure_happened = false;
+	int32_t on_flight_operation_num = 0;
 
-	bool on_flight_connect = false;
-	bool on_flight_write = false;
-	bool on_flight_read = false;
-	bool on_flight_disconnect = false;
-
-	bool queue_disconnect = false;
+	std::error_code first_error{};
+	bool on_connect_was_called_with_success = false;
 
 	bool queue_read = true;
 	message_header read_message_header; // Temporary buffer for subsequent reads
@@ -123,6 +128,7 @@ private:
 
 public:
 	explicit inline ImplBaseConnectionAsyncHE(IOContext& io_context) noexcept;
+	inline ~ImplBaseConnectionAsyncHE();
 	inline void inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler) noexcept;
 	inline void abandon_handler() noexcept;
 
@@ -142,8 +148,7 @@ public:
 	inline void connect_async(detail::Socket&& socket) noexcept;
 	inline void connect_sync(detail::Socket&& socket) noexcept;
 	inline void connect_async(Address address) noexcept;
-	inline void disconnect_async() noexcept;
-	inline void disconnect_if_connected_async() noexcept;
+	inline void complete_and_disconnect_async() noexcept;
 	inline void cancel_and_disconnect_async() noexcept;
 	inline void pause_receive_async() noexcept;
 	inline void resume_receive_async() noexcept;
@@ -151,35 +156,31 @@ public:
 	inline void send_async(M&& message) noexcept;
 
 private:
+	inline void _cancel_and_disconnect_async() noexcept;
+
 	[[nodiscard]] inline bool _no_on_flight_operation() const noexcept;
-	[[nodiscard]] inline bool _is_connecting() const noexcept;
-	[[nodiscard]] inline bool _is_disconnecting() const noexcept;
-	[[nodiscard]] inline bool _is_reading() const noexcept;
-	[[nodiscard]] inline bool _is_writing() const noexcept;
+	[[nodiscard]] inline bool _has_read_work() const noexcept;
+	[[nodiscard]] inline bool _has_write_work() const noexcept;
 
 private:
-	inline void _terminate(std::unique_lock<std::recursive_mutex>& lock) noexcept;
-
-private:
+	inline void _outcome_connect(std::unique_lock<Mutex>& lock, SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	inline void outcome_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 	inline void outcome_disconnect(SelfPtr&& self_sp) noexcept;
-	inline void outcome_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept;
+	inline void outcome_receive(SelfPtr&& self_sp, const std::error_code ec, bool eof_error_in_head = false) noexcept;
 	inline void outcome_send(SelfPtr&& self_sp, const std::error_code ec) noexcept;
 
 private:
-	static void do_start(SelfPtr&& self_sp) noexcept;
-	static void do_resolve(SelfPtr&& self_sp, Address&& address) noexcept;
-	static void do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept;
+	inline void _do_start(SelfPtr&& self_sp) noexcept;
+	inline void _do_resolve(SelfPtr&& self_sp, Address&& address) noexcept;
+	inline void _do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept;
 
-	static void do_read(SelfPtr&& self_sp) noexcept;
-	static void do_read_header(SelfPtr&& self_sp) noexcept;
-	static void do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept;
+	inline void _do_read(SelfPtr&& self_sp) noexcept;
+	inline void _do_read_header(SelfPtr&& self_sp) noexcept;
+	inline void _do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept;
 
-	static void do_write(SelfPtr&& self_sp) noexcept;
-	static void do_write_header(SelfPtr&& self_sp) noexcept;
-	static void do_write_body(SelfPtr&& self_sp) noexcept;
+	inline void _do_write(SelfPtr&& self_sp) noexcept;
 
-	static void do_disconnect(SelfPtr&& self_sp) noexcept;
+	inline void _do_disconnect(SelfPtr&& self_sp) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -188,72 +189,99 @@ inline ImplBaseConnectionAsyncHE::ImplBaseConnectionAsyncHE(IOContext& io_contex
 	work_guard(io_context.context().get_executor()),
 	io_context(io_context) { }
 
+inline ImplBaseConnectionAsyncHE::~ImplBaseConnectionAsyncHE() {
+	log_net.trace("MTCP-{} ~ImplBaseConnectionAsyncHE", id);
+}
+
 inline void ImplBaseConnectionAsyncHE::inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler_) noexcept {
+	// inject_handler only called from the "ctor", no need lock the mutex for it
 	handler = std::move(handler_);
 }
 
 inline void ImplBaseConnectionAsyncHE::abandon_handler() noexcept {
-	std::unique_lock lock{mutex};
-	abandoned_handler = true;
+	auto lock = std::unique_lock(mutex);
+	log_net.trace("MTCP-{} abandon_handler", id);
 
-	if (state == State::Constructed || state == State::Disconnected) {
-		// Move handler to stack to commit suicide
-		auto temp = std::move(handler);
-		lock.unlock();
-		return;
+	handler_abandoned = true;
+
+	if (state != State::Canceling && state != State::Completing && state != State::Disconnected) {
+		log_net.warn("MTCP-{} abandoned a connection handler without specifying complete or cancel. Implicitly calling cancel_and_disconnect_async", id);
+		_cancel_and_disconnect_async();
+
+	} else if (state == State::Disconnected) {
+		// If in disconnected state, that means that there can't be more on_flight_operation
+		// Has to post the self-destruction as it could be called from a handler callback and this destroy the handler's state in the callback
+		io_context.post([self_sp = shared_from_this()] {
+			auto self = self_sp.get();
+
+			auto slock = std::unique_lock(self->strand);
+			auto lock = std::unique_lock(self->mutex);
+
+			// Move handler to stack to commit suicide
+			auto temp_handler = std::move(self->handler);
+
+			lock.unlock();
+			slock.unlock();
+
+			// Handler dtor
+		});
 	}
 }
 
 // -------------------------------------------------------------------------------------------------
 
 inline void ImplBaseConnectionAsyncHE::read_limit(std::size_t bytes_per_second) noexcept {
-	std::unique_lock lock{mutex};
+	auto lock = std::unique_lock(mutex);
 	stream->rate_policy().read_limit(bytes_per_second);
 }
 
 inline void ImplBaseConnectionAsyncHE::write_limit(std::size_t bytes_per_second) noexcept {
-	std::unique_lock lock{mutex};
+	auto lock = std::unique_lock(mutex);
 	stream->rate_policy().write_limit(bytes_per_second);
 }
 
 inline std::size_t ImplBaseConnectionAsyncHE::num_byte_read() const noexcept {
+	auto lock = std::unique_lock(mutex);
 	return stream->rate_policy().num_byte_read();
 }
 
 inline std::size_t ImplBaseConnectionAsyncHE::num_byte_wrote() const noexcept {
+	auto lock = std::unique_lock(mutex);
 	return stream->rate_policy().num_byte_wrote();
 }
 
 inline std::size_t ImplBaseConnectionAsyncHE::num_message_received() const noexcept {
+	auto lock = std::unique_lock(mutex);
 	return num_total_message_write;
 }
 
 inline std::size_t ImplBaseConnectionAsyncHE::num_message_sent() const noexcept {
+	auto lock = std::unique_lock(mutex);
 	return num_total_message_read;
 }
 
 inline std::size_t ImplBaseConnectionAsyncHE::send_queue_size() const noexcept {
-	std::unique_lock lock{mutex};
+	auto lock = std::unique_lock(mutex);
 	return write_messages.size();
 }
 
 // -------------------------------------------------------------------------------------------------
 
 inline void ImplBaseConnectionAsyncHE::connect_async(detail::Socket&& socket) noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} connect_async(socket)", id);
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} connect_async(socket)", id);
 
 	if (state != State::Constructed)
 		return log_net.error("MTCP-{} Logic error: Called connect_async(socket) on connection in incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::Constructed));
 
 	state = State::Connecting;
 	stream.emplace(std::move(socket.socket));
-	do_start(shared_from_this());
+	_do_start(shared_from_this());
 }
 
 inline void ImplBaseConnectionAsyncHE::connect_sync(detail::Socket&& socket) noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} connect_sync(socket)", id);
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} connect_sync(socket)", id);
 
 	if (state != State::Constructed)
 		return log_net.error("MTCP-{} Logic error: Called connect_async(socket) on connection in incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::Constructed));
@@ -261,383 +289,437 @@ inline void ImplBaseConnectionAsyncHE::connect_sync(detail::Socket&& socket) noe
 	state = State::Connecting;
 	stream.emplace(std::move(socket.socket));
 
-	outcome_connect(shared_from_this(), std::error_code());
+	_outcome_connect(lock, shared_from_this(), std::error_code());
 }
 
 inline void ImplBaseConnectionAsyncHE::connect_async(Address address) noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} connect_async(address) to {}", id, address);
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} connect_async(address) to {}", id, address);
 
 	if (state != State::Constructed)
 		return log_net.error("MTCP-{} Logic error: Called connect on connect_async(address) in an incorrect state {}. Expected state {}", id, libv::to_value(state), libv::to_value(State::Constructed));
 
 	state = State::Connecting;
 	stream.emplace(io_context.context());
-	do_resolve(shared_from_this(), std::move(address));
+	_do_resolve(shared_from_this(), std::move(address));
 }
 
-inline void ImplBaseConnectionAsyncHE::disconnect_async() noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} disconnect_async", id);
+inline void ImplBaseConnectionAsyncHE::_cancel_and_disconnect_async() noexcept {
+	log_net.debug("MTCP-{} cancel_and_disconnect_async", id);
 
-	if (state != State::Connecting && state != State::Connected)
-		return log_net.error("MTCP-{} Logic error: Called disconnect_async on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
+	if (!first_error)
+		first_error = boost::asio::error::make_error_code(boost::asio::error::connection_aborted);
 
-	if (_is_disconnecting())
-		return log_net.error("MTCP-{} Logic error: Called disconnect on connection multiple times", id);
+	switch (state) {
+	case State::Constructed:
+		state = State::Disconnected;
+		_do_disconnect(shared_from_this());
+		break;
 
-	queue_disconnect = true;
+	case State::Connecting: [[fallthrough]];
+	case State::Connected: [[fallthrough]];
+	case State::Completing:
+		state = State::Canceling;
+		stream->cancel();
+		if (_no_on_flight_operation())
+			_do_disconnect(shared_from_this());
+		break;
 
-	// Stop reading
-	queue_read = false;
+	case State::Canceling:
+		break; // Already canceling: noop
 
-	// If still connecting or still has something to write, do not disconnect immediately (queue_disconnect flag will take care of it)
-	if (_is_connecting() || _is_writing())
-		return;
-
-	state = State::Disconnecting;
-	do_disconnect(shared_from_this());
-}
-
-inline void ImplBaseConnectionAsyncHE::disconnect_if_connected_async() noexcept {
-	std::unique_lock lock{mutex};
-
-	if (state != State::Connecting && state != State::Connected)
-		return;
-
-	if (_is_disconnecting())
-		return;
-
-	log_net.trace("MTCP-{} disconnect_if_connected_async", id);
-
-	queue_disconnect = true;
-
-	// Stop reading
-	queue_read = false;
-
-	// If still connecting or still has something to write, do not disconnect immediately (queue_disconnect flag will take care of it)
-	if (_is_connecting() || _is_writing())
-		return;
-
-	state = State::Disconnecting;
-	do_disconnect(shared_from_this());
+	case State::Disconnected:
+		break; // Already disconnected, there is nothing to cancel: noop
+	}
 }
 
 inline void ImplBaseConnectionAsyncHE::cancel_and_disconnect_async() noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} cancel_and_disconnect_async", id);
+	auto lock = std::unique_lock(mutex);
+	_cancel_and_disconnect_async();
+}
 
-	if (state != State::Connecting && state != State::Connected)
-		return log_net.error("MTCP-{} Logic error: Called cancel_and_disconnect_async on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
+inline void ImplBaseConnectionAsyncHE::complete_and_disconnect_async() noexcept {
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} complete_and_disconnect_async", id);
 
-	if (queue_disconnect)
-		return log_net.warn("MTCP-{} Logic error: Called disconnect on connection multiple times", id);
+	switch (state) {
+	case State::Constructed:
+		state = State::Disconnected;
+		work_guard.reset();
+		break;
 
-	queue_disconnect = true;
+	case State::Connecting: [[fallthrough]];
+	case State::Connected:
+		state = State::Completing;
+		if (_no_on_flight_operation())
+			_do_disconnect(shared_from_this());
+		break;
 
-	// TODO P5: Properly cancel the read operation (or the stream itself)
-	// TODO P5: Properly cancel every write operation, including the current one
+	case State::Completing:
+		break; // Already completing: noop
 
-	// Stop reading
-	queue_read = false;
-	// Stop writing
-	if (!write_messages.empty())
-		// Drop the write queue's tail. The first element cannot be dropped as there might be an outstanding write operation on it
-		write_messages.erase(++write_messages.begin(), write_messages.end());
+	case State::Canceling:
+		log_net.error("MTCP-{} Requested complete on a connection that is being canceled", id);
+		break;
 
-	state = State::Disconnecting;
-	do_disconnect(shared_from_this());
+	case State::Disconnected:
+		log_net.warn("MTCP-{} Requested complete on a connection that has been disconnected", id);
+		break;
+	}
 }
 
 inline void ImplBaseConnectionAsyncHE::pause_receive_async() noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} pause_receive_async", id);
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} pause_receive_async", id);
 
 	queue_read = false;
 }
 
 inline void ImplBaseConnectionAsyncHE::resume_receive_async() noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} resume_receive_async", id);
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} resume_receive_async", id);
 
-	if (state != State::Connecting && state != State::Connected)
-		return log_net.error("MTCP-{} Logic error: Called receive on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
+	const auto was_queue_read = queue_read;
 
-	queue_read = true;
+	switch (state) {
+	case State::Constructed:
+		log_net.error("MTCP-{} Requested receive on a connection that hasn't been connected", id);
+		break;
 
-	if (state != State::Connected)
-		return;
+	case State::Connecting:
+		queue_read = true;
+		break;
 
-	do_read(shared_from_this());
+	case State::Connected:
+		queue_read = true;
+		if (not was_queue_read)
+			_do_read(shared_from_this());
+		break;
+
+	case State::Completing:
+		log_net.error("MTCP-{} Requested receive on a connection that is being completed", id);
+		break;
+
+	case State::Canceling:
+		log_net.error("MTCP-{} Requested receive on a connection that is being canceled", id);
+		break;
+
+	case State::Disconnected:
+		log_net.warn("MTCP-{} Requested receive on a connection that has been disconnected", id);
+		break;
+	}
 }
 
 template <typename M>
 inline void ImplBaseConnectionAsyncHE::send_async(M&& message) noexcept {
-	std::unique_lock lock{mutex};
-	log_net.trace("MTCP-{} Send requested for {} byte", id, message.size());
+	auto lock = std::unique_lock(mutex);
+	log_net.debug("MTCP-{} Send requested for {} byte", id, message.size());
 
-	if (state != State::Connecting && state != State::Connected)
-		return log_net.error("MTCP-{} Logic error: Called send on connection in state {}. Expected states are {} or {}", id, libv::to_value(state), libv::to_value(State::Connecting), libv::to_value(State::Connected));
+	switch (state) {
+	case State::Constructed:
+		log_net.error("MTCP-{} Requested send on a connection that was not connected", id);
+		break;
 
-	const auto was_writing = _is_writing();
-	write_messages.emplace_back(
-			message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
-			std::move(message));
+	case State::Connecting:
+		write_messages.emplace_back(
+				message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
+				std::move(message));
+		// Still connecting, writing will start from outcome_connect if successful
+		break;
 
-	if (was_writing || state != State::Connected)
-		return;
+	case State::Connected: {
+		const auto first_message_in_queue = write_messages.empty();
+		write_messages.emplace_back(
+				message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
+				std::move(message));
+		if (first_message_in_queue)
+			_do_write(shared_from_this());
+		break;
+	}
 
-	do_write(shared_from_this());
+	case State::Completing:
+		log_net.error("MTCP-{} Requested send on a connection that is being completed", id);
+		break;
+
+	case State::Canceling:
+		log_net.error("MTCP-{} Requested send on a connection that is being canceled", id);
+		break;
+
+	case State::Disconnected:
+		log_net.warn("MTCP-{} Requested send on a connection that has been disconnected", id);
+		break;
+	}
 }
 
 // -------------------------------------------------------------------------------------------------
 
 inline bool ImplBaseConnectionAsyncHE::_no_on_flight_operation() const noexcept {
-	return
-		!on_flight_connect &&
-		!on_flight_disconnect &&
-		!on_flight_read &&
-		!on_flight_write;
+	return on_flight_operation_num == 0;
 }
 
-inline bool ImplBaseConnectionAsyncHE::_is_connecting() const noexcept {
-	return state == State::Connecting;
-}
-
-inline bool ImplBaseConnectionAsyncHE::_is_disconnecting() const noexcept {
-	return queue_disconnect;
-}
-
-inline bool ImplBaseConnectionAsyncHE::_is_reading() const noexcept {
+inline bool ImplBaseConnectionAsyncHE::_has_read_work() const noexcept {
 	return queue_read;
 }
 
-inline bool ImplBaseConnectionAsyncHE::_is_writing() const noexcept {
+inline bool ImplBaseConnectionAsyncHE::_has_write_work() const noexcept {
 	return !write_messages.empty();
 }
 
 // -------------------------------------------------------------------------------------------------
 
-inline void ImplBaseConnectionAsyncHE::_terminate(std::unique_lock<std::recursive_mutex>& lock) noexcept {
-	boost::system::error_code ec_c;
+inline void ImplBaseConnectionAsyncHE::_outcome_connect(std::unique_lock<Mutex>& lock, SelfPtr&& self_sp, const std::error_code ec) noexcept {
+	if (ec) {
+		state = State::Canceling;
+		// stream->cancel(); // NOTE: No need to cancel as there cannot be outstanding operation
 
-	stream->socket().shutdown(stream->socket().shutdown_both, ec_c);
-	log_net.warn_if(ec_c, "MTCP-{} Error while shutting down socket: {}", id, libv::net::to_string(ec_c));
-	log_net.trace_if(!ec_c, "MTCP-{} Successfully shutdown socket", id);
-	stream->close();
+	} else {
+		boost::system::error_code l_ec;
 
-	state = State::Disconnected;
-	handler->on_disconnect(ec_c);
+		// Identify endpoints
+		const auto asio_local_endpoint = stream->socket().local_endpoint(l_ec);
+		(void) l_ec; // Ignore error case where we are actually no longer connected
+		const auto asio_remote_endpoint = stream->socket().remote_endpoint(l_ec);
+		(void) l_ec; // Ignore error case where we are actually no longer connected
 
-	if (abandoned_handler) {
-		// Move handler to stack to commit suicide
-		auto temp = std::move(handler);
-		lock.unlock();
-		return;
+		local_endpoint = Endpoint{asio_local_endpoint.address().to_v4().to_bytes(), asio_local_endpoint.port()};
+		remote_endpoint = Endpoint{asio_remote_endpoint.address().to_v4().to_bytes(), asio_remote_endpoint.port()};
+
+		// Setup socket options
+		stream->socket().set_option(boost::asio::ip::tcp::no_delay{true}, l_ec);
+		log_net.error_if(l_ec, "MTCP-{} Could not set no_delay TCP option. {}", id, libv::net::to_string(l_ec));
+
+		stream->socket().set_option(boost::asio::ip::tcp::socket::keep_alive{true}, l_ec);
+		log_net.error_if(l_ec, "MTCP-{} Could not set keep_alive TCP option. {}", id, libv::net::to_string(l_ec));
 	}
+
+	switch (state) {
+	case State::Constructed: break; // Never happens
+	case State::Connecting:
+		state = State::Connected;
+		break;
+
+	case State::Connected: break; // Never happens
+	case State::Completing:
+		// Cancel reads, let writes happen
+		queue_read = false;
+		break;
+
+	case State::Canceling:
+		// Cancel reads and writes
+		queue_read = false;
+		write_messages.clear();
+		break;
+
+	case State::Disconnected: break; // Never happens
+	}
+
+	if (_has_read_work() && _has_write_work()) {
+		auto self_sp2 = self_sp;
+		_do_read(std::move(self_sp2));
+		_do_write(std::move(self_sp));
+
+	} else if (_has_read_work()) {
+		_do_read(std::move(self_sp));
+
+	} else if (_has_write_work()) {
+		_do_write(std::move(self_sp));
+
+	} else if (state == State::Completing || state == State::Canceling) {
+		assert(_no_on_flight_operation());
+		_do_disconnect(std::move(self_sp));
+	}
+
+	on_connect_was_called_with_success = !ec;
+
+	if (ec && !first_error)
+		first_error = ec;
+
+	lock.unlock();
+	if (ec)
+		handler->on_connect_error(ec);
+	else
+		handler->on_connect();
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	std::unique_lock lock{mutex};
-	on_flight_connect = false;
+	auto slock = std::unique_lock(strand);
+	auto lock = std::unique_lock(mutex);
 
-	if (ec) {
-		state = State::Constructed;
-		handler->on_connect(ec);
-		if (abandoned_handler) {
-			// Move handler to stack to commit suicide
-			auto temp = std::move(handler);
-			lock.unlock();
-			return;
-		}
-
-	} else {
-		{
-			// Identify endpoints
-			boost::system::error_code ignore_ec;
-			const auto asio_local_endpoint = stream->socket().local_endpoint(ignore_ec);
-			(void) ignore_ec; // Ignore error case where we are actually no longer connected
-			const auto asio_remote_endpoint = stream->socket().remote_endpoint(ignore_ec);
-			(void) ignore_ec; // Ignore error case where we are actually no longer connected
-
-			local_endpoint = Endpoint{asio_local_endpoint.address().to_v4().to_bytes(), asio_local_endpoint.port()};
-			remote_endpoint = Endpoint{asio_remote_endpoint.address().to_v4().to_bytes(), asio_remote_endpoint.port()};
-		}
-
-		{
-			// Setup socket options
-			boost::system::error_code option_ec;
-			stream->socket().set_option(boost::asio::ip::tcp::no_delay{true}, option_ec);
-			log_net.error_if(option_ec, "MTCP-{} Could not set no_delay TCP option. {}", id, libv::net::to_string(option_ec));
-
-			stream->socket().set_option(boost::asio::ip::tcp::socket::keep_alive{true}, option_ec);
-			log_net.error_if(option_ec, "MTCP-{} Could not set keep_alive TCP option. {}", id, libv::net::to_string(option_ec));
-		}
-
-		state = State::Connected;
-		handler->on_connect(ec);
-
-		if (_is_reading() && _is_writing()) {
-			auto self_sp2 = self_sp;
-			do_read(std::move(self_sp2));
-			do_write(std::move(self_sp));
-
-		} else if (_is_reading()) {
-			do_read(std::move(self_sp));
-
-		} else if (_is_writing()) {
-			do_write(std::move(self_sp));
-
-		} else if (_is_disconnecting()) {
-			do_disconnect(std::move(self_sp));
-		}
-	}
+	--on_flight_operation_num;
+	_outcome_connect(lock, std::move(self_sp), ec);
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_disconnect(SelfPtr&& self_sp) noexcept {
-	std::unique_lock lock{mutex};
-	on_flight_disconnect = false;
+	auto slock = std::unique_lock(strand);
+	auto lock = std::unique_lock(mutex);
 
-	(void) self_sp;
+	--on_flight_operation_num;
+	assert(_no_on_flight_operation());
 
-	stream->cancel();
-
-	if (state != State::Connected) {
-		if (_no_on_flight_operation())
-			return _terminate(lock);
-		// else
-		//      Noop, the other on flight operation will take care of it
+	if (stream) { // Stream can be nullopt if it was never connected
+		boost::system::error_code ec_c;
+		stream->socket().shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec_c);
+		log_net.warn_if(ec_c, "MTCP-{} Error while shutting down socket: {}", id, libv::net::to_string(ec_c));
+		log_net.debug_if(!ec_c, "MTCP-{} Successfully shutdown socket", id);
+		stream->close();
 	}
+
+	state = State::Disconnected;
+	work_guard.reset();
+
+	if (handler_abandoned) {
+		const auto stack_on_connect_was_called_with_success = on_connect_was_called_with_success;
+		const auto stack_first_error = first_error;
+		// Move handler to stack to commit suicide
+		auto temp_handler = std::move(handler);
+		lock.unlock();
+		if (stack_on_connect_was_called_with_success)
+			temp_handler->on_disconnect(stack_first_error);
+		slock.unlock();
+	} else {
+		lock.unlock();
+		if (on_connect_was_called_with_success)
+			handler->on_disconnect(first_error);
+	}
+
+	(void) self_sp; // Let self die (if not references from anywhere else), but disconnect was the last operation
 }
 
-inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	std::unique_lock lock{mutex};
-	on_flight_read = false;
+inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const std::error_code ec, bool eof_error_in_head) noexcept {
+	auto slock = std::unique_lock(strand);
+	auto lock = std::unique_lock(mutex);
+
+	--on_flight_operation_num;
+
+	auto temp_message_body = std::move(read_message_body);
 
 	if (ec) {
-		if (state != State::Failure) {
-			state = State::Failure;
-			stream->cancel();
-		}
-
-		handler->on_receive(ec, message_body_view{read_message_body});
-
-		if (_no_on_flight_operation())
-			return _terminate(lock);
-		// else
-		//      Noop, the other on flight operation will take care of it
-
+		state = State::Canceling;
+		stream->cancel();
 	} else {
-		num_total_message_read++;
-		handler->on_receive(ec, message_body_view{read_message_body});
+		++num_total_message_read;
+	}
 
-		if (state != State::Connected) {
-			if (_no_on_flight_operation())
-				return _terminate(lock);
-			// else
-			//      Noop, the other on flight operation will take care of it
+	switch (state) {
+	case State::Constructed: break; // Never happens
+	case State::Connecting: break; // Never happens
+	case State::Connected:
+		if (_has_read_work())
+			_do_read(std::move(self_sp));
+		break;
 
-		} else if (_is_reading()) {
-			do_read(std::move(self_sp));
+	case State::Completing: [[fallthrough]];
+	case State::Canceling: [[fallthrough]];
+	case State::Disconnected:
+		queue_read = false;
+		if (_no_on_flight_operation())
+			_do_disconnect(std::move(self_sp));
+		break;
+	}
 
-		} else if (_is_disconnecting() && !_is_writing()) {
-			state = State::Disconnecting;
-			do_disconnect(std::move(self_sp));
-		}
+	if (ec && !eof_error_in_head && !first_error)
+		first_error = ec;
+
+	lock.unlock();
+	if (!eof_error_in_head) {
+		if (ec)
+			handler->on_receive_error(ec, message_body_view{temp_message_body});
+		else
+			handler->on_receive(message_body_view{temp_message_body});
 	}
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std::error_code ec) noexcept {
-	std::unique_lock lock{mutex};
-	on_flight_write = false;
+	auto slock = std::unique_lock(strand);
+	auto lock = std::unique_lock(mutex);
+
+	--on_flight_operation_num;
+
+	auto temp_message_body = std::move(write_messages.front().body_view);
+	write_messages.pop_front();
 
 	if (ec) {
-		if (state != State::Failure) {
-			state = State::Failure;
-			stream->cancel();
-		}
-
-		handler->on_send(ec, std::move(write_messages.front().body_view));
-
-		if (_no_on_flight_operation())
-			return _terminate(lock);
-		// else
-		//      Noop, the other on flight operation will take care of it
-
+		state = State::Canceling;
+		stream->cancel();
 	} else {
-		num_total_message_write++;
-		handler->on_send(ec, std::move(write_messages.front().body_view));
-
-		write_messages.pop_front();
-
-		if (state != State::Connected) {
-			if (_no_on_flight_operation())
-				return _terminate(lock);
-			// else
-			//      Noop, the other on flight operation will take care of it
-
-		} else if (_is_writing()) {
-			do_write(std::move(self_sp));
-
-		} else if (_is_disconnecting() && !_is_reading()) {
-			state = State::Disconnecting;
-			do_disconnect(std::move(self_sp));
-		}
+		++num_total_message_write;
 	}
+
+	switch (state) {
+	case State::Constructed: break; // Never happens
+	case State::Connecting: break; // Never happens
+	case State::Connected: [[fallthrough]];
+	case State::Completing:
+		if (_has_write_work())
+			_do_write(std::move(self_sp));
+		else if (_no_on_flight_operation())
+			_do_disconnect(std::move(self_sp));
+		break;
+
+	case State::Canceling: [[fallthrough]];
+	case State::Disconnected:
+		write_messages.clear();
+		if (_no_on_flight_operation())
+			_do_disconnect(std::move(self_sp));
+		break;
+	}
+
+	if (ec && !first_error)
+		first_error = ec;
+
+	lock.unlock();
+	if (ec)
+		handler->on_send_error(ec, std::move(temp_message_body));
+	else
+		handler->on_send(std::move(temp_message_body));
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplBaseConnectionAsyncHE::do_start(SelfPtr&& self_sp) noexcept {
-	const auto self = self_sp.get();
-
-	self->on_flight_connect = true;
-	self->io_context.post([self_sp = std::move(self_sp)] mutable {
+inline void ImplBaseConnectionAsyncHE::_do_start(SelfPtr&& self_sp) noexcept {
+	++on_flight_operation_num;
+	io_context.post([self_sp = std::move(self_sp)] mutable {
 		const auto self = self_sp.get();
 
 		self->outcome_connect(std::move(self_sp), std::error_code());
 	});
 }
 
-void ImplBaseConnectionAsyncHE::do_resolve(SelfPtr&& self_sp, Address&& address) noexcept {
-	const auto self = self_sp.get();
-
-	self->on_flight_connect = true;
-	self->io_context.resolve_async(address, [self_sp = std::move(self_sp)] (const auto& ec, auto&& endpoints) mutable {
+inline void ImplBaseConnectionAsyncHE::_do_resolve(SelfPtr&& self_sp, Address&& address) noexcept {
+	++on_flight_operation_num;
+	io_context.resolve_async(address, [self_sp = std::move(self_sp)] (const auto& ec, auto&& endpoints) mutable {
 		const auto self = self_sp.get();
 
 		if (ec) {
 			log_net.error("MTCP-{} Failed to resolve {}", self->id, libv::net::to_string(ec));
 			self->outcome_connect(std::move(self_sp), ec);
 		} else {
-			log_net.trace("MTCP-{} Successfully resolved address", self->id);
-			do_connect(std::move(self_sp), std::move(endpoints.results));
+			log_net.debug("MTCP-{} Successfully resolved address", self->id);
+			self->_do_connect(std::move(self_sp), std::move(endpoints.results));
 		}
 	});
 }
 
-void ImplBaseConnectionAsyncHE::do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept {
-	const auto self = self_sp.get();
-
+inline void ImplBaseConnectionAsyncHE::_do_connect(SelfPtr&& self_sp, boost::asio::ip::tcp::resolver::results_type&& endpoints) noexcept {
 	using EPEntry = boost::asio::ip::tcp::resolver::results_type::value_type;
-	const auto connect_condition = [id = self->id](const auto& ec, const EPEntry& entry) {
+
+	const auto connect_condition = [id = id](const auto& ec, const EPEntry& entry) {
 		log_net.warn_if(ec, "MTCP-{} Failed to connect: {}", id, libv::net::to_string(ec));
 
 		const auto& endpoint = entry.endpoint();
 		const auto is_v4 = endpoint.address().is_v4();
 
-		log_net.trace_if(is_v4, "MTCP-{} Connecting to {}:{}...", id, endpoint.address().to_string(), endpoint.port());
+		log_net.debug_if(is_v4, "MTCP-{} Connecting to {}:{}...", id, endpoint.address().to_string(), endpoint.port());
 		return is_v4;
 	};
 
-	self->on_flight_connect = true;
-	self->stream->async_connect(std::move(endpoints), connect_condition, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
+	stream->async_connect(std::move(endpoints), connect_condition, [self_sp = std::move(self_sp)](const auto& ec, const auto& remote_endpoint) mutable {
 		(void) remote_endpoint;
 
 		const auto self = self_sp.get();
 
 		log_net.error_if(ec, "MTCP-{} Failed to connect: {}", self->id, libv::net::to_string(ec));
-		log_net.trace_if(!ec, "MTCP-{} Successfully connected", self->id);
+		log_net.debug_if(!ec, "MTCP-{} Successfully connected", self->id);
 
 		self->outcome_connect(std::move(self_sp), ec);
 	});
@@ -645,43 +727,37 @@ void ImplBaseConnectionAsyncHE::do_connect(SelfPtr&& self_sp, boost::asio::ip::t
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplBaseConnectionAsyncHE::do_disconnect(SelfPtr&& self_sp) noexcept {
-	const auto self = self_sp.get();
-
-	self->on_flight_disconnect = true;
-	self->io_context.post([self_sp = std::move(self_sp)] mutable {
+inline void ImplBaseConnectionAsyncHE::_do_disconnect(SelfPtr&& self_sp) noexcept {
+	++on_flight_operation_num;
+	io_context.post([self_sp = std::move(self_sp)] mutable {
 		const auto self = self_sp.get();
 
-		// Disconnecting will always succeed (in one way or an another)
+		// Disconnecting will always succeed (in one way or another)
 		self->outcome_disconnect(std::move(self_sp));
 	});
 }
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplBaseConnectionAsyncHE::do_read(SelfPtr&& self_sp) noexcept {
-	if (self_sp->on_flight_read)
-		return;
-
-	self_sp->on_flight_read = true;
-	do_read_header(std::move(self_sp));
+inline void ImplBaseConnectionAsyncHE::_do_read(SelfPtr&& self_sp) noexcept {
+	++on_flight_operation_num;
+	_do_read_header(std::move(self_sp));
 }
 
-void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
-	const auto self = self_sp.get();
-
+inline void ImplBaseConnectionAsyncHE::_do_read_header(SelfPtr&& self_sp) noexcept {
 	boost::asio::async_read(
-			*self->stream,
-			boost::asio::buffer(self->read_message_header.header_data(), self->read_message_header.header_size()),
+			*stream,
+			boost::asio::buffer(read_message_header.header_data(), read_message_header.header_size()),
 			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
 				if (ec) {
-					log_net.error("MTCP-{} Failed to read {} header byte: {}", self->id, size, libv::net::to_string(ec));
-					self->outcome_receive(std::move(self_sp), ec);
+					const auto is_eof = ec == boost::asio::error::make_error_code(boost::asio::error::eof);
+					log_net.error_if(!is_eof, "MTCP-{} Failed to read header after {} byte: {}", self->id, size, libv::net::to_string(ec));
+					self->outcome_receive(std::move(self_sp), ec, is_eof);
 
 				} else {
-					log_net.trace("MTCP-{} Successfully read {} header byte", self->id, size);
+					log_net.debug("MTCP-{} Successfully read {} header byte", self->id, size);
 					const auto read_body_size = self->read_message_header.size();
 
 					if (read_body_size > MTCP_MESSAGE_MAX_SIZE) {
@@ -689,34 +765,31 @@ void ImplBaseConnectionAsyncHE::do_read_header(SelfPtr&& self_sp) noexcept {
 						self->outcome_receive(std::move(self_sp), boost::asio::error::make_error_code(boost::asio::error::message_size));
 
 					} else {
-						do_read_body(std::move(self_sp), read_body_size);
+						self->_do_read_body(std::move(self_sp), read_body_size);
 					}
 				}
 			});
 }
 
-void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept {
-	const auto self = self_sp.get();
-
-	self->read_message_body.clear();
+inline void ImplBaseConnectionAsyncHE::_do_read_body(SelfPtr&& self_sp, std::size_t read_body_size) noexcept {
+	read_message_body.clear();
 	if (read_body_size > MTCP_MESSAGE_MAX_RESERVE) {
-		log_net.warn("MTCP-{} Payload size {} exceeds maximum reserve size of {}", self->id, read_body_size, MTCP_MESSAGE_MAX_RESERVE);
-		self->read_message_body.reserve(MTCP_MESSAGE_MAX_RESERVE);
+		log_net.warn("MTCP-{} Payload size {} exceeds maximum reserve size of {}", id, read_body_size, MTCP_MESSAGE_MAX_RESERVE);
+		read_message_body.reserve(MTCP_MESSAGE_MAX_RESERVE);
 
 	} else {
-		self->read_message_body.reserve(read_body_size);
+		read_message_body.reserve(read_body_size);
 	}
 
 	// TODO P5: Use a non dynamic buffer if read_body_size < MTCP_MESSAGE_MAX_RESERVE, with resize instead of reserve
-	self->on_flight_read = true;
 	boost::asio::async_read(
-			*self->stream,
-			boost::asio::dynamic_buffer(self->read_message_body, read_body_size),
+			*stream,
+			boost::asio::dynamic_buffer(read_message_body, read_body_size),
 			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
-				log_net.error_if(ec, "MTCP-{} Failed to read {} payload byte: {}", self->id, size, libv::net::to_string(ec));
-				log_net.trace_if(!ec, "MTCP-{} Successfully read {} payload byte", self->id, size);
+				log_net.error_if(ec, "MTCP-{} Failed to read payload after {} byte: {}", self->id, size, libv::net::to_string(ec));
+				log_net.debug_if(!ec, "MTCP-{} Successfully read {} payload byte", self->id, size);
 
 				self->outcome_receive(std::move(self_sp), ec);
 			});
@@ -724,64 +797,30 @@ void ImplBaseConnectionAsyncHE::do_read_body(SelfPtr&& self_sp, std::size_t read
 
 // -------------------------------------------------------------------------------------------------
 
-void ImplBaseConnectionAsyncHE::do_write(SelfPtr&& self_sp) noexcept {
-	if (self_sp->on_flight_write)
-		return;
+inline void ImplBaseConnectionAsyncHE::_do_write(SelfPtr&& self_sp) noexcept {
+	++on_flight_operation_num;
 
-	self_sp->on_flight_write = true;
-	do_write_header(std::move(self_sp));
-}
+	const auto& front_message = write_messages.front();
+	const auto& front_message_body = front_message.body_view;
+	write_next_header = front_message.header;
 
-// TODO P4: Merge header and body send
-//void ImplBaseConnectionAsyncHE::do_write(SelfPtr&& self_sp) noexcept {
-//	const auto header_buffer = boost::asio::buffer(&self->write_header, sizeof(PacketHeader));
-//	const auto body_buffer = boost::asio::buffer(*self->write_packets.begin());
-//	const auto buffers = std::array<boost::asio::const_buffer, 2>{header_buffer, body_buffer};
-//
-//	boost::asio::async_write(
-//			self->socket,
-//			buffers,
-
-void ImplBaseConnectionAsyncHE::do_write_header(SelfPtr&& self_sp) noexcept {
-	const auto self = self_sp.get();
-
-	self->write_next_header = self->write_messages.front().header;
-
-	assert(self->write_next_header.size() <= MTCP_MESSAGE_MAX_SIZE);
+	assert(write_next_header.size() <= MTCP_MESSAGE_MAX_SIZE);
 	// TODO P1: In not assert builds this will just try to execute, make a return / abort branch for it
-	// TODO P3: replace assert with recoverable error (Simple exception)
+	// 			| replace assert with recoverable error (Simple exception) | No can do: different thread
+	//			| Would rather verify this inside the .send_*() functions, then exceptions would be possible
 
-	const auto header_buffer = boost::asio::buffer(self->write_next_header.header_data(), self->write_next_header.header_size());
+	const auto header_buffer = boost::asio::buffer(write_next_header.header_data(), write_next_header.header_size());
+	const auto body_buffer = boost::asio::buffer(front_message_body.data(), front_message_body.size());
+	const auto buffers = std::array<boost::asio::const_buffer, 2>{header_buffer, body_buffer};
+
 	boost::asio::async_write(
-			*self->stream,
-			header_buffer,
+			*stream,
+			buffers,
 			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
 				const auto self = self_sp.get();
 
-				if (ec) {
-					log_net.error("MTCP-{} Failed to write {} header byte: {}", self->id, size, libv::net::to_string(ec));
-					self->outcome_send(std::move(self_sp), ec);
-
-				} else {
-					log_net.trace("MTCP-{} Successfully wrote {} header byte", self->id, size);
-					do_write_body(std::move(self_sp));
-				}
-			});
-}
-
-void ImplBaseConnectionAsyncHE::do_write_body(SelfPtr&& self_sp) noexcept {
-	const auto self = self_sp.get();
-	const auto& front_message = self->write_messages.front().body_view;
-	const auto body_buffer = boost::asio::buffer(front_message.data(), front_message.size());
-
-	boost::asio::async_write(
-			*self->stream,
-			body_buffer,
-			[self_sp = std::move(self_sp)](const std::error_code ec, std::size_t size) mutable {
-				const auto self = self_sp.get();
-
-				log_net.error_if(ec, "MTCP-{} Failed to write {} payload byte: {}", self->id, size, libv::net::to_string(ec));
-				log_net.trace_if(!ec, "MTCP-{} Successfully wrote {} payload byte", self->id, size);
+				log_net.error_if(ec, "MTCP-{} Failed to write {} + {} byte: {}", self->id, sizeof(message_header), size - sizeof(message_header), libv::net::to_string(ec));
+				log_net.debug_if(!ec, "MTCP-{} Successfully wrote {} + {} byte", self->id, sizeof(message_header), size - sizeof(message_header));
 
 				self->outcome_send(std::move(self_sp), ec);
 			});
@@ -791,6 +830,10 @@ void ImplBaseConnectionAsyncHE::do_write_body(SelfPtr&& self_sp) noexcept {
 
 BaseConnectionAsyncHE::BaseConnectionAsyncHE(IOContext& io_context) noexcept :
 	internals(std::make_shared<ImplBaseConnectionAsyncHE>(io_context)) {
+}
+
+BaseConnectionAsyncHE::~BaseConnectionAsyncHE() {
+	log_net.trace("MTCP-{} ~BaseConnectionAsyncHE", internals->id);
 }
 
 void BaseConnectionAsyncHE::inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler) noexcept {
@@ -841,16 +884,12 @@ void BaseConnectionAsyncHE::connect_async(Address address) noexcept {
 	internals->connect_async(std::move(address));
 }
 
-void BaseConnectionAsyncHE::disconnect_async() noexcept {
-	internals->disconnect_async();
-}
-
-void BaseConnectionAsyncHE::disconnect_if_connected_async() noexcept {
-	internals->disconnect_if_connected_async();
-}
-
 void BaseConnectionAsyncHE::cancel_and_disconnect_async() noexcept {
 	internals->cancel_and_disconnect_async();
+}
+
+void BaseConnectionAsyncHE::complete_and_disconnect_async() noexcept {
+	internals->complete_and_disconnect_async();
 }
 
 void BaseConnectionAsyncHE::pause_receive_async() noexcept {
@@ -889,6 +928,26 @@ void BaseConnectionAsyncHE::send_view_async(message_body_bin_view message) noexc
 }
 void BaseConnectionAsyncHE::send_view_async(message_body_str_view message_str) noexcept {
 	internals->send_async(std::as_bytes(std::span(message_str)));
+}
+
+// -------------------------------------------------------------------------------------------------
+
+BaseConnectionHandler::~BaseConnectionHandler() {
+	log_net.trace("MTCP-{} ~BaseConnectionHandler", connection.internals->id);
+}
+
+void BaseConnectionHandler::on_connect_error(error_code ec) {
+	(void) ec;
+}
+
+void BaseConnectionHandler::on_receive_error(error_code ec, message_view m) {
+	(void) ec;
+	(void) m;
+}
+
+void BaseConnectionHandler::on_send_error(error_code ec, message_view m) {
+	(void) ec;
+	(void) m;
 }
 
 // -------------------------------------------------------------------------------------------------

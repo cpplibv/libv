@@ -3,8 +3,8 @@
 #pragma once
 
 // fwd
-#include <libv/net/detail/fwd_io_context.hpp>
-#include <libv/net/detail/fwd_resolve_results.hpp>
+#include <libv/net/detail/io_context_fwd.hpp>
+#include <libv/net/detail/resolve_results_fwd.hpp>
 // std
 #include <functional>
 #include <memory>

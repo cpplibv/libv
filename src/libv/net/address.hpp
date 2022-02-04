@@ -36,7 +36,7 @@ public:
 		service(std::to_string(port)) { }
 
 	template <typename Str0, typename Str1>
-			requires (std::constructible_from<std::string, Str0> && std::convertible_to<std::string, Str1>)
+			requires (std::constructible_from<std::string, Str0> && std::constructible_from<std::string, Str1>)
 	inline Address(Str0&& address, Str1&& port) :
 		address(std::forward<Str0>(address)),
 		service(std::forward<Str1>(port)) { }

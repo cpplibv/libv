@@ -40,33 +40,39 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
+namespace detail {
+
+template <typename T1, typename T2>
+class HandlerGuard;
+
+} // namespace detail
+
 class BaseConnectionHandler;
+class ImplBaseAcceptorAsyncHE;
+class ImplBaseConnectionAsyncHE;
 
 // -------------------------------------------------------------------------------------------------
 
 /// @thread safe
 class BaseConnectionAsyncHE {
-	friend class BaseConnectionHandler;
+	friend BaseConnectionHandler;
 
 private:
-	std::shared_ptr<class ImplBaseConnectionAsyncHE> internals;
+	std::shared_ptr<ImplBaseConnectionAsyncHE> internals;
 
 public:
 	explicit BaseConnectionAsyncHE(IOContext& io_context) noexcept;
+	inline BaseConnectionAsyncHE(const BaseConnectionAsyncHE& orig) noexcept = default;
+	inline BaseConnectionAsyncHE(BaseConnectionAsyncHE&& orig) noexcept = default;
+	inline BaseConnectionAsyncHE& operator=(const BaseConnectionAsyncHE& orig) & noexcept = default;
+	inline BaseConnectionAsyncHE& operator=(BaseConnectionAsyncHE&& orig) & noexcept = default;
+	~BaseConnectionAsyncHE() noexcept;
 
 private:
 	void inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler) noexcept;
 	void abandon_handler() noexcept;
 
 public:
-	inline BaseConnectionAsyncHE(const BaseConnectionAsyncHE& orig) noexcept = default;
-	inline BaseConnectionAsyncHE(BaseConnectionAsyncHE&& orig) noexcept = default;
-	inline BaseConnectionAsyncHE& operator=(const BaseConnectionAsyncHE& orig) & noexcept = default;
-	inline BaseConnectionAsyncHE& operator=(BaseConnectionAsyncHE&& orig) & noexcept = default;
-
-public:
-	inline ~BaseConnectionAsyncHE() noexcept = default;
-
 	/// Can only return false if the connection was moved out from the current object
 	[[nodiscard]] explicit inline operator bool() const noexcept {
 		return internals != nullptr;
@@ -94,14 +100,11 @@ public:
 	/// Queues an asynchronous connect task.
 	void connect_async(Address address) noexcept;
 
-	/// Queues an asynchronous disconnect task. Implicitly calls pause_receive_async
-	void disconnect_async() noexcept;
-
-	/// Calls disconnect_async if connection is connected (or connecting)
-	void disconnect_if_connected_async() noexcept;
-
-	/// Disconnects asynchronous as soon as possible canceling any pending async task
+			/// Queues an asynchronous disconnect task. Implicitly calls pause_receive_async
+			/// Calls disconnect_async if connection is connected (or connecting)
+			/// Disconnects asynchronous as soon as possible canceling any pending async task
 	void cancel_and_disconnect_async() noexcept;
+	void complete_and_disconnect_async() noexcept;
 
 	/// Pause the repeating asynchronous receive task.
 	/// This operation does not cancels or pauses any already started receive operation
@@ -116,6 +119,12 @@ public:
 	void send_async(message_body_bin_view message) noexcept;
 	/// Queues an asynchronous send task. Moves the storage in
 	void send_async(message_body_str message) noexcept;
+	/// Queues an asynchronous send task. Forwards the storage into a std::string
+	template <typename Str>
+		requires std::constructible_from<message_body_str, Str>
+	inline void send_async(Str&& message) noexcept {
+		send_async(message_body_str(std::move(message)));
+	}
 	/// Queues an asynchronous send task. Copies the data into an internal storage
 	void send_async(message_body_str_view message) noexcept;
 
@@ -131,9 +140,10 @@ public:
 
 class BaseConnectionHandler {
 private:
-	template <typename T1, typename T2> friend class detail::HandlerGuard;
-	friend class ImplBaseAcceptorAsyncHE;
-	friend class ImplBaseConnectionAsyncHE;
+	template <typename T1, typename T2>
+	friend class detail::HandlerGuard;
+	friend ImplBaseAcceptorAsyncHE;
+	friend ImplBaseConnectionAsyncHE;
 
 public:
 	using error_code = std::error_code;
@@ -141,7 +151,7 @@ public:
 	using io_context = IOContext;
 
 private:
-	std::atomic<uint32_t> ref_count = 0;
+	std::atomic<uint32_t> ref_count_ = 0;
 
 public:
 	BaseConnectionAsyncHE connection;
@@ -149,7 +159,7 @@ public:
 public:
 	explicit BaseConnectionHandler() :
 		connection(*libv::net::detail::current_io_context) {}
-	virtual ~BaseConnectionHandler() = default;
+	virtual ~BaseConnectionHandler();
 
 private:
 	inline void inject_handler(std::unique_ptr<BaseConnectionHandler>&& handler) noexcept {
@@ -157,38 +167,37 @@ private:
 	}
 
 	inline void increment_ref_count() noexcept {
-		++ref_count;
-		// TODO P4: Figure out what should happen with revived handlers
+		++ref_count_;
+		// TODO P1: Figure out what should happen with revived handlers
 		//		if (handler->ref_count() == 1)
 		//			log_net.error("Attempting to revive an abounded connection handler");
 		//		| has to be hard error (unless if its after a new object and we are after the ctor)
+		//		| Revive can happen when from inside the on_disconnect someone
+		//  		last ref -> disconnect_async -> on_disconnect -> connection_from_this
 	}
 
 	inline void decrement_ref_count() noexcept {
-		if (--ref_count == 0) {
-			// abandon_handler will discard this handler object:
-			// Copy the connection to the stack to keep alive the connection object while this code runs
-			auto temp = connection;
-			temp.abandon_handler();
-			temp.disconnect_if_connected_async();
+		if (--ref_count_ == 0) {
+			// abandon_handler will discard this handler object by committing indirect suicide
+			connection.abandon_handler();
 		}
 	}
 
-private:
-	virtual void on_connect(error_code ec) = 0;
-	virtual void on_receive(error_code ec, message_view m) = 0;
-	virtual void on_send(error_code ec, message_view m) = 0;
-	virtual void on_disconnect(error_code ec) = 0;
+public:
+	[[nodiscard]] inline uint32_t ref_count() const noexcept {
+		return ref_count_.load();
+	}
 
-//	virtual void on_connect() = 0;
-//	virtual void on_connect(error_code) {}
-//	virtual void on_receive(message m) = 0;
-//	virtual void on_receive(error_code) {}
-//	virtual void on_send(message m) = 0;
-//	virtual void on_send(error_code) {}
-//	/// Receives the first error that occurred which resulted in the disconnect if there was any
-//	/// !!! ^ Match this comment in implementation
-//	virtual void on_disconnect(error_code ec) = 0;
+private:
+	virtual void on_connect() = 0;
+	virtual void on_connect_error(error_code ec);
+	virtual void on_receive(message_view m) = 0;
+	virtual void on_receive_error(error_code ec, message_view m);
+	virtual void on_send(message_view m) = 0;
+	virtual void on_send_error(error_code ec, message_view m);
+	/// Receives the first error that occurred which resulted in the disconnect if there was any
+	/// Always called if the connection was successful (if on_connect() was called)
+	virtual void on_disconnect(error_code ec) = 0;
 };
 
 // -------------------------------------------------------------------------------------------------

@@ -25,10 +25,12 @@ std::string to_string(const std::error_code ec) {
 
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::bad_descriptor))
 		return fmt::format("{} {}", ec, "Bad file descriptor");
+	else if (ec == boost::asio::error::make_error_code(boost::asio::error::connection_aborted))
+		return fmt::format("{} {}", ec, "Connection aborted: An established connection was aborted by the software in your host machine");
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::connection_refused))
-		return fmt::format("{} {}", ec, "Connection refused");
+		return fmt::format("{} {}", ec, "Connection refused: No connection could be made because the target machine actively refused it");
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::connection_reset))
-		return fmt::format("{} {}", ec, "Connection reset by peer");
+		return fmt::format("{} {}", ec, "Connection reset by peer: An existing connection was forcibly closed by the remote host");
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::not_connected))
 		return fmt::format("{} {}", ec, "Transport endpoint is not connected");
 	else if (ec == boost::asio::error::make_error_code(boost::asio::error::timed_out))

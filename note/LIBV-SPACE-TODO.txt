@@ -62,10 +62,13 @@ app.space: Mitigate the compile-time regression
 app.space: Rename universe folder to sim
 libv.ui: Add support for Z-Index offset (Mouse only for now)
 app.space: Fix Z-Index issue with mp menu
-
-
-
-
+libv.net: Fix lifetime extension during termination of connection and acceptor
+libv.net: Fix io_context executor early termination by adding a work_guard to every io_context user
+libv.net: Fix crash when cancelling an async write in mtcp connection
+app.space: Fix entity leak on snapshot universe loading
+libv.ui: Fix incorrect ref_count management in components
+libv.net: Fix incorrect ref_count management in HandlerGuards
+app.space: Fix simple disconnect as a non-connected client will do long timeout
 
 
 
@@ -78,22 +81,55 @@ app.space: Fix Z-Index issue with mp menu
 
 
 
-Bug P1: repeated smashing of host/join can cause failure
-		| Also: Simple disconnect as a non connected client will do long timeout
-		| Also: Connect with a client seg fault
+
+app.space: Bug P3: crash with assert
+	open server
+	client 1 join
+	client 2 join
+	server -> join (switch to client mode)
+		Assertion failed: false && "Internal consistency error", file E:/dev/cpp/libv/app/space/view/scene_mp_status.cpp, line 55
 
 
 
-Bug hunting:
-	Bug P3: app.space: Model loading failure causes silent error and soft-lock
-				Who catches that exception and why?
-			| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
-				So it looks like any exception (what is interesting that it kills the thread)
-			| If the exception comes from model loading (model not file loading) it was a silent crash
-				| This is a different issue, corrupt model file loading
 
-	Performance Bug P4: app.space: 200*200 debug sphere causes low fps
-			| debug shapes have to switch to pre-uploaded meshes
+re-enable receive on network_client
+	| Seg fault on client when connecting to server
+
+
+
+
+
+app.space: During shutdown do not broadcast client disconnections one-by-one to others, but drop every connection at the same time
+	\ only after server hung bug is fixed, as this would work around it
+
+
+
+
+
+
+Bug P2: app.space: Model loading failure causes silent error and soft-lock
+			Who catches that exception and why?
+		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
+			So it looks like any exception (what is interesting that it kills the thread)
+		| If the exception comes from model loading (model not file loading) it was a silent crash
+			| This is a different issue, corrupt model file loading
+
+
+
+Performance Bug P4: app.space: 200*200 debug sphere causes low fps
+		| debug shapes have to switch to pre-uploaded meshes
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -156,6 +192,19 @@ Main areas of focus:
 
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
+	libv.gen: New lib/app to gen source code
+		libv.gen: CMake wish integration to predetermine generated output source files
+				wish_create_exe(
+					Generator src/to/dir/**.in.lua
+				from that "Generator src/to/dir/**.in.lua" is executed in multiple steps
+					first step is only inspection to determine generated output files at configure time
+					second step is simple generation during build time
+					we might need a fake target that reruns the cmake if the output files list changes
+							^ and actually this is the hard part
+						\ Maybe start a daemon or be a daemon that is started at first compilation (shut it down after X min of inactivity)
+								\ still requires everything
+					Maybe output a .cmake file that is included that only contains the output files
+
 
 	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
 

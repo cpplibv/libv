@@ -49,6 +49,7 @@ private:
 
 public:
 	explicit BaseAcceptorAsyncHE(IOContext& io_context);
+	~BaseAcceptorAsyncHE();
 
 private:
 	void inject_handler(std::unique_ptr<BaseAcceptorHandler>&& handler) noexcept;
@@ -88,7 +89,8 @@ public:
 public:
 	explicit BaseAcceptorHandler() :
 		acceptor(*libv::net::detail::current_io_context) {}
-	virtual ~BaseAcceptorHandler() = default;
+
+	virtual ~BaseAcceptorHandler();
 
 private:
 	inline void inject_handler(std::unique_ptr<BaseAcceptorHandler>&& handler) noexcept {
@@ -97,19 +99,18 @@ private:
 
 	inline void increment_ref_count() noexcept {
 		++ref_count;
-		// TODO P4: Figure out what should happen with revived handlers
+		// TODO P1: Figure out what should happen with revived handlers
 		//		if (handler->ref_count() == 1)
 		//			log_net.error("Attempting to revive an abounded connection handler");
 		//		| has to be hard error (unless if its after a new object and we are after the ctor)
+		//		| Revive can happen when from inside the on_accept(ec)
+		//  		last ref -> cancel -> on_accept(ec) -> acceptor_from_this
 	}
 
 	inline void decrement_ref_count() noexcept {
 		if (--ref_count == 0) {
-			// abandon_handler will discard this handler object:
-			// Copy the acceptor to the stack to keep alive the acceptor object while this code runs
-			auto temp = acceptor;
-			temp.abandon_handler();
-			temp.cancel();
+			// abandon_handler will discard this handler object by committing indirect suicide
+			acceptor.abandon_handler();
 		}
 	}
 

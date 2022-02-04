@@ -1,16 +1,18 @@
-// Project: libv.net, File: src/libv/net/detail/fwd_io_context.hpp
+// Project: libv.net, File: src/libv/net/detail/resolve_results_fwd.hpp
 
 #pragma once
 
 
-namespace boost {
-namespace asio {
+namespace libv {
+namespace net {
+namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-class io_context;
+struct ResolveResults;
 
 // -------------------------------------------------------------------------------------------------
 
-} // namespace asio
-} // namespace boost
+} // namespace mtcp
+} // namespace net
+} // namespace libv

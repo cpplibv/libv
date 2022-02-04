@@ -54,6 +54,7 @@ public:
 
 	~ImplIOContext() {
 		join();
+		log_net.trace("IOContext-{}: ~IOContext", id);
 	}
 
 public:
@@ -69,14 +70,14 @@ public:
 
 	template <typename ResolveHandlerT>
 	void resolve_async(const Address& addr, ResolveHandlerT&& handler) {
-		log_net.trace("Resolving {}:{}...", addr.address, addr.service);
+		log_net.debug("Resolving {}:{}...", addr.address, addr.service);
 
 		resolver.async_resolve(addr.address, addr.service,
 				[handler = std::forward<ResolveHandlerT>(handler)] (const auto& ec, auto results) mutable {
 					if (!ec) {
-						log_net.trace("Resolved to {} entry", results.size());
+						log_net.debug("Resolved to {} entry", results.size());
 						for (const auto& entry : results) {
-							log_net.trace("    ...{}:{}", entry.endpoint().address().to_string(), entry.endpoint().port());
+							log_net.debug("    ...{}:{}", entry.endpoint().address().to_string(), entry.endpoint().port());
 						}
 					}
 
@@ -86,12 +87,13 @@ public:
 
 public:
 	void join() {
-		log_net.trace("IOContext-{} Reseting work_guard by thread {}", id, libv::thread_number());
+		log_net.trace("IOContext-{} Joining...", id);
 		work_guard.reset();
 		for (auto& thread : threads) {
 			if (thread.joinable())
 				thread.join();
 		}
+		log_net.trace("IOContext-{} Joined", id);
 	}
 };
 
