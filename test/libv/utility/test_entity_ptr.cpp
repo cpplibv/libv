@@ -199,3 +199,90 @@ TEST_CASE("entity_store capacity growth", "[libv.utility.entity_ptr]") {
 
 	CHECK(fleets.size() == 0);
 }
+
+TEST_CASE("entity_store move", "[libv.utility.entity_ptr]") {
+	libv::entity_store<Fleet> original(2);
+
+	const auto block_capacity = 1637;
+
+	CHECK(original.size() == 0);
+	CHECK(original.capacity() == block_capacity);
+
+	{
+		std::vector<libv::entity_ptr<Fleet>> bucket;
+		for (auto i = 0; i < block_capacity; ++i)
+			bucket.emplace_back(original.create(i, "Long long long long long long long long long fleet name A"));
+
+		CHECK(original.size() == block_capacity);
+		CHECK(original.capacity() == block_capacity);
+
+		bucket.emplace_back(original.create(42, "Long long long long long long long long long fleet name A"));
+
+		CHECK(original.size() == block_capacity + 1);
+		CHECK(original.capacity() == block_capacity * 2);
+
+		for (const auto& fleet : bucket)
+			CHECK(&original == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+
+		// Move the store
+		auto moved = std::move(original);
+
+		CHECK(original.size() == 0);
+		CHECK(original.capacity() == 0);
+
+		CHECK(moved.size() == block_capacity + 1);
+		CHECK(moved.capacity() == block_capacity * 2);
+
+		for (const auto& fleet : bucket)
+			CHECK(&moved == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+
+		// Continue manipulating the moved store
+		for (auto i = 0; i < block_capacity - 1; ++i)
+			bucket.emplace_back(moved.create(i, "Long long long long long long long long long fleet name A"));
+
+		for (const auto& fleet : bucket)
+			CHECK(&moved == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+
+		CHECK(original.size() == 0);
+		CHECK(original.capacity() == 0);
+
+		CHECK(moved.size() == block_capacity * 2);
+		CHECK(moved.capacity() == block_capacity * 2);
+
+		bucket.clear();
+
+		CHECK(moved.size() == 0);
+		CHECK(moved.capacity() == block_capacity * 2);
+	}
+
+	CHECK(original.size() == 0);
+	CHECK(original.capacity() == 0);
+
+	// Start using a moved from state
+	// Hmmm... Lets say its not allowed for now
+//	{
+//		std::vector<libv::entity_ptr<Fleet>> bucket;
+//		for (auto i = 0; i < block_capacity; ++i)
+//			bucket.emplace_back(original.create(i, "Long long long long long long long long long fleet name A"));
+//
+//		CHECK(original.size() == block_capacity);
+//		CHECK(original.capacity() == block_capacity);
+//
+//		bucket.emplace_back(original.create(42, "Long long long long long long long long long fleet name A"));
+//
+//		CHECK(original.size() == block_capacity + 1);
+//		CHECK(original.capacity() == block_capacity * 2);
+//
+//		for (auto i = 0; i < block_capacity - 1; ++i)
+//			bucket.emplace_back(original.create(i, "Long long long long long long long long long fleet name A"));
+//
+//		CHECK(original.size() == block_capacity * 2);
+//		CHECK(original.capacity() == block_capacity * 2);
+//
+//		for (const auto& fleet : bucket)
+//			CHECK(&original == libv::entity_store<Fleet>::context_from_pointer(fleet.get()));
+//	}
+//
+//	CHECK(original.size() == 0);
+//	CHECK(original.capacity() == block_capacity * 2);
+}

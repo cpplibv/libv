@@ -39,7 +39,7 @@ public:
 	Texture() noexcept;
 
 private:
-	Texture(std::shared_ptr<RemoteTexture> remote) noexcept;
+	explicit Texture(std::shared_ptr<RemoteTexture> remote) noexcept;
 
 public:
 	[[nodiscard]] inline Texture base_ref() const noexcept {

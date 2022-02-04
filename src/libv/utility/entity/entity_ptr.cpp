@@ -85,20 +85,23 @@ void BaseContextBlockArena::allocateMoreMemory() {
 	capacity_ += m.chunk_capacity;
 }
 
-BaseContextBlockArena::BaseContextBlockArena(
-		void* context_ptr,
-		std::size_t block_size_and_alignment,
-		std::size_t block_count,
-		std::size_t object_size) :
-		BaseContextBlockArena() { // Calling delegated default ctor to get a dtor call in case of an exception
+void BaseContextBlockArena::update_context_ptr(void* context_ptr) {
+	auto memory_chunk_ptr = first_memory_chunk_ptr_;
 
-	block_size_and_alignment_ = block_size_and_alignment;
-	object_size_ = object_size;
+	while (memory_chunk_ptr != nullptr) {
+		const auto first_block_header = as_aligned<BlockHeader>(memory_chunk_ptr);
+		const auto next_chunk = first_block_header->next_memory_chunk_ptr_;
 
-	auto m = allocateAndInitMemoryChunk(context_ptr, block_size_and_alignment, block_count, object_size, nullptr, nullptr, nullptr);
-	free_list_head = m.first_fl_entry;
-	first_memory_chunk_ptr_ = m.memory_chunk_ptr;
-	capacity_ = m.chunk_capacity;
+		// Destroy Block Headers
+		auto block_it = first_block_header;
+		while (block_it != nullptr) {
+			auto next = block_it->next_header;
+			block_it->context_ptr = context_ptr;
+			block_it = next;
+		}
+
+		memory_chunk_ptr = next_chunk;
+	}
 }
 
 void BaseContextBlockArena::destroy() {
@@ -122,6 +125,64 @@ void BaseContextBlockArena::destroy() {
 
 		memory_chunk_ptr = next_chunk;
 	}
+}
+
+BaseContextBlockArena::BaseContextBlockArena(
+		void* context_ptr,
+		std::size_t block_size_and_alignment,
+		std::size_t block_count,
+		std::size_t object_size) :
+		BaseContextBlockArena() { // Calling delegated default ctor to get a dtor call in case of an exception
+
+	block_size_and_alignment_ = block_size_and_alignment;
+	object_size_ = object_size;
+
+	auto m = allocateAndInitMemoryChunk(context_ptr, block_size_and_alignment, block_count, object_size, nullptr, nullptr, nullptr);
+	free_list_head = m.first_fl_entry;
+	first_memory_chunk_ptr_ = m.memory_chunk_ptr;
+	capacity_ = m.chunk_capacity;
+}
+
+BaseContextBlockArena::BaseContextBlockArena(BaseContextBlockArena&& other) noexcept :
+		free_list_head(other.free_list_head),
+		first_memory_chunk_ptr_(other.first_memory_chunk_ptr_),
+		block_size_and_alignment_(other.block_size_and_alignment_),
+		object_size_(other.object_size_),
+		size_(other.size_),
+		capacity_(other.capacity_) {
+	other.free_list_head = nullptr;
+	other.first_memory_chunk_ptr_ = nullptr;
+	other.block_size_and_alignment_ = 0;
+	other.object_size_ = 0;
+	other.size_ = 0;
+	other.capacity_ = 0;
+
+	update_context_ptr(this);
+}
+
+BaseContextBlockArena& BaseContextBlockArena::operator=(BaseContextBlockArena&& other) & noexcept {
+	if (&other == this)
+		return *this;
+
+	destroy();
+
+	free_list_head = other.free_list_head;
+	first_memory_chunk_ptr_ = other.first_memory_chunk_ptr_;
+	block_size_and_alignment_ = other.block_size_and_alignment_;
+	object_size_ = other.object_size_;
+	size_ = other.size_;
+	capacity_ = other.capacity_;
+
+	other.free_list_head = nullptr;
+	other.first_memory_chunk_ptr_ = nullptr;
+	other.block_size_and_alignment_ = 0;
+	other.object_size_ = 0;
+	other.size_ = 0;
+	other.capacity_ = 0;
+
+	update_context_ptr(this);
+
+	return *this;
 }
 
 // -------------------------------------------------------------------------------------------------

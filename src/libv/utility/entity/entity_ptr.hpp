@@ -111,27 +111,22 @@ public:
 
 public:
 	[[nodiscard]] inline std::size_t size() const noexcept {
-		std::size_t result;
 		auto lock = std::unique_lock(mutex);
-		result = size_;
-		return result;
+		return size_;
 	}
 
 	[[nodiscard]] inline std::size_t capacity() const noexcept {
-		std::size_t result;
 		auto lock = std::unique_lock(mutex);
-		result = capacity_;
-		return result;
+		return capacity_;
 	}
 
 	[[nodiscard]] inline void* context_ptr() const noexcept {
-		void* result;
 		auto lock = std::unique_lock(mutex);
-		result = as_aligned<BlockHeader>(first_memory_chunk_ptr_)->context_ptr;
-		return result;
+		return as_aligned<BlockHeader>(first_memory_chunk_ptr_)->context_ptr;
 	}
 
 private:
+	void update_context_ptr(void* context_ptr);
 	void destroy();
 
 	inline BaseContextBlockArena() = default;
@@ -143,47 +138,10 @@ public:
 			std::size_t block_count,
 			std::size_t object_size);
 
-	constexpr inline BaseContextBlockArena(const BaseContextBlockArena&) = delete;
-
-	constexpr inline BaseContextBlockArena& operator=(const BaseContextBlockArena&) & = delete;
-
-	inline BaseContextBlockArena(BaseContextBlockArena&& other) noexcept :
-			free_list_head(other.free_list_head),
-			first_memory_chunk_ptr_(other.first_memory_chunk_ptr_),
-			block_size_and_alignment_(other.block_size_and_alignment_),
-			object_size_(other.object_size_),
-			size_(other.size_),
-			capacity_(other.capacity_) {
-		other.free_list_head = nullptr;
-		other.first_memory_chunk_ptr_ = nullptr;
-		other.block_size_and_alignment_ = 0;
-		other.object_size_ = 0;
-		other.size_ = 0;
-		other.capacity_ = 0;
-	}
-
-	inline BaseContextBlockArena& operator=(BaseContextBlockArena&& other) & noexcept {
-		if (&other == this)
-			return *this;
-
-		destroy();
-
-		free_list_head = other.free_list_head;
-		first_memory_chunk_ptr_ = other.first_memory_chunk_ptr_;
-		block_size_and_alignment_ = other.block_size_and_alignment_;
-		object_size_ = other.object_size_;
-		size_ = other.size_;
-		capacity_ = other.capacity_;
-
-		other.free_list_head = nullptr;
-		other.first_memory_chunk_ptr_ = nullptr;
-		other.block_size_and_alignment_ = 0;
-		other.object_size_ = 0;
-		other.size_ = 0;
-		other.capacity_ = 0;
-
-		return *this;
-	}
+	BaseContextBlockArena(const BaseContextBlockArena&) = delete;
+	BaseContextBlockArena& operator=(const BaseContextBlockArena&) & = delete;
+	BaseContextBlockArena(BaseContextBlockArena&& other) noexcept;
+	BaseContextBlockArena& operator=(BaseContextBlockArena&& other) & noexcept;
 
 	~BaseContextBlockArena() {
 		destroy();
@@ -235,7 +193,7 @@ private:
 public:
 	constexpr inline entity_ptr() noexcept = default;
 
-	constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
+	explicit(false) constexpr inline entity_ptr(const std::nullptr_t) noexcept : ptr(nullptr) { }
 
 	constexpr inline entity_ptr(const entity_ptr& other) noexcept : ptr(other.ptr) {
 		if (ptr != nullptr)
@@ -287,6 +245,9 @@ public:
 //	[[nodiscard]] explicit(false) constexpr inline operator T*() const noexcept {
 //		return ptr;
 //	}
+	[[nodiscard]] constexpr inline T* get() const noexcept {
+		return ptr;
+	}
 
 public:
 	/// Abandon the stored pointer without (dereferencing it and) decrementing its ref_count
