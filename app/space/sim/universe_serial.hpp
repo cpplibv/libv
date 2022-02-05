@@ -22,6 +22,8 @@ template <typename Archive> void Universe::save(Archive& ar) const {
 
 	ar & LIBV_NVP(universe_rng);
 	ar & LIBV_NVP(galaxy);
+	//if (ar.isLocal())
+	//	ar & LIBV_NVP(controlledFaction);
 }
 
 template <typename Archive> void Universe::load(Archive& ar) {
@@ -29,11 +31,15 @@ template <typename Archive> void Universe::load(Archive& ar) {
 
 	ar & LIBV_NVP(universe_rng);
 	ar & LIBV_NVP(galaxy);
+	//if (ar.isLocal())
+	//	ar & LIBV_NVP(controlledFaction);
 
 	SnapshotPtrResolverArchive resolver{*this, ar.isLocal()};
 
 	resolver & LIBV_NVP(universe_rng);
 	resolver & LIBV_NVP(galaxy);
+	//if (ar.isLocal())
+	//	resolver & LIBV_NVP(controlledFaction);
 }
 
 // -------------------------------------------------------------------------------------------------

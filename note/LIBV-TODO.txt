@@ -673,7 +673,6 @@ libv.sys: Keep awake
 		UNIX:
 			?
 
-
 libv.res: Resource - New library for resource and asset loading, caching and tracking
 		Based on the libv.rev's Shader and ShaderLoad the same concept can be generalized for
 		assets, audio, textures, mods/scripts and models
@@ -709,7 +708,6 @@ app.editor:
 
 
 ext: Edit Distance https://github.com/erikerlandson/edit_distance
-
 
 place.it: flat_varfix_map (would be usable for style.properties)
 	template <typename Key, typename Value>
@@ -1543,6 +1541,7 @@ resource: dns like resource resolver for custom arguments: Args... -> ResourceDe
 resource: forbid usage of absolute paths
 resource: forbid usage of relative paths with starting ..
 
+libv.serial: Maybe create a hjson archive https://hjson.github.io/
 libv.ecs: Provide a component that has a special storage and can work as structure of arrays (SOA) instead of array of structures (AOS) to enable massive use of simd with a special foreach, so the general idea that share the indexing between tiny-tiny sub components
 libv.frame: Move frames from disconnected monitor / off-screen
 libv.frame: remove default own thread, give them an io_context like executor

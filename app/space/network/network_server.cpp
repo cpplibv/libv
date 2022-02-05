@@ -92,8 +92,17 @@ void NetworkLobby::_broadcast(std::vector<std::byte>&& msg) {
 
 void NetworkLobby::disconnect_all() {
 	std::unique_lock lock(mutex);
-	for (const auto& participant : participants)
-		participant.connection().cancel_and_disconnect_async();
+
+//	for (const auto& peer : connectings)
+//		log_space.fatal("[Peer {}] (connecting) ref_count {}", +peer->userID, peer.handler().ref_count());
+//	for (const auto& peer : participants)
+//		log_space.fatal("[Peer {}] (connected) ref_count {}", +peer->userID, peer.handler().ref_count());
+
+	for (const auto& peer : connectings)
+		peer.connection().cancel_and_disconnect_async();
+
+	for (const auto& peer : participants)
+		peer.connection().cancel_and_disconnect_async();
 }
 
 // =================================================================================================
@@ -103,20 +112,19 @@ NetworkPeer::NetworkPeer(std::shared_ptr<NetworkLobby> lobby) :
 }
 
 NetworkPeer::~NetworkPeer() {
+	log_space.trace("[Peer {}] ~NetworkPeer", ID);
 }
 
-void NetworkPeer::on_connect(error_code ec) {
-	if (ec)
-		return log_space.error("[Peer {}] on_connect {}", ID, libv::net::to_string(ec));
-
+void NetworkPeer::on_connect() {
 	lobby->connecting(connection_from_this());
 }
 
-void NetworkPeer::on_receive(error_code ec, message_view m) {
-	if (ec)
-		return log_space.error("[Peer {}] on_receive {}", ID, libv::net::to_string(ec));
+void NetworkPeer::on_connect_error(error_code ec) {
+	log_space.error("[Peer {}] on_connect {}", ID, libv::net::to_string(ec));
+}
 
-	log_space.trace("[Peer {}] on_receive\n{}", ID, debug_binary_as_json(m.as_bin()));
+void NetworkPeer::on_receive(message_view m) {
+	log_space.trace("[Peer {}] on_receive: {}", ID, debug_binary_as_json(m.as_bin()));
 
 	try {
 		libv::archive::Binary::input iar(m.as_bin());
@@ -163,16 +171,23 @@ void NetworkPeer::on_receive(error_code ec, message_view m) {
 	}
 }
 
-void NetworkPeer::on_send(error_code ec, message_view m) {
-	(void) ec;
-	(void) m;
+void NetworkPeer::on_receive_error(error_code ec, message_view) {
+	log_space.error("[Peer {}] on_receive_error {}", ID, libv::net::to_string(ec));
+}
 
-	log_space.trace("[Peer {}] on_send:\n{}", ID, debug_binary_as_json(m.as_bin()));
+void NetworkPeer::on_send(message_view m) {
+	log_space.trace("[Peer {}] on_send: {}", ID, debug_binary_as_json(m.as_bin()));
+}
+
+void NetworkPeer::on_send_error(error_code ec, message_view m) {
+	log_space.error("[Peer {}] on_send_error {} message would have been: {}", ID, libv::net::to_string(ec), debug_binary_as_json(m.as_bin()));
 }
 
 void NetworkPeer::on_disconnect(error_code ec) {
-	(void) ec;
-	log_space.trace("[Peer {}] on_disconnect {}", ID, libv::net::to_string(ec));
+	if (ec)
+		log_space.error("[Peer {}] on_disconnect {}", ID, libv::net::to_string(ec));
+	else
+		log_space.trace("[Peer {}] on_disconnect", ID);
 
 	lobby->leave(connection_from_this());
 }
@@ -183,6 +198,7 @@ AcceptorHandler::AcceptorHandler(std::shared_ptr<NetworkLobby>&& net_lobby) :
 	net_lobby(std::move(net_lobby)) {}
 
 AcceptorHandler::~AcceptorHandler() {
+	log_space.trace("~AcceptorHandler");
 	net_lobby->disconnect_all();
 }
 
@@ -206,6 +222,7 @@ NetworkServer::NetworkServer(uint16_t server_port, GameThread& game_thread, Play
 }
 
 NetworkServer::~NetworkServer() {
+	log_space.trace("~NetworkServer");
 }
 
 void NetworkServer::broadcast(std::vector<std::byte> message) {

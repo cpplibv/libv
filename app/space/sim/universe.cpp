@@ -26,11 +26,13 @@ namespace space {
 // -------------------------------------------------------------------------------------------------
 
 Universe::Universe() : galaxy(memory) { // For de-serialization only
+	controlledFaction = galaxy.faction("Faction 1"); // <<<
 }
 
 Universe::Universe(GalaxyGenerationSettings ggs) :
 	universe_rng(ggs.seed),
 	galaxy(generateGalaxy(memory, std::move(ggs))) {
+	controlledFaction = galaxy.faction("Faction 1"); // <<<
 }
 
 Universe::Universe(Universe&&) noexcept = default;
@@ -38,9 +40,14 @@ Universe::Universe(Universe&&) noexcept = default;
 Universe& Universe::operator=(Universe&& other) & noexcept {
 	galaxy.kill();
 
-	memory = std::move(other.memory);
 	universe_rng = std::move(other.universe_rng);
 	galaxy = std::move(other.galaxy);
+	controlledFaction = std::move(other.controlledFaction);
+
+	// NOTE: Memory has to be moved last to not discard still alive objects
+	memory = std::move(other.memory);
+	// NOTE: having to reassign galaxy's memory address, would be nice to have a better solution
+	galaxy.memory = libv::make_observer_ptr(&memory);
 
 	return *this;
 }

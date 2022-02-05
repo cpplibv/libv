@@ -27,6 +27,8 @@ public:
 	libv::xoroshiro128 universe_rng;
 	Galaxy galaxy;
 
+	libv::entity_ptr<Faction> controlledFaction; // TODO P4: Move to simulation or simulation control
+
 public:
 	template <typename Archive> void save(Archive& ar) const;
 	template <typename Archive> void load(Archive& ar);
@@ -35,9 +37,6 @@ public:
 	Universe(); // For de-serialization only
 	explicit Universe(GalaxyGenerationSettings ggs);
 
-//	// TODO P1: Remove copy ctor and copy assignment (they are only required by an captured lambda in a std::function
-//	Universe(const Universe&) noexcept = default;
-//	Universe& operator=(const Universe&) & noexcept = default;
 	Universe(const Universe&) noexcept = delete;
 	Universe& operator=(const Universe&) & noexcept = delete;
 	Universe(Universe&&) noexcept;

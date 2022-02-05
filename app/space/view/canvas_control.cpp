@@ -398,14 +398,14 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	controls.feature_action<SpaceCanvas>("space.order_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto mouse = calculateHit(ctx);
 		if (mouse.fleetHit) {
-			if (ctx.controlledFaction->canAttack(*mouse.fleetHit->faction))
+			if (ctx.universe.controlledFaction->canAttack(*mouse.fleetHit->faction))
 				ctx.playout.process<CTO_FleetAttackFleet>(mouse.fleetHit->id);
 			else
 				// <<< Not complete, Merge? Land? Go there? go near, or something
 				ctx.playout.process<CTO_FleetMove>(mouse.fleetHit->position);
 
 		} else if (mouse.planetHit) {
-			if (ctx.controlledFaction->canAttack(*mouse.planetHit->faction))
+			if (ctx.universe.controlledFaction->canAttack(*mouse.planetHit->faction))
 				ctx.playout.process<CTO_FleetAttackPlanet>(mouse.planetHit->id);
 			else
 				// <<< Not complete, Merge? Land? Go there? go near, or something
@@ -419,14 +419,14 @@ void CanvasControl::register_controls(libv::ctrl::FeatureRegister controls) {
 	controls.feature_action<SpaceCanvas>("space.queue_order_fleet_to_mouse", [](const auto&, SpaceCanvas& ctx) {
 		const auto mouse = calculateHit(ctx);
 		if (mouse.fleetHit) {
-			if (ctx.controlledFaction->canAttack(*mouse.fleetHit->faction))
+			if (ctx.universe.controlledFaction->canAttack(*mouse.fleetHit->faction))
 				ctx.playout.process<CTO_FleetAttackFleetQueue>(mouse.fleetHit->id);
 			else
 				// <<< Not complete, Merge? Land? Go there? go near, or something
 				ctx.playout.process<CTO_FleetMoveQueue>(mouse.fleetHit->position);
 
 		} else if (mouse.planetHit) {
-			if (ctx.controlledFaction->canAttack(*mouse.planetHit->faction))
+			if (ctx.universe.controlledFaction->canAttack(*mouse.planetHit->faction))
 				ctx.playout.process<CTO_FleetAttackPlanetQueue>(mouse.planetHit->id);
 			else
 				// <<< Not complete, Merge? Land? Go there? go near, or something

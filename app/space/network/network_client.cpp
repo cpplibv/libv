@@ -54,24 +54,20 @@ public:
 	}
 
 private:
-	virtual void on_connect(error_code ec) override {
-		if (ec)
-			return log_space.error("[{}] on_connect {}", name, libv::net::to_string(ec));
-
+	virtual void on_connect() override {
+		log_space.trace("[{}] on_connect", name);
 		const auto program_version = 0; // TODO P1: Fetch global version
 		write(network_encode(CTO_Introduction{name, program_version}));
-		log_space.trace("[{}] on_connect", name);
 	}
 
-	virtual void on_receive(error_code ec, message_view m) override {
-		if (ec)
-			return log_space.error("[{}] on_receive {}", name, libv::net::to_string(ec));
+	virtual void on_connect_error(error_code ec) override {
+		log_space.error("[{}] on_connect {}", name, libv::net::to_string(ec));
+	}
 
+	virtual void on_receive(message_view m) override {
 		log_space.trace("[{}] on_receive:\n{}", name, debug_binary_as_json(m.as_bin()));
 
 		try {
-//			UniverseArchive<libv::archive::Binary::input> iar{universe, false, m.as_bin()};
-//			libv::archive::Binary::input iar(m.as_bin());
 			SnapshotArchive<libv::archive::BasicBinaryInput> iar{false, m.as_bin()};
 			network_codec.decode(iar, [this]<typename T>(T&& message) mutable {
 				if constexpr(std::is_same_v<T, SnapshotLobby>)
@@ -110,20 +106,23 @@ private:
 		}
 	}
 
-	virtual void on_send(error_code ec, message_view m) override {
-		if (ec)
-			return log_space.error("[{}] on_send {} message would have been: {}", name, libv::net::to_string(ec), debug_binary_as_json(m.as_bin()));
+	virtual void on_receive_error(error_code ec, message_view) override {
+		log_space.error("[{}] on_receive {}", name, libv::net::to_string(ec));
+	}
 
-		(void) m;
-
+	virtual void on_send(message_view m) override {
 		log_space.trace("[{}] on_send:\n{}", name, debug_binary_as_json(m.as_bin()));
+	}
+
+	virtual void on_send_error(error_code ec, message_view m) override {
+		log_space.error("[{}] on_send {} message would have been: {}", name, libv::net::to_string(ec), debug_binary_as_json(m.as_bin()));
 	}
 
 	virtual void on_disconnect(error_code ec) override {
 		if (ec)
-			log_space.error("[{}] on_disconnect {} disconnectExpected {}", name, libv::net::to_string(ec), disconnectExpected);
+			log_space.error("[{}] on_disconnect, disconnectExpected {}, {}", name, disconnectExpected, libv::net::to_string(ec));
 		else
-			log_space.trace("[{}] on_disconnect {} disconnectExpected {}", name, libv::net::to_string(ec), disconnectExpected);
+			log_space.trace("[{}] on_disconnect, disconnectExpected {}", name, disconnectExpected);
 
 		if (!disconnectExpected)
 			game_thread.broadcast_on_thread(mc::RequestDestroyClient{});

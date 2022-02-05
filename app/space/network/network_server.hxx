@@ -76,9 +76,12 @@ public:
 	~NetworkPeer();
 
 private:
-	virtual void on_connect(error_code ec) override;
-	virtual void on_receive(error_code ec, message_view m) override;
-	virtual void on_send(error_code ec, message_view m) override;
+	virtual void on_connect() override;
+	virtual void on_connect_error(error_code ec) override;
+	virtual void on_receive(message_view m) override;
+	virtual void on_receive_error(error_code ec, message_view m) override;
+	virtual void on_send(message_view m) override;
+	virtual void on_send_error(error_code ec, message_view m) override;
 	virtual void on_disconnect(error_code ec) override;
 };
 
@@ -106,7 +109,8 @@ struct ImplNetworkServer {
 	libv::net::IOContext io_context{4};
 	Acceptor acceptor;
 
-	explicit inline ImplNetworkServer(std::shared_ptr<NetworkLobby>&& net_lobby) : acceptor(io_context, std::move(net_lobby)) {}
+	explicit inline ImplNetworkServer(std::shared_ptr<NetworkLobby>&& net_lobby) :
+		acceptor(io_context, std::move(net_lobby)) {}
 };
 
 // -------------------------------------------------------------------------------------------------

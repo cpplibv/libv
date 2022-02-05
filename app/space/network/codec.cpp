@@ -29,14 +29,14 @@ std::string debug_binary_as_json(std::span<const std::byte> message) {
 
 	} catch (const Codec::UnexpectedIDException& e) {
 		if (!message.empty())
-			result = fmt::format("<Unknown type ID: 0x{:02X}>", +e.id);
+			result = fmt::format("<Unknown type ID: {} (0x{:02X})", +e.id, +e.id);
 		else
 			result = "<Empty>";
 	} catch (const std::exception& e) {
-		if (!message.empty())
-			result = fmt::format("<Exception during transcoding 0x{:02X}: {}>", static_cast<int>(message[0]), e.what());
+		if (message.empty())
+			result = fmt::format("<Exception during transcoding empty: {}", e.what());
 		else
-			result = fmt::format("<Exception during transcoding empty: {}>", e.what());
+			result = fmt::format("<Exception during transcoding {} (0x{:02X}): {}", static_cast<int>(message[0]), static_cast<int>(message[0]), e.what());
 	}
 
 	return result;

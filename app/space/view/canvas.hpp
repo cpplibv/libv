@@ -44,7 +44,6 @@ public:
 	bool main_canvas;
 	GameSession& game_session;
 	Universe& universe;
-	libv::entity_ptr<Faction> controlledFaction;
 	Playout& playout;
 
 	CameraPlayer camera;

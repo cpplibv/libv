@@ -55,8 +55,8 @@ public:
 public:
 	template <typename CTO>
 	void process_from_network(CTO&& cto) {
-		auto lock = std::unique_lock(mutex);
 		auto cto_sp = std::make_shared<CTO>(std::move(cto));
+		auto lock = std::unique_lock(mutex);
 		stateChangeEntries.emplace_back(std::move(cto_sp), ApplyFunc<CTO>::call);
 	}
 

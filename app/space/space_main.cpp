@@ -26,6 +26,7 @@ int main(int argc, const char** argv) {
 //	libv::logger_stream.deny_below("libv.frame", libv::Logger::Severity::Info);
 //	libv::logger_stream.deny_below("libv.rev", libv::Logger::Severity::Info);
 //	libv::logger_stream.deny_below("libv.ui", libv::Logger::Severity::Info);
+//	libv::logger_stream.deny_below("libv.net", libv::Logger::Severity::Info);
 
 	libv::logger_stream.setFormat("{severity} {thread_id} {module}: {message}, {file}:{line}\n");
 	std::cout << libv::logger_stream;

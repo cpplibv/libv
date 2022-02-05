@@ -82,56 +82,13 @@ app.space: Fix simple disconnect as a non-connected client will do long timeout
 
 
 
-app.space: Bug P3: crash with assert
-	open server
-	client 1 join
-	client 2 join
-	server -> join (switch to client mode)
-		Assertion failed: false && "Internal consistency error", file E:/dev/cpp/libv/app/space/view/scene_mp_status.cpp, line 55
+
+https://www.youtube.com/watch?v=pfIC-kle4b0
 
 
 
-
-re-enable receive on network_client
-	| Seg fault on client when connecting to server
-
-
-
-
-
-app.space: During shutdown do not broadcast client disconnections one-by-one to others, but drop every connection at the same time
-	\ only after server hung bug is fixed, as this would work around it
-
-
-
-
-
-
-Bug P2: app.space: Model loading failure causes silent error and soft-lock
-			Who catches that exception and why?
-		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
-			So it looks like any exception (what is interesting that it kills the thread)
-		| If the exception comes from model loading (model not file loading) it was a silent crash
-			| This is a different issue, corrupt model file loading
-
-
-
-Performance Bug P4: app.space: 200*200 debug sphere causes low fps
-		| debug shapes have to switch to pre-uploaded meshes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+app.space: void Galaxy::update(sim_duration delta_time) {
+	// TODO P1: If dead, delete, so use erase_if_unstable iteration
 
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
@@ -150,12 +107,35 @@ Simulation
 		app.space: Speed hotkeys: 0,1,2,3 = set, space = toggle pause and last non pause speed
 
 
+
+
+
+
+
+Bug P2: app.space: Model loading failure causes silent error and soft-lock
+			Who catches that exception and why?
+		| app.space: E 2 libv: Exception occurred in Frame thread of Space ExecutorThread: Failed to open file: universe.sav: No such file or directory, src/libv/mt/executor_thread.hpp:87
+			So it looks like any exception (what is interesting that it kills the thread)
+		| If the exception comes from model loading (model not file loading) it was a silent crash
+			| This is a different issue, corrupt model file loading
+
+
+
+
+
+
+
+
+
+
+
+
 Options
 	app.space: Debug views and grid on/off (and other options) with persistence
 
 
 entity_ptr
-	libv.utility: entity_store: cheap non alloc default ctor
+	libv.utility: entity_store: cheap non alloc default ctor | this would allow usage after moved from
 	libv.utility: entity_store context_ptr: rename current context ptr to store_ptr and (re)introduce a context_ptr
 	app.space: entity_ptr circular reference leak mitigation ideas:
 		- have a primary owning ptr version too, which is
@@ -166,8 +146,18 @@ entity_ptr
 
 app.space: Make snapshot_ptr_resolver.hpp not include the whole cereal.hpp
 
-place.it:
-	libv.serial: Maybe create a hjson archive https://hjson.github.io/
+app.space: During shutdown do not broadcast client disconnections one-by-one to others, but drop every connection at the same time
+
+app.space: Low Performance P4: app.space: 200*200 debug sphere causes low fps
+		| debug shapes have to switch to pre-uploaded meshes
+
+app.space: Bug P4: crash with assert
+	open server
+	client 1 join
+	client 2 join
+	server -> join (switch to client mode)
+		Assertion failed: false && "Internal consistency error", file E:/dev/cpp/libv/app/space/view/scene_mp_status.cpp, line 55
+
 
 -----------------------------------------------------------------
 

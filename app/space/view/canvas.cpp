@@ -64,7 +64,6 @@ SpaceCanvas::SpaceCanvas(Renderer& renderer, GameSession& game_session, bool mai
 		main_canvas(main_canvas),
 		game_session(game_session),
 		universe(game_session.universe),
-		controlledFaction{universe.galaxy.faction("Faction 1")}, // <<<
 		playout(game_session.playout),
 //		camera(camera),
 		screen_picker(camera.picker({100, 100})),
