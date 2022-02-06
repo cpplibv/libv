@@ -5,6 +5,7 @@
 // hpp
 #include <space/sim/fleet.hpp>
 // libv
+#include <libv/math/quat_serial.hpp>
 #include <libv/math/vec_serial.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_string.hpp>
@@ -30,7 +31,7 @@ template <typename Archive> void Fleet::serialize(Archive& ar) {
 	ar & LIBV_NVP(id);
 	ar & LIBV_NVP(position);
 	ar & LIBV_NVP(name);
-//	ar & LIBV_NVP(orientation);
+	ar & LIBV_NVP(orientation);
 	ar & LIBV_NVP(commands);
 
 	if (ar.isLocal())

@@ -7,6 +7,7 @@
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
+#include <libv/math/noise/perlin.hpp>
 #include <libv/math/smoothstep.hpp>
 // std
 #include <cassert>
@@ -17,9 +18,9 @@
 #include <space/sim/universe.hpp>
 
 
-#include <libv/log/log.hpp>
-#include <libv/math/noise/perlin.hpp>
-#include <libv/math/quat.hpp>
+//#include <libv/log/log.hpp>
+//#include <libv/color/space.hpp>
+
 
 
 namespace space {
@@ -57,6 +58,57 @@ RendererCommandArrow::ArrowStyle convert_to_arrow_style(FleetCommandType type) {
 	assert(false && "Invalid FleetCommandType enum value");
 	return {libv::vec4f(1, 0, 1, 1), libv::vec4f(1, 0, 1, 1)};
 }
+
+//void test_fleet_trajectory(Renderer& renderer) {
+//	const auto targetPosition = libv::vec3f(0, 0, 0);
+//	const auto speed = 1.f;
+//	auto count = 0;
+//	auto success = 0;
+//	const auto angleSpeed = libv::deg_to_rad(30.f) / 60.f;
+//
+//	for (float y = -1.f; y <= 1.f; y += 0.05f)
+//		for (float x = -1.f; x <= 1.f; x += 0.05f) {
+//			count++;
+//			auto position = libv::vec3f(x + y * 0.0001f, y, 0);
+//			auto orientation = libv::quatf::look_at({0, 1, 0}, {0, 0, 1});
+//
+//			for (int j = 0; j < 600; ++j) {
+//
+//				const auto[len, dir] = (targetPosition - position).length_and_dir();
+//				const auto targetOrientation = libv::quatf::look_at(dir, libv::vec3f(0, 0, 1.f));
+//
+//				orientation = libv::rotate_towards(orientation, targetOrientation, angleSpeed);
+//
+//				if (len < speed / 60.f) {
+//					const auto nextPosition = targetPosition;
+//					renderer.debug.lines.emplace_back(position, nextPosition, libv::vec4f{1, 1, 0, 0.4f});
+//					renderer.debug.spheres.emplace_back(libv::vec3f{x, y, 0}, 0.01f, libv::vec4f{libv::color::hue_to_rgb(1.f/3.f - j / 600.f / 3.0f), 1.f}, 3, 3);
+//					success++;
+//					break;
+//				} else {
+//					// -------------------------------------------------------------------------------------------------
+//
+////					float matching = abs(dot(orientation, targetOrientation)); //[0,1] similar
+//					float matching = std::max(0.f, dot(orientation.forward(), targetOrientation.forward())); //[0,1] similar
+//
+//					matching = std::max(0.f, matching * 1.5f - 0.5f);
+////					const auto matchingPow = std::pow(matching, 4.f);
+////					const auto s = 0.2f * std::min(1.f, len) * speed + 0.8f * matchingPow * speed;
+//					const auto s = std::min(1.f, len + matching) * speed * matching;
+////				const auto s = speed;
+//
+//
+//
+//					// -------------------------------------------------------------------------------------------------
+//					const auto nextPosition = position + orientation.forward() * s / 60.f;
+////				renderer.debug.lines.emplace_back(position, nextPosition, libv::vec4f{xy(libv::color::hue_to_rgb(s / 3.0f)), y * 0.5f + 0.5f, 1.f});
+//					renderer.debug.lines.emplace_back(position, nextPosition, libv::vec4f{libv::color::hue_to_rgb(s / 3.0f), 1.f});
+//					position = nextPosition;
+//				}
+//			}
+//		}
+//	log_space.info("Success rate: {}", static_cast<float>(success)/count);
+//}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -115,6 +167,8 @@ void SpaceCanvas::update(libv::ui::time_duration delta_time) {
 	}
 }
 
+// =================================================================================================
+
 // <<< Place it
 //libv::vec3f formation_vic(int shipIndex, int numShips) {
 ////	(void) numShips;
@@ -143,7 +197,7 @@ libv::vec3f pos_in_vic(int vicMaxSize, int indexInVic, float vicCellWidth, float
 //	const auto shipIndexInVic = indexInVic % vicMaxSize;
 	const auto inLeftWing = indexInVic % 2 == 1 ? -1 : 1;
 	const auto level = (indexInVic + 1) / 2; //ceiling
-	libv::vec3f posInVic = {(static_cast<float>(inLeftWing * level) * vicCellWidth), static_cast<float>(level) * vicLevelHeight, 0};
+	libv::vec3f posInVic = {static_cast<float>(level) * vicLevelHeight, (static_cast<float>(inLeftWing * level) * vicCellWidth), 0};
 	return posInVic;
 }
 
@@ -168,21 +222,21 @@ libv::vec3f formation(int shipIndex, int numShips) {
 
 	const auto shipIndexInVic2 = vicLevel3 % vicMaxSize;
 	const auto vicLevel2 = vicLevel3 / vicMaxSize;
-	libv::vec3f posInVic2 = zyx(pos_in_vic(vicMaxSize, shipIndexInVic2, vicCellWidth, vicLevelHeight)); //z
+	libv::vec3f posInVic2 = xzy(pos_in_vic(vicMaxSize, shipIndexInVic2, vicCellWidth, vicLevelHeight)); //z
 
 	const auto shipIndexInVic1 = vicLevel2 % vicMaxSize;
 	const auto vicLevel1 = vicLevel2 / vicMaxSize;
 	libv::vec3f posInVic1 = pos_in_vic(vicMaxSize, shipIndexInVic1, vicCellWidth * 10, vicLevelHeight * 10); //blobs
 
-
-	libv::vec3f pos1 = {posInVic1.x, posInVic1.y + static_cast<float>(vicLevel1) * vicDistance, 0};
-	libv::vec3f pos2 = {0, posInVic2.y + static_cast<float>(vicLevel2) * vicDistance, posInVic2.z};
+	libv::vec3f pos1 = {posInVic1.x + static_cast<float>(vicLevel1) * vicDistance, posInVic1.y, 0};
+	libv::vec3f pos2 = {posInVic2.y + static_cast<float>(vicLevel2) * vicDistance, 0, posInVic2.z};
 	libv::vec3f pos3 = {posInVic3.x, posInVic3.y, 0};
 	libv::vec3f pos = pos1 + pos2 + pos3;
 
-	return pos;
+	return -pos;
 }
 
+// =================================================================================================
 
 void SpaceCanvas::render(libv::glr::Queue& glr) {
 	renderer.prepare_for_render(glr);
@@ -244,20 +298,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		const auto idf = static_cast<float>(+fleet.id);
 
 		glr.model.translate(fleet.position);
+		glr.model *= fleet.orientation.to_mat4();
 //		glr.model.scale(0.05f);
-
-		if (!fleet.commands.empty()) {
-			const auto direction = normalize(fleet.commands.front().target() - fleet.position);
-
-			float angle = std::atan2(direction.y, direction.x);
-			float angleZ = -std::asin(direction.z);
-
-			angle += libv::pi * 0.5f; // <<< Model is incorrectly oriented
-
-			glr.model.rotate(libv::radian(angle), libv::vec3f{0.0f, 0.0f, 1.0f});
-			//glr.model.rotate(libv::radian(angleZ), libv::vec3f{0.0f, 1.0f, 0.0f});
-			glr.model.rotate(libv::radian(angleZ), libv::vec3f{1.0f, 0.0f, 0.0f}); // <<< Model is incorrectly oriented
-		}
+		glr.model.scale(0.2f);
 
 		const auto numShipRendered = static_cast<int>(std::log(static_cast<float>(fleet.number_of_ships)) / std::log(2.f) * 2.f);
 //		const auto numShipRendered = fleet.number_of_ships;
@@ -265,15 +308,16 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			const auto fi = static_cast<float>(i);
 
 			const auto m2_guard = glr.model.push_guard();
-			const auto noiseX = libv::perlin_sample({time / 20 + fleet.distance_travelled / 5, fi * libv::pi + idf * libv::e});
-			const auto noiseY = libv::perlin_sample({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi * 2 + idf * libv::e});
-			const auto noiseZ = libv::perlin_sample({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi * 4 + idf * libv::e});
-			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.4f - 0.2f;
+			const auto noiseX = libv::perlin_sample({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
+			const auto noiseY = libv::perlin_sample({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 5});
+			const auto noiseZ = libv::perlin_sample({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 10});
+			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.2f - 0.1f;
 			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
 
 			glr.model.translate(ship_pos);
 			// glr.model.scale(Fleet::pickingType.radius_universe);
 			glr.model.scale(0.05f);
+			glr.model.rotate(libv::radian(libv::pi / 2), libv::vec3f(0, 0, 1)); // <<< Workaround the incorrect model orientation
 
 			renderer.fleet.render(glr, renderer.resource_context.uniform_stream, fleet.selectionStatus);
 		}

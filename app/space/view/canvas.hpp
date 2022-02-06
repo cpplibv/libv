@@ -17,7 +17,7 @@ namespace space {
 
 // -------------------------------------------------------------------------------------------------
 
-enum class StyleFlag : uint8_t{
+enum class StyleFlag : uint8_t {
 	WORLD = 1 << 0,
 	FILL = 1 << 1,
 	WIREFRAME = 1 << 2,
@@ -77,7 +77,7 @@ public:
 	void add_debug_triangle(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_quad(libv::vec3f a, libv::vec3f b, libv::vec3f c, libv::vec3f d, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_circle(libv::vec3f center, float radius, libv::vec3f normal, libv::vec4f color, StyleFlag mode = StyleFlag::DEFAULT);
-	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count, int segment_count, StyleFlag mode = StyleFlag::DEFAULT);
+	void add_debug_sphere(libv::vec3f center, float radius, libv::vec4f color, int ring_count = 10, int segment_count = 10, StyleFlag mode = StyleFlag::DEFAULT);
 	void add_debug_frustum(
 			libv::vec3f nbl, libv::vec3f nbr, libv::vec3f ntr, libv::vec3f ntl,
 			libv::vec3f fbl, libv::vec3f fbr, libv::vec3f ftr, libv::vec3f ftl,

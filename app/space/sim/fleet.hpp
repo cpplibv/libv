@@ -3,6 +3,7 @@
 #pragma once
 
 // libv
+#include <libv/math/quat.hpp>
 #include <libv/math/vec.hpp>
 #include <libv/utility/entity/entity_ptr.hpp>
 // std
@@ -73,7 +74,8 @@ enum class FleetCommandType {
 
 class Fleet : public Entity<Fleet, FleetID, invalidFleetID> {
 public:
-	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
+//	static constexpr inline ScreenPickableType pickingType{0.75f, 80.f};
+	static constexpr inline ScreenPickableType pickingType{0.5f, 40.f};
 
 public:
 	enum class Selection : int32_t {
@@ -132,7 +134,7 @@ private:
 public:
 	libv::vec3f position;
 	std::string name;
-//	libv::quat orientation;
+	libv::quatf orientation;
 
 	std::vector<Command> commands;
 	Selection selectionStatus = Selection::notSelected;

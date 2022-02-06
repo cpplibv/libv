@@ -74,20 +74,27 @@ void Fleet::update(libv::time_duration delta_time) {
 
 	const auto targetPosition = command.target();
 	const auto[len, dir] = (targetPosition - position).length_and_dir();
+
+	const auto targetOrientation = libv::quatf::look_at(dir, libv::vec3f(0, 0, 1.f));
+
+	const auto angleMaxProgress = libv::deg_to_rad(360.f) * dt;
+	orientation = libv::rotate_towards(orientation, targetOrientation, angleMaxProgress);
+
 	distance_travelled += std::min(movementProgress, len);
 
 	switch (command.type) {
-
-	break; case FleetCommandType::movement:
+	case FleetCommandType::movement:
 		if (len < movementProgress) {
 			position = targetPosition;
 			// TODO P3: Do not waste energy, roll the excess 'movement time' into the next command
 			commands.erase(commands.begin());
 		} else {
-			position += dir * dt; //*speed, no?
+			position += dir * dt;
+//			position += orientation.forward() * movementProgress;
 		}
+		break;
 
-	break; case FleetCommandType::attack:
+	case FleetCommandType::attack:
 		if (len < movementProgress) {
 			position = targetPosition;
 
@@ -101,8 +108,9 @@ void Fleet::update(libv::time_duration delta_time) {
 			commands.erase(commands.begin());
 		} else {
 			position += dir * dt;
+//			position += orientation.forward() * movementProgress;
 		}
-
+		break;
 	}
 
 //		{
@@ -160,6 +168,41 @@ void Fleet::queueAttack(libv::entity_ptr<Fleet> target) {
 //		auto i = for_each_hostile_fleet_in_contact();
 //		if (i_intends_to_attack_this() || this_intends_to_attack_i())
 //			fleets_engage(this, i);
+//	}
+
+// -------------------------------------------------------------------------------------------------
+
+//	struct posAndOrient {
+//		libv::vec3f pos;
+//		libv::quatf orientation;
+//	};
+//
+//	//outer curve
+//	posAndOrient trajectoryCalculation(libv::quatf source_orient, libv::vec3f source_pos, libv::vec3f target_pos, float time, float speed, float angle_speed) {
+////		source_orient.axi
+//		const auto source_dir = source_orient * libv::vec3f{1, 0, 0};
+//		const auto[len, target_dir] = (target_pos - source_pos).length_and_dir();
+//		const auto angle = std::acos(dot(normalize(source_dir), normalize(target_dir))); //might be normalized
+//		const auto iteration = angle / angle_speed;
+//		const auto K = speed * libv::tau / angle_speed;
+//		const auto radius = speed/angle_speed; //=    K / (libv::tau)
+//		const auto circle_dist = K * (angle/libv::tau);
+//		const auto angle_to_circle_point = libv::pi/2 - angle/2;
+////		const auto center = source_pos + radius * libv::vec3f{source_dir.y, source_dir.x, source_dir.z};
+//		const auto center = source_pos + radius * libv::vec3f{source_dir.y, source_dir.x, source_dir.z};
+//		const auto up = orientation.up();
+//		const auto x2 = x cos θ − y sin θ
+//		x sin θ + y cos θ
+//		const auto[len_from_circle_point, target_dir_from_circle_point] = (target_pos - circle_point_pos).length_and_dir();
+//		const auto movementProgress = speed * time;
+//		if(movementProgress > circle_dist){
+//			const auto dist = movementProgress - circle_dist;
+//			const auto final_pos = circle_point_pos + target_dir_from_circle_point * dist;
+//			const auto target_orientation = libv::quatf::angle_axis(libv::radian(std::atan2(target_dir_from_circle_point.y, target_dir_from_circle_point.x)), libv::vec3f(0, 0, 1.f));
+//			return posAndOrient{final_pos, target_orientation};
+//		}else{
+//			const auto final_angle = movementProgress/K * libv::tau;
+//		}
 //	}
 
 // -------------------------------------------------------------------------------------------------
