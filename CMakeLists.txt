@@ -828,11 +828,11 @@ wish_create_library(
 	LINK   Threads::Threads ext_function2 ext_boost
 )
 
-wish_create_library(
-	TARGET libv_update STATIC
-	SOURCE src/libv/update/*.cpp
-	LINK   libv_net libv_process libv_diff libv_serial libv_mt
-)
+#wish_create_library(
+#	TARGET libv_update STATIC
+#	SOURCE src/libv/update/*.cpp
+#	LINK   libv_net libv_process libv_diff libv_serial libv_mt
+#)
 
 wish_create_library(
 	TARGET libv_process STATIC
@@ -862,65 +862,65 @@ wish_create_executable(
 #	LINK   libv_arg
 )
 
-# --- Update ---
-
-wish_create_library(
-	# TODO P5: Make this an object library
-	TARGET update_common STATIC
-	SOURCE app/update/common/*.cpp
-	LINK   libv_update
-
-	LINK   libv_net libv_process
-	LINK   libv_diff # <<< P4: Just for testing
-	LINK   libv_serial # <<< P4: Just for testing
-)
-
-wish_create_executable(
-	TARGET update_server
-	SOURCE app/update/update_server_main.cpp
-	LINK   libv_arg update_common
+## --- Update ---
+#
+#wish_create_library(
+#	# TODO P5: Make this an object library
+#	TARGET update_common STATIC
 #	SOURCE app/update/common/*.cpp
-#	SOURCE app/update/server_main.cpp
-#	LINK   libv_arg libv_net
-)
-
-wish_create_executable(
-	TARGET resource_server
-	SOURCE app/update/resource_server_main.cpp
-	LINK   libv_arg update_common
-#	SOURCE app/update/common/*.cpp
-#	SOURCE app/update/server_main.cpp
-#	LINK   libv_arg libv_net
-)
-
-wish_create_executable(
-	TARGET update_client
-	SOURCE app/update/client_main.cpp
-	LINK   libv_arg update_common
-#	SOURCE app/update/common/*.cpp
+#	LINK   libv_update
+#
+#	LINK   libv_net libv_process
+#	LINK   libv_diff # <<< P4: Just for testing
+#	LINK   libv_serial # <<< P4: Just for testing
+#)
+#
+#wish_create_executable(
+#	TARGET update_server
+#	SOURCE app/update/update_server_main.cpp
+#	LINK   libv_arg update_common
+##	SOURCE app/update/common/*.cpp
+##	SOURCE app/update/server_main.cpp
+##	LINK   libv_arg libv_net
+#)
+#
+#wish_create_executable(
+#	TARGET resource_server
+#	SOURCE app/update/resource_server_main.cpp
+#	LINK   libv_arg update_common
+##	SOURCE app/update/common/*.cpp
+##	SOURCE app/update/server_main.cpp
+##	LINK   libv_arg libv_net
+#)
+#
+#wish_create_executable(
+#	TARGET update_client
 #	SOURCE app/update/client_main.cpp
-#	LINK   libv_arg libv_net
-)
-
-wish_create_executable(
-	TARGET create_update
-	SOURCE app/update/create_update.cpp
-	LINK   libv_log libv_arg libv_diff
-	LINK   libv_serial
-	LINK   libv_process # <<< P4: Just for testing
-	LINK   update_common # <<< P4: Just for testing
-)
-
-wish_create_executable(
-	TARGET apply_update
-	SOURCE app/update/apply_update.cpp
-	LINK   libv_log libv_arg libv_diff
-	LINK   libv_serial
-	LINK   libv_process # <<< P4: Just for testing
-	LINK   update_common # <<< P4: Just for testing
-)
-
-add_custom_target(update DEPENDS update_client update_server apply_update create_update resource_server)
+#	LINK   libv_arg update_common
+##	SOURCE app/update/common/*.cpp
+##	SOURCE app/update/client_main.cpp
+##	LINK   libv_arg libv_net
+#)
+#
+#wish_create_executable(
+#	TARGET create_update
+#	SOURCE app/update/create_update.cpp
+#	LINK   libv_log libv_arg libv_diff
+#	LINK   libv_serial
+#	LINK   libv_process # <<< P4: Just for testing
+#	LINK   update_common # <<< P4: Just for testing
+#)
+#
+#wish_create_executable(
+#	TARGET apply_update
+#	SOURCE app/update/apply_update.cpp
+#	LINK   libv_log libv_arg libv_diff
+#	LINK   libv_serial
+#	LINK   libv_process # <<< P4: Just for testing
+#	LINK   update_common # <<< P4: Just for testing
+#)
+#
+#add_custom_target(update DEPENDS update_client update_server apply_update create_update resource_server)
 
 # ---
 
@@ -1171,11 +1171,11 @@ wish_create_executable(
 	LINK   libv_log libv_state
 )
 
-wish_create_executable(
-	TARGET sandbox_libv_update
-	SOURCE sandbox/libv_update_main.cpp
-	LINK   libv_update libv_net libv_log
-)
+#wish_create_executable(
+#	TARGET sandbox_libv_update
+#	SOURCE sandbox/libv_update_main.cpp
+#	LINK   libv_update libv_net libv_log
+#)
 
 wish_create_executable(
 	TARGET sandbox_libv_ui
