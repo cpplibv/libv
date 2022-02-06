@@ -23,6 +23,7 @@ public:
 private:
 	uint32_t ref_count = 0;
 //	std::atomic_uint32_t ref_count = 0;
+	bool dead_ = false;
 
 public:
 	ID id = InvalidID;
@@ -30,6 +31,15 @@ public:
 protected:
 	constexpr inline Entity() noexcept = default;
 	explicit constexpr inline Entity(ID id) noexcept : id(id) {}
+
+public:
+	constexpr inline void kill() noexcept {
+		dead_ = true;
+	}
+
+	[[nodiscard]] constexpr inline bool dead() const noexcept {
+		return dead_;
+	}
 
 //	isDead() // isDead could and/or should be stored as a single bit inside ID
 //		=> invalidID:= 0, firstID:=1, isDead:= value < 0, id:=abs(value)

@@ -57,9 +57,9 @@ Fleet::Fleet(FleetID id, libv::vec3f position, libv::entity_ptr<Faction> faction
 }
 
 void Fleet::kill() {
+	Base::kill();
 	faction.reset();
 	commands.clear();
-	//dead_ = true;
 }
 
 void Fleet::update(libv::time_duration delta_time) {

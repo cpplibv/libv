@@ -69,7 +69,7 @@ app.space: Fix entity leak on snapshot universe loading
 libv.ui: Fix incorrect ref_count management in components
 libv.net: Fix incorrect ref_count management in HandlerGuards
 app.space: Fix simple disconnect as a non-connected client will do long timeout
-
+app.space: Remove dead component during galaxy update
 
 
 
@@ -86,9 +86,6 @@ app.space: Fix simple disconnect as a non-connected client will do long timeout
 https://www.youtube.com/watch?v=pfIC-kle4b0
 
 
-
-app.space: void Galaxy::update(sim_duration delta_time) {
-	// TODO P1: If dead, delete, so use erase_if_unstable iteration
 
 app.space: Selection state storage
 		selectedFleetIDList have to die, or became a better index
@@ -171,15 +168,15 @@ app.space: Formation
 
 app.space: Controls: Clicking on shuffle button deselects
 		| feature_binary_raii
+app.space: Controls: Ctrl box selection support
+			| Maybe enough if we switch to binary feature for now
+				Good start, but need some working on the conflicts
 app.space: Controls: Clicking and rotating the camera it deselects
 		| Should analog features have priority over action/binary?
 				Or does (0,0) 'magic' happens and that causes the issue?
+app.space: Controls: Canvas controls should be more eager even it canvas is not focused it noone else grabs it input it should
 
 Main areas of focus:
-	40 / 6: Control: Ctrl box selection support
-			| Maybe enough if we switch to binary feature for now
-				Good start, but need some working on the conflicts
-
 	60 / 4: Library: State machine generation
 	12 / 4: Library: Shader / Uniform block generation
 	libv.gen: New lib/app to gen source code
@@ -195,8 +192,7 @@ Main areas of focus:
 								\ still requires everything
 					Maybe output a .cmake file that is included that only contains the output files
 
-
-	10 / 1: Visual: Fleet selecting 4 corner animation / highlight effect
+	app.space: Visual: Fleet selecting 4 corner animation / highlight effect
 
 	app.space: Galaxy generation (scripted)
 	app.space: Main menu

@@ -19,6 +19,7 @@ Planet::Planet(PlanetID id, libv::vec3f position) :
 	position(position) {}
 
 void Planet::kill() {
+	Base::kill();
 	faction.reset();
 }
 

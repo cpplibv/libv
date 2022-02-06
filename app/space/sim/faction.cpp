@@ -43,7 +43,7 @@ Faction::Faction(FactionID id, std::string name, libv::vec4f colorPrimary, libv:
 		Base(id), name(std::move(name)), colorPrimary(colorPrimary), colorSecondary(colorSecondary) {}
 
 void Faction::kill() {
-	// noop
+	Base::kill();
 }
 
 void Faction::update(sim_duration delta_time) {

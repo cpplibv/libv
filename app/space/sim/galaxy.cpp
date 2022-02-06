@@ -3,6 +3,7 @@
 // hpp
 #include <space/sim/galaxy.hpp>
 // libv
+#include <libv/algo/erase_if_unstable.hpp>
 #include <libv/algo/linear_find.hpp>
 #include <libv/utility/projection.hpp>
 // pro
@@ -96,16 +97,20 @@ void Galaxy::kill() {
 }
 
 void Galaxy::update(sim_duration delta_time) {
-	// TODO P1: If dead, delete, so use erase_if_unstable iteration
-
-	for (auto& faction : factions)
+	libv::erase_if_unstable(factions, [&](libv::entity_ptr<Faction>& faction) {
 		faction->update(delta_time);
+		return faction->dead();
+	});
 
-	for (auto& planet : planets)
+	libv::erase_if_unstable(planets, [&](libv::entity_ptr<Planet>& planet) {
 		planet->update(delta_time);
+		return planet->dead();
+	});
 
-	for (auto& fleet : fleets)
+	libv::erase_if_unstable(fleets, [&](libv::entity_ptr<Fleet>& fleet) {
 		fleet->update(delta_time);
+		return fleet->dead();
+	});
 
 //		for (auto& i : colonies)
 //			i.update(dt);
