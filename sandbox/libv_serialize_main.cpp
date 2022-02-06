@@ -5,6 +5,7 @@
 #include <libv/serial/archive/xml.hpp>
 #include <libv/serial/serial.hpp>
 #include <libv/serial/types/std_memory.hpp>
+#include <libv/serial/types/std_string.hpp>
 #include <libv/serial/types/std_vector.hpp>
 // std
 #include <fstream>
@@ -25,7 +26,7 @@ struct Inner {
 	Inner(std::string x) : x(x) { }
 
 	template <typename Archive>
-	inline void serialize(Archive& ar, const unsigned int) {
+	inline void serialize(Archive& ar) {
 		ar & LIBV_NVP(x);
 	}
 
@@ -40,7 +41,7 @@ struct Test {
 	int32_t size = 500100;
 
 	template <typename Archive>
-	inline void serialize(Archive& ar, const unsigned int) {
+	inline void serialize(Archive& ar) {
 		ar & LIBV_NVP(name);
 		ar & LIBV_NVP(shader);
 		ar & LIBV_NVP(data);
@@ -67,12 +68,12 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("test_file_xml");
 		libv::archive::XMLOutput oar(ofs);
-		oar << LIBV_NVP_NAMED("object", object_out);
+		oar << LIBV_NVP_FORCED("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_xml");
 		libv::archive::XMLInput iar(ifs);
-		iar >> LIBV_NVP_NAMED("object", object_in);
+		iar >> LIBV_NVP_FORCED("object", object_in);
 	}
 
 	std::cout << (object_in == object_out) << std::endl;
@@ -80,12 +81,12 @@ int main(int, char **) {
 	{
 		std::ofstream ofs("test_file_bin");
 		libv::archive::BinaryOutput oar(ofs);
-		oar << LIBV_NVP_NAMED("object", object_out);
+		oar << LIBV_NVP_FORCED("object", object_out);
 	}
 	{
 		std::ifstream ifs("test_file_bin");
 		libv::archive::BinaryInput iar(ifs);
-		iar >> LIBV_NVP_NAMED("object", object_in);
+		iar >> LIBV_NVP_FORCED("object", object_in);
 	}
 
 

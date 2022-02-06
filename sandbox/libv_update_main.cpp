@@ -148,22 +148,25 @@ private:
 	}
 
 private:
-	virtual void on_connect(error_code ec) override {
-		if (!ec)
-			room->join(connection_from_this());
-
-		DEBUG_COUT("[Session " << ID << "] on_connect " << libv::net::to_string(ec));
+	virtual void on_connect() override {
+		room->join(connection_from_this());
+		DEBUG_COUT("[Session " << ID << "] on_connect");
 	}
-	virtual void on_receive(error_code ec, message_view m) override {
-		if (!ec)
-			room->deliver(std::string(m.as_str()));
-
-		DEBUG_COUT("[Session " << ID << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+	virtual void on_connect_error(error_code ec) override {
+		DEBUG_COUT("[Session " << ID << "] on_connect_error: " << libv::net::to_string(ec));
 	}
-	virtual void on_send(error_code ec, message_view m) override {
-		(void) ec;
-		(void) m;
-		DEBUG_COUT("[Session " << ID << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? std::string("") : m) << "'");
+	virtual void on_receive(message_view m) override {
+		room->deliver(m.copy_str());
+		DEBUG_COUT("[Session " << ID << "] on_receive: '" << m.as_str() << "'");
+	}
+	virtual void on_receive_error(error_code ec, message_view m) override {
+		DEBUG_COUT("[Session " << ID << "] on_receive_error " << libv::net::to_string(ec) << ": '" << m.as_str() << "'");
+	}
+	virtual void on_send(message_view m) override {
+		DEBUG_COUT("[Session " << ID << "] on_send: '" << m.as_str() << "'");
+	}
+	virtual void on_send_error(error_code ec, message_view m) override {
+		DEBUG_COUT("[Session " << ID << "] on_send_error " << libv::net::to_string(ec) << ": '" << m.as_str() << "'");
 	}
 	virtual void on_disconnect(error_code ec) override {
 		(void) ec;
@@ -223,27 +226,27 @@ public:
 	}
 
 private:
-	virtual void on_connect(error_code ec) override {
-		if (!ec)
-			write("Hello");
-		DEBUG_COUT("[" << name << "] on_connect " << libv::net::to_string(ec));
+	virtual void on_connect() override {
+		write("Hello");
+		DEBUG_COUT("[" << name << "] on_connect");
 	}
-
-	virtual void on_receive(error_code ec, message_view m) override {
-		if (!ec)
-			std::cout << m.as_str() << std::endl;
-
-		DEBUG_COUT("[" << name << "] on_receive " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
+	virtual void on_connect_error(error_code ec) override {
+		DEBUG_COUT("[" << name << "] on_connect_error: " << libv::net::to_string(ec));
 	}
-
-	virtual void on_send(error_code ec, message_view m) override {
-		(void) ec;
-		(void) m;
-		DEBUG_COUT("[" << name << "] on_send " << libv::net::to_string(ec) << " '" << (ec ? "" : m.as_str()) << "'");
+	virtual void on_receive(message_view m) override {
+		std::cout << m.as_str() << std::endl;
+		DEBUG_COUT("[" << name << "] on_receive: '" << m.as_str() << "'");
 	}
-
+	virtual void on_receive_error(error_code ec, message_view m) override {
+		DEBUG_COUT("[" << name << "] on_receive_error " << libv::net::to_string(ec) << ": '" << m.as_str() << "'");
+	}
+	virtual void on_send(message_view m) override {
+		DEBUG_COUT("[" << name << "] on_send: '" << m.as_str() << "'");
+	}
+	virtual void on_send_error(error_code ec, message_view m) override {
+		DEBUG_COUT("[" << name << "] on_send_error " << libv::net::to_string(ec) << ": '" << m.as_str() << "'");
+	}
 	virtual void on_disconnect(error_code ec) override {
-		(void) ec;
 		DEBUG_COUT("[" << name << "] on_disconnect " << libv::net::to_string(ec));
 	}
 };

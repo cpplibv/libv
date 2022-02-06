@@ -132,7 +132,7 @@ int main() {
 
 		{
 			libv::archive::BinaryOutput oar(ss);
-			oar << LIBV_NVP_NAMED("object", object_out);
+			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -141,7 +141,7 @@ int main() {
 
 		{
 			libv::archive::BinaryInput iar(ss);
-			iar >> LIBV_NVP_NAMED("object", object_in);
+			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
 
@@ -152,7 +152,7 @@ int main() {
 
 		{
 			cereal::PortableBinaryOutputArchive oar(ss);
-			oar << LIBV_NVP_NAMED("object", object_out);
+			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -161,7 +161,7 @@ int main() {
 
 		{
 			cereal::PortableBinaryInputArchive iar(ss);
-			iar >> LIBV_NVP_NAMED("object", object_in);
+			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
 
@@ -172,7 +172,7 @@ int main() {
 
 		{
 			cereal::BinaryOutputArchive oar(ss);
-			oar << LIBV_NVP_NAMED("object", object_out);
+			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -181,7 +181,7 @@ int main() {
 
 		{
 			cereal::BinaryInputArchive iar(ss);
-			iar >> LIBV_NVP_NAMED("object", object_in);
+			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
 
@@ -192,7 +192,7 @@ int main() {
 
 		{
 			cereal::JSONOutputArchive oar(ss);
-			oar << LIBV_NVP_NAMED("object", object_out);
+			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -201,7 +201,7 @@ int main() {
 
 		{
 			cereal::JSONInputArchive iar(ss);
-			iar >> LIBV_NVP_NAMED("object", object_in);
+			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
 
@@ -212,7 +212,7 @@ int main() {
 
 		{
 			cereal::XMLOutputArchive oar(ss);
-			oar << LIBV_NVP_NAMED("object", object_out);
+			oar << LIBV_NVP_FORCED("object", object_out);
 		}
 
 		std::cout << std::endl;
@@ -221,7 +221,7 @@ int main() {
 
 		{
 			cereal::XMLInputArchive iar(ss);
-			iar >> LIBV_NVP_NAMED("object", object_in);
+			iar >> LIBV_NVP_FORCED("object", object_in);
 		}
 	}
 
