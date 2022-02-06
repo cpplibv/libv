@@ -465,7 +465,8 @@ public:
 
 	// operator<<(ostream, vec) --------------------------------------------------------------------
 public:
-	friend inline std::ostream& operator<<(std::ostream& os, const quat_t& q) requires requires(std::ostream& o, const T& m) { o << m; } {
+	friend inline std::ostream& operator<<(std::ostream& os, const quat_t& q)
+			requires requires (std::ostream& o, const T& m) { o << m; } {
 		return os << q.w << ' ' << q.x << ' ' << q.y << ' ' << q.z;
 	}
 };

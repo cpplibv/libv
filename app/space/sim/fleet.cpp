@@ -73,7 +73,14 @@ void Fleet::update(libv::time_duration delta_time) {
 	auto& command = commands.front();
 
 	const auto targetPosition = command.target();
-	const auto[len, dir] = (targetPosition - position).length_and_dir();
+
+	auto len = 0.f;
+	auto dir = orientation.forward();
+	if (targetPosition != position) { // NaN protection
+		const auto lenDir = (targetPosition - position).length_and_dir();
+		len = lenDir.length;
+		dir = lenDir.dir;
+	}
 
 	const auto targetOrientation = libv::quatf::look_at(dir, libv::vec3f(0, 0, 1.f));
 

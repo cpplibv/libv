@@ -4,6 +4,7 @@
 #include <space/view/canvas.hpp>
 // ext
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 // libv
 #include <libv/glr/framebuffer.hpp>
 #include <libv/glr/queue.hpp>
@@ -326,9 +327,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 		if (a > 0.02f) { // Skip barely and not visible texts
 			std::string fleetLabel;
 			if (!fleet.commands.empty()) {
-				fleetLabel = fmt::format("Fleet {}\nFaction {}\nI:{} D:{:.2f}\n{}\n{}", +fleet.id, +fleet.faction->id, +fleet.commands.front().type, (fleet.commands.front().target() - fleet.position).length(), static_cast<float>(fleet.number_of_ships), fleet.distance_travelled);
+				fleetLabel = fmt::format("Fleet {}\nFaction {}\nOri:{}\nI:{}\n{}\n{}", +fleet.id, +fleet.faction->id, fleet.orientation, +fleet.commands.front().type, fleet.number_of_ships, fleet.distance_travelled);
 			} else {
-				fleetLabel = fmt::format("Fleet {}\nFaction {}\n{}\n{}", +fleet.id, +fleet.faction->id, static_cast<float>(fleet.number_of_ships), fleet.distance_travelled);
+				fleetLabel = fmt::format("Fleet {}\nFaction {}\nOri:{}\n{}\n{}", +fleet.id, +fleet.faction->id, fleet.orientation, fleet.number_of_ships, fleet.distance_travelled);
 			}
 			renderer.text.add_text(
 					fleet.position,

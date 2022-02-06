@@ -249,6 +249,16 @@ TEST_CASE("quat rotate_towards", "[libv.math.quat]") {
 	CHECK(make_approx(q4) == libv::rotate_towards(q3, q4, libv::angle_between(q3, q4) + 0.0001f));
 	CHECK(make_approx(q4) == libv::rotate_towards(q3, q4, libv::pi));
 	CHECK(make_approx(q4) == libv::rotate_towards(q3, q4, libv::tau));
+
+	CHECK(q1 == libv::rotate_towards(q1, q1, libv::tau));
+	CHECK(q2 == libv::rotate_towards(q2, q2, libv::tau));
+	CHECK(q3 == libv::rotate_towards(q3, q3, libv::tau));
+	CHECK(q4 == libv::rotate_towards(q4, q4, libv::tau));
+
+	CHECK(q1 == libv::rotate_towards(q1, q1, 0.0002f));
+	CHECK(q2 == libv::rotate_towards(q2, q2, 0.0002f));
+	CHECK(q3 == libv::rotate_towards(q3, q3, 0.0002f));
+	CHECK(q4 == libv::rotate_towards(q4, q4, 0.0002f));
 }
 
 TEST_CASE("quat from_vectors", "[libv.math.quat]") {
