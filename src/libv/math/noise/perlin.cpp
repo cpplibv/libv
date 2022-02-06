@@ -77,7 +77,7 @@ inline double PerlinNoise::grad(int hash, double x, double y, double z) noexcept
 
 } // namespace -------------------------------------------------------------------------------------
 
-std::vector<double> noise_perlin_2D(uint64_t seed, uint32_t X, uint32_t Y) {
+std::vector<double> noise_texture_perlin2D(uint64_t seed, uint32_t X, uint32_t Y) {
 	PerlinNoise gen(seed);
 
 	std::vector<double> value;
@@ -93,9 +93,15 @@ std::vector<double> noise_perlin_2D(uint64_t seed, uint32_t X, uint32_t Y) {
 	return value;
 }
 
-float perlin_sample(libv::vec2f coord){
+float noise_perlin(libv::vec2f coord) {
 	return glm::perlin(glm::vec2{coord.x, coord.y});
 }
+
+float noise_simplex(libv::vec2f coord) {
+	return glm::simplex(glm::vec2{coord.x, coord.y});
+}
+
+//float noise_fractal_simplex(libv::vec2f coord,)
 
 // -------------------------------------------------------------------------------------------------
 

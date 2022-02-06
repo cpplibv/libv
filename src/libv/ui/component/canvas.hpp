@@ -40,7 +40,7 @@ public:
 protected:
 	virtual void attach() { }
 	virtual void create(libv::glr::Queue& glr) { (void) glr; }
-	virtual void update(time_duration delta_time) = 0;
+	virtual void update(time_duration delta_time) { (void) delta_time; }
 	virtual void render(libv::glr::Queue& glr) = 0;
 	virtual void destroy(libv::glr::Queue& glr) { (void) glr; }
 

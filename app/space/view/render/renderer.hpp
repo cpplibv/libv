@@ -144,6 +144,14 @@ struct RendererDebug {
 		libv::vec4f color;
 	};
 
+//	struct Plane {
+//		libv::vec3f a;
+//		libv::vec3f b;
+//		libv::vec3f c;
+//		libv::vec3f d;
+//		libv::vec4f color;
+//	};
+
 //	struct Box {
 //		libv::vec3f center;
 //		libv::vec3f size;

@@ -11,7 +11,7 @@ namespace ui {
 
 // -------------------------------------------------------------------------------------------------
 
-class EventFocus : BaseEvent {
+class EventFocus : public BaseEvent {
 private:
 	bool focus_;
 

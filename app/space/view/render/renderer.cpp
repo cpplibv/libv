@@ -296,10 +296,14 @@ void RendererDebug::build_points_mesh(libv::glr::Mesh& mesh) {
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
 
-	(void) position;
-	(void) color0;
-	(void) index;
-	(void) vi;
+	for (const auto& point : points) {
+		position(point.a);
+
+		color0(point.color);
+
+		index.point(vi);
+		vi += 1;
+	}
 }
 
 void RendererDebug::build_lines_mesh(libv::glr::Mesh& mesh) {

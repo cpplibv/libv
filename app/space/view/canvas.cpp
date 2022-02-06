@@ -309,9 +309,9 @@ void SpaceCanvas::render(libv::glr::Queue& glr) {
 			const auto fi = static_cast<float>(i);
 
 			const auto m2_guard = glr.model.push_guard();
-			const auto noiseX = libv::perlin_sample({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
-			const auto noiseY = libv::perlin_sample({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 5});
-			const auto noiseZ = libv::perlin_sample({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e + 10});
+			const auto noiseX = libv::noise_perlin({time / 20 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
+			const auto noiseY = libv::noise_perlin({time / 20 + 2 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
+			const auto noiseZ = libv::noise_perlin({time / 20 + 4 + fleet.distance_travelled / 5, fi * libv::pi / 15.f + idf * libv::e});
 			const auto noise = libv::vec3f{noiseX, noiseY, noiseZ} * 0.2f - 0.1f;
 			libv::vec3f ship_pos = formation(i, fleet.number_of_ships) + noise;
 

@@ -974,7 +974,26 @@ wish_create_executable(
 
 wish_create_executable(
 	TARGET space
-	SOURCE app/space/*.cpp
+	SOURCE app/space/game/*.cpp
+	SOURCE app/space/message/*.cpp
+	SOURCE app/space/network/*.cpp
+	SOURCE app/space/sim/*.cpp
+	SOURCE app/space/view/*.cpp
+	SOURCE app/space/space_main.cpp
+#	LINK   ext_fmt ext_clip ext_range
+	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
+	LINK   libv_vm4
+	LINK   libv_sys
+)
+
+wish_create_executable(
+	TARGET surface
+	SOURCE app/space/game/*.cpp
+	SOURCE app/space/message/*.cpp
+	SOURCE app/space/network/*.cpp
+	SOURCE app/space/sim/*.cpp
+	SOURCE app/space/view/*.cpp
+	SOURCE app/space/surface_main.cpp
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
 	LINK   libv_vm4

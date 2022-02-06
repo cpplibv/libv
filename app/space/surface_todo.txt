@@ -1,0 +1,41 @@
+next step: mesh triangle strips, shader a depth miatt (flat)
+submesh update
+
+
+1. world, camera, rendering
+noise generator math/noise
+	cellular
+		worley, voronai
+	fractal
+	perlin
+	perlin_simplex
+	value
+	warp
+		regular, polar, vortex, inverse
+	palette
+	animation
+
+noise_simplex(x, y[, z, w]): float
+noise_fractal_simplex(x, y[, z, w], octaves, amplitude, frequency, lacunarity, persistence):float
+SurfaceGen
+	seed
+	1. height map, -> temp, humidity map, fertility
+	If temperature increases it will lead to a decrease in relative humidity
+	2. vegetation
+	a humidity, temperature, height -> vegetation
+	b biome range
+	3.
+
+	input:
+		biome ranges/table (different from planet to planet)
+
+	output:
+
+SurfaceViewer
+	frame/window
+	ui
+	canvas
+		visualize surface
+		camera
+		controls
+
