@@ -35,6 +35,10 @@ public:
 	// constructors --------------------------------------------------------------------------------
 
 	constexpr inline quat_t() noexcept = default;
+	constexpr inline quat_t(const quat_t&) noexcept = default;
+	constexpr inline quat_t& operator=(const quat_t&) & noexcept = default;
+	constexpr inline quat_t(quat_t&&) noexcept = default;
+	constexpr inline quat_t& operator=(quat_t&&) & noexcept = default;
 
 	constexpr inline quat_t(T w, T x, T y, T z) noexcept : w(w), x(x), y(y), z(z) {}
 
@@ -138,6 +142,11 @@ public:
 
 	[[nodiscard]] static constexpr inline quat_t from_mat(mat4_t<T> mat) noexcept {
 		return from_mat(mat3_t<T>{mat});
+	}
+
+	template <typename Quat>
+	[[nodiscard]] static constexpr inline quat_t from_quat(const Quat& q) noexcept {
+		return quat_t{q.w, q.x, q.y, q.z};
 	}
 
 public:

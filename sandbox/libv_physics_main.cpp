@@ -180,9 +180,9 @@ int main() {
 				<< "\nposition       : " << libv::vec3f(body->getTransform().getPosition())
 				<< "\norientation    : " << libv::vec4f(body->getTransform().getOrientation())
 				<< "\nangles         : "
-				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).x) << " "
-				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).y) << " "
-				<< libv::rad_to_deg(libv::math::euler_angles(body->getTransform().getOrientation()).z)
+				<< libv::rad_to_deg(libv::quatf::from_quat(body->getTransform().getOrientation()).roll()) << " "
+				<< libv::rad_to_deg(libv::quatf::from_quat(body->getTransform().getOrientation()).pitch()) << " "
+				<< libv::rad_to_deg(libv::quatf::from_quat(body->getTransform().getOrientation()).yaw())
 				<< "\nlinearVelocity : " << libv::vec3f(body->getLinearVelocity())
 				<< "\nangularVelocity: " << libv::vec3f(body->getAngularVelocity()) << std::endl;
 	}
