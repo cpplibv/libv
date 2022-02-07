@@ -1153,6 +1153,12 @@ wish_create_executable(
 )
 
 wish_create_executable(
+	TARGET sandbox_libv_mt
+	SOURCE sandbox/libv_mt_main.cpp
+	LINK   libv_mt libv_container libv_math
+)
+
+wish_create_executable(
 	TARGET sandbox_libv_net
 	SOURCE sandbox/libv_net_main.cpp
 	LINK   libv::net libv::log

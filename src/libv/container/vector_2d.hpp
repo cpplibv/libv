@@ -69,6 +69,14 @@ public:
 		return storage[size_.x * y + x];
 	}
 
+	[[nodiscard]] constexpr inline T& at_total(std::size_t total_index) noexcept {
+		return storage[total_index];
+	}
+
+	[[nodiscard]] constexpr inline const T& at_total(std::size_t total_index) const noexcept {
+		return storage[total_index];
+	}
+
 public:
 	constexpr inline void fill(const T& value) {
 		for (std::size_t i = 0; i < size_.x * size_.y; ++i)
@@ -88,6 +96,18 @@ public:
 		return size_.y;
 	}
 
+	[[nodiscard]] constexpr inline std::size_t size_total() const noexcept {
+		return size_x() * size_y();
+	}
+
+public:
+	[[nodiscard]] constexpr inline libv::vec2z total_to_index(std::size_t total_index) const noexcept {
+		const auto y = total_index / size_.x;
+		const auto x = total_index - y * size_.x;
+		return libv::vec2z{x, y};
+	}
+
+public:
 	[[nodiscard]] constexpr inline T* data() noexcept {
 		return storage.get();
 	}
