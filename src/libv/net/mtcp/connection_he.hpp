@@ -100,10 +100,10 @@ public:
 	/// Queues an asynchronous connect task.
 	void connect_async(Address address) noexcept;
 
-			/// Queues an asynchronous disconnect task. Implicitly calls pause_receive_async
-			/// Calls disconnect_async if connection is connected (or connecting)
-			/// Disconnects asynchronous as soon as possible canceling any pending async task
+	/// Cancels every asynchronous tasks and disconnects afterward
 	void cancel_and_disconnect_async() noexcept;
+
+	/// Marks the connection as complete. Stops receiving, finishes the send queue and disconnects afterward
 	void complete_and_disconnect_async() noexcept;
 
 	/// Pause the repeating asynchronous receive task.
@@ -114,26 +114,16 @@ public:
 	void resume_receive_async() noexcept;
 
 	/// Queues an asynchronous send task. Moves the storage in
-	void send_async(message_body_bin message) noexcept;
+	void send_async(std::vector<std::byte> message) noexcept;
+
 	/// Queues an asynchronous send task. Copies the data into an internal storage
-	void send_async(message_body_bin_view message) noexcept;
-	/// Queues an asynchronous send task. Moves the storage in
-	void send_async(message_body_str message) noexcept;
-	/// Queues an asynchronous send task. Forwards the storage into a std::string
-	template <typename Str>
-		requires std::constructible_from<message_body_str, Str>
-	inline void send_async(Str&& message) noexcept {
-		send_async(message_body_str(std::move(message)));
-	}
+	void send_copy_async(std::span<const std::byte> message) noexcept;
 	/// Queues an asynchronous send task. Copies the data into an internal storage
-	void send_async(message_body_str_view message) noexcept;
+	void send_copy_async(std::string_view message) noexcept;
 
 	/// Queues an asynchronous send task with external reference to memory.
-	/// Management of the memory is the responsibility of the caller
-	void send_view_async(message_body_bin_view message) noexcept;
-	/// Queues an asynchronous send task with external reference to memory.
-	/// Management of the memory is the responsibility of the caller
-	void send_view_async(message_body_str_view message) noexcept;
+	/// NOTE: message_view_proxy is taken by a non owning reference: Management of the memory is the responsibility of the caller
+	void send_view_async(message_view_proxy& view) noexcept;
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -147,7 +137,7 @@ private:
 
 public:
 	using error_code = std::error_code;
-	using message_view = message_body_view;
+	using message = message;
 	using io_context = IOContext;
 
 private:
@@ -191,10 +181,10 @@ public:
 private:
 	virtual void on_connect() = 0;
 	virtual void on_connect_error(error_code ec);
-	virtual void on_receive(message_view m) = 0;
-	virtual void on_receive_error(error_code ec, message_view m);
-	virtual void on_send(message_view m) = 0;
-	virtual void on_send_error(error_code ec, message_view m);
+	virtual void on_receive(message&& m) = 0;
+	virtual void on_receive_error(error_code ec, message&& m);
+	virtual void on_send(message&& m) = 0;
+	virtual void on_send_error(error_code ec, message&& m);
 	/// Receives the first error that occurred which resulted in the disconnect if there was any
 	/// Always called if the connection was successful (if on_connect() was called)
 	virtual void on_disconnect(error_code ec) = 0;

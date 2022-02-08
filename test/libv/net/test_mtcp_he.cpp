@@ -112,17 +112,17 @@ private:
 	virtual void on_connect_error(error_code ec) override {
 		connectionLog.add("on_connect:" + libv::net::to_string(ec));
 	}
-	virtual void on_receive(message_view m) override {
+	virtual void on_receive(message&& m) override {
 		connectionLog.add("on_receive:" + m.copy_str());
 	}
-	virtual void on_receive_error(error_code ec, message_view m) override {
+	virtual void on_receive_error(error_code ec, message&& m) override {
 		(void) m;
 		connectionLog.add("on_receive:" + libv::net::to_string(ec));
 	}
-	virtual void on_send(message_view m) override {
+	virtual void on_send(message&& m) override {
 		connectionLog.add("on_send:" + m.copy_str());
 	}
-	virtual void on_send_error(error_code ec, message_view m) override {
+	virtual void on_send_error(error_code ec, message&& m) override {
 		(void) m;
 		connectionLog.add("on_send:" + libv::net::to_string(ec));
 	}
@@ -266,7 +266,7 @@ TEST_CASE("MTCP Connection without any connect should handle incorrect calls", "
 			client0.connection().resume_receive_async();
 		}
 		SECTION("1 operation: send_async") {
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 		}
 		client0.clear();
 
@@ -278,27 +278,27 @@ TEST_CASE("MTCP Connection without any connect should handle incorrect calls", "
 		TestConnection client0{context, events};
 
 		SECTION("2 operation: a") {
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 			client0.connection().complete_and_disconnect_async();
 		}
 		SECTION("2 operation: b") {
 			client0.connection().complete_and_disconnect_async();
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 		}
 		SECTION("2 operation: c") {
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 			client0.connection().cancel_and_disconnect_async();
 		}
 		SECTION("2 operation: d") {
 			client0.connection().cancel_and_disconnect_async();
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 		}
 		SECTION("2 operation: e") {
 			client0.connection().resume_receive_async();
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 		}
 		SECTION("2 operation: f") {
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 			client0.connection().resume_receive_async();
 		}
 		client0.clear();
@@ -414,7 +414,7 @@ TEST_CASE("MTCP simple test for Connection - Acceptor pair", "[libv.net.mtcp]") 
 			auto client0 = TestConnection{context_client, events_client};
 
 			client0.connection().connect_async(libv::net::Address("127.0.0.1", test_port));
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 			client0.connection().complete_and_disconnect_async();
 			client0.clear();
 
@@ -431,7 +431,7 @@ TEST_CASE("MTCP simple test for Connection - Acceptor pair", "[libv.net.mtcp]") 
 			auto client0 = TestConnection{context_client, events_client};
 
 			client0.connection().connect_async(libv::net::Address("127.0.0.1", test_port));
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 
 			CHECK(events_client.consume_first_wait_for() == "on_connect");
 			CHECK(events_client.consume_first_wait_for() == "on_send:" + msg_64);
@@ -440,7 +440,7 @@ TEST_CASE("MTCP simple test for Connection - Acceptor pair", "[libv.net.mtcp]") 
 			CHECK(events_peers.consume_first_wait_for() == "on_receive:" + msg_64);
 
 			REQUIRE(server->peers.size() == 1);
-			server->peers[0].connection().send_async(msg_32);
+			server->peers[0].connection().send_copy_async(msg_32);
 
 			client0.connection().complete_and_disconnect_async();
 			client0.clear();
@@ -456,7 +456,7 @@ TEST_CASE("MTCP simple test for Connection - Acceptor pair", "[libv.net.mtcp]") 
 			auto client0 = TestConnection{context_client, events_client};
 
 			client0.connection().connect_async(libv::net::Address("127.0.0.1", test_port));
-			client0.connection().send_async(msg_64);
+			client0.connection().send_copy_async(msg_64);
 
 			CHECK(events_client.consume_first_wait_for() == "on_connect");
 			CHECK(events_client.consume_first_wait_for() == "on_send:" + msg_64);
@@ -471,7 +471,7 @@ TEST_CASE("MTCP simple test for Connection - Acceptor pair", "[libv.net.mtcp]") 
 			CHECK(events_client.consume_first_wait_for() == "on_disconnect:" + err_str(error::connection_aborted));
 
 			REQUIRE(server->peers.size() == 1);
-			server->peers[0].connection().send_async(msg_32);
+			server->peers[0].connection().send_copy_async(msg_32);
 
 			// Send doesn't happen, as the connection already disconnected
 			CHECK(events_peers.consume_first_wait_for() == "on_disconnect");

@@ -64,7 +64,7 @@ private:
 		log_space.error("[{}] on_connect {}", name, libv::net::to_string(ec));
 	}
 
-	virtual void on_receive(message_view m) override {
+	virtual void on_receive(message&& m) override {
 		log_space.trace("[{}] on_receive:\n{}", name, debug_binary_as_json(m.as_bin()));
 
 		try {
@@ -106,15 +106,15 @@ private:
 		}
 	}
 
-	virtual void on_receive_error(error_code ec, message_view) override {
+	virtual void on_receive_error(error_code ec, message&&) override {
 		log_space.error("[{}] on_receive {}", name, libv::net::to_string(ec));
 	}
 
-	virtual void on_send(message_view m) override {
+	virtual void on_send(message&& m) override {
 		log_space.trace("[{}] on_send:\n{}", name, debug_binary_as_json(m.as_bin()));
 	}
 
-	virtual void on_send_error(error_code ec, message_view m) override {
+	virtual void on_send_error(error_code ec, message&& m) override {
 		log_space.error("[{}] on_send {} message would have been: {}", name, libv::net::to_string(ec), debug_binary_as_json(m.as_bin()));
 	}
 

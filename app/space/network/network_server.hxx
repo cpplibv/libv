@@ -50,7 +50,7 @@ public:
 
 	template <typename Message>
 			requires requires { typename Message::lobby_command; }
-	void process(NetworkPeer& peer, libv::net::mtcp::message_body_view m, Message&& message);
+	void process(NetworkPeer& peer, libv::net::mtcp::message&& raw_message, Message&& message);
 
 	void broadcast(std::vector<std::byte>&& msg);
 	void disconnect_all();
@@ -78,10 +78,10 @@ public:
 private:
 	virtual void on_connect() override;
 	virtual void on_connect_error(error_code ec) override;
-	virtual void on_receive(message_view m) override;
-	virtual void on_receive_error(error_code ec, message_view m) override;
-	virtual void on_send(message_view m) override;
-	virtual void on_send_error(error_code ec, message_view m) override;
+	virtual void on_receive(message&& m) override;
+	virtual void on_receive_error(error_code ec, message&& m) override;
+	virtual void on_send(message&& m) override;
+	virtual void on_send_error(error_code ec, message&& m) override;
 	virtual void on_disconnect(error_code ec) override;
 };
 

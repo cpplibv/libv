@@ -69,14 +69,16 @@ void NetworkLobby::leave(libv::net::mtcp::Connection<NetworkPeer> peer) {
 
 template <typename Message>
 		requires requires { typename Message::lobby_command; }
-void NetworkLobby::process(NetworkPeer& peer, NetworkPeer::message_view m, Message&& message) {
+void NetworkLobby::process(NetworkPeer& peer, libv::net::mtcp::message&& raw_message, Message&& message) {
 	std::unique_lock lock(mutex);
 
 	(void) peer;
 
 	// <<< Remap userID (for chat messages) before broadcasting it
-	// <<< Verify time stamp within <config:3> sec
-	_broadcast(m.copy_bin());
+	// <<< Verify time stamp within <config:3> sec, rewrite wth now() if mismatches
+	// Excess .copy_bin(), view would be enough, but remap will happen, so dont need to worry that much about it
+	// or it should be used with message_view_proxy to eliminate the copy for each peer
+	_broadcast(raw_message.copy_bin());
 	lobby.process(std::move(message));
 }
 
@@ -123,7 +125,7 @@ void NetworkPeer::on_connect_error(error_code ec) {
 	log_space.error("[Peer {}] on_connect {}", ID, libv::net::to_string(ec));
 }
 
-void NetworkPeer::on_receive(message_view m) {
+void NetworkPeer::on_receive(message&& m) {
 	log_space.trace("[Peer {}] on_receive: {}", ID, debug_binary_as_json(m.as_bin()));
 
 	try {
@@ -171,15 +173,15 @@ void NetworkPeer::on_receive(message_view m) {
 	}
 }
 
-void NetworkPeer::on_receive_error(error_code ec, message_view) {
+void NetworkPeer::on_receive_error(error_code ec, message&&) {
 	log_space.error("[Peer {}] on_receive_error {}", ID, libv::net::to_string(ec));
 }
 
-void NetworkPeer::on_send(message_view m) {
+void NetworkPeer::on_send(message&& m) {
 	log_space.trace("[Peer {}] on_send: {}", ID, debug_binary_as_json(m.as_bin()));
 }
 
-void NetworkPeer::on_send_error(error_code ec, message_view m) {
+void NetworkPeer::on_send_error(error_code ec, message&& m) {
 	log_space.error("[Peer {}] on_send_error {} message would have been: {}", ID, libv::net::to_string(ec), debug_binary_as_json(m.as_bin()));
 }
 

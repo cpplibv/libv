@@ -4,10 +4,12 @@
 
 // libv
 #include <libv/utility/byte_swap.hpp>
+#include <libv/utility/observer_ptr.hpp>
 #include <libv/utility/storage_size.hpp>
 #include <libv/utility/to_underlying.hpp>
 // std
 #include <cstdint>
+#include <cstring>
 #include <limits>
 #include <span>
 #include <string>
@@ -20,12 +22,12 @@ namespace mtcp {
 
 // -------------------------------------------------------------------------------------------------
 
-using message_body_bin = std::vector<std::byte>;
-using message_body_bin_view = std::span<const std::byte>;
-using message_body_str = std::string;
-using message_body_str_view = std::string_view;
-
-using message_body = message_body_str_view;
+//using message_body_bin = std::vector<std::byte>;
+//using message_body_bin_view = std::span<const std::byte>;
+//using message_body_str = std::string;
+//using message_body_str_view = std::string_view;
+//
+//using message_body = message_body_str_view;
 //using message_body_view = message_body_bin_view;
 
 // -------------------------------------------------------------------------------------------------
@@ -82,7 +84,7 @@ public:
 		network_type = libv::host_to_network(libv::to_underlying(value));
 	}
 	[[nodiscard]] constexpr inline mtcp_message_type type() const noexcept {
-		return mtcp_message_type{static_cast<uint8_t>(libv::network_to_host(network_type))};
+		return mtcp_message_type{libv::network_to_host(static_cast<uint8_t>(network_type))};
 	}
 //	constexpr inline void reserved(uint8_t value) noexcept {
 //		_reserved = libv::host_to_network(value);
@@ -105,45 +107,82 @@ public:
 };
 
 static_assert(MTCP_MESSAGE_MAX_SIZE < std::numeric_limits<decltype(std::declval<message_header>().size())>::max());
-static_assert(sizeof(message_header) == 8); // Just a check, not a must
+static_assert(sizeof(message_header) == 8); // Not requirement: Just a check to keep explicit track of the header size
 
 // -------------------------------------------------------------------------------------------------
 
-struct message_body_view {
+class message_view_proxy {
+public:
+	[[nodiscard]] virtual std::span<const std::byte> bytes() const noexcept = 0;
+	virtual void release() const noexcept = 0;
+	virtual ~message_view_proxy() = default;
+};
+
+// -------------------------------------------------------------------------------------------------
+
+class message {
 private:
-	message_body_bin_view data_view;
+	std::vector<std::byte> payload;
+	std::span<const std::byte> view;
+	libv::observer_ptr<message_view_proxy> view_proxy = nullptr;
 
 public:
-	explicit constexpr inline message_body_view(message_body_bin_view bin_view) noexcept :
-		data_view(bin_view) {}
+	explicit inline message(std::vector<std::byte>&& payload) noexcept :
+			payload(std::move(payload)),
+			view(this->payload) {}
 
-	explicit inline message_body_view(message_body_str_view str_view) noexcept :
-		data_view(std::as_bytes(std::span(str_view))) {}
+	explicit inline message(libv::observer_ptr<message_view_proxy> view_proxy) noexcept :
+			view(view_proxy->bytes()),
+			view_proxy(view_proxy) {}
+
+	inline message(const message&) = delete;
+
+	inline message& operator=(const message&) & = delete;
+
+	inline message(message&& orig) noexcept :
+		payload(std::move(orig.payload)),
+		view(std::move(orig.view)),
+		view_proxy(std::move(orig.view_proxy)) {
+		orig.view_proxy = nullptr;
+	}
+
+	inline message& operator=(message&& orig) & noexcept {
+		payload = std::move(orig.payload);
+		view = std::move(orig.view);
+		view_proxy = std::move(orig.view_proxy);
+		orig.view_proxy = nullptr;
+		return *this;
+	}
+
+	inline ~message() {
+		if (view_proxy != nullptr)
+			view_proxy->release();
+	}
 
 public:
-	[[nodiscard]] constexpr inline const std::byte* data() const noexcept {
-		return data_view.data();
+	[[nodiscard]] inline const std::byte* data() const noexcept {
+		return view.data();
 	}
 
-	[[nodiscard]] constexpr inline std::size_t size() const noexcept {
-		return data_view.size();
+	[[nodiscard]] inline std::size_t size() const noexcept {
+		return view.size();
 	}
 
-	[[nodiscard]] constexpr inline message_body_bin_view as_bin() const noexcept {
-		return data_view;
+	[[nodiscard]] inline std::span<const std::byte> as_bin() const noexcept {
+		return view;
 	}
 
-	[[nodiscard]] inline message_body_str_view as_str() const noexcept {
-		return {reinterpret_cast<const char*>(data_view.data()), data_view.size()};
+	[[nodiscard]] inline std::string_view as_str() const noexcept {
+		return {reinterpret_cast<const char*>(data()), size()};
 	}
 
 public:
-	[[nodiscard]] inline message_body_bin copy_bin() const {
-		return {data_view.begin(), data_view.end()};
+	[[nodiscard]] inline std::vector<std::byte> copy_bin() const {
+		return std::vector<std::byte>{view.begin(), view.end()};
 	}
 
-	[[nodiscard]] inline message_body_str copy_str() const {
-		return message_body_str{as_str()};
+	[[nodiscard]] inline std::string copy_str() const {
+		return std::string{as_str()};
 	}
 };
 

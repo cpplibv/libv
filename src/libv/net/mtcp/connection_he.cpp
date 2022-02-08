@@ -40,35 +40,15 @@ using mtcp_stream = boost::beast::basic_stream<boost::asio::ip::tcp, boost::asio
 
 // -------------------------------------------------------------------------------------------------
 
-struct message_entry {
-	message_header header;
-	message_body_bin memory_bin; /// Move-in target to keep alive memory
-	message_body_str memory_str; /// Move-in target to keep alive memory
-	message_body_view body_view; // Generic view to the memory wherever it might be
-
-	inline message_entry() = default;
-	inline message_entry(message_header header_, message_body_bin&& body) :
-		header(header_),
-		memory_bin(std::move(body)),
-		body_view(memory_bin) {
-	}
-	inline message_entry(message_header header_, message_body_str&& body) :
-		header(header_),
-		memory_str(std::move(body)),
-		body_view(memory_str) {
-	}
-	inline message_entry(message_header header_, message_body_bin_view body) :
-		header(header_),
-		body_view(body) {
-	}
-};
-
-// -------------------------------------------------------------------------------------------------
-
 class ImplBaseConnectionAsyncHE : public std::enable_shared_from_this<ImplBaseConnectionAsyncHE> {
 	using SelfPtr = std::shared_ptr<ImplBaseConnectionAsyncHE>;
 
 private:
+	struct message_entry {
+		message_header header;
+		message payload;
+	};
+
 	enum class State {
 		Constructed,   // Does nothing
 		Connecting,    // Resolve / Connect / Start on flight
@@ -114,7 +94,7 @@ private:
 
 	bool queue_read = true;
 	message_header read_message_header; // Temporary buffer for subsequent reads
-	message_body_bin read_message_body;  // Temporary buffer for subsequent reads
+	std::vector<std::byte> read_message_body;  // Temporary buffer for subsequent reads
 
 	message_header write_next_header; // Temporary buffer for subsequent writes
 	/// Write queue
@@ -411,44 +391,53 @@ inline void ImplBaseConnectionAsyncHE::resume_receive_async() noexcept {
 }
 
 template <typename M>
-inline void ImplBaseConnectionAsyncHE::send_async(M&& message) noexcept {
-	auto lock = std::unique_lock(mutex);
-	log_net.debug("MTCP-{} Send requested for {} byte", id, message.size());
+inline void ImplBaseConnectionAsyncHE::send_async(M&& payload) noexcept {
 
-	switch (state) {
-	case State::Constructed:
-		log_net.error("MTCP-{} Requested send on a connection that was not connected", id);
-		break;
+	auto temp_message = message{std::move(payload)}; // Calling message ctor outside the mutex scope
+	const auto temp_message_size = temp_message.size();
 
-	case State::Connecting:
-		write_messages.emplace_back(
-				message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
-				std::move(message));
-		// Still connecting, writing will start from outcome_connect if successful
-		break;
+	{
+		auto lock = std::unique_lock(mutex);
+		log_net.debug("MTCP-{} Send requested for {} byte", id, temp_message_size);
 
-	case State::Connected: {
-		const auto first_message_in_queue = write_messages.empty();
-		write_messages.emplace_back(
-				message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(message.size())},
-				std::move(message));
-		if (first_message_in_queue)
-			_do_write(shared_from_this());
-		break;
+		switch (state) {
+		case State::Constructed:
+			log_net.error("MTCP-{} Requested send on a connection that was not connected", id);
+			break;
+
+		case State::Connecting:
+			write_messages.emplace_back(
+					message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(temp_message_size)},
+					std::move(temp_message));
+			// Still connecting, writing will start from outcome_connect if successful
+			break;
+
+		case State::Connected: {
+			const auto first_message_in_queue = write_messages.empty();
+			write_messages.emplace_back(
+					message_header{mtcp_message_type::message, 0, static_cast<uint32_t>(temp_message_size)},
+					std::move(temp_message));
+			if (first_message_in_queue)
+				_do_write(shared_from_this());
+			break;
+		}
+
+		case State::Completing:
+			log_net.error("MTCP-{} Requested send on a connection that is being completed", id);
+			break;
+
+		case State::Canceling:
+			log_net.error("MTCP-{} Requested send on a connection that is being canceled", id);
+			break;
+
+		case State::Disconnected:
+			log_net.warn("MTCP-{} Requested send on a connection that has been disconnected", id);
+			break;
+		}
 	}
 
-	case State::Completing:
-		log_net.error("MTCP-{} Requested send on a connection that is being completed", id);
-		break;
-
-	case State::Canceling:
-		log_net.error("MTCP-{} Requested send on a connection that is being canceled", id);
-		break;
-
-	case State::Disconnected:
-		log_net.warn("MTCP-{} Requested send on a connection that has been disconnected", id);
-		break;
-	}
+	// < temp_message destructor call (if it was not moved into the write queue)
+	//		no mutex held
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -468,6 +457,8 @@ inline bool ImplBaseConnectionAsyncHE::_has_write_work() const noexcept {
 // -------------------------------------------------------------------------------------------------
 
 inline void ImplBaseConnectionAsyncHE::_outcome_connect(std::unique_lock<Mutex>& lock, SelfPtr&& self_sp, const std::error_code ec) noexcept {
+	decltype(write_messages) death_row_write_messages; // Death row is used to ensure that message's message_view_proxy's callbacks are called without the connection mutex held
+
 	if (ec) {
 		state = State::Canceling;
 		// stream->cancel(); // NOTE: No need to cancel as there cannot be outstanding operation
@@ -507,6 +498,7 @@ inline void ImplBaseConnectionAsyncHE::_outcome_connect(std::unique_lock<Mutex>&
 	case State::Canceling:
 		// Cancel reads and writes
 		queue_read = false;
+		death_row_write_messages = std::move(write_messages);
 		write_messages.clear();
 		break;
 
@@ -534,11 +526,15 @@ inline void ImplBaseConnectionAsyncHE::_outcome_connect(std::unique_lock<Mutex>&
 	if (ec && !first_error)
 		first_error = ec;
 
-	lock.unlock();
+	lock.unlock(); // UNLOCK!
+
 	if (ec)
 		handler->on_connect_error(ec);
 	else
 		handler->on_connect();
+
+	// < death_row_write_messages destructor call (if it was not moved into the write queue)
+	//		strand mutex held, connection mutex released
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_connect(SelfPtr&& self_sp, const std::error_code ec) noexcept {
@@ -572,12 +568,13 @@ inline void ImplBaseConnectionAsyncHE::outcome_disconnect(SelfPtr&& self_sp) noe
 		const auto stack_first_error = first_error;
 		// Move handler to stack to commit suicide
 		auto temp_handler = std::move(handler);
-		lock.unlock();
+		lock.unlock(); // UNLOCK!
 		if (stack_on_connect_was_called_with_success)
 			temp_handler->on_disconnect(stack_first_error);
 		slock.unlock();
+
 	} else {
-		lock.unlock();
+		lock.unlock(); // UNLOCK!
 		if (on_connect_was_called_with_success)
 			handler->on_disconnect(first_error);
 	}
@@ -591,7 +588,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 
 	--on_flight_operation_num;
 
-	auto temp_message_body = std::move(read_message_body);
+	auto temp_message = message{std::move(read_message_body)};
 
 	if (ec) {
 		state = State::Canceling;
@@ -620,22 +617,26 @@ inline void ImplBaseConnectionAsyncHE::outcome_receive(SelfPtr&& self_sp, const 
 	if (ec && !eof_error_in_head && !first_error)
 		first_error = ec;
 
-	lock.unlock();
+	lock.unlock(); // UNLOCK!
+
 	if (!eof_error_in_head) {
 		if (ec)
-			handler->on_receive_error(ec, message_body_view{temp_message_body});
+			handler->on_receive_error(ec, std::move(temp_message));
 		else
-			handler->on_receive(message_body_view{temp_message_body});
+			handler->on_receive(std::move(temp_message));
 	}
 }
 
 inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std::error_code ec) noexcept {
 	auto slock = std::unique_lock(strand);
+
+	decltype(write_messages) death_row_write_messages; // Death row is used to ensure that message's message_view_proxy's callbacks are called without the connection mutex held
+
 	auto lock = std::unique_lock(mutex);
 
 	--on_flight_operation_num;
 
-	auto temp_message_body = std::move(write_messages.front().body_view);
+	auto temp_message = std::move(write_messages.front().payload);
 	write_messages.pop_front();
 
 	if (ec) {
@@ -658,6 +659,7 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 
 	case State::Canceling: [[fallthrough]];
 	case State::Disconnected:
+		death_row_write_messages = std::move(write_messages);
 		write_messages.clear();
 		if (_no_on_flight_operation())
 			_do_disconnect(std::move(self_sp));
@@ -667,11 +669,15 @@ inline void ImplBaseConnectionAsyncHE::outcome_send(SelfPtr&& self_sp, const std
 	if (ec && !first_error)
 		first_error = ec;
 
-	lock.unlock();
+	lock.unlock(); // UNLOCK!
+
 	if (ec)
-		handler->on_send_error(ec, std::move(temp_message_body));
+		handler->on_send_error(ec, std::move(temp_message));
 	else
-		handler->on_send(std::move(temp_message_body));
+		handler->on_send(std::move(temp_message));
+
+	// < death_row_write_messages destructor call (if it was not moved into the write queue)
+	//		strand mutex held, connection mutex released
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -801,7 +807,7 @@ inline void ImplBaseConnectionAsyncHE::_do_write(SelfPtr&& self_sp) noexcept {
 	++on_flight_operation_num;
 
 	const auto& front_message = write_messages.front();
-	const auto& front_message_body = front_message.body_view;
+	const auto& front_message_body = front_message.payload.as_bin();
 	write_next_header = front_message.header;
 
 	assert(write_next_header.size() <= MTCP_MESSAGE_MAX_SIZE);
@@ -900,34 +906,20 @@ void BaseConnectionAsyncHE::resume_receive_async() noexcept {
 	internals->resume_receive_async();
 }
 
-void BaseConnectionAsyncHE::send_async(message_body_bin message) noexcept {
-	internals->send_async(std::move(message));
-}
-void BaseConnectionAsyncHE::send_async(message_body_bin_view message_view) noexcept {
-	std::vector<std::byte> message;
-
-	message.resize(message_view.size());
-	std::memcpy(message.data(), message_view.data(), message_view.size());
-
-	internals->send_async(std::move(message));
-}
-void BaseConnectionAsyncHE::send_async(message_body_str message) noexcept {
-	internals->send_async(std::move(message));
-}
-void BaseConnectionAsyncHE::send_async(message_body_str_view message_str_view) noexcept {
-	std::vector<std::byte> message;
-
-	message.resize(message_str_view.size());
-	std::memcpy(message.data(), message_str_view.data(), message_str_view.size());
-
+void BaseConnectionAsyncHE::send_async(std::vector<std::byte> message) noexcept {
 	internals->send_async(std::move(message));
 }
 
-void BaseConnectionAsyncHE::send_view_async(message_body_bin_view message) noexcept {
-	internals->send_async(std::move(message));
+void BaseConnectionAsyncHE::send_copy_async(std::span<const std::byte> view) noexcept {
+	send_async(std::vector<std::byte>{view.begin(), view.end()});
 }
-void BaseConnectionAsyncHE::send_view_async(message_body_str_view message_str) noexcept {
-	internals->send_async(std::as_bytes(std::span(message_str)));
+
+void BaseConnectionAsyncHE::send_copy_async(std::string_view message) noexcept {
+	send_copy_async(std::as_bytes(std::span(message)));
+}
+
+void BaseConnectionAsyncHE::send_view_async(message_view_proxy& view) noexcept {
+	internals->send_async(libv::make_observer_ptr(&view));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -940,12 +932,12 @@ void BaseConnectionHandler::on_connect_error(error_code ec) {
 	(void) ec;
 }
 
-void BaseConnectionHandler::on_receive_error(error_code ec, message_view m) {
+void BaseConnectionHandler::on_receive_error(error_code ec, message&& m) {
 	(void) ec;
 	(void) m;
 }
 
-void BaseConnectionHandler::on_send_error(error_code ec, message_view m) {
+void BaseConnectionHandler::on_send_error(error_code ec, message&& m) {
 	(void) ec;
 	(void) m;
 }
