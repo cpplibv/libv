@@ -21,7 +21,6 @@
 #include <space/log.hpp>
 
 
-
 namespace space {
 
 // -------------------------------------------------------------------------------------------------
@@ -477,7 +476,7 @@ void RendererDebug::build_triangles_mesh(libv::glr::Mesh& mesh) {
 		const auto rotation_mat = dot_prod < 0.9999f ?
 				libv::mat4f::identity().rotate(std::acos(dot_prod), cross(disc.normal, up)) :
 				libv::mat4f::identity();
-		for (int i = 0 ; i <= count ; ++i) {
+		for (int i = 0; i <= count; ++i) {
 			float a = libv::tau / count * static_cast<float>(i);
 			const auto x = disc.radius * std::cos(a);
 			const auto y = disc.radius * std::sin(a);
@@ -645,7 +644,7 @@ void RendererEditorGrid::render(libv::glr::Queue& glr, libv::glr::UniformBuffer&
 // -------------------------------------------------------------------------------------------------
 
 RendererFleet::RendererFleet(RendererResourceContext& rctx) :
-		// <<< P2: Model loader
+// <<< P2: Model loader
 		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/fighter_01_eltanin.0006_med.fixed.game.vm4"))),
 //		model(libv::vm4::load_or_throw(libv::read_file_or_throw("../../res/model/tank_01_rocket_ring.0031_med.game.vm4"))),
 //		model(rctx.model_loader, "fighter_01_eltanin.0006_med.fixed.game.vm4"),
@@ -714,13 +713,13 @@ RendererText::RendererText(RendererResourceContext& rctx) :
 }
 
 void RendererText::add_text(
-			libv::vec3f position,
-			libv::vec2f screenOffset,
-			std::string str,
-			libv::vec4f color,
-			libv::ui::FontSize fontSize,
-			libv::ui::AlignHorizontal alignH,
-			libv::ui::AlignVertical alignV) {
+		libv::vec3f position,
+		libv::vec2f screenOffset,
+		std::string str,
+		libv::vec4f color,
+		libv::ui::FontSize fontSize,
+		libv::ui::AlignHorizontal alignH,
+		libv::ui::AlignVertical alignV) {
 
 	texts.emplace_back(
 			position,
@@ -800,12 +799,12 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 
 			const auto alignment_offset =
 					entry.screenOffset +
-					content_size *
-					libv::vec2f(
-						-info(entry.layout.align_vertical()).rate(),
-						-info(entry.layout.align_horizontal()).rate());
+							content_size *
+									libv::vec2f(
+											-info(entry.layout.align_vertical()).rate(),
+											-info(entry.layout.align_horizontal()).rate());
 
-			const auto [position2DAnchor, onScreen] = screen_picker.to_screen_ahead(entry.position);
+			const auto[position2DAnchor, onScreen] = screen_picker.to_screen_ahead(entry.position);
 			if (!onScreen)
 				continue;
 
@@ -842,6 +841,62 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 	glr.uniform(std::move(uniforms));
 	glr.render(mesh);
 }
+
+// -------------------------------------------------------------------------------------------------
+
+RendererSurface::RendererSurface(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
+}
+
+void RendererSurface::build_mesh(libv::glr::Mesh& mesh, Surface& surface) {
+	mesh.clear();
+	auto position = mesh.attribute(attribute_position);
+	auto color0 = mesh.attribute(attribute_color0);
+	auto index = mesh.index();
+	libv::glr::VertexIndex vi = 0;
+
+	for (unsigned int i = 0; i < 100; i++) {
+		for (unsigned int j = 0; j < 100; ++j) {
+			position(surface.points[i][j].point);
+			color0(surface.points[i][j].color);
+		}
+	}
+
+	for (int i = 0; i < 99; ++i) {
+		index(vi);
+		for (int j = 0; j < 100; ++j) {
+			index(vi);
+			index(vi + 100);
+			std::cout << "vi:       " << vi << std::endl;
+			std::cout << "vi + 100: " << vi + 100 << std::endl;
+			vi += 1;
+		}
+		index(vi + 100 - 1);
+		//index(vi - 1);
+		std::cout << "vi - 1:   " << vi - 1 << std::endl;
+		std::cout << "vi:       " << vi << std::endl;
+//		std::cout << "vi + 100: " << vi + 100 << std::endl;
+		std::cout << std::endl;
+	}
+
+}
+
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Surface& surface) {
+	build_mesh(mesh, surface);
+
+	glr.program(shader.program());
+
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh);
+	}
+}
+
 
 // -------------------------------------------------------------------------------------------------
 

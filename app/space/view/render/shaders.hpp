@@ -166,6 +166,18 @@ struct UniformsPlanet {
 	}
 };
 
+struct UniformsSurface {
+	libv::glr::Uniform_vec4f base_color;
+
+	template <typename Access> void access_uniforms(Access& access) {
+		access(base_color, "base_color");
+	}
+
+	template <typename Access> void access_blocks(Access& access) {
+		access(uniformBlock_matrices);
+	}
+};
+
 struct UniformsTestMode {
 	libv::glr::Uniform_int32 test_mode;
 
@@ -287,6 +299,7 @@ using ShaderCommandArrow = libv::rev::Shader<UniformsCommandArrow>;
 using ShaderEditorBackground = libv::rev::Shader<UniformsEditorBackground>;
 using ShaderFleet = libv::rev::Shader<UniformsFleet>;
 using ShaderPlanet = libv::rev::Shader<UniformsPlanet>;
+using ShaderSurface = libv::rev::Shader<UniformsSurface>;
 using ShaderTestMode = libv::rev::Shader<UniformsTestMode>;
 using ShaderText = libv::rev::Shader<UniformsText>;
 //using ShaderModel = libv::rev::Shader<UniformsModel>;

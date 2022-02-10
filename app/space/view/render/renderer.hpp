@@ -25,6 +25,8 @@
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>
 
+#include <space/sim/gen/surface.hpp>
+
 
 // =================================================================================================
 
@@ -198,6 +200,20 @@ public:
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream);
 };
 
+struct RendererSurface {
+	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
+	ShaderSurface shader;
+
+private:
+	void build_mesh(libv::glr::Mesh& mesh, Surface& surface);
+
+public:
+	explicit RendererSurface(RendererResourceContext& rctx);
+
+//	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Surface& surface);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Surface& surface);
+};
+
 struct RendererGizmo {
 	libv::glr::Mesh mesh{libv::gl::Primitive::Lines, libv::gl::BufferUsage::StaticDraw};
 	ShaderTestMode shader;
@@ -293,6 +309,7 @@ struct Renderer {
 	RendererCommandArrow arrow{resource_context};
 	RendererFleet fleet{resource_context};
 	RendererPlanet planet{resource_context};
+	RendererSurface surface{resource_context};
 	RendererText text{resource_context};
 
 public:

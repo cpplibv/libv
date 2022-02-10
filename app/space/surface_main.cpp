@@ -28,9 +28,14 @@
 #include <space/view/camera_control.hpp>
 #include <libv/ctrl/feature_register.hpp>
 #include <libv/math/noise/perlin.hpp>
+#include <libv/color/space.hpp>
+#include <space/sim/gen/surface.hpp>
+
+
 
 
 namespace space {
+
 
 class SurfaceCanvas : public libv::ui::CanvasBase {
 public:
@@ -76,13 +81,14 @@ private:
 		glr.state.blendSrc_SourceAlpha();
 		glr.state.blendDst_One_Minus_SourceAlpha();
 
+		//glr.state.enableCullFace();
+		glr.state.disableCullFace();
 		glr.state.cullBackFace();
-		glr.state.enableCullFace();
 		glr.state.frontFaceCCW();
 
 		glr.state.clipPlanes(0);
 		glr.state.polygonModeFill();
-//		glr.state.polygonModeLine();
+		//glr.state.polygonModeLine();
 
 		glr.projection = camera.projection(canvas_size);
 		glr.view = camera.view();
@@ -93,13 +99,16 @@ private:
 		// Set framebuffer to the post-processing target
 		//glr.framebuffer_draw(renderTarget.framebuffer());
 
-		glr.setClearColor(1,1,1,1);
+		glr.setClearColor(0, 0, 0, 1);
 		glr.clearColor();
 		glr.clearDepth();
+		Surface surface;
+
+//		renderer.debug.points.clear();
 
 		{
 			const auto s2_guard = glr.state.push_guard();
-			glr.state.disableDepthMask();
+//			glr.state.disableDepthMask();
 //			float noise_values[100][100];
 			auto count = 100;
 			for (int i = 0; i < count; ++i) {
@@ -108,10 +117,13 @@ private:
 					auto j_f = static_cast<float>(j) / static_cast<float>(count);
 					auto noise_value = libv::noise_perlin(libv::vec2f(static_cast<float>(i) / 10.f, static_cast<float>(j) / 10.f));
 
-					renderer.debug.points.emplace_back(
-							libv::vec3f{i_f, j_f, noise_value*0.1f},
-							libv::vec4f{0, 0, 0, 1}
-					);
+					const auto color = libv::vec4f{libv::color::hue_to_rgb(1.f / 3.f * (noise_value * 0.5f + 0.5f)), 1.f};
+//							libv::vec4f{1, 1, 1, 1}
+//					renderer.debug.points.emplace_back(
+//							libv::vec3f{i_f, j_f, noise_value*0.1f},
+//							color
+//					);
+					surface.points[i][j] = SurfacePoint{libv::vec3f{i_f, j_f, noise_value * 0.1f}, color};
 				}
 			}
 
@@ -124,7 +136,7 @@ private:
 //					libv::vec4f{0.2f, 0.3f, 0.9f, noise_values}
 //			);
 
-			renderer.debug.render(glr, renderer.resource_context.uniform_stream);
+			renderer.surface.render(glr, renderer.resource_context.uniform_stream, surface);
 		}
 
 	}
