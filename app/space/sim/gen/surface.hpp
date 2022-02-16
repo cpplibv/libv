@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <libv/math/vec.hpp>
+#include <libv/container/vector_2d.hpp>
 
 // std
 #include <array>
@@ -27,11 +28,17 @@ public:
 
 class Surface {
 public:
-	std::array<std::array<SurfacePoint, 100>, 100> points;
+	int size;
+	std::vector<std::vector<SurfacePoint>> points;
+//	libv::vector_2D<SurfacePoint> points{256, 256};
 //	libv::vec4f color;
 
 };
 
+class SurfaceGen{
+public:
+//	gimme_surface();
+};
 
 
 //class LandStrip{

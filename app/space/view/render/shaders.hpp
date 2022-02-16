@@ -167,9 +167,12 @@ struct UniformsPlanet {
 };
 
 struct UniformsSurface {
+	libv::glr::Uniform_texture texture_noise;
 	libv::glr::Uniform_vec4f base_color;
+	//libv::glr::Uniform_vec2f render_resolution;
 
 	template <typename Access> void access_uniforms(Access& access) {
+		access(texture_noise, "texture_noise", textureChannel_diffuse);
 		access(base_color, "base_color");
 	}
 

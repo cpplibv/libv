@@ -1,5 +1,18 @@
-next step: mesh triangle strips, shader a depth miatt (flat)
+DONE: next step: mesh triangle strips, shader a depth miatt (flat)
 submesh update
+hotkey for switching between wire and fill
+only build mesh when change
+hook shader error overlay
+DONE: bug image size (heightMap.storage meret allitas is kell)
+seed csere, time-mal menni z koordinatan
+
+template -> hpp, ne inline es kicsi simd vec4f x, vec4f y, int seed
+
+60ms -> 16ms ( multithreading, better containers) <- after composition
+multithreading:  ui must remain responsive (one dedicated thread)
+
+
+
 
 
 1. world, camera, rendering
@@ -7,6 +20,27 @@ noise generator math/noise
 	cellular
 		worley, voronai
 	fractal
+		pingpong, ridged, FBM?
+		octave:
+			how many layer of noise
+			1-15
+			def: 10
+		amplitude:
+			how extreme should the elevation be?
+			0.1-50
+			def: 1
+		frequency(float):
+			how much detail per unit of space
+			0.01 - 15
+			default: 1.5f
+		lacunarity(float):
+			how quickly should freq. grow per octave
+			1-10
+			2.0 is common
+		persistence/gain:
+			How quickly should amplitude shrink per octave
+			min: 0.1 - 1.0
+			0.5 or 1/lacunarity
 	perlin
 	perlin_simplex
 	value
@@ -39,3 +73,29 @@ SurfaceViewer
 		camera
 		controls
 
+
+FastNoiseLite(int seed = 1337)
+{
+	mSeed = seed;
+	mFrequency = 0.01f;
+	mNoiseType = NoiseType_OpenSimplex2;
+	mRotationType3D = RotationType3D_None;
+	mTransformType3D = TransformType3D_DefaultOpenSimplex2;
+
+	mFractalType = FractalType_None;
+	mOctaves = 3;
+	mLacunarity = 2.0f;
+	mGain = 0.5f;
+	mWeightedStrength = 0.0f;
+	mPingPongStength = 2.0f;
+
+	mFractalBounding = 1 / 1.75f;
+
+	mCellularDistanceFunction = CellularDistanceFunction_EuclideanSq;
+	mCellularReturnType = CellularReturnType_Distance;
+	mCellularJitterModifier = 1.0f;
+
+	mDomainWarpType = DomainWarpType_OpenSimplex2;
+	mWarpTransformType3D = TransformType3D_DefaultOpenSimplex2;
+	mDomainWarpAmp = 1.0f;
+}

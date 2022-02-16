@@ -97,9 +97,9 @@ float noise_perlin(libv::vec2f coord) {
 	return glm::perlin(glm::vec2{coord.x, coord.y});
 }
 
-float noise_simplex(libv::vec2f coord) {
-	return glm::simplex(glm::vec2{coord.x, coord.y});
-}
+//float noise_simplex(libv::vec2f coord) {
+//	return glm::simplex(glm::vec2{coord.x, coord.y});
+//}
 
 //float noise_fractal_simplex(libv::vec2f coord,)
 

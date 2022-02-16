@@ -7,6 +7,7 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+/// clamped hermite interpolation between edge0 and edge1
 template <typename T>
 [[nodiscard]] constexpr inline T smoothstep(T value, T edge0, T edge1) noexcept {
 	const auto x = (value - edge0) / (edge1 - edge0);

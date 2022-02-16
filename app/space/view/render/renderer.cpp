@@ -845,8 +845,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 // -------------------------------------------------------------------------------------------------
 
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
-		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs") {
-}
+		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs"){}
 
 void RendererSurface::build_mesh(libv::glr::Mesh& mesh, Surface& surface) {
 	mesh.clear();
@@ -854,37 +853,85 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, Surface& surface) {
 	auto color0 = mesh.attribute(attribute_color0);
 	auto index = mesh.index();
 	libv::glr::VertexIndex vi = 0;
+	const auto rowSize = surface.points.size();
 
-	for (unsigned int i = 0; i < 100; i++) {
-		for (unsigned int j = 0; j < 100; ++j) {
+	for (unsigned int i = 0; i < rowSize; i++) {
+		const auto colSize = surface.points[i].size();
+		for (unsigned int j = 0; j < colSize; ++j) {
 			position(surface.points[i][j].point);
 			color0(surface.points[i][j].color);
 		}
 	}
 
-	for (int i = 0; i < 99; ++i) {
+	for (int i = 0; i < rowSize - 1; ++i) {
 		index(vi);
-		for (int j = 0; j < 100; ++j) {
+		const auto colSize = surface.points[i].size();
+		for (int j = 0; j < colSize; ++j) {
 			index(vi);
-			index(vi + 100);
-			std::cout << "vi:       " << vi << std::endl;
-			std::cout << "vi + 100: " << vi + 100 << std::endl;
+			index(vi + colSize);
 			vi += 1;
 		}
-		index(vi + 100 - 1);
+		index(vi + colSize - 1);
 		//index(vi - 1);
-		std::cout << "vi - 1:   " << vi - 1 << std::endl;
-		std::cout << "vi:       " << vi << std::endl;
-//		std::cout << "vi + 100: " << vi + 100 << std::endl;
-		std::cout << std::endl;
 	}
 
 }
 
 void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Surface& surface) {
+//void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
 	build_mesh(mesh, surface);
 
 	glr.program(shader.program());
+	{
+		auto uniforms = uniform_stream.block_unique(layout_matrices);
+		uniforms[layout_matrices.matMVP] = glr.mvp();
+		uniforms[layout_matrices.matM] = glr.model;
+		uniforms[layout_matrices.matP] = glr.projection;
+		uniforms[layout_matrices.eye] = glr.eye();
+		glr.uniform(std::move(uniforms));
+		glr.render(mesh);
+	}
+}
+
+// -------------------------------------------------------------------------------------------------
+
+
+RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
+		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
+
+
+	build_mesh(mesh);
+}
+
+
+void RendererSurfaceTexture::build_mesh(libv::glr::Mesh& mesh) {
+	auto position = mesh.attribute(attribute_position);
+	auto texture0 = mesh.attribute(attribute_texture0);
+	auto index = mesh.index();
+
+	position(-1, -1, 0);
+	texture0(0, 0);
+
+	position(1, -1, 0);
+	texture0(1, 0);
+
+	position(1, 1, 0);
+	texture0(1, 1);
+
+	position(-1, 1, 0);
+	texture0(0, 1);
+
+	index.quad(0, 1, 2, 3);
+}
+
+void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
+
+	glr.program(shader.program());
+	glr.texture(texture, textureChannel_diffuse);
+
+	texture.set(libv::gl::MagFilter::Nearest);
+	texture.set(libv::gl::MinFilter::Nearest);
+	texture.set(libv::gl::Wrap::ClampToEdge, libv::gl::Wrap::ClampToEdge);
 
 	{
 		auto uniforms = uniform_stream.block_unique(layout_matrices);

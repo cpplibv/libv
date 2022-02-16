@@ -15,7 +15,8 @@ namespace libv {
 
 std::vector<double> noise_texture_perlin2D(uint64_t seed, uint32_t X, uint32_t Y);
 float noise_perlin(libv::vec2f coord);
-float noise_simplex(libv::vec2f coord);
+//float noise_simplex(libv::vec2f coord);
+//float noise_value(libv::vec2f coord);
 
 // -------------------------------------------------------------------------------------------------
 
