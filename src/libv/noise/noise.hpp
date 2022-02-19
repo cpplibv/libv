@@ -72,14 +72,19 @@ template <typename T>
 	 * x += s; y += s;
 	*/
 
-	int i = static_cast<int>(std::floor(x));
-	int j = static_cast<int>(std::floor(y));
-	float xi = static_cast<float> (x - i);
-	float yi = static_cast<float> (y - j);
+	//x = x-y;
+	x = x+y*0.5f;//!!!
+//	y = y + x*0.5f;
+	//y = y+x;
+
+	int i = FastFloor(x);
+	int j = FastFloor(y);
+	float xi = (float)(x - i);
+	float yi = (float)(y - j);
 
 	float t = (xi + yi) * G2;
-	float x0 = static_cast<float> (xi - t);
-	float y0 = static_cast<float> (yi - t);
+	float x0 = (float)(xi - t);
+	float y0 = (float)(yi - t);
 
 	i *= PrimeX;
 	j *= PrimeY;
@@ -92,25 +97,26 @@ template <typename T>
 		n0 = (a * a) * (a * a) * gradCoord(seed, i, j, x0, y0);
 	}
 
-	float c = static_cast<float> (2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + (static_cast<float> (-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
+	float c = (float)(2 * (1 - 2 * G2) * (1 / G2 - 2)) * t + ((float)(-2 * (1 - 2 * G2) * (1 - 2 * G2)) + a);
 	if (c <= 0) n2 = 0;
 	else {
-		float x2 = x0 + (2 * static_cast<float> (G2) - 1);
-		float y2 = y0 + (2 * static_cast<float> (G2) - 1);
+		float x2 = x0 + (2 * (float)G2 - 1);
+		float y2 = y0 + (2 * (float)G2 - 1);
 		n2 = (c * c) * (c * c) * gradCoord(seed, i + PrimeX, j + PrimeY, x2, y2);
 	}
 
 	if (y0 > x0) {
-		float x1 = x0 + static_cast<float> (G2);
-		float y1 = y0 + (static_cast<float> (G2) - 1);
+		float x1 = x0 + (float)G2;
+		float y1 = y0 + ((float)G2 - 1);
 		float b = 0.5f - x1 * x1 - y1 * y1;
 		if (b <= 0) n1 = 0;
 		else {
 			n1 = (b * b) * (b * b) * gradCoord(seed, i, j + PrimeY, x1, y1);
 		}
-	} else {
-		float x1 = x0 + (static_cast<float> (G2) - 1);
-		float y1 = y0 + static_cast<float> (G2);
+	}
+	else {
+		float x1 = x0 + ((float)G2 - 1);
+		float y1 = y0 + (float)G2;
 		float b = 0.5f - x1 * x1 - y1 * y1;
 		if (b <= 0) n1 = 0;
 		else {
@@ -121,12 +127,57 @@ template <typename T>
 	return (n0 + n1 + n2) * 99.83685446303647f;
 }
 
+//template <typename T>
+//[[nodiscard]] float noise_simplex2(int seed, T x, T y) noexcept {
+//	const float SQRT3 = 1.7320508075688772935274463415059f;
+//	const float F2 = 0.5f * (SQRT3 - 1.0f);
+//	const float G2 = (3.0f - SQRT3) / 6.0f;
+//
+//	float f = float( F2 ) * (x + y);
+//	float x0 = FS_Floor_f32( x + f );
+//	float y0 = FS_Floor_f32( y + f );
+//
+//	int i = FS_Convertf32_i32( x0 ) * int( FnPrimes::X );
+//	int j = FS_Convertf32_i32( y0 ) * int( FnPrimes::Y );
+//
+//	float g = float( G2 ) * (x0 + y0);
+//	x0 = x - (x0 - g);
+//	y0 = y - (y0 - g);
+//
+//	mask32v i1 = x0 > y0;
+//	//mask32v j1 = ~i1; //NMasked funcs
+//
+//	float x1 = FS_MaskedSub_f32( x0, float( 1.f ), i1 ) + float( G2 );
+//	float y1 = FS_NMaskedSub_f32( y0, float( 1.f ), i1 ) + float( G2 );
+//
+//	float x2 = x0 + float( G2 * 2 - 1 );
+//	float y2 = y0 + float( G2 * 2 - 1 );
+//
+//	float t0 = FS_FNMulAdd_f32( x0, x0, FS_FNMulAdd_f32( y0, y0, float( 0.5f ) ) );
+//	float t1 = FS_FNMulAdd_f32( x1, x1, FS_FNMulAdd_f32( y1, y1, float( 0.5f ) ) );
+//	float t2 = FS_FNMulAdd_f32( x2, x2, FS_FNMulAdd_f32( y2, y2, float( 0.5f ) ) );
+//
+//	t0 = FS_Max_f32( t0, float( 0 ) );
+//	t1 = FS_Max_f32( t1, float( 0 ) );
+//	t2 = FS_Max_f32( t2, float( 0 ) );
+//
+//	t0 *= t0; t0 *= t0;
+//	t1 *= t1; t1 *= t1;
+//	t2 *= t2; t2 *= t2;
+//
+//	float n0 = FnUtils::GetGradientDot( FnUtils::HashPrimes( seed, i, j ), x0, y0 );
+//	float n1 = FnUtils::GetGradientDot( FnUtils::HashPrimes( seed, FS_MaskedAdd_i32( i, int( FnPrimes::X ), i1 ), FS_NMaskedAdd_i32( j, int( FnPrimes::Y ), i1 ) ), x1, y1 );
+//	float n2 = FnUtils::GetGradientDot( FnUtils::HashPrimes( seed, i + int( FnPrimes::X ), j + int( FnPrimes::Y ) ), x2, y2 );
+//
+//	return float( 38.283687591552734375f ) * FS_FMulAdd_f32( n0, t0, FS_FMulAdd_f32( n1, t1, n2 * t2 ) );
+//}
+
 template <typename T>
 float noise_simplex2S(int seed, T x, T y) {
 	// 2D OpenSimplex2S case is a modified 2D simplex noise.
 
 	const T SQRT3 = (T) 1.7320508075688772935274463415059;
-	const T G2 = (3 - SQRT3) / 6;
+	const T G2 = (T{3} - SQRT3) / T{6};
 
 	/*
 	 * --- Skew moved to TransformNoiseCoordinate method ---

@@ -9,6 +9,9 @@ namespace libv {
 
 // -------------------------------------------------------------------------------------------------
 
+template <typename T>
+static int FastFloor(T f) { return f >= 0 ? static_cast<int> (f) : static_cast<int> (f) - 1; }
+
 
 template <typename T>
 struct Lookup

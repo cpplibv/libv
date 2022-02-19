@@ -847,7 +847,7 @@ void RendererText::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& unifo
 RendererSurface::RendererSurface(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "flat_color.vs", "flat_color.fs"){}
 
-void RendererSurface::build_mesh(libv::glr::Mesh& mesh, Surface& surface) {
+void RendererSurface::build_mesh(libv::glr::Mesh& mesh, surface::Surface& surface) {
 	mesh.clear();
 	auto position = mesh.attribute(attribute_position);
 	auto color0 = mesh.attribute(attribute_color0);
@@ -877,9 +877,9 @@ void RendererSurface::build_mesh(libv::glr::Mesh& mesh, Surface& surface) {
 
 }
 
-void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Surface& surface) {
+void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, surface::Surface& surface) {
 //void RendererSurfaceTexture::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture) {
-	build_mesh(mesh, surface);
+	//build_mesh(mesh, surface);
 
 	glr.program(shader.program());
 	{
@@ -898,8 +898,6 @@ void RendererSurface::render(libv::glr::Queue& glr, libv::glr::UniformBuffer& un
 
 RendererSurfaceTexture::RendererSurfaceTexture(RendererResourceContext& rctx) :
 		shader(rctx.shader_loader, "surface_texture.vs", "surface_texture.fs") {
-
-
 	build_mesh(mesh);
 }
 

@@ -1000,7 +1000,7 @@ wish_create_executable(
 	SOURCE app/space/network/*.cpp
 	SOURCE app/space/sim/*.cpp
 	SOURCE app/space/view/*.cpp
-	SOURCE app/space/surface_main.cpp
+	SOURCE app/space/surface/*.cpp
 #	LINK   ext_fmt ext_clip ext_range
 	LINK   libv_log libv_lua libv_frame libv_ctrl libv_rev libv_glr libv_ui libv_net libv_serial libv_color
 	LINK   libv_vm4

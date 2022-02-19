@@ -25,7 +25,7 @@
 #include <space/view/render/model.hpp>
 #include <space/view/render/shaders.hpp>
 
-#include <space/sim/gen/surface.hpp>
+#include <space/surface/surface.hpp>
 
 
 // =================================================================================================
@@ -204,24 +204,21 @@ struct RendererSurface {
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 	ShaderSurface shader;
 
-private:
-	void build_mesh(libv::glr::Mesh& mesh, Surface& surface);
-
 public:
 	explicit RendererSurface(RendererResourceContext& rctx);
+	void build_mesh(libv::glr::Mesh& mesh, surface::Surface& surface);
 
 //	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, const Surface& surface);
-	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, Surface& surface);
+	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, surface::Surface& surface);
 };
 
 struct RendererSurfaceTexture {
 	libv::glr::Mesh mesh{libv::gl::Primitive::TriangleStrip, libv::gl::BufferUsage::StaticDraw};
 	ShaderSurface shader;
 
-private:
-	void build_mesh(libv::glr::Mesh& mesh);
 
 public:
+	void build_mesh(libv::glr::Mesh& mesh);
 	explicit RendererSurfaceTexture(RendererResourceContext& rctx);
 
 	void render(libv::glr::Queue& glr, libv::glr::UniformBuffer& uniform_stream, libv::glr::Texture texture);

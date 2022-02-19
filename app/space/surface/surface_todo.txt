@@ -10,8 +10,25 @@ template -> hpp, ne inline es kicsi simd vec4f x, vec4f y, int seed
 
 60ms -> 16ms ( multithreading, better containers) <- after composition
 multithreading:  ui must remain responsive (one dedicated thread)
+	vector - > dynArray
 
 
+chuncked lod, tile (lod0, 1, 2), , (lod1-ben benne van lod0 stb)
+ne lyukas: skirt
+pop hatas elkerules: geomorphing (x, y, z1, z2)
+texturazas
+
+terep generalason hangsuly, nem a rendelesen
+erozio algoritmusok (vizcseppes!) 10k-100k csepp
+	megy a lokalis min fele, le csokk magassag, amugy no
+deformalni a terepet (noise + gorbe) z ^ 3 pl vagy maszk (viz tavolsaga adott ponttol), fennsik
+
+ perlin buckakat csinal, white noise felismerhetetlen
+ nem lehet megmondani -> hasznaljuk a gyorsat
+
+ to, folyo, nagy hegy <- felskiccelt - maszk -> generalas
+ vizszint megadasa (0- vizszint + 5)
+ folyo shader <- designer rakta le a folyot
 
 
 
