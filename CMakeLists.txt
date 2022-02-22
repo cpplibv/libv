@@ -635,7 +635,13 @@ wish_generator(
 	TARGET  enum
 	COMMAND enum
 	OUTPUT  REPLACE ".hpp.in.lua" ".hpp"
-#	OUTPUT  REPLACE ".hpp.in.lua" ".cpp"
+)
+
+wish_generator(
+	TARGET  codegen
+	COMMAND codegen
+	OUTPUT  REPLACE ".in.lua" ".hpp"
+	OUTPUT  REPLACE ".in.lua" ".cpp"
 )
 
 #wish_generator(
@@ -854,6 +860,12 @@ wish_create_library(
 
 wish_end_group()
 wish_create_group(GROUP_APPLICATION) # APPLICATION -------------------------------------------------
+
+wish_create_executable(
+	TARGET codegen
+	SOURCE app/codegen/codegen_main.cpp
+	LINK   ext_fmt ext_range libv_lua libv_utility libv_algo
+)
 
 wish_create_executable(
 	TARGET fsw

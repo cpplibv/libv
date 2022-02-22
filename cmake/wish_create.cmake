@@ -178,9 +178,25 @@ endfunction()
 function(wish_generate out_generated_outputs)
 	cmake_parse_arguments(arg "" "" "${__wish_generators}" ${ARGN})
 
+#	# debug
+#	if(arg_DEBUG OR __wish_global_debug)
+#		message("wish_generate")
+#		message("	__wish_generators      : ${__wish_generators}")
+#		message("arg_enum     : ${arg_enum}")
+#		message("arg_codegen     : ${arg_codegen}")
+#		message("	ARGN                   : ${ARGN}")
+#	endif()
+
 	set(generated_outputs "")
 
 	foreach(generator ${__wish_generators})
+#		message("foreach generator     : ${generator}")
+#		message("foreach ${arg_${generator}}     : ${arg_${generator}}")
+##		if (NOT ${arg_${generator}})
+		if (NOT arg_${generator})
+			continue()
+		endif()
+
 		file(GLOB_RECURSE matching_files RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS ${arg_${generator}})
 
 		foreach(matching_file ${matching_files})
@@ -217,6 +233,11 @@ function(wish_generate out_generated_outputs)
 	endforeach()
 
 	set(${out_generated_outputs} ${generated_outputs} PARENT_SCOPE)
+
+#	if(arg_DEBUG OR __wish_global_debug)
+#		message("out_generated_outputs : ${out_generated_outputs}")
+#		message("generated_outputs     : ${generated_outputs}")
+#	endif()
 endfunction()
 
 # --- Executable -----------------------------------------------------------------------------------
