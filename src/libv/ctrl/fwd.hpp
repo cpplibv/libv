@@ -11,11 +11,12 @@ namespace ctrl {
 class ImplControls;
 
 class Controls;
+class BindingRegister;
+class FeatureRegister;
 
 class Binding;
 class Combination;
 class Feature;
-class FeatureRegister;
 class Input;
 class InputID;
 class Sequence;
